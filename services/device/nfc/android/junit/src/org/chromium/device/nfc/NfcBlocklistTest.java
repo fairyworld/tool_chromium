@@ -101,4 +101,20 @@ public class NfcBlocklistTest {
         assertFalse(areHistoricalBytesBlocked(new byte[] {}));
         assertFalse(areHistoricalBytesBlocked(new byte[] {0x01, 0x02, 0x03}));
     }
+
+    /**
+     * Verifies that null historical bytes are not blocked.
+     *
+     * <p>null is returned by IsoDep.getHistoricalBytes() for NFC-B tags, which are instead
+     * identified by their hi-layer response in NfcBlocklist.isTagBlocked().
+     */
+    @Test
+    @Feature({"NfcBlocklistTest"})
+    public void testNullHistoricalBytesAreNotBlocked() {
+        // Even with a server-pushed entry, null (the value every NFC-B ISO-DEP
+        // tag yields from getHistoricalBytes()) is never blocked.
+        NfcBlocklist.overrideNfcBlocklistForTests("8073c021c057597562694b6579");
+        assertFalse(areHistoricalBytesBlocked(null));
+        assertTrue(areHistoricalBytesBlocked(YUBIKEY_5_SERIES_HISTORICAL_BYTES));
+    }
 }

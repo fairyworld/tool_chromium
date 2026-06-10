@@ -130,8 +130,11 @@ public class NfcBlocklist {
 
         IsoDep iso = IsoDep.get(tag);
         if (iso != null) {
-            byte[] historicalBytes = iso.getHistoricalBytes();
-            if (areHistoricalBytesBlocked(historicalBytes)) {
+            byte[] identifierBytes = iso.getHistoricalBytes();
+            if (identifierBytes == null || identifierBytes.length == 0) {
+                identifierBytes = iso.getHiLayerResponse();
+            }
+            if (areHistoricalBytesBlocked(identifierBytes)) {
                 Log.w(TAG, "Access to NFC tag is blocked.");
                 return true;
             }
