@@ -29,9 +29,10 @@ DocumentPipHost::~DocumentPipHost() {
   ClosePipWindow();
 }
 
-void DocumentPipHost::CreatePipWidget(
+void DocumentPipHost::CreateAndShowPipWindow(
     std::unique_ptr<content::WebContents> child_web_contents,
-    blink::mojom::PictureInPictureWindowOptions pip_options) {
+    blink::mojom::PictureInPictureWindowOptions pip_options,
+    const gfx::Rect& initial_bounds) {
   // Avoid creating a second widget if one already exists.
   if (widget_) {
     return;
@@ -55,7 +56,10 @@ void DocumentPipHost::CreatePipWidget(
   params.z_order = ui::ZOrderLevel::kFloatingWindow;
   params.visible_on_all_workspaces = true;
   params.remove_standard_frame = true;
-  params.bounds = gfx::Rect(pip_options_.width, pip_options_.height);
+  // `initial_bounds` is computed for the opener's display (origin + size), so
+  // the window opens on the same monitor as the opener rather than at the
+  // primary display's origin.
+  params.bounds = initial_bounds;
 
   widget_ = std::make_unique<views::Widget>();
   widget_->Init(std::move(params));
@@ -65,6 +69,16 @@ void DocumentPipHost::CreatePipWidget(
   // close callback) cannot outlive this host.
   widget_->MakeCloseSynchronous(base::BindOnce(
       &DocumentPipHost::OnWidgetCloseRequested, base::Unretained(this)));
+
+  widget_->Show();
+}
+
+void DocumentPipHost::Close() {
+  ClosePipWindow();
+}
+
+base::WeakPtr<DocumentPipHost> DocumentPipHost::GetWeakPtr() {
+  return weak_factory_.GetWeakPtr();
 }
 
 Profile* DocumentPipHost::GetProfile() {
@@ -402,7 +416,7 @@ void DocumentPipHost::BeforeUnloadFired(content::WebContents* tab,
 
 void DocumentPipHost::ClosePipWindow() {
   // Clear the child's delegate before tearing down, since the host set itself
-  // as delegate in CreatePipWidget().
+  // as delegate in CreateAndShowPipWindow().
   content::WebContents* child = GetChildWebContents();
   if (child) {
     child->SetDelegate(nullptr);

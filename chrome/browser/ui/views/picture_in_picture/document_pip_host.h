@@ -8,6 +8,7 @@
 #include <optional>
 #include <string>
 
+#include "base/memory/weak_ptr.h"
 #include "base/timer/elapsed_timer.h"
 #include "chrome/browser/picture_in_picture/picture_in_picture_window.h"
 #include "content/public/browser/web_contents_delegate.h"
@@ -42,12 +43,27 @@ class DocumentPipHost : public content::WebContentsUserData<DocumentPipHost>,
 
   ~DocumentPipHost() override;
 
-  // Creates the PiP widget for the given child WebContents. Can be called
-  // multiple times over the host's lifetime - each call opens a new PiP window
-  // after the previous one has been closed via ClosePipWindow(). The child
-  // WebContents ownership is transferred to the widget's WebView.
-  void CreatePipWidget(std::unique_ptr<content::WebContents> child_web_contents,
-                       blink::mojom::PictureInPictureWindowOptions pip_options);
+  // Creates the PiP widget for the given child WebContents and shows it. Can be
+  // called multiple times over the host's lifetime — each call opens a new PiP
+  // window after the previous one has been closed via ClosePipWindow(). The
+  // child WebContents ownership is transferred to the widget's WebView.
+  // `initial_bounds` is the outer window bounds in screen coordinates,
+  // pre-computed for the opener's display so the window opens on the same
+  // monitor as the opener.
+  void CreateAndShowPipWindow(
+      std::unique_ptr<content::WebContents> child_web_contents,
+      blink::mojom::PictureInPictureWindowOptions pip_options,
+      const gfx::Rect& initial_bounds);
+
+  // Tears down the currently open PiP widget (and its child WebContents). The
+  // host stays attached to the opener WebContents so a later
+  // CreateAndShowPipWindow() call can open a new window. Safe to call when no
+  // widget is open.
+  void Close();
+
+  // Returns a WeakPtr to this host. The PictureInPictureWindowManager holds one
+  // so it can drive/close the standalone window without owning the host.
+  base::WeakPtr<DocumentPipHost> GetWeakPtr();
 
   // Accessors.
   Profile* GetProfile();
@@ -197,6 +213,8 @@ class DocumentPipHost : public content::WebContentsUserData<DocumentPipHost>,
   // SetForcedTucking() call.
   std::unique_ptr<PictureInPictureTucker> tucker_;
   bool is_tucking_forced_ = false;
+
+  base::WeakPtrFactory<DocumentPipHost> weak_factory_{this};
 
   WEB_CONTENTS_USER_DATA_KEY_DECL();
 };

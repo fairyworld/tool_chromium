@@ -98,6 +98,10 @@ blink::mojom::PictureInPictureWindowOptions MakeDefaultPipOptions() {
   return opts;
 }
 
+gfx::Rect MakeDefaultInitialBounds() {
+  return gfx::Rect(20, 30, 400, 300);
+}
+
 }  // namespace
 
 class DocumentPipHostTest : public ChromeViewsTestBase {
@@ -153,7 +157,8 @@ class DocumentPipHostTest : public ChromeViewsTestBase {
     auto* host = DocumentPipHost::FromWebContents(opener());
     auto child =
         content::WebContentsTester::CreateTestWebContents(&profile_, nullptr);
-    host->CreatePipWidget(std::move(child), MakeDefaultPipOptions());
+    host->CreateAndShowPipWindow(std::move(child), MakeDefaultPipOptions(),
+                                 MakeDefaultInitialBounds());
     return host;
   }
 
@@ -220,7 +225,7 @@ TEST_F(DocumentPipHostTest, OpenPipWindow_PopulatesSecurityStateWithoutCrash) {
   EXPECT_TRUE(widget->non_client_view()->frame_view());
 }
 
-// After CreatePipWidget(), the child WebContents is hosted in the
+// After CreateAndShowPipWindow(), the child WebContents is hosted in the
 // DocumentPipContentsView (a views::WebView).
 TEST_F(DocumentPipHostTest, ChildWebContentsInWebView) {
   DocumentPipHost* host = CreateHostAndOpenPipWindow();
@@ -289,7 +294,8 @@ TEST_F(DocumentPipHostTest, OpenerDestroyed_HostClosedCleanly) {
   opener_web_contents_.reset();
 }
 
-// After the PiP window is closed, CreatePipWidget() can be called again with a
+// After the PiP window is closed, CreateAndShowPipWindow() can be called again
+// with a
 // new child WebContents to re-open the PiP window.
 TEST_F(DocumentPipHostTest, ReopenAfterClose) {
   DocumentPipHost* host = CreateHostAndOpenPipWindow();
@@ -303,7 +309,8 @@ TEST_F(DocumentPipHostTest, ReopenAfterClose) {
   // Re-open with a new child WebContents.
   auto new_child =
       content::WebContentsTester::CreateTestWebContents(&profile_, nullptr);
-  host->CreatePipWidget(std::move(new_child), MakeDefaultPipOptions());
+  host->CreateAndShowPipWindow(std::move(new_child), MakeDefaultPipOptions(),
+                               MakeDefaultInitialBounds());
 
   EXPECT_TRUE(host->GetWidget());
   EXPECT_TRUE(host->GetChildWebContents());

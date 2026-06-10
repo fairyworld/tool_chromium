@@ -54,6 +54,10 @@ blink::mojom::PictureInPictureWindowOptions MakePipOptions(
   return opts;
 }
 
+gfx::Rect MakeDefaultInitialBounds() {
+  return gfx::Rect(20, 30, 400, 300);
+}
+
 }  // namespace
 
 class DocumentPipFrameViewTest : public ChromeViewsTestBase {
@@ -107,8 +111,9 @@ class DocumentPipFrameViewTest : public ChromeViewsTestBase {
     auto* host = DocumentPipHost::FromWebContents(opener());
     auto child =
         content::WebContentsTester::CreateTestWebContents(&profile_, nullptr);
-    host->CreatePipWidget(std::move(child),
-                          MakePipOptions(disallow_return_to_opener));
+    host->CreateAndShowPipWindow(std::move(child),
+                                 MakePipOptions(disallow_return_to_opener),
+                                 MakeDefaultInitialBounds());
 
     views::Widget* widget = host->GetWidget();
     EXPECT_TRUE(widget);
@@ -443,7 +448,10 @@ TEST_F(DocumentPipFrameViewTest, MouseInsideKeepsRenderActive) {
 
   // OnMouseEnteredOrExitedWindow reads Widget::IsActive() directly, so the
   // following expectation only holds if the widget really is inactive at the
-  // OS level (not just that the observer was notified above).
+  // OS level (not just that the observer was notified above). The widget is
+  // shown (and thus activated) when it is created; hiding it deactivates it
+  // (NativeWidgetMac::Deactivate() is a no-op, so Hide() is used here).
+  frame_view->GetWidget()->Hide();
   ASSERT_FALSE(frame_view->GetWidget()->IsActive());
   OnMouseEnteredOrExitedWindow(frame_view, /*entered=*/false);
   EXPECT_FALSE(GetRenderActive(frame_view));
