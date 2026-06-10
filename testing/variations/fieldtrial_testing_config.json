@@ -19628,21 +19628,6 @@
             ]
         }
     ],
-    "Prerender2MemoryControlsWebView": [
-        {
-            "platforms": [
-                "android_webview"
-            ],
-            "experiments": [
-                {
-                    "name": "Treatment_Disabled",
-                    "disable_features": [
-                        "Prerender2MemoryControls"
-                    ]
-                }
-            ]
-        }
-    ],
     "Prerender2WarmUpCompositorForBookmarkBar": [
         {
             "platforms": [
