@@ -1826,8 +1826,9 @@ bool ChromePasswordProtectionService::IsAccountConsumer(
   // Check that |username| is likely an email address because if |username| has
   // no email domain MayBeEnterpriseUserBasedOnEmail will assume it is a
   // consumer account.
+  AccountInfo account_info = GetAccountInfoForUsername(username);
   std::optional<std::string_view> hosted_domain =
-      GetAccountInfoForUsername(username).GetHostedDomain();
+      account_info.GetHostedDomain();
   return (username.find("@") != std::string::npos &&
           !signin::AccountManagedStatusFinder::MayBeEnterpriseUserBasedOnEmail(
               username)) ||
