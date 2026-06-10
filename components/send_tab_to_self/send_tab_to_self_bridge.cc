@@ -178,8 +178,14 @@ std::optional<syncer::ModelError> SendTabToSelfBridge::MergeFullSyncData(
     std::unique_ptr<syncer::MetadataChangeList> metadata_change_list,
     syncer::EntityChangeList entity_data) {
   DCHECK(entries_.empty());
-  return ApplyIncrementalSyncChanges(std::move(metadata_change_list),
-                                     std::move(entity_data));
+  std::optional<syncer::ModelError> error = ApplyIncrementalSyncChanges(
+      std::move(metadata_change_list), std::move(entity_data));
+  if (IsReady()) {
+    for (auto& observer : observers_) {
+      observer.OnModelReady();
+    }
+  }
+  return error;
 }
 
 std::optional<syncer::ModelError>
@@ -745,8 +751,10 @@ void SendTabToSelfBridge::OnReadAllMetadata(
   }
   change_processor()->ModelReadyToSync(std::move(metadata_batch));
 
-  for (auto& observer : observers_) {
-    observer.OnModelReady();
+  if (IsReady()) {
+    for (auto& observer : observers_) {
+      observer.OnModelReady();
+    }
   }
 
   DoGarbageCollection();
