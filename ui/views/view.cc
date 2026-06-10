@@ -3766,7 +3766,14 @@ bool View::UpdateParentLayers() {
 void View::OrphanLayers() {
   if (layer()) {
     if (ui::Layer* parent = layer()->parent()) {
+      base::WeakPtr<ui::Layer> weak_parent = layer()->parent()->AsWeakPtr();
       for (ui::Layer* layer : GetLayersInOrder()) {
+        // Layer::Remove() will stop any layer animation on the parent, notify
+        // LayerAnimationObserver::OnLayerAnimationAborted(). If the observer
+        // deletes the layer, the weak_parent will become null.
+        if (!weak_parent) {
+          break;
+        }
         parent->Remove(layer);
       }
     }
