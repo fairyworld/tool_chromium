@@ -76,19 +76,19 @@ void AddPermanentFoldersToTracker(const BookmarkModelView* model,
                                   SyncedBookmarkTracker* tracker) {
   sync_pb::EntitySpecifics specifics;
   specifics.mutable_bookmark()->set_legacy_canonicalized_title(kBookmarkBarTag);
-  tracker->Add(
+  tracker->AddRemote(
       /*bookmark_node=*/model->bookmark_bar_node(),
       /*sync_id=*/kBookmarkBarId,
       /*server_version=*/0, /*creation_time=*/base::Time::Now(), specifics);
   specifics.mutable_bookmark()->set_legacy_canonicalized_title(
       kOtherBookmarksTag);
-  tracker->Add(
+  tracker->AddRemote(
       /*bookmark_node=*/model->other_node(),
       /*sync_id=*/kOtherBookmarksId,
       /*server_version=*/0, /*creation_time=*/base::Time::Now(), specifics);
   specifics.mutable_bookmark()->set_legacy_canonicalized_title(
       kMobileBookmarksTag);
-  tracker->Add(
+  tracker->AddRemote(
       /*bookmark_node=*/model->mobile_node(),
       /*sync_id=*/kMobileBookmarksId,
       /*server_version=*/0, /*creation_time=*/base::Time::Now(), specifics);
@@ -338,7 +338,7 @@ TEST_P(BookmarkModelObserverImplTest,
   std::unique_ptr<SyncedBookmarkTracker> bookmark_tracker =
       SyncedBookmarkTracker::CreateEmpty(sync_pb::DataTypeState());
   AddPermanentFoldersToTracker(&model, bookmark_tracker.get());
-  bookmark_tracker->Add(
+  bookmark_tracker->AddRemote(
       /*bookmark_node=*/folder_node,
       /*sync_id=*/"folder_sync_id",
       /*server_version=*/0, /*creation_time=*/base::Time::Now(),
@@ -1117,7 +1117,7 @@ TEST_P(BookmarkModelObserverImplTest,
           syncer::UniquePosition::RandomSuffix())
           .ToProto();
 
-  const SyncedBookmarkTrackerEntity* entity = bookmark_tracker()->Add(
+  const SyncedBookmarkTrackerEntity* entity = bookmark_tracker()->AddRemote(
       bookmark_node, "id", /*server_version=*/1, base::Time::Now(), specifics);
   bookmark_tracker()->IncrementSequenceNumber(entity);
 

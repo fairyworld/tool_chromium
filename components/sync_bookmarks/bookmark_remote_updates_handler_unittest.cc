@@ -1126,8 +1126,8 @@ TEST_F(BookmarkRemoteUpdatesHandlerWithInitialMergeTest,
   // |originator_client_item_id| is used a temp sync id and mark the entity that
   // it needs to be committed..
   const SyncedBookmarkTrackerEntity* entity =
-      tracker()->Add(node, /*sync_id=*/kOriginatorClientItemId,
-                     /*server_version=*/0, kModificationTime, specifics);
+      tracker()->AddRemote(node, /*sync_id=*/kOriginatorClientItemId,
+                           /*server_version=*/0, kModificationTime, specifics);
   tracker()->IncrementSequenceNumber(entity);
 
   ASSERT_THAT(tracker()->GetEntityForSyncId(kOriginatorClientItemId),
@@ -1192,8 +1192,8 @@ TEST_F(
       /*creation_time=*/std::nullopt, kBookmarkGuid);
   // Track a sync entity (similar to what happens after a local creation).
   const SyncedBookmarkTrackerEntity* entity =
-      tracker()->Add(node, /*sync_id=*/kSyncId, /*server_version=*/0,
-                     kModificationTime, specifics);
+      tracker()->AddRemote(node, /*sync_id=*/kSyncId, /*server_version=*/0,
+                           kModificationTime, specifics);
   tracker()->IncrementSequenceNumber(entity);
 
   ASSERT_THAT(tracker()->GetEntityForSyncId(kSyncId), Eq(entity));

@@ -54,7 +54,7 @@ class ProcessorEntityTracker {
   // Starts tracking new locally-created entity (must not be deleted outside
   // current object). The entity will be created unsynced with pending commit
   // data.
-  ProcessorEntity* AddUnsyncedLocal(
+  ProcessorEntity* AddLocalCreation(
       const std::string& storage_key,
       std::unique_ptr<EntityData> data,
       sync_pb::EntitySpecifics trimmed_specifics,

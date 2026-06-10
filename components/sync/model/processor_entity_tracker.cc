@@ -74,7 +74,7 @@ size_t ProcessorEntityTracker::CountNonTombstoneEntries() const {
   return count;
 }
 
-ProcessorEntity* ProcessorEntityTracker::AddUnsyncedLocal(
+ProcessorEntity* ProcessorEntityTracker::AddLocalCreation(
     const std::string& storage_key,
     std::unique_ptr<EntityData> data,
     sync_pb::EntitySpecifics trimmed_specifics,

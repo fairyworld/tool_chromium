@@ -587,7 +587,7 @@ const SyncedBookmarkTrackerEntity* BookmarkRemoteUpdatesHandler::ProcessCreate(
               bookmark_tracker_),
           bookmark_model_, favicon_service_);
   DCHECK(bookmark_node);
-  const SyncedBookmarkTrackerEntity* entity = bookmark_tracker_->Add(
+  const SyncedBookmarkTrackerEntity* entity = bookmark_tracker_->AddRemote(
       bookmark_node, update_entity.id, update.response_version,
       update_entity.creation_time, update_entity.specifics);
   ReuploadEntityIfNeeded(update_entity, entity);

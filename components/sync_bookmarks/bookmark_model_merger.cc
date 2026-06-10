@@ -809,12 +809,8 @@ void BookmarkModelMerger::MigrateBookmarksInSubtreeWithoutClientTagHash(
   const sync_pb::EntitySpecifics specifics = CreateSpecificsFromBookmarkNode(
       node, bookmark_model_, pos.ToProto(), /*force_favicon_load=*/true);
 
-  const SyncedBookmarkTrackerEntity* new_entity = bookmark_tracker_->Add(
-      node, /*sync_id=*/new_guid.AsLowercaseString(),
-      syncer::kUncommittedVersion, creation_time, specifics);
-
-  // Mark the entity that it needs to be committed.
-  bookmark_tracker_->IncrementSequenceNumber(new_entity);
+  bookmark_tracker_->AddLocalCreation(
+      node, /*sync_id=*/new_guid.AsLowercaseString(), creation_time, specifics);
 
   // Make sure all direct children are marked for commit, because their parent
   // changed.
@@ -830,7 +826,7 @@ void BookmarkModelMerger::MergeSubtree(
     const bookmarks::BookmarkNode* local_subtree_root,
     const RemoteTreeNode& remote_node) {
   const EntityData& remote_update_entity = remote_node.entity();
-  const SyncedBookmarkTrackerEntity* entity = bookmark_tracker_->Add(
+  const SyncedBookmarkTrackerEntity* entity = bookmark_tracker_->AddRemote(
       local_subtree_root, remote_update_entity.id,
       remote_node.response_version(), remote_update_entity.creation_time,
       remote_update_entity.specifics);
@@ -987,7 +983,7 @@ void BookmarkModelMerger::ProcessRemoteCreation(
       CreateBookmarkNodeFromSpecifics(specifics.bookmark(), local_parent, index,
                                       bookmark_model_, favicon_service_);
   DCHECK(bookmark_node);
-  const SyncedBookmarkTrackerEntity* entity = bookmark_tracker_->Add(
+  const SyncedBookmarkTrackerEntity* entity = bookmark_tracker_->AddRemote(
       bookmark_node, remote_update_entity.id, remote_node.response_version(),
       remote_update_entity.creation_time, specifics);
   const bool is_reupload_needed =
@@ -1045,11 +1041,9 @@ void BookmarkModelMerger::ProcessLocalCreation(
       GenerateUniquePositionForLocalCreation(parent, index, suffix);
   const sync_pb::EntitySpecifics specifics = CreateSpecificsFromBookmarkNode(
       node, bookmark_model_, pos.ToProto(), /*force_favicon_load=*/true);
-  const SyncedBookmarkTrackerEntity* entity = bookmark_tracker_->Add(
-      node, /*sync_id=*/node->uuid().AsLowercaseString(),
-      syncer::kUncommittedVersion, creation_time, specifics);
-  // Mark the entity that it needs to be committed.
-  bookmark_tracker_->IncrementSequenceNumber(entity);
+  bookmark_tracker_->AddLocalCreation(
+      node, /*sync_id=*/node->uuid().AsLowercaseString(), creation_time,
+      specifics);
   for (size_t i = 0; i < node->children().size(); ++i) {
     // If a local node hasn't matched with any remote entity, its descendants
     // will neither, unless they have been or will be matched by UUID, in which

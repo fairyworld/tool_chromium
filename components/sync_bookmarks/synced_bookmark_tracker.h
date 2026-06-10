@@ -80,10 +80,20 @@ class SyncedBookmarkTracker {
   const SyncedBookmarkTrackerEntity* GetEntityForBookmarkNode(
       const bookmarks::BookmarkNode* node) const;
 
-  // Starts tracking local bookmark `bookmark_node`, which must not be tracked
-  // beforehand. The rest of the arguments represent the initial metadata.
+  // Starts tracking local bookmark `bookmark_node` that is not yet committed to
+  // the server. It must not be tracked beforehand.
   // Returns the tracked entity.
-  const SyncedBookmarkTrackerEntity* Add(
+  const SyncedBookmarkTrackerEntity* AddLocalCreation(
+      const bookmarks::BookmarkNode* bookmark_node,
+      const std::string& sync_id,
+      base::Time creation_time,
+      const sync_pb::EntitySpecifics& specifics);
+
+  // Starts tracking remote bookmark `bookmark_node` that is already synced.
+  // It must not be tracked beforehand. `server_version` must not be
+  // `kUncommittedVersion`.
+  // Returns the tracked entity.
+  const SyncedBookmarkTrackerEntity* AddRemote(
       const bookmarks::BookmarkNode* bookmark_node,
       const std::string& sync_id,
       int64_t server_version,
@@ -247,6 +257,13 @@ class SyncedBookmarkTracker {
       std::optional<int64_t> num_ignored_updates_due_to_missing_parent,
       std::optional<int64_t>
           max_version_among_ignored_updates_due_to_missing_parent);
+
+  const SyncedBookmarkTrackerEntity* AddInternal(
+      const bookmarks::BookmarkNode* bookmark_node,
+      const std::string& sync_id,
+      int64_t server_version,
+      base::Time creation_time,
+      const sync_pb::EntitySpecifics& specifics);
 
   // Add entities to `this` tracker based on the content of `*model` and
   // `model_metadata`. Validates the integrity of `*model` and `model_metadata`

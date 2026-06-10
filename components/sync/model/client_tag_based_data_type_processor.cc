@@ -619,7 +619,7 @@ void ClientTagBasedDataTypeProcessor::Put(
         data->modification_time = data->creation_time;
       }
 
-      entity = entity_tracker_->AddUnsyncedLocal(storage_key, std::move(data),
+      entity = entity_tracker_->AddLocalCreation(storage_key, std::move(data),
                                                  std::move(trimmed_specifics),
                                                  std::move(unique_position));
     }

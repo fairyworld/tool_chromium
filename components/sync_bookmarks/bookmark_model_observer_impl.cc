@@ -203,14 +203,12 @@ void BookmarkModelObserverImpl::BookmarkNodeAdded(
     bookmark_tracker_->UndeleteTombstoneForBookmarkNode(entity, node);
     bookmark_tracker_->Update(entity, entity->metadata().server_version(),
                               creation_time, specifics);
+    bookmark_tracker_->IncrementSequenceNumber(entity);
   } else {
-    entity = bookmark_tracker_->Add(node, node->uuid().AsLowercaseString(),
-                                    syncer::kUncommittedVersion, creation_time,
-                                    specifics);
+    entity = bookmark_tracker_->AddLocalCreation(
+        node, node->uuid().AsLowercaseString(), creation_time, specifics);
   }
 
-  // Mark the entity that it needs to be committed.
-  bookmark_tracker_->IncrementSequenceNumber(entity);
   nudge_for_commit_closure_.Run();
 
   // Do not check if all nodes are tracked because it's still possible that some

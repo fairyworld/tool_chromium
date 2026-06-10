@@ -185,7 +185,7 @@ TEST_F(ProcessorEntityTrackerTest, ShouldAddNewLocalEntity) {
   std::unique_ptr<EntityData> entity_data = std::make_unique<EntityData>(
       GenerateEntityData(kStorageKey1, kClientTagHash1));
   EntityData* entity_data_ptr = entity_data.get();
-  const ProcessorEntity* entity = entity_tracker_.AddUnsyncedLocal(
+  const ProcessorEntity* entity = entity_tracker_.AddLocalCreation(
       kStorageKey1, std::move(entity_data), /*trimmed_specifics=*/{},
       /*unique_position=*/std::nullopt);
   ASSERT_THAT(entity, NotNull());
@@ -210,7 +210,7 @@ TEST_F(ProcessorEntityTrackerTest, ShouldAddNewLocalEntityWithUniquePosition) {
 
   std::unique_ptr<EntityData> entity_data = std::make_unique<EntityData>(
       GenerateEntityData(kStorageKey1, kClientTagHash1));
-  const ProcessorEntity* entity = entity_tracker_.AddUnsyncedLocal(
+  const ProcessorEntity* entity = entity_tracker_.AddLocalCreation(
       kStorageKey1, std::move(entity_data), /*trimmed_specifics=*/{},
       unique_position);
 
@@ -374,7 +374,7 @@ TEST_F(ProcessorEntityTrackerTest, ShouldRemoveEntityForClientTagHash) {
 TEST_F(ProcessorEntityTrackerTest, ShouldReturnLocalChanges) {
   std::unique_ptr<EntityData> entity_data = std::make_unique<EntityData>(
       GenerateEntityData(kStorageKey1, kClientTagHash1));
-  ProcessorEntity* entity = entity_tracker_.AddUnsyncedLocal(
+  ProcessorEntity* entity = entity_tracker_.AddLocalCreation(
       kStorageKey1, std::move(entity_data), /*trimmed_specifics=*/{},
       /*unique_position=*/std::nullopt);
   ASSERT_THAT(entity, NotNull());
@@ -404,7 +404,7 @@ TEST_F(ProcessorEntityTrackerTest, ShouldUpdateSpecificsCacheOnLocalCreation) {
   specifics_for_caching.mutable_preference()->set_name("name");
   specifics_for_caching.mutable_preference()->set_value("value");
 
-  ProcessorEntity* entity = entity_tracker_.AddUnsyncedLocal(
+  ProcessorEntity* entity = entity_tracker_.AddLocalCreation(
       kStorageKey1, std::move(entity_data), specifics_for_caching,
       /*unique_position=*/std::nullopt);
 
