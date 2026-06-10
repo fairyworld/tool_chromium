@@ -577,8 +577,10 @@ void PrefetchingMetricsTestBase::SetUp() {
   attempt_entry_builder_ =
       std::make_unique<test::PreloadingAttemptUkmEntryBuilder>(
           content_preloading_predictor::kSpeculationRules);
+  histogram_tester_ = std::make_unique<base::HistogramTester>();
 }
 void PrefetchingMetricsTestBase::TearDown() {
+  histogram_tester_.reset();
   test_ukm_recorder_.reset();
   attempt_entry_builder_.reset();
   RenderViewHostTestHarness::TearDown();
@@ -592,56 +594,51 @@ blink::DocumentToken PrefetchingMetricsTestBase::MainDocumentToken() {
   return main_rfhi()->GetDocumentToken();
 }
 
-void PrefetchingMetricsTestBase::ExpectPrefetchResponseReceivedNotRecorded(
-    const base::HistogramTester& histogram_tester) {
-  histogram_tester.ExpectTotalCount("PrefetchProxy.Prefetch.Mainframe.RespCode",
-                                    0);
-  histogram_tester.ExpectTotalCount(
+void PrefetchingMetricsTestBase::ExpectPrefetchResponseReceivedNotRecorded() {
+  histogram_tester().ExpectTotalCount(
+      "PrefetchProxy.Prefetch.Mainframe.RespCode", 0);
+  histogram_tester().ExpectTotalCount(
       "PrefetchProxy.Prefetch.Mainframe.TotalTime", 0);
-  histogram_tester.ExpectTotalCount(
+  histogram_tester().ExpectTotalCount(
       "PrefetchProxy.Prefetch.Mainframe.ConnectTime", 0);
 }
 
 void PrefetchingMetricsTestBase::ExpectPrefetchResponseReceivedRecorded(
-    const base::HistogramTester& histogram_tester,
     net::HttpStatusCode response_code) {
-  histogram_tester.ExpectUniqueSample(
+  histogram_tester().ExpectUniqueSample(
       "PrefetchProxy.Prefetch.Mainframe.RespCode", response_code, 1);
-  histogram_tester.ExpectUniqueSample(
+  histogram_tester().ExpectUniqueSample(
       "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
+  histogram_tester().ExpectUniqueSample(
       "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
 }
 
-void PrefetchingMetricsTestBase::ExpectPrefetchCompleteNotRecorded(
-    const base::HistogramTester& histogram_tester) {
-  histogram_tester.ExpectTotalCount("PrefetchProxy.Prefetch.Mainframe.NetError",
-                                    0);
-  histogram_tester.ExpectTotalCount(
+void PrefetchingMetricsTestBase::ExpectPrefetchCompleteNotRecorded() {
+  histogram_tester().ExpectTotalCount(
+      "PrefetchProxy.Prefetch.Mainframe.NetError", 0);
+  histogram_tester().ExpectTotalCount(
       "PrefetchProxy.Prefetch.Mainframe.BodyLength", 0);
 }
 
 void PrefetchingMetricsTestBase::ExpectPrefetchCompleteRecorded(
-    const base::HistogramTester& histogram_tester,
     std::optional<int> body_length,
     int net_error) {
-  histogram_tester.ExpectUniqueSample(
+  histogram_tester().ExpectUniqueSample(
       "PrefetchProxy.Prefetch.Mainframe.NetError", -net_error, 1);
   if (body_length.has_value()) {
-    histogram_tester.ExpectUniqueSample(
+    histogram_tester().ExpectUniqueSample(
         "PrefetchProxy.Prefetch.Mainframe.BodyLength", *body_length, 1);
   } else {
-    histogram_tester.ExpectTotalCount(
+    histogram_tester().ExpectTotalCount(
         "PrefetchProxy.Prefetch.Mainframe.BodyLength", 0);
   }
 }
 
 void PrefetchingMetricsTestBase::ExpectPrefetchNoNetErrorOrResponseReceived(
-    const base::HistogramTester& histogram_tester,
     bool is_eligible,
     bool browser_initiated_prefetch) {
-  ExpectPrefetchResponseReceivedNotRecorded(histogram_tester);
-  ExpectPrefetchCompleteNotRecorded(histogram_tester);
+  ExpectPrefetchResponseReceivedNotRecorded();
+  ExpectPrefetchCompleteNotRecorded();
 
   if (!browser_initiated_prefetch) {
     std::optional<PrefetchReferringPageMetrics> referring_page_metrics =
@@ -654,12 +651,10 @@ void PrefetchingMetricsTestBase::ExpectPrefetchNoNetErrorOrResponseReceived(
 }
 
 void PrefetchingMetricsTestBase::ExpectPrefetchNotEligible(
-    const base::HistogramTester& histogram_tester,
     PreloadingEligibility expected_eligibility,
     bool is_accurate,
     bool browser_initiated_prefetch) {
-  ExpectPrefetchNoNetErrorOrResponseReceived(histogram_tester,
-                                             /*is_eligible=*/false,
+  ExpectPrefetchNoNetErrorOrResponseReceived(/*is_eligible=*/false,
                                              browser_initiated_prefetch);
 
   if (!browser_initiated_prefetch) {
@@ -671,13 +666,11 @@ void PrefetchingMetricsTestBase::ExpectPrefetchNotEligible(
 }
 
 void PrefetchingMetricsTestBase::ExpectPrefetchFailedBeforeResponseReceived(
-    const base::HistogramTester& histogram_tester,
     PrefetchStatus expected_prefetch_status,
     bool is_accurate) {
-  ExpectPrefetchNoNetErrorOrResponseReceived(histogram_tester,
-                                             /*is_eligible=*/true);
-  histogram_tester.ExpectUniqueSample("Preloading.Prefetch.PrefetchStatus",
-                                      expected_prefetch_status, 1);
+  ExpectPrefetchNoNetErrorOrResponseReceived(/*is_eligible=*/true);
+  histogram_tester().ExpectUniqueSample("Preloading.Prefetch.PrefetchStatus",
+                                        expected_prefetch_status, 1);
   ExpectCorrectUkmLogs(
       {.outcome = PreloadingTriggeringOutcome::kFailure,
        .failure = ToPreloadingFailureReason(expected_prefetch_status),
@@ -685,18 +678,17 @@ void PrefetchingMetricsTestBase::ExpectPrefetchFailedBeforeResponseReceived(
 }
 
 void PrefetchingMetricsTestBase::ExpectPrefetchFailedNetError(
-    const base::HistogramTester& histogram_tester,
     int expected_net_error_code,
     blink::mojom::SpeculationEagerness eagerness,
     bool is_accurate_triggering,
     bool browser_initiated_prefetch) {
-  ExpectPrefetchResponseReceivedNotRecorded(histogram_tester);
-  ExpectPrefetchCompleteRecorded(histogram_tester, /*body_length=*/std::nullopt,
+  ExpectPrefetchResponseReceivedNotRecorded();
+  ExpectPrefetchCompleteRecorded(/*body_length=*/std::nullopt,
                                  expected_net_error_code);
 
-  histogram_tester.ExpectUniqueSample("Preloading.Prefetch.PrefetchStatus",
-                                      PrefetchStatus::kPrefetchFailedNetError,
-                                      1);
+  histogram_tester().ExpectUniqueSample("Preloading.Prefetch.PrefetchStatus",
+                                        PrefetchStatus::kPrefetchFailedNetError,
+                                        1);
 
   if (!browser_initiated_prefetch) {
     std::optional<PrefetchReferringPageMetrics> referring_page_metrics =
@@ -714,13 +706,11 @@ void PrefetchingMetricsTestBase::ExpectPrefetchFailedNetError(
 }
 
 void PrefetchingMetricsTestBase::ExpectPrefetchFailedAfterResponseReceived(
-    const base::HistogramTester& histogram_tester,
     net::HttpStatusCode expected_response_code,
     int expected_body_length,
     PrefetchStatus expected_prefetch_status) {
-  ExpectPrefetchResponseReceivedRecorded(histogram_tester,
-                                         expected_response_code);
-  ExpectPrefetchCompleteRecorded(histogram_tester, expected_body_length);
+  ExpectPrefetchResponseReceivedRecorded(expected_response_code);
+  ExpectPrefetchCompleteRecorded(expected_body_length);
 
   std::optional<PrefetchReferringPageMetrics> referring_page_metrics =
       PrefetchReferringPageMetrics::GetForCurrentDocument(main_rfh());
@@ -728,20 +718,19 @@ void PrefetchingMetricsTestBase::ExpectPrefetchFailedAfterResponseReceived(
   EXPECT_EQ(referring_page_metrics->prefetch_eligible_count, 1);
   EXPECT_EQ(referring_page_metrics->prefetch_successful_count, 0);
 
-  histogram_tester.ExpectUniqueSample("Preloading.Prefetch.PrefetchStatus",
-                                      expected_prefetch_status, 1);
+  histogram_tester().ExpectUniqueSample("Preloading.Prefetch.PrefetchStatus",
+                                        expected_prefetch_status, 1);
   ExpectCorrectUkmLogs(
       {.outcome = PreloadingTriggeringOutcome::kFailure,
        .failure = ToPreloadingFailureReason(expected_prefetch_status)});
 }
 
 void PrefetchingMetricsTestBase::ExpectPrefetchSuccess(
-    const base::HistogramTester& histogram_tester,
     int expected_body_length,
     blink::mojom::SpeculationEagerness eagerness,
     bool is_accurate) {
-  ExpectPrefetchResponseReceivedRecorded(histogram_tester);
-  ExpectPrefetchCompleteRecorded(histogram_tester, expected_body_length);
+  ExpectPrefetchResponseReceivedRecorded();
+  ExpectPrefetchCompleteRecorded(expected_body_length);
 
   std::optional<PrefetchReferringPageMetrics> referring_page_metrics =
       PrefetchReferringPageMetrics::GetForCurrentDocument(main_rfh());
