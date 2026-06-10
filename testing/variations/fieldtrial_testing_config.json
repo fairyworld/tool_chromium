@@ -13166,6 +13166,21 @@
             ]
         }
     ],
+    "HeliosScreenContextMigration": [
+        {
+            "platforms": [
+                "ios"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "enable_features": [
+                        "GeminiScreenContextMigration"
+                    ]
+                }
+            ]
+        }
+    ],
     "HeliosWithReaderMode": [
         {
             "platforms": [
