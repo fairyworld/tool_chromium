@@ -14,10 +14,6 @@ namespace personal_context::features {
 // all Personal Context features and services are turned off.
 BASE_DECLARE_FEATURE(kPersonalContext);
 
-// Comma-separated list of AI subscription tiers that are eligible to use
-// Personal Context features (e.g., "1,2").
-BASE_DECLARE_FEATURE_PARAM(std::string, kPersonalContextEligibleTiers);
-
 // The base URL of the Context Memory Service (CMS) endpoint.
 BASE_DECLARE_FEATURE_PARAM(std::string, kContextMemoryServiceBaseUrl);
 

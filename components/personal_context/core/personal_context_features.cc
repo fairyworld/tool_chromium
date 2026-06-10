@@ -11,12 +11,6 @@ namespace personal_context::features {
 BASE_FEATURE(kPersonalContext, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE_PARAM(std::string,
-                   kPersonalContextEligibleTiers,
-                   &kPersonalContext,
-                   "personal_context_eligible_tiers",
-                   "1,2");
-
-BASE_FEATURE_PARAM(std::string,
                    kContextMemoryServiceBaseUrl,
                    &kPersonalContext,
                    "context_memory_service_base_url",
