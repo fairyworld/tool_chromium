@@ -225,13 +225,6 @@ VRServiceImpl::VRServiceImpl(content::RenderFrameHost* render_frame_host)
                                  // owned by VRServiceImpl.
 }
 
-// Constructor for testing.
-VRServiceImpl::VRServiceImpl(base::PassKey<XRRuntimeManagerTest>)
-    : render_frame_host_(nullptr) {
-  DVLOG(2) << __func__;
-  runtime_manager_ = XRRuntimeManagerImpl::GetOrCreateInstanceForTesting();
-  runtime_manager_->AddService(this);
-}
 
 VRServiceImpl::~VRServiceImpl() {
   DVLOG(2) << __func__;
