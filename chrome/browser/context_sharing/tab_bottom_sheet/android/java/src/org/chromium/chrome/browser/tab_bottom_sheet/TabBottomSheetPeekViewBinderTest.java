@@ -4,13 +4,18 @@
 
 package org.chromium.chrome.browser.tab_bottom_sheet;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 
+import android.view.LayoutInflater;
 import android.view.View.OnClickListener;
+import android.view.accessibility.AccessibilityNodeInfo;
+
+import androidx.test.core.app.ActivityScenario;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -21,6 +26,8 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import org.chromium.base.test.BaseRobolectricTestRunner;
+import org.chromium.chrome.browser.context_sharing.R;
+import org.chromium.ui.base.TestActivity;
 import org.chromium.ui.modelutil.PropertyModel;
 import org.chromium.ui.modelutil.PropertyModelChangeProcessor;
 
@@ -199,5 +206,42 @@ public class TabBottomSheetPeekViewBinderTest {
         assertNotNull(mPeekViewClickListener);
         mPeekViewClickListener.onClick(null);
         assertTrue(mClicked);
+    }
+
+    @Test
+    public void testAccessibilityProperties() {
+        try (ActivityScenario<TestActivity> scenario =
+                ActivityScenario.launch(TestActivity.class)) {
+            scenario.onActivity(
+                    activity -> {
+                        activity.setTheme(R.style.Theme_MaterialComponents);
+                        TabBottomSheetPeekView realView =
+                                (TabBottomSheetPeekView)
+                                        LayoutInflater.from(activity)
+                                                .inflate(
+                                                        R.layout.tab_bottom_sheet_peek_layout,
+                                                        null);
+
+                        PropertyModel model =
+                                new PropertyModel.Builder(TabBottomSheetPeekProperties.ALL_KEYS)
+                                        .with(
+                                                TabBottomSheetPeekProperties
+                                                        .CONTENT_DESCRIPTION_A11Y,
+                                                "Ask Gemini, Gemini in Chrome")
+                                        .build();
+                        PropertyModelChangeProcessor.create(
+                                model, realView, TabBottomSheetPeekViewBinder::bind);
+
+                        assertEquals(
+                                "Ask Gemini, Gemini in Chrome",
+                                realView.getContentDescription().toString());
+
+                        AccessibilityNodeInfo info = AccessibilityNodeInfo.obtain();
+                        realView.onInitializeAccessibilityNodeInfo(info);
+                        assertEquals(
+                                android.widget.Button.class.getName(),
+                                info.getClassName().toString());
+                    });
+        }
     }
 }

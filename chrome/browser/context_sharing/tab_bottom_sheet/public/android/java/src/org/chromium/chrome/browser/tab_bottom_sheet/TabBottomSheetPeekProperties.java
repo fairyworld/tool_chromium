@@ -53,6 +53,9 @@ public class TabBottomSheetPeekProperties {
     public static final ReadableObjectPropertyKey<Runnable> ON_PEEK_VIEW_CLICKED =
             new ReadableObjectPropertyKey<>();
 
+    public static final WritableObjectPropertyKey<String> CONTENT_DESCRIPTION_A11Y =
+            new WritableObjectPropertyKey<>();
+
     public static final PropertyKey[] ALL_KEYS = {
         TITLE_TEXT,
         TITLE_TEXT_APPEARANCE_ID,
@@ -65,6 +68,7 @@ public class TabBottomSheetPeekProperties {
         ACTION_BUTTON_ICON_TINT_ID,
         ACTION_BUTTON_HORIZONTAL_PADDING_ID,
         ACTION_BUTTON_CONTENT_DESCRIPTION_ID,
+        CONTENT_DESCRIPTION_A11Y,
         ON_ACTION_BUTTON_CLICKED,
         ON_CLOSE_CLICKED,
         ON_PEEK_VIEW_CLICKED

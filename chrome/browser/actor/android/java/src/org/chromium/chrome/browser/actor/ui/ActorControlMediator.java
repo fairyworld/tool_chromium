@@ -5,6 +5,7 @@
 package org.chromium.chrome.browser.actor.ui;
 
 import org.chromium.build.annotations.NullMarked;
+import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.tab_bottom_sheet.TabBottomSheetPeekProperties;
 import org.chromium.ui.modelutil.PropertyModel;
 
@@ -23,7 +24,7 @@ public class ActorControlMediator {
      * @param title The title of the actor control view.
      * @param state The PeekViewUiState containing the desired UI properties.
      */
-    void setContent(String title, PeekViewUiState state) {
+    void setContent(String title, @Nullable String contentDescription, PeekViewUiState state) {
         mModel.set(TabBottomSheetPeekProperties.TITLE_TEXT, title);
         mModel.set(
                 TabBottomSheetPeekProperties.TITLE_TEXT_APPEARANCE_ID,
@@ -46,5 +47,6 @@ public class ActorControlMediator {
         mModel.set(
                 TabBottomSheetPeekProperties.ACTION_BUTTON_CONTENT_DESCRIPTION_ID,
                 state.buttonContentDescriptionResId);
+        mModel.set(TabBottomSheetPeekProperties.CONTENT_DESCRIPTION_A11Y, contentDescription);
     }
 }

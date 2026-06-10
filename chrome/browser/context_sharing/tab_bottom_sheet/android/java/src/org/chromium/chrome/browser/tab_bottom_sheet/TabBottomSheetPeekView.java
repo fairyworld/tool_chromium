@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.util.AttributeSet;
+import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -84,6 +86,12 @@ class TabBottomSheetPeekView extends RelativeLayout {
      */
     public void setDescriptionVisibility(int visibility) {
         mDescriptionView.setVisibility(visibility);
+    }
+
+    @Override
+    public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName(Button.class.getName());
     }
 
     /**
