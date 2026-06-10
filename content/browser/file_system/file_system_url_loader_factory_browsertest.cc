@@ -845,8 +845,16 @@ IN_PROC_BROWSER_TEST_P(FileSystemURLLoaderFactoryTest,
   EXPECT_TRUE(partial_buffer == base::as_byte_span(response_text));
 }
 
+// TODO(crbug.com/516040951): Fix flakiness and re-enable.
+#if BUILDFLAG(IS_ANDROID)
+#define MAYBE_FileTestMultipleRangesNotSupported \
+  DISABLED_FileTestMultipleRangesNotSupported
+#else
+#define MAYBE_FileTestMultipleRangesNotSupported \
+  FileTestMultipleRangesNotSupported
+#endif
 IN_PROC_BROWSER_TEST_P(FileSystemURLLoaderFactoryTest,
-                       FileTestMultipleRangesNotSupported) {
+                       MAYBE_FileTestMultipleRangesNotSupported) {
   base::ScopedAllowBlockingForTesting allow_blocking;
   WriteFile(
       "file1.dat",
