@@ -2796,11 +2796,12 @@ IN_PROC_BROWSER_TEST_F(ProfilePickerCreationFlowBrowserTest,
   EXPECT_EQ(new_browser->GetProfile()->GetPath(), other_path);
   WaitForPickerClosed();
 
-  // When InitialWebUI is enabled, the browser window is intentionally hidden
-  // initially, which causes FirstWebContentsFinishReason to be
-  // kAbandonNoInitiallyVisibleContent and prevents
-  // FirstWebContentsNonEmptyPaint from being recorded.
-  if (base::FeatureList::IsEnabled(features::kInitialWebUI)) {
+  if (base::FeatureList::IsEnabled(features::kWebUIReloadButton) &&
+      features::kWebUIReloadButtonDeferBrowserViewShow.Get()) {
+    // When kWebUIReloadButtonDeferBrowserViewShow is enabled, the browser
+    // window is intentionally hidden initially, which causes
+    // FirstWebContentsFinishReason to be kAbandonNoInitiallyVisibleContent and
+    // prevents FirstWebContentsNonEmptyPaint from being recorded.
     histogram_tester.ExpectTotalCount(
         "ProfilePicker.FirstProfileTime.FirstWebContentsNonEmptyPaint", 0);
     histogram_tester.ExpectUniqueSample(

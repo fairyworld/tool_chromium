@@ -26297,16 +26297,18 @@
             ],
             "experiments": [
                 {
-                    "name": "Enabled_20260601",
+                    "name": "EnabledWithSurfaceSync_20260609",
                     "params": {
-                        "WebUIReloadButtonDeferBrowserViewShow": "true",
+                        "WebUIReloadButtonDeferBrowserViewShow": "false",
                         "WebUIReloadButtonKeepVisibleUntilPaint": "true",
                         "config": "",
                         "high_stream_priority": "true",
                         "without_spellcheck": "true"
                     },
                     "enable_features": [
+                        "BypassOutdatedSurfaceActivation",
                         "InitialWebUI",
+                        "InitialWebUISurfaceSync",
                         "InitialWebUISyncNavStartToCommit",
                         "InitialWebUIWithoutExtensions",
                         "SendGPUChannelEarly",
