@@ -7519,7 +7519,7 @@
   {
     "name": "page-actions-migration",
     "owners": [ "alsan@google.com", "chrome-desktop-ui-waterloo@google.com" ],
-    "expiry_milestone": 150
+    "expiry_milestone": 152
   },
   {
     "name": "page-content-annotations",
