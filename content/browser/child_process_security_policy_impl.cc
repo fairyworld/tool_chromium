@@ -173,34 +173,32 @@ std::optional<T> CheckAndReturnOptionalRustAndCppResults(
 // Used internally only. These bit positions have no relationship to any
 // underlying OS and can be changed to accommodate finer-grained permissions.
 enum ChildProcessSecurityPermissions {
-  READ_FILE_PERMISSION             = 1 << 0,
-  WRITE_FILE_PERMISSION            = 1 << 1,
-  CREATE_NEW_FILE_PERMISSION       = 1 << 2,
+  READ_FILE_PERMISSION = 1 << 0,
+  WRITE_FILE_PERMISSION = 1 << 1,
+  CREATE_NEW_FILE_PERMISSION = 1 << 2,
   CREATE_OVERWRITE_FILE_PERMISSION = 1 << 3,
-  DELETE_FILE_PERMISSION           = 1 << 4,
+  DELETE_FILE_PERMISSION = 1 << 4,
 
   // Used by Media Galleries API
-  COPY_INTO_FILE_PERMISSION        = 1 << 5,
+  COPY_INTO_FILE_PERMISSION = 1 << 5,
 };
 
 // Used internally only. Bitmasks that are actually used by the Grant* and Can*
 // methods. These contain one or more ChildProcessSecurityPermissions.
 enum ChildProcessSecurityGrants {
-  READ_FILE_GRANT              = READ_FILE_PERMISSION,
-  WRITE_FILE_GRANT             = WRITE_FILE_PERMISSION,
+  READ_FILE_GRANT = READ_FILE_PERMISSION,
+  WRITE_FILE_GRANT = WRITE_FILE_PERMISSION,
 
-  CREATE_NEW_FILE_GRANT        = CREATE_NEW_FILE_PERMISSION |
-                                 COPY_INTO_FILE_PERMISSION,
+  CREATE_NEW_FILE_GRANT =
+      CREATE_NEW_FILE_PERMISSION | COPY_INTO_FILE_PERMISSION,
 
-  CREATE_READ_WRITE_FILE_GRANT = CREATE_NEW_FILE_PERMISSION |
-                                 CREATE_OVERWRITE_FILE_PERMISSION |
-                                 READ_FILE_PERMISSION |
-                                 WRITE_FILE_PERMISSION |
-                                 COPY_INTO_FILE_PERMISSION |
-                                 DELETE_FILE_PERMISSION,
+  CREATE_READ_WRITE_FILE_GRANT =
+      CREATE_NEW_FILE_PERMISSION | CREATE_OVERWRITE_FILE_PERMISSION |
+      READ_FILE_PERMISSION | WRITE_FILE_PERMISSION | COPY_INTO_FILE_PERMISSION |
+      DELETE_FILE_PERMISSION,
 
-  COPY_INTO_FILE_GRANT         = COPY_INTO_FILE_PERMISSION,
-  DELETE_FILE_GRANT            = DELETE_FILE_PERMISSION,
+  COPY_INTO_FILE_GRANT = COPY_INTO_FILE_PERMISSION,
+  DELETE_FILE_GRANT = DELETE_FILE_PERMISSION,
 };
 
 // https://crbug.com/646278 Valid blob URLs should contain canonically
