@@ -71,7 +71,7 @@ export class ShoppingListElement extends CrLitElement {
   override connectedCallback() {
     super.connectedCallback();
 
-    const callbackRouter = this.priceTrackingProxy_.getCallbackRouter();
+    const callbackRouter = this.priceTrackingProxy_.callbackRouter;
     this.listenerIds_.push(
         callbackRouter.priceTrackedForBookmark.addListener(
             (product: BookmarkProductInfo) =>
@@ -96,7 +96,7 @@ export class ShoppingListElement extends CrLitElement {
     super.disconnectedCallback();
 
     this.listenerIds_.forEach(
-        id => this.priceTrackingProxy_.getCallbackRouter().removeListener(id));
+        id => this.priceTrackingProxy_.callbackRouter.removeListener(id));
   }
 
   override willUpdate(changedProperties: PropertyValues) {
@@ -189,13 +189,13 @@ export class ShoppingListElement extends CrLitElement {
       const index = this.untrackedItems_.indexOf(item);
       this.untrackedItems_.splice(index, 1);
       this.requestUpdate();
-      this.priceTrackingProxy_.trackPriceForBookmark(bookmarkId);
+      this.priceTrackingProxy_.handler.trackPriceForBookmark(bookmarkId);
       chrome.metricsPrivate.recordUserAction(
           'Commerce.PriceTracking.SidePanel.Track.BellButton');
     } else {
       this.untrackedItems_.push(item);
       this.requestUpdate();
-      this.priceTrackingProxy_.untrackPriceForBookmark(bookmarkId);
+      this.priceTrackingProxy_.handler.untrackPriceForBookmark(bookmarkId);
       chrome.metricsPrivate.recordUserAction(
           'Commerce.PriceTracking.SidePanel.Untrack.BellButton');
     }
@@ -271,9 +271,11 @@ export class ShoppingListElement extends CrLitElement {
       product: BookmarkProductInfo, attemptedTrack: boolean) {
     this.retryOperationCallback_ = () => {
       if (attemptedTrack) {
-        this.priceTrackingProxy_.trackPriceForBookmark(product.bookmarkId);
+        this.priceTrackingProxy_.handler.trackPriceForBookmark(
+            product.bookmarkId);
       } else {
-        this.priceTrackingProxy_.untrackPriceForBookmark(product.bookmarkId);
+        this.priceTrackingProxy_.handler.untrackPriceForBookmark(
+            product.bookmarkId);
       }
     };
     this.$.errorToast.show();

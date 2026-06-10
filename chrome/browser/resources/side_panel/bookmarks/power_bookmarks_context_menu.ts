@@ -428,12 +428,12 @@ export class PowerBookmarksContextMenuElement extends CrLitElement {
           this.dispatchDisabledFeatureEvent_();
         } else {
           if (this.priceTracked_) {
-            this.priceTrackingProxy_.untrackPriceForBookmark(
+            this.priceTrackingProxy_.handler.untrackPriceForBookmark(
                 BigInt(this.bookmarks_[0].id));
             chrome.metricsPrivate.recordUserAction(
                 'Commerce.PriceTracking.SidePanel.Untrack.ContextMenu');
           } else {
-            this.priceTrackingProxy_.trackPriceForBookmark(
+            this.priceTrackingProxy_.handler.trackPriceForBookmark(
                 BigInt(this.bookmarks_[0].id));
             chrome.metricsPrivate.recordUserAction(
                 'Commerce.PriceTracking.SidePanel.Track.ContextMenu');

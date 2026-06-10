@@ -532,8 +532,8 @@ export class PowerBookmarksListElement extends CrLitElement implements
   }
 
   private updateShoppingCollectionFolderId_(): void {
-    this.priceTrackingProxy_.getShoppingCollectionBookmarkFolderId().then(
-        res => {
+    this.priceTrackingProxy_.handler.getShoppingCollectionBookmarkFolderId()
+        .then(res => {
           this.shoppingCollectionFolderId_ = res.collectionId.toString();
         });
   }
