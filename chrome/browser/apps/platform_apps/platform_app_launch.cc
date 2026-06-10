@@ -21,6 +21,7 @@
 
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 #include "chrome/browser/extensions/chrome_app_deprecation.h"
+#include "chrome/browser/extensions/extension_util.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
@@ -145,7 +146,7 @@ bool OpenDeprecatedApplicationPrompt(Profile* profile,
   Browser* browser = Browser::Create(create_params);
 
   GURL url;
-  if (extensions::IsExtensionForceInstalled(profile, app_id, nullptr)) {
+  if (extensions::util::IsExtensionForceInstalled(app_id, profile)) {
     url = GURL(chrome::kChromeUIAppsWithForceInstalledDeprecationDialogURL +
                app_id);
   } else {

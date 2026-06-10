@@ -11,13 +11,13 @@
 #include "build/build_config.h"
 #include "chrome/browser/extensions/chrome_app_deprecation.h"
 #include "chrome/browser/extensions/extension_management.h"
+#include "chrome/browser/extensions/extension_util.h"
 #include "chrome/browser/extensions/preinstalled_extensions.h"
 #include "chrome/browser/profiles/profile.h"
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/extension_system.h"
 #include "extensions/browser/managed_installation_mode.h"
-#include "extensions/browser/management_policy.h"
 #include "extensions/browser/pref_names.h"
 #include "extensions/common/constants.h"
 #include "extensions/common/extension.h"
@@ -52,19 +52,8 @@ bool IsExtensionInstalled(content::BrowserContext* context,
 bool IsExtensionForceInstalled(content::BrowserContext* context,
                                const std::string& extension_id,
                                std::u16string* reason) {
-  auto* registry = ExtensionRegistry::Get(context);
-  // May be nullptr in unit tests.
-  if (!registry)
-    return false;
-
-  auto* extension_system = ExtensionSystem::Get(context);
-  if (!extension_system)
-    return false;
-
-  const Extension* extension = registry->GetInstalledExtension(extension_id);
-  return extension &&
-         extension_system->management_policy()->MustRemainInstalled(extension,
-                                                                    reason);
+  return extensions::util::IsExtensionForceInstalled(extension_id, context,
+                                                     reason);
 }
 
 bool IsExtensionDefaultInstalled(content::BrowserContext* context,

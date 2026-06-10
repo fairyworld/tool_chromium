@@ -27,6 +27,8 @@ bool IsExtensionInstalled(content::BrowserContext* context,
 
 // Returns whether the extension with `extension_id` is force installed by
 // policy, and fills `reason` (if non-null) with expository text.
+// This is a wrapper around extensions::util::IsExtensionForceInstalled to
+// avoid circular dependencies.
 bool IsExtensionForceInstalled(content::BrowserContext* context,
                                const std::string& extension_id,
                                std::u16string* reason);

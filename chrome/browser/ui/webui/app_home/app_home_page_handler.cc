@@ -20,6 +20,7 @@
 #include "chrome/browser/extensions/chrome_app_deprecation.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/extension_ui_util.h"
+#include "chrome/browser/extensions/extension_util.h"
 #include "chrome/browser/extensions/launch_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
@@ -137,7 +138,7 @@ void AppHomePageHandler::LoadDeprecatedAppsDialogIfRequired() {
                                         kForceInstallDialogQueryString,
                                         &app_id)) {
     if (extensions::IsExtensionUnsupportedDeprecatedApp(profile_, app_id) &&
-        extensions::IsExtensionForceInstalled(profile_, app_id, nullptr)) {
+        extensions::util::IsExtensionForceInstalled(app_id, profile_)) {
       if (extensions::chrome_app_deprecation::IsPreinstalledAppId(app_id)) {
         TabDialogs::FromWebContents(web_contents)
             ->ShowForceInstalledPreinstalledDeprecatedAppDialog(app_id,
@@ -157,7 +158,7 @@ void AppHomePageHandler::LaunchAppInternal(
     app_home::mojom::ClickEventPtr click_event) {
   if (extensions::IsExtensionUnsupportedDeprecatedApp(profile_, app_id) &&
       base::FeatureList::IsEnabled(features::kChromeAppsDeprecation)) {
-    if (!extensions::IsExtensionForceInstalled(profile_, app_id, nullptr)) {
+    if (!extensions::util::IsExtensionForceInstalled(app_id, profile_)) {
       TabDialogs::FromWebContents(web_ui_->GetWebContents())
           ->ShowDeprecatedAppsDialog(app_id, deprecated_app_ids_,
                                      web_ui_->GetWebContents());
@@ -479,8 +480,8 @@ void AppHomePageHandler::FillExtensionInfoList(
     const bool is_deprecated_app =
         extensions::IsExtensionUnsupportedDeprecatedApp(context,
                                                         extension->id());
-    if (is_deprecated_app && !extensions::IsExtensionForceInstalled(
-                                 context, extension->id(), nullptr)) {
+    if (is_deprecated_app && !extensions::util::IsExtensionForceInstalled(
+                                 extension->id(), context)) {
       deprecated_app_ids_.insert(extension->id());
     }
     result->emplace_back(CreateAppInfoPtrFromExtension(extension.get()));
