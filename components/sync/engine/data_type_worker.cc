@@ -563,6 +563,16 @@ void DataTypeWorker::ProcessGetUpdatesResponse(
       }
     }
 
+    // Negative versions are disallowed in the protocol.
+    if (update_entity->version() < 0) {
+      DLOG(ERROR) << "Received update with negative version from server";
+      continue;
+    }
+
+    static_assert(kUncommittedVersion < 0,
+                  "kUncommittedVersion must be negative");
+    CHECK_NE(update_entity->version(), kUncommittedVersion);
+
     UpdateResponseData response_data;
     switch (PopulateUpdateResponseData(*cryptographer_, type_, *update_entity,
                                        &response_data)) {
@@ -1063,6 +1073,8 @@ void DataTypeWorker::DecryptStoredEntities() {
   for (auto it = entries_pending_decryption_.begin();
        it != entries_pending_decryption_.end();) {
     const sync_pb::SyncEntity& encrypted_update = it->second;
+
+    CHECK_NE(encrypted_update.version(), kUncommittedVersion);
 
     UpdateResponseData response_data;
     switch (PopulateUpdateResponseData(*cryptographer_, type_, encrypted_update,

@@ -102,7 +102,7 @@ ProcessorEntity* ProcessorEntityTracker::AddRemote(
   DCHECK(!data.is_deleted());
   DCHECK(storage_key_to_tag_hash_.find(storage_key) ==
          storage_key_to_tag_hash_.end());
-  DCHECK(update_data.response_version != kUncommittedVersion);
+  CHECK_NE(update_data.response_version, kUncommittedVersion);
 
   ProcessorEntity* entity = AddInternal(storage_key, data);
   entity->RecordAcceptedRemoteUpdate(update_data, std::move(trimmed_specifics),

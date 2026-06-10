@@ -239,7 +239,7 @@ const SyncedBookmarkTrackerEntity* SyncedBookmarkTracker::AddRemote(
     int64_t server_version,
     base::Time creation_time,
     const sync_pb::EntitySpecifics& specifics) {
-  DCHECK_NE(server_version, syncer::kUncommittedVersion);
+  CHECK_NE(server_version, syncer::kUncommittedVersion);
   return AddInternal(bookmark_node, sync_id, server_version, creation_time,
                      specifics);
 }
