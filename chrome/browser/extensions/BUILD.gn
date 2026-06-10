@@ -1591,16 +1591,33 @@ static_library("test_support") {
   testonly = true
 
   sources = [
+    "blocked_action_waiter.cc",
+    "blocked_action_waiter.h",
     "chrome_extension_test_notification_observer.cc",
     "chrome_extension_test_notification_observer.h",
     "chrome_test_extension_loader.cc",
     "chrome_test_extension_loader.h",
     "extension_action_test_util.cc",
     "extension_action_test_util.h",
+    "extension_apitest.cc",
+    "extension_apitest.h",
+    "extension_browser_test_util.cc",
+    "extension_browser_test_util.h",
+    "extension_browsertest.cc",
+    "extension_browsertest.h",
+    "extension_browsertest_platform_delegate.h",
     "extension_cookies_test_helper.cc",
     "extension_cookies_test_helper.h",
     "extension_management_test_util.cc",
     "extension_management_test_util.h",
+    "extension_service_test_base.cc",
+    "extension_service_test_base.h",
+    "extension_service_test_with_install.cc",
+    "extension_service_test_with_install.h",
+    "extension_service_user_test_base.cc",
+    "extension_service_user_test_base.h",
+    "extension_with_management_policy_apitest.cc",
+    "extension_with_management_policy_apitest.h",
     "external_testing_loader.cc",
     "external_testing_loader.h",
     "fake_crx_installer.cc",
@@ -1609,6 +1626,8 @@ static_library("test_support") {
     "load_error_waiter.h",
     "menu_manager_test_observer.cc",
     "menu_manager_test_observer.h",
+    "mixin_based_extension_apitest.cc",
+    "mixin_based_extension_apitest.h",
     "mock_crx_installer.cc",
     "mock_crx_installer.h",
     "mock_extension_special_storage_policy.cc",
@@ -1619,21 +1638,38 @@ static_library("test_support") {
     "scoped_test_mv2_enabler.h",
     "signin_test_util.cc",
     "signin_test_util.h",
+    "test_extension_action_dispatcher_observer.cc",
+    "test_extension_action_dispatcher_observer.h",
+    "test_extension_environment.cc",
+    "test_extension_environment.h",
+    "test_extension_menu_icon_loader.cc",
+    "test_extension_menu_icon_loader.h",
     "test_extension_service.cc",
     "test_extension_service.h",
     "test_extension_system.cc",
     "test_extension_system.h",
+    "user_scripts_test_util.cc",
+    "user_scripts_test_util.h",
   ]
 
   deps = [
     "//base",
     "//chrome/browser",
     "//chrome/browser:test_support",
+    "//chrome/browser/bookmarks:test_support",
     "//chrome/browser/extensions",
     "//chrome/browser/extensions:external_loader",
+    "//chrome/browser/prefs",
+    "//chrome/browser/preloading:test_support",
+    "//chrome/browser/sync",
     "//chrome/browser/tab_group_sync:factories",
+    "//chrome/browser/tab_list",
+    "//chrome/browser/trusted_vault",
+    "//chrome/browser/ui/browser_window",
+    "//chrome/browser/ui/browser_window:create_browser_window",
     "//chrome/browser/ui/toolbar",
     "//components/crx_file",
+    "//components/feed:feature_list",
     "//components/policy/core/common:test_support",
     "//components/safe_browsing/core/browser/db:database_manager",
     "//components/services/unzip:in_process",
@@ -1641,20 +1677,74 @@ static_library("test_support") {
     "//components/sessions",
     "//components/signin/public/identity_manager:test_support",
     "//components/sync:test_support",
+    "//components/sync_preferences",
+    "//components/user_manager",
     "//components/value_store:test_support",
     "//content/test:test_support",
     "//extensions:test_support",
     "//extensions/browser:crx_installer",
+    "//extensions/browser:test_support",
     "//net:test_support",
     "//services/data_decoder/public/cpp:test_support",
     "//testing/gmock",
     "//url",
   ]
 
+  public_deps = []
+
+  if (is_android) {
+    sources += [
+      "extension_browsertest_platform_delegate_android.cc",
+      "test_extension_menu_model_android.cc",
+      "test_extension_menu_model_android.h",
+    ]
+    public_deps += [
+      "//extensions/browser:test_support",
+      "//extensions/common:test_support",
+    ]
+    deps += [
+      "//chrome/browser/android:tabs_public",
+      "//chrome/browser/renderer_context_menu:test_support",
+      "//chrome/browser/ui/android/tab_model:test_support",
+      "//chrome/test:test_support_ui_android",
+      "//extensions/common/api",
+    ]
+  } else {
+    sources += [ "extension_browsertest_platform_delegate_non_android.cc" ]
+    deps += [
+      "//chrome/browser/apps/app_service",
+      "//chrome/test:test_support_ui",
+    ]
+  }
+
+  if (is_chromeos) {
+    sources += [
+      "api/document_scan/document_scan_test_utils.cc",
+      "api/document_scan/document_scan_test_utils.h",
+    ]
+
+    deps += [
+      "//chrome/browser/ash/extensions",
+      "//chrome/browser/ash/login/users",
+      "//chrome/browser/ash/login/users:test_support",
+      "//chrome/browser/ash/settings:test_support",
+      "//chromeos/ash/components/dbus/lorgnette_manager:lorgnette_proto",
+      "//components/user_manager:test_support",
+    ]
+  }  # is_chromeos
+
   if (enable_extensions) {
     sources += [
+      "api/braille_display_private/mock_braille_controller.cc",
+      "api/braille_display_private/mock_braille_controller.h",
       "api/passwords_private/test_passwords_private_delegate.cc",
       "api/passwords_private/test_passwords_private_delegate.h",
+      "api/settings_private/generated_pref_test_base.cc",
+      "api/settings_private/generated_pref_test_base.h",
+      "browsertest_util.cc",
+      "browsertest_util.h",
+      "extension_api_unittest.cc",
+      "extension_api_unittest.h",
     ]
 
     deps += [
@@ -1671,19 +1761,7 @@ static_library("test_support") {
       "//extensions:test_support",
       "//extensions/browser",
     ]
-
-    if (is_chromeos) {
-      sources += [
-        "api/document_scan/document_scan_test_utils.cc",
-        "api/document_scan/document_scan_test_utils.h",
-      ]
-
-      deps += [
-        "//chromeos/ash/components/dbus/lorgnette_manager:lorgnette_proto",
-        "//components/user_manager:test_support",
-      ]
-    }
-  }
+  }  # enable_extensions
 }
 
 if (enable_extensions) {

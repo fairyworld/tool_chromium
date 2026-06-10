@@ -177,7 +177,9 @@ static_library("chrome_test_launcher") {
 # Use a static library here because many test binaries depend on this but don't
 # require many files from it. This makes linking more efficient.
 static_library("test_support") {
+  testonly = true
   defines = []
+  allow_circular_includes_from = []
   deps = [
     "//chrome/browser:browser_features",
     "//chrome/browser:browser_process_impl",
@@ -228,8 +230,6 @@ static_library("test_support") {
     "//chrome/browser/origin_trials",
     "//chrome/browser/renderer_context_menu:test_support",
   ]
-
-  testonly = true
 
   sources = [
     "../app/startup_timestamps.h",
@@ -400,93 +400,35 @@ static_library("test_support") {
   }
 
   if (enable_extensions_core) {
+    # TODO(crbug.com/521960574): Move these into build files closer to the
+    # sources.
     sources += [
-      "../browser/extensions/extension_apitest.cc",
-      "../browser/extensions/extension_apitest.h",
-      "../browser/extensions/extension_browser_test_util.cc",
-      "../browser/extensions/extension_browser_test_util.h",
-      "../browser/extensions/extension_browsertest.cc",
-      "../browser/extensions/extension_browsertest.h",
-      "../browser/extensions/extension_browsertest_platform_delegate.h",
-    ]
-
-    if (is_android) {
-      sources += [ "../browser/extensions/extension_browsertest_platform_delegate_android.cc" ]
-      deps += [ "../browser/ui/android/tab_model:test_support" ]
-    } else {
-      sources += [ "../browser/extensions/extension_browsertest_platform_delegate_non_android.cc" ]
-    }
-
-    deps += [
-      "//chrome/browser/extensions",
-      "//chrome/browser/preloading:test_support",
-      "//chrome/browser/tab_list",
-      "//chrome/browser/ui/browser_window",
-      "//chrome/browser/ui/browser_window:create_browser_window",
-      "//components/feed:feature_list",
-      "//extensions/browser:crx_installer",
-    ]
-  }
-
-  if (enable_desktop_android_extensions) {
-    public_deps += [
-      "//extensions/browser:test_support",
-      "//extensions/common:test_support",
-    ]
-
-    deps += [ "//extensions/common/api" ]
-  }
-
-  if (enable_extensions_core) {
-    sources += [
-      "../browser/extensions/blocked_action_waiter.cc",
-      "../browser/extensions/blocked_action_waiter.h",
-      "../browser/extensions/extension_service_test_base.cc",
-      "../browser/extensions/extension_service_test_base.h",
-      "../browser/extensions/extension_service_test_with_install.cc",
-      "../browser/extensions/extension_service_test_with_install.h",
-      "../browser/extensions/extension_service_user_test_base.cc",
-      "../browser/extensions/extension_service_user_test_base.h",
-      "../browser/extensions/extension_with_management_policy_apitest.cc",
-      "../browser/extensions/extension_with_management_policy_apitest.h",
-      "../browser/extensions/mixin_based_extension_apitest.cc",
-      "../browser/extensions/mixin_based_extension_apitest.h",
-      "../browser/extensions/test_extension_action_dispatcher_observer.cc",
-      "../browser/extensions/test_extension_action_dispatcher_observer.h",
-      "../browser/extensions/test_extension_environment.cc",
-      "../browser/extensions/test_extension_environment.h",
-      "../browser/extensions/test_extension_menu_icon_loader.cc",
-      "../browser/extensions/test_extension_menu_icon_loader.h",
-      "../browser/extensions/user_scripts_test_util.cc",
-      "../browser/extensions/user_scripts_test_util.h",
       "../browser/ui/webui/extensions/extension_settings_test_base.cc",
       "../browser/ui/webui/extensions/extension_settings_test_base.h",
       "../common/extensions/manifest_tests/chrome_manifest_test.cc",
       "../common/extensions/manifest_tests/chrome_manifest_test.h",
     ]
+
     public_deps += [
       "//chrome/browser/extensions:test_support",
       "//components/custom_handlers:test_support",
+      "//extensions:test_support",
     ]
-    deps += [ "//chrome/browser/trusted_vault" ]
+
+    deps += [ "//chrome/renderer/extensions" ]
+
+    # TODO(crbug.com/521960574): Fix extension_browsertest.cc and eliminate this
+    # circular dependency.
+    allow_circular_includes_from +=
+        [ "//chrome/browser/extensions:test_support" ]
   }
 
   if (enable_extensions) {
+    # TODO(crbug.com/521960574): Move these into build files closer to the
+    # sources.
     sources += [
-      "../browser/extensions/api/braille_display_private/mock_braille_controller.cc",
-      "../browser/extensions/api/braille_display_private/mock_braille_controller.h",
-      "../browser/extensions/api/settings_private/generated_pref_test_base.cc",
-      "../browser/extensions/api/settings_private/generated_pref_test_base.h",
-      "../browser/extensions/browsertest_util.cc",
-      "../browser/extensions/browsertest_util.h",
-      "../browser/extensions/extension_api_unittest.cc",
-      "../browser/extensions/extension_api_unittest.h",
       "../browser/policy/extension_force_install_mixin.cc",
       "../browser/policy/extension_force_install_mixin.h",
-      "../browser/task_manager/task_manager_browsertest_util.cc",
-      "../browser/task_manager/task_manager_browsertest_util.h",
-      "../browser/task_manager/task_manager_tester.cc",
-      "../browser/task_manager/task_manager_tester.h",
       "../browser/ui/web_applications/test/isolated_web_app_test_utils.cc",
       "../browser/ui/web_applications/test/isolated_web_app_test_utils.h",
       "../browser/ui/web_applications/test/ssl_test_utils.cc",
@@ -524,6 +466,7 @@ static_library("test_support") {
       "//apps:test_support",
       "//chrome/browser/extensions:test_support",
       "//chrome/browser/preloading:test_support",
+      "//chrome/browser/task_manager:test_support",
       "//chrome/browser/ui/autofill:test_support",
       "//chrome/common/extensions/api",
       "//extensions:test_support",
@@ -531,28 +474,6 @@ static_library("test_support") {
       "//extensions/common:test_support",
       "//google_apis/common:test_support",
       "//google_apis/drive",
-    ]
-
-    # TODO(crbug.com/429171097): Remove this dependency when
-    # `task_manager_tester.h` gets modularized.
-    public_deps += [ "//chrome/browser/ui/task_manager" ]
-  }
-
-  # TODO(https://crbug.com/356905053): Continue pulling more common test
-  # support pieces into here and eventually merge this with the
-  # `enable_extensions` block above.
-  if (enable_desktop_android_extensions) {
-    sources += [
-      "../browser/extensions/test_extension_menu_model_android.cc",
-      "../browser/extensions/test_extension_menu_model_android.h",
-    ]
-
-    deps += [ "//chrome/renderer/extensions" ]
-
-    public_deps += [
-      "//extensions:test_support",
-      "//extensions/browser:test_support",
-      "//extensions/common:test_support",
     ]
   }
 
@@ -837,7 +758,7 @@ static_library("test_support") {
       "//components/supervised_user/core/browser/android",
     ]
 
-    allow_circular_includes_from = [ ":test_support_ui_android" ]
+    allow_circular_includes_from += [ ":test_support_ui_android" ]
   } else {
     public_deps += [
       # Android uses //chrome:chrome_android_core instead of the //chrome/app
@@ -947,7 +868,7 @@ static_library("test_support") {
       "base/test_browser_window.cc",
       "base/test_browser_window.h",
     ]
-    allow_circular_includes_from = [ ":test_support_ui" ]
+    allow_circular_includes_from += [ ":test_support_ui" ]
   }
 
   if (enable_devtools_frontend) {
