@@ -90,10 +90,6 @@ source_set("component_updater") {
     public += [ "updater_state.h" ]
   }
 
-  if (is_win && enable_media_foundation_widevine_cdm) {
-    public += [ "media_foundation_widevine_cdm_component_installer.h" ]
-  }
-
   if (enable_library_cdms && enable_widevine && enable_widevine_cdm_component) {
     public += [ "widevine_cdm_component_installer.h" ]
   }
@@ -248,10 +244,6 @@ source_set("impl") {
       "//chrome/elevation_service:public_headers",
       "//chrome/installer/util:with_no_strings",
     ]
-  }
-
-  if (is_win && enable_media_foundation_widevine_cdm) {
-    sources += [ "media_foundation_widevine_cdm_component_installer.cc" ]
   }
 
   if (is_mac) {

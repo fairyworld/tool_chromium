@@ -16115,21 +16115,6 @@
             ]
         }
     ],
-    "MediaHardwareSecureDecryption": [
-        {
-            "platforms": [
-                "windows"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "HardwareSecureDecryptionExperiment"
-                    ]
-                }
-            ]
-        }
-    ],
     "MediaHardwareSecureDecryptionFallbackPerSite": [
         {
             "platforms": [

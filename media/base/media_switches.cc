@@ -943,16 +943,6 @@ BASE_FEATURE(kFailUrlProvisionFetcherForTesting,
 // is already available.
 BASE_FEATURE(kHardwareSecureDecryption, base::FEATURE_ENABLED_BY_DEFAULT);
 
-// By default, a codec is not supported for hardware secure decryption if it
-// does not support clear lead. This option forces the support for testing.
-const base::FeatureParam<bool> kHardwareSecureDecryptionForceSupportClearLead{
-    &kHardwareSecureDecryption, "force_support_clear_lead", false};
-
-// Same as `kHardwareSecureDecryption` above, but only enable experimental
-// sub key systems. Which sub key system is experimental is key system specific.
-BASE_FEATURE(kHardwareSecureDecryptionExperiment,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
 // Allows automatically disabling hardware secure Content Decryption Module
 // (CDM) after failures or crashes to fallback to software secure CDMs. If this
 // feature is disabled, the fallback will never happen and users could be stuck
@@ -1853,8 +1843,7 @@ bool IsDedicatedMediaServiceThreadEnabled(gl::ANGLEImplementation impl) {
 }
 
 bool IsHardwareSecureDecryptionEnabled() {
-  return base::FeatureList::IsEnabled(kHardwareSecureDecryption) ||
-         base::FeatureList::IsEnabled(kHardwareSecureDecryptionExperiment);
+  return base::FeatureList::IsEnabled(kHardwareSecureDecryption);
 }
 
 bool IsLiveTranslateEnabled() {

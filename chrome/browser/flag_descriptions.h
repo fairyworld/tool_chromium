@@ -6618,12 +6618,6 @@ inline constexpr char kHidGetFeatureReportFixDescription[] =
     "Enable/Disable a fix for a bug that caused feature reports to be offset "
     "by one byte when received from devices that do not use numbered reports.";
 
-inline constexpr char kHardwareSecureDecryptionExperimentName[] =
-    "Hardware Secure Decryption Experiment";
-inline constexpr char kHardwareSecureDecryptionExperimentDescription[] =
-    "Enable/Disable the use of hardware secure Content Decryption Module (CDM) "
-    "for experimental protected content playback.";
-
 inline constexpr char kHardwareSecureDecryptionFallbackName[] =
     "Hardware Secure Decryption Fallback";
 inline constexpr char kHardwareSecureDecryptionFallbackDescription[] =

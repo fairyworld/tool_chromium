@@ -5102,13 +5102,6 @@ const FeatureEntry kFeatureEntries[] = {
         FEATURE_VALUE_TYPE(media::kHardwareSecureDecryption),
     },
     {
-        "enable-hardware-secure-decryption-experiment",
-        flag_descriptions::kHardwareSecureDecryptionExperimentName,
-        flag_descriptions::kHardwareSecureDecryptionExperimentDescription,
-        kOsWin,
-        FEATURE_VALUE_TYPE(media::kHardwareSecureDecryptionExperiment),
-    },
-    {
         "enable-hardware-secure-decryption-fallback",
         flag_descriptions::kHardwareSecureDecryptionFallbackName,
         flag_descriptions::kHardwareSecureDecryptionFallbackDescription,
