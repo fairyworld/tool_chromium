@@ -3097,6 +3097,7 @@ bool IsFullscreenNextIAEnabled() {
     return;
   }
 
+  [self.sceneHandler hideAssistant];
   [self.geminiHandler
       hideFloatyIfInvokedAnimated:NO
                        fromSource:gemini::FloatyUpdateSource::Overlay];
@@ -3111,6 +3112,7 @@ bool IsFullscreenNextIAEnabled() {
 - (void)lensOverlayWillDisappear {
   [_sideSwipeCoordinator setEnabled:YES];
   _lensOverlayVisible = NO;
+  [self.sceneHandler revealAssistant];
   self.contentArea.accessibilityElementsHidden = self.contentAreaObstructed;
 }
 
