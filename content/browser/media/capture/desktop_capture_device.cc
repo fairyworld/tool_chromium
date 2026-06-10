@@ -32,13 +32,20 @@
 #include "base/timer/timer.h"
 #include "base/trace_event/trace_event.h"
 #include "build/build_config.h"
+#include "content/browser/gpu/browser_gpu_channel_host_factory.h"
 #include "content/browser/media/capture/desktop_capture_device_uma_types.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/desktop_capture.h"
 #include "content/public/browser/desktop_media_id.h"
 #include "content/public/browser/device_service.h"
+#include "content/public/browser/gpu_data_manager.h"
 #include "content/public/common/content_switches.h"
+#include "gpu/command_buffer/client/client_shared_image.h"
+#include "gpu/command_buffer/client/shared_image_interface.h"
+#include "gpu/command_buffer/common/shared_image_usage.h"
+#include "gpu/config/gpu_info.h"
+#include "media/base/format_utils.h"
 #include "media/base/media_switches.h"
 #include "media/base/video_frame.h"
 #include "media/base/video_frame_converter.h"
@@ -62,6 +69,8 @@
 #include "ui/gfx/icc_profile.h"
 
 #if BUILDFLAG(IS_WIN)
+#include <windows.h>
+
 #include "base/win/windows_version.h"
 #endif
 
@@ -132,15 +141,6 @@ void LogDesktopCaptureRequestRefreshRate(DesktopMediaID::Type capturer_type,
                              rrf_rate_fps);
   }
 }
-
-#if BUILDFLAG(IS_WIN)
-bool IsWgcEnabledForScreenCapture() {
-  // Starting from WIN11 24H2 (build 26100), the Capture API returns empty
-  // frame when the captured content is unchanged, helping to maintain
-  // performance for 0Hz capture scenarios.
-  return base::win::GetVersion() >= base::win::Version::WIN11_24H2;
-}
-#endif  // BUILDFLAG(IS_WIN)
 
 // Helper class which request that the system-global Windows timer interrupt
 // frequency be raised at construction. The corresponding deactivation is done
@@ -230,7 +230,41 @@ bool IsFrameUnpackedOrInverted(webrtc::DesktopFrame* frame) {
          frame->size().width() * webrtc::DesktopFrame::kBytesPerPixel;
 }
 
+// Creates a GpuMemoryBufferHandle from the platform-specific texture handle
+// of a captured frame. Returns std::nullopt on failure.
+std::optional<gfx::GpuMemoryBufferHandle> CreateGmbHandleFromTexture(
+    const webrtc::DesktopFrame* frame) {
+#if BUILDFLAG(IS_WIN)
+  HANDLE shared_handle = frame->texture()->handle();
+  if (shared_handle == INVALID_HANDLE_VALUE || !shared_handle) {
+    LOG(ERROR) << "Invalid texture handle.";
+    return std::nullopt;
+  }
+
+  HANDLE duplicated_handle = INVALID_HANDLE_VALUE;
+  if (!DuplicateHandle(GetCurrentProcess(), shared_handle, GetCurrentProcess(),
+                       &duplicated_handle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+    LOG(ERROR) << "Failed to duplicate texture handle.";
+    return std::nullopt;
+  }
+
+  return gfx::GpuMemoryBufferHandle{
+      gfx::DXGIHandle(base::win::ScopedHandle(duplicated_handle))};
+#else
+  NOTREACHED();  // Texture capture is not implemented on this platform.
+#endif
+}
+
 }  // namespace
+
+#if BUILDFLAG(IS_WIN)
+bool IsWgcEnabledForScreenCapture() {
+  // Starting from WIN11 24H2 (build 26100), the Capture API returns empty
+  // frame when the captured content is unchanged, helping to maintain
+  // performance for 0Hz capture scenarios.
+  return base::win::GetVersion() >= base::win::Version::WIN11_24H2;
+}
+#endif  // BUILDFLAG(IS_WIN)
 
 media::VideoPixelFormat FourCCToVideoPixelFormat(webrtc::FourCC fourcc) {
   switch (fourcc) {
@@ -274,6 +308,10 @@ class DesktopCaptureDevice::Core : public webrtc::DesktopCapturer::Callback {
 
   base::WeakPtr<Core> GetWeakPtr() { return weak_factory_.GetWeakPtr(); }
 
+#if BUILDFLAG(IS_WIN)
+  void SetGpuLuid(CHROME_LUID luid) { active_gpu_luid_ = luid; }
+#endif
+
  private:
   // webrtc::DesktopCapturer::Callback interface.
   // A side-effect of this method is to schedule the next frame.
@@ -285,6 +323,11 @@ class DesktopCaptureDevice::Core : public webrtc::DesktopCapturer::Callback {
                                std::unique_ptr<webrtc::DesktopFrame> frame);
   void OnCaptureResultLegacy(const bool frame_is_refresh,
                              std::unique_ptr<webrtc::DesktopFrame> frame);
+
+  // Deliver texture of the frame to client. Returns false if the texture
+  // could not be delivered (e.g. GPU adapter LUID changed), in which case
+  // the caller should fall back to the software path.
+  bool DeliverTextureToClient(const webrtc::DesktopFrame* frame);
 
   // Method that is scheduled on |task_runner_| to be called on regular interval
   // to capture a frame.
@@ -413,6 +456,19 @@ class DesktopCaptureDevice::Core : public webrtc::DesktopCapturer::Callback {
   // TODO(jiayl): Remove wake_lock_ when there is an API to keep the
   // screen from sleeping for the drive-by web.
   mojo::Remote<device::mojom::WakeLock> wake_lock_;
+
+  // Cached SharedImageInterface used to create shared images from DXGI
+  // texture handles in texture capture mode. Kept alive as a member so that
+  // the shared images it creates remain valid in the GPU process until the
+  // consumer (e.g. video encoder) has finished using them.
+  scoped_refptr<gpu::SharedImageInterface> sii_;
+
+#if BUILDFLAG(IS_WIN)
+  // The GPU adapter LUID that was passed to the WGC capturer at creation
+  // time. Set in Create() via SetGpuLuid(). If the active LUID changes
+  // mid-capture (e.g. GPU process crash), texture delivery must fail.
+  CHROME_LUID active_gpu_luid_ = {};
+#endif
 
   base::WeakPtrFactory<Core> weak_factory_{this};
 };
@@ -589,6 +645,25 @@ void DesktopCaptureDevice::Core::OnCaptureResult(
   VLOG(2) << __func__ << " [SUCCESS]" << (frame_is_refresh ? "[RRF]" : "")
           << (zero_hertz_is_active ? "[0Hz]" : "");
   if (zero_hertz_is_active) {
+    ScheduleNextCaptureFrame();
+    return;
+  }
+
+  if (frame->texture()) {
+    if (!DeliverTextureToClient(frame.get())) {
+      // Texture delivery failed. This is typically caused by a GPU adapter
+      // LUID change (e.g. GPU process crash), which means the WGC capturer's
+      // D3D11 device is on the wrong adapter and all future texture frames
+      // will also fail. Report a permanent error so the capture pipeline can
+      // restart cleanly.
+      // TODO(crbug.com/40929600): Instead of failing, read back the texture
+      // to system memory and deliver as a software YUV frame to survive GPU
+      // crashes like non-texture capture does.
+      client_->OnError(
+          media::VideoCaptureError::kDesktopCaptureDeviceGpuAdapterChanged,
+          FROM_HERE, "Texture delivery failed (GPU adapter may have changed).");
+      return;
+    }
     ScheduleNextCaptureFrame();
     return;
   }
@@ -1021,6 +1096,118 @@ void DesktopCaptureDevice::Core::OnCaptureResultLegacy(
   ScheduleNextCaptureFrame();
 }
 
+bool DesktopCaptureDevice::Core::DeliverTextureToClient(
+    const webrtc::DesktopFrame* frame) {
+  DCHECK(frame->texture());
+
+  // Check if the active GPU adapter LUID has changed (e.g. after GPU process
+  // crash). The WGC capturer's D3D11 device (and thus all its textures) is
+  // bound to the adapter that was active at creation time. If the active
+  // adapter changes mid-capture, the textures are no longer usable by the
+  // new GPU process.
+#if BUILDFLAG(IS_WIN)
+  if (GpuDataManager::Initialized()) {
+    auto current_luid =
+        GpuDataManager::GetInstance()->GetGPUInfo().active_gpu().luid;
+    if (current_luid != active_gpu_luid_) {
+      LOG(WARNING) << "Active GPU LUID changed, texture is on wrong adapter.";
+      sii_.reset();
+      return false;
+    }
+  }
+#endif
+
+  gfx::Size texture_size(frame->size().width(), frame->size().height());
+
+  DCHECK_EQ(frame->pixel_format(), webrtc::FOURCC_ARGB);
+  media::VideoPixelFormat pixel_format = media::PIXEL_FORMAT_ARGB;
+
+  auto gmb_handle = CreateGmbHandleFromTexture(frame);
+  if (!gmb_handle.has_value()) {
+    return false;
+  }
+
+  // Get or create a cached SharedImageInterface. The SII must be kept alive
+  // so that the shared images it creates remain registered in the GPU process
+  // until the consumer (e.g. D3D12 video encoder) has finished using them.
+  // Recreate if the GPU channel was lost (e.g. GPU process crash).
+  if (!sii_ || sii_->IsLost()) {
+    sii_.reset();
+    auto* factory = BrowserGpuChannelHostFactory::instance();
+    if (!factory) {
+      LOG(ERROR) << "BrowserGpuChannelHostFactory is not available.";
+      return false;
+    }
+
+    auto* gpu_channel_host = factory->GetGpuChannel();
+    if (!gpu_channel_host) {
+      LOG(ERROR) << "Failed to get GpuChannelHost.";
+      return false;
+    }
+
+    sii_ = gpu_channel_host->CreateClientSharedImageInterface();
+    if (!sii_) {
+      LOG(ERROR) << "Failed to get SharedImageInterface.";
+      return false;
+    }
+  }
+
+  auto si_format = media::VideoPixelFormatToSharedImageFormat(pixel_format);
+  if (!si_format.has_value()) {
+    LOG(ERROR) << "Unsupported pixel format for shared image.";
+    return false;
+  }
+
+  constexpr auto kSharedImageUsage =
+      gpu::SHARED_IMAGE_USAGE_DISPLAY_READ | gpu::SHARED_IMAGE_USAGE_SCANOUT |
+      gpu::SHARED_IMAGE_USAGE_RASTER_READ |
+      gpu::SHARED_IMAGE_USAGE_VIDEO_ENCODE_ACCELERATOR;
+  auto shared_image = sii_->CreateSharedImage(
+      {*si_format, texture_size, gfx::ColorSpace(),
+       gpu::SharedImageUsageSet(kSharedImageUsage), "DesktopCaptureDevice"},
+      std::move(*gmb_handle));
+  if (!shared_image) {
+    LOG(ERROR) << "Failed to create shared image.";
+    return false;
+  }
+
+  // Trigger sync token verification on the capture thread by calling Export().
+  // This ensures downstream Export() calls (e.g. in
+  // SharedImageBufferTracker::GetVideoBufferHandle()) see a verified token
+  // and do not trigger a synchronous IPC.
+  shared_image->Export();
+
+  base::TimeTicks now = NowTicks();
+  if (first_ref_time_.is_null()) {
+    first_ref_time_ = now;
+  }
+
+  // Update the resolution chooser with the source size so it can compute the
+  // target output size based on constraints.
+  const gfx::Size frame_size(frame->size().width(), frame->size().height());
+  if (last_frame_size_ != frame_size) {
+    resolution_chooser_.SetSourceSize(frame_size);
+    last_frame_size_ = frame_size;
+  }
+
+  // Use the resolution chooser's capture size as natural_size so that
+  // downstream consumers (e.g. video encoder) can scale the texture to the
+  // target resolution on the GPU.
+  gfx::Size natural_size = resolution_chooser_.capture_size();
+  if (natural_size.IsEmpty()) {
+    natural_size = texture_size;
+  }
+
+  client_->OnIncomingCapturedImage(
+      std::move(shared_image),
+      media::VideoCaptureFormat(texture_size, requested_frame_rate_,
+                                pixel_format),
+      0 /* clockwise_rotation */, now, now - first_ref_time_,
+      /*capture_begin_timestamp=*/std::nullopt, natural_size,
+      media::VideoFrameMetadata());
+  return true;
+}
+
 void DesktopCaptureDevice::Core::OnCaptureTimer() {
   DCHECK(task_runner_->BelongsToCurrentThread());
 
@@ -1144,9 +1331,9 @@ std::unique_ptr<media::VideoCaptureDevice> DesktopCaptureDevice::Create(
   // set to true. GDI does not use this option.
   options.set_prefer_cursor_embedded(true);
 
+#if defined(RTC_ENABLE_WIN_WGC)
   if (IsWgcEnabledForScreenCapture()) {
     options.set_allow_wgc_screen_capturer(true);
-
     // 0Hz support is enabled for WGC window capture and screen capture (on
     // compatible OS versions). When 0Hz is enabled, the WGC capturer will
     // compare the pixel values of the new frame and the previous frame and
@@ -1162,20 +1349,33 @@ std::unique_ptr<media::VideoCaptureDevice> DesktopCaptureDevice::Create(
   if (source.type == DesktopMediaID::TYPE_WINDOW) {
     options.set_allow_wgc_zero_hertz(true);
   }
+  options.set_allow_wgc_using_texture(
+      base::FeatureList::IsEnabled(features::kWebRtcAllowWgcUsingTexture));
 
   options.set_wgc_require_border(
       base::FeatureList::IsEnabled(features::kWebRtcWgcRequireBorder));
 
+  // Set the GPU adapter LUID so the WGC capturer creates its D3D11 device on
+  // the same adapter as the GPU process. This is required for DXGI shared
+  // handle interop in texture capture mode.
+  if (GpuDataManager::Initialized()) {
+    auto luid = GpuDataManager::GetInstance()->GetGPUInfo().active_gpu().luid;
+    options.set_d3d_device_luid({luid.LowPart, luid.HighPart});
+  }
+#endif
+
   std::ostringstream string_stream;
   string_stream << "DesktopCaptureOptions: options={prefer_cursor_embedded: "
-                << options.prefer_cursor_embedded()
-                << ", allow_wgc_screen_capturer: "
+                << options.prefer_cursor_embedded();
+#if defined(RTC_ENABLE_WIN_WGC)
+  string_stream << ", allow_wgc_screen_capturer: "
                 << options.allow_wgc_screen_capturer()
                 << ", allow_wgc_window_capturer: "
                 << options.allow_wgc_window_capturer()
                 << ", allow_wgc_zero_hertz: " << options.allow_wgc_zero_hertz()
-                << ", wgc_require_border: " << options.wgc_require_border()
-                << "}";
+                << ", wgc_require_border: " << options.wgc_require_border();
+#endif
+  string_stream << "}";
   VLOG(1) << string_stream.str();
   if (device_client) {
     device_client->OnLog(string_stream.str());
@@ -1235,6 +1435,15 @@ std::unique_ptr<media::VideoCaptureDevice> DesktopCaptureDevice::Create(
 
   if (capturer)
     result.reset(new DesktopCaptureDevice(std::move(capturer), source.type));
+
+#if defined(RTC_ENABLE_WIN_WGC)
+  // Pass the LUID to Core so it can detect adapter changes during capture.
+  if (result) {
+    auto luid = options.d3d_device_luid();
+    static_cast<DesktopCaptureDevice*>(result.get())
+        ->core_->SetGpuLuid({luid.LowPart, luid.HighPart});
+  }
+#endif
 
   return result;
 }
