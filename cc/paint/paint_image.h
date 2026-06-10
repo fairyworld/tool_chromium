@@ -43,6 +43,7 @@ struct FrameMetadata;
 class PaintImageGenerator;
 class PaintWorkletInput;
 class TextureBacking;
+class TextureBackingContext;
 
 enum class ImageType {
   kPNG,
@@ -300,6 +301,9 @@ class CC_PAINT_EXPORT PaintImage {
 
   // Returned mailbox must not outlive this PaintImage.
   gpu::Mailbox GetMailbox() const;
+
+  void BindTextureBacking(scoped_refptr<TextureBackingContext>) const;
+  void UnbindTextureBacking() const;
 
   Id stable_id() const { return id_; }
   Id sync_animation_target_id() const { return sync_animation_target_id_; }

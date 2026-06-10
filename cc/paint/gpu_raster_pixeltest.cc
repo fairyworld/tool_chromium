@@ -1331,6 +1331,8 @@ class TestMailboxBacking : public TextureBacking {
 
   const SkImageInfo& GetSkImageInfo() override { return info_; }
   gpu::Mailbox GetMailbox() const override { return mailbox_; }
+  void Bind(scoped_refptr<TextureBackingContext>) override {}
+  void Unbind() override {}
   sk_sp<SkImage> GetSkImageViaReadback() override { return nullptr; }
   bool readPixels(const SkImageInfo& dstInfo,
                   void* dstPixels,
