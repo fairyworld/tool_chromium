@@ -435,7 +435,7 @@ vars = {
   # Three lines of non-changing comments so that
   # the commit queue can handle CLs rolling feed
   # and whatever else without interference from each other.
-  'quiche_revision': 'e6b8764f38c257c1c7b181bb35b64d7ad95dff10',
+  'quiche_revision': '1276ee42511694e93439c7023781f1a7dcc075a3',
   # Three lines of non-changing comments so that
   # the commit queue can handle CLs rolling ink
   # and whatever else without interference from each other.
@@ -1924,7 +1924,7 @@ deps = {
     Var('chromium_git') + '/angle/angle.git' + '@' +  Var('angle_revision'),
 
   'src/third_party/anonymous_tokens/src':
-    Var('chromium_git') + '/external/github.com/google/anonymous-tokens.git' + '@' + '8e78b089f583d0f8dac8f08128ab560be0e1ee15',
+    Var('chromium_git') + '/external/github.com/google/anonymous-tokens.git' + '@' + 'f5499d91ee1b8ab56b6d110e8e9a0d94c0a6eca7',
 
   'src/third_party/aria-practices/src':
     Var('chromium_git') + '/external/github.com/w3c/aria-practices.git' + '@' + '7b134ce6d19497cce8a67db4a9f59980baf853dc',
