@@ -233,7 +233,8 @@ void ChromeTailoredSecurityService::QueueNotice(bool is_enabled) {
   auto& other_notice_handle =
       is_enabled ? disabled_notice_handle_ : enabled_notice_handle_;
 
-  if (!product_messaging_controller.IsMessageQueued(notice_to_queue)) {
+  if (product_messaging_controller.GetMessageStatus(notice_to_queue) ==
+      user_education::ProductMessageStatus::kNone) {
     // If the conflicting notice is currently held, release it so the new one
     // can process.
     if (other_notice_handle) {

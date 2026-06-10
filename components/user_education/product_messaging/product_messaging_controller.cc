@@ -11,6 +11,9 @@
 #include <vector>
 
 #include "base/callback_list.h"
+#include "base/check.h"
+#include "base/containers/flat_set.h"
+#include "base/containers/map_util.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback.h"
 #include "base/logging.h"
@@ -71,7 +74,7 @@ void ProductMessagingHandleImpl::OnStatusChange(ProductMessageKey key,
   if (key.type() <= message_key_.type()) {
     return;
   }
-  if (status != ProductMessageStatus::kEligible &&
+  if (status != ProductMessageStatus::kReady &&
       status != ProductMessageStatus::kShowing) {
     return;
   }
@@ -100,11 +103,6 @@ void ProductMessagingController::Init(
   policy_ = std::move(policy);
 }
 
-bool ProductMessagingController::IsMessageQueued(
-    ProductMessageKey message_key) const {
-  return pending_messages_.contains(message_key);
-}
-
 void ProductMessagingController::QueueMessage(
     ProductMessageKey message_key,
     ProductMessageReadyCallback ready_to_start_callback) {
@@ -112,14 +110,14 @@ void ProductMessagingController::QueueMessage(
   CHECK(!ready_to_start_callback.is_null());
 
   // Cannot re-queue a notice.
-  if (GetProductMessageStatus(message_key) != ProductMessageStatus::kNone) {
+  if (GetMessageStatus(message_key) != ProductMessageStatus::kNone) {
     return;
   }
 
   const auto result = pending_messages_.emplace(
       message_key, std::move(ready_to_start_callback));
   CHECK(result.second) << "Duplicate message ID: " << message_key.ToString();
-  status_update_callbacks_.Notify(message_key, ProductMessageStatus::kQueued);
+  status_update_callbacks_.Notify(message_key, ProductMessageStatus::kWaiting);
   MaybeShowNextMessage();
 }
 
@@ -128,17 +126,17 @@ void ProductMessagingController::UnqueueMessage(ProductMessageKey message_key) {
 }
 
 // Returns the status of `message`.
-ProductMessageStatus ProductMessagingController::GetProductMessageStatus(
+ProductMessageStatus ProductMessagingController::GetMessageStatus(
     ProductMessageKey message) const {
   if (!message) {
     return ProductMessageStatus::kNone;
   }
-  if (message == current_message_) {
-    return current_message_shown_ ? ProductMessageStatus::kShowing
-                                  : ProductMessageStatus::kEligible;
+  if (const bool* const shown = base::FindOrNull(active_messages_, message)) {
+    return *shown ? ProductMessageStatus::kShowing
+                  : ProductMessageStatus::kReady;
   }
-  if (IsMessageQueued(message)) {
-    return ProductMessageStatus::kQueued;
+  if (pending_messages_.contains(message)) {
+    return ProductMessageStatus::kWaiting;
   }
   return ProductMessageStatus::kNone;
 }
@@ -152,20 +150,20 @@ ProductMessagingController::GetAllMessages(
   const base::flat_set<ProductMessageStatus> filter_statuses(
       statuses_to_retrieve);
   base::flat_map<ProductMessageKey, ProductMessageStatus> infos;
-  if (current_message_ && current_message_.type() > priority_higher_than) {
-    if (current_message_shown_ &&
-        filter_statuses.contains(ProductMessageStatus::kShowing)) {
-      infos.emplace(current_message_, ProductMessageStatus::kShowing);
-    }
-    if (!current_message_shown_ &&
-        filter_statuses.contains(ProductMessageStatus::kEligible)) {
-      infos.emplace(current_message_, ProductMessageStatus::kEligible);
+  for (const auto& [key, shown] : active_messages_) {
+    if (key.type() > priority_higher_than) {
+      if (shown && filter_statuses.contains(ProductMessageStatus::kShowing)) {
+        infos.emplace(key, ProductMessageStatus::kShowing);
+      }
+      if (!shown && filter_statuses.contains(ProductMessageStatus::kReady)) {
+        infos.emplace(key, ProductMessageStatus::kReady);
+      }
     }
   }
-  if (filter_statuses.contains(ProductMessageStatus::kQueued)) {
+  if (filter_statuses.contains(ProductMessageStatus::kWaiting)) {
     for (auto& [key, data] : pending_messages_) {
       if (key.type() > priority_higher_than) {
-        infos.emplace(key, ProductMessageStatus::kQueued);
+        infos.emplace(key, ProductMessageStatus::kWaiting);
       }
     }
   }
@@ -178,13 +176,11 @@ ProductMessagingController::AddStatusUpdateCallbackForTesting(
   return status_update_callbacks_.Add(std::move(callback));
 }
 
-bool ProductMessagingController::HasPendingMessagesForTesting() const {
-  return current_message_ || !pending_messages_.empty();
-}
-
 void ProductMessagingController::ReleaseHandle(ProductMessageKey message_key,
                                                bool message_shown) {
-  CHECK_EQ(current_message_, message_key);
+  const auto it = active_messages_.find(message_key);
+  CHECK(it != active_messages_.end());
+  CHECK_EQ(it->second, message_shown);
   if (message_shown) {
     ProductMessagingData data = storage_service_->ReadProductMessagingData();
     const auto insert_result = data.shown_notices.insert(message_key.GetName());
@@ -192,16 +188,11 @@ void ProductMessagingController::ReleaseHandle(ProductMessageKey message_key,
       storage_service_->SaveProductMessagingData(data);
     }
   }
-  current_message_ = ProductMessageKey();
-  current_message_shown_ = false;
+  active_messages_.erase(it);
   MaybeShowNextMessage();
 }
 
 void ProductMessagingController::MaybeShowNextMessage() {
-  if (!ready_to_show()) {
-    return;
-  }
-
   base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
       FROM_HERE,
       base::BindOnce(&ProductMessagingController::MaybeShowNextMessageImpl,
@@ -231,56 +222,77 @@ void ProductMessagingController::PurgeBlockedMessages() {
 }
 
 void ProductMessagingController::MaybeShowNextMessageImpl() {
-  if (!ready_to_show()) {
-    return;
-  }
-
   PurgeBlockedMessages();
   if (pending_messages_.empty()) {
     return;
   }
 
+  // Build some lookups for faster access.
   ProductMessagingPolicy::Ids ids;
-  std::set<ProductMessageType> types;
+  base::flat_set<ProductMessageType> queued_types;
+  base::flat_set<ProductMessageType> active_types;
   for (const auto& [key, data] : pending_messages_) {
     ids.insert(key.id());
-    types.insert(key.type());
+    queued_types.insert(key.type());
+  }
+  for (const auto& [key, data] : active_messages_) {
+    ids.insert(key.id());
+    active_types.insert(key.type());
   }
 
   // Find a notice that is not waiting for any other notices to show.
   ProductMessageKey to_show;
   for (const auto& [key, data] : pending_messages_) {
+    // Ensure that the message is not temporarily or permanently blocked.
     if (policy_->BlockedByAnyOf(key, ids, /*include_self=*/false) ||
         policy_->MustShowAfterAnyOf(key, ids)) {
       continue;
     }
-    bool allowed = true;
-    for (ProductMessageType type : types) {
-      if (policy_->GetRelationship(key.type(), type) ==
-          ProductMessagingPolicy::TypeRelationship::kSupersededBy) {
-        allowed = false;
-        break;
-      }
+
+    // Ensure that the message is not superseded by any queued message.
+    if (std::ranges::any_of(queued_types, [this, key](ProductMessageType type) {
+          return policy_->GetRelationship(key.type(), type) ==
+                 ProductMessagingPolicy::TypeRelationship::kSupersededBy;
+        })) {
+      continue;
     }
-    if (allowed) {
-      to_show = key;
-      break;
+
+    // Ensure that the message is not superseded or excluded by any active
+    // message.
+    if (std::ranges::any_of(active_types, [this, key](ProductMessageType type) {
+          const auto relationship = policy_->GetRelationship(key.type(), type);
+          return relationship ==
+                     ProductMessagingPolicy::TypeRelationship::kSupersededBy ||
+                 relationship ==
+                     ProductMessagingPolicy::TypeRelationship::kEquivalentTo;
+        })) {
+      continue;
     }
+
+    // Choose this message.
+    to_show = key;
+    break;
   }
 
   if (!to_show) {
-    NOTREACHED() << "Circular dependency in required notifications:"
-                 << DumpData();
+    CHECK(!active_messages_.empty())
+        << "Circular dependency in required notifications:" << DumpData();
+    return;
   }
 
   // Fire the next notice.
   ProductMessageReadyCallback cb = std::move(pending_messages_[to_show]);
   pending_messages_.erase(to_show);
-  current_message_ = to_show;
-  current_message_shown_ = false;
+  active_messages_.emplace(to_show, false);
   std::move(cb).Run(base::WrapUnique(
       new ProductMessagingHandleImpl(to_show, weak_ptr_factory_.GetWeakPtr())));
-  status_update_callbacks_.Notify(to_show, ProductMessageStatus::kEligible);
+  status_update_callbacks_.Notify(to_show, ProductMessageStatus::kReady);
+
+  // Since multiple messages can show at the same time (if they are independent)
+  // we might need to check again.
+  if (!pending_messages_.empty()) {
+    MaybeShowNextMessage();
+  }
 }
 
 void ProductMessagingController::OnNewSession() {
@@ -288,11 +300,13 @@ void ProductMessagingController::OnNewSession() {
 }
 
 void ProductMessagingController::OnMessageShown(ProductMessageKey message_key) {
-  if (message_key == current_message_) {
-    current_message_shown_ = true;
-    status_update_callbacks_.Notify(message_key,
-                                    ProductMessageStatus::kShowing);
+  const auto it = active_messages_.find(message_key);
+  CHECK(it != active_messages_.end());
+  if (it->second) {
+    return;
   }
+  it->second = true;
+  status_update_callbacks_.Notify(message_key, ProductMessageStatus::kShowing);
 }
 
 std::string ProductMessagingController::DumpData() const {

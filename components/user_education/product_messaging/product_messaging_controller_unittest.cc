@@ -4,6 +4,7 @@
 
 #include "components/user_education/product_messaging/product_messaging_controller.h"
 
+#include <concepts>
 #include <initializer_list>
 
 #include "base/functional/bind.h"
@@ -13,6 +14,7 @@
 #include "base/test/task_environment.h"
 #include "components/user_education/common/user_education_data.h"
 #include "components/user_education/product_messaging/product_messaging_policy_impl.h"
+#include "components/user_education/product_messaging/product_messaging_types.h"
 #include "components/user_education/test/test_product_messaging_controller.h"
 #include "components/user_education/test/test_user_education_storage_service.h"
 #include "components/user_education/test/user_education_session_mocks.h"
@@ -29,6 +31,14 @@ DEFINE_LOCAL_PRODUCT_MESSAGE_KEY(kNoticeId2,
                                  ProductMessageType::kLegalOrComplianceNotice);
 DEFINE_LOCAL_PRODUCT_MESSAGE_KEY(kNoticeId3,
                                  ProductMessageType::kLegalOrComplianceNotice);
+DEFINE_LOCAL_PRODUCT_MESSAGE_KEY(kHighPriorityIphId,
+                                 ProductMessageType::kHighPriorityIph);
+DEFINE_LOCAL_PRODUCT_MESSAGE_KEY(kLowPriorityIphId,
+                                 ProductMessageType::kLowPriorityIph);
+DEFINE_LOCAL_PRODUCT_MESSAGE_KEY(kExtremeLowPriorityId,
+                                 ProductMessageType::kLowPriorityForTesting);
+DEFINE_LOCAL_PRODUCT_MESSAGE_KEY(kExtremeHighPriorityId,
+                                 ProductMessageType::kHighPriorityForTesting);
 
 }  // namespace
 
@@ -61,14 +71,25 @@ class ProductMessagingControllerTest : public testing::Test {
 
   ProductMessageKey GetCurrentMessage() const {
     ProductMessageKey found_key;
-    for (const auto& [info_key, info_status] :
-         controller_.GetAllMessages({ProductMessageStatus::kEligible,
-                                     ProductMessageStatus::kShowing})) {
+    for (const auto& [info_key, info_status] : controller_.GetAllMessages(
+             {ProductMessageStatus::kReady, ProductMessageStatus::kShowing})) {
       if (!found_key || info_key.type() > found_key.type()) {
         found_key = info_key;
       }
     }
     return found_key;
+  }
+
+  template <typename... Args>
+    requires((std::same_as<Args, ProductMessageStatus>) && ...)
+  bool HasMessages(Args... args) const {
+    return !controller_.GetAllMessages({args...}).empty();
+  }
+
+  bool HasAnyMessages() const {
+    return HasMessages(ProductMessageStatus::kReady,
+                       ProductMessageStatus::kWaiting,
+                       ProductMessageStatus::kShowing);
   }
 
  private:
@@ -85,14 +106,14 @@ TEST_F(ProductMessagingControllerTest, ConditionallyRecordsDone) {
   EXPECT_TRUE(notice.has_priority());
   notice.SetShown();
   notice.Release();
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
   EXPECT_THAT(storage_service().ReadProductMessagingData().shown_notices,
               testing::UnorderedElementsAre(kNoticeId1.GetName()));
 
   test::TestProductMessage notice2(controller(), kNoticeId2);
   FlushEvents();
   notice2.Release();
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
   EXPECT_THAT(storage_service().ReadProductMessagingData().shown_notices,
               testing::UnorderedElementsAre(kNoticeId1.GetName()));
 
@@ -100,7 +121,7 @@ TEST_F(ProductMessagingControllerTest, ConditionallyRecordsDone) {
   FlushEvents();
   notice3.SetShown();
   notice3.Release();
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
   EXPECT_THAT(storage_service().ReadProductMessagingData().shown_notices,
               testing::UnorderedElementsAre(kNoticeId1.GetName(),
                                             kNoticeId3.GetName()));
@@ -120,16 +141,14 @@ TEST_F(ProductMessagingControllerTest, ShownBlocksSelf) {
 }
 
 TEST_F(ProductMessagingControllerTest, ShownDoesNotBlockSelf) {
-  policy()->SetSelfBlocking(kNoticeId1.type(), false);
-
-  test::TestProductMessage notice(controller(), kNoticeId1);
+  test::TestProductMessage notice(controller(), kHighPriorityIphId);
   FlushEvents();
   EXPECT_TRUE(notice.has_priority());
   notice.SetShown();
   notice.Release();
   EXPECT_FALSE(notice.has_priority());
 
-  test::TestProductMessage notice2(controller(), kNoticeId1);
+  test::TestProductMessage notice2(controller(), kHighPriorityIphId);
   FlushEvents();
   EXPECT_TRUE(notice2.has_priority());
 }
@@ -155,7 +174,7 @@ TEST_F(ProductMessagingControllerTest, ClearsOnNewSession) {
   EXPECT_TRUE(notice.has_priority());
   notice.SetShown();
   notice.Release();
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
   EXPECT_THAT(storage_service().ReadProductMessagingData().shown_notices,
               testing::UnorderedElementsAre(kNoticeId1.GetName()));
   session_provider().StartNewSession();
@@ -200,24 +219,24 @@ TEST_F(ProductMessagingControllerTest,
 }
 
 TEST_F(ProductMessagingControllerTest, QueueAndShowSingleNotice) {
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
   EXPECT_EQ(ProductMessageKey(), GetCurrentMessage());
   test::TestProductMessage notice(controller(), kNoticeId1);
-  EXPECT_TRUE(controller().HasPendingMessagesForTesting());
+  EXPECT_TRUE(HasAnyMessages());
   EXPECT_EQ(ProductMessageKey(), GetCurrentMessage());
   FlushEvents();
-  EXPECT_TRUE(controller().HasPendingMessagesForTesting());
+  EXPECT_TRUE(HasAnyMessages());
   EXPECT_EQ(notice.key(), GetCurrentMessage());
   EXPECT_TRUE(notice.has_priority());
   EXPECT_TRUE(notice.received_priority());
   notice.SetShown();
   notice.Release();
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
   EXPECT_EQ(ProductMessageKey(), GetCurrentMessage());
   EXPECT_FALSE(notice.has_priority());
   EXPECT_TRUE(notice.received_priority());
   FlushEvents();
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
   EXPECT_EQ(ProductMessageKey(), GetCurrentMessage());
 }
 
@@ -248,7 +267,7 @@ TEST_F(ProductMessagingControllerTest, QueueMultipleIndependentNotices) {
     remaining.erase(running);
 
     // Ensure that "has pending notices" is reporting properly.
-    EXPECT_EQ(!remaining.empty(), controller().HasPendingMessagesForTesting());
+    EXPECT_EQ(!remaining.empty(), HasAnyMessages());
   }
 
   // Ensure all notices have been shown.
@@ -272,7 +291,7 @@ TEST_F(ProductMessagingControllerTest, QueueDependentNotices_NotShown) {
   FlushEvents();
   EXPECT_TRUE(notice1.has_priority());
   notice1.Release();
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
 }
 
 TEST_F(ProductMessagingControllerTest, QueueDependentNotices_Shown) {
@@ -295,7 +314,7 @@ TEST_F(ProductMessagingControllerTest, QueueDependentNotices_Shown) {
   EXPECT_TRUE(notice1.has_priority());
   notice1.SetShown();
   notice1.Release();
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
 }
 
 TEST_F(ProductMessagingControllerTest, QueueDependentNoticeChain_NotShown) {
@@ -315,7 +334,7 @@ TEST_F(ProductMessagingControllerTest, QueueDependentNoticeChain_NotShown) {
   FlushEvents();
   EXPECT_TRUE(notice1.has_priority());
   notice1.Release();
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
 }
 
 TEST_F(ProductMessagingControllerTest, QueueDependentNoticeChain_Shown) {
@@ -338,7 +357,7 @@ TEST_F(ProductMessagingControllerTest, QueueDependentNoticeChain_Shown) {
   EXPECT_TRUE(notice1.has_priority());
   notice1.SetShown();
   notice1.Release();
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
 }
 
 TEST_F(ProductMessagingControllerTest, BlockedBy) {
@@ -353,7 +372,7 @@ TEST_F(ProductMessagingControllerTest, BlockedBy) {
   notice2.Release();
   FlushEvents();
   EXPECT_FALSE(notice1.has_priority());
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
 }
 
 TEST_F(ProductMessagingControllerTest, BlockedByNotBlockedIfNotShown) {
@@ -368,7 +387,7 @@ TEST_F(ProductMessagingControllerTest, BlockedByNotBlockedIfNotShown) {
   FlushEvents();
   EXPECT_TRUE(notice1.has_priority());
   notice1.Release();
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
 }
 
 TEST_F(ProductMessagingControllerTest, BlockedByBlocksLater) {
@@ -381,12 +400,12 @@ TEST_F(ProductMessagingControllerTest, BlockedByBlocksLater) {
   notice2.SetShown();
   notice2.Release();
   FlushEvents();
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
 
   test::TestProductMessage notice1(controller(), kNoticeId1);
   FlushEvents();
   EXPECT_FALSE(notice1.has_priority());
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
 }
 
 TEST_F(ProductMessagingControllerTest, BlockedByDoesNotBlockAfterNewSession) {
@@ -399,7 +418,7 @@ TEST_F(ProductMessagingControllerTest, BlockedByDoesNotBlockAfterNewSession) {
   notice2.SetShown();
   notice2.Release();
   FlushEvents();
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
 
   session_provider().StartNewSession();
 
@@ -408,7 +427,7 @@ TEST_F(ProductMessagingControllerTest, BlockedByDoesNotBlockAfterNewSession) {
   EXPECT_TRUE(notice1.has_priority());
   notice1.SetShown();
   notice1.Release();
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
 }
 
 TEST_F(ProductMessagingControllerTest, QueueBlockedByAndDependentNotices) {
@@ -431,7 +450,7 @@ TEST_F(ProductMessagingControllerTest, QueueBlockedByAndDependentNotices) {
   EXPECT_TRUE(notice1.has_priority());
   notice1.SetShown();
   notice1.Release();
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
 }
 
 TEST_F(ProductMessagingControllerTest,
@@ -455,7 +474,7 @@ TEST_F(ProductMessagingControllerTest,
   EXPECT_TRUE(notice1.has_priority());
   notice1.SetShown();
   notice1.Release();
-  EXPECT_FALSE(controller().HasPendingMessagesForTesting());
+  EXPECT_FALSE(HasAnyMessages());
 }
 
 TEST_F(ProductMessagingControllerTest, StatusCallbacks) {
@@ -464,18 +483,18 @@ TEST_F(ProductMessagingControllerTest, StatusCallbacks) {
       controller().AddStatusUpdateCallbackForTesting(status_update.Get());
 
   // Queue one notice.
-  EXPECT_CALL(status_update, Run(kNoticeId1, ProductMessageStatus::kQueued));
+  EXPECT_CALL(status_update, Run(kNoticeId1, ProductMessageStatus::kWaiting));
   test::TestProductMessage notice1(controller(), kNoticeId1);
   EXPECT_CALL(status_update, Run).Times(0);
 
   // Notice should be granted when events are processed, which should trigger a
   // callback on `granted`.
   EXPECT_CALL_IN_SCOPE(status_update,
-                       Run(kNoticeId1, ProductMessageStatus::kEligible),
+                       Run(kNoticeId1, ProductMessageStatus::kReady),
                        FlushEvents());
 
   // Queue a second notice.
-  EXPECT_CALL(status_update, Run(kNoticeId2, ProductMessageStatus::kQueued));
+  EXPECT_CALL(status_update, Run(kNoticeId2, ProductMessageStatus::kWaiting));
   test::TestProductMessage notice2(controller(), kNoticeId2);
   EXPECT_CALL(status_update, Run).Times(0);
 
@@ -488,12 +507,236 @@ TEST_F(ProductMessagingControllerTest, StatusCallbacks) {
 
   // Now the second notice is free to be granted.
   EXPECT_CALL_IN_SCOPE(status_update,
-                       Run(kNoticeId2, ProductMessageStatus::kEligible),
+                       Run(kNoticeId2, ProductMessageStatus::kReady),
                        FlushEvents());
 
   // End the second notice without showing it; this results in no `shown`
   // callback.
   notice2.Release();
+}
+
+using ProductMessagingControllerPriorityTest = ProductMessagingControllerTest;
+
+TEST_F(ProductMessagingControllerPriorityTest, IphBlocksWhenQueuedAtSameTime) {
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, notice_superseded);
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, iph_superseded);
+  test::TestProductMessage notice(controller(), kNoticeId1);
+  notice.SetSupersededCallback(notice_superseded.Get());
+  test::TestProductMessage iph_low(controller(), kLowPriorityIphId);
+  iph_low.SetSupersededCallback(iph_superseded.Get());
+  EXPECT_EQ(ProductMessageStatus::kWaiting,
+            controller().GetMessageStatus(iph_low.key()));
+  EXPECT_EQ(ProductMessageStatus::kWaiting,
+            controller().GetMessageStatus(notice.key()));
+
+  FlushEvents();
+  EXPECT_TRUE(notice.has_priority());
+  EXPECT_FALSE(iph_low.has_priority());
+  EXPECT_TRUE(HasMessages(ProductMessageStatus::kWaiting));
+  EXPECT_EQ(ProductMessageStatus::kWaiting,
+            controller().GetMessageStatus(iph_low.key()));
+  EXPECT_EQ(ProductMessageStatus::kReady,
+            controller().GetMessageStatus(notice.key()));
+  notice.Release();
+  FlushEvents();
+  EXPECT_FALSE(notice.has_priority());
+  EXPECT_TRUE(iph_low.has_priority());
+  EXPECT_FALSE(HasMessages(ProductMessageStatus::kWaiting));
+  EXPECT_EQ(ProductMessageStatus::kReady,
+            controller().GetMessageStatus(iph_low.key()));
+  EXPECT_EQ(ProductMessageStatus::kNone,
+            controller().GetMessageStatus(notice.key()));
+}
+
+TEST_F(ProductMessagingControllerPriorityTest, IphBlocksWhenQueuedAfter) {
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, notice_superseded);
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, iph_superseded);
+  test::TestProductMessage notice(controller(), kNoticeId1);
+  notice.SetSupersededCallback(notice_superseded.Get());
+  FlushEvents();
+  test::TestProductMessage iph_low(controller(), kLowPriorityIphId);
+  iph_low.SetSupersededCallback(iph_superseded.Get());
+  FlushEvents();
+
+  EXPECT_TRUE(notice.has_priority());
+  EXPECT_FALSE(iph_low.has_priority());
+  EXPECT_EQ(ProductMessageStatus::kWaiting,
+            controller().GetMessageStatus(iph_low.key()));
+  EXPECT_EQ(ProductMessageStatus::kReady,
+            controller().GetMessageStatus(notice.key()));
+  EXPECT_TRUE(HasMessages(ProductMessageStatus::kWaiting));
+  notice.Release();
+  FlushEvents();
+  EXPECT_FALSE(notice.has_priority());
+  EXPECT_TRUE(iph_low.has_priority());
+  EXPECT_EQ(ProductMessageStatus::kReady,
+            controller().GetMessageStatus(iph_low.key()));
+  EXPECT_EQ(ProductMessageStatus::kNone,
+            controller().GetMessageStatus(notice.key()));
+  EXPECT_FALSE(HasMessages(ProductMessageStatus::kWaiting));
+}
+
+TEST_F(ProductMessagingControllerPriorityTest, IphGoesFirst) {
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, notice_superseded);
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, iph_superseded);
+  test::TestProductMessage iph_low(controller(), kLowPriorityIphId);
+  iph_low.SetSupersededCallback(iph_superseded.Get());
+  FlushEvents();
+  test::TestProductMessage notice(controller(), kNoticeId1);
+  notice.SetSupersededCallback(notice_superseded.Get());
+  EXPECT_CALL_IN_SCOPE(iph_superseded,
+                       Run(notice.key(), ProductMessageStatus::kReady),
+                       FlushEvents());
+  EXPECT_TRUE(iph_low.has_priority());
+  EXPECT_TRUE(notice.has_priority());
+  EXPECT_EQ(ProductMessageStatus::kReady,
+            controller().GetMessageStatus(iph_low.key()));
+  EXPECT_EQ(ProductMessageStatus::kReady,
+            controller().GetMessageStatus(notice.key()));
+  EXPECT_FALSE(HasMessages(ProductMessageStatus::kWaiting));
+  iph_low.SetShown();
+  EXPECT_EQ(ProductMessageStatus::kShowing,
+            controller().GetMessageStatus(iph_low.key()));
+  EXPECT_EQ(ProductMessageStatus::kReady,
+            controller().GetMessageStatus(notice.key()));
+  EXPECT_CALL_IN_SCOPE(iph_superseded,
+                       Run(notice.key(), ProductMessageStatus::kShowing),
+                       notice.SetShown());
+  EXPECT_EQ(ProductMessageStatus::kShowing,
+            controller().GetMessageStatus(iph_low.key()));
+  EXPECT_EQ(ProductMessageStatus::kShowing,
+            controller().GetMessageStatus(notice.key()));
+  iph_low.Release();
+  EXPECT_EQ(ProductMessageStatus::kNone,
+            controller().GetMessageStatus(iph_low.key()));
+  EXPECT_EQ(ProductMessageStatus::kShowing,
+            controller().GetMessageStatus(notice.key()));
+  notice.Release();
+  EXPECT_EQ(ProductMessageStatus::kNone,
+            controller().GetMessageStatus(iph_low.key()));
+  EXPECT_EQ(ProductMessageStatus::kNone,
+            controller().GetMessageStatus(notice.key()));
+}
+
+TEST_F(ProductMessagingControllerPriorityTest, LowPriorityIndependent) {
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, notice_superseded);
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, ignore_superseded);
+  policy()->SetIgnoreAll(ProductMessageType::kLowPriorityForTesting);
+
+  test::TestProductMessage notice(controller(), kNoticeId1);
+  notice.SetSupersededCallback(notice_superseded.Get());
+  FlushEvents();
+  test::TestProductMessage ignore(controller(), kExtremeLowPriorityId);
+  ignore.SetSupersededCallback(ignore_superseded.Get());
+  FlushEvents();
+
+  EXPECT_TRUE(notice.has_priority());
+  EXPECT_TRUE(ignore.has_priority());
+}
+
+TEST_F(ProductMessagingControllerPriorityTest, HighPriorityIndependent) {
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, notice_superseded);
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, ignore_superseded);
+  policy()->SetIgnoreAll(ProductMessageType::kHighPriorityForTesting);
+
+  test::TestProductMessage notice(controller(), kNoticeId1);
+  notice.SetSupersededCallback(notice_superseded.Get());
+  FlushEvents();
+  test::TestProductMessage ignore(controller(), kExtremeHighPriorityId);
+  ignore.SetSupersededCallback(ignore_superseded.Get());
+  EXPECT_CALL_IN_SCOPE(notice_superseded, Run, FlushEvents());
+
+  EXPECT_TRUE(notice.has_priority());
+  EXPECT_TRUE(ignore.has_priority());
+}
+
+TEST_F(ProductMessagingControllerPriorityTest, IndependentBlocksOther) {
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, notice_superseded);
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, ignore_superseded);
+  policy()->SetIgnoreAll(ProductMessageType::kHighPriorityForTesting);
+
+  test::TestProductMessage ignore(controller(), kExtremeHighPriorityId);
+  ignore.SetSupersededCallback(ignore_superseded.Get());
+  FlushEvents();
+  test::TestProductMessage notice(controller(), kNoticeId1);
+  notice.SetSupersededCallback(notice_superseded.Get());
+  FlushEvents();
+
+  EXPECT_TRUE(ignore.has_priority());
+  EXPECT_FALSE(notice.has_priority());
+}
+
+TEST_F(ProductMessagingControllerPriorityTest, IndependentDoesNotBlock) {
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, notice_superseded);
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, ignore_superseded);
+  policy()->SetIgnoreAll(ProductMessageType::kHighPriorityForTesting,
+                         {ProductMessageType::kLegalOrComplianceNotice});
+
+  test::TestProductMessage ignore(controller(), kExtremeHighPriorityId);
+  ignore.SetSupersededCallback(ignore_superseded.Get());
+  FlushEvents();
+  test::TestProductMessage notice(controller(), kNoticeId1);
+  notice.SetSupersededCallback(notice_superseded.Get());
+  FlushEvents();
+
+  EXPECT_TRUE(ignore.has_priority());
+  EXPECT_TRUE(notice.has_priority());
+}
+
+TEST_F(ProductMessagingControllerPriorityTest,
+       LowPriorityIndependent_QueueSimultaneously) {
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, notice_superseded);
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, ignore_superseded);
+  policy()->SetIgnoreAll(ProductMessageType::kLowPriorityForTesting);
+
+  test::TestProductMessage notice(controller(), kNoticeId1);
+  notice.SetSupersededCallback(notice_superseded.Get());
+  test::TestProductMessage ignore(controller(), kExtremeLowPriorityId);
+  ignore.SetSupersededCallback(ignore_superseded.Get());
+  FlushEvents();
+  FlushEvents();
+
+  EXPECT_TRUE(notice.has_priority());
+  EXPECT_TRUE(ignore.has_priority());
+}
+
+TEST_F(ProductMessagingControllerPriorityTest,
+       IndependentBlocksOther_QueueSimultaneously) {
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, notice_superseded);
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, ignore_superseded);
+  policy()->SetIgnoreAll(ProductMessageType::kHighPriorityForTesting);
+
+  test::TestProductMessage ignore(controller(), kExtremeHighPriorityId);
+  ignore.SetSupersededCallback(ignore_superseded.Get());
+  test::TestProductMessage notice(controller(), kNoticeId1);
+  notice.SetSupersededCallback(notice_superseded.Get());
+  FlushEvents();
+  FlushEvents();
+
+  EXPECT_TRUE(ignore.has_priority());
+  EXPECT_FALSE(notice.has_priority());
+}
+
+TEST_F(ProductMessagingControllerPriorityTest,
+       IndependentDoesNotBlock_QueueSimultaneously) {
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, notice_superseded);
+  UNCALLED_MOCK_CALLBACK(ProductMessageStatusCallback, ignore_superseded);
+  policy()->SetIgnoreAll(ProductMessageType::kHighPriorityForTesting,
+                         {ProductMessageType::kLegalOrComplianceNotice});
+
+  test::TestProductMessage ignore(controller(), kExtremeHighPriorityId);
+  ignore.SetSupersededCallback(ignore_superseded.Get());
+  test::TestProductMessage notice(controller(), kNoticeId1);
+  notice.SetSupersededCallback(notice_superseded.Get());
+
+  // Because we can't guarantee which order these will ready in, the superseded
+  // call might be called.
+  EXPECT_CALL(notice_superseded, Run).Times(testing::AtMost(1));
+  FlushEvents();
+  FlushEvents();
+
+  EXPECT_TRUE(ignore.has_priority());
+  EXPECT_TRUE(notice.has_priority());
 }
 
 }  // namespace user_education

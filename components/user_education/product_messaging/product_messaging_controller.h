@@ -93,9 +93,6 @@ class ProductMessagingController final {
             UserEducationStorageService& storage_service,
             std::unique_ptr<ProductMessagingPolicy> policy);
 
-  // Checks whether the given `message_id` is queued.
-  bool IsMessageQueued(ProductMessageKey message_key) const;
-
   // Requests that `message_key` be queued to show. When it is allowed (which
   // might be as soon as the current message queue empties),
   // `ready_to_start_callback` will be called.
@@ -116,13 +113,13 @@ class ProductMessagingController final {
   void UnqueueMessage(ProductMessageKey message_key);
 
   // Returns the status of `message`.
-  ProductMessageStatus GetProductMessageStatus(ProductMessageKey message) const;
+  ProductMessageStatus GetMessageStatus(ProductMessageKey message) const;
 
-  // Returns queued or showing messages. Can be filtered by priority and by
-  // status.
+  // Returns waiting, ready, or showing messages. Can be filtered by priority
+  // and by status.
   base::flat_map<ProductMessageKey, ProductMessageStatus> GetAllMessages(
       std::initializer_list<ProductMessageStatus> statuses_to_retrieve =
-          {ProductMessageStatus::kQueued, ProductMessageStatus::kEligible,
+          {ProductMessageStatus::kWaiting, ProductMessageStatus::kReady,
            ProductMessageStatus::kShowing},
       ProductMessageType priority_higher_than =
           ProductMessageType::kNone) const;
@@ -132,17 +129,9 @@ class ProductMessagingController final {
   base::CallbackListSubscription AddStatusUpdateCallbackForTesting(
       ProductMessageStatusCallback callback);
 
-  // Returns if any messages queued or showing.
-  bool HasPendingMessagesForTesting() const;
-
  private:
   friend class ProductMessagingHandleImpl;
   friend class internal::MessagingCoordinator;
-
-  bool ready_to_show() const {
-    CHECK(storage_service_) << "Must call Init() before queueing messages.";
-    return !current_message_ && !pending_messages_.empty();
-  }
 
   // Called by ProductMessagePriorityHandle when it is released. Clears the
   // current message and maybe tries to start the next.
@@ -170,8 +159,9 @@ class ProductMessagingController final {
   // purposes.
   std::string DumpData() const;
 
-  ProductMessageKey current_message_;
-  bool current_message_shown_ = false;
+  // Map from message key to whether the message is marked as "shown".
+  std::map<ProductMessageKey, bool> active_messages_;
+
   raw_ptr<UserEducationStorageService> storage_service_ = nullptr;
   std::map<ProductMessageKey, ProductMessageReadyCallback> pending_messages_;
   std::unique_ptr<ProductMessagingPolicy> policy_;

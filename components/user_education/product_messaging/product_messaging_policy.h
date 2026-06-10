@@ -5,8 +5,7 @@
 #ifndef COMPONENTS_USER_EDUCATION_PRODUCT_MESSAGING_PRODUCT_MESSAGING_POLICY_H_
 #define COMPONENTS_USER_EDUCATION_PRODUCT_MESSAGING_PRODUCT_MESSAGING_POLICY_H_
 
-#include <set>
-
+#include "base/containers/flat_set.h"
 #include "components/user_education/product_messaging/product_messaging_types.h"
 
 namespace user_education {
@@ -19,7 +18,7 @@ class ProductMessagingPolicy {
   void operator=(const ProductMessagingPolicy&) = delete;
   virtual ~ProductMessagingPolicy() = default;
 
-  using Ids = std::set<internal::ProductMessageUniqueId>;
+  using Ids = base::flat_set<internal::ProductMessageUniqueId>;
 
   // Returns whether `key` is blocked by any of the keys in `others`, including
   // itself.

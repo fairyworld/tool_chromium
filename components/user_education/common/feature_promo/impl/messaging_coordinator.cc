@@ -7,6 +7,7 @@
 #include "base/callback_list.h"
 #include "base/functional/bind.h"
 #include "components/user_education/product_messaging/product_messaging_controller.h"
+#include "components/user_education/product_messaging/product_messaging_types.h"
 
 namespace user_education::internal {
 
@@ -43,8 +44,7 @@ bool MessagingCoordinator::IsBlockedByExternalPromo() const {
   return !handle_ &&
          !controller_
               ->GetAllMessages(
-                  {ProductMessageStatus::kQueued,
-                   ProductMessageStatus::kEligible,
+                  {ProductMessageStatus::kWaiting, ProductMessageStatus::kReady,
                    ProductMessageStatus::kShowing},
                   /*priority_higher_than=*/ProductMessageType::kHighPriorityIph)
               .empty();
@@ -98,11 +98,13 @@ void MessagingCoordinator::MaybeRequestPriority(bool high_priority) {
                            weak_ptr_factory_.GetWeakPtr());
   if (high_priority) {
     // High priority notices take the same precedence as
-    if (!controller_->IsMessageQueued(kHighPriorityNoticeId)) {
+    if (controller_->GetMessageStatus(kHighPriorityNoticeId) ==
+        ProductMessageStatus::kNone) {
       controller_->UnqueueMessage(kLowPriorityNoticeId);
       controller_->QueueMessage(kHighPriorityNoticeId, std::move(cb));
     }
-  } else if (!controller_->IsMessageQueued(kLowPriorityNoticeId)) {
+  } else if (controller_->GetMessageStatus(kLowPriorityNoticeId) ==
+             ProductMessageStatus::kNone) {
     // Low-priority show after all other messaging.
     controller_->UnqueueMessage(kHighPriorityNoticeId);
     controller_->QueueMessage(kLowPriorityNoticeId, std::move(cb));

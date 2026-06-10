@@ -58,7 +58,12 @@ ProductMessagingPolicyImpl::GetRelationship(
   if (type == other_type) {
     return TypeRelationship::kEquivalentTo;
   }
-  if (ignore_all_.contains(type)) {
+  if (ignore_and_ignored_by_.contains(type)) {
+    return TypeRelationship::kIndependentOf;
+  }
+  if (auto* const ignored_by =
+          base::FindOrNull(ignore_and_ignored_by_, other_type);
+      ignored_by && ignored_by->contains(type)) {
     return TypeRelationship::kIndependentOf;
   }
   if (equivalents_.contains({type, other_type})) {
@@ -85,8 +90,10 @@ void ProductMessagingPolicyImpl::SetSelfBlocking(ProductMessageType type,
   self_blocking_[type] = blocks_self;
 }
 
-void ProductMessagingPolicyImpl::SetIgnoreAll(ProductMessageType type) {
-  ignore_all_.insert(type);
+void ProductMessagingPolicyImpl::SetIgnoreAll(
+    ProductMessageType type,
+    std::initializer_list<ProductMessageType> also_ignored_by) {
+  ignore_and_ignored_by_.emplace(type, also_ignored_by);
 }
 
 void ProductMessagingPolicyImpl::SetEquivalent(ProductMessageType type1,

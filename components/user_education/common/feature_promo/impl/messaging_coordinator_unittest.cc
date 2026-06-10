@@ -43,6 +43,10 @@ class MessagingCoordinatorTest : public testing::Test {
 
   ProductMessagingController& controller() { return controller_; }
 
+  bool IsMessageQueued(ProductMessageKey key) {
+    return controller_.GetMessageStatus(key) == ProductMessageStatus::kWaiting;
+  }
+
   void FlushEvents() {
     base::RunLoop run_loop(base::RunLoop::Type::kNestableTasksAllowed);
     base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
@@ -51,8 +55,8 @@ class MessagingCoordinatorTest : public testing::Test {
   }
 
   void ExpectRequestPending(bool low, bool high) {
-    EXPECT_EQ(low, controller_.IsMessageQueued(kLowPriorityNoticeId));
-    EXPECT_EQ(high, controller_.IsMessageQueued(kHighPriorityNoticeId));
+    EXPECT_EQ(low, IsMessageQueued(kLowPriorityNoticeId));
+    EXPECT_EQ(high, IsMessageQueued(kHighPriorityNoticeId));
   }
 
   // Since this is a friend class of the coordinator, it can access these ids.
@@ -460,8 +464,8 @@ TEST_F(MessagingCoordinatorTest,
   coordinator.TransitionToState(PromoState::kHighPriorityPending);
   test::TestProductMessage notice(controller(), kNoticeId);
 
-  EXPECT_TRUE(controller().IsMessageQueued(kNoticeId));
-  EXPECT_TRUE(controller().IsMessageQueued(kHighPriorityNoticeId));
+  EXPECT_TRUE(IsMessageQueued(kNoticeId));
+  EXPECT_TRUE(IsMessageQueued(kHighPriorityNoticeId));
 
   // This may or may not be called, so make it so it doesn't care.
   EXPECT_CALL(ready, Run).WillRepeatedly([]() {});
@@ -471,8 +475,8 @@ TEST_F(MessagingCoordinatorTest,
   // Either the external message got priority or the coordinator got permission
   // to show the high-priority message, but not both.
   EXPECT_NE(notice.has_priority(), coordinator.CanShowPromo(true));
-  EXPECT_NE(controller().IsMessageQueued(kNoticeId), notice.has_priority());
-  EXPECT_NE(controller().IsMessageQueued(kHighPriorityNoticeId),
+  EXPECT_NE(IsMessageQueued(kNoticeId), notice.has_priority());
+  EXPECT_NE(IsMessageQueued(kHighPriorityNoticeId),
             coordinator.CanShowPromo(true));
 }
 

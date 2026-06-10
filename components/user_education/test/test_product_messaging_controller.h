@@ -31,11 +31,14 @@ class TestProductMessage {
   bool received_priority() const { return shown_; }
   bool has_priority() const { return static_cast<bool>(handle_); }
 
+  void SetSupersededCallback(ProductMessageStatusCallback callback);
+
  private:
   void OnReadyToShow(ProductMessagingHandle handle);
 
   const ProductMessageKey key_;
   bool shown_ = false;
+  ProductMessageStatusCallback pending_status_callback_;
   ProductMessagingHandle handle_;
 };
 
