@@ -256,7 +256,7 @@ uintptr_t BackingStoreImpl::GetIdentifierForMemoryDump() {
 void BackingStoreImpl::ReportMemoryUsage(
     base::trace_event::ProcessMemoryDump* pmd,
     const std::string& dump_name) {
-  // Create the bucket-level dump as an organizational container.
+  // Create the dump as an organizational container.
   pmd->CreateAllocatorDump(dump_name);
   for (const auto& [name, connection] : open_connections_) {
     connection->ReportMemoryUsage(
