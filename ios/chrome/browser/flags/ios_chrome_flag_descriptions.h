@@ -837,6 +837,10 @@ inline constexpr char kGeminiLiveDormantReasonsDescription[] =
 inline constexpr char kGeminiLiveName[] = "GeminiLive";
 inline constexpr char kGeminiLiveDescription[] = "Enables Gemini Live.";
 
+inline constexpr char kGeminiLuminousName[] = "Gemini Luminous";
+inline constexpr char kGeminiLuminousDescription[] =
+    "Enables Gemini Luminous UI.";
+
 inline constexpr char kGeminiMapsRichUIName[] = "Gemini Maps Rich UI";
 inline constexpr char kGeminiMapsRichUIDescription[] =
     "Enables the rich Maps UI in Gemini.";
