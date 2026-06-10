@@ -677,10 +677,6 @@
     "META": {"sizes": {"includes": [500],}},
     "includes": [4580],
   },
-  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/privacy_sandbox/internals/resources.grd": {
-   "META": {"sizes": {"includes": [100],}},
-    "includes": [4600],
-  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/profile_internals/resources.grd": {
     "META": {"sizes": {"includes": [10],}},
     "includes": [4640],
