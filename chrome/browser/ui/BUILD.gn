@@ -781,7 +781,6 @@ static_library("ui") {
 
     # TODO(crbug.com/353332589): Remove this circular dependency when
     # the following headers get modularized:
-    # - c/b/ui/views/chrome_layout_provider.h.
     # - c/b/ui/views/chrome_typography.h
     # - c/b/ui/browser_window.h
     # - c/b/ui/browser.h
@@ -839,8 +838,7 @@ static_library("ui") {
   }
 
   # //chrome/browser/ui/views/relaunch_notification:impl sources include
-  # :ui headers (browser.h, views/frame/browser_view.h,
-  # views/chrome_layout_provider.h).
+  # :ui headers (browser.h, views/frame/browser_view.h).
   if (!is_android && !is_chromeos) {
     allow_circular_includes_from +=
         [ "//chrome/browser/ui/views/relaunch_notification:impl" ]
@@ -1051,7 +1049,6 @@ static_library("ui") {
     # TODO(crbug.com/353332589): Remove this circular dependency when the
     # following headers get componentized:
     # - c/b/ui/chrome_pages.h
-    # - c/b/ui/views/chrome_layout_provider.h
     "//chrome/browser/supervised_user:impl",
 
     # webauthn:impl includes headers from //chrome/browser/ui that can't be
@@ -1495,10 +1492,9 @@ static_library("ui") {
       allow_circular_includes_from += [
         # TODO(crbug.com/364667551): Remove this circular dependency when
         # the following headers get modularized:
-        # - c/b/ui/browser.h"
-        # - c/b/ui/views/frame/browser_view.h"
-        # - c/b/ui/views/toolbar/avatar_toolbar_button_interface.h"
-        # - c/b/ui/views/chrome_layout_provider.h"
+        # - c/b/ui/browser.h
+        # - c/b/ui/views/frame/browser_view.h
+        # - c/b/ui/views/toolbar/avatar_toolbar_button_interface.h
         "//chrome/browser/ui/views/search_ai_mode:impl",
       ]
     }
@@ -3036,7 +3032,6 @@ static_library("ui") {
 
       # TODO(crbug.com/432061436) Remove this dependency when the following
       # headers get componentized:
-      # - c/b/ui/views/chrome_layout_provider.h
       # - c/b/ui/views/chrome_typography.h
       "//chrome/browser/ui/views/apps/app_dialog:impl",
     ]
@@ -3737,11 +3732,9 @@ static_library("ui") {
       "views/chrome_constrained_window_views_client.cc",
       "views/chrome_constrained_window_views_client.h",
       "views/chrome_layout_provider.cc",
-      "views/chrome_layout_provider.h",
       "views/chrome_typography.cc",
       "views/chrome_typography.h",
       "views/chrome_typography_provider.cc",
-      "views/chrome_typography_provider.h",
       "views/chrome_views_delegate.cc",
       "views/chrome_views_delegate.h",
       "views/chrome_web_dialog_view.cc",
@@ -4774,6 +4767,7 @@ static_library("ui") {
       "//chrome/browser/ui/tabs/tab_strip_api/tab_strip_model_impl",
       "//chrome/browser/ui/tabs/tab_strip_api/tab_strip_model_impl/converters",
       "//chrome/browser/ui/views",
+      "//chrome/browser/ui/views:layout_provider",
       "//chrome/browser/ui/views/accessibility",
       "//chrome/browser/ui/views/accessibility:impl",
       "//chrome/browser/ui/views/animations",
@@ -4911,7 +4905,6 @@ static_library("ui") {
       # TODO(crbug.com/408801109): Remove this circular dependency when the
       # following headers get componentized:
       # c/b/ui/browser.h, browser_window.h
-      # c/b/ui/views/chrome_layout_provider.h
       # c/b/ui/views/controls/rich_controls_container_view.h, rich_hover_button.h
       # c/b/ui/views/frame/browser_view.h
       "//chrome/browser/ui/views/location_bar/cookie_controls:impl",
@@ -4926,7 +4919,6 @@ static_library("ui") {
       # TODO(crbug.com/434882143): Remove this circular dependency when the
       # following headers get componentized:
       # c/b/ui/browser.h, browser_dialogs.h, browser_tabstrip.h, view_ids.h, browser_window.h.
-      # c/b/ui/views/chrome_layout_provider.h
       # c/b/ui/views/frame/browser_view.h
       "//chrome/browser/ui/views/location_bar:impl",
 
@@ -4957,7 +4949,7 @@ static_library("ui") {
       # TODO(crbug.com/434882143): Remove this circular dependency when the
       # following headers get componentized:
       # c/b/ui/browser.h, browser_navigator.h, browser_window.h
-      # c/b/ui/views/chrome_layout_provider.h, chrome_typography.h
+      # c/b/ui/views/chrome_typography.h
       # c/b/ui/views/controls/hover_button.h
       # c/b/ui/views/frame/browser_view.h
       "//chrome/browser/ui/views/send_tab_to_self:impl",
@@ -4971,27 +4963,23 @@ static_library("ui") {
       # the following headers get modularized:
       # - c/b/ui/browser.h
       # - c/b/ui/scoped_tabbed_browser_displayer.h
-      # - c/b/ui/views/chrome_layout_provider.h
       "//chrome/browser/ui/views/apps/app_info_dialog:impl",
 
       # TODO(crbug.com/353332589): Remove this circular dependency when
       # the following headers get modularized:
       # - c/b/ui/browser.h,
       # - c/b/ui/views/frame/browser_view.h,
-      # - c/b/ui/views/chrome_layout_provider.h
       "//chrome/browser/ui/views/accessibility:impl",
 
       # TODO(crbug.com/353332589): Remove this circular dependency when
       # the following headers get modularized:
       # - c/b/ui/views/extensions/security_dialog_tracker.h
-      # - c/b/ui/views/chrome_layout_provider.h
       "//chrome/browser/ui/views/digital_credentials:impl",
 
       # TODO(crbug.com/353332589): Remove this circular dependency when
       # the following headers get modularized:
       # - c/b/ui/chrome_pages.h
       # - c/b/ui/scoped_tabbed_browser_displayer.h
-      # - c/b/ui/views/chrome_layout_provider.h
       # - c/b/ui/views/controls/subpage_view.h
       "//chrome/browser/ui/views/commerce:impl",
 
@@ -4999,7 +4987,6 @@ static_library("ui") {
       # the following headers get modularized:
       # - c/b/ui/browser_command_controller.h
       # - c/b/ui/view_ids.h
-      # - c/b/ui/views/chrome_layout_provider.h
       # - c/b/ui/views/chrome_typography.h
       "//chrome/browser/ui/views/sharing_hub:impl",
     ]

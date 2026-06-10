@@ -1135,6 +1135,7 @@ static_library("test_support") {
     deps += [
       "//chrome/browser/ui/color:mixers",
       "//chrome/browser/ui/passwords:impl",
+      "//chrome/browser/ui/views:layout_provider",
       "//components/color",
       "//components/omnibox/browser:test_support",
       "//components/user_education/views",
@@ -3981,6 +3982,7 @@ if (!is_android) {
     deps += [
       "//chrome/browser/speech",
       "//chrome/browser/speech:browser_tests",
+      "//chrome/browser/ui/views:layout_provider",
     ]
 
     if (enable_on_device_translation) {
@@ -9498,6 +9500,7 @@ test("unit_tests") {
       "//chrome/browser/ui/toolbar:unit_tests",
       "//chrome/browser/ui/toolbar/cast",
       "//chrome/browser/ui/views",
+      "//chrome/browser/ui/views:layout_provider",
       "//chrome/browser/ui/views/apps/app_info_dialog:unit_tests",
       "//chrome/browser/ui/views/commerce:unit_tests",
       "//chrome/browser/ui/views/controls",
@@ -11060,6 +11063,7 @@ if (!is_android && !is_chromeos_device) {
         "//chrome/browser/ui/translate:test_support",
         "//chrome/browser/ui/user_education",
         "//chrome/browser/ui/user_education:interactive_ui_tests",
+        "//chrome/browser/ui/views:layout_provider",
         "//chrome/browser/ui/views/commerce",
         "//chrome/browser/ui/views/commerce:interactive_ui_tests",
         "//chrome/browser/ui/views/frame",

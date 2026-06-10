@@ -58,6 +58,18 @@ component("views") {
   }
 }
 
+source_set("layout_provider") {
+  sources = [
+    "chrome_layout_provider.h",
+    "chrome_typography_provider.h",
+  ]
+  public_deps = [
+    "//ui/color:color_headers",
+    "//ui/gfx/geometry",
+    "//ui/views",
+  ]
+}
+
 source_set("test_support") {
   testonly = true
   public = [ "global_media_controls/media_dialog_ui_for_test.h" ]

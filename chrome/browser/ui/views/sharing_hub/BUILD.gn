@@ -44,6 +44,7 @@ source_set("impl") {
     "//chrome/browser/image_editor:image_editor_component_util",
     "//chrome/browser/ui/qrcode_generator",
     "//chrome/browser/ui/sharing_hub",
+    "//chrome/browser/ui/views:layout_provider",
     "//chrome/browser/ui/views/send_tab_to_self",
     "//components/omnibox/browser:vector_icons",
     "//components/url_formatter",

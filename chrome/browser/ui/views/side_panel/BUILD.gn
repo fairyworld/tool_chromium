@@ -128,6 +128,7 @@ source_set("side_panel") {
     "//chrome/browser/ui/tabs:tabs_public",
     "//chrome/browser/ui/tabs/saved_tab_groups",
     "//chrome/browser/ui/user_education",
+    "//chrome/browser/ui/views:layout_provider",
     "//chrome/browser/ui/views/animations",
     "//chrome/browser/ui/views/interaction",
     "//chrome/browser/ui/views/toolbar",

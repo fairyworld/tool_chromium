@@ -28,6 +28,7 @@ source_set("impl") {
   deps = [
     ":search_ai_mode",
     "//chrome/browser/ui/signin",
+    "//chrome/browser/ui/views:layout_provider",
     "//chrome/browser/ui/views/frame:toolbar_button_provider",
   ]
 }
