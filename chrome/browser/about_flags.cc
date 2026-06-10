@@ -4874,10 +4874,13 @@ const FeatureEntry kFeatureEntries[] = {
     {"enable-gpu-rasterization", flag_descriptions::kGpuRasterizationName,
      flag_descriptions::kGpuRasterizationDescription, kOsAll,
      MULTI_VALUE_TYPE(kEnableGpuRasterizationChoices)},
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
     {"fallback-to-sw-if-gles3-not-supported",
      flag_descriptions::kFallbackToSWIfGLES3NotSupportedName,
-     flag_descriptions::kFallbackToSWIfGLES3NotSupportedDescription, kOsAll,
+     flag_descriptions::kFallbackToSWIfGLES3NotSupportedDescription,
+     kOsWin | kOsCrOS,
      FEATURE_VALUE_TYPE(features::kFallbackToSWIfGLES3NotSupported)},
+#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
     {"enable-experimental-web-platform-features",
      flag_descriptions::kExperimentalWebPlatformFeaturesName,
      flag_descriptions::kExperimentalWebPlatformFeaturesDescription, kOsAll,
