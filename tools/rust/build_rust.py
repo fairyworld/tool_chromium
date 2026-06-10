@@ -373,6 +373,10 @@ class XPy:
             self._env[
                 'MACOSX_DEPLOYMENT_TARGET'] = DEFAULT_MACOSX_DEPLOYMENT_TARGET
 
+            # Due to an interaction with Homebrew installed `liblzma.dylib`, we
+            # must tell lzma-sys explicitly to build it from source.
+            self._env['LZMA_API_STATIC'] = '1'
+
         if zlib_path:
             self._env['CFLAGS'] += f' -I{zlib_path}'
             self._env['CXXFLAGS'] += f' -I{zlib_path}'
