@@ -1426,15 +1426,59 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorBrowserTest,
   EXPECT_FALSE(coordinator().IsPanelShowingForBrowser(mock_bwi));
 }
 
-IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorBrowserTest, HotkeyTriggersOpen) {
+class GlicInstanceCoordinatorLocalHotkeyScopeTest
+    : public GlicInstanceCoordinatorBrowserTest {
+ public:
+  GlicInstanceCoordinatorLocalHotkeyScopeTest() {
+    scoped_feature_list_.InitAndEnableFeature(features::kGlicHotkeyLocalScope);
+  }
+
+ private:
+  base::test::ScopedFeatureList scoped_feature_list_;
+};
+
+IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorLocalHotkeyScopeTest,
+                       HotkeyTriggersToggle) {
   EXPECT_EQ(coordinator().GetInstancesForTesting().size(), 0u);
 
   // Simulate receiving the hotkey command.
   bool handled = coordinator().GetHotkeyManagerForTesting()->AcceleratorPressed(
-      LocalHotkeyManager::Command::kOpenGlic);
+      LocalHotkeyManager::Command::kPanelToggle);
   EXPECT_TRUE(handled);
 
   ASSERT_OK(WaitForGlicOpen());
+
+  // Simulate receiving the hotkey command. Closing this time since glic is
+  // open.
+  handled = coordinator().GetHotkeyManagerForTesting()->AcceleratorPressed(
+      LocalHotkeyManager::Command::kPanelToggle);
+  EXPECT_TRUE(handled);
+
+  ASSERT_OK(WaitForGlicClose());
+}
+
+class GlicInstanceCoordinatorLocalHotkeyScopeDisabledTest
+    : public GlicInstanceCoordinatorBrowserTest {
+ public:
+  GlicInstanceCoordinatorLocalHotkeyScopeDisabledTest() {
+    scoped_feature_list_.InitAndDisableFeature(features::kGlicHotkeyLocalScope);
+  }
+
+ private:
+  base::test::ScopedFeatureList scoped_feature_list_;
+};
+
+IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorLocalHotkeyScopeDisabledTest,
+                       HotkeyIsSkipped) {
+  EXPECT_EQ(coordinator().GetInstancesForTesting().size(), 0u);
+
+  // Simulate receiving the hotkey command.
+  bool handled = coordinator().GetHotkeyManagerForTesting()->AcceleratorPressed(
+      LocalHotkeyManager::Command::kPanelToggle);
+  EXPECT_FALSE(handled);
+
+  // Expect 0 instances to be created.
+  EXPECT_EQ(coordinator().GetInstancesForTesting().size(), 0u);
 }
 
 IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorBrowserTest,

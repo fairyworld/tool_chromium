@@ -92,18 +92,11 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
 void RegisterLocalStatePrefs(PrefRegistrySimple* registry) {
   registry->RegisterBooleanPref(prefs::kGlicLauncherEnabled, false);
 
-#if BUILDFLAG(IS_ANDROID)
   registry->RegisterStringPref(
       prefs::kGlicLauncherHotkey,
       ui::Command::AcceleratorToString(
           LocalHotkeyManager::GetDefaultAccelerator(
-              LocalHotkeyManager::Command::kOpenGlic)));
-#else
-  registry->RegisterStringPref(
-      prefs::kGlicLauncherHotkey,
-      ui::Command::AcceleratorToString(
-          GlicLauncherConfiguration::GetDefaultHotkey()));
-#endif
+              LocalHotkeyManager::Command::kPanelToggle)));
   registry->RegisterStringPref(
       prefs::kGlicSelectionHotkey,
       ui::Command::AcceleratorToString(
