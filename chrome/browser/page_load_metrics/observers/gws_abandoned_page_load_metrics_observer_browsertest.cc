@@ -1427,9 +1427,10 @@ IN_PROC_BROWSER_TEST_P(
   }
 }
 
+// TODO(crbug.com/521907529): De-flake and re-enable.
 IN_PROC_BROWSER_TEST_P(
     GWSAbandonedPageLoadMetricsObserverWithIgnoreDuplicateFlagBrowserTest,
-    DuplicateNavigation_RendererInitiated) {
+    DISABLED_DuplicateNavigation_RendererInitiated) {
   const bool ignore_duplicate_navs_enabled = IsIgnoreDuplicateNavsEnabled();
   EXPECT_TRUE(content::NavigateToURL(web_contents(), url_non_srp()));
 
