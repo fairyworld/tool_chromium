@@ -1884,9 +1884,6 @@
     <message name="IDS_SETTINGS_ENABLE_DO_NOT_TRACK_DIALOG_LEARN_MORE_ACCESSIBILITY_LABEL" desc="The accessibility label for a link to learn more about Do Not Track">
       Learn more about Do Not Track
     </message>
-    <message name="IDS_SETTINGS_PERMISSIONS" desc="Name of the settings page which allows users to manage permissions and site content settings">
-      Permissions and content settings
-    </message>
     <message name="IDS_SETTINGS_PERMISSIONS_DESCRIPTION" desc="Description of the controls available on the permissions and site content settings page">
       Controls what information sites can use and show (location, camera, pop-ups, and more)
     </message>
