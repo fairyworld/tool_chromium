@@ -668,7 +668,7 @@
   </message>
 
   <!-- Autofill and passwords entry point summaries - mobile only -->
-  <if expr="is_android">
+  <if expr="is_android or is_ios">
     <message name="IDS_AUTOFILL_AND_PASSWORDS_PASSWORD_MANAGER_SUMMARY" desc="Summary for the Google Password Manager entry in the Autofill and passwords settings." formatter_data="android_java">
       Passwords · Passkeys
     </message>
