@@ -69,6 +69,7 @@ build_webui("build") {
       "default_browser/app_refresh.ts",
       "intro_app.html.ts",
       "intro_app.ts",
+      "sign_in_promo_browser_proxy.ts",
       "sign_in_promo.html.ts",
       "sign_in_promo.ts",
       "sign_in_promo_refresh.html.ts",
@@ -101,6 +102,7 @@ build_webui("build") {
   mojo_files = [
     "$root_gen_dir/chrome/browser/ui/webui/intro/intro.mojom-webui.ts",
     "$root_gen_dir/chrome/browser/ui/webui/intro/sign_in_celebration.mojom-webui.ts",
+    "$root_gen_dir/chrome/browser/ui/webui/intro/sign_in_promo.mojom-webui.ts",
   ]
 
   ts_path_mappings = [ "chrome://intro/tangible_sync_style_shared.css.js|" + rebase_path(
