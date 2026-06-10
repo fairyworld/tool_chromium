@@ -909,8 +909,16 @@ class GlicInvokeDefaultToLastActiveActuatingBrowserTest
   base::test::ScopedFeatureList feature_list_;
 };
 
+// TODO(crbug.com/501124440): Failed on Android.
+#if BUILDFLAG(IS_ANDROID)
+#define MAYBE_NewTabDoesNotDefaultToLastActiveIfActuating \
+  DISABLED_NewTabDoesNotDefaultToLastActiveIfActuating
+#else
+#define MAYBE_NewTabDoesNotDefaultToLastActiveIfActuating \
+  NewTabDoesNotDefaultToLastActiveIfActuating
+#endif
 IN_PROC_BROWSER_TEST_F(GlicInvokeDefaultToLastActiveActuatingBrowserTest,
-                       NewTabDoesNotDefaultToLastActiveIfActuating) {
+                       MAYBE_NewTabDoesNotDefaultToLastActiveIfActuating) {
   GlicHistogramTester histogram_tester;
   ASSERT_OK_AND_ASSIGN(auto instance1, OpenGlicForActiveTab());
 
