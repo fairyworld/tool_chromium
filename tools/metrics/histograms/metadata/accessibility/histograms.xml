@@ -3090,6 +3090,27 @@ even if they fit the naming pattern. -->
   </token>
 </histogram>
 
+<histogram
+    name="Accessibility.ReadAnything.DistilledPageStructure.{RatioMetric}"
+    units="ratio * 100" expires_after="2027-05-01">
+  <owner>lwinston@google.com</owner>
+  <owner>komo-eng@google.com</owner>
+  <summary>
+    Records {RatioMetric}. Recorded when the content is successfully distilled
+    and updated in the Reading Mode panel.
+  </summary>
+  <token key="RatioMetric">
+    <variant name="HeadingToParagraphRatio"
+        summary="the ratio of headings to paragraphs on the distilled page,
+                 scaled by 100, to get a sense of how sparsely populated the
+                 page is"/>
+    <variant name="TopTwoHeadingRatio"
+        summary="the ratio of the top level to the second top level header
+                 present on the page (excluding h1 if there is exactly 1 h1
+                 header), scaled by 100"/>
+  </token>
+</histogram>
+
 <histogram name="Accessibility.ReadAnything.EmptyState"
     enum="ReadAnythingEmptyState" expires_after="2026-12-06">
   <owner>abigailbklein@google.com</owner>
