@@ -451,11 +451,11 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
         break;
       }
 
+      AccountInfo account_info = identity_manager->FindExtendedAccountInfo(
+          identity_manager->GetPrimaryAccountInfo(
+              signin::ConsentLevel::kSignin));
       const AccountCapabilities& capabilities =
-          identity_manager
-              ->FindExtendedAccountInfo(identity_manager->GetPrimaryAccountInfo(
-                  signin::ConsentLevel::kSignin))
-              .capabilities;
+          account_info.GetAccountCapabilities();
       if (base::FeatureList::IsEnabled(
               features::kAutofillAiWalletPrivatePassesCapability)) {
         if (capabilities.supports_wallet_private_passes_in_autofill() !=

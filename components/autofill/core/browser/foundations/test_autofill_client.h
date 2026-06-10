@@ -564,7 +564,7 @@ class TestAutofillClientTemplate : public T {
         GetIdentityManager()->GetPrimaryAccountInfo(
             signin::ConsentLevel::kSignin));
     CHECK(!account_info.account_id.empty());
-    AccountCapabilitiesTestMutator(&account_info.capabilities)
+    AccountCapabilitiesTestMutator(&account_info)
         .set_can_use_model_execution_features(can_use_model_execution);
     signin::UpdateAccountInfoForAccount(GetIdentityManager(), account_info);
   }

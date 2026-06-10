@@ -864,7 +864,7 @@ TEST_F(AutofillAiMayPerformImportToWalletTest,
   signin::IdentityManager* identity_manager = client().GetIdentityManager();
   AccountInfo account_info = identity_manager->FindExtendedAccountInfo(
       identity_manager->GetPrimaryAccountInfo(signin::ConsentLevel::kSignin));
-  AccountCapabilitiesTestMutator(&account_info.capabilities)
+  AccountCapabilitiesTestMutator(&account_info)
       .set_can_use_model_execution_features(false);
   signin::UpdateAccountInfoForAccount(identity_manager, account_info);
   // Expect that Wallet imports for public passes are allowed.
@@ -887,7 +887,7 @@ TEST_F(AutofillAiMayPerformImportToWalletTest,
   signin::IdentityManager* identity_manager = client().GetIdentityManager();
   AccountInfo account_info = identity_manager->FindExtendedAccountInfo(
       identity_manager->GetPrimaryAccountInfo(signin::ConsentLevel::kSignin));
-  AccountCapabilitiesTestMutator(&account_info.capabilities)
+  AccountCapabilitiesTestMutator(&account_info)
       .set_supports_wallet_private_passes_in_autofill(false);
   signin::UpdateAccountInfoForAccount(identity_manager, account_info);
   // Expect that Wallet imports for public passes are allowed.
