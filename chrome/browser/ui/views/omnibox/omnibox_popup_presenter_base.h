@@ -68,7 +68,7 @@ class OmniboxPopupPresenterBase : public content::WebContentsObserver,
   void OnContentHeightChanged(int content_height);
 
   // Synchronize the popup widget's bounds to its anchor (location bar view).
-  void SynchronizePopupBounds();
+  virtual void SynchronizePopupBounds();
 
   // Returns the currently "active" Popup content, whichever one is visible or
   // going to be visible within the popup.
@@ -126,11 +126,18 @@ class OmniboxPopupPresenterBase : public content::WebContentsObserver,
   // Called when the widget has just been destroyed.
   virtual void WidgetDestroyed() {}
 
+  // Hook to create the results frame view.
+  virtual std::unique_ptr<RoundedOmniboxResultsFrame> CreateResultsFrame(
+      std::unique_ptr<views::View> contents,
+      LocationBar* location_bar,
+      bool forward_mouse_events);
+
+  // Returns the frame view of the widget if it exists. CHECKs if no widget
+  // created.
+  RoundedOmniboxResultsFrame* GetResultsFrame() const;
+
   // Returns whether or not the popup should include the location bar cutout.
   virtual bool ShouldShowLocationBarCutout() const;
-
-  // Returns whether or not the popup should trust the content height directly.
-  virtual bool ShouldUseWebContentHeight() const;
 
   // Returns whether the WebUI content view receive focus.
   virtual bool ShouldReceiveFocus() const;
@@ -173,10 +180,6 @@ class OmniboxPopupPresenterBase : public content::WebContentsObserver,
 
   // Remove observation and reset widget, optionally requesting it to close.
   void ReleaseWidget();
-
-  // Returns the frame view of the widget if it exists. CHECKs if no widget
-  // created
-  RoundedOmniboxResultsFrame* GetResultsFrame() const;
 
   // The location bar that owns `this`.
   const raw_ptr<LocationBar> location_bar_;
