@@ -893,6 +893,16 @@ void MirroringActivity::OnMirroringStats(base::Value json_stats) {
   debugger_.get()->OnMirroringStats(json_stats.Clone());
   if (json_stats.is_dict()) {
     most_recent_mirroring_stats_ = std::move(json_stats.GetDict());
+
+    // Mirroring statistics are logged as we go, to enable piecing together a
+    // timeline using the delta between each statistics instance in the logs.
+    // However, only the final set of statistics is submitted to UMA.
+    if (VLOG_IS_ON(2)) {
+      if (std::optional<std::string> stats_json =
+              base::WriteJson(most_recent_mirroring_stats_)) {
+        VLOG(2) << __func__ << " most_recent_mirroring_stats_: " << *stats_json;
+      }
+    }
   }
 }
 
