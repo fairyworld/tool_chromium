@@ -878,7 +878,7 @@ class TestHarnessEventsBrowserTest : public TestAPITest {
              }
              if (onTestStartedFiredCount === 1 &&
                  info.remainingTests === 0 &&
-                 info.assertionDescription === 'Test succeeded') {
+                 info.assertionDescription === '%s PASS') {
                // Send message indicating we successfully received the finished
                // event for this test.
                chrome.test.sendMessage('finished:' + info.testName);
@@ -902,7 +902,8 @@ class TestHarnessEventsBrowserTest : public TestAPITest {
                chrome.test.succeed();
              }
            ]);)",
-        test_name.c_str(), test_name.c_str(), test_name.c_str());
+        test_name.c_str(), test_name.c_str(), test_name.c_str(),
+        test_name.c_str());
   }
 };
 

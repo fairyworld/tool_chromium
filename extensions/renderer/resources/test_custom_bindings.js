@@ -335,7 +335,8 @@ apiBridge.registerCustomHook(function(api) {
       chromeTest.notifyTestStarted(testName(currentTest));
       bindingUtil.setExceptionHandler(function(message, e) {
         if (e !== kFailureException) {
-          chromeTest.fail(`uncaught exception: ${message}`);
+          chromeTest.fail(
+              `Exception running ${testName(currentTest)}: ${message}`);
         }
       });
       const result = $Function.call(currentTest);
@@ -437,7 +438,7 @@ apiBridge.registerCustomHook(function(api) {
     // really fancy, there may be more sophisticated ways of doing this.
     Error.captureStackTrace(stack, failHandler);
 
-    const assertionDescription = message || 'FAIL (no message)';
+    const assertionDescription = message || 'Assertion FAIL';
     const fullMessage = `${assertionDescription} \n ${stack.stack}`;
 
     console.log(`[FAIL] ${testName(currentTest)}: ${fullMessage}`);
@@ -480,7 +481,7 @@ apiBridge.registerCustomHook(function(api) {
         testName: testName(currentTest),
         result: true,
         remainingTests: chromeTest.tests.length,
-        assertionDescription: 'Test succeeded'
+        assertionDescription: `${testName(currentTest)} PASS`
       });
     }
     // Notify other renderer script contexts that the test finished and
@@ -488,7 +489,8 @@ apiBridge.registerCustomHook(function(api) {
     chromeTest.notifyTestFinished(
         testName(currentTest), /* result= */ true,
         /* remainingTests= */ chromeTest.tests.length,
-        /* assertionDescription= */ 'Test succeeded', /* message= */ '');
+        /* assertionDescription= */ `${testName(currentTest)} PASS`,
+        /* message= */ '');
     testDone();
   });
 
