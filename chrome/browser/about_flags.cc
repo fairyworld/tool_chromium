@@ -854,8 +854,8 @@ const FeatureEntry::FeatureParam kChromeFindsTestOptInConditions[] = {
     {"finds_opt_in_promo_max_interacted_count", "9999"}};
 
 const FeatureEntry::FeatureVariation kChromeFindsVariations[] = {
-    {"Enabled (notifications testing)", kChromeFindsTestConfiguration, nullptr},
-    {"Enabled (opt-in testing)", kChromeFindsTestOptInConditions, nullptr}};
+    {"(notifications testing)", kChromeFindsTestConfiguration, nullptr},
+    {"(opt-in testing)", kChromeFindsTestOptInConditions, nullptr}};
 
 const FeatureEntry::FeatureParam kPopularSitesRefreshUsParamArm1[] = {
     {"arm", "1"}};  // ntp_tiles::kPopularSitesRefreshUsArm.name
