@@ -9719,6 +9719,26 @@
             ]
         }
     ],
+    "EnableAccountPreviewData": [
+        {
+            "platforms": [
+                "android",
+                "chromeos",
+                "ios",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled_20260309",
+                    "enable_features": [
+                        "EnableAccountPreviewData"
+                    ]
+                }
+            ]
+        }
+    ],
     "EnableAndroidSidePanel": [
         {
             "platforms": [
