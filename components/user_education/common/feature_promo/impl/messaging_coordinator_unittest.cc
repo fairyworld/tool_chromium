@@ -12,6 +12,7 @@
 #include "base/test/gtest_util.h"
 #include "base/test/task_environment.h"
 #include "components/user_education/product_messaging/product_messaging_controller.h"
+#include "components/user_education/product_messaging/product_messaging_policy_impl.h"
 #include "components/user_education/test/test_product_messaging_controller.h"
 #include "components/user_education/test/test_user_education_storage_service.h"
 #include "components/user_education/test/user_education_session_mocks.h"
@@ -36,7 +37,8 @@ class MessagingCoordinatorTest : public testing::Test {
   ~MessagingCoordinatorTest() override = default;
 
   void SetUp() override {
-    controller_.Init(session_provider_, storage_service_);
+    controller_.Init(session_provider_, storage_service_,
+                     ProductMessagingPolicyImpl::CreateDefault());
   }
 
   ProductMessagingController& controller() { return controller_; }

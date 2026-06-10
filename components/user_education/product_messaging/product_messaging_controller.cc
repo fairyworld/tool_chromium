@@ -5,6 +5,7 @@
 #include "components/user_education/product_messaging/product_messaging_controller.h"
 
 #include <algorithm>
+#include <compare>
 #include <sstream>
 #include <utility>
 #include <vector>
@@ -19,37 +20,9 @@
 #include "components/user_education/common/session/user_education_session_manager.h"
 #include "components/user_education/common/user_education_data.h"
 #include "components/user_education/common/user_education_storage_service.h"
+#include "components/user_education/product_messaging/product_messaging_policy.h"
 
 namespace user_education {
-
-bool ProductMessageKey::operator<(ProductMessageKey other) const {
-  DCHECK(id_ != other.id_ || type_ == other.type_)
-      << "Found two product message keys with same id " << id_
-      << " but different types.";
-  return id_ < other.id_;
-}
-
-std::string ProductMessageKey::GetName() const {
-  static constexpr std::string_view kSuffix = "UniqueId";
-  std::string temp = id_.GetName();
-  if (!temp.empty()) {
-    CHECK(temp.ends_with(kSuffix));
-    temp = temp.substr(0, temp.length() - kSuffix.length());
-  }
-  return temp;
-}
-
-std::string ProductMessageKey::ToString() const {
-  static constexpr std::array<
-      std::string_view, static_cast<size_t>(ProductMessageType::kMaxValue) + 1U>
-      kTypeNames{"[none]", "LowPriorityIph", "HighPriorityIph",
-                 "LegalOrComplianceNotice"};
-  std::ostringstream oss;
-  oss << "ProductMessageKey{ type: "
-      << kTypeNames.at(static_cast<size_t>(type_)) << " id: " << id_.GetName()
-      << " }";
-  return oss.str();
-}
 
 // ProductMessagingHandleImpl
 
@@ -105,25 +78,6 @@ void ProductMessagingHandleImpl::OnStatusChange(ProductMessageKey key,
   superseded_callback_.Run(key, status);
 }
 
-// ProductMessagingController::ProductMessageData
-
-struct ProductMessagingController::ProductMessageData {
-  ProductMessageData() = default;
-  ProductMessageData(ProductMessageData&&) = default;
-  ProductMessageData& operator=(ProductMessageData&&) = default;
-  ProductMessageData(ProductMessageReadyCallback callback_,
-                     std::vector<ProductMessageKey> show_after_,
-                     std::vector<ProductMessageKey> blocked_by_)
-      : callback(std::move(callback_)),
-        show_after(std::move(show_after_)),
-        blocked_by(std::move(blocked_by_)) {}
-  ~ProductMessageData() = default;
-
-  ProductMessageReadyCallback callback;
-  std::vector<ProductMessageKey> show_after;
-  std::vector<ProductMessageKey> blocked_by;
-};
-
 // ProductMessagingController
 
 ProductMessagingController::ProductMessagingController() = default;
@@ -131,7 +85,11 @@ ProductMessagingController::~ProductMessagingController() = default;
 
 void ProductMessagingController::Init(
     UserEducationSessionProvider& session_provider,
-    UserEducationStorageService& storage_service) {
+    UserEducationStorageService& storage_service,
+    std::unique_ptr<ProductMessagingPolicy> policy) {
+  CHECK(!storage_service_);
+  CHECK(!policy_);
+  CHECK(policy);
   storage_service_ = &storage_service;
   if (session_provider.GetNewSessionSinceStartup()) {
     storage_service_->ResetProductMessagingData();
@@ -139,6 +97,7 @@ void ProductMessagingController::Init(
   session_subscription_ =
       session_provider.AddNewSessionCallback(base::BindRepeating(
           &ProductMessagingController::OnNewSession, base::Unretained(this)));
+  policy_ = std::move(policy);
 }
 
 bool ProductMessagingController::IsMessageQueued(
@@ -148,21 +107,17 @@ bool ProductMessagingController::IsMessageQueued(
 
 void ProductMessagingController::QueueMessage(
     ProductMessageKey message_key,
-    ProductMessageReadyCallback ready_to_start_callback,
-    std::initializer_list<ProductMessageKey> always_show_after,
-    std::initializer_list<ProductMessageKey> blocked_by) {
+    ProductMessageReadyCallback ready_to_start_callback) {
   CHECK(message_key);
   CHECK(!ready_to_start_callback.is_null());
 
-  // Cannot re-queue the current notice.
-  if (current_message_ == message_key) {
+  // Cannot re-queue a notice.
+  if (GetProductMessageStatus(message_key) != ProductMessageStatus::kNone) {
     return;
   }
 
   const auto result = pending_messages_.emplace(
-      message_key,
-      ProductMessageData(std::move(ready_to_start_callback),
-                         std::move(always_show_after), std::move(blocked_by)));
+      message_key, std::move(ready_to_start_callback));
   CHECK(result.second) << "Duplicate message ID: " << message_key.ToString();
   status_update_callbacks_.Notify(message_key, ProductMessageStatus::kQueued);
   MaybeShowNextMessage();
@@ -254,19 +209,20 @@ void ProductMessagingController::MaybeShowNextMessage() {
 }
 
 void ProductMessagingController::PurgeBlockedMessages() {
-  ProductMessagingData stored_data =
-      storage_service_->ReadProductMessagingData();
+  ProductMessagingPolicy::Ids ids;
+  for (const auto& name :
+       storage_service_->ReadProductMessagingData().shown_notices) {
+    std::string actual_name = name;
+    actual_name += internal::kProductMessageUniqueIdSuffix;
+    const auto id =
+        internal::ProductMessageUniqueId::FromName(actual_name.c_str());
+    ids.insert(id);
+  }
   std::vector<ProductMessageKey> to_purge;
-  for (const auto& [id, data] : pending_messages_) {
-    if (stored_data.shown_notices.contains(id.GetName())) {
-      to_purge.push_back(id);
+  for (const auto& [key, data] : pending_messages_) {
+    if (policy_->BlockedByAnyOf(key, ids, /*include_self=*/true)) {
+      to_purge.push_back(key);
       continue;
-    }
-    for (auto blocker : data.blocked_by) {
-      if (stored_data.shown_notices.contains(blocker.GetName())) {
-        to_purge.push_back(id);
-        break;
-      }
     }
   }
   for (auto id : to_purge) {
@@ -284,32 +240,31 @@ void ProductMessagingController::MaybeShowNextMessageImpl() {
     return;
   }
 
+  ProductMessagingPolicy::Ids ids;
+  std::set<ProductMessageType> types;
+  for (const auto& [key, data] : pending_messages_) {
+    ids.insert(key.id());
+    types.insert(key.type());
+  }
+
   // Find a notice that is not waiting for any other notices to show.
   ProductMessageKey to_show;
-  for (const auto& [id, data] : pending_messages_) {
-    bool excluded = false;
-    bool show_after_all = false;
-    for (auto after : data.show_after) {
-      if (after.type() <= ProductMessageType::kLowPriorityIph) {
-        show_after_all = true;
-      } else if (pending_messages_.contains(after)) {
-        excluded = true;
+  for (const auto& [key, data] : pending_messages_) {
+    if (policy_->BlockedByAnyOf(key, ids, /*include_self=*/false) ||
+        policy_->MustShowAfterAnyOf(key, ids)) {
+      continue;
+    }
+    bool allowed = true;
+    for (ProductMessageType type : types) {
+      if (policy_->GetRelationship(key.type(), type) ==
+          ProductMessagingPolicy::TypeRelationship::kSupersededBy) {
+        allowed = false;
         break;
       }
     }
-    for (auto blocker : data.blocked_by) {
-      if (pending_messages_.contains(blocker)) {
-        excluded = true;
-        break;
-      }
-    }
-    if (!excluded) {
-      if (!show_after_all) {
-        to_show = id;
-        break;
-      } else if (!to_show) {
-        to_show = id;
-      }
+    if (allowed) {
+      to_show = key;
+      break;
     }
   }
 
@@ -319,8 +274,7 @@ void ProductMessagingController::MaybeShowNextMessageImpl() {
   }
 
   // Fire the next notice.
-  ProductMessageReadyCallback cb =
-      std::move(pending_messages_[to_show].callback);
+  ProductMessageReadyCallback cb = std::move(pending_messages_[to_show]);
   pending_messages_.erase(to_show);
   current_message_ = to_show;
   current_message_shown_ = false;
@@ -344,15 +298,7 @@ void ProductMessagingController::OnMessageShown(ProductMessageKey message_key) {
 std::string ProductMessagingController::DumpData() const {
   std::ostringstream oss;
   for (const auto& [key, data] : pending_messages_) {
-    oss << "\n{ key: " << key.ToString() << " show_after: { ";
-    for (const auto& after : data.show_after) {
-      oss << after.ToString() << ", ";
-    }
-    oss << "} blocked_by: { ";
-    for (const auto& blocker : data.blocked_by) {
-      oss << blocker.ToString() << ", ";
-    }
-    oss << "} }";
+    oss << "\n{ key: " << key.ToString() << " }";
   }
   return oss.str();
 }

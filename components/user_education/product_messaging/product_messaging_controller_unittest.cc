@@ -7,10 +7,12 @@
 #include <initializer_list>
 
 #include "base/functional/bind.h"
+#include "base/memory/raw_ptr.h"
 #include "base/run_loop.h"
 #include "base/task/single_thread_task_runner.h"
 #include "base/test/task_environment.h"
 #include "components/user_education/common/user_education_data.h"
+#include "components/user_education/product_messaging/product_messaging_policy_impl.h"
 #include "components/user_education/test/test_product_messaging_controller.h"
 #include "components/user_education/test/test_user_education_storage_service.h"
 #include "components/user_education/test/user_education_session_mocks.h"
@@ -36,7 +38,9 @@ class ProductMessagingControllerTest : public testing::Test {
   ~ProductMessagingControllerTest() override = default;
 
   void SetUp() override {
-    controller_.Init(session_provider_, storage_service_);
+    auto policy = ProductMessagingPolicyImpl::CreateDefault();
+    policy_ = policy.get();
+    controller_.Init(session_provider_, storage_service_, std::move(policy));
   }
 
   ProductMessagingController& controller() { return controller_; }
@@ -46,6 +50,7 @@ class ProductMessagingControllerTest : public testing::Test {
   test::TestUserEducationStorageService& storage_service() {
     return storage_service_;
   }
+  ProductMessagingPolicyImpl* policy() { return policy_; }
 
   void FlushEvents() {
     base::RunLoop run_loop(base::RunLoop::Type::kNestableTasksAllowed);
@@ -71,6 +76,7 @@ class ProductMessagingControllerTest : public testing::Test {
   test::TestUserEducationSessionProvider session_provider_{false};
   test::TestUserEducationStorageService storage_service_;
   ProductMessagingController controller_;
+  raw_ptr<ProductMessagingPolicyImpl> policy_ = nullptr;
 };
 
 TEST_F(ProductMessagingControllerTest, ConditionallyRecordsDone) {
@@ -113,6 +119,21 @@ TEST_F(ProductMessagingControllerTest, ShownBlocksSelf) {
   EXPECT_FALSE(notice2.has_priority());
 }
 
+TEST_F(ProductMessagingControllerTest, ShownDoesNotBlockSelf) {
+  policy()->SetSelfBlocking(kNoticeId1.type(), false);
+
+  test::TestProductMessage notice(controller(), kNoticeId1);
+  FlushEvents();
+  EXPECT_TRUE(notice.has_priority());
+  notice.SetShown();
+  notice.Release();
+  EXPECT_FALSE(notice.has_priority());
+
+  test::TestProductMessage notice2(controller(), kNoticeId1);
+  FlushEvents();
+  EXPECT_TRUE(notice2.has_priority());
+}
+
 TEST_F(ProductMessagingControllerTest, NotShownDoesNotBlockSelf) {
   test::TestProductMessage notice(controller(), kNoticeId1);
   FlushEvents();
@@ -153,7 +174,8 @@ TEST_F(ProductMessagingControllerTest, ClearsOnNewSessionAtProgramStart) {
       storage_service.ReadProductMessagingData().shown_notices.empty());
 
   test::TestUserEducationSessionProvider session_provider(true);
-  controller.Init(session_provider, storage_service);
+  controller.Init(session_provider, storage_service,
+                  ProductMessagingPolicyImpl::CreateDefault());
 
   EXPECT_TRUE(storage_service.ReadProductMessagingData().shown_notices.empty());
 }
@@ -170,7 +192,8 @@ TEST_F(ProductMessagingControllerTest,
       storage_service.ReadProductMessagingData().shown_notices.empty());
 
   test::TestUserEducationSessionProvider session_provider(false);
-  controller.Init(session_provider, storage_service);
+  controller.Init(session_provider, storage_service,
+                  ProductMessagingPolicyImpl::CreateDefault());
 
   EXPECT_FALSE(
       storage_service.ReadProductMessagingData().shown_notices.empty());
@@ -233,9 +256,11 @@ TEST_F(ProductMessagingControllerTest, QueueMultipleIndependentNotices) {
 }
 
 TEST_F(ProductMessagingControllerTest, QueueDependentNotices_NotShown) {
-  test::TestProductMessage notice1(controller(), kNoticeId1,
-                                   {kNoticeId2, kNoticeId3});
-  test::TestProductMessage notice2(controller(), kNoticeId2, {kNoticeId3});
+  policy()->SetShowAfter(kNoticeId1, {kNoticeId2, kNoticeId3});
+  policy()->SetShowAfter(kNoticeId2, {kNoticeId3});
+
+  test::TestProductMessage notice1(controller(), kNoticeId1);
+  test::TestProductMessage notice2(controller(), kNoticeId2);
   test::TestProductMessage notice3(controller(), kNoticeId3);
 
   FlushEvents();
@@ -251,9 +276,11 @@ TEST_F(ProductMessagingControllerTest, QueueDependentNotices_NotShown) {
 }
 
 TEST_F(ProductMessagingControllerTest, QueueDependentNotices_Shown) {
-  test::TestProductMessage notice1(controller(), kNoticeId1,
-                                   {kNoticeId2, kNoticeId3});
-  test::TestProductMessage notice2(controller(), kNoticeId2, {kNoticeId3});
+  policy()->SetShowAfter(kNoticeId1, {kNoticeId2, kNoticeId3});
+  policy()->SetShowAfter(kNoticeId2, {kNoticeId3});
+
+  test::TestProductMessage notice1(controller(), kNoticeId1);
+  test::TestProductMessage notice2(controller(), kNoticeId2);
   test::TestProductMessage notice3(controller(), kNoticeId3);
 
   FlushEvents();
@@ -272,8 +299,11 @@ TEST_F(ProductMessagingControllerTest, QueueDependentNotices_Shown) {
 }
 
 TEST_F(ProductMessagingControllerTest, QueueDependentNoticeChain_NotShown) {
-  test::TestProductMessage notice1(controller(), kNoticeId1, {kNoticeId2});
-  test::TestProductMessage notice2(controller(), kNoticeId2, {kNoticeId3});
+  policy()->SetShowAfter(kNoticeId1, {kNoticeId2});
+  policy()->SetShowAfter(kNoticeId2, {kNoticeId3});
+
+  test::TestProductMessage notice1(controller(), kNoticeId1);
+  test::TestProductMessage notice2(controller(), kNoticeId2);
   test::TestProductMessage notice3(controller(), kNoticeId3);
 
   FlushEvents();
@@ -289,8 +319,11 @@ TEST_F(ProductMessagingControllerTest, QueueDependentNoticeChain_NotShown) {
 }
 
 TEST_F(ProductMessagingControllerTest, QueueDependentNoticeChain_Shown) {
-  test::TestProductMessage notice1(controller(), kNoticeId1, {kNoticeId2});
-  test::TestProductMessage notice2(controller(), kNoticeId2, {kNoticeId3});
+  policy()->SetShowAfter(kNoticeId1, {kNoticeId2});
+  policy()->SetShowAfter(kNoticeId2, {kNoticeId3});
+
+  test::TestProductMessage notice1(controller(), kNoticeId1);
+  test::TestProductMessage notice2(controller(), kNoticeId2);
   test::TestProductMessage notice3(controller(), kNoticeId3);
 
   FlushEvents();
@@ -309,7 +342,9 @@ TEST_F(ProductMessagingControllerTest, QueueDependentNoticeChain_Shown) {
 }
 
 TEST_F(ProductMessagingControllerTest, BlockedBy) {
-  test::TestProductMessage notice1(controller(), kNoticeId1, {}, {kNoticeId2});
+  policy()->SetBlockedBy(kNoticeId1, {kNoticeId2});
+
+  test::TestProductMessage notice1(controller(), kNoticeId1);
   test::TestProductMessage notice2(controller(), kNoticeId2);
 
   FlushEvents();
@@ -322,7 +357,9 @@ TEST_F(ProductMessagingControllerTest, BlockedBy) {
 }
 
 TEST_F(ProductMessagingControllerTest, BlockedByNotBlockedIfNotShown) {
-  test::TestProductMessage notice1(controller(), kNoticeId1, {}, {kNoticeId2});
+  policy()->SetBlockedBy(kNoticeId1, {kNoticeId2});
+
+  test::TestProductMessage notice1(controller(), kNoticeId1);
   test::TestProductMessage notice2(controller(), kNoticeId2);
 
   FlushEvents();
@@ -335,6 +372,8 @@ TEST_F(ProductMessagingControllerTest, BlockedByNotBlockedIfNotShown) {
 }
 
 TEST_F(ProductMessagingControllerTest, BlockedByBlocksLater) {
+  policy()->SetBlockedBy(kNoticeId1, {kNoticeId2});
+
   test::TestProductMessage notice2(controller(), kNoticeId2);
 
   FlushEvents();
@@ -344,13 +383,15 @@ TEST_F(ProductMessagingControllerTest, BlockedByBlocksLater) {
   FlushEvents();
   EXPECT_FALSE(controller().HasPendingMessagesForTesting());
 
-  test::TestProductMessage notice1(controller(), kNoticeId1, {}, {kNoticeId2});
+  test::TestProductMessage notice1(controller(), kNoticeId1);
   FlushEvents();
   EXPECT_FALSE(notice1.has_priority());
   EXPECT_FALSE(controller().HasPendingMessagesForTesting());
 }
 
 TEST_F(ProductMessagingControllerTest, BlockedByDoesNotBlockAfterNewSession) {
+  policy()->SetBlockedBy(kNoticeId1, {kNoticeId2});
+
   test::TestProductMessage notice2(controller(), kNoticeId2);
 
   FlushEvents();
@@ -362,7 +403,7 @@ TEST_F(ProductMessagingControllerTest, BlockedByDoesNotBlockAfterNewSession) {
 
   session_provider().StartNewSession();
 
-  test::TestProductMessage notice1(controller(), kNoticeId1, {}, {kNoticeId2});
+  test::TestProductMessage notice1(controller(), kNoticeId1);
   FlushEvents();
   EXPECT_TRUE(notice1.has_priority());
   notice1.SetShown();
@@ -371,12 +412,14 @@ TEST_F(ProductMessagingControllerTest, BlockedByDoesNotBlockAfterNewSession) {
 }
 
 TEST_F(ProductMessagingControllerTest, QueueBlockedByAndDependentNotices) {
+  policy()->SetShowAfter(kNoticeId1, {kNoticeId2, kNoticeId3});
+  policy()->SetBlockedBy(kNoticeId2, {kNoticeId3});
+
   // As soon as notice 2 is purged by notice 3 showing, this notice will be able
   // to show.
-  test::TestProductMessage notice1(controller(), kNoticeId1,
-                                   {kNoticeId2, kNoticeId3});
+  test::TestProductMessage notice1(controller(), kNoticeId1);
   // This will be blocked by the first notice, and not show.
-  test::TestProductMessage notice2(controller(), kNoticeId2, {}, {kNoticeId3});
+  test::TestProductMessage notice2(controller(), kNoticeId2);
   // This one will show first.
   test::TestProductMessage notice3(controller(), kNoticeId3);
 
@@ -393,9 +436,12 @@ TEST_F(ProductMessagingControllerTest, QueueBlockedByAndDependentNotices) {
 
 TEST_F(ProductMessagingControllerTest,
        QueueBlockedByAndDependentNoticesNoticesDoNotShow) {
-  test::TestProductMessage notice1(controller(), kNoticeId1, {kNoticeId2},
-                                   {kNoticeId3});
-  test::TestProductMessage notice2(controller(), kNoticeId2, {}, {kNoticeId3});
+  policy()->SetShowAfter(kNoticeId1, {kNoticeId2});
+  policy()->SetBlockedBy(kNoticeId1, {kNoticeId3});
+  policy()->SetBlockedBy(kNoticeId2, {kNoticeId3});
+
+  test::TestProductMessage notice1(controller(), kNoticeId1);
+  test::TestProductMessage notice2(controller(), kNoticeId2);
   test::TestProductMessage notice3(controller(), kNoticeId3);
 
   FlushEvents();

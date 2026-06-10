@@ -243,8 +243,7 @@ void ChromeTailoredSecurityService::QueueNotice(bool is_enabled) {
     product_messaging_controller.QueueMessage(
         notice_to_queue,
         base::BindOnce(&ChromeTailoredSecurityService::TriggerDialogDisplay,
-                       weak_factory_.GetWeakPtr(), is_enabled),
-        {});
+                       weak_factory_.GetWeakPtr(), is_enabled));
   }
 }
 #endif

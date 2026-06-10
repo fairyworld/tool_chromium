@@ -15,11 +15,8 @@ namespace user_education::test {
 // Will hold the handle until `Release()` is called.
 class TestProductMessage {
  public:
-  explicit TestProductMessage(
-      ProductMessagingController& controller,
-      ProductMessageKey key,
-      std::initializer_list<ProductMessageKey> show_after = {},
-      std::initializer_list<ProductMessageKey> blocked_by = {});
+  explicit TestProductMessage(ProductMessagingController& controller,
+                              ProductMessageKey key);
   TestProductMessage(const TestProductMessage&) = delete;
   void operator=(const TestProductMessage&) = delete;
   ~TestProductMessage();

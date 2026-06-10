@@ -8,16 +8,12 @@
 
 namespace user_education::test {
 
-TestProductMessage::TestProductMessage(
-    ProductMessagingController& controller,
-    ProductMessageKey key,
-    std::initializer_list<ProductMessageKey> show_after,
-    std::initializer_list<ProductMessageKey> blocked_by)
+TestProductMessage::TestProductMessage(ProductMessagingController& controller,
+                                       ProductMessageKey key)
     : key_(key) {
   controller.QueueMessage(key_,
                           base::BindOnce(&TestProductMessage::OnReadyToShow,
-                                         base::Unretained(this)),
-                          show_after, blocked_by);
+                                         base::Unretained(this)));
 }
 
 TestProductMessage::~TestProductMessage() = default;
