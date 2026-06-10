@@ -594,7 +594,7 @@ void ClientTagBasedDataTypeProcessor::Put(
     // been sent to the server yet, and the bridge is trying to re-create this
     // entity with a new storage key. In such case, we should reuse the existing
     // entity.
-    entity = entity_tracker_->GetEntityForClientTagHash(data->client_tag_hash);
+    entity = entity_tracker_->GetEntityForTagHash(data->client_tag_hash);
     if (entity != nullptr) {
       CHECK(storage_key != entity->storage_key());
       if (!entity->metadata().is_deleted()) {
@@ -681,7 +681,7 @@ void ClientTagBasedDataTypeProcessor::UpdateStorageKey(
   CHECK(entity_tracker_);
 
   const ProcessorEntity* entity =
-      entity_tracker_->GetEntityForClientTagHash(client_tag_hash);
+      entity_tracker_->GetEntityForTagHash(client_tag_hash);
   CHECK(entity);
 
   CHECK(entity->storage_key().empty());
@@ -853,7 +853,7 @@ void ClientTagBasedDataTypeProcessor::OnCommitCompleted(
 
   for (const CommitResponseData& data : committed_response_list) {
     ProcessorEntity* entity =
-        entity_tracker_->GetEntityForClientTagHash(data.client_tag_hash);
+        entity_tracker_->GetEntityForTagHash(data.client_tag_hash);
     if (entity == nullptr) {
       // This can happen (rarely) if the entity got untracked while a Commit was
       // ongoing, or if the server sent a bogus response (unlikely).
@@ -1124,7 +1124,7 @@ ProcessorEntity* ClientTagBasedDataTypeProcessor::TrackEntityUponFullUpdate(
   // TODO(crbug.com/41406929): The CreateEntity() call below assumes that no
   // entity with this client_tag_hash exists already, but in some cases it
   // does.
-  if (entity_tracker_->GetEntityForClientTagHash(client_tag_hash)) {
+  if (entity_tracker_->GetEntityForTagHash(client_tag_hash)) {
     DLOG(ERROR) << "Received duplicate client_tag_hash " << client_tag_hash
                 << " for " << DataTypeToDebugString(type_);
   }
@@ -1603,7 +1603,7 @@ sync_pb::UniquePosition ClientTagBasedDataTypeProcessor::UniquePositionAfter(
   }
 
   const ProcessorEntity* target_entity =
-      entity_tracker_->GetEntityForClientTagHash(target_client_tag_hash);
+      entity_tracker_->GetEntityForTagHash(target_client_tag_hash);
   if (ShouldReuseTrackedUniquePositionFor(target_entity, position_before,
                                           UniquePosition())) {
     CHECK(target_entity);
@@ -1628,7 +1628,7 @@ sync_pb::UniquePosition ClientTagBasedDataTypeProcessor::UniquePositionBefore(
   }
 
   const ProcessorEntity* target_entity =
-      entity_tracker_->GetEntityForClientTagHash(target_client_tag_hash);
+      entity_tracker_->GetEntityForTagHash(target_client_tag_hash);
   if (ShouldReuseTrackedUniquePositionFor(target_entity, UniquePosition(),
                                           position_after)) {
     CHECK(target_entity);
@@ -1669,7 +1669,7 @@ sync_pb::UniquePosition ClientTagBasedDataTypeProcessor::UniquePositionBetween(
   }
 
   const ProcessorEntity* target_entity =
-      entity_tracker_->GetEntityForClientTagHash(target_client_tag_hash);
+      entity_tracker_->GetEntityForTagHash(target_client_tag_hash);
   if (ShouldReuseTrackedUniquePositionFor(target_entity, position_before,
                                           position_after)) {
     CHECK(target_entity);
@@ -1689,7 +1689,7 @@ ClientTagBasedDataTypeProcessor::UniquePositionForInitialEntity(
   CHECK(entity_tracker_);
 
   const ProcessorEntity* target_entity =
-      entity_tracker_->GetEntityForClientTagHash(target_client_tag_hash);
+      entity_tracker_->GetEntityForTagHash(target_client_tag_hash);
   if (ShouldReuseTrackedUniquePositionFor(target_entity, UniquePosition(),
                                           UniquePosition())) {
     CHECK(target_entity);

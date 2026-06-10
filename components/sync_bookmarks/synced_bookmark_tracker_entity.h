@@ -51,10 +51,6 @@ class SyncedBookmarkTrackerEntity {
   // received from the server).
   bool IsUnsyncedLocalCreation() const;
 
-  // Returns true if the specified `update_version` is already known, i.e. is
-  // smaller or equal to the last known server version.
-  bool IsVersionAlreadyKnown(int64_t update_version) const;
-
   // Check whether |data| matches the stored specifics hash. It also compares
   // parent information (which is included in specifics).
   bool MatchesData(const syncer::EntityData& data) const;

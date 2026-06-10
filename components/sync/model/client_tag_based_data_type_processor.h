@@ -258,7 +258,7 @@ class ClientTagBasedDataTypeProcessor : public DataTypeProcessor,
 
   // Adds metadata to all data returned by the bridge.
   // TODO(jkrcal): Mark as const (together with functions it depends on such as
-  // GetEntityForStorageKey, GetEntityForClientTagHash and maybe more).
+  // GetEntityForStorageKey, GetEntityForTagHash and maybe more).
   void MergeDataWithMetadataForDebugging(AllNodesCallback callback,
                                          std::unique_ptr<DataBatch> batch);
 
