@@ -83,7 +83,7 @@ void AddUiColorMixer(ColorProvider* provider, const ColorProviderKey& key) {
   mixer[kColorFrameCaptionForegroundActive] =
       GetColorWithMaxContrast(kColorFrameActive);
   mixer[kColorFrameCaptionForegroundInactive] =
-      GetColorWithMaxContrast(kColorFrameInactive);
+      AlphaBlend(kColorFrameCaptionForegroundActive, kColorFrameInactive, 0x80);
   mixer[kColorFrameInactive] = {dark_mode ? gfx::kGoogleGrey800
                                           : gfx::kGoogleGrey200};
   mixer[kColorHelpIconActive] = {kColorPrimaryForeground};
