@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "extensions/common/manifest_handlers/app_urls_info.h"
+#include "extensions/common/manifest_handlers/app_urls_handler.h"
 
 #include "base/strings/string_number_conversions.h"
 #include "base/values.h"
@@ -15,13 +15,17 @@ namespace extensions {
 namespace keys = manifest_keys;
 namespace errors = manifest_errors;
 
-bool ParseAppURLs(Extension& extension, std::u16string* error) {
-  // ParseAppURLs() should be called only by Hosted Apps.
-  // TODO(crbug.com/324534603): Change this to is_hosted_app() and
-  // update Extension::InitFromValue() accordingly, convert to CHECK().
-  DCHECK(extension.is_app());
+AppURLsHandler::AppURLsHandler() = default;
+AppURLsHandler::~AppURLsHandler() = default;
+
+bool AppURLsHandler::Parse(Extension* extension, std::u16string* error) {
+  // TODO(crbug.com/324534603): Convert to CHECK().
+  DCHECK(extension->is_hosted_app());
   const base::Value* temp_pattern_value =
-      extension.manifest()->FindPath(keys::kWebURLs);
+      extension->manifest()->FindPath(keys::kWebURLs);
+  // TODO(crbug.com/324534603): Convert to CHECK() and remove the
+  // `if (temp_pattern_value) == nullptr` early return.
+  DCHECK(temp_pattern_value);
   if (temp_pattern_value == nullptr) {
     return true;
   }
@@ -83,10 +87,15 @@ bool ParseAppURLs(Extension& extension, std::u16string* error) {
     }
     pattern.SetPath(pattern.path() + '*');
 
-    extension.AddWebExtentPattern(pattern);
+    extension->AddWebExtentPattern(pattern);
   }
 
   return true;
+}
+
+base::span<const char* const> AppURLsHandler::Keys() const {
+  static constexpr const char* kKeys[] = {keys::kWebURLs};
+  return kKeys;
 }
 
 }  // namespace extensions
