@@ -515,12 +515,7 @@ BookmarkRemoteUpdatesHandler::DetermineLocalTrackedEntityToUpdate(
   // Parse the client tag hash in the update or infer it from the originator
   // information (all of which are immutable properties of a sync entity).
   const syncer::ClientTagHash client_tag_hash_in_update =
-      !update_entity.client_tag_hash.value().empty()
-          ? update_entity.client_tag_hash
-          : SyncedBookmarkTracker::GetClientTagHashFromUuid(
-                InferGuidFromLegacyOriginatorId(
-                    update_entity.originator_cache_guid,
-                    update_entity.originator_client_item_id));
+      GetOrInferClientTagHashInUpdate(update_entity);
 
   const SyncedBookmarkTrackerEntity* const tracked_entity_by_client_tag =
       bookmark_tracker->GetEntityForClientTagHash(client_tag_hash_in_update);

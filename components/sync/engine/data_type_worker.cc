@@ -511,7 +511,8 @@ void DataTypeWorker::ProcessGetUpdatesResponse(
   *data_type_state_.mutable_type_context() = mutated_context;
 
   if (progress_marker.has_gc_directive()) {
-    if (progress_marker.gc_directive().has_version_watermark()) {
+    if (progress_marker.gc_directive().has_version_watermark() ||
+        progress_marker.gc_directive().clear_metadata()) {
       // Clean up all the pending updates because a new GC directive has been
       // received which means that all existing data should be cleaned up.
       pending_updates_.clear();

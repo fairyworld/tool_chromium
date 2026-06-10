@@ -20,6 +20,7 @@
 #include "components/favicon/core/test/mock_favicon_service.h"
 #include "components/sync/base/client_tag_hash.h"
 #include "components/sync/base/data_type.h"
+#include "components/sync/base/server_defined_unique_tags.h"
 #include "components/sync/base/unique_position.h"
 #include "components/sync/model/conflict_resolution.h"
 #include "components/sync/protocol/bookmark_model_metadata.pb.h"
@@ -51,11 +52,8 @@ namespace {
 // The parent tag for children of the root entity. Entities with this parent are
 // referred to as top level entities.
 const char kBookmarkBarId[] = "bookmark_bar_id";
-const char kBookmarkBarTag[] = "bookmark_bar";
 const char kMobileBookmarksId[] = "synced_bookmarks_id";
-const char kMobileBookmarksTag[] = "synced_bookmarks";
 const char kOtherBookmarksId[] = "other_bookmarks_id";
-const char kOtherBookmarksTag[] = "other_bookmarks";
 
 // Fork of enum RemoteBookmarkUpdateError.
 enum class ExpectedRemoteBookmarkUpdateError {
@@ -231,11 +229,11 @@ syncer::UpdateResponseData CreatePermanentFolderUpdateData(
 syncer::UpdateResponseDataList CreatePermanentFoldersUpdateData() {
   syncer::UpdateResponseDataList updates;
   updates.push_back(
-      CreatePermanentFolderUpdateData(kBookmarkBarId, kBookmarkBarTag));
-  updates.push_back(
-      CreatePermanentFolderUpdateData(kOtherBookmarksId, kOtherBookmarksTag));
-  updates.push_back(
-      CreatePermanentFolderUpdateData(kMobileBookmarksId, kMobileBookmarksTag));
+      CreatePermanentFolderUpdateData(kBookmarkBarId, syncer::kBookmarkBarTag));
+  updates.push_back(CreatePermanentFolderUpdateData(
+      kOtherBookmarksId, syncer::kOtherBookmarksTag));
+  updates.push_back(CreatePermanentFolderUpdateData(
+      kMobileBookmarksId, syncer::kSyncedBookmarksTag));
   return updates;
 }
 

@@ -273,6 +273,19 @@ void SyncedBookmarkTracker::UpdateServerVersion(
       server_version);
 }
 
+void SyncedBookmarkTracker::OverrideServerMetadata(
+    const syncer::ClientTagHash& client_tag_hash,
+    const std::string& sync_id,
+    int64_t server_version) {
+  const SyncedBookmarkTrackerEntity* entity =
+      GetEntityForClientTagHash(client_tag_hash);
+  if (entity) {
+    UpdateSyncIdIfNeeded(entity, sync_id);
+    AsMutableEntity(entity)->MutableMetadata()->set_server_version(
+        server_version);
+  }
+}
+
 void SyncedBookmarkTracker::MarkCommitMayHaveStarted(
     const SyncedBookmarkTrackerEntity* entity) {
   DCHECK(entity);

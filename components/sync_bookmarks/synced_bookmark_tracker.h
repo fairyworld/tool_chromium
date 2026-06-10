@@ -112,6 +112,12 @@ class SyncedBookmarkTracker {
   void UpdateServerVersion(const SyncedBookmarkTrackerEntity* entity,
                            int64_t server_version);
 
+  // Overrides the server ID and version of an existing entity.
+  // Internally calls `UpdateSyncIdIfNeeded` and updates the version.
+  void OverrideServerMetadata(const syncer::ClientTagHash& client_tag_hash,
+                              const std::string& sync_id,
+                              int64_t server_version);
+
   // Marks an existing entry that a commit request might have been sent to the
   // server. `entity` must be owned by this tracker.
   void MarkCommitMayHaveStarted(const SyncedBookmarkTrackerEntity* entity);

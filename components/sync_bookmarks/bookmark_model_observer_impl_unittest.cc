@@ -56,11 +56,8 @@ using testing::SizeIs;
 using testing::UnorderedElementsAre;
 
 const char kBookmarkBarId[] = "bookmark_bar_id";
-const char kBookmarkBarTag[] = "bookmark_bar";
 const char kOtherBookmarksId[] = "other_bookmarks_id";
-const char kOtherBookmarksTag[] = "other_bookmarks";
 const char kMobileBookmarksId[] = "synced_bookmarks_id";
-const char kMobileBookmarksTag[] = "synced_bookmarks";
 
 // Matches |arg| of type SyncedBookmarkTrackerEntity*.
 MATCHER_P(HasBookmarkNode, node, "") {
@@ -75,19 +72,17 @@ gfx::Image CreateTestImage(SkColor color) {
 void AddPermanentFoldersToTracker(const BookmarkModelView* model,
                                   SyncedBookmarkTracker* tracker) {
   sync_pb::EntitySpecifics specifics;
-  specifics.mutable_bookmark()->set_legacy_canonicalized_title(kBookmarkBarTag);
+  specifics.mutable_bookmark();
   tracker->AddRemote(
       /*bookmark_node=*/model->bookmark_bar_node(),
       /*sync_id=*/kBookmarkBarId,
       /*server_version=*/0, /*creation_time=*/base::Time::Now(), specifics);
-  specifics.mutable_bookmark()->set_legacy_canonicalized_title(
-      kOtherBookmarksTag);
+  specifics.mutable_bookmark();
   tracker->AddRemote(
       /*bookmark_node=*/model->other_node(),
       /*sync_id=*/kOtherBookmarksId,
       /*server_version=*/0, /*creation_time=*/base::Time::Now(), specifics);
-  specifics.mutable_bookmark()->set_legacy_canonicalized_title(
-      kMobileBookmarksTag);
+  specifics.mutable_bookmark();
   tracker->AddRemote(
       /*bookmark_node=*/model->mobile_node(),
       /*sync_id=*/kMobileBookmarksId,
