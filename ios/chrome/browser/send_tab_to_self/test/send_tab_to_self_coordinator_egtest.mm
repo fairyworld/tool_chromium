@@ -83,7 +83,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGreyUI shareCurrentPage];
 
   NSString* sendTabToSelf =
-      l10n_util::GetNSString(IDS_IOS_SHARE_MENU_SEND_TAB_TO_SELF_ACTION);
+      l10n_util::GetNSString(IDS_IOS_SEND_TAB_TO_SELF_TARGET_DEVICE_ACTION);
   [ChromeEarlGrey verifyTextVisibleInActivitySheetWithID:sendTabToSelf];
 }
 
@@ -99,7 +99,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGreyUI shareCurrentPage];
 
   NSString* sendTabToSelf =
-      l10n_util::GetNSString(IDS_IOS_SHARE_MENU_SEND_TAB_TO_SELF_ACTION);
+      l10n_util::GetNSString(IDS_IOS_SEND_TAB_TO_SELF_TARGET_DEVICE_ACTION);
   [ChromeEarlGrey tapButtonInActivitySheetWithID:sendTabToSelf];
 
   [SigninEarlGreyUI verifyWebSigninIsVisible:YES];
@@ -130,7 +130,7 @@ ElementSelector* UsernameElement() {
 
   [ChromeEarlGreyUI shareCurrentPage];
   NSString* sendTabToSelf =
-      l10n_util::GetNSString(IDS_IOS_SHARE_MENU_SEND_TAB_TO_SELF_ACTION);
+      l10n_util::GetNSString(IDS_IOS_SEND_TAB_TO_SELF_TARGET_DEVICE_ACTION);
   [ChromeEarlGrey tapButtonInActivitySheetWithID:sendTabToSelf];
 
   [ChromeEarlGrey
@@ -158,7 +158,7 @@ ElementSelector* UsernameElement() {
 
   [ChromeEarlGreyUI shareCurrentPage];
   NSString* sendTabToSelf =
-      l10n_util::GetNSString(IDS_IOS_SHARE_MENU_SEND_TAB_TO_SELF_ACTION);
+      l10n_util::GetNSString(IDS_IOS_SEND_TAB_TO_SELF_TARGET_DEVICE_ACTION);
   [ChromeEarlGrey tapButtonInActivitySheetWithID:sendTabToSelf];
 
   [ChromeEarlGrey
@@ -186,7 +186,7 @@ ElementSelector* UsernameElement() {
 
   [ChromeEarlGreyUI shareCurrentPage];
   NSString* sendTabToSelf =
-      l10n_util::GetNSString(IDS_IOS_SHARE_MENU_SEND_TAB_TO_SELF_ACTION);
+      l10n_util::GetNSString(IDS_IOS_SEND_TAB_TO_SELF_TARGET_DEVICE_ACTION);
   [ChromeEarlGrey tapButtonInActivitySheetWithID:sendTabToSelf];
 
   // Tap the device in the device picker.
@@ -238,7 +238,7 @@ ElementSelector* UsernameElement() {
 
   [ChromeEarlGreyUI shareCurrentPage];
   NSString* sendTabToSelf =
-      l10n_util::GetNSString(IDS_IOS_SHARE_MENU_SEND_TAB_TO_SELF_ACTION);
+      l10n_util::GetNSString(IDS_IOS_SEND_TAB_TO_SELF_TARGET_DEVICE_ACTION);
   [ChromeEarlGrey tapButtonInActivitySheetWithID:sendTabToSelf];
 
   // Tap the device in the device picker.
@@ -509,7 +509,7 @@ ElementSelector* UsernameElement() {
   // Verify the "Send to Your Devices" menu item shows up.
   id<GREYMatcher> sendToDevicesMenuItem =
       chrome_test_util::ContextMenuItemWithAccessibilityLabelId(
-          IDS_IOS_SHARE_MENU_SEND_TAB_TO_SELF_ACTION);
+          IDS_IOS_SEND_TAB_TO_SELF_TARGET_DEVICE_ACTION);
   [[EarlGrey selectElementWithMatcher:sendToDevicesMenuItem]
       assertWithMatcher:grey_sufficientlyVisible()];
 
@@ -551,7 +551,7 @@ ElementSelector* UsernameElement() {
   // Verify the "Send to Your Devices" menu item shows up.
   id<GREYMatcher> sendToDevicesMenuItem =
       chrome_test_util::ContextMenuItemWithAccessibilityLabelId(
-          IDS_IOS_SHARE_MENU_SEND_TAB_TO_SELF_ACTION);
+          IDS_IOS_SEND_TAB_TO_SELF_TARGET_DEVICE_ACTION);
   [[EarlGrey selectElementWithMatcher:sendToDevicesMenuItem]
       assertWithMatcher:grey_sufficientlyVisible()];
 
@@ -607,7 +607,7 @@ ElementSelector* UsernameElement() {
   // Verify the "Send to Your Devices" menu item shows up.
   id<GREYMatcher> sendToDevicesMenuItem =
       chrome_test_util::ContextMenuItemWithAccessibilityLabelId(
-          IDS_IOS_SHARE_MENU_SEND_TAB_TO_SELF_ACTION);
+          IDS_IOS_SEND_TAB_TO_SELF_TARGET_DEVICE_ACTION);
   [[EarlGrey selectElementWithMatcher:sendToDevicesMenuItem]
       assertWithMatcher:grey_sufficientlyVisible()];
 

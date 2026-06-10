@@ -51,7 +51,7 @@ chromium-metrics-reviews@google.com.
   <variant name="PlusAddressFallbackFromContextMenu"
       summary="Plus address manual fallback entry point in the context menu."/>
   <variant name="SendTabToSelfEnhancedDesktopUI"
-      summary="Promotion for Send to Your Devices in the tab and webpage
+      summary="Promotion for Send to Your Device in the tab and webpage
                context menus."/>
   <variant name="SideBySide"
       summary="Promotion for Split View in the tab context menu"/>

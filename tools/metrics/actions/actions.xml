@@ -44154,7 +44154,7 @@ should be able to be added at any place in this file.
   <owner>kmilka@chromium.org</owner>
   <owner>src/components/send_tab_to_self/OWNERS</owner>
   <description>
-    The &quot;Send to your devices&quot; option was selected in the sharing hub.
+    The &quot;Send to your device&quot; option was selected in the sharing hub.
   </description>
 </action>
 

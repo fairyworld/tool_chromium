@@ -894,11 +894,12 @@ constexpr CGFloat kEmojiCanvasPaddingRatio = 1.3;
 - (UIAction*)actionToSendTabToSelfWithBlock:(ProceduralBlock)block {
   UIImage* image =
       CustomSymbolWithPointSize(kRecentTabsSymbol, kSymbolActionPointSize);
-  return [self actionWithTitle:l10n_util::GetNSString(
-                                   IDS_IOS_SHARE_MENU_SEND_TAB_TO_SELF_ACTION)
-                         image:image
-                          type:MenuActionType::SendTabToSelf
-                         block:block];
+  return
+      [self actionWithTitle:l10n_util::GetNSString(
+                                IDS_IOS_SEND_TAB_TO_SELF_TARGET_DEVICE_ACTION)
+                      image:image
+                       type:MenuActionType::SendTabToSelf
+                      block:block];
 }
 
 @end
