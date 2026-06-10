@@ -5431,6 +5431,16 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="NetworkService.TimeToFirstCreateNetworkContext" units="ms"
+    expires_after="2026-09-04">
+  <owner>horo@chromium.org</owner>
+  <owner>blink-network-stack@google.com</owner>
+  <summary>
+    The time taken from NetworkService creation to the first
+    CreateNetworkContext call. Recorded once per NetworkService initialization.
+  </summary>
+</histogram>
+
 <histogram name="NetworkService.TimeToGrantCacheAccess" units="ms"
     expires_after="2026-07-05">
   <owner>wfh@chromium.org</owner>
