@@ -14,6 +14,7 @@
 #import "ios/chrome/app/profile/profile_state.h"
 #import "ios/chrome/browser/authentication/ui_bundled/signin/signin_in_progress.h"
 #import "ios/chrome/browser/shared/coordinator/scene/scene_controller.h"
+#import "ios/chrome/browser/shared/coordinator/scene/scene_state_prefs.h"
 #import "ios/chrome/browser/shared/coordinator/scene/scene_util.h"
 #import "ios/chrome/browser/shared/coordinator/scene/state/incognito_state.h"
 #import "ios/chrome/browser/shared/coordinator/scene/state/layout_state.h"
@@ -74,6 +75,7 @@
     _tabGridState = [[TabGridState alloc] init];
     _incognitoState = [[IncognitoState alloc] initWithSceneState:self];
     _layoutState = [[LayoutState alloc] init];
+    _prefs = nil;
 
     // AppState might be nil in tests.
     if (appState) {
@@ -127,8 +129,11 @@
   _scene = scene;
   if (_scene) {
     _sceneSessionID = SessionIdentifierForScene(_scene);
+    _prefs = [[SceneStatePrefs alloc] initWithSession:_scene.session];
+    [_incognitoState preferencesDidLoad];
   } else {
     _sceneSessionID.clear();
+    _prefs = nil;
   }
 }
 
@@ -250,65 +255,6 @@
 
   return
       [NSString stringWithFormat:@"SceneState %p (%@)", self, activityString];
-}
-
-#pragma mark - Session scoped defaults.
-
-// Helper methods to get/set values that are "per-scene" (such as whether the
-// incognito or regular UI is presented, ...). Those methods store/fetch the
-// values from -userInfo property of UISceneSession for devices that support
-// multi-window or in NSUserDefaults for other device.
-//
-// The reason the values are not always stored in UISceneSession -userInfo is
-// that iOS consider that the "swipe gesture" can mean "close the window" even
-// on device that do not support multi-window (such as iPhone) if multi-window
-// support is enabled. As enabling the support is done in the Info.plist and
-// Chrome does not want to distribute a different app to phones and tablets,
-// this means that on iPhone the scene may be closed by the OS and the session
-// destroyed. On device that support multi-window, the user has the option to
-// re-open the window via a shortcut presented by the OS, but there is no such
-// options for device that do not support multi-window.
-//
-// Finally, the methods also support moving the value from NSUserDefaults to
-// UISceneSession -userInfo as required when Chrome is updated from an old
-// version to one where multi-window is enabled (or when the users upgrade
-// their devices).
-//
-// The heuristic is:
-// -  if the device does not support multi-window, NSUserDefaults is used,
-// -  otherwise, the value is first looked up in UISceneSession -userInfo,
-//    if present, it is used (and any copy in NSUserDefaults is deleted),
-//    if not present, the value is looked in NSUserDefaults.
-
-- (NSObject*)sessionObjectForKey:(NSString*)key {
-  if (base::ios::IsMultipleScenesSupported()) {
-    NSObject* value = [_scene.session.userInfo objectForKey:key];
-    if (value) {
-      NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-      if ([userDefaults objectForKey:key]) {
-        [userDefaults removeObjectForKey:key];
-        [userDefaults synchronize];
-      }
-      return value;
-    }
-  }
-
-  NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-  return [userDefaults objectForKey:key];
-}
-
-- (void)setSessionObject:(NSObject*)object forKey:(NSString*)key {
-  if (base::ios::IsMultipleScenesSupported()) {
-    NSMutableDictionary<NSString*, id>* userInfo =
-        [NSMutableDictionary dictionaryWithDictionary:_scene.session.userInfo];
-    [userInfo setObject:object forKey:key];
-    _scene.session.userInfo = userInfo;
-    return;
-  }
-
-  NSUserDefaults* userDefaults = [NSUserDefaults standardUserDefaults];
-  [userDefaults setObject:object forKey:key];
-  [userDefaults synchronize];
 }
 
 #pragma mark - SignInInProgressAudience
