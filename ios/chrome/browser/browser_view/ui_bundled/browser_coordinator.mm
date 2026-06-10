@@ -3896,8 +3896,8 @@ const char kChromeAppStoreUrl[] =
   }
 }
 
-- (void)startGeminiFREWithCompletion:(void (^)(BOOL success))completion
-                      fromEntryPoint:(gemini::EntryPoint)entryPoint {
+- (void)startGeminiFirstRunWithCompletion:(void (^)(BOOL success))completion
+                           fromEntryPoint:(gemini::EntryPoint)entryPoint {
   __weak BrowserCoordinator* weakSelf = self;
   ProceduralBlock startCoordinatorBlock = ^{
     [weakSelf startGeminiFirstRunCoordinatorWithCompletion:completion
@@ -3920,7 +3920,7 @@ const char kChromeAppStoreUrl[] =
       initWithBaseViewController:self.viewController
                          browser:self.browser
                   fromEntryPoint:entryPoint
-                         FREType:GeminiFREType::kNewUser
+                    firstRunType:GeminiFirstRunType::kNewUser
                completionHandler:completion];
   [_geminiFirstRunCoordinator start];
 }

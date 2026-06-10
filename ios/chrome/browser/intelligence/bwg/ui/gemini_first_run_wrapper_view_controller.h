@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef IOS_CHROME_BROWSER_INTELLIGENCE_BWG_UI_GEMINI_FRE_WRAPPER_VIEW_CONTROLLER_H_
-#define IOS_CHROME_BROWSER_INTELLIGENCE_BWG_UI_GEMINI_FRE_WRAPPER_VIEW_CONTROLLER_H_
+#ifndef IOS_CHROME_BROWSER_INTELLIGENCE_BWG_UI_GEMINI_FIRST_RUN_WRAPPER_VIEW_CONTROLLER_H_
+#define IOS_CHROME_BROWSER_INTELLIGENCE_BWG_UI_GEMINI_FIRST_RUN_WRAPPER_VIEW_CONTROLLER_H_
 
 #import "ios/chrome/browser/intelligence/bwg/utils/gemini_constants.h"
 #import "ios/chrome/common/ui/button_stack/button_stack_view_controller.h"
@@ -14,7 +14,6 @@
 // UIViewController that owns GeminiPromo and GeminiConsent view controllers and
 // manages their transitions with a horizontal scroll view.
 //
-// TODO(crbug.com/519213385): Rename to GeminiFirstRunWrapperViewController.
 // The layout is structured as follows:
 // +--------------------------------+
 // |      Vertical Scroll View      |
@@ -30,15 +29,15 @@
 // +--------------------------------+
 // |         Buttons stack          |
 // +--------------------------------+
-@interface GeminiFREWrapperViewController : ButtonStackViewController
+@interface GeminiFirstRunWrapperViewController : ButtonStackViewController
 
 // Initializes the view controller.
 // If `showPromo` is YES, the view controller will display the promo.
 // If NO, the view controller will display the consent view.
-// `freType` specifies the type of Gemini FRE being shown.
+// `firstRunType` specifies the type of Gemini First Run being shown.
 // `consentConfiguration` provides the configuration for the consent view.
 - (instancetype)initWithPromo:(BOOL)showPromo
-                      FREType:(GeminiFREType)FREType
+                 firstRunType:(GeminiFirstRunType)firstRunType
          consentConfiguration:(GeminiConsentConfiguration*)consentConfiguration
     NS_DESIGNATED_INITIALIZER;
 
@@ -59,4 +58,4 @@
 
 @end
 
-#endif  // IOS_CHROME_BROWSER_INTELLIGENCE_BWG_UI_GEMINI_FRE_WRAPPER_VIEW_CONTROLLER_H_
+#endif  // IOS_CHROME_BROWSER_INTELLIGENCE_BWG_UI_GEMINI_FIRST_RUN_WRAPPER_VIEW_CONTROLLER_H_

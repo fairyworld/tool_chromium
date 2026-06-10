@@ -1,8 +1,8 @@
-// Copyright 2025 The Chromium Authors
+// Copyright 2026 The Chromium Authors
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#import "ios/chrome/browser/intelligence/bwg/ui/gemini_fre_wrapper_view_controller.h"
+#import "ios/chrome/browser/intelligence/bwg/ui/gemini_first_run_wrapper_view_controller.h"
 
 #import "base/run_loop.h"
 #import "base/test/metrics/histogram_tester.h"
@@ -21,22 +21,22 @@
 #import "third_party/ocmock/gtest_support.h"
 #import "url/gurl.h"
 
-// Test fixture for GeminiFREWrapperViewController.
-class GeminiFREWrapperViewControllerTest : public PlatformTest {
+// Test fixture for GeminiFirstRunWrapperViewController.
+class GeminiFirstRunWrapperViewControllerTest : public PlatformTest {
  public:
-  GeminiFREWrapperViewController* CreateController(
+  GeminiFirstRunWrapperViewController* CreateController(
       bool with_promo,
       bool is_account_managed,
       bool use_strict_consent = false) {
     GeminiConsentConfiguration* consent_config = [GeminiConsentConfiguration
         configurationForManaged:is_account_managed
                          strict:use_strict_consent
-                           type:GeminiFREType::kNewUser
+                           type:GeminiFirstRunType::kNewUser
                         country:@"us"];
-    GeminiFREWrapperViewController* view_controller =
-        [[GeminiFREWrapperViewController alloc]
+    GeminiFirstRunWrapperViewController* view_controller =
+        [[GeminiFirstRunWrapperViewController alloc]
                    initWithPromo:with_promo
-                         FREType:GeminiFREType::kNewUser
+                    firstRunType:GeminiFirstRunType::kNewUser
             consentConfiguration:consent_config];
     mock_mutator_ =
         [OCMockObject mockForProtocol:@protocol(GeminiFirstRunMutator)];
@@ -51,7 +51,7 @@ class GeminiFREWrapperViewControllerTest : public PlatformTest {
   }
 
   GeminiPromoViewController* GetPromoViewController(
-      GeminiFREWrapperViewController* view_controller) {
+      GeminiFirstRunWrapperViewController* view_controller) {
     for (UIViewController* child in view_controller.childViewControllers) {
       if ([child isKindOfClass:[GeminiPromoViewController class]]) {
         return static_cast<GeminiPromoViewController*>(child);
@@ -61,7 +61,7 @@ class GeminiFREWrapperViewControllerTest : public PlatformTest {
   }
 
   GeminiConsentViewController* GetConsentViewController(
-      GeminiFREWrapperViewController* view_controller) {
+      GeminiFirstRunWrapperViewController* view_controller) {
     for (UIViewController* child in view_controller.childViewControllers) {
       if ([child isKindOfClass:[GeminiConsentViewController class]]) {
         return static_cast<GeminiConsentViewController*>(child);
@@ -70,13 +70,13 @@ class GeminiFREWrapperViewControllerTest : public PlatformTest {
     return nil;
   }
 
-  void PrimaryAction(GeminiFREWrapperViewController* view_controller) {
+  void PrimaryAction(GeminiFirstRunWrapperViewController* view_controller) {
     id<ButtonStackActionDelegate> actionDelegate =
         (id<ButtonStackActionDelegate>)view_controller;
     [actionDelegate didTapPrimaryActionButton];
   }
 
-  void SecondaryAction(GeminiFREWrapperViewController* view_controller) {
+  void SecondaryAction(GeminiFirstRunWrapperViewController* view_controller) {
     id<ButtonStackActionDelegate> actionDelegate =
         (id<ButtonStackActionDelegate>)view_controller;
     [actionDelegate didTapSecondaryActionButton];
@@ -101,8 +101,8 @@ class GeminiFREWrapperViewControllerTest : public PlatformTest {
 };
 
 // Tests first run for Gemini promo being shown.
-TEST_F(GeminiFREWrapperViewControllerTest, FirstRunGeminiPromoShown) {
-  GeminiFREWrapperViewController* view_controller =
+TEST_F(GeminiFirstRunWrapperViewControllerTest, FirstRunGeminiPromoShown) {
+  GeminiFirstRunWrapperViewController* view_controller =
       CreateController(true, true);
   EXPECT_NE(nil, view_controller);
   EXPECT_NE(nil, promo_view_controller_);
@@ -113,9 +113,9 @@ TEST_F(GeminiFREWrapperViewControllerTest, FirstRunGeminiPromoShown) {
   EXPECT_TRUE(consent_view_controller_.view.accessibilityElementsHidden);
 }
 
-// Tests nonconsent flow after the (First Run Experience) FRE Gemini promo.
-TEST_F(GeminiFREWrapperViewControllerTest, PostFRENonConsentFlow) {
-  GeminiFREWrapperViewController* view_controller =
+// Tests nonconsent flow after the Gemini First Run promo.
+TEST_F(GeminiFirstRunWrapperViewControllerTest, PostFirstRunNonConsentFlow) {
+  GeminiFirstRunWrapperViewController* view_controller =
       CreateController(false, true);
   EXPECT_NE(nil, view_controller);
   EXPECT_NE(nil, consent_view_controller_);
@@ -126,8 +126,8 @@ TEST_F(GeminiFREWrapperViewControllerTest, PostFRENonConsentFlow) {
 }
 
 // Tests the flow for continuing after the promo and a user accepting consent.
-TEST_F(GeminiFREWrapperViewControllerTest, FullAcceptFlow) {
-  GeminiFREWrapperViewController* view_controller =
+TEST_F(GeminiFirstRunWrapperViewControllerTest, FullAcceptFlow) {
+  GeminiFirstRunWrapperViewController* view_controller =
       CreateController(true, false);
   EXPECT_NE(nil, promo_view_controller_);
   EXPECT_NE(nil, consent_view_controller_);
@@ -145,21 +145,23 @@ TEST_F(GeminiFREWrapperViewControllerTest, FullAcceptFlow) {
 }
 
 // Tests that tapping the primary button records metrics for the consent.
-TEST_F(GeminiFREWrapperViewControllerTest, ConsentPrimaryButtonRecordsMetrics) {
-  GeminiFREWrapperViewController* view_controller =
+TEST_F(GeminiFirstRunWrapperViewControllerTest,
+       ConsentPrimaryButtonRecordsMetrics) {
+  GeminiFirstRunWrapperViewController* view_controller =
       CreateController(false, false);
 
   StubMutatorActions();
   PrimaryAction(view_controller);
   histogram_tester_->ExpectUniqueSample(
-      kConsentActionHistogram, static_cast<int>(IOSGeminiFREAction::kAccept),
-      1);
+      kFirstRunConsentActionHistogram,
+      static_cast<int>(IOSGeminiFirstRunAction::kAccept), 1);
 }
 
 // Tests that tapping the primary button calls the right mutator function while
-//  on the consent.
-TEST_F(GeminiFREWrapperViewControllerTest, ConsentPrimaryButtonCallsMutator) {
-  GeminiFREWrapperViewController* view_controller =
+//  on the consent.
+TEST_F(GeminiFirstRunWrapperViewControllerTest,
+       ConsentPrimaryButtonCallsMutator) {
+  GeminiFirstRunWrapperViewController* view_controller =
       CreateController(false, false);
 
   OCMExpect([mock_mutator_ didConsentGemini]);
@@ -168,22 +170,23 @@ TEST_F(GeminiFREWrapperViewControllerTest, ConsentPrimaryButtonCallsMutator) {
 }
 
 // Tests that tapping the secondary button records metrics for the consent.
-TEST_F(GeminiFREWrapperViewControllerTest,
+TEST_F(GeminiFirstRunWrapperViewControllerTest,
        ConsentSecondaryButtonRecordsMetrics) {
-  GeminiFREWrapperViewController* view_controller =
+  GeminiFirstRunWrapperViewController* view_controller =
       CreateController(false, false);
 
   StubMutatorActions();
   SecondaryAction(view_controller);
   histogram_tester_->ExpectUniqueSample(
-      kConsentActionHistogram, static_cast<int>(IOSGeminiFREAction::kDismiss),
-      1);
+      kFirstRunConsentActionHistogram,
+      static_cast<int>(IOSGeminiFirstRunAction::kDismiss), 1);
 }
 
 // Tests that tapping the secondary button calls the right mutator function
-// while on the consent.
-TEST_F(GeminiFREWrapperViewControllerTest, ConsentSecondaryButtonCallsMutator) {
-  GeminiFREWrapperViewController* view_controller =
+// while on the consent.
+TEST_F(GeminiFirstRunWrapperViewControllerTest,
+       ConsentSecondaryButtonCallsMutator) {
+  GeminiFirstRunWrapperViewController* view_controller =
       CreateController(false, false);
 
   OCMExpect([mock_mutator_ didRefuseGeminiConsent]);
@@ -192,31 +195,36 @@ TEST_F(GeminiFREWrapperViewControllerTest, ConsentSecondaryButtonCallsMutator) {
 }
 
 // Tests that tapping the primary button records metrics for the promo.
-TEST_F(GeminiFREWrapperViewControllerTest, PromoPrimaryButtonRecordsMetrics) {
-  GeminiFREWrapperViewController* view_controller =
+TEST_F(GeminiFirstRunWrapperViewControllerTest,
+       PromoPrimaryButtonRecordsMetrics) {
+  GeminiFirstRunWrapperViewController* view_controller =
       CreateController(true, false);
 
   StubMutatorActions();
   PrimaryAction(view_controller);
   histogram_tester_->ExpectUniqueSample(
-      kPromoActionHistogram, static_cast<int>(IOSGeminiFREAction::kAccept), 1);
+      kFirstRunPromoActionHistogram,
+      static_cast<int>(IOSGeminiFirstRunAction::kAccept), 1);
 }
 
 // Tests that tapping the secondary button records metrics for the promo.
-TEST_F(GeminiFREWrapperViewControllerTest, PromoSecondaryButtonRecordsMetrics) {
-  GeminiFREWrapperViewController* view_controller =
+TEST_F(GeminiFirstRunWrapperViewControllerTest,
+       PromoSecondaryButtonRecordsMetrics) {
+  GeminiFirstRunWrapperViewController* view_controller =
       CreateController(true, false);
 
   StubMutatorActions();
   SecondaryAction(view_controller);
   histogram_tester_->ExpectUniqueSample(
-      kPromoActionHistogram, static_cast<int>(IOSGeminiFREAction::kDismiss), 1);
+      kFirstRunPromoActionHistogram,
+      static_cast<int>(IOSGeminiFirstRunAction::kDismiss), 1);
 }
 
 // Tests that tapping the secondary button calls the right mutator function
 // while on the promo.
-TEST_F(GeminiFREWrapperViewControllerTest, PromoSecondaryButtonCallsMutator) {
-  GeminiFREWrapperViewController* view_controller =
+TEST_F(GeminiFirstRunWrapperViewControllerTest,
+       PromoSecondaryButtonCallsMutator) {
+  GeminiFirstRunWrapperViewController* view_controller =
       CreateController(true, false);
 
   OCMExpect([mock_mutator_ didCloseGeminiPromo]);

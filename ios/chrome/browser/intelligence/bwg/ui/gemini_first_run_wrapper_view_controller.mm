@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#import "ios/chrome/browser/intelligence/bwg/ui/gemini_fre_wrapper_view_controller.h"
+#import "ios/chrome/browser/intelligence/bwg/ui/gemini_first_run_wrapper_view_controller.h"
 
 #import <algorithm>
 
@@ -47,7 +47,7 @@ const CGFloat kInsetAdjustment = 20;
 
 }  // namespace
 
-@interface GeminiFREWrapperViewController () <
+@interface GeminiFirstRunWrapperViewController () <
     ButtonStackActionDelegate,
     GeminiConsentViewControllerDelegate>
 
@@ -59,15 +59,15 @@ const CGFloat kInsetAdjustment = 20;
 
 @end
 
-@implementation GeminiFREWrapperViewController {
+@implementation GeminiFirstRunWrapperViewController {
   // The Gemini Promo View Controller.
   GeminiPromoViewController* _promoViewController;
   // The Gemini Consent View Controller.
   GeminiConsentViewController* _consentViewController;
   // If YES, the promo view is shown initially. Otherwise, we skip it.
   BOOL _showPromo;
-  // Type of Gemini FRE.
-  GeminiFREType _FREType;
+  // Type of Gemini First Run.
+  GeminiFirstRunType _firstRunType;
   // Configuration for the Gemini Consent view.
   GeminiConsentConfiguration* _consentConfiguration;
   // The main stack view containing the logos.
@@ -75,7 +75,7 @@ const CGFloat kInsetAdjustment = 20;
   // Horizontal stack view holding the promo and consent views.
   UIStackView* _horizontalStackView;
   // Currently active child view controller.
-  __weak UIViewController<GeminiFREViewControllerProtocol>*
+  __weak UIViewController<GeminiFirstRunViewControllerProtocol>*
       _currentChildViewController;
   // Stack View containing the logos.
   UIStackView* _logosStackView;
@@ -88,16 +88,16 @@ const CGFloat kInsetAdjustment = 20;
 }
 
 - (instancetype)initWithPromo:(BOOL)showPromo
-                      FREType:(GeminiFREType)FREType
+                 firstRunType:(GeminiFirstRunType)firstRunType
          consentConfiguration:
              (GeminiConsentConfiguration*)consentConfiguration {
-  ButtonStackConfiguration* configuration =
-      [GeminiFREWrapperViewController buttonsConfigurationForPromo:showPromo];
+  ButtonStackConfiguration* configuration = [GeminiFirstRunWrapperViewController
+      buttonsConfigurationForPromo:showPromo];
 
   self = [super initWithConfiguration:configuration];
   if (self) {
     _showPromo = showPromo;
-    _FREType = FREType;
+    _firstRunType = firstRunType;
     _consentConfiguration = consentConfiguration;
   }
   return self;
@@ -169,7 +169,7 @@ const CGFloat kInsetAdjustment = 20;
   logosStackView.layoutMarginsRelativeArrangement = YES;
 
   UIView* logoBrandContainer =
-      [self animatedLogoContainerWithLottie:kLottieAnimationFREBannerName];
+      [self animatedLogoContainerWithLottie:kLottieAnimationFirstRunBannerName];
   [logosStackView addArrangedSubview:logoBrandContainer];
 
   [NSLayoutConstraint
@@ -225,7 +225,7 @@ const CGFloat kInsetAdjustment = 20;
                                       forAxis:UILayoutConstraintAxisVertical];
   AddSameConstraints(wrapperStackView, self.contentView);
 
-  if (_FREType != GeminiFREType::kLive) {
+  if (_firstRunType != GeminiFirstRunType::kLive) {
     _logosStackView = [self createLogosStackView];
     [wrapperStackView addArrangedSubview:_logosStackView];
     [wrapperStackView setCustomSpacing:kExtraSpacingTitleContent
@@ -340,7 +340,6 @@ const CGFloat kInsetAdjustment = 20;
       preferredCornerRadius;
 }
 
-
 // Updates VoiceOver focus to the consent view after promo transition.
 - (void)updateAccessibilityFocus {
   CHECK(_consentViewController);
@@ -400,11 +399,11 @@ const CGFloat kInsetAdjustment = 20;
 
 - (void)didTapPrimaryActionButton {
   if (_currentChildViewController == _promoViewController) {
-    RecordFREPromoAction(IOSGeminiFREAction::kAccept);
+    RecordFirstRunPromoAction(IOSGeminiFirstRunAction::kAccept);
     [self didAcceptPromo];
   } else if (_currentChildViewController == _consentViewController) {
-    RecordFREConsentAction(IOSGeminiFREAction::kAccept);
-    if (_FREType == GeminiFREType::kLive) {
+    RecordFirstRunConsentAction(IOSGeminiFirstRunAction::kAccept);
+    if (_firstRunType == GeminiFirstRunType::kLive) {
       [self.mutator didConsentToLiveGemini];
     } else {
       [self.mutator didConsentGemini];
@@ -414,10 +413,10 @@ const CGFloat kInsetAdjustment = 20;
 
 - (void)didTapSecondaryActionButton {
   if (_currentChildViewController == _promoViewController) {
-    RecordFREPromoAction(IOSGeminiFREAction::kDismiss);
+    RecordFirstRunPromoAction(IOSGeminiFirstRunAction::kDismiss);
     [self.mutator didCloseGeminiPromo];
   } else if (_currentChildViewController == _consentViewController) {
-    RecordFREConsentAction(IOSGeminiFREAction::kDismiss);
+    RecordFirstRunConsentAction(IOSGeminiFirstRunAction::kDismiss);
     [self.mutator didRefuseGeminiConsent];
   }
 }
@@ -447,8 +446,8 @@ const CGFloat kInsetAdjustment = 20;
 
 - (void)updateButtonConfiguration {
   BOOL onPromo = _currentChildViewController == _promoViewController;
-  ButtonStackConfiguration* configuration =
-      [GeminiFREWrapperViewController buttonsConfigurationForPromo:onPromo];
+  ButtonStackConfiguration* configuration = [GeminiFirstRunWrapperViewController
+      buttonsConfigurationForPromo:onPromo];
   [self updateConfiguration:configuration];
 }
 

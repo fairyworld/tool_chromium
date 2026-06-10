@@ -127,7 +127,7 @@ const double kFullscreenDisablerTimeoutSeconds = 3.0;
 // presentation.
 const double kViewTransitionTime = 0.8;
 
-// Block accepted by -startGeminiFREWithCompletion:
+// Block accepted by -startGeminiFirstRunWithCompletion:
 using BlockWithSuccess = void (^)(BOOL success);
 
 // Returns a BlockWithSuccess that call `closure` if called with YES.
@@ -633,9 +633,9 @@ void GeminiBrowserAgent::StartGeminiFlow(UIViewController* base_view_controller,
       base_view_controller, startup_state, /*first_run_shown=*/true);
 
   [gemini_commands_handler
-      startGeminiFREWithCompletion:BlockRunningClosureIfSuccess(
-                                       std::move(present_floaty_closure))
-                    fromEntryPoint:entry_point];
+      startGeminiFirstRunWithCompletion:BlockRunningClosureIfSuccess(
+                                            std::move(present_floaty_closure))
+                         fromEntryPoint:entry_point];
 }
 
 bool GeminiBrowserAgent::HasCompletedFirstRun() {
@@ -870,8 +870,9 @@ void GeminiBrowserAgent::PresentFloaty(UIViewController* base_view_controller,
         &GeminiBrowserAgent::InvokeFloaty, weak_factory_.GetWeakPtr(), config));
   }
 
-  base::UmaHistogramLongTimes(first_run_shown ? kStartupTimeWithFREHistogram
-                                              : kStartupTimeNoFREHistogram,
+  base::UmaHistogramLongTimes(first_run_shown
+                                  ? kStartupTimeWithFirstRunHistogram
+                                  : kStartupTimeNoFirstRunHistogram,
                               base::TimeTicks::Now() - start_time);
 
   // Request full page context generation, which will update the floaty once

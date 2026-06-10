@@ -2730,7 +2730,7 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="IOS.Gemini.FRE.ConsentAction" enum="IOSGeminiFREAction"
+<histogram name="IOS.Gemini.FRE.ConsentAction" enum="IOSGeminiFirstRunAction"
     expires_after="2026-12-06">
   <owner>sebsg@chromium.org</owner>
   <owner>bling-alchemy@google.com</owner>
@@ -2752,7 +2752,7 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="IOS.Gemini.FRE.PromoAction" enum="IOSGeminiFREAction"
+<histogram name="IOS.Gemini.FRE.PromoAction" enum="IOSGeminiFirstRunAction"
     expires_after="2026-12-06">
   <owner>sebsg@chromium.org</owner>
   <owner>bling-alchemy@google.com</owner>
@@ -2761,7 +2761,7 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="IOS.Gemini.FRE.State" enum="IOSGeminiFREState"
+<histogram name="IOS.Gemini.FRE.State" enum="IOSGeminiFirstRunState"
     expires_after="2027-02-03">
   <owner>fbeauchamp@google.com</owner>
   <owner>bling-alchemy-eng@google.com</owner>
