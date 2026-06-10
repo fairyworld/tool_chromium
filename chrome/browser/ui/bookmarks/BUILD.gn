@@ -161,6 +161,7 @@ source_set("unit_tests") {
     "//chrome/browser/bookmarks:test_support",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/tab_group_sync:factories",
+    "//chrome/browser/ui:browser_actions",
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/fullscreen",
