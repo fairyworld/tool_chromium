@@ -855,12 +855,15 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Download.Progress.InfoBar.Shown"
-    enum="DownloadInfoBar.ShownState" expires_after="2023-06-25">
-  <owner>shaktisahu@chromium.org</owner>
+    enum="DownloadInfoBar.ShownState" expires_after="2026-12-05">
+  <owner>yawfrempong@google.com</owner>
   <owner>clank-downloads@google.com</owner>
   <summary>
     Records various types of messages representing the state of the downloads as
     they are shown on the download progress infobar on android.
+
+    Warning: this histogram was expired from 2023-06-25 to 2026-12-04; data may
+    be missing.
   </summary>
 </histogram>
 
