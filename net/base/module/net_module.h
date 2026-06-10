@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef NET_BASE_NET_MODULE_H__
-#define NET_BASE_NET_MODULE_H__
+#ifndef NET_BASE_MODULE_NET_MODULE_H_
+#define NET_BASE_MODULE_NET_MODULE_H_
 
 #include "base/memory/scoped_refptr.h"
 #include "net/base/net_export.h"
@@ -40,4 +40,4 @@ class NET_EXPORT NetModule {
 
 }  // namespace net
 
-#endif  // NET_BASE_NET_MODULE_H__
+#endif  // NET_BASE_MODULE_NET_MODULE_H_

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "net/base/directory_listing.h"
+#include "net/base/module/directory_listing.h"
 
 #include "base/byte_count.h"
 #include "base/i18n/time_formatting.h"
@@ -16,7 +16,7 @@
 #include "base/strings/string_view_util.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/time/time.h"
-#include "net/base/net_module.h"
+#include "net/base/module/net_module.h"
 #include "net/grit/net_resources.h"
 
 namespace net {

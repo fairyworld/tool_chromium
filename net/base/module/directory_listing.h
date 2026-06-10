@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef NET_BASE_DIRECTORY_LISTING_H_
-#define NET_BASE_DIRECTORY_LISTING_H_
+#ifndef NET_BASE_MODULE_DIRECTORY_LISTING_H_
+#define NET_BASE_MODULE_DIRECTORY_LISTING_H_
 
 #include <stdint.h>
 
@@ -47,4 +47,4 @@ NET_EXPORT std::string GetSizeStringForTesting(base::ByteCount size);
 
 }  // namespace net
 
-#endif  // NET_BASE_DIRECTORY_LISTING_H_
+#endif  // NET_BASE_MODULE_DIRECTORY_LISTING_H_
