@@ -153,10 +153,18 @@ void OmniboxPopupPresenterBase::ShowWidget(base::TimeTicks show_request_time) {
 
   if (auto* content = GetWebUIContent()) {
     content->GetWebContents()->WasShown();
-    if (ShouldReceiveFocus()) {
-      widget_->Activate();
+  }
+  RequestFocus();
+}
+
+void OmniboxPopupPresenterBase::RequestFocus() {
+  if (widget_ && ShouldReceiveFocus()) {
+    widget_->Activate();
+    if (auto* content = GetWebUIContent()) {
       content->RequestFocus();
-      content->GetWebContents()->Focus();
+      if (content->GetWebContents()) {
+        content->GetWebContents()->Focus();
+      }
     }
   }
 }

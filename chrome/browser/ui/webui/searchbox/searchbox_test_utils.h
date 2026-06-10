@@ -125,7 +125,10 @@ class MockOmniboxPopupPage : public omnibox_popup::mojom::Page {
 
   MOCK_METHOD(void, OnShow, (), (override));
   MOCK_METHOD(void, OnContextMenuClosed, (), (override));
-  MOCK_METHOD(void, SetInputText, (const std::string& input), (override));
+  MOCK_METHOD(void,
+              SetInputState,
+              (omnibox_popup::mojom::OmniboxInputStatePtr state),
+              (override));
 };
 #endif
 

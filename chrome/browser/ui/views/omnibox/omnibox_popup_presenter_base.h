@@ -63,6 +63,9 @@ class OmniboxPopupPresenterBase : public content::WebContentsObserver,
   // Tells whether the popup widget exists.
   bool IsShown() const;
 
+  // Request focus on the popup widget and its web contents.
+  void RequestFocus();
+
   // Caches the height of the WebUI content, which is then used to compute the
   // popup widget bounds.
   void OnContentHeightChanged(int content_height);
