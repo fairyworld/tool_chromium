@@ -2307,6 +2307,17 @@ chromium-metrics-reviews@google.com.
   <summary>[iOS] The number of pinned tabs opened at cold launch.</summary>
 </histogram>
 
+<histogram name="Tabs.PinnedTabCount.{TabStripMode}" units="tabs"
+    expires_after="2026-12-10">
+  <owner>agale@chromium.org</owner>
+  <owner>top-chrome-desktop-ui@google.com</owner>
+  <summary>
+    Counts the number of pinned tabs across each window, reported every 5
+    minutes. Desktop only.
+  </summary>
+  <token key="TabStripMode" variants="TabStripMode"/>
+</histogram>
+
 <histogram name="Tabs.PotentialDoubleDirty.SaveQueueSize" units="tabs"
     expires_after="2025-01-12">
   <owner>skym@chromium.org</owner>
