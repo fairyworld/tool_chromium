@@ -673,6 +673,7 @@ source_set("policy") {
     "cloud/user_fm_registration_token_uploader.h",
     "cloud/user_fm_registration_token_uploader_factory.h",
     "configuration_policy_handler_list_factory.h",
+    "default_sensors_setting_policy_handler.h",
     "developer_tools_policy_checker.h",
     "developer_tools_policy_checker_factory.h",
     "developer_tools_policy_handler.h",
@@ -882,6 +883,7 @@ source_set("impl") {
     "cloud/user_fm_registration_token_uploader.cc",
     "cloud/user_fm_registration_token_uploader_factory.cc",
     "configuration_policy_handler_list_factory.cc",
+    "default_sensors_setting_policy_handler.cc",
     "developer_tools_policy_checker.cc",
     "developer_tools_policy_checker_factory.cc",
     "developer_tools_policy_handler.cc",
@@ -998,6 +1000,7 @@ source_set("impl") {
     "//components/unified_consent",
     "//components/user_manager",
     "//components/variations/service",
+    "//services/device/public/cpp:device_features",
   ]
 
   if (enable_extensions_core) {
