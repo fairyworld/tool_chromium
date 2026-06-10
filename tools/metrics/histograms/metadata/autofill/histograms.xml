@@ -5565,12 +5565,6 @@ Called by update_autofill_enums.py. This is a manual comment.-->
     <variant name="EntitySaveUpdateFlow"
         summary="Autofill Android Message shown to prompt a user to save an
                  entity to Chrome (like password, driver's license, etc.)"/>
-    <variant name="SaveCardFailure"
-        summary="Autofill Android Message shown after a credit card has
-                 failed to have been saved to the server."/>
-    <variant name="VirtualCardEnrollFailure"
-        summary="Autofill Android Message shown after a virtual card has
-                 failed to have been enrolled."/>
   </token>
   <token key="Event">
     <variant name="ActionClicked"
