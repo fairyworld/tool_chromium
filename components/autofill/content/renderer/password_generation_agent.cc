@@ -90,12 +90,12 @@ void ClearPreviewedValue(WebInputElement& input_element) {
 // autofill state to `Autofilled`.
 void CopyElementValueToOtherInputElements(
     const blink::WebInputElement& element,
-    std::vector<blink::WebInputElement> elements) {
-  for (blink::WebInputElement& it : elements) {
-    if (element != it) {
-      it.SetAutofillValue(element.Value());
+    base::span<blink::WebInputElement> elements) {
+  for (blink::WebInputElement& e : elements) {
+    if (element != e) {
+      e.SetAutofillValue(element.Value());
     }
-    it.SetAutofillState(blink::WebAutofillState::kAutofilled);
+    e.SetAutofillState(blink::WebAutofillState::kAutofilled);
   }
 }
 
@@ -811,24 +811,17 @@ void PasswordGenerationAgent::PasswordNoLongerGenerated() {
   current_generation_item->password_is_generated = false;
   current_generation_item->password_edited = false;
 
-  // Copy elements to local variables to avoid UAF if current_generation_item_
-  // is replaced.
-  std::vector<WebInputElement> password_elements =
-      current_generation_item->password_elements;
-  WebInputElement generation_element =
-      current_generation_item->generation_element;
-
-  for (WebInputElement& password : password_elements) {
+  for (WebInputElement& password : current_generation_item->password_elements) {
     password.SetAutofillState(WebAutofillState::kNotFilled);
   }
   password_generation::LogPasswordGenerationEvent(
       password_generation::PASSWORD_DELETED);
 
   // Clear all other password fields.
-  for (WebInputElement& element : password_elements) {
+  for (WebInputElement& element : current_generation_item->password_elements) {
     base::AutoReset<bool> auto_reset_update_confirmation_password(
         &current_generation_item->updating_other_password_fields, true);
-    if (generation_element != element) {
+    if (current_generation_item->generation_element != element) {
       element.SetAutofillValue(blink::WebString());
     }
   }
@@ -836,8 +829,8 @@ void PasswordGenerationAgent::PasswordNoLongerGenerated() {
   // The above call to SetAutofillValue() dispatches events that may change the
   // DOM. Therefore, any cached FormData may be outdated, and we must not use a
   // form cache.
-  std::optional<FormData> presaved_form_data =
-      CreateFormDataToPresave(generation_element, /*form_cache=*/{});
+  std::optional<FormData> presaved_form_data = CreateFormDataToPresave(
+      current_generation_item->generation_element, /*form_cache=*/{});
   if (presaved_form_data)
     GetPasswordGenerationDriver().PasswordNoLongerGenerated(
         *presaved_form_data);
