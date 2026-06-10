@@ -98,10 +98,18 @@ UIImage* CustomAppBarSymbol(NSString* symbol_name) {
                                        AppBarSymbolConfiguration());
 }
 
-// Returns the font size for the assistant button.
-UIFont* AssistantButtonFontSize(UITraitCollection* traitCollection) {
-  return PreferredFontForTextStyle(UIFontTextStyleCaption2, UIFontWeightMedium,
-                                   std::nullopt);
+// Returns the font size for the buttons.
+UIFont* ButtonFontSize(UITraitCollection* traitCollection) {
+  UIContentSizeCategory category = ContentSizeCategoryWithMaxCategory(
+      traitCollection.preferredContentSizeCategory,
+      UIContentSizeCategoryExtraExtraLarge);
+  UITraitCollection* cappedTraits = [UITraitCollection
+      traitCollectionWithPreferredContentSizeCategory:category];
+  UIFontDescriptor* descriptor = [UIFontDescriptor
+      preferredFontDescriptorWithTextStyle:UIFontTextStyleCaption2
+             compatibleWithTraitCollection:cappedTraits];
+  return [UIFont systemFontOfSize:descriptor.pointSize
+                           weight:UIFontWeightMedium];
 }
 
 // Returns the alpha for the button based on its enabled and highlighted state.
@@ -550,7 +558,7 @@ CGFloat ButtonHighlightAlpha(UIButton* button) {
     return fullTitle;
   }
   CGSize size = [fullTitle sizeWithAttributes:@{
-    NSFontAttributeName : AssistantButtonFontSize(self.traitCollection)
+    NSFontAttributeName : ButtonFontSize(self.traitCollection)
   }];
 
   CGFloat availableWidthForButton;
@@ -973,7 +981,7 @@ CGFloat ButtonHighlightAlpha(UIButton* button) {
           NSDictionary<NSAttributedStringKey, id>* textAttributes) {
     NSMutableDictionary* mutableAttributes = [textAttributes mutableCopy];
     mutableAttributes[NSFontAttributeName] =
-        AssistantButtonFontSize(self.traitCollection);
+        ButtonFontSize(self.traitCollection);
     mutableAttributes[NSForegroundColorAttributeName] =
         ButtonsForegroundColor();
     return mutableAttributes;
