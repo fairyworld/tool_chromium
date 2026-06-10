@@ -9,7 +9,6 @@
 #include "base/containers/flat_set.h"
 #include "base/feature_list.h"
 #include "base/no_destructor.h"
-#include "base/strings/strcat.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_split.h"
 #include "base/strings/string_util.h"
@@ -29,25 +28,6 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
   if (out) {
     *out = std::string(message);
   }
-}
-
-// Checks whether all requirements for `base::Feature` state are satisfied.
-[[nodiscard]] bool SatisfiesFeatureRequirements(
-    std::string* debug_message = nullptr) {
-  const base::Feature* const kRequiredFeatures[] = {
-      &features::kPersonalContext,
-      &features::kPersonalContextFirstRun,
-  };
-
-  for (const base::Feature* feature : kRequiredFeatures) {
-    if (!base::FeatureList::IsEnabled(*feature)) {
-      MaybeOutputReason(debug_message,
-                        base::StrCat({feature->name, " is not enabled."}));
-      return false;
-    }
-  }
-
-  return true;
 }
 
 // Checks whether all requirements for `IdentityManager` state are met.
@@ -231,10 +211,6 @@ PersonalContextEnablementServiceImpl::GetEnablementState() {
 PersonalContextEnablementState
 PersonalContextEnablementServiceImpl::ComputeEnablementState() {
   using enum PersonalContextEnablementState;
-
-  if (!SatisfiesFeatureRequirements()) {
-    return kDisabledNotEligible;
-  }
 
   if (!SatisfiesAccountRequirements(identity_manager_.get())) {
     return kDisabledNotEligible;
