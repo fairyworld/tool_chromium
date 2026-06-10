@@ -3588,10 +3588,6 @@ bool RenderWidgetHostImpl::KeyPressListenersHandleEvent(
   return false;
 }
 
-void RenderWidgetHostImpl::OnInputIgnored(const blink::WebInputEvent& event) {
-  delegate_->OnInputIgnored(event);
-}
-
 input::StylusInterface* RenderWidgetHostImpl::GetStylusInterface() {
   return static_cast<input::StylusInterface*>(GetView());
 }
