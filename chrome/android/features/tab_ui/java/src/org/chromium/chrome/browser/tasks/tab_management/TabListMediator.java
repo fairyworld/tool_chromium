@@ -72,7 +72,6 @@ import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.quick_delete.QuickDeleteAnimationGradientDrawable;
 import org.chromium.chrome.browser.tab.EmptyTabObserver;
 import org.chromium.chrome.browser.tab.MediaState;
-import org.chromium.chrome.browser.tab.SendTabToSelfTabCardLabelData;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabCreationState;
 import org.chromium.chrome.browser.tab.TabId;
@@ -2602,7 +2601,6 @@ public class TabListMediator implements TabListNotificationHandler {
         model.set(
                 TabProperties.TAB_CONTEXT_CLICK_LISTENER,
                 getTabContextClickListener(tabActionState));
-        model.set(TabProperties.TAB_CARD_LABEL_DATA, model.get(TabProperties.TAB_CARD_LABEL_DATA));
 
         if (mTabActionState != TabActionState.SELECTABLE) {
             updateDescriptionString(tab, model);
@@ -2715,7 +2713,6 @@ public class TabListMediator implements TabListNotificationHandler {
                         .with(CARD_TYPE, TAB)
                         .with(TabProperties.VISIBILITY, View.VISIBLE)
                         .with(TabProperties.ACTOR_UI_STATE, null)
-                        .with(TabProperties.TAB_CARD_LABEL_DATA, getTabCardLabelData(tab))
                         .build();
 
         ActorUiTabController controller = ActorUiTabController.from(tab);
@@ -2879,17 +2876,6 @@ public class TabListMediator implements TabListNotificationHandler {
         if (mThumbnailProvider != null) {
             updateThumbnailFetcher(tabGroupInfo, savedTabGroup);
         }
-    }
-
-    private @Nullable TabCardLabelData getTabCardLabelData(Tab tab) {
-        SendTabToSelfTabCardLabelData data = SendTabToSelfTabCardLabelData.get(tab);
-        if (data == null) return null;
-
-        return new TabCardLabelData(
-                TabCardLabelType.ACTIVITY_UPDATE,
-                data::getLabelText,
-                /* asyncImageFactory= */ null,
-                /* contentDescriptionResolver= */ null);
     }
 
     private String getDomainForTab(Tab tab, PropertyModel model) {
