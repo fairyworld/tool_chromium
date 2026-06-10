@@ -592,20 +592,56 @@ blink::DocumentToken PrefetchingMetricsTestBase::MainDocumentToken() {
   return main_rfhi()->GetDocumentToken();
 }
 
-void PrefetchingMetricsTestBase::ExpectPrefetchNoNetErrorOrResponseReceived(
-    const base::HistogramTester& histogram_tester,
-    bool is_eligible,
-    bool browser_initiated_prefetch) {
+void PrefetchingMetricsTestBase::ExpectPrefetchResponseReceivedNotRecorded(
+    const base::HistogramTester& histogram_tester) {
   histogram_tester.ExpectTotalCount("PrefetchProxy.Prefetch.Mainframe.RespCode",
                                     0);
-  histogram_tester.ExpectTotalCount("PrefetchProxy.Prefetch.Mainframe.NetError",
-                                    0);
-  histogram_tester.ExpectTotalCount(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", 0);
   histogram_tester.ExpectTotalCount(
       "PrefetchProxy.Prefetch.Mainframe.TotalTime", 0);
   histogram_tester.ExpectTotalCount(
       "PrefetchProxy.Prefetch.Mainframe.ConnectTime", 0);
+}
+
+void PrefetchingMetricsTestBase::ExpectPrefetchResponseReceivedRecorded(
+    const base::HistogramTester& histogram_tester,
+    net::HttpStatusCode response_code) {
+  histogram_tester.ExpectUniqueSample(
+      "PrefetchProxy.Prefetch.Mainframe.RespCode", response_code, 1);
+  histogram_tester.ExpectUniqueSample(
+      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
+  histogram_tester.ExpectUniqueSample(
+      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+}
+
+void PrefetchingMetricsTestBase::ExpectPrefetchCompleteNotRecorded(
+    const base::HistogramTester& histogram_tester) {
+  histogram_tester.ExpectTotalCount("PrefetchProxy.Prefetch.Mainframe.NetError",
+                                    0);
+  histogram_tester.ExpectTotalCount(
+      "PrefetchProxy.Prefetch.Mainframe.BodyLength", 0);
+}
+
+void PrefetchingMetricsTestBase::ExpectPrefetchCompleteRecorded(
+    const base::HistogramTester& histogram_tester,
+    std::optional<int> body_length,
+    int net_error) {
+  histogram_tester.ExpectUniqueSample(
+      "PrefetchProxy.Prefetch.Mainframe.NetError", -net_error, 1);
+  if (body_length.has_value()) {
+    histogram_tester.ExpectUniqueSample(
+        "PrefetchProxy.Prefetch.Mainframe.BodyLength", *body_length, 1);
+  } else {
+    histogram_tester.ExpectTotalCount(
+        "PrefetchProxy.Prefetch.Mainframe.BodyLength", 0);
+  }
+}
+
+void PrefetchingMetricsTestBase::ExpectPrefetchNoNetErrorOrResponseReceived(
+    const base::HistogramTester& histogram_tester,
+    bool is_eligible,
+    bool browser_initiated_prefetch) {
+  ExpectPrefetchResponseReceivedNotRecorded(histogram_tester);
+  ExpectPrefetchCompleteNotRecorded(histogram_tester);
 
   if (!browser_initiated_prefetch) {
     std::optional<PrefetchReferringPageMetrics> referring_page_metrics =
@@ -654,17 +690,9 @@ void PrefetchingMetricsTestBase::ExpectPrefetchFailedNetError(
     blink::mojom::SpeculationEagerness eagerness,
     bool is_accurate_triggering,
     bool browser_initiated_prefetch) {
-  histogram_tester.ExpectTotalCount("PrefetchProxy.Prefetch.Mainframe.RespCode",
-                                    0);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.NetError",
-      std::abs(expected_net_error_code), 1);
-  histogram_tester.ExpectTotalCount(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", 0);
-  histogram_tester.ExpectTotalCount(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", 0);
-  histogram_tester.ExpectTotalCount(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", 0);
+  ExpectPrefetchResponseReceivedNotRecorded(histogram_tester);
+  ExpectPrefetchCompleteRecorded(histogram_tester, /*body_length=*/std::nullopt,
+                                 expected_net_error_code);
 
   histogram_tester.ExpectUniqueSample("Preloading.Prefetch.PrefetchStatus",
                                       PrefetchStatus::kPrefetchFailedNetError,
@@ -690,16 +718,9 @@ void PrefetchingMetricsTestBase::ExpectPrefetchFailedAfterResponseReceived(
     net::HttpStatusCode expected_response_code,
     int expected_body_length,
     PrefetchStatus expected_prefetch_status) {
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.RespCode", expected_response_code, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.NetError", net::OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", expected_body_length, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+  ExpectPrefetchResponseReceivedRecorded(histogram_tester,
+                                         expected_response_code);
+  ExpectPrefetchCompleteRecorded(histogram_tester, expected_body_length);
 
   std::optional<PrefetchReferringPageMetrics> referring_page_metrics =
       PrefetchReferringPageMetrics::GetForCurrentDocument(main_rfh());
@@ -719,16 +740,8 @@ void PrefetchingMetricsTestBase::ExpectPrefetchSuccess(
     int expected_body_length,
     blink::mojom::SpeculationEagerness eagerness,
     bool is_accurate) {
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.RespCode", net::HTTP_OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.NetError", net::OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", expected_body_length, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+  ExpectPrefetchResponseReceivedRecorded(histogram_tester);
+  ExpectPrefetchCompleteRecorded(histogram_tester, expected_body_length);
 
   std::optional<PrefetchReferringPageMetrics> referring_page_metrics =
       PrefetchReferringPageMetrics::GetForCurrentDocument(main_rfh());

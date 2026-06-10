@@ -246,6 +246,21 @@ class PrefetchingMetricsTestBase : public RenderViewHostTestHarness {
   void SetUp() override;
   void TearDown() override;
 
+  // Checks the prefetch metrics recorded when the response is received.
+  void ExpectPrefetchResponseReceivedNotRecorded(
+      const base::HistogramTester& histogram_tester);
+  void ExpectPrefetchResponseReceivedRecorded(
+      const base::HistogramTester& histogram_tester,
+      net::HttpStatusCode response_code = net::HTTP_OK);
+
+  // Checks the prefetch metrics recorded when the prefetch is completed.
+  void ExpectPrefetchCompleteNotRecorded(
+      const base::HistogramTester& histogram_tester);
+  void ExpectPrefetchCompleteRecorded(
+      const base::HistogramTester& histogram_tester,
+      std::optional<int> body_length,
+      int net_error = net::OK);
+
   // Prefetch didn't receive any net errors nor non-redirect responses.
   // Use more specific methods below to check UKMs, if applicable.
   void ExpectPrefetchNoNetErrorOrResponseReceived(

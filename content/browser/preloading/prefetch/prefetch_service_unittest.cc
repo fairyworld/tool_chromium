@@ -1331,16 +1331,8 @@ TEST_P(PrefetchServiceTest, SuccessCase_Browser) {
                       /*use_prefetch_proxy=*/false,
                       {{"X-Testing", "Hello World"}}, kHTMLBody);
 
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.RespCode", net::HTTP_OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.NetError", net::OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", std::size(kHTMLBody), 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+  ExpectPrefetchResponseReceivedRecorded(histogram_tester);
+  ExpectPrefetchCompleteRecorded(histogram_tester, std::size(kHTMLBody));
 
   EXPECT_FALSE(probe_listener->GetPrefetchStartFailedCalled());
   EXPECT_TRUE(probe_listener->GetPrefetchResponseCompletedCalled());
@@ -1416,16 +1408,8 @@ TEST_P(PrefetchServiceTest, SuccessCase_Browser_NoVarySearch) {
       {{"X-Testing", "Hello World"}, {"No-Vary-Search", R"(params=("a"))"}},
       kHTMLBody);
 
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.RespCode", net::HTTP_OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.NetError", net::OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", std::size(kHTMLBody), 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+  ExpectPrefetchResponseReceivedRecorded(histogram_tester);
+  ExpectPrefetchCompleteRecorded(histogram_tester, std::size(kHTMLBody));
 
   EXPECT_FALSE(probe_listener->GetPrefetchStartFailedCalled());
   EXPECT_TRUE(probe_listener->GetPrefetchResponseCompletedCalled());
@@ -1472,18 +1456,10 @@ TEST_P(PrefetchServiceTest, FailureCase_Browser_ServerErrorResponseCode) {
   MakeResponseAndWait(net::HTTP_INTERNAL_SERVER_ERROR, net::OK, kHTMLMimeType,
                       /*use_prefetch_proxy=*/false, {}, kHTMLBodyServerError);
 
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.RespCode",
-      net::HTTP_INTERNAL_SERVER_ERROR, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.NetError", net::OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength",
-      std::size(kHTMLBodyServerError), 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+  ExpectPrefetchResponseReceivedRecorded(histogram_tester,
+                                         net::HTTP_INTERNAL_SERVER_ERROR);
+  ExpectPrefetchCompleteRecorded(histogram_tester,
+                                 std::size(kHTMLBodyServerError));
 
   EXPECT_FALSE(probe_listener->GetPrefetchStartFailedCalled());
   EXPECT_FALSE(probe_listener->GetPrefetchResponseCompletedCalled());
@@ -1669,16 +1645,8 @@ TEST_P(PrefetchServiceTest, SuccessCase_Embedder) {
   // Verify that the prefetch request was successful.
   // TODO(crbug.com/40269462): Revise current helper functions (ExpectPrefetch*)
   // for browser-initiated prefetch.
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.RespCode", net::HTTP_OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.NetError", net::OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", std::size(kHTMLBody), 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+  ExpectPrefetchResponseReceivedRecorded(histogram_tester);
+  ExpectPrefetchCompleteRecorded(histogram_tester, std::size(kHTMLBody));
 
   NavigateInitiatedByBrowser(GURL("https://example.com"));
 
@@ -1726,16 +1694,8 @@ TEST_P(PrefetchServiceTest,
   // Verify that the prefetch request was successful.
   // TODO(crbug.com/40269462): Revise current helper functions (ExpectPrefetch*)
   // for browser-initiated prefetch.
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.RespCode", net::HTTP_OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.NetError", net::OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", std::size(kHTMLBody), 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+  ExpectPrefetchResponseReceivedRecorded(histogram_tester);
+  ExpectPrefetchCompleteRecorded(histogram_tester, std::size(kHTMLBody));
 
   NavigateInitiatedByBrowser(GURL("https://example.com"));
 
@@ -1769,16 +1729,8 @@ TEST_P(PrefetchServicePrePrefetchTest, SuccessCase_Embedder_PrePrefetch) {
   // Verify that the prefetch request was successful.
   // TODO(crbug.com/40269462): Revise current helper functions (ExpectPrefetch*)
   // for browser-initiated prefetch.
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.RespCode", net::HTTP_OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.NetError", net::OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", std::size(kHTMLBody), 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+  ExpectPrefetchResponseReceivedRecorded(histogram_tester);
+  ExpectPrefetchCompleteRecorded(histogram_tester, std::size(kHTMLBody));
 
   NavigateInitiatedByBrowser(GURL("https://example.com"));
 
@@ -2613,16 +2565,8 @@ TEST_P(PrefetchServiceTest,
 
   NavigateInitiatedByRenderer(GURL("https://example.com"));
 
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.RespCode", net::HTTP_OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.NetError", net::OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", std::size(kHTMLBody), 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+  ExpectPrefetchResponseReceivedRecorded(histogram_tester);
+  ExpectPrefetchCompleteRecorded(histogram_tester, std::size(kHTMLBody));
 
   std::optional<PrefetchReferringPageMetrics> referring_page_metrics =
       PrefetchReferringPageMetrics::GetForCurrentDocument(main_rfh());
@@ -3230,16 +3174,8 @@ TEST_P(PrefetchServiceTest, DISABLED_CHROMEOS(StreamingURLLoaderSuccessCase)) {
   NavigateInitiatedByRenderer(GURL("https://example.com"));
 
   // Check the metrics while the prefetch is still in progress.
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.RespCode", net::HTTP_OK, 1);
-  histogram_tester.ExpectTotalCount("PrefetchProxy.Prefetch.Mainframe.NetError",
-                                    0);
-  histogram_tester.ExpectTotalCount(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", 0);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+  ExpectPrefetchResponseReceivedRecorded(histogram_tester);
+  ExpectPrefetchCompleteNotRecorded(histogram_tester);
 
   std::optional<PrefetchReferringPageMetrics> referring_page_metrics =
       PrefetchReferringPageMetrics::GetForCurrentDocument(main_rfh());
@@ -3326,16 +3262,8 @@ TEST_P(PrefetchServiceTest, NoVarySearchSuccessCase_Embedder) {
 
   // TODO(crbug.com/40269462): Revise current helper functions (ExpectPrefetch*)
   // for browser-initiated prefetch.
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.RespCode", net::HTTP_OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.NetError", net::OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", std::size(kHTMLBody), 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+  ExpectPrefetchResponseReceivedRecorded(histogram_tester);
+  ExpectPrefetchCompleteRecorded(histogram_tester, std::size(kHTMLBody));
 
   NavigateInitiatedByBrowser(GURL("https://example.com"));
 
@@ -3373,16 +3301,8 @@ TEST_P(PrefetchServicePrePrefetchTest,
 
   // TODO(crbug.com/40269462): Revise current helper functions (ExpectPrefetch*)
   // for browser-initiated prefetch.
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.RespCode", net::HTTP_OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.NetError", net::OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", std::size(kHTMLBody), 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+  ExpectPrefetchResponseReceivedRecorded(histogram_tester);
+  ExpectPrefetchCompleteRecorded(histogram_tester, std::size(kHTMLBody));
 
   NavigateInitiatedByBrowser(GURL("https://example.com"));
 
@@ -4308,16 +4228,10 @@ TEST_P(PrefetchServiceAlwaysBlockUntilHeadTest,
   PrefetchServingHandle serving_handle = future.Take();
   EXPECT_FALSE(serving_handle);
 
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.RespCode", net::HTTP_OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.NetError", -net::ERR_ABORTED, 1);
-  histogram_tester.ExpectTotalCount(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", 0);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+  ExpectPrefetchResponseReceivedRecorded(histogram_tester);
+  ExpectPrefetchCompleteRecorded(histogram_tester,
+                                 /*body_length=*/std::nullopt,
+                                 net::ERR_ABORTED);
 
   std::optional<PrefetchReferringPageMetrics> referring_page_metrics =
       PrefetchReferringPageMetrics::GetForCurrentDocument(main_rfh());
@@ -4679,16 +4593,8 @@ TEST_P(
   CompleteResponseAndWait(net::OK, std::size(kHTMLBody));
 
   // Check the metrics now that the prefetch is complete.
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.RespCode", net::HTTP_OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.NetError", net::OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", std::size(kHTMLBody), 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+  ExpectPrefetchResponseReceivedRecorded(histogram_tester);
+  ExpectPrefetchCompleteRecorded(histogram_tester, std::size(kHTMLBody));
 
   std::optional<PrefetchReferringPageMetrics> referring_page_metrics =
       PrefetchReferringPageMetrics::GetForCurrentDocument(main_rfh());
@@ -4771,16 +4677,8 @@ TEST_P(PrefetchServiceAlwaysBlockUntilHeadTest,
 
   NavigateInitiatedByRenderer(GURL(kTestUrl));
 
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.RespCode", net::HTTP_OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.NetError", net::OK, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", std::size(kHTMLBody), 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+  ExpectPrefetchResponseReceivedRecorded(histogram_tester);
+  ExpectPrefetchCompleteRecorded(histogram_tester, std::size(kHTMLBody));
 
   std::optional<PrefetchReferringPageMetrics> referring_page_metrics =
       PrefetchReferringPageMetrics::GetForCurrentDocument(main_rfh());
@@ -4867,17 +4765,10 @@ TEST_P(PrefetchServiceAlwaysBlockUntilHeadTest,
   SendBodyContentOfResponseAndWait(kHTMLBody);
   CompleteResponseAndWait(net::OK, std::size(kHTMLBody));
 
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.RespCode", net::HTTP_OK, 1);
+  ExpectPrefetchResponseReceivedRecorded(histogram_tester);
   // We cancel the streaming of this prefetch because we know we cannot use it.
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.NetError", -net::ERR_ABORTED, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.BodyLength", std::size(kHTMLBody), 0);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.TotalTime", kTotalTimeDuration, 1);
-  histogram_tester.ExpectUniqueSample(
-      "PrefetchProxy.Prefetch.Mainframe.ConnectTime", kConnectTimeDuration, 1);
+  ExpectPrefetchCompleteRecorded(histogram_tester, /*body_length=*/std::nullopt,
+                                 net::ERR_ABORTED);
 
   std::optional<PrefetchReferringPageMetrics> referring_page_metrics =
       PrefetchReferringPageMetrics::GetForCurrentDocument(main_rfh());
