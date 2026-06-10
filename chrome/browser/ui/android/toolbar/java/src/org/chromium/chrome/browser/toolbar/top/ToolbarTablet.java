@@ -114,6 +114,7 @@ public class ToolbarTablet extends ToolbarLayout {
             new ToolbarWidthConsumer[ToolbarComponentId.COUNT];
 
     private boolean mIsDestroyed;
+    private boolean mShowingFusebox;
 
     /**
      * Constructs a ToolbarTablet object.
@@ -636,6 +637,11 @@ public class ToolbarTablet extends ToolbarLayout {
         setOptionalButtonVisibility(/* isVisible= */ false);
     }
 
+    @Override
+    protected boolean shouldDrawHairline() {
+        return super.shouldDrawHairline() && !mShowingFusebox;
+    }
+
     private void setOptionalButtonVisibility(boolean isVisible) {
         if (mOptionalButton == null) return;
         mOptionalButton.setVisibility(isVisible ? View.VISIBLE : View.GONE);
@@ -924,7 +930,8 @@ public class ToolbarTablet extends ToolbarLayout {
         if (state == FuseboxState.COMPACT || state == FuseboxState.EXPANDED) {
             mFixedHeightBackground.setVisibility(VISIBLE);
             setBackgroundColor(Color.TRANSPARENT);
-            setHairlineVisibility(false);
+            mShowingFusebox = true;
+            updateHairlineVisibility();
             layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         } else {
             mFixedHeightBackground.setVisibility(GONE);
@@ -932,7 +939,8 @@ public class ToolbarTablet extends ToolbarLayout {
                     mThemeColorProvider == null
                             ? SemanticColorUtils.getDefaultBgColor(getContext())
                             : mThemeColorProvider.getThemeColor());
-            setHairlineVisibility(true);
+            mShowingFusebox = false;
+            updateHairlineVisibility();
             layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
         }
         setLayoutParams(layoutParams);

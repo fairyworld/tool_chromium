@@ -903,16 +903,6 @@ public class TopToolbarCoordinator implements Toolbar, TopControlLayer {
     }
 
     @Override
-    public void setBrowsingModeHairlineVisibility(boolean isVisible) {
-        mToolbarLayout.setHairlineVisibility(isVisible);
-    }
-
-    @Override
-    public boolean isBrowsingModeToolbarVisible() {
-        return mToolbarLayout.getVisibility() == View.VISIBLE;
-    }
-
-    @Override
     public View removeLocationBarView() {
         assert mToolbarLayout instanceof ToolbarPhone
                 : "Location bar removal logic is only supported on phones";
@@ -985,10 +975,8 @@ public class TopToolbarCoordinator implements Toolbar, TopControlLayer {
             return;
         }
 
-        // TODO(crbug.com/448641122): This may be better placed in the hairline view itself.
-        // If this layer is at the bottom of the stacker, the hairline should be visible.
         mIsHairlineVisible = mTopControlsStacker.isLayerAtBottom(getTopControlType());
-        mToolbarLayout.setHairlineVisibility(mIsHairlineVisible);
+        mToolbarLayout.setIsBottomMostTopControlsLayer(mIsHairlineVisible);
     }
 
     @Override

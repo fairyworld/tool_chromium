@@ -125,7 +125,14 @@ public abstract class ToolbarLayout extends FrameLayout
     /** Caches the color for the toolbar hairline. */
     private @ColorInt int mToolbarHairlineColor;
 
-    private ImageView mToolbarShadow;
+    protected ImageView mToolbarHairline;
+
+    /**
+     * Whether we are the bottom-most layer in the {@link
+     * org.chromium.chrome.browser.browser_controls.TopControlsStacker} stack of top-anchored UI
+     * elements.
+     */
+    private boolean mIsBottomMostTopControlsLayer = true;
 
     /** Basic constructor for {@link ToolbarLayout}. */
     public ToolbarLayout(Context context, AttributeSet attrs) {
@@ -275,8 +282,8 @@ public abstract class ToolbarLayout extends FrameLayout
         return mThemeColorProvider == null ? mDefaultTint : mThemeColorProvider.getTint();
     }
 
-    protected ImageView getToolbarShadow() {
-        return mToolbarShadow;
+    protected ImageView getToolbarHairline() {
+        return mToolbarHairline;
     }
 
     /**
@@ -291,24 +298,24 @@ public abstract class ToolbarLayout extends FrameLayout
         mShowingProgressBarForBackForwardTransition = showingProgressBarForBackForwardTransition;
         mProgressBar.setVisibility(
                 mShowingProgressBarForBackForwardTransition ? View.GONE : View.VISIBLE);
-        updateShadowVisibility();
+        updateHairlineVisibility();
     }
 
-    /** Update the visibility of the toolbar shadow. */
-    protected void updateShadowVisibility() {
-        boolean shouldDrawShadow = shouldDrawShadow();
-        int shadowVisibility = shouldDrawShadow ? View.VISIBLE : View.INVISIBLE;
+    /** Update the visibility of the toolbar hairline. */
+    protected void updateHairlineVisibility() {
+        boolean shouldDrawHairline = shouldDrawHairline();
+        int hairlineVisibility = shouldDrawHairline ? View.VISIBLE : View.INVISIBLE;
 
-        if (mToolbarShadow != null && mToolbarShadow.getVisibility() != shadowVisibility) {
-            mToolbarShadow.setVisibility(shadowVisibility);
+        if (mToolbarHairline != null && mToolbarHairline.getVisibility() != hairlineVisibility) {
+            mToolbarHairline.setVisibility(hairlineVisibility);
         }
     }
 
     /**
-     * @return Whether the toolbar shadow should be drawn.
+     * @return Whether the toolbar hairline should be drawn.
      */
-    protected boolean shouldDrawShadow() {
-        return !mShowingProgressBarForBackForwardTransition;
+    protected boolean shouldDrawHairline() {
+        return !mShowingProgressBarForBackForwardTransition && mIsBottomMostTopControlsLayer;
     }
 
     @Override
@@ -450,8 +457,8 @@ public abstract class ToolbarLayout extends FrameLayout
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
 
-        mToolbarShadow = getRootView().findViewById(R.id.toolbar_hairline);
-        updateShadowVisibility();
+        mToolbarHairline = getRootView().findViewById(R.id.toolbar_hairline);
+        updateHairlineVisibility();
     }
 
     /**
@@ -788,11 +795,10 @@ public abstract class ToolbarLayout extends FrameLayout
      * @param toolbarColor The toolbar color to base the hairline color on.
      */
     protected void setToolbarHairlineColor(@ColorInt int toolbarColor) {
-        final ImageView shadow = getRootView().findViewById(R.id.toolbar_hairline);
         // Tests don't always set this up. TODO(crbug.com/40866629): Refactor this dep.
-        if (shadow != null) {
+        if (mToolbarHairline != null) {
             mToolbarHairlineColor = computeToolbarHairlineColor(toolbarColor);
-            shadow.setImageTintList(ColorStateList.valueOf(mToolbarHairlineColor));
+            mToolbarHairline.setImageTintList(ColorStateList.valueOf(mToolbarHairlineColor));
         }
     }
 
@@ -884,20 +890,8 @@ public abstract class ToolbarLayout extends FrameLayout
     }
 
     /**
-     * This method sets the toolbar hairline visibility.
-     *
-     * @param isHairlineVisible whether the toolbar hairline should be visible.
-     */
-    public void setHairlineVisibility(boolean isHairlineVisible) {
-        ImageView shadow = getRootView().findViewById(R.id.toolbar_hairline);
-        if (shadow != null) {
-            shadow.setVisibility(isHairlineVisible ? VISIBLE : GONE);
-        }
-    }
-
-    /**
-     * To be called indirectly by
-     * {@link LayoutStateProvider.LayoutStateObserver#onStartedHiding(int, boolean, boolean)}.
+     * To be called indirectly by {@link
+     * LayoutStateProvider.LayoutStateObserver#onStartedHiding(int, boolean, boolean)}.
      */
     public void onTransitionStart() {}
 
@@ -929,6 +923,11 @@ public abstract class ToolbarLayout extends FrameLayout
      *     0.
      */
     public void onToEdgeChange(int newTopPadding) {}
+
+    public void setIsBottomMostTopControlsLayer(boolean isBottomMostLayer) {
+        mIsBottomMostTopControlsLayer = isBottomMostLayer;
+        updateHairlineVisibility();
+    }
 
     @Nullable SigninButtonCoordinator getSigninButtonCoordinatorForTesting() {
         return mSigninButtonCoordinator;
