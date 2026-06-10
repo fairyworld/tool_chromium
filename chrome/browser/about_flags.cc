@@ -10764,6 +10764,10 @@ const FeatureEntry kFeatureEntries[] = {
     {"throttle-main-thread-to-60hz", flag_descriptions::kThrottleMainTo60HzName,
      flag_descriptions::kThrottleMainTo60HzDescription, kOsAll,
      FEATURE_VALUE_TYPE(features::kThrottleMainFrameTo60Hz)},
+    {"throttle-repeated-no-damage-frames",
+     flag_descriptions::kThrottleRepeatedNoDamageFramesName,
+     flag_descriptions::kThrottleRepeatedNoDamageFramesDescription, kOsAll,
+     FEATURE_VALUE_TYPE(features::kThrottleRepeatedNoDamageFrames)},
 
 #if BUILDFLAG(IS_ANDROID)
     {"client-side-detection-server-model-for-scam-detection-android",

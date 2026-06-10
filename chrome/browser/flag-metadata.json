@@ -9139,6 +9139,11 @@
     "expiry_milestone": 155
   },
   {
+    "name": "throttle-repeated-no-damage-frames",
+    "owners": [ "thiabaud@google.com", "jonross@chromium.org" ],
+    "expiry_milestone": 160
+  },
+  {
     "name": "tiled-display-support",
     "owners": [ "sukoo@chromium.org", "//ui/display/OWNERS", "chromeos-gfx-compositor@chromium.org" ],
     "expiry_milestone": 160

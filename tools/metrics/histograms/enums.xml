@@ -15277,6 +15277,7 @@ from previous Chrome versions.
   <int value="296729972" label="MvcUpdateViewWhenModelChanged:enabled"/>
   <int value="297095559" label="ShowBluetoothDebugLogToggle:disabled"/>
   <int value="297750703" label="DesktopPWAsAppIconShortcutsMenu:enabled"/>
+  <int value="298469937" label="ThrottleRepeatedNoDamageFrames:enabled"/>
   <int value="298732294"
       label="AccessibilityImproveLiveRegionAnnounce:disabled"/>
   <int value="299270348" label="EnablePixPaymentsInLandscapeMode:disabled"/>
@@ -19671,6 +19672,7 @@ from previous Chrome versions.
   <int value="1719019077" label="FileSystemProviderCloudFileSystem:disabled"/>
   <int value="1719189460" label="EnablePasswordSelection:disabled"/>
   <int value="1719498202" label="BrowserControlsScrollSnapAnimation:enabled"/>
+  <int value="1719890189" label="ThrottleRepeatedNoDamageFrames:disabled"/>
   <int value="1719958026" label="QueryTiles:enabled"/>
   <int value="1719998906" label="KeyboardLockPrompt:enabled"/>
   <int value="1720399117" label="SkiaGraphite:enabled"/>

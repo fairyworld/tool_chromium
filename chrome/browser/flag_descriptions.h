@@ -4470,6 +4470,12 @@ inline constexpr char kThrottleMainTo60HzName[] =
 inline constexpr char kThrottleMainTo60HzDescription[] =
     "Throttle main thread updates to 60fps, even when VSync rate is higher.";
 
+inline constexpr char kThrottleRepeatedNoDamageFramesName[] =
+    "Throttle repeated no-damage frames";
+inline constexpr char kThrottleRepeatedNoDamageFramesDescription[] =
+    "Throttle main thread updates after we get many frames in a row with no "
+    "updates.";
+
 inline constexpr char kUnthrottleAsyncTouchMovesName[] =
     "Unthrottle async touch moves";
 inline constexpr char kUnthrottleAsyncTouchMovesDescription[] =
