@@ -86,9 +86,10 @@ class ProcessorEntityTracker {
   size_t EstimateMemoryUsage() const;
 
   // Gets the entity for the given tag hash, or null if there isn't one.
-  ProcessorEntity* GetEntityForTagHash(const ClientTagHash& tag_hash);
-  const ProcessorEntity* GetEntityForTagHash(
-      const ClientTagHash& tag_hash) const;
+  ProcessorEntity* GetEntityForClientTagHash(
+      const ClientTagHash& client_tag_hash);
+  const ProcessorEntity* GetEntityForClientTagHash(
+      const ClientTagHash& client_tag_hash) const;
 
   // Gets the entity for the given storage key, or null if there isn't one.
   ProcessorEntity* GetEntityForStorageKey(const std::string& storage_key);
