@@ -117,7 +117,8 @@ IN_PROC_BROWSER_TEST_F(GlicCueTargetBrowserTestAutoSubmitEnabled,
   auto* instance = GetOnlyGlicInstance();
   ASSERT_TRUE(instance);
   EXPECT_TRUE(instance->IsShowing());
-  EXPECT_TRUE(instance->sharing_manager().IsTabPinned(tab2->GetHandle()));
+  EXPECT_TRUE(
+      instance->GetSharingManagerInternal().IsTabPinned(tab2->GetHandle()));
 }
 
 IN_PROC_BROWSER_TEST_F(GlicCueTargetBrowserTestAutoSubmitDisabled,
@@ -145,7 +146,8 @@ IN_PROC_BROWSER_TEST_F(GlicCueTargetBrowserTestAutoSubmitDisabled,
   auto* instance = GetOnlyGlicInstance();
   ASSERT_TRUE(instance);
   EXPECT_TRUE(instance->IsShowing());
-  EXPECT_TRUE(instance->sharing_manager().IsTabPinned(tab2->GetHandle()));
+  EXPECT_TRUE(
+      instance->GetSharingManagerInternal().IsTabPinned(tab2->GetHandle()));
 }
 
 IN_PROC_BROWSER_TEST_F(GlicCueTargetBrowserTest, testOnEditPrompt) {
@@ -172,7 +174,8 @@ IN_PROC_BROWSER_TEST_F(GlicCueTargetBrowserTest, testOnEditPrompt) {
   auto* instance = GetOnlyGlicInstance();
   ASSERT_TRUE(instance);
   EXPECT_TRUE(instance->IsShowing());
-  EXPECT_TRUE(instance->sharing_manager().IsTabPinned(tab2->GetHandle()));
+  EXPECT_TRUE(
+      instance->GetSharingManagerInternal().IsTabPinned(tab2->GetHandle()));
 }
 
 IN_PROC_BROWSER_TEST_F(GlicCueTargetBrowserTest, testGetIcon) {

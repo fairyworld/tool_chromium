@@ -545,7 +545,8 @@ IN_PROC_BROWSER_TEST_F(GlicInvokeBrowserTest, InvokeWithTabsToPin) {
   ASSERT_TRUE(instance);
 
   // Verify that tab2 was pinned.
-  auto usage = instance->sharing_manager().GetPinnedTabUsage(tab2->GetHandle());
+  auto usage = instance->GetSharingManagerInternal().GetPinnedTabUsage(
+      tab2->GetHandle());
   ASSERT_TRUE(usage.has_value());
   EXPECT_EQ(usage->pin_event.trigger, GlicPinTrigger::kInstanceCreation);
 }

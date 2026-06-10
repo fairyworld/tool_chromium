@@ -125,7 +125,7 @@ class GlicInstanceImpl : public GlicInstance,
   GlicUiEmbedder* GetActiveEmbedder();
 
   // GlicSharingManagerProvider implementation.
-  GlicSharingManagerInternal& sharing_manager() override;
+  GlicSharingManagerInternal& GetSharingManagerInternal() override;
   GlicPinCandidateProvider& pin_candidate_provider() override;
 
   void NotifyInstanceActivationChanged(bool is_active);

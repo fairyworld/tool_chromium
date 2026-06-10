@@ -1432,7 +1432,7 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithPixelOutput,
   GetTabListInterface()->OpenTab(GetTestUrl("page2.html"), -1);
 
   ASSERT_OK(OpenGlicForActiveTab());
-  GetOnlyGlicInstance()->sharing_manager().PinTabs(
+  GetOnlyGlicInstance()->GetSharingManagerInternal().PinTabs(
       {GetTabListInterface()->GetTab(0)->GetHandle(),
        GetTabListInterface()->GetTab(1)->GetHandle()});
   ExecuteJsTest();
@@ -1446,7 +1446,7 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithPixelOutput,
   GetTabListInterface()->OpenTab(GetTestUrl("page2.html"), -1);
 
   ASSERT_OK(OpenGlicForActiveTab());
-  GetOnlyGlicInstance()->sharing_manager().PinTabs(
+  GetOnlyGlicInstance()->GetSharingManagerInternal().PinTabs(
       {GetTabListInterface()->GetTab(0)->GetHandle(),
        GetTabListInterface()->GetTab(1)->GetHandle()});
   ExecuteJsTest();
@@ -1467,7 +1467,7 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithPixelOutput, testFaviconIsRemoved) {
 IN_PROC_BROWSER_TEST_P(NewGlicApiTestWithPixelOutput,
                        testFaviconIsOmittedWithClientCapabilities) {
   ASSERT_OK(OpenGlicForActiveTab());
-  GetOnlyGlicInstance()->sharing_manager().PinTabs(
+  GetOnlyGlicInstance()->GetSharingManagerInternal().PinTabs(
       {GetTabListInterface()->GetActiveTab()->GetHandle()});
   ExecuteJsTest();
 }
@@ -1695,7 +1695,7 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, MAYBE_testGetPageMetadataTabDestroyed) {
   ASSERT_OK(OpenGlicForActiveTab());
 
   // Pin both tabs.
-  GetOnlyGlicInstance()->sharing_manager().PinTabs(
+  GetOnlyGlicInstance()->GetSharingManagerInternal().PinTabs(
       {GetTabListInterface()->GetTab(0)->GetHandle(),
        GetTabListInterface()->GetTab(1)->GetHandle()});
 

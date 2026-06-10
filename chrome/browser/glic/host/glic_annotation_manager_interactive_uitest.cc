@@ -204,7 +204,8 @@ class GlicAnnotationManagerUiTestBase : public InteractiveGlicTest {
       auto options = mojom::GetTabContextOptions::New();
       options->include_annotated_page_content = true;
 
-      FocusedTabData data = GetHost()->sharing_manager().GetFocusedTabData();
+      FocusedTabData data =
+          GetHost()->GetSharingManagerInternal().GetFocusedTabData();
       CHECK(data.focus());
       FetchPageContext(
           data.focus(), *options,
@@ -429,7 +430,7 @@ class GlicAnnotationManagerUiTestBase : public InteractiveGlicTest {
       }
       CHECK(GetHost());
       GlicSharingManagerInternal* sharing_manager =
-          &GetHost()->sharing_manager();
+          &GetHost()->GetSharingManagerInternal();
       FocusedTabData focused_tab_data = sharing_manager->GetFocusedTabData();
       content::WebContents* focused_web_contents =
           focused_tab_data.focus() ? focused_tab_data.focus()->GetContents()

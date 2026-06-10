@@ -163,7 +163,7 @@ void GlicInstanceCoordinatorImpl::OnInstanceActivationChanged(
   }
   if (active_instance_) {
     active_instance_sharing_manager_->SetActiveSharingManager(
-        &active_instance_->sharing_manager());
+        &active_instance_->GetSharingManagerInternal());
   } else {
     active_instance_sharing_manager_->SetActiveSharingManager(nullptr);
   }
@@ -774,7 +774,8 @@ void GlicInstanceCoordinatorImpl::ShowInstanceForTabs(
         IsActive(tab->GetBrowserWindowInterface()) && tab->IsActivated();
     // Explicitly pin the tabs for the context menu trigger.
     if (pin_trigger == GlicPinTrigger::kContextMenu) {
-      instance->sharing_manager().PinTabs({tab->GetHandle()}, pin_trigger);
+      instance->GetSharingManagerInternal().PinTabs({tab->GetHandle()},
+                                                    pin_trigger);
     }
     instance->Show(show_opts);
   }
@@ -898,8 +899,9 @@ void GlicInstanceCoordinatorImpl::SwitchConversation(
       // BindTab is not called again, so we must manually overwrite all
       // currently pinned tabs' pin triggers to kConversationChange to make the
       // pin trigger correct.
-      for (auto* tab : target_instance->sharing_manager().GetPinnedTabs()) {
-        target_instance->sharing_manager().SetPinTrigger(
+      for (auto* tab :
+           target_instance->GetSharingManagerInternal().GetPinnedTabs()) {
+        target_instance->GetSharingManagerInternal().SetPinTrigger(
             tab->GetHandle(), GlicPinTrigger::kConversationChange);
       }
     }
@@ -954,7 +956,7 @@ GlicInstanceCoordinatorImpl::GetRecentlyActiveInstances(
 bool GlicInstanceCoordinatorImpl::IsTabPinnedToAnyInstance(
     const tabs::TabHandle& tab_handle) const {
   return std::ranges::any_of(instances_, [&](const auto& entry) {
-    return entry.second->sharing_manager().IsTabPinned(tab_handle);
+    return entry.second->GetSharingManagerInternal().IsTabPinned(tab_handle);
   });
 }
 
@@ -962,7 +964,7 @@ void GlicInstanceCoordinatorImpl::UnpinTabsFromAllInstances(
     base::span<const tabs::TabHandle> tab_handles,
     GlicUnpinTrigger trigger) {
   for (auto& entry : instances_) {
-    entry.second->sharing_manager().UnpinTabs(tab_handles, trigger);
+    entry.second->GetSharingManagerInternal().UnpinTabs(tab_handles, trigger);
   }
 }
 
@@ -1214,8 +1216,8 @@ void GlicInstanceCoordinatorImpl::RestoreTab(
             GetOrRestoreInstanceImpl(pinned_instance_info)) {
       // `GlicPinTrigger::kRestore` is used to prevent auto-binding during this
       // pinning process.
-      pinned_instance->sharing_manager().PinTabs({tab->GetHandle()},
-                                                 GlicPinTrigger::kRestore);
+      pinned_instance->GetSharingManagerInternal().PinTabs(
+          {tab->GetHandle()}, GlicPinTrigger::kRestore);
     }
   }
 }

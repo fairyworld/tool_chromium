@@ -311,8 +311,8 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUnbindOnCloseTest,
   tabs::TabInterface* tab2 = CreateAndActivateTab(GURL("about:blank"));
 
   // Manually pin tab2 with kConversationChange.
-  instance->sharing_manager().PinTabs({tab2->GetHandle()},
-                                      GlicPinTrigger::kConversationChange);
+  instance->GetSharingManagerInternal().PinTabs(
+      {tab2->GetHandle()}, GlicPinTrigger::kConversationChange);
 
   // Bind tab2 to the instance by showing it.
   coordinator().ShowInstanceForTabs({tab2}, instance->id());
@@ -345,18 +345,20 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUnbindOnCloseTest,
   tabs::TabInterface* tab2 = CreateAndActivateTab(GURL("about:blank"));
   // Explicitly pin tab2 to the instance's sharing manager with
   // kInstanceCreation.
-  instance->sharing_manager().PinTabs({tab2->GetHandle()},
-                                      GlicPinTrigger::kInstanceCreation);
+  instance->GetSharingManagerInternal().PinTabs(
+      {tab2->GetHandle()}, GlicPinTrigger::kInstanceCreation);
 
   // Verify both are pinned with kInstanceCreation.
   auto usage_tab1_before =
-      instance->sharing_manager().GetPinnedTabUsage(tab1->GetHandle());
+      instance->GetSharingManagerInternal().GetPinnedTabUsage(
+          tab1->GetHandle());
   ASSERT_TRUE(usage_tab1_before);
   EXPECT_EQ(usage_tab1_before->pin_event.trigger,
             GlicPinTrigger::kInstanceCreation);
 
   auto usage_tab2_before =
-      instance->sharing_manager().GetPinnedTabUsage(tab2->GetHandle());
+      instance->GetSharingManagerInternal().GetPinnedTabUsage(
+          tab2->GetHandle());
   ASSERT_TRUE(usage_tab2_before);
   EXPECT_EQ(usage_tab2_before->pin_event.trigger,
             GlicPinTrigger::kInstanceCreation);
@@ -375,13 +377,15 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorUnbindOnCloseTest,
 
   // Verify BOTH tab1 and tab2 triggers are updated to kConversationChange.
   auto usage_tab1_after =
-      instance->sharing_manager().GetPinnedTabUsage(tab1->GetHandle());
+      instance->GetSharingManagerInternal().GetPinnedTabUsage(
+          tab1->GetHandle());
   ASSERT_TRUE(usage_tab1_after);
   EXPECT_EQ(usage_tab1_after->pin_event.trigger,
             GlicPinTrigger::kConversationChange);
 
   auto usage_tab2_after =
-      instance->sharing_manager().GetPinnedTabUsage(tab2->GetHandle());
+      instance->GetSharingManagerInternal().GetPinnedTabUsage(
+          tab2->GetHandle());
   ASSERT_TRUE(usage_tab2_after);
   EXPECT_EQ(usage_tab2_after->pin_event.trigger,
             GlicPinTrigger::kConversationChange);
@@ -827,12 +831,14 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorBrowserTest,
   tabs::TabInterface* tab = GetTabListInterface()->GetActiveTab();
   ASSERT_OK_AND_ASSIGN(auto* instance, OpenGlicForActiveTab());
   // Unpin the tab.
-  instance->sharing_manager().UnpinTabs({tab->GetHandle()});
-  EXPECT_FALSE(instance->sharing_manager().IsTabPinned(tab->GetHandle()));
+  instance->GetSharingManagerInternal().UnpinTabs({tab->GetHandle()});
+  EXPECT_FALSE(
+      instance->GetSharingManagerInternal().IsTabPinned(tab->GetHandle()));
 
   // Verify kContextMenu trigger explicitly pins the tab.
   coordinator().ShowInstanceForTabs({tab}, instance->id());
-  EXPECT_TRUE(instance->sharing_manager().IsTabPinned(tab->GetHandle()));
+  EXPECT_TRUE(
+      instance->GetSharingManagerInternal().IsTabPinned(tab->GetHandle()));
 }
 
 IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorBrowserTest, TabRestoration) {
@@ -888,7 +894,8 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorBrowserTest,
 
   // Create Instance 2 and bind Tab 2 to it.
   // This should unbind Tab 2 from Instance 1, but keep it pinned to Instance 1.
-  ASSERT_TRUE(instance1->sharing_manager().IsTabPinned(tab2->GetHandle()));
+  ASSERT_TRUE(
+      instance1->GetSharingManagerInternal().IsTabPinned(tab2->GetHandle()));
   coordinator().CreateNewConversationForTabs({tab2});
   GlicInstanceImpl* instance2 = GetInstanceForTab(tab2);
   ASSERT_TRUE(instance2);
@@ -904,9 +911,11 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorBrowserTest,
   // Bound to Instance 2.
   ASSERT_EQ(GetInstanceForTab(tab2), instance2);
   // Pinned to Instance 2 (auto-pinned).
-  ASSERT_TRUE(instance2->sharing_manager().IsTabPinned(tab2->GetHandle()));
+  ASSERT_TRUE(
+      instance2->GetSharingManagerInternal().IsTabPinned(tab2->GetHandle()));
   // Pinned to Instance 1.
-  ASSERT_TRUE(instance1->sharing_manager().IsTabPinned(tab2->GetHandle()));
+  ASSERT_TRUE(
+      instance1->GetSharingManagerInternal().IsTabPinned(tab2->GetHandle()));
   GetTabListInterface()->ActivateTab(tab2->GetHandle());
 
   base::WeakPtr<GlicInstanceImpl> weak_instance2 = instance2->GetWeakPtr();
@@ -931,11 +940,11 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorBrowserTest,
   ASSERT_EQ(instance2_id, restored_instance2->id());
   ASSERT_EQ(restored_instance2->conversation_id(), kConvId);
   // Should be pinned to Instance 2.
-  ASSERT_TRUE(restored_instance2->sharing_manager().IsTabPinned(
+  ASSERT_TRUE(restored_instance2->GetSharingManagerInternal().IsTabPinned(
       restored_tab->GetHandle()));
   // Should be pinned to Instance 1.
-  ASSERT_TRUE(
-      instance1->sharing_manager().IsTabPinned(restored_tab->GetHandle()));
+  ASSERT_TRUE(instance1->GetSharingManagerInternal().IsTabPinned(
+      restored_tab->GetHandle()));
   EXPECT_OK(WaitForEmbedderActivationOrPeek(restored_instance2, restored_tab));
 }
 
@@ -1528,8 +1537,8 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorBrowserTest,
   ASSERT_OK_AND_ASSIGN(auto* instance, OpenGlicForActiveTab());
 
   // Pin the tab explicitly to keep the instance alive even if closed.
-  instance->sharing_manager().PinTabs({tab->GetHandle()},
-                                      GlicPinTrigger::kContextMenu);
+  instance->GetSharingManagerInternal().PinTabs({tab->GetHandle()},
+                                                GlicPinTrigger::kContextMenu);
 
   base::WeakPtr<GlicInstanceImpl> weak_instance = instance->GetWeakPtr();
   // Close the side panel (unbind the embedder).
@@ -1541,7 +1550,7 @@ IN_PROC_BROWSER_TEST_F(GlicInstanceCoordinatorBrowserTest,
   EXPECT_EQ(coordinator().GetInstancesForTesting().size(), 1u);
 
   // Now unpin the tab.
-  instance->sharing_manager().UnpinTabs({tab->GetHandle()});
+  instance->GetSharingManagerInternal().UnpinTabs({tab->GetHandle()});
 
   // Run until the instance is deleted asynchronously.
   ASSERT_OK(WaitForInstanceDeletion(weak_instance));

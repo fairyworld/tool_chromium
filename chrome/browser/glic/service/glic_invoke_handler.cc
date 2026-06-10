@@ -213,8 +213,8 @@ void GlicInvokeHandler::Invoke() {
 
   if (!options_.tab_sharing.tabs_to_pin.empty()) {
     CHECK(options_.tab_sharing.pin_trigger != GlicPinTrigger::kUnknown);
-    instance_->sharing_manager().PinTabs(options_.tab_sharing.tabs_to_pin,
-                                         options_.tab_sharing.pin_trigger);
+    instance_->GetSharingManagerInternal().PinTabs(
+        options_.tab_sharing.tabs_to_pin, options_.tab_sharing.pin_trigger);
   }
 
   std::vector<std::unique_ptr<GlicInvokeTask>> tasks;
