@@ -11,9 +11,13 @@
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/render_widget_host_view.h"
 #include "content/public/browser/web_contents.h"
+#include "third_party/blink/public/common/input/web_keyboard_event.h"
 #include "third_party/blink/public/common/input/web_mouse_event.h"
 #include "third_party/blink/public/common/input/web_mouse_wheel_event.h"
 #include "third_party/blink/public/common/input/web_touch_event.h"
+#include "ui/events/keycodes/dom/dom_code.h"
+#include "ui/events/keycodes/dom/dom_key.h"
+#include "ui/events/keycodes/dom/keycode_converter.h"
 
 namespace cast_receiver {
 namespace {
@@ -63,6 +67,22 @@ void MapPressedButtons(int modifiers, MouseEvent* proto) {
   }
   if (modifiers & blink::WebInputEvent::Modifiers::kForwardButtonDown) {
     proto->add_buttons(MouseEvent::BROWSER_FORWARD_BUTTON);
+  }
+}
+
+KeyboardEvent::ActionType MapKeyActionType(blink::WebInputEvent::Type type) {
+  switch (type) {
+    // Both rawKeyDown and keyDown map to KEY_DOWN. These events are mutually
+    // exclusive for a single physical keystroke (Android sends KeyDown, while
+    // Desktop/Fuchsia sends RawKeyDown + Char), so handling both does not
+    // cause duplicate down events.
+    case blink::WebInputEvent::Type::kRawKeyDown:
+    case blink::WebInputEvent::Type::kKeyDown:
+      return KeyboardEvent::KEY_DOWN;
+    case blink::WebInputEvent::Type::kKeyUp:
+      return KeyboardEvent::KEY_UP;
+    default:
+      return KeyboardEvent::UNKNOWN;
   }
 }
 
@@ -164,6 +184,14 @@ void StreamingInputObserver::OnInputEvent(const content::RenderWidgetHost& host,
       *wrapper.mutable_touch_event() = std::move(*touch_proto);
       input_event_proto = std::move(wrapper);
     }
+  } else if (blink::WebInputEvent::IsKeyboardEventType(event.GetType())) {
+    std::optional<KeyboardEvent> keyboard_proto =
+        HandleKeyEvent(static_cast<const blink::WebKeyboardEvent&>(event));
+    if (keyboard_proto) {
+      cast_receiver::InputEvent wrapper;
+      *wrapper.mutable_keyboard_event() = std::move(*keyboard_proto);
+      input_event_proto = std::move(wrapper);
+    }
   }
 
   if (input_event_proto) {
@@ -171,8 +199,6 @@ void StreamingInputObserver::OnInputEvent(const content::RenderWidgetHost& host,
         (event.TimeStamp() - base::TimeTicks()).InMilliseconds());
     // TODO(b/501522425): Feed input_event_proto into OpenScreen input stream.
   }
-
-  // TODO(b/501521818): Implement translation for keyboard events.
 }
 
 std::optional<cast_receiver::MouseEvent>
@@ -290,6 +316,49 @@ StreamingInputObserver::HandleMouseWheelEvent(
       !!(modifiers & blink::WebInputEvent::Modifiers::kMetaKey));
 
   MapPressedButtons(modifiers, &proto);
+
+  return proto;
+}
+
+std::optional<cast_receiver::KeyboardEvent>
+StreamingInputObserver::HandleKeyEvent(const blink::WebKeyboardEvent& event) {
+  KeyboardEvent::ActionType action_type = MapKeyActionType(event.GetType());
+  if (action_type == KeyboardEvent::UNKNOWN) {
+    return std::nullopt;  // Ignore unknown keyboard events (like Char)
+  }
+
+  cast_receiver::KeyboardEvent proto;
+  proto.set_action_type(action_type);
+
+  std::string key_code = ui::KeycodeConverter::DomCodeToCodeString(
+      static_cast<ui::DomCode>(event.dom_code));
+  if (!key_code.empty()) {
+    proto.set_key_code(key_code);
+  }
+
+  std::string key_value = ui::KeycodeConverter::DomKeyToKeyString(
+      static_cast<ui::DomKey>(event.dom_key));
+  if (!key_value.empty()) {
+    proto.set_key_value(key_value);
+  }
+
+  int modifiers = event.GetModifiers();
+  proto.set_repeat(
+      !!(modifiers & blink::WebInputEvent::Modifiers::kIsAutoRepeat));
+  proto.set_alt_key_press(
+      !!(modifiers & blink::WebInputEvent::Modifiers::kAltKey));
+  proto.set_ctrl_key_press(
+      !!(modifiers & blink::WebInputEvent::Modifiers::kControlKey));
+  proto.set_shift_key_press(
+      !!(modifiers & blink::WebInputEvent::Modifiers::kShiftKey));
+  proto.set_meta_key_press(
+      !!(modifiers & blink::WebInputEvent::Modifiers::kMetaKey));
+  proto.set_caps_lock_enabled(
+      !!(modifiers & blink::WebInputEvent::Modifiers::kCapsLockOn));
+
+  // The timestamp truncated to the whole millisecond.
+  proto.set_timestamp_ms(
+      (event.TimeStamp() - base::TimeTicks()).InMilliseconds());
 
   return proto;
 }

@@ -7,6 +7,7 @@
 
 #include <optional>
 
+#include "components/cast_receiver/proto/keyboard_input_service.pb.h"
 #include "components/cast_receiver/proto/mouse_input_service.pb.h"
 #include "components/cast_receiver/proto/touch_input_service.pb.h"
 #include "content/public/browser/render_widget_host.h"
@@ -19,6 +20,7 @@ class RenderFrameHost;
 }
 
 namespace blink {
+class WebKeyboardEvent;
 class WebMouseEvent;
 class WebMouseWheelEvent;
 class WebTouchEvent;
@@ -75,6 +77,11 @@ class StreamingInputObserver
   std::optional<cast_receiver::MouseEvent> HandleMouseWheelEvent(
       const blink::WebMouseWheelEvent& wheel_event,
       const gfx::Size& visible_viewport_size);
+
+  // Helper method to translate keyboard events. Returns the translated proto if
+  // the event should be handled, or std::nullopt if ignored.
+  std::optional<cast_receiver::KeyboardEvent> HandleKeyEvent(
+      const blink::WebKeyboardEvent& key_event);
 };
 
 }  // namespace cast_receiver

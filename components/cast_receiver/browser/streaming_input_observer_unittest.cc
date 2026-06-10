@@ -6,14 +6,18 @@
 
 #include <optional>
 
+#include "components/cast_receiver/proto/keyboard_input_service.pb.h"
 #include "components/cast_receiver/proto/touch_input_service.pb.h"
 #include "content/public/browser/render_widget_host_view.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/test/test_renderer_host.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "third_party/blink/public/common/input/web_keyboard_event.h"
 #include "third_party/blink/public/common/input/web_mouse_event.h"
 #include "third_party/blink/public/common/input/web_mouse_wheel_event.h"
 #include "third_party/blink/public/common/input/web_touch_event.h"
+#include "ui/events/keycodes/dom/dom_code.h"
+#include "ui/events/keycodes/dom/dom_key.h"
 
 namespace cast_receiver {
 
@@ -46,6 +50,12 @@ class StreamingInputObserverTest : public content::RenderViewHostTestHarness {
       const blink::WebMouseWheelEvent& wheel_event,
       const gfx::Size& visible_viewport_size) {
     return observer.HandleMouseWheelEvent(wheel_event, visible_viewport_size);
+  }
+
+  std::optional<KeyboardEvent> HandleKeyEvent(
+      StreamingInputObserver& observer,
+      const blink::WebKeyboardEvent& key_event) {
+    return observer.HandleKeyEvent(key_event);
   }
 };
 
@@ -259,4 +269,60 @@ TEST_F(StreamingInputObserverTest, TranslateMouseWheel) {
   EXPECT_TRUE(proto.alt_key_press());
   EXPECT_FALSE(proto.ctrl_key_press());
 }
+
+TEST_F(StreamingInputObserverTest, TranslateKeyDown) {
+  StreamingInputObserver observer(web_contents());
+
+  blink::WebKeyboardEvent key_event(
+      blink::WebInputEvent::Type::kRawKeyDown, blink::WebInputEvent::kShiftKey,
+      blink::WebInputEvent::GetStaticTimeStampForTests());
+  key_event.dom_code = static_cast<int>(ui::DomCode::US_A);
+  key_event.dom_key = ui::DomKey::FromCharacter('A');
+
+  std::optional<KeyboardEvent> opt_proto = HandleKeyEvent(observer, key_event);
+  ASSERT_TRUE(opt_proto.has_value());
+
+  const KeyboardEvent& proto = opt_proto.value();
+  EXPECT_EQ(proto.action_type(), KeyboardEvent::KEY_DOWN);
+  EXPECT_EQ(proto.key_code(), "KeyA");
+  EXPECT_EQ(proto.key_value(), "A");
+  EXPECT_FALSE(proto.repeat());
+  EXPECT_TRUE(proto.shift_key_press());
+  EXPECT_FALSE(proto.ctrl_key_press());
+}
+
+TEST_F(StreamingInputObserverTest, TranslateKeyUpWithRepeatAndCapsLock) {
+  StreamingInputObserver observer(web_contents());
+
+  blink::WebKeyboardEvent key_event(
+      blink::WebInputEvent::Type::kKeyUp,
+      blink::WebInputEvent::Modifiers::kIsAutoRepeat |
+          blink::WebInputEvent::Modifiers::kCapsLockOn,
+      blink::WebInputEvent::GetStaticTimeStampForTests());
+  key_event.dom_code = static_cast<int>(ui::DomCode::TAB);
+  key_event.dom_key = ui::DomKey::TAB;
+
+  std::optional<KeyboardEvent> opt_proto = HandleKeyEvent(observer, key_event);
+  ASSERT_TRUE(opt_proto.has_value());
+
+  const KeyboardEvent& proto = opt_proto.value();
+  EXPECT_EQ(proto.action_type(), KeyboardEvent::KEY_UP);
+  EXPECT_EQ(proto.key_code(), "Tab");
+  EXPECT_EQ(proto.key_value(), "Tab");
+  EXPECT_TRUE(proto.repeat());
+  EXPECT_TRUE(proto.caps_lock_enabled());
+  EXPECT_FALSE(proto.shift_key_press());
+}
+
+TEST_F(StreamingInputObserverTest, IgnoreCharEvents) {
+  StreamingInputObserver observer(web_contents());
+
+  blink::WebKeyboardEvent key_event(
+      blink::WebInputEvent::Type::kChar, blink::WebInputEvent::kNoModifiers,
+      blink::WebInputEvent::GetStaticTimeStampForTests());
+
+  std::optional<KeyboardEvent> opt_proto = HandleKeyEvent(observer, key_event);
+  EXPECT_FALSE(opt_proto.has_value());
+}
+
 }  // namespace cast_receiver
