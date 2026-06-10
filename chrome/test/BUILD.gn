@@ -793,26 +793,18 @@ static_library("test_support") {
     ]
     deps += [ "//chrome/browser/printing" ]
 
-    if (is_chromeos) {
+    if (is_chromeos && use_cups) {
       sources += [
-        "chromeos/printing/fake_local_printer_chromeos.cc",
-        "chromeos/printing/fake_local_printer_chromeos.h",
-        "chromeos/printing/mock_local_printer_chromeos.cc",
-        "chromeos/printing/mock_local_printer_chromeos.h",
+        "../browser/extensions/api/printing/fake_print_job_controller.cc",
+        "../browser/extensions/api/printing/fake_print_job_controller.h",
+        "../browser/extensions/api/printing/printing_test_utils.cc",
+        "../browser/extensions/api/printing/printing_test_utils.h",
       ]
-      if (use_cups) {
-        sources += [
-          "../browser/extensions/api/printing/fake_print_job_controller.cc",
-          "../browser/extensions/api/printing/fake_print_job_controller.h",
-          "../browser/extensions/api/printing/printing_test_utils.cc",
-          "../browser/extensions/api/printing/printing_test_utils.h",
-        ]
-        public_deps += [
-          "//chrome/services/printing/public/mojom",
-          "//chromeos/printing",
-          "//printing/backend:test_support",
-        ]
-      }
+      public_deps += [
+        "//chrome/services/printing/public/mojom",
+        "//chromeos/printing",
+        "//printing/backend:test_support",
+      ]
     }
 
     public_deps += [
