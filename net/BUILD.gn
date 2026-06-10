@@ -3252,6 +3252,7 @@ target(_test_target_type, "net_unittests") {
     "HostCacheTest.CheckHostCacheSerialization",
     "HostResolverCacheFuzzTest.SerializationDoesNotCrash",
     "HpackHeaderTableFuzzTest.CanCallMethodSequence",
+    "HttpAuthHandlerDigestTest.DigestAuthDoesNotCrash",
     "HttpNoVarySearchTest.AreEquivalentImplementationsMatch",
     "PickleTest.FuzzRoundTrip",
     "ParseProxyListFuzzer.TestOneInput",
@@ -3365,6 +3366,7 @@ target(_test_target_type, "net_unittests") {
     "data/file_stream_unittest/",
     "data/filter_unittests/",
     "data/fuzzer_data/",
+    "data/fuzzer_dictionaries/",
     "data/gencerts/",
     "data/pac_file_fetcher_unittest/",
     "data/quic_http_response_cache_data/",
@@ -4198,16 +4200,6 @@ fuzzer_test("net_http_chunked_decoder_fuzzer") {
 fuzzer_test("net_http_auth_handler_basic_fuzzer") {
   sources = [ "http/http_auth_handler_basic_fuzzer.cc" ]
   dict = "data/fuzzer_dictionaries/net_http_auth_handler_basic_fuzzer.dict"
-  deps = [
-    ":net_fuzzer_test_support",
-    ":test_support",
-    "//net",
-  ]
-}
-
-fuzzer_test("net_http_auth_handler_digest_fuzzer") {
-  sources = [ "http/http_auth_handler_digest_fuzzer.cc" ]
-  dict = "data/fuzzer_dictionaries/net_http_auth_handler_digest_fuzzer.dict"
   deps = [
     ":net_fuzzer_test_support",
     ":test_support",
