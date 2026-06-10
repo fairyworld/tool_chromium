@@ -505,7 +505,7 @@ void NavigationEntryScreenshot::StartReadBack() {
 }
 
 void NavigationEntryScreenshot::DoReadBack(SkBitmap bitmap) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   CHECK(shared_image_provider_);
   auto context_provider = shared_image_provider_->GetContextProvider();
   auto shared_image = shared_image_provider_->Get();
@@ -518,7 +518,7 @@ void NavigationEntryScreenshot::DoReadBack(SkBitmap bitmap) {
   gfx::Point src_point;
   SkImageInfo info = bitmap.info();
   auto* raster_interface = context_provider->RasterInterface();
-  DCHECK(raster_interface);
+  CHECK(raster_interface, base::NotFatalUntil::M152);
   auto scoped_access = shared_image->BeginRasterAccess(
       raster_interface, shared_image->creation_sync_token(),
       /*readonly=*/true);
@@ -532,7 +532,7 @@ void NavigationEntryScreenshot::DoReadBack(SkBitmap bitmap) {
 }
 
 void NavigationEntryScreenshot::OnReadBack(SkBitmap bitmap, bool success) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   // This has to run after the readback is completed, otherwise, this operation
   // might destroy the context provider, attempting a re-entry to this same
   // callback (crbug.com/456887685).
