@@ -506,9 +506,7 @@ class LocationBarMediator
             hintZeroSuggestRefresh();
         } // Focus change caused by a closed tab may result in there not being an active tab.
         if (!hasFocus && mLocationBarDataProvider.hasTab()) {
-            setUrl(
-                    mLocationBarDataProvider.getCurrentGurl(),
-                    mLocationBarDataProvider.getUrlBarData());
+            updateUrl();
         }
     }
 
@@ -688,9 +686,7 @@ class LocationBarMediator
                     TextSelection.SELECT_ALL);
             mUrlCoordinator.setKeyboardVisibility(false, false);
         } else {
-            setUrl(
-                    mLocationBarDataProvider.getCurrentGurl(),
-                    mLocationBarDataProvider.getUrlBarData());
+            updateUrl();
         }
     }
 
@@ -2638,7 +2634,7 @@ class LocationBarMediator
         }
 
         // Revert the URL to match the current page.
-        setUrl(mLocationBarDataProvider.getCurrentGurl(), mLocationBarDataProvider.getUrlBarData());
+        updateUrl();
         endInputAndFocusCurrentTab();
     }
 
