@@ -45,7 +45,8 @@ class AccountChooserDialogView : public views::DialogDelegate,
   // Sets up the child views.
   void InitWindow();
 
-  void CredentialsItemPressed(const password_manager::PasswordForm* form);
+  void CredentialsItemPressed(const password_manager::PasswordForm* form,
+                              const ui::Event& event);
 
   // A weak pointer to the controller.
   raw_ptr<CredentialManagerDialogController, AcrossTasksDanglingUntriaged>
