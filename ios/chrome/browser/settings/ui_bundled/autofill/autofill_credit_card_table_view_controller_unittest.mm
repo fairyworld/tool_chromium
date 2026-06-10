@@ -16,6 +16,8 @@
 #import "components/autofill/core/browser/data_manager/personal_data_manager_test_utils.h"
 #import "components/autofill/core/browser/data_model/payments/credit_card.h"
 #import "components/autofill/core/browser/geo/alternative_state_name_map_updater.h"
+#import "components/autofill/core/common/autofill_payments_features.h"
+#import "components/autofill/core/common/autofill_prefs.h"
 #import "components/strings/grit/components_strings.h"
 #import "components/sync/test/test_sync_service.h"
 #import "ios/chrome/browser/autofill/model/personal_data_manager_factory.h"
@@ -337,6 +339,37 @@ TEST_F(AutofillCreditCardTableViewControllerTest,
   // Verify that the user action was NOT recorded.
   EXPECT_EQ(0, user_action_tester.GetActionCount(
                    "AutofillCreditCardDeletedAndHadCvc"));
+}
+
+TEST_F(AutofillCreditCardTableViewControllerTest,
+       TestPayOverTimeButton_HiddenByDefault) {
+  CreateController();
+  CheckController();
+
+  // Pay Over Time is hidden by default. Section count remains 3.
+  EXPECT_EQ(3, NumberOfSections());
+}
+
+TEST_F(AutofillCreditCardTableViewControllerTest, TestPayOverTimeButton_Shown) {
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndEnableFeature(
+      autofill::features::kAutofillEnableBuyNowPayLater);
+  profile_->GetPrefs()->SetBoolean(autofill::prefs::kAutofillHasSeenBnpl, true);
+
+  CreateController();
+  CheckController();
+
+  // Expect 4 sections when Pay Over Time is enabled:
+  // 0: Autofill switch
+  // 1: Mandatory reauth switch
+  // 2: CVC storage switch
+  // 3: Pay Over Time setting entry
+  EXPECT_EQ(4, NumberOfSections());
+  EXPECT_EQ(1, NumberOfItemsInSection(3));
+
+  // Confirm the text of the button.
+  CheckTextCellText(l10n_util::GetNSString(IDS_IOS_SETTINGS_PAY_OVER_TIME), 3,
+                    0);
 }
 
 class AutofillAddCreditCardViewControllerTest
