@@ -6,6 +6,8 @@
 
 #include <objbase.h>
 
+#include <wrl/client.h>
+
 #include <utility>
 
 #include "base/check_deref.h"
@@ -108,6 +110,9 @@ void SessionRegistry::OnClientTerminated(scoped_refptr<SessionCore> core) {
   // still holds the session's IUnknown pointer (meaning that the ScopedSession
   // has yet to be destroyed), tell COM to force a disconnect.
   if (IUnknown* unknown = core->release(); unknown != nullptr) {
+    // Keep a strong reference locally to prevent the object from being
+    // synchronously destroyed (and deallocated) during CoDisconnectObject.
+    Microsoft::WRL::ComPtr<IUnknown> keep_alive(unknown);
     ::CoDisconnectObject(unknown, /*dwReserved=*/0);
 
     // This task is handling client termination before the session is destroyed,
