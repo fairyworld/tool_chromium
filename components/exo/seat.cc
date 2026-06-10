@@ -135,6 +135,10 @@ Seat::~Seat() {
   Shutdown();
 }
 
+base::WeakPtr<Seat> Seat::GetWeakPtr() {
+  return weak_ptr_factory_.GetWeakPtr();
+}
+
 void Seat::Shutdown() {
   if (was_shutdown_)
     return;
