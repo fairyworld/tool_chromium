@@ -1195,7 +1195,8 @@ ContextualTasksUiService::CreateMessageProxyWebContents(
 
 void ContextualTasksUiService::OpenUrl(
     const content::OpenURLParams& url_params,
-    const blink::mojom::WindowFeatures& window_features) {
+    const blink::mojom::WindowFeatures& window_features,
+    BrowserWindowInterface* browser) {
   const GURL& url = url_params.url;
   OMNIBOX_LOG("nav_trace")
       << "ContextualTasks navigation trace: OpenUrl called "
@@ -1204,6 +1205,16 @@ void ContextualTasksUiService::OpenUrl(
 
   NavigateParams nav_params(profile_, url, url_params.transition);
   nav_params.FillNavigateParamsFromOpenURLParams(url_params);
+
+  // Browser and tab index have no equivalent in OpenURLParams, so add them to
+  // ensure the tab opens in the right tab strip position.
+  if (browser) {
+    nav_params.browser = browser;
+    TabListInterface* tab_list = TabListInterface::From(browser);
+    if (tab_list) {
+      nav_params.tabstrip_index = tab_list->GetActiveIndex() + 1;
+    }
+  }
   // Reset frame_tree_node_id to avoid targeting the source frame when opening
   // a new tab/window.
   nav_params.frame_tree_node_id = content::FrameTreeNodeId();
@@ -1522,7 +1533,7 @@ bool ContextualTasksUiService::HandleNavigationImpl(
           FROM_HERE, base::BindOnce(&ContextualTasksUiService::OpenUrl,
                                     weak_ptr_factory_.GetWeakPtr(),
                                     std::move(new_url_params),
-                                    blink::mojom::WindowFeatures()));
+                                    blink::mojom::WindowFeatures(), browser));
       return true;
     }
 
@@ -1713,7 +1724,8 @@ bool ContextualTasksUiService::HandleNavigationImpl(
                                         std::move(url_params),
                                         pending_tracker
                                             ? pending_tracker->window_features()
-                                            : blink::mojom::WindowFeatures()));
+                                            : blink::mojom::WindowFeatures(),
+                                        browser));
         }
         return true;
       } else {
@@ -1725,7 +1737,8 @@ bool ContextualTasksUiService::HandleNavigationImpl(
                            weak_ptr_factory_.GetWeakPtr(),
                            std::move(url_params),
                            pending_tracker ? pending_tracker->window_features()
-                                           : blink::mojom::WindowFeatures()));
+                                           : blink::mojom::WindowFeatures(),
+                           browser));
         return true;
       }
     } else {
