@@ -500,7 +500,7 @@ class DriveIntegrationService : public KeyedService,
       drive::FileError status,
       const std::vector<base::FilePath>& paths);
 
-  // Toggle syncing for |path| if the the directory exists.
+  // Toggle syncing for |path| if the directory exists.
   void ToggleSyncForPathIfDirectoryExists(
       const base::FilePath& path,
       drivefs::mojom::DriveFs::ToggleSyncForPathCallback callback,
