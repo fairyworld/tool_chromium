@@ -195,6 +195,16 @@ export function getHtml(this: GlicInternalsAppElement) {
             <option value="2">TrustFirstClick</option>
             <option value="3">TrustFirstInline</option>
           </select>
+          <label for="invokeFreCompletionWaitModeSelect">
+            Wait for FRE Completion Mode
+          </label>
+          <select id="invokeFreCompletionWaitModeSelect"
+              .value="${this.invokeFreCompletionWaitMode_.toString()}"
+              @change="${this.onInvokeFreCompletionWaitModeChange_}">
+            ${this.freCompletionWaitModeEnumValues_.map(item => html`
+              <option value="${item.value}">${item.name}</option>
+            `)}
+          </select>
           <label for="invokeFeatureModeSelect">Feature Mode</label>
           <select id="invokeFeatureModeSelect"
               .value="${this.invokeFeatureMode_.toString()}"

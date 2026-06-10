@@ -33,6 +33,13 @@ struct InternalsDebugInfo {
   string hotkey;
 };
 
+// This determines how invoke will handle waiting for first run experience
+// completion.
+enum FreCompletionWaitMode {
+  kDefault,
+  kNever,
+};
+
 // Configuration options for invoking Glic from the internals page.
 struct TriggerInvokeFromInternalsOptions {
   InvocationSource invocation_source;
@@ -48,6 +55,7 @@ struct TriggerInvokeFromInternalsOptions {
   bool auto_submit;
   FreOverride fre_override = kUnspecified;
   bool wait_for_panel_open;
+  FreCompletionWaitMode fre_completion_wait_mode = kDefault;
   bool? show_panel;
   InvokeTargetSurface surface;
   ActuationTarget actuation_target;

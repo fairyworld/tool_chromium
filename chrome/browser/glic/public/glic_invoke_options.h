@@ -202,6 +202,14 @@ struct TabSharingOptions {
   GlicPinTrigger pin_trigger;
 };
 
+// Specifies how to wait for the First Run Experience (FRE) to complete.
+enum class FreCompletionWaitMode {
+  // Whether or not we wait depends on the FRE override.
+  kDefault,
+  // We do not wait for the FRE to complete, regardless of the FRE override.
+  kNever,
+};
+
 // Configuration options for invoking Glic.
 struct GlicInvokeOptions {
   explicit GlicInvokeOptions(glic::mojom::InvocationSource invocation_source);
@@ -269,6 +277,11 @@ struct GlicInvokeOptions {
   // Defaults to false. If the panel was already open when the invoke was
   // triggered, this flag is ignored.
   bool wait_for_panel_open = false;
+
+  // Specifies how to wait for the First Run Experience (FRE) to complete
+  // before proceeding with the invocation.
+  FreCompletionWaitMode fre_completion_wait_mode =
+      FreCompletionWaitMode::kDefault;
 
   // Browser-specific callback for when the invocation successfully completes.
   // This is called asynchronously.

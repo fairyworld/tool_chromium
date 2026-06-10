@@ -598,6 +598,14 @@ void GlicInternalsPageHandler::TriggerInvokeFromInternalsAction(
   options.timeout = mojo_options->timeout;
   options.fre_override = mojo_options->fre_override;
   options.wait_for_panel_open = mojo_options->wait_for_panel_open;
+  switch (mojo_options->fre_completion_wait_mode) {
+    case mojom::FreCompletionWaitMode::kDefault:
+      options.fre_completion_wait_mode = FreCompletionWaitMode::kDefault;
+      break;
+    case mojom::FreCompletionWaitMode::kNever:
+      options.fre_completion_wait_mode = FreCompletionWaitMode::kNever;
+      break;
+  }
   options.target.actuation_target = mojo_options->actuation_target;
 
   auto split_callback = base::SplitOnceCallback(std::move(callback));

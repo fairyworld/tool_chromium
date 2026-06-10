@@ -277,8 +277,10 @@ void GlicInvokeHandler::Invoke() {
                        weak_ptr_factory_.GetWeakPtr())));
   }
 
-  tasks.push_back(std::make_unique<WaitForFreCompletionTask>(
-      instance_->profile(), options_.fre_override));
+  if (options_.fre_completion_wait_mode == FreCompletionWaitMode::kDefault) {
+    tasks.push_back(std::make_unique<WaitForFreCompletionTask>(
+        instance_->profile(), options_.fre_override));
+  }
 
   tasks.push_back(std::make_unique<SendToClientTask>(
       &*instance_, CreateMojoOptions(), auto_submit_passkey_));

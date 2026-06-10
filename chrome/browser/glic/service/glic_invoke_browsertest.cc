@@ -750,6 +750,7 @@ IN_PROC_BROWSER_TEST_F(GlicInvokeBrowserTest,
   base::test::TestFuture<void> success_future;
   GlicInvokeOptions options(Target(*tab), mojom::InvocationSource::kOsButton);
   options.fre_override = mojom::FreOverride::kTrustFirstClick;
+  options.fre_completion_wait_mode = FreCompletionWaitMode::kDefault;
   options.on_success = success_future.GetCallback();
 
   coordinator().Invoke(std::move(options));
