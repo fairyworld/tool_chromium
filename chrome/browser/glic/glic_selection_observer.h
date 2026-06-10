@@ -112,12 +112,10 @@ class GlicSelectionObserver
 
 
   bool ShouldShowSelectionWidget();
-  void OnWidgetDismissed();
   void OnWidgetPinToggled(bool is_pinned);
   void OnAskGemini();
   void OnCopy();
   void OnCopyLink();
-  void OnDismiss();
   void OnHideForThisSite();
   void OnSettings();
 

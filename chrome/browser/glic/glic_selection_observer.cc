@@ -19,7 +19,6 @@
 #include "chrome/browser/feature_engagement/tracker_factory.h"
 #include "chrome/browser/glic/browser_ui/glic_nudge_controller.h"
 #include "chrome/browser/glic/browser_ui/glic_selection_widget.h"
-#include "chrome/browser/glic/glic_pref_names.h"
 #include "chrome/browser/glic/glic_zero_state_suggestions_manager.h"
 #include "chrome/browser/glic/host/context/glic_sharing_utils.h"
 #include "chrome/browser/glic/host/glic.mojom.h"
@@ -39,7 +38,6 @@
 #include "chrome/browser/ui/toasts/toast_features.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/feature_engagement/public/tracker.h"
-#include "components/prefs/pref_service.h"
 #include "components/shared_highlighting/core/common/disabled_sites.h"
 #include "components/shared_highlighting/core/common/fragment_directives_utils.h"
 #include "components/shared_highlighting/core/common/shared_highlighting_features.h"
@@ -170,8 +168,6 @@ class GlicSelectionObserver::WidgetActionDelegate
   void OnPinToggled(bool is_pinned) override {
     observer_->OnWidgetPinToggled(is_pinned);
   }
-  // TODO(b/520398290): Remove dismiss related code.
-  void OnDismiss() override { observer_->OnDismiss(); }
   void OnHideForThisSite() override { observer_->OnHideForThisSite(); }
   void OnSettings() override { observer_->OnSettings(); }
 
@@ -721,23 +717,7 @@ bool GlicSelectionObserver::ShouldShowSelectionWidget() {
     }
   }
 
-  Profile* profile =
-      Profile::FromBrowserContext(web_contents()->GetBrowserContext());
-  PrefService* prefs = profile->GetPrefs();
-  if (prefs->GetInteger(prefs::kGlicSelectionWidgetDismissCount) >=
-      features::kGlicSelectionPromptWidgetMaxTotalDismisses.Get()) {
-    return false;
-  }
   return true;
-}
-
-void GlicSelectionObserver::OnWidgetDismissed() {
-  Profile* profile =
-      Profile::FromBrowserContext(web_contents()->GetBrowserContext());
-  PrefService* prefs = profile->GetPrefs();
-  prefs->SetInteger(
-      prefs::kGlicSelectionWidgetDismissCount,
-      prefs->GetInteger(prefs::kGlicSelectionWidgetDismissCount) + 1);
 }
 
 void GlicSelectionObserver::OnHideForThisSite() {
@@ -897,11 +877,6 @@ void GlicSelectionObserver::OnCopyLink() {
   if (selected_frame) {
     CopyLinkToHighlight(selected_frame->GetWeakDocumentPtr());
   }
-}
-
-void GlicSelectionObserver::OnDismiss() {
-  DismissUI(/*keep_nudge=*/false);
-  OnWidgetDismissed();
 }
 
 void GlicSelectionObserver::OnWidgetClosed(views::Widget::ClosedReason reason) {

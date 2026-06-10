@@ -367,25 +367,24 @@ class GlicSelectionContentsView : public views::View,
     copy_link_btn_->SetEnabled(false);
 
     // Pill 2
-    // TODO(b/520398290): Will change dismiss_pill_ to control_pill_.
-    dismiss_pill_ = AddChildView(std::make_unique<views::BoxLayoutView>());
-    dismiss_pill_->SetOrientation(views::BoxLayout::Orientation::kHorizontal);
-    dismiss_pill_->SetInsideBorderInsets(gfx::Insets::VH(4, 4));
-    dismiss_pill_->SetCrossAxisAlignment(
+    control_pill_ = AddChildView(std::make_unique<views::BoxLayoutView>());
+    control_pill_->SetOrientation(views::BoxLayout::Orientation::kHorizontal);
+    control_pill_->SetInsideBorderInsets(gfx::Insets::VH(4, 4));
+    control_pill_->SetCrossAxisAlignment(
         views::BoxLayout::CrossAxisAlignment::kCenter);
     auto border2 = std::make_unique<views::BubbleBorder>(
         views::BubbleBorder::NONE, views::BubbleBorder::STANDARD_SHADOW);
     border2->SetColor(ui::kColorSysSurface);
     border2->set_rounded_corners(gfx::RoundedCornersF(
         kCornerRadiusInner, kCornerRadius, kCornerRadius, kCornerRadiusInner));
-    dismiss_pill_->SetBackground(
+    control_pill_->SetBackground(
         std::make_unique<views::BubbleBackground>(border2.get()));
-    dismiss_pill_->SetBorder(std::move(border2));
+    control_pill_->SetBorder(std::move(border2));
 
     // Pin/Unpin Toggle Button or Dismiss Button
     if (features::kGlicSelectionPromptEnablePinning.Get()) {
       pin_btn_ =
-          dismiss_pill_->AddChildView(views::ImageButton::CreateIconButton(
+          control_pill_->AddChildView(views::ImageButton::CreateIconButton(
               base::BindRepeating(&GlicSelectionWidgetDelegate::TogglePinState,
                                   base::Unretained(widget_delegate_)),
               features::IsRoundedIconsEnabled()
@@ -402,7 +401,7 @@ class GlicSelectionContentsView : public views::View,
     } else {
       auto menu_tooltip = l10n_util::GetStringUTF16(IDS_TOAST_MENU_BUTTON_NAME);
       menu_btn_ =
-          dismiss_pill_->AddChildView(views::ImageButton::CreateIconButton(
+          control_pill_->AddChildView(views::ImageButton::CreateIconButton(
               base::RepeatingClosure(), kMoreVertIcon, menu_tooltip));
       menu_btn_->SetButtonController(
           std::make_unique<views::MenuButtonController>(
@@ -426,14 +425,14 @@ class GlicSelectionContentsView : public views::View,
                                     kColorToolbarInkDropRipple);
     }
 
-    dismiss_pill_->SetPaintToLayer();
-    dismiss_pill_->layer()->SetFillsBoundsOpaquely(false);
-    dismiss_pill_->layer()->SetOpacity(0.0f);
+    control_pill_->SetPaintToLayer();
+    control_pill_->layer()->SetFillsBoundsOpaquely(false);
+    control_pill_->layer()->SetOpacity(0.0f);
   }
 
   void OnMouseEntered(const ui::MouseEvent& event) override {
-    if (dismiss_pill_) {
-      dismiss_pill_->layer()->SetOpacity(1.0f);
+    if (control_pill_) {
+      control_pill_->layer()->SetOpacity(1.0f);
     }
     if (ask_pill_) {
       auto* bubble_border =
@@ -448,8 +447,8 @@ class GlicSelectionContentsView : public views::View,
   }
 
   void OnMouseExited(const ui::MouseEvent& event) override {
-    if (dismiss_pill_) {
-      dismiss_pill_->layer()->SetOpacity(0.0f);
+    if (control_pill_) {
+      control_pill_->layer()->SetOpacity(0.0f);
     }
     if (ask_pill_) {
       auto* bubble_border =
@@ -464,6 +463,10 @@ class GlicSelectionContentsView : public views::View,
   void OnThemeChanged() override {
     views::View::OnThemeChanged();
     if (GetWidget() && GetWidget()->widget_delegate()) {
+      // During a theme change, the OS-level native window background is
+      // automatically reset to opaque defaults without updating
+      // BubbleDialogDelegate's internal C++ state variable (which still holds
+      // SK_ColorTRANSPARENT).
       // Force a background color update by temporarily clearing it, then
       // restoring it, which bypasses the color variant equality check.
       auto* bubble_delegate =
@@ -532,8 +535,8 @@ class GlicSelectionContentsView : public views::View,
         static_cast<int>(GlicSelectionWidgetDelegate::MenuCommand::kSettings),
         settings_label);
 
-    int visual_top_of_chip = dismiss_pill_->GetBoundsInScreen().y() +
-                             dismiss_pill_->GetInsets().top();
+    int visual_top_of_chip = control_pill_->GetBoundsInScreen().y() +
+                             control_pill_->GetInsets().top();
     menu_adapter_ = std::make_unique<GlicSelectionMenuModelAdapter>(
         menu_model_.get(), this, visual_top_of_chip,
         menu_btn_->GetBoundsInScreen());
@@ -547,7 +550,7 @@ class GlicSelectionContentsView : public views::View,
     // Offset by the top inset of the shadow in order to align the visual top
     // of the menu with the visual top of the chip.
     anchor_rect.set_y(GetBoundsInScreen().y() +
-                      dismiss_pill_->GetInsets().top());
+                      control_pill_->GetInsets().top());
     anchor_rect.set_height(0);
 
     menu_runner_->RunMenuAt(GetWidget(), nullptr, anchor_rect,
@@ -561,7 +564,7 @@ class GlicSelectionContentsView : public views::View,
   raw_ptr<views::ImageButton> pin_btn_ = nullptr;
   raw_ptr<views::ImageButton> menu_btn_ = nullptr;
   raw_ptr<views::BoxLayoutView> ask_pill_ = nullptr;
-  raw_ptr<views::BoxLayoutView> dismiss_pill_ = nullptr;
+  raw_ptr<views::BoxLayoutView> control_pill_ = nullptr;
 
   std::unique_ptr<GlicSelectionMenuModel> menu_model_;
   // Destruction order matters: `menu_runner_` must be destroyed before

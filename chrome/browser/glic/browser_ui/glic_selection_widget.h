@@ -28,7 +28,6 @@ class GlicSelectionWidgetDelegate : public views::BubbleDialogDelegate {
     virtual void OnCopy() = 0;
     virtual void OnCopyLink() = 0;
     virtual void OnPinToggled(bool is_pinned) = 0;
-    virtual void OnDismiss() = 0;  // TODO(b/520398290): Remove OnDismiss.
     virtual void OnHideForThisSite() = 0;
     virtual void OnSettings() = 0;
 

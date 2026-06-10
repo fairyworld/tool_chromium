@@ -39,7 +39,6 @@ class TestWidgetActionDelegate
     pin_toggled_called = true;
     pin_toggled_val = is_pinned;
   }
-  void OnDismiss() override {}
   void OnHideForThisSite() override { hide_for_this_site_called = true; }
   void OnSettings() override { settings_called = true; }
 
