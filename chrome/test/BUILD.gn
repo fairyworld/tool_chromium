@@ -7379,6 +7379,7 @@ test("unit_tests") {
       "//chrome/browser/android:delta_file_proto",
       "//chrome/browser/android:profile_token",
       "//chrome/browser/android:usage_stats_proto",
+      "//chrome/browser/android/extensions:unit_tests",
       "//chrome/browser/android/httpclient:unittests",
       "//chrome/browser/android/locale",
       "//chrome/browser/android/webapk:webapk_sources",
@@ -7416,6 +7417,7 @@ test("unit_tests") {
       "//chrome/browser/regional_capabilities/android:test_utils_java",
       "//chrome/browser/safe_browsing/android:test_support_java",
       "//chrome/browser/safety_hub/android:unit_tests",
+      "//chrome/browser/search_engines:unit_tests",
       "//chrome/browser/share",
       "//chrome/browser/share:test_support",
       "//chrome/browser/sharing/optimization_guide:unit_tests",
@@ -7502,18 +7504,6 @@ test("unit_tests") {
 
     # TODO(crbug.com/504739401): Remove this dependency.
     deps += [ "//chrome/browser/keyboard_accessory/android:impl" ]
-
-    if (enable_extensions_core) {
-      sources += [
-        "../browser/android/extensions/extensions_url_override_state_tracker_unittest.cc",
-        "../browser/extensions/system_display/display_info_provider_android_unittest.cc",
-        "../browser/search_engines/extension_control_handler_android_unittest.cc",
-      ]
-      deps += [
-        "//chrome/browser/android/extensions:android",
-        "//chrome/browser/search_engines",
-      ]
-    }
 
     if (is_desktop_android) {
       deps += [

@@ -2232,7 +2232,9 @@ source_set("unit_tests") {
     }
   }
 
-  if (enable_desktop_android_extensions) {
+  if (is_android) {
+    sources += [ "system_display/display_info_provider_android_unittest.cc" ]
+
     # developer_private_api_unittest.cc includes extension_util_bridge.h under
     # IS_ANDROID.
     deps += [ "//chrome/browser/ui/android/extensions:public" ]
