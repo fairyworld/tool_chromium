@@ -98,6 +98,7 @@ import org.chromium.components.signin.SigninFeatures;
 import org.chromium.content_public.browser.LoadUrlParams;
 import org.chromium.ui.base.ActivityResultTracker;
 import org.chromium.ui.base.MimeTypeUtils;
+import org.chromium.ui.base.ViewUtils;
 import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.modaldialog.ModalDialogManager;
 import org.chromium.ui.modelutil.PropertyModel;
@@ -978,10 +979,6 @@ public class NewTabPageCoordinator implements ModuleDelegateHost {
 
     // NewTabPageLayout.Delegate implementations.
     public void onMeasure(int width) {
-        if (mIsTablet && mMostVisitedTilesCoordinator != null) {
-            mMostVisitedTilesCoordinator.calculateTabletMvtWidth(width);
-        }
-
         unifyElementWidths(width);
     }
 
@@ -1374,7 +1371,11 @@ public class NewTabPageCoordinator implements ModuleDelegateHost {
         }
     }
 
-    /** Makes the Search Box and Logo as wide as Most Visited. */
+    /**
+     * Unifies the widths of the elements on the New Tab Page. The Search Box, Composeplate, and
+     * Most Visited Tiles are capped at a maximum width, while the Logo always receives the full
+     * width.
+     */
     private void unifyElementWidths(int width) {
         int boundedSearchBoxWidth = Math.min(width - mSearchBoxTwoSideMargin, mSearchBoxMaxWidth);
         if (mNtpSearchBox != null) {
@@ -1387,6 +1388,10 @@ public class NewTabPageCoordinator implements ModuleDelegateHost {
 
         if (mComposeplateCoordinator != null) {
             mComposeplateCoordinator.setLayoutWidth(boundedSearchBoxWidth);
+        }
+
+        if (mMostVisitedTilesCoordinator != null) {
+            mMostVisitedTilesCoordinator.updateMvtWidth(boundedSearchBoxWidth);
         }
 
         mContextMenuStartPosition = null;
@@ -1406,14 +1411,18 @@ public class NewTabPageCoordinator implements ModuleDelegateHost {
         return mSnapshotSingleTabCardChanged;
     }
 
+    public int getSearchBoxTwoSideMarginForTesting() {
+        return mSearchBoxTwoSideMargin;
+    }
+
     private void onDisplayStyleChanged(UiConfig.DisplayStyle newDisplayStyle) {
         if (!mIsTablet) return;
 
         updateDoodleOnTablet();
-        if (mMostVisitedTilesCoordinator != null) {
-            mMostVisitedTilesCoordinator.updateMvtOnTablet();
-        }
         updateSearchBoxTwoSideMargin();
+        // Request a layout pass to trigger onMeasure(), which acts as the single source of
+        // truth to calculate and uniformly apply the bounded widths to all NTP elements.
+        ViewUtils.requestLayout(mNewTabPageLayout, "NewTabPageCoordinator.onDisplayStyleChanged");
     }
 
     /**
