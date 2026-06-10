@@ -590,6 +590,12 @@ CGFloat ButtonHighlightAlpha(UIButton* button) {
                     truncatedTitle:l10n_util::GetNSString(IDS_IOS_APP_BAR_ASK)];
     case AppBarAssistantButtonState::kAIM:
       return l10n_util::GetNSString(IDS_OMNIBOX_AI_MODE_SCOPE_PLACEHOLDER_TEXT);
+    case AppBarAssistantButtonState::kLens:
+      return [self
+          buttonTitleWithFullTitle:l10n_util::GetNSString(
+                                       IDS_IOS_LENS_PRODUCT_NAME)
+                    truncatedTitle:l10n_util::GetNSString(
+                                       IDS_IOS_LENS_PRODUCT_NAME_TRUNCATED)];
     case AppBarAssistantButtonState::kAccount:
       return _signedIn ? l10n_util::GetNSString(IDS_IOS_APP_BAR_ACCOUNT)
                        : l10n_util::GetNSString(IDS_IOS_APP_BAR_SIGN_IN);
@@ -677,6 +683,9 @@ CGFloat ButtonHighlightAlpha(UIButton* button) {
       break;
     case AppBarAssistantButtonState::kAIM:
       image = CustomAppBarSymbol(kMagnifyingglassSparkSymbol);
+      break;
+    case AppBarAssistantButtonState::kLens:
+      image = CustomAppBarSymbol(kCameraLensSymbol);
       break;
     case AppBarAssistantButtonState::kAccount:
       image =
