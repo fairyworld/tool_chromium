@@ -3382,6 +3382,10 @@ void RenderProcessHostImpl::OnImmersiveXrSessionStopped() {
   has_immersive_xr_session_ = false;
 }
 
+bool RenderProcessHostImpl::HasImmersiveXrSessionForTesting() const {
+  return has_immersive_xr_session_;
+}
+
 // static
 void RenderProcessHostImpl::set_render_process_host_factory_for_testing(
     RenderProcessHostFactory* rph_factory) {
