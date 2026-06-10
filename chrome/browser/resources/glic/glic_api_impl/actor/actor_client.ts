@@ -17,12 +17,12 @@ export class ActorWebClientMessageHandler implements
     MessageHandlerInterface<ActorClient> {
   constructor(private host: GlicBrowserHostImpl) {}
 
-  glicWebClientNotifyActorTaskStateChanged(
-      payload: {taskId: number, state: ActorTaskState}): void {
+  notifyActorTaskStateChanged(payload: {taskId: number, state: ActorTaskState}):
+      void {
     this.host.setActorTaskState(payload.taskId, payload.state);
   }
 
-  async glicWebClientRequestToShowDialog(payload: {
+  async requestToShowDialog(payload: {
     request: SelectCredentialDialogRequestPrivate,
   }): Promise<{response: SelectCredentialDialogResponsePrivate}> {
     const request = payload.request;
@@ -75,7 +75,7 @@ export class ActorWebClientMessageHandler implements
     });
   }
 
-  glicWebClientRequestToShowConfirmationDialog(payload: {
+  requestToShowConfirmationDialog(payload: {
     request: UserConfirmationDialogRequestPrivate,
   }): Promise<{response: UserConfirmationDialogResponsePrivate}> {
     return new Promise(resolve => {
@@ -103,7 +103,7 @@ export class ActorWebClientMessageHandler implements
     });
   }
 
-  glicWebClientRequestToConfirmNavigation(payload: {
+  requestToConfirmNavigation(payload: {
     request: NavigationConfirmationRequestPrivate,
   }): Promise<{response: NavigationConfirmationResponsePrivate}> {
     return new Promise(resolve => {
@@ -130,7 +130,7 @@ export class ActorWebClientMessageHandler implements
     });
   }
 
-  async glicWebClientRequestToShowAutofillSuggestionsDialog(payload: {
+  async requestToShowAutofillSuggestionsDialog(payload: {
     request: SelectAutofillSuggestionsDialogRequestPrivate,
   }): Promise<{response: SelectAutofillSuggestionsDialogResponsePrivate}> {
     const request = payload.request;

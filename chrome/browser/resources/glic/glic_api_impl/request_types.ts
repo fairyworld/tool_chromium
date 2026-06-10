@@ -658,7 +658,7 @@ export const WebClientDef = defInterface({
   name: 'WebClient',
   methods: [
     {
-      name: 'glicWebClientNotifyPanelWillOpen',
+      name: 'notifyPanelWillOpen',
       request: defMessage<{
         panelOpeningData: PanelOpeningData,
       }>(),
@@ -668,225 +668,225 @@ export const WebClientDef = defInterface({
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientNotifyPanelWasClosed',
+      name: 'notifyPanelWasClosed',
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientStopMicrophone',
+      name: 'stopMicrophone',
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientPanelStateChanged',
+      name: 'panelStateChanged',
       request: defMessage<{
         panelState: PanelState,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientCanAttachStateChanged',
+      name: 'canAttachStateChanged',
       request: defMessage<{
         canAttach: boolean,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientNotifyGeminiEnterpriseSettingsChanged',
+      name: 'notifyGeminiEnterpriseSettingsChanged',
       request: defMessage<{
         settings: GeminiEnterpriseSettings | undefined,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientNotifyMicrophonePermissionStateChanged',
+      name: 'notifyMicrophonePermissionStateChanged',
       request: defMessage<{
         enabled: boolean,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientNotifyLocationPermissionStateChanged',
+      name: 'notifyLocationPermissionStateChanged',
       request: defMessage<{
         enabled: boolean,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientNotifyTabContextPermissionStateChanged',
+      name: 'notifyTabContextPermissionStateChanged',
       request: defMessage<{
         enabled: boolean,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientNotifyDefaultTabContextPermissionStateChanged',
+      name: 'notifyDefaultTabContextPermissionStateChanged',
       request: defMessage<{
         enabled: boolean,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientNotifyOsLocationPermissionStateChanged',
+      name: 'notifyOsLocationPermissionStateChanged',
       request: defMessage<{
         enabled: boolean,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientNotifyClosedCaptioningSettingChanged',
+      name: 'notifyClosedCaptioningSettingChanged',
       request: defMessage<{
         enabled: boolean,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientNotifyActuationOnWebSettingChanged',
+      name: 'notifyActuationOnWebSettingChanged',
       request: defMessage<{
         enabled: boolean,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientNotifyFocusedTabChanged',
+      name: 'notifyFocusedTabChanged',
       request: defMessage<{
         focusedTabDataPrivate: FocusedTabDataPrivate,
       }>(),
     },
     {
-      name: 'glicWebClientNotifyPanelActiveChanged',
+      name: 'notifyPanelActiveChanged',
       request: defMessage<{
         panelActive: boolean,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientCheckResponsive',
+      name: 'checkResponsive',
       response: defMessage<{
         clientSendMessageQueueLength: number,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientNotifyManualResizeChanged',
+      name: 'notifyManualResizeChanged',
       request: defMessage<{
         resizing: boolean,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientBrowserIsOpenChanged',
+      name: 'browserIsOpenChanged',
       request: defMessage<{
         browserIsOpen: boolean,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientNotifyOsHotkeyStateChanged',
+      name: 'notifyOsHotkeyStateChanged',
       request: defMessage<{
         hotkey: string,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientNotifyPinnedTabsChanged',
+      name: 'notifyPinnedTabsChanged',
       request: defMessage<{
         tabData: TabDataPrivate[],
       }>(),
     },
     {
-      name: 'glicWebClientNotifyPinnedTabDataChanged',
+      name: 'notifyPinnedTabDataChanged',
       request: defMessage<{
         tabData: TabDataPrivate,
       }>(),
     },
     {
-      name: 'glicWebClientNotifySkillPreviewsChanged',
+      name: 'notifySkillPreviewsChanged',
       request: defMessage<{
         skillPreviews: SkillPreview[],
       }>(),
     },
     {
-      name: 'glicWebClientNotifySkillPreviewChanged',
+      name: 'notifySkillPreviewChanged',
       request: defMessage<{
         skillPreview: SkillPreview,
       }>(),
     },
     {
-      name: 'glicWebClientNotifyContextualSkillPreviewsChanged',
+      name: 'notifyContextualSkillPreviewsChanged',
       request: defMessage<{
         contextualSkillPreviews: SkillPreview[],
       }>(),
     },
     {
-      name: 'glicWebClientNotifySkillDeleted',
+      name: 'notifySkillDeleted',
       request: defMessage<{
         skillId: string,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientPinCandidatesChanged',
+      name: 'pinCandidatesChanged',
       request: defMessage<{
         candidates: PinCandidatePrivate[],
         observationId: number,
       }>(),
     },
     {
-      name: 'glicWebClientZeroStateSuggestionsChanged',
+      name: 'zeroStateSuggestionsChanged',
       request: defMessage<{
         suggestions: ZeroStateSuggestionsV2,
         options: ZeroStateSuggestionsOptions,
       }>(),
     },
     {
-      name: 'glicWebClientPageMetadataChanged',
+      name: 'pageMetadataChanged',
       request: defMessage<{
         tabId: string,
         pageMetadata: PageMetadata | null,
       }>(),
     },
     {
-      name: 'glicWebClientNotifyAdditionalContext',
+      name: 'notifyAdditionalContext',
       request: defMessage<{
         context: AdditionalContextPrivate,
       }>(),
     },
     {
-      name: 'glicWebClientCaptureRegionUpdate',
+      name: 'captureRegionUpdate',
       request: defMessage<{
         result?: CaptureRegionResult,
         reason?: CaptureRegionErrorReason, observationId: number,
       }>(),
     },
     {
-      name: 'glicWebClientNotifyActOnWebCapabilityChanged',
+      name: 'notifyActOnWebCapabilityChanged',
       request: defMessage<{
         canActOnWeb: boolean,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientOnboardingCompletedChanged',
+      name: 'onboardingCompletedChanged',
       request: defMessage<{
         completed: boolean,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientNotifyActorTaskListRowClicked',
+      name: 'notifyActorTaskListRowClicked',
       request: defMessage<{
         taskId: number,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientTabDataChanged',
+      name: 'tabDataChanged',
       request: defMessage<{
         tabData?: TabDataPrivate, observationId: number,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientTabFaviconChanged',
+      name: 'tabFaviconChanged',
       request: defMessage<{
         observationId: number,
         tabRemoved?: boolean,
@@ -895,14 +895,14 @@ export const WebClientDef = defInterface({
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientInvoke',
+      name: 'invoke',
       request: defMessage<{
         options: InvokeOptionsPrivate,
       }>(),
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientGetExperimentalTriggeringUpdates',
+      name: 'getExperimentalTriggeringUpdates',
       request: defMessage<{
         observationId: number,
       }>(),
@@ -912,7 +912,7 @@ export const WebClientDef = defInterface({
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientNotifyZoomLevelChanged',
+      name: 'notifyZoomLevelChanged',
       request: defMessage<{
         zoomFactor: number,
       }>(),

@@ -337,8 +337,7 @@ export class GlicApiHost implements PostMessageLifecycleObserver {
     this.isSubscribedToZoomLevel = true;
     try {
       const zoomFactor = await this.embedder.getZoom();
-      this.sender.sendLatestWhenActive(
-          'glicWebClientNotifyZoomLevelChanged', {zoomFactor});
+      this.sender.sendLatestWhenActive('notifyZoomLevelChanged', {zoomFactor});
     } catch (e) {
       console.warn('Failed to get initial zoom level', e);
     }
@@ -350,8 +349,7 @@ export class GlicApiHost implements PostMessageLifecycleObserver {
 
   onZoomLevelChanged(zoomFactor: number) {
     if (this.isSubscribedToZoomLevel) {
-      this.sender.sendLatestWhenActive(
-          'glicWebClientNotifyZoomLevelChanged', {zoomFactor});
+      this.sender.sendLatestWhenActive('notifyZoomLevelChanged', {zoomFactor});
     }
   }
 
@@ -458,8 +456,7 @@ export class GlicApiHost implements PostMessageLifecycleObserver {
 
       let gotResponse = false;
       const responsePromise =
-          this.sender
-              .requestWithResponse('glicWebClientCheckResponsive', undefined)
+          this.sender.requestWithResponse('checkResponsive', undefined)
               .then((response: {clientSendMessageQueueLength: number}) => {
                 gotResponse = true;
                 if (response.clientSendMessageQueueLength >= SMALL_QUEUE_SIZE) {
@@ -572,7 +569,7 @@ export class GlicApiHost implements PostMessageLifecycleObserver {
           BACKGROUND_RESPONSES[type as keyof typeof BACKGROUND_RESPONSES] as
           HostBackgroundResponse<unknown>;
       if (Object.hasOwn(backgroundResponse, 'throws')) {
-        const friendlyName = type.replaceAll(/^glicWebClient/g, '');
+        const friendlyName = type;
         throw new Error(`${friendlyName} not allowed while backgrounded`);
       }
       if (this.loggingEnabled) {

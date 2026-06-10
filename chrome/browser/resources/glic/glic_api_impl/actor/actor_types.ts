@@ -273,7 +273,7 @@ export const ActorClientDef = defInterface({
   name: 'ActorClient',
   methods: [
     {
-      name: 'glicWebClientNotifyActorTaskStateChanged',
+      name: 'notifyActorTaskStateChanged',
       request: defMessage<{
         taskId: number,
         state: ActorTaskState,
@@ -281,7 +281,7 @@ export const ActorClientDef = defInterface({
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientRequestToShowDialog',
+      name: 'requestToShowDialog',
       request: defMessage<{
         request: SelectCredentialDialogRequestPrivate,
       }>(),
@@ -291,7 +291,7 @@ export const ActorClientDef = defInterface({
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientRequestToShowConfirmationDialog',
+      name: 'requestToShowConfirmationDialog',
       request: defMessage<{
         request: UserConfirmationDialogRequestPrivate,
       }>(),
@@ -301,7 +301,7 @@ export const ActorClientDef = defInterface({
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientRequestToConfirmNavigation',
+      name: 'requestToConfirmNavigation',
       request: defMessage<{
         request: NavigationConfirmationRequestPrivate,
       }>(),
@@ -311,7 +311,7 @@ export const ActorClientDef = defInterface({
       backgroundAllowed: true,
     },
     {
-      name: 'glicWebClientRequestToShowAutofillSuggestionsDialog',
+      name: 'requestToShowAutofillSuggestionsDialog',
       request: defMessage<{
         request: SelectAutofillSuggestionsDialogRequestPrivate,
       }>(),

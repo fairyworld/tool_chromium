@@ -810,7 +810,7 @@ export class CaptureRegionObserverImpl implements CaptureRegionObserver {
     if (!this.receiver) {
       return;
     }
-    this.sender.sendWhenActive('glicWebClientCaptureRegionUpdate', {
+    this.sender.sendWhenActive('captureRegionUpdate', {
       reason: enumToClient(CaptureRegionErrorReasonMojo.kUnknown),
       observationId: this.observationId,
     });
@@ -854,14 +854,14 @@ export class CaptureRegionObserverImpl implements CaptureRegionObserver {
       // Use `sendWhenActive` to queue up all captured regions if the panel is
       // inactive. This is important because the panel is inactive during region
       // selection, and we don't want to lose any of the user's selections.
-      this.sender.sendWhenActive('glicWebClientCaptureRegionUpdate', {
+      this.sender.sendWhenActive('captureRegionUpdate', {
         result: captureResult,
         observationId: this.observationId,
       });
     } else {
       // Use `sendWhenActive` to ensure the error is delivered, even if the
       // panel is currently inactive.
-      this.sender.sendWhenActive('glicWebClientCaptureRegionUpdate', {
+      this.sender.sendWhenActive('captureRegionUpdate', {
         reason: enumToClient(reason ?? CaptureRegionErrorReasonMojo.kUnknown),
         observationId: this.observationId,
       });
@@ -912,14 +912,14 @@ class TabDataHandlerImpl implements TabDataHandlerInterface {
     this.receiver.$.close();
     this.receiver = undefined;
     this.sender.requestNoResponse(
-        'glicWebClientTabDataChanged',
+        'tabDataChanged',
         // Omitting tab data signals completion.
         {observationId: this.observationId});
   }
   onTabDataChanged(tabData: TabDataMojoType): void {
     const extras = new ResponseExtras();
     this.sender.requestNoResponse(
-        'glicWebClientTabDataChanged', {
+        'tabDataChanged', {
           tabData: tabDataToClient(tabData, extras),
           observationId: this.observationId,
         },
@@ -969,7 +969,7 @@ class TabFaviconHandlerImpl implements TabFaviconHandlerInterface {
     this.receiver.$.close();
     this.receiver = undefined;
     this.sender.requestNoResponse(
-        'glicWebClientTabFaviconChanged',
+        'tabFaviconChanged',
         {observationId: this.observationId, tabRemoved: true});
   }
   onTabFaviconChanged(favicon: BitmapN32|null): void {
@@ -982,7 +982,7 @@ class TabFaviconHandlerImpl implements TabFaviconHandlerInterface {
       }
     }
     this.sender.requestNoResponse(
-        'glicWebClientTabFaviconChanged', {
+        'tabFaviconChanged', {
           favicon: faviconImage,
           observationId: this.observationId,
         },
@@ -1023,7 +1023,7 @@ export class PinCandidatesObserverImpl implements PinCandidatesObserver {
   onPinCandidatesChanged(candidates: PinCandidateMojo[]): void {
     const extras = new ResponseExtras();
     this.sender.sendLatestWhenActive(
-        'glicWebClientPinCandidatesChanged', {
+        'pinCandidatesChanged', {
           candidates:
               candidates.map(c => ({
                                tabData: tabDataToClient(c.tabData, extras),

@@ -183,8 +183,7 @@ class MessageLogger {
   }
 
   shouldLogMessage(requestType: string): boolean {
-    return this.loggingEnabled &&
-        requestType !== 'glicWebClientCheckResponsive';
+    return this.loggingEnabled && requestType !== 'checkResponsive';
   }
 
   maybeLogMessage(requestType: string, message: string, payload: unknown) {

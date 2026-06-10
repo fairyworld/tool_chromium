@@ -59,7 +59,7 @@ class WebClientMessageHandler implements MessageHandlerInterface<WebClient> {
   constructor(
       private webClient: GlicWebClient, private host: GlicBrowserHostImpl) {}
 
-  async glicWebClientNotifyPanelWillOpen(payload: {
+  async notifyPanelWillOpen(payload: {
     panelOpeningData: PanelOpeningData,
   }): Promise<{openPanelInfo?: OpenPanelInfo}> {
     let openPanelInfo: OpenPanelInfo|undefined;
@@ -79,7 +79,7 @@ class WebClientMessageHandler implements MessageHandlerInterface<WebClient> {
     return {openPanelInfo};
   }
 
-  async glicWebClientNotifyPanelWasClosed(): Promise<void> {
+  async notifyPanelWasClosed(): Promise<void> {
     try {
       this.host.notifyPanelWillOpenCompleted = Promise.withResolvers<void>();
       await this.webClient.notifyPanelWasClosed?.();
@@ -88,69 +88,68 @@ class WebClientMessageHandler implements MessageHandlerInterface<WebClient> {
     }
   }
 
-  glicWebClientPanelStateChanged(payload: {panelState: PanelState}): void {
+  panelStateChanged(payload: {panelState: PanelState}): void {
     this.host.getPanelState?.().assignAndSignal(payload.panelState);
   }
 
-  glicWebClientZeroStateSuggestionsChanged(payload: {
+  zeroStateSuggestionsChanged(payload: {
     suggestions: ZeroStateSuggestionsV2,
     options: ZeroStateSuggestionsOptions,
   }): void {
     this.host.currentZeroStateObserver?.assignAndSignal(payload.suggestions);
   }
 
-  glicWebClientCanAttachStateChanged(payload: {canAttach: boolean}): void {
+  canAttachStateChanged(payload: {canAttach: boolean}): void {
     this.host.canAttachPanelValue.assignAndSignal(payload.canAttach);
   }
 
-  glicWebClientNotifyGeminiEnterpriseSettingsChanged(payload: {
+  notifyGeminiEnterpriseSettingsChanged(payload: {
     settings: GeminiEnterpriseSettings|undefined,
   }) {
     this.host.getGeminiEnterpriseSettings?.().assignAndSignal(payload.settings);
   }
 
-  glicWebClientNotifyMicrophonePermissionStateChanged(payload: {
+  notifyMicrophonePermissionStateChanged(payload: {
     enabled: boolean,
   }) {
     this.host.getMicrophonePermissionState().assignAndSignal(payload.enabled);
   }
 
-  async glicWebClientStopMicrophone(): Promise<void> {
+  async stopMicrophone(): Promise<void> {
     await this.webClient.stopMicrophone?.();
   }
 
-  glicWebClientNotifyLocationPermissionStateChanged(payload: {
+  notifyLocationPermissionStateChanged(payload: {
     enabled: boolean,
   }) {
     this.host.getLocationPermissionState().assignAndSignal(payload.enabled);
   }
 
-  glicWebClientNotifyTabContextPermissionStateChanged(payload: {
+  notifyTabContextPermissionStateChanged(payload: {
     enabled: boolean,
   }) {
     this.host.getTabContextPermissionState().assignAndSignal(payload.enabled);
   }
 
-  glicWebClientNotifyDefaultTabContextPermissionStateChanged(payload: {
+  notifyDefaultTabContextPermissionStateChanged(payload: {
     enabled: boolean,
   }) {
     this.host.defaultTabContextPermission.assignAndSignal(payload.enabled);
   }
 
-  glicWebClientNotifyOsLocationPermissionStateChanged(payload: {
+  notifyOsLocationPermissionStateChanged(payload: {
     enabled: boolean,
   }) {
     this.host.getOsLocationPermissionState().assignAndSignal(payload.enabled);
   }
 
-  glicWebClientNotifyClosedCaptioningSettingChanged(payload: {
+  notifyClosedCaptioningSettingChanged(payload: {
     enabled: boolean,
   }) {
     this.host.closedCaptioningState.assignAndSignal(payload.enabled);
   }
 
-  async glicWebClientInvoke(payload: {options: InvokeOptionsPrivate}):
-      Promise<void> {
+  async invoke(payload: {options: InvokeOptionsPrivate}): Promise<void> {
     try {
       const options = convertInvokeOptionsFromPrivate(payload.options);
       // Wait until notifyPanelWillOpen has resolved before invoking.
@@ -161,7 +160,7 @@ class WebClientMessageHandler implements MessageHandlerInterface<WebClient> {
     }
   }
 
-  async glicWebClientGetExperimentalTriggeringUpdates(
+  async getExperimentalTriggeringUpdates(
       payload: {observationId: number},
       _extras: ResponseExtras): Promise<{success: boolean}> {
     const getUpdates = this.webClient.getExperimentalTriggeringUpdates;
@@ -205,13 +204,13 @@ class WebClientMessageHandler implements MessageHandlerInterface<WebClient> {
     return {success: true};
   }
 
-  glicWebClientNotifyActuationOnWebSettingChanged(payload: {
+  notifyActuationOnWebSettingChanged(payload: {
     enabled: boolean,
   }) {
     this.host.actuationOnWebState.assignAndSignal(payload.enabled);
   }
 
-  glicWebClientNotifyFocusedTabChanged(payload: {
+  notifyFocusedTabChanged(payload: {
     focusedTabDataPrivate: FocusedTabDataPrivate,
   }) {
     const focusedTabData =
@@ -219,16 +218,15 @@ class WebClientMessageHandler implements MessageHandlerInterface<WebClient> {
     this.host.getFocusedTabStateV2().assignAndSignal(focusedTabData);
   }
 
-  glicWebClientNotifyZoomLevelChanged(payload: {zoomFactor: number}) {
+  notifyZoomLevelChanged(payload: {zoomFactor: number}) {
     this.host.getZoomLevel().assignAndSignal(payload.zoomFactor);
   }
 
-  glicWebClientNotifyPanelActiveChanged(payload: {panelActive: boolean}): void {
+  notifyPanelActiveChanged(payload: {panelActive: boolean}): void {
     this.host.panelActiveValue.assignAndSignal(payload.panelActive);
   }
 
-  async glicWebClientCheckResponsive():
-      Promise<{clientSendMessageQueueLength: number}> {
+  async checkResponsive(): Promise<{clientSendMessageQueueLength: number}> {
     await this.webClient.checkResponsive?.();
     return {
       clientSendMessageQueueLength:
@@ -237,19 +235,19 @@ class WebClientMessageHandler implements MessageHandlerInterface<WebClient> {
     };
   }
 
-  glicWebClientNotifyManualResizeChanged(payload: {resizing: boolean}) {
+  notifyManualResizeChanged(payload: {resizing: boolean}) {
     this.host.isManuallyResizing().assignAndSignal(payload.resizing);
   }
 
-  glicWebClientBrowserIsOpenChanged(payload: {browserIsOpen: boolean}) {
+  browserIsOpenChanged(payload: {browserIsOpen: boolean}) {
     this.host.isBrowserOpenValue.assignAndSignal(payload.browserIsOpen);
   }
 
-  glicWebClientNotifyOsHotkeyStateChanged(payload: {hotkey: string}) {
+  notifyOsHotkeyStateChanged(payload: {hotkey: string}) {
     this.host.getOsHotkeyState().assignAndSignal(payload);
   }
 
-  glicWebClientPinCandidatesChanged(payload: {
+  pinCandidatesChanged(payload: {
     candidates: PinCandidatePrivate[],
     observationId: number,
   }): void {
@@ -257,15 +255,13 @@ class WebClientMessageHandler implements MessageHandlerInterface<WebClient> {
         payload.candidates, payload.observationId);
   }
 
-  glicWebClientNotifyPinnedTabsChanged(payload: {tabData: TabDataPrivate[]}):
-      void {
+  notifyPinnedTabsChanged(payload: {tabData: TabDataPrivate[]}): void {
     this.cachedPinnedTabs =
         payload.tabData.map((x) => convertTabDataFromPrivate(x));
     this.host.pinnedTabs?.assignAndSignal(this.cachedPinnedTabs);
   }
 
-  glicWebClientNotifyPinnedTabDataChanged(payload: {tabData: TabDataPrivate}):
-      void {
+  notifyPinnedTabDataChanged(payload: {tabData: TabDataPrivate}): void {
     if (!this.cachedPinnedTabs) {
       return;
     }
@@ -279,7 +275,7 @@ class WebClientMessageHandler implements MessageHandlerInterface<WebClient> {
     this.host.pinnedTabs.assignAndSignal(this.cachedPinnedTabs);
   }
 
-  glicWebClientNotifySkillPreviewsChanged(payload: {
+  notifySkillPreviewsChanged(payload: {
     skillPreviews: SkillPreview[],
   }): void {
     this.cachedSkillPrompts.clear();
@@ -287,15 +283,14 @@ class WebClientMessageHandler implements MessageHandlerInterface<WebClient> {
     this.host.skillPreviews.assignAndSignal(this.combineSkillPreviews());
   }
 
-  glicWebClientNotifyContextualSkillPreviewsChanged(payload: {
+  notifyContextualSkillPreviewsChanged(payload: {
     contextualSkillPreviews: SkillPreview[],
   }): void {
     this.cachedContextualSkillPreviews = payload.contextualSkillPreviews;
     this.host.skillPreviews.assignAndSignal(this.combineSkillPreviews());
   }
 
-  glicWebClientNotifySkillPreviewChanged(payload: {skillPreview: SkillPreview}):
-      void {
+  notifySkillPreviewChanged(payload: {skillPreview: SkillPreview}): void {
     const skillPreview = payload.skillPreview;
     this.cachedSkillPrompts.delete(skillPreview.id);
 
@@ -318,7 +313,7 @@ class WebClientMessageHandler implements MessageHandlerInterface<WebClient> {
     this.host.skillPreviews.assignAndSignal(this.combineSkillPreviews());
   }
 
-  glicWebClientNotifySkillDeleted(payload: {
+  notifySkillDeleted(payload: {
     skillId: string,
   }): void {
     const skillId = payload.skillId;
@@ -335,7 +330,7 @@ class WebClientMessageHandler implements MessageHandlerInterface<WebClient> {
     this.host.skillPreviews.assignAndSignal(this.combineSkillPreviews());
   }
 
-  glicWebClientPageMetadataChanged(
+  pageMetadataChanged(
       payload: {tabId: string, pageMetadata: PageMetadata|null}): void {
     const observable = this.host.pageMetadataObservers.get(payload.tabId);
     if (!observable) {
@@ -352,14 +347,14 @@ class WebClientMessageHandler implements MessageHandlerInterface<WebClient> {
     }
   }
 
-  glicWebClientNotifyAdditionalContext(payload: {
+  notifyAdditionalContext(payload: {
     context: AdditionalContextPrivate,
   }): void {
     const context = convertAdditionalContextFromPrivate(payload.context);
     this.host.additionalContextSubject.next(context);
   }
 
-  glicWebClientCaptureRegionUpdate(payload: {
+  captureRegionUpdate(payload: {
     result?: CaptureRegionResult,
     reason?: CaptureRegionErrorReason, observationId: number,
   }): void {
@@ -375,21 +370,21 @@ class WebClientMessageHandler implements MessageHandlerInterface<WebClient> {
     }
   }
 
-  glicWebClientNotifyActOnWebCapabilityChanged(payload: {
+  notifyActOnWebCapabilityChanged(payload: {
     canActOnWeb: boolean,
   }): void {
     this.host.actOnWebCapabilityValue.assignAndSignal(payload.canActOnWeb);
   }
 
-  glicWebClientOnboardingCompletedChanged(payload: {completed: boolean}): void {
+  onboardingCompletedChanged(payload: {completed: boolean}): void {
     this.host.onboardingCompleted.assignAndSignal(payload.completed);
   }
 
-  glicWebClientNotifyActorTaskListRowClicked(payload: {taskId: number}): void {
+  notifyActorTaskListRowClicked(payload: {taskId: number}): void {
     this.host.actorTaskListRowClickedSubject.next(payload.taskId);
   }
 
-  glicWebClientTabDataChanged(payload: {
+  tabDataChanged(payload: {
     tabData?: TabDataPrivate, observationId: number,
   }): void {
     if (payload.tabData === undefined) {
@@ -401,7 +396,7 @@ class WebClientMessageHandler implements MessageHandlerInterface<WebClient> {
     }
   }
 
-  glicWebClientTabFaviconChanged(payload: {
+  tabFaviconChanged(payload: {
     favicon?: RgbaImage, observationId: number,
     tabRemoved?: boolean,
   }): void {
