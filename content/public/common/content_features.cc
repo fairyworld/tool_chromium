@@ -649,7 +649,7 @@ const char kIsolateOriginsFieldTrialParamName[] = "OriginsList";
 
 #if BUILDFLAG(IS_ANDROID)
 // Enables the ability to specification a renderer that does not use Java.
-BASE_FEATURE(kJavalessRendererExperimentOn, base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kJavalessRendererExperimentOn, base::FEATURE_ENABLED_BY_DEFAULT);
 #endif
 
 // Kill-switch for the tracking of keep-alive requests blocked by client.

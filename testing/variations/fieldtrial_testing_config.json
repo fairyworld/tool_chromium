@@ -15060,9 +15060,6 @@
             "experiments": [
                 {
                     "name": "Enabled",
-                    "params": {
-                        "JavalessRendererEnable": "true"
-                    },
                     "enable_features": [
                         "JavalessRendererExperimentOn"
                     ]
