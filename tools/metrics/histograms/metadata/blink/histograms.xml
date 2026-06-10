@@ -2721,9 +2721,9 @@ chromium-metrics-reviews@google.com.
   <summary>
     Recorded once per FedCM well-known discovery attempt when the
     FedCmWebIdentitySubdomain feature is enabled. True if the
-    https://web-identity.&lt;eTLD+1&gt;/.well-known/web-identity fetch returned
-    a usable response (success ParseStatus and provider_urls.size() &lt;= 1).
-    False if it fell back to the apex
+    https://web-identity.well-known.&lt;eTLD+1&gt;/.well-known/web-identity
+    fetch returned a usable response (success ParseStatus and
+    provider_urls.size() &lt;= 1). False if it fell back to the apex
     https://&lt;eTLD+1&gt;/.well-known/web-identity URL due to fetch failure
     (network error, malformed JSON, or non-dictionary response) or more than one
     provider_url.

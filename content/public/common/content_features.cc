@@ -450,9 +450,9 @@ BASE_FEATURE(kFedCmWellKnownEndpointValidation,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Enables subdomain-first discovery for the FedCM well-known file. Fetches
-// https://web-identity.<eTLD+1>/.well-known/web-identity first and falls back
-// to the apex URL on failure (network error, malformed JSON, or provider_urls
-// length > 1).
+// https://web-identity.well-known.<eTLD+1>/.well-known/web-identity first and
+// falls back to the apex URL on failure (network error, malformed JSON, or
+// provider_urls length > 1).
 BASE_FEATURE(kFedCmWebIdentitySubdomain, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Enables bypassing the well-known file enforcement.
