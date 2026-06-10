@@ -88,11 +88,6 @@
 #include "chrome/browser/flags/android/chrome_feature_list.h"
 #endif
 
-// These are newly failing in test setup on desktop android.
-#if BUILDFLAG(IS_DESKTOP_ANDROID)
-#define DISABLE_ALL_TESTS
-#endif
-
 #if defined(ADDRESS_SANITIZER) || defined(THREAD_SANITIZER) || \
     defined(MEMORY_SANITIZER)
 #define SLOW_BINARY
