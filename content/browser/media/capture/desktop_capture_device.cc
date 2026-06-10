@@ -1099,6 +1099,8 @@ void DesktopCaptureDevice::Core::OnCaptureResultLegacy(
 bool DesktopCaptureDevice::Core::DeliverTextureToClient(
     const webrtc::DesktopFrame* frame) {
   DCHECK(frame->texture());
+  TRACE_EVENT0(TRACE_DISABLED_BY_DEFAULT("video_and_image_capture"),
+               "DesktopCaptureDevice::DeliverTextureToClient");
 
   // Check if the active GPU adapter LUID has changed (e.g. after GPU process
   // crash). The WGC capturer's D3D11 device (and thus all its textures) is
