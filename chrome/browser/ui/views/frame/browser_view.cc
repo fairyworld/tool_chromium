@@ -2500,15 +2500,16 @@ bool BrowserView::IsWindowControlsOverlayEnabled() const {
 }
 
 void BrowserView::UpdateWindowControlsOverlayEnabled() {
-  UpdateWindowControlsOverlayToggleVisible();
+  UpdateWindowControlsOverlayAvailable();
 
-  // If the toggle is not visible, we can assume that Window Controls Overlay
-  // is not enabled.
-  // TODO(crbug.com/515812858): Rename
-  // `should_show_window_controls_overlay_toggle_`.
+  // Window Controls Overlay (WCO) is enabled when it is available in the window
+  // and declared in the app manifest. Additionally, if the
+  // `kDesktopPWAsWindowControlsOverlayWithNoToggle` feature flag is disabled,
+  // the user must also enable WCO via the toggle; otherwise, no further user
+  // action is required. See `UpdateWindowControlsOverlayAvailable()` for the
+  // conditions under which WCO is available.
   auto* const app_controller = web_app::AppBrowserController::From(browser());
-  bool enabled = should_show_window_controls_overlay_toggle_ &&
-                 app_controller &&
+  bool enabled = is_window_controls_overlay_available_ && app_controller &&
                  app_controller->IsWindowControlsOverlayEnabled();
 
   if (enabled == window_controls_overlay_enabled_) {
@@ -2558,17 +2559,17 @@ void BrowserView::UpdateWindowControlsOverlayEnabled() {
 #endif
 }
 
-void BrowserView::UpdateWindowControlsOverlayToggleVisible() {
-  bool should_show = AppUsesWindowControlsOverlay();
+void BrowserView::UpdateWindowControlsOverlayAvailable() {
+  bool available = AppUsesWindowControlsOverlay();
 
   if ((toolbar_ && toolbar_->custom_tab_bar() &&
        toolbar_->custom_tab_bar()->GetVisible()) ||
       (infobar_container_ && infobar_container_->GetVisible())) {
-    should_show = false;
+    available = false;
   }
 
   if (ImmersiveModeController::From(browser())->IsEnabled()) {
-    should_show = false;
+    available = false;
   }
 
 #if BUILDFLAG(IS_MAC)
@@ -2578,19 +2579,19 @@ void BrowserView::UpdateWindowControlsOverlayToggleVisible() {
   // Disable WCO when in fullscreen, because this space is inaccessible to
   // WebContents. https://crbug.com/41431787.
   if (browser_widget_ && IsFullscreen()) {
-    should_show = false;
+    available = false;
   }
 #endif
 
-  if (should_show == should_show_window_controls_overlay_toggle_) {
+  if (available == is_window_controls_overlay_available_) {
     return;
   }
 
   DCHECK(AppUsesWindowControlsOverlay());
-  should_show_window_controls_overlay_toggle_ = should_show;
+  is_window_controls_overlay_available_ = available;
 
   if (web_app_frame_toolbar()) {
-    web_app_frame_toolbar()->SetWindowControlsOverlayToggleVisible(should_show);
+    web_app_frame_toolbar()->SetWindowControlsOverlayToggleVisible(available);
   }
 }
 
