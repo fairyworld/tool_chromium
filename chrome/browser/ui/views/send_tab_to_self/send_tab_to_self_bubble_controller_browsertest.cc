@@ -576,6 +576,31 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfScrollPositionBrowserTest,
                      testing::HasSubstr("dog")));
 }
 
+IN_PROC_BROWSER_TEST_F(SendTabToSelfBubbleControllerBrowserTest,
+                       HideBubbleOnNavigation) {
+  content::WebContents* web_contents =
+      browser()->tab_strip_model()->GetActiveWebContents();
+  ASSERT_TRUE(content::NavigateToURL(web_contents, GURL("about:blank")));
+
+  identity_test_env()->MakePrimaryAccountAvailable(
+      "user@gmail.com", signin::ConsentLevel::kSignin);
+
+  StubSendTabToSelfSyncService* sync_service = GetStubSyncService();
+  ASSERT_TRUE(sync_service);
+  sync_service->SetEntryPointDisplayReason(
+      EntryPointDisplayReason::kOfferFeature);
+
+  SendTabToSelfBubbleController* controller =
+      SendTabToSelfBubbleController::GetOrCreateForWebContents(web_contents);
+
+  controller->ShowBubble();
+  EXPECT_TRUE(controller->IsBubbleShown());
+
+  // Navigate to a new URL. This should hide the bubble.
+  ASSERT_TRUE(content::NavigateToURL(web_contents, GURL("chrome://flags")));
+  EXPECT_FALSE(controller->IsBubbleShown());
+}
+
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 IN_PROC_BROWSER_TEST_F(SendTabToSelfBubbleControllerBrowserTest,
                        ShowPromoBubble) {
