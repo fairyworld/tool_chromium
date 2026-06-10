@@ -1321,6 +1321,12 @@ static_library("ui") {
       "webui/ntp/ntp_resource_cache.h",
       "webui/ntp/ntp_resource_cache_factory.cc",
       "webui/ntp/ntp_resource_cache_factory.h",
+      "webui/ntp_microsoft_auth/ntp_microsoft_auth_page_handler.cc",
+      "webui/ntp_microsoft_auth/ntp_microsoft_auth_page_handler.h",
+      "webui/ntp_microsoft_auth/ntp_microsoft_auth_response_capture_navigation_throttle.cc",
+      "webui/ntp_microsoft_auth/ntp_microsoft_auth_response_capture_navigation_throttle.h",
+      "webui/ntp_microsoft_auth/ntp_microsoft_auth_untrusted_ui.cc",
+      "webui/ntp_microsoft_auth/ntp_microsoft_auth_untrusted_ui.h",
       "webui/omnibox_popup/omnibox_popup_aim_handler.cc",
       "webui/omnibox_popup/omnibox_popup_aim_handler.h",
       "webui/omnibox_popup/omnibox_popup_handler.cc",
@@ -2110,20 +2116,13 @@ static_library("ui") {
       "//chrome/browser/ui/webui/new_tab_page/action_chips:mojo_bindings",
       "//chrome/browser/ui/webui/new_tab_page/composebox/variations",
       "//chrome/browser/ui/webui/new_tab_page/foo:mojo_bindings",
-      "//chrome/browser/ui/webui/ntp_microsoft_auth",
       "//chrome/browser/ui/webui/ntp_microsoft_auth:untrusted",
       "//chrome/browser/ui/webui/searchbox",
       "//ui/webui/resources/cr_components/composebox:mojo_bindings",
       "//ui/webui/resources/cr_components/help_bubble:mojo_bindings",
       "//ui/webui/tracked_element",
     ]
-    allow_circular_includes_from += [
-      "//chrome/browser/ui/search:impl",
-
-      # ntp_microsoft_auth includes headers from //chrome/browser/ui (e.g.
-      # new_tab_page_ui.h) that can't be split out yet.
-      "//chrome/browser/ui/webui/ntp_microsoft_auth",
-    ]
+    allow_circular_includes_from += [ "//chrome/browser/ui/search:impl" ]
   }
   if (enable_devtools_frontend) {
     deps += [ "//chrome/browser/ui/webui/devtools" ]
