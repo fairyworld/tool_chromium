@@ -2411,7 +2411,7 @@ test("content_browsertests") {
     deps += [ "//third_party/ocmock" ]
     data_deps += [ "//content/shell:content_shell" ]
     data += [ "$root_out_dir/Content Shell.app/" ]
-    weak_frameworks = [ "ScreenCaptureKit.framework" ]  # macOS 12.3
+    frameworks = [ "ScreenCaptureKit.framework" ]
   }
 
   if (is_ios) {
@@ -3673,8 +3673,8 @@ test("content_unittests") {
       "CoreMedia.framework",
       "CoreVideo.framework",
       "IOSurface.framework",
+      "ScreenCaptureKit.framework",
     ]
-    weak_frameworks = [ "ScreenCaptureKit.framework" ]  # macOS 12.3
   }
   if (is_chromeos) {
     sources += [ "../browser/handwriting/handwriting_recognition_service_impl_cros_unittest.cc" ]

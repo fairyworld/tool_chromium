@@ -3137,8 +3137,10 @@ source_set("browser") {
         "//sandbox/mac:seatbelt",
         "//sandbox/mac:seatbelt_extension",
       ]
-      frameworks += [ "CoreMedia.framework" ]
-      weak_frameworks = [ "ScreenCaptureKit.framework" ]  # macOS 12.3
+      frameworks += [
+        "CoreMedia.framework",
+        "ScreenCaptureKit.framework",
+      ]
     }
     if (is_chromeos) {
       sources += [
