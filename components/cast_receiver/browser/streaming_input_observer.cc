@@ -7,10 +7,13 @@
 #include <algorithm>
 
 #include "base/check.h"
+#include "components/cast_receiver/proto/input_event.pb.h"
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/render_widget_host_view.h"
 #include "content/public/browser/web_contents.h"
 #include "third_party/blink/public/common/input/web_mouse_event.h"
+#include "third_party/blink/public/common/input/web_mouse_wheel_event.h"
+#include "third_party/blink/public/common/input/web_touch_event.h"
 
 namespace cast_receiver {
 namespace {
@@ -27,6 +30,21 @@ MouseEvent::ActionType MapActionType(blink::WebInputEvent::Type type) {
     case blink::WebInputEvent::Type::kMouseLeave:
     default:
       return MouseEvent::UNKNOWN;
+  }
+}
+
+TouchEvent::ActionType MapTouchActionType(blink::WebInputEvent::Type type) {
+  switch (type) {
+    case blink::WebInputEvent::Type::kTouchStart:
+      return TouchEvent::TOUCH_DOWN;
+    case blink::WebInputEvent::Type::kTouchMove:
+      return TouchEvent::TOUCH_MOVE;
+    case blink::WebInputEvent::Type::kTouchEnd:
+      return TouchEvent::TOUCH_UP;
+    case blink::WebInputEvent::Type::kTouchCancel:
+      return TouchEvent::TOUCH_CANCEL;
+    default:
+      return TouchEvent::UNKNOWN;
   }
 }
 
@@ -119,16 +137,42 @@ void StreamingInputObserver::OnInputEvent(const content::RenderWidgetHost& host,
     return;
   }
 
-  if (blink::WebInputEvent::IsMouseEventType(event.GetType())) {
-    std::optional<MouseEvent> proto = HandleMouseEvent(
+  std::optional<cast_receiver::InputEvent> input_event_proto;
+
+  if (event.GetType() == blink::WebInputEvent::Type::kMouseWheel) {
+    std::optional<MouseEvent> mouse_proto = HandleMouseWheelEvent(
+        static_cast<const blink::WebMouseWheelEvent&>(event),
+        visible_viewport_size);
+    if (mouse_proto) {
+      cast_receiver::InputEvent wrapper;
+      *wrapper.mutable_mouse_event() = std::move(*mouse_proto);
+      input_event_proto = std::move(wrapper);
+    }
+  } else if (blink::WebInputEvent::IsMouseEventType(event.GetType())) {
+    std::optional<MouseEvent> mouse_proto = HandleMouseEvent(
         static_cast<const blink::WebMouseEvent&>(event), visible_viewport_size);
-    if (proto) {
-      // TODO(b/501522425): Feed into OpenScreen input stream.
+    if (mouse_proto) {
+      cast_receiver::InputEvent wrapper;
+      *wrapper.mutable_mouse_event() = std::move(*mouse_proto);
+      input_event_proto = std::move(wrapper);
+    }
+  } else if (blink::WebInputEvent::IsTouchEventType(event.GetType())) {
+    std::optional<TouchEvent> touch_proto = HandleTouchEvent(
+        static_cast<const blink::WebTouchEvent&>(event), visible_viewport_size);
+    if (touch_proto) {
+      cast_receiver::InputEvent wrapper;
+      *wrapper.mutable_touch_event() = std::move(*touch_proto);
+      input_event_proto = std::move(wrapper);
     }
   }
 
-  // TODO(b/501521818): Implement translation for touch, keyboard, and wheel
-  // events.
+  if (input_event_proto) {
+    input_event_proto->set_timestamp_ms(
+        (event.TimeStamp() - base::TimeTicks()).InMilliseconds());
+    // TODO(b/501522425): Feed input_event_proto into OpenScreen input stream.
+  }
+
+  // TODO(b/501521818): Implement translation for keyboard events.
 }
 
 std::optional<cast_receiver::MouseEvent>
@@ -156,6 +200,86 @@ StreamingInputObserver::HandleMouseEvent(
   proto.set_move_y_ratio(move_y_ratio);
 
   int modifiers = mouse_event.GetModifiers();
+  proto.set_alt_key_press(
+      !!(modifiers & blink::WebInputEvent::Modifiers::kAltKey));
+  proto.set_ctrl_key_press(
+      !!(modifiers & blink::WebInputEvent::Modifiers::kControlKey));
+  proto.set_shift_key_press(
+      !!(modifiers & blink::WebInputEvent::Modifiers::kShiftKey));
+  proto.set_meta_key_press(
+      !!(modifiers & blink::WebInputEvent::Modifiers::kMetaKey));
+
+  MapPressedButtons(modifiers, &proto);
+
+  return proto;
+}
+
+std::optional<cast_receiver::TouchEvent>
+StreamingInputObserver::HandleTouchEvent(
+    const blink::WebTouchEvent& touch_event,
+    const gfx::Size& visible_viewport_size) {
+  TouchEvent proto;
+  proto.set_action_type(MapTouchActionType(touch_event.GetType()));
+  if (proto.action_type() == TouchEvent::UNKNOWN) {
+    return std::nullopt;
+  }
+
+  for (unsigned i = 0; i < touch_event.touches_length; ++i) {
+    const blink::WebTouchPoint& point = touch_event.touches[i];
+    // Filter for active touches still in contact with the surface.
+    // The Exo TouchEvent proto does not have explicit release/up events.
+    // Instead, the receiver tracks which touches have stopped by checking which
+    // IDs are no longer present in the active list. Therefore, we exclude
+    // kStateReleased and kStateCancelled touch points here.
+    if (point.state == blink::mojom::TouchState::kStateReleased ||
+        point.state == blink::mojom::TouchState::kStateCancelled) {
+      continue;
+    }
+
+    Touch* touch_proto = proto.add_touches();
+    touch_proto->set_id(point.id);
+
+    float x_ratio =
+        point.PositionInWidget().x() / visible_viewport_size.width();
+    float y_ratio =
+        point.PositionInWidget().y() / visible_viewport_size.height();
+    touch_proto->set_x_ratio(std::clamp(x_ratio, 0.0f, 1.0f));
+    touch_proto->set_y_ratio(std::clamp(y_ratio, 0.0f, 1.0f));
+  }
+
+  int modifiers = touch_event.GetModifiers();
+  proto.set_alt_key_press(
+      !!(modifiers & blink::WebInputEvent::Modifiers::kAltKey));
+  proto.set_ctrl_key_press(
+      !!(modifiers & blink::WebInputEvent::Modifiers::kControlKey));
+  proto.set_shift_key_press(
+      !!(modifiers & blink::WebInputEvent::Modifiers::kShiftKey));
+  proto.set_meta_key_press(
+      !!(modifiers & blink::WebInputEvent::Modifiers::kMetaKey));
+
+  return proto;
+}
+
+std::optional<cast_receiver::MouseEvent>
+StreamingInputObserver::HandleMouseWheelEvent(
+    const blink::WebMouseWheelEvent& wheel_event,
+    const gfx::Size& visible_viewport_size) {
+  MouseEvent proto;
+  proto.set_action_type(MouseEvent::MOUSE_WHEEL);
+
+  float x_ratio =
+      wheel_event.PositionInWidget().x() / visible_viewport_size.width();
+  float y_ratio =
+      wheel_event.PositionInWidget().y() / visible_viewport_size.height();
+  proto.set_x_ratio(std::clamp(x_ratio, 0.0f, 1.0f));
+  proto.set_y_ratio(std::clamp(y_ratio, 0.0f, 1.0f));
+
+  float move_x_ratio = wheel_event.delta_x / visible_viewport_size.width();
+  float move_y_ratio = wheel_event.delta_y / visible_viewport_size.height();
+  proto.set_move_x_ratio(move_x_ratio);
+  proto.set_move_y_ratio(move_y_ratio);
+
+  int modifiers = wheel_event.GetModifiers();
   proto.set_alt_key_press(
       !!(modifiers & blink::WebInputEvent::Modifiers::kAltKey));
   proto.set_ctrl_key_press(

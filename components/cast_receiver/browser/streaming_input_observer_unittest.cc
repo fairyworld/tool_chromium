@@ -6,11 +6,14 @@
 
 #include <optional>
 
+#include "components/cast_receiver/proto/touch_input_service.pb.h"
 #include "content/public/browser/render_widget_host_view.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/test/test_renderer_host.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "third_party/blink/public/common/input/web_mouse_event.h"
+#include "third_party/blink/public/common/input/web_mouse_wheel_event.h"
+#include "third_party/blink/public/common/input/web_touch_event.h"
 
 namespace cast_receiver {
 
@@ -29,6 +32,20 @@ class StreamingInputObserverTest : public content::RenderViewHostTestHarness {
       const blink::WebMouseEvent& mouse_event,
       const gfx::Size& visible_viewport_size) {
     return observer.HandleMouseEvent(mouse_event, visible_viewport_size);
+  }
+
+  std::optional<TouchEvent> HandleTouchEvent(
+      StreamingInputObserver& observer,
+      const blink::WebTouchEvent& touch_event,
+      const gfx::Size& visible_viewport_size) {
+    return observer.HandleTouchEvent(touch_event, visible_viewport_size);
+  }
+
+  std::optional<MouseEvent> HandleMouseWheelEvent(
+      StreamingInputObserver& observer,
+      const blink::WebMouseWheelEvent& wheel_event,
+      const gfx::Size& visible_viewport_size) {
+    return observer.HandleMouseWheelEvent(wheel_event, visible_viewport_size);
   }
 };
 
@@ -161,4 +178,85 @@ TEST_F(StreamingInputObserverTest, ClampsCoordinatesToViewportRatios) {
   EXPECT_FLOAT_EQ(proto.y_ratio(), 0.0f);
 }
 
+TEST_F(StreamingInputObserverTest, TranslateTouchStartWithActiveFiltering) {
+  StreamingInputObserver observer(web_contents());
+
+  blink::WebTouchEvent touch_event(
+      blink::WebInputEvent::Type::kTouchStart, blink::WebInputEvent::kShiftKey,
+      blink::WebInputEvent::GetStaticTimeStampForTests());
+  touch_event.touches_length = 2;
+
+  touch_event.touches[0].id = 101;
+  touch_event.touches[0].state = blink::mojom::TouchState::kStatePressed;
+  touch_event.touches[0].SetPositionInWidget(100.0f, 50.0f);
+
+  touch_event.touches[1].id = 102;
+  touch_event.touches[1].state = blink::mojom::TouchState::kStateReleased;
+  touch_event.touches[1].SetPositionInWidget(300.0f, 150.0f);
+
+  std::optional<TouchEvent> opt_proto =
+      HandleTouchEvent(observer, touch_event, visible_viewport_size());
+  ASSERT_TRUE(opt_proto.has_value());
+
+  const TouchEvent& proto = opt_proto.value();
+  EXPECT_EQ(proto.action_type(), TouchEvent::TOUCH_DOWN);
+  EXPECT_TRUE(proto.shift_key_press());
+  EXPECT_FALSE(proto.ctrl_key_press());
+
+  // Only the pressed touch point should be mapped
+  ASSERT_EQ(proto.touches_size(), 1);
+  EXPECT_EQ(proto.touches(0).id(), 101);
+  EXPECT_FLOAT_EQ(proto.touches(0).x_ratio(), 0.10f);
+  EXPECT_FLOAT_EQ(proto.touches(0).y_ratio(), 0.10f);
+}
+
+TEST_F(StreamingInputObserverTest, TranslateTouchMove) {
+  StreamingInputObserver observer(web_contents());
+
+  blink::WebTouchEvent touch_event(
+      blink::WebInputEvent::Type::kTouchMove, blink::WebInputEvent::kMetaKey,
+      blink::WebInputEvent::GetStaticTimeStampForTests());
+  touch_event.touches_length = 1;
+
+  touch_event.touches[0].id = 202;
+  touch_event.touches[0].state = blink::mojom::TouchState::kStateMoved;
+  touch_event.touches[0].SetPositionInWidget(500.0f, 250.0f);
+
+  std::optional<TouchEvent> opt_proto =
+      HandleTouchEvent(observer, touch_event, visible_viewport_size());
+  ASSERT_TRUE(opt_proto.has_value());
+
+  const TouchEvent& proto = opt_proto.value();
+  EXPECT_EQ(proto.action_type(), TouchEvent::TOUCH_MOVE);
+  EXPECT_TRUE(proto.meta_key_press());
+  ASSERT_EQ(proto.touches_size(), 1);
+  EXPECT_EQ(proto.touches(0).id(), 202);
+  EXPECT_FLOAT_EQ(proto.touches(0).x_ratio(), 0.50f);
+  EXPECT_FLOAT_EQ(proto.touches(0).y_ratio(), 0.50f);
+}
+
+TEST_F(StreamingInputObserverTest, TranslateMouseWheel) {
+  StreamingInputObserver observer(web_contents());
+
+  blink::WebMouseWheelEvent wheel_event(
+      blink::WebInputEvent::Type::kMouseWheel, blink::WebInputEvent::kAltKey,
+      blink::WebInputEvent::GetStaticTimeStampForTests());
+  wheel_event.SetPositionInWidget(gfx::PointF(250.0f, 100.0f));
+  wheel_event.delta_x = 20.0f;
+  wheel_event.delta_y = -10.0f;
+
+  std::optional<MouseEvent> opt_proto =
+      HandleMouseWheelEvent(observer, wheel_event, visible_viewport_size());
+  ASSERT_TRUE(opt_proto.has_value());
+
+  const MouseEvent& proto = opt_proto.value();
+  EXPECT_EQ(proto.action_type(), MouseEvent::MOUSE_WHEEL);
+  EXPECT_FLOAT_EQ(proto.x_ratio(), 0.25f);
+  EXPECT_FLOAT_EQ(proto.y_ratio(), 0.20f);
+  // Scroll deltas mapped to movement ratios
+  EXPECT_FLOAT_EQ(proto.move_x_ratio(), 0.02f);
+  EXPECT_FLOAT_EQ(proto.move_y_ratio(), -0.02f);
+  EXPECT_TRUE(proto.alt_key_press());
+  EXPECT_FALSE(proto.ctrl_key_press());
+}
 }  // namespace cast_receiver

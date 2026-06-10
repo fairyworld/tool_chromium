@@ -8,6 +8,7 @@
 #include <optional>
 
 #include "components/cast_receiver/proto/mouse_input_service.pb.h"
+#include "components/cast_receiver/proto/touch_input_service.pb.h"
 #include "content/public/browser/render_widget_host.h"
 #include "content/public/browser/render_widget_host_observer.h"
 #include "content/public/browser/web_contents_observer.h"
@@ -19,7 +20,9 @@ class RenderFrameHost;
 
 namespace blink {
 class WebMouseEvent;
-}
+class WebMouseWheelEvent;
+class WebTouchEvent;
+}  // namespace blink
 
 namespace cast_receiver {
 
@@ -60,6 +63,18 @@ class StreamingInputObserver
       const gfx::Size& visible_viewport_size);
 
   content::RenderWidgetHost* observed_widget_ = nullptr;
+
+  // Helper method to translate touch events. Returns the translated proto if
+  // the event should be handled, or std::nullopt if ignored.
+  std::optional<cast_receiver::TouchEvent> HandleTouchEvent(
+      const blink::WebTouchEvent& touch_event,
+      const gfx::Size& visible_viewport_size);
+
+  // Helper method to translate wheel events. Returns the translated proto if
+  // the event should be handled, or std::nullopt if ignored.
+  std::optional<cast_receiver::MouseEvent> HandleMouseWheelEvent(
+      const blink::WebMouseWheelEvent& wheel_event,
+      const gfx::Size& visible_viewport_size);
 };
 
 }  // namespace cast_receiver
