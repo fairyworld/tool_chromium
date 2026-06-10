@@ -55,6 +55,9 @@ class SyncedBookmarkTrackerEntity {
   // parent information (which is included in specifics).
   bool MatchesData(const syncer::EntityData& data) const;
 
+  // Check whether |data| matches the stored base specifics hash.
+  bool MatchesBaseData(const syncer::EntityData& data) const;
+
   // Check whether |specifics| matches the stored specifics_hash.
   bool MatchesSpecificsHash(const sync_pb::EntitySpecifics& specifics) const;
 

@@ -19,6 +19,7 @@
 #include "components/sync/base/features.h"
 #include "components/sync/base/time.h"
 #include "components/sync/base/unique_position.h"
+#include "components/sync/engine/commit_and_get_updates_types.h"
 #include "components/sync/protocol/bookmark_model_metadata.pb.h"
 #include "components/sync/protocol/data_type_state.pb.h"
 #include "components/sync/protocol/entity_data.h"
@@ -279,6 +280,67 @@ TEST(SyncedBookmarkTrackerTest, ShouldAckSequenceNumber) {
   EXPECT_THAT(tracker->HasLocalChanges(), Eq(false));
 }
 
+TEST(SyncedBookmarkTrackerTest,
+     ShouldNotSetBaseSpecificsHashForLocalCreations) {
+  std::unique_ptr<SyncedBookmarkTracker> tracker =
+      SyncedBookmarkTracker::CreateEmpty(sync_pb::DataTypeState());
+
+  const std::string kSyncId = "SYNC_ID";
+  const int64_t kId = 1;
+  const base::Uuid kGuid = base::Uuid::GenerateRandomV4();
+  const base::Time kCreationTime(base::Time::Now() - base::Seconds(1));
+  const sync_pb::EntitySpecifics specifics =
+      GenerateSpecifics("Title", "http://foo.com");
+
+  bookmarks::BookmarkNode node(kId, kGuid, GURL("http://foo.com"));
+
+  // Track a new local creation (server_version is kUncommittedVersion).
+  const SyncedBookmarkTrackerEntity* entity = tracker->Add(
+      &node, kSyncId, syncer::kUncommittedVersion, kCreationTime, specifics);
+
+  ASSERT_THAT(entity, NotNull());
+  ASSERT_FALSE(entity->metadata().specifics_hash().empty());
+  ASSERT_TRUE(entity->metadata().base_specifics_hash().empty());
+
+  // Increment sequence number (similar to what happens in
+  // BookmarkModelObserverImpl).
+  tracker->IncrementSequenceNumber(entity);
+
+  // base_specifics_hash should still be empty because it is a local creation.
+  EXPECT_TRUE(entity->metadata().base_specifics_hash().empty());
+}
+
+TEST(SyncedBookmarkTrackerTest,
+     ShouldSetBaseSpecificsHashOnLocalUpdateOfSyncedEntity) {
+  std::unique_ptr<SyncedBookmarkTracker> tracker =
+      SyncedBookmarkTracker::CreateEmpty(sync_pb::DataTypeState());
+
+  const std::string kSyncId = "SYNC_ID";
+  const int64_t kId = 1;
+  const base::Uuid kGuid = base::Uuid::GenerateRandomV4();
+  const int64_t kServerVersion = 1000;
+  const base::Time kCreationTime(base::Time::Now() - base::Seconds(1));
+  const sync_pb::EntitySpecifics specifics =
+      GenerateSpecifics("Title", "http://foo.com");
+
+  bookmarks::BookmarkNode node(kId, kGuid, GURL("http://foo.com"));
+
+  // Track a synced entity.
+  const SyncedBookmarkTrackerEntity* entity =
+      tracker->Add(&node, kSyncId, kServerVersion, kCreationTime, specifics);
+
+  ASSERT_THAT(entity, NotNull());
+  ASSERT_FALSE(entity->metadata().specifics_hash().empty());
+  ASSERT_TRUE(entity->metadata().base_specifics_hash().empty());
+
+  // Increment sequence number (simulating local modification).
+  tracker->IncrementSequenceNumber(entity);
+
+  // base_specifics_hash should be set to the specifics_hash.
+  EXPECT_EQ(entity->metadata().base_specifics_hash(),
+            entity->metadata().specifics_hash());
+}
+
 TEST(SyncedBookmarkTrackerTest, ShouldUpdateUponCommitResponseWithNewId) {
   std::unique_ptr<SyncedBookmarkTracker> tracker =
       SyncedBookmarkTracker::CreateEmpty(sync_pb::DataTypeState());
@@ -302,7 +364,8 @@ TEST(SyncedBookmarkTrackerTest, ShouldUpdateUponCommitResponseWithNewId) {
 
   // Receive a commit response with a changed id.
   tracker->UpdateUponCommitResponse(entity, kNewSyncId, kNewServerVersion,
-                                    /*acked_sequence_number=*/1);
+                                    /*acked_sequence_number=*/1,
+                                    /*specifics_hash=*/"");
 
   // Old id shouldn't be there, but the new one should.
   EXPECT_THAT(tracker->GetEntityForSyncId(kSyncId), IsNull());

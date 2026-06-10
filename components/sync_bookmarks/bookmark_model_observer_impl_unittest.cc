@@ -148,7 +148,8 @@ class BookmarkModelObserverImplTest
       bookmark_tracker()->UpdateUponCommitResponse(
           entity, id,
           /*server_version=*/1,
-          /*acked_sequence_number=*/entity->metadata().sequence_number());
+          /*acked_sequence_number=*/entity->metadata().sequence_number(),
+          /*specifics_hash=*/entity->metadata().specifics_hash());
     }
   }
 
@@ -802,9 +803,11 @@ TEST_P(BookmarkModelObserverImplTest,
 
   // Simulate a commit response for the first commit request (the creation).
   // Don't simulate change in id for simplicity.
-  bookmark_tracker()->UpdateUponCommitResponse(entity, id,
-                                               /*server_version=*/1,
-                                               /*acked_sequence_number=*/1);
+  bookmark_tracker()->UpdateUponCommitResponse(
+      entity, id,
+      /*server_version=*/1,
+      /*acked_sequence_number=*/1,
+      /*specifics_hash=*/entity->metadata().specifics_hash());
 
   // There should still be one local change (the deletion).
   EXPECT_THAT(bookmark_tracker()->GetEntitiesWithLocalChanges().size(), 1U);
@@ -813,9 +816,11 @@ TEST_P(BookmarkModelObserverImplTest,
   EXPECT_THAT(bookmark_tracker()->TrackedEntitiesCountForTest(), 4U);
 
   // Commit the deletion.
-  bookmark_tracker()->UpdateUponCommitResponse(entity, id,
-                                               /*server_version=*/2,
-                                               /*acked_sequence_number=*/2);
+  bookmark_tracker()->UpdateUponCommitResponse(
+      entity, id,
+      /*server_version=*/2,
+      /*acked_sequence_number=*/2,
+      /*specifics_hash=*/entity->metadata().specifics_hash());
   // Entity should have been dropped.
   EXPECT_THAT(bookmark_tracker()->TrackedEntitiesCountForTest(), 3U);
 }

@@ -159,10 +159,10 @@ void BookmarkModelObserverImpl::BookmarkNodeMoved(
       node, bookmark_model_, unique_position.ToProto(),
       /*force_favicon_load=*/true);
 
-  bookmark_tracker_->Update(entity, entity->metadata().server_version(),
-                            modification_time, specifics);
   // Mark the entity that it needs to be committed.
   bookmark_tracker_->IncrementSequenceNumber(entity);
+  bookmark_tracker_->Update(entity, entity->metadata().server_version(),
+                            modification_time, specifics);
   nudge_for_commit_closure_.Run();
   bookmark_tracker_->CheckAllNodesTracked(bookmark_model_);
 }
@@ -533,10 +533,10 @@ void BookmarkModelObserverImpl::ProcessUpdate(
     return;
   }
 
-  bookmark_tracker_->Update(entity, entity->metadata().server_version(),
-                            /*modification_time=*/base::Time::Now(), specifics);
   // Mark the entity that it needs to be committed.
   bookmark_tracker_->IncrementSequenceNumber(entity);
+  bookmark_tracker_->Update(entity, entity->metadata().server_version(),
+                            /*modification_time=*/base::Time::Now(), specifics);
   nudge_for_commit_closure_.Run();
 }
 
@@ -559,9 +559,9 @@ void BookmarkModelObserverImpl::ProcessDelete(
     bookmark_tracker_->Remove(entity);
     return;
   }
-  bookmark_tracker_->MarkDeleted(entity, location);
   // Mark the entity that it needs to be committed.
   bookmark_tracker_->IncrementSequenceNumber(entity);
+  bookmark_tracker_->MarkDeleted(entity, location);
 }
 
 void BookmarkModelObserverImpl::
@@ -612,11 +612,10 @@ syncer::UniquePosition BookmarkModelObserverImpl::UpdateUniquePositionForNode(
   sync_pb::EntitySpecifics specifics = CreateSpecificsFromBookmarkNode(
       node, bookmark_model_, new_unique_position.ToProto(),
       /*force_favicon_load=*/true);
-  bookmark_tracker_->Update(entity, entity->metadata().server_version(),
-                            modification_time, specifics);
-
   // Mark the entity that it needs to be committed.
   bookmark_tracker_->IncrementSequenceNumber(entity);
+  bookmark_tracker_->Update(entity, entity->metadata().server_version(),
+                            modification_time, specifics);
   return new_unique_position;
 }
 

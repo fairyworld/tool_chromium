@@ -150,7 +150,8 @@ class SyncedBookmarkTracker {
   void UpdateUponCommitResponse(const SyncedBookmarkTrackerEntity* entity,
                                 const std::string& sync_id,
                                 int64_t server_version,
-                                int64_t acked_sequence_number);
+                                int64_t acked_sequence_number,
+                                const std::string& specifics_hash);
 
   // Informs the tracker that the sync ID for `entity` has changed. It updates
   // the internal state of the tracker accordingly. `entity` must be owned by

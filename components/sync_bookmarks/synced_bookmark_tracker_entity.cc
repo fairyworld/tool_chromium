@@ -66,6 +66,17 @@ bool SyncedBookmarkTrackerEntity::MatchesData(
   return MatchesSpecificsHash(data.specifics);
 }
 
+bool SyncedBookmarkTrackerEntity::MatchesBaseData(
+    const syncer::EntityData& data) const {
+  DCHECK(IsUnsynced());
+  if (data.is_deleted() || metadata_.base_specifics_hash().empty()) {
+    return false;
+  }
+  std::string hash;
+  HashSpecifics(data.specifics, &hash);
+  return hash == metadata_.base_specifics_hash();
+}
+
 bool SyncedBookmarkTrackerEntity::MatchesSpecificsHash(
     const sync_pb::EntitySpecifics& specifics) const {
   DCHECK(!metadata_.is_deleted());

@@ -209,9 +209,9 @@ void BookmarkDataTypeProcessor::OnCommitCompleted(
       continue;
     }
 
-    bookmark_tracker_->UpdateUponCommitResponse(entity, response.id,
-                                                response.response_version,
-                                                response.sequence_number);
+    bookmark_tracker_->UpdateUponCommitResponse(
+        entity, response.id, response.response_version,
+        response.sequence_number, response.specifics_hash);
   }
 
   bookmark_tracker_->set_data_type_state(type_state);

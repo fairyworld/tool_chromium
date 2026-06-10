@@ -1568,6 +1568,131 @@ TEST_F(BookmarkRemoteUpdatesHandlerWithInitialMergeTest,
 }
 
 TEST_F(BookmarkRemoteUpdatesHandlerWithInitialMergeTest,
+       ShouldResolveConflictBetweenLocalDeletionAndRemoteUpdateWithLocal) {
+  const std::string kTitle = "title";
+  const base::Uuid kGuid = base::Uuid::GenerateRandomV4();
+  const syncer::UniquePosition kUniquePosition = RandomUniquePosition();
+
+  syncer::UpdateResponseDataList updates;
+
+  updates.push_back(CreateUpdateResponseData(
+      /*guid=*/kGuid,
+      /*parent_guid=*/kBookmarkBarGuid,
+      /*title=*/kTitle,
+      /*version=*/0, kUniquePosition));
+
+  updates_handler()->Process(updates,
+                             /*got_new_encryption_requirements=*/false);
+  const SyncedBookmarkTrackerEntity* entity =
+      tracker()->GetEntityForUuid(kGuid);
+  ASSERT_THAT(entity, NotNull());
+  ASSERT_THAT(entity->bookmark_node(), NotNull());
+  ASSERT_THAT(entity->IsUnsynced(), Eq(false));
+
+  const bookmarks::BookmarkNode* bookmark_bar_node =
+      bookmark_model()->bookmark_bar_node();
+  ASSERT_THAT(bookmark_bar_node->children().size(), Eq(1u));
+
+  // Mark the entity as deleted locally.
+  // Call IncrementSequenceNumber first to capture base specifics hash.
+  tracker()->IncrementSequenceNumber(entity);
+  tracker()->MarkDeleted(entity, FROM_HERE);
+  ASSERT_THAT(entity->IsUnsynced(), Eq(true));
+
+  // Remove the bookmark from the local bookmark model.
+  bookmark_model()->Remove(bookmark_bar_node->children().front().get(),
+                           FROM_HERE);
+  ASSERT_THAT(bookmark_bar_node->children().size(), Eq(0u));
+
+  // Push an update for the same entity with same specifics (same unique
+  // position). This simulates a no-op update (e.g. migration).
+  updates.clear();
+  updates.push_back(CreateUpdateResponseData(
+      /*guid=*/kGuid,
+      /*parent_guid=*/kBookmarkBarGuid,
+      /*title=*/kTitle,
+      /*version=*/1, kUniquePosition));
+
+  updates_handler()->Process(updates,
+                             /*got_new_encryption_requirements=*/false);
+
+  // There should have been conflict, and it should have been resolved with the
+  // local version (i.e. keep deletion) because the remote update is a no-op.
+  entity = tracker()->GetEntityForUuid(kGuid);
+  ASSERT_THAT(entity, NotNull());
+  EXPECT_THAT(entity->IsUnsynced(), Eq(true));
+  EXPECT_THAT(entity->metadata().is_deleted(), Eq(true));
+
+  // The bookmark should NOT have been resurrected.
+  EXPECT_THAT(bookmark_bar_node->children().size(), Eq(0u));
+}
+
+TEST_F(BookmarkRemoteUpdatesHandlerWithInitialMergeTest,
+       ShouldResolveConflictBetweenLocalAndRemoteUpdatesWithLocal) {
+  const std::string kTitle = "title";
+  const base::Uuid kGuid = base::Uuid::GenerateRandomV4();
+  const syncer::UniquePosition kUniquePosition = RandomUniquePosition();
+
+  syncer::UpdateResponseDataList updates;
+
+  updates.push_back(CreateUpdateResponseData(
+      /*guid=*/kGuid,
+      /*parent_guid=*/kBookmarkBarGuid,
+      /*title=*/kTitle,
+      /*version=*/0, kUniquePosition));
+
+  updates_handler()->Process(updates,
+                             /*got_new_encryption_requirements=*/false);
+  const SyncedBookmarkTrackerEntity* entity =
+      tracker()->GetEntityForUuid(kGuid);
+  ASSERT_THAT(entity, NotNull());
+  ASSERT_THAT(entity->bookmark_node(), NotNull());
+  ASSERT_THAT(entity->IsUnsynced(), Eq(false));
+
+  const bookmarks::BookmarkNode* bookmark_bar_node =
+      bookmark_model()->bookmark_bar_node();
+  ASSERT_THAT(bookmark_bar_node->children().size(), Eq(1u));
+
+  // Modify the bookmark locally.
+  // Call IncrementSequenceNumber first to capture base specifics hash.
+  tracker()->IncrementSequenceNumber(entity);
+
+  sync_pb::EntitySpecifics local_specifics;
+  sync_pb::BookmarkSpecifics* bookmark_specifics =
+      local_specifics.mutable_bookmark();
+  bookmark_specifics->set_guid(kGuid.AsLowercaseString());
+  bookmark_specifics->set_parent_guid(kBookmarkBarGuid.AsLowercaseString());
+  bookmark_specifics->set_legacy_canonicalized_title("New Local Title");
+  *bookmark_specifics->mutable_unique_position() = kUniquePosition.ToProto();
+
+  tracker()->Update(entity, entity->metadata().server_version(),
+                    base::Time::Now(), local_specifics);
+
+  ASSERT_THAT(entity->IsUnsynced(), Eq(true));
+
+  // Push an update for the same entity with the same specifics as initial sync
+  // (matching base).
+  updates.clear();
+  updates.push_back(CreateUpdateResponseData(
+      /*guid=*/kGuid,
+      /*parent_guid=*/kBookmarkBarGuid,
+      /*title=*/kTitle,
+      /*version=*/1, kUniquePosition));
+
+  updates_handler()->Process(updates,
+                             /*got_new_encryption_requirements=*/false);
+
+  // There should have been conflict, and it should have been resolved with the
+  // local version (i.e. keep local update) because the remote update is a
+  // no-op.
+  ASSERT_THAT(tracker()->GetEntityForUuid(kGuid), Eq(entity));
+  EXPECT_THAT(entity->IsUnsynced(), Eq(true));
+
+  // The tracker server version should have been updated.
+  EXPECT_THAT(entity->metadata().server_version(), Eq(1));
+}
+
+TEST_F(BookmarkRemoteUpdatesHandlerWithInitialMergeTest,
        ShouldResolveConflictBetweenLocalAndRemoteUpdatesWithMatchingThem) {
   const base::Uuid kGuid = base::Uuid::GenerateRandomV4();
   const std::string kTitle = "title";
