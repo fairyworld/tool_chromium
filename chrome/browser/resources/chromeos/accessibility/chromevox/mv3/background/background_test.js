@@ -3757,8 +3757,9 @@ AX_TEST_F(
       await mockFeedback.replay();
     });
 
+// TODO(crbug.com/522344181): Re-enable flaky test.
 AX_TEST_F(
-    'ChromeVoxBackgroundTest', 'SelectWithOptGroup', async function() {
+    'ChromeVoxBackgroundTest', 'DISABLED_SelectWithOptGroup', async function() {
       const mockFeedback = this.createMockFeedback();
       const site = `
     <select>
