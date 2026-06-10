@@ -9,6 +9,7 @@
 
 #include "base/feature_list.h"
 #include "base/metrics/field_trial_params.h"
+#include "base/time/time.h"
 #include "base/values.h"
 
 namespace safe_browsing {
@@ -354,6 +355,12 @@ BASE_DECLARE_FEATURE(kMigrateEnhancedSbUserToEnhancedBundle);
 // and have the kBlockV8OptimizerOnUnfamiliarSitesSetting feature enabled will
 // be eligible for the migration.
 BASE_DECLARE_FEATURE(kMigrateToBlockV8OptimizerOnUnfamiliarSites);
+BASE_DECLARE_FEATURE_PARAM(
+    int,
+    kMigrateToBlockV8OptimizerOnUnfamiliarSitesMinSiteEngagementScore);
+BASE_DECLARE_FEATURE_PARAM(
+    base::TimeDelta,
+    kMigrateToBlockV8OptimizerOnUnfamiliarSitesMinAgeOfInitialVisit);
 
 // When enabled, the Password Leak detection toggle is moved out from under the
 // 'Standard protection' Safe Browsing option to the top-level 'Privacy and
