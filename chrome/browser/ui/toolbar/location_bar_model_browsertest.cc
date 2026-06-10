@@ -22,12 +22,12 @@
 #include "chrome/browser/ui/omnibox/omnibox_view.h"
 #include "chrome/browser/ui/search/instant_test_base.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/common/chrome_features.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/omnibox/common/omnibox_features.h"
+#include "components/search/ntp_features.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/ssl_status.h"
 #include "content/public/common/content_constants.h"
@@ -406,7 +406,7 @@ class LocationBarModelInstantNTPNoBrowserInitiatedLinksTest
  public:
   LocationBarModelInstantNTPNoBrowserInitiatedLinksTest() {
     scoped_feature_list_.InitAndEnableFeature(
-        features::kNtpDisableBrowserInitiatedLinks);
+        ntp_features::kNtpDisableBrowserInitiatedLinks);
   }
 
  private:
@@ -420,7 +420,7 @@ class LocationBarModelInstantNTPBrowserInitiatedLinksTest
  public:
   LocationBarModelInstantNTPBrowserInitiatedLinksTest() {
     scoped_feature_list_.InitAndDisableFeature(
-        features::kNtpDisableBrowserInitiatedLinks);
+        ntp_features::kNtpDisableBrowserInitiatedLinks);
   }
 
  private:

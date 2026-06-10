@@ -9,12 +9,12 @@
 #include "chrome/browser/ui/search/ntp_test_utils.h"
 #include "chrome/browser/ui/tab_contents/core_tab_helper.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/common/chrome_features.h"
 #include "chrome/common/chrome_paths.h"
 #include "chrome/common/url_constants.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/search_test_utils.h"
 #include "chrome/test/base/ui_test_utils.h"
+#include "components/search/ntp_features.h"
 #include "components/search_engines/template_url_service.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/navigation_handle.h"
@@ -73,7 +73,7 @@ class NewTabPageNavigationThrottleNoBrowserInitiatedLinksTest
  public:
   NewTabPageNavigationThrottleNoBrowserInitiatedLinksTest() {
     scoped_feature_list_.InitAndEnableFeature(
-        features::kNtpDisableBrowserInitiatedLinks);
+        ntp_features::kNtpDisableBrowserInitiatedLinks);
   }
 
  private:
@@ -88,7 +88,7 @@ class NewTabPageNavigationThrottleBrowserInitiatedLinksTest
  public:
   NewTabPageNavigationThrottleBrowserInitiatedLinksTest() {
     scoped_feature_list_.InitAndDisableFeature(
-        features::kNtpDisableBrowserInitiatedLinks);
+        ntp_features::kNtpDisableBrowserInitiatedLinks);
   }
 
  private:

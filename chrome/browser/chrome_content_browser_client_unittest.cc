@@ -66,6 +66,7 @@
 #include "components/policy/core/common/policy_pref_names.h"
 #include "components/prefs/testing_pref_service.h"
 #include "components/privacy_sandbox/privacy_sandbox_features.h"
+#include "components/search/ntp_features.h"
 #include "components/search_engines/search_engines_switches.h"
 #include "components/search_engines/template_url_service.h"
 #include "components/site_isolation/features.h"
@@ -375,7 +376,7 @@ TEST_F(ChromeContentBrowserClientTest, ShouldStayInParentProcessForNTP) {
 TEST_F(ChromeContentBrowserClientTest, OverrideNavigationParams_FlagEnabled) {
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndEnableFeature(
-      features::kNtpDisableBrowserInitiatedLinks);
+      ntp_features::kNtpDisableBrowserInitiatedLinks);
 
   ChromeContentBrowserClient client;
   ui::PageTransition transition;
@@ -440,7 +441,7 @@ TEST_F(ChromeContentBrowserClientTest, OverrideNavigationParams_FlagEnabled) {
 TEST_F(ChromeContentBrowserClientTest, OverrideNavigationParams_FlagDisabled) {
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndDisableFeature(
-      features::kNtpDisableBrowserInitiatedLinks);
+      ntp_features::kNtpDisableBrowserInitiatedLinks);
 
   ChromeContentBrowserClient client;
   ui::PageTransition transition;
