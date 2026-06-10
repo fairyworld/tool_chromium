@@ -1,20 +1,4 @@
 {
-    "AAPMBlocksWebGPU": [
-        {
-            "platforms": [
-                "android_webview",
-                "android"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "AAPMBlocksWebGPU"
-                    ]
-                }
-            ]
-        }
-    ],
     "AAudioVariableSizedCallbacks": [
         {
             "platforms": [
