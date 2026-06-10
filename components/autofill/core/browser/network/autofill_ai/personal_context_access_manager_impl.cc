@@ -208,14 +208,14 @@ bool PersonalContextAccessManagerImpl::IsTypeCached(EntityType type) const {
 }
 
 void PersonalContextAccessManagerImpl::ResetCacheForType(EntityType type) {
-  const auto is_entity_type_name = [type](EntityInstance& entity) {
+  const auto is_entity_type = [type](EntityInstance& entity) {
     return entity.type() == type;
   };
   // Clear existing entities of this type.
-  base::EraseIf(prefetched_entity_cache_, is_entity_type_name);
+  base::EraseIf(prefetched_entity_cache_, is_entity_type);
 
   // Clear unmasked SPII of this type.
-  base::EraseIf(unmasked_spii_cache_, is_entity_type_name);
+  base::EraseIf(unmasked_spii_cache_, is_entity_type);
 
   cache_state_.erase(type);
 }
