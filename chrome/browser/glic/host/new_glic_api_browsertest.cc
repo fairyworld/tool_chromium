@@ -932,7 +932,8 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testEnableDragResize) {
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)
-IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testDisableDragResize) {
+// TODO(crbug.com/520824542): Fix flaky test.
+IN_PROC_BROWSER_TEST_P(NewGlicApiTest, DISABLED_testDisableDragResize) {
   ASSERT_OK(OpenGlicForActiveTabAndDetach());
   ASSERT_OK(WaitUntilCanResize(true));
   ExecuteJsTest();
