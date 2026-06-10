@@ -2851,6 +2851,11 @@ public class RootUiCoordinator
         return mShareDelegateSupplier;
     }
 
+    /** Returns the supplier of the omnibox focus state. */
+    public NonNullObservableSupplier<Boolean> getOmniboxFocusStateSupplier() {
+        return mOmniboxFocusStateSupplier;
+    }
+
     public @Nullable ExclusiveAccessManager getExclusiveAccessManager() {
         return mExclusiveAccessManager;
     }

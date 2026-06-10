@@ -201,7 +201,8 @@ public class TabBottomSheetManagerTest {
                                     mWindowAndroid,
                                     mockBottomSheetController,
                                     mockLayoutStateProviderSupplier,
-                                    mockTouchEventProvider);
+                                    mockTouchEventProvider,
+                                    ObservableSuppliers.createNonNull(false));
 
                     manager.tryToShowBottomSheet(
                             mDelegate,
@@ -745,6 +746,30 @@ public class TabBottomSheetManagerTest {
                 });
 
         CriteriaHelper.pollUiThread(() -> !mManager.isSheetShowing());
+    }
+
+    @Test
+    @SmallTest
+    public void testBottomSheetSuppressedOnOmniboxFocus() {
+        NativeInterfaceDelegate mockDelegate = mock(NativeInterfaceDelegate.class);
+        showBottomSheetAndBlockUntilReady(mockDelegate);
+
+        SettableNonNullObservableSupplier<Boolean> supplier =
+                (SettableNonNullObservableSupplier<Boolean>)
+                        mActivity.getRootUiCoordinatorForTesting().getOmniboxFocusStateSupplier();
+
+        // Focus the omnibox (suppression)
+        ThreadUtils.runOnUiThreadBlocking(() -> supplier.set(true));
+
+        // Verify the sheet is closed (suppressed)
+        CriteriaHelper.pollUiThread(() -> !mManager.isSheetShowing());
+        verify(mockDelegate).onBottomSheetSuppressed();
+
+        // Unfocus the omnibox (restoration)
+        ThreadUtils.runOnUiThreadBlocking(() -> supplier.set(false));
+
+        // Verify the sheet is restored
+        blockUntilSheetFullyRestored();
     }
 
     private static class TestManualFillingComponent extends EmptyManualFillingComponent {

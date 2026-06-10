@@ -1896,7 +1896,8 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                             mWindowAndroid,
                             assertNonNull(getBottomSheetController()),
                             mLayoutStateProviderOneShotSupplier,
-                            SupplierUtils.asNonNull(mCompositorViewHolderSupplier).get());
+                            SupplierUtils.asNonNull(mCompositorViewHolderSupplier).get(),
+                            getOmniboxFocusStateSupplier());
             Callback<ReadAloudController> callback =
                     mCallbackController.makeCancelable(
                             (ReadAloudController readAloudController) -> {
