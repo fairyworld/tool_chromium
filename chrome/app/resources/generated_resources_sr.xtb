@@ -2558,6 +2558,7 @@
 <translation id="2822551631199737692">Камера се користи</translation>
 <translation id="2822634587701817431">Скупи/прошири</translation>
 <translation id="2824942875887026017"><ph name="IDS_SHORT_PRODUCT_NAME" /> користи подешавања проксија администратора</translation>
+<translation id="2825200993288778739">Направите своју вештину или додајте из збирке вештина</translation>
 <translation id="282525059261716597">Командна линија:</translation>
 <translation id="2825758591930162672">Јавни кључ субјекта</translation>
 <translation id="2826576843404243001">За сајтове који не подржавају безбедне везе, добијајте упозорење пре него што посетите сајт. Не можете да промените ово подешавање јер је омогућена Напредна заштита.</translation>
@@ -4635,6 +4636,7 @@
 <translation id="4321179778687042513">ctrl</translation>
 <translation id="432160826079505197">Прикажи фајл <ph name="FILE_NAME" /> у Finder-у</translation>
 <translation id="4322394346347055525">Затвори друге картице</translation>
+<translation id="4322400254469690320">Пронађите фајл <ph name="FILENAME" /> у <ph name="FEATURE_NAME" /> фолдеру</translation>
 <translation id="4324577459193912240">Датотека је непотпуна</translation>
 <translation id="4325433082696797523">Меморијски простор и напајање</translation>
 <translation id="4325515113816851466">Изабране опције родитеља неће важити када се одјавиш</translation>
@@ -6629,6 +6631,7 @@
 <translation id="5826993284769733527">Полутранспарентно</translation>
 <translation id="5827266244928330802">Safari</translation>
 <translation id="5827591412833386477">Прикажи сајтове у истој групи</translation>
+<translation id="5827835011646404677">Вештине се чувају на Google налогу</translation>
 <translation id="5828181959764767444">Залазак сунца</translation>
 <translation id="5828545842856466741">Додај профил…</translation>
 <translation id="5828633471261496623">Штампање...</translation>
@@ -11205,6 +11208,7 @@
 <translation id="9130015405878219958">Унет је неважећи режим.</translation>
 <translation id="9130135798965366513">Да бисте наставили, <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> ће делити <ph name="FIELDS_STRING" /> са овим сајтом. Погледајте <ph name="BEGIN_LINK1" />политику приватности<ph name="END_LINK1" /> и <ph name="BEGIN_LINK2" />услове коришћења услуге<ph name="END_LINK2" /> за овај сајт.</translation>
 <translation id="9130364135697530260">Уграђени садржај на овом сајту не може да користи информације које су сачуване о вама</translation>
+<translation id="9130857050314385402">Наслови картица и URL-ови шаљу се Google-у када користите вештину</translation>
 <translation id="9131209053278896908">Овде се приказују блокирани сајтови</translation>
 <translation id="9131487537093447019">Слање порука на Bluetooth уређаје и примање порука са њих.</translation>
 <translation id="9133568201369135151">Прикупљање дијагностичких података је завршено. У те податке су уврштени и неки лични подаци.</translation>

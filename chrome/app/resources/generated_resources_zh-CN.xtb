@@ -1443,6 +1443,7 @@
 <translation id="2039464276165755892">当系统检测到有人在窥视时隐藏通知内容</translation>
 <translation id="2040460856718599782">糟糕！尝试验证您的身份时出现错误。请仔细检查您的登录凭据，然后重试。</translation>
 <translation id="2040822390690632244">更新、帮助、开发者选项</translation>
+<translation id="2040827008689966558">重新打开已关闭的拆分视图</translation>
 <translation id="2040894699575719559">已阻止获取位置信息</translation>
 <translation id="2042279886444479655">使用中的配置文件</translation>
 <translation id="2044014337866019681">请确保您验证的账号是 <ph name="ACCOUNT" /> 以解锁会话。</translation>
@@ -4555,6 +4556,7 @@
 <translation id="4275397969489577657">启用事件流记录功能</translation>
 <translation id="4275788652681621337">关闭侧边栏</translation>
 <translation id="4275830172053184480">重启您的设备</translation>
+<translation id="4276390967705106170">在新的浏览器标签页中打开</translation>
 <translation id="4276598757692536305">打印机 PPD</translation>
 <translation id="4277434192562187284">XML 配置来源</translation>
 <translation id="4278390842282768270">允许</translation>
@@ -5479,6 +5481,7 @@
 <translation id="4946998421534856407">启动器键 + 向上键</translation>
 <translation id="4947376546135294974">来自您当前访问网站的数据</translation>
 <translation id="4949898053053527676">似乎没有任何与您的搜索内容相符的搜索结果</translation>
+<translation id="4949954144207118092">在现有的“<ph name="APP_NAME" />”标签页中打开</translation>
 <translation id="4950100687509657457">创建个人资料</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{1 个文件}other{# 个文件}}</translation>
 <translation id="495170559598752135">操作</translation>
@@ -7604,6 +7607,7 @@
 <translation id="6563055593659435495">无法保持与手机的连接。请确保手机就在附近、处于解锁状态，且已开启蓝牙和 Wi-Fi。</translation>
 <translation id="6564343790052433242">若要为“<ph name="APP_NAME" />”创建通行密钥，必须开启 Google 密码管理工具</translation>
 <translation id="6565899972286925956">尽情创作</translation>
+<translation id="6566648465417201421">重新打开已关闭的拆分视图</translation>
 <translation id="656679903990115526">使用手机扫描此二维码，即可保存并自动填充您的密码，从而轻松登录网站和应用</translation>
 <translation id="6568283005472142698">标签页搜索</translation>
 <translation id="6569931898053264308">节省适量内存</translation>
@@ -7939,6 +7943,7 @@
 <translation id="6805478749741295868">这是一项实验性 AI 功能，有时可能会出错。</translation>
 <translation id="6805817411033102703">共享标签页分组反馈</translation>
 <translation id="6806089545527108739">不允许但可过段时间再询问</translation>
+<translation id="6806123901116522137">前往“AI 创新功能”</translation>
 <translation id="6806781719264274042">仅限您的通讯录中有 Google 账号的联系人。<ph name="LINK_BEGIN" />查看联系人<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">要继续，请插入并轻触您的安全密钥</translation>
 <translation id="6808166974213191158">ChromeOS Flex 系统映像写入工具</translation>
@@ -8592,6 +8597,7 @@
 <translation id="7282992757463864530">信息栏</translation>
 <translation id="7283555985781738399">访客模式</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{此设备将被保存 1 天，下次您无需代码即可连接。这项设置是由您的管理员指定的。}other{此设备将被保存 {DAYS} 天，下次您无需代码即可连接。这项设置是由您的管理员指定的。}}</translation>
+<translation id="7284386549235597598">这将结束 Gemini 当前正在处理的任务。</translation>
 <translation id="7284411326658527427">每个人都可对自己的账号进行个性化设置并确保数据的私密性。</translation>
 <translation id="7285008278689343502">大提顿国家公园</translation>
 <translation id="7286867818472074330">选择通行密钥</translation>
@@ -8662,6 +8668,7 @@
 <translation id="7336799713063880535">已屏蔽通知。</translation>
 <translation id="7337258336304389677">使用手机或平板电脑</translation>
 <translation id="7339052793671338107">侧边栏大小调整手柄（可拖动）</translation>
+<translation id="733918220174231019">结束任务以继续</translation>
 <translation id="7339763383339757376">PKCS #7，单一证书</translation>
 <translation id="7339785458027436441">键入内容时检查拼写</translation>
 <translation id="7339898014177206373">打开新的窗口</translation>
@@ -8812,6 +8819,7 @@
 <translation id="7432200167665670017">您的管理员已禁用“<ph name="EXTENSION_NAME" />”- 应用 ID 为 <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">归档</translation>
 <translation id="7433333862363162673">清除用于执行选择操作的快捷键</translation>
+<translation id="7433495118028038748">是，结束任务</translation>
 <translation id="7433957986129316853">保持现状</translation>
 <translation id="7434100547946193426">其他应用</translation>
 <translation id="7434509671034404296">开发者</translation>

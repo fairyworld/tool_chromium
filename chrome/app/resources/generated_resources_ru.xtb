@@ -2561,6 +2561,7 @@
 <translation id="2822551631199737692">Используется камера</translation>
 <translation id="2822634587701817431">Свернуть или развернуть</translation>
 <translation id="2824942875887026017">В <ph name="IDS_SHORT_PRODUCT_NAME" /> используются настройки прокси-сервера, установленные администратором.</translation>
+<translation id="2825200993288778739">Создайте свое специализированное действие или добавьте его из библиотеки</translation>
 <translation id="282525059261716597">Командная строка:</translation>
 <translation id="2825758591930162672">Открытый ключ субъекта</translation>
 <translation id="2826576843404243001">Получать предупреждения о сайтах, которые не поддерживают защищенное подключение, до их открытия. Этот параметр нельзя изменить, поскольку включена Дополнительная защита.</translation>
@@ -4638,6 +4639,7 @@
 <translation id="4321179778687042513">ctrl</translation>
 <translation id="432160826079505197">Показать файл "<ph name="FILE_NAME" />" в Finder</translation>
 <translation id="4322394346347055525">Закрыть другие вкладки</translation>
+<translation id="4322400254469690320">Файл "<ph name="FILENAME" />" будет сохранен в папке "<ph name="FEATURE_NAME" />".</translation>
 <translation id="4324577459193912240">Файл скачан не полностью</translation>
 <translation id="4325433082696797523">Хранилище и энергопотребление</translation>
 <translation id="4325515113816851466">Если ты выйдешь из аккаунта, родительские настройки перестанут действовать.</translation>
@@ -6632,6 +6634,7 @@
 <translation id="5826993284769733527">Полупрозрачный</translation>
 <translation id="5827266244928330802">Safari</translation>
 <translation id="5827591412833386477">Показывать сайты из одной группы</translation>
+<translation id="5827835011646404677">Специализированные действия сохраняются в аккаунте Google</translation>
 <translation id="5828181959764767444">Закат</translation>
 <translation id="5828545842856466741">Добавить профиль…</translation>
 <translation id="5828633471261496623">Печать...</translation>
@@ -11209,6 +11212,7 @@
 <translation id="9130015405878219958">Указан неверный режим.</translation>
 <translation id="9130135798965366513">Чтобы продолжить, <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> передаст этому сайту ваши данные (<ph name="FIELDS_STRING" />). Ознакомьтесь с <ph name="BEGIN_LINK1" />политикой конфиденциальности<ph name="END_LINK1" /> и <ph name="BEGIN_LINK2" />условиями использования<ph name="END_LINK2" /> сайта.</translation>
 <translation id="9130364135697530260">Страницы, с которых на этот сайт встроен контент, могут использовать сохраненную информацию о вас</translation>
+<translation id="9130857050314385402">Когда вы используете специализированное действие, заголовки вкладок и URL отправляются в Google</translation>
 <translation id="9131209053278896908">Здесь появятся заблокированные сайты.</translation>
 <translation id="9131487537093447019">Обмен сообщениями с устройствами Bluetooth.</translation>
 <translation id="9133568201369135151">Сбор диагностических данных завершен. В них есть ваша личная информация.</translation>

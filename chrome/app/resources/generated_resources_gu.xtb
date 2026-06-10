@@ -1445,6 +1445,7 @@
 <translation id="2039464276165755892">જ્યારે કોઈ અન્ય વ્યક્તિની ભાળ મેળવવામાં આવે, ત્યારે નોટિફિકેશનનું કન્ટેન્ટ છુપાવો</translation>
 <translation id="2040460856718599782">અરેરે! તમને પ્રમાણિત કરવાનો પ્રયાસ કરતી વખતે કંઈક ખોટું થયું. કૃપા કરીને તમારા સાઇન-ઇન ઓળખપત્રોને બીજીવાર તપાસો અને ફરી પ્રયાસ કરો.</translation>
 <translation id="2040822390690632244">અપડેટ, સહાય, ડેવલપરના વિકલ્પો</translation>
+<translation id="2040827008689966558">બંધ કરેલો વિભાજિત વ્યૂ ફરીથી ખોલો</translation>
 <translation id="2040894699575719559">સ્થાનને બ્લૉક કર્યુ છે</translation>
 <translation id="2042279886444479655">સક્રિય પ્રોફાઇલ</translation>
 <translation id="2044014337866019681">કૃપા કરીને ખાતરી કરો કે સત્રને અનલૉક કરવા માટે તમે <ph name="ACCOUNT" />ની ચકાસણી કરી રહ્યાં છો.</translation>
@@ -4562,6 +4563,7 @@
 <translation id="4275397969489577657">ઇવેન્ટ સ્ટ્રીમ લૉગિંગ ચાલુ કરો</translation>
 <translation id="4275788652681621337">બાજુની પૅનલ બંધ કરો</translation>
 <translation id="4275830172053184480">તમારું ઉપકરણ પુનઃપ્રારંભ કરો</translation>
+<translation id="4276390967705106170">નવા બ્રાઉઝર ટૅબમાં ખોલો</translation>
 <translation id="4276598757692536305">પ્રિન્ટર PPD</translation>
 <translation id="4277434192562187284">XML કન્ફિગ્યુરેશન સૉર્સ</translation>
 <translation id="4278390842282768270">મંજૂર</translation>
@@ -5487,6 +5489,7 @@
 <translation id="4946998421534856407">લૉન્ચર + ઉપરની ઍરો કી</translation>
 <translation id="4947376546135294974">તમે મુલાકાત લો છો તે સાઇટનો ડેટા</translation>
 <translation id="4949898053053527676">એવું લાગે છે કે તમારી શોધ માટે કોઈ શોધ પરિણામ ઉપલબ્ધ નથી</translation>
+<translation id="4949954144207118092"><ph name="APP_NAME" />ના હાલના ટૅબમાં ખોલો</translation>
 <translation id="4950100687509657457">પ્રોફાઇલ બનાવો</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{એક ફાઇલ}one{# ફાઇલ}other{# ફાઇલ}}</translation>
 <translation id="495170559598752135">ક્રિયાઓ</translation>
@@ -7618,6 +7621,7 @@ USB ડિવાઇસ</translation>
 <translation id="6563055593659435495">તમારા ફોન સાથે કોઈ કનેક્શન જાળવી શકાતું નથી. ખાતરી કરો કે તમારો ફોન નજીકમાં, અનલૉક કરેલો હોય અને તેમાં બ્લૂટૂથ અને વાઇ-ફાઇની સેવા ચાલુ કરવામાં આવી હોય.</translation>
 <translation id="6564343790052433242"><ph name="APP_NAME" /> માટે પાસકી બનાવવા માટે, Google Password Manager ચાલુ હોવું આવશ્યક છે</translation>
 <translation id="6565899972286925956">કંઈપણ બનાવો</translation>
+<translation id="6566648465417201421">બંધ કરેલો વિભાજિત વ્યૂ ફરીથી ખોલો</translation>
 <translation id="656679903990115526">સાઇટ અને ઍપમાં સરળતાથી સાઇન ઇન કરવા માટે તમારા પાસવર્ડ સાચવવા અને તેને ઑટોમૅટિક રીતે ભરવા માટે તમારા ફોન વડે આને સ્કૅન કરો</translation>
 <translation id="6568283005472142698">ટૅબની શોધ</translation>
 <translation id="6569931898053264308">મધ્યમ પ્રમાણમાં મેમરી બચત</translation>
@@ -7955,6 +7959,7 @@ USB ડિવાઇસ</translation>
 <translation id="6805478749741295868">આ એક પ્રાયોગિક AI સુવિધા છે અને તે હંમેશાં સાચી જ હોય, એવું જરૂરી નથી.</translation>
 <translation id="6805817411033102703">શેર કરેલા ટૅબના ગ્રૂપ વિશેનો પ્રતિસાદ</translation>
 <translation id="6806089545527108739">મંજૂરી આપશો નહીં પરંતુ પછીથી પૂછશો</translation>
+<translation id="6806123901116522137">AI ઇનોવેશન પર જાઓ</translation>
 <translation id="6806781719264274042">માત્ર Google એકાઉન્ટમાંના તમારા સંપર્કો. <ph name="LINK_BEGIN" />સંપર્કો જુઓ<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">આગળ વધવા માટે સિક્યુરિટી કી દાખલ કરીને તેને સ્પર્શ કરો</translation>
 <translation id="6808166974213191158">ChromeOS Flex સિસ્ટમની છબીના લેખક</translation>
@@ -8608,6 +8613,7 @@ USB ડિવાઇસ</translation>
 <translation id="7282992757463864530">માહિતી બાર</translation>
 <translation id="7283555985781738399">અતિથિ મોડ</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{આ ડિવાઇસ 1 દિવસ માટે સચવાશે અને તમે આગલી વખતે કોડ વિના કનેક્ટ કરી શકશો. આ તમારા ઍડમિનિસ્ટ્રેટર દ્વારા સેટ કરાય છે.}one{આ ડિવાઇસ {DAYS} દિવસ માટે સચવાશે અને તમે આગલી વખતે કોડ વિના કનેક્ટ કરી શકશો. આ તમારા ઍડમિનિસ્ટ્રેટર દ્વારા સેટ કરાય છે.}other{આ ડિવાઇસ {DAYS} દિવસ માટે સચવાશે અને તમે આગલી વખતે કોડ વિના કનેક્ટ કરી શકશો. આ તમારા ઍડમિનિસ્ટ્રેટર દ્વારા સેટ કરાય છે.}}</translation>
+<translation id="7284386549235597598">આમ કરવાથી Gemini હાલમાં જે ટાસ્ક પર કામ કરી રહ્યું છે તે સમાપ્ત થશે.</translation>
 <translation id="7284411326658527427">દરેક વ્યક્તિ તેમનું એકાઉન્ટ મનગમતું બનાવી શકે છે અને ડેટા ખાનગી રાખી શકે છે.</translation>
 <translation id="7285008278689343502">ગ્રાન્ડ ટેટન નેશનલ પાર્ક</translation>
 <translation id="7286867818472074330">પાસકી પસંદ કરો</translation>
@@ -8678,6 +8684,7 @@ USB ડિવાઇસ</translation>
 <translation id="7336799713063880535">નોટિફિકેશન બ્લૉક કર્યા.</translation>
 <translation id="7337258336304389677">તમારા ફોન કે ટૅબ્લેટનો ઉપયોગ કરો</translation>
 <translation id="7339052793671338107">બાજુની પૅનલનું કદ બદલવાનું હેન્ડલ (ખેંચી શકાય તેવું)</translation>
+<translation id="733918220174231019">ચાલુ રાખવા માટે ટાસ્ક સમાપ્ત કરો</translation>
 <translation id="7339763383339757376">PKCS #7, સિંગલ પ્રમાણપત્ર</translation>
 <translation id="7339785458027436441">લખતી વખતે જોડણી તપાસો</translation>
 <translation id="7339898014177206373">નવી વિન્ડો</translation>
@@ -8828,6 +8835,7 @@ USB ડિવાઇસ</translation>
 <translation id="7432200167665670017">તમારા વ્યવસ્થાપકે "<ph name="EXTENSION_NAME" />"ને બ્લૉક કરેલું છે - ઍપ ID <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">આર્કાઇવ કરો</translation>
 <translation id="7433333862363162673">પસંદગીનો શૉર્ટકટ સાફ કરો</translation>
+<translation id="7433495118028038748">હા, ટાસ્ક સમાપ્ત કરો</translation>
 <translation id="7433957986129316853">આ જ રાખો</translation>
 <translation id="7434100547946193426">અન્ય ઍપ</translation>
 <translation id="7434509671034404296">વિકાસકર્તા</translation>

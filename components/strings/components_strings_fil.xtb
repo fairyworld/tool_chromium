@@ -269,6 +269,7 @@ Kung ayaw mo, iba-block ito ng iyong mga setting ng privacy. Papayagan nito ang 
 <translation id="1407135791313364759">Buksan lahat</translation>
 <translation id="1408696301184924537">Para i-autofill ang IBAN na ito sa susunod, i-save ito sa iyong Google Account</translation>
 <translation id="1408787208417187241">Triple staple top</translation>
+<translation id="1410306713026702438"><ph name="SUGGESTION_TITLE" />, <ph name="SUGGESTION_DESCRIPTION" />. <ph name="SUGGESTION_TYPE" />. <ph name="MATCH_POSITION" /> sa <ph name="NUM_MATCHES_IN_GROUP" /> sa grupong <ph name="GROUP_HEADER" />.</translation>
 <translation id="1410365862999780287">Hindi makikita ng iba pang gumagamit ng device na ito ang iyong aktibidad, kaya mas pribado kang makakapag-browse. Hindi nito babaguhin kung paano kinokolekta ang data ng mga website na binibisita mo at ng mga serbisyong ginagamit ng mga ito, kabilang ang Google. Mase-save ang mga download, bookmark, at item sa listahan ng babasahin.</translation>
 <translation id="1410941016594047814">Envelope Invite</translation>
 <translation id="1413235258620101697">Ie-encrypt at ise-save sa Google Wallet ang CVC ng card na ito para sa mas mabilis na pag-checkout</translation>
@@ -660,6 +661,7 @@ Kung ayaw mo, iba-block ito ng iyong mga setting ng privacy. Papayagan nito ang 
 <translation id="2045871135676061132">Envelope Personal</translation>
 <translation id="2046951263634619614">Mga Retailer ng Libro</translation>
 <translation id="2048261947532620704">Isinasalin ang page</translation>
+<translation id="2055016614992422886">Pag-uusap</translation>
 <translation id="2059166748188874810">Munisipalidad</translation>
 <translation id="2059202684901022309">22 x 34 in</translation>
 <translation id="2064568741209980952">Credit at Pagpapautang</translation>
@@ -3557,6 +3559,7 @@ Para i-hide ang mga opsyon sa pay later, pumunta sa <ph name="BEGIN_LINK" />mga 
 <translation id="6550245281449521513">Hindi pinapayagan ang pag-lock ng mouse</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />, bago</translation>
 <translation id="6552566579578780089">Mga Pagbabayad</translation>
+<translation id="6553777254569586547"><ph name="SUGGESTION_TITLE" />. <ph name="SUGGESTION_TYPE" />. <ph name="MATCH_POSITION" /> sa <ph name="NUM_MATCHES_IN_GROUP" /> sa grupong <ph name="GROUP_HEADER" />.</translation>
 <translation id="6554732001434021288">Huling binisita <ph name="NUM_DAYS" /> (na) araw ang nakalipas</translation>
 <translation id="6556866813142980365">Redo</translation>
 <translation id="6557715786897013164">14 x 17 in</translation>

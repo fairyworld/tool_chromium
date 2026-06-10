@@ -1458,6 +1458,7 @@ Jy kan hierdie rekening se instellings bestuur deur die Family Link-app op jou t
 <translation id="2039464276165755892">Versteek kennisgewinginhoud wanneer iemand anders bespeur word</translation>
 <translation id="2040460856718599782">Oeps! Kon jou nie staaf nie. Gaan asseblief jou aanmeldingeiebewyse weer na en probeer weer.</translation>
 <translation id="2040822390690632244">Opdaterings, hulp, ontwikkelaaropsies</translation>
+<translation id="2040827008689966558">Maak weer toegemaakte verdeelde aansig oop</translation>
 <translation id="2040894699575719559">Ligging is geblokkeer</translation>
 <translation id="2042279886444479655">Aktiewe profiele</translation>
 <translation id="2044014337866019681">Maak asseblief seker dat jy <ph name="ACCOUNT" /> verifieer om die sessie te ontsluit.</translation>
@@ -4577,6 +4578,7 @@ Jy kan hierdie rekening se instellings bestuur deur die Family Link-app op jou t
 <translation id="4275397969489577657">Aktiveer geleentheidstroomloginskrywings</translation>
 <translation id="4275788652681621337">Maak kantpaneel toe</translation>
 <translation id="4275830172053184480">Herbegin jou toestel</translation>
+<translation id="4276390967705106170">Maak in ’n nuwe blaaieroortjie oop</translation>
 <translation id="4276598757692536305">Drukker-PPD</translation>
 <translation id="4277434192562187284">XML-opstellingbron</translation>
 <translation id="4278390842282768270">Toegelaat</translation>
@@ -5502,6 +5504,7 @@ Gebruik Ctrl + Alt + Verlaag Helderheid om uit te zoem.</translation>
 <translation id="4946998421534856407">lanseerder + oppyl</translation>
 <translation id="4947376546135294974">Data van die webwerf wat jy besoek</translation>
 <translation id="4949898053053527676">Dit lyk of daar geen soekresultate vir jou soektog is nie</translation>
+<translation id="4949954144207118092">Maak in ’n bestaande <ph name="APP_NAME" />-oortjie oop</translation>
 <translation id="4950100687509657457">Skep profiel</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{’n lêer}other{# lêers}}</translation>
 <translation id="495170559598752135">Handelinge</translation>
@@ -7632,6 +7635,7 @@ Maak seker jy wys nie enige sensitiewe inligting nie.</translation>
 <translation id="6563055593659435495">Kan nie ’n verbinding met jou foon behou nie. Maak seker dat jou foon in die omtrek en ontsluit is, en dat Bluetooth en wi-fi aangeskakel is.</translation>
 <translation id="6564343790052433242">Google Wagwoordbestuurder moet aan wees om ’n toegangsleutel vir <ph name="APP_NAME" /> te skep</translation>
 <translation id="6565899972286925956">Skep enigiets</translation>
+<translation id="6566648465417201421">Maak weer toegemaakte verdeelde aansig oop</translation>
 <translation id="656679903990115526">Skandeer dit met jou foon om jou wagwoorde te stoor en outomaties in te vul om maklik by werwe en apps aan te meld</translation>
 <translation id="6568283005472142698">Oortjiesoektog</translation>
 <translation id="6569931898053264308">Middelmatige besparing</translation>
@@ -7967,6 +7971,7 @@ Jy het nog # gekompromitteerde wagwoorde. Google Wagwoordbestuurder beveel aan d
 <translation id="6805478749741295868">Dit is ’n eksperimentele KI-kenmerk en sal dit nie altyd regkry nie.</translation>
 <translation id="6805817411033102703">Terugvoer oor gedeelde oortjiegroepe</translation>
 <translation id="6806089545527108739">Moenie toelaat nie, maar vra later</translation>
+<translation id="6806123901116522137">Gaan na KI-innovasies</translation>
 <translation id="6806781719264274042">Net jou kontakte met ’n Google-rekening. <ph name="LINK_BEGIN" />Bekyk kontakte<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">Sit jou sekuriteitsleutel in en raak daaraan om voort te gaan</translation>
 <translation id="6808166974213191158">Chrome OS Flex-stelselkopieskrywer</translation>
@@ -8619,6 +8624,7 @@ Jy het nog # gekompromitteerde wagwoorde. Google Wagwoordbestuurder beveel aan d
 <translation id="7282992757463864530">Inligtingbalk</translation>
 <translation id="7283555985781738399">Besoekermodus</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{Hierdie toestel sal 1 dag lank gestoor word en jy kan volgende keer sonder ’n kode koppel. Dit word deur jou administrateur gestel.}other{Hierdie toestel sal {DAYS} dae lank gestoor word en jy kan volgende keer sonder ’n kode koppel. Dit word deur jou administrateur gestel.}}</translation>
+<translation id="7284386549235597598">Dit sal die taak beëindig waaraan Gemini tans werk.</translation>
 <translation id="7284411326658527427">Elke persoon kan hul rekening personaliseer en data privaat hou.</translation>
 <translation id="7285008278689343502">Grand Teton Nasionale Park</translation>
 <translation id="7286867818472074330">Kies toegangsleutel</translation>
@@ -8689,6 +8695,7 @@ Jy het nog # gekompromitteerde wagwoorde. Google Wagwoordbestuurder beveel aan d
 <translation id="7336799713063880535">Kennisgewings geblok</translation>
 <translation id="7337258336304389677">Gebruik jou foon of tablet</translation>
 <translation id="7339052793671338107">Kantpaneelhandvatsel vir grootteverandering (sleepbaar)</translation>
+<translation id="733918220174231019">Beëindig taak om voort te gaan</translation>
 <translation id="7339763383339757376">PKCS #7, enkele sertifikaat</translation>
 <translation id="7339785458027436441">Gaan spelling na terwyl jy tik</translation>
 <translation id="7339898014177206373">Nuwe venster</translation>
@@ -8839,6 +8846,7 @@ Jy het nog # gekompromitteerde wagwoorde. Google Wagwoordbestuurder beveel aan d
 <translation id="7432200167665670017">Jou admin het "<ph name="EXTENSION_NAME" />" – app-ID <ph name="EXTENSION_ID" /> geblokkeer</translation>
 <translation id="7433103263856598557">Argief</translation>
 <translation id="7433333862363162673">Vee keusekortpad uit</translation>
+<translation id="7433495118028038748">Ja, beëindig taak</translation>
 <translation id="7433957986129316853">Hou dit</translation>
 <translation id="7434100547946193426">Ander apps</translation>
 <translation id="7434509671034404296">Ontwikkelaar</translation>

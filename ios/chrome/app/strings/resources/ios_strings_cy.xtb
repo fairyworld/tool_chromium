@@ -6,6 +6,7 @@
 <translation id="1005230401424685968">BBBB</translation>
 <translation id="1013952917065545813">Gallwch ddod yn ôl yma i ailagor tabiau rydych wedi'u cau yn ddiweddar</translation>
 <translation id="1016495303386450659">Diweddarwyd yr eitem</translation>
+<translation id="1018804590490383958">Sganio ac awtolenwi</translation>
 <translation id="1019990162050689579">Gweithgarwch Ap Gemini</translation>
 <translation id="102916930470544692">Cod pas</translation>
 <translation id="1030376737535466765">Agor Rheolwr Cyfrineiriau</translation>
@@ -1549,6 +1550,7 @@ Rhaid galluogi Handoff hefyd yn adran Cyffredinol y Gosodiadau, a rhaid i'ch dyf
 <translation id="6301767200000930965">Aa</translation>
 <translation id="630308129961693966">Dewiswch safle eich bar cyfeiriad</translation>
 <translation id="6307241780749477694">Cadarnhewch mai chi sydd yno i gael eich holl gyfrineiriau ar y ddyfais hon</translation>
+<translation id="6307792728709337290">Cadwch eich cerdyn yn eich Cyfrif Google i'w awtolenwi ar gyfer y pryniant hwn a phryniannau yn y dyfodol a wneir ar Chrome.</translation>
 <translation id="6316141353357700666">Dewiswch y cyfrinair rydych am ei ddefnyddio o'r rhestr sy'n ymddangos.</translation>
 <translation id="6321526113093607004">Ychwanegu at Nodau Tudalen</translation>
 <translation id="6327249202318869726">Mae Gemini wedi'i ddiffodd ar gyfer eich cyfrif. Cysylltwch â’ch gweinyddwr am ragor o wybodaeth.</translation>
@@ -2143,6 +2145,7 @@ I barhau o'ch cyfrifiadur, newidiwch i <ph name="OTHER_EMAIL" />. Byddwch yn cae
 <translation id="8263809106706527890">Mae'n bosib y bu newid i osodiadau eich porwr diofyn. Gallwch wirio hyn yn y gosodiadau.</translation>
 <translation id="8264966119170358612">Cafodd rhai o'ch cyfrineiriau a gadwyd eu datgelu mewn achos o dor diogelwch data y tu allan i Google. <ph name="BEGIN_LINK" />Dysgu rhagor<ph name="END_LINK" /></translation>
 <translation id="826614135184049678">Cawsoch eich allgofnodi o'ch cyfrif, <ph name="USER_NAME" />, fel rhan o'ch ailosodiad iPad. I fewngofnodi eto, tapiwch "Parhau" isod.</translation>
+<translation id="8270320981823560179">Drive</translation>
 <translation id="8273982424131314219">Byddwch yn llenwi gwybodaeth i mewn i <ph name="URL" /></translation>
 <translation id="8275068909952022340">Rhagor…</translation>
 <translation id="8281781826761538115">Diofyn - <ph name="DEFAULT_LOCALE" /></translation>

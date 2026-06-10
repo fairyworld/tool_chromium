@@ -1458,6 +1458,7 @@ Du kan hantera inställningarna för det här kontot genom att installera Family
 <translation id="2039464276165755892">Dölj aviseringar när någon annan tittar på skärmen</translation>
 <translation id="2040460856718599782">Hoppsan! Något gick fel när du försökte verifiera dig. Dubbelkolla dina inloggningsuppgifter och försök igen.</translation>
 <translation id="2040822390690632244">Uppdateringar, hjälp, utvecklaralternativ</translation>
+<translation id="2040827008689966558">Öppna delad vy som stängts igen</translation>
 <translation id="2040894699575719559">Platsen är blockerad</translation>
 <translation id="2042279886444479655">Aktiva profiler</translation>
 <translation id="2044014337866019681">Kontrollera att du verifierar <ph name="ACCOUNT" /> om du vill låsa upp sessionen.</translation>
@@ -4577,6 +4578,7 @@ Du kan hantera inställningarna för det här kontot genom att installera Family
 <translation id="4275397969489577657">Aktivera loggning av händelseflöden</translation>
 <translation id="4275788652681621337">Stäng sidopanelen</translation>
 <translation id="4275830172053184480">Starta om enheten</translation>
+<translation id="4276390967705106170">Öppna på en ny webbläsarflik</translation>
 <translation id="4276598757692536305">Skrivarens PPD-fil</translation>
 <translation id="4277434192562187284">XML-konfigurationens källa</translation>
 <translation id="4278390842282768270">Tillåts</translation>
@@ -5502,6 +5504,7 @@ Zooma ut med Ctrl + Alt + Minska ljusstyrkan.</translation>
 <translation id="4946998421534856407">Appstartaren + uppåtpil</translation>
 <translation id="4947376546135294974">Data från webbplatsen du besöker</translation>
 <translation id="4949898053053527676">Det verkar inte finnas några sökresultat för sökningen</translation>
+<translation id="4949954144207118092">Öppna på en befintlig <ph name="APP_NAME" />-flik</translation>
 <translation id="4950100687509657457">Skapa profil</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{en fil}other{# filer}}</translation>
 <translation id="495170559598752135">Åtgärder</translation>
@@ -7631,6 +7634,7 @@ Du kan tilldela flera brytare denna åtgärd.</translation>
 <translation id="6563055593659435495">Det gick inte att upprätthålla anslutningen till telefonen. Se till att telefonen finns i närheten, är olåst och att Bluetooth och wifi har aktiverats på den.</translation>
 <translation id="6564343790052433242">Google Lösenordshantering måste vara aktiverad om du vill skapa en nyckel för <ph name="APP_NAME" /></translation>
 <translation id="6565899972286925956">Skapa vad som helst</translation>
+<translation id="6566648465417201421">Öppna delad vy som stängts igen</translation>
 <translation id="656679903990115526">Skanna detta med telefonen för att spara och autofylla dina lösenord så att du enkelt kan logga in på webbplatser och i appar</translation>
 <translation id="6568283005472142698">Sök bland flikar</translation>
 <translation id="6569931898053264308">Medelstora besparingar</translation>
@@ -7966,6 +7970,7 @@ Det finns # utsatta lösenord till. Du rekommenderas av Google Lösenordshanteri
 <translation id="6805478749741295868">Det här är en experimentell AI-funktion som inte alltid fungerar som den ska.</translation>
 <translation id="6805817411033102703">Feedback om delade flikgrupper</translation>
 <translation id="6806089545527108739">Tillåt inte men fråga senare</translation>
+<translation id="6806123901116522137">Öppna AI-innovationer</translation>
 <translation id="6806781719264274042">Endast dina kontakter med ett Google-konto. <ph name="LINK_BEGIN" />Se kontakter<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">Fortsätt genom att sätta i och trycka på säkerhetsnyckeln</translation>
 <translation id="6808166974213191158">Systemavbildningsskrivare för ChromeOS Flex</translation>
@@ -8619,6 +8624,7 @@ Det finns # utsatta lösenord till. Du rekommenderas av Google Lösenordshanteri
 <translation id="7282992757463864530">Informationsfält</translation>
 <translation id="7283555985781738399">Gästläge</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{Den här enheten sparas i en dag. Nästa gång kan du ansluta utan kod. Det här ställs in av administratören.}other{Den här enheten sparas i {DAYS} dagar. Nästa gång kan du ansluta utan kod. Det här ställs in av administratören.}}</translation>
+<translation id="7284386549235597598">Det här avslutar uppgiften som Gemini arbetar med.</translation>
 <translation id="7284411326658527427">Var och en kan anpassa sitt konto och hålla sin data privat.</translation>
 <translation id="7285008278689343502">Grand Teton nationalpark</translation>
 <translation id="7286867818472074330">Välj nyckel</translation>
@@ -8689,6 +8695,7 @@ Det finns # utsatta lösenord till. Du rekommenderas av Google Lösenordshanteri
 <translation id="7336799713063880535">Aviseringar stoppas.</translation>
 <translation id="7337258336304389677">Använd din telefon eller surfplatta</translation>
 <translation id="7339052793671338107">Storlekshandtag för sidopanel (dragbar)</translation>
+<translation id="733918220174231019">Avsluta uppgiften för att fortsätta</translation>
 <translation id="7339763383339757376">PKCS #7, enstaka certifikat</translation>
 <translation id="7339785458027436441">Kontrollera stavning medan jag skriver</translation>
 <translation id="7339898014177206373">Nytt fönster</translation>
@@ -8839,6 +8846,7 @@ Det finns # utsatta lösenord till. Du rekommenderas av Google Lösenordshanteri
 <translation id="7432200167665670017">Administratören blockerar <ph name="EXTENSION_NAME" /> – app-id <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">Arkivera</translation>
 <translation id="7433333862363162673">Rensa kortkommando för val</translation>
+<translation id="7433495118028038748">Ja, avsluta uppgiften</translation>
 <translation id="7433957986129316853">Behåll den</translation>
 <translation id="7434100547946193426">Andra appar</translation>
 <translation id="7434509671034404296">Utvecklare</translation>

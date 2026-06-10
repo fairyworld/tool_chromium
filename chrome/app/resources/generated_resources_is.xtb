@@ -1458,6 +1458,7 @@ Annars skaltu skrá þig út núna svo breytingarnar á þessum reikningi taki g
 <translation id="2039464276165755892">Fela efni tilkynninga þegar einhver annar greinist</translation>
 <translation id="2040460856718599782">Úbbs! Eitthvað fór úrskeiðis þegar reynt var að sannvotta þig. Farðu vel yfir innskráningarupplýsingarnar þínar og reyndu aftur.</translation>
 <translation id="2040822390690632244">Uppfærslur, hjálp, forritunarkostir</translation>
+<translation id="2040827008689966558">Opna aftur lokaðan tvískiptan skjá</translation>
 <translation id="2040894699575719559">Lokað á staðsetningu</translation>
 <translation id="2042279886444479655">Virkir prófílar</translation>
 <translation id="2044014337866019681">Gakktu úr skugga um að þú sért að staðfesta <ph name="ACCOUNT" /> til að taka lotuna úr lás.</translation>
@@ -4577,6 +4578,7 @@ Annars skaltu skrá þig út núna svo breytingarnar á þessum reikningi taki g
 <translation id="4275397969489577657">Kveikja á skráningu viðburðarstraums</translation>
 <translation id="4275788652681621337">Loka hliðarglugga</translation>
 <translation id="4275830172053184480">Endurræstu tækið</translation>
+<translation id="4276390967705106170">Opna á nýjum vafrafipa</translation>
 <translation id="4276598757692536305">PPD-skrá prentara</translation>
 <translation id="4277434192562187284">Uppruni XML-stillingar</translation>
 <translation id="4278390842282768270">Leyft</translation>
@@ -5502,6 +5504,7 @@ Notaðu Ctrl + Alt + minnka birtustig til að minnka aðdrátt.</translation>
 <translation id="4946998421534856407">ræsilykill + ör upp</translation>
 <translation id="4947376546135294974">Gögn frá vefsvæðinu sem þú heimsækir</translation>
 <translation id="4949898053053527676">Engar leitarniðurstöður virðast passa við leitina</translation>
+<translation id="4949954144207118092">Opna á fyrirliggjandi <ph name="APP_NAME" />-flipa</translation>
 <translation id="4950100687509657457">Búa til prófíl</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{skrá}one{# skrá}other{# skrár}}</translation>
 <translation id="495170559598752135">Aðgerðir</translation>
@@ -7631,6 +7634,7 @@ Notaðu Ctrl + Alt + minnka birtustig til að minnka aðdrátt.</translation>
 <translation id="6563055593659435495">Ekki er hægt að halda tengingu við símann þinn. Gakktu úr skugga um að síminn sé nálægt þér, ólæstur og með kveikt á Bluetooth og WiFi.</translation>
 <translation id="6564343790052433242">Kveikt verður að vera á Google-aðgangsorðastjórnun til að búa til aðgangslykil fyrir <ph name="APP_NAME" /></translation>
 <translation id="6565899972286925956">Skapaðu hvað sem er</translation>
+<translation id="6566648465417201421">Opna aftur lokaðan tvískiptan skjá</translation>
 <translation id="656679903990115526">Skannaðu þetta með símanum þínum til að vista og fylla aðgangsorðin þín sjálfkrafa út til að skrá þig inn á vefsvæði og forrit á einfaldan hátt</translation>
 <translation id="6568283005472142698">Flipaleit</translation>
 <translation id="6569931898053264308">Miðlungs sparnaður</translation>
@@ -7968,6 +7972,7 @@ Notaðu Ctrl + Alt + minnka birtustig til að minnka aðdrátt.</translation>
 <translation id="6805478749741295868">Þetta er gervigreindareiginleiki á tilraunastigi sem getur gert villur.</translation>
 <translation id="6805817411033102703">Ábendingar um samnýtta flipahópa</translation>
 <translation id="6806089545527108739">Ekki leyfa en spyrja síðar</translation>
+<translation id="6806123901116522137">Opna gervigreindarnýjungar</translation>
 <translation id="6806781719264274042">Aðeins tengiliðir með Google-reikning. <ph name="LINK_BEGIN" />Skoða tengiliði<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">Til að halda áfram skaltu setja inn og snerta öryggislykilinn þinn</translation>
 <translation id="6808166974213191158">Vistun ChromeOs Flex kerfismynda</translation>
@@ -8620,6 +8625,7 @@ Notaðu Ctrl + Alt + minnka birtustig til að minnka aðdrátt.</translation>
 <translation id="7282992757463864530">Upplýsingastika</translation>
 <translation id="7283555985781738399">Gestastilling</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{Þetta tæki verður vistað í 1 dag og þú getur tengst án kóða næst. Stjórnandinn þinn stillir þetta.}one{Þetta tæki verður vistað í {DAYS} dag og þú getur tengst án kóða næst. Stjórnandinn þinn stillir þetta.}other{Þetta tæki verður vistað í {DAYS} daga og þú getur tengst án kóða næst. Stjórnandinn þinn stillir þetta.}}</translation>
+<translation id="7284386549235597598">Þetta mun stöðva ljúka verkefni sem Gemini er að vinna í.</translation>
 <translation id="7284411326658527427">Hver einstaklingur getur sérsniðið reikninginn sinn og tryggt öryggi gagna.</translation>
 <translation id="7285008278689343502">Grand Teton-þjóðgarðurinn</translation>
 <translation id="7286867818472074330">Velja aðgangslykil</translation>
@@ -8690,6 +8696,7 @@ Notaðu Ctrl + Alt + minnka birtustig til að minnka aðdrátt.</translation>
 <translation id="7336799713063880535">Lokað á tilkynningar</translation>
 <translation id="7337258336304389677">Notaðu síma eða spjaldtölvu</translation>
 <translation id="7339052793671338107">Stærðarhandfang hliðarglugga (hægt að draga)</translation>
+<translation id="733918220174231019">Ljúktu verkefni til að halda áfram</translation>
 <translation id="7339763383339757376">PKCS #7, stakt vottorð</translation>
 <translation id="7339785458027436441">Athuga stafsetningu meðan á innslætti stendur</translation>
 <translation id="7339898014177206373">Nýr gluggi</translation>
@@ -8840,6 +8847,7 @@ Notaðu Ctrl + Alt + minnka birtustig til að minnka aðdrátt.</translation>
 <translation id="7432200167665670017">Stjórnandinn setti „<ph name="EXTENSION_NAME" />“ á bannlista – Auðkenni forrits <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">Setja í geymslu</translation>
 <translation id="7433333862363162673">Hreinsa flýtileið fyrir val</translation>
+<translation id="7433495118028038748">Já, ljúka verkefni</translation>
 <translation id="7433957986129316853">Halda henni</translation>
 <translation id="7434100547946193426">Önnur forrit</translation>
 <translation id="7434509671034404296">Forritarar</translation>

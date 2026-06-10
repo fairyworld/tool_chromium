@@ -2145,6 +2145,7 @@ Pour continuer à partir de votre ordinateur, passez à <ph name="OTHER_EMAIL" /
 <translation id="8263809106706527890">Il se peut que les paramètres par défaut de votre navigateur aient été modifiés. Vous pouvez vérifier si c'est le cas dans les paramètres.</translation>
 <translation id="8264966119170358612">Certains de vos mots de passe enregistrés ont été exposés à une violation de données d'un tiers. <ph name="BEGIN_LINK" />En savoir plus<ph name="END_LINK" /></translation>
 <translation id="826614135184049678">Vous avez été déconnecté de votre compte <ph name="USER_NAME" /> lors de la réinitialisation de votre iPad. Pour vous reconnecter, touchez « Continuer » ci-dessous.</translation>
+<translation id="8270320981823560179">Disque</translation>
 <translation id="8273982424131314219">Vous remplirez les renseignements dans <ph name="URL" /></translation>
 <translation id="8275068909952022340">Plus…</translation>
 <translation id="8281781826761538115">Paramètres régionaux par défaut - <ph name="DEFAULT_LOCALE" /></translation>

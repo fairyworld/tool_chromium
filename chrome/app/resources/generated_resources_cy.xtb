@@ -1457,6 +1457,7 @@ Gallwch reoli gosodiadau'r cyfrif hwn drwy osod yr ap Family Link ar eich dyfais
 <translation id="2039464276165755892">Cuddio cynnwys hysbysiadau pan ganfyddir rhywun arall</translation>
 <translation id="2040460856718599782">Wps!  Aeth rhywbeth o'i le wrth geisio eich dilysu.  Gwiriwch eich tystlythyrau mewngofnodi eto a rhowch gynnig arall arni.</translation>
 <translation id="2040822390690632244">Diweddariadau, help, dewisiadau datblygwr</translation>
+<translation id="2040827008689966558">Ailagor gwedd hollt sydd wedi'i chau</translation>
 <translation id="2040894699575719559">Rhwystrwyd lleoliad</translation>
 <translation id="2042279886444479655">Gweithredu proffiliau</translation>
 <translation id="2044014337866019681">Gwnewch yn siŵr eich bod yn dilysu <ph name="ACCOUNT" /> i ddatgloi'r sesiwn.</translation>
@@ -4576,6 +4577,7 @@ Gallwch reoli gosodiadau'r cyfrif hwn drwy osod yr ap Family Link ar eich dyfais
 <translation id="4275397969489577657">Galluogi logio ffrydiau digwyddiadau</translation>
 <translation id="4275788652681621337">Cau'r panel ochr</translation>
 <translation id="4275830172053184480">Ailgychwynnwch eich dyfais</translation>
+<translation id="4276390967705106170">Agor mewn tab porwr newydd</translation>
 <translation id="4276598757692536305">Argraffydd PPD</translation>
 <translation id="4277434192562187284">Ffynhonnell ffurfweddiad XML</translation>
 <translation id="4278390842282768270">Caniateir</translation>
@@ -5501,6 +5503,7 @@ Defnyddiwch Ctrl + Alt + Lleihau disgleirdeb i bellhau.</translation>
 <translation id="4946998421534856407">launcher + saeth i fyny</translation>
 <translation id="4947376546135294974">Data o'r wefan rydych yn ymweld â hi</translation>
 <translation id="4949898053053527676">Mae'n ymddangos nad oes unrhyw ganlyniadau chwilio ar gyfer eich chwiliad</translation>
+<translation id="4949954144207118092">Agor mewn tab <ph name="APP_NAME" /> presennol</translation>
 <translation id="4950100687509657457">Creu proffil</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{ffeil}zero{# ffeil}two{# ffeil}few{# ffeil}many{# ffeil}other{# ffeil}}</translation>
 <translation id="495170559598752135">Gweithrediadau</translation>
@@ -7630,6 +7633,7 @@ Gallwch aseinio sawl switsh i'r weithred hon.</translation>
 <translation id="6563055593659435495">Methu â chynnal cysylltiad â'ch ffôn. Sicrhewch fod eich ffôn gerllaw, wedi'i ddatgloi a bod Bluetooth a Wi-FI wedi'u troi ymlaen.</translation>
 <translation id="6564343790052433242">I greu cod pas ar gyfer <ph name="APP_NAME" />, rhaid i Reolwr Cyfrineiriau Google fod ymlaen</translation>
 <translation id="6565899972286925956">Creu unrhyw beth</translation>
+<translation id="6566648465417201421">Ailagor Gwedd Hollt sydd wedi'i Chau</translation>
 <translation id="656679903990115526">Sganiwch hwn gyda'ch ffôn i gadw ac awtolenwi'ch cyfrineiriau i fewngofnodi'n hawdd i wefannau ac apiau</translation>
 <translation id="6568283005472142698">Chwilio Tab</translation>
 <translation id="6569931898053264308">Arbedion Canolig</translation>
@@ -7973,6 +7977,7 @@ Mae gennych # cyfrinair arall sydd wedi'u darganfod. Mae Rheolwr Cyfrineiriau Go
 <translation id="6805478749741295868">Mae hon yn nodwedd AI arbrofol ac ni fydd bob amser yn ei chael yn iawn.</translation>
 <translation id="6805817411033102703">Adborth grwpiau tabiau a rennir</translation>
 <translation id="6806089545527108739">Peidio â chaniatáu ond gofyn yn nes ymlaen</translation>
+<translation id="6806123901116522137">Mynd i Arloesiadau AI</translation>
 <translation id="6806781719264274042">Dim ond eich cysylltiadau sydd â Chyfrif Google. <ph name="LINK_BEGIN" />Gweld cysylltiadau<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">I barhau, mewnosodwch a chyffyrddwch eich allwedd ddiogelwch</translation>
 <translation id="6808166974213191158">Ysgrifennydd Delwedd System ChromeOS Flex</translation>
@@ -8625,6 +8630,7 @@ Mae gennych # cyfrinair arall sydd wedi'u darganfod. Mae Rheolwr Cyfrineiriau Go
 <translation id="7282992757463864530">Bar gwybodaeth</translation>
 <translation id="7283555985781738399">Modd gwestai</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{Bydd y ddyfais hon yn cael ei chadw am 1 diwrnod a gallwch gysylltu heb god y tro nesaf. Mae hyn yn cael ei osod gan eich gweinyddwr.}zero{Bydd y ddyfais hon yn cael ei chadw am {DAYS} diwrnod a gallwch gysylltu heb god y tro nesaf. Mae hyn yn cael ei osod gan eich gweinyddwr.}two{Bydd y ddyfais hon yn cael ei chadw am {DAYS} diwrnod a gallwch gysylltu heb god y tro nesaf. Mae hyn yn cael ei osod gan eich gweinyddwr.}few{Bydd y ddyfais hon yn cael ei chadw am {DAYS} diwrnod a gallwch gysylltu heb god y tro nesaf. Mae hyn yn cael ei osod gan eich gweinyddwr.}many{Bydd y ddyfais hon yn cael ei chadw am {DAYS} diwrnod a gallwch gysylltu heb god y tro nesaf. Mae hyn yn cael ei osod gan eich gweinyddwr.}other{Bydd y ddyfais hon yn cael ei chadw am {DAYS} diwrnod a gallwch gysylltu heb god y tro nesaf. Mae hyn yn cael ei osod gan eich gweinyddwr.}}</translation>
+<translation id="7284386549235597598">Bydd hyn yn dod â'r dasg y mae Gemini yn gweithio arni ar hyn o bryd i ben.</translation>
 <translation id="7284411326658527427">Gall pob person bersonoleiddio ei gyfrif a chadw data yn breifat.</translation>
 <translation id="7285008278689343502">Parc Cenedlaethol Grand Teton</translation>
 <translation id="7286867818472074330">Dewis cod pas</translation>
@@ -8695,6 +8701,7 @@ Mae gennych # cyfrinair arall sydd wedi'u darganfod. Mae Rheolwr Cyfrineiriau Go
 <translation id="7336799713063880535">Rhwystrwyd hysbysiadau.</translation>
 <translation id="7337258336304389677">Defnyddiwch eich ffôn neu lechen</translation>
 <translation id="7339052793671338107">Bachyn Ailfeintio y Panel Ochr (llusgadwy)</translation>
+<translation id="733918220174231019">Gorffen y dasg i barhau</translation>
 <translation id="7339763383339757376">PKCS #7, tystysgrif sengl</translation>
 <translation id="7339785458027436441">Gwirio Sillafu Wrth Deipio</translation>
 <translation id="7339898014177206373">Ffenestr newydd</translation>
@@ -8845,6 +8852,7 @@ Mae gennych # cyfrinair arall sydd wedi'u darganfod. Mae Rheolwr Cyfrineiriau Go
 <translation id="7432200167665670017">Mae eich gweinyddwr wedi rhwystro "<ph name="EXTENSION_NAME" />" - Rhif Adnabod yr Ap <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">Archifo</translation>
 <translation id="7433333862363162673">Clirio llwybr byr dewis</translation>
+<translation id="7433495118028038748">Ie, gorffen y dasg</translation>
 <translation id="7433957986129316853">Cadw</translation>
 <translation id="7434100547946193426">Apiau eraill</translation>
 <translation id="7434509671034404296">Datblygwr</translation>

@@ -1458,6 +1458,7 @@ You can manage this account’s settings by installing the Family Link app on yo
 <translation id="2039464276165755892">Hide notification content when someone else is detected</translation>
 <translation id="2040460856718599782">Oops!  Something went wrong when trying to authenticate you. Please double-check your sign-in credentials and try again.</translation>
 <translation id="2040822390690632244">Updates, help, developer options</translation>
+<translation id="2040827008689966558">Reopen closed split view</translation>
 <translation id="2040894699575719559">Location blocked</translation>
 <translation id="2042279886444479655">Active profiles</translation>
 <translation id="2044014337866019681">Please make sure that you are verifying <ph name="ACCOUNT" /> to unlock the session.</translation>
@@ -4577,6 +4578,7 @@ You can manage this account’s settings by installing the Family Link app on yo
 <translation id="4275397969489577657">Enable event stream logging</translation>
 <translation id="4275788652681621337">Close side panel</translation>
 <translation id="4275830172053184480">Restart your device</translation>
+<translation id="4276390967705106170">Open in a new browser tab</translation>
 <translation id="4276598757692536305">Printer PPD</translation>
 <translation id="4277434192562187284">XML configuration source</translation>
 <translation id="4278390842282768270">Allowed</translation>
@@ -5502,6 +5504,7 @@ Use Ctrl + Alt + Brightness down to zoom out.</translation>
 <translation id="4946998421534856407">launcher + up arrow</translation>
 <translation id="4947376546135294974">Data from the site that you're visiting</translation>
 <translation id="4949898053053527676">It looks like there aren't any search results for your search</translation>
+<translation id="4949954144207118092">Open in an existing <ph name="APP_NAME" /> tab</translation>
 <translation id="4950100687509657457">Create profile</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{a file}other{# files}}</translation>
 <translation id="495170559598752135">Actions</translation>
@@ -7631,6 +7634,7 @@ You can assign multiple switches to this action.</translation>
 <translation id="6563055593659435495">Can't maintain a connection with your phone. Make sure that your phone is nearby, unlocked and that Bluetooth and Wi-Fi are turned on.</translation>
 <translation id="6564343790052433242">To create a passkey for <ph name="APP_NAME" />, Google Password Manager must be on</translation>
 <translation id="6565899972286925956">Create anything</translation>
+<translation id="6566648465417201421">Reopen closed split view</translation>
 <translation id="656679903990115526">Scan this with your phone to save and autofill your passwords to easily sign in to sites and apps</translation>
 <translation id="6568283005472142698">Tab search</translation>
 <translation id="6569931898053264308">Medium savings</translation>
@@ -7966,6 +7970,7 @@ You have # more compromised passwords. Google Password Manager recommends checki
 <translation id="6805478749741295868">This is an experimental AI feature and won't always get it right.</translation>
 <translation id="6805817411033102703">Shared tab groups feedback</translation>
 <translation id="6806089545527108739">Don’t allow but ask later</translation>
+<translation id="6806123901116522137">Go to AI innovations</translation>
 <translation id="6806781719264274042">Only your contacts with a Google Account. <ph name="LINK_BEGIN" />View contacts<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">To continue, insert and touch your security key</translation>
 <translation id="6808166974213191158">Chrome OS Flex system image writer</translation>
@@ -8619,6 +8624,7 @@ You have # more compromised passwords. Google Password Manager recommends checki
 <translation id="7282992757463864530">Infobar</translation>
 <translation id="7283555985781738399">Guest mode</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{This device will be saved for one day and you can connect without a code next time. This is set by your administrator.}other{This device will be saved for {DAYS} days and you can connect without a code next time. This is set by your administrator.}}</translation>
+<translation id="7284386549235597598">This will end the task that Gemini is currently working on.</translation>
 <translation id="7284411326658527427">Each person can personalise their account and keep data private.</translation>
 <translation id="7285008278689343502">Grand Teton National Park</translation>
 <translation id="7286867818472074330">Select passkey</translation>
@@ -8689,6 +8695,7 @@ You have # more compromised passwords. Google Password Manager recommends checki
 <translation id="7336799713063880535">Notifications blocked.</translation>
 <translation id="7337258336304389677">Use your phone or tablet</translation>
 <translation id="7339052793671338107">Side panel resize handle (draggable)</translation>
+<translation id="733918220174231019">End task to continue</translation>
 <translation id="7339763383339757376">PKCS #7, single certificate</translation>
 <translation id="7339785458027436441">Check Spelling While Typing</translation>
 <translation id="7339898014177206373">New window</translation>
@@ -8839,6 +8846,7 @@ You have # more compromised passwords. Google Password Manager recommends checki
 <translation id="7432200167665670017">Your admin has blocked '<ph name="EXTENSION_NAME" />' – app ID <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">Archive</translation>
 <translation id="7433333862363162673">Clear selection shortcut</translation>
+<translation id="7433495118028038748">Yes, end task</translation>
 <translation id="7433957986129316853">Keep it</translation>
 <translation id="7434100547946193426">Other apps</translation>
 <translation id="7434509671034404296">Developer</translation>

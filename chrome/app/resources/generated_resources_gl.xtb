@@ -1447,6 +1447,7 @@ Instala a aplicación Family Link no teu dispositivo e poderás xestionar a conf
 <translation id="2039464276165755892">Ocultar contido das notificacións cando se detecta a presenza doutra persoa</translation>
 <translation id="2040460856718599782">Produciuse un erro ao tentar autenticarte. Volve comprobar as túas credenciais de inicio de sesión e téntao de novo.</translation>
 <translation id="2040822390690632244">Actualizacións, axuda, opcións de programación</translation>
+<translation id="2040827008689966558">Volver abrir vista dividida pechada</translation>
 <translation id="2040894699575719559">Bloqueouse a localización</translation>
 <translation id="2042279886444479655">Perfís activos</translation>
 <translation id="2044014337866019681">Asegúrate de estar verificando a conta <ph name="ACCOUNT" /> para desbloquear a sesión.</translation>
@@ -4566,6 +4567,7 @@ Podes xestionar a configuración desde o menú da tarxeta ou ver máis opcións 
 <translation id="4275397969489577657">Activar rexistro de emisión de eventos</translation>
 <translation id="4275788652681621337">Pechar o panel lateral</translation>
 <translation id="4275830172053184480">Reinicia o dispositivo</translation>
+<translation id="4276390967705106170">Abrir nunha pestana do navegador nova</translation>
 <translation id="4276598757692536305">PPD da impresora</translation>
 <translation id="4277434192562187284">Fonte da configuración XML</translation>
 <translation id="4278390842282768270">Permitida</translation>
@@ -5491,6 +5493,7 @@ Se queres afastala, usa Control + Alt + Reducir brillo.</translation>
 <translation id="4946998421534856407">menú de aplicacións + frecha arriba</translation>
 <translation id="4947376546135294974">Datos do sitio que estás visitando</translation>
 <translation id="4949898053053527676">Parece que non hai ningún resultado para a túa busca</translation>
+<translation id="4949954144207118092">Abrir nunha pestana de <ph name="APP_NAME" /> existente</translation>
 <translation id="4950100687509657457">Crear perfil</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{1 ficheiro}other{# ficheiros}}</translation>
 <translation id="495170559598752135">Accións</translation>
@@ -7617,6 +7620,7 @@ Podes asignarlles esta acción a varios interruptores.</translation>
 <translation id="6563055593659435495">Non se puido manter a conexión co teléfono. Asegúrate de ter o teléfono preto, desbloqueado e co Bluetooth e a wifi activados.</translation>
 <translation id="6564343790052433242">Se queres crear unha clave de acceso para <ph name="APP_NAME" />, o xestor de contrasinais de Google debe estar activado</translation>
 <translation id="6565899972286925956">Crea o que queiras</translation>
+<translation id="6566648465417201421">Volver abrir vista dividida pechada</translation>
 <translation id="656679903990115526">Escanea este código co teléfono para gardar e autocompletar os contrasinais e poder iniciar sesión facilmente nos sitios e nas aplicacións</translation>
 <translation id="6568283005472142698">Busca de pestanas</translation>
 <translation id="6569931898053264308">Aforro moderado</translation>
@@ -7952,6 +7956,7 @@ Quédanche # máis. O xestor de contrasinais de Google recomenda que comprobes e
 <translation id="6805478749741295868">Esta función de IA é experimental e non sempre acerta.</translation>
 <translation id="6805817411033102703">Comentarios sobre os grupos de pestanas compartidos</translation>
 <translation id="6806089545527108739">Non permitir, pero preguntar máis tarde</translation>
+<translation id="6806123901116522137">Ir a Innovacións de IA</translation>
 <translation id="6806781719264274042">Só os contactos que teñan unha Conta de Google. <ph name="LINK_BEGIN" />Ver contactos<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">Para continuar, insire a túa chave de seguranza e tócaa</translation>
 <translation id="6808166974213191158">Escritor de imaxes do sistema Chrome OS Flex</translation>
@@ -8604,6 +8609,7 @@ Quédanche # máis. O xestor de contrasinais de Google recomenda que comprobes e
 <translation id="7282992757463864530">Barra de información</translation>
 <translation id="7283555985781738399">Modo de convidado</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{Este dispositivo gardarase durante 1 día e poderás conectarte sen código a próxima vez. Esta preferencia definiuna o teu administrador.}other{Este dispositivo gardarase durante {DAYS} días e poderás conectarte sen código a próxima vez. Esta preferencia definiuna o teu administrador.}}</translation>
+<translation id="7284386549235597598">Esta acción finalizará a tarefa na que está traballando Gemini.</translation>
 <translation id="7284411326658527427">Cada unha delas pode personalizar a súa conta e protexer a privacidade dos seus datos.</translation>
 <translation id="7285008278689343502">Parque Nacional Grand Teton</translation>
 <translation id="7286867818472074330">Seleccionar clave de acceso</translation>
@@ -8674,6 +8680,7 @@ Quédanche # máis. O xestor de contrasinais de Google recomenda que comprobes e
 <translation id="7336799713063880535">Notificacións bloqueadas.</translation>
 <translation id="7337258336304389677">Usa o teu teléfono ou a tableta</translation>
 <translation id="7339052793671338107">Controlador de cambio de tamaño do panel lateral (arrastrable)</translation>
+<translation id="733918220174231019">Finaliza a tarefa para continuar</translation>
 <translation id="7339763383339757376">PKCS #7, certificado único</translation>
 <translation id="7339785458027436441">Comprobar a ortografía durante a escritura</translation>
 <translation id="7339898014177206373">Nova ventá</translation>
@@ -8824,6 +8831,7 @@ Quédanche # máis. O xestor de contrasinais de Google recomenda que comprobes e
 <translation id="7432200167665670017">O teu administrador bloqueou "<ph name="EXTENSION_NAME" />" (código de identificación da aplicación: <ph name="EXTENSION_ID" />)</translation>
 <translation id="7433103263856598557">Arquivar</translation>
 <translation id="7433333862363162673">Borrar atallo de selección</translation>
+<translation id="7433495118028038748">Si, finalizar tarefa</translation>
 <translation id="7433957986129316853">Conservar cambios</translation>
 <translation id="7434100547946193426">Outras aplicacións</translation>
 <translation id="7434509671034404296">Programador</translation>

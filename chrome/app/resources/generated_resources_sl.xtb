@@ -1457,6 +1457,7 @@ Nastavitve tega računa je mogoče upravljati z namestitvijo aplikacije Family L
 <translation id="2039464276165755892">Skrij vsebino obvestila, ko je zaznana prisotnost druge osebe</translation>
 <translation id="2040460856718599782">Pri preverjanju pristnosti je prišlo do težav. Še enkrat preverite poverilnice za prijavo in poskusite znova.</translation>
 <translation id="2040822390690632244">Obvestila, pomoč, možnosti za razvijalce</translation>
+<translation id="2040827008689966558">Znova odpri zaprti razdeljeni pogled</translation>
 <translation id="2040894699575719559">Lokacija je blokirana</translation>
 <translation id="2042279886444479655">Aktivni profili</translation>
 <translation id="2044014337866019681">Prepričajte se, da zaradi odklepanja seje preverjate račun <ph name="ACCOUNT" />.</translation>
@@ -4576,6 +4577,7 @@ Nastavitve tega računa je mogoče upravljati z namestitvijo aplikacije Family L
 <translation id="4275397969489577657">Omogočanje beleženja toka dogodkov</translation>
 <translation id="4275788652681621337">Zapiranje stranskega podokna</translation>
 <translation id="4275830172053184480">Znova zaženite napravo.</translation>
+<translation id="4276390967705106170">Odpri v novem zavihku brskalnika</translation>
 <translation id="4276598757692536305">PPD tiskalnika</translation>
 <translation id="4277434192562187284">Vir konfiguracije XML-jev</translation>
 <translation id="4278390842282768270">Dovoljeno</translation>
@@ -5501,6 +5503,7 @@ Za pomanjšavo pritisnite Ctrl + Alt + tipko za zmanjšanje svetlosti.</translat
 <translation id="4946998421534856407">zaganjalnik in puščica gor</translation>
 <translation id="4947376546135294974">Podatki s spletnega mesta, ki ste ga obiskali</translation>
 <translation id="4949898053053527676">Videti je, da za vaše iskanje ni nobenih rezultatov iskanja</translation>
+<translation id="4949954144207118092">Odpri v obstoječem zavihku <ph name="APP_NAME" /></translation>
 <translation id="4950100687509657457">Ustvarite profil</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{datoteko}one{# datoteko}two{# datoteki}few{# datoteke}other{# datotek}}</translation>
 <translation id="495170559598752135">Dejanja</translation>
@@ -7631,6 +7634,7 @@ Poskrbite, da ne boste razkrili morebitnih občutljivih podatkov.</translation>
 <translation id="6563055593659435495">Povezave s telefonom ni mogoče ohraniti. Preverite, ali imate telefon v bližini, ali je odklenjen ter ima vklopljeno povezavo Bluetooth in omrežje Wi-Fi.</translation>
 <translation id="6564343790052433242">Če želite ustvariti ključ za dostop za <ph name="APP_NAME" />, mora biti Googlov upravitelj gesel vklopljen</translation>
 <translation id="6565899972286925956">Ustvarite kar koli</translation>
+<translation id="6566648465417201421">Znova odpri zaprti razdeljeni pogled</translation>
 <translation id="656679903990115526">S telefonom optično preberite to, da shranite in samodejno izpolnite gesla, da se boste lahko preprosto prijavili na spletnih mestih in v aplikacijah</translation>
 <translation id="6568283005472142698">Iskanje po zavihkih</translation>
 <translation id="6569931898053264308">Srednji prihranki</translation>
@@ -7972,6 +7976,7 @@ Imate še # ogroženih gesel. Googlov upravitelj gesel priporoča, da takoj prev
 <translation id="6805478749741295868">To je preizkusna funkcija umetne inteligence in se lahko včasih tudi zmoti.</translation>
 <translation id="6805817411033102703">Povratne informacije o deljenih skupinah zavihkov</translation>
 <translation id="6806089545527108739">Ne dovoli, vendar vprašaj pozneje</translation>
+<translation id="6806123901116522137">Odpri inovacije umetne inteligence</translation>
 <translation id="6806781719264274042">Samo vaši stiki z računom Google. <ph name="LINK_BEGIN" />Ogled stikov<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">Če želite nadaljevati, vstavite varnostni ključ in se ga dotaknite</translation>
 <translation id="6808166974213191158">Zapisovalnik sistemskih slik za ChromeOS Flex</translation>
@@ -8625,6 +8630,7 @@ Imate še # ogroženih gesel. Googlov upravitelj gesel priporoča, da takoj prev
 <translation id="7282992757463864530">Informacijska vrstica</translation>
 <translation id="7283555985781738399">Način za goste</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{Ta naprava bo shranjena za 1 dan in naslednjič se lahko z njo povežete brez kode. To nastavi vaš skrbnik.}one{Ta naprava bo shranjena za {DAYS} dan in naslednjič se lahko z njo povežete brez kode. To nastavi vaš skrbnik.}two{Ta naprava bo shranjena za {DAYS} dneva in naslednjič se lahko z njo povežete brez kode. To nastavi vaš skrbnik.}few{Ta naprava bo shranjena za {DAYS} dni in naslednjič se lahko z njo povežete brez kode. To nastavi vaš skrbnik.}other{Ta naprava bo shranjena za {DAYS} dni in naslednjič se lahko z njo povežete brez kode. To nastavi vaš skrbnik.}}</translation>
+<translation id="7284386549235597598">S tem boste končali opravilo, s katerim se trenutno ukvarja Gemini.</translation>
 <translation id="7284411326658527427">Vsak lahko individualno prilagodi svoj račun in poskrbi za zasebnost podatkov.</translation>
 <translation id="7285008278689343502">Narodni park Grand Teton</translation>
 <translation id="7286867818472074330">Izberi ključ za dostop</translation>
@@ -8695,6 +8701,7 @@ Imate še # ogroženih gesel. Googlov upravitelj gesel priporoča, da takoj prev
 <translation id="7336799713063880535">Obvestila so blokir.</translation>
 <translation id="7337258336304389677">Uporabite telefon ali tablični računalnik</translation>
 <translation id="7339052793671338107">Ročica za spreminjanje velikosti stranskega podokna (mogoče jo je povleči)</translation>
+<translation id="733918220174231019">Končanje opravila za nadaljevanje</translation>
 <translation id="7339763383339757376">PKCS #7, enojno potrdilo</translation>
 <translation id="7339785458027436441">Preverjanje črkovanja med tipkanjem</translation>
 <translation id="7339898014177206373">Novo okno</translation>
@@ -8845,6 +8852,7 @@ Imate še # ogroženih gesel. Googlov upravitelj gesel priporoča, da takoj prev
 <translation id="7432200167665670017">Skrbnik je blokiral »<ph name="EXTENSION_NAME" />« – ID aplikacije <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">Arhiviraj</translation>
 <translation id="7433333862363162673">Brisanje bližnjico za izbor</translation>
+<translation id="7433495118028038748">Da, končaj opravilo</translation>
 <translation id="7433957986129316853">Ohrani</translation>
 <translation id="7434100547946193426">Druge aplikacije</translation>
 <translation id="7434509671034404296">Razvijalec</translation>

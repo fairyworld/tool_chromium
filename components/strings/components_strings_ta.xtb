@@ -269,6 +269,7 @@
 <translation id="1407135791313364759">எல்லாவற்றையும் திற</translation>
 <translation id="1408696301184924537">இந்த IBAN அடுத்த முறை தானாக நிரப்பப்பட இதை உங்கள் Google கணக்கில் சேமியுங்கள்</translation>
 <translation id="1408787208417187241">டிரிப்பில் ஸ்டேப்பில் டாப்</translation>
+<translation id="1410306713026702438"><ph name="SUGGESTION_TITLE" />, <ph name="SUGGESTION_DESCRIPTION" />. <ph name="SUGGESTION_TYPE" />. <ph name="GROUP_HEADER" /> குழுவில் <ph name="MATCH_POSITION" />/<ph name="NUM_MATCHES_IN_GROUP" /> நிலையில் உள்ளது.</translation>
 <translation id="1410365862999780287">இந்தச் சாதனத்தைப் பயன்படுத்தும் பிறர், உங்கள் செயல்பாட்டைப் பார்க்க முடியாது என்பதால் நீங்கள் மிகவும் தனிப்பட்ட முறையில் தேடலாம். Google உட்பட, நீங்கள் பார்வையிடும் இணையதளங்கள் தரவை எப்படிச் சேகரிக்கின்றன என்பதையும் அவை பயன்படுத்தும் சேவைகளையும் இது மாற்றாது. பதிவிறக்கங்கள், புக்மார்க்குகள் மற்றும் வாசிப்புப் பட்டியலில் உள்ளவை சேமிக்கப்படும்.</translation>
 <translation id="1410941016594047814">என்வெலப் இன்வைட்</translation>
 <translation id="1413235258620101697">விரைவான செக்-அவுட்டிற்காக இந்தக் கார்டின் CVC என்க்ரிப்ஷன் செய்யப்பட்டு Google Walletடில் சேமிக்கப்படும்</translation>
@@ -660,6 +661,7 @@
 <translation id="2045871135676061132">என்வெலப் பர்சனல்</translation>
 <translation id="2046951263634619614">புத்தக ரீடெய்லர்கள்</translation>
 <translation id="2048261947532620704">பக்கம் மொழிபெயர்க்கப்படுகிறது</translation>
+<translation id="2055016614992422886">உரையாடல்</translation>
 <translation id="2059166748188874810">நகராட்சி</translation>
 <translation id="2059202684901022309">22 x 34 இன்ச்</translation>
 <translation id="2064568741209980952">கடன் வழங்குதல்</translation>
@@ -3552,6 +3554,7 @@
 <translation id="6550245281449521513">மவுஸை லாக் செய்ய முடியாது</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />, புதிது</translation>
 <translation id="6552566579578780089">பேமெண்ட்டுகள்</translation>
+<translation id="6553777254569586547"><ph name="SUGGESTION_TITLE" />. <ph name="SUGGESTION_TYPE" />. <ph name="GROUP_HEADER" /> குழுவில் <ph name="MATCH_POSITION" />/<ph name="NUM_MATCHES_IN_GROUP" /> நிலையில் உள்ளது.</translation>
 <translation id="6554732001434021288">கடைசியாகப் பார்த்தது: <ph name="NUM_DAYS" /> நாட்களுக்கு முன்</translation>
 <translation id="6556866813142980365">மீண்டும் செய்</translation>
 <translation id="6557715786897013164">14 x 17 இன்ச்</translation>

@@ -2562,6 +2562,7 @@
 <translation id="2822551631199737692">කැමරාව භාවිතයේ ඇත</translation>
 <translation id="2822634587701817431">හකුළන්න / දිග හරින්න</translation>
 <translation id="2824942875887026017"><ph name="IDS_SHORT_PRODUCT_NAME" /> ඔබේ පරිපාලක වෙතින් ප්‍රොක්සි සැකසීම් භාවිත කරයි</translation>
+<translation id="2825200993288778739">ඔබේම නිපුණතාවයක් ගොඩනඟන්න හෝ නිපුණතා පුස්තකාලයෙන් එක් කරන්න</translation>
 <translation id="282525059261716597">විධාන පේළිය:</translation>
 <translation id="2825758591930162672">විෂයයේ පොදු යතුර</translation>
 <translation id="2826576843404243001">ආරක්ෂිත සම්බන්ධතා සඳහා සහය නොදක්වන වෙබ් අඩවි සඳහා, වෙබ් අඩවියට පිවිසීමට පෙර අනතුරු අඟවන්න. ඔබ උසස් ආරක්ෂණය සබල කර ඇති නිසා ඔබට මෙම සැකසීම වෙනස් කළ නොහැක.</translation>
@@ -4637,6 +4638,7 @@
 <translation id="4321179778687042513">ctrl</translation>
 <translation id="432160826079505197">ෆෝල්ඩරයේ <ph name="FILE_NAME" /> පෙන්වන්න</translation>
 <translation id="4322394346347055525">වෙනත් ටැබ් වසන්න</translation>
+<translation id="4322400254469690320"><ph name="FEATURE_NAME" /> ෆෝල්ඩරය තුළ ඔබේ <ph name="FILENAME" /> සොයා ගන්න</translation>
 <translation id="4324577459193912240">ගොනුව අසම්පූර්ණයි</translation>
 <translation id="4325433082696797523">ආචයනය සහ බලය</translation>
 <translation id="4325515113816851466">ඔබ වැරීමෙන් පසු ඔබේ මාපියන්ගේ තේරීම් අදාළ නොවේ</translation>
@@ -6632,6 +6634,7 @@
 <translation id="5826993284769733527">අර්ධ විනිවිද</translation>
 <translation id="5827266244928330802">Safari</translation>
 <translation id="5827591412833386477">එකම සමූහයේ වෙබ් අඩවිය පෙන්වන්න</translation>
+<translation id="5827835011646404677">නිපුණතා ඔබේ Google ගිණුමට සුරකිනු ලබයි</translation>
 <translation id="5828181959764767444">හිරු බැසීම</translation>
 <translation id="5828545842856466741">පැතිකඩ එක් කරන්න...</translation>
 <translation id="5828633471261496623">මුද්‍රණය වේ...</translation>
@@ -11203,6 +11206,7 @@
 <translation id="9130015405878219958">අවලංගු ප්‍රකාරය ඇතුළු කෙරිණි.</translation>
 <translation id="9130135798965366513">ඉදිරියට යාමට, <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> ඔබේ <ph name="FIELDS_STRING" /> මෙම අඩවිය සමග බෙදා ගනු ඇත. මෙම අඩවියෙහි <ph name="BEGIN_LINK1" />පෞද්ගලිකත්ව ප්‍රතිපත්තිය<ph name="END_LINK1" /> සහ <ph name="BEGIN_LINK2" />සේවා නියම<ph name="END_LINK2" /> බලන්න.</translation>
 <translation id="9130364135697530260">මෙම අඩවිය හත කාවද්දන ලද අන්තර්ගතයට ඔවුන් ඔබ ගැන සුරැකී ඇති තොරතුරු භාවිත කළ හැක</translation>
+<translation id="9130857050314385402">ඔබ නිපුණතාව භාවිතා කරන විට පටිති මාතෘකා සහ URL Google වෙත යවනු ලැබේ</translation>
 <translation id="9131209053278896908">අවහිර කළ අඩවි මෙහි දිස් වේ</translation>
 <translation id="9131487537093447019">බ්ලූටූත් උපාංග වෙත පණිවිඩ යවන්න සහ ඒවායින් පණිවිඩ ලබා ගන්න.</translation>
 <translation id="9133568201369135151">නිර්ණය කිරීම් දත්ත රැස් කිරීම සම්පූර්ණයි. ඔබේ පුද්ගලික තොරතුරු සමහරක් මෙම දත්තවල ඇතුළත් වේ.</translation>

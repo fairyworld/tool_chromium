@@ -1445,6 +1445,7 @@ Wenn du die Family Link App auf deinem Gerät installierst, kannst du die Einste
 <translation id="2039464276165755892">Benachrichtigungen ausblenden, wenn eine andere Person erkannt wird</translation>
 <translation id="2040460856718599782">Hoppla! Bei der Authentifizierung ist ein Fehler aufgetreten. Bitte überprüfe deine Anmeldedaten und versuche es erneut.</translation>
 <translation id="2040822390690632244">Updates, Hilfe, Entwickleroptionen</translation>
+<translation id="2040827008689966558">Geschlossene geteilte Ansicht wieder öffnen</translation>
 <translation id="2040894699575719559">Standort blockiert</translation>
 <translation id="2042279886444479655">Aktive Profile</translation>
 <translation id="2044014337866019681">Bitte bestätige <ph name="ACCOUNT" />, um die Sitzung zu entsperren.</translation>
@@ -4559,6 +4560,7 @@ Möchtest du <ph name="CONTROL_PANEL_APPLET_NAME" /> starten?</translation>
 <translation id="4275397969489577657">Ereignisstream-Protokollierung aktivieren</translation>
 <translation id="4275788652681621337">Seitenleiste schließen</translation>
 <translation id="4275830172053184480">Gerät neu starten</translation>
+<translation id="4276390967705106170">In einem neuen Browsertab öffnen</translation>
 <translation id="4276598757692536305">Drucker-PPD-Datei</translation>
 <translation id="4277434192562187284">XML-Konfigurationsquelle</translation>
 <translation id="4278390842282768270">Zugelassen</translation>
@@ -5483,6 +5485,7 @@ Zum Herauszoomen drücke Strg + Alt + „Helligkeit verringern“.</translatio
 <translation id="4946998421534856407">Launcher-Taste + Aufwärtspfeil</translation>
 <translation id="4947376546135294974">Daten von der Website, die du besuchst</translation>
 <translation id="4949898053053527676">Für deine Suche gibt es keine Ergebnisse</translation>
+<translation id="4949954144207118092">In einem vorhandenen <ph name="APP_NAME" />-Tab öffnen</translation>
 <translation id="4950100687509657457">Profil erstellen</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{eine Datei}other{# Dateien}}</translation>
 <translation id="495170559598752135">Aktionen</translation>
@@ -7608,6 +7611,7 @@ Du kannst dieser Aktion mehrere Schalter zuweisen.</translation>
 <translation id="6563055593659435495">Verbindung mit deinem Smartphone kann nicht aufrechterhalten werden. Dein Smartphone muss sich in der Nähe befinden, entsperrt sein und Bluetooth und WLAN müssen aktiviert sein.</translation>
 <translation id="6564343790052433242">Damit du einen Passkey für <ph name="APP_NAME" /> erstellen kannst, muss der Google Passwortmanager aktiviert sein</translation>
 <translation id="6565899972286925956">Kreativität ohne Grenzen</translation>
+<translation id="6566648465417201421">Geschlossene geteilte Ansicht wieder öffnen</translation>
 <translation id="656679903990115526">Scanne diesen QR-Code mit deinem Smartphone, um deine Passwörter zu speichern und automatisch ausfüllen zu lassen, damit du dich einfacher auf Websites und in Apps anmelden kannst</translation>
 <translation id="6568283005472142698">Tab-Suche</translation>
 <translation id="6569931898053264308">Mittlere Einsparungen</translation>
@@ -7943,6 +7947,7 @@ Du hast # weitere kompromittierte Passwörter. Der Google Passwortmanager empfi
 <translation id="6805478749741295868">Dies ist eine experimentelle KI-Funktion, die nicht immer richtig funktioniert.</translation>
 <translation id="6805817411033102703">Feedback zu geteilten Tabgruppen</translation>
 <translation id="6806089545527108739">Nicht zulassen, später noch einmal fragen</translation>
+<translation id="6806123901116522137">Zu den KI‑Innovationen</translation>
 <translation id="6806781719264274042">Nur meine Kontakte mit einem Google-Konto. <ph name="LINK_BEGIN" />Kontakte anzeigen<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">Stecke deinen Sicherheitsschlüssel ein und tippe darauf, um fortzufahren</translation>
 <translation id="6808166974213191158">Chrome OS Flex-Systemimage-Writer</translation>
@@ -8596,6 +8601,7 @@ Du hast # weitere kompromittierte Passwörter. Der Google Passwortmanager empfi
 <translation id="7282992757463864530">Infoleiste</translation>
 <translation id="7283555985781738399">Gastmodus</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{Dieses Gerät wird für einen Tag gespeichert und du kannst dich das nächste Mal ohne einen Code verbinden. Dies wird von deinem Administrator festgelegt.}other{Dieses Gerät wird für {DAYS} Tage gespeichert und du kannst dich das nächste Mal ohne einen Code verbinden. Dies wird von deinem Administrator festgelegt.}}</translation>
+<translation id="7284386549235597598">Dadurch wird die Aufgabe beendet, an der Gemini gerade arbeitet.</translation>
 <translation id="7284411326658527427">Jeder Nutzer kann sein Konto personalisieren. Dabei bleiben die Daten der einzelnen Nutzer privat.</translation>
 <translation id="7285008278689343502">Grand-Teton-Nationalpark</translation>
 <translation id="7286867818472074330">Passkey auswählen</translation>
@@ -8666,6 +8672,7 @@ Du hast # weitere kompromittierte Passwörter. Der Google Passwortmanager empfi
 <translation id="7336799713063880535">Benachr. blockiert.</translation>
 <translation id="7337258336304389677">Smartphone oder Tablet verwenden</translation>
 <translation id="7339052793671338107">Ziehpunkt zur Größenanpassung der Seitenleiste (ziehbar)</translation>
+<translation id="733918220174231019">Aufgabe beenden, um fortzufahren</translation>
 <translation id="7339763383339757376">PKCS #7, Einzelzertifikat</translation>
 <translation id="7339785458027436441">Rechtschreibung während der Eingabe prüfen</translation>
 <translation id="7339898014177206373">Neues Fenster</translation>
@@ -8816,6 +8823,7 @@ Du hast # weitere kompromittierte Passwörter. Der Google Passwortmanager empfi
 <translation id="7432200167665670017">Dein Administrator hat „<ph name="EXTENSION_NAME" />“ blockiert – App-ID <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">Archivieren</translation>
 <translation id="7433333862363162673">Tastenkombination zum Aufheben der Auswahl</translation>
+<translation id="7433495118028038748">Ja, Aufgabe beenden</translation>
 <translation id="7433957986129316853">Beibehalten</translation>
 <translation id="7434100547946193426">Weitere Apps</translation>
 <translation id="7434509671034404296">Entwickler</translation>

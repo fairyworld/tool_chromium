@@ -1444,6 +1444,7 @@
 <translation id="2039464276165755892">他者の検出時に通知内容を非表示</translation>
 <translation id="2040460856718599782">ユーザー認証時に問題が発生しました。ログイン情報をお確かめのうえ、もう一度お試しください。</translation>
 <translation id="2040822390690632244">更新、ヘルプ、デベロッパー オプション</translation>
+<translation id="2040827008689966558">閉じた分割ビューを再度開く</translation>
 <translation id="2040894699575719559">位置情報をブロック中</translation>
 <translation id="2042279886444479655">有効なプロファイル</translation>
 <translation id="2044014337866019681">セッションのロックを解除するには、<ph name="ACCOUNT" /> の確認を行ってください。</translation>
@@ -2354,7 +2355,7 @@
 <translation id="2688196195245426394">デバイスをサーバーに登録するときにエラーが発生しました: <ph name="CLIENT_ERROR" />。</translation>
 <translation id="2688734475209947648">このパスワードを覚えておく必要はありません。パスワードは、<ph name="ACCOUNT" /> の Google パスワード マネージャーに保存されます。</translation>
 <translation id="2690024944919328218">言語オプションを表示</translation>
-<translation id="2691385045260836588">機種</translation>
+<translation id="2691385045260836588">車種</translation>
 <translation id="2692503699962701720">要素タイプと書式付きテキストを読み上げるときにピッチを変更する</translation>
 <translation id="2692901429679246677">アクア</translation>
 <translation id="2693134906590795721">充電開始の音</translation>
@@ -2555,6 +2556,7 @@
 <translation id="2822551631199737692">カメラを使用中</translation>
 <translation id="2822634587701817431">拡大または縮小</translation>
 <translation id="2824942875887026017"><ph name="IDS_SHORT_PRODUCT_NAME" /> は管理者により指定されたプロキシ設定を使用しています</translation>
+<translation id="2825200993288778739">独自のスキルを作成するか、スキル ライブラリから追加できます</translation>
 <translation id="282525059261716597">コマンドライン:</translation>
 <translation id="2825758591930162672">サブジェクトの公開鍵</translation>
 <translation id="2826576843404243001">サイトで安全な接続がサポートされていない場合は、サイトにアクセスする前に警告が表示されます。高度な保護機能が有効になっているため、この設定は変更できません。</translation>
@@ -4554,6 +4556,7 @@
 <translation id="4275397969489577657">イベント ストリームのログを有効にする</translation>
 <translation id="4275788652681621337">サイドパネルを閉じる</translation>
 <translation id="4275830172053184480">デバイスの再起動</translation>
+<translation id="4276390967705106170">新しいブラウザタブで開く</translation>
 <translation id="4276598757692536305">プリンタの PPD</translation>
 <translation id="4277434192562187284">XML 構成の参照元</translation>
 <translation id="4278390842282768270">許可されています</translation>
@@ -4627,6 +4630,7 @@
 <translation id="4321179778687042513">ctrl</translation>
 <translation id="432160826079505197">Finder で <ph name="FILE_NAME" /> を表示</translation>
 <translation id="4322394346347055525">他のタブをすべて閉じる</translation>
+<translation id="4322400254469690320"><ph name="FEATURE_NAME" /> フォルダで <ph name="FILENAME" /> を確認できます</translation>
 <translation id="4324577459193912240">ファイルが不完全です</translation>
 <translation id="4325433082696797523">ストレージと電源</translation>
 <translation id="4325515113816851466">ログアウトすると、保護者の方が指定した設定は適用されなくなります</translation>
@@ -5477,6 +5481,7 @@
 <translation id="4946998421534856407">ランチャー+上矢印</translation>
 <translation id="4947376546135294974">アクセスしているサイトのデータ</translation>
 <translation id="4949898053053527676">検索条件と一致する結果が見つかりませんでした</translation>
+<translation id="4949954144207118092">既存の <ph name="APP_NAME" /> タブで開く</translation>
 <translation id="4950100687509657457">プロフィールの作成</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{ファイル}other{# 件のファイル}}</translation>
 <translation id="495170559598752135">操作</translation>
@@ -6615,6 +6620,7 @@
 <translation id="5826993284769733527">半透明</translation>
 <translation id="5827266244928330802">Safari</translation>
 <translation id="5827591412833386477">同じグループ内のサイトを表示する</translation>
+<translation id="5827835011646404677">スキルは Google アカウントに保存されます</translation>
 <translation id="5828181959764767444">日の入り</translation>
 <translation id="5828545842856466741">プロファイルを追加...</translation>
 <translation id="5828633471261496623">印刷中...</translation>
@@ -7601,6 +7607,7 @@
 <translation id="6563055593659435495">スマートフォンとの接続を維持できません。スマートフォンが近くにあってロックが解除され、Bluetooth と Wi−Fi がオンになっていることを確認してください。</translation>
 <translation id="6564343790052433242"><ph name="APP_NAME" /> のパスキーを作成するには、Google パスワード マネージャーをオンにする必要があります</translation>
 <translation id="6565899972286925956">あらゆるものを作成できます</translation>
+<translation id="6566648465417201421">閉じた分割ビューを再度開く</translation>
 <translation id="656679903990115526">スマートフォンでスキャンしてパスワードを保存すると、サイトやアプリで自動入力して簡単にログインできます</translation>
 <translation id="6568283005472142698">タブ検索</translation>
 <translation id="6569931898053264308">中量の節約</translation>
@@ -7935,6 +7942,7 @@
 <translation id="6805478749741295868">これは試験運用版の AI 機能です。常に適切な結果が得られるとは限りません。</translation>
 <translation id="6805817411033102703">共有タブグループのフィードバック</translation>
 <translation id="6806089545527108739">許可しないが後で確認する</translation>
+<translation id="6806123901116522137">AI イノベーションに移動</translation>
 <translation id="6806781719264274042">Google アカウントを利用している連絡先のみ。<ph name="LINK_BEGIN" />連絡先を表示<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">続行するには、セキュリティ キーを差し込んでタッチしてください</translation>
 <translation id="6808166974213191158">ChromeOS Flex システム イメージ ライター</translation>
@@ -8588,6 +8596,7 @@
 <translation id="7282992757463864530">情報バー</translation>
 <translation id="7283555985781738399">ゲストモード</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{このデバイスは 1 日間保存され、次回はコードなしで接続できます。これは管理者によって設定されています。}other{このデバイスは {DAYS} 日間保存され、次回はコードなしで接続できます。これは管理者によって設定されています。}}</translation>
+<translation id="7284386549235597598">Gemini で現在処理中のタスクを終了します。</translation>
 <translation id="7284411326658527427">ユーザーごとにアカウントをカスタマイズして、データのプライバシーを確保できます。</translation>
 <translation id="7285008278689343502">グランドティトン国立公園</translation>
 <translation id="7286867818472074330">パスキーを選択</translation>
@@ -8658,6 +8667,7 @@
 <translation id="7336799713063880535">通知をブロックしました。</translation>
 <translation id="7337258336304389677">スマートフォンまたはタブレットを使用する</translation>
 <translation id="7339052793671338107">サイドパネルのサイズ変更ハンドル（ドラッグ可能）</translation>
+<translation id="733918220174231019">タスクを終了して続行</translation>
 <translation id="7339763383339757376">PKCS #7、単一の証明書</translation>
 <translation id="7339785458027436441">入力中にスペルチェック</translation>
 <translation id="7339898014177206373">新しいウィンドウ</translation>
@@ -8808,6 +8818,7 @@
 <translation id="7432200167665670017">「<ph name="EXTENSION_NAME" />」（アプリ ID: <ph name="EXTENSION_ID" />）は管理者によってブロックされています</translation>
 <translation id="7433103263856598557">アーカイブ</translation>
 <translation id="7433333862363162673">選択ショートカットを解除</translation>
+<translation id="7433495118028038748">はい、タスクを終了します</translation>
 <translation id="7433957986129316853">そのままにする</translation>
 <translation id="7434100547946193426">その他のアプリ</translation>
 <translation id="7434509671034404296">開発 / 管理</translation>
@@ -11179,6 +11190,7 @@
 <translation id="9130015405878219958">入力されたモードが無効です。</translation>
 <translation id="9130135798965366513">続行すると、<ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> からこのサイトに<ph name="FIELDS_STRING" />が共有されます。このサイトの<ph name="BEGIN_LINK1" />プライバシー ポリシー<ph name="END_LINK1" />と<ph name="BEGIN_LINK2" />利用規約<ph name="END_LINK2" />をご確認ください。</translation>
 <translation id="9130364135697530260">このサイトの埋め込みコンテンツでは、保存したあなたに関する情報を使用できます</translation>
+<translation id="9130857050314385402">スキルを使用すると、タブのタイトルと URL が Google に送信されます</translation>
 <translation id="9131209053278896908">ブロック中のサイトがここに表示されます</translation>
 <translation id="9131487537093447019">Bluetooth デバイスとのメッセージの送受信。</translation>
 <translation id="9133568201369135151">診断データの収集が完了しました。このデータには、個人情報の一部が含まれています。</translation>

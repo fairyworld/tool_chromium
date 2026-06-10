@@ -269,6 +269,7 @@
 <translation id="1407135791313364759">Открыть все</translation>
 <translation id="1408696301184924537">Чтобы в следующий раз этот код IBAN подставился автоматически, сохраните его в аккаунте Google.</translation>
 <translation id="1408787208417187241">Три скобы сверху</translation>
+<translation id="1410306713026702438"><ph name="SUGGESTION_TITLE" />, <ph name="SUGGESTION_DESCRIPTION" />. <ph name="SUGGESTION_TYPE" />. <ph name="MATCH_POSITION" /> из <ph name="NUM_MATCHES_IN_GROUP" /> в группе "<ph name="GROUP_HEADER" />".</translation>
 <translation id="1410365862999780287">Другие пользователи этого устройства не увидят, что вы делали, поэтому вы можете пользоваться браузером с большей приватностью. Сайты, которые вы посещаете, и используемые ими сервисы, в том числе продукты Google, продолжат собирать данные как прежде. Новые закладки, скачанные файлы и страницы в списке для чтения будут сохранены.</translation>
 <translation id="1410941016594047814">Конверт Invite</translation>
 <translation id="1413235258620101697">CVC-код этой карты будет зашифрован и сохранен в Google Кошельке, чтобы вы могли оплачивать покупки быстрее.</translation>
@@ -660,6 +661,7 @@
 <translation id="2045871135676061132">Конверт Personal</translation>
 <translation id="2046951263634619614">Книжные магазины</translation>
 <translation id="2048261947532620704">Перевод страницы…</translation>
+<translation id="2055016614992422886">Чат</translation>
 <translation id="2059166748188874810">Муниципалитет</translation>
 <translation id="2059202684901022309">22 x 34 дюйма</translation>
 <translation id="2064568741209980952">Кредиты и займы</translation>
@@ -3556,6 +3558,7 @@
 <translation id="6550245281449521513">Блокировка мыши запрещена</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />, новый атрибут</translation>
 <translation id="6552566579578780089">Способы оплаты</translation>
+<translation id="6553777254569586547"><ph name="SUGGESTION_TITLE" />. <ph name="SUGGESTION_TYPE" />. <ph name="MATCH_POSITION" /> из <ph name="NUM_MATCHES_IN_GROUP" /> в группе "<ph name="GROUP_HEADER" />".</translation>
 <translation id="6554732001434021288">Последнее посещение: <ph name="NUM_DAYS" /> дн. назад</translation>
 <translation id="6556866813142980365">Повторить</translation>
 <translation id="6557715786897013164">14 x 17 дюймов</translation>

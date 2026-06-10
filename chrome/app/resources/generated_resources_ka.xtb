@@ -2562,6 +2562,7 @@
 <translation id="2822551631199737692">კამერა გამოიყენება</translation>
 <translation id="2822634587701817431">შევიწროება / გაშლა</translation>
 <translation id="2824942875887026017"><ph name="IDS_SHORT_PRODUCT_NAME" /> იყენებს პროქსი-სერვერის პარამეტრებს, რომლებიც განსაზღვრულია თქვენი ადმინისტრატორის მიერ</translation>
+<translation id="2825200993288778739">შექმენით საკუთარი ან დაამატეთ უნარების ბიბლიოთეკიდან</translation>
 <translation id="282525059261716597">ბრძანების სტრიქონი:</translation>
 <translation id="2825758591930162672">სუბიექტის საჯარო გასაღები</translation>
 <translation id="2826576843404243001">საიტებისთვის, რომელიც არ სარგებლობს უსაფრთხო კავშირის მხარდაჭერით, გაფრთხილებას მიიღებთ მონახულებამდე. ამ პარამეტრის შეცვლა შეუძლებელია, რადგან დამატებითი დაცვა გაქვთ ჩართული.</translation>
@@ -4639,6 +4640,7 @@
 <translation id="4321179778687042513">ctrl</translation>
 <translation id="432160826079505197"><ph name="FILE_NAME" /> გამოჩნდეს Finder-ში</translation>
 <translation id="4322394346347055525">სხვა ჩანართების დახურვა</translation>
+<translation id="4322400254469690320">იპოვეთ თქვენი „<ph name="FILENAME" />“ საქაღალდეში „<ph name="FEATURE_NAME" />“</translation>
 <translation id="4324577459193912240">ფაილი არასრულია</translation>
 <translation id="4325433082696797523">მეხსიერება და ელკვება</translation>
 <translation id="4325515113816851466">თქვენი მშობლის არჩევანი არ იმოქმედებს სისტემიდან გასვლის შემდეგ</translation>
@@ -6634,6 +6636,7 @@
 <translation id="5826993284769733527">ნახევრადგამჭვირვალე</translation>
 <translation id="5827266244928330802">Safari</translation>
 <translation id="5827591412833386477">საიტების ჩვენება იმავე ჯგუფიდან</translation>
+<translation id="5827835011646404677">უნარები ინახება თქვენს Google ანგარიშში</translation>
 <translation id="5828181959764767444">დაისი</translation>
 <translation id="5828545842856466741">პროფილის დამატება…</translation>
 <translation id="5828633471261496623">ბეჭდვა…</translation>
@@ -11204,6 +11207,7 @@
 <translation id="9130015405878219958">შეყვანილია არასწორი რეჟიმი.</translation>
 <translation id="9130135798965366513">გასაგრძელებლად <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" />-ის მიერ ამ საიტთან გაზიარდება <ph name="FIELDS_STRING" />. გაეცანით ამ საიტის <ph name="BEGIN_LINK1" />კონფიდენციალურობის დებულებასა<ph name="END_LINK1" /> და <ph name="BEGIN_LINK2" />მომსახურების პირობებს<ph name="END_LINK2" />.</translation>
 <translation id="9130364135697530260">ამ საიტზე ჩაშენებულ კონტენტს შეუძლია მის მიერ თქვენ შესახებ შენახული ინფორმაციის გამოყენება</translation>
+<translation id="9130857050314385402">ჩანართის სათაურები და URL-ები ეგზავნება Google-ს, როდესაც იყენებთ უნარს</translation>
 <translation id="9131209053278896908">დაბლოკილი საიტები აქ გამოჩნდება</translation>
 <translation id="9131487537093447019">Bluetooth მოწყობილობებიდან შეტყობინებების გაგზავნა და მიღება.</translation>
 <translation id="9133568201369135151">დიაგნოსტიკური მონაცემების შეგროვება დასრულდა. აღნიშნული მონაცემები მოიცავს თქვენი პერსონალური ინფორმაციის ნაწილსაც.</translation>

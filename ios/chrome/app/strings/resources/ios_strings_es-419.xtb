@@ -6,6 +6,7 @@
 <translation id="1005230401424685968">AAAA</translation>
 <translation id="1013952917065545813">Puedes volver aquí para abrir las pestañas que cerraste recientemente</translation>
 <translation id="1016495303386450659">Elemento actualizado</translation>
+<translation id="1018804590490383958">Escanear y autocompletar</translation>
 <translation id="1019990162050689579">Actividad en la app de Gemini</translation>
 <translation id="102916930470544692">Llave de acceso</translation>
 <translation id="1030376737535466765">Abrir el Administrador de contraseñas</translation>
@@ -1549,6 +1550,7 @@ Handoff también debe estar habilitado en la sección General de la configuraci�
 <translation id="6301767200000930965">Aa</translation>
 <translation id="630308129961693966">Posiciona la barra de direcciones</translation>
 <translation id="6307241780749477694">Verifica tu identidad para obtener todas tus contraseñas en este dispositivo</translation>
+<translation id="6307792728709337290">Guarda tu tarjeta en tu Cuenta de Google para autocompletarla en esta compra y en compras futuras realizadas en Chrome.</translation>
 <translation id="6316141353357700666">Elige la contraseña que quieras usar de la lista que aparece.</translation>
 <translation id="6321526113093607004">Agregar a Favoritos</translation>
 <translation id="6327249202318869726">Gemini se desactivó para tu cuenta. Para obtener más información, comunícate con tu administrador.</translation>
@@ -2143,6 +2145,7 @@ Para continuar desde tu computadora, cambia a <ph name="OTHER_EMAIL" />. Obtendr
 <translation id="8263809106706527890">Es posible que se haya producido un cambio en la configuración predeterminada de tu navegador. Puedes comprobarlo en la configuración.</translation>
 <translation id="8264966119170358612">Se expusieron algunas de tus contraseñas guardadas en una violación de la seguridad de los datos de terceros. <ph name="BEGIN_LINK" />Más información<ph name="END_LINK" /></translation>
 <translation id="826614135184049678">Saliste de tu cuenta <ph name="USER_NAME" /> como parte del restablecimiento de tu iPad. Para volver a acceder, presiona "Continuar".</translation>
+<translation id="8270320981823560179">Drive</translation>
 <translation id="8273982424131314219">Se rellenará la información en <ph name="URL" /></translation>
 <translation id="8275068909952022340">Más…</translation>
 <translation id="8281781826761538115">Predeterminado: <ph name="DEFAULT_LOCALE" /></translation>

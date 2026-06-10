@@ -1448,6 +1448,7 @@ Ak chcete spravovať nastavenia tohto účtu, nainštalujte si do zariadenia apl
 <translation id="2039464276165755892">Skrývať obsah upozornení, keď zariadenie rozpozná inú osobu</translation>
 <translation id="2040460856718599782">Hops, pri overovaní vašej totožnosti sa vyskytla chyba. Skontrolujte znova svoje prihlasovacie údaje a skúste to znova.</translation>
 <translation id="2040822390690632244">Aktualizácie, pomocník, možnosti pre vývojárov</translation>
+<translation id="2040827008689966558">Znova otvoriť zavreté rozdelené zobrazenie</translation>
 <translation id="2040894699575719559">Poloha je blokovaná</translation>
 <translation id="2042279886444479655">Aktívne profily</translation>
 <translation id="2044014337866019681">Ak chcete túto reláciu odblokovať, overte účet <ph name="ACCOUNT" />.</translation>
@@ -4564,6 +4565,7 @@ Ak chcete spravovať nastavenia tohto účtu, nainštalujte si do zariadenia apl
 <translation id="4275397969489577657">Povoliť zápis streamovania udalosti do denníka</translation>
 <translation id="4275788652681621337">Zavrieť bočný panel</translation>
 <translation id="4275830172053184480">Reštart zariadenia</translation>
+<translation id="4276390967705106170">Otvoriť na novej karte prehliadača</translation>
 <translation id="4276598757692536305">Súbor PPD tlačiarne</translation>
 <translation id="4277434192562187284">Zdroj konfigurácie XML</translation>
 <translation id="4278390842282768270">Povolené</translation>
@@ -5488,6 +5490,7 @@ Ak chcete zobrazenie oddialiť, stlačte Ctrl + Alt + zníženie jasu.</translat
 <translation id="4946998421534856407">kláves spúšťača + šípka nahor</translation>
 <translation id="4947376546135294974">Dáta z webu, ktorý navštevujete</translation>
 <translation id="4949898053053527676">Zdá sa, že na základe vášho vyhľadávania sa nenašli žiadne výsledky</translation>
+<translation id="4949954144207118092">Otvoriť na existujúcej karte <ph name="APP_NAME" /></translation>
 <translation id="4950100687509657457">Vytvoriť profil</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{súbor}few{# súbory}many{# files}other{# súborov}}</translation>
 <translation id="495170559598752135">Akcie</translation>
@@ -7616,6 +7619,7 @@ Tejto akcii môžete prideliť viacero prepínačov.</translation>
 <translation id="6563055593659435495">Pripojenie s vaším telefónom sa nedá udržať. Uistite sa, že telefón máte nablízku, odomknutý a so zapnutým rozhraním Bluetooth a pripojením Wi‑Fi.</translation>
 <translation id="6564343790052433242">Ak chcete vytvoriť prístupový kľúč k aplikácii <ph name="APP_NAME" />, Správca hesiel Google musí byť zapnutý</translation>
 <translation id="6565899972286925956">Vytvorte čokoľvek</translation>
+<translation id="6566648465417201421">Znova otvoriť zavreté rozdelené zobrazenie</translation>
 <translation id="656679903990115526">Naskenujte tento kód telefónom, aby ste si mohli uložiť heslá a automaticky ich dopĺňať, a ľahko sa tak prihlasovať na weboch a v aplikáciách</translation>
 <translation id="6568283005472142698">Vyhľadávanie kariet</translation>
 <translation id="6569931898053264308">Stredné úspory</translation>
@@ -7955,6 +7959,7 @@ Máte ešte # ďalších. Správca hesiel Google odporúča okamžite dané hes
 <translation id="6805478749741295868">Toto je experimentálna funkcia umelej inteligencie a nie vždy sa to podarí.</translation>
 <translation id="6805817411033102703">Spätná väzba k zdieľaným skupinám kariet</translation>
 <translation id="6806089545527108739">Nepovoliť, ale opýtať sa neskôr</translation>
+<translation id="6806123901116522137">Prejsť na inovácie umelej inteligencie</translation>
 <translation id="6806781719264274042">Iba vaše kontakty s účtom Google. <ph name="LINK_BEGIN" />Zobraziť kontakty<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">Ak chcete pokračovať, vložte bezpečnostný kľúč a klepnite naň</translation>
 <translation id="6808166974213191158">ChromeOS Flex System Image Writer</translation>
@@ -8608,6 +8613,7 @@ Máte ešte # ďalších. Správca hesiel Google odporúča okamžite dané hes
 <translation id="7282992757463864530">Informačný panel</translation>
 <translation id="7283555985781738399">Režim pre hostí</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{Toto zariadenie bude uložené na 1 deň a nabudúce sa môžete pripojiť bez kódu. Nastavil to váš správca.}few{Toto zariadenie bude uložené na {DAYS} dni a nabudúce sa môžete pripojiť bez kódu. Nastavil to váš správca.}many{Toto zariadenie bude uložené na {DAYS} dňa a nabudúce sa môžete pripojiť bez kódu. Nastavil to váš správca.}other{Toto zariadenie bude uložené na {DAYS} dní a nabudúce sa môžete pripojiť bez kódu. Nastavil to váš správca.}}</translation>
+<translation id="7284386549235597598">Týmto ukončíte úlohu, na ktorej Gemini momentálne pracuje.</translation>
 <translation id="7284411326658527427">Každá osoba si môže prispôsobiť účet a uchovať údaje v súkromí.</translation>
 <translation id="7285008278689343502">Národný park Grand Teton</translation>
 <translation id="7286867818472074330">Vybrať prístupový kľúč</translation>
@@ -8678,6 +8684,7 @@ Máte ešte # ďalších. Správca hesiel Google odporúča okamžite dané hes
 <translation id="7336799713063880535">Upoz. sú blokované.</translation>
 <translation id="7337258336304389677">Použite telefón alebo tablet</translation>
 <translation id="7339052793671338107">Rukoväť na zmenu veľkosti bočného panela (presúvateľná)</translation>
+<translation id="733918220174231019">Ak chcete pokračovať, ukončite úlohu</translation>
 <translation id="7339763383339757376">Štandard PKCS #7, jeden certifikát</translation>
 <translation id="7339785458027436441">Kontrolovať pravopis počas písania</translation>
 <translation id="7339898014177206373">Nové okno</translation>
@@ -8827,6 +8834,7 @@ Máte ešte # ďalších. Správca hesiel Google odporúča okamžite dané hes
 <translation id="7432200167665670017">Váš správca zablokoval <ph name="EXTENSION_NAME" /> – identifikátor aplikácie <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">Archivovať</translation>
 <translation id="7433333862363162673">Vymazať skratku výberu</translation>
+<translation id="7433495118028038748">Áno, ukončiť úlohu</translation>
 <translation id="7433957986129316853">Ponechať</translation>
 <translation id="7434100547946193426">Ďalšie aplikácie</translation>
 <translation id="7434509671034404296">Vývojár</translation>

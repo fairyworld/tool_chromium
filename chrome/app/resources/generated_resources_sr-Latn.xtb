@@ -2558,6 +2558,7 @@ Možete da upravljate podešavanjima ovog naloga ako instalirate aplikaciju Fami
 <translation id="2822551631199737692">Kamera se koristi</translation>
 <translation id="2822634587701817431">Skupi/proširi</translation>
 <translation id="2824942875887026017"><ph name="IDS_SHORT_PRODUCT_NAME" /> koristi podešavanja proksija administratora</translation>
+<translation id="2825200993288778739">Napravite svoju veštinu ili dodajte iz zbirke veština</translation>
 <translation id="282525059261716597">Komandna linija:</translation>
 <translation id="2825758591930162672">Javni ključ subjekta</translation>
 <translation id="2826576843404243001">Za sajtove koji ne podržavaju bezbedne veze, dobijajte upozorenje pre nego što posetite sajt. Ne možete da promenite ovo podešavanje jer je omogućena Napredna zaštita.</translation>
@@ -4635,6 +4636,7 @@ Možete da upravljate podešavanjima ovog naloga ako instalirate aplikaciju Fami
 <translation id="4321179778687042513">ctrl</translation>
 <translation id="432160826079505197">Prikaži fajl <ph name="FILE_NAME" /> u Finder-u</translation>
 <translation id="4322394346347055525">Zatvori druge kartice</translation>
+<translation id="4322400254469690320">Pronađite fajl <ph name="FILENAME" /> u <ph name="FEATURE_NAME" /> folderu</translation>
 <translation id="4324577459193912240">Datoteka je nepotpuna</translation>
 <translation id="4325433082696797523">Memorijski prostor i napajanje</translation>
 <translation id="4325515113816851466">Izabrane opcije roditelja neće važiti kada se odjaviš</translation>
@@ -6629,6 +6631,7 @@ Vodite računa da ne otkrijete nikakve osetljive informacije.</translation>
 <translation id="5826993284769733527">Polutransparentno</translation>
 <translation id="5827266244928330802">Safari</translation>
 <translation id="5827591412833386477">Prikaži sajtove u istoj grupi</translation>
+<translation id="5827835011646404677">Veštine se čuvaju na Google nalogu</translation>
 <translation id="5828181959764767444">Zalazak sunca</translation>
 <translation id="5828545842856466741">Dodaj profil…</translation>
 <translation id="5828633471261496623">Štampanje...</translation>
@@ -11205,6 +11208,7 @@ To može da obuhvata informacije o instaliranom softveru, fajlovima, pregledaču
 <translation id="9130015405878219958">Unet je nevažeći režim.</translation>
 <translation id="9130135798965366513">Da biste nastavili, <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> će deliti <ph name="FIELDS_STRING" /> sa ovim sajtom. Pogledajte <ph name="BEGIN_LINK1" />politiku privatnosti<ph name="END_LINK1" /> i <ph name="BEGIN_LINK2" />uslove korišćenja usluge<ph name="END_LINK2" /> za ovaj sajt.</translation>
 <translation id="9130364135697530260">Ugrađeni sadržaj na ovom sajtu ne može da koristi informacije koje su sačuvane o vama</translation>
+<translation id="9130857050314385402">Naslovi kartica i URL-ovi šalju se Google-u kada koristite veštinu</translation>
 <translation id="9131209053278896908">Ovde se prikazuju blokirani sajtovi</translation>
 <translation id="9131487537093447019">Slanje poruka na Bluetooth uređaje i primanje poruka sa njih.</translation>
 <translation id="9133568201369135151">Prikupljanje dijagnostičkih podataka je završeno. U te podatke su uvršteni i neki lični podaci.</translation>

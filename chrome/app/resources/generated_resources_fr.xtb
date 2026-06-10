@@ -1448,6 +1448,7 @@ Vous pouvez gérer les paramètres de ce compte en installant l'application Fami
 <translation id="2039464276165755892">Masquer les notifications lorsqu'une autre personne est détectée</translation>
 <translation id="2040460856718599782">Petit problème… Une erreur s'est produite lors de la tentative d'authentification. Veuillez vérifier vos identifiants de connexion, puis réessayer.</translation>
 <translation id="2040822390690632244">Mises à jour, aide, options pour les développeurs</translation>
+<translation id="2040827008689966558">Rouvrir la vue fractionnée fermée</translation>
 <translation id="2040894699575719559">Position bloquée</translation>
 <translation id="2042279886444479655">Profils actifs</translation>
 <translation id="2044014337866019681">Pour déverrouiller la session, vérifiez que vous êtes bien en train de valider <ph name="ACCOUNT" />.</translation>
@@ -4562,6 +4563,7 @@ Souhaitez-vous lancer <ph name="CONTROL_PANEL_APPLET_NAME" /> ?</translation>
 <translation id="4275397969489577657">Activer la journalisation des flux d'événements</translation>
 <translation id="4275788652681621337">Fermer le panneau latéral</translation>
 <translation id="4275830172053184480">Redémarrer l'appareil</translation>
+<translation id="4276390967705106170">Ouvrir dans un nouvel onglet du navigateur</translation>
 <translation id="4276598757692536305">PPD de l'imprimante</translation>
 <translation id="4277434192562187284">Source de configuration XML</translation>
 <translation id="4278390842282768270">Autorisé</translation>
@@ -5486,6 +5488,7 @@ Appuyez sur Ctrl+Alt+Baisser la luminosité pour faire un zoom arrière.</transl
 <translation id="4946998421534856407">Lanceur d'applications+Flèche vers le haut</translation>
 <translation id="4947376546135294974">Données du site que vous consultez</translation>
 <translation id="4949898053053527676">Aucun résultat ne semble correspondre à votre recherche</translation>
+<translation id="4949954144207118092">Ouvrir dans un onglet <ph name="APP_NAME" /> existant</translation>
 <translation id="4950100687509657457">Créer un profil</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{un fichier}one{# fichier}other{# fichiers}}</translation>
 <translation id="495170559598752135">Actions</translation>
@@ -7615,6 +7618,7 @@ Assurez-vous de ne pas dévoiler d'informations sensibles.</translation>
 <translation id="6563055593659435495">Impossible de maintenir la connexion avec votre téléphone. Vérifiez que votre téléphone est à proximité et débloqué, et que le Bluetooth et le Wi-Fi sont activés.</translation>
 <translation id="6564343790052433242">Pour créer une clé d'accès pour <ph name="APP_NAME" />, vous devez activer le Gestionnaire de mots de passe de Google</translation>
 <translation id="6565899972286925956">Créez ce que vous voulez</translation>
+<translation id="6566648465417201421">Rouvrir la vue fractionnée fermée</translation>
 <translation id="656679903990115526">Scannez ce code avec votre téléphone pour enregistrer et saisir automatiquement vos mots de passe afin de vous connecter facilement à des sites et applis</translation>
 <translation id="6568283005472142698">Recherche dans les onglets</translation>
 <translation id="6569931898053264308">Économies moyennes</translation>
@@ -7952,6 +7956,7 @@ Vous avez # autres mots de passe compromis. Le Gestionnaire de mots de passe Go
 <translation id="6805478749741295868">Cette fonctionnalité d'IA est expérimentale et n'est pas infaillible.</translation>
 <translation id="6805817411033102703">Commentaires sur les groupes d'onglets partagés</translation>
 <translation id="6806089545527108739">Ne pas autoriser, mais me demander plus tard</translation>
+<translation id="6806123901116522137">Accéder aux innovations d'IA</translation>
 <translation id="6806781719264274042">Seulement vos contacts disposant d'un compte Google. <ph name="LINK_BEGIN" />Afficher les contacts<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">Pour continuer, insérez la clé de sécurité et appuyez dessus</translation>
 <translation id="6808166974213191158">Écriture des images système ChromeOS Flex</translation>
@@ -8605,6 +8610,7 @@ Vous avez # autres mots de passe compromis. Le Gestionnaire de mots de passe Go
 <translation id="7282992757463864530">Barre d'informations</translation>
 <translation id="7283555985781738399">Mode Invité</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{Pendant 1 jour, cet appareil sera enregistré et vous n'aurez pas besoin de code pour vous reconnecter. Ce paramètre est défini par votre administrateur.}one{Pendant {DAYS} jour, cet appareil sera enregistré et vous n'aurez pas besoin de code pour vous reconnecter. Ce paramètre est défini par votre administrateur.}other{Pendant {DAYS} jours, cet appareil sera enregistré et vous n'aurez pas besoin de code pour vous reconnecter. Ce paramètre est défini par votre administrateur.}}</translation>
+<translation id="7284386549235597598">Cela mettra fin à la tâche sur laquelle Gemini travaille actuellement.</translation>
 <translation id="7284411326658527427">Chaque personne pourra personnaliser son compte et préserver la confidentialité de ses données.</translation>
 <translation id="7285008278689343502">Parc national de Grand Teton</translation>
 <translation id="7286867818472074330">Sélectionner une clé d'accès</translation>
@@ -8675,6 +8681,7 @@ Vous avez # autres mots de passe compromis. Le Gestionnaire de mots de passe Go
 <translation id="7336799713063880535">Notif. bloquées.</translation>
 <translation id="7337258336304389677">Utilisez votre téléphone ou votre tablette</translation>
 <translation id="7339052793671338107">Poignée de redimensionnement du panneau latéral (déplaçable)</translation>
+<translation id="733918220174231019">Arrêtez la tâche pour continuer</translation>
 <translation id="7339763383339757376">PKCS #7, certificat unique</translation>
 <translation id="7339785458027436441">Vérifier l'orthographe lors de la frappe</translation>
 <translation id="7339898014177206373">Nouvelle fenêtre</translation>
@@ -8825,6 +8832,7 @@ Vous avez # autres mots de passe compromis. Le Gestionnaire de mots de passe Go
 <translation id="7432200167665670017">Votre administrateur a bloqué "<ph name="EXTENSION_NAME" />" - Identifiant d'application <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">Archiver</translation>
 <translation id="7433333862363162673">Effacer le raccourci de sélection</translation>
+<translation id="7433495118028038748">Oui, arrêter la tâche</translation>
 <translation id="7433957986129316853">Conserver</translation>
 <translation id="7434100547946193426">Autres applis</translation>
 <translation id="7434509671034404296">Options pour les développeurs</translation>

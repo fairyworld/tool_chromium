@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">Brauzerni yangilang</translation>
 <translation id="4021931095789478915">${url} manzilini Saqlangan sahifalarga qoʻshish</translation>
 <translation id="4028871427853484857">Hisobga saqlash…</translation>
+<translation id="4036529942385659684">Muayyan harakatsizlikdan keyin boshlangʻich sahifani chiqarish</translation>
 <translation id="4038354071007134711">Bu faylni ochadigan ilova yo‘q.</translation>
 <translation id="4042870976416480368">Sahifa ichidan qidirish</translation>
 <translation id="4045441967987592849">Qayta ochish</translation>
@@ -2145,6 +2146,7 @@ Kompyuterda davom etish uchun <ph name="OTHER_EMAIL" /> hisobiga almashtiring. B
 <translation id="8263809106706527890">Birlamchi brauzer sozlamalariga oʻzgarishlar kiritilgan boʻlishi mumkin. Buni Sozlamalar orqali tekshirish mumkin.</translation>
 <translation id="8264966119170358612">Saqlangan parollaringizdan ayrimlari Googledan boshqa tashqi xizmatlarning sizib chiqarilgan axborotlari ichidan topildi. <ph name="BEGIN_LINK" />Batafsil<ph name="END_LINK" /></translation>
 <translation id="826614135184049678">iPad qurilmasini tiklash mobaynida <ph name="USER_NAME" /> hisobingizdan chiqarildingiz. Hisobga qayta kirish uchun “Davom etish” ustiga bosing.</translation>
+<translation id="8270320981823560179">Drive</translation>
 <translation id="8273982424131314219">Axborot <ph name="URL" /> sahifasida kiritiladi</translation>
 <translation id="8275068909952022340">Yana…</translation>
 <translation id="8281781826761538115">Standart - <ph name="DEFAULT_LOCALE" /></translation>

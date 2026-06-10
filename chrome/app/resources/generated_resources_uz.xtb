@@ -2564,6 +2564,7 @@ Oʻz qurilmangizda Family Link ilovasini oʻrnatib, bu hisob sozlamalarini boshq
 <translation id="2822551631199737692">Kamera ishlatilmoqda</translation>
 <translation id="2822634587701817431">Yig‘ish / yoyish</translation>
 <translation id="2824942875887026017"><ph name="IDS_SHORT_PRODUCT_NAME" /> administrator tomonidan sozlangan proksi-serverni ishlatmoqda</translation>
+<translation id="2825200993288778739">Oʻzingiznikini yarating yoki malakalar kutubxonasidan qoʻshing</translation>
 <translation id="282525059261716597">Buyruqlar qatori:</translation>
 <translation id="2825758591930162672">Subyektning ochiq kaliti</translation>
 <translation id="2826576843404243001">Xavfsiz ulanishlarda ishlamaydigan saytlarga kirishdan avval ogohlantirish. Bu sozlamani oʻzgartira olmaysiz, chunki kuchaytirilgan himoya yoniq.</translation>
@@ -4639,6 +4640,7 @@ Oʻz qurilmangizda Family Link ilovasini oʻrnatib, bu hisob sozlamalarini boshq
 <translation id="4321179778687042513">ctrl</translation>
 <translation id="432160826079505197"><ph name="FILE_NAME" />: Finder ichida chiqarish</translation>
 <translation id="4322394346347055525">Boshqa ichki oynalarni yopish</translation>
+<translation id="4322400254469690320"><ph name="FILENAME" /> faylini <ph name="FEATURE_NAME" /> jildidan toping</translation>
 <translation id="4324577459193912240">Fayl oxirigacha yuklanmagan</translation>
 <translation id="4325433082696797523">Xotira va quvvat</translation>
 <translation id="4325515113816851466">Hisobdan chiqsangiz, ota-onangizning tanlovlari amal qilmaydi</translation>
@@ -6633,6 +6635,7 @@ Bu amal uchun bir nechta kalit tugma belgilash mumkin.</translation>
 <translation id="5826993284769733527">Yarim shaffof</translation>
 <translation id="5827266244928330802">Safari</translation>
 <translation id="5827591412833386477">Guruhdagi boshqa saytlarni ochish</translation>
+<translation id="5827835011646404677">Malakalar Google hisobingizga saqlanadi</translation>
 <translation id="5828181959764767444">Kun botishi</translation>
 <translation id="5828545842856466741">Profil kiritish...</translation>
 <translation id="5828633471261496623">Chop etilmoqda...</translation>
@@ -11204,6 +11207,7 @@ Bu axborotga oʻrnatilgan dasturlar, fayllar, brauzer, qurilmadagi operatsion ti
 <translation id="9130015405878219958">Noto‘g‘ri rejim ko‘rsatildi.</translation>
 <translation id="9130135798965366513">Davom etish uchun <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> maʼlumotlaringizni (<ph name="FIELDS_STRING" />) bu saytga ulashadi. Bu saytning <ph name="BEGIN_LINK1" />maxfiylik siyosati<ph name="END_LINK1" /> va <ph name="BEGIN_LINK2" />xizmat shartlari<ph name="END_LINK2" /> bilan tanishing.</translation>
 <translation id="9130364135697530260">Bu saytda joylashtirilgan kontent saqlangan shaxsiy maʼlumotlaringizdan foydalanishi mumkin</translation>
+<translation id="9130857050314385402">Malaka ishlatilganda varaq nomlari va URL manzillar Googlega yuboriladi</translation>
 <translation id="9131209053278896908">Bloklangan saytlar shu yerda chiqadi</translation>
 <translation id="9131487537093447019">Bluetooth qurilmalari bilan xabarlar almashish</translation>
 <translation id="9133568201369135151">Diagnostika maʼlumotlarini toʻplash yakunlandi. Ayrim shaxsiy maʼlumotlaringiz bularga qoʻshilgan.</translation>

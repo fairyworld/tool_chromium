@@ -1448,6 +1448,7 @@ Cihazda Family Link tətbiqini quraşdırmaqla bu hesabın ayarlarını idarə e
 <translation id="2039464276165755892">Başqası aşkar edildikdə bildiriş məzmununu gizlədin</translation>
 <translation id="2040460856718599782">Sizi doğrulayan zaman xəta oldu. Giriş kredensiallarınızı yoxlayın və yenidən cəhd edin.</translation>
 <translation id="2040822390690632244">Güncəllənmə, kömək, developer seçimləri</translation>
+<translation id="2040827008689966558">Bağlanmış bölünmüş görünüşü yenidən açın</translation>
 <translation id="2040894699575719559">Məkan blok edildi</translation>
 <translation id="2042279886444479655">Aktiv profillər</translation>
 <translation id="2044014337866019681">Seansı blokdan çıxarmaq üçün <ph name="ACCOUNT" /> hesabını doğruladığınıza əmin olun.</translation>
@@ -4565,6 +4566,7 @@ Cihazda Family Link tətbiqini quraşdırmaqla bu hesabın ayarlarını idarə e
 <translation id="4275397969489577657">Tədbir yayım girişini aktiv edin</translation>
 <translation id="4275788652681621337">Yan paneli bağlayın</translation>
 <translation id="4275830172053184480">Cihazınızı yenidən başladın</translation>
+<translation id="4276390967705106170">Yeni brauzer tabında açın</translation>
 <translation id="4276598757692536305">Printer üçün PPD faylı</translation>
 <translation id="4277434192562187284">XML konfiqurasiya mənbəyi</translation>
 <translation id="4278390842282768270">İcazə verilib</translation>
@@ -5490,6 +5492,7 @@ Uzaqlaşdırmaq üçün Ctrl + Alt + Parlaqlığı Azalt düymələrindən istif
 <translation id="4946998421534856407">başladıcı + yuxarı ox</translation>
 <translation id="4947376546135294974">Daxil olduğunuz saytdan əldə edilən data</translation>
 <translation id="4949898053053527676">Görünür, axtarışınız üçün heç bir axtarış nəticəsi yoxdur</translation>
+<translation id="4949954144207118092">Mövcud <ph name="APP_NAME" /> tətbiqində açın</translation>
 <translation id="4950100687509657457">Profil yaradın</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{fayl}other{# fayl}}</translation>
 <translation id="495170559598752135">Fəaliyyətlər</translation>
@@ -7619,6 +7622,7 @@ Bu əməliyyata birdən çox keçirici təyin edə bilərsiniz.</translation>
 <translation id="6563055593659435495">Telefonunuzla bağlantını saxlamaq mümkün deyil. Telefonunuzun yaxınlıqda, kiliddən çıxarılmış olduğuna, Bluetooth və Wi-Fi-ın yandırılmış olduğuna əmin olun.</translation>
 <translation id="6564343790052433242"><ph name="APP_NAME" /> üçün giriş açarı yaratmaq məqsədilə Google Parol Meneceri aktiv olmalıdır</translation>
 <translation id="6565899972286925956">İstənilən şeyi yaradın</translation>
+<translation id="6566648465417201421">Bağlanmış bölünmüş görünüşü yenidən açın</translation>
 <translation id="656679903990115526">Sayt və tətbiqlərə asanlıqla daxil olmaq məqsədilə parolları yadda saxlamaq və avtomatik doldurmaq üçün telefonunuzla skan edin</translation>
 <translation id="6568283005472142698">Tab Axtarışı</translation>
 <translation id="6569931898053264308">Orta səviyyədə qənaət</translation>
@@ -7954,6 +7958,7 @@ Daha # oğurlanmış parolunuz var. Google Parol Meneceri bu parolları indi yox
 <translation id="6805478749741295868">Bu, təcrübi AI funksiyasıdır və həmişə doğru nəticə verməyə bilər.</translation>
 <translation id="6805817411033102703">Paylaşılan tab qrupları rəyi</translation>
 <translation id="6806089545527108739">İcazə verməyin, amma sonra soruşun</translation>
+<translation id="6806123901116522137">Sİ yeniliklərinə keçin</translation>
 <translation id="6806781719264274042">Yalnız Google Hesabı olan kontaktlarınız. <ph name="LINK_BEGIN" />Kontaktlara baxın<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">Davam etmək üçün təhlükəsizlik açarını daxil edib ona toxunun</translation>
 <translation id="6808166974213191158">ChromeOS Flex Sistem Şəkil Yazıcısı</translation>
@@ -8606,6 +8611,7 @@ Daha # oğurlanmış parolunuz var. Google Parol Meneceri bu parolları indi yox
 <translation id="7282992757463864530">Məlumat paneli</translation>
 <translation id="7283555985781738399">Qonaq rejimi</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{Bu cihaz 1 gün saxlanacaq və növbəti dəfə kod olmadan qoşula bilərsiniz. Bu, administratorunuz tərəfindən ayarlanıb.}other{Bu cihaz {DAYS} gün saxlanacaq və növbəti dəfə kod olmadan qoşula bilərsiniz. Bu, administratorunuz tərəfindən ayarlanıb.}}</translation>
+<translation id="7284386549235597598">Bu zaman Gemini-ın hazırda üzərində işlədiyi tapşırıq sonlandırılacaq.</translation>
 <translation id="7284411326658527427">Hər bir şəxs öz hesabını fərdiləşdirə və datanı məxfi saxlaya bilər.</translation>
 <translation id="7285008278689343502">Grand Teton Milli Parkı</translation>
 <translation id="7286867818472074330">Giriş açarı seçin</translation>
@@ -8676,6 +8682,7 @@ Daha # oğurlanmış parolunuz var. Google Parol Meneceri bu parolları indi yox
 <translation id="7336799713063880535">Bildirişlər blok edilib.</translation>
 <translation id="7337258336304389677">Telefon və ya planşetdən istifadə edin</translation>
 <translation id="7339052793671338107">Yan panelin ölçüsünü dəyişdirmək üçün tutacaq (sürüklənə bilir)</translation>
+<translation id="733918220174231019">Davam etmək üçün tapşırığı sonlandırın</translation>
 <translation id="7339763383339757376">PKCS #7, tək sertifikat</translation>
 <translation id="7339785458027436441">Yazan zaman orfoqrafiyanı yoxlayın</translation>
 <translation id="7339898014177206373">Yeni pəncərə</translation>
@@ -8826,6 +8833,7 @@ Daha # oğurlanmış parolunuz var. Google Parol Meneceri bu parolları indi yox
 <translation id="7432200167665670017">Admininiz "<ph name="EXTENSION_NAME" />" - App ID <ph name="EXTENSION_ID" /> artırmasını bloklayıb</translation>
 <translation id="7433103263856598557">Arxivləyin</translation>
 <translation id="7433333862363162673">Seçim qısayolunu silin</translation>
+<translation id="7433495118028038748">Bəli, tapşırığı sonlandırın</translation>
 <translation id="7433957986129316853">Saxlayın</translation>
 <translation id="7434100547946193426">Digər tətbiqlər</translation>
 <translation id="7434509671034404296">Developer</translation>

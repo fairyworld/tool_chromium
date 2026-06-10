@@ -6,6 +6,7 @@
 <translation id="1005230401424685968">YYYY</translation>
 <translation id="1013952917065545813">ここでは、最近閉じたタブをもう一度開くことができます</translation>
 <translation id="1016495303386450659">更新済みのアイテム</translation>
+<translation id="1018804590490383958">スキャンして自動入力</translation>
 <translation id="1019990162050689579">Gemini アプリ アクティビティ</translation>
 <translation id="102916930470544692">パスキー</translation>
 <translation id="1030376737535466765">パスワード マネージャーを開く</translation>
@@ -873,6 +874,7 @@
 <translation id="4021447724486050609">ブラウザを更新してください</translation>
 <translation id="4021931095789478915">${url} をリーディング リストに追加</translation>
 <translation id="4028871427853484857">アカウントに保存…</translation>
+<translation id="4036529942385659684">一定時間操作が行われなかった後にスタートページを表示する</translation>
 <translation id="4038354071007134711">このデバイスのアプリケーションではファイルを開けません。</translation>
 <translation id="4042870976416480368">ページ内を検索</translation>
 <translation id="4045441967987592849">再度開く</translation>
@@ -1549,6 +1551,7 @@
 <translation id="6301767200000930965">Aあ</translation>
 <translation id="630308129961693966">アドレスバーの位置を選択</translation>
 <translation id="6307241780749477694">このデバイスですべてのパスワードにアクセスできるようにするには、本人確認を行ってください</translation>
+<translation id="6307792728709337290">Google アカウントにカードを保存すると、今回および今後 Chrome で購入する際に自動入力できます。</translation>
 <translation id="6316141353357700666">表示されたリストから使用するパスワードを選択します。</translation>
 <translation id="6321526113093607004">ブックマークに追加</translation>
 <translation id="6327249202318869726">お使いのアカウントでは Gemini が無効になっています。詳しくは管理者にお問い合わせください。</translation>
@@ -2143,6 +2146,7 @@
 <translation id="8263809106706527890">既定のブラウザ設定が変更された可能性があります。これは [設定] で確認できます。</translation>
 <translation id="8264966119170358612">保存したパスワードの一部が Google 以外でのデータ侵害で漏洩しました。<ph name="BEGIN_LINK" />詳細<ph name="END_LINK" /></translation>
 <translation id="826614135184049678">iPad をリセットしている途中で、アカウント <ph name="USER_NAME" /> からログアウトしました。再度ログインするには、下の [続行] をタップします。</translation>
+<translation id="8270320981823560179">ドライブ</translation>
 <translation id="8273982424131314219"><ph name="URL" /> に情報を入力します</translation>
 <translation id="8275068909952022340">その他…</translation>
 <translation id="8281781826761538115">デフォルト - <ph name="DEFAULT_LOCALE" /></translation>

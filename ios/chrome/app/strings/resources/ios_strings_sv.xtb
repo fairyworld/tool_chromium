@@ -6,6 +6,7 @@
 <translation id="1005230401424685968">ÅÅÅÅ</translation>
 <translation id="1013952917065545813">Du kan återkomma hit och öppna nyligen stängda flikar</translation>
 <translation id="1016495303386450659">Bokmärket har uppdaterats</translation>
+<translation id="1018804590490383958">Skanna och autofyll</translation>
 <translation id="1019990162050689579">Gemini-appaktivitet</translation>
 <translation id="102916930470544692">Nyckel</translation>
 <translation id="1030376737535466765">Öppna Lösenordshantering</translation>
@@ -1549,6 +1550,7 @@ Du måste även aktivera Handoff i avsnittet Allmänt i inställningarna och sam
 <translation id="6301767200000930965">Aa</translation>
 <translation id="630308129961693966">Välj adressfältets position</translation>
 <translation id="6307241780749477694">Verifiera din identitet för att få alla dina lösenord på den här enheten</translation>
+<translation id="6307792728709337290">Spara kortet i Google-kontot för att autofylla det för det här köpet och framtida köp i Chrome.</translation>
 <translation id="6316141353357700666">Välj det lösenord du vill använda i listan som visas.</translation>
 <translation id="6321526113093607004">Lägg till i bokmärken</translation>
 <translation id="6327249202318869726">Gemini har inaktiverats för ditt konto. Kontakta administratören om du vill ha mer information.</translation>
@@ -2143,6 +2145,7 @@ Byt till <ph name="OTHER_EMAIL" /> om du vill fortsätta på datorn. Du får lö
 <translation id="8263809106706527890">Inställningarna av standardwebbläsare kan ha ändrats. Du kan kontrollera detta i inställningarna.</translation>
 <translation id="8264966119170358612">Vissa av dina lösenord har läckts i samband med ett dataintrång utanför Google. <ph name="BEGIN_LINK" />Läs mer<ph name="END_LINK" /></translation>
 <translation id="826614135184049678">Du har loggats ut från ditt konto, <ph name="USER_NAME" />, som en del av återställningen av din iPad. Tryck på Fortsätt nedan om du vill logga in igen.</translation>
+<translation id="8270320981823560179">Drive</translation>
 <translation id="8273982424131314219">Uppgifterna fylls i på <ph name="URL" /></translation>
 <translation id="8275068909952022340">Mer …</translation>
 <translation id="8281781826761538115">Standard – <ph name="DEFAULT_LOCALE" /></translation>

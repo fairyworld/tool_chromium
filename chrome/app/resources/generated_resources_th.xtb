@@ -1448,6 +1448,7 @@
 <translation id="2039464276165755892">ซ่อนเนื้อหาการแจ้งเตือนเมื่อตรวจพบบุคคลอื่น</translation>
 <translation id="2040460856718599782">อ๊ะ! เกิดข้อผิดพลาดขณะตรวจสอบสิทธิ์ของคุณ โปรดตรวจสอบข้อมูลรับรองสำหรับลงชื่อเข้าใช้อีกครั้ง แล้วลองอีกครั้ง</translation>
 <translation id="2040822390690632244">การอัปเดต ความช่วยเหลือ ตัวเลือกสำหรับนักพัฒนาซอฟต์แวร์</translation>
+<translation id="2040827008689966558">เปิดมุมมองแบบแยกที่ปิดไปแล้วอีกครั้ง</translation>
 <translation id="2040894699575719559">ตำแหน่งถูกบล็อก</translation>
 <translation id="2042279886444479655">โปรไฟล์ที่ใช้งานอยู่</translation>
 <translation id="2044014337866019681">โปรดยืนยันบัญชี <ph name="ACCOUNT" /> เพื่อปลดล็อกเซสชัน</translation>
@@ -2561,6 +2562,7 @@
 <translation id="2822551631199737692">ใช้กล้องอยู่</translation>
 <translation id="2822634587701817431">หด/ขยาย</translation>
 <translation id="2824942875887026017"><ph name="IDS_SHORT_PRODUCT_NAME" /> ใช้การตั้งค่าพร็อกซีจากผู้ดูแลระบบของคุณ</translation>
+<translation id="2825200993288778739">สร้างทักษะของคุณเองหรือเพิ่มจากคลังทักษะ</translation>
 <translation id="282525059261716597">บรรทัดคำสั่ง:</translation>
 <translation id="2825758591930162672">คีย์สาธารณะของหัวเรื่อง</translation>
 <translation id="2826576843404243001">สำหรับเว็บไซต์ที่ไม่รองรับการเชื่อมต่อที่ปลอดภัย โปรดรับคำเตือนก่อนเข้าชมเว็บไซต์ คุณเปลี่ยนการตั้งค่านี้ไม่ได้เนื่องจากเปิดใช้การปกป้องขั้นสูงอยู่</translation>
@@ -4562,6 +4564,7 @@
 <translation id="4275397969489577657">เปิดใช้การบันทึกสตรีมเหตุการณ์</translation>
 <translation id="4275788652681621337">ปิดแผงด้านข้าง</translation>
 <translation id="4275830172053184480">รีสตาร์ทอุปกรณ์ของคุณ</translation>
+<translation id="4276390967705106170">เปิดในแท็บเบราว์เซอร์ใหม่</translation>
 <translation id="4276598757692536305">PPD ของเครื่องพิมพ์</translation>
 <translation id="4277434192562187284">แหล่งที่มาของการกำหนดค่า XML</translation>
 <translation id="4278390842282768270">อนุญาตแล้ว</translation>
@@ -4635,6 +4638,7 @@
 <translation id="4321179778687042513">ctrl</translation>
 <translation id="432160826079505197">แสดง <ph name="FILE_NAME" /> ใน Finder</translation>
 <translation id="4322394346347055525">ปิดแท็บอื่นๆ</translation>
+<translation id="4322400254469690320">ค้นหา <ph name="FILENAME" /> ในโฟลเดอร์ <ph name="FEATURE_NAME" /></translation>
 <translation id="4324577459193912240">ไฟล์ไม่สมบูรณ์</translation>
 <translation id="4325433082696797523">พื้นที่เก็บข้อมูลและพลังงาน</translation>
 <translation id="4325515113816851466">ตัวเลือกของผู้ปกครองจะไม่มีผลหลังจากคุณออกจากระบบ</translation>
@@ -5486,6 +5490,7 @@
 <translation id="4946998421534856407">Launcher + ลูกศรขึ้น</translation>
 <translation id="4947376546135294974">ข้อมูลจากเว็บไซต์ที่คุณเข้าชม</translation>
 <translation id="4949898053053527676">ดูเหมือนว่าจะไม่มีผลการค้นหาใดๆ สำหรับการค้นหาของคุณ</translation>
+<translation id="4949954144207118092">เปิดในแท็บ <ph name="APP_NAME" /> ที่มีอยู่</translation>
 <translation id="4950100687509657457">สร้างโปรไฟล์</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{1 ไฟล์}other{# ไฟล์}}</translation>
 <translation id="495170559598752135">การทำงาน</translation>
@@ -6625,6 +6630,7 @@
 <translation id="5826993284769733527">เปิดเผยบางส่วน</translation>
 <translation id="5827266244928330802">Safari</translation>
 <translation id="5827591412833386477">แสดงเว็บไซต์ในกลุ่มเดียวกัน</translation>
+<translation id="5827835011646404677">ระบบจะบันทึกทักษะลงในบัญชี Google ของคุณ</translation>
 <translation id="5828181959764767444">พระอาทิตย์ตก</translation>
 <translation id="5828545842856466741">เพิ่มโปรไฟล์...</translation>
 <translation id="5828633471261496623">กำลังพิมพ์...</translation>
@@ -7611,6 +7617,7 @@
 <translation id="6563055593659435495">คงการเชื่อมต่อกับโทรศัพท์ไว้ไม่ได้ ตรวจสอบว่าโทรศัพท์อยู่ใกล้ๆ ปลดล็อกแล้ว และเปิดบลูทูธกับ Wi-Fi ไว้</translation>
 <translation id="6564343790052433242">หากต้องการสร้างพาสคีย์สำหรับ <ph name="APP_NAME" /> เครื่องมือจัดการรหัสผ่านบน Google จะต้องเปิดอยู่</translation>
 <translation id="6565899972286925956">ลองสร้างอะไรก็ได้</translation>
+<translation id="6566648465417201421">เปิดมุมมองแบบแยกที่ปิดไปแล้วอีกครั้ง</translation>
 <translation id="656679903990115526">ใช้โทรศัพท์สแกนเพื่อบันทึกและป้อนรหัสผ่านอัตโนมัติเพื่อให้ลงชื่อเข้าใช้เว็บไซต์และแอปต่างๆ ได้อย่างง่ายดาย</translation>
 <translation id="6568283005472142698">การค้นหาแท็บ</translation>
 <translation id="6569931898053264308">ประหยัดหน่วยความจำได้ปานกลาง</translation>
@@ -7946,6 +7953,7 @@
 <translation id="6805478749741295868">นี่เป็นฟีเจอร์ AI เวอร์ชันทดลองและอาจไม่ถูกต้องเสมอไป</translation>
 <translation id="6805817411033102703">ความคิดเห็นเกี่ยวกับกลุ่มแท็บที่แชร์</translation>
 <translation id="6806089545527108739">ไม่อนุญาตแต่ถามทีหลัง</translation>
+<translation id="6806123901116522137">ไปที่ AI Innovations</translation>
 <translation id="6806781719264274042">เฉพาะรายชื่อติดต่อที่มีบัญชี Google <ph name="LINK_BEGIN" />ดูรายชื่อติดต่อ<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">หากต้องการดำเนินการต่อ ให้เสียบและแตะคีย์ความปลอดภัย</translation>
 <translation id="6808166974213191158">ตัวเขียนอิมเมจระบบ Chrome OS Flex</translation>
@@ -8599,6 +8607,7 @@
 <translation id="7282992757463864530">แถบข้อมูล</translation>
 <translation id="7283555985781738399">โหมดผู้มาเยือน</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{อุปกรณ์นี้จะได้รับการบันทึกไว้เป็นเวลา 1 วันและคุณสามารถเชื่อมต่อโดยไม่ใช้รหัสได้ในครั้งถัดไป ผู้ดูแลระบบเป็นคนตั้งค่านี้}other{อุปกรณ์นี้จะได้รับการบันทึกไว้เป็นเวลา {DAYS} วันและคุณสามารถเชื่อมต่อโดยไม่ใช้รหัสได้ในครั้งถัดไป ผู้ดูแลระบบเป็นคนตั้งค่านี้}}</translation>
+<translation id="7284386549235597598">การดำเนินการนี้จะทำให้งานที่ Gemini กำลังดำเนินอยู่สิ้นสุดลง</translation>
 <translation id="7284411326658527427">โดยแต่ละคนจะปรับเปลี่ยนการตั้งค่าบัญชีในแบบของตนและเก็บเป็นข้อมูลส่วนตัวได้</translation>
 <translation id="7285008278689343502">อุทยานแห่งชาติ Grand Teton</translation>
 <translation id="7286867818472074330">เลือกพาสคีย์</translation>
@@ -8669,6 +8678,7 @@
 <translation id="7336799713063880535">บล็อกการแจ้งเตือนอยู่</translation>
 <translation id="7337258336304389677">ใช้โทรศัพท์หรือแท็บเล็ต</translation>
 <translation id="7339052793671338107">แฮนเดิลปรับขนาดแผงด้านข้าง (ลากได้)</translation>
+<translation id="733918220174231019">สิ้นสุดงานเพื่อดำเนินการต่อ</translation>
 <translation id="7339763383339757376">PKCS #7, ใบรับรองแบบเดี่ยว</translation>
 <translation id="7339785458027436441">ตรวจสอบตัวสะกดขณะพิมพ์</translation>
 <translation id="7339898014177206373">หน้าต่างใหม่</translation>
@@ -8818,6 +8828,7 @@
 <translation id="7432200167665670017">ผู้ดูแลระบบของคุณบล็อก "<ph name="EXTENSION_NAME" />" ไว้ - รหัสแอป <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">เก็บ</translation>
 <translation id="7433333862363162673">ล้างทางลัดการเลือก</translation>
+<translation id="7433495118028038748">ใช่ สิ้นสุดงาน</translation>
 <translation id="7433957986129316853">เก็บไว้</translation>
 <translation id="7434100547946193426">แอปอื่นๆ</translation>
 <translation id="7434509671034404296">นักพัฒนา</translation>
@@ -11190,6 +11201,7 @@
 <translation id="9130015405878219958">โหมดที่ป้อนไม่ถูกต้อง</translation>
 <translation id="9130135798965366513">หากต้องการดำเนินการต่อ <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> จะแชร์<ph name="FIELDS_STRING" />ของคุณกับเว็บไซต์นี้ ดู<ph name="BEGIN_LINK1" />นโยบายความเป็นส่วนตัว<ph name="END_LINK1" />และ<ph name="BEGIN_LINK2" />ข้อกำหนดในการให้บริการ<ph name="END_LINK2" />ของเว็บไซต์นี้</translation>
 <translation id="9130364135697530260">เนื้อหาที่ฝังในเว็บไซต์นี้สามารถใช้ข้อมูลที่บันทึกไว้เกี่ยวกับตัวคุณ</translation>
+<translation id="9130857050314385402">ระบบจะส่งชื่อแท็บและ URL ไปยัง Google เมื่อคุณใช้ทักษะ</translation>
 <translation id="9131209053278896908">เว็บไซต์ที่บล็อกจะปรากฏที่นี่</translation>
 <translation id="9131487537093447019">ส่งข้อความถึงและรับข้อความจากอุปกรณ์บลูทูธ</translation>
 <translation id="9133568201369135151">การรวบรวมข้อมูลการวินิจฉัยเสร็จสมบูรณ์ โดยข้อมูลส่วนบุคคลบางอย่างรวมอยู่ในข้อมูลนี้ด้วย</translation>

@@ -269,6 +269,7 @@
 <translation id="1407135791313364759">باز کردن همه</translation>
 <translation id="1408696301184924537">‏برای اینکه این IBAN دفعه بعد به‌طور خودکار تکمیل شود، آن را در «حساب Google» خود ذخیره کنید</translation>
 <translation id="1408787208417187241">سه منگنه در بالا</translation>
+<translation id="1410306713026702438">‫<ph name="SUGGESTION_TITLE" />، <ph name="SUGGESTION_DESCRIPTION" />. ‫<ph name="SUGGESTION_TYPE" />. ‫<ph name="MATCH_POSITION" /> در <ph name="NUM_MATCHES_IN_GROUP" /> در گروه <ph name="GROUP_HEADER" />.</translation>
 <translation id="1410365862999780287">‏افراد دیگری که از این دستگاه استفاده می‌کنند فعالیت شما را نخواهند دید تا بتوانید مرور خصوصی‌تری داشته باشید. نحوه جمع‌آوری داده‌ها توسط وب‌سایت‌هایی که بازدید می‌کنید و سرویس‌هایی که استفاده می‌کنید (شامل Google) تغییر نخواهد کرد. بااین‌حال، نشانک‌ها و موارد فهرست خواندن ذخیره خواهند شد.</translation>
 <translation id="1410941016594047814">پاکت دعوت‌نامه</translation>
 <translation id="1413235258620101697">‏برای تسویه‌حساب سریع‌تر، کد تأیید این کارت رمزگذاری خواهد شد و در «کیف پول Google» ذخیره می‌شود</translation>
@@ -660,6 +661,7 @@
 <translation id="2045871135676061132">پاکت شخصی</translation>
 <translation id="2046951263634619614">خرده‌فروشی کتاب</translation>
 <translation id="2048261947532620704">درحال ترجمه صفحه</translation>
+<translation id="2055016614992422886">مکالمه</translation>
 <translation id="2059166748188874810">شهرداری</translation>
 <translation id="2059202684901022309">۳۴ × ۲۲ اینچ</translation>
 <translation id="2064568741209980952">اعتبار و وام</translation>
@@ -3558,6 +3560,7 @@
 <translation id="6550245281449521513">قفل موشواره مجاز نیست</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />، جدید</translation>
 <translation id="6552566579578780089">پرداخت</translation>
+<translation id="6553777254569586547">‫<ph name="SUGGESTION_TITLE" />. <ph name="SUGGESTION_TYPE" />. ‫<ph name="MATCH_POSITION" /> در <ph name="NUM_MATCHES_IN_GROUP" /> در گروه <ph name="GROUP_HEADER" />.</translation>
 <translation id="6554732001434021288">آخرین بازدید: <ph name="NUM_DAYS" /> روز پیش</translation>
 <translation id="6556866813142980365">ازنو انجام دادن</translation>
 <translation id="6557715786897013164">۱۷ × ۱۴ اینچ</translation>

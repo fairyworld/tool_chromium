@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">Обновите браузер</translation>
 <translation id="4021931095789478915">Добавить ${url} в список для чтения</translation>
 <translation id="4028871427853484857">Сохранить в аккаунте</translation>
+<translation id="4036529942385659684">Показывать начальную страницу после периода бездействия</translation>
 <translation id="4038354071007134711">Нет приложения, чтобы открыть этот файл.</translation>
 <translation id="4042870976416480368">Найти на странице</translation>
 <translation id="4045441967987592849">Открыть</translation>
@@ -2145,6 +2146,7 @@
 <translation id="8263809106706527890">Возможно, ваш браузер по умолчанию был изменен. Это можно проверить в настройках.</translation>
 <translation id="8264966119170358612">Несколько ваших сохраненных паролей были раскрыты в результате утечки данных в стороннем сервисе. <ph name="BEGIN_LINK" />Подробнее…<ph name="END_LINK" /></translation>
 <translation id="826614135184049678">В результате сброса настроек iPad произошел выход из аккаунта <ph name="USER_NAME" />. Чтобы войти, нажмите "Продолжить" ниже.</translation>
+<translation id="8270320981823560179">Диск</translation>
 <translation id="8273982424131314219">Данные будут вставлены на сайте <ph name="URL" /></translation>
 <translation id="8275068909952022340">Ещё…</translation>
 <translation id="8281781826761538115">Язык по умолчанию: <ph name="DEFAULT_LOCALE" /></translation>

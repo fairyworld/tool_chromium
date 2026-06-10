@@ -2571,6 +2571,7 @@
 <translation id="2822551631199737692">دوربین درحال استفاده است</translation>
 <translation id="2822634587701817431">کوچک کردن / بزرگ کردن</translation>
 <translation id="2824942875887026017"><ph name="IDS_SHORT_PRODUCT_NAME" /> درحال استفاده از تنظیمات پراکسی از سرپرست شما است</translation>
+<translation id="2825200993288778739">مهارت خودتان را بسازید یا از کتابخانه مهارت‌ها اضافه کنید</translation>
 <translation id="282525059261716597">خط فرمان:</translation>
 <translation id="2825758591930162672">کلید عمومی موضوع</translation>
 <translation id="2826576843404243001">برای سایت‌هایی که از اتصال‌های ایمن پشتیبانی نمی‌کنند، قبل‌از بازدید از سایت هشدار دریافت کنید. نمی‌توانید این تنظیم را تغییر دهید زیرا «محافظت پیشرفته» را فعال کرده‌اید.</translation>
@@ -4648,6 +4649,7 @@
 <translation id="4321179778687042513">مهار</translation>
 <translation id="432160826079505197">‏نمایش <ph name="FILE_NAME" /> در Finder</translation>
 <translation id="4322394346347055525">بستن برگه‌های دیگر</translation>
+<translation id="4322400254469690320">‫<ph name="FILENAME" /> را در پوشه <ph name="FEATURE_NAME" /> پیدا کنید</translation>
 <translation id="4324577459193912240">فایل ناقص</translation>
 <translation id="4325433082696797523">فضای ذخیره‌سازی و شارژ</translation>
 <translation id="4325515113816851466">بعداز اینکه از سیستم خارج شدید، انتخاب‌های ولی‌تان اعمال نمی‌شود</translation>
@@ -6643,6 +6645,7 @@
 <translation id="5826993284769733527">نیمه شفاف</translation>
 <translation id="5827266244928330802">Safari</translation>
 <translation id="5827591412833386477">نمایش سایت‌های هم‌گروه</translation>
+<translation id="5827835011646404677">‏مهارت‌ها در «حساب Google» شما ذخیره شده‌اند</translation>
 <translation id="5828181959764767444">غروب</translation>
 <translation id="5828545842856466741">افزودن نمایه…</translation>
 <translation id="5828633471261496623">در حال چاپ...</translation>
@@ -11217,6 +11220,7 @@
 <translation id="9130015405878219958">حالت نامعتبر وارد شده است.</translation>
 <translation id="9130135798965366513">برای ادامه دادن، <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> <ph name="FIELDS_STRING" /> شما را با این سایت هم‌رسانی خواهد کرد. <ph name="BEGIN_LINK1" />خط‌مشی رازداری<ph name="END_LINK1" /> و <ph name="BEGIN_LINK2" />شرایط خدمات<ph name="END_LINK2" /> این سایت را بررسی کنید.</translation>
 <translation id="9130364135697530260">محتوای جاسازی‌شده در این سایت می‌تواند از اطلاعات ذخیره‌شده درباره شما استفاده کند</translation>
+<translation id="9130857050314385402">‏وقتی از مهارتی استفاده می‌کنید، عنوان زبانه‌ها و نشانی‌های وب به Google ارسال می‌شود</translation>
 <translation id="9131209053278896908">سایت‌های مسدودشده اینجا نشان داده می‌شود</translation>
 <translation id="9131487537093447019">ارسال پیام‌ها به دستگاه‌های بلوتوث و دریافت پیام‌ها از آنها</translation>
 <translation id="9133568201369135151">جمع‌آوری داده‌های عیب‌یابی تکمیل شد. برخی‌از اطلاعات شخصی‌تان به این داده‌ها اضافه شده است.</translation>

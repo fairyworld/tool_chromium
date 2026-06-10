@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">مرورگرتان را به‌روز کنید</translation>
 <translation id="4021931095789478915">‏افزودن ${url} به فهرست خواندن</translation>
 <translation id="4028871427853484857">ذخیره کردن در حساب…</translation>
+<translation id="4036529942385659684">نمایش صفحه شروع پس‌از دوره‌ی عدم فعالیت</translation>
 <translation id="4038354071007134711">برنامه‌ای در این دستگاه نمی‌تواند فایل را باز کند.</translation>
 <translation id="4042870976416480368">یافتن در صفحه</translation>
 <translation id="4045441967987592849">باز کردن مجدد</translation>
@@ -2145,6 +2146,7 @@ Handoff باید در بخش عمومی تنظیمات نیز فعال شود و
 <translation id="8263809106706527890">ممکن است تغییری در تنظیمات مرورگر پیش‌فرض ایجاد شده باشد. می‌توانید آن را در تنظیمات بررسی کنید.</translation>
 <translation id="8264966119170358612">‏برخی‌از گذرواژه‌های ذخیره‌شده‌تان به‌دلیل سرقت اطلاعات شبکه در سایت غیر Google لو رفته‌اند. <ph name="BEGIN_LINK" />بیشتر بدانید<ph name="END_LINK" /></translation>
 <translation id="826614135184049678">‏به‌عنوان بخشی از بازنشانی iPad، از سیستم حساب <ph name="USER_NAME" /> خارج شدید. برای ورود مجدد به سیستم، روی «ادامه» در زیر تک‌ضرب بزنید.</translation>
+<translation id="8270320981823560179">Drive</translation>
 <translation id="8273982424131314219">اطلاعات را در <ph name="URL" /> تکمیل خواهید کرد</translation>
 <translation id="8275068909952022340">بیشتر…</translation>
 <translation id="8281781826761538115">پیش‌فرض - <ph name="DEFAULT_LOCALE" /></translation>

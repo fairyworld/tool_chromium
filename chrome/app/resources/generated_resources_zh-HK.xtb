@@ -1458,6 +1458,7 @@
 <translation id="2039464276165755892">偵測到有人窺探螢幕時隱藏通知內容</translation>
 <translation id="2040460856718599782">糟糕！嘗試驗證您的身分時發生錯誤。請重新檢查您的登入憑證，然後再試一次。</translation>
 <translation id="2040822390690632244">更新、說明、開發人員選項</translation>
+<translation id="2040827008689966558">重新開啟已關閉的分割檢視模式</translation>
 <translation id="2040894699575719559">位置已封鎖</translation>
 <translation id="2042279886444479655">使用中的設定檔</translation>
 <translation id="2044014337866019681">請確保您驗證的是 <ph name="ACCOUNT" />，才能解鎖工作階段。</translation>
@@ -4574,6 +4575,7 @@
 <translation id="4275397969489577657">啟用活動串流記錄</translation>
 <translation id="4275788652681621337">關閉側面板</translation>
 <translation id="4275830172053184480">重新啟動裝置</translation>
+<translation id="4276390967705106170">在新的瀏覽器分頁中開啟</translation>
 <translation id="4276598757692536305">打印機 PPD</translation>
 <translation id="4277434192562187284">XML 設定來源</translation>
 <translation id="4278390842282768270">已允許</translation>
@@ -5498,6 +5500,7 @@
 <translation id="4946998421534856407">啟動器鍵 + 向上箭咀鍵</translation>
 <translation id="4947376546135294974">來自你正在瀏覽網站的資料</translation>
 <translation id="4949898053053527676">似乎沒有任何符合搜尋條件的結果</translation>
+<translation id="4949954144207118092">在現有「<ph name="APP_NAME" />」分頁中開啟</translation>
 <translation id="4950100687509657457">建立設定檔</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{1 個檔案}other{# 個檔案}}</translation>
 <translation id="495170559598752135">動作</translation>
@@ -7623,6 +7626,7 @@
 <translation id="6563055593659435495">無法與手機保持連線。請確認你的手機在附近並已解鎖，且已開啟藍牙和 Wi-Fi。</translation>
 <translation id="6564343790052433242">如要為 <ph name="APP_NAME" /> 建立密鑰，必須開啟「Google 密碼管理工具」</translation>
 <translation id="6565899972286925956">創作任何內容</translation>
+<translation id="6566648465417201421">重新開啟已關閉的分割檢視模式</translation>
 <translation id="656679903990115526">使用手機掃瞄即可儲存和自動填入密碼，輕鬆登入網站和應用程式</translation>
 <translation id="6568283005472142698">分頁搜尋</translation>
 <translation id="6569931898053264308">節省中量記憶體</translation>
@@ -7958,6 +7962,7 @@
 <translation id="6805478749741295868">這是實驗版 AI 功能，提供的建議不一定符合需求。</translation>
 <translation id="6805817411033102703">共用分頁群組意見反映</translation>
 <translation id="6806089545527108739">不允許但稍後再詢問</translation>
+<translation id="6806123901116522137">前往「AI 創新技術」</translation>
 <translation id="6806781719264274042">只限你的聯絡人 (必須擁有 Google 帳戶)。<ph name="LINK_BEGIN" />查看聯絡人<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">如要繼續，請插入並輕觸安全密鑰</translation>
 <translation id="6808166974213191158">ChromeOS Flex 系統映像寫入工具</translation>
@@ -8611,6 +8616,7 @@
 <translation id="7282992757463864530">資料列</translation>
 <translation id="7283555985781738399">訪客模式</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{系統會記住此裝置，在 1 天內無需輸入驗證碼即可再次連接。此設定由管理員設定。}other{系統會記住此裝置，在 {DAYS} 天內無需輸入驗證碼即可再次連接。此設定由管理員設定。}}</translation>
+<translation id="7284386549235597598">這會結束 Gemini 目前正在處理的工作。</translation>
 <translation id="7284411326658527427">每位使用者都可將帳戶個人化，以確保資料私隱。</translation>
 <translation id="7285008278689343502">大提頓國家公園</translation>
 <translation id="7286867818472074330">選取密鑰</translation>
@@ -8681,6 +8687,7 @@
 <translation id="7336799713063880535">已封鎖通知。</translation>
 <translation id="7337258336304389677">使用手機或平板電腦</translation>
 <translation id="7339052793671338107">側面板調整大小控點 (可拖曳)</translation>
+<translation id="733918220174231019">結束工作以繼續</translation>
 <translation id="7339763383339757376">PKCS #7，單一憑證</translation>
 <translation id="7339785458027436441">輸入時檢查拼字</translation>
 <translation id="7339898014177206373">新視窗</translation>
@@ -8830,6 +8837,7 @@
 <translation id="7432200167665670017">管理員已封鎖「<ph name="EXTENSION_NAME" />」(應用程式 ID：<ph name="EXTENSION_ID" />)</translation>
 <translation id="7433103263856598557">封存</translation>
 <translation id="7433333862363162673">清除選擇快速鍵</translation>
+<translation id="7433495118028038748">是，結束工作</translation>
 <translation id="7433957986129316853">保留</translation>
 <translation id="7434100547946193426">其他應用程式</translation>
 <translation id="7434509671034404296">開發人員</translation>

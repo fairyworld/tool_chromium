@@ -1448,6 +1448,7 @@ Chcete-li spravovat nastavení tohoto účtu, nainstalujte si do zařízení apl
 <translation id="2039464276165755892">Skrýt obsah oznámení, když je poblíž někdo další</translation>
 <translation id="2040460856718599782">Jejda! Při ověřování vaší totožnosti došlo k chybě. Zkontrolujte prosím identifikační údaje a zkuste to znovu.</translation>
 <translation id="2040822390690632244">Aktualizace, nápověda, možnosti pro vývojáře</translation>
+<translation id="2040827008689966558">Znovu otevřít zavřené rozdělené zobrazení</translation>
 <translation id="2040894699575719559">Místo bylo zablokováno</translation>
 <translation id="2042279886444479655">Aktivní profily</translation>
 <translation id="2044014337866019681">Pokud tuto relaci chcete odemknout, zkontrolujte, zda ověřujete účet <ph name="ACCOUNT" />.</translation>
@@ -4561,6 +4562,7 @@ Zpráva serveru: <ph name="SERVER_MSG" /></translation>
 <translation id="4275397969489577657">Zapnout protokolování streamů událostí</translation>
 <translation id="4275788652681621337">Zavřít boční panel</translation>
 <translation id="4275830172053184480">Restartovat zařízení</translation>
+<translation id="4276390967705106170">Otevřít na nové kartě prohlížeče</translation>
 <translation id="4276598757692536305">PPD tiskárny</translation>
 <translation id="4277434192562187284">Zdroj konfigurace ve formátu XML</translation>
 <translation id="4278390842282768270">Povoleno</translation>
@@ -5485,6 +5487,7 @@ Oddálení provedete stisknutím kláves Ctrl + Alt + Snížit jas.</translation
 <translation id="4946998421534856407">spouštěč + šipka nahoru</translation>
 <translation id="4947376546135294974">Data z navštíveného webu</translation>
 <translation id="4949898053053527676">Vašemu hledání neodpovídají žádné výsledky</translation>
+<translation id="4949954144207118092">Otevřít na existující kartě aplikace <ph name="APP_NAME" /></translation>
 <translation id="4950100687509657457">Vytvořit profil</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{soubor}few{# soubory}many{# souboru}other{# souborů}}</translation>
 <translation id="495170559598752135">Akce</translation>
@@ -7610,6 +7613,7 @@ K této akci lze přiřadit několik přepínačů.</translation>
 <translation id="6563055593659435495">Nelze udržet spojení s telefonem. Zkontrolujte, zda je telefon poblíž, zda je odemknutý a zda jsou zapnuté Bluetooth a Wi-Fi.</translation>
 <translation id="6564343790052433242">K vytvoření přístupového klíče pro aplikaci <ph name="APP_NAME" /> musí být Správce hesel Google zapnutý</translation>
 <translation id="6565899972286925956">Vytvořte cokoli</translation>
+<translation id="6566648465417201421">Znovu otevřít zavřené rozdělené zobrazení</translation>
 <translation id="656679903990115526">Naskenujte telefonem tenhle kód a ukládejte si a automaticky vyplňujte hesla pro snadné přihlašování na weby a do aplikací</translation>
 <translation id="6568283005472142698">Vyhledávání v kartách</translation>
 <translation id="6569931898053264308">Střední úspora</translation>
@@ -7949,6 +7953,7 @@ Máte # dalších prolomených hesel. Správce hesel Google doporučuje ihned ta
 <translation id="6805478749741295868">Toto je experimentální funkce založená na umělé inteligenci a nemusí vždy fungovat správně.</translation>
 <translation id="6805817411033102703">Zpětná vazba ke sdíleným skupinám karet</translation>
 <translation id="6806089545527108739">Nepovolovat, ale později se zeptat</translation>
+<translation id="6806123901116522137">Přejít na AI inovace</translation>
 <translation id="6806781719264274042">Pouze vaše kontakty s účtem Google. <ph name="LINK_BEGIN" />Zobrazit kontakty<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">Chcete-li pokračovat, vložte bezpečnostní klíč a dotkněte se ho.</translation>
 <translation id="6808166974213191158">Zapisovač obrazu systému ChromeOS Flex</translation>
@@ -8602,6 +8607,7 @@ Máte # dalších prolomených hesel. Správce hesel Google doporučuje ihned ta
 <translation id="7282992757463864530">Informační panel</translation>
 <translation id="7283555985781738399">Režim hosta</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{Toto zařízení bude 1 den uloženo a příště se budete moci připojit bez kódu. Toto nastavuje váš administrátor.}few{Toto zařízení bude {DAYS} dny uloženo a příště se budete moci připojit bez kódu. Toto nastavuje váš administrátor.}many{Toto zařízení bude {DAYS} dne uloženo a příště se budete moci připojit bez kódu. Toto nastavuje váš administrátor.}other{Toto zařízení bude {DAYS} dní uloženo a příště se budete moci připojit bez kódu. Toto nastavuje váš administrátor.}}</translation>
+<translation id="7284386549235597598">Tímto ukončíte úkol, na kterém Gemini právě pracuje.</translation>
 <translation id="7284411326658527427">Každý uživatel si může svůj účet přizpůsobit a chránit soukromí svých dat.</translation>
 <translation id="7285008278689343502">Národní park Grand Teton</translation>
 <translation id="7286867818472074330">Vybrat přístupový klíč</translation>
@@ -8672,6 +8678,7 @@ Máte # dalších prolomených hesel. Správce hesel Google doporučuje ihned ta
 <translation id="7336799713063880535">Oznámení jsou blokována.</translation>
 <translation id="7337258336304389677">Použijte telefon nebo tablet</translation>
 <translation id="7339052793671338107">Úchyt pro změnu velikosti bočního panelu (přetahovatelný)</translation>
+<translation id="733918220174231019">Pokud chcete pokračovat, ukončete úkol</translation>
 <translation id="7339763383339757376">PKCS #7, jeden certifikát</translation>
 <translation id="7339785458027436441">Kontrolovat během psaní pravopis</translation>
 <translation id="7339898014177206373">Nové okno</translation>
@@ -8821,6 +8828,7 @@ Máte # dalších prolomených hesel. Správce hesel Google doporučuje ihned ta
 <translation id="7432200167665670017">Administrátor rozšíření <ph name="EXTENSION_NAME" /> zablokoval – ID aplikace <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">Archivovat</translation>
 <translation id="7433333862363162673">Vymazat zkratku výběru</translation>
+<translation id="7433495118028038748">Ano, ukončit úkol</translation>
 <translation id="7433957986129316853">Zachovat</translation>
 <translation id="7434100547946193426">Další aplikace</translation>
 <translation id="7434509671034404296">Vývojář</translation>

@@ -1459,6 +1459,7 @@ Du kan administrere indstillingerne for denne konto ved at installere Family Lin
 <translation id="2039464276165755892">Skjul notifikationsindhold, når der registreres en anden person</translation>
 <translation id="2040460856718599782">Ups! Noget gik galt under forsøget på at godkende dig. Kontrollér dine loginoplysninger, og prøv igen.</translation>
 <translation id="2040822390690632244">Opdateringer, hjælp, indstillinger for udviklere</translation>
+<translation id="2040827008689966558">Åbn den opdelte visning igen</translation>
 <translation id="2040894699575719559">Stedet er blokeret</translation>
 <translation id="2042279886444479655">Aktive profiler</translation>
 <translation id="2044014337866019681">Sørg for, at du verificerer <ph name="ACCOUNT" /> for at låse sessionen op.</translation>
@@ -4578,6 +4579,7 @@ Vil du starte <ph name="CONTROL_PANEL_APPLET_NAME" />?</translation>
 <translation id="4275397969489577657">Aktivér logning af begivenhedsstreaming</translation>
 <translation id="4275788652681621337">Luk sidepanelet</translation>
 <translation id="4275830172053184480">Genstart din enhed</translation>
+<translation id="4276390967705106170">Åbn på en ny browserfane</translation>
 <translation id="4276598757692536305">PPD-fil for printer</translation>
 <translation id="4277434192562187284">XML-konfigurationskilde</translation>
 <translation id="4278390842282768270">Tilladt</translation>
@@ -5503,6 +5505,7 @@ Brug Ctrl+Alt+Lysstyrke ned for at zoome ud.</translation>
 <translation id="4946998421534856407">appliste + pil op</translation>
 <translation id="4947376546135294974">Data fra det website, du besøger</translation>
 <translation id="4949898053053527676">Det ser ikke ud til, at der er nogen resultater for din søgning</translation>
+<translation id="4949954144207118092">Åbn på en eksisterende <ph name="APP_NAME" />-fane</translation>
 <translation id="4950100687509657457">Opret profil</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{en fil}one{# fil}other{# filer}}</translation>
 <translation id="495170559598752135">Handlinger</translation>
@@ -7632,6 +7635,7 @@ Flere kontakter kan tildeles denne handling.</translation>
 <translation id="6563055593659435495">Forbindelsen til din telefon kan ikke opretholdes. Sørg for, at din telefon er i nærheden, at den er låst op, og at Bluetooth og Wi-Fi er aktiveret.</translation>
 <translation id="6564343790052433242">Google Adgangskodeadministrator skal være aktiveret for at oprette en adgangsnøgle til <ph name="APP_NAME" /></translation>
 <translation id="6565899972286925956">Opret hvad som helst</translation>
+<translation id="6566648465417201421">Åbn opdelt visning igen</translation>
 <translation id="656679903990115526">Scan dette med din telefon for at gemme og automatisk udfylde dine adgangskoder, så du nemt kan logge ind på websites og i apps</translation>
 <translation id="6568283005472142698">Fanesøgning</translation>
 <translation id="6569931898053264308">Mellemstore hukommelsesbesparelser</translation>
@@ -7969,6 +7973,7 @@ Du har # andre kompromitterede adgangskoder. Google Adgangs­kode­admin­istrat
 <translation id="6805478749741295868">Dette er en eksperimentel AI-funktion, som ikke altid rammer plet.</translation>
 <translation id="6805817411033102703">Feedback om delte fanegrupper</translation>
 <translation id="6806089545527108739">Tillad ikke, men spørg senere</translation>
+<translation id="6806123901116522137">Gå til AI-innovationer</translation>
 <translation id="6806781719264274042">Kun kontakter med en Google-konto. <ph name="LINK_BEGIN" />Se kontakter<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">Indsæt og tryk på din sikkerhedsnøgle for at fortsætte</translation>
 <translation id="6808166974213191158">Værktøj til skrivning af systembillede i ChromeOS Flex</translation>
@@ -8622,6 +8627,7 @@ Du har # andre kompromitterede adgangskoder. Google Adgangs­kode­admin­istrat
 <translation id="7282992757463864530">Oplysningsbjælke</translation>
 <translation id="7283555985781738399">Gæstetilstand</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{Denne enhed gemmes i 1 dag, og du kan oprette forbindelse uden en kode næste gang. Koden indstilles af din administrator.}one{Denne enhed gemmes i {DAYS} dag, og du kan oprette forbindelse uden en kode næste gang. Koden indstilles af din administrator.}other{Denne enhed gemmes i {DAYS} dage, og du kan oprette forbindelse uden en kode næste gang. Koden indstilles af din administrator.}}</translation>
+<translation id="7284386549235597598">Dette afslutter den opgave, som Gemini i øjeblikket arbejder på.</translation>
 <translation id="7284411326658527427">Hver person kan tilpasse sin konto og holde sine data private.</translation>
 <translation id="7285008278689343502">Grand Teton National Park</translation>
 <translation id="7286867818472074330">Vælg adgangsnøgle</translation>
@@ -8692,6 +8698,7 @@ Du har # andre kompromitterede adgangskoder. Google Adgangs­kode­admin­istrat
 <translation id="7336799713063880535">Notifikationer blokeres.</translation>
 <translation id="7337258336304389677">Brug din telefon eller tablet</translation>
 <translation id="7339052793671338107">Sidepanelets tilpasningshåndtag (kan trækkes)</translation>
+<translation id="733918220174231019">Afslut opgaven for at fortsætte</translation>
 <translation id="7339763383339757376">PKCS #7, enkeltcertifikat</translation>
 <translation id="7339785458027436441">Kontrollér stavning under indtastning</translation>
 <translation id="7339898014177206373">Nyt vindue</translation>
@@ -8842,6 +8849,7 @@ Du har # andre kompromitterede adgangskoder. Google Adgangs­kode­admin­istrat
 <translation id="7432200167665670017">Din administrator har blokeret "<ph name="EXTENSION_NAME" />" – app-id <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">Arkivér</translation>
 <translation id="7433333862363162673">Genvej til at rydde valg</translation>
+<translation id="7433495118028038748">Ja, afslut opgave</translation>
 <translation id="7433957986129316853">Behold den</translation>
 <translation id="7434100547946193426">Andre apps</translation>
 <translation id="7434509671034404296">Udvikler</translation>

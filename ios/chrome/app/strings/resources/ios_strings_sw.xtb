@@ -6,6 +6,7 @@
 <translation id="1005230401424685968">YYYY</translation>
 <translation id="1013952917065545813">Unaweza kurudi hapa ili ufungue tena vichupo ambavyo ulifunga hivi majuzi</translation>
 <translation id="1016495303386450659">Umesasisha kipengee</translation>
+<translation id="1018804590490383958">Changanua na ujaze kiotomatiki</translation>
 <translation id="1019990162050689579">Shughuli kwenye Programu ya Gemini</translation>
 <translation id="102916930470544692">Ufunguo wa siri</translation>
 <translation id="1030376737535466765">Fungua Kidhibiti cha Manenosiri</translation>
@@ -1549,6 +1550,7 @@ Lazima Handoff iwashwe pia katika sehemu ya Jumla ya Mipangilio, na lazima vifaa
 <translation id="6301767200000930965">Aa</translation>
 <translation id="630308129961693966">Chagua nafasi ya sehemu ya anwani</translation>
 <translation id="6307241780749477694">Thibitisha kuwa ni wewe ili upate manenosiri yako yote kwenye kifaa hiki</translation>
+<translation id="6307792728709337290">Hifadhi maelezo ya kadi yako kwenye Akaunti yako ya Google ili yajazwe kiotomatiki kwa ununuzi huu na utakaofanya baadaye kwenye Chrome.</translation>
 <translation id="6316141353357700666">Chagua nenosiri unalotaka kutumia kutoka kwenye orodha inayoonekana.</translation>
 <translation id="6321526113093607004">Ongeza kwenye Alamisho</translation>
 <translation id="6327249202318869726">Gemini imezimwa katika akaunti yako. Wasiliana na msimamizi wako ili upate maelezo zaidi.</translation>
@@ -2143,6 +2145,7 @@ Ili uendelee kwenye kompyuta yako, badilisha utumie <ph name="OTHER_EMAIL" />. U
 <translation id="8263809106706527890">Huenda kuna badiliko kwenye mipangilio chaguomsingi ya kivinjari chako. Unaweza kuangalia badiliko hili kwenye mipangilio.</translation>
 <translation id="8264966119170358612">Baadhi ya manenosiri uliyohifadhi yalifichuliwa katika ufichuzi haramu wa data kwenye tovuti isiyo ya Google. <ph name="BEGIN_LINK" />Pata maelezo zaidi<ph name="END_LINK" /></translation>
 <translation id="826614135184049678">Uliondolewa kwenye akaunti yako, <ph name="USER_NAME" />, ikiwa ni sehemu ya kuweka upya mipangilio ya iPad yako. Ili uingie tena katika akaunti, bofya "Endelea" hapa chini.</translation>
+<translation id="8270320981823560179">Hifadhi</translation>
 <translation id="8273982424131314219">Utajaza maelezo katika <ph name="URL" /></translation>
 <translation id="8275068909952022340">Zaidi…</translation>
 <translation id="8281781826761538115">Chaguomsingi - <ph name="DEFAULT_LOCALE" /></translation>

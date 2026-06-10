@@ -1445,6 +1445,7 @@ Para administrar la configuración de esta cuenta, instala la app de Family Lin
 <translation id="2039464276165755892">Ocultar el contenido de las notificaciones cuando se detecte a otra persona</translation>
 <translation id="2040460856718599782">Se produjo un error cuando intentábamos autenticarte. Verifica tus credenciales de acceso y vuelve a intentarlo.</translation>
 <translation id="2040822390690632244">Actualizaciones, ayuda, opciones para desarrolladores</translation>
+<translation id="2040827008689966558">Volver a abrir la vista dividida cerrada</translation>
 <translation id="2040894699575719559">Ubicación bloqueada</translation>
 <translation id="2042279886444479655">Perfiles activos</translation>
 <translation id="2044014337866019681">Para desbloquear la sesión, asegúrate de verificar <ph name="ACCOUNT" />.</translation>
@@ -4561,6 +4562,7 @@ Para administrar la configuración de esta cuenta, instala la app de Family Lin
 <translation id="4275397969489577657">Habilitar el acceso para la transmisión de eventos</translation>
 <translation id="4275788652681621337">Cerrar el panel lateral</translation>
 <translation id="4275830172053184480">Reiniciar tu dispositivo</translation>
+<translation id="4276390967705106170">Abrir en una pestaña nueva del navegador</translation>
 <translation id="4276598757692536305">PPD de la impresora</translation>
 <translation id="4277434192562187284">Configuración de la fuente de XML</translation>
 <translation id="4278390842282768270">Permitido</translation>
@@ -5486,6 +5488,7 @@ Usa Ctrl + Alt + Disminuir brillo para alejarte.</translation>
 <translation id="4946998421534856407">Selector + flecha hacia arriba</translation>
 <translation id="4947376546135294974">Datos del sitio que estás visitando</translation>
 <translation id="4949898053053527676">Al parecer, no hay resultados para tu búsqueda</translation>
+<translation id="4949954144207118092">Abrir en una pestaña existente de <ph name="APP_NAME" /></translation>
 <translation id="4950100687509657457">Crear perfil</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{un archivo}other{# archivos}}</translation>
 <translation id="495170559598752135">Acciones</translation>
@@ -7615,6 +7618,7 @@ Puedes asignar varios interruptores a esta acción.</translation>
 <translation id="6563055593659435495">No se puede mantener la conexión con tu teléfono. Asegúrate de que el teléfono esté cerca, desbloqueado y tenga las conexiones Bluetooth y Wi-Fi activadas.</translation>
 <translation id="6564343790052433242">Para crear una llave de acceso para <ph name="APP_NAME" />, el Administrador de contraseñas de Google debe estar activado</translation>
 <translation id="6565899972286925956">Crea lo que quieras</translation>
+<translation id="6566648465417201421">Volver a abrir la vista dividida cerrada</translation>
 <translation id="656679903990115526">Escanea este código con tu teléfono para guardar y autocompletar tus contraseñas y acceder fácilmente a sitios y apps</translation>
 <translation id="6568283005472142698">Búsqueda de pestañas</translation>
 <translation id="6569931898053264308">Ahorro: moderado</translation>
@@ -7950,6 +7954,7 @@ Tienes # contraseñas hackeadas más. El Administrador de contraseñas de Go
 <translation id="6805478749741295868">Esta es una función experimental basada en IA y puede tener errores.</translation>
 <translation id="6805817411033102703">Comentarios sobre los grupos de pestañas compartidos</translation>
 <translation id="6806089545527108739">No permitir, pero preguntar más tarde</translation>
+<translation id="6806123901116522137">Ir a las innovaciones en IA</translation>
 <translation id="6806781719264274042">Solo tus contactos con Cuentas de Google. <ph name="LINK_BEGIN" />Ver contactos<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">Para continuar, inserta y toca tu llave de seguridad</translation>
 <translation id="6808166974213191158">Escritor de imágenes del sistema ChromeOS Flex</translation>
@@ -8603,6 +8608,7 @@ Tienes # contraseñas hackeadas más. El Administrador de contraseñas de Go
 <translation id="7282992757463864530">Barra de información</translation>
 <translation id="7283555985781738399">Modo de invitado</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{Este dispositivo se guardará por 1 día y no necesitarás un código la próxima vez que te conectes. Esto lo estableció el administrador.}other{Este dispositivo se guardará por {DAYS} días y no necesitarás un código la próxima vez que te conectes. Esto lo estableció el administrador.}}</translation>
+<translation id="7284386549235597598">Esto finalizará la tarea en la que Gemini está trabajando.</translation>
 <translation id="7284411326658527427">Cada persona podrá personalizar su cuenta y proteger la privacidad de sus datos.</translation>
 <translation id="7285008278689343502">Parque nacional Grand Teton</translation>
 <translation id="7286867818472074330">Seleccionar llave de acceso</translation>
@@ -8673,6 +8679,7 @@ Tienes # contraseñas hackeadas más. El Administrador de contraseñas de Go
 <translation id="7336799713063880535">Notificaciones bloqueadas</translation>
 <translation id="7337258336304389677">Usa tu teléfono o tablet</translation>
 <translation id="7339052793671338107">Controlador de cambio de tamaño del panel lateral (arrastrable)</translation>
+<translation id="733918220174231019">Finalizar la tarea para continuar</translation>
 <translation id="7339763383339757376">PKCS N. º 7, certificado único</translation>
 <translation id="7339785458027436441">Controlar ortografía al escribir</translation>
 <translation id="7339898014177206373">Nueva ventana</translation>
@@ -8823,6 +8830,7 @@ Tienes # contraseñas hackeadas más. El Administrador de contraseñas de Go
 <translation id="7432200167665670017">Tu administrador bloqueó "<ph name="EXTENSION_NAME" />" - ID de la app: <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">Archivar</translation>
 <translation id="7433333862363162673">Borrar la combinación de teclas de selección</translation>
+<translation id="7433495118028038748">Sí, finalizar tarea</translation>
 <translation id="7433957986129316853">Conservar el cambio</translation>
 <translation id="7434100547946193426">Otras apps</translation>
 <translation id="7434509671034404296">Opciones para desarrolladores</translation>

@@ -1447,6 +1447,7 @@ Kontu honen ezarpenak kudeatzeko, instalatu Family Link aplikazioa zure gailuan.
 <translation id="2039464276165755892">Ezkutatu jakinarazpenetako edukia beste norbaiten aurpegia hautematen denean</translation>
 <translation id="2040460856718599782">Arazo bat izan da zu autentifikatzen saiatzean. Egiaztatu bi aldiz saioa hasteko erabili dituzun kredentzialak eta saiatu berriro.</translation>
 <translation id="2040822390690632244">Eguneratzeak, laguntza, garatzaileentzako aukerak</translation>
+<translation id="2040827008689966558">Ireki berriro itxitako ikuspegi zatitua</translation>
 <translation id="2040894699575719559">Blokeatu egin da kokapena</translation>
 <translation id="2042279886444479655">Profil aktiboak</translation>
 <translation id="2044014337866019681">Ziurtatu <ph name="ACCOUNT" /> kontua ari zarela egiaztatzen saioa desblokeatzeko.</translation>
@@ -4561,6 +4562,7 @@ Kontu honen ezarpenak kudeatzeko, instalatu Family Link aplikazioa zure gailuan.
 <translation id="4275397969489577657">Gaitu gertaeren jarioa erregistratzeko aukera</translation>
 <translation id="4275788652681621337">Itxi alboko panela</translation>
 <translation id="4275830172053184480">Berrabiarazi gailua</translation>
+<translation id="4276390967705106170">Ireki arakatzaileko beste fitxa batean</translation>
 <translation id="4276598757692536305">Inprimagailuaren PPDa</translation>
 <translation id="4277434192562187284">XML darabilen konfigurazioaren iturburua</translation>
 <translation id="4278390842282768270">Baimenduta</translation>
@@ -5485,6 +5487,7 @@ Pantaila txikitzeko, berriz, erabili Ktrl + Alt + Txikitu distira.</translat
 <translation id="4946998421534856407">Exekutatzeko tresnaren tekla + gora egiteko gezi-tekla</translation>
 <translation id="4947376546135294974">Bisitatzen ari zaren webguneko datuak</translation>
 <translation id="4949898053053527676">Ez da emaitzarik lortu egin duzun bilaketarako</translation>
+<translation id="4949954144207118092">Ireki lehendik dagoen <ph name="APP_NAME" /> aplikazioko fitxa batean</translation>
 <translation id="4950100687509657457">Sortu profil bat</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{fitxategi bat}other{# fitxategi}}</translation>
 <translation id="495170559598752135">Ekintzak</translation>
@@ -7610,6 +7613,7 @@ Erabilerraztasun-etengailu bat baino gehiago eslei diezazkiokezu ekintza horri.<
 <translation id="6563055593659435495">Ezin da mantendu gailua telefonoarekin konektatuta. Ziurtatu telefonoa hurbil eta desblokeatuta dagoela, eta Bluetootha eta wifia aktibatuta dauzkala.</translation>
 <translation id="6564343790052433242"><ph name="APP_NAME" /> atzitzeko sarbide-gako bat sortzeko, Google-ren Pasahitz-kudeatzailea aktibatuta eduki behar duzu</translation>
 <translation id="6565899972286925956">Sortu edozer</translation>
+<translation id="6566648465417201421">Ireki berriro itxitako ikuspegi zatitua</translation>
 <translation id="656679903990115526">Eskaneatu hau telefonoarekin pasahitzak gordetzeko eta automatikoki betetzeko, webgune eta aplikazioetan saioa erraz hasteko</translation>
 <translation id="6568283005472142698">Fitxa-bilaketa</translation>
 <translation id="6569931898053264308">Aurrezte ertaina</translation>
@@ -7945,6 +7949,7 @@ Arriskuan dauden # pasahitz gehiago dauzkazu. Google-ren Pasahitz-kudeatzailea z
 <translation id="6805478749741295868">AAren eginbide esperimental bat da hau, eta ez du beti dena ongi egingo.</translation>
 <translation id="6805817411033102703">Fitxa talde partekatuei buruzko oharrak</translation>
 <translation id="6806089545527108739">Ez eman baimenik, baina galdetu geroago</translation>
+<translation id="6806123901116522137">Joan AAren berrikuntzetara</translation>
 <translation id="6806781719264274042">Google-ko kontu bat duten kontaktuak soilik. <ph name="LINK_BEGIN" />Ikusi kontaktuak<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">Aurrera egiteko, sartu segurtasun-giltza eta saka ezazu</translation>
 <translation id="6808166974213191158">ChromeOS Flex sistemaren irudi-idazlea</translation>
@@ -8597,6 +8602,7 @@ Arriskuan dauden # pasahitz gehiago dauzkazu. Google-ren Pasahitz-kudeatzailea z
 <translation id="7282992757463864530">Informazio-barra</translation>
 <translation id="7283555985781738399">Gonbidatu modua</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{Gailua egun batez gordeko da; hurrengoan, koderik erabili gabe konektatu ahal izango zara. Administratzaileak ezarri du arau hori.}other{Gailua {DAYS} egunez gordeko da; hurrengoan, koderik erabili gabe konektatu ahal izango zara. Administratzaileak ezarri du arau hori.}}</translation>
+<translation id="7284386549235597598">Gemini egiten ari den zeregina amaitu egingo da.</translation>
 <translation id="7284411326658527427">Bakoitzak bere kontua pertsonaliza dezake, eta datuak pribatu mantendu.</translation>
 <translation id="7285008278689343502">Grand Teton parke nazionala</translation>
 <translation id="7286867818472074330">Hautatu sarbide-gakoa</translation>
@@ -8667,6 +8673,7 @@ Arriskuan dauden # pasahitz gehiago dauzkazu. Google-ren Pasahitz-kudeatzailea z
 <translation id="7336799713063880535">Jakinarazpenak blokeatuta.</translation>
 <translation id="7337258336304389677">Erabili telefonoa edo tableta</translation>
 <translation id="7339052793671338107">Alboko panelaren tamaina aldatzeko kontrol-puntua (arrastatu egin daiteke)</translation>
+<translation id="733918220174231019">Aurrera egiteko, amaitu zeregina</translation>
 <translation id="7339763383339757376">PKCS #7, ziurtagiri bakarra</translation>
 <translation id="7339785458027436441">Zuzendu ortografia idatzi bitartean</translation>
 <translation id="7339898014177206373">Leiho berria</translation>
@@ -8816,6 +8823,7 @@ Arriskuan dauden # pasahitz gehiago dauzkazu. Google-ren Pasahitz-kudeatzailea z
 <translation id="7432200167665670017">Administratzaileak "<ph name="EXTENSION_NAME" />" blokeatu du. Aplikazio-identifikatzailea: <ph name="EXTENSION_ID" />.</translation>
 <translation id="7433103263856598557">Artxibatu</translation>
 <translation id="7433333862363162673">Hautapena garbitzeko lasterbidea</translation>
+<translation id="7433495118028038748">Bai, amaitu zeregina</translation>
 <translation id="7433957986129316853">Mantendu</translation>
 <translation id="7434100547946193426">Beste aplikazio batzuk</translation>
 <translation id="7434509671034404296">Garatzailea</translation>

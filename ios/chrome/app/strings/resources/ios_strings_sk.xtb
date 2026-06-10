@@ -6,6 +6,7 @@
 <translation id="1005230401424685968">RRRR</translation>
 <translation id="1013952917065545813">Môžete sa sem vrátiť a znova otvoriť karty, ktoré ste nedávno zatvorili</translation>
 <translation id="1016495303386450659">Položka bola aktualizovaná</translation>
+<translation id="1018804590490383958">Naskenovať a automaticky doplniť</translation>
 <translation id="1019990162050689579">Aktivita v aplikáciách Gemini</translation>
 <translation id="102916930470544692">Prístupový kľúč</translation>
 <translation id="1030376737535466765">Otvoriť Správcu hesiel</translation>
@@ -1549,6 +1550,7 @@ Funkciu Handoff musíte povoliť v nastaveniach v časti Všeobecné a vaše zar
 <translation id="6301767200000930965">Aa</translation>
 <translation id="630308129961693966">Vyberte umiestnenie panela s adresou</translation>
 <translation id="6307241780749477694">Overte svoju totožnosť a budete mať v tomto zariadení k dispozícii všetky svoje heslá</translation>
+<translation id="6307792728709337290">Uložte si kartu v účte Google, aby sa automaticky dopĺňala pri nákupoch v Chrome, teraz aj v budúcnosti.</translation>
 <translation id="6316141353357700666">V zobrazenom zozname vyberte heslo, ktoré chcete použiť.</translation>
 <translation id="6321526113093607004">Pridať medzi záložky</translation>
 <translation id="6327249202318869726">Aplikácia je pre váš účet vypnutá. Bližšie informácie vám poskytne správca.</translation>
@@ -2143,6 +2145,7 @@ Ak chcete pokračovať v počítači, prepnite na účet <ph name="OTHER_EMAIL"
 <translation id="8263809106706527890">Možno sa zmenili nastavenia predvoleného prehliadača. Môžete to skontrolovať v nastaveniach.</translation>
 <translation id="8264966119170358612">Pri porušení ochrany údajov tretej strany boli odhalené niektoré vaše heslá. <ph name="BEGIN_LINK" />Ďalšie informácie<ph name="END_LINK" /></translation>
 <translation id="826614135184049678">V rámci resetu iPadu vás systém odhlásil z účtu <ph name="USER_NAME" />. Ak sa chcete znova prihlásiť, klepnite nižšie na Pokračovať.</translation>
+<translation id="8270320981823560179">Disk</translation>
 <translation id="8273982424131314219">Vyplníte informácie na webe <ph name="URL" /></translation>
 <translation id="8275068909952022340">Viac…</translation>
 <translation id="8281781826761538115">Predvolené – <ph name="DEFAULT_LOCALE" /></translation>

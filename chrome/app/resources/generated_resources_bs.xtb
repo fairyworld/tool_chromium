@@ -1455,6 +1455,7 @@ Postavkama ovog računa možete upravljati instaliranjem aplikacije Family Link 
 <translation id="2039464276165755892">Sakrijte sadržaj obavještenja kada se otkrije prisustvo druge osobe</translation>
 <translation id="2040460856718599782">Ups!  Došlo je do greške prilikom vaše autentifikacije.  Ponovo provjerite akreditive za prijavu i pokušajte ponovo.</translation>
 <translation id="2040822390690632244">Ažuriranja, pomoć i opcije za programere</translation>
+<translation id="2040827008689966558">Ponovo otvori zatvoreni podijeljeni prikaz</translation>
 <translation id="2040894699575719559">Lokacija je blokirana</translation>
 <translation id="2042279886444479655">Aktivni profili</translation>
 <translation id="2044014337866019681">Provjerite potvrđujete li račun <ph name="ACCOUNT" /> radi otključavanja sesije.</translation>
@@ -4574,6 +4575,7 @@ Postavkama ovog računa možete upravljati instaliranjem aplikacije Family Link 
 <translation id="4275397969489577657">Omogući zapisivanje prenosa događaja</translation>
 <translation id="4275788652681621337">Zatvori bočnu ploču</translation>
 <translation id="4275830172053184480">Ponovo pokrenite uređaj</translation>
+<translation id="4276390967705106170">Otvori na novoj kartici preglednika</translation>
 <translation id="4276598757692536305">PPD štampača</translation>
 <translation id="4277434192562187284">Izvor konfiguracije za XML</translation>
 <translation id="4278390842282768270">Dozvoljeno</translation>
@@ -5499,6 +5501,7 @@ Koristite Ctrl + Alt + Smanjivanje osvjetljenja da umanjite.</translation>
 <translation id="4946998421534856407">pokretač + strelica nagore</translation>
 <translation id="4947376546135294974">Podaci s web lokacije koju posjećujete</translation>
 <translation id="4949898053053527676">Izgleda da nema rezultata pretraživanja</translation>
+<translation id="4949954144207118092">Otvori na postojećoj kartici aplikacije <ph name="APP_NAME" /></translation>
 <translation id="4950100687509657457">Izradi profil</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{fajl}one{# fajl}few{# fajla}other{# fajlova}}</translation>
 <translation id="495170559598752135">Radnje</translation>
@@ -7628,6 +7631,7 @@ Ovoj radnji možete dodijeliti više prekidača.</translation>
 <translation id="6563055593659435495">Nije moguće održavati vezu s telefonom. Provjerite nalazi li se telefon u blizini, je li otključan i jesu li uključeni Bluetooth i WiFi.</translation>
 <translation id="6564343790052433242">Da kreirate pristupni ključ za aplikaciju <ph name="APP_NAME" />, Google upravitelj lozinki mora biti uključen</translation>
 <translation id="6565899972286925956">Kreirajte bilo šta</translation>
+<translation id="6566648465417201421">Ponovo otvori zatvoreni podijeljeni prikaz</translation>
 <translation id="656679903990115526">Skenirajte ovo telefonom da sačuvate i automatski popunite lozinke radi lakše prijave na web lokacije i u aplikacije</translation>
 <translation id="6568283005472142698">Pretraživanje kartica</translation>
 <translation id="6569931898053264308">Srednje uštede</translation>
@@ -7967,6 +7971,7 @@ Imate još # ugroženih lozinki. Googleov Upravitelj lozinki preporučuje da odm
 <translation id="6805478749741295868">Ovo je eksperimentalna AI funkcija i ponekad može pogriješiti.</translation>
 <translation id="6805817411033102703">Povratne informacije o dijeljenim grupama kartica</translation>
 <translation id="6806089545527108739">Nemoj dozvoliti, ali pitaj kasnije</translation>
+<translation id="6806123901116522137">Idi na AI inovacije</translation>
 <translation id="6806781719264274042">Samo vaši kontakti s Google računom. <ph name="LINK_BEGIN" />Pregledajte kontakte<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">Da nastavite, umetnite i dodirnite sigurnosni ključ</translation>
 <translation id="6808166974213191158">Pisanje sistemskih slika ChromeOS Flexa</translation>
@@ -8620,6 +8625,7 @@ Imate još # ugroženih lozinki. Googleov Upravitelj lozinki preporučuje da odm
 <translation id="7282992757463864530">Infotraka</translation>
 <translation id="7283555985781738399">Način rada za gosta</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{Ovaj uređaj će biti sačuvan jedan dan i sljedeći put se možete povezati bez koda. Ovo je postavio vaš administrator.}one{Ovaj uređaj će biti sačuvan {DAYS} dan i sljedeći put se možete povezati bez koda. Ovo je postavio vaš administrator.}few{Ovaj uređaj će biti sačuvan {DAYS} dana i sljedeći put se možete povezati bez koda. Ovo je postavio vaš administrator.}other{Ovaj uređaj će biti sačuvan {DAYS} dana i sljedeći put se možete povezati bez koda. Ovo je postavio vaš administrator.}}</translation>
+<translation id="7284386549235597598">Ovo će završiti zadatak na kojem Gemini trenutno radi.</translation>
 <translation id="7284411326658527427">Svaka osoba može personalizirati svoj račun i čuvati privatnost podataka.</translation>
 <translation id="7285008278689343502">Nacionalni park Grand Teton</translation>
 <translation id="7286867818472074330">Odaberite pristupni ključ</translation>
@@ -8690,6 +8696,7 @@ Imate još # ugroženih lozinki. Googleov Upravitelj lozinki preporučuje da odm
 <translation id="7336799713063880535">Obavješt. blokirana.</translation>
 <translation id="7337258336304389677">Koristite telefon ili tablet</translation>
 <translation id="7339052793671338107">Regulator za promjenu veličine bočne ploče (može se prevući)</translation>
+<translation id="733918220174231019">Završite zadatak da nastavite</translation>
 <translation id="7339763383339757376">PKCS #7, pojedinačni certifikat</translation>
 <translation id="7339785458027436441">Provjeravaj pravopis prilikom pisanja</translation>
 <translation id="7339898014177206373">Novi prozor</translation>
@@ -8840,6 +8847,7 @@ Imate još # ugroženih lozinki. Googleov Upravitelj lozinki preporučuje da odm
 <translation id="7432200167665670017">Vaš administrator je blokirao "<ph name="EXTENSION_NAME" />" – ID aplikacije <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">Arhiviraj</translation>
 <translation id="7433333862363162673">Brisanje prečice za odabir</translation>
+<translation id="7433495118028038748">Da, završi zadatak</translation>
 <translation id="7433957986129316853">Zadrži</translation>
 <translation id="7434100547946193426">Druge aplikacije</translation>
 <translation id="7434509671034404296">Programer</translation>

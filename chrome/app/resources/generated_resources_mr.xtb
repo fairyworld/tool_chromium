@@ -2575,6 +2575,7 @@
 <translation id="2822551631199737692">कॅमेरा वापरात आहे</translation>
 <translation id="2822634587701817431">कोलॅप्स / विस्तार करा</translation>
 <translation id="2824942875887026017"><ph name="IDS_SHORT_PRODUCT_NAME" /> तुमच्या अ‍ॅडमिनिस्ट्रेटरमधून प्रॉक्सी सेटिंग्ज वापरत आहे</translation>
+<translation id="2825200993288778739">स्वतःची कौशल्ये तयार करा किंवा कौशल्ये लायब्ररीतून जोडा</translation>
 <translation id="282525059261716597">कमांड लाइन:</translation>
 <translation id="2825758591930162672">विषयाची सार्वजनिक की</translation>
 <translation id="2826576843404243001">सुरक्षित कनेक्शनला सपोर्ट न करणाऱ्या साइटसाठी, साइटला भेट देण्यापूर्वी चेतावणी मिळवा. प्रगत संरक्षण सुरू केल्यामुळे, तुम्ही हे सेटिंग बदलू शकत नाही.</translation>
@@ -4650,6 +4651,7 @@
 <translation id="4321179778687042513">ctrl</translation>
 <translation id="432160826079505197"><ph name="FILE_NAME" /> फाइंडर मध्ये दाखवा</translation>
 <translation id="4322394346347055525">अन्य टॅब बंद करा</translation>
+<translation id="4322400254469690320"><ph name="FEATURE_NAME" /> फोल्डरमध्ये तुमचे <ph name="FILENAME" /> शोधा.</translation>
 <translation id="4324577459193912240">फाइल अपूर्ण आहे</translation>
 <translation id="4325433082696797523">स्टोरेज आणि पॉवर</translation>
 <translation id="4325515113816851466">तुम्ही साइन आउट केल्यानंतर तुमच्या पालकांच्या निवडी लागू होणार नाहीत</translation>
@@ -6645,6 +6647,7 @@
 <translation id="5826993284769733527">अर्धपारदर्शक</translation>
 <translation id="5827266244928330802">Safari</translation>
 <translation id="5827591412833386477">एकाच गटामध्ये साइट दाखवा</translation>
+<translation id="5827835011646404677">कौशल्ये तुमच्या Google खात्यात सेव्ह केली जातात</translation>
 <translation id="5828181959764767444">सूर्यास्त</translation>
 <translation id="5828545842856466741">प्रोफाइल जोडा…</translation>
 <translation id="5828633471261496623">प्रिंट करत आहे...</translation>
@@ -11220,6 +11223,7 @@ I feel - विटांची इमारत</translation>
 <translation id="9130015405878219958">चुकीचे मोड एंटर केले.</translation>
 <translation id="9130135798965366513">पुढे सुरू ठेवण्यासाठी, <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> तुमचे <ph name="FIELDS_STRING" /> या साइटसोबत शेअर करेल. या साइटचे <ph name="BEGIN_LINK1" />गोपनीयता धोरण<ph name="END_LINK1" /> आणि <ph name="BEGIN_LINK2" />सेवा अटी<ph name="END_LINK2" /> पहा.</translation>
 <translation id="9130364135697530260">या साइटवर एंबेड केलेल्या आशयाने तुमच्याविषयी सेव्ह केलेली माहिती ते वापरू शकत नाही</translation>
+<translation id="9130857050314385402">तुम्ही कौशल्ये वापरता तेव्हा टॅबची शीर्षके आणि URL Google कडे पाठवली जातात</translation>
 <translation id="9131209053278896908">ब्लॉक केलेल्या साइट येथे दिसतात</translation>
 <translation id="9131487537093447019">ब्लूटूथ डिव्हाइस वर मेसेज पाठवा आणि त्यावरून मिळवा.</translation>
 <translation id="9133568201369135151">निदानासंबंधित डेटा संग्रह पूर्ण झाला आहे. तुमची काही वैयक्तिक माहिती या डेटामध्ये समाविष्ट आहे.</translation>

@@ -1456,6 +1456,7 @@ Ha kezelni szeretné a fiók beállításait, telepítse eszközére a Family Li
 <translation id="2039464276165755892">Az értesítések tartalmának elrejtése, amikor valaki mást észlel a rendszer</translation>
 <translation id="2040460856718599782">Hoppá! Hiba történt, miközben a rendszer megpróbálta azonosítani. Kérjük, ellenőrizze még egyszer bejelentkezési adatait, majd próbálja meg ismét.</translation>
 <translation id="2040822390690632244">Frissítések, súgó, fejlesztői beállítások</translation>
+<translation id="2040827008689966558">Bezárt osztott nézet ismételt megnyitása</translation>
 <translation id="2040894699575719559">Helyadatok letiltva</translation>
 <translation id="2042279886444479655">Aktív profilok</translation>
 <translation id="2044014337866019681">A munkamenet zárolásának feloldásához igazolja a következő fiókot: <ph name="ACCOUNT" />.</translation>
@@ -4574,6 +4575,7 @@ Elindítja a következőt: <ph name="CONTROL_PANEL_APPLET_NAME" />?</translation
 <translation id="4275397969489577657">Esemény streamnaplózásának engedélyezése</translation>
 <translation id="4275788652681621337">Oldalsó panel bezárása</translation>
 <translation id="4275830172053184480">Indítsa újra az eszközt</translation>
+<translation id="4276390967705106170">Megnyitás új böngészőlapon</translation>
 <translation id="4276598757692536305">Nyomtatóhoz használt PPD-fájl</translation>
 <translation id="4277434192562187284">XML-konfigurációs forrás</translation>
 <translation id="4278390842282768270">Engedélyezve</translation>
@@ -5499,6 +5501,7 @@ kicsinyítéshez pedig a Ctrl + Alt + Fényerő csökkentése billentyűpara
 <translation id="4946998421534856407">indító + felfelé nyíl</translation>
 <translation id="4947376546135294974">A felkeresett webhelyről származó adatok</translation>
 <translation id="4949898053053527676">Úgy tűnik, nincs találat erre a keresésre.</translation>
+<translation id="4949954144207118092">Megnyitás egy meglévő <ph name="APP_NAME" />-lapon</translation>
 <translation id="4950100687509657457">Profil létrehozása</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{egy fájlt}other{# fájlt}}</translation>
 <translation id="495170559598752135">Műveletek</translation>
@@ -7629,6 +7632,7 @@ Győződjön meg arról, hogy nem ad ki bizalmas adatokat.</translation>
 <translation id="6563055593659435495">Nem sikerült fenntartani a telefon kapcsolatát. Gondoskodjon arról, hogy telefonja a közelben legyen feloldott állapotban, valamint arról, hogy a Bluetooth- és a Wi-Fi-kapcsolat be legyen kapcsolva.</translation>
 <translation id="6564343790052433242">A(z) <ph name="APP_NAME" /> alkalmazáshoz való azonosítókulcs létrehozásához a Google Jelszókezelőnek bekapcsolva kell lennie</translation>
 <translation id="6565899972286925956">Bármit létrehozhat</translation>
+<translation id="6566648465417201421">Bezárt osztott nézet ismételt megnyitása</translation>
 <translation id="656679903990115526">Olvassa be a telefonjával, hogy menthesse és automatikusan kitölthesse jelszavait, és így egyszerűen bejelentkezhessen a webhelyekre és az alkalmazásokba.</translation>
 <translation id="6568283005472142698">Keresés a lapokon</translation>
 <translation id="6569931898053264308">Közepes megtakarítás</translation>
@@ -7964,6 +7968,7 @@ Győződjön meg arról, hogy nem ad ki bizalmas adatokat.</translation>
 <translation id="6805478749741295868">Ez egy kísérleti AI-funkció, amely nem mindig működik megfelelően.</translation>
 <translation id="6805817411033102703">Visszajelzés a megosztott lapcsoportokról</translation>
 <translation id="6806089545527108739">Nem engedélyezem, de később kérdezzen rá</translation>
+<translation id="6806123901116522137">Ugrás az AI-innovációkhoz</translation>
 <translation id="6806781719264274042">Csak az Ön Google-fiókkal rendelkező ismerősei. <ph name="LINK_BEGIN" />Névjegyek mutatása<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">A folytatáshoz helyezze be, majd érintse meg a biztonsági kulcsot</translation>
 <translation id="6808166974213191158">ChromeOS Flex rendszerképíró</translation>
@@ -8617,6 +8622,7 @@ Győződjön meg arról, hogy nem ad ki bizalmas adatokat.</translation>
 <translation id="7282992757463864530">Információs sáv</translation>
 <translation id="7283555985781738399">Vendég mód</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{Az eszközt a rendszer egy napig menti el, Ön pedig legközelebb kód nélkül csatlakozhat. Ezt a rendszergazda állítja be.}other{Az eszközt a rendszer {DAYS} napig menti el, Ön pedig legközelebb kód nélkül csatlakozhat. Ezt a rendszergazda állítja be.}}</translation>
+<translation id="7284386549235597598">Ezzel befejezi a feladatot, amelyen a Gemini jelenleg dolgozik.</translation>
 <translation id="7284411326658527427">Bárki személyre szabhatja a saját fiókját, és gondoskodhat adatainak biztonságáról.</translation>
 <translation id="7285008278689343502">Grand Teton Nemzeti Park</translation>
 <translation id="7286867818472074330">Azonosítókulcs kiválasztása</translation>
@@ -8687,6 +8693,7 @@ Győződjön meg arról, hogy nem ad ki bizalmas adatokat.</translation>
 <translation id="7336799713063880535">Értesítések letiltva.</translation>
 <translation id="7337258336304389677">Telefon vagy táblagép használata</translation>
 <translation id="7339052793671338107">Oldalsó panelt átméretező fogópont (húzható)</translation>
+<translation id="733918220174231019">A folytatáshoz fejezze be a feladatot</translation>
 <translation id="7339763383339757376">PKCS #7, egyedüli tanúsítvány</translation>
 <translation id="7339785458027436441">Helyesírás-ellenőrzés gépeléskor</translation>
 <translation id="7339898014177206373">Új ablak</translation>
@@ -8836,6 +8843,7 @@ Győződjön meg arról, hogy nem ad ki bizalmas adatokat.</translation>
 <translation id="7432200167665670017">A(z) „<ph name="EXTENSION_NAME" />” bővítményt letiltotta a rendszergazda – alkalmazásazonosító: <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">Archiválás</translation>
 <translation id="7433333862363162673">Kiválasztási billentyűparancs törlése</translation>
+<translation id="7433495118028038748">Igen, feladat befejezése</translation>
 <translation id="7433957986129316853">Megtartom</translation>
 <translation id="7434100547946193426">Egyéb alkalmazások</translation>
 <translation id="7434509671034404296">Fejlesztőknek</translation>

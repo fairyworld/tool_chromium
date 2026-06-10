@@ -1455,6 +1455,7 @@
 <translation id="2039464276165755892">ሌላ ሰው ሲገኝ የማሳወቂያ ይዘትን ደብቅ</translation>
 <translation id="2040460856718599782">ውይ!  እርስዎን ለማረጋገጥ በሚሞከርበት ጊዜ የሆነ ስህተት ተፈጥሯል።  እባክዎ የመለያ መግቢያ ምስክርነቶችዎን ደግመው ያረጋግጡና እንደገና ይሞክሩ።</translation>
 <translation id="2040822390690632244">ዝማኔዎች፣ እገዛ፣ የገንቢ አማራጮች</translation>
+<translation id="2040827008689966558">የተዘጋ የተከፈለ ዕይታን እንደገና ይክፈቱ</translation>
 <translation id="2040894699575719559">አካባቢ ታግዷል</translation>
 <translation id="2042279886444479655">ንቁ መገለጫዎች</translation>
 <translation id="2044014337866019681">እባክዎ ክፍለ-ጊዜውን ለመክፈት <ph name="ACCOUNT" />ን እያረጋገጡ መሆንዎን ያረጋግጡ።</translation>
@@ -4570,6 +4571,7 @@
 <translation id="4275397969489577657">የክስተት ዥረት ምዝግብ ማስታወሻን ያንቁ</translation>
 <translation id="4275788652681621337">የጎን ፓነልን ዝጋ</translation>
 <translation id="4275830172053184480">መሣሪያዎን ዳግም ያስጀምሩ</translation>
+<translation id="4276390967705106170">በአዲስ የአሳሽ ትር ውስጥ ይክፈቱ</translation>
 <translation id="4276598757692536305">ማተሚያ PPD</translation>
 <translation id="4277434192562187284">የXML ውቅረት ምንጭ</translation>
 <translation id="4278390842282768270">ተፈቅዷል</translation>
@@ -5495,6 +5497,7 @@
 <translation id="4946998421534856407">ማስጀምሪያ + የላይ ቀስት</translation>
 <translation id="4947376546135294974">እየጎበኙት ካለ ጣቢያ የመጣ ውሂብ</translation>
 <translation id="4949898053053527676">ለፍለጋዎ ማናቸውም ዓይነት የፍለጋ ውጤቶች ያሉ አይመስልም።</translation>
+<translation id="4949954144207118092">በነባር <ph name="APP_NAME" /> ትር ውስጥ ይክፈቱ</translation>
 <translation id="4950100687509657457">መገለጫ ፍጠር</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{አንድ ፋይል}one{# ፋይሎች}other{# ፋይሎች}}</translation>
 <translation id="495170559598752135">እርምጃዎች</translation>
@@ -7624,6 +7627,7 @@
 <translation id="6563055593659435495">ከስልክዎ ጋር ያለውን ግንኙነት መጠበቅ አልተቻለም። ስልክዎ በአቅራቢያ መሆኑን፣ መከፈቱን እና ብሉቱዝ እና Wi-Fi መብራታቸውን ያረጋግጡ</translation>
 <translation id="6564343790052433242">ለ<ph name="APP_NAME" /> የይለፍ ቁልፍ ለመፍጠር Google የይለፍ ቃል አስተዳዳሪ መብራት አለበት</translation>
 <translation id="6565899972286925956">ማንኛውንም ነገር ይፍጠሩ</translation>
+<translation id="6566648465417201421">የተዘጋ የተከፈለ ዕይታን እንደገና ይክፈቱ</translation>
 <translation id="656679903990115526">በቀላሉ ወደ ጣቢያዎች እና መተግበሪያዎች ለመግባት የይለፍ ቃላትዎን ለማስቀመጥ እና በራስ-ሙላ ለማድረግ ይህን በስልክዎ ይቃኙ</translation>
 <translation id="6568283005472142698">የትር ፍለጋ</translation>
 <translation id="6569931898053264308">መካከለኛ ቁጠባዎች</translation>
@@ -7961,6 +7965,7 @@
 <translation id="6805478749741295868">ይህ የሙከራ ሰው ሠራሽ አስተውሎት ባህሪ ነው እናም ሁልጊዜ ትክክል አይሆንም።</translation>
 <translation id="6805817411033102703">የተጋሩ የትር ቡድኖች ግብረመልስ</translation>
 <translation id="6806089545527108739">አትፍቀድ ነገር ግን በኋላ ጠይቅ</translation>
+<translation id="6806123901116522137">ወደ የሰው ሠራሽ አስተውሎት ፈጠራዎች ሂድ</translation>
 <translation id="6806781719264274042">የGoogle መለያ ያላቸው ዕውቂያዎችዎ ብቻ። <ph name="LINK_BEGIN" />ዕውቂያዎችን አሳይ<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">ለመቀጠል የደህንነት ቁልፍዎን አስገብተው ይንኩ</translation>
 <translation id="6808166974213191158">የChrome OS ስርዓት ምስል ጸሐፊ</translation>
@@ -8614,6 +8619,7 @@
 <translation id="7282992757463864530">የመረጃ አሞሌ</translation>
 <translation id="7283555985781738399">የእንግዳ ሁነታ</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{ይህ መሣሪያ ለ1 ቀን የሚቀመጥ ሲሆን በቀጣዩ ጊዜ ላይ ያለ ኮድ ማገናኘት ይችላሉ። ይህ በአስተዳዳሪዎ የሚቀናበር ነው።}one{ይህ መሣሪያ ለ{DAYS} ቀናት የሚቀመጥ ሲሆን በቀጣዩ ጊዜ ላይ ያለ ኮድ ማገናኘት ይችላሉ። ይህ በአስተዳዳሪዎ የሚቀናበር ነው።}other{ይህ መሣሪያ ለ{DAYS} ቀናት የሚቀመጥ ሲሆን በቀጣዩ ጊዜ ላይ ያለ ኮድ ማገናኘት ይችላሉ። ይህ በአስተዳዳሪዎ የሚቀናበር ነው።}}</translation>
+<translation id="7284386549235597598">ይህ Gemini በአሁኑ ጊዜ እየሠራበት ያለውን ተግባር ያበቃል።</translation>
 <translation id="7284411326658527427">እያንዳንዱ ሰው መለያቸውን የግል ማድረግ እና ውሂብን የግል አድርገው ማቆየት ይችላሉ።</translation>
 <translation id="7285008278689343502">ግራንድ ቴቶን ብሔራዊ ፓርክ</translation>
 <translation id="7286867818472074330">የይለፍ ቁልፍ ምረጥ</translation>
@@ -8684,6 +8690,7 @@
 <translation id="7336799713063880535">ማሳወቂያዎች ታግደዋል።</translation>
 <translation id="7337258336304389677">ስልክዎን ወይም ጡባዊዎን ይጠቀሙ</translation>
 <translation id="7339052793671338107">የጎን ፓነል የመያዣ መጠንን ለውጥ (ሊጎተት የሚችል)</translation>
+<translation id="733918220174231019">ለመቀጠል ተግባርን ይጨርሱ</translation>
 <translation id="7339763383339757376">PKCS #7፣ ነጠላ ሰርቲፊኬት</translation>
 <translation id="7339785458027436441">በሚጽፉበት ጊዜ ሆሄ ያረጋግጡ</translation>
 <translation id="7339898014177206373">አዲሰ መስኮት</translation>
@@ -8834,6 +8841,7 @@
 <translation id="7432200167665670017">የእርስዎ አስተዳዳሪ «<ph name="EXTENSION_NAME" />»ን አግዷል - የመተግበሪያ መታወቂያ <ph name="EXTENSION_ID" /></translation>
 <translation id="7433103263856598557">በማህደር ማስቀመጥ</translation>
 <translation id="7433333862363162673">የምርጫ አቋራጭን አጽዳ</translation>
+<translation id="7433495118028038748">አዎ፣ ተግባርን ጨርስ</translation>
 <translation id="7433957986129316853">ይቀጥል</translation>
 <translation id="7434100547946193426">ሌሎች መተግበሪያዎች</translation>
 <translation id="7434509671034404296">ገንቢ</translation>

@@ -6,6 +6,7 @@
 <translation id="1005230401424685968">YYYY</translation>
 <translation id="1013952917065545813">Puwede kang bumalik dito para buksan ulit ang mga tab na isinara mo kamakailan</translation>
 <translation id="1016495303386450659">Na-update ang item</translation>
+<translation id="1018804590490383958">I-scan at i-autofill</translation>
 <translation id="1019990162050689579">Aktibidad sa Gemini App</translation>
 <translation id="102916930470544692">Passkey</translation>
 <translation id="1030376737535466765">Buksan ang Password Manager</translation>
@@ -873,6 +874,7 @@
 <translation id="4021447724486050609">I-update ang iyong Browser</translation>
 <translation id="4021931095789478915">Idagdag ang ${url} sa listahan ng babasahin</translation>
 <translation id="4028871427853484857">I-save sa account…</translation>
+<translation id="4036529942385659684">Ipakita ang panimulang page pagkatapos ng panahong walang aktibidad</translation>
 <translation id="4038354071007134711">Walang application sa device ang makakabukas nito.</translation>
 <translation id="4042870976416480368">Hanapin sa Page</translation>
 <translation id="4045441967987592849">Buksan ulit</translation>
@@ -1549,6 +1551,7 @@ Dapat ding naka-enable ang handoff sa Pangkalahatang seksyon ng Mga Setting, at 
 <translation id="6301767200000930965">Aa</translation>
 <translation id="630308129961693966">Piliin ang address bar position</translation>
 <translation id="6307241780749477694">I-verify na ikaw ito para makuha ang lahat ng iyong password sa device na ito</translation>
+<translation id="6307792728709337290">I-save ang iyong card sa Google Account mo para i-autofill ito para sa pagbiling ito at mga pagbili sa hinaharap na gagawin sa Chrome.</translation>
 <translation id="6316141353357700666">Piliin ang password na gusto mong gamitin mula sa lalabas na listahan.</translation>
 <translation id="6321526113093607004">Idagdag sa Mga Bookmark</translation>
 <translation id="6327249202318869726">Naka-off ang Gemini para sa iyong account. Makipag-ugnayan sa iyong admin para sa higit pang impormasyon.</translation>
@@ -2143,6 +2146,7 @@ Para magpatuloy mula sa iyong computer, lumipat sa <ph name="OTHER_EMAIL" />. Ma
 <translation id="8263809106706527890">Posibleng nagkaroon ng pagbabago sa iyong mga setting ng default browser. Makikita mo ito sa mga setting.</translation>
 <translation id="8264966119170358612">Nalantad ang ilan sa iyong mga naka-save na password sa isang paglabag sa data na hindi sa Google. <ph name="BEGIN_LINK" />Matuto pa<ph name="END_LINK" /></translation>
 <translation id="826614135184049678">Na-sign out ka sa iyong account na <ph name="USER_NAME" />, bilang bahagi ng pag-reset ng iPad mo. Para mag-sign in ulit, i-tap ang "Magpatuloy" sa ibaba.</translation>
+<translation id="8270320981823560179">Drive</translation>
 <translation id="8273982424131314219">Maglalagay ka ng impormasyon sa <ph name="URL" /></translation>
 <translation id="8275068909952022340">Higit pa…</translation>
 <translation id="8281781826761538115">Default - <ph name="DEFAULT_LOCALE" /></translation>

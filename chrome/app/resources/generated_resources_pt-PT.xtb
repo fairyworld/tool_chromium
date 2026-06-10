@@ -2562,6 +2562,7 @@ Pode gerir as definições desta conta ao instalar a aplicação Family Link no 
 <translation id="2822551631199737692">A câmara está a ser usada</translation>
 <translation id="2822634587701817431">Reduzir/expandir</translation>
 <translation id="2824942875887026017"><ph name="IDS_SHORT_PRODUCT_NAME" /> está a utilizar definições do proxy do seu administrador.</translation>
+<translation id="2825200993288778739">Crie a sua própria ou adicione a partir da biblioteca de competências</translation>
 <translation id="282525059261716597">Linha de comandos</translation>
 <translation id="2825758591930162672">Chave pública do requerente</translation>
 <translation id="2826576843404243001">Relativamente aos sites que não suportam ligações seguras, receba um aviso antes de visitar o site. Não pode alterar esta definição porque tem a Proteção avançada ativada.</translation>
@@ -4640,6 +4641,7 @@ Quer pará-lo?</translation>
 <translation id="4321179778687042513">ctrl</translation>
 <translation id="432160826079505197">Mostrar <ph name="FILE_NAME" /> no Finder</translation>
 <translation id="4322394346347055525">Fechar os Outros Separadores</translation>
+<translation id="4322400254469690320">Encontre o seu <ph name="FILENAME" /> na pasta <ph name="FEATURE_NAME" /></translation>
 <translation id="4324577459193912240">Ficheiro incompleto</translation>
 <translation id="4325433082696797523">Armazenamento e alimentação</translation>
 <translation id="4325515113816851466">As escolhas dos teus pais deixam de ser aplicadas depois de terminares sessão</translation>
@@ -6636,6 +6638,7 @@ Certifique-se de que não revela informações confidenciais.</translation>
 <translation id="5826993284769733527">Semitransparente</translation>
 <translation id="5827266244928330802">Safari</translation>
 <translation id="5827591412833386477">Mostrar sites no mesmo grupo</translation>
+<translation id="5827835011646404677">As competências são guardadas na sua Conta Google</translation>
 <translation id="5828181959764767444">Pôr do sol</translation>
 <translation id="5828545842856466741">Adicionar perfil…</translation>
 <translation id="5828633471261496623">A imprimir...</translation>
@@ -11208,6 +11211,7 @@ Pode incluir informações sobre o software instalado, os ficheiros, o navegador
 <translation id="9130015405878219958">Introduzido modo inválido.</translation>
 <translation id="9130135798965366513">Para continuar, o fornecedor <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> vai partilhar o seu <ph name="FIELDS_STRING" /> com este site. Consulte a <ph name="BEGIN_LINK1" />política de privacidade<ph name="END_LINK1" /> e os <ph name="BEGIN_LINK2" />termos de utilização<ph name="END_LINK2" /> deste site.</translation>
 <translation id="9130364135697530260">O conteúdo incorporado neste site pode usar informações guardadas sobre si</translation>
+<translation id="9130857050314385402">Os URLs e os títulos dos separadores são enviados para a Google quando usa a competência</translation>
 <translation id="9131209053278896908">Os sites bloqueados aparecem aqui</translation>
 <translation id="9131487537093447019">Envie mensagens para e receba mensagens de dispositivos Bluetooth.</translation>
 <translation id="9133568201369135151">A recolha de dados de diagnóstico está concluída. Algumas das suas informações pessoais estão incluídas nestes dados.</translation>

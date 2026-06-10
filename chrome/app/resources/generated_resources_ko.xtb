@@ -1459,6 +1459,7 @@
 <translation id="2039464276165755892">다른 사람이 감지되면 알림 내용을 숨깁니다.</translation>
 <translation id="2040460856718599782">인증을 시도하는 중에 문제가 발생했습니다. 로그인 사용자 인증 정보를 확인하고 다시 시도해 주세요.</translation>
 <translation id="2040822390690632244">업데이트, 도움말, 개발자 옵션</translation>
+<translation id="2040827008689966558">닫힌 분할 뷰 다시 열기</translation>
 <translation id="2040894699575719559">위치가 차단됨</translation>
 <translation id="2042279886444479655">활성화된 프로필</translation>
 <translation id="2044014337866019681">세션을 잠금 해제하려면 <ph name="ACCOUNT" /> 계정을 인증하세요.</translation>
@@ -4577,6 +4578,7 @@
 <translation id="4275397969489577657">이벤트 스트림 로깅 사용</translation>
 <translation id="4275788652681621337">측면 패널 닫기</translation>
 <translation id="4275830172053184480">기기 다시 시작</translation>
+<translation id="4276390967705106170">새 브라우저 탭에서 열기</translation>
 <translation id="4276598757692536305">프린터 PPD</translation>
 <translation id="4277434192562187284">XML 구성 소스</translation>
 <translation id="4278390842282768270">허용됨</translation>
@@ -5502,6 +5504,7 @@
 <translation id="4946998421534856407">런처 + 위쪽 화살표</translation>
 <translation id="4947376546135294974">방문 중인 사이트의 데이터</translation>
 <translation id="4949898053053527676">검색어와 일치하는 검색 결과가 없는 것 같습니다</translation>
+<translation id="4949954144207118092">기존 <ph name="APP_NAME" /> 탭에서 열기</translation>
 <translation id="4950100687509657457">프로필 만들기</translation>
 <translation id="495164417696120157">{COUNT,plural, =1{파일 1개}other{파일 #개}}</translation>
 <translation id="495170559598752135">작업</translation>
@@ -7631,6 +7634,7 @@
 <translation id="6563055593659435495">휴대전화와 연결을 유지할 수 없습니다. 휴대전화가 근처에 있고 잠금 해제되어 있으며, 블루투스와 Wi-Fi가 켜져 있는지 확인하세요.</translation>
 <translation id="6564343790052433242"><ph name="APP_NAME" />의 패스키를 만들려면 Google 비밀번호 관리자가 사용 설정되어 있어야 합니다.</translation>
 <translation id="6565899972286925956">무엇이든 만들어 보세요</translation>
+<translation id="6566648465417201421">닫힌 분할 뷰 다시 열기</translation>
 <translation id="656679903990115526">휴대전화로 이 QR 코드를 스캔하여 비밀번호를 저장하고 자동 완성하여 사이트 및 앱에 간편하게 로그인하세요.</translation>
 <translation id="6568283005472142698">탭 검색</translation>
 <translation id="6569931898053264308">메모리 다소 절약</translation>
@@ -7966,6 +7970,7 @@
 <translation id="6805478749741295868">실험용 AI 기능이므로 정확하지 않을 수 있습니다.</translation>
 <translation id="6805817411033102703">공유 탭 그룹에 관한 의견</translation>
 <translation id="6806089545527108739">허용하지 않고 나중에 묻기</translation>
+<translation id="6806123901116522137">AI 혁신으로 이동</translation>
 <translation id="6806781719264274042">Google 계정이 있는 연락처만. <ph name="LINK_BEGIN" />연락처 보기<ph name="LINK_END" /></translation>
 <translation id="6808039367995747522">계속하려면 보안 키를 삽입하고 터치하세요.</translation>
 <translation id="6808166974213191158">ChromeOS Flex 시스템 이미지 작성기</translation>
@@ -8619,6 +8624,7 @@
 <translation id="7282992757463864530">정보 표시줄</translation>
 <translation id="7283555985781738399">게스트 모드</translation>
 <translation id="7284307451964417957">{DAYS,plural, =1{기기는 하루 동안 저장되며 다음번 연결 시 코드가 필요하지 않습니다. 이는 관리자가 설정한 규칙입니다.}other{기기는 {DAYS}일 동안 저장되며 다음번 연결 시 코드가 필요하지 않습니다. 이는 관리자가 설정한 규칙입니다.}}</translation>
+<translation id="7284386549235597598">Gemini가 현재 수행 중인 작업이 종료됩니다.</translation>
 <translation id="7284411326658527427">모든 사용자는 자신의 계정을 맞춤설정하고 데이터를 비공개로 유지할 수 있습니다.</translation>
 <translation id="7285008278689343502">그랜드 테턴 국립공원</translation>
 <translation id="7286867818472074330">패스키 선택</translation>
@@ -8689,6 +8695,7 @@
 <translation id="7336799713063880535">알림 차단됨</translation>
 <translation id="7337258336304389677">휴대전화 또는 태블릿 사용</translation>
 <translation id="7339052793671338107">측면 패널 크기 조절 핸들, 드래그 가능</translation>
+<translation id="733918220174231019">작업을 종료하고 계속 진행</translation>
 <translation id="7339763383339757376">PKCS #7, 단일 인증서</translation>
 <translation id="7339785458027436441">입력 시 맞춤법 검사</translation>
 <translation id="7339898014177206373">새 창</translation>
@@ -8838,6 +8845,7 @@
 <translation id="7432200167665670017">관리자가 "<ph name="EXTENSION_NAME" />" 확장 프로그램(앱 ID: <ph name="EXTENSION_ID" />)을 차단함</translation>
 <translation id="7433103263856598557">보관처리</translation>
 <translation id="7433333862363162673">선택 항목 지우기 단축키</translation>
+<translation id="7433495118028038748">예, 작업 종료</translation>
 <translation id="7433957986129316853">유지</translation>
 <translation id="7434100547946193426">기타 앱</translation>
 <translation id="7434509671034404296">개발자 정보</translation>

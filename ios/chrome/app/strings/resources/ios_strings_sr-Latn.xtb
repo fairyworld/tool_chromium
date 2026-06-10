@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">Ažurirajte pregledač</translation>
 <translation id="4021931095789478915">Dodaj ${url} na listu za čitanje</translation>
 <translation id="4028871427853484857">Sačuvaj na nalogu…</translation>
+<translation id="4036529942385659684">Prikaži početnu stranicu posle perioda neaktivnosti</translation>
 <translation id="4038354071007134711">Nijedna aplikacija na ovom uređaju ne može da otvori datoteku.</translation>
 <translation id="4042870976416480368">Nađi na stranici</translation>
 <translation id="4045441967987592849">Ponovo otvori</translation>
@@ -2145,6 +2146,7 @@ Da biste nastavili sa računara, pređite na <ph name="OTHER_EMAIL" />. Dobiće
 <translation id="8263809106706527890">Možda je došlo do promene podešavanja podrazumevanog pregledača. Ovo možete da proverite u podešavanjima.</translation>
 <translation id="8264966119170358612">Neke od vaših sačuvanih lozinki su otkrivene tokom povrede podataka koji nisu Google podaci. <ph name="BEGIN_LINK" />Saznajte više<ph name="END_LINK" /></translation>
 <translation id="826614135184049678">Odjavljeni ste sa naloga <ph name="USER_NAME" /> u sklopu resetovanja na iPad-u. Da biste se ponovo prijavili, dodirnite Nastavi ispod.</translation>
+<translation id="8270320981823560179">Disk</translation>
 <translation id="8273982424131314219">Popunićete informacije na <ph name="URL" /></translation>
 <translation id="8275068909952022340">Još…</translation>
 <translation id="8281781826761538115">Podrazumevano – <ph name="DEFAULT_LOCALE" /></translation>
