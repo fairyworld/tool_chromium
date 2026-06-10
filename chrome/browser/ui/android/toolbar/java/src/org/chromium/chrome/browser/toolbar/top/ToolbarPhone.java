@@ -2032,13 +2032,13 @@ public class ToolbarPhone extends ToolbarLayout
         VisibleUrlText visibleUrlText =
                 new VisibleUrlText(
                         urlBarData.displayText, mLocationBar.getOmniboxVisibleTextPrefixHint());
-        assumeNonNull(getTint());
+        assumeNonNull(getButtonTintList());
 
         View urlBar =
                 mLocationBar.getPhoneCoordinator().getViewForDrawing().findViewById(R.id.url_bar);
 
         return new PhoneCaptureStateToken(
-                getTint().getDefaultColor(),
+                getButtonTintList().getDefaultColor(),
                 mToolbarBackground.getColor(),
                 mTabCountSupplier == null ? 0 : mTabCountSupplier.get(),
                 mButtonData,

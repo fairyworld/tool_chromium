@@ -354,7 +354,7 @@ public class ToolbarTablet extends ToolbarLayout {
         } else {
             mBookmarkButtonImageRes = R.drawable.ic_star_24dp;
             mBookmarkButton.setImageResource(R.drawable.ic_star_24dp);
-            ImageViewCompat.setImageTintList(mBookmarkButton, getTint());
+            ImageViewCompat.setImageTintList(mBookmarkButton, getButtonTintList());
             mBookmarkButton.setContentDescription(
                     getContext().getString(R.string.accessibility_menu_bookmark));
         }
@@ -587,7 +587,7 @@ public class ToolbarTablet extends ToolbarLayout {
 
         mOptionalButtonUsesTint = buttonSpec.getSupportsTinting();
         if (mOptionalButtonUsesTint) {
-            ImageViewCompat.setImageTintList(mOptionalButton, getTint());
+            ImageViewCompat.setImageTintList(mOptionalButton, getButtonTintList());
         } else {
             ImageViewCompat.setImageTintList(mOptionalButton, null);
         }

@@ -270,10 +270,8 @@ public abstract class ToolbarLayout extends FrameLayout
         mIncognitoStateProvider = incognitoStateProvider;
     }
 
-    /**
-     * @return The tint the toolbar buttons should use.
-     */
-    protected @Nullable ColorStateList getTint() {
+    /** Returns the tint selector the toolbar buttons should use. */
+    protected @Nullable ColorStateList getButtonTintList() {
         return mThemeColorProvider == null ? mDefaultTint : mThemeColorProvider.getTint();
     }
 
