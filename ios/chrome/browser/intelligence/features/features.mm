@@ -23,6 +23,7 @@
 #import "components/variations/service/variations_service_utils.h"
 #import "ios/chrome/browser/intelligence/actor/tools/utils/actor_tool_utils.h"
 #import "ios/chrome/browser/shared/model/application_context/application_context.h"
+#import "ios/chrome/browser/shared/public/features/features.h"
 #import "ios/chrome/browser/tabs/model/inactive_tabs/features.h"
 
 BASE_FEATURE(kEnhancedCalendar, base::FEATURE_DISABLED_BY_DEFAULT);
@@ -918,8 +919,9 @@ bool IsActorServiceLoggingEnabled() {
   return base::FeatureList::IsEnabled(kActorServiceLogging);
 }
 
-BASE_FEATURE(kIOSBottomSheetMigration, base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kIOSGeminiBottomSheetMigration, base::FEATURE_DISABLED_BY_DEFAULT);
 
-bool IsIOSBottomSheetMigrationEnabled() {
-  return base::FeatureList::IsEnabled(kIOSBottomSheetMigration);
+bool IsIOSGeminiBottomSheetMigrationEnabled() {
+  return IsGeminiCopresenceEnabled() && IsAssistantContainerEnabled() &&
+         base::FeatureList::IsEnabled(kIOSGeminiBottomSheetMigration);
 }

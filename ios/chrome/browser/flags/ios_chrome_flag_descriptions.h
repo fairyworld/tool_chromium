@@ -916,11 +916,6 @@ inline constexpr char kIOSBackendPromoServiceIntegrationName[] =
 inline constexpr char kIOSBackendPromoServiceIntegrationDescription[] =
     "Enables Backend Promo Service integration.";
 
-inline constexpr char kIOSBottomSheetMigrationName[] =
-    "iOS Bottom Sheet Migration";
-inline constexpr char kIOSBottomSheetMigrationDescription[] =
-    "Enables the iOS bottom sheet migration.";
-
 inline constexpr char kIOSBrowserEditMenuMetricsName[] =
     "Browser edit menu metrics";
 inline constexpr char kIOSBrowserEditMenuMetricsDescription[] =
@@ -986,6 +981,13 @@ inline constexpr char kIOSExpandedTipsName[] = "Expanded Tips Notifications";
 inline constexpr char kIOSExpandedTipsDescription[] =
     "Enables a feature that adds several new Tips Notifications that can be "
     "sent.";
+
+inline constexpr char kIOSGeminiBottomSheetMigrationName[] =
+    "iOS Gemini Bottom Sheet Migration";
+inline constexpr char kIOSGeminiBottomSheetMigrationDescription[] =
+    "Enables presenting the Gemini Floaty embedded in a bottom sheet instead"
+    " of a overlay view. This feature requires both 'Gemini Copresence'"
+    " and 'Assistant Container' features to be enabled.";
 
 inline constexpr char kIOSKeyboardAccessoryDefaultViewName[] =
     "Default Input Accessory View";

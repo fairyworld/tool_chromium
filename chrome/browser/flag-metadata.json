@@ -5853,11 +5853,6 @@
     "expiry_milestone": 153
   },
   {
-    "name": "ios-bottom-sheet-migration",
-    "owners": [ "gayane@google.com", "bling-flags@google.com" ],
-    "expiry_milestone": 160
-  },
-  {
     "name": "ios-browser-edit-menu-metrics",
     "owners": [ "olivierrobin@chromium.org", "bling-flags@google.com" ],
     "expiry_milestone": 175
@@ -5915,6 +5910,14 @@
       "bling-mony-pod@google.com"
     ],
     "expiry_milestone": 153
+  },
+  {
+    "name": "ios-gemini-bottom-sheet-migration",
+    "owners": [
+      "gayane@google.com",
+      "bling-flags@google.com"
+    ],
+    "expiry_milestone": 160
   },
   {
     "name": "ios-keyboard-accessory-default-view",
