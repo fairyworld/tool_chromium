@@ -55,14 +55,6 @@ gfx::Image FaviconCache::GetFaviconForPageUrl(
                             /*notify_on_empty=*/false);
 }
 
-gfx::Image FaviconCache::GetLargestFaviconForPageUrl(
-    const GURL& page_url,
-    FaviconFetchedCallback on_favicon_fetched) {
-  return GetFaviconInternal({RequestType::kRawByPageUrl, page_url},
-                            std::move(on_favicon_fetched),
-                            /*notify_on_empty=*/false);
-}
-
 gfx::Image FaviconCache::GetFaviconForIconUrl(
     const GURL& icon_url,
     FaviconFetchedCallback on_favicon_fetched,
@@ -103,27 +95,21 @@ gfx::Image FaviconCache::GetFaviconInternal(
     return gfx::Image();
   }
 
-  if (request.type == RequestType::kByPageUrl) {
-    favicon_service_->GetFaviconImageForPageURL(
-        request.url,
-        base::BindRepeating(&FaviconCache::OnFaviconFetched,
-                            weak_factory_.GetWeakPtr(), request),
-        &task_tracker_);
-  } else if (request.type == RequestType::kRawByPageUrl) {
-    favicon_service_->GetRawFaviconForPageURL(
-        request.url, {favicon_base::IconType::kFavicon},
-        /*icon_size_in_pixels=*/0, /*fallback_to_host=*/false,
-        base::BindRepeating(&FaviconCache::OnFaviconRawBitmapFetched,
-                            weak_factory_.GetWeakPtr(), request),
-        &task_tracker_);
-  } else if (request.type == RequestType::kByIconUrl) {
-    favicon_service_->GetFaviconImage(
-        request.url,
-        base::BindRepeating(&FaviconCache::OnFaviconFetched,
-                            weak_factory_.GetWeakPtr(), request),
-        &task_tracker_);
-  } else {
-    NOTREACHED();
+  switch (request.type) {
+    case RequestType::kByPageUrl:
+      favicon_service_->GetFaviconImageForPageURL(
+          request.url,
+          base::BindRepeating(&FaviconCache::OnFaviconFetched,
+                              weak_factory_.GetWeakPtr(), request),
+          &task_tracker_);
+      break;
+    case RequestType::kByIconUrl:
+      favicon_service_->GetFaviconImage(
+          request.url,
+          base::BindRepeating(&FaviconCache::OnFaviconFetched,
+                              weak_factory_.GetWeakPtr(), request),
+          &task_tracker_);
+      break;
   }
 
   pending_requests_[request].push_back(
@@ -149,19 +135,6 @@ void FaviconCache::OnFaviconFetched(
   }
 
   InvokeRequestCallbackWithFavicon(request, result.image);
-}
-
-void FaviconCache::OnFaviconRawBitmapFetched(
-    const Request& request,
-    const favicon_base::FaviconRawBitmapResult& bitmap_result) {
-  if (!bitmap_result.is_valid()) {
-    responses_without_favicons_.Put(request, true);
-    pending_requests_.erase(request);
-    return;
-  }
-
-  InvokeRequestCallbackWithFavicon(
-      request, gfx::Image::CreateFrom1xPNGBytes(bitmap_result.bitmap_data));
 }
 
 void FaviconCache::InvokeRequestCallbackWithFavicon(const Request& request,
