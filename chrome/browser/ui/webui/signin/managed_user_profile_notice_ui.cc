@@ -272,8 +272,8 @@ void ManagedUserProfileNoticeUI::Initialize(
         create_param) {
   auto* profile = Profile::FromWebUI(web_ui());
   bool is_school_account =
-      create_param->account_info.capabilities.can_use_edu_features() ==
-      signin::Tribool::kTrue;
+      create_param->account_info.GetAccountCapabilities()
+          .can_use_edu_features() == signin::Tribool::kTrue;
   base::DictValue update_data;
   std::string domain =
       enterprise_util::GetDomainFromEmail(create_param->account_info.email);

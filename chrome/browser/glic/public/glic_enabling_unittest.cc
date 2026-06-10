@@ -619,7 +619,7 @@ class GlicEnablingProfileReadyStateTestBase
     auto* identity_test_env = identity_test_env_adaptor_->identity_test_env();
     AccountInfo account_info = identity_test_env->MakePrimaryAccountAvailable(
         "test@example.com", signin::ConsentLevel::kSignin);
-    AccountCapabilitiesTestMutator mutator(&account_info.capabilities);
+    AccountCapabilitiesTestMutator mutator(&account_info);
     mutator.set_can_use_model_execution_features(true);
     signin::UpdateAccountInfoForAccount(identity_test_env->identity_manager(),
                                         account_info);
@@ -695,7 +695,7 @@ class GlicEnablingAnchorEntryPointTestBase : public testing::Test {
         IdentityManagerFactory::GetForProfile(profile());
     AccountInfo account_info = signin::MakePrimaryAccountAvailable(
         identity_manager, "test@example.com", signin::ConsentLevel::kSignin);
-    AccountCapabilitiesTestMutator mutator(&account_info.capabilities);
+    AccountCapabilitiesTestMutator mutator(&account_info);
     mutator.set_can_use_model_execution_features(true);
     signin::UpdateAccountInfoForAccount(identity_manager, account_info);
   }
@@ -810,7 +810,7 @@ TEST_F(GlicEnablingAnchorEntryPointTestBase,
   AccountInfo account_info =
       identity_manager->FindExtendedAccountInfoByAccountId(
           identity_manager->GetPrimaryAccountId(signin::ConsentLevel::kSignin));
-  AccountCapabilitiesTestMutator mutator(&account_info.capabilities);
+  AccountCapabilitiesTestMutator mutator(&account_info);
   mutator.set_can_use_model_execution_features(false);
   signin::UpdateAccountInfoForAccount(identity_manager, account_info);
 

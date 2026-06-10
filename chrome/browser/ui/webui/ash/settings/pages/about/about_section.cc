@@ -546,7 +546,7 @@ bool AboutSection::ShouldShowAUToggle(user_manager::User* active_user) {
       identity_manager->FindExtendedAccountInfoByGaiaId(account_id.GetGaiaId());
   // If the user falls under New Deal..
   // Show toggle based on user's capabilities.
-  return account_info.capabilities.can_toggle_auto_updates() ==
+  return account_info.GetAccountCapabilities().can_toggle_auto_updates() ==
          signin::Tribool::kTrue;
 }
 

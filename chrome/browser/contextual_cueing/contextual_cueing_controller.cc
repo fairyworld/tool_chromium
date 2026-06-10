@@ -548,7 +548,7 @@ bool ContextualCueingController::IsUserSubjectToAgeRestrictions() {
       identity_manager_
           ->FindExtendedAccountInfo(identity_manager_->GetPrimaryAccountInfo(
               signin::ConsentLevel::kSignin))
-          .capabilities;
+          .GetAccountCapabilities();
 
   return capabilities.can_use_model_execution_features() !=
          signin::Tribool::kTrue;

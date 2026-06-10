@@ -125,7 +125,7 @@ namespace {
 
 constexpr int kExperimentalTriggeringVersion = 1;
 
-signin::Tribool CanUseGeminiInChrome(AccountCapabilities& capabilities) {
+signin::Tribool CanUseGeminiInChrome(const AccountCapabilities& capabilities) {
   return capabilities.can_use_gemini_in_chrome();
 }
 
@@ -542,12 +542,14 @@ GlicEnabling::ProfileEnablement GlicEnabling::EnablementForProfile(
       // kGlicEligibilitySeparateAccountCapability feature, also remove the
       // fallback to can_use_model_execution_features().
       signin::Tribool capability_value =
-          primary_account.capabilities.can_use_model_execution_features();
+          primary_account.GetAccountCapabilities()
+              .can_use_model_execution_features();
       if (base::FeatureList::IsEnabled(
               switches::kGlicEligibilitySeparateAccountCapability) &&
-          (CanUseGeminiInChrome(primary_account.capabilities) !=
+          (CanUseGeminiInChrome(primary_account.GetAccountCapabilities()) !=
            signin::Tribool::kUnknown)) {
-        capability_value = CanUseGeminiInChrome(primary_account.capabilities);
+        capability_value =
+            CanUseGeminiInChrome(primary_account.GetAccountCapabilities());
       }
       result.primary_account_is_capable =
           (capability_value == signin::Tribool::kTrue);
@@ -558,12 +560,14 @@ GlicEnabling::ProfileEnablement GlicEnabling::EnablementForProfile(
       base::FieldTrial* field_trial = base::FeatureList::GetFieldTrial(
           switches::kGlicEligibilitySeparateAccountCapability);
       if (field_trial &&
-          (CanUseGeminiInChrome(primary_account.capabilities) !=
+          (CanUseGeminiInChrome(primary_account.GetAccountCapabilities()) !=
            signin::Tribool::kUnknown) &&
-          (primary_account.capabilities.can_use_model_execution_features() !=
+          (primary_account.GetAccountCapabilities()
+               .can_use_model_execution_features() !=
            signin::Tribool::kUnknown) &&
-          (CanUseGeminiInChrome(primary_account.capabilities) !=
-           primary_account.capabilities.can_use_model_execution_features())) {
+          (CanUseGeminiInChrome(primary_account.GetAccountCapabilities()) !=
+           primary_account.GetAccountCapabilities()
+               .can_use_model_execution_features())) {
         g_browser_process->GetFeatures()
             ->glic_synthetic_trial_manager()
             ->SetSyntheticExperimentState(
@@ -572,12 +576,12 @@ GlicEnabling::ProfileEnablement GlicEnabling::EnablementForProfile(
       }
 
       result.live_allowed =
-          primary_account.capabilities.can_use_model_execution_features() ==
-          signin::Tribool::kTrue;
+          primary_account.GetAccountCapabilities()
+              .can_use_model_execution_features() == signin::Tribool::kTrue;
 
       result.share_image_allowed =
-          primary_account.capabilities.can_use_model_execution_features() ==
-          signin::Tribool::kTrue;
+          primary_account.GetAccountCapabilities()
+              .can_use_model_execution_features() == signin::Tribool::kTrue;
     }
   }
 

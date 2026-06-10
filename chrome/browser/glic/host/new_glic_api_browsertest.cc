@@ -1848,7 +1848,7 @@ class NewGlicApiTestWithGeminiActOnWebPolicy : public NewGlicApiTest {
     AccountInfo account_info = identity_test_env_->MakePrimaryAccountAvailable(
         "foo@bar.com", signin::ConsentLevel::kSync);
 
-    AccountCapabilitiesTestMutator mutator(&account_info.capabilities);
+    AccountCapabilitiesTestMutator mutator(&account_info);
     mutator.set_can_use_model_execution_features(true);
     identity_test_env_->UpdateAccountInfoForAccount(account_info);
     identity_test_env_->SimulateSuccessfulFetchOfAccountInfo(

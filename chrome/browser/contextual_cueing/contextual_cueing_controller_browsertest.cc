@@ -1670,7 +1670,7 @@ class ContextualCueingControllerBrowserTestWithAgeRestriction
   void SetUserRestriction(bool is_restricted) {
     auto account_info = identity_test_env()->MakePrimaryAccountAvailable(
         "user@gmail.com", signin::ConsentLevel::kSignin);
-    AccountCapabilitiesTestMutator mutator(&account_info.capabilities);
+    AccountCapabilitiesTestMutator mutator(&account_info);
     mutator.set_can_use_model_execution_features(!is_restricted);
     identity_test_env()->UpdateAccountInfoForAccount(account_info);
   }

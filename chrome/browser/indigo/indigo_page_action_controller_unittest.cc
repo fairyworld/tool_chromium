@@ -267,7 +267,7 @@ class IndigoPageActionControllerTest : public testing::Test {
         identity_manager->FindExtendedAccountInfoByAccountId(
             identity_manager->GetPrimaryAccountId(
                 signin::ConsentLevel::kSignin));
-    AccountCapabilitiesTestMutator mutator(&account_info.capabilities);
+    AccountCapabilitiesTestMutator mutator(&account_info);
     mutator.set_can_use_model_execution_features(
         can_use_model_execution_features);
     identity_test_env_adaptor_->identity_test_env()
