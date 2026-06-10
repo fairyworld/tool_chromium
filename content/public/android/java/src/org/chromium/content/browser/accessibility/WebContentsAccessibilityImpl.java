@@ -472,7 +472,8 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
                         // Invalidate cached state for the node that has changed.
                         clearNodeInfoCacheForGivenId(virtualViewId);
 
-                        requestSendAccessibilityEvent(event);
+                        requestSendAccessibilityEvent(
+                                event, WindowContentChangedSubtype.NONE, virtualViewId);
 
                         // Always send the ENTER and then the EXIT event, to match a
                         // standard Android View.
@@ -1973,7 +1974,8 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
                         ? ACTION_NEXT_AT_MOVEMENT_GRANULARITY.getId()
                         : ACTION_PREVIOUS_AT_MOVEMENT_GRANULARITY.getId());
 
-        requestSendAccessibilityEvent(traverseEvent);
+        requestSendAccessibilityEvent(
+                traverseEvent, WindowContentChangedSubtype.NONE, mAccessibilityFocusId);
     }
 
     private void scrollToMakeNodeVisible(int virtualViewId) {
@@ -2337,7 +2339,7 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
 
             event.setContentChangeTypes(AccessibilityEvent.CONTENT_CHANGE_TYPE_CHECKED);
             event.setSource(mView, id);
-            requestSendAccessibilityEvent(event);
+            requestSendAccessibilityEvent(event, WindowContentChangedSubtype.NONE, id);
         }
     }
 
@@ -2356,7 +2358,7 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
                 event.setContentChangeTypes(subType);
             }
             event.setSource(mView, id);
-            requestSendAccessibilityEvent(event);
+            requestSendAccessibilityEvent(event, WindowContentChangedSubtype.NONE, id);
         }
     }
 
@@ -2392,7 +2394,7 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
         if (delegate != null) {
             delegate.setTextChangeTypes(event, subType);
         }
-        requestSendAccessibilityEvent(event);
+        requestSendAccessibilityEvent(event, WindowContentChangedSubtype.NONE, id);
     }
 
     @CalledByNative
@@ -2422,7 +2424,7 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
 
             event.setContentChangeTypes(AccessibilityEvent.CONTENT_CHANGE_TYPE_SUBTREE);
             event.setSource(mView, virtualViewId);
-            requestSendAccessibilityEvent(event);
+            requestSendAccessibilityEvent(event, WindowContentChangedSubtype.NONE, virtualViewId);
         }
     }
 
@@ -2462,7 +2464,7 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
 
         event.setContentChangeTypes(CONTENT_CHANGE_TYPE_SORT_DIRECTION);
 
-        requestSendAccessibilityEvent(event);
+        requestSendAccessibilityEvent(event, WindowContentChangedSubtype.NONE, id);
     }
 
     @CalledByNative
@@ -2508,7 +2510,7 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
 
             event.setContentChangeTypes(CONTENT_CHANGE_TYPE_PANE_APPEARED);
             event.setSource(mView, virtualViewId);
-            requestSendAccessibilityEvent(event);
+            requestSendAccessibilityEvent(event, WindowContentChangedSubtype.NONE, virtualViewId);
         }
     }
 
@@ -2545,7 +2547,7 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
                 return;
             }
             event.setSource(mView, virtualViewId);
-            requestSendAccessibilityEvent(event);
+            requestSendAccessibilityEvent(event, WindowContentChangedSubtype.NONE, virtualViewId);
         }
     }
 
