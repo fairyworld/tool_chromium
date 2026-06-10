@@ -36,6 +36,7 @@
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
 #include "content/public/test/browser_test.h"
+#include "content/public/test/browser_test_utils.h"
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "net/test/embedded_test_server/http_request.h"
@@ -622,8 +623,7 @@ IN_PROC_BROWSER_TEST_F(IndigoBrowserTest, ToolbarPositioningTransform) {
       StopObservingState(kToolbarBoundsState));
 }
 
-// TODO(b/521479979): Re-enable this test once the bug is fixed.
-IN_PROC_BROWSER_TEST_F(IndigoBrowserTest, DISABLED_HideToolbarOnReload) {
+IN_PROC_BROWSER_TEST_F(IndigoBrowserTest, HideToolbarOnReload) {
   const GURL url = embedded_test_server()->GetURL("/image.html");
 
   RunTestSequence(
@@ -634,6 +634,13 @@ IN_PROC_BROWSER_TEST_F(IndigoBrowserTest, DISABLED_HideToolbarOnReload) {
       PressButton(
           page_actions::AnchoredMessageBubbleView::kAnchoredMessageChipId),
       WaitForShow(IndigoToolbar::kToolbarElementId),
+      // The OOPIF can still be navigating. If so, the reload button is in the
+      // "Stop" state. Wait for the entire WebContents to stop loading before
+      // reloading.
+      Do(base::BindLambdaForTesting([&]() {
+        content::WaitForLoadStop(
+            browser()->tab_strip_model()->GetActiveWebContents());
+      })),
       PressButton(kReloadButtonElementId),
       // Verify the toolbar is hidden.
       WaitForHide(IndigoToolbar::kToolbarElementId));
