@@ -332,4 +332,23 @@ TEST(HttpPasswordStoreMigrator, MigrateHttpFormToHttpsTestSignonRealm) {
   }
 }
 
+TEST(HttpPasswordStoreMigrator, MigrateHttpFormToHttpsTestSkipZeroClick) {
+  PasswordForm http_form;
+  http_form.url = GURL("http://example.org/");
+  http_form.signon_realm = "http://example.org/";
+  http_form.scheme = PasswordForm::Scheme::kHtml;
+
+  // For non-shared passwords, skip_zero_click should be reset to false.
+  http_form.skip_zero_click = true;
+  http_form.type = PasswordForm::Type::kGenerated;
+  EXPECT_FALSE(HttpPasswordStoreMigrator::MigrateHttpFormToHttps(http_form)
+                   .skip_zero_click);
+
+  // For shared passwords, skip_zero_click should be preserved.
+  http_form.skip_zero_click = true;
+  http_form.type = PasswordForm::Type::kReceivedViaSharing;
+  EXPECT_TRUE(HttpPasswordStoreMigrator::MigrateHttpFormToHttps(http_form)
+                  .skip_zero_click);
+}
+
 }  // namespace password_manager

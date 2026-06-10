@@ -88,7 +88,9 @@ PasswordForm HttpPasswordStoreMigrator::MigrateHttpFormToHttps(
   https_form.form_data = autofill::FormData();
   https_form.generation_upload_status =
       PasswordForm::GenerationUploadStatus::kNoSignalSent;
-  https_form.skip_zero_click = false;
+  if (https_form.type != PasswordForm::Type::kReceivedViaSharing) {
+    https_form.skip_zero_click = false;
+  }
   return https_form;
 }
 
