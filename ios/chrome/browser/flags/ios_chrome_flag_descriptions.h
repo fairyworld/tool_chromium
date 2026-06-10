@@ -613,6 +613,14 @@ inline constexpr char kDownloadListDescription[] =
     "Controls the UI type for the download list. When enabled, allows "
     "switching between default and custom UI implementations.";
 
+inline constexpr char kDownloadListPaginationName[] =
+    "Enable iOS Download List Pagination";
+inline constexpr char kDownloadListPaginationDescription[] =
+    "Switches the iOS download list service layer to a paginated, "
+    "keyset-cursor-backed reader with an active-records-only in-memory cache "
+    "instead of loading the full table at startup. Reduces memory and "
+    "startup work for users with very large download histories.";
+
 inline constexpr char kDownloadServiceForegroundSessionName[] =
     "Download service foreground download";
 inline constexpr char kDownloadServiceForegroundSessionDescription[] =

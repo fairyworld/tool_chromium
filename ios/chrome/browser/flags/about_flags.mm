@@ -2906,6 +2906,10 @@ constexpr auto kFeatureEntries = std::to_array<flags_ui::FeatureEntry>({
      flag_descriptions::kPasswordManagerActorLoginName,
      flag_descriptions::kPasswordManagerActorLoginDescription, flags_ui::kOsIos,
      FEATURE_VALUE_TYPE(password_manager::features::kActorLogin)},
+    {"download-list-pagination-ios",
+     flag_descriptions::kDownloadListPaginationName,
+     flag_descriptions::kDownloadListPaginationDescription, flags_ui::kOsIos,
+     FEATURE_VALUE_TYPE(kDownloadListPagination)},
 });
 
 bool SkipConditionalFeatureEntry(const flags_ui::FeatureEntry& entry) {

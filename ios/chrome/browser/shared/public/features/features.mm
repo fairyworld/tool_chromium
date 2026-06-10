@@ -234,6 +234,12 @@ DownloadListUIType CurrentDownloadListUIType() {
 
 BASE_FEATURE(kDownloadList, base::FEATURE_DISABLED_BY_DEFAULT);
 
+BASE_FEATURE(kDownloadListPagination, base::FEATURE_DISABLED_BY_DEFAULT);
+
+bool IsDownloadListPaginationEnabled() {
+  return base::FeatureList::IsEnabled(kDownloadListPagination);
+}
+
 const char kEnableServerDrivenBackgroundRefreshSchedule[] =
     "EnableServerDrivenBackgroundRefreshSchedule";
 const char kEnableRecurringBackgroundRefreshSchedule[] =
