@@ -2119,12 +2119,17 @@ class LocationBarMediator
 
     @VisibleForTesting
     boolean shouldShowMicButton() {
-        if (isUrlBarFocusedWithUserInput()) return false;
-
-        if (mFuseboxCoordinator.getFuseboxLayoutModeSupplier().get()
-                        == FuseboxLayoutMode.SUGGESTIONS_POPOVER
-                && mCurrentInput != null
-                && ToolModeUtils.isConventionalRequest(mCurrentInput.getRequestType())) {
+        boolean useDesktopBehavior =
+                mFuseboxCoordinator.getFuseboxLayoutModeSupplier().get()
+                        == FuseboxLayoutMode.SUGGESTIONS_POPOVER;
+        if (useDesktopBehavior) {
+            boolean isConventionalRequest =
+                    mCurrentInput != null
+                            && ToolModeUtils.isConventionalRequest(mCurrentInput.getRequestType());
+            // With any AI request, desktop also wants to avoid the early return from focus+user
+            // input that's handled in the else if below.
+            if (isConventionalRequest) return false;
+        } else if (isUrlBarFocusedWithUserInput()) {
             return false;
         }
 
