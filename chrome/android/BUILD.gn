@@ -3347,7 +3347,6 @@ template("libmonochrome_tmpl") {
     deps = [
       "//android_webview",
       "//base:jni_onload",
-      "//components/crash/android:crashpad_main",
     ]
     if (defined(invoker.deps)) {
       deps += invoker.deps
