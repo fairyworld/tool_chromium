@@ -38,7 +38,7 @@ DevToolsConnectionDialog::DevToolsConnectionDialog(
     return;
   }
 
-  if (browser->window()) {
+  if (browser->GetWindow()) {
     browser->GetWindow()->Activate();
   }
 

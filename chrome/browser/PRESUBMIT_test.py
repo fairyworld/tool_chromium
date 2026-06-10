@@ -473,5 +473,95 @@ class CheckNewDirectoryHasBuildGnTest(unittest.TestCase):
             mock_input_api, mock_output_api)
         self.assertEqual([], warnings)
 
+
+class CheckNoNewBrowserWindowGetterTest(unittest.TestCase):
+    def testWarnsOnNewCallSites(self):
+        # New code under chrome/browser/ should not call
+        # `<expr>->window()->X(` or `<expr>.window()->X(` where X is declared
+        # on ui::BaseWindow, including when the call line-wraps across
+        # `window()` and `->X`.
+        input_api = MockInputApi()
+        input_api.files = [
+            # Should warn: single-line Browser->window()->BaseWindowMethod().
+            MockAffectedFile('chrome/browser/ui/single.cc',
+                             ['browser->window()->GetNativeWindow();']),
+            MockAffectedFile('chrome/browser/ui/single2.cc',
+                             ['browser_->window()->Show();']),
+            MockAffectedFile('chrome/browser/ui/dot.cc',
+                             ['settings.window()->IsVisible();']),
+            MockAffectedFile('chrome/browser/ui/method_call.cc',
+                             ['browser()->window()->GetBounds();']),
+            # Should warn: line-wrap before `->X(`.
+            MockAffectedFile('chrome/browser/ui/wrap_before_arrow.cc', [
+                'some_long_browser_expression->window()',
+                '    ->GetNativeWindow();',
+            ]),
+            # Should warn: line-wrap after `->`, before the method name.
+            MockAffectedFile('chrome/browser/ui/wrap_after_arrow.cc', [
+                'browser->window()->',
+                '    GetBounds();',
+            ]),
+            # Should warn: line-wrap with dot-form receiver.
+            MockAffectedFile('chrome/browser/ui/wrap_dot.cc', [
+                'new_browser.window()',
+                '    ->Activate();',
+            ]),
+            # Should NOT warn: uses Browser::GetWindow() (the recommended
+            # API).
+            MockAffectedFile('chrome/browser/ui/ok_getwindow.cc',
+                             ['browser->GetWindow()->GetNativeWindow();']),
+            # Should NOT warn: bare `window()` (Browser-internal or unrelated
+            # classes like extensions::WindowController).
+            MockAffectedFile('chrome/browser/ui/ok_bare.cc',
+                             ['  if (window()->IsFullscreen()) {}']),
+            # Should NOT warn: identifier ends with `_window`, not `window`.
+            MockAffectedFile('chrome/browser/ui/ok_other_window.cc', [
+                'dialog_window()->Show();',
+                'root_window()->SetBounds(b);',
+                'app_window()->IsFullscreen();',
+            ]),
+            # Should NOT warn: file is in the excluded_paths list because its
+            # window() method is extensions::WindowController::window().
+            MockAffectedFile(
+                'chrome/browser/extensions/api/tabs/tabs_api.cc',
+                ['window_controller->window()->Close();']),
+            # Should NOT warn: `// nocheck` escape hatch on the method line.
+            MockAffectedFile('chrome/browser/ui/nocheck.cc', [
+                'browser->window()->Show();  // nocheck',
+            ]),
+            # Should NOT warn: `// nocheck` on a different line of the
+            # multi-line match.
+            MockAffectedFile('chrome/browser/ui/nocheck_multiline.cc', [
+                'browser->window()  // nocheck',
+                '    ->Show();',
+            ]),
+            # Should NOT warn: comment line is ignored.
+            MockAffectedFile('chrome/browser/ui/comment.cc', [
+                '// Replaced browser->window()->Show() with GetWindow().',
+            ]),
+        ]
+
+        results = PRESUBMIT._CheckNoNewBrowserWindowGetter(
+            input_api, MockOutputApi())
+
+        self.assertEqual(1, len(results))
+        message = results[0].message
+        self.assertIn('chrome/browser/ui/single.cc', message)
+        self.assertIn('chrome/browser/ui/single2.cc', message)
+        self.assertIn('chrome/browser/ui/dot.cc', message)
+        self.assertIn('chrome/browser/ui/method_call.cc', message)
+        self.assertIn('chrome/browser/ui/wrap_before_arrow.cc', message)
+        self.assertIn('chrome/browser/ui/wrap_after_arrow.cc', message)
+        self.assertIn('chrome/browser/ui/wrap_dot.cc', message)
+        self.assertNotIn('chrome/browser/ui/ok_getwindow.cc', message)
+        self.assertNotIn('chrome/browser/ui/ok_bare.cc', message)
+        self.assertNotIn('chrome/browser/ui/ok_other_window.cc', message)
+        self.assertNotIn('chrome/browser/extensions/api/tabs/tabs_api.cc',
+                         message)
+        self.assertNotIn('chrome/browser/ui/nocheck.cc', message)
+        self.assertNotIn('chrome/browser/ui/nocheck_multiline.cc', message)
+        self.assertNotIn('chrome/browser/ui/comment.cc', message)
+
+
 if __name__ == '__main__':
     unittest.main()

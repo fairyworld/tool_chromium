@@ -55,8 +55,8 @@ class DevToolsManagerDelegateTest : public InProcessBrowserTest {
 
   void CheckIsMaximized(bool maximized) {
     ui_test_utils::CheckWaiter(
-        base::BindRepeating(&BrowserWindow::IsMaximized,
-                            base::Unretained(browser()->window())),
+        base::BindRepeating(&ui::BaseWindow::IsMaximized,
+                            base::Unretained(browser()->GetWindow())),
         maximized, base::Seconds(1))
         .Wait();
     EXPECT_EQ(maximized, browser()->GetWindow()->IsMaximized());
@@ -64,8 +64,8 @@ class DevToolsManagerDelegateTest : public InProcessBrowserTest {
 
   void CheckIsMinimized(bool minimized) {
     ui_test_utils::CheckWaiter(
-        base::BindRepeating(&BrowserWindow::IsMinimized,
-                            base::Unretained(browser()->window())),
+        base::BindRepeating(&ui::BaseWindow::IsMinimized,
+                            base::Unretained(browser()->GetWindow())),
         minimized, base::Seconds(1))
         .Wait();
     EXPECT_EQ(minimized, browser()->GetWindow()->IsMinimized());
@@ -73,8 +73,8 @@ class DevToolsManagerDelegateTest : public InProcessBrowserTest {
 
   void CheckIsFullscreen(bool fullscreen) {
     ui_test_utils::CheckWaiter(
-        base::BindRepeating(&BrowserWindow::IsFullscreen,
-                            base::Unretained(browser()->window())),
+        base::BindRepeating(&ui::BaseWindow::IsFullscreen,
+                            base::Unretained(browser()->GetWindow())),
         fullscreen, base::Seconds(1))
         .Wait();
     EXPECT_EQ(fullscreen, browser()->GetWindow()->IsFullscreen());

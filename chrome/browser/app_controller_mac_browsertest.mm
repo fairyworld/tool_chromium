@@ -814,7 +814,7 @@ IN_PROC_BROWSER_TEST_F(AppControllerBrowserTest, OpenInRegularBrowser) {
   // See: https://crrev.com/c/4530255/comments/2aadb9cf_9a39d4bf
   [[NSNotificationCenter defaultCenter]
       postNotificationName:NSWindowDidBecomeMainNotification
-                    object:incognito_browser->window()
+                    object:incognito_browser->GetWindow()
                                ->GetNativeWindow()
                                .GetNativeNSWindow()];
   // Open a url.
@@ -861,7 +861,7 @@ IN_PROC_BROWSER_TEST_F(AppControllerBrowserTest,
   // See: https://crrev.com/c/4530255/comments/2aadb9cf_9a39d4bf
   [[NSNotificationCenter defaultCenter]
       postNotificationName:NSWindowDidBecomeMainNotification
-                    object:incognito_browser->window()
+                    object:incognito_browser->GetWindow()
                                ->GetNativeWindow()
                                .GetNativeNSWindow()];
 
@@ -905,7 +905,7 @@ IN_PROC_BROWSER_TEST_F(AppControllerBrowserTest, OpenUrlInGuestBrowser) {
   // See: https://crrev.com/c/4530255/comments/2aadb9cf_9a39d4bf
   [[NSNotificationCenter defaultCenter]
       postNotificationName:NSWindowDidBecomeMainNotification
-                    object:guest_browser->window()
+                    object:guest_browser->GetWindow()
                                ->GetNativeWindow()
                                .GetNativeNSWindow()];
   // Open a url.
@@ -984,7 +984,7 @@ IN_PROC_BROWSER_TEST_F(AppControllerBrowserTest,
   // See: https://crrev.com/c/4530255/comments/2aadb9cf_9a39d4bf
   [[NSNotificationCenter defaultCenter]
       postNotificationName:NSWindowDidBecomeMainNotification
-                    object:incognito_browser->window()
+                    object:incognito_browser->GetWindow()
                                ->GetNativeWindow()
                                .GetNativeNSWindow()];
   // Open a url.

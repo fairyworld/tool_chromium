@@ -182,7 +182,7 @@ IN_PROC_BROWSER_TEST_P(BocaAppProviderIntegrationTest,
   LaunchAndWait();
   auto* window =
       ash::FindSystemWebAppBrowser(profile(), ash::SystemWebAppType::BOCA)
-          ->window()
+          ->GetWindow()
           ->GetNativeWindow();
   ash::WindowState* window_state = ash::WindowState::Get(window);
   EXPECT_TRUE(window_state->IsFloated());
@@ -237,7 +237,7 @@ IN_PROC_BROWSER_TEST_P(BocaAppConsumerIntegrationTest,
   LaunchAndWait();
   auto* window =
       ash::FindSystemWebAppBrowser(profile(), ash::SystemWebAppType::BOCA)
-          ->window()
+          ->GetWindow()
           ->GetNativeWindow();
   ash::WindowState* window_state = ash::WindowState::Get(window);
   EXPECT_FALSE(window_state->IsFloated());
