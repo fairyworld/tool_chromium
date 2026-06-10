@@ -172,11 +172,6 @@ class LocationBarMediator
     private static final int WIDTH_CHANGE_ANIMATION_DURATION_MS = 225;
     private static final int WIDTH_CHANGE_ANIMATION_DELAY_MS = 75;
     public static final int POPOVER_FADE_DURATION_MS = 150;
-    private @Nullable Boolean mIsLensOnOmniboxEnabled;
-    private @Nullable ViewGroup mToolbarParent;
-    private int mIndexInToolbar;
-    private @Nullable View mDropdown;
-    private boolean mIsReparenting;
 
     /** Uma methods for omnibox. */
     public interface OmniboxUma {
@@ -220,15 +215,10 @@ class LocationBarMediator
             };
 
     private final LocationBarLayout mLocationBarLayout;
-    private VoiceRecognitionHandler mVoiceRecognitionHandler;
     private final LocationBarDataProvider mLocationBarDataProvider;
     private final @Nullable BrowserControlsStateProvider mBrowserControlsStateProvider;
     private final LocationBarEmbedderUiOverrides mEmbedderUiOverrides;
     private final LocationBarEmbedder mLocationBarEmbedder;
-    private StatusCoordinator mStatusCoordinator;
-    private @Nullable AutocompleteCoordinator mAutocompleteCoordinator;
-    private @Nullable OmniboxPrerender mOmniboxPrerender;
-    private UrlBarCoordinator mUrlCoordinator;
     private final MonotonicObservableSupplier<Profile> mProfileSupplier;
     private final CallbackController mCallbackController = new CallbackController();
     private final OverrideUrlLoadingDelegate mOverrideUrlLoadingDelegate;
@@ -237,8 +227,6 @@ class LocationBarMediator
     private final Context mContext;
     private final BackKeyBehaviorDelegate mBackKeyBehavior;
     private final WindowAndroid mWindowAndroid;
-    private GURL mOriginalUrl = GURL.emptyGURL();
-    private @Nullable Animator mUrlFocusChangeAnimator;
     private final ObserverList<UrlFocusChangeListener> mUrlFocusChangeListeners =
             new ObserverList<>();
     private final Rect mRootViewBounds = new Rect();
@@ -246,11 +234,41 @@ class LocationBarMediator
     private final OmniboxSuggestionsDropdownEmbedderImpl mEmbedderImpl;
     private final @Nullable PageZoomIndicatorCoordinator mPageZoomIndicatorCoordinator;
     private final @Nullable LocationBarFocusScrimHandler mScrimHandler;
+    private final boolean mIsTablet;
+    private final BooleanSupplier mIsToolbarMicEnabledSupplier;
+    private final SettableNonNullObservableSupplier<Boolean> mBackPressStateSupplier =
+            ObservableSuppliers.createNonNull(false);
+    private final MonotonicObservableSupplier<TabModelSelector> mTabModelSelectorSupplier;
+    private final Supplier<@Nullable ModalDialogManager> mModalDialogManagerSupplier;
+    private final FuseboxCoordinator mFuseboxCoordinator;
+    private final Callback<@AutocompleteRequestType Integer> mAutocompleteRequestTypeObserver =
+            this::onAutocompleteRequestTypeChanged;
+    private final Callback<@Nullable SiteSearchData> mSiteSearchDataObserver =
+            (siteSearchData) -> updateUrlBarHintText();
+    private final SearchEngineNameObserver mSearchEngineNameObserver = this::updateUrlBarHintText;
+    private final ButtonToolbarWidthConsumer mBookmarkButtonToolbarWidthConsumer;
+    private final ButtonToolbarWidthConsumer mInstallButtonToolbarWidthConsumer;
+    private final ButtonToolbarWidthConsumer mMicButtonToolbarWidthConsumer;
+    private final ButtonToolbarWidthConsumer mLensButtonToolbarWidthConsumer;
+    private final ButtonToolbarWidthConsumer mZoomButtonToolbarWidthConsumer;
+    private final @Nullable OmniboxChipManager mOmniboxChipManager;
+    private final SettableNullableObservableSupplier<GURL> mExactMatchUrlSupplier;
 
+    private @Nullable Boolean mIsLensOnOmniboxEnabled;
+    private @Nullable ViewGroup mToolbarParent;
+    private int mIndexInToolbar;
+    private @Nullable View mDropdown;
+    private boolean mIsReparenting;
+    private VoiceRecognitionHandler mVoiceRecognitionHandler;
+    private StatusCoordinator mStatusCoordinator;
+    private @Nullable AutocompleteCoordinator mAutocompleteCoordinator;
+    private @Nullable OmniboxPrerender mOmniboxPrerender;
+    private UrlBarCoordinator mUrlCoordinator;
+    private GURL mOriginalUrl = GURL.emptyGURL();
+    private @Nullable Animator mUrlFocusChangeAnimator;
     private boolean mNativeInitialized;
     private boolean mUrlFocusedWithoutAnimations;
     private boolean mIsUrlFocusChangeInProgress;
-    private final boolean mIsTablet;
     private boolean mShouldShowLensButtonWhenUnfocused;
     private boolean mShouldShowMicButtonWhenUnfocused;
     // Whether the microphone and bookmark buttons should be shown in the tablet location bar. These
@@ -265,36 +283,17 @@ class LocationBarMediator
     private @Nullable Boolean mPreviousBookmarkButtonVisible;
     private @Nullable Boolean mPreviousZoomButtonVisible;
     private LensController mLensController;
-    private final BooleanSupplier mIsToolbarMicEnabledSupplier;
     // Tracks if the location bar is laid out in a focused state due to an ntp scroll.
     private boolean mIsLocationBarFocusedFromNtpScroll;
     private boolean mAccessibilityFocusWorkaroundInProgress;
     private @BrandedColorScheme int mBrandedColorScheme = BrandedColorScheme.APP_DEFAULT;
     // TODO(https://crbug.com/481357849): Remove this.
     private boolean mHasEverUpdatedBrandedColorScheme;
-    private final SettableNonNullObservableSupplier<Boolean> mBackPressStateSupplier =
-            ObservableSuppliers.createNonNull(false);
-    private final MonotonicObservableSupplier<TabModelSelector> mTabModelSelectorSupplier;
     private @Nullable SearchEngineService mSearchEngineService;
     private @Nullable AddToHomescreenCoordinator mAddToHomescreenCoordinatorForTesting;
-    private final Supplier<@Nullable ModalDialogManager> mModalDialogManagerSupplier;
-    private final FuseboxCoordinator mFuseboxCoordinator;
     private @Nullable AutocompleteInput mCurrentInput;
     private @Nullable FuseboxAttachmentModelList mFuseboxAttachmentModelList;
-    private final Callback<@AutocompleteRequestType Integer> mAutocompleteRequestTypeObserver =
-            this::onAutocompleteRequestTypeChanged;
-    private final Callback<@Nullable SiteSearchData> mSiteSearchDataObserver =
-            (siteSearchData) -> updateUrlBarHintText();
-    private final SearchEngineNameObserver mSearchEngineNameObserver = this::updateUrlBarHintText;
     private @Nullable Callback<Boolean> mOnSpecializedFuseboxModeActivatedCallback;
-
-    private final ButtonToolbarWidthConsumer mBookmarkButtonToolbarWidthConsumer;
-    private final ButtonToolbarWidthConsumer mInstallButtonToolbarWidthConsumer;
-    private final ButtonToolbarWidthConsumer mMicButtonToolbarWidthConsumer;
-    private final ButtonToolbarWidthConsumer mLensButtonToolbarWidthConsumer;
-    private final ButtonToolbarWidthConsumer mZoomButtonToolbarWidthConsumer;
-    private final @Nullable OmniboxChipManager mOmniboxChipManager;
-    private final SettableNullableObservableSupplier<GURL> mExactMatchUrlSupplier;
     private boolean mMiniOriginMode;
 
     /*package */ LocationBarMediator(
@@ -582,24 +581,6 @@ class LocationBarMediator
 
     /*package */ void setUnfocusedWidth(int unfocusedWidth) {
         mLocationBarLayout.setUnfocusedWidth(unfocusedWidth);
-    }
-
-    /* package */ void setVoiceRecognitionHandlerForTesting(
-            VoiceRecognitionHandler voiceRecognitionHandler) {
-        mVoiceRecognitionHandler = voiceRecognitionHandler;
-    }
-
-    /* package */ void setLensControllerForTesting(LensController lensController) {
-        mLensController = lensController;
-    }
-
-    void resetLastCachedIsLensOnOmniboxEnabledForTesting() {
-        mIsLensOnOmniboxEnabled = null;
-    }
-
-    /* package */ void setIsUrlBarFocusedWithoutAnimationsForTesting(
-            boolean isUrlBarFocusedWithoutAnimations) {
-        mUrlFocusedWithoutAnimations = isUrlBarFocusedWithoutAnimations;
     }
 
     /*package */ void updateVisualsForState() {
@@ -1110,11 +1091,6 @@ class LocationBarMediator
         mPageZoomIndicatorCoordinator.show(webContents);
     }
 
-    /* package */ void setAddToHomescreenCoordinatorForTesting(
-            AddToHomescreenCoordinator addToHomescreenCoordinator) {
-        mAddToHomescreenCoordinatorForTesting = addToHomescreenCoordinator;
-    }
-
     private @Nullable AddToHomescreenCoordinator getAddToHomescreenCoordinator() {
         if (mAddToHomescreenCoordinatorForTesting != null) {
             return mAddToHomescreenCoordinatorForTesting;
@@ -1544,11 +1520,6 @@ class LocationBarMediator
     /* package */ void setMiniOriginMode(boolean active) {
         mMiniOriginMode = active;
         updateBackButtonVisibility();
-    }
-
-    /* package */ void setShouldShowMicButtonWhenUnfocusedForTesting(boolean shouldShow) {
-        assert mIsTablet;
-        mShouldShowMicButtonWhenUnfocused = shouldShow;
     }
 
     /**
@@ -2034,14 +2005,6 @@ class LocationBarMediator
         mPreviousZoomButtonVisible = showZoomButton;
 
         mLocationBarLayout.setZoomButtonVisibility(showZoomButton);
-    }
-
-    public void updateZoomButtonVisibilityForTesting() {
-        updateZoomButtonVisibility(/* notifyEmbedder= */ true);
-    }
-
-    public ToolbarWidthConsumer getBookmarkButtonToolbarWidthConsumerForTesting() {
-        return mBookmarkButtonToolbarWidthConsumer;
     }
 
     private @Nullable WebContents getWebContentsForCurrentTab() {
@@ -2950,5 +2913,41 @@ class LocationBarMediator
         if (mFuseboxAttachmentModelList != null) {
             mFuseboxAttachmentModelList.addAttachmentChangeListener(this);
         }
+    }
+
+    /* package */ void setVoiceRecognitionHandlerForTesting(
+            VoiceRecognitionHandler voiceRecognitionHandler) {
+        mVoiceRecognitionHandler = voiceRecognitionHandler;
+    }
+
+    /* package */ void setLensControllerForTesting(LensController lensController) {
+        mLensController = lensController;
+    }
+
+    /* package */ void resetLastCachedIsLensOnOmniboxEnabledForTesting() {
+        mIsLensOnOmniboxEnabled = null;
+    }
+
+    /* package */ void setIsUrlBarFocusedWithoutAnimationsForTesting(
+            boolean isUrlBarFocusedWithoutAnimations) {
+        mUrlFocusedWithoutAnimations = isUrlBarFocusedWithoutAnimations;
+    }
+
+    /* package */ void setAddToHomescreenCoordinatorForTesting(
+            AddToHomescreenCoordinator addToHomescreenCoordinator) {
+        mAddToHomescreenCoordinatorForTesting = addToHomescreenCoordinator;
+    }
+
+    /* package */ void setShouldShowMicButtonWhenUnfocusedForTesting(boolean shouldShow) {
+        assert mIsTablet;
+        mShouldShowMicButtonWhenUnfocused = shouldShow;
+    }
+
+    /* package */ void updateZoomButtonVisibilityForTesting() {
+        updateZoomButtonVisibility(/* notifyEmbedder= */ true);
+    }
+
+    /* package */ ToolbarWidthConsumer getBookmarkButtonToolbarWidthConsumerForTesting() {
+        return mBookmarkButtonToolbarWidthConsumer;
     }
 }
