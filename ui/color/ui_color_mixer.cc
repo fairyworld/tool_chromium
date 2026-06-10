@@ -131,6 +131,8 @@ void AddUiColorMixer(ColorProvider* provider, const ColorProviderKey& key) {
   mixer[kColorLiveCaptionBubbleCheckbox] = PickGoogleColor(
       kColorAccent, kColorLiveCaptionBubbleBackgroundDefault, 6.0f);
   mixer[kColorLiveCaptionBubbleLink] = {kColorLiveCaptionBubbleCheckbox};
+  mixer[kColorLiveCaptionDialogBackground] = {kColorPrimaryBackground};
+  mixer[kColorLiveCaptionDialogForeground] = {kColorPrimaryForeground};
   mixer[kColorMenuBackground] = {kColorPrimaryBackground};
   mixer[kColorMenuBorder] = {kColorMidground};
   mixer[kColorMenuButtonBackground] = {kColorMenuBackground};
