@@ -114,9 +114,9 @@ void PersonalContextAccessManagerImpl::PrefetchAmbientAutofillContext(
 
   std::vector<EntityType> types_to_request;
   for (const EntityType& type : requested_types) {
-    if (ShouldRequestType(type.name())) {
+    if (ShouldRequestType(type)) {
       types_to_request.push_back(type);
-      SetTypeStatus(type.name(), RequestState::Status::kPending);
+      SetTypeStatus(type, RequestState::Status::kPending);
     }
   }
 
@@ -143,7 +143,7 @@ void PersonalContextAccessManagerImpl::OnPrefetchAmbientAutofillContextComplete(
     personal_context::FetchContextResult result) {
   if (!result.response.has_value()) {
     for (const EntityType& type : requested_types) {
-      SetTypeStatus(type.name(), RequestState::Status::kFailure);
+      SetTypeStatus(type, RequestState::Status::kFailure);
     }
     return;
   }
@@ -154,21 +154,20 @@ void PersonalContextAccessManagerImpl::OnPrefetchAmbientAutofillContextComplete(
 
   if (!entities.has_value()) {
     for (const EntityType& type : requested_types) {
-      SetTypeStatus(type.name(), RequestState::Status::kFailure);
+      SetTypeStatus(type, RequestState::Status::kFailure);
     }
     return;
   }
 
-  absl::flat_hash_map<EntityTypeName, std::vector<EntityInstance>>
-      grouped_entities;
+  absl::flat_hash_map<EntityType, std::vector<EntityInstance>> grouped_entities;
   // Initialize requested types results, including entries for empty responses
   // so that EntityTypes without responses are not fetched over and over again.
   for (EntityType type : requested_types) {
-    grouped_entities[type.name()] = std::vector<EntityInstance>();
+    grouped_entities[type] = std::vector<EntityInstance>();
   }
   // Group entities by type.
   for (EntityInstance& entity : *entities) {
-    grouped_entities[entity.type().name()].push_back(std::move(entity));
+    grouped_entities[entity.type()].push_back(std::move(entity));
   }
 
   CachePrefetchedEntities(std::move(grouped_entities));
@@ -202,17 +201,15 @@ PersonalContextAccessManagerImpl::GetCachedEntities() const {
   return base::ToVector(prefetched_entity_cache_);
 }
 
-bool PersonalContextAccessManagerImpl::IsTypeCached(
-    EntityTypeName type_name) const {
-  const RequestState* request_state = base::FindOrNull(cache_state_, type_name);
+bool PersonalContextAccessManagerImpl::IsTypeCached(EntityType type) const {
+  const RequestState* request_state = base::FindOrNull(cache_state_, type);
   return request_state &&
          request_state->status == RequestState::Status::kSuccess;
 }
 
-void PersonalContextAccessManagerImpl::ResetCacheForType(
-    EntityTypeName type_name) {
-  const auto is_entity_type_name = [type_name](EntityInstance& entity) {
-    return entity.type().name() == type_name;
+void PersonalContextAccessManagerImpl::ResetCacheForType(EntityType type) {
+  const auto is_entity_type_name = [type](EntityInstance& entity) {
+    return entity.type() == type;
   };
   // Clear existing entities of this type.
   base::EraseIf(prefetched_entity_cache_, is_entity_type_name);
@@ -220,21 +217,21 @@ void PersonalContextAccessManagerImpl::ResetCacheForType(
   // Clear unmasked SPII of this type.
   base::EraseIf(unmasked_spii_cache_, is_entity_type_name);
 
-  cache_state_.erase(type_name);
+  cache_state_.erase(type);
 }
 
 void PersonalContextAccessManagerImpl::CachePrefetchedEntities(
-    absl::flat_hash_map<EntityTypeName, std::vector<EntityInstance>> entities) {
-  for (auto& [type_name, type_entities] : entities) {
-    ResetCacheForType(type_name);
+    absl::flat_hash_map<EntityType, std::vector<EntityInstance>> entities) {
+  for (auto& [type, type_entities] : entities) {
+    ResetCacheForType(type);
     prefetched_entity_cache_.insert(
         std::make_move_iterator(type_entities.begin()),
         std::make_move_iterator(type_entities.end()));
-    SetTypeStatus(type_name, RequestState::Status::kSuccess);
+    SetTypeStatus(type, RequestState::Status::kSuccess);
     base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
         FROM_HERE,
         base::BindOnce(&PersonalContextAccessManagerImpl::ResetCacheForType,
-                       weak_factory_.GetWeakPtr(), type_name),
+                       weak_factory_.GetWeakPtr(), type),
         kPrefetchedEntitiesCacheTTL);
   }
 }
@@ -277,8 +274,8 @@ void PersonalContextAccessManagerImpl::WipeCaches() {
 }
 
 bool PersonalContextAccessManagerImpl::ShouldRequestType(
-    EntityTypeName type_name) const {
-  const RequestState* request_state = base::FindOrNull(cache_state_, type_name);
+    EntityType type) const {
+  const RequestState* request_state = base::FindOrNull(cache_state_, type);
   if (!request_state) {
     return true;
   }
@@ -305,9 +302,9 @@ bool PersonalContextAccessManagerImpl::ShouldRetryAfterFailure(
 }
 
 void PersonalContextAccessManagerImpl::SetTypeStatus(
-    EntityTypeName type_name,
+    EntityType type,
     RequestState::Status status) {
-  RequestState& state = cache_state_[type_name];
+  RequestState& state = cache_state_[type];
   state.status = status;
   state.last_update_time = base::TimeTicks::Now();
 
