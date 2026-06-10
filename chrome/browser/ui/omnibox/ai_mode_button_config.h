@@ -42,6 +42,9 @@ struct AiModeButtonConfig {
   // Omnibox placeholder text conditionally shown when the omnibox is focused
   // and empty.
   std::u16string placeholder_text;
+
+  // Returns true if the config is valid.
+  bool IsValid() const;
 };
 
 // Returns the currently selected AI button configuration.

@@ -249,6 +249,7 @@ if (!is_android) {
   source_set("unit_tests") {
     testonly = true
     sources = [
+      "ai_mode_button_config_unittest.cc",
       "alternate_nav_infobar_delegate_unittest.cc",
       "chrome_omnibox_navigation_observer_unittest.cc",
       "clipboard_utils_unittest.cc",

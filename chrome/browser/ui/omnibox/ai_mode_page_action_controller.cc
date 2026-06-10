@@ -156,6 +156,11 @@ void AiModePageActionController::NotifyOmniboxTriggeredFeatureService(
 bool AiModePageActionController::ShouldShowPageAction(
     Profile* profile,
     LocationBarView& location_bar_view) {
+  const auto& config = ai_mode_button_config::GetCurrentAiModeButtonConfig();
+  if (!config.IsValid()) {
+    return false;
+  }
+
   if (!profile->GetPrefs()->GetBoolean(omnibox::kShowAiModeOmniboxButton)) {
     return false;
   }
