@@ -48,6 +48,7 @@
 #include "chrome/browser/ui/autofill/autofill_bubble_base.h"
 #include "chrome/browser/ui/autofill/payments/filled_card_information_bubble_controller_impl.h"
 #include "chrome/browser/ui/autofill/payments/mandatory_reauth_bubble_controller_impl.h"
+#include "chrome/browser/ui/autofill/payments/omnibox_autofill_bubble_controller.h"
 #include "chrome/browser/ui/autofill/payments/omnibox_autofill_page_action_controller.h"
 #include "chrome/browser/ui/autofill/payments/save_payment_icon_controller.h"
 #include "chrome/browser/ui/autofill/payments/virtual_card_enroll_bubble_controller_impl.h"
@@ -1848,8 +1849,15 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
                   if (!tab) {
                     return;
                   }
-                  // TODO(crbug.com/490215251): Set the callback to display the
-                  // Autofill bubble.
+
+                  // Show the payment method suggestion list after the user
+                  // clicks the "Autofill payment" chip displayed on the
+                  // omnibox.
+                  if (auto* controller =
+                          autofill::OmniboxAutofillBubbleController::From(
+                              *tab)) {
+                    controller->QueueOrShowBubble(/*force_show=*/true);
+                  }
                 },
                 bwi))
             .SetActionId(kActionAutofillPayment)
