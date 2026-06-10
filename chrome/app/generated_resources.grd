@@ -878,6 +878,11 @@ are declared in tools/grit/grit_args.gni.
           <message name="IDS_CONTENT_CONTEXT_ADD_TO_DICTIONARY" desc="The name of the Add to dictionary command in the content area context menu">
             &amp;Add to dictionary
           </message>
+          <if expr="is_macosx">
+            <message name="IDS_CONTENT_CONTEXT_REMOVE_FROM_DICTIONARY" desc="The name of the Remove from Dictionary command in the content area context menu">
+              &amp;Remove from dictionary
+            </message>
+          </if>
           <message name="IDS_CONTENT_CONTEXT_ACCESSIBILITY_LABELS_MENU_OPTION" desc="The context-menu item that asks whether to integrate the accessibility image labeling service of Google to Chrome.">
             Get image descriptions from Google
           </message>
@@ -1229,6 +1234,11 @@ are declared in tools/grit/grit_args.gni.
           <message name="IDS_CONTENT_CONTEXT_ADD_TO_DICTIONARY" desc="In Title Case: The name of the Add to dictionary command in the content area context menu">
             &amp;Add to Dictionary
           </message>
+          <if expr="is_macosx">
+            <message name="IDS_CONTENT_CONTEXT_REMOVE_FROM_DICTIONARY" desc="In Title Case: The name of the Remove from Dictionary command in the content area context menu">
+              &amp;Remove from Dictionary
+            </message>
+          </if>
           <message name="IDS_CONTENT_CONTEXT_ACCESSIBILITY_LABELS_MENU_OPTION" desc="The context-menu item that asks whether to integrate the accessibility image labeling service of Google to Chrome.">
             Get Image Descriptions from Google
           </message>
