@@ -84,8 +84,8 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
   // check is a very hacky way to check whether the user is underaged.
   // Consider defining a separate capability or syncing a separate setting
   // through ACCOUNT_SETTING instead.
-  if (extended_account_info.capabilities.can_use_model_execution_features() !=
-      signin::Tribool::kTrue) {
+  if (extended_account_info.GetAccountCapabilities()
+          .can_use_model_execution_features() != signin::Tribool::kTrue) {
     MaybeOutputReason(debug_message, "User is underaged.");
     return false;
   }
