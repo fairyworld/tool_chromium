@@ -238,48 +238,6 @@ struct PasswordGenerationAgent::GenerationItemInfo {
   // button. In this case, the generation popup should not be shown again in
   // this navigation unless explicitly triggered from the context menu.
   bool generation_rejected = false;
-
-  base::WeakPtrFactory<GenerationItemInfo> weak_ptr_factory{this};
-};
-
-class PasswordGenerationAgent::ScopedUpdatingOtherPasswordFields {
- public:
-  explicit ScopedUpdatingOtherPasswordFields(PasswordGenerationAgent* owner)
-      : owner_(*owner) {
-    auto [current_generation_item, auto_protect] =
-        owner_->current_generation_item_.GetAndProtect();
-    if (current_generation_item) {
-      // We cache the weak pointer to the current GenerationItemInfo to handle
-      // the case where it might be destroyed or replaced during synchronous
-      // event dispatching (e.g., if a JavaScript event listener triggers
-      // a new generation flow). This ensures we don't access freed memory or
-      // modify the state of a different item in the destructor.
-      item_ = current_generation_item->weak_ptr_factory.GetWeakPtr();
-
-      // We cache the old value to restore it in the destructor, ensuring we
-      // don't blindly overwrite it if it was already set to true by an outer
-      // scope.
-      old_value_ = item_->updating_other_password_fields;
-      item_->updating_other_password_fields = true;
-    }
-  }
-
-  ~ScopedUpdatingOtherPasswordFields() {
-    // If the item is still valid, restore its state. If it was destroyed
-    // during re-entrancy, doing nothing is the safe choice.
-    if (item_) {
-      item_->updating_other_password_fields = old_value_;
-    }
-  }
-
- private:
-  const raw_ref<PasswordGenerationAgent> owner_;
-
-  // Weak reference to the item we are updating, to handle re-entrancy safely.
-  base::WeakPtr<GenerationItemInfo> item_;
-
-  // The value of updating_other_password_fields_ before we set it to true.
-  bool old_value_ = false;
 };
 
 PasswordGenerationAgent::PasswordGenerationAgent(
@@ -425,8 +383,8 @@ void PasswordGenerationAgent::GeneratedPasswordAccepted(
 
   for (blink::WebInputElement& password_element :
        current_generation_item->password_elements) {
-    ScopedUpdatingOtherPasswordFields auto_reset_update_confirmation_password(
-        this);
+    base::AutoReset<bool> auto_reset_update_confirmation_password(
+        &current_generation_item->updating_other_password_fields, true);
     password_element.SetAutofillValue(blink::WebString::FromUtf16(password));
     // crbug.com/1467893: JS can clear the generated password. In this case
     // consider filling unsuccessful and don't presave the password.
@@ -736,8 +694,8 @@ bool PasswordGenerationAgent::TextDidChangeInTextField(
       PasswordNoLongerGenerated();
     } else if (current_generation_item->password_is_generated) {
       current_generation_item->password_edited = true;
-      ScopedUpdatingOtherPasswordFields auto_reset_update_confirmation_password(
-          this);
+      base::AutoReset<bool> auto_reset_update_confirmation_password(
+          &current_generation_item->updating_other_password_fields, true);
       // Mirror edits to any confirmation password fields.
       CopyElementValueToOtherInputElements(
           element, current_generation_item->password_elements);
@@ -868,8 +826,8 @@ void PasswordGenerationAgent::PasswordNoLongerGenerated() {
 
   // Clear all other password fields.
   for (WebInputElement& element : password_elements) {
-    ScopedUpdatingOtherPasswordFields auto_reset_update_confirmation_password(
-        this);
+    base::AutoReset<bool> auto_reset_update_confirmation_password(
+        &current_generation_item->updating_other_password_fields, true);
     if (generation_element != element) {
       element.SetAutofillValue(blink::WebString());
     }
