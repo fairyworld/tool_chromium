@@ -117,6 +117,7 @@ import org.chromium.components.embedder_support.util.UrlUtilities;
 import org.chromium.components.metrics.OmniboxEventProtos.OmniboxEventProto.PageClassification;
 import org.chromium.components.omnibox.AutocompleteInput;
 import org.chromium.components.omnibox.AutocompleteInput.AutocompleteState;
+import org.chromium.components.omnibox.AutocompleteInput.SiteSearchData;
 import org.chromium.components.omnibox.AutocompleteMatch;
 import org.chromium.components.omnibox.AutocompleteRequestType;
 import org.chromium.components.omnibox.OmniboxCapabilities;
@@ -162,7 +163,6 @@ class LocationBarMediator
                 TemplateUrlServiceObserver,
                 BackPressHandler,
                 PauseResumeWithNativeObserver,
-                SearchEngineNameObserver,
                 AppBannerManager.Observer,
                 OmniboxSuggestionsDropdownScrollListener {
 
@@ -283,8 +283,9 @@ class LocationBarMediator
     private @Nullable FuseboxAttachmentModelList mFuseboxAttachmentModelList;
     private final Callback<@AutocompleteRequestType Integer> mAutocompleteRequestTypeObserver =
             this::onAutocompleteRequestTypeChanged;
-    private final Callback<AutocompleteInput.@Nullable SiteSearchData> mSiteSearchDataObserver =
-            (siteSearchData) -> onSearchEngineNameChanged();
+    private final Callback<@Nullable SiteSearchData> mSiteSearchDataObserver =
+            (siteSearchData) -> updateUrlBarHintText();
+    private final SearchEngineNameObserver mSearchEngineNameObserver = this::updateUrlBarHintText;
     private @Nullable Callback<Boolean> mOnSpecializedFuseboxModeActivatedCallback;
 
     private final ButtonToolbarWidthConsumer mBookmarkButtonToolbarWidthConsumer;
@@ -440,7 +441,7 @@ class LocationBarMediator
             templateUrlService.removeObserver(this);
         }
         if (mSearchEngineService != null) {
-            mSearchEngineService.removeSearchEngineNameObserver(this);
+            mSearchEngineService.removeSearchEngineNameObserver(mSearchEngineNameObserver);
         }
         mStatusCoordinator = null;
         mAutocompleteCoordinator.removeOmniboxSuggestionsDropdownScrollListener(this);
@@ -1762,11 +1763,11 @@ class LocationBarMediator
         mOmniboxPrerender.initializeForProfile(profile);
 
         if (mSearchEngineService != null) {
-            mSearchEngineService.removeSearchEngineNameObserver(this);
+            mSearchEngineService.removeSearchEngineNameObserver(mSearchEngineNameObserver);
         }
 
         mSearchEngineService = SearchEngineService.getForProfile(profile);
-        mSearchEngineService.addSearchEngineNameObserver(this);
+        mSearchEngineService.addSearchEngineNameObserver(mSearchEngineNameObserver);
         mLocationBarLayout.setSearchEngineService(mSearchEngineService);
     }
 
@@ -2230,7 +2231,7 @@ class LocationBarMediator
                     type != AutocompleteRequestType.SEARCH);
         }
         updateButtonVisibility();
-        onSearchEngineNameChanged();
+        updateUrlBarHintText();
         mLocationBarLayout.onSpecializedFuseboxModeActivated(isSpecializedRequestType);
     }
 
@@ -2404,7 +2405,7 @@ class LocationBarMediator
 
     @Override
     public void onTitleChanged() {
-        onSearchEngineNameChanged();
+        updateUrlBarHintText();
     }
 
     @Override
@@ -2519,7 +2520,7 @@ class LocationBarMediator
 
         mCurrentInput = null;
         // The hint text depends on mCurrentInput, nulling it may change the outcome.
-        onSearchEngineNameChanged();
+        updateUrlBarHintText();
 
         setAttachmentModelList(null);
     }
@@ -2822,8 +2823,7 @@ class LocationBarMediator
                         mContext, mWindowAndroid, assertNonNull(mProfileSupplier.get()));
     }
 
-    @Override
-    public void onSearchEngineNameChanged() {
+    public void updateUrlBarHintText() {
         // Edge case / SearchActivity could be triggering focus before Profile (and by proxy -
         // SearchEngineService) is available.
         if (mSearchEngineService == null) return;
