@@ -3777,9 +3777,16 @@
     <message name="IDS_SETTINGS_ACCOUNT_DATATYPES_HEADING" desc="Heading of the section in the account settings page for managing data types.">
       In your Google Account
     </message>
-    <message name="IDS_SETTINGS_ACCOUNT_BODY" desc="Description of the section in the account settings page for managing data types.">
-      When on, data is saved in your Google Account and can be used on all your devices. When off, data is saved only to this device.
-    </message>
+    <if expr="not is_chromeos">
+      <message name="IDS_SETTINGS_ACCOUNT_BODY" desc="Description of the section in the account settings page for managing data types.">
+        When on, data is saved in your Google Account and can be used on all your devices. When off, data is saved only to this device.
+      </message>
+    </if>
+    <if expr="is_chromeos">
+      <message name="IDS_SETTINGS_ACCOUNT_BODY_CHROMEOS" desc="Description of the section in the account settings page for managing data types on ChromeOS.">
+        When on, data is saved in your Google Account and can be used on all your devices. When off, data is saved only to this device. For ChromeOS sync options, go to <ph name="LINK_BEGIN">&lt;a&gt;</ph>ChromeOS settings<ph name="LINK_END">&lt;/a&gt;</ph>.
+      </message>
+    </if>
     <message name="IDS_SETTINGS_ACCOUNT_SYNC_DISABLED"  desc="Section in the account settings page informing the user when the toggles to save a specific data type to the user's Google Account are disabled as per an Enterprise policy.">
       Managed by your organization
     </message>
