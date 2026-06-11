@@ -10,7 +10,6 @@
 #import "base/strings/sys_string_conversions.h"
 #import "components/password_manager/core/browser/mock_password_form_manager_for_ui.h"
 #import "components/password_manager/core/browser/password_manager_metrics_util.h"
-#import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
 
 namespace {
 std::unique_ptr<password_manager::PasswordFormManagerForUI> CreateFormManager(
@@ -61,7 +60,7 @@ MockIOSChromeSavePasswordInfoBarDelegate::
           CreateFormManager(form.get(), url.get()),
           ukm::kInvalidSourceId,
           /*is_replacement=*/false,
-          [[CommandDispatcher alloc] init],
+          /*sync_presenter_handler=*/nil,
           /*profile_store=*/nullptr,
           /*account_store=*/nullptr),
       form_(std::move(form)),

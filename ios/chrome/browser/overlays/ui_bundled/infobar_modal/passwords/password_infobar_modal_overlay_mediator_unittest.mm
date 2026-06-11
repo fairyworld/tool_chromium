@@ -13,7 +13,6 @@
 #import "ios/chrome/browser/overlays/model/public/overlay_request.h"
 #import "ios/chrome/browser/overlays/model/public/overlay_response.h"
 #import "ios/chrome/browser/passwords/model/test/mock_ios_chrome_save_passwords_infobar_delegate.h"
-#import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
 #import "ios/chrome/browser/shared/public/commands/settings_commands.h"
 #import "ios/chrome/grit/ios_branded_strings.h"
 #import "ios/chrome/grit/ios_strings.h"
@@ -62,7 +61,8 @@ class PasswordInfobarModalOverlayMediatorTest : public PlatformTest {
             infobar_.get(), InfobarOverlayType::kModal);
     consumer_ = [[FakeInfobarPasswordModalConsumer alloc] init];
     mediator_ = [[PasswordInfobarModalOverlayMediator alloc]
-        initWithRequest:request_.get()];
+               initWithRequest:request_.get()
+        settingsCommandHandler:settings_commands_handler_];
     mediator_.delegate = delegate_;
     mediator_.consumer = consumer_;
   }
@@ -73,6 +73,7 @@ class PasswordInfobarModalOverlayMediatorTest : public PlatformTest {
   id<OverlayRequestMediatorDelegate> delegate_ = nil;
   PasswordInfobarModalOverlayMediator* mediator_ = nil;
   FakeInfobarPasswordModalConsumer* consumer_;
+  id settings_commands_handler_ = nil;
 };
 
 // Tests that a PasswordInfobarModalOverlayMediator correctly sets up its
@@ -141,16 +142,15 @@ TEST_F(PasswordInfobarModalOverlayMediatorTest, NeverSaveCredentials) {
 // Tests that `-presentPasswordSettings` calls the `Cancel()` delegate method
 // then stops the overlay.
 TEST_F(PasswordInfobarModalOverlayMediatorTest, PresentPasswordSettings) {
+  settings_commands_handler_ =
+      OCMStrictProtocolMock(@protocol(SettingsCommands));
   InitInfobar();
 
-  id commands_handler = OCMStrictProtocolMock(@protocol(SettingsCommands));
-  [mock_delegate().GetDispatcher()
-      startDispatchingToTarget:commands_handler
-                   forProtocol:@protocol(SettingsCommands)];
-  [[commands_handler expect] showSavedPasswordsSettingsFromViewController:nil];
+  [[settings_commands_handler_ expect]
+      showSavedPasswordsSettingsFromViewController:nil];
 
   OCMExpect([delegate_ stopOverlayForMediator:mediator_]);
 
   [mediator_ presentPasswordSettings];
-  [commands_handler verify];
+  [settings_commands_handler_ verify];
 }

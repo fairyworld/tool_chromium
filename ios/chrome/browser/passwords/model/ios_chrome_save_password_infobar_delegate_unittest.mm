@@ -27,7 +27,6 @@
 #import "components/password_manager/core/browser/password_store/stored_credential.h"
 #import "components/trusted_vault/trusted_vault_client.h"
 #import "components/ukm/test_ukm_recorder.h"
-#import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
 #import "ios/chrome/browser/shared/public/commands/sync_presenter_commands.h"
 #import "ios/chrome/grit/ios_strings.h"
 #import "services/metrics/public/cpp/ukm_recorder.h"
@@ -99,11 +98,8 @@ class IOSChromeSavePasswordInfoBarDelegateTest : public PlatformTest {
     ON_CALL(*account_store_, GetError)
         .WillByDefault(Return(password_manager::ActionableError::kNoError));
 
-    dispatcher_ = [[CommandDispatcher alloc] init];
     mock_sync_presenter_ =
         OCMStrictProtocolMock(@protocol(SyncPresenterCommands));
-    [dispatcher_ startDispatchingToTarget:mock_sync_presenter_
-                              forProtocol:@protocol(SyncPresenterCommands)];
 
     url_ = GURL(kUrl);
 
@@ -137,7 +133,7 @@ class IOSChromeSavePasswordInfoBarDelegateTest : public PlatformTest {
     delegate_ = std::make_unique<IOSChromeSavePasswordInfoBarDelegate>(
         kAccountToStorePassword, password_update, kSignedInAccountStoreUser,
         std::move(form_manager), ukm_source_id_, /*is_replacement=*/false,
-        dispatcher_, profile_store_.get(), account_store_.get());
+        mock_sync_presenter_, profile_store_.get(), account_store_.get());
     const int different_nav_entry_id = kNavEntryId - 1;
     delegate_->set_nav_entry_id(different_nav_entry_id);
   }
@@ -170,7 +166,7 @@ class IOSChromeSavePasswordInfoBarDelegateTest : public PlatformTest {
   // Pointer to the infobar's form manager.
   raw_ptr<password_manager::MockPasswordFormManagerForUI, DanglingUntriaged>
       form_manager_ptr_;
-  CommandDispatcher* dispatcher_;
+
   id mock_sync_presenter_;
 };
 

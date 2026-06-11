@@ -18,7 +18,7 @@
 #import "ios/chrome/browser/passwords/model/ios_chrome_password_infobar_metrics_recorder.h"
 #import "services/metrics/public/cpp/ukm_source_id.h"
 
-@class CommandDispatcher;
+@protocol SyncPresenterCommands;
 
 namespace password_manager {
 class PasswordFormManagerForUI;
@@ -40,7 +40,7 @@ class IOSChromeSavePasswordInfoBarDelegate : public ConfirmInfoBarDelegate {
       std::unique_ptr<password_manager::PasswordFormManagerForUI> form_to_save,
       ukm::SourceId ukm_source_id,
       bool is_replacement,
-      CommandDispatcher* dispatcher,
+      id<SyncPresenterCommands> sync_presenter_handler,
       password_manager::PasswordStoreInterface* profile_store,
       password_manager::PasswordStoreInterface* account_store);
 
@@ -64,9 +64,6 @@ class IOSChromeSavePasswordInfoBarDelegate : public ConfirmInfoBarDelegate {
 
   // The URL host for which the credentials are being saved for.
   NSString* GetURLHostText() const;
-
-  // Gets the command dispatcher.
-  CommandDispatcher* GetDispatcher() const { return dispatcher_; }
 
   // The account where the password will be saved, or std::nullopt if it's
   // saved locally.
@@ -142,8 +139,8 @@ class IOSChromeSavePasswordInfoBarDelegate : public ConfirmInfoBarDelegate {
   // The UKM source ID for the page.
   const ukm::SourceId ukm_source_id_;
 
-  // CommandDispatcher for dispatching commands.
-  CommandDispatcher* dispatcher_ = nullptr;
+  // Handler for sync presenter commands.
+  __weak id<SyncPresenterCommands> sync_presenter_handler_ = nil;
 
   // The password_manager::PasswordFormManager managing the form we're asking
   // the user about, and should save as per their decision.

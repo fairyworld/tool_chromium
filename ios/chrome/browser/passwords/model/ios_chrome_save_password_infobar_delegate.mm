@@ -30,7 +30,6 @@
 #import "components/strings/grit/components_strings.h"
 #import "components/trusted_vault/trusted_vault_client.h"
 #import "ios/chrome/browser/infobars/model/infobar_ios.h"
-#import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
 #import "ios/chrome/browser/shared/public/commands/sync_presenter_commands.h"
 #import "ios/chrome/grit/ios_branded_strings.h"
 #import "ios/chrome/grit/ios_strings.h"
@@ -202,11 +201,11 @@ IOSChromeSavePasswordInfoBarDelegate::IOSChromeSavePasswordInfoBarDelegate(
     std::unique_ptr<PasswordFormManagerForUI> form_to_save,
     ukm::SourceId ukm_source_id,
     bool is_replacement,
-    CommandDispatcher* dispatcher,
+    id<SyncPresenterCommands> sync_presenter_handler,
     password_manager::PasswordStoreInterface* profile_store,
     password_manager::PasswordStoreInterface* account_store)
     : ukm_source_id_(ukm_source_id),
-      dispatcher_(dispatcher),
+      sync_presenter_handler_(sync_presenter_handler),
       form_to_save_(std::move(form_to_save)),
       infobar_type_(password_update
                         ? PasswordInfobarType::kPasswordInfobarTypeUpdate
@@ -424,7 +423,9 @@ bool IOSChromeSavePasswordInfoBarDelegate::IsPresenting() const {
 
 bool IOSChromeSavePasswordInfoBarDelegate::MaybeHandlePasswordError(
     password_manager::ActionableError error) {
-  CHECK(dispatcher_, base::NotFatalUntil::M160);
+  if (!sync_presenter_handler_) {
+    return false;
+  }
 
   base::WeakPtr<IOSChromeSavePasswordInfoBarDelegate> weak_this =
       weak_ptr_factory_.GetWeakPtr();
@@ -444,11 +445,11 @@ bool IOSChromeSavePasswordInfoBarDelegate::MaybeHandlePasswordError(
     case password_manager::ActionableError::kNeedsPassphrase:
       return false;
     case password_manager::ActionableError::kSignInNeeded:
-      [HandlerForProtocol(dispatcher_, SyncPresenterCommands)
+      [sync_presenter_handler_
           showPrimaryAccountReauthWithDismissalCompletion:completion];
       break;
     case password_manager::ActionableError::kTrustedVaultKeyNeeded:
-      [HandlerForProtocol(dispatcher_, SyncPresenterCommands)
+      [sync_presenter_handler_
           showTrustedVaultReauthForFetchKeysWithTrigger:
               trusted_vault::TrustedVaultUserActionTriggerForUMA::
                   kPasswordSavePrompt
@@ -483,7 +484,7 @@ void IOSChromeSavePasswordInfoBarDelegate::OnPasswordErrorFlowCompleted() {
     auto new_delegate = std::make_unique<IOSChromeSavePasswordInfoBarDelegate>(
         account_to_store_password_, password_update_,
         account_storage_user_state_, std::move(form_to_save_), ukm_source_id_,
-        /*is_replacement=*/true, dispatcher_, profile_store_.get(),
+        /*is_replacement=*/true, sync_presenter_handler_, profile_store_.get(),
         account_store_.get());
     InfobarType type = IsPasswordUpdate()
                            ? InfobarType::kInfobarTypePasswordUpdate
