@@ -37,9 +37,8 @@ class RootTabCollectionNode : public TabCollectionNode,
       base::RepeatingClosure callback);
   base::CallbackListSubscription RegisterOnChildRemovedCallback(
       base::RepeatingClosure callback);
-  typedef base::RepeatingCallback<void(TabCollectionNode*)> ChildMovedCallback;
   base::CallbackListSubscription RegisterOnChildMovedCallback(
-      ChildMovedCallback callback);
+      base::RepeatingClosure callback);
 
   typedef base::RepeatingCallback<void(const tabs::TabInterface*)>
       ActiveTabChangedCallback;
@@ -81,9 +80,7 @@ class RootTabCollectionNode : public TabCollectionNode,
   CustomRemoveChildViewCallback remove_node_view_from_parent_;
   base::RepeatingClosureList on_children_added_callback_list_;
   base::RepeatingClosureList on_children_removed_callback_list_;
-  using ChildMovedCallbackList =
-      base::RepeatingCallbackList<void(TabCollectionNode*)>;
-  ChildMovedCallbackList on_child_moved_callback_list_;
+  base::RepeatingClosureList on_child_moved_callback_list_;
   using ActiveTabChangedCallbackList =
       base::RepeatingCallbackList<void(const tabs::TabInterface*)>;
   ActiveTabChangedCallbackList on_active_tab_changed_callback_list_;
