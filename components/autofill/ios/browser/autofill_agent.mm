@@ -734,6 +734,7 @@ bool HasGuid(const Suggestion::Payload& payload) {
       case SuggestionType::kOpenGemini:
       case SuggestionType::kAtMemoryNoConnection:
       case SuggestionType::kPersonalContextNotice:
+      case SuggestionType::kFetchingAmbientData:
         break;
     }
 
