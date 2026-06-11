@@ -1952,8 +1952,8 @@ bool ChromeContentBrowserClient::ShouldUseProcessPerSite(
   }
 
 #if !BUILDFLAG(IS_ANDROID)
-  if (search::ShouldUseProcessPerSiteForInstantSiteURL(
-          security_principal.GetDeprecatedSiteURL(), profile)) {
+  if (search::ShouldUseProcessPerSiteForSecurityPrincipal(security_principal,
+                                                          profile)) {
     return true;
   }
 #endif
@@ -2371,8 +2371,8 @@ bool ChromeContentBrowserClient::IsSuitableHost(
     bool is_instant_process =
         instant_service->IsInstantProcess(process_host->GetDeprecatedID());
     bool should_be_in_instant_process =
-        search::ShouldAssignURLToInstantRenderer(
-            security_principal.GetDeprecatedSiteURL(), profile);
+        search::ShouldAssignSecurityPrincipalToInstantRenderer(
+            security_principal, profile);
     if (is_instant_process) {
       return should_be_in_instant_process;
     }
@@ -2487,9 +2487,8 @@ void ChromeContentBrowserClient::SiteInstanceGotProcessAndSite(
 #if !BUILDFLAG(IS_ANDROID)
   // Remember the ID of the Instant process to signal the renderer process
   // on startup in |AppendExtraCommandLineSwitches| below.
-  if (search::ShouldAssignURLToInstantRenderer(
-          site_instance->GetSecurityPrincipal().GetDeprecatedSiteURL(),
-          profile)) {
+  if (search::ShouldAssignSecurityPrincipalToInstantRenderer(
+          site_instance->GetSecurityPrincipal(), profile)) {
     InstantService* instant_service =
         InstantServiceFactory::GetForProfile(profile);
     if (instant_service) {
