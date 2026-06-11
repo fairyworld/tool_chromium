@@ -889,8 +889,16 @@ IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest,
                   }));
 }
 
+// TODO(crbug.com/522524976): Flaky on MSan Linux bots
+#if defined(MEMORY_SANITIZER) && BUILDFLAG(IS_LINUX)
+#define MAYBE_ActivatedActionItemsDoNotOverflow \
+  DISABLED_ActivatedActionItemsDoNotOverflow
+#else
+#define MAYBE_ActivatedActionItemsDoNotOverflow \
+  ActivatedActionItemsDoNotOverflow
+#endif
 IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest,
-                       ActivatedActionItemsDoNotOverflow) {
+                       MAYBE_ActivatedActionItemsDoNotOverflow) {
   RunTestSequence(
       PinBookmarkToToolbar(),
       CheckActionItemOverflowed(ChromeActionIds::kActionSidePanelShowBookmarks,
