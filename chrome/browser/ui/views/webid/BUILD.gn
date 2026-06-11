@@ -15,6 +15,7 @@ source_set("test_support") {
 
   public_deps = [
     "//base",
+    "//chrome/browser/ui/views/controls",
     "//chrome/browser/ui/webid",
     "//chrome/test:test_support",
     "//content/public/browser",

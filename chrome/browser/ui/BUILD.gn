@@ -3728,7 +3728,6 @@ static_library("ui") {
       "views/content_setting_site_row_view.cc",
       "views/content_setting_site_row_view.h",
       "views/controls/hover_button.cc",
-      "views/controls/hover_button.h",
       "views/controls/page_switcher_view.cc",
       "views/controls/rich_controls_container_view.cc",
       "views/controls/rich_controls_container_view.h",
@@ -4917,7 +4916,6 @@ static_library("ui") {
       # TODO(crbug.com/434882143): Remove this circular dependency when the
       # following headers get componentized:
       # c/b/ui/browser.h, browser_navigator.h, browser_window.h
-      # c/b/ui/views/controls/hover_button.h
       # c/b/ui/views/frame/browser_view.h
       "//chrome/browser/ui/views/send_tab_to_self:impl",
 
@@ -5683,6 +5681,7 @@ static_library("test_support") {
   if (toolkit_views) {
     deps += [
       "//chrome/browser/ui/extensions:test_support",
+      "//chrome/browser/ui/views/controls",
       "//components/constrained_window",
       "//components/webauthn/content/browser",
       "//ui/views:test_support",
