@@ -54,6 +54,7 @@
 #include "chrome/browser/ui/views/autofill/at_memory_promo_bubble_view.h"
 #include "chrome/browser/ui/views/autofill/popup/popup_view_views.h"
 #include "chrome/browser/ui/views/bookmarks/bookmark_bar_view.h"
+#include "chrome/browser/ui/views/contextual_tasks/contextual_tasks_button.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/frame/contents_web_view.h"
 #include "chrome/browser/ui/views/location_bar/cookie_controls/cookie_controls_icon_view.h"
@@ -2386,6 +2387,43 @@ void MaybeRegisterChromeTutorials(
 
     tutorial_registry.AddTutorial(kVerticalTabsTutorialId,
                                   std::move(vertical_tabs_tutorial));
+  }
+
+  {  // Contextual Tasks tutorial
+    auto contextual_tasks_tutorial =
+        TutorialDescription::Create<kContextualTasksTutorialMetricPrefix>(
+
+            // Bubble step - overflow menu button
+            BubbleStep(kContextualTasksWebUIOverflowMenuElementId)
+                .SetBubbleBodyText(IDS_TUTORIAL_CONTEXTUAL_TASKS_STEP1)
+                .SetBubbleArrow(HelpBubbleArrow::kTopRight)
+                .InAnyContext(),
+
+            // Bubble step - pin button
+            BubbleStep(kContextualTasksWebUIOverflowMenuPinButtonElementId)
+                .SetBubbleBodyText(IDS_TUTORIAL_CONTEXTUAL_TASKS_STEP2)
+                .SetBubbleArrow(HelpBubbleArrow::kRightCenter)
+                .InAnyContext(),
+
+            // Hidden step - wait for pin button to be hidden?
+            HiddenStep::WaitForHidden(
+                kContextualTasksWebUIOverflowMenuPinButtonElementId),
+
+            // Completion of the tutorial after side panel appears.
+            BubbleStep(
+                kPinnedToolbarActionShowSidePanelContextualTasksElementId)
+                .SetBubbleTitleText(IDS_TUTORIAL_GENERIC_SUCCESS_TITLE)
+                .SetBubbleBodyText(IDS_TUTORIAL_CONTEXTUAL_TASKS_STEP3)
+                .SetBubbleArrow(HelpBubbleArrow::kTopRight)
+                .InAnyContext());
+
+    contextual_tasks_tutorial.metadata.additional_description =
+        "Tutorial for pinning Google Search AI Mode.";
+    contextual_tasks_tutorial.metadata.launch_milestone = 147;
+    contextual_tasks_tutorial.metadata.owners = "dianaou@google.com";
+
+    tutorial_registry.AddTutorial(kContextualTasksTutorialId,
+                                  std::move(contextual_tasks_tutorial));
   }
 }
 

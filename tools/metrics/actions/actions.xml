@@ -882,6 +882,8 @@ should be able to be added at any place in this file.
   <variant name="_WebUiHelpBubbleTest"
       summary="For WebUiHelpBubbleTest feature."/>
   <variant name="_WhatsNewUpdated" summary="For what's new updated content."/>
+  <variant name="IPH_SidePanelContextualTasksPinnableFeature"
+      summary="contextual tasks side panel pinnable"/>
 </variants>
 
 <variants name="MerchantTrust_Type">

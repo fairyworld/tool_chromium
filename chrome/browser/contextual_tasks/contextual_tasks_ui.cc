@@ -710,8 +710,11 @@ ContextualTasksUI::ContextualTasksUI(content::WebUI* web_ui)
 
 #if !BUILDFLAG(IS_ANDROID)
   ui::TrackedElementHandlerDocumentSingleton::Register(
-      this,
-      std::vector<ui::ElementIdentifier>{kSmartTabSharingMenuItemElementId});
+      this, std::vector<ui::ElementIdentifier>{
+                kSmartTabSharingMenuItemElementId,
+                kContextualTasksWebUIPinButtonElementId,
+                kContextualTasksWebUIOverflowMenuElementId,
+                kContextualTasksWebUIOverflowMenuPinButtonElementId});
 #endif
 }
 

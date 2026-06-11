@@ -253,6 +253,9 @@ BASE_FEATURE(kIPHSidePanelLensOverlayPinnableFeature,
 BASE_FEATURE(kIPHSidePanelLensOverlayPinnableFollowupFeature,
              "IPH_SidePanelLensOverlayPinnableFollowupFeature",
              base::FEATURE_ENABLED_BY_DEFAULT);
+BASE_FEATURE(kIPHSidePanelContextualTasksPinnableFeature,
+             "IPH_SidePanelContextualTasksPinnableFeature",
+             base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kIPHSideSearchAutoTriggeringFeature,
              "IPH_SideSearchAutoTriggering",
              base::FEATURE_DISABLED_BY_DEFAULT);

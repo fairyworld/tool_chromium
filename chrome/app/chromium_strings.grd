@@ -1972,6 +1972,15 @@ Chromium is unable to recover your settings.
           Pinned! You can access Image Search again from the new button on the toolbar
         </message>
 
+        <message name="IDS_TUTORIAL_CONTEXTUAL_TASKS_STEP1" desc="The body text of the first step of the Contextual Tasks tutorial.">
+          You can pin Contextual Tasks to easily ask questions as you browse
+        </message>
+        <message name="IDS_TUTORIAL_CONTEXTUAL_TASKS_STEP2" desc="The body text of the second step of the Contextual Tasks tutorial.">
+          Select "Pin to toolbar"
+        </message>
+        <message name="IDS_TUTORIAL_CONTEXTUAL_TASKS_STEP3" desc="The body text of the third step of the Contextual Tasks tutorial.">
+          Pinned! Use Contextual Tasks again from the toolbar
+        </message>
         <!-- Overlay WebUI Strings -->
         <message name="IDS_LENS_OVERLAY_COPY"
           desc="Command in the Lens Overlay context menu to copy text.">
