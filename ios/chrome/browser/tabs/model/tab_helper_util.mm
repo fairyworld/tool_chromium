@@ -15,6 +15,7 @@
 #import "components/keyed_service/core/service_access_type.h"
 #import "components/language/ios/browser/ios_language_detection_tab_helper.h"
 #import "components/omnibox/common/omnibox_features.h"
+#import "components/password_manager/core/browser/features/password_features.h"
 #import "components/safe_browsing/core/common/features.h"
 #import "components/safe_browsing/ios/browser/safe_browsing_url_allow_list.h"
 #import "components/send_tab_to_self/features.h"
@@ -86,6 +87,7 @@
 #import "ios/chrome/browser/overscroll_actions/model/overscroll_actions_tab_helper.h"
 #import "ios/chrome/browser/page_info/features/features.h"
 #import "ios/chrome/browser/page_info/model/about_this_site_tab_helper.h"
+#import "ios/chrome/browser/passwords/model/actor_login/ios_chrome_actor_login_delegate_client.h"
 #import "ios/chrome/browser/passwords/model/ios_chrome_account_password_store_factory.h"
 #import "ios/chrome/browser/passwords/model/password_controller.h"
 #import "ios/chrome/browser/passwords/model/password_tab_helper.h"
@@ -385,6 +387,9 @@ void AttachTabHelpers(web::WebState* web_state, TabHelperFilter filter_flags) {
   const bool is_actor_tab_helper_enabled =
       IsActorEnabled() && !attacher.IsForPrerender();
   attacher.CreateWhen<ActorTabHelper>(is_actor_tab_helper_enabled);
+  attacher.CreateWhen<IOSChromeActorLoginDelegateClient>(
+      is_actor_tab_helper_enabled &&
+      base::FeatureList::IsEnabled(password_manager::features::kActorLogin));
 
   attacher.Create<WebViewProxyTabHelper>();
 
