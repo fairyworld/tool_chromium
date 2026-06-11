@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "base/containers/to_vector.h"
+#include "base/i18n/rtl.h"
 #include "base/types/is_instantiation.h"
 #include "components/autofill/core/common/autocomplete_parsing_util.h"
 #include "components/autofill/core/common/autofill_test_utils.h"
@@ -92,6 +93,7 @@ struct FieldDescription {
   std::optional<FormFieldData::LabelSource> label_source;
   std::optional<std::u16string> pattern;
   std::optional<std::u16string> css_classes;
+  std::optional<base::i18n::TextDirection> text_direction;
 };
 
 struct CreateFormFieldData {
@@ -238,6 +240,9 @@ FormFieldData GetFormFieldData(const FieldDescriptionType& description) {
   }
   if (description.css_classes) {
     field_data.set_css_classes(*description.css_classes);
+  }
+  if (description.text_direction) {
+    field_data.set_text_direction(*description.text_direction);
   }
   CHECK(!description.checked ||
         field_data.form_control_type() == FormControlType::kInputCheckbox ||
