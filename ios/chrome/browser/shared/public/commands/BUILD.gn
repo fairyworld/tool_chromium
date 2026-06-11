@@ -8,6 +8,7 @@ source_set("commands") {
     "activity_service_commands.h",
     "activity_service_share_url_command.h",
     "activity_service_share_url_command.mm",
+    "actor_overlay_commands.h",
     "add_contacts_commands.h",
     "app_bar_commands.h",
     "auto_deletion_commands.h",

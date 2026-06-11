@@ -145,6 +145,7 @@
 #import "ios/chrome/browser/incognito_reauth/ui_bundled/incognito_reauth_scene_agent.h"
 #import "ios/chrome/browser/infobars/model/infobar_ios.h"
 #import "ios/chrome/browser/infobars/model/infobar_manager_impl.h"
+#import "ios/chrome/browser/intelligence/actor/coordinator/actor_overlay_coordinator.h"
 #import "ios/chrome/browser/intelligence/bwg/coordinator/gemini_entry_flow_coordinator.h"
 #import "ios/chrome/browser/intelligence/bwg/coordinator/gemini_first_run_coordinator.h"
 #import "ios/chrome/browser/intelligence/bwg/model/gemini_browser_agent.h"
@@ -247,6 +248,7 @@
 #import "ios/chrome/browser/shared/model/web_state_list/tab_utils.h"
 #import "ios/chrome/browser/shared/public/commands/activity_service_commands.h"
 #import "ios/chrome/browser/shared/public/commands/activity_service_share_url_command.h"
+#import "ios/chrome/browser/shared/public/commands/actor_overlay_commands.h"
 #import "ios/chrome/browser/shared/public/commands/add_contacts_commands.h"
 #import "ios/chrome/browser/shared/public/commands/auto_deletion_commands.h"
 #import "ios/chrome/browser/shared/public/commands/autofill_commands.h"
@@ -412,6 +414,7 @@ const char kChromeAppStoreUrl[] =
 
 @interface BrowserCoordinator () <
     ActivityServiceCommands,
+    ActorOverlayCommands,
     AddContactsCommands,
     AppLauncherTabHelperBrowserPresentationProvider,
     AutoDeletionCommands,
@@ -863,6 +866,9 @@ const char kChromeAppStoreUrl[] =
 
   // The coordinator showing the multimodal composebox menu.
   ComposeboxMenuCoordinator* _composeboxMenuCoordinator;
+
+  // The coordinator showing the Actor overlay.
+  ActorOverlayCoordinator* _actorOverlayCoordinator;
 }
 
 #pragma mark - SnackbarCoordinatorDelegate
@@ -1346,6 +1352,7 @@ const char kChromeAppStoreUrl[] =
   // handlers.
   NSArray<Protocol*>* protocols = @[
     @protocol(ActivityServiceCommands),
+    @protocol(ActorOverlayCommands),
     @protocol(AutoDeletionCommands),
     @protocol(AutofillCommands),
     @protocol(BrowserCoordinatorCommands),
@@ -1823,6 +1830,9 @@ const char kChromeAppStoreUrl[] =
 
 // Stops child coordinators.
 - (void)stopChildCoordinators {
+  [_actorOverlayCoordinator stop];
+  _actorOverlayCoordinator = nil;
+
   [self.ARQuickLookCoordinator stop];
   self.ARQuickLookCoordinator = nil;
 
@@ -3560,6 +3570,24 @@ const char kChromeAppStoreUrl[] =
                    forComposebox:YES];
   _driveFilePickerCoordinator.composeboxDelegate = delegate;
   [_driveFilePickerCoordinator start];
+}
+
+#pragma mark - ActorOverlayCommands
+
+- (void)showActorOverlayForWebState:(web::WebState*)webState {
+  if (_actorOverlayCoordinator) {
+    [self hideActorOverlay];
+  }
+  _actorOverlayCoordinator = [[ActorOverlayCoordinator alloc]
+      initWithBaseViewController:self.viewController
+                         browser:self.browser
+                        webState:webState];
+  [_actorOverlayCoordinator start];
+}
+
+- (void)hideActorOverlay {
+  [_actorOverlayCoordinator stop];
+  _actorOverlayCoordinator = nil;
 }
 
 #pragma mark - EnhancedCalendarCommands
