@@ -84,6 +84,8 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
 
       composeButtonEnabled: {type: Boolean},
 
+      showComposeButton_: {type: Boolean},
+
       cyclingPlaceholders: {type: Boolean},
 
       isDraggingFile: {
@@ -202,6 +204,7 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
   accessor energyEffectAnimationEnabled: boolean = false;
   accessor composeboxEnabled: boolean = false;
   accessor composeButtonEnabled: boolean = false;
+  protected accessor showComposeButton_: boolean = false;
   accessor cyclingPlaceholders: boolean = false;
   accessor isDraggingFile: boolean = false;
   accessor contextMenuGlifAnimationState: GlifAnimationState =
@@ -234,6 +237,8 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
       loadTimeData.getBoolean('searchboxVoiceSearch');
   protected accessor searchboxLensSearchEnabled_: boolean =
       loadTimeData.getBoolean('searchboxLensSearch');
+  protected readonly ntpRealboxDynamicAiModeButtonEnabled_: boolean =
+      loadTimeData.getBoolean('ntpRealboxDynamicAiModeButton');
   protected accessor useWebkitSearchIcons_: boolean = false;
   protected dragAndDropHandler: DragAndDropHandler|null = null;
   protected callbackRouter_: PageCallbackRouter;
@@ -298,6 +303,11 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
         changedProperties.has('colorSourceIsBaseline')) {
       this.useWebkitSearchIcons_ = this.composeButtonEnabled ||
           (this.searchboxChromeRefreshTheming && !this.colorSourceIsBaseline);
+    }
+
+    if (changedProperties.has('composeButtonEnabled') ||
+        changedProperties.has('result')) {
+      this.showComposeButton_ = this.calculateShowComposeButton_();
     }
 
     if (changedProperties.has('inVoiceSearchMode') ||
@@ -717,6 +727,19 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
   protected inputHasMatches_(): boolean {
     return !!this.result && !!this.result.matches &&
         this.result.matches.length > 0;
+  }
+
+  private calculateShowComposeButton_(): boolean {
+    if (!this.composeButtonEnabled) {
+      return false;
+    }
+    if (this.ntpRealboxDynamicAiModeButtonEnabled_) {
+      const defaultMatch = this.result?.matches?.[0];
+      if (defaultMatch && !defaultMatch.isSearchType) {
+        return false;
+      }
+    }
+    return true;
   }
 
   protected computePlaceholderText_(placeholderText: string): string {

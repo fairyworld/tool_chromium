@@ -660,6 +660,10 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(
       "searchboxShowComposeEntrypoint",
       (aim_eligible || ntp_composebox::IsNtpComposeboxEnabled(profile)));
 
+  source->AddBoolean(
+      "ntpRealboxDynamicAiModeButton",
+      base::FeatureList::IsEnabled(ntp_realbox::kNtpRealboxDynamicAiModeButton));
+
   if (ntp_realbox::IsNtpRealboxNextEnabled(profile)) {
     if (base::FeatureList::IsEnabled(
             ntp_realbox::kNtpRealboxCyclingPlaceholders)) {

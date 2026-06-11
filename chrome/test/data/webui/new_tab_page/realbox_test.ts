@@ -990,4 +990,50 @@ suite('NewTabPageRealboxNextTest', () => {
     assertTrue(!!animatedGlow);
     assertFalse(animatedGlow.darkThemeColorsEnabled);
   });
+
+  test(
+      'compose button hides for URL suggestions when ' +
+          'ntpRealboxDynamicAiModeButton is enabled',
+      async () => {
+        loadTimeData.overrideValues({ntpRealboxDynamicAiModeButton: true});
+
+        // Re-create realbox to pick up new loadTimeData.
+        realbox = createAndAppendRealbox({
+          composeButtonEnabled: true,
+        });
+        await microtasksFinished();
+
+        // Initially, with no results, compose button should be visible.
+        let composeButton =
+            realbox.shadowRoot.querySelector('cr-searchbox-compose-button');
+        assertTrue(!!composeButton);
+
+        // Simulate autocomplete result with a URL suggestion as default match.
+        const urlMatch = createSearchMatchForTesting({
+          isSearchType: false,
+        });
+        realbox.result = createAutocompleteResultForTesting({
+          matches: [urlMatch],
+        });
+        await microtasksFinished();
+
+        // Compose button should be hidden.
+        composeButton =
+            realbox.shadowRoot.querySelector('cr-searchbox-compose-button');
+        assertFalse(!!composeButton);
+
+        // Simulate autocomplete result with a Search suggestion as default match.
+        const searchMatch = createSearchMatchForTesting({
+          isSearchType: true,
+        });
+        realbox.result = createAutocompleteResultForTesting({
+          matches: [searchMatch],
+        });
+        await microtasksFinished();
+
+        // Compose button should be visible again.
+        composeButton =
+            realbox.shadowRoot.querySelector('cr-searchbox-compose-button');
+        assertTrue(!!composeButton);
+      });
 });

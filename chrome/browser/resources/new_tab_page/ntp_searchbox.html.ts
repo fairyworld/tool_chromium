@@ -63,7 +63,7 @@ export function getHtml(this: NtpSearchboxElement) {
         </button>
       </div>
     ` : ''}
-    ${this.composeButtonEnabled ? html`
+    ${this.showComposeButton_ ? html`
       <cr-searchbox-compose-button id="composeButton" slot="compose-button"
           @compose-click="${this.onComposeClick_}">
       </cr-searchbox-compose-button>
