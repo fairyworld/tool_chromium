@@ -395,6 +395,10 @@ chromium-metrics-reviews@google.com.
     The snackbar was cleared by other events, such as activity being stopped or
     manually cleared by the manager.
   </int>
+  <int value="7" label="Replaced by high priority">
+    The snackbar was instantly preempted and dismissed by a high priority
+    security warning.
+  </int>
 </enum>
 
 <!-- LINT.IfChange(SnackbarIdentifier) -->
