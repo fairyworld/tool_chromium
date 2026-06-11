@@ -97,7 +97,6 @@ class IOSChromeSavePasswordInfoBarDelegate : public ConfirmInfoBarDelegate {
   // TODO(crbug.com/40667480): This function is only virtual so it can be mocked
   // for testing purposes.  It should become non-virtual once this test is
   // refactored for testability.
-  // TODO(crbug.com/40248770): Fix dismissal handlers.
   virtual void InfobarGone();
 
   // True if password is being updated at the moment the InfobarModal is
