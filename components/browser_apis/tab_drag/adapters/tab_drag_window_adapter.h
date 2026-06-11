@@ -7,6 +7,7 @@
 
 #include "base/memory/weak_ptr.h"
 #include "ui/gfx/geometry/point.h"
+#include "ui/gfx/geometry/rect.h"
 
 namespace tabs_api {
 
@@ -14,6 +15,9 @@ namespace tabs_api {
 class TabDragWindowAdapter {
  public:
   virtual ~TabDragWindowAdapter() = default;
+
+  // Returns the window bounds in screen coordinates.
+  virtual gfx::Rect GetBoundsInScreen() const = 0;
 
   // Converts a point in screen coordinates to local window coordinates.
   virtual gfx::Point ConvertScreenPointToLocal(

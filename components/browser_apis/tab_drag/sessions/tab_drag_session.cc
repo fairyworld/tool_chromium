@@ -35,10 +35,6 @@ TabDragSession::~TabDragSession() {
   input_adapter_->ReleaseInputCapture();
 }
 
-void TabDragSession::Cancel() {
-  EndSession();
-}
-
 void TabDragSession::EndSession() {
   if (listener_) {
     listener_->OnSessionEnded();
@@ -50,16 +46,17 @@ void TabDragSession::EndSession() {
 
 void TabDragSession::OnInputEvent(const TabDragInputEvent& event) {
   TabDragSessionInputEvent::Type event_type;
+  bool should_end = false;
   switch (event.type) {
     case TabDragInputEvent::Type::kCancelled:
       event_type = TabDragSessionInputEvent::Type::kCancelled;
-      Cancel();
+      should_end = true;
       break;
     case TabDragInputEvent::Type::kDropped:
       event_type = TabDragSessionInputEvent::Type::kDropped;
       last_mouse_screen_point_ = event.screen_point;
       delta_ = event.screen_point - start_point_in_screen_;
-      EndSession();
+      should_end = true;
       break;
     case TabDragInputEvent::Type::kMoved:
       event_type = TabDragSessionInputEvent::Type::kMoved;
@@ -72,6 +69,10 @@ void TabDragSession::OnInputEvent(const TabDragInputEvent& event) {
                                          .screen_point = event.screen_point};
   if (listener_) {
     listener_->OnDragSessionEvent(session_event);
+  }
+
+  if (should_end) {
+    EndSession();
   }
 }
 

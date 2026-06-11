@@ -37,9 +37,6 @@ class TabDragSessionManager {
       const std::vector<tabs_api::NodeId>& source_tab_ids,
       const gfx::Point& start_point);
 
-  // Cancels the active session if one exists.
-  void CancelDrag();
-
   TabDragSession* active_session() { return active_session_.get(); }
 
   // Callback notified by the active session when it naturally terminates.

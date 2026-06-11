@@ -22,6 +22,14 @@ class TabDragSession;
 
 // Routes tab drag events to the right DropTarget. It maintains a mapping of
 // active drop targets associated with their respective browser windows.
+enum class DropTargetEvent {
+  kEntered,
+  kDrag,
+  kLeave,
+  kDrop,
+  kCancelled,
+};
+
 class TabDragEventRouter : public TabDragSessionInputListener {
  public:
   TabDragEventRouter();
@@ -55,10 +63,28 @@ class TabDragEventRouter : public TabDragSessionInputListener {
     return weak_factory_.GetWeakPtr();
   }
 
+  size_t drop_targets_count_for_testing() const { return drop_targets_.size(); }
+
  private:
+  void HandleDragMoved(const gfx::Point& screen_point);
+  void HandleDragDropped(const gfx::Point& screen_point);
+  void HandleDragCancelled();
+
+  void TransitionToTargetWindow(TabDragWindowAdapter* new_target,
+                                const gfx::Point& screen_point);
+
+  void DispatchEvent(TabDragWindowAdapter* window,
+                     DropTargetEvent event,
+                     const gfx::Point& screen_point = gfx::Point());
+
+  TabDragWindowAdapter* FindTargetWindow(const gfx::Point& screen_point) const;
+  mojom::DropTarget* GetDropTarget(TabDragWindowAdapter* window) const;
+  std::vector<tabs_api::NodeId> GetDraggedTabs() const;
+
   std::map<TabDragWindowAdapter*, mojo::AssociatedRemote<mojom::DropTarget>>
       drop_targets_;
   raw_ptr<TabDragSession> active_session_ = nullptr;
+  raw_ptr<TabDragWindowAdapter> current_drop_target_window_ = nullptr;
   base::WeakPtrFactory<TabDragEventRouter> weak_factory_{this};
 };
 

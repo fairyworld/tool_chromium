@@ -80,17 +80,7 @@ TEST_F(TabDragSessionTest, StartAndReleaseCapture) {
   EXPECT_TRUE(toy_adapter.capture_released());
 }
 
-TEST_F(TabDragSessionTest, CancelSession) {
-  ToyTabDragSessionInputAdapter toy_adapter;
-  base::MockOnceClosure end_callback;
 
-  TabDragSession session({NodeId(NodeId::Type::kContent, "tab1")}, gfx::Point(),
-                         toy_adapter, nullptr, end_callback.Get());
-  EXPECT_TRUE(session.Start().has_value());
-
-  EXPECT_CALL(end_callback, Run()).Times(1);
-  session.Cancel();
-}
 
 TEST_F(TabDragSessionTest, InputEventCancelled) {
   ToyTabDragSessionInputAdapter toy_adapter;

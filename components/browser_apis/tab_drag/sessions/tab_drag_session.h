@@ -19,6 +19,8 @@
 
 namespace tabs_api {
 
+class TabDragWindowAdapter;
+
 // Platform-agnostic coordinator for tab dragging.
 // Managed and owned by TabDragSessionManager.
 class TabDragSession {
@@ -32,9 +34,6 @@ class TabDragSession {
   TabDragSession& operator=(const TabDragSession&) = delete;
   ~TabDragSession();
 
-  // Explicitly cancel the session.
-  void Cancel();
-
   // Starts the session by initiating input capture.
   base::expected<void, mojo_base::mojom::ErrorPtr> Start();
 
@@ -45,6 +44,13 @@ class TabDragSession {
     return last_mouse_screen_point_;
   }
   const gfx::Vector2d& delta() const { return delta_; }
+  const std::vector<tabs_api::NodeId>& dragged_tabs() const {
+    return dragged_tabs_;
+  }
+  TabDragWindowAdapter* dragged_window() const { return dragged_window_; }
+  void set_dragged_window(TabDragWindowAdapter* window) {
+    dragged_window_ = window;
+  }
 
  private:
   void EndSession();
@@ -59,6 +65,7 @@ class TabDragSession {
   const gfx::Point start_point_in_screen_;
   gfx::Point last_mouse_screen_point_;
   gfx::Vector2d delta_;
+  raw_ptr<TabDragWindowAdapter> dragged_window_ = nullptr;
 };
 
 }  // namespace tabs_api

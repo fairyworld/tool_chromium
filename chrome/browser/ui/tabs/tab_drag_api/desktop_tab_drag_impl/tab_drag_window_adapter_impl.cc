@@ -6,12 +6,17 @@
 
 #include "base/notimplemented.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
+#include "ui/base/base_window.h"
 
 TabDragWindowAdapterImpl::TabDragWindowAdapterImpl(
     BrowserWindowInterface* browser_window)
     : browser_window_(browser_window) {}
 
 TabDragWindowAdapterImpl::~TabDragWindowAdapterImpl() = default;
+
+gfx::Rect TabDragWindowAdapterImpl::GetBoundsInScreen() const {
+  return browser_window_->GetWindow()->GetBounds();
+}
 
 gfx::Point TabDragWindowAdapterImpl::ConvertScreenPointToLocal(
     const gfx::Point& screen_point) const {

@@ -56,12 +56,6 @@ TabDragSessionManager::StartDrag(
   return std::monostate();
 }
 
-void TabDragSessionManager::CancelDrag() {
-  if (active_session_) {
-    active_session_->Cancel();
-  }
-}
-
 void TabDragSessionManager::OnSessionEnded() {
   if (active_session_) {
     // Post a task to destroy the active session. This keeps the session pointer
