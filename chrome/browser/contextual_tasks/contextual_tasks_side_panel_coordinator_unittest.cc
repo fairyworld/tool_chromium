@@ -422,4 +422,24 @@ TEST_F(ContextualTasksSidePanelCoordinatorTest, CleanUpUnusedWebContents) {
   EXPECT_EQ(1u, GetNumberOfActiveTasksForTesting(task_id2));
 }
 
+TEST_F(ContextualTasksSidePanelCoordinatorTest, OpenInZeroStateCreatesNewTask) {
+  ContextualTask old_task(base::Uuid::GenerateRandomV4());
+  tabs::TabInterface* active_tab = tab_list_->GetActiveTab();
+  SessionID active_tab_id =
+      sessions::SessionTabHelper::IdForTab(active_tab->GetContents());
+
+  // Setup: The active tab is currently associated with old_task.
+  EXPECT_CALL(*mock_controller_, GetContextualTaskForTab(active_tab_id))
+      .WillOnce(Return(old_task))
+      .WillRepeatedly(Return(std::nullopt));
+
+  EXPECT_CALL(*mock_controller_,
+              DisassociateTabFromTask(old_task.GetTaskId(), active_tab_id))
+      .Times(1);
+  EXPECT_CALL(*mock_controller_, CreateTask()).Times(1);
+
+  coordinator_->OpenInZeroState();
+}
+
 }  // namespace contextual_tasks
+

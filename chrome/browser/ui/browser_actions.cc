@@ -21,6 +21,7 @@
 #include "chrome/app/vector_icons/vector_icons.h"
 #include "chrome/browser/contextual_cueing/features.h"
 #include "chrome/browser/contextual_tasks/contextual_tasks_side_panel_coordinator.h"
+#include "chrome/browser/contextual_tasks/contextual_tasks_utils.h"
 #include "chrome/browser/devtools/devtools_window.h"
 #include "chrome/browser/glic/browser_ui/glic_vector_icon_manager.h"
 #include "chrome/browser/glic/host/glic.mojom.h"
@@ -470,7 +471,12 @@ void BrowserActions::InitializeSidePanelActions() {
                   if (!bwi) {
                     return;
                   }
-                  chrome::ToggleContextualTasksSidePanel(bwi);
+                  if (contextual_tasks::IsContextualTasksPinButtonInToolbarEnabled() &&
+                      contextual_tasks::GetEffectivePinState(bwi->GetProfile())) {
+                    chrome::ToggleContextualTasksSidePanelZeroState(bwi);
+                  } else {
+                    chrome::ToggleContextualTasksSidePanel(bwi);
+                  }
                 },
                 bwi))
             .SetActionId(kActionSidePanelShowContextualTasks)

@@ -468,6 +468,10 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksEphemeralButtonInteractiveTest,
       WaitForHide(kSidePanelElementId),
       EnsurePresent(kContextualTasksEphemeralToolbarButtonElementId),
       EnsureNotPresent(
+          ContextualTasksCloseTabButton::kContextualTasksCloseTabButton),
+      PressButton(kPinnedToolbarActionShowSidePanelContextualTasksElementId),
+      WaitForShow(kSidePanelElementId),
+      EnsureNotPresent(
           ContextualTasksCloseTabButton::kContextualTasksCloseTabButton));
 }
 

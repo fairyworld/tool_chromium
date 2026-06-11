@@ -60,6 +60,7 @@
 #include "components/strings/grit/components_strings.h"
 #include "components/web_modal/web_contents_modal_dialog_manager.h"
 #include "components/web_modal/web_contents_modal_dialog_manager_delegate.h"
+#include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
 #include "content/public/browser/navigation_handle.h"
 #include "content/public/browser/page.h"
@@ -326,6 +327,23 @@ void ContextualTasksSidePanelCoordinator::Close() {
   NotifyActiveTaskContextProvider();
 
   RecordSessionEndMetrics();
+}
+
+void ContextualTasksSidePanelCoordinator::OpenInZeroState() {
+  tabs::TabInterface* active_tab_interface =
+      TabListInterface::From(browser_window_)->GetActiveTab();
+  if (active_tab_interface) {
+    DisassociateTabFromTask(active_tab_interface->GetContents());
+  }
+
+  if (content::WebContents* active_contents = GetActiveWebContents()) {
+    MaybeDetachWebContents(active_contents);
+  }
+
+  CleanUpUnusedWebContents();
+
+  Show(/*transition_from_tab=*/false,
+       omnibox::ChromeAimEntryPoint::DESKTOP_CHROME_COBROWSE_TOOLBAR_BUTTON);
 }
 
 bool ContextualTasksSidePanelCoordinator::IsPanelOpenForContextualTask() const {

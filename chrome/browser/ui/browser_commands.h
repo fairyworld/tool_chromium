@@ -275,6 +275,7 @@ void ShowTabSearch(BrowserWindowInterface* browser);
 void CloseTabSearch(BrowserWindowInterface* browser);
 void ToggleTabSearchPin(BrowserWindowInterface* browser);
 void ToggleContextualTasksSidePanel(BrowserWindowInterface* browser);
+void ToggleContextualTasksSidePanelZeroState(BrowserWindowInterface* browser);
 void ToggleVerticalTabs(BrowserWindowInterface* browser);
 void ToggleVerticalTabsExpandOnHover(BrowserWindowInterface* browser);
 bool CanCloseFind(BrowserWindowInterface* browser);
