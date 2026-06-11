@@ -1292,6 +1292,18 @@ chromium-metrics-reviews@google.com.
   <int value="9" label="SpeculativeTransferStateReplaced"/>
 </enum>
 
+<enum name="IntentReferrer">
+  <int value="0" label="Ignored"/>
+  <int value="1" label="AllowedThroughSession"/>
+  <int value="2" label="AllowedInsecure"/>
+</enum>
+
+<enum name="IntentTransitionType">
+  <int value="0" label="Ignored"/>
+  <int value="1" label="AllowedTyped"/>
+  <int value="2" label="AllowedInsecure"/>
+</enum>
+
 <!-- LINT.IfChange(LauncherShortcutUpdateFailure) -->
 
 <enum name="LauncherShortcutUpdateFailure">
