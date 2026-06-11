@@ -2777,6 +2777,7 @@ BrowserAccessibilityAndroid::ComputeAndroidNameTo() const {
       if (ui::IsImage(GetRole()) && !GetImageAnnotationText().empty()) {
         name_to_cache_ = AndroidNameTo::kContentDescription;
       } else {
+        // TODO(crbug.com/498093320): Add support for Canvas accessibility.
         name_to_cache_ = AndroidNameTo::kText;
       }
       break;

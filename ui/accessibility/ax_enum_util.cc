@@ -1290,6 +1290,8 @@ const char* ToString(ax::mojom::StringAttribute string_attribute) {
       return "ariaNotificationAnnouncement";
     case ax::mojom::StringAttribute::kAriaNotificationIdDeprecated:
       return "ariaNotificationId";
+    case ax::mojom::StringAttribute::kCanvasAnnotation:
+      return "canvasAnnotation";
     case ax::mojom::StringAttribute::kCheckedStateDescription:
       return "checkedStateDescription";
     case ax::mojom::StringAttribute::kChildTreeId:
@@ -1387,6 +1389,8 @@ ax::mojom::StringAttribute StringToStringAttribute(
     return ax::mojom::StringAttribute::kAriaNotificationAnnouncementDeprecated;
   } else if (string_attribute == "kAriaNotificationIdDeprecated") {
     return ax::mojom::StringAttribute::kAriaNotificationIdDeprecated;
+  } else if (string_attribute == "kCanvasAnnotation") {
+    return ax::mojom::StringAttribute::kCanvasAnnotation;
   } else if (string_attribute == "kCheckedStateDescription") {
     return ax::mojom::StringAttribute::kCheckedStateDescription;
   } else if (string_attribute == "kChildTreeId") {

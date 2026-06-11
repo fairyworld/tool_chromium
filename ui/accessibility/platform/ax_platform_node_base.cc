@@ -261,6 +261,17 @@ std::string AXPlatformNodeBase::GetName() const {
     name += extra_text;
   }
 
+  if (GetRole() == ax::mojom::Role::kCanvas) {
+    std::string canvas_annotation =
+        GetStringAttribute(ax::mojom::StringAttribute::kCanvasAnnotation);
+    if (!canvas_annotation.empty()) {
+      if (!name.empty()) {
+        name += ". ";
+      }
+      name += canvas_annotation;
+    }
+  }
+
   DCHECK(base::IsStringUTF8AllowingNoncharacters(name)) << "Invalid UTF8";
   return name;
 }
