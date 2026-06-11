@@ -2192,6 +2192,7 @@ source_set("unit_tests") {
         "//chrome/browser/ash/login/users",
         "//chrome/browser/ash/printing",
         "//chrome/browser/extensions/api/braille_display_private",
+        "//chrome/browser/prefs:util",
         "//chrome/browser/printing",
         "//chrome/test:test_support_unit",
         "//chromeos/ash/components/dbus/image_burner",

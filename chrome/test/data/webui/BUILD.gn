@@ -203,6 +203,7 @@ source_set("browser_tests") {
       "chromeos/shortcut_customization/shortcut_customization_browsertest.cc",
       "chromeos/vc_background_ui/vc_background_ui_browsertest.cc",
     ]
+    deps += [ "//chrome/browser/prefs:util" ]
     if (is_chrome_branded) {
       sources += [
         "chromeos/boca_receiver_app_ui/boca_receiver_untrusted_ui_browsertest.cc",
