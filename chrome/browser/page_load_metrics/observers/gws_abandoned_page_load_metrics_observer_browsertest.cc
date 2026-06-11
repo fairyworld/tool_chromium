@@ -1427,12 +1427,16 @@ IN_PROC_BROWSER_TEST_P(
   }
 }
 
-// TODO(crbug.com/521907529): De-flake and re-enable.
 IN_PROC_BROWSER_TEST_P(
     GWSAbandonedPageLoadMetricsObserverWithIgnoreDuplicateFlagBrowserTest,
-    DISABLED_DuplicateNavigation_RendererInitiated) {
+    DuplicateNavigation_RendererInitiated) {
   const bool ignore_duplicate_navs_enabled = IsIgnoreDuplicateNavsEnabled();
   EXPECT_TRUE(content::NavigateToURL(web_contents(), url_non_srp()));
+
+  auto waiter = CreatePageLoadMetricsTestWaiter();
+  waiter->AddPageExpectation(
+      PageLoadMetricsTestWaiter::TimingField::kLoadEvent);
+  waiter->AddCustomUserTimingMarkExpectation("SearchBodyEnd");
 
   // 1. Start renderer-initiated navigation to `url_srp()`
   content::TestNavigationManager nav_manager(web_contents(), url_srp());
@@ -1450,7 +1454,7 @@ IN_PROC_BROWSER_TEST_P(
   // Otherwise, it's cancelled by the second.
   EXPECT_EQ(nav_manager.was_committed(), ignore_duplicate_navs_enabled);
 
-  EXPECT_TRUE(content::WaitForLoadStop(web_contents()));
+  waiter->Wait();
   EXPECT_EQ(url_srp(),
             web_contents()->GetPrimaryMainFrame()->GetLastCommittedURL());
 
