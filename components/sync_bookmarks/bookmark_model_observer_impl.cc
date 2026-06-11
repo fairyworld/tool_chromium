@@ -552,8 +552,7 @@ void BookmarkModelObserverImpl::ProcessDelete(
   DCHECK(entity);
   // If the entity hasn't been committed and doesn't have an inflight commit
   // request, simply remove it from the tracker.
-  if (entity->metadata().server_version() == syncer::kUncommittedVersion &&
-      !entity->commit_may_have_started()) {
+  if (entity->IsUnsyncedLocalCreation() && !entity->commit_may_have_started()) {
     bookmark_tracker_->Remove(entity);
     return;
   }

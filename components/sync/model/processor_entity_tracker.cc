@@ -81,7 +81,7 @@ ProcessorEntity* ProcessorEntityTracker::AddLocalCreation(
     std::optional<sync_pb::UniquePosition> unique_position) {
   DCHECK(data);
   DCHECK(!data->client_tag_hash.value().empty());
-  DCHECK(!GetEntityForTagHash(data->client_tag_hash));
+  DCHECK(!GetEntityForClientTagHash(data->client_tag_hash));
   DCHECK(!data->is_deleted());
   DCHECK(!storage_key.empty());
 
@@ -98,7 +98,7 @@ ProcessorEntity* ProcessorEntityTracker::AddRemote(
     std::optional<sync_pb::UniquePosition> unique_position) {
   const EntityData& data = update_data.entity;
   DCHECK(!data.client_tag_hash.value().empty());
-  DCHECK(!GetEntityForTagHash(data.client_tag_hash));
+  DCHECK(!GetEntityForClientTagHash(data.client_tag_hash));
   DCHECK(!data.is_deleted());
   DCHECK(storage_key_to_tag_hash_.find(storage_key) ==
          storage_key_to_tag_hash_.end());
@@ -115,7 +115,7 @@ void ProcessorEntityTracker::RemoveEntityForClientTagHash(
   DCHECK(
       IsInitialSyncAtLeastPartiallyDone(data_type_state_.initial_sync_state()));
   DCHECK(!client_tag_hash.value().empty());
-  const ProcessorEntity* entity = GetEntityForTagHash(client_tag_hash);
+  const ProcessorEntity* entity = GetEntityForClientTagHash(client_tag_hash);
   if (entity == nullptr || entity->storage_key().empty()) {
     entities_.erase(client_tag_hash);
   } else {
@@ -186,16 +186,16 @@ size_t ProcessorEntityTracker::EstimateMemoryUsage() const {
   return memory_usage;
 }
 
-ProcessorEntity* ProcessorEntityTracker::GetEntityForTagHash(
-    const ClientTagHash& tag_hash) {
+ProcessorEntity* ProcessorEntityTracker::GetEntityForClientTagHash(
+    const ClientTagHash& client_tag_hash) {
   return const_cast<ProcessorEntity*>(
-      static_cast<const ProcessorEntityTracker*>(this)->GetEntityForTagHash(
-          tag_hash));
+      static_cast<const ProcessorEntityTracker*>(this)
+          ->GetEntityForClientTagHash(client_tag_hash));
 }
 
-const ProcessorEntity* ProcessorEntityTracker::GetEntityForTagHash(
-    const ClientTagHash& tag_hash) const {
-  auto it = entities_.find(tag_hash);
+const ProcessorEntity* ProcessorEntityTracker::GetEntityForClientTagHash(
+    const ClientTagHash& client_tag_hash) const {
+  auto it = entities_.find(client_tag_hash);
   return it != entities_.end() ? it->second.get() : nullptr;
 }
 
@@ -212,7 +212,7 @@ const ProcessorEntity* ProcessorEntityTracker::GetEntityForStorageKey(
   if (iter == storage_key_to_tag_hash_.end()) {
     return nullptr;
   }
-  return GetEntityForTagHash(iter->second);
+  return GetEntityForClientTagHash(iter->second);
 }
 
 std::vector<const ProcessorEntity*>
@@ -287,7 +287,7 @@ ProcessorEntityTracker::IncrementSequenceNumberForAllExcept(
 void ProcessorEntityTracker::UpdateOrOverrideStorageKey(
     const ClientTagHash& client_tag_hash,
     const std::string& storage_key) {
-  ProcessorEntity* entity = GetEntityForTagHash(client_tag_hash);
+  ProcessorEntity* entity = GetEntityForClientTagHash(client_tag_hash);
   DCHECK(entity);
   // If the entity already had a storage key, clear it.
   const std::string previous_storage_key = entity->storage_key();
@@ -308,7 +308,7 @@ ProcessorEntity* ProcessorEntityTracker::AddInternal(
     const std::string& storage_key,
     const EntityData& data) {
   DCHECK(!data.client_tag_hash.value().empty());
-  DCHECK(!GetEntityForTagHash(data.client_tag_hash));
+  DCHECK(!GetEntityForClientTagHash(data.client_tag_hash));
   DCHECK(storage_key.empty() || storage_key_to_tag_hash_.find(storage_key) ==
                                     storage_key_to_tag_hash_.end());
 

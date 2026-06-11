@@ -154,7 +154,7 @@ TEST_F(ProcessorEntityTrackerTest, ShouldLoadFromMetadata) {
   const ProcessorEntity* entity =
       entity_tracker.GetEntityForStorageKey(kStorageKey1);
   ASSERT_THAT(entity, NotNull());
-  EXPECT_EQ(entity, entity_tracker.GetEntityForTagHash(kClientTagHash1));
+  EXPECT_EQ(entity, entity_tracker.GetEntityForClientTagHash(kClientTagHash1));
 
   EXPECT_EQ(kStorageKey1, entity->storage_key());
   EXPECT_EQ(1u, entity->metadata().creation_time());
@@ -192,7 +192,7 @@ TEST_F(ProcessorEntityTrackerTest, ShouldAddNewLocalEntity) {
 
   EXPECT_EQ(1u, entity_tracker_.size());
   EXPECT_EQ(1u, entity_tracker_.CountNonTombstoneEntries());
-  EXPECT_EQ(entity, entity_tracker_.GetEntityForTagHash(
+  EXPECT_EQ(entity, entity_tracker_.GetEntityForClientTagHash(
                         entity_data_ptr->client_tag_hash));
   EXPECT_EQ(entity, entity_tracker_.GetEntityForStorageKey(kStorageKey1));
   EXPECT_TRUE(entity_tracker_.HasLocalChanges());
@@ -230,8 +230,8 @@ TEST_F(ProcessorEntityTrackerTest, ShouldAddNewRemoteEntity) {
 
   EXPECT_EQ(1u, entity_tracker_.size());
   EXPECT_EQ(1u, entity_tracker_.CountNonTombstoneEntries());
-  EXPECT_EQ(entity,
-            entity_tracker_.GetEntityForTagHash(update.entity.client_tag_hash));
+  EXPECT_EQ(entity, entity_tracker_.GetEntityForClientTagHash(
+                        update.entity.client_tag_hash));
   EXPECT_EQ(entity, entity_tracker_.GetEntityForStorageKey(kStorageKey1));
   EXPECT_FALSE(entity_tracker_.HasLocalChanges());
   EXPECT_EQ(kStorageKey1, entity->storage_key());
@@ -264,7 +264,7 @@ TEST_F(ProcessorEntityTrackerTest, ShouldAddEntityWithoutStorageKey) {
 
   // The entity should be available by the client tag hash only.
   EXPECT_EQ(kEmptyStorageKey, entity->storage_key());
-  EXPECT_EQ(entity, entity_tracker_.GetEntityForTagHash(kClientTagHash1));
+  EXPECT_EQ(entity, entity_tracker_.GetEntityForClientTagHash(kClientTagHash1));
 
   // The empty storage key must not be used.
   EXPECT_THAT(entity_tracker_.GetEntityForStorageKey(kEmptyStorageKey),
@@ -348,7 +348,7 @@ TEST_F(ProcessorEntityTrackerTest, ShouldRemoveEntityForClientTagHash) {
       GenerateUpdate(kStorageKey1, kClientTagHash1, kServerVersion),
       /*trimmed_specifics=*/{}, /*unique_position=*/std::nullopt);
   ASSERT_THAT(entity, NotNull());
-  ASSERT_EQ(entity, entity_tracker_.GetEntityForTagHash(kClientTagHash1));
+  ASSERT_EQ(entity, entity_tracker_.GetEntityForClientTagHash(kClientTagHash1));
 
   const ProcessorEntity* entity_no_key = entity_tracker_.AddRemote(
       kEmptyStorageKey,
@@ -356,12 +356,13 @@ TEST_F(ProcessorEntityTrackerTest, ShouldRemoveEntityForClientTagHash) {
       /*trimmed_specifics=*/{}, /*unique_position=*/std::nullopt);
   ASSERT_THAT(entity_no_key, NotNull());
   ASSERT_EQ(entity_no_key,
-            entity_tracker_.GetEntityForTagHash(kClientTagHash2));
+            entity_tracker_.GetEntityForClientTagHash(kClientTagHash2));
   ASSERT_EQ(2u, entity_tracker_.size());
 
   entity_tracker_.RemoveEntityForClientTagHash(kClientTagHash2);
   EXPECT_EQ(1u, entity_tracker_.size());
-  EXPECT_THAT(entity_tracker_.GetEntityForTagHash(kClientTagHash2), IsNull());
+  EXPECT_THAT(entity_tracker_.GetEntityForClientTagHash(kClientTagHash2),
+              IsNull());
 
   // A second call does not affect anything.
   entity_tracker_.RemoveEntityForClientTagHash(kClientTagHash2);

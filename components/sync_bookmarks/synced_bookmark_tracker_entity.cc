@@ -57,6 +57,11 @@ bool SyncedBookmarkTrackerEntity::IsUnsyncedLocalCreation() const {
          IsUnsynced();
 }
 
+bool SyncedBookmarkTrackerEntity::IsVersionAlreadyKnown(
+    int64_t update_version) const {
+  return metadata_.server_version() >= update_version;
+}
+
 bool SyncedBookmarkTrackerEntity::MatchesData(
     const syncer::EntityData& data) const {
   if (metadata_.is_deleted() || data.is_deleted()) {

@@ -337,6 +337,26 @@ TEST(SyncedBookmarkTrackerTest,
             entity->metadata().specifics_hash());
 }
 
+TEST(SyncedBookmarkTrackerTest, ShouldVerifyIsVersionAlreadyKnown) {
+  std::unique_ptr<SyncedBookmarkTracker> tracker =
+      SyncedBookmarkTracker::CreateEmpty(sync_pb::DataTypeState());
+
+  const std::string kSyncId = "SYNC_ID";
+  const int64_t kServerVersion = 1000;
+  const base::Time kCreationTime = base::Time::Now();
+  const sync_pb::EntitySpecifics specifics =
+      GenerateSpecifics(/*title=*/std::string(), /*url=*/std::string());
+  bookmarks::BookmarkNode node(/*id=*/1, base::Uuid::GenerateRandomV4(),
+                               GURL());
+
+  const SyncedBookmarkTrackerEntity* entity = tracker->AddRemote(
+      &node, kSyncId, kServerVersion, kCreationTime, specifics);
+
+  EXPECT_TRUE(entity->IsVersionAlreadyKnown(kServerVersion - 1));
+  EXPECT_TRUE(entity->IsVersionAlreadyKnown(kServerVersion));
+  EXPECT_FALSE(entity->IsVersionAlreadyKnown(kServerVersion + 1));
+}
+
 TEST(SyncedBookmarkTrackerTest, ShouldUpdateUponCommitResponseWithNewId) {
   std::unique_ptr<SyncedBookmarkTracker> tracker =
       SyncedBookmarkTracker::CreateEmpty(sync_pb::DataTypeState());

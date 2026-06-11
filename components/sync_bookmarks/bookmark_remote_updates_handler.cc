@@ -290,8 +290,8 @@ void BookmarkRemoteUpdatesHandler::Process(
     }
 
     // Ignore updates that have already been seen according to the version.
-    if (tracked_entity && tracked_entity->metadata().server_version() >=
-                              update->response_version) {
+    if (tracked_entity &&
+        tracked_entity->IsVersionAlreadyKnown(update->response_version)) {
       if (update_entity.id == tracked_entity->metadata().server_id()) {
         // Seen this update before. This update may be a reflection and may have
         // missing the UUID in specifics. Next reupload will populate UUID in
