@@ -68,6 +68,7 @@ final class SidePanelContainerCoordinatorImpl
         ThreadUtils.assertOnUiThread();
         mSidePanelCoordinatorAndroid = sidePanelCoordinatorAndroid;
         mSideUiCoordinator.registerSideUiContainer(this);
+        mSidePanelCoordinatorAndroid.init();
     }
 
     @Override

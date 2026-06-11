@@ -289,6 +289,20 @@ void SidePanelCoordinatorAndroid::OnWindowResized(JNIEnv* env,
   }
 }
 
+void SidePanelCoordinatorAndroid::Init(JNIEnv* env) {
+  SPLOG("Init");
+  // During tab tear-off (multi-window), a new Activity is created and the
+  // reparented tab is added to the tab model before this coordinator and
+  // its observer are constructed. Consequently, the observer misses the
+  // initial active tab change event. We explicitly trigger it here during
+  // initialization to restore the side panel state for the active tab.
+  if (tabs::TabInterface* active_tab =
+          TabListInterface::From(browser())->GetActiveTab()) {
+    OnActiveTabChanged(/*old_contents=*/nullptr, active_tab->GetContents(),
+                       /*tab_removed_for_deletion=*/false);
+  }
+}
+
 void SidePanelCoordinatorAndroid::Toggle(SidePanelEntryKey key,
                                          SidePanelOpenTrigger open_trigger) {
   SPLOG("Toggle - key: " << key.ToString()

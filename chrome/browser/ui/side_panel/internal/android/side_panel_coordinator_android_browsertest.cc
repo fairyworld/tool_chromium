@@ -2229,3 +2229,35 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorAndroidBrowserTest,
   // would fail.
   EXPECT_FALSE(SidePanelRegistry::From(tab_1)->GetActiveEntry().has_value());
 }
+
+IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorAndroidBrowserTest,
+                       Init_RestoresActiveEntryFromActiveTab) {
+  // Arrange: Get the active tab and its registry.
+  tabs::TabInterface* tab = tab_list_->GetActiveTab();
+  auto* registry = SidePanelRegistry::From(tab);
+
+  // Register a test entry.
+  auto entry_key = SidePanelEntryKey(SidePanelEntryId::kAboutThisSite);
+  std::unique_ptr<SidePanelEntry> entry =
+      CreateSidePanelEntry(entry_key, browser_);
+  SidePanelEntry* entry_ptr = entry.get();
+  registry->Register(std::move(entry));
+
+  // Simulate the tab tear-off case:
+  // (1) Make the entry active in the registry without calling
+  // coordinator_->Show()
+  registry->SetActiveEntry(entry_ptr);
+
+  // (2) The coordinator won't be aware of the active entry since we didn't call
+  // Show().
+  EXPECT_FALSE(coordinator_->IsSidePanelShowing());
+
+  // Act: Call Init.
+  coordinator_->Init(nullptr);
+  WaitUntilOpened(coordinator_);
+
+  // Assert: The coordinator should now be showing the side panel with the
+  // correct entry.
+  EXPECT_TRUE(coordinator_->IsSidePanelShowing());
+  EXPECT_TRUE(coordinator_->IsSidePanelEntryShowing(entry_key));
+}
