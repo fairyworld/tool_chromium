@@ -139,8 +139,8 @@ static const size_t kMaxTooltipLength = 1024;
 std::unique_ptr<ui::TouchSelectionController> CreateSelectionController(
     ui::TouchSelectionControllerClient* client,
     bool has_view_tree) {
-  DCHECK(client);
-  DCHECK(has_view_tree);
+  CHECK(client, base::NotFatalUntil::M152);
+  CHECK(has_view_tree, base::NotFatalUntil::M152);
   ui::TouchSelectionController::Config config;
   config.max_tap_duration =
       base::Milliseconds(gfx::ViewConfiguration::GetLongPressTimeoutInMs());
@@ -760,8 +760,8 @@ RenderWidgetHostViewAndroid::~RenderWidgetHostViewAndroid() {
   UpdateNativeViewTree(/*parent_native_view=*/nullptr,
                        /*parent_layer=*/nullptr);
   view_.set_event_handler(nullptr);
-  DCHECK(!ime_adapter_android_);
-  DCHECK(!delegated_frame_host_);
+  CHECK(!ime_adapter_android_, base::NotFatalUntil::M152);
+  CHECK(!delegated_frame_host_, base::NotFatalUntil::M152);
   if (obj_) {
     Java_RenderWidgetHostViewImpl_clearNativePtr(
         base::android::AttachCurrentThread(), obj_);
@@ -1250,7 +1250,8 @@ bool RenderWidgetHostViewAndroid::IsSurfaceAvailableForCopy() {
 void RenderWidgetHostViewAndroid::ShowWithVisibility(
     PageVisibilityState page_visibility) {
   TRACE_EVENT0("content", "RenderWidgetHostViewAndroid::ShowWithVisibility");
-  DCHECK_NE(page_visibility, PageVisibilityState::kHidden);
+  CHECK_NE(page_visibility, PageVisibilityState::kHidden,
+           base::NotFatalUntil::M152);
   Visibility next_view_visibility = view_visibility_;
   if (page_visibility == PageVisibilityState::kVisible) {
     next_view_visibility = Visibility::VISIBLE;
@@ -1391,7 +1392,7 @@ void RenderWidgetHostViewAndroid::OnUpdateTextInputStateCalled(
   if (!ime_adapter_android_)
     return;
 
-  DCHECK_EQ(text_input_manager_, text_input_manager);
+  CHECK_EQ(text_input_manager_, text_input_manager, base::NotFatalUntil::M152);
   if (GetTextInputManager()->GetActiveWidget()) {
     ime_adapter_android_->UpdateState(
         *GetTextInputManager()->GetTextInputState());
@@ -1405,7 +1406,7 @@ void RenderWidgetHostViewAndroid::OnUpdateTextInputStateCalled(
 void RenderWidgetHostViewAndroid::OnImeCancelComposition(
     TextInputManager* text_input_manager,
     RenderWidgetHostViewBase* updated_view) {
-  DCHECK_EQ(text_input_manager_, text_input_manager);
+  CHECK_EQ(text_input_manager_, text_input_manager, base::NotFatalUntil::M152);
   if (ime_adapter_android_)
     ime_adapter_android_->CancelComposition();
 }
@@ -1413,7 +1414,7 @@ void RenderWidgetHostViewAndroid::OnImeCancelComposition(
 void RenderWidgetHostViewAndroid::OnTextSelectionChanged(
     TextInputManager* text_input_manager,
     RenderWidgetHostViewBase* updated_view) {
-  DCHECK_EQ(text_input_manager_, text_input_manager);
+  CHECK_EQ(text_input_manager_, text_input_manager, base::NotFatalUntil::M152);
 
   if (!selection_popup_controller_)
     return;
