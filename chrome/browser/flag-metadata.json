@@ -1714,7 +1714,7 @@
     "expiry_milestone": 150
   },
   {
-    "name": "classifier-api-for-tiny-model",
+    "name": "classifier-api",
     "owners": ["//chrome/browser/ai/OWNERS", "builtin-ai-team@google.com"],
     "expiry_milestone": 155
   },
@@ -7946,12 +7946,12 @@
     "expiry_milestone": 155
   },
   {
-    "name": "prompt-api-for-gemini-nano",
+    "name": "prompt-api",
    "owners": ["//chrome/browser/ai/OWNERS", "builtin-ai-team@google.com"],
     "expiry_milestone": 154
   },
   {
-    "name": "prompt-api-for-gemini-nano-multimodal-input",
+    "name": "prompt-api-multimodal-input",
     "owners": ["//chrome/browser/ai/OWNERS", "builtin-ai-team@google.com"],
     "expiry_milestone": 154
   },
@@ -8328,7 +8328,7 @@
     "expiry_milestone": 151
   },
   {
-    "name": "rewriter-api-for-gemini-nano",
+    "name": "rewriter-api",
     "owners": ["//chrome/browser/ai/OWNERS", "builtin-ai-team@google.com"],
     "expiry_milestone": 154
   },
@@ -8861,7 +8861,7 @@
     "expiry_milestone": 155
   },
   {
-    "name": "summarizer-api-for-gemini-nano",
+    "name": "summarizer-api",
     "owners": ["//chrome/browser/ai/OWNERS", "builtin-ai-team@google.com"],
     "expiry_milestone": 159
   },
@@ -10032,7 +10032,7 @@
     "expiry_milestone": 160
   },
   {
-    "name": "writer-api-for-gemini-nano",
+    "name": "writer-api",
     "owners": ["//chrome/browser/ai/OWNERS", "builtin-ai-team@google.com"],
     "expiry_milestone": 154
   },

@@ -4994,94 +4994,79 @@ inline constexpr char kRunVideoCaptureServiceInBrowserProcessName[] =
 inline constexpr char kRunVideoCaptureServiceInBrowserProcessDescription[] =
     "Run the video capture service in the browser process.";
 
-inline constexpr char kPromptAPIForGeminiNanoName[] =
-    "Prompt API for Gemini Nano";
-inline constexpr char kPromptAPIForGeminiNanoDescription[] =
-    "Enables the exploratory Prompt API, allowing you to send natural language "
-    "instructions to a built-in large language model (Gemini Nano in Chrome). "
-    "Exploratory APIs are designed for local prototyping to help discover "
-    "potential use cases, and may never launch. These explorations will inform "
-    "the built-in AI roadmap [1]. "
-    "This API is primarily intended for natural language processing tasks such "
-    "as summarizing, classifying, or rephrasing text. It is NOT suitable for "
-    "use cases that require factual accuracy (e.g. answering knowledge "
-    "questions).";
-inline constexpr const char* kAIAPIsForGeminiNanoLinks[1] = {
-    "https://goo.gle/chrome-ai-dev-preview"};
+inline constexpr char kPromptAPIName[] = "Prompt API";
+inline constexpr char kPromptAPIDescription[] =
+    "Enables the Prompt API, allowing you to send natural language "
+    "instructions to a built-in large language model. This API is primarily "
+    "intended for natural language processing tasks such as summarizing, "
+    "classifying, or rephrasing text. It is NOT suitable for use cases that "
+    "require factual accuracy (e.g. answering knowledge questions)."
+    "Please refer to the built-in AI documentation [1] for details.";
+inline constexpr const char* kAIAPIsLinks[1] = {
+    "https://developer.chrome.com/docs/ai/built-in"};
 
 inline constexpr char kGemma4ForBuiltInAIName[] = "Gemma 4 for Built-in AI";
 inline constexpr char kGemma4ForBuiltInAIDescription[] =
-    "Enables all built-in AI APIs (Prompt, Summarizer, Writer, etc.) with the "
-    "Gemma 4 model.";
-inline constexpr const char* kGemma4ForBuiltInAILinks[1] = {
-    "https://goo.gle/chrome-ai-dev-preview"};
+    "Enables all built-in AI APIs (Prompt, Summarizer, Writer, etc.) to use "
+    "the Gemma 4 model.";
 
-inline constexpr char kPromptAPIForGeminiNanoMultimodalInputName[] =
-    "Prompt API for Gemini Nano with Multimodal Input";
-inline constexpr char kPromptAPIForGeminiNanoMultimodalInputDescription[] =
-    "Extends the exploratory Prompt API with image and audio input types. "
-    "Allows you to supplement natural language instructions for a built-in "
-    "large language model (Gemini Nano in Chrome) with image and audio inputs. "
-    "Exploratory APIs are designed for local prototyping to help discover "
-    "potential use cases, and may never launch. These explorations will inform "
-    "the built-in AI roadmap [1]. "
-    "This API enhancement is primarily intended for natural language "
-    "processing tasks associated with visual and auditory data, such as "
-    "generating rough descriptions of pictures and sounds. It is NOT suitable "
-    "for use cases that require factual accuracy (e.g. answering knowledge "
-    "questions).";
+inline constexpr char kPromptAPIMultimodalInputName[] =
+    "Prompt API Multimodal Input";
+inline constexpr char kPromptAPIMultimodalInputDescription[] =
+    "Extends the Prompt API with image and audio input types. Allows you to "
+    "supplement natural language instructions for a built-in large language "
+    "model with image and audio inputs. This API enhancement is primarily "
+    "intended for natural language processing tasks associated with visual and "
+    "auditory data, such as generating rough descriptions of pictures and "
+    "sounds. It is NOT suitable for use cases that require factual accuracy "
+    "(e.g. answering knowledge questions). "
+    "Please refer to the built-in AI documentation [1] for details.";
 
-inline constexpr char kWriterAPIForGeminiNanoName[] =
-    "Writer API for Gemini Nano";
-inline constexpr char kWriterAPIForGeminiNanoDescription[] =
-    "Enables the Writer API, allowing you to write a piece "
-    "of text with a built-in large language model (Gemini Nano in Chrome). "
+inline constexpr char kWriterAPIName[] = "Writer API";
+inline constexpr char kWriterAPIDescription[] =
+    "Enables the Writer API, allowing you to write a piece of text with a "
+    "built-in large language model. "
     "The API may be subject to changes including the supported options. "
-    "Please refer to the built-in AI article [1] for details.";
+    "Please refer to the built-in AI documentation [1] for details.";
 
-inline constexpr char kRewriterAPIForGeminiNanoName[] =
-    "Rewriter API for Gemini Nano";
-inline constexpr char kRewriterAPIForGeminiNanoDescription[] =
-    "Enables the Rewriter API, allowing you to rewrite a piece "
-    "of text with a built-in large language model (Gemini Nano in Chrome). "
+inline constexpr char kRewriterAPIName[] = "Rewriter API";
+inline constexpr char kRewriterAPIDescription[] =
+    "Enables the Rewriter API, allowing you to rewrite a piece of text with a "
+    "built-in large language model. "
     "The API may be subject to changes including the supported options. "
-    "Please refer to the built-in AI article [1] for details.";
+    "Please refer to the built-in AI documentation [1] for details.";
 
-inline constexpr char kProofreaderAPIName[] =
-    "Proofreader API for Small Expert Model";
+inline constexpr char kProofreaderAPIName[] = "Proofreader API";
 inline constexpr char kProofreaderAPIDescription[] =
     "Enables the Proofreader API, allowing you to proofread a piece of text "
-    "with a built-in small expert model in Chrome. "
+    "with a built-in small expert model. "
     "The API may be subject to changes including the supported options. "
-    "Please refer to the built-in AI article [1] for details.";
+    "Please refer to the built-in AI documentation [1] for details.";
 
-inline constexpr char kClassifierAPIForTinyModelName[] =
-    "Classifier API for Tiny Model";
-inline constexpr char kClassifierAPIForTinyModelDescription[] =
+inline constexpr char kClassifierAPIName[] = "Classifier API";
+inline constexpr char kClassifierAPIDescription[] =
     "Enables the Classifier API, allowing you to classify a piece of text "
-    "with a built-in tiny model in Chrome. "
+    "with a built-in small expert model. "
     "The API may be subject to changes including the supported options. "
-    "Please refer to the built-in AI article [1] for details.";
+    "Please refer to the built-in AI documentation [1] for details.";
 
 inline constexpr char kSummarizerAPIWithPerformancePreferenceName[] =
-    "Summarizer API with Performance Preference";
+    "Summarizer API Performance Preference";
 inline constexpr char kSummarizerAPIWithPerformancePreferenceDescription[] =
     "Adds the \"preference\" create option to the Summarizer API. Allows the "
     "developer to choose between \"capability\", \"speed\", and \"auto\" to "
     "hint at the desired balance between performance and capability. "
     "We're rapidly iterating on the training set for the smaller expert "
-    "model used with the 'speed' preference, and welcome your feedback "
-    "here: https://issues.chromium.org/issues/new?component=1617227";
-inline constexpr const char* kSummarizerAPIWithPerformancePreferenceLink[1] = {
-    "https://chromestatus.com/feature/6309243756085248"};
+    "model used with the 'speed' preference, and welcome your feedback";
+inline constexpr const char* kSummarizerAPIWithPerformancePreferenceLinks[2] = {
+    "https://chromestatus.com/feature/6309243756085248",
+    "https://issues.chromium.org/issues/new?component=1617227"};
 
-inline constexpr char kSummarizerAPIForGeminiNanoName[] =
-    "Summarizer API for Gemini Nano";
-inline constexpr char kSummarizerAPIForGeminiNanoDescription[] =
-    "Enables the Summarizer API, allowing you to summarize a piece "
-    "of text with a built-in large language model (Gemini Nano in Chrome). "
-    "The API may be subject to changes including the supported options. "
-    "Please refer to the built-in AI article [1] for details.";
+inline constexpr char kSummarizerAPIName[] = "Summarizer API";
+inline constexpr char kSummarizerAPIDescription[] =
+    "Enables the Summarizer API, allowing you to summarize a piece of text "
+    "with a built-in large language model. "
+    "Please refer to the built-in AI documentation [1] for details.";
 
 inline constexpr char kOnDeviceModelLitertLmBackendName[] =
     "LiteRT-LM for On-Device AI";
