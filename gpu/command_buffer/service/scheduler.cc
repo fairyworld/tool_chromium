@@ -498,7 +498,7 @@ Scheduler::Sequence* Scheduler::FindNextTaskFromRoot(Sequence* root_sequence) {
   // First, recurse into any dependency that needs to run before the first
   // task in |root_sequence|. The dependencies are sorted by their order num
   // (because of WaitFence ordering).
-  const uint32_t first_task_order_num = root_sequence->tasks_.front().order_num;
+  const uint64_t first_task_order_num = root_sequence->tasks_.front().order_num;
   DVLOG(10) << "Sequence " << root_sequence->sequence_id()
             << " (order_num: " << first_task_order_num << ") has "
             << root_sequence->wait_fences_.size() << " waits.";
