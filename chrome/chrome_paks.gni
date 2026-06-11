@@ -372,7 +372,6 @@ template("chrome_extra_paks") {
         "$root_gen_dir/chrome/drive_internals_resources.pak",
         "$root_gen_dir/chrome/edu_coexistence_resources.pak",
         "$root_gen_dir/chrome/emoji_picker_resources.pak",
-        "$root_gen_dir/chrome/emulator_resources.pak",
         "$root_gen_dir/chrome/enterprise_reporting_resources.pak",
         "$root_gen_dir/chrome/extended_updates_resources.pak",
         "$root_gen_dir/chrome/floating_workspace_resources.pak",
