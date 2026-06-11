@@ -162,7 +162,7 @@ class FuseboxPopup {
         initializeItem(
                 mTabButton,
                 R.string.omnibox_navattach_tabs,
-                R.drawable.ic_features_24dp,
+                R.drawable.ic_grid_view_24dp,
                 R.string.accessibility_omnibox_add_tabs);
         initializeItem(
                 mCameraButton,
