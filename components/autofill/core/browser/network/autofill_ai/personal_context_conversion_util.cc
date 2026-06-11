@@ -285,8 +285,6 @@ std::optional<EntityInstance> PersonalContextEntityToEntityInstance(
       return PersonalContextOrderToEntityInstance(entity.order());
     case personal_context::proto::Entity::kShipment:
       return PersonalContextShipmentToEntityInstance(entity.shipment());
-    case personal_context::proto::Entity::kSensitivePiiPresence:
-      return std::nullopt;
     case personal_context::proto::Entity::ENTITY_NOT_SET:
       NOTREACHED();
   }
