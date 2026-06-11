@@ -1300,6 +1300,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                     submenuItems.add(buildReadingListItem());
 
                     BookmarkModel bookmarkModel = mBookmarkModelSupplier.get();
+
+                    // TODO(crbug.com/521223427): Implement dynamic updates so that we don't
+                    // have to rely on timing to load the {@link BookmarkModel}.
                     if (bookmarkModel != null && bookmarkModel.isBookmarkModelLoaded()) {
                         List<ListItem> bookmarksBarItems =
                                 getBookmarkItemList(
@@ -2374,6 +2377,20 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
             updateHelper.unregisterObserver(assumeNonNull(mUpdateStateChangeObserver));
             mUpdateMenuItemVisible = false;
             mUpdateStateChangeObserver = null;
+        }
+    }
+
+    @Override
+    public void onMenuShown() {
+        super.onMenuShown();
+
+        if (ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)) {
+            // TODO(crbug.com/521223427): Implement dynamic updates so that we don't
+            // have to rely on timing to load the {@link BookmarkModel}.
+            BookmarkModel bookmarkModel = mBookmarkModelSupplier.get();
+            if (bookmarkModel != null && !bookmarkModel.isBookmarkModelLoaded()) {
+                bookmarkModel.finishLoadingBookmarkModel(() -> {});
+            }
         }
     }
 
