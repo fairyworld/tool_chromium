@@ -66,7 +66,7 @@ export class ShoppingListElement extends CrLitElement {
   private priceTrackingProxy_: PriceTrackingBrowserProxy =
       PriceTrackingBrowserProxyImpl.getInstance();
   private listenerIds_: number[] = [];
-  private retryOperationCallback_: () => void;
+  private retryOperationCallback_: (() => void)|null = null;
 
   override connectedCallback() {
     super.connectedCallback();
@@ -129,7 +129,7 @@ export class ShoppingListElement extends CrLitElement {
   private getProductInfoFromEvent_(event: Event): BookmarkProductInfo {
     const target = event.currentTarget as HTMLElement;
     const index = Number(target.dataset['index']);
-    return this.productInfos[index];
+    return this.productInfos[index]!;
   }
 
   protected onProductAuxclick_(event: MouseEvent) {

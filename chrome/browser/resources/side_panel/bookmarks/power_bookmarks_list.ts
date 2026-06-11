@@ -180,15 +180,15 @@ export class PowerBookmarksListElement extends CrLitElement implements
       PowerBookmarksService.getInstance();
   private keyArrowNavigationService_: KeyArrowNavigationService;
   private bookmarksDragManager_: PowerBookmarksDragManager;
-  private focusOutlineManager_: FocusOutlineManager;
+  private focusOutlineManager_: FocusOutlineManager|null = null;
   private shownBookmarksResizeObserver_?: ResizeObserver;
   private recordCountMetricsOnNextUpdate_: boolean = false;
   private rebuildNavigationElementsTimerId_: number = -1;
   private expandedFolderIds_: Set<string> = new Set();
 
   accessor activeFolderPath: BookmarksTreeNode[] = [];
-  protected accessor activeSortIndex: number;
-  protected accessor sortOrder: SortOrder;
+  protected accessor activeSortIndex: number = 0;
+  protected accessor sortOrder: SortOrder = 0;
   accessor contextMenuBookmark: BookmarksTreeNode|undefined;
   accessor editing: boolean = false;
   accessor hasSomeActiveFilter: boolean = false;
@@ -204,10 +204,10 @@ export class PowerBookmarksListElement extends CrLitElement implements
   protected accessor hasLoadedData_: boolean = false;
   protected accessor canDrag_: boolean = true;
   protected accessor hasActiveDrag_: boolean = false;
-  protected accessor sectionVisibility_: ListSectionVisibility;
-  protected accessor hasFolders_: boolean;
+  protected accessor sectionVisibility_: ListSectionVisibility = {};
+  protected accessor hasFolders_: boolean = false;
   protected accessor scrollTarget_: HTMLElement = document.documentElement;
-  protected accessor shoppingCollectionFolderId_: string;
+  protected accessor shoppingCollectionFolderId_: string = '';
   protected accessor updatedElementIds_: string[] = [];
   protected accessor firstSecondaryIndex_: number = -1;
 
@@ -424,9 +424,9 @@ export class PowerBookmarksListElement extends CrLitElement implements
     // Show the focus state immediately after dropping a bookmark to indicate
     // where the bookmark was moved to, and remove the state immediately after
     // the next mouse event.
-    this.focusOutlineManager_.visible = true;
+    this.focusOutlineManager_!.visible = true;
     document.addEventListener('mousedown', () => {
-      this.focusOutlineManager_.visible = false;
+      this.focusOutlineManager_!.visible = false;
     }, {once: true});
   }
 
@@ -490,14 +490,7 @@ export class PowerBookmarksListElement extends CrLitElement implements
     return this.displayList_.some(item => item.bookmark.id === bookmark.id);
   }
 
-  private removeNodeFromDisplayLists_(nodeId: string) {
-    const itemIndex =
-        this.displayList_.findIndex(item => item.bookmark.id === nodeId);
-    if (itemIndex > -1) {
-      this.displayList_.splice(itemIndex, 1);
-      this.displayList_ = [...this.displayList_];
-    }
-  }
+
 
   /**
    * Returns true if the given node is either the current active folder or a
@@ -562,9 +555,7 @@ export class PowerBookmarksListElement extends CrLitElement implements
     }
   }
 
-  private updateDisplayListObserver_() {
-    this.updateDisplayList_();
-  }
+
 
   /**
    * Update the lists of bookmarks and folders displayed to the user.
@@ -820,10 +811,7 @@ export class PowerBookmarksListElement extends CrLitElement implements
     this.$.list.fillCurrentViewport();
   }
 
-  private getSelectedDescription_() {
-    return loadTimeData.getStringF(
-        'selectedBookmarkCount', this.getSelectedBookmarksLength_());
-  }
+
 
   protected getSelectedBookmarksList_(): BookmarksTreeNode[] {
     const selectedEntries =
@@ -835,11 +823,6 @@ export class PowerBookmarksListElement extends CrLitElement implements
         .filter(b => !!b);
   }
 
-  private getSelectedBookmarksLength_(): number {
-    return Object.values(this.selectedBookmarks)
-        .filter((selected) => selected)
-        .length;
-  }
 
   /**
    * Toggles the given label between active and inactive.
