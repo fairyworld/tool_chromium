@@ -122,10 +122,7 @@ class PersonalContextManagerTest : public testing::Test {
   ~PersonalContextManagerTest() override = default;
 
   void SetUp() override {
-    scoped_feature_list_.InitAndEnableFeatureWithParameters(
-        features::kPersonalContext,
-        {{features::kContextMemoryServiceBaseUrl.name,
-          "https://example.com/v1"}});
+    scoped_feature_list_.InitAndEnableFeature(features::kPersonalContext);
     url_loader_factory_ =
         base::MakeRefCounted<network::WeakWrapperSharedURLLoaderFactory>(
             &test_url_loader_factory_);
@@ -136,8 +133,9 @@ class PersonalContextManagerTest : public testing::Test {
   bool SimulateResponse(std::string_view content,
                         net::HttpStatusCode http_status) {
     return test_url_loader_factory_.SimulateResponseForPendingRequest(
-        "https://example.com/v1:fetchContext", std::string(content),
-        http_status, network::TestURLLoaderFactory::kUrlMatchPrefix);
+        "https://contextmemoryservice-pa.googleapis.com/v1:fetchContext",
+        std::string(content), http_status,
+        network::TestURLLoaderFactory::kUrlMatchPrefix);
   }
 
   bool SimulateSuccessfulResponse() {
@@ -156,8 +154,9 @@ class PersonalContextManagerTest : public testing::Test {
   bool SimulatePiiResponse(std::string_view content,
                            net::HttpStatusCode http_status) {
     return test_url_loader_factory_.SimulateResponseForPendingRequest(
-        "https://example.com/v1:fetchPiiEntities", std::string(content),
-        http_status, network::TestURLLoaderFactory::kUrlMatchPrefix);
+        "https://contextmemoryservice-pa.googleapis.com/v1:fetchPiiEntities",
+        std::string(content), http_status,
+        network::TestURLLoaderFactory::kUrlMatchPrefix);
   }
 
   bool SimulateSuccessfulPiiResponse() {
@@ -230,7 +229,7 @@ TEST_F(PersonalContextManagerTest, MultipleParallelRequestsLimit) {
       /*timeout=*/std::nullopt, response_holder2.GetCallback());
 
   test_url_loader_factory()->EraseResponse(
-      GURL("https://example.com/v1:fetchContext"));
+      GURL("https://contextmemoryservice-pa.googleapis.com/v1:fetchContext"));
   EXPECT_TRUE(SimulateSuccessfulResponse());
 
   EXPECT_TRUE(response_holder2.GetFinalStatus());

@@ -27,23 +27,23 @@
 namespace personal_context {
 namespace {
 
-const char kTestBaseUrl[] = "https://example.com/v1";
-const char kTestEndpointUrl[] = "https://example.com/v1:fetchContext";
-const char kTestPiiEndpointUrl[] = "https://example.com/v1:fetchPiiEntities";
+const char kTestEndpointUrl[] =
+    "https://contextmemoryservice-pa.googleapis.com/v1:fetchContext";
+const char kTestPiiEndpointUrl[] =
+    "https://contextmemoryservice-pa.googleapis.com/v1:fetchPiiEntities";
 
 class PersonalContextFetcherTest : public testing::Test {
  public:
   PersonalContextFetcherTest() {
-    scoped_feature_list_.InitAndEnableFeatureWithParameters(
-        features::kPersonalContext,
-        {{features::kContextMemoryServiceBaseUrl.name, kTestBaseUrl}});
+    scoped_feature_list_.InitAndEnableFeature(features::kPersonalContext);
 
     shared_url_loader_factory_ =
         base::MakeRefCounted<network::WeakWrapperSharedURLLoaderFactory>(
             &test_url_loader_factory_);
 
     fetcher_ = std::make_unique<PersonalContextFetcher>(
-        identity_test_env_.identity_manager(), shared_url_loader_factory_);
+        identity_test_env_.identity_manager(), shared_url_loader_factory_,
+        GURL("https://contextmemoryservice-pa.googleapis.com/v1"));
   }
 
   void SetUp() override {

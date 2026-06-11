@@ -15,6 +15,7 @@
 #include "base/sequence_checker.h"
 #include "components/personal_context/core/personal_context_types.h"
 #include "components/personal_context/proto/context_memory_service.pb.h"
+#include "url/gurl.h"
 
 namespace network {
 class SharedURLLoaderFactory;
@@ -92,6 +93,9 @@ class PersonalContextManager final {
 
   // Unowned IdentityManager for fetching access tokens.
   const raw_ptr<signin::IdentityManager> identity_manager_;
+
+  // Holds the memory service url.
+  const GURL memory_service_url_;
 
   SEQUENCE_CHECKER(sequence_checker_);
 

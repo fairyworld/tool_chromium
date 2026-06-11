@@ -55,7 +55,8 @@ class PersonalContextFetcher {
  public:
   PersonalContextFetcher(
       signin::IdentityManager* identity_manager,
-      scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory);
+      scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
+      GURL memory_service_url);
   PersonalContextFetcher(const PersonalContextFetcher&) = delete;
   PersonalContextFetcher& operator=(const PersonalContextFetcher&) = delete;
   ~PersonalContextFetcher();
@@ -112,6 +113,9 @@ class PersonalContextFetcher {
 
   raw_ptr<signin::IdentityManager> identity_manager_;
   scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory_;
+
+  // Holds the memory service url.
+  const GURL memory_service_url_;
 
   SEQUENCE_CHECKER(sequence_checker_);
 

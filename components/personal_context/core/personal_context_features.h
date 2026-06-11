@@ -14,9 +14,6 @@ namespace personal_context::features {
 // all Personal Context features and services are turned off.
 BASE_DECLARE_FEATURE(kPersonalContext);
 
-// The base URL of the Context Memory Service (CMS) endpoint.
-BASE_DECLARE_FEATURE_PARAM(std::string, kContextMemoryServiceBaseUrl);
-
 // Controls whether the First Run and onboarding experience for Personal Context
 // is enabled. When disabled, the service remains in a "Not Eligible" state
 // because the required user acknowledgment or setup flow cannot be triggered.

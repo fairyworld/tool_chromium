@@ -12,7 +12,6 @@
 #include "base/strings/strcat.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/time/time.h"
-#include "components/personal_context/core/personal_context_features.h"
 #include "components/personal_context/proto/context_memory_service.pb.h"
 #include "components/signin/public/base/oauth_consumer_id.h"
 #include "components/signin/public/identity_manager/access_token_info.h"
@@ -141,9 +140,11 @@ proto::FetchContextRequest PersonalContextFetcher::ToFetchContextRequest(
 
 PersonalContextFetcher::PersonalContextFetcher(
     signin::IdentityManager* identity_manager,
-    scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory)
+    scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
+    GURL memory_service_url)
     : identity_manager_(identity_manager),
-      url_loader_factory_(std::move(url_loader_factory)) {}
+      url_loader_factory_(std::move(url_loader_factory)),
+      memory_service_url_(std::move(memory_service_url)) {}
 
 PersonalContextFetcher::~PersonalContextFetcher() {
   RunErrorCallback(ContextMemoryError::FromExecutionError(
@@ -188,8 +189,7 @@ void PersonalContextFetcher::Fetch(proto::ContextMemoryFeature feature,
   std::string serialized_request;
   request.SerializeToString(&serialized_request);
 
-  GURL endpoint_url(
-      base::StrCat({features::kContextMemoryServiceBaseUrl.Get(), rpc_method}));
+  GURL endpoint_url(base::StrCat({memory_service_url_.spec(), rpc_method}));
 
   HandleTokenRequestFlow(
       identity_manager_, signin::OAuthConsumerId::kContextMemoryService,

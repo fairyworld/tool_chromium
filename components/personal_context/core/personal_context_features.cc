@@ -10,12 +10,6 @@ namespace personal_context::features {
 
 BASE_FEATURE(kPersonalContext, base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE_PARAM(std::string,
-                   kContextMemoryServiceBaseUrl,
-                   &kPersonalContext,
-                   "context_memory_service_base_url",
-                   "https://contextmemoryservice-pa.googleapis.com/v1");
-
 BASE_FEATURE(kPersonalContextFirstRun, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kPersonalContextFirstRunNoticePhase2,

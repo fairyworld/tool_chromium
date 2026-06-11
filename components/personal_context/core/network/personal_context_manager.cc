@@ -8,6 +8,7 @@
 #include <optional>
 
 #include "base/check.h"
+#include "base/command_line.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback_helpers.h"
 #include "base/notreached.h"
@@ -16,14 +17,31 @@
 #include "base/types/expected.h"
 #include "components/personal_context/core/context_memory_error.h"
 #include "components/personal_context/core/network/personal_context_fetcher.h"
-#include "components/personal_context/core/personal_context_features.h"
+#include "components/personal_context/core/personal_context_debug_features.h"
 #include "components/personal_context/core/personal_context_types.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
+#include "url/gurl.h"
 
 namespace personal_context {
 
 namespace {
+
+constexpr char kContextMemoryServiceBaseUrl[] =
+    "https://contextmemoryservice-pa.googleapis.com/v1";
+
+// Returns the base URL of the Context Memory Service. If the
+// `kContextMemoryServiceBaseUrlSwitch` is set, its value is returned.
+// Otherwise, the production URL is returned.
+GURL GetContextMemoryServiceBaseUrl() {
+  base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
+  if (command_line->HasSwitch(
+          features::debug::kContextMemoryServiceBaseUrlSwitch)) {
+    return GURL(command_line->GetSwitchValueASCII(
+        features::debug::kContextMemoryServiceBaseUrlSwitch));
+  }
+  return GURL(kContextMemoryServiceBaseUrl);
+}
 
 // The maximum number of parallel `FetchContext()` calls allowed for the
 // `feature`. Must be at least 1.
@@ -59,7 +77,8 @@ PersonalContextManager::PersonalContextManager(
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
     signin::IdentityManager* identity_manager)
     : url_loader_factory_(std::move(url_loader_factory)),
-      identity_manager_(identity_manager) {}
+      identity_manager_(identity_manager),
+      memory_service_url_(GetContextMemoryServiceBaseUrl()) {}
 
 PersonalContextManager::~PersonalContextManager() = default;
 
@@ -88,8 +107,8 @@ void PersonalContextManager::FetchContext(
   }
 
   FetcherId fetcher_id = next_fetcher_id_++;
-  auto fetcher = std::make_unique<PersonalContextFetcher>(identity_manager_,
-                                                          url_loader_factory_);
+  auto fetcher = std::make_unique<PersonalContextFetcher>(
+      identity_manager_, url_loader_factory_, memory_service_url_);
 
   auto fetcher_it =
       fetchers_for_feature.emplace(fetcher_id, std::move(fetcher));
@@ -142,8 +161,8 @@ void PersonalContextManager::FetchPiiEntities(
   }
 
   FetcherId fetcher_id = next_fetcher_id_++;
-  auto fetcher = std::make_unique<PersonalContextFetcher>(identity_manager_,
-                                                          url_loader_factory_);
+  auto fetcher = std::make_unique<PersonalContextFetcher>(
+      identity_manager_, url_loader_factory_, memory_service_url_);
 
   auto fetcher_it =
       fetchers_for_feature.emplace(fetcher_id, std::move(fetcher));
