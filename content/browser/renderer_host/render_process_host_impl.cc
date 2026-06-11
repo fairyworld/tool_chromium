@@ -2621,7 +2621,7 @@ void RenderProcessHostImpl::SetVideoDecoderFactoryCreationCBForTesting(
 
 void RenderProcessHostImpl::SetVideoDecoderEventCBForTesting(
     VideoDecoderEventCB callback) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   GetVideoDecoderEventCB() = callback;
 }
 #endif  // BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
@@ -2722,7 +2722,7 @@ RenderProcessHostImpl::GetInfoForBrowserContextDestructionCrashReporting() {
 
 #if BUILDFLAG(CLANG_PROFILING_INSIDE_SANDBOX)
 void RenderProcessHostImpl::DumpProfilingData(base::OnceClosure callback) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   GetRendererInterface()->WriteClangProfilingProfile(std::move(callback));
 }
 #endif
@@ -2752,7 +2752,7 @@ void RenderProcessHostImpl::WriteIntoTrace(
 
 void RenderProcessHostImpl::CreateEmbeddedFrameSinkProvider(
     mojo::PendingReceiver<blink::mojom::EmbeddedFrameSinkProvider> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   if (!embedded_frame_sink_provider_) {
     // The client id gets converted to a uint32_t in FrameSinkId.
     uint32_t renderer_client_id =
@@ -2772,7 +2772,7 @@ void RenderProcessHostImpl::BindCompositingModeReporter(
 
 void RenderProcessHostImpl::CreateDomStorageProvider(
     mojo::PendingReceiver<blink::mojom::DomStorageProvider> receiver) {
-  DCHECK(!dom_storage_provider_receiver_.is_bound());
+  CHECK(!dom_storage_provider_receiver_.is_bound(), base::NotFatalUntil::M152);
   dom_storage_provider_receiver_.Bind(std::move(receiver));
 }
 
@@ -2800,7 +2800,7 @@ void RenderProcessHostImpl::CreateOneShotSyncService(
     const url::Origin& origin,
     mojo::PendingReceiver<blink::mojom::OneShotBackgroundSyncService>
         receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   storage_partition_impl_->GetBackgroundSyncContext()->CreateOneShotSyncService(
       origin, this, std::move(receiver));
 }
@@ -2809,14 +2809,14 @@ void RenderProcessHostImpl::CreatePeriodicSyncService(
     const url::Origin& origin,
     mojo::PendingReceiver<blink::mojom::PeriodicBackgroundSyncService>
         receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   storage_partition_impl_->GetBackgroundSyncContext()
       ->CreatePeriodicSyncService(origin, this, std::move(receiver));
 }
 
 void RenderProcessHostImpl::BindPushMessaging(
     mojo::PendingReceiver<blink::mojom::PushMessaging> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   push_messaging_manager_->AddPushMessagingReceiver(std::move(receiver));
 }
 
@@ -2943,12 +2943,13 @@ base::Process::Priority RenderProcessHostImpl::GetPriority() const {
 }
 
 void RenderProcessHostImpl::IncrementKeepAliveRefCount(uint64_t handle_id) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   CHECK(!are_ref_counts_disabled_);
   CHECK(!deleting_soon_);
   CHECK(IsKeepAliveRefCountAllowed());
   ++keep_alive_ref_count_;
-  DCHECK(!keep_alive_start_times_.contains(handle_id));
+  CHECK(!keep_alive_start_times_.contains(handle_id),
+        base::NotFatalUntil::M152);
   keep_alive_start_times_[handle_id] = base::Time::Now();
 }
 
@@ -2962,7 +2963,7 @@ bool RenderProcessHostImpl::AreAllRefCountsZero() {
 }
 
 void RenderProcessHostImpl::DecrementKeepAliveRefCount(uint64_t handle_id) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   CHECK(!are_ref_counts_disabled_);
   CHECK(IsKeepAliveRefCountAllowed());
   CHECK_GT(keep_alive_ref_count_, 0);
