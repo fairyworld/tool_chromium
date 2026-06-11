@@ -2,23 +2,22 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-package org.chromium.chrome.browser.autofill.bottom_sheet_utils;
+package org.chromium.components.browser_ui.bottomsheet;
 
 import static org.chromium.components.browser_ui.bottomsheet.BottomSheetController.SheetState.HALF;
 
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.chromium.build.annotations.NullMarked;
-import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
 
-/** Listener for scroll events of the recycler view holding addresses and credit cards. */
+/** Listener for scroll events of the recycler view inside a bottom sheet. */
 @NullMarked
-public class DetailScreenScrollListener extends RecyclerView.OnScrollListener {
+public class BottomSheetRecyclerScrollListener extends RecyclerView.OnScrollListener {
     private final BottomSheetController mBottomSheetController;
 
     private int mY;
 
-    public DetailScreenScrollListener(BottomSheetController bottomSheetController) {
+    public BottomSheetRecyclerScrollListener(BottomSheetController bottomSheetController) {
         mBottomSheetController = bottomSheetController;
     }
 

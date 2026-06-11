@@ -2,13 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-package org.chromium.chrome.browser.touch_to_fill.common;
+package org.chromium.components.browser_ui.bottomsheet;
 
 import static org.chromium.build.NullUtil.assumeNonNull;
+import static org.chromium.components.browser_ui.widget.R.drawable.card_with_corners_background;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.RippleDrawable;
+import android.util.TypedValue;
 import android.view.View;
 
 import androidx.annotation.DrawableRes;
@@ -17,11 +21,29 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
+import org.chromium.components.browser_ui.styles.R;
+import org.chromium.components.browser_ui.styles.SemanticColorUtils;
 
-/** This is an item decorator for lists of items displayed in Touch to Fill BottomSheets. */
+/** This is an item decorator for lists of items displayed in BottomSheets. */
 @NullMarked
 public abstract class ItemDividerBase extends RecyclerView.ItemDecoration {
     protected final Context mContext;
+
+    protected @DrawableRes int getRoundedAllDrawableId() {
+        return card_with_corners_background;
+    }
+
+    protected @DrawableRes int getRoundedUpDrawableId() {
+        return R.drawable.list_item_background_top;
+    }
+
+    protected @DrawableRes int getRoundedDownDrawableId() {
+        return R.drawable.list_item_background_bottom;
+    }
+
+    protected @DrawableRes int getMiddleDrawableId() {
+        return R.drawable.list_item_background_middle;
+    }
 
     private void loadBackgroundDrawable(@Nullable View view, @DrawableRes int backgroundId) {
         if (view == null) {
@@ -30,7 +52,13 @@ public abstract class ItemDividerBase extends RecyclerView.ItemDecoration {
         }
         GradientDrawable background =
                 (GradientDrawable) AppCompatResources.getDrawable(mContext, backgroundId);
-        TouchToFillUtil.addColorAndRippleToBackground(view, background, mContext);
+        TypedValue themeRes = new TypedValue();
+        mContext.getTheme().resolveAttribute(android.R.attr.colorControlHighlight, themeRes, true);
+        RippleDrawable rippleDrawable =
+                new RippleDrawable(ColorStateList.valueOf(themeRes.data), background, null);
+        view.setBackground(rippleDrawable);
+        view.setBackgroundTintList(
+                ColorStateList.valueOf(SemanticColorUtils.getColorSurfaceContainerLow(mContext)));
     }
 
     /**
@@ -50,8 +78,6 @@ public abstract class ItemDividerBase extends RecyclerView.ItemDecoration {
                 && shouldSkipItemType(parent.getAdapter().getItemViewType(firstItem))) {
             ++firstItem;
         }
-        // Find the last item to decorate by skipping items like footer, fill button, additional
-        // info, etc.
         while (firstItem <= lastItem
                 && shouldSkipItemType(parent.getAdapter().getItemViewType(lastItem))) {
             --lastItem;
@@ -62,21 +88,13 @@ public abstract class ItemDividerBase extends RecyclerView.ItemDecoration {
         }
         if (firstItem == lastItem) {
             // There's only 1 item to decorate - round all corners.
-            loadBackgroundDrawable(
-                    parent.getChildAt(firstItem),
-                    R.drawable.touch_to_fill_credential_background_modern_rounded_all);
+            loadBackgroundDrawable(parent.getChildAt(firstItem), getRoundedAllDrawableId());
             return;
         }
-        loadBackgroundDrawable(
-                parent.getChildAt(firstItem),
-                R.drawable.touch_to_fill_credential_background_modern_rounded_up);
-        loadBackgroundDrawable(
-                parent.getChildAt(lastItem),
-                R.drawable.touch_to_fill_credential_background_modern_rounded_down);
+        loadBackgroundDrawable(parent.getChildAt(firstItem), getRoundedUpDrawableId());
+        loadBackgroundDrawable(parent.getChildAt(lastItem), getRoundedDownDrawableId());
         for (int viewPosition = firstItem + 1; viewPosition < lastItem; viewPosition++) {
-            loadBackgroundDrawable(
-                    parent.getChildAt(viewPosition),
-                    R.drawable.touch_to_fill_credential_background_modern);
+            loadBackgroundDrawable(parent.getChildAt(viewPosition), getMiddleDrawableId());
         }
     }
 

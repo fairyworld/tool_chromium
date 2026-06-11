@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-package org.chromium.chrome.browser.touch_to_fill.common;
+package org.chromium.components.browser_ui.bottomsheet;
 
 import static org.chromium.build.NullUtil.assertNonNull;
 import static org.chromium.build.NullUtil.assumeNonNull;
@@ -22,33 +22,27 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.chromium.base.Callback;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
-import org.chromium.chrome.browser.autofill.bottom_sheet_utils.DetailScreenScrollListener;
-import org.chromium.components.browser_ui.bottomsheet.BottomSheetContent;
-import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetController.SheetState;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetController.StateChangeReason;
-import org.chromium.components.browser_ui.bottomsheet.BottomSheetObserver;
-import org.chromium.components.browser_ui.bottomsheet.EmptyBottomSheetObserver;
 import org.chromium.ui.accessibility.AccessibilityState;
 import org.chromium.ui.base.LocalizationUtils;
 import org.chromium.ui.base.ViewUtils;
 
 import java.util.Set;
 
-/** This is a base class for the Touch to Fill View classes. */
+/** A generic base class for list-based bottom sheets. */
 @NullMarked
-public abstract class TouchToFillViewBase implements BottomSheetContent {
-    public static final int MAX_FULLY_VISIBLE_SUGGESTION_COUNT = 3;
+public abstract class BottomSheetListViewBase implements BottomSheetContent {
+    public static final int MAX_FULLY_VISIBLE_LIST_ITEM_COUNT = 3;
 
     private final BottomSheetController mBottomSheetController;
     private final RelativeLayout mContentView;
-    private final DetailScreenScrollListener mScrollListener;
+    private final BottomSheetRecyclerScrollListener mScrollListener;
     private final boolean mSuppressCollectionA11y;
     private @Nullable Callback<Integer> mDismissHandler;
     // Current scrollable surface on the screen that is updated whenever the user navigates between
-    // the screens in the bottom sheets. For example, loyalty cards are displayed on 2 screens in
-    // the bottom sheet. The home screen displays only affiliated loyalty cards and the second
-    // screen displays all loyalty cards of a user.
+    // the screens in the bottom sheets. For example, if the bottom sheet has multiple screens
+    // (e.g. main and detail screens).
     private @Nullable RecyclerView mSheetItemListView;
 
     private final BottomSheetObserver mBottomSheetObserver =
@@ -56,7 +50,7 @@ public abstract class TouchToFillViewBase implements BottomSheetContent {
                 @Override
                 public void onSheetClosed(@BottomSheetController.StateChangeReason int reason) {
                     if (mBottomSheetController.getCurrentSheetContent()
-                            != TouchToFillViewBase.this) {
+                            != BottomSheetListViewBase.this) {
                         return;
                     }
                     super.onSheetClosed(reason);
@@ -69,7 +63,7 @@ public abstract class TouchToFillViewBase implements BottomSheetContent {
                 public void onSheetStateChanged(
                         @SheetState int newState, @StateChangeReason int reason) {
                     if (mBottomSheetController.getCurrentSheetContent()
-                            != TouchToFillViewBase.this) {
+                            != BottomSheetListViewBase.this) {
                         return;
                     }
                     super.onSheetStateChanged(newState, reason);
@@ -115,18 +109,20 @@ public abstract class TouchToFillViewBase implements BottomSheetContent {
 
     /**
      * Used as a helper to measure the size of the sheet content.
+     *
      * @return the side margin of the content view.
      */
     protected abstract @Px int getSideMarginPx();
 
     /**
-     * Used as a helper for the suggestion list height calculation.
-     * @return the item types of the suggestions in the list on the {@link BottomSheet}.
+     * Used as a helper for the list item height calculation.
+     *
+     * @return the item types of the list items on the {@link BottomSheet}.
      */
     protected abstract Set<Integer> listedItemTypes();
 
     /**
-     * Used as a helper for the suggestion list height calculation.
+     * Used as a helper for the list item height calculation.
      *
      * @return the item types of the footer on the {@link BottomSheet}.
      */
@@ -140,7 +136,7 @@ public abstract class TouchToFillViewBase implements BottomSheetContent {
      *     it to `true` implies that the item content description is updated accordingly for items
      *     that are eligible for indexing from the UI perspective.
      */
-    public TouchToFillViewBase(
+    public BottomSheetListViewBase(
             BottomSheetController bottomSheetController,
             RelativeLayout contentView,
             Boolean suppressCollectionA11y) {
@@ -148,7 +144,7 @@ public abstract class TouchToFillViewBase implements BottomSheetContent {
         mContentView = contentView;
         mContentView.setOnGenericMotionListener((v, e) -> true); // Filter background interaction.
 
-        mScrollListener = new DetailScreenScrollListener(mBottomSheetController);
+        mScrollListener = new BottomSheetRecyclerScrollListener(mBottomSheetController);
         mSuppressCollectionA11y = suppressCollectionA11y;
 
         // Apply RTL layout changes.
@@ -222,7 +218,7 @@ public abstract class TouchToFillViewBase implements BottomSheetContent {
 
     /**
      * Returns the height of the full state. Must show the footer items permanently. For up to four
-     * suggestions, the sheet usually cannot fill the screen.
+     * list items, the sheet usually cannot fill the screen.
      *
      * @return the full state height in pixels. Never 0. Can theoretically exceed the screen height.
      */
@@ -236,14 +232,14 @@ public abstract class TouchToFillViewBase implements BottomSheetContent {
             return requiredMaxHeight;
         }
         remeasure();
-        ViewUtils.requestLayout(mContentView, "TouchToFillView.getMaximumSheetHeightPx");
+        ViewUtils.requestLayout(mContentView, "BottomSheetListViewBase.getMaximumSheetHeightPx");
         return getHeightWhenFullyExtendedPx();
     }
 
     /**
-     * Returns the height of the half state. Does not show the footer items. For 1 suggestion (plus
-     * fill button), 2 or 3 suggestions, it shows all items fully. For 4+ suggestions, it shows the
-     * first 3.5 suggestion to encourage scrolling.
+     * Returns the height of the half state. Does not show the footer items. For 1 list item (plus
+     * action button), 2 or 3 list items, it shows all items fully. For 4+ list items, it shows the
+     * first 3.5 list items to encourage scrolling.
      *
      * @return the half state height in pixels. Never 0. Can theoretically exceed the screen height.
      */
@@ -276,13 +272,13 @@ public abstract class TouchToFillViewBase implements BottomSheetContent {
         for (int posInSheet = 0; posInSheet < mSheetItemListView.getChildCount(); posInSheet++) {
             View child = mSheetItemListView.getChildAt(posInSheet);
             if (isListedItem(child)) {
-                // Counting how many clickable suggestions are displayed.
+                // Counting how many clickable list items are displayed.
                 visibleItems++;
             } else if (showOnlyInitialItems && isFooterItem(child)) {
                 // If we want to show only the initial items, the footer should remain hidden.
                 return totalHeight + getConclusiveMarginHeightPx();
             }
-            if (showOnlyInitialItems && visibleItems > MAX_FULLY_VISIBLE_SUGGESTION_COUNT) {
+            if (showOnlyInitialItems && visibleItems > MAX_FULLY_VISIBLE_LIST_ITEM_COUNT) {
                 // If the current item is the last to be shown, skip remaining elements and margins.
                 totalHeight += getHeightWithMarginsPx(child, true);
                 return totalHeight;

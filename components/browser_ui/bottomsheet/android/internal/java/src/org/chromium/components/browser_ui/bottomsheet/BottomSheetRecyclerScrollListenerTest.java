@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-package org.chromium.chrome.browser.autofill.bottom_sheet_utils;
+package org.chromium.components.browser_ui.bottomsheet;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -27,25 +27,24 @@ import org.robolectric.annotation.Config;
 
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.base.test.util.Batch;
-import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetController.SheetState;
 
-/** Robolectric unit tests for {@link DetailScreenScrollListener}. */
+/** Robolectric unit tests for {@link BottomSheetRecyclerScrollListener}. */
 @RunWith(BaseRobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
 @Batch(Batch.PER_CLASS)
-public class DetailScreenScrollListenerTest {
+public class BottomSheetRecyclerScrollListenerTest {
     @Rule public MockitoRule mMockitoRule = MockitoJUnit.rule();
 
     @Mock private BottomSheetController mMockBottomSheetController;
 
-    private DetailScreenScrollListener mScrollListener;
+    private BottomSheetRecyclerScrollListener mScrollListener;
     private Context mContext;
 
     @Before
     public void setUp() {
         mContext = Robolectric.setupActivity(Activity.class);
-        mScrollListener = new DetailScreenScrollListener(mMockBottomSheetController);
+        mScrollListener = new BottomSheetRecyclerScrollListener(mMockBottomSheetController);
     }
 
     /** Creates a test RecyclerView with deterministic scroll offset. */
@@ -68,7 +67,9 @@ public class DetailScreenScrollListenerTest {
         assertTrue(mScrollListener.isScrolledToTop());
     }
 
-    /** Tests that {@link DetailScreenScrollListener#reset} returns to scrolled-to-top state. */
+    /**
+     * Tests that {@link BottomSheetRecyclerScrollListener#reset} returns to scrolled-to-top state.
+     */
     @Test
     @SmallTest
     public void testReset() {
