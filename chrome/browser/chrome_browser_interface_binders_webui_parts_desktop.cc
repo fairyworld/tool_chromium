@@ -101,6 +101,7 @@
 #include "chrome/common/chrome_features.h"
 #include "components/accessibility_annotator/core/logging/accessibility_annotator_internals.mojom.h"
 #include "components/autofill/core/browser/ml_model/logging/autofill_ml_internals.mojom.h"
+#include "components/browser_apis/bookmarks/bookmarks_api.mojom.h"
 #include "components/browser_apis/browser_controls/browser_controls_api.mojom.h"
 #include "components/browser_apis/tab_drag/tab_drag_api.mojom.h"
 #include "components/browser_apis/ui_controllers/toolbar/toolbar_ui_api.mojom.h"
@@ -674,6 +675,7 @@ void PopulateChromeWebUIFrameInterfaceBrokersTrustedPartsDesktop(
     registry.ForWebUI<WebUIBrowserUI>()
         .Add<webui_browser::mojom::PageHandlerFactory>()
         .Add<bookmark_bar::mojom::PageHandlerFactory>()
+        .Add<bookmarks_api::mojom::BookmarksService>()
         .Add<extensions_bar::mojom::PageHandlerFactory>()
         .Add<searchbox::mojom::PageHandlerFactory>()
         .Add<tabs_api::mojom::TabDragService>()

@@ -35,6 +35,7 @@ source_set("webui_browser") {
     "//chrome/browser/ui/webui/cr_components/searchbox",
     "//chrome/browser/ui/webui/metrics_reporter",
     "//chrome/browser/ui/webui/webui_toolbar",
+    "//components/browser_apis/bookmarks",
     "//components/browser_apis/tab_drag:mojom",
     "//components/browser_apis/tab_strip:mojom_experiment",
     "//components/browser_apis/tab_strip:mojom_ui_controller",

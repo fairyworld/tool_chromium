@@ -34,6 +34,7 @@ class ActorBorderViewController;
 class ActorTaskListBubbleController;
 class BookmarkBarController;
 class BookmarksSidePanelCoordinator;
+class BookmarksServiceFeature;
 class BreadcrumbManagerBrowserAgent;
 class Browser;
 class BrowserActions;
@@ -297,6 +298,10 @@ class BrowserWindowFeatures {
 
   ImmersiveModeController* immersive_mode_controller() {
     return immersive_mode_controller_.get();
+  }
+
+  BookmarksServiceFeature* bookmarks_service_feature() {
+    return bookmarks_service_feature_.get();
   }
 
   media_router::CastBrowserController* cast_browser_controller() {
@@ -849,6 +854,8 @@ class BrowserWindowFeatures {
       browser_window_modal_dialog_delegate_;
 
   std::unique_ptr<WindowMetadataController> window_metadata_controller_;
+
+  std::unique_ptr<BookmarksServiceFeature> bookmarks_service_feature_;
 
   // Keep this member last to ensure embedder features are torn down first, in
   // reverse order of initialization.
