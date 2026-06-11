@@ -291,6 +291,27 @@ TEST_F(StreamingInputObserverTest, TranslateKeyDown) {
   EXPECT_FALSE(proto.ctrl_key_press());
 }
 
+TEST_F(StreamingInputObserverTest, TranslateKeyDownNonRaw) {
+  StreamingInputObserver observer(web_contents());
+
+  blink::WebKeyboardEvent key_event(
+      blink::WebInputEvent::Type::kKeyDown, blink::WebInputEvent::kShiftKey,
+      blink::WebInputEvent::GetStaticTimeStampForTests());
+  key_event.dom_code = static_cast<int>(ui::DomCode::US_A);
+  key_event.dom_key = ui::DomKey::FromCharacter('A');
+
+  std::optional<KeyboardEvent> opt_proto = HandleKeyEvent(observer, key_event);
+  ASSERT_TRUE(opt_proto.has_value());
+
+  const KeyboardEvent& proto = opt_proto.value();
+  EXPECT_EQ(proto.action_type(), KeyboardEvent::KEY_DOWN);
+  EXPECT_EQ(proto.key_code(), "KeyA");
+  EXPECT_EQ(proto.key_value(), "A");
+  EXPECT_FALSE(proto.repeat());
+  EXPECT_TRUE(proto.shift_key_press());
+  EXPECT_FALSE(proto.ctrl_key_press());
+}
+
 TEST_F(StreamingInputObserverTest, TranslateKeyUpWithRepeatAndCapsLock) {
   StreamingInputObserver observer(web_contents());
 
