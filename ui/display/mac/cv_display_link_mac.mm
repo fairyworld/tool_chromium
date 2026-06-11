@@ -277,10 +277,15 @@ base::TimeDelta CVDisplayLinkMac::GetRefreshInterval() const {
   if (!(cv_time.flags & kCVTimeIsIndefinite)) {
     double refresh_interval = (static_cast<double>(cv_time.timeValue) /
                                static_cast<double>(cv_time.timeScale));
-    return (base::Seconds(1) * refresh_interval);
-  } else {
-    return display::GetNSScreenRefreshInterval(display_id_);
+    base::TimeDelta interval = base::Seconds(1) * refresh_interval;
+
+    // A non-zero safeguard for the refresh interval.
+    if (interval.is_positive()) {
+      return interval;
+    }
   }
+
+  return display::GetNSScreenRefreshInterval(display_id_);
 }
 
 void CVDisplayLinkMac::GetRefreshIntervalRange(
