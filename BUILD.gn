@@ -678,9 +678,11 @@ group("gn_all") {
     if (is_mac || is_win || is_android || is_linux || is_chromeos) {
       deps += [
         "//third_party/crashpad/crashpad:crashpad_tests",
-        "//third_party/crashpad/crashpad/handler:crashpad_handler",
         "//third_party/crashpad/crashpad/tools:crashpad_database_util",
       ]
+      if (!is_android) {
+        deps += [ "//third_party/crashpad/crashpad/handler:crashpad_handler" ]
+      }
     }
 
     if (enable_message_center) {

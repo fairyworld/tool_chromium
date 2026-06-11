@@ -1685,6 +1685,8 @@ if (is_android) {
         "${target_gen_dir}/android_browsertests_manifest/AndroidManifest.xml"
     android_manifest_dep = ":android_browsertests_manifest"
 
+    loadable_modules = [ "$root_out_dir/libcrashpad_handler_trampoline.so" ]
+
     if (!is_java_debug) {
       proguard_enabled = true
       proguard_configs = [ "//chrome/android/proguard/main.flags" ]
@@ -1852,7 +1854,6 @@ if (is_android) {
       "//components/commerce/core:feature_list",
       "//components/commerce/core:persisted_state_db_content_proto",
       "//components/content_settings/browser",
-      "//components/crash/android:crashpad_main",
       "//components/device_signals/core/browser",
       "//components/enterprise",
       "//components/enterprise:test_support",
@@ -1937,6 +1938,7 @@ if (is_android) {
       "//components/webui/chrome_urls",
       "//content/test:android_test_message_pump_support",
       "//testing/android/native_test:native_test_support",
+      "//third_party/crashpad/crashpad/handler:crashpad_handler_trampoline",
       "//third_party/federated_compute:confidential_compute",
       "//third_party/federated_compute:confidential_compute_crypto_test_util",
     ]
@@ -2209,7 +2211,6 @@ if (is_android) {
       "//chrome/android:base_module_java",
       "//chrome/android:chrome_all_java",
       "//chrome/browser/tabmodel:java",
-      "//components/crash/android:handler_java",
       "//components/crash/android:java",
       "//components/module_installer/android:module_installer_java",
       "//content/public/android:content_java",

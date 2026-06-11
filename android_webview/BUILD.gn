@@ -619,7 +619,6 @@ if (_is_default_toolchain) {
       "//components/autofill/android:autofill_java",
       "//components/background_task_scheduler:background_task_scheduler_task_ids_java",
       "//components/content_capture/android:java",
-      "//components/crash/android:handler_java",
       "//components/crash/android:java",
       "//components/embedder_support/android:application_java",
       "//components/embedder_support/android:context_menu_java",
