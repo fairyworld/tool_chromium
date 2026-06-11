@@ -131,7 +131,7 @@ void ReportUploader::Upload() {
                                       weak_ptr_factory_.GetWeakPtr());
 
   switch (config_.report_type) {
-    case ReportType::kFull:
+    case ReportType::kBrowser:
     case ReportType::kBrowserVersion: {
       auto request = std::make_unique<ReportRequest::DeviceReportRequestProto>(
           requests_.front()->GetDeviceReportRequest());

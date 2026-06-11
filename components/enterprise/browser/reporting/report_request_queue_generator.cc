@@ -116,7 +116,7 @@ void ReportRequestQueueGenerator::GenerateProfileReportWithIndex(
                            .browser_report()
                            .chrome_user_profile_infos(profile_index);
   profile_report_generator_.MaybeGenerate(
-      base::FilePath::FromUTF8Unsafe(basic_profile.id()), ReportType::kFull,
+      base::FilePath::FromUTF8Unsafe(basic_profile.id()), ReportType::kBrowser,
       SecuritySignalsMode::kNoSignals,
       base::BindOnce(ToIndexedReportPair, profile_index)
           .Then(std::move(callback)));

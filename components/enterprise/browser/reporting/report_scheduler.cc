@@ -102,10 +102,10 @@ ReportScheduler::ReportScheduler(CreateParams params)
 
   if (report_generator_) {
     reporting_pref_name_ = std::string(kCloudReportingEnabled);
-    full_report_type_ = ReportType::kFull;
+    status_report_type_ = ReportType::kBrowser;
   } else {
     reporting_pref_name_ = std::string(kCloudProfileReportingEnabled);
-    full_report_type_ = ReportType::kProfileReport;
+    status_report_type_ = ReportType::kProfileReport;
   }
 
   require_policy_fetch_with_profile_id_ =
@@ -173,7 +173,7 @@ void ReportScheduler::OnDMTokenUpdated() {
   }
 }
 
-void ReportScheduler::UploadFullReport(base::OnceClosure on_report_uploaded) {
+void ReportScheduler::UploadReport(base::OnceClosure on_report_uploaded) {
   ReportTrigger trigger = kTriggerNone;
   if (IsReportingEnabled()) {
     trigger = kTriggerManual;
@@ -378,7 +378,7 @@ void ReportScheduler::OnReportGenerated(
     SYSLOG(ERROR)
         << "No cloud report can be generated. Likely the report is too large.";
     // Do not restart the periodic report timer, as it's likely that subsequent
-    // attempts to generate full reports would also fail.
+    // attempts to generate status reports would also fail.
     active_report_generation_config_ =
         ReportGenerationConfig(ReportTrigger::kTriggerNone);
     RunPendingTriggers();
@@ -485,8 +485,9 @@ void ReportScheduler::OnReportUploaded(ReportUploader::ReportStatus status) {
         SecuritySignalsMode::kNoSignals) {
       delegate_->OnSecuritySignalsUploaded();
 
-      // A full report includes security signals already, we don't need another
-      // security signals only report until the timer runs out again.
+      // A report with signals attached includes security signals already, we
+      // don't need another security signals only report until the timer runs
+      // out again.
       if (pending_triggers_ & ReportTrigger::kTriggerSecurity) {
         pending_triggers_ -= ReportTrigger::kTriggerSecurity;
       }
@@ -587,7 +588,7 @@ ReportType ReportScheduler::TriggerToReportType(ReportTrigger trigger) {
       NOTREACHED();
     case ReportTrigger::kTriggerTimer:
     case ReportTrigger::kTriggerManual:
-      return full_report_type_;
+      return status_report_type_;
     case ReportTrigger::kTriggerUpdate:
       return ReportType::kBrowserVersion;
     case ReportTrigger::kTriggerNewVersion:

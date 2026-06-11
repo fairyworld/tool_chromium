@@ -143,11 +143,11 @@ class ReportRequestQueueGeneratorTest : public ::testing::Test {
 #endif  // !BUILDFLAG(IS_ANDROID)
 
   std::unique_ptr<ReportRequest> GenerateBasicRequest() {
-    auto request = std::make_unique<ReportRequest>(ReportType::kFull);
+    auto request = std::make_unique<ReportRequest>(ReportType::kBrowser);
     base::RunLoop run_loop;
 
     browser_report_generator_.Generate(
-        ReportType::kFull,
+        ReportType::kBrowser,
         base::BindLambdaForTesting(
             [&run_loop, &request](std::unique_ptr<em::BrowserReport> report) {
               request->GetDeviceReportRequest().set_allocated_browser_report(

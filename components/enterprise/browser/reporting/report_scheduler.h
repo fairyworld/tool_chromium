@@ -118,7 +118,7 @@ class ReportScheduler {
 
   void OnDMTokenUpdated();
 
-  void UploadFullReport(base::OnceClosure on_report_uploaded);
+  void UploadReport(base::OnceClosure on_report_uploaded);
 
  private:
   // Observes CloudReportingEnabled policy.
@@ -198,7 +198,7 @@ class ReportScheduler {
   // pref is true.
   bool require_policy_fetch_with_profile_id_;
 
-  ReportType full_report_type_;
+  ReportType status_report_type_;
 
   std::vector<std::unique_ptr<ReportUploader>> report_uploaders_for_test_;
 

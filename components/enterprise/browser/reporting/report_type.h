@@ -8,7 +8,7 @@
 namespace enterprise_reporting {
 
 enum class ReportType {
-  kFull = 0,
+  kBrowser = 0,
   kBrowserVersion = 1,
   kProfileReport = 2,
 };
