@@ -30450,9 +30450,12 @@ should be able to be added at any place in this file.
   </description>
 </action>
 
-<action name="MobilePasswordCheckupInteractionIgnoredOnCooldown">
+<action name="MobilePasswordCheckupInteractionIgnoredDuringNavigation">
   <owner>vincb@google.com</owner>
-  <description>TODO(crbug.com/483963166): Write the description.</description>
+  <description>
+    Reported when a user interaction (tap) on the Password Checkup homepage is
+    ignored because a navigation is already in progress. iOS only.
+  </description>
 </action>
 
 <action name="MobilePasswordCheckupSettingsBack">
