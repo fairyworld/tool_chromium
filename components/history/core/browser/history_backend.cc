@@ -1026,10 +1026,13 @@ void HistoryBackend::AddPage(const HistoryAddPageArgs& request) {
       !ui::PageTransitionCoreTypeIs(request_transition,
                                     ui::PAGE_TRANSITION_TYPED) &&
       !is_keyword_generated) {
-    // Check both the start and end of a redirect chain, since the user will
-    // consider both to have been "navigated to".
-    if (IsUntypedIntranetHost(request.url) ||
-        (has_redirects && IsUntypedIntranetHost(request.redirects[0]))) {
+    // Check the start of the redirect chain (or the final URL if there are no
+    // redirects) to see if it is an intranet host. We only check the start of
+    // the redirect chain because the user typed/clicked it directly, so we
+    // want to avoid promoting other hosts (like localhost redirect targets)
+    // in the chain to TYPED.
+    if (IsUntypedIntranetHost(has_redirects ? request.redirects[0]
+                                            : request.url)) {
       request_transition = ui::PageTransitionFromInt(
           ui::PAGE_TRANSITION_TYPED |
           ui::PageTransitionGetQualifier(request_transition));

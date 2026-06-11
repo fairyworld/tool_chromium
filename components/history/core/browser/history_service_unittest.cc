@@ -129,8 +129,9 @@ class HistoryServiceTest : public testing::Test {
   }
 
   void TearDown() override {
-    if (history_service_)
+    if (history_service_) {
       CleanupHistoryService();
+    }
 
     // Make sure we don't have any event pending that could disrupt the next
     // test.
@@ -456,7 +457,7 @@ TEST_F(HistoryServiceTest, MakeIntranetURLsTyped) {
   EXPECT_TRUE(ui::PageTransitionCoreTypeIs(
       query_url_result_.visits[0].transition, ui::PAGE_TRANSITION_TYPED));
 
-  // As should one with an intranet URL at the tail.
+  // But a chain with an intranet URL at the tail should NOT be promoted.
   history::RedirectList redirects2 = {GURL("http://first2.com/"),
                                       GURL("http://second2.com/"),
                                       GURL("http://intranet2/path")};
@@ -469,9 +470,9 @@ TEST_F(HistoryServiceTest, MakeIntranetURLsTyped) {
   EXPECT_EQ(0, query_url_result_.row.typed_count());
   ASSERT_EQ(1U, query_url_result_.visits.size());
   EXPECT_TRUE(ui::PageTransitionCoreTypeIs(
-      query_url_result_.visits[0].transition, ui::PAGE_TRANSITION_TYPED));
+      query_url_result_.visits[0].transition, ui::PAGE_TRANSITION_LINK));
 
-  // But not one with an intranet URL in the middle.
+  // Nor one with an intranet URL in the middle.
   history::RedirectList redirects3 = {GURL("http://first3.com/"),
                                       GURL("http://intranet3/path"),
                                       GURL("http://third3.com/")};
