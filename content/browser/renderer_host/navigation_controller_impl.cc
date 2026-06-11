@@ -5651,7 +5651,8 @@ NavigationControllerImpl::GetNavigationApiHistoryEntryVectors(
     }
   } else if (GetLastCommittedEntryIndex() != -1 &&
              GetLastCommittedEntryIndex() >= backmost_index &&
-             GetLastCommittedEntryIndex() <= forwardmost_index) {
+             GetLastCommittedEntryIndex() <= forwardmost_index &&
+             !node->is_on_initial_empty_document()) {
     previous_entry = GetLastCommittedEntry()->GetFrameEntry(node);
   }
   if (previous_entry) {
