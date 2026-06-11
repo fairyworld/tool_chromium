@@ -2515,7 +2515,7 @@ void RenderWidgetHostViewAndroid::StartObservingRootWindow() {
 
 void RenderWidgetHostViewAndroid::StopObservingRootWindow() {
   if (!(view_.GetWindowAndroid())) {
-    DCHECK(!observing_root_window_);
+    CHECK(!observing_root_window_, base::NotFatalUntil::M152);
     return;
   }
 
@@ -2986,8 +2986,9 @@ void RenderWidgetHostViewAndroid::UpdateNativeViewTree(
   bool has_view_tree = view_.parent() != nullptr;
 
   // Allows same parent view to be set again.
-  DCHECK(!will_build_tree || !has_view_tree ||
-         parent_native_view == view_.parent());
+  CHECK(!will_build_tree || !has_view_tree ||
+            parent_native_view == view_.parent(),
+        base::NotFatalUntil::M152);
 
   StopObservingRootWindow();
 
@@ -3198,7 +3199,7 @@ void RenderWidgetHostViewAndroid::OnRootWindowVisibilityChanged(bool visible) {
   TRACE_EVENT1("browser",
                "RenderWidgetHostViewAndroid::OnRootWindowVisibilityChanged",
                "visible", visible);
-  DCHECK(observing_root_window_);
+  CHECK(observing_root_window_, base::NotFatalUntil::M152);
 
   // Don't early out if visibility hasn't changed and visible. This is necessary
   // as OnDetachedFromWindow() sets |is_window_visible_| to true, so that this
@@ -3219,7 +3220,7 @@ void RenderWidgetHostViewAndroid::OnAttachedToWindow() {
   if (VisibilityNeedsDrawing()) {
     StartObservingRootWindow();
   }
-  DCHECK(view_.GetWindowAndroid());
+  CHECK(view_.GetWindowAndroid(), base::NotFatalUntil::M152);
   if (view_.GetWindowAndroid()->GetCompositor())
     OnAttachCompositor();
 }
@@ -3233,7 +3234,7 @@ void RenderWidgetHostViewAndroid::OnDetachedFromWindow() {
 }
 
 void RenderWidgetHostViewAndroid::OnAttachCompositor() {
-  DCHECK(view_.parent());
+  CHECK(view_.parent(), base::NotFatalUntil::M152);
   CreateOverscrollControllerIfPossible();
   if (observing_root_window_ && using_browser_compositor_) {
     ui::WindowAndroidCompositor* compositor =
@@ -3243,7 +3244,7 @@ void RenderWidgetHostViewAndroid::OnAttachCompositor() {
 }
 
 void RenderWidgetHostViewAndroid::OnDetachCompositor() {
-  DCHECK(view_.parent());
+  CHECK(view_.parent(), base::NotFatalUntil::M152);
   overscroll_controller_.reset();
   if (using_browser_compositor_)
     delegated_frame_host_->DetachFromCompositor();
@@ -3257,14 +3258,14 @@ void RenderWidgetHostViewAndroid::OnAnimate(base::TimeTicks begin_frame_time) {
 
 void RenderWidgetHostViewAndroid::OnActivityStopped() {
   TRACE_EVENT0("browser", "RenderWidgetHostViewAndroid::OnActivityStopped");
-  DCHECK(observing_root_window_);
+  CHECK(observing_root_window_, base::NotFatalUntil::M152);
   is_window_activity_started_ = false;
   UpdateVisibility();
 }
 
 void RenderWidgetHostViewAndroid::OnActivityStarted() {
   TRACE_EVENT0("browser", "RenderWidgetHostViewAndroid::OnActivityStarted");
-  DCHECK(observing_root_window_);
+  CHECK(observing_root_window_, base::NotFatalUntil::M152);
   is_window_activity_started_ = true;
   UpdateVisibility();
 }
@@ -3379,8 +3380,9 @@ void RenderWidgetHostViewAndroid::SetOverscrollControllerForTesting(
 
 void RenderWidgetHostViewAndroid::TakeFallbackContentFrom(
     RenderWidgetHostView* view) {
-  DCHECK(!static_cast<RenderWidgetHostViewBase*>(view)
-              ->IsRenderWidgetHostViewChildFrame());
+  CHECK(!static_cast<RenderWidgetHostViewBase*>(view)
+             ->IsRenderWidgetHostViewChildFrame(),
+        base::NotFatalUntil::M152);
   CopyBackgroundColorIfPresentFrom(*view);
 
   RenderWidgetHostViewAndroid* view_android =
@@ -3867,7 +3869,7 @@ void RenderWidgetHostViewAndroid::EndRotationBatching() {
   // OnPhysicalBackingSizeChanged which would re-trigger rotation if we were
   // still tracking `fullscreen_rotation_`. crbug.com/1302964
   fullscreen_rotation_ = false;
-  DCHECK(!rotation_metrics_.empty());
+  CHECK(!rotation_metrics_.empty(), base::NotFatalUntil::M152);
   TRACE_EVENT_END(
       "viz", /* RenderWidgetHostViewAndroid::RotationBegin */
       perfetto::NamedTrack("RenderWidgetHostViewAndroid",
