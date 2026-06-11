@@ -432,6 +432,24 @@ TEST_F(BrowserViewTest, FindBrowserWindowWithWebContentsTabSwitch) {
       BrowserWindow::FindBrowserWindowWithWebContents(new_active_contents));
 }
 
+// Tests that BrowserWindow::FromBrowser() resolves to the same BrowserWindow as
+// Browser::window(), and handles edge cases.
+TEST_F(BrowserViewTest, FromBrowser) {
+  // For a fully-constructed BrowserView-backed Browser the result must be
+  // identical to the legacy Browser::window() getter.
+  EXPECT_EQ(browser()->window(),  // nocheck
+            BrowserWindow::FromBrowser(browser()));
+  // The result must also match the BrowserView-specific lookup.
+  EXPECT_EQ(browser_view(), BrowserWindow::FromBrowser(browser()));
+
+  // Null input is tolerated and yields null output, mirroring the behavior
+  // callers previously got from a defensive `browser ? browser->window() :
+  // nullptr` pattern. Cast disambiguates between the const/non-const
+  // overloads.
+  EXPECT_EQ(nullptr, BrowserWindow::FromBrowser(
+                         static_cast<BrowserWindowInterface*>(nullptr)));
+}
+
 // On macOS, most accelerators are handled by CommandDispatcher.
 #if !BUILDFLAG(IS_MAC)
 // Test that repeated accelerators are processed or ignored depending on the

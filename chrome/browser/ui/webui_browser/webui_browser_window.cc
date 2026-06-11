@@ -236,8 +236,8 @@ WebUIBrowserWindow* WebUIBrowserWindow::FromWebShellWebContents(
 }
 
 // static
-WebUIBrowserWindow* WebUIBrowserWindow::FromBrowser(
-    BrowserWindowInterface* browser) {
+const WebUIBrowserWindow* WebUIBrowserWindow::FromBrowser(
+    const BrowserWindowInterface* browser) {
   // This function is implemented based on
   // BrowserView::GetBrowserViewForBrowser(). Please see the comments in that
   // function for the implementation rationale.
@@ -245,6 +245,16 @@ WebUIBrowserWindow* WebUIBrowserWindow::FromBrowser(
     return nullptr;
   }
   return FromNativeWindow(browser->GetWindow()->GetNativeWindow());
+}
+
+// static
+WebUIBrowserWindow* WebUIBrowserWindow::FromBrowser(
+    BrowserWindowInterface* browser) {
+  // Implement the non-const overload in terms of the const one and cast the
+  // constness back off. Safe because the caller supplied a non-const browser.
+  // See //styleguide/c++/const.md#classes-of-const-in_correctness.
+  return const_cast<WebUIBrowserWindow*>(
+      FromBrowser(static_cast<const BrowserWindowInterface*>(browser)));
 }
 
 // static
