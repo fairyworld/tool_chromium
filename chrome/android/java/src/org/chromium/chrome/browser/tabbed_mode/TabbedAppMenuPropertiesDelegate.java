@@ -62,6 +62,7 @@ import org.chromium.chrome.browser.layouts.LayoutStateProvider;
 import org.chromium.chrome.browser.multiwindow.MultiInstanceManager.PersistedInstanceType;
 import org.chromium.chrome.browser.multiwindow.MultiWindowModeStateDispatcher;
 import org.chromium.chrome.browser.multiwindow.MultiWindowUtils;
+import org.chromium.chrome.browser.ntp.RecentlyClosedBulkEvent;
 import org.chromium.chrome.browser.ntp.RecentlyClosedEntry;
 import org.chromium.chrome.browser.ntp.RecentlyClosedGroup;
 import org.chromium.chrome.browser.ntp.RecentlyClosedTab;
@@ -1099,18 +1100,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
             }
 
             if (entry instanceof RecentlyClosedTab tab) {
-                items.add(
-                        buildRecentEntryMenuItem(
-                                entry,
-                                TitleUtil.getTitleForDisplay(tab.getTitle(), tab.getUrl()),
-                                createIconSupplierForTab(
-                                        tab.getUrl(),
-                                        tab.getTabGroupId(),
-                                        // Recently closed tabs are not tracked for incognito.
-                                        /* isOffTheRecord= */ false,
-                                        // No live Tab object is available to get a cached favicon.
-                                        /* cachedFavicon= */ null,
-                                        /* fallbackToHost= */ false)));
+                items.add(buildRecentTabMenuItem(tab));
                 count++;
             } else if (entry instanceof RecentlyClosedWindow window) {
                 items.add(buildClosedWindowMenuItem(window));
@@ -1119,9 +1109,15 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
             } else if (entry instanceof RecentlyClosedGroup group) {
                 items.add(buildClosedGroupMenuItem(group));
                 count++;
+            } else if (entry instanceof RecentlyClosedBulkEvent bulkEvent) {
+                for (RecentlyClosedTab tab : bulkEvent.getTabs()) {
+                    if (count >= MAX_RECENT_ENTRIES_TO_SHOW) {
+                        break;
+                    }
+                    items.add(buildRecentTabMenuItem(tab));
+                    count++;
+                }
             }
-
-            // TODO(crbug.com/509065810): Support other bulk closures.
         }
         return items;
     }
@@ -1298,20 +1294,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                     AppMenuHandler.AppMenuItemType.DIVIDER,
                                     buildModelForDivider(R.id.divider_line_id)));
                     for (RecentlyClosedTab tab : tabs) {
-                        LazyOneshotSupplier<Drawable> iconSupplier =
-                                createIconSupplierForTab(
-                                        tab.getUrl(),
-                                        tab.getTabGroupId(),
-                                        // Recently closed tabs are not tracked for incognito.
-                                        /* isOffTheRecord= */ false,
-                                        // No live Tab object is available to get a cached favicon.
-                                        /* cachedFavicon= */ null,
-                                        /* fallbackToHost= */ false);
-                        submenuItems.add(
-                                buildRecentEntryMenuItem(
-                                        tab,
-                                        TitleUtil.getTitleForDisplay(tab.getTitle(), tab.getUrl()),
-                                        iconSupplier));
+                        submenuItems.add(buildRecentTabMenuItem(tab));
                     }
                     return submenuItems;
                 };
@@ -1343,6 +1326,20 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                         mContext, R.drawable.ic_open_in_new_24dp))
                         .build();
         return new ListItem(AppMenuHandler.AppMenuItemType.RECENT_ENTRY, model);
+    }
+
+    private ListItem buildRecentTabMenuItem(RecentlyClosedTab tab) {
+        return buildRecentEntryMenuItem(
+                tab,
+                TitleUtil.getTitleForDisplay(tab.getTitle(), tab.getUrl()),
+                createIconSupplierForTab(
+                        tab.getUrl(),
+                        tab.getTabGroupId(),
+                        // Recently closed tabs are not tracked for incognito.
+                        /* isOffTheRecord= */ false,
+                        // No live Tab object is available to get a cached favicon.
+                        /* cachedFavicon= */ null,
+                        /* fallbackToHost= */ false));
     }
 
     private ListItem buildRecentEntryMenuItem(

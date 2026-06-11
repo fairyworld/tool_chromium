@@ -101,6 +101,7 @@ import org.chromium.chrome.browser.layouts.LayoutType;
 import org.chromium.chrome.browser.multiwindow.MultiWindowModeStateDispatcher;
 import org.chromium.chrome.browser.multiwindow.MultiWindowTestUtils;
 import org.chromium.chrome.browser.multiwindow.MultiWindowUtils;
+import org.chromium.chrome.browser.ntp.RecentlyClosedBulkEvent;
 import org.chromium.chrome.browser.ntp.RecentlyClosedEntry;
 import org.chromium.chrome.browser.ntp.RecentlyClosedGroup;
 import org.chromium.chrome.browser.ntp.RecentlyClosedTab;
@@ -4502,6 +4503,78 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         ListItem restoreItem = windowSubmenu.get(0);
         assertEquals(
                 closedWindow, restoreItem.model.get(AppMenuRecentEntryItemProperties.RECENT_ENTRY));
+    }
+
+    @Test
+    public void testHistorySubmenu_WithRecentlyClosedBulkEvent() {
+        setUpMocksForPageMenu();
+
+        List<RecentlyClosedEntry> entries = new ArrayList<>();
+        RecentlyClosedBulkEvent bulkEvent = new RecentlyClosedBulkEvent(100, 0);
+        RecentlyClosedTab tab1 =
+                new RecentlyClosedTab(
+                        /* sessionId= */ 1,
+                        /* timestamp= */ 0,
+                        "Title 1",
+                        JUnitTestGURLs.URL_1,
+                        /* tabGroupId= */ null);
+        RecentlyClosedTab tab2 =
+                new RecentlyClosedTab(
+                        /* sessionId= */ 2,
+                        /* timestamp= */ 0,
+                        "Title 2",
+                        JUnitTestGURLs.URL_2,
+                        /* tabGroupId= */ null);
+        bulkEvent.getTabs().add(tab1);
+        bulkEvent.getTabs().add(tab2);
+        entries.add(bulkEvent);
+        when(mRecentlyClosedEntriesManager.getRecentlyClosedEntries()).thenReturn(entries);
+
+        List<MenuItem> expectedSubmenu =
+                new ArrayList<>(
+                        Arrays.asList(
+                                item(R.id.open_history_menu_id),
+                                item(R.id.recent_tabs_menu_id),
+                                item(R.id.quick_delete_menu_id),
+                                item(R.id.divider_line_id),
+                                item(R.id.recent_entry_tab_menu_item),
+                                item(R.id.recent_entry_tab_menu_item)));
+
+        List<ListItem> items =
+                findItemById(
+                                mTabbedAppMenuPropertiesDelegate.getMenuItems(),
+                                R.id.history_parent_menu_id)
+                        .model
+                        .get(AppMenuItemWithSubmenuProperties.SUBMENU_PROVIDER)
+                        .get();
+
+        assertMenuTreesAreEqual(
+                items,
+                expectedSubmenu,
+                (item, expectedId) -> {
+                    assertEquals(
+                            "Mismatched item id",
+                            expectedId,
+                            item.model.get(AppMenuItemProperties.MENU_ITEM_ID));
+                });
+
+        List<MenuItem> expectedTitles =
+                new ArrayList<>(
+                        Arrays.asList(
+                                item(R.string.menu_history),
+                                item(R.string.menu_recent_tabs),
+                                item(R.string.menu_quick_delete),
+                                item(0),
+                                item("Title 1"),
+                                item("Title 2")));
+
+        assertMenuTitlesAreEqual(items, expectedTitles);
+
+        // Verify that the RECENT_ENTRY property points to the individual tab, not the bulk event.
+        ListItem item1 = items.get(4);
+        assertEquals(tab1, item1.model.get(AppMenuRecentEntryItemProperties.RECENT_ENTRY));
+        ListItem item2 = items.get(5);
+        assertEquals(tab2, item2.model.get(AppMenuRecentEntryItemProperties.RECENT_ENTRY));
     }
 
     @Test
