@@ -109,34 +109,34 @@ float MotionEventWeb::GetY(size_t pointer_index) const {
 }
 
 float MotionEventWeb::GetRawX(size_t pointer_index) const {
-  DCHECK_LT(pointer_index, GetPointerCount());
+  CHECK_LT(pointer_index, GetPointerCount(), base::NotFatalUntil::M152);
   return event_.touches[pointer_index].PositionInScreen().x();
 }
 
 float MotionEventWeb::GetRawY(size_t pointer_index) const {
-  DCHECK_LT(pointer_index, GetPointerCount());
+  CHECK_LT(pointer_index, GetPointerCount(), base::NotFatalUntil::M152);
   return event_.touches[pointer_index].PositionInScreen().y();
 }
 
 float MotionEventWeb::GetTouchMajor(size_t pointer_index) const {
-  DCHECK_LT(pointer_index, GetPointerCount());
+  CHECK_LT(pointer_index, GetPointerCount(), base::NotFatalUntil::M152);
   return 2.f * std::max(event_.touches[pointer_index].radius_x,
                         event_.touches[pointer_index].radius_y);
 }
 
 float MotionEventWeb::GetTouchMinor(size_t pointer_index) const {
-  DCHECK_LT(pointer_index, GetPointerCount());
+  CHECK_LT(pointer_index, GetPointerCount(), base::NotFatalUntil::M152);
   return 2.f * std::min(event_.touches[pointer_index].radius_x,
                         event_.touches[pointer_index].radius_y);
 }
 
 bool MotionEventWeb::HasNativeTouchMajor(size_t pointer_index) const {
-  DCHECK_LT(pointer_index, GetPointerCount());
+  CHECK_LT(pointer_index, GetPointerCount(), base::NotFatalUntil::M152);
   return true;
 }
 
 float MotionEventWeb::GetOrientation(size_t pointer_index) const {
-  DCHECK_LT(pointer_index, GetPointerCount());
+  CHECK_LT(pointer_index, GetPointerCount(), base::NotFatalUntil::M152);
 
   float orientation_rad =
       base::DegToRad(event_.touches[pointer_index].rotation_angle);
@@ -176,25 +176,25 @@ float MotionEventWeb::GetPressure(size_t pointer_index) const {
 }
 
 float MotionEventWeb::GetTiltX(size_t pointer_index) const {
-  DCHECK_LT(pointer_index, GetPointerCount());
+  CHECK_LT(pointer_index, GetPointerCount(), base::NotFatalUntil::M152);
 
   return event_.touches[pointer_index].tilt_x;
 }
 
 float MotionEventWeb::GetTiltY(size_t pointer_index) const {
-  DCHECK_LT(pointer_index, GetPointerCount());
+  CHECK_LT(pointer_index, GetPointerCount(), base::NotFatalUntil::M152);
 
   return event_.touches[pointer_index].tilt_y;
 }
 
 float MotionEventWeb::GetTwist(size_t pointer_index) const {
-  DCHECK_LT(pointer_index, GetPointerCount());
+  CHECK_LT(pointer_index, GetPointerCount(), base::NotFatalUntil::M152);
 
   return event_.touches[pointer_index].twist;
 }
 
 float MotionEventWeb::GetTangentialPressure(size_t pointer_index) const {
-  DCHECK_LT(pointer_index, GetPointerCount());
+  CHECK_LT(pointer_index, GetPointerCount(), base::NotFatalUntil::M152);
 
   return event_.touches[pointer_index].tangential_pressure;
 }
