@@ -101,6 +101,7 @@ source_set("commands") {
     "tab_group_confirmation_commands.h",
     "tab_groups_commands.h",
     "tab_picker_commands.h",
+    "tab_picker_commands.mm",
     "tab_strip_commands.h",
     "tab_strip_last_tab_dragged_alert_command.h",
     "tab_strip_last_tab_dragged_alert_command.mm",

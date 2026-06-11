@@ -449,6 +449,8 @@ lens::ImageEncodingOptions GetDefaultImageEncodingOptions() {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+#pragma mark - Public
+
 - (void)setConsumer:(id<ComposeboxInputPlateConsumer>)consumer {
   DCHECK_CALLED_ON_VALID_SEQUENCE(_sequenceChecker);
   _consumer = consumer;
@@ -595,6 +597,60 @@ lens::ImageEncodingOptions GetDefaultImageEncodingOptions() {
   if (params.attachmentList) {
     [self updateAttachments:params.attachmentList];
   }
+}
+
+- (std::set<web::WebStateID>)allAttachedWebStateIDs {
+  std::set<web::WebStateID> webStateIDs;
+  for (ComposeboxInputItem* item in _items.containedItems) {
+    web::WebStateID webStateID = _latestTabSelectionMapping[item.identifier];
+
+    if (!webStateID.valid()) {
+      continue;
+    }
+
+    // Include web state IDs of tabs added to composebox context from other
+    // web states.
+    webStateIDs.insert(webStateID);
+  }
+  return webStateIDs;
+}
+
+- (std::set<web::WebStateID>)attachedWebStateIDsInCurrentContext {
+  std::set<web::WebStateID> webStateIDs;
+  for (ComposeboxInputItem* item in _items.containedItems) {
+    web::WebStateID webStateID = _latestTabSelectionMapping[item.identifier];
+
+    if (!webStateID.valid()) {
+      continue;
+    }
+
+    // Only get web state IDs for tabs in the current web state.
+    WebStateSearchCriteria searchCriteria{
+        .identifier = webStateID,
+        .pinned_state = WebStateSearchCriteria::PinnedState::kAny,
+    };
+
+    if (GetWebStateIndex(_webStateList, searchCriteria) !=
+        WebStateList::kInvalidIndex) {
+      webStateIDs.insert(webStateID);
+    }
+  }
+  return webStateIDs;
+}
+
+- (NSUInteger)maxTabAttachmentCount {
+  return [_stateManager maxTabAttachmentCount];
+}
+
+- (void)attachSelectedTabsWithWebStateIDs:
+            (std::set<web::WebStateID>)selectedWebStateIDs
+                        cachedWebStateIDs:
+                            (std::set<web::WebStateID>)cachedWebStateIDs {
+  [self
+      attachSelectedTabsWithWebStateIDs:selectedWebStateIDs
+                      cachedWebStateIDs:cachedWebStateIDs
+                   fromExternalWebState:nullptr
+                                 source:ComposeboxInputItemSource::kTabPicker];
 }
 
 #pragma mark - ComposeboxInputPlateMutator
@@ -838,62 +894,6 @@ lens::ImageEncodingOptions GetDefaultImageEncodingOptions() {
   }
   _omniboxFocused = focused;
   [self requestUIRefresh];
-}
-
-#pragma mark - TabPickerSelectionDelegate
-
-- (std::set<web::WebStateID>)allAttachedWebStateIDs {
-  std::set<web::WebStateID> webStateIDs;
-  for (ComposeboxInputItem* item in _items.containedItems) {
-    web::WebStateID webStateID = _latestTabSelectionMapping[item.identifier];
-
-    if (!webStateID.valid()) {
-      continue;
-    }
-
-    // Include web state IDs of tabs added to composebox context from other
-    // web states.
-    webStateIDs.insert(webStateID);
-  }
-  return webStateIDs;
-}
-
-- (std::set<web::WebStateID>)attachedWebStateIDsInCurrentContext {
-  std::set<web::WebStateID> webStateIDs;
-  for (ComposeboxInputItem* item in _items.containedItems) {
-    web::WebStateID webStateID = _latestTabSelectionMapping[item.identifier];
-
-    if (!webStateID.valid()) {
-      continue;
-    }
-
-    // Only get web state IDs for tabs in the current web state.
-    WebStateSearchCriteria searchCriteria{
-        .identifier = webStateID,
-        .pinned_state = WebStateSearchCriteria::PinnedState::kAny,
-    };
-
-    if (GetWebStateIndex(_webStateList, searchCriteria) !=
-        WebStateList::kInvalidIndex) {
-      webStateIDs.insert(webStateID);
-    }
-  }
-  return webStateIDs;
-}
-
-- (NSUInteger)maxTabAttachmentCount {
-  return [_stateManager maxTabAttachmentCount];
-}
-
-- (void)attachSelectedTabsWithWebStateIDs:
-            (std::set<web::WebStateID>)selectedWebStateIDs
-                        cachedWebStateIDs:
-                            (std::set<web::WebStateID>)cachedWebStateIDs {
-  [self
-      attachSelectedTabsWithWebStateIDs:selectedWebStateIDs
-                      cachedWebStateIDs:cachedWebStateIDs
-                   fromExternalWebState:nullptr
-                                 source:ComposeboxInputItemSource::kTabPicker];
 }
 
 - (void)removeDeselectedIDs:(std::set<web::WebStateID>)deselectedIDs {

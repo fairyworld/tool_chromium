@@ -22,8 +22,7 @@
                                          UINavigationControllerDelegate,
                                          UIImagePickerControllerDelegate,
                                          UIDocumentPickerDelegate,
-                                         TabPickerCommands,
-                                         TabPickerSelectionDelegate>
+                                         TabPickerCommands>
 @end
 
 @implementation ComposeboxPickerPresenter {
@@ -96,7 +95,35 @@
 }
 
 - (void)presentTabPicker {
-  [self showTabPicker];
+  if (!_browser) {
+    return;
+  }
+
+  [self createSnackbarPresenterIfNeeded];
+
+  TabPickerParams* params =
+      [[TabPickerParams alloc] initWithSnackbarPresenter:_snackbarPresenter];
+  params.maxTabAttachmentCount =
+      [self.dataSource maxTabAttachmentCountForPresenter:self];
+  params.preselectedWebStateIDs =
+      [self.dataSource attachedWebStateIDsInCurrentContextForPresenter:self];
+
+  __weak __typeof(self) weakSelf = self;
+  TabPickerCompletionBlock completionBlock =
+      ^(std::set<web::WebStateID> selectedIDs,
+        std::set<web::WebStateID> cachedIDs) {
+        [weakSelf.delegate composeboxPickerPresenter:weakSelf
+                   handleSelectedTabsWithWebStateIDs:selectedIDs
+                                   cachedWebStateIDs:cachedIDs];
+      };
+
+  _tabPickerCoordinator = [[TabPickerCoordinator alloc]
+      initWithBaseViewController:_baseViewController
+                         browser:_browser.get()];
+  _tabPickerCoordinator.params = params;
+  _tabPickerCoordinator.tabPickerCompletionBlock = completionBlock;
+  _tabPickerCoordinator.tabPickerHandler = self;
+  [_tabPickerCoordinator start];
 }
 
 - (void)presentDriveFilePicker {
@@ -155,20 +182,12 @@
 
 #pragma mark - TabPickerCommands
 
-- (void)showTabPicker {
-  if (!_browser) {
-    return;
-  }
-
-  _tabPickerCoordinator = [[TabPickerCoordinator alloc]
-      initWithBaseViewController:_baseViewController
-                         browser:_browser.get()];
-  // TODO(crbug.com/40280872): Integrate logger and snackbar presenter
-  [self createSnackbarPresenterIfNeeded];
-  _tabPickerCoordinator.snackbarPresenter = _snackbarPresenter;
-  _tabPickerCoordinator.delegate = self;
-  _tabPickerCoordinator.tabPickerHandler = self;
-  [_tabPickerCoordinator start];
+- (void)showTabPickerWithParams:(TabPickerParams*)params
+                     completion:(TabPickerCompletionBlock)completion {
+  // TODO(crbug.com/516502526): This method is a no-op and only exists
+  // temporarily to satisfy protocol requirements while we move the ownership of
+  // TabPickerCoordinator to BrowserCoordinator, which will properly handle this
+  // command.
 }
 
 - (void)hideTabPicker {
@@ -205,34 +224,6 @@
 - (void)documentPicker:(UIDocumentPickerViewController*)controller
     didPickDocumentsAtURLs:(NSArray<NSURL*>*)urls {
   [self.delegate composeboxPickerPresenter:self didPickFilesWithURLs:urls];
-}
-
-// Returns the associated IDs for all currently attached tabs.
-- (std::set<web::WebStateID>)allAttachedWebStateIDs {
-  return [self.dataSource allAttachedWebStateIDsForPresenter:self];
-}
-
-// Returns the associated IDs for currently attached tabs from the current web
-// state context. Tabs attached from different web states (not visible in the
-// tab picker) will be excluded.
-- (std::set<web::WebStateID>)attachedWebStateIDsInCurrentContext {
-  return [self.dataSource attachedWebStateIDsInCurrentContextForPresenter:self];
-}
-
-// Returns the max number of tab attachments.
-- (NSUInteger)maxTabAttachmentCount {
-  return [self.dataSource maxTabAttachmentCountForPresenter:self];
-}
-
-// Attaches the selected tabs. `cachedWebStateIDs` contains the IDs of the
-// tabs that have their content cached.
-- (void)attachSelectedTabsWithWebStateIDs:
-            (std::set<web::WebStateID>)selectedWebStateIDs
-                        cachedWebStateIDs:
-                            (std::set<web::WebStateID>)cachedWebStateIDs {
-  [self.delegate composeboxPickerPresenter:self
-         handleSelectedTabsWithWebStateIDs:selectedWebStateIDs
-                         cachedWebStateIDs:cachedWebStateIDs];
 }
 
 #pragma mark - Private
