@@ -2350,8 +2350,13 @@ class LocationBarMediator
 
     @Override
     public void onTabChanged(@Nullable Tab previousTab) {
-        suspendInput();
-        mUrlCoordinator.clearFocus();
+        // Save the previous tab state.
+        if (mCurrentInput != null) {
+            mCurrentInput.setSelection(
+                    new TextSelection(
+                            mUrlCoordinator.getSelectionStart(),
+                            mUrlCoordinator.getSelectionEnd()));
+        }
 
         // Restore the saved tab state.
         var state = FuseboxSessionState.from(mLocationBarDataProvider);
@@ -2463,12 +2468,6 @@ class LocationBarMediator
     @Override
     public void suspendInput() {
         if (mAutocompleteCoordinator == null || mCurrentInput == null || mIsReparenting) return;
-
-        // Preserve editing state ahead of reparenting.
-        mCurrentInput.setSelection(
-                new TextSelection(
-                        mUrlCoordinator.getSelectionStart(), mUrlCoordinator.getSelectionEnd()));
-
         if (mFuseboxCoordinator.getFuseboxLayoutModeSupplier().get()
                         == FuseboxLayoutMode.SUGGESTIONS_POPOVER
                 && isParentedToSuggestionsContainer()) {
