@@ -34,6 +34,7 @@ import org.chromium.build.annotations.Initializer;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.app.tabmodel.AsyncTabParamsManagerSingleton;
+import org.chromium.chrome.browser.crash.ChromePureJavaExceptionReporter;
 import org.chromium.chrome.browser.crypto.CipherFactory;
 import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.preferences.ChromePreferenceKeys;
@@ -680,7 +681,8 @@ public class TabPersistentStoreImpl implements TabPersistentStore {
         } catch (Exception e) {
             // Catch generic exception to prevent a corrupted state from crashing the app
             // at startup.
-            Log.i(TAG, "loadTabs exception: " + e, e);
+            Log.e(TAG, "loadTabs exception: " + e, e);
+            ChromePureJavaExceptionReporter.reportJavaException(e, false);
         } finally {
             StrictMode.setThreadPolicy(oldPolicy);
         }
