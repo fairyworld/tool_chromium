@@ -60,7 +60,6 @@ class DataProtectionSceneAgentTestBase : public PlatformTest {
     scene_state_.window = [[UIWindow alloc]
         initWithWindowScene:chrome_test_util::GetAnyWindowScene()];
     scene_state_.UIEnabled = YES;
-    scene_state_.incognitoState.incognitoContentVisible = NO;
 
     agent_ = [[DataProtectionSceneAgent alloc] init];
 
@@ -92,6 +91,10 @@ class DataProtectionSceneAgentTestBase : public PlatformTest {
     NSArray<UIWindow*>* windows = @[ scene_state_.window ];
     OCMStub([mock_window_scene_ windows]).andReturn(windows);
     scene_state_.scene = mock_window_scene_;
+
+    // Set `incognitoContentVisible` to NO after the scene is connected to
+    // overwrite any polluted state loaded from `NSUserDefaults`.
+    scene_state_.incognitoState.incognitoContentVisible = NO;
 
     mock_agent_ = OCMPartialMock(agent_);
     [mock_agent_ setExpectationOrderMatters:YES];
