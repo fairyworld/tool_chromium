@@ -605,6 +605,17 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Glic.ExperimentalTriggering.OptIn.ErrorShown"
+    enum="GlicExperimentalTriggeringErrorType" expires_after="2027-05-18">
+  <owner>huanwu@chromium.org</owner>
+  <owner>sauski@google.com</owner>
+  <summary>
+    Records the type of error shown to the user on the Glic Experimental
+    Triggering Opt-In dialog. Recorded when the dialog transitions into an error
+    state.
+  </summary>
+</histogram>
+
 <histogram name="Glic.ExperimentalTriggering.OptIn.NoThanks.Version"
     enum="GlicRequiredExperimentalOptIn" expires_after="2027-05-18">
   <owner>sauski@google.com</owner>
