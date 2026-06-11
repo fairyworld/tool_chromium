@@ -30,17 +30,15 @@ namespace {
 class ToyTabDragSession : public TabDragSession {
  public:
   ToyTabDragSession(const std::vector<tabs_api::NodeId>& dragged_tabs,
+                    TabDragSessionInputAdapter& input_adapter,
                     TabDragWindowAdapter* dragged_window)
       : TabDragSession(dragged_tabs,
                        gfx::Point(),
-                       toy_input_adapter_,
+                       input_adapter,
                        nullptr,
                        base::OnceClosure()) {
     set_dragged_window(dragged_window);
   }
-
- private:
-  ToyTabDragSessionInputAdapter toy_input_adapter_;
 };
 
 }  // namespace
@@ -89,7 +87,8 @@ TEST_F(TabDragEventRouterTest, RouteMoveEvents) {
       registration.BindNewEndpointAndPassDedicatedReceiver());
 
   std::vector<NodeId> tabs = {NodeId(NodeId::Type::kContent, "tab1")};
-  ToyTabDragSession session(tabs, nullptr);
+  ToyTabDragSessionInputAdapter input_adapter;
+  ToyTabDragSession session(tabs, input_adapter, nullptr);
   router_.OnSessionStarted(&session);
 
   // Move inside bounds
@@ -140,7 +139,8 @@ TEST_F(TabDragEventRouterTest, MultiWindowRouting) {
   router_.RegisterDropTarget(&window_b, remote_b.Unbind(),
                              reg_b.BindNewEndpointAndPassDedicatedReceiver());
 
-  ToyTabDragSession session({}, nullptr);
+  ToyTabDragSessionInputAdapter input_adapter;
+  ToyTabDragSession session({}, input_adapter, nullptr);
   router_.OnSessionStarted(&session);
 
   // Start in A
@@ -193,7 +193,8 @@ TEST_F(TabDragEventRouterTest, IgnoreDraggedWindow) {
                              reg_b.BindNewEndpointAndPassDedicatedReceiver());
 
   // Start session dragging Window B
-  ToyTabDragSession session({}, &window_b);
+  ToyTabDragSessionInputAdapter input_adapter;
+  ToyTabDragSession session({}, input_adapter, &window_b);
   router_.OnSessionStarted(&session);
 
   // Move over the overlapping area (50, 50)
@@ -221,7 +222,8 @@ TEST_F(TabDragEventRouterTest, DropEvent) {
                              reg.BindNewEndpointAndPassDedicatedReceiver());
 
   std::vector<NodeId> tabs = {NodeId(NodeId::Type::kContent, "tab1")};
-  ToyTabDragSession session(tabs, nullptr);
+  ToyTabDragSessionInputAdapter input_adapter;
+  ToyTabDragSession session(tabs, input_adapter, nullptr);
   router_.OnSessionStarted(&session);
 
   // Move in
@@ -251,7 +253,8 @@ TEST_F(TabDragEventRouterTest, CancelEvent) {
   router_.RegisterDropTarget(&window, remote.Unbind(),
                              reg.BindNewEndpointAndPassDedicatedReceiver());
 
-  ToyTabDragSession session({}, nullptr);
+  ToyTabDragSessionInputAdapter input_adapter;
+  ToyTabDragSession session({}, input_adapter, nullptr);
   router_.OnSessionStarted(&session);
 
   // Move in
