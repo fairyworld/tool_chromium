@@ -448,11 +448,10 @@ bool IOSChromeSavePasswordInfoBarDelegate::MaybeHandlePasswordError(
           showPrimaryAccountReauthWithDismissalCompletion:completion];
       break;
     case password_manager::ActionableError::kTrustedVaultKeyNeeded:
-      // TODO(crbug.com/464228247): Add new UMA trigger.
       [HandlerForProtocol(dispatcher_, SyncPresenterCommands)
           showTrustedVaultReauthForFetchKeysWithTrigger:
               trusted_vault::TrustedVaultUserActionTriggerForUMA::
-                  kPasswordManagerSettings
+                  kPasswordSavePrompt
                                              completion:completion];
       break;
   }

@@ -908,7 +908,7 @@ TEST_F(IOSChromeSavePasswordInfoBarDelegateTest,
   OCMExpect([mock_sync_presenter_
       showTrustedVaultReauthForFetchKeysWithTrigger:
           trusted_vault::TrustedVaultUserActionTriggerForUMA::
-              kPasswordManagerSettings
+              kPasswordSavePrompt
                                          completion:[OCMArg any]]);
 
   // Tap on "Accept".
