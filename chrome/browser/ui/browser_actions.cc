@@ -479,7 +479,10 @@ void BrowserActions::InitializeSidePanelActions() {
             .SetTooltipText(l10n_util::GetStringUTF16(
                 IDS_CONTEXTUAL_TASKS_CONTEXTUAL_TASKS_TITLE))
             .SetImage(ui::ImageModel::FromVectorIcon(
-                kDockToRightSparkCustomIcon, ui::kColorIcon))
+                features::IsRoundedIconsEnabled()
+                    ? omnibox::kSearchSparkIcon
+                    : omnibox::kSearchSparkOldIcon,
+                ui::kColorIcon))
             .SetProperty(
                 actions::kActionItemPinnableKey,
                 static_cast<

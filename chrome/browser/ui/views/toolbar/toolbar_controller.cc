@@ -34,6 +34,7 @@
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/vector_icons/vector_icons.h"
+#include "components/omnibox/browser/vector_icons.h"
 #include "third_party/abseil-cpp/absl/functional/overload.h"
 #include "ui/actions/actions.h"
 #include "ui/base/l10n/l10n_util.h"
@@ -269,7 +270,9 @@ ToolbarController::GetDefaultResponsiveElements(Browser* browser) {
           ToolbarController::ElementIdInfo{
               kPinnedToolbarActionShowSidePanelContextualTasksElementId,
               IDS_OVERFLOW_MENU_ITEM_TEXT_CONTEXTUAL_TASKS,
-              &kDockToRightSparkCustomIcon,
+              &(features::IsRoundedIconsEnabled()
+                    ? omnibox::kSearchSparkIcon
+                    : omnibox::kSearchSparkOldIcon),
               kPinnedToolbarActionShowSidePanelContextualTasksElementId},
           /*is_section_end=*/false),
   };

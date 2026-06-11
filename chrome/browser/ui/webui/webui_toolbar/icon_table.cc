@@ -225,7 +225,9 @@ const base::flat_map<const gfx::VectorIcon*, IconInfo>& KnownIcons() {
           {{&(features::IsRoundedIconsEnabled() ? kManageSearchIcon
                                                 : kTabSearchTabStripOldIcon)},
            {"pinned-toolbar-action:TabSearch", IconType::kIconSet}},
-          {{&kDockToRightSparkCustomIcon},
+          {{&(features::IsRoundedIconsEnabled()
+                  ? omnibox::kSearchSparkIcon
+                  : omnibox::kSearchSparkOldIcon)},
            {"pinned-toolbar-action:SidePanelShowContextualTasks",
             IconType::kIconSet}},
           {{&(features::IsRoundedIconsEnabled()
