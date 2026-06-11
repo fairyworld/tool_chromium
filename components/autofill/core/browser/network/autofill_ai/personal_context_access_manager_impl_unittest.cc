@@ -18,6 +18,8 @@
 #include "components/autofill/core/browser/network/autofill_ai/personal_context_conversion_util.h"
 #include "components/autofill/core/browser/test_utils/entity_data_test_utils.h"
 #include "components/autofill/core/common/autofill_features.h"
+#include "components/personal_context/core/mock_personal_context_enablement_service.h"
+#include "components/personal_context/core/mock_personal_context_service.h"
 #include "components/personal_context/core/personal_context_enablement_service.h"
 #include "components/personal_context/core/personal_context_service.h"
 #include "components/personal_context/core/personal_context_types.h"
@@ -31,6 +33,8 @@ namespace {
 
 using ::base::test::RunOnceCallback;
 using personal_context::ContextMemoryError;
+using ::personal_context::MockPersonalContextEnablementService;
+using ::personal_context::MockPersonalContextService;
 using ::testing::_;
 using ::testing::DoAll;
 using ::testing::ElementsAre;
@@ -64,40 +68,6 @@ using ::testing::WithArg;
       ElementsAreArray(types));
 }
 
-class MockPersonalContextService
-    : public personal_context::PersonalContextService {
- public:
-  MockPersonalContextService() = default;
-  ~MockPersonalContextService() override = default;
-
-  MOCK_METHOD(void,
-              FetchContext,
-              (personal_context::proto::ContextMemoryFeature feature,
-               const google::protobuf::MessageLite& request_metadata,
-               const personal_context::ContextMemoryRequestOptions& options,
-               personal_context::FetchContextCallback callback),
-              (override));
-  MOCK_METHOD(void,
-              FetchPiiEntities,
-              (const personal_context::proto::FetchPiiEntitiesRequest& request,
-               const personal_context::ContextMemoryRequestOptions& options,
-               personal_context::FetchPiiContextCallback callback),
-              (override));
-};
-
-class MockPersonalContextEnablementService
-    : public personal_context::PersonalContextEnablementService {
- public:
-  MockPersonalContextEnablementService() = default;
-  ~MockPersonalContextEnablementService() override = default;
-
-  MOCK_METHOD(void, AddObserver, (Observer * observer), (override));
-  MOCK_METHOD(void, RemoveObserver, (Observer * observer), (override));
-  MOCK_METHOD(personal_context::PersonalContextEnablementState,
-              GetEnablementState,
-              (),
-              (override));
-};
 
 class PersonalContextAccessManagerImplTest : public testing::Test {
  public:

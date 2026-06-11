@@ -1921,6 +1921,7 @@ source_set("unit_tests") {
     "//components/optimization_guide/proto:optimization_guide_proto",
     "//components/os_crypt/async/browser:test_support",
     "//components/password_manager/core/browser/features:password_features",
+    "//components/personal_context/core:test_support",
     "//components/plus_addresses/core/browser",
     "//components/policy/core/common",
     "//components/pref_registry",
