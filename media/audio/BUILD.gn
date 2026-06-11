@@ -195,8 +195,8 @@ source_set("audio") {
     frameworks += [
       "AudioUnit.framework",
       "CoreMedia.framework",
+      "ScreenCaptureKit.framework",
     ]
-    weak_frameworks = [ "ScreenCaptureKit.framework" ]  # macOS 13.0
   }
 
   if (is_ios) {
@@ -504,8 +504,10 @@ source_set("unit_tests") {
       "mac/catap_audio_input_stream_unittest.mm",
     ]
     deps += [ "//third_party/ocmock" ]
-    frameworks = [ "CoreMedia.framework" ]
-    weak_frameworks = [ "ScreenCaptureKit.framework" ]  # macOS 13.0
+    frameworks = [
+      "CoreMedia.framework",
+      "ScreenCaptureKit.framework",
+    ]
   }
 
   if (use_cras) {

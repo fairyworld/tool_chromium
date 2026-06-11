@@ -1735,11 +1735,9 @@ bool IsMacCatapSystemLoopbackCaptureSupported() {
 }
 
 bool IsMacSckSystemLoopbackCaptureSupported() {
-  // Only supported on macOS 13.0+.
   // Disabled on macOS 15.0 due to problems with permission prompt.
   // The override feature is useful for testing on unsupported versions.
-  return (base::mac::MacOSVersion() >= 13'00'00 &&
-          base::mac::MacOSVersion() < 15'00'00) ||
+  return (base::mac::MacOSVersion() < 15'00'00) ||
          base::FeatureList::IsEnabled(kMacSckSystemAudioLoopbackOverride);
 }
 #endif  // BUILDFLAG(IS_MAC)

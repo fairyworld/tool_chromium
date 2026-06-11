@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-
 #include "media/audio/mac/audio_loopback_input_mac_impl.h"
 
 #import <ScreenCaptureKit/ScreenCaptureKit.h>
@@ -34,8 +33,7 @@ constexpr float kMaxVolume = 1.0;
 // invoked after the client no longer wants to receive data, or
 // SCKAudioInputStream has already been destroyed, this reference counted class
 // outlives both objects and helps prevent use-after-free situations.
-class API_AVAILABLE(macos(13.0)) SharedHelper
-    : public base::RefCountedThreadSafe<SharedHelper> {
+class SharedHelper : public base::RefCountedThreadSafe<SharedHelper> {
  public:
   REQUIRE_ADOPTION_FOR_REFCOUNTED_TYPE();
 
@@ -216,7 +214,6 @@ class API_AVAILABLE(macos(13.0)) SharedHelper
 
 }  // namespace media
 
-API_AVAILABLE(macos(13.0))
 @interface ScreenCaptureKitAudioHelper
     : NSObject <SCStreamDelegate, SCStreamOutput> {
   scoped_refptr<media::SharedHelper> _sharedHelper;
@@ -569,12 +566,8 @@ AudioInputStream* CreateSCKAudioInputStream(
     const std::string& device_id,
     AudioManager::LogCallback log_callback,
     const base::RepeatingCallback<void(AudioInputStream*)> close_callback) {
-  if (@available(macOS 13.0, *)) {
-    return new SCKAudioInputStream(params, device_id, std::move(log_callback),
-                                   std::move(close_callback));
-  }
-
-  return nullptr;
+  return new SCKAudioInputStream(params, device_id, std::move(log_callback),
+                                 std::move(close_callback));
 }
 
 }  // namespace media
