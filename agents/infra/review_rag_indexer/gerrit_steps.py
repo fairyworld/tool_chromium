@@ -7,10 +7,27 @@ import concurrent.futures
 import functools
 import json
 import logging
+import pathlib
+import posixpath
+import sys
 import threading
+import urllib.parse
 
 import requests
 from urllib3 import util
+
+# depot_tools is DEPSed in at //third_party/depot_tools.
+_DEPOT_TOOLS_DIR = (pathlib.Path(__file__).resolve().parents[3] /
+                    'third_party' / 'depot_tools')
+if _DEPOT_TOOLS_DIR.exists():
+    _DEPOT_TOOLS_DIR_STR = str(_DEPOT_TOOLS_DIR)
+    if _DEPOT_TOOLS_DIR_STR not in sys.path:
+        sys.path.append(_DEPOT_TOOLS_DIR_STR)
+else:
+    logging.warning('depot_tools not found at %s, gerrit_util import may fail',
+                    _DEPOT_TOOLS_DIR)
+
+import gerrit_util  # pylint: disable=import-error
 
 from common_types import ClInfo, CommonArgs
 
@@ -20,12 +37,51 @@ MAX_RETRIES = 2
 BACKOFF_FACTOR_SECONDS = 1.0
 
 
+class GerritUtilHttpConnAdapter:
+    """Adapter to extract auth headers from gerrit_util."""
+
+    def __init__(self, host: str, uri: str):
+        self.req_host = host
+        self.req_uri = uri
+        self.req_headers = {}
+        self.proxy_info = None
+
+    def has_header(self, header: str) -> bool:
+        return header in self.req_headers
+
+    def get_full_url(self) -> str:
+        return self.req_uri
+
+    def get_header(self, header: str, default: str = None) -> str:
+        return self.req_headers.get(header, default)
+
+    def add_unredirected_header(self, header: str, value: str):
+        self.req_headers[header] = value
+
+    @property
+    def unverifiable(self) -> bool:
+        return False
+
+    @property
+    def origin_req_host(self) -> str:
+        return self.req_host
+
+    @property
+    def type(self) -> str:
+        return urllib.parse.urlparse(self.req_uri).scheme
+
+    @property
+    def host(self) -> str:
+        return self.req_host
+
+
 class _SessionManager:
     """Manages all requests.Sessions for a ThreadPoolExecutor."""
 
-    def __init__(self):
+    def __init__(self, gerrit_host: str):
         self._lock = threading.Lock()
         self._sessions = {}
+        self._gerrit_host = gerrit_host
 
     def register_session_for_current_thread(self) -> None:
         thread_name = threading.current_thread()
@@ -40,7 +96,42 @@ class _SessionManager:
             )
             s.mount('https://',
                     requests.adapters.HTTPAdapter(max_retries=retry))
+            self._configure_session_auth(s)
             self._sessions[thread_name] = s
+
+    def _configure_session_auth(self, session: requests.Session) -> None:
+        """Configures a Session to have authentication headers applied.
+
+        Args:
+            session: The requests.Session object to add authentication to.
+        """
+        gerrit_adapter = GerritUtilHttpConnAdapter(
+            self._gerrit_host, f'https://{self._gerrit_host}/a/')
+
+        try:
+            # pylint: disable=protected-access
+            authenticator = gerrit_util._Authenticator.get()
+            # pylint: enable=protected-access
+            authenticator.authenticate(gerrit_adapter)
+        except Exception as e:
+            raise RuntimeError(
+                f'Failed to authenticate for {self._gerrit_host}: {e}') from e
+
+        session.headers.update(gerrit_adapter.req_headers)
+
+        # Apply proxy if set for SSO.
+        if gerrit_adapter.proxy_info:
+            proxy_url = (
+                f'http://{gerrit_adapter.proxy_info.proxy_host.decode()}'
+                f':{gerrit_adapter.proxy_info.proxy_port}')
+            session.proxies = {
+                'http': proxy_url,
+                'https': proxy_url,
+            }
+            logging.debug('Using SSO proxy: %s', proxy_url)
+
+        # Store the base URL (potentially rewritten by SSO).
+        session.gerrit_base_url = gerrit_adapter.req_uri.rstrip('/')
 
     def get_session_for_current_thread(self) -> requests.Session:
         thread_name = threading.current_thread()
@@ -49,7 +140,7 @@ class _SessionManager:
             return self._sessions[thread_name]
 
 
-def _fetch_hashtags_for_cl(project: str, session_manager: _SessionManager,
+def _fetch_hashtags_for_cl(session_manager: _SessionManager,
                            cl_info: ClInfo) -> bool:
     """Fetches hashtags for a single CL and updates it in place.
 
@@ -57,7 +148,6 @@ def _fetch_hashtags_for_cl(project: str, session_manager: _SessionManager,
     backoff.
 
     Args:
-        project: The Git-on-Borg project name.
         session_manager: The _SessionManager storing per-thread Sessions for
             the current executor.
         cl_info: The ClInfo object to update.
@@ -69,10 +159,9 @@ def _fetch_hashtags_for_cl(project: str, session_manager: _SessionManager,
     Raises:
         ValueError: If the response from Gerrit is not a JSON list.
     """
-    gerrit_host = f'{project}-review.googlesource.com'
-    url = f'https://{gerrit_host}/changes/{cl_info.cl_number}/hashtags'
-
     session = session_manager.get_session_for_current_thread()
+    url = posixpath.join(session.gerrit_base_url, 'changes',
+                         str(cl_info.cl_number), 'hashtags')
 
     try:
         logging.debug('Fetching hashtags for CL %d from %s', cl_info.cl_number,
@@ -114,13 +203,12 @@ def retrieve_hashtags(common_args: CommonArgs, cl_infos: list[ClInfo]) -> None:
 
     logging.info('Retrieving hashtags for %d CLs...', len(cl_infos))
 
-    manager = _SessionManager()
+    manager = _SessionManager(f'{common_args.project}-review.googlesource.com')
     with concurrent.futures.ThreadPoolExecutor(
             max_workers=common_args.num_network_workers,
             initializer=manager.register_session_for_current_thread
     ) as executor:
-        func = functools.partial(_fetch_hashtags_for_cl, common_args.project,
-                                 manager)
+        func = functools.partial(_fetch_hashtags_for_cl, manager)
         results = list(executor.map(func, cl_infos))
 
     failures = results.count(False)

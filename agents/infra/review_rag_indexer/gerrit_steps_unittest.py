@@ -37,9 +37,15 @@ class FetchHashtagsForClTest(unittest.TestCase):
         self.mock_session_class = mock.patch('requests.Session').start()
         self.mock_get = self.mock_session_class.return_value.get
         self.mock_sleep = mock.patch('time.sleep').start()
+
+        self.mock_authenticator = mock.Mock()
+        mock.patch('gerrit_util._Authenticator.get',
+                   return_value=self.mock_authenticator).start()
+
         self.addCleanup(mock.patch.stopall)
 
-        self.manager = gerrit_steps._SessionManager()
+        self.manager = gerrit_steps._SessionManager(
+            'chromium-review.googlesource.com')
         self.manager.register_session_for_current_thread()
 
     def test_session_configuration(self):
@@ -60,13 +66,13 @@ class FetchHashtagsForClTest(unittest.TestCase):
         mock_response.status_code = 200
         self.mock_get.return_value = mock_response
 
-        result = gerrit_steps._fetch_hashtags_for_cl('chromium', self.manager,
+        result = gerrit_steps._fetch_hashtags_for_cl(self.manager,
                                                      self.cl_info)
 
         self.assertTrue(result)
         self.assertEqual(self.cl_info.hashtags, {'tag1', 'tag2'})
         self.mock_get.assert_called_once_with(
-            'https://chromium-review.googlesource.com/changes/1234/hashtags',
+            'https://chromium-review.googlesource.com/a/changes/1234/hashtags',
             timeout=30,
         )
 
@@ -76,7 +82,7 @@ class FetchHashtagsForClTest(unittest.TestCase):
         mock_response.status_code = 200
         self.mock_get.return_value = mock_response
 
-        result = gerrit_steps._fetch_hashtags_for_cl('chromium', self.manager,
+        result = gerrit_steps._fetch_hashtags_for_cl(self.manager,
                                                      self.cl_info)
 
         self.assertTrue(result)
@@ -88,7 +94,7 @@ class FetchHashtagsForClTest(unittest.TestCase):
 
         with self.assertLogs(level='WARNING') as log:
             result = gerrit_steps._fetch_hashtags_for_cl(
-                'chromium', self.manager, self.cl_info)
+                self.manager, self.cl_info)
 
         self.assertFalse(result)
         self.assertEqual(self.cl_info.hashtags, set())
@@ -103,8 +109,7 @@ class FetchHashtagsForClTest(unittest.TestCase):
         self.mock_get.return_value = mock_response
 
         with self.assertRaises(json.JSONDecodeError):
-            gerrit_steps._fetch_hashtags_for_cl('chromium', self.manager,
-                                                self.cl_info)
+            gerrit_steps._fetch_hashtags_for_cl(self.manager, self.cl_info)
 
         self.assertEqual(self.mock_get.call_count, 1)
         self.mock_sleep.assert_not_called()
@@ -116,8 +121,7 @@ class FetchHashtagsForClTest(unittest.TestCase):
         self.mock_get.return_value = mock_response
 
         with self.assertRaises(ValueError) as cm:
-            gerrit_steps._fetch_hashtags_for_cl('chromium', self.manager,
-                                                self.cl_info)
+            gerrit_steps._fetch_hashtags_for_cl(self.manager, self.cl_info)
 
         self.assertIn('Expected list of hashtags', str(cm.exception))
         self.assertEqual(self.mock_get.call_count, 1)
@@ -130,7 +134,7 @@ class FetchHashtagsForClTest(unittest.TestCase):
         mock_response.status_code = 200
         self.mock_get.return_value = mock_response
 
-        result = gerrit_steps._fetch_hashtags_for_cl('chromium', self.manager,
+        result = gerrit_steps._fetch_hashtags_for_cl(self.manager,
                                                      self.cl_info)
 
         self.assertTrue(result)
@@ -144,10 +148,74 @@ class FetchHashtagsForClTest(unittest.TestCase):
 
         with self.assertLogs(level='WARNING'):
             result = gerrit_steps._fetch_hashtags_for_cl(
-                'chromium', self.manager, self.cl_info)
+                self.manager, self.cl_info)
 
         self.assertFalse(result)
         self.assertEqual(self.cl_info.hashtags, {'ipc_review'})
+
+    def test_session_auth_cookies(self):
+        self.mock_authenticator.authenticate.side_effect = (
+            lambda conn: conn.req_headers.update(
+                {'Authorization': 'Bearer token'}))
+
+        manager = gerrit_steps._SessionManager(
+            'chromium-review.googlesource.com')
+
+        mock_session = mock.Mock()
+        mock_session.headers = {}
+        self.mock_session_class.return_value = mock_session
+
+        manager.register_session_for_current_thread()
+
+        self.assertEqual(mock_session.headers,
+                         {'Authorization': 'Bearer token'})
+        self.assertEqual(mock_session.gerrit_base_url,
+                         'https://chromium-review.googlesource.com/a')
+
+    def test_session_auth_sso(self):
+
+        def sso_auth(conn):
+            conn.req_headers.update({'Cookie': 'sso_cookie'})
+            conn.req_uri = 'http://chromium.git.corp.google.com/a/'
+
+            class MockProxy:
+                proxy_host = b'localhost'
+                proxy_port = 8080
+
+            conn.proxy_info = MockProxy()
+
+        self.mock_authenticator.authenticate.side_effect = sso_auth
+
+        manager = gerrit_steps._SessionManager(
+            'chromium-review.googlesource.com')
+
+        mock_session = mock.Mock()
+        mock_session.headers = {}
+        self.mock_session_class.return_value = mock_session
+
+        manager.register_session_for_current_thread()
+
+        self.assertEqual(mock_session.headers, {'Cookie': 'sso_cookie'})
+        self.assertEqual(mock_session.proxies, {
+            'http': 'http://localhost:8080',
+            'https': 'http://localhost:8080',
+        })
+        self.assertEqual(mock_session.gerrit_base_url,
+                         'http://chromium.git.corp.google.com/a')
+
+    def test_session_auth_failure(self):
+        self.mock_authenticator.authenticate.side_effect = Exception(
+            'Auth error')
+
+        manager = gerrit_steps._SessionManager(
+            'chromium-review.googlesource.com')
+
+        with self.assertRaises(RuntimeError) as cm:
+            manager.register_session_for_current_thread()
+
+        self.assertIn(
+            'Failed to authenticate for chromium-review.googlesource.com',
+            str(cm.exception))
 
 
 class RetrieveHashtagsTest(unittest.TestCase):
@@ -213,8 +281,8 @@ class RetrieveHashtagsTest(unittest.TestCase):
 
         self.assertEqual(self.mock_fetch.call_count, 2)
         self.mock_fetch.assert_has_calls([
-            mock.call('chromium', mock.ANY, cl_infos[0]),
-            mock.call('chromium', mock.ANY, cl_infos[1]),
+            mock.call(mock.ANY, cl_infos[0]),
+            mock.call(mock.ANY, cl_infos[1]),
         ],
                                          any_order=True)
 
@@ -264,6 +332,27 @@ class RetrieveHashtagsTest(unittest.TestCase):
             gerrit_steps.retrieve_hashtags(self.common_args, cl_infos)
 
         self.assertIn('exceeded threshold', str(cm.exception))
+
+
+class GerritAuthIntegrationTest(unittest.TestCase):
+    """Integration tests that use real gerrit_util authenticators.
+
+    These tests assume the environment has some valid way to authenticate
+    (e.g., .gitcookies or SSO) and verify that the integration with
+    depot_tools works without raising exceptions.
+    """
+
+    def test_real_auth_integration(self):
+        manager = gerrit_steps._SessionManager(
+            'chromium-review.googlesource.com')
+        session = requests.Session()
+
+        manager._configure_session_auth(session)
+
+        self.assertTrue(hasattr(session, 'gerrit_base_url'))
+        self.assertTrue(
+            session.gerrit_base_url.startswith(('http://', 'https://')))
+        self.assertTrue(session.gerrit_base_url.endswith('/a'))
 
 
 if __name__ == '__main__':
