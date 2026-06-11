@@ -389,9 +389,15 @@ void UnexportableKeyServiceImpl::GenerateAttestationKeySlowlyAsync(
     BackgroundTaskPriority priority,
     base::OnceCallback<void(ServiceErrorOr<UnexportableAttestationKeyId>)>
         callback) {
-  // TODO(crbug.com/501306852): Implement this.
-  std::move(callback).Run(
-      base::unexpected(ServiceError::kOperationNotSupported));
+  task_manager_->GenerateAttestationKeySlowlyAsync(
+      task_origin_, config_, acceptable_algorithms, priority,
+      WrapCallbackWithErrorIfCancelled(
+          std::move(callback),
+          // SAFETY: `attestation_keys_` is owned by `this` and is guaranteed to
+          // be alive if the projection callback is invoked (which only happens
+          // if the service is still alive).
+          base::BindOnce(&AttestationKeyRepository::OnKeyGenerated,
+                         base::Unretained(attestation_keys_.get()))));
 }
 
 void UnexportableKeyServiceImpl::FromWrappedAttestationKeySlowlyAsync(
@@ -399,9 +405,17 @@ void UnexportableKeyServiceImpl::FromWrappedAttestationKeySlowlyAsync(
     BackgroundTaskPriority priority,
     base::OnceCallback<void(ServiceErrorOr<UnexportableAttestationKeyId>)>
         callback) {
-  // TODO(crbug.com/501306852): Implement this.
-  std::move(callback).Run(
-      base::unexpected(ServiceError::kOperationNotSupported));
+  WrappedKeyAndTagView key_view = {wrapped_key, GetApplicationTag(config_)};
+  if (attestation_keys_->RegisterUnwrapKeyCallback(key_view,
+                                                   std::move(callback)) == 1) {
+    // NOTE: We don't wrap the callback in `WrapCallbackWithErrorIfCancelled`
+    // here, but rather run the callbacks explicitly during the destruction of
+    // `MaybePendingKeyId`.
+    task_manager_->FromWrappedAttestationKeySlowlyAsync(
+        task_origin_, config_, wrapped_key, priority,
+        base::BindOnce(&AttestationKeyRepository::OnKeyCreatedFromWrappedKey,
+                       attestation_keys_->GetWeakPtr(), Materialize(key_view)));
+  }
 }
 
 void UnexportableKeyServiceImpl::GetAllKeysForGarbageCollectionSlowlyAsync(
@@ -432,6 +446,31 @@ void UnexportableKeyServiceImpl::SignSlowlyAsync(
   }
 
   std::move(callback).Run(base::unexpected(ServiceError::kKeyNotFound));
+}
+
+void UnexportableKeyServiceImpl::CertifySlowlyAsync(
+    UnexportableAttestationKeyId attestation_key_id,
+    UnexportableSigningKeyId signing_key_id,
+    base::span<const uint8_t> challenge,
+    BackgroundTaskPriority priority,
+    base::OnceCallback<void(ServiceErrorOr<crypto::AttestationStatement>)>
+        callback) {
+  auto* attestation_key = attestation_keys_->GetKey(attestation_key_id);
+  if (!attestation_key) {
+    std::move(callback).Run(base::unexpected(ServiceError::kKeyNotFound));
+    return;
+  }
+
+  auto* signing_key = signing_keys_->GetKey(signing_key_id);
+  if (!signing_key) {
+    std::move(callback).Run(base::unexpected(ServiceError::kKeyNotFound));
+    return;
+  }
+
+  task_manager_->CertifySlowlyAsync(
+      task_origin_, base::WrapRefCounted(attestation_key),
+      base::WrapRefCounted(signing_key), challenge, priority,
+      WrapCallbackWithErrorIfCancelled(std::move(callback)));
 }
 
 void UnexportableKeyServiceImpl::DeleteKeysSlowlyAsync(

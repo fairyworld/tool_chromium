@@ -21,6 +21,7 @@
 #include "components/unexportable_keys/service_error.h"
 #include "components/unexportable_keys/unexportable_key_id.h"
 #include "crypto/signature_verifier.h"
+#include "crypto/unexportable_key.h"
 #include "mojo/public/cpp/bindings/callback_helpers.h"
 #include "mojo/public/cpp/bindings/enum_traits.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
@@ -164,6 +165,18 @@ void UnexportableKeyServiceProxied::SignSlowlyAsync(
                 mojo::WrapCallbackWithDefaultInvokeIfNotRun(
                     std::move(callback),
                     base::unexpected(ServiceError::kOperationCancelled)));
+}
+
+void UnexportableKeyServiceProxied::CertifySlowlyAsync(
+    UnexportableAttestationKeyId attestation_key_id,
+    UnexportableSigningKeyId signing_key_id,
+    base::span<const uint8_t> challenge,
+    BackgroundTaskPriority priority,
+    base::OnceCallback<void(ServiceErrorOr<crypto::AttestationStatement>)>
+        callback) {
+  // TODO(crbug.com/501306852): Implement this.
+  std::move(callback).Run(
+      base::unexpected(ServiceError::kOperationNotSupported));
 }
 
 ServiceErrorOr<std::vector<uint8_t>>
