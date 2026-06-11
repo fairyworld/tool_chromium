@@ -42,6 +42,12 @@ public class CommonOnLayoutChangeListeners {
     private static final LayoutFilter SIZE_CHANGED =
             (l, t, r, b, ol, ot, or, ob) -> didSizeChange(l, t, r, b, ol, ot, or, ob);
 
+    private static final LayoutFilter HEIGHT_CHANGED =
+            (l, t, r, b, ol, ot, or, ob) -> didHeightChange(t, b, ot, ob);
+
+    private static final LayoutFilter WIDTH_CHANGED =
+            (l, t, r, b, ol, ot, or, ob) -> didWidthChange(l, r, ol, or);
+
     /**
      * Creates a {@link View.OnLayoutChangeListener} that executes the given {@link Runnable} when
      * the view's layout bounds change. Duplicate layout events with unchanged bounds are filtered.
@@ -96,6 +102,61 @@ public class CommonOnLayoutChangeListeners {
         };
     }
 
+    /**
+     * Creates a {@link View.OnLayoutChangeListener} that executes the given {@link Runnable} when
+     * the view's layout height changes. Duplicate layout events with unchanged heights are
+     * filtered.
+     *
+     * @param runnable The runnable to run when layout height changes.
+     */
+    public static OnLayoutChangeListener createHeightChangedListener(Runnable runnable) {
+        return (v, l, t, r, b, ol, ot, or, ob) -> {
+            if (HEIGHT_CHANGED.shouldTrigger(l, t, r, b, ol, ot, or, ob)) runnable.run();
+        };
+    }
+
+    /**
+     * Creates a {@link View.OnLayoutChangeListener} that executes the given {@link OnLayoutChanged}
+     * callback when the view's layout height changes. Duplicate layout events with unchanged
+     * heights are filtered.
+     *
+     * @param callback The callback to execute when layout height changes.
+     */
+    public static OnLayoutChangeListener createHeightChangedListener(OnLayoutChanged callback) {
+        return (v, l, t, r, b, ol, ot, or, ob) -> {
+            if (HEIGHT_CHANGED.shouldTrigger(l, t, r, b, ol, ot, or, ob)) {
+                callback.onLayoutChanged(v, l, t, r, b);
+            }
+        };
+    }
+
+    /**
+     * Creates a {@link View.OnLayoutChangeListener} that executes the given {@link Runnable} when
+     * the view's layout width changes. Duplicate layout events with unchanged widths are filtered.
+     *
+     * @param runnable The runnable to run when layout width changes.
+     */
+    public static OnLayoutChangeListener createWidthChangedListener(Runnable runnable) {
+        return (v, l, t, r, b, ol, ot, or, ob) -> {
+            if (WIDTH_CHANGED.shouldTrigger(l, t, r, b, ol, ot, or, ob)) runnable.run();
+        };
+    }
+
+    /**
+     * Creates a {@link View.OnLayoutChangeListener} that executes the given {@link OnLayoutChanged}
+     * callback when the view's layout width changes. Duplicate layout events with unchanged widths
+     * are filtered.
+     *
+     * @param callback The callback to execute when layout width changes.
+     */
+    public static OnLayoutChangeListener createWidthChangedListener(OnLayoutChanged callback) {
+        return (v, l, t, r, b, ol, ot, or, ob) -> {
+            if (WIDTH_CHANGED.shouldTrigger(l, t, r, b, ol, ot, or, ob)) {
+                callback.onLayoutChanged(v, l, t, r, b);
+            }
+        };
+    }
+
     private static boolean didBoundsChange(
             @Px int left,
             @Px int top,
@@ -118,5 +179,15 @@ public class CommonOnLayoutChangeListeners {
             @Px int oldRight,
             @Px int oldBottom) {
         return (right - left) != (oldRight - oldLeft) || (bottom - top) != (oldBottom - oldTop);
+    }
+
+    private static boolean didHeightChange(
+            @Px int top, @Px int bottom, @Px int oldTop, @Px int oldBottom) {
+        return (bottom - top) != (oldBottom - oldTop);
+    }
+
+    private static boolean didWidthChange(
+            @Px int left, @Px int right, @Px int oldLeft, @Px int oldRight) {
+        return (right - left) != (oldRight - oldLeft);
     }
 }

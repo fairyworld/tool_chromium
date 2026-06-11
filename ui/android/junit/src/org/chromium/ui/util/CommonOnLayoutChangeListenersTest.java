@@ -145,4 +145,44 @@ public class CommonOnLayoutChangeListenersTest {
         listener.onLayoutChange(mView, 20, 30, 120, 140, 10, 20, 110, 130);
         assertEquals(1, callCount.get());
     }
+
+    @Test
+    public void testLayoutHeightChanged() {
+        AtomicInteger callCount = new AtomicInteger(0);
+        OnLayoutChangeListener listener =
+                CommonOnLayoutChangeListeners.createHeightChangedListener(
+                        callCount::incrementAndGet);
+
+        // Run when height changed (width same):
+        listener.onLayoutChange(mView, 0, 0, 100, 100, 0, 0, 100, 50);
+        assertEquals(1, callCount.get());
+
+        // Does not run when width changed but height same:
+        listener.onLayoutChange(mView, 0, 0, 200, 100, 0, 0, 100, 100);
+        assertEquals(1, callCount.get());
+
+        // Run when height changes:
+        listener.onLayoutChange(mView, 0, 0, 200, 200, 0, 0, 200, 100);
+        assertEquals(2, callCount.get());
+    }
+
+    @Test
+    public void testLayoutWidthChanged() {
+        AtomicInteger callCount = new AtomicInteger(0);
+        OnLayoutChangeListener listener =
+                CommonOnLayoutChangeListeners.createWidthChangedListener(
+                        callCount::incrementAndGet);
+
+        // Run when width changed (height same):
+        listener.onLayoutChange(mView, 0, 0, 100, 100, 0, 0, 50, 100);
+        assertEquals(1, callCount.get());
+
+        // Does not run when height changed but width same:
+        listener.onLayoutChange(mView, 0, 0, 100, 200, 0, 0, 100, 100);
+        assertEquals(1, callCount.get());
+
+        // Run when width changes:
+        listener.onLayoutChange(mView, 0, 0, 200, 200, 0, 0, 100, 200);
+        assertEquals(2, callCount.get());
+    }
 }
