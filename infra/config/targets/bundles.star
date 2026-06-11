@@ -1195,34 +1195,6 @@ targets.bundle(
 )
 
 targets.bundle(
-    name = "chrome_sizes_android",
-    targets = [
-        "chrome_sizes",
-    ],
-    per_test_modifications = {
-        "chrome_sizes": targets.per_test_modification(
-            mixins = targets.mixin(
-                args = [
-                    "--platform=android",
-                ],
-                swarming = targets.swarming(
-                    dimensions = {
-                        "cpu": "x86-64",
-                        "os": "Ubuntu-22.04",
-                    },
-                ),
-            ),
-            remove_mixins = [
-                "chromium_nexus_5x_oreo",
-                "chromium_pixel_2_pie",
-                "marshmallow",
-                "oreo_mr1_fleet",
-            ],
-        ),
-    },
-)
-
-targets.bundle(
     name = "chromedriver_py_tests_isolated_scripts",
     targets = [
         "chromedriver_py_tests",

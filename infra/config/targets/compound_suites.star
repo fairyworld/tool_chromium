@@ -148,11 +148,3 @@ targets.legacy_compound_suite(
 #         'telemetry_perf_unittests_isolated_scripts_android',
 #     ],
 # )
-
-targets.legacy_compound_suite(
-    name = "win_specific_isolated_scripts_and_sizes",
-    basic_suites = [
-        "chrome_sizes_suite",
-        "win_specific_isolated_scripts",
-    ],
-)

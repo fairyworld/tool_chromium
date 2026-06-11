@@ -609,9 +609,6 @@ ci.builder(
         ],
     ),
     targets = targets.bundle(
-        targets = [
-            "chrome_sizes_android",
-        ],
         additional_compile_targets = [
             "all",
         ],
@@ -657,9 +654,6 @@ ci.builder(
         ],
     ),
     targets = targets.bundle(
-        targets = [
-            "chrome_sizes_android",
-        ],
         additional_compile_targets = [
             "all",
         ],
@@ -1287,7 +1281,7 @@ ci.builder(
     targets = targets.bundle(
         targets = [
             "clang_tot_gtests",
-            "win_specific_isolated_scripts_and_sizes",
+            "win_specific_isolated_scripts",
         ],
         additional_compile_targets = [
             "all",
@@ -1389,7 +1383,7 @@ ci.builder(
     targets = targets.bundle(
         targets = [
             "clang_tot_gtests",
-            "win_specific_isolated_scripts_and_sizes",
+            "win_specific_isolated_scripts",
         ],
         additional_compile_targets = [
             "all",
@@ -1436,7 +1430,7 @@ ci.builder(
     targets = targets.bundle(
         targets = [
             "clang_tot_gtests",
-            "win_specific_isolated_scripts_and_sizes",
+            "win_specific_isolated_scripts",
         ],
         additional_compile_targets = [
             "all",
@@ -1484,7 +1478,7 @@ ci.builder(
     targets = targets.bundle(
         targets = [
             "clang_tot_gtests",
-            "win_specific_isolated_scripts_and_sizes",
+            "win_specific_isolated_scripts",
         ],
         additional_compile_targets = [
             "all",
@@ -1533,7 +1527,7 @@ ci.builder(
     targets = targets.bundle(
         targets = [
             "clang_tot_gtests",
-            "win_specific_isolated_scripts_and_sizes",
+            "win_specific_isolated_scripts",
         ],
         additional_compile_targets = [
             "all",

@@ -2818,11 +2818,6 @@
       'blink_web_tests_ppapi_isolated_scripts',
       'chrome_sizes_suite',
     ],
-
-    'win_specific_isolated_scripts_and_sizes': [
-      'chrome_sizes_suite',
-      'win_specific_isolated_scripts',
-    ],
   },
 
   'matrix_compound_suites': {
