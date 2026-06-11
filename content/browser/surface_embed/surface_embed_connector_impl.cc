@@ -357,7 +357,7 @@ void SurfaceEmbedConnectorImpl::SetView(RenderWidgetHostViewChildFrame* view,
     frame_sink_id_ = view_->GetFrameSinkId();
 
     if (delegate_) {
-      delegate_->SetFrameSinkId(frame_sink_id_);
+      delegate_->SetFrameSinkId(frame_sink_id_, allow_paint_holding);
     }
 
     MaybeRefreshKeepSurfaceAlive();
