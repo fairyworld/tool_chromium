@@ -427,11 +427,6 @@ TEST_P(DesktopMediaPickerViewsTest, AccessibleBubbleFrameViewTitle) {
 
 #if BUILDFLAG(IS_MAC)
 TEST_P(DesktopMediaPickerViewsTest, OnPermissionUpdateWithPermissions) {
-  if (base::mac::MacOSMajorVersion() < 13) {
-    GTEST_SKIP()
-        << "ScreenCapturePermissionChecker only created for MacOS 13 and later";
-  }
-
   test_api_.OnPermissionUpdate(true);
 
   test_api_.SelectTabForSourceType(DesktopMediaList::Type::kScreen);
@@ -448,11 +443,6 @@ TEST_P(DesktopMediaPickerViewsTest, OnPermissionUpdateWithPermissions) {
 }
 
 TEST_P(DesktopMediaPickerViewsTest, OnPermissionUpdateWithoutPermissions) {
-  if (base::mac::MacOSMajorVersion() < 13) {
-    GTEST_SKIP()
-        << "ScreenCapturePermissionChecker only created for MacOS 13 and later";
-  }
-
   test_api_.OnPermissionUpdate(false);
 
   test_api_.SelectTabForSourceType(DesktopMediaList::Type::kScreen);
