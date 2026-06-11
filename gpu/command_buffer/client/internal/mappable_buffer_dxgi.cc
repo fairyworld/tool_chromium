@@ -214,24 +214,21 @@ bool MappableBufferDXGI::AsyncMappingIsNonBlocking() const {
   return true;
 }
 
-void* MappableBufferDXGI::memory(size_t plane) {
+base::span<uint8_t> MappableBufferDXGI::memory(size_t plane) {
   AssertMapped();
 
   if (static_cast<int>(plane) > format_.NumberOfPlanes() ||
       (!shared_memory_handle_ && !premapped_memory_.data())) {
-    return nullptr;
+    return {};
   }
 
-  uint8_t* plane_addr = (use_premapped_memory_ && premapped_memory_.data())
-                            ? premapped_memory_.data()
-                            : shared_memory_handle_->GetMapping()
-                                  .GetMemoryAsSpan<uint8_t>()
-                                  .data();
-  // This is safe, since we already checked that the requested plane is
-  // valid for current format.
-  UNSAFE_TODO(plane_addr += viz::SharedMemoryOffsetForSharedImageFormat(
-                  format_, plane, size_));
-  return plane_addr;
+  size_t offset =
+      viz::SharedMemoryOffsetForSharedImageFormat(format_, plane, size_);
+  return (use_premapped_memory_ && premapped_memory_.data())
+             ? premapped_memory_.subspan(offset)
+             : shared_memory_handle_->GetMapping()
+                   .GetMemoryAsSpan<uint8_t>()
+                   .subspan(offset);
 }
 
 void MappableBufferDXGI::Unmap() {

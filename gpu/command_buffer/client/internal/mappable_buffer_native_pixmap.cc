@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include "base/compiler_specific.h"
 #include "base/functional/bind.h"
 #include "base/logging.h"
 #include "base/memory/ptr_util.h"
@@ -128,9 +129,11 @@ bool MappableBufferNativePixmap::Map() {
   return true;
 }
 
-void* MappableBufferNativePixmap::memory(size_t plane) {
+base::span<uint8_t> MappableBufferNativePixmap::memory(size_t plane) {
   AssertMapped();
-  return pixmap_->GetMemoryAddress(plane);
+  return UNSAFE_BUFFERS(base::span<uint8_t>(
+      static_cast<uint8_t*>(pixmap_->GetMemoryAddress(plane)),
+      pixmap_->GetPlaneSize(plane)));
 }
 
 void MappableBufferNativePixmap::Unmap() {
