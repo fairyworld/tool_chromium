@@ -173,11 +173,11 @@ bool MappableBufferSharedMemory::Map() {
   return true;
 }
 
-base::span<uint8_t> MappableBufferSharedMemory::memory(size_t plane) {
+void* MappableBufferSharedMemory::memory(size_t plane) {
   AssertMapped();
   DCHECK_LT(static_cast<int>(plane), format_.NumberOfPlanes());
-  return shared_memory_mapping_.GetMemoryAsSpan<uint8_t>().subspan(
-      offset_ +
+  return UNSAFE_TODO(
+      static_cast<uint8_t*>(shared_memory_mapping_.memory()) + offset_ +
       viz::SharedMemoryOffsetForSharedImageFormat(format_, plane, size_));
 }
 

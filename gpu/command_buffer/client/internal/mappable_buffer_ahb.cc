@@ -10,7 +10,6 @@
 
 #include "base/check.h"
 #include "base/check_op.h"
-#include "base/compiler_specific.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback_helpers.h"
 #include "base/memory/ptr_util.h"
@@ -145,19 +144,19 @@ bool MappableBufferAHB::AsyncMappingIsNonBlocking() const {
   return true;
 }
 
-base::span<uint8_t> MappableBufferAHB::memory(size_t plane) {
+void* MappableBufferAHB::memory(size_t plane) {
   AssertMapped();
 
   if (static_cast<int>(plane) > format_.NumberOfPlanes() ||
       !shared_memory_handle_) {
-    return {};
+    return nullptr;
   }
 
   base::span<uint8_t> mapping =
       shared_memory_handle_->GetMapping().GetMemoryAsSpan<uint8_t>();
   size_t offset =
       viz::SharedMemoryOffsetForSharedImageFormat(format_, plane, size_);
-  return mapping.subspan(offset);
+  return mapping.subspan(offset).data();
 }
 
 void MappableBufferAHB::Unmap() {
