@@ -307,6 +307,7 @@
 #import "ios/chrome/browser/shared/public/commands/snackbar_commands.h"
 #import "ios/chrome/browser/shared/public/commands/sync_presenter_commands.h"
 #import "ios/chrome/browser/shared/public/commands/synced_set_up_commands.h"
+#import "ios/chrome/browser/shared/public/commands/tab_picker_commands.h"
 #import "ios/chrome/browser/shared/public/commands/text_zoom_commands.h"
 #import "ios/chrome/browser/shared/public/commands/toolbar_commands.h"
 #import "ios/chrome/browser/shared/public/commands/unit_conversion_commands.h"
@@ -346,6 +347,7 @@
 #import "ios/chrome/browser/synced_set_up/coordinator/synced_set_up_coordinator_delegate.h"
 #import "ios/chrome/browser/synced_set_up/utils/utils.h"
 #import "ios/chrome/browser/tab_insertion/model/tab_insertion_browser_agent.h"
+#import "ios/chrome/browser/tab_picker/coordinator/tab_picker_coordinator.h"
 #import "ios/chrome/browser/tab_switcher/ui_bundled/tab_group_action_type.h"
 #import "ios/chrome/browser/tab_switcher/ui_bundled/tab_group_confirmation_coordinator.h"
 #import "ios/chrome/browser/tabs/model/tab_title_util.h"
@@ -492,6 +494,7 @@ const char kChromeAppStoreUrl[] =
     SnackbarCoordinatorDelegate,
     StoreKitCoordinatorDelegate,
     SyncPresenterCommands,
+    TabPickerCommands,
     TextZoomCommands,
     TrustedVaultReauthenticationCoordinatorDelegate,
     UnitConversionCommands,
@@ -702,6 +705,9 @@ const char kChromeAppStoreUrl[] =
 
 // Coordinator for presenting SKStoreProductViewController.
 @property(nonatomic, strong) StoreKitCoordinator* storeKitCoordinator;
+
+// Coordinator for the tab picker.
+@property(nonatomic, strong) TabPickerCoordinator* tabPickerCoordinator;
 
 // Coordinator for Text Zoom.
 @property(nonatomic, strong) TextZoomCoordinator* textZoomCoordinator;
@@ -1255,6 +1261,12 @@ const char kChromeAppStoreUrl[] =
   self.storeKitCoordinator = nil;
 }
 
+// Stops the tab picker coordinator.
+- (void)stopTabPickerCoordinator {
+  [self.tabPickerCoordinator stop];
+  self.tabPickerCoordinator = nil;
+}
+
 // Stops the coordinator for password manager settings.
 - (void)stopPasswordSettingsCoordinator {
   [self.passwordSettingsCoordinator stop];
@@ -1386,6 +1398,7 @@ const char kChromeAppStoreUrl[] =
     @protocol(SharedTabGroupLastTabAlertCommands),
     @protocol(SyncedSetUpCommands),
     @protocol(SyncPresenterCommands),
+    @protocol(TabPickerCommands),
     @protocol(TextZoomCommands),
     @protocol(WebContentCommands),
     @protocol(DefaultBrowserGenericPromoCommands),
@@ -1678,6 +1691,8 @@ const char kChromeAppStoreUrl[] =
 
   [self.snackbarCoordinator stop];
   self.snackbarCoordinator = nil;
+
+  [self stopTabPickerCoordinator];
 
   _keyCommandsProvider = nil;
   _dispatcher = nil;
@@ -3283,6 +3298,7 @@ const char kChromeAppStoreUrl[] =
   [self cancelCollaborationFlows];
   [self.NTPCoordinator clearPresentedState];
   [self dismissMultimodalActionsMenu];
+  [self stopTabPickerCoordinator];
   // The composebox replaces the omnibox.
   if (dismissOmnibox) {
     [self hideComposebox];
@@ -4250,6 +4266,31 @@ const char kChromeAppStoreUrl[] =
 - (void)repostFormTabHelperDismissRepostFormDialog:
     (RepostFormTabHelper*)helper {
   [self stopRepostFormCoordinator];
+}
+
+#pragma mark - TabPickerCommands
+
+- (void)showTabPickerWithParams:(TabPickerParams*)params
+                     completion:(TabPickerCompletionBlock)completion {
+  if (self.tabPickerCoordinator) {
+    return;
+  }
+
+  UIViewController* baseViewController = params.baseViewController
+                                             ? params.baseViewController
+                                             : self.viewController;
+
+  self.tabPickerCoordinator = [[TabPickerCoordinator alloc]
+      initWithBaseViewController:baseViewController
+                         browser:self.browser];
+  self.tabPickerCoordinator.params = params;
+  self.tabPickerCoordinator.tabPickerCompletionBlock = completion;
+  self.tabPickerCoordinator.tabPickerHandler = self;
+  [self.tabPickerCoordinator start];
+}
+
+- (void)hideTabPicker {
+  [self stopTabPickerCoordinator];
 }
 
 #pragma mark - TextZoomCommands

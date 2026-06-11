@@ -14,22 +14,16 @@
 #import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
 #import "ios/chrome/browser/shared/public/commands/drive_file_picker_commands.h"
 #import "ios/chrome/browser/shared/public/commands/tab_picker_commands.h"
-#import "ios/chrome/browser/tab_picker/coordinator/tab_picker_coordinator.h"
-#import "ios/chrome/browser/tab_picker/coordinator/tab_picker_logger.h"
-#import "ios/chrome/browser/tab_picker/coordinator/tab_picker_snackbar_presenter.h"
 
 @interface ComposeboxPickerPresenter () <PHPickerViewControllerDelegate,
                                          UINavigationControllerDelegate,
                                          UIImagePickerControllerDelegate,
-                                         UIDocumentPickerDelegate,
-                                         TabPickerCommands>
+                                         UIDocumentPickerDelegate>
 @end
 
 @implementation ComposeboxPickerPresenter {
   // The VC used as a base for presentations.
   __weak UIViewController* _baseViewController;
-  // Coordinator for the tab picker.
-  TabPickerCoordinator* _tabPickerCoordinator;
   base::WeakPtr<Browser> _browser;
 
   // Presents snackbars.
@@ -107,6 +101,7 @@
       [self.dataSource maxTabAttachmentCountForPresenter:self];
   params.preselectedWebStateIDs =
       [self.dataSource attachedWebStateIDsInCurrentContextForPresenter:self];
+  params.baseViewController = _baseViewController;
 
   __weak __typeof(self) weakSelf = self;
   TabPickerCompletionBlock completionBlock =
@@ -117,13 +112,9 @@
                                    cachedWebStateIDs:cachedIDs];
       };
 
-  _tabPickerCoordinator = [[TabPickerCoordinator alloc]
-      initWithBaseViewController:_baseViewController
-                         browser:_browser.get()];
-  _tabPickerCoordinator.params = params;
-  _tabPickerCoordinator.tabPickerCompletionBlock = completionBlock;
-  _tabPickerCoordinator.tabPickerHandler = self;
-  [_tabPickerCoordinator start];
+  id<TabPickerCommands> tabPickerHandler =
+      HandlerForProtocol(_browser->GetCommandDispatcher(), TabPickerCommands);
+  [tabPickerHandler showTabPickerWithParams:params completion:completionBlock];
 }
 
 - (void)presentDriveFilePicker {
@@ -178,21 +169,6 @@
                                    composeboxPickerPresenterDidDissmissCamera:
                                        weakSelf];
                              }];
-}
-
-#pragma mark - TabPickerCommands
-
-- (void)showTabPickerWithParams:(TabPickerParams*)params
-                     completion:(TabPickerCompletionBlock)completion {
-  // TODO(crbug.com/516502526): This method is a no-op and only exists
-  // temporarily to satisfy protocol requirements while we move the ownership of
-  // TabPickerCoordinator to BrowserCoordinator, which will properly handle this
-  // command.
-}
-
-- (void)hideTabPicker {
-  [_tabPickerCoordinator stop];
-  _tabPickerCoordinator = nil;
 }
 
 #pragma mark - PHPickerViewControllerDelegate
