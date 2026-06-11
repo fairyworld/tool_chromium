@@ -262,8 +262,7 @@ TEST_F(TouchToFillPasswordManagerWebAuthnDelegateTest, ShowAndCancel) {
   touch_to_fill_controller().Close();
 }
 
-TEST_F(TouchToFillPasswordManagerWebAuthnDelegateTest,
-       ShowAndCancelImmediate) {
+TEST_F(TouchToFillPasswordManagerWebAuthnDelegateTest, ShowAndCancelImmediate) {
   std::vector<Credential> credentials({CreatePasskey()});
 
   EXPECT_CALL(view(), Show(Eq(GURL(kExampleCom)), IsOriginSecure(true),

@@ -13,7 +13,7 @@
 #include "chrome/browser/password_manager/android/grouped_affiliations/acknowledge_grouped_credential_sheet_controller.h"
 #include "chrome/browser/password_manager/android/password_manager_ui_util_android.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller_delegate.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_delegate.h"
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_view.h"
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_view_factory.h"
 #include "components/password_manager/content/browser/keyboard_replacing_surface_visibility_controller.h"
@@ -94,7 +94,7 @@ void TouchToFillPasswordManagerController::InitData(
 }
 
 bool TouchToFillPasswordManagerController::Show(
-    std::unique_ptr<TouchToFillControllerDelegate> ttf_delegate,
+    std::unique_ptr<TouchToFillPasswordManagerDelegate> ttf_delegate,
     webauthn::WebAuthnCredManDelegate* cred_man_delegate) {
   if (!ttf_delegate->ShouldShowTouchToFill()) {
     return false;

@@ -185,7 +185,7 @@ class TouchToFillControllerAutofillTest
   }
 
   std::unique_ptr<TouchToFillControllerAutofillDelegate>
-  MakeTouchToFillControllerDelegate(
+  MakeTouchToFillPasswordManagerDelegate(
       SubmissionReadinessState submission_readiness,
       std::unique_ptr<MockPasswordCredentialFiller> filler,
       const password_manager::PasswordForm* form_to_fill,
@@ -274,7 +274,7 @@ TEST_F(TouchToFillControllerAutofillTest, Show_Fill_And_Submit) {
                            ElementsAreArray(credentials),
                            TouchToFillPasswordManagerView::kTriggerSubmission));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kTwoFields, std::move(filler_to_pass),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -302,7 +302,7 @@ TEST_F(TouchToFillControllerAutofillTest, Show_Fill_And_Dont_Submit) {
                            ElementsAreArray(credentials),
                            TouchToFillPasswordManagerView::kNone));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, std::move(filler_to_pass),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -334,7 +334,7 @@ TEST_F(TouchToFillControllerAutofillTest, Dont_Submit_With_Empty_Username) {
                            TouchToFillPasswordManagerView::kTriggerSubmission));
   EXPECT_CALL(*last_mock_filler(), UpdateTriggerSubmission(true));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kTwoFields, std::move(filler_to_pass),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -368,7 +368,7 @@ TEST_F(TouchToFillControllerAutofillTest,
                            TouchToFillPasswordManagerView::kNone));
   EXPECT_CALL(*last_mock_filler(), UpdateTriggerSubmission(false));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kTwoFields, std::move(filler_to_pass),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -393,7 +393,7 @@ TEST_F(TouchToFillControllerAutofillTest, Show_And_Fill_No_Auth_Available) {
                            ElementsAreArray(credentials),
                            TouchToFillPasswordManagerView::kNone));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, CreateMockFiller(),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -428,7 +428,7 @@ TEST_F(TouchToFillControllerAutofillTest,
                            ElementsAreArray(credentials),
                            TouchToFillPasswordManagerView::kTriggerSubmission));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kTwoFields, std::move(filler_to_pass),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -459,7 +459,7 @@ TEST_F(TouchToFillControllerAutofillTest,
                            ElementsAreArray(credentials),
                            TouchToFillPasswordManagerView::kNone));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, CreateMockFiller(),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -482,7 +482,7 @@ TEST_F(TouchToFillControllerAutofillTest,
 TEST_F(TouchToFillControllerAutofillTest, Show_Empty) {
   EXPECT_CALL(view(), Show).Times(0);
   Show({},
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, CreateMockFiller(),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -503,7 +503,7 @@ TEST_F(TouchToFillControllerAutofillTest, Show_Insecure_Origin) {
                            IsOriginSecure(false), ElementsAreArray(credentials),
                            TouchToFillPasswordManagerView::kNone));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, std::move(filler_to_pass),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -532,7 +532,7 @@ TEST_F(TouchToFillControllerAutofillTest, Show_And_Fill_Android_Credential) {
                            ElementsAreArray(credentials),
                            TouchToFillPasswordManagerView::kNone));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, CreateMockFiller(),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -603,7 +603,7 @@ TEST_F(TouchToFillControllerAutofillTest, Show_Orders_Credentials) {
                                         bob, bob_backup, david),
                    TouchToFillPasswordManagerView::kNone));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, CreateMockFiller(),
            form_to_fill(), form_to_fill()->username_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -618,7 +618,7 @@ TEST_F(TouchToFillControllerAutofillTest, Dismiss) {
                            ElementsAreArray(credentials),
                            TouchToFillPasswordManagerView::kNone));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, CreateMockFiller(),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -648,7 +648,7 @@ TEST_F(TouchToFillControllerAutofillTest, ManagePasswordsSelected) {
                            ElementsAreArray(credentials),
                            TouchToFillPasswordManagerView::kNone));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, CreateMockFiller(),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -686,7 +686,7 @@ TEST_F(TouchToFillControllerAutofillTest, DestroyedWhileAuthRunning) {
                            ElementsAreArray(credentials),
                            TouchToFillPasswordManagerView::kNone));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, CreateMockFiller(),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -712,7 +712,7 @@ TEST_F(TouchToFillControllerAutofillTest, ShowWebAuthnCredential) {
                            ElementsAreArray(credentials),
                            TouchToFillPasswordManagerView::kNone));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, CreateMockFiller(),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -738,7 +738,7 @@ TEST_F(TouchToFillControllerAutofillTest, ShowAndSelectHybrid) {
                    ElementsAreArray(credentials),
                    TouchToFillPasswordManagerView::kShouldShowHybridOption));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, CreateMockFiller(),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(true)),
@@ -766,7 +766,7 @@ TEST_F(TouchToFillControllerAutofillTest, ShowCredManEntryIfThereArePasskeys) {
                    ElementsAreArray(credentials),
                    TouchToFillPasswordManagerView::kShouldShowCredManEntry));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, CreateMockFiller(),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -783,7 +783,7 @@ TEST_F(TouchToFillControllerAutofillTest,
       TriggerCredManUi(WebAuthnCredManDelegate::RequestPasswords(false)));
   EXPECT_CALL(view(), Show(_, _, _, _)).Times(0);
   Show({},
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, CreateMockFiller(),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -799,7 +799,7 @@ TEST_F(TouchToFillControllerAutofillTest, NoCredManEntryIfNoPasskeys) {
   EXPECT_CALL(view(), Show(Eq(GURL(kExampleCom)), IsOriginSecure(true),
                            ElementsAreArray(credentials), 0));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, CreateMockFiller(),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -816,7 +816,7 @@ TEST_F(TouchToFillControllerAutofillTest,
       autofill::FieldRendererId(3);
   bool is_shown =
       Show(credentials,
-           MakeTouchToFillControllerDelegate(
+           MakeTouchToFillPasswordManagerDelegate(
                SubmissionReadinessState::kNoInformation, CreateMockFiller(),
                &change_password_form,
                change_password_form.new_password_element_renderer_id,
@@ -838,7 +838,7 @@ TEST_F(TouchToFillControllerAutofillTest,
   Credential credentials[] = {credential};
 
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, CreateMockFiller(),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -872,7 +872,7 @@ TEST_F(TouchToFillControllerAutofillTest,
        .match_type = password_manager_util::GetLoginMatchType::kGrouped});
   Credential credentials[] = {credential};
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kNoInformation, CreateMockFiller(),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -907,7 +907,7 @@ TEST_F(TouchToFillControllerAutofillTest, LogBackupPasswordSelected) {
 
   EXPECT_CALL(view(), Show);
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            SubmissionReadinessState::kTwoFields, std::move(filler_to_pass),
            form_to_fill(), form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),
@@ -941,7 +941,7 @@ TEST_P(TouchToFillControllerAutofillTestWithSubmissionReadinessVariationTest,
                            ElementsAreArray(credentials),
                            /*flags=*/_));
   Show(credentials,
-       MakeTouchToFillControllerDelegate(
+       MakeTouchToFillPasswordManagerDelegate(
            submission_readiness, CreateMockFiller(), form_to_fill(),
            form_to_fill()->password_element_renderer_id,
            TouchToFillControllerAutofillDelegate::ShowHybridOption(false)),

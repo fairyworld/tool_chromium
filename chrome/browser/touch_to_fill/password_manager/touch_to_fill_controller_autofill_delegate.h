@@ -17,7 +17,7 @@
 #include "base/types/strong_alias.h"
 #include "chrome/browser/password_manager/android/grouped_affiliations/acknowledge_grouped_credential_sheet_bridge.h"
 #include "chrome/browser/password_manager/android/grouped_affiliations/acknowledge_grouped_credential_sheet_controller.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller_delegate.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_delegate.h"
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_view.h"
 #include "components/autofill/core/common/unique_ids.h"
 #include "components/device_reauth/device_authenticator.h"
@@ -50,7 +50,7 @@ class Profile;
 // - `OnReauthCompleted` (only of auth before filling of on).
 // - `FillCredential` finally fills the credentials.
 class TouchToFillControllerAutofillDelegate
-    : public TouchToFillControllerDelegate {
+    : public TouchToFillPasswordManagerDelegate {
  public:
   using ShowHybridOption = base::StrongAlias<struct ShowHybridOptionTag, bool>;
 
@@ -113,7 +113,7 @@ class TouchToFillControllerAutofillDelegate
       const TouchToFillControllerAutofillDelegate&) = delete;
   ~TouchToFillControllerAutofillDelegate() override;
 
-  // TouchToFillControllerDelegate:
+  // TouchToFillPasswordManagerDelegate:
   void OnShow(base::span<const TouchToFillPasswordManagerView::Credential>
                   credentials) override;
   void OnCredentialSelected(const password_manager::UiCredential& credential,

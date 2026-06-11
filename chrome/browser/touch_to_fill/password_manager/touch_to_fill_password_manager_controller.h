@@ -28,7 +28,7 @@ class WebAuthnCredManDelegate;
 }  // namespace webauthn
 
 class Profile;
-class TouchToFillControllerDelegate;
+class TouchToFillPasswordManagerDelegate;
 
 class TouchToFillPasswordManagerController {
  public:
@@ -64,8 +64,9 @@ class TouchToFillPasswordManagerController {
   // Instructs the controller to show the provided the bottom sheet.
   // IMPORTANT: call `InitData` prior to this method to set |credentials| and
   // |passkey_credentials|, that will be displayed.
-  virtual bool Show(std::unique_ptr<TouchToFillControllerDelegate> ttf_delegate,
-                    webauthn::WebAuthnCredManDelegate* cred_man_delegate);
+  virtual bool Show(
+      std::unique_ptr<TouchToFillPasswordManagerDelegate> ttf_delegate,
+      webauthn::WebAuthnCredManDelegate* cred_man_delegate);
 
   // Informs the controller that the user has made a selection. Invokes both
   // FillSuggestion() and TouchToFillDismissed() on |driver_|. No-op if invoked
@@ -141,7 +142,7 @@ class TouchToFillPasswordManagerController {
   // Delegate for interacting with the client that owns this controller.
   // It is provided when Show() is called, and reset when the view is
   // destroyed.
-  std::unique_ptr<TouchToFillControllerDelegate> ttf_delegate_;
+  std::unique_ptr<TouchToFillPasswordManagerDelegate> ttf_delegate_;
 
   // Delegate for interacting with the Android Credential Manager. Lifecycle is
   // not bound to this controller.

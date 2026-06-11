@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_CONTROLLER_DELEGATE_H_
-#define CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_CONTROLLER_DELEGATE_H_
+#ifndef CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_PASSWORD_MANAGER_DELEGATE_H_
+#define CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_PASSWORD_MANAGER_DELEGATE_H_
 
 #include <optional>
 #include <vector>
@@ -17,15 +17,15 @@
 namespace password_manager {
 class PasskeyCredential;
 class UiCredential;
-}
+}  // namespace password_manager
 
 class GURL;
 
 // Delegate interface for TouchToFillPasswordManagerController, to be
 // implemented by owner-specified classes.
-class TouchToFillControllerDelegate {
+class TouchToFillPasswordManagerDelegate {
  public:
-  virtual ~TouchToFillControllerDelegate();
+  virtual ~TouchToFillPasswordManagerDelegate();
 
   // Called by the controller before the view is shown.
   virtual void OnShow(
@@ -87,8 +87,8 @@ class TouchToFillControllerDelegate {
   virtual bool ShouldShowNoPasskeysSheetIfRequired() = 0;
 
   // A method for the delegate providing a credential sorting that will override
-  // the `TouchToFillPasswordManagerController` default. If the delegate does
-  // not have a custom sorting function, this returns `std::nullopt`.
+  // the `TouchToFillController` default. If the delegate does not have a custom
+  // sorting function, this returns `std::nullopt`.
   virtual std::optional<std::vector<TouchToFillPasswordManagerView::Credential>>
   SortCredentials(base::span<const TouchToFillPasswordManagerView::Credential>
                       credentials) = 0;
@@ -97,4 +97,4 @@ class TouchToFillControllerDelegate {
   virtual gfx::NativeView GetNativeView() = 0;
 };
 
-#endif  // CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_CONTROLLER_DELEGATE_H_
+#endif  // CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_PASSWORD_MANAGER_DELEGATE_H_

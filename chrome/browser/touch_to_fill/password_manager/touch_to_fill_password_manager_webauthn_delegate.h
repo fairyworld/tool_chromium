@@ -11,7 +11,7 @@
 #include "base/containers/span.h"
 #include "base/functional/callback_forward.h"
 #include "base/memory/raw_ptr.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller_delegate.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_delegate.h"
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_view.h"
 #include "chrome/browser/webauthn/shared_types.h"
 #include "chrome/browser/webauthn/touch_to_fill_credential_receiver.h"
@@ -33,7 +33,7 @@ class UiCredential;
 // without necessarily any forms or input fields being present on the page. This
 // is owned by WebAuthnRequestDelegateAndroid.
 class TouchToFillPasswordManagerWebAuthnDelegate
-    : public TouchToFillControllerDelegate {
+    : public TouchToFillPasswordManagerDelegate {
  public:
   using SortingCallback = base::RepeatingCallback<
       std::vector<TouchToFillPasswordManagerView::Credential>(
@@ -55,7 +55,7 @@ class TouchToFillPasswordManagerWebAuthnDelegate
 
   ~TouchToFillPasswordManagerWebAuthnDelegate() override;
 
-  // TouchToFillControllerDelegate:
+  // TouchToFillPasswordManagerDelegate:
   void OnShow(base::span<const TouchToFillPasswordManagerView::Credential>
                   credentials) override;
   void OnCredentialSelected(const password_manager::UiCredential& credential,

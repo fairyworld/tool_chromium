@@ -42,10 +42,10 @@ if (is_android) {
     sources = [
       "touch_to_fill_controller_autofill_delegate.cc",
       "touch_to_fill_controller_autofill_delegate.h",
-      "touch_to_fill_controller_delegate.cc",
-      "touch_to_fill_controller_delegate.h",
       "touch_to_fill_password_manager_controller.cc",
       "touch_to_fill_password_manager_controller.h",
+      "touch_to_fill_password_manager_delegate.cc",
+      "touch_to_fill_password_manager_delegate.h",
       "touch_to_fill_password_manager_webauthn_delegate.cc",
       "touch_to_fill_password_manager_webauthn_delegate.h",
     ]

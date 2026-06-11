@@ -117,8 +117,8 @@
 #include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate.h"
 #include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate_factory.h"
 #include "chrome/browser/password_manager/factories/account_password_store_factory.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller_delegate.h"
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_controller.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_delegate.h"
 #include "components/password_manager/content/browser/mock_keyboard_replacing_surface_visibility_controller.h"
 #include "components/password_manager/core/browser/passkey_credential.h"
 #include "components/webauthn/android/cred_man_support.h"
@@ -414,7 +414,7 @@ class MockTouchToFillPasswordManagerController
 
   MOCK_METHOD(bool,
               Show,
-              (std::unique_ptr<TouchToFillControllerDelegate>,
+              (std::unique_ptr<TouchToFillPasswordManagerDelegate>,
                webauthn::WebAuthnCredManDelegate*),
               (override));
 };
@@ -2216,7 +2216,7 @@ TEST_F(ChromePasswordManagerClientAndroidTest,
   std::vector<TouchToFillPasswordManagerView::Credential> credentials{};
   EXPECT_CALL(*ttf_controller, InitData(Eq(credentials), _));
   EXPECT_CALL(*ttf_controller, Show)
-      .WillOnce([&waiter](std::unique_ptr<TouchToFillControllerDelegate>,
+      .WillOnce([&waiter](std::unique_ptr<TouchToFillPasswordManagerDelegate>,
                           webauthn::WebAuthnCredManDelegate*) {
         waiter.Quit();
         return true;
