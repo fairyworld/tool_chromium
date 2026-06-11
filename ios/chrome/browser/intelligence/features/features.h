@@ -278,10 +278,6 @@ BASE_DECLARE_FEATURE(kGeminiResponseViewDynamicResizing);
 // Returns true if Gemini Dynamic Resizing is enabled.
 bool IsGeminiResponseViewDynamicResizingEnabled();
 
-// Feature flag for Gemini Dynamic Settings.
-BASE_DECLARE_FEATURE(kGeminiDynamicSettings);
-bool IsGeminiDynamicSettingsEnabled();
-
 // Feature flag for enabling early metrics collection for page stability.
 BASE_DECLARE_FEATURE(kPageStabilityMetrics);
 bool IsPageStabilityMetricsEnabled();

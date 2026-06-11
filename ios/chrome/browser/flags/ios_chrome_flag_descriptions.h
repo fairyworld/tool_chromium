@@ -820,10 +820,6 @@ inline constexpr char kGeminiCopresenceDescription[] =
     "Enables the Gemini Copresence feature, which provides a persistent Gemini "
     "overlay.";
 
-inline constexpr char kGeminiDynamicSettingsName[] = "Gemini Dynamic Settings";
-inline constexpr char kGeminiDynamicSettingsDescription[] =
-    "Enables loading Gemini settings dynamically using the Gemini SDK.";
-
 inline constexpr char kGeminiImageRemixToolName[] = "Gemini Image Remix Tool";
 inline constexpr char kGeminiImageRemixToolDescription[] =
     "Enables the image remix tool in the Gemini floaty.";

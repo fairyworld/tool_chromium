@@ -1498,9 +1498,6 @@
       <message name="IDS_IOS_BWG_PROMO_SECOND_BOX_TITLE" desc="Second box title text for the Gemini Promo page.">
           Summarize
       </message>
-      <message name="IDS_IOS_BWG_SETTINGS_APP_ACTIVITY_FOOTER_TEXT" desc="The footer text of app activity row in BWG settings page.">
-        View and manage Gemini activity like your chats, feedback, and prompts
-      </message>
       <message name="IDS_IOS_BWG_SETTINGS_APP_ACTIVITY_TITLE" desc="The title text of app activity row in BWG settings page.">
         Gemini App Activity
       </message>

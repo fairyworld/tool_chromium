@@ -455,10 +455,6 @@ void GeminiBrowserAgent::OnPrimaryAccountChanged(
 }
 
 void GeminiBrowserAgent::ConfigureGemini() {
-  if (!IsGeminiDynamicSettingsEnabled()) {
-    return;
-  }
-
   AuthenticationService* auth_service =
       AuthenticationServiceFactory::GetForProfile(browser_->GetProfile());
   if (!auth_service || !auth_service->HasPrimaryIdentity()) {

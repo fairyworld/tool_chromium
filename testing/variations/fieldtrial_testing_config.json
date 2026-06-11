@@ -13147,21 +13147,6 @@
             ]
         }
     ],
-    "HeliosDynamicSettings": [
-        {
-            "platforms": [
-                "ios"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "GeminiDynamicSettings"
-                    ]
-                }
-            ]
-        }
-    ],
     "HeliosScreenContextMigration": [
         {
             "platforms": [

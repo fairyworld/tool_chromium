@@ -541,15 +541,6 @@ bool IsGeminiResponseViewDynamicResizingEnabled() {
   return base::FeatureList::IsEnabled(kGeminiResponseViewDynamicResizing);
 }
 
-BASE_FEATURE(kGeminiDynamicSettings, base::FEATURE_ENABLED_BY_DEFAULT);
-
-bool IsGeminiDynamicSettingsEnabled() {
-  if (!IsPageActionMenuEnabled()) {
-    return false;
-  }
-  return base::FeatureList::IsEnabled(kGeminiDynamicSettings);
-}
-
 BASE_FEATURE(kPageStabilityMetrics, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // The length of time after an interaction we will track mutations before
