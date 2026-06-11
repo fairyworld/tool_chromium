@@ -1386,6 +1386,9 @@ public final class ProductionSupportedFlagList {
         Flag.baseFeature(
                 "AddressSorterConnectCache",
                 "Enables caching the results of UDP connect() results in AddressSorterPosix."),
+        Flag.baseFeature(
+                "EarlyCookieLoadOnPreconnect",
+                "When enabled, cookies are loaded early on preconnect requests."),
 
         // Add new commandline switches and features above. The final entry should have a
         // trailing comma for cleaner diffs.
