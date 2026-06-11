@@ -1021,6 +1021,7 @@ IN_PROC_BROWSER_TEST_F(ProfilePickerCreationFlowBrowserTest, ShowPicker) {
 }
 
 IN_PROC_BROWSER_TEST_F(ProfilePickerCreationFlowBrowserTest, ShowChoice) {
+  base::HistogramTester histogram_tester;
   ProfilePicker::Show(ProfilePicker::Params::FromEntryPoint(
       ProfilePicker::EntryPoint::kProfileMenuAddNewProfile));
   EXPECT_TRUE(ProfilePicker::IsOpen());
@@ -1031,6 +1032,8 @@ IN_PROC_BROWSER_TEST_F(ProfilePickerCreationFlowBrowserTest, ShowChoice) {
   EXPECT_NE(delegate->GetWindowTitle(), delegate->GetAccessibleWindowTitle());
   WaitForLoadStop(GURL("chrome://profile-picker/new-profile"));
   EXPECT_NE(delegate->GetWindowTitle(), delegate->GetAccessibleWindowTitle());
+  histogram_tester.ExpectUniqueSample(
+      "Signin.SignIn.Offered", signin_metrics::AccessPoint::kUserManager, 1);
 }
 
 IN_PROC_BROWSER_TEST_F(ProfilePickerCreationFlowBrowserTest,
