@@ -5,6 +5,7 @@
 package org.chromium.chrome.browser.toolbar.top;
 
 import static org.chromium.build.NullUtil.assertNonNull;
+import static org.chromium.build.NullUtil.assumeNonNull;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
@@ -109,6 +110,8 @@ public class ToolbarTablet extends ToolbarLayout {
     private @Nullable TabletCaptureStateToken mLastCaptureStateToken;
     private @DrawableRes int mBookmarkButtonImageRes;
     private @Nullable ExtensionsToolbarCoordinator mExtensionsToolbarCoordinator;
+    private @Nullable ImageButton mGlicActionChip;
+    private @Nullable View mGlicDivider;
 
     private final @Nullable ToolbarWidthConsumer[] mToolbarWidthConsumers =
             new ToolbarWidthConsumer[ToolbarComponentId.COUNT];
@@ -645,6 +648,43 @@ public class ToolbarTablet extends ToolbarLayout {
     private void setOptionalButtonVisibility(boolean isVisible) {
         if (mOptionalButton == null) return;
         mOptionalButton.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * Set {@link ToolbarWidthConsumer} for Glic button pinned on the tab strip but moved to the
+     * toolbar when the tab strip becomes hidden.
+     */
+    public void setGlicToolbarWidthConsumer(ToolbarWidthConsumer consumer) {
+        mToolbarWidthConsumers[ToolbarComponentId.GLIC_PINNED_MOVED] = consumer;
+    }
+
+    /**
+     * Toggle Glic action button visibility on the toolbar.
+     *
+     * @param visible Whether the button should be visible or not.
+     * @param clickListener Callback to invoke when the Glic action button is clicked.
+     */
+    public void setGlicActionChipVisibility(boolean visible, OnClickListener clickListener) {
+        if (mGlicDivider == null) {
+            mGlicDivider = assumeNonNull(findViewById(R.id.glic_divider));
+        }
+        mGlicDivider.setVisibility(visible ? VISIBLE : GONE);
+        if (visible) {
+            ViewStub glicActionChipStub = findViewById(R.id.glic_action_chip_stub);
+            if (mGlicActionChip == null && glicActionChipStub != null) {
+                mGlicActionChip = (ImageButton) glicActionChipStub.inflate();
+                mGlicActionChip.setOnClickListener(clickListener);
+                mGlicActionChip.setImageResource(R.drawable.ic_spark_24dp);
+                mGlicActionChip.setContentDescription(
+                        getContext().getString(R.string.glic_tab_strip_button_tooltip));
+                ImageViewCompat.setImageTintList(mGlicActionChip, getButtonTintList());
+            }
+            assumeNonNull(mGlicActionChip).setVisibility(VISIBLE);
+        } else {
+            if (mGlicActionChip != null) {
+                mGlicActionChip.setVisibility(GONE);
+            }
+        }
     }
 
     private class ToolbarPaddingWidthConsumer implements ToolbarWidthConsumer {

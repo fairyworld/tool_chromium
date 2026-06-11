@@ -113,8 +113,10 @@ import org.chromium.chrome.browser.glic.GlicKeyedService.GlicInvocationSource;
 import org.chromium.chrome.browser.glic.GlicKeyedServiceHandler;
 import org.chromium.chrome.browser.glic.GlicMetrics;
 import org.chromium.chrome.browser.glic.GlicNavigationUtils;
+import org.chromium.chrome.browser.glic.GlicPrefNames;
 import org.chromium.chrome.browser.glic.GlicPromoCoordinator;
 import org.chromium.chrome.browser.glic.GlicUiCoordinator;
+import org.chromium.chrome.browser.glic.GlicUtils;
 import org.chromium.chrome.browser.history.HistoryManagerUtils;
 import org.chromium.chrome.browser.hub.HubManager;
 import org.chromium.chrome.browser.incognito.reauth.IncognitoReauthCoordinatorFactory;
@@ -153,6 +155,7 @@ import org.chromium.chrome.browser.open_in_app.TabbedOpenInAppEntryPoint;
 import org.chromium.chrome.browser.pdf.PdfPageIphController;
 import org.chromium.chrome.browser.preferences.ChromePreferenceKeys;
 import org.chromium.chrome.browser.preferences.ChromeSharedPreferences;
+import org.chromium.chrome.browser.preferences.PrefServiceUtil;
 import org.chromium.chrome.browser.privacy.settings.PrivacySettings;
 import org.chromium.chrome.browser.privacy_sandbox.PrivacySandbox3pcdRollbackMessageController;
 import org.chromium.chrome.browser.profiles.Profile;
@@ -263,6 +266,7 @@ import org.chromium.components.embedder_support.util.UrlUtilities;
 import org.chromium.components.feature_engagement.EventConstants;
 import org.chromium.components.feature_engagement.FeatureConstants;
 import org.chromium.components.feature_engagement.Tracker;
+import org.chromium.components.prefs.PrefChangeRegistrar;
 import org.chromium.components.signin.AccountManagerFacadeProvider;
 import org.chromium.components.signin.base.AccountInfo;
 import org.chromium.components.signin.identitymanager.IdentityManager;
@@ -302,6 +306,11 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
     private static final String TAG = "TabbedRootUiCoord";
     private static boolean sDisableTopControlsAnimationForTesting;
     private final RootUiTabObserver mRootUiTabObserver;
+    private final SettableNonNullObservableSupplier<Boolean> mIsVerticalTabsActiveSupplier =
+            ObservableSuppliers.createNonNull(false);
+    private final SettableNonNullObservableSupplier<Boolean> mIsGlicPinnedSupplier =
+            ObservableSuppliers.createNonNull(false);
+    private @Nullable PrefChangeRegistrar mPrefChangeRegistrar;
     private @Nullable TabbedSystemUiCoordinator mSystemUiCoordinator;
     private @Nullable TabGroupSyncController mTabGroupSyncController;
     private final OneshotSupplierImpl<TabGroupUiActionHandler> mTabGroupUiActionHandlerSupplier =
@@ -1280,7 +1289,9 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                 (MonotonicObservableSupplier<Integer>) mTabStripVisibilitySupplier,
                 (preventClose, invocationSource) -> toggleGlic(preventClose, invocationSource),
                 mChromeAndroidTaskSupplier,
-                mBrowserControlsManager);
+                mBrowserControlsManager,
+                mIsVerticalTabsActiveSupplier,
+                mIsGlicPinnedSupplier);
     }
 
     @Override
@@ -2191,18 +2202,36 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
         mSecondaryUiContainerMarginAdjuster = new ViewMarginAdjusterForSideUi(secondaryUiContainer);
         mSideUiCoordinator.addObserver(mSecondaryUiContainerMarginAdjuster);
 
-        // Restore the user's saved tab layout preference upon browser cold launch.
         if (VerticalTabUtils.isVerticalTabsEligible(mActivity)) {
+            // Restore the user's saved tab layout preference upon browser cold launch.
             boolean useVerticalLayoutOnLaunch =
                     ChromeSharedPreferences.getInstance()
                             .readBoolean(ChromePreferenceKeys.VERTICAL_TABS_ENABLED, false);
 
+            mIsVerticalTabsActiveSupplier.set(useVerticalLayoutOnLaunch);
             if (useVerticalLayoutOnLaunch) {
                 var transitionCoordinator =
                         assumeNonNull(mToolbarManager).getTabStripTransitionCoordinator();
                 assumeNonNull(transitionCoordinator).suppressTabStrip(true);
                 assumeNonNull(mVerticalTabsSideUiCoordinator).setVisible(true);
             }
+
+            // Set up vertical tabs + pinned Glic visibility interaction.
+            Profile profile = currentlySelectedProfile;
+            if (profile != null && GlicEnabling.isEnabledForProfile(profile)) {
+                mIsGlicPinnedSupplier.set(GlicUtils.isButtonPinnedToTabStrip(profile));
+                mPrefChangeRegistrar = PrefServiceUtil.createFor(profile);
+                mPrefChangeRegistrar.addObserver(
+                        GlicPrefNames.GLIC_PINNED_TO_TABSTRIP,
+                        () ->
+                                mIsGlicPinnedSupplier.set(
+                                        GlicUtils.isButtonPinnedToTabStrip(profile)));
+            }
+
+            var toolbar =
+                    assumeNonNull(getToolbarManagerSupplier().get()).getTopToolbarCoordinator();
+            toolbar.observeGlicVerticalTabs(
+                    mIsVerticalTabsActiveSupplier, mIsGlicPinnedSupplier, mIncognitoStateProvider);
         }
     }
 
@@ -2221,6 +2250,7 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
 
         assumeNonNull(transitionCoordinator).suppressTabStrip(shouldShowVerticalTabs);
         assumeNonNull(mVerticalTabsSideUiCoordinator).setVisible(shouldShowVerticalTabs);
+        mIsVerticalTabsActiveSupplier.set(shouldShowVerticalTabs);
     }
 
     private void destroySideUi() {
@@ -2252,6 +2282,15 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
 
             mSideUiCoordinator.destroy();
             mSideUiCoordinator = null;
+        }
+
+        if (mVerticalTabsSideUiCoordinator != null) {
+            mVerticalTabsSideUiCoordinator.destroy();
+            mVerticalTabsSideUiCoordinator = null;
+        }
+        if (mPrefChangeRegistrar != null) {
+            mPrefChangeRegistrar.destroy();
+            mPrefChangeRegistrar = null;
         }
     }
 

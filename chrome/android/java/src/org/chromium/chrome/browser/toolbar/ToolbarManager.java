@@ -97,6 +97,7 @@ import org.chromium.chrome.browser.gesturenav.GestureNavigationUtils;
 import org.chromium.chrome.browser.gesturenav.OverscrollGlowCoordinator;
 import org.chromium.chrome.browser.gesturenav.TabOnBackGestureHandler;
 import org.chromium.chrome.browser.glic.GlicButtonDelegate;
+import org.chromium.chrome.browser.glic.GlicKeyedService.GlicInvocationSource;
 import org.chromium.chrome.browser.history.HistoryManagerUtils;
 import org.chromium.chrome.browser.homepage.HomepageManager;
 import org.chromium.chrome.browser.homepage.HomepageManager.HomepageStateListener;
@@ -2634,7 +2635,8 @@ public class ToolbarManager
                 mSuppressToolbarSceneLayerSupplier,
                 mToolbarProgressBarLayer::onProgressBarInfoUpdate,
                 mCaptureResourceIdSupplier,
-                mTabStripTopControlLayer);
+                mTabStripTopControlLayer,
+                this::onGlicToggled);
 
         // This call is mainly to ensure the tab strip height stays the same as the internal value
         // from TabStripTransitionCoordinator. When canForceTopChromeHeightAdjustmentOnStartup()
@@ -2713,6 +2715,10 @@ public class ToolbarManager
         }
 
         TraceEvent.end("ToolbarManager.initializeWithNative");
+    }
+
+    private void onGlicToggled() {
+        mToggleGlicCallback.onClick(/* preventClose= */ false, GlicInvocationSource.TOOLBAR_BUTTON);
     }
 
     /**
@@ -3607,6 +3613,11 @@ public class ToolbarManager
     /** Returns {@link WindowAndroid} */
     public WindowAndroid getWindowAndroid() {
         return mWindowAndroid;
+    }
+
+    /** Returns the {@link TopToolbarCoordinator}. */
+    public TopToolbarCoordinator getTopToolbarCoordinator() {
+        return mToolbar;
     }
 
     /** Returns {@link LocationBarModel} for access in tests. */

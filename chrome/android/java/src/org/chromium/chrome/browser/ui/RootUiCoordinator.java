@@ -368,7 +368,7 @@ public class RootUiCoordinator
      */
     private @Nullable ToolbarThemeColorProvider mAdjustedToolbarThemeColorProvider;
 
-    private IncognitoStateProvider mIncognitoStateProvider;
+    protected IncognitoStateProvider mIncognitoStateProvider;
 
     private final @Nullable Callback<Boolean> mOnOmniboxFocusChangedListener;
     protected @Nullable ToolbarManager mToolbarManager;
