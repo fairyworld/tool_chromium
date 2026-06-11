@@ -645,6 +645,13 @@ BASE_FEATURE(kPreferWarmRendererProcess, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kReusePrerenderingProcessForMainFrames,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
+// Allows a reload to replace the initial navigation entry if it is
+// the first navigation to commit. This fixes the case where a browser-initiated
+// reload occurs before the first navigation has committed, resulting in
+// discarding the pending entry and remaining on the about:blank page. See
+// https://crbug.com/324117294.
+BASE_FEATURE(kReplaceInitialEntryForReload, base::FEATURE_ENABLED_BY_DEFAULT);
+
 #if BUILDFLAG(IS_ANDROID)
 // If enabled, then orientation lock won't claim to work on anything but phone
 // form factors.  Tablets already do unpredictable things, such as letterboxing

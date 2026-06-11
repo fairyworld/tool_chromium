@@ -18015,8 +18015,16 @@ RendererLoadType CalculateRendererLoadType(NavigationRequest* request,
 
   if (!is_error_document && is_reload) {
     // For non-error documents, if the NavigationType given by the browser is
-    // a reload, then the navigation will be classified as a reload.
-    return RendererLoadType::kReload;
+    // a reload, then the navigation will normally be classified as a reload.
+    // However, if should_replace_current_entry is set (e.g., reloading before
+    // the initial entry has been replaced), use kReplaceCurrentItem so that
+    // the renderer replaces the entry rather than treating it as a standard
+    // reload.
+    // TODO(crbug.com/519762182): Consider treating reload-before-initial-
+    // entry-replacement as a new navigation (DIFFERENT_DOCUMENT) rather than
+    // a reload because the document never actually loaded.
+    return should_replace_current_entry ? RendererLoadType::kReplaceCurrentItem
+                                        : RendererLoadType::kReload;
   }
 
   return should_replace_current_entry ? RendererLoadType::kReplaceCurrentItem

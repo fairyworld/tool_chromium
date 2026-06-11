@@ -1842,9 +1842,17 @@ NavigationRequest::NavigationRequest(
   } else {
     CHECK_EQ(common_params_->url, commit_params_->original_url);
   }
-  // Navigations can't be a replacement and a reload at the same time.
+  // Navigations generally can't be both a replacement and a reload, except
+  // when reloading on the initial entry before it has been replaced by the
+  // first real navigation.
+  NavigationEntryImpl* last_committed_entry =
+      frame_tree_node_->navigator().controller().GetLastCommittedEntry();
+  bool is_initial_nav_entry = frame_tree_node_->IsMainFrame() &&
+                              last_committed_entry &&
+                              last_committed_entry->IsInitialEntry();
   CHECK(!common_params_->should_replace_current_entry ||
-        !NavigationTypeUtils::IsReload(common_params_->navigation_type));
+        !NavigationTypeUtils::IsReload(common_params_->navigation_type) ||
+        is_initial_nav_entry);
   CHECK(IsInOutermostMainFrame() ||
         common_params_->base_url_for_data_url.is_empty());
 #if BUILDFLAG(IS_ANDROID)

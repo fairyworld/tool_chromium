@@ -672,10 +672,23 @@ WebFrameLoadType NavigationTypeToLoadType(
     bool should_replace_current_entry) {
   switch (navigation_type) {
     case blink::mojom::NavigationType::RELOAD:
-      return WebFrameLoadType::kReload;
-
     case blink::mojom::NavigationType::RELOAD_BYPASSING_CACHE:
-      return WebFrameLoadType::kReloadBypassingCache;
+      // When should_replace_current_entry is set for a reload (e.g., reloading
+      // before the initial entry has been replaced), use kReplaceCurrentItem
+      // so the initial entry is properly replaced. For shift-reload, this
+      // trades off Blink's subresource cache-bypass behavior (which keys off
+      // kReloadBypassingCache) in favor of correct history-entry behavior;
+      // the main resource still bypasses the cache because the browser-side
+      // request uses NavigationType::RELOAD_BYPASSING_CACHE.
+      // TODO(crbug.com/519762182): Consider treating reload-before-initial-
+      // entry-replacement as a new navigation (DIFFERENT_DOCUMENT) rather
+      // than a reload because the document never actually loaded.
+      if (should_replace_current_entry) {
+        return WebFrameLoadType::kReplaceCurrentItem;
+      }
+      return navigation_type == blink::mojom::NavigationType::RELOAD
+                 ? WebFrameLoadType::kReload
+                 : WebFrameLoadType::kReloadBypassingCache;
 
     case blink::mojom::NavigationType::HISTORY_SAME_DOCUMENT:
     case blink::mojom::NavigationType::HISTORY_DIFFERENT_DOCUMENT:
