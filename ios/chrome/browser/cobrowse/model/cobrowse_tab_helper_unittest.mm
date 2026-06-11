@@ -317,16 +317,41 @@ TEST_F(CobrowseTabHelperTest, HideAssistantOnAimZeroStateSearchNavigation) {
   [mock_scene_commands_handler_ verify];
 }
 
-// Tests that closeAssistant is called when navigating to the NTP.
-TEST_F(CobrowseTabHelperTest, CloseAssistantOnNtpNavigation) {
+// Tests that hideAssistant is called when navigating to the NTP, and
+// showAssistant is restored when navigating to a normal web page.
+TEST_F(CobrowseTabHelperTest, HideOnNtpAndRestoreOnNormalNavigation) {
+  GURL aim_url("https://www.google.com/search?q=test&udm=50");
   GURL ntp_url("chrome://newtab");
+  GURL normal_url("https://www.example.com");
 
-  web::FakeNavigationContext context;
-  context.SetUrl(ntp_url);
+  OCMStub([mock_tab_grid_state_ tabGridVisible]).andReturn(NO);
 
-  OCMExpect([mock_scene_commands_handler_ closeAssistant]);
+  web::FakeWebState* opener_ptr = CreateAndInsertWebState(aim_url);
 
-  tab_helper_->DidStartNavigation(fake_web_state_, &context);
+  web::FakeWebState* new_web_state_ptr =
+      CreateAndInsertWebStateWithOpener(GURL::EmptyGURL(), opener_ptr);
 
+  CobrowseTabHelper* new_tab_helper =
+      CobrowseTabHelper::FromWebState(new_web_state_ptr);
+
+  // 1. Start session by navigating to a normal page.
+  web::FakeNavigationContext context1;
+  context1.SetUrl(normal_url);
+  OCMExpect([mock_scene_commands_handler_ showAssistant]);
+  new_tab_helper->DidStartNavigation(new_web_state_ptr, &context1);
+  [mock_scene_commands_handler_ verify];
+
+  // 2. Navigate to NTP -> should hide.
+  web::FakeNavigationContext context2;
+  context2.SetUrl(ntp_url);
+  OCMExpect([mock_scene_commands_handler_ hideAssistant]);
+  new_tab_helper->DidStartNavigation(new_web_state_ptr, &context2);
+  [mock_scene_commands_handler_ verify];
+
+  // 3. Navigate to a normal page again -> should restore (show).
+  web::FakeNavigationContext context3;
+  context3.SetUrl(normal_url);
+  OCMExpect([mock_scene_commands_handler_ showAssistant]);
+  new_tab_helper->DidStartNavigation(new_web_state_ptr, &context3);
   [mock_scene_commands_handler_ verify];
 }

@@ -43,12 +43,6 @@ void CobrowseTabHelper::WasShown(web::WebState* web_state) {
   }
 
   GURL url = web_state->GetVisibleURL();
-  if (ShouldCloseAssistant(url)) {
-    [scene_handler_ closeAssistant];
-    delegate_->SetSessionActive(false);
-    return;
-  }
-
   if (ShouldHideAssistant(url)) {
     [scene_handler_ hideAssistant];
     return;
@@ -72,12 +66,6 @@ void CobrowseTabHelper::DidStartNavigation(
   }
 
   const GURL& url = navigation_context->GetUrl();
-  if (ShouldCloseAssistant(url)) {
-    [scene_handler_ closeAssistant];
-    delegate_->SetSessionActive(false);
-    return;
-  }
-
   if (ShouldHideAssistant(url)) {
     [scene_handler_ hideAssistant];
     return;
@@ -102,14 +90,6 @@ void CobrowseTabHelper::WebStateDestroyed(web::WebState* web_state) {
 
 #pragma mark - Private helpers
 
-bool CobrowseTabHelper::ShouldCloseAssistant(const GURL& url) {
-  if (IsUrlNtp(url)) {
-    return true;
-  }
-
-  return false;
-}
-
 void CobrowseTabHelper::ShowAssistant() {
   [scene_handler_ showAssistant];
 }
@@ -120,6 +100,10 @@ bool CobrowseTabHelper::ShouldHideAssistant(const GURL& url) {
   }
 
   if (IsAimURL(url) || IsAimZeroStateURL(url)) {
+    return true;
+  }
+
+  if (IsUrlNtp(url)) {
     return true;
   }
 
