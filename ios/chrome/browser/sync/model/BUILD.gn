@@ -32,6 +32,7 @@ source_set("model") {
     "//components/history/core/browser",
     "//components/network_time",
     "//components/password_manager/core/browser",
+    "//components/password_manager/core/browser/features:password_features",
     "//components/password_manager/core/browser/sharing",
     "//components/pref_registry",
     "//components/prefs",
