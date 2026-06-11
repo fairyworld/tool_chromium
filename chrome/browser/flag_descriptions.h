@@ -4787,6 +4787,10 @@ inline constexpr char kWebCryptoPQCDescription[] =
 inline constexpr char kWebiumName[] = "Webium";
 inline constexpr char kWebiumDescription[] = "Webium Prototype Browser.";
 
+inline constexpr char kWebUIToolbarName[] = "WebUI Toolbar";
+inline constexpr char kWebUIToolbarDescription[] =
+    "Use WebUI to render the toolbar.";
+
 inline constexpr char kWebOtpBackendName[] = "Web OTP";
 inline constexpr char kWebOtpBackendDescription[] =
     "Enables Web OTP API that uses the specified backend.";

@@ -4025,6 +4025,10 @@ const FeatureEntry::FeatureVariation kNavigationBlurVariations[] = {
 constexpr char kWebiumFlag[] = "webium";
 constexpr char kWebiumFeatures[] =
     "Webium,SurfaceEmbed,ExtensionsMenuAccessControl";
+constexpr char kWebUIToolbarFlag[] = "webui-toolbar";
+constexpr char kWebUIToolbarFeatures[] =
+    "InitialWebUI,WebUIReloadButton,WebUIBackForwardButton,WebUIHomeButton,"
+    "WebUISplitTabsButton";
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 const FeatureEntry::FeatureParam kMobileNTPPromoOnDesktopGeneral[] = {
@@ -13010,6 +13014,15 @@ const FeatureEntry kFeatureEntries[] = {
     {"read-aloud-native", flag_descriptions::kReadAloudNativeName,
      flag_descriptions::kReadAloudNativeDescription, kOsAndroid,
      FEATURE_VALUE_TYPE(features::kReadAloudNative)},
+#endif
+
+#if !BUILDFLAG(IS_ANDROID)
+    {kWebUIToolbarFlag, flag_descriptions::kWebUIToolbarName,
+     flag_descriptions::kWebUIToolbarDescription, kOsWin | kOsMac | kOsLinux,
+     ENABLE_DISABLE_VALUE_TYPE_AND_VALUE(switches::kEnableFeatures,
+                                         kWebUIToolbarFeatures,
+                                         switches::kDisableFeatures,
+                                         kWebUIToolbarFeatures)},
 #endif
 
     // Add new entries above this line.
