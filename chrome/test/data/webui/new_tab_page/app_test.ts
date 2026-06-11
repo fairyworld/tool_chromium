@@ -2904,13 +2904,13 @@ suite('NewTabPageAppContextMenuAnimationTest', () => {
     await microtasksFinished();
   }
 
-  suite('CappingEnabled', () => {
+  suite('LimitingEnabled', () => {
     suiteSetup(() => {
       loadTimeData.overrideValues({
         ntpRealboxNextEnabled: true,
         ntpNextFeaturesEnabled: true,
         actionChipsEnabled: true,
-        realboxContextMenuAnimationCappingEnabled: true,
+        contextMenuAnimationLimitingEnabled: true,
       });
     });
 
@@ -3000,13 +3000,13 @@ suite('NewTabPageAppContextMenuAnimationTest', () => {
     });
   });
 
-  suite('CappingDisabled', () => {
+  suite('LimitingDisabled', () => {
     suiteSetup(() => {
       loadTimeData.overrideValues({
         ntpRealboxNextEnabled: true,
         ntpNextFeaturesEnabled: true,
         actionChipsEnabled: true,
-        realboxContextMenuAnimationCappingEnabled: false,
+        contextMenuAnimationLimitingEnabled: false,
       });
     });
 

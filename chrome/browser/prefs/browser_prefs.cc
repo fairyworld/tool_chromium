@@ -982,6 +982,10 @@ inline constexpr char kLastClearBrowsingDataTab[] =
 constexpr char kGlicSelectionWidgetDismissCount[] =
     "glic.selection_widget_dismiss_count";
 
+// Deprecated 06/2026.
+inline constexpr char kRealboxContextMenuAnimationState[] =
+    "realbox.context_menu_animation_state";
+
 // Register local state used only for migration (clearing or moving to a new
 // key).
 void RegisterLocalStatePrefsForMigration(PrefRegistrySimple* registry) {
@@ -1317,6 +1321,9 @@ void RegisterProfilePrefsForMigration(
   registry->RegisterBooleanPref(kDeleteCookiesBasic, true);
   registry->RegisterIntegerPref(kLastClearBrowsingDataTab, 0);
   registry->RegisterIntegerPref(kGlicSelectionWidgetDismissCount, 0);
+
+  // Deprecated 06/2026.
+  registry->RegisterDictionaryPref(kRealboxContextMenuAnimationState);
 }
 
 }  // namespace
@@ -2070,7 +2077,7 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
 #endif
 
   registry->RegisterBooleanPref(prefs::kDisableScreenshots, false);
-  registry->RegisterDictionaryPref(prefs::kRealboxContextMenuAnimationState);
+  registry->RegisterDictionaryPref(prefs::kContextMenuAnimationState);
   registry->RegisterListPref(
       webauthn::pref_names::kRemoteDesktopAllowedOrigins);
 
@@ -2588,6 +2595,9 @@ void MigrateObsoleteProfilePrefs(PrefService* profile_prefs,
 
   // Added 06/2026.
   profile_prefs->ClearPref(kGlicSelectionWidgetDismissCount);
+
+  // Added 06/2026.
+  profile_prefs->ClearPref(kRealboxContextMenuAnimationState);
 
   // Please don't delete the following line. It is used by PRESUBMIT.py.
   // END_MIGRATE_OBSOLETE_PROFILE_PREFS
