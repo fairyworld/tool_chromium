@@ -501,7 +501,7 @@ void DWriteFontProxyImpl::MatchUniqueFont(
   if (FAILED(hr))
     return;
 
-  DCHECK_GT(system_font_set->GetFontCount(), 0U);
+  CHECK_GT(system_font_set->GetFontCount(), 0U, base::NotFatalUntil::M152);
 
   mswr::ComPtr<IDWriteFontSet> filtered_set;
 
@@ -589,17 +589,17 @@ void DWriteFontProxyImpl::InitializeDirectWrite() {
   // QueryInterface for IDWriteFactory2. This should succeed since we only
   // support >= Win10.
   factory_.As<IDWriteFactory2>(&factory2_);
-  DCHECK(factory2_);
+  CHECK(factory2_, base::NotFatalUntil::M152);
 
   // QueryInterface for IDwriteFactory3, needed for MatchUniqueFont on Windows.
   // This should succeed since we only support >= Win10.
   factory_.As<IDWriteFactory3>(&factory3_);
-  DCHECK(factory3_);
+  CHECK(factory3_, base::NotFatalUntil::M152);
 
   // Normally identical to factory_->GetSystemFontCollection() unless a
   // sideloaded font has been added using SideLoadFontForTesting().
   HRESULT hr = GetLocalFontCollection(factory3_, &collection_);
-  DCHECK(SUCCEEDED(hr));
+  CHECK(SUCCEEDED(hr), base::NotFatalUntil::M152);
 
   if (!collection_) {
     return;
