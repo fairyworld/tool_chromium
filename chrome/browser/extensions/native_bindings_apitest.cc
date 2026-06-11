@@ -517,19 +517,13 @@ IN_PROC_BROWSER_TEST_F(NativeBindingsApiTest, PromiseBasedAPI) {
 
 class NativeBindingsBrowserNamespaceTest : public NativeBindingsApiTest {
  public:
-  NativeBindingsBrowserNamespaceTest() {
-    scoped_feature_list_.InitAndEnableFeature(
-        extensions_features::kExtensionBrowserNamespaceAndPolyfillSupport);
-  }
+  NativeBindingsBrowserNamespaceTest() = default;
 
   NativeBindingsBrowserNamespaceTest(
       const NativeBindingsBrowserNamespaceTest&) = delete;
   const NativeBindingsBrowserNamespaceTest& operator=(
       const NativeBindingsBrowserNamespaceTest&) = delete;
   ~NativeBindingsBrowserNamespaceTest() override = default;
-
- protected:
-  base::test::ScopedFeatureList scoped_feature_list_;
 };
 
 // Tests that extension background script contexts have access to

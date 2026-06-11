@@ -266,16 +266,6 @@ BASE_DECLARE_FEATURE(kEnterpriseExtensionDOMActivityTelemetry);
 // capability, even when no other API/feature might be restricted by it.
 BASE_DECLARE_FEATURE(kDebuggerAPIRestrictedToDevMode);
 
-// Creates a `browser` object that can be used in place of `chrome` where
-// extension APIs are available. It does not include non-extension APIs like
-// `loadTimes`, `csi`, etc. or deprecated APIs (e.g. `app`).
-// Also aligns one-time message (e.g. runtime.sendMessage) behavior more closely
-// with the mozilla/webextension-polyfill. This includes supporting
-// chrome.runtime.onMessage() listeners returning a Promise. Also in more error
-// cases (like listeners sending unserializable responses or throwing errors
-// during execution) the error is passed back to the sender.
-BASE_DECLARE_FEATURE(kExtensionBrowserNamespaceAndPolyfillSupport);
-
 // When enabled, a call to base::ListValue::Clone is avoided when dispatching an
 // extension function. Behind a feature to assess impact
 // (go/chrome-performance-work-should-be-finched).
