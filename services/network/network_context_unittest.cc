@@ -12261,6 +12261,8 @@ TEST_F(EarlyCookieLoadOnPreconnectTest, Basic) {
   net::EmbeddedTestServer test_server;
   ASSERT_TRUE(test_server.Start());
 
+  base::HistogramTester histogram_tester;
+
   network_context->PreconnectSockets(
       1, test_server.base_url(), network::mojom::CredentialsMode::kInclude,
       net::NetworkAnonymizationKey(), /*network_restrictions_id=*/std::nullopt,
@@ -12277,6 +12279,9 @@ TEST_F(EarlyCookieLoadOnPreconnectTest, Basic) {
             store->commands()[1].type);
   EXPECT_EQ(net::CookieMonster::GetKey(test_server.base_url().host()),
             store->commands()[1].key);
+
+  histogram_tester.ExpectUniqueSample("Cookie.OnPreconnect.LoadCookie", true,
+                                      1);
 }
 
 }  // namespace
