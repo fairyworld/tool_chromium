@@ -831,7 +831,7 @@ TEST_F(GeminiTabHelperTest,
 TEST_F(GeminiTabHelperTest,
        IsGeminiAvailableForWebState_WhenUrlIsPdf_AllPagesEnabled) {
   feature_list_.InitWithFeatures(
-      /*enabled_features=*/{kGeminiFloatyAllPages, kPageActionMenu},
+      /*enabled_features=*/{kPageActionMenu},
       /*disabled_features=*/{});
   web_state_ = std::make_unique<web::FakeWebState>();
   web_state_->SetBrowserState(profile_.get());

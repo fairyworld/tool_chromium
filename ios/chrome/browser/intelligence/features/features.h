@@ -344,10 +344,6 @@ bool IsGeminiActorEnabled();
 BASE_DECLARE_FEATURE(kGeminiRichAPCExtraction);
 bool IsGeminiRichAPCExtractionEnabled();
 
-// Feature flag to enable Gemini Floaty on all pages.
-BASE_DECLARE_FEATURE(kGeminiFloatyAllPages);
-bool IsGeminiFloatyAllPagesEnabled();
-
 // Enables the GeminiMapsRichUI feature.
 BASE_DECLARE_FEATURE(kGeminiMapsRichUI);
 

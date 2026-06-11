@@ -5069,14 +5069,6 @@
     "expiry_milestone": 160
   },
   {
-    "name": "gemini-floaty-all-pages",
-    "owners": [
-      "tarekmakkouk@google.com",
-      "bling-alchemy-eng@google.com"
-    ],
-    "expiry_milestone": 160
-  },
-  {
     "name": "gemini-image-remix-tool",
     "owners": [
       "nicolasmacbeth@google.com",

@@ -820,10 +820,6 @@ inline constexpr char kGeminiDynamicSettingsName[] = "Gemini Dynamic Settings";
 inline constexpr char kGeminiDynamicSettingsDescription[] =
     "Enables loading Gemini settings dynamically using the Gemini SDK.";
 
-inline constexpr char kGeminiFloatyAllPagesName[] = "Gemini Floaty All Pages";
-inline constexpr char kGeminiFloatyAllPagesDescription[] =
-    "Enables the Gemini floaty on all pages.";
-
 inline constexpr char kGeminiImageRemixToolName[] = "Gemini Image Remix Tool";
 inline constexpr char kGeminiImageRemixToolDescription[] =
     "Enables the image remix tool in the Gemini floaty.";
