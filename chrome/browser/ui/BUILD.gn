@@ -62,13 +62,6 @@ source_set("tab_modal_confirm_dialog_delegate") {
   ]
 }
 
-source_set("web_app_testing_flags") {
-  sources = [
-    "views/web_apps/web_app_testing_flags.cc",
-    "views/web_apps/web_app_testing_flags.h",
-  ]
-}
-
 if (!is_android) {
   source_set("chrome_web_modal_dialog_manager_delegate") {
     public = [ "chrome_web_modal_dialog_manager_delegate.h" ]
@@ -209,7 +202,6 @@ static_library("ui") {
     # should be added to //chrome/browser:browser_generated_files.
     ":accelerator_utils_headers",
     ":simple_message_box_headers",
-    ":web_app_testing_flags",
     "//chrome/browser:browser_public_dependencies",
     "//chrome/browser:primitives",
     "//chrome/browser/feedback",
@@ -5717,7 +5709,6 @@ static_library("test_support") {
 
   if (toolkit_views) {
     deps += [
-      ":web_app_dialog_test_support",
       "//chrome/browser/ui/extensions:test_support",
       "//components/constrained_window",
       "//components/webauthn/content/browser",
@@ -5799,21 +5790,6 @@ if (use_aura) {
       "//chrome/common",
       "//components/prefs",
       "//content/public/browser",
-    ]
-  }
-}
-
-if (toolkit_views) {
-  source_set("web_app_dialog_test_support") {
-    testonly = true
-    sources = [
-      "views/web_apps/web_app_dialog_test_support.cc",
-      "views/web_apps/web_app_dialog_test_support.h",
-    ]
-    deps = [
-      "//base",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/web_applications",
     ]
   }
 }
