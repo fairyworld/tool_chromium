@@ -14,6 +14,8 @@ source_set("test_support") {
     "mock_log.h",
     "mock_loopback_source.cc",
     "mock_loopback_source.h",
+    "mock_stream_factory.cc",
+    "mock_stream_factory.h",
   ]
 
   deps = [
