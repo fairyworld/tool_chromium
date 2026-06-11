@@ -313,6 +313,16 @@ bool IsSwiftShaderAllowedByCommandLine(const base::CommandLine* command_line) {
 
   return false;
 }
+
+bool IsSwiftShaderUsedForWebGLByCommandLine(
+    const base::CommandLine* command_line) {
+  std::string use_gl = command_line->GetSwitchValueASCII(switches::kUseGL);
+  if (!use_gl.empty() && use_gl != gl::kGLImplementationANGLEName) {
+    return false;
+  }
+  return command_line->GetSwitchValueASCII(switches::kUseANGLE) ==
+         gl::kANGLEImplementationSwiftShaderForWebGLName;
+}
 #endif
 
 // Allow fallback to SwfitShader without command line flags during the
@@ -328,6 +338,10 @@ bool IsSwiftShaderAllowedByCommandLine(const base::CommandLine*) {
 }
 
 bool IsSwiftShaderAllowedByFeature() {
+  return false;
+}
+
+bool IsSwiftShaderUsedForWebGLByCommandLine(const base::CommandLine*) {
   return false;
 }
 #endif
