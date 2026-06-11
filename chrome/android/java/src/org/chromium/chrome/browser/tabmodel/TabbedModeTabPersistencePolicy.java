@@ -660,11 +660,7 @@ public class TabbedModeTabPersistencePolicy implements TabPersistencePolicy {
                     for (String metadataFileName : getAllMetadataFileNames()) {
                         getTabsFromMetadataFile(tabIds, metadataFileName);
                     }
-                    PostTask.postTask(
-                            TaskTraits.UI_DEFAULT,
-                            () -> {
-                                tabIdsCallback.onResult(tabIds);
-                            });
+                    PostTask.postTask(TaskTraits.UI_DEFAULT, tabIdsCallback.bind(tabIds));
                 });
     }
 

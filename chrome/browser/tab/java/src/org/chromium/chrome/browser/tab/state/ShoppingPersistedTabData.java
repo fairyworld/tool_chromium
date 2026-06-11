@@ -398,11 +398,7 @@ public class ShoppingPersistedTabData extends PersistedTabData {
      */
     public static void from(Tab tab, Callback<@Nullable ShoppingPersistedTabData> callback) {
         if (tab == null || tab.isDestroyed()) {
-            PostTask.runOrPostTask(
-                    TaskTraits.UI_DEFAULT,
-                    () -> {
-                        callback.onResult(null);
-                    });
+            PostTask.runOrPostTask(TaskTraits.UI_DEFAULT, callback.bind(null));
             return;
         }
         if (sDelayedInitFinished) {
@@ -410,11 +406,7 @@ public class ShoppingPersistedTabData extends PersistedTabData {
         } else {
             @DelayedInitMethod int delayedInitMethod = getDelayedInitMethod();
             if (delayedInitMethod == DelayedInitMethod.EMPTY_RESPONSES_UNTIL_INIT) {
-                PostTask.postTask(
-                        TaskTraits.UI_DEFAULT,
-                        () -> {
-                            callback.onResult(null);
-                        });
+                PostTask.postTask(TaskTraits.UI_DEFAULT, callback.bind(null));
             } else if (delayedInitMethod == DelayedInitMethod.DELAY_RESPONSES_UNTIL_INIT) {
                 sShoppingDataRequests.add(new ShoppingDataRequest(tab, callback));
             } else {
@@ -455,11 +447,7 @@ public class ShoppingPersistedTabData extends PersistedTabData {
         // example, for incognito Tabs it is not possible to call a backend service with the user's
         // URL.
         if (tab == null || tab.isDestroyed() || tab.isIncognito() || tab.isCustomTab()) {
-            PostTask.postTask(
-                    TaskTraits.UI_DEFAULT,
-                    () -> {
-                        callback.onResult(null);
-                    });
+            PostTask.postTask(TaskTraits.UI_DEFAULT, callback.bind(null));
             return;
         }
         PersistedTabData.<@Nullable ShoppingPersistedTabData>from(
@@ -483,10 +471,7 @@ public class ShoppingPersistedTabData extends PersistedTabData {
                                             }
                                             PostTask.postTask(
                                                     TaskTraits.UI_DEFAULT,
-                                                    () -> {
-                                                        factoryCallback.onResult(
-                                                                shoppingPersistedTabData);
-                                                    });
+                                                    factoryCallback.bind(shoppingPersistedTabData));
                                         });
                             });
                 },

@@ -3975,10 +3975,7 @@ public class AwContents implements SmartClipProvider {
     @CalledByNative
     private static void generateMHTMLCallback(String path, long size, Callback<String> callback) {
         if (callback == null) return;
-        AwThreadUtils.postToUiThreadLooper(
-                () -> {
-                    callback.onResult(size < 0 ? null : path);
-                });
+        AwThreadUtils.postToUiThreadLooper(callback.bind(size < 0 ? null : path));
     }
 
     @CalledByNative

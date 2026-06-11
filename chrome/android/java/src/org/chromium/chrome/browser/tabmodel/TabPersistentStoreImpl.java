@@ -2058,11 +2058,7 @@ public class TabPersistentStoreImpl implements TabPersistentStore {
                 TaskTraits.BEST_EFFORT,
                 () -> {
                     List<ClosedWindowTabInfo> tabs = getTabListForClosedWindow(instanceId);
-                    PostTask.postTask(
-                            TaskTraits.UI_DEFAULT,
-                            () -> {
-                                callback.onResult(tabs);
-                            });
+                    PostTask.postTask(TaskTraits.UI_DEFAULT, callback.bind(tabs));
                 });
     }
 
