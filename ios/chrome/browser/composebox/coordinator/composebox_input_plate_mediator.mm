@@ -80,6 +80,9 @@
 #import "ios/chrome/browser/intelligence/proto_wrappers/page_context_wrapper.h"
 #import "ios/chrome/browser/lens/ui_bundled/lens_availability.h"
 #import "ios/chrome/browser/lens/ui_bundled/lens_entrypoint.h"
+#import "ios/chrome/browser/ntp/model/new_tab_page_tab_helper.h"
+#import "ios/chrome/browser/ntp/model/new_tab_page_util.h"
+#import "ios/chrome/browser/ntp/shared/metrics/home_metrics.h"
 #import "ios/chrome/browser/search_engines/model/search_engine_observer_bridge.h"
 #import "ios/chrome/browser/shared/model/profile/profile_ios.h"
 #import "ios/chrome/browser/shared/model/url/url_util.h"
@@ -1896,6 +1899,14 @@ lens::ImageEncodingOptions GetDefaultImageEncodingOptions() {
   switch (_modeHolder.mode) {
     case ComposeboxMode::kRegularSearch:
       [self recordNavigationInitiated];
+      if (web::WebState* web_state = _webStateList->GetActiveWebState()) {
+        if (IsVisibleURLNewTabPage(web_state)) {
+          NewTabPageTabHelper* NTPHelper =
+              NewTabPageTabHelper::FromWebState(web_state);
+          RecordHomeAction(IOSHomeActionType::kOmnibox,
+                           NTPHelper && NTPHelper->ShouldShowStartSurface());
+        }
+      }
       [self.URLLoader loadURLParams:URLLoadParams];
       break;
     case ComposeboxMode::kAIM:

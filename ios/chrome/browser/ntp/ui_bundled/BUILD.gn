@@ -388,6 +388,7 @@ source_set("unit_tests") {
     "//components/regional_capabilities",
     "//components/search_engines",
     "//components/signin/public/identity_manager",
+    "//components/variations:test_support",
     "//ios/chrome/app/strings",
     "//ios/chrome/browser/bookmarks/model",
     "//ios/chrome/browser/browser_view/model",

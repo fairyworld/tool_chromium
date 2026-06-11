@@ -3147,6 +3147,27 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="IOS.Home.Click" enum="IOSHomeActionType"
+    expires_after="2027-06-02">
+  <owner>thegreenfrog@chromium.org</owner>
+  <owner>bling-team@google.com</owner>
+  <summary>
+    This histogram is logged whenever a click happens on the Home surface (NTP
+    or Start). It is the union of IOS.NTP.Click and IOS.Start.Click.
+  </summary>
+</histogram>
+
+<histogram name="IOS.Home.Impression" enum="IOSNTPImpressionType"
+    expires_after="2027-06-02">
+  <owner>thegreenfrog@chromium.org</owner>
+  <owner>bling-team@google.com</owner>
+  <summary>
+    This histogram is logged whenever the Home surface (NTP or Start) is shown.
+    It is the union of IOS.NTP.Impression and IOS.Start.Impression, recording
+    the feed visibility.
+  </summary>
+</histogram>
+
 <histogram name="IOS.HomeCustomization.Background.Color.ClickCount"
     units="count" expires_after="2027-01-19">
   <owner>cheickcisse@google.com</owner>

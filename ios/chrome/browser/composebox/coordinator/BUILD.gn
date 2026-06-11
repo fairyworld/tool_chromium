@@ -216,6 +216,8 @@ group("ntp_deps") {
   public_deps = [
     "//ios/chrome/browser/ntp/model",
     "//ios/chrome/browser/ntp/model:util",
+    "//ios/chrome/browser/ntp/shared/metrics:constants",
+    "//ios/chrome/browser/ntp/shared/metrics:home_metrics",
   ]
 }
 
@@ -330,6 +332,8 @@ source_set("unit_tests") {
     ":input_state_manager",
     ":lens_deps",
     ":mode_holder",
+    ":ntp_deps",
+    ":url_loading_deps",
     "//base",
     "//base/test:test_support",
     "//components/contextual_search:prefs",
