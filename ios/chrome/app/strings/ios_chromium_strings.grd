@@ -946,6 +946,9 @@ Only someone with your passphrase can read your encrypted data. The passphrase i
       <message name="IDS_IOS_PASSWORD_CHECK_ERROR" desc="Description of the password check cell, explaining that Password Check failed. [iOS only]" meaning="Password Check failed due to some error.">
         Chromium can't check your passwords
       </message>
+      <message name="IDS_IOS_PASSWORD_MANAGER_FIX_PASSWORD_ERROR_INFOBAR_SUBTITLE" desc="Infobar subtitle for fixing sync errors before saving a password on the account.">
+        Verify it's you to get it on all devices with your Account
+      </message>
       <message name="IDS_IOS_PASSWORD_SETTINGS_PASSWORDS_IN_OTHER_APPS_DESCRIPTION" desc="Help text explaining the benefits of having Chromium set as a credential provider for other apps. [iOS Only]">
         Sign in quickly to apps and sites by autofilling your passwords &amp; passkeys from Chromium
       </message>

@@ -25,6 +25,7 @@
 #import "components/password_manager/core/browser/password_store/mock_password_store_interface.h"
 #import "components/password_manager/core/browser/password_store/password_form_converters.h"
 #import "components/password_manager/core/browser/password_store/stored_credential.h"
+#import "components/strings/grit/components_strings.h"
 #import "components/trusted_vault/trusted_vault_client.h"
 #import "components/ukm/test_ukm_recorder.h"
 #import "ios/chrome/browser/shared/public/commands/sync_presenter_commands.h"
@@ -313,6 +314,45 @@ TEST_F(IOSChromeSavePasswordInfoBarDelegateTest,
   InitializeDelegate(/*password_update=*/true);
   EXPECT_THAT(delegate_->GetButtonLabel(ConfirmInfoBarDelegate::BUTTON_CANCEL),
               IsEmpty());
+}
+
+TEST_F(IOSChromeSavePasswordInfoBarDelegateTest,
+       GetButtonLabel_ButtonOk_WhenActionableError) {
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndEnableFeature(
+      password_manager::features::kInFlowTrustedVaultKeyRetrievalIos);
+
+  InitializeDelegate(/*password_update=*/false,
+                     password_manager::ActionableError::kSignInNeeded);
+  EXPECT_EQ(l10n_util::GetStringUTF16(IDS_CONTINUE),
+            delegate_->GetButtonLabel(ConfirmInfoBarDelegate::BUTTON_OK));
+}
+
+TEST_F(IOSChromeSavePasswordInfoBarDelegateTest,
+       GetButtonLabel_ButtonCancel_WhenActionableError) {
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndEnableFeature(
+      password_manager::features::kInFlowTrustedVaultKeyRetrievalIos);
+
+  InitializeDelegate(/*password_update=*/false,
+                     password_manager::ActionableError::kSignInNeeded);
+  EXPECT_THAT(delegate_->GetButtonLabel(ConfirmInfoBarDelegate::BUTTON_CANCEL),
+              IsEmpty());
+}
+
+TEST_F(IOSChromeSavePasswordInfoBarDelegateTest,
+       GetButtonLabel_WhenActionableErrorAndFeatureDisabled) {
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndDisableFeature(
+      password_manager::features::kInFlowTrustedVaultKeyRetrievalIos);
+
+  InitializeDelegate(/*password_update=*/false,
+                     password_manager::ActionableError::kSignInNeeded);
+  EXPECT_EQ(l10n_util::GetStringUTF16(IDS_IOS_PASSWORD_MANAGER_SAVE_BUTTON),
+            delegate_->GetButtonLabel(ConfirmInfoBarDelegate::BUTTON_OK));
+  EXPECT_EQ(
+      l10n_util::GetStringUTF16(IDS_IOS_PASSWORD_MANAGER_MODAL_BLOCK_BUTTON),
+      delegate_->GetButtonLabel(ConfirmInfoBarDelegate::BUTTON_CANCEL));
 }
 
 TEST_F(IOSChromeSavePasswordInfoBarDelegateTest, Accept_WhenSave) {

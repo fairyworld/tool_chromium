@@ -178,6 +178,10 @@ void RecordDurationAtMoment(bool is_update,
 password_manager::ActionableError GetPasswordStoreActionableError(
     password_manager::PasswordStoreInterface* profile_store,
     password_manager::PasswordStoreInterface* account_store) {
+  if (!base::FeatureList::IsEnabled(
+          password_manager::features::kInFlowTrustedVaultKeyRetrievalIos)) {
+    return password_manager::ActionableError::kNoError;
+  }
   password_manager::ActionableError error =
       password_manager::ActionableError::kNoError;
   if (account_store) {
@@ -187,6 +191,12 @@ password_manager::ActionableError GetPasswordStoreActionableError(
     error = profile_store->GetError();
   }
   return error;
+}
+
+// Returns true if `error` can be fixed by the user in save password flow.
+bool IsActionableError(password_manager::ActionableError error) {
+  return error == password_manager::ActionableError::kSignInNeeded ||
+         error == password_manager::ActionableError::kTrustedVaultKeyNeeded;
 }
 
 }  // namespace
@@ -252,6 +262,24 @@ NSString* IOSChromeSavePasswordInfoBarDelegate::GetURLHostText() const {
   return base::SysUTF8ToNSString(form_to_save_->GetURL().GetHost());
 }
 
+NSString* IOSChromeSavePasswordInfoBarDelegate::GetSubtitle() const {
+  password_manager::ActionableError error = GetPasswordStoreActionableError(
+      profile_store_.get(), account_store_.get());
+  if (IsActionableError(error)) {
+    return l10n_util::GetNSString(
+        IDS_IOS_PASSWORD_MANAGER_FIX_PASSWORD_ERROR_INFOBAR_SUBTITLE);
+  }
+
+  if (account_to_store_password_.has_value()) {
+    return l10n_util::GetNSStringF(
+        IDS_IOS_PASSWORD_MANAGER_ON_ACCOUNT_SAVE_SUBTITLE,
+        base::UTF8ToUTF16(*account_to_store_password_));
+  }
+
+  // TODO(crbug.com/464228247): Check if it's possible to reach this case.
+  return l10n_util::GetNSString(IDS_IOS_PASSWORD_MANAGER_LOCAL_SAVE_SUBTITLE);
+}
+
 std::optional<std::string>
 IOSChromeSavePasswordInfoBarDelegate::GetAccountToStorePassword() const {
   return account_to_store_password_;
@@ -277,13 +305,23 @@ std::u16string IOSChromeSavePasswordInfoBarDelegate::GetMessageText() const {
 
 std::u16string IOSChromeSavePasswordInfoBarDelegate::GetButtonLabel(
     InfoBarButton button) const {
+  password_manager::ActionableError error = GetPasswordStoreActionableError(
+      profile_store_.get(), account_store_.get());
+  bool has_actionable_error = IsActionableError(error);
+
   switch (button) {
-    case BUTTON_OK:
-      return l10n_util::GetStringUTF16(
-          IsPasswordUpdate() ? IDS_IOS_PASSWORD_MANAGER_UPDATE_BUTTON
-                             : IDS_IOS_PASSWORD_MANAGER_SAVE_BUTTON);
+    case BUTTON_OK: {
+      if (IsPasswordUpdate()) {
+        return l10n_util::GetStringUTF16(
+            IDS_IOS_PASSWORD_MANAGER_UPDATE_BUTTON);
+      }
+      if (has_actionable_error) {
+        return l10n_util::GetStringUTF16(IDS_CONTINUE);
+      }
+      return l10n_util::GetStringUTF16(IDS_IOS_PASSWORD_MANAGER_SAVE_BUTTON);
+    }
     case BUTTON_CANCEL: {
-      return IsPasswordUpdate()
+      return IsPasswordUpdate() || has_actionable_error
                  ? std::u16string()
                  : l10n_util::GetStringUTF16(
                        IDS_IOS_PASSWORD_MANAGER_MODAL_BLOCK_BUTTON);
@@ -296,14 +334,9 @@ std::u16string IOSChromeSavePasswordInfoBarDelegate::GetButtonLabel(
 bool IOSChromeSavePasswordInfoBarDelegate::Accept() {
   DCHECK(form_to_save_);
 
-  if (base::FeatureList::IsEnabled(
-          password_manager::features::kInFlowTrustedVaultKeyRetrievalIos)) {
-    password_manager::ActionableError error = GetPasswordStoreActionableError(
-        profile_store_.get(), account_store_.get());
-    if (MaybeHandlePasswordError(error)) {
-      handling_password_error_ = true;
-      return false;
-    }
+  if (MaybeHandlePasswordError()) {
+    handling_password_error_ = true;
+    return false;
   }
 
   SavePassword();
@@ -421,8 +454,7 @@ bool IOSChromeSavePasswordInfoBarDelegate::IsPresenting() const {
   return start_timestamp_.has_value();
 }
 
-bool IOSChromeSavePasswordInfoBarDelegate::MaybeHandlePasswordError(
-    password_manager::ActionableError error) {
+bool IOSChromeSavePasswordInfoBarDelegate::MaybeHandlePasswordError() {
   if (!sync_presenter_handler_) {
     return false;
   }
@@ -435,7 +467,8 @@ bool IOSChromeSavePasswordInfoBarDelegate::MaybeHandlePasswordError(
     }
   };
 
-  switch (error) {
+  switch (GetPasswordStoreActionableError(profile_store_.get(),
+                                          account_store_.get())) {
     // TODO(crbug.com/464228247): Verify if the logic is correct for all errors.
     case password_manager::ActionableError::kNoError:
     case password_manager::ActionableError::kInactionable:

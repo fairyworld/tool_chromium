@@ -65,6 +65,9 @@ class IOSChromeSavePasswordInfoBarDelegate : public ConfirmInfoBarDelegate {
   // The URL host for which the credentials are being saved for.
   NSString* GetURLHostText() const;
 
+  // The subtitle for the Infobar.
+  NSString* GetSubtitle() const;
+
   // The account where the password will be saved, or std::nullopt if it's
   // saved locally.
   std::optional<std::string> GetAccountToStorePassword() const;
@@ -124,7 +127,7 @@ class IOSChromeSavePasswordInfoBarDelegate : public ConfirmInfoBarDelegate {
   // their account, handles it by displaying an appropriate view for resolving
   // the error. Returns true if a fix error view was displayed. Otherwise, does
   // nothing.
-  bool MaybeHandlePasswordError(password_manager::ActionableError error);
+  bool MaybeHandlePasswordError();
 
   // Saves the password from `form_to_save_`.
   void SavePassword();
