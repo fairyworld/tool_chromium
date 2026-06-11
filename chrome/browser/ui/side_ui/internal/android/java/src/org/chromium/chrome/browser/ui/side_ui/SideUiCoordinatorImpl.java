@@ -274,8 +274,10 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
         } else {
             unshowableSideUiIds.add(SideUiId.SIDE_PANEL);
         }
+        SideUiShowability sideUiShowability =
+                new SideUiShowability(showableSideUiIds, unshowableSideUiIds);
         for (var sideUiObserver : mSideUiObservers) {
-            sideUiObserver.onShowableSideUisUpdated(showableSideUiIds, unshowableSideUiIds);
+            sideUiObserver.onShowableSideUisUpdated(sideUiShowability);
         }
 
         // 3.1. Check if we need to close side UI.

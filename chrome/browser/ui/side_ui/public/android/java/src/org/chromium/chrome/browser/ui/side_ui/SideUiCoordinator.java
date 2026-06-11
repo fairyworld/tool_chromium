@@ -14,6 +14,7 @@ import org.chromium.build.annotations.Nullable;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -61,6 +62,36 @@ public interface SideUiCoordinator extends SideUiStateProvider {
         int LEFT = 0;
         int RIGHT = 1;
         int NUM_ENTRIES = 2;
+    }
+
+    /**
+     * POD-type that holds the showability for {@link SideUiContainer}s.
+     *
+     * <p>What "showability" means:
+     *
+     * <ul>
+     *   <li>Showable: There is enough space to show a {@link SideUiContainer}, but it may not be
+     *       actually shown.
+     *   <li>Unshowable: There is not enough space to show a {@link SideUiContainer}, and that
+     *       container is guaranteed to be hidden.
+     * </ul>
+     *
+     * <p>One use case of showability is using it to control the entry point visibility of a feature
+     * that needs a {@link SideUiContainer}.
+     */
+    final class SideUiShowability {
+        /** IDs of showable {@link SideUiContainer}s. */
+        public final List<@SideUiId Integer> mShowableSideUiIds;
+
+        /** IDs of unshowable {@link SideUiContainer}s. */
+        public final List<@SideUiId Integer> mUnshowableSideUiIds;
+
+        public SideUiShowability(
+                List<@SideUiId Integer> showableSideUiIds,
+                List<@SideUiId Integer> unshowableSideUiIds) {
+            mShowableSideUiIds = List.copyOf(showableSideUiIds);
+            mUnshowableSideUiIds = List.copyOf(unshowableSideUiIds);
+        }
     }
 
     /**
