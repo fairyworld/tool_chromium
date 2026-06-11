@@ -1907,7 +1907,8 @@ void RenderWidgetHostViewAndroid::UpdateFrameSinkIdRegistration() {
 }
 
 void RenderWidgetHostViewAndroid::UpdateBackgroundColor() {
-  DCHECK(RenderWidgetHostViewBase::GetBackgroundColor());
+  CHECK(RenderWidgetHostViewBase::GetBackgroundColor(),
+        base::NotFatalUntil::M152);
 
   SkColor color = *RenderWidgetHostViewBase::GetBackgroundColor();
   view_.OnBackgroundColorChanged(color);
@@ -2096,7 +2097,7 @@ void RenderWidgetHostViewAndroid::ResetSynchronousCompositor() {
 }
 
 void RenderWidgetHostViewAndroid::OnOverscrollRefreshHandlerAvailable() {
-  DCHECK(!overscroll_controller_);
+  CHECK(!overscroll_controller_, base::NotFatalUntil::M152);
   CreateOverscrollControllerIfPossible();
 }
 
@@ -2126,8 +2127,8 @@ void RenderWidgetHostViewAndroid::SetNeedsAnimate() {
     return;
   }
 
-  DCHECK(view_.GetWindowAndroid());
-  DCHECK(using_browser_compositor_);
+  CHECK(view_.GetWindowAndroid(), base::NotFatalUntil::M152);
+  CHECK(using_browser_compositor_, base::NotFatalUntil::M152);
   view_.GetWindowAndroid()->SetNeedsAnimate();
 }
 
@@ -2154,7 +2155,7 @@ void RenderWidgetHostViewAndroid::OnSelectionEvent(
     ui::SelectionEventType event) {
   if (!selection_popup_controller_)
     return;
-  DCHECK(touch_selection_controller_);
+  CHECK(touch_selection_controller_, base::NotFatalUntil::M152);
   // If a selection drag has started, it has taken over the active touch
   // sequence. Immediately cancel gesture detection and any downstream touch
   // listeners (e.g., web content) to communicate this transfer.
@@ -2238,7 +2239,7 @@ void RenderWidgetHostViewAndroid::SynchronousCopyContents(
   // TODO(crbug.com/41305903): [BUG] Current implementation does not support
   // read-back of regions that do not originate at (0,0).
   const gfx::Size& input_size_in_pixel = src_subrect_in_pixel.size();
-  DCHECK(!input_size_in_pixel.IsEmpty());
+  CHECK(!input_size_in_pixel.IsEmpty(), base::NotFatalUntil::M152);
 
   gfx::Size output_size_in_pixel;
   if (dst_size_in_pixel.IsEmpty())
@@ -2277,7 +2278,7 @@ void RenderWidgetHostViewAndroid::UpdateTouchSelectionController(
   if (!touch_selection_controller_)
     return;
 
-  DCHECK(touch_selection_controller_client_manager_);
+  CHECK(touch_selection_controller_client_manager_, base::NotFatalUntil::M152);
   touch_selection_controller_client_manager_->UpdateClientSelectionBounds(
       selection.start, selection.end, this, nullptr);
   OnUpdateScopedSelectionHandles();
@@ -2406,13 +2407,15 @@ void RenderWidgetHostViewAndroid::TryUpdateVisibilities(
     case Visibility::VISIBLE:
       // A visible view must have a visible page. It cannot be hidden or
       // hidden-but-painting.
-      DCHECK_EQ(new_page_visibility, PageVisibilityState::kVisible);
+      CHECK_EQ(new_page_visibility, PageVisibilityState::kVisible,
+               base::NotFatalUntil::M152);
       break;
     case Visibility::HIDDEN:
     case Visibility::OCCLUDED:
       // A hidden or occluded view cannot have a visible page. It must be hidden
       // or hidden-but-painting.
-      DCHECK_NE(new_page_visibility, PageVisibilityState::kVisible);
+      CHECK_NE(new_page_visibility, PageVisibilityState::kVisible,
+               base::NotFatalUntil::M152);
       break;
   }
 #endif
@@ -2474,7 +2477,7 @@ void RenderWidgetHostViewAndroid::HideInternal() {
   }
 
   if (stop_observing_root_window) {
-    DCHECK(view_visibility_ != Visibility::VISIBLE);
+    CHECK(view_visibility_ != Visibility::VISIBLE, base::NotFatalUntil::M152);
     StopObservingRootWindow();
   }
 
@@ -2491,9 +2494,9 @@ void RenderWidgetHostViewAndroid::HideInternal() {
 }
 
 void RenderWidgetHostViewAndroid::StartObservingRootWindow() {
-  DCHECK(view_.parent());
-  DCHECK(view_.GetWindowAndroid());
-  DCHECK(VisibilityNeedsDrawing());
+  CHECK(view_.parent(), base::NotFatalUntil::M152);
+  CHECK(view_.GetWindowAndroid(), base::NotFatalUntil::M152);
+  CHECK(VisibilityNeedsDrawing(), base::NotFatalUntil::M152);
   if (observing_root_window_)
     return;
 
