@@ -2968,21 +2968,21 @@ void RenderProcessHostImpl::DecrementKeepAliveRefCount(uint64_t handle_id) {
   CHECK(IsKeepAliveRefCountAllowed());
   CHECK_GT(keep_alive_ref_count_, 0);
   --keep_alive_ref_count_;
-  DCHECK(keep_alive_start_times_.contains(handle_id));
+  CHECK(keep_alive_start_times_.contains(handle_id), base::NotFatalUntil::M152);
   keep_alive_start_times_.erase(handle_id);
   if (AreAllRefCountsZero())
     Cleanup();
 }
 
 void RenderProcessHostImpl::IncrementPendingReuseRefCount() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   CHECK(!are_ref_counts_disabled_);
   CHECK(!deleting_soon_);
   ++pending_reuse_ref_count_;
 }
 
 void RenderProcessHostImpl::DecrementPendingReuseRefCount() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   CHECK(!are_ref_counts_disabled_);
   CHECK_GT(pending_reuse_ref_count_, 0);
   --pending_reuse_ref_count_;
@@ -2992,7 +2992,7 @@ void RenderProcessHostImpl::DecrementPendingReuseRefCount() {
 }
 
 int RenderProcessHostImpl::GetPendingReuseRefCountForTesting() const {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   CHECK(!are_ref_counts_disabled_);
   CHECK(!deleting_soon_);
   return pending_reuse_ref_count_;
@@ -3003,7 +3003,7 @@ base::TimeTicks RenderProcessHostImpl::GetProcessLaunchedTime() const {
 }
 
 std::string RenderProcessHostImpl::GetKeepAliveDurations() const {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   std::stringstream result;
   base::Time now = base::Time::Now();
   result << keep_alive_start_times_.size() << " uid/time-deltas:";
@@ -3062,7 +3062,8 @@ void RenderProcessHostImpl::ForEachRenderFrameHost(
 void RenderProcessHostImpl::RegisterRenderFrameHost(
     const GlobalRenderFrameHostId& render_frame_host_id,
     bool is_outermost_main_frame) {
-  DCHECK(!render_frame_host_id_set_.contains(render_frame_host_id));
+  CHECK(!render_frame_host_id_set_.contains(render_frame_host_id),
+        base::NotFatalUntil::M152);
 
   if (is_outermost_main_frame) {
     ++outermost_main_frame_count_;
@@ -3080,7 +3081,8 @@ void RenderProcessHostImpl::RegisterRenderFrameHost(
 void RenderProcessHostImpl::UnregisterRenderFrameHost(
     const GlobalRenderFrameHostId& render_frame_host_id,
     bool is_outermost_main_frame) {
-  DCHECK(render_frame_host_id_set_.contains(render_frame_host_id));
+  CHECK(render_frame_host_id_set_.contains(render_frame_host_id),
+        base::NotFatalUntil::M152);
   render_frame_host_id_set_.erase(render_frame_host_id);
   prerendering_frame_host_id_set_.erase(render_frame_host_id);
   if (is_outermost_main_frame) {
@@ -3101,14 +3103,14 @@ void RenderProcessHostImpl::OnRenderFrameHostPrerenderStateChanged(
 }
 
 void RenderProcessHostImpl::IncrementWorkerRefCount() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   CHECK(!are_ref_counts_disabled_);
   CHECK(!deleting_soon_);
   ++worker_ref_count_;
 }
 
 void RenderProcessHostImpl::DecrementWorkerRefCount() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   CHECK(!are_ref_counts_disabled_);
   CHECK_GT(worker_ref_count_, 0);
   --worker_ref_count_;
@@ -3120,7 +3122,7 @@ void RenderProcessHostImpl::DisableRefCounts() {
   TRACE_EVENT("shutdown", "RenderProcessHostImpl::DisableRefCounts",
               ChromeTrackEvent::kRenderProcessHost, *this);
 
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
 
   if (are_ref_counts_disabled_)
     return;
