@@ -1346,18 +1346,78 @@ source_set("core") {
   }
 
   if (is_mac) {
+    sources += [
+      "app_controller_mac.mm",
+      "browser_process_platform_part_mac.mm",
+      "chrome_browser_application_mac.mm",
+      "chrome_browser_main_mac.mm",
+      "file_select_helper_mac.mm",
+      "fullscreen_mac.mm",
+      "global_keyboard_shortcuts_mac.mm",
+      "icon_loader_mac.mm",
+      "memory_details_mac.cc",
+      "platform_util_mac.mm",
+      "process_singleton_mac.mm",
+      "shell_integration_mac.mm",
+    ]
+
     deps += [
+      ":app_controller_mac",
+      ":chrome_browser_application_mac",
       ":chrome_browser_main_mac",
+      ":fullscreen",
+      ":global_keyboard_shortcuts_mac",
       "//chrome/app_shim",
       "//chrome/browser/apps/app_shim",
+      "//chrome/browser/enterprise/connectors/device_trust/key_management/core/mac",
       "//chrome/browser/mac",
+      "//chrome/browser/mac:impl",
+      "//chrome/browser/renderer_host:delegate",
+      "//chrome/browser/renderer_host:delegate_impl",
+      "//chrome/browser/renderer_host:history_swiper",
+      "//chrome/browser/shortcuts",
       "//chrome/browser/ui/cocoa",
+      "//chrome/browser/web_applications/os_integration/mac:web_app_shortcut_copier_lib",
       "//chrome/browser/webshare",
       "//chrome/browser/webshare:impl",
+      "//chrome/services/mac_notifications",
+      "//chrome/services/mac_notifications/public/cpp",
+      "//chrome/services/mac_notifications/public/mojom",
+      "//components/crash/core/app",
+      "//components/device_signals/core/browser/mac",
       "//components/enterprise/platform_auth:enterprise_platform_auth",
+      "//components/handoff",
+      "//components/metal_util",
       "//components/os_crypt/async/browser:keychain_key_provider",
+      "//components/policy/core/common:common_constants",
+      "//components/remote_cocoa/app_shim",
       "//components/remote_cocoa/app_shim:features",
+      "//components/remote_cocoa/browser",
       "//sandbox/mac:seatbelt",
+      "//sandbox/policy",
+      "//services/video_capture/public/mojom:constants",
+      "//third_party/crashpad/crashpad/client",
+    ]
+
+    frameworks = [
+      "Accelerate.framework",
+      "AudioUnit.framework",
+      "AVFoundation.framework",
+      "AuthenticationServices.framework",
+      "CoreVideo.framework",  # Used for the Thumbnail capturer on macOS.
+      "DiskArbitration.framework",
+      "IOKit.framework",
+      "LocalAuthentication.framework",
+      "OpenGL.framework",
+      "QuartzCore.framework",
+      "SafariServices.framework",
+      "SecurityInterface.framework",
+      "UserNotifications.framework",
+      "UniformTypeIdentifiers.framework",
+      "VideoToolbox.framework",
+    ]
+    weak_frameworks = [
+      "ScreenCaptureKit.framework",  # Available in macOS 12.3, stable in 13.2.
     ]
   }
 
@@ -4452,84 +4512,6 @@ static_library("browser") {
         "//ui/views/controls/webview",
       ]
     }
-  }
-  if (is_mac) {
-    sources += [
-      "app_controller_mac.mm",
-      "browser_process_platform_part_mac.mm",
-      "chrome_browser_application_mac.mm",
-      "chrome_browser_main_mac.mm",
-      "file_select_helper_mac.mm",
-      "fullscreen_mac.mm",
-      "global_keyboard_shortcuts_mac.mm",
-      "icon_loader_mac.mm",
-      "memory_details_mac.cc",
-      "platform_util_mac.mm",
-      "process_singleton_mac.mm",
-      "shell_integration_mac.mm",
-    ]
-
-    deps += [
-      ":app_controller_mac",
-      ":chrome_browser_application_mac",
-      ":chrome_browser_main_mac",
-      ":global_keyboard_shortcuts_mac",
-      "//chrome/app_shim",
-      "//chrome/browser/apps/app_shim",
-      "//chrome/browser/enterprise/connectors/device_trust/key_management/core/mac",
-      "//chrome/browser/mac",
-      "//chrome/browser/mac:impl",
-      "//chrome/browser/renderer_host:delegate",
-      "//chrome/browser/renderer_host:delegate_impl",
-      "//chrome/browser/renderer_host:history_swiper",
-      "//chrome/browser/web_applications/os_integration/mac:web_app_shortcut_copier_lib",
-      "//chrome/services/mac_notifications",
-      "//chrome/services/mac_notifications/public/cpp",
-      "//chrome/services/mac_notifications/public/mojom",
-      "//components/crash/core/app",
-      "//components/device_signals/core/browser/mac",
-      "//components/enterprise/platform_auth:enterprise_platform_auth",
-      "//components/metal_util",
-      "//components/os_crypt/async/browser:keychain_key_provider",
-      "//components/policy/core/common:common_constants",
-      "//components/remote_cocoa/app_shim",
-      "//components/remote_cocoa/app_shim:features",
-      "//components/remote_cocoa/browser",
-      "//sandbox/mac:seatbelt",
-      "//sandbox/policy",
-      "//services/video_capture/public/mojom:constants",
-      "//third_party/crashpad/crashpad/client",
-    ]
-
-    # Any circular includes must depend on the target
-    # "browser_public_dependencies".
-    allow_circular_includes_from += [
-      "//chrome/browser/apps/app_shim",
-      "//chrome/browser/ui/cocoa",
-    ]
-
-    deps += [ "//chrome/browser/ui/cocoa" ]
-
-    frameworks = [
-      "Accelerate.framework",
-      "AudioUnit.framework",
-      "AVFoundation.framework",
-      "AuthenticationServices.framework",
-      "CoreVideo.framework",  # Used for the Thumbnail capturer on macOS.
-      "DiskArbitration.framework",
-      "IOKit.framework",
-      "LocalAuthentication.framework",
-      "OpenGL.framework",
-      "QuartzCore.framework",
-      "SafariServices.framework",
-      "SecurityInterface.framework",
-      "UserNotifications.framework",
-      "UniformTypeIdentifiers.framework",
-      "VideoToolbox.framework",
-    ]
-    weak_frameworks = [
-      "ScreenCaptureKit.framework",  # Available in macOS 12.3, stable in 13.2.
-    ]
   }
 
   if (enterprise_watermark) {
