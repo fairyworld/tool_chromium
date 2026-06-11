@@ -1261,25 +1261,86 @@ source_set("core") {
   }
 
   if (is_win) {
-    sources += [ "chrome_browser_main_win.h" ]
+    sources += [
+      "chrome_browser_main_win.cc",
+      "chrome_browser_main_win.h",
+      "font_prewarmer_tab_helper.cc",
+      "fullscreen_win.cc",
+      "icon_loader_win.cc",
+      "memory_details_win.cc",
+      "platform_util_win.cc",
+      "process_singleton_win.cc",
+      "shell_integration_win.cc",
+    ]
+
+    libs = [
+      "secur32.lib",
+
+      # Needed for _variant_t used in browser_dm_token_storage_win.cc
+      "comsuppw.lib",
+    ]
+
     deps += [
+      ":font_prewarmer_tab_helper",
+      ":fullscreen",
+      "//chrome/app:chrome_exe_main_exports",
+      "//chrome/app/theme:chrome_unscaled_resources_grit",
+      "//chrome/browser/install_verification:impl",
       "//chrome/browser/os_crypt",
+      "//chrome/browser/platform_experience:prefs",
+      "//chrome/browser/shortcuts",
+      "//chrome/browser/startup",
+      "//chrome/browser/web_applications/chrome_pwa_launcher:util",
       "//chrome/browser/webnn",
       "//chrome/browser/webshare:impl",
+      "//chrome/browser/win:chrome_process_finder",
+      "//chrome/browser/win:cloud_synced_folder_checker",
       "//chrome/browser/win:isolated_browser_support",
       "//chrome/browser/win:mica_titlebar",
+      "//chrome/browser/win:registry_watcher",
+      "//chrome/browser/win/conflicts:module_info",
+      "//chrome/chrome_elf:constants",
+      "//chrome/chrome_elf:dll_hash",
+      "//chrome/chrome_elf:third_party_shared_defines",
+      "//chrome/common:version_header",
+      "//chrome/credential_provider/common:common_constants",
+      "//chrome/elevation_service:public_headers",
+      "//chrome/install_static:install_static_util",
       "//chrome/installer/util:isolation_support",
+      "//chrome/installer/util:with_no_strings",
+      "//chrome/notification_helper:constants",
+      "//chrome/services/util_win/public/mojom",
+      "//chrome/updater/app/server/win:updater_legacy_idl",
+      "//chrome/windows_services/elevated_tracing_service:tracing_service_idl",
       "//components/app_launch_prefetch",
+      "//components/crash/core/app",
+      "//components/crash/core/app:crash_export_thunk_include",
+      "//components/device_signals/core/browser/win",
+      "//components/live_caption:utils",
       "//components/os_crypt/async/browser:dpapi_key_provider",
       "//components/stylus_handwriting/win",
       "//media/mojo/services",
       "//sandbox/win:sandbox",
+      "//services/proxy_resolver/public/mojom",
+      "//third_party/crashpad/crashpad/client",
+      "//third_party/iaccessible2",
+      "//third_party/isimpledom",
+      "//third_party/wtl",
+      "//ui/aura_extra",
+      "//ui/base:fullscreen_win",
+      "//ui/color:accent_color_observer",
+      "//ui/display/util",
     ]
+
+    all_dependent_configs = [ ":browser_win_linker_flags" ]
 
     if (is_chrome_branded) {
       deps += [
+        "//chrome/browser/platform_experience/installer:installer_win",
         "//chrome/browser/win/installer_downloader:controller",
         "//chrome/browser/win/installer_downloader:infobar",
+        "//chrome/browser/win/installer_downloader:infobar_impl",
+        "//chrome/updater/app/server/win:updater_legacy_idl",
       ]
     }
   }
@@ -4365,23 +4426,6 @@ static_library("browser") {
   }
 
   if (is_win) {
-    libs += [
-      "secur32.lib",
-
-      # Needed for _variant_t used in browser_dm_token_storage_win.cc
-      "comsuppw.lib",
-    ]
-    sources += [
-      "chrome_browser_main_win.cc",
-      "font_prewarmer_tab_helper.cc",
-      "fullscreen_win.cc",
-      "icon_loader_win.cc",
-      "memory_details_win.cc",
-      "platform_util_win.cc",
-      "process_singleton_win.cc",
-      "shell_integration_win.cc",
-    ]
-
     # taskbar_decorator_win.cc in c/b/taskbar includes
     # chrome/browser/profiles/avatar_menu.h which is in this target, hence
     # causing a circular dependency.
@@ -4396,67 +4440,10 @@ static_library("browser") {
     ]
 
     deps += [
-      ":font_prewarmer_tab_helper",
-      "//chrome/app:chrome_exe_main_exports",
-      "//chrome/app/theme:chrome_unscaled_resources_grit",
-      "//chrome/browser/install_verification:impl",
-      "//chrome/browser/os_crypt",
-      "//chrome/browser/platform_experience:prefs",
-      "//chrome/browser/shortcuts",
-      "//chrome/browser/startup",
       "//chrome/browser/taskbar",
-      "//chrome/browser/web_applications/chrome_pwa_launcher:util",
-      "//chrome/browser/webnn",
-      "//chrome/browser/win:chrome_process_finder",
-      "//chrome/browser/win:cloud_synced_folder_checker",
       "//chrome/browser/win:impl",
-      "//chrome/browser/win:isolated_browser_support",
-      "//chrome/browser/win:mica_titlebar",
-      "//chrome/browser/win:registry_watcher",
-      "//chrome/browser/win/conflicts:module_info",
-      "//chrome/chrome_elf:constants",
-      "//chrome/chrome_elf:dll_hash",
-      "//chrome/chrome_elf:third_party_shared_defines",
-      "//chrome/common:version_header",
-      "//chrome/credential_provider/common:common_constants",
-      "//chrome/elevation_service:public_headers",
-      "//chrome/install_static:install_static_util",
-      "//chrome/installer/util:isolation_support",
-      "//chrome/installer/util:with_no_strings",
-      "//chrome/notification_helper:constants",
-      "//chrome/services/util_win/public/mojom",
-      "//chrome/updater/app/server/win:updater_legacy_idl",
-      "//chrome/windows_services/elevated_tracing_service:tracing_service_idl",
       "//components/app_launch_prefetch",
-      "//components/crash/core/app",
-      "//components/crash/core/app:crash_export_thunk_include",
-      "//components/device_signals/core/browser/win",
-      "//components/live_caption:utils",
-      "//components/os_crypt/async/browser:dpapi_key_provider",
-      "//components/stylus_handwriting/win",
-      "//sandbox/win:sandbox",
-      "//services/proxy_resolver/public/mojom",
-      "//third_party/crashpad/crashpad/client",
-      "//third_party/iaccessible2",
-      "//third_party/isimpledom",
-      "//third_party/wtl",
-      "//ui/aura_extra",
-      "//ui/base:fullscreen_win",
-      "//ui/color:accent_color_observer",
-      "//ui/display/util",
     ]
-
-    all_dependent_configs = [ ":browser_win_linker_flags" ]
-
-    if (is_chrome_branded) {
-      deps += [
-        "//chrome/browser/platform_experience/installer:installer_win",
-        "//chrome/browser/win/installer_downloader:controller",
-        "//chrome/browser/win/installer_downloader:infobar",
-        "//chrome/browser/win/installer_downloader:infobar_impl",
-        "//chrome/updater/app/server/win:updater_legacy_idl",
-      ]
-    }
   } else {
     # Non - Windows.
     if (toolkit_views) {
