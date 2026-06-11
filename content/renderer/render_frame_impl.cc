@@ -821,17 +821,27 @@ class MHTMLHandleWriterDelegate {
   void WriteContents(std::vector<WebThreadSafeData> mhtml_contents) {
     // MHTMLHandleWriter::WriteContents calls MHTMLHandleWriter::Finish
     // eventually.
+    if (!handle_) {
+      return;
+    }
+    MHTMLHandleWriter* raw_handle = handle_.get();
     base::ThreadPool::PostTask(
         FROM_HERE, {base::MayBlock()},
-        base::BindOnce(&MHTMLHandleWriter::WriteContents, std::move(handle_),
+        base::BindOnce(&MHTMLHandleWriter::WriteContents,
+                       base::Unretained(raw_handle), std::move(handle_),
                        std::move(mhtml_contents)));
   }
 
   // Within the context of the delegate, only for premature write finish.
   void Finish(mojom::MhtmlSaveStatus save_status) {
-    base::ThreadPool::PostTask(FROM_HERE, {base::MayBlock()},
-                               base::BindOnce(&MHTMLHandleWriter::Finish,
-                                              std::move(handle_), save_status));
+    if (!handle_) {
+      return;
+    }
+    MHTMLHandleWriter* raw_handle = handle_.get();
+    base::ThreadPool::PostTask(
+        FROM_HERE, {base::MayBlock()},
+        base::BindOnce(&MHTMLHandleWriter::Finish, base::Unretained(raw_handle),
+                       std::move(handle_), save_status));
   }
 
  private:
