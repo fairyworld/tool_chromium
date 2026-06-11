@@ -377,6 +377,11 @@ class CONTENT_EXPORT DatabaseConnection {
   // `metadata_`).
   StatusOr<blink::IndexedDBDatabaseMetadata> GenerateIndexedDbMetadata();
 
+  // `sql::Database` error callback. Records the error in `sql_error_` so it
+  // survives a later successful op (e.g. an aborted transaction's rollback)
+  // that would otherwise reset the last-error code.
+  void OnSqlError(int error, sql::Statement* statement);
+
   // Serves as the checkpoint callback. This is static because it may be
   // called on a different thread, and it's not possible to check the validity
   // of a WeakPtr-bound callback on a different sequence.
@@ -464,6 +469,11 @@ class CONTENT_EXPORT DatabaseConnection {
   const base::FilePath path_;
 
   std::unique_ptr<sql::Database> db_;
+
+  // Stores the error code reported by `db_`. See `OnSqlError()` for specifics
+  // on when this is updated.
+  std::optional<int> sql_error_;
+
   std::unique_ptr<sql::MetaTable> meta_table_;
   blink::IndexedDBDatabaseMetadata metadata_;
   raw_ref<BackingStoreImpl> backing_store_;
