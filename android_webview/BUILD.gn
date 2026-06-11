@@ -975,23 +975,9 @@ if (_is_default_toolchain) {
     deps = [ "//gin:v8_snapshot_assets" ]
   }
 
-  java_group("monochrome_webview_primary_abi_assets") {
-    deps = [
-      "//gin:v8_snapshot_assets",
-      "//third_party/icu:icu_assets",
-    ]
-  }
-
   if (android_64bit_target_cpu && defined(android_app_secondary_abi)) {
     java_group("webview_secondary_abi_assets") {
       deps = [ "//gin:v8_snapshot_secondary_abi_assets" ]
-    }
-
-    java_group("monochrome_webview_secondary_abi_assets") {
-      deps = [
-        "//gin:v8_snapshot_secondary_abi_assets",
-        "//third_party/icu:icu_assets",
-      ]
     }
   }
 
