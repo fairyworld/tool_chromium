@@ -366,6 +366,8 @@ source_set("eg_test_support+eg2") {
     "chrome_matchers.mm",
     "chrome_matchers_app_interface.h",
     "chrome_matchers_app_interface_stub.mm",
+    "chrome_multitasking_test_util.h",
+    "chrome_multitasking_test_util.mm",
     "chrome_test_case.h",
     "chrome_test_case.mm",
     "chrome_test_case_app_interface.h",
