@@ -64,14 +64,6 @@ class COMPONENT_EXPORT(ON_DEVICE_MODEL_ML) ChromeML {
   }
 
   DISABLE_CFI_DLSYM
-  ChromeMLSafetyResult ClassifyTextSafety(ChromeMLModel model,
-                                          const char* text,
-                                          float* scores,
-                                          size_t* num_scores) const {
-    return api_->ClassifyTextSafety(model, text, scores, num_scores);
-  }
-
-  DISABLE_CFI_DLSYM
   void DestroyModel(ChromeMLModel model) const { api_->DestroyModel(model); }
 
   DISABLE_CFI_DLSYM
@@ -239,26 +231,6 @@ class COMPONENT_EXPORT(ON_DEVICE_MODEL_ML) ChromeML {
     if (api_->DestroyGpuDelegate) {
       api_->DestroyGpuDelegate(delegate);
     }
-  }
-
-  // TS API methods
-  DISABLE_CFI_DLSYM
-  ChromeMLTSModel TSCreateModel(
-      const ChromeMLTSModelDescriptor* descriptor) const {
-    return api_->ts_api.CreateModel(descriptor);
-  }
-
-  DISABLE_CFI_DLSYM
-  void TSDestroyModel(ChromeMLTSModel model) const {
-    api_->ts_api.DestroyModel(model);
-  }
-
-  DISABLE_CFI_DLSYM
-  ChromeMLSafetyResult TSClassifyTextSafety(ChromeMLTSModel model,
-                                            const char* text,
-                                            float* scores,
-                                            size_t* num_scores) const {
-    return api_->ts_api.ClassifyTextSafety(model, text, scores, num_scores);
   }
 
   // ASR API methods
