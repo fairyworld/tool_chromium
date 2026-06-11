@@ -36,8 +36,11 @@ constexpr float kFrameThrottlingSlackFactor = 0.9;
 
 bool IsEligibleToThrottleMainFrameRate() {
 #if BUILDFLAG(IS_ANDROID)
-  // Still requires balancing tradeoffs for desktop Android, not enabled yet.
-  return !base::android::device_info::is_desktop();
+  // Still requires balancing tradeoffs for desktop Android, not enabled
+  // unconditionally yet.
+  return !base::android::device_info::is_desktop() ||
+         base::FeatureList::IsEnabled(
+             features::kThrottleMainFrameTo60HzDesktopAndroid);
 #else
   return true;
 #endif

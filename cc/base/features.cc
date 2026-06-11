@@ -139,6 +139,9 @@ BASE_FEATURE(kThrottleMainFrameTo60Hz,
 #if BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kThrottleMainFrameTo60HzWebView,
              base::FEATURE_DISABLED_BY_DEFAULT);
+
+BASE_FEATURE(kThrottleMainFrameTo60HzDesktopAndroid,
+             base::FEATURE_DISABLED_BY_DEFAULT);
 #endif
 
 BASE_FEATURE(kHighFramerateRequestFromClient,

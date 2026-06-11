@@ -165,6 +165,9 @@ CC_BASE_EXPORT BASE_DECLARE_FEATURE(kThrottleMainFrameTo60Hz);
 #if BUILDFLAG(IS_ANDROID)
 // Same as above, for WebView.
 CC_BASE_EXPORT BASE_DECLARE_FEATURE(kThrottleMainFrameTo60HzWebView);
+
+// Same as above, for Desktop Android.
+CC_BASE_EXPORT BASE_DECLARE_FEATURE(kThrottleMainFrameTo60HzDesktopAndroid);
 #endif
 
 // When enabled, clients can request a high framerate, which disables
