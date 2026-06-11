@@ -5910,6 +5910,7 @@ test("unit_tests") {
     "../browser/component_updater/origin_trials_component_installer_unittest.cc",
     "../browser/component_updater/pki_metadata_component_installer_unittest.cc",
     "../browser/component_updater/privacy_sandbox_attestations_component_installer_unittest.cc",
+    "../browser/component_updater/private_verification_tokens_installer_unittest.cc",
     "../browser/component_updater/subresource_filter_component_installer_unittest.cc",
     "../browser/custom_handlers/chrome_protocol_handler_registry_unittest.cc",
     "../browser/enterprise/connectors/interstitials/enterprise_page_unittest.cc",

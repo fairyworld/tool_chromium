@@ -27,6 +27,7 @@
 #include "chrome/browser/component_updater/mei_preload_component_installer.h"
 #include "chrome/browser/component_updater/pki_metadata_component_installer.h"
 #include "chrome/browser/component_updater/privacy_sandbox_attestations_component_installer.h"
+#include "chrome/browser/component_updater/private_verification_tokens_installer.h"
 #include "chrome/browser/component_updater/ssl_error_assistant_component_installer.h"
 #include "chrome/browser/component_updater/subresource_filter_component_installer.h"
 #include "chrome/browser/component_updater/trust_token_key_commitments_component_installer.h"
@@ -144,6 +145,7 @@ void RegisterComponentsForUpdate() {
       cus, g_browser_process->GetApplicationLocale());
   RegisterOptimizationHintsComponent(cus);
   RegisterTrustTokenKeyCommitmentsComponentIfTrustTokensEnabled(cus);
+  RegisterPrivateVerificationTokensComponentIfEnabled(cus);
   RegisterFirstPartySetsComponent(cus);
   RegisterPrivacySandboxAttestationsComponent(cus);
   if (history_embeddings::IsHistoryEmbeddingsFeatureEnabled()) {
