@@ -1031,11 +1031,11 @@ class LocationBarMediator
     /* package */ void setUrl(GURL currentUrl, UrlBarData urlBarData) {
         // If the URL is currently focused, do not replace the text they have entered with the URL.
         // Once they stop editing the URL, the current tab's URL will automatically be filled in.
-        mOriginalUrl = currentUrl;
-        if (mCurrentInput != null) {
+        if (mUrlCoordinator.hasFocus()) {
             return;
         }
 
+        mOriginalUrl = currentUrl;
         setUrlBarText(urlBarData, UrlBar.ScrollType.SCROLL_TO_TLD, TextSelection.SELECT_ALL);
     }
 
@@ -1220,7 +1220,6 @@ class LocationBarMediator
                     mAutocompleteCoordinator.beginInput(session);
                     mFuseboxCoordinator.beginInput(session);
                     mStatusCoordinator.beginInput(session);
-                    mUrlCoordinator.beginInput();
                     // Trigger animation now that we have an up-to-date value for the fusebox state.
                     setupSuggestionsListShowAnimation();
                     setAttachmentModelList(session.getFuseboxAttachmentModelList());
@@ -2453,9 +2452,7 @@ class LocationBarMediator
             if (shouldShowLensButton()) LensMetrics.recordOmniboxFocusedWhenLensShown();
         }
 
-        if (input.getAutocompleteState() == AutocompleteState.ENABLED
-                && !mIsReparenting
-                && mUrlHasFocus) {
+        if (mUrlHasFocus && mUrlFocusedWithoutAnimations && !mIsReparenting) {
             handleUrlFocusAnimation(true);
         } else if (input.getAutocompleteState() != AutocompleteState.STANDBY_NO_FOCUS) {
             requestUrlFocus();
@@ -2474,8 +2471,8 @@ class LocationBarMediator
             reparentToToolbar();
         }
         mAutocompleteCoordinator.endInput();
+
         mStatusCoordinator.endInput();
-        mUrlCoordinator.endInput();
 
         if (mScrimHandler != null) mScrimHandler.setVisibility(false);
         mCurrentInput.getRequestTypeSupplier().removeObserver(mAutocompleteRequestTypeObserver);
@@ -2508,7 +2505,6 @@ class LocationBarMediator
 
         suspendInput();
         state.deactivate();
-        updateUrl();
         if (mUrlHasFocus) {
             mUrlCoordinator.clearFocus();
         }

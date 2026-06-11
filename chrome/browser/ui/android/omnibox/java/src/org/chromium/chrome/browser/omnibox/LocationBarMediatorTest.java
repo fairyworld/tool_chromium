@@ -843,7 +843,6 @@ public class LocationBarMediatorTest {
 
         verify(mView).requestFocus();
         verify(mAutocompleteCoordinator).endInput();
-        verify(mUrlCoordinator).endInput();
     }
 
     public void testLoadUrlWithAutocompleteLoadCallback_base() {
@@ -1218,7 +1217,6 @@ public class LocationBarMediatorTest {
             assertTrue(mMediator.handleEscPress());
             verify(mAutocompleteCoordinator).stopAutocomplete();
             verify(mAutocompleteCoordinator, never()).endInput();
-            verify(mUrlCoordinator, never()).endInput();
         }
 
         {
@@ -1229,7 +1227,6 @@ public class LocationBarMediatorTest {
             verify(mLocationBarLayout).setDeleteButtonVisibility(false);
             assertEquals(input.getUserText(), input.getInitialUserText());
             verify(mAutocompleteCoordinator, never()).endInput();
-            verify(mUrlCoordinator, never()).endInput();
         }
 
         {
@@ -1237,7 +1234,6 @@ public class LocationBarMediatorTest {
             // canceled.
             assertTrue(mMediator.handleEscPress());
             verify(mAutocompleteCoordinator).endInput();
-            verify(mUrlCoordinator).endInput();
         }
 
         {
@@ -1361,9 +1357,6 @@ public class LocationBarMediatorTest {
 
     @Test
     public void testSetUrl() {
-        mProfileSupplier.set(mProfile);
-        mMediator.onFinishNativeInitialization();
-
         var url = JUnitTestGURLs.BLUE_1;
         UrlBarData urlBarData = UrlBarData.forUrl(url);
         mMediator.setUrl(url, urlBarData);
@@ -1371,7 +1364,6 @@ public class LocationBarMediatorTest {
         // Assume that the URL bar is now focused without focus animations.
         doReturn(true).when(mUrlCoordinator).hasFocus();
         mMediator.setIsUrlBarFocusedWithoutAnimationsForTesting(true);
-        mMediator.beginOrResumeInput(/* activateNewSession= */ true);
         mMediator.setUrl(url, urlBarData);
 
         // Verify that setUrl() never clears focus when the URL bar is focused without animations.
@@ -1428,7 +1420,6 @@ public class LocationBarMediatorTest {
                 ArgumentCaptor.forClass(FuseboxSessionState.class);
         verify(mFuseboxCoordinator).beginInput(captor.capture());
         verify(mStatusCoordinator).beginInput(captor.getValue());
-        verify(mUrlCoordinator).beginInput();
 
         assertEquals(
                 OmniboxFocusReason.NTP_AI_MODE,
@@ -1449,7 +1440,6 @@ public class LocationBarMediatorTest {
         ArgumentCaptor<FuseboxSessionState> captor =
                 ArgumentCaptor.forClass(FuseboxSessionState.class);
         verify(mAutocompleteCoordinator).beginInput(captor.capture());
-        verify(mUrlCoordinator).beginInput();
         assertEquals("pastedText", captor.getValue().getAutocompleteInput().getUserText());
     }
 
@@ -1578,7 +1568,6 @@ public class LocationBarMediatorTest {
         assertFalse(mTabletMediator.isUrlBarFocused());
         verify(mStatusCoordinator).setShouldAnimateIconChanges(false);
         verify(mStatusCoordinator).endInput();
-        verify(mUrlCoordinator).endInput();
         verify(mUrlCoordinator).onUrlFocusChange(false);
         verify(mUrlCoordinator, atLeastOnce())
                 .setUrlBarData(
