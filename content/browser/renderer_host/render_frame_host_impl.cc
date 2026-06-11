@@ -2810,7 +2810,6 @@ RenderFrameHostImpl::RenderFrameHostImpl(
 }
 
 RenderFrameHostImpl::~RenderFrameHostImpl() {
-  DismissUnboundedSurface();
   base::trace_event::TraceSessionObserverList::RemoveObserver(this);
   TRACE_EVENT("navigation", "RenderFrameHostImpl::~RenderFrameHostImpl",
               perfetto::TerminatingFlow::FromPointer(this));
@@ -11216,37 +11215,6 @@ void RenderFrameHostImpl::InitializeCrashReportContext(
   std::move(callback).Run(std::move(region));
 }
 
-void RenderFrameHostImpl::DismissUnboundedSurface() {
-  if (!base::FeatureList::IsEnabled(blink::features::kUnboundedElement)) {
-    return;
-  }
-
-  if (unbounded_surface_client_.is_bound()) {
-    unbounded_surface_client_->OnDismissed();
-    unbounded_surface_client_.reset();
-  }
-
-  if (RenderWidgetHostViewBase* root_view = GetUnboundedSurfaceRootView()) {
-    root_view->DismissUnboundedSurface();
-  }
-
-  RenderFrameHostImpl* outermost = GetOutermostMainFrame();
-  if (outermost && outermost != this) {
-    outermost->DismissUnboundedSurface();
-    return;
-  }
-
-  if (active_unbounded_frame_) {
-    CHECK_EQ(active_unbounded_frame_->GetOutermostMainFrame(), this);
-    // Copy the pointer to a local variable and clear the member first to avoid
-    // footguns if subsequent code or re-entrant calls try to access it.
-    base::WeakPtr<RenderFrameHostImpl> active_frame = active_unbounded_frame_;
-    active_unbounded_frame_.reset();
-    if (active_frame && active_frame.get() != this) {
-      active_frame->DismissUnboundedSurface();
-    }
-  }
-}
 
 void RenderFrameHostImpl::RequestUnboundedSurface(
     mojo::PendingAssociatedReceiver<blink::mojom::UnboundedSurfaceHost> host,
@@ -11285,77 +11253,9 @@ void RenderFrameHostImpl::RequestUnboundedSurface(
         "RequestUnboundedSurface called with empty bounds.");
     return;
   }
-  RenderFrameHostImpl* outermost = GetOutermostMainFrame();
-  if (!outermost) {
-    return;
-  }
-  RenderWidgetHostViewBase* parent_view = nullptr;
-  RenderWidgetHostViewBase* view = GetUnboundedSurfaceRootView(&parent_view);
-  if (!view) {
-    return;
-  }
-
-  DismissUnboundedSurface();
-  CHECK(!unbounded_surface_client_.is_bound());
-  CHECK(!outermost->active_unbounded_frame_);
-
-  unbounded_surface_host_receiver_.reset();
-  unbounded_surface_host_receiver_.Bind(std::move(host));
-
-  unbounded_surface_client_.Bind(std::move(client));
-  unbounded_surface_client_.set_disconnect_handler(base::BindOnce(
-      &RenderFrameHostImpl::DismissUnboundedSurface, base::Unretained(this)));
-  outermost->active_unbounded_frame_ = GetWeakPtr();
-
-  float dsf = GetScaleFactorForView(parent_view);
-  gfx::Rect bounds_in_screen = gfx::ScaleToRoundedRect(bounds, 1.f / dsf);
-  bounds_in_screen.Offset(parent_view->GetViewBounds().OffsetFromOrigin());
-
-  view->CreateUnboundedSurface(this, bounds_in_screen);
-  if (view->HasActiveUnboundedSurface()) {
-    unbounded_surface_client_->OnSurfaceAllocated(
-        view->GetUnboundedSurfaceFrameSinkId(),
-        view->GetUnboundedSurfaceLocalSurfaceId());
-  }
-}
-
-void RenderFrameHostImpl::GetCompositorFrameSink(
-    mojo::PendingReceiver<viz::mojom::CompositorFrameSink> sink,
-    mojo::PendingRemote<viz::mojom::CompositorFrameSinkClient> client) {
-  if (!base::FeatureList::IsEnabled(blink::features::kUnboundedElement)) {
-    mojo::ReportBadMessage("kUnboundedElement feature must be enabled.");
-    return;
-  }
-  RenderWidgetHostViewBase* view = GetUnboundedSurfaceRootView();
-  if (!view || !view->HasActiveUnboundedSurface()) {
-    return;
-  }
-  view->GetUnboundedSurfaceCompositorFrameSink(std::move(sink),
-                                               std::move(client));
-}
-
-void RenderFrameHostImpl::UpdateBounds(const gfx::Rect& bounds) {
-  if (!base::FeatureList::IsEnabled(blink::features::kUnboundedElement)) {
-    mojo::ReportBadMessage("kUnboundedElement feature must be enabled.");
-    return;
-  }
-  RenderWidgetHostViewBase* parent_view = nullptr;
-  RenderWidgetHostViewBase* view = GetUnboundedSurfaceRootView(&parent_view);
-  if (!view || !view->HasActiveUnboundedSurface()) {
-    return;
-  }
-  // TODO(crbug.com/508672616): This will break in some circumstances (such as
-  // going between monitors with different DSFs, mixed DSF multi-monitor
-  // setups, or dynamic scaling changes) and we need to propagate changes to
-  // the renderer.
-  float dsf = GetScaleFactorForView(parent_view);
-  gfx::Rect bounds_in_screen = gfx::ScaleToRoundedRect(bounds, 1.f / dsf);
-  bounds_in_screen.Offset(parent_view->GetViewBounds().OffsetFromOrigin());
-  view->UpdateUnboundedSurfaceBounds(bounds_in_screen);
-  if (unbounded_surface_client_.is_bound()) {
-    unbounded_surface_client_->OnSurfaceAllocated(
-        view->GetUnboundedSurfaceFrameSinkId(),
-        view->GetUnboundedSurfaceLocalSurfaceId());
+  if (auto* root_view = GetUnboundedSurfaceRootView()) {
+    root_view->CreateUnboundedSurface(std::move(host), std::move(client),
+                                      bounds);
   }
 }
 
@@ -11372,7 +11272,6 @@ RenderWidgetHostViewBase* RenderFrameHostImpl::GetUnboundedSurfaceRootView(
   }
   return nullptr;
 }
-
 UnboundedSurfaceWindow*
 RenderFrameHostImpl::GetUnboundedSurfaceWindowForTesting() {
   if (RenderWidgetHostViewBase* view = GetUnboundedSurfaceRootView()) {

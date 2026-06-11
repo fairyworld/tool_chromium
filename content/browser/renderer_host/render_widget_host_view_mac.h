@@ -201,9 +201,11 @@ class CONTENT_EXPORT RenderWidgetHostViewMac
       const cc::RenderFrameMetadata& metadata) override;
   void DidNavigate() override;
 
-  // UnboundedElement API overrides:
-  void CreateUnboundedSurface(RenderFrameHostImpl* parent_rfh,
-                              const gfx::Rect& bounds_in_screen) override;
+  void CreateUnboundedSurface(
+      mojo::PendingAssociatedReceiver<blink::mojom::UnboundedSurfaceHost> host,
+      mojo::PendingAssociatedRemote<blink::mojom::UnboundedSurfaceClient>
+          client,
+      const gfx::Rect& bounds_in_dips) override;
 
   blink::mojom::PointerLockResult LockPointer(bool) override;
   blink::mojom::PointerLockResult ChangePointerLock(bool) override;

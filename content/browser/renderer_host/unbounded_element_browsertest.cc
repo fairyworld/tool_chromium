@@ -113,8 +113,9 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, InputEventRouting) {
   EXPECT_TRUE(NavigateToURL(shell(), url));
 
   std::string script = R"(
-    document.body.innerHTML =
-        '<div id="child" style="width:100px; height:100px;" unbounded></div>';
+    document.body.innerHTML = `
+      <div id="child" style="width:100px; height:100px;" unbounded></div>
+    `;
     const div = document.getElementById('child');
     div.addEventListener('mousemove', (e) => {
       window.__mouse_x = e.clientX;
@@ -142,8 +143,9 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
   EXPECT_TRUE(NavigateToURL(shell(), url));
 
   std::string script = R"(
-    document.body.innerHTML =
-      '<div id="target" style="width:50px; height:50px;" unbounded></div>';
+    document.body.innerHTML = `
+      <div id="target" style="width:50px; height:50px;" unbounded></div>
+    `;
     document.getElementById('target').showUnboundedElement();
   )";
   ASSERT_TRUE(ExecJs(primary_main_frame_host(), script));
@@ -167,8 +169,9 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
   EXPECT_TRUE(NavigateToURL(shell(), url));
 
   std::string script = R"(
-    document.body.innerHTML =
-      '<div id="target" style="width:50px; height:50px;" unbounded></div>';
+    document.body.innerHTML = `
+      <div id="target" style="width:50px; height:50px;" unbounded></div>
+    `;
     document.getElementById('target').showUnboundedElement();
   )";
   ASSERT_TRUE(ExecJs(primary_main_frame_host(), script));
@@ -210,8 +213,9 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, CompositorPopupAllocation) {
   EXPECT_TRUE(NavigateToURL(shell(), url));
 
   std::string script = R"(
-    document.body.innerHTML =
-      '<div id="target" style="width:100px; height:100px;" unbounded></div>';
+    document.body.innerHTML = `
+      <div id="target" style="width:100px; height:100px;" unbounded></div>
+    `;
     document.getElementById('target').showUnboundedElement();
   )";
   EXPECT_TRUE(ExecJs(primary_main_frame_host(), script));
@@ -271,8 +275,9 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementHighDPIBrowserTest,
   EXPECT_TRUE(NavigateToURL(shell(), url));
 
   std::string script = R"(
-    document.body.innerHTML =
-      '<div id="target" style="width:100px; height:100px;" unbounded></div>';
+    document.body.innerHTML = `
+      <div id="target" style="width:100px; height:100px;" unbounded></div>
+    `;
     document.getElementById('target').showUnboundedElement();
   )";
   EXPECT_TRUE(ExecJs(primary_main_frame_host(), script));
@@ -342,8 +347,9 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, PopupInputEventRouting) {
 
   std::string script = R"(
     document.body.style.margin = '0';
-    document.body.innerHTML =
-        '<div id="child" style="width:100px; height:100px;" unbounded></div>';
+    document.body.innerHTML = `
+      <div id="child" style="width:100px; height:100px;" unbounded></div>
+    `;
     const div = document.getElementById('child');
     div.addEventListener('mousemove', (e) => {
       window.__mouse_x = e.clientX;
@@ -396,9 +402,10 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
   std::string script = base::StringPrintf(
       R"(
     document.body.style.margin = '0';
-    document.body.innerHTML =
-        '<div id="child" style="width:100px; height:100px; ' +
-        'position:absolute; top:%dpx; left:%dpx;" unbounded></div>';
+    document.body.innerHTML = `
+      <div id="child" style="width:100px; height:100px; position:absolute;
+           top:%dpx; left:%dpx;" unbounded></div>
+    `;
     const div = document.getElementById('child');
     div.addEventListener('mousemove', (e) => {
       window.__mouse_x = e.clientX;
@@ -449,9 +456,10 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
   std::string script = R"(
     document.body.style.margin = '0';
     document.body.style.height = '2000px';
-    document.body.innerHTML =
-        '<div id="child" style="width:100px; height:100px; ' +
-        'position:absolute; top:400px; left:50px;" unbounded></div>';
+    document.body.innerHTML = `
+      <div id="child" style="width:100px; height:100px; position:absolute;
+           top:400px; left:50px;" unbounded></div>
+    `;
     window.scrollTo(0, 100);
     const div = document.getElementById('child');
     div.addEventListener('mousemove', (e) => {
@@ -497,9 +505,10 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, DISABLED_IframeInputEventRou
   // Set up the unbounded element inside the iframe.
   std::string iframe_script = R"(
     document.body.style.margin = '0';
-    document.body.innerHTML =
-        '<div id="child" style="width:50px; height:50px; ' +
-        'position:absolute; top:120px; left:120px;" unbounded></div>';
+    document.body.innerHTML = `
+      <div id="child" style="width:50px; height:50px; position:absolute;
+           top:120px; left:120px;" unbounded></div>
+    `;
     const div = document.getElementById('child');
     div.addEventListener('mousemove', (e) => {
       window.__mouse_x = e.clientX;
@@ -529,9 +538,10 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, DynamicBoundsSync) {
   EXPECT_TRUE(NavigateToURL(shell(), url));
 
   std::string script = R"(
-    document.body.innerHTML =
-        '<div id="child" style="width:100px; height:100px; ' +
-        'position:absolute; top:0; left:0;" unbounded></div>';
+    document.body.innerHTML = `
+      <div id="child" style="width:100px; height:100px; position:absolute;
+           top:0; left:0;" unbounded></div>
+    `;
     const div = document.getElementById('child');
     div.showUnboundedElement();
   )";
@@ -571,6 +581,33 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, DynamicBoundsSync) {
     EXPECT_EQ(150, bounds.width());
     EXPECT_EQ(200, bounds.height());
   }
+}
+
+IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
+                       IframeDeletionDoesNotDismissUnboundedSurface) {
+  GURL url(embedded_test_server()->GetURL("/title1.html"));
+  EXPECT_TRUE(NavigateToURL(shell(), url));
+
+  std::string script = R"(
+    document.body.innerHTML = `
+      <div id="target" style="width:100px; height:100px;" unbounded></div>
+      <iframe id="test_iframe" src="about:blank"></iframe>
+    `;
+    document.getElementById('target').showUnboundedElement();
+  )";
+  EXPECT_TRUE(ExecJs(primary_main_frame_host(), script));
+  WaitForFrameReady();
+
+  UnboundedSurfaceWindow* window =
+      primary_main_frame_host()->GetUnboundedSurfaceWindowForTesting();
+  ASSERT_TRUE(window);
+  EXPECT_TRUE(window->is_valid());
+
+  // Remove the iframe and verify it doesn't dismiss the unbounded surface.
+  EXPECT_TRUE(ExecJs(primary_main_frame_host(),
+                     "document.getElementById('test_iframe').remove();"));
+  RunUntilInputProcessed(primary_main_frame_host()->GetRenderWidgetHost());
+  EXPECT_TRUE(window->is_valid());
 }
 
 }  // namespace content

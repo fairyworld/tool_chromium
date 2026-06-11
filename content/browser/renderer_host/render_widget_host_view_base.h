@@ -41,6 +41,7 @@
 #include "third_party/blink/public/mojom/frame/fullscreen.mojom.h"
 #include "third_party/blink/public/mojom/frame/intrinsic_sizing_info.mojom-forward.h"
 #include "third_party/blink/public/mojom/input/input_event_result.mojom-shared.h"
+#include "third_party/blink/public/mojom/unbounded_element/unbounded_element.mojom-forward.h"
 #include "third_party/skia/include/core/SkImageInfo.h"
 #include "ui/accessibility/ax_action_handler_registry.h"
 #include "ui/base/ime/mojom/text_input_state.mojom-forward.h"
@@ -88,7 +89,6 @@ namespace content {
 class DevicePosturePlatformProvider;
 class MouseWheelPhaseHandler;
 class RenderWidgetHostImpl;
-class RenderFrameHostImpl;
 class UnboundedSurfaceWindow;
 class ScopedViewTransitionResources;
 class TextInputManager;
@@ -431,8 +431,11 @@ class CONTENT_EXPORT RenderWidgetHostViewBase
   virtual void Destroy();
 
   // Unbounded element API methods.
-  virtual void CreateUnboundedSurface(RenderFrameHostImpl* parent_rfh,
-                                      const gfx::Rect& bounds_in_screen);
+  virtual void CreateUnboundedSurface(
+      mojo::PendingAssociatedReceiver<blink::mojom::UnboundedSurfaceHost> host,
+      mojo::PendingAssociatedRemote<blink::mojom::UnboundedSurfaceClient>
+          client,
+      const gfx::Rect& bounds_in_dips);
   virtual void UpdateUnboundedSurfaceBounds(const gfx::Rect& bounds_in_screen);
   virtual void DismissUnboundedSurface();
   virtual bool HasActiveUnboundedSurface() const;
