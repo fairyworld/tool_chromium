@@ -85,6 +85,16 @@ ServiceErrorOr<mojom::NewSigningKeyDataPtr> PopulateNewSigningKeyData(
   return data;
 }
 
+ServiceErrorOr<mojom::NewAttestationKeyDataPtr> PopulateNewAttestationKeyData(
+    unexportable_keys::UnexportableKeyService& unexportable_key_service,
+    const ServiceErrorOr<UnexportableAttestationKeyId> error_or_key_id) {
+  auto data = mojom::NewAttestationKeyData::New();
+  ASSIGN_OR_RETURN(data->key_id, error_or_key_id);
+  ASSIGN_OR_RETURN(data->metadata,
+                   PopulateKeyMetadata(unexportable_key_service, data->key_id));
+  return data;
+}
+
 ServiceErrorOr<std::vector<mojom::NewKeyDataPtr>> PopulateAllNewKeyData(
     unexportable_keys::UnexportableKeyService& unexportable_key_service,
     ServiceErrorOr<std::vector<UnexportableKeyId>> error_or_key_ids) {
@@ -139,18 +149,26 @@ void unexportable_keys::UnexportableKeyServiceProxyImpl::GenerateAttestationKey(
         acceptable_algorithms,
     BackgroundTaskPriority priority,
     GenerateAttestationKeyCallback callback) {
-  // TODO(crbug.com/501306852): Implement this.
-  std::move(callback).Run(
-      base::unexpected(ServiceError::kOperationNotSupported));
+  unexportable_key_service_->GenerateAttestationKeySlowlyAsync(
+      acceptable_algorithms, priority,
+      base::BindOnce(PopulateNewAttestationKeyData,
+                     std::ref(*unexportable_key_service_))
+          .Then(std::move(callback)));
 }
 
 void unexportable_keys::UnexportableKeyServiceProxyImpl::
     FromWrappedAttestationKey(const std::vector<uint8_t>& wrapped_key,
                               BackgroundTaskPriority priority,
                               FromWrappedAttestationKeyCallback callback) {
-  // TODO(crbug.com/501306852): Implement this.
-  std::move(callback).Run(
-      base::unexpected(ServiceError::kOperationNotSupported));
+  if (wrapped_key.size() > kMaxWrappedKeySize) {
+    receiver_.ReportBadMessage("wrapped key size too long");
+    return;
+  }
+  unexportable_key_service_->FromWrappedAttestationKeySlowlyAsync(
+      wrapped_key, priority,
+      base::BindOnce(PopulateNewAttestationKeyData,
+                     std::ref(*unexportable_key_service_))
+          .Then(std::move(callback)));
 }
 
 void unexportable_keys::UnexportableKeyServiceProxyImpl::Sign(
@@ -168,9 +186,9 @@ void unexportable_keys::UnexportableKeyServiceProxyImpl::Certify(
     const std::vector<uint8_t>& challenge,
     BackgroundTaskPriority priority,
     CertifyCallback callback) {
-  // TODO(crbug.com/501306852): Implement this.
-  std::move(callback).Run(
-      base::unexpected(ServiceError::kOperationNotSupported));
+  unexportable_key_service_->CertifySlowlyAsync(attestation_key_id,
+                                                signing_key_id, challenge,
+                                                priority, std::move(callback));
 }
 
 void unexportable_keys::UnexportableKeyServiceProxyImpl::

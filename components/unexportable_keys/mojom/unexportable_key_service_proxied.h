@@ -113,6 +113,16 @@ class UnexportableKeyServiceProxied : public UnexportableKeyService {
           original_callback,
       ServiceErrorOr<mojom::NewSigningKeyDataPtr> result);
 
+  void OnAttestationKeyGenerated(
+      base::OnceCallback<void(ServiceErrorOr<UnexportableAttestationKeyId>)>
+          original_callback,
+      ServiceErrorOr<mojom::NewAttestationKeyDataPtr> result);
+
+  void OnAttestationKeyLoaded(
+      base::OnceCallback<void(ServiceErrorOr<UnexportableAttestationKeyId>)>
+          original_callback,
+      ServiceErrorOr<mojom::NewAttestationKeyDataPtr> result);
+
   void OnGetAllKeysForGarbageCollection(
       base::OnceCallback<void(ServiceErrorOr<std::vector<UnexportableKeyId>>)>
           original_callback,

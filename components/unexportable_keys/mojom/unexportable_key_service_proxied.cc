@@ -141,8 +141,24 @@ void UnexportableKeyServiceProxied::GenerateAttestationKeySlowlyAsync(
     BackgroundTaskPriority priority,
     base::OnceCallback<void(ServiceErrorOr<UnexportableAttestationKeyId>)>
         callback) {
-  // TODO(crbug.com/501306852): Implement this.
-  std::move(callback).Run(base::unexpected(ServiceError::kKeyNotFound));
+  // SAFETY: remote_ will not call any pending callbacks after it is destroyed.
+  // Since we own remote_, it is guaranteed that this will be alive when a
+  // callback is called.
+  remote_->GenerateAttestationKey(
+      base::ToVector(acceptable_algorithms), priority,
+      mojo::WrapCallbackWithDefaultInvokeIfNotRun(
+          base::BindOnce(
+              &UnexportableKeyServiceProxied::OnAttestationKeyGenerated,
+              base::Unretained(this), std::move(callback)),
+          base::unexpected(ServiceError::kOperationCancelled)));
+}
+
+void UnexportableKeyServiceProxied::OnAttestationKeyGenerated(
+    base::OnceCallback<void(ServiceErrorOr<UnexportableAttestationKeyId>)>
+        original_callback,
+    ServiceErrorOr<mojom::NewAttestationKeyDataPtr> result) {
+  std::move(original_callback)
+      .Run(OnKeyGeneratedImpl(key_cache_, std::move(result)));
 }
 
 void UnexportableKeyServiceProxied::FromWrappedAttestationKeySlowlyAsync(
@@ -150,8 +166,23 @@ void UnexportableKeyServiceProxied::FromWrappedAttestationKeySlowlyAsync(
     BackgroundTaskPriority priority,
     base::OnceCallback<void(ServiceErrorOr<UnexportableAttestationKeyId>)>
         callback) {
-  // TODO(crbug.com/501306852): Implement this.
-  std::move(callback).Run(base::unexpected(ServiceError::kKeyNotFound));
+  // SAFETY: remote_ will not call any pending callbacks after it is destroyed.
+  // Since we own remote_, it is guaranteed that this will be alive when a
+  // callback is called.
+  remote_->FromWrappedAttestationKey(
+      base::ToVector(wrapped_key), priority,
+      mojo::WrapCallbackWithDefaultInvokeIfNotRun(
+          base::BindOnce(&UnexportableKeyServiceProxied::OnAttestationKeyLoaded,
+                         base::Unretained(this), std::move(callback)),
+          base::unexpected(ServiceError::kOperationCancelled)));
+}
+
+void UnexportableKeyServiceProxied::OnAttestationKeyLoaded(
+    base::OnceCallback<void(ServiceErrorOr<UnexportableAttestationKeyId>)>
+        original_callback,
+    ServiceErrorOr<mojom::NewAttestationKeyDataPtr> result) {
+  std::move(original_callback)
+      .Run(OnKeyLoadedImpl(key_cache_, std::move(result)));
 }
 
 void UnexportableKeyServiceProxied::SignSlowlyAsync(
@@ -172,9 +203,11 @@ void UnexportableKeyServiceProxied::CertifySlowlyAsync(
     BackgroundTaskPriority priority,
     base::OnceCallback<void(ServiceErrorOr<crypto::AttestationStatement>)>
         callback) {
-  // TODO(crbug.com/501306852): Implement this.
-  std::move(callback).Run(
-      base::unexpected(ServiceError::kOperationNotSupported));
+  remote_->Certify(attestation_key_id, signing_key_id,
+                   base::ToVector(challenge), priority,
+                   mojo::WrapCallbackWithDefaultInvokeIfNotRun(
+                       std::move(callback),
+                       base::unexpected(ServiceError::kOperationCancelled)));
 }
 
 ServiceErrorOr<std::vector<uint8_t>>

@@ -12,6 +12,7 @@
 
 #include "base/containers/to_vector.h"
 #include "base/functional/bind.h"
+#include "base/no_destructor.h"
 #include "base/test/bind.h"
 #include "base/test/gmock_expected_support.h"
 #include "base/test/task_environment.h"
@@ -33,6 +34,7 @@ namespace unexportable_keys {
 
 using ::base::test::ErrorIs;
 using ::base::test::ValueIs;
+using ::testing::ElementsAre;
 using ::testing::ElementsAreArray;
 using ::testing::IsEmpty;
 using ::testing::UnorderedElementsAre;
@@ -43,6 +45,24 @@ namespace {
 constexpr auto kTestSubjectPublicKeyInfo = std::to_array<uint8_t>({1, 2, 3, 4});
 constexpr auto kTestWrappedKey = std::to_array<uint8_t>({5, 6, 7, 8});
 constexpr std::string_view kTestKeyTag = "test_key_tag";
+
+constexpr auto kTestWrappedAttestationKey =
+    std::to_array<uint8_t>({0x11, 0x22, 0x33});
+constexpr auto kTestAttestationAlgorithms =
+    std::to_array<crypto::SignatureVerifier::SignatureAlgorithm>({
+        crypto::SignatureVerifier::SignatureAlgorithm::RSA_PKCS1_SHA256,
+        crypto::SignatureVerifier::SignatureAlgorithm::ECDSA_SHA256,
+    });
+constexpr auto kTestChallenge = std::to_array<uint8_t>({1, 2, 3});
+
+const crypto::AttestationStatement& GetTestAttestationStatement() {
+  static const base::NoDestructor<crypto::AttestationStatement> statement({
+      .format = crypto::AttestationStatement::Format::kTpm,
+      .statement = {0x01, 0x02},
+      .signature = {0x03, 0x04},
+  });
+  return *statement;
+}
 
 mojom::NewKeyMetadataPtr ToNewKeyMetadata(CachedKeyData cache_data) {
   auto metadata = mojom::NewKeyMetadata::New();
@@ -74,6 +94,13 @@ mojom::NewSigningKeyDataPtr ToMojomKeyData(UnexportableSigningKeyId key_id,
                                            CachedKeyData cache_data) {
   return ToMojomKeyDataImpl<mojom::NewSigningKeyData>(key_id,
                                                       std::move(cache_data));
+}
+
+mojom::NewAttestationKeyDataPtr ToMojomKeyData(
+    UnexportableAttestationKeyId key_id,
+    CachedKeyData cache_data) {
+  return ToMojomKeyDataImpl<mojom::NewAttestationKeyData>(
+      key_id, std::move(cache_data));
 }
 
 template <
@@ -148,18 +175,17 @@ class FakeUnexportableKeyServiceProxy : public mojom::UnexportableKeyService {
           acceptable_algorithms,
       BackgroundTaskPriority priority,
       GenerateAttestationKeyCallback callback) override {
-    // TODO(crbug.com/501306852): Implement this.
     std::move(callback).Run(
-        base::unexpected(ServiceError::kOperationNotSupported));
+        GenerateKeyImpl(std::exchange(generate_attestation_response_, {}),
+                        acceptable_algorithms));
   }
 
   void FromWrappedAttestationKey(
       const std::vector<uint8_t>& wrapped_key,
       BackgroundTaskPriority priority,
       FromWrappedAttestationKeyCallback callback) override {
-    // TODO(crbug.com/501306852): Implement this.
-    std::move(callback).Run(
-        base::unexpected(ServiceError::kOperationNotSupported));
+    std::move(callback).Run(FromWrappedKeyImpl(
+        std::exchange(from_wrapped_attestation_response_, {}), wrapped_key));
   }
 
   void Sign(const UnexportableSigningKeyId& key_id,
@@ -182,9 +208,11 @@ class FakeUnexportableKeyServiceProxy : public mojom::UnexportableKeyService {
                const std::vector<uint8_t>& challenge,
                BackgroundTaskPriority priority,
                CertifyCallback callback) override {
-    // TODO(crbug.com/501306852): Implement this.
-    std::move(callback).Run(
-        base::unexpected(ServiceError::kOperationNotSupported));
+    if (certify_response_) {
+      std::move(callback).Run(*std::exchange(certify_response_, {}));
+    } else {
+      std::move(callback).Run(GetTestAttestationStatement());
+    }
   }
 
   void GetAllKeysForGarbageCollection(
@@ -237,6 +265,21 @@ class FakeUnexportableKeyServiceProxy : public mojom::UnexportableKeyService {
     delete_all_keys_response_ = std::move(response);
   }
 
+  void SetGenerateAttestationResponse(
+      ServiceErrorOr<mojom::NewAttestationKeyDataPtr> response) {
+    generate_attestation_response_ = std::move(response);
+  }
+
+  void SetFromWrappedAttestationResponse(
+      ServiceErrorOr<mojom::NewAttestationKeyDataPtr> response) {
+    from_wrapped_attestation_response_ = std::move(response);
+  }
+
+  void SetCertifyResponse(
+      ServiceErrorOr<crypto::AttestationStatement> response) {
+    certify_response_ = std::move(response);
+  }
+
  private:
   std::optional<ServiceErrorOr<mojom::NewSigningKeyDataPtr>> generate_response_;
   std::optional<ServiceErrorOr<mojom::NewSigningKeyDataPtr>>
@@ -246,6 +289,11 @@ class FakeUnexportableKeyServiceProxy : public mojom::UnexportableKeyService {
       get_all_keys_response_;
   std::optional<ServiceErrorOr<uint64_t>> delete_keys_response_;
   std::optional<ServiceErrorOr<uint64_t>> delete_all_keys_response_;
+  std::optional<ServiceErrorOr<mojom::NewAttestationKeyDataPtr>>
+      generate_attestation_response_;
+  std::optional<ServiceErrorOr<mojom::NewAttestationKeyDataPtr>>
+      from_wrapped_attestation_response_;
+  std::optional<ServiceErrorOr<crypto::AttestationStatement>> certify_response_;
 };
 
 class UnexportableKeyServiceProxiedTest : public ::testing::Test {
@@ -253,9 +301,15 @@ class UnexportableKeyServiceProxiedTest : public ::testing::Test {
   UnexportableSigningKeyId GenerateSigningKeyOrDie() {
     base::test::TestFuture<ServiceErrorOr<UnexportableSigningKeyId>> future;
     proxied_service_.GenerateSigningKeySlowlyAsync(
-        {crypto::SignatureVerifier::SignatureAlgorithm::RSA_PKCS1_SHA256
+        {crypto::SignatureVerifier::SignatureAlgorithm::RSA_PKCS1_SHA256},
+        BackgroundTaskPriority::kUserVisible, future.GetCallback());
+    return future.Get().value();
+  }
 
-        },
+  UnexportableAttestationKeyId GenerateAttestationKeyOrDie() {
+    base::test::TestFuture<ServiceErrorOr<UnexportableAttestationKeyId>> future;
+    proxied_service_.GenerateAttestationKeySlowlyAsync(
+        {crypto::SignatureVerifier::SignatureAlgorithm::RSA_PKCS1_SHA256},
         BackgroundTaskPriority::kUserVisible, future.GetCallback());
     return future.Get().value();
   }
@@ -688,5 +742,121 @@ TEST_F(UnexportableKeyServiceProxiedTest, SignCancelled) {
   EXPECT_THAT(future.Get(), ErrorIs(ServiceError::kOperationCancelled));
 }
 
+TEST_F(UnexportableKeyServiceProxiedTest, GenerateAttestationKeySuccess) {
+  base::test::TestFuture<ServiceErrorOr<UnexportableAttestationKeyId>> future;
+  proxied_service_.GenerateAttestationKeySlowlyAsync(
+      kTestAttestationAlgorithms, BackgroundTaskPriority::kUserVisible,
+      future.GetCallback());
+
+  ASSERT_OK_AND_ASSIGN(UnexportableAttestationKeyId key_id, future.Get());
+
+  EXPECT_THAT(proxied_service_.GetSubjectPublicKeyInfo(key_id),
+              ValueIs(ElementsAreArray(kTestSubjectPublicKeyInfo)));
+  EXPECT_THAT(proxied_service_.GetWrappedKey(key_id),
+              ValueIs(ElementsAreArray(kTestWrappedKey)));
+  EXPECT_THAT(
+      proxied_service_.GetAlgorithm(key_id),
+      ValueIs(crypto::SignatureVerifier::SignatureAlgorithm::RSA_PKCS1_SHA256));
+  EXPECT_THAT(proxied_service_.GetKeyTag(key_id), ValueIs(kTestKeyTag));
+}
+
+TEST_F(UnexportableKeyServiceProxiedTest, GenerateAttestationKeyError) {
+  fake_service_.SetGenerateAttestationResponse(
+      base::unexpected(ServiceError::kCryptoApiFailed));
+
+  base::test::TestFuture<ServiceErrorOr<UnexportableAttestationKeyId>> future;
+  proxied_service_.GenerateAttestationKeySlowlyAsync(
+      kTestAttestationAlgorithms, BackgroundTaskPriority::kUserVisible,
+      future.GetCallback());
+
+  EXPECT_THAT(future.Get(), ErrorIs(ServiceError::kCryptoApiFailed));
+}
+
+TEST_F(UnexportableKeyServiceProxiedTest, GenerateAttestationKeyCancelled) {
+  base::test::TestFuture<ServiceErrorOr<UnexportableAttestationKeyId>> future;
+  proxied_service_.GenerateAttestationKeySlowlyAsync(
+      kTestAttestationAlgorithms, BackgroundTaskPriority::kUserVisible,
+      future.GetCallback());
+
+  receiver_.reset();
+  EXPECT_THAT(future.Get(), ErrorIs(ServiceError::kOperationCancelled));
+}
+
+TEST_F(UnexportableKeyServiceProxiedTest, FromWrappedAttestationKeySuccess) {
+  base::test::TestFuture<ServiceErrorOr<UnexportableAttestationKeyId>> future;
+  proxied_service_.FromWrappedAttestationKeySlowlyAsync(
+      kTestWrappedAttestationKey, BackgroundTaskPriority::kUserVisible,
+      future.GetCallback());
+
+  ASSERT_OK_AND_ASSIGN(UnexportableAttestationKeyId key_id, future.Get());
+
+  EXPECT_THAT(proxied_service_.GetSubjectPublicKeyInfo(key_id),
+              ValueIs(ElementsAreArray(kTestSubjectPublicKeyInfo)));
+  EXPECT_THAT(proxied_service_.GetWrappedKey(key_id),
+              ValueIs(ElementsAreArray(kTestWrappedAttestationKey)));
+  EXPECT_THAT(
+      proxied_service_.GetAlgorithm(key_id),
+      ValueIs(crypto::SignatureVerifier::SignatureAlgorithm::ECDSA_SHA256));
+  EXPECT_THAT(proxied_service_.GetKeyTag(key_id), ValueIs(kTestKeyTag));
+}
+
+TEST_F(UnexportableKeyServiceProxiedTest, FromWrappedAttestationKeyError) {
+  fake_service_.SetFromWrappedAttestationResponse(
+      base::unexpected(ServiceError::kKeyNotFound));
+
+  base::test::TestFuture<ServiceErrorOr<UnexportableAttestationKeyId>> future;
+  proxied_service_.FromWrappedAttestationKeySlowlyAsync(
+      kTestWrappedAttestationKey, BackgroundTaskPriority::kUserVisible,
+      future.GetCallback());
+
+  EXPECT_THAT(future.Get(), ErrorIs(ServiceError::kKeyNotFound));
+}
+
+TEST_F(UnexportableKeyServiceProxiedTest, FromWrappedAttestationKeyCancelled) {
+  base::test::TestFuture<ServiceErrorOr<UnexportableAttestationKeyId>> future;
+  proxied_service_.FromWrappedAttestationKeySlowlyAsync(
+      kTestWrappedAttestationKey, BackgroundTaskPriority::kUserVisible,
+      future.GetCallback());
+
+  receiver_.reset();
+  EXPECT_THAT(future.Get(), ErrorIs(ServiceError::kOperationCancelled));
+}
+
+TEST_F(UnexportableKeyServiceProxiedTest, CertifySuccess) {
+  base::test::TestFuture<ServiceErrorOr<crypto::AttestationStatement>> future;
+  proxied_service_.CertifySlowlyAsync(
+      GenerateAttestationKeyOrDie(), GenerateSigningKeyOrDie(), kTestChallenge,
+      BackgroundTaskPriority::kUserVisible, future.GetCallback());
+
+  ASSERT_OK_AND_ASSIGN(const crypto::AttestationStatement& statement,
+                       future.Get());
+  const crypto::AttestationStatement& expected_statement =
+      GetTestAttestationStatement();
+  EXPECT_EQ(statement.format, expected_statement.format);
+  EXPECT_EQ(statement.statement, expected_statement.statement);
+  EXPECT_EQ(statement.signature, expected_statement.signature);
+}
+
+TEST_F(UnexportableKeyServiceProxiedTest, CertifyError) {
+  fake_service_.SetCertifyResponse(
+      base::unexpected(ServiceError::kCryptoApiFailed));
+
+  base::test::TestFuture<ServiceErrorOr<crypto::AttestationStatement>> future;
+  proxied_service_.CertifySlowlyAsync(
+      GenerateAttestationKeyOrDie(), GenerateSigningKeyOrDie(), kTestChallenge,
+      BackgroundTaskPriority::kUserVisible, future.GetCallback());
+
+  EXPECT_THAT(future.Get(), ErrorIs(ServiceError::kCryptoApiFailed));
+}
+
+TEST_F(UnexportableKeyServiceProxiedTest, CertifyCancelled) {
+  base::test::TestFuture<ServiceErrorOr<crypto::AttestationStatement>> future;
+  proxied_service_.CertifySlowlyAsync(
+      GenerateAttestationKeyOrDie(), GenerateSigningKeyOrDie(), kTestChallenge,
+      BackgroundTaskPriority::kUserVisible, future.GetCallback());
+
+  receiver_.reset();
+  EXPECT_THAT(future.Get(), ErrorIs(ServiceError::kOperationCancelled));
+}
 }  // namespace
 }  // namespace unexportable_keys
