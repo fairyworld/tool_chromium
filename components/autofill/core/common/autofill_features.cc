@@ -305,7 +305,7 @@ BASE_FEATURE_PARAM(bool,
                    kAutofillAiServerModelUseCacheResults,
                    &kAutofillAiServerModel,
                    "autofill_ai_model_use_cache_results",
-                   false);
+                   true);
 
 // If enabled, AutofillAi supports shipment entities.
 BASE_FEATURE(kAutofillAiShipment, base::FEATURE_DISABLED_BY_DEFAULT);
