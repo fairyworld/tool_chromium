@@ -845,8 +845,9 @@ IN_PROC_BROWSER_TEST_F(GlicExperimentalOptInTest, NoAccountCookieSyncFails) {
 
   // Click the close button inside the error panel to dismiss the dialog.
   views::test::WidgetDestroyedWaiter waiter(widget);
-  ASSERT_TRUE(ExecJs(dialog_contents,
-                     "setTimeout(() => getCloseButtonError().click(), 0);"));
+  content::ExecuteScriptAsync(
+      dialog_contents,
+      std::string(kCommonJs) + "getCloseButtonError().click();");
   waiter.Wait();
 
   EXPECT_FALSE(opt_in_result.Get());
@@ -942,12 +943,13 @@ IN_PROC_BROWSER_TEST_F(GlicExperimentalOptInOfflineTest,
   EXPECT_TRUE(close_button_visible);
 
   // Click the close button inside the WebUI.
-  ASSERT_TRUE(ExecJs(dialog_contents,
-                     "setTimeout(() => "
-                     "getCloseButtonError().click(), 0);"));
+  views::test::WidgetDestroyedWaiter waiter(widget);
+  content::ExecuteScriptAsync(
+      dialog_contents,
+      std::string(kCommonJs) + "getCloseButtonError().click();");
 
   // The dialog should close and the result should be false (rejected).
-  views::test::WidgetDestroyedWaiter(widget).Wait();
+  waiter.Wait();
   EXPECT_FALSE(opt_in_result.Get());
 }
 
