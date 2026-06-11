@@ -826,7 +826,7 @@ std::string NavigationEntryImpl::GetExtraHeaders() const {
 
 void NavigationEntryImpl::AddExtraHeaders(
     const std::string& more_extra_headers) {
-  DCHECK(!more_extra_headers.empty());
+  CHECK(!more_extra_headers.empty(), base::NotFatalUntil::M152);
   if (!extra_headers_.empty()) {
     extra_headers_ += "\r\n";
   }
@@ -872,7 +872,7 @@ std::unique_ptr<NavigationEntryImpl> NavigationEntryImpl::Clone() const {
 
 std::unique_ptr<NavigationEntryImpl> NavigationEntryImpl::CloneWithoutSharing(
     NavigationEntryRestoreContextImpl* restore_context) const {
-  DCHECK(restore_context);
+  CHECK(restore_context, base::NotFatalUntil::M152);
   return CloneAndReplaceInternal(nullptr, false, nullptr, nullptr,
                                  restore_context,
                                  ClonePolicy::kCloneFrameEntries);
@@ -1352,8 +1352,9 @@ void NavigationEntryImpl::RemoveEntryForFrame(FrameTreeNode* frame_tree_node,
 
 void NavigationEntryImpl::UpdateBackForwardCacheNotRestoredReasons(
     NavigationRequest* navigation_request) {
-  DCHECK(BackForwardCacheMetrics::IsCrossDocumentMainFrameHistoryNavigation(
-      navigation_request));
+  CHECK(BackForwardCacheMetrics::IsCrossDocumentMainFrameHistoryNavigation(
+            navigation_request),
+        base::NotFatalUntil::M152);
   if (!back_forward_cache_metrics()) {
     // Create a metrics object if there is none.
     FrameNavigationEntry* frame_navigation_entry =
