@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_CONTROLLER_WEBAUTHN_DELEGATE_H_
-#define CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_CONTROLLER_WEBAUTHN_DELEGATE_H_
+#ifndef CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_PASSWORD_MANAGER_WEBAUTHN_DELEGATE_H_
+#define CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_PASSWORD_MANAGER_WEBAUTHN_DELEGATE_H_
 
 #include <optional>
 #include <vector>
@@ -32,7 +32,7 @@ class UiCredential;
 // manager because it is in response to an immediate WebAuthn invocation,
 // without necessarily any forms or input fields being present on the page. This
 // is owned by WebAuthnRequestDelegateAndroid.
-class TouchToFillControllerWebAuthnDelegate
+class TouchToFillPasswordManagerWebAuthnDelegate
     : public TouchToFillControllerDelegate {
  public:
   using SortingCallback = base::RepeatingCallback<
@@ -42,18 +42,18 @@ class TouchToFillControllerWebAuthnDelegate
 
   using CredentialReceiver = TouchToFillCredentialReceiver;
 
-  TouchToFillControllerWebAuthnDelegate(
+  TouchToFillPasswordManagerWebAuthnDelegate(
       CredentialReceiver* receiver,
       SortingCallback sort_credentials_callback,
       bool should_show_hybrid_option,
       bool is_immediate);
 
-  TouchToFillControllerWebAuthnDelegate(
-      const TouchToFillControllerWebAuthnDelegate&) = delete;
-  TouchToFillControllerWebAuthnDelegate& operator=(
-      const TouchToFillControllerWebAuthnDelegate&) = delete;
+  TouchToFillPasswordManagerWebAuthnDelegate(
+      const TouchToFillPasswordManagerWebAuthnDelegate&) = delete;
+  TouchToFillPasswordManagerWebAuthnDelegate& operator=(
+      const TouchToFillPasswordManagerWebAuthnDelegate&) = delete;
 
-  ~TouchToFillControllerWebAuthnDelegate() override;
+  ~TouchToFillPasswordManagerWebAuthnDelegate() override;
 
   // TouchToFillControllerDelegate:
   void OnShow(base::span<const TouchToFillPasswordManagerView::Credential>
@@ -90,4 +90,4 @@ class TouchToFillControllerWebAuthnDelegate
   bool is_immediate_;
 };
 
-#endif  // CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_CONTROLLER_WEBAUTHN_DELEGATE_H_
+#endif  // CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_PASSWORD_MANAGER_WEBAUTHN_DELEGATE_H_
