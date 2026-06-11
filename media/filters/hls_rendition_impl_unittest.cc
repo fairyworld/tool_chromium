@@ -420,7 +420,9 @@ class HlsRenditionImplUnittest : public testing::Test {
         .WillOnce([content = junk_content, host = mock_hrh_.get()](
                       const hls::MediaSegment&, bool, bool,
                       HlsDataSourceProvider::ReadCb cb) {
-          auto stream = StringHlsDataSourceStreamFactory::CreateStream(content);
+          auto stream = StringHlsDataSourceStreamFactory::CreateStream(
+              content,
+              hls::SecurityMetadata::CreateForTesting("https://example.com"));
           std::move(cb).Run(std::move(stream));
         });
     EXPECT_CALL(
@@ -450,7 +452,9 @@ class HlsRenditionImplUnittest : public testing::Test {
           if (auto enc_data = segment.GetEncryptionData()) {
             ASSERT_FALSE(enc_data->NeedsKeyFetch());
           }
-          auto stream = StringHlsDataSourceStreamFactory::CreateStream(content);
+          auto stream = StringHlsDataSourceStreamFactory::CreateStream(
+              content,
+              hls::SecurityMetadata::CreateForTesting("https://example.com"));
           std::move(cb).Run(std::move(stream));
         });
   }
@@ -469,7 +473,9 @@ class HlsRenditionImplUnittest : public testing::Test {
             ASSERT_TRUE(enc_data->NeedsKeyFetch());
             std::move(intercept).Run(enc_data.get());
           }
-          auto stream = StringHlsDataSourceStreamFactory::CreateStream(content);
+          auto stream = StringHlsDataSourceStreamFactory::CreateStream(
+              content,
+              hls::SecurityMetadata::CreateForTesting("https://example.com"));
           std::move(cb).Run(std::move(stream));
         });
   }

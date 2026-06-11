@@ -39,6 +39,10 @@ HlsDataSourceStream::~HlsDataSourceStream() {
   std::move(on_destructed_cb_).Run();
 }
 
+void HlsDataSourceStream::TrackOrigin(const url::Origin& origin) {
+  security_info_.response_origins.insert(origin);
+}
+
 std::string_view HlsDataSourceStream::AsString() const {
   return base::as_string_view(buffer_);
 }

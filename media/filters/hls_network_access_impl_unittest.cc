@@ -321,7 +321,8 @@ TEST_F(HlsNetworkAccessImplUnittest, TestSegmentWithCORSKey) {
                              "https://example.net/enc.key");
 
   // This actually has to be 16 non-zero bytes.
-  auto* ds_for_keyfetch = factory_->PregenerateNextMock();
+  auto* ds_for_keyfetch =
+      factory_->PregenerateNextMock("https://example.net/enc.key");
   EXPECT_CALL(*ds_for_keyfetch, Initialize)
       .WillOnce(base::test::RunOnceCallback<0>(true));
   EXPECT_CALL(*ds_for_keyfetch, Read(0, SpanSizeEq(16384), _))
@@ -359,8 +360,10 @@ TEST_F(HlsNetworkAccessImplUnittest, TestSegmentWithRedirectionKey) {
   auto segment = MakeSegment(std::nullopt, std::nullopt, InitMode::kAbsent,
                              "https://example.com/enc.key");
 
-  // This actually has to be 16 non-zero bytes.
-  auto* ds_for_keyfetch = factory_->PregenerateNextMock();
+  // This actually has to be 16 non-zero bytes. Note that it also redirects to
+  // an off-host key service.
+  auto* ds_for_keyfetch =
+      factory_->PregenerateNextMock("https://crypto-r-us.net/enc.key");
   EXPECT_CALL(*ds_for_keyfetch, Initialize)
       .WillOnce(base::test::RunOnceCallback<0>(true));
   EXPECT_CALL(*ds_for_keyfetch, Read(0, SpanSizeEq(16384), _))
@@ -368,8 +371,6 @@ TEST_F(HlsNetworkAccessImplUnittest, TestSegmentWithRedirectionKey) {
         std::ranges::fill(data.first<16>(), 'x');
         std::move(cb).Run(16);
       });
-  EXPECT_CALL(*ds_for_keyfetch, DidRedirect())
-      .WillRepeatedly(testing::Return(true));
   EXPECT_CALL(*ds_for_keyfetch, Read(16, SpanSizeEq(16384), _))
       .WillOnce(base::test::RunOnceCallback<2>(0));
   EXPECT_CALL(*ds_for_keyfetch, WouldTaintOrigin())
