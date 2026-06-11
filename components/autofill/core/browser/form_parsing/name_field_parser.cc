@@ -172,7 +172,8 @@ std::unique_ptr<FullNameField> FullNameField::Parse(ParsingContext& context,
 
 void FullNameField::AddClassifications(
     FieldCandidatesMap& field_candidates) const {
-  AddClassification(match_, NAME_FULL, kBaseNameParserScore, field_candidates);
+  AddClassification(match_, NAME_FULL, HeuristicParser::kName,
+                    field_candidates);
 }
 
 FullNameField::FullNameField(FieldAndMatchInfo match)
@@ -255,15 +256,16 @@ FirstTwoLastNamesField::ParseComponentNames(ParsingContext& context,
 void FirstTwoLastNamesField::AddClassifications(
     FieldCandidatesMap& field_candidates) const {
   AddClassification(honorific_prefix_, NAME_HONORIFIC_PREFIX,
-                    kBaseNameParserScore, field_candidates);
-  AddClassification(first_name_, NAME_FIRST, kBaseNameParserScore,
+                    HeuristicParser::kName, field_candidates);
+  AddClassification(first_name_, NAME_FIRST, HeuristicParser::kName,
                     field_candidates);
-  AddClassification(first_last_name_, NAME_LAST_FIRST, kBaseNameParserScore,
+  AddClassification(first_last_name_, NAME_LAST_FIRST, HeuristicParser::kName,
                     field_candidates);
-  AddClassification(second_last_name_, NAME_LAST_SECOND, kBaseNameParserScore,
+  AddClassification(second_last_name_, NAME_LAST_SECOND, HeuristicParser::kName,
                     field_candidates);
   const FieldType type = middle_initial_ ? NAME_MIDDLE_INITIAL : NAME_MIDDLE;
-  AddClassification(middle_name_, type, kBaseNameParserScore, field_candidates);
+  AddClassification(middle_name_, type, HeuristicParser::kName,
+                    field_candidates);
 }
 
 std::unique_ptr<FirstLastNameField>
@@ -495,13 +497,14 @@ FirstLastNameField::FirstLastNameField() = default;
 void FirstLastNameField::AddClassifications(
     FieldCandidatesMap& field_candidates) const {
   AddClassification(honorific_prefix_, NAME_HONORIFIC_PREFIX,
-                    kBaseNameParserScore, field_candidates);
-  AddClassification(first_name_, NAME_FIRST, kBaseNameParserScore,
+                    HeuristicParser::kName, field_candidates);
+  AddClassification(first_name_, NAME_FIRST, HeuristicParser::kName,
                     field_candidates);
-  AddClassification(last_name_, NAME_LAST, kBaseNameParserScore,
+  AddClassification(last_name_, NAME_LAST, HeuristicParser::kName,
                     field_candidates);
   const FieldType type = middle_initial_ ? NAME_MIDDLE_INITIAL : NAME_MIDDLE;
-  AddClassification(middle_name_, type, kBaseNameParserScore, field_candidates);
+  AddClassification(middle_name_, type, HeuristicParser::kName,
+                    field_candidates);
 }
 
 }  // namespace autofill
