@@ -549,18 +549,18 @@ if (enable_js_protobuf) {
 source_set("time_util") {
   public = [ "src/google/protobuf/util/time_util.h" ]
   sources = [ "src/google/protobuf/util/time_util.cc" ]
-  deps = [
+  public_deps = [
     ":duration_proto",
-    ":protobuf_lite",
     ":timestamp_proto",
   ]
+  deps = [ ":protobuf_lite" ]
 }
 
 source_set("io_gzip_stream") {
   public = [ "src/google/protobuf/io/gzip_stream.h" ]
   sources = [ "src/google/protobuf/io/gzip_stream.cc" ]
 
-  deps = [
+  public_deps = [
     ":protobuf_lite",
     "//third_party/zlib",
   ]
