@@ -846,9 +846,10 @@ bool TabStyleViewsImpl::ShouldPaintTabBackgroundColor(
            GetHoverAnimationValue() > 0.0;
   }
 
-  // In the active case, always paint the tab background. The fill image may be
-  // transparent.
-  if (selection_state == TabStyle::TabSelectionState::kActive) {
+  // In the active and selected cases, always paint the tab background. The fill
+  // image may be transparent.
+  if (selection_state == TabStyle::TabSelectionState::kActive ||
+      selection_state == TabStyle::TabSelectionState::kSelected) {
     return true;
   }
 
