@@ -1739,8 +1739,11 @@ public class TabListMediator implements TabListNotificationHandler {
 
         boolean isTargetTabPinned = tab.getIsPinned();
         Token targetTabGroupId = tab.getTabGroupId();
-        if (targetTabGroupId != null && tabModel.getTabGroupCollapsed(targetTabGroupId)) {
-            return TabList.INVALID_TAB_INDEX; // Hidden if the group is collapsed.
+        if (targetTabGroupId != null
+                && tabModel.getTabGroupCollapsed(targetTabGroupId)
+                && getTabGroupHeaderUiIndex(targetTabGroupId) != TabModel.INVALID_TAB_INDEX) {
+            // Hidden if the group is collapsed and a valid header exists.
+            return TabList.INVALID_TAB_INDEX;
         }
 
         int targetTabCurrentIndex = mModelList.indexFromTabId(tab.getId());
@@ -1785,57 +1788,38 @@ public class TabListMediator implements TabListNotificationHandler {
                 return adjustIndexForTabMovement(currentIndex, targetTabCurrentIndex);
             }
 
-            // For tabs belonging to a group, find the group header, scan its children, and insert
-            // the tab in relative backend order.
-            if (targetTabGroupId != null) {
-                // Match the target group's header card.
+            // Target tab matches the current top-level card's group id, insert it within that
+            // group's bounds.
+            if (targetTabGroupId != null && targetTabGroupId.equals(currentTab.getTabGroupId())) {
+                isScanningTargetGroup = true;
+
+                // Default the insertion point to immediately after the header.
                 if (isTabGroupHeader(currentModel)) {
-                    if (targetTabGroupId.equals(currentTab.getTabGroupId())) {
-                        isScanningTargetGroup = true;
-                        targetInsertionUiIndex =
-                                adjustIndexForTabMovement(currentIndex + 1, targetTabCurrentIndex);
-                        continue;
-                    }
+                    targetInsertionUiIndex =
+                            adjustIndexForTabMovement(currentIndex + 1, targetTabCurrentIndex);
+                    continue;
                 }
 
-                // Scan consecutive children of this group.
-                if (isScanningTargetGroup) {
-                    if (targetTabGroupId.equals(currentModel.get(TabProperties.TAB_GROUP_ID))) {
-                        // Insert before the first sibling with a higher index.
-                        if (hasHigherBackendIndex(currentTabModelIndex, targetTabModelIndex)) {
-                            return adjustIndexForTabMovement(currentIndex, targetTabCurrentIndex);
-                        }
-                        targetInsertionUiIndex =
-                                adjustIndexForTabMovement(currentIndex + 1, targetTabCurrentIndex);
-                    } else {
-                        // Insert at the end of the group after exiting its children bounds.
-                        return targetInsertionUiIndex;
-                    }
+                // Find the first sibling that comes after the target in the backend, and insert
+                // immediately before it.
+                if (hasHigherBackendIndex(currentTabModelIndex, targetTabModelIndex)) {
+                    return adjustIndexForTabMovement(currentIndex, targetTabCurrentIndex);
                 }
-            }
-            // For standalone tabs or group headers, compare with top-level items.
-            else {
+                targetInsertionUiIndex =
+                        adjustIndexForTabMovement(currentIndex + 1, targetTabCurrentIndex);
+
+            } else if (isScanningTargetGroup) {
+                // Insert at end of group.
+                return targetInsertionUiIndex;
+            } else {
                 // Only compare top-level items, skip nested child rows.
                 if (currentModel.get(TabProperties.TAB_GROUP_ID) != null) {
                     continue;
                 }
 
-                // Resolve the maximum backend index: for group headers, it is the highest index
-                // among all tabs in that group; for standalone tabs, it is the tab's own index.
-                int maxIndex = TabModel.INVALID_TAB_INDEX;
-                if (isTabGroupHeader(currentModel)) {
-                    List<Tab> groupTabs = tabModel.getRelatedTabList(currentTabId);
-                    for (Tab t : groupTabs) {
-                        Integer idx = tabIdToBackendIndexMap.get(t.getId());
-                        if (idx != null) {
-                            maxIndex = Math.max(maxIndex, idx);
-                        }
-                    }
-                } else {
-                    maxIndex = currentTabModelIndex;
-                }
-
-                if (hasHigherBackendIndex(maxIndex, targetTabModelIndex)) {
+                // Insert immediately before the first top-level item whose backend index is greater
+                // than the target tab's backend index.
+                if (hasHigherBackendIndex(currentTabModelIndex, targetTabModelIndex)) {
                     return adjustIndexForTabMovement(currentIndex, targetTabCurrentIndex);
                 }
             }
@@ -1967,7 +1951,7 @@ public class TabListMediator implements TabListNotificationHandler {
 
         int sourceUiIndex =
                 tabGroupId == null
-                        ? mModelList.indexFromTabId(movedTab.getId())
+                        ? getTabCardUiIndexForNestedLayout(movedTab.getId())
                         : getTabGroupHeaderUiIndex(tabGroupId);
         if (sourceUiIndex == TabModel.INVALID_TAB_INDEX) return;
 

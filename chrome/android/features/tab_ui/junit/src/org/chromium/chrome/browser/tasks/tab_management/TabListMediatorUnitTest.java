@@ -3911,6 +3911,7 @@ public class TabListMediatorUnitTest {
         when(mTabModel.getRelatedTabList(mTab1.getId())).thenReturn(Arrays.asList(mTab1, mTab2));
         when(mTabModel.isTabInTabGroup(mTab1)).thenReturn(true);
         when(mTabModel.isTabInTabGroup(mTab2)).thenReturn(true);
+        mTabGroupObserverCaptor.getValue().didMergeTabToGroup(mTab1, /* isDestinationTab= */ true);
         mTabGroupObserverCaptor.getValue().didMergeTabToGroup(mTab2, /* isDestinationTab= */ false);
         mTabGroupObserverCaptor.getValue().didCreateNewGroup(mTab1, mTabModel);
 
@@ -6749,37 +6750,6 @@ public class TabListMediatorUnitTest {
         // List should contain: [0] Pinned Tab 1, [1] Regular Tab 2, [2] Regular Tab 3.
         assertEquals(3, mModelList.size());
         assertEquals(TAB3_ID, mModelList.get(2).model.get(TabProperties.TAB_ID));
-    }
-
-    @Test
-    public void testVerticalTabs_onTabUnpinned_IntoCollapsedGroup_RemovedFromUI() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
-        mMediator.initWithNative(mProfile);
-        mMediator.resetWithListOfTabs(null, null, false);
-
-        // Both mTab1 and mTab2 are pinned, and belong to a collapsed group.
-        when(mTab1.getIsPinned()).thenReturn(true);
-        when(mTab2.getIsPinned()).thenReturn(true);
-        when(mTab1.getTabGroupId()).thenReturn(TAB_GROUP_ID);
-        when(mTab2.getTabGroupId()).thenReturn(TAB_GROUP_ID);
-        doReturn(true).when(mTabModel).getTabGroupCollapsed(TAB_GROUP_ID);
-
-        mockTabIndexes(mTab1, mTab2);
-
-        // Reset list with both pinned tabs visible.
-        mMediator.resetWithListOfTabs(Arrays.asList(mTab1, mTab2), null, false);
-        assertEquals(2, mModelList.size());
-
-        // Unpin mTab1.
-        when(mTab1.getIsPinned()).thenReturn(false);
-
-        // Trigger observer callback.
-        mTabObserverCaptor.getValue().onTabPinnedStateChanged(mTab1, false);
-
-        // Verifies that since mTab1 is unpinned into a collapsed group, it is removed from the UI
-        // list.
-        assertEquals(1, mModelList.size());
-        assertEquals(TAB2_ID, mModelList.get(0).model.get(TabProperties.TAB_ID));
     }
 
     @Test
