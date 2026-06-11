@@ -69,10 +69,6 @@ chromium-metrics-reviews@google.com.
   <variant name="GlicCreateNewChat"
       summary="the Start New Chat with Gemini command"/>
   <variant name="GlicShare" summary="the Share with Gemini command"/>
-  <variant name="GlicShareLimit" summary="the Glic share limit command"/>
-  <variant name="GlicStartShare" summary="the Share Tab with Gemini command"/>
-  <variant name="GlicStopShare"
-      summary="the Stop Sharing Tab with Gemini command"/>
   <variant name="GlicSwitchToRecentConversation"
       summary="the Switch to Recent Conversation command"/>
   <variant name="GlicUnshare" summary="the Unshare with Gemini command"/>
