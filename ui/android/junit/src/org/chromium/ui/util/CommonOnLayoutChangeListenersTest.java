@@ -19,9 +19,9 @@ import org.chromium.base.test.BaseRobolectricTestRunner;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-/** Unit tests for {@link BoundsChangedLayoutListener}. */
+/** Unit tests for {@link CommonOnLayoutChangeListeners}. */
 @RunWith(BaseRobolectricTestRunner.class)
-public class BoundsChangedLayoutListenerTest {
+public class CommonOnLayoutChangeListenersTest {
     private View mView;
 
     @Before
@@ -33,7 +33,8 @@ public class BoundsChangedLayoutListenerTest {
     public void testLayoutBoundsChanged() {
         AtomicInteger callCount = new AtomicInteger(0);
         OnLayoutChangeListener listener =
-                BoundsChangedLayoutListener.create(callCount::incrementAndGet);
+                CommonOnLayoutChangeListeners.createBoundsChangedListener(
+                        callCount::incrementAndGet);
 
         // Run when bounds changed:
         listener.onLayoutChange(mView, 0, 0, 100, 100, 0, 0, 50, 50);
@@ -48,7 +49,8 @@ public class BoundsChangedLayoutListenerTest {
     public void testLayoutBoundsUnchanged() {
         AtomicInteger callCount = new AtomicInteger(0);
         OnLayoutChangeListener listener =
-                BoundsChangedLayoutListener.create(callCount::incrementAndGet);
+                CommonOnLayoutChangeListeners.createBoundsChangedListener(
+                        callCount::incrementAndGet);
 
         // Does not run when bounds are exactly the same:
         listener.onLayoutChange(mView, 0, 0, 100, 100, 0, 0, 100, 100);
@@ -64,13 +66,13 @@ public class BoundsChangedLayoutListenerTest {
     }
 
     @Test
-    public void testOnBoundsChangedCallback() {
+    public void testOnLayoutChangedCallback() {
         AtomicInteger callCount = new AtomicInteger(0);
         int[] capturedBounds = new int[4];
         final View[] capturedView = new View[1];
 
         OnLayoutChangeListener listener =
-                BoundsChangedLayoutListener.create(
+                CommonOnLayoutChangeListeners.createBoundsChangedListener(
                         (v, left, top, right, bottom) -> {
                             callCount.incrementAndGet();
                             capturedView[0] = v;
@@ -92,5 +94,55 @@ public class BoundsChangedLayoutListenerTest {
         assertEquals(20, capturedBounds[1]);
         assertEquals(110, capturedBounds[2]);
         assertEquals(120, capturedBounds[3]);
+    }
+
+    @Test
+    public void testLayoutSizeChanged() {
+        AtomicInteger callCount = new AtomicInteger(0);
+        OnLayoutChangeListener listener =
+                CommonOnLayoutChangeListeners.createSizeChangedListener(callCount::incrementAndGet);
+
+        // Run when size changed:
+        listener.onLayoutChange(mView, 0, 0, 100, 100, 0, 0, 50, 50);
+        assertEquals(1, callCount.get());
+
+        // Run when size changed but same position/bounds shift:
+        listener.onLayoutChange(mView, 10, 10, 110, 110, 0, 0, 100, 100);
+        assertEquals(1, callCount.get());
+
+        // Run when size changes:
+        listener.onLayoutChange(mView, 10, 10, 120, 110, 10, 10, 110, 110);
+        assertEquals(2, callCount.get());
+    }
+
+    @Test
+    public void testOnSizeChangedCallback() {
+        AtomicInteger callCount = new AtomicInteger(0);
+        int[] capturedBounds = new int[4];
+        final View[] capturedView = new View[1];
+
+        OnLayoutChangeListener listener =
+                CommonOnLayoutChangeListeners.createSizeChangedListener(
+                        (v, left, top, right, bottom) -> {
+                            callCount.incrementAndGet();
+                            capturedView[0] = v;
+                            capturedBounds[0] = left;
+                            capturedBounds[1] = top;
+                            capturedBounds[2] = right;
+                            capturedBounds[3] = bottom;
+                        });
+
+        // Run when size changed:
+        listener.onLayoutChange(mView, 10, 20, 110, 130, 0, 0, 50, 50);
+        assertEquals(1, callCount.get());
+        assertEquals(mView, capturedView[0]);
+        assertEquals(10, capturedBounds[0]);
+        assertEquals(20, capturedBounds[1]);
+        assertEquals(110, capturedBounds[2]);
+        assertEquals(130, capturedBounds[3]);
+
+        // Does not run when size is unchanged, even if bounds changed (shift without resizing):
+        listener.onLayoutChange(mView, 20, 30, 120, 140, 10, 20, 110, 130);
+        assertEquals(1, callCount.get());
     }
 }
