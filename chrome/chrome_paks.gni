@@ -273,6 +273,7 @@ template("chrome_extra_paks") {
         "$root_gen_dir/chrome/webui_browser_resources.pak",
         "$root_gen_dir/chrome/webui_gallery_resources.pak",
         "$root_gen_dir/chrome/webui_toolbar_resources.pak",
+        "$root_gen_dir/chrome/webui_toolbar_shared_resources.pak",
         "$root_gen_dir/chrome/whats_new_resources.pak",
         "$root_gen_dir/components/headless/command_handler/headless_command_resources.pak",
         "$root_gen_dir/content/browser/tracing/tracing_resources.pak",

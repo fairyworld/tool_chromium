@@ -1786,6 +1786,11 @@
     "messages": [10120],
   },
 
+  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/webui_toolbar_shared/resources.grd": {
+    "META": {"sizes": {"includes": [20]}},
+    "includes": [10140],
+  },
+
   "<(SHARED_INTERMEDIATE_DIR)/THIS_IS_A_PLACEHOLDER.grd": {
     "META": {"sizes": {"includes": [800]}},
     "includes": [12000],

@@ -37,6 +37,8 @@
 #include "chrome/grit/generated_resources.h"
 #include "chrome/grit/webui_toolbar_resources.h"
 #include "chrome/grit/webui_toolbar_resources_map.h"
+#include "chrome/grit/webui_toolbar_shared_resources.h"
+#include "chrome/grit/webui_toolbar_shared_resources_map.h"
 #include "components/browser_apis/browser_controls/browser_controls_api.mojom.h"
 #include "components/browser_apis/ui_controllers/toolbar/toolbar_ui_api.mojom.h"
 #include "components/strings/grit/components_strings.h"
@@ -109,6 +111,8 @@ WebUIToolbarUI::WebUIToolbarUI(content::WebUI* web_ui)
   BrowserWindowInterface* browser =
       webui::GetBrowserWindowInterface(web_ui->GetWebContents());
   webui_toolbar::PopulateSplitTabsDataSource(source, browser);
+
+  source->AddResourcePaths(kWebuiToolbarSharedResources);
 
   // Handles chrome.send() calls that records non-timestamp histograms.
   web_ui->AddMessageHandler(std::make_unique<MetricsHandler>());

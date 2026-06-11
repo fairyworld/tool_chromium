@@ -96,6 +96,7 @@ group("resources") {
       "webui_browser:resources",
       "webui_gallery:resources",
       "webui_toolbar:resources",
+      "webui_toolbar_shared:resources",
       "whats_new:resources",
       "//components/browser_apis/tab_strip/resources",
     ]

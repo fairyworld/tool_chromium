@@ -9,8 +9,8 @@ import './split_tabs_button.js';
 import './home_button.js';
 import './pinned_toolbar_actions.js';
 import './avatar_button.js';
-import './icon_table.js';
-import './icon_from_table.js';
+import '/shared/icon_table.js';
+import '/shared/icon_from_table.js';
 import './icons.html.js';
 
 import {assert} from '//resources/js/assert.js';
@@ -18,6 +18,8 @@ import {loadTimeData} from '//resources/js/load_time_data.js';
 import {TrackedElementManager} from '//resources/js/tracked_element/tracked_element_manager.js';
 import {CrLitElement, nothing} from '//resources/lit/v3_0/lit.rollup.js';
 import type {PropertyValues} from '//resources/lit/v3_0/lit.rollup.js';
+import {IconTable} from '/shared/icon_table.js';
+import {AppMenuIconType, AppMenuSeverity, AvatarToolbarButtonState} from '/shared/toolbar_ui_api_data_model.mojom-webui.js';
 import {ColorChangeUpdater} from 'chrome://resources/cr_components/color_change_listener/colors_css_updater.js';
 import {HelpBubbleMixinLit} from 'chrome://resources/cr_components/help_bubble/help_bubble_mixin_lit.js';
 
@@ -25,14 +27,14 @@ import {getCss} from './app.css.js';
 import {getHtml} from './app.html.js';
 import {BrowserProxyImpl, EventDispositionFlag, INVALID_NAVIGATION_CONTROLS_STATE_LISTENER_HANDLE} from './browser_proxy.js';
 import type {BrowserProxy, IconUpdate, NavigationControlsState, NavigationControlsStateListenerHandle} from './browser_proxy.js';
-import {IconTable} from './icon_table.js';
 import {MetricsRecorder} from './metrics_recorder.js';
 import {setHasHelpBubble} from './toolbar_button.js';
-import {AppMenuIconType, AppMenuSeverity, AvatarToolbarButtonState} from './toolbar_ui_api_data_model.mojom-webui.js';
+
 // clang-format off
 // Helper so tests can find what they needed when optimization is on.
-// This should probably be a separate file, but rollup support only
-// handles 2 at most now.
+// Exporting from this file, the rollup file, ensures that we test the
+// same code that we ship in optimized builds.
+import type {IconFromTableElement} from '/shared/icon_from_table.js';
 import {
   ContentSettingImageType,
   IconType,
@@ -42,12 +44,12 @@ import {
   PermissionChipTheme,
   PermissionPromptStyle,
   SplitTabActiveLocation,
-} from './toolbar_ui_api_data_model.mojom-webui.js';
-import type {OmniboxAction, LocationBarState, PermissionChipState} from './toolbar_ui_api_data_model.mojom-webui.js';
+} from '/shared/toolbar_ui_api_data_model.mojom-webui.js';
+import type {OmniboxAction, LocationBarState, PermissionChipState} from '/shared/toolbar_ui_api_data_model.mojom-webui.js';
+
 import {INVALID_FOCUS_REQUEST_HANDLE} from './browser_proxy.js';
 import {ContentSettingIconElement} from './content_setting_icon.js';
 import {ContentSettingsIconsElement} from './content_settings_icons.js';
-import type {IconFromTableElement} from './icon_from_table.js';
 import {LocationBarElement} from './location_bar.js';
 import {LocationIconElement} from './location_icon.js';
 import {PointerProxyImpl} from './pointer_proxy.js';
