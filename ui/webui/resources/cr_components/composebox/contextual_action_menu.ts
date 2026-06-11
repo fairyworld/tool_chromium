@@ -155,12 +155,6 @@ export class ContextualActionMenuElement extends
   protected get supportedModels_(): Map<ModelMode, {
     icon: string,
   }> {
-    const thinkingIcon =
-        (loadTimeData.getBoolean('thinkingModelIconUpdate') &&
-         this.inputState &&
-         this.inputState.allowedModels.includes(ModelMode.kGeminiProNoGenUi)) ?
-        'composebox:astrophotographyMode' :
-        'composebox:thinkingModel';
     return new Map([
       [
         ModelMode.kGeminiRegular,
@@ -177,7 +171,7 @@ export class ContextualActionMenuElement extends
       [
         ModelMode.kGeminiPro,
         {
-          icon: thinkingIcon,
+          icon: 'composebox:thinkingModel',
         },
       ],
       [

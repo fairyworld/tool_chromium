@@ -398,8 +398,6 @@ BASE_FEATURE(kAimUrlInterceptPassthrough, DISABLED);
 
 BASE_FEATURE(kOmniboxDebugLogs, base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kThinkingModelIconUpdate, base::FEATURE_DISABLED_BY_DEFAULT);
-
 // Kill switch - Enables voice search coherence across composeboxes in NTP,
 // cobrowsing, omnibox by default, unless feature param overrides.
 //  - Submit and stop buttons in voice search mode.
