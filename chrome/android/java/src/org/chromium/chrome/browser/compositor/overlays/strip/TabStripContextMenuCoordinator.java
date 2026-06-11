@@ -191,12 +191,18 @@ public class TabStripContextMenuCoordinator {
                             .withIsIncognito(isIncognito)
                             .build());
         }
-        if (VerticalTabUtils.shouldShowVerticalTabsEntryPoint(mContext)) {
+        if (VerticalTabUtils.isVerticalTabsEligible(mContext)) {
             itemList.add(BasicListMenu.buildMenuDivider(isIncognito));
+
+            int layoutTitleRes =
+                    VerticalTabUtils.isVerticalTabsEnabled(mContext)
+                            ? R.string.show_tabs_horizontally
+                            : R.string.show_tabs_vertically;
+
             itemList.add(
                     new ListItemBuilder()
-                            .withTitleRes(R.string.show_tabs_vertically)
-                            .withMenuId(R.id.show_tabs_vertically_menu_id)
+                            .withTitleRes(layoutTitleRes)
+                            .withMenuId(R.id.toggle_tab_layout_menu_id)
                             .withIsIncognito(isIncognito)
                             .build());
         }
@@ -250,8 +256,8 @@ public class TabStripContextMenuCoordinator {
                 BookmarkAllTabsHandler.bookmarkAllTabs(mTabModel, mWindowAndroid, mSnackbarManager);
             } else if (model.get(MENU_ITEM_ID) == R.id.name_window) {
                 mMultiInstanceManager.showNameWindowDialog(NameWindowDialogSource.TAB_STRIP);
-            } else if (model.get(MENU_ITEM_ID) == R.id.show_tabs_vertically_menu_id) {
-                RecordUserAction.record("Android.TabStripMenu.ShowTabsVertically");
+            } else if (model.get(MENU_ITEM_ID) == R.id.toggle_tab_layout_menu_id) {
+                RecordUserAction.record("Android.TabStripMenu.ToggleTabLayout");
                 if (mContext instanceof MenuOrKeyboardActionController controller) {
                     controller.onMenuOrKeyboardAction(
                             R.id.toggle_tab_layout_menu_id, /* fromMenu= */ false);

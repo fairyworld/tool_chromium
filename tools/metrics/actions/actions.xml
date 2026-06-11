@@ -5080,11 +5080,12 @@ should be able to be added at any place in this file.
   </description>
 </action>
 
-<action name="Android.TabStripMenu.ShowTabsVertically">
+<action name="Android.TabStripMenu.ToggleTabLayout">
   <owner>eleanorlee@google.com</owner>
   <description>
-    User tapped 'Show tabs vertically' in the tab strip context menu to display
-    the vertical tabs.
+    User tapped 'Show tabs vertically' in the tab strip context menu or 'Show
+    tabs horizontally' in the Vertical Tabs empty context menu to toggle the tab
+    layout.
   </description>
 </action>
 
