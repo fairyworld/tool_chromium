@@ -25061,7 +25061,7 @@
                 {
                     "name": "Enabled",
                     "params": {
-                        "sqrt_allocation_limits_factor": "50",
+                        "sqrt_allocation_limits_factor": "100",
                         "sqrt_allocation_limits_max_growing_factor": "4",
                         "sqrt_allocation_limits_minimal_factor": "20"
                     },
