@@ -74,7 +74,7 @@ BASE_FEATURE(kAimEligibilityServiceIdentityImprovements,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 const base::FeatureParam<bool> kAimIdentityOauthEnabled{
-    &kAimEligibilityServiceIdentityImprovements, "oauth_enabled", true};
+    &kAimEligibilityServiceIdentityImprovements, "oauth_enabled", false};
 const base::FeatureParam<bool> kAimIdentityRefreshOnCookieChanges{
     &kAimEligibilityServiceIdentityImprovements, "refresh_on_cookie_changes",
     true};
