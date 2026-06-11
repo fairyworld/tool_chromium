@@ -4,6 +4,7 @@
 
 package org.chromium.chrome.browser.tab_bottom_sheet;
 
+import static org.chromium.chrome.browser.tab_bottom_sheet.TabBottomSheetUtils.canResizeWebView;
 import static org.chromium.chrome.browser.tab_bottom_sheet.TabBottomSheetUtils.isActivityInactive;
 
 import static java.lang.Math.max;
@@ -25,7 +26,6 @@ import org.chromium.base.Log;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.context_sharing.R;
-import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.glic.GlicMetrics;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetContent;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
@@ -454,7 +454,7 @@ public class TabBottomSheetCoordinator {
                     stopObservingCompositorViewInteractions();
                 }
 
-                if (ChromeFeatureList.sTabBottomSheetResizeWebview.getValue()) {
+                if (canResizeWebView()) {
                     mMediator.onSheetResizingStatusChanged(state == SheetState.SCROLLING);
                 }
 
@@ -480,7 +480,7 @@ public class TabBottomSheetCoordinator {
                     mBottomSheetController.collapseSheet(/* animate= */ true);
                     mExpectingLayoutChange = false;
                 }
-                if (ChromeFeatureList.sTabBottomSheetResizeWebview.getValue()) {
+                if (canResizeWebView()) {
                     if (mInitialContainerSizeChanged) {
                         setToFlexibleHeight();
                     } else {
@@ -498,7 +498,7 @@ public class TabBottomSheetCoordinator {
                     return;
                 }
 
-                if (!ChromeFeatureList.sTabBottomSheetResizeWebview.getValue()) {
+                if (!canResizeWebView()) {
                     setToFixedHeightOrFallback();
                 }
             }
@@ -643,8 +643,7 @@ public class TabBottomSheetCoordinator {
 
         // In the case the bottom sheet is unable to set to our desired fixed height, fallback to
         // use of flexible heights.
-        if (ChromeFeatureList.sTabBottomSheetResizeWebview.getValue()
-                && mBottomSheetController.getContainerHeight() != fixedHeight) {
+        if (canResizeWebView() && mBottomSheetController.getContainerHeight() != fixedHeight) {
             setToFlexibleHeight();
         }
     }
