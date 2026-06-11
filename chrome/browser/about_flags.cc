@@ -4784,7 +4784,7 @@ const FeatureEntry kFeatureEntries[] = {
          kAutofillShowTypePredictionsVariations,
          "AutofillShowTypePredictions")},
     {"autofill-at-memory", flag_descriptions::kAutofillAtMemoryName,
-     flag_descriptions::kAutofillAtMemoryDescription, kOsDesktop | kOsAndroid,
+     flag_descriptions::kAutofillAtMemoryDescription, kOsAll,
      FEATURE_VALUE_TYPE(autofill::features::kAutofillAtMemory)},
     {"autofill-payments-field-swapping",
      flag_descriptions::kAutofillPaymentsFieldSwappingName,
