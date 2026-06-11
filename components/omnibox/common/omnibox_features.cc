@@ -134,9 +134,7 @@ BASE_FEATURE(kOnDeviceTailEnableEnglishModel,
              ENABLED);
 
 // Feature used to fetch document suggestions.
-BASE_FEATURE(kDocumentProvider,
-             "OmniboxDocumentProvider",
-             enable_if(!IS_ANDROID && !IS_IOS));
+BASE_FEATURE(kDocumentProvider, "OmniboxDocumentProvider", enable_if(!IS_IOS));
 
 // If enabled, the authentication requirement for Drive suggestions is based on
 // whether the primary account is available, i.e., the user is signed into
