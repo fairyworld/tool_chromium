@@ -2526,7 +2526,7 @@ void HistoryBackend::ReplaceClusters(
 }
 
 ClusterId HistoryBackend::ReserveNextClusterIdWithVisit(
-    const ClusterVisit& cluster_visit) {
+    ClusterVisit cluster_visit) {
   TRACE_EVENT0("browser", "HistoryBackend::ReserveNextClusterIdWithVisit");
   ClusterId cluster_id =
       db_ ? db_->ReserveNextClusterId(/*originator_cache_guid=*/"",
@@ -2536,13 +2536,14 @@ ClusterId HistoryBackend::ReserveNextClusterIdWithVisit(
     // DB write was not successful, just return.
     return ClusterId(0);
   }
-  AddVisitsToCluster(cluster_id, {cluster_visit});
+  std::vector<ClusterVisit> visits;
+  visits.push_back(std::move(cluster_visit));
+  AddVisitsToCluster(cluster_id, std::move(visits));
   return cluster_id;
 }
 
-void HistoryBackend::AddVisitsToCluster(
-    ClusterId cluster_id,
-    const std::vector<ClusterVisit>& visits) {
+void HistoryBackend::AddVisitsToCluster(ClusterId cluster_id,
+                                        std::vector<ClusterVisit> visits) {
   TRACE_EVENT0("browser", "HistoryBackend::AddVisitsToCluster");
   if (!db_) {
     return;
@@ -2594,8 +2595,7 @@ void HistoryBackend::HideVisits(const std::vector<VisitID>& visit_ids) {
   db_->HideVisits(visit_ids);
 }
 
-void HistoryBackend::UpdateClusterVisit(
-    const history::ClusterVisit& cluster_visit) {
+void HistoryBackend::UpdateClusterVisit(history::ClusterVisit cluster_visit) {
   TRACE_EVENT0("browser", "HistoryBackend::UpdateClusterVisit");
   if (!db_) {
     return;

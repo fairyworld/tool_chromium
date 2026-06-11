@@ -663,7 +663,7 @@ class HistoryService : public KeyedService,
   // the new cluster. It is expected for this to only be called for local
   // visits. Virtual for testing.
   virtual base::CancelableTaskTracker::TaskId ReserveNextClusterIdWithVisit(
-      const ClusterVisit& cluster_visit,
+      ClusterVisit cluster_visit,
       base::OnceCallback<void(ClusterId)> callback,
       base::CancelableTaskTracker* tracker);
 
@@ -671,7 +671,7 @@ class HistoryService : public KeyedService,
   // Virtual for testing.
   virtual base::CancelableTaskTracker::TaskId AddVisitsToCluster(
       ClusterId cluster_id,
-      const std::vector<ClusterVisit>& visits,
+      std::vector<ClusterVisit> visits,
       base::OnceClosure callback,
       base::CancelableTaskTracker* tracker);
 
@@ -691,7 +691,7 @@ class HistoryService : public KeyedService,
   // Updates the details of the existing cluster visit that has the same visit
   // ID as `new_cluster_visit`.
   virtual base::CancelableTaskTracker::TaskId UpdateClusterVisit(
-      const history::ClusterVisit& new_cluster_visit,
+      history::ClusterVisit new_cluster_visit,
       base::OnceClosure callback,
       base::CancelableTaskTracker* tracker);
 
