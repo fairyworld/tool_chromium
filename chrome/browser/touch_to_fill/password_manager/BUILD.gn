@@ -40,14 +40,14 @@ source_set("public") {
 if (is_android) {
   source_set("impl") {
     sources = [
-      "touch_to_fill_controller.cc",
-      "touch_to_fill_controller.h",
       "touch_to_fill_controller_autofill_delegate.cc",
       "touch_to_fill_controller_autofill_delegate.h",
       "touch_to_fill_controller_delegate.cc",
       "touch_to_fill_controller_delegate.h",
       "touch_to_fill_controller_webauthn_delegate.cc",
       "touch_to_fill_controller_webauthn_delegate.h",
+      "touch_to_fill_password_manager_controller.cc",
+      "touch_to_fill_password_manager_controller.h",
     ]
 
     public_deps = [

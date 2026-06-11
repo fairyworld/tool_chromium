@@ -13,13 +13,14 @@ namespace password_manager {
 class UiCredential;
 }  // namespace password_manager
 
-class TouchToFillController;
+class TouchToFillPasswordManagerController;
 
 // This class provides an implementation of the TouchToFillView interface and
 // communicates via JNI with its TouchToFillBridge Java counterpart.
 class TouchToFillViewImpl : public TouchToFillView {
  public:
-  explicit TouchToFillViewImpl(TouchToFillController* controller);
+  explicit TouchToFillViewImpl(
+      TouchToFillPasswordManagerController* controller);
   ~TouchToFillViewImpl() override;
 
   // TouchToFillView:
@@ -47,7 +48,7 @@ class TouchToFillViewImpl : public TouchToFillView {
   // java object whenever Show() is called.
   bool RecreateJavaObject();
 
-  raw_ptr<TouchToFillController> controller_ = nullptr;
+  raw_ptr<TouchToFillPasswordManagerController> controller_ = nullptr;
   base::android::ScopedJavaGlobalRef<jobject> java_object_internal_;
 };
 

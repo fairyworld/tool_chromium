@@ -14,7 +14,7 @@
 #include "base/android/jni_string.h"
 #include "base/time/time.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller.h"  // nogncheck
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_controller.h"  // nogncheck
 #include "chrome/browser/ui/passwords/ui_utils.h"
 #include "components/password_manager/core/browser/password_manager_util.h"
 #include "components/password_manager/core/browser/password_ui_utils.h"
@@ -83,7 +83,8 @@ PasskeyCredential ConvertJavaWebauthnCredential(
 
 }  // namespace
 
-TouchToFillViewImpl::TouchToFillViewImpl(TouchToFillController* controller)
+TouchToFillViewImpl::TouchToFillViewImpl(
+    TouchToFillPasswordManagerController* controller)
     : controller_(controller) {}
 
 TouchToFillViewImpl::~TouchToFillViewImpl() {

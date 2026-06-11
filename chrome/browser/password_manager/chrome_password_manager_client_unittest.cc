@@ -117,8 +117,8 @@
 #include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate.h"
 #include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate_factory.h"
 #include "chrome/browser/password_manager/factories/account_password_store_factory.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller.h"
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller_delegate.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_controller.h"
 #include "components/password_manager/content/browser/mock_keyboard_replacing_surface_visibility_controller.h"
 #include "components/password_manager/core/browser/passkey_credential.h"
 #include "components/webauthn/android/cred_man_support.h"
@@ -394,14 +394,17 @@ std::unique_ptr<KeyedService> CreateMockPasswordChangeService(
 }
 
 #if BUILDFLAG(IS_ANDROID)
-class MockTouchToFillController : public TouchToFillController {
+class MockTouchToFillPasswordManagerController
+    : public TouchToFillPasswordManagerController {
  public:
-  MockTouchToFillController(
+  MockTouchToFillPasswordManagerController(
       Profile* profile,
       base::WeakPtr<
           password_manager::KeyboardReplacingSurfaceVisibilityController>
           visibility_controller)
-      : TouchToFillController(profile, visibility_controller, nullptr) {}
+      : TouchToFillPasswordManagerController(profile,
+                                             visibility_controller,
+                                             nullptr) {}
 
   MOCK_METHOD(void,
               InitData,
@@ -1504,13 +1507,15 @@ class ChromePasswordManagerClientAndroidTest
     task_environment()->AdvanceClock(delta);
   }
 
-  MockTouchToFillController* MakeMockTouchToFillController() {
+  MockTouchToFillPasswordManagerController*
+  MakeMockTouchToFillPasswordManagerController() {
     visibility_controller_ = std::make_unique<
         password_manager::MockKeyboardReplacingSurfaceVisibilityController>();
-    auto owned_ttf_controller = std::make_unique<MockTouchToFillController>(
-        profile(), visibility_controller_->AsWeakPtr());
+    auto owned_ttf_controller =
+        std::make_unique<MockTouchToFillPasswordManagerController>(
+            profile(), visibility_controller_->AsWeakPtr());
     auto* ttf_controller = owned_ttf_controller.get();
-    GetClient()->SetTouchToFillControllerForTesting(
+    GetClient()->SetTouchToFillPasswordManagerControllerForTesting(
         std::move(owned_ttf_controller));
     return ttf_controller;
   }
@@ -2126,7 +2131,7 @@ TEST_F(ChromePasswordManagerClientAndroidTest,
           kDelaySuggestionsOnAutofocusWaitingForPasskeys);
   CreateManualFillingController(web_contents());
 
-  auto* ttf_controller = MakeMockTouchToFillController();
+  auto* ttf_controller = MakeMockTouchToFillPasswordManagerController();
 
   EXPECT_CALL(*ttf_controller, InitData).Times(0);
   EXPECT_CALL(*ttf_controller, Show).Times(0);
@@ -2178,7 +2183,7 @@ TEST_F(ChromePasswordManagerClientAndroidTest,
           kDelaySuggestionsOnAutofocusWaitingForPasskeys);
   CreateManualFillingController(web_contents());
 
-  auto* ttf_controller = MakeMockTouchToFillController();
+  auto* ttf_controller = MakeMockTouchToFillPasswordManagerController();
   EXPECT_CALL(*ttf_controller, InitData).Times(0);
   EXPECT_CALL(*ttf_controller, Show).Times(0);
 
@@ -2243,7 +2248,7 @@ TEST_F(ChromePasswordManagerClientAndroidTest,
           kDelaySuggestionsOnAutofocusWaitingForPasskeys);
   CreateManualFillingController(web_contents());
 
-  auto* ttf_controller = MakeMockTouchToFillController();
+  auto* ttf_controller = MakeMockTouchToFillPasswordManagerController();
   EXPECT_CALL(*ttf_controller, InitData).Times(0);
   EXPECT_CALL(*ttf_controller, Show).Times(0);
 

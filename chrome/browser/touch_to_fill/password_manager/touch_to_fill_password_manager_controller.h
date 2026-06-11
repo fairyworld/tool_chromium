@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_CONTROLLER_H_
-#define CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_CONTROLLER_H_
+#ifndef CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_PASSWORD_MANAGER_CONTROLLER_H_
+#define CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_PASSWORD_MANAGER_CONTROLLER_H_
 
 #include <memory>
 
@@ -30,7 +30,7 @@ class WebAuthnCredManDelegate;
 class Profile;
 class TouchToFillControllerDelegate;
 
-class TouchToFillController {
+class TouchToFillPasswordManagerController {
  public:
   // Convenience enum for selecting the correct UI that this controller can
   // display.
@@ -41,16 +41,18 @@ class TouchToFillController {
     kShowNoPasskeysSheet,
   };
 
-  TouchToFillController(
+  TouchToFillPasswordManagerController(
       Profile* profile,
       base::WeakPtr<
           password_manager::KeyboardReplacingSurfaceVisibilityController>
           visibility_controller,
       std::unique_ptr<AcknowledgeGroupedCredentialSheetController>
           grouped_credential_sheet_controller);
-  TouchToFillController(const TouchToFillController&) = delete;
-  TouchToFillController& operator=(const TouchToFillController&) = delete;
-  virtual ~TouchToFillController();
+  TouchToFillPasswordManagerController(
+      const TouchToFillPasswordManagerController&) = delete;
+  TouchToFillPasswordManagerController& operator=(
+      const TouchToFillPasswordManagerController&) = delete;
+  virtual ~TouchToFillPasswordManagerController();
 
   // Sets the credentials that will be shown in the sheet. Also sets the
   // `frame_driver` for which TTF is expected to be shown.
@@ -162,7 +164,8 @@ class TouchToFillController {
   std::vector<TouchToFillView::Credential> credentials_;
   base::WeakPtr<password_manager::ContentPasswordManagerDriver> frame_driver_;
 
-  base::WeakPtrFactory<TouchToFillController> weak_ptr_factory_{this};
+  base::WeakPtrFactory<TouchToFillPasswordManagerController> weak_ptr_factory_{
+      this};
 };
 
-#endif  // CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_CONTROLLER_H_
+#endif  // CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_PASSWORD_MANAGER_CONTROLLER_H_

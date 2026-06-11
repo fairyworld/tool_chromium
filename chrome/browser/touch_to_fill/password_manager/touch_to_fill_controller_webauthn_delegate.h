@@ -27,11 +27,11 @@ class PasskeyCredential;
 class UiCredential;
 }  // namespace password_manager
 
-// Derived TouchToFillController class specific for use with non-conditional
-// WebAuthn sign-in. It does not integrate with the password manager because it
-// is in response to an immediate WebAuthn invocation, without necessarily any
-// forms or input fields being present on the page.
-// This is owned by WebAuthnRequestDelegateAndroid.
+// Derived TouchToFillPasswordManagerController class specific for use with
+// non-conditional WebAuthn sign-in. It does not integrate with the password
+// manager because it is in response to an immediate WebAuthn invocation,
+// without necessarily any forms or input fields being present on the page. This
+// is owned by WebAuthnRequestDelegateAndroid.
 class TouchToFillControllerWebAuthnDelegate
     : public TouchToFillControllerDelegate {
  public:

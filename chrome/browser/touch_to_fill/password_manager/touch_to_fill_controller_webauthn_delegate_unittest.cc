@@ -13,7 +13,7 @@
 #include "base/types/pass_key.h"
 #include "chrome/browser/password_manager/android/password_manager_launcher_android.h"
 #include "chrome/browser/touch_to_fill/password_manager/no_passkeys/android/no_passkeys_bottom_sheet_bridge.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_controller.h"
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_view.h"
 #include "chrome/browser/webauthn/android/credential_sorter_android.h"
 #include "chrome/browser/webauthn/android/webauthn_request_delegate_android.h"
@@ -136,9 +136,10 @@ class TouchToFillControllerWebAuthnTest
 
     visibility_controller_ = std::make_unique<
         password_manager::MockKeyboardReplacingSurfaceVisibilityController>();
-    touch_to_fill_controller_ = std::make_unique<TouchToFillController>(
-        profile(), visibility_controller_->AsWeakPtr(),
-        /*grouped_credential_sheet_controller=*/nullptr);
+    touch_to_fill_controller_ =
+        std::make_unique<TouchToFillPasswordManagerController>(
+            profile(), visibility_controller_->AsWeakPtr(),
+            /*grouped_credential_sheet_controller=*/nullptr);
     auto mock_view = std::make_unique<MockTouchToFillView>();
     mock_view_ = mock_view.get();
     touch_to_fill_controller().set_view(std::move(mock_view));
@@ -182,7 +183,7 @@ class TouchToFillControllerWebAuthnTest
 
   MockJniDelegate& jni_delegate() { return *jni_delegate_; }
 
-  TouchToFillController& touch_to_fill_controller() {
+  TouchToFillPasswordManagerController& touch_to_fill_controller() {
     return *touch_to_fill_controller_;
   }
 
@@ -206,7 +207,8 @@ class TouchToFillControllerWebAuthnTest
   std::unique_ptr<
       password_manager::MockKeyboardReplacingSurfaceVisibilityController>
       visibility_controller_;
-  std::unique_ptr<TouchToFillController> touch_to_fill_controller_;
+  std::unique_ptr<TouchToFillPasswordManagerController>
+      touch_to_fill_controller_;
   raw_ptr<MockTouchToFillView> mock_view_ = nullptr;
   raw_ptr<MockJniDelegate> jni_delegate_ = nullptr;
 };

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_controller.h"
 
 #include <algorithm>
 #include <tuple>
@@ -31,7 +31,7 @@ using password_manager::PasskeyCredential;
 using password_manager::UiCredential;
 using webauthn::WebAuthnCredManDelegate;
 using Credential = TouchToFillView::Credential;
-using DisplayTarget = TouchToFillController::DisplayTarget;
+using DisplayTarget = TouchToFillPasswordManagerController::DisplayTarget;
 
 // Constants used to rank passkeys and passwords in the default credential
 // sorting. Passkeys have a higher value so they will be sorted above
@@ -71,7 +71,7 @@ std::vector<Credential> DefaultSortCredentials(
 }
 }  // namespace
 
-TouchToFillController::TouchToFillController(
+TouchToFillPasswordManagerController::TouchToFillPasswordManagerController(
     Profile* profile,
     base::WeakPtr<
         password_manager::KeyboardReplacingSurfaceVisibilityController>
@@ -82,9 +82,10 @@ TouchToFillController::TouchToFillController(
       visibility_controller_(visibility_controller),
       grouped_credential_sheet_controller_(
           std::move(grouped_credential_sheet_controller)) {}
-TouchToFillController::~TouchToFillController() = default;
+TouchToFillPasswordManagerController::~TouchToFillPasswordManagerController() =
+    default;
 
-void TouchToFillController::InitData(
+void TouchToFillPasswordManagerController::InitData(
     std::vector<Credential> credentials,
     base::WeakPtr<password_manager::ContentPasswordManagerDriver>
         frame_driver) {
@@ -92,7 +93,7 @@ void TouchToFillController::InitData(
   frame_driver_ = frame_driver;
 }
 
-bool TouchToFillController::Show(
+bool TouchToFillPasswordManagerController::Show(
     std::unique_ptr<TouchToFillControllerDelegate> ttf_delegate,
     webauthn::WebAuthnCredManDelegate* cred_man_delegate) {
   if (!ttf_delegate->ShouldShowTouchToFill()) {
@@ -129,15 +130,16 @@ bool TouchToFillController::Show(
       }
       no_passkeys_bridge_->Show(
           GetNativeView()->GetWindowAndroid(), origin.host(),
-          base::BindOnce(&TouchToFillController::OnDismiss,
+          base::BindOnce(&TouchToFillPasswordManagerController::OnDismiss,
                          weak_ptr_factory_.GetWeakPtr()),
-          base::BindOnce(&TouchToFillController::OnHybridSignInSelected,
-                         weak_ptr_factory_.GetWeakPtr()));
+          base::BindOnce(
+              &TouchToFillPasswordManagerController::OnHybridSignInSelected,
+              weak_ptr_factory_.GetWeakPtr()));
       return true;
     case DisplayTarget::kDeferToCredMan:
-      cred_man_delegate->SetRequestCompletionCallback(
-          base::BindRepeating(&TouchToFillController::OnCredManUiClosed,
-                              weak_ptr_factory_.GetWeakPtr()));
+      cred_man_delegate->SetRequestCompletionCallback(base::BindRepeating(
+          &TouchToFillPasswordManagerController::OnCredManUiClosed,
+          weak_ptr_factory_.GetWeakPtr()));
       OnShowCredManSelected();
       return true;
     case DisplayTarget::kShowTouchToFill:
@@ -156,9 +158,9 @@ bool TouchToFillController::Show(
       if (cred_man_delegate &&
           cred_man_delegate->HasPasskeys() ==
               WebAuthnCredManDelegate::State::kHasPasskeys) {
-        cred_man_delegate->SetRequestCompletionCallback(
-            base::BindRepeating(&TouchToFillController::OnCredManUiClosed,
-                                weak_ptr_factory_.GetWeakPtr()));
+        cred_man_delegate->SetRequestCompletionCallback(base::BindRepeating(
+            &TouchToFillPasswordManagerController::OnCredManUiClosed,
+            weak_ptr_factory_.GetWeakPtr()));
         flags |= TouchToFillView::kShouldShowCredManEntry;
       }
 
@@ -175,7 +177,7 @@ bool TouchToFillController::Show(
   }
 }
 
-void TouchToFillController::OnCredentialSelected(
+void TouchToFillPasswordManagerController::OnCredentialSelected(
     const UiCredential& credential) {
   view_.reset();
 
@@ -188,11 +190,9 @@ void TouchToFillController::OnCredentialSelected(
     grouped_credential_sheet_controller_->ShowAcknowledgeSheet(
         std::move(current_origin), credential.display_name(),
         GetNativeView()->GetWindowAndroid(),
-        base::BindOnce(
-            &TouchToFillController::OnAcknowledgementBeforeFillingReceived,
-            // Using `base::Unretained` is safe here because the
-            // `grouped_credential_sheet_controller_` is owned by this.
-            weak_ptr_factory_.GetWeakPtr(), credential));
+        base::BindOnce(&TouchToFillPasswordManagerController::
+                           OnAcknowledgementBeforeFillingReceived,
+                       weak_ptr_factory_.GetWeakPtr(), credential));
     return;
   }
 
@@ -209,13 +209,15 @@ void TouchToFillController::OnCredentialSelected(
   // A WeakPtr is necessary because the delegate may trigger this callback
   // during or after the destruction of this controller.
   ttf_delegate_->OnCredentialSelected(
-      credential, base::BindOnce(&TouchToFillController::ActionCompleted,
-                                 weak_ptr_factory_.GetWeakPtr()));
+      credential,
+      base::BindOnce(&TouchToFillPasswordManagerController::ActionCompleted,
+                     weak_ptr_factory_.GetWeakPtr()));
 }
 
-void TouchToFillController::OnAcknowledgementBeforeFillingReceived(
-    const password_manager::UiCredential& credential,
-    AcknowledgeGroupedCredentialSheetBridge::DismissReason dismiss_reason) {
+void TouchToFillPasswordManagerController::
+    OnAcknowledgementBeforeFillingReceived(
+        const password_manager::UiCredential& credential,
+        AcknowledgeGroupedCredentialSheetBridge::DismissReason dismiss_reason) {
   // Emit UMA if grouped affiliation match was available for the user.
   password_manager::metrics_util::LogFillSuggestionGroupedMatchAccepted(
       dismiss_reason ==
@@ -226,8 +228,9 @@ void TouchToFillController::OnAcknowledgementBeforeFillingReceived(
       // A WeakPtr is necessary because the delegate may trigger this callback
       // during or after the destruction of this controller.
       ttf_delegate_->OnCredentialSelected(
-          credential, base::BindOnce(&TouchToFillController::ActionCompleted,
-                                     weak_ptr_factory_.GetWeakPtr()));
+          credential,
+          base::BindOnce(&TouchToFillPasswordManagerController::ActionCompleted,
+                         weak_ptr_factory_.GetWeakPtr()));
       break;
     case AcknowledgeGroupedCredentialSheetBridge::DismissReason::kBack:
       visibility_controller_->SetCanBeShown();
@@ -239,50 +242,55 @@ void TouchToFillController::OnAcknowledgementBeforeFillingReceived(
   }
 }
 
-void TouchToFillController::OnPasskeyCredentialSelected(
+void TouchToFillPasswordManagerController::OnPasskeyCredentialSelected(
     const PasskeyCredential& credential) {
   view_.reset();
   // A WeakPtr is necessary because the delegate may trigger this callback
   // during or after the destruction of this controller.
   ttf_delegate_->OnPasskeyCredentialSelected(
-      credential, base::BindOnce(&TouchToFillController::ActionCompleted,
-                                 weak_ptr_factory_.GetWeakPtr()));
+      credential,
+      base::BindOnce(&TouchToFillPasswordManagerController::ActionCompleted,
+                     weak_ptr_factory_.GetWeakPtr()));
 }
 
-void TouchToFillController::OnManagePasswordsSelected(bool passkeys_shown) {
+void TouchToFillPasswordManagerController::OnManagePasswordsSelected(
+    bool passkeys_shown) {
   view_.reset();
   // A WeakPtr is necessary because the delegate may trigger this callback
   // during or after the destruction of this controller.
   ttf_delegate_->OnManagePasswordsSelected(
-      passkeys_shown, base::BindOnce(&TouchToFillController::ActionCompleted,
-                                     weak_ptr_factory_.GetWeakPtr()));
+      passkeys_shown,
+      base::BindOnce(&TouchToFillPasswordManagerController::ActionCompleted,
+                     weak_ptr_factory_.GetWeakPtr()));
 }
 
-void TouchToFillController::OnHybridSignInSelected() {
+void TouchToFillPasswordManagerController::OnHybridSignInSelected() {
   view_.reset();
   // A WeakPtr is necessary because the delegate may trigger this callback
   // during or after the destruction of this controller.
-  ttf_delegate_->OnHybridSignInSelected(base::BindOnce(
-      &TouchToFillController::ActionCompleted, weak_ptr_factory_.GetWeakPtr()));
+  ttf_delegate_->OnHybridSignInSelected(
+      base::BindOnce(&TouchToFillPasswordManagerController::ActionCompleted,
+                     weak_ptr_factory_.GetWeakPtr()));
 }
 
-void TouchToFillController::OnShowCredManSelected() {
+void TouchToFillPasswordManagerController::OnShowCredManSelected() {
   view_.reset();
   cred_man_delegate_->TriggerCredManUi(
       WebAuthnCredManDelegate::RequestPasswords(false));
 }
 
-void TouchToFillController::OnCredManUiClosed(bool success) {
+void TouchToFillPasswordManagerController::OnCredManUiClosed(bool success) {
   if (!ttf_delegate_) {
     return;
   }
   // A WeakPtr is necessary because the delegate may trigger this callback
   // during or after the destruction of this controller.
-  ttf_delegate_->OnCredManDismissed(base::BindOnce(
-      &TouchToFillController::ActionCompleted, weak_ptr_factory_.GetWeakPtr()));
+  ttf_delegate_->OnCredManDismissed(
+      base::BindOnce(&TouchToFillPasswordManagerController::ActionCompleted,
+                     weak_ptr_factory_.GetWeakPtr()));
 }
 
-void TouchToFillController::OnDismiss() {
+void TouchToFillPasswordManagerController::OnDismiss() {
   view_.reset();
   no_passkeys_bridge_.reset();
   if (!ttf_delegate_) {
@@ -292,25 +300,26 @@ void TouchToFillController::OnDismiss() {
   }
   // A WeakPtr is necessary because the delegate may trigger this callback
   // during or after the destruction of this controller.
-  ttf_delegate_->OnDismiss(base::BindOnce(
-      &TouchToFillController::ActionCompleted, weak_ptr_factory_.GetWeakPtr()));
+  ttf_delegate_->OnDismiss(
+      base::BindOnce(&TouchToFillPasswordManagerController::ActionCompleted,
+                     weak_ptr_factory_.GetWeakPtr()));
 }
 
-Profile* TouchToFillController::GetProfile() {
+Profile* TouchToFillPasswordManagerController::GetProfile() {
   return profile_;
 }
 
-gfx::NativeView TouchToFillController::GetNativeView() {
+gfx::NativeView TouchToFillPasswordManagerController::GetNativeView() {
   return ttf_delegate_->GetNativeView();
 }
 
-void TouchToFillController::Close() {
+void TouchToFillPasswordManagerController::Close() {
   // TODO(crbug.com/40277147). This is a duplicate of `OnDismiss`. Merge the two
   // functions.
   OnDismiss();
 }
 
-void TouchToFillController::Reset() {
+void TouchToFillPasswordManagerController::Reset() {
   if (!visibility_controller_) {
     return;
   }
@@ -321,14 +330,14 @@ void TouchToFillController::Reset() {
   credentials_.clear();
 }
 
-void TouchToFillController::ActionCompleted() {
+void TouchToFillPasswordManagerController::ActionCompleted() {
   if (visibility_controller_) {
     visibility_controller_->SetShown();
   }
   ttf_delegate_.reset();
 }
 
-DisplayTarget TouchToFillController::GetResponsibleDisplayTarget(
+DisplayTarget TouchToFillPasswordManagerController::GetResponsibleDisplayTarget(
     base::span<const Credential> credentials) const {
   bool has_passkeys_in_cred_man =
       cred_man_delegate_ && cred_man_delegate_->HasPasskeys() ==

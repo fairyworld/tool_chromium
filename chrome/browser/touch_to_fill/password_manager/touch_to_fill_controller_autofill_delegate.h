@@ -40,12 +40,11 @@ class WebContents;
 }
 
 class ChromePasswordManagerClient;
-class TouchToFillController;
+class TouchToFillPasswordManagerController;
 class Profile;
 
-// Delegate interface for TouchToFillController being used in an autofill
-// context.
-// The order of execution is the following:
+// Delegate interface for TouchToFillPasswordManagerController being used in an
+// autofill context. The order of execution is the following:
 // - `OnShow` is called upon showing the bottom sheet with credentials.
 // - `OnCredentialSelected` is called upon selecting the credential.
 // - `OnReauthCompleted` (only of auth before filling of on).

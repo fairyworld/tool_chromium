@@ -8,6 +8,6 @@
 
 // static
 std::unique_ptr<TouchToFillView> TouchToFillViewFactory::Create(
-    TouchToFillController* controller) {
+    TouchToFillPasswordManagerController* controller) {
   return std::make_unique<TouchToFillViewImpl>(controller);
 }

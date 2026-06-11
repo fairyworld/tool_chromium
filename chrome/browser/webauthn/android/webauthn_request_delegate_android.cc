@@ -17,8 +17,8 @@
 #include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate.h"
 #include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate_factory.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller.h"
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller_webauthn_delegate.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_controller.h"
 #include "chrome/browser/webauthn/android/credential_sorter_android.h"
 #include "chrome/browser/webauthn/password_credential_fetcher.h"
 #include "chrome/browser/webauthn/webauthn_metrics_util.h"
@@ -179,10 +179,11 @@ void WebAuthnRequestDelegateAndroid::MaybeShowTouchToFillSheet(
         password_manager::KeyboardReplacingSurfaceVisibilityControllerImpl>();
   }
   if (!touch_to_fill_controller_) {
-    touch_to_fill_controller_ = std::make_unique<TouchToFillController>(
-        Profile::FromBrowserContext(frame_host->GetBrowserContext()),
-        visibility_controller_->AsWeakPtr(),
-        /*grouped_credential_sheet_controller=*/nullptr);
+    touch_to_fill_controller_ =
+        std::make_unique<TouchToFillPasswordManagerController>(
+            Profile::FromBrowserContext(frame_host->GetBrowserContext()),
+            visibility_controller_->AsWeakPtr(),
+            /*grouped_credential_sheet_controller=*/nullptr);
   }
   touch_to_fill_controller_->InitData(
       std::move(credentials),

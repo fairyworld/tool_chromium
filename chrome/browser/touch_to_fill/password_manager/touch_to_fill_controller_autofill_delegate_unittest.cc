@@ -24,7 +24,7 @@
 #include "chrome/browser/password_manager/android/password_manager_launcher_android.h"
 #include "chrome/browser/password_manager/chrome_password_manager_client.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_controller.h"
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_view.h"
 #include "chrome/test/base/chrome_render_view_host_test_harness.h"
 #include "components/autofill/core/common/unique_ids.h"
@@ -180,7 +180,7 @@ class TouchToFillControllerAutofillTest
 
   base::HistogramTester& histogram_tester() { return histogram_tester_; }
 
-  TouchToFillController& touch_to_fill_controller() {
+  TouchToFillPasswordManagerController& touch_to_fill_controller() {
     return *touch_to_fill_controller_;
   }
 
@@ -230,9 +230,10 @@ class TouchToFillControllerAutofillTest
     mock_view_ = mock_view.get();
     visibility_controller_ = std::make_unique<
         password_manager::MockKeyboardReplacingSurfaceVisibilityController>();
-    touch_to_fill_controller_ = std::make_unique<TouchToFillController>(
-        profile(), visibility_controller_->AsWeakPtr(),
-        grouped_credential_sheet_helper_.CreateController());
+    touch_to_fill_controller_ =
+        std::make_unique<TouchToFillPasswordManagerController>(
+            profile(), visibility_controller_->AsWeakPtr(),
+            grouped_credential_sheet_helper_.CreateController());
     touch_to_fill_controller().set_view(std::move(mock_view));
     form_to_fill_.password_element_renderer_id = autofill::FieldRendererId(1);
     form_to_fill_.username_element_renderer_id = autofill::FieldRendererId(2);
@@ -249,7 +250,8 @@ class TouchToFillControllerAutofillTest
   std::unique_ptr<
       password_manager::MockKeyboardReplacingSurfaceVisibilityController>
       visibility_controller_;
-  std::unique_ptr<TouchToFillController> touch_to_fill_controller_;
+  std::unique_ptr<TouchToFillPasswordManagerController>
+      touch_to_fill_controller_;
   base::test::ScopedFeatureList scoped_feature_list_{
       password_manager::features::kBiometricTouchToFill};
   raw_ptr<MockPasswordCredentialFiller> weak_filler_;

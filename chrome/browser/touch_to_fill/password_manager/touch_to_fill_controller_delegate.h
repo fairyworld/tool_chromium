@@ -21,8 +21,8 @@ class UiCredential;
 
 class GURL;
 
-// Delegate interface for TouchToFillController, to be implemented by
-// owner-specified classes.
+// Delegate interface for TouchToFillPasswordManagerController, to be
+// implemented by owner-specified classes.
 class TouchToFillControllerDelegate {
  public:
   virtual ~TouchToFillControllerDelegate();
@@ -86,8 +86,8 @@ class TouchToFillControllerDelegate {
   virtual bool ShouldShowNoPasskeysSheetIfRequired() = 0;
 
   // A method for the delegate providing a credential sorting that will override
-  // the `TouchToFillController` default. If the delegate does not have a custom
-  // sorting function, this returns `std::nullopt`.
+  // the `TouchToFillPasswordManagerController` default. If the delegate does
+  // not have a custom sorting function, this returns `std::nullopt`.
   virtual std::optional<std::vector<TouchToFillView::Credential>>
   SortCredentials(
       base::span<const TouchToFillView::Credential> credentials) = 0;

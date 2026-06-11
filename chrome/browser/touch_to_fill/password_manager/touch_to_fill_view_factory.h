@@ -8,12 +8,12 @@
 #include <memory>
 
 class TouchToFillView;
-class TouchToFillController;
+class TouchToFillPasswordManagerController;
 
 class TouchToFillViewFactory {
  public:
   static std::unique_ptr<TouchToFillView> Create(
-      TouchToFillController* controller);
+      TouchToFillPasswordManagerController* controller);
 };
 
 #endif  // CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_VIEW_FACTORY_H_
