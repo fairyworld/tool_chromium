@@ -12,6 +12,7 @@
 use cxx::UniquePtr;
 use std::collections::{BTreeMap, HashMap};
 use std::sync::{LazyLock, Mutex, MutexGuard};
+use storage_common::FileSystemType;
 use url::Origin;
 
 /// This block defines the Foreign Function Interface for C++ code to call the
@@ -23,6 +24,7 @@ mod ffi {
     unsafe extern "C++" {
         include!("url/origin.rs.h");
         include!("content/browser/isolated_origin_util.h");
+        include!("storage/common/file_system/file_system_types.h");
 
         // Gives us access to C++ url::Origin and all methods exposed in the origin
         // bridge file without having to redefine them here.
@@ -36,6 +38,9 @@ mod ffi {
         #[Self = "IsolatedOriginUtil"]
         #[cxx_name = "IsValidIsolatedOrigin"]
         fn is_valid_isolated_origin(origin: &Origin) -> bool;
+
+        #[namespace = "storage"]
+        type FileSystemType = storage_common::FileSystemType;
     }
 
     extern "Rust" {
@@ -59,6 +64,12 @@ mod ffi {
             result: &mut bool,
         ) -> bool;
         fn erase_v8_optimization_state(browsing_instance_id: u32);
+
+        fn register_file_system_permission_policy(file_system_type: FileSystemType, policy: i32);
+        fn find_permissions_for_file_system_type(
+            file_system_type: FileSystemType,
+            policy: &mut i32,
+        ) -> bool;
     }
 }
 
@@ -170,6 +181,23 @@ fn erase_v8_optimization_state(browsing_instance_id: u32) {
     cpsp.v8_optimization_verdict_map.remove(&browsing_instance_id);
 }
 
+fn register_file_system_permission_policy(file_system_type: FileSystemType, policy: i32) {
+    let mut cpsp = ChildProcessSecurityPolicyImpl::get_locked_instance();
+    cpsp.file_system_policy_map.insert(file_system_type, policy);
+}
+
+fn find_permissions_for_file_system_type(
+    file_system_type: FileSystemType,
+    policy: &mut i32,
+) -> bool {
+    let cpsp = ChildProcessSecurityPolicyImpl::get_locked_instance();
+    if let Some(val) = cpsp.file_system_policy_map.get(&file_system_type) {
+        *policy = *val;
+        return true;
+    }
+    false
+}
+
 /// Defines a global policy object that tracks security information for child
 /// processes as well as global security state. This is intended to primarily be
 /// used for access checks on renderer processes but may eventually be used for
@@ -194,6 +222,10 @@ pub struct ChildProcessSecurityPolicyImpl {
     /// works on the C++ side (using binary search over sorted keys).
     v8_optimization_verdict_map:
         BTreeMap<BrowsingInstanceId, BTreeMap<cxx::UniquePtr<Origin>, V8OptimizationVerdict>>,
+    /// A map of FileSystemTypes to bitwise-or'd combinations of permission
+    /// policies allowed for those types. See
+    /// storage::FileSystemContext::GetPermissionPolicy.
+    file_system_policy_map: BTreeMap<FileSystemType, i32>,
     // TODO(crbug.com/482216433): this will also eventually track per-process
     // state.
 }
@@ -203,7 +235,11 @@ impl ChildProcessSecurityPolicyImpl {
     /// ChildProcessSecurityPolicyImpl should always be obtained via
     /// `get_locked_instance()`.
     fn new() -> Self {
-        Self { known_schemes: HashMap::new(), v8_optimization_verdict_map: BTreeMap::new() }
+        Self {
+            known_schemes: HashMap::new(),
+            v8_optimization_verdict_map: BTreeMap::new(),
+            file_system_policy_map: BTreeMap::new(),
+        }
     }
 
     /// Private function to get a reference to the singleton instance of

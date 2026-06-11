@@ -2010,6 +2010,15 @@ bool ChildProcessSecurityPolicyImpl::HasPermissionsForFileSystemFile(
 bool ChildProcessSecurityPolicyImpl::FindPermissionPolicyForFileSystemType(
     storage::FileSystemType type,
     int& policy) {
+  RUST_CPP_RETURN_FUNCTION(
+      rust::child_process_security_policy::
+          find_permissions_for_file_system_type(type, policy),
+      FindPermissionPolicyForFileSystemType_Cpp(type, policy), bool);
+}
+
+bool ChildProcessSecurityPolicyImpl::FindPermissionPolicyForFileSystemType_Cpp(
+    storage::FileSystemType type,
+    int& policy) {
   base::AutoLock lock(lock_);
   auto found = file_system_policy_map_.find(type);
   if (found == file_system_policy_map_.end()) {
@@ -2792,6 +2801,15 @@ bool ChildProcessSecurityPolicyImpl::HasPermissionsForFileSystem(
 }
 
 void ChildProcessSecurityPolicyImpl::RegisterFileSystemPermissionPolicy(
+    storage::FileSystemType type,
+    int policy) {
+  RUST_CPP_VOID_FUNCTION(
+      rust::child_process_security_policy::
+          register_file_system_permission_policy(type, policy),
+      RegisterFileSystemPermissionPolicy_Cpp(type, policy));
+}
+
+void ChildProcessSecurityPolicyImpl::RegisterFileSystemPermissionPolicy_Cpp(
     storage::FileSystemType type,
     int policy) {
   base::AutoLock lock(lock_);

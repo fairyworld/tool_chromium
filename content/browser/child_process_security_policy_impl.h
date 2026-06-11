@@ -567,6 +567,8 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
   // storage::FilePermissionPolicy.
   void RegisterFileSystemPermissionPolicy(storage::FileSystemType type,
                                           int policy);
+  void RegisterFileSystemPermissionPolicy_Cpp(storage::FileSystemType type,
+                                              int policy);
 
   // Returns true if sending MIDI messages is allowed.
   bool CanSendMidiMessage(ChildProcessId child_id);
@@ -1026,6 +1028,8 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
   // to Crubit.
   bool FindPermissionPolicyForFileSystemType(storage::FileSystemType type,
                                              int& policy);
+  bool FindPermissionPolicyForFileSystemType_Cpp(storage::FileSystemType type,
+                                                 int& policy);
 
   // Determines if certain permissions were granted for a file system.
   // |permissions| is an internally defined bit-set.
