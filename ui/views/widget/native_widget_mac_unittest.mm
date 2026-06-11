@@ -1107,9 +1107,9 @@ TEST_F(NativeWidgetMacTest, NonWidgetParentLastReference) {
     native_parent = nil;
   }
 
-  // As of macOS 13 (Ventura), it seems that exiting the autoreleasepool
-  // block does not immediately trigger a release of its contents. Wait
-  // here for the deallocations to occur before proceeding.
+  // It seems that exiting the autoreleasepool block does not immediately
+  // trigger a release of its contents. Wait here for the deallocations to occur
+  // before proceeding.
   EXPECT_TRUE(base::test::RunUntil([&]() { return child_dealloced; }));
   EXPECT_TRUE(base::test::RunUntil([&]() { return native_parent_dealloced; }));
 }
