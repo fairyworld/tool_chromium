@@ -1558,7 +1558,7 @@ group("chromium_builder_perf") {
 }
 
 if (!is_ios && !is_android && !is_castos && !is_cronet_build) {
-  group("chromium_builder_asan") {
+  group("blackbox_fuzzing_targets") {
     testonly = true
     write_runtime_deps = "${root_out_dir}/${target_name}.runtime_deps"
 

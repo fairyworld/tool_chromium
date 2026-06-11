@@ -168,7 +168,7 @@ ci.builder(
     ),
     targets = targets.bundle(
         additional_compile_targets = [
-            "chromium_builder_asan",
+            "blackbox_fuzzing_targets",
         ],
     ),
     console_view_entry = consoles.console_view_entry(
@@ -257,7 +257,7 @@ ci.builder(
             "clang_tot_gtests",
         ],
         additional_compile_targets = [
-            "chromium_builder_asan",
+            "blackbox_fuzzing_targets",
         ],
         mixins = [
             "x86-64",
@@ -307,7 +307,7 @@ ci.builder(
             "clang_tot_gtests",
         ],
         additional_compile_targets = [
-            "chromium_builder_asan",
+            "blackbox_fuzzing_targets",
         ],
         mixins = [
             "x86-64",
@@ -2028,7 +2028,7 @@ tot_mac_builder(
             "clang_tot_gtests",
         ],
         additional_compile_targets = [
-            "chromium_builder_asan",
+            "blackbox_fuzzing_targets",
         ],
         mixins = [
             targets.mixin(
