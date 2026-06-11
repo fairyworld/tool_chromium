@@ -195,14 +195,8 @@ DragDropOperation::DragDropOperation(
           origin_->get()->window());
   os_exchange_data_->SetSource(
       std::make_unique<ui::DataTransferEndpoint>(endpoint_type));
-
-  if (endpoint_type == ui::EndpointType::kUnknownVm ||
-      endpoint_type == ui::EndpointType::kArc ||
-      endpoint_type == ui::EndpointType::kBorealis ||
-      endpoint_type == ui::EndpointType::kCrostini ||
-      endpoint_type == ui::EndpointType::kPluginVm) {
-    os_exchange_data_->MarkRendererTaintedFromOrigin(url::Origin());
-  }
+  // All data here comes from VM, mark them as renderer-tainted.
+  os_exchange_data_->MarkRendererTaintedFromOrigin(url::Origin());
 
   extended_drag_source_ = ExtendedDragSource::Get();
   if (extended_drag_source_) {
