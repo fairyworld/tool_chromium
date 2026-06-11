@@ -4884,15 +4884,10 @@ public class StripLayoutHelper
         // 1. Calculate the bounds to fully show the regular view on the left/right side of the
         // strip.
         // TODO(wenyufu): Account for offsetX{Left,Right} result too much offset. Is this expected?
-        boolean rtl = LocalizationUtils.isLayoutRtl();
         final float rightBound =
-                getVisibleRightBound(/* clampToUnpinnedViews= */ true)
-                        - mRightFadeWidth
-                        - (rtl ? 0f : mReservedEndMargin);
+                getVisibleRightBound(/* clampToUnpinnedViews= */ true) - mRightFadeWidth;
         final float leftBound =
-                getVisibleLeftBound(/* clampToUnpinnedViews= */ true)
-                        + mLeftFadeWidth
-                        - (rtl ? mReservedEndMargin : 0f);
+                getVisibleLeftBound(/* clampToUnpinnedViews= */ true) + mLeftFadeWidth;
 
         // 2. Calculate vectors from the view's ideal position to the farthest left/right point
         // where the view can be visible.
