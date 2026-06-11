@@ -4653,7 +4653,7 @@ void RenderProcessHostImpl::AddPriorityClient(
 
 void RenderProcessHostImpl::RemovePriorityClient(
     RenderProcessHostPriorityClient* priority_client) {
-  DCHECK(priority_clients_.contains(priority_client));
+  CHECK(priority_clients_.contains(priority_client), base::NotFatalUntil::M152);
   priority_clients_.erase(priority_client);
   UpdateProcessPriorityInputs();
 }
@@ -4695,13 +4695,13 @@ RenderProcessHost::FilterURLResult RenderProcessHostImpl::FilterURL(
 
 void RenderProcessHostImpl::EnableAudioDebugRecordings(
     const base::FilePath& file_path) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
 
   aec_dump_manager_.Start(file_path);
 }
 
 void RenderProcessHostImpl::DisableAudioDebugRecordings() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
 
   aec_dump_manager_.Stop();
 }
@@ -4796,19 +4796,21 @@ void RenderProcessHostImpl::UnregisterHost(ChildProcessId host_id) {
 // static
 void RenderProcessHostImpl::RegisterCreationObserver(
     RenderProcessHostCreationObserver* observer) {
-  DCHECK(BrowserThread::CurrentlyOn(BrowserThread::UI) ||
-         // Android unit tests trigger the thread uninitialized case.
-         !BrowserThread::IsThreadInitialized(BrowserThread::UI));
+  CHECK(BrowserThread::CurrentlyOn(BrowserThread::UI) ||
+            // Android unit tests trigger the thread uninitialized case.
+            !BrowserThread::IsThreadInitialized(BrowserThread::UI),
+        base::NotFatalUntil::M152);
   GetAllCreationObservers().push_back(observer);
 }
 
 // static
 void RenderProcessHostImpl::UnregisterCreationObserver(
     RenderProcessHostCreationObserver* observer) {
-  DCHECK(
-      BrowserThread::CurrentlyOn(BrowserThread::UI) ||
-      // Chrome OS and Android unit tests trigger the thread uninitialized case.
-      !BrowserThread::IsThreadInitialized(BrowserThread::UI));
+  CHECK(BrowserThread::CurrentlyOn(BrowserThread::UI) ||
+            // Chrome OS and Android unit tests trigger the thread uninitialized
+            // case.
+            !BrowserThread::IsThreadInitialized(BrowserThread::UI),
+        base::NotFatalUntil::M152);
   auto iter = std::ranges::find(GetAllCreationObservers(), observer);
   CHECK(iter != GetAllCreationObservers().end());
   GetAllCreationObservers().erase(iter);
@@ -4865,7 +4867,7 @@ bool RenderProcessHostImpl::IsSuitableHost(
   TRACE_EVENT("navigation", "RenderProcessHostImpl::IsSuitableHost",
               ChromeTrackEvent::kRenderProcessHost, *host);
   BrowserContext* browser_context = isolation_context.browser_context();
-  DCHECK(browser_context);
+  CHECK(browser_context, base::NotFatalUntil::M152);
   if (run_renderer_in_process()) {
     DCHECK_EQ(host->GetBrowserContext(), browser_context)
         << " Single-process mode does not support multiple browser contexts.";
@@ -5136,13 +5138,13 @@ void RenderProcessHost::ShutDownInProcessRenderer() {
 
 // static
 RenderProcessHost::iterator RenderProcessHost::AllHostsIterator() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   return iterator(&GetAllHosts());
 }
 
 // static
 RenderProcessHost* RenderProcessHost::FromID(int render_process_id) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   return GetAllHosts().Lookup(ChildProcessId(render_process_id));
 }
 
@@ -5158,7 +5160,7 @@ size_t RenderProcessHostImpl::GetCount() {
 
 // static
 size_t RenderProcessHostImpl::GetLiveCount() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
 
   size_t count = 0;
   for (auto iter = RenderProcessHost::AllHostsIterator(); !iter.IsAtEnd();
@@ -5281,8 +5283,8 @@ RenderProcessHost* RenderProcessHostImpl::GetSoleProcessHostForSite(
 void RenderProcessHostImpl::RegisterSoleProcessHostForSite(
     RenderProcessHost* process,
     SiteInstanceImpl* site_instance) {
-  DCHECK(process);
-  DCHECK(site_instance);
+  CHECK(process, base::NotFatalUntil::M152);
+  CHECK(site_instance, base::NotFatalUntil::M152);
 
   // Look up the map of site to process for site_instance's BrowserContext.
   SiteProcessMap* map =
