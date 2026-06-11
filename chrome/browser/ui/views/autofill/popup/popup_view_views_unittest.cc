@@ -434,6 +434,10 @@ class PopupViewViewsTestWithClickableSuggestionType
     DCHECK(IsClickable(GetParam()));
     return GetParam();
   }
+
+  bool BypassesInitialHoverClickSuppression() const {
+    return type() == SuggestionType::kDatalistEntry;
+  }
 };
 
 TEST_F(PopupViewViewsTest, ShowHideTest) {
@@ -2530,7 +2534,8 @@ TEST_P(PopupViewViewsTestWithClickableSuggestionType,
 TEST_P(PopupViewViewsTestWithClickableSuggestionType,
        IgnoreClickIfFocusedAtPaintWithoutExit) {
   CreateAndShowView({type()});
-  EXPECT_CALL(controller(), AcceptSuggestion).Times(0);
+  EXPECT_CALL(controller(), AcceptSuggestion)
+      .Times(BypassesInitialHoverClickSuppression() ? 1 : 0);
   generator().MoveMouseTo(GetCenterOfSuggestion(0));
   ASSERT_TRUE(view().IsMouseHovered());
   Paint();
@@ -2543,7 +2548,8 @@ TEST_P(PopupViewViewsTestWithClickableSuggestionType,
 TEST_P(PopupViewViewsTestWithClickableSuggestionType,
        IgnoreClickIfFocusedAtPaintWithSlightMouseMovement) {
   CreateAndShowView({type()});
-  EXPECT_CALL(controller(), AcceptSuggestion).Times(0);
+  EXPECT_CALL(controller(), AcceptSuggestion)
+      .Times(BypassesInitialHoverClickSuppression() ? 1 : 0);
   int width = GetRowViewAt(0).width();
   int height = GetRowViewAt(0).height();
   for (int x : {-width / 3, width / 3}) {
