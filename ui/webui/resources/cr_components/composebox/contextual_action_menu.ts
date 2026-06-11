@@ -23,7 +23,7 @@ import type {InputState} from '//resources/mojo/components/omnibox/composebox/co
 import {InputType, ModelMode, ToolMode} from '//resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
 import type {UnguessableToken} from '//resources/mojo/mojo/public/mojom/base/unguessable_token.mojom-webui.js';
 
-import {recordContextAdditionMethod, TabUploadOrigin} from './common.js';
+import {getLoadTimeBoolean, recordContextAdditionMethod, TabUploadOrigin} from './common.js';
 import {getCss} from './contextual_action_menu.css.js';
 import {getHtml} from './contextual_action_menu.html.js';
 import {WindowProxy} from './window_proxy.js';
@@ -81,7 +81,7 @@ export class ContextualActionMenuElement extends
       tabPreviewsEnabled_: {type: Boolean},
       showContextMenuHeaders_: {type: Boolean},
       disableAutoReposition: {type: Boolean},
-      contextManagementInComposeboxEnabled: {
+      contextManagementInComposeboxEnabled_: {
         reflect: true,
         type: Boolean,
         attribute: 'context-management-enabled',
@@ -103,7 +103,6 @@ export class ContextualActionMenuElement extends
   accessor inputState: InputState|null = null;
   accessor smartTabSharingActive: boolean = false;
   accessor smartTabSharingVisible: boolean = false;
-  accessor contextManagementInComposeboxEnabled: boolean = false;
   accessor disableAutoReposition: boolean = false;
   accessor uploadButtonDisabled: boolean = false;
   accessor isSidePanel: boolean = false;
@@ -118,6 +117,8 @@ export class ContextualActionMenuElement extends
   private metricsSource_: string = loadTimeData.getString('composeboxSource');
   protected accessor showContextMenuHeaders_: boolean =
       loadTimeData.getBoolean('ShowContextMenuHeaders');
+  protected accessor contextManagementInComposeboxEnabled_: boolean =
+      getLoadTimeBoolean('contextManagementInComposeboxEnabled', false);
   protected accessor shareTabsFlyoutOpen_: boolean = false;
   protected accessor shareTabsFlyoutPosition_: string = 'right';
   protected accessor sharingTabsText_: string = '';
@@ -195,7 +196,7 @@ export class ContextualActionMenuElement extends
   override updated(changedProperties: PropertyValues<this>) {
     super.updated(changedProperties);
 
-    if (this.contextManagementInComposeboxEnabled) {
+    if (this.contextManagementInComposeboxEnabled_) {
       if (changedProperties.has('disabledTabIds') ||
           changedProperties.has('aimThreadRestoredTabs')) {
         this.updateSharingTabsText_();
@@ -225,7 +226,7 @@ export class ContextualActionMenuElement extends
   showAt(anchor: HTMLElement) {
     // Show the menu initially to render it and measure its natural height.
     this.$.menu.showAt(anchor, {
-      width: this.contextManagementInComposeboxEnabled ?
+      width: this.contextManagementInComposeboxEnabled_ ?
           SHARE_TABS_MENU_WIDTH_PX :
           MENU_WIDTH_PX,
       anchorAlignmentX: AnchorAlignment.AFTER_START,
@@ -259,7 +260,7 @@ export class ContextualActionMenuElement extends
 
     // Position the menu using the finalized alignment.
     this.$.menu.showAt(anchor, {
-      width: this.contextManagementInComposeboxEnabled ?
+      width: this.contextManagementInComposeboxEnabled_ ?
           SHARE_TABS_MENU_WIDTH_PX :
           MENU_WIDTH_PX,
       anchorAlignmentX: AnchorAlignment.AFTER_START,
@@ -268,7 +269,7 @@ export class ContextualActionMenuElement extends
     });
     window.addEventListener('blur', this.onWindowBlur_);
 
-    if (this.contextManagementInComposeboxEnabled) {
+    if (this.contextManagementInComposeboxEnabled_) {
       this.updateSharingTabsText_();
     }
     this.updateScrollable_();
@@ -303,7 +304,7 @@ export class ContextualActionMenuElement extends
         this.aimThreadRestoredTabs.length :
         0;
     const totalTabs = this.disabledTabIds.size + restoredCount;
-    if (!this.contextManagementInComposeboxEnabled || totalTabs === 0) {
+    if (!this.contextManagementInComposeboxEnabled_ || totalTabs === 0) {
       this.sharingTabsText_ = this.i18n('shareTabs');
       return;
     }

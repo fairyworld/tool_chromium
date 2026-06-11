@@ -77,7 +77,6 @@ export const ComposeboxEmbedderMixin =
             showContextMenuDescription: {type: Boolean},
             smartTabSharingActive: {type: Boolean},
             smartTabSharingVisible: {type: Boolean},
-            contextManagementInComposeboxEnabled: {type: Boolean},
             shouldShowGhostFiles: {type: Boolean},
             showMenuOnClick: {type: Boolean},
             submitButtonIconType: {type: String},
@@ -187,7 +186,6 @@ export const ComposeboxEmbedderMixin =
             loadTimeData.getBoolean('composeboxSmartComposeEnabled');
         accessor smartTabSharingActive: boolean = false;
         accessor smartTabSharingVisible: boolean = false;
-        accessor contextManagementInComposeboxEnabled: boolean = false;
         contextMenuDescriptionEnabled: boolean =
             loadTimeData.getBoolean('composeboxShowContextMenuDescription');
         accessor showContextMenuDescription: boolean =
@@ -1458,7 +1456,8 @@ export const ComposeboxEmbedderMixin =
                   .filter(
                       file => !file.isDeletable ||
                           (file.tabId &&
-                           this.contextManagementInComposeboxEnabled)) :
+                           loadTimeData.getBoolean(
+                               'contextManagementInComposeboxEnabled'))) :
               Array.from(this.files.values()).filter(file => !file.isDeletable);
           if (undeletableFiles.length !== this.files.size) {
             this.files =
@@ -2375,7 +2374,6 @@ export interface ComposeboxEmbedderMixinInterface extends
   smartComposeEnabled: boolean;
   smartTabSharingActive: boolean;
   smartTabSharingVisible: boolean;
-  contextManagementInComposeboxEnabled: boolean;
   contextMenuDescriptionEnabled: boolean;
   showContextMenuDescription: boolean;
   shouldShowGhostFiles: boolean;

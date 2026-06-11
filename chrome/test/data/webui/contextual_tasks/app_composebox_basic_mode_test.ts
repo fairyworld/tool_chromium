@@ -41,7 +41,6 @@ suite('ContextualTasksAppComposeboxBasicModeTest', function() {
       enableBasicModeZOrder: true,
       enableComposeboxJumpFix: false,
       composeboxSmartTabSharingVisible: false,
-      contextManagementInComposeboxEnabled: false,
     });
     const proxy = new TestContextualTasksBrowserProxy('http://example.com');
     BrowserProxyImpl.setInstance(proxy);

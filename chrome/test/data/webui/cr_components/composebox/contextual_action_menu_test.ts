@@ -40,6 +40,7 @@ suite('ContextualActionMenu', () => {
       composeboxFileMaxCount: 10,
       composeboxShowContextMenuTabPreviews: true,
       ShowContextMenuHeaders: true,
+      contextManagementInComposeboxEnabled: false,
     });
 
     const pluralStringProxy = new TestPluralStringProxy();
@@ -51,7 +52,6 @@ suite('ContextualActionMenu', () => {
       disabledTabIds: new Map(),
       tabSuggestions: [],
       smartTabSharingVisible: false,
-      contextManagementInComposeboxEnabled: false,
     });
     document.body.appendChild(actionMenu);
     await microtasksFinished();
@@ -652,10 +652,12 @@ suite('ContextualActionMenu', () => {
   });
 
   test('Toggling smart tab sharing fires event', async () => {
+    loadTimeData.overrideValues({
+      contextManagementInComposeboxEnabled: true,
+    });
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
     actionMenu.smartTabSharingVisible = true;
-    actionMenu.contextManagementInComposeboxEnabled = true;
     actionMenu.tabSuggestions = [
       {
         tabId: 1,
@@ -693,10 +695,12 @@ suite('ContextualActionMenu', () => {
   });
 
   test('Clicking smart tab sharing row updates UI', async () => {
+    loadTimeData.overrideValues({
+      contextManagementInComposeboxEnabled: true,
+    });
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
     actionMenu.smartTabSharingVisible = true;
-    actionMenu.contextManagementInComposeboxEnabled = true;
     actionMenu.tabSuggestions = [
       {
         tabId: 1,
@@ -752,9 +756,11 @@ suite('ContextualActionMenu', () => {
   });
 
   test('Share tabs flyout height fits content', async () => {
+    loadTimeData.overrideValues({
+      contextManagementInComposeboxEnabled: true,
+    });
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
-    actionMenu.contextManagementInComposeboxEnabled = true;
     actionMenu.tabSuggestions = [
       {
         tabId: 1,
@@ -839,9 +845,12 @@ suite('ContextualActionMenu', () => {
   // TODO(crbug.com/512920161): Deflake and reenable this test.
   // <if expr="not is_linux and not is_macosx and not is_win and not is_chromeos">
   test('Share tabs flyout keyboard navigation', async () => {
+    loadTimeData.overrideValues({
+      contextManagementInComposeboxEnabled: true,
+    });
+
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
-    actionMenu.contextManagementInComposeboxEnabled = true;
     actionMenu.tabSuggestions = [
       {
         tabId: 1,
@@ -979,9 +988,9 @@ suite('ContextualActionMenu', () => {
     assertFalse(!!$$(actionMenu, '#shareTabsTrigger'));
 
     // There is no tab counter if no tabs exist.
+    loadTimeData.overrideValues({contextManagementInComposeboxEnabled: true});
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
-    actionMenu.contextManagementInComposeboxEnabled = true;
     actionMenu.tabSuggestions = [
       {
         tabId: 1,
@@ -1021,10 +1030,11 @@ suite('ContextualActionMenu', () => {
   test(
       'Tabs counter visibility with restored tabs and no suggestions',
       async () => {
+        loadTimeData.overrideValues(
+            {contextManagementInComposeboxEnabled: true});
         actionMenu.remove();
         actionMenu =
             document.createElement('cr-composebox-contextual-action-menu');
-        actionMenu.contextManagementInComposeboxEnabled = true;
         const restoredTab: TabInfo = {
           tabId: 1,
           title: 'Restored Tab',
@@ -1235,9 +1245,12 @@ suite('ContextualActionMenu', () => {
   });
 
   test('focuses Share Tabs when opening the + menu via keydown', async () => {
+    loadTimeData.overrideValues({
+      contextManagementInComposeboxEnabled: true,
+    });
+
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
-    actionMenu.contextManagementInComposeboxEnabled = true;
 
     // Initially, there is no tab data.
     actionMenu.tabSuggestions = [];
@@ -1285,11 +1298,14 @@ suite('ContextualActionMenu', () => {
   test(
       'navigates up and down between Share Tabs and other menu items',
       async () => {
+        loadTimeData.overrideValues({
+          contextManagementInComposeboxEnabled: true,
+        });
+
         actionMenu.remove();
         actionMenu =
             document.createElement('cr-composebox-contextual-action-menu');
         actionMenu.smartTabSharingVisible = true;
-        actionMenu.contextManagementInComposeboxEnabled = true;
 
         actionMenu.smartTabSharingActive = true;
         actionMenu.tabSuggestions = [];
@@ -1328,9 +1344,12 @@ suite('ContextualActionMenu', () => {
       });
 
   test('Share tabs flyout dynamic repositioning', async () => {
+    loadTimeData.overrideValues({
+      contextManagementInComposeboxEnabled: true,
+    });
+
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
-    actionMenu.contextManagementInComposeboxEnabled = true;
     actionMenu.tabSuggestions = [
       {
         tabId: 1,
@@ -1414,9 +1433,9 @@ suite('ContextualActionMenu', () => {
   });
 
   test('Favicon group rendered in action menu', async () => {
+    loadTimeData.overrideValues({ contextManagementInComposeboxEnabled: true });
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
-    actionMenu.contextManagementInComposeboxEnabled = true;
     const tabInfo: TabInfo = {
       tabId: 1,
       title: 'Tab 1',
@@ -1576,9 +1595,11 @@ suite('ContextualActionMenu', () => {
   });
 
   test('Recent tab suffix disabled state', async () => {
+    loadTimeData.overrideValues({
+      contextManagementInComposeboxEnabled: true,
+    });
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
-    actionMenu.contextManagementInComposeboxEnabled = true;
     const tabInfo: TabInfo = {
       tabId: 1,
       title: 'Recent Tab',
@@ -1610,11 +1631,11 @@ suite('ContextualActionMenu', () => {
 
   test('Menu closes after tab selection in Realbox', async () => {
     loadTimeData.overrideValues({
+      contextManagementInComposeboxEnabled: true,
       composeboxContextMenuEnableMultiTabSelection: true,
     });
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
-    actionMenu.contextManagementInComposeboxEnabled = true;
     Object.assign(actionMenu, {
       metricsSource_: 'NewTabPage',
     });
@@ -1651,12 +1672,12 @@ suite('ContextualActionMenu', () => {
       'Menu stays open after tab selection in Side Panel with multi-tab selection',
       async () => {
         loadTimeData.overrideValues({
+          contextManagementInComposeboxEnabled: true,
           composeboxContextMenuEnableMultiTabSelection: true,
         });
         actionMenu.remove();
         actionMenu =
             document.createElement('cr-composebox-contextual-action-menu');
-        actionMenu.contextManagementInComposeboxEnabled = true;
         Object.assign(actionMenu, {
           metricsSource_: 'contextual-tasks',
         });
@@ -1701,11 +1722,11 @@ suite('ContextualActionMenu', () => {
         lastActive: { internalValue: 0n },
       };
       loadTimeData.overrideValues({
+        contextManagementInComposeboxEnabled: true,
         composeboxContextMenuEnableMultiTabSelection: true,
       });
       actionMenu.remove();
       actionMenu = document.createElement('cr-composebox-contextual-action-menu');
-      actionMenu.contextManagementInComposeboxEnabled = true;
       Object.assign(actionMenu, {
         metricsSource_: 'NewTabPage',
         disabledTabIds: new Map([[1, 'some-token']]),
@@ -1750,7 +1771,7 @@ suite('ContextualActionMenu', () => {
           lastActive: {internalValue: 0n},
         };
 
-        actionMenu.contextManagementInComposeboxEnabled = true;
+        actionMenu['contextManagementInComposeboxEnabled_'] = true;
 
         actionMenu.inputState = new MockInputState({
           allowedInputTypes: [InputType.kBrowserTab],
@@ -1812,10 +1833,12 @@ suite('ContextualActionMenu', () => {
   test(
       'Dynamic suffix shows Current Tab only in Side Panel Contextual Tasks',
       async () => {
+        loadTimeData.overrideValues({
+          contextManagementInComposeboxEnabled: true,
+        });
         actionMenu.remove();
         actionMenu =
             document.createElement('cr-composebox-contextual-action-menu');
-        actionMenu.contextManagementInComposeboxEnabled = true;
 
         const tabInfo = {
           tabId: 1,
@@ -1859,11 +1882,14 @@ suite('ContextualActionMenu', () => {
 
   suite('SmartTabSharingTogglePositioning', () => {
     setup(async () => {
+      loadTimeData.overrideValues({
+        contextManagementInComposeboxEnabled: true,
+      });
+
       actionMenu.remove();
       actionMenu =
           document.createElement('cr-composebox-contextual-action-menu');
       actionMenu.smartTabSharingVisible = true;
-      actionMenu.contextManagementInComposeboxEnabled = true;
       actionMenu.tabSuggestions = [
         {
           tabId: 1,

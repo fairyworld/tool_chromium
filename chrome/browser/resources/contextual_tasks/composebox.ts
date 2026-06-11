@@ -153,7 +153,6 @@ export class ContextualTasksComposeboxElement extends I18nMixinLit
       usePecApi_: {type: Boolean},
       useFork_: {type: Boolean},
       smartTabSharingVisible_: {type: Boolean},
-      contextManagementInComposeboxEnabled_: {type: Boolean},
       energyEffectEnabled_: {type: Boolean, reflect: true},
       energyEffectAnimationEnabled_: {type: Boolean, reflect: true},
       glifAnimationState_: {type: String},
@@ -218,8 +217,6 @@ export class ContextualTasksComposeboxElement extends I18nMixinLit
       loadTimeData.getBoolean('useContextualTasksComposeboxFork');
   protected accessor smartTabSharingVisible_: boolean =
       loadTimeData.getBoolean('composeboxSmartTabSharingVisible');
-  protected accessor contextManagementInComposeboxEnabled_: boolean =
-      loadTimeData.getBoolean('contextManagementInComposeboxEnabled');
   protected accessor energyEffectEnabled_: boolean =
       loadTimeData.getBoolean('energyEffectEnabled');
   // The use of energyEffectEnabled to set energyEffectAnimationEnabled_ is
