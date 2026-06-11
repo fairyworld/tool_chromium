@@ -1383,6 +1383,9 @@ public final class ProductionSupportedFlagList {
         Flag.baseFeature(
                 "WebViewHttpCacheQuotaApi",
                 "When enabled, HTTP cache quota can be managed via support library APIs."),
+        Flag.baseFeature(
+                "AddressSorterConnectCache",
+                "Enables caching the results of UDP connect() results in AddressSorterPosix."),
 
         // Add new commandline switches and features above. The final entry should have a
         // trailing comma for cleaner diffs.
