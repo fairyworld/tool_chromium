@@ -4231,8 +4231,12 @@ void BrowserView::UpdateTabSearchBubbleHost() {
         toolbar_->tab_search_button(), browser_.get());
     auto* toolbar_button_controller =
         TabSearchToolbarButtonController::From(browser_.get());
-    CHECK(toolbar_button_controller);
-    toolbar_button_controller->UpdateBubbleHost(tab_search_bubble_host_.get());
+    // If TabSearchToolbarButtonController has not yet been instantiated at this
+    // point it will update the TabSearchBubbleHost when it is constructed.
+    if (toolbar_button_controller) {
+      toolbar_button_controller->UpdateBubbleHost(
+          tab_search_bubble_host_.get());
+    }
   } else {
     tab_search_bubble_host_ = std::make_unique<TabSearchBubbleHost>(
         BrowserElementsViews::From(browser_.get())

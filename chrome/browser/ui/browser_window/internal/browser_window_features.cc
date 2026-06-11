@@ -687,6 +687,15 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
         browser_view, exclusive_access_manager_.get());
   }
 
+  if (browser_view) {
+    if (features::HasTabSearchToolbarButton() ||
+        tabs::IsVerticalTabsFeatureEnabled()) {
+      tab_search_toolbar_button_controller_ =
+          GetUserDataFactory().CreateInstance<TabSearchToolbarButtonController>(
+              *browser_, browser_.get(), browser_view);
+    }
+  }
+
   // Features that are only enabled for normal browser windows (e.g. a window
   // with an omnibox and a tab strip). By default most features should be
   // instantiated in this block.
@@ -963,13 +972,6 @@ void BrowserWindowFeatures::InitPostBrowserViewConstruction(
       actor_ui_window_controller_ =
           GetUserDataFactory().CreateInstance<ActorUiWindowController>(
               *browser_, browser_, std::move(container_overlay_view_pairs));
-    }
-
-    if (features::HasTabSearchToolbarButton() ||
-        tabs::IsVerticalTabsFeatureEnabled()) {
-      tab_search_toolbar_button_controller_ =
-          GetUserDataFactory().CreateInstance<TabSearchToolbarButtonController>(
-              *browser_, browser_.get(), browser_view);
     }
   }
 
