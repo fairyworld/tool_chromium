@@ -4602,13 +4602,6 @@ inline constexpr char kUndoMigrationOfSyncingUserToSignedInDescription[] =
     "When enabled, reverts the migration of syncing users who were previously "
     "migrated to the signed-in, non-syncing state.";
 
-inline constexpr char kUseSearchClickForRightClickName[] =
-    "Use Search+Click for right click";
-inline constexpr char kUseSearchClickForRightClickDescription[] =
-    "When enabled search+click will be remapped to right click, allowing "
-    "webpages and apps to consume alt+click. When disabled the legacy "
-    "behavior of remapping alt+click to right click will remain unchanged.";
-
 inline constexpr char kNotificationOneTapUnsubscribeOnDesktopName[] =
     "Notification one-tap unsubscribe on Desktop";
 inline constexpr char kNotificationOneTapUnsubscribeOnDesktopDescription[] =

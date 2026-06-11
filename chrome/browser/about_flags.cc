@@ -7922,11 +7922,6 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kNearbyPresenceDescription, kOsCrOS,
      FEATURE_VALUE_TYPE(ash::features::kNearbyPresence)},
 
-    {"use-search-click-for-right-click",
-     flag_descriptions::kUseSearchClickForRightClickName,
-     flag_descriptions::kUseSearchClickForRightClickDescription, kOsCrOS,
-     FEATURE_VALUE_TYPE(ash::features::kUseSearchClickForRightClick)},
-
     {"display-alignment-assistance",
      flag_descriptions::kDisplayAlignmentAssistanceName,
      flag_descriptions::kDisplayAlignmentAssistanceDescription, kOsCrOS,

@@ -14189,7 +14189,6 @@ from previous Chrome versions.
   <int value="-58338160" label="ChromeShareLongScreenshot:enabled"/>
   <int value="-58242474" label="ash-disable-swipe-to-close-in-overview-mode"/>
   <int value="-57986995" label="DisablePostScriptPrinting:enabled"/>
-  <int value="-57383646" label="UseSearchClickForRightClick:disabled"/>
   <int value="-56235502" label="WebRtcHideLocalIpsWithMdns:enabled"/>
   <int value="-56173048" label="SearchInCCT:disabled"/>
   <int value="-55944747" label="disable-child-account-detection"/>
@@ -14371,7 +14370,6 @@ from previous Chrome versions.
   <int value="0" label="BAD_FLAG_FORMAT">
     Command-line flag doesn't start with two dashes.
   </int>
-  <int value="1343197" label="UseSearchClickForRightClick:enabled"/>
   <int value="1558582" label="ResamplingInputEvents:enabled"/>
   <int value="1618593" label="AutofillUseConsistentPopupSettingsIcons:enabled"/>
   <int value="2070488" label="EnablePasswordsAccountStorageSavingUi:disabled"/>

@@ -9477,14 +9477,6 @@
     "expiry_milestone": 160
   },
   {
-    "name": "use-search-click-for-right-click",
-    "owners": [
-      "jimmyxgong@chromium.org",
-      "cros-device-enablement@google.com"
-    ],
-    "expiry_milestone": 150
-  },
-  {
     "name": "use-shared-image-in-oop-vd",
     "owners": [ "fangzhoug@chromium.org", "blundell@chromium.org", "vasilyt@chromium.org" ],
     "expiry_milestone": 153
