@@ -49,6 +49,7 @@ export function getHtml(this: OmniboxAimAppElement) {
       .showVoiceSearch="${true}"
       .usePecApi="${this.usePecApi_}"
       .smartTabSharingVisible="${this.smartTabSharingVisible_}"
+      .contextManagementInComposeboxEnabled="${this.contextManagementInComposeboxEnabled_}"
       .isOblongShape="${this.isOblongShape_}"
       .webuiOmniboxSimplificationEnabled="${this.webuiOmniboxSimplificationEnabled_}"
       entrypoint-name="Omnibox">

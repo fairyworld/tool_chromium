@@ -38,6 +38,7 @@ export function getHtml(this: ComposeboxElement) {
         .usePecApi="${this.usePecApi}"
         .smartTabSharingActive="${this.smartTabSharingActive}"
         .smartTabSharingVisible="${this.smartTabSharingVisible}"
+        .contextManagementInComposeboxEnabled="${this.contextManagementInComposeboxEnabled}"
         .searchboxLayoutMode="${this.searchboxLayoutMode}"
         .tabSuggestions="${this.tabSuggestions}"
         .recentTabId="${this.recentTabId}"

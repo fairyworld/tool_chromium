@@ -70,7 +70,6 @@ suite('ComposeboxTest', () => {
       composeboxDragAndDropHint: 'Hint',
       removeSuggestion: 'Remove',
       composeboxDeleteFileTitle: 'Delete',
-      contextManagementInComposeboxEnabled: false,
       tabFaviconChipsToCoinsEnabled: false,
     });
 
@@ -848,7 +847,6 @@ suite('composeboxSharedMountAutoRepositionDefault', () => {
       dismissButton: 'Dismiss',
       composeboxDragAndDropHint: 'Hint',
       removeSuggestion: 'Remove',
-      contextManagementInComposeboxEnabled: false,
       tabFaviconChipsToCoinsEnabled: false,
     });
 
