@@ -761,7 +761,7 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
     "ManagedConfigurationAPI",
     "ManagementAPI",
 #if BUILDFLAG(ENABLE_EXTENSIONS)
-    "ManifestV2ExperimentManager",
+    "ManifestV2Handler",
 #endif
 #if BUILDFLAG(IS_CHROMEOS)
     "MediaGalleriesAPI",

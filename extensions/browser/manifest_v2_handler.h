@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef EXTENSIONS_BROWSER_MANIFEST_V2_EXPERIMENT_MANAGER_H_
-#define EXTENSIONS_BROWSER_MANIFEST_V2_EXPERIMENT_MANAGER_H_
+#ifndef EXTENSIONS_BROWSER_MANIFEST_V2_HANDLER_H_
+#define EXTENSIONS_BROWSER_MANIFEST_V2_HANDLER_H_
 
 #include "base/auto_reset.h"
 #include "base/memory/raw_ptr.h"
@@ -32,15 +32,13 @@ class ScopedTestMV2Enabler;
 
 // The central class responsible for managing experiments related to the MV2
 // deprecation.
-class ManifestV2ExperimentManager : public KeyedService,
-                                    public ExtensionRegistryObserver {
+class ManifestV2Handler : public KeyedService,
+                          public ExtensionRegistryObserver {
  public:
-  explicit ManifestV2ExperimentManager(
-      content::BrowserContext* browser_context);
-  ManifestV2ExperimentManager(const ManifestV2ExperimentManager&) = delete;
-  ManifestV2ExperimentManager& operator=(const ManifestV2ExperimentManager&) =
-      delete;
-  ~ManifestV2ExperimentManager() override;
+  explicit ManifestV2Handler(content::BrowserContext* browser_context);
+  ManifestV2Handler(const ManifestV2Handler&) = delete;
+  ManifestV2Handler& operator=(const ManifestV2Handler&) = delete;
+  ~ManifestV2Handler() override;
 
   // The possible states for an MV2 extension during the experiments.
   // Do not re-order entries, as these are used in histograms.
@@ -62,11 +60,10 @@ class ManifestV2ExperimentManager : public KeyedService,
     kMaxValue = kHardDisabled,
   };
 
-  // Retrieves the ManifestV2ExperimentManager associated with the given
+  // Retrieves the ManifestV2Handler associated with the given
   // `browser_context`. Note this instance is shared between on- and off-the-
   // record contexts.
-  static ManifestV2ExperimentManager* Get(
-      content::BrowserContext* browser_context);
+  static ManifestV2Handler* Get(content::BrowserContext* browser_context);
 
   // Returns the singleton instance of the factory for this KeyedService.
   static BrowserContextKeyedServiceFactory* GetFactory();
@@ -150,9 +147,9 @@ class ManifestV2ExperimentManager : public KeyedService,
   base::ScopedObservation<ExtensionRegistry, ExtensionRegistryObserver>
       registry_observation_{this};
 
-  base::WeakPtrFactory<ManifestV2ExperimentManager> weak_factory_{this};
+  base::WeakPtrFactory<ManifestV2Handler> weak_factory_{this};
 };
 
 }  // namespace extensions
 
-#endif  // EXTENSIONS_BROWSER_MANIFEST_V2_EXPERIMENT_MANAGER_H_
+#endif  // EXTENSIONS_BROWSER_MANIFEST_V2_HANDLER_H_

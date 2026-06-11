@@ -60,7 +60,7 @@
 #include "extensions/browser/file_highlighter.h"
 #include "extensions/browser/install_verifier.h"
 #include "extensions/browser/management_policy.h"
-#include "extensions/browser/manifest_v2_experiment_manager.h"
+#include "extensions/browser/manifest_v2_handler.h"
 #include "extensions/browser/path_util.h"
 #include "extensions/browser/permissions/permissions_updater.h"
 #include "extensions/browser/permissions/scripting_permissions_modifier.h"
@@ -598,7 +598,7 @@ DeveloperPrivateUpdateProfileConfigurationFunction::Run() {
   }
 
   if (update.is_mv2_deprecation_notice_dismissed.value_or(false)) {
-    ManifestV2ExperimentManager::Get(browser_context())
+    ManifestV2Handler::Get(browser_context())
         ->MarkNoticeAsAcknowledgedGlobally();
   }
 

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "extensions/browser/manifest_v2_experiment_manager.h"
+#include "extensions/browser/manifest_v2_handler.h"
 
 #include "base/auto_reset.h"
 #include "base/metrics/histogram_functions.h"
@@ -57,18 +57,14 @@ const char* GetHistogramManifestLocation(mojom::ManifestLocation location) {
   }
 }
 
-class ManifestV2ExperimentManagerFactory
-    : public BrowserContextKeyedServiceFactory {
+class ManifestV2HandlerFactory : public BrowserContextKeyedServiceFactory {
  public:
-  ManifestV2ExperimentManagerFactory();
-  ManifestV2ExperimentManagerFactory(
-      const ManifestV2ExperimentManagerFactory&) = delete;
-  ManifestV2ExperimentManagerFactory& operator=(
-      const ManifestV2ExperimentManagerFactory&) = delete;
-  ~ManifestV2ExperimentManagerFactory() override = default;
+  ManifestV2HandlerFactory();
+  ManifestV2HandlerFactory(const ManifestV2HandlerFactory&) = delete;
+  ManifestV2HandlerFactory& operator=(const ManifestV2HandlerFactory&) = delete;
+  ~ManifestV2HandlerFactory() override = default;
 
-  ManifestV2ExperimentManager* GetForBrowserContext(
-      content::BrowserContext* context);
+  ManifestV2Handler* GetForBrowserContext(content::BrowserContext* context);
 
  private:
   // BrowserContextKeyedServiceFactory:
@@ -79,37 +75,34 @@ class ManifestV2ExperimentManagerFactory
   bool ServiceIsCreatedWithBrowserContext() const override;
 };
 
-ManifestV2ExperimentManagerFactory::ManifestV2ExperimentManagerFactory()
+ManifestV2HandlerFactory::ManifestV2HandlerFactory()
     : BrowserContextKeyedServiceFactory(
-          "ManifestV2ExperimentManager",
+          "ManifestV2Handler",
           BrowserContextDependencyManager::GetInstance()) {
   DependsOn(ExtensionPrefsFactory::GetInstance());
   DependsOn(ExtensionRegistryFactory::GetInstance());
   DependsOn(ExtensionsBrowserClient::Get()->GetExtensionSystemFactory());
 }
 
-ManifestV2ExperimentManager*
-ManifestV2ExperimentManagerFactory::GetForBrowserContext(
+ManifestV2Handler* ManifestV2HandlerFactory::GetForBrowserContext(
     content::BrowserContext* browser_context) {
-  return static_cast<ManifestV2ExperimentManager*>(
+  return static_cast<ManifestV2Handler*>(
       GetServiceForBrowserContext(browser_context, /*create=*/true));
 }
 
-content::BrowserContext*
-ManifestV2ExperimentManagerFactory::GetBrowserContextToUse(
+content::BrowserContext* ManifestV2HandlerFactory::GetBrowserContextToUse(
     content::BrowserContext* browser_context) const {
   return ExtensionsBrowserClient::Get()
       ->GetContextRedirectedToOriginalWithoutAshInternals(browser_context);
 }
 
 std::unique_ptr<KeyedService>
-ManifestV2ExperimentManagerFactory::BuildServiceInstanceForBrowserContext(
+ManifestV2HandlerFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
-  return std::make_unique<ManifestV2ExperimentManager>(context);
+  return std::make_unique<ManifestV2Handler>(context);
 }
 
-bool ManifestV2ExperimentManagerFactory::ServiceIsCreatedWithBrowserContext()
-    const {
+bool ManifestV2HandlerFactory::ServiceIsCreatedWithBrowserContext() const {
   return true;
 }
 
@@ -126,39 +119,37 @@ bool ShouldDisableLegacyExtensions() {
 
 }  // namespace
 
-ManifestV2ExperimentManager::ManifestV2ExperimentManager(
-    content::BrowserContext* browser_context)
+ManifestV2Handler::ManifestV2Handler(content::BrowserContext* browser_context)
     : browser_context_(browser_context) {
   registry_observation_.Observe(ExtensionRegistry::Get(browser_context));
 
   ExtensionSystem::Get(browser_context)
       ->ready()
       .Post(FROM_HERE,
-            base::BindOnce(&ManifestV2ExperimentManager::OnExtensionSystemReady,
+            base::BindOnce(&ManifestV2Handler::OnExtensionSystemReady,
                            weak_factory_.GetWeakPtr()));
 }
 
-ManifestV2ExperimentManager::~ManifestV2ExperimentManager() = default;
+ManifestV2Handler::~ManifestV2Handler() = default;
 
 // static
-ManifestV2ExperimentManager* ManifestV2ExperimentManager::Get(
+ManifestV2Handler* ManifestV2Handler::Get(
     content::BrowserContext* browser_context) {
-  return static_cast<ManifestV2ExperimentManagerFactory*>(GetFactory())
+  return static_cast<ManifestV2HandlerFactory*>(GetFactory())
       ->GetForBrowserContext(browser_context);
 }
 
 // static
-BrowserContextKeyedServiceFactory* ManifestV2ExperimentManager::GetFactory() {
-  static base::NoDestructor<ManifestV2ExperimentManagerFactory> g_factory;
+BrowserContextKeyedServiceFactory* ManifestV2Handler::GetFactory() {
+  static base::NoDestructor<ManifestV2HandlerFactory> g_factory;
   return g_factory.get();
 }
 
-bool ManifestV2ExperimentManager::IsExtensionAffected(
-    const Extension& extension) {
+bool ManifestV2Handler::IsExtensionAffected(const Extension& extension) {
   return impact_checker_.IsExtensionAffected(extension);
 }
 
-bool ManifestV2ExperimentManager::ShouldBlockExtensionInstallation(
+bool ManifestV2Handler::ShouldBlockExtensionInstallation(
     int manifest_version,
     Manifest::Type manifest_type,
     mojom::ManifestLocation manifest_location) {
@@ -172,8 +163,7 @@ bool ManifestV2ExperimentManager::ShouldBlockExtensionInstallation(
                                              manifest_location);
 }
 
-bool ManifestV2ExperimentManager::ShouldBlockExtensionEnable(
-    const Extension& extension) {
+bool ManifestV2Handler::ShouldBlockExtensionEnable(const Extension& extension) {
   if (!ShouldDisableLegacyExtensions()) {
     return false;
   }
@@ -182,31 +172,31 @@ bool ManifestV2ExperimentManager::ShouldBlockExtensionEnable(
       extension.manifest_version(), extension.GetType(), extension.location());
 }
 
-bool ManifestV2ExperimentManager::DidUserAcknowledgeNoticeGlobally() {
+bool ManifestV2Handler::DidUserAcknowledgeNoticeGlobally() {
   return extension_prefs()->GetPrefAsBoolean(
       kMV2DeprecationUnsupportedAcknowledgedGloballyPref);
 }
 
-void ManifestV2ExperimentManager::MarkNoticeAsAcknowledgedGlobally() {
+void ManifestV2Handler::MarkNoticeAsAcknowledgedGlobally() {
   extension_prefs()->SetBooleanPref(
       kMV2DeprecationUnsupportedAcknowledgedGloballyPref, true);
 }
 
-ExtensionPrefs* ManifestV2ExperimentManager::extension_prefs() {
+ExtensionPrefs* ManifestV2Handler::extension_prefs() {
   if (!extension_prefs_) {
     extension_prefs_ = ExtensionPrefs::Get(browser_context_);
   }
   return extension_prefs_;
 }
 
-void ManifestV2ExperimentManager::OnExtensionSystemReady() {
+void ManifestV2Handler::OnExtensionSystemReady() {
   CheckDisabledExtensions();
   DisableAffectedExtensions();
 
   EmitMetricsForProfileReady();
 }
 
-void ManifestV2ExperimentManager::DisableAffectedExtensions() {
+void ManifestV2Handler::DisableAffectedExtensions() {
   if (!ShouldDisableLegacyExtensions()) {
     return;
   }
@@ -232,7 +222,7 @@ void ManifestV2ExperimentManager::DisableAffectedExtensions() {
   }
 }
 
-void ManifestV2ExperimentManager::CheckDisabledExtensions() {
+void ManifestV2Handler::CheckDisabledExtensions() {
   ExtensionRegistry* extension_registry =
       ExtensionRegistry::Get(browser_context_);
   ExtensionSet disabled_extensions;
@@ -246,8 +236,7 @@ void ManifestV2ExperimentManager::CheckDisabledExtensions() {
   }
 }
 
-void ManifestV2ExperimentManager::MaybeReEnableExtension(
-    const Extension& extension) {
+void ManifestV2Handler::MaybeReEnableExtension(const Extension& extension) {
   if (!extension_prefs()->HasDisableReason(
           extension.id(),
           disable_reason::DISABLE_UNSUPPORTED_MANIFEST_VERSION)) {
@@ -270,7 +259,7 @@ void ManifestV2ExperimentManager::MaybeReEnableExtension(
           extension.id(), disable_reason::DISABLE_UNSUPPORTED_MANIFEST_VERSION);
 }
 
-void ManifestV2ExperimentManager::EmitMetricsForProfileReady() {
+void ManifestV2Handler::EmitMetricsForProfileReady() {
   if (!ShouldDisableLegacyExtensions()) {
     // Don't bother reporting MV2-specific metrics if the user isn't in an
     // environment in which extensions could be disabled.
@@ -325,7 +314,7 @@ void ManifestV2ExperimentManager::EmitMetricsForProfileReady() {
   }
 }
 
-void ManifestV2ExperimentManager::OnExtensionInstalled(
+void ManifestV2Handler::OnExtensionInstalled(
     content::BrowserContext* browser_context,
     const Extension* extension,
     bool is_update) {
@@ -338,18 +327,16 @@ void ManifestV2ExperimentManager::OnExtensionInstalled(
   MaybeReEnableExtension(*extension);
 }
 
-void ManifestV2ExperimentManager::
-    DisableAffectedExtensionsForTesting() {  // IN-TEST
+void ManifestV2Handler::DisableAffectedExtensionsForTesting() {  // IN-TEST
   DisableAffectedExtensions();
 }
 
-void ManifestV2ExperimentManager::
-    EmitMetricsForProfileReadyForTesting() {  // IN-TEST
+void ManifestV2Handler::EmitMetricsForProfileReadyForTesting() {  // IN-TEST
   EmitMetricsForProfileReady();
 }
 
 base::AutoReset<bool>
-ManifestV2ExperimentManager::AllowMV2ExtensionsForTesting(  // IN-TEST
+ManifestV2Handler::AllowMV2ExtensionsForTesting(  // IN-TEST
     base::PassKey<ScopedTestMV2Enabler> pass_key) {
   return base::AutoReset<bool>(&g_allow_mv2_for_testing, true);
 }

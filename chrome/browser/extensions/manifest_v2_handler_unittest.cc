@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "extensions/browser/manifest_v2_experiment_manager.h"
+#include "extensions/browser/manifest_v2_handler.h"
 
 #include "base/memory/raw_ptr.h"
 #include "base/test/metrics/histogram_tester.h"
@@ -24,11 +24,10 @@
 
 namespace extensions {
 
-class ManifestV2ExperimentManagerUnitTest
-    : public ExtensionServiceUserTestBase {
+class ManifestV2HandlerUnitTest : public ExtensionServiceUserTestBase {
  public:
-  ManifestV2ExperimentManagerUnitTest() = default;
-  ~ManifestV2ExperimentManagerUnitTest() override = default;
+  ManifestV2HandlerUnitTest() = default;
+  ~ManifestV2HandlerUnitTest() override = default;
 
   void SetUp() override {
     ExtensionServiceUserTestBase::SetUp();
@@ -46,11 +45,11 @@ class ManifestV2ExperimentManagerUnitTest
         GetFakeUserManager()->AddUser(account_id_), account_id_));
 #endif
 
-    experiment_manager_ = ManifestV2ExperimentManager::Get(profile());
+    handler_ = ManifestV2Handler::Get(profile());
   }
 
   void TearDown() override {
-    experiment_manager_ = nullptr;
+    handler_ = nullptr;
     ExtensionServiceUserTestBase::TearDown();
   }
 
@@ -58,18 +57,16 @@ class ManifestV2ExperimentManagerUnitTest
   // bypass their disabling for testing.
   bool ShouldAllowMV2Extensions() override { return false; }
 
-  ManifestV2ExperimentManager* experiment_manager() {
-    return experiment_manager_.get();
-  }
+  ManifestV2Handler* handler() { return handler_.get(); }
 
  private:
-  raw_ptr<ManifestV2ExperimentManager> experiment_manager_;
+  raw_ptr<ManifestV2Handler> handler_;
 };
 
 // Sanity check that MV2 extensions are considered affected when the
 // experiment is enabled in the "unsupported" phase. The "is affected" logic is
 // much more heavily tested in mv2_deprecation_impact_checker_unittest.cc.
-TEST_F(ManifestV2ExperimentManagerUnitTest, MV2ExtensionsAreAffected) {
+TEST_F(ManifestV2HandlerUnitTest, MV2ExtensionsAreAffected) {
   struct {
     mojom::ManifestLocation manifest_location;
     const char* name;
@@ -86,20 +83,20 @@ TEST_F(ManifestV2ExperimentManagerUnitTest, MV2ExtensionsAreAffected) {
             .SetManifestVersion(2)
             .SetLocation(test_case.manifest_location)
             .Build();
-    EXPECT_TRUE(experiment_manager()->IsExtensionAffected(*mv2_extension));
+    EXPECT_TRUE(handler()->IsExtensionAffected(*mv2_extension));
 
-    // Modern extensions are not affected by the experiment.
+    // Modern extensions are not affected.
     scoped_refptr<const Extension> extension =
         ExtensionBuilder(test_case.name)
             .SetLocation(test_case.manifest_location)
             .Build();
-    EXPECT_FALSE(experiment_manager()->IsExtensionAffected(*extension));
+    EXPECT_FALSE(handler()->IsExtensionAffected(*extension));
   }
 }
 
 // Tests the manager properly indicates when to block user-installed extensions
 // in the "unsupported" phase.
-TEST_F(ManifestV2ExperimentManagerUnitTest,
+TEST_F(ManifestV2HandlerUnitTest,
        ShouldBlockInstallation_UserInstalledExtensions) {
   constexpr bool kInstallShouldBeBlocked = true;
   constexpr bool kInstallShouldBeAllowed = false;
@@ -146,18 +143,17 @@ TEST_F(ManifestV2ExperimentManagerUnitTest,
             .Build();
 
     EXPECT_EQ(test_case.should_block_install,
-              experiment_manager()->ShouldBlockExtensionInstallation(
+              handler()->ShouldBlockExtensionInstallation(
                   extension->manifest_version(), extension->GetType(),
                   extension->location()));
 
     EXPECT_EQ(test_case.should_block_install,
-              experiment_manager()->ShouldBlockExtensionEnable(*extension));
+              handler()->ShouldBlockExtensionEnable(*extension));
   }
 }
 
 // Tests the manager never blocks component extensions from installing.
-TEST_F(ManifestV2ExperimentManagerUnitTest,
-       ShouldBlockInstallation_ComponentExtensions) {
+TEST_F(ManifestV2HandlerUnitTest, ShouldBlockInstallation_ComponentExtensions) {
   struct {
     mojom::ManifestLocation manifest_location;
     int manifest_version;
@@ -183,29 +179,29 @@ TEST_F(ManifestV2ExperimentManagerUnitTest,
     // Component extensions are built-in parts of Chrome that are extensions as
     // an implementation detail. They should always be allowed to install and
     // remain enabled.
-    EXPECT_FALSE(experiment_manager()->ShouldBlockExtensionInstallation(
+    EXPECT_FALSE(handler()->ShouldBlockExtensionInstallation(
         extension->manifest_version(), extension->GetType(),
         extension->location()));
-    EXPECT_FALSE(experiment_manager()->ShouldBlockExtensionEnable(*extension));
+    EXPECT_FALSE(handler()->ShouldBlockExtensionEnable(*extension));
   }
 }
 
 // Tests that the proper manifest group is used when emitting metrics for
 // disabled extensions.
-TEST_F(ManifestV2ExperimentManagerUnitTest,
+TEST_F(ManifestV2HandlerUnitTest,
        ProfileMetrics_ExtensionLocationsAreProperlyGrouped) {
   struct {
     mojom::ManifestLocation manifest_location;
     std::string name;
     std::string expected_histogram;
-    ManifestV2ExperimentManager::MV2ExtensionState expected_state =
-        ManifestV2ExperimentManager::MV2ExtensionState::kHardDisabled;
+    ManifestV2Handler::MV2ExtensionState expected_state =
+        ManifestV2Handler::MV2ExtensionState::kHardDisabled;
   } test_cases[] = {
       {mojom::ManifestLocation::kInternal, "Internal",
        "Extensions.MV2Deprecation.MV2ExtensionState.Internal"},
       {mojom::ManifestLocation::kComponent, "Component",
        "Extensions.MV2Deprecation.MV2ExtensionState.Component",
-       ManifestV2ExperimentManager::MV2ExtensionState::kUnaffected},
+       ManifestV2Handler::MV2ExtensionState::kUnaffected},
       {mojom::ManifestLocation::kExternalPolicy, "Policy",
        "Extensions.MV2Deprecation.MV2ExtensionState.Policy"},
       {mojom::ManifestLocation::kExternalPolicyDownload, "Policy Download",
@@ -243,8 +239,8 @@ TEST_F(ManifestV2ExperimentManagerUnitTest,
             .Build();
     registrar()->AddExtension(extension.get());
 
-    experiment_manager()->DisableAffectedExtensionsForTesting();
-    experiment_manager()->EmitMetricsForProfileReadyForTesting();
+    handler()->DisableAffectedExtensionsForTesting();
+    handler()->EmitMetricsForProfileReadyForTesting();
 
     // In each case, at most one histogram should have any records, and it
     // should have exactly one entry: the extension is hard-disabled.
@@ -264,7 +260,7 @@ TEST_F(ManifestV2ExperimentManagerUnitTest,
 }
 
 // Tests that modern extensions don't emit any metrics.
-TEST_F(ManifestV2ExperimentManagerUnitTest,
+TEST_F(ManifestV2HandlerUnitTest,
        ProfileMetrics_ModernExtensionsArentIncluded) {
   base::HistogramTester histogram_tester;
 
@@ -274,8 +270,8 @@ TEST_F(ManifestV2ExperimentManagerUnitTest,
           .Build();
   registrar()->AddExtension(extension.get());
 
-  experiment_manager()->DisableAffectedExtensionsForTesting();
-  experiment_manager()->EmitMetricsForProfileReadyForTesting();
+  handler()->DisableAffectedExtensionsForTesting();
+  handler()->EmitMetricsForProfileReadyForTesting();
 
   histogram_tester.ExpectTotalCount(
       "Extensions.MV2Deprecation.MV2ExtensionState.Internal", 0);
@@ -283,7 +279,7 @@ TEST_F(ManifestV2ExperimentManagerUnitTest,
 
 // Tests that extensions that are disabled for other reasons (such as by user
 // action) emit `kOther` for their state.
-TEST_F(ManifestV2ExperimentManagerUnitTest,
+TEST_F(ManifestV2HandlerUnitTest,
        ProfileMetrics_ExtensionsThatAreDisabledForOtherReasonsEmitOther) {
   base::HistogramTester histogram_tester;
 
@@ -296,18 +292,18 @@ TEST_F(ManifestV2ExperimentManagerUnitTest,
 
   registrar()->DisableExtension(extension->id(),
                                 {disable_reason::DISABLE_USER_ACTION});
-  experiment_manager()->EmitMetricsForProfileReadyForTesting();
+  handler()->EmitMetricsForProfileReadyForTesting();
 
   histogram_tester.ExpectTotalCount(
       "Extensions.MV2Deprecation.MV2ExtensionState.Internal", 1);
   histogram_tester.ExpectBucketCount(
       "Extensions.MV2Deprecation.MV2ExtensionState.Internal",
-      ManifestV2ExperimentManager::MV2ExtensionState::kOther, 1);
+      ManifestV2Handler::MV2ExtensionState::kOther, 1);
 }
 
 // Tests that MV2 extensions cannot be re-enabled in the "unsupported"
 // experiment phase.
-TEST_F(ManifestV2ExperimentManagerUnitTest, MV2ExtensionsCannotBeEnabled) {
+TEST_F(ManifestV2HandlerUnitTest, MV2ExtensionsCannotBeEnabled) {
   constexpr bool kEnableShouldBeBlocked = true;
   constexpr bool kEnableShouldBeAllowed = false;
   struct {
@@ -367,7 +363,7 @@ TEST_F(ManifestV2ExperimentManagerUnitTest, MV2ExtensionsCannotBeEnabled) {
             .Build();
 
     EXPECT_EQ(test_case.should_block_enable,
-              experiment_manager()->ShouldBlockExtensionEnable(*extension));
+              handler()->ShouldBlockExtensionEnable(*extension));
   }
 }
 

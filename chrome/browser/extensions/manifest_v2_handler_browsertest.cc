@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "extensions/browser/manifest_v2_experiment_manager.h"
+#include "extensions/browser/manifest_v2_handler.h"
 
 #include <algorithm>
 
@@ -46,10 +46,10 @@ const Extension* GetExtensionByName(std::string_view name,
 
 }  // namespace
 
-class ManifestV2ExperimentManagerBrowserTest : public ExtensionBrowserTest {
+class ManifestV2HandlerBrowserTest : public ExtensionBrowserTest {
  public:
-  ManifestV2ExperimentManagerBrowserTest() = default;
-  ~ManifestV2ExperimentManagerBrowserTest() override = default;
+  ManifestV2HandlerBrowserTest() = default;
+  ~ManifestV2HandlerBrowserTest() override = default;
 
   // Since this is testing the MV2 deprecation experiments, we probably don't
   // want to bypass their disabling for testing. There are some exceptions for
@@ -108,9 +108,7 @@ class ManifestV2ExperimentManagerBrowserTest : public ExtensionBrowserTest {
 
   ExtensionPrefs* extension_prefs() { return ExtensionPrefs::Get(profile()); }
 
-  ManifestV2ExperimentManager* experiment_manager() {
-    return ManifestV2ExperimentManager::Get(profile());
-  }
+  ManifestV2Handler* handler() { return ManifestV2Handler::Get(profile()); }
 
   base::HistogramTester& histogram_tester() { return histogram_tester_; }
 
@@ -120,13 +118,13 @@ class ManifestV2ExperimentManagerBrowserTest : public ExtensionBrowserTest {
 
 // A test series to verify MV2 extensions are disabled on startup.
 // Step 1: Install an MV2 extension.
-IN_PROC_BROWSER_TEST_F(ManifestV2ExperimentManagerBrowserTest,
+IN_PROC_BROWSER_TEST_F(ManifestV2HandlerBrowserTest,
                        PRE_ExtensionsAreDisabledOnStartup) {
   const Extension* extension = AddMV2Extension("Test MV2 Extension");
   ASSERT_TRUE(extension);
 }
 // Step 2: Verify the extension is disabled.
-IN_PROC_BROWSER_TEST_F(ManifestV2ExperimentManagerBrowserTest,
+IN_PROC_BROWSER_TEST_F(ManifestV2HandlerBrowserTest,
                        ExtensionsAreDisabledOnStartup) {
   WaitForExtensionSystemReady();
 
@@ -151,7 +149,7 @@ IN_PROC_BROWSER_TEST_F(ManifestV2ExperimentManagerBrowserTest,
       "Extensions.MV2Deprecation.MV2ExtensionState.Internal", 1);
   histogram_tester().ExpectBucketCount(
       "Extensions.MV2Deprecation.MV2ExtensionState.Internal",
-      ManifestV2ExperimentManager::MV2ExtensionState::kHardDisabled, 1);
+      ManifestV2Handler::MV2ExtensionState::kHardDisabled, 1);
 
   // The user should not be allowed to re-enable the extension.
   ExtensionSystem* system = ExtensionSystem::Get(profile());
@@ -165,7 +163,7 @@ IN_PROC_BROWSER_TEST_F(ManifestV2ExperimentManagerBrowserTest,
 }
 
 // Tests that extensions are re-enabled automatically if they update to MV3.
-IN_PROC_BROWSER_TEST_F(ManifestV2ExperimentManagerBrowserTest,
+IN_PROC_BROWSER_TEST_F(ManifestV2HandlerBrowserTest,
                        ExtensionsAreReEnabledWhenUpdatedToMV3) {
   WaitForExtensionSystemReady();
 
@@ -197,7 +195,7 @@ IN_PROC_BROWSER_TEST_F(ManifestV2ExperimentManagerBrowserTest,
   // other browser tests in this file. However, that makes it much more
   // difficult to update the extension to an MV3 version, since we couldn't
   // construct the extension dynamically.
-  experiment_manager()->DisableAffectedExtensionsForTesting();
+  handler()->DisableAffectedExtensionsForTesting();
 
   // The MV2 extension is disabled.
   EXPECT_TRUE(
@@ -224,7 +222,7 @@ IN_PROC_BROWSER_TEST_F(ManifestV2ExperimentManagerBrowserTest,
 
 // Tests that externally-installed extensions are allowed to be installed, but
 // will still be disabled by the MV2 experiments.
-IN_PROC_BROWSER_TEST_F(ManifestV2ExperimentManagerBrowserTest,
+IN_PROC_BROWSER_TEST_F(ManifestV2HandlerBrowserTest,
                        ExternalExtensionsCanBeInstalledButAreAlsoDisabled) {
   // External extensions are default-disabled on Windows and Mac. This won't
   // be affected by the MV2 deprecation, but for consistency of testing, we
@@ -264,10 +262,10 @@ IN_PROC_BROWSER_TEST_F(ManifestV2ExperimentManagerBrowserTest,
   EXPECT_TRUE(extension_prefs()->GetDisableReasons(kExtensionId).empty());
 
   // The extension should still be counted as "affected" by the MV2 deprecation.
-  EXPECT_TRUE(experiment_manager()->IsExtensionAffected(*extension));
+  EXPECT_TRUE(handler()->IsExtensionAffected(*extension));
 
   // And should also be disabled when we check again.
-  experiment_manager()->DisableAffectedExtensionsForTesting();
+  handler()->DisableAffectedExtensionsForTesting();
   EXPECT_TRUE(
       extension_registry()->disabled_extensions().Contains(kExtensionId));
   EXPECT_THAT(extension_prefs()->GetDisableReasons(kExtensionId),
@@ -277,7 +275,7 @@ IN_PROC_BROWSER_TEST_F(ManifestV2ExperimentManagerBrowserTest,
 
 // Tests that unpacked extensions cannot be installed in the unsupported
 // experiment phase.
-IN_PROC_BROWSER_TEST_F(ManifestV2ExperimentManagerBrowserTest,
+IN_PROC_BROWSER_TEST_F(ManifestV2HandlerBrowserTest,
                        UnpackedExtensionsCannotBeInstalledInUnsupportedPhase) {
   WaitForExtensionSystemReady();
 
