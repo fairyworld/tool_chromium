@@ -7,8 +7,10 @@
 
 #include <vector>
 
+#include "base/memory/raw_ref.h"
 #include "base/types/expected.h"
 #include "components/browser_apis/tab_drag/adapters/tab_drag_session_input_adapter.h"
+#include "components/browser_apis/tab_drag/sessions/tab_drag_session_injector.h"
 #include "components/browser_apis/tab_strip/types/node_id.h"
 #include "mojo/public/mojom/base/error.mojom.h"
 
@@ -36,6 +38,26 @@ class ToyTabDragSessionInputAdapter : public TabDragSessionInputAdapter {
   bool capture_started_ = false;
   bool capture_released_ = false;
   EventCallback callback_;
+};
+
+class ToyTabDragSessionInjector : public TabDragSessionInjector {
+ public:
+  ToyTabDragSessionInjector(TabDragSessionInputAdapter& adapter,
+                            TabDragSessionInputListener& listener,
+                            DropTargetRegistry& registry)
+      : adapter_(adapter), listener_(listener), registry_(registry) {}
+  ~ToyTabDragSessionInjector() override = default;
+
+  TabDragSessionInputAdapter& GetInputAdapter() override { return *adapter_; }
+  TabDragSessionInputListener& GetInputListener() override {
+    return *listener_;
+  }
+  DropTargetRegistry& GetDropTargetRegistry() override { return *registry_; }
+
+ private:
+  const raw_ref<TabDragSessionInputAdapter> adapter_;
+  const raw_ref<TabDragSessionInputListener> listener_;
+  const raw_ref<DropTargetRegistry> registry_;
 };
 
 }  // namespace tabs_api

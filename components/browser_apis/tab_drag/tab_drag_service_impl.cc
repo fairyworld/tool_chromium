@@ -7,7 +7,7 @@
 #include "base/check.h"
 #include "base/types/expected.h"
 #include "components/browser_apis/tab_drag/adapters/tab_drag_window_adapter.h"
-#include "components/browser_apis/tab_drag/sessions/tab_drag_event_router.h"
+#include "components/browser_apis/tab_drag/sessions/tab_drag_session_injector.h"
 #include "components/browser_apis/tab_drag/sessions/tab_drag_session_manager.h"
 #include "mojo/public/mojom/base/error.mojom.h"
 
@@ -24,7 +24,7 @@ TabDragServiceImpl::TabDragServiceImpl(
 
 TabDragServiceImpl::~TabDragServiceImpl() {
   if (session_manager_ && window_adapter_) {
-    session_manager_->event_router()->UnregisterDropTarget(
+    session_manager_->GetDropTargetRegistry().UnregisterDropTarget(
         window_adapter_.get());
   }
 }
@@ -45,7 +45,7 @@ TabDragServiceImpl::RegisterDropTarget(
     mojo::PendingAssociatedRemote<mojom::DropTarget> target,
     mojo::PendingAssociatedReceiver<mojom::DropTargetRegistration>
         registration) {
-  session_manager_->event_router()->RegisterDropTarget(
+  session_manager_->GetDropTargetRegistry().RegisterDropTarget(
       window_adapter_.get(), std::move(target), std::move(registration));
   return std::monostate();
 }

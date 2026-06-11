@@ -17,6 +17,7 @@ source_set("testing") {
   public_deps = [
     "//components/browser_apis/tab_drag:mojom",
     "//components/browser_apis/tab_drag/adapters",
+    "//components/browser_apis/tab_drag/sessions",
     "//components/browser_apis/tab_strip/types",
   ]
 

@@ -11,6 +11,7 @@
 #include "base/memory/raw_ptr.h"
 #include "base/test/mock_callback.h"
 #include "components/browser_apis/tab_drag/adapters/tab_drag_session_input_adapter.h"
+#include "components/browser_apis/tab_drag/sessions/tab_drag_session_injector.h"
 #include "components/browser_apis/tab_drag/sessions/tab_drag_session_input_listener.h"
 #include "components/browser_apis/tab_drag/testing/toy_tab_drag_session_input_adapter.h"
 #include "components/browser_apis/tab_strip/types/node_id.h"
@@ -26,6 +27,23 @@ class TabDragSessionTest : public ::testing::Test {
  protected:
   TabDragSessionTest() = default;
   ~TabDragSessionTest() override = default;
+};
+
+class DummyTabDragSessionInputListener : public TabDragSessionInputListener {
+ public:
+  void OnSessionStarted(TabDragSession* session) override {}
+  void OnSessionEnded() override {}
+  void OnDragSessionEvent(const TabDragSessionInputEvent& event) override {}
+};
+
+class DummyDropTargetRegistry : public DropTargetRegistry {
+ public:
+  void RegisterDropTarget(
+      TabDragWindowAdapter* window_adapter,
+      mojo::PendingAssociatedRemote<mojom::DropTarget> target,
+      mojo::PendingAssociatedReceiver<mojom::DropTargetRegistration>
+          registration) override {}
+  void UnregisterDropTarget(TabDragWindowAdapter* window_adapter) override {}
 };
 
 class ToyTabDragSessionInputListener : public TabDragSessionInputListener {
@@ -62,15 +80,21 @@ class ToyTabDragSessionInputListener : public TabDragSessionInputListener {
 
 TEST_F(TabDragSessionTest, StartAndReleaseCapture) {
   ToyTabDragSessionInputAdapter toy_adapter;
+  DummyTabDragSessionInputListener dummy_listener;
+  DummyDropTargetRegistry dummy_registry;
+  ToyTabDragSessionInjector injector(toy_adapter, dummy_listener,
+                                     dummy_registry);
   base::MockOnceClosure end_callback;
 
   EXPECT_FALSE(toy_adapter.capture_started());
   EXPECT_FALSE(toy_adapter.capture_released());
 
   {
-    TabDragSession session({NodeId(NodeId::Type::kContent, "tab1")},
-                           gfx::Point(), toy_adapter, nullptr,
-                           end_callback.Get());
+    TabDragSessionParams params{
+        .source_tab_ids = {NodeId(NodeId::Type::kContent, "tab1")},
+        .start_point = gfx::Point(),
+        .end_callback = end_callback.Get()};
+    TabDragSession session(std::move(params), &injector);
     EXPECT_FALSE(toy_adapter.capture_started());
     EXPECT_TRUE(session.Start().has_value());
     EXPECT_TRUE(toy_adapter.capture_started());
@@ -80,14 +104,19 @@ TEST_F(TabDragSessionTest, StartAndReleaseCapture) {
   EXPECT_TRUE(toy_adapter.capture_released());
 }
 
-
-
 TEST_F(TabDragSessionTest, InputEventCancelled) {
   ToyTabDragSessionInputAdapter toy_adapter;
+  DummyTabDragSessionInputListener dummy_listener;
+  DummyDropTargetRegistry dummy_registry;
+  ToyTabDragSessionInjector injector(toy_adapter, dummy_listener,
+                                     dummy_registry);
   base::MockOnceClosure end_callback;
 
-  TabDragSession session({NodeId(NodeId::Type::kContent, "tab1")}, gfx::Point(),
-                         toy_adapter, nullptr, end_callback.Get());
+  TabDragSessionParams params{
+      .source_tab_ids = {NodeId(NodeId::Type::kContent, "tab1")},
+      .start_point = gfx::Point(),
+      .end_callback = end_callback.Get()};
+  TabDragSession session(std::move(params), &injector);
   EXPECT_TRUE(session.Start().has_value());
 
   EXPECT_CALL(end_callback, Run()).Times(1);
@@ -96,10 +125,17 @@ TEST_F(TabDragSessionTest, InputEventCancelled) {
 
 TEST_F(TabDragSessionTest, InputEventDropped) {
   ToyTabDragSessionInputAdapter toy_adapter;
+  DummyTabDragSessionInputListener dummy_listener;
+  DummyDropTargetRegistry dummy_registry;
+  ToyTabDragSessionInjector injector(toy_adapter, dummy_listener,
+                                     dummy_registry);
   base::MockOnceClosure end_callback;
 
-  TabDragSession session({NodeId(NodeId::Type::kContent, "tab1")}, gfx::Point(),
-                         toy_adapter, nullptr, end_callback.Get());
+  TabDragSessionParams params{
+      .source_tab_ids = {NodeId(NodeId::Type::kContent, "tab1")},
+      .start_point = gfx::Point(),
+      .end_callback = end_callback.Get()};
+  TabDragSession session(std::move(params), &injector);
   EXPECT_TRUE(session.Start().has_value());
 
   EXPECT_CALL(end_callback, Run()).Times(1);
@@ -108,11 +144,18 @@ TEST_F(TabDragSessionTest, InputEventDropped) {
 
 TEST_F(TabDragSessionTest, CoordinateTracking) {
   ToyTabDragSessionInputAdapter toy_adapter;
+  DummyTabDragSessionInputListener dummy_listener;
+  DummyDropTargetRegistry dummy_registry;
+  ToyTabDragSessionInjector injector(toy_adapter, dummy_listener,
+                                     dummy_registry);
   base::MockOnceClosure end_callback;
 
   gfx::Point start_point(10, 10);
-  TabDragSession session({NodeId(NodeId::Type::kContent, "tab1")}, start_point,
-                         toy_adapter, nullptr, end_callback.Get());
+  TabDragSessionParams params{
+      .source_tab_ids = {NodeId(NodeId::Type::kContent, "tab1")},
+      .start_point = start_point,
+      .end_callback = end_callback.Get()};
+  TabDragSession session(std::move(params), &injector);
   EXPECT_TRUE(session.Start().has_value());
 
   EXPECT_EQ(session.start_point_in_screen(), start_point);
@@ -139,9 +182,14 @@ TEST_F(TabDragSessionTest, ListenerNotification) {
   ToyTabDragSessionInputAdapter toy_adapter;
   base::MockOnceClosure end_callback;
   ToyTabDragSessionInputListener listener;
+  DummyDropTargetRegistry dummy_registry;
+  ToyTabDragSessionInjector injector(toy_adapter, listener, dummy_registry);
 
-  TabDragSession session({NodeId(NodeId::Type::kContent, "tab1")}, gfx::Point(),
-                         toy_adapter, &listener, end_callback.Get());
+  TabDragSessionParams params{
+      .source_tab_ids = {NodeId(NodeId::Type::kContent, "tab1")},
+      .start_point = gfx::Point(),
+      .end_callback = end_callback.Get()};
+  TabDragSession session(std::move(params), &injector);
 
   EXPECT_FALSE(listener.session_started());
   EXPECT_TRUE(session.Start().has_value());

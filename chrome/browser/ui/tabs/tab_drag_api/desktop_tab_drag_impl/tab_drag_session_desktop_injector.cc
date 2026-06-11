@@ -6,17 +6,26 @@
 
 #include "chrome/browser/ui/tabs/tab_drag_api/desktop_tab_drag_impl/tab_drag_session_input_adapter_impl.h"
 #include "components/browser_apis/tab_drag/adapters/tab_drag_session_input_adapter.h"
+#include "components/browser_apis/tab_drag/sessions/tab_drag_event_router.h"
 
 namespace tabs_api {
 
 TabDragSessionDesktopInjector::TabDragSessionDesktopInjector()
-    : adapter_(std::make_unique<TabDragSessionInputAdapterImpl>()) {}
+    : adapter_(std::make_unique<TabDragSessionInputAdapterImpl>()),
+      event_router_(std::make_unique<TabDragEventRouter>()) {}
 
 TabDragSessionDesktopInjector::~TabDragSessionDesktopInjector() = default;
 
-TabDragSessionInputAdapter&
-TabDragSessionDesktopInjector::tab_drag_session_input_adapter() {
+TabDragSessionInputAdapter& TabDragSessionDesktopInjector::GetInputAdapter() {
   return *adapter_;
+}
+
+TabDragSessionInputListener& TabDragSessionDesktopInjector::GetInputListener() {
+  return *event_router_;
+}
+
+DropTargetRegistry& TabDragSessionDesktopInjector::GetDropTargetRegistry() {
+  return *event_router_;
 }
 
 }  // namespace tabs_api
