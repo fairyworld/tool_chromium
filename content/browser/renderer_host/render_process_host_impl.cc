@@ -3852,7 +3852,6 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
       switches::kDisableVideoCaptureUseGpuMemoryBuffer,
       switches::kDomAutomationController,
       switches::kEnableAutomation,
-      switches::kEnableExperimentalAccessibilityLanguageDetection,
       switches::kEnableExperimentalAccessibilityLabelsDebugging,
       switches::kEnableExperimentalWebPlatformFeatures,
       switches::kEnableBlinkTestFeatures,

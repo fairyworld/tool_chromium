@@ -4601,8 +4601,6 @@ class DumpAccessibilityTreeWithLanguageDetectionTest
     DumpAccessibilityTreeTest::SetUpCommandLine(command_line);
 
     command_line->AppendSwitch(
-        ::switches::kEnableExperimentalAccessibilityLanguageDetection);
-    command_line->AppendSwitch(
         ::switches::kEnableExperimentalAccessibilityLanguageDetectionDynamic);
   }
 
@@ -4642,10 +4640,6 @@ IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeWithLanguageDetectionTest,
   RunLanguageDetectionTest(FILE_PATH_LITERAL("lang-attribute-switching.html"));
 }
 
-IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeWithLanguageDetectionTest,
-                       LangDetectionStaticBasic) {
-  RunLanguageDetectionTest(FILE_PATH_LITERAL("static-basic.html"));
-}
 
 IN_PROC_BROWSER_TEST_P(DumpAccessibilityTreeWithLanguageDetectionTest,
                        LangDetectionDynamicBasic) {

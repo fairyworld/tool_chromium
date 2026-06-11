@@ -2105,13 +2105,6 @@ inline constexpr char kDeprecateAltClickName[] =
 inline constexpr char kDeprecateAltClickDescription[] =
     "Start providing notifications about Alt+Click deprecation and enable "
     "Search+Click as an alternative.";
-
-inline constexpr char kExperimentalAccessibilityLanguageDetectionName[] =
-    "Experimental accessibility language detection";
-inline constexpr char kExperimentalAccessibilityLanguageDetectionDescription[] =
-    "Enable language detection for in-page content which is then exposed to "
-    "assistive technologies such as screen readers.";
-
 inline constexpr char kExperimentalAccessibilityLanguageDetectionDynamicName[] =
     "Experimental accessibility language detection for dynamic content";
 inline constexpr char

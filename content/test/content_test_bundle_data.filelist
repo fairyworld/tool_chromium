@@ -6199,10 +6199,6 @@ data/accessibility/language-detection/lang-attribute-switching-expected-mac.txt
 data/accessibility/language-detection/lang-attribute-switching-expected-win.txt
 data/accessibility/language-detection/lang-attribute-switching.html
 data/accessibility/language-detection/lang-attribute.html
-data/accessibility/language-detection/static-basic-expected-blink.txt
-data/accessibility/language-detection/static-basic-expected-mac.txt
-data/accessibility/language-detection/static-basic-expected-win.txt
-data/accessibility/language-detection/static-basic.html
 data/accessibility/lines/lines-inline-nested.html
 data/accessibility/lines/lines.html
 data/accessibility/mac/action/ax-press-button-expected.txt

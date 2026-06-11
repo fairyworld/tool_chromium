@@ -3374,11 +3374,6 @@
     "expiry_milestone": 140
   },
   {
-    "name": "enable-experimental-accessibility-language-detection",
-    "owners": [ "chrishall@chromium.org", "//ui/accessibility/OWNERS" ],
-    "expiry_milestone": 130
-  },
-  {
     "name": "enable-experimental-accessibility-language-detection-dynamic",
     "owners": [ "chrishall@chromium.org", "//ui/accessibility/OWNERS" ],
     "expiry_milestone": 130

@@ -5934,12 +5934,6 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kSmartZoomDescription, kOsAndroid,
      FEATURE_VALUE_TYPE(features::kSmartZoom)},
 #endif  // BUILDFLAG(IS_ANDROID)
-    {"enable-experimental-accessibility-language-detection",
-     flag_descriptions::kExperimentalAccessibilityLanguageDetectionName,
-     flag_descriptions::kExperimentalAccessibilityLanguageDetectionDescription,
-     kOsAll,
-     SINGLE_VALUE_TYPE(
-         ::switches::kEnableExperimentalAccessibilityLanguageDetection)},
     {"enable-experimental-accessibility-language-detection-dynamic",
      flag_descriptions::kExperimentalAccessibilityLanguageDetectionDynamicName,
      flag_descriptions::
