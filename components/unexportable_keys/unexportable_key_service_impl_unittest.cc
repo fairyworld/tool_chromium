@@ -59,6 +59,8 @@ constexpr BackgroundTaskPriority kTaskPriority =
 constexpr BackgroundTaskOrigin kTaskOrigin =
     BackgroundTaskOrigin::kDeviceBoundSessionCredentials;
 
+constexpr base::TimeDelta kSpareKeyPoolDelay = base::Minutes(2);
+
 }  // namespace
 
 class UnexportableKeyServiceImplTest : public testing::Test {
@@ -67,6 +69,9 @@ class UnexportableKeyServiceImplTest : public testing::Test {
   UnexportableKeyTaskManager& task_manager() { return *task_manager_; }
 
   void RunBackgroundTasks() { task_environment_.RunUntilIdle(); }
+  void FastForwardBy(base::TimeDelta delta) {
+    task_environment_.FastForwardBy(delta);
+  }
 
   void ResetService(crypto::UnexportableKeyProvider::Config config = {}) {
     task_manager_.emplace();
@@ -103,6 +108,21 @@ class UnexportableKeyServiceImplTest : public testing::Test {
     auto key = generate_key_future.Get();
     CHECK(key.has_value());
     return *key;
+  }
+
+  // Triggers a signing key generation request and returns the underlying
+  // `base::test::TestFuture`. This helper significantly reduces boilerplate
+  // across tests. Callers can inspect `IsReady()` to verify synchronous cache
+  // hits from the spare key pool, or invoke `Get()` to await asynchronous
+  // hardware generation.
+  base::test::TestFuture<ServiceErrorOr<UnexportableSigningKeyId>>
+  RequestSigningKeyFuture(
+      base::span<const crypto::SignatureVerifier::SignatureAlgorithm>
+          algorithms = kAcceptableAlgorithms) {
+    base::test::TestFuture<ServiceErrorOr<UnexportableSigningKeyId>> future;
+    service().GenerateSigningKeySlowlyAsync(algorithms, kTaskPriority,
+                                            future.GetCallback());
+    return future;
   }
 
  private:
@@ -1490,20 +1510,184 @@ TEST_F(UnexportableKeyServiceImplTest, GetCreationTimeWithStatefulKey) {
   EXPECT_EQ(service().GetCreationTime(key_id), base::Time::Now());
 }
 
-TEST_F(UnexportableKeyServiceImplTest, SpareKeyPoolEmptyOnInitialization) {
+TEST_F(UnexportableKeyServiceImplTest, SpareSigningKeyPoolCapacityLimits) {
   base::test::ScopedFeatureList feature_list(
       kEnableUnexportableKeysSpareKeyPool);
 
-  crypto::ScopedMockUnexportableKeyProvider& scoped_provider =
-      SwitchToMockKeyProvider();
+  ResetService();
 
-  EXPECT_CALL(scoped_provider.mock(), GenerateSigningKeySlowly)
-      .Times(1);
-
-  base::test::TestFuture<ServiceErrorOr<UnexportableSigningKeyId>> future;
-  service().GenerateSigningKeySlowlyAsync(kAcceptableAlgorithms, kTaskPriority,
-                                          future.GetCallback());
+  // The spare signing key pool has a strict capacity limit of 2 keys.
+  // Fast forward by kSpareKeyPoolDelay to let the pool replenish.
+  FastForwardBy(kSpareKeyPoolDelay);
   RunBackgroundTasks();
+
+  // Request the first key. Since the pool was replenished to capacity 2,
+  // this should be an instant cache hit and resolve synchronously.
+  auto f1 = RequestSigningKeyFuture();
+  EXPECT_OK(f1.Get());
+
+  // Request the second key. This should also be an instant cache hit.
+  auto f2 = RequestSigningKeyFuture();
+  EXPECT_OK(f2.Get());
+
+  // Request the third key. Because the pool capacity was strictly 2,
+  // the cache is now completely empty and it will fall back to a background
+  // task.
+  auto f3 = RequestSigningKeyFuture();
+  EXPECT_FALSE(f3.IsReady());
+  RunBackgroundTasks();
+  EXPECT_OK(f3.Get());
+}
+
+TEST_F(UnexportableKeyServiceImplTest, SpareSigningKeyPoolMiss) {
+  base::test::ScopedFeatureList feature_list(
+      kEnableUnexportableKeysSpareKeyPool);
+
+  ResetService();
+
+  auto future = RequestSigningKeyFuture();
+
+  // Because the cache is empty, the generation falls back to the ThreadPool.
+  // Since the ThreadPool is paused in our test environment, the future must
+  // strictly remain pending. This mathematically proves the cache miss.
+  EXPECT_FALSE(future.IsReady());
+
+  RunBackgroundTasks();
+
+  EXPECT_OK(future.Get());
+}
+
+TEST_F(UnexportableKeyServiceImplTest, SpareSigningKeyPoolHit) {
+  base::test::ScopedFeatureList feature_list(
+      kEnableUnexportableKeysSpareKeyPool);
+
+  ResetService();
+
+  // Fast forward by kSpareKeyPoolDelay to trigger the initial pool
+  // replenishment and populate the cache.
+  FastForwardBy(kSpareKeyPoolDelay);
+  RunBackgroundTasks();
+
+  // Request first key. It should hit the cache and succeed synchronously.
+  auto f1 = RequestSigningKeyFuture();
+  EXPECT_OK(f1.Get());
+
+  // Request second key. It should also hit the cache since capacity is 2.
+  auto f2 = RequestSigningKeyFuture();
+  EXPECT_OK(f2.Get());
+
+  // Request third key. Cache is exhausted (size 2). Should fallback to slow
+  // path.
+  auto f3 = RequestSigningKeyFuture();
+
+  // Run background tasks. This will allow the third key generation to complete
+  // and will also allow the background replenishment tasks to run.
+  RunBackgroundTasks();
+
+  EXPECT_OK(f3.Get());
+
+  // Request fourth key. It should hit the replenished cache synchronously.
+  auto f4 = RequestSigningKeyFuture();
+  EXPECT_OK(f4.Get());
+
+  // Run pending background replenishment tasks to avoid a dangling pointer
+  // crash during TaskEnvironment teardown.
+  RunBackgroundTasks();
+}
+
+TEST_F(UnexportableKeyServiceImplTest,
+       SpareSigningKeyPoolReplenishmentFailsAndRecovers) {
+  base::test::ScopedFeatureList feature_list(
+      kEnableUnexportableKeysSpareKeyPool);
+
+  ResetService();
+
+  // We must use a Mock provider here because the standard Fake provider always
+  // succeeds and cannot simulate asynchronous hardware generation failures,
+  // which is mathematically required to test the failure recovery path.
+  // Break the provider so that background replenishment fails.
+  crypto::MockUnexportableKeyProvider& mock_provider =
+      SwitchToMockKeyProvider().mock();
+  EXPECT_CALL(mock_provider, GenerateSigningKeySlowly)
+      .Times(2)  // 2 for initial pool replenishment attempt
+      .WillRepeatedly(
+          [](base::span<const crypto::SignatureVerifier::SignatureAlgorithm>)
+              -> std::unique_ptr<crypto::UnexportableSigningKey> {
+            return nullptr;
+          });
+
+  // Fast forward by 2 minutes to trigger the initial pool replenishment.
+  // The generation tasks will fail.
+  FastForwardBy(kSpareKeyPoolDelay);
+  RunBackgroundTasks();
+
+  // Restore the provider to a working state.
+  EXPECT_CALL(mock_provider, GenerateSigningKeySlowly)
+      .WillRepeatedly(
+          [](base::span<const crypto::SignatureVerifier::SignatureAlgorithm>
+                 acceptable_algorithms) {
+            auto key = std::make_unique<
+                NiceMock<crypto::MockUnexportableSigningKey>>();
+            ON_CALL(*key, Algorithm)
+                .WillByDefault(Return(acceptable_algorithms[0]));
+            static std::atomic<uint8_t> id{0};
+            ON_CALL(*key, GetWrappedKey)
+                .WillByDefault(Return(std::vector<uint8_t>{id++}));
+            return key;
+          });
+
+  // Now request a key.
+  // Because the pool is empty, it misses the cache and falls back to slow path.
+  // The slow path will succeed AND trigger background replenishment tasks.
+  auto f1 = RequestSigningKeyFuture();
+
+  RunBackgroundTasks();
+
+  EXPECT_OK(f1.Get());
+
+  // Subsequent requests should now hit the newly replenished cache
+  // synchronously!
+  auto f2 = RequestSigningKeyFuture();
+  EXPECT_OK(f2.Get());
+
+  // Run pending background replenishment tasks to avoid a dangling pointer
+  // crash during TaskEnvironment teardown.
+  RunBackgroundTasks();
+}
+
+TEST_F(UnexportableKeyServiceImplTest, SpareSigningKeyPoolFallback) {
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndDisableFeature(kEnableUnexportableKeysSpareKeyPool);
+
+  ResetService();
+
+  auto future = RequestSigningKeyFuture();
+  EXPECT_FALSE(future.IsReady());
+
+  RunBackgroundTasks();
+
+  EXPECT_OK(future.Get());
+}
+
+TEST_F(UnexportableKeyServiceImplTest,
+       GenerateSigningKeySlowlyAsyncCallbackIsCancelledOnServiceDestruction) {
+  base::test::ScopedFeatureList feature_list(
+      kEnableUnexportableKeysSpareKeyPool);
+
+  ResetService();
+
+  // Requesting a key implicitly triggers background spare pool replenishment
+  // tasks.
+  auto future = RequestSigningKeyFuture();
+
+  // Destroying the service cancels the main request and destroys the owned
+  // `SpareKeyPoolRequest` objects in the in-flight replenishment pool. This
+  // verifies that the background tasks safely no-op (via the requests'
+  // WeakPtrs) without a use-after-free crash on service destruction.
+  DestroyService();
+  RunBackgroundTasks();
+
+  EXPECT_THAT(future.Get(), ErrorIs(ServiceError::kOperationCancelled));
 }
 
 }  // namespace unexportable_keys
