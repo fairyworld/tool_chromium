@@ -358,6 +358,13 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
   _authServiceObserverBridge.reset();
   _identityManager = nullptr;
   _identityManagerObserverBridge.reset();
+
+  self.navigationAgent = nullptr;
+  self.browserPolicyConnector = nullptr;
+  self.promosManager = nullptr;
+  self.readingListBrowserAgent = nullptr;
+  self.tabBasedIPHBrowserAgent = nullptr;
+  self.templateURLService = nullptr;
 }
 
 #pragma mark - Property getters/setters
@@ -2502,15 +2509,25 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
 - (void)reload {
   RecordAction(UserMetricsAction("MobileMenuReload"));
   self.tabBasedIPHBrowserAgent->NotifyMultiGestureRefreshEvent();
+  // Dismissing the menu disconnects the mediator, so save anything cleaned up
+  // there.
+  WebNavigationBrowserAgent* navigationAgent = self.navigationAgent;
   [self dismissMenu];
-  self.navigationAgent->Reload();
+  if (navigationAgent) {
+    navigationAgent->Reload();
+  }
 }
 
 // Dismisses the menu and stops the current page load.
 - (void)stopLoading {
   RecordAction(UserMetricsAction("MobileMenuStop"));
+  // Dismissing the menu disconnects the mediator, so save anything cleaned up
+  // there.
+  WebNavigationBrowserAgent* navigationAgent = self.navigationAgent;
   [self dismissMenu];
-  self.navigationAgent->StopLoading();
+  if (navigationAgent) {
+    navigationAgent->StopLoading();
+  }
 }
 
 // Dismisses the menu and opens a new tab.
@@ -2593,8 +2610,13 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
 // Dismisses the menu and requests the desktop version of the current page
 - (void)requestDesktopSite {
   RecordAction(UserMetricsAction("MobileMenuRequestDesktopSite"));
+  // Dismissing the menu disconnects the mediator, so save anything cleaned up
+  // there.
+  WebNavigationBrowserAgent* navigationAgent = self.navigationAgent;
   [self dismissMenu];
-  self.navigationAgent->RequestDesktopSite();
+  if (navigationAgent) {
+    navigationAgent->RequestDesktopSite();
+  }
   [self.helpHandler
       presentInProductHelpWithType:InProductHelpType::kDefaultSiteView];
 }
@@ -2613,8 +2635,13 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
 // Dismisses the menu and requests the mobile version of the current page
 - (void)requestMobileSite {
   RecordAction(UserMetricsAction("MobileMenuRequestMobileSite"));
+  // Dismissing the menu disconnects the mediator, so save anything cleaned up
+  // there.
+  WebNavigationBrowserAgent* navigationAgent = self.navigationAgent;
   [self dismissMenu];
-  self.navigationAgent->RequestMobileSite();
+  if (navigationAgent) {
+    navigationAgent->RequestMobileSite();
+  }
 }
 
 // Dismisses the menu and opens Find In Page

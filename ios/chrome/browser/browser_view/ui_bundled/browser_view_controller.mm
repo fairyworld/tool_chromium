@@ -878,6 +878,7 @@ bool IsFullscreenNextIAEnabled() {
   _layoutState = nil;
   [[NSNotificationCenter defaultCenter] removeObserver:self];
   _bookmarksCoordinator = nil;
+  self.popupMenuCoordinator = nil;
 
   // Clears the pointer to C++ objects.
   _urlLoadingBrowserAgent = nullptr;
