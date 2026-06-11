@@ -3882,7 +3882,7 @@ void RenderWidgetHostViewAndroid::EndRotationBatching() {
 }
 
 void RenderWidgetHostViewAndroid::BeginRotationEmbed() {
-  DCHECK(!rotation_metrics_.empty());
+  CHECK(!rotation_metrics_.empty(), base::NotFatalUntil::M152);
   rotation_metrics_.back().second =
       local_surface_id_allocator_.GetCurrentLocalSurfaceId();
 
