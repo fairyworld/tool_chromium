@@ -1081,12 +1081,12 @@ class UnmatchedServiceWorkerProcessTracker
   UnmatchedServiceWorkerProcessTracker() = default;
 
   ~UnmatchedServiceWorkerProcessTracker() override {
-    DCHECK(site_process_set_.empty());
+    CHECK(site_process_set_.empty(), base::NotFatalUntil::M152);
   }
 
   // Implementation of RenderProcessHostObserver.
   void RenderProcessHostDestroyed(RenderProcessHost* host) override {
-    DCHECK(HasProcess(host));
+    CHECK(HasProcess(host), base::NotFatalUntil::M152);
     ChildProcessId process_id = host->GetID();
     for (auto it = site_process_set_.begin(); it != site_process_set_.end();) {
       if (it->second == process_id) {
@@ -1212,7 +1212,7 @@ size_t GetPlatformProcessLimit() {
 
 RenderProcessHostImpl::BadMojoMessageCallbackForTesting&
 GetBadMojoMessageCallbackForTesting() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   static base::NoDestructor<
       RenderProcessHostImpl::BadMojoMessageCallbackForTesting>
       s_callback;
@@ -1229,7 +1229,7 @@ void InvokeBadMojoMessageCallbackForTesting(  // IN-TEST
     return;
   }
 
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   RenderProcessHostImpl::BadMojoMessageCallbackForTesting& callback =
       GetBadMojoMessageCallbackForTesting();
   if (!callback.is_null())
@@ -1251,7 +1251,7 @@ void LogDelayReasonForCleanup(
 #if BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
 RenderProcessHostImpl::VideoDecoderFactoryCreationCB&
 GetVideoDecoderFactoryCreationCB() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   static base::NoDestructor<
       RenderProcessHostImpl::VideoDecoderFactoryCreationCB>
       s_callback;
@@ -1259,14 +1259,14 @@ GetVideoDecoderFactoryCreationCB() {
 }
 
 RenderProcessHostImpl::VideoDecoderEventCB& GetVideoDecoderEventCB() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   static base::NoDestructor<RenderProcessHostImpl::VideoDecoderEventCB>
       s_callback;
   return *s_callback;
 }
 
 void InvokeVideoDecoderEventCB(RenderProcessHostImpl::VideoDecoderEvent event) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   RenderProcessHostImpl::VideoDecoderEventCB& callback =
       GetVideoDecoderEventCB();
   if (!callback.is_null()) {
@@ -1553,7 +1553,8 @@ size_t RenderProcessHost::GetMaxRendererProcessCount() {
     static constexpr size_t kMinRendererProcessCount = 3;
     static const size_t kMaxRendererProcessCount =
         RenderProcessHostImpl::GetPlatformMaxRendererProcessCount();
-    DCHECK_LE(kMinRendererProcessCount, kMaxRendererProcessCount);
+    CHECK_LE(kMinRendererProcessCount, kMaxRendererProcessCount,
+             base::NotFatalUntil::M152);
 
     max_count = std::clamp(max_count, kMinRendererProcessCount,
                            kMaxRendererProcessCount);
@@ -1750,7 +1751,7 @@ RenderProcessHostImpl::RenderProcessHostImpl(
 
 // static
 void RenderProcessHostImpl::ShutDownInProcessRenderer() {
-  DCHECK(g_run_renderer_in_process);
+  CHECK(g_run_renderer_in_process, base::NotFatalUntil::M152);
 
   switch (RenderProcessHostImpl::GetCount()) {
     case 0:
@@ -1793,7 +1794,7 @@ bool RenderProcessHostImpl::HasDomStorageBinderForTesting() {
 // static
 void RenderProcessHostImpl::SetBadMojoMessageCallbackForTesting(
     BadMojoMessageCallbackForTesting callback) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
 
   // No support for setting the global callback twice.
   DCHECK_NE(callback.is_null(),
