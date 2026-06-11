@@ -49,6 +49,7 @@ import org.chromium.components.browser_ui.widget.displaystyle.UiConfig;
 import org.chromium.ui.insets.InsetObserver;
 import org.chromium.ui.modelutil.PropertyModel;
 import org.chromium.ui.modelutil.PropertyModelChangeProcessor;
+import org.chromium.ui.util.CommonOnLayoutChangeListeners;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -120,20 +121,13 @@ public class UploadImagePreviewCoordinator implements InsetObserver.WindowInsets
         mShouldShowLogoAndSearchBox =
                 ChromeFeatureList.sNewTabPageCustomizationV2ShowLogoAndSearchBox.getValue();
         mLayoutChangeListener =
-                (view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
-                    // Checks if the bounding box has actually changed to avoid redundant calls.
-                    if (left == oldLeft
-                            && top == oldTop
-                            && right == oldRight
-                            && bottom == oldBottom) {
-                        return;
-                    }
-
-                    mUiConfig.updateDisplayStyle();
-                    if (mShouldShowLogoAndSearchBox) {
-                        updateSearchBoxWidthPreview();
-                    }
-                };
+                CommonOnLayoutChangeListeners.createBoundsChangedListener(
+                        () -> {
+                            mUiConfig.updateDisplayStyle();
+                            if (mShouldShowLogoAndSearchBox) {
+                                updateSearchBoxWidthPreview();
+                            }
+                        });
         mPreviewLayout.addOnLayoutChangeListener(mLayoutChangeListener);
 
         mDialog =
