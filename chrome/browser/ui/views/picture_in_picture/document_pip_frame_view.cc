@@ -13,6 +13,8 @@
 #include "chrome/browser/picture_in_picture/picture_in_picture_occlusion_tracker.h"
 #include "chrome/browser/picture_in_picture/picture_in_picture_window_manager.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
+#include "chrome/browser/ui/content_settings/content_setting_image_model.h"
+#include "chrome/browser/ui/views/location_bar/content_setting_image_view.h"
 #include "chrome/browser/ui/views/page_info/page_info_bubble_specification.h"
 #include "chrome/browser/ui/views/page_info/page_info_bubble_view.h"
 #include "chrome/browser/ui/views/picture_in_picture/document_pip_host.h"
@@ -36,6 +38,7 @@
 #include "ui/gfx/geometry/rect_f.h"
 #include "ui/views/accessibility/view_accessibility.h"
 #include "ui/views/background.h"
+#include "ui/views/border.h"
 #include "ui/views/controls/button/button.h"
 #include "ui/views/controls/button/image_button.h"
 #include "ui/views/controls/image_view.h"
@@ -43,6 +46,8 @@
 #include "ui/views/event_monitor.h"
 #include "ui/views/layout/flex_layout.h"
 #include "ui/views/layout/flex_layout_view.h"
+#include "ui/views/style/typography.h"
+#include "ui/views/style/typography_provider.h"
 #include "ui/views/view_class_properties.h"
 #include "ui/views/widget/widget.h"
 #include "ui/views/widget/widget_delegate.h"
@@ -61,6 +66,14 @@ constexpr int kResizeAreaCornerSize = 16;
 // Match PictureInPictureBrowserFrameView's 16px top-bar icon sizes so the
 // security/page-info icon aligns with the PiP window controls.
 constexpr int kSecurityIconImageSize = 16;
+
+// Size of the camera/microphone content-setting icons, matching
+// PictureInPictureBrowserFrameView.
+constexpr int kContentSettingIconSize = 16;
+
+// Vertical margin around the content-setting icons, matching
+// PictureInPictureBrowserFrameView.
+constexpr int kIconViewVerticalMargin = 5;
 
 // Creates an ImageButton styled for the PiP title bar.
 std::unique_ptr<views::ImageButton> CreatePipTitleBarButton(
@@ -213,6 +226,27 @@ DocumentPipFrameView::DocumentPipFrameView(DocumentPipHost* host)
   button_container_view_ = top_bar_container_view_->AddChildView(
       std::make_unique<views::FlexLayoutView>());
 
+  // Create the camera/microphone content-setting icons. These sit to the left
+  // of the window-control buttons and surface the active media-capture state of
+  // the opener WebContents. Mirrors PictureInPictureBrowserFrameView, but with
+  // a null Browser (standalone PiP has no feature-promo surface).
+  constexpr ContentSettingImageModel::ImageType kContentSettingImageOrder[] = {
+      ContentSettingImageModel::ImageType::kMediaStream};
+  const gfx::FontList& font_list = views::TypographyProvider::Get().GetFont(
+      views::style::CONTEXT_LABEL, views::style::STYLE_PRIMARY);
+  for (auto type : kContentSettingImageOrder) {
+    auto model = ContentSettingImageModel::CreateForContentType(type);
+    model->SetIconSize(kContentSettingIconSize);
+    auto image_view = std::make_unique<ContentSettingImageView>(
+        std::move(model), /*parent_delegate=*/this, /*delegate=*/this,
+        /*browser=*/nullptr, font_list);
+    image_view->SetProperty(views::kMarginsKey,
+                            gfx::Insets::VH(kIconViewVerticalMargin, 0));
+    image_view->SetBorder(views::CreateEmptyBorder(gfx::Insets(4)));
+    content_setting_views_.push_back(
+        button_container_view_->AddChildView(std::move(image_view)));
+  }
+
   // Create the back-to-tab button if allowed.
 
   if (!disallow_return_to_opener) {
@@ -270,6 +304,7 @@ DocumentPipFrameView::DocumentPipFrameView(DocumentPipHost* host)
   widget_observation_.Observe(widget);
 
   UpdateOriginAndSecurity();
+  UpdateContentSettingsIcons();
 }
 
 DocumentPipFrameView::~DocumentPipFrameView() {
@@ -311,6 +346,15 @@ int DocumentPipFrameView::NonClientHitTest(const gfx::Point& point) {
   }
   if (ConvertControlBoundsToFrame(close_image_button_).Contains(point)) {
     return HTCLIENT;
+  }
+
+  // Allow interacting with the visible content-setting icons (they open a
+  // content-setting bubble when clicked).
+  for (ContentSettingImageView* view : content_setting_views_) {
+    if (view->GetVisible() &&
+        ConvertControlBoundsToFrame(view).Contains(point)) {
+      return HTCLIENT;
+    }
   }
 
   // Allow dragging and resizing the window.
@@ -475,6 +519,12 @@ void DocumentPipFrameView::UpdateTopBarView(bool render_active) {
   }
   render_active_ = render_active;
 
+  // TODO(crbug.com/515252142): Port the top-bar animations from
+  // PictureInPictureBrowserFrameView::UpdateTopBarView (top-bar color fade,
+  // camera-slide, and show/hide of the window-control buttons) for visual
+  // parity. This currently applies the active/inactive color instantly instead
+  // of animating. The animations are Browser-free, so porting them does not
+  // reintroduce the //chrome/browser/ui monolith.
   const auto* color_provider = GetColorProvider();
   const SkColor foreground = color_provider->GetColor(
       render_active_ ? kColorPipWindowForeground
@@ -517,6 +567,56 @@ bool DocumentPipFrameView::ShowPageInfo() {
     tracker->OnPictureInPictureWidgetOpened(bubble->GetWidget());
   }
   return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// IconLabelBubbleView::Delegate implementations:
+
+SkColor DocumentPipFrameView::GetIconLabelBubbleSurroundingForegroundColor()
+    const {
+  return GetColorProvider()->GetColor(kColorPipWindowForeground);
+}
+
+SkColor DocumentPipFrameView::GetIconLabelBubbleBackgroundColor() const {
+  return GetColorProvider()->GetColor(kColorPipWindowTopBarBackground);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// ContentSettingImageViewDelegate implementations:
+
+bool DocumentPipFrameView::ShouldHideContentSettingImage() {
+  return false;
+}
+
+content::WebContents* DocumentPipFrameView::GetContentSettingWebContents() {
+  // Mirror PictureInPictureBrowserFrameView: surface the content-setting state
+  // of the opener WebContents, which holds the committed URL and page state.
+  return host_->GetOpenerWebContents();
+}
+
+ContentSettingBubbleModelDelegate*
+DocumentPipFrameView::GetContentSettingBubbleModelDelegate() {
+  // TODO(crbug.com/515252142): Return a monolith-free bubble-model delegate
+  // that routes the content-setting bubble's "Manage"/open-settings actions
+  // through the opener WebContents (see issues/011 and Task 4e). Today this
+  // returns null to avoid reintroducing the //chrome/browser/ui monolith
+  // dependency (BrowserContentSettingBubbleModelDelegate). The only surfaced
+  // content setting (kMediaStream) null-checks the delegate, so the bubble
+  // still opens but its "Manage media settings" action is inert — a parity
+  // gap vs. PictureInPictureBrowserFrameView that must be closed.
+  return nullptr;
+}
+
+void DocumentPipFrameView::UpdateContentSettingsIcons() {
+  // TODO(crbug.com/515252142): For parity with
+  // PictureInPictureBrowserFrameView::UpdateContentSettingsIcons, re-apply a
+  // visibility-dependent margin on `button_container_view_` so the spacing
+  // between the content-setting icons and the window controls stays consistent
+  // when the camera/mic icon appears or disappears (coupled to the camera-slide
+  // animation).
+  for (ContentSettingImageView* view : content_setting_views_) {
+    view->Update();
+  }
 }
 
 BEGIN_METADATA(DocumentPipFrameView)

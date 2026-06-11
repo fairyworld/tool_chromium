@@ -225,7 +225,34 @@ TEST_F(DocumentPipHostTest, OpenPipWindow_PopulatesSecurityStateWithoutCrash) {
   EXPECT_TRUE(widget->non_client_view()->frame_view());
 }
 
-// After CreateAndShowPipWindow(), the child WebContents is hosted in the
+// FromChildWebContents resolves the host from the child (PiP) WebContents.
+TEST_F(DocumentPipHostTest, FromChildWebContents_ResolvesHost) {
+  DocumentPipHost* host = CreateHostAndOpenPipWindow();
+  ASSERT_TRUE(host);
+
+  content::WebContents* child = host->GetChildWebContents();
+  ASSERT_TRUE(child);
+  EXPECT_EQ(host, DocumentPipHost::FromChildWebContents(child));
+}
+
+// FromChildWebContents returns null for the opener and for null input.
+TEST_F(DocumentPipHostTest, FromChildWebContents_ReturnsNullForNonChild) {
+  DocumentPipHost* host = CreateHostAndOpenPipWindow();
+  ASSERT_TRUE(host);
+
+  EXPECT_EQ(nullptr, DocumentPipHost::FromChildWebContents(opener()));
+  EXPECT_EQ(nullptr, DocumentPipHost::FromChildWebContents(nullptr));
+}
+
+// UpdateContentSettingsIcons forwards to the frame view without crashing.
+TEST_F(DocumentPipHostTest, UpdateContentSettingsIcons_DoesNotCrash) {
+  DocumentPipHost* host = CreateHostAndOpenPipWindow();
+  ASSERT_TRUE(host);
+
+  host->UpdateContentSettingsIcons();
+}
+
+// After CreatePipWidget(), the child WebContents is hosted in the
 // DocumentPipContentsView (a views::WebView).
 TEST_F(DocumentPipHostTest, ChildWebContentsInWebView) {
   DocumentPipHost* host = CreateHostAndOpenPipWindow();

@@ -72,6 +72,17 @@ class DocumentPipHost : public content::WebContentsUserData<DocumentPipHost>,
   views::Widget* GetWidget();
   const blink::mojom::PictureInPictureWindowOptions& GetPipOptions() const;
 
+  // Looks up the DocumentPipHost that owns `child_web_contents` (the
+  // WebContents rendered inside a Document PiP window), or nullptr if it is not
+  // a Document PiP child. Used by the content-settings refresh path, which is
+  // handed the captured (child) WebContents.
+  static DocumentPipHost* FromChildWebContents(
+      content::WebContents* child_web_contents);
+
+  // Refreshes the camera/microphone content-setting icons in the PiP window's
+  // title bar. No-op if the PiP window is not currently open.
+  void UpdateContentSettingsIcons();
+
   // content::WebContentsObserver (observing the opener):
   // Bring WebContentsObserver::BeforeUnloadFired(bool) into scope so the
   // WebContentsDelegate::BeforeUnloadFired() override below does not hide it.
@@ -167,6 +178,15 @@ class DocumentPipHost : public content::WebContentsUserData<DocumentPipHost>,
   void BeforeUnloadFired(content::WebContents* tab,
                          bool proceed,
                          bool* proceed_to_fire_unload) override;
+
+  // content::WebContentsDelegate - Media:
+  void RequestMediaAccessPermission(
+      content::WebContents* web_contents,
+      const content::MediaStreamRequest& request,
+      content::MediaResponseCallback callback) override;
+  bool CheckMediaAccessPermission(content::RenderFrameHost* render_frame_host,
+                                  const url::Origin& security_origin,
+                                  blink::mojom::MediaStreamType type) override;
 
   // PictureInPictureWindow:
   void SetForcedTucking(bool tuck) override;

@@ -7,17 +7,86 @@
 #include <vector>
 
 #include "base/functional/bind.h"
+#include "base/memory/raw_ptr.h"
+#include "chrome/browser/media/webrtc/media_capture_devices_dispatcher.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/views/picture_in_picture/document_pip_contents_view.h"
+#include "chrome/browser/ui/views/picture_in_picture/document_pip_frame_view.h"
 #include "chrome/browser/ui/views/picture_in_picture/document_pip_widget_delegate.h"
 #include "chrome/browser/ui/views/picture_in_picture/picture_in_picture_tucker.h"
 #include "components/page_load_metrics/browser/metrics_web_contents_observer.h"
 #include "content/public/browser/keyboard_event_processing_result.h"
+#include "content/public/browser/media_stream_request.h"
+#include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/web_contents.h"
+#include "content/public/browser/web_contents_user_data.h"
+#include "extensions/buildflags/buildflags.h"
 #include "third_party/blink/public/mojom/manifest/display_mode.mojom.h"
+#include "third_party/blink/public/mojom/mediastream/media_stream.mojom.h"
 #include "third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom.h"
 #include "ui/base/mojom/window_show_state.mojom.h"
+#include "ui/views/view_utils.h"
 #include "ui/views/widget/widget.h"
+#include "ui/views/window/non_client_view.h"
+#include "url/origin.h"
+
+#if BUILDFLAG(ENABLE_EXTENSIONS)
+#include "extensions/browser/extension_registry.h"
+#include "extensions/common/constants.h"
+#include "extensions/common/extension.h"
+#endif
+
+namespace {
+
+// Resolves the extension (if any) that owns `security_origin`, mirroring
+// Browser::GetExtensionForOrigin so media-capture requests from extension
+// pages are attributed to the right extension.
+// TODO(crbug.com/515252142): Currently unused while the media-permission path
+// is stubbed out (see RequestMediaAccessPermission/CheckMediaAccessPermission);
+// the [[maybe_unused]] attribute can be dropped once Task 7 restores them.
+[[maybe_unused]] const extensions::Extension* GetExtensionForOrigin(
+    Profile* profile,
+    const GURL& security_origin) {
+#if BUILDFLAG(ENABLE_EXTENSIONS)
+  if (!security_origin.SchemeIs(extensions::kExtensionScheme)) {
+    return nullptr;
+  }
+
+  const extensions::Extension* extension =
+      extensions::ExtensionRegistry::Get(profile)->enabled_extensions().GetByID(
+          security_origin.GetHost());
+  DCHECK(extension);
+  return extension;
+#else
+  return nullptr;
+#endif
+}
+
+// Stores a back-pointer from a Document PiP child WebContents to its host, so
+// the content-settings refresh path can find the host given the captured child
+// WebContents. Attached to the child in CreatePipWidget.
+class DocumentPipHostBackPointer
+    : public content::WebContentsUserData<DocumentPipHostBackPointer> {
+ public:
+  DocumentPipHost* host() { return host_; }
+
+ private:
+  friend class content::WebContentsUserData<DocumentPipHostBackPointer>;
+
+  DocumentPipHostBackPointer(content::WebContents* child_web_contents,
+                             DocumentPipHost* host)
+      : content::WebContentsUserData<DocumentPipHostBackPointer>(
+            *child_web_contents),
+        host_(host) {}
+
+  const raw_ptr<DocumentPipHost> host_;
+
+  WEB_CONTENTS_USER_DATA_KEY_DECL();
+};
+
+WEB_CONTENTS_USER_DATA_KEY_IMPL(DocumentPipHostBackPointer);
+
+}  // namespace
 
 WEB_CONTENTS_USER_DATA_KEY_IMPL(DocumentPipHost);
 
@@ -42,6 +111,12 @@ void DocumentPipHost::CreateAndShowPipWindow(
   pip_options_ = std::move(pip_options);
 
   child_web_contents->SetDelegate(this);
+
+  // Store a back-pointer on the child so the content-settings refresh path can
+  // find this host given the captured (child) WebContents. Done before the
+  // child's ownership is transferred to the widget delegate below.
+  DocumentPipHostBackPointer::CreateForWebContents(child_web_contents.get(),
+                                                   this);
 
   widget_delegate_ = std::make_unique<DocumentPipWidgetDelegate>(
       this, std::move(child_web_contents));
@@ -107,6 +182,29 @@ views::Widget* DocumentPipHost::GetWidget() {
 const blink::mojom::PictureInPictureWindowOptions&
 DocumentPipHost::GetPipOptions() const {
   return pip_options_;
+}
+
+// static
+DocumentPipHost* DocumentPipHost::FromChildWebContents(
+    content::WebContents* child_web_contents) {
+  if (!child_web_contents) {
+    return nullptr;
+  }
+  auto* back_pointer =
+      DocumentPipHostBackPointer::FromWebContents(child_web_contents);
+  return back_pointer ? back_pointer->host() : nullptr;
+}
+
+void DocumentPipHost::UpdateContentSettingsIcons() {
+  if (!widget_) {
+    return;
+  }
+  views::NonClientView* const non_client_view = widget_->non_client_view();
+  if (!non_client_view) {
+    return;
+  }
+  views::AsViewClass<DocumentPipFrameView>(non_client_view->frame_view())
+      ->UpdateContentSettingsIcons();
 }
 
 // =============================================================================
@@ -408,6 +506,51 @@ void DocumentPipHost::BeforeUnloadFired(content::WebContents* tab,
   if (proceed_to_fire_unload) {
     *proceed_to_fire_unload = true;
   }
+}
+
+// =============================================================================
+// WebContentsDelegate - Media
+// =============================================================================
+
+void DocumentPipHost::RequestMediaAccessPermission(
+    content::WebContents* web_contents,
+    const content::MediaStreamRequest& request,
+    content::MediaResponseCallback callback) {
+  // TODO(crbug.com/515252142): Wire camera/mic permission requests once the
+  // standalone permission-prompt surface exists (Task 7). The permission
+  // dialog stack assumes the requesting WebContents is hosted by a Browser, so
+  // routing this through MediaCaptureDevicesDispatcher would crash for the
+  // standalone Document PiP window. Until then, deny the request so the
+  // renderer's getUserMedia() promise rejects cleanly instead of hanging.
+  //
+  // const extensions::Extension* extension =
+  //     GetExtensionForOrigin(GetProfile(), request.security_origin);
+  // MediaCaptureDevicesDispatcher::GetInstance()->ProcessMediaAccessRequest(
+  //     web_contents, request, std::move(callback), extension);
+  std::move(callback).Run(
+      blink::mojom::StreamDevicesSet(),
+      blink::mojom::MediaStreamRequestResult::PERMISSION_DENIED,
+      /*ui=*/nullptr);
+}
+
+bool DocumentPipHost::CheckMediaAccessPermission(
+    content::RenderFrameHost* render_frame_host,
+    const url::Origin& security_origin,
+    blink::mojom::MediaStreamType type) {
+  // TODO(crbug.com/515252142): Restore the real permission-state lookup once
+  // the standalone permission-prompt surface exists (Task 7). Camera/mic access
+  // cannot be granted through the UI in the standalone Document PiP window yet,
+  // so report no permission rather than surfacing state the user has no way to
+  // act on.
+  //
+  // Profile* profile =
+  //     Profile::FromBrowserContext(render_frame_host->GetBrowserContext());
+  // const extensions::Extension* extension =
+  //     GetExtensionForOrigin(profile, security_origin.GetURL());
+  // return MediaCaptureDevicesDispatcher::GetInstance()
+  //     ->CheckMediaAccessPermission(render_frame_host, security_origin, type,
+  //                                  extension);
+  return false;
 }
 
 // =============================================================================
