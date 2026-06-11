@@ -54,6 +54,7 @@ group("resources") {
       "bookmarks:resources",
       "certificate_manager:resources",
       "content_annotator_internals:resources",
+      "contextual_cueing/internals:resources",
       "data_sharing:resources",
       "downloads:resources",
       "drive_picker_host:resources",

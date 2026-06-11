@@ -5194,6 +5194,10 @@ static_library("browser") {
       "//chrome/browser/chrome_for_testing:browser",
     ]
   }
+
+  if (!is_android) {
+    deps += [ "//chrome/browser/contextual_cueing/internals" ]
+  }
 }
 
 # These are the dependencies for the "browser" target that are outside of

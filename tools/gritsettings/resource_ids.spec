@@ -453,6 +453,10 @@
     "META": {"sizes": {"includes": [20]}},
     "includes": [3768],
   },
+  "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/contextual_cueing/internals/resources.grd": {
+    "META": {"sizes": {"includes": [10]}},
+    "includes": [3769],
+  },
   "<(SHARED_INTERMEDIATE_DIR)/chrome/browser/resources/contextual_tasks/resources.grd": {
     "META": {"sizes": {"includes": [60]}},
     "includes": [3770],

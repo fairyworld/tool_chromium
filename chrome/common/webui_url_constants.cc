@@ -136,6 +136,9 @@ base::span<const base::cstring_view> ChromeURLHosts() {
       kChromeUIComponentsHost,
       commerce::kChromeUICommerceInternalsHost,
       kChromeUIConnectorsInternalsHost,
+#if !BUILDFLAG(IS_ANDROID)
+      kChromeUIContextualCueingInternalsHost,
+#endif
       kChromeUICrashesHost,
       kChromeUICreditsHost,
 #if BUILDFLAG(IS_CHROMEOS) && !defined(OFFICIAL_BUILD)
