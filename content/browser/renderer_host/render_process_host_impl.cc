@@ -5557,7 +5557,7 @@ void RenderProcessHostImpl::ShareMetricsMemoryRegion() {
 
 ChildProcessTerminationInfo RenderProcessHostImpl::GetChildTerminationInfo(
     bool already_dead) {
-  DCHECK(child_process_launcher_);
+  CHECK(child_process_launcher_, base::NotFatalUntil::M152);
 
   ChildProcessTerminationInfo info;
 
@@ -5601,11 +5601,11 @@ void RenderProcessHostImpl::ProcessDied(
   }
 
   // It should not be possible for us to be called re-entrantly.
-  DCHECK(!within_process_died_observer_);
+  CHECK(!within_process_died_observer_, base::NotFatalUntil::M152);
 
   // It should not be possible for a process death notification to come in
   // while we are dying.
-  DCHECK(!deleting_soon_);
+  CHECK(!deleting_soon_, base::NotFatalUntil::M152);
 
   child_process_launcher_.reset();
   is_dead_ = true;
@@ -5674,7 +5674,7 @@ void RenderProcessHostImpl::FastShutdown() {
 }
 
 void RenderProcessHostImpl::ResetIPC() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   media_interface_proxy_.reset();
   renderer_host_receiver_.reset();
   io_thread_host_impl_.reset();
@@ -5730,8 +5730,8 @@ WebExposedIsolationLevel RenderProcessHost::GetWebExposedIsolationLevel() {
 }
 
 void RenderProcessHost::PostTaskWhenProcessIsReady(base::OnceClosure task) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  DCHECK(!task.is_null());
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
+  CHECK(!task.is_null(), base::NotFatalUntil::M152);
   new RenderProcessHostIsReadyObserver(this, std::move(task));
 }
 
@@ -5938,8 +5938,8 @@ void RenderProcessHostImpl::UpdateProcessPriority() {
   // (http://crbug.com/398103).
   if (!run_renderer_in_process() &&
       GetContentClient()->browser()->IsRendererProcessPriorityEnabled()) {
-    DCHECK(child_process_launcher_.get());
-    DCHECK(!child_process_launcher_->IsStarting());
+    CHECK(child_process_launcher_.get(), base::NotFatalUntil::M152);
+    CHECK(!child_process_launcher_->IsStarting(), base::NotFatalUntil::M152);
 #if BUILDFLAG(IS_ANDROID)
     // TODO(339097516): Remove the following CHECK when the issue is fixed.
     CHECK(child_process_launcher_->GetProcess().IsValid());
@@ -6020,10 +6020,12 @@ void RenderProcessHostImpl::OnProcessLaunched() {
   process_launched_time_ = base::TimeTicks::Now();
 
   if (child_process_launcher_) {
-    DCHECK(child_process_launcher_->GetProcess().IsValid());
+    CHECK(child_process_launcher_->GetProcess().IsValid(),
+          base::NotFatalUntil::M152);
     // TODO(crbug.com/40590142): This should be based on
     // |priority_.GetProcessPriority()|, see similar check below.
-    DCHECK_EQ(blink::kLaunchingProcessIsBackgrounded, !priority_.visible);
+    CHECK_EQ(blink::kLaunchingProcessIsBackgrounded, !priority_.visible,
+             base::NotFatalUntil::M152);
 
     // Unpause the channel now that the process is launched. We don't flush it
     // yet to ensure that any initialization messages sent here (e.g., things
@@ -6065,7 +6067,8 @@ void RenderProcessHostImpl::OnProcessLaunched() {
     // directly from base::Process.
     // TODO(crbug.com/40590142): Fix initial priority on Android to
     // reflect |priority_.GetProcessPriority()|.
-    DCHECK_EQ(blink::kLaunchingProcessIsBackgrounded, !priority_.visible);
+    CHECK_EQ(blink::kLaunchingProcessIsBackgrounded, !priority_.visible,
+             base::NotFatalUntil::M152);
 #else
     priority_.visible = child_process_launcher_->GetProcess().GetPriority() !=
                         base::Process::Priority::kBestEffort;
@@ -6119,7 +6122,7 @@ void RenderProcessHostImpl::OnProcessLaunched() {
   }
 
   if (IsReady()) {
-    DCHECK(!sent_render_process_ready_);
+    CHECK(!sent_render_process_ready_, base::NotFatalUntil::M152);
     sent_render_process_ready_ = true;
     // Send RenderProcessReady only if the channel is already connected.
     for (auto& observer : observers_)
