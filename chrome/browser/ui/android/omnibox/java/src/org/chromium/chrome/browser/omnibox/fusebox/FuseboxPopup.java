@@ -29,6 +29,7 @@ import org.chromium.ui.base.LocalizationUtils;
 import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.insets.InsetObserver;
 import org.chromium.ui.insets.InsetObserver.WindowInsetObserver;
+import org.chromium.ui.util.CommonOnLayoutChangeListeners;
 import org.chromium.ui.widget.AnchoredPopupWindow;
 import org.chromium.ui.widget.RectProvider;
 
@@ -118,15 +119,10 @@ class FuseboxPopup {
 
         mViewGroup = contentView.findViewById(R.id.fusebox_view_group);
         mViewGroup.addOnLayoutChangeListener(
-                (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
-                    if (bottom - top != oldBottom - oldTop) {
-                        PostTask.postTask(
-                                TaskTraits.UI_DEFAULT,
-                                () -> {
-                                    updateLayout();
-                                });
-                    }
-                });
+                CommonOnLayoutChangeListeners.createHeightChangedListener(
+                        () -> {
+                            PostTask.postTask(TaskTraits.UI_DEFAULT, this::updateLayout);
+                        }));
         mScrollView = contentView.findViewById(R.id.fusebox_scroll_view);
         mScrollView.setLayoutDirection(
                 LocalizationUtils.isLayoutRtl()
