@@ -18562,21 +18562,6 @@
             ]
         }
     ],
-    "PasswordRemovalFromDeleteBrowsingData": [
-        {
-            "platforms": [
-                "ios"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "PasswordRemovalFromDeleteBrowsingData"
-                    ]
-                }
-            ]
-        }
-    ],
     "PasswordUploadUiUpdate": [
         {
             "platforms": [
