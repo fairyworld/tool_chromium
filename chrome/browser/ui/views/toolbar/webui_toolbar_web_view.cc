@@ -554,6 +554,14 @@ void WebUIToolbarWebView::ShowAvatarMenu() {
   avatar_control_.ButtonPressed(/*is_source_accelerator=*/false);
 }
 
+void WebUIToolbarWebView::SetAvatarButtonHovered(bool hovered) {
+  avatar_control_.SetAvatarButtonHovered(hovered);
+}
+
+void WebUIToolbarWebView::SetAvatarButtonFocused(bool focused) {
+  avatar_control_.SetAvatarButtonFocused(focused);
+}
+
 ReloadControl* WebUIToolbarWebView::GetReloadControl() {
   return &reload_control_;
 }

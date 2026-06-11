@@ -28,7 +28,7 @@ import type {BrowserProxy, IconUpdate, NavigationControlsState, NavigationContro
 import {IconTable} from './icon_table.js';
 import {MetricsRecorder} from './metrics_recorder.js';
 import {setHasHelpBubble} from './toolbar_button.js';
-import {AppMenuIconType, AppMenuSeverity} from './toolbar_ui_api_data_model.mojom-webui.js';
+import {AppMenuIconType, AppMenuSeverity, AvatarToolbarButtonState} from './toolbar_ui_api_data_model.mojom-webui.js';
 // clang-format off
 // Helper so tests can find what they needed when optimization is on.
 // This should probably be a separate file, but rollup support only
@@ -228,6 +228,7 @@ export class ToolbarAppElement extends AppElementBase {
       },
     },
     avatarControlState: {
+      state: AvatarToolbarButtonState.kNormal,
       iconUrl: '',
       text: '',
       tooltip: '',
