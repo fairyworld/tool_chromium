@@ -383,7 +383,9 @@ ProcessExitResult HandleRunElevated(const base::CommandLine& command_line) {
     return ProcessExitResult(UNEXPECTED_ELEVATION_LOOP);
   }
 
-  if (command_line.HasSwitch(kSilentSwitch)) {
+  if (command_line.HasSwitch(kSilentSwitch) &&
+      command_line.GetSwitchValueASCII(kSilentSwitch) !=
+          kSilentSwitchValueAllowUAC) {
     VLOG(1) << __func__ << ": cannot show an elevation prompt with `/silent`: "
             << command_line.GetCommandLineString();
     return ProcessExitResult(UNEXPECTED_ELEVATION_LOOP_SILENT);
