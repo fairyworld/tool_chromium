@@ -7,8 +7,8 @@
 #import "base/functional/bind.h"
 #import "base/strings/sys_string_conversions.h"
 #import "base/task/sequenced_task_runner.h"
-#import "components/search_engines/template_url.h"
 #import "components/search_engines/template_url_service.h"
+#import "components/search_engines/util.h"
 #import "ios/chrome/browser/cobrowse/model/cobrowse_context.h"
 #import "ios/chrome/browser/shared/model/url/url_util.h"
 #import "ios/chrome/browser/shared/public/commands/scene_commands.h"
@@ -107,16 +107,6 @@ bool CobrowseTabHelper::ShouldCloseAssistant(const GURL& url) {
     return true;
   }
 
-  // Do not show the cobrowse AIM assistant sheet if navigating to a search URL.
-  const TemplateURL* default_search_provider =
-      template_url_service_ ? template_url_service_->GetDefaultSearchProvider()
-                            : nullptr;
-  if (default_search_provider &&
-      default_search_provider->IsSearchURL(
-          url, template_url_service_->search_terms_data())) {
-    return true;
-  }
-
   return false;
 }
 
@@ -128,5 +118,10 @@ bool CobrowseTabHelper::ShouldHideAssistant(const GURL& url) {
   if (delegate_ && delegate_->IsTabGridVisible()) {
     return true;
   }
+
+  if (IsAimURL(url) || IsAimZeroStateURL(url)) {
+    return true;
+  }
+
   return false;
 }

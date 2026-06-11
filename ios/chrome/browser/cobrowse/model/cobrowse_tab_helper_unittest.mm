@@ -272,14 +272,45 @@ TEST_F(CobrowseTabHelperTest, NoTriggerInIncognito) {
   [mock_scene_commands_handler_ verify];
 }
 
-// Tests that closeAssistant is called when navigating to a search URL.
-TEST_F(CobrowseTabHelperTest, CloseAssistantOnSearchNavigation) {
+// Tests that closeAssistant is NOT called when navigating to a regular search
+// URL.
+TEST_F(CobrowseTabHelperTest, NoCloseAssistantOnRegularSearchNavigation) {
   GURL search_url("https://www.google.com/search?q=test");
 
   web::FakeNavigationContext context;
   context.SetUrl(search_url);
 
-  OCMExpect([mock_scene_commands_handler_ closeAssistant]);
+  [[mock_scene_commands_handler_ reject] closeAssistant];
+  [[mock_scene_commands_handler_ reject] hideAssistant];
+
+  tab_helper_->DidStartNavigation(fake_web_state_, &context);
+
+  [mock_scene_commands_handler_ verify];
+}
+
+// Tests that hideAssistant is called when navigating to an AIM search URL.
+TEST_F(CobrowseTabHelperTest, HideAssistantOnAimSearchNavigation) {
+  GURL aim_search_url("https://www.google.com/search?q=test&udm=50");
+
+  web::FakeNavigationContext context;
+  context.SetUrl(aim_search_url);
+
+  OCMExpect([mock_scene_commands_handler_ hideAssistant]);
+
+  tab_helper_->DidStartNavigation(fake_web_state_, &context);
+
+  [mock_scene_commands_handler_ verify];
+}
+
+// Tests that hideAssistant is called when navigating to an AIM Zero State
+// search URL.
+TEST_F(CobrowseTabHelperTest, HideAssistantOnAimZeroStateSearchNavigation) {
+  GURL aim_zero_state_url("https://www.google.com/?udm=50");
+
+  web::FakeNavigationContext context;
+  context.SetUrl(aim_zero_state_url);
+
+  OCMExpect([mock_scene_commands_handler_ hideAssistant]);
 
   tab_helper_->DidStartNavigation(fake_web_state_, &context);
 
