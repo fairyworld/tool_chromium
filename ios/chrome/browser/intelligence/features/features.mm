@@ -752,15 +752,6 @@ bool IsGeminiRichAPCExtractionEnabled() {
   return base::FeatureList::IsEnabled(kGeminiRichAPCExtraction);
 }
 
-BASE_FEATURE(kGeminiMapsRichUI, base::FEATURE_ENABLED_BY_DEFAULT);
-
-bool IsGeminiMapsRichUIEnabled() {
-  if (!IsPageActionMenuEnabled()) {
-    return false;
-  }
-  return base::FeatureList::IsEnabled(kGeminiMapsRichUI);
-}
-
 BASE_FEATURE(kGeminiUnaryMigration, base::FEATURE_DISABLED_BY_DEFAULT);
 
 bool IsGeminiUnaryMigrationEnabled() {

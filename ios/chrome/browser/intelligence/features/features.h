@@ -344,12 +344,6 @@ bool IsGeminiActorEnabled();
 BASE_DECLARE_FEATURE(kGeminiRichAPCExtraction);
 bool IsGeminiRichAPCExtractionEnabled();
 
-// Enables the GeminiMapsRichUI feature.
-BASE_DECLARE_FEATURE(kGeminiMapsRichUI);
-
-// Returns true if the GeminiMapsRichUI feature is enabled.
-bool IsGeminiMapsRichUIEnabled();
-
 // Enables the GeminiUnaryMigration feature.
 BASE_DECLARE_FEATURE(kGeminiUnaryMigration);
 

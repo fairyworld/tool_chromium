@@ -841,10 +841,6 @@ inline constexpr char kGeminiLuminousName[] = "Gemini Luminous";
 inline constexpr char kGeminiLuminousDescription[] =
     "Enables Gemini Luminous UI.";
 
-inline constexpr char kGeminiMapsRichUIName[] = "Gemini Maps Rich UI";
-inline constexpr char kGeminiMapsRichUIDescription[] =
-    "Enables the rich Maps UI in Gemini.";
-
 inline constexpr char kGeminiMultiTabContextName[] = "Gemini Multi Tab Context";
 inline constexpr char kGeminiMultiTabContextDescription[] =
     "Enables attaching multiple tabs in Gemini.";
