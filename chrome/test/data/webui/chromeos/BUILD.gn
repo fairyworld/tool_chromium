@@ -13,20 +13,6 @@ import("../build_webui_tests.gni")
 assert(is_chromeos)
 
 if (include_js2gtest_tests) {
-  js2gtest("interactive_ui_tests_js_webui") {
-    test_type = "webui"
-
-    sources = [ "cr_focus_row_behavior_interactive_test.js" ]
-
-    gen_include_files = [
-      "polymer_browser_test_base.js",
-      "polymer_interactive_ui_test.js",
-    ]
-
-    deps = [ "//chrome/browser/ui" ]
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-  }
-
   js2gtest("browser_tests_js_webui") {
     test_type = "webui"
 
@@ -58,17 +44,6 @@ if (include_js2gtest_tests) {
 
     data = [ "//ui/webui/resources/js/load_time_data_deprecated.js" ]
 
-    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-  }
-
-  js2gtest("browser_tests_js_mojo_webui") {
-    test_type = "mojo_webui"
-    sources = [
-      "crostini_installer_browsertest.js",
-      "manage_mirrorsync/manage_mirrorsync_browsertest.js",
-      "nearby_share/nearby_browsertest.js",
-      "nearby_share/shared/nearby_shared_v3_browsertest.js",
-    ]
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
   }
 }
@@ -114,10 +89,12 @@ build_webui_tests("build") {
   ts_composite = true
   cc_test_files = [
     "cr_components_chromeos_v3_browsertest.js",
-    "cr_focus_row_behavior_interactive_test.js",
-    "crostini_installer_browsertest.js",
+    "cr_focus_row_behavior_interactive_test.cc",
+    "crostini_installer_browsertest.cc",
     "internet_config_dialog_browsertest.cc",
     "internet_detail_dialog_browsertest.cc",
+    "nearby_share/nearby_browsertest.cc",
+    "nearby_share/shared/nearby_shared_v3_browsertest.cc",
   ]
   files = [
     "chai_assert.js",

@@ -175,6 +175,7 @@ source_set("browser_tests") {
       "chromeos/cloud_upload/connect_onedrive_browsertest.cc",
       "chromeos/cloud_upload/file_handler_page_browsertest.cc",
       "chromeos/cloud_upload/move_confirmation_page_browsertest.cc",
+      "chromeos/crostini_installer_browsertest.cc",
       "chromeos/diagnostics/diagnostics_browsertest.cc",
       "chromeos/edu_coexistence/edu_coexistence_browsertest.cc",
       "chromeos/enterprise_reporting/enterprise_reporting_browsertest.cc",
@@ -186,6 +187,9 @@ source_set("browser_tests") {
       "chromeos/inline_login/inline_login_browsertest.cc",
       "chromeos/internet_config_dialog_browsertest.cc",
       "chromeos/internet_detail_dialog_browsertest.cc",
+      "chromeos/manage_mirrorsync/manage_mirrorsync_browsertest.cc",
+      "chromeos/nearby_share/nearby_browsertest.cc",
+      "chromeos/nearby_share/shared/nearby_shared_v3_browsertest.cc",
       "chromeos/office_fallback/office_fallback_browsertest.cc",
       "chromeos/oobe/security_token_pin_browsertest.cc",
       "chromeos/os_feedback_ui/os_feedback_browsertest.cc",
@@ -416,6 +420,7 @@ source_set("interactive_ui_tests") {
   if (is_chromeos) {
     sources += [
       "chromeos/ash_common/cr_elements/ash_common_cr_elements_focus_test.cc",
+      "chromeos/cr_focus_row_behavior_interactive_test.cc",
       "chromeos/print_preview/print_preview_focus_test.cc",
       "chromeos/settings/os_settings_focus_test.cc",
     ]

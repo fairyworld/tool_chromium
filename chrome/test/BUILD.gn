@@ -4268,7 +4268,6 @@ if (!is_android) {
         "//ash/webui/color_internals:browser_tests_js",
         "//ash/webui/eche_app_ui:browser_tests_js",
         "//ash/webui/system_apps:browser_tests",
-        "//chrome/test/data/webui/chromeos:browser_tests_js_mojo_webui",
         "//chrome/test/data/webui/chromeos:browser_tests_js_webui",
       ]
 
@@ -10777,11 +10776,6 @@ if (!is_android && !is_chromeos_device) {
 
     if (include_js_tests) {
       deps += [ "//chrome/test/data/webui:interactive_ui_tests" ]
-    }
-    if (include_js2gtest_tests && is_chromeos) {
-      data += js2gtest_js_libraries
-      deps +=
-          [ "//chrome/test/data/webui/chromeos:interactive_ui_tests_js_webui" ]
     }
 
     # Runtime dependencies
