@@ -2513,7 +2513,6 @@ static_library("ui") {
       "//chrome/browser/ui/ash/wallpaper",
       "//chrome/browser/ui/ash/wm",
       "//chrome/browser/ui/views/apps/app_dialog",
-      "//chrome/browser/ui/views/apps/app_dialog:impl",
       "//chrome/browser/ui/views/bruschetta",
       "//chrome/browser/ui/views/crostini",
       "//chrome/browser/ui/views/mahi",
@@ -3019,9 +3018,6 @@ static_library("ui") {
       "//chrome/browser/ui/webui/nearby_share",
       "//chrome/browser/ui/webui/signin/ash",
       "//chrome/browser/ash/arc:arc_util_impl",
-
-      # TODO(crbug.com/432061436) Remove circular dependency.
-      "//chrome/browser/ui/views/apps/app_dialog:impl",
     ]
 
     if (is_chrome_branded) {
