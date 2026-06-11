@@ -229,7 +229,8 @@ bool MouseWheelPhaseHandler::ShouldBreakLatchingDueToDirectionChange(
   // This function is called to check if breaking timer-based wheel scroll
   // latching sequence is needed or not, and timer-based wheel scroll latching
   // happens only when scroll state is unknown.
-  DCHECK(touchpad_scroll_phase_state_ == TOUCHPAD_SCROLL_STATE_UNKNOWN);
+  CHECK(touchpad_scroll_phase_state_ == TOUCHPAD_SCROLL_STATE_UNKNOWN,
+        base::NotFatalUntil::M152);
   if (first_scroll_update_ack_state_ != FirstScrollUpdateAckState::kNotConsumed)
     return false;
 
