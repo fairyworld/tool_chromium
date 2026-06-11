@@ -7232,6 +7232,24 @@
             ]
         }
     ],
+    "ContextualTasks_ShowMenuIcon": [
+        {
+            "platforms": [
+                "chromeos",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled_20260610",
+                    "enable_features": [
+                        "ShowContextualTasksMenuIcon"
+                    ]
+                }
+            ]
+        }
+    ],
     "CookieSameSiteConsidersRedirectChainDesktop": [
         {
             "platforms": [
