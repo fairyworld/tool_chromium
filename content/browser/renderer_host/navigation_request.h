@@ -1844,10 +1844,6 @@ class CONTENT_EXPORT NavigationRequest
     before_unload_execution_mode_ = mode;
   }
 
-  void set_activation_beacon_url(const GURL& url) {
-    activation_beacon_url_ = url;
-  }
-
  private:
   friend class NavigationRequestTest;
   FRIEND_TEST_ALL_PREFIXES(NavigationRequestTest, SanitizeRedirectsForCommit);

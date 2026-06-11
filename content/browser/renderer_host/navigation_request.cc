@@ -4859,6 +4859,33 @@ void NavigationRequest::OnResponseStarted(
   SetState(WILL_PROCESS_RESPONSE);
   response_head_ = std::move(response_head);
   response_body_ = std::move(response_body);
+
+  // If the navigation is activating a prefetched response, and the response
+  // contains a valid same-origin activation beacon endpoint, we record it to
+  // send the beacon when the navigation commits.
+  // We must ensure this is actually a prefetch activation (not a normal network
+  // request that happened to return the header) by checking `is_prefetched`.
+  // `was_in_prefetch_cache` and `kNavigationalPrefetch` are browser-controlled
+  // flags set by the prefetch serving loaders, so they are safe from server
+  // spoofing. Prerender commits are excluded here because the page is not yet
+  // presented to the user; the beacon should be sent when the prerender is
+  // activated.
+  if (base::FeatureList::IsEnabled(features::kPrefetchActivationBeacon) &&
+      !IsInPrerenderedMainFrame() && response_head_->parsed_headers &&
+      response_head_->parsed_headers->prefetch_activation_beacon_endpoint
+          .has_value()) {
+    const GURL& endpoint =
+        *response_head_->parsed_headers->prefetch_activation_beacon_endpoint;
+    bool is_prefetched =
+        response_head_->was_in_prefetch_cache ||
+        response_head_->navigation_delivery_type ==
+            network::mojom::NavigationDeliveryType::kNavigationalPrefetch;
+    if (is_prefetched && endpoint.is_valid() &&
+        url::Origin::Create(endpoint).IsSameOriginWith(
+            url::Origin::Create(GetURL()))) {
+      activation_beacon_url_ = endpoint;
+    }
+  }
   ssl_info_ = response_head_->ssl_info;
   auth_challenge_info_ = response_head_->auth_challenge_info;
   BrowserContext* browser_context =
