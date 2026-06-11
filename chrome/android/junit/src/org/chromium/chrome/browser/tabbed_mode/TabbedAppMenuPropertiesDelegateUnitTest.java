@@ -736,8 +736,9 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         expectedItems.addAll(
                 Arrays.asList(
                         item(R.id.divider_line_id),
+                        item(R.id.more_tools_menu_id, item(R.id.ntp_customization_id)),
+                        item(R.id.divider_line_id),
                         item(R.id.preferences_id),
-                        item(R.id.ntp_customization_id),
                         item(
                                 R.id.help_parent_menu_id,
                                 item(R.id.about_chrome_menu_id),
@@ -2804,7 +2805,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         ModelList modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
 
-        ListItem item = findItemById(modelList, R.id.ntp_customization_id);
+        ListItem item;
+        if (ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)) {
+            List<ListItem> submenu = getSubmenuItems(modelList, R.id.more_tools_menu_id);
+            assertNotNull(submenu);
+            item = findItemById(submenu, R.id.ntp_customization_id);
+        } else {
+            item = findItemById(modelList, R.id.ntp_customization_id);
+        }
+        assertNotNull(item);
         assertTrue(item.model.get(AppMenuItemProperties.ENABLED));
     }
 

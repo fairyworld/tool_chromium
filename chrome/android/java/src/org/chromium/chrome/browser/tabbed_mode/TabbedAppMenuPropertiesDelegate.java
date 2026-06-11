@@ -565,7 +565,8 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
         modelList.add(buildSettingsItem());
 
         // NTP Customizations
-        if (shouldShowNtpCustomizations(currentTab)) {
+        if (!ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)
+                && shouldShowNtpCustomizations(currentTab)) {
             modelList.add(buildNtpCustomizationsItem(currentTab));
         }
 
@@ -1935,11 +1936,15 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
             return true;
         }
 
-        if (shouldShowDevToolsItem(currentTab)) {
+        if (shouldShowNameWindowItem()) {
             return true;
         }
 
-        if (shouldShowNameWindowItem()) {
+        if (shouldShowNtpCustomizations(currentTab)) {
+            return true;
+        }
+
+        if (shouldShowDevToolsItem(currentTab)) {
             return true;
         }
 
@@ -1962,12 +1967,16 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
             submenuItems.add(buildTaskManagerItem());
         }
 
-        if (shouldShowDevToolsItem(currentTab)) {
-            submenuItems.add(buildDevToolsItem(currentTab));
-        }
-
         if (shouldShowNameWindowItem()) {
             submenuItems.add(buildNameWindowItem());
+        }
+
+        if (shouldShowNtpCustomizations(currentTab)) {
+            submenuItems.add(buildNtpCustomizationsItem(currentTab));
+        }
+
+        if (shouldShowDevToolsItem(currentTab)) {
+            submenuItems.add(buildDevToolsItem(currentTab));
         }
 
         if (shouldShowTabLayoutToggleItem()) {
