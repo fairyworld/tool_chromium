@@ -300,6 +300,7 @@ if (!is_android) {
     deps = [
       ":toolbar",
       "//base",
+      "//chrome/browser/headless:command_processor",
       "//chrome/browser/ui",
       "//chrome/browser/ui:ui_features",
       "//chrome/browser/ui/interaction",
