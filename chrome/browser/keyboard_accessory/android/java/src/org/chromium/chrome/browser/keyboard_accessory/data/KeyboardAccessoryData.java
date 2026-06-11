@@ -513,6 +513,19 @@ public class KeyboardAccessoryData {
          * @param sheetType The type of the accessory manual filling sheet (addresses, credit cards,
          *     passwords).
          * @param userInfoTitle The user info title of accessory sheet tab.
+         * @param warning An optional warning to be displayed the beginning of the sheet.
+         */
+        public AccessorySheetData(
+                @AccessoryTabType int sheetType, String userInfoTitle, String warning) {
+            this(sheetType, userInfoTitle, "", warning);
+        }
+
+        /**
+         * Creates the AccessorySheetData object.
+         *
+         * @param sheetType The type of the accessory manual filling sheet (addresses, credit cards,
+         *     passwords).
+         * @param userInfoTitle The user info title of accessory sheet tab.
          * @param plusAddressTitle The plus address section title.
          * @param warning An optional warning to be displayed the beginning of the sheet.
          */

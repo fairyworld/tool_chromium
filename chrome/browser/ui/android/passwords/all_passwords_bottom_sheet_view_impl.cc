@@ -68,8 +68,7 @@ void AllPasswordsBottomSheetViewImpl::Show(
         env, credential.username_value, credential.password_value,
         GetDisplayUsername(credential), credential.url.spec(),
         facet.IsValidAndroidFacetURI(), app_display_name,
-        controller_->IsPlusAddress(
-            base::UTF16ToUTF8(credential.username_value))));
+        /*isPlusAddressUsername=*/false));
   }
 
   const bool is_password_field =
