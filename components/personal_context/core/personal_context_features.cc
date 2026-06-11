@@ -8,7 +8,7 @@
 
 namespace personal_context::features {
 
-BASE_FEATURE(kPersonalContext, base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kPersonalContext, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kPersonalContextFirstRun, base::FEATURE_DISABLED_BY_DEFAULT);
 

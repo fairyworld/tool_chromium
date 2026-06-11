@@ -11,7 +11,8 @@
 namespace personal_context::features {
 
 // The main feature flag for the Personal Context service. When disabled,
-// all Personal Context features and services are turned off.
+// all Personal Context features and services are turned off. Enabled by default
+// and kept around as a kill-switch.
 BASE_DECLARE_FEATURE(kPersonalContext);
 
 // Controls whether the First Run and onboarding experience for Personal Context
