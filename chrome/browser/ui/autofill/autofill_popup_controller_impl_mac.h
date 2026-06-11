@@ -45,6 +45,8 @@ class AutofillPopupControllerImplMac : public AutofillPopupControllerImpl {
   void HideViewAndDie() override;
 
  private:
+  friend class AutofillPopupControllerImplMacTestApi;
+
   // The controller providing the autofill touch bar.
   WebTextfieldTouchBarController* __weak touch_bar_controller_;
 };

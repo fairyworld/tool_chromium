@@ -63,6 +63,9 @@ void AutofillPopupControllerImplMac::Show(
     touch_bar_controller_ = [WebTextfieldTouchBarController
         controllerForWindow:[container_view().GetNativeNSView() window]];
     [touch_bar_controller_ showCreditCardAutofillWithController:this];
+  } else if (touch_bar_controller_) {
+    [touch_bar_controller_ hideCreditCardAutofillTouchBar];
+    touch_bar_controller_ = nil;
   }
 
   AutofillPopupControllerImpl::Show(ui_session_id, std::move(suggestions),

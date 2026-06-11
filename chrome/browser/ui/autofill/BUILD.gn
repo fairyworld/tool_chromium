@@ -425,6 +425,10 @@ source_set("unit_tests") {
     ]
   }
 
+  if (is_mac) {
+    sources += [ "autofill_popup_controller_impl_mac_unittest.mm" ]
+  }
+
   # TODO(crbug.com/40031409): Fix code that adds exit-time destructors and
   # enable the diagnostic by removing this line.
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
@@ -462,6 +466,9 @@ source_set("test_support") {
       "mock_autofill_popup_controller.cc",
       "mock_autofill_popup_controller.h",
     ]
+    if (is_mac) {
+      sources += [ "autofill_popup_controller_impl_mac_test_api.h" ]
+    }
     public_deps += [ "//ui/gfx:test_support" ]
   }
 }
