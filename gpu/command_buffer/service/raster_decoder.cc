@@ -27,6 +27,7 @@
 #include "base/memory/aligned_memory.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/ref_counted.h"
+#include "base/memory/safety_checks.h"
 #include "base/memory/weak_ptr.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/notimplemented.h"
@@ -1589,6 +1590,7 @@ error::Error RasterDecoderImpl::DoCommands(unsigned int num_commands,
                                            const volatile void* buffer,
                                            int num_entries,
                                            int* entries_processed) {
+  base::ScopedSafetyChecksExclusion exclusion;
   if (gpu_debug_commands_) {
     return DoCommandsImpl<true>(num_commands, buffer, num_entries,
                                 entries_processed);
