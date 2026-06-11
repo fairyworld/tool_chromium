@@ -501,6 +501,9 @@ enum class PresentedState {
            inIncognito:(BOOL)inIncognito
                 newTab:(BOOL)newTab
     urlBeforeDismissal:(const GURL&)urlBeforeDismissal {
+  if (!_currentProfile || !self.browser) {
+    return;
+  }
   BOOL openInForegroundTab = YES;
   WebStateList* webStateList = self.browser->GetWebStateList();
   for (const GURL& url : urls) {
@@ -514,8 +517,9 @@ enum class PresentedState {
 
       // TODO(crbug.com/40508042): See if we need different metrics for 'Open
       // all', 'Open all in incognito' and 'Open in incognito'.
-      bool is_ntp = webStateList->GetActiveWebState()->GetVisibleURL() ==
-                    kChromeUINewTabURL;
+      web::WebState* activeWebState = webStateList->GetActiveWebState();
+      bool is_ntp = activeWebState &&
+                    activeWebState->GetVisibleURL() == kChromeUINewTabURL;
       new_tab_page_uma::RecordNTPAction(
           _regularProfile->IsOffTheRecord(), is_ntp,
           new_tab_page_uma::ACTION_OPENED_BOOKMARK);
