@@ -1317,6 +1317,12 @@ void SearchboxHandler::GetRecentTabs(GetRecentTabsCallback callback) {
   std::move(callback).Run({});
 }
 
+void SearchboxHandler::WaitForTabFaviconLoad(
+    int32_t tab_id,
+    WaitForTabFaviconLoadCallback callback) {
+  std::move(callback).Run(std::nullopt);
+}
+
 void SearchboxHandler::GetInputState(GetInputStateCallback callback) {
   std::move(callback).Run({});
 }
