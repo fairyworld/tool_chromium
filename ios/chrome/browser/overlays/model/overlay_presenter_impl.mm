@@ -6,6 +6,7 @@
 
 #import "base/check_op.h"
 #import "base/memory/ptr_util.h"
+#import "ios/chrome/app/application_delegate/startup_information.h"
 #import "ios/chrome/app/profile/profile_state.h"
 #import "ios/chrome/browser/overlays/model/public/overlay_callback_manager.h"
 #import "ios/chrome/browser/overlays/model/public/overlay_presentation_context.h"
@@ -227,9 +228,11 @@ OverlayRequest* OverlayPresenterImpl::GetActiveRequest() const {
 #pragma mark UI Presentation and Dismissal helpers
 
 void OverlayPresenterImpl::PresentOverlayForActiveRequest() {
-  // Don't show an infobar if the profile isn't in its normal state.
+  // Don't show an infobar if the profile isn't in its normal state, or if the
+  // application is terminating.
   if (profile_state_ &&
-      profile_state_.initStage < ProfileInitStage::kNormalUI) {
+      (profile_state_.initStage < ProfileInitStage::kNormalUI ||
+       profile_state_.startupInformation.isTerminating)) {
     return;
   }
 
