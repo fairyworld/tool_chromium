@@ -46,11 +46,11 @@ include_rules = [
   "+chrome/browser/web_applications/web_app_provider.h",
   "+chrome/browser/web_applications/web_app_registrar.h",
   "+chrome/common/extensions/api",
-  "+chrome/common/pref_names.h",
 ]
 
 specific_include_rules = {
   "autotest_private_api\\.cc": [
+    "+chrome/common/pref_names.h",
     "+ui/message_center",
   ],
   "autotest_private_apitest\\.cc": [

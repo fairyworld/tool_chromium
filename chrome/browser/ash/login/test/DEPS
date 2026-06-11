@@ -31,6 +31,5 @@ include_rules = [
   "+chrome/browser/ui/webui/signin",
   "+chrome/common/chrome_paths.h",
   "+chrome/common/chrome_switches.h",
-  "+chrome/common/pref_names.h",
   "+chrome/test/base",
 ]
