@@ -1665,6 +1665,9 @@
     "messages": [9520],
   },
 
+  "services/device/public/cpp/usb/resources/usb_ids_resources.grd": {
+    "includes": [9530],
+  },
   "services/services_strings.grd": {
     "messages": [9540],
   },
