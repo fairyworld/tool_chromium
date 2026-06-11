@@ -397,6 +397,8 @@ class LocationBarMediator
                         mLocationBarDataProvider,
                         mEmbedderUiOverrides,
                         mSearchEngineServiceSupplier,
+                        mFuseboxCoordinator,
+                        mProfileSupplier,
                         (hint) -> mUrlCoordinator.setUrlBarHintText(hint));
     }
 

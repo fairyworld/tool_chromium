@@ -252,6 +252,8 @@ public class LocationBarMediatorTest {
     private final SettableNonNullObservableSupplier<@FuseboxLayoutMode Integer>
             mFuseboxLayoutModeSupplier =
                     ObservableSuppliers.createNonNull(FuseboxLayoutMode.TOOLBAR);
+    private final SettableNonNullObservableSupplier<Boolean> mActivationChipVisibilitySupplier =
+            ObservableSuppliers.createNonNull(false);
     private final UserDataHost mTabUserDataHost = new UserDataHost();
     private final FuseboxSessionState mSessionState = new FuseboxSessionState();
     private final SettableNullableObservableSupplier<GURL> mExactMatchUrlSupplier =
@@ -333,6 +335,9 @@ public class LocationBarMediatorTest {
         doReturn(mFuseboxLayoutModeSupplier)
                 .when(mFuseboxCoordinator)
                 .getFuseboxLayoutModeSupplier();
+        doReturn(mActivationChipVisibilitySupplier)
+                .when(mFuseboxCoordinator)
+                .getActivationChipVisibilitySupplier();
         doReturn("").when(mUrlCoordinator).getTextWithAutocomplete();
 
         ComposeboxQueryControllerBridge.setInstanceForTesting(mComposeboxBridge);
