@@ -660,7 +660,13 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                     assumeNonNull(identityManager);
                     @Nullable AccountInfo primaryAccountInfo =
                             identityManager.getPrimaryAccountInfo();
-                    assert primaryAccountInfo != null;
+                    if (primaryAccountInfo == null) {
+                        // Can happen in case of a race condition between a sign-out (because the
+                        // primary account got removed from the device) and the user interacting
+                        // with the collaboration coordinator.
+                        successCallback.onResult(false);
+                        return;
+                    }
                     AccountManagerFacadeProvider.getInstance()
                             .updateCredentials(
                                     primaryAccountInfo.getId(), mActivity, successCallback);
