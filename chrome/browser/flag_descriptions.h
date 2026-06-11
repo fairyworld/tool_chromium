@@ -5007,6 +5007,12 @@ inline constexpr char kGemma4ForBuiltInAIDescription[] =
     "Enables all built-in AI APIs (Prompt, Summarizer, Writer, etc.) to use "
     "the Gemma 4 model.";
 
+inline constexpr char kOnDeviceModelSpeculativeDecodingName[] =
+    "Speculative Decoding for Built-in AI";
+inline constexpr char kOnDeviceModelSpeculativeDecodingDescription[] =
+    "Enables speculative decoding for built-in AI models using LiteRT LM and "
+    "Gemma 4.";
+
 inline constexpr char kPromptAPIMultimodalInputName[] =
     "Prompt API Multimodal Input";
 inline constexpr char kPromptAPIMultimodalInputDescription[] =

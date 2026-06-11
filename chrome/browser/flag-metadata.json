@@ -7377,6 +7377,11 @@
     "expiry_milestone": 160
   },
   {
+    "name": "on-device-model-speculative-decoding",
+    "owners": ["//services/on_device_model/OWNERS", "builtin-ai-team@google.com"],
+    "expiry_milestone": 160
+  },
+  {
     "name": "on-startup-window-policy",
     "owners": ["aishwaryarj@google.com", "zheliooo@google.com", "clank-large-form-factors@google.com"],
     "expiry_milestone": 154

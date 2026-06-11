@@ -4522,6 +4522,12 @@ const FeatureEntry::Choice kGemma4Choices[] = {
      "OptimizationGuideManifestBroker,OnDeviceModelLitertLmBackend,"
      "AIApiFoundationalModel:model_version/v4"}};
 
+const FeatureEntry::Choice kSpeculativeDecodingChoices[] = {
+    {flags_ui::kGenericExperimentChoiceDefault, "", ""},
+    {flags_ui::kGenericExperimentChoiceEnabled, switches::kEnableFeatures,
+     "OnDeviceModelSpeculativeDecoding,OptimizationGuideManifestBroker,"
+     "OnDeviceModelLitertLmBackend,AIApiFoundationalModel:model_version/v4"}};
+
 const FeatureEntry::FeatureParam kWalletApiPrivatePassesUrl[] = {
     {"wallet_pass_save_url", "https://wallet1ppasses.pa.googleapis.com"}};
 
@@ -10108,6 +10114,11 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kOnDeviceModelLitertLmBackendDescription, kOsDesktop,
      FEATURE_VALUE_TYPE(
          on_device_model::features::kOnDeviceModelLitertLmBackend)},
+
+    {"on-device-model-speculative-decoding",
+     flag_descriptions::kOnDeviceModelSpeculativeDecodingName,
+     flag_descriptions::kOnDeviceModelSpeculativeDecodingDescription,
+     kOsDesktop, MULTI_VALUE_TYPE(kSpeculativeDecodingChoices)},
 
     {"css-grid-lanes-layout", flag_descriptions::kCSSGridLanesLayoutName,
      flag_descriptions::kCSSGridLanesLayoutDescription, kOsAll,

@@ -104,9 +104,6 @@ struct ChromeMLModelDescriptor {
   float temperature;
   int top_k;
 
-  // Speculative decoding
-  int num_draft_tokens;
-
   // Packed TS data.
   const void* ts_data;
   size_t ts_size;
@@ -121,6 +118,7 @@ struct ChromeMLModelDescriptor {
   bool enable_host_mapped_pointer;
   bool use_low_power;
   bool allow_fp16;
+  bool enable_speculative_decoding;
 
   ml::ModelPerformanceHint performance_hint;
 };
@@ -138,9 +136,6 @@ struct ChromeMLAdaptationDescriptor {
   // Parameters which control the output sampling.
   uint32_t top_k;
   float temperature;
-
-  // Whether or not the mode will use speculative decoding.
-  bool enable_speculative_decoding;
 
   // Whether this model will handle InputPieces containing images.
   bool enable_image_input;
