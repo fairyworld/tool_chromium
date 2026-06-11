@@ -2299,7 +2299,7 @@ export const ComposeboxEmbedderMixin =
         }
 
         shouldShowDivider(): boolean {
-          if (this.tabFaviconChipsToCoinsEnabled) {
+          if (this.tabFaviconChipsToCoinsEnabled && this.hasTabs()) {
             const hasNonTabFiles =
                 Array.from(this.files.values()).some(f => !f.url);
             if (!hasNonTabFiles) {
