@@ -94,7 +94,6 @@
 #import "ios/chrome/browser/policy_url_blocking/model/policy_url_blocking_tab_helper.h"
 #import "ios/chrome/browser/reader_mode/model/features.h"
 #import "ios/chrome/browser/reader_mode/model/reader_mode_tab_helper.h"
-#import "ios/chrome/browser/reading_list/model/offline_page_tab_helper.h"
 #import "ios/chrome/browser/reading_list/model/reading_list_model_factory.h"
 #import "ios/chrome/browser/reading_list/model/reading_list_web_state_observer.h"
 #import "ios/chrome/browser/safe_browsing/model/safe_browsing_client_factory.h"
@@ -323,7 +322,7 @@ void AttachTabHelpers(web::WebState* web_state, TabHelperFilter filter_flags) {
 
   attacher.Create<WebSelectionTabHelper>();
   attacher.Create<WebPerformanceMetricsTabHelper>();
-  attacher.Create<OfflinePageTabHelper>(
+  attacher.Create<ReadingListWebStateObserver>(
       ReadingListModelFactory::GetForProfile(profile));
   attacher.Create<PermissionsTabHelper>();
   attacher.Create<RepostFormTabHelper>();

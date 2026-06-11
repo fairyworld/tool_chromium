@@ -68,7 +68,6 @@
 #import "ios/chrome/browser/reader_mode/model/constants.h"
 #import "ios/chrome/browser/reader_mode/model/features.h"
 #import "ios/chrome/browser/reader_mode/model/reader_mode_tab_helper.h"
-#import "ios/chrome/browser/reading_list/model/offline_url_utils.h"
 #import "ios/chrome/browser/reading_list/ui_bundled/reading_list_utils.h"
 #import "ios/chrome/browser/search_engines/model/search_engine_observer_bridge.h"
 #import "ios/chrome/browser/search_engines/model/search_engines_util.h"
@@ -1973,11 +1972,6 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
       self.webState->GetNavigationManager()->GetVisibleItem();
   if (!navItem) {
     return NO;
-  }
-  const GURL& URL = navItem->GetURL();
-  // Show site info for offline pages.
-  if (reading_list::IsOfflineURL(URL)) {
-    return YES;
   }
   // Do not show site info for NTP.
   if ([self isCurrentWebPageNTP]) {

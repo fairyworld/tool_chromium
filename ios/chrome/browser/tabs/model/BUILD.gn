@@ -89,6 +89,7 @@ source_set("tabs_internal") {
     "//ios/chrome/browser/contextual_panel/model:public",
     "//ios/chrome/browser/crash_report/model/breadcrumbs",
     "//ios/chrome/browser/data_sharing/model",
+    "//ios/chrome/browser/dom_distiller/model",
     "//ios/chrome/browser/download/model",
     "//ios/chrome/browser/download/ui:features",
     "//ios/chrome/browser/drive/model:drive_tab_helper",

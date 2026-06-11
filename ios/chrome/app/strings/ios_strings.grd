@@ -5255,12 +5255,6 @@ Handoff must also be enabled in the General section of Settings, and your device
       <message name="IDS_IOS_PAGE_INFO_CONNECTION" desc="Title of the button opening the connection information (in page info)">
         Connection
       </message>
-      <message name="IDS_IOS_PAGE_INFO_OFFLINE_PAGE" desc="Message to display in the page info when the page you are on is an offline page.">
-        This page has been saved to your Reading List.
-      </message>
-      <message name="IDS_IOS_PAGE_INFO_OFFLINE_PAGE_LABEL" desc="Label to display at the top of the site information screen when the page you are on is an offline page.">
-        Offline page
-      </message>
       <message name="IDS_IOS_PAGE_INFO_OFFLINE_TITLE" desc="Title of the message to display in the page info bubble when the page you are on is an offline page.">
         Viewing offline version
       </message>
