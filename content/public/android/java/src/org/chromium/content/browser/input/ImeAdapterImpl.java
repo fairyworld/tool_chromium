@@ -426,6 +426,15 @@ public class ImeAdapterImpl
         getStylusWritingImeCallback().handleStylusWritingGestureAction(-1, gestureData);
     }
 
+    /** Signals to Blink to cancel and clear any active handwriting preview spans. */
+    public void cancelPreviewGesture() {
+        if (mNativeImeAdapterAndroid == 0) {
+            Log.e(TAG, "cancelPreviewGesture called after native adapter was destroyed.");
+            return;
+        }
+        ImeAdapterImplJni.get().cancelPreviewGesture(mNativeImeAdapterAndroid);
+    }
+
     void handleGesture(OngoingGesture request) {
         mOngoingGestures.put(request.getId(), request);
         StylusWritingGestureData gestureData = request.getGestureData();
@@ -2228,6 +2237,8 @@ public class ImeAdapterImpl
         // Stylus Writing
         void handleStylusWritingGestureAction(
                 long nativeImeAdapterAndroid, int id, ByteBuffer gestureData);
+
+        void cancelPreviewGesture(long nativeImeAdapterAndroid);
 
         void performSpellCheck(long nativeImeAdapterAndroid);
 
