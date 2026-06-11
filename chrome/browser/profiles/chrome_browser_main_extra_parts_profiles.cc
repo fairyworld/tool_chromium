@@ -81,6 +81,7 @@
 #include "chrome/browser/download/background_download_service_factory.h"
 #include "chrome/browser/download/download_core_service_factory.h"
 #include "chrome/browser/engagement/site_engagement_service_factory.h"
+#include "chrome/browser/enterprise/browser_management/enterprise_management_metrics_service_factory.h"
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/enterprise/connectors/connectors_service.h"
 #include "chrome/browser/enterprise/data_protection/data_protection_url_lookup_service_factory.h"
@@ -1300,6 +1301,7 @@ void ChromeBrowserMainExtraPartsProfiles::
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
   policy::ExtensionInstallPolicyServiceFactory::GetInstance();
 #endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
+  policy::EnterpriseManagementMetricsServiceFactory::GetInstance();
   policy::ManagementServiceFactory::GetInstance();
 #if BUILDFLAG(IS_CHROMEOS)
   policy::PolicyCertServiceFactory::GetInstance();

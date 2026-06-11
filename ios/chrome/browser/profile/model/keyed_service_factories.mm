@@ -130,6 +130,7 @@
 #import "ios/chrome/browser/passwords/model/password_manager_log_router_factory.h"
 #import "ios/chrome/browser/photos/model/photos_service_factory.h"
 #import "ios/chrome/browser/policy/model/cloud/user_policy_signin_service_factory.h"
+#import "ios/chrome/browser/policy/model/enterprise_management_metrics_service_factory.h"
 #import "ios/chrome/browser/policy/model/reporting/cloud_profile_reporting_service_factory_ios.h"
 #import "ios/chrome/browser/policy_url_blocking/model/policy_url_blocking_service_factory.h"
 #import "ios/chrome/browser/power_bookmarks/model/power_bookmark_service_factory.h"
@@ -277,6 +278,7 @@ void EnsureProfileKeyedServiceFactoriesBuilt() {
   ios::WebDataServiceFactory::GetInstance();
   ios::WebHistoryServiceFactory::GetInstance();
   ios::ZeroSuggestCacheServiceFactory::GetInstance();
+  policy::EnterpriseManagementMetricsServiceFactory::GetInstance();
   policy::UserPolicySigninServiceFactory::GetInstance();
   safe_browsing::ChromeEnterpriseRealTimeUrlLookupServiceFactory::GetInstance();
   segmentation_platform::SegmentationPlatformServiceFactory::GetInstance();

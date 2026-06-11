@@ -59,6 +59,19 @@ chromium-metrics-reviews@google.com.
   <int value="1" label="Warned"/>
 </enum>
 
+<!-- LINT.IfChange(BrowserManagementStatus) -->
+
+<enum name="BrowserManagementStatus">
+  <int value="0" label="Unmanaged (None)"/>
+  <int value="1" label="Computer Local (&lt;= 3 policies)"/>
+  <int value="2" label="Computer Local (&gt; 3 policies)"/>
+  <int value="3" label="Domain Local"/>
+  <int value="4" label="Cloud"/>
+  <int value="5" label="Cloud Domain"/>
+</enum>
+
+<!-- LINT.ThenChange(//components/policy/core/common/enterprise_management_metrics_service.h:BrowserManagementStatus) -->
+
 <enum name="CertificatePrivateKeySource">
   <int value="0" label="Unexportable"/>
   <int value="1" label="Software"/>
@@ -2828,6 +2841,18 @@ chromium-metrics-reviews@google.com.
   <int value="1" label="not yet owned"/>
   <int value="2" label="ownership taken"/>
 </enum>
+
+<!-- LINT.IfChange(PlatformManagementStatus) -->
+
+<enum name="PlatformManagementStatus">
+  <int value="0" label="Unmanaged (None)"/>
+  <int value="1" label="Computer Local"/>
+  <int value="2" label="Domain Local"/>
+  <int value="3" label="Cloud"/>
+  <int value="4" label="Cloud Domain"/>
+</enum>
+
+<!-- LINT.ThenChange(//components/policy/core/common/enterprise_management_metrics_service.h:PlatformManagementStatus) -->
 
 <enum name="PromotionBannerAction">
   <int value="0" label="Promotion banner dismissed">
