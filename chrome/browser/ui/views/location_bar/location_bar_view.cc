@@ -568,7 +568,8 @@ void LocationBarView::Init() {
   // Because AIM eligibility can change during the lifecycle of the
   // `LocationBarView`, the AI Mode page action is added regardless of
   // eligibility, but its visibility is toggled to match eligibility.
-  if (base::FeatureList::IsEnabled(omnibox::kAiModeOmniboxEntryPoint)) {
+  if (browser_ &&
+      base::FeatureList::IsEnabled(omnibox::kAiModeOmniboxEntryPoint)) {
     // Position in the leading position, like the entrypoint for
     // kLensOverlayHomework above. While both chips may be enabled, they will
     // not appear at the same time due to different focus behavior. The

@@ -16,6 +16,7 @@
 #include "base/metrics/user_metrics.h"
 #include "base/metrics/user_metrics_action.h"
 #include "base/notreached.h"
+#include "base/types/to_address.h"
 #include "build/branding_buildflags.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/app/vector_icons/vector_icons.h"
@@ -33,7 +34,9 @@
 #include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/sharing_hub/sharing_hub_features.h"
 #include "chrome/browser/ui/accelerator_table.h"
-#include "chrome/browser/ui/omnibox/ai_mode_button_config.h"
+#include "chrome/browser/ui/omnibox/ai_mode_button_service_factory.h"
+#include "components/omnibox/browser/ai_mode_button_config.h"
+#include "components/omnibox/browser/ai_mode_button_service.h"
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/global_keyboard_shortcuts_mac.h"
 #endif
@@ -1448,48 +1451,61 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               ui::kColorIcon))
           .Build());
 
-  const auto& ai_config = ai_mode_button_config::GetCurrentAiModeButtonConfig();
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                bool via_keyboard = false;
+  auto* ai_mode_button_service =
+      AiModeButtonServiceFactory::GetForProfile(base::to_address(profile_));
+  const ai_mode_button_config::AiModeButtonConfig* ai_config =
+      ai_mode_button_service ? ai_mode_button_service->GetCurrentConfig()
+                             : nullptr;
+  if (ai_mode_button_service) {
+    // If `ai_mode_button_service` is null, it will remain null and the button
+    // will not be needed. If `ai_config` is null, it may later become non-null;
+    // the config's nullness can swap multiple times during the profile's
+    // lifecycle; so add the button regardless of the config's nullness.
+    root_action_item_->AddChild(
+        actions::ActionItem::Builder(
+            base::BindRepeating(
+                [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                   actions::ActionInvocationContext context) {
+                  bool via_keyboard = false;
 
-                std::underlying_type_t<page_actions::PageActionTrigger>
-                    page_action_trigger = context.GetProperty(
-                        page_actions::kPageActionTriggerKey);
+                  std::underlying_type_t<page_actions::PageActionTrigger>
+                      page_action_trigger = context.GetProperty(
+                          page_actions::kPageActionTriggerKey);
 
-                if ((page_action_trigger !=
-                     page_actions::kInvalidPageActionTrigger) &&
-                    page_action_trigger ==
-                        std::to_underlying(
-                            page_actions::PageActionTrigger::kKeyboard)) {
-                  via_keyboard = true;
-                }
+                  if ((page_action_trigger !=
+                       page_actions::kInvalidPageActionTrigger) &&
+                      page_action_trigger ==
+                          std::to_underlying(
+                              page_actions::PageActionTrigger::kKeyboard)) {
+                    via_keyboard = true;
+                  }
 
-                tabs::TabInterface* active_tab = bwi->GetActiveTabInterface();
-                CHECK(active_tab);
+                  tabs::TabInterface* active_tab = bwi->GetActiveTabInterface();
+                  CHECK(active_tab);
 
-                content::WebContents* web_contents = active_tab->GetContents();
-                CHECK(web_contents);
+                  content::WebContents* web_contents =
+                      active_tab->GetContents();
+                  CHECK(web_contents);
 
-                OmniboxController* omnibox_controller =
-                    search::GetOmniboxController(web_contents);
-                CHECK(omnibox_controller);
+                  OmniboxController* omnibox_controller =
+                      search::GetOmniboxController(web_contents);
+                  CHECK(omnibox_controller);
 
-                omnibox::AiModePageActionController::OpenAiMode(
-                    *omnibox_controller, via_keyboard);
-              },
-              bwi))
-          .SetActionId(kActionAiMode)
-          .SetText(ai_config.text)
-          .SetTooltipText(ai_config.tooltip)
-          .SetImage(ui::ImageModel::FromVectorIcon(
-              features::IsRoundedIconsEnabled() ? omnibox::kSearchSparkIcon
-                                                : omnibox::kSearchSparkOldIcon))
-          .SetProperty(actions::kActionItemPinnableKey, false)
-          .Build());
+                  omnibox::AiModePageActionController::OpenAiMode(
+                      *omnibox_controller, via_keyboard);
+                },
+                bwi))
+            .SetActionId(kActionAiMode)
+            .SetText(ai_config ? ai_config->text : std::u16string())
+            .SetTooltipText(ai_config ? ai_config->tooltip : std::u16string())
+            .SetEnabled(ai_config != nullptr)
+            .SetImage(ui::ImageModel::FromVectorIcon(
+                features::IsRoundedIconsEnabled()
+                    ? omnibox::kSearchSparkIcon
+                    : omnibox::kSearchSparkOldIcon))
+            .SetProperty(actions::kActionItemPinnableKey, false)
+            .Build());
+  }
 
   root_action_item_->AddChild(
       actions::ActionItem::Builder(

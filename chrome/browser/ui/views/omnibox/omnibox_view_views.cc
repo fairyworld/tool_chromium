@@ -47,7 +47,7 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
 #include "chrome/browser/ui/lens/lens_overlay_entry_point_controller.h"
-#include "chrome/browser/ui/omnibox/ai_mode_button_config.h"
+#include "chrome/browser/ui/omnibox/ai_mode_button_service_factory.h"
 #include "chrome/browser/ui/omnibox/clipboard_utils.h"
 #include "chrome/browser/ui/omnibox/omnibox_controller.h"
 #include "chrome/browser/ui/omnibox/omnibox_edit_model.h"
@@ -72,6 +72,8 @@
 #include "chrome/grit/generated_resources.h"
 #include "components/contextual_tasks/public/features.h"
 #include "components/lens/lens_features.h"
+#include "components/omnibox/browser/ai_mode_button_config.h"
+#include "components/omnibox/browser/ai_mode_button_service.h"
 #include "components/omnibox/browser/autocomplete_input.h"
 #include "components/omnibox/browser/autocomplete_match.h"
 #include "components/omnibox/browser/omnibox_client.h"
@@ -202,9 +204,11 @@ void LogOmniboxFocusToCutOrCopyAllTextTime(
   }
 }
 
-std::u16string AimPlaceholderText() {
-  const auto& config = ai_mode_button_config::GetCurrentAiModeButtonConfig();
-  return u"\u21E5 " + config.placeholder_text;
+std::u16string AimPlaceholderText(
+    const ai_mode_button_config::AiModeButtonConfig& config) {
+  // Appends a unicode character to represent the tab key.
+  const std::u16string kTabChar = u"\u21E5";
+  return kTabChar + u" " + config.placeholder_text;
 }
 
 }  // namespace
@@ -405,12 +409,13 @@ void OmniboxViewViews::InstallPlaceholderText() {
     // placeholder text to suggest tabbing into AI Mode. Note, even if the AI
     // placeholder text is installed, it will only be visible if
     // `ShouldShowPlaceholderText()` is also true.
-    SetPlaceholderText(AimPlaceholderText());
+    auto* config = GetAiModeConfig();
+    CHECK(config);
+    SetPlaceholderText(AimPlaceholderText(*config));
     // Override the AIM accessibility placeholder text, so that the tab icon is
     // not announced.
-    const auto& config = ai_mode_button_config::GetCurrentAiModeButtonConfig();
     GetViewAccessibility().SetPlaceholder(
-        base::UTF16ToUTF8(config.placeholder_text));
+        base::UTF16ToUTF8(config->placeholder_text));
   } else if (ShouldInstallContextualTasksPlaceholderText()) {
     // For Contextual Tasks page, use the page title as placeholder text.
     SetPlaceholderText(location_bar_view_->GetWebContents()->GetTitle());
@@ -705,7 +710,9 @@ void OmniboxViewViews::OnPaint(gfx::Canvas* canvas) {
 
   // Record an impression of the AIM hint text if it is being shown.
   const bool should_show_placeholder = ShouldShowPlaceholderText();
-  const bool is_aim_placeholder = GetPlaceholderText() == AimPlaceholderText();
+  auto* config = GetAiModeConfig();
+  const bool is_aim_placeholder =
+      config && GetPlaceholderText() == AimPlaceholderText(*config);
   if (should_show_placeholder && is_aim_placeholder && !aim_hint_shown_) {
     aim_hint_shown_ = true;
     RecordAimHintImpression();
@@ -2421,9 +2428,11 @@ void OmniboxViewViews::UpdateContextMenu(ui::SimpleMenuModel* menu_contents) {
 
   if (omnibox::ShouldShowAimContextMenuOption(
           location_bar_view_->GetProfile())) {
-    const auto& config = ai_mode_button_config::GetCurrentAiModeButtonConfig();
-    menu_contents->AddCheckItem(IDC_SHOW_AI_MODE_OMNIBOX_BUTTON,
-                                config.context_menu_label);
+    auto* config = GetAiModeConfig();
+    if (config) {
+      menu_contents->AddCheckItem(IDC_SHOW_AI_MODE_OMNIBOX_BUTTON,
+                                  config->context_menu_label);
+    }
   }
 
   if (omnibox_feature_configs::Toolbelt::Get().enabled) {
@@ -2689,7 +2698,17 @@ bool OmniboxViewViews::ShouldInstallAimPlaceholderText() const {
       OmniboxFieldTrial::IsAimOmniboxEntrypointEnabled(aim_eligibility_service);
 
   return is_aim_entrypoint_enabled &&
-         controller()->edit_model()->is_caret_visible();
+         controller()->edit_model()->is_caret_visible() && GetAiModeConfig();
+}
+
+const ai_mode_button_config::AiModeButtonConfig*
+OmniboxViewViews::GetAiModeConfig() const {
+  if (!location_bar_view_) {
+    return nullptr;
+  }
+  auto* service = AiModeButtonServiceFactory::GetForProfile(
+      location_bar_view_->GetProfile());
+  return service ? service->GetCurrentConfig() : nullptr;
 }
 
 bool OmniboxViewViews::ShouldInstallContextualTasksPlaceholderText() const {

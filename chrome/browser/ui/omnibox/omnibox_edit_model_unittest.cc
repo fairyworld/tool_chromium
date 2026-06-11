@@ -18,7 +18,6 @@
 #include "base/test/task_environment.h"
 #include "build/build_config.h"
 #include "chrome/browser/contextual_search/contextual_search_service_factory.h"
-#include "chrome/browser/ui/omnibox/ai_mode_button_config.h"
 #include "chrome/browser/ui/omnibox/chrome_omnibox_client.h"
 #include "chrome/browser/ui/omnibox/omnibox_controller.h"
 #include "chrome/browser/ui/omnibox/omnibox_next_features.h"
@@ -39,6 +38,7 @@
 #include "components/dom_distiller/core/url_utils.h"
 #include "components/omnibox/browser/actions/omnibox_action.h"
 #include "components/omnibox/browser/actions/tab_switch_action.h"
+#include "components/omnibox/browser/ai_mode_button_config.h"
 #include "components/omnibox/browser/autocomplete_controller.h"
 #include "components/omnibox/browser/autocomplete_enums.h"
 #include "components/omnibox/browser/autocomplete_match.h"
@@ -2177,7 +2177,7 @@ TEST_F(OmniboxEditModelTest, NavigateToThirdPartyAiMode) {
   test_config.id = SearchEngineType::SEARCH_ENGINE_YAHOO;
   test_config.navigation_url = "https://url.com/search?p={searchTerms}";
   test_config.navigation_url_empty = "https://url-empty.com";
-  ai_mode_button_config::SetCurrentAiModeButtonConfigForTesting(&test_config);
+  client()->GetAiModeButtonService()->current_config_ = test_config;
 
   // Test with query.
   EXPECT_CALL(*client(), OpenUrl(GURL("https://url.com/search?p=query"),
@@ -2190,8 +2190,6 @@ TEST_F(OmniboxEditModelTest, NavigateToThirdPartyAiMode) {
                                  WindowOpenDisposition::CURRENT_TAB))
       .Times(1);
   model()->NavigateToThirdPartyAiMode(u"");
-
-  ai_mode_button_config::SetCurrentAiModeButtonConfigForTesting(nullptr);
 }
 
 class OmniboxEditModelContextualSearchTest

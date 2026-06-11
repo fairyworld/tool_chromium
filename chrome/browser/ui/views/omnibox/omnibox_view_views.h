@@ -45,6 +45,10 @@
 class LocationBarView;
 class IconLabelBubbleView;
 
+namespace ai_mode_button_config {
+struct AiModeButtonConfig;
+}
+
 namespace content {
 class WebContents;
 }  // namespace content
@@ -405,6 +409,9 @@ class OmniboxViewViews
   // Returns true if the Contextual Tasks placeholder text should be installed
   // instead of the DSE placeholder text.
   bool ShouldInstallContextualTasksPlaceholderText() const;
+
+  // Helper to get the current `AiModeButtonConfig` if available.
+  const ai_mode_button_config::AiModeButtonConfig* GetAiModeConfig() const;
 
   // Records an impression of the AIM hint text.
   void RecordAimHintImpression();

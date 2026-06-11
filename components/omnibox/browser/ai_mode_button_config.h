@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_UI_OMNIBOX_AI_MODE_BUTTON_CONFIG_H_
-#define CHROME_BROWSER_UI_OMNIBOX_AI_MODE_BUTTON_CONFIG_H_
+#ifndef COMPONENTS_OMNIBOX_BROWSER_AI_MODE_BUTTON_CONFIG_H_
+#define COMPONENTS_OMNIBOX_BROWSER_AI_MODE_BUTTON_CONFIG_H_
 
 #include <string>
 
@@ -13,7 +13,7 @@ namespace ai_mode_button_config {
 
 // The config for an omnibox AI button.
 struct AiModeButtonConfig {
-  SearchEngineType id;
+  SearchEngineType id = SearchEngineType::SEARCH_ENGINE_UNKNOWN;
 
   // Text shown in button.
   std::u16string text;
@@ -47,14 +47,6 @@ struct AiModeButtonConfig {
   bool IsValid() const;
 };
 
-// Returns the currently selected AI button configuration.
-// TODO(crbug.com/510389207): Use a observe or callback API so consumers of the
-//   config are updated when the config changes.
-const AiModeButtonConfig& GetCurrentAiModeButtonConfig();
-
-// Sets the current config for testing. Pass nullptr to reset.
-void SetCurrentAiModeButtonConfigForTesting(const AiModeButtonConfig* config);
-
 }  // namespace ai_mode_button_config
 
-#endif  // CHROME_BROWSER_UI_OMNIBOX_AI_MODE_BUTTON_CONFIG_H_
+#endif  // COMPONENTS_OMNIBOX_BROWSER_AI_MODE_BUTTON_CONFIG_H_

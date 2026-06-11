@@ -10,7 +10,7 @@ assert(is_win || is_mac || is_linux || is_chromeos || is_android)
 # The public interface has no circular dependencies.
 source_set("omnibox") {
   public = [
-    "ai_mode_button_config.h",
+    "ai_mode_button_service_factory.h",
     "omnibox_controller.h",
     "omnibox_edit_model.h",
     "omnibox_next_features.h",
@@ -76,7 +76,7 @@ source_set("omnibox") {
 # //chrome/browser/ui.
 source_set("impl") {
   sources = [
-    "ai_mode_button_config.cc",
+    "ai_mode_button_service_factory.cc",
     "omnibox_controller.cc",
     "omnibox_edit_model.cc",
     "omnibox_next_features.cc",
@@ -249,7 +249,6 @@ if (!is_android) {
   source_set("unit_tests") {
     testonly = true
     sources = [
-      "ai_mode_button_config_unittest.cc",
       "alternate_nav_infobar_delegate_unittest.cc",
       "chrome_omnibox_navigation_observer_unittest.cc",
       "clipboard_utils_unittest.cc",

@@ -8,6 +8,7 @@
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
 #include "base/metrics/histogram_functions.h"
+#include "base/types/to_address.h"
 #include "chrome/browser/autocomplete/aim_eligibility_service_factory.h"
 #include "chrome/browser/bitmap_fetcher/bitmap_fetcher_service.h"
 #include "chrome/browser/bitmap_fetcher/bitmap_fetcher_service_factory.h"
@@ -17,7 +18,7 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
 #include "chrome/browser/ui/layout_constants.h"
-#include "chrome/browser/ui/omnibox/ai_mode_button_config.h"
+#include "chrome/browser/ui/omnibox/ai_mode_button_service_factory.h"
 #include "chrome/browser/ui/omnibox/omnibox_controller.h"
 #include "chrome/browser/ui/omnibox/omnibox_edit_model.h"
 #include "chrome/browser/ui/omnibox/omnibox_next_features.h"
@@ -29,6 +30,8 @@
 #include "components/favicon/core/favicon_service.h"
 #include "components/favicon_base/favicon_types.h"
 #include "components/keyed_service/core/service_access_type.h"
+#include "components/omnibox/browser/ai_mode_button_config.h"
+#include "components/omnibox/browser/ai_mode_button_service.h"
 #include "components/omnibox/browser/autocomplete_match.h"
 #include "components/omnibox/browser/autocomplete_result.h"
 #include "components/omnibox/browser/omnibox_client.h"
@@ -156,8 +159,12 @@ void AiModePageActionController::NotifyOmniboxTriggeredFeatureService(
 bool AiModePageActionController::ShouldShowPageAction(
     Profile* profile,
     LocationBarView& location_bar_view) {
-  const auto& config = ai_mode_button_config::GetCurrentAiModeButtonConfig();
-  if (!config.IsValid()) {
+  auto* service = AiModeButtonServiceFactory::GetForProfile(profile);
+  if (!service) {
+    return false;
+  }
+  auto* config = service->GetCurrentConfig();
+  if (!config || !config->IsValid()) {
     return false;
   }
 
@@ -248,8 +255,12 @@ void AiModePageActionController::SetPageActionVisibility(bool is_visible) {
     return;
   }
 
-  const auto& config = ai_mode_button_config::GetCurrentAiModeButtonConfig();
-  if (config.id == SearchEngineType::SEARCH_ENGINE_GOOGLE) {
+  auto* service =
+      AiModeButtonServiceFactory::GetForProfile(base::to_address(profile_));
+  CHECK(service);
+  auto* config = service->GetCurrentConfig();
+  CHECK(config);
+  if (config->id == SearchEngineType::SEARCH_ENGINE_GOOGLE) {
     ShowAndOverrideImage(
         ui::ImageModel::FromImageGenerator(
             base::BindRepeating([](const ui::ColorProvider* color_provider) {
@@ -266,7 +277,7 @@ void AiModePageActionController::SetPageActionVisibility(bool is_visible) {
         IconSource::kVectorIcon);
 
   } else {
-    GURL favicon_url(config.favicon_url);
+    GURL favicon_url(config->favicon_url);
     OmniboxClient* client =
         location_bar_view_->GetOmniboxController()->client();
     gfx::Image image = client->GetFaviconForIconUrl(
@@ -341,8 +352,12 @@ void AiModePageActionController::OnFaviconFetchedFromNetwork(SkBitmap bitmap) {
   }
 
   // Store fetched icon into favicon cache.
-  const auto& config = ai_mode_button_config::GetCurrentAiModeButtonConfig();
-  GURL favicon_url(config.favicon_url);
+  auto* service =
+      AiModeButtonServiceFactory::GetForProfile(base::to_address(profile_));
+  CHECK(service);
+  auto* config = service->GetCurrentConfig();
+  CHECK(config);
+  GURL favicon_url(config->favicon_url);
   favicon::FaviconService* favicon_service =
       FaviconServiceFactory::GetForProfile(base::to_address(profile_),
                                            ServiceAccessType::EXPLICIT_ACCESS);
