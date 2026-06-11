@@ -11,7 +11,9 @@
 #import "base/notreached.h"
 #import "base/strings/sys_string_conversions.h"
 #import "ios/chrome/app/application_delegate/app_state.h"
+#import "ios/chrome/app/profile/profile_init_stage.h"
 #import "ios/chrome/app/profile/profile_state.h"
+#import "ios/chrome/app/profile/profile_state_observer.h"
 #import "ios/chrome/browser/authentication/ui_bundled/signin/signin_in_progress.h"
 #import "ios/chrome/browser/shared/coordinator/scene/scene_controller.h"
 #import "ios/chrome/browser/shared/coordinator/scene/scene_state_prefs.h"
@@ -30,7 +32,7 @@
 
 #pragma mark - SceneState
 
-@interface SceneState () <SignInInProgressAudience>
+@interface SceneState () <SignInInProgressAudience, ProfileStateObserver>
 
 @end
 
@@ -129,8 +131,7 @@
   _scene = scene;
   if (_scene) {
     _sceneSessionID = SessionIdentifierForScene(_scene);
-    _prefs = [[SceneStatePrefs alloc] initWithSession:_scene.session];
-    [_incognitoState preferencesDidLoad];
+    [self createPrefsIfPossible];
   } else {
     _sceneSessionID.clear();
     _prefs = nil;
@@ -186,8 +187,14 @@
 }
 
 - (void)setProfileState:(ProfileState*)profileState {
+  if (_profileState) {
+    [_profileState removeObserver:self];
+  }
   _profileState = profileState;
   [_observers sceneState:self profileStateConnected:_profileState];
+  if (_profileState) {
+    [_profileState addObserver:self];
+  }
 }
 
 #pragma mark - UIBlockerTarget
@@ -281,6 +288,31 @@
   }
   _signinUIBlocker.reset();
   [_observers signinDidEnd:self];
+}
+
+#pragma mark - ProfileStateObserver
+
+- (void)profileState:(ProfileState*)profileState
+    didTransitionToInitStage:(ProfileInitStage)nextInitStage
+               fromInitStage:(ProfileInitStage)fromInitStage {
+  if (nextInitStage >= ProfileInitStage::kProfileLoaded) {
+    [profileState removeObserver:self];
+    [self createPrefsIfPossible];
+  }
+}
+
+#pragma mark - Private methods
+
+// Will create the SceneStatePrefs if the object is ready. Can be called
+// when any condition controlling the creation of the object has changed.
+- (void)createPrefsIfPossible {
+  if (!_scene || _sceneSessionID.empty() ||
+      _profileState.initStage < ProfileInitStage::kProfileLoaded) {
+    return;
+  }
+
+  _prefs = [[SceneStatePrefs alloc] initWithSession:_scene.session];
+  [_incognitoState preferencesDidLoad];
 }
 
 @end
