@@ -18,7 +18,6 @@
 #include "components/autofill/core/browser/suggestions/suggestion.h"
 #include "components/autofill/core/browser/suggestions/suggestion_type.h"
 #include "components/autofill/core/browser/ui/popup_open_enums.h"
-#include "components/autofill/core/browser/ui/suggestion_button_action.h"
 #include "components/autofill/core/browser/ui/tabbed_pane_enums.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "ui/gfx/geometry/point.h"
@@ -62,10 +61,6 @@ class MockAutofillPopupController : public AutofillPopupController {
   MOCK_METHOD(void,
               AcceptSuggestion,
               (int, autofill::AutofillMetrics::SuggestionAcceptedMethod),
-              (override));
-  MOCK_METHOD(void,
-              PerformButtonActionForSuggestion,
-              (int, const SuggestionButtonAction&),
               (override));
   const std::vector<Suggestion>& GetSuggestions() const override {
     return suggestions_;

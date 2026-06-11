@@ -76,7 +76,6 @@
 #include "components/autofill/core/browser/suggestions/suggestion_util.h"
 #include "components/autofill/core/browser/ui/autofill_suggestion_delegate.h"
 #include "components/autofill/core/browser/ui/popup_open_enums.h"
-#include "components/autofill/core/browser/ui/suggestion_button_action.h"
 #include "components/autofill/core/browser/ui/tabbed_pane_enums.h"
 #include "components/autofill/core/common/aliases.h"
 #include "components/autofill/core/common/autofill_features.h"
@@ -1008,18 +1007,6 @@ void AutofillExternalDelegate::DidAcceptSuggestion(
 
   manager_->client().HideSuggestions(SuggestionHidingReason::kAcceptSuggestion,
                                      /*product=*/std::nullopt);
-}
-
-void AutofillExternalDelegate::DidPerformButtonActionForSuggestion(
-    const Suggestion& suggestion,
-    const SuggestionButtonAction& button_action) {
-  switch (suggestion.type) {
-    case SuggestionType::kComposeResumeNudge:
-      NOTIMPLEMENTED();
-      return;
-    default:
-      NOTREACHED();
-  }
 }
 
 bool AutofillExternalDelegate::RemoveSuggestion(const Suggestion& suggestion) {

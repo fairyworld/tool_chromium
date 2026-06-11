@@ -936,14 +936,6 @@ bool AutofillPopupControllerImpl::
          !IsRootPopup();
 }
 
-void AutofillPopupControllerImpl::PerformButtonActionForSuggestion(
-    int index,
-    const SuggestionButtonAction& button_action) {
-  CHECK_LE(base::checked_cast<size_t>(index), GetSuggestions().size());
-  delegate_->DidPerformButtonActionForSuggestion(GetSuggestions()[index],
-                                                 button_action);
-}
-
 const std::vector<
     std::optional<AutofillPopupController::SuggestionFilterMatch>>&
 AutofillPopupControllerImpl::GetSuggestionFilterMatches() const {

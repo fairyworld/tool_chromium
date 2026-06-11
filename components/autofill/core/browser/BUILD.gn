@@ -847,7 +847,6 @@ static_library("browser") {
     "ui/popup_open_enums.h",
     "ui/region_combobox_model.cc",
     "ui/region_combobox_model.h",
-    "ui/suggestion_button_action.h",
     "ui/tabbed_pane_enums.h",
     "webdata/addresses/address_autofill_table.cc",
     "webdata/addresses/address_autofill_table.h",

@@ -472,13 +472,6 @@ void PasswordAutofillManager::DidAcceptSuggestion(
   }
 }
 
-void PasswordAutofillManager::DidPerformButtonActionForSuggestion(
-    const Suggestion&,
-    const autofill::SuggestionButtonAction&) {
-  // Button actions do currently not exist for password entries.
-  NOTREACHED();
-}
-
 bool PasswordAutofillManager::RemoveSuggestion(const Suggestion& suggestion) {
   // Password suggestions cannot be deleted this way.
   // See http://crbug.com/329038#c15
