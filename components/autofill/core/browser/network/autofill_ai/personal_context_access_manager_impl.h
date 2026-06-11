@@ -20,6 +20,7 @@
 #include "components/autofill/core/browser/network/autofill_ai/personal_context_access_manager.h"
 #include "components/personal_context/core/personal_context_enablement_service.h"
 #include "components/personal_context/core/personal_context_types.h"
+#include "components/personal_context/proto/features/common_data.pb.h"
 #include "net/base/backoff_entry.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 
@@ -93,10 +94,21 @@ class PersonalContextAccessManagerImpl
       std::vector<EntityType> requested_types,
       personal_context::FetchContextResult result);
 
-  // Caches a batch of prefetched `entities` and schedules new invalidations
-  // after `kPrefetchedEntitiesCacheTTL`.
+  // Handles the asynchronous result of the SPII entities fetch.
+  void OnFetchPiiEntitiesComplete(
+      const EntityInstance::EntityId& id,
+      GetUnmaskedSpiiEntityCallback callback,
+      personal_context::FetchPiiEntitiesResult result);
+
+  // Caches a batch of prefetched `entities` and their original `protos`.
+  // Schedules new invalidations for each `EntityType` after
+  // `kPrefetchedEntitiesCacheTTL`. The original entity `protos` from where
+  // `entities` were extracted also require caching for subsequent
+  // unmasking requests.
   void CachePrefetchedEntities(
-      absl::flat_hash_map<EntityType, std::vector<EntityInstance>> entities);
+      absl::flat_hash_map<EntityType, std::vector<EntityInstance>> entities,
+      absl::flat_hash_map<EntityInstance::EntityId,
+                          personal_context::proto::Entity> protos);
 
   // Returns true if a network request should be initiated for `type`.
   // This is true if the type is not cached, its cache TTL has expired, or a
@@ -136,6 +148,10 @@ class PersonalContextAccessManagerImpl
   //   type from `unmasked_spii_cache_`.
   base::flat_set<EntityInstance, EntityInstance::CompareByGuid>
       prefetched_entity_cache_;
+
+  // Map from EntityId to the original proto Entity received during prefetch.
+  absl::flat_hash_map<EntityInstance::EntityId, personal_context::proto::Entity>
+      prefetched_proto_cache_;
 
   // Cache of unmasked sensitive PII (SPII) entity instances.
   //

@@ -39,10 +39,11 @@ class PersonalContextAccessManager : public KeyedService {
   virtual std::optional<EntityInstance> GetCachedEntity(
       const EntityInstance::EntityId& id) const = 0;
 
-  // Retrieves the unmasked SPII `EntityInstance` with the given `id`.
-  // If it is in the cache, runs the `callback` immediately with the cached
-  // value. Otherwise, triggers a network request and runs the `callback` with
-  // the result.
+  // Retrieves the unmasked SPII `EntityInstance` with the given `id`. If it is
+  // in the cache, runs the `callback` immediately with the cached value.
+  // Otherwise, triggers a network request and runs the `callback` with the
+  // result. If the request fails synchronously, runs the `callback` with
+  // `std::nullopt`.
   virtual void GetUnmaskedSpiiEntity(
       const EntityInstance::EntityId& id,
       GetUnmaskedSpiiEntityCallback callback) = 0;

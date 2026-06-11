@@ -473,6 +473,108 @@ TEST_F(PersonalContextAccessManagerImplTest,
   EXPECT_EQ(GetUnmaskedSpiiEntitySync(passport_guid), std::nullopt);
 }
 
+// Tests that GetUnmaskedSpiiEntity returns the cached entity immediately
+// without calling the service if it is already in the unmasked cache.
+TEST_F(PersonalContextAccessManagerImplTest, GetUnmaskedSpiiEntity_CacheHit) {
+  EntityInstance passport = test::GetPassportEntityInstance(
+      {.record_type = EntityInstance::RecordType::kPersonalContext});
+
+  test_api(access_manager()).CacheUnmaskedSpiiEntity(passport);
+
+  // No service call expected.
+  EXPECT_CALL(mock_personal_context_service(), FetchPiiEntities).Times(0);
+  EXPECT_EQ(GetUnmaskedSpiiEntitySync(passport.guid()), passport);
+}
+
+// Tests that GetUnmaskedSpiiEntity triggers a service call on cache miss
+// (when the masked entity is prefetched), caches the unmasked result,
+// and returns it.
+TEST_F(PersonalContextAccessManagerImplTest,
+       GetUnmaskedSpiiEntity_CacheMiss_Success) {
+  // 1. Prefetch (masked) Passport.
+  personal_context::proto::ContextMemoryAmbientAutofillResponse response;
+  response.add_entities()->mutable_passport()->set_number("P123");
+  PrefetchAmbientAutofillContextSync({EntityType(EntityTypeName::kPassport)},
+                                     response);
+  ASSERT_TRUE(
+      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
+
+  std::vector<EntityInstance> cached = access_manager().GetCachedEntities();
+  ASSERT_EQ(cached.size(), 1u);
+  EntityInstance passport_masked = cached[0];
+
+  // 2. Prepare unmasked response.
+  personal_context::proto::FetchPiiEntitiesResponse expected_response;
+  expected_response.add_entities()->mutable_passport()->set_number(
+      "P123_UNMASKED");
+
+  EXPECT_CALL(mock_personal_context_service(), FetchPiiEntities(_, _, _))
+      .WillOnce(RunOnceCallback<2>(personal_context::FetchPiiEntitiesResult(
+          base::ok(std::move(expected_response)))));
+
+  // Call GetUnmaskedSpiiEntity.
+  {
+    std::optional<EntityInstance> result =
+        GetUnmaskedSpiiEntitySync(passport_masked.guid());
+    ASSERT_TRUE(result.has_value());
+    // The result should be unmasked and have the same GUID.
+    EXPECT_FALSE(result->IsMaskedEntity());
+    EXPECT_EQ(result->guid(), passport_masked.guid());
+    EXPECT_EQ(
+        result->attribute(AttributeType(AttributeTypeName::kPassportNumber))
+            ->GetCompleteRawInfo(),
+        u"P123_UNMASKED");
+  }
+
+  // Verify that the unmasked passport is now cached in the unmasked cache by
+  // calling `GetUnmaskedSpiiEntitySync` again and ensuring no service call
+  // is made.
+  EXPECT_CALL(mock_personal_context_service(), FetchPiiEntities).Times(0);
+  {
+    std::optional<EntityInstance> cached_result =
+        GetUnmaskedSpiiEntitySync(passport_masked.guid());
+    ASSERT_TRUE(cached_result.has_value());
+    EXPECT_EQ(cached_result->guid(), passport_masked.guid());
+    EXPECT_FALSE(cached_result->IsMaskedEntity());
+  }
+}
+
+// Tests that `GetUnmaskedSpiiEntity` returns `std::nullopt` immediately
+// if the requested entity is not even in the prefetched (masked) cache.
+TEST_F(PersonalContextAccessManagerImplTest,
+       GetUnmaskedSpiiEntity_CacheMiss_NotPrefetched) {
+  EntityInstance::EntityId unknown_id("unknown_id");
+
+  // No service call expected because it's not prefetched.
+  EXPECT_CALL(mock_personal_context_service(), FetchPiiEntities).Times(0);
+  EXPECT_EQ(GetUnmaskedSpiiEntitySync(unknown_id), std::nullopt);
+}
+
+// Tests that `GetUnmaskedSpiiEntity` returns `std::nullopt` if the service call
+// fails.
+TEST_F(PersonalContextAccessManagerImplTest,
+       GetUnmaskedSpiiEntity_CacheMiss_ServiceFailure) {
+  // 1. Prefetch (masked) Passport.
+  personal_context::proto::ContextMemoryAmbientAutofillResponse response;
+  response.add_entities()->mutable_passport()->set_number("P123");
+  PrefetchAmbientAutofillContextSync({EntityType(EntityTypeName::kPassport)},
+                                     response);
+
+  std::vector<EntityInstance> cached = access_manager().GetCachedEntities();
+  ASSERT_EQ(cached.size(), 1u);
+  EntityInstance::EntityId passport_guid = cached[0].guid();
+
+  using personal_context::ContextMemoryError;
+  ContextMemoryError expected_error = ContextMemoryError::FromExecutionError(
+      ContextMemoryError::ExecutionError::kGenericFailure);
+
+  EXPECT_CALL(mock_personal_context_service(), FetchPiiEntities(_, _, _))
+      .WillOnce(RunOnceCallback<2>(personal_context::FetchPiiEntitiesResult(
+          base::unexpected(expected_error))));
+
+  EXPECT_EQ(GetUnmaskedSpiiEntitySync(passport_guid), std::nullopt);
+}
+
 // Tests that PrefetchAmbientAutofillContext is not executed if the
 // kAutofillAmbientAutofill flag is disabled.
 TEST_F(PersonalContextAccessManagerImplTest,
