@@ -5,9 +5,6 @@
 #include "chrome/browser/autofill/android/autofill_fallback_surface_launcher.h"
 
 #include "base/android/jni_android.h"
-#include "base/android/jni_string.h"
-#include "chrome/browser/profiles/profile.h"
-#include "chrome/common/url_constants.h"
 #include "content/public/browser/web_contents.h"
 #include "ui/android/view_android.h"
 #include "ui/android/window_android.h"
@@ -34,11 +31,6 @@ void ShowGoogleWallePrivatePassesHelpCenterPageInCct(
         base::android::AttachCurrentThread(),
         web_contents.GetNativeView()->GetWindowAndroid()->GetJavaObject());
   }
-}
-
-static std::string
-JNI_AutofillFallbackSurfaceLauncher_GetPlusAddressManagementUrl(JNIEnv* env) {
-  return "";
 }
 
 }  // namespace autofill
