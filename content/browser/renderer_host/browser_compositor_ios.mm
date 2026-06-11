@@ -454,7 +454,7 @@ void BrowserCompositorIOS::InvalidateSurface() {
 }
 
 void BrowserCompositorIOS::Suspend() {
-  DCHECK(compositor_);
+  CHECK(compositor_, base::NotFatalUntil::M152);
   // Requests a compositor lock without a timeout.
   compositor_suspended_lock_ =
       compositor_->GetCompositorLock(nullptr, base::TimeDelta());

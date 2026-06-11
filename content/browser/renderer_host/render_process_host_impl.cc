@@ -428,7 +428,7 @@ class SiteProcessMap : public base::SupportsUserData::Data {
     for (const auto& i : site_info_set) {
       auto iter = map_.find(i);
       if (iter != map_.end()) {
-        DCHECK_EQ(iter->second, host);
+        CHECK_EQ(iter->second, host, base::NotFatalUntil::M152);
         map_.erase(iter);
       }
     }
@@ -440,7 +440,7 @@ class SiteProcessMap : public base::SupportsUserData::Data {
 
 // Find the SiteProcessMap specific to the given context.
 SiteProcessMap* GetSiteProcessMapForBrowserContext(BrowserContext* context) {
-  DCHECK(context);
+  CHECK(context, base::NotFatalUntil::M152);
   SiteProcessMap* existing_map = static_cast<SiteProcessMap*>(
       context->GetUserData(kSiteProcessMapKeyName));
   if (existing_map)
@@ -485,7 +485,7 @@ class RenderProcessHostIsReadyObserver : public RenderProcessHostObserver {
   }
 
   void CallTask() {
-    DCHECK_CURRENTLY_ON(BrowserThread::UI);
+    CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
     if (render_process_host_->IsReady())
       std::move(task_).Run();
 
@@ -620,8 +620,9 @@ bool IsBelowReuseResourceThresholds(RenderProcessHost* host,
     return HasEnoughMemoryForAnotherMainFrame(host, main_frame_count);
   }
 
-  DCHECK_EQ(process_reuse_policy,
-            ProcessReusePolicy::kReusePendingOrCommittedSiteSubframe);
+  CHECK_EQ(process_reuse_policy,
+           ProcessReusePolicy::kReusePendingOrCommittedSiteSubframe,
+           base::NotFatalUntil::M152);
 
   // For subframe process reuse, simply check if the `host` has already exceeded
   // the memory threshold to decide whether it should be reused for a new
@@ -746,7 +747,8 @@ class SiteProcessCountTracker : public base::SupportsUserData::Data,
     ChildProcessIdCountMap& counts_per_process = result->second;
 
     --counts_per_process[render_process_host_id];
-    DCHECK_GE(counts_per_process[render_process_host_id], 0);
+    CHECK_GE(counts_per_process[render_process_host_id], 0,
+             base::NotFatalUntil::M152);
 
     if (counts_per_process[render_process_host_id] == 0)
       counts_per_process.erase(render_process_host_id);
@@ -871,7 +873,7 @@ class SiteProcessCountTracker : public base::SupportsUserData::Data,
 
     for (auto host_info : rph_to_sites_map) {
       RenderProcessHost* host = GetAllHosts().Lookup(host_info.first);
-      DCHECK(host);
+      CHECK(host, base::NotFatalUntil::M152);
 
       bool is_locked_to_site = host->GetProcessLock().IsLockedToSite();
       output += base::StringPrintf("\tProcess Host ID %d (PID %s, %s):\n",
@@ -977,7 +979,7 @@ class SiteProcessCountTracker : public base::SupportsUserData::Data,
   void RenderProcessHostDestroyed(RenderProcessHost* host) override {
 #ifndef NDEBUG
     host->RemoveObserver(this);
-    DCHECK(!HasProcess(host));
+    CHECK(!HasProcess(host), base::NotFatalUntil::M152);
 #endif
   }
 
@@ -1043,7 +1045,8 @@ class UnmatchedServiceWorkerProcessTracker
   static void Register(RenderProcessHost* render_process_host,
                        SiteInstanceImpl* site_instance) {
     BrowserContext* browser_context = site_instance->GetBrowserContext();
-    DCHECK(!site_instance->GetSiteInfo().site_url().is_empty());
+    CHECK(!site_instance->GetSiteInfo().site_url().is_empty(),
+          base::NotFatalUntil::M152);
     if (!ShouldTrackProcessForSite(site_instance->GetSiteInfo()))
       return;
 
