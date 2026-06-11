@@ -85,7 +85,7 @@ class CONTENT_EXPORT SurfaceEmbedConnector {
   virtual void OnVisibilityChanged(
       blink::mojom::FrameVisibility visibility) = 0;
 
-  // Called by the SecureEmbedHost to synchronize visual properties between the
+  // Called by the SurfaceEmbedHost to synchronize visual properties between the
   // parent and child WebContents.
   virtual void OnSynchronizeVisualProperties(
       const blink::FrameVisualProperties& visual_properties) = 0;
