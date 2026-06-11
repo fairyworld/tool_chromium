@@ -698,6 +698,8 @@ class LocationBarMediator
         mCurrentInput
                 .setUserText(text)
                 .setAllowUserTextAutocompletion(mUrlCoordinator.shouldAutocomplete());
+        mLocationBarLayout.setIsInStandby(
+                mCurrentInput.getAutocompleteState() == AutocompleteState.STANDBY);
     }
 
     /**
@@ -1245,6 +1247,8 @@ class LocationBarMediator
         if (mCurrentInput.isInCacheableContext() && mAutocompleteCoordinator != null) {
             mAutocompleteCoordinator.serveCachedZeroSuggest(mCurrentInput);
         }
+        mLocationBarLayout.setIsInStandby(
+                mCurrentInput.getAutocompleteState() == AutocompleteState.STANDBY);
     }
 
     @VisibleForTesting
@@ -2496,6 +2500,7 @@ class LocationBarMediator
         if (mUrlHasFocus) {
             mUrlCoordinator.clearFocus();
         }
+        mLocationBarLayout.setIsInStandby(false);
     }
 
     @Override
