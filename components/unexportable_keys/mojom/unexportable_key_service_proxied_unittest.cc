@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <optional>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -16,6 +17,7 @@
 #include "base/test/task_environment.h"
 #include "base/test/test_future.h"
 #include "base/types/expected.h"
+#include "base/types/optional_util.h"
 #include "base/unguessable_token.h"
 #include "components/unexportable_keys/background_task_priority.h"
 #include "components/unexportable_keys/mojom/unexportable_key_service.mojom.h"
@@ -42,6 +44,84 @@ constexpr auto kTestSubjectPublicKeyInfo = std::to_array<uint8_t>({1, 2, 3, 4});
 constexpr auto kTestWrappedKey = std::to_array<uint8_t>({5, 6, 7, 8});
 constexpr std::string_view kTestKeyTag = "test_key_tag";
 
+mojom::NewKeyMetadataPtr ToNewKeyMetadata(CachedKeyData cache_data) {
+  auto metadata = mojom::NewKeyMetadata::New();
+  metadata->subject_public_key_info =
+      std::move(cache_data.subject_public_key_info);
+  metadata->wrapped_key = std::move(cache_data.wrapped_key);
+  metadata->algorithm = cache_data.algorithm;
+  metadata->key_tag = base::OptionalFromExpected(std::move(cache_data.key_tag));
+  metadata->creation_time =
+      base::OptionalFromExpected(cache_data.creation_time);
+  return metadata;
+}
+
+template <typename MojomType, typename KeyIdType>
+mojo::StructPtr<MojomType> ToMojomKeyDataImpl(KeyIdType key_id,
+                                              CachedKeyData cache_data) {
+  auto data = MojomType::New();
+  data->key_id = key_id;
+  data->metadata = ToNewKeyMetadata(std::move(cache_data));
+  return data;
+}
+
+mojom::NewKeyDataPtr ToMojomKeyData(UnexportableKeyId key_id,
+                                    CachedKeyData cache_data) {
+  return ToMojomKeyDataImpl<mojom::NewKeyData>(key_id, std::move(cache_data));
+}
+
+mojom::NewSigningKeyDataPtr ToMojomKeyData(UnexportableSigningKeyId key_id,
+                                           CachedKeyData cache_data) {
+  return ToMojomKeyDataImpl<mojom::NewSigningKeyData>(key_id,
+                                                      std::move(cache_data));
+}
+
+template <
+    typename NewKeyDataPtrType,
+    typename KeyIdType = decltype(std::declval<NewKeyDataPtrType>()->key_id)>
+ServiceErrorOr<NewKeyDataPtrType> GenerateKeyImpl(
+    std::optional<ServiceErrorOr<NewKeyDataPtrType>> response,
+    base::span<const crypto::SignatureVerifier::SignatureAlgorithm>
+        acceptable_algorithms) {
+  if (response) {
+    return std::move(*response);
+  }
+  if (acceptable_algorithms.empty()) {
+    return base::unexpected(ServiceError::kAlgorithmNotSupported);
+  }
+  return ToMojomKeyData(
+      KeyIdType(),
+      {
+          .subject_public_key_info = base::ToVector(kTestSubjectPublicKeyInfo),
+          .wrapped_key = base::ToVector(kTestWrappedKey),
+          .algorithm = acceptable_algorithms[0],
+          .key_tag = std::string(kTestKeyTag),
+      });
+}
+
+template <
+    typename NewKeyDataPtrType,
+    typename KeyIdType = decltype(std::declval<NewKeyDataPtrType>()->key_id)>
+ServiceErrorOr<NewKeyDataPtrType> FromWrappedKeyImpl(
+    std::optional<ServiceErrorOr<NewKeyDataPtrType>> response,
+    base::span<const uint8_t> wrapped_key) {
+  if (response) {
+    return std::move(*response);
+  }
+  if (wrapped_key.empty()) {
+    return base::unexpected(ServiceError::kKeyNotFound);
+  }
+  return ToMojomKeyData(
+      KeyIdType(),
+      {
+          .subject_public_key_info = base::ToVector(kTestSubjectPublicKeyInfo),
+          .wrapped_key = base::ToVector(wrapped_key),
+          .algorithm =
+              crypto::SignatureVerifier::SignatureAlgorithm::ECDSA_SHA256,
+          .key_tag = std::string(kTestKeyTag),
+      });
+}
+
 class FakeUnexportableKeyServiceProxy : public mojom::UnexportableKeyService {
  public:
   FakeUnexportableKeyServiceProxy() = default;
@@ -52,43 +132,15 @@ class FakeUnexportableKeyServiceProxy : public mojom::UnexportableKeyService {
           acceptable_algorithms,
       BackgroundTaskPriority priority,
       GenerateSigningKeyCallback callback) override {
-    if (generate_response_) {
-      std::move(callback).Run(std::move(generate_response_.value()));
-      generate_response_.reset();
-    } else if (acceptable_algorithms.empty()) {
-      std::move(callback).Run(
-          base::unexpected(ServiceError::kAlgorithmNotSupported));
-    } else {
-      auto new_key_data = mojom::NewSigningKeyData::New();
-      new_key_data->metadata = mojom::NewKeyMetadata::New();
-      new_key_data->metadata->subject_public_key_info =
-          base::ToVector(kTestSubjectPublicKeyInfo);
-      new_key_data->metadata->wrapped_key = base::ToVector(kTestWrappedKey);
-      new_key_data->metadata->algorithm = acceptable_algorithms[0];
-      new_key_data->metadata->key_tag = kTestKeyTag;
-      std::move(callback).Run(std::move(new_key_data));
-    }
+    std::move(callback).Run(GenerateKeyImpl(
+        std::exchange(generate_response_, {}), acceptable_algorithms));
   }
 
   void FromWrappedSigningKey(const std::vector<uint8_t>& wrapped_key,
                              BackgroundTaskPriority priority,
                              FromWrappedSigningKeyCallback callback) override {
-    if (from_wrapped_response_) {
-      std::move(callback).Run(std::move(from_wrapped_response_.value()));
-      from_wrapped_response_.reset();
-    } else if (wrapped_key.empty()) {
-      std::move(callback).Run(base::unexpected(ServiceError::kKeyNotFound));
-    } else {
-      auto new_key_data = mojom::NewSigningKeyData::New();
-      new_key_data->metadata = mojom::NewKeyMetadata::New();
-      new_key_data->metadata->subject_public_key_info =
-          base::ToVector(kTestSubjectPublicKeyInfo);
-      new_key_data->metadata->wrapped_key = wrapped_key;
-      new_key_data->metadata->algorithm =
-          crypto::SignatureVerifier::SignatureAlgorithm::ECDSA_SHA256;
-      new_key_data->metadata->key_tag = kTestKeyTag;
-      std::move(callback).Run(std::move(new_key_data));
-    }
+    std::move(callback).Run(FromWrappedKeyImpl(
+        std::exchange(from_wrapped_response_, {}), wrapped_key));
   }
 
   void GenerateAttestationKey(
@@ -159,65 +211,53 @@ class FakeUnexportableKeyServiceProxy : public mojom::UnexportableKeyService {
   }
 
   void SetGenerateResponse(
-      base::expected<mojom::NewSigningKeyDataPtr, ServiceError> response) {
+      ServiceErrorOr<mojom::NewSigningKeyDataPtr> response) {
     generate_response_ = std::move(response);
   }
 
   void SetFromWrappedResponse(
-      base::expected<mojom::NewSigningKeyDataPtr, ServiceError> response) {
+      ServiceErrorOr<mojom::NewSigningKeyDataPtr> response) {
     from_wrapped_response_ = std::move(response);
   }
 
-  void SetSignResponse(
-      base::expected<std::vector<uint8_t>, ServiceError> response) {
+  void SetSignResponse(ServiceErrorOr<std::vector<uint8_t>> response) {
     sign_response_ = std::move(response);
   }
 
   void SetGetAllKeysForGarbageCollectionResponse(
-      base::expected<std::vector<mojom::NewKeyDataPtr>, ServiceError>
-          response) {
+      ServiceErrorOr<std::vector<mojom::NewKeyDataPtr>> response) {
     get_all_keys_response_ = std::move(response);
   }
 
-  void SetDeleteKeyResponse(std::optional<ServiceError> response) {
-    delete_key_response_ = std::move(response);
-  }
-
-  void SetDeleteKeysResponse(base::expected<uint64_t, ServiceError> response) {
+  void SetDeleteKeysResponse(ServiceErrorOr<uint64_t> response) {
     delete_keys_response_ = std::move(response);
   }
 
-  void SetDeleteAllKeysResponse(
-      base::expected<uint64_t, ServiceError> response) {
+  void SetDeleteAllKeysResponse(ServiceErrorOr<uint64_t> response) {
     delete_all_keys_response_ = std::move(response);
   }
 
  private:
-  std::optional<base::expected<mojom::NewSigningKeyDataPtr, ServiceError>>
-      generate_response_;
-  std::optional<base::expected<mojom::NewSigningKeyDataPtr, ServiceError>>
+  std::optional<ServiceErrorOr<mojom::NewSigningKeyDataPtr>> generate_response_;
+  std::optional<ServiceErrorOr<mojom::NewSigningKeyDataPtr>>
       from_wrapped_response_;
-  std::optional<base::expected<std::vector<uint8_t>, ServiceError>>
-      sign_response_;
-  std::optional<base::expected<std::vector<mojom::NewKeyDataPtr>, ServiceError>>
+  std::optional<ServiceErrorOr<std::vector<uint8_t>>> sign_response_;
+  std::optional<ServiceErrorOr<std::vector<mojom::NewKeyDataPtr>>>
       get_all_keys_response_;
-  std::optional<std::optional<ServiceError>> delete_key_response_;
-  std::optional<base::expected<uint64_t, ServiceError>> delete_keys_response_;
-  std::optional<base::expected<uint64_t, ServiceError>>
-      delete_all_keys_response_;
+  std::optional<ServiceErrorOr<uint64_t>> delete_keys_response_;
+  std::optional<ServiceErrorOr<uint64_t>> delete_all_keys_response_;
 };
 
 class UnexportableKeyServiceProxiedTest : public ::testing::Test {
  protected:
   UnexportableSigningKeyId GenerateSigningKeyOrDie() {
     base::test::TestFuture<ServiceErrorOr<UnexportableSigningKeyId>> future;
-    std::vector<crypto::SignatureVerifier::SignatureAlgorithm> algos = {
-        crypto::SignatureVerifier::SignatureAlgorithm::RSA_PKCS1_SHA256};
     proxied_service_.GenerateSigningKeySlowlyAsync(
-        algos, BackgroundTaskPriority::kUserVisible, future.GetCallback());
-    const ServiceErrorOr<UnexportableSigningKeyId>& result = future.Get();
-    CHECK(result.has_value());
-    return *result;
+        {crypto::SignatureVerifier::SignatureAlgorithm::RSA_PKCS1_SHA256
+
+        },
+        BackgroundTaskPriority::kUserVisible, future.GetCallback());
+    return future.Get().value();
   }
 
   base::test::TaskEnvironment task_environment_;
@@ -284,13 +324,14 @@ TEST_F(UnexportableKeyServiceProxiedTest, GenerateKeyCollision) {
   ASSERT_TRUE(future1.Get().has_value());
   UnexportableSigningKeyId key_id = future1.Get().value();
 
-  mojom::NewSigningKeyDataPtr collision_data = mojom::NewSigningKeyData::New();
-  collision_data->key_id = key_id;
-  collision_data->metadata = mojom::NewKeyMetadata::New();
-  collision_data->metadata->subject_public_key_info = {9, 9};
-  collision_data->metadata->wrapped_key = {9, 9, 9};
-  collision_data->metadata->algorithm =
-      crypto::SignatureVerifier::SignatureAlgorithm::RSA_PKCS1_SHA256;
+  mojom::NewSigningKeyDataPtr collision_data = ToMojomKeyData(
+      key_id,
+      {
+          .subject_public_key_info = {9, 9},
+          .wrapped_key = {9, 9, 9},
+          .algorithm =
+              crypto::SignatureVerifier::SignatureAlgorithm::RSA_PKCS1_SHA256,
+      });
   fake_service_.SetGenerateResponse(std::move(collision_data));
 
   base::test::TestFuture<ServiceErrorOr<UnexportableSigningKeyId>> future2;
@@ -342,13 +383,14 @@ TEST_F(UnexportableKeyServiceProxiedTest, FromWrappedSigningKeyAlreadyCached) {
   ASSERT_TRUE(original_wrapped.has_value());
   ASSERT_TRUE(original_algo.has_value());
 
-  mojom::NewSigningKeyDataPtr new_key_data = mojom::NewSigningKeyData::New();
-  new_key_data->key_id = key_id;
-  new_key_data->metadata = mojom::NewKeyMetadata::New();
-  new_key_data->metadata->subject_public_key_info = {99, 99};
-  new_key_data->metadata->wrapped_key = {99};
-  new_key_data->metadata->algorithm =
-      crypto::SignatureVerifier::SignatureAlgorithm::ECDSA_SHA256;
+  mojom::NewSigningKeyDataPtr new_key_data = ToMojomKeyData(
+      key_id,
+      {
+          .subject_public_key_info = {99, 99},
+          .wrapped_key = {99},
+          .algorithm =
+              crypto::SignatureVerifier::SignatureAlgorithm::ECDSA_SHA256,
+      });
 
   fake_service_.SetFromWrappedResponse(std::move(new_key_data));
 
@@ -525,16 +567,15 @@ TEST_F(UnexportableKeyServiceProxiedTest,
   UnexportableKeyId key_id2;
 
   auto create_data = [](UnexportableKeyId id) {
-    auto data = mojom::NewKeyData::New();
-    data->key_id = id;
-    data->metadata = mojom::NewKeyMetadata::New();
-    data->metadata->subject_public_key_info =
-        base::ToVector(kTestSubjectPublicKeyInfo);
-    data->metadata->wrapped_key = base::ToVector(kTestWrappedKey);
-    data->metadata->algorithm =
-        crypto::SignatureVerifier::SignatureAlgorithm::ECDSA_SHA256;
-    data->metadata->key_tag = kTestKeyTag;
-    return data;
+    return ToMojomKeyData(
+        id, {
+                .subject_public_key_info =
+                    base::ToVector(kTestSubjectPublicKeyInfo),
+                .wrapped_key = base::ToVector(kTestWrappedKey),
+                .algorithm =
+                    crypto::SignatureVerifier::SignatureAlgorithm::ECDSA_SHA256,
+                .key_tag = std::string(kTestKeyTag),
+            });
   };
 
   key_data_list.push_back(create_data(key_id1));

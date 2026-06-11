@@ -33,33 +33,52 @@ ServiceErrorOr<size_t> AdaptSizeType(ServiceErrorOr<uint64_t> result) {
   return result.transform(
       [](uint64_t r) { return base::checked_cast<size_t>(r); });
 }
+
+CachedKeyData ToCachedKeyData(mojom::NewKeyMetadataPtr metadata) {
+  return CachedKeyData{
+      .subject_public_key_info = std::move(metadata->subject_public_key_info),
+      .wrapped_key = std::move(metadata->wrapped_key),
+      .algorithm = metadata->algorithm,
+      .key_tag = base::OptionalToExpected(std::move(metadata->key_tag),
+                                          ServiceError::kOperationNotSupported),
+      .creation_time = base::OptionalToExpected(
+          metadata->creation_time, ServiceError::kOperationNotSupported),
+  };
+}
+
+template <
+    typename NewKeyDataPtrType,
+    typename KeyIdType = decltype(std::declval<NewKeyDataPtrType>()->key_id)>
+ServiceErrorOr<KeyIdType> OnKeyGeneratedImpl(
+    absl::flat_hash_map<UnexportableKeyId, CachedKeyData>& key_cache,
+    ServiceErrorOr<NewKeyDataPtrType> result) {
+  ASSIGN_OR_RETURN(NewKeyDataPtrType new_key_data, std::move(result));
+  KeyIdType key_id = new_key_data->key_id;
+  if (!key_cache
+           .try_emplace(key_id,
+                        ToCachedKeyData(std::move(new_key_data->metadata)))
+           .second) {
+    return base::unexpected(ServiceError::kKeyCollision);
+  }
+
+  return key_id;
+}
+
+template <
+    typename NewKeyDataPtrType,
+    typename KeyIdType = decltype(std::declval<NewKeyDataPtrType>()->key_id)>
+ServiceErrorOr<KeyIdType> OnKeyLoadedImpl(
+    absl::flat_hash_map<UnexportableKeyId, CachedKeyData>& key_cache,
+    ServiceErrorOr<NewKeyDataPtrType> result) {
+  ASSIGN_OR_RETURN(NewKeyDataPtrType new_key_data, std::move(result));
+  KeyIdType key_id = new_key_data->key_id;
+  key_cache.try_emplace(key_id,
+                        ToCachedKeyData(std::move(new_key_data->metadata)));
+  return key_id;
+}
+
 }  // namespace
 
-UnexportableKeyServiceProxied::CachedKeyData::CachedKeyData() = default;
-
-UnexportableKeyServiceProxied::CachedKeyData::CachedKeyData(
-    const mojom::NewKeyMetadataPtr& metadata)
-    : subject_public_key_info(metadata->subject_public_key_info),
-      wrapped_key(metadata->wrapped_key),
-      algorithm(metadata->algorithm),
-      key_tag(base::OptionalToExpected(metadata->key_tag,
-                                       ServiceError::kOperationNotSupported)),
-      creation_time(
-          base::OptionalToExpected(metadata->creation_time,
-                                   ServiceError::kOperationNotSupported)) {}
-
-UnexportableKeyServiceProxied::CachedKeyData::CachedKeyData(
-    const UnexportableKeyServiceProxied::CachedKeyData& other) = default;
-UnexportableKeyServiceProxied::CachedKeyData&
-UnexportableKeyServiceProxied::CachedKeyData::operator=(
-    const UnexportableKeyServiceProxied::CachedKeyData& other) = default;
-UnexportableKeyServiceProxied::CachedKeyData::CachedKeyData(
-    UnexportableKeyServiceProxied::CachedKeyData&& other) noexcept = default;
-UnexportableKeyServiceProxied::CachedKeyData&
-UnexportableKeyServiceProxied::CachedKeyData::operator=(
-    UnexportableKeyServiceProxied::CachedKeyData&& other) = default;
-
-UnexportableKeyServiceProxied::CachedKeyData::~CachedKeyData() = default;
 
 UnexportableKeyServiceProxied::UnexportableKeyServiceProxied(
     mojo::PendingRemote<mojom::UnexportableKeyService> pending_remote)
@@ -75,9 +94,9 @@ void UnexportableKeyServiceProxied::GenerateSigningKeySlowlyAsync(
         callback) {
   remote_->GenerateSigningKey(
       base::ToVector(acceptable_algorithms), priority,
-      // remote_ will not call any pending callbacks after it is destroyed.
-      // Since we own remote_, it is guaranteed that this will be alive when a
-      // callback is called.
+      // SAFETY: remote_ will not call any pending callbacks after it is
+      // destroyed. Since we own remote_, it is guaranteed that this will be
+      // alive when a callback is called.
       mojo::WrapCallbackWithDefaultInvokeIfNotRun(
           base::BindOnce(&UnexportableKeyServiceProxied::OnSigningKeyGenerated,
                          base::Unretained(this), std::move(callback)),
@@ -88,21 +107,8 @@ void UnexportableKeyServiceProxied::OnSigningKeyGenerated(
     base::OnceCallback<void(ServiceErrorOr<UnexportableSigningKeyId>)>
         original_callback,
     ServiceErrorOr<mojom::NewSigningKeyDataPtr> result) {
-  if (!result.has_value()) {
-    std::move(original_callback).Run(base::unexpected(result.error()));
-    return;
-  }
-
-  const mojom::NewSigningKeyDataPtr& new_key_data = result.value();
-  UnexportableKeyId key_id(new_key_data->key_id);
-
-  if (!key_cache_.try_emplace(key_id, new_key_data->metadata).second) {
-    std::move(original_callback)
-        .Run(base::unexpected(ServiceError::kKeyCollision));
-    return;
-  }
-
-  std::move(original_callback).Run(UnexportableSigningKeyId(key_id));
+  std::move(original_callback)
+      .Run(OnKeyGeneratedImpl(key_cache_, std::move(result)));
 }
 
 void UnexportableKeyServiceProxied::FromWrappedSigningKeySlowlyAsync(
@@ -112,9 +118,9 @@ void UnexportableKeyServiceProxied::FromWrappedSigningKeySlowlyAsync(
         callback) {
   remote_->FromWrappedSigningKey(
       base::ToVector(wrapped_key), priority,
-      // remote_ will not call any pending callbacks after it is destroyed.
-      // Since we own remote_, it is guaranteed that this will be alive when a
-      // callback is called.
+      // SAFETY: remote_ will not call any pending callbacks after it is
+      // destroyed. Since we own remote_, it is guaranteed that this will be
+      // alive when a callback is called.
       mojo::WrapCallbackWithDefaultInvokeIfNotRun(
           base::BindOnce(&UnexportableKeyServiceProxied::OnSigningKeyLoaded,
                          base::Unretained(this), std::move(callback)),
@@ -125,16 +131,8 @@ void UnexportableKeyServiceProxied::OnSigningKeyLoaded(
     base::OnceCallback<void(ServiceErrorOr<UnexportableSigningKeyId>)>
         original_callback,
     ServiceErrorOr<mojom::NewSigningKeyDataPtr> result) {
-  if (!result.has_value()) {
-    std::move(original_callback).Run(base::unexpected(result.error()));
-    return;
-  }
-
-  const mojom::NewSigningKeyDataPtr& new_key_data = result.value();
-  UnexportableKeyId key_id(new_key_data->key_id);
-
-  key_cache_.try_emplace(key_id, new_key_data->metadata);
-  std::move(original_callback).Run(UnexportableSigningKeyId(key_id));
+  std::move(original_callback)
+      .Run(OnKeyLoadedImpl(key_cache_, std::move(result)));
 }
 
 void UnexportableKeyServiceProxied::GenerateAttestationKeySlowlyAsync(
@@ -259,7 +257,7 @@ void UnexportableKeyServiceProxied::GetAllKeysForGarbageCollectionSlowlyAsync(
     BackgroundTaskPriority priority,
     base::OnceCallback<void(ServiceErrorOr<std::vector<UnexportableKeyId>>)>
         callback) {
-  // remote_ will not call any pending callbacks after it is destroyed.
+  // SAFETY: remote_ will not call any pending callbacks after it is destroyed.
   // Since we own remote_, it is guaranteed that this will be alive when a
   // callback is called.
   remote_->GetAllKeysForGarbageCollection(
@@ -284,7 +282,8 @@ void UnexportableKeyServiceProxied::OnGetAllKeysForGarbageCollection(
   key_ids.reserve(key_data.size());
   for (mojom::NewKeyDataPtr& new_key_data : key_data) {
     UnexportableKeyId key_id = new_key_data->key_id;
-    key_cache_.try_emplace(key_id, new_key_data->metadata);
+    key_cache_.try_emplace(key_id,
+                           ToCachedKeyData(std::move(new_key_data->metadata)));
     key_ids.push_back(key_id);
   }
 
