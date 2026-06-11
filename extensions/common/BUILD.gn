@@ -476,6 +476,8 @@ static_library("common") {
     "manifest_handlers/webview_info.h",
     "message_bundle.cc",
     "message_bundle.h",
+    "mime_handler_availability.cc",
+    "mime_handler_availability.h",
     "permissions/api_permission.cc",
     "permissions/api_permission.h",
     "permissions/api_permission_set.cc",
