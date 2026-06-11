@@ -789,7 +789,7 @@ bool IsGeminiBinaryMigrationEnabled() {
 }
 
 BASE_FEATURE(kPersistTabContextRichExtraction,
-             base::FEATURE_DISABLED_BY_DEFAULT);
+             base::FEATURE_ENABLED_BY_DEFAULT);
 
 bool IsPersistTabContextRichExtractionEnabled() {
   return base::FeatureList::IsEnabled(kPersistTabContextRichExtraction);
