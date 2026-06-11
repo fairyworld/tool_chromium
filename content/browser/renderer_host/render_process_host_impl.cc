@@ -2422,14 +2422,14 @@ void RenderProcessHostImpl::BindRestrictedCookieManagerForServiceWorker(
 
 void RenderProcessHostImpl::BindVideoDecodePerfHistory(
     mojo::PendingReceiver<media::mojom::VideoDecodePerfHistory> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   GetBrowserContext()->GetVideoDecodePerfHistory()->BindReceiver(
       std::move(receiver));
 }
 
 void RenderProcessHostImpl::BindWebrtcVideoPerfHistory(
     mojo::PendingReceiver<media::mojom::WebrtcVideoPerfHistory> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   BrowserContextImpl::From(GetBrowserContext())
       ->GetWebrtcVideoPerfHistory()
       ->BindReceiver(std::move(receiver));
@@ -2438,7 +2438,7 @@ void RenderProcessHostImpl::BindWebrtcVideoPerfHistory(
 void RenderProcessHostImpl::BindQuotaManagerHost(
     const blink::StorageKey& storage_key,
     mojo::PendingReceiver<blink::mojom::QuotaManagerHost> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   storage_partition_impl_->GetQuotaContext()->BindQuotaManagerHost(
       storage_key, std::move(receiver));
 }
@@ -2446,7 +2446,7 @@ void RenderProcessHostImpl::BindQuotaManagerHost(
 void RenderProcessHostImpl::CreateLockManager(
     const blink::StorageKey& storage_key,
     mojo::PendingReceiver<blink::mojom::LockManager> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
 
   base::UnguessableToken token = base::UnguessableToken::Create();
   storage_partition_impl_->BindLockManager(storage_key, token,
@@ -2456,7 +2456,7 @@ void RenderProcessHostImpl::CreateLockManager(
 void RenderProcessHostImpl::CreatePermissionService(
     const url::Origin& origin,
     mojo::PendingReceiver<blink::mojom::PermissionService> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
 
   if (!permission_service_context_) {
     permission_service_context_ =
@@ -2479,7 +2479,7 @@ void RenderProcessHostImpl::CreateNotificationService(
     const RenderProcessHost::NotificationServiceCreatorType creator_type,
     const blink::StorageKey& storage_key,
     mojo::PendingReceiver<blink::mojom::NotificationService> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   RenderFrameHost* rfh = RenderFrameHost::FromID(rfh_id);
   WeakDocumentPtr weak_document_ptr =
       rfh ? rfh->GetWeakDocumentPtr() : WeakDocumentPtr();
@@ -2523,7 +2523,7 @@ void RenderProcessHostImpl::SetBatterySaverMode(
 #if BUILDFLAG(ALLOW_OOP_VIDEO_DECODER)
 void RenderProcessHostImpl::CreateOOPVideoDecoder(
     mojo::PendingReceiver<media::mojom::VideoDecoder> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   if (!video_decoder_factory_remote_.is_bound()) {
     auto creation_cb = GetVideoDecoderFactoryCreationCB();
     if (creation_cb.is_null()) {
@@ -2572,7 +2572,7 @@ void RenderProcessHostImpl::CreateOOPVideoDecoder(
 }
 
 void RenderProcessHostImpl::OnVideoDecoderDisconnected() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
 
   if (video_decoder_trackers_.empty()) {
     // All VideoDecoders have disconnected. Let's reset() the
@@ -2593,7 +2593,7 @@ void RenderProcessHostImpl::OnVideoDecoderDisconnected() {
 }
 
 void RenderProcessHostImpl::ResetVideoDecoderFactory() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
 
   video_decoder_factory_remote_.reset();
 
@@ -2615,7 +2615,7 @@ void RenderProcessHostImpl::ResetVideoDecoderFactory() {
 
 void RenderProcessHostImpl::SetVideoDecoderFactoryCreationCBForTesting(
     VideoDecoderFactoryCreationCB callback) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   GetVideoDecoderFactoryCreationCB() = callback;
 }
 
