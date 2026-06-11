@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">Përditëso shfletuesin</translation>
 <translation id="4021931095789478915">Shto ${url} te lista e leximit</translation>
 <translation id="4028871427853484857">Ruaje te llogaria…</translation>
+<translation id="4036529942385659684">Shfaq faqen e fillimit pas një periudhe pa aktivitet</translation>
 <translation id="4038354071007134711">Asnjë aplikim në këtë pajisje nuk mund ta hapë skedarin.</translation>
 <translation id="4042870976416480368">Gjej brenda faqes</translation>
 <translation id="4045441967987592849">Rihap</translation>
@@ -911,7 +912,6 @@
 <translation id="417138788035229076">Menaxho grupin</translation>
 <translation id="4172051516777682613">Trego gjithmonë</translation>
 <translation id="417273154673973994">{count,plural, =1{1 grup skedash u mbyll dhe u ruajt}other{{count} grupe skedash u mbyllën dhe u ruajtën}}</translation>
-<translation id="417612446554534067">Dërgo te pajisjet e tua</translation>
 <translation id="4180726336228139707">Vetëm në këtë pajisje</translation>
 <translation id="4181841719683918333">Gjuhët</translation>
 <translation id="4183350924949589798">Më shumë siguri?</translation>

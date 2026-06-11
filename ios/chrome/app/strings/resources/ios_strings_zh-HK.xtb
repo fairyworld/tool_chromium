@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">更新瀏覽器</translation>
 <translation id="4021931095789478915">將 ${url} 新增至閱讀清單</translation>
 <translation id="4028871427853484857">儲存在帳戶中…</translation>
+<translation id="4036529942385659684">閒置一段時間後顯示起始頁面</translation>
 <translation id="4038354071007134711">此裝置上沒有可開啟該檔案的應用程式。</translation>
 <translation id="4042870976416480368">在網頁中搜尋</translation>
 <translation id="4045441967987592849">重開</translation>
@@ -911,7 +912,6 @@
 <translation id="417138788035229076">管理群組</translation>
 <translation id="4172051516777682613">永遠顯示</translation>
 <translation id="417273154673973994">{count,plural, =1{已關閉並儲存 1 個分頁群組}other{已關閉並儲存 {count} 個分頁群組}}</translation>
-<translation id="417612446554534067">傳送至你的裝置</translation>
 <translation id="4180726336228139707">只儲存在此裝置上</translation>
 <translation id="4181841719683918333">語言</translation>
 <translation id="4183350924949589798">想增強安全性嗎？</translation>

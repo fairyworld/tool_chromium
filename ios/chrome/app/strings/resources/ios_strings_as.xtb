@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">আপোনাৰ ব্ৰাউজাৰটো আপডে’ট কৰক</translation>
 <translation id="4021931095789478915">পঢ়াৰ সূচীত ${url} যোগ দিয়ক</translation>
 <translation id="4028871427853484857">একাউণ্টত ছেভ কৰক…</translation>
+<translation id="4036529942385659684">নিষ্ক্ৰিয়তাৰ সময়সীমাৰ পাছত আৰম্ভণিৰ পৃষ্ঠাখন দেখুৱাওক</translation>
 <translation id="4038354071007134711">এই ডিভাইচটোত থকা কোনো এপ্লিকেশ্বনে ফাইলটো খুলিব নোৱাৰে।</translation>
 <translation id="4042870976416480368">পৃষ্ঠাত বিচাৰক</translation>
 <translation id="4045441967987592849">পুনৰ খোলক</translation>
@@ -911,7 +912,6 @@
 <translation id="417138788035229076">গোট পৰিচালনা কৰক</translation>
 <translation id="4172051516777682613">সদায় দেখুৱাওক</translation>
 <translation id="417273154673973994">{count,plural, =1{১ টা টেবৰ গোট বন্ধ কৰি ছেভ কৰা হৈছে}one{{count} টা টেবৰ গোট বন্ধ কৰি ছেভ কৰা হৈছে}other{{count} টা টেবৰ গোট বন্ধ কৰি ছেভ কৰা হৈছে}}</translation>
-<translation id="417612446554534067">আপোনাৰ ডিভাইচসমূহলৈ পঠিয়াওক</translation>
 <translation id="4180726336228139707">কেৱল এই ডিভাইচটোত</translation>
 <translation id="4181841719683918333">ভাষাসমূহ</translation>
 <translation id="4183350924949589798">অধিক সুৰক্ষা লাগে নেকি?</translation>

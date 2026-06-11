@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">Opdater din browser</translation>
 <translation id="4021931095789478915">Føj ${url} til læselisten</translation>
 <translation id="4028871427853484857">Gem på kontoen…</translation>
+<translation id="4036529942385659684">Vis startsiden efter en periode med inaktivitet</translation>
 <translation id="4038354071007134711">Ingen apps på denne enhed, der kan åbne filen.</translation>
 <translation id="4042870976416480368">Find på siden</translation>
 <translation id="4045441967987592849">Genåbn</translation>
@@ -911,7 +912,6 @@
 <translation id="417138788035229076">Administrer gruppe</translation>
 <translation id="4172051516777682613">Vis altid</translation>
 <translation id="417273154673973994">{count,plural, =1{1 fanegruppe blev lukket og gemt}one{{count} fanegruppe blev lukket og gemt}other{{count} fanegrupper blev lukket og gemt}}</translation>
-<translation id="417612446554534067">Send til dine enheder</translation>
 <translation id="4180726336228139707">Kun på denne enhed</translation>
 <translation id="4181841719683918333">Sprog</translation>
 <translation id="4183350924949589798">Større sikkerhed?</translation>

@@ -269,6 +269,7 @@
 <translation id="1407135791313364759">全部開啟</translation>
 <translation id="1408696301184924537">如想下次自動填入此 IBAN，請先儲存至 Google 帳戶</translation>
 <translation id="1408787208417187241">三釘 (頂端)</translation>
+<translation id="1410306713026702438"><ph name="SUGGESTION_TITLE" />，<ph name="SUGGESTION_DESCRIPTION" />。<ph name="SUGGESTION_TYPE" />。群組「<ph name="GROUP_HEADER" />」入面嘅第 <ph name="MATCH_POSITION" /> 項，總共 <ph name="NUM_MATCHES_IN_GROUP" /> 項。</translation>
 <translation id="1410365862999780287">此裝置的其他使用者不會看到你的活動，瀏覽活動記錄的私隱更有保障。無痕模式不會影響網站及其使用的服務 (包括 Google) 收集資料的方式，且下載檔案、書籤和閱讀清單項目仍會保留在裝置上。</translation>
 <translation id="1410941016594047814">Invite 信封</translation>
 <translation id="1413235258620101697">此付款卡的 CVC 經已加密並儲存至「Google 錢包」，方便快速結帳</translation>
@@ -660,6 +661,7 @@
 <translation id="2045871135676061132">Personal 信封</translation>
 <translation id="2046951263634619614">圖書零售商</translation>
 <translation id="2048261947532620704">正在翻譯頁面</translation>
+<translation id="2055016614992422886">對話</translation>
 <translation id="2059166748188874810">自治市</translation>
 <translation id="2059202684901022309">22 x 34 吋</translation>
 <translation id="2064568741209980952">信用借貸</translation>
@@ -3556,6 +3558,7 @@
 <translation id="6550245281449521513">唔可以鎖定滑鼠</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />，新加入</translation>
 <translation id="6552566579578780089">付款資料</translation>
+<translation id="6553777254569586547"><ph name="SUGGESTION_TITLE" />，<ph name="SUGGESTION_TYPE" />。群組「<ph name="GROUP_HEADER" />」入面嘅第 <ph name="MATCH_POSITION" /> 項，總共 <ph name="NUM_MATCHES_IN_GROUP" /> 項。</translation>
 <translation id="6554732001434021288">上次瀏覽日期：<ph name="NUM_DAYS" /> 天前</translation>
 <translation id="6556866813142980365">重做</translation>
 <translation id="6557715786897013164">14 x 17 吋</translation>

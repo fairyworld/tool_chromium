@@ -269,6 +269,7 @@ Du wirst sonst gemäß deinen Datenschutzeinstellungen blockiert. Wenn Cookies u
 <translation id="1407135791313364759">Alle öffnen</translation>
 <translation id="1408696301184924537">Wenn du diese IBAN beim nächsten Mal automatisch ausfüllen lassen möchtest, speichere sie in deinem Google-Konto</translation>
 <translation id="1408787208417187241">Drei Heftklammern oben</translation>
+<translation id="1410306713026702438"><ph name="SUGGESTION_TITLE" />, <ph name="SUGGESTION_DESCRIPTION" />. <ph name="SUGGESTION_TYPE" />. <ph name="MATCH_POSITION" /> von <ph name="NUM_MATCHES_IN_GROUP" /> in der Gruppe „<ph name="GROUP_HEADER" />“.</translation>
 <translation id="1410365862999780287">Andere Personen, die dieses Gerät verwenden, können deine Aktivitäten nicht sehen, sodass du privat surfen kannst. Dies hat keine Auswirkungen darauf, wie Daten durch von dir besuchte Websites und den von ihnen genutzten Diensten, einschließlich Google, erhoben werden. Downloads, Lesezeichen und Webseiten auf deiner Leseliste werden gespeichert.</translation>
 <translation id="1410941016594047814">Umschlag Invite</translation>
 <translation id="1413235258620101697">Der CVC dieser Karte wird verschlüsselt und für einen schnelleren Bezahlvorgang in Google Wallet gespeichert</translation>
@@ -660,6 +661,7 @@ Du wirst sonst gemäß deinen Datenschutzeinstellungen blockiert. Wenn Cookies u
 <translation id="2045871135676061132">Umschlag Personal</translation>
 <translation id="2046951263634619614">Buchhändler</translation>
 <translation id="2048261947532620704">Seite wird übersetzt</translation>
+<translation id="2055016614992422886">Unterhaltung</translation>
 <translation id="2059166748188874810">Gemeinde</translation>
 <translation id="2059202684901022309">22 x 34 Zoll</translation>
 <translation id="2064568741209980952">Kredite und Darlehen</translation>
@@ -3555,6 +3557,7 @@ Wenn du die Optionen für „Später bezahlen“ ausblenden möchtest, rufe die 
 <translation id="6550245281449521513">Maussperre nicht zulässig</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />, neu</translation>
 <translation id="6552566579578780089">Zahlungen</translation>
+<translation id="6553777254569586547"><ph name="SUGGESTION_TITLE" />. <ph name="SUGGESTION_TYPE" />. <ph name="MATCH_POSITION" /> von <ph name="NUM_MATCHES_IN_GROUP" /> in der Gruppe „<ph name="GROUP_HEADER" />“.</translation>
 <translation id="6554732001434021288">Vor <ph name="NUM_DAYS" /> Tagen zuletzt besucht</translation>
 <translation id="6556866813142980365">Wiederholen</translation>
 <translation id="6557715786897013164">14 × 17 Zoll</translation>

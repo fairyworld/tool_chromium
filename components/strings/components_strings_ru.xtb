@@ -301,6 +301,7 @@
 <translation id="1445896388055045436">Показывать информацию о преимуществах и бонусах карты при оформлении покупки. Применяются условия эмитента.</translation>
 <translation id="1447067628680007684">(x86_64)</translation>
 <translation id="1448166547804028941">Ключи <ph name="DATA_CONTROLS_FIRST_KEY_SET" /> невозможно добавить в тот же словарь, что и ключи <ph name="DATA_CONTROLS_SECOND_KEY_SET" />.</translation>
+<translation id="1449251255954293933">Сохраните идентификатор Redress Number в Google Кошельке</translation>
 <translation id="1455413310270022028">Ластик</translation>
 <translation id="1457992721081300557">{NUM_REVIEWS,plural, =0{Показать отзывы}=1{Показать 1 отзыв}one{Показать все отзывы (#)}few{Показать все # отзыва}many{Показать все # отзывов}other{Показать все # отзыва}}</translation>
 <translation id="1458059624921545588">Люди и общество</translation>
@@ -1157,6 +1158,7 @@
 <translation id="2782088940970074970">Прокат автомобилей</translation>
 <translation id="278436560439594386">Бытовая техника</translation>
 <translation id="2784474685437057136">B5 Extra</translation>
+<translation id="2784795832957740711">Пароли · Ключи доступа</translation>
 <translation id="2784949926578158345">Соединение сброшено.</translation>
 <translation id="2786008859124691917">Велосипеды и аксессуары</translation>
 <translation id="2792012897584536778">Администраторы этого устройства настроили сертификаты безопасности, которые дают возможность просматривать контент посещаемых вами сайтов.</translation>
@@ -2306,6 +2308,7 @@
 <translation id="46128681529823442">Футбольная экипировка</translation>
 <translation id="4612904677925722054">Этот сайт может содержать материалы для взрослых. Чтобы зайти на него, тебе нужно разрешение родителя или законного представителя.</translation>
 <translation id="4619564267100705184">Подтвердить личность</translation>
+<translation id="4619669610757527494">Сохраните водительское удостоверение в Google Кошельке</translation>
 <translation id="4622292761762557753">Все равно передать</translation>
 <translation id="4622647778991854660">Включите уведомления в Центре уведомлений. <ph name="LINK" /></translation>
 <translation id="4623894491222334521">Удостоверения личности</translation>
@@ -2835,6 +2838,7 @@
 <translation id="543656192084990644">Использовать датчики движения запрещено</translation>
 <translation id="5441409130426352029"><ph name="ATTRIBUTE_VALUE" />, прежнее значение: <ph name="PREVIOUS_VALUE" /></translation>
 <translation id="5443468954631487277">В обратном порядке лицевой стороной вверх</translation>
+<translation id="5447103258548475868">Сохраните паспорт в Google Кошельке</translation>
 <translation id="5447235695608032700">Разрешить сайту <ph name="SITE" /> использовать сохраненную информацию о вас</translation>
 <translation id="5447973833955560753">Пароль для восстановления</translation>
 <translation id="5451331376824595378">Когда Chrome сообщает о событиях безопасности, вашему администратору отправляется информация о них. К ней относятся URL страниц, которые вы посещали в Chrome или с которых копировали данные, названия файлов и метаданные, IP-адреса, сведения о сбоях браузера и вкладок, а также имя пользователя, которое вы используете для входа в веб-приложения, систему на устройстве и в Chrome.</translation>
@@ -3017,6 +3021,7 @@
 <translation id="5718601519531438273">Сюда входят сведения о паспортах и водительских удостоверениях</translation>
 <translation id="5720705177508910913">Текущий пользователь</translation>
 <translation id="5720895412771013401">Настольные компьютеры</translation>
+<translation id="5721147290164931316">Отсканируйте QR-код, чтобы войти с помощью телефона</translation>
 <translation id="5721367770070844253">{count,plural, =1{{website_1}}=2{{website_1}, {website_2}}=3{{website_1}, {website_2} и ещё 1}one{{website_1}, {website_2} и ещё {more_count}}few{{website_1}, {website_2} и ещё {more_count}}many{{website_1}, {website_2} и ещё {more_count}}other{{website_1}, {website_2} и ещё {more_count}}}</translation>
 <translation id="572328651809341494">Недавние вкладки</translation>
 <translation id="5723873695528696965">Управление MIDI-устройствами и их перепрограммирование.</translation>
@@ -4236,6 +4241,7 @@
 <translation id="7599089013883397081">Превышено время ожидания</translation>
 <translation id="7602868996817972616">Спросить Google об этой странице</translation>
 <translation id="7606123685356405076">Модели Gemini 3</translation>
+<translation id="760632772920590778">Сохраните данные автомобиля в Google Кошельке</translation>
 <translation id="7610193165460212391">Значение <ph name="VALUE" /> лежит за пределами разрешенного диапазона.</translation>
 <translation id="761261689936461781">Толстая</translation>
 <translation id="7613889955535752492">Срок действия: <ph name="EXPIRATION_MONTH" />/<ph name="EXPIRATION_YEAR" /></translation>
@@ -4264,7 +4270,9 @@
 <translation id="7646681339175747202">Пароль, который вы только что использовали, был раскрыт в результате утечки данных. Измените его прямо сейчас в Google Менеджере паролей.</translation>
 <translation id="7647206758853451655">Качество печати</translation>
 <translation id="7648133459447652947">Чтобы увидеть указатель, переключитесь между приложениями, обновите страницу или вернитесь назад.</translation>
+<translation id="764847582138410250">Отсканируйте QR-код, чтобы войти с помощью телефона</translation>
 <translation id="7648527891719919697">Сайт останется заблокированным, поскольку вы включили Дополнительную защиту в <ph name="BEGIN_ANDROID_SETTINGS_LINK" />настройках Android<ph name="END_ANDROID_SETTINGS_LINK" />. Подробнее <ph name="BEGIN_LEARN_MORE_LINK" />об этом уведомлении<ph name="END_LEARN_MORE_LINK" />…</translation>
+<translation id="7648900539798595789">Сохраните идентификатор KTN (Known Traveler Number) в Google Кошельке</translation>
 <translation id="7648992873808071793">сохранение файлов на этом устройстве</translation>
 <translation id="7649070708921625228">Справка</translation>
 <translation id="7650141368285545431">Использовать ключ доступа с другого устройства</translation>
@@ -4357,6 +4365,7 @@
 <translation id="7773005668374414287">В том же порядке лицевой стороной вверх</translation>
 <translation id="7779418012194492374">Отменить доступ к устройству "<ph name="DEVICE_NAME" />"</translation>
 <translation id="7781829728241885113">Вчера</translation>
+<translation id="7782228658217918863">Сохраните удостоверение личности в Google Кошельке</translation>
 <translation id="7782465647372057580">Данные аккаунта шифруются и доступны только вам.</translation>
 <translation id="7785471469930192436">Изучите инструкции по удалению истории поиска, для этого ознакомьтесь со справочными материалами используемой поисковой системы.</translation>
 <translation id="7785790577395078482">этот планшет</translation>

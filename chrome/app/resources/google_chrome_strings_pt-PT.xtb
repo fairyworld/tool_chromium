@@ -435,15 +435,6 @@ Se esta página não estiver a funcionar conforme esperado, experimente permitir
 <translation id="569897634095159764">Não é possível ligar à Internet. O servidor proxy necessita de autenticação.</translation>
 <translation id="5709557627224531708">Definir o Chrome como o navegador predefinido</translation>
 <translation id="5719246646468301581">Termos de Utilização Adicionais do Google Chrome e do ChromeOS</translation>
-<translation id="5719324992913248873">Esta ação irá:
-        <ph name="LINE_BREAKS" />
-          • Repor algumas definições e os atalhos do Chrome
-          <ph name="LINE_BREAK" />
-          • Desativar extensões
-          <ph name="LINE_BREAK" />
-          • Eliminar cookies e outros dados temporários de sites
-          <ph name="LINE_BREAKS" />
-          Os marcadores, o histórico e as palavras-passe guardadas não são afetados.</translation>
 <translation id="5736850870166430177">Se um site tentar roubar a sua palavra-passe, ou quando transferir um ficheiro prejudicial, o Chrome também pode enviar URLs, incluindo bits de conteúdo das páginas, para a Navegação segura</translation>
 <translation id="5756509061973259733">Já existe um perfil do Chrome com esta conta neste dispositivo.</translation>
 <translation id="5759947850379142561">Selecione qualquer texto ou imagem para pesquisar com o Google Lens ou prima a tecla Escape para sair do Google Lens</translation>

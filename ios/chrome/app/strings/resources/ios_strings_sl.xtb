@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">Posodobite brskalnik</translation>
 <translation id="4021931095789478915">Dodajanje ${url} na bralni seznam</translation>
 <translation id="4028871427853484857">Shrani v računu …</translation>
+<translation id="4036529942385659684">Prikaz začetne strani po obdobju nedejavnosti</translation>
 <translation id="4038354071007134711">Nobena aplikacija v tej napravi ne more odpreti datoteke.</translation>
 <translation id="4042870976416480368">Najdi na strani</translation>
 <translation id="4045441967987592849">Znova odpri</translation>
@@ -911,7 +912,6 @@
 <translation id="417138788035229076">Upravljanje skupine</translation>
 <translation id="4172051516777682613">Vedno pokaži</translation>
 <translation id="417273154673973994">{count,plural, =1{1 skupina zavihkov je zaprta in shranjena}one{{count} skupina zavihkov je zaprta in shranjena}two{{count} skupini zavihkov sta zaprti in shranjeni}few{{count} skupine zavihkov so zaprte in shranjene}other{{count} skupin zavihkov je zaprtih in shranjenih}}</translation>
-<translation id="417612446554534067">Pošiljanje v naprave</translation>
 <translation id="4180726336228139707">Samo v tej napravi</translation>
 <translation id="4181841719683918333">Jeziki</translation>
 <translation id="4183350924949589798">Več varnosti?</translation>

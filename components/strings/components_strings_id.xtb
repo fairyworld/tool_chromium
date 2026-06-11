@@ -269,6 +269,7 @@ Jika tidak, ini akan diblokir oleh setelan privasi Anda. Ini akan memungkinkan k
 <translation id="1407135791313364759">Buka semua</translation>
 <translation id="1408696301184924537">Untuk mengisi otomatis IBAN ini di lain waktu, simpan di Akun Google Anda</translation>
 <translation id="1408787208417187241">Tiga jepretan di atas</translation>
+<translation id="1410306713026702438"><ph name="SUGGESTION_TITLE" />, <ph name="SUGGESTION_DESCRIPTION" />. <ph name="SUGGESTION_TYPE" />. <ph name="MATCH_POSITION" /> dari <ph name="NUM_MATCHES_IN_GROUP" /> di grup <ph name="GROUP_HEADER" />.</translation>
 <translation id="1410365862999780287">Orang lain yang menggunakan perangkat ini tidak akan melihat aktivitas Anda, sehingga Anda dapat menjelajah secara lebih pribadi. Hal ini tidak akan mengubah cara pengumpulan data oleh situs web yang Anda kunjungi dan layanan yang mereka gunakan, termasuk Google. Hasil download, bookmark, dan item daftar bacaan akan disimpan.</translation>
 <translation id="1410941016594047814">Envelope Invite</translation>
 <translation id="1413235258620101697">CVC kartu ini akan dienkripsi dan disimpan di Google Wallet untuk checkout yang lebih cepat</translation>
@@ -661,6 +662,7 @@ disusupi oleh penyerang. Hanya buka <ph name="BEGIN_LINK" />situs yang tidak ama
 <translation id="2045871135676061132">Envelope Personal</translation>
 <translation id="2046951263634619614">Retailer Buku</translation>
 <translation id="2048261947532620704">Menerjemahkan halaman</translation>
+<translation id="2055016614992422886">Percakapan</translation>
 <translation id="2059166748188874810">Kotamadya</translation>
 <translation id="2059202684901022309">22 x 34 inci (55 x 86 cm)</translation>
 <translation id="2064568741209980952">Kredit &amp; Pinjaman</translation>
@@ -3557,6 +3559,7 @@ Untuk menyembunyikan opsi bayar nanti, buka <ph name="BEGIN_LINK" />setelan pemb
 <translation id="6550245281449521513">Kunci mouse tidak diizinkan</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />, baru</translation>
 <translation id="6552566579578780089">Pembayaran</translation>
+<translation id="6553777254569586547"><ph name="SUGGESTION_TITLE" />. <ph name="SUGGESTION_TYPE" />. <ph name="MATCH_POSITION" /> dari <ph name="NUM_MATCHES_IN_GROUP" /> di grup <ph name="GROUP_HEADER" />.</translation>
 <translation id="6554732001434021288">Terakhir dibuka <ph name="NUM_DAYS" /> hari lalu</translation>
 <translation id="6556866813142980365">Urungkan</translation>
 <translation id="6557715786897013164">14 x 17 inci (35 x 43 cm)</translation>

@@ -269,6 +269,7 @@
 <translation id="1407135791313364759">ସବୁ ଖୋଲନ୍ତୁ</translation>
 <translation id="1408696301184924537">ପରବର୍ତ୍ତୀ ସମୟରେ ଏହି IBANକୁ ଅଟୋଫିଲ କରିବା ପାଇଁ ଏହାକୁ ଆପଣଙ୍କ Google ଆକାଉଣ୍ଟରେ ସେଭ କରନ୍ତୁ</translation>
 <translation id="1408787208417187241">ଉପର ପଟରେ ତିନୋଟି ଷ୍ଟାପଲ୍</translation>
+<translation id="1410306713026702438"><ph name="SUGGESTION_TITLE" />, <ph name="SUGGESTION_DESCRIPTION" />। <ph name="SUGGESTION_TYPE" />। <ph name="GROUP_HEADER" /> ଗ୍ରୁପରେ <ph name="NUM_MATCHES_IN_GROUP" />ରୁ <ph name="MATCH_POSITION" />।</translation>
 <translation id="1410365862999780287">ଏହି ଡିଭାଇସକୁ ବ୍ୟବହାର କରୁଥିବା ଅନ୍ୟମାନେ ଆପଣଙ୍କ କାର୍ଯ୍ୟକଳାପ ଦେଖିବେ ନାହିଁ, ତେଣୁ ଆପଣ ଅଧିକ ପ୍ରାଇଭେଟ ଭାବେ ବ୍ରାଉଜ କରିପାରିବେ। Google ସମେତ ଆପଣ ଭିଜିଟ କରୁଥିବା ୱେବସାଇଟ ଏବଂ ସେଗୁଡ଼ିକ ବ୍ୟବହାର କରୁଥିବା ସେବାଗୁଡ଼ିକ ଦ୍ୱାରା ଡାଟା କିପରି ସଂଗ୍ରହ କରାଯାଏ ତାହା ଏହା ପରିବର୍ତ୍ତନ କରିବ ନାହିଁ। ଡାଉନଲୋଡ, ବୁକମାର୍କ ଏବଂ ପଢ଼ିବା ତାଲିକାର ଆଇଟମଗୁଡ଼ିକୁ ସେଭ କରାଯିବ।</translation>
 <translation id="1410941016594047814">ଏନଭେଲପ ଇନଭାଇଟ</translation>
 <translation id="1413235258620101697">ଦ୍ରୁତ ଚେକଆଉଟ ପାଇଁ ଏହି କାର୍ଡର CVCକୁ ଏନକ୍ରିପ୍ଟ କରାଯାଇ Google Walletରେ ସେଭ କରାଯିବ</translation>
@@ -660,6 +661,7 @@
 <translation id="2045871135676061132">ଏନଭେଲପ ପର୍ସନାଲ</translation>
 <translation id="2046951263634619614">ବହି ରିଟେଲର</translation>
 <translation id="2048261947532620704">ପୃଷ୍ଠାକୁ ଅନୁବାଦ କରାଯାଉଛି</translation>
+<translation id="2055016614992422886">ବାର୍ତ୍ତାଳାପ</translation>
 <translation id="2059166748188874810">ମ୍ୟୁନିସିପାଲିଟି</translation>
 <translation id="2059202684901022309">22 x 34 ଇଞ୍ଚ</translation>
 <translation id="2064568741209980952">କ୍ରେଡିଟ ଓ ଋଣ ପ୍ରଦାନ</translation>
@@ -3553,6 +3555,7 @@
 <translation id="6550245281449521513">ମାଉସ ଲକ କରିବାକୁ ଅନୁମତି ଦିଆଯାଇନାହିଁ</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />, ନୂଆ</translation>
 <translation id="6552566579578780089">ପେମେଣ୍ଟ</translation>
+<translation id="6553777254569586547"><ph name="SUGGESTION_TITLE" />। <ph name="SUGGESTION_TYPE" />। <ph name="GROUP_HEADER" /> ଗ୍ରୁପରେ <ph name="NUM_MATCHES_IN_GROUP" />ରୁ <ph name="MATCH_POSITION" />।</translation>
 <translation id="6554732001434021288">ଗତ ଥର <ph name="NUM_DAYS" /> ଦିନ ପୂର୍ବେ ଭିଜିଟ୍ କରାଯାଇଛି</translation>
 <translation id="6556866813142980365">ରି-ଡୁ କରନ୍ତୁ</translation>
 <translation id="6557715786897013164">14 x 17 ଇଞ୍ଚ</translation>

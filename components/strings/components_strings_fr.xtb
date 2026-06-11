@@ -269,6 +269,7 @@ Par défaut, ce type d'accès est bloqué par vos paramètres de confidentialit�
 <translation id="1407135791313364759">Tout ouvrir</translation>
 <translation id="1408696301184924537">Pour que cet IBAN soit renseigné automatiquement la prochaine fois, enregistrez-le dans votre compte Google</translation>
 <translation id="1408787208417187241">Triple agrafe en haut</translation>
+<translation id="1410306713026702438"><ph name="SUGGESTION_TITLE" />, <ph name="SUGGESTION_DESCRIPTION" />. <ph name="SUGGESTION_TYPE" />. <ph name="MATCH_POSITION" /> sur <ph name="NUM_MATCHES_IN_GROUP" /> dans le groupe <ph name="GROUP_HEADER" />.</translation>
 <translation id="1410365862999780287">Vous pouvez naviguer plus confidentiellement, car les autres utilisateurs de cet appareil ne voient pas votre activité. Cela ne change pas la façon dont les sites Web et les services qu'ils utilisent, y compris Google, collectent les données. Les téléchargements, favoris et éléments de la liste de lecture sont enregistrés.</translation>
 <translation id="1410941016594047814">Enveloppe d'invitation</translation>
 <translation id="1413235258620101697">Le code CVC de cette carte sera chiffré et enregistré dans Google Wallet pour accélérer le paiement</translation>
@@ -660,6 +661,7 @@ Par défaut, ce type d'accès est bloqué par vos paramètres de confidentialit�
 <translation id="2045871135676061132">Enveloppe personnelle</translation>
 <translation id="2046951263634619614">Librairies</translation>
 <translation id="2048261947532620704">Traduction de la page</translation>
+<translation id="2055016614992422886">Conversation</translation>
 <translation id="2059166748188874810">Municipalité</translation>
 <translation id="2059202684901022309">22 x 34 pouces</translation>
 <translation id="2064568741209980952">Crédit et prêt</translation>
@@ -3557,6 +3559,7 @@ Pour masquer les options de paiement différé, accédez aux <ph name="BEGIN_LIN
 <translation id="6550245281449521513">Verrouillage de la souris non autorisé</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />, nouveau</translation>
 <translation id="6552566579578780089">Paiements</translation>
+<translation id="6553777254569586547"><ph name="SUGGESTION_TITLE" />. <ph name="SUGGESTION_TYPE" />. <ph name="MATCH_POSITION" /> sur <ph name="NUM_MATCHES_IN_GROUP" /> dans le groupe <ph name="GROUP_HEADER" />.</translation>
 <translation id="6554732001434021288">Dernière visite : il y a <ph name="NUM_DAYS" /> jours</translation>
 <translation id="6556866813142980365">Rétablir</translation>
 <translation id="6557715786897013164">14 x 17 pouces</translation>

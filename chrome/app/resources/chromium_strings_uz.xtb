@@ -120,15 +120,6 @@
 <translation id="2287771843518581140">{NUM_TABS,plural, =1{Chromium brauzerni sekinlashtiruvchi varaqni pauza qilishni tavsiya qiladi}other{Chromium brauzerni sekinlashtiruvchi varaqlarni pauza qilishni tavsiya qiladi}}</translation>
 <translation id="2307973900865360088">Dokda qoldirish</translation>
 <translation id="2313870531055795960">URL manzillar Chromium bilgan zararli saytlar roʻyxati orqali tekshiriladi. Agar sayt parolingizni oʻgirlashga urinsa yoki zararli fayl yuklab olsangiz, Chromium ham URL manzillar kabi sahifa elementlarini Saytlarni xavfsiz kezish tizimiga yuborishi mumkin.</translation>
-<translation id="2332076562712130931">Bunda:
-          <ph name="LINE_BREAKS" />
-           • Ayrim Chromium sozlamalari va Chromium yorliqlari tiklanadi
-           <ph name="LINE_BREAK" />
-           • Kengaytmalar faolsizlantiriladi
-           <ph name="LINE_BREAK" />
-           • Cookie fayllar va boshqa vaqtincha sayt maʼlumotlari tozalanadi
-            <ph name="LINE_BREAKS" />
-           Bukmarklar, tarix va saqlangan parollar joyida qoladi.</translation>
 <translation id="2343156876103232566">Bu yerdan Android telefoningizga raqam yuborish uchun ikkala qurilmada Chromium hisobingizga kiring.</translation>
 <translation id="2356070529366658676">So‘ralsin</translation>
 <translation id="2359808026110333948">Davom etish</translation>

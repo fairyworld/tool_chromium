@@ -269,6 +269,7 @@
 <translation id="1407135791313364759">سبھی کو کھولیں</translation>
 <translation id="1408696301184924537">‏اگلی بار اس IBAN کو آٹو فل کرنے کے لیے، اسے اپنے Google اکاؤنٹ میں محفوظ کریں</translation>
 <translation id="1408787208417187241">اوپر تین سٹیپل</translation>
+<translation id="1410306713026702438"><ph name="SUGGESTION_TITLE" />، <ph name="SUGGESTION_DESCRIPTION" />۔ <ph name="SUGGESTION_TYPE" />۔ <ph name="GROUP_HEADER" /> گروپ میں <ph name="NUM_MATCHES_IN_GROUP" /> میں سے <ph name="MATCH_POSITION" />۔</translation>
 <translation id="1410365862999780287">‏دوسرے لوگ جو یہ آلہ استعمال کرتے ہیں وہ آپ کی سرگرمی نہیں دیکھ پائیں گے، لہذا آپ مزید نجی طور پر براؤز کر سکتے ہیں۔ اس سے آپ کی ملاحظہ کی جانے والی ویب سائٹس کے ذریعے ڈیٹا جمع کرنے کا طریقہ اور Google سمیت ان کی استعمال کی جانے والی سروسز تبدیل نہیں ہوگی۔ تاہم، ڈاؤن لوڈز، بک مارکس اور پڑھنے کی فہرست کے آئٹمز محفوظ ہو جائیں گے۔</translation>
 <translation id="1410941016594047814">لفافہ دعوت نامہ</translation>
 <translation id="1413235258620101697">‏اس کارڈ کا CVC تیزی سے چیک آؤٹ کے لیے Google والٹ میں مرموز اور محفوظ کیا جائے گا</translation>
@@ -660,6 +661,7 @@
 <translation id="2045871135676061132">ذاتی لفافہ</translation>
 <translation id="2046951263634619614">کتاب کے ریٹیلرز</translation>
 <translation id="2048261947532620704">صفحہ کا ترجمہ کیا جا رہا ہے</translation>
+<translation id="2055016614992422886">گفتگو</translation>
 <translation id="2059166748188874810">میونسپلٹی</translation>
 <translation id="2059202684901022309">‏‎22 x 34 انچ</translation>
 <translation id="2064568741209980952">کریڈٹ اور قرض دینا</translation>
@@ -3559,6 +3561,7 @@
 <translation id="6550245281449521513">ماؤس لاک کی اجازت نہیں ہے</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />، نیا</translation>
 <translation id="6552566579578780089">ادائیگیاں</translation>
+<translation id="6553777254569586547"><ph name="SUGGESTION_TITLE" />۔ <ph name="SUGGESTION_TYPE" />۔ <ph name="GROUP_HEADER" /> گروپ میں <ph name="NUM_MATCHES_IN_GROUP" /> میں سے <ph name="MATCH_POSITION" />۔</translation>
 <translation id="6554732001434021288">سائٹ آخری بار <ph name="NUM_DAYS" /> دن پہلے ملاحظہ کی گئی</translation>
 <translation id="6556866813142980365">واپس لائیں</translation>
 <translation id="6557715786897013164">‏‎14 x 17 انچ</translation>

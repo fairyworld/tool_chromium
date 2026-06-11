@@ -269,6 +269,7 @@
 <translation id="1407135791313364759">Бүгдийг нээ</translation>
 <translation id="1408696301184924537">Энэ IBAN-г дараагийн удаа автоматаар бөглөхийн тулд Google Бүртгэлдээ хадгална уу</translation>
 <translation id="1408787208417187241">Дээд буланд гурван удаа үдэх</translation>
+<translation id="1410306713026702438"><ph name="SUGGESTION_TITLE" />, <ph name="SUGGESTION_DESCRIPTION" />. <ph name="SUGGESTION_TYPE" />. <ph name="GROUP_HEADER" /> бүлгийн <ph name="NUM_MATCHES_IN_GROUP" />-н <ph name="MATCH_POSITION" />.</translation>
 <translation id="1410365862999780287">Энэ төхөөрөмжийг ашигладаг бусад хүн таны үйл ажиллагааг харахгүй тул та илүү нууцлалтайгаар үзэх боломжтой. Энэ нь таны зочилдог вебсайтууд болон тэдгээрийн ашигладаг үйлчилгээ өгөгдлийг хэрхэн цуглуулдаг болохыг өөрчлөхгүй бөгөөд үүнд Google багтана. Татаж авсан файл, хавчуурга болон унших жагсаалтын зүйлсийг хадгална.</translation>
 <translation id="1410941016594047814">Урилгын дугтуй</translation>
 <translation id="1413235258620101697">Энэ картын баталгаажуулалтын кодыг (CVC) шифрлэх бөгөөд илүү хурдан тооцоо хийхэд зориулж таны Google Wallet-д хадгална</translation>
@@ -660,6 +661,7 @@
 <translation id="2045871135676061132">Хувийн дугтуй</translation>
 <translation id="2046951263634619614">Номын жижиглэн борлуулагчид</translation>
 <translation id="2048261947532620704">Хуудсыг орчуулж байна</translation>
+<translation id="2055016614992422886">Харилцан яриа</translation>
 <translation id="2059166748188874810">Хотын захиргаа</translation>
 <translation id="2059202684901022309">22 x 34 инч</translation>
 <translation id="2064568741209980952">Кредит болон зээл</translation>
@@ -3557,6 +3559,7 @@
 <translation id="6550245281449521513">Хулганын түгжээг зөвшөөрөөгүй</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />, шинэ</translation>
 <translation id="6552566579578780089">Төлбөр</translation>
+<translation id="6553777254569586547"><ph name="SUGGESTION_TITLE" />. <ph name="SUGGESTION_TYPE" />. <ph name="GROUP_HEADER" /> бүлгийн <ph name="NUM_MATCHES_IN_GROUP" />-н <ph name="MATCH_POSITION" />.</translation>
 <translation id="6554732001434021288">Хамгийн сүүлд <ph name="NUM_DAYS" /> хоногийн өмнө зочилсон</translation>
 <translation id="6556866813142980365">Дахин хийх</translation>
 <translation id="6557715786897013164">14 x 17 инч</translation>

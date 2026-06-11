@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">Uppfærðu vafrann þinn</translation>
 <translation id="4021931095789478915">Bæta ${url} við leslista</translation>
 <translation id="4028871427853484857">Vista á reikningi…</translation>
+<translation id="4036529942385659684">Sýna upphafssíðu eftir aðgerðaleysi</translation>
 <translation id="4038354071007134711">Ekkert forrit í þessu tæki getur opnað skrána.</translation>
 <translation id="4042870976416480368">Finna á síðu</translation>
 <translation id="4045441967987592849">Opna aftur</translation>
@@ -911,7 +912,6 @@
 <translation id="417138788035229076">Stjórna hópi</translation>
 <translation id="4172051516777682613">Sýna alltaf</translation>
 <translation id="417273154673973994">{count,plural, =1{Einn flipahópur vistaður og honum lokað}one{{count} flipahópur vistaður og þeim lokað}other{{count} flipahópar vistaðir og þeim lokað}}</translation>
-<translation id="417612446554534067">Senda í tækin þín</translation>
 <translation id="4180726336228139707">Aðeins í þessu tæki</translation>
 <translation id="4181841719683918333">Tungumál</translation>
 <translation id="4183350924949589798">Aukið öryggi?</translation>

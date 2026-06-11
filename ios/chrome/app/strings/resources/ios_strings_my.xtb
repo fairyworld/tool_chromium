@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">ဘရောင်ဇာကို အပ်ဒိတ်လုပ်ရန်</translation>
 <translation id="4021931095789478915">ဖတ်ရန် စာရင်းသို့ ${url} ထည့်ရန်</translation>
 <translation id="4028871427853484857">အကောင့်တွင် သိမ်းရန်…</translation>
+<translation id="4036529942385659684">အသုံးမပြုသည့်ကာလကြာပြီးနောက် စတင်သည့်စာမျက်နှာကို ပြပါ</translation>
 <translation id="4038354071007134711">ဤကိရိယာပေါ်ရှိ မည်သည့်အပလီကေးရှင်းမှ ဖိုင်ကိုမဖွင့်နိုင်ပါ။</translation>
 <translation id="4042870976416480368">စာမျက်နှာတွင် ရှာရန်</translation>
 <translation id="4045441967987592849">ပြန်ဖွင့်ရန်</translation>
@@ -911,7 +912,6 @@
 <translation id="417138788035229076">အုပ်စုကို စီမံရန်</translation>
 <translation id="4172051516777682613">အမြဲပြရန်</translation>
 <translation id="417273154673973994">{count,plural, =1{တဘ်အုပ်စု ၁ ခုကို ပိတ်ပြီး သိမ်းလိုက်သည်}other{တဘ်အုပ်စု {count} ခုကို ပိတ်ပြီး သိမ်းလိုက်သည်}}</translation>
-<translation id="417612446554534067">သင့်စက်များသို့ ပို့ရန်</translation>
 <translation id="4180726336228139707">ဤစက်တွင်သာ</translation>
 <translation id="4181841719683918333">ဘာသာစကားများ</translation>
 <translation id="4183350924949589798">နောက်ထပ်လုံခြုံရေး ရယူမလား။</translation>

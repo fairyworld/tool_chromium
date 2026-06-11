@@ -269,6 +269,7 @@
 <translation id="1407135791313364759">Баарын ачуу</translation>
 <translation id="1408696301184924537">Кийинки жолу бул IBAN коду дароо киргизилиши үчүн аны Google аккаунтуңузга сактап коюңуз</translation>
 <translation id="1408787208417187241">Жогорку жагын үч жолу илмек менен бекитүү</translation>
+<translation id="1410306713026702438"><ph name="SUGGESTION_TITLE" />, <ph name="SUGGESTION_DESCRIPTION" />. <ph name="SUGGESTION_TYPE" />. <ph name="GROUP_HEADER" /> тобундагы <ph name="NUM_MATCHES_IN_GROUP" /> ичинен <ph name="MATCH_POSITION" />.</translation>
 <translation id="1410365862999780287">Бул түзмөктү колдонгон башка колдонуучулар аракетиңизди көрүшпөйт, андыктан сайттарды купуя карап чыга аласыз. Муну менен сиз баш баккан вебсайттардын жана алар колдонгон кызматтардын, анын ичинде Google'дун маалыматты чогултуу ыкмасы өзгөртүлбөйт. Жүктөлүп алынган файлдар, кыстармалар жана окуу тизмелери сакталып кала берет.</translation>
 <translation id="1410941016594047814">Конверт Чакыруу</translation>
 <translation id="1413235258620101697">Бул картанын CVC коду шифрленип, тезирээк төлөө үчүн Google Капчыкта сакталат</translation>
@@ -660,6 +661,7 @@
 <translation id="2045871135676061132">Конверт Жеке</translation>
 <translation id="2046951263634619614">Чекене китеп сатуучулар</translation>
 <translation id="2048261947532620704">Барак которулууда</translation>
+<translation id="2055016614992422886">Сүйлөшүү</translation>
 <translation id="2059166748188874810">Муниципалитет</translation>
 <translation id="2059202684901022309">22 x 34 дюйм</translation>
 <translation id="2064568741209980952">Насыялар</translation>
@@ -3556,6 +3558,7 @@
 <translation id="6550245281449521513">Чычкан кулпусуна уруксат берилбейт</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />, жаңы</translation>
 <translation id="6552566579578780089">Төлөмдөр</translation>
+<translation id="6553777254569586547"><ph name="SUGGESTION_TITLE" />. <ph name="SUGGESTION_TYPE" />. <ph name="GROUP_HEADER" /> тобундагы <ph name="NUM_MATCHES_IN_GROUP" /> ичинен <ph name="MATCH_POSITION" />.</translation>
 <translation id="6554732001434021288">Акыркы жолу <ph name="NUM_DAYS" /> күн мурун кирген</translation>
 <translation id="6556866813142980365">Кайталоо</translation>
 <translation id="6557715786897013164">14 x 17 дюйм</translation>

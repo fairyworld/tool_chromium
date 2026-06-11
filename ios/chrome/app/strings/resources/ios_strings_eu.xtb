@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">Eguneratu arakatzailea</translation>
 <translation id="4021931095789478915">Gehitu ${url} irakurketa-zerrendan</translation>
 <translation id="4028871427853484857">Gorde kontuan…</translation>
+<translation id="4036529942385659684">Jarduerarik gabeko tarte baten ondoren, erakutsi hasierako orria</translation>
 <translation id="4038354071007134711">Ez dago fitxategia ireki dezakeen aplikaziorik gailu honetan.</translation>
 <translation id="4042870976416480368">Bilatu orrian</translation>
 <translation id="4045441967987592849">Ireki berriro</translation>
@@ -911,7 +912,6 @@
 <translation id="417138788035229076">Kudeatu taldea</translation>
 <translation id="4172051516777682613">Erakutsi beti</translation>
 <translation id="417273154673973994">{count,plural, =1{1 fitxa talde itxi da, eta gorde}other{{count} fitxa talde itxi dira, eta gorde}}</translation>
-<translation id="417612446554534067">Bidali zure gailuetara</translation>
 <translation id="4180726336228139707">Gailu honetan soilik</translation>
 <translation id="4181841719683918333">Hizkuntzak</translation>
 <translation id="4183350924949589798">Segurtasuna areagotu nahi duzu?</translation>

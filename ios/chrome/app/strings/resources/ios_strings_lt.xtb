@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">Naršyklės atnaujinimas</translation>
 <translation id="4021931095789478915">Pridėti ${url} prie skaitymo sąrašo</translation>
 <translation id="4028871427853484857">Išsaugoti paskyroje…</translation>
+<translation id="4036529942385659684">Rodyti pradžios puslapį po neaktyvumo laikotarpio</translation>
 <translation id="4038354071007134711">Šiame įreng. nėra progr., gal. atidaryti failą.</translation>
 <translation id="4042870976416480368">Rasti puslapyje</translation>
 <translation id="4045441967987592849">Atidaryti iš naujo</translation>
@@ -911,7 +912,6 @@
 <translation id="417138788035229076">Tvarkyti grupę</translation>
 <translation id="4172051516777682613">Visada rodyti</translation>
 <translation id="417273154673973994">{count,plural, =1{Viena skirtukų grupė uždaryta ir išsaugota}one{{count} skirtukų grupė uždaryta ir išsaugota}few{{count} skirtukų grupės uždarytos ir išsaugotos}many{{count} skirtukų grupės uždaryta ir išsaugota}other{{count} skirtukų grupių uždaryta ir išsaugota}}</translation>
-<translation id="417612446554534067">Išsiųsti į jūsų įrenginius</translation>
 <translation id="4180726336228139707">Tik šiame įrenginyje</translation>
 <translation id="4181841719683918333">Kalbos</translation>
 <translation id="4183350924949589798">Daugiau saugumo?</translation>

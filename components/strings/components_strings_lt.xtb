@@ -269,6 +269,7 @@ Kitu atveju tai bus užblokuota pagal jūsų privatumo nustatymus. Taip turinys,
 <translation id="1407135791313364759">Atidaryti viską</translation>
 <translation id="1408696301184924537">Jei norite kitą kartą automatiškai užpildyti šį IBAN, išsaugokite jį „Google“ paskyroje</translation>
 <translation id="1408787208417187241">Trys sankabėlės viršuje</translation>
+<translation id="1410306713026702438"><ph name="SUGGESTION_TITLE" />, <ph name="SUGGESTION_DESCRIPTION" />. <ph name="SUGGESTION_TYPE" />. <ph name="MATCH_POSITION" /> iš <ph name="NUM_MATCHES_IN_GROUP" /> grupėje „<ph name="GROUP_HEADER" />“.</translation>
 <translation id="1410365862999780287">Kiti šį įrenginį naudojantys žmonės nematys jūsų veiklos, todėl galėsite naršyti daugiau privačiai. Tai nepakeis, kaip lankomos svetainės ir naudojamos paslaugos, įskaitant „Google“, renka duomenis. Atsisiuntimai, žymės ir skaitymo sąrašo elementai bus išsaugoti.</translation>
 <translation id="1410941016594047814">Kvietimo vokas</translation>
 <translation id="1413235258620101697">Šios kortelės saugos kodas (CVC) bus šifruotas ir išsaugotas „Google Wallet“, kad galėtumėte greičiau atsiskaityti</translation>
@@ -660,6 +661,7 @@ Kitu atveju tai bus užblokuota pagal jūsų privatumo nustatymus. Taip turinys,
 <translation id="2045871135676061132">Asmeninis vokas</translation>
 <translation id="2046951263634619614">Knygų mažmenininkai</translation>
 <translation id="2048261947532620704">Verčiamas puslapis</translation>
+<translation id="2055016614992422886">Pokalbis</translation>
 <translation id="2059166748188874810">Savivaldybė</translation>
 <translation id="2059202684901022309">22 x 34 col.</translation>
 <translation id="2064568741209980952">Kreditai ir paskolos</translation>
@@ -3558,6 +3560,7 @@ Jei norite paslėpti mokėjimo vėliau parinktis, eikite į <ph name="BEGIN_LINK
 <translation id="6550245281449521513">Pelės užraktas neleidžiamas</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />, nauja</translation>
 <translation id="6552566579578780089">Mokėjimai</translation>
+<translation id="6553777254569586547"><ph name="SUGGESTION_TITLE" />. <ph name="SUGGESTION_TYPE" />. <ph name="MATCH_POSITION" /> iš <ph name="NUM_MATCHES_IN_GROUP" /> grupėje „<ph name="GROUP_HEADER" />“.</translation>
 <translation id="6554732001434021288">Paskutinį kartą lankytasi prieš <ph name="NUM_DAYS" /> d.</translation>
 <translation id="6556866813142980365">Grąžinti</translation>
 <translation id="6557715786897013164">14 x 17 col.</translation>

@@ -269,6 +269,7 @@
 <translation id="1407135791313364759">모두 열기</translation>
 <translation id="1408696301184924537">다음번에 이 IBAN을 자동 완성하려면 Google 계정에 저장하세요.</translation>
 <translation id="1408787208417187241">상단 트리플 스테이플</translation>
+<translation id="1410306713026702438"><ph name="SUGGESTION_TITLE" />, <ph name="SUGGESTION_DESCRIPTION" />. <ph name="SUGGESTION_TYPE" /> <ph name="GROUP_HEADER" /> 그룹의 <ph name="NUM_MATCHES_IN_GROUP" />개 중 <ph name="MATCH_POSITION" />번째 항목입니다.</translation>
 <translation id="1410365862999780287">이 기기를 사용하는 다른 사용자가 내 활동을 볼 수 없으므로 비공개로 탐색할 수 있습니다. 방문하는 웹사이트와 Google을 비롯하여 해당 웹사이트에서 사용하는 서비스에서 데이터를 수집하는 방식은 변경되지 않습니다. 다운로드, 북마크, 읽기 목록 항목은 계속해서 저장됩니다</translation>
 <translation id="1410941016594047814">봉투 Invite</translation>
 <translation id="1413235258620101697">더 빠른 결제를 위해 이 카드의 CVC가 암호화되고 Google 월렛에 저장됩니다.</translation>
@@ -660,6 +661,7 @@
 <translation id="2045871135676061132">봉투 Personal</translation>
 <translation id="2046951263634619614">서점</translation>
 <translation id="2048261947532620704">페이지 번역 중</translation>
+<translation id="2055016614992422886">대화</translation>
 <translation id="2059166748188874810">지방 자치제</translation>
 <translation id="2059202684901022309">22x34인치</translation>
 <translation id="2064568741209980952">신용 및 대출</translation>
@@ -3016,6 +3018,7 @@
 <translation id="5718601519531438273">여권, 운전면허증 등의 정보가 포함됩니다.</translation>
 <translation id="5720705177508910913">현재 사용자</translation>
 <translation id="5720895412771013401">데스크톱 컴퓨터</translation>
+<translation id="5721147290164931316">스캔하여 휴대전화로 로그인</translation>
 <translation id="5721367770070844253">{count,plural, =1{{website_1}}=2{{website_1}, {website_2}}=3{{website_1}, {website_2} 외 1개}other{{website_1}, {website_2} 외 {more_count}개}}</translation>
 <translation id="572328651809341494">최근 탭</translation>
 <translation id="5723873695528696965">MIDI 기기 제어 및 다시 프로그래밍</translation>
@@ -3557,6 +3560,7 @@
 <translation id="6550245281449521513">마우스 잠금이 허용되지 않음</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />, new</translation>
 <translation id="6552566579578780089">결제</translation>
+<translation id="6553777254569586547"><ph name="SUGGESTION_TITLE" />, <ph name="SUGGESTION_TYPE" />. <ph name="GROUP_HEADER" /> 그룹의 <ph name="NUM_MATCHES_IN_GROUP" />개 중 <ph name="MATCH_POSITION" />번째 항목입니다.</translation>
 <translation id="6554732001434021288">최근 방문: <ph name="NUM_DAYS" />일 전</translation>
 <translation id="6556866813142980365">다시실행</translation>
 <translation id="6557715786897013164">14x17인치</translation>
@@ -4261,6 +4265,7 @@
 <translation id="7646681339175747202">방금 사용한 비밀번호가 정보 유출로 인해 노출된 것으로 확인됩니다. 지금 바로 비밀번호를 변경하는 것이 좋습니다.</translation>
 <translation id="7647206758853451655">인쇄 품질</translation>
 <translation id="7648133459447652947">커서를 표시하려면 앱을 전환하거나, 페이지를 새로고침하거나, 뒤로 돌아가세요.</translation>
+<translation id="764847582138410250">스캔하여 휴대전화로 로그인</translation>
 <translation id="7648527891719919697"><ph name="BEGIN_ANDROID_SETTINGS_LINK" />Android 설정<ph name="END_ANDROID_SETTINGS_LINK" />에서 고급 보호를 사용 설정했기 때문에 이 사이트는 차단된 상태로 유지됩니다. <ph name="BEGIN_LEARN_MORE_LINK" />이 경고 자세히 알아보기<ph name="END_LEARN_MORE_LINK" /></translation>
 <translation id="7648992873808071793">이 기기에 파일 저장</translation>
 <translation id="7649070708921625228">도움말</translation>

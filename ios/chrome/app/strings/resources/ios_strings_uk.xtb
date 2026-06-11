@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">Оновіть вебпереглядач</translation>
 <translation id="4021931095789478915">Додати URL-адресу ${url} у список читання</translation>
 <translation id="4028871427853484857">Зберегти в обліковому записі…</translation>
+<translation id="4036529942385659684">Показувати початкову сторінку після періоду неактивності</translation>
 <translation id="4038354071007134711">Немає додатків на пристрої, щоб відкрити цей файл.</translation>
 <translation id="4042870976416480368">Знайти на сторінці</translation>
 <translation id="4045441967987592849">Повторно відкрити</translation>
@@ -911,7 +912,6 @@
 <translation id="417138788035229076">Керувати групою</translation>
 <translation id="4172051516777682613">Завжди показувати</translation>
 <translation id="417273154673973994">{count,plural, =1{1 групу вкладок закрито й збережено}one{{count} групу вкладок закрито й збережено}few{{count} групи вкладок закрито й збережено}many{{count} груп вкладок закрито й збережено}other{{count} групи вкладок закрито й збережено}}</translation>
-<translation id="417612446554534067">Надіслати на ваші пристрої</translation>
 <translation id="4180726336228139707">Лише на цьому пристрої</translation>
 <translation id="4181841719683918333">Мови</translation>
 <translation id="4183350924949589798">Посилити захист?</translation>

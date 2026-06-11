@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">Tarayıcınızı güncelleyin</translation>
 <translation id="4021931095789478915">${url} URL'sini okuma listesine ekle</translation>
 <translation id="4028871427853484857">Hesaba kaydet…</translation>
+<translation id="4036529942385659684">Belirli bir süre işlem yapılmadığında başlangıç sayfasını göster</translation>
 <translation id="4038354071007134711">Bu cihazdaki hiçbir uygulama dosyayı açamıyor.</translation>
 <translation id="4042870976416480368">Sayfada Bul</translation>
 <translation id="4045441967987592849">Yeniden aç</translation>
@@ -911,7 +912,6 @@
 <translation id="417138788035229076">Grubu yönet</translation>
 <translation id="4172051516777682613">Her zaman göster</translation>
 <translation id="417273154673973994">{count,plural, =1{1 sekme grubu kapatıldı ve kaydedildi}other{{count} sekme grubu kapatıldı ve kaydedildi}}</translation>
-<translation id="417612446554534067">Cihazlarıma Gönder</translation>
 <translation id="4180726336228139707">Yalnızca bu cihazda</translation>
 <translation id="4181841719683918333">Diller</translation>
 <translation id="4183350924949589798">Daha fazla güvenlik mi istiyorsunuz?</translation>

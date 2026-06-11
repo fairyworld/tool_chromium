@@ -269,6 +269,7 @@
 <translation id="1407135791313364759">အားလုံး ဖွင့်ရန်</translation>
 <translation id="1408696301184924537">ဤအိုင်ဘီအေအန် (IBAN) ကို နောက်တစ်ကြိမ်တွင် အော်တိုဖြည့်ရန် သင့် Google Account တွင် ၎င်းကိုသိမ်းပါ</translation>
 <translation id="1408787208417187241">ထိပ်တွင် ချုပ်စက်ဖြင့် သုံးချက်ချုပ်ရန်</translation>
+<translation id="1410306713026702438"><ph name="SUGGESTION_TITLE" />၊ <ph name="SUGGESTION_DESCRIPTION" />။ <ph name="SUGGESTION_TYPE" />။ <ph name="GROUP_HEADER" /> အုပ်စုတွင် <ph name="NUM_MATCHES_IN_GROUP" /> အနက် <ph name="MATCH_POSITION" />။</translation>
 <translation id="1410365862999780287">ဤစက်သုံးသော အခြားသူများက သင့်လုပ်ဆောင်ချက်ကို မမြင်နိုင်သောကြောင့် ပို၍ သိုသိပ်စွာ ဖွင့်ကြည့်နိုင်ပါပြီ။ ၎င်းသည် သင်ဝင်ကြည့်သောဝဘ်ဆိုက်များ၊ Google အပါအဝင် ၎င်းတို့အသုံးပြုသော ဝန်ဆောင်မှုများက ဒေတာစုဆောင်းပုံကို ပြောင်းမည်မဟုတ်ပါ။ ဒေါင်းလုဒ်၊ လိပ်စာနှင့် ဖတ်ရန်စာရင်းဖိုင်များကို သိမ်းပါမည်။</translation>
 <translation id="1410941016594047814">ဖိတ်စာ စာအိတ်</translation>
 <translation id="1413235258620101697">ပိုမိုမြန်ဆန်စွာ ငွေရှင်းနိုင်ရန် ဤကတ်၏ CVC နံပါတ်ကို Google Wallet တွင် အသွင်ဝှက်ပြီး သိမ်းပါမည်</translation>
@@ -661,6 +662,7 @@
 <translation id="2045871135676061132">Personal စာအိတ်</translation>
 <translation id="2046951263634619614">စာအုပ်လက်လီအရောင်းဆိုင်</translation>
 <translation id="2048261947532620704">စာမျက်နှာကို ဘာသာပြန်နေသည်</translation>
+<translation id="2055016614992422886">စကားဝိုင်း</translation>
 <translation id="2059166748188874810">မြူနီစီပယ်</translation>
 <translation id="2059202684901022309">၂၂ x ၃၄ လက်မ</translation>
 <translation id="2064568741209980952">ခရက်ဒစ်နှင့် ငွေချေးလုပ်ငန်း</translation>
@@ -3557,6 +3559,7 @@
 <translation id="6550245281449521513">မောက်စ်လော့ခ်ချခြင်း ခွင့်မပြုတော့ပါ</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />- အသစ်</translation>
 <translation id="6552566579578780089">ငွေပေးချေမှုများ</translation>
+<translation id="6553777254569586547"><ph name="SUGGESTION_TITLE" />။ <ph name="SUGGESTION_TYPE" />။ <ph name="GROUP_HEADER" /> အုပ်စုတွင် <ph name="NUM_MATCHES_IN_GROUP" /> အနက် <ph name="MATCH_POSITION" />။</translation>
 <translation id="6554732001434021288">ပြီးခဲ့သော <ph name="NUM_DAYS" /> ရက်က နောက်ဆုံး ဝင်ကြည့်ထားသည်</translation>
 <translation id="6556866813142980365">ပြန်လုပ်ရန်</translation>
 <translation id="6557715786897013164">၁၄ x ၁၇ လက်မ</translation>

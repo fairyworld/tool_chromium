@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">Uppdatera webbläsaren</translation>
 <translation id="4021931095789478915">Lägg till ${url} i läslistan</translation>
 <translation id="4028871427853484857">Spara i kontot …</translation>
+<translation id="4036529942385659684">Visa startsidan efter en period av inaktivitet</translation>
 <translation id="4038354071007134711">Det går inte att öppna filen med någon av apparna på enheten.</translation>
 <translation id="4042870976416480368">Sök på sidan</translation>
 <translation id="4045441967987592849">Öppna igen</translation>
@@ -911,7 +912,6 @@
 <translation id="417138788035229076">Hantera grupp</translation>
 <translation id="4172051516777682613">Visa alltid</translation>
 <translation id="417273154673973994">{count,plural, =1{1 flikgrupp har stängts och sparats}other{{count} flikgrupper har stängts och sparats}}</translation>
-<translation id="417612446554534067">Skicka till dina enheter</translation>
 <translation id="4180726336228139707">Bara på den här enheten</translation>
 <translation id="4181841719683918333">Språk</translation>
 <translation id="4183350924949589798">Vill du ha bättre säkerhet?</translation>

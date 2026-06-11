@@ -117,6 +117,7 @@
 <translation id="1373120905936431262">Загрузите изображение, чтобы создать ремикс с помощью Nano Banana</translation>
 <translation id="1377508275003315939">Пароли</translation>
 <translation id="1381022135873211423">{count,plural, =1{Адрес {position} из {count}}one{Адрес {position} из {count}}few{Адрес {position} из {count}}many{Адрес {position} из {count}}other{Адрес {position} из {count}}}</translation>
+<translation id="13813615483058219">Что-то пошло не так. Проверьте подключение к интернету, увеличьте громкость или повторите попытку.</translation>
 <translation id="1383876407941801731">Поиск</translation>
 <translation id="138618066238211776">Продолжить как <ph name="USER_NAME" /></translation>
 <translation id="138692594145659985">Параметры сохранения карты</translation>
@@ -912,7 +913,6 @@
 <translation id="417138788035229076">Управление группой</translation>
 <translation id="4172051516777682613">Показывать всегда</translation>
 <translation id="417273154673973994">{count,plural, =1{1 группа вкладок закрыта и сохранена.}one{{count} группа вкладок закрыта и сохранена.}few{{count} группы вкладок закрыто и сохранено.}many{{count} групп вкладок закрыто и сохранено.}other{{count} группы вкладок закрыто и сохранено.}}</translation>
-<translation id="417612446554534067">Отправить на свои устройства</translation>
 <translation id="4180726336228139707">Только на этом устройстве</translation>
 <translation id="4181841719683918333">Языки</translation>
 <translation id="4183350924949589798">Хотите усилить защиту аккаунта?</translation>

@@ -269,6 +269,7 @@
 <translation id="1407135791313364759">ሁሉንም ክፈት</translation>
 <translation id="1408696301184924537">በቀጣዩ ጊዜ ይህን አይቢኤኤን በራስ-ሙላ ለመሙላት በGoogle መለያዎ ውስጥ ያስቀምጡት</translation>
 <translation id="1408787208417187241">ሦስቴ ከላይ በስቴፕለር ምታ</translation>
+<translation id="1410306713026702438"><ph name="SUGGESTION_TITLE" />፣ <ph name="SUGGESTION_DESCRIPTION" />። <ph name="SUGGESTION_TYPE" />። የ<ph name="NUM_MATCHES_IN_GROUP" /> <ph name="MATCH_POSITION" /> በ<ph name="GROUP_HEADER" /> ቡድን ውስጥ።</translation>
 <translation id="1410365862999780287">ይህን መሳሪያ የሚጠቀሙ ሌሎች የእርስዎን እንቅስቃሴ ማየት አይችሉም፣ ስለዚህ የበለጠ በግል ማሰስ ይችላሉ። ይህ እርስዎ በሚጎበኟቸው ድረ ገጾች እና፣ Googleን ጨምሮ እነሱ በሚጠቀሙባቸው አገልግሎቶች መረጃ እንዴት እንደሚሰበሰብ አይቀይረውም። ውርዶች፣ ዕልባቶች እና የንባብ ዝርዝር ንጥሎች ይቀመጣሉ።</translation>
 <translation id="1410941016594047814">ኢንቫይት ፖስታ</translation>
 <translation id="1413235258620101697">የዚህ ካርድ የካርድ ማረጋገጫ ኮድ ለበለጠ ፈጣን ክፍያ ማጠናቀቅ ይመሠጠራል እና Google Wallet ውስጥ ይቀመጣል</translation>
@@ -660,6 +661,7 @@
 <translation id="2045871135676061132">ፐርሰናል ፖስታ</translation>
 <translation id="2046951263634619614">የመጽሐፍ ቸርቻሪዎች</translation>
 <translation id="2048261947532620704">ገጽን በመተርጎም ላይ</translation>
+<translation id="2055016614992422886">ውይይት</translation>
 <translation id="2059166748188874810">ማዘጋጃ ቤት</translation>
 <translation id="2059202684901022309">22 x 34 ኢንች</translation>
 <translation id="2064568741209980952">ክሬዲት እና ማበደር</translation>
@@ -3556,6 +3558,7 @@
 <translation id="6550245281449521513">የመዳፊት መቆለፊያ አይፈቀድም</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />፣ አዲስ</translation>
 <translation id="6552566579578780089">ክፍያዎች</translation>
+<translation id="6553777254569586547"><ph name="SUGGESTION_TITLE" />። <ph name="SUGGESTION_TYPE" />። የ<ph name="NUM_MATCHES_IN_GROUP" /> <ph name="MATCH_POSITION" /> በ<ph name="GROUP_HEADER" /> ቡድን ውስጥ።</translation>
 <translation id="6554732001434021288">ለመጨረሻ ጊዜ የተጎበኘው ከ<ph name="NUM_DAYS" /> ቀናት በፊት ነው</translation>
 <translation id="6556866813142980365">ድገም</translation>
 <translation id="6557715786897013164">14 x 17 ኢንች</translation>

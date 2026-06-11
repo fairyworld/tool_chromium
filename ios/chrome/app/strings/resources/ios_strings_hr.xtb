@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">Ažurirajte preglednik</translation>
 <translation id="4021931095789478915">Dodaj ${url} na popis za čitanje</translation>
 <translation id="4028871427853484857">Spremi na račun…</translation>
+<translation id="4036529942385659684">Prikaži početnu stranicu nakon razdoblja neaktivnosti</translation>
 <translation id="4038354071007134711">Na ovom uređaju nema aplikacije za tu datoteku.</translation>
 <translation id="4042870976416480368">Traži na stranici</translation>
 <translation id="4045441967987592849">Ponovno otvori</translation>
@@ -911,7 +912,6 @@
 <translation id="417138788035229076">Upravljajte grupom</translation>
 <translation id="4172051516777682613">Uvijek prikaži</translation>
 <translation id="417273154673973994">{count,plural, =1{Jedna grupa kartica zatvorena je i spremljena}one{{count} grupa kartica zatvorena je i spremljena}few{{count} grupe kartica zatvorene su i spremljene}other{{count} grupa kartica zatvoreno je i spremljeno}}</translation>
-<translation id="417612446554534067">Pošaljite na svoje uređaje</translation>
 <translation id="4180726336228139707">Samo na ovom uređaju</translation>
 <translation id="4181841719683918333">Jezici</translation>
 <translation id="4183350924949589798">Dodatna zaštita?</translation>

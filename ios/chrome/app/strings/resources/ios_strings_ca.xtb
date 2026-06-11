@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">Actualitza el navegador</translation>
 <translation id="4021931095789478915">Afegeix ${url} a la llista de lectura</translation>
 <translation id="4028871427853484857">Desa al compte…</translation>
+<translation id="4036529942385659684">Mostra la pàgina d'inici després d'un període d'inactivitat</translation>
 <translation id="4038354071007134711">Cap aplicació del dispos. no pot obrir el fitxer.</translation>
 <translation id="4042870976416480368">Cerca a la pàgina</translation>
 <translation id="4045441967987592849">Torna a obrir</translation>
@@ -911,7 +912,6 @@
 <translation id="417138788035229076">Gestiona el grup</translation>
 <translation id="4172051516777682613">Mostra sempre</translation>
 <translation id="417273154673973994">{count,plural, =1{S'ha tancat i desat 1 grup de pestanyes}other{S'han tancat i desat {count} grups de pestanyes}}</translation>
-<translation id="417612446554534067">Envia als teus dispositius</translation>
 <translation id="4180726336228139707">Només en aquest dispositiu</translation>
 <translation id="4181841719683918333">Idiomes</translation>
 <translation id="4183350924949589798">Més seguretat?</translation>

@@ -269,6 +269,7 @@
 <translation id="1407135791313364759">બધું ખોલો</translation>
 <translation id="1408696301184924537">આગલી વખત આ IBAN ઑટોમૅટિક રીતે ભરાય તે માટે, તેને તમારા Google એકાઉન્ટમાં સાચવો</translation>
 <translation id="1408787208417187241">ઉપરની બાજુએ ત્રણ સ્ટેપલ લગાવો</translation>
+<translation id="1410306713026702438"><ph name="SUGGESTION_TITLE" />, <ph name="SUGGESTION_DESCRIPTION" />. <ph name="SUGGESTION_TYPE" />. <ph name="GROUP_HEADER" /> ગ્રૂપમાં <ph name="NUM_MATCHES_IN_GROUP" />માંથી <ph name="MATCH_POSITION" />.</translation>
 <translation id="1410365862999780287">આ ડિવાઇસનો ઉપયોગ કરનારા અન્ય લોકો તમારી પ્રવૃત્તિ જોઈ શકશે નહીં, જેથી તમે વધુ ખાનગી રીતે બ્રાઉઝ કરી શકશો. આનાથી Google સહિત તમે મુલાકાત લેતા હો એ વેબસાઇટ દ્વારા ડેટા એકત્રિત કરવાની રીત તેમજ તે સાઇટ જે સેવાઓનો ઉપયોગ કરતી હોય, તેમાં કોઈ બદલાવ થશે નહીં. જોકે, ડાઉનલોડ, બુકમાર્ક અને વાંચન સૂચિની આઇટમ સાચવવામાં આવશે.</translation>
 <translation id="1410941016594047814">એન્વલપ આમંત્રણ</translation>
 <translation id="1413235258620101697">આ કાર્ડનો CVCનો એન્ક્રિપ્ટેડ હશે અને વધુ ઝડપી ચેકઆઉટ માટે તેને Google Walletમાં સાચવવામાં આવશે</translation>
@@ -660,6 +661,7 @@
 <translation id="2045871135676061132">એન્વલપ વ્યક્તિગત</translation>
 <translation id="2046951263634619614">પુસ્તકના છૂટક વેપારીઓ</translation>
 <translation id="2048261947532620704">પેજનો અનુવાદ કરવામાં આવી રહ્યો છે</translation>
+<translation id="2055016614992422886">વાતચીત</translation>
 <translation id="2059166748188874810">નગરપાલિકા</translation>
 <translation id="2059202684901022309">22 x 34 ઇંચ</translation>
 <translation id="2064568741209980952">જમા રાખવું અને ઉધાર આપવું</translation>
@@ -3557,6 +3559,7 @@
 <translation id="6550245281449521513">માઉસ લૉક કરવાની મંજૂરી નથી</translation>
 <translation id="6551737294564628267"><ph name="ATTRIBUTE_NAME" />, નવો</translation>
 <translation id="6552566579578780089">ચુકવણીઓ</translation>
+<translation id="6553777254569586547"><ph name="SUGGESTION_TITLE" />. <ph name="SUGGESTION_TYPE" />. <ph name="GROUP_HEADER" /> ગ્રૂપમાં <ph name="NUM_MATCHES_IN_GROUP" />માંથી <ph name="MATCH_POSITION" />.</translation>
 <translation id="6554732001434021288">છેલ્લે <ph name="NUM_DAYS" /> દિવસ પહેલાં મુલાકાત લીધી</translation>
 <translation id="6556866813142980365">ફરી કરો</translation>
 <translation id="6557715786897013164">14 x 17 ઇંચ</translation>

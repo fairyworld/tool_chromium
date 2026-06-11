@@ -874,6 +874,7 @@
 <translation id="4021447724486050609">Browser aktualisieren</translation>
 <translation id="4021931095789478915">${url} zur Leseliste hinzufügen</translation>
 <translation id="4028871427853484857">Im Konto speichern…</translation>
+<translation id="4036529942385659684">Startseite nach einer Zeit der Inaktivität anzeigen</translation>
 <translation id="4038354071007134711">Keine App zum Öffnen der Datei auf diesem Gerät</translation>
 <translation id="4042870976416480368">Auf Seite suchen</translation>
 <translation id="4045441967987592849">Noch einmal öffnen</translation>
@@ -911,7 +912,6 @@
 <translation id="417138788035229076">Gruppe verwalten</translation>
 <translation id="4172051516777682613">Immer anzeigen</translation>
 <translation id="417273154673973994">{count,plural, =1{1 Tabgruppe geschlossen und gespeichert}other{{count} Tabgruppen geschlossen und gespeichert}}</translation>
-<translation id="417612446554534067">An meine Geräte senden</translation>
 <translation id="4180726336228139707">Nur auf diesem Gerät</translation>
 <translation id="4181841719683918333">Sprachen</translation>
 <translation id="4183350924949589798">Mehr Sicherheit?</translation>
