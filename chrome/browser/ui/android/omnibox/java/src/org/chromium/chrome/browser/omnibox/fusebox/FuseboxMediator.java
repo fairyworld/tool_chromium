@@ -1002,8 +1002,7 @@ import java.util.function.Supplier;
                 isInInputSession()
                         && mModel.get(FuseboxProperties.FUSEBOX_LAYOUT_MODE)
                                 == FuseboxLayoutMode.SUGGESTIONS_POPOVER
-                        && mModel.get(FuseboxProperties.REQUEST_TYPE)
-                                == AutocompleteRequestType.SEARCH
+                        && mInput.getRequestType() == AutocompleteRequestType.SEARCH
                         && mInput.getSiteSearchData() == null
                         && (mExactMatchUrlSupplier.get() == null);
         mModel.set(FuseboxProperties.ACTIVATION_CHIP_VISIBLE, showActivationChip);
