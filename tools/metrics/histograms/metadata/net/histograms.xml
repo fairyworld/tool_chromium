@@ -4545,6 +4545,29 @@ chromium-metrics-reviews@google.com.
     units="ms" expires_after="2026-11-29">
   <owner>bashi@chromium.org</owner>
   <owner>blink-network-stack@google.com</owner>
+  <summary>Deprecated. Replaced by Create{StreamType}Time4.</summary>
+  <token key="StreamType">
+    <variant name="HttpStream"/>
+    <variant name="WebSocketStream"/>
+  </token>
+  <token key="HostType">
+    <variant name=""/>
+    <variant name=".GoogleHost"/>
+  </token>
+  <token key="Protocol" variants="NegotiatedProtocolCoalesced"/>
+  <token key="AddressFamily">
+    <variant name=""/>
+    <variant name=".IPv4"/>
+    <variant name=".IPv6"/>
+    <variant name=".Unspecified"/>
+  </token>
+</histogram>
+
+<histogram
+    name="Net.NetworkTransaction.Create{StreamType}Time4{HostType}.{Protocol}{AddressFamily}"
+    units="ms" expires_after="2026-11-29">
+  <owner>bashi@chromium.org</owner>
+  <owner>blink-network-stack@google.com</owner>
   <summary>
     The time taken for creating a(n) {StreamType}. Recorded in
     HttpNetworkTransaction::DoCreateStreamComplete when the stream creation
@@ -4622,6 +4645,14 @@ chromium-metrics-reviews@google.com.
     enum="SSLNegotiatedAlpnProtocol" expires_after="2026-12-06">
   <owner>bashi@chromium.org</owner>
   <owner>src/net/OWNERS</owner>
+  <summary>Deprecated. Replaced by NegotiatedProtocol3.</summary>
+  <token key="HostType" variants="HostType"/>
+</histogram>
+
+<histogram name="Net.NetworkTransaction.NegotiatedProtocol3{HostType}"
+    enum="SSLNegotiatedAlpnProtocol" expires_after="2026-10-04">
+  <owner>bashi@chromium.org</owner>
+  <owner>src/net/OWNERS</owner>
   <summary>
     Negotiated protocol of an HttpStream. Recorded in HttpNetworkTransaction
     when an HttpStreamRequest succeeded for the first time (i.e. not for
@@ -4657,6 +4688,14 @@ chromium-metrics-reviews@google.com.
     enum="NetworkSessionSource" expires_after="2027-03-02">
   <owner>bashi@chromium.org</owner>
   <owner>blink-network-stack@google.com</owner>
+  <summary>Deprecated. Replaced by SessionSource4.</summary>
+  <token key="Protocol" variants="NegotiatedProtocolCoalesced"/>
+</histogram>
+
+<histogram name="Net.NetworkTransaction.SessionSource4.{Protocol}"
+    enum="NetworkSessionSource" expires_after="2027-03-02">
+  <owner>bashi@chromium.org</owner>
+  <owner>blink-network-stack@google.com</owner>
   <summary>
     Measures whether a request used a new or an existing {Protocol} session.
     Recorded in HttpNetworkTransaction::DoCreateStreamComplete when the stream
@@ -4673,6 +4712,13 @@ chromium-metrics-reviews@google.com.
     enum="AddressFamily" expires_after="2026-07-12">
   <owner>bashi@chromium.org</owner>
   <owner>src/net/OWNERS</owner>
+  <summary>Deprecated. Replaced by StreamAddressFamily3.</summary>
+</histogram>
+
+<histogram name="Net.NetworkTransaction.StreamAddressFamily3"
+    enum="AddressFamily" expires_after="2026-07-12">
+  <owner>bashi@chromium.org</owner>
+  <owner>src/net/OWNERS</owner>
   <summary>
     Address family of a remote endpoint of an HttpStream. Recorded in
     HttpNetworkTransaction when an HttpStreamRequest succeeded and getting the
@@ -4686,6 +4732,16 @@ chromium-metrics-reviews@google.com.
     units="ms" expires_after="2026-11-29">
   <owner>bashi@chromium.org</owner>
   <owner>src/net/OWNERS</owner>
+  <summary>Deprecated. Replaced by StreamRequestCompleteTime4.</summary>
+  <token key="HostType" variants="HostType"/>
+  <token key="SuccessOrFailure" variants="SuccessOrFailure"/>
+</histogram>
+
+<histogram
+    name="Net.NetworkTransaction.StreamRequestCompleteTime4{HostType}.{SuccessOrFailure}"
+    units="ms" expires_after="2026-11-29">
+  <owner>bashi@chromium.org</owner>
+  <owner>src/net/OWNERS</owner>
   <summary>
     The time taken by an HttpStreamRequest to complete. Recorded only when an
     HttpStreamRequest succeeded without retries in HttpNetworkTransaction for
@@ -4696,6 +4752,13 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Net.NetworkTransaction.StreamRequestErrorCode3"
+    enum="NetErrorCodes" expires_after="2027-01-06">
+  <owner>bashi@chromium.org</owner>
+  <owner>src/net/OWNERS</owner>
+  <summary>Deprecated. Replaced by StreamRequestErrorCode4.</summary>
+</histogram>
+
+<histogram name="Net.NetworkTransaction.StreamRequestErrorCode4"
     enum="NetErrorCodes" expires_after="2027-01-06">
   <owner>bashi@chromium.org</owner>
   <owner>src/net/OWNERS</owner>
@@ -4718,6 +4781,19 @@ chromium-metrics-reviews@google.com.
 
 <histogram
     name="Net.NetworkTransaction.{Protocol}StreamCreationTime2.{NewOrExisting}"
+    units="ms" expires_after="2026-10-11">
+  <owner>bashi@chromium.org</owner>
+  <owner>blink-network-stack@google.com</owner>
+  <summary>Deprecated. Replaced by {Protocol}StreamCreationTime3.</summary>
+  <token key="Protocol" variants="NegotiatedProtocolCoalesced"/>
+  <token key="NewOrExisting">
+    <variant name="Existing"/>
+    <variant name="New"/>
+  </token>
+</histogram>
+
+<histogram
+    name="Net.NetworkTransaction.{Protocol}StreamCreationTime3.{NewOrExisting}"
     units="ms" expires_after="2026-10-11">
   <owner>bashi@chromium.org</owner>
   <owner>blink-network-stack@google.com</owner>
