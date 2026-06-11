@@ -784,7 +784,8 @@ void OnListFamilyMembersResponse(
         identityManager->GetPrimaryAccountInfo(signin::ConsentLevel::kSignin);
     AccountInfo info = identityManager->FindExtendedAccountInfoByAccountId(
         primaryAccountInfo.account_id);
-    if (info.capabilities.can_submit_feedback() == signin::Tribool::kFalse) {
+    if (info.GetAccountCapabilities().can_submit_feedback() ==
+        signin::Tribool::kFalse) {
       // TODO(crbug.com/512043635): Remove this test once Chrome uses Aloha
       // feedback. Aloha feedback is responsible for checking the capability.
       base::UmaHistogramEnumeration("IOS.Feedback.ReportAnIssue.NotDisplayed",

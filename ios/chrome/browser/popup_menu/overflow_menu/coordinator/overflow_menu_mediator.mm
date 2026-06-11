@@ -2667,7 +2667,7 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
   }
   AccountInfo accountInfo =
       self.identityManager->FindExtendedAccountInfo(primaryAccount);
-  return accountInfo.capabilities.can_submit_feedback() !=
+  return accountInfo.GetAccountCapabilities().can_submit_feedback() !=
          signin::Tribool::kFalse;
 }
 
