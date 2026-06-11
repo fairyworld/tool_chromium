@@ -2035,6 +2035,10 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
                         IntentUtils.safeGetStringExtra(intent, Browser.EXTRA_APPLICATION_ID),
                         tabIdToBringToFront,
                         intent);
+        if (tab == null) {
+            Log.e(TAG, "processUrlViewIntent returned null, failing to handle intent.");
+            return false;
+        }
         boolean shouldPin = IntentHandler.getPinnedState(intent);
         if (shouldPin && !tab.getIsPinned()) {
             getTabModelSelector()
