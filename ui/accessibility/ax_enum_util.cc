@@ -1358,6 +1358,8 @@ const char* ToString(ax::mojom::StringAttribute string_attribute) {
       return "url";
     case ax::mojom::StringAttribute::kValue:
       return "value";
+    case ax::mojom::StringAttribute::kAriaValueText:
+      return "ariaValueText";
     case ax::mojom::StringAttribute::kVirtualContent:
       return "virtualContent";
   }
@@ -1454,7 +1456,9 @@ ax::mojom::StringAttribute StringToStringAttribute(
   } else if (string_attribute == "kUrl") {
     return ax::mojom::StringAttribute::kUrl;
   } else if (string_attribute == "kValue") {
-    return ax::mojom::StringAttribute::kUrl;
+    return ax::mojom::StringAttribute::kValue;
+  } else if (string_attribute == "kAriaValueText") {
+    return ax::mojom::StringAttribute::kAriaValueText;
   } else if (string_attribute == "kVirtualContent") {
     return ax::mojom::StringAttribute::kVirtualContent;
   } else {

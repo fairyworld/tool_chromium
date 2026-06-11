@@ -313,8 +313,10 @@ IN_PROC_BROWSER_TEST_F(AccessibilityActionBrowserTest,
   EXPECT_EQ(8.0, target->GetFloatAttribute(
                      ax::mojom::FloatAttribute::kValueForRange));
   // Numerical ranges (see ui::IsRangeValueSupported) shouldn't have
-  // ax::mojom::StringAttribute::kValue set unless they use aria-valuetext.
-  EXPECT_FALSE(target->HasStringAttribute(ax::mojom::StringAttribute::kValue));
+  // ax::mojom::StringAttribute::kAriaValueText set unless they use
+  // aria-valuetext.
+  EXPECT_FALSE(
+      target->HasStringAttribute(ax::mojom::StringAttribute::kAriaValueText));
 
   // Increment, should result in value changing from 8 to 10.
   {

@@ -140,6 +140,8 @@ optimization_guide::proto::AXStringAttribute StringAttributeToProto(
     case ax::mojom::StringAttribute::kCanvasAnnotation:
       return optimization_guide::proto::AXStringAttribute::
           AX_SA_CANVASANNOTATION;
+    case ax::mojom::StringAttribute::kAriaValueText:
+      return optimization_guide::proto::AXStringAttribute::AX_SA_ARIAVALUETEXT;
   }
 }
 

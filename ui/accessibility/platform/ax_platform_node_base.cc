@@ -635,6 +635,10 @@ bool AXPlatformNodeBase::GetStringAttribute(
   return GetDelegate()->GetStringAttribute(attribute, value);
 }
 
+std::optional<std::string> AXPlatformNodeBase::GetAriaValueTextOrValue() const {
+  return GetDelegate()->GetAriaValueTextOrValue();
+}
+
 std::u16string AXPlatformNodeBase::GetString16Attribute(
     ax::mojom::StringAttribute attribute) const {
   return GetDelegate()->GetString16Attribute(attribute);

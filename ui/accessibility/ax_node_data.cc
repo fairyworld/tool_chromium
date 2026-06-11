@@ -1507,6 +1507,9 @@ std::string AXNodeData::ToString(bool verbose) const {
       case ax::mojom::StringAttribute::kValue:
         base::StrAppend(&result, {" value=", value});
         break;
+      case ax::mojom::StringAttribute::kAriaValueText:
+        base::StrAppend(&result, {" aria_valuetext=", value});
+        break;
       case ax::mojom::StringAttribute::kVirtualContent:
         base::StrAppend(&result, {" virtual_content=", value});
         break;

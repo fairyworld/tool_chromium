@@ -596,8 +596,8 @@ enum Mutation {
   kSubtreeUpdateEnd,
 };
 
-// Next version: 11
-// Next value: 46
+// Next version: 12
+// Next value: 47
 [Extensible, Stable, Uuid="e5a4cd0c-3152-4427-93d5-35ff7d0f1ae8"]
 enum StringAttribute {
   [Default]kNone = 0,
@@ -660,6 +660,7 @@ enum StringAttribute {
   // TODO(bebeaudr): kAriaVirtualContent is currently a string attribute to
   // facilitate prototyping. Make it an enum when we're done prototyping.
   kVirtualContent = 30,
+  [MinVersion=11] kAriaValueText = 46,
 };
 
 // Next version: 8
