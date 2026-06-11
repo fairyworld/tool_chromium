@@ -35,7 +35,7 @@ namespace crosapi {
 // Account Manager.
 //
 // TODO(b/365741912, b/365902693): This service is a temporary stepping stone
-// for direct Ash callers that still need the current Account Manager dialog/UI
+// for direct Ash callers that still need the current Account Manager dialog
 // path. After all callers are off AccountManagerFacade, create an Ash-owned
 // dialog coordinator and switch those direct callers from this service to that
 // coordinator. Furthermore, once the remaining crosapi/facade users are gone,
@@ -80,7 +80,6 @@ class COMPONENT_EXPORT(ACCOUNT_MANAGER_CORE) AccountManagerMojoService
   void ShowReauthAccountDialog(
       const std::string& email,
       ShowReauthAccountDialogCallback callback) override;
-  void ShowManageAccountsSettings() override;
   void CreateAccessTokenFetcher(
       mojom::AccountKeyPtr mojo_account_key,
       const std::string& oauth_consumer_name,

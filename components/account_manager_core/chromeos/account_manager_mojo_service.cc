@@ -185,10 +185,6 @@ void AccountManagerMojoService::ShowReauthAccountDialog(
                             weak_ptr_factory_.GetWeakPtr()));
 }
 
-void AccountManagerMojoService::ShowManageAccountsSettings() {
-  account_manager_ui_->ShowManageAccountsSettings();
-}
-
 void AccountManagerMojoService::CreateAccessTokenFetcher(
     mojom::AccountKeyPtr mojo_account_key,
     const std::string& oauth_consumer_name,

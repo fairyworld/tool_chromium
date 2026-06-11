@@ -433,8 +433,6 @@ IN_PROC_BROWSER_TEST_P(AccountManagerUIHandlerTest,
               Optional(StrEq(kReauthAccountEmail)));
   EXPECT_EQ(0,
             fake_account_manager_ui_ptr->show_account_addition_dialog_calls());
-  EXPECT_EQ(0,
-            fake_account_manager_ui_ptr->show_manage_accounts_settings_calls());
   histogram_tester.ExpectUniqueSample(
       account_manager::kAccountAdditionSourceHistogramName,
       account_manager::AccountAdditionSource::kSettingsReauthAccountButton,
@@ -470,8 +468,6 @@ IN_PROC_BROWSER_TEST_P(AccountManagerUIHandlerTest,
             fake_account_manager_ui_ptr->show_account_addition_dialog_calls());
   EXPECT_EQ(0, fake_account_manager_ui_ptr
                    ->show_account_reauthentication_dialog_calls());
-  EXPECT_EQ(0,
-            fake_account_manager_ui_ptr->show_manage_accounts_settings_calls());
   ASSERT_TRUE(
       fake_account_manager_ui_ptr->last_add_account_options().has_value());
   EXPECT_TRUE(fake_account_manager_ui_ptr->last_add_account_options()

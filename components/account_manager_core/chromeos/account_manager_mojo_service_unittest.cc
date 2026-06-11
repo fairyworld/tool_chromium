@@ -249,10 +249,6 @@ class AccountManagerMojoServiceTest : public ::testing::Test {
     GetFakeAccountManagerUI()->CloseDialog();
   }
 
-  void ShowManageAccountsSettings() {
-    account_manager_mojo_service_->ShowManageAccountsSettings();
-  }
-
   mojom::AccessTokenResultPtr FetchAccessToken(
       const account_manager::AccountKey& account_key) {
     return FetchAccessToken(account_key, /*scopes=*/{});
@@ -655,14 +651,6 @@ TEST_F(AccountManagerMojoServiceTest, ShowReauthAccountDialogOpensTheDialog) {
   EXPECT_EQ(
       1,
       GetFakeAccountManagerUI()->show_account_reauthentication_dialog_calls());
-}
-
-TEST_F(AccountManagerMojoServiceTest, ShowManageAccountSettingsTest) {
-  EXPECT_EQ(0,
-            GetFakeAccountManagerUI()->show_manage_accounts_settings_calls());
-  ShowManageAccountsSettings();
-  EXPECT_EQ(1,
-            GetFakeAccountManagerUI()->show_manage_accounts_settings_calls());
 }
 
 TEST_F(AccountManagerMojoServiceTest,
