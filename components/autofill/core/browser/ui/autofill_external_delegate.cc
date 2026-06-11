@@ -855,8 +855,10 @@ void AutofillExternalDelegate::DidAcceptSuggestion(
                              GetWeakPtr(), GetTriggerSource(),
                              autofill_field->Type().GetAutofillAiTypes()));
 
-      if (is_async && base::FeatureList::IsEnabled(
-                          features::kAutofillAiWalletPrivatePasses)) {
+      if (is_async &&
+          (base::FeatureList::IsEnabled(features::kAutofillAmbientAutofill) ||
+           base::FeatureList::IsEnabled(
+               features::kAutofillAiWalletPrivatePasses))) {
         manager_->client().UpdateAutofillSuggestions(
             PrepareLoadingStateSuggestions(
                 base::ToVector(manager_->client().GetAutofillSuggestions()),

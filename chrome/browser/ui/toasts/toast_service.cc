@@ -432,7 +432,9 @@ void ToastService::RegisterToasts(
           .Build());
 
   if (base::FeatureList::IsEnabled(
-          autofill::features::kAutofillAiWalletPrivatePasses)) {
+          autofill::features::kAutofillAiWalletPrivatePasses) ||
+      base::FeatureList::IsEnabled(
+          autofill::features::kAutofillAmbientAutofill)) {
     toast_registry_->RegisterToast(
         ToastId::kAutofillAiFetchFromWalletErrorMessage,
         ToastSpecification::Builder(

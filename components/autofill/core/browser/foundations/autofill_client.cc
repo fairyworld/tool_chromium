@@ -167,6 +167,11 @@ AutofillClient::GetPersonalContextAccessManager() {
   return nullptr;
 }
 
+const PersonalContextAccessManager*
+AutofillClient::GetPersonalContextAccessManager() const {
+  return const_cast<AutofillClient*>(this)->GetPersonalContextAccessManager();
+}
+
 AutofillAiModelCache* AutofillClient::GetAutofillAiModelCache() {
   return nullptr;
 }
