@@ -117,21 +117,22 @@ class PasswordGenerationAgent::DeferringPasswordGenerationDriver
  private:
   template <typename F, typename... Args>
   void SendMsg(F fn, Args&&... args) {
-    DCHECK(!agent_->IsPrerendering());
-    mojom::PasswordGenerationDriver& password_generation_client =
-        agent_->GetPasswordGenerationDriver();
-    DCHECK_NE(&password_generation_client, this);
-    (password_generation_client.*fn)(std::forward<Args>(args)...);
+    if (auto* driver = agent_->unsafe_driver()) {
+      DCHECK(!agent_->IsPrerendering());
+      DCHECK_NE(driver, this);
+      (driver->*fn)(std::forward<Args>(args)...);
+    }
   }
   template <typename F, typename... Args>
   void DeferMsg(F fn, Args... args) {
-    DCHECK(agent_->IsPrerendering());
-    agent_->render_frame()
-        ->GetWebFrame()
-        ->GetDocument()
-        .AddPostPrerenderingActivationStep(base::BindOnce(
-            &DeferringPasswordGenerationDriver::SendMsg<F, Args...>,
-            weak_ptr_factory_.GetWeakPtr(), fn, std::forward<Args>(args)...));
+    if (auto* render_frame = agent_->unsafe_render_frame()) {
+      DCHECK(agent_->IsPrerendering());
+      render_frame->GetWebFrame()
+          ->GetDocument()
+          .AddPostPrerenderingActivationStep(base::BindOnce(
+              &DeferringPasswordGenerationDriver::SendMsg<F, Args...>,
+              weak_ptr_factory_.GetWeakPtr(), fn, std::forward<Args>(args)...));
+    }
   }
   void AutomaticGenerationAvailable(
       const password_generation::PasswordGenerationUIData&
@@ -268,7 +269,8 @@ void PasswordGenerationAgent::BindPendingReceiver(
 void PasswordGenerationAgent::DidCommitProvisionalLoad(
     ui::PageTransition transition) {
   // Update stats for primary main frame navigation.
-  if (render_frame()->GetWebFrame()->IsOutermostMainFrame()) {
+  if (auto* frame = unsafe_render_frame();
+      frame && frame->GetWebFrame()->IsOutermostMainFrame()) {
     auto [current_generation_item, auto_protect] =
         current_generation_item_.GetAndProtect();
     if (current_generation_item) {
@@ -296,10 +298,11 @@ void PasswordGenerationAgent::DidChangeScrollOffset() {
 #if !BUILDFLAG(IS_ANDROID)
   auto [current_generation_item, auto_protect] =
       current_generation_item_.GetAndProtect();
-  if (!current_generation_item) {
+  auto* driver = unsafe_driver();
+  if (!driver || !current_generation_item) {
     return;
   }
-  GetPasswordGenerationDriver().FrameWasScrolled();
+  driver->FrameWasScrolled();
 #endif  // !BUILDFLAG(IS_ANDROID)
 }
 
@@ -329,8 +332,8 @@ bool PasswordGenerationAgent::ShouldIgnoreBlur() {
 }
 
 bool PasswordGenerationAgent::IsPrerendering() const {
-  return render_frame() &&
-         render_frame()->GetWebFrame()->GetDocument().IsPrerendering();
+  auto* frame = unsafe_render_frame();
+  return frame && frame->GetWebFrame()->GetDocument().IsPrerendering();
 }
 
 void PasswordGenerationAgent::PreviewGenerationSuggestion(
@@ -400,10 +403,9 @@ void PasswordGenerationAgent::GeneratedPasswordAccepted(
       current_generation_item->generation_element, /*form_cache=*/{});
   const std::u16string generated_password =
       current_generation_item->generation_element.Value().Utf16();
-  if (presaved_form_data) {
+  if (auto* driver = unsafe_driver(); driver && presaved_form_data) {
     CHECK(!generated_password.empty());
-    GetPasswordGenerationDriver().PresaveGeneratedPassword(*presaved_form_data,
-                                                           generated_password);
+    driver->PresaveGeneratedPassword(*presaved_form_data, generated_password);
   }
 
   // Call UpdateStateForTextChange after the corresponding PasswordFormManager
@@ -430,15 +432,16 @@ void PasswordGenerationAgent::GeneratedPasswordRejected() {
 void PasswordGenerationAgent::FocusNextFieldAfterPasswords() {
   auto [current_generation_item, auto_protect] =
       current_generation_item_.GetAndProtect();
-  if (!current_generation_item || !render_frame()) {
+  if (!current_generation_item) {
     return;
   }
 
   for (const WebInputElement& password_element :
        current_generation_item->password_elements) {
-    if (password_element ==
-        password_agent_->last_queried_element().DynamicTo<WebInputElement>()) {
-      render_frame()->GetWebView()->AdvanceFocus(false);
+    if (auto* frame = unsafe_render_frame();
+        frame && password_element == password_agent_->last_queried_element()
+                                         .DynamicTo<WebInputElement>()) {
+      frame->GetWebView()->AdvanceFocus(false);
     }
   }
 }
@@ -472,7 +475,8 @@ void PasswordGenerationAgent::FoundFormEligibleForGeneration(
 
 void PasswordGenerationAgent::TriggeredGeneratePassword(
     TriggeredGeneratePasswordCallback callback) {
-  if (SetUpTriggeredGeneration()) {
+  if (auto* frame = unsafe_render_frame();
+      frame && SetUpTriggeredGeneration()) {
     LogMessage(Logger::STRING_GENERATION_RENDERER_SHOW_GENERATION_POPUP);
     auto [current_generation_item, auto_protect] =
         current_generation_item_.GetAndProtect();
@@ -485,7 +489,7 @@ void PasswordGenerationAgent::TriggeredGeneratePassword(
             .FormControlType()  // nocheck
         == kInputPassword;
     password_generation::PasswordGenerationUIData password_generation_ui_data(
-        gfx::RectF(render_frame()->ConvertViewportToWindow(
+        gfx::RectF(frame->ConvertViewportToWindow(
             current_generation_item->generation_element.BoundsInWidget())),
         current_generation_item->generation_element.MaxLength(),
         current_generation_item->generation_element.NameForAutofill().Utf16(),
@@ -522,9 +526,9 @@ bool PasswordGenerationAgent::SetUpTriggeredGeneration() {
         last_focused_password_element,
         it->second.confirmation_password_renderer_id, /*form_cache=*/{});
   } else {
+    auto* frame = unsafe_render_frame();
     blink::WebDocument document =
-        render_frame() ? render_frame()->GetWebFrame()->GetDocument()
-                       : WebDocument();
+        frame ? frame->GetWebFrame()->GetDocument() : WebDocument();
     if (!document) {
       return false;
     }
@@ -612,7 +616,9 @@ void PasswordGenerationAgent::DidEndTextFieldEditing(
   if (element && current_generation_item &&
       element == current_generation_item->generation_element) {
 #if !BUILDFLAG(IS_ANDROID)
-    GetPasswordGenerationDriver().GenerationElementLostFocus();
+    if (auto* driver = unsafe_driver()) {
+      driver->GenerationElementLostFocus();
+    }
 #endif  // !BUILDFLAG(IS_ANDROID)
     current_generation_item->password_revealed_after_editing = false;
     current_generation_item->generation_element.SetShouldRevealPassword(false);
@@ -655,9 +661,9 @@ bool PasswordGenerationAgent::TextDidChangeInTextField(
       } else {
         std::optional<FormData> presaved_form_data = CreateFormDataToPresave(
             current_generation_item->generation_element, form_cache);
-        if (presaved_form_data) {
-          GetPasswordGenerationDriver().PresaveGeneratedPassword(
-              *presaved_form_data, generated_password);
+        if (auto* driver = unsafe_driver(); driver && presaved_form_data) {
+          driver->PresaveGeneratedPassword(*presaved_form_data,
+                                           generated_password);
         }
       }
     }
@@ -670,7 +676,9 @@ bool PasswordGenerationAgent::TextDidChangeInTextField(
     } else {
       // User has rejected the feature and has started typing a password.
 #if !BUILDFLAG(IS_ANDROID)
-      GetPasswordGenerationDriver().PasswordGenerationRejectedByTyping();
+      if (auto* driver = unsafe_driver()) {
+        driver->PasswordGenerationRejectedByTyping();
+      }
 #endif  // !BUILDFLAG(IS_ANDROID)
       // If the user is still modifying the field after leaving the editing
       // state without fully clearing, it should remain revealed.
@@ -707,10 +715,10 @@ bool PasswordGenerationAgent::TextDidChangeInTextField(
           current_generation_item->generation_element, /*form_cache=*/{});
       std::u16string generated_password =
           current_generation_item->generation_element.Value().Utf16();
-      if (presaved_form_data) {
+      if (auto* driver = unsafe_driver(); driver && presaved_form_data) {
         CHECK(!generated_password.empty());
-        GetPasswordGenerationDriver().PresaveGeneratedPassword(
-            *presaved_form_data, generated_password);
+        driver->PresaveGeneratedPassword(*presaved_form_data,
+                                         generated_password);
       }
     }
 
@@ -743,8 +751,6 @@ bool PasswordGenerationAgent::MaybeOfferAutomaticGeneration() {
 }
 
 void PasswordGenerationAgent::AutomaticGenerationAvailable() {
-  if (!render_frame())
-    return;
   auto [current_generation_item, auto_protect] =
       current_generation_item_.GetAndProtect();
   DCHECK(current_generation_item);
@@ -758,8 +764,11 @@ void PasswordGenerationAgent::AutomaticGenerationAvailable() {
   bool is_generation_element_password_type =
       current_generation_item->generation_element.FormControlType()  // nocheck
       == kInputPassword;
+  if (!unsafe_render_frame() || !unsafe_driver()) {
+    return;
+  }
   password_generation::PasswordGenerationUIData password_generation_ui_data(
-      gfx::RectF(render_frame()->ConvertViewportToWindow(
+      gfx::RectF(unsafe_render_frame()->ConvertViewportToWindow(
           current_generation_item->generation_element.BoundsInWidget())),
       current_generation_item->generation_element.MaxLength(),
       current_generation_item->generation_element.NameForAutofill().Utf16(),
@@ -770,20 +779,19 @@ void PasswordGenerationAgent::AutomaticGenerationAvailable() {
       current_generation_item->form_data_,
       current_generation_item->generation_rejected);
   current_generation_item->generation_popup_shown = true;
-  GetPasswordGenerationDriver().AutomaticGenerationAvailable(
-      password_generation_ui_data);
+  unsafe_driver()->AutomaticGenerationAvailable(password_generation_ui_data);
 }
 
 #if !BUILDFLAG(IS_ANDROID)
 void PasswordGenerationAgent::ShowEditingPopup(
     const SynchronousFormCache& form_cache) {
-  if (!render_frame())
-    return;
-
   auto [current_generation_item, auto_protect] =
       current_generation_item_.GetAndProtect();
 
-  gfx::RectF bounding_box(render_frame()->ConvertViewportToWindow(
+  if (!unsafe_render_frame()) {
+    return;
+  }
+  gfx::RectF bounding_box(unsafe_render_frame()->ConvertViewportToWindow(
       current_generation_item->generation_element.BoundsInWidget()));
 
   std::optional<FormData> form_data = CreateFormDataToPresave(
@@ -796,8 +804,11 @@ void PasswordGenerationAgent::ShowEditingPopup(
   std::u16string password_value =
       current_generation_item->generation_element.Value().Utf16();
 
-  GetPasswordGenerationDriver().ShowPasswordEditingPopup(
-      bounding_box, *form_data, generation_element_renderer_id, password_value);
+  if (auto* driver = unsafe_driver()) {
+    driver->ShowPasswordEditingPopup(bounding_box, *form_data,
+                                     generation_element_renderer_id,
+                                     password_value);
+  }
   current_generation_item->editing_popup_shown = true;
 }
 #endif  // !BUILDFLAG(IS_ANDROID)
@@ -831,9 +842,9 @@ void PasswordGenerationAgent::PasswordNoLongerGenerated() {
   // form cache.
   std::optional<FormData> presaved_form_data = CreateFormDataToPresave(
       current_generation_item->generation_element, /*form_cache=*/{});
-  if (presaved_form_data)
-    GetPasswordGenerationDriver().PasswordNoLongerGenerated(
-        *presaved_form_data);
+  if (auto* driver = unsafe_driver(); driver && presaved_form_data) {
+    driver->PasswordNoLongerGenerated(*presaved_form_data);
+  }
 }
 
 void PasswordGenerationAgent::MaybeCreateCurrentGenerationItem(
@@ -892,43 +903,41 @@ void PasswordGenerationAgent::MaybeCreateCurrentGenerationItem(
   generation_element.SetAttribute("aria-autocomplete", "list");
 }
 
-mojom::PasswordManagerDriver&
-PasswordGenerationAgent::GetPasswordManagerDriver() {
-  DCHECK(password_agent_);
-  return password_agent_->GetPasswordManagerDriver();
-}
-
-mojom::PasswordGenerationDriver&
-PasswordGenerationAgent::GetPasswordGenerationDriver() {
+mojom::PasswordGenerationDriver* PasswordGenerationAgent::unsafe_driver() {
   if (IsPrerendering()) {
     if (!deferring_password_generation_driver_) {
       deferring_password_generation_driver_ =
           std::make_unique<DeferringPasswordGenerationDriver>(this);
     }
-    return *deferring_password_generation_driver_;
+    return deferring_password_generation_driver_.get();
   }
 
   // Lazily bind this interface.
-  if (!password_generation_client_) {
-    render_frame()->GetRemoteAssociatedInterfaces()->GetInterface(
+  if (auto* frame = unsafe_render_frame();
+      frame && !password_generation_client_) {
+    frame->GetRemoteAssociatedInterfaces()->GetInterface(
         &password_generation_client_);
   }
 
-  return *password_generation_client_;
+  return password_generation_client_.get();
 }
 
 void PasswordGenerationAgent::LogMessage(Logger::StringID message_id) {
-  if (!password_agent_->logging_state_active())
+  if (!password_agent_->logging_state_active() ||
+      !password_agent_->unsafe_driver()) {
     return;
-  RendererSavePasswordProgressLogger logger(&GetPasswordManagerDriver());
+  }
+  RendererSavePasswordProgressLogger logger(password_agent_->unsafe_driver());
   logger.LogMessage(message_id);
 }
 
 void PasswordGenerationAgent::LogBoolean(Logger::StringID message_id,
                                          bool truth_value) {
-  if (!password_agent_->logging_state_active())
+  if (!password_agent_->logging_state_active() ||
+      !password_agent_->unsafe_driver()) {
     return;
-  RendererSavePasswordProgressLogger logger(&GetPasswordManagerDriver());
+  }
+  RendererSavePasswordProgressLogger logger(password_agent_->unsafe_driver());
   logger.LogBoolean(message_id, truth_value);
 }
 

@@ -338,7 +338,7 @@ void PasswordGenerationAgentTest::SetUp() {
 
   // TODO(crbug.com/41401202): Remove workaround preventing non-test classes to
   // bind fake_driver_ or fake_pw_client_.
-  password_autofill_agent_->GetPasswordManagerDriver();
+  password_autofill_agent_->unsafe_driver();
   password_generation_->RequestPasswordManagerClientForTesting();
   base::RunLoop().RunUntilIdle();  // Executes binding the interfaces.
   // Reject all requests to bind driver/client to anything but the test class:
