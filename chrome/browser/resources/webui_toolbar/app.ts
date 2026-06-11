@@ -7,6 +7,7 @@ import './reload_button.js';
 import './location_bar.js';
 import './split_tabs_button.js';
 import './home_button.js';
+import './battery_saver_button.js';
 import './pinned_toolbar_actions.js';
 import './avatar_button.js';
 import '/shared/icon_table.js';
@@ -25,7 +26,7 @@ import {HelpBubbleMixinLit} from 'chrome://resources/cr_components/help_bubble/h
 
 import {getCss} from './app.css.js';
 import {getHtml} from './app.html.js';
-import {BrowserProxyImpl, EventDispositionFlag, INVALID_NAVIGATION_CONTROLS_STATE_LISTENER_HANDLE} from './browser_proxy.js';
+import {BrowserProxyImpl, ContextMenuType, EventDispositionFlag, INVALID_NAVIGATION_CONTROLS_STATE_LISTENER_HANDLE} from './browser_proxy.js';
 import type {BrowserProxy, IconUpdate, NavigationControlsState, NavigationControlsStateListenerHandle} from './browser_proxy.js';
 import {MetricsRecorder} from './metrics_recorder.js';
 import {setHasHelpBubble} from './toolbar_button.js';
@@ -60,6 +61,7 @@ import {getClickSourceType, getContextMenuSourceType, PressHandler} from './tool
 
 export {
   BrowserProxyImpl,
+  ContextMenuType,
   ContentSettingIconElement,
   ContentSettingImageType,
   ContentSettingsIconsElement,
@@ -100,6 +102,7 @@ const TRACKED_ELEMENTS: Array<{selector: string, id: string}> = [
   {selector: '#location-bar', id: 'kLocationBarElementId'},
   {selector: '#home', id: 'kToolbarHomeButtonElementId'},
   {selector: '#avatar', id: 'kToolbarAvatarButtonElementId'},
+  {selector: '#battery-saver', id: 'kToolbarBatterySaverButtonElementId'},
 ];
 
 const AppElementBase = HelpBubbleMixinLit(CrLitElement);
@@ -130,6 +133,7 @@ export class ToolbarAppElement extends AppElementBase {
       isReloadButtonEnabled_: {type: Boolean},
       isSplitTabsButtonEnabled_: {type: Boolean},
       isHomeButtonEnabled_: {type: Boolean},
+      isBatterySaverButtonEnabled_: {type: Boolean},
       isLocationBarEnabled_: {type: Boolean},
       navigationControlsState_: {type: Object},
       isBackForwardButtonEnabled_: {type: Boolean},
@@ -145,6 +149,8 @@ export class ToolbarAppElement extends AppElementBase {
       loadTimeData.getBoolean('enableSplitTabsButton');
   protected accessor isHomeButtonEnabled_: boolean =
       loadTimeData.getBoolean('enableHomeButton');
+  protected accessor isBatterySaverButtonEnabled_: boolean =
+      loadTimeData.getBoolean('enableBatterySaverButton');
   protected accessor isLocationBarEnabled_: boolean =
       loadTimeData.getBoolean('enableLocationBar');
   protected accessor isBackForwardButtonEnabled_: boolean =
@@ -196,6 +202,8 @@ export class ToolbarAppElement extends AppElementBase {
       isContextMenuVisible: false,
       trailingMargin: 0,
     },
+
+    batterySaverButtonVisible: false,
     locationBarState: {
       omniboxViewState: {
         browserVersion: 0,

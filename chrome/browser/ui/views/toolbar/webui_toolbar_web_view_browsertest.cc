@@ -25,7 +25,13 @@
 #include "base/time/time.h"
 #include "base/values.h"
 #include "build/build_config.h"
+#if BUILDFLAG(IS_CHROMEOS)
+#include "ash/constants/ash_features.h"
+#include "ash/constants/ash_pref_names.h"
+#include "chromeos/dbus/power/power_manager_client.h"
+#endif
 #include "chrome/app/chrome_command_ids.h"
+#include "chrome/browser/browser_process.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/profiles/profile.h"
@@ -55,6 +61,7 @@
 #include "chrome/browser/ui/views/frame/toolbar_button_provider.h"
 #include "chrome/browser/ui/views/location_bar/webui_location_bar.h"
 #include "chrome/browser/ui/views/page_info/page_info_bubble_view_base.h"
+#include "chrome/browser/ui/views/performance_controls/battery_saver_bubble_view.h"
 #include "chrome/browser/ui/views/toolbar/home_button.h"
 #include "chrome/browser/ui/views/toolbar/reload_button.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_view.h"
@@ -81,6 +88,7 @@
 #include "components/contextual_tasks/public/features.h"
 #include "components/data_sharing/public/features.h"
 #include "components/metrics/content/subprocess_metrics_provider.h"
+#include "components/performance_manager/public/user_tuning/prefs.h"
 #include "components/permissions/test/permission_request_observer.h"
 #include "components/prefs/pref_service.h"
 #include "components/strings/grit/components_strings.h"
@@ -450,7 +458,11 @@ class WebUIToolbarWebViewPixelBrowserTest : public InProcessBrowserTest {
          features::kWebUIExtensionsContainer,
          features::kSkipIPCChannelPausingForNonGuests,
          features::kWebUIInProcessResourceLoadingV2,
-         features::kInitialWebUISyncNavStartToCommit},
+         features::kInitialWebUISyncNavStartToCommit,
+#if BUILDFLAG(IS_CHROMEOS)
+         ash::features::kBatterySaver,
+#endif
+         features::kWebUIBatterySaverButton},
         {});
   }
 
@@ -1247,6 +1259,115 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewPixelBrowserTest,
                                 })();)",
                                 GetButtonAppJS(kHomeSelector))),
             false);
+}
+
+IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewPixelBrowserTest,
+                       CheckBatterySaverButtonShowHide) {
+  content::ScopedAccessibilityModeOverride mode_override(ui::kAXModeComplete);
+  ui::TrackedElement* element = nullptr;
+  WebUIToolbarWebView* webui_toolbar_view = nullptr;
+  views::WebView* web_view = nullptr;
+  ASSERT_NO_FATAL_FAILURE(SetUpWebUI(kWebUIToolbarElementIdentifier, &element,
+                                     &webui_toolbar_view, &web_view,
+                                     browser()));
+
+  content::WebContents* webui_web_contents = web_view->GetWebContents();
+  const std::string bsm_selector = "#battery-saver";
+
+  // 1. Verify initially hidden.
+  EXPECT_FALSE(webui_toolbar_view->battery_saver_control_.IsVisible());
+  auto check_visible = [&]() {
+    return content::EvalJs(
+               webui_web_contents,
+               base::StringPrintf("(() => { const btn = %s; return !!btn && "
+                                  "btn.checkVisibility(); })()",
+                                  GetButtonAppJS(bsm_selector).c_str()))
+        .ExtractBool();
+  };
+  EXPECT_FALSE(check_visible());
+
+  // 2. Enable Battery Saver.
+#if BUILDFLAG(IS_CHROMEOS)
+  g_browser_process->local_state()->SetBoolean(ash::prefs::kPowerBatterySaver,
+                                               true);
+#else
+  g_browser_process->local_state()->SetInteger(
+      performance_manager::user_tuning::prefs::kBatterySaverModeState,
+      static_cast<int>(performance_manager::user_tuning::prefs::
+                           BatterySaverModeState::kEnabled));
+#endif
+
+  // 3. Verify it becomes visible.
+  EXPECT_TRUE(base::test::RunUntil([&]() {
+    return webui_toolbar_view->battery_saver_control_.IsVisible();
+  }));
+  EXPECT_TRUE(WaitForButtonVisible(webui_web_contents, bsm_selector));
+
+  // Verify appropriate accessibility properties for battery saver button.
+  std::string expected_bsm_name =
+      l10n_util::GetStringUTF8(IDS_BATTERY_SAVER_BUTTON_ACCNAME);
+  std::string expected_bsm_description =
+      l10n_util::GetStringUTF8(IDS_BATTERY_SAVER_BUTTON_TOOLTIP);
+  content::WaitForAccessibilityTreeToContainNodeWithName(webui_web_contents,
+                                                         expected_bsm_name);
+  content::FindAccessibilityNodeCriteria find_criteria;
+  find_criteria.name = expected_bsm_name;
+  EXPECT_TRUE(base::test::RunUntil([&]() {
+    ui::AXPlatformNodeDelegate* node =
+        content::FindAccessibilityNode(webui_web_contents, find_criteria);
+    return node && node->GetData().role == ax::mojom::Role::kButton &&
+           node->GetData().GetStringAttribute(
+               ax::mojom::StringAttribute::kName) == expected_bsm_name &&
+           node->GetData().GetStringAttribute(
+               ax::mojom::StringAttribute::kDescription) ==
+               expected_bsm_description;
+  }));
+
+  // Now we can get the tracked element for the BSM button.
+  ui::TrackedElement* bsm_element =
+      BrowserElements::From(browser())->GetElement(
+          kToolbarBatterySaverButtonElementId);
+  ASSERT_TRUE(bsm_element);
+
+  // 4. Show battery saver button bubble (context menu).
+  views::NamedWidgetShownWaiter waiter(views::test::AnyWidgetTestPasskey{},
+                                       BatterySaverBubbleView::kViewClassName);
+
+  EXPECT_TRUE(content::ExecJs(
+      webui_web_contents,
+      base::StringPrintf("%s.click();",
+                         GetButtonIconJS(bsm_selector).c_str())));
+
+  views::Widget* bubble_widget = waiter.WaitIfNeededAndGet();
+  ASSERT_TRUE(bubble_widget);
+
+  // 5. Close bubble.
+  views::test::WidgetDestroyedWaiter destroyed_waiter(bubble_widget);
+  bubble_widget->Close();
+  destroyed_waiter.Wait();
+
+  // 6. Disable Battery Saver and verify it becomes hidden again.
+#if BUILDFLAG(IS_CHROMEOS)
+  g_browser_process->local_state()->SetBoolean(ash::prefs::kPowerBatterySaver,
+                                               false);
+#else
+  g_browser_process->local_state()->SetInteger(
+      performance_manager::user_tuning::prefs::kBatterySaverModeState,
+      static_cast<int>(performance_manager::user_tuning::prefs::
+                           BatterySaverModeState::kDisabled));
+#endif
+
+  EXPECT_TRUE(base::test::RunUntil([&]() {
+    return !webui_toolbar_view->battery_saver_control_.IsVisible();
+  }));
+  EXPECT_TRUE(base::test::RunUntil([&]() {
+    return content::EvalJs(
+               webui_web_contents,
+               base::StringPrintf("(() => { const btn = %s; return !btn || "
+                                  "!btn.checkVisibility(); })()",
+                                  GetButtonAppJS(bsm_selector).c_str()))
+        .ExtractBool();
+  }));
 }
 
 class WebUIToolbarWebViewStabilityTest : public InProcessBrowserTest {

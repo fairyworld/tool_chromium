@@ -72,6 +72,8 @@ WebUIToolbarUI::WebUIToolbarUI(content::WebUI* web_ui)
       // go/keep-sorted start
       {"backButtonAccName", IDS_ACCNAME_BACK},
       {"backButtonTooltip", IDS_TOOLTIP_BACK},
+      {"batterySaverButtonAccName", IDS_BATTERY_SAVER_BUTTON_ACCNAME},
+      {"batterySaverButtonTooltip", IDS_BATTERY_SAVER_BUTTON_TOOLTIP},
       {"forwardButtonAccName", IDS_ACCNAME_FORWARD},
       {"forwardButtonTooltip", IDS_TOOLTIP_FORWARD},
       {"homeButtonAccName", IDS_ACCNAME_HOME},
@@ -92,6 +94,8 @@ WebUIToolbarUI::WebUIToolbarUI(content::WebUI* web_ui)
   source->AddBoolean("enableReloadButton",
                      features::IsWebUIReloadButtonEnabled());
   source->AddBoolean("enableHomeButton", features::IsWebUIHomeButtonEnabled());
+  source->AddBoolean("enableBatterySaverButton",
+                     features::IsWebUIBatterySaverButtonEnabled());
   source->AddBoolean("enableLocationBar",
                      features::IsWebUILocationBarEnabled());
   source->AddBoolean("enableBackForwardButtons",
@@ -310,7 +314,8 @@ WebUIToolbarUI::GetKnownElementIdentifiers() {
        kPinnedToolbarActionSendTabToSelfElementId,
        kToolbarAvatarButtonElementId,
        PermissionChipView::kPermissionRequestChipElementId,
-       PermissionChipView::kIndicatorChipElementId});
+       PermissionChipView::kIndicatorChipElementId,
+       kToolbarBatterySaverButtonElementId});
   auto pinned_ids = webui_toolbar::GetPinnedToolbarActionElementIds();
   pinned_ids.reserve(pinned_ids.size() + ids->size());
   pinned_ids.insert(pinned_ids.end(), ids->begin(), ids->end());
