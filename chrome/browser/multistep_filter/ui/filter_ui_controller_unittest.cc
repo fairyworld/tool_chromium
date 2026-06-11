@@ -404,14 +404,29 @@ TEST_F(FilterUiControllerTest, NavigateToWithWebContents) {
   controller->NavigateTo(url);
 }
 
-// === Group 5: Commands (ExecuteCommand) ===
+// === Group 5: Menu Delegate Methods (IsCommandIdChecked, IsCommandIdEnabled,
+// ExecuteCommand) ===
+
+TEST_F(FilterUiControllerTest, IsCommandIdCheckedReturnsFalse) {
+  EXPECT_FALSE(
+      test_api(*controller_).IsCommandIdChecked(internal::kDismissCommand));
+  EXPECT_FALSE(
+      test_api(*controller_).IsCommandIdChecked(internal::kSettingsCommand));
+}
+
+TEST_F(FilterUiControllerTest, IsCommandIdEnabledReturnsTrue) {
+  EXPECT_TRUE(
+      test_api(*controller_).IsCommandIdEnabled(internal::kDismissCommand));
+  EXPECT_TRUE(
+      test_api(*controller_).IsCommandIdEnabled(internal::kSettingsCommand));
+}
 
 TEST_F(FilterUiControllerTest, ExecuteCommandDismissClearsSuggestion) {
   UrlFilterSuggestion suggestion =
       CreateDummySuggestion(GURL("https://example.com"), DefaultAttributes());
   controller_->OnSuggestionGenerated(suggestion);
 
-  controller_->ExecuteCommand(internal::kDismissCommand, 0);
+  test_api(*controller_).ExecuteCommand(internal::kDismissCommand, 0);
 
   EXPECT_FALSE(
       test_api(*controller_).current_url_filter_suggestion().has_value());
@@ -422,7 +437,7 @@ TEST_F(FilterUiControllerTest, ExecuteCommandSettingsClearsSuggestion) {
       CreateDummySuggestion(GURL("https://example.com"), DefaultAttributes());
   controller_->OnSuggestionGenerated(suggestion);
 
-  controller_->ExecuteCommand(internal::kSettingsCommand, 0);
+  test_api(*controller_).ExecuteCommand(internal::kSettingsCommand, 0);
 
   EXPECT_FALSE(
       test_api(*controller_).current_url_filter_suggestion().has_value());
@@ -435,7 +450,7 @@ TEST_F(FilterUiControllerTest, ExecuteCommandWithNullWebContents) {
   EXPECT_CALL(*mock_tab_, GetContents()).WillOnce(Return(nullptr));
 
   // Should not crash when attempting to open settings.
-  controller_->ExecuteCommand(internal::kSettingsCommand, 0);
+  test_api(*controller_).ExecuteCommand(internal::kSettingsCommand, 0);
 }
 
 // === Group 7: Action Invocation (OnActionInvoked) ===

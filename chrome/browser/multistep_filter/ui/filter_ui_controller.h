@@ -62,11 +62,6 @@ class FilterUiController : public tabs::ContentsObservingTabFeature,
   FilterUiController& operator=(const FilterUiController&) = delete;
   ~FilterUiController() override;
 
-  // ui::SimpleMenuModel::Delegate:
-  bool IsCommandIdChecked(int command_id) const override;
-  bool IsCommandIdEnabled(int command_id) const override;
-  void ExecuteCommand(int command_id, int event_flags) override;
-
   // Callback for when a suggestion is generated.
   virtual void OnSuggestionGenerated(
       std::optional<UrlFilterSuggestion> suggestion);
@@ -87,8 +82,10 @@ class FilterUiController : public tabs::ContentsObservingTabFeature,
  private:
   friend class FilterUiControllerTestApi;
 
-  // Handles the dismissal of the suggestion.
-  void DismissSuggestion();
+  // ui::SimpleMenuModel::Delegate:
+  bool IsCommandIdChecked(int command_id) const override;
+  bool IsCommandIdEnabled(int command_id) const override;
+  void ExecuteCommand(int command_id, int event_flags) override;
 
   // Opens the settings page.
   void OpenSettings();

@@ -111,50 +111,6 @@ FilterUiController::~FilterUiController() {
   }
 }
 
-// Items in the contextual cue menu are action buttons rather than toggles,
-// so they are never checked.
-bool FilterUiController::IsCommandIdChecked(int command_id) const {
-  return false;
-}
-
-// All commands in the contextual cue menu are always enabled when visible.
-bool FilterUiController::IsCommandIdEnabled(int command_id) const {
-  return true;
-}
-
-void FilterUiController::ExecuteCommand(int command_id, int event_flags) {
-  switch (command_id) {
-    case internal::kDismissCommand:
-      DismissSuggestion();
-      break;
-    case internal::kSettingsCommand:
-      OpenSettings();
-      break;
-  }
-}
-
-void FilterUiController::DismissSuggestion() {
-  ClearSuggestion(SuggestionUserDecision::kDismissed);
-}
-
-void FilterUiController::OpenSettings() {
-  ClearSuggestion(SuggestionUserDecision::kIgnored);
-
-  // TODO(crbug.com/517999412): Use Delegate pattern to avoid circular
-  // dependency and use chrome::ShowSettingsSubPage instead of manual
-  // navigation.
-  if (content::WebContents* web_contents = tab().GetContents()) {
-    GURL settings_url(chrome::kChromeUISettingsURL);
-    content::OpenURLParams params(
-        settings_url.Resolve(chrome::kExperimentalAISettingsSubPage),
-        content::Referrer(), WindowOpenDisposition::NEW_FOREGROUND_TAB,
-        ui::PAGE_TRANSITION_GENERATED,
-        /*is_renderer_initiated=*/false);
-    web_contents->OpenURL(params,
-                          base::BindOnce([](content::NavigationHandle&) {}));
-  }
-}
-
 void FilterUiController::OnSuggestionGenerated(
     std::optional<UrlFilterSuggestion> suggestion) {
   if (!suggestion) {
@@ -224,6 +180,45 @@ void FilterUiController::NavigateTo(const GURL& url) {
       params, base::BindOnce([](content::NavigationHandle& handle) {
         FilterInitiatedNavigationMarker::CreateForNavigationHandle(handle);
       }));
+}
+
+// Items in the contextual cue menu are action buttons rather than toggles,
+// so they are never checked.
+bool FilterUiController::IsCommandIdChecked(int command_id) const {
+  return false;
+}
+
+// All commands in the contextual cue menu are always enabled when visible.
+bool FilterUiController::IsCommandIdEnabled(int command_id) const {
+  return true;
+}
+
+void FilterUiController::ExecuteCommand(int command_id, int event_flags) {
+  switch (command_id) {
+    case internal::kDismissCommand:
+      ClearSuggestion(SuggestionUserDecision::kDismissed);
+      break;
+    case internal::kSettingsCommand:
+      ClearSuggestion(SuggestionUserDecision::kIgnored);
+      OpenSettings();
+      break;
+  }
+}
+
+void FilterUiController::OpenSettings() {
+  // TODO(crbug.com/517999412): Use Delegate pattern to avoid circular
+  // dependency and use chrome::ShowSettingsSubPage instead of manual
+  // navigation.
+  if (content::WebContents* web_contents = tab().GetContents()) {
+    GURL settings_url(chrome::kChromeUISettingsURL);
+    content::OpenURLParams params(
+        settings_url.Resolve(chrome::kExperimentalAISettingsSubPage),
+        content::Referrer(), WindowOpenDisposition::NEW_FOREGROUND_TAB,
+        ui::PAGE_TRANSITION_GENERATED,
+        /*is_renderer_initiated=*/false);
+    web_contents->OpenURL(params,
+                          base::BindOnce([](content::NavigationHandle&) {}));
+  }
 }
 
 void FilterUiController::ShowCue(const UrlFilterSuggestion& suggestion) {
