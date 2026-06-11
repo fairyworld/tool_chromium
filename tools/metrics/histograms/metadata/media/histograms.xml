@@ -1603,7 +1603,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Media.Audio.DecoderType" enum="AudioDecoderType"
-    expires_after="2026-06-30">
+    expires_after="2027-06-30">
   <owner>jophba@chromium.org</owner>
   <owner>dalecurtis@chromium.org</owner>
   <owner>media-dev-uma@chromium.org</owner>
@@ -7988,7 +7988,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Media.VideoCapture.AspectRatio" units="%"
-    expires_after="2026-03-25">
+    expires_after="2027-06-30">
   <owner>hiroh@chromium.org</owner>
   <owner>chromeos-gfx-video@chromium.org</owner>
   <owner>jophba@chromium.org</owner>
@@ -7996,6 +7996,9 @@ chromium-metrics-reviews@google.com.
     Video Capture Device captured aspect ratio, as a rounded integer multiplied
     by 100. The collection is made in the VideoCaptureController upon reception
     of the first frame.
+
+    Warning: this histogram was expired from 2026-03-25 to 2026-06-10; data may
+    be missing.
   </summary>
 </histogram>
 
@@ -8092,7 +8095,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Media.VideoCapture.Device.SupportedResolution"
-    enum="VideoResolutionDesignation" expires_after="2026-03-25">
+    enum="VideoResolutionDesignation" expires_after="2027-06-30">
   <owner>bryantchandler@chromium.org</owner>
   <owner>eshr@google.com</owner>
   <owner>handellm@google.com</owner>
@@ -8104,6 +8107,9 @@ chromium-metrics-reviews@google.com.
     pixel count. This is recorded during the first device enumeration per
     Capture process launch. (This is usually once per launch of Chrome unless
     the Capture process crashes.)
+
+    Warning: this histogram was expired from 2026-03-25 to 2026-06-10; data may
+    be missing.
   </summary>
 </histogram>
 
@@ -8123,7 +8129,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Media.VideoCapture.FrameRate" units="fps"
-    expires_after="2026-11-29">
+    expires_after="2027-06-30">
   <owner>hiroh@chromium.org</owner>
   <owner>chromeos-gfx-video@chromium.org</owner>
   <owner>guidou@chromium.org</owner>
@@ -8138,7 +8144,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Media.VideoCapture.Height" units="pixels"
-    expires_after="2026-03-25">
+    expires_after="2027-06-30">
   <owner>hiroh@chromium.org</owner>
   <owner>chromeos-gfx-video@chromium.org</owner>
   <owner>handellm@google.com</owner>
@@ -8148,6 +8154,9 @@ chromium-metrics-reviews@google.com.
     in the VideoCaptureController upon reception of the first frame.
 
     Warning: this histogram was expired from 2023-12-31 to 2025-03-25; data may
+    be missing.
+
+    Warning: this histogram was expired from 2026-03-25 to 2026-06-10; data may
     be missing.
   </summary>
 </histogram>
@@ -8230,7 +8239,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Media.VideoCapture.ScaleOverride" units="units"
-    expires_after="2026-03-25">
+    expires_after="2027-06-30">
   <owner>jophba@chromium.org</owner>
   <owner>klausw@chromium.org</owner>
   <summary>
@@ -8238,16 +8247,22 @@ chromium-metrics-reviews@google.com.
     to align with the requested capture size, multiplied by 100. Recorded when
     capture of a web contents is started, the content size of the capture
     changes, and when capture stops.
+
+    Warning: this histogram was expired from 2026-03-25 to 2026-06-10; data may
+    be missing.
   </summary>
 </histogram>
 
 <histogram name="Media.VideoCapture.ScaleOverrideChangeCount" units="units"
-    expires_after="2026-03-25">
+    expires_after="2027-06-30">
   <owner>jophba@chromium.org</owner>
   <owner>klausw@chromium.org</owner>
   <summary>
     The number of times the scale override changed in a single capture session.
     Recorded when capture of a web contents is stopped.
+
+    Warning: this histogram was expired from 2026-03-25 to 2026-06-10; data may
+    be missing.
   </summary>
 </histogram>
 
@@ -8320,7 +8335,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Media.VideoCapture.Track.FrameDrop.{StreamType}"
-    enum="VideoCaptureFrameDropReason" expires_after="2026-03-25">
+    enum="VideoCaptureFrameDropReason" expires_after="2027-06-30">
   <owner>hiroh@chromium.org</owner>
   <owner>chromeos-gfx-video@chromium.org</owner>
   <owner>guidou@chromium.org</owner>
@@ -8336,6 +8351,9 @@ chromium-metrics-reviews@google.com.
     (e.g. a DeviceCapture webcam source dropping frames in the capture process).
 
     Warning: this histogram was expired from 2024-03-03 to 2025-03-25; data may
+    be missing.
+
+    Warning: this histogram was expired from 2026-03-25 to 2026-06-10; data may
     be missing.
   </summary>
   <token key="StreamType">
