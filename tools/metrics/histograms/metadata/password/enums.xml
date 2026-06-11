@@ -566,6 +566,7 @@ chromium-metrics-reviews@google.com.
   <int value="4" label="Rejected, no frame for id"/>
   <int value="5" label="Rejected, no trusted URL"/>
   <int value="6" label="Rejected, can't extract form data"/>
+  <int value="7" label="Rejected, no user interaction"/>
 </enum>
 
 <enum name="HistogramExportResult">
