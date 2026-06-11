@@ -72,6 +72,7 @@
 #include "components/omnibox/browser/omnibox_field_trial.h"
 #include "components/omnibox/browser/omnibox_log.h"
 #include "components/omnibox/browser/omnibox_logging_utils.h"
+#include "components/omnibox/browser/omnibox_metrics_constants.h"
 #include "components/omnibox/browser/omnibox_metrics_provider.h"
 #include "components/omnibox/browser/omnibox_navigation_observer.h"
 #include "components/omnibox/browser/omnibox_popup_selection.h"
@@ -162,48 +163,23 @@ enum class OmniboxEscapeAction {
 const char kOmniboxFocusResultedInNavigation[] =
     "Omnibox.FocusResultedInNavigation";
 
-// Histogram name which counts the number of times the user enters
-// keyword hint mode and via what method.  The possible values are listed
-// in the metrics OmniboxEnteredKeywordMode2 enum which is defined in metrics
-// enum XML file.
-const char kEnteredKeywordModeHistogram[] = "Omnibox.EnteredKeywordMode2";
-
-// Like `kEnteredKeywordModeHistogram` but only logged when user has additional
-// text input at the time keyword mode was entered.
-const char kEnteredKeywordModeWithInputHistogram[] =
-    "Omnibox.EnteredKeywordModeWithInput";
-
-// Histogram name which counts the number of times the user completes a search
-// in keyword mode, enumerated by how they enter keyword mode.
-const char kAcceptedKeywordSuggestionHistogram[] =
-    "Omnibox.AcceptedKeywordSuggestion";
-
-// Histogram name which counts the number of times the user enters the keyword
-// mode, enumerated by the type of search engine.
-const char kKeywordModeUsageByEngineTypeEnteredHistogramName[] =
-    "Omnibox.KeywordModeUsageByEngineType.Entered";
-
-// Histogram name which counts the number of times the user completes a search
-// in keyword mode, enumerated by the type of search engine.
-const char kKeywordModeUsageByEngineTypeAcceptedHistogramName[] =
-    "Omnibox.KeywordModeUsageByEngineType.Accepted";
-
 void EmitEnteredKeywordModeHistogram(
     OmniboxEventProto::KeywordModeEntryMethod entry_method,
     const TemplateURL* turl,
     bool entered_with_input) {
   UMA_HISTOGRAM_ENUMERATION(
-      kEnteredKeywordModeHistogram, static_cast<int>(entry_method),
+      omnibox::kEnteredKeywordModeHistogram, static_cast<int>(entry_method),
       static_cast<int>(OmniboxEventProto::KeywordModeEntryMethod_MAX + 1));
   if (entered_with_input) {
     UMA_HISTOGRAM_ENUMERATION(
-        kEnteredKeywordModeWithInputHistogram, static_cast<int>(entry_method),
+        omnibox::kEnteredKeywordModeWithInputHistogram,
+        static_cast<int>(entry_method),
         static_cast<int>(OmniboxEventProto::KeywordModeEntryMethod_MAX + 1));
   }
 
   if (turl != nullptr) {
     base::UmaHistogramEnumeration(
-        kKeywordModeUsageByEngineTypeEnteredHistogramName,
+        omnibox::kKeywordModeUsageByEngineTypeEnteredHistogramName,
         turl->GetBuiltinEngineType(),
         BuiltinEngineType::KEYWORD_MODE_ENGINE_TYPE_MAX);
   }
@@ -213,12 +189,13 @@ void EmitAcceptedKeywordSuggestionHistogram(
     OmniboxEventProto::KeywordModeEntryMethod entry_method,
     const TemplateURL* turl) {
   UMA_HISTOGRAM_ENUMERATION(
-      kAcceptedKeywordSuggestionHistogram, static_cast<int>(entry_method),
+      omnibox::kAcceptedKeywordSuggestionHistogram,
+      static_cast<int>(entry_method),
       static_cast<int>(OmniboxEventProto::KeywordModeEntryMethod_MAX + 1));
 
   if (turl != nullptr) {
     base::UmaHistogramEnumeration(
-        kKeywordModeUsageByEngineTypeAcceptedHistogramName,
+        omnibox::kKeywordModeUsageByEngineTypeAcceptedHistogramName,
         turl->GetBuiltinEngineType(),
         BuiltinEngineType::KEYWORD_MODE_ENGINE_TYPE_MAX);
   }
