@@ -214,6 +214,8 @@ source_set("renderer") {
     "static_v8_external_one_byte_string_resource.h",
     "storage_area.cc",
     "storage_area.h",
+    "test_api_standardized_behavior_native_handler.cc",
+    "test_api_standardized_behavior_native_handler.h",
     "test_features_native_handler.cc",
     "test_features_native_handler.h",
     "trace_util.h",

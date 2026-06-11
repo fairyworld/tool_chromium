@@ -3078,6 +3078,8 @@ void ChromeContentBrowserClient::AppendExtraCommandLineSwitches(
                                                                 // only.
         extensions::switches::kAllowlistedExtensionID,
         extensions::switches::kExtensionTestApiOnWebPages,  // For tests only.
+        extensions::switches::
+            kExtensionTestApiStandardizedBehavior,  // For tests only.
         extensions::switches::kAppsGalleryURL,
 #endif
         switches::kAllowInsecureLocalhost,
