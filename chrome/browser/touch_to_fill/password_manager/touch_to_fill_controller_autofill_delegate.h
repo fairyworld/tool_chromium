@@ -18,7 +18,7 @@
 #include "chrome/browser/password_manager/android/grouped_affiliations/acknowledge_grouped_credential_sheet_bridge.h"
 #include "chrome/browser/password_manager/android/grouped_affiliations/acknowledge_grouped_credential_sheet_controller.h"
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller_delegate.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_view.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_view.h"
 #include "components/autofill/core/common/unique_ids.h"
 #include "components/device_reauth/device_authenticator.h"
 #include "components/password_manager/core/browser/password_form.h"
@@ -114,8 +114,8 @@ class TouchToFillControllerAutofillDelegate
   ~TouchToFillControllerAutofillDelegate() override;
 
   // TouchToFillControllerDelegate:
-  void OnShow(
-      base::span<const TouchToFillView::Credential> credentials) override;
+  void OnShow(base::span<const TouchToFillPasswordManagerView::Credential>
+                  credentials) override;
   void OnCredentialSelected(const password_manager::UiCredential& credential,
                             base::OnceClosure action_completed) override;
   void OnPasskeyCredentialSelected(
@@ -132,8 +132,9 @@ class TouchToFillControllerAutofillDelegate
   bool ShouldTriggerSubmission() override;
   bool ShouldShowHybridOption() override;
   bool ShouldShowNoPasskeysSheetIfRequired() override;
-  std::optional<std::vector<TouchToFillView::Credential>> SortCredentials(
-      base::span<const TouchToFillView::Credential> credentials) override;
+  std::optional<std::vector<TouchToFillPasswordManagerView::Credential>>
+  SortCredentials(base::span<const TouchToFillPasswordManagerView::Credential>
+                      credentials) override;
   gfx::NativeView GetNativeView() override;
 
  private:

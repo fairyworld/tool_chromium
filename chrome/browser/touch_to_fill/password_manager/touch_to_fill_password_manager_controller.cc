@@ -14,8 +14,8 @@
 #include "chrome/browser/password_manager/android/password_manager_ui_util_android.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller_delegate.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_view.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_view_factory.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_view.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_view_factory.h"
 #include "components/password_manager/content/browser/keyboard_replacing_surface_visibility_controller.h"
 #include "components/password_manager/core/browser/origin_credential_store.h"
 #include "components/password_manager/core/browser/passkey_credential.h"
@@ -30,7 +30,7 @@ namespace {
 using password_manager::PasskeyCredential;
 using password_manager::UiCredential;
 using webauthn::WebAuthnCredManDelegate;
-using Credential = TouchToFillView::Credential;
+using Credential = TouchToFillPasswordManagerView::Credential;
 using DisplayTarget = TouchToFillPasswordManagerController::DisplayTarget;
 
 // Constants used to rank passkeys and passwords in the default credential
@@ -144,16 +144,16 @@ bool TouchToFillPasswordManagerController::Show(
       return true;
     case DisplayTarget::kShowTouchToFill:
       if (!view_) {
-        view_ = TouchToFillViewFactory::Create(this);
+        view_ = TouchToFillPasswordManagerViewFactory::Create(this);
       }
 
-      int flags = TouchToFillView::kNone;
+      int flags = TouchToFillPasswordManagerView::kNone;
 
       if (ttf_delegate_->ShouldTriggerSubmission()) {
-        flags |= TouchToFillView::kTriggerSubmission;
+        flags |= TouchToFillPasswordManagerView::kTriggerSubmission;
       }
       if (ttf_delegate_->ShouldShowHybridOption()) {
-        flags |= TouchToFillView::kShouldShowHybridOption;
+        flags |= TouchToFillPasswordManagerView::kShouldShowHybridOption;
       }
       if (cred_man_delegate &&
           cred_man_delegate->HasPasskeys() ==
@@ -161,7 +161,7 @@ bool TouchToFillPasswordManagerController::Show(
         cred_man_delegate->SetRequestCompletionCallback(base::BindRepeating(
             &TouchToFillPasswordManagerController::OnCredManUiClosed,
             weak_ptr_factory_.GetWeakPtr()));
-        flags |= TouchToFillView::kShouldShowCredManEntry;
+        flags |= TouchToFillPasswordManagerView::kShouldShowCredManEntry;
       }
 
       std::optional<std::vector<Credential>> sorted_credentials =
@@ -171,7 +171,7 @@ bool TouchToFillPasswordManagerController::Show(
       }
 
       return view_->Show(url,
-                         TouchToFillView::IsOriginSecure(
+                         TouchToFillPasswordManagerView::IsOriginSecure(
                              network::IsOriginPotentiallyTrustworthy(origin)),
                          *sorted_credentials, flags);
   }

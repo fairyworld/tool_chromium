@@ -408,7 +408,7 @@ class MockTouchToFillPasswordManagerController
 
   MOCK_METHOD(void,
               InitData,
-              (std::vector<TouchToFillView::Credential>,
+              (std::vector<TouchToFillPasswordManagerView::Credential>,
                base::WeakPtr<password_manager::ContentPasswordManagerDriver>),
               (override));
 
@@ -2161,7 +2161,7 @@ TEST_F(ChromePasswordManagerClientAndroidTest,
 
   base::RunLoop().RunUntilIdle();
 
-  std::vector<TouchToFillView::Credential> credentials{};
+  std::vector<TouchToFillPasswordManagerView::Credential> credentials{};
   EXPECT_CALL(*ttf_controller, InitData(Eq(credentials), _));
   EXPECT_CALL(*ttf_controller, Show).WillOnce(Return(true));
 
@@ -2213,7 +2213,7 @@ TEST_F(ChromePasswordManagerClientAndroidTest,
   base::RunLoop().RunUntilIdle();
 
   base::RunLoop waiter;
-  std::vector<TouchToFillView::Credential> credentials{};
+  std::vector<TouchToFillPasswordManagerView::Credential> credentials{};
   EXPECT_CALL(*ttf_controller, InitData(Eq(credentials), _));
   EXPECT_CALL(*ttf_controller, Show)
       .WillOnce([&waiter](std::unique_ptr<TouchToFillControllerDelegate>,

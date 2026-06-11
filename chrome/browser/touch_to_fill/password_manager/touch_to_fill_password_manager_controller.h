@@ -12,8 +12,8 @@
 #include "base/memory/weak_ptr.h"
 #include "chrome/browser/password_manager/android/grouped_affiliations/acknowledge_grouped_credential_sheet_controller.h"
 #include "chrome/browser/touch_to_fill/password_manager/no_passkeys/android/no_passkeys_bottom_sheet_bridge.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_view.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_view_factory.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_view.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_view_factory.h"
 #include "components/password_manager/core/browser/origin_credential_store.h"
 #include "components/password_manager/core/browser/passkey_credential.h"
 #include "ui/gfx/native_ui_types.h"
@@ -57,7 +57,7 @@ class TouchToFillPasswordManagerController {
   // Sets the credentials that will be shown in the sheet. Also sets the
   // `frame_driver` for which TTF is expected to be shown.
   virtual void InitData(
-      std::vector<TouchToFillView::Credential> credentials,
+      std::vector<TouchToFillPasswordManagerView::Credential> credentials,
       base::WeakPtr<password_manager::ContentPasswordManagerDriver>
           frame_driver);
 
@@ -113,7 +113,7 @@ class TouchToFillPasswordManagerController {
   void Reset();
 
 #if defined(UNIT_TEST)
-  void set_view(std::unique_ptr<TouchToFillView> view) {
+  void set_view(std::unique_ptr<TouchToFillPasswordManagerView> view) {
     view_ = std::move(view);
   }
 
@@ -135,7 +135,8 @@ class TouchToFillPasswordManagerController {
 
   // Helper method to select the display target.
   DisplayTarget GetResponsibleDisplayTarget(
-      base::span<const TouchToFillView::Credential> credentials) const;
+      base::span<const TouchToFillPasswordManagerView::Credential> credentials)
+      const;
 
   // Delegate for interacting with the client that owns this controller.
   // It is provided when Show() is called, and reset when the view is
@@ -147,7 +148,7 @@ class TouchToFillPasswordManagerController {
   raw_ptr<webauthn::WebAuthnCredManDelegate> cred_man_delegate_;
   // View used to communicate with the Android frontend. Lazily instantiated so
   // that it can be injected by tests.
-  std::unique_ptr<TouchToFillView> view_;
+  std::unique_ptr<TouchToFillPasswordManagerView> view_;
 
   std::unique_ptr<NoPasskeysBottomSheetBridge> no_passkeys_bridge_;
 
@@ -161,7 +162,7 @@ class TouchToFillPasswordManagerController {
   std::unique_ptr<AcknowledgeGroupedCredentialSheetController>
       grouped_credential_sheet_controller_;
 
-  std::vector<TouchToFillView::Credential> credentials_;
+  std::vector<TouchToFillPasswordManagerView::Credential> credentials_;
   base::WeakPtr<password_manager::ContentPasswordManagerDriver> frame_driver_;
 
   base::WeakPtrFactory<TouchToFillPasswordManagerController> weak_ptr_factory_{

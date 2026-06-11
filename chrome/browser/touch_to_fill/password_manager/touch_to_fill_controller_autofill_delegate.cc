@@ -39,7 +39,7 @@ namespace {
 
 using password_manager::UiCredential;
 
-using Credential = TouchToFillView::Credential;
+using Credential = TouchToFillPasswordManagerView::Credential;
 
 // Returns whether there is at least one password credential with a non-empty
 // username.

@@ -20,7 +20,7 @@
 #include "url/gurl.h"
 #include "url/origin.h"
 
-using Credential = TouchToFillView::Credential;
+using Credential = TouchToFillPasswordManagerView::Credential;
 
 TouchToFillControllerWebAuthnDelegate::TouchToFillControllerWebAuthnDelegate(
     CredentialReceiver* receiver,

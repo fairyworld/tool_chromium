@@ -12,7 +12,7 @@
 #include "base/functional/callback_forward.h"
 #include "base/memory/raw_ptr.h"
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller_delegate.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_view.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_view.h"
 #include "chrome/browser/webauthn/shared_types.h"
 #include "chrome/browser/webauthn/touch_to_fill_credential_receiver.h"
 #include "ui/gfx/native_ui_types.h"
@@ -35,9 +35,9 @@ class UiCredential;
 class TouchToFillControllerWebAuthnDelegate
     : public TouchToFillControllerDelegate {
  public:
-  using SortingCallback =
-      base::RepeatingCallback<std::vector<TouchToFillView::Credential>(
-          std::vector<TouchToFillView::Credential>,
+  using SortingCallback = base::RepeatingCallback<
+      std::vector<TouchToFillPasswordManagerView::Credential>(
+          std::vector<TouchToFillPasswordManagerView::Credential>,
           bool)>;
 
   using CredentialReceiver = TouchToFillCredentialReceiver;
@@ -56,8 +56,8 @@ class TouchToFillControllerWebAuthnDelegate
   ~TouchToFillControllerWebAuthnDelegate() override;
 
   // TouchToFillControllerDelegate:
-  void OnShow(
-      base::span<const TouchToFillView::Credential> credentials) override;
+  void OnShow(base::span<const TouchToFillPasswordManagerView::Credential>
+                  credentials) override;
   void OnCredentialSelected(const password_manager::UiCredential& credential,
                             base::OnceClosure action_completed) override;
   void OnPasskeyCredentialSelected(
@@ -74,8 +74,9 @@ class TouchToFillControllerWebAuthnDelegate
   bool ShouldTriggerSubmission() override;
   bool ShouldShowHybridOption() override;
   bool ShouldShowNoPasskeysSheetIfRequired() override;
-  std::optional<std::vector<TouchToFillView::Credential>> SortCredentials(
-      base::span<const TouchToFillView::Credential> credentials) override;
+  std::optional<std::vector<TouchToFillPasswordManagerView::Credential>>
+  SortCredentials(base::span<const TouchToFillPasswordManagerView::Credential>
+                      credentials) override;
   gfx::NativeView GetNativeView() override;
 
  private:

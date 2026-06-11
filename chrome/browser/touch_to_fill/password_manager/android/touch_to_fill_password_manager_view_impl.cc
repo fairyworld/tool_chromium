@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/touch_to_fill/password_manager/android/touch_to_fill_view_impl.h"
+#include "chrome/browser/touch_to_fill/password_manager/android/touch_to_fill_password_manager_view_impl.h"
 
 #include <jni.h>
 
@@ -83,11 +83,11 @@ PasskeyCredential ConvertJavaWebauthnCredential(
 
 }  // namespace
 
-TouchToFillViewImpl::TouchToFillViewImpl(
+TouchToFillPasswordManagerViewImpl::TouchToFillPasswordManagerViewImpl(
     TouchToFillPasswordManagerController* controller)
     : controller_(controller) {}
 
-TouchToFillViewImpl::~TouchToFillViewImpl() {
+TouchToFillPasswordManagerViewImpl::~TouchToFillPasswordManagerViewImpl() {
   if (java_object_internal_) {
     // Don't create an object just for destruction.
     Java_TouchToFillBridge_destroy(AttachCurrentThread(),
@@ -95,10 +95,11 @@ TouchToFillViewImpl::~TouchToFillViewImpl() {
   }
 }
 
-bool TouchToFillViewImpl::Show(const GURL& url,
-                               IsOriginSecure is_origin_secure,
-                               base::span<const Credential> credentials,
-                               int flags) {
+bool TouchToFillPasswordManagerViewImpl::Show(
+    const GURL& url,
+    IsOriginSecure is_origin_secure,
+    base::span<const Credential> credentials,
+    int flags) {
   if (!RecreateJavaObject()) {
     // It's possible that the constructor cannot access the bottom sheet clank
     // component. That case may be temporary but we can't let users in a waiting
@@ -148,51 +149,53 @@ bool TouchToFillViewImpl::Show(const GURL& url,
   Java_TouchToFillBridge_showCredentials(
       env, java_object_internal_, url::GURLAndroid::FromNativeGURL(env, url),
       is_origin_secure.value(), credential_array,
-      !!(flags & TouchToFillView::kTriggerSubmission),
-      !!(flags & TouchToFillView::kShouldShowHybridOption),
-      !!(flags & TouchToFillView::kShouldShowCredManEntry));
+      !!(flags & TouchToFillPasswordManagerView::kTriggerSubmission),
+      !!(flags & TouchToFillPasswordManagerView::kShouldShowHybridOption),
+      !!(flags & TouchToFillPasswordManagerView::kShouldShowCredManEntry));
   return true;
 }
 
-void TouchToFillViewImpl::OnCredentialSelected(const UiCredential& credential) {
+void TouchToFillPasswordManagerViewImpl::OnCredentialSelected(
+    const UiCredential& credential) {
   controller_->OnCredentialSelected(credential);
 }
 
-void TouchToFillViewImpl::OnDismiss() {
+void TouchToFillPasswordManagerViewImpl::OnDismiss() {
   controller_->OnDismiss();
 }
 
-void TouchToFillViewImpl::OnCredentialSelected(
+void TouchToFillPasswordManagerViewImpl::OnCredentialSelected(
     JNIEnv* env,
     const JavaRef<jobject>& credential) {
   OnCredentialSelected(ConvertJavaCredential(env, credential));
 }
 
-void TouchToFillViewImpl::OnWebAuthnCredentialSelected(
+void TouchToFillPasswordManagerViewImpl::OnWebAuthnCredentialSelected(
     JNIEnv* env,
     const JavaRef<jobject>& credential) {
   controller_->OnPasskeyCredentialSelected(
       ConvertJavaWebauthnCredential(env, credential));
 }
 
-void TouchToFillViewImpl::OnManagePasswordsSelected(JNIEnv* env,
-                                                    bool passkeys_shown) {
+void TouchToFillPasswordManagerViewImpl::OnManagePasswordsSelected(
+    JNIEnv* env,
+    bool passkeys_shown) {
   controller_->OnManagePasswordsSelected(passkeys_shown);
 }
 
-void TouchToFillViewImpl::OnHybridSignInSelected(JNIEnv* env) {
+void TouchToFillPasswordManagerViewImpl::OnHybridSignInSelected(JNIEnv* env) {
   controller_->OnHybridSignInSelected();
 }
 
-void TouchToFillViewImpl::OnShowCredManSelected(JNIEnv* env) {
+void TouchToFillPasswordManagerViewImpl::OnShowCredManSelected(JNIEnv* env) {
   controller_->OnShowCredManSelected();
 }
 
-void TouchToFillViewImpl::OnDismiss(JNIEnv* env) {
+void TouchToFillPasswordManagerViewImpl::OnDismiss(JNIEnv* env) {
   OnDismiss();
 }
 
-bool TouchToFillViewImpl::RecreateJavaObject() {
+bool TouchToFillPasswordManagerViewImpl::RecreateJavaObject() {
   if (controller_->GetNativeView() == nullptr ||
       controller_->GetNativeView()->GetWindowAndroid() == nullptr) {
     return false;  // No window attached (yet or anymore).

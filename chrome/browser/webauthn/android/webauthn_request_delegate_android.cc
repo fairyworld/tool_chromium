@@ -19,6 +19,7 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller_webauthn_delegate.h"
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_controller.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_view.h"
 #include "chrome/browser/webauthn/android/credential_sorter_android.h"
 #include "chrome/browser/webauthn/password_credential_fetcher.h"
 #include "chrome/browser/webauthn/webauthn_metrics_util.h"
@@ -162,7 +163,7 @@ void WebAuthnRequestDelegateAndroid::MaybeShowTouchToFillSheet(
     return;
   }
 
-  std::vector<TouchToFillView::Credential> credentials;
+  std::vector<TouchToFillPasswordManagerView::Credential> credentials;
   credentials.reserve(passkey_credentials.size() + password_credentials.size());
   credentials.insert(credentials.end(), passkey_credentials.begin(),
                      passkey_credentials.end());
@@ -193,9 +194,10 @@ void WebAuthnRequestDelegateAndroid::MaybeShowTouchToFillSheet(
   touch_to_fill_controller_->Show(
       std::make_unique<TouchToFillControllerWebAuthnDelegate>(
           this,
-          base::BindRepeating<std::vector<TouchToFillView::Credential>(
-              std::vector<TouchToFillView::Credential>, bool)>(
-              webauthn::sorting::SortTouchToFillCredentials),
+          base::BindRepeating<
+              std::vector<TouchToFillPasswordManagerView::Credential>(
+                  std::vector<TouchToFillPasswordManagerView::Credential>,
+                  bool)>(webauthn::sorting::SortTouchToFillCredentials),
           should_show_hybrid_option, is_immediate),
       WebAuthnCredManDelegateFactory::GetFactory(web_contents())
           ->GetRequestDelegate(frame_host));

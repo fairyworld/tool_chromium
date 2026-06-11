@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_VIEW_H_
-#define CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_VIEW_H_
+#ifndef CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_PASSWORD_MANAGER_VIEW_H_
+#define CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_PASSWORD_MANAGER_VIEW_H_
 
 #include <utility>
 
@@ -13,10 +13,9 @@
 #include "components/password_manager/core/browser/passkey_credential.h"
 #include "url/gurl.h"
 
-
 // This class represents the interface used for communicating between the Touch
 // To Fill controller with the Android frontend.
-class TouchToFillView {
+class TouchToFillPasswordManagerView {
  public:
   using IsOriginSecure = base::StrongAlias<class IsOriginSecureTag, bool>;
   using Credential = std::variant<password_manager::PasskeyCredential,
@@ -37,10 +36,12 @@ class TouchToFillView {
     kShouldShowCredManEntry = 1 << 2,
   };
 
-  TouchToFillView() = default;
-  TouchToFillView(const TouchToFillView&) = delete;
-  TouchToFillView& operator=(const TouchToFillView&) = delete;
-  virtual ~TouchToFillView() = default;
+  TouchToFillPasswordManagerView() = default;
+  TouchToFillPasswordManagerView(const TouchToFillPasswordManagerView&) =
+      delete;
+  TouchToFillPasswordManagerView& operator=(
+      const TouchToFillPasswordManagerView&) = delete;
+  virtual ~TouchToFillPasswordManagerView() = default;
 
   // Instructs Touch To Fill to show the provided `credentials` to the user.
   // `formatted_url` contains a human friendly version of the current origin.
@@ -63,4 +64,4 @@ class TouchToFillView {
   virtual void OnDismiss() = 0;
 };
 
-#endif  // CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_VIEW_H_
+#endif  // CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_PASSWORD_MANAGER_VIEW_H_

@@ -10,7 +10,7 @@
 
 #include "base/containers/span.h"
 #include "base/functional/callback_forward.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_view.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_view.h"
 #include "ui/gfx/native_ui_types.h"
 #include "url/origin.h"
 
@@ -29,7 +29,8 @@ class TouchToFillControllerDelegate {
 
   // Called by the controller before the view is shown.
   virtual void OnShow(
-      base::span<const TouchToFillView::Credential> credentials) = 0;
+      base::span<const TouchToFillPasswordManagerView::Credential>
+          credentials) = 0;
 
   // Informs the controller that the user has made a selection. Invokes both
   // FillSuggestion() and TouchToFillDismissed() on |driver_|. No-op if
@@ -88,9 +89,9 @@ class TouchToFillControllerDelegate {
   // A method for the delegate providing a credential sorting that will override
   // the `TouchToFillPasswordManagerController` default. If the delegate does
   // not have a custom sorting function, this returns `std::nullopt`.
-  virtual std::optional<std::vector<TouchToFillView::Credential>>
-  SortCredentials(
-      base::span<const TouchToFillView::Credential> credentials) = 0;
+  virtual std::optional<std::vector<TouchToFillPasswordManagerView::Credential>>
+  SortCredentials(base::span<const TouchToFillPasswordManagerView::Credential>
+                      credentials) = 0;
 
   // The web page view containing the focused field.
   virtual gfx::NativeView GetNativeView() = 0;

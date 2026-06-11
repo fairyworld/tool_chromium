@@ -163,7 +163,7 @@
 #include "chrome/browser/password_manager/android/password_manager_ui_util_android.h"
 #include "chrome/browser/touch_to_fill/password_manager/password_generation/android/touch_to_fill_password_generation_controller.h"
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller_autofill_delegate.h"  // nogncheck
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_view.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_view.h"
 #include "components/password_manager/content/browser/keyboard_replacing_surface_visibility_controller_impl.h"
 #include "components/password_manager/core/browser/credential_cache.h"
 #include "components/password_manager/core/browser/password_credential_filler_impl.h"
@@ -683,7 +683,7 @@ void ChromePasswordManagerClient::ContinueShowKeyboardReplacingSurface(
   base::span<const password_manager::UiCredential> password_credentials =
       credential_cache_.GetCredentialStore(driver->GetLastCommittedOrigin())
           .GetCredentials();
-  std::vector<TouchToFillView::Credential> credentials;
+  std::vector<TouchToFillPasswordManagerView::Credential> credentials;
   credentials.reserve(password_credentials.size() + passkeys.size());
   credentials.insert(credentials.end(), passkeys.begin(), passkeys.end());
   credentials.insert(credentials.end(), password_credentials.begin(),

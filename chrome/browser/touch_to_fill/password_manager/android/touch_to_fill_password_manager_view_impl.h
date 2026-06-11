@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_ANDROID_TOUCH_TO_FILL_VIEW_IMPL_H_
-#define CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_ANDROID_TOUCH_TO_FILL_VIEW_IMPL_H_
+#ifndef CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_ANDROID_TOUCH_TO_FILL_PASSWORD_MANAGER_VIEW_IMPL_H_
+#define CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_ANDROID_TOUCH_TO_FILL_PASSWORD_MANAGER_VIEW_IMPL_H_
 
 #include "base/android/scoped_java_ref.h"
 #include "base/memory/raw_ptr.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_view.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_view.h"
 
 namespace password_manager {
 class UiCredential;
@@ -15,15 +15,17 @@ class UiCredential;
 
 class TouchToFillPasswordManagerController;
 
-// This class provides an implementation of the TouchToFillView interface and
-// communicates via JNI with its TouchToFillBridge Java counterpart.
-class TouchToFillViewImpl : public TouchToFillView {
+// This class provides an implementation of the TouchToFillPasswordManagerView
+// interface and communicates via JNI with its TouchToFillBridge Java
+// counterpart.
+class TouchToFillPasswordManagerViewImpl
+    : public TouchToFillPasswordManagerView {
  public:
-  explicit TouchToFillViewImpl(
+  explicit TouchToFillPasswordManagerViewImpl(
       TouchToFillPasswordManagerController* controller);
-  ~TouchToFillViewImpl() override;
+  ~TouchToFillPasswordManagerViewImpl() override;
 
-  // TouchToFillView:
+  // TouchToFillPasswordManagerView:
   bool Show(const GURL& url,
             IsOriginSecure is_origin_secure,
             base::span<const Credential> credentials,
@@ -52,4 +54,4 @@ class TouchToFillViewImpl : public TouchToFillView {
   base::android::ScopedJavaGlobalRef<jobject> java_object_internal_;
 };
 
-#endif  // CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_ANDROID_TOUCH_TO_FILL_VIEW_IMPL_H_
+#endif  // CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_ANDROID_TOUCH_TO_FILL_PASSWORD_MANAGER_VIEW_IMPL_H_

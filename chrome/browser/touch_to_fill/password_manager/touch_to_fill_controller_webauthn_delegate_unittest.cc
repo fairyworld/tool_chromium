@@ -14,7 +14,7 @@
 #include "chrome/browser/password_manager/android/password_manager_launcher_android.h"
 #include "chrome/browser/touch_to_fill/password_manager/no_passkeys/android/no_passkeys_bottom_sheet_bridge.h"
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_controller.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_view.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_view.h"
 #include "chrome/browser/webauthn/android/credential_sorter_android.h"
 #include "chrome/browser/webauthn/android/webauthn_request_delegate_android.h"
 #include "chrome/browser/webauthn/shared_types.h"
@@ -38,8 +38,8 @@ namespace {
 
 using password_manager::PasskeyCredential;
 using password_manager::UiCredential;
-using Credential = TouchToFillView::Credential;
-using IsOriginSecure = TouchToFillView::IsOriginSecure;
+using Credential = TouchToFillPasswordManagerView::Credential;
+using IsOriginSecure = TouchToFillPasswordManagerView::IsOriginSecure;
 using SortingCallback = TouchToFillControllerWebAuthnDelegate::SortingCallback;
 using ::testing::_;
 using ::testing::ElementsAreArray;
@@ -104,7 +104,7 @@ class MockCredentialReceiver
   raw_ptr<content::WebContents> web_contents_;
 };
 
-struct MockTouchToFillView : public TouchToFillView {
+struct MockTouchToFillView : public TouchToFillPasswordManagerView {
   MOCK_METHOD(bool,
               Show,
               (const GURL&, IsOriginSecure, base::span<const Credential>, int),
@@ -217,9 +217,9 @@ TEST_F(TouchToFillControllerWebAuthnTest, ShowAndSelectCredential) {
   auto passkey_credential = CreatePasskey();
   std::vector<Credential> credentials{passkey_credential};
 
-  EXPECT_CALL(view(),
-              Show(Eq(GURL(kExampleCom)), IsOriginSecure(true),
-                   ElementsAreArray(credentials), TouchToFillView::kNone));
+  EXPECT_CALL(view(), Show(Eq(GURL(kExampleCom)), IsOriginSecure(true),
+                           ElementsAreArray(credentials),
+                           TouchToFillPasswordManagerView::kNone));
   Show(credentials, MakeTouchToFillControllerDelegate(
                         /*should_show_hybrid_option=*/false,
                         /*is_immediate=*/false, SortingCallback()));
@@ -233,9 +233,9 @@ TEST_F(TouchToFillControllerWebAuthnTest, ShowAndSelectWithMultipleCredential) {
   std::vector<Credential> credentials(
       {CreatePasskey(kCredentialId1), passkey_credential2});
 
-  EXPECT_CALL(view(),
-              Show(Eq(GURL(kExampleCom)), IsOriginSecure(true),
-                   ElementsAreArray(credentials), TouchToFillView::kNone));
+  EXPECT_CALL(view(), Show(Eq(GURL(kExampleCom)), IsOriginSecure(true),
+                           ElementsAreArray(credentials),
+                           TouchToFillPasswordManagerView::kNone));
   Show(credentials, MakeTouchToFillControllerDelegate(
                         /*should_show_hybrid_option=*/false,
                         /*is_immediate=*/false, SortingCallback()));
@@ -247,9 +247,9 @@ TEST_F(TouchToFillControllerWebAuthnTest, ShowAndSelectWithMultipleCredential) {
 TEST_F(TouchToFillControllerWebAuthnTest, ShowAndCancel) {
   std::vector<Credential> credentials({CreatePasskey()});
 
-  EXPECT_CALL(view(),
-              Show(Eq(GURL(kExampleCom)), IsOriginSecure(true),
-                   ElementsAreArray(credentials), TouchToFillView::kNone));
+  EXPECT_CALL(view(), Show(Eq(GURL(kExampleCom)), IsOriginSecure(true),
+                           ElementsAreArray(credentials),
+                           TouchToFillPasswordManagerView::kNone));
   Show(credentials, MakeTouchToFillControllerDelegate(
                         /*should_show_hybrid_option=*/false,
                         /*is_immediate=*/false, SortingCallback()));
@@ -261,9 +261,9 @@ TEST_F(TouchToFillControllerWebAuthnTest, ShowAndCancel) {
 TEST_F(TouchToFillControllerWebAuthnTest, ShowAndCancelImmediate) {
   std::vector<Credential> credentials({CreatePasskey()});
 
-  EXPECT_CALL(view(),
-              Show(Eq(GURL(kExampleCom)), IsOriginSecure(true),
-                   ElementsAreArray(credentials), TouchToFillView::kNone));
+  EXPECT_CALL(view(), Show(Eq(GURL(kExampleCom)), IsOriginSecure(true),
+                           ElementsAreArray(credentials),
+                           TouchToFillPasswordManagerView::kNone));
   Show(credentials, MakeTouchToFillControllerDelegate(
                         /*should_show_hybrid_option=*/false,
                         /*is_immediate=*/true, SortingCallback()));
@@ -275,9 +275,10 @@ TEST_F(TouchToFillControllerWebAuthnTest, ShowAndCancelImmediate) {
 TEST_F(TouchToFillControllerWebAuthnTest, ShowAndSelectHybrid) {
   std::vector<Credential> credentials({CreatePasskey()});
 
-  EXPECT_CALL(view(), Show(Eq(GURL(kExampleCom)), IsOriginSecure(true),
-                           ElementsAreArray(credentials),
-                           TouchToFillView::kShouldShowHybridOption));
+  EXPECT_CALL(view(),
+              Show(Eq(GURL(kExampleCom)), IsOriginSecure(true),
+                   ElementsAreArray(credentials),
+                   TouchToFillPasswordManagerView::kShouldShowHybridOption));
   Show(credentials, MakeTouchToFillControllerDelegate(
                         /*should_show_hybrid_option=*/true,
                         /*is_immediate=*/false, SortingCallback()));
@@ -312,9 +313,9 @@ TEST_F(TouchToFillControllerWebAuthnTest, ShowPasswordForImmediate) {
   auto password_credential = CreatePasswordCredential();
   std::vector<Credential> credentials({CreatePasskey(), password_credential});
 
-  EXPECT_CALL(view(),
-              Show(Eq(GURL(kExampleCom)), IsOriginSecure(true),
-                   ElementsAreArray(credentials), TouchToFillView::kNone));
+  EXPECT_CALL(view(), Show(Eq(GURL(kExampleCom)), IsOriginSecure(true),
+                           ElementsAreArray(credentials),
+                           TouchToFillPasswordManagerView::kNone));
   Show(credentials, MakeTouchToFillControllerDelegate(
                         /*should_show_hybrid_option=*/false,
                         /*is_immediate=*/true, SortingCallback()));
@@ -355,12 +356,13 @@ TEST_F(TouchToFillControllerWebAuthnTest, SortCredentialsForImmediate) {
 
   EXPECT_CALL(view(), Show(Eq(GURL(kExampleCom)), IsOriginSecure(true),
                            ElementsAreArray(sorted_credentials),
-                           TouchToFillView::kNone));
+                           TouchToFillPasswordManagerView::kNone));
   Show(credentials,
        MakeTouchToFillControllerDelegate(
            /*should_show_hybrid_option=*/false,
            /*is_immediate=*/true,
-           base::BindRepeating<std::vector<TouchToFillView::Credential>(
-               std::vector<TouchToFillView::Credential>, bool)>(
-               webauthn::sorting::SortTouchToFillCredentials)));
+           base::BindRepeating<
+               std::vector<TouchToFillPasswordManagerView::Credential>(
+                   std::vector<TouchToFillPasswordManagerView::Credential>,
+                   bool)>(webauthn::sorting::SortTouchToFillCredentials)));
 }
