@@ -87,10 +87,19 @@ BASE_FEATURE(kLocalHistoryZeroSuggestBeyondNTP, DISABLED);
 // Enables showing tabs from other devices in zero-prefix suggest.
 BASE_FEATURE(kOmniboxCrossDeviceTabZeroSuggest, DISABLED);
 BASE_FEATURE_PARAM(int,
-                   kOmniboxCrossDeviceTabZeroSuggestMaxAge,
+                   kOmniboxCrossDeviceTabZeroSuggestMaxAgeMinutes,
                    &kOmniboxCrossDeviceTabZeroSuggest,
-                   "max_age_minutes",
                    5);
+BASE_FEATURE_PARAM(
+    int,
+    kOmniboxCrossDeviceTabZeroSuggestDelayedContinuationMaxAgeMinutes,
+    &kOmniboxCrossDeviceTabZeroSuggest,
+    720);
+BASE_FEATURE_PARAM(
+    int,
+    kOmniboxCrossDeviceTabZeroSuggestMaxDelayedContinuationUptimeMinutes,
+    &kOmniboxCrossDeviceTabZeroSuggest,
+    5);
 
 // Enables the use of a request debouncer to throttle the number of ZPS prefetch
 // requests initiated over a given period of time (to help minimize the
