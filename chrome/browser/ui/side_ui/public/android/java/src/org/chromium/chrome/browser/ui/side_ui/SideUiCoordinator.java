@@ -12,6 +12,8 @@ import androidx.annotation.Px;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -38,8 +40,9 @@ public interface SideUiCoordinator extends SideUiStateProvider {
         SideUiId.VERTICAL_TABS,
         SideUiId.SIDE_PANEL,
         SideUiId.SIDE_UI_FOR_TESTING_HIGH_PRIORITY,
-        SideUiId.SIDE_UI_FOR_TESTING_HIGH_PRIORITY
+        SideUiId.SIDE_UI_FOR_TESTING_LOW_PRIORITY
     })
+    @Target(ElementType.TYPE_USE)
     @interface SideUiId {
         int VERTICAL_TABS = 0;
         int SIDE_PANEL = 1;
@@ -53,6 +56,7 @@ public interface SideUiCoordinator extends SideUiStateProvider {
      * a corresponding container view in main_forked_with_secondary_ui_container.xml.
      */
     @IntDef({AnchorSide.LEFT, AnchorSide.RIGHT})
+    @Target(ElementType.TYPE_USE)
     @interface AnchorSide {
         int LEFT = 0;
         int RIGHT = 1;
@@ -86,9 +90,9 @@ public interface SideUiCoordinator extends SideUiStateProvider {
      */
     final class SideUiSpecs {
         /** Maps @AnchorSide to ContainerWidth. */
-        private final Map<Integer, Integer> mSideUiWidths = new ArrayMap<>();
+        private final Map<@AnchorSide Integer, Integer> mSideUiWidths = new ArrayMap<>();
 
-        public SideUiSpecs(Map<Integer, Integer> sideUiWidths) {
+        public SideUiSpecs(Map<@AnchorSide Integer, Integer> sideUiWidths) {
             mSideUiWidths.putAll(sideUiWidths);
         }
 
@@ -107,7 +111,7 @@ public interface SideUiCoordinator extends SideUiStateProvider {
          * Returns all the entries in the SideUiSpecs. Each entry has a mapping from
          * {@link @AnchorSide} to width.
          */
-        public Set<Map.Entry<Integer, Integer>> entrySet() {
+        public Set<Map.Entry<@AnchorSide Integer, Integer>> entrySet() {
             return mSideUiWidths.entrySet();
         }
 

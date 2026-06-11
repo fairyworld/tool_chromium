@@ -184,7 +184,7 @@ public class SideUiCoordinatorImplTest {
         RobolectricUtil.runAllBackgroundAndUi();
 
         // Verify observers notified.
-        Map<Integer, Integer> sideUiWidths = new ArrayMap<>();
+        Map<@AnchorSide Integer, Integer> sideUiWidths = new ArrayMap<>();
         sideUiWidths.put(AnchorSide.LEFT, width);
         sideUiWidths.put(AnchorSide.RIGHT, 0);
         SideUiSpecs expectedSideUiSpecs = new SideUiSpecs(sideUiWidths);
@@ -212,7 +212,7 @@ public class SideUiCoordinatorImplTest {
         RobolectricUtil.runAllBackgroundAndUi();
 
         // Verify observers notified.
-        Map<Integer, Integer> sideUiWidths = new ArrayMap<>();
+        Map<@AnchorSide Integer, Integer> sideUiWidths = new ArrayMap<>();
         sideUiWidths.put(AnchorSide.LEFT, 0);
         sideUiWidths.put(AnchorSide.RIGHT, width);
         SideUiSpecs expectedSideUiSpecs = new SideUiSpecs(sideUiWidths);
@@ -506,7 +506,7 @@ public class SideUiCoordinatorImplTest {
         RobolectricUtil.runAllBackgroundAndUi();
 
         // Verify that observers are notified with the updated specs.
-        Map<Integer, Integer> sideUiWidths = new ArrayMap<>();
+        Map<@AnchorSide Integer, Integer> sideUiWidths = new ArrayMap<>();
         sideUiWidths.put(AnchorSide.LEFT, 0);
         sideUiWidths.put(AnchorSide.RIGHT, sideUiContainer.mMinWidthDp);
         SideUiSpecs expectedSideUiSpecs = new SideUiSpecs(sideUiWidths);

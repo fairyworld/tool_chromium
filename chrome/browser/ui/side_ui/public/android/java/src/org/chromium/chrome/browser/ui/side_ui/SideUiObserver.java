@@ -10,6 +10,7 @@ import android.transition.TransitionSet;
 
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
+import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.SideUiId;
 import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.SideUiSpecs;
 
 import java.util.List;
@@ -84,5 +85,6 @@ public interface SideUiObserver {
      * @param showableIds The IDs of containers that have enough space to be shown.
      * @param unshowableIds The IDs of containers that do not have enough space.
      */
-    default void onShowableSideUisUpdated(List<Integer> showableIds, List<Integer> unshowableIds) {}
+    default void onShowableSideUisUpdated(
+            List<@SideUiId Integer> showableIds, List<@SideUiId Integer> unshowableIds) {}
 }
