@@ -641,6 +641,10 @@ void X11Window::SetTitle(const std::u16string& title) {
                                  x11::GetAtom("UTF8_STRING"), utf8str);
   connection_->SetStringProperty(xwindow_, x11::Atom::WM_NAME,
                                  x11::GetAtom("UTF8_STRING"), utf8str);
+  connection_->SetStringProperty(xwindow_, x11::Atom::WM_ICON_NAME,
+                                 x11::Atom::STRING, utf8str);
+  connection_->SetStringProperty(xwindow_, x11::GetAtom("_NET_WM_ICON_NAME"),
+                                 x11::GetAtom("UTF8_STRING"), utf8str);
 }
 
 void X11Window::SetCapture() {
