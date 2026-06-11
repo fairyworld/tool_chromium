@@ -58,7 +58,7 @@ const base::FeatureParam<std::string>
 const base::FeatureParam<std::string>
     kPassthroughCommandDecoderBlockListByModel{
         &kDefaultPassthroughCommandDecoder, "BlockListByModel",
-        "SM-I610|SM-I610H|Robin XR"};
+        "SM-I610|SM-I610H|Robin XR|Android XR Puck|Aura"};
 
 const base::FeatureParam<std::string>
     kPassthroughCommandDecoderBlockListByBoard{
