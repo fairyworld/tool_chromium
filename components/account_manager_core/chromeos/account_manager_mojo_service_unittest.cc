@@ -245,7 +245,9 @@ class AccountManagerMojoServiceTest : public ::testing::Test {
 
   void CallAccountUpsertionFinished(
       const account_manager::AccountUpsertionResult& result) {
-    account_manager_mojo_service_->OnAccountUpsertionFinished(result);
+    account_manager_mojo_service_
+        ->CreateInlineLoginAccountUpsertionFinishedCallback()
+        .Run(result);
     GetFakeAccountManagerUI()->CloseDialog();
   }
 
@@ -286,10 +288,6 @@ class AccountManagerMojoServiceTest : public ::testing::Test {
     account_manager_mojo_service_->ReportAuthError(
         std::move(account_key_ptr),
         account_manager::ToMojoGoogleServiceAuthError(error));
-  }
-
-  void NotifySigninDialogClosed() {
-    account_manager_mojo_service_->NotifySigninDialogClosed();
   }
 
   int GetNumObservers() const {
