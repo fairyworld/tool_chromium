@@ -71,6 +71,7 @@ import org.chromium.chrome.browser.compositor.layouts.components.CompositorButto
 import org.chromium.chrome.browser.compositor.layouts.components.CompositorButton.ButtonType;
 import org.chromium.chrome.browser.compositor.layouts.components.TintedCompositorButton;
 import org.chromium.chrome.browser.compositor.overlays.strip.StripLayoutGroupTitle.StripLayoutGroupTitleDelegate;
+import org.chromium.chrome.browser.compositor.overlays.strip.StripLayoutView.StripLayoutViewOnAccessibilityFocusHandler;
 import org.chromium.chrome.browser.compositor.overlays.strip.StripLayoutView.StripLayoutViewOnClickHandler;
 import org.chromium.chrome.browser.compositor.overlays.strip.StripLayoutView.StripLayoutViewOnKeyboardFocusHandler;
 import org.chromium.chrome.browser.compositor.overlays.strip.StripTabModelActionListener.ActionType;
@@ -166,6 +167,7 @@ public class StripLayoutHelper
         implements StripLayoutGroupTitleDelegate,
                 StripLayoutViewOnClickHandler,
                 StripLayoutViewOnKeyboardFocusHandler,
+                StripLayoutViewOnAccessibilityFocusHandler,
                 StripUpdateDelegate,
                 AnimationHost,
                 TabListNotificationHandler {
@@ -3143,6 +3145,15 @@ public class StripLayoutHelper
         mUpdateHost.requestUpdate();
     }
 
+    @Override
+    public void onAccessibilityFocus(StripLayoutView view) {
+        bringViewToVisibleArea(
+                view,
+                LayoutManagerImpl.time(),
+                /* animate= */ !AccessibilityState.prefersReducedMotion());
+        mUpdateHost.requestUpdate();
+    }
+
     /**
      * Show the context menu originating at {@param clickedView}, and returns true if a context menu
      * was shown. (Note: this will return false if there is no context menu to be shown at {@param
@@ -4180,6 +4191,7 @@ public class StripLayoutHelper
                         mContext,
                         /* delegate= */ this,
                         /* keyboardFocusHandler= */ this,
+                        /* accessibilityFocusHandler= */ this,
                         mIncognito,
                         tabGroupId);
         pushPropertiesToGroupTitle(groupTitle);
@@ -4432,6 +4444,7 @@ public class StripLayoutHelper
                         Tab.INVALID_TAB_ID,
                         /* clickHandler= */ this,
                         /* keyboardFocusHandler= */ this,
+                        /* accessibilityFocusHandler= */ this,
                         mTabLoadTrackerHost,
                         mUpdateHost,
                         mIncognito,
@@ -4459,6 +4472,7 @@ public class StripLayoutHelper
                         id,
                         /* clickHandler= */ this,
                         /* keyboardFocusHandler= */ this,
+                        /* accessibilityFocusHandler= */ this,
                         mTabLoadTrackerHost,
                         mUpdateHost,
                         mIncognito,

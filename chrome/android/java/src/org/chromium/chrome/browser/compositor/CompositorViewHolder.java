@@ -2413,6 +2413,16 @@ public class CompositorViewHolder extends FrameLayout
 
             event.setContentDescription(getAccessibilityDescription(view));
             event.setClassName(CompositorViewHolder.class.getName());
+
+            if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED) {
+                // TODO(crbug.com/522892476): This is not the "proper" place to respond to a11y
+                // events. It's intended to be a place to augment the AccessibilityEvent before it's
+                // actually fired. We listen here, since ExploreByTouchHelper does not emit
+                // #onPerformActionForVirtualView events on a11y focus. If we refactor to instead
+                // use an AccessibilityNodeProvider, we likely can listen to this event in the
+                // "proper" location.
+                view.onAccessibilityFocused();
+            }
         }
 
         @Override

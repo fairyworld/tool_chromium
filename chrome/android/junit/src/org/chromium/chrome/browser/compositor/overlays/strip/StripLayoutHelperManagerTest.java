@@ -1458,6 +1458,7 @@ public class StripLayoutHelperManagerTest {
                         tabId,
                         null,
                         null,
+                        null,
                         callback,
                         mUpdateHost,
                         false,
