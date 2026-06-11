@@ -614,9 +614,10 @@ chromium-metrics-reviews@google.com.
   <int value="12" label="Additional context no source frame"/>
   <int value="13" label="Additional context no client frame"/>
   <int value="14" label="Additional context no clipboard metadata"/>
+  <int value="15" label="Instance not found"/>
 </enum>
 
-<!-- LINT.ThenChange(//chrome/browser/glic/public/glic_invoke_options.h:GlicInvokeResult) -->
+<!-- LINT.ThenChange(//chrome/browser/glic/public/glic_invoke_options.h:GlicInvokeError) -->
 
 <!-- LINT.IfChange(GlicResponseError) -->
 

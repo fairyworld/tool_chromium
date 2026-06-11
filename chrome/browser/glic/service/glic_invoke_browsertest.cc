@@ -97,6 +97,20 @@ IN_PROC_BROWSER_TEST_F(GlicInvokeBrowserTest, InvokeWithEmptyConversationId) {
   EXPECT_EQ(error_future.Get(), GlicInvokeError::kInvalidConversationId);
 }
 
+IN_PROC_BROWSER_TEST_F(GlicInvokeBrowserTest, InvokeWithInvalidInstanceId) {
+  base::test::TestFuture<GlicInvokeError> error_future;
+  InstanceId invalid_id("non-existent-instance-id");
+  GlicInvokeOptions options(glic::Target(invalid_id),
+                            mojom::InvocationSource::kOsButton);
+  options.on_error = error_future.GetCallback();
+  options.target.surface = DefaultSurface{
+      GetTabListInterface()->GetActiveTab()->GetBrowserWindowInterface()};
+
+  coordinator().Invoke(std::move(options));
+
+  EXPECT_EQ(error_future.Get(), GlicInvokeError::kInstanceNotFound);
+}
+
 IN_PROC_BROWSER_TEST_F(GlicInvokeBrowserTest, InvokeWhenWebClientAlreadySet) {
   tabs::TabInterface* tab = GetTabListInterface()->GetActiveTab();
 

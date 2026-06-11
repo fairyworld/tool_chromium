@@ -662,6 +662,9 @@ void GlicInternalsPageHandler::TriggerInvokeFromInternalsAction(
           case GlicInvokeError::kAdditionalContextNoClipboardMetadata:
             error_msg = "No clipboard metadata for context";
             break;
+          case GlicInvokeError::kInstanceNotFound:
+            error_msg = "Instance Not Found";
+            break;
           case GlicInvokeError::kUnknown:
             error_msg = "Unknown Error";
             break;

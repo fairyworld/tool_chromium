@@ -180,7 +180,9 @@ enum class GlicInvokeError {
   // Could not create clipboard metadata for policy checks. This is likely due
   // to the context type not yet being supported.
   kAdditionalContextNoClipboardMetadata = 14,
-  kMaxValue = kAdditionalContextNoClipboardMetadata,
+  // The targeted Glic InstanceId could not be found or has closed.
+  kInstanceNotFound = 15,
+  kMaxValue = kInstanceNotFound,
 };
 // LINT.ThenChange(//tools/metrics/histograms/metadata/glic/enums.xml:GlicInvokeResult,//chrome/browser/glic/host/glic_internals_page_handler.cc:GlicInvokeError)
 
