@@ -1810,7 +1810,7 @@ void RenderProcessHostImpl::SetForGuestsOnlyForTesting() {
 RenderProcessHostImpl::~RenderProcessHostImpl() {
   TRACE_EVENT("shutdown", "~RenderProcessHostImpl",
               ChromeTrackEvent::kRenderProcessHost, *this);
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
 #ifndef NDEBUG
   DCHECK(is_self_deleted_)
       << "RenderProcessHostImpl is destroyed by something other than itself";
@@ -1996,7 +1996,7 @@ bool RenderProcessHostImpl::Init() {
       trace_id);
 
   if (run_renderer_in_process()) {
-    DCHECK(g_renderer_main_thread_factory);
+    CHECK(g_renderer_main_thread_factory, base::NotFatalUntil::M152);
     CHECK(!in_process_renderer_);
     // Crank up a thread and run the initialization there.  With the way that
     // messages flow between the browser and renderer, this thread is required
@@ -2191,7 +2191,7 @@ void RenderProcessHostImpl::InitializeChannelProxy() {
 
   ResetChannelProxy();
 
-  DCHECK(!channel_);
+  CHECK(!channel_, base::NotFatalUntil::M152);
   channel_ = IPC::ChannelProxy::Create(
       std::move(channel_factory), this,
       /*ipc_task_runner=*/io_task_runner.get(),
@@ -2265,7 +2265,7 @@ void RenderProcessHostImpl::ResetChannelProxy() {
 }
 
 void RenderProcessHostImpl::CreateMessageFilters() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
 #if BUILDFLAG(IS_P2P_ENABLED)
   // TODO(crbug.com/40169214): Move this initialization out of
   // CreateMessageFilters().
@@ -2283,7 +2283,7 @@ void RenderProcessHostImpl::BindCacheStorage(
         dip_reporter_remote,
     const storage::BucketLocator& bucket_locator,
     mojo::PendingReceiver<blink::mojom::CacheStorage> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
 
   storage_partition_impl_->GetCacheStorageControl()->AddReceiver(
       cross_origin_embedder_policy, std::move(coep_reporter_remote),
@@ -2307,7 +2307,7 @@ void RenderProcessHostImpl::BindIndexedDB(
     const blink::StorageKey& storage_key,
     BucketContext& bucket_context,
     mojo::PendingReceiver<blink::mojom::IDBFactory> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   if (storage_key.origin().opaque()) {
     // Opaque origins aren't valid for IndexedDB access, so we won't bind
     // |receiver| to |indexed_db_factory_|.  Return early here which
@@ -2332,7 +2332,7 @@ void RenderProcessHostImpl::BindIndexedDB(
 void RenderProcessHostImpl::BindBucketManagerHost(
     base::WeakPtr<BucketContext> bucket_context,
     mojo::PendingReceiver<blink::mojom::BucketManagerHost> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   storage_partition_impl_->GetBucketManager()->BindReceiver(
       std::move(bucket_context), std::move(receiver),
       mojo::GetBadMessageCallback());
@@ -2345,7 +2345,7 @@ void RenderProcessHostImpl::ForceCrash() {
 void RenderProcessHostImpl::BindFileSystemManager(
     const blink::StorageKey& storage_key,
     mojo::PendingReceiver<blink::mojom::FileSystemManager> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   // Note, the base::Unretained() is safe because the target object has an IO
   // thread deleter and the callback is also targeting the IO thread.
   GetIOThreadTaskRunner({})->PostTask(
@@ -2358,7 +2358,7 @@ void RenderProcessHostImpl::BindFileSystemManager(
 void RenderProcessHostImpl::BindFileSystemAccessManager(
     const blink::StorageKey& storage_key,
     mojo::PendingReceiver<blink::mojom::FileSystemAccessManager> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   // This code path is only for workers, hence always pass in
   // IPC::mojom::kRoutingIdNone as frame ID. Frames themselves go through
   // RenderFrameHostImpl instead.
@@ -2404,7 +2404,7 @@ void RenderProcessHostImpl::GetSandboxedFileSystemForBucket(
 void RenderProcessHostImpl::BindRestrictedCookieManagerForServiceWorker(
     const blink::StorageKey& storage_key,
     mojo::PendingReceiver<network::mojom::RestrictedCookieManager> receiver) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
 
   // TODO(crbug.com/390003764): Consider whether/how to apply devtools cookies
   // setting overrides for a service worker
