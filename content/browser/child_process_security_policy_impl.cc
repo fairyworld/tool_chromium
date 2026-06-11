@@ -3080,18 +3080,6 @@ bool ChildProcessSecurityPolicyImpl::GetMatchingProcessIsolatedOrigin(
   CHECK_CURRENTLY_ON(BrowserThread::UI);
 
   *result = url::Origin();
-  base::AutoLock isolated_origins_lock(isolated_origins_lock_);
-
-  // If |isolation_context| does not specify a BrowsingInstance ID (which should
-  // only happen in tests), then assume that we want to retrieve the latest
-  // applicable information; i.e., return the latest matching isolated origins
-  // that would apply to future BrowsingInstances.  Using
-  // NextBrowsingInstanceId() will match all available IsolatedOriginEntries.
-  BrowsingInstanceId browsing_instance_id(
-      isolation_context.browsing_instance_id());
-  if (browsing_instance_id.is_null()) {
-    browsing_instance_id = SiteInstanceImpl::NextBrowsingInstanceId();
-  }
 
   // Check the opt-in isolation status of |origin| in |isolation_context|.
   // Note that while IsolatedOrigins considers any sub-origin of an isolated
@@ -3110,19 +3098,44 @@ bool ChildProcessSecurityPolicyImpl::GetMatchingProcessIsolatedOrigin(
   // case a SiteInstanceGroup will allow a logical group of SiteInstances that
   // live same-process.
   if (SiteIsolationPolicy::IsProcessIsolationForOriginAgentClusterEnabled()) {
-    OriginAgentClusterIsolationState oac_isolation_state_request =
+    OriginAgentClusterIsolationState oac_isolation_state =
         requests_origin_keyed_process
             ? OriginAgentClusterIsolationState::CreateForOriginAgentCluster(
                   true /* has_oac_request */,
                   true /* requires_origin_keyed_process */)
             : OriginAgentClusterIsolationState::CreateNonIsolatedByDefault();
-    OriginAgentClusterIsolationState oac_isolation_state_result =
-        DetermineOriginAgentClusterIsolation(isolation_context, origin,
-                                             oac_isolation_state_request);
-    if (oac_isolation_state_result.requires_origin_keyed_process()) {
+    oac_isolation_state = DetermineOriginAgentClusterIsolation(
+        isolation_context, origin, oac_isolation_state);
+    if (oac_isolation_state.requires_origin_keyed_process()) {
       *result = origin;
       return true;
     }
+  }
+
+  return GetMatchingProcessIsolatedOriginFromLegacyOriginList(
+      isolation_context, origin, site_url, result);
+}
+
+bool ChildProcessSecurityPolicyImpl::
+    GetMatchingProcessIsolatedOriginFromLegacyOriginList(
+        const IsolationContext& isolation_context,
+        const url::Origin& origin,
+        const GURL& site_url,
+        url::Origin* result) {
+  CHECK_CURRENTLY_ON(BrowserThread::UI);
+
+  *result = url::Origin();
+  base::AutoLock isolated_origins_lock(isolated_origins_lock_);
+
+  // If |isolation_context| does not specify a BrowsingInstance ID (which should
+  // only happen in tests), then assume that we want to retrieve the latest
+  // applicable information; i.e., return the latest matching isolated origins
+  // that would apply to future BrowsingInstances.  Using
+  // NextBrowsingInstanceId() will match all available IsolatedOriginEntries.
+  BrowsingInstanceId browsing_instance_id(
+      isolation_context.browsing_instance_id());
+  if (browsing_instance_id.is_null()) {
+    browsing_instance_id = SiteInstanceImpl::NextBrowsingInstanceId();
   }
 
   // Look up the list of origins corresponding to |origin|'s site.
