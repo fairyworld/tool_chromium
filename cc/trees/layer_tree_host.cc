@@ -794,9 +794,6 @@ void LayerTreeHost::OnDeferCommitsChanged(bool defer_status,
   client_->OnDeferCommitsChanged(defer_status, reason);
 }
 
-void LayerTreeHost::SetShouldThrottleFrameRate(bool flag) {
-  proxy_->SetShouldThrottleFrameRate(flag);
-}
 
 ScopedRequestHighFramerate::ScopedRequestHighFramerate(LayerTreeHost* host)
     : host_(host->weak_ptr_factory_.GetWeakPtr()) {

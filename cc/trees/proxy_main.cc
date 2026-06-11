@@ -843,11 +843,6 @@ void ProxyMain::StopDeferringCommits() {
   layer_tree_host_->OnDeferCommitsChanged(false, reason);
 }
 
-void ProxyMain::SetShouldThrottleFrameRate(bool flag) {
-  ImplThreadTaskRunner()->PostTask(
-      FROM_HERE, base::BindOnce(&ProxyImpl::SetShouldThrottleFrameRate,
-                                base::Unretained(proxy_impl_.get()), flag));
-}
 
 void ProxyMain::SetRequestHighFramerate(bool flag) {
   ImplThreadTaskRunner()->PostTask(

@@ -1780,11 +1780,6 @@ bool SchedulerStateMachine::HasInitializedLayerTreeFrameSink() const {
   NOTREACHED();
 }
 
-void SchedulerStateMachine::SetShouldThrottleFrameRate(bool flag) {
-  if (base::FeatureList::IsEnabled(features::kRenderThrottleFrameRate)) {
-    throttle_frame_rate_ = flag;
-  }
-}
 
 void SchedulerStateMachine::UpdateConsecutiveNoDamageThrottlingInterval() {
   if (!base::FeatureList::IsEnabled(
@@ -1819,22 +1814,11 @@ void SchedulerStateMachine::SetRequestHighFramerate(bool flag) {
 }
 
 base::TimeDelta SchedulerStateMachine::MainFrameThrottledInterval() const {
-  if (!throttle_frame_rate_) {
-    if (high_framerate_requests_count_ &&
-        base::FeatureList::IsEnabled(
-            features::kHighFramerateRequestFromClient)) {
-      return base::TimeDelta();
-    } else {
-      return main_frame_throttled_interval_;
-    }
+  if (high_framerate_requests_count_ &&
+      base::FeatureList::IsEnabled(features::kHighFramerateRequestFromClient)) {
+    return base::TimeDelta();
   } else {
-    auto throttled_interval =
-        std::max(base::Hertz(features::kRenderThrottledFrameIntervalHz.Get()),
-                 main_frame_throttled_interval_);
-    if (throttled_interval < unthrottled_frame_interval_) {
-      return base::TimeDelta();
-    }
-    return throttled_interval;
+    return main_frame_throttled_interval_;
   }
 }
 
