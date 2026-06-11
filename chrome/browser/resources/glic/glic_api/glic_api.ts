@@ -3084,6 +3084,11 @@ export enum ActuationTarget {
   CURRENT_TAB = 2,
   // Forces actuation in a new tab.
   NEW_TAB = 3,
+  // Forces actuation on the target surface, if the surface is a valid tab.
+  // Note: kTargetSurface can be different than kCurrentTab if the target
+  // surface is not the foregrounded tab. This option has no effect if the
+  // surface does not resolve to a valid tab.
+  TARGET_SURFACE = 4,
 }
 
 ///////////////////////////////////////////////

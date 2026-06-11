@@ -249,6 +249,8 @@ std::string ActuationTargetToString(glic::mojom::ActuationTarget target) {
       return "kCurrentTab";
     case glic::mojom::ActuationTarget::kNewTab:
       return "kNewTab";
+    case glic::mojom::ActuationTarget::kTargetSurface:
+      return "kTargetSurface";
   }
   LOG(ERROR) << "Unexpected value for ActuationTarget: "
              << static_cast<int>(target);

@@ -400,6 +400,16 @@ mojom::InvokeOptionsPtr GlicInvokeHandler::CreateMojoOptions() {
   mojo_options->actuation_target = options_.target.actuation_target;
   mojo_options->disable_zero_state_suggestions = options_.disable_zss;
 
+  if (mojo_options->actuation_target ==
+      mojom::ActuationTarget::kTargetSurface) {
+    // If the target surface is not a tab, no specific tab ID is passed to the
+    // client. The actuation will still happen, but it won't be targeted at a
+    // specific tab.
+    if (IsTabTarget()) {
+      mojo_options->actuation_tab_id = GetTab().GetHandle().raw_value();
+    }
+  }
+
   if (options_.skill_id) {
     mojo_options->skill_id = *options_.skill_id;
   }

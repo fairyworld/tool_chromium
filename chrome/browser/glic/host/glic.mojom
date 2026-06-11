@@ -1733,6 +1733,11 @@ enum ActuationTarget {
   kCurrentTab = 2,
   // Forces actuation in a new tab.
   kNewTab = 3,
+  // Forces actuation on the target surface, if the surface is a valid tab.
+  // Note: kTargetSurface can be different than kCurrentTab if the target
+  // surface is not the foregrounded tab. This option has no effect if the
+  // surface does not resolve to a valid tab.
+  [MinVersion=1] kTargetSurface = 4,
 };
 
 struct UniversalCartPayload {
@@ -1779,6 +1784,10 @@ struct InvokeOptions {
 
   // Source-specific payload for the invocation.
   InvocationPayload? payload;
+
+  // The ID of the tab to actuate on, if actuation_target is kTargetSurface.
+  [MinVersion=1]
+  int32? actuation_tab_id;
 };
 
 // @generate glic_api
