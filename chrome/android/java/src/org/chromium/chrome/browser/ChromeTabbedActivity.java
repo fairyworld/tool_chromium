@@ -239,6 +239,7 @@ import org.chromium.chrome.browser.quick_delete.QuickDeleteDelegateImpl;
 import org.chromium.chrome.browser.quick_delete.QuickDeleteMetricsDelegate;
 import org.chromium.chrome.browser.read_later.ReadingListBackPressHandler;
 import org.chromium.chrome.browser.recent_tabs.CrossDevicePaneFactory;
+import org.chromium.chrome.browser.recent_tabs.ForeignSessionHelper;
 import org.chromium.chrome.browser.reengagement.ReengagementNotificationController;
 import org.chromium.chrome.browser.safety_hub.SafetyHubMagicStackBuilder;
 import org.chromium.chrome.browser.search_engines.SearchEngineChoiceNotification;
@@ -4322,6 +4323,23 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
                         (RecentlyClosedTab) entry, WindowOpenDisposition.NEW_FOREGROUND_TAB);
                 RecordUserAction.record("MobileMenuRecentEntry");
             }
+        } else if (id == R.id.recent_entry_foreign_tab_menu_item) {
+            assert menuItemData != null;
+            assert menuItemData.get(
+                            AppMenuPropertiesDelegateImpl.RECENT_ENTRY_SESSION_TAG_BUNDLE_KEY)
+                    != null;
+            assert menuItemData.get(AppMenuPropertiesDelegateImpl.RECENT_ENTRY_TAB_ID_BUNDLE_KEY)
+                    != null;
+
+            String sessionTag =
+                    menuItemData.getString(
+                            AppMenuPropertiesDelegateImpl.RECENT_ENTRY_SESSION_TAG_BUNDLE_KEY);
+            int tabId =
+                    menuItemData.getInt(
+                            AppMenuPropertiesDelegateImpl.RECENT_ENTRY_TAB_ID_BUNDLE_KEY);
+
+            openForeignSessionTab(sessionTag, tabId);
+            RecordUserAction.record("MobileMenuRecentEntry");
         } else if (id == R.id.recent_entry_group_menu_item) {
             assert menuItemData != null;
             assert menuItemData.get(
@@ -4540,6 +4558,14 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
             return super.onMenuOrKeyboardAction(id, fromMenu, menuItemData, triggeringMotion);
         }
         return true;
+    }
+
+    private void openForeignSessionTab(String sessionTag, int tabId) {
+        Profile profile = getTabModelSelector().getCurrentModel().getProfile();
+        ForeignSessionHelper helper = new ForeignSessionHelper(profile);
+        helper.openForeignSessionTab(
+                getActivityTab(), sessionTag, tabId, WindowOpenDisposition.NEW_FOREGROUND_TAB);
+        helper.destroy();
     }
 
     @VisibleForTesting
