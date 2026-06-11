@@ -115,14 +115,7 @@ BASE_FEATURE(kDefaultPassthroughCommandDecoder,
 // Controls whether the GPU process falls back to software if GLES3 is not
 // supported.
 BASE_FEATURE(kFallbackToSWIfGLES3NotSupported,
-#if BUILDFLAG(IS_WIN)
-             // TODO(https://crbug.com/444049511): Currently disabled on
-             // Windows for D3D9 users that are still on ES 2. Enable once
-             // crbug.com/40874754 is fixed, deprecating D3D9 usage.
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#else   // BUILDFLAG(IS_CHROMEOS)
              base::FEATURE_ENABLED_BY_DEFAULT);
-#endif  // BUILDFLAG(IS_WIN)
 #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_CHROMEOS)
 
 #if BUILDFLAG(IS_WIN)
