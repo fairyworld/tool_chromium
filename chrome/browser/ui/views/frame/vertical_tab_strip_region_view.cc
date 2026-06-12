@@ -525,7 +525,8 @@ void VerticalTabStripRegionView::InitializeTabStrip() {
       base::BindRepeating(&VerticalTabStripRegionView::SetTabStripView,
                           base::Unretained(this)),
       base::BindRepeating(&VerticalTabStripRegionView::ClearTabStripView,
-                          base::Unretained(this)));
+                          base::Unretained(this)),
+      TabStripOrientation::kVertical);
 
   std::unique_ptr<TabMenuModelFactory> tab_menu_model_factory;
   if (browser_view_ &&
