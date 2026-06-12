@@ -5,7 +5,9 @@
 #ifndef COMPONENTS_FACILITATED_PAYMENTS_CORE_BROWSER_NETWORK_API_FACILITATED_PAYMENTS_NETWORK_INTERFACE_H_
 #define COMPONENTS_FACILITATED_PAYMENTS_CORE_BROWSER_NETWORK_API_FACILITATED_PAYMENTS_NETWORK_INTERFACE_H_
 
+#include <cstdint>
 #include <memory>
+#include <vector>
 
 #include "base/memory/raw_ref.h"
 #include "base/types/strong_alias.h"
@@ -42,7 +44,8 @@ class FacilitatedPaymentsNetworkInterface
   using GetDetailsForCreatePaymentInstrumentResponseCallback =
       base::OnceCallback<void(
           autofill::payments::PaymentsAutofillClient::PaymentsRpcResult,
-          bool)>;
+          bool,
+          const std::vector<uint8_t>&)>;
   using RequestId =
       base::StrongAlias<struct autofill::payments::RequestIdTag, std::string>;
 

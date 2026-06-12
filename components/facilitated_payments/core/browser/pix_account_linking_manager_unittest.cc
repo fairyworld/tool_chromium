@@ -82,7 +82,7 @@ class PixAccountLinkingManagerTest : public testing::Test {
         .WillByDefault([](long, auto callback, const std::string&) {
           std::move(callback).Run(autofill::payments::PaymentsAutofillClient::
                                       PaymentsRpcResult::kSuccess,
-                                  true);
+                                  true, std::vector<uint8_t>{});
           return base::StrongAlias<autofill::payments::RequestIdTag,
                                    std::string>();
         });
@@ -227,7 +227,7 @@ TEST_F(PixAccountLinkingManagerTest,
       .WillOnce([](long, auto callback, const std::string&) {
         std::move(callback).Run(autofill::payments::PaymentsAutofillClient::
                                     PaymentsRpcResult::kSuccess,
-                                false);
+                                false, std::vector<uint8_t>{});
         return base::StrongAlias<autofill::payments::RequestIdTag,
                                  std::string>();
       });
@@ -441,7 +441,8 @@ TEST_P(PixAccountLinkingManagerParameterizedTest,
   test_api().OnGetDetailsForCreatePaymentInstrumentResponseReceived(
       base::TimeTicks::Now() - base::Seconds(2),
       autofill::payments::PaymentsAutofillClient::PaymentsRpcResult::kSuccess,
-      /*is_eligible_for_pix_account_linking=*/GetParam());
+      /*is_eligible_for_pix_account_linking=*/GetParam(),
+      /*action_token=*/std::vector<uint8_t>{});
 
   histogram_tester.ExpectUniqueSample(
       "FacilitatedPayments.Pix.AccountLinking."
@@ -565,7 +566,7 @@ TEST_F(PixAccountLinkingManagerTest,
       .WillOnce([](long, auto callback, const std::string&) {
         std::move(callback).Run(autofill::payments::PaymentsAutofillClient::
                                     PaymentsRpcResult::kSuccess,
-                                false);
+                                false, std::vector<uint8_t>{});
         return base::StrongAlias<autofill::payments::RequestIdTag,
                                  std::string>();
       });

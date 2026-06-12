@@ -86,6 +86,7 @@ class FacilitatedPaymentsNetworkInterfaceTest
   std::unique_ptr<FacilitatedPaymentsNetworkInterface>
       payments_network_interface_;
   bool is_eligible_for_pix_account_linking_ = false;
+  std::vector<uint8_t> action_token_;
 
  private:
   void OnInitiatePaymentResponseReceived(
@@ -98,9 +99,11 @@ class FacilitatedPaymentsNetworkInterfaceTest
 
   void OnGetDetailsForCreatePaymentInstrumentResponseReceived(
       autofill::payments::PaymentsAutofillClient::PaymentsRpcResult result,
-      bool is_eligible_for_pix_account_linking) {
+      bool is_eligible_for_pix_account_linking,
+      const std::vector<uint8_t>& action_token) {
     result_ = result;
     is_eligible_for_pix_account_linking_ = is_eligible_for_pix_account_linking;
+    action_token_ = action_token;
   }
 
   FacilitatedPaymentsNetworkInterface::RequestId id_;
@@ -169,6 +172,7 @@ TEST_F(FacilitatedPaymentsNetworkInterfaceTest,
       autofill::payments::PaymentsAutofillClient::PaymentsRpcResult::kSuccess,
       result_);
   EXPECT_TRUE(is_eligible_for_pix_account_linking_);
+  EXPECT_TRUE(action_token_.empty());
 }
 
 TEST_F(FacilitatedPaymentsNetworkInterfaceTest,

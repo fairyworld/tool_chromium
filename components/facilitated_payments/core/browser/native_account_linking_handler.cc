@@ -110,7 +110,8 @@ void NativeAccountLinkingHandler::
         base::TimeTicks start_time,
         autofill::payments::PaymentsAutofillClient::PaymentsRpcResult
             rpc_result,
-        bool is_eligible) {
+        bool is_eligible,
+        const std::vector<uint8_t>& action_token) {
   base::TimeDelta latency = base::TimeTicks::Now() - start_time;
   bool result =
       rpc_result ==
@@ -120,8 +121,7 @@ void NativeAccountLinkingHandler::
       GetHistogramSuffix(), is_eligible && result, latency);
 
   if (result && is_eligible) {
-    // TODO(b:505507305): Trigger native handoff to start the instrument manager
-    // flow once JNI bridge is added.
+    action_token_ = action_token;
   } else {
     if (!result) {
       LogAccountLinkingFlowExitedReason(
@@ -134,6 +134,23 @@ void NativeAccountLinkingHandler::
     }
     OnAccountLinkingResult(false);
   }
+}
+
+void NativeAccountLinkingHandler::OnAccepted() {
+  DismissPrompt();
+  if (action_token_.empty()) {
+    LogAccountLinkingFlowExitedReason(
+        GetHistogramSuffix(),
+        AccountLinkingFlowExitedReason::kActionTokenNotAvailable);
+    OnAccountLinkingResult(false);
+    return;
+  }
+  InvokeInstrumentManager(action_token_);
+}
+
+void NativeAccountLinkingHandler::OnDeclined() {
+  DismissPrompt();
+  OnAccountLinkingResult(false);
 }
 
 }  // namespace payments::facilitated
