@@ -202,6 +202,7 @@ public class TopToolbarCoordinator implements Toolbar, TopControlLayer {
      *     behavior of the home button.
      * @param topControlsStacker The TopControlsStacker for child objects to check state from.
      * @param browserControlsVisibilityManager BrowserControlsStateProvider instance.
+     * @param onSigninTapped Runnable to be called when the signin button is tapped.
      */
     public TopToolbarCoordinator(
             ToolbarControlContainer controlContainer,
@@ -248,7 +249,8 @@ public class TopToolbarCoordinator implements Toolbar, TopControlLayer {
             DeviceLockActivityLauncher deviceLockActivityLauncher,
             BottomSheetController bottomSheetController,
             ModalDialogManager modalDialogManager,
-            SnackbarManager snackbarManager) {
+            SnackbarManager snackbarManager,
+            Runnable onSigninTapped) {
         mToolbarLayout = toolbarLayout;
         mMenuButtonCoordinator = browsingModeMenuButtonCoordinator;
         mControlContainer = controlContainer;
@@ -270,6 +272,7 @@ public class TopToolbarCoordinator implements Toolbar, TopControlLayer {
                                 signinButtonStub,
                                 tabSupplier,
                                 omniboxStubSupplier,
+                                onSigninTapped,
                                 mToolbarLayout::beginButtonTransition,
                                 profileSupplier,
                                 signinAndHistorySyncActivityLauncher,

@@ -2080,7 +2080,8 @@ public class ToolbarManager
                         deviceLockActivityLauncher,
                         mBottomSheetController,
                         mModalDialogManagerSupplier.get(),
-                        snackbarManager);
+                        snackbarManager,
+                        this::endFuseboxInput);
 
         mHomepageStateListener =
                 () -> {

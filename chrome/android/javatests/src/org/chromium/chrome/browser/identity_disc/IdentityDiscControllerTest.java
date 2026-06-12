@@ -102,6 +102,8 @@ import org.chromium.components.sync.UserActionableError;
 import org.chromium.components.user_prefs.UserPrefs;
 import org.chromium.content_public.common.ContentUrlConstants;
 import org.chromium.ui.base.ActivityResultTracker;
+import org.chromium.ui.base.ActivityWindowAndroid;
+import org.chromium.ui.base.IntentRequestTracker;
 import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.modaldialog.ModalDialogManager;
 import org.chromium.ui.test.util.GmsCoreVersionRestriction;
@@ -142,18 +144,19 @@ public class IdentityDiscControllerTest {
     private Tab mTab;
     private SettableMonotonicObservableSupplier<Profile> mProfileSupplier;
     private String mFallbackAccountName;
+    private WindowAndroid mWindowAndroid;
 
     @Mock private IdentityServicesProvider mIdentityServicesProviderMock;
     @Mock private SigninManager mSigninManagerMock;
     @Mock private IdentityManager mIdentityManagerMock;
     @Mock private ButtonDataProvider.ButtonDataObserver mButtonDataObserver;
     @Mock private Tracker mTracker;
-    @Mock private WindowAndroid mWindowAndroid;
     @Mock private ActivityResultTracker mActivityResultTracker;
     @Mock private DeviceLockActivityLauncher mDeviceLockActivityLauncher;
     @Mock private BottomSheetController mBottomSheetController;
     @Mock private ModalDialogManager mModalDialogManager;
     @Mock private SnackbarManager mSnackbarManager;
+    @Mock private Runnable mOnSigninTapped;
 
     @BeforeClass
     public static void setUpBeforeActivityLaunched() {
@@ -178,14 +181,29 @@ public class IdentityDiscControllerTest {
         mPage = mActivityTestRule.startOnNtp();
         mTab = mPage.getTab();
         NewTabPageTestUtils.waitForNtpLoaded(mTab);
-        mFallbackAccountName =
-                mActivityTestRule.getActivity().getString(R.string.default_google_account_username);
+        Activity activity = mActivityTestRule.getActivity();
+        assertNotNull(activity);
+        mFallbackAccountName = activity.getString(R.string.default_google_account_username);
+        ThreadUtils.runOnUiThreadBlocking(
+                () -> {
+                    mWindowAndroid =
+                            new ActivityWindowAndroid(
+                                    activity,
+                                    /* listenToActivityState= */ true,
+                                    IntentRequestTracker.createFromActivity(activity),
+                                    /* insetObserver= */ null,
+                                    /* occlusionTrackingAllowed= */ true);
+                });
     }
 
     @After
     public void tearDown() {
         ThreadUtils.runOnUiThreadBlocking(
                 () -> {
+                    if (mWindowAndroid != null) {
+                        mWindowAndroid.destroy();
+                        mWindowAndroid = null;
+                    }
                     PrefService prefService =
                             UserPrefs.get(ProfileManager.getLastUsedRegularProfile());
                     prefService.clearPref(Pref.SIGNIN_ALLOWED);
@@ -589,6 +607,18 @@ public class IdentityDiscControllerTest {
 
     @Test
     @MediumTest
+    @UiThreadTest
+    @EnableFeatures(SigninFeatures.ENABLE_ACTIVITYLESS_SIGNIN_ALL_ENTRY_POINT)
+    public void testOnClick_profileInitialized_callsOnSigninTapped() {
+        IdentityDiscController identityDiscController = buildController();
+        mProfileSupplier.set(ProfileManager.getLastUsedRegularProfile());
+
+        identityDiscController.onClick();
+        verify(mOnSigninTapped).run();
+    }
+
+    @Test
+    @MediumTest
     @Feature("RenderTest")
     @UseMethodParameter(NightModeTestUtils.NightModeParams.class)
     public void testIdentityDisc_signedOut(boolean nightModeEnabled) throws IOException {
@@ -775,7 +805,8 @@ public class IdentityDiscControllerTest {
                         mProfileSupplier,
                         mBottomSheetController,
                         mModalDialogManager,
-                        mSnackbarManager);
+                        mSnackbarManager,
+                        mOnSigninTapped);
         ResettersForTesting.register(() -> ThreadUtils.runOnUiThreadBlocking(controller::destroy));
         return controller;
     }
