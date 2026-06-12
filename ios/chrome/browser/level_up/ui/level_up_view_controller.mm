@@ -148,7 +148,7 @@ const CGFloat kTasksCellHeight = 350.0;
   self.title = l10n_util::GetNSString(IDS_IOS_TOOLS_MENU_LEVEL_UP);
 
   UIButton* menuButton = [UIButton buttonWithType:UIButtonTypeSystem];
-  menuButton.backgroundColor = [UIColor colorNamed:kPrimaryBackgroundColor];
+  menuButton.backgroundColor = UIColor.clearColor;
   menuButton.tintColor = [UIColor colorNamed:kTextPrimaryColor];
   [menuButton setImage:DefaultSymbolTemplateWithPointSize(
                            kEllipsisSymbol, kSymbolAccessoryPointSize)
@@ -159,7 +159,7 @@ const CGFloat kTasksCellHeight = 350.0;
       [[UIBarButtonItem alloc] initWithCustomView:menuButton];
 
   UIButton* dismissButton = [UIButton buttonWithType:UIButtonTypeSystem];
-  dismissButton.backgroundColor = [UIColor colorNamed:kPrimaryBackgroundColor];
+  dismissButton.backgroundColor = UIColor.clearColor;
   dismissButton.tintColor = [UIColor colorNamed:kTextPrimaryColor];
   [dismissButton setImage:DefaultSymbolTemplateWithPointSize(
                               kXMarkSymbol, kSymbolAccessoryPointSize)
