@@ -15,14 +15,28 @@ config("federated_compute_include") {
 source_set("base") {
   public = [
     "src/fcp/base/base_name.h",
+    "src/fcp/base/clock.h",
+    "src/fcp/base/compression.h",
     "src/fcp/base/digest.h",
     "src/fcp/base/monitoring.h",
+    "src/fcp/base/platform.h",
+    "src/fcp/base/random_token.h",
+    "src/fcp/base/scheduler.h",
+    "src/fcp/base/time_util.h",
+    "src/fcp/base/wall_clock_stopwatch.h",
   ]
 
   sources = [
     "src/fcp/base/base_name.cc",
+    "src/fcp/base/clock.cc",
+    "src/fcp/base/compression.cc",
     "src/fcp/base/digest.cc",
     "src/fcp/base/monitoring.cc",
+    "src/fcp/base/platform.cc",
+    "src/fcp/base/random_token.cc",
+    "src/fcp/base/scheduler.cc",
+    "src/fcp/base/time_util.cc",
+    "src/fcp/base/wall_clock_stopwatch.cc",
   ]
 
   configs -= [ "//build/config/compiler:chromium_code" ]
@@ -33,6 +47,9 @@ source_set("base") {
   deps = [
     "//third_party/abseil-cpp:absl",
     "//third_party/boringssl",
+    "//third_party/protobuf:duration_proto",
+    "//third_party/protobuf:io_gzip_stream",
+    "//third_party/protobuf:timestamp_proto",
   ]
 }
 
