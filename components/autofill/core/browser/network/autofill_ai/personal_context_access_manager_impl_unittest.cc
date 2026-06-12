@@ -31,6 +31,7 @@ namespace autofill {
 
 namespace {
 
+using ::base::test::InvokeFuture;
 using ::base::test::RunOnceCallback;
 using personal_context::ContextMemoryError;
 using ::personal_context::MockPersonalContextEnablementService;
@@ -47,6 +48,8 @@ using ::testing::ResultOf;
 using ::testing::Truly;
 using ::testing::UnorderedElementsAre;
 using ::testing::WithArg;
+
+using RequestStatus = PersonalContextAccessManager::RequestStatus;
 
 [[nodiscard]] auto HasAttributeWithValue(AttributeTypeName attribute_type_name,
                                          std::u16string value) {
@@ -68,6 +71,18 @@ using ::testing::WithArg;
       ElementsAreArray(types));
 }
 
+
+class MockPersonalContextAccessManagerObserver
+    : public PersonalContextAccessManager::Observer {
+ public:
+  MockPersonalContextAccessManagerObserver() = default;
+  ~MockPersonalContextAccessManagerObserver() override = default;
+
+  MOCK_METHOD(void,
+              OnPrefetchAmbientAutofillContextComplete,
+              (bool success),
+              (override));
+};
 
 class PersonalContextAccessManagerImplTest : public testing::Test {
  public:
@@ -664,7 +679,7 @@ TEST_F(PersonalContextAccessManagerImplTest, PendingRequestBlocksSubsequent) {
       FetchContext(
           personal_context::proto::CONTEXT_MEMORY_FEATURE_AMBIENT_AUTOFILL, _,
           _, _))
-      .WillOnce(WithArg<3>(base::test::InvokeFuture(future)));
+      .WillOnce(WithArg<3>(InvokeFuture(future)));
 
   // First request should trigger FetchContext.
   access_manager().PrefetchAmbientAutofillContext(requested_types);
@@ -805,6 +820,114 @@ TEST_F(PersonalContextAccessManagerImplTest, FailureTriggersBackoff) {
   // reset on success.
   access_manager().PrefetchAmbientAutofillContext(requested_types);
   check.Call("9. Reset success");
+}
+
+// Tests that the prefetch status transitions correctly (`kNotStarted` ->
+// `kPending` -> `kSuccess` -> `kNotStarted`) and the observer is notified
+// with success = true when a prefetch request succeeds.
+TEST_F(PersonalContextAccessManagerImplTest, PrefetchStatusAndObserverSuccess) {
+  MockPersonalContextAccessManagerObserver observer;
+  access_manager().AddObserver(&observer);
+
+  const EntityType order_type = EntityType(EntityTypeName::kOrder);
+
+  EXPECT_EQ(
+      access_manager().GetPrefetchAmbientAutofillStatusByEntityType(order_type),
+      RequestStatus::kNotStarted);
+
+  base::test::TestFuture<personal_context::FetchContextCallback> future;
+  EXPECT_CALL(mock_personal_context_service(), FetchContext)
+      .WillOnce(WithArg<3>(InvokeFuture(future)));
+
+  // 1. Start prefetch. Status should transition to `kPending`.
+  access_manager().PrefetchAmbientAutofillContext({order_type});
+  EXPECT_EQ(
+      access_manager().GetPrefetchAmbientAutofillStatusByEntityType(order_type),
+      RequestStatus::kPending);
+
+  // 2. Resolve request successfully. Status should transition to `kSuccess`,
+  // and observer should be notified with success = true.
+  personal_context::proto::ContextMemoryAmbientAutofillResponse response;
+  personal_context::proto::Any any_response;
+  response.SerializeToString(any_response.mutable_value());
+
+  EXPECT_CALL(observer, OnPrefetchAmbientAutofillContextComplete(true));
+  future.Take().Run(
+      personal_context::FetchContextResult(base::ok(std::move(any_response))));
+
+  EXPECT_EQ(
+      access_manager().GetPrefetchAmbientAutofillStatusByEntityType(order_type),
+      RequestStatus::kSuccess);
+
+  // 3. Fast forward 30 minutes (TTL expires). Status should transition back to
+  // `kNotStarted`.
+  FastForwardBy(base::Minutes(30));
+  EXPECT_EQ(
+      access_manager().GetPrefetchAmbientAutofillStatusByEntityType(order_type),
+      RequestStatus::kNotStarted);
+}
+
+// Tests that the prefetch status transitions correctly (`kNotStarted` ->
+// `kPending` -> `kFailure` -> `kNotStarted`) and the observer is notified
+// with success = false when a prefetch request fails.
+TEST_F(PersonalContextAccessManagerImplTest, PrefetchStatusAndObserverFailure) {
+  MockPersonalContextAccessManagerObserver observer;
+  access_manager().AddObserver(&observer);
+
+  const EntityType order_type = EntityType(EntityTypeName::kOrder);
+
+  EXPECT_EQ(
+      access_manager().GetPrefetchAmbientAutofillStatusByEntityType(order_type),
+      RequestStatus::kNotStarted);
+
+  base::test::TestFuture<personal_context::FetchContextCallback> future;
+  EXPECT_CALL(mock_personal_context_service(), FetchContext)
+      .WillOnce(WithArg<3>(InvokeFuture(future)));
+
+  // 1. Start prefetch. Status should transition to `kPending`.
+  access_manager().PrefetchAmbientAutofillContext({order_type});
+  EXPECT_EQ(
+      access_manager().GetPrefetchAmbientAutofillStatusByEntityType(order_type),
+      RequestStatus::kPending);
+
+  // 2. Resolve request with failure. Status should transition to `kFailure`,
+  // and observer should be notified with success = false.
+  EXPECT_CALL(observer, OnPrefetchAmbientAutofillContextComplete(false));
+  ContextMemoryError expected_error = ContextMemoryError::FromExecutionError(
+      ContextMemoryError::ExecutionError::kGenericFailure);
+  future.Take().Run(
+      personal_context::FetchContextResult(base::unexpected(expected_error)));
+
+  EXPECT_EQ(
+      access_manager().GetPrefetchAmbientAutofillStatusByEntityType(order_type),
+      RequestStatus::kFailure);
+
+  // 3. Wipe caches. Status should transition back to `kNotStarted`.
+  access_manager().OnEnablementStateChanged(
+      personal_context::PersonalContextEnablementState::
+          kDisabledViaPersonalIntelligenceInAutofillToggle);
+  EXPECT_EQ(
+      access_manager().GetPrefetchAmbientAutofillStatusByEntityType(order_type),
+      RequestStatus::kNotStarted);
+}
+
+// Tests that calling PrefetchAmbientAutofillContext when all types are cached
+// indeed notifies the observer synchronously.
+TEST_F(PersonalContextAccessManagerImplTest,
+       PrefetchWhenAlreadyCachedNotifiesObserver) {
+  MockPersonalContextAccessManagerObserver observer;
+  access_manager().AddObserver(&observer);
+
+  // 1. Cache Passport.
+  personal_context::proto::ContextMemoryAmbientAutofillResponse response;
+  response.add_entities()->mutable_passport()->set_number("P123");
+  PrefetchAmbientAutofillContextSync({EntityType(EntityTypeName::kPassport)},
+                                     response);
+
+  // 2. Call Prefetch again. Expect observer to be notified synchronously.
+  EXPECT_CALL(observer, OnPrefetchAmbientAutofillContextComplete(true));
+  access_manager().PrefetchAmbientAutofillContext(
+      {EntityType(EntityTypeName::kPassport)});
 }
 
 }  // namespace

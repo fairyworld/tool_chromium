@@ -226,6 +226,10 @@ AutofillAiManager::AutofillAiManager(
         client, ScopedAutofillManagersObservation::InitializationPolicy::
                     kObservePreexistingManagers);
   }
+  if (PersonalContextAccessManager* access_manager =
+          client_->GetPersonalContextAccessManager()) {
+    personal_context_access_manager_observation_.Observe(access_manager);
+  }
 }
 
 AutofillAiManager::~AutofillAiManager() = default;
@@ -341,6 +345,10 @@ void AutofillAiManager::OnAfterLoadedServerPredictions(
     // times if OnAfterLoadedServerPredictions is called multiple times.
     access_manager->PrefetchAmbientAutofillContext(requested_types);
   }
+}
+
+void AutofillAiManager::OnPrefetchAmbientAutofillContextComplete(bool success) {
+  // TODO(crbug.com/503303085): Implement.
 }
 
 void AutofillAiManager::UpdateLoggerReadinessData(const FormStructure& form) {

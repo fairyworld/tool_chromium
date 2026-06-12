@@ -126,11 +126,12 @@ void PersonalContextAccessManagerImpl::PrefetchAmbientAutofillContext(
   for (const EntityType& type : requested_types) {
     if (ShouldRequestType(type)) {
       types_to_request.push_back(type);
-      SetTypeStatus(type, RequestState::Status::kPending);
+      SetTypeStatus(type, RequestStatus::kPending);
     }
   }
 
   if (types_to_request.empty()) {
+    NotifyPrefetchStatusObservers(/*success=*/true);
     return;
   }
 
@@ -153,8 +154,9 @@ void PersonalContextAccessManagerImpl::OnPrefetchAmbientAutofillContextComplete(
     personal_context::FetchContextResult result) {
   if (!result.response.has_value()) {
     for (const EntityType& type : requested_types) {
-      SetTypeStatus(type, RequestState::Status::kFailure);
+      SetTypeStatus(type, RequestStatus::kFailure);
     }
+    NotifyPrefetchStatusObservers(/*success=*/false);
     return;
   }
 
@@ -165,8 +167,9 @@ void PersonalContextAccessManagerImpl::OnPrefetchAmbientAutofillContextComplete(
 
   if (!parsed_entities.has_value()) {
     for (const EntityType& type : requested_types) {
-      SetTypeStatus(type, RequestState::Status::kFailure);
+      SetTypeStatus(type, RequestStatus::kFailure);
     }
+    NotifyPrefetchStatusObservers(/*success=*/false);
     return;
   }
 
@@ -187,6 +190,7 @@ void PersonalContextAccessManagerImpl::OnPrefetchAmbientAutofillContextComplete(
   }
 
   CachePrefetchedEntities(std::move(grouped_entities), std::move(protos));
+  NotifyPrefetchStatusObservers(/*success=*/true);
 }
 
 std::optional<EntityInstance> PersonalContextAccessManagerImpl::GetCachedEntity(
@@ -268,8 +272,26 @@ PersonalContextAccessManagerImpl::GetCachedEntities() const {
 
 bool PersonalContextAccessManagerImpl::IsTypeCached(EntityType type) const {
   const RequestState* request_state = base::FindOrNull(cache_state_, type);
-  return request_state &&
-         request_state->status == RequestState::Status::kSuccess;
+  return request_state && request_state->status == RequestStatus::kSuccess;
+}
+
+void PersonalContextAccessManagerImpl::AddObserver(
+    PersonalContextAccessManager::Observer* observer) {
+  observers_.AddObserver(observer);
+}
+
+void PersonalContextAccessManagerImpl::RemoveObserver(
+    PersonalContextAccessManager::Observer* observer) {
+  observers_.RemoveObserver(observer);
+}
+
+PersonalContextAccessManager::RequestStatus
+PersonalContextAccessManagerImpl::GetPrefetchAmbientAutofillStatusByEntityType(
+    EntityType type) const {
+  if (const RequestState* state = base::FindOrNull(cache_state_, type)) {
+    return state->status;
+  }
+  return RequestStatus::kNotStarted;
 }
 
 void PersonalContextAccessManagerImpl::ResetCacheForType(EntityType type) {
@@ -302,7 +324,7 @@ void PersonalContextAccessManagerImpl::CachePrefetchedEntities(
     prefetched_entity_cache_.insert(
         std::make_move_iterator(type_entities.begin()),
         std::make_move_iterator(type_entities.end()));
-    SetTypeStatus(type, RequestState::Status::kSuccess);
+    SetTypeStatus(type, RequestStatus::kSuccess);
     base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
         FROM_HERE,
         base::BindOnce(&PersonalContextAccessManagerImpl::ResetCacheForType,
@@ -360,19 +382,19 @@ bool PersonalContextAccessManagerImpl::ShouldRequestType(
   }
 
   switch (request_state->status) {
-    case RequestState::Status::kPending:
+    case RequestStatus::kPending:
       return false;
-    case RequestState::Status::kSuccess:
+    case RequestStatus::kSuccess:
       if (base::TimeTicks::Now() - request_state->last_update_time >
           kPrefetchedEntitiesCacheTTL) {
         return true;
       }
       return false;
-    case RequestState::Status::kFailure:
+    case RequestStatus::kFailure:
       return ShouldRetryAfterFailure(*request_state);
+    case RequestStatus::kNotStarted:
+      return true;
   }
-
-  return false;
 }
 
 bool PersonalContextAccessManagerImpl::ShouldRetryAfterFailure(
@@ -380,9 +402,8 @@ bool PersonalContextAccessManagerImpl::ShouldRetryAfterFailure(
   return state.backoff_entry && !state.backoff_entry->ShouldRejectRequest();
 }
 
-void PersonalContextAccessManagerImpl::SetTypeStatus(
-    EntityType type,
-    RequestState::Status status) {
+void PersonalContextAccessManagerImpl::SetTypeStatus(EntityType type,
+                                                     RequestStatus status) {
   RequestState& state = cache_state_[type];
   state.status = status;
   state.last_update_time = base::TimeTicks::Now();
@@ -392,14 +413,23 @@ void PersonalContextAccessManagerImpl::SetTypeStatus(
   }
 
   switch (status) {
-    case RequestState::Status::kPending:
+    case RequestStatus::kPending:
       break;
-    case RequestState::Status::kSuccess:
+    case RequestStatus::kSuccess:
       state.backoff_entry->Reset();
       break;
-    case RequestState::Status::kFailure:
+    case RequestStatus::kFailure:
       state.backoff_entry->InformOfRequest(/*succeeded=*/false);
       break;
+    case RequestStatus::kNotStarted:
+      break;
+  }
+}
+
+void PersonalContextAccessManagerImpl::NotifyPrefetchStatusObservers(
+    bool success) {
+  for (PersonalContextAccessManager::Observer& observer : observers_) {
+    observer.OnPrefetchAmbientAutofillContextComplete(success);
   }
 }
 
