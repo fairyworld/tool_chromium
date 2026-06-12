@@ -358,6 +358,11 @@ public abstract class PersistedTabData implements UserData {
         return tab.getUserDataHost().setUserData(clazz, persistedTabData);
     }
 
+    /** Returns the associated tab. */
+    public Tab getTab() {
+        return mTab;
+    }
+
     /** Save {@link PersistedTabData} to storage */
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     public void save() {
