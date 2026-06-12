@@ -20422,8 +20422,6 @@
                 {
                     "name": "Enabled_WithReadability",
                     "enable_features": [
-                        "ImmersiveReadAnything",
-                        "ReadAnythingImagesViaAlgorithm",
                         "ReadAnythingReadabilitySelectText",
                         "ReadAnythingWithReadability"
                     ]
