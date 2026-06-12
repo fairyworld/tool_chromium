@@ -4152,6 +4152,18 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Media.EME.MediaDrm.ProvisioningNetworkRetry"
+    enum="MediaDrmProvisioningNetworkRetryResult" expires_after="2027-06-03">
+  <owner>vpasupathy@chromium.org</owner>
+  <owner>media-dev-uma@chromium.org</owner>
+  <summary>
+    Result of a network connection change event triggering a retry attempt for
+    background preprovisioning of MediaDrm origin IDs. This records whether the
+    event was ignored due to exponential backoff or if a retry was actually
+    attempted.
+  </summary>
+</histogram>
+
 <histogram name="Media.EME.MediaDrmBridge.KeySystemSupport"
     enum="BooleanSupported" expires_after="2026-12-09">
   <owner>xhwang@chromium.org</owner>

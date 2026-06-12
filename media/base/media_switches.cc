@@ -1152,6 +1152,10 @@ BASE_FEATURE(kMediaDrmPreprovisioning, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kMediaDrmPreprovisioningAtStartup,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
+// Enables exponential backoff for preprovisioning requests in
+// MediaDrmOriginIdManager.
+BASE_FEATURE(kMediaDrmPreprovisioningBackoff, base::FEATURE_ENABLED_BY_DEFAULT);
+
 // Enables MediaDrmBridge to call into MediaDrm API to query HDCP Status to
 // support the CDM API GetStatusForPolicy.
 BASE_FEATURE(kMediaDrmGetStatusForPolicy, base::FEATURE_ENABLED_BY_DEFAULT);
