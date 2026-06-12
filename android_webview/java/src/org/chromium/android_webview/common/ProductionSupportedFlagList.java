@@ -452,6 +452,9 @@ public final class ProductionSupportedFlagList {
                 "If enabled, the HTMLPreloadScanner will run on a worker thread."),
         Flag.baseFeature(BaseFeatures.ALIGN_WAKE_UPS, "Align delayed wake ups at 125 Hz"),
         Flag.baseFeature(
+                BaseFeatures.ANDROID_THREAD_PRIORITY,
+                "Allows fine-grained control of thread priorities on Android."),
+        Flag.baseFeature(
                 GpuFeatures.INCREASED_CMD_BUFFER_PARSE_SLICE,
                 "Enable the use of an increased parse slice size per command buffer before"
                         + " each forced context switch."),

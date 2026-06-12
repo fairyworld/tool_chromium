@@ -4892,6 +4892,7 @@ if (is_android) {
       "allocator/partition_alloc_features.cc",
       "features.cc",
       "task/task_features.cc",
+      "threading/platform_thread_android.cc",
     ]
     class_name = "org.chromium.base.BaseFeatures"
   }
