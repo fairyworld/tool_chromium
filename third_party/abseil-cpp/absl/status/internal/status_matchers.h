@@ -30,12 +30,20 @@ namespace absl_testing {
 ABSL_NAMESPACE_BEGIN
 namespace status_internal {
 
-inline const absl::Status& GetStatus(const absl::Status& status) {
+// TODO(b/323927127): Remove ABSL_REFACTOR_INLINE once callers are cleaned up
+// and move it into a namespace like adl_barrier without types to avoid
+// accidental ADL.
+ABSL_REFACTOR_INLINE inline const absl::Status& GetStatus(
+    const absl::Status& status) {
   return status;
 }
 
+// TODO(b/323927127): Remove ABSL_REFACTOR_INLINE once callers are cleaned up
+// and move it into a namespace like adl_barrier without types to avoid
+// accidental ADL.
 template <typename T>
-const absl::Status& GetStatus(const absl::StatusOr<T>& status) {
+ABSL_REFACTOR_INLINE const absl::Status& GetStatus(
+    const absl::StatusOr<T>& status) {
   return status.status();
 }
 
@@ -48,7 +56,8 @@ template <typename StatusOrType>
 class IsOkAndHoldsMatcherImpl
     : public ::testing::MatcherInterface<StatusOrType> {
  public:
-  typedef typename std::remove_reference_t<StatusOrType>::value_type value_type;
+  typedef
+      typename std::remove_reference<StatusOrType>::type::value_type value_type;
 
   template <typename InnerMatcher>
   explicit IsOkAndHoldsMatcherImpl(InnerMatcher&& inner_matcher)

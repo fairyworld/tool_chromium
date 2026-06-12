@@ -24,7 +24,6 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -476,16 +475,16 @@ TEST(InlinedVectorTest, MoveOnly) {
   v.emplace(v.begin(), MoveOnly{});
 }
 TEST(InlinedVectorTest, Noexcept) {
-  EXPECT_TRUE(std::is_nothrow_move_constructible_v<IntVec>);
-  EXPECT_TRUE(
-      (std::is_nothrow_move_constructible_v<absl::InlinedVector<MoveOnly, 2>>));
+  EXPECT_TRUE(std::is_nothrow_move_constructible<IntVec>::value);
+  EXPECT_TRUE((std::is_nothrow_move_constructible<
+               absl::InlinedVector<MoveOnly, 2>>::value));
 
   struct MoveCanThrow {
     MoveCanThrow(MoveCanThrow&&) {}
   };
   EXPECT_EQ(absl::default_allocator_is_nothrow::value,
-            (std::is_nothrow_move_constructible_v<
-                absl::InlinedVector<MoveCanThrow, 2>>));
+            (std::is_nothrow_move_constructible<
+                absl::InlinedVector<MoveCanThrow, 2>>::value));
 }
 
 TEST(InlinedVectorTest, EmplaceBack) {

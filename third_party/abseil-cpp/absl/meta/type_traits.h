@@ -231,7 +231,7 @@ template <typename T>
 using remove_cvref = std::remove_cvref<T>;
 
 template <typename T>
-using remove_cvref_t = std::remove_cvref_t<T>;
+using remove_cvref_t = typename std::remove_cvref<T>::type;
 #else
 // remove_cvref()
 //
@@ -239,7 +239,8 @@ using remove_cvref_t = std::remove_cvref_t<T>;
 // C++20.
 template <typename T>
 struct remove_cvref {
-  using type = std::remove_cv_t<std::remove_reference_t<T>>;
+  using type =
+      typename std::remove_cv<typename std::remove_reference<T>::type>::type;
 };
 
 template <typename T>
@@ -295,9 +296,9 @@ struct IsHashable : std::false_type {};
 template <typename Key>
 struct IsHashable<
     Key,
-    std::enable_if_t<std::is_convertible_v<
+    std::enable_if_t<std::is_convertible<
         decltype(std::declval<std::hash<Key>&>()(std::declval<Key const&>())),
-        std::size_t>>> : std::true_type {};
+        std::size_t>::value>> : std::true_type {};
 
 struct AssertHashEnabledHelper {
  private:
@@ -315,19 +316,19 @@ struct AssertHashEnabledHelper {
     static_assert(IsHashable<Key>::value,
                   "std::hash<Key> does not provide a call operator");
     static_assert(
-        std::is_default_constructible_v<std::hash<Key>>,
+        std::is_default_constructible<std::hash<Key>>::value,
         "std::hash<Key> must be default constructible when it is enabled");
     static_assert(
-        std::is_copy_constructible_v<std::hash<Key>>,
+        std::is_copy_constructible<std::hash<Key>>::value,
         "std::hash<Key> must be copy constructible when it is enabled");
-    static_assert(std::is_copy_assignable_v<std::hash<Key>>,
+    static_assert(std::is_copy_assignable<std::hash<Key>>::value,
                   "std::hash<Key> must be copy assignable when it is enabled");
     // is_destructible is unchecked as it's implied by each of the
     // is_constructible checks.
     using ReturnType = decltype(GetReturnType<Key>(0));
-    static_assert(
-        std::is_same_v<ReturnType, NAT> || std::is_same_v<ReturnType, size_t>,
-        "std::hash<Key> must return size_t");
+    static_assert(std::is_same<ReturnType, NAT>::value ||
+                      std::is_same<ReturnType, size_t>::value,
+                  "std::hash<Key> must return size_t");
     return nullptr;
   }
 
@@ -361,7 +362,7 @@ using IsSwappableImpl = decltype(swap(std::declval<T&>(), std::declval<T&>()));
 template <class T,
           class IsNoexcept = std::integral_constant<
               bool, noexcept(swap(std::declval<T&>(), std::declval<T&>()))>>
-using IsNothrowSwappableImpl = std::enable_if_t<IsNoexcept::value>;
+using IsNothrowSwappableImpl = typename std::enable_if<IsNoexcept::value>::type;
 
 // IsSwappable
 //
@@ -480,10 +481,10 @@ struct is_trivially_relocatable
 // TODO(b/325479096): Remove this case.
 template <class T>
 struct is_trivially_relocatable
-    : std::integral_constant<bool,
-                             std::is_trivially_copyable_v<T> ||
-                                 (__is_trivially_relocatable(T) &&
-                                  std::is_trivially_move_assignable_v<T>)> {};
+    : std::integral_constant<
+          bool, std::is_trivially_copyable<T>::value ||
+                    (__is_trivially_relocatable(T) &&
+                     std::is_trivially_move_assignable<T>::value)> {};
 #else
 // Otherwise we use a fallback that detects only those types we can feasibly
 // detect. Any type that is trivially copyable is by definition trivially
@@ -544,13 +545,14 @@ namespace type_traits_internal {
 // Do not specialize or use this directly. It's an implementation detail.
 template <typename T, typename = void>
 struct IsOwnerImpl : std::false_type {
-  static_assert(std::is_same_v<T, absl::remove_cvref_t<T>>,
+  static_assert(std::is_same<T, absl::remove_cvref_t<T>>::value,
                 "type must lack qualifiers");
 };
 
 template <typename T>
 struct IsOwnerImpl<
-    T, std::enable_if_t<std::is_class_v<typename T::absl_internal_is_view>>>
+    T,
+    std::enable_if_t<std::is_class<typename T::absl_internal_is_view>::value>>
     : std::negation<typename T::absl_internal_is_view> {};
 
 // A trait to determine whether a type is an owner.
@@ -586,13 +588,14 @@ struct IsOwner<std::vector<T, Alloc>> : std::true_type {};
 // Do not specialize or use this directly.
 template <typename T, typename = void>
 struct IsViewImpl : std::false_type {
-  static_assert(std::is_same_v<T, absl::remove_cvref_t<T>>,
+  static_assert(std::is_same<T, absl::remove_cvref_t<T>>::value,
                 "type must lack qualifiers");
 };
 
 template <typename T>
 struct IsViewImpl<
-    T, std::enable_if_t<std::is_class_v<typename T::absl_internal_is_view>>>
+    T,
+    std::enable_if_t<std::is_class<typename T::absl_internal_is_view>::value>>
     : T::absl_internal_is_view {};
 
 // A trait to determine whether a type is a view.
@@ -604,7 +607,7 @@ struct IsViewImpl<
 // If it ever becomes possible to detect [[gsl::Pointer]], we should leverage
 // it: https://wg21.link/p1179
 template <typename T>
-struct IsView : std::integral_constant<bool, std::is_pointer_v<T> ||
+struct IsView : std::integral_constant<bool, std::is_pointer<T>::value ||
                                                  IsViewImpl<T>::value> {};
 
 // This allows incomplete types to be used for associative containers, and also
@@ -631,7 +634,7 @@ struct IsView<std::span<T>> : std::true_type {};
 // to a "view" (such as std::string_view) to be a lifetime-bound assignment.
 template <typename T, typename U>
 using IsLifetimeBoundAssignment = std::conjunction<
-    std::integral_constant<bool, !std::is_lvalue_reference_v<U>>,
+    std::integral_constant<bool, !std::is_lvalue_reference<U>::value>,
     IsOwner<absl::remove_cvref_t<U>>, IsView<absl::remove_cvref_t<T>>>;
 
 }  // namespace type_traits_internal

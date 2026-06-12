@@ -25,16 +25,16 @@ namespace {
 using absl::random_internal::Randen;
 
 TEST(RandenTest, CopyAndMove) {
-  static_assert(std::is_copy_constructible_v<Randen>,
+  static_assert(std::is_copy_constructible<Randen>::value,
                 "Randen must be copy constructible");
 
-  static_assert(std::is_copy_assignable_v<Randen>,
+  static_assert(std::is_copy_assignable<Randen>::value,
                 "Randen must be copy assignable");
 
-  static_assert(std::is_move_constructible_v<Randen>,
+  static_assert(std::is_move_constructible<Randen>::value,
                 "Randen must be move constructible");
 
-  static_assert(std::is_move_assignable_v<Randen>,
+  static_assert(std::is_move_assignable<Randen>::value,
                 "Randen must be move assignable");
 }
 

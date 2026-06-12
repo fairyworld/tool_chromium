@@ -173,9 +173,10 @@ class chunked_queue {
     using iterator_category = std::forward_iterator_tag;
     using value_type = typename AllocatorTraits::value_type;
     using difference_type = typename AllocatorTraits::difference_type;
-    using pointer = std::conditional_t<std::is_const_v<CT>,
-                                       typename AllocatorTraits::const_pointer,
-                                       typename AllocatorTraits::pointer>;
+    using pointer =
+        typename std::conditional<std::is_const<CT>::value,
+                                  typename AllocatorTraits::const_pointer,
+                                  typename AllocatorTraits::pointer>::type;
     using reference = CT&;
 
     basic_iterator() = default;

@@ -606,7 +606,7 @@ namespace std {
 template <int H>
 struct hash<Hashable<H>> {
   template <class E = Hashable<H>,
-            class = std::enable_if_t<E::HashableBy(kStd)>>
+            class = typename std::enable_if<E::HashableBy(kStd)>::type>
   size_t operator()(E) const {
     return kStd;
   }
