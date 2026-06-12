@@ -559,6 +559,8 @@ void BookmarkContextMenuController::ExecuteCommand(int id, int event_flags) {
     }
 
     case IDC_BOOKMARK_BAR_SUBMENU_ALWAYS_SHOW: {
+      base::RecordAction(
+          base::UserMetricsAction("BookmarkBar_ContextMenu_AlwaysShow"));
       prefs->SetInteger(
           bookmarks::prefs::kBookmarkBarVisibilityState,
           static_cast<int>(bookmarks::BookmarkBarVisibilityState::kAlwaysShow));
@@ -566,6 +568,8 @@ void BookmarkContextMenuController::ExecuteCommand(int id, int event_flags) {
     }
 
     case IDC_BOOKMARK_BAR_SUBMENU_ALWAYS_HIDE: {
+      base::RecordAction(
+          base::UserMetricsAction("BookmarkBar_ContextMenu_AlwaysHide"));
       prefs->SetInteger(
           bookmarks::prefs::kBookmarkBarVisibilityState,
           static_cast<int>(bookmarks::BookmarkBarVisibilityState::kAlwaysHide));
@@ -573,6 +577,8 @@ void BookmarkContextMenuController::ExecuteCommand(int id, int event_flags) {
     }
 
     case IDC_BOOKMARK_BAR_SUBMENU_ONLY_ON_NTP: {
+      base::RecordAction(
+          base::UserMetricsAction("BookmarkBar_ContextMenu_OnlyShowOnNtp"));
       prefs->SetInteger(
           bookmarks::prefs::kBookmarkBarVisibilityState,
           static_cast<int>(
