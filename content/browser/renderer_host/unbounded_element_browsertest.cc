@@ -151,12 +151,14 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
   ASSERT_TRUE(ExecJs(primary_main_frame_host(), script));
   WaitForFrameReady();
 
+  std::string get_style =
+      "getComputedStyle(document.getElementById('target')).visibility";
+  EXPECT_EQ("visible", EvalJs(primary_main_frame_host(), get_style));
+
   SimulateKeyPress(web_contents(), ui::DomKey::ESCAPE, ui::DomCode::ESCAPE,
                    ui::VKEY_ESCAPE, false, false, false, false);
   RunUntilInputProcessed(primary_main_frame_host()->GetRenderWidgetHost());
 
-  std::string get_style =
-      "getComputedStyle(document.getElementById('target')).visibility";
   EXPECT_EQ("hidden", EvalJs(primary_main_frame_host(), get_style));
 }
 
@@ -177,11 +179,13 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
   ASSERT_TRUE(ExecJs(primary_main_frame_host(), script));
   WaitForFrameReady();
 
+  std::string get_style =
+      "getComputedStyle(document.getElementById('target')).visibility";
+  EXPECT_EQ("visible", EvalJs(primary_main_frame_host(), get_style));
+
   SimulateMouseClickAt(web_contents(), 0, blink::WebMouseEvent::Button::kLeft,
                        gfx::Point(300, 300));
   RunUntilInputProcessed(primary_main_frame_host()->GetRenderWidgetHost());
-  std::string get_style =
-      "getComputedStyle(document.getElementById('target')).visibility";
   EXPECT_EQ("hidden", EvalJs(primary_main_frame_host(), get_style));
 }
 
