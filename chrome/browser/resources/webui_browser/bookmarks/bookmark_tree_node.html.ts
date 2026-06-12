@@ -10,7 +10,7 @@ export function getHtml(this: BookmarkTreeNodeElement) {
   // clang-format off
   return html`
 ${this.node.folder ? html`
-  <details ?open="${this.node.folder.id === 1n}">
+  <details>
     <summary>${this.node.folder.title || 'Bookmarks'}</summary>
     <div class="folder-children">
       ${this.node.folder.children.map(item => html`

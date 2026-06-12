@@ -5,6 +5,7 @@
 module bookmarks_api.mojom;
 
 import "mojo/public/mojom/base/error.mojom";
+import "mojo/public/mojom/base/uuid.mojom";
 import "url/mojom/url.mojom";
 
 // Represents a node in the bookmarks hierarchy.
@@ -15,14 +16,14 @@ union BookmarkNode {
 
 // Represents a url node.
 struct Url {
-  int64 id;
+  mojo_base.mojom.Uuid id;
   string title;
   url.mojom.Url url;
 };
 
 // Represents a bookmark node.
 struct Folder {
-  int64 id;
+  mojo_base.mojom.Uuid id;
   string title;
   array<BookmarkNode> children;
 };
@@ -34,5 +35,6 @@ interface BookmarksService {
   GetBookmarks() => result<BookmarkNode, mojo_base.mojom.Error>;
 
   // Get a specific bookmark node by ID.
-  GetBookmark(int64 id) => result<BookmarkNode, mojo_base.mojom.Error>;
+  GetBookmark(mojo_base.mojom.Uuid id)
+      => result<BookmarkNode, mojo_base.mojom.Error>;
 };

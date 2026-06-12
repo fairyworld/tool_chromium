@@ -5,6 +5,7 @@
 #include "components/browser_apis/bookmarks/bookmarks_service_impl.h"
 
 #include "base/test/task_environment.h"
+#include "base/uuid.h"
 #include "components/bookmarks/browser/bookmark_model.h"
 #include "components/bookmarks/test/bookmark_test_helpers.h"
 #include "components/bookmarks/test/test_bookmark_client.h"
@@ -40,7 +41,7 @@ TEST_F(BookmarksServiceImplTest, GetBookmarks_Empty) {
   ASSERT_TRUE(result.has_value());
   ASSERT_TRUE(result.value()->is_folder());
   const auto& root_folder = result.value()->get_folder();
-  EXPECT_EQ(root_folder->id, model_->root_node()->id());
+  EXPECT_EQ(root_folder->id, model_->root_node()->uuid());
 
   ASSERT_EQ(root_folder->children.size(), 3u);
   ASSERT_TRUE(root_folder->children[0]->is_folder());
@@ -52,7 +53,7 @@ TEST_F(BookmarksServiceImplTest, GetBookmarks_Empty) {
 }
 
 TEST_F(BookmarksServiceImplTest, GetBookmark_NotFound) {
-  auto result = service_->GetBookmark(999);
+  auto result = service_->GetBookmark(base::Uuid::GenerateRandomV4());
   EXPECT_FALSE(result.has_value());
   EXPECT_EQ(result.error()->code, mojo_base::mojom::Code::kNotFound);
 }
@@ -63,11 +64,11 @@ TEST_F(BookmarksServiceImplTest, GetBookmark_Success) {
   const bookmarks::BookmarkNode* node =
       model_->AddURL(parent, 0, u"Title", GURL("http://example.com"));
 
-  auto result = service_->GetBookmark(node->id());
+  auto result = service_->GetBookmark(node->uuid());
   ASSERT_TRUE(result.has_value());
   ASSERT_TRUE(result.value()->is_url());
   const auto& url_node = result.value()->get_url();
-  EXPECT_EQ(url_node->id, node->id());
+  EXPECT_EQ(url_node->id, node->uuid());
   EXPECT_EQ(url_node->title, "Title");
   EXPECT_EQ(url_node->url, GURL("http://example.com"));
 }

@@ -31,7 +31,7 @@ export class BookmarkTreeNodeElement extends CrLitElement {
 
   accessor node: BookmarkNode = {
     folder: {
-      id: 0n,
+      id: {value: ''},
       title: '',
       children: [],
     },

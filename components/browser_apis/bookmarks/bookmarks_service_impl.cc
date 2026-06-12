@@ -35,14 +35,19 @@ BookmarksServiceImpl::GetBookmarks() {
 }
 
 mojom::BookmarksService::GetBookmarkResult BookmarksServiceImpl::GetBookmark(
-    int64_t id) {
+    const base::Uuid& id) {
   if (!bookmark_model_ || !bookmark_model_->loaded()) {
     return base::unexpected(mojo_base::mojom::Error::New(
         mojo_base::mojom::Code::kFailedPrecondition,
         "Bookmark model not loaded"));
   }
-  const bookmarks::BookmarkNode* node =
-      bookmarks::GetBookmarkNodeByID(bookmark_model_, id);
+  const bookmarks::BookmarkNode* node = bookmark_model_->GetNodeByUuid(
+      id, bookmarks::BookmarkModel::NodeTypeForUuidLookup::kAccountNodes);
+  if (!node) {
+    node = bookmark_model_->GetNodeByUuid(
+        id,
+        bookmarks::BookmarkModel::NodeTypeForUuidLookup::kLocalOrSyncableNodes);
+  }
   if (!node) {
     return base::unexpected(mojo_base::mojom::Error::New(
         mojo_base::mojom::Code::kNotFound, "Bookmark not found"));
@@ -54,13 +59,13 @@ mojom::BookmarkNodePtr BookmarksServiceImpl::ConvertNode(
     const bookmarks::BookmarkNode* node) {
   if (node->is_url()) {
     auto url_node = mojom::Url::New();
-    url_node->id = node->id();
+    url_node->id = node->uuid();
     url_node->title = base::UTF16ToUTF8(node->GetTitle());
     url_node->url = node->url();
     return mojom::BookmarkNode::NewUrl(std::move(url_node));
   } else {
     auto folder_node = mojom::Folder::New();
-    folder_node->id = node->id();
+    folder_node->id = node->uuid();
     folder_node->title = base::UTF16ToUTF8(node->GetTitle());
     for (const auto& child : node->children()) {
       folder_node->children.push_back(ConvertNode(child.get()));
