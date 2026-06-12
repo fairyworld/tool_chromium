@@ -1381,6 +1381,8 @@ public final class ProductionSupportedFlagList {
                 AwFeatures.WEBVIEW_SET_DOWNLOAD_FAVICONS_ENABLED,
                 "Enables the WebSettings setDownloadFaviconsEnabled method"),
         Flag.baseFeature(
+                AwFeatures.WEBVIEW_MEMORY_PROFILING_CLIENT, "Enables Heap Profiler support"),
+        Flag.baseFeature(
                 "WebViewHttpCacheQuotaApi",
                 "When enabled, HTTP cache quota can be managed via support library APIs."),
         Flag.baseFeature(

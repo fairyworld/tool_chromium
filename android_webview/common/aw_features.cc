@@ -50,6 +50,14 @@ BASE_FEATURE(kWebViewFileSystemAccess, base::FEATURE_DISABLED_BY_DEFAULT);
 // Force the default WebAuthn state to be APP mode.
 BASE_FEATURE(kWebViewForceWebAuthn, base::FEATURE_DISABLED_BY_DEFAULT);
 
+// Install the profiling client with memory_system::Initializer. If this is
+// enabled the profiler MAY be started by
+// HeapProfilerController::StartIfEnabled, which is controlled by the
+// cross-platform features in
+// components/heap_profiling/in_process/heap_profiler_parameters.h. Otherwise
+// the profiler will never be started.
+BASE_FEATURE(kWebViewMemoryProfilingClient, base::FEATURE_DISABLED_BY_DEFAULT);
+
 // Enables lazy profile creation in WebView.
 BASE_FEATURE(kWebViewProfileStoreNotTriggerStartup,
              base::FEATURE_DISABLED_BY_DEFAULT);
