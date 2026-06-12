@@ -1170,7 +1170,8 @@ bool AreNumbersEqual(CGFloat num1, CGFloat num2) {
   // Ensures that fake omnibox visibility is correct.
   // On iPads, fake omnibox disappears and becomes real omnibox. On other
   // devices, fake omnibox persists and sticks to top.
-  if ([ChromeEarlGrey isIPadIdiom] && [ChromeEarlGrey isChromeNextEnabled]) {
+  // For Next, the fakebox always disappears.
+  if ([ChromeEarlGrey isIPadIdiom] || [ChromeEarlGrey isChromeNextEnabled]) {
     [[EarlGrey selectElementWithMatcher:chrome_test_util::FakeOmnibox()]
         assertWithMatcher:mostlyNotVisible()];
   } else {
