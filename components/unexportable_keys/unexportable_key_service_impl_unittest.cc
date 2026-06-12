@@ -12,10 +12,13 @@
 #include "base/containers/span.h"
 #include "base/containers/to_vector.h"
 #include "base/functional/callback.h"
+#include "base/logging.h"
 #include "base/memory/ref_counted.h"
+#include "base/strings/strcat.h"
 #include "base/test/bind.h"
 #include "base/test/gmock_expected_support.h"
 #include "base/test/gmock_move_support.h"
+#include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
 #include "base/test/test_future.h"
@@ -59,7 +62,20 @@ constexpr BackgroundTaskPriority kTaskPriority =
 constexpr BackgroundTaskOrigin kTaskOrigin =
     BackgroundTaskOrigin::kDeviceBoundSessionCredentials;
 
+constexpr std::string_view kSpareSigningKeyPoolHistogramPrefix =
+    "Crypto.UnexportableKeys.SparePool.Signing.";
+constexpr std::string_view kSparePoolRetrievalResultSuffix = "RetrievalResult";
+constexpr std::string_view kSparePoolSizeSuffix = "PoolSize";
+constexpr std::string_view kSparePoolRequestLatencySuffix = "RequestLatency";
+constexpr std::string_view kSparePoolGenerateErrorSuffix = "GenerateError";
+constexpr std::string_view kSparePoolReplenishmentLatencySuffix =
+    "ReplenishmentLatency";
+
 constexpr base::TimeDelta kSpareKeyPoolDelay = base::Minutes(2);
+
+std::string GetSparePoolHistogramName(std::string_view suffix) {
+  return base::StrCat({kSpareSigningKeyPoolHistogramPrefix, suffix});
+}
 
 }  // namespace
 
@@ -124,6 +140,9 @@ class UnexportableKeyServiceImplTest : public testing::Test {
                                             future.GetCallback());
     return future;
   }
+
+ protected:
+  base::HistogramTester histogram_tester_;
 
  private:
   base::test::TaskEnvironment task_environment_{
@@ -1537,6 +1556,42 @@ TEST_F(UnexportableKeyServiceImplTest, SpareSigningKeyPoolCapacityLimits) {
   EXPECT_FALSE(f3.IsReady());
   RunBackgroundTasks();
   EXPECT_OK(f3.Get());
+
+  // Verify UMA histograms.
+  // Chronological trace of the pool size at each request:
+  // 1. First request (f1): The pool has been fully replenished to capacity 2.
+  //    Logs PoolSize = 2. The key is popped, reducing the pool size to 1.
+  // 2. Second request (f2): The pool has 1 key remaining.
+  //    Logs PoolSize = 1. The key is popped, reducing the pool size to 0.
+  // 3. Third request (f3): The pool is completely empty (size 0).
+  //    Logs PoolSize = 0. This results in a cache miss and falls back to a
+  //    background task.
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolSizeSuffix), 3);
+  histogram_tester_.ExpectBucketCount(
+      GetSparePoolHistogramName(kSparePoolSizeSuffix), 2, 1);
+  histogram_tester_.ExpectBucketCount(
+      GetSparePoolHistogramName(kSparePoolSizeSuffix), 1, 1);
+  histogram_tester_.ExpectBucketCount(
+      GetSparePoolHistogramName(kSparePoolSizeSuffix), 0, 1);
+
+  // Verify retrieval results.
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolRetrievalResultSuffix), 3);
+  histogram_tester_.ExpectBucketCount(
+      GetSparePoolHistogramName(kSparePoolRetrievalResultSuffix),
+      SpareKeyPoolRetrievalResult::kHit, 2);
+  histogram_tester_.ExpectBucketCount(
+      GetSparePoolHistogramName(kSparePoolRetrievalResultSuffix),
+      SpareKeyPoolRetrievalResult::kMissDidNotReplenishFromLastUse, 1);
+
+  // Verify actual latency values: all requests (hits and misses) execute
+  // instantaneously in mock time (0ms).
+  histogram_tester_.ExpectTimeBucketCount(
+      GetSparePoolHistogramName(kSparePoolRequestLatencySuffix),
+      base::TimeDelta(), 3);
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolRequestLatencySuffix), 3);
 }
 
 TEST_F(UnexportableKeyServiceImplTest, SpareSigningKeyPoolMiss) {
@@ -1555,6 +1610,97 @@ TEST_F(UnexportableKeyServiceImplTest, SpareSigningKeyPoolMiss) {
   RunBackgroundTasks();
 
   EXPECT_OK(future.Get());
+  histogram_tester_.ExpectUniqueSample(
+      GetSparePoolHistogramName(kSparePoolRetrievalResultSuffix),
+      SpareKeyPoolRetrievalResult::kMissNotInitialized, 1);
+  histogram_tester_.ExpectUniqueSample(
+      GetSparePoolHistogramName(kSparePoolSizeSuffix), 0, 1);
+  histogram_tester_.ExpectTimeBucketCount(
+      GetSparePoolHistogramName(kSparePoolRequestLatencySuffix),
+      base::TimeDelta(), 1);
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolRequestLatencySuffix), 1);
+}
+
+TEST_F(UnexportableKeyServiceImplTest,
+       SpareSigningKeyPoolMissNoKeyForAlgorithm) {
+  base::test::ScopedFeatureList feature_list(
+      kEnableUnexportableKeysSpareKeyPool);
+
+  ResetService();
+
+  base::test::TestFuture<ServiceErrorOr<UnexportableSigningKeyId>> future;
+  service().GenerateSigningKeySlowlyAsync(
+      {crypto::SignatureVerifier::SignatureAlgorithm::RSA_PKCS1_SHA1},
+      kTaskPriority, future.GetCallback());
+
+  RunBackgroundTasks();
+
+  // RSA_PKCS1_SHA1 is not supported by the provider, so the key generation
+  // should fail.
+  EXPECT_THAT(future.Get(), ErrorIs(ServiceError::kAlgorithmNotSupported));
+
+  // Verify that the retrieval result logs that the algorithm is not supported
+  // by the hardware, and that the request latency is recorded.
+  histogram_tester_.ExpectUniqueSample(
+      GetSparePoolHistogramName(kSparePoolRetrievalResultSuffix),
+      SpareKeyPoolRetrievalResult::kAlgorithmNotSupported, 1);
+  histogram_tester_.ExpectTimeBucketCount(
+      GetSparePoolHistogramName(kSparePoolRequestLatencySuffix),
+      base::TimeDelta(), 1);
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolRequestLatencySuffix), 1);
+}
+
+TEST_F(UnexportableKeyServiceImplTest,
+       SpareSigningKeyPoolMissNoKeyForAlgorithmButPoolNotEmpty) {
+  base::test::ScopedFeatureList feature_list(
+      kEnableUnexportableKeysSpareKeyPool);
+
+  ResetService();
+
+  // Use Mock provider to force replenishment to only generate ECDSA keys.
+  crypto::MockUnexportableKeyProvider& mock_provider =
+      SwitchToMockKeyProvider().mock();
+  EXPECT_CALL(mock_provider, GenerateSigningKeySlowly)
+      .WillRepeatedly([](base::span<
+                          const crypto::SignatureVerifier::SignatureAlgorithm>
+                             acceptable_algorithms) {
+        auto key =
+            std::make_unique<NiceMock<crypto::MockUnexportableSigningKey>>();
+        ON_CALL(*key, Algorithm)
+            .WillByDefault(Return(
+                crypto::SignatureVerifier::SignatureAlgorithm::ECDSA_SHA256));
+        static std::atomic<uint8_t> id{0};
+        ON_CALL(*key, GetWrappedKey)
+            .WillByDefault(Return(std::vector<uint8_t>{id++}));
+        return key;
+      });
+
+  // Trigger replenishment to fill the pool with ECDSA keys.
+  FastForwardBy(kSpareKeyPoolDelay);
+  RunBackgroundTasks();
+
+  // Request an RSA key.
+  // The provider supports both, so SelectAlgorithm will succeed, but the pool
+  // has no RSA keys.
+  base::test::TestFuture<ServiceErrorOr<UnexportableSigningKeyId>> future;
+  service().GenerateSigningKeySlowlyAsync(
+      {crypto::SignatureVerifier::SignatureAlgorithm::RSA_PKCS1_SHA256},
+      kTaskPriority, future.GetCallback());
+
+  // Since it's a miss, it falls back to slow path.
+  EXPECT_FALSE(future.IsReady());
+
+  RunBackgroundTasks();
+  EXPECT_OK(future.Get());
+
+  // Verify telemetry:
+  // We should see a miss due to kMissNoKeyForAlgorithm because the pool was
+  // NOT empty (it had ECDSA keys), but had no RSA keys.
+  histogram_tester_.ExpectUniqueSample(
+      GetSparePoolHistogramName(kSparePoolRetrievalResultSuffix),
+      SpareKeyPoolRetrievalResult::kMissNoKeyForAlgorithm, 1);
 }
 
 TEST_F(UnexportableKeyServiceImplTest, SpareSigningKeyPoolHit) {
@@ -1593,6 +1739,42 @@ TEST_F(UnexportableKeyServiceImplTest, SpareSigningKeyPoolHit) {
   // Run pending background replenishment tasks to avoid a dangling pointer
   // crash during TaskEnvironment teardown.
   RunBackgroundTasks();
+
+  // Verify retrieval results.
+  histogram_tester_.ExpectBucketCount(
+      GetSparePoolHistogramName(kSparePoolRetrievalResultSuffix),
+      SpareKeyPoolRetrievalResult::kHit, 3);
+  histogram_tester_.ExpectBucketCount(
+      GetSparePoolHistogramName(kSparePoolRetrievalResultSuffix),
+      SpareKeyPoolRetrievalResult::kMissDidNotReplenishFromLastUse, 1);
+
+  // Verify PoolSize:
+  // f1 saw 2, f2 saw 1, f3 saw 0, f4 saw 2 (fully replenished).
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolSizeSuffix), 4);
+  histogram_tester_.ExpectBucketCount(
+      GetSparePoolHistogramName(kSparePoolSizeSuffix), 2, 2);
+  histogram_tester_.ExpectBucketCount(
+      GetSparePoolHistogramName(kSparePoolSizeSuffix), 1, 1);
+  histogram_tester_.ExpectBucketCount(
+      GetSparePoolHistogramName(kSparePoolSizeSuffix), 0, 1);
+
+  // Verify actual latency values: all requests (hits and misses) execute
+  // instantaneously in mock time (0ms).
+  histogram_tester_.ExpectTimeBucketCount(
+      GetSparePoolHistogramName(kSparePoolRequestLatencySuffix),
+      base::TimeDelta(), 4);
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolRequestLatencySuffix), 4);
+
+  // Verify replenishment latency: 5 successful replenishment tasks completed
+  // and all took exactly 0ms in mock time.
+  histogram_tester_.ExpectUniqueSample(
+      GetSparePoolHistogramName(kSparePoolReplenishmentLatencySuffix), 0, 5);
+
+  histogram_tester_.ExpectUniqueSample(
+      GetSparePoolHistogramName(kSparePoolGenerateErrorSuffix),
+      kNoServiceErrorForMetrics, 5);
 }
 
 TEST_F(UnexportableKeyServiceImplTest,
@@ -1653,6 +1835,44 @@ TEST_F(UnexportableKeyServiceImplTest,
   // Run pending background replenishment tasks to avoid a dangling pointer
   // crash during TaskEnvironment teardown.
   RunBackgroundTasks();
+
+  // Verify retrieval results.
+  histogram_tester_.ExpectBucketCount(
+      GetSparePoolHistogramName(kSparePoolRetrievalResultSuffix),
+      SpareKeyPoolRetrievalResult::kMissFailedToCreateSpareKey, 1);
+  histogram_tester_.ExpectBucketCount(
+      GetSparePoolHistogramName(kSparePoolRetrievalResultSuffix),
+      SpareKeyPoolRetrievalResult::kHit, 1);
+  histogram_tester_.ExpectBucketCount(
+      GetSparePoolHistogramName(kSparePoolGenerateErrorSuffix),
+      ServiceError::kCryptoApiFailed, 2);
+  histogram_tester_.ExpectBucketCount(
+      GetSparePoolHistogramName(kSparePoolGenerateErrorSuffix),
+      kNoServiceErrorForMetrics, 3);
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolGenerateErrorSuffix), 5);
+
+  // Verify PoolSize:
+  // f1 saw 0 (failed to replenish), f2 saw 2 (successfully replenished).
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolSizeSuffix), 2);
+  histogram_tester_.ExpectBucketCount(
+      GetSparePoolHistogramName(kSparePoolSizeSuffix), 0, 1);
+  histogram_tester_.ExpectBucketCount(
+      GetSparePoolHistogramName(kSparePoolSizeSuffix), 2, 1);
+
+  // Verify actual latency values: all requests (hits and misses) execute
+  // instantaneously in mock time (0ms).
+  histogram_tester_.ExpectTimeBucketCount(
+      GetSparePoolHistogramName(kSparePoolRequestLatencySuffix),
+      base::TimeDelta(), 2);
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolRequestLatencySuffix), 2);
+
+  // Verify replenishment latency: 3 successful replenishment tasks completed
+  // (the initial 2 failed and should not record latency), all taking 0ms.
+  histogram_tester_.ExpectUniqueSample(
+      GetSparePoolHistogramName(kSparePoolReplenishmentLatencySuffix), 0, 3);
 }
 
 TEST_F(UnexportableKeyServiceImplTest, SpareSigningKeyPoolFallback) {
@@ -1667,6 +1887,20 @@ TEST_F(UnexportableKeyServiceImplTest, SpareSigningKeyPoolFallback) {
   RunBackgroundTasks();
 
   EXPECT_OK(future.Get());
+
+  // Verify that no spare pool telemetry is logged since the pool is disabled.
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolRetrievalResultSuffix), 0);
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolSizeSuffix), 0);
+  // RequestLatency is still recorded when the feature is disabled (control
+  // group).
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolRequestLatencySuffix), 1);
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolGenerateErrorSuffix), 0);
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolReplenishmentLatencySuffix), 0);
 }
 
 TEST_F(UnexportableKeyServiceImplTest,
@@ -1688,6 +1922,20 @@ TEST_F(UnexportableKeyServiceImplTest,
   RunBackgroundTasks();
 
   EXPECT_THAT(future.Get(), ErrorIs(ServiceError::kOperationCancelled));
+
+  // Verify UMA histograms.
+  histogram_tester_.ExpectUniqueSample(
+      GetSparePoolHistogramName(kSparePoolRetrievalResultSuffix),
+      SpareKeyPoolRetrievalResult::kMissNotInitialized, 1);
+  histogram_tester_.ExpectUniqueSample(
+      GetSparePoolHistogramName(kSparePoolSizeSuffix), 0, 1);
+  histogram_tester_.ExpectTimeBucketCount(
+      GetSparePoolHistogramName(kSparePoolRequestLatencySuffix),
+      base::TimeDelta(), 1);
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolRequestLatencySuffix), 1);
+  histogram_tester_.ExpectTotalCount(
+      GetSparePoolHistogramName(kSparePoolGenerateErrorSuffix), 0);
 }
 
 }  // namespace unexportable_keys

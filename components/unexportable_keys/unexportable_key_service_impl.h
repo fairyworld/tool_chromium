@@ -29,6 +29,24 @@
 
 namespace unexportable_keys {
 
+// LINT.IfChange(SpareKeyPoolRetrievalResult)
+// These values are persisted to logs. Entries should not be renumbered and
+// numeric values should never be reused.
+enum class SpareKeyPoolRetrievalResult {
+  kHit = 0,
+  // We haven't initialized spare keys yet.
+  kMissNotInitialized = 1,
+  // We tried to initialize a spare key but creation failed.
+  kMissFailedToCreateSpareKey = 2,
+  // We decided to not create a key for this algorithm.
+  kMissNoKeyForAlgorithm = 3,
+  // A key got requested before we finished replenishing the pool.
+  kMissDidNotReplenishFromLastUse = 4,
+  // The hardware doesn't support the requested algorithm.
+  kAlgorithmNotSupported = 5,
+  kMaxValue = kAlgorithmNotSupported,
+};
+// LINT.ThenChange(/tools/metrics/histograms/metadata/net/enums.xml:SpareKeyPoolRetrievalResult)
 class UnexportableKeyTaskManager;
 class SpareKeyPoolRequest;
 
@@ -223,7 +241,9 @@ class COMPONENT_EXPORT(UNEXPORTABLE_KEYS) UnexportableKeyServiceImpl
   // queuing more tasks than needed to reach the maximum spare pool capacity.
   // We store unique_ptr to ensure pointer stability for the requests,
   // as they might be referenced asynchronously.
-  absl::flat_hash_set<std::unique_ptr<SpareKeyPoolRequest>>
+  // `std::nullopt` indicates that the pool has not started replenishing yet.
+  // When populated, it holds the in-flight requests.
+  std::optional<absl::flat_hash_set<std::unique_ptr<SpareKeyPoolRequest>>>
       inflight_spare_key_pool_requests_;
 
   base::WeakPtrFactory<UnexportableKeyServiceImpl> weak_ptr_factory_{this};

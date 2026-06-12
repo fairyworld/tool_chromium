@@ -790,6 +790,67 @@ chromium-metrics-reviews@google.com.
   </token>
 </histogram>
 
+<histogram name="Crypto.UnexportableKeys.SparePool.Signing.GenerateError"
+    enum="UnexportableKeyServiceResult" expires_after="2027-01-01">
+  <owner>amraboelkher@chromium.org</owner>
+  <owner>jdoerrie@chromium.org</owner>
+  <summary>
+    Recorded when a background task finishes generating a spare signing key to
+    replenish the pool, regardless of success or failure. Records 'Success' (0,
+    corresponding to kNoServiceErrorForMetrics in C++) or the specific
+    ServiceError code on failure.
+  </summary>
+</histogram>
+
+<histogram name="Crypto.UnexportableKeys.SparePool.Signing.PoolSize"
+    units="keys" expires_after="2027-01-01">
+  <owner>amraboelkher@chromium.org</owner>
+  <owner>jdoerrie@chromium.org</owner>
+  <summary>
+    Recorded when an asynchronous signing key generation request is received,
+    immediately before checking the pool for a hit or triggering replenishment.
+    Records the total number of spare signing keys currently sitting idle in the
+    pool for the requested algorithm.
+  </summary>
+</histogram>
+
+<histogram
+    name="Crypto.UnexportableKeys.SparePool.Signing.ReplenishmentLatency"
+    units="ms" expires_after="2027-01-01">
+  <owner>amraboelkher@chromium.org</owner>
+  <owner>jdoerrie@chromium.org</owner>
+  <summary>
+    Recorded when a background task successfully generates a spare signing key
+    to replenish the pool. Records the duration (in milliseconds) of the
+    background task from its launch until completion.
+  </summary>
+</histogram>
+
+<histogram name="Crypto.UnexportableKeys.SparePool.Signing.RequestLatency"
+    units="ms" expires_after="2027-01-01">
+  <owner>amraboelkher@chromium.org</owner>
+  <owner>jdoerrie@chromium.org</owner>
+  <summary>
+    Recorded when an asynchronous signing key generation request completes (its
+    callback is executed), regardless of whether the spare pool feature is
+    enabled or disabled. Records the duration (in milliseconds) from the initial
+    request until callback execution, covering both instantaneous pool hits and
+    slow fallback background generations.
+  </summary>
+</histogram>
+
+<histogram name="Crypto.UnexportableKeys.SparePool.Signing.RetrievalResult"
+    enum="SpareKeyPoolRetrievalResult" expires_after="2027-01-01">
+  <owner>amraboelkher@chromium.org</owner>
+  <owner>jdoerrie@chromium.org</owner>
+  <summary>
+    Recorded when a consumer requests a signing key asynchronously. Records the
+    outcome (hit, various miss reasons, or hardware support failure) of
+    attempting to retrieve a pre-generated spare signing key from the background
+    pool.
+  </summary>
+</histogram>
+
 <histogram name="Crypto.VirtualKeySupport" enum="TPMSupport"
     expires_after="2025-08-01">
   <owner>kristianm@chromium.org</owner>
