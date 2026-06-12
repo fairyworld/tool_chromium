@@ -341,8 +341,6 @@ void AutofillAiManager::OnAfterLoadedServerPredictions(
   if (PersonalContextAccessManager* access_manager =
           client_->GetPersonalContextAccessManager()) {
     base::flat_set<EntityType> requested_types(std::from_range, relevant_types);
-    // TODO(crbug.com/516721244): Ensure that types are not requested multiple
-    // times if OnAfterLoadedServerPredictions is called multiple times.
     access_manager->PrefetchAmbientAutofillContext(requested_types);
   }
 }
