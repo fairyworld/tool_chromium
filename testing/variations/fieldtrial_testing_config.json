@@ -23017,6 +23017,21 @@
             ]
         }
     ],
+    "StartSurfaceUserSetting": [
+        {
+            "platforms": [
+                "ios"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "enable_features": [
+                        "StartSurfaceUserSetting"
+                    ]
+                }
+            ]
+        }
+    ],
     "StatefulMemoryPressure": [
         {
             "platforms": [
