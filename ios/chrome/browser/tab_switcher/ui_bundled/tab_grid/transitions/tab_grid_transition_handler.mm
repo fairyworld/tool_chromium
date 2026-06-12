@@ -265,6 +265,7 @@ enum class TabGridTransitionType {
     if (IsFullscreenRefactoringEnabled()) {
       browserLayout.view.translatesAutoresizingMaskIntoConstraints = NO;
       AddSameConstraints(browserLayout.view, appContentGuide);
+      [parentViewController.view layoutIfNeeded];
     }
   } else {
     [tabGrid addChildViewController:browserLayout];
@@ -272,6 +273,7 @@ enum class TabGridTransitionType {
     if (IsFullscreenRefactoringEnabled()) {
       browserLayout.view.translatesAutoresizingMaskIntoConstraints = NO;
       AddSameConstraints(browserLayout.view, tabGrid.view);
+      [tabGrid.view layoutIfNeeded];
     }
   }
 
