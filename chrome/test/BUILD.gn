@@ -9490,7 +9490,10 @@ test("unit_tests") {
     ]
 
     if (is_win) {
-      deps += [ "//chrome/browser/win:registry_watcher" ]
+      deps += [
+        "//chrome/browser/ui/webui/default_browser:unit_tests",
+        "//chrome/browser/win:registry_watcher",
+      ]
     }
     if (is_mac) {
       deps += [ "//components/remote_cocoa/browser" ]
