@@ -1,6 +1,8 @@
 include_rules = [
   "+components/embedder_support/android/web_contents_delegate_jni_headers",
   "+components/input",
+  "+components/printing/browser",
+  "+printing/buildflags",
   "+content/public/browser",
   "+content/public/common",
   "+jni",

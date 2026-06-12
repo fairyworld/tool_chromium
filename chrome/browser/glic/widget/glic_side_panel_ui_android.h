@@ -13,6 +13,7 @@
 #include "chrome/browser/glic/service/glic_ui_embedder.h"
 #include "chrome/browser/ui/browser_window/public/browser_collection_observer.h"
 #include "content/public/browser/web_contents_delegate.h"
+#include "printing/buildflags/buildflags.h"
 
 class BrowserWindowInterface;
 class GlobalBrowserCollection;
@@ -83,6 +84,13 @@ class GlicSidePanelUi : public GlicUiEmbedder,
   void RunFileChooser(content::RenderFrameHost* render_frame_host,
                       scoped_refptr<content::FileSelectListener> listener,
                       const blink::mojom::FileChooserParams& params) override;
+#if BUILDFLAG(ENABLE_PRINTING)
+  void PrintCrossProcessSubframe(
+      content::WebContents* web_contents,
+      const gfx::Rect& rect,
+      int document_cookie,
+      content::RenderFrameHost* subframe_host) const override;
+#endif
 
   // BrowserCollectionObserver
   void OnBrowserActivated(BrowserWindowInterface* browser) override;

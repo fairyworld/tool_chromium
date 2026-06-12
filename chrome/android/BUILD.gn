@@ -916,11 +916,14 @@ if (_is_default_toolchain) {
 
     if (enable_printing) {
       sources += [
+        "java/src/org/chromium/chrome/browser/printing/ChromeThinWebViewPrintableFactory.java",
         "java/src/org/chromium/chrome/browser/printing/PrintHelper.java",
         "java/src/org/chromium/chrome/browser/printing/TabPrinter.java",
+        "java/src/org/chromium/chrome/browser/printing/WebContentsPrinter.java",
       ]
       deps += [
         "//base:supplier_java",
+        "//components/thin_webview/internal:internal_java",
         "//printing:printing_java",
       ]
     }

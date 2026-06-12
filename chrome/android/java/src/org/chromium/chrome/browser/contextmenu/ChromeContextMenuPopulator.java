@@ -488,6 +488,9 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
             ModelList pageGroup = new ModelList();
             if (mMode == ContextMenuMode.THIN_WEB_VIEW) {
                 pageGroup.add(createListItem(Item.RELOAD));
+                if (mItemDelegate.isPrintSupported()) {
+                    pageGroup.add(createListItem(Item.PRINT_PAGE));
+                }
             } else {
                 if (UrlUtilities.isDownloadableScheme(mParams.getPageUrl())) {
                     pageGroup.add(

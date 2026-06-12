@@ -22,6 +22,7 @@ android_library("java") {
     "java/src/org/chromium/components/thinwebview/ThinWebView.java",
     "java/src/org/chromium/components/thinwebview/ThinWebViewAttachParams.java",
     "java/src/org/chromium/components/thinwebview/ThinWebViewConstraints.java",
+    "java/src/org/chromium/components/thinwebview/ThinWebViewPrintableFactory.java",
   ]
 
   deps = [
@@ -29,6 +30,7 @@ android_library("java") {
     "//components/embedder_support/android:context_menu_java",
     "//components/embedder_support/android:web_contents_delegate_java",
     "//content/public/android:content_java",
+    "//printing:printing_java",
     "//third_party/androidx:androidx_annotation_annotation_java",
     "//ui/android:ui_java",
   ]

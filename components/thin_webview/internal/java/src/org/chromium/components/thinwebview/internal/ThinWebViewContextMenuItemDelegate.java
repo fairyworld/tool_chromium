@@ -4,6 +4,7 @@
 
 package org.chromium.components.thinwebview.internal;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.MailTo;
@@ -13,12 +14,18 @@ import android.provider.ContactsContract;
 import androidx.browser.customtabs.CustomTabsIntent;
 
 import org.chromium.base.IntentUtils;
+import org.chromium.base.ServiceLoaderUtil;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.components.embedder_support.contextmenu.ContextMenuItemDelegate;
 import org.chromium.components.embedder_support.util.UrlUtilities;
+import org.chromium.components.thinwebview.ThinWebViewPrintableFactory;
 import org.chromium.content_public.browser.WebContents;
 import org.chromium.content_public.common.Referrer;
+import org.chromium.printing.PrintManagerDelegateImpl;
+import org.chromium.printing.Printable;
+import org.chromium.printing.PrintingController;
+import org.chromium.printing.PrintingControllerImpl;
 import org.chromium.ui.base.Clipboard;
 import org.chromium.ui.base.WindowAndroid;
 import org.chromium.url.GURL;
@@ -31,6 +38,7 @@ public class ThinWebViewContextMenuItemDelegate implements ContextMenuItemDelega
     private final WebContents mWebContents;
     private final @Nullable String mIntentTargetClassName;
     private final @Nullable BiConsumer<GURL, String> mEphemeralTabOpener;
+    private final @Nullable ThinWebViewPrintableFactory mPrintableFactory;
 
     /** Builds a {@link ThinWebViewContextMenuItemDelegate} instance. */
     public ThinWebViewContextMenuItemDelegate(WebContents webContents) {
@@ -53,6 +61,7 @@ public class ThinWebViewContextMenuItemDelegate implements ContextMenuItemDelega
         mWebContents = webContents;
         mIntentTargetClassName = intentTargetClassName;
         mEphemeralTabOpener = ephemeralTabOpener;
+        mPrintableFactory = ServiceLoaderUtil.maybeCreate(ThinWebViewPrintableFactory.class);
     }
 
     @Override
@@ -192,6 +201,28 @@ public class ThinWebViewContextMenuItemDelegate implements ContextMenuItemDelega
             intent.putExtra(CustomTabsIntent.EXTRA_ENABLE_EPHEMERAL_BROWSING, true);
             safeStartActivity(intent);
         }
+    }
+
+    @Override
+    public boolean isPrintSupported() {
+        return mPrintableFactory != null && mPrintableFactory.create(mWebContents) != null;
+    }
+
+    @Override
+    public void startPrint() {
+        if (mPrintableFactory == null) return;
+
+        Printable printable = mPrintableFactory.create(mWebContents);
+        if (printable == null) return;
+
+        WindowAndroid window = mWebContents.getTopLevelNativeWindow();
+        if (window == null) return;
+
+        Activity activity = window.getActivity().get();
+        if (activity == null) return;
+
+        PrintingController printingController = PrintingControllerImpl.getInstance(window);
+        printingController.startPrint(printable, new PrintManagerDelegateImpl(activity));
     }
 
     private void safeStartActivity(Intent intent) {
