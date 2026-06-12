@@ -3,6 +3,5 @@ include_rules = [
   "+components/browser_ui/modaldialog/android",
   "+components/permissions",
   "+content/public",
-  "+printing/android",
   "+third_party/skia/include",
 ]

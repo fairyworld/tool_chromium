@@ -20,11 +20,6 @@
 #include "base/trace_event/trace_event.h"
 #include "components/embedder_support/android/delegate/color_picker_bridge.h"
 #include "components/input/native_web_keyboard_event.h"
-#include "printing/buildflags/buildflags.h"
-
-#if BUILDFLAG(ENABLE_PRINTING)
-#include "components/printing/browser/print_composite_client.h"  // nogncheck
-#endif
 #include "content/public/browser/color_chooser.h"
 #include "content/public/browser/global_request_id.h"
 #include "content/public/browser/invalidate_type.h"
@@ -720,19 +715,6 @@ void WebContentsDelegateAndroid::SetContentsBounds(content::WebContents* source,
   ScopedJavaLocalRef<jobject> jsource = source->GetJavaWebContents();
 
   Java_WebContentsDelegateAndroid_setContentsBounds(env, obj, jsource, bounds);
-}
-
-void WebContentsDelegateAndroid::PrintCrossProcessSubframe(
-    content::WebContents* web_contents,
-    const gfx::Rect& rect,
-    int document_cookie,
-    content::RenderFrameHost* subframe_host) const {
-#if BUILDFLAG(ENABLE_PRINTING)
-  auto* client = printing::PrintCompositeClient::FromWebContents(web_contents);
-  if (client) {
-    client->PrintCrossProcessSubframe(rect, document_cookie, subframe_host);
-  }
-#endif
 }
 
 }  // namespace web_contents_delegate_android

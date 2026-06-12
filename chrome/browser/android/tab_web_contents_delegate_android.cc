@@ -94,6 +94,11 @@
 #include "ui/gfx/geometry/skia_conversions.h"
 #include "url/android/gurl_android.h"
 #include "url/origin.h"
+
+#if BUILDFLAG(ENABLE_PRINTING)
+#include "components/printing/browser/print_composite_client.h"
+#endif
+
 #if BUILDFLAG(ENABLE_PAINT_PREVIEW)
 #include "components/paint_preview/browser/paint_preview_client.h"
 #endif
@@ -572,6 +577,18 @@ void TabWebContentsDelegateAndroid::GetAIPageContent(
         return result->proto.SerializeAsString();
       }).Then(std::move(callback)));
 }
+
+#if BUILDFLAG(ENABLE_PRINTING)
+void TabWebContentsDelegateAndroid::PrintCrossProcessSubframe(
+    content::WebContents* web_contents,
+    const gfx::Rect& rect,
+    int document_cookie,
+    content::RenderFrameHost* subframe_host) const {
+  auto* client = printing::PrintCompositeClient::FromWebContents(web_contents);
+  if (client)
+    client->PrintCrossProcessSubframe(rect, document_cookie, subframe_host);
+}
+#endif
 
 #if BUILDFLAG(ENABLE_PAINT_PREVIEW)
 void TabWebContentsDelegateAndroid::CapturePaintPreviewOfSubframe(

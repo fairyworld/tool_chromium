@@ -21,10 +21,6 @@
 #include "content/public/browser/file_select_listener.h"
 #include "content/public/browser/render_widget_host_view.h"
 #include "content/public/browser/web_contents.h"
-
-#if BUILDFLAG(ENABLE_PRINTING)
-#include "components/printing/browser/print_composite_client.h"
-#endif
 #include "ui/android/window_android.h"
 #include "ui/base/base_window.h"
 #include "ui/gfx/image/image.h"
@@ -281,18 +277,5 @@ void GlicSidePanelUi::RunFileChooser(
   FileSelectHelper::RunFileChooser(render_frame_host, std::move(listener),
                                    params);
 }
-
-#if BUILDFLAG(ENABLE_PRINTING)
-void GlicSidePanelUi::PrintCrossProcessSubframe(
-    content::WebContents* web_contents,
-    const gfx::Rect& rect,
-    int document_cookie,
-    content::RenderFrameHost* subframe_host) const {
-  auto* client = printing::PrintCompositeClient::FromWebContents(web_contents);
-  if (client) {
-    client->PrintCrossProcessSubframe(rect, document_cookie, subframe_host);
-  }
-}
-#endif
 
 }  // namespace glic
