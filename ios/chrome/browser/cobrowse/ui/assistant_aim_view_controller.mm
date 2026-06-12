@@ -123,6 +123,10 @@ constexpr CGFloat kThresholdForCompleteVisibility = 0.3;
         (kThresholdForCompleteVisibility - kThresholdForClosedState);
   }
 
+  if (percentage <= kThresholdForCompleteVisibility) {
+    [self hideHistoryAnimated];
+  }
+
   // This ensures the header end up centered in the collapsed state.
   _headerTopMargin.constant =
       kHeaderCenteringVerticalMargin +
@@ -317,6 +321,27 @@ constexpr CGFloat kThresholdForCompleteVisibility = 0.3;
   return fabs(translation.y) <= 3 * fabs(translation.x);
 }
 
+// Hides the history view with animation.
+- (void)hideHistoryAnimated {
+  if (!_historyViewController) {
+    return;
+  }
+
+  __weak __typeof(self) weakSelf = self;
+  __weak UIView* weakHistoryView = _historyViewController.view;
+  [UIView animateWithDuration:0.3
+      animations:^{
+        [self->_headerView setMode:AssistantAIMHeaderViewMode::kChat];
+        weakHistoryView.alpha = 0;
+        weakSelf.view.backgroundColor = [UIColor clearColor];
+        [weakSelf.view layoutIfNeeded];
+      }
+      completion:^(BOOL) {
+        [weakSelf hideHistory];
+      }];
+}
+
+// Hides the history view.
 - (void)hideHistory {
   if (!_historyViewController) {
     return;
