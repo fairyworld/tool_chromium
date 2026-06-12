@@ -5,11 +5,9 @@
 package org.chromium.chrome.browser.multiwindow;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.ActivityManager.AppTask;
 import android.app.ActivityOptions;
 import android.app.ApplicationExitInfo;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Build;
@@ -35,7 +33,6 @@ import org.chromium.chrome.browser.multiwindow.MultiInstanceManager.NewWindowApp
 import org.chromium.chrome.browser.preferences.ChromePreferenceKeys;
 import org.chromium.chrome.browser.preferences.ChromeSharedPreferences;
 import org.chromium.chrome.browser.tabwindow.TabWindowManager;
-import org.chromium.chrome.browser.util.AndroidTaskUtils;
 import org.chromium.ui.modaldialog.DialogDismissalCause;
 import org.chromium.ui.modaldialog.ModalDialogManager;
 import org.chromium.ui.modaldialog.ModalDialogProperties;
@@ -117,7 +114,7 @@ public class TabbedCrashRecoveryDelegate {
         // Reset state before processing a new crash recovery request to avoid using stale state.
         resetState();
 
-        mPreRecoveryAppTasks = getAppTasksById(hostActivity);
+        mPreRecoveryAppTasks = MultiWindowUtils.getAppTasksById(hostActivity);
         int crashedWindowTaskCount = 0;
         for (CrashRecoveryWindowInfo windowInfo : crashedWindows) {
             int windowId = windowInfo.windowId;
@@ -320,18 +317,6 @@ public class TabbedCrashRecoveryDelegate {
 
         RecordUserAction.record("Android.MultiWindow.CrashRecoveryDialogShown");
         modalDialogManager.showDialog(model, ModalDialogManager.ModalDialogType.APP);
-    }
-
-    private static Map<Integer, AppTask> getAppTasksById(Context context) {
-        ActivityManager activityManager =
-                (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        List<AppTask> appTasks = activityManager.getAppTasks();
-        Map<Integer, AppTask> results = new HashMap<>();
-        for (AppTask task : appTasks) {
-            ActivityManager.RecentTaskInfo info = AndroidTaskUtils.getTaskInfoFromTask(task);
-            if (info != null) results.put(info.taskId, task);
-        }
-        return results;
     }
 
     /* package */ void restoreWindows(ChromeTabbedActivity hostActivity) {
