@@ -46,7 +46,7 @@ void OmniboxPopupViewFullWebUI::UpdatePopupAppearance() {
   // directly from specific events (focus, tab switch).
 }
 
-void OmniboxPopupViewFullWebUI::PushTextToWebUI() {
+void OmniboxPopupViewFullWebUI::PushTextToWebUI(bool is_double_click) {
   if (is_switching_tab_) {
     return;
   }
@@ -56,13 +56,24 @@ void OmniboxPopupViewFullWebUI::PushTextToWebUI() {
         controller()->edit_model()->user_input_in_progress()
             ? controller()->edit_model()->user_text()
             : controller()->edit_model()->GetPermanentDisplayText();
+    gfx::Range selection;
+    if (auto* omnibox_view_views =
+            static_cast<OmniboxViewViews*>(omnibox_view_)) {
+      selection = omnibox_view_views->GetSelectedRange();
+    }
+
     // `last_sent_text_` is null after a state reset (e.g., tab switch).
-    // Otherwise, check if `text` has diverged (e.g., via navigation or
-    // internal WebUI-triggered model updates).
+    // Otherwise, check if `text` or `selection` has diverged.
     bool text_changed = !last_sent_text_ || text != *last_sent_text_;
-    if (text_changed) {
-      popup_handler->SetInputState(base::UTF16ToUTF8(text),
-                                   popup_handler->latest_selection());
+    bool selection_changed = selection != popup_handler->latest_selection();
+
+    if (text_changed || selection_changed) {
+      // TODO(crbug.com/497883783): Consider adding a dedicated
+      // `SetSelectionRange` IPC method so that when only the selection
+      // changes (e.g. during double clicks or mouse dragging), we do not push
+      // the input text and risk resetting DOM input state or scroll position.
+      popup_handler->SetInputState(base::UTF16ToUTF8(text), selection,
+                                   is_double_click);
       last_sent_text_ = text;
     }
   }
@@ -135,7 +146,7 @@ void OmniboxPopupViewFullWebUI::OnTabChanged(content::WebContents* contents) {
             ? controller()->edit_model()->user_text()
             : controller()->edit_model()->GetPermanentDisplayText();
     gfx::Range selection = state ? state->selection : gfx::Range(0, 0);
-    popup_handler->SetInputState(base::UTF16ToUTF8(text), selection);
+    popup_handler->SetInputState(base::UTF16ToUTF8(text), selection, false);
     last_sent_text_ = text;
   }
 }
@@ -147,7 +158,7 @@ void OmniboxPopupViewFullWebUI::OnFocus() {
 void OmniboxPopupViewFullWebUI::UpdatePopupStateAndContent(
     OmniboxPopupState state) {
   if (state == OmniboxPopupState::kFull) {
-    PushTextToWebUI();
+    PushTextToWebUI(false);
   }
   controller()->popup_state_manager()->SetPopupState(state);
 }

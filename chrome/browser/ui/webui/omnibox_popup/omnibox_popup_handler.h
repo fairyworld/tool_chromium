@@ -45,7 +45,9 @@ class OmniboxPopupHandler : public omnibox_popup::mojom::PageHandler {
   // omnibox_popup::mojom::Page:
   void OnShow();
   void OnContextMenuClosed();
-  void SetInputState(const std::string& text, const gfx::Range& selection);
+  void SetInputState(const std::string& text,
+                     const gfx::Range& selection,
+                     bool is_double_click);
 
   const gfx::Range& latest_selection() const { return latest_selection_; }
 

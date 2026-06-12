@@ -18,6 +18,8 @@ struct OmniboxInputState {
   // selection changes sent back from WebUI during asynchronous state
   // restoration.
   uint32 sequence_number;
+  // Whether the input was double clicked to open the omnibox.
+  bool is_double_click;
 };
 
 // Browser-side handler for the Omnibox Popup.

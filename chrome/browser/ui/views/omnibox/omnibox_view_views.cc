@@ -1428,8 +1428,33 @@ bool OmniboxViewViews::OnMousePressed(const ui::MouseEvent& event) {
   }
 
   is_mouse_pressed_ = true;
+
+  // Replicating native double-click word-selection in the Full WebUI Omnibox
+  // popup relies on forwarding raw mouse presses from the WebUI popup window to
+  // this native C++ textfield (`BrowserWidget`).
+  //
+  // However, in Full WebUI mode, the frameless WebUI popup window is the active
+  // OS window, so this underlying C++ textfield does not have native keyboard
+  // focus (`HasFocus()` is false). Furthermore, on the New Tab Page (NTP)
+  // before typing a query, `OmniboxController::IsPopupOpen()` logically returns
+  // false (because Autocomplete matches are completely empty or zero-suggest).
+  //
+  // To prevent `OnMousePressed()` from mistakenly assuming this forwarded click
+  // is an initial focus-gaining action and setting
+  // `select_all_on_mouse_release_` (which would forcefully wipe out any partial
+  // or double-click highlight on mouse release), we also verify the physical UI
+  // state (`GetOmniboxPopupView()->IsOpen()`). If the real physical WebUI popup
+  // view is open, we completely lock out the "select all on mouse release"
+  // trigger and allow partial selections and caret placements to stick
+  // perfectly.
+  const bool is_popup_open =
+      controller()->IsPopupOpen() ||
+      (location_bar_view_ && location_bar_view_->GetOmniboxPopupView() &&
+       location_bar_view_->GetOmniboxPopupView()->IsOpen());
+
   select_all_on_mouse_release_ =
       (event.IsOnlyLeftMouseButton() || event.IsOnlyRightMouseButton()) &&
+      !is_popup_open &&
       (!HasFocus() ||
        (controller()->edit_model()->focus_state() == OMNIBOX_FOCUS_INVISIBLE));
   if (select_all_on_mouse_release_) {
@@ -1464,6 +1489,8 @@ bool OmniboxViewViews::OnMousePressed(const ui::MouseEvent& event) {
     next_double_click_selection_len_ = 0;
   }
 
+  bool is_double_click = false;
+
   if (!select_all_on_mouse_release_) {
     if (UnapplySteadyStateElisions(UnelisionGesture::kOther)) {
       // This ensures that when the user makes a double-click partial select, we
@@ -1471,6 +1498,7 @@ bool OmniboxViewViews::OnMousePressed(const ui::MouseEvent& event) {
       // selection, which is on mousedown.
       TextChanged();
       filter_drag_events_for_unelision_ = true;
+      is_double_click = true;
     } else if (event.GetClickCount() == 1 && event.IsLeftMouseButton()) {
       // Select the current word and record it for later. This is done to handle
       // an edge case where the wrong word is selected on a double click when
@@ -1501,8 +1529,20 @@ bool OmniboxViewViews::OnMousePressed(const ui::MouseEvent& event) {
         SetSelectedRange(gfx::Range(next_double_click_selection_offset_,
                                     next_double_click_selection_offset_ +
                                         next_double_click_selection_len_));
+        is_double_click = true;
       }
     }
+  }
+
+  // When mouse clicks are being forwarded from the WebUI popup to this native
+  // textfield, push the newly calculated selection range (e.g. word highlights)
+  // back to the WebUI searchbox so it maintains perfect visual sync. Whenever
+  // selection is set on the omnibox_view_views, it should be pushed to the
+  // popup.
+  if (location_bar_view_ && location_bar_view_->GetOmniboxPopupView() &&
+      base::FeatureList::IsEnabled(
+          omnibox::kWebUIOmniboxFullPopupDoubleClick)) {
+    location_bar_view_->GetOmniboxPopupView()->PushTextToWebUI(is_double_click);
   }
 
   return handled;
@@ -1515,6 +1555,8 @@ bool OmniboxViewViews::OnMouseDragged(const ui::MouseEvent& event) {
     return true;
   }
 
+  // TODO(crbug.com/514810983): Figure out dragging behavior for full webui
+  // popup.
   if (HasTextBeingDragged()) {
     if (auto* popup_closer = controller()->client()->GetOmniboxPopupCloser()) {
       popup_closer->CloseWithReason(omnibox::PopupCloseReason::kTextDrag);

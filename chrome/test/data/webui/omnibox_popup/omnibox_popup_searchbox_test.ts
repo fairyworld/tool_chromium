@@ -38,6 +38,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       text: testText,
       selection: {start: 0, end: 0},
       sequenceNumber: 1,
+      isDoubleClick: false,
     });
     await microtasksFinished();
 
@@ -60,6 +61,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       text: 'test text',
       selection: {start: 0, end: 0},
       sequenceNumber: 123,
+      isDoubleClick: false,
     });
     await microtasksFinished();
 
@@ -104,6 +106,7 @@ suite('OmniboxPopupSearchboxTest', function() {
       text: 'test text',
       selection: {start: 1, end: 4},
       sequenceNumber: 1,
+      isDoubleClick: false,
     });
     await microtasksFinished();
 

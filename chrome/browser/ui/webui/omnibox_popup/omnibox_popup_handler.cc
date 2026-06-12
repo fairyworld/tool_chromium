@@ -44,12 +44,14 @@ void OmniboxPopupHandler::OnContextMenuClosed() {
 }
 
 void OmniboxPopupHandler::SetInputState(const std::string& text,
-                                        const gfx::Range& selection) {
+                                        const gfx::Range& selection,
+                                        bool is_double_click) {
   latest_selection_ = selection;
   current_sequence_number_++;
   auto state = omnibox_popup::mojom::OmniboxInputState::New();
   state->text = text;
   state->selection = selection;
   state->sequence_number = current_sequence_number_;
+  state->is_double_click = is_double_click;
   page_->SetInputState(std::move(state));
 }

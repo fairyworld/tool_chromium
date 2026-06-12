@@ -290,6 +290,7 @@ export class OmniboxPopupSearchboxElement extends
       selection:
           {start: input.selectionStart || 0, end: input.selectionEnd || 0},
       sequenceNumber: this.currentSequenceNum_,
+      isDoubleClick: false,
     });
   }
 
@@ -300,7 +301,16 @@ export class OmniboxPopupSearchboxElement extends
   private onSetInputState_(state: OmniboxInputState) {
     this.$.input.setInputText(state.text);
     this.currentSequenceNum_ = state.sequenceNumber;
-    this.$.input.setSelectionRange(state.selection.start, state.selection.end);
+    if (state.selection.start <= state.selection.end) {
+      // TODO(crbug.com/514810983): Show full URL on double click instead of
+      // shifting selection.
+      const selectionOffset = state.isDoubleClick ? 12 : 0;
+      this.$.input.setSelectionRange(
+          state.selection.start - selectionOffset,
+          state.selection.end - selectionOffset);
+    } else {
+      this.$.input.select();
+    }
   }
 
   protected onInputFocusin_() {

@@ -66,12 +66,14 @@ TEST_F(OmniboxPopupHandlerTest, ShowContextMenu) {
 TEST_F(OmniboxPopupHandlerTest, SetInputState) {
   std::string test_text = "test input";
   gfx::Range test_selection(1, 5);
+  bool is_double_click = false;
   EXPECT_CALL(page_, SetInputState(testing::_))
       .WillOnce([&](omnibox_popup::mojom::OmniboxInputStatePtr state) {
         EXPECT_EQ(state->text, test_text);
         EXPECT_EQ(state->selection, test_selection);
+        EXPECT_EQ(state->is_double_click, is_double_click);
       });
-  handler_->SetInputState(test_text, test_selection);
+  handler_->SetInputState(test_text, test_selection, is_double_click);
   page_.FlushForTesting();
 }
 
