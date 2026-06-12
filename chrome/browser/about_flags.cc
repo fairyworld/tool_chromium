@@ -6953,6 +6953,11 @@ const FeatureEntry kFeatureEntries[] = {
      kOsDesktop | kOsAndroid,
      FEATURE_VALUE_TYPE(omnibox::kComposeboxUsesChromeComposeClient)},
 
+#if !BUILDFLAG(IS_ANDROID)
+    {"context-containers", flag_descriptions::kContextContainersName,
+     flag_descriptions::kContextContainersDescription, kOsDesktop,
+     FEATURE_VALUE_TYPE(features::kContextContainers)},
+#endif
     {"context-management-in-composebox",
      flag_descriptions::kContextManagementInComposeboxName,
      flag_descriptions::kContextManagementInComposeboxDescription, kOsDesktop,

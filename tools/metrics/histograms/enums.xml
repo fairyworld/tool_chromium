@@ -10963,6 +10963,7 @@ from previous Chrome versions.
       label="SupervisedUserMergeDeviceParentalControlsAndFamilyLinkPrefs:disabled"/>
   <int value="-1114996018" label="PermissionElement:disabled"/>
   <int value="-1114715252" label="WebAuthenticationNewPasskeyUI:disabled"/>
+  <int value="-1114708553" label="ContextContainers:enabled"/>
   <int value="-1114080030" label="ResourceLoadingHints:enabled"/>
   <int value="-1113746031" label="AppDeduplicationService:enabled"/>
   <int value="-1113373128" label="WebUIDownloadShelf:enabled"/>
@@ -14339,6 +14340,7 @@ from previous Chrome versions.
   <int value="-11209341" label="FileSystemAccessLockingScheme:enabled"/>
   <int value="-10709540"
       label="OmniboxUIExperimentHideSuggestionUrlScheme:enabled"/>
+  <int value="-10430319" label="ContextContainers:disabled"/>
   <int value="-9881235"
       label="AutofillShowManualFallbackInContextMenu:disabled"/>
   <int value="-9836751" label="SideSearchDSESupport:enabled"/>

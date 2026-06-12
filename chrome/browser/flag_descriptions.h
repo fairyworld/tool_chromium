@@ -1489,6 +1489,10 @@ inline constexpr char kCompressionDictionaryTTLDescription[] =
     "Enables support for the 'ttl' parameter in the 'use-as-dictionary' HTTP "
     "response header.";
 
+inline constexpr char kContextContainersName[] = "Context Containers";
+inline constexpr char kContextContainersDescription[] =
+    "Enables Context Container.";
+
 inline constexpr char kContextManagementInComposeboxName[] =
     "Context management in the Composebox";
 inline constexpr char kContextManagementInComposeboxDescription[] =
