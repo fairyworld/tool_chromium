@@ -55,6 +55,7 @@ source_set("base") {
 
 proto_library("confidential_compute_proto") {
   sources = [
+    "src/fcp/protos/confidentialcompute/aggregation_client_payload.proto",
     "src/fcp/protos/confidentialcompute/data_upload_config.proto",
     "src/fcp/protos/confidentialcompute/key.proto",
     "src/fcp/protos/confidentialcompute/payload_transparency.proto",
@@ -64,6 +65,7 @@ proto_library("confidential_compute_proto") {
 
   deps = [
     "//third_party/oak:oak_proto",
+    "//third_party/oak:proto_attestation_reference_value_proto",
     "//third_party/protobuf:timestamp_proto",
   ]
 
@@ -103,6 +105,34 @@ source_set("confidential_compute") {
     "//base",
     "//components/cbor",
   ]
+}
+
+proto_library("federatedcompute_proto") {
+  sources = [
+    "chromium/fcp/protos/federated_api.proto",
+    "chromium/fcp/protos/federatedcompute/aggregations.proto",
+    "chromium/fcp/protos/federatedcompute/common.proto",
+    "chromium/fcp/protos/federatedcompute/confidential_aggregations.proto",
+    "chromium/fcp/protos/federatedcompute/eligibility_eval_tasks.proto",
+    "chromium/fcp/protos/federatedcompute/secure_aggregations.proto",
+    "chromium/fcp/protos/federatedcompute/task_assignments.proto",
+    "chromium/fcp/secagg/shared/secagg_messages.proto",
+  ]
+
+  deps = [
+    "//third_party/federated_compute/third_party/googleapis:google_rpc_code_proto",
+    "//third_party/federated_compute/third_party/googleapis:google_rpc_status_proto",
+    "//third_party/protobuf:any_proto",
+    "//third_party/protobuf:duration_proto",
+  ]
+
+  import_dirs = [
+    "//third_party/oak/chromium",
+    "//third_party/federated_compute/third_party/googleapis/src",
+  ]
+
+  proto_in_dir = "chromium"
+  cc_generator_options = "lite"
 }
 
 source_set("confidential_compute_crypto_test_util") {
