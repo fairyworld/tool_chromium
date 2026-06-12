@@ -6,6 +6,8 @@ source_set("test_support") {
   testonly = true
 
   sources = [
+    "fake_audio_service.cc",
+    "fake_audio_service.h",
     "fake_consumer.cc",
     "fake_consumer.h",
     "fake_loopback_group_member.cc",
