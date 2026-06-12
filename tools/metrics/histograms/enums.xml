@@ -10606,6 +10606,8 @@ from previous Chrome versions.
   <int value="-1228546373"
       label="UseLookalikesForNavigationSuggestions:enabled"/>
   <int value="-1228472899" label="EmailVerificationProtocol:disabled"/>
+  <int value="-1227812611"
+      label="EnableOAuthMultiloginYoutubeCookiesBinding:disabled"/>
   <int value="-1227660915" label="WebContentsOcclusion:disabled"/>
   <int value="-1227571965" label="SnapGroup:enabled"/>
   <int value="-1226536953" label="DeskTemplateSync:disabled"/>
@@ -13345,6 +13347,8 @@ from previous Chrome versions.
   <int value="-332018524" label="ContextualTasksContextLibrary:enabled"/>
   <int value="-332010491" label="RetailCoupons:enabled"/>
   <int value="-331952590" label="OmniboxTriggerForPrerender2:enabled"/>
+  <int value="-331406700"
+      label="EnableOAuthMultiloginYoutubeCookiesBinding:enabled"/>
   <int value="-331137136"
       label="WebAssemblyExperimentalStackSwitching:disabled"/>
   <int value="-329727402" label="disable-files-quick-view"/>

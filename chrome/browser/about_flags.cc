@@ -4194,6 +4194,21 @@ const FeatureEntry::FeatureVariation
          nullptr},
 };
 
+const FeatureEntry::FeatureParam
+    kOAuthMultiloginYoutubeCookieBindingWithoutEnforcement[] = {
+        {"OAuthMultiloginYoutubeCookieBindingEnforced", "false"}};
+const FeatureEntry::FeatureParam
+    kOAuthMultiloginYoutubeCookieBindingWithEnforcement[] = {
+        {"OAuthMultiloginYoutubeCookieBindingEnforced", "true"}};
+
+const FeatureEntry::FeatureVariation
+    kOAuthMultiloginYoutubeCookieBindingEnforcementVariations[] = {
+        {"without enforcement",
+         kOAuthMultiloginYoutubeCookieBindingWithoutEnforcement, nullptr},
+        {"with enforcement",
+         kOAuthMultiloginYoutubeCookieBindingWithEnforcement, nullptr},
+};
+
 const FeatureEntry::FeatureParam kRefreshTokenBindingUpgradeDarkLaunch[] = {
     {"upgrade-type", "dark-launch"}};
 const FeatureEntry::FeatureParam kRefreshTokenBindingUpgradeLiveLaunch[] = {
@@ -10733,6 +10748,15 @@ const FeatureEntry kFeatureEntries[] = {
          switches::kEnableOAuthMultiloginCookiesBindingServerExperiment,
          kOAuthMultiloginCookieBindingEnforcementVariations,
          "EnableOAuthMultiloginCookiesBindingServerExperiment")},
+
+    {"enable-oauth-multilogin-youtube-cookies-binding",
+     flag_descriptions::kEnableOAuthMultiloginYoutubeCookiesBindingName,
+     flag_descriptions::kEnableOAuthMultiloginYoutubeCookiesBindingDescription,
+     kOsMac | kOsWin | kOsLinux,
+     FEATURE_WITH_PARAMS_VALUE_TYPE(
+         switches::kEnableOAuthMultiloginYoutubeCookiesBinding,
+         kOAuthMultiloginYoutubeCookieBindingEnforcementVariations,
+         "EnableOAuthMultiloginYoutubeCookiesBinding")},
 
     {"enable-chrome-refresh-token-binding",
      flag_descriptions::kEnableChromeRefreshTokenBindingName,

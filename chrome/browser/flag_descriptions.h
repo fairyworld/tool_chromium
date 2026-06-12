@@ -8351,6 +8351,13 @@ inline constexpr char
         "cookies to cryptographic keys. This flag is meant to be used in "
         "conjunction with the 'Enable OAuthMultilogin Cookies Binding' flag.";
 
+inline constexpr char kEnableOAuthMultiloginYoutubeCookiesBindingName[] =
+    "Enable Youtube OAuthMultilogin Cookies Binding";
+inline constexpr char kEnableOAuthMultiloginYoutubeCookiesBindingDescription[] =
+    "When enabled, Chrome will send a specific URL parameter to Gaia "
+    "to trigger the server-side experiment for binding the OAuthMultilogin "
+    "cookies for Youtube to cryptographic keys.";
+
 inline constexpr char kEnableBoundSessionCredentialsName[] =
     "Device Bound Session Credentials";
 inline constexpr char kEnableBoundSessionCredentialsDescription[] =

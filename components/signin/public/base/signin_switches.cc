@@ -410,6 +410,15 @@ BASE_FEATURE(kEnableOAuthMultiloginStandardCookiesBindingForSecondaryPartitions,
              base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
+#if BUILDFLAG(ENABLE_DICE_SUPPORT)
+BASE_FEATURE(kEnableOAuthMultiloginYoutubeCookiesBinding,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE_PARAM(bool,
+                   kOAuthMultiloginYoutubeCookieBindingEnforced,
+                   &kEnableOAuthMultiloginYoutubeCookiesBinding,
+                   true);
+#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
+
 BASE_FEATURE(kEnablePreferencesAccountStorage,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
