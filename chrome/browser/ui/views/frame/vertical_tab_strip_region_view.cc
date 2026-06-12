@@ -1065,8 +1065,11 @@ void VerticalTabStripRegionView::OnChildrenRemoved() {
   hover_tab_selector_->CancelTabTransition();
 }
 
-void VerticalTabStripRegionView::OnChildMoved() {
+void VerticalTabStripRegionView::OnChildMoved(TabCollectionNode* moved_node) {
   hover_tab_selector_->CancelTabTransition();
+  if (tab_strip_view_) {
+    tab_strip_view_->OnChildMoved(moved_node);
+  }
 }
 
 void VerticalTabStripRegionView::OnExpandOnHoverEnabledChanged(bool enabled) {
@@ -1361,7 +1364,7 @@ void VerticalTabStripRegionView::OnActiveTabChanged(
   }
 
   if (tab_strip_view_) {
-    tab_strip_view_->OnActiveTabChanged(active_tab);
+    tab_strip_view_->OnTabChanged(active_tab);
   }
 }
 
