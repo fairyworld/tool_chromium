@@ -106,8 +106,7 @@ bool ManifestV2HandlerFactory::ServiceIsCreatedWithBrowserContext() const {
   return true;
 }
 
-// Returns true if legacy extensions should be disabled, looking at both
-// experiment stage and global state.
+// Returns true if legacy extensions should be disabled.
 bool ShouldDisableLegacyExtensions() {
   if (g_allow_mv2_for_testing) {
     // We allow legacy MV2 extensions for testing purposes.
@@ -245,9 +244,9 @@ void ManifestV2Handler::MaybeReEnableExtension(const Extension& extension) {
   }
 
   // Check if the extension is still affected *and* whether the environment is
-  // still one in which extensions should be disabled. It's possible the user
-  // moved from a later experiment stage to an earlier one or set a feature
-  // flag, in which case extensions should be re-enabled.
+  // still one in which extensions should be disabled. It's possible the global
+  // state changed (e.g. in testing), in which case extensions should be
+  // re-enabled.
   if (impact_checker_.IsExtensionAffected(extension) &&
       ShouldDisableLegacyExtensions()) {
     return;

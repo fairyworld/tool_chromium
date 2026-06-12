@@ -29,8 +29,8 @@ class MV2DeprecationImpactCheckerUnitTest : public ExtensionServiceTestBase {
     ExtensionServiceTestBase::TearDown();
   }
 
-  // Since this is testing the MV2 deprecation experiments, we don't want to
-  // bypass their disabling for testing.
+  // Since this is testing the MV2 deprecation, we don't want to bypass the
+  // related disabling.
   bool ShouldAllowMV2Extensions() override { return false; }
 
   // Adds a new force-installed extension with the given `name`,
@@ -105,7 +105,7 @@ class MV2DeprecationImpactCheckerUnitTest : public ExtensionServiceTestBase {
 };
 
 // Tests that user-visible MV2 extensions are properly considered affected by
-// the MV2 deprecation experiment.
+// the MV2 deprecation.
 TEST_F(MV2DeprecationImpactCheckerUnitTest,
        UserVisibleMV2ExtensionsAreAffected) {
   scoped_refptr<const Extension> user_installed =
@@ -130,8 +130,7 @@ TEST_F(MV2DeprecationImpactCheckerUnitTest,
           .Build();
 
   // Unpacked (and commandline) extensions *are* affected by the MV2
-  // deprecation.  They will be treated differently depending on the experiment
-  // stage, but should be included in e.g. the warning.
+  // deprecation.
   scoped_refptr<const Extension> unpacked =
       ExtensionBuilder("unpacked")
           .SetLocation(mojom::ManifestLocation::kUnpacked)
@@ -152,7 +151,7 @@ TEST_F(MV2DeprecationImpactCheckerUnitTest,
 }
 
 // Checks that certain special cases of extensions, such as default-installed
-// and installed by OEM, are also affected by the MV2 deprecation experiments.
+// and installed by OEM, are also affected by the MV2 deprecation.
 TEST_F(MV2DeprecationImpactCheckerUnitTest,
        DefaultInstalledMV2ExtensionsAreAffected) {
   scoped_refptr<const Extension> default_installed =
@@ -174,7 +173,7 @@ TEST_F(MV2DeprecationImpactCheckerUnitTest,
 }
 
 // Tests that component extensions are not included in the MV2 deprecation
-// experiment (they're implementation details of the browser).
+// (they're implementation details of the browser).
 TEST_F(MV2DeprecationImpactCheckerUnitTest, ComponentExtensionsAreNotAffected) {
   scoped_refptr<const Extension> component =
       ExtensionBuilder("component")
@@ -187,13 +186,13 @@ TEST_F(MV2DeprecationImpactCheckerUnitTest, ComponentExtensionsAreNotAffected) {
           .SetManifestVersion(2)
           .Build();
 
-  // Component extensions are never affected by the experiment.
+  // Component extensions are never affected.
   EXPECT_FALSE(impact_checker()->IsExtensionAffected(*component));
   EXPECT_FALSE(impact_checker()->IsExtensionAffected(*external_component));
 }
 
 // Tests that MV3 extensions, of any location, are not affected by the MV2
-// deprecation experiment.
+// deprecation.
 TEST_F(MV2DeprecationImpactCheckerUnitTest, NoMV3ExtensionsAreAffected) {
   struct {
     mojom::ManifestLocation manifest_location;
@@ -266,7 +265,7 @@ TEST_F(MV2DeprecationImpactCheckerUnitTest,
 }
 
 // Tests that any MV3 extension installed by policy is never affected by
-// MV2 experiments.
+// MV2 deprecation.
 TEST_F(MV2DeprecationImpactCheckerUnitTest,
        MV3PolicyInstalledExtensionsNeverAffected) {
   scoped_refptr<const Extension> forced_policy = AddForceInstalledExtension(
@@ -299,7 +298,7 @@ TEST_F(MV2DeprecationImpactCheckerUnitTest,
 }
 
 // Tests that non-extension "extension-like" things (such as platform apps and
-// hosted apps) are not affected by the MV2 deprecation experiment.
+// hosted apps) are not affected by the MV2 deprecation.
 TEST_F(MV2DeprecationImpactCheckerUnitTest, NonExtensionsAreNotAffected) {
   scoped_refptr<const Extension> platform_app =
       ExtensionBuilder("app", ExtensionBuilder::Type::PLATFORM_APP)
@@ -325,7 +324,7 @@ TEST_F(MV2DeprecationImpactCheckerUnitTest, NonExtensionsAreNotAffected) {
 }
 
 // Tests that user script MV2 extensions are properly considered affected by
-// the MV2 deprecation experiment.
+// the MV2 deprecation.
 TEST_F(MV2DeprecationImpactCheckerUnitTest, UserScriptsAreAffected) {
   scoped_refptr<const Extension> user_script =
       ExtensionBuilder("user script")

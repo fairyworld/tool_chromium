@@ -30,8 +30,7 @@ class Extension;
 class ExtensionPrefs;
 class ScopedTestMV2Enabler;
 
-// The central class responsible for managing experiments related to the MV2
-// deprecation.
+// The central class responsible for managing deprecated MV2 extensions.
 class ManifestV2Handler : public KeyedService,
                           public ExtensionRegistryObserver {
  public:
@@ -40,7 +39,7 @@ class ManifestV2Handler : public KeyedService,
   ManifestV2Handler& operator=(const ManifestV2Handler&) = delete;
   ~ManifestV2Handler() override;
 
-  // The possible states for an MV2 extension during the experiments.
+  // The possible states for an MV2 extension.
   // Do not re-order entries, as these are used in histograms.
   // Exposed for testing purposes.
   enum class MV2ExtensionState {
@@ -82,12 +81,12 @@ class ManifestV2Handler : public KeyedService,
   // Returns true if Chrome should disallow enabling the given `extension`.
   bool ShouldBlockExtensionEnable(const Extension& extension);
 
-  // Returns true if the user has acknowledge the notice during the current MV2
-  // deprecation `experiment_stage_`.
+  // Returns true if the user has acknowledged the notice about deprecated
+  // extensions.
   bool DidUserAcknowledgeNoticeGlobally();
 
-  // Called to indicate the user chose to acknowledge the global notice during
-  // the current MV2 deprecation `experiment_stage_`..
+  // Called to indicate the user acknowledged the notice about deprecated
+  // extensions.
   void MarkNoticeAsAcknowledgedGlobally();
 
   // Helpers to call internal methods directly for testing purposes. These are
@@ -112,8 +111,7 @@ class ManifestV2Handler : public KeyedService,
   // Called when the extension system has finished its initialization steps.
   void OnExtensionSystemReady();
 
-  // Disables any Manifest V2 extensions that are affected by the experiment,
-  // if the user hasn't chosen to re-enable them.
+  // Disables any Manifest V2 extensions that are in-scope for the handler.
   void DisableAffectedExtensions();
 
   // Loops through disabled extensions and checks if any should be re-enabled.
@@ -133,7 +131,7 @@ class ManifestV2Handler : public KeyedService,
                             bool is_update) override;
 
   // A helper object to determine if a given extension is affected by the
-  // MV2 deprecation experiments.
+  // MV2 deprecation.
   MV2DeprecationImpactChecker impact_checker_;
 
   // The associated ExtensionPrefs. Guaranteed to be safe to use since this

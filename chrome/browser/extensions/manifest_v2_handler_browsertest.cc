@@ -51,7 +51,7 @@ class ManifestV2HandlerBrowserTest : public ExtensionBrowserTest {
   ManifestV2HandlerBrowserTest() = default;
   ~ManifestV2HandlerBrowserTest() override = default;
 
-  // Since this is testing the MV2 deprecation experiments, we probably don't
+  // Since this is testing the handling of MV2 extensions, we probably don't
   // want to bypass their disabling for testing. There are some exceptions for
   // pre-tests that explicitly need to do this as part of the setup.
   bool ShouldAllowMV2Extensions() override {
@@ -221,7 +221,7 @@ IN_PROC_BROWSER_TEST_F(ManifestV2HandlerBrowserTest,
 }
 
 // Tests that externally-installed extensions are allowed to be installed, but
-// will still be disabled by the MV2 experiments.
+// will still be disabled.
 IN_PROC_BROWSER_TEST_F(ManifestV2HandlerBrowserTest,
                        ExternalExtensionsCanBeInstalledButAreAlsoDisabled) {
   // External extensions are default-disabled on Windows and Mac. This won't
@@ -273,10 +273,9 @@ IN_PROC_BROWSER_TEST_F(ManifestV2HandlerBrowserTest,
                   disable_reason::DISABLE_UNSUPPORTED_MANIFEST_VERSION));
 }
 
-// Tests that unpacked extensions cannot be installed in the unsupported
-// experiment phase.
+// Tests that unpacked extensions cannot be installed.
 IN_PROC_BROWSER_TEST_F(ManifestV2HandlerBrowserTest,
-                       UnpackedExtensionsCannotBeInstalledInUnsupportedPhase) {
+                       UnpackedExtensionsCannotBeInstalled) {
   WaitForExtensionSystemReady();
 
   static constexpr char kMv2Manifest[] =

@@ -53,8 +53,8 @@ class ManifestV2HandlerUnitTest : public ExtensionServiceUserTestBase {
     ExtensionServiceUserTestBase::TearDown();
   }
 
-  // Since this is testing the MV2 deprecation experiments, we don't want to
-  // bypass their disabling for testing.
+  // Since this is testing the MV2 handling, we don't want to bypass their
+  // disabling for testing.
   bool ShouldAllowMV2Extensions() override { return false; }
 
   ManifestV2Handler* handler() { return handler_.get(); }
@@ -63,9 +63,9 @@ class ManifestV2HandlerUnitTest : public ExtensionServiceUserTestBase {
   raw_ptr<ManifestV2Handler> handler_;
 };
 
-// Sanity check that MV2 extensions are considered affected when the
-// experiment is enabled in the "unsupported" phase. The "is affected" logic is
-// much more heavily tested in mv2_deprecation_impact_checker_unittest.cc.
+// Checks that MV2 extensions are considered "affected" by the
+// MV2ExtensionHandler. This logic is much more heavily tested in
+// mv2_deprecation_impact_checker_unittest.cc.
 TEST_F(ManifestV2HandlerUnitTest, MV2ExtensionsAreAffected) {
   struct {
     mojom::ManifestLocation manifest_location;
@@ -94,8 +94,7 @@ TEST_F(ManifestV2HandlerUnitTest, MV2ExtensionsAreAffected) {
   }
 }
 
-// Tests the manager properly indicates when to block user-installed extensions
-// in the "unsupported" phase.
+// Tests the manager properly indicates when to block user-installed extensions.
 TEST_F(ManifestV2HandlerUnitTest,
        ShouldBlockInstallation_UserInstalledExtensions) {
   constexpr bool kInstallShouldBeBlocked = true;
@@ -301,8 +300,7 @@ TEST_F(ManifestV2HandlerUnitTest,
       ManifestV2Handler::MV2ExtensionState::kOther, 1);
 }
 
-// Tests that MV2 extensions cannot be re-enabled in the "unsupported"
-// experiment phase.
+// Tests that MV2 extensions cannot be re-enabled.
 TEST_F(ManifestV2HandlerUnitTest, MV2ExtensionsCannotBeEnabled) {
   constexpr bool kEnableShouldBeBlocked = true;
   constexpr bool kEnableShouldBeAllowed = false;
