@@ -796,13 +796,14 @@ public class NtpCustomizationUtils {
      *
      * @param bitmap The bitmap from which to extract and save the primary color.
      */
-    static void pickAndSavePrimaryColor(Bitmap bitmap) {
+    static @Nullable @ColorInt Integer pickAndSavePrimaryColor(Bitmap bitmap) {
         @ColorInt Integer primaryColor = getContentBasedSeedColor(bitmap);
         if (primaryColor != null) {
             setCustomizedPrimaryColorToSharedPreference(primaryColor.intValue());
         } else {
             removeCustomizedPrimaryColorFromSharedPreference();
         }
+        return primaryColor;
     }
 
     /**
@@ -1381,7 +1382,7 @@ public class NtpCustomizationUtils {
      * @param skipSavingPrimaryColor True if color selection and saving are deferred until the
      *     bottom sheet is dismissed.
      */
-    public static void saveBackgroundInfo(
+    public static @Nullable @ColorInt Integer saveBackgroundInfo(
             @Nullable CustomBackgroundInfo customBackgroundInfo,
             Bitmap bitmap,
             BackgroundImageInfo backgroundImageInfo,
@@ -1394,11 +1395,13 @@ public class NtpCustomizationUtils {
             removeCustomBackgroundInfoFromSharedPreference();
         }
 
+        @ColorInt Integer primaryColor = null;
         if (!skipSavingPrimaryColor) {
-            pickAndSavePrimaryColor(bitmap);
+            primaryColor = pickAndSavePrimaryColor(bitmap);
         }
 
         updateBackgroundImageInfo(backgroundImageInfo);
+        return primaryColor;
     }
 
     /**

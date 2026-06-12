@@ -38,6 +38,7 @@ import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgrou
 import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataColor;
 import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataCustomizedColor;
 import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataManager;
+import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataUploadImage;
 import org.chromium.chrome.browser.preferences.ChromePreferenceKeys;
 import org.chromium.chrome.browser.preferences.ChromeSharedPreferences;
 
@@ -312,6 +313,9 @@ public class NtpCustomizationConfigManager {
         } else if (backgroundData.getBackgroundType() == NtpBackgroundType.COLOR_FROM_HEX) {
             onBackgroundColorChanged(context, backgroundData);
             saveUserSelectedBackgroundType = true;
+        } else if (backgroundData instanceof NtpBackgroundDataUploadImage uploadImageData) {
+            saveUserSelectedBackgroundType = true;
+            onUploadedImageSelected(uploadImageData);
         }
 
         if (saveUserSelectedBackgroundType) {
@@ -322,20 +326,32 @@ public class NtpCustomizationConfigManager {
     /**
      * Called when a user uploaded image is selected.
      *
-     * @param bitmap The new background image bitmap before transformations.
-     * @param backgroundImageInfo The {@link BackgroundImageInfo} object containing the portrait and
-     *     landscape matrices.
+     * @param uploadImageData The {@link NtpBackgroundDataUploadImage} object containing the
+     *     background image and info.
      */
-    public void onUploadedImageSelected(Bitmap bitmap, BackgroundImageInfo backgroundImageInfo) {
+    private void onUploadedImageSelected(NtpBackgroundDataUploadImage uploadImageData) {
         @NtpBackgroundType int oldType = mBackgroundType;
 
         mBackgroundType = IMAGE_FROM_DISK;
+        mNtpBackgroundData = uploadImageData;
 
-        NtpCustomizationUtils.saveBackgroundInfo(
-                /* customBackgroundInfo= */ null,
-                bitmap,
-                backgroundImageInfo,
-                /* skipSavingPrimaryColor= */ false);
+        Bitmap bitmap = uploadImageData.getBitmap();
+        if (bitmap == null) {
+            //  TODO(https://crbug.com/488439751): Removes this early exit when we load the bitmap.
+            return;
+        }
+
+        BackgroundImageInfo backgroundImageInfo =
+                assumeNonNull(uploadImageData.getBackgroundImageInfo());
+
+        @ColorInt
+        Integer primaryColor =
+                NtpCustomizationUtils.saveBackgroundInfo(
+                        /* customBackgroundInfo= */ null,
+                        bitmap,
+                        backgroundImageInfo,
+                        /* skipSavingPrimaryColor= */ false);
+        uploadImageData.setPrimaryColor(primaryColor);
 
         onBackgroundImageChanged(bitmap, backgroundImageInfo, oldType);
     }

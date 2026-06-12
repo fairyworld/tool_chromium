@@ -41,6 +41,8 @@ import org.chromium.chrome.browser.ntp_customization.NtpCustomizationMetricsUtil
 import org.chromium.chrome.browser.ntp_customization.NtpCustomizationUtils;
 import org.chromium.chrome.browser.ntp_customization.R;
 import org.chromium.chrome.browser.ntp_customization.theme.NtpThemeProperty;
+import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataBase.PlatformType;
+import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataUploadImage;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.search_engines.TemplateUrlServiceFactory;
 import org.chromium.chrome.browser.ui.edge_to_edge.EdgeToEdgeUtils;
@@ -362,7 +364,16 @@ public class UploadImagePreviewCoordinator implements InsetObserver.WindowInsets
                 new BackgroundImageInfo(
                         portraitMatrix, landscapeMatrix, portraitSize, landscapeSize);
 
-        NtpCustomizationConfigManager.getInstance().onUploadedImageSelected(bitmap, info);
+        NtpBackgroundDataUploadImage uploadImageData =
+                new NtpBackgroundDataUploadImage(
+                        PlatformType.ANDROID_LOCAL,
+                        NtpCustomizationUtils.createBackgroundImageFile().getAbsolutePath(),
+                        info,
+                        bitmap,
+                        /* primaryColor= */ null);
+
+        NtpCustomizationConfigManager.getInstance()
+                .onBackgroundDataChanged(mActivity, uploadImageData);
 
         // Records metrics before the callback closes the bottom sheet.
         NtpCustomizationMetricsUtils.recordThemeUploadImagePreviewInteractions(

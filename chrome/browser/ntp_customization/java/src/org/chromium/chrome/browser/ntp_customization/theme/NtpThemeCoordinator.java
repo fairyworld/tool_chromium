@@ -38,6 +38,8 @@ import org.chromium.chrome.browser.ntp_customization.theme.theme_collections.Ntp
 import org.chromium.chrome.browser.ntp_customization.theme.theme_collections.NtpThemeCollectionsCoordinator;
 import org.chromium.chrome.browser.ntp_customization.theme.upload_image.BackgroundImageInfo;
 import org.chromium.chrome.browser.ntp_customization.theme.upload_image.UploadImagePreviewCoordinator;
+import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataBase.PlatformType;
+import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataUploadImage;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.ui.base.DeviceFormFactor;
 import org.chromium.ui.modelutil.PropertyModel;
@@ -147,7 +149,15 @@ public class NtpThemeCoordinator {
             // until the ntp customization bottom sheets are fully dismissed.
             BackgroundImageInfo info =
                     NtpCustomizationUtils.getDefaultBackgroundImageInfo(mContext, bitmap);
-            NtpCustomizationConfigManager.getInstance().onUploadedImageSelected(bitmap, info);
+            NtpBackgroundDataUploadImage uploadImageData =
+                    new NtpBackgroundDataUploadImage(
+                            PlatformType.ANDROID_LOCAL,
+                            NtpCustomizationUtils.createBackgroundImageFile().getAbsolutePath(),
+                            info,
+                            bitmap,
+                            /* primaryColor= */ null);
+            NtpCustomizationConfigManager.getInstance()
+                    .onBackgroundDataChanged(mContext, uploadImageData);
             onPreviewClosed(/* isImageSelected= */ true);
             return;
         }

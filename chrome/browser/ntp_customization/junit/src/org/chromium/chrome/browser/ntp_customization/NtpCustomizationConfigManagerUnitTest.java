@@ -63,6 +63,7 @@ import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgrou
 import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataColor;
 import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataCustomizedColor;
 import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataManager;
+import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataUploadImage;
 import org.chromium.chrome.browser.preferences.ChromePreferenceKeys;
 import org.chromium.chrome.browser.preferences.ChromeSharedPreferences;
 import org.chromium.chrome.browser.ui.theme.ChromeSemanticColorUtils;
@@ -226,7 +227,14 @@ public class NtpCustomizationConfigManagerUnitTest {
         int initialBackgroundType = mNtpCustomizationConfigManager.getBackgroundType();
         mNtpCustomizationConfigManager.addListener(mListener, mContext, /* skipNotify= */ false);
 
-        mNtpCustomizationConfigManager.onUploadedImageSelected(mBitmap, mBackgroundImageInfo);
+        NtpBackgroundDataUploadImage uploadImageData =
+                new NtpBackgroundDataUploadImage(
+                        PlatformType.ANDROID_LOCAL,
+                        /* lastUploadImageFilePath= */ "",
+                        mBackgroundImageInfo,
+                        mBitmap,
+                        /* primaryColor= */ null);
+        mNtpCustomizationConfigManager.onBackgroundDataChanged(mContext, uploadImageData);
         RobolectricUtil.runAllBackgroundAndUi();
 
         // Verifies that the image file are saved to the disk and matrices are persisted to prefs.
@@ -260,6 +268,27 @@ public class NtpCustomizationConfigManagerUnitTest {
         assertEquals(
                 NtpBackgroundType.IMAGE_FROM_DISK,
                 mNtpCustomizationConfigManager.getBackgroundType());
+    }
+
+    @Test
+    @EnableFeatures({
+        ChromeFeatureList.NEW_TAB_PAGE_CUSTOMIZATION_V2,
+        ChromeFeatureList.NEW_TAB_PAGE_CUSTOMIZATION_THEME_SYNC
+    })
+    public void testOnUploadedImageSelected_syncsToDataManager() {
+        NtpBackgroundDataUploadImage uploadImageData =
+                new NtpBackgroundDataUploadImage(
+                        PlatformType.ANDROID_LOCAL,
+                        /* lastUploadImageFilePath= */ "",
+                        mBackgroundImageInfo,
+                        mBitmap,
+                        /* primaryColor= */ null);
+        mNtpCustomizationConfigManager.onBackgroundDataChanged(mContext, uploadImageData);
+        RobolectricUtil.runAllBackgroundAndUi();
+
+        verify(mNtpBackgroundDataManager)
+                .saveUserSelectedBackgroundTypeToSharedPreference(
+                        any(NtpBackgroundDataUploadImage.class));
     }
 
     @Test
@@ -546,7 +575,14 @@ public class NtpCustomizationConfigManagerUnitTest {
     public void testOnBackgroundReset_fromUploadImage() {
         mNtpCustomizationConfigManager.addListener(mListener, mContext, /* skipNotify= */ false);
 
-        mNtpCustomizationConfigManager.onUploadedImageSelected(mBitmap, mBackgroundImageInfo);
+        NtpBackgroundDataUploadImage uploadImageData =
+                new NtpBackgroundDataUploadImage(
+                        PlatformType.ANDROID_LOCAL,
+                        /* lastUploadImageFilePath= */ "",
+                        mBackgroundImageInfo,
+                        mBitmap,
+                        /* primaryColor= */ null);
+        mNtpCustomizationConfigManager.onBackgroundDataChanged(mContext, uploadImageData);
         RobolectricUtil.runAllBackgroundAndUi();
         assertEquals(
                 NtpBackgroundType.IMAGE_FROM_DISK,

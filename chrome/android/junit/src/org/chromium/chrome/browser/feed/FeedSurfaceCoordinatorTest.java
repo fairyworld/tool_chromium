@@ -69,6 +69,8 @@ import org.chromium.chrome.browser.ntp_customization.NtpCustomizationConfigManag
 import org.chromium.chrome.browser.ntp_customization.policy.NtpCustomizationPolicyManager;
 import org.chromium.chrome.browser.ntp_customization.theme.NtpBackgroundImageCoordinator;
 import org.chromium.chrome.browser.ntp_customization.theme.upload_image.BackgroundImageInfo;
+import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataBase;
+import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataUploadImage;
 import org.chromium.chrome.browser.preferences.ChromePreferenceKeys;
 import org.chromium.chrome.browser.preferences.ChromeSharedPreferences;
 import org.chromium.chrome.browser.preferences.Pref;
@@ -468,7 +470,14 @@ public class FeedSurfaceCoordinatorTest {
         NtpCustomizationConfigManager configManager = NtpCustomizationConfigManager.getInstance();
         configManager.setBackgroundTypeForTesting(CHROME_COLOR);
 
-        configManager.onUploadedImageSelected(mBitmap, mBackgroundImageInfo);
+        NtpBackgroundDataUploadImage uploadImageData =
+                new NtpBackgroundDataUploadImage(
+                        NtpBackgroundDataBase.PlatformType.ANDROID_LOCAL,
+                        /* lastUploadImageFilePath= */ "",
+                        mBackgroundImageInfo,
+                        mBitmap,
+                        /* primaryColor= */ null);
+        configManager.onBackgroundDataChanged(mActivity, uploadImageData);
 
         // Verifies the coordinator delegates the setBackground call to the custom view.
         verify(mBackgroundImageCoordinator)

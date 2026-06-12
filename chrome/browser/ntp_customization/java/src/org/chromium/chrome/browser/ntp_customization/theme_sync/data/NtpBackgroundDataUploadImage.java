@@ -70,7 +70,7 @@ public class NtpBackgroundDataUploadImage extends NtpBackgroundDataBase {
      *
      * @param primaryColor The primary color to set.
      */
-    public void setPrimaryColor(@ColorInt int primaryColor) {
+    public void setPrimaryColor(@Nullable @ColorInt Integer primaryColor) {
         mPrimaryColor = primaryColor;
     }
 
