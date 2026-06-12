@@ -36,6 +36,8 @@ public class VerticalTabsSideUiCoordinator implements SideUiContainer {
     private final @Px int mViewWidth;
 
     // Whether the vertical tab is automatically hidden due to run-time conditions.
+    // TODO(crbug.com/513622986): Handle auto-hide logic when screen size goes below threshold.
+    @SuppressWarnings("UnusedVariable")
     private boolean mIsAutoHidden;
 
     // Whether the vertical tab is set to visible via UI. Remains true even if it is temporarily
@@ -111,16 +113,6 @@ public class VerticalTabsSideUiCoordinator implements SideUiContainer {
 
     @Override
     public void onContainerResized(@Px int containerWidth) {}
-
-    @Override
-    public void onWindowResized(boolean canShowSideUi) {
-        // TODO(crbug.com/513622986): Handle auto-hide logic when screen size goes below threshold.
-        // No-op if currently off or visibility hasn't changed.
-        if (!mManualVisible || (canShowSideUi != mIsAutoHidden)) return;
-
-        mIsAutoHidden = !canShowSideUi;
-        requestShow(canShowSideUi);
-    }
 
     public void destroy() {
         mTabListCoordinator.destroy();
