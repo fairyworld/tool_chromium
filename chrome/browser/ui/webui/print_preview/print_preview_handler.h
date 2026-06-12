@@ -217,8 +217,8 @@ class PrintPreviewHandler : public content::WebUIMessageHandler {
   // preview is displayed.
   void HandleGetInitialSettings(const base::ListValue& args);
 
-  // Opens printer settings in the Chrome OS Settings App or OS's printer manger
-  // dialog. |args| is unused.
+  // Opens printer settings in the Chrome OS Settings App or OS's printer
+  // manager dialog. |args| is unused.
   void HandleManagePrinters(const base::ListValue& args);
 
   void SendInitialSettings(const std::string& callback_id,

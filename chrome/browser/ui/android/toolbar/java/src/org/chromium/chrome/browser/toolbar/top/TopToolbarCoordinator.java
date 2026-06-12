@@ -807,7 +807,7 @@ public class TopToolbarCoordinator implements Toolbar, TopControlLayer {
     }
 
     /**
-     * @param attached Whether or not the web content is attached to the view heirarchy.
+     * @param attached Whether or not the web content is attached to the view hierarchy.
      */
     public void setContentAttached(boolean attached) {
         mToolbarLayout.setContentAttached(attached);

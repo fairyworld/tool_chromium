@@ -539,7 +539,7 @@ void OmniboxViewViews::SetFocus(bool is_user_initiated) {
   // keep it revealed. |location_bar_view_| can be nullptr in unit tests.
   //
   // Besides tests, location bar is also used in non-browser UI in production
-  // enviroment. There are only two known case so far, one is
+  // environment. There are only two known case so far, one is
   // simple_web_view_dialog for ChromeOS to draw captive portal during OOBE
   // signin. The other one is presentation_receiver_window_view which applies to
   // both ChromeOS and other desktop platforms. Null check to avoid crash before
@@ -2451,7 +2451,7 @@ void OmniboxViewViews::UpdateContextMenu(ui::SimpleMenuModel* menu_contents) {
                                             IDS_CONTEXT_MENU_SHOW_FULL_URLS);
   }
 
-  // Location bar is also used in non-browser UI in production enviroment.
+  // Location bar is also used in non-browser UI in production environment.
   // The only known case so far is simple_web_view_dialog for ChromeOS to draw
   // captive portal during OOBE signin. Null check to avoid crash before these
   // UIs are migrated away. See crbug.com/379534750 for a production crash

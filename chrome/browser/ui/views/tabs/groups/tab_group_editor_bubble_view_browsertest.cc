@@ -420,7 +420,7 @@ IN_PROC_BROWSER_TEST_F(TabGroupEditorBubbleViewDialogBrowserTestWithSavedGroup,
   // Pull the dialog state and call the OnDialogOk method.
   deletion_dialog_controller->SimulateOkButtonForTesting();
 
-  // Make sure that the ungroup action occured.
+  // Make sure that the ungroup action occurred.
   EXPECT_EQ(0u, group_model->ListTabGroups().size());
   EXPECT_FALSE(group_model->ContainsTabGroup(group_list[0]));
   EXPECT_EQ(1, tsm->count());

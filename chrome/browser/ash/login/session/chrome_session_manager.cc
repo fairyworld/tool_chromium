@@ -222,7 +222,7 @@ void StartUserSession(
     UserSessionManager* user_session_mgr = UserSessionManager::GetInstance();
     const user_manager::User* user = user_manager->GetActiveUser();
     if (!user) {
-      // This is possible if crash occured after profile removal
+      // This is possible if crash occurred after profile removal
       // (see crbug.com/40303043 for some more info).
       LOG(ERROR) << "Could not get active user after crash.";
       return;
