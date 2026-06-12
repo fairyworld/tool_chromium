@@ -298,6 +298,10 @@ enum class TabGridTransitionType {
   UIViewController* parentViewController = _params->parent_view_controller;
   [browserLayout didMoveToParentViewController:parentViewController];
 
+  if (_transitionType == TabGridTransitionType::kDisabledAnimation) {
+    [browserLayout.view layoutIfNeeded];
+  }
+
   [browserLayout setNeedsStatusBarAppearanceUpdate];
 }
 
