@@ -76,8 +76,8 @@ std::string GetTestSuffix(
       return "kImportToWallet";
     case AutofillAiAction::kWalletDataSharingPromotion:
       return "kWalletDataSharingPromotion";
-    case AutofillAiAction::kTypeSupportsAccessibilityAnnotatorData:
-      return "kTypeSupportsAccessibilityAnnotatorData";
+    case AutofillAiAction::kTypeSupportsPersonalContextData:
+      return "kTypeSupportsPersonalContextData";
   }
   NOTREACHED();
 }
@@ -247,7 +247,7 @@ TEST_P(AutofillAiMayPerformActionTest,
                 AutofillAiAction::kFilling, AutofillAiAction::kImport,
                 AutofillAiAction::kListEntityInstancesInSettings,
                 AutofillAiAction::kUseCachedServerClassificationModelResults,
-                AutofillAiAction::kTypeSupportsAccessibilityAnnotatorData});
+                AutofillAiAction::kTypeSupportsPersonalContextData});
   EXPECT_EQ(
       MayPerformAutofillAiAction(client(), GetParam(), EntityType(kPassport)),
       kAllowedActions.contains(GetParam()));
@@ -285,7 +285,7 @@ TEST_P(AutofillAiMayPerformActionTest, ActionsWhenNotOptedIntoAutofillAi) {
                 AutofillAiAction::kListEntityInstancesInSettings,
                 AutofillAiAction::kOptIn,
                 AutofillAiAction::kUseCachedServerClassificationModelResults,
-                AutofillAiAction::kTypeSupportsAccessibilityAnnotatorData});
+                AutofillAiAction::kTypeSupportsPersonalContextData});
   EXPECT_EQ(
       MayPerformAutofillAiAction(client(), GetParam(), EntityType(kPassport)),
       kAllowedActions.contains(GetParam()));
@@ -540,17 +540,17 @@ TEST_P(AutofillAiMayPerformActionTest,
       !kForbiddenActions.contains(GetParam()));
 }
 
-TEST_F(AutofillAiPermissionUtilsTest, kTypeSupportsAccessibilityAnnotatorData) {
+TEST_F(AutofillAiPermissionUtilsTest, kTypeSupportsPersonalContextData) {
   for (const EntityTypeName type : {kPassport, kDriversLicense, kNationalIdCard,
                                     kFlightReservation, kShipment, kOrder}) {
     EXPECT_TRUE(MayPerformAutofillAiAction(
-        client(), AutofillAiAction::kTypeSupportsAccessibilityAnnotatorData,
+        client(), AutofillAiAction::kTypeSupportsPersonalContextData,
         EntityType(type)));
   }
   for (const EntityTypeName type :
        {kVehicle, kRedressNumber, kKnownTravelerNumber}) {
     EXPECT_FALSE(MayPerformAutofillAiAction(
-        client(), AutofillAiAction::kTypeSupportsAccessibilityAnnotatorData,
+        client(), AutofillAiAction::kTypeSupportsPersonalContextData,
         EntityType(type)));
   }
 }
@@ -570,7 +570,7 @@ INSTANTIATE_TEST_SUITE_P(
            AutofillAiAction::kServerClassificationModel,
            AutofillAiAction::kUseCachedServerClassificationModelResults,
            AutofillAiAction::kWalletDataSharingPromotion,
-           AutofillAiAction::kTypeSupportsAccessibilityAnnotatorData),
+           AutofillAiAction::kTypeSupportsPersonalContextData),
     GetTestSuffix);
 
 #if !BUILDFLAG(IS_CHROMEOS)  // Signing out does not work on ChromeOS.

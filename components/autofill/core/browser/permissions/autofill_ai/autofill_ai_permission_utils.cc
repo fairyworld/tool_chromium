@@ -184,7 +184,7 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     case AutofillAiAction::kUseCachedServerClassificationModelResults:
     case AutofillAiAction::kImportToWallet:
     case AutofillAiAction::kWalletDataSharingPromotion:
-    case AutofillAiAction::kTypeSupportsAccessibilityAnnotatorData:
+    case AutofillAiAction::kTypeSupportsPersonalContextData:
       return false;
     case AutofillAiAction::kEditAndDeleteEntityInstanceInSettings:
     case AutofillAiAction::kListEntityInstancesInSettings:
@@ -254,7 +254,7 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     case AutofillAiAction::kListEntityInstancesInSettings:
     case AutofillAiAction::kLogToMqls:
     case AutofillAiAction::kOptIn:
-    case AutofillAiAction::kTypeSupportsAccessibilityAnnotatorData:
+    case AutofillAiAction::kTypeSupportsPersonalContextData:
       return true;
     case AutofillAiAction::kEnableOrDisable:
       return is_enabled(features::kAutofillAiAvailableByDefault);
@@ -285,7 +285,7 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     case AutofillAiAction::kLogToMqls:
     case AutofillAiAction::kOptIn:
     case AutofillAiAction::kEnableOrDisable:
-    case AutofillAiAction::kTypeSupportsAccessibilityAnnotatorData:
+    case AutofillAiAction::kTypeSupportsPersonalContextData:
       return true;
   }
   NOTREACHED();
@@ -343,8 +343,8 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
       return policy_pref_enabled && autofill_ai_available;
     case AutofillAiAction::kFilling:
     case AutofillAiAction::kImport:
-    case AutofillAiAction::kTypeSupportsAccessibilityAnnotatorData:
-      if (action == AutofillAiAction::kTypeSupportsAccessibilityAnnotatorData) {
+    case AutofillAiAction::kTypeSupportsPersonalContextData:
+      if (action == AutofillAiAction::kTypeSupportsPersonalContextData) {
         if (!entity_type) {
           return false;
         }
@@ -484,7 +484,7 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     case AutofillAiAction::kServerClassificationModel:
     case AutofillAiAction::kUseCachedServerClassificationModelResults:
     case AutofillAiAction::kWalletDataSharingPromotion:
-    case AutofillAiAction::kTypeSupportsAccessibilityAnnotatorData:
+    case AutofillAiAction::kTypeSupportsPersonalContextData:
       break;
   }
   return true;
@@ -514,7 +514,7 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     case AutofillAiAction::kImportToWallet:
     case AutofillAiAction::kWalletDataSharingPromotion:
     case AutofillAiAction::kServerClassificationModel:
-    case AutofillAiAction::kTypeSupportsAccessibilityAnnotatorData: {
+    case AutofillAiAction::kTypeSupportsPersonalContextData: {
       if (is_off_the_record) {
         MaybeOutputReason(debug_message, "Off the record.");
         return false;
@@ -547,7 +547,7 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     case AutofillAiAction::kServerClassificationModel:
     case AutofillAiAction::kFilling:
     case AutofillAiAction::kUseCachedServerClassificationModelResults:
-    case AutofillAiAction::kTypeSupportsAccessibilityAnnotatorData:
+    case AutofillAiAction::kTypeSupportsPersonalContextData:
       break;
   }
 
@@ -580,7 +580,7 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     case AutofillAiAction::kServerClassificationModel:
     case AutofillAiAction::kFilling:
     case AutofillAiAction::kUseCachedServerClassificationModelResults:
-    case AutofillAiAction::kTypeSupportsAccessibilityAnnotatorData:
+    case AutofillAiAction::kTypeSupportsPersonalContextData:
       break;
   }
 
