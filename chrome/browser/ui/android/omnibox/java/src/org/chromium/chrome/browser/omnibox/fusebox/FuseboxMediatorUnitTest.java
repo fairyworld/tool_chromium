@@ -78,6 +78,7 @@ import org.chromium.chrome.browser.omnibox.fusebox.FuseboxCoordinator.FuseboxLay
 import org.chromium.chrome.browser.omnibox.fusebox.FuseboxCoordinator.FuseboxState;
 import org.chromium.chrome.browser.omnibox.fusebox.FuseboxCoordinator.PopupState;
 import org.chromium.chrome.browser.omnibox.fusebox.FuseboxMetrics.FuseboxAttachmentButtonType;
+import org.chromium.chrome.browser.omnibox.fusebox.FuseboxProperties.BackgroundStyle;
 import org.chromium.chrome.browser.omnibox.fusebox.FuseboxProperties.PopupButtonData;
 import org.chromium.chrome.browser.omnibox.styles.OmniboxResourceProvider;
 import org.chromium.chrome.browser.omnibox.suggestions.AutocompleteController;
@@ -506,6 +507,26 @@ public class FuseboxMediatorUnitTest {
         recreateMediator();
 
         assertEquals(FuseboxState.EXPANDED, mModel.get(FuseboxProperties.FUSEBOX_STATE).intValue());
+    }
+
+    @Test
+    public void plusButtonBackground_popoverLayout_isAlwaysVisibleWide() {
+        mModel.set(FuseboxProperties.FUSEBOX_LAYOUT_MODE, FuseboxLayoutMode.SUGGESTIONS_POPOVER);
+        recreateMediator();
+
+        assertEquals(
+                BackgroundStyle.ALWAYS_VISIBLE_WIDE,
+                mModel.get(FuseboxProperties.PLUS_BUTTON_BACKGROUND_STYLE).intValue());
+    }
+
+    @Test
+    public void plusButtonBackground_toolbarLayout_isInteractOnlySmall() {
+        mModel.set(FuseboxProperties.FUSEBOX_LAYOUT_MODE, FuseboxLayoutMode.TOOLBAR);
+        recreateMediator();
+
+        assertEquals(
+                BackgroundStyle.INTERACT_ONLY_SMALL,
+                mModel.get(FuseboxProperties.PLUS_BUTTON_BACKGROUND_STYLE).intValue());
     }
 
     @Test

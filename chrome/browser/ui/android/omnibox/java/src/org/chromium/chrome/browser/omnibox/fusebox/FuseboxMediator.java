@@ -48,6 +48,7 @@ import org.chromium.chrome.browser.omnibox.fusebox.FuseboxCoordinator.FuseboxSta
 import org.chromium.chrome.browser.omnibox.fusebox.FuseboxCoordinator.PopupState;
 import org.chromium.chrome.browser.omnibox.fusebox.FuseboxMetrics.AiModeActivationSource;
 import org.chromium.chrome.browser.omnibox.fusebox.FuseboxMetrics.FuseboxAttachmentButtonType;
+import org.chromium.chrome.browser.omnibox.fusebox.FuseboxProperties.BackgroundStyle;
 import org.chromium.chrome.browser.omnibox.fusebox.FuseboxProperties.PopupButtonData;
 import org.chromium.chrome.browser.omnibox.fusebox.FuseboxProperties.PopupButtonType;
 import org.chromium.chrome.browser.omnibox.styles.OmniboxResourceProvider;
@@ -229,6 +230,7 @@ import java.util.function.Supplier;
         mModel.set(FuseboxProperties.POPUP_MODEL_DIVIDER_VISIBLE, false);
         mModel.set(FuseboxProperties.POPUP_MODEL_HEADER_VISIBLE, false);
         mBackPressManager.addHandler(this, BackPressHandler.Type.FUSEBOX_POPUP);
+        updatePlusButtonBackgroundStyle();
     }
 
     /* package */ void destroy() {
@@ -518,6 +520,17 @@ import java.util.function.Supplier;
         mModel.set(FuseboxProperties.FUSEBOX_STATE, targetState);
         mModel.set(FuseboxProperties.PLUS_BUTTON_VISIBLE, targetState == FuseboxState.EXPANDED);
         mModel.set(FuseboxProperties.REQUEST_TYPE_BUTTON_VISIBLE, showRequestTypeButton);
+    }
+
+    private void updatePlusButtonBackgroundStyle() {
+        boolean useWideStyle =
+                mModel.get(FuseboxProperties.FUSEBOX_LAYOUT_MODE)
+                        == FuseboxLayoutMode.SUGGESTIONS_POPOVER;
+        mModel.set(
+                FuseboxProperties.PLUS_BUTTON_BACKGROUND_STYLE,
+                useWideStyle
+                        ? BackgroundStyle.ALWAYS_VISIBLE_WIDE
+                        : BackgroundStyle.INTERACT_ONLY_SMALL);
     }
 
     @SuppressWarnings("checkstyle:SimplifyBooleanReturn")
