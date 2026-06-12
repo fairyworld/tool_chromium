@@ -69,6 +69,8 @@ class AUCallbackProxy;
 class MEDIA_EXPORT AUAudioInputStream
     : public AgcAudioStream<AudioInputStream> {
  public:
+  using Error = AudioInputStream::AudioInputCallback::Error;
+
   // The ctor takes all the usual parameters, plus |manager| which is the
   // the audio manager who is creating this object.
   AUAudioInputStream(AudioManagerApple* manager,
@@ -165,7 +167,8 @@ class MEDIA_EXPORT AUAudioInputStream
   void HandleError(OSStatus err,
                    const char* message,
                    const base::Location& location = FROM_HERE);
-  void HandleErrorAndNotify_Locked(OSStatus err,
+  void HandleErrorAndNotify_Locked(Error error_code,
+                                   OSStatus err,
                                    const char* message,
                                    const base::Location& location = FROM_HERE)
       EXCLUSIVE_LOCKS_REQUIRED(lock_);

@@ -32,6 +32,8 @@ using ::testing::_;
 
 namespace media {
 
+using Error = AudioInputStream::AudioInputCallback::Error;
+
 constexpr int kSampleRate = 48000;
 constexpr int kFramesPerBuffer = 480;
 
@@ -260,7 +262,7 @@ class MockAudioInputCallback : public AudioInputStream::AudioInputCallback {
                     base::TimeTicks capture_time,
                     double volume,
                     const AudioGlitchInfo& glitch_info));
-  MOCK_METHOD0(OnError, void());
+  MOCK_METHOD1(OnError, void(Error));
 };
 
 class FakeAudioInputCallback : public AudioInputStream::AudioInputCallback {
@@ -280,7 +282,7 @@ class FakeAudioInputCallback : public AudioInputStream::AudioInputCallback {
     }
   }
 
-  void OnError() override {}
+  void OnError(Error error_code) override {}
 
   std::vector<float> channel_data() const { return channel_data_; }
 
@@ -519,7 +521,7 @@ TEST_F(SCKAudioInputStreamTest, ReportErrorToClient) {
     EXPECT_EQ(stream->Open(), AudioInputStream::OpenOutcome::kSuccess);
 
     MockAudioInputCallback sink;
-    EXPECT_CALL(sink, OnError()).Times(1);
+    EXPECT_CALL(sink, OnError(Error::kRuntimeError)).Times(1);
 
     stream->Start(&sink);
     SendError();

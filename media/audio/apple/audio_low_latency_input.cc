@@ -702,7 +702,8 @@ void AUAudioInputStream::SetSystemAGC(bool enable) {
       &property_size);
   if (result != noErr) {
     base::AutoLock al(lock_);
-    HandleErrorAndNotify_Locked(result, "Error reading System AGC property");
+    HandleErrorAndNotify_Locked(Error::kStartupFailed, result,
+                                "Error reading System AGC property");
     return;
   }
 
@@ -718,7 +719,8 @@ void AUAudioInputStream::SetSystemAGC(bool enable) {
 
     if (result != noErr) {
       base::AutoLock al(lock_);
-      HandleErrorAndNotify_Locked(result, "Error setting System AGC property");
+      HandleErrorAndNotify_Locked(Error::kStartupFailed, result,
+                                  "Error setting System AGC property");
       return;
     }
 
@@ -1150,7 +1152,8 @@ OSStatus AUAudioInputStream::OnDataIsAvailable(
     LOG(ERROR) << "Too long sequence of " << err << " errors!";
   }
 
-  HandleErrorAndNotify_Locked(result, "AudioUnitRender() failed");
+  HandleErrorAndNotify_Locked(Error::kRuntimeError, result,
+                              "AudioUnitRender() failed");
   return result;
 }
 
@@ -1276,13 +1279,14 @@ void AUAudioInputStream::HandleError(OSStatus err,
 }
 
 void AUAudioInputStream::HandleErrorAndNotify_Locked(
+    Error error_code,
     OSStatus err,
     const char* message,
     const base::Location& location) {
   lock_.AssertAcquired();
   HandleError(err, message, location);
   if (sink_) {
-    sink_->OnError();
+    sink_->OnError(error_code);
   }
 }
 

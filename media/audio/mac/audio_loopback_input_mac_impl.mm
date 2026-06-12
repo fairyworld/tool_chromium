@@ -26,6 +26,8 @@ using ErrorCallback = base::RepeatingCallback<void()>;
 
 namespace media {
 
+using Error = AudioInputStream::AudioInputCallback::Error;
+
 constexpr float kMaxVolume = 1.0;
 
 // Used for synchronized data access between SCKAudioInputStream and
@@ -549,7 +551,7 @@ void SCKAudioInputStream::OnStreamError() {
   CHECK(sink_);
   // |sink_| is safe to access, as OnStreamError() is called from
   // |shared_helper_| with the lock acquired.
-  sink_->OnError();
+  sink_->OnError(Error::kRuntimeError);
 }
 
 void SCKAudioInputStream::SendLogMessage(const char* format, ...) {
