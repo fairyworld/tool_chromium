@@ -8427,8 +8427,26 @@ bool NavigationRequest::IsReload() const {
   return NavigationTypeUtils::IsReload(common_params_->navigation_type);
 }
 
+RenderFrameHost* NavigationRequest::GetRenderFrameHostForDownloadLogging() {
+  RenderFrameHostImpl* rfh = frame_tree_node_->current_frame_host();
+
+  // Attribute download logging to the initiator's RenderFrameHost for a
+  // newly opened popup that turns into a download. This allows for actionable
+  // telemetry (UKM) and better debugging. Note: This is a best-effort approach,
+  // as the initiator document might have already navigated away.
+  if (IsInOutermostMainFrame() && rfh->is_initial_empty_document()) {
+    if (RenderFrameHostImpl* initiator_rfh =
+            GetInitiatorDocumentRenderFrameHost()) {
+      rfh = initiator_rfh;
+    }
+  }
+
+  return rfh;
+}
+
 void NavigationRequest::RecordDownloadUseCountersPrePolicyCheck() {
-  RenderFrameHost* rfh = frame_tree_node_->current_frame_host();
+  RenderFrameHost* rfh = GetRenderFrameHostForDownloadLogging();
+
   GetContentClient()->browser()->LogWebFeatureForCurrentPage(
       rfh, blink::mojom::WebFeature::kDownloadPrePolicyCheck);
 
@@ -8474,7 +8492,8 @@ void NavigationRequest::RecordDownloadUseCountersPrePolicyCheck() {
 
 void NavigationRequest::RecordDownloadUseCountersPostPolicyCheck() {
   CHECK(is_download_);
-  RenderFrameHost* rfh = frame_tree_node_->current_frame_host();
+  RenderFrameHost* rfh = GetRenderFrameHostForDownloadLogging();
+
   GetContentClient()->browser()->LogWebFeatureForCurrentPage(
       rfh, blink::mojom::WebFeature::kDownloadPostPolicyCheck);
 }

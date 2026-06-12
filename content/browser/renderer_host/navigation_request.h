@@ -2208,6 +2208,10 @@ class CONTENT_EXPORT NavigationRequest
   // when we commit the new page.
   void AddOldPageInfoToCommitParamsIfNeeded();
 
+  // Returns the RenderFrameHost that should be attributed for download related
+  // logging (e.g., UseCounters, console messages).
+  RenderFrameHost* GetRenderFrameHostForDownloadLogging();
+
   // Record download related UseCounters when navigation is a download before
   // filtered by download_policy.
   void RecordDownloadUseCountersPrePolicyCheck();
