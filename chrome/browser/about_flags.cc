@@ -10298,10 +10298,6 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kPermissionsAIv4Description, kOsAll,
      FEATURE_VALUE_TYPE(permissions::features::kPermissionsAIv4)},
 
-    {"permissions-ai-p92", flag_descriptions::kPermissionsAIP92Name,
-     flag_descriptions::kPermissionsAIP92Description, kOsAll,
-     FEATURE_VALUE_TYPE(permissions::features::kPermissionsAIP92)},
-
 #if BUILDFLAG(IS_ANDROID)
     {"permissions-android-clapper-loud",
      flag_descriptions::kPermissionsAndroidClapperLoudName,

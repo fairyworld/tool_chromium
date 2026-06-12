@@ -7679,15 +7679,6 @@
     "expiry_milestone": 154
   },
   {
-    "name": "permissions-ai-p92",
-    "owners": [
-      "elklm@chromium.org",
-      "hempjudith@google.com",
-      "//components/permissions/PERMISSIONS_OWNERS"
-    ],
-    "expiry_milestone": 150
-  },
-  {
     "name": "permissions-ai-v4",
     "owners": [
       "elklm@chromium.org",
