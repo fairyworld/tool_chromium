@@ -525,6 +525,7 @@ void IOSChromeSavePasswordInfoBarDelegate::OnPasswordErrorFlowCompleted() {
     auto new_infobar =
         std::make_unique<InfoBarIOS>(type, std::move(new_delegate),
                                      /*skip_banner=*/true);
+    new_infobar->set_start_animated(false);
     infobar_ptr->owner()->ReplaceInfoBar(infobar_ptr, std::move(new_infobar));
   }
 }
