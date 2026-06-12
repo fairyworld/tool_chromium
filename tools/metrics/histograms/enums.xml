@@ -13946,6 +13946,7 @@ from previous Chrome versions.
   <int value="-145418947" label="webview-disable-package-allowlist-throttling"/>
   <int value="-145345223" label="ThirdPartyStoragePartitioning:enabled"/>
   <int value="-144134779" label="AndroidPayIntegrationV2:disabled"/>
+  <int value="-143630801" label="AllowMultipleMediaNotifications:disabled"/>
   <int value="-143382681" label="InstantTethering:enabled"/>
   <int value="-143121333" label="WebXRIncubations:enabled"/>
   <int value="-142004292" label="QuickActionShowBubbleLauncher:disabled"/>
@@ -17746,6 +17747,7 @@ from previous Chrome versions.
   <int value="1099498594" label="SupervisedUserProfileSigninIPH:enabled"/>
   <int value="1100048827" label="BluetoothWbsDogfood:enabled"/>
   <int value="1100244809" label="MacSystemMediaPermissionsInfoUI:disabled"/>
+  <int value="1100562852" label="AllowMultipleMediaNotifications:enabled"/>
   <int value="1101062411" label="Rar2Fs:disabled"/>
   <int value="1101421005" label="DownloadLater:disabled"/>
   <int value="1101579966" label="AndroidDocumentPictureInPicture:enabled"/>

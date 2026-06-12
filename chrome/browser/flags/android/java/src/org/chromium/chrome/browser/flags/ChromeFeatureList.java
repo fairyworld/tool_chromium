@@ -172,6 +172,8 @@ public abstract class ChromeFeatureList {
     // Don't clean up this flag yet, BCIV is launched, so this needs to be enabled by
     // default, but some render tests need to disable this so that the hairline isn't
     // included in the screenshot. See https://crbug.com/394842006 for more details.
+    public static final String ALLOW_MULTIPLE_MEDIA_NOTIFICATIONS =
+            "AllowMultipleMediaNotifications";
     public static final String ALWAYS_DRAW_COMPOSITED_TOOLBAR_HAIRLINE =
             "AlwaysDrawCompositedToolbarHairline";
     public static final String ANDROID_ACTOR_TASK_TIMEOUT = "AndroidActorTaskTimeout";

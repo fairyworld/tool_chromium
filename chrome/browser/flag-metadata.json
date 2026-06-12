@@ -196,6 +196,11 @@
     "expiry_milestone": 130
   },
   {
+    "name": "allow-multiple-media-notifications",
+    "owners": [ "jhimawan@google.com", "clank-app-team@google.com", "philyan@google.com" ],
+    "expiry_milestone": 160
+  },
+  {
     "name": "alt-click-and-six-pack-customization",
     "owners": [ "michaelcheco@chromium.org", "cros-device-enablement@google.com" ],
     "expiry_milestone": 140

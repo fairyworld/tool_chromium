@@ -219,6 +219,7 @@ const base::Feature* const kFeaturesExposedToJava[] = {
     &kActivateHistoryNavigationCoordinatorInGestureNavMode,
     &kAdaptiveButtonInTopToolbarCustomizationV2,
     &kAllocInstanceIdIncreasedDefaultRange,
+    &kAllowMultipleMediaNotifications,
     &kAlwaysDrawCompositedToolbarHairline,
     &kAndroidActorTaskTimeout,
     &kAndroidAppIntegrationMultiDataSource,
@@ -581,6 +582,7 @@ BASE_FEATURE(kAccountForSuppressedKeyboardInsets, base::FEATURE_ENABLED_BY_DEFAU
 BASE_FEATURE(kActivateHistoryNavigationCoordinatorInGestureNavMode, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kAdaptiveButtonInTopToolbarCustomizationV2, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kAllocInstanceIdIncreasedDefaultRange, base::FEATURE_ENABLED_BY_DEFAULT);
+BASE_FEATURE(kAllowMultipleMediaNotifications, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kAlwaysDrawCompositedToolbarHairline, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kAndroidActorTaskTimeout, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kAndroidAppIntegrationMultiDataSource, base::FEATURE_ENABLED_BY_DEFAULT);

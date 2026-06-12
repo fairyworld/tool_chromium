@@ -5179,6 +5179,11 @@ inline constexpr char kAccessibilityUnifiedSnapshotsDescription[] =
     "When enabled, use the experimental unified code path for AXTree "
     "snapshots.";
 
+inline constexpr char kAllowMultipleMediaNotificationsName[] =
+    "Allow multiple media notifications";
+inline constexpr char kAllowMultipleMediaNotificationsDescription[] =
+    "Enable Clank to post multiple media notifications.";
+
 inline constexpr char kAlwaysDrawCompositedToolbarHairlineName[] =
     "Always Draw Composited Toolbar Hairline";
 inline constexpr char kAlwaysDrawCompositedToolbarHairlineDescription[] =

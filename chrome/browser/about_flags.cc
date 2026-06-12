@@ -13026,6 +13026,12 @@ const FeatureEntry kFeatureEntries[] = {
                                          kWebUIToolbarFeatures)},
 #endif
 
+#if BUILDFLAG(IS_ANDROID)
+    {"allow-multiple-media-notifications",
+     flag_descriptions::kAllowMultipleMediaNotificationsName,
+     flag_descriptions::kAllowMultipleMediaNotificationsDescription, kOsAndroid,
+     FEATURE_VALUE_TYPE(chrome::android::kAllowMultipleMediaNotifications)},
+#endif
     // Add new entries above this line.
     // NOTE: Adding a new flag requires adding a corresponding entry to enum
     // "LoginCustomFlags" in tools/metrics/histograms/enums.xml. See "Flag
