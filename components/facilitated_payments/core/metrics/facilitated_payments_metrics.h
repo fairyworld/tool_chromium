@@ -183,7 +183,10 @@ enum class PixFlowExitedReason {
   kIframeUrlNotAllowlisted = 20,
   // Pix code was copied when a payflow has already started.
   kFlowAlreadyStarted = 21,
-  kMaxValue = kFlowAlreadyStarted
+  // Pix code was copied in a same-origin iframe but the merchant is not
+  // allowlisted.
+  kSameOriginMerchantNotAllowlisted = 22,
+  kMaxValue = kSameOriginMerchantNotAllowlisted
 };
 // LINT.ThenChange(/tools/metrics/histograms/metadata/facilitated_payments/enums.xml:FacilitatedPayments.PixFlowExitedReason)
 
