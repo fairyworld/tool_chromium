@@ -175,6 +175,7 @@
 #include "services/metrics/public/cpp/ukm_recorder.h"
 #include "services/metrics/public/cpp/ukm_source_id.h"
 #include "services/network/public/cpp/client_hints.h"
+#include "services/network/public/cpp/constants.h"
 #include "services/network/public/cpp/content_decoding_interceptor.h"
 #include "services/network/public/cpp/content_security_policy/content_security_policy.h"
 #include "services/network/public/cpp/cross_origin_embedder_policy.h"
@@ -1823,8 +1824,7 @@ NavigationRequest::NavigationRequest(
       request_method_(common_params_->method),
       original_url_(common_params_->url),
       prerender_host_id_(
-          GetPrerenderHostRegistry().GetPrerenderHostIdForNavigation(this)),
-      network_restrictions_id_(std::nullopt) {
+          GetPrerenderHostRegistry().GetPrerenderHostIdForNavigation(this)) {
   TRACE_EVENT("navigation", "NavigationRequest::NavigationRequest",
               perfetto::Flow::FromPointer(this),
               perfetto::protos::pbzero::ChromeTrackEvent::kNavigation, this);
@@ -2249,7 +2249,7 @@ NavigationRequest::NavigationRequest(
       storage_partition->GetNetworkContext()->PreconnectSockets(
           1, common_params_->url, network::mojom::CredentialsMode::kInclude,
           GetIsolationInfo().network_anonymization_key(),
-          /*network_restrictions_id=*/std::nullopt,
+          network::GetNoOpNetworkRestrictionsId(),
           net::MutableNetworkTrafficAnnotationTag(),
           /*keepalive_config=*/std::nullopt, mojo::NullRemote());
     }

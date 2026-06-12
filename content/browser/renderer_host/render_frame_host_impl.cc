@@ -2197,7 +2197,7 @@ class RenderFrameHostImpl::SubresourceLoaderFactoriesConfig {
     return cookie_setting_overrides_;
   }
 
-  const std::optional<base::UnguessableToken>& network_restrictions_id() const {
+  const base::UnguessableToken& network_restrictions_id() const {
     return network_restrictions_id_;
   }
 
@@ -2216,7 +2216,7 @@ class RenderFrameHostImpl::SubresourceLoaderFactoriesConfig {
       trust_token_redemption_policy_;
   ukm::SourceIdObj ukm_source_id_;
   net::CookieSettingOverrides cookie_setting_overrides_;
-  std::optional<base::UnguessableToken> network_restrictions_id_;
+  base::UnguessableToken network_restrictions_id_;
 };
 
 class PendingNavigation {
@@ -3583,8 +3583,7 @@ RenderFrameHostImpl::GetPendingIsolationInfoForSubresources() {
   return config.isolation_info();
 }
 
-std::optional<base::UnguessableToken>
-RenderFrameHostImpl::GetNetworkRestrictionsID() {
+base::UnguessableToken RenderFrameHostImpl::GetNetworkRestrictionsID() {
   // TODO(crbug.com/447954811): Consider refactoring this method after
   // RenderDocument launches, because we may not need to consider pending
   // navigations anymore.

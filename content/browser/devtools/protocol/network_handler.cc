@@ -95,6 +95,7 @@
 #include "net/ssl/ssl_cipher_suite_names.h"
 #include "net/ssl/ssl_connection_status_flags.h"
 #include "net/url_request/referrer_policy.h"
+#include "services/network/public/cpp/constants.h"
 #include "services/network/public/cpp/data_element.h"
 #include "services/network/public/cpp/devtools_observer_util.h"
 #include "services/network/public/cpp/features.h"
@@ -4718,7 +4719,7 @@ void NetworkHandler::LoadNetworkResource(
         network::mojom::TrustTokenOperationPolicyVerdict::kForbid,
         network::mojom::TrustTokenOperationPolicyVerdict::kForbid,
         frame->GetCookieSettingOverrides(),
-        /*network_restrictions_id=*/std::nullopt,
+        /*network_restrictions_id=*/network::GetTODONetworkRestrictionsId(),
         "NetworkHandler::LoadNetworkResource");
 
     auto factory = CreateNetworkFactoryForDevTools(

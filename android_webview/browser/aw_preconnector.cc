@@ -16,6 +16,7 @@
 #include "content/public/browser/preconnect_request.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "net/base/network_anonymization_key.h"
+#include "services/network/public/cpp/constants.h"
 #include "url/android/gurl_android.h"
 #include "url/origin.h"
 #include "url/url_constants.h"
@@ -109,10 +110,14 @@ bool AwPreconnector::Preconnect(JNIEnv* env, const GURL& url) {
 
   std::optional<net::ConnectionKeepAliveConfig> keepalive_config;
 
+  // Preconnection initiated at the Profile level is out of scope of connection
+  // allowlists, so there is no associated frame/document context to restrict.
+  // See https://wicg.github.io/connection-allowlists/#threat-model. Hence
+  // pass a No-op network_restrictions_id.
   GetPreconnectManager().StartPreconnectUrl(
       url, /*allow_credentials=*/true, key, kWebViewPreconnectTrafficAnnotation,
       /*storage_partition_config=*/nullptr,
-      /*network_restrictions_id=*/std::nullopt, std::move(keepalive_config),
+      network::GetNoOpNetworkRestrictionsId(), std::move(keepalive_config),
       std::move(observer));
 
   TRACE_EVENT1("android_webview", "Preconnect::Begin", "url", url);

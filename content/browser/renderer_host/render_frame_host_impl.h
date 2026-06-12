@@ -518,7 +518,7 @@ class CONTENT_EXPORT RenderFrameHostImpl
   const net::NetworkIsolationKey& GetNetworkIsolationKey() override;
   const net::IsolationInfo& GetIsolationInfoForSubresources() override;
   net::IsolationInfo GetPendingIsolationInfoForSubresources() override;
-  std::optional<base::UnguessableToken> GetNetworkRestrictionsID() override;
+  base::UnguessableToken GetNetworkRestrictionsID() override;
   gfx::NativeView GetNativeView() override;
   void AddMessageToConsole(blink::mojom::ConsoleMessageLevel level,
                            const std::string& message) override;
