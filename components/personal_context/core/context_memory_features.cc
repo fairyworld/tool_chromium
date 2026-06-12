@@ -20,6 +20,8 @@ std::string_view GetStringNameForContextMemoryFeature(
       return "AtMemory";
     case proto::CONTEXT_MEMORY_FEATURE_UNSPECIFIED:
       return "Unspecified";
+    case proto::CONTEXT_MEMORY_FEATURE_AUTO_TODOS:
+      return "AutoTodos";
     case proto::ContextMemoryFeature_INT_MIN_SENTINEL_DO_NOT_USE_:
     case proto::ContextMemoryFeature_INT_MAX_SENTINEL_DO_NOT_USE_:
       return "";

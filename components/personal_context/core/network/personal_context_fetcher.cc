@@ -87,6 +87,10 @@ net::NetworkTrafficAnnotationTag GetNetworkTrafficAnnotation(
       // TODO(crbug.com/515050857): fill out at-memory traffic annotation
       // details.
       return MISSING_TRAFFIC_ANNOTATION;
+    case proto::CONTEXT_MEMORY_FEATURE_AUTO_TODOS:
+      // TODO(crbug.com/523284957): fill out auto-todos traffic annotation
+      // details.
+      return MISSING_TRAFFIC_ANNOTATION;
     case proto::CONTEXT_MEMORY_FEATURE_UNSPECIFIED:
     default:
       NOTREACHED();
