@@ -5,7 +5,9 @@
 #include "components/themes/cross_device/cross_device_theme_tracker.h"
 
 #include "base/test/task_environment.h"
+#include "components/sync/base/client_tag_hash.h"
 #include "components/sync_device_info/fake_device_info_tracker.h"
+#include "components/sync_device_info/test_device_info_builder.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -35,6 +37,22 @@ class TestCrossDeviceThemeTracker
 
 class CrossDeviceThemeTrackerTest : public testing::Test {
  protected:
+  std::string AddDevice(const std::string& cache_guid,
+                        const std::string& client_name,
+                        syncer::DeviceInfo::OsType os_type,
+                        syncer::DeviceInfo::FormFactor form_factor) {
+    auto device_info = syncer::TestDeviceInfoBuilder()
+                           .WithGuid(cache_guid)
+                           .WithClientName(client_name)
+                           .WithOsType(os_type)
+                           .WithFormFactor(form_factor)
+                           .Build();
+    fake_device_info_tracker_.Add(std::move(device_info));
+
+    syncer::DataType type = OsTypeToDataType(os_type);
+    return syncer::ClientTagHash::FromUnhashed(type, cache_guid).value();
+  }
+
   base::test::TaskEnvironment task_environment_;
   syncer::FakeDeviceInfoTracker fake_device_info_tracker_;
   TestCrossDeviceThemeTracker tracker_{&fake_device_info_tracker_};
@@ -90,6 +108,7 @@ TEST_F(CrossDeviceThemeTrackerTest, UpdateAndRemoveTheme) {
   theme_info2.form_factor = syncer::DeviceInfo::FormFactor::kTablet;
   theme_info2.color = SK_ColorGREEN;
 
+  // Expect observer notification on update.
   EXPECT_CALL(observer, OnCrossDeviceThemeChanged()).Times(1);
   tracker_.UpdateThemeInfo("guid_2", theme_info2);
   testing::Mock::VerifyAndClearExpectations(&observer);
@@ -128,6 +147,54 @@ TEST_F(CrossDeviceThemeTrackerTest, StatusChanges) {
   EXPECT_CALL(observer, OnServiceStatusChanged(testing::_)).Times(0);
   tracker_.SetStatus(ServiceStatus::kActive);
   testing::Mock::VerifyAndClearExpectations(&observer);
+
+  tracker_.RemoveObserver(&observer);
+}
+
+TEST_F(CrossDeviceThemeTrackerTest, DeviceInfoChange) {
+  MockObserver observer;
+  tracker_.AddObserver(&observer);
+
+  std::string cache_guid = "device_guid_1";
+  std::string hash =
+      AddDevice(cache_guid, "Phone", syncer::DeviceInfo::OsType::kAndroid,
+                syncer::DeviceInfo::FormFactor::kPhone);
+
+  PlatformThemeInfo theme_info;
+  theme_info.os_type = syncer::DeviceInfo::OsType::kAndroid;
+  theme_info.color = SK_ColorBLUE;
+
+  // Update theme. Since device info is already added, it should resolve
+  // immediately.
+  EXPECT_CALL(observer, OnCrossDeviceThemeChanged()).Times(1);
+  tracker_.UpdateThemeInfo(hash, theme_info);
+  testing::Mock::VerifyAndClearExpectations(&observer);
+
+  auto themes = tracker_.GetOtherDevicesThemes();
+  ASSERT_EQ(themes.size(), 1u);
+  EXPECT_EQ(themes[0].device_name, "Phone");
+  EXPECT_EQ(themes[0].form_factor, syncer::DeviceInfo::FormFactor::kPhone);
+
+  // Now simulate a change in device info (e.g. name change).
+  const syncer::DeviceInfo* old_device =
+      fake_device_info_tracker_.GetDeviceInfo(cache_guid);
+  ASSERT_TRUE(old_device);
+  fake_device_info_tracker_.Remove(old_device);
+
+  EXPECT_CALL(observer, OnCrossDeviceThemeChanged()).Times(1);
+  auto updated_device_info =
+      syncer::TestDeviceInfoBuilder()
+          .WithGuid(cache_guid)
+          .WithClientName("New Phone Name")
+          .WithOsType(syncer::DeviceInfo::OsType::kAndroid)
+          .WithFormFactor(syncer::DeviceInfo::FormFactor::kPhone)
+          .Build();
+  fake_device_info_tracker_.Add(std::move(updated_device_info));
+  testing::Mock::VerifyAndClearExpectations(&observer);
+
+  themes = tracker_.GetOtherDevicesThemes();
+  ASSERT_EQ(themes.size(), 1u);
+  EXPECT_EQ(themes[0].device_name, "New Phone Name");
 
   tracker_.RemoveObserver(&observer);
 }
