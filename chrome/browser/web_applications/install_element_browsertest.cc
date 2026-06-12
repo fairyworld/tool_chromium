@@ -584,6 +584,7 @@ IN_PROC_BROWSER_TEST_F(InstallElementBrowserTest,
 
   // Verify promptaction event was fired.
   WaitForPromptActionEvent(kInstallElementId);
+  test::CompletePageLoadForAllWebContents();
 
   // Verify the app is still installed.
   EXPECT_TRUE(provider().registrar_unsafe().AppMatches(
