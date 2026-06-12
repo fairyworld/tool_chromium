@@ -29,8 +29,8 @@ class UnboundedElementBrowserTest : public ContentBrowserTest {
   UnboundedElementBrowserTest() = default;
   ~UnboundedElementBrowserTest() override = default;
   void SetUp() override {
-#if !BUILDFLAG(IS_MAC)
-    // TODO(crbug.com/508672616): Not yet completed for non-Mac platforms.
+#if BUILDFLAG(IS_ANDROID)
+    // TODO(crbug.com/508672616): Not yet implemented on Android.
     GTEST_SKIP();
 #else
     feature_list_.InitWithFeatures(

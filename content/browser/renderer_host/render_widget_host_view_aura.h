@@ -237,6 +237,14 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
   viz::ScopedSurfaceIdAllocator DidUpdateVisualProperties(
       const cc::RenderFrameMetadata& metadata) override;
   void DidNavigate() override;
+
+  // Unbounded element API overrides:
+  void CreateUnboundedSurface(
+      mojo::PendingAssociatedReceiver<blink::mojom::UnboundedSurfaceHost> host,
+      mojo::PendingAssociatedRemote<blink::mojom::UnboundedSurfaceClient>
+          client,
+      const gfx::Rect& bounds_in_dips) override;
+
   void TakeFallbackContentFrom(RenderWidgetHostView* view) override;
   bool CanSynchronizeVisualProperties() override;
   // TODO(lanwei): Use TestApi interface to write functions that are used in

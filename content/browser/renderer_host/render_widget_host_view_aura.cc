@@ -51,6 +51,7 @@
 #include "content/browser/renderer_host/render_widget_host_delegate.h"
 #include "content/browser/renderer_host/render_widget_host_impl.h"
 #include "content/browser/renderer_host/render_widget_host_view_event_handler.h"
+#include "content/browser/renderer_host/unbounded_surface_window_aura.h"
 #include "content/browser/renderer_host/visible_time_request_trigger.h"
 #include "content/public/browser/content_browser_client.h"
 #include "content/public/browser/device_service.h"
@@ -3589,6 +3590,14 @@ void RenderWidgetHostViewAura::DidNavigate() {
   }
   delegated_frame_host_->DidNavigate();
   is_first_navigation_ = false;
+}
+
+void RenderWidgetHostViewAura::CreateUnboundedSurface(
+    mojo::PendingAssociatedReceiver<blink::mojom::UnboundedSurfaceHost> host,
+    mojo::PendingAssociatedRemote<blink::mojom::UnboundedSurfaceClient> client,
+    const gfx::Rect& bounds_in_dips) {
+  unbounded_surface_window_ = UnboundedSurfaceWindowAura::Create(
+      this, std::move(host), std::move(client), bounds_in_dips);
 }
 
 MouseWheelPhaseHandler* RenderWidgetHostViewAura::GetMouseWheelPhaseHandler() {

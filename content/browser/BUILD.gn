@@ -3705,6 +3705,8 @@ source_set("browser") {
       "renderer_host/delegated_frame_host_client_aura.h",
       "renderer_host/render_widget_host_view_event_handler.cc",
       "renderer_host/render_widget_host_view_event_handler.h",
+      "renderer_host/unbounded_surface_window_aura.cc",
+      "renderer_host/unbounded_surface_window_aura.h",
     ]
 
     if (is_linux) {
