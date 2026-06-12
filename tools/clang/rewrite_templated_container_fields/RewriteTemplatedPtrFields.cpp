@@ -826,11 +826,17 @@ AST_MATCHER_P(clang::Expr,
       has(expr(unless(declRefExpr(to(cxxMethodDecl(hasName("operator*"))))))
               .bind("expr")));
 
+  auto loop_var_second = memberExpr(
+      member(hasName("second")),
+      hasObjectExpression(declRefExpr(to(varDecl(hasParent(declStmt(
+          hasParent(cxxForRangeStmt(hasRangeInit(expr().bind("expr")))))))))));
+
   auto second_member =
       memberExpr(member(hasName("second")), has(expr().bind("expr")));
 
-  auto items = {iterator,        search_calls,  unary_op,     reversed_expr,
-                bracket_op_call, arrow_op_call, star_op_call, second_member};
+  auto items = {iterator,      search_calls,    unary_op,
+                reversed_expr, bracket_op_call, arrow_op_call,
+                star_op_call,  loop_var_second, second_member};
   clang::ast_matchers::internal::BoundNodesTreeBuilder matches;
   const clang::Expr* n = nullptr;
   std::any_of(items.begin(), items.end(), [&](auto& item) {
@@ -1081,7 +1087,8 @@ class ContainerRewriter {
       auto auto_star_in_range_stmt = traverse(
           clang::TK_IgnoreUnlessSpelledInSource,
           cxxForRangeStmt(
-              has(varDecl(hasDescendant(loc(qualType(pointsTo(autoType())))
+              hasLoopVariable(
+                  varDecl(hasDescendant(loc(qualType(pointsTo(autoType())))
                                             .bind("autoLoc")))
                       .bind("autoVarDecl")),
               has(expr(
