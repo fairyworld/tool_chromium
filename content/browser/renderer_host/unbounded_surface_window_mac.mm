@@ -198,10 +198,9 @@ void UnboundedSurfaceWindowMac::InitWindow(const gfx::Rect& bounds_in_dips) {
   gfx::Size size_pixels = gfx::ToRoundedSize(gfx::ConvertSizeToPixels(
       bounds_in_screen.size(), display_info.scale_factor));
 
-  recyclable_compositor_->UpdateSurface(
-      size_pixels, display_info.scale_factor, display_info.display_color_spaces,
-      display_info.display_id,
-      /*refresh_rate_changed_on_same_display=*/false);
+  recyclable_compositor_->UpdateSurface(size_pixels, display_info.scale_factor,
+                                        display_info.display_color_spaces,
+                                        display_info.display_id);
 
   recyclable_compositor_->compositor()->SetRootLayer(root_layer_.get());
   recyclable_compositor_->compositor()->SetBackgroundColor(SK_ColorTRANSPARENT);
@@ -245,8 +244,7 @@ void UnboundedSurfaceWindowMac::SetBounds(const gfx::Rect& bounds_in_screen) {
 
       recyclable_compositor_->UpdateSurface(
           size_pixels, display_info.scale_factor,
-          display_info.display_color_spaces, display_info.display_id,
-          /*refresh_rate_changed_on_same_display=*/false);
+          display_info.display_color_spaces, display_info.display_id);
     }
 
     if (root_layer_) {
