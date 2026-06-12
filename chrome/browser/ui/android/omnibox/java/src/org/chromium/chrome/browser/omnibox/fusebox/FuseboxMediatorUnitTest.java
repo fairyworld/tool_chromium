@@ -645,6 +645,42 @@ public class FuseboxMediatorUnitTest {
     }
 
     @Test
+    public void testActivationChipSelectionChanged_clearsUrl() {
+        mInput.setRequestType(AutocompleteRequestType.SEARCH);
+        mInput.setInitialUserText("google.com");
+        mUrlBarText.set("google.com");
+        recreateMediator();
+
+        mMediator.onActivationChipSelectionChanged(true);
+
+        verify(mClearUrlBarTextCallback).run();
+    }
+
+    @Test
+    public void testActivationChipSelectionChanged_doesNotClearIfDifferent() {
+        mInput.setRequestType(AutocompleteRequestType.SEARCH);
+        mInput.setInitialUserText("google.com");
+        mUrlBarText.set("different text");
+        recreateMediator();
+
+        mMediator.onActivationChipSelectionChanged(true);
+
+        verify(mClearUrlBarTextCallback, never()).run();
+    }
+
+    @Test
+    public void testActivationChipSelectionChanged_doesNotClearIfEmpty() {
+        mInput.setRequestType(AutocompleteRequestType.SEARCH);
+        mInput.setInitialUserText("google.com");
+        mUrlBarText.set("");
+        recreateMediator();
+
+        mMediator.onActivationChipSelectionChanged(true);
+
+        verify(mClearUrlBarTextCallback, never()).run();
+    }
+
+    @Test
     public void updateFuseboxState_setsRequestTypeButtonVisible_true() {
         OmniboxCapabilities.setIsDesktopPlatformForTesting(false);
         mInput.setRequestType(AutocompleteRequestType.AI_MODE);

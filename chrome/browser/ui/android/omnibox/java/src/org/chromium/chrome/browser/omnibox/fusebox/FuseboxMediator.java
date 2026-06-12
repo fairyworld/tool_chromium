@@ -192,6 +192,8 @@ import java.util.function.Supplier;
         mActivationChipVisibilitySupplier = activationChipVisibilitySupplier;
         mOnActivationChipClickedWithQuery = onActivationChipClickedWithQuery;
         mClearUrlBarTextRunnable = clearUrlBarTextRunnable;
+        // TODO(https://crbug.com/520528598): Remove current text supplier once AutocompleteInput
+        // has uncommitted text, and use that instead.
         mUrlBarTextSupplier = urlBarTextSupplier;
 
         // Create the upload failed snackbar.
@@ -1029,6 +1031,11 @@ import java.util.function.Supplier;
 
     void onActivationChipSelectionChanged(boolean selected) {
         mModel.set(FuseboxProperties.ACTIVATION_CHIP_SELECTED, selected);
+        if (selected && isInInputSession()) {
+            if (isUrlBarTextUnchanged() && !TextUtils.isEmpty(mUrlBarTextSupplier.get())) {
+                mClearUrlBarTextRunnable.run();
+            }
+        }
     }
 
     private void updatePopupButtonEnabledStates() {
@@ -1222,20 +1229,21 @@ import java.util.function.Supplier;
         if (!isInInputSession()) return;
         mInput.setAutocompleteState(AutocompleteState.ENABLED);
 
-        // TODO(https://crbug.com/520528598): Remove current text supplier once AutocompleteInput
-        // has uncommitted text, and use that instead.
-        String currentUrlBarText = mUrlBarTextSupplier.get();
-        String initialUserText = mInput.getInitialUserText();
         activateAiMode(AutocompleteRequestType.AI_MODE, AiModeActivationSource.DEDICATED_BUTTON);
-        if (TextUtils.isEmpty(currentUrlBarText)
-                || TextUtils.equals(currentUrlBarText, initialUserText)) {
+        if (isUrlBarTextUnchanged()) {
             mClearUrlBarTextRunnable.run();
-        } else {
+        } else if (!TextUtils.isEmpty(mUrlBarTextSupplier.get())) {
             // TODO(https://crbug.com/520528598): Call commit on the AutocompleteInput and then
             // reimplement this runnable to navigate via the current input state, instead of reading
             // from the views.
             mOnActivationChipClickedWithQuery.run();
         }
+    }
+
+    private boolean isUrlBarTextUnchanged() {
+        String currentUrlBarText = mUrlBarTextSupplier.get();
+        String initialUserText = assumeNonNull(mInput).getInitialUserText();
+        return TextUtils.equals(currentUrlBarText, initialUserText);
     }
 
     @VisibleForTesting
