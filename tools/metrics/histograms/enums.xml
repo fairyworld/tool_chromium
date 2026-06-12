@@ -13037,6 +13037,7 @@ from previous Chrome versions.
   <int value="-438495497" label="enable-unsafe-swiftshader"/>
   <int value="-438379844" label="SwapSideVolumeButtonsForOrientation:enabled"/>
   <int value="-438348502" label="LogUrlScoringSignals:disabled"/>
+  <int value="-438255075" label="OmniboxFuseboxAsyncInflation:disabled"/>
   <int value="-438059967"
       label="CertificateTransparencyIgnoreOcspScts:enabled"/>
   <int value="-437937965" label="AccessibilityShakeToLocate:disabled"/>
@@ -15608,6 +15609,7 @@ from previous Chrome versions.
   <int value="395148768" label="AutofillFillIbanFields:disabled"/>
   <int value="397275669" label="QuickCommands:disabled"/>
   <int value="397422144" label="autofill-ai-wallet-pass-branding-2026:enabled"/>
+  <int value="398220251" label="OmniboxFuseboxAsyncInflation:enabled"/>
   <int value="398903399" label="GenericSensorExtraClasses:disabled"/>
   <int value="399015470" label="SkiaGraphitePrecompilation:enabled"/>
   <int value="399039205" label="enable-webrtc-hw-vp9-encoding"/>

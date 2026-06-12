@@ -17313,6 +17313,21 @@
             ]
         }
     ],
+    "OmniboxFuseboxAsyncInflation": [
+        {
+            "platforms": [
+                "android"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "enable_features": [
+                        "OmniboxFuseboxAsyncInflation"
+                    ]
+                }
+            ]
+        }
+    ],
     "OmniboxItemDecoration": [
         {
             "platforms": [

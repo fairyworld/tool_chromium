@@ -314,6 +314,9 @@ BASE_FEATURE(kOmniboxAppendInvocationSource, DISABLED);
 // Enable asynchronous Omnibox/Suggest view inflation.
 BASE_FEATURE(kOmniboxAsyncViewInflation, DISABLED);
 
+// Enable asynchronous Fusebox view inflation.
+BASE_FEATURE(kOmniboxFuseboxAsyncInflation, DISABLED);
+
 // Use FusedLocationProvider on Android to fetch device location.
 BASE_FEATURE(kUseFusedLocationProvider, ENABLED);
 
@@ -484,6 +487,7 @@ static int64_t JNI_OmniboxFeatureMap_GetNativeMap(JNIEnv* env) {
       &kForceAndroidRealbox,
       &kOmniboxTouchDownTriggerForPrefetch,
       &kOmniboxAsyncViewInflation,
+      &kOmniboxFuseboxAsyncInflation,
       &kRichAutocompletion,
       &kUrlBarWithoutLigatures,
       &kUseFusedLocationProvider,

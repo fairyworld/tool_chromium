@@ -3291,6 +3291,12 @@ inline constexpr char kOmniboxDiagnosticsDescription[] =
     " Use sparingly, as this may produce significant amount of log output. "
     " Restart twice when changing this option.";
 
+inline constexpr char kOmniboxFuseboxAsyncInflationName[] =
+    "Fusebox Async View Inflation";
+inline constexpr char kOmniboxFuseboxAsyncInflationDescription[] =
+    "When enabled, Fusebox RecyclerView will be inflated on a background thread"
+    " instead of the UI thread.";
+
 inline constexpr char kOmniboxForceAllowedToBeDefaultName[] =
     "Omnibox Force Allowed To Be Default";
 inline constexpr char kOmniboxForceAllowedToBeDefaultDescription[] =
