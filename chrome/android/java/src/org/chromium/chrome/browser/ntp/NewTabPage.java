@@ -536,7 +536,6 @@ public class NewTabPage
                 isInNightMode,
                 shareDelegateSupplier,
                 modalDialogManager,
-                url,
                 edgeToEdgeControllerSupplier,
                 startupMetricsTracker,
                 tabModelSelector,
@@ -545,7 +544,6 @@ public class NewTabPage
         View view = getView();
         view.addOnAttachStateChangeListener(
                 new View.OnAttachStateChangeListener() {
-
                     @Override
                     public void onViewAttachedToWindow(View view) {
                         updateMargins();
@@ -605,7 +603,6 @@ public class NewTabPage
      * @param snackbarManager {@link SnackbarManager} object.
      * @param isInNightMode {@code true} if the night mode setting is on.
      * @param shareDelegateSupplier Supplies a delegate used to open SharingHub.
-     * @param url The URL used to identify NTP's launch origin
      * @param edgeToEdgeControllerSupplier The supplier to {@link EdgeToEdgeController}.
      * @param startupMetricsTracker Used to record NTP startup metric.
      */
@@ -618,7 +615,6 @@ public class NewTabPage
             boolean isInNightMode,
             Supplier<@Nullable ShareDelegate> shareDelegateSupplier,
             ModalDialogManager modalDialogManager,
-            String url,
             MonotonicObservableSupplier<EdgeToEdgeController> edgeToEdgeControllerSupplier,
             StartupMetricsTracker startupMetricsTracker,
             TabModelSelector tabModelSelector,
@@ -660,7 +656,6 @@ public class NewTabPage
                         mBottomSheetController,
                         shareDelegateSupplier,
                         /* externalScrollableContainerDelegate= */ null,
-                        NewTabPageUtils.decodeOriginFromNtpUrl(url),
                         PrivacyPreferencesManagerImpl.getInstance(),
                         mToolbarSupplier,
                         mConstructedTimeNs,
