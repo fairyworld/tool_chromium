@@ -15,7 +15,7 @@ from utils.command_error import CommandError
 
 _DIR_SOURCE_ROOT = os.path.normpath(
     os.path.join(os.path.basename(__file__), '../../..'))
-_COMMON_EXTENSIONS = ('.java', '.cc', '.mm', '.h', '.json', '.html')
+_COMMON_EXTENSIONS = ('.java', '.cc', '.mm', '.h', '.json', '.html', '.ts')
 
 
 def _CodeSearchFiles(query_args: list[str]) -> list[str]:
@@ -132,20 +132,25 @@ def _RecursiveMatchFilename(folder: str,
 
 
 def _FindTestFilesInDirectory(directory: str) -> list[str]:
-  test_files: list[str] = []
+  test_files: set[str] = set()
   if const.DEBUG:
     print('Test files:')
   for root, _, files in os.walk(directory):
     for f in files:
       path: str = os.path.join(root, f)
+      if f.endswith(('_test.ts', '_unittest.ts', '_spec.ts')):
+        resolved_path = _FindCppTestForTsFile(path)
+        if resolved_path:
+          test_files.add(resolved_path)
+          continue
       file_validity: const.TestValidity = IsTestFile(path)
       if file_validity is const.TestValidity.VALID_TEST:
         if const.DEBUG:
           print(path)
-        test_files.append(path)
+        test_files.add(path)
       elif const.DEBUG and file_validity is const.TestValidity.MAYBE_A_TEST:
         print(path + ' matched but doesn\'t include gtest files, skipping.')
-  return test_files
+  return sorted(test_files)
 
 
 def SearchForTestsByName(terms: list[str], quiet: bool,
@@ -232,8 +237,37 @@ def IsProbablyFile(name: str) -> bool:
           or os.path.exists(os.path.join(_DIR_SOURCE_ROOT, name)))
 
 
+def _FindCppTestForTsFile(target: str) -> str | None:
+  filename = os.path.basename(target)
+  js_filename = os.path.splitext(filename)[0] + '.js'
+  current_dir = os.path.dirname(os.path.abspath(target))
+  webui_root = str(const.SRC_DIR / 'chrome' / 'test' / 'data' / 'webui')
+  while current_dir.startswith(webui_root):
+    try:
+      for f in os.listdir(current_dir):
+        if f.endswith(('test.cc', 'tests.cc')):
+          cc_path = os.path.join(current_dir, f)
+          try:
+            with open(cc_path, 'r', encoding='utf-8') as cc_file:
+              cc_content = cc_file.read()
+              if js_filename in cc_content or filename in cc_content:
+                return cc_path
+          except IOError:
+            pass
+    except OSError:
+      pass
+    current_dir = os.path.dirname(current_dir)
+  return None
+
+
 def _FindTestForFile(target: os.PathLike[str]) -> str | None:
   root, ext = os.path.splitext(target)
+
+  # For WebUI TypeScript tests, resolve to the nearest C++ wrapper that
+  # references this test
+  if ext == '.ts':
+    return _FindCppTestForTsFile(str(target))
+
   # If the target is a C++ implementation file, try to guess the test file.
   # Candidates should be ordered most to least promising.
   test_candidates: list[str] = [target]

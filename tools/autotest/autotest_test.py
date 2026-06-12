@@ -132,6 +132,45 @@ class FindMatchingTestFilesTest(TestCase):
 
     self.assertEqual([test_file], file_finder.FindMatchingTestFiles(test_dir))
 
+  def test_webui_tests(self):
+    # Setup a fake WebUI directory structure under const.SRC_DIR
+    webui_dir = os.path.join(const.SRC_DIR, 'chrome', 'test', 'data', 'webui',
+                             'glic')
+    unit_tests_dir = os.path.join(webui_dir, 'unit_tests')
+    self.fs.create_dir(unit_tests_dir)
+
+    # Create the C++ wrapper containing references to the JS files
+    cc_wrapper = os.path.join(webui_dir, 'glic_browsertest.cc')
+    self.fs.create_file(cc_wrapper,
+                        contents='TEST_F(GlicWebUIBrowserTest, All) {\n'
+                        '  RunTest("glic/unit_tests/glic_api_host_test.js")\n'
+                        '  RunTest("glic/unit_tests/glic_api_client_test.js")\n'
+                        '}')
+
+    # Create the TS test files
+    ts_file1 = os.path.join(unit_tests_dir, 'glic_api_host_test.ts')
+    ts_file2 = os.path.join(unit_tests_dir, 'glic_api_client_test.ts')
+    ts_file_ignored = os.path.join(unit_tests_dir, 'glic_api_ignored_test.ts')
+
+    self.fs.create_file(ts_file1, contents='// TS test 1')
+    self.fs.create_file(ts_file2, contents='// TS test 2')
+    self.fs.create_file(ts_file_ignored, contents='// TS test ignored')
+
+    # Assertion 1: Running on a single TS file that is referenced should
+    # return the C++ wrapper
+    self.assertEqual([cc_wrapper], file_finder.FindMatchingTestFiles(ts_file1))
+
+    # Assertion 2: Running on a single TS file that is NOT referenced should
+    # raise an AutotestError
+    with self.assertRaises(AutotestError) as cm:
+      file_finder.FindMatchingTestFiles(ts_file_ignored)
+    self.assertIn("doesn't look like a test file", str(cm.exception))
+
+    # Assertion 3: Searching the unit_tests directory should return only
+    # the C++ wrapper (deduplicated)
+    self.assertEqual([cc_wrapper],
+                     file_finder.FindMatchingTestFiles(unit_tests_dir))
+
   def test_recursive_search(self):
     # Setup: root/match.cc, root/subdir/match.cc
     root = os.path.join(const.SRC_DIR, 'search_root')
