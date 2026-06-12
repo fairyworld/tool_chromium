@@ -339,12 +339,10 @@ ContextualTasksContextService::ContextualTasksContextService(
       embedder_metadata_provider_);
   scoped_page_embeddings_service_observation_.Observe(page_embeddings_service_);
 
-  if (optimization_guide_keyed_service_) {
-    model_handler_ = std::make_unique<ContextualTasksContextModelHandler>(
-        optimization_guide_keyed_service_,
-        base::ThreadPool::CreateSequencedTaskRunner(
-            {base::MayBlock(), base::TaskPriority::USER_BLOCKING}));
-  }
+  model_handler_ = std::make_unique<ContextualTasksContextModelHandler>(
+      optimization_guide_keyed_service_,
+      base::ThreadPool::CreateSequencedTaskRunner(
+          {base::MayBlock(), base::TaskPriority::USER_BLOCKING}));
 }
 
 ContextualTasksContextService::~ContextualTasksContextService() = default;

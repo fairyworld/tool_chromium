@@ -426,6 +426,7 @@ source_set("unit_tests") {
     "//chrome/browser/contextual_tasks:test_support",
     "//chrome/browser/contextual_tasks:ui",
     "//chrome/browser/lens/core/mojom:mojo_bindings",
+    "//chrome/browser/optimization_guide:test_support",
     "//chrome/browser/search_engines",
     "//chrome/browser/signin",
     "//chrome/browser/sync",

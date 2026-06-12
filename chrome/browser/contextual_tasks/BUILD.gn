@@ -599,6 +599,7 @@ source_set("unit_tests") {
     "//chrome/browser:global_features",
     "//chrome/browser/autocomplete:aim_eligibility_service",
     "//chrome/browser/contextual_search",
+    "//chrome/browser/optimization_guide",
     "//chrome/browser/optimization_guide:test_support",
     "//chrome/browser/search_engines",
     "//chrome/browser/sync",
