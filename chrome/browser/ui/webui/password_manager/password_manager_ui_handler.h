@@ -73,6 +73,8 @@ class PasswordManagerUIHandler : public password_manager::mojom::PageHandler {
   void GetPasswordManagerActionableError(
       GetPasswordManagerActionableErrorCallback callback) override;
 
+  void ShowLastExportedFileInShell() override;
+
  private:
   password_manager::SavedPasswordsPresenter* GetSavedPasswordsPresenter();
 

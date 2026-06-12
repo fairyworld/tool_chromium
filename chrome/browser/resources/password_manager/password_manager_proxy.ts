@@ -342,7 +342,7 @@ export interface PasswordManagerProxy {
   /**
    * Shows the file with the exported passwords in the OS shell.
    */
-  showExportedFileInShell(filePath: string): void;
+  showLastExportedFileInShell(): void;
 
   /**
    * Requests whether the given |url| meets the requirements to save a password
@@ -700,8 +700,8 @@ export class PasswordManagerImpl implements PasswordManagerProxy {
         result => result.success);
   }
 
-  showExportedFileInShell(filePath: string) {
-    chrome.passwordsPrivate.showExportedFileInShell(filePath);
+  showLastExportedFileInShell() {
+    this.handler.showLastExportedFileInShell();
   }
 
   getUrlCollection(url: string) {

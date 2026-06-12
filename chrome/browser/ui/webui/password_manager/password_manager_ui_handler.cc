@@ -157,3 +157,7 @@ void PasswordManagerUIHandler::GetPasswordManagerActionableError(
   std::move(callback).Run(ToActionableMojomError(
       passwords_private_delegate_->GetActionableError()));
 }
+
+void PasswordManagerUIHandler::ShowLastExportedFileInShell() {
+  passwords_private_delegate_->ShowLastExportedFileInShell(web_contents_);
+}

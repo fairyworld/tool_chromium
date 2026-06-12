@@ -343,4 +343,10 @@ TEST_F(PasswordManagerUIHandlerUnitTest,
             mojom::PasswordManagerActionableError::kTrustedVaultKeyNeeded);
 }
 
+TEST_F(PasswordManagerUIHandlerUnitTest,
+       ShowLastExportedFileInShell_CallsDelegate) {
+  handler().ShowLastExportedFileInShell();
+  EXPECT_TRUE(test_delegate().get_exported_file_shown_in_shell());
+}
+
 }  // namespace password_manager
