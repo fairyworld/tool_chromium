@@ -3173,4 +3173,34 @@ public class LocationBarMediatorTest {
 
         verify(mUrlCoordinator).setAccessibilityWarning(eq(null));
     }
+
+    @Test
+    public void testReparenting_onSessionRestoration_whenUrlAlreadyFocused() {
+        // Start in a focused but not reparented state.
+        mMediator.onUrlFocusChange(true);
+        assertFalse(mMediator.isParentedToSuggestionsContainer());
+
+        // Complete initialization after focus has already happened.
+        mMediator.onFinishNativeInitialization();
+        mProfileSupplier.set(mProfile);
+        mFuseboxLayoutModeSupplier.set(FuseboxLayoutMode.SUGGESTIONS_POPOVER);
+        doReturn(mLocationBarParent).when(mLocationBarLayout).getParent();
+        doReturn(mSuggestionsContainer).when(mAutocompleteCoordinator).getSuggestionsContainer();
+        doReturn(mDropdown).when(mSuggestionsContainer).takeDropdownView();
+        MarginLayoutParams layoutParams = new MarginLayoutParams(-2, -2);
+        doReturn(layoutParams).when(mLocationBarLayout).getLayoutParams();
+        View placeholder = Mockito.mock(View.class);
+        doReturn(placeholder)
+                .when(mLocationBarLayout)
+                .findViewById(R.id.suggestions_container_placeholder);
+        int placeholderIndex = 2;
+        doReturn(placeholderIndex).when(mLocationBarLayout).indexOfChild(placeholder);
+
+        mMediator.beginInput(mSessionState.getAutocompleteInput());
+
+        assertTrue(mMediator.isParentedToSuggestionsContainer());
+        verify(mSuggestionsContainer).addView(mLocationBarLayout, 0, layoutParams);
+        verify(mUrlCoordinator).startReparenting();
+        verify(mUrlCoordinator).finishReparenting(true);
+    }
 }

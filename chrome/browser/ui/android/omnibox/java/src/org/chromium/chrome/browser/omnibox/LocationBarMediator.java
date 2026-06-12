@@ -2443,8 +2443,13 @@ class LocationBarMediator
             if (shouldShowLensButton()) LensMetrics.recordOmniboxFocusedWhenLensShown();
         }
 
-        if (mUrlHasFocus && mUrlFocusedWithoutAnimations && !mIsReparenting) {
-            handleUrlFocusAnimation(true);
+        // The || !isParentedToSuggestionsContainer() is to handle if the URL bar already has focus
+        // (e.g. restored after activity recreation) but hasn't been reparented to the suggestions
+        // container. We need this to trigger the focus animation to complete the reparenting.
+        if (mUrlHasFocus
+                && (mUrlFocusedWithoutAnimations || !isParentedToSuggestionsContainer())
+                && !mIsReparenting) {
+            handleUrlFocusAnimation(/* hasFocus= */ true);
         } else if (input.getAutocompleteState() != AutocompleteState.STANDBY_NO_FOCUS) {
             requestUrlFocus();
         }
