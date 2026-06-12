@@ -95,6 +95,12 @@ suite('SiteShortcutsPageTest', function() {
     // The button is initially not visible because the section is collapsed.
     assertFalse(isVisible(page.$.addSearchEngine));
 
+    assertEquals(
+        loadTimeData.getString('searchSiteShortcutsActiveShortcuts') + ' ' +
+            loadTimeData.getString(
+                'searchSiteShortcutsActiveShortcutsExplanation'),
+        page.$.activeShortcutsRow.ariaLabel);
+
     // Expand the sections, which should show the add button and the lists.
     page.$.activeShortcutsRow.click();
     page.$.inactiveShortcutsRow.click();
