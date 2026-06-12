@@ -149,6 +149,7 @@ import org.chromium.chrome.browser.tab_ui.TabContentManagerThumbnailProvider;
 import org.chromium.chrome.browser.tab_ui.TabListFaviconProvider;
 import org.chromium.chrome.browser.tab_ui.TabListFaviconProvider.TabFavicon;
 import org.chromium.chrome.browser.tab_ui.TabListFaviconProvider.TabFaviconMetadata;
+import org.chromium.chrome.browser.tab_ui.TabListMode;
 import org.chromium.chrome.browser.tab_ui.ThumbnailProvider;
 import org.chromium.chrome.browser.tabmodel.TabClosureParams;
 import org.chromium.chrome.browser.tabmodel.TabGroupObserver;
@@ -164,7 +165,6 @@ import org.chromium.chrome.browser.tabmodel.TabUiUnitTestUtils;
 import org.chromium.chrome.browser.tabmodel.TabUngrouper;
 import org.chromium.chrome.browser.tasks.tab_management.PriceMessageService.PriceTabData;
 import org.chromium.chrome.browser.tasks.tab_management.TabActionButtonData.TabActionButtonType;
-import org.chromium.chrome.browser.tasks.tab_management.TabListCoordinator.TabListMode;
 import org.chromium.chrome.browser.tasks.tab_management.TabListMediator.ShoppingPersistedTabDataFetcher;
 import org.chromium.chrome.browser.tasks.tab_management.TabListMediator.TabListConfigDelegate;
 import org.chromium.chrome.browser.tasks.tab_management.TabListMediator.TabListLayoutType;
@@ -5807,7 +5807,7 @@ public class TabListMediatorUnitTest {
     @Test
     public void testUpdateTabStripNotificationBubble_hasUpdate() {
         // Setup the test such that the tab list is strip mode, with a tab group of 2 tabs.
-        setUpTabListMediator(TabListMediatorType.TAB_STRIP, TabListMode.STRIP);
+        setUpTabListMediator(TabListMediatorType.TAB_STRIP, TabListMode.BOTTOM_STRIP);
         List<Tab> tabs = List.of(mTab1, mTab2);
         createTabGroup(tabs, TAB_GROUP_ID);
 

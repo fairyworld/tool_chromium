@@ -45,6 +45,7 @@ import org.chromium.base.test.util.Batch;
 import org.chromium.base.test.util.DisableIf;
 import org.chromium.base.test.util.MinAndroidSdkLevel;
 import org.chromium.chrome.R;
+import org.chromium.chrome.browser.tab_ui.TabListMode;
 import org.chromium.chrome.test.ChromeJUnit4ClassRunner;
 import org.chromium.ui.base.DeviceFormFactor;
 import org.chromium.ui.modelutil.PropertyKey;
@@ -157,7 +158,7 @@ public class TabListContainerViewBinderTest {
         setUpGridLayoutManager();
         mRecyclerView.layout(0, 0, 100, 500);
 
-        mContainerModel.set(TabListContainerProperties.MODE, TabListCoordinator.TabListMode.GRID);
+        mContainerModel.set(TabListContainerProperties.MODE, TabListMode.GRID);
         mContainerModel.set(TabListContainerProperties.INITIAL_SCROLL_INDEX, 5);
 
         // Offset will be view height (500) / 2 - tab card height calculated from TabUtils / 2
