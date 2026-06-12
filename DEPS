@@ -1778,6 +1778,11 @@ deps = {
     'dep_type': 'cipd',
   },
 
+  'src/third_party/androidx/third_party/ink/src': {
+    'url': Var('chromium_git') + '/external/github.com/google/ink.git@4413fe7bd41f09f37d7c8fe87df59b6e0f54300a', # 1.1.0-alpha03
+    'condition': 'checkout_android and non_git_source',
+  },
+
   'src/third_party/androidx_javascriptengine/src': {
       'url': Var('chromium_git') + '/aosp/platform/frameworks/support/javascriptengine/javascriptengine/src.git' + '@' + '7539442db1dc790c64d0d9bade922329292d834b',
       'condition': 'checkout_android',
