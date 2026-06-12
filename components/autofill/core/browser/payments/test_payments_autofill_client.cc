@@ -301,10 +301,6 @@ TestPaymentsAutofillClient::GetRiskBasedAuthenticator() {
   return risk_based_authenticator_.get();
 }
 
-bool TestPaymentsAutofillClient::IsRiskBasedAuthEffectivelyAvailable() const {
-  return true;
-}
-
 bool TestPaymentsAutofillClient::IsMandatoryReauthEnabled() {
   return GetPaymentsDataManager().IsPaymentMethodsMandatoryReauthEnabled();
 }

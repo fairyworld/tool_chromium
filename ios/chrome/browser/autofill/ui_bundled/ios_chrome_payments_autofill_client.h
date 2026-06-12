@@ -155,7 +155,6 @@ class IOSChromePaymentsAutofillClient : public PaymentsAutofillClient {
   CreditCardCvcAuthenticator& GetCvcAuthenticator() override;
   CreditCardOtpAuthenticator* GetOtpAuthenticator() override;
   CreditCardRiskBasedAuthenticator* GetRiskBasedAuthenticator() override;
-  bool IsRiskBasedAuthEffectivelyAvailable() const override;
   bool IsMandatoryReauthEnabled() override;
   void ShowMandatoryReauthOptInPrompt(
       base::OnceClosure accept_mandatory_reauth_callback,

@@ -483,11 +483,6 @@ IOSChromePaymentsAutofillClient::GetRiskBasedAuthenticator() {
   return risk_based_authenticator_.get();
 }
 
-bool IOSChromePaymentsAutofillClient::IsRiskBasedAuthEffectivelyAvailable()
-    const {
-  return true;
-}
-
 bool IOSChromePaymentsAutofillClient::IsMandatoryReauthEnabled() {
   return GetPaymentsDataManager().IsPaymentMethodsMandatoryReauthEnabled();
 }

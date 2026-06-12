@@ -805,10 +805,6 @@ ChromePaymentsAutofillClient::GetRiskBasedAuthenticator() {
   return risk_based_authenticator_.get();
 }
 
-bool ChromePaymentsAutofillClient::IsRiskBasedAuthEffectivelyAvailable() const {
-  return true;
-}
-
 bool ChromePaymentsAutofillClient::IsMandatoryReauthEnabled() {
   return GetPaymentsDataManager().IsPaymentMethodsMandatoryReauthEnabled();
 }

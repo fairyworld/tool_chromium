@@ -592,11 +592,6 @@ class PaymentsAutofillClient : public RiskDataLoader {
   // return a nullptr on iOS WebView.
   virtual CreditCardRiskBasedAuthenticator* GetRiskBasedAuthenticator() = 0;
 
-  // Returns true if Hagrid (risk based authentication) is supported on this
-  // platform. Override in subclasses, return true in supported platform,
-  // defaults to false.
-  virtual bool IsRiskBasedAuthEffectivelyAvailable() const = 0;
-
   // Returns true if Mandatory Reauth is supported on this platform and enabled
   // by the user, if applicable.
   virtual bool IsMandatoryReauthEnabled() = 0;
