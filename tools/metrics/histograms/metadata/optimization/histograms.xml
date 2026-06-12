@@ -727,6 +727,36 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="OptimizationGuide.AIPageContent.GetImageBytes.Latency"
+    units="ms" expires_after="2027-06-08">
+  <owner>linnan@chromium.org</owner>
+  <owner>chrome-intelligence-core@google.com</owner>
+  <summary>
+    Records the end-to-end latency of a GetImageBytes request. Recorded on the
+    browser side only when the request successfully retrieves image bytes.
+  </summary>
+</histogram>
+
+<histogram name="OptimizationGuide.AIPageContent.GetImageBytes.Size"
+    units="bytes" expires_after="2027-06-08">
+  <owner>linnan@chromium.org</owner>
+  <owner>chrome-intelligence-core@google.com</owner>
+  <summary>
+    Records the size of successfully extracted image bytes. Recorded on the
+    browser side only when the request successfully retrieves image bytes.
+  </summary>
+</histogram>
+
+<histogram name="OptimizationGuide.AIPageContent.GetImageBytes.Status"
+    enum="AIPageContentGetImageBytesStatus" expires_after="2027-06-08">
+  <owner>linnan@chromium.org</owner>
+  <owner>chrome-intelligence-core@google.com</owner>
+  <summary>
+    Records the outcome/status of a GetImageBytes request. Recorded on the
+    renderer side once per AIPageContentAgent::GetImageBytes call.
+  </summary>
+</histogram>
+
 <histogram name="OptimizationGuide.AIPageContent.RendererLatency.{FrameType}"
     units="ms" expires_after="2026-10-25">
   <owner>khushalsagar@chromium.org</owner>
