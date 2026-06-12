@@ -2,13 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/password_manager/actor_login/actor_login_quality_logger.h"
+#include "components/password_manager/core/browser/actor_login/actor_login_quality_logger.h"
 
 #include <memory>
 
 #include "base/test/task_environment.h"
 #include "base/test/test_future.h"
-#include "chrome/test/base/testing_browser_process.h"
 #include "components/language/core/browser/language_model.h"
 #include "components/metrics/metrics_state_manager.h"
 #include "components/metrics/test/test_enabled_state_provider.h"
@@ -88,19 +87,19 @@ class ActorLoginQualityLoggerTest : public testing::Test {
 };
 
 TEST_F(ActorLoginQualityLoggerTest, UploadFinalLogNoMetadata) {
-  ActorLoginQualityLogger logger;
+  ActorLoginQualityLogger logger(/*variations_service=*/nullptr);
   logger.UploadFinalLog(logs_uploader_.get());
   EXPECT_EQ(0u, logs_uploader_->uploaded_logs().size());
 }
 
 TEST_F(ActorLoginQualityLoggerTest, UploadFinalLogHandlesNull) {
-  ActorLoginQualityLogger logger;
+  ActorLoginQualityLogger logger(/*variations_service=*/nullptr);
   logger.UploadFinalLog(nullptr);
   EXPECT_TRUE(logs_uploader_->uploaded_logs().empty());
 }
 
 TEST_F(ActorLoginQualityLoggerTest, SetsGetCredentialsDetails) {
-  ActorLoginQualityLogger logger;
+  ActorLoginQualityLogger logger(/*variations_service=*/nullptr);
 
   GetCredentialsDetails expected_details;
   expected_details.set_outcome(
@@ -126,7 +125,7 @@ TEST_F(ActorLoginQualityLoggerTest, SetsGetCredentialsDetails) {
 }
 
 TEST_F(ActorLoginQualityLoggerTest, SetsFederatedGetCredentialsDetails) {
-  ActorLoginQualityLogger logger;
+  ActorLoginQualityLogger logger(/*variations_service=*/nullptr);
 
   optimization_guide::proto::ActorLoginQuality_FederatedGetCredentialsDetails
       federated_details;
@@ -146,7 +145,7 @@ TEST_F(ActorLoginQualityLoggerTest, SetsFederatedGetCredentialsDetails) {
 
 TEST_F(ActorLoginQualityLoggerTest,
        SetsFederatedGetCredentialsDetailsDoesNotOverridePasswordDetails) {
-  ActorLoginQualityLogger logger;
+  ActorLoginQualityLogger logger(/*variations_service=*/nullptr);
 
   GetCredentialsDetails password_details;
   password_details.set_outcome(
@@ -180,7 +179,7 @@ TEST_F(ActorLoginQualityLoggerTest,
 
 TEST_F(ActorLoginQualityLoggerTest,
        SetsGetCredentialsDetailsDoesNotOverrideFederatedDetails) {
-  ActorLoginQualityLogger logger;
+  ActorLoginQualityLogger logger(/*variations_service=*/nullptr);
 
   optimization_guide::proto::ActorLoginQuality_FederatedGetCredentialsDetails
       federated_details;
@@ -213,7 +212,7 @@ TEST_F(ActorLoginQualityLoggerTest,
 }
 
 TEST_F(ActorLoginQualityLoggerTest, SetsDomainAndLanguage) {
-  ActorLoginQualityLogger logger;
+  ActorLoginQualityLogger logger(/*variations_service=*/nullptr);
 
   translate::testing::MockTranslateDriver translate_driver;
   auto mock_translate_ranker =
@@ -242,7 +241,7 @@ TEST_F(ActorLoginQualityLoggerTest, SetsDomainAndLanguage) {
 TEST_F(ActorLoginQualityLoggerTest, LogsLocation) {
   // Required by the `VariationsService`.
   base::test::TaskEnvironment task_environment;
-  // Set variation service.
+
   variations::TestVariationsService::RegisterPrefs(pref_service_.registry());
   auto enabled_state_provider =
       std::make_unique<metrics::TestEnabledStateProvider>(/*consent=*/true,
@@ -255,24 +254,18 @@ TEST_F(ActorLoginQualityLoggerTest, LogsLocation) {
           metrics::StartupVisibility::kUnknown);
   auto variations_service = std::make_unique<variations::TestVariationsService>(
       &pref_service_, metrics_state_manager.get());
-  TestingBrowserProcess::GetGlobal()->SetVariationsService(
-      variations_service.get());
 
-  // This pref directly overrides any country detection logic within the
-  // variations service.
   pref_service_.SetString(variations::prefs::kVariationsCountry, "US");
 
   ActorLoginQuality expected_log;
   expected_log.set_location("US");
 
-  ActorLoginQualityLogger logger;
+  ActorLoginQualityLogger logger(variations_service.get());
   EXPECT_THAT(logger.get_log_data(), ProtoEquals(expected_log));
-
-  TestingBrowserProcess::GetGlobal()->SetVariationsService(nullptr);
 }
 
 TEST_F(ActorLoginQualityLoggerTest, AddAttemptLoginDetails) {
-  ActorLoginQualityLogger logger;
+  ActorLoginQualityLogger logger(/*variations_service=*/nullptr);
 
   optimization_guide::proto::ActorLoginQuality_AttemptLoginDetails
       expected_details;
@@ -291,7 +284,7 @@ TEST_F(ActorLoginQualityLoggerTest, AddAttemptLoginDetails) {
 }
 
 TEST_F(ActorLoginQualityLoggerTest, SetsPermissionDetails) {
-  ActorLoginQualityLogger logger;
+  ActorLoginQualityLogger logger(/*variations_service=*/nullptr);
 
   PermissionDetails expected_permission =
       optimization_guide::proto::ActorLoginQuality_PermissionOption_ALLOW_ONCE;

@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_PASSWORD_MANAGER_ACTOR_LOGIN_PASSWORD_CHANGE_FROM_CHECKUP_ACTOR_LOGIN_SERVICE_H_
-#define CHROME_BROWSER_PASSWORD_MANAGER_ACTOR_LOGIN_PASSWORD_CHANGE_FROM_CHECKUP_ACTOR_LOGIN_SERVICE_H_
+#ifndef COMPONENTS_PASSWORD_MANAGER_CORE_BROWSER_ACTOR_LOGIN_PASSWORD_CHANGE_FROM_CHECKUP_ACTOR_LOGIN_SERVICE_H_
+#define COMPONENTS_PASSWORD_MANAGER_CORE_BROWSER_ACTOR_LOGIN_PASSWORD_CHANGE_FROM_CHECKUP_ACTOR_LOGIN_SERVICE_H_
 
 #include <string>
 
-#include "chrome/browser/password_manager/actor_login/actor_login_service.h"
+#include "components/password_manager/core/browser/actor_login/actor_login_service.h"
 #include "url/gurl.h"
 #include "url/origin.h"
 
@@ -64,4 +64,4 @@ class PasswordChangeFromCheckupActorLoginService : public ActorLoginService {
 
 }  // namespace actor_login
 
-#endif  // CHROME_BROWSER_PASSWORD_MANAGER_ACTOR_LOGIN_PASSWORD_CHANGE_FROM_CHECKUP_ACTOR_LOGIN_SERVICE_H_
+#endif  // COMPONENTS_PASSWORD_MANAGER_CORE_BROWSER_ACTOR_LOGIN_PASSWORD_CHANGE_FROM_CHECKUP_ACTOR_LOGIN_SERVICE_H_

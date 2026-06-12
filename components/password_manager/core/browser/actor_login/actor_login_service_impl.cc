@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/password_manager/actor_login/actor_login_service_impl.h"
+#include "components/password_manager/core/browser/actor_login/actor_login_service_impl.h"
 
 #include "base/functional/bind.h"
 #include "base/types/expected.h"

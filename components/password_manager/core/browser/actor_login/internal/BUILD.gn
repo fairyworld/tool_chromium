@@ -30,6 +30,7 @@ source_set("delegate") {
     ":unit_tests",
     "//chrome/browser/password_manager/actor_login:*",
     "//chrome/browser/password_manager/actor_login/internal:*",
+    "//components/password_manager/core/browser/actor_login:*",
     "//components/password_manager/core/browser/actor_login/test:*",
     "//ios/chrome/browser/passwords/model/actor_login:*",
   ]

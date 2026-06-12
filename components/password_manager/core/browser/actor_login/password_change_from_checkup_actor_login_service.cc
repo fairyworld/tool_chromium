@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/password_manager/actor_login/password_change_from_checkup_actor_login_service.h"
+#include "components/password_manager/core/browser/actor_login/password_change_from_checkup_actor_login_service.h"
 
 #include <utility>
 #include <vector>
@@ -12,8 +12,8 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/task/bind_post_task.h"
 #include "base/task/single_thread_task_runner.h"
-#include "chrome/browser/password_manager/actor_login/automated_password_change_credential_filler.h"
 #include "components/autofill/core/common/form_field_data.h"
+#include "components/password_manager/core/browser/actor_login/automated_password_change_credential_filler.h"
 #include "components/password_manager/core/browser/actor_login/internal/actor_login_delegate_client.h"
 #include "components/password_manager/core/browser/actor_login/internal/actor_login_form_finder.h"
 #include "components/password_manager/core/browser/password_form_manager.h"

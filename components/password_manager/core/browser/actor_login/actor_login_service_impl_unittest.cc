@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/password_manager/actor_login/actor_login_service_impl.h"
+#include "components/password_manager/core/browser/actor_login/actor_login_service_impl.h"
 
 #include "base/functional/bind.h"
 #include "base/functional/callback_helpers.h"
@@ -11,15 +11,15 @@
 #include "base/test/bind.h"
 #include "base/test/gmock_callback_support.h"
 #include "base/test/metrics/histogram_tester.h"
+#include "base/test/task_environment.h"
 #include "base/test/test_future.h"
 #include "base/types/expected.h"
-#include "chrome/browser/password_manager/actor_login/actor_login_service.h"
+#include "components/password_manager/core/browser/actor_login/actor_login_service.h"
 #include "components/password_manager/core/browser/actor_login/actor_login_types.h"
 #include "components/password_manager/core/browser/actor_login/internal/actor_login_metrics.h"
 #include "components/password_manager/core/browser/actor_login/test/fake_actor_login_delegate_client.h"
 #include "components/password_manager/core/browser/actor_login/test/mock_actor_login_delegate.h"
 #include "components/password_manager/core/browser/actor_login/test/mock_actor_login_quality_logger.h"
-#include "content/public/test/browser_task_environment.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -63,7 +63,7 @@ class ActorLoginServiceImplTest : public testing::Test {
   }
 
  protected:
-  content::BrowserTaskEnvironment task_environment_;
+  base::test::TaskEnvironment task_environment_;
   MockActorLoginDelegate mock_delegate_;
   std::unique_ptr<ActorLoginServiceImpl> service_;
   MockActorLoginQualityLogger mock_mqls_logger_;
