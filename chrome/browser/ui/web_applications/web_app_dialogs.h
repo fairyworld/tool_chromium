@@ -220,10 +220,6 @@ void ShowSubAppsInstallDialog(
     const webapps::AppId& parent_app_id,
     base::OnceCallback<void(bool)> callback);
 
-// Sets whether |ShowDiyInstallDialogForWebApps| should accept immediately
-// without any user interaction.
-void SetAutoAcceptDiyAppsInstallDialogForTesting(bool auto_accept);
-
 // Shows the Isolated Web App manual install wizard.
 IsolatedWebAppInstallerCoordinator* LaunchIsolatedWebAppInstaller(
     Profile* profile,
