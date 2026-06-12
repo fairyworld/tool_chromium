@@ -4549,9 +4549,21 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarProcessOverheadExperimentBrowserTest,
 }
 
 class WebUIToolbarAlreadyExistsForTheSameProfileOnInitTest
-    : public WebUIToolbarWebViewBrowserTest {
+    : public WebUIToolbarWebViewBrowserTest,
+      public testing::WithParamInterface<bool> {
  public:
-  WebUIToolbarAlreadyExistsForTheSameProfileOnInitTest() = default;
+  WebUIToolbarAlreadyExistsForTheSameProfileOnInitTest()
+      : WebUIToolbarWebViewBrowserTest(
+            {features::kWebUIReloadButton, features::kWebUISplitTabsButton,
+             features::kWebUIHomeButton, features::kWebUIExtensionsContainer,
+             features::kSkipIPCChannelPausingForNonGuests,
+             features::kWebUIInProcessResourceLoadingV2,
+             features::kInitialWebUISyncNavStartToCommit},
+            {}) {
+    scoped_feature_list_.InitAndEnableFeatureWithParameters(
+        features::kInitialWebUI,
+        {{"use_separate_process", GetParam() ? "true" : "false"}});
+  }
 
   void SetUpInProcessBrowserTestFixture() override {
     WebUIToolbarWebViewBrowserTest::SetUpInProcessBrowserTestFixture();
@@ -4560,9 +4572,12 @@ class WebUIToolbarAlreadyExistsForTheSameProfileOnInitTest
 
  protected:
   std::unique_ptr<base::HistogramTester> histogram_tester_;
+
+ private:
+  base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-IN_PROC_BROWSER_TEST_F(WebUIToolbarAlreadyExistsForTheSameProfileOnInitTest,
+IN_PROC_BROWSER_TEST_P(WebUIToolbarAlreadyExistsForTheSameProfileOnInitTest,
                        FirstProcessRecordsFalse) {
   content::FetchHistogramsFromChildProcesses();
   metrics::SubprocessMetricsProvider::MergeHistogramDeltasForTesting();
@@ -4571,6 +4586,44 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarAlreadyExistsForTheSameProfileOnInitTest,
       "InitialWebUI.Toolbar.ProcessAlreadyExistsForTheSameProfileOnCreation",
       false, 1);
 }
+
+IN_PROC_BROWSER_TEST_P(WebUIToolbarAlreadyExistsForTheSameProfileOnInitTest,
+                       DoesNotRecordTrueForDifferentTopChromeWebUI) {
+  // Destroy the first window's Toolbar process by destroying its WebContents.
+  WebUIToolbarWebView* webui_toolbar_view = ::GetWebUIToolbarWebView(browser());
+  ASSERT_TRUE(webui_toolbar_view);
+  webui_toolbar_view->GetWebViewForTesting()->SetOwnedWebContents(nullptr);
+
+  // Launch a different Top Chrome WebUI process (e.g. Tab Search) by opening a
+  // new tab and navigating it to Tab Search.
+  GURL tab_search_url("chrome://tab-search.top-chrome/");
+  ui_test_utils::NavigateToURLWithDisposition(
+      browser(), tab_search_url, WindowOpenDisposition::NEW_FOREGROUND_TAB,
+      ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
+
+  // Create a second browser window. This will trigger the creation of a new
+  // toolbar process for that window.
+  base::HistogramTester histograms;
+  Browser* second_browser = CreateBrowser(browser()->profile());
+  ASSERT_TRUE(second_browser);
+
+  content::FetchHistogramsFromChildProcesses();
+  metrics::SubprocessMetricsProvider::MergeHistogramDeltasForTesting();
+
+  if (GetParam()) {
+    histograms.ExpectUniqueSample(
+        "InitialWebUI.Toolbar.ProcessAlreadyExistsForTheSameProfileOnCreation",
+        false, 1);
+  } else {
+    histograms.ExpectTotalCount(
+        "InitialWebUI.Toolbar.ProcessAlreadyExistsForTheSameProfileOnCreation",
+        0);
+  }
+}
+
+INSTANTIATE_TEST_SUITE_P(All,
+                         WebUIToolbarAlreadyExistsForTheSameProfileOnInitTest,
+                         testing::Bool());
 
 class WebUIToolbarWebViewContentSettingsBrowserTest
     : public WebUIToolbarWebViewBrowserTest {

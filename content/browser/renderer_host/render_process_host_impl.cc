@@ -1857,15 +1857,31 @@ bool RenderProcessHostImpl::Init() {
   if (IsInitializedAndNotDead())
     return true;
 
-  if (IsForTopChromeWebUI()) {
+#if !BUILDFLAG(IS_ANDROID)
+  bool is_initial_web_ui = false;
+  // If `use_separate_process` is true, the initial WebUI has its own process
+  // lock URL (e.g. chrome://webui-toolbar.top-chrome/), which can be uniquely
+  // identified using `IsInitialWebUIURL`.
+  // If `use_separate_process` is false, it shares the generic process lock
+  // `chrome://top-chrome/` with other Top Chrome WebUIs. In this case, we
+  // cannot distinguish it by lock URL and must fallback to checking if it is a
+  // Top Chrome WebUI process in general.
+  if (features::kInitialWebUIUseSeparateProcess.Get()) {
+    is_initial_web_ui = GetContentClient()->browser()->IsInitialWebUIURL(
+        GetProcessLock().GetProcessLockURL());
+  } else {
+    is_initial_web_ui = IsForTopChromeWebUI();
+  }
+
+  if (is_initial_web_ui) {
     bool existing_found = false;
     auto* browser_context = GetBrowserContext();
     for (auto it = RenderProcessHost::AllHostsIterator(); !it.IsAtEnd();
          it.Advance()) {
       RenderProcessHost* host = it.GetCurrentValue();
-      if (host != this && host->IsForTopChromeWebUI() &&
-          host->GetBrowserContext() == browser_context &&
-          host->IsInitializedAndNotDead()) {
+      if (host != this && host->GetBrowserContext() == browser_context &&
+          host->IsInitializedAndNotDead() &&
+          host->GetProcessLock() == GetProcessLock()) {
         existing_found = true;
         break;
       }
@@ -1874,6 +1890,7 @@ bool RenderProcessHostImpl::Init() {
         "InitialWebUI.Toolbar.ProcessAlreadyExistsForTheSameProfileOnCreation",
         existing_found);
   }
+#endif  // !BUILDFLAG(IS_ANDROID)
 
   base::CommandLine::StringType renderer_prefix;
   // A command prefix is something prepended to the command line of the spawned
