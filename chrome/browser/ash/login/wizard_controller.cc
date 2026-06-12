@@ -489,7 +489,7 @@ WizardController::WizardController(
     // as screens should work with late binding/early unbinding in that case.
     oobe_ui_observation_.Observe(GetOobeUI());
 
-    MaybeEnablePreConsentMetrics();
+    MaybeEnablePreChoiceMetrics();
   }
 }
 
@@ -1430,7 +1430,7 @@ void WizardController::ShowOsTrialScreen() {
 }
 
 void WizardController::ShowConsolidatedConsentScreen() {
-  // Disable PreConsent metrics if the user is affiliated or managed.
+  // Disable PreChoice metrics if the user is affiliated or managed.
   Profile* profile = ProfileManager::GetActiveUserProfile();
   CHECK(profile);
   if (enterprise_util::IsBrowserManaged(profile)) {
@@ -4063,22 +4063,22 @@ void WizardController::MaybeAbortQuickStartFlow(
   }
 }
 
-void WizardController::MaybeEnablePreConsentMetrics() {
+void WizardController::MaybeEnablePreChoiceMetrics() {
   if (switches::ShouldDisablePreConsentMetricsForTesting()) {
     return;
   }
-  // Enable pre-consent metrics if this device is in oobe and is the first
+  // Enable pre-choice metrics if this device is in oobe and is the first
   // user.
   Profile* profile = ProfileManager::GetActiveUserProfile();
   CHECK(profile);
   if (enterprise_util::IsBrowserManaged(profile)) {
-    VLOG(1) << "Device enrolled. Do not enable pre consent metrics.";
+    VLOG(1) << "Device enrolled. Do not enable pre choice metrics.";
     return;
   }
 
   if (!wizard_context_->is_add_person_flow &&
       metrics::CrOSPreChoiceMetricsManager::Get()) {
-    // Update stats reporter that the current metrics consent is enabled. This
+    // Update stats reporter that the current metrics choice is enabled. This
     // will make sure that any changes in the future are properly propagated
     // when using the API.
     StatsReportingController::Get()->SetEnabled(

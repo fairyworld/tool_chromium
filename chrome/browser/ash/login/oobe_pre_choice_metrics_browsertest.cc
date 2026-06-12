@@ -29,7 +29,6 @@
 #include "chrome/browser/metrics/chrome_metrics_service_accessor.h"
 #include "chrome/browser/metrics/cros_pre_choice_metrics_manager.h"
 #include "chrome/browser/metrics/structured/test/structured_metrics_mixin.h"
-#include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/webui/ash/login/choobe_screen_handler.h"
 #include "chrome/browser/ui/webui/ash/login/consolidated_consent_screen_handler.h"
 #include "chrome/browser/ui/webui/ash/login/gaia_screen_handler.h"
@@ -53,18 +52,17 @@
 
 namespace ash {
 
-class OobePreConsentMetricsTest : public OobeBaseTest {
+class OobePreChoiceMetricsTest : public OobeBaseTest {
  public:
-  OobePreConsentMetricsTest() {
+  OobePreChoiceMetricsTest() {
     // TODO(crbug.com/396450575): Remove this line after ash feature flag is set
     // to true by default.
     feature_list_.InitAndEnableFeature(ash::features::kOobePreConsentMetrics);
   }
 
-  OobePreConsentMetricsTest(const OobePreConsentMetricsTest&) = delete;
-  OobePreConsentMetricsTest& operator=(const OobePreConsentMetricsTest&) =
-      delete;
-  ~OobePreConsentMetricsTest() override = default;
+  OobePreChoiceMetricsTest(const OobePreChoiceMetricsTest&) = delete;
+  OobePreChoiceMetricsTest& operator=(const OobePreChoiceMetricsTest&) = delete;
+  ~OobePreChoiceMetricsTest() override = default;
 
   void SetUp() override {
     ASSERT_TRUE(temp_dir_.CreateUniqueTempDir());
@@ -89,13 +87,13 @@ class OobePreConsentMetricsTest : public OobeBaseTest {
     return temp_dir_.GetPath().Append("test-file");
   }
 
-  void EnsureManagerSetupAndValidateConsent() {
+  void EnsureManagerSetupAndValidateChoice() {
     ASSERT_NE(metrics::CrOSPreChoiceMetricsManager::Get(), nullptr);
 
     ValidateMetricsConsent(/*enabled=*/true);
   }
 
-  // Checks if the file that marks the end of pre-consent stage exists.
+  // Checks if the file that marks the end of pre-choice stage exists.
   void CheckForMarkerFile(base::Location from_here = FROM_HERE) {
     base::ScopedAllowBlockingForTesting allow_blocking;
     ASSERT_TRUE(base::PathExists(GetTestPath()));
@@ -103,7 +101,8 @@ class OobePreConsentMetricsTest : public OobeBaseTest {
 
   void ValidateMetricsConsent(bool enabled) {
     EXPECT_EQ(g_browser_process->local_state()->GetBoolean(
-        metrics::prefs::kMetricsReportingEnabled), enabled);
+                  metrics::prefs::kMetricsReportingEnabled),
+              enabled);
   }
 
  protected:
@@ -114,8 +113,8 @@ class OobePreConsentMetricsTest : public OobeBaseTest {
   std::unique_ptr<metrics::CrOSPreChoiceMetricsManager> manager_;
 };
 
-IN_PROC_BROWSER_TEST_F(OobePreConsentMetricsTest, RegularUserConsented) {
-  EnsureManagerSetupAndValidateConsent();
+IN_PROC_BROWSER_TEST_F(OobePreChoiceMetricsTest, RegularUserConsented) {
+  EnsureManagerSetupAndValidateChoice();
 
   login_manager_mixin_.LoginAsNewRegularUser();
   OobeScreenExitWaiter(GetFirstSigninScreen()).Wait();
@@ -131,8 +130,8 @@ IN_PROC_BROWSER_TEST_F(OobePreConsentMetricsTest, RegularUserConsented) {
   CheckForMarkerFile();
 }
 
-IN_PROC_BROWSER_TEST_F(OobePreConsentMetricsTest, RegularUserDissented) {
-  EnsureManagerSetupAndValidateConsent();
+IN_PROC_BROWSER_TEST_F(OobePreChoiceMetricsTest, RegularUserDissented) {
+  EnsureManagerSetupAndValidateChoice();
 
   login_manager_mixin_.LoginAsNewRegularUser();
   OobeScreenExitWaiter(GetFirstSigninScreen()).Wait();
@@ -151,8 +150,8 @@ IN_PROC_BROWSER_TEST_F(OobePreConsentMetricsTest, RegularUserDissented) {
   CheckForMarkerFile();
 }
 
-IN_PROC_BROWSER_TEST_F(OobePreConsentMetricsTest, GuestUserConsented) {
-  EnsureManagerSetupAndValidateConsent();
+IN_PROC_BROWSER_TEST_F(OobePreChoiceMetricsTest, GuestUserConsented) {
+  EnsureManagerSetupAndValidateChoice();
 
   WizardController::default_controller()->AdvanceToScreen(
       GuestTosScreenView::kScreenId);
@@ -171,7 +170,7 @@ IN_PROC_BROWSER_TEST_F(OobePreConsentMetricsTest, GuestUserConsented) {
       ash::prefs::kOobeGuestMetricsEnabled));
   CheckForMarkerFile();
 
-  // Validate pre-consent stage has completed and consent remains true before
+  // Validate pre-choice stage has completed and consent remains true before
   // first non-guest user sign in.
   session_manager::SessionManager::Get()->RequestSignOut();
 
@@ -179,8 +178,8 @@ IN_PROC_BROWSER_TEST_F(OobePreConsentMetricsTest, GuestUserConsented) {
   CheckForMarkerFile();
 }
 
-IN_PROC_BROWSER_TEST_F(OobePreConsentMetricsTest, GuestUserDissented) {
-  EnsureManagerSetupAndValidateConsent();
+IN_PROC_BROWSER_TEST_F(OobePreChoiceMetricsTest, GuestUserDissented) {
+  EnsureManagerSetupAndValidateChoice();
 
   WizardController::default_controller()->AdvanceToScreen(
       GuestTosScreenView::kScreenId);
@@ -200,7 +199,7 @@ IN_PROC_BROWSER_TEST_F(OobePreConsentMetricsTest, GuestUserDissented) {
       ash::prefs::kOobeGuestMetricsEnabled));
   CheckForMarkerFile();
 
-  // Validate pre-consent stage has completed and consent remains true before
+  // Validate pre-choice stage has completed and consent remains true before
   // first non-guest user sign in.
   session_manager::SessionManager::Get()->RequestSignOut();
 
@@ -208,13 +207,13 @@ IN_PROC_BROWSER_TEST_F(OobePreConsentMetricsTest, GuestUserDissented) {
   CheckForMarkerFile();
 }
 
-class ManagedOobePreConsentMetricsTest : public OobePreConsentMetricsTest {
+class ManagedOobePreChoiceMetricsTest : public OobePreChoiceMetricsTest {
  public:
-  ManagedOobePreConsentMetricsTest() = default;
-  ~ManagedOobePreConsentMetricsTest() override = default;
+  ManagedOobePreChoiceMetricsTest() = default;
+  ~ManagedOobePreChoiceMetricsTest() override = default;
 
   void SetUpInProcessBrowserTestFixture() override {
-    OobePreConsentMetricsTest::SetUpInProcessBrowserTestFixture();
+    OobePreChoiceMetricsTest::SetUpInProcessBrowserTestFixture();
     ASSERT_TRUE(user_policy_mixin_.RequestPolicyUpdate());
   }
 
@@ -225,8 +224,8 @@ class ManagedOobePreConsentMetricsTest : public OobePreConsentMetricsTest {
   UserPolicyMixin user_policy_mixin_{&mixin_host_, test_user_.account_id};
 };
 
-IN_PROC_BROWSER_TEST_F(ManagedOobePreConsentMetricsTest, ManagedUser) {
-  EnsureManagerSetupAndValidateConsent();
+IN_PROC_BROWSER_TEST_F(ManagedOobePreChoiceMetricsTest, ManagedUser) {
+  EnsureManagerSetupAndValidateChoice();
 
   ASSERT_TRUE(user_policy_mixin_.RequestPolicyUpdate());
   login_manager_mixin_.LoginWithDefaultContext(test_user_);
@@ -238,14 +237,14 @@ IN_PROC_BROWSER_TEST_F(ManagedOobePreConsentMetricsTest, ManagedUser) {
   CheckForMarkerFile();
 }
 
-class ChildOobePreConsentMetricsTest : public OobePreConsentMetricsTest {
+class ChildOobePreChoiceMetricsTest : public OobePreChoiceMetricsTest {
  public:
-  ChildOobePreConsentMetricsTest() = default;
-  ~ChildOobePreConsentMetricsTest() override = default;
+  ChildOobePreChoiceMetricsTest() = default;
+  ~ChildOobePreChoiceMetricsTest() override = default;
 
   void SetUpInProcessBrowserTestFixture() override {
     ASSERT_TRUE(user_policy_mixin_.RequestPolicyUpdate());
-    OobePreConsentMetricsTest::SetUpInProcessBrowserTestFixture();
+    OobePreChoiceMetricsTest::SetUpInProcessBrowserTestFixture();
   }
 
  private:
@@ -254,8 +253,8 @@ class ChildOobePreConsentMetricsTest : public OobePreConsentMetricsTest {
   UserPolicyMixin user_policy_mixin_{&mixin_host_, test_user_.account_id};
 };
 
-IN_PROC_BROWSER_TEST_F(ChildOobePreConsentMetricsTest, ChildUser) {
-  EnsureManagerSetupAndValidateConsent();
+IN_PROC_BROWSER_TEST_F(ChildOobePreChoiceMetricsTest, ChildUser) {
+  EnsureManagerSetupAndValidateChoice();
 
   LoginDisplayHost::default_host()
       ->GetWizardContextForTesting()
@@ -275,11 +274,10 @@ IN_PROC_BROWSER_TEST_F(ChildOobePreConsentMetricsTest, ChildUser) {
   CheckForMarkerFile();
 }
 
-class EnrolledDeviceOobePreConsentMetricsTest
-    : public OobePreConsentMetricsTest {
+class EnrolledDeviceOobePreChoiceMetricsTest : public OobePreChoiceMetricsTest {
  public:
-  EnrolledDeviceOobePreConsentMetricsTest() {
-    LOG(WARNING) << "EnrolledDeviceOobePreConsentMetricsTest";
+  EnrolledDeviceOobePreChoiceMetricsTest() {
+    LOG(WARNING) << "EnrolledDeviceOobePreChoiceMetricsTest";
     login_manager_mixin_.AppendRegularUsers(1);
     device_state_.SetState(
         DeviceStateMixin::State::OOBE_COMPLETED_CLOUD_ENROLLED);
@@ -298,18 +296,18 @@ class EnrolledDeviceOobePreConsentMetricsTest
       &mixin_host_, DeviceStateMixin::State::OOBE_COMPLETED_UNOWNED};
 };
 
-// Since the device is already enrolled, pre-consent feature should not be
+// Since the device is already enrolled, pre-choice feature should not be
 // enabled.
-IN_PROC_BROWSER_TEST_F(EnrolledDeviceOobePreConsentMetricsTest,
-                       ShouldNotHavePreConsentMetrics) {
+IN_PROC_BROWSER_TEST_F(EnrolledDeviceOobePreChoiceMetricsTest,
+                       ShouldNotHavePreChoiceMetrics) {
   EXPECT_EQ(metrics::CrOSPreChoiceMetricsManager::Get(), nullptr);
-  // It's unable to check the pre-consent complete file since the location of
+  // It's unable to check the pre-choice complete file since the location of
   // the file, "/home/chronos", is not accessible by browser test. And because
   // CrOSPreChoiceMetricsManager is not created at all in
   // `CrOSPreChoiceMetricsManager::MaybeCreate` so it's not possible to
   // override the complete file location. However, by checking if the
   // CrOSPreChoiceMetricsManager is nullptr should be sufficient because it
-  // indicates that the manager is not initialized and pre-consent will have no
+  // indicates that the manager is not initialized and pre-choice will have no
   // chance to be enabled.
 }
 
