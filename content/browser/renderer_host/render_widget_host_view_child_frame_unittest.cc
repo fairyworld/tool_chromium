@@ -519,4 +519,10 @@ TEST_F(RenderWidgetHostViewChildFrameTest,
             GetMockInputHelper()->GetAndResetLastBubbledEventType());
 }
 
+TEST_F(RenderWidgetHostViewChildFrameTest,
+       InvalidateLocalSurfaceIdAndAllocationGroup) {
+  // Calling this method on a child frame should be a no-op and not crash.
+  view_->InvalidateLocalSurfaceIdAndAllocationGroup();
+}
+
 }  // namespace content

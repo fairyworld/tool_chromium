@@ -920,8 +920,8 @@ bool RenderWidgetHostViewChildFrame::IsRenderWidgetHostViewChildFrame() const {
 
 void RenderWidgetHostViewChildFrame::
     InvalidateLocalSurfaceIdAndAllocationGroup() {
-  // This should only be handled by the top frame.
-  NOTREACHED();
+  // Child frames do not manage their own LocalSurfaceId or allocation groups in
+  // the browser process.
 }
 
 #if BUILDFLAG(IS_MAC)
