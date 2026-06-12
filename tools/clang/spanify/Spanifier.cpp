@@ -820,6 +820,37 @@ clang::TypeLoc UnwrapTypedefTypeLoc(clang::TypeLoc type_loc) {
   return type_loc;
 }
 
+bool isConstToken(const clang::Token& tok) {
+  const bool is_const_keyword = tok.is(clang::tok::kw_const);
+  const bool is_raw_identifier_and_const =
+      tok.is(clang::tok::raw_identifier) && tok.getRawIdentifier() == "const";
+  return is_const_keyword || is_raw_identifier_and_const;
+}
+
+bool HasConstNode(const clang::TypeLoc* type_loc,
+                  const clang::SourceManager& source_manager,
+                  const clang::LangOptions& lang_opts) {
+  clang::Token tok;
+  if (!clang::Lexer::getRawToken(type_loc->getBeginLoc(), &tok, source_manager,
+                                 lang_opts, /*KeepWhitespace=*/false)) {
+    if (isConstToken(tok)) {
+      return true;
+    }
+  }
+
+  auto get_next_tok = [&](clang::SourceLocation loc) {
+    return clang::Lexer::findNextToken(loc, source_manager, lang_opts);
+  };
+  for (auto maybe_tok = get_next_tok(type_loc->getBeginLoc());
+       maybe_tok && maybe_tok->getLocation() < type_loc->getEndLoc();
+       maybe_tok = get_next_tok(maybe_tok->getLocation())) {
+    if (isConstToken(*maybe_tok)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 std::string getNodeFromPointerTypeLoc(const clang::PointerTypeLoc* type_loc,
                                       const MatchFinder::MatchResult& result) {
   const clang::SourceManager& source_manager = *result.SourceManager;
@@ -836,22 +867,34 @@ std::string getNodeFromPointerTypeLoc(const clang::PointerTypeLoc* type_loc,
   // *  `QualifiedTypeLoc` deliberately does not provide source locations
   //    for qualifiers [1].
   //
-  // As a best effort, if we bound `qualified_type_loc`, we abuse the
-  // Lexer to back up one token behind `type_loc`. Take a deep breath
-  // and hope that it's the `const` qualifier.
+  // As a best effort, if the type is const-qualified:
+  // 1. We first check if the `const` keyword is already within the source
+  //    range of `type_loc` (e.g. `const int*` or `int const*`). If it is, the
+  //    range is already correct and we can return it as is.
+  // 2. Otherwise, we abuse the Lexer to back up one token behind `type_loc`.
+  //    Take a deep breath and hope that it's the `const` qualifier. If so, we
+  //    extend the range to include it.
   //
   // [1]
   // https://github.com/llvm/llvm-project/blob/6cf656eca717890a43975c026d0ae34c16c6c455/clang/include/clang/AST/TypeLoc.h#L288
   clang::SourceRange replacement_range = [type_loc, &result, &source_manager,
                                           &lang_opts]() {
-    const auto* qualified_type_loc =
-        result.Nodes.getNodeAs<clang::QualifiedTypeLoc>("qualified_type_loc");
+    const auto qualified_type_loc =
+        type_loc->getPointeeLoc().getAs<clang::QualifiedTypeLoc>();
     clang::SourceRange result = {type_loc->getBeginLoc(),
                                  type_loc->getEndLoc().getLocWithOffset(1)};
-    if (!qualified_type_loc ||
-        !qualified_type_loc->getType().isConstQualified()) {
+    if (qualified_type_loc.isNull() ||
+        !qualified_type_loc.getType().isConstQualified()) {
       return result;
     }
+
+    // If `const` is found within the source range of `type_loc` (e.g.
+    // `const int*` or `int const*`), the default range already includes
+    // the qualifier, so we can return the result as is.
+    if (HasConstNode(type_loc, source_manager, lang_opts)) {
+      return result;
+    }
+
     std::optional<clang::Token> previous_token =
         clang::Lexer::findPreviousToken(type_loc->getBeginLoc(), source_manager,
                                         lang_opts, /*IncludeComments=*/false);
@@ -860,15 +903,15 @@ std::string getNodeFromPointerTypeLoc(const clang::PointerTypeLoc* type_loc,
     if (!previous_token.has_value()) {
       return result;
     }
-    std::string_view hopefully_const_qualifier = clang::Lexer::getSourceText(
-        clang::CharSourceRange::getCharRange(
-            {previous_token->getLocation(), previous_token->getEndLoc()}),
-        source_manager, lang_opts);
-    if (hopefully_const_qualifier != "const") {
+    if (!isConstToken(*previous_token)) {
+      std::string_view actual_previous_qualifier = clang::Lexer::getSourceText(
+          clang::CharSourceRange::getCharRange(
+              {previous_token->getLocation(), previous_token->getEndLoc()}),
+          source_manager, lang_opts);
       // A patch hitting this will likely fail to compile.
       llvm::errs() << "WARNING: `getNodeFromPointerTypeLoc()` expected "
                       "`const`, but got: "
-                   << hopefully_const_qualifier << " instead.\n";
+                   << actual_previous_qualifier << " instead.\n";
       return result;
     }
 
