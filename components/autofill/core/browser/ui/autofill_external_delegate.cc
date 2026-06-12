@@ -938,8 +938,8 @@ void AutofillExternalDelegate::DidAcceptSuggestion(
       break;
     }
     case SuggestionType::kAllLoyaltyCardsEntry: {
-      manager_->touch_to_fill_delegate()->ShowTouchToFillForAllLoyaltyCards(
-          query_form_, query_field_);
+      manager_->touch_to_fill_payment_method_delegate()
+          ->ShowTouchToFillForAllLoyaltyCards(query_form_, query_field_);
       break;
     }
     case SuggestionType::kOneTimePasswordEntry: {

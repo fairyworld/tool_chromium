@@ -17,8 +17,8 @@
 #include "components/autofill/core/common/form_field_data.h"
 #include "components/autofill/core/common/unique_ids.h"
 
-#ifndef COMPONENTS_AUTOFILL_CORE_BROWSER_INTEGRATORS_TOUCH_TO_FILL_TOUCH_TO_FILL_DELEGATE_H_
-#define COMPONENTS_AUTOFILL_CORE_BROWSER_INTEGRATORS_TOUCH_TO_FILL_TOUCH_TO_FILL_DELEGATE_H_
+#ifndef COMPONENTS_AUTOFILL_CORE_BROWSER_INTEGRATORS_TOUCH_TO_FILL_TOUCH_TO_FILL_PAYMENT_METHOD_DELEGATE_H_
+#define COMPONENTS_AUTOFILL_CORE_BROWSER_INTEGRATORS_TOUCH_TO_FILL_TOUCH_TO_FILL_PAYMENT_METHOD_DELEGATE_H_
 
 namespace autofill {
 
@@ -28,9 +28,9 @@ class FormStructure;
 // An interface for interaction with the bottom sheet UI controller, which is
 // `TouchToFillPaymentMethodController` on Android. The delegate will supply
 // the data to show and will be notified of events by the controller.
-class TouchToFillDelegate {
+class TouchToFillPaymentMethodDelegate {
  public:
-  virtual ~TouchToFillDelegate() = default;
+  virtual ~TouchToFillPaymentMethodDelegate() = default;
 
   // Returns the BrowserAutofillManager whose forms may be filled by this
   // delegate. Must be constant throughout the lifetime of `this`.
@@ -97,4 +97,4 @@ class TouchToFillDelegate {
 
 }  // namespace autofill
 
-#endif  // COMPONENTS_AUTOFILL_CORE_BROWSER_INTEGRATORS_TOUCH_TO_FILL_TOUCH_TO_FILL_DELEGATE_H_
+#endif  // COMPONENTS_AUTOFILL_CORE_BROWSER_INTEGRATORS_TOUCH_TO_FILL_TOUCH_TO_FILL_PAYMENT_METHOD_DELEGATE_H_

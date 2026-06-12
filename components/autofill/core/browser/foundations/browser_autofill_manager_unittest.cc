@@ -628,20 +628,24 @@ class MockAutofillClient : public TestAutofillClient {
   MOCK_METHOD(AutofillAiManager*, GetAutofillAiManager, (), (override));
 };
 
-class MockTouchToFillDelegate : public TouchToFillDelegate {
+class MockTouchToFillPaymentMethodDelegate
+    : public TouchToFillPaymentMethodDelegate {
  public:
-  static std::unique_ptr<MockTouchToFillDelegate> Create(
+  static std::unique_ptr<MockTouchToFillPaymentMethodDelegate> Create(
       BrowserAutofillManager* manager) {
-    auto delegate = std::make_unique<NiceMock<MockTouchToFillDelegate>>();
+    auto delegate =
+        std::make_unique<NiceMock<MockTouchToFillPaymentMethodDelegate>>();
     ON_CALL(*delegate, GetAutofillManager()).WillByDefault(ReturnRef(*manager));
     ON_CALL(*delegate, IsShowingTouchToFill()).WillByDefault(Return(false));
     return delegate;
   }
 
-  MockTouchToFillDelegate() = default;
-  MockTouchToFillDelegate(const MockTouchToFillDelegate&) = delete;
-  MockTouchToFillDelegate& operator=(const MockTouchToFillDelegate&) = delete;
-  ~MockTouchToFillDelegate() override = default;
+  MockTouchToFillPaymentMethodDelegate() = default;
+  MockTouchToFillPaymentMethodDelegate(
+      const MockTouchToFillPaymentMethodDelegate&) = delete;
+  MockTouchToFillPaymentMethodDelegate& operator=(
+      const MockTouchToFillPaymentMethodDelegate&) = delete;
+  ~MockTouchToFillPaymentMethodDelegate() override = default;
 
   MOCK_METHOD(BrowserAutofillManager&, GetAutofillManager, (), (override));
   MOCK_METHOD(bool,
@@ -763,7 +767,8 @@ class TestBrowserAutofillManager : public autofill::TestBrowserAutofillManager {
  public:
   explicit TestBrowserAutofillManager(AutofillDriver* driver)
       : autofill::TestBrowserAutofillManager(driver) {
-    set_touch_to_fill_delegate(MockTouchToFillDelegate::Create(this));
+    set_touch_to_fill_payment_method_delegate(
+        MockTouchToFillPaymentMethodDelegate::Create(this));
     test_api(*this).SetExternalDelegate(
         std::make_unique<TestAutofillExternalDelegate>(this));
     test_api(*this).set_credit_card_access_manager(
@@ -1197,9 +1202,9 @@ class BrowserAutofillManagerTest
         autofill_client().GetCrowdsourcingManager());
   }
 
-  MockTouchToFillDelegate& touch_to_fill_delegate() {
-    return *static_cast<MockTouchToFillDelegate*>(
-        autofill_manager().touch_to_fill_delegate());
+  MockTouchToFillPaymentMethodDelegate& touch_to_fill_delegate() {
+    return *static_cast<MockTouchToFillPaymentMethodDelegate*>(
+        autofill_manager().touch_to_fill_payment_method_delegate());
   }
 
   MockCreditCardAccessManager& cc_access_manager() {

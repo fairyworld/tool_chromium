@@ -26,7 +26,7 @@
 #include "components/autofill/core/browser/data_model/valuables/loyalty_card.h"
 #include "components/autofill/core/browser/foundations/test_autofill_client.h"
 #include "components/autofill/core/browser/foundations/test_browser_autofill_manager.h"
-#include "components/autofill/core/browser/integrators/touch_to_fill/touch_to_fill_delegate.h"
+#include "components/autofill/core/browser/integrators/touch_to_fill/touch_to_fill_payment_method_delegate.h"
 #include "components/autofill/core/browser/payments/bnpl_util.h"
 #include "components/autofill/core/browser/payments/payments_util.h"
 #include "components/autofill/core/browser/payments/test_legal_message_line.h"
@@ -206,7 +206,7 @@ class TouchToFillPaymentMethodControllerImplTest
     NavigateAndCommit(GURL("about:blank"));
     FocusWebContentsOnMainFrame();
     ASSERT_TRUE(web_contents()->GetFocusedFrame());
-    autofill_manager().set_touch_to_fill_delegate(
+    autofill_manager().set_touch_to_fill_payment_method_delegate(
         std::make_unique<MockTouchToFillDelegateAndroidImpl>(
             &autofill_manager()));
     mock_view_ = std::make_unique<MockTouchToFillPaymentMethodViewImpl>();
@@ -254,7 +254,7 @@ class TouchToFillPaymentMethodControllerImplTest
 
   MockTouchToFillDelegateAndroidImpl& ttf_delegate() {
     return *static_cast<MockTouchToFillDelegateAndroidImpl*>(
-        autofill_manager().touch_to_fill_delegate());
+        autofill_manager().touch_to_fill_payment_method_delegate());
   }
 
   const std::vector<CreditCard> credit_cards_ = {test::GetCreditCard(),

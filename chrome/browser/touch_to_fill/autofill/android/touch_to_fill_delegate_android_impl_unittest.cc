@@ -86,35 +86,41 @@ class MockPaymentsAutofillClient : public payments::TestPaymentsAutofillClient {
               ScanCreditCard,
               (CreditCardScanCallback callback),
               (override));
-  MOCK_METHOD(bool,
-              ShowTouchToFillCreditCard,
-              ((base::WeakPtr<autofill::TouchToFillDelegate> delegate),
-               (base::span<const Suggestion> suggestions)),
-              (override));
-  MOCK_METHOD(bool,
-              ShowTouchToFillIban,
-              (base::WeakPtr<autofill::TouchToFillDelegate> delegate,
-               base::span<const Iban> ibans_to_suggest),
-              (override));
-  MOCK_METHOD(bool,
-              ShowTouchToFillAffiliatedLoyaltyCard,
-              (base::WeakPtr<autofill::TouchToFillDelegate> delegate,
-               std::vector<LoyaltyCard> loyalty_cards_to_suggest),
-              (override));
-  MOCK_METHOD(bool,
-              ShowTouchToFillForAllLoyaltyCards,
-              (base::WeakPtr<autofill::TouchToFillDelegate> delegate,
-               std::vector<LoyaltyCard> loyalty_cards_to_suggest),
-              (override));
+  MOCK_METHOD(
+      bool,
+      ShowTouchToFillCreditCard,
+      ((base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate> delegate),
+       (base::span<const Suggestion> suggestions)),
+      (override));
+  MOCK_METHOD(
+      bool,
+      ShowTouchToFillIban,
+      (base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate> delegate,
+       base::span<const Iban> ibans_to_suggest),
+      (override));
+  MOCK_METHOD(
+      bool,
+      ShowTouchToFillAffiliatedLoyaltyCard,
+      (base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate> delegate,
+       std::vector<LoyaltyCard> loyalty_cards_to_suggest),
+      (override));
+  MOCK_METHOD(
+      bool,
+      ShowTouchToFillForAllLoyaltyCards,
+      (base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate> delegate,
+       std::vector<LoyaltyCard> loyalty_cards_to_suggest),
+      (override));
   MOCK_METHOD(void, HideTouchToFillPaymentMethod, (), (override));
 
   void ExpectDelegateWeakPtrFromShowInvalidatedOnHideForCards() {
     EXPECT_CALL(*this, ShowTouchToFillCreditCard)
-        .WillOnce([this](base::WeakPtr<autofill::TouchToFillDelegate> delegate,
-                         base::span<const Suggestion> suggestions) {
-          captured_delegate_ = delegate;
-          return true;
-        });
+        .WillOnce(
+            [this](base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate>
+                       delegate,
+                   base::span<const Suggestion> suggestions) {
+              captured_delegate_ = delegate;
+              return true;
+            });
     EXPECT_CALL(*this, HideTouchToFillPaymentMethod).WillOnce([this] {
       EXPECT_FALSE(captured_delegate_);
     });
@@ -122,11 +128,13 @@ class MockPaymentsAutofillClient : public payments::TestPaymentsAutofillClient {
 
   void ExpectDelegateWeakPtrFromShowInvalidatedOnHideForIbans() {
     EXPECT_CALL(*this, ShowTouchToFillIban)
-        .WillOnce([this](base::WeakPtr<autofill::TouchToFillDelegate> delegate,
-                         base::span<const Iban> ibans_to_suggest) {
-          captured_delegate_ = delegate;
-          return true;
-        });
+        .WillOnce(
+            [this](base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate>
+                       delegate,
+                   base::span<const Iban> ibans_to_suggest) {
+              captured_delegate_ = delegate;
+              return true;
+            });
     EXPECT_CALL(*this, HideTouchToFillPaymentMethod).WillOnce([this] {
       EXPECT_FALSE(captured_delegate_);
     });
@@ -136,7 +144,8 @@ class MockPaymentsAutofillClient : public payments::TestPaymentsAutofillClient {
   ExpectDelegateWeakPtrFromShowInvalidatedOnHideForAffiliatedLoyaltyCards() {
     EXPECT_CALL(*this, ShowTouchToFillAffiliatedLoyaltyCard)
         .WillOnce(
-            [this](base::WeakPtr<autofill::TouchToFillDelegate> delegate,
+            [this](base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate>
+                       delegate,
                    base::span<const LoyaltyCard> loyalty_cards_to_suggest) {
               captured_delegate_ = delegate;
               return true;
@@ -149,7 +158,8 @@ class MockPaymentsAutofillClient : public payments::TestPaymentsAutofillClient {
   void ExpectDelegateWeakPtrFromShowInvalidatedOnHideForAllLoyaltyCards() {
     EXPECT_CALL(*this, ShowTouchToFillForAllLoyaltyCards)
         .WillOnce(
-            [this](base::WeakPtr<autofill::TouchToFillDelegate> delegate,
+            [this](base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate>
+                       delegate,
                    base::span<const LoyaltyCard> loyalty_cards_to_suggest) {
               captured_delegate_ = delegate;
               return true;
@@ -160,7 +170,7 @@ class MockPaymentsAutofillClient : public payments::TestPaymentsAutofillClient {
   }
 
  private:
-  base::WeakPtr<autofill::TouchToFillDelegate> captured_delegate_;
+  base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate> captured_delegate_;
 };
 
 class MockAutofillClient : public TestAutofillClient {
@@ -245,7 +255,7 @@ class TouchToFillDelegateAndroidImplUnitTest
     touch_to_fill_delegate_ = touch_to_fill_delegate.get();
     base::WeakPtr<TouchToFillDelegateAndroidImpl> touch_to_fill_delegate_weak =
         touch_to_fill_delegate->GetWeakPtr();
-    autofill_manager().set_touch_to_fill_delegate(
+    autofill_manager().set_touch_to_fill_payment_method_delegate(
         std::move(touch_to_fill_delegate));
 
     // Default setup for successful `TryToShowTouchToFill`.
@@ -428,7 +438,7 @@ TEST_F(TouchToFillDelegateAndroidImplUnitTest,
   ASSERT_TRUE(captured_callback);
 
   // Expect FillOrPreviewForm is not called after delegate is reset.
-  autofill_manager().set_touch_to_fill_delegate(nullptr);
+  autofill_manager().set_touch_to_fill_payment_method_delegate(nullptr);
   EXPECT_CALL(autofill_manager(), FillOrPreviewForm).Times(0);
 
   std::move(captured_callback).Run(test_card);
