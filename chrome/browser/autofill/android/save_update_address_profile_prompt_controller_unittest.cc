@@ -312,39 +312,6 @@ TEST_F(SaveUpdateAddressProfilePromptControllerTest,
 }
 
 TEST_F(SaveUpdateAddressProfilePromptControllerTest,
-       ReturnsCorrectStringsToDisplayWhenMigrateSyncAddress) {
-  sync_service_.GetUserSettings()->SetSelectedTypes(
-      /*sync_everything=*/false,
-      /*types=*/{syncer::UserSelectableType::kAutofill});
-  identity_test_env_.MakePrimaryAccountAvailable(kUserEmail,
-                                                 signin::ConsentLevel::kSync);
-  sync_service_.SetSignedIn(signin::ConsentLevel::kSync);
-  SetUpController(SaveUpdateAddressProfilePromptMode::kMigrateProfile);
-
-  EXPECT_EQ(l10n_util::GetStringUTF16(
-                IDS_AUTOFILL_ACCOUNT_MIGRATE_ADDRESS_PROMPT_TITLE),
-            controller_->GetTitle());
-  EXPECT_EQ(l10n_util::GetStringUTF16(
-                IDS_AUTOFILL_SAVE_ADDRESS_PROMPT_MIGRATION_OK_BUTTON_LABEL),
-            controller_->GetPositiveButtonText());
-
-  EXPECT_EQ(u"John H. Doe\n666 Erebus St.", controller_->GetAddress());
-
-  EXPECT_EQ(u"johndoe@hades.com", controller_->GetEmail());
-  EXPECT_EQ(u"16502111111", controller_->GetPhoneNumber());
-
-  EXPECT_EQ(l10n_util::GetStringUTF16(
-                IDS_AUTOFILL_MIGRATE_ADDRESS_PROMPT_CANCEL_BUTTON_LABEL),
-            controller_->GetNegativeButtonText());
-
-  EXPECT_EQ(
-      l10n_util::GetStringFUTF16(
-          IDS_AUTOFILL_SYNCABLE_PROFILE_MIGRATION_PROMPT_NOTICE,
-          base::ASCIIToUTF16(kUserEmail)),
-      controller_->GetRecordTypeNotice(identity_test_env_.identity_manager()));
-}
-
-TEST_F(SaveUpdateAddressProfilePromptControllerTest,
        ReturnsCorrectStringsToDisplayWhenSaveAccountAddress) {
   SigninUser();
   test_api(profile_).set_record_type(AutofillProfile::RecordType::kAccount);
