@@ -9706,6 +9706,7 @@ from previous Chrome versions.
   <int value="-1514717827" label="ConvertTrackpadEventsToMouse:enabled"/>
   <int value="-1514611301" label="enable-data-reduction-proxy-bypass-warnings"/>
   <int value="-1514210698" label="SafetyHubWeakAndReusedPasswords:enabled"/>
+  <int value="-1513873851" label="FedCmNativeIdPs:enabled"/>
   <int value="-1513112313" label="AudioSettingsPage:enabled"/>
   <int value="-1512656386" label="disable-new-audio-rendering-mixing-strategy"/>
   <int value="-1512555526" label="PaintPreviewShowOnStartup:enabled"/>
@@ -13328,6 +13329,7 @@ from previous Chrome versions.
       label="AutofillEnableAmountExtractionAllowlistDesktop:disabled"/>
   <int value="-339739745"
       label="SecurePaymentConfirmationAvailabilityAPI:disabled"/>
+  <int value="-339420159" label="FedCmNativeIdPs:disabled"/>
   <int value="-339201954" label="WebAppEnableScopeExtensions:disabled"/>
   <int value="-339103761" label="ArcGraphicBuffersVisualizationTool:enabled"/>
   <int value="-339092189" label="CommercePriceTrackingChipExperiment:disabled"/>
