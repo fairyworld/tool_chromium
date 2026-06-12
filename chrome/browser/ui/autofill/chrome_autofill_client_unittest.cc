@@ -197,8 +197,8 @@ class ChromeAutofillClientTest : public ChromeRenderViewHostTestHarness {
 #endif
   }
 
-  void InitializeAccessibilityAnnotatorEnablementService() {
-    accessibility_annotator_enablement_service_ =
+  void InitializePersonalContextEnablementService() {
+    personal_context_enablement_service_ =
         static_cast<MockPersonalContextEnablementService*>(
             PersonalContextEnablementServiceFactory::GetInstance()
                 ->SetTestingFactoryAndUse(
@@ -229,7 +229,7 @@ class ChromeAutofillClientTest : public ChromeRenderViewHostTestHarness {
 #if !BUILDFLAG(IS_ANDROID)
     autofill_field_promo_controller_ = nullptr;
 #endif  // !BUILDFLAG(IS_ANDROID)
-    accessibility_annotator_enablement_service_ = nullptr;
+    personal_context_enablement_service_ = nullptr;
     ChromeRenderViewHostTestHarness::TearDown();
   }
 
@@ -242,9 +242,8 @@ class ChromeAutofillClientTest : public ChromeRenderViewHostTestHarness {
     return ContentAutofillDriver::GetForRenderFrameHost(rfh);
   }
 
-  MockPersonalContextEnablementService*
-  accessibility_annotator_enablement_service() {
-    return accessibility_annotator_enablement_service_;
+  MockPersonalContextEnablementService* personal_context_enablement_service() {
+    return personal_context_enablement_service_;
   }
 
 #if !BUILDFLAG(IS_ANDROID)
@@ -283,7 +282,7 @@ class ChromeAutofillClientTest : public ChromeRenderViewHostTestHarness {
   raw_ptr<MockAutofillFieldPromoController> autofill_field_promo_controller_;
 #endif  // !BUILDFLAG(IS_ANDROID)
   raw_ptr<MockPersonalContextEnablementService>
-      accessibility_annotator_enablement_service_;
+      personal_context_enablement_service_;
   TestAutofillClientInjector<TestChromeAutofillClient>
       test_autofill_client_injector_;
   base::OnceCallback<void()> setup_flags_;
@@ -850,10 +849,9 @@ TEST_F(ChromeAutofillClientTest, GetPersonalContextEnablementState_NoService) {
 
 // Tests that the client correctly pipes the state from the enablement service.
 TEST_F(ChromeAutofillClientTest, GetPersonalContextEnablementState_HappyPath) {
-  InitializeAccessibilityAnnotatorEnablementService();
+  InitializePersonalContextEnablementService();
 
-  EXPECT_CALL(*accessibility_annotator_enablement_service(),
-              GetEnablementState())
+  EXPECT_CALL(*personal_context_enablement_service(), GetEnablementState())
       .WillRepeatedly(
           Return(personal_context::PersonalContextEnablementState::kEnabled));
   EXPECT_EQ(client()->GetPersonalContextEnablementState(),
