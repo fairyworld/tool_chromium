@@ -113,7 +113,6 @@ source_set("unit_tests") {
     ":service_impl",
     "//base/test:test_support",
     "//chrome/browser/password_manager/actor_login/internal",
-    "//chrome/browser/password_manager/actor_login/internal:test_support",
     "//chrome/browser/password_manager/actor_login/internal:unit_tests",
     "//chrome/test:test_support",
     "//components/language/core/browser",

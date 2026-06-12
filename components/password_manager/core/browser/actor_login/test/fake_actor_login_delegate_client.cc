@@ -2,19 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/password_manager/actor_login/internal/fake_actor_login_delegate_client.h"
+#include "components/password_manager/core/browser/actor_login/test/fake_actor_login_delegate_client.h"
 
 #include <utility>
 
 #include "base/strings/utf_string_conversions.h"
 #include "base/task/sequenced_task_runner.h"
-#include "chrome/browser/password_manager/actor_login/actor_login_permission_cleaning_service_factory.h"
-#include "chrome/browser/password_manager/actor_login/actor_login_permission_service_factory.h"
-#include "chrome/browser/password_manager/actor_login/internal/fake_actor_login_siwg_controller.h"
-#include "chrome/browser/profiles/profile.h"
 #include "components/password_manager/core/browser/actor_login/internal/actor_login_metrics_helper.h"
 #include "components/password_manager/core/browser/actor_login/internal/actor_login_siwg_controller_interface.h"
 #include "components/password_manager/core/browser/actor_login/internal/actor_login_web_content_interface.h"
+#include "components/password_manager/core/browser/actor_login/test/fake_actor_login_siwg_controller.h"
 #include "components/prefs/pref_service.h"
 
 namespace actor_login {
@@ -45,11 +42,16 @@ class FakeActorLoginFederatedCredentialFetcher
 }  // namespace
 
 FakeActorLoginDelegateClient::FakeActorLoginDelegateClient(
-    Profile* profile,
+    PrefService* prefs,
     const url::Origin& origin,
     password_manager::PasswordManagerDriver* driver,
-    password_manager::PasswordManagerClient* client)
-    : profile_(profile), origin_(origin), driver_(driver), client_(client) {}
+    password_manager::PasswordManagerClient* client,
+    ActorLoginPermissionCleaningService* cleaning_service)
+    : prefs_(prefs),
+      origin_(origin),
+      driver_(driver),
+      client_(client),
+      cleaning_service_(cleaning_service) {}
 
 FakeActorLoginDelegateClient::~FakeActorLoginDelegateClient() = default;
 
@@ -59,7 +61,7 @@ void FakeActorLoginDelegateClient::SetActorLoginWebContentInterface(
 }
 
 PrefService* FakeActorLoginDelegateClient::GetPrefs() {
-  return profile_->GetPrefs();
+  return prefs_;
 }
 
 password_manager::PasswordManagerClient*
@@ -87,7 +89,7 @@ FakeActorLoginDelegateClient::GetTranslateManager() {
 
 ActorLoginPermissionCleaningService*
 FakeActorLoginDelegateClient::GetPermissionCleaningService() {
-  return ActorLoginPermissionCleaningServiceFactory::GetForProfile(profile_);
+  return cleaning_service_;
 }
 
 std::unique_ptr<ActorLoginCredentialsFetcher>

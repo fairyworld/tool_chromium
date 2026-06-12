@@ -14,9 +14,9 @@
 #include "base/test/test_future.h"
 #include "base/types/expected.h"
 #include "chrome/browser/password_manager/actor_login/actor_login_service.h"
-#include "chrome/browser/password_manager/actor_login/internal/fake_actor_login_delegate_client.h"
 #include "components/password_manager/core/browser/actor_login/actor_login_types.h"
 #include "components/password_manager/core/browser/actor_login/internal/actor_login_metrics.h"
+#include "components/password_manager/core/browser/actor_login/test/fake_actor_login_delegate_client.h"
 #include "components/password_manager/core/browser/actor_login/test/mock_actor_login_delegate.h"
 #include "components/password_manager/core/browser/actor_login/test/mock_actor_login_quality_logger.h"
 #include "content/public/test/browser_task_environment.h"
@@ -87,8 +87,8 @@ TEST_F(ActorLoginServiceImplTest, GetCredentialsInvalidTabInterface) {
 
 TEST_F(ActorLoginServiceImplTest, GetCredentialsDelegatesToActorLoginDelegate) {
   auto client = std::make_unique<FakeActorLoginDelegateClient>(
-      /*profile=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
-      /*client=*/nullptr);
+      /*prefs=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
+      /*client=*/nullptr, /*cleaning_service=*/nullptr);
 
   EXPECT_CALL(mock_delegate_,
               GetCredentials(/*has_sign_in_with_google_button=*/false, _, _));
@@ -100,8 +100,8 @@ TEST_F(ActorLoginServiceImplTest, GetCredentialsDelegatesToActorLoginDelegate) {
 TEST_F(ActorLoginServiceImplTest,
        GetCredentialsDelegatesToActorLoginDelegate_WithSiwgButton) {
   auto client = std::make_unique<FakeActorLoginDelegateClient>(
-      /*profile=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
-      /*client=*/nullptr);
+      /*prefs=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
+      /*client=*/nullptr, /*cleaning_service=*/nullptr);
 
   EXPECT_CALL(mock_delegate_,
               GetCredentials(/*has_sign_in_with_google_button=*/true, _, _));
@@ -113,8 +113,8 @@ TEST_F(ActorLoginServiceImplTest,
 TEST_F(ActorLoginServiceImplTest, GetCredentials_Success) {
   base::HistogramTester histogram_tester;
   auto client = std::make_unique<FakeActorLoginDelegateClient>(
-      /*profile=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
-      /*client=*/nullptr);
+      /*prefs=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
+      /*client=*/nullptr, /*cleaning_service=*/nullptr);
 
   std::vector<Credential> credentials;
   credentials.push_back(CreateTestCredential());
@@ -137,8 +137,8 @@ TEST_F(ActorLoginServiceImplTest, GetCredentials_Success) {
 TEST_F(ActorLoginServiceImplTest, GetCredentials_ServiceBusy) {
   base::HistogramTester histogram_tester;
   auto client = std::make_unique<FakeActorLoginDelegateClient>(
-      /*profile=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
-      /*client=*/nullptr);
+      /*prefs=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
+      /*client=*/nullptr, /*cleaning_service=*/nullptr);
 
   base::test::TestFuture<CredentialsOrError> future;
   EXPECT_CALL(mock_delegate_, GetCredentials)
@@ -159,8 +159,8 @@ TEST_F(ActorLoginServiceImplTest, GetCredentials_ServiceBusy) {
 TEST_F(ActorLoginServiceImplTest, GetCredentials_FillingNotAllowed) {
   base::HistogramTester histogram_tester;
   auto client = std::make_unique<FakeActorLoginDelegateClient>(
-      /*profile=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
-      /*client=*/nullptr);
+      /*prefs=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
+      /*client=*/nullptr, /*cleaning_service=*/nullptr);
 
   base::test::TestFuture<CredentialsOrError> future;
   EXPECT_CALL(mock_delegate_, GetCredentials)
@@ -197,8 +197,8 @@ TEST_F(ActorLoginServiceImplTest, AttemptLoginInvalidTabInterface) {
 
 TEST_F(ActorLoginServiceImplTest, AttemptLoginDelegatesToActorLoginDelegate) {
   auto client = std::make_unique<FakeActorLoginDelegateClient>(
-      /*profile=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
-      /*client=*/nullptr);
+      /*prefs=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
+      /*client=*/nullptr, /*cleaning_service=*/nullptr);
   Credential credential = CreateTestCredential();
 
   EXPECT_CALL(mock_delegate_, AttemptLogin(Eq(credential), _, _, _, _, _));
@@ -210,8 +210,8 @@ TEST_F(ActorLoginServiceImplTest, AttemptLoginDelegatesToActorLoginDelegate) {
 TEST_F(ActorLoginServiceImplTest, AttemptLogin_ServiceBusy) {
   base::HistogramTester histogram_tester;
   auto client = std::make_unique<FakeActorLoginDelegateClient>(
-      /*profile=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
-      /*client=*/nullptr);
+      /*prefs=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
+      /*client=*/nullptr, /*cleaning_service=*/nullptr);
   Credential credential = CreateTestCredential();
 
   base::test::TestFuture<LoginStatusResultOrError> future;
@@ -233,8 +233,8 @@ TEST_F(ActorLoginServiceImplTest, AttemptLogin_ServiceBusy) {
 TEST_F(ActorLoginServiceImplTest, AttemptLogin_FillingNotAllowed) {
   base::HistogramTester histogram_tester;
   auto client = std::make_unique<FakeActorLoginDelegateClient>(
-      /*profile=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
-      /*client=*/nullptr);
+      /*prefs=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
+      /*client=*/nullptr, /*cleaning_service=*/nullptr);
   Credential credential = CreateTestCredential();
 
   base::test::TestFuture<LoginStatusResultOrError> future;
@@ -261,8 +261,8 @@ TEST_P(ActorLoginServiceImplAttemptLoginTest, AttemptLoginResults) {
   const AttemptLoginTestCase& test_case = GetParam();
   base::HistogramTester histogram_tester;
   auto client = std::make_unique<FakeActorLoginDelegateClient>(
-      /*profile=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
-      /*client=*/nullptr);
+      /*prefs=*/nullptr, /*origin=*/url::Origin(), /*driver=*/nullptr,
+      /*client=*/nullptr, /*cleaning_service=*/nullptr);
   Credential credential = CreateTestCredential();
 
   base::test::TestFuture<LoginStatusResultOrError> future;

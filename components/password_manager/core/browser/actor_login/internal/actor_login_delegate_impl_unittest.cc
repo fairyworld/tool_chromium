@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// TODO(crbug.com/472291829): This test case will also be moved to /components
-// after decoupling.
 #include "components/password_manager/core/browser/actor_login/internal/actor_login_delegate_impl.h"
 
 #include "base/functional/callback_helpers.h"
@@ -13,23 +11,16 @@
 #include "base/test/gmock_callback_support.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/run_until.h"
+#include "base/test/task_environment.h"
 #include "base/test/test_future.h"
 #include "build/build_config.h"
-#include "chrome/browser/actor/actor_keyed_service.h"
-#include "chrome/browser/actor/actor_keyed_service_factory.h"
-#include "chrome/browser/actor/actor_keyed_service_fake.h"
-#include "chrome/browser/password_manager/actor_login/actor_login_permission_cleaning_service_factory.h"
-#include "chrome/browser/password_manager/actor_login/actor_login_permission_service_factory.h"
-#include "chrome/browser/password_manager/actor_login/internal/fake_actor_login_delegate_client.h"
-#include "chrome/common/chrome_features.h"
-#include "chrome/test/base/chrome_render_view_host_test_harness.h"
-#include "chrome/test/base/testing_profile.h"
 #include "components/autofill/core/common/autofill_prefs.h"
 #include "components/autofill/core/common/autofill_test_utils.h"
 #include "components/device_reauth/device_authenticator.h"
 #include "components/password_manager/core/browser/actor_login/actor_login_types.h"
 #include "components/password_manager/core/browser/actor_login/internal/actor_login_permission_cleaning_service.h"
 #include "components/password_manager/core/browser/actor_login/test/actor_login_test_util.h"
+#include "components/password_manager/core/browser/actor_login/test/fake_actor_login_delegate_client.h"
 #include "components/password_manager/core/browser/actor_login/test/mock_actor_login_permission_service.h"
 #include "components/password_manager/core/browser/actor_login/test/mock_actor_login_quality_logger.h"
 #include "components/password_manager/core/browser/fake_form_fetcher.h"
@@ -41,19 +32,20 @@
 #include "components/password_manager/core/browser/password_store/test_password_store.h"
 #include "components/password_manager/core/browser/stub_password_manager_client.h"
 #include "components/password_manager/core/browser/stub_password_manager_driver.h"
+#include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
-#include "components/tabs/public/mock_tab_interface.h"
-#include "components/tabs/public/tab_interface.h"
+#include "components/prefs/testing_pref_service.h"
 #include "components/ukm/test_ukm_recorder.h"
-#include "content/public/browser/web_contents.h"
-#include "content/public/common/content_features.h"
-#include "content/public/test/navigation_simulator.h"
-#include "content/public/test/web_contents_tester.h"
 #include "services/metrics/public/cpp/ukm_builders.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 #include "url/origin.h"
+
+#if BUILDFLAG(IS_ANDROID)
+#include "components/webauthn/android/cred_man_support.h"
+#include "components/webauthn/android/webauthn_cred_man_delegate.h"
+#endif
 
 // TODO(crbug.com/519172533): Write integration tests to check the interaction
 // between the delegate, the `ActorLoginSiwgController`, the
@@ -175,48 +167,37 @@ class MockPasswordManagerDriver
 
 }  // namespace
 
-class ActorLoginDelegateImplTest : public ChromeRenderViewHostTestHarness {
+class ActorLoginDelegateImplTest : public testing::Test {
  public:
-  ActorLoginDelegateImplTest()
-      : ChromeRenderViewHostTestHarness(
-            base::test::TaskEnvironment::MainThreadType::UI) {
+  ActorLoginDelegateImplTest() {
     std::vector<base::test::FeatureRef> disabled_features;
 #if BUILDFLAG(IS_ANDROID)
     disabled_features.push_back(
         password_manager::features::kActorLoginNoPermanentPermissionsAndroid);
 #endif
     scoped_feature_list_.InitWithFeatures(
-        /*enabled_features=*/{features::kGlicActor},
+        /*enabled_features=*/{},
         /*disabled_features=*/disabled_features);
   }
 
   void SetUp() override {
-    ChromeRenderViewHostTestHarness::SetUp();
+    testing::Test::SetUp();
 
     ON_CALL(mock_driver_, GetLastCommittedOrigin())
         .WillByDefault(ReturnRef(test_origin_));
 
-    ActorLoginPermissionServiceFactory::GetInstance()->SetTestingFactory(
-        profile(), base::BindRepeating([](content::BrowserContext* context)
-                                           -> std::unique_ptr<KeyedService> {
-          auto mock_service =
-              std::make_unique<NiceMock<MockActorLoginPermissionService>>();
-          ON_CALL(*mock_service, ListPermissions(An<const url::Origin&>(), _))
-              .WillByDefault(base::test::RunOnceCallbackRepeatedly<1>(
-                  std::vector<FederatedPermission>()));
-          return mock_service;
-        }));
+#if BUILDFLAG(IS_ANDROID)
+    prefs_.registry()->RegisterBooleanPref(
+        autofill::prefs::kAutofillUsingPlatformAutofill, false);
+    webauthn::WebAuthnCredManDelegate::override_cred_man_support_for_testing(
+        webauthn::CredManSupport::DISABLED);
+#endif
 
-    web_contents_ = CreateTestWebContents();
-    content::NavigationSimulator::NavigateAndCommitFromBrowser(
-        web_contents_.get(), GURL(kTestUrl));
-
+    mock_cleaning_service_ =
+        std::make_unique<NiceMock<MockActorLoginPermissionCleaningService>>();
     delegate_client_ = std::make_unique<FakeActorLoginDelegateClient>(
-        profile(), test_origin_, &mock_driver_, &client_);
-
-    mock_tab_interface_ = std::make_unique<tabs::MockTabInterface>();
-    tabs::TabLookupFromWebContents::CreateForWebContents(
-        web_contents_.get(), mock_tab_interface_.get());
+        &prefs_, test_origin_, &mock_driver_, &client_,
+        mock_cleaning_service_.get());
 
     delegate_ =
         ActorLoginDelegateImpl::CreateForUserData(delegate_client_.get());
@@ -230,14 +211,10 @@ class ActorLoginDelegateImplTest : public ChromeRenderViewHostTestHarness {
     client_.account_store()->ShutdownOnUIThread();
     base::RunLoop().RunUntilIdle();
 
-    // Reset the raw pointer before it becomes dangling in
-    // ChromeRenderViewHostTestHarness::TearDown()
     delegate_client_->WebContentsDestroyed();
     delegate_ = nullptr;
     delegate_client_.reset();
-    web_contents_.reset();
-    mock_tab_interface_.reset();
-    ChromeRenderViewHostTestHarness::TearDown();
+    mock_cleaning_service_.reset();
   }
 
   base::WeakPtr<MockActorLoginQualityLogger> mqls_logger() {
@@ -297,9 +274,11 @@ class ActorLoginDelegateImplTest : public ChromeRenderViewHostTestHarness {
   }
 
  protected:
+  base::test::SingleThreadTaskEnvironment task_environment_;
+  TestingPrefServiceSimple prefs_;
   FakePasswordManagerClient client_;
   std::unique_ptr<FakeActorLoginDelegateClient> delegate_client_;
-  // `raw_ptr` because `WebContentsUserData` owns it
+  // `raw_ptr` because the delegate client owns it.
   raw_ptr<ActorLoginDelegateImpl> delegate_ = nullptr;
   NiceMock<MockPasswordManager> mock_password_manager_;
   NiceMock<MockPasswordFormCache> mock_form_cache_;
@@ -313,11 +292,9 @@ class ActorLoginDelegateImplTest : public ChromeRenderViewHostTestHarness {
   autofill::test::AutofillUnitTestEnvironment autofill_test_environment_{
       {.disable_server_communication = true}};
   NiceMock<MockActorLoginQualityLogger> mock_mqls_logger;
-
-  // Tab setup
+  std::unique_ptr<NiceMock<MockActorLoginPermissionCleaningService>>
+      mock_cleaning_service_;
   base::test::ScopedFeatureList scoped_feature_list_;
-  std::unique_ptr<content::WebContents> web_contents_;
-  std::unique_ptr<tabs::MockTabInterface> mock_tab_interface_;
 };
 
 TEST_F(ActorLoginDelegateImplTest, GetCredentialsSuccess_FeatureOn) {
@@ -345,7 +322,8 @@ TEST_F(ActorLoginDelegateImplTest, GetCredentials_NullClient) {
   ActorLoginDelegateImpl::RemoveFromUserDataForTesting(delegate_client_.get());
   delegate_ = nullptr;
   delegate_client_ = std::make_unique<FakeActorLoginDelegateClient>(
-      profile(), test_origin_, &mock_driver_, nullptr);
+      &prefs_, test_origin_, &mock_driver_, nullptr,
+      mock_cleaning_service_.get());
   auto* delegate =
       ActorLoginDelegateImpl::CreateForUserData(delegate_client_.get());
 
@@ -371,7 +349,8 @@ TEST_F(ActorLoginDelegateImplTest, GetCredentials_NullClient_HasPasswords) {
   ActorLoginDelegateImpl::RemoveFromUserDataForTesting(delegate_client_.get());
   delegate_ = nullptr;
   delegate_client_ = std::make_unique<FakeActorLoginDelegateClient>(
-      profile(), test_origin_, &mock_driver_, nullptr);
+      &prefs_, test_origin_, &mock_driver_, nullptr,
+      mock_cleaning_service_.get());
   auto* delegate =
       ActorLoginDelegateImpl::CreateForUserData(delegate_client_.get());
 
@@ -388,8 +367,7 @@ TEST_F(ActorLoginDelegateImplTest,
   base::test::ScopedFeatureList scoped_feature_list(
       password_manager::features::kActorLogin);
 
-  profile()->GetPrefs()->SetBoolean(
-      autofill::prefs::kAutofillUsingPlatformAutofill, true);
+  prefs_.SetBoolean(autofill::prefs::kAutofillUsingPlatformAutofill, true);
 
   GURL url = GURL(kTestUrl);
   std::vector<password_manager::PasswordForm> saved_forms;
@@ -413,12 +391,8 @@ TEST_F(ActorLoginDelegateImplTest, GetCredentialsLogsDomainAndLanguage) {
       password_manager::features::kActorLogin);
   SetUpGetCredentialsDeps();
   EXPECT_CALL(mock_form_cache_, GetFormManagers());
-
-  const GURL kUrl = GURL("https://example.com");
-  content::WebContentsTester* web_contents_tester =
-      content::WebContentsTester::For(web_contents());
-  web_contents_tester->NavigateAndCommit(kUrl);
-  EXPECT_CALL(*mqls_logger(), SetDomainAndLanguage(_, Eq(kUrl)));
+  EXPECT_CALL(*mqls_logger(),
+              SetDomainAndLanguage(_, Eq(GURL("https://example.com/"))));
   delegate_->GetCredentials(/*has_sign_in_with_google_button=*/false,
                             mqls_logger(), base::DoNothing());
 }
@@ -500,13 +474,10 @@ TEST_F(ActorLoginDelegateImplTest, AttemptLoginLogsDomainAndLanguage) {
   Credential credential = CreateTestCredential(u"username", url, origin);
 
   SetUpActorCredentialFillerDeps();
-
   EXPECT_CALL(mock_form_cache_, GetFormManagers());
 
-  content::WebContentsTester* web_contents_tester =
-      content::WebContentsTester::For(web_contents());
-  web_contents_tester->NavigateAndCommit(url);
-  EXPECT_CALL(*mqls_logger(), SetDomainAndLanguage(_, Eq(url)));
+  EXPECT_CALL(*mqls_logger(),
+              SetDomainAndLanguage(_, Eq(GURL("https://example.com/"))));
   delegate_->AttemptLogin(credential, false, mqls_logger(),
                           base::TimeTicks::Now(), base::DoNothing(),
                           /*action_sequence_delegate=*/nullptr);
@@ -652,7 +623,7 @@ TEST_F(ActorLoginDelegateImplTest, ContextDestroyedDuringAttemptLogin) {
 
   delegate_client_->WebContentsDestroyed();
   delegate_ = nullptr;
-  task_environment()->RunUntilIdle();
+  task_environment_.RunUntilIdle();
   // The callback should never be invoked because the
   // delegate was destroyed.
   EXPECT_FALSE(future.IsReady());
@@ -816,7 +787,6 @@ TEST_F(ActorLoginDelegateImplTest,
   base::HistogramTester histogram_tester;
   ukm::TestAutoSetUkmRecorder ukm_recorder;
 
-  content::WebContents* test_contents = web_contents_.get();
   GURL url = GURL(kTestUrl);
   url::Origin origin = url::Origin::Create(url);
   Credential credential = CreateTestCredential(u"username", url, origin);
@@ -827,25 +797,6 @@ TEST_F(ActorLoginDelegateImplTest,
   federation_detail.account_id = "12345";
 
   SetUpActorCredentialFillerDeps();
-
-  // Create a task and associate it with the tab. Avoids hitting a CHECK when
-  // invoking `GetCredentials`.
-  actor::ActorKeyedServiceFactory::GetInstance()->SetTestingFactory(
-      profile(), base::BindRepeating([](content::BrowserContext* context)
-                                         -> std::unique_ptr<KeyedService> {
-        return std::make_unique<actor::ActorKeyedServiceFake>(
-            Profile::FromBrowserContext(context));
-      }));
-  auto* actor_service = static_cast<actor::ActorKeyedServiceFake*>(
-      actor::ActorKeyedService::Get(profile()));
-  actor::TaskId task_id = actor_service->CreateTaskForTesting();
-  actor::ActorTask* task = actor_service->GetTask(task_id);
-  base::RunLoop loop;
-  task->AddTab(tabs::TabInterface::GetFromContents(test_contents)->GetHandle(),
-               /*stop_task_on_detach=*/true,
-               base::BindLambdaForTesting(
-                   [&](actor::mojom::ActionResultPtr result) { loop.Quit(); }));
-  loop.Run();
 
   base::test::TestFuture<LoginStatusResultOrError> future;
   delegate_->AttemptLogin(credential, false, mqls_logger(),
@@ -996,17 +947,7 @@ TEST_F(ActorLoginDelegateImplTest,
 
   EXPECT_CALL(mock_password_manager_, RemoveObserver(delegate_.get()));
 
-  auto* cleaning_service =
-      static_cast<MockActorLoginPermissionCleaningService*>(
-          ActorLoginPermissionCleaningServiceFactory::GetInstance()
-              ->SetTestingFactoryAndUse(
-                  profile(),
-                  base::BindRepeating([](content::BrowserContext* context)
-                                          -> std::unique_ptr<KeyedService> {
-                    return std::make_unique<
-                        NiceMock<MockActorLoginPermissionCleaningService>>();
-                  })));
-
+  auto* cleaning_service = mock_cleaning_service_.get();
   EXPECT_CALL(*cleaning_service,
               ClearConflictingPermissions(Eq(credential), _, _));
   delegate_->OnLoginSuccessful(form);
@@ -1079,17 +1020,7 @@ TEST_F(ActorLoginDelegateImplTest,
   form.username_value = u"wrong_username";
   form.actor_login_approved = true;
 
-  auto* cleaning_service =
-      static_cast<MockActorLoginPermissionCleaningService*>(
-          ActorLoginPermissionCleaningServiceFactory::GetInstance()
-              ->SetTestingFactoryAndUse(
-                  profile(),
-                  base::BindRepeating([](content::BrowserContext* context)
-                                          -> std::unique_ptr<KeyedService> {
-                    return std::make_unique<
-                        NiceMock<MockActorLoginPermissionCleaningService>>();
-                  })));
-
+  auto* cleaning_service = mock_cleaning_service_.get();
   EXPECT_CALL(*cleaning_service, ClearConflictingPermissions).Times(0);
 
   delegate_->OnLoginSuccessful(form);
@@ -1155,17 +1086,7 @@ TEST_F(ActorLoginDelegateImplTest,
   EXPECT_CALL(mock_password_manager_, AddObserver(delegate_.get()));
   ASSERT_TRUE(attempt_login_future.Wait());
 
-  auto* cleaning_service =
-      static_cast<MockActorLoginPermissionCleaningService*>(
-          ActorLoginPermissionCleaningServiceFactory::GetInstance()
-              ->SetTestingFactoryAndUse(
-                  profile(),
-                  base::BindRepeating([](content::BrowserContext* context)
-                                          -> std::unique_ptr<KeyedService> {
-                    return std::make_unique<
-                        NiceMock<MockActorLoginPermissionCleaningService>>();
-                  })));
-
+  auto* cleaning_service = mock_cleaning_service_.get();
   EXPECT_CALL(*cleaning_service, ClearConflictingPermissions).Times(0);
 
   password_manager::PasswordForm form;
@@ -1344,11 +1265,8 @@ TEST_F(
 
 TEST_F(ActorLoginDelegateImplTest,
        GetCredentialsWithSiwgButtonFetchesFederated) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitWithFeatures(
-      {password_manager::features::kActorLogin,
-       ::features::kFedCmEmbedderInitiatedLogin},
-      {});
+  base::test::ScopedFeatureList scoped_feature_list(
+      password_manager::features::kActorLogin);
   SetUpGetCredentialsDeps();
   EXPECT_CALL(mock_form_cache_, GetFormManagers());
 
@@ -1370,11 +1288,8 @@ TEST_F(ActorLoginDelegateImplTest,
 
 TEST_F(ActorLoginDelegateImplTest,
        GetCredentialsWithoutSiwgButtonSkipsFederated) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitWithFeatures(
-      {password_manager::features::kActorLogin,
-       ::features::kFedCmEmbedderInitiatedLogin},
-      {});
+  base::test::ScopedFeatureList scoped_feature_list(
+      password_manager::features::kActorLogin);
   SetUpGetCredentialsDeps();
   EXPECT_CALL(mock_form_cache_, GetFormManagers());
 
@@ -1395,26 +1310,6 @@ TEST_F(ActorLoginDelegateImplTest, RemovedOnUserTakeover) {
       .WillRepeatedly(Return(base::span(form_managers_)));
 
   SetUpActorCredentialFillerDeps();
-  actor::ActorKeyedServiceFactory::GetInstance()->SetTestingFactory(
-      profile(), base::BindRepeating([](content::BrowserContext* context)
-                                         -> std::unique_ptr<KeyedService> {
-        return std::make_unique<actor::ActorKeyedServiceFake>(
-            Profile::FromBrowserContext(context));
-      }));
-
-  auto* actor_service = static_cast<actor::ActorKeyedServiceFake*>(
-      actor::ActorKeyedService::Get(profile()));
-
-  // Create a task and associate it with the tab.
-  actor::TaskId task_id = actor_service->CreateTaskForTesting();
-  actor::ActorTask* task = actor_service->GetTask(task_id);
-  content::WebContents* test_contents = web_contents_.get();
-  base::RunLoop loop;
-  task->AddTab(tabs::TabInterface::GetFromContents(test_contents)->GetHandle(),
-               /*stop_task_on_detach=*/true,
-               base::BindLambdaForTesting(
-                   [&](actor::mojom::ActionResultPtr result) { loop.Quit(); }));
-  loop.Run();
 
   // Invoke AttemptLogin with a federated credential
   GURL url = GURL(kTestUrl);
@@ -1445,9 +1340,6 @@ TEST_F(ActorLoginDelegateImplTest, RemovedOnUserTakeover) {
   // Simulate control state change to trigger the callback.
   delegate_client_->TriggerControlStateReleasedCallback();
 
-  // Stop the task, which should invoke the callback.
-  actor_service->StopTaskForTesting(
-      task_id, actor::ActorTask::StoppedReason::kStoppedByUser);
   ASSERT_TRUE(attempt_login_future.Wait());
 
   // Verify that the delegate client's `RemoveFederatedEmbedderLoginRequest` has
@@ -1465,18 +1357,7 @@ TEST_F(ActorLoginDelegateImplTest,
        password_manager::features::kActorLoginConflictingPermissionCleanup},
       /*disabled_features=*/{});
 
-  // Setup mock cleaning service
-  auto* mock_cleaning_service =
-      static_cast<MockActorLoginPermissionCleaningService*>(
-          ActorLoginPermissionCleaningServiceFactory::GetInstance()
-              ->SetTestingFactoryAndUse(
-                  profile(),
-                  base::BindRepeating([](content::BrowserContext* context)
-                                          -> std::unique_ptr<KeyedService> {
-                    return std::make_unique<
-                        NiceMock<MockActorLoginPermissionCleaningService>>();
-                  })));
-
+  auto* mock_cleaning_service = mock_cleaning_service_.get();
   GURL url = GURL(kTestUrl);
   url::Origin origin = url::Origin::Create(url);
   SetUpConflictingPermissions(url, kTestUsername);
@@ -1513,24 +1394,6 @@ TEST_F(ActorLoginDelegateImplTest,
   form_fetcher_.NotifyFetchCompleted();
   ASSERT_TRUE(get_creds_future.Get().has_value());
 
-  // Setup ActorKeyedServiceFake
-  auto* actor_service = static_cast<actor::ActorKeyedServiceFake*>(
-      actor::ActorKeyedServiceFactory::GetInstance()->SetTestingFactoryAndUse(
-          profile(), base::BindRepeating([](content::BrowserContext* context)
-                                             -> std::unique_ptr<KeyedService> {
-            return std::make_unique<actor::ActorKeyedServiceFake>(
-                Profile::FromBrowserContext(context));
-          })));
-
-  actor::TaskId task_id = actor_service->CreateTaskForTesting();
-  actor::ActorTask* task = actor_service->GetTask(task_id);
-  content::WebContents* test_contents = web_contents_.get();
-  base::RunLoop loop;
-  task->AddTab(tabs::TabInterface::GetFromContents(test_contents)->GetHandle(),
-               /*stop_task_on_detach=*/true,
-               base::BindLambdaForTesting(
-                   [&](actor::mojom::ActionResultPtr result) { loop.Quit(); }));
-  loop.Run();
   Credential credential = CreateTestCredential(kTestUsername, url, origin);
   credential.type = CredentialType::kFederated;
   FederationDetail federation_detail;
@@ -1563,18 +1426,7 @@ TEST_F(ActorLoginDelegateImplTest, FailedFederatedLoginDoesntClearPermissions) {
        password_manager::features::kActorLoginConflictingPermissionCleanup},
       /*disabled_features=*/{});
 
-  // Setup mock cleaning service
-  auto* mock_cleaning_service =
-      static_cast<MockActorLoginPermissionCleaningService*>(
-          ActorLoginPermissionCleaningServiceFactory::GetInstance()
-              ->SetTestingFactoryAndUse(
-                  profile(),
-                  base::BindRepeating([](content::BrowserContext* context)
-                                          -> std::unique_ptr<KeyedService> {
-                    return std::make_unique<
-                        NiceMock<MockActorLoginPermissionCleaningService>>();
-                  })));
-
+  auto* mock_cleaning_service = mock_cleaning_service_.get();
   GURL url = GURL(kTestUrl);
   url::Origin origin = url::Origin::Create(url);
   SetUpConflictingPermissions(url, kTestUsername);
@@ -1610,25 +1462,6 @@ TEST_F(ActorLoginDelegateImplTest, FailedFederatedLoginDoesntClearPermissions) {
 
   form_fetcher_.NotifyFetchCompleted();
   ASSERT_TRUE(get_creds_future.Get().has_value());
-
-  // Setup ActorKeyedServiceFake
-  auto* actor_service = static_cast<actor::ActorKeyedServiceFake*>(
-      actor::ActorKeyedServiceFactory::GetInstance()->SetTestingFactoryAndUse(
-          profile(), base::BindRepeating([](content::BrowserContext* context)
-                                             -> std::unique_ptr<KeyedService> {
-            return std::make_unique<actor::ActorKeyedServiceFake>(
-                Profile::FromBrowserContext(context));
-          })));
-
-  actor::TaskId task_id = actor_service->CreateTaskForTesting();
-  actor::ActorTask* task = actor_service->GetTask(task_id);
-  content::WebContents* test_contents = web_contents_.get();
-  base::RunLoop loop;
-  task->AddTab(tabs::TabInterface::GetFromContents(test_contents)->GetHandle(),
-               /*stop_task_on_detach=*/true,
-               base::BindLambdaForTesting(
-                   [&](actor::mojom::ActionResultPtr result) { loop.Quit(); }));
-  loop.Run();
 
   Credential credential = CreateTestCredential(u"username", url, origin);
   credential.type = CredentialType::kFederated;

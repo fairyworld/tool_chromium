@@ -107,6 +107,7 @@ source_set("unit_tests") {
   testonly = true
   sources = [
     "actor_login_credential_filler_unittest.cc",
+    "actor_login_delegate_impl_unittest.cc",
     "actor_login_duplicate_permission_cleaner_unittest.cc",
     "actor_login_get_credentials_helper_unittest.cc",
     "actor_login_password_credentials_fetcher_unittest.cc",
@@ -125,7 +126,9 @@ source_set("unit_tests") {
     "//components/password_manager/core/browser/actor_login/test:test_support",
     "//components/password_manager/core/browser/affiliation:affiliation_match_helper",
     "//components/password_manager/core/browser/features:password_features",
+    "//components/prefs:test_support",
     "//components/proto_extras:proto_matchers",
+    "//components/ukm:test_support",
     "//google_apis/common",
     "//services/network:test_support",
     "//testing/gmock",

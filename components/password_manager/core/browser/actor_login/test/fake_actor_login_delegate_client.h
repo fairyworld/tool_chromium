@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_PASSWORD_MANAGER_ACTOR_LOGIN_INTERNAL_FAKE_ACTOR_LOGIN_DELEGATE_CLIENT_H_
-#define CHROME_BROWSER_PASSWORD_MANAGER_ACTOR_LOGIN_INTERNAL_FAKE_ACTOR_LOGIN_DELEGATE_CLIENT_H_
+#ifndef COMPONENTS_PASSWORD_MANAGER_CORE_BROWSER_ACTOR_LOGIN_TEST_FAKE_ACTOR_LOGIN_DELEGATE_CLIENT_H_
+#define COMPONENTS_PASSWORD_MANAGER_CORE_BROWSER_ACTOR_LOGIN_TEST_FAKE_ACTOR_LOGIN_DELEGATE_CLIENT_H_
 
 #include <memory>
 
@@ -14,7 +14,7 @@
 #include "components/password_manager/core/browser/actor_login/internal/actor_login_delegate_client.h"
 #include "url/origin.h"
 
-class Profile;
+class PrefService;
 
 namespace actor_login {
 class ActorLoginWebContentInterface;
@@ -33,10 +33,12 @@ class FakeActorLoginSiwgController;
 // delegate state and trigger test events.
 class FakeActorLoginDelegateClient : public ActorLoginDelegateClient {
  public:
-  FakeActorLoginDelegateClient(Profile* profile,
-                               const url::Origin& origin,
-                               password_manager::PasswordManagerDriver* driver,
-                               password_manager::PasswordManagerClient* client);
+  FakeActorLoginDelegateClient(
+      PrefService* prefs,
+      const url::Origin& origin,
+      password_manager::PasswordManagerDriver* driver,
+      password_manager::PasswordManagerClient* client,
+      ActorLoginPermissionCleaningService* cleaning_service);
   ~FakeActorLoginDelegateClient() override;
 
   // ActorLoginDelegateClient implementation:
@@ -108,11 +110,12 @@ class FakeActorLoginDelegateClient : public ActorLoginDelegateClient {
   void WebContentsDestroyed();
 
  private:
-  raw_ptr<Profile> profile_ = nullptr;
+  raw_ptr<PrefService> prefs_ = nullptr;
   bool test_requires_federated_button_click_ = false;
   url::Origin origin_;
   raw_ptr<password_manager::PasswordManagerDriver> driver_ = nullptr;
   raw_ptr<password_manager::PasswordManagerClient> client_ = nullptr;
+  raw_ptr<ActorLoginPermissionCleaningService> cleaning_service_ = nullptr;
   raw_ptr<ActorLoginWebContentInterface> web_interface_ = nullptr;
   raw_ptr<FakeActorLoginSiwgController> siwg_controller_ = nullptr;
   bool is_remove_federated_embedder_login_request_called_ = false;
@@ -122,4 +125,4 @@ class FakeActorLoginDelegateClient : public ActorLoginDelegateClient {
 
 }  // namespace actor_login
 
-#endif  // CHROME_BROWSER_PASSWORD_MANAGER_ACTOR_LOGIN_INTERNAL_FAKE_ACTOR_LOGIN_DELEGATE_CLIENT_H_
+#endif  // COMPONENTS_PASSWORD_MANAGER_CORE_BROWSER_ACTOR_LOGIN_TEST_FAKE_ACTOR_LOGIN_DELEGATE_CLIENT_H_
