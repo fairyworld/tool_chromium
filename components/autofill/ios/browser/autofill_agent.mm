@@ -404,7 +404,8 @@ bool HasGuid(const Suggestion::Payload& payload) {
         });
   }
 
-  if (suggestion.type == SuggestionType::kAddressEntry ||
+  if (suggestion.type == SuggestionType::kAutocompleteEntry ||
+      suggestion.type == SuggestionType::kAddressEntry ||
       suggestion.type == SuggestionType::kCreditCardEntry ||
       suggestion.type == SuggestionType::kVirtualCreditCardEntry ||
       suggestion.type == SuggestionType::kAddressFieldByFieldFilling ||
@@ -449,16 +450,8 @@ bool HasGuid(const Suggestion::Payload& payload) {
     return;
   }
 
-  if (suggestion.type == SuggestionType::kAutocompleteEntry) {
-    // FormSuggestion is a simple, single value that can be filled out now.
-    [self fillField:SysNSStringToUTF8(fieldIdentifier)
-        fieldRendererID:fieldRendererID
-         formRendererID:formRendererID
-               formName:SysNSStringToUTF8(formName)
-                  value:SysNSStringToUTF16(suggestion.value)
-                inFrame:frame];
-  } else if (suggestion.type == SuggestionType::kUndoOrClear &&
-             !base::FeatureList::IsEnabled(kAutofillUndoIos)) {
+  if (suggestion.type == SuggestionType::kUndoOrClear &&
+      !base::FeatureList::IsEnabled(kAutofillUndoIos)) {
     const auto callback = [](__weak AutofillAgent* agent,
                              base::WeakPtr<web::WebFrame> frame,
                              FormRendererId formId,
@@ -481,10 +474,6 @@ bool HasGuid(const Suggestion::Payload& payload) {
                        std::exchange(_suggestionHandledCompletion, nil)));
 
   } else {
-    // TODO(crbug.com/366247033): Remove this crash key once the underlying
-    // crash has been fixed.
-    SCOPED_CRASH_KEY_NUMBER("Bug366247033", "suggestion_type",
-                            static_cast<int>(suggestion.type));
     NOTREACHED();
   }
 }
@@ -638,12 +627,6 @@ bool HasGuid(const Suggestion::Payload& payload) {
              popup_suggestion.type ==
                  SuggestionType::kSaveAndFillCreditCardEntry)) {
           break;
-        }
-
-        // Filter out any key/value suggestions if the user hasn't typed yet.
-        if (popup_suggestion.type == SuggestionType::kAutocompleteEntry &&
-            _typedValue.length == 0) {
-          continue;
         }
 
         // `value` will contain the text to be filled in the selected element

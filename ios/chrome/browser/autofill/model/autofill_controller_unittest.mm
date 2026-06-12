@@ -1162,19 +1162,6 @@ TEST_F(AutofillControllerTest, KeyValueFocusChange) {
   EXPECT_NSEQ(@"Bonjour", suggestion.value);
 }
 
-// Checks that focusing on an element of a key/value type form without typing
-// won't result in suggestions being sent to the AutofillAgent, once data has
-// been loaded into a test data manager.
-TEST_F(AutofillControllerTest, NoKeyValueSuggestionsWithoutTyping) {
-  SetUpKeyValueData();
-  ResetWaitForSuggestionRetrieval();
-  // Focus element.
-  web::test::ExecuteJavaScript(@"document.forms[0].greeting.focus()",
-                               web_state());
-  WaitForSuggestionRetrieval(/*wait_for_trigger=*/YES);
-  EXPECT_EQ(0U, [suggestion_controller() suggestions].count);
-}
-
 // Checks that an HTML page containing a credit card-type form which is
 // submitted with scripts (simulating user form submission) results in a credit
 // card being successfully imported into the PersonalDataManager.
