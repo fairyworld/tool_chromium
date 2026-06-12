@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/translate/core/language_detection/chinese_script_classifier.h"
+#include "components/language_detection/core/chinese_script_classifier.h"
 
 #include <algorithm>
 #include <memory>
@@ -13,7 +13,7 @@
 #include "third_party/icu/source/common/unicode/uniset.h"
 #include "third_party/icu/source/common/unicode/unistr.h"
 
-namespace translate {
+namespace language_detection {
 
 namespace {
 // BCP 47 language code representing Chinese in Han Simplified script.
@@ -773,7 +773,6 @@ bool ChineseScriptClassifier::IsInitialized() const {
 ChineseScriptClassifier::~ChineseScriptClassifier() = default;
 
 std::string ChineseScriptClassifier::Classify(std::string_view input) const {
-  // If there was a problem with initialization, return the empty string.
   if (!IsInitialized()) {
     return "";
   }
@@ -785,10 +784,26 @@ std::string ChineseScriptClassifier::Classify(std::string_view input) const {
   // Remove whitespace since transliterators may not preserve it.
   std::erase_if(input_subset, base::IsAsciiWhitespace<char>);
 
-  // Convert the input to icu::UnicodeString so we can iterate over codepoints.
-  icu::UnicodeString input_codepoints =
-      icu::UnicodeString::fromUTF8(input_subset);
+  return Classify(icu::UnicodeString::fromUTF8(input_subset));
+}
 
+std::string ChineseScriptClassifier::Classify(std::u16string_view input) const {
+  if (!IsInitialized()) {
+    return "";
+  }
+
+  // Operate only on first 250 characters (roughly equivalent to 500 bytes of
+  // UTF-8 for Chinese).
+  std::u16string input_subset(input.substr(0, 250));
+
+  // Remove whitespace.
+  std::erase_if(input_subset, base::IsAsciiWhitespace<char16_t>);
+
+  return Classify(icu::UnicodeString(input_subset));
+}
+
+std::string ChineseScriptClassifier::Classify(
+    const icu::UnicodeString& input_codepoints) const {
   // Count matches between the original input chars and the Hant and Hans
   // versions of the input.
   int hant_count = 0;
@@ -796,10 +811,12 @@ std::string ChineseScriptClassifier::Classify(std::string_view input) const {
 
   for (int index = 0; index < input_codepoints.length(); ++index) {
     const auto codepoint = input_codepoints.charAt(index);
-    if (hans_set_->contains(codepoint))
+    if (hans_set_->contains(codepoint)) {
       ++hans_count;
-    if (hant_set_->contains(codepoint))
+    }
+    if (hant_set_->contains(codepoint)) {
       ++hant_count;
+    }
   }
   DVLOG(1) << "Found " << hans_count << " zh-Hans chars in input";
   DVLOG(1) << "Found " << hant_count << " zh-Hant chars in input";
@@ -815,4 +832,4 @@ std::string ChineseScriptClassifier::Classify(std::string_view input) const {
   }
 }
 
-}  // namespace translate
+}  // namespace language_detection

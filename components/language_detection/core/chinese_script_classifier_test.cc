@@ -2,14 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/translate/core/language_detection/chinese_script_classifier.h"
+#include "components/language_detection/core/chinese_script_classifier.h"
 
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "testing/gtest/include/gtest/gtest.h"
 
-namespace translate {
+namespace language_detection {
 namespace {
 
 class ChineseScriptClassifierTest : public testing::Test {
@@ -69,4 +70,4 @@ TEST_F(ChineseScriptClassifierTest,
 }
 
 }  // namespace
-}  // namespace translate
+}  // namespace language_detection

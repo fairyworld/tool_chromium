@@ -2,18 +2,19 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef COMPONENTS_TRANSLATE_CORE_LANGUAGE_DETECTION_CHINESE_SCRIPT_CLASSIFIER_H_
-#define COMPONENTS_TRANSLATE_CORE_LANGUAGE_DETECTION_CHINESE_SCRIPT_CLASSIFIER_H_
+#ifndef COMPONENTS_LANGUAGE_DETECTION_CORE_CHINESE_SCRIPT_CLASSIFIER_H_
+#define COMPONENTS_LANGUAGE_DETECTION_CORE_CHINESE_SCRIPT_CLASSIFIER_H_
 
 #include <memory>
 #include <string>
 #include <string_view>
 
+#include "base/component_export.h"
 #include "third_party/icu/source/common/unicode/uniset.h"
 
-namespace translate {
+namespace language_detection {
 
-class ChineseScriptClassifier {
+class COMPONENT_EXPORT(LANGUAGE_DETECTION) ChineseScriptClassifier {
  public:
   // Initializes both the zh-Hans and zh-Hant UnicodeSets used for
   // lookup when Classify is called.
@@ -27,12 +28,15 @@ class ChineseScriptClassifier {
   //
   // Behavior is undefined for non-Chinese input.
   std::string Classify(std::string_view input) const;
+  std::string Classify(std::u16string_view input) const;
 
   // Returns true if the underlying transliterators were properly initialized
   // by the constructor.
   bool IsInitialized() const;
 
  private:
+  std::string Classify(const icu::UnicodeString& input_codepoints) const;
+
   // Set of chars generally unique to zh-Hans.
   std::unique_ptr<icu::UnicodeSet> hans_set_;
 
@@ -40,6 +44,6 @@ class ChineseScriptClassifier {
   std::unique_ptr<icu::UnicodeSet> hant_set_;
 };
 
-}  // namespace translate
+}  // namespace language_detection
 
-#endif  // COMPONENTS_TRANSLATE_CORE_LANGUAGE_DETECTION_CHINESE_SCRIPT_CLASSIFIER_H_
+#endif  // COMPONENTS_LANGUAGE_DETECTION_CORE_CHINESE_SCRIPT_CLASSIFIER_H_
