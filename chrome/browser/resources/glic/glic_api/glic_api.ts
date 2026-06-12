@@ -143,6 +143,8 @@ export declare interface InvokeOptions {
   zssConfig?: ZssConfig;
   /** Source-specific payload for the invocation. */
   payload?: InvocationPayload;
+  /** The ID of the tab to actuate on, if actuationTarget is kTargetSurface. */
+  actuationTabId?: string;
 }
 
 /** An update sent from the web client to the host. */

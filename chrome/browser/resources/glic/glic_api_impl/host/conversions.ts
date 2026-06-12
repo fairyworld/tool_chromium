@@ -712,6 +712,7 @@ export function invokeOptionsToClient(
     zssConfig: options.zssConfig ? zssConfigToClient(options.zssConfig) :
                                    undefined,
     payload: invocationPayloadToClient(options.payload, extras),
+    actuationTabId: idToClient(options.actuationTabId),
   };
 }
 
