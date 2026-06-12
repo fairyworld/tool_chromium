@@ -266,6 +266,10 @@ BASE_DECLARE_FEATURE(kEnterpriseExtensionDOMActivityTelemetry);
 // capability, even when no other API/feature might be restricted by it.
 BASE_DECLARE_FEATURE(kDebuggerAPIRestrictedToDevMode);
 
+// When enabled, the `browser` namespace is made available on web pages
+// even if they are not externally connectable.
+BASE_DECLARE_FEATURE(kExtensionBrowserNamespaceOnWebPages);
+
 // When enabled, a call to base::ListValue::Clone is avoided when dispatching an
 // extension function. Behind a feature to assess impact
 // (go/chrome-performance-work-should-be-finched).

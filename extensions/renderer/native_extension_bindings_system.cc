@@ -617,9 +617,13 @@ void NativeExtensionBindingsSystem::UpdateBindingsForContext(
   if (extension && extension->manifest_version() >= 3 &&
       chrome_manifest_urls::GetDevToolsPage(extension).is_empty()) {
     set_accessor_on_browser = true;
-  } else if (is_webpage && CanWebpageContextConnectExternally(context)) {
+  } else if (is_webpage &&
+             (CanWebpageContextConnectExternally(context) ||
+              base::FeatureList::IsEnabled(
+                  extensions_features::kExtensionBrowserNamespaceOnWebPages))) {
     //  Create if this is a web page and it can communicate with an extension
-    //  (meaning it will have an extension API enabled for it).
+    //  (meaning it will have an extension API enabled for it) or we've
+    //  explicitly enabled it for webpages.
     set_accessor_on_browser = true;
   }
 
@@ -730,6 +734,9 @@ void NativeExtensionBindingsSystem::UpdateBindingsForContext(
       }
     }
 
+    if (set_accessor_on_browser && !browser) {
+      browser = GetOrCreateGlobalObjectProperty(v8_context, "browser");
+    }
     UpdateContentCapabilities(context);
     return;
   }
