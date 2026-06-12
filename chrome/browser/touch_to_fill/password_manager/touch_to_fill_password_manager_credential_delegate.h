@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_CONTROLLER_AUTOFILL_DELEGATE_H_
-#define CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_CONTROLLER_AUTOFILL_DELEGATE_H_
+#ifndef CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_PASSWORD_MANAGER_CREDENTIAL_DELEGATE_H_
+#define CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_PASSWORD_MANAGER_CREDENTIAL_DELEGATE_H_
 
 #include <memory>
 #include <optional>
@@ -49,7 +49,7 @@ class Profile;
 // - `OnCredentialSelected` is called upon selecting the credential.
 // - `OnReauthCompleted` (only of auth before filling of on).
 // - `FillCredential` finally fills the credentials.
-class TouchToFillControllerAutofillDelegate
+class TouchToFillPasswordManagerCredentialDelegate
     : public TouchToFillPasswordManagerDelegate {
  public:
   using ShowHybridOption = base::StrongAlias<struct ShowHybridOptionTag, bool>;
@@ -86,7 +86,7 @@ class TouchToFillControllerAutofillDelegate
   };
 
   // No-op constructor for tests.
-  TouchToFillControllerAutofillDelegate(
+  TouchToFillPasswordManagerCredentialDelegate(
       base::PassKey<class TouchToFillControllerAutofillTest>,
       password_manager::PasswordManagerClient* password_client,
       content::WebContents* web_contents,
@@ -98,7 +98,7 @@ class TouchToFillControllerAutofillDelegate
       autofill::FieldRendererId focused_field_renderer_id,
       ShowHybridOption should_show_hybrid_option);
 
-  TouchToFillControllerAutofillDelegate(
+  TouchToFillPasswordManagerCredentialDelegate(
       ChromePasswordManagerClient* password_client,
       std::unique_ptr<device_reauth::DeviceAuthenticator> authenticator,
       base::WeakPtr<password_manager::WebAuthnCredentialsDelegate>
@@ -107,11 +107,11 @@ class TouchToFillControllerAutofillDelegate
       const password_manager::PasswordForm* form_to_fill,
       autofill::FieldRendererId focused_field_renderer_id,
       ShowHybridOption should_show_hybrid_option);
-  TouchToFillControllerAutofillDelegate(
-      const TouchToFillControllerAutofillDelegate&) = delete;
-  TouchToFillControllerAutofillDelegate& operator=(
-      const TouchToFillControllerAutofillDelegate&) = delete;
-  ~TouchToFillControllerAutofillDelegate() override;
+  TouchToFillPasswordManagerCredentialDelegate(
+      const TouchToFillPasswordManagerCredentialDelegate&) = delete;
+  TouchToFillPasswordManagerCredentialDelegate& operator=(
+      const TouchToFillPasswordManagerCredentialDelegate&) = delete;
+  ~TouchToFillPasswordManagerCredentialDelegate() override;
 
   // TouchToFillPasswordManagerDelegate:
   void OnShow(base::span<const TouchToFillPasswordManagerView::Credential>
@@ -188,4 +188,4 @@ class TouchToFillControllerAutofillDelegate
   ukm::SourceId source_id_ = ukm::kInvalidSourceId;
 };
 
-#endif  // CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_CONTROLLER_AUTOFILL_DELEGATE_H_
+#endif  // CHROME_BROWSER_TOUCH_TO_FILL_PASSWORD_MANAGER_TOUCH_TO_FILL_PASSWORD_MANAGER_CREDENTIAL_DELEGATE_H_

@@ -162,7 +162,7 @@
 #include "chrome/browser/password_manager/android/password_manager_launcher_android.h"
 #include "chrome/browser/password_manager/android/password_manager_ui_util_android.h"
 #include "chrome/browser/touch_to_fill/password_manager/password_generation/android/touch_to_fill_password_generation_controller.h"
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller_autofill_delegate.h"  // nogncheck
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_credential_delegate.h"  // nogncheck
 #include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_view.h"
 #include "components/password_manager/content/browser/keyboard_replacing_surface_visibility_controller_impl.h"
 #include "components/password_manager/core/browser/credential_cache.h"
@@ -672,12 +672,12 @@ void ChromePasswordManagerClient::ContinueShowKeyboardReplacingSurface(
 
   const PasswordForm* form_to_fill = password_manager_.GetParsedObservedForm(
       driver, request.field.element_id.renderer_id);
-  auto ttf_controller_autofill_delegate =
-      std::make_unique<TouchToFillControllerAutofillDelegate>(
+  auto ttf_password_manager_credential_delegate =
+      std::make_unique<TouchToFillPasswordManagerCredentialDelegate>(
           this, GetDeviceAuthenticator(), webauthn_delegate->AsWeakPtr(),
           std::make_unique<PasswordCredentialFillerImpl>(weak_driver, request),
           form_to_fill, request.field.element_id.renderer_id,
-          TouchToFillControllerAutofillDelegate::ShowHybridOption(
+          TouchToFillPasswordManagerCredentialDelegate::ShowHybridOption(
               should_show_hybrid_option));
 
   base::span<const password_manager::UiCredential> password_credentials =
@@ -692,7 +692,7 @@ void ChromePasswordManagerClient::ContinueShowKeyboardReplacingSurface(
   TouchToFillPasswordManagerController* ttf_controller =
       GetOrCreateTouchToFillPasswordManagerController();
   ttf_controller->InitData(std::move(credentials), driver->AsWeakPtrImpl());
-  if (!ttf_controller->Show(std::move(ttf_controller_autofill_delegate),
+  if (!ttf_controller->Show(std::move(ttf_password_manager_credential_delegate),
                             GetWebAuthnCredManDelegateForDriver(driver))) {
     driver->GetPasswordAutofillManager()->ShowSuggestions(request.field);
   }

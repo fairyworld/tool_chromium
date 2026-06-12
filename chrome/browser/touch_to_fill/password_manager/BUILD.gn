@@ -40,10 +40,10 @@ source_set("public") {
 if (is_android) {
   source_set("impl") {
     sources = [
-      "touch_to_fill_controller_autofill_delegate.cc",
-      "touch_to_fill_controller_autofill_delegate.h",
       "touch_to_fill_password_manager_controller.cc",
       "touch_to_fill_password_manager_controller.h",
+      "touch_to_fill_password_manager_credential_delegate.cc",
+      "touch_to_fill_password_manager_credential_delegate.h",
       "touch_to_fill_password_manager_delegate.cc",
       "touch_to_fill_password_manager_delegate.h",
       "touch_to_fill_password_manager_webauthn_delegate.cc",
@@ -81,7 +81,7 @@ if (is_android) {
     testonly = true
 
     sources = [
-      "touch_to_fill_controller_autofill_delegate_unittest.cc",
+      "touch_to_fill_password_manager_credential_delegate_unittest.cc",
       "touch_to_fill_password_manager_webauthn_delegate_unittest.cc",
     ]
 
@@ -121,6 +121,6 @@ if (is_android) {
 
   java_cpp_enum("java_enum_srcjar") {
     visibility = [ "./*" ]
-    sources = [ "touch_to_fill_controller_autofill_delegate.h" ]
+    sources = [ "touch_to_fill_password_manager_credential_delegate.h" ]
   }
 }

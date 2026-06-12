@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_controller_autofill_delegate.h"
+#include "chrome/browser/touch_to_fill/password_manager/touch_to_fill_password_manager_credential_delegate.h"
 
 #include <algorithm>
 #include <memory>
@@ -53,17 +53,18 @@ bool ContainsNonEmptyUsername(const base::span<const Credential>& credentials) {
 }  // namespace
 
 // No-op constructor for tests.
-TouchToFillControllerAutofillDelegate::TouchToFillControllerAutofillDelegate(
-    base::PassKey<class TouchToFillControllerAutofillTest>,
-    password_manager::PasswordManagerClient* password_client,
-    content::WebContents* web_contents,
-    std::unique_ptr<device_reauth::DeviceAuthenticator> authenticator,
-    base::WeakPtr<password_manager::WebAuthnCredentialsDelegate>
-        webauthn_delegate,
-    std::unique_ptr<password_manager::PasswordCredentialFiller> filler,
-    const password_manager::PasswordForm* form_to_fill,
-    autofill::FieldRendererId focused_field_renderer_id,
-    ShowHybridOption should_show_hybrid_option)
+TouchToFillPasswordManagerCredentialDelegate::
+    TouchToFillPasswordManagerCredentialDelegate(
+        base::PassKey<class TouchToFillControllerAutofillTest>,
+        password_manager::PasswordManagerClient* password_client,
+        content::WebContents* web_contents,
+        std::unique_ptr<device_reauth::DeviceAuthenticator> authenticator,
+        base::WeakPtr<password_manager::WebAuthnCredentialsDelegate>
+            webauthn_delegate,
+        std::unique_ptr<password_manager::PasswordCredentialFiller> filler,
+        const password_manager::PasswordForm* form_to_fill,
+        autofill::FieldRendererId focused_field_renderer_id,
+        ShowHybridOption should_show_hybrid_option)
     : password_client_(password_client),
       web_contents_(web_contents),
       authenticator_(std::move(authenticator)),
@@ -73,15 +74,16 @@ TouchToFillControllerAutofillDelegate::TouchToFillControllerAutofillDelegate(
       focused_field_renderer_id_(focused_field_renderer_id),
       should_show_hybrid_option_(should_show_hybrid_option) {}
 
-TouchToFillControllerAutofillDelegate::TouchToFillControllerAutofillDelegate(
-    ChromePasswordManagerClient* password_client,
-    std::unique_ptr<device_reauth::DeviceAuthenticator> authenticator,
-    base::WeakPtr<password_manager::WebAuthnCredentialsDelegate>
-        webauthn_delegate,
-    std::unique_ptr<password_manager::PasswordCredentialFiller> filler,
-    const password_manager::PasswordForm* form_to_fill,
-    autofill::FieldRendererId focused_field_renderer_id,
-    ShowHybridOption should_show_hybrid_option)
+TouchToFillPasswordManagerCredentialDelegate::
+    TouchToFillPasswordManagerCredentialDelegate(
+        ChromePasswordManagerClient* password_client,
+        std::unique_ptr<device_reauth::DeviceAuthenticator> authenticator,
+        base::WeakPtr<password_manager::WebAuthnCredentialsDelegate>
+            webauthn_delegate,
+        std::unique_ptr<password_manager::PasswordCredentialFiller> filler,
+        const password_manager::PasswordForm* form_to_fill,
+        autofill::FieldRendererId focused_field_renderer_id,
+        ShowHybridOption should_show_hybrid_option)
     : password_client_(password_client),
       // |TouchToFillControllerTest| doesn't provide an instance of
       // |ChromePasswordManagerClient|, so the test-only constructor should
@@ -98,15 +100,15 @@ TouchToFillControllerAutofillDelegate::TouchToFillControllerAutofillDelegate(
                      ->GetPrimaryMainFrame()
                      ->GetPageUkmSourceId()) {}
 
-TouchToFillControllerAutofillDelegate::
-    ~TouchToFillControllerAutofillDelegate() {
+TouchToFillPasswordManagerCredentialDelegate::
+    ~TouchToFillPasswordManagerCredentialDelegate() {
   if (authenticator_) {
     // This is a noop if no auth triggered by Touch To Fill is in progress.
     authenticator_->Cancel();
   }
 }
 
-void TouchToFillControllerAutofillDelegate::OnShow(
+void TouchToFillPasswordManagerCredentialDelegate::OnShow(
     base::span<const Credential> credentials) {
   CHECK(filler_);
 
@@ -122,7 +124,7 @@ void TouchToFillControllerAutofillDelegate::OnShow(
       .Record(ukm::UkmRecorder::Get());
 }
 
-void TouchToFillControllerAutofillDelegate::OnCredentialSelected(
+void TouchToFillPasswordManagerCredentialDelegate::OnCredentialSelected(
     const UiCredential& credential,
     base::OnceClosure action_complete) {
   if (!filler_) {
@@ -143,12 +145,12 @@ void TouchToFillControllerAutofillDelegate::OnCredentialSelected(
   // the callback being reset by the authenticator. Therefore, it is safe
   // to use base::Unretained.
   authenticator_->AuthenticateWithMessage(
-      u"",
-      base::BindOnce(&TouchToFillControllerAutofillDelegate::OnReauthCompleted,
-                     base::Unretained(this), credential));
+      u"", base::BindOnce(
+               &TouchToFillPasswordManagerCredentialDelegate::OnReauthCompleted,
+               base::Unretained(this), credential));
 }
 
-void TouchToFillControllerAutofillDelegate::OnPasskeyCredentialSelected(
+void TouchToFillPasswordManagerCredentialDelegate::OnPasskeyCredentialSelected(
     const password_manager::PasskeyCredential& credential,
     base::OnceClosure action_complete) {
   if (!webauthn_delegate_) {
@@ -163,7 +165,7 @@ void TouchToFillControllerAutofillDelegate::OnPasskeyCredentialSelected(
   std::move(action_complete).Run();
 }
 
-void TouchToFillControllerAutofillDelegate::OnManagePasswordsSelected(
+void TouchToFillPasswordManagerCredentialDelegate::OnManagePasswordsSelected(
     bool passkeys_shown,
     base::OnceClosure action_complete) {
   if (!filler_) {
@@ -190,7 +192,7 @@ void TouchToFillControllerAutofillDelegate::OnManagePasswordsSelected(
   std::move(action_complete).Run();
 }
 
-void TouchToFillControllerAutofillDelegate::OnHybridSignInSelected(
+void TouchToFillPasswordManagerCredentialDelegate::OnHybridSignInSelected(
     base::OnceClosure action_complete) {
   if (!webauthn_delegate_) {
     return;
@@ -204,7 +206,7 @@ void TouchToFillControllerAutofillDelegate::OnHybridSignInSelected(
   std::move(action_complete).Run();
 }
 
-void TouchToFillControllerAutofillDelegate::OnDismiss(
+void TouchToFillPasswordManagerCredentialDelegate::OnDismiss(
     base::OnceClosure action_complete) {
   if (!filler_) {
     return;
@@ -218,7 +220,7 @@ void TouchToFillControllerAutofillDelegate::OnDismiss(
   std::move(action_complete).Run();
 }
 
-void TouchToFillControllerAutofillDelegate::OnCredManDismissed(
+void TouchToFillPasswordManagerCredentialDelegate::OnCredManDismissed(
     base::OnceClosure action_completed) {
   if (!filler_) {
     return;
@@ -226,17 +228,17 @@ void TouchToFillControllerAutofillDelegate::OnCredManDismissed(
   std::move(action_completed).Run();
 }
 
-GURL TouchToFillControllerAutofillDelegate::GetFrameUrl() {
+GURL TouchToFillPasswordManagerCredentialDelegate::GetFrameUrl() {
   CHECK(filler_);
   return filler_->GetFrameUrl();
 }
 
-url::Origin TouchToFillControllerAutofillDelegate::GetFrameOrigin() {
+url::Origin TouchToFillPasswordManagerCredentialDelegate::GetFrameOrigin() {
   CHECK(filler_);
   return filler_->GetFrameOrigin();
 }
 
-bool TouchToFillControllerAutofillDelegate::ShouldShowTouchToFill() {
+bool TouchToFillPasswordManagerCredentialDelegate::ShouldShowTouchToFill() {
   if (!form_to_fill_) {
     return false;
   }
@@ -263,30 +265,30 @@ bool TouchToFillControllerAutofillDelegate::ShouldShowTouchToFill() {
   return false;
 }
 
-bool TouchToFillControllerAutofillDelegate::ShouldTriggerSubmission() {
+bool TouchToFillPasswordManagerCredentialDelegate::ShouldTriggerSubmission() {
   return filler_->ShouldTriggerSubmission();
 }
 
-bool TouchToFillControllerAutofillDelegate::ShouldShowHybridOption() {
+bool TouchToFillPasswordManagerCredentialDelegate::ShouldShowHybridOption() {
   return should_show_hybrid_option_.value();
 }
 
-bool TouchToFillControllerAutofillDelegate::
+bool TouchToFillPasswordManagerCredentialDelegate::
     ShouldShowNoPasskeysSheetIfRequired() {
   return false;
 }
 
 std::optional<std::vector<Credential>>
-TouchToFillControllerAutofillDelegate::SortCredentials(
+TouchToFillPasswordManagerCredentialDelegate::SortCredentials(
     base::span<const Credential> credentials) {
   return std::nullopt;
 }
 
-gfx::NativeView TouchToFillControllerAutofillDelegate::GetNativeView() {
+gfx::NativeView TouchToFillPasswordManagerCredentialDelegate::GetNativeView() {
   return web_contents_->GetNativeView();
 }
 
-void TouchToFillControllerAutofillDelegate::OnReauthCompleted(
+void TouchToFillPasswordManagerCredentialDelegate::OnReauthCompleted(
     UiCredential credential,
     bool auth_successful) {
   CHECK(action_complete_);
@@ -304,14 +306,14 @@ void TouchToFillControllerAutofillDelegate::OnReauthCompleted(
   FillCredential(credential);
 }
 
-void TouchToFillControllerAutofillDelegate::FillCredential(
+void TouchToFillPasswordManagerCredentialDelegate::FillCredential(
     const UiCredential& credential) {
   filler_->UpdateTriggerSubmission(ShouldTriggerSubmission());
   filler_->FillUsernameAndPassword(
       credential.username(), credential.password(),
-      base::BindOnce(
-          &TouchToFillControllerAutofillDelegate::OnFillingCredentialComplete,
-          base::Unretained(this), credential.username()));
+      base::BindOnce(&TouchToFillPasswordManagerCredentialDelegate::
+                         OnFillingCredentialComplete,
+                     base::Unretained(this), credential.username()));
   if (credential.is_backup_credential()) {
     password_manager::metrics_util::LogPasswordDropdownItemSelected(
         password_manager::metrics_util::PasswordDropdownSelectedOption::
@@ -319,7 +321,7 @@ void TouchToFillControllerAutofillDelegate::FillCredential(
   }
 }
 
-void TouchToFillControllerAutofillDelegate::OnFillingCredentialComplete(
+void TouchToFillPasswordManagerCredentialDelegate::OnFillingCredentialComplete(
     const std::u16string& username,
     bool triggered_submission) {
   if (triggered_submission) {
@@ -330,9 +332,9 @@ void TouchToFillControllerAutofillDelegate::OnFillingCredentialComplete(
   std::move(action_complete_).Run();
 }
 
-void TouchToFillControllerAutofillDelegate::CleanUpFillerAndReportOutcome(
-    TouchToFillOutcome outcome,
-    bool show_virtual_keyboard) {
+void TouchToFillPasswordManagerCredentialDelegate::
+    CleanUpFillerAndReportOutcome(TouchToFillOutcome outcome,
+                                  bool show_virtual_keyboard) {
   // User action is complete which indicates that the user has been informed
   // about any shared unnotified password. Report that to the client to mark
   // them as notified.
