@@ -90,7 +90,7 @@ public class FakeAccountManagerDelegate implements AccountManagerDelegate {
             added = mAccounts.add(new AccountHolder(accountInfo));
         }
         assert added : "Account already added";
-        callOnCoreAccountInfoChanged();
+        callOnAccountsChanged();
         return account;
     }
 
@@ -113,12 +113,12 @@ public class FakeAccountManagerDelegate implements AccountManagerDelegate {
                 }
             }
         }
-        callOnCoreAccountInfoChanged();
+        callOnAccountsChanged();
     }
 
-    public void callOnCoreAccountInfoChanged() {
+    public void callOnAccountsChanged() {
         if (mObserver != null) {
-            ThreadUtils.runOnUiThreadBlocking(mObserver::onCoreAccountInfosChanged);
+            ThreadUtils.runOnUiThreadBlocking(mObserver::onAccountsChanged);
         }
     }
 
