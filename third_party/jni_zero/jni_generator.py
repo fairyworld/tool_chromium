@@ -712,15 +712,26 @@ def GenerateFromSource(parser, args, jni_mode):
                       args.unshared_header_names)
 
   try:
-    parsed_files = [
-        parse.parse_java_file(f,
-                              package_prefix=args.package_prefix,
-                              package_prefix_filter=args.package_prefix_filter,
-                              enable_legacy_natives=args.enable_legacy_natives,
-                              allow_private_called_by_natives=args.
-                              allow_private_called_by_natives)
-        for f in args.input_files
-    ]
+    errors = []
+    parsed_files = []
+    for f in args.input_files:
+      try:
+        parsed_files.append(
+            parse.parse_java_file(
+                f,
+                package_prefix=args.package_prefix,
+                package_prefix_filter=args.package_prefix_filter,
+                enable_legacy_natives=args.enable_legacy_natives,
+                allow_private_called_by_natives=args.
+                allow_private_called_by_natives))
+      except parse.ParseError as e:
+        errors.append(e)
+
+    if errors:
+      for e in errors:
+        sys.stderr.write(f'\n--- JNI Parsing Error ---\n{e}\n')
+      sys.exit(1)
+
     jni_objs = [
         JniObject(x,
                   from_javap=False,
