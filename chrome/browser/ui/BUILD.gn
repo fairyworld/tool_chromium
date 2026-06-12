@@ -3237,6 +3237,7 @@ static_library("ui") {
         "webui/signin/batch_upload:mojo_bindings",
         "//chrome/browser/ui/webui/feature_showcase",
         "//chrome/browser/ui/webui/signin:batch_upload",
+        "//services/audio/public/cpp",
       ]
 
       # batch_upload includes headers from //chrome/browser/ui (e.g. browser.h)

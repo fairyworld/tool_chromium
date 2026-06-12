@@ -8,12 +8,14 @@
 #include <utility>
 
 #include "base/check_deref.h"
+#include "base/check_is_test.h"
 #include "base/command_line.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback.h"
 #include "base/functional/callback_helpers.h"
 #include "base/memory/weak_ptr.h"
 #include "base/metrics/histogram_functions.h"
+#include "base/no_destructor.h"
 #include "base/notreached.h"
 #include "base/strings/string_util.h"
 #include "base/task/single_thread_task_runner.h"
@@ -48,6 +50,7 @@
 #include "chrome/common/channel_info.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/webui_url_constants.h"
+#include "chrome/grit/browser_resources.h"
 #include "components/prefs/pref_service.h"
 #include "components/regional_capabilities/regional_capabilities_service.h"
 #include "components/signin/public/base/consent_level.h"
@@ -57,9 +60,12 @@
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/primary_account_mutator.h"
 #include "components/signin/public/identity_manager/tribool.h"
+#include "content/public/browser/audio_service.h"
 #include "content/public/browser/web_ui.h"
 #include "google_apis/gaia/core_account_id.h"
+#include "media/base/audio_codecs.h"
 #include "net/base/url_util.h"
+#include "services/audio/public/cpp/sounds/sounds_manager.h"
 #include "url/gurl.h"
 
 #if BUILDFLAG(IS_WIN)
@@ -76,6 +82,12 @@
 #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 namespace {
+
+FirstRunFlowController::SoundsManagerFactory& GetSoundsManagerFactory() {
+  static base::NoDestructor<FirstRunFlowController::SoundsManagerFactory>
+      factory(base::BindRepeating(&audio::SoundsManager::Create));
+  return *factory;
+}
 
 const signin_metrics::AccessPoint kAccessPoint =
     signin_metrics::AccessPoint::kForYouFre;
@@ -635,7 +647,13 @@ void FirstRunFlowController::ToggleMediaEffects(bool active) {
           GetCurrentStepController()) {
     current_step_controller->ToggleMediaEffects(active);
   }
-  // TODO(crbug.com/485150597): Add resuming/pausing the audio.
+  if (sounds_manager_) {
+    if (active) {
+      sounds_manager_->Play(kAmbientSoundKey);
+    } else {
+      sounds_manager_->Pause(kAmbientSoundKey);
+    }
+  }
 }
 
 bool FirstRunFlowController::AreEffectsEnabled() const {
@@ -653,6 +671,20 @@ void FirstRunFlowController::Init() {
           base::BindRepeating(&FirstRunFlowController::AreEffectsEnabled,
                               base::Unretained(this))));
   SwitchToStep(Step::kIntro, /*reset_state=*/true);
+
+  if (switches::IsFirstRunDesktopRevampEnabled(
+          IsProfileInSearchEngineChoiceRegion(profile_))) {
+    sounds_manager_ = GetSoundsManagerFactory().Run(
+        content::GetAudioServiceStreamFactoryBinder());
+    if (sounds_manager_) {
+      sounds_manager_->Initialize(kAmbientSoundKey,
+                                  IDR_INTRO_SOUND_AMBIENT_FLAC,
+                                  media::AudioCodec::kFLAC, /*loop=*/true);
+      if (AreEffectsEnabled()) {
+        sounds_manager_->Play(kAmbientSoundKey);
+      }
+    }
+  }
 
   signin_metrics::LogSignInOffered(
       kAccessPoint, signin_metrics::PromoAction::
@@ -834,4 +866,13 @@ FirstRunFlowController::RegisterPostIdentitySteps(
   post_identity_steps.emplace(
       ProfileManagementFlowController::Step::kFinishFlow);
   return post_identity_steps;
+}
+
+// static
+base::AutoReset<FirstRunFlowController::SoundsManagerFactory>
+FirstRunFlowController::SetSoundsManagerFactoryForTesting(  // IN-TEST
+    FirstRunFlowController::SoundsManagerFactory factory) {
+  CHECK_IS_TEST();
+  return base::AutoReset<SoundsManagerFactory>(&GetSoundsManagerFactory(),
+                                               std::move(factory));
 }

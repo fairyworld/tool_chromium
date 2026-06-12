@@ -11412,6 +11412,7 @@ if (!is_android && !is_chromeos_device) {
         "//chrome/browser/ui/startup:test_support_ui",
         "//chrome/browser/ui/webui/intro",
         "//components/enterprise/idle",
+        "//services/audio/public/cpp",
       ]
     }
 

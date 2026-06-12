@@ -14,6 +14,8 @@
 
 DECLARE_ELEMENT_IDENTIFIER_VALUE(
     kProfilePickerToolbarDontSignInButtonElementId);
+DECLARE_ELEMENT_IDENTIFIER_VALUE(
+    kProfilePickerToolbarEffectsControlButtonElementId);
 
 // Class responsible for the top toolbar shown within the First Run and Profile
 // Creation flows.

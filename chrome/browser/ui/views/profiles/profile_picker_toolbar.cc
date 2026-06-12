@@ -33,6 +33,8 @@
 #include "ui/views/view_class_properties.h"
 
 DEFINE_ELEMENT_IDENTIFIER_VALUE(kProfilePickerToolbarDontSignInButtonElementId);
+DEFINE_ELEMENT_IDENTIFIER_VALUE(
+    kProfilePickerToolbarEffectsControlButtonElementId);
 
 namespace {
 
@@ -322,6 +324,9 @@ void ProfilePickerToolbar::AddEffectsControlButton(
   CHECK(effects_control_button_ == nullptr);
   effects_control_button_ = AddChildView(std::make_unique<EffectsControlButton>(
       std::move(on_effects_control_callback)));
+  effects_control_button_->SetProperty(
+      views::kElementIdentifierKey,
+      kProfilePickerToolbarEffectsControlButtonElementId);
 }
 
 void ProfilePickerToolbar::SetSigninButtonsVisible(bool visible) {
