@@ -241,10 +241,11 @@ IN_PROC_BROWSER_TEST_F(MultistepFilterBrowserTest,
   FilterUiController* ui_controller =
       FilterUiController::From(browser()->tab_strip_model()->GetActiveTab());
   ASSERT_TRUE(ui_controller);
-  const std::optional<UrlFilterSuggestion>& suggestion_result =
-      test_api(*ui_controller).current_url_filter_suggestion();
-  ASSERT_TRUE(suggestion_result.has_value());
-  EXPECT_EQ(suggestion_result->navigation_url, suggestion_url);
+  const std::optional<FilterUiController::SuggestionState>& state =
+      test_api(*ui_controller).suggestion_state();
+  ASSERT_TRUE(state.has_value());
+  const UrlFilterSuggestion& suggestion_result = state->suggestion;
+  EXPECT_EQ(suggestion_result.navigation_url, suggestion_url);
 
   page_actions::PageActionController* page_action_controller =
       browser()
@@ -354,8 +355,7 @@ IN_PROC_BROWSER_TEST_F(MultistepFilterBrowserTest,
   FilterUiController* ui_controller =
       FilterUiController::From(browser()->tab_strip_model()->GetActiveTab());
   ASSERT_TRUE(ui_controller);
-  EXPECT_FALSE(
-      test_api(*ui_controller).current_url_filter_suggestion().has_value());
+  EXPECT_FALSE(test_api(*ui_controller).suggestion_state().has_value());
 
   ToastController* toast_controller =
       browser()->browser_window_features()->toast_controller();
