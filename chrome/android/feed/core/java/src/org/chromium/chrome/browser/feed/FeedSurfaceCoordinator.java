@@ -100,8 +100,7 @@ public class FeedSurfaceCoordinator
         implements FeedSurfaceProvider,
                 FeedBubbleDelegate,
                 SwipeRefreshLayout.OnRefreshListener,
-                SurfaceCoordinator,
-                FeedContentFirstLoadWatcher {
+                SurfaceCoordinator {
 
     protected final Activity mActivity;
     private final SnackbarManager mSnackbarManager;
@@ -637,10 +636,6 @@ public class FeedSurfaceCoordinator
         }
     }
 
-    // TODO(crbug.com/407797637): Removes the FeedContentFirstLoadWatcher interface.
-    @Override
-    public void nonNativeContentLoaded(@StreamKind int kind) {}
-
     @Override
     @SuppressWarnings("NullAway")
     public void destroy() {
@@ -1071,7 +1066,6 @@ public class FeedSurfaceCoordinator
                 mShareSupplier,
                 kind,
                 mActionDelegate,
-                /* feedContentFirstLoadWatcher= */ this,
                 streamsMediator,
                 new FeedSurfaceRendererBridge.Factory() {});
     }

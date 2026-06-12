@@ -76,9 +76,6 @@ std::string SerializedOfflineBadgeContent();
 
 feedwire::ThereAndBackAgainData MakeThereAndBackAgainData(int64_t id);
 
-std::string DatastoreEntryToString(std::string_view key,
-                                   std::string_view value);
-
 class TestReliabilityLoggingBridge : public ReliabilityLoggingBridge {
  public:
   TestReliabilityLoggingBridge();
