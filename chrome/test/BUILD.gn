@@ -2134,9 +2134,8 @@ if (is_android) {
 
   test("android_sync_integration_tests") {
     use_default_launcher = false
-    android_manifest =
-        "${target_gen_dir}/android_browsertests_manifest/AndroidManifest.xml"
-    android_manifest_dep = ":android_browsertests_manifest"
+    android_manifest = "${target_gen_dir}/android_sync_integration_tests_manifest/AndroidManifest.xml"
+    android_manifest_dep = ":android_sync_integration_tests_manifest"
 
     deps = [
       "//chrome/browser/sync/test/integration:sync_integration_tests_impl",
@@ -2232,6 +2231,26 @@ if (is_android) {
     input = "//chrome/test/android/browsertests_apk/AndroidManifest.xml.jinja2"
     output =
         "${target_gen_dir}/android_browsertests_manifest/AndroidManifest.xml"
+    variables = [
+      "manifest_package=org.chromium.android_browsertests_apk",
+      "library_name=android_browsertests__library",
+    ]
+    if (enable_javaless_renderers) {
+      variables += [ "javaless_renderers=true" ]
+    }
+  }
+
+  jinja_template("android_sync_integration_tests_manifest") {
+    testonly = true
+    input = "//chrome/test/android/browsertests_apk/AndroidManifest.xml.jinja2"
+    output = "${target_gen_dir}/android_sync_integration_tests_manifest/AndroidManifest.xml"
+    variables = [
+      "manifest_package=org.chromium.android_browsertests_apk",
+      "library_name=android_sync_integration_tests__library",
+    ]
+    if (enable_javaless_renderers) {
+      variables += [ "javaless_renderers=true" ]
+    }
   }
 }
 
