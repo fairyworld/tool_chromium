@@ -727,12 +727,19 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryUsesCaretAnchorWithValidCaret) {
 
   IssueOnQuery(form, caret_bounds, AutofillSuggestionTriggerSource::kAtMemory);
 
+  const PopupAnchorType expected_anchor_type =
+#if BUILDFLAG(IS_ANDROID)
+      PopupAnchorType::kAtMemoryBottomSheet;
+#else
+      PopupAnchorType::kCaret;
+#endif
+
   EXPECT_CALL(autofill_client(),
               ShowAutofillSuggestions(
                   AllOf(Field(&AutofillClient::PopupOpenArgs::element_bounds,
                               gfx::RectF(caret_bounds)),
                         Field(&AutofillClient::PopupOpenArgs::anchor_type,
-                              PopupAnchorType::kCaret)),
+                              expected_anchor_type)),
                   _));
 
   OnSuggestionsReturned(
@@ -740,9 +747,8 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryUsesCaretAnchorWithValidCaret) {
       {CreateAutofillSuggestion(SuggestionType::kAddressEntry, u"suggestion")});
 }
 
-// Tests that @memory trigger source uses the default field anchor
-// type when caret bounds are empty.
-TEST_F(AutofillExternalDelegateTest, AtMemoryUsesFieldAnchorWithEmptyCaret) {
+// Tests that @memory trigger source uses the bottom sheet anchor type.
+TEST_F(AutofillExternalDelegateTest, AtMemoryUsesBottomSheetAnchor) {
   gfx::RectF field_bounds(0, 0, 100, 20);
   gfx::Rect empty_caret_bounds;
   FormData form = CreateTestFormWithBounds(field_bounds);
@@ -752,7 +758,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryUsesFieldAnchorWithEmptyCaret) {
 
   const PopupAnchorType expected_anchor_type =
 #if BUILDFLAG(IS_ANDROID)
-      PopupAnchorType::kKeyboardAccessory;
+      PopupAnchorType::kAtMemoryBottomSheet;
 #else
       PopupAnchorType::kField;
 #endif
@@ -780,12 +786,19 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryContextMenuUsesCaretAnchor) {
   IssueOnQuery(form, caret_bounds,
                AutofillSuggestionTriggerSource::kAtMemoryContextMenu);
 
+  const PopupAnchorType expected_anchor_type =
+#if BUILDFLAG(IS_ANDROID)
+      PopupAnchorType::kAtMemoryBottomSheet;
+#else
+      PopupAnchorType::kCaret;
+#endif
+
   EXPECT_CALL(autofill_client(),
               ShowAutofillSuggestions(
                   AllOf(Field(&AutofillClient::PopupOpenArgs::element_bounds,
                               gfx::RectF(caret_bounds)),
                         Field(&AutofillClient::PopupOpenArgs::anchor_type,
-                              PopupAnchorType::kCaret)),
+                              expected_anchor_type)),
                   _));
 
   OnSuggestionsReturned(

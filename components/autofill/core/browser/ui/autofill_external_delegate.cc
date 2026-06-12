@@ -489,13 +489,20 @@ void AutofillExternalDelegate::AttemptToDisplayAutofillSuggestions(
   // the same place relative to the field after the update.
   const bool prefer_prev_arrow_side_on_suggestions_update = show_tabbed_popup;
 
+  PopupAnchorType anchor_type =
+      should_use_caret_bounds ? PopupAnchorType::kCaret : default_anchor_type;
+#if BUILDFLAG(IS_ANDROID)
+  if (is_at_memory) {
+    anchor_type = PopupAnchorType::kAtMemoryBottomSheet;
+  }
+#endif
+
   AutofillClient::PopupOpenArgs open_args(
       should_use_caret_bounds ? gfx::RectF(caret_bounds_)
                               : query_field_.bounds(),
       query_field_.text_direction(), std::move(suggestions), trigger_source_,
-      query_field_.form_control_ax_id(),
-      should_use_caret_bounds ? PopupAnchorType::kCaret : default_anchor_type,
-      show_tabbed_popup, prefer_prev_arrow_side_on_suggestions_update);
+      query_field_.form_control_ax_id(), anchor_type, show_tabbed_popup,
+      prefer_prev_arrow_side_on_suggestions_update);
   manager_->client().ShowAutofillSuggestions(open_args, GetWeakPtr());
 }
 

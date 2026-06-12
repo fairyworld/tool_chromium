@@ -22,6 +22,7 @@
 #include "chrome/browser/autofill/ui/ui_util.h"
 #include "chrome/browser/keyboard_accessory/android/manual_filling_controller.h"
 #include "chrome/browser/profiles/profile.h"
+#include "chrome/browser/ui/autofill/at_memory_suggestion_controller.h"
 #include "chrome/browser/ui/autofill/autofill_keyboard_accessory_view.h"
 #include "chrome/browser/ui/autofill/autofill_popup_view.h"
 #include "chrome/browser/ui/autofill/autofill_suggestion_controller_utils.h"
@@ -278,14 +279,6 @@ AutofillKeyboardAccessoryControllerImpl::
 
 void AutofillKeyboardAccessoryControllerImpl::Hide(
     SuggestionHidingReason reason) {
-  // Ignore kEndEditing for @memory sources because showing the bottom sheet
-  // causes focus loss on the text field, which triggers kEndEditing. This
-  // keeps the sheet open.
-  if (IsAtMemoryTriggerSource(trigger_source_) &&
-      reason == SuggestionHidingReason::kEndEditing) {
-    return;
-  }
-
   // For tests, keep open when hiding is due to external stimuli.
   if (keep_popup_open_for_testing_ &&
       (reason == SuggestionHidingReason::kWidgetChanged ||
@@ -568,7 +561,7 @@ const Suggestion& AutofillKeyboardAccessoryControllerImpl::GetSuggestionAt(
 
 FillingProduct AutofillKeyboardAccessoryControllerImpl::GetMainFillingProduct()
     const {
-  return delegate_->GetMainFillingProduct();
+  return suggestions_filling_product_;
 }
 
 AutofillSuggestionTriggerSource
@@ -611,17 +604,6 @@ void AutofillKeyboardAccessoryControllerImpl::Show(
 
   if (IsPointerLocked(web_contents_.get())) {
     Hide(SuggestionHidingReason::kMouseLocked);
-    return;
-  }
-
-  if (IsAtMemoryTriggerSource(trigger_source)) {
-    trigger_source_ = trigger_source;
-    suggestions_filling_product_ = FillingProduct::kAtMemory;
-    if (auto* client =
-            ChromeAutofillClient::FromWebContents(web_contents_.get())) {
-      client->ShowAtMemoryBottomSheet(suggestions);
-    }
-    delegate_->OnSuggestionsShown(suggestions);
     return;
   }
 
