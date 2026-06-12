@@ -10754,6 +10754,36 @@ be describing additional metrics about the same event.
       from 64 to 127.
     </summary>
   </metric>
+  <metric
+      name="BeforeSoftNavigation.MaxCumulativeShiftScore.MainFrame.SessionWindow.Gap1000ms.Max5000ms">
+    <summary>
+      Measures the maximum cumulative layout shift (bit.ly/cls-explainer) that
+      has occurred in a session window, after the page is restored from the
+      back-forward, before the first soft navigation. The gap between two
+      consecutive shifts in a window is not bigger than 1000ms and the maximum
+      window size is 5000ms. This metric's integral value is 100x the fractional
+      cumulative layout shift score described in the explainer.
+    </summary>
+  </metric>
+  <metric
+      name="BeforeSoftNavigation.NumInteractionsAfterBackForwardCacheRestore">
+    <summary>
+      The number of distinct user interactions on a page after it is restored
+      from the back-forward cache, before the first soft navigation. See
+      definition of user interaction:
+      https://web.dev/better-responsiveness-metric/#group-events-into-interactions
+    </summary>
+  </metric>
+  <metric
+      name="BeforeSoftNavigation.UserInteractionLatencyAfterBackForwardCacheRestore.HighPercentile2.MaxEventDurationMs">
+    <summary>
+      An approximation of a high percentile of user interaction latency of a
+      page after it is restored from the back-forward cache, in ms. For this
+      metric, we measure the latency of user interactions by
+      Responsiveness.UserInteraction.MaxEventDuration. Only interactions before
+      the first soft navigation are considered.
+    </summary>
+  </metric>
   <metric name="CrossOriginSubframesFeatures">
     <summary>
       Bitmask of features numbered from 0 to 63 used by the cross origin
