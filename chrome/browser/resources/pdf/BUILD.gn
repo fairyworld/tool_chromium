@@ -118,6 +118,7 @@ build_webui("build") {
       "elements/viewer_text_side_panel.html.ts",
       "elements/viewer_text_side_panel.ts",
       "ink2_manager.ts",
+      "ink_text_annotation_utils.ts",
       "undo_redo_stack.ts",
     ]
   }

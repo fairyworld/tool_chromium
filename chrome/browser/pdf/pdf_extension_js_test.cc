@@ -644,6 +644,10 @@ IN_PROC_BROWSER_TEST_P(PDFExtensionJSInk2Test, CaretBrowsingMode) {
   RunTestsInJsModule("caret_browsing_mode_test.js", "test-bookmarks.pdf");
 }
 
+IN_PROC_BROWSER_TEST_P(PDFExtensionJSInk2Test, InkTextAnnotationUtils) {
+  RunTestsInJsModule("ink_text_annotation_utils_test.js", "test.pdf");
+}
+
 class PDFExtensionJSInk2TextTest : public PDFExtensionJSTest {
  protected:
   std::vector<base::test::FeatureRefAndParams> GetEnabledFeatures()
