@@ -635,6 +635,12 @@ class TypeResolver:
         f'{self.java_class.class_without_prefix.package_with_slashes}/{name}')
     return ret.make_prefixed(self.java_class.prefix_with_dots)
 
+  def get_resolved_classes(self):
+    return [
+        val.class_without_prefix.full_name_with_dots
+        for val in self._cache.values() if not val.is_generic_type()
+    ]
+
 
 CLASS_CLASS = JavaClass('java/lang/Class')
 CLASS_LOADER_CLASS = JavaClass('java/lang/ClassLoader')
