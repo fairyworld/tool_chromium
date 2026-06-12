@@ -6096,11 +6096,6 @@ test("unit_tests") {
     "../browser/storage_access_api/storage_access_api_tab_helper_unittest.cc",
     "../browser/storage_access_api/storage_access_grant_permission_context_unittest.cc",
     "../browser/subresource_filter/subresource_filter_history_observer_unittest.cc",
-    "../browser/sync/chrome_sync_client_unittest.cc",
-    "../browser/sync/session_sync_service_factory_unittest.cc",
-    "../browser/sync/sessions/sync_sessions_web_contents_router_unittest.cc",
-    "../browser/sync/sync_service_factory_unittest.cc",
-    "../browser/sync/sync_startup_tracker_unittest.cc",
     "../browser/tab_group_sync/tab_group_sync_service_factory_unittest.cc",
     "../browser/tab_group_sync/tab_group_sync_utils_unittest.cc",
     "../browser/task_manager/providers/browser_process_task_unittest.cc",
@@ -6511,6 +6506,7 @@ test("unit_tests") {
     "//chrome/browser/supervised_user:test_support",
     "//chrome/browser/supervised_user:unit_tests",
     "//chrome/browser/sync",
+    "//chrome/browser/sync:unit_tests",
     "//chrome/browser/tab_group_sync",
     "//chrome/browser/tab_group_sync:factories",
     "//chrome/browser/tab_list:test_support",
@@ -7386,7 +7382,6 @@ test("unit_tests") {
       "../browser/signin/android/cross_device_signin_flow_navigation_throttle_unittest.cc",
       "../browser/signin/android/signin_manager_android_unittest.cc",
       "../browser/ssl/known_interception_disclosure_message_delegate_unittest.cc",
-      "../browser/sync/glue/synced_tab_delegate_android_unittest.cc",
       "../browser/webauthn/android/cable_module_android_unittest.cc",
       "../browser/webauthn/android/cable_registration_state_unittest.cc",
       "../browser/webauthn/android/credential_sorter_android_unittest.cc",
@@ -7638,9 +7633,6 @@ test("unit_tests") {
       "../browser/signin/signin_promo_unittest.cc",
       "../browser/support_tool/support_tool_handler_unittest.cc",
       "../browser/support_tool/system_log_source_data_collector_adaptor_unittest.cc",
-      "../browser/sync/prefs/chrome_syncable_prefs_database_unittest.cc",
-      "../browser/sync/sessions/sync_sessions_router_tab_helper_unittest.cc",
-      "../browser/sync/sync_ui_util_unittest.cc",
       "../browser/task_manager/sampling/task_group_unittest.cc",
       "../browser/task_manager/sampling/task_manager_impl_unittest.cc",
       "../browser/task_manager/task_manager_metrics_recorder_unittest.cc",
@@ -8783,10 +8775,7 @@ test("unit_tests") {
   # extensions tests are listed in their subdirectory BUILD.gn file, like
   # //chrome/browser/extensions/BUILD.gn or //chrome/common/extensions/BUILD.gn.
   if (enable_extensions_core) {
-    sources += [
-      "../browser/metrics/extensions_metrics_provider_unittest.cc",
-      "../browser/sync/glue/extensions_activity_monitor_unittest.cc",
-    ]
+    sources += [ "../browser/metrics/extensions_metrics_provider_unittest.cc" ]
     deps += [
       "//base",
       "//chrome/browser/extensions:test_support",
