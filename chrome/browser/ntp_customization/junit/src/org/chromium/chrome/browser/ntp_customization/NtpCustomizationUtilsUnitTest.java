@@ -484,7 +484,7 @@ public class NtpCustomizationUtilsUnitTest {
         assertTrue(dailyRefreshImageFile.exists());
 
         // Call reset.
-        NtpCustomizationUtils.resetCustomizedImage();
+        NtpCustomizationUtils.resetCustomizedImage(/* deleteImageFile= */ true);
         RobolectricUtil.runAllBackgroundAndUi();
 
         // Verify all keys are removed.

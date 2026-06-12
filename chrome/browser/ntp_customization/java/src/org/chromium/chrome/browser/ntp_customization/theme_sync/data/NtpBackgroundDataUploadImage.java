@@ -12,8 +12,10 @@ import androidx.annotation.VisibleForTesting;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import org.chromium.base.Callback;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
+import org.chromium.chrome.browser.ntp_customization.NtpCustomizationConfigManager;
 import org.chromium.chrome.browser.ntp_customization.NtpCustomizationUtils.NtpBackgroundType;
 import org.chromium.chrome.browser.ntp_customization.theme.upload_image.BackgroundImageInfo;
 
@@ -27,7 +29,7 @@ public class NtpBackgroundDataUploadImage extends NtpBackgroundDataBase {
 
     private final String mLastUploadImageFilePath;
     private final @Nullable BackgroundImageInfo mBackgroundImageInfo;
-    private final @Nullable Bitmap mBitmap;
+    private @Nullable Bitmap mBitmap;
     private @Nullable @ColorInt Integer mPrimaryColor;
 
     /**
@@ -87,6 +89,29 @@ public class NtpBackgroundDataUploadImage extends NtpBackgroundDataBase {
     }
 
     @Override
+    public void getBitmapOrLoadImage(Callback<@Nullable Bitmap> onImageLoadedCallback) {
+        if (mBitmap != null) {
+            onImageLoadedCallback.onResult(mBitmap);
+            return;
+        }
+
+        NtpBackgroundDataBase currentBackgroundData =
+                NtpCustomizationConfigManager.getInstance().getNtpBackgroundData();
+        if (currentBackgroundData instanceof NtpBackgroundDataUploadImage uploadImageData
+                && Objects.equals(currentBackgroundData, this)) {
+            mBitmap = uploadImageData.getBitmap();
+            onImageLoadedCallback.onResult(mBitmap);
+        } else {
+            // TODO(https://crbug.com/488439751): Loads bitmap using mLastUploadImageFilePath.
+            NtpBackgroundDataUtils.loadImage(
+                    (result) -> {
+                        mBitmap = result;
+                        onImageLoadedCallback.onResult(mBitmap);
+                    });
+        }
+    }
+
+    @Override
     public JSONObject toJson() throws JSONException {
         JSONObject json = super.toJson();
         json.put(LAST_UPLOAD_IMAGE_FILE_PATH_KEY, mLastUploadImageFilePath);
@@ -110,6 +135,11 @@ public class NtpBackgroundDataUploadImage extends NtpBackgroundDataBase {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), mLastUploadImageFilePath, mPrimaryColor);
+    }
+
+    @Override
+    public @Nullable Bitmap getImageBitmapForTesting() {
+        return mBitmap;
     }
 
     /** Returns the NtpBackgroundDataUploadImage object from the given JSON. */

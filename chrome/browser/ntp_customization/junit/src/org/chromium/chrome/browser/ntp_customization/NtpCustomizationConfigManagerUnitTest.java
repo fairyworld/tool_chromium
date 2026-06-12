@@ -69,6 +69,7 @@ import org.chromium.chrome.browser.preferences.ChromeSharedPreferences;
 import org.chromium.chrome.browser.ui.theme.ChromeSemanticColorUtils;
 import org.chromium.url.JUnitTestGURLs;
 
+import java.io.File;
 import java.util.concurrent.Executor;
 
 /** Unit tests for {@link NtpCustomizationConfigManager}. */
@@ -571,8 +572,14 @@ public class NtpCustomizationConfigManagerUnitTest {
         assertNotEquals(0, NtpCustomizationUtils.getDailyRefreshTimestampToSharedPreference());
     }
 
-    @Test
-    public void testOnBackgroundReset_fromUploadImage() {
+    private void testOnBackgroundReset_fromUploadImageImpl(boolean deleteImageFile) {
+        if (deleteImageFile) {
+            // Re-initialize to pick up enabled features.
+            ThreadUtils.runOnUiThreadBlocking(
+                    () -> mNtpCustomizationConfigManager = new NtpCustomizationConfigManager());
+            mNtpCustomizationConfigManager.setNtpBackgroundDataManagerForTesting(
+                    mNtpBackgroundDataManager);
+        }
         mNtpCustomizationConfigManager.addListener(mListener, mContext, /* skipNotify= */ false);
 
         NtpBackgroundDataUploadImage uploadImageData =
@@ -588,17 +595,41 @@ public class NtpCustomizationConfigManagerUnitTest {
                 NtpBackgroundType.IMAGE_FROM_DISK,
                 mNtpCustomizationConfigManager.getBackgroundType());
 
+        File imageFile = NtpCustomizationUtils.createBackgroundImageFile();
+        assertTrue(imageFile.exists());
+
         // Test case for resetting to the default color.
         mNtpCustomizationConfigManager.onBackgroundReset();
+        RobolectricUtil.runAllBackgroundAndUi();
 
         assertEquals(NtpBackgroundType.DEFAULT, mNtpCustomizationConfigManager.getBackgroundType());
         assertNull(mNtpCustomizationConfigManager.getBackgroundImageInfoForTesting());
         assertNull(mNtpCustomizationConfigManager.getOriginalBitmapForTesting());
+        if (deleteImageFile) {
+            assertFalse(imageFile.exists());
+
+        } else {
+            assertTrue(imageFile.exists());
+        }
 
         SharedPreferencesManager prefsManager = ChromeSharedPreferences.getInstance();
         assertFalse(prefsManager.contains(ChromePreferenceKeys.NTP_CUSTOMIZATION_BACKGROUND_TYPE));
 
         verify(mListener).onBackgroundReset(eq(NtpBackgroundType.IMAGE_FROM_DISK));
+    }
+
+    @Test
+    public void testOnBackgroundReset_fromUploadImage() {
+        testOnBackgroundReset_fromUploadImageImpl(/* deleteImageFile= */ true);
+    }
+
+    @Test
+    @EnableFeatures({
+        ChromeFeatureList.NEW_TAB_PAGE_CUSTOMIZATION_V2,
+        ChromeFeatureList.NEW_TAB_PAGE_CUSTOMIZATION_THEME_SYNC
+    })
+    public void testOnBackgroundReset_fromUploadImage_syncEnabled() {
+        testOnBackgroundReset_fromUploadImageImpl(/* deleteImageFile= */ false);
     }
 
     @Test

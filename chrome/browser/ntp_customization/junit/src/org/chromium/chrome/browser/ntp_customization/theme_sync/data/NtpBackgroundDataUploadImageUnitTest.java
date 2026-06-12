@@ -7,7 +7,11 @@ package org.chromium.chrome.browser.ntp_customization.theme_sync.data;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
 
@@ -15,11 +19,18 @@ import androidx.annotation.ColorInt;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.robolectric.annotation.Config;
 
+import org.chromium.base.Callback;
 import org.chromium.base.test.BaseRobolectricTestRunner;
+import org.chromium.chrome.browser.ntp_customization.NtpCustomizationConfigManager;
 import org.chromium.chrome.browser.ntp_customization.NtpCustomizationUtils.NtpBackgroundType;
 import org.chromium.chrome.browser.ntp_customization.theme.upload_image.BackgroundImageInfo;
 import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataBase.PlatformType;
@@ -28,6 +39,17 @@ import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgrou
 @RunWith(BaseRobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
 public class NtpBackgroundDataUploadImageUnitTest {
+    @Rule public final MockitoRule mMockitoRule = MockitoJUnit.rule();
+
+    @Mock private NtpCustomizationConfigManager mNtpCustomizationConfigManager;
+    @Mock private Callback<Bitmap> mCallback;
+    @Mock private Bitmap mBitmap;
+
+    @Before
+    public void setUp() {
+        NtpCustomizationConfigManager.setInstanceForTesting(mNtpCustomizationConfigManager);
+    }
+
     @Test
     public void testEquals() {
         BackgroundImageInfo info1 = new BackgroundImageInfo(new Matrix(), new Matrix(), null, null);
@@ -81,5 +103,70 @@ public class NtpBackgroundDataUploadImageUnitTest {
         assertEquals(
                 landscapeMatrix.toShortString(),
                 restored.getBackgroundImageInfo().getLandscapeMatrix().toShortString());
+    }
+
+    @Test
+    public void testGetImageBitmap() {
+        BackgroundImageInfo info = new BackgroundImageInfo(new Matrix(), new Matrix(), null, null);
+        NtpBackgroundDataUploadImage data =
+                new NtpBackgroundDataUploadImage(
+                        PlatformType.ANDROID_LOCAL,
+                        "path",
+                        info,
+                        mBitmap,
+                        /* primaryColor= */ null);
+        assertEquals(mBitmap, data.getImageBitmapForTesting());
+
+        NtpBackgroundDataUploadImage dataWithoutBitmap =
+                new NtpBackgroundDataUploadImage(
+                        PlatformType.ANDROID_LOCAL,
+                        "path",
+                        info,
+                        /* bitmap= */ null,
+                        /* primaryColor= */ null);
+        assertNull(dataWithoutBitmap.getImageBitmapForTesting());
+    }
+
+    @Test
+    public void testLoadImage_withBitmap() {
+        BackgroundImageInfo info = new BackgroundImageInfo(new Matrix(), new Matrix(), null, null);
+        NtpBackgroundDataUploadImage data =
+                new NtpBackgroundDataUploadImage(
+                        PlatformType.ANDROID_LOCAL,
+                        "path",
+                        info,
+                        mBitmap,
+                        /* primaryColor= */ null);
+
+        data.getBitmapOrLoadImage(mCallback);
+        verify(mCallback).onResult(mBitmap);
+    }
+
+    @Test
+    public void testLoadImage_fromCurrentBackgroundData() {
+        BackgroundImageInfo info = new BackgroundImageInfo(new Matrix(), new Matrix(), null, null);
+        // The currentData has a bitmap.
+        NtpBackgroundDataUploadImage currentData =
+                new NtpBackgroundDataUploadImage(
+                        PlatformType.ANDROID_LOCAL,
+                        "path",
+                        info,
+                        mBitmap,
+                        /* primaryColor= */ null);
+        when(mNtpCustomizationConfigManager.getNtpBackgroundData()).thenReturn(currentData);
+
+        // The testData does not have a bitmap, but is equal to currentData (same path).
+        NtpBackgroundDataUploadImage testData =
+                new NtpBackgroundDataUploadImage(
+                        PlatformType.ANDROID_LOCAL,
+                        "path",
+                        info,
+                        /* bitmap= */ null,
+                        /* primaryColor= */ null);
+
+        testData.getBitmapOrLoadImage(mCallback);
+        verify(mCallback).onResult(mBitmap);
+        // Also verify that testData now has the bitmap cached.
+        assertEquals(mBitmap, testData.getImageBitmapForTesting());
     }
 }

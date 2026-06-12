@@ -7,6 +7,7 @@ package org.chromium.chrome.browser.ntp_customization.theme_sync.data;
 import static org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataBase.BACKGROUND_TYPE_KEY;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Point;
 
@@ -14,8 +15,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import org.chromium.base.Callback;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
+import org.chromium.chrome.browser.ntp_customization.NtpCustomizationConfigManager;
 import org.chromium.chrome.browser.ntp_customization.NtpCustomizationUtils;
 
 /** Utility class for NTP background data conversion. */
@@ -120,5 +123,18 @@ public class NtpBackgroundDataUtils {
         } catch (JSONException e) {
             return null;
         }
+    }
+
+    /**
+     * Loads the NTP background image from disk asynchronously.
+     *
+     * @param onImageLoadedCallback The callback to invoke when the image is loaded.
+     */
+    static void loadImage(Callback<@Nullable Bitmap> onImageLoadedCallback) {
+        NtpCustomizationUtils.readNtpBackgroundImage(
+                (bitmap) -> {
+                    onImageLoadedCallback.onResult(bitmap);
+                },
+                NtpCustomizationConfigManager.EXECUTOR);
     }
 }

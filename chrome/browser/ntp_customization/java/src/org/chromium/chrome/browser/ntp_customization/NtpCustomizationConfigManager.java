@@ -47,7 +47,7 @@ import java.util.concurrent.Executor;
 /** Manages the NTP's background configuration and notifies listeners of changes. */
 @NullMarked
 public class NtpCustomizationConfigManager {
-    private static final Executor EXECUTOR =
+    public static final Executor EXECUTOR =
             (Runnable r) -> PostTask.postTask(TaskTraits.USER_BLOCKING_MAY_BLOCK, r);
 
     private final boolean mIsNtpCustomizationSyncEnabled;
@@ -478,7 +478,7 @@ public class NtpCustomizationConfigManager {
 
     private void cleanupImageInfoAndNotifyBackgroundColorChangeImpl(
             Context context, @NtpBackgroundType int oldType) {
-        cleanupBackgroundImage();
+        cleanupBackgroundImage(!mIsNtpCustomizationSyncEnabled);
         notifyBackgroundColorChanged(context, /* fromInitialization= */ false, oldType);
     }
 
@@ -588,6 +588,11 @@ public class NtpCustomizationConfigManager {
         return mBackgroundType;
     }
 
+    /** Returns the {@link NtpBackgroundDataBase} instance representing the current theme. */
+    public @Nullable NtpBackgroundDataBase getNtpBackgroundData() {
+        return mNtpBackgroundData;
+    }
+
     /**
      * Returns the current background color for NTP. Needs to use the Activity's context rather than
      * the application's context, which isn't themed and will provide a wrong color.
@@ -650,10 +655,10 @@ public class NtpCustomizationConfigManager {
     }
 
     /** Cleans up background bitmap image related info. */
-    private void cleanupBackgroundImage() {
+    private void cleanupBackgroundImage(boolean deleteImageFile) {
         mBackgroundImageInfo = null;
         mOriginalBitmap = null;
-        NtpCustomizationUtils.resetCustomizedImage();
+        NtpCustomizationUtils.resetCustomizedImage(deleteImageFile);
     }
 
     private void cleanupChromeColors() {
@@ -666,7 +671,8 @@ public class NtpCustomizationConfigManager {
 
         switch (oldType) {
             case CHROME_COLOR -> cleanupChromeColors();
-            case IMAGE_FROM_DISK, THEME_COLLECTION -> cleanupBackgroundImage();
+            case IMAGE_FROM_DISK, THEME_COLLECTION ->
+                    cleanupBackgroundImage(!mIsNtpCustomizationSyncEnabled);
         }
     }
 
@@ -688,7 +694,7 @@ public class NtpCustomizationConfigManager {
         mHomepageStateListeners.clear();
         mIsInitialized = false;
         mBackgroundType = NtpBackgroundType.DEFAULT;
-        cleanupBackgroundImage();
+        cleanupBackgroundImage(/* deleteImageFile= */ true);
         mIsMvtToggleOn = false;
     }
 
