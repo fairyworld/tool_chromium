@@ -1763,28 +1763,28 @@ You can also use the keyboard shortcut. First, highlight text, then press <ph na
       <message name="IDS_ASH_VIDEO_CONFERENCE_TOGGLE_BUBBLE_BUTTON_TOOLTIP" desc="The tooltip for the toggle bubble button in the video conference tray.">
         Camera and audio controls
       </message>
-      <message name="VIDEO_CONFERENCE_TOGGLE_BUTTON_TOOLTIP" desc="Tooltip shown for the toggle buttons shown in the shelf tray. There is a different toggle button for each (Microphone, Camera, Screen Capture). If the button is toggled on, it may also be in-use.">
+      <message name="IDS_VIDEO_CONFERENCE_TOGGLE_BUTTON_TOOLTIP" desc="Tooltip shown for the toggle buttons shown in the shelf tray. There is a different toggle button for each (Microphone, Camera, Screen Capture). If the button is toggled on, it may also be in-use.">
         Toggle <ph name="CAPTURE_MEDIUM">$1<ex>Camera</ex></ph>. <ph name="CAPTURE_MEDIUM">$1<ex>Camera</ex></ph> is <ph name="CAPTURE_STATE">$2<ex>on and in use</ex></ph>
       </message>
-      <message name="VIDEO_CONFERENCE_ONE_WAY_TOGGLE_BUTTON_TOOLTIP" desc="Tooltip shown for a toggle button in the shelf tray which is 'one way', which means that activating the button only turns the behavior off and it cannot be turned back on.">
+      <message name="IDS_VIDEO_CONFERENCE_ONE_WAY_TOGGLE_BUTTON_TOOLTIP" desc="Tooltip shown for a toggle button in the shelf tray which is 'one way', which means that activating the button only turns the behavior off and it cannot be turned back on.">
         Stop <ph name="CAPTURE_MEDIUM">$1<ex>Camera</ex></ph>. <ph name="CAPTURE_MEDIUM">$1<ex>Camera</ex></ph> is <ph name="CAPTURE_STATE">$2<ex>on and in use</ex></ph>
       </message>
-      <message name="VIDEO_CONFERENCE_TOGGLE_BUTTON_TYPE_CAMERA" desc="The portion of the tooltip for the camera toggle button.">
+      <message name="IDS_VIDEO_CONFERENCE_TOGGLE_BUTTON_TYPE_CAMERA" desc="The portion of the tooltip for the camera toggle button.">
         Camera
       </message>
-      <message name="VIDEO_CONFERENCE_TOGGLE_BUTTON_TYPE_MICROPHONE" desc="The portion of the tooltip for the microphone toggle button.">
+      <message name="IDS_VIDEO_CONFERENCE_TOGGLE_BUTTON_TYPE_MICROPHONE" desc="The portion of the tooltip for the microphone toggle button.">
         Microphone
       </message>
-      <message name="VIDEO_CONFERENCE_TOGGLE_BUTTON_TYPE_SCREEN_SHARE" desc="The portion of the tooltip for the screen capture toggle button.">
+      <message name="IDS_VIDEO_CONFERENCE_TOGGLE_BUTTON_TYPE_SCREEN_SHARE" desc="The portion of the tooltip for the screen capture toggle button.">
         Screen Share
       </message>
-      <message name="VIDEO_CONFERENCE_TOGGLE_BUTTON_STATE_ON" desc="The state of the toggle button when the toggle is on but not capturing.">
+      <message name="IDS_VIDEO_CONFERENCE_TOGGLE_BUTTON_STATE_ON" desc="The state of the toggle button when the toggle is on but not capturing.">
         on
       </message>
-      <message name="VIDEO_CONFERENCE_TOGGLE_BUTTON_STATE_ON_AND_IN_USE" desc="The state of the toggle button when the toggle is on and capturing.">
+      <message name="IDS_VIDEO_CONFERENCE_TOGGLE_BUTTON_STATE_ON_AND_IN_USE" desc="The state of the toggle button when the toggle is on and capturing.">
         on and in use
       </message>
-      <message name="VIDEO_CONFERENCE_TOGGLE_BUTTON_STATE_OFF" desc="The state of the toggle button when the toggle is muting.">
+      <message name="IDS_VIDEO_CONFERENCE_TOGGLE_BUTTON_STATE_OFF" desc="The state of the toggle button when the toggle is muting.">
         off
       </message>
        <!--  Video Conference bubble  -->
@@ -7405,7 +7405,7 @@ New install
       <message name="IDS_ASH_ECHE_TOAST_TABLET_MODE_NOT_SUPPORTED" desc="A toast message that we show when user tries to switch to tablet mode.">
         Can't stream apps in tablet mode. Try again in laptop mode.
       </message>
-      <message name="ID_ASH_ECHE_APP_STREAMING_BUBBLE_TITLE" desc="The title appear on the top of app streaming bubble">
+      <message name="IDS_ASH_ECHE_APP_STREAMING_BUBBLE_TITLE" desc="The title appear on the top of app streaming bubble">
         From <ph name="PHONE_NAME">$1<ex>Pixel 7</ex></ph>
       </message>
       <message name="IDS_ASH_ECHE_APP_STREMING_ERROR_DIALOG_TITLE" desc="The title of dialog that appears when there is a connection error trying to stream app">
