@@ -247,8 +247,7 @@ inline constexpr char kApiMimeHandlerDescription[] =
 inline constexpr char kApproximateGeolocationPermissionName[] =
     "Approximate Geolocation Permission";
 inline constexpr char kApproximateGeolocationPermissionDescription[] =
-    "Enables the approximate geolocation permission prompt, with options to "
-    "control prompt arm variations.";
+    "Enables the approximate geolocation permission prompt.";
 
 inline constexpr char kAndroidAppIntegrationMultiDataSourceName[] =
     "Integrate with Android App Search with multiple data sources.";

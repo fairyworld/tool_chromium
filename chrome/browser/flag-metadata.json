@@ -573,9 +573,8 @@
   },
   {
     "name": "approximate-geolocation-permission",
-    "owners": [ "tommasin@chromium.org", "dullweber@chromium.org",
-    "//components/permissions/PERMISSIONS_OWNERS"],
-    "expiry_milestone": 150
+    "owners": [ "antoniosartori@chromium.org", "//components/permissions/PERMISSIONS_OWNERS" ],
+    "expiry_milestone": 158
   },
   {
     "name": "arc-aaudio-mmap-low-latency",
