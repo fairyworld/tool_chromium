@@ -370,6 +370,15 @@ export declare interface GlicBrowserHost {
     (tabId: string, options: TabContextOptions): Promise<TabContextResult>;
 
   /**
+   * Retrieves raw image bytes, MIME type, and metadata for an image node from
+   * the tab associated with `tabId`.
+   *
+   * @throws {Error} on failure.
+   */
+  getImageBytesFromTab?(tabId: string, documentId: string, domNodeId: number):
+      Promise<ImageBytesResult>;
+
+  /**
    * Sets the maximum number of supported pinned tabs. Should not be called
    * more than once. Chrome may not be able to support the given number, so
    * the applied limit is returned.
@@ -1965,6 +1974,30 @@ export declare interface Screenshot {
   mimeType: string;
   /** Image annotations for this screenshot. */
   originAnnotations: ImageOriginAnnotations;
+}
+
+/**
+ * Metadata about an image on the page.
+ */
+export declare interface ImageInfo {
+  /** The accessible name or descriptive caption of the image. */
+  caption?: string;
+  /** The origin of the page or document containing the image source. */
+  sourceOrigin?: string;
+  /** The URL source location of the image. It is empty if not available. */
+  url: string;
+  /** The image encoding format represented as a MIME type. */
+  mimeType?: string;
+}
+
+/**
+ * Result of retrieving image bytes.
+ */
+export declare interface ImageBytesResult {
+  /** Raw encoded image bytes. */
+  bytes: ArrayBuffer;
+  /** Metadata about the image. */
+  imageInfo: ImageInfo;
 }
 
 /**

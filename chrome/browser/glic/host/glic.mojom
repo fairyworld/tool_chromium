@@ -1265,6 +1265,11 @@ interface WebClientHandler {
   GetContextFromTab(int32 tab_id, GetTabContextOptions options)
       => (GetContextResult result);
 
+  // Returns raw image bytes and MIME type for an image node from the tab
+  // associated with `tab_id`.
+  GetImageBytesFromTab(int32 tab_id, string document_id, int32 dom_node_id)
+      => (GetImageBytesResult result);
+
   // Sets the maximum number of supported pinned tabs. Negative means that the
   // client has no limit. Since the browser may only support so many, the
   // effective limit is returned. The returned number may also differ from the
@@ -2303,6 +2308,32 @@ struct Screenshot {
   string mime_type;
   // Image annotations for this screenshot.
   ImageOriginAnnotations origin_annotations;
+};
+
+// Information about an image on the page.
+struct ImageInfo {
+  // Caption of the image if available.
+  string? caption;
+  // Security origin of the image resource.
+  url.mojom.Origin? source_origin;
+  // Source URL of the image.
+  url.mojom.Url url;
+  // The image encoding format represented as a MIME type (e.g., image/jpeg).
+  string? mime_type;
+};
+
+// Result of retrieving image bytes.
+struct ImageBytesResult {
+  // Raw encoded image bytes.
+  mojo_base.mojom.BigBuffer bytes;
+  // Metadata about the image.
+  ImageInfo image_info;
+};
+
+// Result of retrieving image bytes or failure reason.
+union GetImageBytesResult {
+  ImageBytesResult image_bytes;
+  string error_reason;
 };
 
 // @generate glic_api

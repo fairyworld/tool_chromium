@@ -149,6 +149,19 @@ export const WebClientHostDef = defInterface({
       histogram: {id: 10},
     },
     {
+      name: 'getImageBytesFromTab',
+      request: defMessage<{
+        tabId: string,
+        documentId: string,
+        domNodeId: number,
+      }>(),
+      response: defMessage<{
+        result: ImageBytesResultPrivate | null,
+      }>(),
+      backgroundAllowed: false,
+      histogram: {id: 101},
+    },
+    {
       name: 'setMaximumNumberOfPinnedTabs',
       request: defMessage<{
         requestedMax: number,
@@ -1040,6 +1053,7 @@ export const RECORDED_REQUEST_IDS = {
   OnExperimentalTriggeringUpdate: 98,
   OnOptinImpression: 99,
   ProcessCounterAbuseVerdict: 100,
+  GetImageBytesFromTab: 101,
 } as const satisfies InterfaceHistogramIds<WebClientHost>&
     InterfaceHistogramIds<ActorHost>;
 // LINT.ThenChange(
@@ -1193,6 +1207,18 @@ export declare interface AdditionalContextPrivate extends
 export declare interface InvokeOptionsPrivate extends
     Omit<InvokeOptions, 'context'> {
   context?: AdditionalContextPrivate;
+}
+
+export declare interface ImageInfoPrivate {
+  caption?: string;
+  sourceOrigin?: string;
+  url: string;
+  mimeType?: string;
+}
+
+export declare interface ImageBytesResultPrivate {
+  bytes: ArrayBuffer;
+  imageInfo: ImageInfoPrivate;
 }
 
 export class ErrorWithReasonImpl<T extends keyof ErrorReasonTypes> extends Error

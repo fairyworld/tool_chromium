@@ -608,6 +608,37 @@ class ApiTests extends ApiTestFixtureBase {
     }
     assertTrue(false, 'scrollTo should have thrown an error');
   }
+
+  async testGetImageBytesFromTab() {
+    assertDefined(this.host.getImageBytesFromTab);
+
+    const tabId = checkDefined(this.testParams.tabId);
+    const documentId = checkDefined(this.testParams.documentId);
+    const domNodeId = checkDefined(this.testParams.domNodeId);
+
+    // Call from tab ID
+    const result =
+        await this.host.getImageBytesFromTab(tabId, documentId, domNodeId);
+    assertDefined(result);
+    assertDefined(result.bytes);
+    assertTrue(result.bytes.byteLength > 0);
+    assertDefined(result.imageInfo);
+    assertEquals(result.imageInfo.mimeType, 'image/gif');
+    assertEquals(result.imageInfo.caption, 'test_image_bytes');
+    assertEquals(result.imageInfo.url, '');
+    assertEquals(result.imageInfo.sourceOrigin, 'null');
+
+    // Test failures.
+    // 1. Invalid DOM node ID.
+    await assertRejects(
+        this.host.getImageBytesFromTab(tabId, documentId, 9999),
+        {withErrorMessage: 'getImageBytes failed: failed to get image bytes'});
+
+    // 2. Invalid tab ID.
+    await assertRejects(
+        this.host.getImageBytesFromTab('99999', documentId, domNodeId),
+        {withErrorMessage: 'getImageBytes failed: tab not found'});
+  }
 }
 
 class FaviconTest extends ApiTests {

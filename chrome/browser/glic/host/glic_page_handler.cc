@@ -4,6 +4,8 @@
 
 #include "chrome/browser/glic/host/glic_page_handler.h"
 
+#include <utility>
+
 #include "base/callback_list.h"
 #include "base/feature_list.h"
 #include "base/files/file_util.h"
@@ -132,6 +134,7 @@
 #include "pdf/buildflags.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 #include "third_party/blink/public/common/features.h"
+#include "third_party/blink/public/mojom/content_extraction/ai_page_content.mojom.h"
 #include "third_party/skia/include/core/SkBitmap.h"
 #include "ui/base/device_form_factor.h"
 #include "ui/base/window_open_disposition.h"
@@ -179,7 +182,7 @@ namespace glic {
 
 namespace {
 
-mojom::GetContextResultPtr LogErrorAndUnwrapResult(
+mojom::GetContextResultPtr LogErrorAndUnwrapContextResult(
     base::OnceCallback<void(GlicGetContextFromTabError)> error_logger,
     GlicGetContextResult result) {
   if (!result.has_value()) {
@@ -187,6 +190,31 @@ mojom::GetContextResultPtr LogErrorAndUnwrapResult(
     return mojom::GetContextResult::NewErrorReason(result.error().message);
   }
   return std::move(result.value());
+}
+
+mojom::GetImageBytesResultPtr LogErrorAndUnwrapImageBytesResult(
+    base::OnceCallback<void(GlicGetContextFromTabError)> error_logger,
+    GlicGetImageBytesResult result) {
+  if (!result.has_value()) {
+    std::move(error_logger).Run(result.error().error_code);
+    return mojom::GetImageBytesResult::NewErrorReason(result.error().message);
+  }
+
+  auto converted_result = mojom::ImageBytesResult::New();
+  converted_result->bytes = std::move(result.value()->image_bytes);
+
+  converted_result->image_info = mojom::ImageInfo::New();
+  const blink::mojom::AIPageContentImageInfoPtr& image_info =
+      result.value()->image_info;
+  if (image_info) {
+    converted_result->image_info->caption = image_info->image_caption;
+    if (image_info->source_origin) {
+      converted_result->image_info->source_origin = image_info->source_origin;
+    }
+    converted_result->image_info->url = image_info->url;
+    converted_result->image_info->mime_type = image_info->mime_type;
+  }
+  return mojom::GetImageBytesResult::NewImageBytes(std::move(converted_result));
 }
 
 GlicUnpinTrigger FromMojomUnpinTrigger(mojom::UnpinTrigger trigger) {
@@ -846,7 +874,7 @@ class GlicWebClientHandler : public glic::mojom::WebClientHandler,
     GetSharingManagerInternal().GetContextFromTab(
         tab_handle, *options,
         base::BindOnce(
-            &LogErrorAndUnwrapResult,
+            &LogErrorAndUnwrapContextResult,
             base::BindOnce(&GlicMetrics::LogGetContextFromFocusedTabError,
                            base::Unretained(glic_service_->metrics())))
             .Then(std::move(callback)));
@@ -859,8 +887,21 @@ class GlicWebClientHandler : public glic::mojom::WebClientHandler,
     GetSharingManagerInternal().GetContextFromTab(
         tabs::TabHandle(tab_id), *options,
         base::BindOnce(
-            &LogErrorAndUnwrapResult,
+            &LogErrorAndUnwrapContextResult,
             base::BindOnce(&GlicMetrics::LogGetContextFromTabError,
+                           base::Unretained(glic_service_->metrics())))
+            .Then(std::move(callback)));
+  }
+
+  void GetImageBytesFromTab(int32_t tab_id,
+                            const std::string& document_id,
+                            int32_t dom_node_id,
+                            GetImageBytesFromTabCallback callback) override {
+    GetSharingManagerInternal().GetImageBytes(
+        tabs::TabHandle(tab_id), document_id, dom_node_id,
+        base::BindOnce(
+            &LogErrorAndUnwrapImageBytesResult,
+            base::BindOnce(&GlicMetrics::LogGetImageBytesFromTabError,
                            base::Unretained(glic_service_->metrics())))
             .Then(std::move(callback)));
   }

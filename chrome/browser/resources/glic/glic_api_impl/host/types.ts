@@ -53,6 +53,7 @@ export const BACKGROUND_RESPONSES: HostBackgroundResponseMap = {
   showProfilePicker: {throws: true},
   getContextFromFocusedTab: {throws: true},
   getContextFromTab: {throws: true},
+  getImageBytesFromTab: {throws: true},
   captureScreenshot: {throws: true},
   scrollTo: {
     does: () => {

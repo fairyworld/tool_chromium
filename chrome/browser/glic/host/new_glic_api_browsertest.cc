@@ -2,7 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include <cstdint>
+#include <optional>
+#include <string>
+
 #include "base/functional/callback.h"
+#include "base/strings/string_number_conversions.h"
+#include "base/strings/stringprintf.h"
 #include "base/test/gmock_callback_support.h"
 #include "base/test/gmock_expected_support.h"
 #include "base/test/scoped_logging_settings.h"
@@ -12,6 +18,7 @@
 #include "chrome/browser/enterprise/browser_management/management_service_factory.h"
 #include "chrome/browser/glic/glic_enums.h"
 #include "chrome/browser/glic/host/auth_controller.h"
+#include "chrome/browser/glic/host/context/glic_tab_data.h"
 #include "chrome/browser/glic/host/glic.mojom.h"
 #include "chrome/browser/glic/host/glic_features.mojom-features.h"
 #include "chrome/browser/glic/host/glic_web_contents_warming_pool.h"
@@ -48,6 +55,8 @@
 #include "components/favicon/core/favicon_driver.h"
 #include "components/favicon/core/favicon_driver_observer.h"
 #include "components/optimization_guide/content/browser/page_content_proto_provider.h"
+#include "components/optimization_guide/content/browser/page_content_test_utils.h"
+#include "components/optimization_guide/proto/features/common_quality_data.pb.h"
 #include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
 #include "components/policy/core/common/mock_configuration_policy_provider.h"
 #include "components/policy/core/common/policy_map.h"
@@ -62,6 +71,9 @@
 #include "content/public/browser/favicon_status.h"
 #include "content/public/browser/navigation_controller.h"
 #include "content/public/browser/navigation_entry.h"
+#include "content/public/browser/render_frame_host.h"
+#include "content/public/browser/render_widget_host.h"
+#include "content/public/browser/web_contents.h"
 #include "content/public/common/content_features.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
@@ -746,6 +758,87 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest,
   EXPECT_EQ(GetTabListInterface()->GetTabCount(), 1);
   ExecuteJsTest();
   EXPECT_EQ(GetTabListInterface()->GetTabCount(), 1);
+}
+
+IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testGetImageBytesFromTab) {
+  // 1. Open glic.
+  ASSERT_OK(OpenGlicForActiveTab());
+
+  content::WebContents* web_contents =
+      GetTabListInterface()->GetActiveTab()->GetContents();
+  ASSERT_TRUE(web_contents);
+
+  // 2. Inject image into the page and wait for load.
+  const std::string kImageBase64 =
+      "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+  ASSERT_TRUE(
+      content::EvalJs(web_contents, base::StringPrintf(R"js(
+    new Promise(resolve => {
+      const img = document.createElement('img');
+      img.src = 'data:image/gif;base64,%s';
+      img.alt = 'test_image_bytes';
+      img.onload = () => resolve(true);
+      document.body.appendChild(img);
+      if (img.complete) {
+        resolve(true);
+      }
+    });
+  )js",
+                                                       kImageBase64.c_str()))
+          .ExtractBool());
+
+  // Wait for rendering to sync.
+  {
+    base::test::TestFuture<bool> future;
+    web_contents->GetPrimaryMainFrame()
+        ->GetRenderWidgetHost()
+        ->InsertVisualStateCallback(future.GetCallback());
+    ASSERT_TRUE(future.Wait());
+  }
+
+  // 3. Fetch AIPageContent to extract the DOM node ID of the image.
+  base::test::TestFuture<optimization_guide::AIPageContentResultOrError>
+      content_future;
+  optimization_guide::GetAIPageContent(
+      web_contents,
+      optimization_guide::ActionableAIPageContentOptions(
+          /*on_critical_path =*/true),
+      content_future.GetCallback());
+
+  auto result = content_future.Take();
+  ASSERT_TRUE(result.has_value());
+
+  const optimization_guide::proto::ContentNode* image_node =
+      optimization_guide::FindFirstNodeWithAttributeType(
+          result->proto.root_node(),
+          optimization_guide::proto::CONTENT_ATTRIBUTE_IMAGE);
+  ASSERT_TRUE(image_node);
+  int32_t dom_node_id =
+      image_node->content_attributes().common_ancestor_dom_node_id();
+  ASSERT_NE(dom_node_id, 0);
+
+  // 4. Get the document identifier.
+  std::optional<std::string> document_identifier =
+      optimization_guide::DocumentIdentifierUserData::GetDocumentIdentifier(
+          web_contents->GetPrimaryMainFrame()->GetGlobalFrameToken());
+  ASSERT_TRUE(document_identifier.has_value());
+
+  const int tab_id = GetTabId(web_contents);
+
+  GlicHistogramTester histogram_tester;
+
+  ExecuteJsTest(
+      {.params = base::Value(base::DictValue()
+                                 .Set("tabId", base::NumberToString(tab_id))
+                                 .Set("documentId", *document_identifier)
+                                 .Set("domNodeId", dom_node_id))});
+
+  histogram_tester.ExpectBucketCount("Glic.Api.GetImageBytesFromTab.Error",
+                                     GlicGetContextFromTabError::kUnknown, 1);
+  histogram_tester.ExpectBucketCount("Glic.Api.GetImageBytesFromTab.Error",
+                                     GlicGetContextFromTabError::kTabNotFound,
+                                     1);
+  histogram_tester.ExpectTotalCount("Glic.Api.GetImageBytesFromTab.Error", 2);
 }
 
 class GlicApiScrollToTest : public NewGlicApiTest {
