@@ -2477,10 +2477,15 @@ class LocationBarMediator
             reparentToToolbar();
         }
 
+        // Clear our input field before propagating to children. In case they trigger events back up
+        // to us, we'll be able to ignore them now.
+        AutocompleteInput currentInput = mCurrentInput;
+        mCurrentInput = null;
+
         mAutocompleteCoordinator.endInput();
         mStatusCoordinator.endInput();
         if (mScrimHandler != null) mScrimHandler.setVisibility(false);
-        mCurrentInput.getRequestTypeSupplier().removeObserver(mAutocompleteRequestTypeObserver);
+        currentInput.getRequestTypeSupplier().removeObserver(mAutocompleteRequestTypeObserver);
         FuseboxSessionState state = FuseboxSessionState.from(mLocationBarDataProvider);
         if (state != null) {
             // Only for Contextual Tasks, we skip ending the Fusebox input to allow it to stay warm
@@ -2491,7 +2496,6 @@ class LocationBarMediator
         }
         mHintTextUpdater.endInput();
 
-        mCurrentInput = null;
         setAttachmentModelList(null);
     }
 
