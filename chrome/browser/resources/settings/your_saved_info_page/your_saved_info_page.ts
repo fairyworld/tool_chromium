@@ -463,6 +463,11 @@ export class SettingsYourSavedInfoPageElement extends
       case 'shopping':
         triggerId = 'shoppingManagerButton';
         break;
+      // TODO(crbug.com/514256365): Add real value trigger ID here once entry
+      // point is added.
+      case 'suggestionsFromGemini':
+        triggerId = 'travelManagerButton';
+        break;
       default:
         assertNotReached(`Unrecognized child view ID: ${childViewId}`);
     }
