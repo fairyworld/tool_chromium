@@ -251,6 +251,7 @@ bool AiModePageActionController::ShouldShowPageAction(
 
 void AiModePageActionController::SetPageActionVisibility(bool is_visible) {
   if (!is_visible) {
+    favicon_fetch_weak_factory_.InvalidateWeakPtrs();
     Hide(IconSource::kInvisible);
     return;
   }
@@ -283,7 +284,7 @@ void AiModePageActionController::SetPageActionVisibility(bool is_visible) {
     gfx::Image image = client->GetFaviconForIconUrl(
         favicon_url,
         base::BindOnce(&AiModePageActionController::OnFaviconFetchedLocally,
-                       weak_factory_.GetWeakPtr(), favicon_url),
+                       favicon_fetch_weak_factory_.GetWeakPtr(), favicon_url),
         /*notify_on_empty=*/true);
     // `image` will be empty if not cached. In which case, let
     // `OnFaviconFetchedLocally()` handle visibility and the image.
@@ -319,8 +320,18 @@ void AiModePageActionController::ShowAndOverrideImage(
 void AiModePageActionController::OnFaviconFetchedLocally(
     const GURL& favicon_url,
     const gfx::Image& favicon) {
-  if (favicon.IsEmpty() ||
-      !ShouldShowPageAction(base::to_address(profile_), *location_bar_view_)) {
+  // If visibility became false, this callback should have been cancelled.
+  CHECK(ShouldShowPageAction(base::to_address(profile_), *location_bar_view_));
+
+  // If the config changed, this callback should have been cancelled.
+  auto* service =
+      AiModeButtonServiceFactory::GetForProfile(base::to_address(profile_));
+  CHECK(service);
+  auto* config = service->GetCurrentConfig();
+  CHECK(config);
+  CHECK_EQ(GURL{config->favicon_url}, favicon_url);
+
+  if (favicon.IsEmpty()) {
     FetchFaviconFromNetwork(favicon_url);
     return;
   }
@@ -341,23 +352,29 @@ void AiModePageActionController::FetchFaviconFromNetwork(
   fetcher_service->RequestImage(
       favicon_url,
       base::BindOnce(&AiModePageActionController::OnFaviconFetchedFromNetwork,
-                     weak_factory_.GetWeakPtr()));
+                     favicon_fetch_weak_factory_.GetWeakPtr(), favicon_url));
 }
 
-void AiModePageActionController::OnFaviconFetchedFromNetwork(SkBitmap bitmap) {
-  if (bitmap.empty() ||
-      !ShouldShowPageAction(base::to_address(profile_), *location_bar_view_)) {
-    Hide(IconSource::kFailedIcon);
-    return;
-  }
+void AiModePageActionController::OnFaviconFetchedFromNetwork(
+    const GURL& favicon_url,
+    SkBitmap bitmap) {
+  // If visibility became false, this callback should have been cancelled.
+  CHECK(ShouldShowPageAction(base::to_address(profile_), *location_bar_view_));
 
-  // Store fetched icon into favicon cache.
+  // If the config changed, this callback should have been cancelled.
   auto* service =
       AiModeButtonServiceFactory::GetForProfile(base::to_address(profile_));
   CHECK(service);
   auto* config = service->GetCurrentConfig();
   CHECK(config);
-  GURL favicon_url(config->favicon_url);
+  CHECK_EQ(GURL{config->favicon_url}, favicon_url);
+
+  if (bitmap.empty()) {
+    Hide(IconSource::kFailedIcon);
+    return;
+  }
+
+  // Store fetched icon into favicon cache.
   favicon::FaviconService* favicon_service =
       FaviconServiceFactory::GetForProfile(base::to_address(profile_),
                                            ServiceAccessType::EXPLICIT_ACCESS);

@@ -114,7 +114,7 @@ class AiModePageActionController : public OmniboxEditModel::Observer {
   void OnFaviconFetchedLocally(const GURL& favicon_url,
                                const gfx::Image& favicon);
   void FetchFaviconFromNetwork(const GURL& favicon_url);
-  void OnFaviconFetchedFromNetwork(SkBitmap bitmap);
+  void OnFaviconFetchedFromNetwork(const GURL& favicon_url, SkBitmap bitmap);
 
   const raw_ref<BrowserWindowInterface> bwi_;
   const raw_ref<Profile> profile_;
@@ -125,7 +125,11 @@ class AiModePageActionController : public OmniboxEditModel::Observer {
   base::ScopedObservation<OmniboxEditModel, OmniboxEditModel::Observer>
       observation_{this};
 
-  // Used for `OnFaviconFetched()` callback.
+  // Used to cancel pending favicon fetches when the config changes.
+  base::WeakPtrFactory<AiModePageActionController> favicon_fetch_weak_factory_{
+      this};
+
+  // Lives as long as this lives. Used to subscribe to config changes.
   base::WeakPtrFactory<AiModePageActionController> weak_factory_{this};
 };
 
