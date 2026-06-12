@@ -757,6 +757,16 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="OptimizationGuide.AIPageContent.GetImageBytes.Timeout"
+    enum="Boolean" expires_after="2027-06-08">
+  <owner>linnan@chromium.org</owner>
+  <owner>chrome-intelligence-core@google.com</owner>
+  <summary>
+    Records whether a GetImageBytes request timed out on the browser side.
+    Recorded for every image extraction request.
+  </summary>
+</histogram>
+
 <histogram name="OptimizationGuide.AIPageContent.RendererLatency.{FrameType}"
     units="ms" expires_after="2026-10-25">
   <owner>khushalsagar@chromium.org</owner>
