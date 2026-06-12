@@ -5924,6 +5924,9 @@ data/accessibility/html/tabindex-with-link-children-expected-mac.txt
 data/accessibility/html/tabindex-with-link-children-expected-uia-win.txt
 data/accessibility/html/tabindex-with-link-children-expected-win.txt
 data/accessibility/html/tabindex-with-link-children.html
+data/accessibility/html/tabindex-with-list-child-expected-android.txt
+data/accessibility/html/tabindex-with-list-child-expected-blink.txt
+data/accessibility/html/tabindex-with-list-child.html
 data/accessibility/html/table-canvas-fallback-expected-blink.txt
 data/accessibility/html/table-canvas-fallback.html
 data/accessibility/html/table-column-remove-expected-blink.txt
