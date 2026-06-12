@@ -363,7 +363,8 @@ void WebUIToolbarWebView::AddedToWidget() {
     }
     if (features::IsWebUIExtensionsContainerEnabled()) {
       extensions_container_ = std::make_unique<WebUIToolbarExtensionsContainer>(
-          *browser_, GetWidget(), web_contents()->GetWeakPtr());
+          *browser_, GetWidget(), web_contents()->GetWeakPtr(), &icon_table_,
+          /*push_icon_table_updates=*/false);
       // Register `extensions_container_` as the `ExtensionsContainer` for
       // `browser_`.
       scoped_extensions_container_user_data_ =

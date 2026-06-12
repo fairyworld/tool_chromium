@@ -39,6 +39,7 @@ build_webui("build") {
   mojo_files = [
     "$root_gen_dir/components/browser_apis/browser_controls/browser_controls_api.mojom-webui.ts",
     "$root_gen_dir/components/browser_apis/browser_controls/browser_controls_api_data_model.mojom-webui.ts",
+    "$root_gen_dir/components/browser_apis/ui_controllers/toolbar/extensions_bar.mojom-webui.ts",
     "$root_gen_dir/components/browser_apis/ui_controllers/toolbar/toolbar_ui_api.mojom-webui.ts",
     "$root_gen_dir/components/browser_apis/ui_controllers/toolbar/toolbar_ui_api_data_model.mojom-webui.ts",
   ]
