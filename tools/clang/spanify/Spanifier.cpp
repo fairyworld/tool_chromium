@@ -677,6 +677,23 @@ clang::SourceRange GetExprRange(const clang::Expr& expr,
             ToSpellingLoc(call_expr->getRParenLoc()).getLocWithOffset(1)};
   }
 
+  if (const auto* cast_expr = clang::dyn_cast<clang::ImplicitCastExpr>(&expr)) {
+    // Unwrap implicit casts to find the range of the underlying expression.
+    //
+    // This prevents assertion crashes (`begin_location == end_location`) that
+    // are triggered when a multi-token expression falls back to the default
+    // single-token check.
+    //
+    // For example, in:
+    //   a += b + get_offset();
+    // where `a` is a pointer and `b` is a short, the RHS `b + get_offset()`
+    // is wrapped in an ImplicitCastExpr (IntegralCast to ptrdiff_t).
+    // Unwrapping it allows us to visit the BinaryOperator `b + get_offset()`
+    // and correctly resolve its range:
+    //   `b + get_offset()`
+    return GetExprRange(*cast_expr->getSubExpr(), source_manager, lang_opts);
+  }
+
   if (auto* binary_op = clang::dyn_cast<clang::BinaryOperator>(&expr)) {
     // Disclaimer: This doesn't support edge cases like following.
     //     #define MY_MACRO(arg) arg
