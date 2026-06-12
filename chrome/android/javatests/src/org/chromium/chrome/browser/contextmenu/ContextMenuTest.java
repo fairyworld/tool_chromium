@@ -75,9 +75,9 @@ import org.chromium.chrome.browser.ephemeraltab.EphemeralTabCoordinator;
 import org.chromium.chrome.browser.firstrun.FirstRunStatus;
 import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.flags.ChromeSwitches;
+import org.chromium.chrome.browser.gsa.GSAUtils;
 import org.chromium.chrome.browser.media.PictureInPicture;
 import org.chromium.chrome.browser.share.ChromeShareExtras;
-import org.chromium.chrome.browser.share.LensUtils;
 import org.chromium.chrome.browser.share.ShareDelegate;
 import org.chromium.chrome.browser.share.ShareDelegate.ShareOrigin;
 import org.chromium.chrome.browser.tab.Tab;
@@ -737,7 +737,7 @@ public class ContextMenuTest {
     @Feature({"Browser", "ContextMenu"})
     @RequiresRestart
     public void testContextMenuRetrievesImageOptions() throws TimeoutException {
-        LensUtils.setFakePassableLensEnvironmentForTesting(true);
+        GSAUtils.setFakePassableGsaEnvironmentForTesting(true);
 
         Tab tab = mActivityTestRule.getActivityTab();
         mMenuCoordinator = ContextMenuUtils.openContextMenu(tab, "testImage");
@@ -784,7 +784,7 @@ public class ContextMenuTest {
     @Policies.Add({@Policies.Item(key = "DefaultSearchProviderEnabled", string = "false")})
     public void testContextMenuRetrievesImageOptions_NoDefaultSearchEngineLensEnabled()
             throws TimeoutException {
-        LensUtils.setFakePassableLensEnvironmentForTesting(true);
+        GSAUtils.setFakePassableGsaEnvironmentForTesting(true);
 
         Tab tab = mActivityTestRule.getActivityTab();
         mMenuCoordinator = ContextMenuUtils.openContextMenu(tab, "testImage");
@@ -807,7 +807,7 @@ public class ContextMenuTest {
     @SmallTest
     @Feature({"Browser", "ContextMenu"})
     public void testContextMenuRetrievesImageLinkOptions() throws TimeoutException {
-        LensUtils.setFakePassableLensEnvironmentForTesting(true);
+        GSAUtils.setFakePassableGsaEnvironmentForTesting(true);
 
         Tab tab = mActivityTestRule.getActivityTab();
         mMenuCoordinator = ContextMenuUtils.openContextMenu(tab, "testImageLink");
@@ -869,7 +869,7 @@ public class ContextMenuTest {
     public void testSearchImageWithGoogleLensMenuItemName() throws Throwable {
         Tab tab = mActivityTestRule.getActivityTab();
 
-        LensUtils.setFakePassableLensEnvironmentForTesting(true);
+        GSAUtils.setFakePassableGsaEnvironmentForTesting(true);
         hardcodeTestImageForSharing(TEST_JPG_IMAGE_FILE_EXTENSION);
 
         mMenuCoordinator = ContextMenuUtils.openContextMenu(tab, "testImage");
