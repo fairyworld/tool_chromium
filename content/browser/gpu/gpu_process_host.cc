@@ -1133,6 +1133,8 @@ void GpuProcessHost::DidInitialize(
                                            gpu_feature_info_for_hardware_gpu);
     gpu_data_manager->UpdateGpuInfo(gpu_info, gpu_info_for_hardware_gpu);
     gpu_data_manager->UpdateGpuExtraInfo(gpu_extra_info);
+    // The GPU process might change the actual GpuMode after initialization.
+    mode_ = gpu_data_manager->GetGpuMode();
   }
 
 #if BUILDFLAG(IS_ANDROID)
