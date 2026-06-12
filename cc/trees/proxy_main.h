@@ -6,11 +6,13 @@
 #define CC_TREES_PROXY_MAIN_H_
 
 #include <memory>
+#include <string_view>
 #include <vector>
 
 #include "base/memory/raw_ptr.h"
 #include "base/task/single_thread_task_runner.h"
 #include "base/time/time.h"
+#include "base/timer/elapsed_timer.h"
 #include "base/types/optional_ref.h"
 #include "cc/cc_export.h"
 #include "cc/input/browser_controls_offset_tag_modifications.h"
@@ -59,6 +61,10 @@ class CC_EXPORT ProxyMain : public Proxy {
   void RequestNewLayerTreeFrameSink();
   void DidInitializeLayerTreeFrameSink(bool success);
   void DidCompletePageScaleAnimation();
+  void RecordBeginMainFrameMetrics(
+      const std::bitset<BeginMainFrameReasonSize>& reasons,
+      const base::ElapsedTimer& timer,
+      std::string_view suffix) const;
   void BeginMainFrame(
       std::unique_ptr<BeginMainFrameAndCommitState> begin_main_frame_state);
   void DidChangeBeginFrameSourcePaused(bool paused);
@@ -178,6 +184,8 @@ class CC_EXPORT ProxyMain : public Proxy {
   void set_begin_main_frame_reason(const BeginMainFrameReason reason) {
     begin_main_frame_reason_.set(static_cast<int>(reason));
   }
+
+  bool IsEmbeddedFrame() const;
 
   raw_ptr<LayerTreeHost> layer_tree_host_;
 
