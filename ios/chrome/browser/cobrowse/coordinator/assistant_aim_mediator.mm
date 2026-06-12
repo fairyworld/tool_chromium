@@ -42,19 +42,22 @@
 #import "ios/web/public/web_client.h"
 #import "ios/web/public/web_state.h"
 #import "ios/web/public/web_state_delegate_bridge.h"
+#import "ios/web/public/web_state_observer_bridge.h"
 #import "net/base/apple/url_conversions.h"
 #import "third_party/lens_server_proto/aim_communication.pb.h"
 #import "url/gurl.h"
 
 @interface AssistantAIMMediator () <CRWWebStatePolicyDecider,
                                     CRWWebFramesManagerObserver,
-                                    CRWWebStateDelegate>
+                                    CRWWebStateDelegate,
+                                    CRWWebStateObserver>
 @end
 
 @implementation AssistantAIMMediator {
   std::unique_ptr<web::WebState> _webState;
   std::unique_ptr<web::WebStatePolicyDeciderBridge> _policyDeciderBridge;
   std::unique_ptr<web::WebStateDelegateBridge> _webStateDelegateBridge;
+  std::unique_ptr<web::WebStateObserverBridge> _webStateObserverBridge;
   __weak id<AssistantAIMConsumer> _consumer;
   CobrowseContext* _context;
   id<AssistantContainerCommands> _containerHandler;
@@ -93,6 +96,9 @@
     _webState->SetUserAgentOverride(
         web::GetWebClient()->GetUserAgent(web::UserAgentType::MOBILE) + " " +
         contextual_tasks::GetContextualTasksUserAgentSuffix());
+    _webStateObserverBridge =
+        std::make_unique<web::WebStateObserverBridge>(self);
+    _webState->AddObserver(_webStateObserverBridge.get());
     _webStateDelegateBridge =
         std::make_unique<web::WebStateDelegateBridge>(self);
     _webState->SetDelegate(_webStateDelegateBridge.get());
@@ -153,6 +159,9 @@
         ->GetWebFramesManager(_webState.get())
         ->RemoveObserver(_webFramesManagerObserverBridge.get());
     _webFramesManagerObserverBridge.reset();
+  }
+  if (_webState) {
+    _webState->RemoveObserver(_webStateObserverBridge.get());
   }
   _webState.reset();
   _urlLoader = nullptr;
@@ -463,6 +472,28 @@
 
 - (const std::optional<std::vector<lens::FeatureCapability>>&)capabilities {
   return _capabilities;
+}
+
+#pragma mark - CRWWebStateObserver
+
+- (void)webState:(web::WebState*)webState
+    didFinishNavigation:(web::NavigationContext*)navigationContext {
+  CobrowseContext* context =
+      [[CobrowseContext alloc] initWithURL:webState->GetVisibleURL()];
+  if (context.searchQuery) {
+    [_consumer setHeaderTitle:context.searchQuery];
+  } else {
+    [_consumer setHeaderTitle:@""];
+  }
+}
+
+- (void)webStateDestroyed:(web::WebState*)webState {
+  //  DCHECK_EQ(_webState, webState);
+  if (_webState) {
+    _webState->RemoveObserver(_webStateObserverBridge.get());
+    _webState.reset();
+  }
+  _webStateObserverBridge.reset();
 }
 
 @end

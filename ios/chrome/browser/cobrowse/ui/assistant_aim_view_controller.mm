@@ -285,6 +285,10 @@ constexpr CGFloat kThresholdForCompleteVisibility = 0.3;
   [_historyViewController updateHistoryItems:items];
 }
 
+- (void)setHeaderTitle:(NSString*)title {
+  [_headerView setTitle:title];
+}
+
 #pragma mark - AssistantAIMHistoryViewControllerDelegate
 
 - (void)assistantAIMHistoryViewControllerDidTapDismiss:
@@ -471,8 +475,6 @@ constexpr CGFloat kThresholdForCompleteVisibility = 0.3;
   _headerView = [[AssistantAIMHeaderView alloc] init];
   _headerView.actionHandler = _mutator;
   _headerView.translatesAutoresizingMaskIntoConstraints = NO;
-  // TODO(crbug.com/492442806): Update title.
-  [_headerView setTitle:@"Commuter Bike"];
   _headerView.delegate = self;
   [self.view addSubview:_headerView];
 

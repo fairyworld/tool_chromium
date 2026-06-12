@@ -21,6 +21,9 @@
 - (void)displayHistoryWithItems:
     (const std::vector<AssistantAIMHistoryItem>&)items;
 
+// Sets the header title.
+- (void)setHeaderTitle:(NSString*)title;
+
 @end
 
 #endif  // IOS_CHROME_BROWSER_COBROWSE_UI_ASSISTANT_AIM_CONSUMER_H_
