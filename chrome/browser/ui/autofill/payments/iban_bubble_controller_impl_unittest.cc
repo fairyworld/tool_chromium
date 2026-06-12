@@ -7,6 +7,8 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/with_feature_override.h"
 #include "chrome/browser/ui/autofill/autofill_bubble_base.h"
+#include "chrome/browser/ui/autofill/autofill_bubble_handler.h"
+#include "chrome/browser/ui/autofill/test/test_autofill_bubble_handler.h"
 #include "chrome/test/base/browser_with_test_window_test.h"
 #include "components/autofill/core/browser/data_model/payments/iban.h"
 #include "components/autofill/core/browser/metrics/payments/iban_metrics.h"
@@ -17,6 +19,7 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/l10n/l10n_util.h"
+#include "ui/base/unowned_user_data/scoped_unowned_user_data.h"
 
 namespace autofill {
 
@@ -50,7 +53,15 @@ class IbanBubbleControllerImplTest : public base::test::WithFeatureOverride,
     AddTab(browser(), GURL("about:blank"));
     content::WebContents* web_contents =
         browser()->tab_strip_model()->GetActiveWebContents();
+    scoped_autofill_bubble_handler_ = std::make_unique<
+        ui::ScopedUnownedUserData<autofill::AutofillBubbleHandler>>(
+        browser()->GetUnownedUserDataHost(), test_autofill_bubble_handler_);
     TestIbanBubbleControllerImpl::CreateForTesting(web_contents);
+  }
+
+  void TearDown() override {
+    scoped_autofill_bubble_handler_.reset();
+    BrowserWithTestWindowTest::TearDown();
   }
 
   void ShowLocalSaveBubble(const Iban& iban) {
@@ -102,6 +113,9 @@ class IbanBubbleControllerImplTest : public base::test::WithFeatureOverride,
   }
 
   std::u16string_view saved_nickname_;
+  autofill::TestAutofillBubbleHandler test_autofill_bubble_handler_;
+  std::unique_ptr<ui::ScopedUnownedUserData<autofill::AutofillBubbleHandler>>
+      scoped_autofill_bubble_handler_;
   base::WeakPtrFactory<IbanBubbleControllerImplTest> weak_ptr_factory_{this};
 };
 

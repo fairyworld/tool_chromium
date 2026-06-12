@@ -171,6 +171,7 @@ source_set("autofill") {
 source_set("impl") {
   sources = [
     "autofill_bubble_controller_base.cc",
+    "autofill_bubble_handler.cc",
     "autofill_client_provider.cc",
     "autofill_client_provider_factory.cc",
     "autofill_popup_hide_helper.cc",

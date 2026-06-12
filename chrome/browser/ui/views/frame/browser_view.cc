@@ -5050,7 +5050,7 @@ void BrowserView::AddedToWidget() {
   // be constructed following the check above.
   autofill_bubble_handler_ =
       std::make_unique<autofill::AutofillBubbleHandlerImpl>(
-          toolbar_button_provider);
+          browser_.get(), toolbar_button_provider);
 
 #if !BUILDFLAG(IS_CHROMEOS)
   if (auto* controller = DownloadToolbarUIController::From(browser_.get())) {
