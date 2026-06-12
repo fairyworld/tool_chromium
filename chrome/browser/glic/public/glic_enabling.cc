@@ -1087,6 +1087,12 @@ GlicEnabling::GetGeminiEnterpriseSettings(Profile* profile) {
     }
   }
 
+  auto* actor_service = actor::ActorKeyedService::Get(profile);
+  if (!actor_service || !GlicActorPolicyChecker::IsEnterpriseAccount(
+                            *profile, actor_service->GetJournal())) {
+    return std::nullopt;
+  }
+
   const base::DictValue& pref_dict =
       profile->GetPrefs()->GetDict(glic::prefs::kGlicGeminiEnterpriseSettings);
   return ParseGeminiEnterpriseSettings(pref_dict);

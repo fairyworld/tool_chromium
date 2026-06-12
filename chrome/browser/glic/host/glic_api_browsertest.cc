@@ -636,7 +636,9 @@ class GlicApiTestGeminiEnterpriseSettingsDisabled
 
 class GlicApiTestGeminiEnterpriseSettingsPolicy : public GlicApiTestWithOneTab {
  public:
-  GlicApiTestGeminiEnterpriseSettingsPolicy() {
+  GlicApiTestGeminiEnterpriseSettingsPolicy()
+      : GlicApiTestWithOneTab(GlicTestEnvironmentConfig{
+            .default_account_hosted_domain = "enterprise.com"}) {
     scoped_feature_list_.InitAndEnableFeature(
         features::kGlicGeminiEnterpriseSettingsEnabled);
   }
