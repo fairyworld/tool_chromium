@@ -3022,6 +3022,7 @@ Gå til <ph name="BEGIN_LINK" />betalingsinnstillingene<ph name="END_LINK" /> fo
 <translation id="5718601519531438273">Inkluderer informasjon som pass og førerkort</translation>
 <translation id="5720705177508910913">Gjeldende bruker</translation>
 <translation id="5720895412771013401">Stasjonære datamaskiner</translation>
+<translation id="5721147290164931316">Skann for å logge på med telefonen</translation>
 <translation id="5721367770070844253">{count,plural, =1{{website_1}}=2{{website_1} og {website_2}}=3{{website_1}, {website_2} og 1 til}other{{website_1}, {website_2} og {more_count} til}}</translation>
 <translation id="572328651809341494">Nylige faner</translation>
 <translation id="5723873695528696965">kontrollere og omprogrammere MIDI-enhetene dine</translation>
@@ -4269,6 +4270,7 @@ Gå til <ph name="BEGIN_LINK" />betalingsinnstillingene<ph name="END_LINK" /> fo
 <translation id="7646681339175747202">Passordet du nettopp brukte, er funnet i et databrudd. Google Passordlagring anbefaler at du endrer passordet nå.</translation>
 <translation id="7647206758853451655">Utskriftskvalitet</translation>
 <translation id="7648133459447652947">For å vise markøren, bytt app, last inn siden på nytt eller gå tilbake</translation>
+<translation id="764847582138410250">Skann for å logge på med telefonen</translation>
 <translation id="7648527891719919697">Dette nettstedet forblir blokkert fordi du har Avansert beskyttelse påslått i <ph name="BEGIN_ANDROID_SETTINGS_LINK" />Android-innstillingene<ph name="END_ANDROID_SETTINGS_LINK" />. <ph name="BEGIN_LEARN_MORE_LINK" />Finn ut mer om denne advarselen<ph name="END_LEARN_MORE_LINK" /></translation>
 <translation id="7648900539798595789">Lagre Known Traveler Number i Google Wallet</translation>
 <translation id="7648992873808071793">lagre filer på denne enheten</translation>

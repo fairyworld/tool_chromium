@@ -117,6 +117,7 @@
 <translation id="1373120905936431262">上傳圖片，使用 Nano Banana 改造</translation>
 <translation id="1377508275003315939">密碼</translation>
 <translation id="1381022135873211423">{count,plural, =1{第 {position} 個地址，共 {count} 個}other{第 {position} 個地址，共 {count} 個}}</translation>
+<translation id="13813615483058219">發生錯誤，請檢查網際網路連線、調高音量或再試一次。</translation>
 <translation id="1383876407941801731">搜尋</translation>
 <translation id="138618066238211776">以<ph name="USER_NAME" />的身分繼續</translation>
 <translation id="138692594145659985">卡片儲存選項</translation>
@@ -1135,6 +1136,7 @@
 <translation id="4896467949657706481">系統已關閉分頁並將你登出</translation>
 <translation id="4911042367886397055"><ph name="USER_NAME" />，歡迎回來！</translation>
 <translation id="4913626501929406101">你可以安全地分享密碼副本給家庭群組的成員。<ph name="BEGIN_LINK" />瞭解詳情<ph name="END_LINK" /></translation>
+<translation id="4916679969857390442">透鏡</translation>
 <translation id="4917025507570489430">登入 <ph name="USER_EMAIL" /> 後，就能使用現有的瀏覽資料。貴機構可能會看到這些資料。</translation>
 <translation id="4918086044614829423">接受</translation>
 <translation id="4930714375720679147">開啟</translation>

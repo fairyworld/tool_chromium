@@ -539,6 +539,17 @@ Algumas funcionalidades podem não estar disponíveis. Especifique um diretório
 <translation id="6896758677409633944">Copiar</translation>
 <translation id="6901631050894301805">Defina o Chromium como o navegador predefinido e afixe-o à barra de tarefas</translation>
 <translation id="6909503629704372277">&amp;Gerir perfis do Chromium</translation>
+<translation id="6919942714452658456">Esta ação vai:
+          <ph name="LINE_BREAKS" />
+            • Repor a página inicial, a página Novo separador, o motor de pesquisa e os separadores fixos
+            <ph name="LINE_BREAK" />
+            • Desativar extensões
+            <ph name="LINE_BREAK" />
+            • Eliminar cookies e outros dados temporários de sites
+            <ph name="LINE_BREAK" />
+            • Repor os atalhos do Chromium
+            <ph name="LINE_BREAKS" />
+            Os marcadores, o histórico e as palavras-passe guardadas não serão afetados.</translation>
 <translation id="6934579572334859869">Pergunte à pesquisa de imagens acerca desta imagem</translation>
 <translation id="6948031725951063910">Atingiu o limite de <ph name="BOOKMARK_LIMIT" /> marcadores do Chromium, por isso, alguns dos seus marcadores ainda não foram guardados na sua Conta Google.
 
@@ -720,6 +731,15 @@ O Chromium não consegue recuperar as suas definições.</translation>
 <translation id="8907580949721785412">O Chromium está a tentar mostrar palavras-passe. Escreva a sua palavra-passe do Windows para permitir esta ação.</translation>
 <translation id="8932992523185907506">O Chromium já não é o seu navegador predefinido. Definir o Chromium como navegador predefinido?</translation>
 <translation id="8941642502866065432">Não é possível atualizar o Chromium.</translation>
+<translation id="8944232836376404813">Esta ação vai:
+          <ph name="LINE_BREAKS" />
+            • Repor a página inicial, a página Novo separador, o motor de pesquisa e os separadores fixos
+            <ph name="LINE_BREAK" />
+            • Desativar extensões
+            <ph name="LINE_BREAK" />
+            • Eliminar cookies e outros dados temporários de sites
+            <ph name="LINE_BREAKS" />
+            Os marcadores, o histórico e as palavras-passe guardadas não serão afetados.</translation>
 <translation id="897581876605952338">Logótipo do Chromium Enterprise</translation>
 <translation id="8981150672034878610">Não é possível iniciar o Chromium porque algo correu mal ao abrir o seu perfil. Experimente reiniciar o Chromium.</translation>
 <translation id="8988036198400390003">Gerir perfis do Chromium</translation>

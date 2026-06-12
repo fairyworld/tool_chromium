@@ -117,6 +117,7 @@
 <translation id="1373120905936431262">‏‫Nano Banana کے ساتھ ریمکس کرنے کے لیے کوئی تصویر اپ لوڈ کریں</translation>
 <translation id="1377508275003315939">پاس ورڈز</translation>
 <translation id="1381022135873211423">{count,plural, =1{{count} پتہ میں سے {position}}other{{count} پتے میں سے {position}}}</translation>
+<translation id="13813615483058219">کچھ غلط ہو گیا۔ اپنا انٹرنیٹ کنکشن چیک کریں، اپنا والیوم بڑھائیں یا دوبارہ کوشش کریں۔</translation>
 <translation id="1383876407941801731">تلاش کریں</translation>
 <translation id="138618066238211776">بطور <ph name="USER_NAME" /> جاری رکھیں</translation>
 <translation id="138692594145659985">کارڈ محفوظ کرنے کے اختیارات</translation>
@@ -1135,6 +1136,7 @@
 <translation id="4896467949657706481">ٹیبز بند کیے گئے؛ آپ کو سائن آؤٹ کیا گیا</translation>
 <translation id="4911042367886397055">پھر سے خوش آمدید، <ph name="USER_NAME" />!</translation>
 <translation id="4913626501929406101">آپ اپنے فیملی گروپ میں کسی کے ساتھ اپنے پاس ورڈ کی کاپی کا اشتراک محفوظ طریقے سے کر سکتے ہیں۔ <ph name="BEGIN_LINK" />مزید جانیں<ph name="END_LINK" /></translation>
+<translation id="4916679969857390442">لینز</translation>
 <translation id="4917025507570489430">بطور <ph name="USER_EMAIL" /> سائن ان ہونے پر، آپ موجودہ براؤزنگ ڈیٹا استعمال کر سکتے ہیں۔ آپ کی تنظیم اس ڈیٹا کو دیکھنے کے قابل ہو سکتی ہے۔</translation>
 <translation id="4918086044614829423">قبول کریں</translation>
 <translation id="4930714375720679147">آن کریں</translation>

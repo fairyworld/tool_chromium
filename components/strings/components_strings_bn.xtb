@@ -3023,6 +3023,7 @@
 <translation id="5718601519531438273">পাসপোর্ট ও ড্রাইভিং লাইসেন্সের মতো তথ্য অন্তর্ভুক্ত থাকে</translation>
 <translation id="5720705177508910913">বর্তমান ব্যবহারকারী</translation>
 <translation id="5720895412771013401">ডেস্কটপ কম্পিউটার</translation>
+<translation id="5721147290164931316">ফোন দিয়ে সাইন-ইন করার জন্য স্ক্যান করুন</translation>
 <translation id="5721367770070844253">{count,plural, =1{{website_1}}=2{{website_1}, {website_2}}=3{{website_1}, {website_2} ও আরও ১টি}one{{website_1}, {website_2} ও আরও {more_count}টি}other{{website_1}, {website_2} ও আরও {more_count}টি}}</translation>
 <translation id="572328651809341494">সাম্প্রতিক ট্যাবগুলি</translation>
 <translation id="5723873695528696965">আপনার MIDI ডিভাইস কন্ট্রোল ও রিপ্রোগ্রাম করুন</translation>
@@ -4270,6 +4271,7 @@
 <translation id="7646681339175747202">ডেটা লঙ্ঘনের ঘটনাতে আপনার এইমাত্র ব্যবহার করা পাসওয়ার্ডটি পাওয়া গেছে। Google Password Manager আপনার পাসওয়ার্ড এখনই পরিবর্তন করতে সাজেস্ট করছে।</translation>
 <translation id="7647206758853451655">প্রিন্টের কোয়ালিটি</translation>
 <translation id="7648133459447652947">আপনার কার্সর দেখতে, অ্যাপ পরিবর্তন করুন, পৃষ্ঠাটি আবার লোড করুন অথবা ফিরে যান</translation>
+<translation id="764847582138410250">ফোন দিয়ে সাইন-ইন করার জন্য স্ক্যান করুন</translation>
 <translation id="7648527891719919697">আপনি <ph name="BEGIN_ANDROID_SETTINGS_LINK" />Android সেটিংস<ph name="END_ANDROID_SETTINGS_LINK" /> থেকে উন্নত সুরক্ষা চালু করেছেন বলে এই সাইটটি ব্লক করা থাকবে। <ph name="BEGIN_LEARN_MORE_LINK" />এই সতর্কতা সম্পর্কে আরও জানুন<ph name="END_LEARN_MORE_LINK" /></translation>
 <translation id="7648900539798595789">Google Wallet-এ পরিচিত পর্যটকের নম্বর সেভ করুন</translation>
 <translation id="7648992873808071793">এই ডিভাইসে ফাইলগুলি জমা করুন</translation>

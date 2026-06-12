@@ -301,6 +301,7 @@
 <translation id="1445896388055045436">በክፍያ ማጠናቀቅ ወቅት የሚገኙ የካርድ ጥቅማጥቅሞችን እና ሽልማቶችን ያሳያል። የሰጪ ደንቦች ይተገበራሉ።</translation>
 <translation id="1447067628680007684">(x86_64)</translation>
 <translation id="1448166547804028941">«<ph name="DATA_CONTROLS_FIRST_KEY_SET" />» ቁልፎችን እንደ «<ph name="DATA_CONTROLS_SECOND_KEY_SET" />» ቁልፎች በተመሳሳይ መዝገበ-ቃላት ማቀናበር አይቻልም</translation>
+<translation id="1449251255954293933">የማስተካከያ ቁጥርን Google Wallet ውስጥ ያስቀምጡ</translation>
 <translation id="1455413310270022028">ማጥፊያ</translation>
 <translation id="1457992721081300557">{NUM_REVIEWS,plural, =0{0 ግምገማዎችን ይመልከቱ}=1{1 ግምገማ ይመልከቱ}one{ሁሉንም # ግምገማ ይመልከቱ}other{ሁሉንም # ግምገማዎች ይመልከቱ}}</translation>
 <translation id="1458059624921545588">ሰዎች እና ማህበረሰብ</translation>
@@ -1157,6 +1158,7 @@
 <translation id="2782088940970074970">የመኪና ኪራዮች</translation>
 <translation id="278436560439594386">የቤት መገልገያዎች</translation>
 <translation id="2784474685437057136">B5 Extra</translation>
+<translation id="2784795832957740711">የይለፍ ቃሎች · የይለፍ ቁልፎች</translation>
 <translation id="2784949926578158345">ግንኙነቱ ዳግም እንዲጀምር ተደርጓል።</translation>
 <translation id="2786008859124691917">ብስክሌቶች እና መለዋወጫዎች</translation>
 <translation id="2792012897584536778">የዚህ መሣሪያ አስተዳዳሪዎች እርስዎ የሚጎበኟቸው የድር ጣቢያዎች ይዘትን እንዲያዩ ሊያስችሉ የሚችሉ የደህንነት እውቅና ማረጋገጫዎችን አቀናብረዋል።</translation>
@@ -2306,6 +2308,7 @@
 <translation id="46128681529823442">የእግር ኳስ መሣሪያ</translation>
 <translation id="4612904677925722054">ይህ ጣቢያ የአዋቂ ይዘት ሊኖረው ይችላል። ወላጅ ወይም አሳዳጊ ይህን ድር ጣቢያ ቢጎበኙ ምንም ችግር የለውም ማለት አለባቸው።</translation>
 <translation id="4619564267100705184">እርስዎ መሆንዎን ያረጋግጡ</translation>
+<translation id="4619669610757527494">የመንጃ ፈቃድን Google Wallet ውስጥ ያስቀምጡ</translation>
 <translation id="4622292761762557753">ቢሆንም አስተላልፍ</translation>
 <translation id="4622647778991854660">በማሳወቂያ ማእከል ውስጥ ማሳወቂያዎችን ያንቁ። <ph name="LINK" /> ይክፈቱ።</translation>
 <translation id="4623894491222334521">የማንነት ሰነዶች</translation>
@@ -2835,6 +2838,7 @@
 <translation id="543656192084990644">የእንቅስቃሴ ዳሳሾች አይፈቀዱም</translation>
 <translation id="5441409130426352029"><ph name="ATTRIBUTE_VALUE" />፣ <ph name="PREVIOUS_VALUE" /> ነበር</translation>
 <translation id="5443468954631487277">ተቃራኒ ቅደም-ተከተል ፊቱ ወደ ላይ</translation>
+<translation id="5447103258548475868">ፓስፖርትን Google Wallet ውስጥ ያስቀምጡ</translation>
 <translation id="5447235695608032700">ስለ እርስዎ ያስቀመጡትን መረጃ እንዲጠቀም <ph name="SITE" /> ለሚለው ይፍቀዱ</translation>
 <translation id="5447973833955560753">የመልሶ ማግኛ የይለፍ ቃል</translation>
 <translation id="5451331376824595378">የደህንነት ክስተቶች በChrome ሲጠቆሙ ስለ ክስተቶቹ አግባብነት ያለው ውሂብ ለአስተዳዳሪዎ ይላካል። ይህ በChrome ውስጥ የሚጎበኙትን ገጾች ዩአርኤሎች፣ ውሂብ የገለበጡባቸውን ገጾች ዩአርኤሎች፣ የፋይል ስሞች ወይም ዲበ ውሂብ፣ አይ ፒ አድራሻዎች፣ የአሳሽ ወይም የትር ብልሽቶች፣ እና በድር ላይ ለተመሠረቱ መተግበሪያዎች በመለያ ለመግባት የሚጠቀሙበት የተጠቃሚ ስም፣ መሣሪያዎ እና Chromeን ሊያካትት ይችላል።</translation>
@@ -4236,6 +4240,7 @@
 <translation id="7599089013883397081">የእረፍት ጊዜን በማውረድ ላይ</translation>
 <translation id="7602868996817972616">Googleን ስለዚህ ገፅ ይጠይቁ</translation>
 <translation id="7606123685356405076">የGemini 3 ሞዴሎች</translation>
+<translation id="760632772920590778">ተሽከርካሪን Google Wallet ውስጥ ያስቀምጡ</translation>
 <translation id="7610193165460212391">እሴት ከክልል <ph name="VALUE" /> ውጭ ነው።</translation>
 <translation id="761261689936461781">ወፍራም</translation>
 <translation id="7613889955535752492">የሚያበቃበት ጊዜ፦ <ph name="EXPIRATION_MONTH" />/<ph name="EXPIRATION_YEAR" /></translation>
@@ -4265,6 +4270,7 @@
 <translation id="7647206758853451655">የህትመት ጥራት</translation>
 <translation id="7648133459447652947">ጠቋሚዎን ለማሳየት መተግበሪያዎችን ይቀይሩ፣ ገፁን እንደገና ይጫኑ ወይም ይመለሱ</translation>
 <translation id="7648527891719919697"><ph name="BEGIN_ANDROID_SETTINGS_LINK" />የAndroid ቅንብሮች<ph name="END_ANDROID_SETTINGS_LINK" /> ውስጥ የላቀ ጥበቃን ስላበሩ ይህ ጣቢያ እንደታገደ ይቆያል። <ph name="BEGIN_LEARN_MORE_LINK" />ስለዚህ ማስጠንቀቂያ የበለጠ ይወቁ<ph name="END_LEARN_MORE_LINK" /></translation>
+<translation id="7648900539798595789">የሚታወቅ የተጓዥ ቁጥርን Google Wallet ውስጥ ያስቀምጡ</translation>
 <translation id="7648992873808071793">በዚህ መሣሪያ ላይ ፋይሎችን አከማች</translation>
 <translation id="7649070708921625228">እገዛ</translation>
 <translation id="7650141368285545431">የይለፍ ቁልፍን ከሌላ መሣሪያ ይጠቀሙ</translation>
@@ -4357,6 +4363,7 @@
 <translation id="7773005668374414287">ተመሳሳይ ቅደም-ተከተል ፊቱ ወደ ላይ</translation>
 <translation id="7779418012194492374">ለ<ph name="DEVICE_NAME" /> መዳረሻን ሻር</translation>
 <translation id="7781829728241885113">ትናንት</translation>
+<translation id="7782228658217918863">የመታወቂያ ካርድን Google Wallet ውስጥ ያስቀምጡ</translation>
 <translation id="7782465647372057580">የመለያ መረጃ የተመሰጠረ እና የግል ነው</translation>
 <translation id="7785471469930192436">መተግበር የሚችል ከሆነ የፍለጋ ታሪክዎን ለመሰረዝ የፍለጋ ፕሮግራምዎን መመሪያዎች ይመልከቱ።</translation>
 <translation id="7785790577395078482">ይህ ጡባዊ</translation>

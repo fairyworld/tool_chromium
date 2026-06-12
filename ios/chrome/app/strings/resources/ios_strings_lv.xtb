@@ -117,6 +117,7 @@
 <translation id="1373120905936431262">Augšupielādējiet attēlu, ko remiksēt, izmantojot Nano Banana</translation>
 <translation id="1377508275003315939">Paroles</translation>
 <translation id="1381022135873211423">{count,plural, =1{Numur {position}. Kopējais adrešu skaits ir {count}}zero{Numur {position}. Kopējais adrešu skaits ir {count}}one{Numur {position}. Kopējais adrešu skaits ir {count}}other{Numur {position}. Kopējais adrešu skaits ir {count}}}</translation>
+<translation id="13813615483058219">Radās kļūda. Pārbaudiet interneta savienojumu, palieliniet skaļumu vai mēģiniet vēlreiz.</translation>
 <translation id="1383876407941801731">Meklēt</translation>
 <translation id="138618066238211776">Turpināt ar lietotāja <ph name="USER_NAME" /> kontu</translation>
 <translation id="138692594145659985">Kartītes saglabāšanas iespējas</translation>
@@ -1135,6 +1136,7 @@
 <translation id="4896467949657706481">Cilnes tika aizvērtas; jūs tikāt izrakstīts</translation>
 <translation id="4911042367886397055">Laipni lūdzam atpakaļ, <ph name="USER_NAME" />!</translation>
 <translation id="4913626501929406101">Varat droši kopīgot paroles kopiju ar kādu ģimenes grupas dalībnieku. <ph name="BEGIN_LINK" />Uzziniet vairāk<ph name="END_LINK" />.</translation>
+<translation id="4916679969857390442">Lēca</translation>
 <translation id="4917025507570489430">Varat izmantot esošos pārlūkošanas datus, kad esat pierakstījies kā <ph name="USER_EMAIL" />. Iespējams, jūsu organizācija varēs skatīt šos datus.</translation>
 <translation id="4918086044614829423">Pieņemt</translation>
 <translation id="4930714375720679147">Ieslēgt</translation>

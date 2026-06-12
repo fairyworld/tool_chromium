@@ -60,6 +60,17 @@
 <translation id="1587223624401073077">O Google Chrome está a utilizar a câmara.</translation>
 <translation id="1587325591171447154"><ph name="FILE_NAME" /> é perigoso, por isso o Chrome bloqueou-o.</translation>
 <translation id="1597911401261118146">Para verificar se as suas palavras-passe estão protegidas contra violação de dados e outros problemas de segurança, <ph name="BEGIN_LINK" />inicie sessão no Chrome<ph name="END_LINK" />.</translation>
+<translation id="1619639070275605589">Esta ação vai:
+          <ph name="LINE_BREAKS" />
+            • Repor a página inicial, a página Novo separador, o motor de pesquisa e os separadores fixos
+            <ph name="LINE_BREAK" />
+            • Desativar extensões
+            <ph name="LINE_BREAK" />
+            • Eliminar cookies e outros dados temporários de sites
+            <ph name="LINE_BREAK" />
+            • Repor os atalhos do Chrome
+            <ph name="LINE_BREAKS" />
+            Os marcadores, o histórico e as palavras-passe guardadas não serão afetados.</translation>
 <translation id="1619887657840448962">Para tornar o Chrome mais seguro, desativámos a seguinte extensão, que não está listada na <ph name="IDS_EXTENSION_WEB_STORE_TITLE" />, e é possível que tenha sido adicionada sem o seu conhecimento.</translation>
 <translation id="1628000112320670027">Obter ajuda relacionada com o Chrome</translation>
 <translation id="1640672724030957280">A transferir...</translation>
@@ -773,6 +784,15 @@ Não é possível guardar novos marcadores na sua conta até eliminar alguns. Se
 <translation id="8922998289262614701">Remover os dados desta app do Chrome</translation>
 <translation id="8925636929359899517">Usamos as informações para melhorar este serviço. Consulte a <ph name="BEGIN_LINK1" />Política de Privacidade<ph name="END_LINK1" /> e os <ph name="BEGIN_LINK2" />Termos de Utilização<ph name="END_LINK2" />.</translation>
 <translation id="8936233353620149764">Ativar/desativar o Gemini no Chrome</translation>
+<translation id="8944232836376404813">Esta ação vai:
+          <ph name="LINE_BREAKS" />
+            • Repor a página inicial, a página Novo separador, o motor de pesquisa e os separadores fixos
+            <ph name="LINE_BREAK" />
+            • Desativar extensões
+            <ph name="LINE_BREAK" />
+            • Eliminar cookies e outros dados temporários de sites
+            <ph name="LINE_BREAKS" />
+            Os marcadores, o histórico e as palavras-passe guardadas não serão afetados.</translation>
 <translation id="8948460679427074738">Esta extensão não publicou Práticas de Privacidade, por exemplo, a forma como recolhe e usa os dados. O Chrome recomenda que a remova.</translation>
 <translation id="8958307504142971576">Agora, tem mais funcionalidades disponíveis no Chrome</translation>
 <translation id="8991530961471831170">Abrir Gemini no Chrome</translation>

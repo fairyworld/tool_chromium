@@ -3018,6 +3018,7 @@ Gå til <ph name="BEGIN_LINK" />betalingsindstillingerne<ph name="END_LINK" /> f
 <translation id="5718601519531438273">Dette omfatter oplysninger såsom pas og kørekort</translation>
 <translation id="5720705177508910913">Aktuel bruger</translation>
 <translation id="5720895412771013401">Stationære computere</translation>
+<translation id="5721147290164931316">Scan for at logge ind med din telefon</translation>
 <translation id="5721367770070844253">{count,plural, =1{{website_1}}=2{{website_1}, {website_2}}=3{{website_1}, {website_2} og 1 mere}one{{website_1}, {website_2} og {more_count} mere}other{{website_1}, {website_2} og {more_count} mere}}</translation>
 <translation id="572328651809341494">Seneste faner</translation>
 <translation id="5723873695528696965">Styre og omprogrammere dine MIDI-enheder</translation>
@@ -4265,6 +4266,7 @@ Yderligere oplysninger:
 <translation id="7646681339175747202">Den adgangskode, du lige har brugt, er blevet lækket i forbindelse med et brud på datasikkerheden. Google Adgangs­kode­admin­istrator anbefaler, at du ændrer din adgangskode med det samme.</translation>
 <translation id="7647206758853451655">Udskriftskvalitet</translation>
 <translation id="7648133459447652947">Hvis du vil have vist markøren igen, skal du skifte app, genindlæse siden eller gå tilbage</translation>
+<translation id="764847582138410250">Scan for at logge ind med din telefon</translation>
 <translation id="7648527891719919697">Dette website forbliver blokeret, fordi Avanceret beskyttelse er aktiveret i <ph name="BEGIN_ANDROID_SETTINGS_LINK" />Android-indstillingerne<ph name="END_ANDROID_SETTINGS_LINK" />. <ph name="BEGIN_LEARN_MORE_LINK" />Få flere oplysninger om denne advarsel<ph name="END_LEARN_MORE_LINK" /></translation>
 <translation id="7648992873808071793">Gemme filer på denne enhed</translation>
 <translation id="7649070708921625228">Hjælp</translation>

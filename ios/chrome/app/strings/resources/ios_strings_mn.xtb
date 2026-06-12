@@ -117,6 +117,7 @@
 <translation id="1373120905936431262">Nano Banana-р ремикс хийхийн тулд зураг байршуулаарай</translation>
 <translation id="1377508275003315939">Нууц үг</translation>
 <translation id="1381022135873211423">{count,plural, =1{{count}-н {position}-р хаяг}other{{count}-н {position}-р хаяг}}</translation>
+<translation id="13813615483058219">Ямар нэг алдаа гарлаа. Интернэт холболтоо шалгаж, дуугаа чангалах эсвэл дахин оролдоно уу.</translation>
 <translation id="1383876407941801731">Хайлт</translation>
 <translation id="138618066238211776"><ph name="USER_NAME" />-р үргэлжлүүлэх</translation>
 <translation id="138692594145659985">Карт хадгалах сонголтууд</translation>
@@ -1135,6 +1136,7 @@
 <translation id="4896467949657706481">Табуудыг хаасан; таныг гаргасан</translation>
 <translation id="4911042367886397055">Эргээд тавтай морилно уу <ph name="USER_NAME" />!</translation>
 <translation id="4913626501929406101">Та нууц үгнийхээ хуулбарыг гэр бүлийн бүлэгтээ байгаа хэн нэгэнтэй аюулгүй хуваалцах боломжтой. <ph name="BEGIN_LINK" />Нэмэлт мэдээлэл авах<ph name="END_LINK" /></translation>
+<translation id="4916679969857390442">Lens</translation>
 <translation id="4917025507570489430">Та <ph name="USER_EMAIL" />-р нэвтэрсэн үедээ одоо байгаа интернэтээр үзсэн өгөгдлийг ашиглах боломжтой. Танай байгууллага энэ өгөгдлийг үзэх боломжтой байж болзошгүй.</translation>
 <translation id="4918086044614829423">Хүлээн зөвшөөрөх</translation>
 <translation id="4930714375720679147">Асаах</translation>

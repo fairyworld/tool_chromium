@@ -117,6 +117,7 @@
 <translation id="1373120905936431262">Upload et billede, der skal remixes med Nano Banana</translation>
 <translation id="1377508275003315939">Adgangskoder</translation>
 <translation id="1381022135873211423">{count,plural, =1{{position} af {count} adresse}one{{position} af {count} adresse}other{{position} af {count} adresser}}</translation>
+<translation id="13813615483058219">Noget gik galt. Tjek din internetforbindelse, øg lydstyrken, eller prøv igen.</translation>
 <translation id="1383876407941801731">Søg</translation>
 <translation id="138618066238211776">Fortsæt som <ph name="USER_NAME" /></translation>
 <translation id="138692594145659985">Valgmuligheder for at gemme kort</translation>
@@ -1135,6 +1136,7 @@
 <translation id="4896467949657706481">Fanerne er blevet lukket: Du er blevet logget ud</translation>
 <translation id="4911042367886397055">Velkommen tilbage, <ph name="USER_NAME" />.</translation>
 <translation id="4913626501929406101">Du kan på sikker vis dele en kopi af din adgangskode med en anden i din familiegruppe. <ph name="BEGIN_LINK" />Få flere oplysninger<ph name="END_LINK" /></translation>
+<translation id="4916679969857390442">Objektiv</translation>
 <translation id="4917025507570489430">Du kan bruge eksisterende browserdata, når du er logget ind som <ph name="USER_EMAIL" />. Din organisation kan muligvis se disse data.</translation>
 <translation id="4918086044614829423">Accepter</translation>
 <translation id="4930714375720679147">Aktivér</translation>

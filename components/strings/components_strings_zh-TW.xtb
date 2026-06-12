@@ -301,6 +301,7 @@
 <translation id="1445896388055045436">結帳時顯示可用的卡片福利和獎勵 (適用發卡機構的條款規定)。</translation>
 <translation id="1447067628680007684">(x86_64)</translation>
 <translation id="1448166547804028941">「<ph name="DATA_CONTROLS_SECOND_KEY_SET" />」鍵無法在相同的字典中設為「<ph name="DATA_CONTROLS_FIRST_KEY_SET" />」鍵</translation>
+<translation id="1449251255954293933">將檢核號碼 (redress number) 儲存到 Google 錢包</translation>
 <translation id="1455413310270022028">橡皮擦</translation>
 <translation id="1457992721081300557">{NUM_REVIEWS,plural, =0{查看 0 則評論}=1{查看 1 則評論}other{查看全部 # 則評論}}</translation>
 <translation id="1458059624921545588">人文與社會</translation>
@@ -1156,6 +1157,7 @@
 <translation id="2782088940970074970">租車</translation>
 <translation id="278436560439594386">家電</translation>
 <translation id="2784474685437057136">B5 Extra</translation>
+<translation id="2784795832957740711">密碼 · 密碼金鑰</translation>
 <translation id="2784949926578158345">連線已重設。</translation>
 <translation id="2786008859124691917">腳踏車與配件</translation>
 <translation id="2792012897584536778">這個裝置的系統管理員已設定安全憑證，這些憑證將允許系統管理員檢視你所造訪的網站內容。</translation>
@@ -2305,6 +2307,7 @@
 <translation id="46128681529823442">足球裝備</translation>
 <translation id="4612904677925722054">這個網站可能含有兒童不宜的內容。你必須獲得家長或監護人許可，才能造訪這個網站。</translation>
 <translation id="4619564267100705184">驗證身分</translation>
+<translation id="4619669610757527494">將駕照儲存到 Google 錢包</translation>
 <translation id="4622292761762557753">仍要轉移</translation>
 <translation id="4622647778991854660">請前往通知中心啟用通知。開啟<ph name="LINK" />。</translation>
 <translation id="4623894491222334521">身分證明文件</translation>
@@ -2834,6 +2837,7 @@
 <translation id="543656192084990644">不允許使用動作感應器</translation>
 <translation id="5441409130426352029"><ph name="ATTRIBUTE_VALUE" />，原本為：<ph name="PREVIOUS_VALUE" /></translation>
 <translation id="5443468954631487277">相反順序 (正面朝上)</translation>
+<translation id="5447103258548475868">將護照儲存到 Google 錢包</translation>
 <translation id="5447235695608032700">允許 <ph name="SITE" /> 使用與你相關的既有資訊</translation>
 <translation id="5447973833955560753">備援密碼</translation>
 <translation id="5451331376824595378">Chrome 在標記安全性事件時，會將事件相關資料傳送給系統管理員，內容可能包括你在 Chrome 中造訪的網頁網址、複製資料的來源網址、檔案名稱或中繼資料、IP 位址、瀏覽器或分頁當機相關資料，以及用於登入網頁應用程式、裝置和 Chrome 的使用者名稱。</translation>
@@ -3016,6 +3020,7 @@
 <translation id="5718601519531438273">提供護照和駕照等資訊</translation>
 <translation id="5720705177508910913">目前使用者</translation>
 <translation id="5720895412771013401">桌上型電腦</translation>
+<translation id="5721147290164931316">掃描即可使用手機登入</translation>
 <translation id="5721367770070844253">{count,plural, =1{{website_1}}=2{{website_1}、{website_2}}=3{{website_1}、{website_2} 和另外 1 個}other{{website_1}、{website_2} 和另外 {more_count} 個}}</translation>
 <translation id="572328651809341494">最近開啟的分頁</translation>
 <translation id="5723873695528696965">控制 MIDI 裝置及重設程式</translation>
@@ -4235,6 +4240,7 @@
 <translation id="7599089013883397081">下載作業逾時</translation>
 <translation id="7602868996817972616">問問 Google 這個網頁的內容</translation>
 <translation id="7606123685356405076">Gemini 3 模型</translation>
+<translation id="760632772920590778">將車輛資訊儲存到 Google 錢包</translation>
 <translation id="7610193165460212391">值超出 <ph name="VALUE" /> 的範圍。</translation>
 <translation id="761261689936461781">粗</translation>
 <translation id="7613889955535752492">有效期限：<ph name="EXPIRATION_MONTH" />/<ph name="EXPIRATION_YEAR" /></translation>
@@ -4263,7 +4269,9 @@
 <translation id="7646681339175747202">你剛剛使用的密碼已在資料侵害事件中外洩，Google 密碼管理工具建議你立即變更密碼。</translation>
 <translation id="7647206758853451655">列印品質</translation>
 <translation id="7648133459447652947">如要顯示游標，請切換應用程式、重新載入頁面或返回</translation>
+<translation id="764847582138410250">掃描即可使用手機登入</translation>
 <translation id="7648527891719919697">你已在 <ph name="BEGIN_ANDROID_SETTINGS_LINK" />Android 設定<ph name="END_ANDROID_SETTINGS_LINK" />中開啟進階保護功能，因此這個網站將維持封鎖狀態。<ph name="BEGIN_LEARN_MORE_LINK" />進一步瞭解這項警告<ph name="END_LEARN_MORE_LINK" /></translation>
+<translation id="7648900539798595789">將已知旅客號碼儲存到 Google 錢包</translation>
 <translation id="7648992873808071793">在這個裝置上儲存檔案</translation>
 <translation id="7649070708921625228">說明</translation>
 <translation id="7650141368285545431">使用其他裝置的密碼金鑰</translation>
@@ -4356,6 +4364,7 @@
 <translation id="7773005668374414287">相同順序 (正面朝上)</translation>
 <translation id="7779418012194492374">撤銷「<ph name="DEVICE_NAME" />」的存取權</translation>
 <translation id="7781829728241885113">昨天</translation>
+<translation id="7782228658217918863">將身分證件儲存到 Google 錢包</translation>
 <translation id="7782465647372057580">系統會加密帳戶資訊，妥善保護你的隱私</translation>
 <translation id="7785471469930192436">如要刪除搜尋記錄，請參閱搜尋引擎的相關操作說明 (如果有的話)</translation>
 <translation id="7785790577395078482">這台平板電腦</translation>

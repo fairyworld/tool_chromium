@@ -3016,6 +3016,7 @@ Wenn du die Optionen für „Später bezahlen“ ausblenden möchtest, rufe die 
 <translation id="5718601519531438273">Dazu gehören Informationen wie Reisepässe und Führerscheine</translation>
 <translation id="5720705177508910913">Aktueller Nutzer</translation>
 <translation id="5720895412771013401">Computer</translation>
+<translation id="5721147290164931316">Zum Anmelden mit dem Smartphone scannen</translation>
 <translation id="5721367770070844253">{count,plural, =1{{website_1}}=2{{website_1}, {website_2}}=3{{website_1}, {website_2} und 1 weitere}other{{website_1}, {website_2} und {more_count} weitere}}</translation>
 <translation id="572328651809341494">Zuletzt geöffnete Tabs</translation>
 <translation id="5723873695528696965">MIDI-Geräte steuern und neu programmieren</translation>
@@ -4263,6 +4264,7 @@ Weitere Details:
 <translation id="7646681339175747202">Das eingegebene Passwort wurde in einer Datenpanne gefunden. Der Google Passwortmanager empfiehlt, dieses Passwort jetzt zu ändern.</translation>
 <translation id="7647206758853451655">Druckqualität</translation>
 <translation id="7648133459447652947">Zum Einblenden des Cursors wechsle zu einer anderen App, lade die Seite neu oder gehe zurück</translation>
+<translation id="764847582138410250">Zum Anmelden mit dem Smartphone scannen</translation>
 <translation id="7648527891719919697">Diese Website bleibt gesperrt, weil du das erweiterte Sicherheitsprogramm in den <ph name="BEGIN_ANDROID_SETTINGS_LINK" />Android-Einstellungen<ph name="END_ANDROID_SETTINGS_LINK" /> aktiviert hast. <ph name="BEGIN_LEARN_MORE_LINK" />Weitere Informationen zu dieser Warnung<ph name="END_LEARN_MORE_LINK" /></translation>
 <translation id="7648992873808071793">Dateien auf diesem Gerät speichern</translation>
 <translation id="7649070708921625228">Hilfe</translation>

@@ -7998,6 +7998,7 @@ Mulai <ph name="PRODUCT_NAME" /> 147, kebijakan ini tidak akan digunakan lagi. A
 <translation id="5962271004971310788">Ekstensi yang harus diizinkan berjalan dalam mode Samaran oleh pengguna agar dapat menavigasi dalam mode Samaran</translation>
 <translation id="5963752574792883406">port 990 (blokir dapat dibatalkan hingga 01/02/2022)</translation>
 <translation id="596523880465577341">Kebijakan ini tidak digunakan lagi dan tidak didukung. Sebagai gantinya, gunakan kebijakan '<ph name="EXTENSION_INSTALL_ALLOWLIST_POLICY_NAME" />'.</translation>
+<translation id="5965344524743236327">ID atau nomor project <ph name="GOOGLE_CLOUD_PRODUCT_NAME" /> yang sesuai dengan instance <ph name="GEMINI_ENTERPRISE_PRODUCT_NAME" /> yang akan diaktifkan. Pelajari lebih lanjut project ID di https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects.</translation>
 <translation id="5966615072639944554">Ekstensi yang diizinkan untuk menggunakan API pengesahan jarak jauh</translation>
 <translation id="596732417280023843">Nama profil sertifikat.</translation>
 <translation id="5972538402066550344">Izinkan kontrol pelaporan terperinci</translation>
@@ -8424,6 +8425,7 @@ Jika kebijakan <ph name="ALLOWED_INPUT_METHODS_POLICY_NAME" /> tidak disetel ata
 <translation id="6264247808139384018">Jika kebijakan disetel ke Aktif atau tidak disetel, pengguna yang melakukan autentikasi dengan sandi akan dapat mengunci layar.
 
 Jika kebijakan disetel ke Nonaktif, pengguna tidak dapat mengunci layar. (Pengguna hanya dapat logout dari sesi pengguna).</translation>
+<translation id="6265114688953151459">ID unik mesin <ph name="GEMINI_ENTERPRISE_PRODUCT_NAME" />. Formatnya harus terdiri dari 1—63 karakter yang cocok dengan pola [a-z0-9][a-z0-9-_]*. Pelajari lebih lanjut di https://docs.cloud.google.com/gemini/enterprise/docs/reference/rest/v1/projects.locations.collections.engines#Engine.</translation>
 <translation id="6265892395051519509">Mengizinkan akses ke sensor di situs ini</translation>
 <translation id="6266043141694454734">Menentukan apakah Chrome Root Store dan pemverifikasi sertifikat bawaan akan digunakan untuk memverifikasi sertifikat server</translation>
 <translation id="6266686172120601139">Mengaktifkan buffering adaptif untuk Web Audio</translation>
