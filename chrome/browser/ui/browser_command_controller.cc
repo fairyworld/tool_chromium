@@ -331,16 +331,6 @@ BrowserCommandController::BrowserCommandController(BrowserWindowInterface* bwi)
           &BrowserCommandController::UpdateCommandsForBookmarkBar,
           base::Unretained(this)));
   profile_pref_registrar_.Add(
-      bookmarks::prefs::kShowAppsShortcutInBookmarkBar,
-      base::BindRepeating(
-          &BrowserCommandController::UpdateCommandsForBookmarkBar,
-          base::Unretained(this)));
-  profile_pref_registrar_.Add(
-      bookmarks::prefs::kShowTabGroupsInBookmarkBar,
-      base::BindRepeating(
-          &BrowserCommandController::UpdateCommandsForBookmarkBar,
-          base::Unretained(this)));
-  profile_pref_registrar_.Add(
       policy::policy_prefs::kIncognitoModeAvailability,
       base::BindRepeating(
           &BrowserCommandController::UpdateCommandsForIncognitoAvailability,
@@ -1136,12 +1126,6 @@ bool BrowserCommandController::ExecuteCommandWithDisposition(
     case IDC_BOOKMARK_BAR_SUBMENU_ONLY_ON_NTP:
       SetBookmarkBarVisibilityState(
           browser_, bookmarks::BookmarkBarVisibilityState::kOnlyShowOnNtp);
-      break;
-    case IDC_BOOKMARK_BAR_SHOW_APPS_SHORTCUT:
-      ToggleShowAppsShortcutInBookmarkBar(browser_);
-      break;
-    case IDC_BOOKMARK_BAR_TOGGLE_SHOW_TAB_GROUPS:
-      ToggleShowTabGroupsInBookmarkBar(browser_);
       break;
     case IDC_SHOW_FULL_URLS:
       ToggleShowFullURLs(browser_);
@@ -2235,14 +2219,6 @@ void BrowserCommandController::UpdateCommandsForBookmarkBar() {
                                         visibility_commands_enabled);
   command_updater_.UpdateCommandEnabled(IDC_BOOKMARK_BAR_SUBMENU_ONLY_ON_NTP,
                                         visibility_commands_enabled);
-  command_updater_.UpdateCommandEnabled(
-      IDC_BOOKMARK_BAR_SHOW_APPS_SHORTCUT,
-      common_enabled && !profile()->GetPrefs()->IsManagedPreference(
-                            bookmarks::prefs::kShowAppsShortcutInBookmarkBar));
-  command_updater_.UpdateCommandEnabled(
-      IDC_BOOKMARK_BAR_TOGGLE_SHOW_TAB_GROUPS,
-      common_enabled && !profile()->GetPrefs()->IsManagedPreference(
-                            bookmarks::prefs::kShowTabGroupsInBookmarkBar));
 }
 
 void BrowserCommandController::UpdateCommandsForFileSelectionDialogs() {
