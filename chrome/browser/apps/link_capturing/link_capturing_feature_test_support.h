@@ -32,9 +32,7 @@ namespace apps::test {
 enum class LinkCapturingFeatureVersion {
   kV2DefaultOff,
   kV2DefaultOffCaptureExistingFrames,
-#if !BUILDFLAG(IS_CHROMEOS)
   kV2DefaultOn,
-#endif
 };
 
 // Returns if links that target existing frames (e.g. "_self", "_top",

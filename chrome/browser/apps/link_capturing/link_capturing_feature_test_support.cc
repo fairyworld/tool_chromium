@@ -48,13 +48,12 @@ std::vector<base::test::FeatureRefAndParams> GetFeaturesToEnableLinkCapturingUX(
     std::optional<bool> override_captures_by_default,
     bool capture_existing_frame_navigations) {
 #if BUILDFLAG(IS_CHROMEOS)
-  CHECK(!override_captures_by_default || !override_captures_by_default.value());
-  // TODO(crbug.com/376922620): Create a feature flag to turn off the v1
-  // throttle.
+  std::string default_state = (override_captures_by_default.value_or(false))
+                                  ? "reimpl_default_on"
+                                  : "reimpl_default_off";
   std::vector<base::test::FeatureRefAndParams> features_to_enable = {
       {::features::kPwaNavigationCapturing,
-       {{::features::kNavigationCapturingDefaultState.name,
-         "reimpl_default_off"}}}};
+       {{::features::kNavigationCapturingDefaultState.name, default_state}}}};
   if (capture_existing_frame_navigations) {
     features_to_enable.push_back(
         {features::kNavigationCapturingOnExistingFrames, {}});
@@ -88,10 +87,8 @@ bool ShouldLinksWithExistingFrameTargetsCapture(
       return false;
     case LinkCapturingFeatureVersion::kV2DefaultOffCaptureExistingFrames:
       return true;
-#if !BUILDFLAG(IS_CHROMEOS)
     case LinkCapturingFeatureVersion::kV2DefaultOn:
       return false;
-#endif
   }
 }
 
@@ -101,10 +98,8 @@ std::string ToString(LinkCapturingFeatureVersion version) {
       return "V2DefaultOff";
     case LinkCapturingFeatureVersion::kV2DefaultOffCaptureExistingFrames:
       return "V2DefaultOffCaptureExistingFrames";
-#if !BUILDFLAG(IS_CHROMEOS)
     case LinkCapturingFeatureVersion::kV2DefaultOn:
       return "V2DefaultOn";
-#endif
   }
 }
 
@@ -125,12 +120,10 @@ std::vector<base::test::FeatureRefAndParams> GetFeaturesToEnableLinkCapturingUX(
       return GetFeaturesToEnableLinkCapturingUX(
           /*override_captures_by_default=*/false,
           /*capture_existing_frame_navigations=*/true);
-#if !BUILDFLAG(IS_CHROMEOS)
     case LinkCapturingFeatureVersion::kV2DefaultOn:
       return GetFeaturesToEnableLinkCapturingUX(
           /*override_captures_by_default=*/true,
           /*capture_existing_frame_navigations=*/false);
-#endif
   }
 }
 

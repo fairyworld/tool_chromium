@@ -49,9 +49,14 @@ class PreferredAppsListHandle {
   virtual std::optional<std::string> FindPreferredAppForIntent(
       const IntentPtr& intent) const = 0;
 
-  // Returns a list of app IDs that are set as preferred app to an intent
-  // filter in the |intent_filters| list.
+  // Returns a list of app IDs that are set as preferred apps for intent
+  // filters that structurally overlap with `intent_filters`. `app_id` is the
+  // ID of the new app we want to enable (which is ignored to avoid
+  // self-conflict checks and passed to the conflict callback to verify if they
+  // can co-exist). If `app_id` is std::nullopt, we return all overlapping
+  // preferred apps.
   virtual base::flat_set<std::string> FindPreferredAppsForFilters(
+      std::optional<std::string> app_id,
       const IntentFilters& intent_filters) const = 0;
 
   class Observer : public base::CheckedObserver {

@@ -525,13 +525,16 @@ IN_PROC_BROWSER_TEST_P(WebAppLinkCapturingBrowserTest,
 #endif
 }
 
-// https://crbug.com/40279851: ChromeOS currently capturing nested app links
-// into the parent app, treating them as overlapping apps. Other platforms split
-// the URL space and fully respect the child app's user setting. Thus, on
-// non-CrOS platforms both apps can capture links.
-#if !BUILDFLAG(IS_CHROMEOS)
+// Since overlapping scopes support is enabled on ChromeOS, parent and child
+// apps can both capture links at the same time.
 IN_PROC_BROWSER_TEST_P(WebAppLinkCapturingBrowserTest,
                        ParentAppAndChildAppCapture) {
+#if BUILDFLAG(IS_CHROMEOS)
+  if (GetParam() != apps::test::LinkCapturingFeatureVersion::kV2DefaultOn) {
+    GTEST_SKIP()
+        << "This test only runs on ChromeOS when kV2DefaultOn is enabled";
+  }
+#endif
   // Note: The order matters so the nested app navigation for installation
   // doesn't get captured by the parent app.
   webapps::AppId nested_app_id = InstallNestedApp();
@@ -570,7 +573,6 @@ IN_PROC_BROWSER_TEST_P(WebAppLinkCapturingBrowserTest,
   ExpectTabs(nested_browser, {GetNestedAppUrl()});
   ExpectTabs(parent_browser, {GetParentAppUrl()});
 }
-#endif  // !BUILDFLAG(IS_CHROMEOS)
 
 // Tests that link capturing works while inside a web app window.
 // TODO(crbug.com/330148482): Flaky on Linux Debug bots.
@@ -804,7 +806,8 @@ INSTANTIATE_TEST_SUITE_P(
 #if BUILDFLAG(IS_CHROMEOS)
     testing::Values(apps::test::LinkCapturingFeatureVersion::kV2DefaultOff,
                     apps::test::LinkCapturingFeatureVersion::
-                        kV2DefaultOffCaptureExistingFrames),
+                        kV2DefaultOffCaptureExistingFrames,
+                    apps::test::LinkCapturingFeatureVersion::kV2DefaultOn),
 #else
     testing::Values(apps::test::LinkCapturingFeatureVersion::kV2DefaultOff,
                     apps::test::LinkCapturingFeatureVersion::kV2DefaultOn),

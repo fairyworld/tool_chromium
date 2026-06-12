@@ -25,4 +25,12 @@ bool ShouldShowLinkCapturingUX() {
 #endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
+bool IsNavigationCapturingOnByDefault() {
+  return base::FeatureList::IsEnabled(::features::kPwaNavigationCapturing) &&
+         (::features::kNavigationCapturingDefaultState.Get() ==
+              ::features::CapturingState::kReimplDefaultOn ||
+          ::features::kNavigationCapturingDefaultState.Get() ==
+              ::features::CapturingState::kReimplOnViaClientMode);
+}
+
 }  // namespace apps::features

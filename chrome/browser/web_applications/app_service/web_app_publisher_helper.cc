@@ -517,8 +517,7 @@ bool AreOtherAppsPreferredForLinks(
 
   base::flat_set<std::string> preferred_apps =
       proxy->PreferredAppsList().FindPreferredAppsForFilters(
-          *new_app_intent_filters);
-  preferred_apps.erase(app_id);
+          app_id, *new_app_intent_filters);
 
   return preferred_apps.size() > 0;
 }

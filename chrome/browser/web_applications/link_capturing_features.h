@@ -24,6 +24,9 @@ BASE_DECLARE_FEATURE(kUpdateAppStringsOnSettings);
 // always on CrOS.
 bool ShouldShowLinkCapturingUX();
 
+// Returns true if navigation capturing is on by default.
+bool IsNavigationCapturingOnByDefault();
+
 }  // namespace apps::features
 
 #endif  // CHROME_BROWSER_WEB_APPLICATIONS_LINK_CAPTURING_FEATURES_H_
