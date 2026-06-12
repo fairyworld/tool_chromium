@@ -67,8 +67,6 @@
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/TargetSelect.h"
-#include "tools/clang/raw_ptr_plugin/RawPtrManualPathsToIgnore.h"
-
 using namespace clang::ast_matchers;
 
 namespace {
@@ -217,8 +215,7 @@ class LocalVisitor
  public:
   void visitMatch(
       const clang::ast_matchers::BoundNodes& BoundNodesView) override {
-    if (const auto* ptr =
-            BoundNodesView.getNodeAs<clang::FunctionDecl>("fct_decl")) {
+    if (BoundNodesView.getNodeAs<clang::FunctionDecl>("fct_decl")) {
       fct_decl_ = BoundNodesView.getNodeAs<clang::FunctionDecl>("fct_decl");
       is_lambda_ = false;
     } else {
@@ -450,15 +447,13 @@ class PotentialNodes : public MatchFinder::MatchCallback {
       lhs.replacement = p.first;
       lhs.include_directive = p.second;
 
-      if (const clang::FieldDecl* field_decl =
-              result.Nodes.getNodeAs<clang::FieldDecl>("lhs_field")) {
+      if (result.Nodes.getNodeAs<clang::FieldDecl>("lhs_field")) {
         lhs.is_field = true;
       }
 
       // To make sure we add all field decls to the graph.(Specifically those
       // not connected to other nodes)
-      if (const clang::FieldDecl* field_decl =
-              result.Nodes.getNodeAs<clang::FieldDecl>("field_decl")) {
+      if (result.Nodes.getNodeAs<clang::FieldDecl>("field_decl")) {
         lhs.is_field = true;
         output_helper_.AddSingleNode(lhs);
         return;
@@ -468,8 +463,7 @@ class PotentialNodes : public MatchFinder::MatchCallback {
       // that reason, fields annotated with RAW_PTR_EXCLUSION are added as
       // single nodes to the list, this is then used as a starting point to
       // propagate the exclusion to all neighboring nodes.
-      if (const clang::FieldDecl* field_decl =
-              result.Nodes.getNodeAs<clang::FieldDecl>("excluded_field_decl")) {
+      if (result.Nodes.getNodeAs<clang::FieldDecl>("excluded_field_decl")) {
         lhs.is_field = true;
         lhs.is_excluded = true;
         output_helper_.AddSingleNode(lhs);
@@ -489,8 +483,7 @@ class PotentialNodes : public MatchFinder::MatchCallback {
     }
 
     Node rhs;
-    if (const clang::FieldDecl* field_decl =
-            result.Nodes.getNodeAs<clang::FieldDecl>("rhs_field")) {
+    if (result.Nodes.getNodeAs<clang::FieldDecl>("rhs_field")) {
       rhs.is_field = true;
     }
 
@@ -723,8 +716,7 @@ class AffectedPtrExprRewriter : public MatchFinder::MatchCallback {
     }
 
     Node rhs;
-    if (const clang::FieldDecl* field_decl =
-            result.Nodes.getNodeAs<clang::FieldDecl>("rhs_field")) {
+    if (result.Nodes.getNodeAs<clang::FieldDecl>("rhs_field")) {
       rhs.is_field = true;
     }
 
