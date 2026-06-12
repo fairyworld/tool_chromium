@@ -586,10 +586,12 @@ class TypeResolver:
     if '.' in name and name[0].islower():
       return JavaClass(name.replace('.', '/'))
 
+    # Enforce normalized form for optimal caching.
     assert '$' not in name, 'Name: ' + name
 
     # javap output for nested classes looks like: android.os.Debug$MemoryInfo,
     # but .java source needs the transformation.
+    name_with_dots = name
     name = name.replace('.', '$')
 
     for p in self.type_params:
@@ -622,7 +624,7 @@ class TypeResolver:
         return self.java_class.make_nested(inner)
 
     if self.parent_resolver:
-      return self.parent_resolver.resolve(name)
+      return self.parent_resolver.resolve(name_with_dots)
 
     # java.lang classes always take priority over types from the same package.
     # To use a type from the same package that has the same name as a java.lang
@@ -635,6 +637,12 @@ class TypeResolver:
     ret = JavaClass(
         f'{self.java_class.class_without_prefix.package_with_slashes}/{name}')
     return ret.make_prefixed(self.java_class.prefix_with_dots)
+
+  def get_resolved_classes(self):
+    return [
+        val.class_without_prefix.full_name_with_dots
+        for val in self._cache.values() if not val.is_generic_type()
+    ]
 
 
 CLASS_CLASS = JavaClass('java/lang/Class')

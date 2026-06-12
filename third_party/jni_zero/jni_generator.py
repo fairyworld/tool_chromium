@@ -701,6 +701,17 @@ def _WriteHeaders(jni_mode,
       f.write(unshared_header_content)
 
 
+def _WriteResolvedTypes(resolved_types_path, jni_objs):
+  resolved_classes = set()
+  for obj in jni_objs:
+    resolved_classes.update(obj.type_resolver.get_resolved_classes())
+    for c in obj.jni_classes:
+      resolved_classes.update(c.type_resolver.get_resolved_classes())
+
+  with common.atomic_output(resolved_types_path, 'w') as f:
+    f.write('\n'.join(sorted(resolved_classes)) + '\n')
+
+
 def GenerateFromSource(parser, args, jni_mode):
   if not args.use_std_primitive_types:
     java_types.SetUseJniPrimitiveTypes()
@@ -739,6 +750,8 @@ def GenerateFromSource(parser, args, jni_mode):
                   module_name=args.module_name) for x in parsed_files
     ]
     _CheckNotEmpty(jni_objs)
+    if args.resolved_types_path:
+      _WriteResolvedTypes(args.resolved_types_path, jni_objs)
   except parse.ParseError as e:
     sys.stderr.write(f'{e}\n')
     sys.exit(1)
