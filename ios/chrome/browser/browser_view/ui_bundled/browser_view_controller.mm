@@ -379,6 +379,11 @@ bool IsFullscreenNextIAEnabled() {
 @property(nonatomic, readonly, getter=isContentAreaObstructed)
     BOOL contentAreaObstructed;
 
+// When YES, the Fullscreen progress may be dirty and should be applied at
+// next opportunity even if it appears to have not changed. This is only
+// used for the legacy fullscreen implementation.
+@property(nonatomic, assign) BOOL fullscreenProgressDirty;
+
 @end
 
 @implementation BrowserViewController
@@ -2130,6 +2135,10 @@ bool IsFullscreenNextIAEnabled() {
   [animator addAnimations:^{
     [weakSelf updateHeadersForFullscreenProgress:finalProgress];
     [weakSelf updateFootersForFullscreenProgress:finalProgress];
+    // This animation can be canceled in the middle, and there is no way to
+    // know when this happens. Setting `fullscreenProgressDirty` will force
+    // a layout to happen on the next fullscreen update.
+    weakSelf.fullscreenProgressDirty = YES;
   }];
 
   // Animating layout changes of the rendered content in the WKWebView is not
@@ -2357,6 +2366,12 @@ bool IsFullscreenNextIAEnabled() {
         [view setNeedsLayout];
         [view layoutIfNeeded];
       }
+    } else if (self.fullscreenProgressDirty) {
+      CHECK(!IsFullscreenRefactoringEnabled());
+      UIView* view = self.view;
+      [view setNeedsLayout];
+      [view layoutIfNeeded];
+      self.fullscreenProgressDirty = NO;
     }
   }
 }
