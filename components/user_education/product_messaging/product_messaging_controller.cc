@@ -86,17 +86,17 @@ void ProductMessagingHandleImpl::OnStatusChange(ProductMessageKey key,
 struct ProductMessagingController::QueueData {
   QueueData() = default;
   QueueData(ProductMessageReadyCallback callback_,
-            std::optional<base::Time> expires_at_)
+            std::optional<base::TimeTicks> expires_at_)
       : callback(std::move(callback_)), expires_at(expires_at_) {}
   QueueData(QueueData&& other) noexcept = default;
   QueueData& operator=(QueueData&& other) noexcept = default;
   ~QueueData() = default;
 
   ProductMessageReadyCallback callback;
-  std::optional<base::Time> expires_at;
+  std::optional<base::TimeTicks> expires_at;
 
   bool is_expired() const {
-    return expires_at && base::Time::Now() >= expires_at;
+    return expires_at && base::TimeTicks::Now() >= expires_at;
   }
 };
 
@@ -128,8 +128,9 @@ void ProductMessagingController::QueueMessage(
     std::optional<base::TimeDelta> timeout) {
   CHECK(message_key);
   CHECK(!ready_to_start_callback.is_null());
-  const std::optional<base::Time> expiry =
-      timeout ? std::make_optional(base::Time::Now() + *timeout) : std::nullopt;
+  const std::optional<base::TimeTicks> expiry =
+      timeout ? std::make_optional(base::TimeTicks::Now() + *timeout)
+              : std::nullopt;
 
   // Cannot re-queue a notice unless overriding the timer.
   if (active_messages_.contains(message_key)) {
@@ -217,7 +218,7 @@ ProductMessagingController::GetRemainingTimeForTesting(
   const auto* const entry = base::FindOrNull(pending_messages_, message_key);
   CHECK(entry);
   return entry->expires_at
-             ? std::make_optional(*entry->expires_at - base::Time::Now())
+             ? std::make_optional(*entry->expires_at - base::TimeTicks::Now())
              : std::nullopt;
 }
 

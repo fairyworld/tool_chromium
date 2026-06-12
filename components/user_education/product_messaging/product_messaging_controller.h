@@ -129,7 +129,8 @@ class ProductMessagingController final {
       ProductMessageStatusCallback callback);
 
   // Returns the remaining time for `message_key` in the queue, or `nullopt` if
-  // no expiry. Fails if the message is not queued.
+  // no expiry. Fails if the message is not queued. May be negative if the entry
+  // is expired but has not been purged, indicating it is overdue to expire.
   std::optional<base::TimeDelta> GetRemainingTimeForTesting(
       ProductMessageKey message_key) const;
 
