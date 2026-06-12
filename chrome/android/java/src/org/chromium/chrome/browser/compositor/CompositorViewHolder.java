@@ -27,7 +27,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.transition.ChangeBounds;
 import android.transition.Transition;
-import android.transition.TransitionSet;
 import android.util.ArrayMap;
 import android.util.AttributeSet;
 import android.util.Size;
@@ -102,7 +101,6 @@ import org.chromium.content_public.browser.NavigationHandle;
 import org.chromium.content_public.browser.WebContents;
 import org.chromium.ui.KeyboardVisibilityDelegate;
 import org.chromium.ui.UiUtils;
-import org.chromium.ui.animation.transition.IntegerValueTransition;
 import org.chromium.ui.base.ApplicationViewportInsetTracker;
 import org.chromium.ui.base.EventForwarder;
 import org.chromium.ui.base.EventOffsetHandler;
@@ -1452,36 +1450,23 @@ public class CompositorViewHolder extends FrameLayout
         WebContents webContents = currentTab.getWebContents();
         if (webContents == null) return null;
 
-        Point viewportSize = getViewportSize();
-        int sideUiTotalWidth =
-                sideUiSpecs.getWidth(AnchorSide.LEFT) + sideUiSpecs.getWidth(AnchorSide.RIGHT);
-        int startWidth = ViewUtils.dpToPx(mActivity, webContents.getWidth());
-        int targetWidth = viewportSize.x - sideUiTotalWidth;
+        if (mView == null) return null;
 
-        TransitionSet transitionSet = new TransitionSet();
+        // TODO(crbug.com/515834044): Investigate adding a Transition to instead resize WebContents
+        //  in the middle of the Transition to make the transition a bit smoother.
 
         // TODO(crbug.com/513304704): Add tests covering the Java View Transitions.
-        if (mView != null) {
-            // Apply a ChangeBounds() to the view and all its descendants to make sure any changes
-            // are properly animated. If this isn't applied to all the descendant Views, the
-            // animation may not be triggered at all.
-            ChangeBounds changeBounds = new ChangeBounds();
-            Collection<View> descendants = new ArrayList<>();
-            changeBounds.addTarget(mView);
-            ViewUtils.getAllDescendants(mView, descendants, emptySet());
-            for (View view : descendants) {
-                changeBounds.addTarget(view);
-            }
-            transitionSet.addTransition(changeBounds);
+        // Apply a ChangeBounds() to the view and all its descendants to make sure any changes are
+        // properly animated. If this isn't applied to all the descendant Views, the animation may
+        // not be triggered at all.
+        ChangeBounds changeBounds = new ChangeBounds();
+        Collection<View> descendants = new ArrayList<>();
+        changeBounds.addTarget(mView);
+        ViewUtils.getAllDescendants(mView, descendants, emptySet());
+        for (View view : descendants) {
+            changeBounds.addTarget(view);
         }
-
-        transitionSet.addTransition(
-                new IntegerValueTransition(
-                        this,
-                        startWidth,
-                        targetWidth,
-                        (desiredWidth) -> updateWebContentsSize(getCurrentTab(), desiredWidth)));
-        return transitionSet;
+        return changeBounds;
     }
 
     @Override
