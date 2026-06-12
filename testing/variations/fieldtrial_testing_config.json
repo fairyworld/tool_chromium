@@ -11074,6 +11074,21 @@
             ]
         }
     ],
+    "FeedbackEntryPointsRequireCanSubmitFeedbackCapability": [
+        {
+            "platforms": [
+                "ios"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled_20260612",
+                    "enable_features": [
+                        "FeedbackEntryPointsRequireCanSubmitFeedbackCapability"
+                    ]
+                }
+            ]
+        }
+    ],
     "FencedFramesEnableCredentialsForAutomaticBeacons": [
         {
             "platforms": [
