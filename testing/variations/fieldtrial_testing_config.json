@@ -18714,6 +18714,27 @@
             ]
         }
     ],
+    "PdfInkSignaturesTextAnnotations": [
+        {
+            "platforms": [
+                "chromeos",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "enabled",
+                    "params": {
+                        "text-annotations": "true"
+                    },
+                    "enable_features": [
+                        "PdfInk2"
+                    ]
+                }
+            ]
+        }
+    ],
     "PdfSaveToDriveSurvey": [
         {
             "platforms": [
