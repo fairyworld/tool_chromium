@@ -15,7 +15,7 @@ from utils.command_error import CommandError
 
 _DIR_SOURCE_ROOT = os.path.normpath(
     os.path.join(os.path.basename(__file__), '../../..'))
-_COMMON_EXTENSIONS = ('.java', '.cc', '.mm', '.h', '.json')
+_COMMON_EXTENSIONS = ('.java', '.cc', '.mm', '.h', '.json', '.html')
 
 
 def _CodeSearchFiles(query_args: list[str]) -> list[str]:
@@ -46,7 +46,33 @@ def _FindRemoteCandidates(target: str) -> tuple[list[str], list[str]]:
   return list(exact), list(close)
 
 
+def IsWebTestFile(file_path: str) -> bool:
+  normalized = os.path.normpath(file_path).replace('\\', '/')
+  if 'third_party/blink/web_tests/' not in normalized and \
+      'third_party/web_tests/' not in normalized:
+    return False
+
+  _, ext = os.path.splitext(normalized)
+  if ext not in ('.html', '.htm', '.xhtml', '.xht', '.xml', '.svg', '.js',
+                 '.php'):
+    return False
+
+  parts = normalized.split('/')
+  if 'resources' in parts or 'support' in parts:
+    return False
+
+  basename = os.path.basename(normalized)
+  if basename.endswith(('-expected.html', '-expected.xml', '-expected.txt',
+                        '-expected.png', '-expected.ini')):
+    return False
+
+  return True
+
+
 def IsTestFile(file_path: str) -> const.TestValidity:
+  if IsWebTestFile(file_path):
+    return const.TestValidity.VALID_TEST
+
   if not const.TEST_FILE_NAME_REGEX.match(file_path):
     return const.TestValidity.NOT_A_TEST
 
