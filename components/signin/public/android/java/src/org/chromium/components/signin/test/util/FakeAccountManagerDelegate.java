@@ -18,6 +18,7 @@ import org.chromium.components.signin.AccountManagerDelegateException;
 import org.chromium.components.signin.AccountsChangeObserver;
 import org.chromium.components.signin.AuthException;
 import org.chromium.components.signin.PlatformAccount;
+import org.chromium.components.signin.SigninFeatureMap;
 import org.chromium.components.signin.Tribool;
 import org.chromium.components.signin.base.AccountInfo;
 import org.chromium.google_apis.gaia.CoreAccountId;
@@ -74,7 +75,7 @@ public class FakeAccountManagerDelegate implements AccountManagerDelegate {
 
     @Override
     public Account[] getAccountsSynchronous() throws AccountManagerDelegateException {
-        assert !AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled();
+        assert !SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled();
         synchronized (mAccounts) {
             return mAccounts.stream().map((ah) -> ah.getAccount()).toArray(Account[]::new);
         }
@@ -84,7 +85,7 @@ public class FakeAccountManagerDelegate implements AccountManagerDelegate {
     public PlatformAccount addAccount(AccountInfo accountInfo) {
         boolean added = false;
         FakePlatformAccount account = new FakePlatformAccount(accountInfo);
-        if (AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled()) {
+        if (SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled()) {
             added = mPlatformAccounts.add(account);
         } else {
             added = mAccounts.add(new AccountHolder(accountInfo));
@@ -96,7 +97,7 @@ public class FakeAccountManagerDelegate implements AccountManagerDelegate {
 
     /** Removes an AccountHolder. */
     public void removeAccount(CoreAccountId accountId) {
-        if (AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled()) {
+        if (SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled()) {
             synchronized (mPlatformAccounts) {
                 @Nullable PlatformAccount account = tryGetPlatformAccount(accountId);
                 if (account == null || !mPlatformAccounts.remove(account)) {
@@ -201,7 +202,7 @@ public class FakeAccountManagerDelegate implements AccountManagerDelegate {
     @Override
     public List<PlatformAccount> getPlatformAccountsSynchronous()
             throws AccountManagerDelegateException {
-        assert AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled();
+        assert SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled();
         synchronized (mPlatformAccounts) {
             return new ArrayList<>(mPlatformAccounts);
         }

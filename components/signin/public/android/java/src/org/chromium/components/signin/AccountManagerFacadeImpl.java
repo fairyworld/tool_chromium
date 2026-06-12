@@ -99,7 +99,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
         ThreadUtils.assertOnUiThread();
         mDelegate = delegate;
 
-        if (AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled()) {
+        if (SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled()) {
             mDelegate.attachAccountsChangeObserver(() -> onPlatformAccountsUpdated(null));
             onPlatformAccountsUpdated(null);
         } else {
@@ -118,7 +118,6 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
 
     /**
      * Adds an observer to receive accounts change notifications.
-     *
      * @param observer the observer to add.
      */
     @Override
@@ -162,7 +161,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
 
         pendingRequestStarted();
 
-        if (!AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled()) {
+        if (!SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled()) {
             String oauth2Scope = OAUTH2_SCOPE_PREFIX + scope;
             ConnectionRetry.runAuthTask(
                     new AuthTask() {
@@ -258,7 +257,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
                 new AuthTask() {
                     @Override
                     public @Nullable AccessTokenData run() throws AuthException {
-                        if (AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled()) {
+                        if (SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled()) {
                             mDelegate.invalidateAccessTokenForPlatformAccount(accessToken);
                             return null;
                         }
@@ -299,7 +298,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
     public void checkIsSubjectToParentalControls(
             CoreAccountInfo coreAccountInfo, ChildAccountStatusListener listener) {
         ThreadUtils.assertOnUiThread();
-        if (!AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled()) {
+        if (!SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled()) {
             new AsyncTask<Boolean>() {
                 @Override
                 public Boolean doInBackground() {
@@ -335,7 +334,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
 
     private void checkIsSubjectToParentalControlsHelper(
             CoreAccountInfo coreAccountInfo, ChildAccountStatusListener listener) {
-        assert AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled();
+        assert SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled();
         @Nullable PlatformAccount account = getPlatformAccount(coreAccountInfo.getGaiaId());
         if (account == null) {
             listener.onStatusReady(false, null);
@@ -373,7 +372,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
         ThreadUtils.assertOnUiThread();
 
         Promise<AccountCapabilities> accountCapabilitiesPromise = new Promise<>();
-        if (!AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled()) {
+        if (!SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled()) {
             new AsyncTask<AccountCapabilities>() {
                 @Override
                 public AccountCapabilities doInBackground() {
@@ -410,7 +409,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
     private void fetchCapabilitiesHelper(
             CoreAccountInfo coreAccountInfo,
             Promise<AccountCapabilities> accountCapabilitiesPromise) {
-        assert AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled();
+        assert SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled();
 
         @Nullable PlatformAccount account = getPlatformAccount(coreAccountInfo.getGaiaId());
         if (account == null) {
@@ -499,7 +498,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
                 AccountUtils.createAccountFromEmail(accountInfo.getEmail()),
                 activity,
                 (success) -> {
-                    if (AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled()) {
+                    if (SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled()) {
                         onPlatformAccountsUpdated(
                                 () -> {
                                     if (callback != null) {
@@ -549,7 +548,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
     /** Fetches gaia ids, creates account objects and updates {@link #mAccountsPromise}. */
     @MainThread
     private void fetchGaiaIdsAndUpdateCoreAccountInfos(@Nullable Runnable callback) {
-        assert !AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled();
+        assert !SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled();
         ThreadUtils.assertOnUiThread();
         if (mFetchGaiaIdsTask != null) {
             // Cancel previous fetch task as it is obsolete now.
@@ -563,7 +562,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
 
     @VisibleForTesting
     void onAccountsUpdated(@Nullable Runnable callback) {
-        assert !AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled();
+        assert !SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled();
         ThreadUtils.assertOnUiThread();
         new AsyncTask<@Nullable List<Account>>() {
             @Override
@@ -617,7 +616,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
 
     @VisibleForTesting
     void onPlatformAccountsUpdated(@Nullable Runnable callback) {
-        assert AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled();
+        assert SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled();
         ThreadUtils.assertOnUiThread();
         new AsyncTask<@Nullable List<PlatformAccount>>() {
             @Override
@@ -681,7 +680,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
 
     private void onAccountRestrictionPatternsUpdated(List<PatternMatcher> patternMatchers) {
         mAccountRestrictionPatterns.set(patternMatchers);
-        if (AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled()) {
+        if (SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled()) {
             updateAccountInfos(null);
             return;
         }
@@ -690,7 +689,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
 
     @MainThread
     private void updateAccounts(@Nullable Runnable callback) {
-        assert !AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled();
+        assert !SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled();
         if (mAllAccounts.get() == null || mAccountRestrictionPatterns.get() == null) {
             return;
         }
@@ -699,7 +698,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
 
     @MainThread
     private void updateAccountInfos(@Nullable Runnable callback) {
-        assert AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled();
+        assert SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled();
 
         if (mAllPlatformAccounts.get() == null || mAccountRestrictionPatterns.get() == null) {
             return;
@@ -726,7 +725,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
     }
 
     private List<PlatformAccount> getFilteredPlatformAccounts() {
-        assert AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled();
+        assert SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled();
         List<PlatformAccount> filteredAccounts = new ArrayList<>();
         List<PatternMatcher> restrictions = assumeNonNull(mAccountRestrictionPatterns.get());
         for (PlatformAccount account : assumeNonNull(mAllPlatformAccounts.get())) {
@@ -747,7 +746,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
     }
 
     private List<String> getFilteredAccountEmails() {
-        assert !AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled();
+        assert !SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled();
         List<String> ret = new ArrayList<>();
         List<PatternMatcher> restrictions = mAccountRestrictionPatterns.get();
         assumeNonNull(restrictions);
@@ -781,7 +780,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
     public void resetAccountsForTesting() {
         mAccountsPromise = new Promise<>();
         mAllAccounts.set(null);
-        if (AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled()) {
+        if (SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled()) {
             updateAccountInfos(null);
             return;
         }
@@ -799,7 +798,7 @@ public class AccountManagerFacadeImpl implements AccountManagerFacade {
         private final @Nullable Runnable mCallback;
 
         GetAccountAsyncTask(List<String> emails, @Nullable Runnable callback) {
-            assert !AccountManagerDelegate.isAccountManagerDelegateMigrationEnabled();
+            assert !SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled();
             mEmails = emails;
             mCallback = callback;
         }
