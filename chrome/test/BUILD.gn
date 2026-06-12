@@ -8800,11 +8800,12 @@ test("unit_tests") {
     ]
   }
 
+  # Unit tests that run on Win/Mac/Linux. Note that most extensions tests are
+  # listed in their subdirectory BUILD.gn file, like
+  # //chrome/browser/extensions/BUILD.gn.
   # TODO(crbug.com/1229899): Clean up and move this to a separate target.
   if (enable_extensions) {
     sources += [
-      "../browser/controlled_frame/controlled_frame_menu_icon_loader_unittest.cc",
-      "../browser/controlled_frame/controlled_frame_permissions_unittest.cc",
       "../browser/media/cast_mirroring_service_host_unittest.cc",
       "../browser/safe_browsing/test_extension_event_observer.cc",
       "../browser/safe_browsing/test_extension_event_observer.h",
@@ -8842,6 +8843,7 @@ test("unit_tests") {
     deps += [
       "//apps:unit_tests",
       "//chrome/browser/affiliations",
+      "//chrome/browser/controlled_frame:unit_tests",
       "//chrome/browser/sync_file_system:unit_tests",
       "//chrome/browser/ui/web_applications:unit_tests",
       "//chrome/browser/web_applications:unit_tests",
