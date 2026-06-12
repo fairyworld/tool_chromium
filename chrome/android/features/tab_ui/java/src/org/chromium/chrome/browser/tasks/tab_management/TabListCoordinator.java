@@ -317,7 +317,7 @@ public class TabListCoordinator implements PriceWelcomeMessageProvider, DestroyO
         mTabListFaviconProvider =
                 new TabListFaviconProvider(
                         mActivity,
-                        mMode == TabListMode.BOTTOM_STRIP,
+                        mMode,
                         R.dimen.default_favicon_corner_radius,
                         TabFavicon::getBitmap);
 

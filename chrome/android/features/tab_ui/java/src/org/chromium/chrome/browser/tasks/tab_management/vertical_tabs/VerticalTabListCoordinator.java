@@ -254,7 +254,7 @@ public class VerticalTabListCoordinator {
         mTabListFaviconProvider =
                 new TabListFaviconProvider(
                         activity,
-                        /* isTabStrip */ false,
+                        TabListMode.VERTICAL,
                         R.dimen.default_favicon_corner_radius,
                         TabFavicon::getBitmap);
 
