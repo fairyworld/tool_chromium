@@ -2100,6 +2100,10 @@ class LocationBarMediator
 
     @VisibleForTesting
     boolean shouldShowBookmarkButton() {
+        if (UrlUtilities.isNtpUrl(mLocationBarDataProvider.getCurrentGurl())) {
+            return false;
+        }
+
         return mShouldShowButtonsWhenUnfocused && shouldShowPageActionButtons();
     }
 
