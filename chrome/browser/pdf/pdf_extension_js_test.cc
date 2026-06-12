@@ -700,6 +700,10 @@ IN_PROC_BROWSER_TEST_P(PDFExtensionJSInk2TextTest, Ink2TextStylesSelector) {
   RunTestsInJsModule("ink2_text_styles_selector_test.js", "test.pdf");
 }
 
+IN_PROC_BROWSER_TEST_P(PDFExtensionJSInk2TextTest, InkTextAnnotations) {
+  RunTestsInJsModule("ink2_text_annotations_test.js", "test.pdf");
+}
+
 class PDFExtensionJSInk2BeforeUnloadTest : public PDFExtensionJSTestBase {
  public:
   // OOPIF PDF only, since MimeHandler handles the beforeunload event instead.

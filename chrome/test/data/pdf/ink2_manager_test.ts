@@ -7,7 +7,7 @@ import {AnnotationBrushType, DEFAULT_TEXTBOX_WIDTH, Ink2Manager, MIN_TEXTBOX_SIZ
 import {assert} from 'chrome://resources/js/assert.js';
 import {eventToPromise} from 'chrome://webui-test/test_util.js';
 
-import {assertAnnotationBrush, assertDeepEquals, MockDocumentDimensions, setGetAnnotationBrushReply, setUpInkTestContext} from './test_util.js';
+import {assertAnnotationBrush, assertDeepEquals, getTestAnnotation, MockDocumentDimensions, setGetAnnotationBrushReply, setUpInkTestContext} from './test_util.js';
 import type {MockPdfPluginElement} from './test_util.js';
 
 let viewport: Viewport;
@@ -77,33 +77,6 @@ async function changeActiveAnnotation(
   manager.setTextBoxActive(true);
 
   return initEvent;
-}
-
-function getTestAnnotation(id: number): TextAnnotation {
-  return {
-    id: id,
-    mojoTextInfo: new ArrayBuffer(0),
-    pageIndex: 0,
-    pdfZoom: 1.0,
-    text: 'Hello World',
-    textAttributes: {
-      typeface: TextTypeface.SANS_SERIF,
-      size: 12,
-      color: {r: 0, g: 100, b: 0},
-      alignment: TextAlignment.LEFT,
-      styles: {
-        bold: false,
-        italic: false,
-      },
-    },
-    textBoxRect: {
-      height: 35,
-      locationX: 60,
-      locationY: 25,
-      width: 50,
-    },
-    textOrientation: 0,
-  };
 }
 
 function getTestAnnotationMessageData(id: number): TextAnnotationMessageData {
