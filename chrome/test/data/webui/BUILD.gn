@@ -25,6 +25,7 @@ source_set("browser_tests") {
     "bluetooth_internals/bluetooth_internals_browsertest.cc",
     "chrome_urls/chrome_urls_browsertest.cc",
     "commerce_internals/commerce_internals_browsertest.cc",
+    "contextual_tasks/contextual_tasks_browsertest.cc",
     "cr_elements/cr_elements_browsertest.cc",
     "flags/flags_browsertest.cc",
     "js/js_browsertest.cc",
@@ -36,10 +37,12 @@ source_set("browser_tests") {
   deps = [
     "//chrome/browser:browser_features",
     "//chrome/browser:chrome_content_browser_client",
+    "//chrome/browser/autocomplete:aim_eligibility_service",
     "//chrome/browser/bookmarks",
     "//chrome/browser/ui/tabs/tab_group_home:constants",
     "//chrome/test:test_support",
     "//components/commerce/core:commerce_constants",
+    "//components/contextual_tasks/public",
     "//components/webui/chrome_urls/",
     "//ui/compositor",
   ]
@@ -58,7 +61,6 @@ source_set("browser_tests") {
       "bookmarks/bookmarks_browsertest.cc",
       "chrome_apis/chrome_histograms_browsertest.cc",
       "chrome_apis/chrome_timeticks_browsertest.cc",
-      "contextual_tasks/contextual_tasks_browsertest.cc",
       "css/css_browsertest.cc",
       "data_sharing/data_sharing_browsertest.cc",
       "device_log/device_log_ui_browsertest.cc",
@@ -271,7 +273,6 @@ source_set("browser_tests") {
     deps += [
       "//build/config/coverage:buildflags",
       "//chrome/app:command_ids",
-      "//chrome/browser/autocomplete:aim_eligibility_service",
       "//chrome/browser/commerce",
       "//chrome/browser/devtools",
       "//chrome/browser/devtools:test_support",
@@ -294,7 +295,6 @@ source_set("browser_tests") {
       "//components/commerce/core:feature_list",
       "//components/commerce/core:shopping_service_test_support",
       "//components/compose/core/browser:features",
-      "//components/contextual_tasks/public",
       "//components/data_sharing:test_support",
       "//components/history/core/common",
       "//components/history_clusters/core",
@@ -530,6 +530,7 @@ webui_ts_library("build_ts") {
     "test_util.ts",
     "test_open_window_proxy.ts",
     "trusted_html.ts",
+    "metrics_test_support.ts",
   ]
 
   if (!is_android) {
@@ -544,14 +545,13 @@ webui_ts_library("build_ts") {
     ]
   }
 
-  if (!is_android || enable_webui_contextual_tasks_composebox) {
-    in_files += [ "metrics_test_support.ts" ]
-  }
-
   deps = [ "//ui/webui/resources/js:build_ts" ]
 
-  definitions =
-      [ "//tools/typescript/definitions/dom_automation_controller.d.ts" ]
+  definitions = [
+    "//tools/typescript/definitions/dom_automation_controller.d.ts",
+    "//tools/typescript/definitions/chrome_histograms.d.ts",
+    "//tools/typescript/definitions/metrics_private.d.ts",
+  ]
 
   if (!is_android) {
     deps += [ "//third_party/polymer/v3_0:library" ]
@@ -563,12 +563,7 @@ webui_ts_library("build_ts") {
     ]
   }
 
-  if (!is_android || enable_webui_contextual_tasks_composebox) {
-    definitions += [
-      "//tools/typescript/definitions/chrome_histograms.d.ts",
-      "//tools/typescript/definitions/metrics_private.d.ts",
-    ]
-  }
+  definitions += []
 
   path_mappings =
       [ "//webui-test/chai.js|" +
@@ -589,6 +584,7 @@ generate_grd("build_grd") {
     "bluetooth_internals:build_grdp",
     "chrome_urls:build_grdp",
     "commerce_internals:build_grdp",
+    "contextual_tasks:build_grdp",
     "cr_elements:build_grdp",
     "flags:build_grdp",
     "js:build_grdp",
@@ -602,6 +598,7 @@ generate_grd("build_grd") {
     "$target_gen_dir/chai_resources.grdp",
     "$target_gen_dir/chrome_urls/resources.grdp",
     "$target_gen_dir/commerce_internals/resources.grdp",
+    "$target_gen_dir/contextual_tasks/resources.grdp",
     "$target_gen_dir/cr_elements/resources.grdp",
     "$target_gen_dir/flags/resources.grdp",
     "$target_gen_dir/js/resources.grdp",
@@ -623,7 +620,6 @@ generate_grd("build_grd") {
       "actor_overlay:build_grdp",
       "bookmarks:build_grdp",
       "chrome_apis:build_grdp",
-      "contextual_tasks:build_grdp",
       "cr_components/cr_shortcut_input:build_grdp",
       "cr_components/help_bubble:build_grdp",
       "cr_components/history_clusters:build_grdp",
@@ -683,7 +679,6 @@ generate_grd("build_grd") {
 
       "$target_gen_dir/webview/resources.grdp",
       "$target_gen_dir/bookmarks/resources.grdp",
-      "$target_gen_dir/contextual_tasks/resources.grdp",
       "$target_gen_dir/cr_components/cr_shortcut_input/resources.grdp",
       "$target_gen_dir/cr_components/help_bubble/resources.grdp",
       "$target_gen_dir/cr_components/history_clusters/resources.grdp",

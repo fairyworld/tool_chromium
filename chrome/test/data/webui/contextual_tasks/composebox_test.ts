@@ -21,8 +21,9 @@ import {TestMock} from 'chrome://webui-test/test_mock.js';
 import {$$, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 import {TestContextualTasksBrowserProxy} from './test_contextual_tasks_browser_proxy.js';
+import {setupAutocompleteResults} from './test_searchbox_utils.js';
+import {createCtComposeboxApp, fixtureUrl, getSubmitButton, simulateUserInput} from './test_utils.js';
 import type {CtComposeboxAppParts} from './test_utils.js';
-import {createCtComposeboxApp, fixtureUrl, getSubmitButton, setupAutocompleteResults, simulateUserInput} from './test_utils.js';
 
 declare global {
   interface Window {
@@ -282,6 +283,8 @@ suite('ContextualTasksComposeboxTest', () => {
     assertEquals(0, composebox.selectedMatchIndex, 'Parent index should be 0');
   });
 
+  // TODO(crbug.com/523350742): Enable Tooltip tests on Android.
+  // <if expr="not is_android">
   test('TooltipVisibilityUpdatesOnResize', () => {
     mockTimer.install();
     const composeboxElement = contextualTasksApp.$.composebox;
@@ -396,6 +399,8 @@ suite('ContextualTasksComposeboxTest', () => {
     mockTimer.tick(1);
     assertEquals(1, contextualTasksApp.numberOfTimesTooltipShownForTesting);
   });
+  // </if>
+
 
   test('ToolChipVisibilityBasedOnInputState', async () => {
     const innerComposebox = contextualTasksApp.$.composebox.$.composebox;

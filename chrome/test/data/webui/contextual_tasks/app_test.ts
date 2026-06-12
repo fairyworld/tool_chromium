@@ -500,6 +500,7 @@ suite('ContextualTasksAppTest', function() {
     const composebox =
         appElement.shadowRoot.querySelector('contextual-tasks-composebox');
     assertTrue(!!composebox);
+    assertTrue(!!composebox.shadowRoot);
     const innerComposebox =
         composebox.shadowRoot.querySelector<HTMLElement>('#composebox');
     assertTrue(!!innerComposebox);

@@ -24,7 +24,8 @@ import {TestMock} from 'chrome://webui-test/test_mock.js';
 import {microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 import {TestContextualTasksBrowserProxy} from './test_contextual_tasks_browser_proxy.js';
-import {ADD_FILE_CONTEXT_FN, assertStyle, FAKE_TOKEN_STRING, fixtureUrl, getSubmitButton, getSubmitContainer, installMock, setupAutocompleteResults, simulateUserInput, uploadFileAndVerify} from './test_utils.js';
+import {ADD_FILE_CONTEXT_FN, setupAutocompleteResults, uploadFileAndVerify} from './test_searchbox_utils.js';
+import {assertStyle, FAKE_TOKEN_STRING, fixtureUrl, getSubmitButton, getSubmitContainer, installMock, simulateUserInput} from './test_utils.js';
 
 function disableAnimationsRecursively(element: Element) {
   const noAnimation = document.createElement('style');
@@ -498,6 +499,7 @@ suite('ContextualTasksComposeboxZeroStateTest', () => {
         'Suggestions should be hidden via CSS when dropdown is hidden');
   });
 
+  // <if expr="not is_android">
   test('TooltipImpressionTimerResetsOnHide', async () => {
     loadTimeData.overrideValues({
       showOnboardingTooltip: true,
@@ -551,6 +553,7 @@ suite('ContextualTasksComposeboxZeroStateTest', () => {
     // Should NOT have incremented because timer was cleared.
     assertEquals(0, contextualTasksApp.numberOfTimesTooltipShownForTesting);
   });
+  // </if>
 
   test(
       'on focus out does not set animation state as none \

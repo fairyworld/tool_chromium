@@ -23,7 +23,8 @@ import {TestMock} from 'chrome://webui-test/test_mock.js';
 import {isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 import {TestContextualTasksBrowserProxy} from './test_contextual_tasks_browser_proxy.js';
-import {ADD_TAB_CONTEXT_FN, assertStyle, FAKE_TOKEN_STRING, FAKE_TOKEN_STRING_2, fixtureUrl, getSubmitButton, getSubmitContainer, installMock, setupAutocompleteResults, simulateUserInput, uploadFileAndVerify} from './test_utils.js';
+import {ADD_TAB_CONTEXT_FN, setupAutocompleteResults, uploadFileAndVerify} from './test_searchbox_utils.js';
+import {assertStyle, FAKE_TOKEN_STRING, FAKE_TOKEN_STRING_2, fixtureUrl, getSubmitButton, getSubmitContainer, installMock, simulateUserInput} from './test_utils.js';
 
 function pressEnter(element: HTMLElement) {
   element.dispatchEvent(new KeyboardEvent('keydown', {
