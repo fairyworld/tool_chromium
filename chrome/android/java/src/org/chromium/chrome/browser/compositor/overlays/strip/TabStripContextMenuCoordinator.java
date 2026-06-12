@@ -136,6 +136,7 @@ public class TabStripContextMenuCoordinator {
                         .setOutsideTouchable(true)
                         .setHorizontalOverlapAnchor(true)
                         .setVerticalOverlapAnchor(true)
+                        .setAllowOverlapCaptionBar(true)
                         .setPreferredHorizontalOrientation(HorizontalOrientation.LAYOUT_DIRECTION)
                         .setMaxWidth(popupWidthPx)
                         .setAllowNonTouchableSize(true)

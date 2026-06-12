@@ -2692,8 +2692,17 @@ public class StripLayoutHelper
     }
 
     private void getAdjustedAnchorRect(RectProvider anchorRectProvider) {
+        getAdjustedAnchorRect(anchorRectProvider, /* includeTopPadding= */ true);
+    }
+
+    private void getAdjustedAnchorRect(RectProvider anchorRectProvider, boolean includeTopPadding) {
         StripLayoutUtils.getAdjustedAnchorRect(
-                mContext, mControlContainer, mIncognito, mTopPadding, anchorRectProvider);
+                mContext,
+                mControlContainer,
+                mIncognito,
+                mTopPadding,
+                anchorRectProvider,
+                includeTopPadding);
     }
 
     private void startReorderMode(
@@ -3209,9 +3218,7 @@ public class StripLayoutHelper
      * @param yDp The y coordinate of the position of the gesture event.
      */
     private void showTabStripContextMenu(float xDp, float yDp) {
-        if (mModel == null) {
-            return;
-        }
+        if (mModel == null) return;
         if (mTabStripContextMenuCoordinator == null) {
             mTabStripContextMenuCoordinator =
                     TabStripContextMenuCoordinator.createContextMenuCoordinator(
@@ -3232,7 +3239,7 @@ public class StripLayoutHelper
                         Math.round(yDp * dpToPx),
                         Math.round(xDp * dpToPx) + tabWidthPx,
                         Math.round(yDp * dpToPx)));
-        getAdjustedAnchorRect(anchorRectProvider);
+        getAdjustedAnchorRect(anchorRectProvider, /* includeTopPadding= */ false);
 
         var activity = assertNonNull(mWindowAndroid.getActivity().get());
         mTabStripContextMenuCoordinator.showMenu(
