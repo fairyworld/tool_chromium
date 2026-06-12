@@ -609,11 +609,6 @@ bool IsSkiaGraphiteSupportedByDevice(const base::CommandLine* command_line) {
 }
 }  // namespace
 
-// This function should be called only from the browser process on all platforms
-// so that the finch flag check will happen in exactly one place and then the
-// Graphite enabled state will be propagated elsewhere via GpuPreferences to GPU
-// process launch and then later to renderer processes via GpuFeatureInfo.
-
 bool IsSkiaGraphiteEnabled(const base::CommandLine* command_line) {
   // Force disabling graphite if --disable-skia-graphite flag is specified.
   if (command_line->HasSwitch(switches::kDisableSkiaGraphite)) {
