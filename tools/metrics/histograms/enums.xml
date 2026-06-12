@@ -7973,6 +7973,7 @@ from previous Chrome versions.
   <int value="-2067166422" label="enable-slimming-paint-v2"/>
   <int value="-2066994897" label="AutofillVcnEnrollRequestTimeout:enabled"/>
   <int value="-2066541315" label="Mus:enabled"/>
+  <int value="-2065759371" label="ContextualTasksHideMenuOnAiPage:enabled"/>
   <int value="-2065683095" label="FedCmNonceInParams:disabled"/>
   <int value="-2064999807"
       label="OmniboxRevertModelBeforeClosingPopup:disabled"/>
@@ -16469,6 +16470,8 @@ from previous Chrome versions.
       label="FencedFramesCrossOriginAutomaticBeacons:disabled"/>
   <int value="685861269" label="CSSGridLanesLayout:enabled"/>
   <int value="685916283" label="enable-zip-archiver-on-file-manager"/>
+  <int value="686055212"
+      label="EnableContextualTasksPinButtonInToolbar:disabled"/>
   <int value="686371937" label="ResponsiveIframes:disabled"/>
   <int value="686822618" label="DefaultSiteInstanceGroups:enabled"/>
   <int value="686929809" label="BorealisWebUIInstaller:enabled"/>
@@ -16525,6 +16528,8 @@ from previous Chrome versions.
   <int value="701766325" label="PerNavigationMojoInterface:enabled"/>
   <int value="702060507" label="SafetyCheckWeakPasswords:disabled"/>
   <int value="702117246" label="OmniboxSiteSearchStarterPack:disabled"/>
+  <int value="703006465"
+      label="EnableContextualTasksPinButtonInToolbar:enabled"/>
   <int value="703122112" label="ShoppingList:enabled"/>
   <int value="703469777" label="AndroidNightModeTabReparenting:enabled"/>
   <int value="704405738" label="ShowNewTabAnimations:enabled"/>
@@ -20426,6 +20431,7 @@ from previous Chrome versions.
   <int value="1952183277" label="CrOSLateBootCrOSSOUL:enabled"/>
   <int value="1952339754"
       label="SignedExchangePrefetchCacheForNavigations:enabled"/>
+  <int value="1952481662" label="ContextualTasksHideMenuOnAiPage:disabled"/>
   <int value="1952811009" label="EnableSuggestedDriveFiles:disabled"/>
   <int value="1953967314" label="NtpRealboxWidthBehavior:disabled"/>
   <int value="1954461720" label="SysUiDownloadsIntegrationV2:disabled"/>

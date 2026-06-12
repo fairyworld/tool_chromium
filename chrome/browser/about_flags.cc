@@ -11818,6 +11818,22 @@ const FeatureEntry kFeatureEntries[] = {
      kOsDesktop | kOsAndroid,
      FEATURE_VALUE_TYPE(contextual_tasks::kContextualTasksSuggestionsEnabled)},
 
+    {"enable-contextual-tasks-pin-button-in-toolbar",
+     contextual_tasks::flag_descriptions::
+         kEnableContextualTasksPinButtonInToolbarName,
+     contextual_tasks::flag_descriptions::
+         kEnableContextualTasksPinButtonInToolbarDescription,
+     kOsDesktop | kOsAndroid,
+     FEATURE_VALUE_TYPE(
+         contextual_tasks::kEnableContextualTasksPinButtonInToolbar)},
+
+    {"contextual-tasks-hide-menu-on-ai-page",
+     contextual_tasks::flag_descriptions::kContextualTasksHideMenuOnAiPageName,
+     contextual_tasks::flag_descriptions::
+         kContextualTasksHideMenuOnAiPageDescription,
+     kOsDesktop | kOsAndroid,
+     FEATURE_VALUE_TYPE(contextual_tasks::kContextualTasksHideMenuOnAiPage)},
+
     {"contextual-tasks-context-library",
      contextual_tasks::flag_descriptions::kContextualTasksContextLibraryName,
      contextual_tasks::flag_descriptions::
