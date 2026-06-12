@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/password_manager/actor_login/internal/chrome_actor_login_delegate_client.h"
+#include "chrome/browser/password_manager/actor_login/chrome_actor_login_delegate_client.h"
 
 #include "chrome/browser/actor/actor_keyed_service.h"
 #include "chrome/browser/glic/public/glic_keyed_service.h"
@@ -145,6 +145,7 @@ bool ChromeActorLoginDelegateClient::IsTaskInFocus() {
   // attached to a tab.
   tabs::TabInterface* tab_interface =
       tabs::TabInterface::GetFromContents(&GetWebContents());
+  CHECK(tab_interface);
 // TODO(crbug.com/482430429): Reconsider the use of BrowserWindowInterface on
 // Android.
 #if !BUILDFLAG(IS_ANDROID)

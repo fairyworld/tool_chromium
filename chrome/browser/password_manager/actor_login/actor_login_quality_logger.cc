@@ -14,7 +14,6 @@
 #include "components/optimization_guide/core/model_quality/model_quality_logs_uploader_service.h"
 #include "components/translate/core/browser/translate_manager.h"
 #include "components/variations/service/variations_service.h"
-#include "content/public/browser/web_contents.h"
 
 ActorLoginQualityLogger::ActorLoginQualityLogger() {
   variations::VariationsService* variation_service =

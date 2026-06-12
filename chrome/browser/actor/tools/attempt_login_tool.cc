@@ -19,6 +19,7 @@
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/password_manager/actor_login/actor_login_service.h"
+#include "chrome/browser/password_manager/actor_login/chrome_actor_login_delegate_client.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/actor.mojom-shared.h"
 #include "chrome/common/actor/action_result.h"
@@ -45,6 +46,8 @@
 #endif
 
 namespace actor {
+
+using actor_login::ChromeActorLoginDelegateClient;
 
 namespace {
 
@@ -211,7 +214,9 @@ void AttemptLoginTool::Invoke(ToolCallback callback) {
         webui::mojom::UserGrantedPermissionDuration::kAlwaysAllow;
 
     GetActorLoginService().AttemptLogin(
-        tab, user_selected_credential_and_pemission->credential,
+        ChromeActorLoginDelegateClient::GetOrCreateForWebContents(
+            tab->GetContents()),
+        user_selected_credential_and_pemission->credential,
         should_store_permission, quality_logger_.AsWeakPtr(),
         attempt_login_tool_start_time_,
         base::BindOnce(&AttemptLoginTool::OnAttemptLogin,
@@ -239,7 +244,9 @@ void AttemptLoginTool::Invoke(ToolCallback callback) {
   }
 
   GetActorLoginService().GetCredentials(
-      tab, sign_in_with_google_button_.has_value(), quality_logger_.AsWeakPtr(),
+      ChromeActorLoginDelegateClient::GetOrCreateForWebContents(
+          tab->GetContents()),
+      sign_in_with_google_button_.has_value(), quality_logger_.AsWeakPtr(),
       base::BindOnce(&AttemptLoginTool::OnGetCredentials,
                      weak_ptr_factory_.GetWeakPtr()));
 }
@@ -477,8 +484,10 @@ void AttemptLoginTool::OnCredentialCachingDone(
       webui::mojom::UserGrantedPermissionDuration::kAlwaysAllow;
 
   GetActorLoginService().AttemptLogin(
-      tab, selected_credential, should_store_permission,
-      quality_logger_.AsWeakPtr(), attempt_login_tool_start_time_,
+      ChromeActorLoginDelegateClient::GetOrCreateForWebContents(
+          tab->GetContents()),
+      selected_credential, should_store_permission, quality_logger_.AsWeakPtr(),
+      attempt_login_tool_start_time_,
       base::BindOnce(&AttemptLoginTool::OnAttemptLogin,
                      weak_ptr_factory_.GetWeakPtr(), selected_credential,
                      should_store_permission),
@@ -623,7 +632,9 @@ void AttemptLoginTool::MaybeRetryCredentialNeedingFocus() {
   tool_delegate().UninterruptFromTool();
 
   GetActorLoginService().AttemptLogin(
-      tab, credential_awaiting_task_focus_->first,
+      ChromeActorLoginDelegateClient::GetOrCreateForWebContents(
+          tab->GetContents()),
+      credential_awaiting_task_focus_->first,
       credential_awaiting_task_focus_->second, quality_logger_.AsWeakPtr(),
       attempt_login_tool_start_time_,
       base::BindOnce(&AttemptLoginTool::OnAttemptLogin,

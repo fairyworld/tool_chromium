@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_PASSWORD_MANAGER_ACTOR_LOGIN_INTERNAL_CHROME_ACTOR_LOGIN_DELEGATE_CLIENT_H_
-#define CHROME_BROWSER_PASSWORD_MANAGER_ACTOR_LOGIN_INTERNAL_CHROME_ACTOR_LOGIN_DELEGATE_CLIENT_H_
+#ifndef CHROME_BROWSER_PASSWORD_MANAGER_ACTOR_LOGIN_CHROME_ACTOR_LOGIN_DELEGATE_CLIENT_H_
+#define CHROME_BROWSER_PASSWORD_MANAGER_ACTOR_LOGIN_CHROME_ACTOR_LOGIN_DELEGATE_CLIENT_H_
 
 #include "base/callback_list.h"
 #include "base/memory/raw_ptr.h"
@@ -20,7 +20,7 @@ class PrefService;
 namespace content {
 class Page;
 class WebContents;
-}
+}  // namespace content
 
 namespace translate {
 class TranslateManager;
@@ -110,4 +110,4 @@ class ChromeActorLoginDelegateClient
 
 }  // namespace actor_login
 
-#endif  // CHROME_BROWSER_PASSWORD_MANAGER_ACTOR_LOGIN_INTERNAL_CHROME_ACTOR_LOGIN_DELEGATE_CLIENT_H_
+#endif  // CHROME_BROWSER_PASSWORD_MANAGER_ACTOR_LOGIN_CHROME_ACTOR_LOGIN_DELEGATE_CLIENT_H_

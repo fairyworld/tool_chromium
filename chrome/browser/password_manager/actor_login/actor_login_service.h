@@ -9,9 +9,9 @@
 #include "base/time/time.h"
 #include "components/password_manager/core/browser/actor_login/actor_login_quality_logger_interface.h"
 #include "components/password_manager/core/browser/actor_login/actor_login_types.h"
-#include "components/tabs/public/tab_interface.h"
-
 namespace actor_login {
+
+class ActorLoginDelegateClient;
 
 // Interface for the `ActorLoginService`.
 // This service provides methods for retrieving credentials and attempting
@@ -20,19 +20,19 @@ class ActorLoginService {
  public:
   virtual ~ActorLoginService() = default;
 
-  // Asynchronously retrieves credentials for the given `tab`.
+  // Asynchronously retrieves credentials for the given `client`.
   // The `mqls_logger` is owned by the caller to ensure the same instance is
   // used to log both `GetCredentials` and `AttemptLogin`.
   // The `callback` will
   // be invoked with a `base::expected` containing either a list of
   // `Credential`s or an `ActorLoginError`.
   virtual void GetCredentials(
-      tabs::TabInterface* tab,
+      ActorLoginDelegateClient* client,
       bool has_sign_in_with_google_button,
       base::WeakPtr<ActorLoginQualityLoggerInterface> mqls_logger,
       CredentialsOrErrorReply callback) = 0;
 
-  // Attempts to log in using the provided `credential` for the given `tab`.
+  // Attempts to log in using the provided `credential` for the given `client`.
   // If `should_store_permission` is true, `credential` will be updated to store
   // the permission to use it in actor login.
   // The `mqls_logger` is owned by the caller to ensure the same instance is
@@ -42,7 +42,7 @@ class ActorLoginService {
   // The `action_sequence_delegate` allows for communicating outcomes of a login
   // when additional steps are involved after AttemptLogin has completed.
   virtual void AttemptLogin(
-      tabs::TabInterface* tab,
+      ActorLoginDelegateClient* client,
       const Credential& credential,
       bool should_store_permission,
       base::WeakPtr<ActorLoginQualityLoggerInterface> mqls_logger,

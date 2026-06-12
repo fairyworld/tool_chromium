@@ -33,13 +33,13 @@ class PasswordChangeFromCheckupActorLoginService : public ActorLoginService {
 
   // ActorLoginService
   void GetCredentials(
-      tabs::TabInterface* tab,
+      ActorLoginDelegateClient* client,
       bool has_sign_in_with_google_button,
       base::WeakPtr<ActorLoginQualityLoggerInterface> mqls_logger,
       CredentialsOrErrorReply callback) override;
 
   void AttemptLogin(
-      tabs::TabInterface* tab,
+      ActorLoginDelegateClient* client,
       const Credential& credential,
       bool should_store_permission,
       base::WeakPtr<ActorLoginQualityLoggerInterface> mqls_logger,

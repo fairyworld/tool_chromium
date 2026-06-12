@@ -30,8 +30,8 @@ namespace gfx {
 class RectF;
 }
 
-namespace tabs {
-class TabInterface;
+namespace actor_login {
+class ActorLoginDelegateClient;
 }
 
 namespace actor {
@@ -50,12 +50,12 @@ class MockActorLoginService : public actor_login::ActorLoginService {
 
   // `actor_login::ActorLoginService`:
   void GetCredentials(
-      tabs::TabInterface* tab,
+      actor_login::ActorLoginDelegateClient* client,
       bool has_sign_in_with_google_button,
       base::WeakPtr<actor_login::ActorLoginQualityLoggerInterface> mqls_logger,
       actor_login::CredentialsOrErrorReply callback) override;
   void AttemptLogin(
-      tabs::TabInterface* tab,
+      actor_login::ActorLoginDelegateClient* client,
       const actor_login::Credential& credential,
       bool should_store_permission,
       base::WeakPtr<actor_login::ActorLoginQualityLoggerInterface> mqls_logger,
@@ -85,7 +85,7 @@ class MockActorLoginService : public actor_login::ActorLoginService {
   void OnActionSequenceEnded(bool success);
 
   static void OnFederatedLoginResume(
-      tabs::TabInterface* tab,
+      content::WebContents* web_contents,
       content::webid::FederatedLoginResult result);
 
   actor_login::CredentialsOrError credentials_;
