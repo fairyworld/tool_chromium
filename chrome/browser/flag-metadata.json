@@ -718,11 +718,6 @@
     "expiry_milestone": 153
   },
   {
-    "name": "audio-ducking",
-    "owners": ["steimel@chromium.org", "mfoltz@chromium.org"],
-    "expiry_milestone": 150
-  },
-  {
     "name": "audio-flexible-loopback-for-system-loopback",
     "owners": ["aaronyu@google.com", "chromeos-audio@google.com" ],
     "expiry_milestone": 200

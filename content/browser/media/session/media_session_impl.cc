@@ -33,6 +33,7 @@
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_contents_delegate.h"
 #include "content/public/common/content_client.h"
+#include "media/audio/audio_constants.h"
 #include "media/audio/audio_device_description.h"
 #include "media/base/media_content_type.h"
 #include "media/base/media_switches.h"
@@ -63,7 +64,6 @@ using media_session::mojom::MediaSessionInfo;
 namespace {
 
 const double kUnduckedVolumeMultiplier = 1.0;
-const double kDefaultDuckingVolumeMultiplier = 0.2;
 
 const char kDebugInfoOwnerSeparator[] = " - ";
 
@@ -1001,17 +1001,11 @@ MediaSessionImpl::MediaSessionImpl(WebContents* web_contents)
       audio_focus_state_(State::INACTIVE),
       desired_audio_focus_type_(AudioFocusType::kGainTransientMayDuck),
       is_ducking_(false),
-      ducking_volume_multiplier_(kDefaultDuckingVolumeMultiplier),
+      ducking_volume_multiplier_(media::kDefaultDuckingVolumeMultiplier),
       routed_service_(nullptr) {
 #if BUILDFLAG(IS_ANDROID)
   session_android_ = std::make_unique<MediaSessionAndroid>(this);
   should_throttle_duration_update_ = true;
-#else
-  if (base::FeatureList::IsEnabled(media::kAudioDucking)) {
-    ducking_volume_multiplier_ =
-        1.0 -
-        (std::clamp(media::kAudioDuckingAttenuation.Get(), 0, 100) / 100.0);
-  }
 #endif  // BUILDFLAG(IS_ANDROID)
   if (web_contents && web_contents->GetPrimaryMainFrame() &&
       web_contents->GetPrimaryMainFrame()->GetView()) {

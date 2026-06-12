@@ -33,9 +33,6 @@ AudioDucker::~AudioDucker() {
 }
 
 bool AudioDucker::StartDuckingOtherAudio() {
-  if (!base::FeatureList::IsEnabled(media::kAudioDucking)) {
-    return false;
-  }
   if (ducking_state_ == AudioDuckingState::kDucking) {
     return true;
   }
@@ -48,9 +45,6 @@ bool AudioDucker::StartDuckingOtherAudio() {
 }
 
 bool AudioDucker::StopDuckingOtherAudio() {
-  if (!base::FeatureList::IsEnabled(media::kAudioDucking)) {
-    return false;
-  }
   if (ducking_state_ == AudioDuckingState::kNoDucking) {
     return true;
   }

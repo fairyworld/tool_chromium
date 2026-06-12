@@ -3574,26 +3574,6 @@ const FeatureEntry::FeatureVariation
 #endif  // BUILDFLAG(IS_ANDROID) && PA_BUILDFLAG(HAS_MEMORY_TAGGING) &&
         // PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
 
-#if !BUILDFLAG(IS_ANDROID)
-const FeatureEntry::FeatureParam kAudioDuckingAttenuation_60[] = {
-    {"attenuation", "60"}};
-const FeatureEntry::FeatureParam kAudioDuckingAttenuation_70[] = {
-    {"attenuation", "70"}};
-const FeatureEntry::FeatureParam kAudioDuckingAttenuation_80[] = {
-    {"attenuation", "80"}};
-const FeatureEntry::FeatureParam kAudioDuckingAttenuation_90[] = {
-    {"attenuation", "90"}};
-const FeatureEntry::FeatureParam kAudioDuckingAttenuation_100[] = {
-    {"attenuation", "100"}};
-
-const FeatureEntry::FeatureVariation kAudioDuckingAttenuationVariations[] = {
-    {"attenuation 60", kAudioDuckingAttenuation_60, nullptr},
-    {"attenuation 70", kAudioDuckingAttenuation_70, nullptr},
-    {"attenuation 80", kAudioDuckingAttenuation_80, nullptr},
-    {"attenuation 90", kAudioDuckingAttenuation_90, nullptr},
-    {"attenuation 100", kAudioDuckingAttenuation_100, nullptr}};
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_ANDROID)
 const FeatureEntry::FeatureParam
     kMaliciousApkDownloadCheckTelemetryOnlyParams[] = {
@@ -8985,14 +8965,6 @@ const FeatureEntry kFeatureEntries[] = {
      FEATURE_WITH_PARAMS_VALUE_TYPE(net::features::kDiskCacheBackendExperiment,
                                     kDiskCacheBackendExperimentVariations,
                                     "DiskCacheBackendExperiment")},
-
-#if !BUILDFLAG(IS_ANDROID)
-    {"audio-ducking", flag_descriptions::kAudioDuckingName,
-     flag_descriptions::kAudioDuckingDescription, kOsDesktop,
-     FEATURE_WITH_PARAMS_VALUE_TYPE(media::kAudioDucking,
-                                    kAudioDuckingAttenuationVariations,
-                                    "AudioDucking")},
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_CHROMEOS)
     {"enable-libinput-to-handle-touchpad",

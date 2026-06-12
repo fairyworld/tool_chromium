@@ -1478,15 +1478,6 @@ BASE_FEATURE(kMediaOptimizer,
 // Enable aggregate power measurement for media playback.
 BASE_FEATURE(kMediaPowerExperiment, base::FEATURE_DISABLED_BY_DEFAULT);
 
-#if !BUILDFLAG(IS_ANDROID)
-// Enables audio ducking.
-BASE_FEATURE(kAudioDucking, base::FEATURE_ENABLED_BY_DEFAULT);
-// 0 = no attenuation
-// 100 = fully muted
-const base::FeatureParam<int> kAudioDuckingAttenuation{&kAudioDucking,
-                                                       "attenuation", 80};
-#endif  // !BUILDFLAG(IS_ANDROID)
-
 #if BUILDFLAG(IS_WIN)
 // Enables ducking of other Windows applications.
 BASE_FEATURE(kAudioDuckingWin, base::FEATURE_ENABLED_BY_DEFAULT);

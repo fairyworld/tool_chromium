@@ -1396,11 +1396,6 @@ inline constexpr char kDocumentPictureInPictureAnimateResizeDescription[] =
     "Use an animation when programmatically resizing a document"
     "picture-in-picture window";
 
-inline constexpr char kAudioDuckingName[] = "Audio Ducking";
-inline constexpr char kAudioDuckingDescription[] =
-    "Allows Chrome to duck (attenuate) "
-    "audio from other tabs.";
-
 inline constexpr char kDsePreload2Name[] = "Default Search Engine preload 2";
 inline constexpr char kDsePreload2Description[] =
     "Enables new DSE preload instead of existing one, which uses //content "
