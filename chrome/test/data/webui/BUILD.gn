@@ -162,7 +162,10 @@ source_set("browser_tests") {
   }
 
   if (is_chromeos) {
-    deps += [ "//chrome/browser/ui/webui/ash/cloud_upload:browser_tests" ]
+    deps += [
+      "//ash/webui/connectivity_diagnostics",
+      "//chrome/browser/ui/webui/ash/cloud_upload:browser_tests",
+    ]
     sources += [
       "chromeos/account_manager/account_manager_browsertest.cc",
       "chromeos/ash_common/ash_common_browsertest.cc",
@@ -175,6 +178,7 @@ source_set("browser_tests") {
       "chromeos/cloud_upload/connect_onedrive_browsertest.cc",
       "chromeos/cloud_upload/file_handler_page_browsertest.cc",
       "chromeos/cloud_upload/move_confirmation_page_browsertest.cc",
+      "chromeos/cr_components_chromeos_v3_browsertest.cc",
       "chromeos/crostini_installer_browsertest.cc",
       "chromeos/diagnostics/diagnostics_browsertest.cc",
       "chromeos/edu_coexistence/edu_coexistence_browsertest.cc",

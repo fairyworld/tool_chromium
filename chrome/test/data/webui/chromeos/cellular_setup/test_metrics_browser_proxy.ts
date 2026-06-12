@@ -2,10 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import type {MetricsBrowserProxy} from 'chrome://resources/ash/common/cellular_setup/metrics_browser_proxy.js';
+
 /**
  * A mock to intercept metric logging calls.
  */
-export class MockMetricsPrivate {
+export class TestMetricsBrowserProxy implements MetricsBrowserProxy {
   private cellularSetupResultDict_: Map<number, number> = new Map();
   private histogramCounts_: Map<string, number> = new Map();
 
