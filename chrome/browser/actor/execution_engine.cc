@@ -309,10 +309,6 @@ ExecutionEngine::ShouldDeferNavigation(
   switch (decision) {
     case GatingDecision::kAllowSameOrigin:
     case GatingDecision::kAllowByContainerConfig:
-      LogNavigationGating(source_origin, navigation_handle.GetInitiatorOrigin(),
-                          url::Origin::Create(navigation_handle.GetURL()),
-                          /*applied_gate=*/false);
-      return content::NavigationThrottle::PROCEED;
     case GatingDecision::kAllowByStaticList:
       LogNavigationGating(source_origin, navigation_handle.GetInitiatorOrigin(),
                           url::Origin::Create(navigation_handle.GetURL()),
