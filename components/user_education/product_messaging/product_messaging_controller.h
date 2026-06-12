@@ -25,10 +25,6 @@ namespace user_education {
 class ProductMessagingController;
 class ProductMessagingPolicy;
 
-namespace internal {
-class MessagingCoordinator;
-}
-
 // The owner of this object currently has priority to show a product message
 // It must be held while the message is showing and released immediately after
 // the message is dismissed.
@@ -131,7 +127,6 @@ class ProductMessagingController final {
 
  private:
   friend class ProductMessagingHandleImpl;
-  friend class internal::MessagingCoordinator;
 
   // Called by ProductMessagePriorityHandle when it is released. Clears the
   // current message and maybe tries to start the next.
