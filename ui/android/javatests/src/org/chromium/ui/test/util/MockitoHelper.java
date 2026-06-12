@@ -68,7 +68,7 @@ public class MockitoHelper {
                 });
     }
 
-    /** Similar to {@link #doCallback(Callback)} but able to return a value as well. */
+    /** Similar to {@link #doCallback(Callback)} but able to return a value. */
     public static <T, R> Stubber doFunction(Function<T, R> function) {
         return doFunction(function, 0);
     }
