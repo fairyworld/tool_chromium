@@ -50,7 +50,7 @@ class MockFrameInfoHelper : public FrameInfoHelper,
   void GetFrameInfo(std::unique_ptr<CodecOutputBufferRenderer> buffer_renderer,
                     FrameInfoReadyCB cb) override {
     FrameInfo info;
-    info.coded_size = buffer_renderer->size();
+    info.coded_size = buffer_renderer->visible_size();
     info.visible_rect = gfx::Rect(info.coded_size);
 
     std::move(cb).Run(std::move(buffer_renderer), info);

@@ -45,10 +45,10 @@ class MEDIA_GPU_EXPORT CodecOutputBuffer {
   // Releases this buffer and renders it to the surface.
   bool ReleaseToSurface();
 
-  // The size of the image.
-  gfx::Size size() const { return size_; }
+  // The visible size of the image.
+  gfx::Size visible_size() const { return visible_size_; }
 
-  // Returns true if a coded size guess based on `size_` is available.
+  // Returns true if a coded size guess based on `visible_size_` is available.
   bool CanGuessCodedSize() const;
 
   // Attempts to guess the coded size. `CanGuessCodedSize` must be true.
@@ -77,20 +77,20 @@ class MEDIA_GPU_EXPORT CodecOutputBuffer {
   friend class CodecWrapperImpl;
   CodecOutputBuffer(scoped_refptr<CodecWrapperImpl> codec,
                     int64_t id,
-                    const gfx::Size& size,
+                    const gfx::Size& visible_size,
                     const MediaFormatColorSpace& color_space,
                     std::optional<gfx::Size> coded_size_alignment);
 
   // For testing, since CodecWrapperImpl isn't available.  Uses nullptr.
   CodecOutputBuffer(int64_t id,
-                    const gfx::Size& size,
+                    const gfx::Size& visible_size,
                     const MediaFormatColorSpace& color_space,
                     std::optional<gfx::Size> coded_size_alignment);
 
   scoped_refptr<CodecWrapperImpl> codec_;
   int64_t id_;
   bool was_rendered_ = false;
-  gfx::Size size_;
+  gfx::Size visible_size_;
   base::OnceClosure render_cb_;
   MediaFormatColorSpace color_space_;
 

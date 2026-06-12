@@ -121,23 +121,23 @@ class CodecWrapperImpl : public base::RefCountedThreadSafe<CodecWrapperImpl> {
 CodecOutputBuffer::CodecOutputBuffer(
     scoped_refptr<CodecWrapperImpl> codec,
     int64_t id,
-    const gfx::Size& size,
+    const gfx::Size& visible_size,
     const MediaFormatColorSpace& color_space,
     std::optional<gfx::Size> coded_size_alignment)
     : codec_(std::move(codec)),
       id_(id),
-      size_(size),
+      visible_size_(visible_size),
       color_space_(color_space),
       coded_size_alignment_(coded_size_alignment) {}
 
 // For testing.
 CodecOutputBuffer::CodecOutputBuffer(
     int64_t id,
-    const gfx::Size& size,
+    const gfx::Size& visible_size,
     const MediaFormatColorSpace& color_space,
     std::optional<gfx::Size> coded_size_alignment)
     : id_(id),
-      size_(size),
+      visible_size_(visible_size),
       color_space_(color_space),
       coded_size_alignment_(coded_size_alignment) {}
 
@@ -166,10 +166,11 @@ bool CodecOutputBuffer::CanGuessCodedSize() const {
 
 gfx::Size CodecOutputBuffer::GuessCodedSize() const {
   DCHECK(CanGuessCodedSize());
-  return gfx::Size(base::bits::AlignUpDeprecatedDoNotUse(
-                       size_.width(), coded_size_alignment_->width()),
-                   base::bits::AlignUpDeprecatedDoNotUse(
-                       size_.height(), coded_size_alignment_->height()));
+  return gfx::Size(
+      base::bits::AlignUpDeprecatedDoNotUse(visible_size_.width(),
+                                            coded_size_alignment_->width()),
+      base::bits::AlignUpDeprecatedDoNotUse(visible_size_.height(),
+                                            coded_size_alignment_->height()));
 }
 
 CodecWrapperImpl::CodecWrapperImpl(

@@ -221,7 +221,7 @@ TEST_F(CodecWrapperTest, CodecOutputBuffersHaveTheCorrectSize) {
   EXPECT_CALL(*codec_, GetOutputSize(_))
       .WillOnce(DoAll(SetArgPointee<0>(gfx::Size(42, 42)), Return(OkStatus())));
   auto codec_buffer = DequeueCodecOutputBuffer();
-  ASSERT_EQ(codec_buffer->size(), gfx::Size(42, 42));
+  ASSERT_EQ(codec_buffer->visible_size(), gfx::Size(42, 42));
 }
 
 TEST_F(CodecWrapperTest, CodecOutputBuffersGuessCodedSize) {
@@ -231,7 +231,7 @@ TEST_F(CodecWrapperTest, CodecOutputBuffersGuessCodedSize) {
   EXPECT_CALL(*codec_, GetOutputSize(_))
       .WillOnce(DoAll(SetArgPointee<0>(gfx::Size(42, 42)), Return(OkStatus())));
   auto codec_buffer = DequeueCodecOutputBuffer();
-  ASSERT_EQ(codec_buffer->size(), gfx::Size(42, 42));
+  ASSERT_EQ(codec_buffer->visible_size(), gfx::Size(42, 42));
   EXPECT_TRUE(codec_buffer->CanGuessCodedSize());
   EXPECT_EQ(codec_buffer->GuessCodedSize(), gfx::Size(48, 48));
 }
@@ -248,7 +248,7 @@ TEST_F(CodecWrapperTest, CodecOutputBuffersGuessCodedSizeNoAlignment) {
   EXPECT_CALL(*codec_, GetOutputSize(_))
       .WillOnce(DoAll(SetArgPointee<0>(gfx::Size(42, 42)), Return(OkStatus())));
   auto codec_buffer = DequeueCodecOutputBuffer();
-  ASSERT_EQ(codec_buffer->size(), gfx::Size(42, 42));
+  ASSERT_EQ(codec_buffer->visible_size(), gfx::Size(42, 42));
   EXPECT_FALSE(codec_buffer->CanGuessCodedSize());
 }
 
@@ -264,7 +264,7 @@ TEST_F(CodecWrapperTest, CodecOutputBuffersGuessCodedSizeWeirdAlignment) {
   EXPECT_CALL(*codec_, GetOutputSize(_))
       .WillOnce(DoAll(SetArgPointee<0>(gfx::Size(42, 42)), Return(OkStatus())));
   auto codec_buffer = DequeueCodecOutputBuffer();
-  ASSERT_EQ(codec_buffer->size(), gfx::Size(42, 42));
+  ASSERT_EQ(codec_buffer->visible_size(), gfx::Size(42, 42));
   EXPECT_TRUE(codec_buffer->CanGuessCodedSize());
   EXPECT_EQ(codec_buffer->GuessCodedSize(), gfx::Size(128, 42));
 }
@@ -419,10 +419,10 @@ TEST_F(CodecWrapperTest, CodecOutputsIgnoreZeroSize) {
       .WillOnce(DoAll(SetArgPointee<0>(kNewSize), Return(OkStatus())));
 
   auto codec_buffer = DequeueCodecOutputBuffer();
-  ASSERT_EQ(codec_buffer->size(), kInitialCodedSize);
+  ASSERT_EQ(codec_buffer->visible_size(), kInitialCodedSize);
 
   codec_buffer = DequeueCodecOutputBuffer();
-  ASSERT_EQ(codec_buffer->size(), kNewSize);
+  ASSERT_EQ(codec_buffer->visible_size(), kNewSize);
 }
 
 }  // namespace media
