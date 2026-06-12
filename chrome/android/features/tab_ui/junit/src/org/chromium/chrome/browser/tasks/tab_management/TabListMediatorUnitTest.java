@@ -1295,6 +1295,40 @@ public class TabListMediatorUnitTest {
     }
 
     @Test
+    public void tabAddition_Restore_NestedLayout() {
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+
+        createTabGroup(List.of(mTab1, mTab2), TAB_GROUP_ID);
+        mockRepresentativeTabs(mTab1, mTab2);
+        doReturn(POSITION1).when(mTabModel).representativeIndexOf(mTab2);
+        doReturn(POSITION1).when(mTabModel).representativeIndexOf(mTab1);
+        mModelList.clear();
+
+        mTabModelObserverCaptor
+                .getValue()
+                .didAddTab(
+                        mTab2,
+                        TabLaunchType.FROM_RESTORE,
+                        TabCreationState.LIVE_IN_FOREGROUND,
+                        false);
+
+        // In nested layout, restoring the first tab in a group adds the group header
+        // and the tab itself (2 cards).
+        assertThat(mModelList.size(), equalTo(2));
+
+        mTabModelObserverCaptor
+                .getValue()
+                .didAddTab(
+                        mTab1,
+                        TabLaunchType.FROM_RESTORE,
+                        TabCreationState.LIVE_IN_FOREGROUND,
+                        false);
+
+        // Restoring the second tab adds its card to the list.
+        assertThat(mModelList.size(), equalTo(3));
+    }
+
+    @Test
     public void tabAddition_GroupedLayout() {
         Tab newTab = prepareTab(TAB3_ID, TAB3_TITLE, TAB3_URL);
         mockRepresentativeTabs(mTab1, mTab2, newTab);
