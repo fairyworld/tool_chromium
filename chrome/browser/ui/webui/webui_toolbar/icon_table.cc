@@ -91,7 +91,7 @@ const base::flat_map<const gfx::VectorIcon*, IconInfo>& KnownIcons() {
            {"webui-toolbar:omnibox_info", IconType::kIconSet}},
           {{&omnibox::kChromeProductIcon},
            {"webui-toolbar:omnibox_chrome_product", IconType::kIconSet}},
-          {{&omnibox::kPageInfoIcon},
+          {{&omnibox::kPageInfoCustomIcon},
            {"webui-toolbar:omnibox_page_info", IconType::kIconSet}},
           {{&omnibox::kStarIcon},
            {"webui-toolbar:omnibox_star", IconType::kIconSet}},
@@ -134,9 +134,9 @@ const base::flat_map<const gfx::VectorIcon*, IconInfo>& KnownIcons() {
                   ? omnibox::kChromeProductIcon
                   : omnibox::kProductChromeRefreshOldIcon)},
            {"lhs_icons/product_chrome_refresh_icon.svg", IconType::kMaskUrl}},
-          // Will be replaced by kPageInfoIcon.
+          // Will be replaced by kPageInfoCustomIcon.
           {{&(features::IsRoundedIconsEnabled()
-                  ? omnibox::kPageInfoIcon
+                  ? omnibox::kPageInfoCustomIcon
                   : omnibox::kSecurePageInfoChromeRefreshOldIcon)},
            {"lhs_icons/secure_page_info_chrome_refresh.svg",
             IconType::kMaskUrl}},
