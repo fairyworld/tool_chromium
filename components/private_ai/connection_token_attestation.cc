@@ -168,8 +168,10 @@ void ConnectionTokenAttestation::OnInnerConnectionResponse(
                         base::NumberToString(static_cast<int>(result.error())),
                         ", assuming token rejection."}));
       attestation_state_ = AttestationState::kTokenFailed;
-      std::move(original_callback)
-          .Run(base::unexpected(StatusCode::kClientAttestationFailed));
+      if (original_callback) {
+        std::move(original_callback)
+            .Run(base::unexpected(StatusCode::kClientAttestationFailed));
+      }
       // The connection is now considered broken due to failed attestation.
       CallOnDisconnect(StatusCode::kClientAttestationFailed);
       return;
@@ -181,7 +183,9 @@ void ConnectionTokenAttestation::OnInnerConnectionResponse(
     }
   }
 
-  std::move(original_callback).Run(std::move(result));
+  if (original_callback) {
+    std::move(original_callback).Run(std::move(result));
+  }
 }
 
 void ConnectionTokenAttestation::OnDestroy(StatusCode status_code) {
