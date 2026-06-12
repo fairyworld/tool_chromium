@@ -523,9 +523,12 @@ import java.util.function.Supplier;
     }
 
     private void updatePlusButtonBackgroundStyle() {
+        boolean isAiMode =
+                mInput != null && mInput.getRequestType() == AutocompleteRequestType.AI_MODE;
         boolean useWideStyle =
-                mModel.get(FuseboxProperties.FUSEBOX_LAYOUT_MODE)
-                        == FuseboxLayoutMode.SUGGESTIONS_POPOVER;
+                isAiMode
+                        && mModel.get(FuseboxProperties.FUSEBOX_LAYOUT_MODE)
+                                == FuseboxLayoutMode.SUGGESTIONS_POPOVER;
         mModel.set(
                 FuseboxProperties.PLUS_BUTTON_BACKGROUND_STYLE,
                 useWideStyle
@@ -1000,6 +1003,8 @@ import java.util.function.Supplier;
             updateClientControlledToolButtonList();
             updatePopupButtonEnabledStates();
         }
+
+        updatePlusButtonBackgroundStyle();
     }
 
     private void onSiteSearchDataChanged(@Nullable SiteSearchData siteSearchData) {

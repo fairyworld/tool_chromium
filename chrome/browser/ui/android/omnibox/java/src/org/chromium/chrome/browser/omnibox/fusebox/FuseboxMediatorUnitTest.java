@@ -510,7 +510,8 @@ public class FuseboxMediatorUnitTest {
     }
 
     @Test
-    public void plusButtonBackground_popoverLayout_isAlwaysVisibleWide() {
+    public void plusButtonBackground_aiModePopover() {
+        mInput.setRequestType(AutocompleteRequestType.AI_MODE);
         mModel.set(FuseboxProperties.FUSEBOX_LAYOUT_MODE, FuseboxLayoutMode.SUGGESTIONS_POPOVER);
         recreateMediator();
 
@@ -520,7 +521,19 @@ public class FuseboxMediatorUnitTest {
     }
 
     @Test
-    public void plusButtonBackground_toolbarLayout_isInteractOnlySmall() {
+    public void plusButtonBackground_imageGenPopover() {
+        mInput.setRequestType(AutocompleteRequestType.IMAGE_GENERATION);
+        mModel.set(FuseboxProperties.FUSEBOX_LAYOUT_MODE, FuseboxLayoutMode.SUGGESTIONS_POPOVER);
+        recreateMediator();
+
+        assertEquals(
+                BackgroundStyle.INTERACT_ONLY_SMALL,
+                mModel.get(FuseboxProperties.PLUS_BUTTON_BACKGROUND_STYLE).intValue());
+    }
+
+    @Test
+    public void plusButtonBackground_aiModeToolbar() {
+        mInput.setRequestType(AutocompleteRequestType.AI_MODE);
         mModel.set(FuseboxProperties.FUSEBOX_LAYOUT_MODE, FuseboxLayoutMode.TOOLBAR);
         recreateMediator();
 
