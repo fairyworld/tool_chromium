@@ -6,6 +6,8 @@ source_set("core") {
   sources = [
     "context_memory_error.cc",
     "context_memory_error.h",
+    "context_memory_features.cc",
+    "context_memory_features.h",
     "country_type.h",
     "network/personal_context_fetcher.cc",
     "network/personal_context_fetcher.h",

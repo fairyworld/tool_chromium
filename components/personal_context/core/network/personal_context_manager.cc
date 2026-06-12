@@ -11,11 +11,14 @@
 #include "base/command_line.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback_helpers.h"
+#include "base/metrics/histogram_functions.h"
 #include "base/notreached.h"
+#include "base/strings/strcat.h"
 #include "base/task/sequenced_task_runner.h"
 #include "base/time/time.h"
 #include "base/types/expected.h"
 #include "components/personal_context/core/context_memory_error.h"
+#include "components/personal_context/core/context_memory_features.h"
 #include "components/personal_context/core/network/personal_context_fetcher.h"
 #include "components/personal_context/core/personal_context_debug_features.h"
 #include "components/personal_context/core/personal_context_types.h"
@@ -71,6 +74,21 @@ size_t GetMaxParallelPiiFeatureFetchers(proto::ContextMemoryFeature feature) {
   }
 }
 
+void RecordResultHistogram(proto::ContextMemoryFeature feature, bool success) {
+  base::UmaHistogramBoolean(
+      base::StrCat({"PersonalContext.FetchContext.Result.",
+                    GetStringNameForContextMemoryFeature(feature)}),
+      success);
+}
+
+void RecordLatencyHistogram(proto::ContextMemoryFeature feature,
+                            base::TimeDelta latency) {
+  base::UmaHistogramMediumTimes(
+      base::StrCat({"PersonalContext.FetchContext.Latency.",
+                    GetStringNameForContextMemoryFeature(feature)}),
+      latency);
+}
+
 }  // namespace
 
 PersonalContextManager::PersonalContextManager(
@@ -108,39 +126,45 @@ void PersonalContextManager::FetchContext(
 
   FetcherId fetcher_id = next_fetcher_id_++;
   auto fetcher = std::make_unique<PersonalContextFetcher>(
-      identity_manager_, url_loader_factory_, memory_service_url_);
+      feature, identity_manager_, url_loader_factory_, memory_service_url_);
 
   auto fetcher_it =
       fetchers_for_feature.emplace(fetcher_id, std::move(fetcher));
   fetcher_it.first->second->FetchContext(
-      feature, request_metadata, timeout,
+      request_metadata, timeout,
       base::BindOnce(&PersonalContextManager::OnFetchContextResponse,
                      weak_ptr_factory_.GetWeakPtr(), feature, fetcher_id,
-                     std::move(callback)));
+                     base::TimeTicks::Now(), std::move(callback)));
 }
 
 void PersonalContextManager::OnFetchContextResponse(
     proto::ContextMemoryFeature feature,
     FetcherId fetcher_id,
+    base::TimeTicks start_time,
     FetchContextCallback callback,
     base::expected<const proto::FetchContextResponse, ContextMemoryError>
         fetch_response) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   active_fetchers_[feature].erase(fetcher_id);
 
+  RecordLatencyHistogram(feature, base::TimeTicks::Now() - start_time);
+
   if (!fetch_response.has_value()) {
+    RecordResultHistogram(feature, /*success=*/false);
     std::move(callback).Run(
         FetchContextResult(base::unexpected(fetch_response.error())));
     return;
   }
 
   if (!fetch_response->has_response_metadata()) {
+    RecordResultHistogram(feature, /*success=*/false);
     std::move(callback).Run(FetchContextResult(
         base::unexpected(ContextMemoryError::FromExecutionError(
             ContextMemoryError::ExecutionError::kGenericFailure))));
     return;
   }
 
+  RecordResultHistogram(feature, /*success=*/true);
   std::move(callback).Run(
       FetchContextResult(base::ok(fetch_response->response_metadata())));
 }
@@ -162,12 +186,12 @@ void PersonalContextManager::FetchPiiEntities(
 
   FetcherId fetcher_id = next_fetcher_id_++;
   auto fetcher = std::make_unique<PersonalContextFetcher>(
-      identity_manager_, url_loader_factory_, memory_service_url_);
+      feature, identity_manager_, url_loader_factory_, memory_service_url_);
 
   auto fetcher_it =
       fetchers_for_feature.emplace(fetcher_id, std::move(fetcher));
   fetcher_it.first->second->FetchPiiEntities(
-      feature, request, timeout,
+      request, timeout,
       base::BindOnce(&PersonalContextManager::OnFetchPiiEntitiesResponse,
                      weak_ptr_factory_.GetWeakPtr(), feature, fetcher_id,
                      std::move(callback)));
