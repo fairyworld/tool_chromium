@@ -185,6 +185,7 @@ const base::Feature* const kAllFeatures[] = {
     &kIPHiOSGeminiImageRemixFeature,
     &kIPHiOSGeminiLiveIPHFeature,
     &kIPHiOSGeminiLiveNewBadgeFeature,
+    &kIPHiOSGeminiWhatCanGeminiDo,
     &kIPHiOSHistoryOnOverflowMenuFeature,
     &kIPHiOSHomepageCustomizationNewBadge,
     &kIPHiOSHomepageLensNewBadge,

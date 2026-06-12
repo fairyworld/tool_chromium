@@ -388,6 +388,8 @@ DEFINE_VARIATION_PARAM(kIPHiOSGeminiFullscreenPromoFeature,
                        "IPH_iOSGeminiFullscreenPromoFeature");
 DEFINE_VARIATION_PARAM(kIPHiOSGeminiImageRemixFeature,
                        "IPH_iOSGeminiImageRemixFeature");
+DEFINE_VARIATION_PARAM(kIPHiOSGeminiWhatCanGeminiDo,
+                       "IPHiOSGeminiWhatCanGeminiDo");
 DEFINE_VARIATION_PARAM(kIPHiOSNewIAPromoFeature, "IPH_iOSNewIAPromoFeature");
 DEFINE_VARIATION_PARAM(kIPHiOSPinMostVisitedSiteFeature,
                        "IPH_iOSPinMostVisitedSiteFeature");
@@ -775,6 +777,7 @@ inline constexpr flags_ui::FeatureEntry::FeatureVariation
         VARIATION_ENTRY(kIPHiOSGeminiImageRemixFeature),
         VARIATION_ENTRY(kIPHiOSGeminiLiveIPHFeature),
         VARIATION_ENTRY(kIPHiOSGeminiLiveNewBadgeFeature),
+        VARIATION_ENTRY(kIPHiOSGeminiWhatCanGeminiDo),
         VARIATION_ENTRY(kIPHiOSHistoryOnOverflowMenuFeature),
         VARIATION_ENTRY(kIPHiOSLensKeyboardFeature),
         VARIATION_ENTRY(kIPHiOSLensOverlayEntrypointTipFeature),

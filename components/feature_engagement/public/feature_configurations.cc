@@ -3272,6 +3272,23 @@ std::optional<FeatureConfig> GetClientSideFeatureConfig(
     return config;
   }
 
+  if (kIPHiOSGeminiWhatCanGeminiDo.name == feature->name) {
+    FeatureConfig config;
+    config.valid = true;
+    config.availability = Comparator(ANY, 0);
+    config.session_rate = Comparator(ANY, 0);
+    // Limit showing the suggestion to less than 5 times.
+    config.trigger = EventConfig(events::kIOSGeminiWhatCanGeminiDoTriggered,
+                                 Comparator(LESS_THAN, 5),
+                                 feature_engagement::kMaxStoragePeriod,
+                                 feature_engagement::kMaxStoragePeriod);
+    config.used =
+        EventConfig(events::kIOSGeminiWhatCanGeminiDoTapped, Comparator(ANY, 0),
+                    feature_engagement::kMaxStoragePeriod,
+                    feature_engagement::kMaxStoragePeriod);
+    return config;
+  }
+
   if (kIPHiOSGeminiImageRemixFeature.name == feature->name) {
     // Show the entry point once a year, but block it for 3 days if the user has
     // seen another Gemini-related IPH.

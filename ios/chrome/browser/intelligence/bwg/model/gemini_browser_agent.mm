@@ -233,7 +233,9 @@ GeminiBrowserAgent::GeminiBrowserAgent(Browser* browser)
     bwg_gateway_.pageStateChangeHandler = gemini_page_state_change_handler_;
 
     bwg_session_handler_ = [[GeminiSessionHandler alloc]
-        initWithWebStateList:browser_->GetWebStateList()];
+        initWithWebStateList:browser_->GetWebStateList()
+                     tracker:feature_engagement::TrackerFactory::GetForProfile(
+                                 browser_->GetProfile())];
     if (IsGeminiCopresenceEnabled()) {
       gemini_view_state_handler_ =
           [[GeminiViewStateChangeHandler alloc] initWithTarget:this];
