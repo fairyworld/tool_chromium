@@ -215,7 +215,7 @@ void WebAuthnRequestDelegateAndroid::CleanupWebAuthnRequest(
     if (credentials_delegate) {
       credentials_delegate->NotifyWebAuthnRequestAborted();
     }
-  } else {
+  } else if (touch_to_fill_controller_) {
     touch_to_fill_controller_->Close();
   }
 
