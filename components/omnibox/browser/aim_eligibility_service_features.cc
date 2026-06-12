@@ -18,7 +18,7 @@ BASE_FEATURE(kAimCoBrowseEligibilityCheckEnabled,
 BASE_FEATURE(kAimFuseboxEligibilityCheckEnabled,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-BASE_FEATURE(kAimUrlNavigationFetchEnabled, base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kAimUrlNavigationFetchEnabled, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kAimServerEligibilitySendCoBrowseUserAgentSuffixEnabled,
              base::FEATURE_ENABLED_BY_DEFAULT);
@@ -71,7 +71,7 @@ BASE_FEATURE(kAimServerEligibilityIncludeClientCountry,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kAimEligibilityServiceIdentityImprovements,
-             base::FEATURE_DISABLED_BY_DEFAULT);
+             base::FEATURE_ENABLED_BY_DEFAULT);
 
 const base::FeatureParam<bool> kAimIdentityOauthEnabled{
     &kAimEligibilityServiceIdentityImprovements, "oauth_enabled", false};
