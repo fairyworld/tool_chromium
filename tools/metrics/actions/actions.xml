@@ -5097,6 +5097,24 @@ should be able to be added at any place in this file.
   </description>
 </action>
 
+<action name="Android.VerticalTabs.UndoCloseTab">
+  <owner>agazal@google.com</owner>
+  <owner>kije@google.com</owner>
+  <owner>clank-app-team@google.com</owner>
+  <description>
+    User undoes a closed tab that was closed from the Vertical Tabs pane.
+  </description>
+</action>
+
+<action name="Android.VerticalTabs.UndoCloseTabGroup">
+  <owner>agazal@google.com</owner>
+  <owner>kije@google.com</owner>
+  <owner>clank-app-team@google.com</owner>
+  <description>
+    User undoes a closed group that was closed from the Vertical Tabs pane.
+  </description>
+</action>
+
 <action name="Android.WindowManager.ChangeWindowName">
   <owner>aishwaryarj@google.com</owner>
   <owner>rathomas@google.com</owner>

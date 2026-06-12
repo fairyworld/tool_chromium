@@ -358,7 +358,8 @@ public class TabListMediator implements TabListNotificationHandler {
         TabClosedFrom.TAB_STRIP,
         TabClosedFrom.GRID_TAB_SWITCHER,
         TabClosedFrom.GRID_TAB_SWITCHER_GROUP,
-        TabClosedFrom.VERTICAL_TABS
+        TabClosedFrom.VERTICAL_TABS,
+        TabClosedFrom.VERTICAL_TABS_GROUP
     })
     @Retention(RetentionPolicy.SOURCE)
     private @interface TabClosedFrom {
@@ -367,6 +368,7 @@ public class TabListMediator implements TabListNotificationHandler {
         int GRID_TAB_SWITCHER = 2;
         int GRID_TAB_SWITCHER_GROUP = 3;
         int VERTICAL_TABS = 4;
+        int VERTICAL_TABS_GROUP = 5;
     }
 
     private static final String TAG = "TabListMediator";
@@ -1208,7 +1210,11 @@ public class TabListMediator implements TabListNotificationHandler {
                                     RecordUserAction.record("GridTabSwitcher.UndoCloseTabGroup");
                                     break;
                                 case TabClosedFrom.VERTICAL_TABS:
-                                    RecordUserAction.record("VerticalTabs.UndoCloseTab");
+                                    RecordUserAction.record("Android.VerticalTabs.UndoCloseTab");
+                                    break;
+                                case TabClosedFrom.VERTICAL_TABS_GROUP:
+                                    RecordUserAction.record(
+                                            "Android.VerticalTabs.UndoCloseTabGroup");
                                     break;
                                 default:
                                     assert false
@@ -1662,9 +1668,16 @@ public class TabListMediator implements TabListNotificationHandler {
     }
 
     private void onGroupClosedFrom(int tabId) {
-        // TODO(crbug.com/509226293): Support tracking group closure source for Vertical Tabs
-        // when group-level actions are supported.
-        sTabClosedFromMap.put(tabId, TabClosedFrom.GRID_TAB_SWITCHER_GROUP);
+        @TabClosedFrom int from;
+        if (mComponentId == TabComponentId.GRID_TAB_SWITCHER) {
+            from = TabClosedFrom.GRID_TAB_SWITCHER_GROUP;
+        } else if (mComponentId == TabComponentId.VERTICAL_TABS) {
+            from = TabClosedFrom.VERTICAL_TABS_GROUP;
+        } else {
+            Log.w(TAG, "Attempting to close tab group from Unknown UI: " + mComponentId);
+            return;
+        }
+        sTabClosedFromMap.put(tabId, from);
     }
 
     private List<Tab> getRelatedTabsForId(int id) {
