@@ -254,9 +254,6 @@ void ShowWebInstallAppLaunchDialog(
     const SkBitmap& icon,
     WebInstallAppLaunchAcceptanceCallback callback);
 
-// Sets whether |ShowWebInstallAppLaunchDialog| should accept immediately.
-base::AutoReset<bool> SetAutoAcceptWebInstallLaunchDialogForTesting();
-
 // Shows the install not supported dialog for web apps. This dialog is
 // displayed when the user tries to install a web app in an unsupported
 // environment, such as Incognito or Guest mode. The |callback| is called
