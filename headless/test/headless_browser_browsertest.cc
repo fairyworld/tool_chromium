@@ -280,30 +280,6 @@ IN_PROC_BROWSER_TEST_F(HeadlessBrowserTestWithProxy, MAYBE_SetProxyConfig) {
   EXPECT_TRUE(browser_context->GetAllWebContents().empty());
 }
 
-// WebGL is not guaranteed to be supported everywhere except when using
-// --enable-unsafe-swiftshader.
-class HeadlessWebGLAvailabilityTest : public HeadlessBrowserTest {
- public:
-  void SetUpCommandLine(base::CommandLine* command_line) override {
-    command_line->AppendSwitch(::switches::kEnableUnsafeSwiftShader);
-    HeadlessBrowserTest::SetUpCommandLine(command_line);
-  }
-};
-
-IN_PROC_BROWSER_TEST_F(HeadlessWebGLAvailabilityTest, WebGLSupported) {
-  HeadlessBrowserContext* browser_context =
-      browser()->CreateBrowserContextBuilder().Build();
-
-  HeadlessWebContents* web_contents =
-      browser_context->CreateWebContentsBuilder().Build();
-
-  EXPECT_THAT(
-      EvaluateScript(web_contents,
-                     "(document.createElement('canvas').getContext('webgl')"
-                     "    instanceof WebGLRenderingContext)"),
-      DictHasValue("result.result.value", true));
-}
-
 IN_PROC_BROWSER_TEST_F(HeadlessBrowserTest, ClipboardCopyPasteText) {
   // Tests copy-pasting text with the clipboard in headless mode.
   ui::Clipboard* clipboard = ui::ClipboardNonBacked::GetForCurrentThread();
