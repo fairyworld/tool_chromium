@@ -537,6 +537,11 @@ IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, AutoRemovalToast) {
           "runMochaSuite('NewTabPageAppTest AutoRemovalToast')");
 }
 
+IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, VoiceSearchCoherence) {
+  RunTest("new_tab_page/app_test.js",
+          "runMochaSuite('NewTabPageAppTest VoiceSearchCoherence')");
+}
+
 IN_PROC_BROWSER_TEST_F(NewTabPageAppTest, ContextMenuAnimation) {
   RunTest("new_tab_page/app_test.js",
           "runMochaSuite('NewTabPageAppContextMenuAnimationTest')");

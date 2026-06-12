@@ -330,6 +330,13 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(
   source->AddBoolean(
       "caretAnimationEnabled",
       base::FeatureList::IsEnabled(ntp_features::kNtpAnimatedCaret));
+  source->AddBoolean(
+      "voiceSearchCoherenceSearchboxEnabled",
+      base::FeatureList::IsEnabled(omnibox::kVoiceSearchCoherenceSearchbox));
+
+  source->AddBoolean(
+      "voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled",
+      omnibox::kVoiceSearchCoherenceSearchboxWithLiveTranscription.Get());
 
   static constexpr webui::LocalizedString kStrings[] = {
       {"doneButton", IDS_DONE},
