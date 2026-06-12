@@ -14908,8 +14908,13 @@
             "experiments": [
                 {
                     "name": "Enabled",
+                    "params": {
+                        "enable_for_default_hint": "false",
+                        "min_script_length": "0"
+                    },
                     "enable_features": [
-                        "InlineScriptCache"
+                        "InlineScriptCache",
+                        "InlineScriptCacheHint"
                     ]
                 }
             ]
