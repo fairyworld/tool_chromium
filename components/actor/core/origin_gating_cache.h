@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef COMPONENTS_ACTOR_CORE_ORIGIN_CHECKER_H_
-#define COMPONENTS_ACTOR_CORE_ORIGIN_CHECKER_H_
+#ifndef COMPONENTS_ACTOR_CORE_ORIGIN_GATING_CACHE_H_
+#define COMPONENTS_ACTOR_CORE_ORIGIN_GATING_CACHE_H_
 
 #include <variant>
 
@@ -14,10 +14,13 @@
 
 namespace actor {
 
-class OriginChecker {
+// This class acts as a cache for origin- or site-keyed decisions.  Permission
+// to navigate to an origin/site can be recorded, optionally recording that user
+// confirmation was obtained for that permission.
+class OriginGatingCache {
  public:
-  OriginChecker();
-  ~OriginChecker();
+  OriginGatingCache();
+  ~OriginGatingCache();
 
   // Returns true iff navigation to `destination_origin` is allowed, either
   // because the source and destination are considered the "same", or by a
@@ -66,4 +69,4 @@ class OriginChecker {
 
 }  // namespace actor
 
-#endif  // COMPONENTS_ACTOR_CORE_ORIGIN_CHECKER_H_
+#endif  // COMPONENTS_ACTOR_CORE_ORIGIN_GATING_CACHE_H_

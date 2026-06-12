@@ -54,7 +54,7 @@
 #include "components/actor/core/actor_features.h"
 #include "components/actor/core/actor_util.h"
 #include "components/actor/core/journal_details_builder.h"
-#include "components/actor/core/origin_checker.h"
+#include "components/actor/core/origin_gating_cache.h"
 #include "components/actor/core/safety_list_manager.h"
 #include "components/actor/core/task_id.h"
 #include "components/actor/public/mojom/actor_types.mojom.h"
@@ -229,7 +229,7 @@ std::unique_ptr<ExecutionEngine> ExecutionEngine::CreateForTesting(
 
 ExecutionEngine::~ExecutionEngine() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  origin_checker_.RecordSizeMetrics();
+  origin_gating_cache_.RecordSizeMetrics();
 
   RunUserTakeoverCallbackIfExists(/*should_cancel=*/true);
 }
@@ -298,7 +298,8 @@ ExecutionEngine::ShouldDeferNavigation(
       "Actor.NavigationGating.TimeElapsedForGating2");
 
   // Note: `DetermineGatingDecision` and `CheckNavigationSensitiveUrlList`
-  // operate on GURLs, but metrics and `origin_checker_` operate on Origins.
+  // operate on GURLs, but metrics and `origin_gating_cache_` operate on
+  // Origins.
   const GatingDecision decision = DetermineGatingDecision(
       GetPrimaryMainFrame(navigation_handle)->GetLastCommittedURL(),
       /*destination_url=*/navigation_handle.GetURL());
@@ -403,7 +404,7 @@ void ExecutionEngine::CheckNavigationSensitiveUrlList(
   url::Origin destination_origin = url::Origin::Create(destination_url);
   // Check previously confirmed origins. If the user has previously confirmed
   // the origin is allowed, we should proceed and not double prompt.
-  if (origin_checker_.IsNavigationConfirmedByUser(destination_origin)) {
+  if (origin_gating_cache_.IsNavigationConfirmedByUser(destination_origin)) {
     OnNavigationSensitiveUrlListChecked(source, initiator, destination_origin,
                                         ukm_source_id, skip_prompt,
                                         std::move(timer), std::move(callback),
@@ -434,7 +435,7 @@ void ExecutionEngine::OnNavigationSensitiveUrlListChecked(
   // If not sensitive, check if it's an origin the actor has previously
   // interacted with or received instructions from the server to interact with.
   if (not_sensitive &&
-      origin_checker_.IsNavigationAllowed(source, destination)) {
+      origin_gating_cache_.IsNavigationAllowed(source, destination)) {
     LogNavigationGating(source, initiator, destination,
                         /*applied_gate=*/false);
     ukm::builders::Actor_OriginGating builder(ukm_source_id);
@@ -484,8 +485,8 @@ void ExecutionEngine::HandleNavigationToNewOrigin(
     ExecutionEngine::NavigationDecisionCallback callback) {
   if (!kGlicConfirmNavigationToNewOrigins.Get()) {
     if (kGlicConfirmNavigationToNewOriginsDarkLaunch.Get() &&
-        !dark_launch_origin_checker_.IsNavigationAllowed(url::Origin(),
-                                                         destination)) {
+        !dark_launch_origin_gating_cache_.IsNavigationAllowed(url::Origin(),
+                                                              destination)) {
       SendNavigationConfirmationRequest(
           destination,
           base::BindOnce(&OnNavigationConfirmationDecisionInBackground, state_,
@@ -495,7 +496,7 @@ void ExecutionEngine::HandleNavigationToNewOrigin(
                              "DarkLaunchConfirmationRequestLatency")));
       // Navigation is auto-approved, so add to origin checker allowlist to skip
       // future checks and metrics.
-      dark_launch_origin_checker_.AllowNavigationTo(
+      dark_launch_origin_gating_cache_.AllowNavigationTo(
           destination,
           /*is_user_confirmed=*/false);
     }
@@ -552,8 +553,8 @@ void ExecutionEngine::OnNavigationConfirmationDecision(
           .SetEngineState(static_cast<int64_t>(engine_state));
       builder.Record(ukm::UkmRecorder::Get());
       if (permission_granted) {
-        origin_checker_.AllowNavigationTo(destination,
-                                          /*is_user_confirmed=*/false);
+        origin_gating_cache_.AllowNavigationTo(destination,
+                                               /*is_user_confirmed=*/false);
       }
       std::move(callback).Run(permission_granted);
       return;
@@ -599,7 +600,7 @@ void ExecutionEngine::OnPromptUserToConfirmNavigationDecision(
       if (permission_granted) {
         // See the comment on `OriginOrPrecursorIfOpaque` for why we do not
         // store `destination` directly here.
-        origin_checker_.AllowNavigationTo(
+        origin_gating_cache_.AllowNavigationTo(
             OriginOrPrecursorIfOpaque(destination),
             /*is_user_confirmed=*/true);
       }
@@ -741,8 +742,8 @@ void ExecutionEngine::Act(std::vector<std::unique_ptr<ToolRequest>>&& actions,
       if (std::optional<url::Origin> maybe_origin =
               action->AssociatedOriginGrant();
           maybe_origin) {
-        origin_checker_.AllowNavigationTo(maybe_origin.value(),
-                                          /*is_user_confirmed=*/false);
+        origin_gating_cache_.AllowNavigationTo(maybe_origin.value(),
+                                               /*is_user_confirmed=*/false);
       }
     }
   }
@@ -832,10 +833,11 @@ void ExecutionEngine::SafetyChecksForNextAction() {
   // Asynchronously check if we can act on the tab. NOTE that the MayActOnTab
   // check uses `GetLastCommittedURL()` from the tab. For opaque origins, this
   // means that we'll get the precursor URL. For this reason, we previously
-  // added the precursor to `origin_checker_` to ensure the optimization guide
-  // sensitive origin check would be skipped as expected.
+  // added the precursor to `origin_gating_cache_` to ensure the optimization
+  // guide sensitive origin check would be skipped as expected.
   MayActOnTab(
-      *tab, *journal_, task_->id(), origin_checker_, task_->policy_checker(),
+      *tab, *journal_, task_->id(), origin_gating_cache_,
+      task_->policy_checker(),
       base::BindOnce(
           &ExecutionEngine::OnMayActOnTabDecision, GetActionSequenceWeakPtr(),
           tab->GetContents()->GetPrimaryMainFrame()->GetLastCommittedOrigin()));
@@ -1340,7 +1342,7 @@ void ExecutionEngine::AddWritableMainframeOrigins(
   if (!IsNavigationGatingEnabled()) {
     return;
   }
-  origin_checker_.AllowNavigationTo(added_writable_mainframe_origins);
+  origin_gating_cache_.AllowNavigationTo(added_writable_mainframe_origins);
 }
 
 void ExecutionEngine::SetActorLoginService(

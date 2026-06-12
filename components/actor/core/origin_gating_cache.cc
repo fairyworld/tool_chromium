@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/actor/core/origin_checker.h"
+#include "components/actor/core/origin_gating_cache.h"
 
 #include <algorithm>
 #include <variant>
@@ -18,13 +18,13 @@
 
 namespace actor {
 
-OriginChecker::OriginChecker()
+OriginGatingCache::OriginGatingCache()
     : allowed_navigation_origins_(kGlicNavigationGatingUseSiteNotOrigin.Get()
                                       ? StateMap(SiteMap())
                                       : StateMap(OriginMap())) {}
-OriginChecker::~OriginChecker() = default;
+OriginGatingCache::~OriginGatingCache() = default;
 
-bool OriginChecker::IsNavigationAllowed(
+bool OriginGatingCache::IsNavigationAllowed(
     const url::Origin& source_origin,
     const url::Origin& destination_origin) const {
   CHECK(IsNavigationGatingEnabled());
@@ -44,7 +44,7 @@ bool OriginChecker::IsNavigationAllowed(
       allowed_navigation_origins_);
 }
 
-bool OriginChecker::IsNavigationConfirmedByUser(
+bool OriginGatingCache::IsNavigationConfirmedByUser(
     const url::Origin& origin) const {
   const auto* state = std::visit(absl::Overload{
                                      [&](const OriginMap& origins) {
@@ -59,8 +59,8 @@ bool OriginChecker::IsNavigationConfirmedByUser(
   return state && state->is_user_confirmed;
 }
 
-void OriginChecker::AllowNavigationTo(url::Origin origin,
-                                      bool is_user_confirmed) {
+void OriginGatingCache::AllowNavigationTo(url::Origin origin,
+                                          bool is_user_confirmed) {
   auto& state = std::visit(
       absl::Overload{
           [&](OriginMap& origins) -> State& {
@@ -79,7 +79,7 @@ void OriginChecker::AllowNavigationTo(url::Origin origin,
   }
 }
 
-void OriginChecker::AllowNavigationTo(
+void OriginGatingCache::AllowNavigationTo(
     const absl::flat_hash_set<url::Origin>& origins) {
   std::visit(
       absl::Overload{
@@ -103,7 +103,7 @@ void OriginChecker::AllowNavigationTo(
       allowed_navigation_origins_);
 }
 
-void OriginChecker::RecordSizeMetrics() const {
+void OriginGatingCache::RecordSizeMetrics() const {
   auto [total, user_confirmed_total] =
       std::visit(absl::Overload{
                      [](const OriginMap& origins) {

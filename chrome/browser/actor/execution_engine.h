@@ -29,7 +29,7 @@
 #include "chrome/common/actor.mojom-forward.h"
 #include "chrome/common/buildflags.h"
 #include "components/actor/core/aggregated_journal.h"
-#include "components/actor/core/origin_checker.h"
+#include "components/actor/core/origin_gating_cache.h"
 #include "components/actor/public/mojom/actor_types.mojom.h"
 #include "components/autofill/core/browser/integrators/actor/actor_form_filling_types.h"
 #include "components/password_manager/core/browser/actor_login/actor_login_types.h"
@@ -464,10 +464,10 @@ class ExecutionEngine : public ToolDelegate,
 
   // Manages the sets of origins that have been allowed for navigations and that
   // the user has been prompted about.
-  OriginChecker origin_checker_;
+  OriginGatingCache origin_gating_cache_;
   // This will allow us to store already-recorded origins to avoid duplication
   // of dark launch metrics.
-  OriginChecker dark_launch_origin_checker_;
+  OriginGatingCache dark_launch_origin_gating_cache_;
 
   TabObservationStrategy observation_strategy_;
 
