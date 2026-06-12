@@ -10,6 +10,8 @@ source_set("test_support") {
     "fake_consumer.h",
     "fake_loopback_group_member.cc",
     "fake_loopback_group_member.h",
+    "fake_output_stream.cc",
+    "fake_output_stream.h",
     "mock_log.cc",
     "mock_log.h",
     "mock_loopback_source.cc",
