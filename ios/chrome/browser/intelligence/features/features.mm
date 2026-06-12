@@ -531,16 +531,6 @@ bool IsGeminiCopresenceTrackSourcesEnabled() {
       kGeminiCopresence, kGeminiCopresenceTrackSources, false);
 }
 
-BASE_FEATURE(kGeminiResponseViewDynamicResizing,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-bool IsGeminiResponseViewDynamicResizingEnabled() {
-  if (!IsPageActionMenuEnabled()) {
-    return false;
-  }
-  return base::FeatureList::IsEnabled(kGeminiResponseViewDynamicResizing);
-}
-
 BASE_FEATURE(kPageStabilityMetrics, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // The length of time after an interaction we will track mutations before

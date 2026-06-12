@@ -272,12 +272,6 @@ extern const char kGeminiCopresenceWithFullscreenDisabler[];
 bool IsGeminiCopresenceTrackSourcesEnabled();
 extern const char kGeminiCopresenceTrackSources[];
 
-// Feature flag for Gemini Dynamic Resizing.
-BASE_DECLARE_FEATURE(kGeminiResponseViewDynamicResizing);
-
-// Returns true if Gemini Dynamic Resizing is enabled.
-bool IsGeminiResponseViewDynamicResizingEnabled();
-
 // Feature flag for enabling early metrics collection for page stability.
 BASE_DECLARE_FEATURE(kPageStabilityMetrics);
 bool IsPageStabilityMetricsEnabled();
