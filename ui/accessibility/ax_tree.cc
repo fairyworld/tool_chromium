@@ -917,6 +917,10 @@ AXTree::~AXTree() {
   CHECK(observers_.empty());
 }
 
+base::WeakPtr<AXTree> AXTree::GetWeakPtr() {
+  return weak_ptr_factory_.GetWeakPtr();
+}
+
 void AXTree::AddObserver(AXTreeObserver* observer) {
   observers_.AddObserver(observer);
 }
@@ -3139,6 +3143,8 @@ bool AXTree::HasPaginationSupport() const {
 void AXTree::NotifyTreeManagerWillBeRemoved(AXTreeID previous_tree_id) {
   if (previous_tree_id == AXTreeIDUnknown())
     return;
+
+  weak_ptr_factory_.InvalidateWeakPtrs();
 
   observers_.Notify(&AXTreeObserver::OnTreeManagerWillBeRemoved,
                     previous_tree_id);

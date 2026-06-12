@@ -25,6 +25,7 @@
 #include "base/functional/bind.h"
 #include "base/functional/callback.h"
 #include "base/i18n/break_iterator.h"
+#include "base/memory/weak_ptr.h"
 #include "base/no_destructor.h"
 #include "base/notreached.h"
 #include "base/strings/string_number_conversions.h"
@@ -47,6 +48,7 @@ namespace ui {
 
 class AXNodePosition;
 class AXNode;
+class AXTree;
 
 // Defines the type of position in the accessibility tree.
 // A tree position is used when referring to a specific child of a node in the
@@ -273,7 +275,8 @@ class AXPosition {
     new_position->Initialize(AXPositionKind::TREE_POSITION,
                              anchor.tree()->GetAXTreeID(), anchor.id(),
                              child_index, INVALID_OFFSET,
-                             ax::mojom::TextAffinity::kDownstream);
+                             ax::mojom::TextAffinity::kDownstream,
+                             const_cast<AXTree*>(anchor.tree()));
     return new_position;
   }
 
@@ -304,7 +307,8 @@ class AXPosition {
     AXPositionInstance new_position(new AXPositionType());
     new_position->Initialize(AXPositionKind::TEXT_POSITION,
                              anchor.tree()->GetAXTreeID(), anchor.id(),
-                             INVALID_INDEX, text_offset, affinity);
+                             INVALID_INDEX, text_offset, affinity,
+                             const_cast<AXTree*>(anchor.tree()));
     return new_position;
   }
 
@@ -555,9 +559,18 @@ class AXPosition {
     if (tree_id_ == AXTreeIDUnknown() || anchor_id_ == kInvalidAXNodeID)
       return nullptr;
 
+    if (cached_tree_) {
+      AXNode* node = cached_tree_->GetFromId(anchor_id());
+      if (node) {
+        return node;
+      }
+    }
+
     const AXTreeManager* manager = GetManager();
-    if (manager)
+    if (manager && manager->ax_tree()) {
+      cached_tree_ = manager->ax_tree()->GetWeakPtr();
       return manager->GetNode(anchor_id());
+    }
 
     return nullptr;
   }
@@ -4682,6 +4695,7 @@ class AXPosition {
   void swap(AXPosition& other) {
     std::swap(kind_, other.kind_);
     std::swap(tree_id_, other.tree_id_);
+    std::swap(cached_tree_, other.cached_tree_);
     std::swap(anchor_id_, other.anchor_id_);
     std::swap(child_index_, other.child_index_);
     std::swap(text_offset_, other.text_offset_);
@@ -4918,6 +4932,7 @@ class AXPosition {
   AXPosition(const AXPosition& other)
       : kind_(other.kind_),
         tree_id_(other.tree_id_),
+        cached_tree_(other.cached_tree_),
         anchor_id_(other.anchor_id_),
         child_index_(other.child_index_),
         text_offset_(other.text_offset_),
@@ -4985,18 +5000,25 @@ class AXPosition {
                                    AXNodeID anchor_id,
                                    int child_index,
                                    int text_offset,
-                                   ax::mojom::TextAffinity affinity) {
+                                   ax::mojom::TextAffinity affinity,
+                                   AXTree* tree = nullptr) {
     kind_ = kind;
     tree_id_ = tree_id;
     anchor_id_ = anchor_id;
     child_index_ = child_index;
     text_offset_ = text_offset;
     affinity_ = affinity;
+    if (tree) {
+      cached_tree_ = tree->GetWeakPtr();
+    } else {
+      cached_tree_.reset();
+    }
 
     if (!IsValid()) {
       // Reset to the null position.
       kind_ = AXPositionKind::NULL_POSITION;
       tree_id_ = AXTreeIDUnknown();
+      cached_tree_.reset();
       anchor_id_ = kInvalidAXNodeID;
       child_index_ = INVALID_INDEX;
       text_offset_ = INVALID_OFFSET;
@@ -5009,13 +5031,19 @@ class AXPosition {
                   AXNodeID anchor_id,
                   int child_index,
                   int text_offset,
-                  ax::mojom::TextAffinity affinity) {
+                  ax::mojom::TextAffinity affinity,
+                  AXTree* tree = nullptr) {
     kind_ = kind;
     tree_id_ = tree_id;
     anchor_id_ = anchor_id;
     child_index_ = child_index;
     text_offset_ = text_offset;
     affinity_ = affinity;
+    if (tree) {
+      cached_tree_ = tree->GetWeakPtr();
+    } else {
+      cached_tree_.reset();
+    }
 
     // TODO(accessibility) Consider using WeakPtr<AXTree> instead of an
     // AXTreeID, which would be both faster and easier to use in combination
@@ -6624,10 +6652,8 @@ class AXPosition {
   }
 
   AXPositionKind kind_ = AXPositionKind::NULL_POSITION;
-  // TODO(crbug.com/40864560): use weak pointers for the AXTree, so that
-  // AXPosition can be used without AXTreeManager support (and also faster than
-  // the slow AXTreeID).
   AXTreeID tree_id_;
+  mutable base::WeakPtr<AXTree> cached_tree_ = nullptr;
   AXNodeID anchor_id_;
 
   // For text positions, |child_index_| is initially set to |-1| and only
