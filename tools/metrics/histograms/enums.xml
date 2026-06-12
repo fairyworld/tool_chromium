@@ -12017,6 +12017,7 @@ from previous Chrome versions.
       label="ExperimentalAccessibilityGoogleTtsHighQualityVoices:enabled"/>
   <int value="-770134156" label="ToolbarGlowUp:enabled"/>
   <int value="-769865314" label="AutofillCacheQueryResponses:disabled"/>
+  <int value="-769163822" label="AutofillAmbientAutofill:disabled"/>
   <int value="-768338958" label="CrosSeparateGeoApiKey:enabled"/>
   <int value="-768240392" label="CertificateTransparency2022Policy:enabled"/>
   <int value="-767903409" label="EarlyBodyLoad:enabled"/>
@@ -15849,6 +15850,7 @@ from previous Chrome versions.
   <int value="476814335" label="AutoDisableAccessibilityV2:enabled"/>
   <int value="477796416" label="ReleaseNotes:enabled"/>
   <int value="477967119" label="enable-unified-media-pipeline"/>
+  <int value="478274417" label="AutofillAmbientAutofill:enabled"/>
   <int value="478380451" label="BlockMigratedDefaultChromeAppSync:disabled"/>
   <int value="478622074" label="EnableBrightnessControlInSettings:enabled"/>
   <int value="479906041" label="RunAllFlashInAllowMode:disabled"/>

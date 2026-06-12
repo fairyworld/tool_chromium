@@ -841,6 +841,11 @@ inline constexpr char
         "field is not a username/password field and does not have any autofill "
         "suggestions. ";
 
+inline constexpr char kAutofillAmbientAutofillName[] =
+    "Autofill Ambient Autofill";
+inline constexpr char kAutofillAmbientAutofillDescription[] =
+    "Enables Ambient Autofill.";
+
 inline constexpr char kAutofillAtMemoryName[] = "Autofill @memory";
 inline constexpr char kAutofillAtMemoryDescription[] =
     "Enables the @memory feature which allows to recall and insert personal"
