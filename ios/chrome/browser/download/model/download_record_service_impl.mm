@@ -12,8 +12,11 @@
 #import "base/files/file_path.h"
 #import "base/files/file_util.h"
 #import "base/functional/bind.h"
+#import "base/notimplemented.h"
 #import "base/strings/sys_string_conversions.h"
+#import "base/task/sequenced_task_runner.h"
 #import "base/task/thread_pool.h"
+#import "ios/chrome/browser/download/model/download_filter_util.h"
 #import "ios/chrome/browser/download/model/download_record_database.h"
 #import "ios/chrome/browser/shared/public/features/features.h"
 
@@ -129,6 +132,36 @@ void DownloadRecordServiceImpl::RemoveDownloadByIdAsync(
             }
           },
           weak_ptr_factory_.GetWeakPtr(), download_id, std::move(callback)));
+}
+
+void DownloadRecordServiceImpl::GetDownloadsPageAsync(
+    const DownloadRecordQuery& query,
+    DownloadRecordsPageCallback callback) {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(main_sequence_checker_);
+
+  // Placeholder stub: this CL only introduces the public pagination
+  // interface (contract-only). The real keyset-paginated reader path —
+  // including filter / cursor handling, the active-records cache merge,
+  // and `kDownloadListPagination` flag gating — lands in a follow-up
+  // CL. Until then, callers always observe an empty page; production
+  // code should continue to use `GetAllDownloadsAsync()`.
+  NOTIMPLEMENTED_LOG_ONCE();
+  base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
+      FROM_HERE,
+      base::BindOnce(std::move(callback), std::vector<DownloadRecord>{}));
+}
+
+void DownloadRecordServiceImpl::GetDownloadsCountAsync(
+    std::optional<DownloadFilterType> filter,
+    DownloadRecordsCountCallback callback) {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(main_sequence_checker_);
+
+  // Placeholder stub — see `GetDownloadsPageAsync` above. Always posts 0
+  // to the calling sequence until the paginated reader CL replaces this
+  // body.
+  NOTIMPLEMENTED_LOG_ONCE();
+  base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
+      FROM_HERE, base::BindOnce(std::move(callback), size_t{0}));
 }
 
 void DownloadRecordServiceImpl::UpdateDownloadFilePathAsync(

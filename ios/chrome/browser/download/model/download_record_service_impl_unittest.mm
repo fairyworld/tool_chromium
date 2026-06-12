@@ -16,6 +16,7 @@
 #import "base/strings/sys_string_conversions.h"
 #import "base/test/bind.h"
 #import "base/test/scoped_feature_list.h"
+#import "base/test/test_future.h"
 #import "ios/chrome/browser/download/model/download_record.h"
 #import "ios/chrome/browser/download/model/download_record_observer.h"
 #import "ios/chrome/browser/shared/model/profile/test/test_profile_ios.h"
@@ -477,4 +478,43 @@ TEST_F(DownloadRecordServiceImplTest, RecordDownloadTwiceWithSameTask) {
 
   EXPECT_EQ(1u, result.size());
   EXPECT_EQ(download_id, result[0].download_id);
+}
+
+// Sanity test for the placeholder pagination stub: regardless of feature
+// flag state or how many records are persisted, `GetDownloadsPageAsync`
+// posts an empty vector to the calling sequence asynchronously. The
+// real keyset-paginated reader lands in a follow-up CL; this test locks
+// in the contract so callers can call the API unconditionally without
+// crashing.
+TEST_F(DownloadRecordServiceImplTest, GetDownloadsPageAsync_StubReturnsEmpty) {
+  // Record one download so the cache is non-empty; the stub still must
+  // return empty per contract.
+  std::unique_ptr<web::FakeDownloadTask> task =
+      CreateFakeDownloadTask("page_stub_1");
+  RecordDownloadAndValidate(task.get());
+
+  base::test::TestFuture<std::vector<DownloadRecord>> future;
+  DownloadRecordQuery query;
+  service_->GetDownloadsPageAsync(query, future.GetCallback());
+
+  // *Async contract: callback must NOT have fired synchronously.
+  EXPECT_FALSE(future.IsReady());
+
+  // Pumps the calling sequence until the posted callback runs.
+  EXPECT_TRUE(future.Get().empty());
+}
+
+// Mirrors `GetDownloadsPageAsync_StubReturnsEmpty` for the count API:
+// the placeholder stub always posts 0 to the calling sequence
+// asynchronously.
+TEST_F(DownloadRecordServiceImplTest, GetDownloadsCountAsync_StubReturnsZero) {
+  std::unique_ptr<web::FakeDownloadTask> task =
+      CreateFakeDownloadTask("count_stub_1");
+  RecordDownloadAndValidate(task.get());
+
+  base::test::TestFuture<size_t> future;
+  service_->GetDownloadsCountAsync(std::nullopt, future.GetCallback());
+
+  EXPECT_FALSE(future.IsReady());  // *Async contract.
+  EXPECT_EQ(0u, future.Get());
 }
