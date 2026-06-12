@@ -73,10 +73,6 @@ enum class AutofillAiAction {
   // Whether the user should see a promotion to allow Wallet to share data with
   // Chrome.
   kWalletDataSharingPromotion,
-  // When true autofill AI will offer personalized suggestions.
-  // TODO(crbug.com/503319530): Correctly implement this action, it is currently
-  // hardcoded to false.
-  kAccessibilityAnnotatorInfraAvailable,
   // Returns true if the entity type supports accessibility annotation data.
   kTypeSupportsAccessibilityAnnotatorData,
   kMaxValue = kTypeSupportsAccessibilityAnnotatorData,

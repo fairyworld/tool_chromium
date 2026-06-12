@@ -76,8 +76,6 @@ std::string GetTestSuffix(
       return "kImportToWallet";
     case AutofillAiAction::kWalletDataSharingPromotion:
       return "kWalletDataSharingPromotion";
-    case AutofillAiAction::kAccessibilityAnnotatorInfraAvailable:
-      return "kAccessibilityAnnotatorInfraAvailable";
     case AutofillAiAction::kTypeSupportsAccessibilityAnnotatorData:
       return "kTypeSupportsAccessibilityAnnotatorData";
   }
