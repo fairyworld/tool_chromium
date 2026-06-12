@@ -1137,7 +1137,6 @@ static_library("ui") {
       "//chrome/browser/ui/autofill:autofill_ai_ui_utils_impl",
       "//chrome/browser/ui/exclusive_access",
       "//chrome/browser/ui/plus_addresses",
-      "//chrome/browser/ui/plus_addresses:impl",
       "//chrome/browser/ui/webui/bookmarks:bookmarks_android",
       "//chrome/browser/ui/webui/feed_internals",
       "//chrome/browser/ui/webui/notifications_internals",
@@ -4711,7 +4710,6 @@ static_library("ui") {
       "//chrome/browser/ui/dialogs",
       "//chrome/browser/ui/dialogs:impl",
       "//chrome/browser/ui/plus_addresses",
-      "//chrome/browser/ui/plus_addresses:impl",
       "//chrome/browser/ui/qrcode_generator",
       "//chrome/browser/ui/qrcode_generator:impl",
       "//chrome/browser/ui/send_tab_to_self",
@@ -4882,9 +4880,6 @@ static_library("ui") {
       # c/b/ui/browser.h, browser_dialogs.h, browser_tabstrip.h, view_ids.h, browser_window.h.
       # c/b/ui/views/frame/browser_view.h
       "//chrome/browser/ui/views/location_bar:impl",
-
-      # TODO(crbug.com/413572035): Remove circular dependency.
-      "//chrome/browser/ui/plus_addresses:impl",
 
       # TODO(crbug.com/432061436) Remove this circular dependency when the
       # following headers get componentized:
