@@ -6,14 +6,13 @@ import '//resources/cr_elements/cr_icon_button/cr_icon_button.js';
 import '/strings.m.js';
 import './battery_saver_button_icons.html.js';
 
-import {getCss as getHiddenStyleCss} from '//resources/cr_elements/cr_hidden_style_lit.css.js';
 import {loadTimeData} from '//resources/js/load_time_data.js';
 import {CrLitElement} from '//resources/lit/v3_0/lit.rollup.js';
 
 import {getHtml} from './battery_saver_button.html.js';
 import {BrowserProxyImpl, ContextMenuType} from './browser_proxy.js';
 import type {BrowserProxy} from './browser_proxy.js';
-import {getCss as getToolbarButtonCss} from './toolbar_button.css.js';
+import {getCss} from './toolbar_button.css.js';
 import {getContextMenuPosition, getContextMenuSourceType} from './toolbar_button.js';
 
 
@@ -23,7 +22,7 @@ export class BatterySaverButtonElement extends CrLitElement {
   }
 
   static override get styles() {
-    return [getHiddenStyleCss(), getToolbarButtonCss()];
+    return getCss();
   }
 
   override render() {

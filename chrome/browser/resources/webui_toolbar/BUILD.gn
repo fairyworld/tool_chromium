@@ -137,7 +137,6 @@ build_webui("build") {
   css_files = [
     "app.css",
     "avatar_button.css",
-    "back_forward_button.css",
     "content_setting_icon.css",
     "content_settings_icons.css",
     "home_button.css",
@@ -145,12 +144,10 @@ build_webui("build") {
     "location_icon.css",
     "permission_chip.css",
     "permission_dashboard.css",
-    "pinned_toolbar_action.css",
     "pinned_toolbar_actions.css",
     "readonly_omnibox.css",
     "reload_button.css",
     "selected_keyword.css",
-    "split_tabs_button.css",
     "toolbar_button.css",
     "toolbar_divider.css",
   ]

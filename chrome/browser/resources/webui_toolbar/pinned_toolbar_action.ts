@@ -19,8 +19,8 @@ import type {PinnedToolbarActionState} from '/shared/toolbar_ui_api_data_model.m
 import {BrowserProxyImpl} from './browser_proxy.js';
 import type {BrowserProxy} from './browser_proxy.js';
 import {ContextMenuType} from './browser_proxy.js';
-import {getCss} from './pinned_toolbar_action.css.js';
 import {getHtml} from './pinned_toolbar_action.html.js';
+import {getCss} from './toolbar_button.css.js';
 import {getContextMenuPosition, getContextMenuSourceType, HelpBubbleAnchorMixin, setHasHelpBubble} from './toolbar_button.js';
 
 const PinnedToolbarActionElementBase = HelpBubbleAnchorMixin(CrLitElement);
