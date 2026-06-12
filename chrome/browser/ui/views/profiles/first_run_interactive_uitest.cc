@@ -97,8 +97,10 @@ namespace {
 
 using ::testing::_;
 using ::testing::Eq;
+using ::testing::Mock;
 using ::testing::Not;
 using ::testing::Return;
+using ::testing::StrictMock;
 using ::testing::TestParamInfo;
 using ::testing::Values;
 using ::testing::ValuesIn;
@@ -2161,11 +2163,10 @@ class FirstRunRevampInteractiveUiTest : public FirstRunInteractiveUiBaseTest {
             {{switches::kFirstRunDesktopRevamp, {}}}) {}
 };
 
-IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest, AmbientSound) {
+IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest, InitSoundsOnFlowStart) {
   ASSERT_TRUE(fre_service()->ShouldOpenFirstRun());
 
-  auto mock_sounds_manager =
-      std::make_unique<testing::NiceMock<MockSoundsManager>>();
+  auto mock_sounds_manager = std::make_unique<StrictMock<MockSoundsManager>>();
   MockSoundsManager* mock_sounds_manager_ptr = mock_sounds_manager.get();
 
   // Set the factory to return the `MockSoundsManager`.
@@ -2179,25 +2180,63 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest, AmbientSound) {
                     return std::move(mock_sounds_manager);
                   }));
 
-  // Verify that the ambient sound is initialized and playing at the start.
+  // Verify that the ambient and logo sounds are initialized at the start.
   EXPECT_CALL(
       *mock_sounds_manager_ptr,
       Initialize(FirstRunFlowController::kAmbientSoundKey,
                  IDR_INTRO_SOUND_AMBIENT_FLAC, media::AudioCodec::kFLAC, true))
       .WillOnce(Return(true));
   EXPECT_CALL(*mock_sounds_manager_ptr,
+              Initialize(FirstRunFlowController::kLogoSoundKey,
+                         IDR_INTRO_SOUND_LOGO_FLAC, media::AudioCodec::kFLAC,
+                         /*loop=*/false))
+      .WillOnce(Return(true));
+  EXPECT_CALL(*mock_sounds_manager_ptr,
               Play(FirstRunFlowController::kAmbientSoundKey))
+      .WillOnce(Return(true));
+  EXPECT_CALL(*mock_sounds_manager_ptr,
+              Play(FirstRunFlowController::kLogoSoundKey))
       .WillOnce(Return(true));
 
   OpenFirstRun();
+}
 
-  // Verify that clicking on the effects control button pauses / resumes the
-  // ambient sound.
+IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
+                       EffectsButtonControlsSounds) {
+  ASSERT_TRUE(fre_service()->ShouldOpenFirstRun());
+
+  auto mock_sounds_manager = std::make_unique<StrictMock<MockSoundsManager>>();
+  MockSoundsManager* mock_sounds_manager_ptr = mock_sounds_manager.get();
+
+  // Set the factory to return the `MockSoundsManager`.
+  base::AutoReset<FirstRunFlowController::SoundsManagerFactory>
+      sounds_factory_reset =
+          FirstRunFlowController::SetSoundsManagerFactoryForTesting(
+              base::BindLambdaForTesting(
+                  [&mock_sounds_manager](
+                      audio::SoundsManager::StreamFactoryBinder)
+                      -> std::unique_ptr<audio::SoundsManager> {
+                    return std::move(mock_sounds_manager);
+                  }));
+
+  EXPECT_CALL(*mock_sounds_manager_ptr, Initialize)
+      .Times(2)
+      .WillRepeatedly(Return(true));
+  EXPECT_CALL(*mock_sounds_manager_ptr, Play)
+      .Times(2)
+      .WillRepeatedly(Return(true));
+
+  OpenFirstRun();
+
+  Mock::VerifyAndClearExpectations(mock_sounds_manager_ptr);
+
+  // Verify that clicking on the effects control button pauses
+  // the ambient sound, and stops the one-shot sound(s).
   EXPECT_CALL(*mock_sounds_manager_ptr,
               Pause(FirstRunFlowController::kAmbientSoundKey))
       .WillOnce(Return(true));
   EXPECT_CALL(*mock_sounds_manager_ptr,
-              Play(FirstRunFlowController::kAmbientSoundKey))
+              Stop(FirstRunFlowController::kLogoSoundKey))
       .WillOnce(Return(true));
 
   RunTestSequenceInContext(
@@ -2208,7 +2247,17 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest, AmbientSound) {
       WaitForShow(kProfilePickerToolbarEffectsControlButtonElementId),
       // Click the effects control button. Since it is currently playing, it
       // should pause.
-      PressButton(kProfilePickerToolbarEffectsControlButtonElementId),
-      // Click it again to resume.
+      PressButton(kProfilePickerToolbarEffectsControlButtonElementId));
+
+  Mock::VerifyAndClearExpectations(mock_sounds_manager_ptr);
+
+  // Verify that clicking on the effects control button resumes the ambient
+  // sound, and DOES NOT play the one-shot sound(s) again.
+  EXPECT_CALL(*mock_sounds_manager_ptr,
+              Play(FirstRunFlowController::kAmbientSoundKey))
+      .WillOnce(Return(true));
+
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
       PressButton(kProfilePickerToolbarEffectsControlButtonElementId));
 }

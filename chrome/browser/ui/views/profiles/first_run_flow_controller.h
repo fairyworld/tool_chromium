@@ -45,6 +45,7 @@ std::unique_ptr<ProfileManagementStepController> CreateFeatureShowcaseStep(
 class FirstRunFlowController : public ProfileManagementFlowControllerImpl {
  public:
   static constexpr audio::SoundsManager::SoundKey kAmbientSoundKey = 0;
+  static constexpr audio::SoundsManager::SoundKey kLogoSoundKey = 1;
 
   // Profile management flow controller that will run the FRE for `profile` in
   // `host`.

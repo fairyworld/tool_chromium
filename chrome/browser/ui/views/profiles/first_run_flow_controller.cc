@@ -649,9 +649,13 @@ void FirstRunFlowController::ToggleMediaEffects(bool active) {
   }
   if (sounds_manager_) {
     if (active) {
+      // Resume only the ambient sound, other (on action) sounds are played
+      // once, and resuming them may be confusing for the user.
       sounds_manager_->Play(kAmbientSoundKey);
     } else {
       sounds_manager_->Pause(kAmbientSoundKey);
+      // Stop one-shot sounds, safe to call even if not playing.
+      sounds_manager_->Stop(kLogoSoundKey);
     }
   }
 }
@@ -677,10 +681,13 @@ void FirstRunFlowController::Init() {
     sounds_manager_ = GetSoundsManagerFactory().Run(
         content::GetAudioServiceStreamFactoryBinder());
     if (sounds_manager_) {
+      sounds_manager_->Initialize(kLogoSoundKey, IDR_INTRO_SOUND_LOGO_FLAC,
+                                  media::AudioCodec::kFLAC, /*loop=*/false);
       sounds_manager_->Initialize(kAmbientSoundKey,
                                   IDR_INTRO_SOUND_AMBIENT_FLAC,
                                   media::AudioCodec::kFLAC, /*loop=*/true);
       if (AreEffectsEnabled()) {
+        sounds_manager_->Play(kLogoSoundKey);
         sounds_manager_->Play(kAmbientSoundKey);
       }
     }
