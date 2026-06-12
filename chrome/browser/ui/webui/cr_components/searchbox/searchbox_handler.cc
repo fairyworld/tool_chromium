@@ -185,7 +185,8 @@ constexpr char kNotesSparkIconResourceName[] =
     "//resources/cr_components/searchbox/icons/notes_spark.svg";
 constexpr char kPageIconResourceName[] =
     "//resources/cr_components/searchbox/icons/page_cr23.svg";
-constexpr char kPedalsIconResourceName[] = "//theme/current-channel-logo";
+constexpr char kPedalsIconResourceName[] =
+    "//resources/cr_components/searchbox/icons/chrome_product_cr23.svg";
 constexpr char kSearchIconResourceName[] =
     "//resources/cr_components/searchbox/icons/search_cr23.svg";
 constexpr char kSparkIconResourceName[] =
