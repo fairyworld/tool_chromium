@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 """Handles interacting with Gerrit to retrieve CL metadata."""
 
+import collections
 import concurrent.futures
 import functools
 import json
@@ -29,7 +30,7 @@ else:
 
 import gerrit_util  # pylint: disable=import-error
 
-from common_types import ClInfo, CommonArgs
+from common_types import ClInfo, CommentThread, CommonArgs
 
 GERRIT_MAGIC_PREFIX = ")]}'"
 REQUEST_TIMEOUT_SECONDS = 30
@@ -198,9 +199,6 @@ def retrieve_hashtags(common_args: CommonArgs, cl_infos: list[ClInfo]) -> None:
     Raises:
         RuntimeError: If the failure rate of hashtag retrieval exceeds 1%.
     """
-    if not cl_infos:
-        return
-
     logging.info('Retrieving hashtags for %d CLs...', len(cl_infos))
 
     manager = _SessionManager(f'{common_args.project}-review.googlesource.com')
@@ -222,3 +220,156 @@ def retrieve_hashtags(common_args: CommonArgs, cl_infos: list[ClInfo]) -> None:
                 f'exceeded threshold (1.0%). Aborting.')
     else:
         logging.info('Successfully retrieved hashtags for all CLs.')
+
+
+def _traverse_comment_thread(node: dict, replies: dict[str, list[dict]],
+                             thread_comments: list[dict]) -> None:
+    """Helper to recursively traverse a comment thread (DFS).
+
+    Args:
+        node: The current comment being processed.
+        replies: A map from parent IDs to comments that reply to that parent.
+        thread_comments: The replies that have been added to this thread so
+            far. Will be modified in place.
+    """
+    thread_comments.append(node)
+    for reply in replies.get(node['id'], []):
+        _traverse_comment_thread(reply, replies, thread_comments)
+
+
+def _reconstruct_threads_for_file(file_path: str,
+                                  comments: list[dict]) -> list[CommentThread]:
+    """Reconstructs comment threads for a single file.
+
+    Omits threads that contain only a single comment, as they are likely
+    unhelpful (e.g. "LGTM").
+
+    Args:
+        file_path: The path of the file the comments are on.
+        comments: A list of comment dicts from Gerrit.
+
+    Returns:
+        A list of CommentThread objects.
+    """
+    known_ids = {c['id']: c for c in comments}
+    replies = collections.defaultdict(list)
+    roots = []
+
+    for c in comments:
+        parent_id = c.get('in_reply_to')
+        if parent_id and parent_id in known_ids:
+            replies[parent_id].append(c)
+        else:
+            roots.append(c)
+
+    # Sort roots and replies by updated time to ensure chronological order.
+    # Gerrit timestamp format "YYYY-MM-DD HH:MM:SS.SSSSSSSSS" is
+    # lexicographically sortable.
+    roots.sort(key=lambda c: c.get('updated', ''))
+    for children in replies.values():
+        children.sort(key=lambda c: c.get('updated', ''))
+
+    thread_dataclasses = []
+
+    for root in roots:
+        thread_comments = []
+        _traverse_comment_thread(root, replies, thread_comments)
+
+        if len(thread_comments) < 2:
+            continue
+
+        markdown_parts = []
+        for i, c in enumerate(thread_comments, start=1):
+            author_name = c.get('author', {}).get('name', 'Unknown')
+            header = f'# Comment {i} ({author_name})'
+            message = c.get('message', '').strip()
+            markdown_parts.append(f"{header}\n\n{message}")
+
+        thread_markdown = '\n\n'.join(markdown_parts)
+
+        thread_dataclasses.append(
+            CommentThread(file_path=file_path,
+                          patch_set=root.get('patch_set', 1),
+                          thread_markdown=thread_markdown))
+
+    return thread_dataclasses
+
+
+def _fetch_comments_for_cl(session_manager: _SessionManager,
+                           cl_info: ClInfo) -> bool:
+    """Fetches/reconstructs comments for a single CL and updates in place.
+
+    Args:
+        session_manager: The _SessionManager storing per-thread Sessions.
+        cl_info: The ClInfo object to fetch comments for and update.
+
+    Returns:
+        True if comments were successfully retrieved (even if there were none),
+        False if the retrieval failed.
+
+    Raises:
+        ValueError: If the response from Gerrit is not a JSON dict.
+    """
+    session = session_manager.get_session_for_current_thread()
+    url = posixpath.join(session.gerrit_base_url, 'changes',
+                         str(cl_info.cl_number), 'comments')
+
+    try:
+        logging.debug('Fetching comments for CL %d from %s', cl_info.cl_number,
+                      url)
+        response = session.get(url, timeout=REQUEST_TIMEOUT_SECONDS)
+        response.raise_for_status()
+
+        text = response.text.removeprefix(GERRIT_MAGIC_PREFIX).lstrip()
+        comments_map = json.loads(text)
+
+        if not isinstance(comments_map, dict):
+            raise ValueError(
+                f'Expected dict of comments for CL {cl_info.cl_number}, '
+                f'got {type(comments_map)}')
+
+        threads = []
+        for file_path, comments in comments_map.items():
+            threads.extend(_reconstruct_threads_for_file(file_path, comments))
+
+        cl_info.comments = threads
+        return True
+    except requests.exceptions.RequestException as e:
+        logging.warning('Failed to fetch comments for CL %d: %s',
+                        cl_info.cl_number, e)
+        return False
+
+
+def retrieve_comments(common_args: CommonArgs, cl_infos: list[ClInfo]) -> None:
+    """Retrieves and reconstructs comments for all given CLs in parallel.
+
+    Updates the `comments` field of each `ClInfo` object in place.
+
+    Args:
+        common_args: The CommonArgs for the run.
+        cl_infos: The list of ClInfo objects to update.
+
+    Raises:
+        RuntimeError: If the failure rate of comment retrieval exceeds 1%.
+    """
+    logging.info('Retrieving comments for %d CLs...', len(cl_infos))
+
+    manager = _SessionManager(f'{common_args.project}-review.googlesource.com')
+    with concurrent.futures.ThreadPoolExecutor(
+            max_workers=common_args.num_network_workers,
+            initializer=manager.register_session_for_current_thread
+    ) as executor:
+        func = functools.partial(_fetch_comments_for_cl, manager)
+        results = list(executor.map(func, cl_infos))
+
+    failures = results.count(False)
+    if failures > 0:
+        failure_rate = failures / len(cl_infos)
+        logging.warning('%d/%d CLs failed to retrieve comments (%.1f%%)',
+                        failures, len(cl_infos), failure_rate * 100)
+        if failure_rate > 0.01:
+            raise RuntimeError(
+                f'Comment retrieval failure rate ({failure_rate:.1%}) '
+                f'exceeded threshold (1.0%). Aborting.')
+    else:
+        logging.info('Successfully retrieved comments for all CLs.')
