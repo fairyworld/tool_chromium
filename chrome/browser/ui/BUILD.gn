@@ -4678,18 +4678,6 @@ static_library("ui") {
       "views/webauthn/sheet_view_factory.h",
       "views/webauthn/webauthn_hover_button.cc",
       "views/webauthn/webauthn_hover_button.h",
-      "views/webid/account_selection_bubble_view.cc",
-      "views/webid/account_selection_bubble_view.h",
-      "views/webid/account_selection_modal_view.cc",
-      "views/webid/account_selection_modal_view.h",
-      "views/webid/account_selection_view_base.cc",
-      "views/webid/account_selection_view_base.h",
-      "views/webid/fedcm_account_selection_view_desktop.cc",
-      "views/webid/fedcm_account_selection_view_desktop.h",
-      "views/webid/fedcm_modal_dialog_view.cc",
-      "views/webid/fedcm_modal_dialog_view.h",
-      "views/webid/webid_utils.cc",
-      "views/webid/webid_utils.h",
     ]
 
     sources += get_target_outputs(":webui_name_variants")
@@ -4782,6 +4770,8 @@ static_library("ui") {
       "//chrome/browser/ui/views/tabs/vertical:impl",
       "//chrome/browser/ui/views/user_education",
       "//chrome/browser/ui/views/web_dialogs",
+      "//chrome/browser/ui/views/webid",
+      "//chrome/browser/ui/views/webid:impl",
       "//chrome/browser/ui/views/zoom",
       "//chrome/browser/ui/waap:waap_utils",
       "//chrome/browser/ui/webauthn:impl",
@@ -4956,6 +4946,12 @@ static_library("ui") {
       # - c/b/ui/browser_command_controller.h
       # - c/b/ui/view_ids.h
       "//chrome/browser/ui/views/sharing_hub:impl",
+
+      # TODO(crbug.com/353332589): Remove this circular dependency when
+      # the following headers get modularized:
+      # - c/b/ui/views/extensions/security_dialog_tracker.h
+      # - c/b/ui/views/frame/browser_view.h
+      "//chrome/browser/ui/views/webid:impl",
     ]
 
     if (is_linux) {
