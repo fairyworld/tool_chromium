@@ -28,6 +28,7 @@ BASE_DECLARE_FEATURE(kWebViewEarlyTracingInit);
 BASE_DECLARE_FEATURE(kWebViewEnableDnsPlatform);
 BASE_DECLARE_FEATURE(kWebViewFileSystemAccess);
 BASE_DECLARE_FEATURE(kWebViewForceWebAuthn);
+BASE_DECLARE_FEATURE(kWebViewGateTextSizeAdjustOnTextAutosizing);
 BASE_DECLARE_FEATURE(kWebViewInvokeZoomPickerOnGSU);
 BASE_DECLARE_FEATURE(kWebViewMemoryProfilingClient);
 BASE_DECLARE_FEATURE(kWebViewProfileStoreNotTriggerStartup);
