@@ -7,9 +7,12 @@
 #include <memory>
 
 #include "base/functional/callback.h"
+#include "chrome/browser/extensions/chrome_app_deprecation.h"
 #include "chrome/browser/extensions/chrome_extension_system_factory.h"
+#include "chrome/browser/extensions/extension_management.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/extension_util.h"
+#include "chrome/browser/extensions/preinstalled_extensions.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/web_applications/extensions_manager.h"
 #include "content/public/browser/storage_partition.h"
@@ -20,6 +23,7 @@
 #include "extensions/browser/extension_util.h"
 #include "extensions/browser/install_gate.h"
 #include "extensions/browser/pref_names.h"
+#include "extensions/common/constants.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/extension_set.h"
 
@@ -81,6 +85,66 @@ ExtensionsManagerImpl::GetIsolatedStoragePaths() {
 std::unique_ptr<ExtensionInstallGate>
 ExtensionsManagerImpl::RegisterGarbageCollectionInstallGate() {
   return std::make_unique<web_app::ExtensionInstallGateImpl>(profile_);
+}
+
+bool ExtensionsManagerImpl::IsExtensionBlockedByPolicy(
+    const std::string& extension_id) {
+  if (!registry_) {
+    return false;
+  }
+  const extensions::Extension* extension =
+      registry_->GetInstalledExtension(extension_id);
+  extensions::ExtensionManagement* management =
+      extensions::ExtensionManagementFactory::GetForBrowserContext(profile_);
+  extensions::ManagedInstallationMode mode =
+      extension ? management->GetInstallationMode(extension)
+                : management->GetInstallationMode(extension_id,
+                                                  /*update_url=*/std::string());
+  return mode == extensions::ManagedInstallationMode::kBlocked ||
+         mode == extensions::ManagedInstallationMode::kRemoved;
+}
+
+bool ExtensionsManagerImpl::IsExtensionInstalled(
+    const std::string& extension_id) {
+  return registry_ && registry_->GetInstalledExtension(extension_id);
+}
+
+bool ExtensionsManagerImpl::IsExtensionForceInstalled(
+    const std::string& extension_id,
+    std::u16string* reason) {
+  return extensions::util::IsExtensionForceInstalled(extension_id, profile_,
+                                                     reason);
+}
+
+bool ExtensionsManagerImpl::IsExtensionDefaultInstalled(
+    const std::string& extension_id) {
+  if (!registry_) {
+    return false;
+  }
+  const extensions::Extension* extension =
+      registry_->GetInstalledExtension(extension_id);
+  return extension && (extension->creation_flags() &
+                       extensions::Extension::WAS_INSTALLED_BY_DEFAULT);
+}
+
+bool ExtensionsManagerImpl::IsExternalExtensionUninstalled(
+    const std::string& extension_id) {
+  auto* prefs = extensions::ExtensionPrefs::Get(profile_);
+  return prefs && prefs->IsExternalExtensionUninstalled(extension_id);
+}
+
+bool ExtensionsManagerImpl::DidPreinstalledAppsPerformNewInstallation() {
+#if !BUILDFLAG(IS_CHROMEOS)
+  return preinstalled_extensions::Provider::DidPerformNewInstallationForProfile(
+      profile_);
+#else
+  return false;
+#endif
+}
+
+bool ExtensionsManagerImpl::IsPreinstalledExtensionAppId(
+    const std::string& app_id) {
+  return extensions::chrome_app_deprecation::IsPreinstalledAppId(app_id);
 }
 
 // Implementation of ExtensionsManager static methods:

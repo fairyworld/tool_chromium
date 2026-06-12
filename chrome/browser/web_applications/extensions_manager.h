@@ -61,6 +61,16 @@ class ExtensionsManager {
   // ExtensionService to delay Extension installs.
   virtual std::unique_ptr<ExtensionInstallGate>
   RegisterGarbageCollectionInstallGate() = 0;
+
+  virtual bool IsExtensionBlockedByPolicy(const std::string& extension_id) = 0;
+  virtual bool IsExtensionInstalled(const std::string& extension_id) = 0;
+  virtual bool IsExtensionForceInstalled(const std::string& extension_id,
+                                         std::u16string* reason) = 0;
+  virtual bool IsExtensionDefaultInstalled(const std::string& extension_id) = 0;
+  virtual bool IsExternalExtensionUninstalled(
+      const std::string& extension_id) = 0;
+  virtual bool DidPreinstalledAppsPerformNewInstallation() = 0;
+  virtual bool IsPreinstalledExtensionAppId(const std::string& app_id) = 0;
 };
 
 }  // namespace web_app

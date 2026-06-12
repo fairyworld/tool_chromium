@@ -42,6 +42,15 @@ class ExtensionsManagerImpl : public ExtensionsManager {
   std::unique_ptr<ExtensionInstallGate> RegisterGarbageCollectionInstallGate()
       override;
 
+  bool IsExtensionBlockedByPolicy(const std::string& extension_id) override;
+  bool IsExtensionInstalled(const std::string& extension_id) override;
+  bool IsExtensionForceInstalled(const std::string& extension_id,
+                                 std::u16string* reason) override;
+  bool IsExtensionDefaultInstalled(const std::string& extension_id) override;
+  bool IsExternalExtensionUninstalled(const std::string& extension_id) override;
+  bool DidPreinstalledAppsPerformNewInstallation() override;
+  bool IsPreinstalledExtensionAppId(const std::string& app_id) override;
+
   static KeyedServiceBaseFactory* GetExtensionSystemSharedFactory();
 
  private:
