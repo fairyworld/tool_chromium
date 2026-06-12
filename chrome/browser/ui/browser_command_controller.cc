@@ -19,6 +19,7 @@
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/user_metrics.h"
 #include "base/notimplemented.h"
+#include "base/strings/strcat.h"
 #include "base/time/time.h"
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
@@ -1274,6 +1275,11 @@ bool BrowserCommandController::ExecuteCommandWithDisposition(
     case IDC_SHOW_BETA_FORUM:
       ShowBetaForum(browser_);
       break;
+    case IDC_CHROME_ENTERPRISE_RELEASE_NOTES:
+      if (base::FeatureList::IsEnabled(features::kEnterpriseReleaseNotes)) {
+        chrome::ShowChromeEnterpriseReleaseNotes(browser_);
+      }
+      break;
     case IDC_ROUTE_MEDIA:
       RouteMediaInvokedFromAppMenu(browser_);
       break;
@@ -1792,6 +1798,9 @@ void BrowserCommandController::InitCommandState() {
   command_updater_.UpdateCommandEnabled(IDC_HELP_PAGE_VIA_KEYBOARD, true);
   command_updater_.UpdateCommandEnabled(IDC_HELP_PAGE_VIA_MENU, true);
   command_updater_.UpdateCommandEnabled(IDC_SHOW_BETA_FORUM, true);
+  command_updater_.UpdateCommandEnabled(
+      IDC_CHROME_ENTERPRISE_RELEASE_NOTES,
+      base::FeatureList::IsEnabled(features::kEnterpriseReleaseNotes));
   command_updater_.UpdateCommandEnabled(
       IDC_BOOKMARKS_MENU, (!guest_session && !profile()->IsSystemProfile()));
   command_updater_.UpdateCommandEnabled(IDC_SAVED_TAB_GROUPS_MENU, true);
