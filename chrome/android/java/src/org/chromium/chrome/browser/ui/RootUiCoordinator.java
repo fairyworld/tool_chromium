@@ -2137,7 +2137,8 @@ public class RootUiCoordinator
                             mBottomBarHostManager,
                             mActionRegistry,
                             (preventClose, invocationSource) ->
-                                    toggleGlic(preventClose, invocationSource));
+                                    toggleGlic(preventClose, invocationSource),
+                            shouldSuppressTabStripAtStart());
             if (!mSupportsAppMenuSupplier.getAsBoolean()) {
                 mToolbarManager.getToolbar().disableMenuButton();
             }
@@ -2455,10 +2456,16 @@ public class RootUiCoordinator
         }
     }
 
-    /**
-     * @return whether the Android Edge To Edge Feature is supported for the current activity.
-     */
+    /** Returns whether the Android Edge To Edge Feature is supported for the current activity. */
     protected boolean supportsEdgeToEdge() {
+        return false;
+    }
+
+    /**
+     * Returns whether to suppress the tab strip when Chrome starts. Overridden by the subclass that
+     * needs the behavior.
+     */
+    protected boolean shouldSuppressTabStripAtStart() {
         return false;
     }
 

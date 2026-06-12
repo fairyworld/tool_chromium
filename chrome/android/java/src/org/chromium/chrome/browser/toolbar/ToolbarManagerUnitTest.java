@@ -447,7 +447,8 @@ public class ToolbarManagerUnitTest {
                         mOmniboxChipManager,
                         mBottomBarHostManager,
                         mActionRegistry,
-                        /* toggleGlicCallback= */ (preventClose, invocationSource) -> {});
+                        /* toggleGlicCallback= */ (preventClose, invocationSource) -> {},
+                        /* suppressTabStripAtStart= */ false);
 
         NonNullObservableSupplier<TabModelDotInfo> dotSupplier =
                 ObservableSuppliers.createNonNull(mTabModelDotInfo);

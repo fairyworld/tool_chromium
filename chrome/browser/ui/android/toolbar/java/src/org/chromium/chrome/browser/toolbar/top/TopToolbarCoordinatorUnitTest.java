@@ -199,7 +199,8 @@ public class TopToolbarCoordinatorUnitTest {
                         mBottomSheetController,
                         mModalDialogManager,
                         mSnackbarManager,
-                        mOnSigninTapped);
+                        mOnSigninTapped,
+                        /* suppressTabStripAtStart= */ false);
     }
 
     @Test

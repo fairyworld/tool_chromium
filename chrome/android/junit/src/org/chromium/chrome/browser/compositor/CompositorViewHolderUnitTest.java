@@ -14,6 +14,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -1455,7 +1456,7 @@ public class CompositorViewHolderUnitTest {
         mCompositorViewHolder.onSideUiSpecsChanged(currentSideUiSpecs);
 
         // Verify.
-        verify(mWebContents)
+        verify(mWebContents, atLeastOnce())
                 .setSize(viewportWidth - (startContainerWidth + endContainerWidth), viewportHeight);
     }
 

@@ -742,6 +742,7 @@ public class ToolbarManager
      * @param pageZoomManager The {@link PageZoomManager} used to manage the page zoom.
      * @param omniboxChipManager The {@link OmniboxChipManager} to show chips in the omnibox.
      * @param bottomBarHostManager The {@link BottomBarHostManager} to manage the bottom bar.
+     * @param suppressTabStripAtStart if {@code true}, suppress tab strip when Chrome starts.
      */
     public ToolbarManager(
             AppCompatActivity activity,
@@ -803,7 +804,8 @@ public class ToolbarManager
             @Nullable OmniboxChipManager omniboxChipManager,
             @Nullable BottomBarHostManager bottomBarHostManager,
             @Nullable ActionRegistry actionRegistry,
-            GlicButtonDelegate toggleGlicCallback) {
+            GlicButtonDelegate toggleGlicCallback,
+            boolean suppressTabStripAtStart) {
         TraceEvent.begin("ToolbarManager.ToolbarManager");
         mActionRegistry = actionRegistry;
         mToggleGlicCallback = toggleGlicCallback;
@@ -1193,9 +1195,11 @@ public class ToolbarManager
             browsingModeThemeColorProviderWithAdjustableTint.addTintObserver(
                     mHomeButtonCoordinator);
         }
+        int initialTabStripHeight =
+                suppressTabStripAtStart ? 0 : mToolbarLayout.getTabStripHeightFromResource();
         mTabStripTopControlLayer =
                 new TabStripTopControlLayer(
-                        mToolbarLayout.getTabStripHeightFromResource(),
+                        initialTabStripHeight,
                         mTopControlsStacker,
                         mBrowserControlsSizer,
                         mControlContainer,
@@ -1216,7 +1220,8 @@ public class ToolbarManager
                         profileSupplier,
                         activityResultTracker,
                         deviceLockActivityLauncher,
-                        snackbarManager);
+                        snackbarManager,
+                        suppressTabStripAtStart);
         mActionModeController =
                 new ActionModeController(
                         mActivity,
@@ -2031,7 +2036,8 @@ public class ToolbarManager
             MonotonicObservableSupplier<Profile> profileSupplier,
             ActivityResultTracker activityResultTracker,
             DeviceLockActivityLauncher deviceLockActivityLauncher,
-            SnackbarManager snackbarManager) {
+            SnackbarManager snackbarManager,
+            boolean suppressTabStripAtStart) {
         TopToolbarCoordinator toolbar =
                 new TopToolbarCoordinator(
                         controlContainer,
@@ -2081,7 +2087,8 @@ public class ToolbarManager
                         mBottomSheetController,
                         mModalDialogManagerSupplier.get(),
                         snackbarManager,
-                        this::endFuseboxInput);
+                        this::endFuseboxInput,
+                        suppressTabStripAtStart);
 
         mHomepageStateListener =
                 () -> {

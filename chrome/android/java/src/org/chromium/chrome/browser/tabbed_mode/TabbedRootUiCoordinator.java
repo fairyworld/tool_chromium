@@ -2203,65 +2203,63 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                                     mVerticalTabsActionDelegate,
                                     mWindowAndroid,
                                     assumeNonNull(mMultiInstanceManager),
-                                    assumeNonNull(mSnackbarManagerSupplier.get())));
+                                    assumeNonNull(mSnackbarManagerSupplier.get())),
+                            mIsVerticalTabsActiveSupplier);
             mSideUiCoordinator.registerSideUiContainer(mVerticalTabsSideUiCoordinator);
         }
+
+        mSideUiStateProviderSupplier.onAvailable(
+                provider -> maybeInitializeVeritcalTabs(currentlySelectedProfile));
         mSideUiStateProviderSupplier.set(mSideUiCoordinator);
 
         // TODO(crbug.com/510890983): Add render tests for the secondary container adjustment.
         View secondaryUiContainer = mActivity.findViewById(R.id.secondary_ui_container);
         mSecondaryUiContainerMarginAdjuster = new ViewMarginAdjusterForSideUi(secondaryUiContainer);
         mSideUiCoordinator.addObserver(mSecondaryUiContainerMarginAdjuster);
+    }
 
-        if (VerticalTabUtils.isVerticalTabsEligible(mActivity)) {
-            // Restore the user's saved tab layout preference upon browser cold launch.
-            boolean useVerticalLayoutOnLaunch =
-                    ChromeSharedPreferences.getInstance()
-                            .readBoolean(ChromePreferenceKeys.VERTICAL_TABS_ENABLED, false);
+    private void maybeInitializeVeritcalTabs(Profile profile) {
+        if (!VerticalTabUtils.isVerticalTabsEligible(mActivity)) return;
 
-            mIsVerticalTabsActiveSupplier.set(useVerticalLayoutOnLaunch);
-            if (useVerticalLayoutOnLaunch) {
-                var transitionCoordinator =
-                        assumeNonNull(mToolbarManager).getTabStripTransitionCoordinator();
-                assumeNonNull(transitionCoordinator).suppressTabStrip(true);
-                assumeNonNull(mVerticalTabsSideUiCoordinator).setVisible(true);
-            }
+        // Restore the user's saved tab layout preference upon browser cold launch.
+        boolean useVerticalLayoutOnLaunch =
+                ChromeSharedPreferences.getInstance()
+                        .readBoolean(ChromePreferenceKeys.VERTICAL_TABS_ENABLED, false);
 
-            // Set up vertical tabs + pinned Glic visibility interaction.
-            Profile profile = currentlySelectedProfile;
-            if (profile != null && GlicEnabling.isEnabledForProfile(profile)) {
-                mIsGlicPinnedSupplier.set(GlicUtils.isButtonPinnedToTabStrip(profile));
-                mPrefChangeRegistrar = PrefServiceUtil.createFor(profile);
-                mPrefChangeRegistrar.addObserver(
-                        GlicPrefNames.GLIC_PINNED_TO_TABSTRIP,
-                        () ->
-                                mIsGlicPinnedSupplier.set(
-                                        GlicUtils.isButtonPinnedToTabStrip(profile)));
-            }
-
-            var toolbar =
-                    assumeNonNull(getToolbarManagerSupplier().get()).getTopToolbarCoordinator();
-            toolbar.observeGlicVerticalTabs(
-                    mIsVerticalTabsActiveSupplier, mIsGlicPinnedSupplier, mIncognitoStateProvider);
+        mIsVerticalTabsActiveSupplier.addSyncObserver(
+                active -> {
+                    var transitionCoordinator =
+                            assumeNonNull(mToolbarManager).getTabStripTransitionCoordinator();
+                    assumeNonNull(transitionCoordinator).suppressTabStrip(active);
+                });
+        if (useVerticalLayoutOnLaunch) {
+            assumeNonNull(mVerticalTabsSideUiCoordinator).setVisible(true);
         }
+
+        // Set up vertical tabs + pinned Glic visibility interaction.
+        if (profile != null && GlicEnabling.isEnabledForProfile(profile)) {
+            mIsGlicPinnedSupplier.set(GlicUtils.isButtonPinnedToTabStrip(profile));
+            mPrefChangeRegistrar = PrefServiceUtil.createFor(profile);
+            mPrefChangeRegistrar.addObserver(
+                    GlicPrefNames.GLIC_PINNED_TO_TABSTRIP,
+                    () -> mIsGlicPinnedSupplier.set(GlicUtils.isButtonPinnedToTabStrip(profile)));
+        }
+
+        var toolbar = assumeNonNull(getToolbarManagerSupplier().get()).getTopToolbarCoordinator();
+        toolbar.observeGlicVerticalTabs(
+                mIsVerticalTabsActiveSupplier, mIsGlicPinnedSupplier, mIncognitoStateProvider);
     }
 
     /** Toggle the visibility between horizontal tab strip and vertical tab list. */
     public void toggleTabStrip() {
-        var transitionCoordinator =
-                assumeNonNull(mToolbarManager).getTabStripTransitionCoordinator();
-        // TODO(crbug.com/509226293):
-        //    - Coordinate horizontal/vertical tab animation.
         boolean shouldShowVerticalTabs =
                 !ChromeSharedPreferences.getInstance()
-                        .readBoolean(ChromePreferenceKeys.VERTICAL_TABS_ENABLED, false);
+                        .readBoolean(ChromePreferenceKeys.VERTICAL_TABS_ENABLED, true);
 
         ChromeSharedPreferences.getInstance()
                 .writeBoolean(ChromePreferenceKeys.VERTICAL_TABS_ENABLED, shouldShowVerticalTabs);
 
-        assumeNonNull(transitionCoordinator).suppressTabStrip(shouldShowVerticalTabs);
         assumeNonNull(mVerticalTabsSideUiCoordinator).setVisible(shouldShowVerticalTabs);
-        mIsVerticalTabsActiveSupplier.set(shouldShowVerticalTabs);
     }
 
     private void destroySideUi() {
@@ -2322,6 +2320,11 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
     @Override
     protected boolean supportsEdgeToEdge() {
         return EdgeToEdgeUtils.isEdgeToEdgeBottomChinEnabled(mActivity);
+    }
+
+    @Override
+    protected boolean shouldSuppressTabStripAtStart() {
+        return VerticalTabUtils.isVerticalTabsEnabled(mActivity);
     }
 
     public @Nullable StatusIndicatorCoordinator getStatusIndicatorCoordinatorForTesting() {
