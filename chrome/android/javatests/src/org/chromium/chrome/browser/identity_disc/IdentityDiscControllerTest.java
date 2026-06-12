@@ -48,6 +48,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
+import org.chromium.base.ResettersForTesting;
 import org.chromium.base.ThreadUtils;
 import org.chromium.base.supplier.ObservableSuppliers;
 import org.chromium.base.supplier.SettableMonotonicObservableSupplier;
@@ -765,15 +766,18 @@ public class IdentityDiscControllerTest {
     }
 
     private IdentityDiscController buildController() {
-        return new IdentityDiscController(
-                mActivityTestRule.getActivity(),
-                mWindowAndroid,
-                mActivityResultTracker,
-                mDeviceLockActivityLauncher,
-                mProfileSupplier,
-                mBottomSheetController,
-                mModalDialogManager,
-                mSnackbarManager);
+        IdentityDiscController controller =
+                new IdentityDiscController(
+                        mActivityTestRule.getActivity(),
+                        mWindowAndroid,
+                        mActivityResultTracker,
+                        mDeviceLockActivityLauncher,
+                        mProfileSupplier,
+                        mBottomSheetController,
+                        mModalDialogManager,
+                        mSnackbarManager);
+        ResettersForTesting.register(() -> ThreadUtils.runOnUiThreadBlocking(controller::destroy));
+        return controller;
     }
 
     private PrimaryAccountChangeEvent newSigninEvent(int eventType) {
