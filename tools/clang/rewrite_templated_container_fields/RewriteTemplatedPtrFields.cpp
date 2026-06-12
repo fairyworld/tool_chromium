@@ -834,9 +834,16 @@ AST_MATCHER_P(clang::Expr,
   auto second_member =
       memberExpr(member(hasName("second")), has(expr().bind("expr")));
 
-  auto items = {iterator,      search_calls,    unary_op,
-                reversed_expr, bracket_op_call, arrow_op_call,
-                star_op_call,  loop_var_second, second_member};
+  auto cxx_construct =
+      cxxConstructExpr(argumentCountIs(1), hasArgument(0, expr().bind("expr")));
+
+  auto cxx_bind_temp = cxxBindTemporaryExpr(has(expr().bind("expr")));
+
+  auto paren_expr = parenExpr(has(expr().bind("expr")));
+
+  auto items = {iterator,        search_calls,  unary_op,      reversed_expr,
+                bracket_op_call, arrow_op_call, star_op_call,  loop_var_second,
+                second_member,   cxx_construct, cxx_bind_temp, paren_expr};
   clang::ast_matchers::internal::BoundNodesTreeBuilder matches;
   const clang::Expr* n = nullptr;
   std::any_of(items.begin(), items.end(), [&](auto& item) {
@@ -852,6 +859,36 @@ AST_MATCHER_P(clang::Expr,
     return matcher.matches(*n, Finder, Builder);
   }
   return InnerMatcher.matches(Node, Finder, Builder);
+}
+
+AST_MATCHER_P(clang::FieldDecl,
+              hasExplicitFieldTypeLoc,
+              clang::ast_matchers::internal::Matcher<clang::TypeLoc>,
+              InnerMatcher) {
+  const clang::FieldDecl* explicit_field_decl =
+      raw_ptr_plugin::GetExplicitDecl(&Node);
+  if (!explicit_field_decl) {
+    return false;
+  }
+  if (auto* tsi = explicit_field_decl->getTypeSourceInfo()) {
+    return InnerMatcher.matches(tsi->getTypeLoc(), Finder, Builder);
+  }
+  return false;
+}
+
+AST_MATCHER_P(clang::ParmVarDecl,
+              hasExplicitParmVarTypeLoc,
+              clang::ast_matchers::internal::Matcher<clang::TypeLoc>,
+              InnerMatcher) {
+  const clang::ParmVarDecl* explicit_param =
+      raw_ptr_plugin::GetExplicitDecl(&Node);
+  if (!explicit_param) {
+    return false;
+  }
+  if (auto* tsi = explicit_param->getTypeSourceInfo()) {
+    return InnerMatcher.matches(tsi->getTypeLoc(), Finder, Builder);
+  }
+  return false;
 }
 
 class DeclVisitor
@@ -970,42 +1007,41 @@ class ContainerRewriter {
               allOf(raw_ptr_plugin::isInMacroLocation(),
                     unless(raw_ptr_plugin::isRawPtrExclusionAnnotated())));
 
-    // Supports typedefs as well.
-    auto lhs_type_loc =
+    // Explicit types are used here instead of auto (which would resolve to
+    // internal VariadicOperatorMatcher types) to avoid C++ template argument
+    // deduction failures when passing them to other matchers like
+    // hasDescendant().
+    clang::ast_matchers::internal::Matcher<clang::TypeLoc> lhs_type_loc =
         anyOf(hasDescendant(loc(qualType(hasDeclaration(typedefNameDecl(
                   type_def_name_decl(hasDescendant(lhs_location))))))),
               hasDescendant(lhs_location));
 
     // Supports typedefs as well.
-    auto rhs_type_loc =
+    clang::ast_matchers::internal::Matcher<clang::TypeLoc> rhs_type_loc =
         anyOf(hasDescendant(loc(qualType(hasDeclaration(typedefNameDecl(
                   type_def_name_decl(hasDescendant(rhs_location))))))),
               hasDescendant(rhs_location));
 
-    auto lhs_field =
-        fieldDecl(raw_ptr_plugin::hasExplicitFieldDecl(lhs_type_loc),
-                  unless(field_exclusions))
-            .bind("lhs_field");
-    auto rhs_field =
-        fieldDecl(raw_ptr_plugin::hasExplicitFieldDecl(rhs_type_loc),
-                  unless(field_exclusions))
-            .bind("rhs_field");
+    auto lhs_field = fieldDecl(hasExplicitFieldTypeLoc(lhs_type_loc),
+                               unless(field_exclusions))
+                         .bind("lhs_field");
+    auto rhs_field = fieldDecl(hasExplicitFieldTypeLoc(rhs_type_loc),
+                               unless(field_exclusions))
+                         .bind("rhs_field");
 
     auto lhs_var = anyOf(
         varDecl(hasDescendant(loc(qualType(autoType())).bind("lhs_auto_loc"))),
-        varDecl(lhs_type_loc).bind("lhs_var"));
+        varDecl(hasDescendant(lhs_type_loc)).bind("lhs_var"));
 
     auto rhs_var = anyOf(
         varDecl(hasDescendant(loc(qualType(autoType())).bind("rhs_auto_loc"))),
-        varDecl(rhs_type_loc).bind("rhs_var"));
+        varDecl(hasDescendant(rhs_type_loc)).bind("rhs_var"));
 
     auto lhs_param =
-        parmVarDecl(raw_ptr_plugin::hasExplicitParmVarDecl(lhs_type_loc))
-            .bind("lhs_param");
+        parmVarDecl(hasExplicitParmVarTypeLoc(lhs_type_loc)).bind("lhs_param");
 
     auto rhs_param =
-        parmVarDecl(raw_ptr_plugin::hasExplicitParmVarDecl(rhs_type_loc))
-            .bind("rhs_param");
+        parmVarDecl(hasExplicitParmVarTypeLoc(rhs_type_loc)).bind("rhs_param");
 
     auto rhs_call_expr =
         callExpr(callee(functionDecl(hasReturnTypeLoc(rhs_type_loc))));
@@ -1024,7 +1060,7 @@ class ContainerRewriter {
     // To make sure we add all field decls to the graph.(Specifically those not
     // connected to other nodes)
     auto field_decl =
-        fieldDecl(raw_ptr_plugin::hasExplicitFieldDecl(lhs_type_loc),
+        fieldDecl(hasExplicitFieldTypeLoc(lhs_type_loc),
                   unless(anyOf(field_exclusions,
                                raw_ptr_plugin::isRawPtrExclusionAnnotated())))
             .bind("field_decl");
@@ -1038,7 +1074,7 @@ class ContainerRewriter {
     // used as a starting point to propagate the exclusion before running dfs on
     // the graph.
     auto excluded_field_decl =
-        fieldDecl(raw_ptr_plugin::hasExplicitFieldDecl(lhs_type_loc),
+        fieldDecl(hasExplicitFieldTypeLoc(lhs_type_loc),
                   anyOf(raw_ptr_plugin::isRawPtrExclusionAnnotated(),
                         isInLocationListedInFilterFile(paths_to_exclude)))
             .bind("excluded_field_decl");
@@ -1054,19 +1090,21 @@ class ContainerRewriter {
     auto lhs_move_call =
         callExpr(callee(functionDecl(ref_cref_move)), hasArgument(0, lhs_expr));
 
-    auto rhs_cxx_temp_expr = cxxTemporaryObjectExpr(rhs_type_loc);
+    auto rhs_cxx_temp_expr =
+        cxxTemporaryObjectExpr(hasDescendant(rhs_type_loc));
 
-    auto lhs_cxx_temp_expr = cxxTemporaryObjectExpr(lhs_type_loc);
+    auto lhs_cxx_temp_expr =
+        cxxTemporaryObjectExpr(hasDescendant(lhs_type_loc));
 
     // This represents the forms under which an expr could appear on the right
     // hand side of an assignment operation, var construction, or an expr passed
     // as callExpr argument. Examples: rhs_expr, &rhs_expr, *rhs_expr,
     // fct_call(),*fct_call(), &fct_call(), std::move(), .begin();
-    auto rhs_expr_variations =
-        expr_variations(anyOf(rhs_expr, rhs_move_call, rhs_cxx_temp_expr));
+    auto rhs_expr_variations = ignoringImplicit(
+        expr_variations(anyOf(rhs_expr, rhs_move_call, rhs_cxx_temp_expr)));
 
-    auto lhs_expr_variations =
-        expr_variations(anyOf(lhs_expr, lhs_move_call, lhs_cxx_temp_expr));
+    auto lhs_expr_variations = ignoringImplicit(
+        expr_variations(anyOf(lhs_expr, lhs_move_call, lhs_cxx_temp_expr)));
 
     // rewrite affected expressions
     {
