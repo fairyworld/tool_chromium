@@ -2,6 +2,7 @@
   "phases": {
     "local": {
       "gn_args": {
+        "is_component_build": true,
         "is_debug": true,
         "symbol_level": 1,
         "target_cpu": "x64",
@@ -12,6 +13,7 @@
     },
     "remoteexec": {
       "gn_args": {
+        "is_component_build": true,
         "is_debug": true,
         "symbol_level": 1,
         "target_cpu": "x64",
