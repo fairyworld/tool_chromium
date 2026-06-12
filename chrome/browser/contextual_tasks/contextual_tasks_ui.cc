@@ -446,8 +446,6 @@ ContextualTasksUI::ContextualTasksUI(content::WebUI* web_ui)
       {"oauthErrorDialogBody", IDS_CONTEXTUAL_TASKS_OAUTH_ERROR_DIALOG_BODY},
       {"oauthErrorDialogReloadButton",
        IDS_CONTEXTUAL_TASKS_OAUTH_ERROR_DIALOG_RELOAD_BUTTON},
-      {"stsTryItLink", IDS_STS_IPH_TRY_IT_LINK},
-      {"stsTryItBodyEnd", IDS_STS_IPH_TRY_IT_BODY_END},
       {"stsTryItTurnOn", IDS_STS_IPH_TRY_IT_TURN_ON},
       {"stsTryItNotNow", IDS_STS_IPH_TRY_IT_NOT_NOW},
       {"stsDefaultOnLink", IDS_STS_IPH_DEFAULT_ON_LINK},
