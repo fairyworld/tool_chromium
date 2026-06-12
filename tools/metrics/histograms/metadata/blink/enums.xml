@@ -273,7 +273,7 @@ Called by update_document_policy_enum.py.-->
   <int value="10" label="TokenSentToRenderer"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/autofill/content/browser/email_verifier_delegate.h:EvpAutofillFlowResult) -->
+<!-- LINT.ThenChange(//components/autofill/content/browser/integrators/email_verifier/email_verifier_delegate.h:EvpAutofillFlowResult) -->
 
 <!-- LINT.IfChange(EvpPermissionUiStatus) -->
 
