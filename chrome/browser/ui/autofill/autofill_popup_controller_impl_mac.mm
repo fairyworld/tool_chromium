@@ -16,27 +16,16 @@ using base::WeakPtr;
 
 namespace autofill {
 
-// static
-WeakPtr<AutofillSuggestionController> AutofillSuggestionController::GetOrCreate(
-    WeakPtr<AutofillSuggestionController> previous,
-    WeakPtr<AutofillSuggestionDelegate> delegate,
+base::WeakPtr<AutofillSuggestionController>
+CreateAutofillPopupControllerImplMac(
+    base::WeakPtr<AutofillSuggestionDelegate> delegate,
     content::WebContents* web_contents,
     PopupControllerCommon controller_common,
-    int32_t form_control_ax_id,
-    AutofillSuggestionTriggerSource trigger_source) {
-  if (previous &&
-      previous->MayRecycle(delegate, web_contents, trigger_source)) {
-    previous->Recycle(std::move(controller_common), form_control_ax_id);
-    return previous;
-  }
-
-  if (previous.get()) {
-    previous->Hide(SuggestionHidingReason::kViewDestroyed);
-  }
-
-  auto* controller = new AutofillPopupControllerImplMac(
-      delegate, web_contents, std::move(controller_common), form_control_ax_id);
-  return controller->GetWeakPtr();
+    int32_t form_control_ax_id) {
+  return (new AutofillPopupControllerImplMac(delegate, web_contents,
+                                             std::move(controller_common),
+                                             form_control_ax_id))
+      ->GetWeakPtr();
 }
 
 AutofillPopupControllerImplMac::AutofillPopupControllerImplMac(

@@ -244,28 +244,6 @@ std::u16string GetAccountEmail(content::WebContents* web_contents) {
 
 }  // namespace
 
-// static
-base::WeakPtr<AutofillSuggestionController>
-AutofillSuggestionController::GetOrCreate(
-    base::WeakPtr<AutofillSuggestionController> previous,
-    base::WeakPtr<AutofillSuggestionDelegate> delegate,
-    content::WebContents* web_contents,
-    PopupControllerCommon controller_common,
-    int32_t form_control_ax_id,
-    AutofillSuggestionTriggerSource trigger_source) {
-  if (previous &&
-      previous->MayRecycle(delegate, web_contents, trigger_source)) {
-    previous->Recycle(std::move(controller_common), form_control_ax_id);
-    return previous;
-  }
-
-  if (previous) {
-    previous->Hide(SuggestionHidingReason::kViewDestroyed);
-  }
-  auto* controller = new AutofillKeyboardAccessoryControllerImpl(
-      delegate, web_contents, std::move(controller_common));
-  return controller->GetWeakPtr();
-}
 
 bool AutofillKeyboardAccessoryControllerImpl::MayRecycle(
     base::WeakPtr<AutofillSuggestionDelegate> delegate,

@@ -171,31 +171,6 @@ void MaybeRecordAddressDeletedMetric(content::WebContents* web_contents,
 
 }  // namespace
 
-#if !BUILDFLAG(IS_MAC) && !BUILDFLAG(IS_ANDROID)
-// static
-base::WeakPtr<AutofillSuggestionController>
-AutofillSuggestionController::GetOrCreate(
-    base::WeakPtr<AutofillSuggestionController> previous,
-    base::WeakPtr<AutofillSuggestionDelegate> delegate,
-    content::WebContents* web_contents,
-    PopupControllerCommon controller_common,
-    int32_t form_control_ax_id,
-    AutofillSuggestionTriggerSource trigger_source) {
-  if (previous &&
-      previous->MayRecycle(delegate, web_contents, trigger_source)) {
-    previous->Recycle(std::move(controller_common), form_control_ax_id);
-    return previous;
-  }
-
-  if (previous) {
-    previous->Hide(SuggestionHidingReason::kViewDestroyed);
-  }
-  auto* controller = new AutofillPopupControllerImpl(
-      delegate, web_contents, std::move(controller_common), form_control_ax_id,
-      /*parent=*/std::nullopt);
-  return controller->GetWeakPtr();
-}
-#endif
 
 bool AutofillPopupControllerImpl::MayRecycle(
     base::WeakPtr<AutofillSuggestionDelegate> delegate,
