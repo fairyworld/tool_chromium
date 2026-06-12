@@ -33,6 +33,7 @@ import android.os.UserManager;
 import androidx.test.rule.GrantPermissionRule;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,6 +54,7 @@ import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.base.test.RobolectricUtil;
 import org.chromium.base.test.util.Features;
 import org.chromium.base.test.util.HistogramWatcher;
+import org.chromium.components.extensions.ExtensionsBuildflags;
 import org.chromium.components.externalauth.ExternalAuthUtils;
 import org.chromium.components.signin.AccountManagerDelegate.CapabilityResponse;
 import org.chromium.components.signin.AccountManagerFacade.ChildAccountStatusListener;
@@ -116,6 +118,11 @@ public class AccountManagerFacadeImplTest {
 
     @Before
     public void setUp() {
+        if (SigninFeatureMap.sMigrateAccountManagerDelegate.isEnabled()) {
+            Assume.assumeFalse(
+                    "MigrateAccountManagerDelegate is not supported when extensions are enabled.",
+                    ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE);
+        }
         lenient().when(mExternalAuthUtilsMock.canUseGooglePlayServices()).thenReturn(true);
         ExternalAuthUtils.setInstanceForTesting(mExternalAuthUtilsMock);
 
