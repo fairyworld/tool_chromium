@@ -21,6 +21,9 @@ PreferredAppsList::~PreferredAppsList() = default;
 void PreferredAppsList::Init() {
   preferred_apps_ = PreferredApps();
   initialized_ = true;
+  for (auto& obs : observers_) {
+    obs.OnPreferredAppsListInitialized();
+  }
 }
 
 void PreferredAppsList::Init(PreferredApps preferred_apps) {
@@ -36,6 +39,9 @@ void PreferredAppsList::Init(PreferredApps preferred_apps) {
     iter++;
   }
   initialized_ = true;
+  for (auto& obs : observers_) {
+    obs.OnPreferredAppsListInitialized();
+  }
 }
 
 ReplacedAppPreferences PreferredAppsList::AddPreferredApp(

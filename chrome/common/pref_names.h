@@ -1905,6 +1905,21 @@ inline constexpr char kWebAppsUninstalledDefaultChromeApps[] =
 // outlive the app installation and uninstallation.
 inline constexpr char kWebAppsPreferences[] = "web_apps.web_app_ids";
 
+#if BUILDFLAG(IS_CHROMEOS)
+// The current migration state for PWA navigation capturing on ChromeOS, stored
+// as an integer matching values in `web_app::MigrationState`. Default
+// initialized to match that on-by-default is not enabled on ChromeOS.
+inline constexpr char kLastNavigationCapturingMigrationState[] =
+    "web_apps.last_navigation_capturing_migration_state";
+
+// A list of web app IDs that were set as the preferred app for capturing
+// supported links before migration was executed to start capturing by default.
+// Used as a backup to revert changes if the user turns off capturing by default
+// on ChromeOS.
+inline constexpr char kWebAppsPreviouslyAppSupportedLinks[] =
+    "web_apps.previously_app_supported_links";
+#endif
+
 #if BUILDFLAG(IS_MAC)
 // A boolean that indicates whether ad-hoc code signing should be used for
 // PWA app shims. This is managed by enterprise policy.

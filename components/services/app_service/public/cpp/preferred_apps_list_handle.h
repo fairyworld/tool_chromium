@@ -59,6 +59,8 @@ class PreferredAppsListHandle {
     virtual void OnPreferredAppChanged(const std::string& app_id,
                                        bool is_preferred_app) = 0;
 
+    virtual void OnPreferredAppsListInitialized() {}
+
     // Called when the PreferredAppsList object (the thing that this observer
     // observes) will be destroyed. In response, the observer, |this|, should
     // call "handle->RemoveObserver(this)", whether directly or indirectly (e.g.
