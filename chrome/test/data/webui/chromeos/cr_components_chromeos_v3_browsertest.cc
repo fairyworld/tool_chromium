@@ -7,192 +7,303 @@
 #include "chrome/test/base/web_ui_mocha_browser_test.h"
 #include "content/public/test/browser_test.h"
 
-#define REGISTER_TEST(test_fixture, host, test_path)  \
-  class test_fixture : public WebUIMochaBrowserTest { \
-   protected:                                         \
-    test_fixture() { set_test_loader_host(host); }    \
-  };                                                  \
-  IN_PROC_BROWSER_TEST_F(test_fixture, All) {         \
-    RunTest(test_path, "mocha.run()");                \
-  }
-
 // Bluetooth components
-REGISTER_TEST(BluetoothBasePageTestV3,
-              ash::kChromeUIBluetoothPairingHost,
-              "chromeos/bluetooth/bluetooth_base_page_test.js")
-REGISTER_TEST(BluetoothBluetoothIconTestV3,
-              ash::kChromeUIBluetoothPairingHost,
-              "chromeos/bluetooth/bluetooth_icon_test.js")
-REGISTER_TEST(BluetoothBatteryIconPercentageTestV3,
-              ash::kChromeUIBluetoothPairingHost,
-              "chromeos/bluetooth/bluetooth_battery_icon_percentage_test.js")
-REGISTER_TEST(BluetoothDeviceBatteryInfoTestV3,
-              ash::kChromeUIBluetoothPairingHost,
-              "chromeos/bluetooth/bluetooth_device_battery_info_test.js")
-REGISTER_TEST(
-    BluetoothDeviceSelectionPageTestV3,
-    ash::kChromeUIBluetoothPairingHost,
-    "chromeos/bluetooth/bluetooth_pairing_device_selection_page_test.js")
-REGISTER_TEST(BluetoothPairingConfirmCodeTestV3,
-              ash::kChromeUIBluetoothPairingHost,
-              "chromeos/bluetooth/bluetooth_pairing_confirm_code_page_test.js")
-REGISTER_TEST(BluetoothPairingDeviceItemTestV3,
-              ash::kChromeUIBluetoothPairingHost,
-              "chromeos/bluetooth/bluetooth_pairing_device_item_test.js")
-REGISTER_TEST(BluetoothPairingRequestCodePageTestV3,
-              ash::kChromeUIBluetoothPairingHost,
-              "chromeos/bluetooth/bluetooth_pairing_request_code_page_test.js")
-REGISTER_TEST(BluetoothPairingEnterCodePageTestV3,
-              ash::kChromeUIBluetoothPairingHost,
-              "chromeos/bluetooth/bluetooth_pairing_enter_code_page_test.js")
-REGISTER_TEST(BluetoothPairingUiTestV3,
-              ash::kChromeUIBluetoothPairingHost,
-              "chromeos/bluetooth/bluetooth_pairing_ui_test.js")
-REGISTER_TEST(BluetoothSpinnerPageTestV3,
-              ash::kChromeUIBluetoothPairingHost,
-              "chromeos/bluetooth/bluetooth_spinner_page_test.js")
+class CrComponentsCrOsBluetoothTest : public WebUIMochaBrowserTest {
+ protected:
+  CrComponentsCrOsBluetoothTest() {
+    set_test_loader_host(ash::kChromeUIBluetoothPairingHost);
+  }
+};
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrOsBluetoothTest, BluetoothBasePage) {
+  RunTest("chromeos/bluetooth/bluetooth_base_page_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrOsBluetoothTest, BluetoothIcon) {
+  RunTest("chromeos/bluetooth/bluetooth_icon_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrOsBluetoothTest,
+                       BluetoothBatteryIconPercentage) {
+  RunTest("chromeos/bluetooth/bluetooth_battery_icon_percentage_test.js",
+          "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrOsBluetoothTest,
+                       BluetoothDeviceBatteryInfo) {
+  RunTest("chromeos/bluetooth/bluetooth_device_battery_info_test.js",
+          "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrOsBluetoothTest,
+                       BluetoothPairingDeviceSelectionPage) {
+  RunTest("chromeos/bluetooth/bluetooth_pairing_device_selection_page_test.js",
+          "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrOsBluetoothTest,
+                       BluetoothPairingConfirmCodePage) {
+  RunTest("chromeos/bluetooth/bluetooth_pairing_confirm_code_page_test.js",
+          "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrOsBluetoothTest,
+                       BluetoothPairingDeviceItem) {
+  RunTest("chromeos/bluetooth/bluetooth_pairing_device_item_test.js",
+          "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrOsBluetoothTest,
+                       BluetoothPairingRequestCodePage) {
+  RunTest("chromeos/bluetooth/bluetooth_pairing_request_code_page_test.js",
+          "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrOsBluetoothTest,
+                       BluetoothPairingEnterCodePage) {
+  RunTest("chromeos/bluetooth/bluetooth_pairing_enter_code_page_test.js",
+          "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrOsBluetoothTest, BluetoothPairingUi) {
+  RunTest("chromeos/bluetooth/bluetooth_pairing_ui_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrOsBluetoothTest, BluetoothSpinnerPage) {
+  RunTest("chromeos/bluetooth/bluetooth_spinner_page_test.js", "mocha.run()");
+}
 
 // NetworkComponents
-REGISTER_TEST(NetworkComponentsApnListTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/apn_list_test.js")
-REGISTER_TEST(NetworkComponentsApnListItemTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/apn_list_item_test.js")
-REGISTER_TEST(NetworkComponentsApnSelectionDialogTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/apn_selection_dialog_test.js")
-REGISTER_TEST(NetworkComponentsApnSelectionDialogListItemTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/apn_selection_dialog_list_item_test.js")
-REGISTER_TEST(NetworkComponentsCrPolicyNetworkBehaviorMojoTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/cr_policy_network_behavior_mojo_tests.js")
-REGISTER_TEST(NetworkComponentsCrPolicyNetworkIndicatorMojoTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/cr_policy_network_indicator_mojo_tests.js")
-REGISTER_TEST(NetworkComponentsNetworkApnlistTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_apnlist_test.js")
-REGISTER_TEST(NetworkComponentsNetworkChooseMobileTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_choose_mobile_test.js")
-REGISTER_TEST(NetworkComponentsNetworkConfigTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_config_test.js")
-REGISTER_TEST(NetworkComponentsNetworkConfigElementBehaviorTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_config_element_behavior_test.js")
-REGISTER_TEST(NetworkComponentsNetworkConfigInputTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_config_input_test.js")
-REGISTER_TEST(NetworkComponentsNetworkConfigSelectTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_config_select_test.js")
-REGISTER_TEST(NetworkComponentsNetworkConfigToggleTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_config_toggle_test.js")
-REGISTER_TEST(NetworkComponentsNetworkConfigVpnTestTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_config_vpn_test.js")
-REGISTER_TEST(NetworkComponentsNetworkConfigWifiTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_config_wifi_test.js")
-REGISTER_TEST(NetworkComponentsNetworkIconTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_icon_test.js")
-REGISTER_TEST(NetworkComponentsNetworkIpConfigTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_ip_config_test.js")
-REGISTER_TEST(NetworkComponentsNetworkListTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_list_test.js")
-REGISTER_TEST(NetworkComponentsNetworkListItemTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_list_item_test.js")
-REGISTER_TEST(NetworkComponentsNetworkNameserversTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_nameservers_test.js")
-REGISTER_TEST(NetworkComponentsNetworkPasswordInputTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_password_input_test.js")
-REGISTER_TEST(NetworkComponentsNetworkPropertyListMojoTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_property_list_mojo_test.js")
-REGISTER_TEST(NetworkComponentsNetworkProxyExclusionsTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_proxy_exclusions_test.js")
-REGISTER_TEST(NetworkComponentsNetworkProxyInputTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_proxy_input_test.js")
-REGISTER_TEST(NetworkComponentsNetworkProxyTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_proxy_test.js")
-REGISTER_TEST(NetworkComponentsNetworkSelectTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_select_test.js")
-REGISTER_TEST(NetworkComponentsNetworkSiminfoTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/network_siminfo_test.js")
-REGISTER_TEST(NetworkComponentsSimLockDialogsTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/network/sim_lock_dialogs_test.js")
+class CrComponentsCrosNetworkTest : public WebUIMochaBrowserTest {
+ protected:
+  CrComponentsCrosNetworkTest() {
+    set_test_loader_host(ash::kChromeUIOSSettingsHost);
+  }
+};
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, ApnList) {
+  RunTest("chromeos/network/apn_list_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, ApnListItem) {
+  RunTest("chromeos/network/apn_list_item_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, ApnSelectionDialog) {
+  RunTest("chromeos/network/apn_selection_dialog_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest,
+                       ApnSelectionDialogListItem) {
+  RunTest("chromeos/network/apn_selection_dialog_list_item_test.js",
+          "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest,
+                       CrPolicyNetworkBehaviorMojo) {
+  RunTest("chromeos/network/cr_policy_network_behavior_mojo_tests.js",
+          "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest,
+                       CrPolicyNetworkIndicatorMojo) {
+  RunTest("chromeos/network/cr_policy_network_indicator_mojo_tests.js",
+          "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkApnlist) {
+  RunTest("chromeos/network/network_apnlist_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkChooseMobile) {
+  RunTest("chromeos/network/network_choose_mobile_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkConfig) {
+  RunTest("chromeos/network/network_config_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest,
+                       NetworkConfigElementBehavior) {
+  RunTest("chromeos/network/network_config_element_behavior_test.js",
+          "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkConfigInput) {
+  RunTest("chromeos/network/network_config_input_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkConfigSelect) {
+  RunTest("chromeos/network/network_config_select_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkConfigToggle) {
+  RunTest("chromeos/network/network_config_toggle_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkConfigVpn) {
+  RunTest("chromeos/network/network_config_vpn_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkConfigWifi) {
+  RunTest("chromeos/network/network_config_wifi_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkIcon) {
+  RunTest("chromeos/network/network_icon_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkIpConfig) {
+  RunTest("chromeos/network/network_ip_config_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkList) {
+  RunTest("chromeos/network/network_list_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkListItem) {
+  RunTest("chromeos/network/network_list_item_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkNameservers) {
+  RunTest("chromeos/network/network_nameservers_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkPasswordInput) {
+  RunTest("chromeos/network/network_password_input_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkPropertyListMojo) {
+  RunTest("chromeos/network/network_property_list_mojo_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkProxyExclusions) {
+  RunTest("chromeos/network/network_proxy_exclusions_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkProxyInput) {
+  RunTest("chromeos/network/network_proxy_input_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkProxy) {
+  RunTest("chromeos/network/network_proxy_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkSelect) {
+  RunTest("chromeos/network/network_select_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, NetworkSiminfo) {
+  RunTest("chromeos/network/network_siminfo_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkTest, SimLockDialogs) {
+  RunTest("chromeos/network/sim_lock_dialogs_test.js", "mocha.run()");
+}
 
 // NetworkHealth
-REGISTER_TEST(NetworkHealthNetworkDiagnosticsTestV3,
-              ash::kChromeUIConnectivityDiagnosticsHost,
-              "chromeos/network_health/network_diagnostics_test.js")
-REGISTER_TEST(NetworkHealthRoutineGroupTestV3,
-              ash::kChromeUIConnectivityDiagnosticsHost,
-              "chromeos/network_health/routine_group_test.js")
+class CrComponentsCrosNetworkHealthTest : public WebUIMochaBrowserTest {
+ protected:
+  CrComponentsCrosNetworkHealthTest() {
+    set_test_loader_host(ash::kChromeUIConnectivityDiagnosticsHost);
+  }
+};
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkHealthTest, NetworkDiagnostics) {
+  RunTest("chromeos/network_health/network_diagnostics_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosNetworkHealthTest, RoutineGroup) {
+  RunTest("chromeos/network_health/routine_group_test.js", "mocha.run()");
+}
 
 // TrafficCounters
-REGISTER_TEST(TrafficCountersTrafficCountersTestV3,
-              ash::kChromeUINetworkHost,
-              "chromeos/traffic_counters/traffic_counters_test.js")
+class CrComponentsCrosTrafficCountersTest : public WebUIMochaBrowserTest {
+ protected:
+  CrComponentsCrosTrafficCountersTest() {
+    set_test_loader_host(ash::kChromeUINetworkHost);
+  }
+};
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosTrafficCountersTest, TrafficCounters) {
+  RunTest("chromeos/traffic_counters/traffic_counters_test.js", "mocha.run()");
+}
 
 // MultiDeviceSetup
-REGISTER_TEST(MultiDeviceSetupIntegrationTestV3,
-              ash::kChromeUIMultiDeviceSetupHost,
-              "chromeos/multidevice_setup/integration_test.js")
-REGISTER_TEST(MultiDeviceSetupSetupSucceededPageTestV3,
-              ash::kChromeUIMultiDeviceSetupHost,
-              "chromeos/multidevice_setup/setup_succeeded_page_test.js")
-REGISTER_TEST(MultiDeviceSetupStartSetupPageTestV3,
-              ash::kChromeUIMultiDeviceSetupHost,
-              "chromeos/multidevice_setup/start_setup_page_test.js")
+class CrComponentsCrosMultiDeviceSetupTest : public WebUIMochaBrowserTest {
+ protected:
+  CrComponentsCrosMultiDeviceSetupTest() {
+    set_test_loader_host(ash::kChromeUIMultiDeviceSetupHost);
+  }
+};
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosMultiDeviceSetupTest, Integration) {
+  RunTest("chromeos/multidevice_setup/integration_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosMultiDeviceSetupTest,
+                       SetupSucceededPage) {
+  RunTest("chromeos/multidevice_setup/setup_succeeded_page_test.js",
+          "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosMultiDeviceSetupTest, StartSetupPage) {
+  RunTest("chromeos/multidevice_setup/start_setup_page_test.js", "mocha.run()");
+}
 
 // CellularSetup
-REGISTER_TEST(CellularSetupActivationCodePageTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/cellular_setup/activation_code_page_test.js")
-REGISTER_TEST(CellularSetupBasePageTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/cellular_setup/base_page_test.js")
-REGISTER_TEST(CellularSetupButtonBarTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/cellular_setup/button_bar_test.js")
-REGISTER_TEST(CellularSetupCellularSetupTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/cellular_setup/cellular_setup_test.js")
-REGISTER_TEST(CellularSetupConfirmationCodePageTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/cellular_setup/confirmation_code_page_test.js")
-REGISTER_TEST(CellularSetupProfileDiscoveryListPageTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/cellular_setup/profile_discovery_list_page_test.js")
-REGISTER_TEST(CellularSetupEsimFlowUiTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/cellular_setup/esim_flow_ui_test.js")
-REGISTER_TEST(CellularSetupFinalPageTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/cellular_setup/final_page_test.js")
-REGISTER_TEST(CellularSetupProvisioningPageTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/cellular_setup/provisioning_page_test.js")
-REGISTER_TEST(CellularSetupPsimFlowUiTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/cellular_setup/psim_flow_ui_test.js")
-REGISTER_TEST(CellularSetupSetupLoadingPageTestV3,
-              ash::kChromeUIOSSettingsHost,
-              "chromeos/cellular_setup/setup_loading_page_test.js")
+class CrComponentsCrosCellularSetupTest : public WebUIMochaBrowserTest {
+ protected:
+  CrComponentsCrosCellularSetupTest() {
+    set_test_loader_host(ash::kChromeUIOSSettingsHost);
+  }
+};
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosCellularSetupTest, ActivationCodePage) {
+  RunTest("chromeos/cellular_setup/activation_code_page_test.js",
+          "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosCellularSetupTest, BasePage) {
+  RunTest("chromeos/cellular_setup/base_page_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosCellularSetupTest, ButtonBar) {
+  RunTest("chromeos/cellular_setup/button_bar_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosCellularSetupTest, CellularSetup) {
+  RunTest("chromeos/cellular_setup/cellular_setup_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosCellularSetupTest,
+                       ConfirmationCodePage) {
+  RunTest("chromeos/cellular_setup/confirmation_code_page_test.js",
+          "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosCellularSetupTest,
+                       ProfileDiscoveryListPage) {
+  RunTest("chromeos/cellular_setup/profile_discovery_list_page_test.js",
+          "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosCellularSetupTest, EsimFlowUi) {
+  RunTest("chromeos/cellular_setup/esim_flow_ui_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosCellularSetupTest, FinalPage) {
+  RunTest("chromeos/cellular_setup/final_page_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosCellularSetupTest, ProvisioningPage) {
+  RunTest("chromeos/cellular_setup/provisioning_page_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosCellularSetupTest, PsimFlowUi) {
+  RunTest("chromeos/cellular_setup/psim_flow_ui_test.js", "mocha.run()");
+}
+
+IN_PROC_BROWSER_TEST_F(CrComponentsCrosCellularSetupTest, SetupLoadingPage) {
+  RunTest("chromeos/cellular_setup/setup_loading_page_test.js", "mocha.run()");
+}
