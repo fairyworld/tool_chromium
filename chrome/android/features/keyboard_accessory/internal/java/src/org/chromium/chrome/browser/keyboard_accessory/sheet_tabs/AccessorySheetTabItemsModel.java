@@ -79,14 +79,11 @@ class AccessorySheetTabItemsModel
             /** A section containing a passkey. */
             int PASSKEY_SECTION = 11;
 
-            // /** Obsolete: A section containing a plus address info. */
-            // int PLUS_ADDRESS_SECTION = 12;
-
             /** A section containing a Google Wallet loyalty card info. */
-            int LOYALTY_CARD_INFO = 13;
+            int LOYALTY_CARD_INFO = 12;
 
             /** An optional divider used to separate sections. */
-            int DIVIDER = 14;
+            int DIVIDER = 13;
         }
 
         private final Object mDataPiece;
