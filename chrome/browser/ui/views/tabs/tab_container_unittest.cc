@@ -186,7 +186,10 @@ class TabContainerTest : public ChromeViewsTestBase {
  public:
   TabContainerTest()
       : animation_mode_reset_(gfx::AnimationTestApi::SetRichAnimationRenderMode(
-            gfx::Animation::RichAnimationRenderMode::FORCE_ENABLED)) {}
+            gfx::Animation::RichAnimationRenderMode::FORCE_ENABLED)) {
+    scoped_feature_list_.InitAndEnableFeature(
+        features::kTabStripNewTabButtonFlickerFix);
+  }
   TabContainerTest(const TabContainerTest&) = delete;
   TabContainerTest& operator=(const TabContainerTest&) = delete;
   ~TabContainerTest() override = default;
@@ -432,6 +435,7 @@ class TabContainerTest : public ChromeViewsTestBase {
 
   // Used to force animation on, so that any tests that rely on animation pass
   // on machines where animation is turned off.
+  base::test::ScopedFeatureList scoped_feature_list_;
   gfx::AnimationTestApi::RenderModeResetter animation_mode_reset_;
 
   int tab_container_width_ = 0;
@@ -1173,9 +1177,9 @@ TEST_F(TabContainerTest, PreferredWidthDuringAnimation) {
   // During animations, container preferred size should animate smoothly.
   EXPECT_EQ(initial_pref_width, tab_container_->GetPreferredSize().width());
 
-  // Minimum size should match preferred width during animations.
-  EXPECT_EQ(tab_container_->GetPreferredSize().width(),
-            tab_container_->GetMinimumSize().width());
+  // Minimum size should remain at the new steady-state minimum width (for 1
+  // tab) during animations.
+  const int animating_min_width = tab_container_->GetMinimumSize().width();
 
   // Complete the animation and the preferred width should match ideal bounds of
   // the trailingmost tab.
@@ -1184,6 +1188,9 @@ TEST_F(TabContainerTest, PreferredWidthDuringAnimation) {
   EXPECT_EQ(tab_container_->GetPreferredSize().width(),
             tab_container_->GetIdealBounds(tab_container_->GetTabCount() - 1)
                 .right());
+
+  // The minimum width should remain unchanged after completing the animation.
+  EXPECT_EQ(animating_min_width, tab_container_->GetMinimumSize().width());
 }
 
 TEST_F(TabContainerTest, PreferredWidthNotAffectedByTransferTabTo) {
@@ -1199,15 +1206,18 @@ TEST_F(TabContainerTest, PreferredWidthNotAffectedByTransferTabTo) {
   // Preferred width should be unchanged, even though `owned_tab` is no longer
   // part of `tab_container_`.
   EXPECT_EQ(initial_pref_width, tab_container_->GetPreferredSize().width());
-  // Minimum size should match preferred width during animations.
-  EXPECT_EQ(tab_container_->GetPreferredSize().width(),
-            tab_container_->GetMinimumSize().width());
+  // Minimum size should remain at the steady-state minimum width and not match
+  // the preferred width during animations.
+  const int animating_min_width = tab_container_->GetMinimumSize().width();
+  EXPECT_NE(tab_container_->GetPreferredSize().width(), animating_min_width);
 
   // Complete the animation and stop pretending.
   tab_container_->CompleteAnimationAndLayout();
   tab_container_controller_->set_is_animating_outside_container(false);
   // Preferred width should now be changed.
   EXPECT_NE(initial_pref_width, tab_container_->GetPreferredSize().width());
+  // Minimum size should remain unchanged after completing the animation.
+  EXPECT_EQ(animating_min_width, tab_container_->GetMinimumSize().width());
 }
 
 TEST_F(TabContainerTest, PreferredWidthAddTabToViewModel) {
@@ -1223,9 +1233,10 @@ TEST_F(TabContainerTest, PreferredWidthAddTabToViewModel) {
   tab_container_controller_->set_is_animating_outside_container(true);
   // Preferred width should be unchanged.
   EXPECT_EQ(initial_pref_width, tab_container_->GetPreferredSize().width());
-  // Minimum size should match preferred width during animations.
-  EXPECT_EQ(tab_container_->GetPreferredSize().width(),
-            tab_container_->GetMinimumSize().width());
+  // Minimum size should remain at the steady-state minimum width and not match
+  // the preferred width during animations.
+  const int animating_min_width = tab_container_->GetMinimumSize().width();
+  EXPECT_NE(tab_container_->GetPreferredSize().width(), animating_min_width);
 
   // Complete animation and stop pretending.
   tab_container_->CompleteAnimationAndLayout();
@@ -1233,6 +1244,8 @@ TEST_F(TabContainerTest, PreferredWidthAddTabToViewModel) {
   // Preferred width should be changed, even though we still haven't handed the
   // actual view over.
   EXPECT_NE(initial_pref_width, tab_container_->GetPreferredSize().width());
+  // Minimum size should remain unchanged after completing the animation.
+  EXPECT_EQ(animating_min_width, tab_container_->GetMinimumSize().width());
 }
 
 TEST_F(TabContainerTest, TabDestroyedWhileOutOfContainerDoesNotActuallyReturn) {

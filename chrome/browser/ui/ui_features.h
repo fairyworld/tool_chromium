@@ -222,6 +222,7 @@ inline constexpr char kTabHoverCardAdditionalMaxWidthDelay[] =
     "additional_max_width_delay";
 
 BASE_DECLARE_FEATURE(kTabStripSkipSelectionEventOnActivation);
+BASE_DECLARE_FEATURE(kTabStripNewTabButtonFlickerFix);
 
 // If enabled, use desktop widget to show tab modal dialogs.
 BASE_DECLARE_FEATURE(kTabModalUsesDesktopWidget);
