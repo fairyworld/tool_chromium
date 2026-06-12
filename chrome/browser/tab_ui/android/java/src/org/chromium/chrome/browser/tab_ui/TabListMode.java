@@ -12,7 +12,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /** Modes of showing the list of tabs. */
-@IntDef({TabListMode.GRID, TabListMode.BOTTOM_STRIP, TabListMode.NUM_ENTRIES})
+@IntDef({TabListMode.GRID, TabListMode.BOTTOM_STRIP, TabListMode.VERTICAL, TabListMode.NUM_ENTRIES})
 @Retention(RetentionPolicy.SOURCE)
 @NullMarked
 public @interface TabListMode {
@@ -20,5 +20,6 @@ public @interface TabListMode {
     int BOTTOM_STRIP = 1;
     // int CAROUSEL_DEPRECATED = 2;
     // int LIST_DEPRECATED = 3;
-    int NUM_ENTRIES = 4;
+    int VERTICAL = 4;
+    int NUM_ENTRIES = 5;
 }

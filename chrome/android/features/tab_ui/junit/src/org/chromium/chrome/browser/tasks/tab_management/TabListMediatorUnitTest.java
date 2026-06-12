@@ -1296,7 +1296,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void tabAddition_Restore_NestedLayout() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
 
         createTabGroup(List.of(mTab1, mTab2), TAB_GROUP_ID);
         mockRepresentativeTabs(mTab1, mTab2);
@@ -1684,7 +1684,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void tabAddition_NestedLayout_PinnedTab_ToBoundary() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
         mMediator.initWithNative(mProfile);
         mMediator.resetWithListOfTabs(null, null, false);
 
@@ -1722,7 +1722,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void tabAddition_NestedLayout_RegularTab_AfterPinnedSection() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
         mMediator.initWithNative(mProfile);
         mMediator.resetWithListOfTabs(null, null, false);
 
@@ -1809,7 +1809,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void testTabGroupIdAndHeaderIdMutualExclusivity() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
 
         Tab childTab = prepareTab(TAB1_ID, TAB1_TITLE, TAB1_URL);
         when(mTabModel.isTabInTabGroup(childTab)).thenReturn(true);
@@ -2276,7 +2276,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void didMergeTabToGroup_NestedLayout() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
         mockTabIndexes(mTab1, mTab2);
 
         assertEquals(2, mModelList.size());
@@ -2502,7 +2502,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void testDidMoveTabGroup_NestedLayout_Forward() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
 
         // Assume that moveTab in TabModel is finished.
         mockTabIndexes(mTab2, mTab1);
@@ -2520,7 +2520,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void testDidMoveTabGroup_NestedLayout_Backward() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
 
         // Assume that moveTab in TabModel is finished.
         mockTabIndexes(mTab2, mTab1);
@@ -2538,7 +2538,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void testDidMoveTabGroup_NestedLayout_Group_Forward() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
 
         Tab tab3 = prepareTab(TAB3_ID, TAB3_TITLE, TAB3_URL);
         List<Tab> tabs = List.of(mTab2, tab3);
@@ -2577,7 +2577,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void testDidMoveTabGroup_NestedLayout_Group_Backward() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
 
         Tab tab3 = prepareTab(TAB3_ID, TAB3_TITLE, TAB3_URL);
         List<Tab> tabs = List.of(mTab1, tab3);
@@ -3118,7 +3118,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void didMoveTabOutOfGroup_FlatLayout_Strip() {
-        setUpTabListMediator(TabListMediatorType.TAB_STRIP, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.TAB_STRIP, TabListMode.BOTTOM_STRIP);
 
         // Assume that filter is already updated.
 
@@ -3138,7 +3138,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void didMoveTabOutOfGroup_FlatLayout_Strip_Undo() {
-        setUpTabListMediator(TabListMediatorType.TAB_STRIP, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.TAB_STRIP, TabListMode.BOTTOM_STRIP);
 
         // Setup the same as didMoveTabOutOfGroup_FlatLayout_Strip.
 
@@ -3232,7 +3232,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void didMoveTabOutOfGroup_NestedLayout_LastTab() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
         initAndAssertAllProperties();
 
         // Create a single tab group that became a single tab.
@@ -4350,7 +4350,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void testDidCreateNewGroup_InNestedLayout() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
 
         assertEquals(2, mModelList.size());
         assertEquals(mTab1.getId(), mModelList.get(0).model.get(TabProperties.TAB_ID));
@@ -4377,7 +4377,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void testDidCreateNewGroup_RestoresScrambledTabs_InNestedLayout() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
 
         assertEquals(2, mModelList.size());
         assertEquals(mTab1.getId(), mModelList.get(0).model.get(TabProperties.TAB_ID));
@@ -5084,7 +5084,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void tabClosure_updatesTabGroup_inNestedLayout() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
         initAndAssertAllProperties();
 
         // Mock that tab1 and tab3 are in the same group and group root id is TAB1_ID.
@@ -5136,7 +5136,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void tabClosure_RepresentativeTab_inNestedLayout() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
         initAndAssertAllProperties();
 
         Tab tab3 = prepareTab(TAB3_ID, TAB3_TITLE, TAB3_URL);
@@ -6825,7 +6825,7 @@ public class TabListMediatorUnitTest {
     }
 
     private Tab setUpNestedLayoutWithTwoTabGroup(boolean isCollapsed) {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
         mMediator.initWithNative(mProfile);
         mMediator.resetWithListOfTabs(null, null, false);
 
@@ -7084,7 +7084,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void testVerticalTabs_onTabPinnedStateChanged_ToPinnedSection() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
         mMediator.initWithNative(mProfile);
         mMediator.resetWithListOfTabs(null, null, false);
 
@@ -7115,7 +7115,7 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void testVerticalTabs_onTabPinnedStateChanged_ToRegularSection() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.GRID);
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
         mMediator.initWithNative(mProfile);
         mMediator.resetWithListOfTabs(null, null, false);
 

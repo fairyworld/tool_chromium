@@ -300,7 +300,7 @@ public class VerticalTabListCoordinator {
                 new TabListMediator(
                         activity,
                         mModelList,
-                        TabListMode.GRID,
+                        TabListMode.VERTICAL,
                         /* modalDialogManager */ null,
                         tabModelSelector.getCurrentTabModelSupplier(),
                         /* thumbnailProvider */ null,
