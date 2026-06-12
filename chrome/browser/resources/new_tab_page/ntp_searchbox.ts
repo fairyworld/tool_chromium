@@ -28,6 +28,7 @@ import {assert} from '//resources/js/assert.js';
 import {loadTimeData} from '//resources/js/load_time_data.js';
 import {CrLitElement} from '//resources/lit/v3_0/lit.rollup.js';
 import type {PropertyValues} from '//resources/lit/v3_0/lit.rollup.js';
+import {DriveDisclaimerStatus} from '//resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import type {DriveUploadError, PageCallbackRouter, PageHandlerInterface, TabInfo} from '//resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import type {InputState} from '//resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
 import {InputType, ModelMode, ToolMode} from '//resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
@@ -243,7 +244,7 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
   protected dragAndDropHandler: DragAndDropHandler|null = null;
   protected callbackRouter_: PageCallbackRouter;
 
-  private placeholderCycler_: PlaceholderTextCycler | null = null;
+  private placeholderCycler_: PlaceholderTextCycler|null = null;
   private dragAndDropEnabled_: boolean =
       loadTimeData.getBoolean('composeboxContextDragAndDropEnabled');
   private onTabStripChangedListenerId_: number|null = null;
@@ -557,6 +558,14 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
   }
 
   protected async onOpenDriveUpload_() {
+    // Check if the user has accepted the Drive disclaimer. This handles
+    // the edge case where a user sees the drive option in the menu, but
+    // then revokes Drive permissions.
+    const {status} = await this.pageHandler().getDriveDisclaimerStatus();
+    if (status !== DriveDisclaimerStatus.kAccepted) {
+      return;
+    }
+
     const {response} = await this.pageHandler().onDriveUploadClicked();
 
     const driveUploads: DriveUpload[] =
@@ -675,8 +684,7 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
     this.setInputText('');
   }
 
-  protected onSearchboxInputFilesPasted_(
-      e: CustomEvent<{files: FileList}>) {
+  protected onSearchboxInputFilesPasted_(e: CustomEvent<{files: FileList}>) {
     this.processFiles_(e.detail.files, ComposeboxContextAddedMethod.COPY_PASTE);
   }
 
