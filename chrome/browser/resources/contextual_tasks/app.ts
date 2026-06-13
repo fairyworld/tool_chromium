@@ -354,6 +354,9 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
   private isFrameLoading: boolean = false;
   private isSubmittingFromComposebox_: boolean = false;
   private listenerIds_: number[] = [];
+  // <if expr="not is_android">
+  private iphMenuCheckIntervalId_: number|undefined = undefined;
+  // </if>
   private eventTracker_: EventTracker = new EventTracker();
   private commonSearchParams_: {[key: string]: string}|null = null;
   private postMessageHandler_: PostMessageHandler|null = null;
@@ -841,13 +844,30 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
 
   protected onComposeboxContextMenuOpened_() {
     // <if expr="not is_android">
-    setTimeout(() => {
+    if (this.iphMenuCheckIntervalId_ !== undefined) {
+      clearInterval(this.iphMenuCheckIntervalId_);
+      this.iphMenuCheckIntervalId_ = undefined;
+    }
+    let attempts = 0;
+    this.iphMenuCheckIntervalId_ = setInterval(() => {
+      attempts++;
+      if (attempts > 20) {
+        if (this.iphMenuCheckIntervalId_ !== undefined) {
+          clearInterval(this.iphMenuCheckIntervalId_);
+          this.iphMenuCheckIntervalId_ = undefined;
+        }
+        return;
+      }
       const menu = this.getContextualActionMenu();
       // Since a separate IPH "Try It" promo may turn the STS feature on, make
       // sure it is not already on before promoting with the help bubble.
       if (menu && !menu.smartTabSharingActive) {
         const menuItem = menu.shadowRoot?.querySelector('#shareTabsTrigger');
-        if (menuItem) {
+        if (menuItem && menuItem.getBoundingClientRect().width > 0) {
+          if (this.iphMenuCheckIntervalId_ !== undefined) {
+            clearInterval(this.iphMenuCheckIntervalId_);
+            this.iphMenuCheckIntervalId_ = undefined;
+          }
           const rect = menuItem.getBoundingClientRect();
           const floatingAnchor = this.shadowRoot.querySelector<HTMLElement>(
               '#iphMenuSmartTabSharingAnchor');
@@ -872,7 +892,7 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
           }
         }
       }
-    }, 200);
+    }, 100);
     // </if>
   }
 
