@@ -1047,4 +1047,63 @@ suite('NewTabPageRealboxNextTest', () => {
             realbox.shadowRoot.querySelector('cr-searchbox-compose-button');
         assertTrue(!!composeButton);
       });
+
+   test('has-user-input attribute is set when typing', async () => {
+      loadTimeData.overrideValues({ntpRealboxDynamicAiModeButton: true});
+      realbox = createAndAppendRealbox({
+        composeButtonEnabled: true,
+        composeboxEnabled: true,
+        ntpRealboxNextEnabled: true,
+      });
+      await microtasksFinished();
+      const composeButton =
+          realbox.shadowRoot.querySelector('cr-searchbox-compose-button');
+      assertTrue(!!composeButton);
+
+      assertFalse(composeButton.hasAttribute('has-user-input'));
+
+      // Simulate typing
+      realbox.$.input.dispatchEvent(new CustomEvent('searchbox-input-text-updated', {
+        detail: {value: 'hello', isComposing: false},
+      }));
+      await microtasksFinished();
+      assertTrue(composeButton.hasAttribute('has-user-input'));
+
+      // Simulate clearing input
+      realbox.$.input.dispatchEvent(new CustomEvent('searchbox-input-text-updated', {
+        detail: {value: '', isComposing: false},
+      }));
+      await microtasksFinished();
+      assertFalse(composeButton.hasAttribute('has-user-input'));
+    });
+
+  suite('DynamicAiModeButton', () => {
+    test('dynamic attribute is set correctly', async () => {
+      loadTimeData.overrideValues({ntpRealboxDynamicAiModeButton: true});
+      realbox = createAndAppendRealbox({
+        composeButtonEnabled: true,
+        composeboxEnabled: true,
+        ntpRealboxNextEnabled: true,
+      });
+      await microtasksFinished();
+      const composeButton =
+          realbox.shadowRoot.querySelector('cr-searchbox-compose-button');
+      assertTrue(!!composeButton);
+      assertTrue(composeButton.hasAttribute('dynamic'));
+    });
+
+    test('dynamic attribute is not set when disabled', async () => {
+      loadTimeData.overrideValues({ntpRealboxDynamicAiModeButton: false});
+      realbox = createAndAppendRealbox({
+        composeButtonEnabled: true,
+        composeboxEnabled: true,
+        ntpRealboxNextEnabled: true,
+      });
+      await microtasksFinished();
+      const composeButton =
+          realbox.shadowRoot.querySelector('cr-searchbox-compose-button');
+      assertTrue(!!composeButton);
+      assertFalse(composeButton.hasAttribute('dynamic'));
+    });
+  });
 });

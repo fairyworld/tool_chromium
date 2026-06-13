@@ -669,7 +669,9 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(
 
   source->AddBoolean(
       "ntpRealboxDynamicAiModeButton",
-      base::FeatureList::IsEnabled(ntp_realbox::kNtpRealboxDynamicAiModeButton));
+      ntp_realbox::IsNtpRealboxNextEnabled(profile) &&
+          base::FeatureList::IsEnabled(
+              ntp_realbox::kNtpRealboxDynamicAiModeButton));
 
   if (ntp_realbox::IsNtpRealboxNextEnabled(profile)) {
     if (base::FeatureList::IsEnabled(

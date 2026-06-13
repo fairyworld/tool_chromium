@@ -198,6 +198,8 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
         reflect: true,
       },
       energyEffectAnimationEnabled: {type: Boolean},
+      hasUserInput_: {type: Boolean},
+      ntpRealboxDynamicAiModeButtonEnabled_: {type: Boolean},
     };
   }
 
@@ -238,9 +240,10 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
       loadTimeData.getBoolean('searchboxVoiceSearch');
   protected accessor searchboxLensSearchEnabled_: boolean =
       loadTimeData.getBoolean('searchboxLensSearch');
-  protected readonly ntpRealboxDynamicAiModeButtonEnabled_: boolean =
+  protected accessor ntpRealboxDynamicAiModeButtonEnabled_: boolean =
       loadTimeData.getBoolean('ntpRealboxDynamicAiModeButton');
   protected accessor useWebkitSearchIcons_: boolean = false;
+  protected accessor hasUserInput_: boolean = false;
   protected dragAndDropHandler: DragAndDropHandler|null = null;
   protected callbackRouter_: PageCallbackRouter;
 
@@ -712,6 +715,7 @@ export class NtpSearchboxElement extends NtpSearchboxElementBase implements
 
   protected onSearchboxInputTextUpdated_(
       e: CustomEvent<{value: string, isComposing: boolean}>) {
+    this.hasUserInput_ = !!e.detail.value.trim();
     this.onSearchboxInputTextUpdated(e, /*is_composing=*/ false);
   }
 
