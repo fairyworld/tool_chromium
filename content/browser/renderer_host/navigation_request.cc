@@ -4105,8 +4105,7 @@ void NavigationRequest::CheckForIsolationOptIn(const GURL& url) {
   url::Origin origin = url::Origin::Create(url);
   auto* browser_context =
       frame_tree_node_->navigator().controller().GetBrowserContext();
-  if (policy->UpdateOriginIsolationOptInListIfNecessary(browser_context,
-                                                        origin)) {
+  if (policy->RecordOriginAgentClusterRequestIfNew(browser_context, origin)) {
     // This is a new request for isolating |origin|, either by explicitly opting
     // it in or out. Do a global walk of session history to find any existing
     // instances of |origin|, so that those existing BrowsingInstances can give
@@ -5317,27 +5316,27 @@ void NavigationRequest::SelectFrameHostForOnResponseStarted(
     AddOriginAgentClusterStateIfNecessary(isolation_context);
 
     // TODO(wjmaclean): Once this is all working, consider combining the
-    // following code into the function above.
-    // If this navigation request didn't opt-in to origin isolation, we need
-    // to check here in case the origin has previously requested isolation and
-    // should be marked as opted-out in this SiteInstance. At this point we know
-    // that |render_frame_host_|'s SiteInstance has been finalized, so it's safe
-    // to use it here to get the correct |IsolationContext|.
+    // following code into the function above. If this navigation request didn't
+    // opt-in to origin isolation, we need to check here in case the origin has
+    // previously requested isolation and should be marked as opted-out in this
+    // SiteInstance. At this point we know that |render_frame_host_|'s
+    // SiteInstance has been finalized, so it's safe to use it here to get the
+    // correct |IsolationContext|.
     //
     // When loading a data URL with a base URL, use the base URL to calculate
-    // the origin; otherwise, `AddDefaultIsolatedOriginIfNeeded()` will simply
-    // do nothing as a data: URL has an opaque origin.
+    // the origin; otherwise, `RecordDefaultOriginAgentClusterOriginIfNew()`
+    // will simply do nothing as a data: URL has an opaque origin.
     //
     // TODO(wjmaclean): this won't handle cases like about:blank (where it
-    // inherits an origin we care about).  We plan to compute the origin
-    // before commit time (https://crbug.com/888079), which may make it
-    // possible to compute the right origin here.
+    // inherits an origin we care about).  We plan to compute the origin before
+    // commit time (https://crbug.com/888079), which may make it possible to
+    // compute the right origin here.
     const url::Origin origin =
         IsLoadDataWithBaseURL()
             ? url::Origin::Create(common_params_->base_url_for_data_url)
             : url::Origin::Create(common_params_->url);
     auto* policy = ChildProcessSecurityPolicyImpl::GetInstance();
-    policy->AddDefaultIsolatedOriginIfNeeded(
+    policy->RecordDefaultOriginAgentClusterOriginIfNew(
         isolation_context, origin, false /* is_global_walk_or_frame_removal */);
 
     url::Origin process_lock_origin =

@@ -251,7 +251,7 @@ impl ChildProcessSecurityPolicyImpl {
     ///
     /// NOTE: Unlike the C++ implementation, which uses multiple fine-grained
     /// locks (e.g., `lock_`, `isolated_origins_lock_`,
-    /// `origins_isolation_opt_in_lock_`) to reduce thread contention, the
+    /// `origin_agent_cluster_lock_`) to reduce thread contention, the
     /// Rust implementation deliberately uses a single class-wide Mutex.
     /// This simplifies the concurrency model and reduces the risk of
     /// lock-ordering deadlocks.
