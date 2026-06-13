@@ -464,6 +464,7 @@ class HlsManifestDemuxerEngineTest : public testing::Test {
     base::SequenceBound<FakeHlsDataSourceProvider> dsp(
         task_environment_.GetMainThreadTaskRunner(), mock_dsp_.get());
 
+    GURL url = GURL("http://media.example.com/manifest.m3u8");
     engine_ = std::make_unique<HlsManifestDemuxerEngine>(
         std::move(dsp), base::SingleThreadTaskRunner::GetCurrentDefault(),
         std::make_unique<ForwardingTrackManager>(
@@ -473,8 +474,7 @@ class HlsManifestDemuxerEngineTest : public testing::Test {
                                 base::Unretained(this)),
             base::BindRepeating(&HlsManifestDemuxerEngineTest::SetTrackState,
                                 base::Unretained(this))),
-        false, GURL("http://media.example.com/manifest.m3u8"),
-        media_log_.get());
+        false, url::Origin::Create(url), url, media_log_.get());
   }
 
   void InitializeEngine() {

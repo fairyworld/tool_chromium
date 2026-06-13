@@ -63,7 +63,8 @@ class HlsNetworkAccessImplUnittest : public testing::Test {
       init = base::MakeRefCounted<hls::MediaSegment::InitializationSegment>(
           GURL("https://foo.com"), ByteRangeFromTuple(init_br));
     }
-    auto manifest_uri = GURL("https://example.com");
+    auto manifest_uri = GURL("https://example.com/manifest.m3u8");
+    auto resource_uri = GURL("https://example.com/content.mp4");
     if (key_location.has_value()) {
       auto key_uri = GURL(*key_location);
       enc_data = base::MakeRefCounted<hls::MediaSegment::EncryptionData>(
@@ -74,9 +75,9 @@ class HlsNetworkAccessImplUnittest : public testing::Test {
               : hls::MediaSegment::EncryptionData::KeyLocation::kUnsafeOrigin);
     }
     return base::MakeRefCounted<hls::MediaSegment>(
-        base::Seconds(1), 0, 0, manifest_uri, std::move(init),
-        std::move(enc_data), ByteRangeFromTuple(byte_range), std::nullopt,
-        false, false, init_mode == InitMode::kPresent, false);
+        base::Seconds(1), 0, 0, resource_uri, url::Origin::Create(manifest_uri),
+        std::move(init), std::move(enc_data), ByteRangeFromTuple(byte_range),
+        std::nullopt, false, false, init_mode == InitMode::kPresent, false);
   }
 
  protected:
@@ -435,7 +436,7 @@ TEST_F(HlsNetworkAccessImplUnittest, TestReadKeyDisallowsGzip) {
                                     DataSource::CacheMode::kHitCache,
                                     DataSource::EncodingMode::kIdentity))
       .Times(1);
-  EXPECT_CALL(*factory_, MockCreate(GURL("https://example.com/"),
+  EXPECT_CALL(*factory_, MockCreate(GURL("https://example.com/content.mp4"),
                                     DataSource::CacheMode::kHitCache,
                                     DataSource::EncodingMode::kIdentity))
       .Times(1);
