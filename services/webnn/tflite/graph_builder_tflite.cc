@@ -911,10 +911,10 @@ ContextProperties GraphBuilderTflite::GetContextProperties() {
        {DataTypeConstraint::kUint8, SupportedRanks::UpTo(5)},
        // IsNaN is emulated by not_equal.
        /*is_nan_input=*/
-       {DataTypeConstraint::kFloat16To32, SupportedRanks::UpTo(4)},
+       {DataTypeConstraint::kFloat16To32, SupportedRanks::UpTo(5)},
        // IsInfinite is emulated by abs and equal.
        /*is_infinite_input=*/
-       {DataTypeConstraint::kFloat16To32, SupportedRanks::UpTo(4)},
+       {DataTypeConstraint::kFloat16To32, SupportedRanks::UpTo(5)},
        /*logical_output=*/DataTypeConstraint::kUint8,
        /*abs_input=*/{kFloat16To32AndInt32, SupportedRanks::UpTo(8)},
        /*ceil_input=*/
@@ -7525,9 +7525,15 @@ auto GraphBuilderTflite::SerializeIsInfinite(
     default:
       NOTREACHED() << "Unsupported data type for isInfinite operation.";
   }
-  return SerializeBinaryOperation(::tflite::BuiltinOperator_EQUAL,
-                                  abs_output_tensor_index, inf_tensor_index,
-                                  output_tensor_info.index);
+
+  // Use the rank-reduction helper because TFLite's EQUAL kernel is
+  // limited to 4D when broadcasting is required.
+  return SerializeBinaryOperationWithRankReduction(
+      ::tflite::BuiltinOperator_EQUAL, abs_output_tensor_index,
+      input_tensor_info.dimensions, input_tensor_info.data_type,
+      inf_tensor_index, /*rhs_dims=*/{}, input_tensor_info.data_type,
+      output_tensor_info.index, output_tensor_info.dimensions,
+      output_tensor_info.data_type, kTfliteBroadcastRankLimit);
 }
 
 auto GraphBuilderTflite::SerializeLogicalNot(
