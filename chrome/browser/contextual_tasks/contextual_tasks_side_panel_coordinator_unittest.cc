@@ -327,6 +327,77 @@ TEST_F(ContextualTasksSidePanelCoordinatorTest, CloseSidePanelWhenNotEligible) {
   EXPECT_EQ(0u, coordinator_->GetNumberOfActiveTasks());
 }
 
+TEST_F(ContextualTasksSidePanelCoordinatorTest,
+       CloseSidePanelDiscardsCacheIfNoEntryPoint) {
+  base::test::ScopedFeatureList local_feature_list;
+  local_feature_list.InitAndEnableFeatureWithParameters(
+      kContextualTasks, {{"ContextualTasksEntryPoint", "no-entry-point"}});
+
+  ClearCacheForTesting();
+
+  base::Uuid active_task_id = base::Uuid::GenerateRandomV4();
+  CreateCachedWebContentsForTesting(active_task_id, true);
+
+  base::Uuid inactive_task_id = base::Uuid::GenerateRandomV4();
+  CreateCachedWebContentsForTesting(inactive_task_id, true);
+
+  tabs::TabInterface* active_tab = tab_list_->GetActiveTab();
+  SessionID active_tab_id =
+      sessions::SessionTabHelper::IdForTab(active_tab->GetContents());
+  EXPECT_CALL(*mock_controller_, GetContextualTaskForTab(active_tab_id))
+      .WillRepeatedly(Return(ContextualTask(active_task_id)));
+  EXPECT_CALL(*mock_controller_, GetTabsAssociatedWithTask(active_task_id))
+      .WillRepeatedly(Return(std::vector<SessionID>{active_tab_id}));
+
+  UpdateWebContentsForActiveTab();
+  ASSERT_EQ(coordinator_->GetActiveWebContents(),
+            GetWebContentsForTaskForTesting(active_task_id));
+
+  EXPECT_EQ(2u, coordinator_->GetNumberOfActiveTasks());
+
+  EXPECT_CALL(*mock_panel_host_,
+              Close(ContextualTasksPanelHost::AnimationStyle::kStandard));
+  coordinator_->Close();
+
+  EXPECT_EQ(1u, coordinator_->GetNumberOfActiveTasks());
+  EXPECT_EQ(0u, GetNumberOfActiveTasksForTesting(active_task_id));
+  EXPECT_EQ(1u, GetNumberOfActiveTasksForTesting(inactive_task_id));
+}
+
+TEST_F(ContextualTasksSidePanelCoordinatorTest,
+       CloseSidePanelKeepsCacheIfEntryPointSet) {
+  base::test::ScopedFeatureList local_feature_list;
+  local_feature_list.InitAndEnableFeatureWithParameters(
+      kContextualTasks,
+      {{"ContextualTasksEntryPoint", "toolbar-ephemeral-branded"}});
+
+  ClearCacheForTesting();
+
+  base::Uuid active_task_id = base::Uuid::GenerateRandomV4();
+  CreateCachedWebContentsForTesting(active_task_id, true);
+
+  tabs::TabInterface* active_tab = tab_list_->GetActiveTab();
+  SessionID active_tab_id =
+      sessions::SessionTabHelper::IdForTab(active_tab->GetContents());
+  EXPECT_CALL(*mock_controller_, GetContextualTaskForTab(active_tab_id))
+      .WillRepeatedly(Return(ContextualTask(active_task_id)));
+  EXPECT_CALL(*mock_controller_, GetTabsAssociatedWithTask(active_task_id))
+      .WillRepeatedly(Return(std::vector<SessionID>{active_tab_id}));
+
+  UpdateWebContentsForActiveTab();
+  ASSERT_EQ(coordinator_->GetActiveWebContents(),
+            GetWebContentsForTaskForTesting(active_task_id));
+
+  EXPECT_EQ(1u, coordinator_->GetNumberOfActiveTasks());
+
+  EXPECT_CALL(*mock_panel_host_,
+              Close(ContextualTasksPanelHost::AnimationStyle::kStandard));
+  coordinator_->Close();
+
+  EXPECT_EQ(1u, coordinator_->GetNumberOfActiveTasks());
+  EXPECT_EQ(1u, GetNumberOfActiveTasksForTesting(active_task_id));
+}
+
 #if !BUILDFLAG(IS_ANDROID)
 TEST_F(ContextualTasksSidePanelCoordinatorTest,
        ShowSidePanelLaunchesSurveyArm1) {

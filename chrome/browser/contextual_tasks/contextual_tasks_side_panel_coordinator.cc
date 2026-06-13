@@ -327,6 +327,19 @@ void ContextualTasksSidePanelCoordinator::Close() {
   NotifyActiveTaskContextProvider();
 
   RecordSessionEndMetrics();
+
+  if (kShowEntryPoint.Get() == EntryPointOption::kNoEntryPoint) {
+    if (content::WebContents* active_web_contents = GetActiveWebContents()) {
+      MaybeDetachWebContents(active_web_contents);
+      for (auto it = task_id_to_web_contents_cache_.begin();
+           it != task_id_to_web_contents_cache_.end(); ++it) {
+        if (it->second->web_contents.get() == active_web_contents) {
+          task_id_to_web_contents_cache_.erase(it);
+          break;
+        }
+      }
+    }
+  }
 }
 
 void ContextualTasksSidePanelCoordinator::OpenInZeroState() {
