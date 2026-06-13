@@ -1144,6 +1144,18 @@ base::CancelableTaskTracker::TaskId HistoryService::QueryURL(
       std::move(callback));
 }
 
+base::CancelableTaskTracker::TaskId HistoryService::QueryUrlIds(
+    const std::vector<GURL>& urls,
+    QueryUrlIdsCallback callback,
+    base::CancelableTaskTracker* tracker) {
+  DCHECK(backend_task_runner_) << "History service being called after cleanup";
+  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+  return tracker->PostTaskAndReplyWithResult(
+      backend_task_runner_.get(), FROM_HERE,
+      base::BindOnce(&HistoryBackend::QueryUrlIds, history_backend_, urls),
+      std::move(callback));
+}
+
 base::CancelableTaskTracker::TaskId HistoryService::QueryURLAndVisits(
     const GURL& url,
     const VisitQuery404sPolicy policy_for_404s,

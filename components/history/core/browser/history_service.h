@@ -313,6 +313,16 @@ class HistoryService : public KeyedService,
       QueryURLCallback callback,
       base::CancelableTaskTracker* tracker);
 
+  // Returns one URLID per input URL, in input order; unknown URLs map to 0.
+  using QueryUrlIdsCallback = base::OnceCallback<void(std::vector<URLID>)>;
+
+  // Bulk variant of `QueryURL` that resolves many URLs in a single backend
+  // round trip.
+  base::CancelableTaskTracker::TaskId QueryUrlIds(
+      const std::vector<GURL>& urls,
+      QueryUrlIdsCallback callback,
+      base::CancelableTaskTracker* tracker);
+
   // Queries the basic information about the URL in the history database, and
   // includes the visits (each time the URL is visited). If visits are not
   // needed, use `QueryURL()` instead, as it's faster.

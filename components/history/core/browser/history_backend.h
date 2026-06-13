@@ -300,6 +300,8 @@ class HistoryBackend : public base::RefCountedThreadSafe<HistoryBackend>,
   // Querying ------------------------------------------------------------------
 
   QueryURLResult QueryURL(const GURL& url);
+  // Returns a vector parallel to `urls`; unknown URLs map to 0.
+  std::vector<URLID> QueryUrlIds(const std::vector<GURL>& urls);
   QueryURLAndVisitsResult QueryURLAndVisits(
       const GURL& url,
       VisitQuery404sPolicy policy_for_404s);

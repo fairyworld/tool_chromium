@@ -2059,6 +2059,17 @@ QueryURLResult HistoryBackend::QueryURL(const GURL& url) {
   return result;
 }
 
+std::vector<URLID> HistoryBackend::QueryUrlIds(const std::vector<GURL>& urls) {
+  std::vector<URLID> result(urls.size(), 0);
+  if (!db_) {
+    return result;
+  }
+  for (size_t i = 0; i < urls.size(); ++i) {
+    result[i] = db_->GetRowForURL(urls[i], nullptr);
+  }
+  return result;
+}
+
 QueryURLAndVisitsResult HistoryBackend::QueryURLAndVisits(
     const GURL& url,
     VisitQuery404sPolicy policy_for_404s) {
