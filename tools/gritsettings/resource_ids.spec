@@ -1603,6 +1603,9 @@
   "ash/login/resources/login_resources.grd": {
     "structures": [9140],
   },
+  "ash/login/resources/login_strings.grd": {
+    "messages": [9150],
+  },
   "ash/public/cpp/resources/ash_public_unscaled_resources.grd": {
     "includes": [9160],
     "structures": [9180],
