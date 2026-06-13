@@ -2971,15 +2971,32 @@ void ChildProcessSecurityPolicyImpl::RemoveStateForBrowserContext(
                   [](const auto& pair) { return pair.second.empty(); });
   }
 
-  {
-    base::AutoLock origin_agent_cluster_lock(origin_agent_cluster_lock_);
-    origin_agent_cluster_opt_ins_and_outs_.erase(browser_context.UniqueToken());
-  }
+  RemoveOriginAgentClusterRequestsForBrowserContext(browser_context);
 
   {
     base::AutoLock lock(lock_);
     security_states_.ClearBrowserContextIfMatches(browser_context);
   }
+}
+
+void ChildProcessSecurityPolicyImpl::
+    RemoveOriginAgentClusterRequestsForBrowserContext(
+        const BrowserContext& browser_context) {
+  // TODO(crbug.com/522298905): Add FFI for base::UnguessableToken so that
+  // `UniqueToken()` can be used to represent BrowserContext ID in Rust. For
+  // now, fall back to its string representation in `UniqueId()`.
+  RUST_CPP_VOID_FUNCTION(
+      rust::child_process_security_policy::
+          remove_origin_agent_cluster_requests_for_browser_context(
+              browser_context.UniqueId()),
+      RemoveOriginAgentClusterRequestsForBrowserContext_Cpp(browser_context));
+}
+
+void ChildProcessSecurityPolicyImpl::
+    RemoveOriginAgentClusterRequestsForBrowserContext_Cpp(
+        const BrowserContext& browser_context) {
+  base::AutoLock origin_agent_cluster_lock(origin_agent_cluster_lock_);
+  origin_agent_cluster_opt_ins_and_outs_.erase(browser_context.UniqueToken());
 }
 
 void ChildProcessSecurityPolicyImpl::SecurityStateMaps::
@@ -3248,8 +3265,26 @@ bool ChildProcessSecurityPolicyImpl::
     HasOriginEverRequestedOriginAgentClusterValue(
         BrowserContext* browser_context,
         const url::Origin& origin) {
-  const auto& browser_context_id = browser_context->UniqueToken();
+  // TODO(crbug.com/522298905): Add FFI for base::UnguessableToken so that
+  // `UniqueToken()` can be used to represent BrowserContext ID in Rust. For
+  // now, fall back to its string representation in `UniqueId()`.
+  RUST_CPP_RETURN_FUNCTION(
+      rust::child_process_security_policy::
+          has_origin_ever_requested_origin_agent_cluster_value(
+              browser_context->UniqueId(),
+              // Make a copy of the origin for Rust to own.
+              std::make_unique<url::Origin>(origin)),
+      HasOriginEverRequestedOriginAgentClusterValue_Cpp(browser_context,
+                                                        origin),
+      bool);
+}
+
+bool ChildProcessSecurityPolicyImpl::
+    HasOriginEverRequestedOriginAgentClusterValue_Cpp(
+        BrowserContext* browser_context,
+        const url::Origin& origin) {
   base::AutoLock origin_agent_cluster_lock(origin_agent_cluster_lock_);
+  const auto& browser_context_id = browser_context->UniqueToken();
   auto it = origin_agent_cluster_opt_ins_and_outs_.find(browser_context_id);
   return it != origin_agent_cluster_opt_ins_and_outs_.end() &&
          it->second.contains(origin);
@@ -3279,7 +3314,7 @@ void ChildProcessSecurityPolicyImpl::RecordDefaultOriginAgentClusterOriginIfNew(
     const IsolationContext& isolation_context,
     const url::Origin& origin,
     bool is_global_walk_or_frame_removal) {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI);
   if (!IsolatedOriginUtil::IsValidOriginForOriginAgentClusterOptIn(origin)) {
     return;
   }
@@ -3292,8 +3327,6 @@ void ChildProcessSecurityPolicyImpl::RecordDefaultOriginAgentClusterOriginIfNew(
   DCHECK(browser_context);
   CHECK(!browsing_instance_id.is_null());
 
-  base::AutoLock origin_agent_cluster_lock(origin_agent_cluster_lock_);
-
   // Commits of origins that have ever sent the OriginAgentCluster header in
   // this BrowserContext are tracked in every BrowsingInstance in this
   // BrowserContext, to avoid having to do multiple global walks. If the origin
@@ -3301,14 +3334,20 @@ void ChildProcessSecurityPolicyImpl::RecordDefaultOriginAgentClusterOriginIfNew(
   // avoid unnecessary work, since this is called on every commit. Skip this
   // during global walks and frame removals, since we do want to track the
   // origin's non-isolated status in those cases.
-  if (!is_global_walk_or_frame_removal) {
-    const auto& browser_context_id = browser_context->UniqueToken();
-    auto it = origin_agent_cluster_opt_ins_and_outs_.find(browser_context_id);
-    if (it == origin_agent_cluster_opt_ins_and_outs_.end() ||
-        !it->second.contains(origin)) {
-      return;
-    }
+  if (!is_global_walk_or_frame_removal &&
+      !HasOriginEverRequestedOriginAgentClusterValue(browser_context, origin)) {
+    return;
   }
+
+  // Note: this lock is grabbed in the call to
+  // `HasOriginEverRequestedOriginAgentClusterValue` above, then released and
+  // reacquired here. This is safe, because once
+  // `HasOriginEverRequestedOriginAgentClusterValue()` returns true, it will
+  // keep returning true, as the OAC maps used here don't change origin values
+  // until the maps are cleared entirely. Also, their manipulation is restricted
+  // to the UI thread, so another thread can't concurrently add new values while
+  // we reacquire the lock.
+  base::AutoLock origin_agent_cluster_lock(origin_agent_cluster_lock_);
 
   // If |origin| has already recorded an Origin-Agent-Cluster state, then we
   // don't want to add it to the list. Technically this check is unnecessary
@@ -3498,6 +3537,21 @@ void ChildProcessSecurityPolicyImpl::
 }
 
 bool ChildProcessSecurityPolicyImpl::RecordOriginAgentClusterRequestIfNew(
+    BrowserContext* browser_context,
+    const url::Origin& origin) {
+  // TODO(crbug.com/522298905): Add FFI for base::UnguessableToken so that
+  // `UniqueToken()` can be used to represent BrowserContext ID in Rust. For
+  // now, fall back to its string representation in `UniqueId()`.
+  RUST_CPP_RETURN_FUNCTION(
+      rust::child_process_security_policy::
+          record_origin_agent_cluster_request_if_new(
+              browser_context->UniqueId(),
+              // Make a copy of the origin for Rust to own.
+              std::make_unique<url::Origin>(origin)),
+      RecordOriginAgentClusterRequestIfNew_Cpp(browser_context, origin), bool);
+}
+
+bool ChildProcessSecurityPolicyImpl::RecordOriginAgentClusterRequestIfNew_Cpp(
     BrowserContext* browser_context,
     const url::Origin& origin) {
   if (!IsolatedOriginUtil::IsValidOriginForOriginAgentClusterOptIn(origin)) {

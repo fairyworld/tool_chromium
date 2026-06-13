@@ -376,6 +376,8 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
   // for origin isolation.
   bool RecordOriginAgentClusterRequestIfNew(BrowserContext* browser_context,
                                             const url::Origin& origin);
+  bool RecordOriginAgentClusterRequestIfNew_Cpp(BrowserContext* browser_context,
+                                                const url::Origin& origin);
 
   // A version of GetMatchingProcessIsolatedOrigin that takes in both the
   // |origin| and the |site_url| that |origin| corresponds to.  |site_url| is
@@ -643,6 +645,9 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
   // (either opt-in or opt-out) for this |origin| in the given |browser_context|
   // before in any BrowsingInstance.
   bool HasOriginEverRequestedOriginAgentClusterValue(
+      BrowserContext* browser_context,
+      const url::Origin& origin);
+  bool HasOriginEverRequestedOriginAgentClusterValue_Cpp(
       BrowserContext* browser_context,
       const url::Origin& origin);
 
@@ -1129,6 +1134,13 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
   // process.
   bool CanCommitSchemeInAnyProcess(const std::string& scheme);
   bool CanCommitSchemeInAnyProcess_Cpp(const std::string& scheme);
+
+  // Helpers to remove all origins that have ever requested a particular OAC
+  // state in `browser_context`.
+  void RemoveOriginAgentClusterRequestsForBrowserContext(
+      const BrowserContext& browser_context);
+  void RemoveOriginAgentClusterRequestsForBrowserContext_Cpp(
+      const BrowserContext& browser_context);
 
   // You must acquire this lock before reading or writing any members of this
   // class, except for isolated_origins_, schemes_okay_to_*, and
