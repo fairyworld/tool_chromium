@@ -527,18 +527,6 @@ bool ChildProcessSecurityPolicyImpl::Handle::CanAccessDataForOrigin(
   return policy->CanAccessDataForOrigin(child_id_.GetUnsafeValue(), origin);
 }
 
-ChildProcessSecurityPolicyImpl::OriginAgentClusterOptInEntry::
-    OriginAgentClusterOptInEntry(
-        const OriginAgentClusterIsolationState& oac_isolation_state_in,
-        const url::Origin& origin_in)
-    : oac_isolation_state(oac_isolation_state_in), origin(origin_in) {}
-
-ChildProcessSecurityPolicyImpl::OriginAgentClusterOptInEntry::
-    OriginAgentClusterOptInEntry(const OriginAgentClusterOptInEntry&) = default;
-
-ChildProcessSecurityPolicyImpl::OriginAgentClusterOptInEntry::
-    ~OriginAgentClusterOptInEntry() = default;
-
 // The SecurityState class is used to maintain per-child process security state
 // information.
 class ChildProcessSecurityPolicyImpl::SecurityState {
@@ -3271,18 +3259,10 @@ OriginAgentClusterIsolationState*
 ChildProcessSecurityPolicyImpl::LookupOriginAgentClusterState(
     const BrowsingInstanceId& browsing_instance_id,
     const url::Origin& origin) {
-  auto it_isolation_by_browsing_instance =
-      origin_agent_cluster_states_by_browsing_instance_.find(
-          browsing_instance_id);
-  if (it_isolation_by_browsing_instance ==
-      origin_agent_cluster_states_by_browsing_instance_.end()) {
-    return nullptr;
-  }
-  auto& origin_list = it_isolation_by_browsing_instance->second;
-  auto it_origin_list = std::ranges::find(
-      origin_list, origin, &OriginAgentClusterOptInEntry::origin);
-  if (it_origin_list != origin_list.end()) {
-    return &(it_origin_list->oac_isolation_state);
+  if (auto* origin_map =
+          base::FindOrNull(origin_agent_cluster_states_by_browsing_instance_,
+                           browsing_instance_id)) {
+    return base::FindOrNull(*origin_map, origin);
   }
   return nullptr;
 }
@@ -3343,7 +3323,7 @@ void ChildProcessSecurityPolicyImpl::RecordDefaultOriginAgentClusterOriginIfNew(
   // origin should use the default isolation model in use by the
   // BrowsingInstance.
   origin_agent_cluster_states_by_browsing_instance_[browsing_instance_id]
-      .emplace_back(isolation_context.default_isolation_state(), origin);
+      .emplace(origin, isolation_context.default_isolation_state());
 }
 
 void ChildProcessSecurityPolicyImpl::RemoveAllStateForBrowsingInstance(
@@ -3508,24 +3488,13 @@ void ChildProcessSecurityPolicyImpl::
   // a new SiteInstance, so |browsing_instance_id| should always be defined.
   CHECK(!browsing_instance_id.is_null());
 
-  // For Origin Agent Cluster, use the
-  // origin_agent_cluster_states_by_browsing_instance_ map.
+  // Register the OAC state for `origin` in the per-BrowsingInstance map. We
+  // only support adding new entries, not modifying existing ones. If at some
+  // point in the future we allow isolation state to change during the lifetime
+  // of a BrowsingInstance, then this will need to be updated.
   base::AutoLock origin_agent_cluster_lock(origin_agent_cluster_lock_);
-  auto it = origin_agent_cluster_states_by_browsing_instance_.find(
-      browsing_instance_id);
-  if (it == origin_agent_cluster_states_by_browsing_instance_.end()) {
-    std::tie(it, std::ignore) =
-        origin_agent_cluster_states_by_browsing_instance_.emplace(
-            browsing_instance_id, std::vector<OriginAgentClusterOptInEntry>());
-  }
-
-  // We only support adding new entries, not modifying existing ones. If at
-  // some point in the future we allow isolation status to change during the
-  // lifetime of a BrowsingInstance, then this will need to be updated.
-  if (!std::ranges::contains(it->second, origin,
-                             &OriginAgentClusterOptInEntry::origin)) {
-    it->second.emplace_back(oac_isolation_state, origin);
-  }
+  origin_agent_cluster_states_by_browsing_instance_[browsing_instance_id]
+      .try_emplace(origin, oac_isolation_state);
 }
 
 bool ChildProcessSecurityPolicyImpl::RecordOriginAgentClusterRequestIfNew(

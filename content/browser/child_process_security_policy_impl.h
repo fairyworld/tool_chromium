@@ -968,20 +968,6 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
     IsolatedOriginSource source_;
   };
 
-  // A struct to hold the OAC opted-in origins and their isolation state. It
-  // associates a specific |origin| with its OriginAgentClusterIsolationState,
-  // and is tracked in |origin_agent_cluster_by_browsing_instance_|.
-  struct OriginAgentClusterOptInEntry {
-    OriginAgentClusterOptInEntry(
-        const OriginAgentClusterIsolationState& oac_isolation_state_in,
-        const url::Origin& origin_in);
-    OriginAgentClusterOptInEntry(const OriginAgentClusterOptInEntry&);
-    ~OriginAgentClusterOptInEntry();
-
-    OriginAgentClusterIsolationState oac_isolation_state;
-    url::Origin origin;
-  };
-
   // Obtain an instance of ChildProcessSecurityPolicyImpl via GetInstance().
   ChildProcessSecurityPolicyImpl();
   friend struct base::DefaultSingletonTraits<ChildProcessSecurityPolicyImpl>;
@@ -1245,7 +1231,8 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
   // origin and a precursor of a sandboxed origin, even though that's not
   // technically necessary. See https://crbug.com/446157743 and
   // https://crbug.com/40910871.
-  base::flat_map<BrowsingInstanceId, std::vector<OriginAgentClusterOptInEntry>>
+  base::flat_map<BrowsingInstanceId,
+                 base::flat_map<url::Origin, OriginAgentClusterIsolationState>>
       origin_agent_cluster_states_by_browsing_instance_
           GUARDED_BY(origin_agent_cluster_lock_);
 
