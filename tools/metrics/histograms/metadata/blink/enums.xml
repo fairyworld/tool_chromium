@@ -6664,6 +6664,12 @@ Called by update_use_counter_feature_enum.py.-->
   <int value="5920" label="CreateTextModuleScript"/>
   <int value="5921" label="DigitalCredentialsProtocolOpenId4VciV1"/>
   <int value="5922" label="ElementAttachShadowNonHTMLNamespace"/>
+  <int value="5923" label="V8Element_AriaActionsElements_AttributeGetter"/>
+  <int value="5924" label="V8Element_AriaActionsElements_AttributeSetter"/>
+  <int value="5925"
+      label="V8ElementInternals_AriaActionsElements_AttributeGetter"/>
+  <int value="5926"
+      label="V8ElementInternals_AriaActionsElements_AttributeSetter"/>
 </enum>
 
 <!-- LINT.ThenChange(//third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom:WebFeature) -->

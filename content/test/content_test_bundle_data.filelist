@@ -1961,6 +1961,10 @@ data/accessibility/aria/aria1.1-combobox-expected-blink.txt
 data/accessibility/aria/aria1.1-combobox-expected-mac.txt
 data/accessibility/aria/aria1.1-combobox-expected-win.txt
 data/accessibility/aria/aria1.1-combobox.html
+data/accessibility/aria/ariaActionsElements-expected-blink.txt
+data/accessibility/aria/ariaActionsElements-internals-expected-blink.txt
+data/accessibility/aria/ariaActionsElements-internals.html
+data/accessibility/aria/ariaActionsElements.html
 data/accessibility/aria/ariaControlsElements-expected-blink.txt
 data/accessibility/aria/ariaControlsElements-internals-expected-blink.txt
 data/accessibility/aria/ariaControlsElements-internals.html
