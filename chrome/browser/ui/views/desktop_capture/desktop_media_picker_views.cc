@@ -894,7 +894,7 @@ std::unique_ptr<views::View> DesktopMediaPickerDialogView::SetupPane(
       categories_.emplace_back(type, std::move(controller), audio_offered,
                                audio_checked, supports_reselect_button);
 
-  base::RepeatingCallback<void(void)> trigger_audio_permission_check;
+  base::RepeatingClosure trigger_audio_permission_check;
 #if BUILDFLAG(IS_MAC)
   if (audio_capture_permission_checker_ &&
       (type == DesktopMediaList::Type::kScreen ||

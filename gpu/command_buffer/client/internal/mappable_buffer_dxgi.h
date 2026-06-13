@@ -100,8 +100,7 @@ class GPU_COMMAND_BUFFER_CLIENT_EXPORT MappableBufferDXGI
 
   // Returns callback for reporting early result.
   // `DoMapAsync` can't invoke it directly as it holds a mapping lock.
-  std::optional<base::OnceCallback<void(void)>> DoMapAsync(
-      base::OnceCallback<void(bool)>);
+  std::optional<base::OnceClosure> DoMapAsync(base::OnceCallback<void(bool)>);
   void CheckAsyncMapResult(bool result);
   void AssertMapped();
 

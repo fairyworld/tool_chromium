@@ -76,7 +76,7 @@ SkBitmap LoadImageFromTestFile(
 }
 
 void WaitForStatus(scoped_refptr<screen_ai::OpticalCharacterRecognizer> ocr,
-                   base::OnceCallback<void(void)> callback,
+                   base::OnceClosure callback,
                    int remaining_tries) {
   if (ocr->StatusAvailableForTesting() || !remaining_tries) {
     std::move(callback).Run();

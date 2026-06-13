@@ -116,7 +116,7 @@ bool MappableBufferDXGI::Map() {
 
 void MappableBufferDXGI::MapAsync(base::OnceCallback<void(bool)> result_cb) {
   TRACE_EVENT0("gpu", "MappableBufferDXGI::MapAsync");
-  std::optional<base::OnceCallback<void(void)>> early_result;
+  std::optional<base::OnceClosure> early_result;
   early_result = DoMapAsync(std::move(result_cb));
   // Can't run the callback inside DoMapAsync because it grabs the lock.
   if (early_result.has_value()) {
@@ -124,7 +124,7 @@ void MappableBufferDXGI::MapAsync(base::OnceCallback<void(bool)> result_cb) {
   }
 }
 
-std::optional<base::OnceCallback<void(void)>> MappableBufferDXGI::DoMapAsync(
+std::optional<base::OnceClosure> MappableBufferDXGI::DoMapAsync(
     base::OnceCallback<void(bool)> result_cb) {
   base::AutoLock auto_lock(map_lock_);
   if (map_count_ > 0) {
