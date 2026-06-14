@@ -206,13 +206,12 @@ public class VerticalTabListCoordinator {
 
                             @Override
                             public void onLongPress(MotionEvent e) {
-                                // Ignore mouse right-click long-presses to prevent double-context
-                                // menu rendering. Regular right-clicks are already handled by
-                                // setOnContextClickListener. This method is for regular
-                                // long-presses (both mouse & touch).
-                                if (e.getToolType(0) == MotionEvent.TOOL_TYPE_MOUSE
-                                        && (e.getButtonState() & MotionEvent.BUTTON_SECONDARY)
-                                                != 0) {
+                                // Ignore long-press actions if a secondary button modifier
+                                // (right-click) is active. Right-clicks are already handled by
+                                // setOnContextClickListener; allowing this to proceed causes
+                                // double-rendering on desktop workspaces where trackpad taps are
+                                // emulated via TOOL_TYPE_FINGER (instead of TOOL_TYPE_MOUSE).
+                                if ((e.getButtonState() & MotionEvent.BUTTON_SECONDARY) != 0) {
                                     return;
                                 }
 
@@ -438,15 +437,14 @@ public class VerticalTabListCoordinator {
             Activity activity, RecyclerView recyclerView, float localX, float localY) {
         // Get the top-left edge pos of the scrollable recycler view.
         int[] recyclerViewPos = new int[2];
-        recyclerView.getLocationOnScreen(recyclerViewPos);
+        recyclerView.getLocationInWindow(recyclerViewPos);
 
-        // Get the absolute/global coordinate of the finger/mouse relative to the entire device
-        // screen.
-        int absoluteX = recyclerViewPos[0] + (int) localX;
-        int absoluteY = recyclerViewPos[1] + (int) localY;
+        // Calculate window-relative anchor coordinates.
+        int windowX = recyclerViewPos[0] + (int) localX;
+        int windowY = recyclerViewPos[1] + (int) localY;
 
         // Build a tight 1x1 bounding box directly underneath the pointer location.
-        Rect anchorRect = new Rect(absoluteX, absoluteY, absoluteX + 1, absoluteY + 1);
+        Rect anchorRect = new Rect(windowX, windowY, windowX + 1, windowY + 1);
         RectProvider rectProvider = new RectProvider(anchorRect);
 
         if (mTabStripContextMenuCoordinator == null) {
