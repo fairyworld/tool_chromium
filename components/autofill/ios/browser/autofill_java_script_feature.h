@@ -49,15 +49,13 @@ class AutofillJavaScriptFeature : public web::JavaScriptFeature {
 
   // Fills a number of fields in the same named form for full-form Autofill.
   // Applies Autofill CSS (i.e. yellow background) to filled elements.
-  // Only empty fields will be filled, except that field named
-  // Field identified by `force_fill_field_id` will always be filled even if
-  // non-empty. `force_fill_field_id` may be null. Fields must be contained in
+  // Only empty fields will be filled, except the focused field which will
+  // always be filled even if non-empty. Fields must be contained in
   // `frame`. `callback` is called after the forms are filled with `data`
   // which must contain pairs of unique renderer ids of filled fields and
   // corresponding filled values. `callback` cannot be nil.
   void FillForm(web::WebFrame* frame,
                 base::DictValue data,
-                autofill::FieldRendererId force_fill_field_id,
                 base::OnceCallback<void(NSString*)> callback);
 
   // Clear autofilled fields of the specified form and frame. Fields that are

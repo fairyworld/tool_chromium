@@ -200,11 +200,6 @@ bool HasGuid(const Suggestion::Payload& payload) {
   // The pref service for which this agent was created.
   raw_ptr<PrefService> _prefService;
 
-  // The unique renderer ID of the most recent autocomplete field;
-  // tracks the currently-focused form element in order to force filling of
-  // the currently selected form element, even if it's non-empty.
-  FieldRendererId _pendingAutocompleteFieldID;
-
   // Suggestions state:
   // The most recent form suggestions.
   NSArray* _mostRecentSuggestions;
@@ -420,7 +415,6 @@ bool HasGuid(const Suggestion::Payload& payload) {
           base::FeatureList::IsEnabled(
               autofill::features::kAutofillAiCreateEntityDataManager));
 
-    _pendingAutocompleteFieldID = fieldRendererID;
     if (_suggestionDelegate) {
       Suggestion autofill_suggestion(suggestion.type);
       autofill_suggestion.main_text.value =
@@ -1196,7 +1190,7 @@ bool HasGuid(const Suggestion::Payload& payload) {
         }
       };
   AutofillJavaScriptFeature::GetInstance()->FillForm(
-      frame, std::move(data.payload), _pendingAutocompleteFieldID,
+      frame, std::move(data.payload),
       base::BindOnce(callback, weakSelf, frame->AsWeakPtr(),
                      std::exchange(_suggestionHandledCompletion, nil),
                      std::move(data.fieldToFormLookupMap), data.actionType));

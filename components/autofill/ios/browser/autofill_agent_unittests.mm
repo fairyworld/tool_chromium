@@ -253,7 +253,7 @@ TEST_F(AutofillAgentTests,
             u"\"-default\",\"value\":\"name_value\"},\"4\":{\"hostFormId\":0,"
             u"\"isAutofilled\":false,\"section\":\"-default\","
             u"\"value\":\"01\"},\"5\":{\"hostFormId\":0,\"isAutofilled\":true,"
-            u"\"section\":\"-default\",\"value\":\"\"}}}, 0]);",
+            u"\"section\":\"-default\",\"value\":\"\"}}}]);",
             fake_main_frame_->GetLastJavaScriptCall());
 }
 

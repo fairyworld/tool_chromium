@@ -104,17 +104,13 @@ void AutofillJavaScriptFeature::FillSpecificFormField(
 void AutofillJavaScriptFeature::FillForm(
     web::WebFrame* frame,
     base::DictValue data,
-    autofill::FieldRendererId force_fill_field_id,
     base::OnceCallback<void(NSString*)> callback) {
   DCHECK(!callback.is_null());
 
-  CallJavaScriptFunction(
-      frame, "autofill.fillForm",
-      base::ListValue()
-          .Append(std::move(data))
-          .Append(static_cast<int>(force_fill_field_id.value())),
-      autofill::CreateStringCallback(std::move(callback)),
-      base::Seconds(kJavaScriptExecutionTimeoutInSeconds));
+  CallJavaScriptFunction(frame, "autofill.fillForm",
+                         base::ListValue().Append(std::move(data)),
+                         autofill::CreateStringCallback(std::move(callback)),
+                         base::Seconds(kJavaScriptExecutionTimeoutInSeconds));
 }
 
 void AutofillJavaScriptFeature::ClearAutofilledFieldsForForm(
