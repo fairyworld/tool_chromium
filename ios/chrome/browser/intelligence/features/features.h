@@ -254,6 +254,7 @@ BASE_DECLARE_FEATURE(kGeminiCopresence);
 bool IsGeminiCopresenceEnabled();
 
 // The threshold interval for displaying the response ready state in seconds.
+// TODO(crbug.com/522712050): Remove once Gemini Config Params are merged.
 extern const char kGeminiCopresenceResponseReadyInterval[];
 double GetGeminiCopresenceResponseReadyInterval();
 
@@ -271,6 +272,13 @@ extern const char kGeminiCopresenceWithFullscreenDisabler[];
 // Returns true if Gemini Copresence tracks multiple hiding sources.
 bool IsGeminiCopresenceTrackSourcesEnabled();
 extern const char kGeminiCopresenceTrackSources[];
+
+// Feature flag for Gemini configurable parameters.
+BASE_DECLARE_FEATURE(kGeminiConfigParams);
+
+// The threshold interval for displaying the response ready state in seconds.
+extern const char kGeminiResponseReadyInterval[];
+double GetGeminiResponseReadyInterval();
 
 // Feature flag for enabling early metrics collection for page stability.
 BASE_DECLARE_FEATURE(kPageStabilityMetrics);

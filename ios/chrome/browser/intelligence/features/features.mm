@@ -487,6 +487,7 @@ bool IsGeminiCopresenceEnabled() {
   return base::FeatureList::IsEnabled(kGeminiCopresence);
 }
 
+// TODO(crbug.com/522712050): Remove once Gemini Config Params are merged.
 const char kGeminiCopresenceResponseReadyInterval[] =
     "GeminiCopresenceResponseReadyInterval";
 
@@ -529,6 +530,17 @@ bool IsGeminiCopresenceTrackSourcesEnabled() {
 
   return base::GetFieldTrialParamByFeatureAsBool(
       kGeminiCopresence, kGeminiCopresenceTrackSources, false);
+}
+
+BASE_FEATURE(kGeminiConfigParams, base::FEATURE_ENABLED_BY_DEFAULT);
+
+const char kGeminiResponseReadyInterval[] = "GeminiResponseReadyInterval";
+constexpr double kGeminiResponseReadyIntervalDefault = 7.0;
+
+double GetGeminiResponseReadyInterval() {
+  return base::GetFieldTrialParamByFeatureAsDouble(
+      kGeminiConfigParams, kGeminiResponseReadyInterval,
+      kGeminiResponseReadyIntervalDefault);
 }
 
 BASE_FEATURE(kPageStabilityMetrics, base::FEATURE_DISABLED_BY_DEFAULT);
