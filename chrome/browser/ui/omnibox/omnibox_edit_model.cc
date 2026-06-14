@@ -412,8 +412,9 @@ void OmniboxEditModel::SetUserText(const std::u16string& text) {
 }
 
 bool OmniboxEditModel::Unelide() {
-  // Unelision should not occur if the user has already inputted text.
-  if (user_input_in_progress()) {
+  // Unelision should not occur if the user has already inputted text or moved
+  // to another match. Doing so would incorrectly reset the omnibox text.
+  if (user_input_in_progress() || has_temporary_text_) {
     return false;
   }
 
