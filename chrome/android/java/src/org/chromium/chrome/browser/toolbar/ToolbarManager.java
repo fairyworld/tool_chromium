@@ -170,6 +170,7 @@ import org.chromium.chrome.browser.theme.ThemeColorProvider.TintObserver;
 import org.chromium.chrome.browser.theme.ToolbarThemeColorProvider;
 import org.chromium.chrome.browser.toolbar.adaptive.AdaptiveToolbarButtonVariant;
 import org.chromium.chrome.browser.toolbar.back_button.BackButtonCoordinator;
+import org.chromium.chrome.browser.toolbar.bottom.BottomBarConstraintsSupplier;
 import org.chromium.chrome.browser.toolbar.bottom.BottomControlsContentDelegate;
 import org.chromium.chrome.browser.toolbar.bottom.BottomControlsCoordinator;
 import org.chromium.chrome.browser.toolbar.bottom.ScrollingBottomViewResourceFrameLayout;
@@ -326,6 +327,13 @@ public class ToolbarManager
                                             ? null
                                             : TabBrowserControlsConstraintsHelper
                                                     .getObservableConstraints(tab));
+
+    // Under certain conditions (such as on the New Tab Page), we force BOTH constraints for the
+    // bottom bar. Note that this derived supplier is only consumed by the
+    // ScrollingBottomViewResourceFrameLayout to determine whether capturing a screenshot of the
+    // bottom bar is allowed to prevent stale screenshots. It does not affect the physical scroll
+    // behavior of the bottom bar, which is still driven by the actual tab constraints.
+    private final BottomBarConstraintsSupplier mBottomBarConstraintsSupplier;
 
     private SettableMonotonicObservableSupplier<BottomControlsCoordinator>
             mTabGroupUiBottomControlsCoordinatorSupplier = ObservableSuppliers.createMonotonic();
@@ -904,6 +912,9 @@ public class ToolbarManager
         mActivity.registerComponentCallbacks(mComponentCallbacks);
 
         mIncognitoStateProvider = incognitoStateProvider;
+        mBottomBarConstraintsSupplier =
+                new BottomBarConstraintsSupplier(
+                        mConstraintsSupplier, mCurrentTabSupplier, activity);
         mBottomUiThemeColorProvider = bottomUiThemeColorProvider;
         mToolbarThemeColorProvider = toolbarThemeColorProvider;
         mToolbarThemeColorProvider.addThemeColorObserver(this);
@@ -2467,7 +2478,7 @@ public class ToolbarManager
                         bottomBarContainerOneshotSupplier,
                         mTabObscuringHandler,
                         mLayoutManager.getOverlayPanelManager().getPanelStateSupplier(),
-                        mConstraintsSupplier,
+                        mBottomBarConstraintsSupplier,
                         /* readAloudRestoringSupplier= */ () -> {
                             final var readAloud = mReadAloudControllerSupplier.get();
                             return readAloud != null && readAloud.isRestoringPlayer();
@@ -2983,6 +2994,7 @@ public class ToolbarManager
 
         mControlContainer.setOnDragListener(null);
         mControlContainer.destroy();
+        mBottomBarConstraintsSupplier.destroy();
         mConstraintsSupplier.destroy();
         mLocationBarFocusHandler.destroy();
 
@@ -3666,6 +3678,11 @@ public class ToolbarManager
 
     public BottomControlsCoordinator getTabGroupUiBottomControlsCoordinatorForTesting() {
         return mTabGroupUiBottomControlsCoordinatorSupplier.get();
+    }
+
+    public NullableObservableSupplier<@BrowserControlsState Integer>
+            getBottomBarConstraintsSupplierForTesting() {
+        return mBottomBarConstraintsSupplier;
     }
 
     public @Nullable ToggleTabStackButtonCoordinator getTabSwitcherButtonCoordinatorForTesting() {
