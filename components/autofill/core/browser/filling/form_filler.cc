@@ -291,7 +291,8 @@ bool AllowPaymentSwapping(const AutofillField& trigger_field,
     return field_type != UNKNOWN_TYPE &&
            field_type != CREDIT_CARD_STANDALONE_VERIFICATION_CODE;
   };
-  return has_relevant_cc_field_type(trigger_field) &&
+  return field.last_modifier() == FieldModifier::kAutofill &&
+         has_relevant_cc_field_type(trigger_field) &&
          has_relevant_cc_field_type(field) && !is_refill &&
          IsPaymentsFieldSwappingEnabled();
 }
@@ -959,21 +960,16 @@ void FormFiller::FillOrPreviewForm(
 
     std::string failure_to_fill;  // Reason for failing to fill.
 
-    const bool allow_payment_swapping =
-        // TODO(crbug.com/393114125): Change to use
-        // `AutofillField::field_modifiers_`.
-        result_fields[i].is_autofilled_according_to_renderer() &&
-        AllowPaymentSwapping(trigger_field, field, refill_options.is_refill());
-
     const std::optional<ValueAndTypeAndOverride> field_filling_content =
         GetFieldFillingData(field, augmented_filling_payload,
                             forced_fill_values, action_persistence,
-                            allow_payment_swapping, &failure_to_fill);
-
-    // Fill the data from `field_filling_content` into `result_fields[i]`, which
-    // will be sent to the renderer.
-    FillField(field_filling_content, result_fields[i], action_persistence,
-              trigger_source, allow_payment_swapping);
+                            AllowPaymentSwapping(trigger_field, field,
+                                                 refill_options.is_refill()),
+                            &failure_to_fill);
+    FillField(
+        field_filling_content, result_fields[i], action_persistence,
+        trigger_source,
+        AllowPaymentSwapping(trigger_field, field, refill_options.is_refill()));
 
     const bool is_newly_autofilled_or_emptied =
         field_filling_content.has_value();
