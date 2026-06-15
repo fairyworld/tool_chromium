@@ -348,8 +348,9 @@ void EmailVerifierDelegate::OnFillOrPreviewField(
   TriggerVerification(manager, *form, *triggering_email_field, value);
 }
 
-void EmailVerifierDelegate::OnFormWithEmailVerificationTokenSubmitted(
+void EmailVerifierDelegate::OnBeforeFormWithEmailVerificationTokenSubmitted(
     AutofillManager& manager,
+    const FormData& form,
     const FieldGlobalId& field_id) {
   if (auto it = issuers_.find(field_id); it != issuers_.end()) {
     GURL issuer_url = it->second;

@@ -255,10 +255,19 @@ class AutofillManager
                                       const FormData& form) {}
 
     // Fired when a form with a shared email verification token is submitted.
+    // A `FormData` is passed instead of a `FormGlobalId` because the form
+    // structure cached inside `AutofillManager` is not updated at this point
+    // yet and thus does not contain, e.g., the submitted values, that an
+    // observer may wish to analyze.
     //
     // This is *not* necessarily a subset of On{Before,After}FormSubmitted().
-    virtual void OnFormWithEmailVerificationTokenSubmitted(
+    virtual void OnBeforeFormWithEmailVerificationTokenSubmitted(
         AutofillManager& manager,
+        const FormData& form,
+        const FieldGlobalId& field) {}
+    virtual void OnAfterFormWithEmailVerificationTokenSubmitted(
+        AutofillManager& manager,
+        const FormData& form,
         const FieldGlobalId& field) {}
   };
 
@@ -441,6 +450,9 @@ class AutofillManager
   // by the renderer event OnFoo().
   virtual void OnFormSubmittedImpl(const FormData& form,
                                    mojom::SubmissionSource source) = 0;
+  virtual void OnFormWithEmailVerificationTokenSubmittedImpl(
+      const FormData& form,
+      const FieldGlobalId& field_id) = 0;
   virtual void OnCaretMovedInFormFieldImpl(const FormData& form,
                                            const FieldGlobalId& field_id,
                                            const gfx::Rect& caret_bounds) = 0;

@@ -982,6 +982,10 @@ void BrowserAutofillManager::OnFormSubmittedImpl(const FormData& form,
   }
 }
 
+void BrowserAutofillManager::OnFormWithEmailVerificationTokenSubmittedImpl(
+    const FormData& form,
+    const FieldGlobalId& field_id) {}
+
 void BrowserAutofillManager::UpdatePendingForm(const FormData& form) {
   // Process the current pending form if different than supplied |form|.
   if (pending_form_data_ && CalculateFormSignature(*pending_form_data_) !=

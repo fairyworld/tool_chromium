@@ -269,8 +269,14 @@ void AutofillManager::OnFormSubmitted(const FormData& form,
 void AutofillManager::OnFormWithEmailVerificationTokenSubmitted(
     const FormData& form,
     const FieldGlobalId& field_id) {
-  NotifyObservers(&Observer::OnFormWithEmailVerificationTokenSubmitted,
-                  field_id);
+  if (!IsValidFormData(form)) {
+    return;
+  }
+  NotifyObservers(&Observer::OnBeforeFormWithEmailVerificationTokenSubmitted,
+                  form, field_id);
+  OnFormWithEmailVerificationTokenSubmittedImpl(form, field_id);
+  NotifyObservers(&Observer::OnAfterFormWithEmailVerificationTokenSubmitted,
+                  form, field_id);
 }
 
 void AutofillManager::OnFormsSeen(std::vector<FormData> updated_forms,

@@ -312,8 +312,8 @@ TEST_F(EmailVerifierDelegateTest, TokenSharedSuccess) {
   testing::Mock::VerifyAndClearExpectations(&client());
 
   EXPECT_CALL(client(), ShowEmailVerifiedToast(GURL("https://example.com")));
-  delegate().OnFormWithEmailVerificationTokenSubmitted(
-      manager(), form->field(1)->global_id());
+  delegate().OnBeforeFormWithEmailVerificationTokenSubmitted(
+      manager(), form->ToFormData(), form->field(1)->global_id());
 
   histogram_tester.ExpectBucketCount("Blink.Evp.Autofill.FlowResult",
                                      EvpAutofillFlowResult::kSuccess, 1);
