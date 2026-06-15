@@ -111,7 +111,7 @@ void IsolatedWebAppApiBridgeImpl::Bind(
 void IsolatedWebAppApiBridgeImpl::SetShape(const std::vector<gfx::Rect>& rects,
                                            SetShapeCallback callback) {
   if (!force_enable_api_for_testing_ && !ApiIsEnabledFor(render_frame_host())) {
-    mojo::ReportBadMessage("SetShape is disabled for this caller.");
+    receiver_.ReportBadMessage("SetShape is disabled for this caller.");
     return;
   }
 
