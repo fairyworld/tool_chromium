@@ -859,12 +859,6 @@ void TabContainerImpl::PaintChildren(const views::PaintInfo& paint_info) {
 }
 
 gfx::Size TabContainerImpl::GetMinimumSize() const {
-  if (base::FeatureList::IsEnabled(features::kTabStripNewTabButtonFlickerFix)) {
-    return gfx::Size(override_available_width_for_tabs_.value_or(
-                         layout_helper_->CalculateMinimumWidth()),
-                     GetLayoutConstant(LayoutConstant::kTabStripHeight));
-  }
-
   // During animations, our minimum width tightly hugs the current bounds of our
   // children.
   std::optional<int> minimum_width = GetMidAnimationTrailingX();
@@ -1307,14 +1301,6 @@ std::optional<int> TabContainerImpl::GetMidAnimationTrailingX() const {
   if (!controller_->IsAnimatingInTabStrip() || IsDragSessionActive() ||
       IsDragSessionEnding()) {
     return std::nullopt;
-  }
-
-  if (base::FeatureList::IsEnabled(features::kTabStripNewTabButtonFlickerFix)) {
-    // During animations not related to a drag session, we want to tightly hug
-    // our tabs. The `overall_bounds_view_` is animated smoothly to the ideal
-    // trailing X and is free from the rounding jitter of individual child
-    // views.
-    return overall_bounds_view_->bounds().right();
   }
 
   // During animations not related to a drag session, we want to tightly hug
