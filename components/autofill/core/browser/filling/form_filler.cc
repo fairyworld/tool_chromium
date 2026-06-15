@@ -39,6 +39,7 @@
 #include "base/strings/utf_string_conversions.h"
 #include "base/time/time.h"
 #include "base/timer/timer.h"
+#include "base/types/expected.h"
 #include "base/types/optional_ref.h"
 #include "base/types/pass_key.h"
 #include "base/types/zip.h"
@@ -930,19 +931,38 @@ void FormFiller::FillOrPreviewForm(
   LOG_AF(buffer) << form << Br{};
   LOG_AF(buffer) << Tag{"table"};
 
-  std::vector<FormFieldData> result_fields = base::ToVector(
-      form.fields(), [](const std::unique_ptr<AutofillField>& field) {
-        return FormFieldData(*field);
-      });
-  absl::flat_hash_map<FieldGlobalId, FieldType> filled_field_types;
+  const auto filling_content =
+      base::MakeFlatMap<FieldGlobalId,
+                        base::expected<ValueAndTypeAndOverride, std::string>>(
+          form.fields(), {}, [&](const std::unique_ptr<AutofillField>& field) {
+            using Pair =
+                std::pair<const FieldGlobalId,
+                          base::expected<ValueAndTypeAndOverride, std::string>>;
 
-  // `FormFiller::GetFieldFillingSkipReasons` returns for each field a generic
-  // list of reason for skipping each field.
+            std::string failure_to_fill;
+            if (std::optional<ValueAndTypeAndOverride> filling_content =
+                    GetFieldFillingData(
+                        *field, augmented_filling_payload, forced_fill_values,
+                        action_persistence,
+                        AllowPaymentSwapping(trigger_field, *field,
+                                             refill_options.is_refill()),
+                        &failure_to_fill)) {
+              return Pair(field->global_id(), std::move(*filling_content));
+            }
+            return Pair(field->global_id(), base::unexpected(failure_to_fill));
+          });
+
   base::flat_map<FieldGlobalId, DenseSet<FieldFillingSkipReason>> skip_reasons =
       GetFieldFillingSkipReasons(form, trigger_field, refill_options,
                                  augmented_filling_payload.filling_product(),
                                  trigger_source, manager_->client(),
                                  blocked_fields);
+
+  std::vector<FormFieldData> result_fields = base::ToVector(
+      form.fields(), [](const std::unique_ptr<AutofillField>& field) {
+        return FormFieldData(*field);
+      });
+  absl::flat_hash_map<FieldGlobalId, FieldType> filled_field_types;
 
   // This loop sets the values to fill in the `result_fields`. The
   // `result_fields` are sent to the renderer, whereas the very similar
@@ -958,14 +978,12 @@ void FormFiller::FillOrPreviewForm(
       continue;
     }
 
-    std::string failure_to_fill;  // Reason for failing to fill.
+    const base::expected<ValueAndTypeAndOverride, std::string>&
+        expected_content = filling_content.at(field.global_id());
 
     const std::optional<ValueAndTypeAndOverride> field_filling_content =
-        GetFieldFillingData(field, augmented_filling_payload,
-                            forced_fill_values, action_persistence,
-                            AllowPaymentSwapping(trigger_field, field,
-                                                 refill_options.is_refill()),
-                            &failure_to_fill);
+        expected_content.has_value() ? std::optional(expected_content.value())
+                                     : std::nullopt;
     FillField(
         field_filling_content, result_fields[i], action_persistence,
         trigger_source,
@@ -1001,7 +1019,8 @@ void FormFiller::FillOrPreviewForm(
         << base::StringPrintf(
                "Field %zu Fillable - has value: %d->%d; autofilled: %d->%d. %s",
                i, has_value_before, has_value_after, is_autofilled_before,
-               is_autofilled_after, failure_to_fill);
+               is_autofilled_after,
+               expected_content.error_or("Decided to fill"));
   }
 
   const bool may_refill_in_future = MaybeInitializeRefillContext(
@@ -1390,9 +1409,6 @@ FormFiller::GetFieldFillingData(
       *failure_to_fill += "No value to fill available. ";
     }
     return std::nullopt;
-  }
-  if (failure_to_fill) {
-    *failure_to_fill = "Decided to fill";
   }
   return ValueAndTypeAndOverride{filling_value_and_type,
                                  /*value_is_an_override=*/false};
