@@ -131,7 +131,7 @@ TEST_F(FilterAnnotationTableTest,
   EXPECT_EQ(annotations.front(), annotation2);
 }
 TEST_F(FilterAnnotationTableTest,
-       StoreAnnotation_OverwritesExistingAnnotationForSameTaskAndDomain) {
+       StoreAnnotation_OverwritesExistingAnnotationForSameTaskAndHost) {
   base::Uuid id1 = base::Uuid::GenerateRandomV4();
   std::vector<FilterAttribute> attributes1;
   attributes1.emplace_back("key1", "value1");
@@ -157,15 +157,15 @@ TEST_F(FilterAnnotationTableTest,
 }
 
 TEST_F(FilterAnnotationTableTest,
-       StoreAnnotation_DoesNotOverwriteForDifferentTaskOrDomain) {
+       StoreAnnotation_DoesNotOverwriteForDifferentTaskOrHost) {
   base::Uuid id1 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation annotation1(id1, "task1", "example.com", "sub.example.com",
+  FilterAnnotation annotation1(id1, "task1", "example.com", "sub1.example.com",
                                base::Time::Now(), {});
   base::Uuid id2 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation annotation2(id2, "task2", "example.com", "sub.example.com",
+  FilterAnnotation annotation2(id2, "task2", "example.com", "sub1.example.com",
                                base::Time::Now(), {});
   base::Uuid id3 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation annotation3(id3, "task1", "other.com", "sub.other.com",
+  FilterAnnotation annotation3(id3, "task1", "example.com", "sub2.example.com",
                                base::Time::Now(), {});
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation1));

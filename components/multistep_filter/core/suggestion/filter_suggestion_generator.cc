@@ -194,7 +194,7 @@ void FilterSuggestionGenerator::OnAllAnnotationsFetched(
   // Suppress suggestions if the latest annotation is for the same domain and
   // within the throttle duration.
   if (!all_annotations.empty() &&
-      all_annotations.front().source_domain == domain &&
+      all_annotations.front().source_host == url.GetHost() &&
       base::Time::Now() - all_annotations.front().creation_timestamp <
           kSameDomainSuggestionSuppressionDuration.Get()) {
     LogSuggestionSuppressed(log_router_, navigation_id, domain,

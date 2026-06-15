@@ -96,9 +96,9 @@ bool FilterAnnotationTable::Init(sql::Database* db) {
          filter_annotation_attributes::kTableName, "(",
          filter_annotation_attributes::kAnnotationId, ")"});
     const std::string kCreateAnnotationsCompositeIndexSql = base::StrCat(
-        {"CREATE INDEX IF NOT EXISTS filter_annotations_task_domain_idx ON ",
+        {"CREATE INDEX IF NOT EXISTS filter_annotations_task_host_idx ON ",
          filter_annotations::kTableName, "(", filter_annotations::kTaskType,
-         ", ", filter_annotations::kSourceDomain, ")"});
+         ", ", filter_annotations::kSourceHost, ")"});
     const std::string kCreateAnnotationsDomainTimestampIndexSql = base::StrCat(
         {"CREATE INDEX IF NOT EXISTS "
          "filter_annotations_domain_timestamp_idx "
@@ -122,14 +122,14 @@ bool FilterAnnotationTable::StoreAnnotation(
     return false;
   }
 
-  // Delete all existing annotations for the same task type and source domain to
+  // Delete all existing annotations for the same task type and source host to
   // ensure we only store the latest one.
   sql::Statement delete_attributes(db_->GetCachedStatement(
       SQL_FROM_HERE, GetDeleteAttributesSql(base::StrCat(
                          {filter_annotations::kTaskType, " = ? AND ",
-                          filter_annotations::kSourceDomain, " = ?"}))));
+                          filter_annotations::kSourceHost, " = ?"}))));
   delete_attributes.BindString(0, annotation.task_type);
-  delete_attributes.BindString(1, annotation.source_domain);
+  delete_attributes.BindString(1, annotation.source_host);
   if (!delete_attributes.Run()) {
     return false;
   }
@@ -138,9 +138,9 @@ bool FilterAnnotationTable::StoreAnnotation(
       SQL_FROM_HERE,
       base::StrCat({"DELETE FROM ", filter_annotations::kTableName, " WHERE ",
                     filter_annotations::kTaskType, " = ? AND ",
-                    filter_annotations::kSourceDomain, " = ?"})));
+                    filter_annotations::kSourceHost, " = ?"})));
   delete_annotations.BindString(0, annotation.task_type);
-  delete_annotations.BindString(1, annotation.source_domain);
+  delete_annotations.BindString(1, annotation.source_host);
   if (!delete_annotations.Run()) {
     return false;
   }
