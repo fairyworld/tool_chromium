@@ -8157,7 +8157,7 @@ NavigationRequest::CheckCSPEmbeddedEnforcement() {
 
   // The |response()| can be null for navigations that do not require a
   // URLLoader (about:blank, about:srcdoc, ...)
-  const network::mojom::AllowCSPFromHeaderValue* allow_csp_from =
+  const network::mojom::OriginOrWildcardHeaderValue* allow_csp_from =
       response() ? response()->parsed_headers->allow_csp_from.get() : nullptr;
 
   if (network::AllowsBlanketEnforcementOfRequiredCSP(
