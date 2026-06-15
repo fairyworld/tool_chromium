@@ -11975,6 +11975,25 @@
             ]
         }
     ],
+    "GlicDisableDaisyChainNewTabs": [
+        {
+            "platforms": [
+                "chromeos",
+                "linux",
+                "mac",
+                "windows",
+                "android"
+            ],
+            "experiments": [
+                {
+                    "name": "Disabled",
+                    "disable_features": [
+                        "GlicDaisyChainNewTabs"
+                    ]
+                }
+            ]
+        }
+    ],
     "GlicDogfood": [
         {
             "platforms": [
@@ -12020,7 +12039,6 @@
                 {
                     "name": "Enabled",
                     "enable_features": [
-                        "GlicDaisyChainNewTabs",
                         "GlicDefaultTabContextSetting",
                         "GlicEnableMultiInstanceBasedOnTier",
                         "GlicLiveModeOnlyGlow",
