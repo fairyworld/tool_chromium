@@ -10,6 +10,7 @@
 #include "content/common/content_export.h"
 #include "content/public/browser/document_user_data.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
+#include "mojo/public/cpp/bindings/receiver_set.h"
 #include "third_party/blink/public/mojom/webid/federated_auth_request.mojom.h"
 
 namespace content {
@@ -27,7 +28,9 @@ class IdentityRegistry;
 // RequestService is a document-scoped manager class that coordinates
 // Federated Credential Management (FedCM) requests for a given RenderFrameHost.
 // It owns the active Request session.
-class CONTENT_EXPORT RequestService : public DocumentUserData<RequestService> {
+class CONTENT_EXPORT RequestService
+    : public DocumentUserData<RequestService>,
+      public blink::mojom::FederatedRequestService {
  public:
   DOCUMENT_USER_DATA_KEY_DECL();
 
@@ -40,6 +43,9 @@ class CONTENT_EXPORT RequestService : public DocumentUserData<RequestService> {
   // Binds a new receiver to a request session.
   void BindFederatedAuthRequest(
       mojo::PendingReceiver<blink::mojom::FederatedAuthRequest> receiver);
+
+  void BindFederatedRequestService(
+      mojo::PendingReceiver<blink::mojom::FederatedRequestService> receiver);
 
   Request* GetActiveRequestForTesting() { return active_request_.get(); }
 
@@ -69,6 +75,8 @@ class CONTENT_EXPORT RequestService : public DocumentUserData<RequestService> {
   // Requests made when there is a pending FedCM request or for the purpose of
   // Wallets or multi-IDP are not counted.
   int num_requests_{0};
+
+  mojo::ReceiverSet<blink::mojom::FederatedRequestService> receivers_;
 };
 
 }  // namespace webid

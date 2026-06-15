@@ -201,17 +201,23 @@ Request::~Request() {
 void Request::BindReceiver(
     mojo::PendingReceiver<blink::mojom::FederatedAuthRequest>
         pending_receiver) {
+  auth_request_receivers_.Add(this, std::move(pending_receiver));
+}
+
+void Request::BindReceiver(
+    mojo::PendingReceiver<blink::mojom::FederatedRequest> pending_receiver) {
   receivers_.Add(this, std::move(pending_receiver));
 }
 
 void Request::ReportBadMessage(const char* message) {
-  receivers_.ReportBadMessage(message);
+  auth_request_receivers_.ReportBadMessage(message);
 }
 
 void Request::ResetAndDeleteThisForTesting() {
   // Resetting the receivers_ before we destruct the objects means that
   // callbacks won't be called. This matches DocumentService::ResetAndDeleteThis
   // and is what our tests expect.
+  auth_request_receivers_.Clear();
   receivers_.Clear();
   if (request_service_) {
     request_service_->OnRequestDestroyed(this);

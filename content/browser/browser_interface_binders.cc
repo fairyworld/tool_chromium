@@ -1387,6 +1387,9 @@ void PopulateBinderMapWithContext(
   map->Add<blink::mojom::FederatedAuthRequest>(
       &BindRenderFrameHostImpl<
           &RenderFrameHostImpl::BindFederatedAuthRequestReceiver>);
+  map->Add<blink::mojom::FederatedRequestService>(
+      &BindRenderFrameHostImpl<
+          &RenderFrameHostImpl::BindFederatedRequestServiceReceiver>);
   map->Add<payments::mojom::SecurePaymentConfirmationService>(
       &BindRenderFrameHostImpl<
           &RenderFrameHostImpl::CreateSecurePaymentConfirmationService>);

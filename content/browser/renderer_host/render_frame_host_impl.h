@@ -2211,6 +2211,8 @@ class CONTENT_EXPORT RenderFrameHostImpl
 
   void BindFederatedAuthRequestReceiver(
       mojo::PendingReceiver<blink::mojom::FederatedAuthRequest> receiver);
+  void BindFederatedRequestServiceReceiver(
+      mojo::PendingReceiver<blink::mojom::FederatedRequestService> receiver);
 
   void BindRestrictedCookieManager(
       mojo::PendingReceiver<network::mojom::RestrictedCookieManager> receiver);

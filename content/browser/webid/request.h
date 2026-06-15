@@ -65,6 +65,7 @@ using TokenError = IdentityCredentialTokenError;
 // WebID-related request. It is owned and managed by RequestService.
 class CONTENT_EXPORT Request
     : public blink::mojom::FederatedAuthRequest,
+      public blink::mojom::FederatedRequest,
       public content::FederatedIdentityPermissionContextDelegate::
           IdpSigninStatusObserver,
       public IdentityRegistryDelegate,
@@ -92,6 +93,8 @@ class CONTENT_EXPORT Request
 
   void BindReceiver(mojo::PendingReceiver<blink::mojom::FederatedAuthRequest>
                         pending_receiver);
+  void BindReceiver(
+      mojo::PendingReceiver<blink::mojom::FederatedRequest> pending_receiver);
 
   void ReportBadMessage(const char* message);
 
@@ -691,7 +694,8 @@ class CONTENT_EXPORT Request
   // dismissals triggered by tab closure on Android during the navigation.
   bool in_redirect_to_{false};
 
-  mojo::ReceiverSet<blink::mojom::FederatedAuthRequest> receivers_;
+  mojo::ReceiverSet<blink::mojom::FederatedAuthRequest> auth_request_receivers_;
+  mojo::ReceiverSet<blink::mojom::FederatedRequest> receivers_;
 
   base::WeakPtrFactory<Request> weak_ptr_factory_{this};
 };
