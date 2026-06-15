@@ -3503,11 +3503,6 @@
     "expiry_milestone": -1
   },
   {
-    "name": "enable-fast-touchpad-click",
-    "owners": ["seobrien@chromium.org","hbarnor@chromium.org"],
-    "expiry_milestone": 140
-  },
-  {
     "name": "enable-feed-ablation",
     "owners": [ "adamta@chromium.org", "ginnyhuang@chromium.org", "bling-pandamonium@google.com" ],
     // Long expiry to allow us to disable Discover remotely.

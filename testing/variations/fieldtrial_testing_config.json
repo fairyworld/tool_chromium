@@ -23917,21 +23917,6 @@
             ]
         }
     ],
-    "TouchpadFastClickStudy": [
-        {
-            "platforms": [
-                "chromeos"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "EnableFastTouchpadClick"
-                    ]
-                }
-            ]
-        }
-    ],
     "TraceSiteInstanceGetProcessCreation": [
         {
             "platforms": [
