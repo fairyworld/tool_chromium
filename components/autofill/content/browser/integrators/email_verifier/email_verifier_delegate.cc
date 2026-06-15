@@ -352,6 +352,10 @@ void EmailVerifierDelegate::OnBeforeFormWithEmailVerificationTokenSubmitted(
     AutofillManager& manager,
     const FormData& form,
     const FieldGlobalId& field_id) {
+  if (manager.driver().GetLifecycleState() !=
+      AutofillDriver::LifecycleState::kActive) {
+    return;
+  }
   if (auto it = issuers_.find(field_id); it != issuers_.end()) {
     GURL issuer_url = it->second;
     issuers_.erase(it);
