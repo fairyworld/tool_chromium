@@ -24,6 +24,7 @@ class TabDragSessionInjector;
 struct TabDragInputEvent;
 
 struct TabDragSessionParams {
+  raw_ptr<TabDragWindowAdapter> source_window = nullptr;
   std::vector<tabs_api::NodeId> source_tab_ids;
   gfx::Point start_point;
   base::OnceClosure end_callback;
@@ -53,9 +54,6 @@ class TabDragSession {
     return dragged_tabs_;
   }
   TabDragWindowAdapter* dragged_window() const { return dragged_window_; }
-  void set_dragged_window(TabDragWindowAdapter* window) {
-    dragged_window_ = window;
-  }
 
  private:
   void EndSession();

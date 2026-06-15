@@ -37,7 +37,8 @@ void TabDragServiceImpl::Accept(
 mojom::TabDragService::StartDragResult TabDragServiceImpl::StartDrag(
     const std::vector<tabs_api::NodeId>& source_tab_ids,
     const gfx::Point& start_point) {
-  return session_manager_->StartDrag(source_tab_ids, start_point);
+  return session_manager_->StartDrag(window_adapter_.get(), source_tab_ids,
+                                     start_point);
 }
 
 mojom::TabDragService::RegisterDropTargetResult

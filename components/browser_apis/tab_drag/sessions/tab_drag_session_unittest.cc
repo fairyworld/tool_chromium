@@ -14,6 +14,7 @@
 #include "components/browser_apis/tab_drag/sessions/tab_drag_session_injector.h"
 #include "components/browser_apis/tab_drag/sessions/tab_drag_session_input_listener.h"
 #include "components/browser_apis/tab_drag/testing/toy_tab_drag_session_input_adapter.h"
+#include "components/browser_apis/tab_drag/testing/toy_tab_drag_window_adapter.h"
 #include "components/browser_apis/tab_strip/types/node_id.h"
 #include "mojo/public/mojom/base/error.mojom.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -25,8 +26,10 @@ namespace tabs_api {
 
 class TabDragSessionTest : public ::testing::Test {
  protected:
-  TabDragSessionTest() = default;
+  TabDragSessionTest() : dummy_window_(gfx::Rect(0, 0, 100, 100)) {}
   ~TabDragSessionTest() override = default;
+
+  ToyTabDragWindowAdapter dummy_window_;
 };
 
 class DummyTabDragSessionInputListener : public TabDragSessionInputListener {
@@ -85,12 +88,15 @@ TEST_F(TabDragSessionTest, StartAndReleaseCapture) {
   ToyTabDragSessionInjector injector(toy_adapter, dummy_listener,
                                      dummy_registry);
   base::MockOnceClosure end_callback;
+  ToyTabDragWindowAdapter toy_window(gfx::Rect(0, 0, 100, 100));
 
   EXPECT_FALSE(toy_adapter.capture_started());
   EXPECT_FALSE(toy_adapter.capture_released());
+  EXPECT_FALSE(toy_window.HasCapture());
 
   {
     TabDragSessionParams params{
+        .source_window = &toy_window,
         .source_tab_ids = {NodeId(NodeId::Type::kContent, "tab1")},
         .start_point = gfx::Point(),
         .end_callback = end_callback.Get()};
@@ -99,9 +105,11 @@ TEST_F(TabDragSessionTest, StartAndReleaseCapture) {
     EXPECT_TRUE(session.Start().has_value());
     EXPECT_TRUE(toy_adapter.capture_started());
     EXPECT_FALSE(toy_adapter.capture_released());
+    EXPECT_TRUE(toy_window.HasCapture());
   }
 
   EXPECT_TRUE(toy_adapter.capture_released());
+  EXPECT_FALSE(toy_window.HasCapture());
 }
 
 TEST_F(TabDragSessionTest, InputEventCancelled) {
@@ -113,6 +121,7 @@ TEST_F(TabDragSessionTest, InputEventCancelled) {
   base::MockOnceClosure end_callback;
 
   TabDragSessionParams params{
+      .source_window = &dummy_window_,
       .source_tab_ids = {NodeId(NodeId::Type::kContent, "tab1")},
       .start_point = gfx::Point(),
       .end_callback = end_callback.Get()};
@@ -132,6 +141,7 @@ TEST_F(TabDragSessionTest, InputEventDropped) {
   base::MockOnceClosure end_callback;
 
   TabDragSessionParams params{
+      .source_window = &dummy_window_,
       .source_tab_ids = {NodeId(NodeId::Type::kContent, "tab1")},
       .start_point = gfx::Point(),
       .end_callback = end_callback.Get()};
@@ -152,6 +162,7 @@ TEST_F(TabDragSessionTest, CoordinateTracking) {
 
   gfx::Point start_point(10, 10);
   TabDragSessionParams params{
+      .source_window = &dummy_window_,
       .source_tab_ids = {NodeId(NodeId::Type::kContent, "tab1")},
       .start_point = start_point,
       .end_callback = end_callback.Get()};
@@ -186,6 +197,7 @@ TEST_F(TabDragSessionTest, ListenerNotification) {
   ToyTabDragSessionInjector injector(toy_adapter, listener, dummy_registry);
 
   TabDragSessionParams params{
+      .source_window = &dummy_window_,
       .source_tab_ids = {NodeId(NodeId::Type::kContent, "tab1")},
       .start_point = gfx::Point(),
       .end_callback = end_callback.Get()};
@@ -215,6 +227,30 @@ TEST_F(TabDragSessionTest, ListenerNotification) {
             TabDragSessionInputEvent::Type::kDropped);
   EXPECT_EQ(listener.events()[1].screen_point, drop_point);
   EXPECT_TRUE(listener.session_ended());
+}
+
+TEST_F(TabDragSessionTest, CaptureLostExternally) {
+  ToyTabDragSessionInputAdapter toy_adapter;
+  DummyTabDragSessionInputListener dummy_listener;
+  DummyDropTargetRegistry dummy_registry;
+  ToyTabDragSessionInjector injector(toy_adapter, dummy_listener,
+                                     dummy_registry);
+  base::MockOnceClosure end_callback;
+  ToyTabDragWindowAdapter toy_window(gfx::Rect(0, 0, 100, 100));
+
+  TabDragSessionParams params{
+      .source_window = &toy_window,
+      .source_tab_ids = {NodeId(NodeId::Type::kContent, "tab1")},
+      .start_point = gfx::Point(),
+      .end_callback = end_callback.Get()};
+  TabDragSession session(std::move(params), &injector);
+  EXPECT_TRUE(session.Start().has_value());
+  EXPECT_TRUE(toy_window.HasCapture());
+
+  // Simulate external capture loss.
+  toy_window.ReleaseCapture();
+  EXPECT_CALL(end_callback, Run()).Times(1);
+  toy_adapter.SendToyEvent(TabDragInputEvent::Type::kCaptureChanged);
 }
 
 }  // namespace tabs_api

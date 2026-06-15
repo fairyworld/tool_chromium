@@ -24,6 +24,7 @@ TabDragSessionManager::~TabDragSessionManager() = default;
 
 base::expected<std::monostate, mojo_base::mojom::ErrorPtr>
 TabDragSessionManager::StartDrag(
+    TabDragWindowAdapter* source_window,
     const std::vector<tabs_api::NodeId>& source_tab_ids,
     const gfx::Point& start_point) {
   if (source_tab_ids.empty()) {
@@ -38,6 +39,7 @@ TabDragSessionManager::StartDrag(
   }
 
   TabDragSessionParams params;
+  params.source_window = source_window;
   params.source_tab_ids = source_tab_ids;
   params.start_point = start_point;
   params.end_callback = base::BindOnce(&TabDragSessionManager::OnSessionEnded,

@@ -20,6 +20,7 @@ namespace tabs_api {
 class TabDragSessionInjector;
 class TabDragSession;
 class DropTargetRegistry;
+class TabDragWindowAdapter;
 
 // Browser-process-wide manager that owns and coordinates the active
 // TabDragSession. This ensures the session outlives individual window
@@ -34,6 +35,7 @@ class TabDragSessionManager {
 
   // Starts a global drag session. Returns monostate if successful, or an error.
   base::expected<std::monostate, mojo_base::mojom::ErrorPtr> StartDrag(
+      TabDragWindowAdapter* source_window,
       const std::vector<tabs_api::NodeId>& source_tab_ids,
       const gfx::Point& start_point);
 

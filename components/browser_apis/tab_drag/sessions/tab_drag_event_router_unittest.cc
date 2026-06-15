@@ -32,21 +32,21 @@ class ToyTabDragSession : public TabDragSession {
   ToyTabDragSession(const std::vector<tabs_api::NodeId>& dragged_tabs,
                     TabDragSessionInjector* injector,
                     TabDragWindowAdapter* dragged_window)
-      : TabDragSession(TabDragSessionParams{.source_tab_ids = dragged_tabs},
-                       injector) {
-    set_dragged_window(dragged_window);
-  }
+      : TabDragSession(TabDragSessionParams{.source_window = dragged_window,
+                                            .source_tab_ids = dragged_tabs},
+                       injector) {}
 };
 
 }  // namespace
 
 class TabDragEventRouterTest : public ::testing::Test {
  protected:
-  TabDragEventRouterTest() = default;
+  TabDragEventRouterTest() : source_window_(gfx::Rect(0, 0, 10, 10)) {}
   ~TabDragEventRouterTest() override = default;
 
   base::test::SingleThreadTaskEnvironment task_environment_;
   TabDragEventRouter router_;
+  ToyTabDragWindowAdapter source_window_;
 };
 
 TEST_F(TabDragEventRouterTest, RegisterAndUnregister) {
@@ -86,7 +86,7 @@ TEST_F(TabDragEventRouterTest, RouteMoveEvents) {
   std::vector<NodeId> tabs = {NodeId(NodeId::Type::kContent, "tab1")};
   ToyTabDragSessionInputAdapter input_adapter;
   ToyTabDragSessionInjector injector(input_adapter, router_, router_);
-  ToyTabDragSession session(tabs, &injector, nullptr);
+  ToyTabDragSession session(tabs, &injector, &source_window_);
   router_.OnSessionStarted(&session);
 
   // Move inside bounds
@@ -139,7 +139,7 @@ TEST_F(TabDragEventRouterTest, MultiWindowRouting) {
 
   ToyTabDragSessionInputAdapter input_adapter;
   ToyTabDragSessionInjector injector(input_adapter, router_, router_);
-  ToyTabDragSession session({}, &injector, nullptr);
+  ToyTabDragSession session({}, &injector, &source_window_);
   router_.OnSessionStarted(&session);
 
   // Start in A
@@ -224,7 +224,7 @@ TEST_F(TabDragEventRouterTest, DropEvent) {
   std::vector<NodeId> tabs = {NodeId(NodeId::Type::kContent, "tab1")};
   ToyTabDragSessionInputAdapter input_adapter;
   ToyTabDragSessionInjector injector(input_adapter, router_, router_);
-  ToyTabDragSession session(tabs, &injector, nullptr);
+  ToyTabDragSession session(tabs, &injector, &source_window_);
   router_.OnSessionStarted(&session);
 
   // Move in
@@ -256,7 +256,7 @@ TEST_F(TabDragEventRouterTest, CancelEvent) {
 
   ToyTabDragSessionInputAdapter input_adapter;
   ToyTabDragSessionInjector injector(input_adapter, router_, router_);
-  ToyTabDragSession session({}, &injector, nullptr);
+  ToyTabDragSession session({}, &injector, &source_window_);
   router_.OnSessionStarted(&session);
 
   // Move in

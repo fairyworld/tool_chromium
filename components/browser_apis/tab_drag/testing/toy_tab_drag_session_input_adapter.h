@@ -5,8 +5,6 @@
 #ifndef COMPONENTS_BROWSER_APIS_TAB_DRAG_TESTING_TOY_TAB_DRAG_SESSION_INPUT_ADAPTER_H_
 #define COMPONENTS_BROWSER_APIS_TAB_DRAG_TESTING_TOY_TAB_DRAG_SESSION_INPUT_ADAPTER_H_
 
-#include <vector>
-
 #include "base/memory/raw_ref.h"
 #include "base/types/expected.h"
 #include "components/browser_apis/tab_drag/adapters/tab_drag_session_input_adapter.h"
@@ -23,7 +21,6 @@ class ToyTabDragSessionInputAdapter : public TabDragSessionInputAdapter {
 
   // TabDragSessionInputAdapter overrides:
   base::expected<void, mojo_base::mojom::ErrorPtr> StartInputCapture(
-      const std::vector<tabs_api::NodeId>& source_tab_ids,
       EventCallback callback) override;
 
   void ReleaseInputCapture() override;

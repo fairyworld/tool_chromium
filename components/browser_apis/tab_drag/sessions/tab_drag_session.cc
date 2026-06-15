@@ -7,6 +7,7 @@
 #include "base/check_deref.h"
 #include "base/functional/bind.h"
 #include "components/browser_apis/tab_drag/adapters/tab_drag_session_input_adapter.h"
+#include "components/browser_apis/tab_drag/adapters/tab_drag_window_adapter.h"
 #include "components/browser_apis/tab_drag/sessions/tab_drag_session_injector.h"
 #include "components/browser_apis/tab_drag/sessions/tab_drag_session_input_listener.h"
 
@@ -18,19 +19,24 @@ TabDragSession::TabDragSession(TabDragSessionParams params,
       injector_(CHECK_DEREF(injector)),
       end_callback_(std::move(params.end_callback)),
       start_point_in_screen_(params.start_point),
-      last_mouse_screen_point_(params.start_point) {}
+      last_mouse_screen_point_(params.start_point),
+      dragged_window_(params.source_window) {
+  CHECK(dragged_window_);
+}
 
 base::expected<void, mojo_base::mojom::ErrorPtr> TabDragSession::Start() {
-  auto result = injector_->GetInputAdapter().StartInputCapture(
-      dragged_tabs_, base::BindRepeating(&TabDragSession::OnInputEvent,
-                                         base::Unretained(this)));
+  auto result =
+      injector_->GetInputAdapter().StartInputCapture(base::BindRepeating(
+          &TabDragSession::OnInputEvent, base::Unretained(this)));
   if (result.has_value()) {
+    dragged_window_->SetCapture();
     injector_->GetInputListener().OnSessionStarted(this);
   }
   return result;
 }
 
 TabDragSession::~TabDragSession() {
+  dragged_window_->ReleaseCapture();
   injector_->GetInputAdapter().ReleaseInputCapture();
 }
 
@@ -59,6 +65,14 @@ void TabDragSession::OnInputEvent(const TabDragInputEvent& event) {
       event_type = TabDragSessionInputEvent::Type::kMoved;
       last_mouse_screen_point_ = event.screen_point;
       delta_ = event.screen_point - start_point_in_screen_;
+      break;
+    case TabDragInputEvent::Type::kCaptureChanged:
+      if (dragged_window_->HasCapture()) {
+        // Window has capture - ignore.
+        return;
+      }
+      event_type = TabDragSessionInputEvent::Type::kCancelled;
+      should_end = true;
       break;
   }
 
