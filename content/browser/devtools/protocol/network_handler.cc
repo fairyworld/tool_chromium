@@ -1642,6 +1642,7 @@ DispatchResponse NetworkHandler::Disable() {
     SetNetworkConditions({}, /*offline=*/false);
   }
   extra_headers_.clear();
+  session()->browser_originating_session_state()->extra_request_headers.clear();
   ClearAcceptedEncodingsOverride();
   enable_third_party_cookie_restriction_ = false;
 #if BUILDFLAG(ENABLE_DEVICE_BOUND_SESSIONS)
@@ -2800,6 +2801,7 @@ void NetworkHandler::DeleteCookies(
 Response NetworkHandler::SetExtraHTTPHeaders(
     std::unique_ptr<protocol::Network::Headers> headers) {
   std::vector<std::pair<std::string, std::string>> new_headers;
+  base::flat_map<std::string, std::string> extra_request_headers;
   for (const auto entry : *headers) {
     if (!entry.second.is_string()) {
       return Response::InvalidParams("Invalid header value, string expected");
@@ -2812,8 +2814,11 @@ Response NetworkHandler::SetExtraHTTPHeaders(
       return Response::InvalidParams("Invalid header value");
     }
     new_headers.emplace_back(entry.first, value);
+    extra_request_headers[entry.first] = value;
   }
   extra_headers_.swap(new_headers);
+  session()->browser_originating_session_state()->extra_request_headers =
+      std::move(extra_request_headers);
   return Response::FallThrough();
 }
 
