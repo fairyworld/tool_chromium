@@ -304,6 +304,7 @@ public class NewTabPageTest {
             Assert.assertTrue(afterFocusFakeboxTop < initialFakeboxTop);
         }
 
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
         mOmnibox.clearFocus();
         waitForFakeboxTopPosition(mNtp, initialFakeboxTop);
     }
