@@ -140,7 +140,7 @@ class PersonalContextAccessManagerImpl
   //
   // **Eviction Mechanism**: Managed **per entity type** (not per individual
   // entity). When a type is prefetched, its lifetime is tracked in
-  // `cached_types_`. After `kPrefetchedEntitiesCacheTTL` the entire
+  // `cached_state_`. After `kPrefetchedEntitiesCacheTTL` the entire
   // type expires, and all entities belonging to this type are evicted together
   // from this cache.
   //

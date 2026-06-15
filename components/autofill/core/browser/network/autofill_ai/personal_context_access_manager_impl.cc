@@ -79,15 +79,14 @@ ExtractEntitiesFromResponse(const std::string& serialized_response) {
 
 bool IsPersonalContextEnabled(
     personal_context::PersonalContextEnablementState state) {
-  using personal_context::PersonalContextEnablementState;
+  using enum personal_context::PersonalContextEnablementState;
   switch (state) {
-    case PersonalContextEnablementState::kDisabledNotEligible:
-    case PersonalContextEnablementState::kDisabledNeedsOptIn:
-    case PersonalContextEnablementState::
-        kDisabledViaPersonalIntelligenceInAutofillToggle:
+    case kDisabledNotEligible:
+    case kDisabledNeedsOptIn:
+    case kDisabledViaPersonalIntelligenceInAutofillToggle:
       return false;
-    case PersonalContextEnablementState::kEnabled:
-    case PersonalContextEnablementState::kEnabledShouldShowNotice:
+    case kEnabled:
+    case kEnabledShouldShowNotice:
       return true;
   }
 }
