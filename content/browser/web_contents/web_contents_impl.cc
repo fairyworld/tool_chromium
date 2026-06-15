@@ -10700,6 +10700,14 @@ void WebContentsImpl::OnFocusedElementChangedInFrame(
   OPTIONAL_TRACE_EVENT1("content",
                         "WebContentsImpl::OnFocusedElementChangedInFrame",
                         "render_frame_host", frame);
+  // Only apply focus updates from the currently focused frame. We ignore
+  // updates from unfocused frames (instead of treating them as bad messages)
+  // because document-local focus changes are allowed, and focus transitions
+  // can race asynchronously. Focus theft is already handled and blocked (with
+  // bad messages) in `RenderFrameHostImpl::VerifyFencedFrameFocusChange`.
+  if (frame != GetFocusedFrame()) {
+    return;
+  }
   RenderWidgetHostViewBase* root_view =
       static_cast<RenderWidgetHostViewBase*>(GetRenderWidgetHostView());
   if (!root_view || !frame->GetView()) {
