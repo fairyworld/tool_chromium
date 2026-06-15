@@ -263,10 +263,9 @@ class FormFiller {
   // Returns the value to fill along with the field type and if the value is an
   // override.
   ValueAndTypeAndOverride GetFieldFillingData(
-      const AutofillField& autofill_field,
+      const AutofillField& field,
       const AugmentedFillingPayload& filling_payload,
       const std::map<FieldGlobalId, FillingValueAndType>& forced_fill_values,
-      const FormFieldData& field_data,
       mojom::ActionPersistence action_persistence,
       std::string* failure_to_fill);
 

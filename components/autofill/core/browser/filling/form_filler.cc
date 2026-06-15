@@ -1335,13 +1335,12 @@ bool FormFiller::MaybeInitializeRefillContext(
 }
 
 FormFiller::ValueAndTypeAndOverride FormFiller::GetFieldFillingData(
-    const AutofillField& autofill_field,
+    const AutofillField& field,
     const AugmentedFillingPayload& filling_payload,
     const std::map<FieldGlobalId, FillingValueAndType>& forced_fill_values,
-    const FormFieldData& field_data,
     mojom::ActionPersistence action_persistence,
     std::string* failure_to_fill) {
-  if (auto it = forced_fill_values.find(field_data.global_id());
+  if (auto it = forced_fill_values.find(field.global_id());
       it != forced_fill_values.end()) {
     return {it->second, /*value_is_an_override=*/true};
   }
@@ -1350,13 +1349,13 @@ FormFiller::ValueAndTypeAndOverride FormFiller::GetFieldFillingData(
           [&](const AutofillProfile* profile) {
             return GetFillingValueAndTypeForProfile(
                 CHECK_DEREF(profile), manager_->client().GetAppLocale(),
-                autofill_field.Type(), field_data,
-                manager_->client().GetAddressNormalizer(), failure_to_fill);
+                field.Type(), field, manager_->client().GetAddressNormalizer(),
+                failure_to_fill);
           },
           [&](const CreditCard* credit_card) {
             return GetFillingValueAndTypeForCreditCard(
                 CHECK_DEREF(credit_card), manager_->client().GetAppLocale(),
-                action_persistence, autofill_field,
+                action_persistence, field,
                 manager_->client().IsCvcSavingSupported(), failure_to_fill);
           },
           [&](const AugmentedFillingPayload::EntityPayload&
@@ -1366,23 +1365,23 @@ FormFiller::ValueAndTypeAndOverride FormFiller::GetFieldFillingData(
             const std::vector<AutofillFieldWithAttributeType>& fields =
                 entity_and_fields_and_types.second;
             return GetFillingValueAndTypeForEntity(
-                entity, fields, autofill_field, action_persistence,
+                entity, fields, field, action_persistence,
                 manager_->client().GetAppLocale(),
                 manager_->client().GetAddressNormalizer());
           },
           [&](const VerifiedProfile* profile) {
             const FieldType field_type =
-                autofill_field.Type().GetIdentityCredentialType();
+                field.Type().GetIdentityCredentialType();
             auto it = profile->find(field_type);
             std::u16string value = it == profile->end() ? u"" : it->second;
             return FillingValueAndType(value, field_type);
           },
           [&](const OtpFillData* otp_fill_data) {
-            auto it = otp_fill_data->find(field_data.global_id());
+            auto it = otp_fill_data->find(field.global_id());
             const std::u16string& value =
                 it == otp_fill_data->end() ? u"" : it->second;
-            return FillingValueAndType(
-                value, autofill_field.Type().GetPasswordManagerType());
+            return FillingValueAndType(value,
+                                       field.Type().GetPasswordManagerType());
           }},
       filling_payload.variant);
 
@@ -1409,7 +1408,7 @@ std::optional<FieldType> FormFiller::FillField(
     std::string* failure_to_fill) {
   const ValueAndTypeAndOverride filling_content =
       GetFieldFillingData(autofill_field, filling_payload, forced_fill_values,
-                          field_data, action_persistence, failure_to_fill);
+                          action_persistence, failure_to_fill);
 
   // Do not attempt to fill empty values as it would skew the metrics.
   if (filling_content.value.empty() && !allow_suggestion_swapping) {
