@@ -205,6 +205,7 @@
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 #include "chrome/browser/ui/webui/feature_showcase/feature_showcase.mojom.h"
 #include "chrome/browser/ui/webui/feature_showcase/feature_showcase_ui.h"
+#include "chrome/browser/ui/webui/feature_showcase/google_lens.mojom.h"
 #include "chrome/browser/ui/webui/feature_showcase/password_manager.mojom.h"
 #include "chrome/browser/ui/webui/signin/signout_confirmation/signout_confirmation_ui.h"
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
@@ -356,6 +357,9 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
   RegisterWebUIControllerInterfaceBinder<
       feature_showcase::mojom::PasswordManagerPageHandlerFactory,
       FeatureShowcaseUI>(map);
+  RegisterWebUIControllerInterfaceBinder<
+      feature_showcase::mojom::GoogleLensPageHandlerFactory, FeatureShowcaseUI>(
+      map);
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
   RegisterWebUIControllerInterfaceBinder<
       batch_upload_promo::mojom::PageHandlerFactory, settings::SettingsUI>(map);
