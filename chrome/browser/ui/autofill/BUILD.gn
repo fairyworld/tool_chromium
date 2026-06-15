@@ -469,6 +469,8 @@ source_set("test_support") {
       "autofill_popup_controller_impl_test_api.h",
       "mock_autofill_popup_controller.cc",
       "mock_autofill_popup_controller.h",
+      "mock_bubble_manager.cc",
+      "mock_bubble_manager.h",
     ]
     if (is_mac) {
       sources += [ "autofill_popup_controller_impl_mac_test_api.h" ]

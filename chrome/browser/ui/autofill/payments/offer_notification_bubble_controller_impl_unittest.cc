@@ -7,21 +7,31 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/with_feature_override.h"
 #include "chrome/browser/ui/autofill/autofill_bubble_base.h"
+#include "chrome/browser/ui/autofill/bubble_manager.h"
+#include "chrome/browser/ui/autofill/mock_bubble_manager.h"
 #include "chrome/browser/ui/autofill/payments/payments_ui_constants.h"
-#include "chrome/browser/ui/tabs/tab_strip_model.h"
-#include "chrome/test/base/browser_with_test_window_test.h"
+#include "chrome/browser/ui/autofill/test/test_autofill_bubble_handler.h"
+#include "chrome/browser/ui/browser_window/test/mock_browser_window_interface.h"
+#include "chrome/browser/ui/tabs/public/tab_features.h"
+#include "chrome/test/base/chrome_render_view_host_test_harness.h"
 #include "components/autofill/core/browser/data_model/payments/autofill_offer_data.h"
 #include "components/autofill/core/browser/payments/offer_notification_options.h"
 #include "components/autofill/core/browser/test_utils/autofill_test_utils.h"
+#include "components/autofill/core/common/autofill_clock.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/autofill/core/common/autofill_payments_features.h"
 #include "components/commerce/core/commerce_feature_list.h"
 #include "components/strings/grit/components_strings.h"
+#include "components/tabs/public/mock_tab_interface.h"
+#include "components/tabs/public/tab_interface.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/base/l10n/l10n_util.h"
+#include "ui/base/unowned_user_data/scoped_unowned_user_data.h"
+#include "ui/base/unowned_user_data/unowned_user_data_host.h"
 
 namespace autofill {
+
 namespace {
 
 class TestOfferNotificationBubbleControllerImpl
@@ -38,23 +48,25 @@ class TestOfferNotificationBubbleControllerImpl
       content::WebContents* web_contents)
       : OfferNotificationBubbleControllerImpl(web_contents) {}
 
+  void UpdatePageActionIcon() override {}
+
  private:
   // Overrides to bypass the IsWebContentsActive check.
   bool IsWebContentsActive() override { return true; }
 };
 
 }  // namespace
+
 // The anonymous namespace needs to end here because of `friend`ships between
 // the tests and the production code.
-
 class OfferNotificationBubbleControllerImplTest
     : public base::test::WithFeatureOverride,
-      public BrowserWithTestWindowTest {
+      public ChromeRenderViewHostTestHarness {
  public:
   OfferNotificationBubbleControllerImplTest()
       : base::test::WithFeatureOverride(
             features::kAutofillShowBubblesBasedOnPriorities),
-        BrowserWithTestWindowTest(
+        ChromeRenderViewHostTestHarness(
             base::test::TaskEnvironment::TimeSource::MOCK_TIME) {}
   OfferNotificationBubbleControllerImplTest(
       const OfferNotificationBubbleControllerImplTest&) = delete;
@@ -62,17 +74,75 @@ class OfferNotificationBubbleControllerImplTest
       const OfferNotificationBubbleControllerImplTest&) = delete;
 
   void SetUp() override {
-    BrowserWithTestWindowTest::SetUp();
-    AddTab(GURL("about:blank"));
+    ChromeRenderViewHostTestHarness::SetUp();
+
+    // Ensure WebContents is navigated and process is fully initialized.
+    NavigateAndCommit(GURL("about:blank"));
+
+    // Create MockTabInterface.
+    auto mock_tab = std::make_unique<tabs::MockTabInterface>();
+
+    // Configure MockTabInterface to return our web_contents() when
+    // GetContents() is called.
+    ON_CALL(*mock_tab, GetContents())
+        .WillByDefault(testing::Return(web_contents()));
+
+    // Create TabFeatures.
+    auto tab_features = std::make_unique<tabs::TabFeatures>();
+
+    // Create MockBubbleManager.
+    auto mock_bubble_manager =
+        std::make_unique<testing::NiceMock<MockBubbleManager>>();
+
+    // Configure MockBubbleManager to immediately show bubble when requested.
+    ON_CALL(*mock_bubble_manager, RequestShowController(testing::_, testing::_))
+        .WillByDefault(
+            [](BubbleControllerBase& controller_to_show, bool force_show) {
+              controller_to_show.ShowBubble();
+            });
+
+    // Configure MockBubbleManager to return false for
+    // HasConflictingPendingBubble.
+    ON_CALL(*mock_bubble_manager, HasConflictingPendingBubble(testing::_))
+        .WillByDefault(testing::Return(false));
+
+    tab_features->SetBubbleManagerForTesting(std::move(mock_bubble_manager));
+
+    // Configure MockTabInterface to return our TabFeatures.
+    ON_CALL(*mock_tab, GetTabFeatures())
+        .WillByDefault(testing::Return(tab_features.get()));
+    ON_CALL(testing::Const(*mock_tab), GetTabFeatures())
+        .WillByDefault(testing::Return(tab_features.get()));
+
+    // Configure MockBrowserWindowInterface to return our UnownedUserDataHost.
+    ON_CALL(mock_browser_window_interface_, GetUnownedUserDataHost())
+        .WillByDefault(testing::ReturnRef(unowned_user_data_host_));
+
+    // Configure MockTabInterface to return our MockBrowserWindowInterface.
+    ON_CALL(*mock_tab, GetBrowserWindowInterface())
+        .WillByDefault(testing::Return(&mock_browser_window_interface_));
+
+    // Bind TestAutofillBubbleHandler to the UnownedUserDataHost.
+    scoped_autofill_bubble_handler_ = std::make_unique<
+        ui::ScopedUnownedUserData<autofill::AutofillBubbleHandler>>(
+        unowned_user_data_host_, test_autofill_bubble_handler_);
+
+    // Keep TabFeatures and MockTabInterface alive by storing them in the test
+    // fixture.
+    tab_features_ = std::move(tab_features);
+    tab_interface_ = std::move(mock_tab);
+
+    // Associate the mock TabInterface with the WebContents.
+    tabs::TabLookupFromWebContents::CreateForWebContents(web_contents(),
+                                                         tab_interface_.get());
+
     TestOfferNotificationBubbleControllerImpl::CreateForTesting(web_contents());
   }
 
-  content::WebContents* web_contents() {
-    return browser()->tab_strip_model()->GetActiveWebContents();
-  }
-
-  virtual void AddTab(const GURL& url) {
-    BrowserWithTestWindowTest::AddTab(browser(), url);
+  TestOfferNotificationBubbleControllerImpl* controller() {
+    return static_cast<TestOfferNotificationBubbleControllerImpl*>(
+        TestOfferNotificationBubbleControllerImpl::FromWebContents(
+            web_contents()));
   }
 
  protected:
@@ -119,14 +189,15 @@ class OfferNotificationBubbleControllerImplTest
         promo_code);
   }
 
-  TestOfferNotificationBubbleControllerImpl* controller() {
-    return static_cast<TestOfferNotificationBubbleControllerImpl*>(
-        TestOfferNotificationBubbleControllerImpl::FromWebContents(
-            web_contents()));
-  }
-
  private:
   CreditCard card_ = test::GetCreditCard();
+  std::unique_ptr<tabs::TabInterface> tab_interface_;
+  std::unique_ptr<tabs::TabFeatures> tab_features_;
+  testing::NiceMock<MockBrowserWindowInterface> mock_browser_window_interface_;
+  ui::UnownedUserDataHost unowned_user_data_host_;
+  autofill::TestAutofillBubbleHandler test_autofill_bubble_handler_;
+  std::unique_ptr<ui::ScopedUnownedUserData<autofill::AutofillBubbleHandler>>
+      scoped_autofill_bubble_handler_;
 };
 
 TEST_P(OfferNotificationBubbleControllerImplTest, BubbleShown) {
