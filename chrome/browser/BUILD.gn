@@ -5831,10 +5831,7 @@ static_library("test_support") {
       "android/webapk/test/fake_webapk_specifics_fetcher.h",
     ]
 
-    deps += [
-      "//chrome/browser/android",
-      "//chrome/browser/download:test_support",
-    ]
+    deps += [ "//chrome/browser/android" ]
   } else {
     sources += [
       "apps/intent_helper/preferred_apps_test_util.cc",
