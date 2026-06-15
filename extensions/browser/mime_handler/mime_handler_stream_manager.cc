@@ -755,7 +755,14 @@ void MimeHandlerStreamManager::DeleteClaimedStreamInfo(
 
 bool MimeHandlerStreamManager::MaybeDeleteStreamOnExtensionHostChanged(
     content::RenderFrameHost* old_host) {
-  if (!IsExtensionHost(old_host)) {
+  content::RenderFrameHost* embedder_host = old_host->GetParent();
+  if (!embedder_host) {
+    return false;
+  }
+
+  auto* stream_info = GetClaimedStreamInfo(embedder_host);
+  if (!stream_info || old_host->GetFrameTreeNodeId() !=
+                          stream_info->extension_host_frame_tree_node_id()) {
     return false;
   }
 
@@ -766,9 +773,6 @@ bool MimeHandlerStreamManager::MaybeDeleteStreamOnExtensionHostChanged(
     return false;
   }
 
-  content::RenderFrameHost* embedder_host = old_host->GetParent();
-  CHECK(embedder_host);
-
   DeleteClaimedStreamInfo(embedder_host);
   // DO NOT add code past this point. `this` may have been deleted.
 
@@ -777,15 +781,24 @@ bool MimeHandlerStreamManager::MaybeDeleteStreamOnExtensionHostChanged(
 
 bool MimeHandlerStreamManager::MaybeDeleteStreamOnContentHostChanged(
     content::RenderFrameHost* old_host) {
-  if (!IsContentHost(old_host)) {
+  content::RenderFrameHost* extension_host = old_host->GetParent();
+  if (!extension_host) {
     return false;
   }
 
-  // `IsContentHost()` validated: parent is extension host, grandparent is
-  // embedder.
-  content::RenderFrameHost* embedder_host = old_host->GetParent()->GetParent();
-  CHECK(embedder_host);
+  content::RenderFrameHost* embedder_host = extension_host->GetParent();
+  if (!embedder_host) {
+    return false;
+  }
+
   auto* stream_info = GetClaimedStreamInfo(embedder_host);
+  if (!stream_info ||
+      extension_host->GetFrameTreeNodeId() !=
+          stream_info->extension_host_frame_tree_node_id() ||
+      old_host->GetFrameTreeNodeId() !=
+          stream_info->content_host_frame_tree_node_id()) {
+    return false;
+  }
 
   // Let the delegate validate content-frame invariants.
   stream_info->delegate()->ValidateContentFrameHost(old_host, stream_info);
