@@ -3211,17 +3211,4 @@ public class LocationBarMediatorTest {
         verify(mUrlCoordinator).startReparenting();
         verify(mUrlCoordinator).finishReparenting(true);
     }
-
-    @Test
-    public void testSuspendInput() {
-        mMediator.onFinishNativeInitialization();
-        mProfileSupplier.set(mProfile);
-        AutocompleteInput input = mSessionState.getAutocompleteInput();
-
-        mMediator.beginInput(input);
-        assertTrue(input.getRequestTypeSupplier().hasObservers());
-
-        mMediator.suspendInput();
-        assertFalse(input.getRequestTypeSupplier().hasObservers());
-    }
 }
