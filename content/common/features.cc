@@ -709,14 +709,6 @@ const base::FeatureParam<std::string>
 // same service worker that controls their parent.
 BASE_FEATURE(kServiceWorkerSrcdocSupport, base::FEATURE_ENABLED_BY_DEFAULT);
 
-// When this is enabled, it fixes the object lifetime issue when
-// `race-network-and-fetch-handler` is used, the object should be deleted after
-// the fetch event completion, regardless of the result of racing.
-//
-// crbug.com/340949948 for more details.
-BASE_FEATURE(kServiceWorkerStaticRouterRaceRequestFix2,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 // Enforce CORP check for Service Worker Static Router's cache source.
 BASE_FEATURE(kServiceWorkerStaticRouterCORPCheck,
              base::FEATURE_ENABLED_BY_DEFAULT);

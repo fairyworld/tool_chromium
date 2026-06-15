@@ -1450,16 +1450,13 @@ bool ServiceWorkerMainResourceLoader::ShouldDelayDeletion() {
   // destruction until following conditions are satisfied:
   // 1) Fetch event is completed.
   // 2) The data pipe for the fetch handler is successfully consumed or aborted
-  //    in `race_network_request_url_loader_client_`. This is considered only
-  //    when `kServiceWorkerStaticRouterRaceRequestFix2` is enabled:
+  //    in `race_network_request_url_loader_client_`.
   if (dispatched_preload_type() == DispatchedPreloadType::kRaceNetworkRequest) {
     CHECK(race_network_request_url_loader_client_.has_value());
     if (!did_dispatch_event_) {
       return true;
     }
-    if (base::FeatureList::IsEnabled(
-            features::kServiceWorkerStaticRouterRaceRequestFix2) &&
-        !race_network_request_url_loader_client_
+    if (!race_network_request_url_loader_client_
              ->clone_response_for_fetch_handler_completed_or_connection_closed()) {
       return true;
     }
@@ -1499,11 +1496,9 @@ void ServiceWorkerMainResourceLoader::DeleteIfNeeded() {
   if (!can_delete) {
     return;
   }
-  if (base::FeatureList::IsEnabled(
-          features::kServiceWorkerStaticRouterRaceRequestFix2) &&
-      ShouldDelayDeletion()) {
-    // Speculative fix to delay the object deletion until the fetch event
-    // completion. crbug.com/340949948 for more details.
+  if (ShouldDelayDeletion()) {
+    // Delay the object deletion until the fetch event completion.
+    // crbug.com/340949948 for more details.
     return;
   }
   delete this;
