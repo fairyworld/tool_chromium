@@ -18,6 +18,10 @@ namespace signin {
 class IdentityManager;
 }
 
+namespace personal_context {
+enum class PersonalContextEnablementState;
+}
+
 namespace syncer {
 class SyncService;
 }
@@ -129,6 +133,8 @@ bool MayPerformAutofillAiAction(
     bool is_wallet_public_pass_storage_enabled,
     bool is_off_the_record,
     const GeoIpCountryCode& country_code,
+    personal_context::PersonalContextEnablementState
+        personal_context_enablement_state,
     AutofillAiAction action,
     std::optional<EntityType> entity_type = std::nullopt,
     std::string* debug_message = nullptr);
@@ -170,6 +176,8 @@ bool SetAutofillAiOptInStatus(
     bool is_wallet_public_pass_storage_enabled,
     bool is_off_the_record,
     const GeoIpCountryCode& country_code,
+    personal_context::PersonalContextEnablementState
+        personal_context_enablement_state,
     AutofillAiOptInStatus opt_in_status);
 
 // Returns whether the user has ever explicitly opted in or out of Autofill AI.

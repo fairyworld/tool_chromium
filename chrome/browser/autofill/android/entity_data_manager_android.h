@@ -25,6 +25,11 @@ namespace consent_auditor {
 class ConsentAuditor;
 }
 
+namespace personal_context {
+class PersonalContextEnablementService;
+enum class PersonalContextEnablementState;
+}  // namespace personal_context
+
 namespace signin {
 class IdentityManager;
 }
@@ -58,10 +63,10 @@ class EntityDataManagerAndroid : public EntityDataManager::Observer {
       const syncer::SyncService* sync_service,
       const account_settings::AccountSettingService* account_setting_service,
       consent_auditor::ConsentAuditor* consent_auditor,
-      bool is_off_the_record,
-      WalletPassAccessManager* wallet_pass_access_manager,
       personal_context::PersonalContextEnablementService*
           personal_context_enablement_service,
+      bool is_off_the_record,
+      WalletPassAccessManager* wallet_pass_access_manager,
       EntityDataManager* entity_data_manager);
 
   EntityDataManagerAndroid(const EntityDataManagerAndroid&) = delete;
@@ -231,10 +236,10 @@ class EntityDataManagerAndroid : public EntityDataManager::Observer {
   const raw_ptr<const account_settings::AccountSettingService>
       account_setting_service_;
   const raw_ptr<consent_auditor::ConsentAuditor> consent_auditor_;
-  const bool is_off_the_record_;
-  const raw_ptr<WalletPassAccessManager> wallet_pass_access_manager_;
   const raw_ptr<personal_context::PersonalContextEnablementService>
       personal_context_enablement_service_;
+  const bool is_off_the_record_;
+  const raw_ptr<WalletPassAccessManager> wallet_pass_access_manager_;
 
   // Pointer to the EntityDataManager.
   raw_ref<EntityDataManager> entity_data_manager_;

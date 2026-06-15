@@ -65,10 +65,10 @@ EntityDataManagerAndroid::EntityDataManagerAndroid(
     const syncer::SyncService* sync_service,
     const account_settings::AccountSettingService* account_setting_service,
     consent_auditor::ConsentAuditor* consent_auditor,
-    bool is_off_the_record,
-    WalletPassAccessManager* wallet_pass_access_manager,
     personal_context::PersonalContextEnablementService*
         personal_context_enablement_service,
+    bool is_off_the_record,
+    WalletPassAccessManager* wallet_pass_access_manager,
     EntityDataManager* entity_data_manager)
     : weak_java_obj_(env, obj),
       google_groups_manager_(google_groups_manager),
@@ -77,9 +77,9 @@ EntityDataManagerAndroid::EntityDataManagerAndroid(
       sync_service_(sync_service),
       account_setting_service_(account_setting_service),
       consent_auditor_(consent_auditor),
+      personal_context_enablement_service_(personal_context_enablement_service),
       is_off_the_record_(is_off_the_record),
       wallet_pass_access_manager_(wallet_pass_access_manager),
-      personal_context_enablement_service_(personal_context_enablement_service),
       entity_data_manager_(CHECK_DEREF(entity_data_manager)) {
   entity_data_manager_observer_.Observe(entity_data_manager);
 }
@@ -136,9 +136,9 @@ static int64_t JNI_EntityDataManager_Init(JNIEnv* env,
           SyncServiceFactory::GetForProfile(profile),
           AccountSettingServiceFactory::GetForBrowserContext(profile),
           ConsentAuditorFactory::GetForProfile(profile),
+          PersonalContextEnablementServiceFactory::GetForProfile(profile),
           profile->IsOffTheRecord(),
           WalletPassAccessManagerFactory::GetForProfile(profile),
-          PersonalContextEnablementServiceFactory::GetForProfile(profile),
           entity_data_manager);
   return reinterpret_cast<intptr_t>(entity_data_manager_android);
 }
@@ -171,10 +171,18 @@ bool EntityDataManagerAndroid::SetAutofillAiOptInStatus(
           ->GetBoolean(account_settings::kWalletPrivacyContextualSurfacing)
           .value_or(false);
 
+  const personal_context::PersonalContextEnablementState
+      personal_context_enablement_state =
+          personal_context_enablement_service_
+              ? personal_context_enablement_service_->GetEnablementState()
+              : personal_context::PersonalContextEnablementState::
+                    kDisabledNotEligible;
+
   return autofill::SetAutofillAiOptInStatus(
       google_groups_manager_, prefs_, &entity_data_manager(), identity_manager_,
       sync_service_, is_wallet_public_pass_storage_enabled, is_off_the_record_,
-      entity_data_manager_->GetVariationCountryCode(), opt_in_status);
+      entity_data_manager_->GetVariationCountryCode(),
+      personal_context_enablement_state, opt_in_status);
 }
 
 std::optional<EntityInstanceAndroid>
@@ -422,11 +430,18 @@ bool EntityDataManagerAndroid::IsWalletPublicPassStorageEnabled(JNIEnv* env) {
 bool EntityDataManagerAndroid::RunMayPerformAutofillAiAction(
     AutofillAiAction action,
     std::optional<EntityType> entity_type) const {
+  const personal_context::PersonalContextEnablementState
+      personal_context_enablement_state =
+          personal_context_enablement_service_
+              ? personal_context_enablement_service_->GetEnablementState()
+              : personal_context::PersonalContextEnablementState::
+                    kDisabledNotEligible;
+
   return MayPerformAutofillAiAction(
       google_groups_manager_, prefs_, &entity_data_manager(), identity_manager_,
       sync_service_, IsWalletPublicPassStorageEnabledHelper(),
       is_off_the_record_, entity_data_manager_->GetVariationCountryCode(),
-      action, entity_type);
+      personal_context_enablement_state, action, entity_type);
 }
 
 // Returns true if the `entity_type` supports wallet storage.

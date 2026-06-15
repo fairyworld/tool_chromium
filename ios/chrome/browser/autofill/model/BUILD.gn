@@ -59,6 +59,7 @@ source_set("model") {
     "//components/image_fetcher/ios",
     "//components/leveldb_proto",
     "//components/optimization_guide/core:model_execution",
+    "//components/personal_context/core",
     "//components/prefs",
     "//components/strings:components_strings__strings_grit",
     "//components/sync/service",

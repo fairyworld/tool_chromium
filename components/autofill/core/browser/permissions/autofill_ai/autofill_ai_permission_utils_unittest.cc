@@ -545,6 +545,8 @@ TEST_P(AutofillAiMayPerformActionTest,
       !kForbiddenActions.contains(GetParam()));
 }
 TEST_F(AutofillAiPermissionUtilsTest, kTypeSupportsPersonalContextData) {
+  client().set_personal_context_enablement_state(
+      personal_context::PersonalContextEnablementState::kEnabled);
   for (const EntityTypeName type : {kPassport, kDriversLicense, kNationalIdCard,
                                     kFlightReservation, kShipment, kOrder}) {
     EXPECT_TRUE(MayPerformAutofillAiAction(
@@ -557,6 +559,18 @@ TEST_F(AutofillAiPermissionUtilsTest, kTypeSupportsPersonalContextData) {
         client(), AutofillAiAction::kTypeSupportsPersonalContextData,
         EntityType(type)));
   }
+}
+
+TEST_F(AutofillAiPermissionUtilsTest, kAmbientAutofillFilling) {
+  client().set_personal_context_enablement_state(
+      personal_context::PersonalContextEnablementState::kEnabled);
+  EXPECT_TRUE(MayPerformAutofillAiAction(
+      client(), AutofillAiAction::kAmbientAutofillFilling));
+
+  client().set_personal_context_enablement_state(
+      personal_context::PersonalContextEnablementState::kDisabledNotEligible);
+  EXPECT_FALSE(MayPerformAutofillAiAction(
+      client(), AutofillAiAction::kAmbientAutofillFilling));
 }
 
 INSTANTIATE_TEST_SUITE_P(
