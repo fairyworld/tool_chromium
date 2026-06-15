@@ -544,8 +544,10 @@ SegmentID HistoryBackend::CalculateSegmentID(
     const GURL& url,
     VisitID from_visit,
     ui::PageTransition transition_type) {
-  // We only consider main frames.
-  if (!ui::PageTransitionIsMainFrame(transition_type)) {
+  // Only consider main frames, and ignore redirects (i.e. consider only the
+  // start of a redirect chain).
+  if (!ui::PageTransitionIsMainFrame(transition_type) ||
+      ui::PageTransitionIsRedirect(transition_type)) {
     return 0;
   }
 
