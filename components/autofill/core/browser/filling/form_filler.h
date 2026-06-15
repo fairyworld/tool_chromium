@@ -20,6 +20,7 @@
 #include "base/memory/raw_ref.h"
 #include "base/memory/weak_ptr.h"
 #include "base/time/time.h"
+#include "base/types/expected.h"
 #include "base/types/optional_ref.h"
 #include "components/autofill/core/browser/autofill_trigger_source.h"
 #include "components/autofill/core/browser/data_model/autofill_ai/entity_instance.h"
@@ -271,7 +272,7 @@ class FormFiller {
       std::string* failure_to_fill);
 
   // Fills `field` and modifies the states needed by the renderer for filling.
-  void FillField(const std::optional<ValueAndTypeAndOverride>& filling_content,
+  void FillField(const ValueAndTypeAndOverride& filling_content,
                  FormFieldData& field,
                  mojom::ActionPersistence action_persistence,
                  AutofillTriggerSource trigger_source,
@@ -296,6 +297,21 @@ class FormFiller {
           skip_reasons,
       const FillingPayload& filling_payload,
       bool is_refill);
+
+  // Similar to the static GetFieldFillingSkipReasons() but adds additional skip
+  // reasons based on `filling_content`.
+  base::flat_map<FieldGlobalId, DenseSet<FieldFillingSkipReason>>
+  GetFieldFillingSkipReasons(
+      const FormStructure& form,
+      const AutofillField& trigger_field,
+      const RefillOptions& refill_options,
+      FillingProduct filling_product,
+      AutofillTriggerSource trigger_source,
+      const AutofillClient& client,
+      base::flat_set<FieldGlobalId> blocked_fields,
+      const base::flat_map<FieldGlobalId,
+                           base::expected<ValueAndTypeAndOverride,
+                                          std::string>>& filling_content);
 
   LogManager* log_manager();
 

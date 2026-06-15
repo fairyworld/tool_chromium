@@ -1098,20 +1098,25 @@ class BrowserAutofillManagerTest
     }
     autofill_client().set_last_committed_primary_main_frame_url(form->url());
 
-    test_api(*form).Append(CreateTestFormField("Name on Card", "nameoncard", "",
-                                               FormControlType::kInputText));
-    test_api(*form).Append(CreateTestFormField("Card Number", "cardnumber", "",
-                                               FormControlType::kInputText));
+    auto append_field = [&](FormFieldData field) {
+      field.set_origin(url::Origin::Create(form->url()));
+      test_api(*form).Append(std::move(field));
+    };
+
+    append_field(CreateTestFormField("Name on Card", "nameoncard", "",
+                                     FormControlType::kInputText));
+    append_field(CreateTestFormField("Card Number", "cardnumber", "",
+                                     FormControlType::kInputText));
     if (use_month_type) {
-      test_api(*form).Append(CreateTestFormField(
-          "Expiration Date", "ccmonth", "", FormControlType::kInputMonth));
+      append_field(CreateTestFormField("Expiration Date", "ccmonth", "",
+                                       FormControlType::kInputMonth));
     } else {
-      test_api(*form).Append(CreateTestFormField(
-          "Expiration Date", "ccmonth", "", FormControlType::kInputText));
-      test_api(*form).Append(
+      append_field(CreateTestFormField("Expiration Date", "ccmonth", "",
+                                       FormControlType::kInputText));
+      append_field(
           CreateTestFormField("", "ccyear", "", FormControlType::kInputText));
     }
-    test_api(*form).Append(
+    append_field(
         CreateTestFormField("CVC", "cvc", "", FormControlType::kInputText));
   }
 
@@ -4069,12 +4074,17 @@ void DoTestFormSubmittedNonAddressControlWithDefaultValue(
   test_api(form).fields().erase(phonenumber_it);
 
   // Insert country code and national phone number fields.
-  test_api(form).Append(CreateTestFormField("Country Code", "countrycode", "1",
-                                            form_control_type,
-                                            "tel-country-code"));
-  test_api(form).Append(CreateTestFormField("Phone Number", "phonenumber", "",
-                                            FormControlType::kInputText,
-                                            "tel-national"));
+  FormFieldData country_code_field =
+      CreateTestFormField("Country Code", "countrycode", "1", form_control_type,
+                          "tel-country-code");
+  country_code_field.set_origin(form.main_frame_origin());
+  test_api(form).Append(std::move(country_code_field));
+
+  FormFieldData phone_number_field =
+      CreateTestFormField("Phone Number", "phonenumber", "",
+                          FormControlType::kInputText, "tel-national");
+  phone_number_field.set_origin(form.main_frame_origin());
+  test_api(form).Append(std::move(phone_number_field));
 
   test->FormsSeen({form});
 
@@ -6896,9 +6906,7 @@ TEST_F(BrowserAutofillManagerTest, FillOrPreviewForm_BlockedFields) {
   EXPECT_CALL(autofill_driver(),
               ApplyFormAction(mojom::FormActionType::kFill,
                               mojom::ActionPersistence::kFill, _, _, _, _,
-                              expected_types, _))
-      .WillOnce(
-          Return(base::flat_set<FieldGlobalId>{form.fields()[0].global_id()}));
+                              expected_types, _));
 
   autofill_manager().FillOrPreviewForm(
       mojom::ActionPersistence::kFill, form.global_id(),
@@ -6932,9 +6940,7 @@ TEST_F(BrowserAutofillManagerTest,
   EXPECT_CALL(autofill_driver(),
               ApplyFormAction(mojom::FormActionType::kFill,
                               mojom::ActionPersistence::kFill, _, _, _, _,
-                              expected_types, _))
-      .WillOnce(
-          Return(base::flat_set<FieldGlobalId>{form.fields()[0].global_id()}));
+                              expected_types, _));
 
   autofill_manager().FillOrPreviewForm(
       mojom::ActionPersistence::kFill, form.global_id(),
