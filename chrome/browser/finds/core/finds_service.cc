@@ -483,7 +483,9 @@ void FindsService::OnHistoryQueryComplete(
   }
 
   opt_guide_service_->ExecuteModel(
-      optimization_guide::ModelBasedCapabilityKey::kFinds, request, {},
+      optimization_guide::ModelBasedCapabilityKey::kFinds, request,
+      optimization_guide::ModelExecutionOptions{
+          .execution_timeout = features::kModelExecutionRequestTimeout.Get()},
       base::BindOnce(&FindsService::OnModelExecutionComplete,
                      weak_ptr_factory_.GetWeakPtr(), std::move(callback)));
 }
