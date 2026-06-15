@@ -954,6 +954,23 @@ BASE_FEATURE(kAutofillThirdPartyModeRestoredOnStart,
              base::FEATURE_ENABLED_BY_DEFAULT);
 #endif  // BUILDFLAG(IS_ANDROID)
 
+// Mitigates side-channel brute-force probing of autofill data by rate-limiting
+// AskForValuesToFill() invocations per RenderFrame via a token bucket.
+BASE_FEATURE(kAutofillThrottleBruteForceProbing,
+             base::FEATURE_ENABLED_BY_DEFAULT);
+
+// The burst budget of AskForValuesToFill() calls permitted per RenderFrame.
+BASE_FEATURE_PARAM(int,
+                   kAutofillThrottleBruteForceProbingMaxTokens,
+                   &kAutofillThrottleBruteForceProbing,
+                   15);
+
+// The rate at which AskForValuesToFill() token budget replenishes.
+BASE_FEATURE_PARAM(base::TimeDelta,
+                   kAutofillThrottleBruteForceProbingReplenishRate,
+                   &kAutofillThrottleBruteForceProbing,
+                   base::Milliseconds(750));
+
 // Enables tracking of user edits to <select> fields that were not autofilled.
 BASE_FEATURE(kAutofillTrackSelectFieldEdits, base::FEATURE_DISABLED_BY_DEFAULT);
 

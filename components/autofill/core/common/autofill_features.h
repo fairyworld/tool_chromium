@@ -329,6 +329,13 @@ BASE_DECLARE_FEATURE(kAutofillThirdPartyModeContentProvider);
 COMPONENT_EXPORT(AUTOFILL)
 BASE_DECLARE_FEATURE(kAutofillThirdPartyModeRestoredOnStart);
 #endif  // BUILDFLAG(IS_ANDROID)
+COMPONENT_EXPORT(AUTOFILL)
+BASE_DECLARE_FEATURE(kAutofillThrottleBruteForceProbing);
+COMPONENT_EXPORT(AUTOFILL)
+BASE_DECLARE_FEATURE_PARAM(int, kAutofillThrottleBruteForceProbingMaxTokens);
+COMPONENT_EXPORT(AUTOFILL)
+BASE_DECLARE_FEATURE_PARAM(base::TimeDelta,
+                           kAutofillThrottleBruteForceProbingReplenishRate);
 COMPONENT_EXPORT(AUTOFILL) BASE_DECLARE_FEATURE(kAutofillTrackSelectFieldEdits);
 COMPONENT_EXPORT(AUTOFILL) BASE_DECLARE_FEATURE(kAutofillUKMExperimentalFields);
 COMPONENT_EXPORT(AUTOFILL)
