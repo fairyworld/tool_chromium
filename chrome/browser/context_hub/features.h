@@ -13,6 +13,9 @@ namespace context_hub::features {
 // all Context Hub features and services are turned off.
 BASE_DECLARE_FEATURE(kContextHub);
 
+// The feature flag for the Auto Todos feature in Context Hub.
+BASE_DECLARE_FEATURE(kAutoTodos);
+
 }  // namespace context_hub::features
 
 #endif  // CHROME_BROWSER_CONTEXT_HUB_FEATURES_H_

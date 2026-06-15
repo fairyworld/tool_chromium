@@ -8,4 +8,6 @@ namespace context_hub::features {
 
 BASE_FEATURE(kContextHub, base::FEATURE_DISABLED_BY_DEFAULT);
 
+BASE_FEATURE(kAutoTodos, base::FEATURE_DISABLED_BY_DEFAULT);
+
 }  // namespace context_hub::features
