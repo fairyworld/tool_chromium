@@ -322,6 +322,7 @@
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
     BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/autofill/at_memory_promo_tracker_factory.h"
+#include "components/enterprise/network_header_injection/core/features.h"  // nogncheck
 #endif
 #if BUILDFLAG(IS_WIN)
 #include "chrome/browser/ui/search_promotion/search_promotion_manager_factory.h"
@@ -987,7 +988,9 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
 #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || \
     BUILDFLAG(IS_WIN)
-  enterprise_custom_headers::HttpHeaderInjectionServiceFactory::GetInstance();
+  if (enterprise_custom_headers::IsHttpHeaderInjectionEnabled()) {
+    enterprise_custom_headers::HttpHeaderInjectionServiceFactory::GetInstance();
+  }
 #endif
 #if BUILDFLAG(ENTERPRISE_WATERMARK)
   enterprise_data_protection::DataProtectionUrlLookupServiceFactory::
