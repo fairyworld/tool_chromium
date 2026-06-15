@@ -9649,7 +9649,6 @@ interface SpeechRecognition : EventTarget
     getter onstart
     getter processLocally
     getter quality
-    getter unspokenPunctuation
     method abort
     method constructor
     method start
@@ -9672,7 +9671,6 @@ interface SpeechRecognition : EventTarget
     setter onstart
     setter processLocally
     setter quality
-    setter unspokenPunctuation
 interface SpeechRecognitionErrorEvent : Event
     attribute @@toStringTag
     getter error
@@ -12236,7 +12234,6 @@ interface webkitSpeechRecognition : EventTarget
     getter onstart
     getter processLocally
     getter quality
-    getter unspokenPunctuation
     method abort
     method constructor
     method start
@@ -12259,7 +12256,6 @@ interface webkitSpeechRecognition : EventTarget
     setter onstart
     setter processLocally
     setter quality
-    setter unspokenPunctuation
 interface webkitSpeechRecognitionError : Event
     attribute @@toStringTag
     getter error
