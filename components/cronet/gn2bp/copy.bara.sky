@@ -44,10 +44,13 @@ origin_files = glob([
     # We don't care about siso, and the contents of the .sisoenv file tend to be
     # non-deterministic, causing spurious diffs.
     "build/config/siso/**",
-  ]) + glob([
-    "components/cronet/**",
-    "testing/**"
-  ]) - glob([
+  ]) + glob(["components/cronet/**"]) - glob([
+    # Don't copy gn2bp itself. It's unnecessary, and can cause confusion when
+    # people unfamiliar with gn2bp try to understand where to run it and where
+    # to make changes. Excluding it makes it clear gn2bp is meant to live in
+    # Chromium and Chromium only. It also avoids Code Search pollution.
+    "components/cronet/gn2bp/**",
+  ]) + glob(["testing/**"]) - glob([
     # Per aosp/2399270
     "testing/buildbot/**",
     # Exclude test files to reduce the number of gn2bp files
