@@ -98,10 +98,9 @@ class OfferNotificationBubbleControllerImplTest
     base::Time expiry = base::Time::Now() + base::Days(2);
     GURL offer_details_url("https://www.google.com/");
     std::string offer_reward_amount = "5%";
-    return autofill::AutofillOfferData::GPayCardLinkedOffer(
-        offer_id, expiry, merchant_origins, offer_details_url,
-        autofill::DisplayStrings(), eligible_instrument_ids,
-        offer_reward_amount);
+    return AutofillOfferData::GPayCardLinkedOffer(
+        offer_id, expiry, merchant_origins, offer_details_url, DisplayStrings(),
+        eligible_instrument_ids, offer_reward_amount);
   }
 
   AutofillOfferData CreateTestGPayPromoCodeOffer(
@@ -109,13 +108,13 @@ class OfferNotificationBubbleControllerImplTest
       const std::string& promo_code) {
     int64_t offer_id = 2468;
     base::Time expiry = base::Time::Now() + base::Days(2);
-    autofill::DisplayStrings display_strings;
+    DisplayStrings display_strings;
     display_strings.value_prop_text = "5% off on shoes. Up to $50.";
     display_strings.see_details_text = "See details";
     display_strings.usage_instructions_text =
         "Click the promo code field at checkout to autofill it.";
     GURL offer_details_url = GURL("https://pay.google.com");
-    return autofill::AutofillOfferData::GPayPromoCodeOffer(
+    return AutofillOfferData::GPayPromoCodeOffer(
         offer_id, expiry, merchant_origins, offer_details_url, display_strings,
         promo_code);
   }
