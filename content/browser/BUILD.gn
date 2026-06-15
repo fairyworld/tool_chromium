@@ -3217,8 +3217,8 @@ source_set("browser") {
       "speech/tts_win.cc",
       "speech/tts_win_utils.cc",
       "speech/tts_win_utils.h",
-      "webnn/webnn_compiler_launcher.cc",
-      "webnn/webnn_compiler_launcher.h",
+      "webnn/webnn_compiler_process_host.cc",
+      "webnn/webnn_compiler_process_host.h",
     ]
     deps += [
       "//components/app_launch_prefetch",
