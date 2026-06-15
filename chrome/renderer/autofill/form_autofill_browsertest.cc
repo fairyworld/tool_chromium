@@ -34,6 +34,7 @@
 #include "components/autofill/core/common/form_data_test_api.h"
 #include "components/autofill/core/common/form_field_data.h"
 #include "components/autofill/core/common/mojom/autofill_types.mojom-shared.h"
+#include "components/autofill/core/common/test_utils/autofill_form_test_utils.h"
 #include "components/autofill/core/common/unique_ids.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -323,28 +324,6 @@ FormData FindForm(const blink::WebFormControlElement& element) {
   return FormData();
 }
 
-// TODO(crbug.com/40765988): Replace this with
-// FormData::IdenticalAndEquivalentDomElements().
-#define EXPECT_FORM_FIELD_DATA_EQUALS(expected, actual)                      \
-  do {                                                                       \
-    EXPECT_EQ(expected.label(), actual.label());                             \
-    EXPECT_EQ(expected.name(), actual.name());                               \
-    EXPECT_EQ(expected.value(), actual.value());                             \
-    EXPECT_EQ(expected.form_control_type(), actual.form_control_type());     \
-    EXPECT_EQ(expected.autocomplete_attribute(),                             \
-              actual.autocomplete_attribute());                              \
-    EXPECT_EQ(expected.parsed_autocomplete(), actual.parsed_autocomplete()); \
-    EXPECT_EQ(expected.placeholder(), actual.placeholder());                 \
-    EXPECT_EQ(expected.max_length(), actual.max_length());                   \
-    EXPECT_EQ(expected.css_classes(), actual.css_classes());                 \
-    EXPECT_EQ(expected.is_autofilled_according_to_renderer(),                \
-              actual.is_autofilled_according_to_renderer());                 \
-    EXPECT_EQ(expected.check_status(), actual.check_status());               \
-    EXPECT_EQ(expected.properties_mask(), actual.properties_mask());         \
-    EXPECT_EQ(expected.id_attribute(), actual.id_attribute());               \
-    EXPECT_EQ(expected.name_attribute(), actual.name_attribute());           \
-  } while (0)
-
 class FormAutofillTest : public test::AutofillRendererTest {
  public:
   FormAutofillTest() = default;
@@ -402,23 +381,22 @@ class FormAutofillTest : public test::AutofillRendererTest {
     ASSERT_EQ(labels.size(), names.size());
     ASSERT_EQ(labels.size(), values.size());
 
-    std::vector<FormFieldData> fields;
+    std::vector<test::CommonFieldDescription> fields;
     for (size_t i = 0; i < labels.size(); ++i) {
-      FormFieldData expected;
-      expected.set_id_attribute(id_attributes[i]);
-      expected.set_name_attribute(name_attributes[i]);
-      expected.set_label(labels[i]);
-      expected.set_name(names[i]);
-      expected.set_value(values[i]);
-      expected.set_form_control_type(FormControlType::kInputText);
-      expected.set_max_length(FormFieldData::kDefaultMaxLength);
-      fields.push_back(expected);
+      fields.push_back({.label = labels[i],
+                        .name = names[i],
+                        .name_attribute = name_attributes[i],
+                        .id_attribute = id_attributes[i],
+                        .value = values[i],
+                        .max_length = FormFieldData::kDefaultMaxLength,
+                        .form_control_type = FormControlType::kInputText});
     }
     ExpectLabelsAndTypes(html, fields);
   }
 
-  void ExpectLabelsAndTypes(const char* html,
-                            const std::vector<FormFieldData>& fields) {
+  void ExpectLabelsAndTypes(
+      const char* html,
+      const std::vector<test::CommonFieldDescription>& fields) {
     LoadHTML(html);
 
     std::vector<FormData> forms = UpdateFormCache().updated_forms;
@@ -431,7 +409,7 @@ class FormAutofillTest : public test::AutofillRendererTest {
 
     for (size_t i = 0; i < fields.size(); ++i) {
       SCOPED_TRACE(base::StringPrintf("i: %" PRIuS, i));
-      EXPECT_FORM_FIELD_DATA_EQUALS(fields[i], form.fields()[i]);
+      EXPECT_THAT(form.fields()[i], test::FormFieldDescriptionEq(fields[i]));
     }
   }
 
@@ -684,38 +662,27 @@ class FormAutofillTest : public test::AutofillRendererTest {
       EXPECT_EQ(GURL("http://abc.com"), form.action());
     }
 
-    const std::vector<FormFieldData>& fields = form.fields();
-    ASSERT_EQ(4U, fields.size());
-
-    FormFieldData expected;
-    expected.set_form_control_type(FormControlType::kInputText);
-    expected.set_max_length(FormFieldData::kDefaultMaxLength);
-
-    expected.set_id_attribute(u"firstname");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"John");
-    expected.set_label(u"John");
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[0]);
-
-    expected.set_id_attribute(u"lastname");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Smith");
-    expected.set_label(u"Smith");
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[1]);
-
-    expected.set_id_attribute(u"email");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"john@example.com");
-    expected.set_label(u"john@example.com");
-    expected.set_autocomplete_attribute("off");
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[2]);
-    expected.set_autocomplete_attribute({});
-
-    expected.set_id_attribute(u"phone");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"1.800.555.1234");
-    expected.set_label(u"1.800.555.1234");
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[3]);
+    EXPECT_THAT(
+        form.fields(),
+        testing::ElementsAre(
+            test::FormFieldDescriptionEq({.label = u"John",
+                                          .name = u"firstname",
+                                          .id_attribute = u"firstname",
+                                          .value = u"John"}),
+            test::FormFieldDescriptionEq({.label = u"Smith",
+                                          .name = u"lastname",
+                                          .id_attribute = u"lastname",
+                                          .value = u"Smith"}),
+            test::FormFieldDescriptionEq({.label = u"john@example.com",
+                                          .name = u"email",
+                                          .id_attribute = u"email",
+                                          .value = u"john@example.com",
+                                          .autocomplete_attribute = "off"}),
+            test::FormFieldDescriptionEq({.label = u"1.800.555.1234",
+                                          .name = u"phone",
+                                          .id_attribute = u"phone",
+                                          .value = u"1.800.555.1234",
+                                          .autocomplete_attribute = ""})));
   }
 
   void TestFindFormForTextAreaElement(const char* html, bool unowned) {
@@ -736,44 +703,29 @@ class FormAutofillTest : public test::AutofillRendererTest {
       EXPECT_EQ(GURL("http://abc.com"), form.action());
     }
 
-    const std::vector<FormFieldData>& fields = form.fields();
-    ASSERT_EQ(4U, fields.size());
-
-    FormFieldData expected;
-
-    expected.set_id_attribute(u"firstname");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"John");
-    expected.set_label(u"John");
-    expected.set_form_control_type(FormControlType::kInputText);
-    expected.set_max_length(FormFieldData::kDefaultMaxLength);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[0]);
-
-    expected.set_id_attribute(u"lastname");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Smith");
-    expected.set_label(u"Smith");
-    expected.set_form_control_type(FormControlType::kInputText);
-    expected.set_max_length(FormFieldData::kDefaultMaxLength);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[1]);
-
-    expected.set_id_attribute(u"email");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"john@example.com");
-    expected.set_label(u"john@example.com");
-    expected.set_autocomplete_attribute("off");
-    expected.set_form_control_type(FormControlType::kInputText);
-    expected.set_max_length(FormFieldData::kDefaultMaxLength);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[2]);
-    expected.set_autocomplete_attribute({});
-
-    expected.set_id_attribute(u"street-address");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"123 Fantasy Ln.\nApt. 42");
-    expected.set_label({});
-    expected.set_form_control_type(FormControlType::kTextArea);
-    expected.set_max_length(FormFieldData::kDefaultMaxLength);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[3]);
+    EXPECT_THAT(
+        form.fields(),
+        testing::ElementsAre(
+            test::FormFieldDescriptionEq({.label = u"John",
+                                          .name = u"firstname",
+                                          .id_attribute = u"firstname",
+                                          .value = u"John"}),
+            test::FormFieldDescriptionEq({.label = u"Smith",
+                                          .name = u"lastname",
+                                          .id_attribute = u"lastname",
+                                          .value = u"Smith"}),
+            test::FormFieldDescriptionEq({.label = u"john@example.com",
+                                          .name = u"email",
+                                          .id_attribute = u"email",
+                                          .value = u"john@example.com",
+                                          .autocomplete_attribute = "off"}),
+            test::FormFieldDescriptionEq(
+                {.label = u"",
+                 .name = u"street-address",
+                 .id_attribute = u"street-address",
+                 .value = u"123 Fantasy Ln.\nApt. 42",
+                 .autocomplete_attribute = "",
+                 .form_control_type = FormControlType::kTextArea})));
   }
 
   void TestFillFormMaxLength(const char* html, bool unowned) {
@@ -792,29 +744,23 @@ class FormAutofillTest : public test::AutofillRendererTest {
       EXPECT_EQ(GURL("http://abc.com"), form.action());
     }
 
-    const std::vector<FormFieldData>& fields = form.fields();
-    ASSERT_EQ(3U, fields.size());
-
-    FormFieldData expected;
-    expected.set_form_control_type(FormControlType::kInputText);
-
-    expected.set_id_attribute(u"firstname");
-    expected.set_name(expected.id_attribute());
-    expected.set_max_length(5);
-    expected.set_is_autofilled_according_to_renderer(false);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[0]);
-
-    expected.set_id_attribute(u"lastname");
-    expected.set_name(expected.id_attribute());
-    expected.set_max_length(7);
-    expected.set_is_autofilled_according_to_renderer(false);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[1]);
-
-    expected.set_id_attribute(u"email");
-    expected.set_name(expected.id_attribute());
-    expected.set_max_length(9);
-    expected.set_is_autofilled_according_to_renderer(false);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[2]);
+    EXPECT_THAT(form.fields(),
+                testing::ElementsAre(
+                    test::FormFieldDescriptionEq(
+                        {.name = u"firstname",
+                         .id_attribute = u"firstname",
+                         .max_length = 5,
+                         .is_autofilled_according_to_renderer = false}),
+                    test::FormFieldDescriptionEq(
+                        {.name = u"lastname",
+                         .id_attribute = u"lastname",
+                         .max_length = 7,
+                         .is_autofilled_according_to_renderer = false}),
+                    test::FormFieldDescriptionEq(
+                        {.name = u"email",
+                         .id_attribute = u"email",
+                         .max_length = 9,
+                         .is_autofilled_according_to_renderer = false})));
 
     // Fill the form.
     test_api(form).field(0).set_value(u"Brother");
@@ -834,31 +780,26 @@ class FormAutofillTest : public test::AutofillRendererTest {
       EXPECT_EQ(GURL("http://abc.com"), form2.action());
     }
 
-    const std::vector<FormFieldData>& fields2 = form2.fields();
-    ASSERT_EQ(3U, fields2.size());
-
-    expected.set_form_control_type(FormControlType::kInputText);
-
-    expected.set_id_attribute(u"firstname");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Broth");
-    expected.set_max_length(5);
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[0]);
-
-    expected.set_id_attribute(u"lastname");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Jonatha");
-    expected.set_max_length(7);
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[1]);
-
-    expected.set_id_attribute(u"email");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"brotherj@");
-    expected.set_max_length(9);
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[2]);
+    EXPECT_THAT(form2.fields(),
+                testing::ElementsAre(
+                    test::FormFieldDescriptionEq(
+                        {.name = u"firstname",
+                         .id_attribute = u"firstname",
+                         .value = u"Broth",
+                         .max_length = 5,
+                         .is_autofilled_according_to_renderer = true}),
+                    test::FormFieldDescriptionEq(
+                        {.name = u"lastname",
+                         .id_attribute = u"lastname",
+                         .value = u"Jonatha",
+                         .max_length = 7,
+                         .is_autofilled_according_to_renderer = true}),
+                    test::FormFieldDescriptionEq(
+                        {.name = u"email",
+                         .id_attribute = u"email",
+                         .value = u"brotherj@",
+                         .max_length = 9,
+                         .is_autofilled_according_to_renderer = true})));
   }
 
   void TestFillFormNegativeMaxLength(const char* html, bool unowned) {
@@ -877,24 +818,14 @@ class FormAutofillTest : public test::AutofillRendererTest {
       EXPECT_EQ(GURL("http://abc.com"), form.action());
     }
 
-    const std::vector<FormFieldData>& fields = form.fields();
-    ASSERT_EQ(3U, fields.size());
-
-    FormFieldData expected;
-    expected.set_form_control_type(FormControlType::kInputText);
-    expected.set_max_length(FormFieldData::kDefaultMaxLength);
-
-    expected.set_id_attribute(u"firstname");
-    expected.set_name(expected.id_attribute());
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[0]);
-
-    expected.set_id_attribute(u"lastname");
-    expected.set_name(expected.id_attribute());
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[1]);
-
-    expected.set_id_attribute(u"email");
-    expected.set_name(expected.id_attribute());
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[2]);
+    EXPECT_THAT(form.fields(),
+                testing::ElementsAre(
+                    test::FormFieldDescriptionEq(
+                        {.name = u"firstname", .id_attribute = u"firstname"}),
+                    test::FormFieldDescriptionEq(
+                        {.name = u"lastname", .id_attribute = u"lastname"}),
+                    test::FormFieldDescriptionEq(
+                        {.name = u"email", .id_attribute = u"email"})));
 
     // Fill the form.
     test_api(form).field(0).set_value(u"Brother");
@@ -911,23 +842,18 @@ class FormAutofillTest : public test::AutofillRendererTest {
       EXPECT_EQ(GURL("http://abc.com"), form2.action());
     }
 
-    const std::vector<FormFieldData>& fields2 = form2.fields();
-    ASSERT_EQ(3U, fields2.size());
-
-    expected.set_id_attribute(u"firstname");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Brother");
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[0]);
-
-    expected.set_id_attribute(u"lastname");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Jonathan");
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[1]);
-
-    expected.set_id_attribute(u"email");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"brotherj@example.com");
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[2]);
+    EXPECT_THAT(
+        form2.fields(),
+        testing::ElementsAre(
+            test::FormFieldDescriptionEq({.name = u"firstname",
+                                          .id_attribute = u"firstname",
+                                          .value = u"Brother"}),
+            test::FormFieldDescriptionEq({.name = u"lastname",
+                                          .id_attribute = u"lastname",
+                                          .value = u"Jonathan"}),
+            test::FormFieldDescriptionEq({.name = u"email",
+                                          .id_attribute = u"email",
+                                          .value = u"brotherj@example.com"})));
   }
 
   void TestFillFormEmptyName(const char* html, bool unowned) {
@@ -946,24 +872,14 @@ class FormAutofillTest : public test::AutofillRendererTest {
       EXPECT_EQ(GURL("http://abc.com"), form.action());
     }
 
-    const std::vector<FormFieldData>& fields = form.fields();
-    ASSERT_EQ(3U, fields.size());
-
-    FormFieldData expected;
-    expected.set_form_control_type(FormControlType::kInputText);
-    expected.set_max_length(FormFieldData::kDefaultMaxLength);
-
-    expected.set_id_attribute(u"firstname");
-    expected.set_name(expected.id_attribute());
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[0]);
-
-    expected.set_id_attribute(u"lastname");
-    expected.set_name(expected.id_attribute());
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[1]);
-
-    expected.set_id_attribute(u"email");
-    expected.set_name(expected.id_attribute());
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[2]);
+    EXPECT_THAT(form.fields(),
+                testing::ElementsAre(
+                    test::FormFieldDescriptionEq(
+                        {.name = u"firstname", .id_attribute = u"firstname"}),
+                    test::FormFieldDescriptionEq(
+                        {.name = u"lastname", .id_attribute = u"lastname"}),
+                    test::FormFieldDescriptionEq(
+                        {.name = u"email", .id_attribute = u"email"})));
 
     // Fill the form.
     test_api(form).field(0).set_value(u"Wyatt");
@@ -980,26 +896,18 @@ class FormAutofillTest : public test::AutofillRendererTest {
       EXPECT_EQ(GURL("http://abc.com"), form2.action());
     }
 
-    const std::vector<FormFieldData>& fields2 = form2.fields();
-    ASSERT_EQ(3U, fields2.size());
-
-    expected.set_form_control_type(FormControlType::kInputText);
-    expected.set_max_length(FormFieldData::kDefaultMaxLength);
-
-    expected.set_id_attribute(u"firstname");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Wyatt");
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[0]);
-
-    expected.set_id_attribute(u"lastname");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Earp");
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[1]);
-
-    expected.set_id_attribute(u"email");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"wyatt@example.com");
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[2]);
+    EXPECT_THAT(
+        form2.fields(),
+        testing::ElementsAre(
+            test::FormFieldDescriptionEq({.name = u"firstname",
+                                          .id_attribute = u"firstname",
+                                          .value = u"Wyatt"}),
+            test::FormFieldDescriptionEq({.name = u"lastname",
+                                          .id_attribute = u"lastname",
+                                          .value = u"Earp"}),
+            test::FormFieldDescriptionEq({.name = u"email",
+                                          .id_attribute = u"email",
+                                          .value = u"wyatt@example.com"})));
   }
 
   void TestFillFormEmptyFormNames(const char* html, bool unowned) {
@@ -1019,28 +927,22 @@ class FormAutofillTest : public test::AutofillRendererTest {
       EXPECT_EQ(GURL("http://abc.com"), form.action());
     }
 
-    const std::vector<FormFieldData>& fields = form.fields();
     const size_t unowned_offset = unowned ? 3 : 0;
-    ASSERT_EQ(unowned_offset + 3, fields.size());
-
-    FormFieldData expected;
-    expected.set_form_control_type(FormControlType::kInputText);
-    expected.set_max_length(FormFieldData::kDefaultMaxLength);
-
-    expected.set_id_attribute(u"apple");
-    expected.set_name(expected.id_attribute());
-    expected.set_is_autofilled_according_to_renderer(false);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[unowned_offset]);
-
-    expected.set_id_attribute(u"banana");
-    expected.set_name(expected.id_attribute());
-    expected.set_is_autofilled_according_to_renderer(false);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[unowned_offset + 1]);
-
-    expected.set_id_attribute(u"cantelope");
-    expected.set_name(expected.id_attribute());
-    expected.set_is_autofilled_according_to_renderer(false);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[unowned_offset + 2]);
+    ASSERT_EQ(unowned_offset + 3, form.fields().size());
+    EXPECT_THAT(base::span(form.fields()).subspan(unowned_offset, 3U),
+                testing::ElementsAre(
+                    test::FormFieldDescriptionEq(
+                        {.name = u"apple",
+                         .id_attribute = u"apple",
+                         .is_autofilled_according_to_renderer = false}),
+                    test::FormFieldDescriptionEq(
+                        {.name = u"banana",
+                         .id_attribute = u"banana",
+                         .is_autofilled_according_to_renderer = false}),
+                    test::FormFieldDescriptionEq(
+                        {.name = u"cantelope",
+                         .id_attribute = u"cantelope",
+                         .is_autofilled_according_to_renderer = false})));
 
     // Fill the form.
     test_api(form).field(unowned_offset + 0).set_value(u"Red");
@@ -1066,26 +968,24 @@ class FormAutofillTest : public test::AutofillRendererTest {
       EXPECT_EQ(GURL("http://abc.com"), form2.action());
     }
 
-    const std::vector<FormFieldData>& fields2 = form2.fields();
-    ASSERT_EQ(unowned_offset + 3, fields2.size());
-
-    expected.set_id_attribute(u"apple");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Red");
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[unowned_offset + 0]);
-
-    expected.set_id_attribute(u"banana");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Yellow");
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[unowned_offset + 1]);
-
-    expected.set_id_attribute(u"cantelope");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Also Yellow");
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[unowned_offset + 2]);
+    ASSERT_EQ(unowned_offset + 3, form2.fields().size());
+    EXPECT_THAT(base::span(form2.fields()).subspan(unowned_offset, 3U),
+                testing::ElementsAre(
+                    test::FormFieldDescriptionEq(
+                        {.name = u"apple",
+                         .id_attribute = u"apple",
+                         .value = u"Red",
+                         .is_autofilled_according_to_renderer = true}),
+                    test::FormFieldDescriptionEq(
+                        {.name = u"banana",
+                         .id_attribute = u"banana",
+                         .value = u"Yellow",
+                         .is_autofilled_according_to_renderer = true}),
+                    test::FormFieldDescriptionEq(
+                        {.name = u"cantelope",
+                         .id_attribute = u"cantelope",
+                         .value = u"Also Yellow",
+                         .is_autofilled_according_to_renderer = true})));
   }
 
   void TestFillFormNonEmptyField(const char* html,
@@ -1104,7 +1004,8 @@ class FormAutofillTest : public test::AutofillRendererTest {
     WebInputElement input_element = GetInputElementById("firstname");
 
     // Simulate typing by modifying the field value.
-    input_element.SetValue(WebString::FromAscii("Wy"));
+    constexpr std::string_view kNewFirstnameValue = "Wy";
+    input_element.SetValue(WebString::FromAscii(kNewFirstnameValue));
 
     // Find the form that contains the input element.
     FormData form = FindForm(input_element);
@@ -1113,54 +1014,46 @@ class FormAutofillTest : public test::AutofillRendererTest {
       EXPECT_EQ(GURL("http://abc.com"), form.action());
     }
 
-    const std::vector<FormFieldData>& fields = form.fields();
-    ASSERT_EQ(3U, fields.size());
-
-    FormFieldData expected;
-    expected.set_form_control_type(FormControlType::kInputText);
-    expected.set_max_length(FormFieldData::kDefaultMaxLength);
-
-    expected.set_id_attribute(u"firstname");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Wy");
-    if (placeholder_firstname) {
-      expected.set_label(ASCIIToUTF16(placeholder_firstname));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_firstname));
-    }
-    expected.set_is_autofilled_according_to_renderer(false);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[0]);
-
-    expected.set_id_attribute(u"lastname");
-    expected.set_name(expected.id_attribute());
-    if (initial_lastname) {
-      expected.set_label(ASCIIToUTF16(initial_lastname));
-      expected.set_value(ASCIIToUTF16(initial_lastname));
-    } else if (placeholder_lastname) {
-      expected.set_label(ASCIIToUTF16(placeholder_lastname));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_lastname));
-      expected.set_value(ASCIIToUTF16(placeholder_lastname));
-    } else {
-      expected.set_label({});
-      expected.set_value({});
-    }
-    expected.set_is_autofilled_according_to_renderer(false);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[1]);
-
-    expected.set_id_attribute(u"email");
-    expected.set_name(expected.id_attribute());
-    if (initial_email) {
-      expected.set_label(ASCIIToUTF16(initial_email));
-      expected.set_value(ASCIIToUTF16(initial_email));
-    } else if (placeholder_email) {
-      expected.set_label(ASCIIToUTF16(placeholder_email));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_email));
-      expected.set_value(ASCIIToUTF16(placeholder_email));
-    } else {
-      expected.set_label({});
-      expected.set_value({});
-    }
-    expected.set_is_autofilled_according_to_renderer(false);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[2]);
+    const std::u16string firstname_label =
+        placeholder_firstname ? ASCIIToUTF16(placeholder_firstname) : u"";
+    const std::u16string firstname_placeholder =
+        placeholder_firstname ? ASCIIToUTF16(placeholder_firstname) : u"";
+    const std::u16string lastname_label =
+        initial_lastname
+            ? ASCIIToUTF16(initial_lastname)
+            : (placeholder_lastname ? ASCIIToUTF16(placeholder_lastname) : u"");
+    const std::u16string lastname_placeholder =
+        placeholder_lastname ? ASCIIToUTF16(placeholder_lastname) : u"";
+    const std::u16string email_label =
+        initial_email
+            ? ASCIIToUTF16(initial_email)
+            : (placeholder_email ? ASCIIToUTF16(placeholder_email) : u"");
+    const std::u16string email_placeholder =
+        placeholder_email ? ASCIIToUTF16(placeholder_email) : u"";
+    EXPECT_THAT(
+        form.fields(),
+        testing::ElementsAre(
+            test::FormFieldDescriptionEq(
+                {.label = firstname_label,
+                 .name = u"firstname",
+                 .id_attribute = u"firstname",
+                 .value = base::UTF8ToUTF16(kNewFirstnameValue),
+                 .placeholder = firstname_placeholder,
+                 .is_autofilled_according_to_renderer = false}),
+            test::FormFieldDescriptionEq(
+                {.label = lastname_label,
+                 .name = u"lastname",
+                 .id_attribute = u"lastname",
+                 .value = lastname_label,
+                 .placeholder = !initial_lastname ? lastname_placeholder : u"",
+                 .is_autofilled_according_to_renderer = false}),
+            test::FormFieldDescriptionEq(
+                {.label = email_label,
+                 .name = u"email",
+                 .id_attribute = u"email",
+                 .value = email_label,
+                 .placeholder = !initial_email ? email_placeholder : u"",
+                 .is_autofilled_according_to_renderer = false})));
 
     // Preview the form and verify that the cursor position has been updated.
     test_api(form).field(0).set_value(u"Wyatt");
@@ -1187,47 +1080,29 @@ class FormAutofillTest : public test::AutofillRendererTest {
       EXPECT_EQ(GURL("http://abc.com"), form2.action());
     }
 
-    const std::vector<FormFieldData>& fields2 = form2.fields();
-    ASSERT_EQ(3U, fields2.size());
-
-    expected.set_id_attribute(u"firstname");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Wyatt");
-    if (placeholder_firstname) {
-      expected.set_label(ASCIIToUTF16(placeholder_firstname));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_firstname));
-    } else {
-      expected.set_label({});
-      expected.set_placeholder({});
-    }
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[0]);
-
-    expected.set_id_attribute(u"lastname");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Earp");
-    if (placeholder_lastname) {
-      expected.set_label(ASCIIToUTF16(placeholder_lastname));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_lastname));
-    } else {
-      expected.set_label({});
-      expected.set_placeholder({});
-    }
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[1]);
-
-    expected.set_id_attribute(u"email");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"wyatt@example.com");
-    if (placeholder_email) {
-      expected.set_label(ASCIIToUTF16(placeholder_email));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_email));
-    } else {
-      expected.set_label({});
-      expected.set_placeholder({});
-    }
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[2]);
+    EXPECT_THAT(form2.fields(),
+                testing::ElementsAre(
+                    test::FormFieldDescriptionEq(
+                        {.label = firstname_placeholder,
+                         .name = u"firstname",
+                         .id_attribute = u"firstname",
+                         .value = u"Wyatt",
+                         .placeholder = firstname_placeholder,
+                         .is_autofilled_according_to_renderer = true}),
+                    test::FormFieldDescriptionEq(
+                        {.label = lastname_placeholder,
+                         .name = u"lastname",
+                         .id_attribute = u"lastname",
+                         .value = u"Earp",
+                         .placeholder = lastname_placeholder,
+                         .is_autofilled_according_to_renderer = true}),
+                    test::FormFieldDescriptionEq(
+                        {.label = email_placeholder,
+                         .name = u"email",
+                         .id_attribute = u"email",
+                         .value = u"wyatt@example.com",
+                         .placeholder = email_placeholder,
+                         .is_autofilled_according_to_renderer = true})));
 
     // Verify that the cursor position has been updated.
     EXPECT_EQ(5u, input_element.SelectionStart());
@@ -1431,13 +1306,9 @@ TEST_F(FormAutofillTest, WebFormControlElementToFormField) {
   WebFormControlElementToFormFieldForTesting(WebFormElement(), element, nullptr,
                                              &result);
 
-  FormFieldData expected;
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  expected.set_id_attribute(u"element");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"value");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, result);
+  EXPECT_THAT(result, test::FormFieldDescriptionEq({.name = u"element",
+                                                    .id_attribute = u"element",
+                                                    .value = u"value"}));
 }
 
 // We should be able to extract a text field with autocomplete="off".
@@ -1452,14 +1323,11 @@ TEST_F(FormAutofillTest, WebFormControlElementToFormFieldAutocompleteOff) {
   WebFormControlElementToFormFieldForTesting(WebFormElement(), element, nullptr,
                                              &result);
 
-  FormFieldData expected;
-  expected.set_id_attribute(u"element");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"value");
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_autocomplete_attribute("off");
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, result);
+  EXPECT_THAT(result,
+              test::FormFieldDescriptionEq({.name = u"element",
+                                            .id_attribute = u"element",
+                                            .value = u"value",
+                                            .autocomplete_attribute = "off"}));
 }
 
 // We should be able to extract a text field with maxlength specified.
@@ -1474,13 +1342,10 @@ TEST_F(FormAutofillTest, WebFormControlElementToFormFieldMaxLength) {
   WebFormControlElementToFormFieldForTesting(WebFormElement(), element, nullptr,
                                              &result);
 
-  FormFieldData expected;
-  expected.set_id_attribute(u"element");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"value");
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(5);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, result);
+  EXPECT_THAT(result, test::FormFieldDescriptionEq({.name = u"element",
+                                                    .id_attribute = u"element",
+                                                    .value = u"value",
+                                                    .max_length = 5}));
 }
 
 // We should be able to extract a text field that has been autofilled.
@@ -1496,14 +1361,11 @@ TEST_F(FormAutofillTest, WebFormControlElementToFormFieldAutofilled) {
   WebFormControlElementToFormFieldForTesting(WebFormElement(), element, nullptr,
                                              &result);
 
-  FormFieldData expected;
-  expected.set_id_attribute(u"element");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"value");
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  expected.set_is_autofilled_according_to_renderer(true);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, result);
+  EXPECT_THAT(result, test::FormFieldDescriptionEq(
+                          {.name = u"element",
+                           .id_attribute = u"element",
+                           .value = u"value",
+                           .is_autofilled_according_to_renderer = true}));
 }
 
 // We should be able to extract a <select> field.
@@ -1521,20 +1383,15 @@ TEST_F(FormAutofillTest, WebFormControlElementToFormFieldSelect) {
   WebFormControlElementToFormFieldForTesting(WebFormElement(), element, nullptr,
                                              &result);
 
-  FormFieldData expected;
-  expected.set_id_attribute(u"element");
-  expected.set_name(expected.id_attribute());
-  expected.set_max_length(0);
-  expected.set_form_control_type(FormControlType::kSelectOne);
-
-  expected.set_value(u"CA");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, result);
-  EXPECT_EQ(result.selected_option_text(), u"California");
-  ASSERT_EQ(2U, result.options().size());
-  EXPECT_EQ(u"CA", result.options()[0].value);
-  EXPECT_EQ(u"California", result.options()[0].text);
-  EXPECT_EQ(u"TX", result.options()[1].value);
-  EXPECT_EQ(u"Texas", result.options()[1].text);
+  EXPECT_THAT(result,
+              test::FormFieldDescriptionEq(
+                  {.name = u"element",
+                   .id_attribute = u"element",
+                   .value = u"CA",
+                   .max_length = 0,
+                   .form_control_type = FormControlType::kSelectOne,
+                   .select_options = {{{.value = u"CA", .text = u"California"},
+                                       {.value = u"TX", .text = u"Texas"}}}}));
 }
 
 // We copy extra attributes for the select field.
@@ -1551,25 +1408,21 @@ TEST_F(FormAutofillTest,
   WebFormControlElement element = GetFormControlElementById("element");
   element.SetAutofillState(WebAutofillState::kAutofilled);
 
-  FormFieldData result1;
+  FormFieldData result;
   WebFormControlElementToFormFieldForTesting(WebFormElement(), element, nullptr,
-                                             &result1);
+                                             &result);
 
-  FormFieldData expected;
-  expected.set_id_attribute(u"element");
-  expected.set_name(expected.id_attribute());
-  expected.set_max_length(0);
-  expected.set_form_control_type(FormControlType::kSelectOne);
-  // We check that the extra attributes have been copied to `result1`.
-  expected.set_is_autofilled_according_to_renderer(true);
-  expected.set_autocomplete_attribute("off");
-  expected.set_should_autocomplete(false);
-  expected.set_is_focusable(true);
-  expected.set_is_visible(true);
-  expected.set_text_direction(base::i18n::LEFT_TO_RIGHT);
-
-  expected.set_value(u"CA");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, result1);
+  // Check that the extra attributes have been copied to `result`.
+  EXPECT_THAT(result, test::FormFieldDescriptionEq(
+                          {.is_focusable = true,
+                           .is_visible = true,
+                           .name = u"element",
+                           .id_attribute = u"element",
+                           .value = u"CA",
+                           .max_length = 0,
+                           .autocomplete_attribute = "off",
+                           .form_control_type = FormControlType::kSelectOne,
+                           .text_direction = base::i18n::LEFT_TO_RIGHT}));
 }
 
 // When faced with <select> field with *many* options, we should trim them to a
@@ -1648,15 +1501,12 @@ spans multiple lines.</textarea>)");
   WebFormControlElementToFormFieldForTesting(WebFormElement(), element, nullptr,
                                              &result);
 
-  FormFieldData expected;
-  expected.set_id_attribute(u"element");
-  expected.set_name(expected.id_attribute());
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  expected.set_form_control_type(FormControlType::kTextArea);
-  expected.set_value(
-      u"This element's value\n"
-      u"spans multiple lines.");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, result);
+  EXPECT_THAT(result, test::FormFieldDescriptionEq(
+                          {.name = u"element",
+                           .id_attribute = u"element",
+                           .value = u"This element's value\n"
+                                    u"spans multiple lines.",
+                           .form_control_type = FormControlType::kTextArea}));
 }
 
 // We should be able to extract an <input type=month> field.
@@ -1672,13 +1522,12 @@ TEST_F(FormAutofillTest, WebFormControlElementToFormFieldMonthInput) {
   WebFormControlElementToFormFieldForTesting(WebFormElement(), element, nullptr,
                                              &result);
 
-  FormFieldData expected;
-  expected.set_id_attribute(u"element");
-  expected.set_name(expected.id_attribute());
-  expected.set_max_length(0);
-  expected.set_form_control_type(FormControlType::kInputMonth);
-  expected.set_value(u"2011-12");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, result);
+  EXPECT_THAT(result, test::FormFieldDescriptionEq(
+                          {.name = u"element",
+                           .id_attribute = u"element",
+                           .value = u"2011-12",
+                           .max_length = 0,
+                           .form_control_type = FormControlType::kInputMonth}));
 }
 
 // We should be able to extract password fields.
@@ -1695,13 +1544,12 @@ TEST_F(FormAutofillTest, WebFormControlElementToPasswordFormField) {
   WebFormControlElementToFormFieldForTesting(element.Form(), element, nullptr,
                                              &result);
 
-  FormFieldData expected;
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  expected.set_id_attribute(u"password");
-  expected.set_name(expected.id_attribute());
-  expected.set_form_control_type(FormControlType::kInputPassword);
-  expected.set_value(u"secret");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, result);
+  EXPECT_THAT(result,
+              test::FormFieldDescriptionEq(
+                  {.name = u"password",
+                   .id_attribute = u"password",
+                   .value = u"secret",
+                   .form_control_type = FormControlType::kInputPassword}));
 }
 
 // We should be able to extract the autocompletetype attribute.
@@ -1771,22 +1619,23 @@ TEST_F(FormAutofillTest, WebFormControlElementToFormFieldAutocompletetype) {
     WebFormControlElementToFormFieldForTesting(WebFormElement(), element,
                                                nullptr, &result);
 
-    FormFieldData expected;
-    expected.set_id_attribute(ASCIIToUTF16(test_case.element_id));
-    expected.set_name(expected.id_attribute());
-    expected.set_form_control_type(test_case.form_control_type);
-    expected.set_max_length(
-        (test_case.form_control_type == FormControlType::kInputText ||
-         test_case.form_control_type == FormControlType::kTextArea)
-            ? FormFieldData::kDefaultMaxLength
-            : 0);
-    expected.set_autocomplete_attribute(test_case.autocomplete_attribute);
-    expected.set_parsed_autocomplete(
-        ParseAutocompleteAttribute(test_case.autocomplete_attribute));
-    expected.set_value(ASCIIToUTF16(test_case.value));
-
     SCOPED_TRACE(test_case.element_id);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, result);
+
+    EXPECT_THAT(
+        result,
+        test::FormFieldDescriptionEq(
+            {.name = ASCIIToUTF16(test_case.element_id),
+             .id_attribute = ASCIIToUTF16(test_case.element_id),
+             .value = ASCIIToUTF16(test_case.value),
+             .max_length =
+                 (test_case.form_control_type == FormControlType::kInputText ||
+                  test_case.form_control_type == FormControlType::kTextArea)
+                     ? FormFieldData::kDefaultMaxLength
+                     : 0,
+             .autocomplete_attribute = test_case.autocomplete_attribute,
+             .parsed_autocomplete =
+                 ParseAutocompleteAttribute(test_case.autocomplete_attribute),
+             .form_control_type = test_case.form_control_type}));
   }
 }
 
@@ -1971,64 +1820,57 @@ TEST_F(FormAutofillTest, WebFormElementToFormData) {
   EXPECT_EQ(GetFormRendererId(forms[0]), form.renderer_id());
   EXPECT_EQ(GURL("http://cnn.com/submit/"), form.action());
 
-  const std::vector<FormFieldData>& fields = form.fields();
-  ASSERT_EQ(6U, fields.size());
+  EXPECT_THAT(form.fields(),
+              testing::ElementsAre(
+                  test::FormFieldDescriptionEq(
+                      {.label = u"First name:",
+                       .name = u"firstname",
+                       .id_attribute = u"firstname",
+                       .value = u"John",
+                       .max_length = FormFieldData::kDefaultMaxLength,
+                       .form_control_type = FormControlType::kInputText}),
+                  test::FormFieldDescriptionEq(
+                      {.label = u"Last name:",
+                       .name = u"lastname",
+                       .id_attribute = u"lastname",
+                       .value = u"Smith",
+                       .max_length = FormFieldData::kDefaultMaxLength,
+                       .form_control_type = FormControlType::kInputText}),
+                  test::FormFieldDescriptionEq(
+                      {.label = u"Address:",
+                       .name = u"street-address",
+                       .id_attribute = u"street-address",
+                       .value = u"123 Fantasy Ln.\nApt. 42",
+                       .max_length = FormFieldData::kDefaultMaxLength,
+                       .form_control_type = FormControlType::kTextArea}),
+                  test::FormFieldDescriptionEq(
+                      {.label = u"State:",
+                       .name = u"state",
+                       .id_attribute = u"state",
+                       .value = u"CA",
+                       .max_length = 0,
+                       .form_control_type = FormControlType::kSelectOne}),
+                  test::FormFieldDescriptionEq(
+                      {.label = u"Password:",
+                       .name = u"password",
+                       .id_attribute = u"password",
+                       .value = u"secret",
+                       .max_length = FormFieldData::kDefaultMaxLength,
+                       .form_control_type = FormControlType::kInputPassword}),
+                  test::FormFieldDescriptionEq(
+                      {.label = u"Card expiration:",
+                       .name = u"month",
+                       .id_attribute = u"month",
+                       .value = u"2011-12",
+                       .max_length = 0,
+                       .form_control_type = FormControlType::kInputMonth})));
 
-  FormFieldData expected;
-  expected.set_id_attribute(u"firstname");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"John");
-  expected.set_label(u"First name:");
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[0]);
-
-  expected.set_id_attribute(u"lastname");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"Smith");
-  expected.set_label(u"Last name:");
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[1]);
-
-  expected.set_id_attribute(u"street-address");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"123 Fantasy Ln.\nApt. 42");
-  expected.set_label(u"Address:");
-  expected.set_form_control_type(FormControlType::kTextArea);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[2]);
-
-  expected.set_id_attribute(u"state");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"CA");
-  expected.set_label(u"State:");
-  expected.set_form_control_type(FormControlType::kSelectOne);
-  expected.set_max_length(0);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[3]);
-
-  expected.set_id_attribute(u"password");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"secret");
-  expected.set_label(u"Password:");
-  expected.set_form_control_type(FormControlType::kInputPassword);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[4]);
-
-  expected.set_id_attribute(u"month");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"2011-12");
-  expected.set_label(u"Card expiration:");
-  expected.set_form_control_type(FormControlType::kInputMonth);
-  expected.set_max_length(0);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[5]);
-
-  // Check renderer_id.
-  std::vector<WebFormControlElement> form_control_elements =
-      forms[0].GetFormControlElements();
-  for (size_t i = 0; i < fields.size(); ++i)
-    EXPECT_EQ(GetFieldRendererId(form_control_elements[i]),
-              fields[i].renderer_id());
+  // Check that the `renderer_id`s of the extracted `form.fields()` match the
+  // IDs of the form control elements.
+  EXPECT_EQ(base::ToVector(form.fields(), &FormFieldData::renderer_id),
+            base::ToVector(GetOwnedAutofillableFormControls(
+                               forms[0].GetDocument(), forms[0]),
+                           &GetFieldRendererId));
 }
 
 TEST_F(FormAutofillTest, WebFormElementConsiderNonControlLabelableElements) {
@@ -2048,9 +1890,8 @@ TEST_F(FormAutofillTest, WebFormElementConsiderNonControlLabelableElements) {
 
   FormData form = *ExtractFormData(web_form);
 
-  const std::vector<FormFieldData>& fields = form.fields();
-  ASSERT_EQ(1U, fields.size());
-  EXPECT_EQ(u"firstname", fields[0].name());
+  EXPECT_THAT(form.fields(), testing::ElementsAre(test::FormFieldDescriptionEq(
+                                 {.name = u"firstname"})));
 }
 
 // We should not be able to serialize a form with too many fillable fields.
@@ -2129,10 +1970,11 @@ TEST_F(FormAutofillTest, WebFormElementToFormData_AutocompleteOff_OnField) {
   ASSERT_TRUE(web_form);
 
   FormData form = *ExtractFormData(web_form);
-  ASSERT_EQ(3U, form.fields().size());
-  EXPECT_FALSE(form.fields()[0].should_autocomplete());
-  EXPECT_TRUE(form.fields()[1].should_autocomplete());
-  EXPECT_TRUE(form.fields()[2].should_autocomplete());
+  EXPECT_THAT(form.fields(),
+              testing::ElementsAre(
+                  test::FormFieldDescriptionEq({.should_autocomplete = false}),
+                  test::FormFieldDescriptionEq({.should_autocomplete = true}),
+                  test::FormFieldDescriptionEq({.should_autocomplete = true})));
 }
 
 // `should_autocomplete` must be set to false for the field with
@@ -2150,8 +1992,8 @@ TEST_F(FormAutofillTest, WebFormElementToFormData_AutocompleteOff_OneTimeCode) {
   ASSERT_TRUE(web_form);
 
   FormData form = *ExtractFormData(web_form);
-  ASSERT_EQ(1U, form.fields().size());
-  EXPECT_FALSE(form.fields()[0].should_autocomplete());
+  EXPECT_THAT(form.fields(), testing::ElementsAre(test::FormFieldDescriptionEq(
+                                 {.should_autocomplete = false})));
 }
 
 // Tests CSS classes are set.
@@ -2171,10 +2013,12 @@ TEST_F(FormAutofillTest, WebFormElementToFormData_CssClasses) {
   ASSERT_TRUE(web_form);
 
   FormData form = *ExtractFormData(web_form);
-  ASSERT_EQ(3U, form.fields().size());
-  EXPECT_EQ(u"firstname_field", form.fields()[0].css_classes());
-  EXPECT_EQ(u"lastname_field", form.fields()[1].css_classes());
-  EXPECT_EQ(std::u16string(), form.fields()[2].css_classes());
+  EXPECT_THAT(
+      form.fields(),
+      testing::ElementsAre(
+          test::FormFieldDescriptionEq({.css_classes = u"firstname_field"}),
+          test::FormFieldDescriptionEq({.css_classes = u"lastname_field"}),
+          test::FormFieldDescriptionEq({.css_classes = u""})));
 }
 
 // Tests id attributes are set.
@@ -2195,25 +2039,21 @@ TEST_F(FormAutofillTest, WebFormElementToFormData_IdAttributes) {
   ASSERT_TRUE(web_form);
 
   FormData form = *ExtractFormData(web_form);
-  EXPECT_EQ(4U, form.fields().size());
-
-  // id attributes.
-  EXPECT_EQ(u"firstname", form.fields()[0].id_attribute());
-  EXPECT_EQ(u"lastname", form.fields()[1].id_attribute());
-  EXPECT_EQ(u"same", form.fields()[2].id_attribute());
-  EXPECT_EQ(u"addressline1", form.fields()[3].id_attribute());
-
-  // name attributes.
-  EXPECT_EQ(u"name1", form.fields()[0].name_attribute());
-  EXPECT_EQ(u"name2", form.fields()[1].name_attribute());
-  EXPECT_EQ(u"same", form.fields()[2].name_attribute());
-  EXPECT_EQ(u"", form.fields()[3].name_attribute());
-
-  // name for autofill
-  EXPECT_EQ(u"name1", form.fields()[0].name());
-  EXPECT_EQ(u"name2", form.fields()[1].name());
-  EXPECT_EQ(u"same", form.fields()[2].name());
-  EXPECT_EQ(u"addressline1", form.fields()[3].name());
+  EXPECT_THAT(
+      form.fields(),
+      testing::ElementsAre(
+          test::FormFieldDescriptionEq({.name = u"name1",
+                                        .name_attribute = u"name1",
+                                        .id_attribute = u"firstname"}),
+          test::FormFieldDescriptionEq({.name = u"name2",
+                                        .name_attribute = u"name2",
+                                        .id_attribute = u"lastname"}),
+          test::FormFieldDescriptionEq({.name = u"same",
+                                        .name_attribute = u"same",
+                                        .id_attribute = u"same"}),
+          test::FormFieldDescriptionEq({.name = u"addressline1",
+                                        .name_attribute = u"",
+                                        .id_attribute = u"addressline1"})));
 }
 
 TEST_F(FormAutofillTest, ExtractForms) {
@@ -2248,56 +2088,42 @@ TEST_F(FormAutofillTest, ExtractMultipleForms) {
   EXPECT_EQ(u"TestForm", form.name());
   EXPECT_EQ(GURL("http://cnn.com"), form.action());
 
-  const std::vector<FormFieldData>& fields = form.fields();
-  ASSERT_EQ(3U, fields.size());
-
-  FormFieldData expected;
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-
-  expected.set_id_attribute(u"firstname");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"John");
-  expected.set_label(u"John");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[0]);
-
-  expected.set_id_attribute(u"lastname");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"Smith");
-  expected.set_label(u"Smith");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[1]);
-
-  expected.set_id_attribute(u"email");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"john@example.com");
-  expected.set_label(u"john@example.com");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[2]);
+  EXPECT_THAT(
+      form.fields(),
+      testing::ElementsAre(
+          test::FormFieldDescriptionEq({.label = u"John",
+                                        .name = u"firstname",
+                                        .id_attribute = u"firstname",
+                                        .value = u"John"}),
+          test::FormFieldDescriptionEq({.label = u"Smith",
+                                        .name = u"lastname",
+                                        .id_attribute = u"lastname",
+                                        .value = u"Smith"}),
+          test::FormFieldDescriptionEq({.label = u"john@example.com",
+                                        .name = u"email",
+                                        .id_attribute = u"email",
+                                        .value = u"john@example.com"})));
 
   // Second form.
   const FormData& form2 = forms[1];
   EXPECT_EQ(u"TestForm2", form2.name());
   EXPECT_EQ(GURL("http://zoo.com"), form2.action());
 
-  const std::vector<FormFieldData>& fields2 = form2.fields();
-  ASSERT_EQ(3U, fields2.size());
-
-  expected.set_id_attribute(u"firstname");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"Jack");
-  expected.set_label(u"Jack");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[0]);
-
-  expected.set_id_attribute(u"lastname");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"Adams");
-  expected.set_label(u"Adams");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[1]);
-
-  expected.set_id_attribute(u"email");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"jack@example.com");
-  expected.set_label(u"jack@example.com");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[2]);
+  EXPECT_THAT(
+      form2.fields(),
+      testing::ElementsAre(
+          test::FormFieldDescriptionEq({.label = u"Jack",
+                                        .name = u"firstname",
+                                        .id_attribute = u"firstname",
+                                        .value = u"Jack"}),
+          test::FormFieldDescriptionEq({.label = u"Adams",
+                                        .name = u"lastname",
+                                        .id_attribute = u"lastname",
+                                        .value = u"Adams"}),
+          test::FormFieldDescriptionEq({.label = u"jack@example.com",
+                                        .name = u"email",
+                                        .id_attribute = u"email",
+                                        .value = u"jack@example.com"})));
 }
 
 TEST_F(FormAutofillTest, OnlyExtractNewForms) {
@@ -2328,36 +2154,24 @@ TEST_F(FormAutofillTest, OnlyExtractNewForms) {
   forms = UpdateFormCache().updated_forms;
   ASSERT_EQ(1U, forms.size());
 
-  const std::vector<FormFieldData>& fields = forms[0].fields();
-  ASSERT_EQ(4U, fields.size());
-
-  FormFieldData expected;
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-
-  expected.set_id_attribute(u"firstname");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"John");
-  expected.set_label(u"John");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[0]);
-
-  expected.set_id_attribute(u"lastname");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"Smith");
-  expected.set_label(u"Smith");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[1]);
-
-  expected.set_id_attribute(u"email");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"john@example.com");
-  expected.set_label(u"john@example.com");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[2]);
-
-  expected.set_id_attribute(u"telephone");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"12345");
-  expected.set_label({});
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[3]);
+  EXPECT_THAT(forms[0].fields(),
+              testing::ElementsAre(
+                  test::FormFieldDescriptionEq({.label = u"John",
+                                                .name = u"firstname",
+                                                .id_attribute = u"firstname",
+                                                .value = u"John"}),
+                  test::FormFieldDescriptionEq({.label = u"Smith",
+                                                .name = u"lastname",
+                                                .id_attribute = u"lastname",
+                                                .value = u"Smith"}),
+                  test::FormFieldDescriptionEq({.label = u"john@example.com",
+                                                .name = u"email",
+                                                .id_attribute = u"email",
+                                                .value = u"john@example.com"}),
+                  test::FormFieldDescriptionEq({.label = u"",
+                                                .name = u"telephone",
+                                                .id_attribute = u"telephone",
+                                                .value = u"12345"})));
 
   forms.clear();
 
@@ -2388,26 +2202,21 @@ TEST_F(FormAutofillTest, OnlyExtractNewForms) {
   forms = UpdateFormCache().updated_forms;
   ASSERT_EQ(1U, forms.size());
 
-  const std::vector<FormFieldData>& fields2 = forms[0].fields();
-  ASSERT_EQ(3U, fields2.size());
-
-  expected.set_id_attribute(u"second_firstname");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"Bob");
-  expected.set_label({});
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[0]);
-
-  expected.set_id_attribute(u"second_lastname");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"Hope");
-  expected.set_label({});
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[1]);
-
-  expected.set_id_attribute(u"second_email");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"bobhope@example.com");
-  expected.set_label({});
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[2]);
+  EXPECT_THAT(
+      forms[0].fields(),
+      testing::ElementsAre(
+          test::FormFieldDescriptionEq({.label = u"",
+                                        .name = u"second_firstname",
+                                        .id_attribute = u"second_firstname",
+                                        .value = u"Bob"}),
+          test::FormFieldDescriptionEq({.label = u"",
+                                        .name = u"second_lastname",
+                                        .id_attribute = u"second_lastname",
+                                        .value = u"Hope"}),
+          test::FormFieldDescriptionEq({.label = u"",
+                                        .name = u"second_email",
+                                        .id_attribute = u"second_email",
+                                        .value = u"bobhope@example.com"})));
 }
 
 // We should not report additional forms for empty forms.
@@ -2948,53 +2757,38 @@ TEST_F(FormAutofillTest, LabelsInferredFromPreviousTD) {
 // inferred.
 // Also <!-- comment --> is excluded.
 TEST_F(FormAutofillTest, LabelsInferredFromTableWithSpecialElements) {
-  FormFieldData expected;
-  std::vector<FormFieldData> fields;
-
-  expected.set_id_attribute(u"firstname");
-  expected.set_name_attribute(u"");
-  expected.set_label(u"* First Name");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"John");
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  fields.push_back(expected);
-
-  expected.set_id_attribute(u"middlename");
-  expected.set_name_attribute(u"");
-  expected.set_label(u"* Middle Name");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"Joe");
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  fields.push_back(expected);
-
-  expected.set_id_attribute(u"lastname");
-  expected.set_name_attribute(u"");
-  expected.set_label(u"* Last Name");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"Smith");
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  fields.push_back(expected);
-
-  expected.set_id_attribute(u"country");
-  expected.set_name_attribute(u"");
-  expected.set_label(u"* Country");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"US");
-  expected.set_form_control_type(FormControlType::kSelectOne);
-  expected.set_max_length(0);
-  fields.push_back(expected);
-
-  expected.set_id_attribute(u"email");
-  expected.set_name_attribute(u"");
-  expected.set_label(u"* Email");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"john@example.com");
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  fields.push_back(expected);
+  std::vector<test::CommonFieldDescription> fields = {
+      {.label = u"* First Name",
+       .name = u"firstname",
+       .name_attribute = u"",
+       .id_attribute = u"firstname",
+       .value = u"John",
+       .form_control_type = FormControlType::kInputText},
+      {.label = u"* Middle Name",
+       .name = u"middlename",
+       .name_attribute = u"",
+       .id_attribute = u"middlename",
+       .value = u"Joe",
+       .form_control_type = FormControlType::kInputText},
+      {.label = u"* Last Name",
+       .name = u"lastname",
+       .name_attribute = u"",
+       .id_attribute = u"lastname",
+       .value = u"Smith",
+       .form_control_type = FormControlType::kInputText},
+      {.label = u"* Country",
+       .name = u"country",
+       .name_attribute = u"",
+       .id_attribute = u"country",
+       .value = u"US",
+       .max_length = 0,
+       .form_control_type = FormControlType::kSelectOne},
+      {.label = u"* Email",
+       .name = u"email",
+       .name_attribute = u"",
+       .id_attribute = u"email",
+       .value = u"john@example.com",
+       .form_control_type = FormControlType::kInputText}};
 
   ExpectLabelsAndTypes(
       R"(<form name=TestForm action='http://cnn.com'>
@@ -3742,32 +3536,21 @@ TEST_F(FormAutofillTest, ThreePartPhone) {
   EXPECT_EQ(u"TestForm", form.name());
   EXPECT_EQ(GURL("http://cnn.com"), form.action());
 
-  const std::vector<FormFieldData>& fields = form.fields();
-  ASSERT_EQ(4U, fields.size());
-
-  FormFieldData expected;
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-
-  expected.set_label(u"Phone:");
-  expected.set_name_attribute(u"dayphone1");
-  expected.set_name(expected.name_attribute());
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[0]);
-
-  expected.set_label(u"");
-  expected.set_name_attribute(u"dayphone2");
-  expected.set_name(expected.name_attribute());
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[1]);
-
-  expected.set_label(u"");
-  expected.set_name_attribute(u"dayphone3");
-  expected.set_name(expected.name_attribute());
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[2]);
-
-  expected.set_label(u"ext.:");
-  expected.set_name_attribute(u"dayphone4");
-  expected.set_name(expected.name_attribute());
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[3]);
+  EXPECT_THAT(
+      form.fields(),
+      testing::ElementsAre(
+          test::FormFieldDescriptionEq({.label = u"Phone:",
+                                        .name = u"dayphone1",
+                                        .name_attribute = u"dayphone1"}),
+          test::FormFieldDescriptionEq({.label = u"",
+                                        .name = u"dayphone2",
+                                        .name_attribute = u"dayphone2"}),
+          test::FormFieldDescriptionEq({.label = u"",
+                                        .name = u"dayphone3",
+                                        .name_attribute = u"dayphone3"}),
+          test::FormFieldDescriptionEq({.label = u"ext.:",
+                                        .name = u"dayphone4",
+                                        .name_attribute = u"dayphone4"})));
 }
 
 TEST_F(FormAutofillTest, MaxLengthFields) {
@@ -3795,49 +3578,34 @@ TEST_F(FormAutofillTest, MaxLengthFields) {
   EXPECT_EQ(u"TestForm", form.name());
   EXPECT_EQ(GURL("http://cnn.com"), form.action());
 
-  const std::vector<FormFieldData>& fields = form.fields();
-  ASSERT_EQ(6U, fields.size());
-
-  FormFieldData expected;
-  expected.set_form_control_type(FormControlType::kInputText);
-
-  expected.set_name_attribute(u"dayphone1");
-  expected.set_label(u"Phone:");
-  expected.set_name(expected.name_attribute());
-  expected.set_max_length(3);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[0]);
-
-  expected.set_name_attribute(u"dayphone2");
-  expected.set_label(u"");
-  expected.set_name(expected.name_attribute());
-  expected.set_max_length(3);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[1]);
-
-  expected.set_name_attribute(u"dayphone3");
-  expected.set_label(u"");
-  expected.set_name(expected.name_attribute());
-  expected.set_max_length(4);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[2]);
-
-  expected.set_name_attribute(u"dayphone4");
-  expected.set_label(u"ext.:");
-  expected.set_name(expected.name_attribute());
-  expected.set_max_length(5);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[3]);
-
-  // When unspecified `size`, default is returned.
-  expected.set_name_attribute(u"default1");
-  expected.set_label({});
-  expected.set_name(expected.name_attribute());
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[4]);
-
-  // When invalid `size`, default is returned.
-  expected.set_name_attribute(u"invalid1");
-  expected.set_label({});
-  expected.set_name(expected.name_attribute());
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[5]);
+  EXPECT_THAT(form.fields(),
+              testing::ElementsAre(
+                  test::FormFieldDescriptionEq({.label = u"Phone:",
+                                                .name = u"dayphone1",
+                                                .name_attribute = u"dayphone1",
+                                                .max_length = 3}),
+                  test::FormFieldDescriptionEq({.label = u"",
+                                                .name = u"dayphone2",
+                                                .name_attribute = u"dayphone2",
+                                                .max_length = 3}),
+                  test::FormFieldDescriptionEq({.label = u"",
+                                                .name = u"dayphone3",
+                                                .name_attribute = u"dayphone3",
+                                                .max_length = 4}),
+                  test::FormFieldDescriptionEq({.label = u"ext.:",
+                                                .name = u"dayphone4",
+                                                .name_attribute = u"dayphone4",
+                                                .max_length = 5}),
+                  test::FormFieldDescriptionEq(
+                      {.label = u"",
+                       .name = u"default1",
+                       .name_attribute = u"default1",
+                       .max_length = FormFieldData::kDefaultMaxLength}),
+                  test::FormFieldDescriptionEq(
+                      {.label = u"",
+                       .name = u"invalid1",
+                       .name_attribute = u"invalid1",
+                       .max_length = FormFieldData::kDefaultMaxLength})));
 }
 
 // This test re-creates the experience of typing in a field then selecting a
@@ -3956,64 +3724,51 @@ TEST_F(FormAutofillTest, FillFormModifyValues) {
   EXPECT_EQ(u"TestForm", form2.name());
   EXPECT_EQ(GURL("http://abc.com"), form2.action());
 
-  const std::vector<FormFieldData>& fields2 = form2.fields();
-  ASSERT_EQ(6U, fields2.size());
-
-  FormFieldData expected;
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-
-  expected.set_id_attribute(u"firstname");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"Wyatt");
-  expected.set_label(u"First Name");
-  expected.set_placeholder(u"First Name");
-  expected.set_is_autofilled_according_to_renderer(true);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[0]);
-
-  // The last name field is not filled, because there is a value in it.
-  expected.set_id_attribute(u"lastname");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"Earp");
-  expected.set_label(u"Last Name");
-  expected.set_placeholder(u"Last Name");
-  expected.set_is_autofilled_according_to_renderer(false);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[1]);
-
-  expected.set_id_attribute(u"phone");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"888-123-4567");
-  expected.set_label(u"Phone");
-  expected.set_placeholder(u"Phone");
-  expected.set_is_autofilled_according_to_renderer(true);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[2]);
-
-  expected.set_id_attribute(u"cc");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"1111-2222-3333-4444");
-  expected.set_label(u"Credit Card Number");
-  expected.set_placeholder(u"Credit Card Number");
-  expected.set_is_autofilled_according_to_renderer(true);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[3]);
-
-  expected.set_id_attribute(u"city");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"Montreal");
-  expected.set_label(u"City");
-  expected.set_placeholder(u"City");
-  expected.set_is_autofilled_according_to_renderer(true);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[4]);
-
-  expected.set_form_control_type(FormControlType::kSelectOne);
-  expected.set_id_attribute(u"state");
-  expected.set_name_attribute(u"state");
-  expected.set_name(expected.name_attribute());
-  expected.set_value(u"AA");
-  expected.set_label(u"State");
-  expected.set_placeholder(u"State");
-  expected.set_is_autofilled_according_to_renderer(true);
-  expected.set_max_length(0);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[5]);
+  EXPECT_THAT(
+      form2.fields(),
+      testing::ElementsAre(test::FormFieldDescriptionEq(
+                               {.label = u"First Name",
+                                .name = u"firstname",
+                                .id_attribute = u"firstname",
+                                .value = u"Wyatt",
+                                .placeholder = u"First Name",
+                                .is_autofilled_according_to_renderer = true}),
+                           test::FormFieldDescriptionEq(
+                               {.label = u"Last Name",
+                                .name = u"lastname",
+                                .id_attribute = u"lastname",
+                                .value = u"Earp",
+                                .placeholder = u"Last Name",
+                                .is_autofilled_according_to_renderer = false}),
+                           test::FormFieldDescriptionEq(
+                               {.label = u"Phone",
+                                .name = u"phone",
+                                .id_attribute = u"phone",
+                                .value = u"888-123-4567",
+                                .placeholder = u"Phone",
+                                .is_autofilled_according_to_renderer = true}),
+                           test::FormFieldDescriptionEq(
+                               {.label = u"Credit Card Number",
+                                .name = u"cc",
+                                .id_attribute = u"cc",
+                                .value = u"1111-2222-3333-4444",
+                                .placeholder = u"Credit Card Number",
+                                .is_autofilled_according_to_renderer = true}),
+                           test::FormFieldDescriptionEq(
+                               {.label = u"City",
+                                .name = u"city",
+                                .id_attribute = u"city",
+                                .value = u"Montreal",
+                                .placeholder = u"City",
+                                .is_autofilled_according_to_renderer = true}),
+                           test::FormFieldDescriptionEq(
+                               {.label = u"State",
+                                .name = u"state",
+                                .name_attribute = u"state",
+                                .id_attribute = u"state",
+                                .value = u"AA",
+                                .placeholder = u"State",
+                                .is_autofilled_according_to_renderer = true})));
 }
 
 // Similar to test case `FillFormModifyValues`.
@@ -4076,36 +3831,29 @@ TEST_F(FormAutofillTest, FillFormModifyInitiatingValue) {
   EXPECT_EQ(u"TestForm", form2.name());
   EXPECT_EQ(GURL("http://abc.com"), form2.action());
 
-  const std::vector<FormFieldData>& fields2 = form2.fields();
-  ASSERT_EQ(3U, fields2.size());
-
-  FormFieldData expected;
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-
-  expected.set_id_attribute(u"cc");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"1111-2222-3333-4444");
-  expected.set_label(u"Credit Card Number");
-  expected.set_placeholder(u"Credit Card Number");
-  expected.set_is_autofilled_according_to_renderer(true);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[0]);
-
-  expected.set_id_attribute(u"expiration_date");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"03/2030");
-  expected.set_label(u"Expiration Date");
-  expected.set_placeholder(u"Expiration Date");
-  expected.set_is_autofilled_according_to_renderer(true);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[1]);
-
-  expected.set_id_attribute(u"name");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"John Smith");
-  expected.set_label(u"Full Name");
-  expected.set_placeholder(u"Full Name");
-  expected.set_is_autofilled_according_to_renderer(false);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[2]);
+  EXPECT_THAT(form2.fields(),
+              testing::ElementsAre(
+                  test::FormFieldDescriptionEq(
+                      {.label = u"Credit Card Number",
+                       .name = u"cc",
+                       .id_attribute = u"cc",
+                       .value = u"1111-2222-3333-4444",
+                       .placeholder = u"Credit Card Number",
+                       .is_autofilled_according_to_renderer = true}),
+                  test::FormFieldDescriptionEq(
+                      {.label = u"Expiration Date",
+                       .name = u"expiration_date",
+                       .id_attribute = u"expiration_date",
+                       .value = u"03/2030",
+                       .placeholder = u"Expiration Date",
+                       .is_autofilled_according_to_renderer = true}),
+                  test::FormFieldDescriptionEq(
+                      {.label = u"Full Name",
+                       .name = u"name",
+                       .id_attribute = u"name",
+                       .value = u"John Smith",
+                       .placeholder = u"Full Name",
+                       .is_autofilled_according_to_renderer = false})));
 
   // Verify that the cursor position has been updated.
   EXPECT_EQ(19u, input_element.SelectionStart());
@@ -4176,36 +3924,29 @@ TEST_F(FormAutofillTest, FillFormJSModifiesUserInputValue) {
   EXPECT_EQ(u"TestForm", form2.name());
   EXPECT_EQ(GURL("http://abc.com"), form2.action());
 
-  const std::vector<FormFieldData>& fields2 = form2.fields();
-  ASSERT_EQ(3U, fields2.size());
-
-  FormFieldData expected;
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-
-  expected.set_id_attribute(u"cc");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"1111-2222-3333-4444");
-  expected.set_label(u"Credit Card Number");
-  expected.set_placeholder(u"Credit Card Number");
-  expected.set_is_autofilled_according_to_renderer(true);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[0]);
-
-  expected.set_id_attribute(u"expiration_date");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"03/2030");
-  expected.set_label(u"Expiration Date");
-  expected.set_placeholder(u"Expiration Date");
-  expected.set_is_autofilled_according_to_renderer(true);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[1]);
-
-  expected.set_id_attribute(u"name");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"John Smith");
-  expected.set_label(u"Full Name");
-  expected.set_placeholder(u"Full Name");
-  expected.set_is_autofilled_according_to_renderer(false);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[2]);
+  EXPECT_THAT(form2.fields(),
+              testing::ElementsAre(
+                  test::FormFieldDescriptionEq(
+                      {.label = u"Credit Card Number",
+                       .name = u"cc",
+                       .id_attribute = u"cc",
+                       .value = u"1111-2222-3333-4444",
+                       .placeholder = u"Credit Card Number",
+                       .is_autofilled_according_to_renderer = true}),
+                  test::FormFieldDescriptionEq(
+                      {.label = u"Expiration Date",
+                       .name = u"expiration_date",
+                       .id_attribute = u"expiration_date",
+                       .value = u"03/2030",
+                       .placeholder = u"Expiration Date",
+                       .is_autofilled_according_to_renderer = true}),
+                  test::FormFieldDescriptionEq(
+                      {.label = u"Full Name",
+                       .name = u"name",
+                       .id_attribute = u"name",
+                       .value = u"John Smith",
+                       .placeholder = u"Full Name",
+                       .is_autofilled_according_to_renderer = false})));
 
   // Verify that the cursor position has been updated.
   EXPECT_EQ(19u, input_element.SelectionStart());
@@ -4476,35 +4217,20 @@ TEST_F(FormAutofillTest, SelectOneAsText) {
   EXPECT_EQ(u"TestForm", form.name());
   EXPECT_EQ(GURL("http://cnn.com"), form.action());
 
-  const std::vector<FormFieldData>& fields = form.fields();
-  ASSERT_EQ(3U, fields.size());
-
-  FormFieldData expected;
-
-  expected.set_id_attribute(u"firstname");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"John");
-  expected.set_label(u"John");
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[0]);
-
-  expected.set_id_attribute(u"lastname");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"Smith");
-  expected.set_label(u"Smith");
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[1]);
-
-  expected.set_id_attribute(u"country");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"AL");
-  expected.set_label({});
-  expected.set_form_control_type(FormControlType::kSelectOne);
-  expected.set_max_length(0);
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[2]);
-  EXPECT_EQ(fields[2].selected_option_text(), u"Albania");
+  EXPECT_THAT(form.fields(),
+              testing::ElementsAre(
+                  test::FormFieldDescriptionEq({.label = u"John",
+                                                .name = u"firstname",
+                                                .id_attribute = u"firstname",
+                                                .value = u"John"}),
+                  test::FormFieldDescriptionEq({.label = u"Smith",
+                                                .name = u"lastname",
+                                                .id_attribute = u"lastname",
+                                                .value = u"Smith"}),
+                  test::FormFieldDescriptionEq({.label = u"",
+                                                .name = u"country",
+                                                .id_attribute = u"country",
+                                                .value = u"AL"})));
 }
 
 TEST_F(FormAutofillTest, UnownedFormElementsToFormDataWithoutForm) {
@@ -4522,30 +4248,21 @@ TEST_F(FormAutofillTest, UnownedFormElementsToFormDataWithoutForm) {
   EXPECT_TRUE(form.name().empty());
   EXPECT_FALSE(form.action().is_valid());
 
-  const std::vector<FormFieldData>& fields = form.fields();
-  ASSERT_EQ(3U, fields.size());
-
-  FormFieldData expected;
-  expected.set_form_control_type(FormControlType::kInputText);
-  expected.set_max_length(FormFieldData::kDefaultMaxLength);
-
-  expected.set_id_attribute(u"firstname");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"John");
-  expected.set_label(u"First name:");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[0]);
-
-  expected.set_id_attribute(u"lastname");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"Smith");
-  expected.set_label(u"Last name:");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[1]);
-
-  expected.set_id_attribute(u"email");
-  expected.set_name(expected.id_attribute());
-  expected.set_value(u"john@example.com");
-  expected.set_label(u"Email:");
-  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields[2]);
+  EXPECT_THAT(
+      form.fields(),
+      testing::ElementsAre(
+          test::FormFieldDescriptionEq({.label = u"First name:",
+                                        .name = u"firstname",
+                                        .id_attribute = u"firstname",
+                                        .value = u"John"}),
+          test::FormFieldDescriptionEq({.label = u"Last name:",
+                                        .name = u"lastname",
+                                        .id_attribute = u"lastname",
+                                        .value = u"Smith"}),
+          test::FormFieldDescriptionEq({.label = u"Email:",
+                                        .name = u"email",
+                                        .id_attribute = u"email",
+                                        .value = u"john@example.com"})));
 }
 
 TEST_F(FormAutofillTest, UnownedFormElementsToFormDataWithForm) {
@@ -4653,20 +4370,15 @@ TEST_F(FormAutofillTest, AriaLabelAndDescription) {
   ASSERT_TRUE(control_element);
   FormData form = FindForm(control_element);
 
-  const std::vector<FormFieldData>& fields = form.fields();
-  ASSERT_EQ(3U, fields.size());
-
-  // Field 0
-  EXPECT_EQ(u"inline aria label", fields[0].aria_label());
-  EXPECT_EQ(u"", fields[0].aria_description());
-
-  // Field 1
-  EXPECT_EQ(u"aria label", fields[1].aria_label());
-  EXPECT_EQ(u"", fields[1].aria_description());
-
-  // Field 2
-  EXPECT_EQ(u"", fields[2].aria_label());
-  EXPECT_EQ(u"aria description", fields[2].aria_description());
+  EXPECT_THAT(
+      form.fields(),
+      testing::ElementsAre(
+          test::FormFieldDescriptionEq(
+              {.aria_label = u"inline aria label", .aria_description = u""}),
+          test::FormFieldDescriptionEq(
+              {.aria_label = u"aria label", .aria_description = u""}),
+          test::FormFieldDescriptionEq(
+              {.aria_label = u"", .aria_description = u"aria description"})));
 }
 
 TEST_F(FormAutofillTest, AriaLabelAndDescription2) {
@@ -4691,20 +4403,15 @@ TEST_F(FormAutofillTest, AriaLabelAndDescription2) {
   ASSERT_TRUE(control_element);
   FormData form = FindForm(control_element);
 
-  const std::vector<FormFieldData>& fields = form.fields();
-  ASSERT_EQ(3U, fields.size());
-
-  // Field 0
-  EXPECT_EQ(u"inline aria label", fields[0].aria_label());
-  EXPECT_EQ(u"", fields[0].aria_description());
-
-  // Field 1
-  EXPECT_EQ(u"aria label", fields[1].aria_label());
-  EXPECT_EQ(u"", fields[1].aria_description());
-
-  // Field 2
-  EXPECT_EQ(u"", fields[2].aria_label());
-  EXPECT_EQ(u"aria description", fields[2].aria_description());
+  EXPECT_THAT(
+      form.fields(),
+      testing::ElementsAre(
+          test::FormFieldDescriptionEq(
+              {.aria_label = u"inline aria label", .aria_description = u""}),
+          test::FormFieldDescriptionEq(
+              {.aria_label = u"aria label", .aria_description = u""}),
+          test::FormFieldDescriptionEq(
+              {.aria_label = u"", .aria_description = u"aria description"})));
 }
 
 }  // namespace
