@@ -27,6 +27,7 @@
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/autofill/core/common/autofill_prefs.h"
 #include "components/consent_auditor/fake_consent_auditor.h"
+#include "components/personal_context/core/personal_context_prefs.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"
 #include "components/sync/test/test_sync_service.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
@@ -48,6 +49,7 @@ class EntityDataManagerAndroidTest : public testing::Test {
  public:
   EntityDataManagerAndroidTest() {
     prefs::RegisterProfilePrefs(prefs_.registry());
+    personal_context::prefs::RegisterProfilePrefs(prefs_.registry());
     entity_data_manager_ = std::make_unique<EntityDataManager>(
         &prefs_, identity_test_env_.identity_manager(), &sync_service_,
         webdata_helper_.autofill_webdata_service(),
@@ -308,6 +310,19 @@ TEST_F(EntityDataManagerAndroidTest, LogEntityDeletedFromSettings) {
       EntityTypeName::kPassport, 1);
   histogram_tester.ExpectUniqueSample("Autofill.Ai.EntityDeletedFromSettings",
                                       EntityTypeName::kPassport, 1);
+}
+
+TEST_F(EntityDataManagerAndroidTest, PersonalContextEnabled_GetAndSet) {
+  // The default value registered in personal_context::prefs is true.
+  EXPECT_TRUE(entity_data_manager_android_->IsPersonalContextEnabled(env()));
+
+  // Set to false and verify it changed.
+  entity_data_manager_android_->SetPersonalContextEnabled(env(), false);
+  EXPECT_FALSE(entity_data_manager_android_->IsPersonalContextEnabled(env()));
+
+  // Set back to true and verify it changed.
+  entity_data_manager_android_->SetPersonalContextEnabled(env(), true);
+  EXPECT_TRUE(entity_data_manager_android_->IsPersonalContextEnabled(env()));
 }
 
 }  // namespace

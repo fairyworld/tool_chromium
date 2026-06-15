@@ -44,6 +44,7 @@
 #include "components/autofill/core/common/autofill_prefs.h"
 #include "components/consent_auditor/consent_auditor.h"
 #include "components/personal_context/core/personal_context_enablement_service.h"
+#include "components/personal_context/core/personal_context_prefs.h"
 #include "components/personal_context/core/personal_context_types.h"
 #include "components/personal_context/core/url_constants.h"
 #include "components/wallet/core/common/wallet_features.h"
@@ -95,13 +96,15 @@ bool EntityDataManagerAndroid::IsPersonalContextPreferenceVisible(JNIEnv* env) {
 }
 
 bool EntityDataManagerAndroid::IsPersonalContextEnabled(JNIEnv* env) {
-  // TODO(b/517066061): Implement pref and read value.
-  return true;
+  return prefs_->GetBoolean(
+      personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus);
 }
 
 void EntityDataManagerAndroid::SetPersonalContextEnabled(JNIEnv* env,
                                                          bool enabled) {
-  // TODO(b/517066061): Implement pref and write value.
+  prefs_->SetBoolean(
+      personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
+      enabled);
 }
 
 static std::string
