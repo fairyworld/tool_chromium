@@ -99,13 +99,13 @@ class ActorTask : public web::WebStateObserver,
   void DidStopLoading(web::WebState* web_state) override;
   void WebStateDestroyed(web::WebState* web_state) override;
 
+ private:
+  friend class ActorTaskTest;
+
   // ToolDelegate:
   ActorTaskId GetTaskId() const override;
   AggregatedJournal& GetJournal() const override;
   ActorToolFactory& GetToolFactory() const override;
-
- private:
-  friend class ActorTaskTest;
 
   // Sets the actuation state on all controlled `WebState`s based on
   // `actuating`.
