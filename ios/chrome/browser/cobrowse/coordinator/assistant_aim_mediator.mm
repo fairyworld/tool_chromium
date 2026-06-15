@@ -492,7 +492,6 @@
 }
 
 - (void)webStateDestroyed:(web::WebState*)webState {
-  //  DCHECK_EQ(_webState, webState);
   if (_webState) {
     _webState->RemoveObserver(_webStateObserverBridge.get());
     _webState.reset();
