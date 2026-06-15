@@ -1394,6 +1394,9 @@ public final class ProductionSupportedFlagList {
         Flag.baseFeature(
                 "EarlyCookieLoadOnPreconnect",
                 "When enabled, cookies are loaded early on preconnect requests."),
+        Flag.baseFeature(
+                "NoVarySearchCacheLoadOnSeparateTaskRunner",
+                "Enable loading the No Vary Search cache on a separate task runner."),
 
         // Add new commandline switches and features above. The final entry should have a
         // trailing comma for cleaner diffs.

@@ -294,7 +294,7 @@ class NoVarySearchCacheStorageTestBase : public ::testing::TestWithParam<bool> {
     if (GetParam()) {
       enabled_features.push_back(
           {features::kNoVarySearchCacheLoadOnSeparateTaskRunner,
-           {{"priority", "USER_VISIBLE"}}});
+           {{"NoVarySearchCacheLoadTaskRunnerPriority", "USER_VISIBLE"}}});
     } else {
       disabled_features.push_back(
           features::kNoVarySearchCacheLoadOnSeparateTaskRunner);

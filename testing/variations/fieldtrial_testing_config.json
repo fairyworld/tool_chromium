@@ -16956,6 +16956,29 @@
             ]
         }
     ],
+    "NoVarySearchCacheLoadOnSeparateTaskRunner": [
+        {
+            "platforms": [
+                "android_webview",
+                "android",
+                "chromeos",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "params": {
+                        "NoVarySearchCacheLoadTaskRunnerPriority": "USER_VISIBLE"
+                    },
+                    "enable_features": [
+                        "NoVarySearchCacheLoadOnSeparateTaskRunner"
+                    ]
+                }
+            ]
+        }
+    ],
     "NonStandardAppearanceValueSliderVertical": [
         {
             "platforms": [
