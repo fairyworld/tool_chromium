@@ -459,7 +459,7 @@
 #include "chrome/browser/ui/webui/ash/edu_coexistence/edu_coexistence_login_handler.h"
 #include "chrome/browser/ui/webui/ash/login/enable_debugging_screen_handler.h"
 #include "chrome/browser/ui/webui/ash/settings/os_settings_ui.h"
-#include "chrome/browser/ui/webui/certificates_handler.h"
+#include "chrome/browser/ui/webui/certificate_manager/certificates_handler.h"
 #include "chrome/browser/ui/webui/settings/reset_settings_handler.h"
 #include "chrome/browser/ui/webui/signin/ash/inline_login_handler_impl.h"
 #include "chrome/browser/upgrade_detector/upgrade_detector_chromeos.h"

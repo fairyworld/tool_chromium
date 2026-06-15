@@ -83,6 +83,7 @@ source_set("searchbox_impl") {
     "//chrome/browser/ui/webui/new_tab_page/composebox/variations",
     "//components/contextual_search:prefs",
     "//components/contextual_search:public",
+    "//components/contextual_search/footprints/public",
     "//components/contextual_tasks/public:query_contextualizer",
     "//components/favicon/content",
     "//components/favicon/core",
@@ -92,7 +93,6 @@ source_set("searchbox_impl") {
     "//components/search",
     "//components/sessions",
     "//components/vector_icons",
-    "//components/contextual_search/footprints/public",
   ]
   if (!is_android) {
     deps += [
@@ -103,6 +103,7 @@ source_set("searchbox_impl") {
       "//chrome/browser/ui/views/drive_picker_host",
       "//chrome/browser/ui/webui/drive_picker_host",
       "//chrome/browser/ui/webui/drive_picker_host:drive_picker_host_request",
+      "//chrome/browser/ui/webui/omnibox_popup",
       "//components/contextual_search/footprints/internal",
     ]
   }

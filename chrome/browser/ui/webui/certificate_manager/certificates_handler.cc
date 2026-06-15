@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/ui/webui/certificates_handler.h"
+#include "chrome/browser/ui/webui/certificate_manager/certificates_handler.h"
 
 #include "chrome/common/pref_names.h"
 #include "components/pref_registry/pref_registry_syncable.h"

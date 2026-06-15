@@ -1135,6 +1135,11 @@ source_set("core") {
   ]
 
   if (!is_android) {
+    public_deps = [
+      "//chrome/browser/ui/webui/omnibox_popup",
+      "//chrome/browser/ui/webui/omnibox_popup/mojom",
+    ]
+
     deps += [
       ":chrome_process_singleton",
       ":intranet_redirect_detector",
@@ -1154,6 +1159,7 @@ source_set("core") {
       "//chrome/browser/ui/webui/image",
       "//chrome/browser/ui/webui/indigo_internals",
       "//chrome/browser/ui/webui/indigo_internals:mojo_bindings",
+      "//chrome/browser/ui/webui/new_tab_page",
       "//chrome/browser/ui/webui/user_education_internals",
       "//chrome/browser/ui/webui/webnn_internals",
       "//chrome/browser/ui/webui_browser",
@@ -1242,6 +1248,10 @@ source_set("core") {
 
   if (enable_compose) {
     deps += [ "//chrome/browser/ui/webui/compose" ]
+  }
+
+  if (chrome_root_store_cert_management_ui) {
+    deps += [ "//chrome/browser/ui/webui/certificate_manager" ]
   }
 
   if (!is_android && !is_chromeos) {
@@ -2910,6 +2920,12 @@ static_library("browser") {
       "//chrome/browser/dictation:impl",
       "//chrome/browser/payments:impl",
       "//chrome/browser/ui/tabs/tab_drag_api/desktop_tab_drag_impl",
+      "//chrome/browser/ui/webui/new_tab_page",
+      "//chrome/browser/ui/webui/new_tab_page:impl",
+      "//chrome/browser/ui/webui/new_tab_page_third_party",
+      "//chrome/browser/ui/webui/new_tab_page_third_party:impl",
+      "//chrome/browser/ui/webui/ntp",
+      "//chrome/browser/ui/webui/tab_search",
       "//chrome/browser/web_applications/isolated_web_apps/window_management",
       "//chrome/browser/web_applications/isolated_web_apps/window_management:impl",
       "//chrome/browser/webapps:desktop",
@@ -3083,7 +3099,7 @@ static_library("browser") {
       "//chrome/browser/ui/webui/commerce:impl",
       "//chrome/browser/ui/webui/content_annotator_internals",
       "//chrome/browser/ui/webui/cr_components/searchbox:searchbox_impl",
-      "//chrome/browser/ui/webui/cr_components/theme_color_picker",
+      "//chrome/browser/ui/webui/cr_components/theme_color_picker:impl",
       "//chrome/browser/ui/webui/customize_buttons",
       "//chrome/browser/ui/webui/customize_buttons:impl",
       "//chrome/browser/ui/webui/data_sharing",
@@ -3097,6 +3113,7 @@ static_library("browser") {
       "//chrome/browser/ui/webui/new_tab_footer:impl",
       "//chrome/browser/ui/webui/omnibox",
       "//chrome/browser/ui/webui/omnibox/logging:mojo_bindings",
+      "//chrome/browser/ui/webui/omnibox_popup",
       "//chrome/browser/ui/webui/omnibox_popup/mojom",
       "//chrome/browser/ui/webui/searchbox",
       "//chrome/browser/ui/webui/settings",

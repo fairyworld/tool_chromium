@@ -129,8 +129,12 @@ source_set("configs") {
       "//chrome/browser/ui/webui/inspect",
       "//chrome/browser/ui/webui/multistep_filter_internals",
       "//chrome/browser/ui/webui/new_tab_footer",
+      "//chrome/browser/ui/webui/new_tab_page_third_party",
+      "//chrome/browser/ui/webui/new_tab_page_third_party:impl",
+      "//chrome/browser/ui/webui/omnibox_popup",
       "//chrome/browser/ui/webui/personal_context",
       "//chrome/browser/ui/webui/profile_internals",
+      "//chrome/browser/ui/webui/tab_search",
       "//chrome/browser/ui/webui/web_app_internals",
       "//chrome/browser/ui/webui/webui_js_error",
       "//chrome/browser/ui/webui/webui_toolbar",
@@ -247,6 +251,10 @@ source_set("configs") {
 
   if (enable_webui_certificate_viewer) {
     deps += [ "//chrome/browser/ui/webui/certificate_viewer" ]
+  }
+
+  if (chrome_root_store_cert_management_ui) {
+    deps += [ "//chrome/browser/ui/webui/certificate_manager" ]
   }
 
   if (!is_android) {

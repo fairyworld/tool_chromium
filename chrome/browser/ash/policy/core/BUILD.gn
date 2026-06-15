@@ -252,6 +252,7 @@ source_set("unit_tests") {
     "//chrome/browser/signin",
     "//chrome/browser/ui/ash/wallpaper",
     "//chrome/browser/ui/ash/wallpaper:test_support",
+    "//chrome/browser/ui/webui/certificate_manager",
     "//chrome/common:chrome_features",
     "//chrome/common:constants",
     "//chrome/common:non_code_constants",
