@@ -52,6 +52,11 @@ let formMutationObserver: MutationObserver|null = null;
 let passwordTypeObserver: MutationObserver|null = null;
 
 /**
+ * Timer handle for the throttled mutation processing.
+ */
+let mutationProcessTimeout: ReturnType<typeof setTimeout>|null = null;
+
+/**
  * Snapshot of the total number of form controls in the document.
  */
 let formControlCount: number = -1;
@@ -623,9 +628,8 @@ function getFormControlCount(): number {
  * using cached live HTMLCollections. If any additions are detected, send
  * a single generic form activity message.
  *
- * @param delay The scheduling delay for sending messages.
  */
-function processFormMutationsOptimized(delay: number): void {
+function processFormMutationsOptimized(): void {
   const newFormControlCount = getFormControlCount();
 
   const removedFormIDs: string[] = [];
@@ -730,8 +734,9 @@ function processFormMutationsOptimized(delay: number): void {
   if (addedFormMessage) {
     messagesToSend.push(addedFormMessage);
   }
+  // The delay has already been applied in `trackFormMutations`.
   if (messagesToSend.length > 0 &&
-      !sendFormMutationMessagesAfterDelay(messagesToSend, delay, true)) {
+      !sendFormMutationMessagesAfterDelay(messagesToSend, 0, true)) {
     formMsgBatchMetadata.dropCount += messagesToSend.length;
   }
 }
@@ -750,8 +755,7 @@ function initializePasswordFieldTypeObserver(): void {
       }
     }
   });
-  const observeTarget = document.body || document;
-  passwordTypeObserver.observe(observeTarget, {
+  passwordTypeObserver.observe(document, {
     attributes: true,
     attributeFilter: ['type'],
     subtree: true,
@@ -770,8 +774,23 @@ function cleanUpFormMutationTracking(): void {
     passwordTypeObserver.disconnect();
     passwordTypeObserver = null;
   }
+  if (mutationProcessTimeout) {
+    clearTimeout(mutationProcessTimeout);
+    mutationProcessTimeout = null;
+  }
   formControlCollections = [];
   lastFocusedElement = null;
+}
+
+/**
+ * Starts observing form mutations.
+ * @param observer The MutationObserver to observe for mutations.
+ */
+function observeFormMutations(observer: MutationObserver|null): void {
+  if (!observer) {
+    return;
+  }
+  observer.observe(document, {childList: true, subtree: true});
 }
 
 /**
@@ -801,14 +820,26 @@ function trackFormMutations(delay: number): void {
     formControlCount = getFormControlCount();
 
     formMutationObserver = new MutationObserver(function() {
-      processFormMutationsOptimized(delay);
+      // Disconnect the observer to reduce the number of microtasks
+      // during the delay period.
+      if (formMutationObserver) {
+        formMutationObserver.disconnect();
+      }
+
+      mutationProcessTimeout = setTimeout(function() {
+        mutationProcessTimeout = null;
+        processFormMutationsOptimized();
+        // Reconnect the observer to start listening for new mutations again.
+        observeFormMutations(formMutationObserver);
+      }, delay);
     });
+    observeFormMutations(formMutationObserver);
   } else {
     formMutationObserver = new MutationObserver(function(mutations) {
       processFormMutationsStandard(mutations, delay);
     });
+    formMutationObserver.observe(document, {childList: true, subtree: true});
   }
-  formMutationObserver.observe(document, {childList: true, subtree: true});
 }
 
 const formHandlersApi = new CrWebApi('formHandlers');

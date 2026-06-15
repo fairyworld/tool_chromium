@@ -919,8 +919,11 @@ TEST_P(FormMutationTest, OptimizedFormMutations_ThrottledAcrossTicks) {
   // Confirm only 1 event was received by the observer (the second was dropped).
   EXPECT_EQ(observer_->number_of_events_received(), 1);
 
+  bool optimization_enabled = base::FeatureList::IsEnabled(
+      autofill::features::kAutofillTrackFormMutationsOptimizationIos);
+  int expected_drop_count = optimization_enabled ? 0 : 1;
   histogram_tester_.ExpectUniqueSample("Autofill.iOS.FormActivity.DropCount",
-                                       /*sample=*/1,
+                                       /*sample=*/expected_drop_count,
                                        /*expected_bucket_count=*/1);
   histogram_tester_.ExpectUniqueSample("Autofill.iOS.FormActivity.SendCount",
                                        /*sample=*/1,
