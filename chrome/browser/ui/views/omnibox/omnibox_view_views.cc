@@ -1785,12 +1785,17 @@ void OmniboxViewViews::OnBlur() {
   //
   // This should never exit keyword mode.
   if (GetWidget() && GetWidget()->IsActive() &&
-      !controller()->edit_model()->is_keyword_selected() &&
-      ((!controller()->edit_model()->user_input_in_progress() &&
-        GetText() != controller()->edit_model()->GetPermanentDisplayText()) ||
-       (controller()->edit_model()->user_input_in_progress() &&
-        GetText() == controller()->edit_model()->GetPermanentDisplayText()))) {
-    RevertAll();
+      !controller()->edit_model()->is_keyword_selected()) {
+    // Bypass native RevertAll when Full WebUI V2 is enabled to prevent wiping
+    // out active WebUI drafting states.
+    if (!base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopupV2) &&
+        ((!controller()->edit_model()->user_input_in_progress() &&
+          GetText() != controller()->edit_model()->GetPermanentDisplayText()) ||
+         (controller()->edit_model()->user_input_in_progress() &&
+          GetText() ==
+              controller()->edit_model()->GetPermanentDisplayText()))) {
+      RevertAll();
+    }
   }
 
   controller()->edit_model()->OnWillKillFocus();
