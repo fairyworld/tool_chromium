@@ -239,6 +239,22 @@ public class LocationBarTabletUnitTest {
                 OmniboxResourceProvider.getStandardSuggestionBackgroundColor(
                         mActivity, BrandedColorScheme.APP_DEFAULT);
         assertEquals(expectedOuterRectColor, outerRect.getColor().getDefaultColor());
+
+        LayerDrawable background = (LayerDrawable) mLocationBarTablet.getBackground();
+        int glifLayerIndex = background.findIndexByLayerId(R.id.glif_border_layer);
+        assertEquals(0, background.getLayerInsetBottom(glifLayerIndex));
+        assertEquals(0, background.getLayerInsetTop(glifLayerIndex));
+        assertEquals(0, background.getLayerInsetLeft(glifLayerIndex));
+        assertEquals(0, background.getLayerInsetRight(glifLayerIndex));
+
+        mLocationBarTablet.onSpecializedFuseboxModeActivated(true);
+        GlifStrokeDrawable glifStrokeDrawable =
+                (GlifStrokeDrawable) background.getDrawable(glifLayerIndex);
+        float radius =
+                mLocationBarTablet
+                        .getResources()
+                        .getDimension(R.dimen.omnibox_suggestion_dropdown_round_corner_radius);
+        assertEquals(radius, glifStrokeDrawable.getCornerRadiusForTesting(), MathUtils.EPSILON);
     }
 
     @Test

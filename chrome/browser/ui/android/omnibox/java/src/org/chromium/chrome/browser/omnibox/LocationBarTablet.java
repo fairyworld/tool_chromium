@@ -526,6 +526,9 @@ class LocationBarTablet extends LocationBarLayout implements OnLongClickListener
             mOuterRect.setColor(
                     OmniboxResourceProvider.getStandardSuggestionBackgroundColor(
                             getContext(), mBrandedColorScheme));
+            mFocusedPopupDrawable.setLayerInsetRelative(
+                    mFocusedPopupDrawable.findIndexByLayerId(R.id.glif_border_layer), 0, 0, 0, 0);
+            mGlifBorderDrawable.setCornerRadius(mOmniboxSuggestionDropdownRoundCornerRadius);
         }
     }
 
