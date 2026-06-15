@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/ui/views/autofill/email_verification_popup_view.h"
+#include "chrome/browser/ui/views/autofill/popup/email_verifier/email_verification_popup_view.h"
 
 #include <memory>
 #include <utility>
@@ -13,7 +13,7 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/test_future.h"
 #include "base/values.h"
-#include "chrome/browser/ui/autofill/email_verification_popup_controller.h"
+#include "chrome/browser/ui/autofill/email_verifier/email_verification_popup_controller.h"
 #include "chrome/test/base/testing_profile.h"
 #include "chrome/test/views/chrome_views_test_base.h"
 #include "components/autofill/content/browser/test_autofill_client_injector.h"
