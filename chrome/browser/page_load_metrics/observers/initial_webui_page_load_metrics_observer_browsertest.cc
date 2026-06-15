@@ -307,7 +307,7 @@ IN_PROC_BROWSER_TEST_F(InitialWebUIPageLoadMetricsObserverBrowserTest,
                     "DocumentTiming.NavigationToDOMContentLoadedEventFired"),
                 HasMetric("DocumentTiming.NavigationToLoadEventFired"),
                 HasMetric("PaintTiming.NavigationToFirstPaint"),
-                HasMetric("CpuTimeMs")),
+                HasMetric("CPUTimeMs")),
           // 5. RecordPageEndMetrics
           AllOf(HasMetric("Navigation.PageTransition"),
                 HasMetric("Navigation.PageEndReason3"),

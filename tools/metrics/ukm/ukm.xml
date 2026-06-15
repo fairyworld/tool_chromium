@@ -11039,7 +11039,7 @@ be describing additional metrics about the same event.
   <summary>
     Core metrics associated with the page loads for Initial WebUI pages.
   </summary>
-  <metric name="CpuTimeMs">
+  <metric name="CPUTimeMs">
     <summary>
       Amount of CPU wall time over the duration of a page load, while the page
       is in the foreground. Measured in milliseconds.

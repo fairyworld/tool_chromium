@@ -388,7 +388,7 @@ void InitialWebUIPageLoadMetricsObserver::RecordTimingMetrics(
         timing.paint_timing->first_paint.value().InMilliseconds());
   }
 
-  builder.SetCpuTimeMs(total_foreground_cpu_time_.InMilliseconds());
+  builder.SetCPUTimeMs(total_foreground_cpu_time_.InMilliseconds());
 
   builder.Record(ukm::UkmRecorder::Get());
 }

@@ -130,7 +130,7 @@ TEST_F(InitialWebUIPageLoadMetricsObserverTest,
               "DocumentTiming.NavigationToDOMContentLoadedEventFired", 30),
           HasMetricWithValue("DocumentTiming.NavigationToLoadEventFired", 40),
           HasMetricWithValue("ParseTiming.NavigationToParseStart", 5))));
-  EXPECT_THAT(entries, Contains(HasMetricWithValue("CpuTimeMs", 50)));
+  EXPECT_THAT(entries, Contains(HasMetricWithValue("CPUTimeMs", 50)));
 }
 
 TEST_F(InitialWebUIPageLoadMetricsObserverTest, NavigationTiming) {
