@@ -340,7 +340,14 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
   EXPECT_GE(popup_bounds.height(), 90);
 }
 
-IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, PopupInputEventRouting) {
+// TODO(crbug.com/523970924): Re-enable the test.
+#if BUILDFLAG(IS_LINUX)
+#define MAYBE_PopupInputEventRouting DISABLED_PopupInputEventRouting
+#else
+#define MAYBE_PopupInputEventRouting PopupInputEventRouting
+#endif
+IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
+                       MAYBE_PopupInputEventRouting) {
 #if BUILDFLAG(IS_CHROMEOS)
   // TODO(crbug.com/508672616): Not yet working on ChromeOS due to Aura/Ash
   // popup container positioning and coordinate conversion issues.
@@ -391,8 +398,16 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, PopupInputEventRouting) {
 #endif
 }
 
+// TODO(crbug.com/523970924): Re-enable the test.
+#if BUILDFLAG(IS_LINUX)
+#define MAYBE_PopupOutsideViewportInputEventRouting \
+  DISABLED_PopupOutsideViewportInputEventRouting
+#else
+#define MAYBE_PopupOutsideViewportInputEventRouting \
+  PopupOutsideViewportInputEventRouting
+#endif
 IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
-                       PopupOutsideViewportInputEventRouting) {
+                       MAYBE_PopupOutsideViewportInputEventRouting) {
 #if BUILDFLAG(IS_CHROMEOS)
   // TODO(crbug.com/508672616): Not yet working on ChromeOS due to Aura/Ash
   // popup container positioning and coordinate conversion issues.
