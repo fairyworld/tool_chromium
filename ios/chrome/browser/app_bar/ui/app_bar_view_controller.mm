@@ -703,7 +703,8 @@ CGFloat ButtonHighlightAlpha(UIButton* button) {
     case AppBarAssistantButtonState::kAccount:
       image =
           _assistantButtonAvatar
-              ? [_assistantButtonAvatar
+              ? [CircularImageFromImage(_assistantButtonAvatar,
+                                        kButtonImageSize)
                     imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]
               : DefaultAppBarSymbol(kPersonCropCircleSymbol);
       break;
