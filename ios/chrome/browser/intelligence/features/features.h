@@ -409,6 +409,12 @@ BASE_DECLARE_FEATURE(kGeminiLuminous);
 // Returns true if Gemini Luminous is enabled.
 bool IsGeminiLuminousEnabled();
 
+// Feature flag controlling App Switcher AI summarization.
+BASE_DECLARE_FEATURE(kAppSwitcherAISummarization);
+
+// Returns true if App Switcher AI summarization is enabled.
+bool IsAppSwitcherAISummarizationEnabled();
+
 #pragma mark - Debugging Features
 
 // Holds the variations of the BWG Promo Consent flow for debugging.

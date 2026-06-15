@@ -72,6 +72,12 @@ inline constexpr char kAppBackgroundRefreshDescription[] =
     "Schedules app background refresh after some minimum period of time has "
     "passed after the last refresh.";
 
+inline constexpr char kAppSwitcherAISummarizationName[] =
+    "App Switcher AI summarization";
+inline constexpr char kAppSwitcherAISummarizationDescription[] =
+    "When enabled, the app will properly handle external actions from the "
+    "AI Summarization option in the App Switcher.";
+
 inline constexpr char kAppleCalendarExperienceKitName[] =
     "Experience Kit Apple Calendar";
 inline constexpr char kAppleCalendarExperienceKitDescription[] =

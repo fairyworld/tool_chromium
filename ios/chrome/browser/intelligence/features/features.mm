@@ -841,6 +841,15 @@ bool IsGeminiLuminousEnabled() {
   return base::FeatureList::IsEnabled(kGeminiLuminous);
 }
 
+BASE_FEATURE(kAppSwitcherAISummarization, base::FEATURE_DISABLED_BY_DEFAULT);
+
+bool IsAppSwitcherAISummarizationEnabled() {
+  if (!IsPageActionMenuEnabled()) {
+    return false;
+  }
+  return base::FeatureList::IsEnabled(kAppSwitcherAISummarization);
+}
+
 #pragma mark - Debugging Features
 
 const char kBWGPromoConsentParams[] = "BWGPromoConsentVariations";
