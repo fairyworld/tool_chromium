@@ -159,8 +159,7 @@ class WebInstallFromUrlCommandBrowserTest
                          "}).catch(error => {"
                          "  webInstallError = error;"
                          "});";
-    bool result = ExecJs(contents ? contents : web_contents(), script);
-    return result;
+    return ExecJs(contents ? contents : web_contents(), script);
   }
 
   // 1 param navigator.install(install_url)
@@ -173,8 +172,7 @@ class WebInstallFromUrlCommandBrowserTest
                          "  webInstallError = error;"
                          "});";
 
-    bool result = ExecJs(contents ? contents : web_contents(), script);
-    return result;
+    return ExecJs(contents ? contents : web_contents(), script);
   }
 
   bool ResultExists(content::WebContents* contents = nullptr) {
@@ -278,7 +276,6 @@ IN_PROC_BROWSER_TEST_F(WebInstallFromUrlCommandBrowserTest,
   EXPECT_TRUE(ResultExists());
   EXPECT_FALSE(ErrorExists());
 
-  test::CompletePageLoadForAllWebContents();
   histograms.ExpectUniqueSample("WebApp.Install.Source.Success", kInstallSource,
                                 1);
   histograms.ExpectUniqueSample("WebApp.LaunchSource", kLaunchSource, 1);
@@ -356,7 +353,6 @@ IN_PROC_BROWSER_TEST_F(WebInstallFromUrlCommandBrowserTest,
   EXPECT_TRUE(ResultExists());
   EXPECT_FALSE(ErrorExists());
 
-  test::CompletePageLoadForAllWebContents();
   histograms.ExpectUniqueSample("WebApp.Install.Source.Success", kInstallSource,
                                 1);
   histograms.ExpectUniqueSample("WebApp.LaunchSource", kLaunchSource, 1);
@@ -759,7 +755,6 @@ IN_PROC_BROWSER_TEST_F(WebInstallFromUrlCommandBrowserTest,
   EXPECT_TRUE(ResultExists());
   EXPECT_FALSE(ErrorExists());
 
-  test::CompletePageLoadForAllWebContents();
   histograms.ExpectUniqueSample("WebApp.Install.Source.Success", kInstallSource,
                                 1);
   histograms.ExpectUniqueSample("WebApp.LaunchSource", kLaunchSource, 1);
@@ -832,7 +827,6 @@ IN_PROC_BROWSER_TEST_F(WebInstallBackgroundAppAlreadyInstalledBrowserTest,
   EXPECT_TRUE(ResultExists());
   EXPECT_FALSE(ErrorExists());
   EXPECT_EQ(GetManifestIdResult(), manifest_id);
-  test::CompletePageLoadForAllWebContents();
   histograms.ExpectBucketCount("WebApp.LaunchSource",
                                apps::LaunchSource::kFromWebInstallApi, 1);
   histograms.ExpectBucketCount(
@@ -897,7 +891,6 @@ IN_PROC_BROWSER_TEST_F(WebInstallBackgroundAppAlreadyInstalledBrowserTest,
   EXPECT_TRUE(ResultExists());
   EXPECT_FALSE(ErrorExists());
   EXPECT_EQ(GetManifestIdResult(), manifest_id);
-  test::CompletePageLoadForAllWebContents();
   histograms.ExpectBucketCount("WebApp.LaunchSource",
                                apps::LaunchSource::kFromWebInstallApi, 1);
 
@@ -1159,7 +1152,6 @@ IN_PROC_BROWSER_TEST_F(WebInstallBackgroundAppAlreadyInstalledBrowserTest,
   EXPECT_TRUE(ResultExists(app_web_contents));
   EXPECT_FALSE(ErrorExists(app_web_contents));
   EXPECT_EQ(GetManifestIdResult(app_web_contents), manifest_id);
-  test::CompletePageLoadForAllWebContents();
   histograms.ExpectBucketCount("WebApp.LaunchSource",
                                apps::LaunchSource::kFromWebInstallApi, 1);
 
@@ -1442,7 +1434,6 @@ IN_PROC_BROWSER_TEST_P(WebInstallFromUrlCommandBrowserTest, LaunchApp) {
   EXPECT_FALSE(ErrorExists());
   EXPECT_EQ(GetManifestIdResult(), manifest_id.spec());
 
-  test::CompletePageLoadForAllWebContents();
   // Verify the app was reinstalled.
   histograms.ExpectUniqueSample("WebApp.Install.Source.Success", kInstallSource,
                                 1);
