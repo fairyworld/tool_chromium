@@ -388,6 +388,12 @@ source_set("ui_impl") {
     "//ui/webui/tracked_element",
   ]
 
+  if (enable_webui_contextual_tasks_composebox) {
+    # FaviconSource is only used under #if
+    # ENABLE_WEBUI_CONTEXTUAL_TASKS_COMPOSEBOX.
+    deps += [ "//chrome/browser/ui/webui:favicon_source" ]
+  }
+
   if (is_android) {
     deps += [
       ":jni_headers",

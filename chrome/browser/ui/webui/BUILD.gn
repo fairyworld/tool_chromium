@@ -9,6 +9,7 @@ import("//components/safe_browsing/buildflags.gni")
 import("//components/signin/features.gni")
 import("//extensions/buildflags/buildflags.gni")
 import("//tools/metrics/generate_allowlist_from_histograms_file.gni")
+import("//ui/webui/webui_features.gni")
 
 generate_allowlist_from_histograms_file("webui_url_hashes") {
   namespace = "webui_metrics"
@@ -320,6 +321,81 @@ source_set("webui_util") {
     "//chrome/browser/ui/browser_window",
     "//chrome/browser/ui/tabs:tabs_public",
   ]
+}
+
+# favicon_source.cc uses IDR_DEFAULT_FAVICON_*_{32,64} resources that
+# //ui/resources only defines under "not is_android or is_desktop_android or
+# enable_webui_ntp"; gate the target to where it was compiled inside :ui.
+if (enable_extensions_core || enable_webui_ntp ||
+    enable_webui_contextual_tasks_composebox) {
+  source_set("favicon_source") {
+    sources = [ "favicon_source.cc" ]
+    public = [ "favicon_source.h" ]
+    public_deps = [
+      "//base",
+      "//components/favicon/core",
+      "//content/public/browser",
+    ]
+    deps = [
+      "//chrome/browser/favicon",
+      "//chrome/browser/history",
+      "//chrome/browser/profiles:profile",
+      "//chrome/browser/search",
+      "//chrome/browser/search_engines",
+      "//chrome/common",
+      "//components/favicon_base",
+      "//components/google/core/common",
+      "//components/history/core/browser",
+      "//components/search_engines",
+      "//skia",
+      "//ui/base",
+      "//ui/gfx/codec",
+      "//ui/native_theme",
+      "//ui/resources",
+      "//url",
+    ]
+
+    # webui_util_desktop.h is included only under #if !BUILDFLAG(IS_ANDROID);
+    # the util target itself is desktop-only.
+    if (is_win || is_mac || is_linux || is_chromeos) {
+      deps += [ "//chrome/browser/ui/webui/util" ]
+    }
+
+    # InstantService (//chrome/browser/search) constructs FaviconSource, so it
+    # includes favicon_source.h while FaviconSource calls
+    # InstantService::ShouldServiceRequest() — a genuine bidirectional pair.
+    allow_circular_includes_from = [ "//chrome/browser/search" ]
+  }
+}
+
+# favicon_source_unittest.cc hard-depends on //extensions, which is unavailable
+# on non-desktop Android; it ran only under !is_android in chrome/test.
+if (!is_android) {
+  source_set("favicon_source_unit_tests") {
+    testonly = true
+    sources = [ "favicon_source_unittest.cc" ]
+    deps = [
+      ":favicon_source",
+      "//base",
+      "//base/test:test_support",
+      "//chrome/browser/favicon",
+      "//chrome/browser/search_engines",
+      "//chrome/common",
+      "//chrome/test:test_support",
+      "//components/favicon/core/test:test_support",
+      "//components/favicon_base",
+      "//components/search_engines",
+      "//content/public/browser",
+      "//content/test:test_support",
+      "//extensions/browser",
+      "//extensions/common",
+      "//testing/gmock",
+      "//testing/gtest",
+      "//ui/native_theme",
+      "//ui/native_theme:test_support",
+      "//ui/resources",
+    ]
+  }
 }
 
 source_set("plural_string_handler") {

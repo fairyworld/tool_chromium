@@ -5155,10 +5155,7 @@ static_library("ui") {
 
   if (enable_extensions_core || enable_webui_ntp ||
       enable_webui_contextual_tasks_composebox) {
-    sources += [
-      "webui/favicon_source.cc",
-      "webui/favicon_source.h",
-    ]
+    deps += [ "//chrome/browser/ui/webui:favicon_source" ]
   }
 
   if (enable_extensions_core) {
