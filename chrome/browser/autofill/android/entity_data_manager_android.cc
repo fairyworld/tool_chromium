@@ -66,6 +66,8 @@ EntityDataManagerAndroid::EntityDataManagerAndroid(
     consent_auditor::ConsentAuditor* consent_auditor,
     bool is_off_the_record,
     WalletPassAccessManager* wallet_pass_access_manager,
+    personal_context::PersonalContextEnablementService*
+        personal_context_enablement_service,
     EntityDataManager* entity_data_manager)
     : weak_java_obj_(env, obj),
       google_groups_manager_(google_groups_manager),
@@ -76,30 +78,41 @@ EntityDataManagerAndroid::EntityDataManagerAndroid(
       consent_auditor_(consent_auditor),
       is_off_the_record_(is_off_the_record),
       wallet_pass_access_manager_(wallet_pass_access_manager),
+      personal_context_enablement_service_(personal_context_enablement_service),
       entity_data_manager_(CHECK_DEREF(entity_data_manager)) {
   entity_data_manager_observer_.Observe(entity_data_manager);
 }
 
 EntityDataManagerAndroid::~EntityDataManagerAndroid() = default;
 
-static jboolean JNI_EntityDataManager_IsPersonalContextSettingVisible(
-    JNIEnv* env,
-    Profile* profile) {
-  CHECK(profile);
-
-  if (!AreAutofillPersonalContextFeaturesSupported()) {
+bool EntityDataManagerAndroid::IsPersonalContextPreferenceVisible(JNIEnv* env) {
+  if (!autofill::AreAutofillPersonalContextFeaturesSupported()) {
     return false;
   }
 
-  personal_context::PersonalContextEnablementService* enablement_service =
-      PersonalContextEnablementServiceFactory::GetForProfile(profile);
-  return enablement_service &&
-         enablement_service->GetEnablementState() ==
-             personal_context::PersonalContextEnablementState::kEnabled;
+  return autofill::ShouldShowPersonalContextAutofillSetting(
+      personal_context_enablement_service_);
 }
 
-static std::string JNI_EntityDataManager_GetPersonalContextSettingsUrl(
+bool EntityDataManagerAndroid::IsPersonalContextEnabled(JNIEnv* env) {
+  // TODO(b/517066061): Implement pref and read value.
+  return true;
+}
+
+void EntityDataManagerAndroid::SetPersonalContextEnabled(JNIEnv* env,
+                                                         bool enabled) {
+  // TODO(b/517066061): Implement pref and write value.
+}
+
+static std::string
+JNI_EntityDataManager_GetPersonalContextManageConnectedAppsUrl(JNIEnv* env) {
+  // TODO(b/516667536): Update url when final one is ready.
+  return personal_context::kPersonalContextSettingsURL;
+}
+
+static std::string JNI_EntityDataManager_GetPersonalContextManageSuggestionsUrl(
     JNIEnv* env) {
+  // TODO(b/516667536): Update url when final one is ready.
   return personal_context::kPersonalContextSettingsURL;
 }
 
@@ -122,6 +135,7 @@ static int64_t JNI_EntityDataManager_Init(JNIEnv* env,
           ConsentAuditorFactory::GetForProfile(profile),
           profile->IsOffTheRecord(),
           WalletPassAccessManagerFactory::GetForProfile(profile),
+          PersonalContextEnablementServiceFactory::GetForProfile(profile),
           entity_data_manager);
   return reinterpret_cast<intptr_t>(entity_data_manager_android);
 }
@@ -136,7 +150,7 @@ bool EntityDataManagerAndroid::IsEligibleToAutofillAi(JNIEnv* env) {
 }
 
 bool EntityDataManagerAndroid::IsEligibleToAutofillAiForType(JNIEnv* env,
-                                                              int entity_type) {
+                                                             int entity_type) {
   EntityType type(static_cast<EntityTypeName>(entity_type));
   return RunMayPerformAutofillAiAction(AutofillAiAction::kOptIn, type);
 }
@@ -372,7 +386,8 @@ bool EntityDataManagerAndroid::CanEnableOrDisableAutofillAi(JNIEnv* env) {
 }
 
 bool EntityDataManagerAndroid::CanEnableOrDisableAutofillAiForType(
-    JNIEnv* env, int entity_type) {
+    JNIEnv* env,
+    int entity_type) {
   EntityType type(static_cast<EntityTypeName>(entity_type));
   return RunMayPerformAutofillAiAction(AutofillAiAction::kEnableOrDisable,
                                        type);

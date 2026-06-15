@@ -37,6 +37,10 @@ namespace account_settings {
 class AccountSettingService;
 }
 
+namespace personal_context {
+class PersonalContextEnablementService;
+}
+
 namespace autofill {
 
 class WalletPassAccessManager;
@@ -56,6 +60,8 @@ class EntityDataManagerAndroid : public EntityDataManager::Observer {
       consent_auditor::ConsentAuditor* consent_auditor,
       bool is_off_the_record,
       WalletPassAccessManager* wallet_pass_access_manager,
+      personal_context::PersonalContextEnablementService*
+          personal_context_enablement_service,
       EntityDataManager* entity_data_manager);
 
   EntityDataManagerAndroid(const EntityDataManagerAndroid&) = delete;
@@ -143,6 +149,15 @@ class EntityDataManagerAndroid : public EntityDataManager::Observer {
   // servers. Used to display a notice in the management UI.
   bool IsWalletPublicPassStorageEnabled(JNIEnv* env);
 
+  // Returns whether the personal context preference is visible.
+  bool IsPersonalContextPreferenceVisible(JNIEnv* env);
+
+  // Returns whether the personal context is enabled.
+  bool IsPersonalContextEnabled(JNIEnv* env);
+
+  // Sets whether the personal context is enabled.
+  void SetPersonalContextEnabled(JNIEnv* env, bool enabled);
+
  private:
   friend class EntityDataManagerAndroidTestApi;
 
@@ -218,6 +233,8 @@ class EntityDataManagerAndroid : public EntityDataManager::Observer {
   const raw_ptr<consent_auditor::ConsentAuditor> consent_auditor_;
   const bool is_off_the_record_;
   const raw_ptr<WalletPassAccessManager> wallet_pass_access_manager_;
+  const raw_ptr<personal_context::PersonalContextEnablementService>
+      personal_context_enablement_service_;
 
   // Pointer to the EntityDataManager.
   raw_ref<EntityDataManager> entity_data_manager_;
