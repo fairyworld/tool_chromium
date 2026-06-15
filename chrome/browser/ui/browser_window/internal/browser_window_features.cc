@@ -678,7 +678,10 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
 
   // This code needs exclusive access manager to be initialized.
 #if !BUILDFLAG(IS_CHROMEOS)
-  if (download_toolbar_ui_controller_) {
+  if (browser_view) {
+    download_toolbar_ui_controller_ =
+        GetUserDataFactory().CreateInstance<DownloadToolbarUIController>(
+            *browser_view->browser(), browser_view);
     download_toolbar_ui_controller_->display_controller()
         ->ListenToFullScreenChanges();
   }
@@ -980,12 +983,6 @@ void BrowserWindowFeatures::InitPostBrowserViewConstruction(
                 enterprise_data_protection::DataProtectionUIController>(
                 *browser_view->browser(), browser_view);
   }
-
-#if !BUILDFLAG(IS_CHROMEOS)
-  download_toolbar_ui_controller_ =
-      GetUserDataFactory().CreateInstance<DownloadToolbarUIController>(
-          *browser_view->browser(), browser_view);
-#endif
 
   if (base::FeatureList::IsEnabled(ntp_features::kNtpFooter)) {
     new_tab_footer_controller_ =

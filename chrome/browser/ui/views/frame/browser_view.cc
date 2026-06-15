@@ -5059,12 +5059,6 @@ void BrowserView::AddedToWidget() {
       std::make_unique<autofill::AutofillBubbleHandlerImpl>(
           browser_.get(), toolbar_button_provider);
 
-#if !BUILDFLAG(IS_CHROMEOS)
-  if (auto* controller = DownloadToolbarUIController::From(browser_.get())) {
-    controller->Init();
-  }
-#endif
-
   auto* const frame_view = GetFrameView();
   frame_view->OnBrowserViewInitViewsComplete();
   frame_view->UpdateMinimumSize();
