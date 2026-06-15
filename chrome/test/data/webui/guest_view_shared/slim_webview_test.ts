@@ -528,9 +528,19 @@ suite('Requests', function() {
       const response = await fetch('/capture-headers');
       return await response.json();
     });
-
     const fetchHeaders2 = capturedHeaders2['/capture-headers'];
     assertTrue(!!fetchHeaders2);
     assertEquals(customUa2, fetchHeaders2['User-Agent']);
+
+    // 6. Test that the user agent is reset after removing the override.
+    webview.setUserAgentOverride('');
+    assertEquals(navigator.userAgent, webview.getUserAgent());
+    const capturedHeaders3 = await evalOnWebview(webview, async () => {
+      const response = await fetch('/capture-headers');
+      return await response.json();
+    });
+    const fetchHeaders3 = capturedHeaders3['/capture-headers'];
+    assertTrue(!!fetchHeaders3);
+    assertEquals(navigator.userAgent, fetchHeaders3['User-Agent']);
   });
 });
