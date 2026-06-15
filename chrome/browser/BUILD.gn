@@ -581,6 +581,19 @@ if (is_chromeos) {
         [ "file_system_access/cloud_identifier/cloud_identifier_util_ash.h" ]
     deps = [ "//content/public/browser" ]
   }
+
+  source_set("exo_parts") {
+    public = [ "exo_parts.h" ]
+    sources = [ "exo_parts.cc" ]
+    deps = [
+      "//ash",
+      "//ash/constants",
+      "//base",
+      "//chrome/browser/ash/exo",
+      "//chromeos/ash/experiences/arc",
+      "//components/exo/server",
+    ]
+  }
 } else {
   source_set("fullscreen") {
     public = [ "fullscreen.h" ]
@@ -1448,6 +1461,17 @@ source_set("core") {
     ]
   }
 
+  if (is_linux || is_chromeos) {
+    sources += [
+      "chrome_browser_main_linux.cc",
+      "memory_details_linux.cc",
+    ]
+    deps += [ "//third_party/fontconfig" ]
+    if (use_dbus) {
+      deps += [ "//dbus" ]
+    }
+  }
+
   if (is_linux) {
     sources += [
       "chrome_browser_main_extra_parts_linux.h",
@@ -1456,9 +1480,16 @@ source_set("core") {
     deps += [ "//components/os_crypt/async/browser:posix_key_provider" ]
 
     if (use_dbus) {
+      sources += [
+        "dbus_memory_pressure_evaluator_linux.cc",
+        "dbus_memory_pressure_evaluator_linux.h",
+      ]
       deps += [
+        "//components/dbus",
+        "//components/memory_pressure",
         "//components/os_crypt/async/browser:freedesktop_secret_key_provider",
         "//components/os_crypt/async/browser:secret_portal_key_provider",
+        "//dbus",
       ]
     }
   }
@@ -1545,7 +1576,13 @@ source_set("core") {
   }
 
   if (is_chromeos) {
+    sources += [
+      "file_system_access/cloud_identifier/cloud_identifier_util_ash.cc",
+      "icon_loader_chromeos.cc",
+      "shell_integration_chromeos.cc",
+    ]
     deps += [
+      ":cloud_identifier_util_ash",
       "//ash/webui/camera_app_ui",
       "//ash/webui/help_app_ui",
       "//ash/webui/media_app_ui",
@@ -1557,6 +1594,7 @@ source_set("core") {
       "//chrome/browser/apps/app_service",
       "//chrome/browser/apps/app_service/app_install:navigation_throttle",
       "//chrome/browser/apps/digital_goods",
+      "//chrome/browser/apps/intent_helper:chromeos_disabled_apps_throttle",
       "//chrome/browser/ash/app_list/search",
       "//chrome/browser/ash/app_mode",
       "//chrome/browser/ash/app_restore",
@@ -1565,10 +1603,12 @@ source_set("core") {
       "//chrome/browser/ash/arc/session",
       "//chrome/browser/ash/boca/on_task",
       "//chrome/browser/ash/crostini",
+      "//chrome/browser/ash/drive",
       "//chrome/browser/ash/drive/fileapi",
       "//chrome/browser/ash/extensions/autotest_private",
       "//chrome/browser/ash/file_manager",
       "//chrome/browser/ash/file_suggest",
+      "//chrome/browser/ash/file_system_provider",
       "//chrome/browser/ash/file_system_provider/fileapi",
       "//chrome/browser/ash/fileapi",
       "//chrome/browser/ash/fusebox",
@@ -1737,13 +1777,6 @@ source_set("core") {
 
   if (is_mac) {
     deps += [ ":chrome_browser_main_mac" ]
-  }
-
-  if (is_chromeos) {
-    deps += [
-      ":cloud_identifier_util_ash",
-      "//chrome/browser/apps/intent_helper:chromeos_disabled_apps_throttle",
-    ]
   }
 
   if (is_chrome_for_testing) {
@@ -3485,14 +3518,12 @@ static_library("browser") {
 
   if (is_chromeos) {
     sources += [
+      # The following files include headers still owned by //chrome/browser/ui
+      # (e.g. browser.h), so they can't move into :core until those get
+      # componentized.
       "browser_process_platform_part_ash.cc",
       "chrome_browser_interface_binders_webui_parts_chromeos.cc",
-      "exo_parts.cc",
-      "exo_parts.h",
-      "file_system_access/cloud_identifier/cloud_identifier_util_ash.cc",
-      "icon_loader_chromeos.cc",
       "platform_util_ash.cc",
-      "shell_integration_chromeos.cc",
     ]
 
     deps += [
@@ -4658,17 +4689,6 @@ static_library("browser") {
     ]
   }
 
-  if (is_linux || is_chromeos) {
-    sources += [
-      "chrome_browser_main_linux.cc",
-      "memory_details_linux.cc",
-    ]
-    deps += [ "//third_party/fontconfig" ]
-    if (use_dbus) {
-      deps += [ "//dbus" ]
-    }
-  }
-
   if (is_linux) {
     sources += [
       "chrome_browser_main_extra_parts_linux.cc",
@@ -4688,11 +4708,7 @@ static_library("browser") {
     }
 
     if (use_dbus) {
-      sources += [
-        "dbus_memory_pressure_evaluator_linux.cc",
-        "dbus_memory_pressure_evaluator_linux.h",
-        "platform_util_linux.cc",
-      ]
+      sources += [ "platform_util_linux.cc" ]
       deps += [
         "//chrome/common:chrome_features",
         "//components/dbus",
