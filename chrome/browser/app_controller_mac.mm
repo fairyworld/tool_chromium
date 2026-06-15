@@ -47,6 +47,7 @@
 #include "chrome/browser/download/download_core_service_factory.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/first_run/first_run.h"
+#include "chrome/browser/global_keyboard_shortcuts_mac.h"
 #include "chrome/browser/lifetime/application_lifetime.h"
 #include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/lifetime/browser_shutdown.h"
@@ -1021,7 +1022,7 @@ class AppControllerProfileObserver : public ProfileAttributesStorage::Observer,
 
   NSEvent* event = [NSApp currentEvent];
   // Run only for keyboard-initiated quits.
-  if (event.type != NSEventTypeKeyDown) {
+  if (!event || CommandForKeyEvent(event).chrome_command != IDC_EXIT) {
     return ConfirmQuitResultNotPrompted;
   }
 

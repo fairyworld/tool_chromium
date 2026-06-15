@@ -1295,6 +1295,25 @@ IN_PROC_BROWSER_TEST_F(AppControllerMainMenuBrowserTest,
             ConfirmQuitResultNotPrompted);
 }
 
+// Verifies that the Confirm Quit panel is not shown when a keyboard shortcut
+// other than the quit shortcut is pressed.
+IN_PROC_BROWSER_TEST_F(AppControllerMainMenuBrowserTest,
+                       ConfirmQuitPanelNotShownWithNonQuitKeyEvent) {
+  g_browser_process->local_state()->SetBoolean(prefs::kConfirmToQuitEnabled,
+                                               true);
+
+  ASSERT_FALSE(GlobalBrowserCollection::GetInstance()->IsEmpty());
+
+  // Cmd+S is not the Quit shortcut.
+  NSEvent* cmd_s_event = cocoa_test_event_utils::KeyEventWithKeyCode(
+      's', 's', NSEventTypeKeyDown, NSEventModifierFlagCommand);
+  ScopedMockCurrentEvent mock_event(cmd_s_event);
+  ScopedMockConfirmQuitPanel mock_quit_panel;
+
+  EXPECT_EQ([AppController.sharedController confirmQuitIfNeeded],
+            ConfirmQuitResultNotPrompted);
+}
+
 // Verifies that the Confirm Quit panel is not shown if there are no open
 // browser/app windows.
 IN_PROC_BROWSER_TEST_F(AppControllerMainMenuBrowserTest,
