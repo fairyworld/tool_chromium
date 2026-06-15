@@ -458,8 +458,14 @@ ukm::SourceId ContentAutofillDriver::GetPageUkmSourceId() const {
 }
 
 bool ContentAutofillDriver::IsPolicyControlledFeatureAutofillEnabled() const {
-  return render_frame_host_->IsFeatureEnabled(
-      network::mojom::PermissionsPolicyFeature::kAutofill);
+  const url::Origin& origin = render_frame_host_->GetLastCommittedOrigin();
+  const url::Origin& main_origin =
+      render_frame_host_->GetMainFrame()->GetLastCommittedOrigin();
+  // We intentionally force-enable the policy on the main frame (and descendant
+  // frames that share the main frame's origin).
+  return origin.IsSameOriginWith(main_origin) ||
+         render_frame_host_->IsFeatureEnabled(
+             network::mojom::PermissionsPolicyFeature::kAutofill);
 }
 
 bool ContentAutofillDriver::IsPolicyControlledFeatureManualTextEnabled() const {

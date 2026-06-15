@@ -1082,6 +1082,33 @@ TEST_F(ContentAutofillDriverTest, FormSignaturesPreservedDuringRouting) {
             base::NumberToString(expected_structural_signature.value()));
 }
 
+// Tests that the policy-controlled feature "autofill" is force-enabled in the
+// main frame and same-origin descendants.
+TEST_F(ContentAutofillDriverTest, AutofillPolicyControlledFeature) {
+  auto create_rfh = [](content::RenderFrameHost* parent, std::string_view url) {
+    return content::NavigationSimulator::NavigateAndCommitFromDocument(
+        GURL(url), content::RenderFrameHostTester::For(parent)->AppendChild(
+                       std::string(url)));
+  };
+
+  content::RenderFrameHost* main = main_frame();
+  content::RenderFrameHost* same1 = create_rfh(main, "https://a.test/same1");
+  content::RenderFrameHost* cross1 = create_rfh(main, "https://b.test/cross1");
+  content::RenderFrameHost* same2 = create_rfh(cross1, "https://a.test/same2");
+  content::RenderFrameHost* cross2 = create_rfh(same1, "https://b.test/cross2");
+
+  ASSERT_EQ(main->GetLastCommittedOrigin(), same1->GetLastCommittedOrigin());
+  ASSERT_EQ(main->GetLastCommittedOrigin(), same2->GetLastCommittedOrigin());
+  ASSERT_NE(main->GetLastCommittedOrigin(), cross1->GetLastCommittedOrigin());
+  ASSERT_NE(main->GetLastCommittedOrigin(), cross2->GetLastCommittedOrigin());
+
+  EXPECT_TRUE(driver(main).IsPolicyControlledFeatureAutofillEnabled());
+  EXPECT_TRUE(driver(same1).IsPolicyControlledFeatureAutofillEnabled());
+  EXPECT_TRUE(driver(same2).IsPolicyControlledFeatureAutofillEnabled());
+  EXPECT_FALSE(driver(cross1).IsPolicyControlledFeatureAutofillEnabled());
+  EXPECT_FALSE(driver(cross2).IsPolicyControlledFeatureAutofillEnabled());
+}
+
 }  // namespace
 
 }  // namespace autofill
