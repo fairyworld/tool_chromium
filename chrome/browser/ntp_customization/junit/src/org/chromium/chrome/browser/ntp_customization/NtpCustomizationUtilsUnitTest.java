@@ -539,6 +539,27 @@ public class NtpCustomizationUtilsUnitTest {
     }
 
     @Test
+    public void testUpdateBackgroundImageFilePath() {
+        String filePath = "/path/to/image.png";
+        SharedPreferencesManager prefsManager = ChromeSharedPreferences.getInstance();
+
+        assertEquals("", NtpCustomizationUtils.getBackgroundImageFilePathFromSharedPreference());
+
+        NtpCustomizationUtils.setBackgroundImageFilePathToSharedPreference(filePath);
+        assertEquals(
+                filePath, NtpCustomizationUtils.getBackgroundImageFilePathFromSharedPreference());
+        assertEquals(
+                filePath,
+                prefsManager.readString(
+                        ChromePreferenceKeys.NTP_CUSTOMIZATION_BACKGROUND_IMAGE_FILE_PATH, ""));
+
+        NtpCustomizationUtils.resetSharedPreferenceForTesting();
+        assertFalse(
+                prefsManager.contains(
+                        ChromePreferenceKeys.NTP_CUSTOMIZATION_BACKGROUND_IMAGE_FILE_PATH));
+    }
+
+    @Test
     @EnableFeatures(ChromeFeatureList.NEW_TAB_PAGE_CUSTOMIZATION_V2)
     public void testGetPrimaryColorFromCustomizedThemeColor_colorFromHex_LightAndDark() {
         NtpCustomizationUtils.setNtpBackgroundTypeToSharedPreference(COLOR_FROM_HEX);
