@@ -154,7 +154,7 @@ TEST_F(ClientImplIntegrationTest, AttestationFailure) {
   // 2. Client should receive an error.
   auto result = future.Get();
   ASSERT_FALSE(result.has_value());
-  EXPECT_EQ(result.error(), StatusCode::kClientAttestationFailed);
+  EXPECT_EQ(result.error(), StatusCode::kClientAttestationTokenFetchFailed);
 }
 
 TEST_F(ClientImplIntegrationTest, Timeout) {

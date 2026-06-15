@@ -30,6 +30,19 @@ reviewer.
 
 <!-- LINT.ThenChange(//components/private_ai/proto/private_ai.proto:FeatureName) -->
 
+<histogram name="PrivateAi.Client.ClientAttestationRequestFailureReason"
+    enum="PrivateAiStatusCode" expires_after="2026-11-25">
+  <owner>arabm@google.com</owner>
+  <owner>dullweber@chromium.org</owner>
+  <owner>lamzin@google.com</owner>
+  <summary>
+    Records the underlying status code (error reason) when the initial client
+    attestation request fails. This error is rewritten as
+    kClientAttestationFailed on the main request status code metric, and this
+    histogram tracks the original failure reason of the request.
+  </summary>
+</histogram>
+
 <histogram name="PrivateAi.Client.FeatureName" enum="PrivateAiFeatureName"
     expires_after="2026-12-01">
   <owner>nikhiljakhar@google.com</owner>

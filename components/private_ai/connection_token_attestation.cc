@@ -98,7 +98,7 @@ void ConnectionTokenAttestation::OnTokenFetched(
     std::optional<phosphor::BlindSignedAuthToken> auth_token) {
   if (!auth_token.has_value()) {
     logger_->LogError(FROM_HERE, "Failed to get anonymous auth token");
-    CallOnDisconnect(StatusCode::kClientAttestationFailed);
+    CallOnDisconnect(StatusCode::kClientAttestationTokenFetchFailed);
     return;
   }
 
@@ -113,7 +113,7 @@ void ConnectionTokenAttestation::OnTokenFetched(
 
   if (!token_str || !extensions_str) {
     logger_->LogError(FROM_HERE, "Failed to decode anonymous auth token");
-    CallOnDisconnect(StatusCode::kClientAttestationFailed);
+    CallOnDisconnect(StatusCode::kClientAttestationTokenDecodeFailed);
     return;
   }
 
@@ -162,6 +162,10 @@ void ConnectionTokenAttestation::OnInnerConnectionResponse(
       // after sending the token, we assume it's an attestation failure caused
       // by an invalid token. The server closes the stream on invalid token,
       // which surfaces as an error here.
+      base::UmaHistogramEnumeration(
+          "PrivateAi.Client.ClientAttestationRequestFailureReason",
+          result.error());
+
       logger_->LogError(
           FROM_HERE,
           base::StrCat({"Request failed with error code: ",

@@ -24015,7 +24015,7 @@ Called by update_net_error_codes.py.-->
 
 <!-- LINT.ThenChange(//components/private_ai/phosphor/data_types.h:GetAuthnTokensResult) -->
 
-<!-- LINT.IfChange(StatusCode) -->
+<!-- LINT.IfChange(PrivateAiStatusCode) -->
 
 <enum name="PrivateAiStatusCode">
   <summary>Private AI request status code.</summary>
@@ -24035,6 +24035,12 @@ Called by update_net_error_codes.py.-->
   <int value="13" label="Destroyed"/>
   <int value="14" label="UnusedConnection"/>
   <int value="15" label="ProxyConfigFailed"/>
+  <int value="16" label="ConnectionClosedByClient"/>
+  <int value="17" label="ProxyTokenFetchFailed"/>
+  <int value="18" label="UnexpectedTransportError"/>
+  <int value="19" label="ClientAttestationTokenFetchFailed"/>
+  <int value="20" label="ClientAttestationTokenDecodeFailed"/>
+  <int value="21" label="ConnectionClosedByServer"/>
 </enum>
 
 <!-- LINT.ThenChange(//components/private_ai/status_code.h:StatusCode) -->
