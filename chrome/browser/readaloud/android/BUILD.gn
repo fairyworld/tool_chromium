@@ -424,5 +424,9 @@ static_library("native") {
     "//components/prefs",
   ]
 
-  public_deps = [ ":features_jni_headers" ]
+  public_deps = [
+    ":features_jni_headers",
+    "//chrome/browser/readaloud",
+    "//chrome/browser/readaloud:impl",
+  ]
 }
