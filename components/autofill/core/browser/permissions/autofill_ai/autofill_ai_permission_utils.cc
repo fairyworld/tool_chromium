@@ -184,6 +184,7 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     case AutofillAiAction::kUseCachedServerClassificationModelResults:
     case AutofillAiAction::kImportToWallet:
     case AutofillAiAction::kWalletDataSharingPromotion:
+    case AutofillAiAction::kAmbientAutofillFilling:
     case AutofillAiAction::kTypeSupportsPersonalContextData:
       return false;
     case AutofillAiAction::kEditAndDeleteEntityInstanceInSettings:
@@ -254,10 +255,12 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     case AutofillAiAction::kListEntityInstancesInSettings:
     case AutofillAiAction::kLogToMqls:
     case AutofillAiAction::kOptIn:
-    case AutofillAiAction::kTypeSupportsPersonalContextData:
       return true;
     case AutofillAiAction::kEnableOrDisable:
       return is_enabled(features::kAutofillAiAvailableByDefault);
+    case AutofillAiAction::kAmbientAutofillFilling:
+    case AutofillAiAction::kTypeSupportsPersonalContextData:
+      return is_enabled(features::kAutofillAmbientAutofill);
   }
   NOTREACHED();
 }
@@ -285,6 +288,7 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     case AutofillAiAction::kLogToMqls:
     case AutofillAiAction::kOptIn:
     case AutofillAiAction::kEnableOrDisable:
+    case AutofillAiAction::kAmbientAutofillFilling:
     case AutofillAiAction::kTypeSupportsPersonalContextData:
       return true;
   }
@@ -403,6 +407,8 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
                   features::kAutofillAiAvailableByDefault));
     case AutofillAiAction::kEnableOrDisable:
     case AutofillAiAction::kListEntityInstancesInSettings:
+    // TODO(crbug.com/523168644): Add pref check for ambient autofill.
+    case AutofillAiAction::kAmbientAutofillFilling:
       return true;
   }
   NOTREACHED();
@@ -484,6 +490,7 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     case AutofillAiAction::kServerClassificationModel:
     case AutofillAiAction::kUseCachedServerClassificationModelResults:
     case AutofillAiAction::kWalletDataSharingPromotion:
+    case AutofillAiAction::kAmbientAutofillFilling:
     case AutofillAiAction::kTypeSupportsPersonalContextData:
       break;
   }
@@ -514,6 +521,7 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     case AutofillAiAction::kImportToWallet:
     case AutofillAiAction::kWalletDataSharingPromotion:
     case AutofillAiAction::kServerClassificationModel:
+    case AutofillAiAction::kAmbientAutofillFilling:
     case AutofillAiAction::kTypeSupportsPersonalContextData: {
       if (is_off_the_record) {
         MaybeOutputReason(debug_message, "Off the record.");
@@ -547,6 +555,7 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     case AutofillAiAction::kServerClassificationModel:
     case AutofillAiAction::kFilling:
     case AutofillAiAction::kUseCachedServerClassificationModelResults:
+    case AutofillAiAction::kAmbientAutofillFilling:
     case AutofillAiAction::kTypeSupportsPersonalContextData:
       break;
   }
@@ -580,9 +589,13 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     case AutofillAiAction::kServerClassificationModel:
     case AutofillAiAction::kFilling:
     case AutofillAiAction::kUseCachedServerClassificationModelResults:
+    // TODO(crbug.com/523168644): Check reauth availability.
+    case AutofillAiAction::kAmbientAutofillFilling:
     case AutofillAiAction::kTypeSupportsPersonalContextData:
       break;
   }
+
+  // TODO(crbug.com/523168644): Check personal context eligibility requirements.
 
   // If the user changes their GeoIp, the feature might stop working, but the
   // data should not disappear.

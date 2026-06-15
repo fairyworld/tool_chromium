@@ -73,6 +73,8 @@ enum class AutofillAiAction {
   // Whether the user should see a promotion to allow Wallet to share data with
   // Chrome.
   kWalletDataSharingPromotion,
+  // Whether ambient autofill filling is enabled.
+  kAmbientAutofillFilling,
   // Returns true if the entity type supports personal context data.
   kTypeSupportsPersonalContextData,
   kMaxValue = kTypeSupportsPersonalContextData,

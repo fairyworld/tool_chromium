@@ -76,6 +76,8 @@ std::string GetTestSuffix(
       return "kImportToWallet";
     case AutofillAiAction::kWalletDataSharingPromotion:
       return "kWalletDataSharingPromotion";
+    case AutofillAiAction::kAmbientAutofillFilling:
+      return "kAmbientAutofillFilling";
     case AutofillAiAction::kTypeSupportsPersonalContextData:
       return "kTypeSupportsPersonalContextData";
   }
@@ -108,6 +110,7 @@ class AutofillAiPermissionUtilsTest : public ::testing::Test {
         {{features::kAutofillAiWithDataSchema, {}},
          {features::kAutofillAiWalletVehicleRegistration, {}},
          {features::kAutofillAiWalletFlightReservation, {}},
+         {features::kAutofillAmbientAutofill, {}},
          {features::kAutofillAiServerModel,
           {{"autofill_ai_model_use_cache_results", "true"}}}},
         {});
@@ -247,6 +250,7 @@ TEST_P(AutofillAiMayPerformActionTest,
                 AutofillAiAction::kFilling, AutofillAiAction::kImport,
                 AutofillAiAction::kListEntityInstancesInSettings,
                 AutofillAiAction::kUseCachedServerClassificationModelResults,
+                AutofillAiAction::kAmbientAutofillFilling,
                 AutofillAiAction::kTypeSupportsPersonalContextData});
   EXPECT_EQ(
       MayPerformAutofillAiAction(client(), GetParam(), EntityType(kPassport)),
@@ -285,6 +289,7 @@ TEST_P(AutofillAiMayPerformActionTest, ActionsWhenNotOptedIntoAutofillAi) {
                 AutofillAiAction::kListEntityInstancesInSettings,
                 AutofillAiAction::kOptIn,
                 AutofillAiAction::kUseCachedServerClassificationModelResults,
+                AutofillAiAction::kAmbientAutofillFilling,
                 AutofillAiAction::kTypeSupportsPersonalContextData});
   EXPECT_EQ(
       MayPerformAutofillAiAction(client(), GetParam(), EntityType(kPassport)),
@@ -539,7 +544,6 @@ TEST_P(AutofillAiMayPerformActionTest,
       MayPerformAutofillAiAction(client(), GetParam(), EntityType(kPassport)),
       !kForbiddenActions.contains(GetParam()));
 }
-
 TEST_F(AutofillAiPermissionUtilsTest, kTypeSupportsPersonalContextData) {
   for (const EntityTypeName type : {kPassport, kDriversLicense, kNationalIdCard,
                                     kFlightReservation, kShipment, kOrder}) {
@@ -570,6 +574,7 @@ INSTANTIATE_TEST_SUITE_P(
            AutofillAiAction::kServerClassificationModel,
            AutofillAiAction::kUseCachedServerClassificationModelResults,
            AutofillAiAction::kWalletDataSharingPromotion,
+           AutofillAiAction::kAmbientAutofillFilling,
            AutofillAiAction::kTypeSupportsPersonalContextData),
     GetTestSuffix);
 
