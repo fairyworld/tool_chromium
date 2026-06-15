@@ -658,6 +658,25 @@ void GeminiBrowserAgent::StartGeminiFlow(UIViewController* base_view_controller,
                          fromEntryPoint:entry_point];
 }
 
+GeminiConfiguration*
+GeminiBrowserAgent::CreateGeminiConfigurationForActiveWebState(
+    UIViewController* base_view_controller,
+    GeminiStartupState* startup_state) {
+  web::WebState* web_state = browser_->GetWebStateList()->GetActiveWebState();
+  if (!web_state) {
+    return nil;
+  }
+  GeminiTabHelper* gemini_tab_helper = GetActiveTabHelper(web_state);
+  if (!gemini_tab_helper) {
+    return nil;
+  }
+  GeminiPageContext* initial_page_context =
+      gemini_tab_helper->GetPartialPageContext();
+  ApplyUserPrefsToPageContext(initial_page_context);
+  return CreateGeminiConfiguration(base_view_controller, startup_state,
+                                   web_state, initial_page_context);
+}
+
 bool GeminiBrowserAgent::HasCompletedFirstRun() {
   PrefService* pref_service = browser_->GetProfile()->GetPrefs();
 

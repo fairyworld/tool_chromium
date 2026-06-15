@@ -146,6 +146,7 @@
 #import "ios/chrome/browser/infobars/model/infobar_ios.h"
 #import "ios/chrome/browser/infobars/model/infobar_manager_impl.h"
 #import "ios/chrome/browser/intelligence/actor/coordinator/actor_overlay_coordinator.h"
+#import "ios/chrome/browser/intelligence/bwg/coordinator/gemini_container_coordinator.h"
 #import "ios/chrome/browser/intelligence/bwg/coordinator/gemini_entry_flow_coordinator.h"
 #import "ios/chrome/browser/intelligence/bwg/coordinator/gemini_first_run_coordinator.h"
 #import "ios/chrome/browser/intelligence/bwg/model/gemini_browser_agent.h"
@@ -824,6 +825,7 @@ const char kChromeAppStoreUrl[] =
   TabGroupConfirmationCoordinator* _lastTabClosingAlert;
 
   // The coordinators for Gemini related logic.
+  GeminiContainerCoordinator* _geminiContainerCoordinator;
   GeminiFirstRunCoordinator* _geminiFirstRunCoordinator;
   GeminiEntryFlowCoordinator* _geminiEntryFlowCoordinator;
 
@@ -1999,6 +2001,11 @@ const char kChromeAppStoreUrl[] =
   [_passkeyIncognitoCoordinator stop];
   _passkeyIncognitoCoordinator = nil;
 
+  if (IsIOSGeminiBottomSheetMigrationEnabled()) {
+    [_geminiContainerCoordinator stop];
+    _geminiContainerCoordinator = nil;
+  }
+
   if (IsGeneralizedGeminiEntryFlowEnabled()) {
     [_geminiEntryFlowCoordinator stop];
     _geminiEntryFlowCoordinator = nil;
@@ -2226,11 +2233,28 @@ const char kChromeAppStoreUrl[] =
 
 // Starts the Gemini session directly via the browser agent.
 - (void)startGeminiSessionWithStartupState:(GeminiStartupState*)startupState {
+  if (IsIOSGeminiBottomSheetMigrationEnabled()) {
+    // TODO(crbug.com/522834015): Start the First Run coordinator if needed.
+    if (_geminiContainerCoordinator) {
+      return;
+    }
+
+    _geminiContainerCoordinator = [[GeminiContainerCoordinator alloc]
+        initWithBaseViewController:self.viewController
+                           browser:self.browser
+                      startupState:startupState];
+    [_geminiContainerCoordinator start];
+    return;
+  }
+
   GeminiBrowserAgent* geminiBrowserAgent =
       GeminiBrowserAgent::FromBrowser(self.browser);
-  if (geminiBrowserAgent) {
-    geminiBrowserAgent->StartGeminiFlow(self.viewController, startupState);
+  if (!geminiBrowserAgent) {
+    CHECK(geminiBrowserAgent, base::NotFatalUntil::M152);
+    return;
   }
+
+  geminiBrowserAgent->StartGeminiFlow(self.viewController, startupState);
 }
 
 #pragma mark - ActivityServiceCommands
@@ -3853,14 +3877,7 @@ const char kChromeAppStoreUrl[] =
 #pragma mark - BWGCommands
 
 - (void)startGeminiFlowWithStartupState:(GeminiStartupState*)startupState {
-  GeminiBrowserAgent* geminiBrowserAgent =
-      GeminiBrowserAgent::FromBrowser(self.browser);
-  if (!geminiBrowserAgent) {
-    CHECK(geminiBrowserAgent, base::NotFatalUntil::M152);
-    return;
-  }
-
-  geminiBrowserAgent->StartGeminiFlow(self.viewController, startupState);
+  [self startGeminiSessionWithStartupState:startupState];
 }
 
 - (void)
@@ -3902,6 +3919,21 @@ const char kChromeAppStoreUrl[] =
   if (_geminiFirstRunCoordinator) {
     [_geminiFirstRunCoordinator stopWithCompletion:completion];
     _geminiFirstRunCoordinator = nil;
+    return;
+  }
+
+  if (_geminiContainerCoordinator) {
+    __weak __typeof(self) weakSelf = self;
+    [_geminiContainerCoordinator dismissWithCompletion:^{
+      BrowserCoordinator* strongSelf = weakSelf;
+      if (strongSelf) {
+        [strongSelf->_geminiContainerCoordinator stop];
+        strongSelf->_geminiContainerCoordinator = nil;
+      }
+      if (completion) {
+        completion();
+      }
+    }];
     return;
   }
 
