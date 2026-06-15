@@ -261,30 +261,21 @@ class FormFiller {
   };
 
   // Returns the value to fill along with the field type and if the value is an
-  // override.
-  ValueAndTypeAndOverride GetFieldFillingData(
+  // override. Returns `std::nullopt` if no value to fill could be found.
+  std::optional<ValueAndTypeAndOverride> GetFieldFillingData(
       const AutofillField& field,
       const AugmentedFillingPayload& filling_payload,
       const std::map<FieldGlobalId, FillingValueAndType>& forced_fill_values,
       mojom::ActionPersistence action_persistence,
-      std::string* failure_to_fill);
-
-  // Fills `field_data` and modifies `autofill_field` given all other states.
-  // Returns the FieldType of the value that was filled, or std::nullopt if no
-  // value was filled. If the FieldType is not known, returns UNKNOWN_TYPE. The
-  // return value is independent of whether the field was filled or autofilled
-  // before. When `allow_suggestion_swapping` is true, the method still returns
-  // the FieldType if the `autofill_field` is emptied.
-  // TODO(crbug.com/40227071): Cleanup API and logic.
-  std::optional<FieldType> FillField(
-      const AutofillField& autofill_field,
-      const AugmentedFillingPayload& filling_payload,
-      const std::map<FieldGlobalId, FillingValueAndType>& forced_fill_values,
-      FormFieldData& field_data,
-      mojom::ActionPersistence action_persistence,
-      AutofillTriggerSource trigger_source,
       bool allow_suggestion_swapping,
       std::string* failure_to_fill);
+
+  // Fills `field` and modifies the states needed by the renderer for filling.
+  void FillField(const std::optional<ValueAndTypeAndOverride>& filling_content,
+                 FormFieldData& field,
+                 mojom::ActionPersistence action_persistence,
+                 AutofillTriggerSource trigger_source,
+                 bool allow_suggestion_swapping);
 
   // Updates the cached `AutofillField`s in `form` with the information
   // resulting from a filling operation.

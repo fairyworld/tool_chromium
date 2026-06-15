@@ -909,14 +909,14 @@ void FormFiller::FillOrPreviewForm(
     mojom::ActionPersistence action_persistence,
     const FillingPayload& filling_payload,
     FormStructure& form,
-    AutofillField& autofill_trigger_field,
+    AutofillField& trigger_field,
     AutofillTriggerSource trigger_source,
     const base::flat_set<FieldGlobalId>& blocked_fields,
     FillId fill_id,
     const std::map<FieldGlobalId, FillingValueAndType>& forced_fill_values,
     RefillOptions refill_options) {
   const AugmentedFillingPayload augmented_filling_payload =
-      AugmentedFillingPayload(filling_payload, form, autofill_trigger_field);
+      AugmentedFillingPayload(filling_payload, form, trigger_field);
 
   LogBuffer buffer(IsLoggingActive(log_manager()));
   LOG_AF(buffer) << "action_persistence: "
@@ -938,7 +938,7 @@ void FormFiller::FillOrPreviewForm(
   // `FormFiller::GetFieldFillingSkipReasons` returns for each field a generic
   // list of reason for skipping each field.
   base::flat_map<FieldGlobalId, DenseSet<FieldFillingSkipReason>> skip_reasons =
-      GetFieldFillingSkipReasons(form, autofill_trigger_field, refill_options,
+      GetFieldFillingSkipReasons(form, trigger_field, refill_options,
                                  augmented_filling_payload.filling_product(),
                                  trigger_source, manager_->client(),
                                  blocked_fields);
@@ -946,7 +946,7 @@ void FormFiller::FillOrPreviewForm(
   // This loop sets the values to fill in the `result_fields`. The
   // `result_fields` are sent to the renderer, whereas the very similar
   // `form.fields()` remains in the browser process.
-  // The fill value is determined by `FillField()`.
+  // The fill value is determined by `GetFieldFillingData()`.
   for (size_t i = 0; i < result_fields.size(); ++i) {
     const AutofillField& field = CHECK_DEREF(form.field(i));
     if (!skip_reasons[field.global_id()].empty()) {
@@ -959,22 +959,24 @@ void FormFiller::FillOrPreviewForm(
 
     std::string failure_to_fill;  // Reason for failing to fill.
 
-    const bool allow_suggestion_swapping =
+    const bool allow_payment_swapping =
         // TODO(crbug.com/393114125): Change to use
         // `AutofillField::field_modifiers_`.
         result_fields[i].is_autofilled_according_to_renderer() &&
-        AllowPaymentSwapping(autofill_trigger_field, field,
-                             refill_options.is_refill());
+        AllowPaymentSwapping(trigger_field, field, refill_options.is_refill());
 
-    // Fill the data from `augmented_filling_payload` into `result_form`, which
-    // will be sent to the renderer. When `allow_suggestion_swapping` is true,
-    // the fields can also be emptied. In that scenario,
-    // `field.is_autofilled_according_to_renderer()` becomes false.
-    const std::optional<FieldType> filled_field_type =
-        FillField(field, augmented_filling_payload, forced_fill_values,
-                  result_fields[i], action_persistence, trigger_source,
-                  allow_suggestion_swapping, &failure_to_fill);
-    const bool is_newly_autofilled_or_emptied = filled_field_type.has_value();
+    const std::optional<ValueAndTypeAndOverride> field_filling_content =
+        GetFieldFillingData(field, augmented_filling_payload,
+                            forced_fill_values, action_persistence,
+                            allow_payment_swapping, &failure_to_fill);
+
+    // Fill the data from `field_filling_content` into `result_fields[i]`, which
+    // will be sent to the renderer.
+    FillField(field_filling_content, result_fields[i], action_persistence,
+              trigger_source, allow_payment_swapping);
+
+    const bool is_newly_autofilled_or_emptied =
+        field_filling_content.has_value();
     const bool autofilled_value_did_not_change =
         field.is_autofilled_according_to_renderer() &&
         result_fields[i].is_autofilled_according_to_renderer() &&
@@ -987,9 +989,9 @@ void FormFiller::FillOrPreviewForm(
       skip_reasons[field.global_id()].insert(
           FieldFillingSkipReason::kNoValueToFill);
     } else {
-      CHECK(filled_field_type);
-      filled_field_types.emplace(result_fields[i].global_id(),
-                                 *filled_field_type);
+      CHECK(field_filling_content);
+      filled_field_types.emplace(field.global_id(),
+                                 field_filling_content->filling_type);
     }
 
     const bool has_value_before = !field.value().empty();
@@ -1007,9 +1009,9 @@ void FormFiller::FillOrPreviewForm(
   }
 
   const bool may_refill_in_future = MaybeInitializeRefillContext(
-      action_persistence, form, autofill_trigger_field,
-      augmented_filling_payload, blocked_fields, fill_id, result_fields,
-      filled_field_types, refill_options);
+      action_persistence, form, trigger_field, augmented_filling_payload,
+      blocked_fields, fill_id, result_fields, filled_field_types,
+      refill_options);
 
   // Remove fields that won't be filled. This includes:
   // - Fields that have a skip reason.
@@ -1024,9 +1026,9 @@ void FormFiller::FillOrPreviewForm(
       manager_->driver().ApplyFormAction(
           mojom::FormActionType::kFill, action_persistence, result_fields,
           fill_id,
-          /*supports_refill=*/may_refill_in_future,
-          autofill_trigger_field.origin(), filled_field_types,
-          /*section_for_clear_form_on_ios=*/autofill_trigger_field.section());
+          /*supports_refill=*/may_refill_in_future, trigger_field.origin(),
+          filled_field_types,
+          /*section_for_clear_form_on_ios=*/trigger_field.section());
 
   // This will hold the subset of fields of `result_fields` whose ids are in
   // `safe_filled_field_ids`.
@@ -1053,7 +1055,7 @@ void FormFiller::FillOrPreviewForm(
   if (action_persistence == mojom::ActionPersistence::kFill) {
     form.set_last_filling_timestamp(base::TimeTicks::Now());
 
-    AppendFillLogEvents(form, autofill_trigger_field, safe_filled_field_ids,
+    AppendFillLogEvents(form, trigger_field, safe_filled_field_ids,
                         skip_reasons, filling_payload,
                         refill_options.is_refill());
 
@@ -1077,7 +1079,7 @@ void FormFiller::FillOrPreviewForm(
                         << std::move(buffer);
 
   manager_->OnDidFillOrPreviewForm(
-      action_persistence, form, autofill_trigger_field, safe_filled_fields,
+      action_persistence, form, trigger_field, safe_filled_fields,
       base::MakeFlatSet<FieldGlobalId>(result_fields, {},
                                        &FormFieldData::global_id),
       filling_payload, trigger_source, refill_options.reason());
@@ -1334,15 +1336,17 @@ bool FormFiller::MaybeInitializeRefillContext(
   return true;
 }
 
-FormFiller::ValueAndTypeAndOverride FormFiller::GetFieldFillingData(
+std::optional<FormFiller::ValueAndTypeAndOverride>
+FormFiller::GetFieldFillingData(
     const AutofillField& field,
     const AugmentedFillingPayload& filling_payload,
     const std::map<FieldGlobalId, FillingValueAndType>& forced_fill_values,
     mojom::ActionPersistence action_persistence,
+    bool allow_suggestion_swapping,
     std::string* failure_to_fill) {
   if (auto it = forced_fill_values.find(field.global_id());
       it != forced_fill_values.end()) {
-    return {it->second, /*value_is_an_override=*/true};
+    return ValueAndTypeAndOverride{it->second, /*value_is_an_override=*/true};
   }
   FillingValueAndType filling_value_and_type = std::visit(
       absl::Overload{
@@ -1385,33 +1389,7 @@ FormFiller::ValueAndTypeAndOverride FormFiller::GetFieldFillingData(
           }},
       filling_payload.variant);
 
-  CHECK(filling_value_and_type.filling_type != UNKNOWN_TYPE ||
-        // The skip reasons lump all Autofill AI types together because
-        // there is only a single FillingProduct for Autofill AI. Therefore,
-        // when two Autofill AI FieldTypes of different entities appear in
-        // the form, only the above std::visit() calls detects that the
-        // value is not fillable and returns UNKNOWN_TYPE in that case.
-        std::holds_alternative<AugmentedFillingPayload::EntityPayload>(
-            filling_payload.variant));
-  return {filling_value_and_type,
-          /*value_is_an_override=*/false};
-}
-
-std::optional<FieldType> FormFiller::FillField(
-    const AutofillField& autofill_field,
-    const AugmentedFillingPayload& filling_payload,
-    const std::map<FieldGlobalId, FillingValueAndType>& forced_fill_values,
-    FormFieldData& field_data,
-    mojom::ActionPersistence action_persistence,
-    AutofillTriggerSource trigger_source,
-    bool allow_suggestion_swapping,
-    std::string* failure_to_fill) {
-  const ValueAndTypeAndOverride filling_content =
-      GetFieldFillingData(autofill_field, filling_payload, forced_fill_values,
-                          action_persistence, failure_to_fill);
-
-  // Do not attempt to fill empty values as it would skew the metrics.
-  if (filling_content.value.empty() && !allow_suggestion_swapping) {
+  if (filling_value_and_type.value.empty() && !allow_suggestion_swapping) {
     if (failure_to_fill) {
       *failure_to_fill += "No value to fill available. ";
     }
@@ -1420,12 +1398,25 @@ std::optional<FieldType> FormFiller::FillField(
   if (failure_to_fill) {
     *failure_to_fill = "Decided to fill";
   }
+  return ValueAndTypeAndOverride{filling_value_and_type,
+                                 /*value_is_an_override=*/false};
+}
 
-  field_data.set_value(filling_content.value);
-  field_data.set_force_override(filling_content.value_is_an_override ||
+void FormFiller::FillField(
+    const std::optional<ValueAndTypeAndOverride>& filling_content,
+    FormFieldData& field_data,
+    mojom::ActionPersistence action_persistence,
+    AutofillTriggerSource trigger_source,
+    bool allow_suggestion_swapping) {
+  if (!filling_content) {
+    return;
+  }
+
+  field_data.set_value(filling_content->value);
+  field_data.set_force_override(filling_content->value_is_an_override ||
                                 allow_suggestion_swapping);
-  if (field_data.IsSelectElement() && filling_content.select_text) {
-    field_data.set_selected_option_text(*filling_content.select_text);
+  if (field_data.IsSelectElement() && filling_content->select_text) {
+    field_data.set_selected_option_text(*filling_content->select_text);
   }
 
   // Sometimes the field can be cleared by Autofill instead of being filled
@@ -1435,7 +1426,7 @@ std::optional<FieldType> FormFiller::FillField(
   // Moreover, Glic-triggered filling operations must be done without setting
   // a blue background.
   bool should_mark_as_autofilled =
-      !filling_content.value.empty() &&
+      !filling_content->value.empty() &&
       (trigger_source != AutofillTriggerSource::kGlic ||
        action_persistence == mojom::ActionPersistence::kPreview);
 
@@ -1443,7 +1434,6 @@ std::optional<FieldType> FormFiller::FillField(
   // set here so that the form is sent to the renderer and the renderer is able
   // to fill them and update the background accordingly.
   field_data.set_is_autofilled_according_to_renderer(should_mark_as_autofilled);
-  return filling_content.filling_type;
 }
 
 void FormFiller::UpdateCacheOnFill(
