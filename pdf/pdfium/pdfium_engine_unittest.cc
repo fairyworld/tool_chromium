@@ -35,6 +35,7 @@
 #include "pdf/document_layout.h"
 #include "pdf/document_metadata.h"
 #include "pdf/page_character_index.h"
+#include "pdf/page_orientation.h"
 #include "pdf/pdf_features.h"
 #include "pdf/pdfium/pdfium_api_wrappers.h"
 #include "pdf/pdfium/pdfium_draw_selection_test_base.h"
@@ -3111,6 +3112,7 @@ class PDFiumEngineInkDrawTextTest : public PDFiumTestBase {
         /*typeface=*/TextTypeface::kSansSerif,
         /*alignment=*/TextAlignment::kLeft,
         /*orientation=*/0,
+        /*viewport_orientation=*/PageOrientation::kOriginal,
         /*is_bold=*/false,
         /*is_italic=*/false,
         /*text=*/"Hello!");
@@ -3735,11 +3737,11 @@ TEST_P(PDFiumEngineInkDrawTextTest, DrawTextSaveAndLoad) {
   // Verify the loaded attributes have the exact same bounds and properties
   // as the original drawn annotation.
   EXPECT_THAT(page_boxes[0].attributes,
-              InkTextBoxAttributesEq(kOriginalRect, attribute.color,
-                                     attribute.css_font_size,
-                                     attribute.typeface, attribute.alignment,
-                                     attribute.orientation, attribute.is_bold,
-                                     attribute.is_italic, attribute.text));
+              InkTextBoxAttributesEq(
+                  kOriginalRect, attribute.color, attribute.css_font_size,
+                  attribute.typeface, attribute.alignment,
+                  attribute.orientation, attribute.viewport_orientation,
+                  attribute.is_bold, attribute.is_italic, attribute.text));
 }
 
 TEST_P(PDFiumEngineInkDrawTextTest, LoadTextAnnotationsFromPdfMultiPages) {

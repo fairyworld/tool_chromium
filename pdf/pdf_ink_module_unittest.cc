@@ -557,6 +557,7 @@ TEST_P(PdfInkModuleTest, HandleGetAllTextAnnotationsMessage) {
                      /*typeface=*/TextTypeface::kMonospace,
                      /*alignment=*/TextAlignment::kCenter,
                      /*orientation=*/1,
+                     /*viewport_orientation=*/PageOrientation::kOriginal,
                      /*is_bold=*/false,
                      /*is_italic=*/true,
                      /*text=*/"Hello World from Test!")));
@@ -1038,6 +1039,7 @@ class PdfInkModuleTextTest : public testing::Test {
         /*typeface=*/TextTypeface::kSerif,
         /*alignment=*/TextAlignment::kCenter,
         /*orientation=*/1,
+        /*viewport_orientation=*/PageOrientation::kOriginal,
         /*is_bold=*/true,
         /*is_italic=*/true,
         /*text=*/"hi");
@@ -1297,6 +1299,7 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageEdit) {
                      /*typeface=*/TextTypeface::kSerif,
                      /*alignment=*/TextAlignment::kCenter,
                      /*orientation=*/1,
+                     /*viewport_orientation=*/PageOrientation::kOriginal,
                      /*is_bold=*/true,
                      /*is_italic=*/true,
                      /*text=*/"ah")));
@@ -1631,6 +1634,7 @@ TEST_F(PdfInkModuleTextTest,
                        /*typeface=*/TextTypeface::kSerif,
                        /*alignment=*/TextAlignment::kCenter,
                        /*orientation=*/1,
+                       /*viewport_orientation=*/PageOrientation::kOriginal,
                        /*is_bold=*/true,
                        /*is_italic=*/true,
                        /*text=*/kOriginalText));
