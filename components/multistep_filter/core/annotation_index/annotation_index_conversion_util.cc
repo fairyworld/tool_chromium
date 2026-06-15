@@ -104,7 +104,8 @@ std::optional<FilterAnnotation> ToFilterAnnotation(
     const GURL& url,
     const ExtractTaskAttributesResponse& response) {
   const std::string domain = GetEtldPlusOne(url);
-  if (domain.empty() || response.task_type().empty() ||
+  const std::string host(url.host());
+  if (domain.empty() || host.empty() || response.task_type().empty() ||
       response.task_attributes().empty()) {
     return std::nullopt;
   }
@@ -115,7 +116,8 @@ std::optional<FilterAnnotation> ToFilterAnnotation(
   }
 
   return FilterAnnotation(base::Uuid::GenerateRandomV4(), response.task_type(),
-                          domain, base::Time::Now(), std::move(attributes));
+                          domain, host, base::Time::Now(),
+                          std::move(attributes));
 }
 
 }  // namespace multistep_filter
