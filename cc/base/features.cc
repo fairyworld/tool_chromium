@@ -114,7 +114,7 @@ constexpr const char kNewContentForCheckerboardedScrollsPerFrame[] =
 const base::FeatureParam<std::string> kNewContentForCheckerboardedScrollsParam(
     &kNewContentForCheckerboardedScrolls,
     "mode",
-    kNewContentForCheckerboardedScrollsPerScroll);
+    kNewContentForCheckerboardedScrollsPerFrame);
 
 BASE_FEATURE(kAllowLCDTextWithFilter, base::FEATURE_ENABLED_BY_DEFAULT);
 
