@@ -567,6 +567,10 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
   browser_animation_controller_ =
       GetUserDataFactory().CreateInstance<BrowserAnimationController>(*browser,
                                                                       *browser);
+  browser_animation_controller_->AddAnimationProvider(
+      std::make_unique<SidePanelAnimations>());
+  browser_animation_controller_->AddAnimationProvider(
+      std::make_unique<TabStripAnimations>());
 
   context_highlight_window_feature_ =
       std::make_unique<ContextHighlightWindowFeature>(*browser);
@@ -885,14 +889,6 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
 void BrowserWindowFeatures::InitPostBrowserViewConstruction(
     BrowserView* browser_view) {
   scrim_view_controller_ = std::make_unique<ScrimViewController>(browser_view);
-
-  // Set the window for the animation controller. Add animation providers here
-  // as well.
-  browser_animation_controller_->set_browser_view(browser_view);
-  browser_animation_controller_->AddAnimationProvider(
-      std::make_unique<SidePanelAnimations>());
-  browser_animation_controller_->AddAnimationProvider(
-      std::make_unique<TabStripAnimations>());
 
   if (HistorySidePanelCoordinator::IsSupported()) {
     GetUserDataFactory().CreateInstance<HistorySidePanelCoordinator>(
