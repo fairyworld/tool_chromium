@@ -45,8 +45,8 @@ class COMPONENT_EXPORT(ON_DEVICE_MODEL_ML) ChromeML {
   // Wrappers for C-API function pointers. Centralizes DISABLE_CFI_DLSYM
   // annotations here to avoid spreading them across the codebase.
   DISABLE_CFI_DLSYM
-  void InitDawnProcs(const DawnProcTable& procs) const {
-    api_->InitDawnProcs(procs);
+  bool TryInitDawnProcs(const DawnProcTable& procs) const {
+    return api_->TryInitDawnProcs(procs);
   }
 
   DISABLE_CFI_DLSYM
