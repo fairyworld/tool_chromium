@@ -99,6 +99,7 @@ void PixAccountLinkingManager::MaybeShowPixAccountLinkingPrompt(
     client_->GetFacilitatedPaymentsNetworkInterface()
         ->GetDetailsForCreatePaymentInstrument(
             billing_customer_id,
+            /*client_token=*/std::vector<uint8_t>{},
             base::BindOnce(
                 &PixAccountLinkingManager::
                     OnGetDetailsForCreatePaymentInstrumentResponseReceived,

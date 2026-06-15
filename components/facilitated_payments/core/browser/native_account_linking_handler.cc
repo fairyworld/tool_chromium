@@ -74,11 +74,8 @@ void NativeAccountLinkingHandler::InitiateAccountLinkingNetworkCall(
   auto billing_customer_id = autofill::payments::GetBillingCustomerId(
       CHECK_DEREF(client_->GetPaymentsDataManager()));
 
-  // TODO(b:505507305): Pass `client_token` to
-  // `GetDetailsForCreatePaymentInstrument` once the method signature is updated
-  // to accept it.
   payments_network_interface->GetDetailsForCreatePaymentInstrument(
-      billing_customer_id,
+      billing_customer_id, client_token,
       base::BindOnce(&NativeAccountLinkingHandler::
                          OnGetDetailsForCreatePaymentInstrumentResponseReceived,
                      weak_ptr_factory_.GetWeakPtr(), base::TimeTicks::Now()),

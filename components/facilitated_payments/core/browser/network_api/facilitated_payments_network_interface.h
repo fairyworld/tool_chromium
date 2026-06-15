@@ -75,6 +75,7 @@ class FacilitatedPaymentsNetworkInterface
   // server. This method is virtual so it can be overridden in tests.
   virtual RequestId GetDetailsForCreatePaymentInstrument(
       int64_t billing_customer_number,
+      const std::vector<uint8_t>& client_token,
       GetDetailsForCreatePaymentInstrumentResponseCallback response_callback,
       const std::string& app_locale);
 

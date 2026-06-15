@@ -29,6 +29,7 @@ constexpr int kChromePaymentsBillableServiceNumber = 70073;
 
 GetDetailsForPixAccountLinkingRequest::GetDetailsForPixAccountLinkingRequest(
     int64_t billing_customer_number,
+    const std::vector<uint8_t>& client_token,
     base::OnceCallback<
         void(autofill::payments::PaymentsAutofillClient::PaymentsRpcResult,
              bool,
@@ -36,6 +37,7 @@ GetDetailsForPixAccountLinkingRequest::GetDetailsForPixAccountLinkingRequest(
     const std::string& app_locale,
     const bool full_sync_enabled)
     : billing_customer_number_(billing_customer_number),
+      client_token_(client_token),
       response_callback_(std::move(response_callback)),
       app_locale_(app_locale),
       full_sync_enabled_(full_sync_enabled) {}
@@ -69,6 +71,10 @@ std::string GetDetailsForPixAccountLinkingRequest::GetRequestContent() {
           // request is for Pix account linking. No additional data is required
           // within the dict.
           .Set("pix_account_linking_info", base::DictValue());
+
+  if (!client_token_.empty()) {
+    request_dict.Set("client_token", base::Base64Encode(client_token_));
+  }
 
   return base::WriteJson(request_dict).value_or("");
 }

@@ -78,8 +78,9 @@ class PixAccountLinkingManagerTest : public testing::Test {
     // account linking.
     ON_CALL(*payments_network_interface(),
             GetDetailsForCreatePaymentInstrument(testing::_, testing::_,
-                                                 testing::_))
-        .WillByDefault([](long, auto callback, const std::string&) {
+                                                 testing::_, testing::_))
+        .WillByDefault([](long, const std::vector<uint8_t>&, auto callback,
+                          const std::string&) {
           std::move(callback).Run(autofill::payments::PaymentsAutofillClient::
                                       PaymentsRpcResult::kSuccess,
                                   true, std::vector<uint8_t>{});
@@ -193,9 +194,9 @@ TEST_F(PixAccountLinkingManagerTest,
 
   // Backend call for GetDetailsForPaymentInstrument should not be called if
   // user is not a payments customer. But, the prompt should still be shown.
-  EXPECT_CALL(
-      *payments_network_interface(),
-      GetDetailsForCreatePaymentInstrument(testing::_, testing::_, testing::_))
+  EXPECT_CALL(*payments_network_interface(),
+              GetDetailsForCreatePaymentInstrument(testing::_, testing::_,
+                                                   testing::_, testing::_))
       .Times(0);
   EXPECT_CALL(client(), ShowPixAccountLinkingPrompt(0, testing::_, testing::_));
 
@@ -206,9 +207,9 @@ TEST_F(PixAccountLinkingManagerTest,
 TEST_F(PixAccountLinkingManagerTest,
        ServerEligibilityCheckNotCompleted_PromptNotShown) {
   // Simulate that the payments server hasn't yet returned eligibility.
-  EXPECT_CALL(
-      *payments_network_interface(),
-      GetDetailsForCreatePaymentInstrument(testing::_, testing::_, testing::_))
+  EXPECT_CALL(*payments_network_interface(),
+              GetDetailsForCreatePaymentInstrument(testing::_, testing::_,
+                                                   testing::_, testing::_))
       .WillOnce(testing::Return(
           base::StrongAlias<autofill::payments::RequestIdTag, std::string>()));
 
@@ -221,10 +222,11 @@ TEST_F(PixAccountLinkingManagerTest,
 TEST_F(PixAccountLinkingManagerTest,
        ServerEligibilityCheckReturnsIneligible_PromptNotShown) {
   // Simulate that the payments server hasn't yet returned eligibility.
-  EXPECT_CALL(
-      *payments_network_interface(),
-      GetDetailsForCreatePaymentInstrument(testing::_, testing::_, testing::_))
-      .WillOnce([](long, auto callback, const std::string&) {
+  EXPECT_CALL(*payments_network_interface(),
+              GetDetailsForCreatePaymentInstrument(testing::_, testing::_,
+                                                   testing::_, testing::_))
+      .WillOnce([](long, const std::vector<uint8_t>&, auto callback,
+                   const std::string&) {
         std::move(callback).Run(autofill::payments::PaymentsAutofillClient::
                                     PaymentsRpcResult::kSuccess,
                                 false, std::vector<uint8_t>{});
@@ -542,9 +544,9 @@ TEST_F(PixAccountLinkingManagerTest,
        ServerEligibilityCheckNotCompleted_ExitedReasonLogged) {
   base::HistogramTester histogram_tester;
   // Simulate that the payments server hasn't yet returned eligibility.
-  EXPECT_CALL(
-      *payments_network_interface(),
-      GetDetailsForCreatePaymentInstrument(testing::_, testing::_, testing::_))
+  EXPECT_CALL(*payments_network_interface(),
+              GetDetailsForCreatePaymentInstrument(testing::_, testing::_,
+                                                   testing::_, testing::_))
       .WillOnce(testing::Return(
           base::StrongAlias<autofill::payments::RequestIdTag, std::string>()));
 
@@ -560,10 +562,11 @@ TEST_F(PixAccountLinkingManagerTest,
        ServerEligibilityCheckReturnsIneligible_ExitedReasonLogged) {
   base::HistogramTester histogram_tester;
   // Simulate that the payments server hasn't yet returned eligibility.
-  EXPECT_CALL(
-      *payments_network_interface(),
-      GetDetailsForCreatePaymentInstrument(testing::_, testing::_, testing::_))
-      .WillOnce([](long, auto callback, const std::string&) {
+  EXPECT_CALL(*payments_network_interface(),
+              GetDetailsForCreatePaymentInstrument(testing::_, testing::_,
+                                                   testing::_, testing::_))
+      .WillOnce([](long, const std::vector<uint8_t>&, auto callback,
+                   const std::string&) {
         std::move(callback).Run(autofill::payments::PaymentsAutofillClient::
                                     PaymentsRpcResult::kSuccess,
                                 false, std::vector<uint8_t>{});

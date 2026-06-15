@@ -24,6 +24,7 @@ class GetDetailsForPixAccountLinkingRequest
  public:
   GetDetailsForPixAccountLinkingRequest(
       const int64_t billing_customer_number,
+      const std::vector<uint8_t>& client_token,
       base::OnceCallback<
           void(autofill::payments::PaymentsAutofillClient::PaymentsRpcResult,
                bool,
@@ -59,6 +60,7 @@ class GetDetailsForPixAccountLinkingRequest
                            ParseResponse_Error);
   // Request properties
   const int64_t billing_customer_number_;
+  const std::vector<uint8_t> client_token_;
   base::OnceCallback<void(
       autofill::payments::PaymentsAutofillClient::PaymentsRpcResult,
       bool,
