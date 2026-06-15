@@ -1223,8 +1223,16 @@ const char* BeforeUnloadExecutionModeToString(
   }
 }
 
-// The sampling rate for UKM.
-constexpr double kUkmSamplingRate = 0.001;
+// The default sampling rate for UKM.
+constexpr double kDefaultUkmSamplingRate = 0.001;
+
+double GetUkmSamplingRate() {
+  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
+          switches::kForceNavigationTimelineUkmRecordingForTesting)) {
+    return 1.0;
+  }
+  return kDefaultUkmSamplingRate;
+}
 
 // Builds the final `EmbedderIsolationInfo` for a navigation. `kPdf` is
 // preserved as-is so the PDF renderer carve-out is never lost. Otherwise,
@@ -12335,8 +12343,8 @@ NavigationDiscardReason NavigationRequest::GetTypeForNavigationDiscardReason() {
 std::optional<ukm::builders::NavigationTimeline>
 NavigationRequest::GetNavigationTimelineUkmBuilder() {
   if (ShouldRecordNavigationTimelineUkm() && IsInMainFrame() &&
-      // UKM data is sampled at a frequency of `kUkmSamplingRate`.
-      base::RandDouble() < kUkmSamplingRate) {
+      // UKM data is sampled at a frequency of `GetUkmSamplingRate()`.
+      base::RandDouble() < GetUkmSamplingRate()) {
     return ukm::builders::NavigationTimeline(GetNextPageUkmSourceId());
   }
   return std::nullopt;
@@ -12438,8 +12446,8 @@ void NavigationRequest::MaybeRecordTraceEventsAndHistograms() {
                   navigation_commit_sent_time);  // Navigation StartToCommit
   navigation_start_to_commit_ended_ = true;
 
-  // UKM data is sampled at a frequency of `kUkmSamplingRate`.
-  if (record_metrics && base::RandDouble() < kUkmSamplingRate &&
+  // UKM data is sampled at a frequency of `GetUkmSamplingRate()`.
+  if (record_metrics && base::RandDouble() < GetUkmSamplingRate() &&
       !navigation_start_time.is_null() && !begin_navigation_time_.is_null() &&
       !loader_start_time.is_null() && !receive_response_time_.is_null() &&
       navigation_start_time <= begin_navigation_time_ &&
