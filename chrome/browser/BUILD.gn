@@ -1140,9 +1140,16 @@ source_set("core") {
       "//chrome/browser/ui/webui/omnibox_popup/mojom",
     ]
 
+    sources += [
+      "chrome_process_singleton.cc",
+      "intranet_redirect_detector.cc",
+      "process_singleton_startup_lock.cc",
+      "repost_form_warning_controller.cc",
+    ]
     deps += [
       ":chrome_process_singleton",
       ":intranet_redirect_detector",
+      ":repost_form_warning_controller",
       "//chrome/browser/accessibility/live_caption",
       "//chrome/browser/apps/app_service",
       "//chrome/browser/apps/app_service/publishers",
@@ -1255,6 +1262,7 @@ source_set("core") {
   }
 
   if (!is_android && !is_chromeos) {
+    sources += [ "platform_util.cc" ]
     deps += [ "//chrome/browser/default_browser" ]
   }
 
@@ -1430,7 +1438,14 @@ source_set("core") {
   }
 
   if (!is_win && !is_android) {
-    deps += [ ":chrome_browser_main_posix" ]
+    sources += [
+      "certificate_viewer_stub.cc",
+      "chrome_browser_main_posix.cc",
+    ]
+    deps += [
+      ":certificate_viewer",
+      ":chrome_browser_main_posix",
+    ]
   }
 
   if (is_linux) {
@@ -1449,21 +1464,52 @@ source_set("core") {
   }
 
   if (is_android) {
-    sources += [ "chrome_browser_main_android.h" ]
+    sources += [
+      "after_startup_task_utils_android.cc",
+      "browser_process_platform_part_android.cc",
+      "chrome_browser_interface_binders_webui_parts_android.cc",
+      "chrome_browser_main_android.cc",
+      "chrome_browser_main_android.h",
+      "chrome_content_browser_client_android.cc",
+      "chrome_content_browser_client_android.h",
+      "commerce/android/price_tracking_utils_android.cc",
+      "commerce/android/shopping_service_factory_android.cc",
+      "composeplate/android/composeplate_utils.cc",
+      "icon_loader_android.cc",
+      "incognito/android/incognito_utils_android.cc",
+      "memory_details_android.cc",
+      "platform_util_android.cc",
+      "shell_integration_android.cc",
+    ]
     deps += [
       ":profile_key_startup_accessor",
+      "//chrome/android:jni_headers",
       "//chrome/browser/accessibility/accessibility_prefs",
+      "//chrome/browser/android",
+      "//chrome/browser/autocomplete",
+      "//chrome/browser/bookmarks",
+      "//chrome/browser/commerce",
+      "//chrome/browser/commerce/android:shopping_service_jni",
+      "//chrome/browser/composeplate/android:jni_headers",
       "//chrome/browser/dev_ui",
       "//chrome/browser/facilitated_payments",
       "//chrome/browser/feed",
+      "//chrome/browser/flags:flags_android",
+      "//chrome/browser/incognito:jni_headers",
       "//chrome/browser/notifications/chime/android",
       "//chrome/browser/offline_pages",
       "//chrome/browser/offline_pages:impl",
+      "//chrome/browser/prefetch/android",
+      "//chrome/browser/preloading/android",
       "//chrome/browser/ui/page_info",
+      "//chrome/browser/ui/webui/feed_internals",
+      "//chrome/browser/ui/webui/notifications_internals",
+      "//chrome/browser/util:jni_headers",
       "//chrome/browser/webapps:android",
       "//components/android_autofill/browser:features",
       "//components/browser_ui/accessibility/android",
       "//components/browser_ui/contacts_picker/android",
+      "//components/commerce/core:shopping_service",
       "//components/crash/content/browser",
       "//components/credential_management/android:features",
       "//components/external_intents/android",
@@ -1481,6 +1527,21 @@ source_set("core") {
       "//services/webnn/public/mojom:features",
       "//ui/compositor",
     ]
+  }
+
+  if (enable_offline_pages) {
+    # Used to build test harness locally.The harness is used manually to
+    # produce multiple offline pages to evaluate quality of the snapshots.
+    # This will only be built iff. | enable_offline_pages_harness | is set while
+    # | enable_offline_pages | and | is_android | are both true.
+    if (enable_offline_pages_harness && is_android) {
+      sources += [
+        "offline_pages/android/evaluation/evaluation_test_scheduler.cc",
+        "offline_pages/android/evaluation/evaluation_test_scheduler.h",
+        "offline_pages/android/evaluation/offline_page_evaluation_bridge.cc",
+        "offline_pages/android/evaluation/offline_page_evaluation_bridge.h",
+      ]
+    }
   }
 
   if (is_chromeos) {
@@ -1662,6 +1723,13 @@ source_set("core") {
   }
 
   deps += [ "//chrome/browser/vr:chrome_xr_integration_client" ]
+
+  if (is_posix) {
+    sources += [
+      "shutdown_signal_handlers_posix.cc",
+      "shutdown_signal_handlers_posix.h",
+    ]
+  }
 
   if (is_posix && !is_mac) {
     deps += [ "//chrome/app:chrome_crash_reporter_client" ]
@@ -2793,47 +2861,12 @@ static_library("browser") {
   }
 
   if (is_android) {
-    sources += [
-      "after_startup_task_utils_android.cc",
-      "browser_process_platform_part_android.cc",
-      "chrome_browser_interface_binders_webui_parts_android.cc",
-      "chrome_browser_main_android.cc",
-      "chrome_content_browser_client_android.cc",
-      "chrome_content_browser_client_android.h",
-      "commerce/android/price_tracking_utils_android.cc",
-      "commerce/android/shopping_service_factory_android.cc",
-      "commerce/price_tracking/android/price_tracking_notification_bridge.cc",
-      "commerce/price_tracking/android/price_tracking_notification_bridge.h",
-      "composeplate/android/composeplate_utils.cc",
-      "icon_loader_android.cc",
-      "incognito/android/incognito_utils_android.cc",
-      "memory_details_android.cc",
-      "platform_util_android.cc",
-      "prefetch/android/preload_pages_settings_bridge.cc",
-      "shell_integration_android.cc",
-    ]
-
     deps += [
       "//chrome/browser/android",
-
-      # JNI headers and other Android-specific deps consumed by the remaining
-      # Android sources still in :browser (top-level *_android.cc and the few
-      # in commerce/, composeplate/, incognito/, prefetch/, preloading/).
-      "//chrome/android:jni_headers",
-      "//chrome/browser/commerce/android:shopping_service_jni",
-      "//chrome/browser/commerce/price_tracking/android:jni_headers",
-      "//chrome/browser/composeplate/android:jni_headers",
-      "//chrome/browser/incognito:jni_headers",
-      "//chrome/browser/prefetch/android:jni_headers",
-      "//chrome/browser/preloading/android",
-      "//chrome/browser/ui/webui/feed_internals",
-      "//chrome/browser/ui/webui/notifications_internals",
-      "//chrome/browser/util:jni_headers",
       "//components/webxr/android",
 
-      # Targets containing implementations consumed by the remaining Android
-      # sources that still live in :browser (top-level *_android.cc and the
-      # few in commerce/, composeplate/, incognito/, prefetch/, preloading/).
+      # Targets containing Android-specific implementations that have to be
+      # linked into the browser.
       # These mirror the allow_circular_includes_from list below.
       "//chrome/browser/auxiliary_search:impl",
       "//chrome/browser/bookmarks/android:impl",
@@ -2860,10 +2893,9 @@ static_library("browser") {
     allow_circular_includes_from += [
       "//chrome/browser/android",
 
-      # The following entries cover the remaining Android sources that still
-      # live in :browser (top-level *_android.cc and the few in commerce/,
-      # composeplate/, incognito/, prefetch/, preloading/). When those move
-      # into their own subdir targets, the entries below can be removed.
+      # The following targets contain Android implementations whose files
+      # still include headers owned by :browser. When those headers get
+      # componentized, the entries below can be removed.
       "//chrome/browser/autocomplete:impl",
       "//chrome/browser/auxiliary_search:impl",
       "//chrome/browser/background_sync:impl",
@@ -2939,11 +2971,9 @@ static_library("browser") {
     ]
 
     sources += [
+      # This file includes many headers still owned by //chrome/browser/ui,
+      # so it can't move into :core until they get componentized.
       "chrome_browser_interface_binders_webui_parts_desktop.cc",
-      "chrome_process_singleton.cc",
-      "intranet_redirect_detector.cc",
-      "process_singleton_startup_lock.cc",
-      "repost_form_warning_controller.cc",
     ]
 
     #!is_android
@@ -3387,8 +3417,6 @@ static_library("browser") {
 
     #!is_android
     if (!is_chromeos) {
-      sources += [ "platform_util.cc" ]
-
       deps += [
         "//chrome/browser/default_browser",
         "//chrome/browser/download/bubble",
@@ -3442,8 +3470,9 @@ static_library("browser") {
 
     if (!is_win) {
       sources += [
-        "certificate_viewer_stub.cc",
-        "chrome_browser_main_posix.cc",
+        # This file includes process_singleton_dialog_linux.h, which is still
+        # owned by //chrome/browser/ui, so it can't move into :core until
+        # that header gets componentized.
         "process_singleton_posix.cc",
       ]
       deps += [ ":chrome_browser_main_posix" ]
@@ -4676,10 +4705,6 @@ static_library("browser") {
   }
 
   if (is_posix) {
-    sources += [
-      "shutdown_signal_handlers_posix.cc",
-      "shutdown_signal_handlers_posix.h",
-    ]
     if (!is_mac) {
       deps += [ "//components/os_crypt/async/browser:posix_key_provider" ]
     }
@@ -4980,14 +5005,6 @@ static_library("browser") {
   # TODO(https://crbug.com/356905053): Add more dependencies here and merge this
   # block with the `enable_extensions` block above.
   if (enable_desktop_android_extensions) {
-    sources += [
-      # TODO(https://crbug.com/356905053): These files are temporary workarounds
-      # allow for a lightweight extensions runtime in desktop-android builds.
-      # They should be removed.
-      "extensions/extension_menu_model_android.cc",
-      "extensions/extension_menu_model_android.h",
-    ]
-
     deps += [
       "//chrome/browser/extensions",
       "//chrome/browser/ui/android/extensions",
@@ -5035,19 +5052,6 @@ static_library("browser") {
     # //chrome/browser/net/net_error_tab_helper.h
     # //chrome/browser/ssl/chrome_security_state_tab_helper.h
     allow_circular_includes_from += [ "//chrome/browser/offline_pages:impl" ]
-
-    # Used to build test harness locally.The harness is used manually to
-    # produce multiple offline pages to evaluate quality of the snapshots.
-    # This will only be built iff. | enable_offline_pages_harness | is set while
-    # | enable_offline_pages | and | is_android | are both true.
-    if (enable_offline_pages_harness && is_android) {
-      sources += [
-        "offline_pages/android/evaluation/evaluation_test_scheduler.cc",
-        "offline_pages/android/evaluation/evaluation_test_scheduler.h",
-        "offline_pages/android/evaluation/offline_page_evaluation_bridge.cc",
-        "offline_pages/android/evaluation/offline_page_evaluation_bridge.h",
-      ]
-    }
   }
   if (enable_on_device_translation) {
     deps += [

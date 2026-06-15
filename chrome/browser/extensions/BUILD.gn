@@ -686,6 +686,14 @@ source_set("extensions") {
     ]
 
     if (enable_desktop_android_extensions) {
+      sources += [
+        # These files are temporary workarounds to allow for a lightweight
+        # extensions runtime in desktop-android builds. They should be removed
+        # (see https://crbug.com/356905053).
+        "extension_menu_model_android.cc",
+        "extension_menu_model_android.h",
+      ]
+
       # pack_extension_job.cc and developer_private_functions.cc include headers
       # from android extension bridges under IS_ANDROID.
       deps += [ "//chrome/browser/ui/android/extensions:public" ]
