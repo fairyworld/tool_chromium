@@ -124,7 +124,6 @@
   E_CPONLY(kColorContextualTasksBannerPromoBackground) \
   E_CPONLY(kColorContextualTasksBannerPromoText) \
   E_CPONLY(kColorContextualTasksBannerPromoIconBackground) \
-  E_CPONLY(kColorContextualTasksBannerPromoIconForeground) \
   /* Desktop media picker view. */ \
   E_CPONLY(kColorDesktopMediaPickerDescriptionLabel) \
   /* Desktop media tab list colors. */ \
