@@ -8,7 +8,10 @@ component("platform_runtime") {
     "platform_runtime_impl.cc",
     "platform_runtime_impl.h",
   ]
-  deps = [ "//base" ]
+  deps = [
+    "//base",
+    "//net",
+  ]
 }
 
 source_set("unit_tests") {
@@ -25,4 +28,8 @@ source_set("unit_tests") {
 shared_library("platform_runtime_test_lib") {
   testonly = true
   sources = [ "platform_runtime_test_lib.cc" ]
+  deps = [ "//base" ]
+  if (is_android) {
+    configs -= [ "//build/config/android:hide_all_but_jni_onload" ]
+  }
 }
