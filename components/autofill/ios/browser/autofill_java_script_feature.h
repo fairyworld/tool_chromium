@@ -68,8 +68,8 @@ class AutofillJavaScriptFeature : public web::JavaScriptFeature {
   // fields. `callback` cannot be nil.
   void ClearAutofilledFieldsForForm(
       web::WebFrame* frame,
-      autofill::FormRendererId form_renderer_id,
-      autofill::FieldRendererId field_renderer_id,
+      FormRendererId form_renderer_id,
+      FieldRendererId field_renderer_id,
       base::OnceCallback<void(NSString*)> callback);
 
   // Marks up the form with autofill field prediction data (diagnostic tool).

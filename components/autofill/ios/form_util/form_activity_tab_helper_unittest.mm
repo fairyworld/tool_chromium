@@ -110,7 +110,7 @@ constexpr NSString* kTestHTMLFormWithIframes =
 
 }  // namespace
 
-// Tests fixture for autofill::FormActivityTabHelper class.
+// Tests fixture for FormActivityTabHelper class.
 class FormActivityTabHelperTest : public AutofillTestWithWebState {
  public:
   FormActivityTabHelperTest()
@@ -190,12 +190,12 @@ TEST_F(FormActivityTabHelperTest, TestPasswordSymbolSetOnNewElement) {
   LoadHtml(@"<div />");
 
   web::WebFramesManager* frames_manager =
-      autofill::AutofillJavaScriptFeature::GetInstance()->GetWebFramesManager(
+      AutofillJavaScriptFeature::GetInstance()->GetWebFramesManager(
           web_state());
   web::WebFrame* main_frame = frames_manager->GetMainWebFrame();
   ASSERT_TRUE(main_frame);
 
-  autofill::FormHandlersJavaScriptFeature::GetInstance()->TrackFormMutations(
+  FormHandlersJavaScriptFeature::GetInstance()->TrackFormMutations(
       main_frame, /*mutation_tracking_delay=*/200);
 
   // Adds a password input in the page to see if the mutation callback
@@ -218,12 +218,12 @@ TEST_F(FormActivityTabHelperTest, TestPasswordSymbolSetOnTypeChange) {
             "<input type='password' id='pw'/>");
 
   web::WebFramesManager* frames_manager =
-      autofill::AutofillJavaScriptFeature::GetInstance()->GetWebFramesManager(
+      AutofillJavaScriptFeature::GetInstance()->GetWebFramesManager(
           web_state());
   web::WebFrame* main_frame = frames_manager->GetMainWebFrame();
   ASSERT_TRUE(main_frame);
 
-  autofill::FormHandlersJavaScriptFeature::GetInstance()->TrackFormMutations(
+  FormHandlersJavaScriptFeature::GetInstance()->TrackFormMutations(
       main_frame, /*mutation_tracking_delay=*/200);
 
   // Loading the page should have set the attribute since the input is a
@@ -251,12 +251,12 @@ TEST_F(FormActivityTabHelperTest, TestPasswordSymbolFeatureDisabled) {
   LoadHtml(@"<input type='password' id='pw'/>");
 
   web::WebFramesManager* frames_manager =
-      autofill::AutofillJavaScriptFeature::GetInstance()->GetWebFramesManager(
+      AutofillJavaScriptFeature::GetInstance()->GetWebFramesManager(
           web_state());
   web::WebFrame* main_frame = frames_manager->GetMainWebFrame();
   ASSERT_TRUE(main_frame);
 
-  autofill::FormHandlersJavaScriptFeature::GetInstance()->TrackFormMutations(
+  FormHandlersJavaScriptFeature::GetInstance()->TrackFormMutations(
       main_frame, /*mutation_tracking_delay=*/200);
 
   // The Has Been Password symbol is not set since the feature is disabled
@@ -435,7 +435,7 @@ class FormMutationTest : public base::test::WithFeatureOverride,
  public:
   FormMutationTest()
       : base::test::WithFeatureOverride(
-            autofill::features::kAutofillTrackFormMutationsOptimizationIos) {}
+            features::kAutofillTrackFormMutationsOptimizationIos) {}
   void SetUp() override { FormActivityTabHelperTest::SetUp(); }
 
  protected:
@@ -788,7 +788,7 @@ TEST_P(FormMutationTest, RemovedAndAddedFormsRegistered_WithDroppedMessages) {
   }));
 
   if (base::FeatureList::IsEnabled(
-          autofill::features::kAutofillTrackFormMutationsOptimizationIos)) {
+          features::kAutofillTrackFormMutationsOptimizationIos)) {
     EXPECT_THAT(
         observer_->form_removal_info()->form_removal_params.removed_forms,
         UnorderedElementsAre(FormRendererId(1), FormRendererId(3)));
@@ -1011,8 +1011,7 @@ class FormSubmittedHookTest : public FormActivityTabHelperTest {
     web::FakeWebClient* web_client =
         static_cast<web::FakeWebClient*>(GetWebClient());
 
-    renderer_id_feature_ =
-        autofill::test::CreateRendererIdTestJavaScriptFeature();
+    renderer_id_feature_ = test::CreateRendererIdTestJavaScriptFeature();
 
     web_client->SetJavaScriptFeatures({
         FormHandlersJavaScriptFeature::GetInstance(),
