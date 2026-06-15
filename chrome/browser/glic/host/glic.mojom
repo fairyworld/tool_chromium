@@ -2122,6 +2122,11 @@ struct TabContext {
   // A screenshot of the user-visible portion of the tab. Provided only if
   // requested.
   Screenshot? viewport_screenshot;
+  // Proto for ScreenshotInfo.
+  // See components/optimization_guide/proto/features/common_quality_data.proto.
+  // Provided if include_viewport_screenshot was requested in
+  // GetTabContextOptions and layout metadata is available.
+  mojo_base.mojom.ProtoWrapper? screenshot_info;
   // Information about a PDF document. Provided if the document is a PDF or
   // contains a PDF, and PDF data was requested. Note that it is possible for
   // a document to contain multiple PDFs using iframes. Only the first PDF

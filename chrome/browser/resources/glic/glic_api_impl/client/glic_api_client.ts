@@ -1585,11 +1585,14 @@ export function convertTabContextResultFromPrivate(
     data: TabContextResultPrivate|
     ResumeActorTaskResultPrivate): TabContextResult|ResumeActorTaskResult {
   const tabData = convertTabDataFromPrivate(data.tabData);
+  const screenshotInfo = data.screenshotInfo &&
+      streamFromBuffer(new Uint8Array(data.screenshotInfo));
   const pdfDocumentData = data.pdfDocumentData &&
       convertPdfDocumentDataFromPrivate(data.pdfDocumentData);
   const annotatedPageData = data.annotatedPageData &&
       convertAnnotatedPageDataFromPrivate(data.annotatedPageData);
-  return replaceProperties(data, {tabData, pdfDocumentData, annotatedPageData});
+  return replaceProperties(
+      data, {tabData, screenshotInfo, pdfDocumentData, annotatedPageData});
 }
 
 function convertAdditionalContextFromPrivate(context: AdditionalContextPrivate):

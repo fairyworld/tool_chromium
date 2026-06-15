@@ -11,6 +11,7 @@
 //   undefined.
 
 import type {BigBuffer} from '//resources/mojo/mojo/public/mojom/base/big_buffer.mojom-webui.js';
+import type {ProtoWrapper} from '//resources/mojo/mojo/public/mojom/base/proto_wrapper.mojom-webui.js';
 import type {TimeDelta} from '//resources/mojo/mojo/public/mojom/base/time.mojom-webui.js';
 import type {BitmapN32} from '//resources/mojo/skia/public/mojom/bitmap.mojom-webui.js';
 import {AlphaType} from '//resources/mojo/skia/public/mojom/image_info.mojom-webui.js';
@@ -129,19 +130,27 @@ export function pdfDocumentDataToClient(
   };
 }
 
+export function protoWrapperToClient(
+    protoWrapper: ProtoWrapper|null|undefined,
+    extras: ResponseExtras): ArrayBuffer|undefined {
+  if (!protoWrapper) {
+    return undefined;
+  }
+  const buffer = getArrayBufferFromBigBuffer(protoWrapper.smuggled);
+  if (buffer) {
+    extras.addTransfer(buffer);
+  }
+  return buffer;
+}
+
 export function annotatedPageDataToClient(
     annotatedPageData: AnnotatedPageDataMojo|null,
     extras: ResponseExtras): AnnotatedPageDataPrivate|undefined {
   if (!annotatedPageData) {
     return undefined;
   }
-  const annotatedPageContent = annotatedPageData.annotatedPageContent ?
-      getArrayBufferFromBigBuffer(
-          annotatedPageData.annotatedPageContent.smuggled) :
-      undefined;
-  if (annotatedPageContent) {
-    extras.addTransfer(annotatedPageContent);
-  }
+  const annotatedPageContent =
+      protoWrapperToClient(annotatedPageData.annotatedPageContent, extras);
   let metadata: PageMetadata|undefined = undefined;
   if (annotatedPageData.metadata) {
     metadata = {
@@ -389,6 +398,8 @@ export function tabContextToClient(
   const webPageData = webPageDataToClient(tabContext.webPageData);
   const viewportScreenshot =
       screenshotToClient(tabContext.viewportScreenshot, extras);
+  const screenshotInfo =
+      protoWrapperToClient(tabContext.screenshotInfo, extras);
   const pdfDocumentData =
       pdfDocumentDataToClient(tabContext.pdfDocumentData, extras);
   const annotatedPageData =
@@ -398,6 +409,7 @@ export function tabContextToClient(
     tabData,
     webPageData,
     viewportScreenshot,
+    screenshotInfo,
     pdfDocumentData,
     annotatedPageData,
   };
@@ -406,21 +418,8 @@ export function tabContextToClient(
 export function resumeActorTaskResultToClient(
     tabContext: TabContextMojo, actionResult: number,
     extras: ResponseExtras): ResumeActorTaskResultPrivate {
-  const tabData: TabDataPrivate = tabDataToClient(tabContext.tabData, extras);
-  const webPageData = webPageDataToClient(tabContext.webPageData);
-  const viewportScreenshot =
-      screenshotToClient(tabContext.viewportScreenshot, extras);
-  const pdfDocumentData =
-      pdfDocumentDataToClient(tabContext.pdfDocumentData, extras);
-  const annotatedPageData =
-      annotatedPageDataToClient(tabContext.annotatedPageData, extras);
-
   return {
-    tabData,
-    webPageData,
-    viewportScreenshot,
-    pdfDocumentData,
-    annotatedPageData,
+    ...tabContextToClient(tabContext, extras),
     actionResult,
   };
 }

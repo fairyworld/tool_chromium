@@ -79,6 +79,7 @@
 #include "content/public/test/browser_test_utils.h"
 #include "mojo/public/cpp/base/big_buffer.h"
 #include "services/network/test/test_url_loader_factory.h"
+#include "third_party/blink/public/common/features.h"
 #include "url/origin.h"
 
 #if BUILDFLAG(IS_CHROMEOS)
@@ -273,7 +274,8 @@ class NewGlicApiTest : public GlicApiBrowserTest,
          {chrome::android::kBrowserWindowInterfaceMobile, {}},
 #endif
          {features::kGlicActor,
-          {{features::kGlicActorPolicyControlExemption.name, "true"}}}},
+          {{features::kGlicActorPolicyControlExemption.name, "true"}}},
+         {blink::features::kAIPageContentTrackedElementsIframe, {}}},
         /*disabled_features=*/
         {
             features::kGlicWarming,
@@ -1431,6 +1433,14 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testDoNothing) {
   ASSERT_EQ(GetTabListInterface()->GetTabCount(), 1);
   ASSERT_EQ(GetTabListInterface()->GetTab(0)->GetContents()->GetURL(),
             GetTestUrl("page.html"));
+  ASSERT_OK(OpenGlicForActiveTab());
+  ExecuteJsTest();
+}
+
+IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testGetContextFromFocusedTabWithIframe) {
+  ASSERT_TRUE(content::NavigateToURL(
+      GetTabListInterface()->GetActiveTab()->GetContents(),
+      embedded_test_server()->GetURL("/browser_tests/test_iframe.html")));
   ASSERT_OK(OpenGlicForActiveTab());
   ExecuteJsTest();
 }

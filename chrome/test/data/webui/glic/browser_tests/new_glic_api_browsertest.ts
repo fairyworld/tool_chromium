@@ -16,6 +16,29 @@ class ApiTests extends ApiTestFixtureBase {
 
   async testDoNothing() {}
 
+  async testGetContextFromFocusedTabWithIframe() {
+    await this.host.setTabContextPermissionState(true);
+
+    const result = await this.host.getContextFromFocusedTab?.({
+      viewportScreenshot: true,
+    });
+
+    assertDefined(result);
+    assertEquals(
+        new URL(result.tabData.url).pathname, '/browser_tests/test_iframe.html',
+        `Tab data has unexpected url ${result.tabData.url}`);
+
+    assertDefined(result.screenshotInfo);
+    const bytes = await new Response(result.screenshotInfo).bytes();
+    assertTrue(bytes.length > 0, 'screenshotInfo should not be empty');
+
+    const decoded = new TextDecoder().decode(bytes);
+    assertTrue(
+        decoded.includes('test.html'),
+        `screenshotInfo should contain the iframe URL 'test.html', got: ${
+            decoded}`);
+  }
+
   async testReloadWebUi() {}
 
   async testDefaultTabContextApiIsUndefinedWhenFeatureDisabled() {

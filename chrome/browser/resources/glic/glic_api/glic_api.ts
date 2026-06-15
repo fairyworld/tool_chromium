@@ -1713,6 +1713,12 @@ export declare interface TabContextResult {
    */
   viewportScreenshot?: Screenshot;
   /**
+   * Serialized optimization_guide.proto.ScreenshotInfo from
+   * common_quality_data.proto. Provided if viewportScreenshot was requested and
+   * layout metadata is available.
+   */
+  screenshotInfo?: ReadableStream<Uint8Array>;
+  /**
    * PDF document data. Provided if requested, and the top level document in the
    * focused tab is a PDF.
    */

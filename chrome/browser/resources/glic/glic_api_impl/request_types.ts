@@ -1159,17 +1159,21 @@ export declare interface FocusedTabDataPrivate {
 }
 
 // TabContextResult data for postMessage transport.
-export declare interface TabContextResultPrivate extends
-    Omit<TabContextResult, 'tabData'|'pdfDocumentData'|'annotatedPageData'> {
+export declare interface TabContextResultPrivate extends Omit<
+    TabContextResult,
+    'tabData'|'screenshotInfo'|'pdfDocumentData'|'annotatedPageData'> {
   tabData: TabDataPrivate;
+  screenshotInfo?: ArrayBuffer;
   pdfDocumentData?: PdfDocumentDataPrivate;
   annotatedPageData?: AnnotatedPageDataPrivate;
 }
 
 // ResumeActorTaskResult data for postMessage transport.
 export declare interface ResumeActorTaskResultPrivate extends Omit<
-    ResumeActorTaskResult, 'tabData'|'pdfDocumentData'|'annotatedPageData'> {
+    ResumeActorTaskResult,
+    'tabData'|'screenshotInfo'|'pdfDocumentData'|'annotatedPageData'> {
   tabData: TabDataPrivate;
+  screenshotInfo?: ArrayBuffer;
   pdfDocumentData?: PdfDocumentDataPrivate;
   annotatedPageData?: AnnotatedPageDataPrivate;
 }
