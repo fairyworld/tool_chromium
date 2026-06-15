@@ -123,6 +123,10 @@ crbug.com/1078566 [ android ] GpuNormalTermination_NewWebGLNotBlocked [ Skip ]
 [ fuchsia ] ContextLost_WebGLContextLostInHiddenTab [ Skip ]
 [ fuchsia ] ContextLost_WebGLContextRestoredInHiddenTab [ Skip ]
 
+# web-engine-shell does not enter element fullscreen, so fullscreenchange
+# never fires and the test cannot complete.
+crbug.com/41101884 [ fuchsia ] ContextLost_WebGLContextNotLostFromFullscreenChange [ Skip ]
+
 # Webgpu not fully supported on Linux, Android, ChromeOS, and Fuchsia
 [ linux ] ContextLost_WebGPUContextLostFromGPUProcessExit [ Skip ]
 [ linux ] ContextLost_WebGPUBlockedAfterJSNavigation [ Skip ]

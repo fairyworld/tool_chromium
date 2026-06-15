@@ -1176,11 +1176,11 @@ data/accessibility/aria/aria-list-expected-auralinux.txt
 data/accessibility/aria/aria-list-expected-blink.txt
 data/accessibility/aria/aria-list-expected-mac.txt
 data/accessibility/aria/aria-list-expected-win.txt
-data/accessibility/aria/aria-list.html
 data/accessibility/aria/aria-list-labeled-expected-android-external.txt
 data/accessibility/aria/aria-list-labeled-expected-android.txt
 data/accessibility/aria/aria-list-labeled-expected-blink.txt
 data/accessibility/aria/aria-list-labeled.html
+data/accessibility/aria/aria-list.html
 data/accessibility/aria/aria-listbox-activedescendant-expected-blink.txt
 data/accessibility/aria/aria-listbox-activedescendant-expected-mac.txt
 data/accessibility/aria/aria-listbox-activedescendant.html
@@ -8056,6 +8056,7 @@ data/gpu/webgl2_conformance_mac_runtimes.json
 data/gpu/webgl2_conformance_win_runtimes.json
 data/gpu/webgl_extension_test.html
 data/gpu/webgl_test_page.html
+data/gpu/webgl_with_fullscreen.html
 data/gpu/webgl_with_select_element.html
 data/gpu/webgl_y16_uploads.html
 data/gpu/webgpu-caching.html
