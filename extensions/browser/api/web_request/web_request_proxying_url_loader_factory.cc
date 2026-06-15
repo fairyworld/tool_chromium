@@ -609,6 +609,7 @@ void WebRequestProxyingURLLoaderFactory::InProgressRequest::OnLoaderCreated(
 }
 
 void WebRequestProxyingURLLoaderFactory::InProgressRequest::OnBeforeSendHeaders(
+    const GURL& request_url,
     const net::HttpRequestHeaders& headers,
     OnBeforeSendHeadersCallback callback) {
   TRACE_EVENT("extensions",

@@ -184,7 +184,7 @@ interface CustomProxyConfigClient {
 // Sent by TrustedURLLoaderHeaderClient to perform modifications for a request.
 interface TrustedHeaderClient {
   // Allows modifying request headers before the request is sent.
-  OnBeforeSendHeaders(HttpRequestHeaders headers)
+  OnBeforeSendHeaders(url.mojom.Url request_url, HttpRequestHeaders headers)
       => (int32 result, HttpRequestHeaders? headers);
 
   // Allows modifying response headers, including sensitive headers such as
