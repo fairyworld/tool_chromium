@@ -440,12 +440,6 @@ inline constexpr char
         "Search. "
         "Requires #customize-chrome-wallpaper-search to be enabled too.";
 
-inline constexpr char kCustomizeTabGroupColorPaletteName[] =
-    "Customize tab group color palette";
-inline constexpr char kCustomizeTabGroupColorPaletteDescription[] =
-    "Enables parsing of the `tab_group_color_palette` key in the "
-    "manifest.json file, which allows customization of the tab group color "
-    "palette. Disabling this flag will cause the key to be ignored.";
 
 inline constexpr char kDataControlsDragEnforcementName[] =
     "Data Controls drag-and-drop enforcement";

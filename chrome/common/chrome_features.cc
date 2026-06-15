@@ -134,10 +134,6 @@ BASE_FEATURE(kChromeStructuredMetrics, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kContextContainers, base::FEATURE_DISABLED_BY_DEFAULT);
 #endif
 
-// When enabled, allows parsing of `tab_group_color_palette` theme key, else
-// ignores it.
-BASE_FEATURE(kCustomizeTabGroupColorPalette, base::FEATURE_DISABLED_BY_DEFAULT);
-
 // Moves the Extensions "puzzle piece" icon from the title bar into the app menu
 // for web app windows.
 BASE_FEATURE(kDesktopPWAsElidedExtensionsMenu,

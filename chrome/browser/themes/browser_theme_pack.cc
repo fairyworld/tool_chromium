@@ -1622,6 +1622,9 @@ void BrowserThemePack::ParseImageNamesFromJSON(
 
 void BrowserThemePack::SetTabGroupColorPaletteShadesFromJSON(
     const base::DictValue* tab_group_color_palette_value) {
+  if (!tab_group_color_palette_value) {
+    return;
+  }
   size_t count = 0;
   for (const auto [key, value] : *tab_group_color_palette_value) {
     if (!value.is_int()) {
