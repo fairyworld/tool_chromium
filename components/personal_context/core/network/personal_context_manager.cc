@@ -31,7 +31,7 @@ namespace personal_context {
 namespace {
 
 constexpr char kContextMemoryServiceBaseUrl[] =
-    "https://contextmemoryservice-pa.googleapis.com/v1";
+    "https://contextmemoryservice.pa.googleapis.com/v1";
 
 // Returns the base URL of the Context Memory Service. If the
 // `kContextMemoryServiceBaseUrlSwitch` is set, its value is returned.

@@ -135,7 +135,7 @@ class PersonalContextManagerTest : public testing::Test {
   bool SimulateResponse(std::string_view content,
                         net::HttpStatusCode http_status) {
     return test_url_loader_factory_.SimulateResponseForPendingRequest(
-        "https://contextmemoryservice-pa.googleapis.com/v1:fetchContext",
+        "https://contextmemoryservice.pa.googleapis.com/v1:fetchContext",
         std::string(content), http_status,
         network::TestURLLoaderFactory::kUrlMatchPrefix);
   }
@@ -156,7 +156,7 @@ class PersonalContextManagerTest : public testing::Test {
   bool SimulatePiiResponse(std::string_view content,
                            net::HttpStatusCode http_status) {
     return test_url_loader_factory_.SimulateResponseForPendingRequest(
-        "https://contextmemoryservice-pa.googleapis.com/v1:fetchPiiEntities",
+        "https://contextmemoryservice.pa.googleapis.com/v1:fetchPiiEntities",
         std::string(content), http_status,
         network::TestURLLoaderFactory::kUrlMatchPrefix);
   }
@@ -250,7 +250,7 @@ TEST_F(PersonalContextManagerTest, MultipleParallelRequestsLimit) {
       /*timeout=*/std::nullopt, response_holder2.GetCallback());
 
   test_url_loader_factory()->EraseResponse(
-      GURL("https://contextmemoryservice-pa.googleapis.com/v1:fetchContext"));
+      GURL("https://contextmemoryservice.pa.googleapis.com/v1:fetchContext"));
   EXPECT_TRUE(SimulateSuccessfulResponse());
 
   EXPECT_TRUE(response_holder2.GetFinalStatus());
