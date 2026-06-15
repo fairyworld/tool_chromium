@@ -23,6 +23,7 @@ source_set("contextual_cueing") {
     "//chrome/browser/tab_list",
     "//chrome/browser/ui/actions:actions_headers",
     "//components/favicon_base",
+    "//components/optimization_guide/proto:optimization_guide_proto",
     "//components/page_content_annotations/core",
     "//components/sessions",
     "//components/tabs:public",
