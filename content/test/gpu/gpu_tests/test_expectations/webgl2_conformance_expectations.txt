@@ -1048,7 +1048,7 @@ crbug.com/352104898 [ fuchsia fuchsia-board-qemu-x64 passthrough ] WebglExtensio
 crbug.com/352104898 [ fuchsia fuchsia-board-qemu-x64 passthrough ] WebglExtension_EXT_texture_norm16 [ Failure ]
 crbug.com/352104898 [ fuchsia fuchsia-board-qemu-x64 passthrough ] WebglExtension_WEBGL_blend_func_extended [ Failure ]
 crbug.com/352104898 [ fuchsia fuchsia-board-qemu-x64 passthrough angle-swiftshader ] WebglExtension_WEBGL_render_shared_exponent [ Failure ]
-
+crbug.com/523649422 [ fuchsia ] conformance2/transform_feedback/too-small-buffers.html [ Failure ]
 
 ###############################
 # New failures in WebGL rolls #
