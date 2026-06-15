@@ -77,7 +77,6 @@ proto_library("confidential_compute_proto") {
 
   import_dirs = [
     "//third_party/oak/chromium",
-    "//third_party/protobuf/src",
   ]
 
   proto_in_dir = "src"
