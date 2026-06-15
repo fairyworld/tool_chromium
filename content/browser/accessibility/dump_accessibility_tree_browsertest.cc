@@ -108,6 +108,7 @@ void DumpAccessibilityTreeTest::ChooseFeatures(
     std::vector<base::test::FeatureRef>* disabled_features) {
   // crbug.com/339418716 - temporary until enabled by default
   enabled_features->emplace_back(blink::features::kUserMediaElement);
+  enabled_features->emplace_back(blink::features::kUserMediaElementLegacy);
   enabled_features->emplace_back(blink::features::kInstallElement);
 #if BUILDFLAG(IS_WIN)
   // Enable UIA MathML support for dump tests

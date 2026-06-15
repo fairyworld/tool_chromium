@@ -54,7 +54,8 @@ class AccessibilityActionBrowserTest : public ContentBrowserTest {
 
   void SetUp() override {
     feature_list_.InitWithFeatures({blink::features::kGeolocationElement,
-                                    blink::features::kUserMediaElement},
+                                    blink::features::kUserMediaElement,
+                                    blink::features::kUserMediaElementLegacy},
                                    {});
     ContentBrowserTest::SetUp();
   }
