@@ -6190,6 +6190,15 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
       <message name="IDS_SEND_TAB_TO_SELF_SHEET_TOOLBAR" desc="Header for device picker sheet where users can pick a device to send a tab to.">
         Send to
       </message>
+      <message name="IDS_SEND_TAB_TO_SELF_ENHANCED_TITLE" desc="Header for the enhanced device picker sheet where users can pick a device to send a tab to.">
+        Choose a device
+      </message>
+      <message name="IDS_SEND_TAB_TO_SELF_SEND_BUTTON" desc="Label for the primary button to confirm sending a tab to a selected device.">
+        Send
+      </message>
+      <message name="IDS_SEND_TAB_TO_SELF_MANAGE_DEVICES_FOOTER" desc="Label for the secondary footer action to manage devices.">
+        Manage your devices
+      </message>
       <message name="IDS_SEND_TAB_TO_SELF_MANAGE_DEVICES_LINK" desc="Text with a link to a page where the user can manage the devices they can share a tab to.">
         <ph name="BEGIN_LINK">&lt;link&gt;</ph>Your devices<ph name="END_LINK">&lt;/link&gt;</ph> · <ph name="EMAIL">%1$s<ex>foo@gmail.com</ex></ph>
       </message>

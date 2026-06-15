@@ -17290,6 +17290,7 @@ from previous Chrome versions.
   <int value="947608420" label="AndroidZoomImmersive:enabled"/>
   <int value="947684823" label="BookmarkTriggerForPrefetch:disabled"/>
   <int value="948085015" label="WebFilterInterstitialRefresh:disabled"/>
+  <int value="948277664" label="SendTabToSelfEnhancedBottomsheet:disabled"/>
   <int value="948351976" label="WallpaperWebUI:disabled"/>
   <int value="948521531" label="StylusHandwriting:disabled"/>
   <int value="948682684" label="BorealisDGPU:disabled"/>
@@ -18750,6 +18751,7 @@ from previous Chrome versions.
   <int value="1416592483" label="ash-enable-mirrored-screen"/>
   <int value="1416845437" label="InstallPromptSegmentation:disabled"/>
   <int value="1416970206" label="ArcGameModeFeature:disabled"/>
+  <int value="1417862460" label="SendTabToSelfEnhancedBottomsheet:enabled"/>
   <int value="1418054870" label="SpecialLocale:enabled"/>
   <int value="1419676945" label="ToolbarSnapshotRefactor:disabled"/>
   <int value="1419806576" label="OsFeedback:enabled"/>
