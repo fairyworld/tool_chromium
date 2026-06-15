@@ -8080,26 +8080,6 @@
             ]
         }
     ],
-    "DataControlsSearchWith": [
-        {
-            "platforms": [
-                "android",
-                "chromeos",
-                "linux",
-                "mac",
-                "windows",
-                "ios"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "DataControlsSearchWith"
-                    ]
-                }
-            ]
-        }
-    ],
     "DataUrlWorkerOpaqueOrigin": [
         {
             "platforms": [
