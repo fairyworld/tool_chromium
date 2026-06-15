@@ -301,10 +301,12 @@ void FilterSuggestionGenerator::OnFilterSuggestionCandidatesFetched(
   UrlFilterSuggestion suggestion(UrlFilterSuggestion::Params{
       .navigation_url = std::move(candidate.navigation_url),
       .source_domain = base::UTF8ToUTF16(matching_annotation_it->source_domain),
+      .source_host = base::UTF8ToUTF16(matching_annotation_it->source_host),
       .extraction_timestamp = matching_annotation_it->creation_timestamp,
       .attribute_ui_labels = std::move(attribute_ui_labels),
       .triggering_navigation_id = navigation_id,
       .triggering_domain = std::string(domain),
+      .triggering_host = url.GetHost(),
       .task_type = std::move(matching_annotation_it->task_type),
       .suggestion_message = std::move(*message)});
   LogSuggestionGenerated(log_router_, navigation_id, domain, suggestion);

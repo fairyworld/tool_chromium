@@ -134,10 +134,12 @@ TEST_F(FilterSuggestionGeneratorTest,
   UrlFilterSuggestion expected_suggestion(UrlFilterSuggestion::Params{
       .navigation_url = expected_candidate.navigation_url,
       .source_domain = base::UTF8ToUTF16(annotation.source_domain),
+      .source_host = base::UTF8ToUTF16(annotation.source_host),
       .extraction_timestamp = annotation.creation_timestamp,
       .attribute_ui_labels = std::move(attribute_ui_labels),
       .triggering_navigation_id = kTestNavigationId,
       .triggering_domain = "example.com",
+      .triggering_host = "example.com",
       .task_type = kShoppingTask,
       .suggestion_message = u"Template"});
 
