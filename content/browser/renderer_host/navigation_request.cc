@@ -1845,10 +1845,14 @@ NavigationRequest::NavigationRequest(
   CHECK_EQ(common_params_->url, original_url_);
   if (base::FeatureList::IsEnabled(
           features::kSanitizeOriginalUrlDuringNavigation)) {
-    CHECK_EQ(common_params_->url.DeprecatedGetOriginAsURL(),
-             commit_params_->original_url);
+    // TODO(523555340): CHECK-exclusion: Convert to a CHECK once we are
+    // confident it won't be triggered.
+    DCHECK_EQ(common_params_->url.DeprecatedGetOriginAsURL(),
+              commit_params_->original_url);
   } else {
-    CHECK_EQ(common_params_->url, commit_params_->original_url);
+    // TODO(523555340): CHECK-exclusion: Convert to a CHECK once we are
+    // confident it won't be triggered.
+    DCHECK_EQ(common_params_->url, commit_params_->original_url);
   }
   // Navigations generally can't be both a replacement and a reload, except
   // when reloading on the initial entry before it has been replaced by the
