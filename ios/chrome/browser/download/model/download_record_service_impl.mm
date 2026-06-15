@@ -12,7 +12,6 @@
 #import "base/files/file_path.h"
 #import "base/files/file_util.h"
 #import "base/functional/bind.h"
-#import "base/notimplemented.h"
 #import "base/strings/sys_string_conversions.h"
 #import "base/task/sequenced_task_runner.h"
 #import "base/task/thread_pool.h"
@@ -48,6 +47,16 @@ DownloadRecordServiceImpl::DownloadRecordServiceImpl(
 
 DownloadRecordServiceImpl::~DownloadRecordServiceImpl() {
   // Ensure database is destroyed on the correct thread.
+  //
+  // TODO(crbug.com/524030520): The DB-thread bindings below that use
+  // base::Unretained(this) (InsertRecord, GetAllFromCache,
+  // GetByIdFromCache, DeleteRecord, UpdateFilePathInRecord, UpdateRecord)
+  // are not fully safe against profile-shutdown races: DeleteSoon() only
+  // keeps `database_` alive against in-flight DB-thread tasks, not the
+  // service object itself, so those tasks can UAF on `this` when they
+  // touch `record_cache_`. Fix is tracked in the bug above (extract a
+  // DownloadRecordStore inner class that owns database_ + record_cache_
+  // and DeleteSoon() the store instead).
   if (database_) {
     database_task_runner_->DeleteSoon(FROM_HERE, std::move(database_));
   }
@@ -139,16 +148,23 @@ void DownloadRecordServiceImpl::GetDownloadsPageAsync(
     DownloadRecordsPageCallback callback) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(main_sequence_checker_);
 
-  // Placeholder stub: this CL only introduces the public pagination
-  // interface (contract-only). The real keyset-paginated reader path —
-  // including filter / cursor handling, the active-records cache merge,
-  // and `kDownloadListPagination` flag gating — lands in a follow-up
-  // CL. Until then, callers always observe an empty page; production
-  // code should continue to use `GetAllDownloadsAsync()`.
-  NOTIMPLEMENTED_LOG_ONCE();
-  base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
+  // The closure intentionally takes a raw DownloadRecordDatabase* rather
+  // than capturing `this`. The dtor's DeleteSoon() of `database_` on
+  // `database_task_runner_` keeps the pointee alive until all queued
+  // DB-thread tasks have drained, so binding the raw DB pointer here is
+  // safe even if the service is destroyed before this task runs.
+  database_task_runner_->PostTaskAndReplyWithResult(
       FROM_HERE,
-      base::BindOnce(std::move(callback), std::vector<DownloadRecord>{}));
+      base::BindOnce(
+          [](DownloadRecordDatabase* db,
+             const DownloadRecordQuery& query) -> std::vector<DownloadRecord> {
+            if (!db || !db->IsInitialized()) {
+              return {};
+            }
+            return db->GetDownloadRecordsPage(query);
+          },
+          database_.get(), query),
+      std::move(callback));
 }
 
 void DownloadRecordServiceImpl::GetDownloadsCountAsync(
@@ -156,12 +172,25 @@ void DownloadRecordServiceImpl::GetDownloadsCountAsync(
     DownloadRecordsCountCallback callback) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(main_sequence_checker_);
 
-  // Placeholder stub — see `GetDownloadsPageAsync` above. Always posts 0
-  // to the calling sequence until the paginated reader CL replaces this
-  // body.
-  NOTIMPLEMENTED_LOG_ONCE();
-  base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
-      FROM_HERE, base::BindOnce(std::move(callback), size_t{0}));
+  // Translate the optional filter into a count-only query. The cursor
+  // fields are ignored by the DB layer for count queries.
+  DownloadRecordQuery query;
+  query.filter_type = filter;
+
+  // See GetDownloadsPageAsync above for why this lambda binds the raw
+  // DB pointer instead of `this`.
+  database_task_runner_->PostTaskAndReplyWithResult(
+      FROM_HERE,
+      base::BindOnce(
+          [](DownloadRecordDatabase* db,
+             const DownloadRecordQuery& query) -> size_t {
+            if (!db || !db->IsInitialized()) {
+              return 0;
+            }
+            return static_cast<size_t>(db->GetDownloadRecordsCount(query));
+          },
+          database_.get(), query),
+      std::move(callback));
 }
 
 void DownloadRecordServiceImpl::UpdateDownloadFilePathAsync(

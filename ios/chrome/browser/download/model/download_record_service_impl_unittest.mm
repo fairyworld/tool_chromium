@@ -480,17 +480,13 @@ TEST_F(DownloadRecordServiceImplTest, RecordDownloadTwiceWithSameTask) {
   EXPECT_EQ(download_id, result[0].download_id);
 }
 
-// Sanity test for the placeholder pagination stub: regardless of feature
-// flag state or how many records are persisted, `GetDownloadsPageAsync`
-// posts an empty vector to the calling sequence asynchronously. The
-// real keyset-paginated reader lands in a follow-up CL; this test locks
-// in the contract so callers can call the API unconditionally without
-// crashing.
-TEST_F(DownloadRecordServiceImplTest, GetDownloadsPageAsync_StubReturnsEmpty) {
-  // Record one download so the cache is non-empty; the stub still must
-  // return empty per contract.
+// Sanity test for the pagination API: with one persisted record,
+// `GetDownloadsPageAsync` posts a non-empty vector to the calling
+// sequence asynchronously. Locks in the async contract; broader
+// coverage (cursor / filter / ordering) lands in a follow-up CL.
+TEST_F(DownloadRecordServiceImplTest, GetDownloadsPageAsync_AsyncRoundTrip) {
   std::unique_ptr<web::FakeDownloadTask> task =
-      CreateFakeDownloadTask("page_stub_1");
+      CreateFakeDownloadTask("page_async_1");
   RecordDownloadAndValidate(task.get());
 
   base::test::TestFuture<std::vector<DownloadRecord>> future;
@@ -501,20 +497,20 @@ TEST_F(DownloadRecordServiceImplTest, GetDownloadsPageAsync_StubReturnsEmpty) {
   EXPECT_FALSE(future.IsReady());
 
   // Pumps the calling sequence until the posted callback runs.
-  EXPECT_TRUE(future.Get().empty());
+  std::vector<DownloadRecord> page = future.Get();
+  ASSERT_EQ(1u, page.size());
+  EXPECT_EQ("page_async_1", page[0].download_id);
 }
 
-// Mirrors `GetDownloadsPageAsync_StubReturnsEmpty` for the count API:
-// the placeholder stub always posts 0 to the calling sequence
-// asynchronously.
-TEST_F(DownloadRecordServiceImplTest, GetDownloadsCountAsync_StubReturnsZero) {
+// Mirrors `GetDownloadsPageAsync_AsyncRoundTrip` for the count API.
+TEST_F(DownloadRecordServiceImplTest, GetDownloadsCountAsync_AsyncRoundTrip) {
   std::unique_ptr<web::FakeDownloadTask> task =
-      CreateFakeDownloadTask("count_stub_1");
+      CreateFakeDownloadTask("count_async_1");
   RecordDownloadAndValidate(task.get());
 
   base::test::TestFuture<size_t> future;
   service_->GetDownloadsCountAsync(std::nullopt, future.GetCallback());
 
   EXPECT_FALSE(future.IsReady());  // *Async contract.
-  EXPECT_EQ(0u, future.Get());
+  EXPECT_EQ(size_t{1}, future.Get());
 }
