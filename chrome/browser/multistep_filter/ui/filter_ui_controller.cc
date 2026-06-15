@@ -244,11 +244,11 @@ void FilterUiController::OpenSettings() {
 }
 
 void FilterUiController::ShowCue(const UrlFilterSuggestion& suggestion) {
-  // Fetch favicon for the suggestion domain.
-  GURL domain_url(
-      base::StrCat({"https://", base::UTF16ToUTF8(suggestion.source_domain)}));
+  // Fetch favicon for the suggestion source host.
+  GURL host_url(
+      base::StrCat({"https://", base::UTF16ToUTF8(suggestion.source_host)}));
   favicon_service_->GetFaviconImageForPageURL(
-      domain_url,
+      host_url,
       base::BindOnce(&FilterUiController::OnFaviconAvailable,
                      dismissal_weak_factory_.GetWeakPtr(), suggestion),
       &favicon_task_tracker_);
@@ -341,7 +341,7 @@ void FilterUiController::OnFaviconAvailable(
       {.icon = result.image.IsEmpty()
                    ? ui::ImageModel::FromVectorIcon(vector_icons::kGlobeIcon)
                    : ui::ImageModel::FromImage(result.image),
-       .text = suggestion.source_domain});
+       .text = suggestion.source_host});
 
   page_actions::AnchoredMessageExpandableContent content;
   content.items = std::move(items);
