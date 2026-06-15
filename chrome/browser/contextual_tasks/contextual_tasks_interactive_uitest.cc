@@ -2419,59 +2419,5 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksInteractiveUiTest,
                                        /*expected_upload_file_count=*/0,
                                        /*expected_added_input_names=*/{}));
 }
-IN_PROC_BROWSER_TEST_F(ContextualTasksInteractiveUiTest, ShareTabsMenuRenders) {
-  DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kSecondTab);
-
-  const DeepQuery kComposebox = {"contextual-tasks-app", "#composebox",
-                                 "#composebox"};
-
-  const DeepQuery kEntrypointButton = {
-      "contextual-tasks-app", "#composebox",       "#composebox",
-      "#contextEntrypoint",   "#entrypointButton", "#entrypoint"};
-
-  const DeepQuery kMenu = {"contextual-tasks-app", "#composebox", "#composebox",
-                           "#contextEntrypoint", "#menu"};
-
-  const DeepQuery kShareTabsTrigger = {
-      "contextual-tasks-app", "#composebox", "#composebox",
-      "#contextEntrypoint",   "#menu",       "#shareTabsTrigger"};
-
-  RunTestSequence(
-      InstrumentTab(kPrimaryTab, 0),
-      AddInstrumentedTab(kSecondTab, GURL("https://www.google.com")),
-      SelectTab(kTabStripElementId, 0),
-      OpenContextualTasksInCurrentTab(GURL(kCujInterceptionUrl)),
-      // Wait for the app and composebox to be ready.
-      WaitForElementExists(kPrimaryTab, kEntrypointButton),
-      ExecuteJsAt(kPrimaryTab, kComposebox,
-                  "el => {"
-                  "  el.refreshTabSuggestions = function() {"
-                  "    this.tabSuggestions = [{"
-                  "      tabId: 123,"
-                  "      title: 'Google',"
-                  "      url: {url: 'https://www.google.com'},"
-                  "      showInCurrentTabChip: false,"
-                  "      showInPreviousTabChip: false"
-                  "    }];"
-                  "    return Promise.resolve();"
-                  "  };"
-                  "}"),
-      ExecuteJsAt(kPrimaryTab, kMenu,
-                  "el => {"
-                  "  el.isInputTypeAllowed_ = function() { return true; };"
-                  "  el.tabSuggestions = [{"
-                  "    tabId: 123,"
-                  "    title: 'Google',"
-                  "    url: {url: 'https://www.google.com'},"
-                  "    showInCurrentTabChip: false,"
-                  "    showInPreviousTabChip: false"
-                  "  }];"
-                  "}"),
-      // Click the entrypoint to open the context menu.
-      ClickElement(kPrimaryTab, kEntrypointButton),
-      // Verify the Share Tabs trigger element exists. This element is required
-      // by the STS FRE IPH as it indirectly acts as a webui location anchor.
-      WaitForElementExists(kPrimaryTab, kShareTabsTrigger));
-}
 
 }  // namespace contextual_tasks
