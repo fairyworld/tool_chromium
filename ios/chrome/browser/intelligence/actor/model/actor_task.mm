@@ -18,6 +18,7 @@
 #import "ios/chrome/browser/intelligence/actor/model/actor_engine.h"
 #import "ios/chrome/browser/intelligence/actor/model/actor_tab_helper.h"
 #import "ios/chrome/browser/intelligence/actor/public/actor_task_updates_observer.h"
+#import "ios/chrome/browser/intelligence/actor/tools/model/actor_tool_factory.h"
 #import "ios/chrome/browser/intelligence/actor/tools/model/actor_tool_request.h"
 #import "ios/web/public/web_state.h"
 
@@ -107,12 +108,12 @@ ActorTask::ActorTask(ActorTaskId task_id,
     : task_id_(task_id),
       title_(title),
       allow_incognito_web_states_(allow_incognito_web_states),
-      journal_(journal) {
+      journal_(journal),
+      tool_factory_(tool_factory) {
   // TODO(crbug.com/504704411): Allow incognito WebStates.
   CHECK(!allow_incognito_web_states_);
-
-  engine_ =
-      std::make_unique<ActorEngine>(task_id_, journal_, this, tool_factory);
+  engine_ = std::make_unique<ActorEngine>(/*execution_updates_delegate=*/this,
+                                          /*tool_delegate=*/this);
   observers_ = static_cast<CRBProtocolObservers<ActorTaskUpdatesObserver>*>(
       [CRBProtocolObservers
           observersWithProtocol:@protocol(ActorTaskUpdatesObserver)]);
@@ -229,6 +230,20 @@ void ActorTask::DidStopLoading(web::WebState* web_state) {
 
 void ActorTask::WebStateDestroyed(web::WebState* web_state) {
   OnWebStateFinishedLoading(web_state);
+}
+
+ActorTaskId ActorTask::GetTaskId() const {
+  return task_id_;
+}
+
+AggregatedJournal& ActorTask::GetJournal() const {
+  CHECK(journal_);
+  return *journal_;
+}
+
+ActorToolFactory& ActorTask::GetToolFactory() const {
+  CHECK(tool_factory_);
+  return *tool_factory_;
 }
 
 void ActorTask::OnWebStateFinishedLoading(web::WebState* web_state) {
