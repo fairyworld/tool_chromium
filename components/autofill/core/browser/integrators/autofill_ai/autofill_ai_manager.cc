@@ -490,8 +490,7 @@ void AutofillAiManager::HandlePromptResult(
   // is no longer eligible by the time the user clicks "Accept", we abort the
   // Wallet save.
   if (entity.record_type() == EntityInstance::RecordType::kServerWallet &&
-      !MayPerformAutofillAiAction(*client_,
-                                  autofill::AutofillAiAction::kImportToWallet,
+      !MayPerformAutofillAiAction(*client_, AutofillAiAction::kImportToWallet,
                                   entity.type())) {
     HandleIneligibleWalletFallback(prompt_type, std::move(entity));
     return;

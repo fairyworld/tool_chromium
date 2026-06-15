@@ -151,7 +151,7 @@ class AtMemoryManagerTest : public testing::Test,
     webdata_helper().WaitUntilIdle();
   }
 
-  autofill::test::AutofillUnitTestEnvironment autofill_test_environment_;
+  test::AutofillUnitTestEnvironment autofill_test_environment_;
   base::test::TaskEnvironment task_environment_;
   raw_ptr<accessibility_annotator::MockAccessibilityQueryService>
       mock_query_service_ptr_ = nullptr;

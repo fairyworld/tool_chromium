@@ -82,7 +82,7 @@ class DetermineAttributeTypesTest : public testing::Test {
   static constexpr DetermineAttributeTypesPassKey kPassKey = {};
 
  private:
-  autofill::test::AutofillUnitTestEnvironment autofill_environment_;
+  test::AutofillUnitTestEnvironment autofill_environment_;
   base::test::ScopedFeatureList feature_list_{
       features::kAutofillAiWithDataSchema};
 };

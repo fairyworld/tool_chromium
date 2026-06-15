@@ -102,7 +102,7 @@ void AutofillDriverRouter::TriggerFormExtractionExcept(
     AutofillDriver& exception) {
 #if BUILDFLAG(IS_IOS)
   if (!base::FeatureList::IsEnabled(
-          autofill::features::kAutofillAcrossIframesIosTriggerFormExtraction)) {
+          features::kAutofillAcrossIframesIosTriggerFormExtraction)) {
     return;
   }
 #endif

@@ -240,7 +240,7 @@ class TestAutofillClientTemplate : public T {
   }
 
   PasswordManagerDelegate* GetPasswordManagerDelegate(
-      const autofill::FieldGlobalId& field_id) override {
+      const FieldGlobalId& field_id) override {
     return password_manager_delegate_.get();
   }
 
@@ -780,7 +780,7 @@ class TestAutofillClientTemplate : public T {
   bool wallet_public_pass_storage_enabled_ = true;
 
   std::unique_ptr<test::AutofillTestingPrefService> prefs_ =
-      autofill::test::PrefServiceForTesting();
+      test::PrefServiceForTesting();
   std::unique_ptr<TestStrikeDatabase> test_strike_database_;
 
   std::unique_ptr<TestPersonalDataManager> test_personal_data_manager_;

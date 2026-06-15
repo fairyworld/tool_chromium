@@ -166,22 +166,22 @@
 namespace autofill {
 namespace {
 
+using ::autofill::autofill_metrics::GetUkmEvents;
+using ::autofill::autofill_metrics::UkmEventsAre;
+using ::autofill::mojom::SubmissionIndicatorEvent;
+using ::autofill::mojom::SubmissionSource;
+using ::autofill::test::AddFieldPredictionsToForm;
+using ::autofill::test::CreateFieldPrediction;
+using ::autofill::test::CreateTestAddressFormData;
+using ::autofill::test::CreateTestFormField;
+using ::autofill::test::CreateTestHybridSignUpFormData;
+using ::autofill::test::CreateTestIbanFormData;
 using ::autofill::test::MakeGuid;
-using autofill_metrics::GetUkmEvents;
-using autofill_metrics::UkmEventsAre;
 using ::base::Bucket;
 using ::base::BucketsAre;
 using ::base::UTF8ToUTF16;
 using ::base::test::RunCallback;
 using ::base::test::RunOnceCallback;
-using mojom::SubmissionIndicatorEvent;
-using mojom::SubmissionSource;
-using test::AddFieldPredictionsToForm;
-using test::CreateFieldPrediction;
-using test::CreateTestAddressFormData;
-using test::CreateTestFormField;
-using test::CreateTestHybridSignUpFormData;
-using test::CreateTestIbanFormData;
 using ::testing::_;
 using ::testing::AllOf;
 using ::testing::AnyNumber;
@@ -2759,7 +2759,7 @@ TEST_F(BrowserAutofillManagerTest, SuggestionGenerationTimingMetric) {
 
   autofill_manager().OnAskForValuesToFill(
       form, form.fields()[0].global_id(), gfx::Rect(),
-      autofill::AutofillSuggestionTriggerSource::kFormControlElementClicked,
+      AutofillSuggestionTriggerSource::kFormControlElementClicked,
       std::nullopt);
 
   // Verify the metric was recorded exactly once.
@@ -3364,12 +3364,12 @@ TEST_F(BrowserAutofillManagerWithLogEventsTest,
       {CreateFieldPrediction(ADDRESS_HOME_LINE1,
                              FieldPrediction::SOURCE_OVERRIDE)},
       form_suggestion);
-  autofill::test::AddFieldPredictionToForm(form.fields()[2], ADDRESS_HOME_CITY,
-                                           form_suggestion);
-  autofill::test::AddFieldPredictionToForm(form.fields()[3], ADDRESS_HOME_STATE,
-                                           form_suggestion);
-  autofill::test::AddFieldPredictionToForm(form.fields()[4], ADDRESS_HOME_ZIP,
-                                           form_suggestion);
+  test::AddFieldPredictionToForm(form.fields()[2], ADDRESS_HOME_CITY,
+                                 form_suggestion);
+  test::AddFieldPredictionToForm(form.fields()[3], ADDRESS_HOME_STATE,
+                                 form_suggestion);
+  test::AddFieldPredictionToForm(form.fields()[4], ADDRESS_HOME_ZIP,
+                                 form_suggestion);
 
   std::string response_string;
   ASSERT_TRUE(response.SerializeToString(&response_string));
@@ -3459,8 +3459,8 @@ TEST_F(BrowserAutofillManagerWithLogEventsTest,
                                       ADDRESS_HOME_STREET_ADDRESS,
                                       ADDRESS_HOME_CITY};
   for (size_t i = 0; i < server_types.size(); ++i) {
-    autofill::test::AddFieldPredictionToForm(form.fields()[i], server_types[i],
-                                             form_suggestion);
+    test::AddFieldPredictionToForm(form.fields()[i], server_types[i],
+                                   form_suggestion);
   }
 
   std::string response_string;
@@ -3826,20 +3826,19 @@ TEST_F(BrowserAutofillManagerTest, OnLoadedServerPredictionsFromApi) {
   AutofillQueryResponse::FormSuggestion* form_suggestion;
   // Set suggestions for form 1.
   form_suggestion = response.add_form_suggestions();
-  autofill::test::AddFieldPredictionToForm(form.fields()[0], ADDRESS_HOME_CITY,
-                                           form_suggestion);
-  autofill::test::AddFieldPredictionToForm(form.fields()[1], ADDRESS_HOME_STATE,
-                                           form_suggestion);
-  autofill::test::AddFieldPredictionToForm(form.fields()[2], ADDRESS_HOME_ZIP,
-                                           form_suggestion);
+  test::AddFieldPredictionToForm(form.fields()[0], ADDRESS_HOME_CITY,
+                                 form_suggestion);
+  test::AddFieldPredictionToForm(form.fields()[1], ADDRESS_HOME_STATE,
+                                 form_suggestion);
+  test::AddFieldPredictionToForm(form.fields()[2], ADDRESS_HOME_ZIP,
+                                 form_suggestion);
   // Set suggestions for form 2.
   form_suggestion = response.add_form_suggestions();
-  autofill::test::AddFieldPredictionToForm(form2.fields()[0], NAME_LAST,
-                                           form_suggestion);
-  autofill::test::AddFieldPredictionToForm(form2.fields()[1], NAME_MIDDLE,
-                                           form_suggestion);
-  autofill::test::AddFieldPredictionToForm(form2.fields()[2], ADDRESS_HOME_ZIP,
-                                           form_suggestion);
+  test::AddFieldPredictionToForm(form2.fields()[0], NAME_LAST, form_suggestion);
+  test::AddFieldPredictionToForm(form2.fields()[1], NAME_MIDDLE,
+                                 form_suggestion);
+  test::AddFieldPredictionToForm(form2.fields()[2], ADDRESS_HOME_ZIP,
+                                 form_suggestion);
 
   std::string response_string;
   ASSERT_TRUE(response.SerializeToString(&response_string));
@@ -3906,16 +3905,16 @@ TEST_F(BrowserAutofillManagerTest, DetermineHeuristicsWithOverallPrediction) {
 
   AutofillQueryResponse response;
   auto* form_suggestion = response.add_form_suggestions();
-  autofill::test::AddFieldPredictionToForm(
-      form.fields()[0], CREDIT_CARD_NAME_FIRST, form_suggestion);
-  autofill::test::AddFieldPredictionToForm(
-      form.fields()[1], CREDIT_CARD_NAME_LAST, form_suggestion);
-  autofill::test::AddFieldPredictionToForm(form.fields()[2], CREDIT_CARD_NUMBER,
-                                           form_suggestion);
-  autofill::test::AddFieldPredictionToForm(
-      form.fields()[3], CREDIT_CARD_EXP_MONTH, form_suggestion);
-  autofill::test::AddFieldPredictionToForm(
-      form.fields()[4], CREDIT_CARD_EXP_4_DIGIT_YEAR, form_suggestion);
+  test::AddFieldPredictionToForm(form.fields()[0], CREDIT_CARD_NAME_FIRST,
+                                 form_suggestion);
+  test::AddFieldPredictionToForm(form.fields()[1], CREDIT_CARD_NAME_LAST,
+                                 form_suggestion);
+  test::AddFieldPredictionToForm(form.fields()[2], CREDIT_CARD_NUMBER,
+                                 form_suggestion);
+  test::AddFieldPredictionToForm(form.fields()[3], CREDIT_CARD_EXP_MONTH,
+                                 form_suggestion);
+  test::AddFieldPredictionToForm(form.fields()[4], CREDIT_CARD_EXP_4_DIGIT_YEAR,
+                                 form_suggestion);
 
   std::string response_string;
   ASSERT_TRUE(response.SerializeToString(&response_string));
