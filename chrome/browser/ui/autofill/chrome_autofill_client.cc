@@ -1082,11 +1082,12 @@ bool ChromeAutofillClient::IsAndroidLargeFormFactor() const {
 
 #if BUILDFLAG(IS_ANDROID)
 void ChromeAutofillClient::ShowAtMemoryBottomSheet(
-    base::span<const Suggestion> suggestions) {
+    base::span<const Suggestion> suggestions,
+    base::WeakPtr<AutofillSuggestionDelegate> delegate) {
   if (AtMemoryBottomSheetBridge* bridge =
           GetOrCreateAtMemoryBottomSheetBridge()) {
     bridge->RequestShowContent(
-        std::make_unique<AtMemoryBottomSheetDelegateAndroid>(this),
+        std::make_unique<AtMemoryBottomSheetDelegateAndroid>(this, delegate),
         suggestions);
   }
 }

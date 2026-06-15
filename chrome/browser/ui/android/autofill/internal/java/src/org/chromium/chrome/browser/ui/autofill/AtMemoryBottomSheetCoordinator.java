@@ -45,6 +45,8 @@ public class AtMemoryBottomSheetCoordinator {
     interface Delegate {
         void onDismissed();
 
+        void onQuerySubmitted(String query);
+
         void onSuggestionClicked(AutofillSuggestion suggestion);
 
         void onFlyoutClicked(AutofillSuggestion suggestion);

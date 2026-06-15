@@ -31,6 +31,15 @@ AtMemorySuggestionController::AtMemorySuggestionController(
 AtMemorySuggestionController::~AtMemorySuggestionController() = default;
 
 void AtMemorySuggestionController::Hide(SuggestionHidingReason reason) {
+  // The bottom sheet search bar is focused, which triggers a focus change.
+  // Ignore these hiding reasons to keep the bottom sheet visible while the
+  // user enters their query. SuggestionHidingReason::kUserAborted is passed
+  // to this method when the bottom sheet is closed (e.g. dismissed by the
+  // user).
+  if (reason == SuggestionHidingReason::kEndEditing ||
+      reason == SuggestionHidingReason::kFocusChanged) {
+    return;
+  }
   if (delegate_) {
     delegate_->OnSuggestionsHidden(reason);
   }
@@ -119,7 +128,7 @@ void AtMemorySuggestionController::Show(
 
   if (auto* client =
           ChromeAutofillClient::FromWebContents(web_contents_.get())) {
-    client->ShowAtMemoryBottomSheet(suggestions_);
+    client->ShowAtMemoryBottomSheet(suggestions_, delegate_);
   }
   if (delegate_) {
     delegate_->OnSuggestionsShown(suggestions_);

@@ -241,7 +241,8 @@ bool AutofillClient::IsAndroidLargeFormFactor() const {
 
 #if BUILDFLAG(IS_ANDROID)
 void AutofillClient::ShowAtMemoryBottomSheet(
-    base::span<const Suggestion> suggestions) {}
+    base::span<const Suggestion> suggestions,
+    base::WeakPtr<AutofillSuggestionDelegate> delegate) {}
 
 AutofillSnackbarControllerImpl*
 AutofillClient::GetAutofillSnackbarController() {

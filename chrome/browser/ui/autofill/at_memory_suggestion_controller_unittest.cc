@@ -21,6 +21,7 @@
 namespace autofill {
 namespace {
 
+using ::testing::_;
 using ::testing::ElementsAreArray;
 
 class TestAtMemorySuggestionControllerAutofillClient
@@ -45,7 +46,8 @@ class TestAtMemorySuggestionControllerAutofillClient
 
   MOCK_METHOD(void,
               ShowAtMemoryBottomSheet,
-              (base::span<const Suggestion>),
+              (base::span<const Suggestion>,
+               base::WeakPtr<AutofillSuggestionDelegate>),
               (override));
 
  private:
@@ -82,7 +84,8 @@ TEST_F(AtMemorySuggestionControllerTest, ShowSuggestions) {
   std::vector<Suggestion> suggestions = {
       Suggestion(u"test", SuggestionType::kAddressEntry)};
 
-  EXPECT_CALL(client(), ShowAtMemoryBottomSheet(ElementsAreArray(suggestions)));
+  EXPECT_CALL(client(),
+              ShowAtMemoryBottomSheet(ElementsAreArray(suggestions), _));
   EXPECT_CALL(manager().external_delegate(),
               OnSuggestionsShown(ElementsAreArray(suggestions)));
 
@@ -99,6 +102,28 @@ TEST_F(AtMemorySuggestionControllerTest, HideSuggestions) {
   EXPECT_CALL(manager().external_delegate(),
               OnSuggestionsHidden(SuggestionHidingReason::kUserAborted));
 
+  client().suggestion_controller(manager()).Hide(
+      SuggestionHidingReason::kUserAborted);
+}
+
+// Tests that the controller ignores focus loss and end editing hiding reasons.
+TEST_F(AtMemorySuggestionControllerTest, IgnoreFocusLossAndEndEditing) {
+  std::vector<Suggestion> suggestions = {
+      Suggestion(u"test", SuggestionType::kAddressEntry)};
+
+  ShowSuggestions(manager(), suggestions);
+
+  EXPECT_CALL(manager().external_delegate(), OnSuggestionsHidden).Times(0);
+
+  client().suggestion_controller(manager()).Hide(
+      SuggestionHidingReason::kEndEditing);
+  client().suggestion_controller(manager()).Hide(
+      SuggestionHidingReason::kFocusChanged);
+
+  testing::Mock::VerifyAndClearExpectations(&manager().external_delegate());
+
+  EXPECT_CALL(manager().external_delegate(),
+              OnSuggestionsHidden(SuggestionHidingReason::kUserAborted));
   client().suggestion_controller(manager()).Hide(
       SuggestionHidingReason::kUserAborted);
 }

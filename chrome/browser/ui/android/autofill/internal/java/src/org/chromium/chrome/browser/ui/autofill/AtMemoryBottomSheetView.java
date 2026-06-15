@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.Adapter;
 
+import org.chromium.base.Callback;
 import org.chromium.base.ui.KeyboardUtils;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.chrome.browser.ui.autofill.internal.R;
@@ -59,6 +60,22 @@ public class AtMemoryBottomSheetView {
 
     public void clearSearchText() {
         mSearchView.setQuery("", /* submit= */ false);
+    }
+
+    public void setOnQuerySubmittedCallback(Callback<String> callback) {
+        mSearchView.setOnQueryTextListener(
+                new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        callback.onResult(query);
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        return false;
+                    }
+                });
     }
 
     /** Draws a divider line below each item in the list except for the last item. */
