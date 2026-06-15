@@ -44,10 +44,10 @@ origin_files = glob([
     # We don't care about siso, and the contents of the .sisoenv file tend to be
     # non-deterministic, causing spurious diffs.
     "build/config/siso/**",
-  ]) + glob(["components/cronet/**"]) - glob([
-    # Per aosp/2374766
-    "components/cronet/native/**",
-  ]) + glob(["testing/**"]) - glob([
+  ]) + glob([
+    "components/cronet/**",
+    "testing/**"
+  ]) - glob([
     # Per aosp/2399270
     "testing/buildbot/**",
     # Exclude test files to reduce the number of gn2bp files
