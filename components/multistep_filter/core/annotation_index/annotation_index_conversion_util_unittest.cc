@@ -128,7 +128,6 @@ TEST(AnnotationIndexConversionUtilTest, ToExtractTaskAttributesRequest) {
 
 TEST(AnnotationIndexConversionUtilTest, ToFilterAnnotation) {
   ExtractTaskAttributesResponse response;
-  response.set_domain("example.com");
   response.set_task_type("SEARCH_FLIGHTS");
 
   TaskAttribute* attr1 = response.add_task_attributes();
@@ -139,7 +138,8 @@ TEST(AnnotationIndexConversionUtilTest, ToFilterAnnotation) {
   attr2->set_key("PRICE_MAX");
   attr2->set_value("500");
 
-  std::optional<FilterAnnotation> annotation = ToFilterAnnotation(response);
+  std::optional<FilterAnnotation> annotation =
+      ToFilterAnnotation(GURL("https://example.com"), response);
 
   ASSERT_TRUE(annotation.has_value());
   EXPECT_TRUE(annotation->id.is_valid());
@@ -154,7 +154,21 @@ TEST(AnnotationIndexConversionUtilTest, ToFilterAnnotation) {
 
 TEST(AnnotationIndexConversionUtilTest, ToFilterAnnotation_EmptyResponse) {
   ExtractTaskAttributesResponse response;
-  std::optional<FilterAnnotation> annotation = ToFilterAnnotation(response);
+  std::optional<FilterAnnotation> annotation =
+      ToFilterAnnotation(GURL("https://example.com"), response);
+  EXPECT_FALSE(annotation.has_value());
+}
+
+TEST(AnnotationIndexConversionUtilTest, ToFilterAnnotation_EmptyDomain) {
+  ExtractTaskAttributesResponse response;
+  response.set_task_type("SEARCH_FLIGHTS");
+
+  TaskAttribute* attr1 = response.add_task_attributes();
+  attr1->set_key("PRICE_MIN");
+  attr1->set_value("100");
+
+  std::optional<FilterAnnotation> annotation =
+      ToFilterAnnotation(GURL("file:///invalid-domain"), response);
   EXPECT_FALSE(annotation.has_value());
 }
 

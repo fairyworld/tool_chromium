@@ -205,9 +205,8 @@ IN_PROC_BROWSER_TEST_F(MultistepFilterBrowserTest,
       embedded_test_server()->GetURL(kTestAllowedDomain2, kSuggestionUrlPath);
 
   fake_server().SetExtractResponse(CreateExtractTaskAttributesResponse(
-      kTestAllowedDomain, kTestTaskType,
-      {{kTestAttributeKey, kTestAttributeValue},
-       {kTestAttributeKey2, kTestAttributeValue2}}));
+      kTestTaskType, {{kTestAttributeKey, kTestAttributeValue},
+                      {kTestAttributeKey2, kTestAttributeValue2}}));
   fake_server().SetSupportedTasksResponse(
       CreateSupportedTasksResponse({kTestTaskType}));
 
@@ -284,8 +283,7 @@ IN_PROC_BROWSER_TEST_F(MultistepFilterBrowserTest,
       embedded_test_server()->GetURL(kTestAllowedDomain, kExtractionUrlPath);
 
   fake_server().SetExtractResponse(CreateExtractTaskAttributesResponse(
-      kTestAllowedDomain, kTestTaskType,
-      {{kTestAttributeKey, kTestAttributeValue}}));
+      kTestTaskType, {{kTestAttributeKey, kTestAttributeValue}}));
 
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), extraction_url));
   EXPECT_TRUE(extraction_future_.Take().has_value());
@@ -332,9 +330,8 @@ IN_PROC_BROWSER_TEST_F(MultistepFilterBrowserTest,
       embedded_test_server()->GetURL(kTestAllowedDomain2, kSuggestionUrlPath);
 
   fake_server().SetExtractResponse(CreateExtractTaskAttributesResponse(
-      kTestAllowedDomain, kTestTaskType,
-      {{kTestAttributeKey, kTestAttributeValue},
-       {kTestAttributeKey2, kTestAttributeValue2}}));
+      kTestTaskType, {{kTestAttributeKey, kTestAttributeValue},
+                      {kTestAttributeKey2, kTestAttributeValue2}}));
   fake_server().SetSupportedTasksResponse(
       CreateSupportedTasksResponse({kTestTaskType}));
 
