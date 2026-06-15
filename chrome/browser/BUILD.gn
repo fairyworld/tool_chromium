@@ -1474,17 +1474,29 @@ source_set("core") {
 
   if (is_linux) {
     sources += [
+      "chrome_browser_main_extra_parts_linux.cc",
       "chrome_browser_main_extra_parts_linux.h",
       "chrome_browser_main_linux.h",
+      "fullscreen_linux.cc",
+      "icon_loader_auralinux.cc",
+      "shell_integration_linux.cc",
     ]
-    deps += [ "//components/os_crypt/async/browser:posix_key_provider" ]
+    deps += [
+      ":fullscreen",
+      ":shell_integration_linux",
+      "//components/os_crypt/async/browser:posix_key_provider",
+      "//third_party/libxml:xml_writer",
+      "//ui/linux:display_server_utils",
+    ]
 
     if (use_dbus) {
       sources += [
         "dbus_memory_pressure_evaluator_linux.cc",
         "dbus_memory_pressure_evaluator_linux.h",
+        "platform_util_linux.cc",
       ]
       deps += [
+        "//chrome/common:chrome_features",
         "//components/dbus",
         "//components/memory_pressure",
         "//components/os_crypt/async/browser:freedesktop_secret_key_provider",
@@ -1721,8 +1733,20 @@ source_set("core") {
     ]
   }
 
+  if (use_aura) {
+    sources += [ "platform_util_aura.cc" ]
+    deps += [ "//ui/aura" ]
+  }
+
   if (use_ozone) {
-    sources += [ "chrome_browser_main_extra_parts_ozone.h" ]
+    sources += [
+      "chrome_browser_main_extra_parts_ozone.cc",
+      "chrome_browser_main_extra_parts_ozone.h",
+    ]
+    deps += [
+      "//ui/events/ozone",
+      "//ui/ozone",
+    ]
     deps += [
       "//ui/events/ozone",
       "//ui/ozone",
@@ -1764,6 +1788,32 @@ source_set("core") {
 
   deps += [ "//chrome/browser/vr:chrome_xr_integration_client" ]
 
+  if (enable_vr) {
+    sources += [
+      "vr/chrome_xr_integration_client.cc",
+      "vr/ui_host/vr_ui_host_impl.cc",
+      "vr/ui_host/vr_ui_host_impl.h",
+    ]
+    deps += [
+      "//chrome/browser/vr:vr_common",
+      "//device/vr",
+      "//device/vr/public/mojom:isolated_xr_service",
+    ]
+
+    if (is_android) {
+      deps += [ "//components/webxr/android" ]
+
+      # vr/chrome_xr_integration_client.cc unconditionally includes JNI headers
+      # from the per-runtime modules.
+      if (enable_arcore) {
+        deps += [ "//chrome/browser/android/vr:ar_jni_headers" ]
+      }
+      if (enable_cardboard) {
+        deps += [ "//chrome/browser/android/vr:vr_jni_headers" ]
+      }
+    }
+  }
+
   if (is_posix) {
     sources += [
       "shutdown_signal_handlers_posix.cc",
@@ -1772,7 +1822,12 @@ source_set("core") {
   }
 
   if (is_posix && !is_mac) {
-    deps += [ "//chrome/app:chrome_crash_reporter_client" ]
+    sources += [ "//chrome/app/chrome_crash_reporter_client.cc" ]
+    deps += [
+      "//chrome/app:chrome_crash_reporter_client",
+      "//components/crash/core/app",
+      "//components/version_info:generate_version_info",
+    ]
   }
 
   if (is_mac) {
@@ -4690,12 +4745,6 @@ static_library("browser") {
   }
 
   if (is_linux) {
-    sources += [
-      "chrome_browser_main_extra_parts_linux.cc",
-      "fullscreen_linux.cc",
-      "icon_loader_auralinux.cc",
-      "shell_integration_linux.cc",
-    ]
     deps += [
       ":shell_integration_linux",
       "//chrome/app/theme:chrome_unscaled_resources_grit",
@@ -4708,7 +4757,6 @@ static_library("browser") {
     }
 
     if (use_dbus) {
-      sources += [ "platform_util_linux.cc" ]
       deps += [
         "//chrome/common:chrome_features",
         "//components/dbus",
@@ -4770,7 +4818,6 @@ static_library("browser") {
   }
 
   if (is_posix && !is_mac) {
-    sources += [ "//chrome/app/chrome_crash_reporter_client.cc" ]
     deps += [
       "//chrome/app:chrome_crash_reporter_client",
       "//components/crash/content/browser",
@@ -4780,8 +4827,6 @@ static_library("browser") {
   }
 
   if (use_aura) {
-    # Cross - platform Aura files.
-    sources += [ "platform_util_aura.cc" ]
     deps += [
       "//ui/aura",
       "//ui/base/dragdrop:types",
@@ -4800,7 +4845,6 @@ static_library("browser") {
   }
 
   if (use_ozone) {
-    sources += [ "chrome_browser_main_extra_parts_ozone.cc" ]
     deps += [
       "//ui/events/ozone",
       "//ui/ozone",
@@ -4939,12 +4983,6 @@ static_library("browser") {
   }
 
   if (enable_extensions) {
-    sources += [
-      "policy/value_provider/extension_install_policies_value_provider.cc",
-      "policy/value_provider/extension_install_policies_value_provider.h",
-      "policy/value_provider/extension_policies_value_provider.cc",
-      "policy/value_provider/extension_policies_value_provider.h",
-    ]
     public_deps += [
       "//chrome/browser/apps/platform_apps",
       "//chrome/browser/apps/platform_apps/api",
@@ -5042,9 +5080,6 @@ static_library("browser") {
     deps += [ "//media/mojo/mojom" ]
 
     if (enable_cdm_storage_id) {
-      if (is_chrome_branded) {
-        sources += [ "internal/google_chrome_cdm_storage_id_key.h" ]
-      }
       if (enable_rlz) {
         deps += [ "//rlz:rlz_lib" ]
       }
@@ -5133,31 +5168,12 @@ static_library("browser") {
   }
 
   if (enable_vr) {
-    sources += [
-      "vr/chrome_xr_integration_client.cc",
-      "vr/ui_host/vr_ui_host_impl.cc",
-      "vr/ui_host/vr_ui_host_impl.h",
-    ]
-
     deps += [
       "//chrome/browser/vr:chrome_xr_integration_client",
       "//chrome/browser/vr:vr_common",
       "//device/vr",
       "//device/vr/public/mojom:isolated_xr_service",
     ]
-
-    if (is_android) {
-      # vr/chrome_xr_integration_client.cc unconditionally includes JNI headers
-      # from the per-runtime modules.
-      if (enable_arcore) {
-        deps += [ "//chrome/browser/android/vr:ar_jni_headers" ]
-      }
-      if (enable_cardboard) {
-        deps += [ "//chrome/browser/android/vr:vr_jni_headers" ]
-      }
-    } else {
-      deps += [ "//device/vr/public/mojom:isolated_xr_service" ]
-    }
   }
 
   if (enable_lens_desktop_google_branded_features) {
