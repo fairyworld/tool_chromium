@@ -772,7 +772,11 @@ void AUAudioInputStream::Start(AudioInputCallback* callback) {
   StartAgc();
   OSStatus result = AudioOutputUnitStart(audio_unit_);
   if (result != noErr) {
-    SendLog("Failed to start acquiring data", result);
+    {
+      base::AutoLock al(lock_);
+      HandleErrorAndNotify_Locked(Error::kStartupFailed, result,
+                                  "AudioOutputUnitStart failed");
+    }
     Stop();
     return;
   }
