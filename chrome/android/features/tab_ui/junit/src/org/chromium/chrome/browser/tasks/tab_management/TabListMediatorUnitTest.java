@@ -1830,11 +1830,18 @@ public class TabListMediatorUnitTest {
         PropertyModel headerModel = mModelList.get(0).model;
         assertEquals(TAB_GROUP_ID, headerModel.get(TabProperties.TAB_GROUP_HEADER_ID));
         assertNull(headerModel.get(TabProperties.TAB_GROUP_ID));
+        assertEquals(TAB_GROUP, headerModel.get(CARD_TYPE));
+        assertEquals(TAB1_ID, headerModel.get(TabProperties.TAB_ID));
 
         // The second card should be the child tab.
         PropertyModel childModel = mModelList.get(1).model;
         assertEquals(TAB_GROUP_ID, childModel.get(TabProperties.TAB_GROUP_ID));
         assertNull(childModel.get(TabProperties.TAB_GROUP_HEADER_ID));
+        assertEquals(TAB, childModel.get(CARD_TYPE));
+        assertEquals(TAB1_ID, childModel.get(TabProperties.TAB_ID));
+
+        // indexFromTabId should skip the header card and find the child tab.
+        assertEquals(1, mModelList.indexFromTabId(TAB1_ID));
     }
 
     @Test
