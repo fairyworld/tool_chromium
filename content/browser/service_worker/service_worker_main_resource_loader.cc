@@ -414,13 +414,6 @@ void ServiceWorkerMainResourceLoader::StartRequest(
         NOTREACHED();
       case network::mojom::ServiceWorkerRouterSourceType::
           kRaceNetworkAndFetchEvent:
-        if (base::FeatureList::IsEnabled(
-                features::
-                    kServiceWorkerStaticRouterRaceNetworkRequestPerformanceImprovement)) {
-          active_worker->CountFeature(
-              blink::mojom::WebFeature::
-                  kServiceWorkerStaticRouter_RaceNetworkAndFetchHandlerImprovement);
-        }
         break;
       case network::mojom::ServiceWorkerRouterSourceType::kRaceNetworkAndCache:
         return;

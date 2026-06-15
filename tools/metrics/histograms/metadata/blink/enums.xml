@@ -5846,7 +5846,7 @@ Called by update_use_counter_feature_enum.py.-->
   <int value="5157" label="ARIAActionsAttribute"/>
   <int value="5158" label="OBSOLETE_ResolveToConfigValueCoercedToTrue"/>
   <int value="5159"
-      label="ServiceWorkerStaticRouter_RaceNetworkAndFetchHandlerImprovement"/>
+      label="OBSOLETE_ServiceWorkerStaticRouter_RaceNetworkAndFetchHandlerImprovement"/>
   <int value="5160" label="HasCapUnits"/>
   <int value="5161" label="HasRcapUnits"/>
   <int value="5162" label="HasIcUnits"/>

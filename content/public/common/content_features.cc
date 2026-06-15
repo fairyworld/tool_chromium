@@ -999,12 +999,6 @@ BASE_FEATURE(kOptimizeWebRequestProxyForServiceWorkerAutoPreload,
 BASE_FEATURE(kServiceWorkerInterceptDownloads,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-// crbug.com/374606637: When this is enabled, race-network-and-fetch-hander will
-// prioritize the response processing for the network request over the
-// processing for the fetch handler.
-BASE_FEATURE(kServiceWorkerStaticRouterRaceNetworkRequestPerformanceImprovement,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_IOS)
 // Run video capture service in the Browser process as opposed to a dedicated
 // utility process.

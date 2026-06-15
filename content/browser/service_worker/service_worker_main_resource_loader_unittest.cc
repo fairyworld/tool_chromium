@@ -1416,10 +1416,7 @@ TEST_F(ServiceWorkerMainResourceLoaderTest, Lifetime) {
 TEST_F(ServiceWorkerMainResourceLoaderTest, Lifetime_RaceNetworkRequest) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitWithFeatures(
-      {features::
-           kServiceWorkerStaticRouterRaceNetworkRequestPerformanceImprovement,
-       features::kServiceWorkerStaticRouterRaceRequestFix2},
-      {});
+      {features::kServiceWorkerStaticRouterRaceRequestFix2}, {});
 
   SetupStaticRoutingRules(
       network::mojom::ServiceWorkerRouterSourceType::kRaceNetworkAndFetchEvent);
