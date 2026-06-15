@@ -180,7 +180,7 @@
 #include "content/browser/webauth/authenticator_impl.h"
 #include "content/browser/webauth/webauth_request_security_checker_impl.h"
 #include "content/browser/webid/flags.h"
-#include "content/browser/webid/request.h"
+#include "content/browser/webid/request_service.h"
 #include "content/browser/websockets/websocket_connector_impl.h"
 #include "content/browser/webtransport/web_transport_connector_impl.h"
 #include "content/browser/webui/url_data_manager_backend.h"
@@ -14951,8 +14951,9 @@ void RenderFrameHostImpl::BindDigitalIdentityRequestReceiver(
 
 void RenderFrameHostImpl::BindFederatedAuthRequestReceiver(
     mojo::PendingReceiver<blink::mojom::FederatedAuthRequest> receiver) {
-  webid::Request* request = webid::Request::GetOrCreateForCurrentDocument(this);
-  request->BindReceiver(std::move(receiver));
+  webid::RequestService* service =
+      webid::RequestService::GetOrCreateForCurrentDocument(this);
+  service->BindFederatedAuthRequest(std::move(receiver));
 }
 
 void RenderFrameHostImpl::BindRestrictedCookieManager(

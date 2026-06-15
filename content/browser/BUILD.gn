@@ -2523,6 +2523,8 @@ source_set("browser") {
     "webid/request.h",
     "webid/request_page_data.cc",
     "webid/request_page_data.h",
+    "webid/request_service.cc",
+    "webid/request_service.h",
     "webid/url_computations.cc",
     "webid/url_computations.h",
     "webid/user_info_request.cc",
