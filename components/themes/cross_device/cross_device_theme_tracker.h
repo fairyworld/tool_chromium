@@ -15,13 +15,9 @@
 #include "base/observer_list_types.h"
 #include "components/keyed_service/core/keyed_service.h"
 #include "components/sync/base/client_tag_hash.h"
-#include "components/sync/protocol/theme_android_specifics.pb.h"
-#include "components/sync/protocol/theme_ios_specifics.pb.h"
-#include "components/sync/protocol/theme_specifics.pb.h"
+#include "components/sync/base/data_type.h"
 #include "components/sync_device_info/device_info.h"
 #include "components/sync_device_info/device_info_tracker.h"
-#include "third_party/skia/include/core/SkColor.h"
-#include "url/gurl.h"
 
 namespace themes {
 
@@ -31,57 +27,34 @@ enum class ServiceStatus {
   kSyncDisabled,
 };
 
-// Holds theme information from a specific platform and device.
-// This is a unified representation of themes across different platforms
-// (Desktop, Android, iOS) and is used to display theme info from other devices
-// in the NTP.
-struct PlatformThemeInfo {
-  PlatformThemeInfo();
-  PlatformThemeInfo(const PlatformThemeInfo&);
-  PlatformThemeInfo& operator=(const PlatformThemeInfo&);
-  ~PlatformThemeInfo();
+// Helper to compare theme specifics.
+// Each platform must specialize this for its own specifics type to avoid
+// using SerializeAsString() which is unstable.
+template <typename T>
+struct ThemeComparer;
 
-  bool operator==(const PlatformThemeInfo&) const;
+// Holds theme information from a specific platform and device.
+template <typename LocalSpecifics>
+struct DeviceThemeInfo {
+  DeviceThemeInfo() = default;
+  DeviceThemeInfo(const DeviceThemeInfo&) = default;
+  DeviceThemeInfo& operator=(const DeviceThemeInfo&) = default;
+  ~DeviceThemeInfo() = default;
+
+  bool operator==(const DeviceThemeInfo& other) const {
+    return device_name == other.device_name && os_type == other.os_type &&
+           form_factor == other.form_factor &&
+           ThemeComparer<LocalSpecifics>::Equals(theme, other.theme);
+  }
 
   std::string device_name;
   syncer::DeviceInfo::OsType os_type = syncer::DeviceInfo::OsType::kUnknown;
   syncer::DeviceInfo::FormFactor form_factor =
       syncer::DeviceInfo::FormFactor::kUnknown;
-
-  std::optional<SkColor> color;
-  std::optional<sync_pb::UserColorTheme::BrowserColorVariant> color_variant;
-
-  struct Background {
-    Background();
-    Background(const Background&);
-    Background& operator=(const Background&);
-    ~Background();
-
-    bool operator==(const Background&) const = default;
-
-    GURL url;
-    std::string attribution_line_1;
-    std::string attribution_line_2;
-  };
-  std::optional<Background> background;
-
-  struct Extension {
-    Extension();
-    Extension(const Extension&);
-    Extension& operator=(const Extension&);
-    ~Extension();
-
-    bool operator==(const Extension&) const = default;
-
-    std::string id;
-    std::string name;
-  };
-  std::optional<Extension> extension;
+  LocalSpecifics theme;
 };
 
-// Base class for tracking theme configurations across devices.
-// It maintains a cache of themes from other devices and notifies observers when
-// they change. Derived classes implement platform-specific sync logic.
+// Helper to map DeviceInfo OS type to Sync DataType.
 inline syncer::DataType OsTypeToDataType(syncer::DeviceInfo::OsType os_type) {
   switch (os_type) {
     case syncer::DeviceInfo::OsType::kAndroid:
@@ -135,8 +108,8 @@ class CrossDeviceThemeTracker : public KeyedService,
     observers_.RemoveObserver(observer);
   }
 
-  std::vector<PlatformThemeInfo> GetOtherDevicesThemes() const {
-    std::vector<PlatformThemeInfo> themes;
+  std::vector<DeviceThemeInfo<LocalSpecifics>> GetOtherDevicesThemes() const {
+    std::vector<DeviceThemeInfo<LocalSpecifics>> themes;
     for (const auto& [_, theme_info] : other_themes_) {
       themes.push_back(theme_info);
     }
@@ -158,7 +131,7 @@ class CrossDeviceThemeTracker : public KeyedService,
   void OnDeviceInfoChange() override {
     bool changed = false;
     for (auto& [cache_guid, theme_info] : other_themes_) {
-      PlatformThemeInfo updated_info = theme_info;
+      DeviceThemeInfo<LocalSpecifics> updated_info = theme_info;
       ResolveDeviceInfo(cache_guid, updated_info);
       if (theme_info.device_name != updated_info.device_name ||
           theme_info.form_factor != updated_info.form_factor) {
@@ -174,7 +147,7 @@ class CrossDeviceThemeTracker : public KeyedService,
 
  protected:
   void UpdateThemeInfo(const std::string& cache_guid,
-                       PlatformThemeInfo theme_info) {
+                       DeviceThemeInfo<LocalSpecifics> theme_info) {
     ResolveDeviceInfo(cache_guid, theme_info);
     auto it = other_themes_.find(cache_guid);
     if (it != other_themes_.end() && it->second == theme_info) {
@@ -212,7 +185,7 @@ class CrossDeviceThemeTracker : public KeyedService,
 
  private:
   void ResolveDeviceInfo(const std::string& client_tag_hash_value,
-                         PlatformThemeInfo& theme_info) {
+                         DeviceThemeInfo<LocalSpecifics>& theme_info) {
     if (!device_info_tracker_) {
       return;
     }
@@ -232,7 +205,7 @@ class CrossDeviceThemeTracker : public KeyedService,
 
   raw_ptr<syncer::DeviceInfoTracker> device_info_tracker_;
   base::ObserverList<Observer> observers_;
-  std::map<std::string, PlatformThemeInfo> other_themes_;
+  std::map<std::string, DeviceThemeInfo<LocalSpecifics>> other_themes_;
   ServiceStatus status_ = ServiceStatus::kInitializing;
 };
 

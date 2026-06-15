@@ -52,13 +52,15 @@ GetSpecifics<sync_pb::ThemeAndroidSpecifics>(
 
 // Generic sync bridge for cross-device themes.
 // It is read-only and delegates storage and updates to callbacks.
-template <typename Specifics>
+template <typename RemoteSpecifics, typename LocalSpecifics>
 class CrossDeviceThemeSyncBridge : public syncer::DataTypeSyncBridge {
  public:
   using TranslateCallback =
-      base::RepeatingCallback<PlatformThemeInfo(const Specifics&)>;
+      base::RepeatingCallback<DeviceThemeInfo<LocalSpecifics>(
+          const RemoteSpecifics&)>;
   using UpdateCallback =
-      base::RepeatingCallback<void(const std::string&, PlatformThemeInfo)>;
+      base::RepeatingCallback<void(const std::string&,
+                                   DeviceThemeInfo<LocalSpecifics>)>;
   using RemoveCallback = base::RepeatingCallback<void(const std::string&)>;
 
   CrossDeviceThemeSyncBridge(
@@ -119,9 +121,10 @@ class CrossDeviceThemeSyncBridge : public syncer::DataTypeSyncBridge {
         remove_cb_.Run(change->storage_key());
       } else {
         const sync_pb::EntitySpecifics& specifics = change->data().specifics;
-        const Specifics& platform_specifics =
-            GetSpecifics<Specifics>(specifics);
-        PlatformThemeInfo theme_info = translate_cb_.Run(platform_specifics);
+        const RemoteSpecifics& platform_specifics =
+            GetSpecifics<RemoteSpecifics>(specifics);
+        DeviceThemeInfo<LocalSpecifics> theme_info =
+            translate_cb_.Run(platform_specifics);
 
         batch->WriteData(change->storage_key(), specifics.SerializeAsString());
         update_cb_.Run(change->storage_key(), std::move(theme_info));
@@ -199,9 +202,10 @@ class CrossDeviceThemeSyncBridge : public syncer::DataTypeSyncBridge {
     for (const auto& record : *data_records) {
       sync_pb::EntitySpecifics specifics;
       if (specifics.ParseFromString(record.value)) {
-        const Specifics& platform_specifics =
-            GetSpecifics<Specifics>(specifics);
-        PlatformThemeInfo theme_info = translate_cb_.Run(platform_specifics);
+        const RemoteSpecifics& platform_specifics =
+            GetSpecifics<RemoteSpecifics>(specifics);
+        DeviceThemeInfo<LocalSpecifics> theme_info =
+            translate_cb_.Run(platform_specifics);
         update_cb_.Run(record.id, std::move(theme_info));
       }
     }

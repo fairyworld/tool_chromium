@@ -13,18 +13,27 @@
 
 namespace themes {
 
+struct TestTheme {
+  std::string color;
+};
+
+template <>
+struct ThemeComparer<TestTheme> {
+  static bool Equals(const TestTheme& lhs, const TestTheme& rhs) {
+    return lhs.color == rhs.color;
+  }
+};
+
 namespace {
 
-class MockObserver
-    : public CrossDeviceThemeTracker<sync_pb::ThemeSpecifics>::Observer {
+class MockObserver : public CrossDeviceThemeTracker<TestTheme>::Observer {
  public:
   MOCK_METHOD(void, OnCrossDeviceThemeChanged, (), (override));
   MOCK_METHOD(void, OnServiceStatusChanged, (ServiceStatus), (override));
 };
 
 // Testable subclass to expose protected methods.
-class TestCrossDeviceThemeTracker
-    : public CrossDeviceThemeTracker<sync_pb::ThemeSpecifics> {
+class TestCrossDeviceThemeTracker : public CrossDeviceThemeTracker<TestTheme> {
  public:
   explicit TestCrossDeviceThemeTracker(
       syncer::DeviceInfoTracker* device_info_tracker)
@@ -67,11 +76,11 @@ TEST_F(CrossDeviceThemeTrackerTest, UpdateAndRemoveTheme) {
   MockObserver observer;
   tracker_.AddObserver(&observer);
 
-  PlatformThemeInfo theme_info;
+  DeviceThemeInfo<TestTheme> theme_info;
   theme_info.device_name = "Phone";
   theme_info.os_type = syncer::DeviceInfo::OsType::kAndroid;
   theme_info.form_factor = syncer::DeviceInfo::FormFactor::kPhone;
-  theme_info.color = SK_ColorBLUE;
+  theme_info.theme.color = "blue";
 
   // Expect observer notification on update.
   EXPECT_CALL(observer, OnCrossDeviceThemeChanged()).Times(1);
@@ -84,17 +93,17 @@ TEST_F(CrossDeviceThemeTrackerTest, UpdateAndRemoveTheme) {
   EXPECT_EQ(themes[0].device_name, "Phone");
   EXPECT_EQ(themes[0].os_type, syncer::DeviceInfo::OsType::kAndroid);
   EXPECT_EQ(themes[0].form_factor, syncer::DeviceInfo::FormFactor::kPhone);
-  EXPECT_EQ(themes[0].color, SK_ColorBLUE);
+  EXPECT_EQ(themes[0].theme.color, "blue");
 
   // Update same guid.
-  theme_info.color = SK_ColorRED;
+  theme_info.theme.color = "red";
   EXPECT_CALL(observer, OnCrossDeviceThemeChanged()).Times(1);
   tracker_.UpdateThemeInfo("guid_1", theme_info);
   testing::Mock::VerifyAndClearExpectations(&observer);
 
   themes = tracker_.GetOtherDevicesThemes();
   ASSERT_EQ(themes.size(), 1u);
-  EXPECT_EQ(themes[0].color, SK_ColorRED);
+  EXPECT_EQ(themes[0].theme.color, "red");
 
   // Update with same info, expect NO notification.
   EXPECT_CALL(observer, OnCrossDeviceThemeChanged()).Times(0);
@@ -102,11 +111,11 @@ TEST_F(CrossDeviceThemeTrackerTest, UpdateAndRemoveTheme) {
   testing::Mock::VerifyAndClearExpectations(&observer);
 
   // Add another guid.
-  PlatformThemeInfo theme_info2;
+  DeviceThemeInfo<TestTheme> theme_info2;
   theme_info2.device_name = "Tablet";
   theme_info2.os_type = syncer::DeviceInfo::OsType::kAndroid;
   theme_info2.form_factor = syncer::DeviceInfo::FormFactor::kTablet;
-  theme_info2.color = SK_ColorGREEN;
+  theme_info2.theme.color = "green";
 
   // Expect observer notification on update.
   EXPECT_CALL(observer, OnCrossDeviceThemeChanged()).Times(1);
@@ -160,9 +169,9 @@ TEST_F(CrossDeviceThemeTrackerTest, DeviceInfoChange) {
       AddDevice(cache_guid, "Phone", syncer::DeviceInfo::OsType::kAndroid,
                 syncer::DeviceInfo::FormFactor::kPhone);
 
-  PlatformThemeInfo theme_info;
+  DeviceThemeInfo<TestTheme> theme_info;
   theme_info.os_type = syncer::DeviceInfo::OsType::kAndroid;
-  theme_info.color = SK_ColorBLUE;
+  theme_info.theme.color = "blue";
 
   // Update theme. Since device info is already added, it should resolve
   // immediately.

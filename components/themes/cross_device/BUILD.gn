@@ -13,7 +13,6 @@ source_set("features") {
 source_set("cross_device") {
   sources = [
     "cross_device_theme_sync_bridge.h",
-    "cross_device_theme_tracker.cc",
     "cross_device_theme_tracker.h",
   ]
   public_deps = [
