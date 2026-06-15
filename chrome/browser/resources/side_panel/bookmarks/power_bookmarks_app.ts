@@ -242,6 +242,9 @@ export class PowerBookmarksAppElement extends CrLitElement implements
     this.$.bookmarksList.onBookmarkChanged(id);
     this.updateShoppingData_();
     this.updateCanAddCurrentUrl_();
+    if (this.selectedBookmarks_[id]) {
+      this.selectedBookmarks_ = {};
+    }
   }
 
   onBookmarkAdded(bookmark: BookmarksTreeNode, parent: BookmarksTreeNode) {
@@ -255,6 +258,9 @@ export class PowerBookmarksAppElement extends CrLitElement implements
       newParent: BookmarksTreeNode) {
     this.$.bookmarksList.onBookmarkMoved(bookmark, oldParent, newParent);
     this.updateCanAddCurrentUrl_();
+    if (this.selectedBookmarks_[bookmark.id]) {
+      this.selectedBookmarks_ = {};
+    }
   }
 
   onBookmarkRemoved(bookmark: BookmarksTreeNode) {
@@ -372,7 +378,6 @@ export class PowerBookmarksAppElement extends CrLitElement implements
         event.detail.bookmarks.map(bookmark => bookmark.id), event.detail.name,
         event.detail.url, parentId);
     this.selectedBookmarks_ = {};
-    this.editing_ = false;
   }
 
   protected getSelectedDescription_() {
@@ -472,7 +477,6 @@ export class PowerBookmarksAppElement extends CrLitElement implements
         .then(() => {
           this.showDeletionToast_(selectedBookmarksList);
           this.selectedBookmarks_ = {};
-          this.editing_ = false;
         });
   }
 
@@ -494,7 +498,6 @@ export class PowerBookmarksAppElement extends CrLitElement implements
     event.stopPropagation();
     this.showDeletionToast_(event.detail.bookmarks);
     this.selectedBookmarks_ = {};
-    this.editing_ = false;
   }
 
   protected onContextMenuClose_() {

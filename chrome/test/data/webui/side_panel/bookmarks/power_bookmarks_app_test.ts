@@ -645,6 +645,55 @@ suite('General', () => {
       await microtasksFinished();
     });
 
+    test('ClearsSelectionOnMove', async () => {
+      const header =
+          powerBookmarksApp.$.bookmarksList.shadowRoot
+              .querySelector<HTMLElement>('power-bookmarks-list-header')!;
+      const editButton =
+          header.shadowRoot!.querySelector<HTMLElement>('#editButton')!;
+      editButton.click();
+      await microtasksFinished();
+
+      await selectBookmark('3');
+      assertTrue(powerBookmarksApp['selectedBookmarks_']['3'] === true);
+      assertTrue(powerBookmarksApp['editing_']);
+
+      bookmarksApi.callbackRouterRemote.onBookmarkNodeMoved(
+          FOLDERS[1]!.id,
+          /*oldIndex=*/ 0,
+          FOLDERS[0]!.id,
+          /*newIndex=*/ 0,
+      );
+      await microtasksFinished();
+
+      assertFalse(powerBookmarksApp['selectedBookmarks_']['3'] === true);
+      assertTrue(powerBookmarksApp['editing_']);
+    });
+
+    test('ClearsSelectionOnChanged', async () => {
+      const header =
+          powerBookmarksApp.$.bookmarksList.shadowRoot
+              .querySelector<HTMLElement>('power-bookmarks-list-header')!;
+      const editButton =
+          header.shadowRoot!.querySelector<HTMLElement>('#editButton')!;
+      editButton.click();
+      await microtasksFinished();
+
+      await selectBookmark('3');
+      assertTrue(powerBookmarksApp['selectedBookmarks_']['3'] === true);
+      assertTrue(powerBookmarksApp['editing_']);
+
+      bookmarksApi.callbackRouterRemote.onBookmarkNodeChanged(
+          '3',
+          'New Title',
+          'https://www.google.com/',
+      );
+      await microtasksFinished();
+
+      assertFalse(powerBookmarksApp['selectedBookmarks_']['3'] === true);
+      assertTrue(powerBookmarksApp['editing_']);
+    });
+
     test('MovesBookmarkWithFilter', async () => {
       await openBookmark('5');
       await performSearch('bookmark');
