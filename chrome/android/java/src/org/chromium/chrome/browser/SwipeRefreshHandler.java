@@ -312,7 +312,9 @@ public class SwipeRefreshHandler extends TabWebContentsUserData
     public void release(@OverscrollActivationStatus int status) {
         TraceEvent.begin("SwipeRefreshHandler.release");
         assumeNonNull(mSwipeRefreshLayout);
-        boolean allowRefresh = status == OverscrollActivationStatus.ALLOW_ACTIVATION;
+        boolean allowRefresh =
+                status == OverscrollActivationStatus.ALLOW_ACTIVATION
+                        || status == OverscrollActivationStatus.FORCE_ACTIVATION;
         if (mSwipeType == OverscrollAction.PULL_TO_REFRESH) {
             mSwipeRefreshLayout.release(allowRefresh);
         } else if (mSwipeType == OverscrollAction.HISTORY_NAVIGATION) {

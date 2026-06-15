@@ -26,6 +26,12 @@ namespace {
 // quite common during a slow scroll)
 const float kMinFlingVelocityForActivation = -500.f;
 
+// Minimum velocity in the active navigation direction required to force-trigger
+// navigation on gesture end. According to UX, the most common scale factor
+// is 1.625, so 1100 dp(fling-to-start threshold used on chrome desktop) is
+// about 1788 pixel.
+const float kMinFlingVelocityForForceActivation = 1788.f;
+
 // Weighted value used to determine whether a scroll should trigger vertical
 // scroll or horizontal navigation.
 const float kWeightAngle30 = 1.73f;
@@ -78,10 +84,7 @@ void OverscrollRefresh::OnScrollEnd(const gfx::Vector2dF& scroll_velocity) {
     Release(OverscrollActivationStatus::kReset);
     return;
   }
-  bool allow_activation = GetVelocityInActiveActionDirection(scroll_velocity) >
-                          kMinFlingVelocityForActivation;
-  Release(allow_activation ? OverscrollActivationStatus::kAllowActivation
-                           : OverscrollActivationStatus::kDisallowActivation);
+  Release(GetActivationStatus(scroll_velocity));
 }
 
 void OverscrollRefresh::OnOverscrolled(const cc::OverscrollBehavior& behavior,
@@ -152,7 +155,7 @@ void OverscrollRefresh::OnOverscrolled(const cc::OverscrollBehavior& behavior,
     if (scroll_consumption_state_ == ScrollConsumptionState::kEnabled) {
       // Make sure active_action_ is not set yet before set
       CHECK(!active_action_.has_value());
-      active_action_ = ActiveAction{type, overscroll_edge};
+      active_action_ = ActiveAction{type, overscroll_edge, source_device};
     }
   }
 }
@@ -249,6 +252,27 @@ float OverscrollRefresh::GetVelocityInActiveActionDirection(
       } else {
         return -velocity.x();
       }
+    default:
+      NOTREACHED();
+  }
+}
+
+OverscrollActivationStatus OverscrollRefresh::GetActivationStatus(
+    const gfx::Vector2dF& velocity) {
+  float velocity_in_direction = GetVelocityInActiveActionDirection(velocity);
+  switch (active_action_->action) {
+    case OverscrollAction::kHistoryNavigation: {
+      if (active_action_->device == blink::WebGestureDevice::kTouchpad &&
+          velocity_in_direction > kMinFlingVelocityForForceActivation) {
+        return OverscrollActivationStatus::kForceActivation;
+      }
+      [[fallthrough]];
+    }
+    case OverscrollAction::kPullToRefresh:
+    case OverscrollAction::kPullFromBottomEdge:
+      return velocity_in_direction > kMinFlingVelocityForActivation
+                 ? OverscrollActivationStatus::kAllowActivation
+                 : OverscrollActivationStatus::kDisallowActivation;
     default:
       NOTREACHED();
   }

@@ -680,4 +680,36 @@ TEST_F(OverscrollRefreshTest, OverscrollBehaviorXNonePreventsTriggerStart) {
   TestOverscrollBehavior(ob, gfx::Vector2dF(10, 0), false);
 }
 
+TEST_F(OverscrollRefreshTest, LeftEdgeHistoryNavigationFlingToStart) {
+  effect_.SetTouchpadOverscrollHistoryNavigation(true);
+  effect_.OnScrollBegin(gfx::PointF(2.f, 50.f));
+  gfx::Vector2dF scroll_right(10, 0);
+  effect_.OnOverscrolled(cc::OverscrollBehavior(), -scroll_right,
+                         blink::WebGestureDevice::kTouchpad);
+  ASSERT_TRUE(effect_.IsActive());
+  EXPECT_TRUE(GetAndResetPullStarted());
+
+  // Set the fling speed to 1800 to exceed the fling-to-start threshold
+  effect_.OnScrollEnd(gfx::Vector2dF(1800, 0));
+  EXPECT_TRUE(GetAndResetPullReleased());
+  EXPECT_EQ(OverscrollActivationStatus::kForceActivation,
+            GetAndResetOverscrollActivationStatus());
+}
+
+TEST_F(OverscrollRefreshTest, RightEdgeHistoryNavigationFlingToStart) {
+  effect_.SetTouchpadOverscrollHistoryNavigation(true);
+  effect_.OnScrollBegin(gfx::PointF(98.f, 50.f));
+  gfx::Vector2dF scroll_left(-10, 0);
+  effect_.OnOverscrolled(cc::OverscrollBehavior(), -scroll_left,
+                         blink::WebGestureDevice::kTouchpad);
+  ASSERT_TRUE(effect_.IsActive());
+  EXPECT_TRUE(GetAndResetPullStarted());
+
+  // Set the fling speed to -1800 to exceed the fling-to-start threshold
+  effect_.OnScrollEnd(gfx::Vector2dF(-1800, 0));
+  EXPECT_TRUE(GetAndResetPullReleased());
+  EXPECT_EQ(OverscrollActivationStatus::kForceActivation,
+            GetAndResetOverscrollActivationStatus());
+}
+
 }  // namespace ui

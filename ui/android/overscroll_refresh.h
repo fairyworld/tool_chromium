@@ -27,11 +27,13 @@ enum class OverscrollAction {
 // kDisallowActivation: Prevents activation.
 // kAllowActivation: Allows activation, but the final decision depends on
 //                     Java-side logic (e.g. drag distance threshold).
+// kForceActivation: Forces the activation.
 // kReset: This is for NavigationHandler.java to reset the state
 enum class OverscrollActivationStatus {
   kDisallowActivation = 0,
   kAllowActivation = 1,
-  kReset = 2
+  kForceActivation = 2,
+  kReset = 3
 };
 
 namespace cc {
@@ -125,6 +127,11 @@ class UI_ANDROID_EXPORT OverscrollRefresh {
   // Returns velocity in the active action direction.
   float GetVelocityInActiveActionDirection(const gfx::Vector2dF& velocity);
 
+  // Returns the activation status based on velocity in the active action
+  // direction.
+  OverscrollActivationStatus GetActivationStatus(
+      const gfx::Vector2dF& velocity);
+
   bool scrolled_to_top_;
   bool scrolled_to_bottom_;
 
@@ -152,6 +159,7 @@ class UI_ANDROID_EXPORT OverscrollRefresh {
   struct ActiveAction {
     OverscrollAction action = OverscrollAction::kNone;
     std::optional<BackGestureEventSwipeEdge> edge;
+    std::optional<blink::WebGestureDevice> device;
   };
   std::optional<ActiveAction> active_action_;
 };

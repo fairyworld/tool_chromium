@@ -92,6 +92,8 @@ public class SideSlideLayout extends ViewGroup {
     // Flag indicating that the navigation will be activated.
     private boolean mNavigating;
 
+    private @OverscrollActivationStatus int mOverscrollActivationStatus;
+
     private int mCurrentTargetOffset;
     private float mTotalMotion;
 
@@ -285,6 +287,7 @@ public class SideSlideLayout extends ViewGroup {
             mAnimateToStartPosition.reset();
         }
 
+        mOverscrollActivationStatus = OverscrollActivationStatus.ALLOW_ACTIVATION;
         mTotalMotion = 0;
         mMaxOverscroll = 0.f;
         mIsBeingDragged = true;
@@ -356,6 +359,7 @@ public class SideSlideLayout extends ViewGroup {
      *     activation
      */
     boolean willNavigate() {
+        if (mOverscrollActivationStatus == OverscrollActivationStatus.FORCE_ACTIVATION) return true;
         return getOverscroll() > mTotalDragDistance * THRESHOLD_MULTIPLIER;
     }
 
@@ -390,10 +394,13 @@ public class SideSlideLayout extends ViewGroup {
     public void release(@OverscrollActivationStatus int status) {
         if (!mIsBeingDragged) return;
 
+        mOverscrollActivationStatus = status;
         // See ACTION_UP handling in {@link #onTouchEvent(...)}.
         mIsBeingDragged = false;
 
-        boolean allowNav = status == OverscrollActivationStatus.ALLOW_ACTIVATION;
+        boolean allowNav =
+                status == OverscrollActivationStatus.ALLOW_ACTIVATION
+                        || status == OverscrollActivationStatus.FORCE_ACTIVATION;
 
         boolean activated = mMaxOverscroll >= mArrowViewWidth / 3f;
         if (activated) {

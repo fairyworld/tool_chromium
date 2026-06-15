@@ -427,7 +427,9 @@ class NavigationHandler implements TouchEventObserver {
     }
 
     private void onGestureEnd(@OverscrollActivationStatus int status) {
-        boolean allowNav = status == OverscrollActivationStatus.ALLOW_ACTIVATION;
+        boolean allowNav =
+                status == OverscrollActivationStatus.ALLOW_ACTIVATION
+                        || status == OverscrollActivationStatus.FORCE_ACTIVATION;
         // If the back gesture will update history, record the metrics.
         if (mBackGestureForTabHistoryInProgress) {
             assumeNonNull(mTab);
