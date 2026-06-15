@@ -263,8 +263,6 @@ TEST_F(ReportRequestQueueGeneratorTest, GenerateSingleReport) {
   VerifyProfiles(requests[0]->GetDeviceReportRequest().browser_report(),
                  /*idle profiles*/ {},
                  /*active profiles*/ {kActiveProfileName1});
-  histogram_tester()->ExpectBucketCount("Enterprise.CloudReportingRequestSize",
-                                        /*report size floor to KB*/ 0, 1);
 }
 
 TEST_F(ReportRequestQueueGeneratorTest, BasicReportIsTooBig) {
@@ -275,9 +273,6 @@ TEST_F(ReportRequestQueueGeneratorTest, BasicReportIsTooBig) {
   CreateActiveProfiles();
   auto requests = GenerateRequests(GenerateBasicRequest());
   EXPECT_EQ(0u, requests.size());
-
-  histogram_tester()->ExpectTotalCount("Enterprise.CloudReportingRequestSize",
-                                       0);
 }
 
 TEST_F(ReportRequestQueueGeneratorTest, ChromePoliciesCollection) {
@@ -328,8 +323,6 @@ TEST_F(ReportRequestQueueGeneratorTest, GenerateReport) {
 
   VerifyProfiles(requests[0]->GetDeviceReportRequest().browser_report(),
                  idle_profile_names, {});
-  histogram_tester()->ExpectBucketCount("Enterprise.CloudReportingRequestSize",
-                                        /*report size floor to KB*/ 0, 1);
 }
 
 TEST_F(ReportRequestQueueGeneratorTest, GenerateActiveProfiles) {
@@ -340,8 +333,6 @@ TEST_F(ReportRequestQueueGeneratorTest, GenerateActiveProfiles) {
 
   VerifyProfiles(requests[0]->GetDeviceReportRequest().browser_report(),
                  idle_profile_names, active_profile_names);
-  histogram_tester()->ExpectBucketCount("Enterprise.CloudReportingRequestSize",
-                                        /*report size floor to KB*/ 0, 1);
 }
 
 TEST_F(ReportRequestQueueGeneratorTest, ReportSeparation) {
@@ -377,8 +368,6 @@ TEST_F(ReportRequestQueueGeneratorTest, ReportSeparation) {
       requests[1]->GetDeviceReportRequest().browser_report(),
       {/* idle_profile_names */ expected_active_profiles_in_requests[0]},
       {/* active_profile_names */ expected_active_profiles_in_requests[1]});
-  histogram_tester()->ExpectBucketCount("Enterprise.CloudReportingRequestSize",
-                                        /*report size floor to KB*/ 0, 2);
 }
 
 TEST_F(ReportRequestQueueGeneratorTest, ProfileReportIsTooBig) {
@@ -392,6 +381,7 @@ TEST_F(ReportRequestQueueGeneratorTest, ProfileReportIsTooBig) {
 
   // Add a smaller Profile.
   CreateActiveProfile(kActiveProfileName2);
+  base::HistogramTester tester;
   requests = GenerateRequests(GenerateBasicRequest());
   EXPECT_EQ(1u, requests.size());
 
@@ -399,8 +389,8 @@ TEST_F(ReportRequestQueueGeneratorTest, ProfileReportIsTooBig) {
   // reported.
   VerifyProfiles(requests[0]->GetDeviceReportRequest().browser_report(),
                  {kActiveProfileName1}, {kActiveProfileName2});
-  histogram_tester()->ExpectBucketCount("Enterprise.CloudReportingRequestSize",
-                                        /*report size floor to KB*/ 0, 2);
+
+  tester.ExpectTotalCount("Enterprise.CloudReporting.DroppedReportSize", 1);
 }
 
 #endif  // !BUILDFLAG(IS_ANDROID)

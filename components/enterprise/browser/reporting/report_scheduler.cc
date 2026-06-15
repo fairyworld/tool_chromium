@@ -12,6 +12,7 @@
 #include "base/metrics/histogram_functions.h"
 #include "base/not_fatal_until.h"
 #include "base/notreached.h"
+#include "base/strings/strcat.h"
 #include "base/strings/stringprintf.h"
 #include "base/syslog_logging.h"
 #include "base/time/time.h"
@@ -324,9 +325,26 @@ void ReportScheduler::GenerateAndUploadReport(ReportTrigger trigger) {
   if (active_report_generation_config_.report_trigger != kTriggerNone) {
     // A report is already being generated. Remember this trigger to be handled
     // once the current report completes.
+    if (trigger == ReportTrigger::kTriggerTimer &&
+        active_report_generation_config_.report_trigger ==
+            ReportTrigger::kTriggerTimer) {
+      // If a new timer trigger fires while a previous timer-triggered report
+      // is still active, it indicates that the previous report generation
+      // or upload has overrun the cycle (e.g. due to retries or slow
+      // generation).
+      base::UmaHistogramBoolean("Enterprise.CloudReporting.SchedulerOverrun",
+                                true);
+    }
     pending_triggers_ |= trigger;
     return;
   }
+
+  if (trigger == ReportTrigger::kTriggerTimer) {
+    base::UmaHistogramBoolean("Enterprise.CloudReporting.SchedulerOverrun",
+                              false);
+  }
+
+  report_generation_start_time_ = base::TimeTicks::Now();
 
   ReportType report_type = TriggerToReportType(trigger);
   SecuritySignalsMode signals_mode = SecuritySignalsMode::kNoSignals;
@@ -493,6 +511,16 @@ void ReportScheduler::OnReportUploaded(ReportUploader::ReportStatus status) {
       }
     }
   }
+
+  std::string_view report_type_suffix =
+      GetReportTypeMetricSuffix(active_report_generation_config_.report_type);
+  std::string_view signals_suffix = GetSecuritySignalsModeMetricSuffix(
+      active_report_generation_config_.security_signals_mode);
+
+  base::UmaHistogramLongTimes(
+      base::StrCat({"Enterprise.CloudReporting.ReportUploadLatency.",
+                    report_type_suffix, signals_suffix}),
+      base::TimeTicks::Now() - report_generation_start_time_);
 
   active_report_generation_config_ =
       ReportGenerationConfig(ReportTrigger::kTriggerNone);

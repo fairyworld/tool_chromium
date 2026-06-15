@@ -7,6 +7,7 @@
 #include <array>
 #include <utility>
 
+#include "base/strings/strcat.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/task_environment.h"
 #include "base/test/test_future.h"
@@ -405,6 +406,12 @@ TEST_P(ReportUploaderTestWithReportType, Success) {
   EXPECT_TRUE(has_responded_);
   histogram_tester_.ExpectUniqueSample(
       kResponseMetricsName, ReportResponseMetricsStatus::kSuccess, 1);
+
+  histogram_tester_.ExpectUniqueSample(
+      base::StrCat({"Enterprise.CloudReportingRequestSize.",
+                    GetReportTypeMetricSuffix(GetReportType())}),
+      /*report size floor to KB*/ 0, 1);
+
   ::testing::Mock::VerifyAndClearExpectations(&client_);
 }
 

@@ -187,6 +187,9 @@ class ReportScheduler {
   ReportGenerationConfig active_report_generation_config_ =
       ReportGenerationConfig(ReportTrigger::kTriggerNone);
 
+  // The start time of the active report generation/upload process.
+  base::TimeTicks report_generation_start_time_;
+
   // The set of triggers that have fired while processing a report (a bitfield
   // of ReportTrigger values). They will be handled following completion of the
   // in-process report.
