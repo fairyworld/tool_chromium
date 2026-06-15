@@ -5,8 +5,10 @@
 package org.chromium.chrome.browser.tasks.tab_management.vertical_tabs;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -36,6 +38,7 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.robolectric.Robolectric;
+import org.robolectric.shadows.ShadowLooper;
 
 import org.chromium.base.Callback;
 import org.chromium.base.test.BaseRobolectricTestRunner;
@@ -52,6 +55,8 @@ import org.chromium.components.tab_groups.TabGroupColorId;
 import org.chromium.components.tab_groups.TabGroupColorPickerUtils;
 import org.chromium.components.tab_groups.TabGroupsFeatureMap;
 import org.chromium.ui.modelutil.PropertyModel;
+
+import java.util.concurrent.TimeUnit;
 
 /** Unit tests for {@link TabVerticalViewBinder}. */
 // TODO(crbug.com/515147675): Create an instrumented RenderTest class once Pinned Tabs and
@@ -406,18 +411,28 @@ public class TabVerticalViewBinderUnitTest {
                                 .inflate(R.layout.vertical_tab_group_header, null, false);
         ImageView expandChevron = headerView.findViewById(R.id.expand_chevron);
 
-        // 0. Test Default/Null State (should point up - 180 degrees as false = expanded)
+        // Test Detached / Recycled State (should snap instantly)
+        assertFalse(headerView.isAttachedToWindow());
+        mModel.set(TabProperties.IS_COLLAPSED, false);
         TabVerticalViewBinder.bindTabGroupHeader(mModel, headerView, TabProperties.IS_COLLAPSED);
         assertEquals(180f, expandChevron.getRotation(), 0.0f);
 
-        // 1. Test Collapsed State (should point down - 0 degrees)
+        // Toggling to Collapsed while detached (should instantly snap to 0 degrees)
         mModel.set(TabProperties.IS_COLLAPSED, true);
         TabVerticalViewBinder.bindTabGroupHeader(mModel, headerView, TabProperties.IS_COLLAPSED);
         assertEquals(0f, expandChevron.getRotation(), 0.0f);
 
-        // 2. Test Expanded/Not-Collapsed State (should point up - 180 degrees)
+        // Test Attached / Clicked State (should animate)
+        activity.setContentView(headerView);
+        assertTrue(headerView.isAttachedToWindow());
+
+        // Toggling back to Expanded while attached (should animate to 180 degrees)
         mModel.set(TabProperties.IS_COLLAPSED, false);
         TabVerticalViewBinder.bindTabGroupHeader(mModel, headerView, TabProperties.IS_COLLAPSED);
+
+        assertEquals(0f, expandChevron.getRotation(), 0.0f);
+        ShadowLooper.idleMainLooper(
+                TabVerticalViewBinder.CHEVRON_ANIMATION_DURATION_MS, TimeUnit.MILLISECONDS);
         assertEquals(180f, expandChevron.getRotation(), 0.0f);
     }
 

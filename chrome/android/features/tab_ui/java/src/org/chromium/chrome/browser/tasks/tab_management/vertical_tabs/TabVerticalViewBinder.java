@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.VisibleForTesting;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.widget.ImageViewCompat;
@@ -35,6 +36,7 @@ import org.chromium.ui.modelutil.PropertyModel;
 class TabVerticalViewBinder {
     private static final float ROTATION_COLLAPSED = 0f;
     private static final float ROTATION_EXPANDED = 180f;
+    @VisibleForTesting static final long CHEVRON_ANIMATION_DURATION_MS = 200L;
 
     // Public Entry-Point Binders
 
@@ -246,9 +248,20 @@ class TabVerticalViewBinder {
         boolean isCollapsed = model.get(TabProperties.IS_COLLAPSED);
         @Nullable ImageView expandChevron = view.findViewById(R.id.expand_chevron);
         if (expandChevron != null) {
-            // TODO(crbug.com/509226293): Animate the rotation once child tab
-            // expansion transitions are implemented.
-            expandChevron.setRotation(isCollapsed ? ROTATION_COLLAPSED : ROTATION_EXPANDED);
+            expandChevron.animate().cancel();
+            float targetRotation = isCollapsed ? ROTATION_COLLAPSED : ROTATION_EXPANDED;
+
+            if (expandChevron.getRotation() == targetRotation) return;
+
+            if (expandChevron.isAttachedToWindow()) {
+                expandChevron
+                        .animate()
+                        .rotation(targetRotation)
+                        .setDuration(CHEVRON_ANIMATION_DURATION_MS)
+                        .start();
+            } else {
+                expandChevron.setRotation(targetRotation);
+            }
         }
     }
 
