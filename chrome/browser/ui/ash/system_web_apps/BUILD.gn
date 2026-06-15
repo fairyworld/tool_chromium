@@ -91,6 +91,7 @@ source_set("impl") {
     "//chrome/browser/ui/ash/multi_user",
     "//chrome/browser/ui/web_applications",
     "//chrome/browser/ui/web_applications:launch_utils",
+    "//chrome/browser/ui/webui:theme_source",
     "//chrome/browser/web_applications",
     "//chrome/common",
     "//chromeos/ash/components/browser_context_helper",

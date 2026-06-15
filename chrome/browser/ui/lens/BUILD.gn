@@ -180,6 +180,7 @@ source_set("impl") {
     "//chrome/browser/ui/views/page_action",
     "//chrome/browser/ui/views/toolbar",
     "//chrome/browser/ui/webui",
+    "//chrome/browser/ui/webui:theme_source",
     "//chrome/browser/ui/webui:webui_util",
     "//chrome/browser/ui/webui/new_tab_page",
     "//chrome/browser/ui/webui/new_tab_page_third_party",

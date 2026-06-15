@@ -76,6 +76,7 @@ source_set("search") {
       "//chrome/app/theme:theme_resources_grit",
       "//chrome/browser/resources/new_tab_page_instant:resources",
       "//chrome/browser/resources/new_tab_page_instant:resources_grit",
+      "//chrome/browser/ui/webui:theme_source",
       "//chrome/common:constants",
       "//chrome/common:non_code_constants",
       "//chrome/common/search:mojo_bindings",
@@ -92,5 +93,10 @@ source_set("search") {
       "//ui/gfx:color_utils",
       "//ui/webui/resources/cr_components/composebox:mojo_bindings",
     ]
+
+    # InstantService constructs ThemeSource while theme_source.cc includes
+    # instant_service.h (InstantService::ShouldServiceRequest) — a genuine
+    # bidirectional pair, with the real dep edge owned here.
+    allow_circular_includes_from = [ "//chrome/browser/ui/webui:theme_source" ]
   }
 }

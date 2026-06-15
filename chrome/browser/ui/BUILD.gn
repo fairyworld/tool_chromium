@@ -1085,8 +1085,6 @@ static_library("ui") {
     sources += [
       "webui/new_tab_page/action_chips/action_chips_handler.cc",
       "webui/new_tab_page/action_chips/action_chips_handler.h",
-      "webui/theme_source.cc",
-      "webui/theme_source.h",
     ]
     deps += [
       "//chrome/browser/contextual_search",
@@ -1094,10 +1092,17 @@ static_library("ui") {
       "//chrome/browser/preloading/new_tab_page_preload",
       "//chrome/browser/search/background",
       "//chrome/browser/ui/color:mixers",
+      "//chrome/browser/ui/webui:theme_source",
       "//chrome/browser/ui/webui:webui_util",
       "//chrome/browser/ui/webui/new_tab_page/action_chips",
     ]
     public_deps += [ "//components/themes" ]
+  }
+
+  if (!is_android) {
+    # customize_chrome_ui.cc and other desktop :ui sources include
+    # theme_handler.h.
+    deps += [ "//chrome/browser/ui/webui:theme_handler" ]
   }
 
   if (enterprise_data_controls) {
@@ -1418,8 +1423,6 @@ static_library("ui") {
       "webui/theme_colors_source_manager.h",
       "webui/theme_colors_source_manager_factory.cc",
       "webui/theme_colors_source_manager_factory.h",
-      "webui/theme_handler.cc",
-      "webui/theme_handler.h",
     ]
 
     if (is_chrome_branded) {
@@ -1547,6 +1550,7 @@ static_library("ui") {
       "//chrome/browser/ui/webui/new_tab_page_third_party",
       "//chrome/browser/ui/webui/new_tab_page_third_party:impl",
       "//chrome/browser/ui/webui/ntp",
+      "//chrome/browser/ui/webui/ntp:ntp_resource_cache",
       "//chrome/browser/ui/webui/omnibox_popup",
       "//chrome/browser/ui/webui/omnibox_popup/mojom",
       "//chrome/browser/ui/webui/support_tool",
@@ -1996,9 +2000,10 @@ static_library("ui") {
       # most_visited_handler.h from //chrome/browser/ui.
       "//chrome/browser/ui/webui/new_tab_page_third_party:impl",
 
-      # ntp includes theme_handler.h, theme_source.h, browser_window.h, and
+      # ntp and ntp_resource_cache include browser_window.h and
       # layout_constants.h from //chrome/browser/ui.
       "//chrome/browser/ui/webui/ntp",
+      "//chrome/browser/ui/webui/ntp:ntp_resource_cache",
 
       # omnibox_popup includes browser_window.h and other headers from
       # //chrome/browser/ui.
