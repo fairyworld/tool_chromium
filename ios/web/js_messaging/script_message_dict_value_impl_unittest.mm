@@ -86,7 +86,7 @@ TEST_F(ScriptMessageDictValueTest, DictShouldSupportNestedDicts) {
   };
   ScriptMessageDictValue dict(ns_dict);
 
-  std::unique_ptr<ScriptMessageDictValue> inner_dict = dict.FindDict("dictKey");
+  std::optional<ScriptMessageDictValue> inner_dict = dict.FindDict("dictKey");
   ASSERT_TRUE(inner_dict);
   EXPECT_EQ("innerVal", inner_dict->FindString("innerKey").value_or(""));
 }

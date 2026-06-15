@@ -47,6 +47,17 @@ TEST_F(ScriptMessageListValueTest, SizeIsTwoGivenNonEmptyArray) {
   EXPECT_EQ(list.Size(), 2u);
 }
 
+// Tests whether the Front() function correctly returns std::nullopt if the
+// list is empty.
+TEST_F(ScriptMessageListValueTest, NoFrontElementIfArrayIsEmpty) {
+  NSArray* array_with_dict_elements = @[];
+  ScriptMessageListValue list(array_with_dict_elements);
+
+  std::optional<ScriptMessageValue> front = list.Front();
+
+  ASSERT_FALSE(front.has_value());
+}
+
 // Tests whether the Front() function correctly returns the first element in the
 // list.
 TEST_F(ScriptMessageListValueTest, FrontElementIsEquivalentToTheFirstElement) {
@@ -54,10 +65,10 @@ TEST_F(ScriptMessageListValueTest, FrontElementIsEquivalentToTheFirstElement) {
       @[ @{@"name" : @"item1"}, @{@"name" : @"item2"} ];
   ScriptMessageListValue list(array_with_dict_elements);
 
-  std::unique_ptr<ScriptMessageValue> front = list.Front();
+  std::optional<ScriptMessageValue> front = list.Front();
 
-  ASSERT_TRUE(front);
-  EXPECT_EQ(base::Value::Type::DICT, front->type());
+  ASSERT_TRUE(front.has_value());
+  ASSERT_EQ(base::Value::Type::DICT, front->type());
   EXPECT_EQ("item1", front->GetDict().FindString("name").value_or(""));
 }
 
@@ -69,10 +80,10 @@ TEST_F(ScriptMessageListValueTest,
       @[ @1, @2, @3, @4, @5, @6, @7, @8, @9, @10 ];
   ScriptMessageListValue list(array_with_nsnumber_elements);
 
-  std::unique_ptr<ScriptMessageValue> front = list.Front();
+  std::optional<ScriptMessageValue> front = list.Front();
 
-  ASSERT_TRUE(front);
-  EXPECT_EQ(base::Value::Type::INTEGER, front->type());
+  ASSERT_TRUE(front.has_value());
+  ASSERT_EQ(base::Value::Type::INTEGER, front->type());
   EXPECT_EQ(1, front->GetValue().GetInt());
 }
 
@@ -83,11 +94,22 @@ TEST_F(ScriptMessageListValueTest,
   NSArray* array_with_string_elements = @[ @"a", @"b", @"c", @"d", @"e" ];
   ScriptMessageListValue list(array_with_string_elements);
 
-  std::unique_ptr<ScriptMessageValue> front = list.Front();
+  std::optional<ScriptMessageValue> front = list.Front();
 
-  ASSERT_TRUE(front);
-  EXPECT_EQ(base::Value::Type::STRING, front->type());
+  ASSERT_TRUE(front.has_value());
+  ASSERT_EQ(base::Value::Type::STRING, front->type());
   EXPECT_EQ("a", front->GetValue().GetString());
+}
+
+// Tests whether the Back() function correctly returns std::nullopt if the
+// list is empty.
+TEST_F(ScriptMessageListValueTest, NoBackElementIfArrayIsEmpty) {
+  NSArray* array_with_dict_elements = @[];
+  ScriptMessageListValue list(array_with_dict_elements);
+
+  std::optional<ScriptMessageValue> back = list.Back();
+
+  ASSERT_FALSE(back.has_value());
 }
 
 // Tests whether the Back() function correctly returns the last element in the
@@ -97,10 +119,10 @@ TEST_F(ScriptMessageListValueTest, BackElementIsEquivalentToTheLastElement) {
       @[ @{@"name" : @"item1"}, @{@"name" : @"item2"} ];
   ScriptMessageListValue list(array_with_dict_elements);
 
-  std::unique_ptr<ScriptMessageValue> back = list.Back();
+  std::optional<ScriptMessageValue> back = list.Back();
 
-  ASSERT_TRUE(back);
-  EXPECT_EQ(base::Value::Type::DICT, back->type());
+  ASSERT_TRUE(back.has_value());
+  ASSERT_EQ(base::Value::Type::DICT, back->type());
   EXPECT_EQ("item2", back->GetDict().FindString("name").value_or(""));
 }
 
@@ -112,10 +134,10 @@ TEST_F(ScriptMessageListValueTest,
       @[ @1, @2, @3, @4, @5, @6, @7, @8, @9, @10 ];
   ScriptMessageListValue list(array_with_nsnumber_elements);
 
-  std::unique_ptr<ScriptMessageValue> back = list.Back();
+  std::optional<ScriptMessageValue> back = list.Back();
 
-  ASSERT_TRUE(back);
-  EXPECT_EQ(base::Value::Type::INTEGER, back->type());
+  ASSERT_TRUE(back.has_value());
+  ASSERT_EQ(base::Value::Type::INTEGER, back->type());
   EXPECT_EQ(10, back->GetValue().GetInt());
 }
 
@@ -126,10 +148,10 @@ TEST_F(ScriptMessageListValueTest,
   NSArray* array_with_string_elements = @[ @"a", @"b", @"c", @"d", @"e" ];
   ScriptMessageListValue list(array_with_string_elements);
 
-  std::unique_ptr<ScriptMessageValue> back = list.Back();
+  std::optional<ScriptMessageValue> back = list.Back();
 
-  ASSERT_TRUE(back);
-  EXPECT_EQ(base::Value::Type::STRING, back->type());
+  ASSERT_TRUE(back.has_value());
+  ASSERT_EQ(base::Value::Type::STRING, back->type());
   EXPECT_EQ("e", back->GetValue().GetString());
 }
 

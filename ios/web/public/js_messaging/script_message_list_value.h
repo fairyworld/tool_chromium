@@ -7,7 +7,7 @@
 
 #include <Foundation/Foundation.h>
 
-#include <memory>
+#include <optional>
 
 namespace web {
 class ScriptMessageValue;
@@ -30,11 +30,13 @@ class ScriptMessageListValue {
   // Returns the number of elements in the list.
   size_t Size() const;
 
-  // Returns the value stored at the beginning of the list.
-  std::unique_ptr<ScriptMessageValue> Front() const;
+  // Returns the value stored at the beginning of the list or `std::nullopt
+  // if the list is empty.
+  std::optional<ScriptMessageValue> Front() const;
 
-  // Returns the value stored at the end of the list.
-  std::unique_ptr<ScriptMessageValue> Back() const;
+  // Returns the value stored at the end of the list or `std::nullopt
+  // if the list is empty.
+  std::optional<ScriptMessageValue> Back() const;
 
   // TODO(crbug.com/509501985): Add support for iteration.
  private:

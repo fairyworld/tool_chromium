@@ -25,12 +25,18 @@ size_t ScriptMessageListValue::Size() const {
   return [data_ count];
 }
 
-std::unique_ptr<ScriptMessageValue> ScriptMessageListValue::Front() const {
-  return CreateScriptMessageValue([data_ firstObject]);
+std::optional<ScriptMessageValue> ScriptMessageListValue::Front() const {
+  if (id value = [data_ firstObject]) {
+    return CreateScriptMessageValue(value);
+  }
+  return std::nullopt;
 }
 
-std::unique_ptr<ScriptMessageValue> ScriptMessageListValue::Back() const {
-  return CreateScriptMessageValue([data_ lastObject]);
+std::optional<ScriptMessageValue> ScriptMessageListValue::Back() const {
+  if (id value = [data_ lastObject]) {
+    return CreateScriptMessageValue(value);
+  }
+  return std::nullopt;
 }
 
 }  // namespace web
