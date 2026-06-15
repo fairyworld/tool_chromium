@@ -2340,7 +2340,7 @@ TEST_F(EmailVerificationObserverTest,
       form_util::GetFieldRendererId(verification_element), "evt_token_123");
 
   EXPECT_CALL(autofill_driver(),
-              OnEmailVerificationTokenShared(
+              FormWithEmailVerificationTokenSubmitted(
                   form_util::GetFieldRendererId(verification_element)));
 
   test_api(autofill_agent())
@@ -2377,7 +2377,7 @@ TEST_F(EmailVerificationObserverTest,
   email_element.SetValue(blink::WebString::FromUtf16(u"b@example.com"));
 
   EXPECT_CALL(autofill_driver(),
-              OnEmailVerificationTokenShared(
+              FormWithEmailVerificationTokenSubmitted(
                   form_util::GetFieldRendererId(verification_element)))
       .Times(0);
 
@@ -2415,7 +2415,7 @@ TEST_F(EmailVerificationObserverTest,
   email_element.SetValue(blink::WebString::FromUtf16(u""));
 
   EXPECT_CALL(autofill_driver(),
-              OnEmailVerificationTokenShared(
+              FormWithEmailVerificationTokenSubmitted(
                   form_util::GetFieldRendererId(verification_element)))
       .Times(0);
 

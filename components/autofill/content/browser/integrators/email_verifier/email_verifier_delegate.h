@@ -84,8 +84,9 @@ class EmailVerifierDelegate : public AutofillManager::Observer,
                             mojom::ActionPersistence action_persistence,
                             const std::u16string& value,
                             std::optional<FieldType> field_type_used) override;
-  void OnEmailVerificationTokenShared(AutofillManager& manager,
-                                      FieldGlobalId field_id) override;
+  void OnFormWithEmailVerificationTokenSubmitted(
+      AutofillManager& manager,
+      const FieldGlobalId& field_id) override;
 
   // content::WebContentsObserver:
   void DidFinishNavigation(

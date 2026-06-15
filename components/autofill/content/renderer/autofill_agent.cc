@@ -472,8 +472,10 @@ class AutofillAgent::DeferringAutofillDriver : public mojom::AutofillDriver {
     DeferMsg(&mojom::AutofillDriver::JavaScriptChangedAutofilledValue, form,
              field_id, old_value);
   }
-  void OnEmailVerificationTokenShared(FieldRendererId field_id) override {
-    DeferMsg(&mojom::AutofillDriver::OnEmailVerificationTokenShared, field_id);
+  void FormWithEmailVerificationTokenSubmitted(
+      FieldRendererId field_id) override {
+    DeferMsg(&mojom::AutofillDriver::FormWithEmailVerificationTokenSubmitted,
+             field_id);
   }
 
   const raw_ref<AutofillAgent> agent_;
@@ -882,9 +884,8 @@ void AutofillAgent::EmailVerificationObserver::WillSendSubmitEvent(
       element.SetValue(WebString::FromUtf8(info.token));
 
       if (auto* driver = agent_->unsafe_autofill_driver()) {
-        driver->OnEmailVerificationTokenShared(field_id);
+        driver->FormWithEmailVerificationTokenSubmitted(field_id);
       }
-
       return;
     }
   }

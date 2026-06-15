@@ -598,12 +598,6 @@ void ContentAutofillDriver::SendEmailVerificationToken(
                email_field_id, email, token_field_id, token);
 }
 
-void ContentAutofillDriver::OnEmailVerificationTokenShared(
-    FieldRendererId field_id) {
-  FieldGlobalId global_id = {GetFrameToken(), field_id};
-  autofill_manager_->OnEmailVerificationTokenShared(global_id);
-}
-
 void ContentAutofillDriver::FormsSeen(
     const std::vector<FormData>& updated_forms,
     const std::vector<FormRendererId>& removed_forms) {
@@ -718,6 +712,12 @@ void ContentAutofillDriver::JavaScriptChangedAutofilledValue(
                  &AutofillDriverRouter::JavaScriptChangedAutofilledValue,
                  &AutofillManager::OnJavaScriptChangedAutofilledValue, form,
                  field_id, old_value);
+}
+
+void ContentAutofillDriver::FormWithEmailVerificationTokenSubmitted(
+    FieldRendererId field_id) {
+  FieldGlobalId global_id = {GetFrameToken(), field_id};
+  autofill_manager_->OnFormWithEmailVerificationTokenSubmitted(global_id);
 }
 
 const mojo::AssociatedRemote<mojom::AutofillAgent>&

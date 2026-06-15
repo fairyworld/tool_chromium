@@ -312,7 +312,8 @@ class ContentAutofillDriver : public AutofillDriver,
                              base::TimeTicks timestamp) override;
   void TextFieldDidScroll(const FormData& form,
                           FieldRendererId field_id) override;
-  void OnEmailVerificationTokenShared(FieldRendererId field_id) override;
+  void FormWithEmailVerificationTokenSubmitted(
+      FieldRendererId field_id) override;
 
   // The functions below this line do not cross the IPC boundary.
   bool IsSafeToFill(const FormFieldData& field,

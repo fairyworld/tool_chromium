@@ -216,9 +216,6 @@ class AutofillManager
     virtual void OnSuggestionsHidden(AutofillManager& manager,
                                      SuggestionHidingReason reason) {}
 
-    virtual void OnEmailVerificationTokenShared(AutofillManager& manager,
-                                                FieldGlobalId field_id) {}
-
     // Fired when an autofill of `filling_payload` is previewed or filled.
     // This is not fired for single-field operations (see
     // OnFillOrPreviewField()). `filled_field_ids` represents the IDs of the
@@ -256,6 +253,13 @@ class AutofillManager
                                        const FormData& form) {}
     virtual void OnAfterFormSubmitted(AutofillManager& manager,
                                       const FormData& form) {}
+
+    // Fired when a form with a shared email verification token is submitted.
+    //
+    // This is *not* necessarily a subset of On{Before,After}FormSubmitted().
+    virtual void OnFormWithEmailVerificationTokenSubmitted(
+        AutofillManager& manager,
+        const FieldGlobalId& field) {}
   };
 
   AutofillManager(const AutofillManager&) = delete;
@@ -316,7 +320,9 @@ class AutofillManager
   // Invoked when the suggestions are actually hidden.
   virtual void OnSuggestionsHidden(SuggestionHidingReason reason);
 
-  virtual void OnEmailVerificationTokenShared(FieldGlobalId field_id);
+  // Invoked when a form with an email verification token is submitted.
+  virtual void OnFormWithEmailVerificationTokenSubmitted(
+      const FieldGlobalId& field_id);
 
   // Routes calls from external components to FormFiller::FillOrPreviewField.
   // Virtual for testing.

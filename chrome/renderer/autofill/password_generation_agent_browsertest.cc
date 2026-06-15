@@ -142,7 +142,8 @@ class FakeContentAutofillDriver : public mojom::AutofillDriver {
   void SelectFieldOptionsDidChange(const FormData& form,
                                    FieldRendererId field_id) override {}
 
-  void OnEmailVerificationTokenShared(FieldRendererId field_id) override {}
+  void FormWithEmailVerificationTokenSubmitted(
+      FieldRendererId field_id) override {}
 
   std::unique_ptr<base::RunLoop> forms_seen_run_loop_;
 
