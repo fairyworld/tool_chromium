@@ -244,7 +244,6 @@ class GlicApiTest : public NonInteractiveGlicApiTest, public WithTestParams {
     features_.InitWithFeaturesAndParameters(
         /*enabled_features=*/
         {{features::kGlicScrollTo, {}},
-         {features::kGlicApiActivationGating, {}},
          {mojom::features::kGlicMultiTab, {}},
          {features::kGlicWebContentsWarming,
           {
@@ -427,7 +426,6 @@ class DISABLED_GlicApiTestWithOneTabAndPreloading
               {features::kGlicPreLoadingTimeMs.name, "20"},
               {features::kGlicMinLoadingTimeMs.name, "40"},
           }},
-         {features::kGlicApiActivationGating, {}},
          {features::kGlicWarming,
           {{features::kGlicWarmingDelayMs.name, "0"},
            {features::kGlicWarmingJitterMs.name, "0"}}}},
@@ -2210,9 +2208,8 @@ IN_PROC_BROWSER_TEST_P(GlicApiTest, testCallingApiWhileHiddenRecordsMetrics) {
       "Glic.Api.RequestCounts.CreateTab",
       GlicRequestEvent::kRequestReceivedWhileInactive, 1);
 
-  // Confirm that this request that is response-receiving but not allowed while
-  // hidden (aka "gated"), does not get latency metrics recorded.
-  histogram_tester.ExpectTotalCount("Glic.Api.RequestHostLatency.CreateTab", 0);
+  // Confirm that this request gets latency metrics recorded.
+  histogram_tester.ExpectTotalCount("Glic.Api.RequestHostLatency.CreateTab", 1);
 }
 
 IN_PROC_BROWSER_TEST_P(GlicApiTestWithOneTab, testPinTabs) {

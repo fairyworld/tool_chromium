@@ -25,12 +25,11 @@ import {createBidirectionalPostMessageTransport} from '../transport/post_message
 import {ERROR_CODEC, getHostRequestHistogramInfo, MAX_REQUEST_ID, WebClientDef, WebClientHostDef} from './../request_types.js';
 import type {ActorClient, ActorHost, WebClient, WebClientHost} from './../request_types.js';
 import {urlFromClient} from './conversions.js';
-import {GatedSender} from './gated_sender.js';
 import {HostMessageHandler, TabDataHandlerSet, TabFaviconHandlerSet} from './host_from_client.js';
 import type {CaptureRegionObserverImpl, PinCandidatesObserverImpl} from './host_from_client.js';
 import {ActorClientImpl} from './host_to_client.js';
-import type {HostBackgroundResponse, HostBackgroundResponseDoes, HostBackgroundResponseReturns} from './types.js';
-import {BACKGROUND_RESPONSES} from './types.js';
+import {PanelOpenState} from './types.js';
+
 
 export enum WebClientState {
   UNINITIALIZED,
@@ -39,10 +38,6 @@ export enum WebClientState {
   ERROR,  // Final state
 }
 
-enum PanelOpenState {
-  OPEN,
-  CLOSED,
-}
 
 // These values are persisted to logs. Entries should not be renumbered and
 // numeric values should never be reused.
@@ -199,12 +194,10 @@ type HandlerFunction = (payload: unknown, extras: ResponseExtras) =>
  */
 export class GlicApiHost implements PostMessageLifecycleObserver {
   hostMessageHandler: HostMessageHandler;
-  sender: GatedSender<WebClient>;
-  actorSender?: GatedSender<ActorClient>;
-  private readonly apiGatingOn = ObservableValue.withValue(false);
-  private enableApiActivationGating = true;
+  sender: PostMessageRemote<WebClient>;
+  actorSender?: PostMessageRemote<ActorClient>;
   panelIsActive = false;
-  private isInvoking = false;
+
   private handler: WebClientHandlerRemote;
   private webClientErrorTimer: OneShotTimer;
   private webClientState =
@@ -220,7 +213,6 @@ export class GlicApiHost implements PostMessageLifecycleObserver {
   private panelOpenState = PanelOpenState.CLOSED;
   private instanceIsActive = true;
   private hasShownDebuggerAttachedWarning = false;
-  private loggingEnabled = loadTimeData.getBoolean('loggingEnabled');
   detailedWebClientState = DetailedWebClientState.BOOTSTRAP_PENDING;
   // Present while the client is monitoring pin candidates.
   pinCandidatesObserver?: PinCandidatesObserverImpl;
@@ -238,7 +230,7 @@ export class GlicApiHost implements PostMessageLifecycleObserver {
       private browserProxy: BrowserProxy,
       public readonly communicator: GlicApiCommunicator,
       private embedder: ApiHostEmbedder) {
-    this.sender = new GatedSender(communicator.pmRemote, this.apiGatingOn);
+    this.sender = communicator.pmRemote;
     this.handler = new WebClientHandlerRemote();
     this.handler.onConnectionError.addListener(() => {
       if (this.webClientState.getCurrentValue() !== WebClientState.ERROR) {
@@ -289,10 +281,7 @@ export class GlicApiHost implements PostMessageLifecycleObserver {
     actorRemote?: PendingRemote<ActorHost>,
     actorReceiver?: PendingReceiver<ActorClient>,
   } {
-    this.enableApiActivationGating = initialState.enableApiActivationGating;
     this.panelIsActive = initialState.panelIsActive;
-
-    this.updateSenderActive();
 
     if (!initialState.enableActInFocusedTab) {
       return {};
@@ -300,7 +289,7 @@ export class GlicApiHost implements PostMessageLifecycleObserver {
     this.actorHandler = new ActorHandlerRemote();
     const {remote: clientRemote, receiver: actorReceiver} =
         this.communicator.router.newPipeWithRemote(ActorClientDef);
-    this.actorSender = new GatedSender(clientRemote, this.apiGatingOn);
+    this.actorSender = clientRemote;
     const actorClientReceiver =
         new ActorClientReceiver(new ActorClientImpl(this.actorSender));
     this.handler.createActorHandler(
@@ -318,26 +307,12 @@ export class GlicApiHost implements PostMessageLifecycleObserver {
     };
   }
 
-  updateSenderActive() {
-    const shouldGate = this.shouldGateRequests();
-    if (this.sender.isGating() === shouldGate) {
-      return;
-    }
-    this.apiGatingOn.assignAndSignal(shouldGate);
-  }
-
-  shouldGateRequests(): boolean {
-    if (this.isInvoking) {
-      return false;
-    }
-    return !this.panelIsActive && this.enableApiActivationGating;
-  }
 
   async subscribeToZoomLevel() {
     this.isSubscribedToZoomLevel = true;
     try {
       const zoomFactor = await this.embedder.getZoom();
-      this.sender.sendLatestWhenActive('notifyZoomLevelChanged', {zoomFactor});
+      this.sender.requestNoResponse('notifyZoomLevelChanged', {zoomFactor});
     } catch (e) {
       console.warn('Failed to get initial zoom level', e);
     }
@@ -349,13 +324,8 @@ export class GlicApiHost implements PostMessageLifecycleObserver {
 
   onZoomLevelChanged(zoomFactor: number) {
     if (this.isSubscribedToZoomLevel) {
-      this.sender.sendLatestWhenActive('notifyZoomLevelChanged', {zoomFactor});
+      this.sender.requestNoResponse('notifyZoomLevelChanged', {zoomFactor});
     }
-  }
-
-  setIsInvoking(isInvoking: boolean) {
-    this.isInvoking = isInvoking;
-    this.updateSenderActive();
   }
 
   waitingOnPanelWillOpen() {
@@ -447,8 +417,8 @@ export class GlicApiHost implements PostMessageLifecycleObserver {
       }
       const SMALL_QUEUE_SIZE = 50;
       const hostSendMessageQueueLength =
-          this.sender.getRawSender().rawSender().messageQueueLength() +
-          this.sender.getRawSender().rawSender().inFlightRequestCount();
+          this.sender.rawSender().messageQueueLength() +
+          this.sender.rawSender().inFlightRequestCount();
       if (hostSendMessageQueueLength >= SMALL_QUEUE_SIZE) {
         chrome.histograms.recordMediumCount(
             'Glic.Host.HostSendMessageQueueLength', hostSendMessageQueueLength);
@@ -559,40 +529,12 @@ export class GlicApiHost implements PostMessageLifecycleObserver {
           DetailedWebClientState.WEB_CLIENT_NOT_CREATED;
     }
 
-    let response;
-    if (this.shouldGateRequests() &&
-        Object.hasOwn(BACKGROUND_RESPONSES, type)) {
-      if (this.loggingEnabled) {
-        console.warn(`GlicApiHost: Using background behavior for ${type}`);
-      }
-      const backgroundResponse =
-          BACKGROUND_RESPONSES[type as keyof typeof BACKGROUND_RESPONSES] as
-          HostBackgroundResponse<unknown>;
-      if (Object.hasOwn(backgroundResponse, 'throws')) {
-        const friendlyName = type;
-        throw new Error(`${friendlyName} not allowed while backgrounded`);
-      }
-      if (this.loggingEnabled) {
-        console.warn(`Using background request behavior for ${type}`);
-      }
-      if (Object.hasOwn(backgroundResponse, 'does')) {
-        response =
-            await (backgroundResponse as HostBackgroundResponseDoes<unknown>)
-                .does();
-      } else {
-        response =
-            (backgroundResponse as HostBackgroundResponseReturns<unknown>)
-                .returns;
-      }
-    } else {
-      // Request is not gated, so call the handler directly.
-      const startTime = performance.now();
-      response = await handlerFunction(payload, extras);
-      if (response) {
-        // Report latency metric for handled requests that return a response.
-        const latency = performance.now() - startTime;
-        this.reportLatency(type, interfaceDef, latency);
-      }
+    const startTime = performance.now();
+    const response = await handlerFunction(payload, extras);
+    if (response) {
+      // Report latency metric for handled requests that return a response.
+      const latency = performance.now() - startTime;
+      this.reportLatency(type, interfaceDef, latency);
     }
     // Not all request types require a return value.
     return response;

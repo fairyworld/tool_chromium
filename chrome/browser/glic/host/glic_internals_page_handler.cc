@@ -504,8 +504,7 @@ void GlicInternalsPageHandler::GetInternalsDataPayload(
 
   boolean_settings["Get Page Metadata Enabled"] =
       base::FeatureList::IsEnabled(blink::features::kFrameMetadataObserver);
-  boolean_settings["API Activation Gating Enabled"] =
-      base::FeatureList::IsEnabled(features::kGlicApiActivationGating);
+
   boolean_settings["Capture Region Enabled"] =
       base::FeatureList::IsEnabled(features::kGlicCaptureRegion);
   boolean_settings["Can Act on Web"] =

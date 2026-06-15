@@ -260,7 +260,6 @@ class NewGlicApiTest : public GlicApiBrowserTest,
            {features::kGlicWebContentsWarmingDelay.name, "7d"}}},
          {features::kGlicRollout, {}},
          {features::kGlicScrollTo, {}},
-         {features::kGlicApiActivationGating, {}},
          {mojom::features::kGlicMultiTab, {}},
          {features::kGlicWebActuationSetting, {}},
          {features::kGlicCaptureRegion, {}},
@@ -715,12 +714,9 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testCreateTabSimple) {
 #if BUILDFLAG(IS_ANDROID)
 #define MAYBE_testCreateTab DISABLED_testCreateTab
 #define MAYBE_testCreateTabInBackground DISABLED_testCreateTabInBackground
-#define MAYBE_testCreateTabFailsIfNotActive \
-  DISABLED_testCreateTabFailsIfNotActive
 #else
 #define MAYBE_testCreateTab testCreateTab
 #define MAYBE_testCreateTabInBackground testCreateTabInBackground
-#define MAYBE_testCreateTabFailsIfNotActive testCreateTabFailsIfNotActive
 #endif
 
 IN_PROC_BROWSER_TEST_P(NewGlicApiTest, MAYBE_testCreateTab) {
@@ -1128,22 +1124,6 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testResizeWindowWithinBounds) {
             glic_widget->WidgetToVisibleBounds(final_widget_bounds).size());
 }
 #endif
-
-IN_PROC_BROWSER_TEST_P(NewGlicApiTest, MAYBE_testCreateTabFailsIfNotActive) {
-  ASSERT_OK(OpenGlicForActiveTab());
-  ExecuteJsTest();
-}
-
-IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testCreateTabSucceedsIfInvoking) {
-  ASSERT_OK_AND_ASSIGN(auto* instance, OpenGlicForActiveTab());
-  ASSERT_OK(WaitForGlicClient(instance));
-  instance->host().NotifyIsInvoking(true);
-  auto options = mojom::InvokeOptions::New();
-  options->invocation_source = mojom::InvocationSource::kTopChromeButton;
-  instance->host().GetPrimaryWebClient()->Invoke(std::move(options),
-                                                 base::DoNothing());
-  ExecuteJsTest();
-}
 
 IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testFailureForCapturedApiTestError) {
   ASSERT_OK(OpenGlicForActiveTab());

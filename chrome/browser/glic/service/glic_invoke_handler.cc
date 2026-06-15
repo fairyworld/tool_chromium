@@ -261,7 +261,6 @@ void GlicInvokeHandler::Invoke() {
         instance_->GetWeakPtr(), std::move(options_.on_client_connected))));
   }
   // TODO(b/505086089): Handle client disconnects.
-  tasks.push_back(std::make_unique<NotifyIsInvokingTask>(instance_->host()));
 
   if (options_.wait_for_panel_open && IsTabTarget()) {
     tasks.push_back(

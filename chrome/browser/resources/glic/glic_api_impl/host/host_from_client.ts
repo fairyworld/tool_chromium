@@ -23,7 +23,7 @@ import type {MessageHandlerInterface} from '../transport/messaging.js';
 import type {PendingReceiver, PendingRemote, PostMessageRemote} from '../transport/post_message_transport.js';
 
 import {bitmapN32ToRGBAImage, captureRegionResultToClient, conversationInfoFromClient, conversionSettings, counterAbuseVerdictFromClient, focusedTabDataToClient, getPinCandidatesOptionsFromClient, hostCapabilitiesToClient, idFromClient, idToClient, imageBytesResultToClient, microphoneStatusToMojo, optionalFromClient, optionalToClient, panelStateToClient, pinTabsOptionsToMojo, subscriberObservationTypeFromClient, tabContextOptionsFromClient, tabContextToClient, tabDataToClient, timeDeltaFromClient, unpinTabsOptionsToMojo, urlFromClient, urlToClient, webClientModeToMojo, zeroStateSuggestionsToClient} from './conversions.js';
-import type {GatedSender} from './gated_sender.js';
+
 import type {ApiHostEmbedder, GlicApiHost} from './glic_api_host.js';
 import {DetailedWebClientState} from './glic_api_host.js';
 import {WebClientImpl} from './host_to_client.js';
@@ -46,8 +46,8 @@ export class HostMessageHandler implements
 
   constructor(
       private handler: WebClientHandlerInterface,
-      private sender: GatedSender<WebClient>, private embedder: ApiHostEmbedder,
-      private host: GlicApiHost) {}
+      private sender: PostMessageRemote<WebClient>,
+      private embedder: ApiHostEmbedder, private host: GlicApiHost) {}
 
   destroy() {
     if (this.receiver) {
@@ -90,18 +90,6 @@ export class HostMessageHandler implements
     this.host.setInstanceIsActive(initialState.instanceIsActive);
     const platform = initialState.platform;
 
-    // If the panel isn't active, don't send the focused tab until later.
-    if (initialState.enableApiActivationGating && !initialState.panelIsActive) {
-      const actualFocus = initialState.focusedTabData;
-      initialState.focusedTabData = {
-        noFocusedTabData: {
-          activeTabData: null,
-          noFocusReason: 'glic not active',
-        },
-      };
-      // Note: this will queue up the message, and not send it right awway.
-      webClientImpl.notifyFocusedTabChanged(actualFocus);
-    }
 
     return {
       initialState: replaceProperties(initialState, {
@@ -815,7 +803,7 @@ export class HostMessageHandler implements
 export class CaptureRegionObserverImpl implements CaptureRegionObserver {
   receiver?: CaptureRegionObserverReceiver;
   constructor(
-      private sender: GatedSender<WebClient>,
+      private sender: PostMessageRemote<WebClient>,
       private handler: WebClientHandlerInterface, public observationId: number,
       private params?: CaptureRegionParams) {
     this.connectToSource();
@@ -825,7 +813,7 @@ export class CaptureRegionObserverImpl implements CaptureRegionObserver {
     if (!this.receiver) {
       return;
     }
-    this.sender.sendWhenActive('captureRegionUpdate', {
+    this.sender.requestNoResponse('captureRegionUpdate', {
       reason: enumToClient(CaptureRegionErrorReasonMojo.kUnknown),
       observationId: this.observationId,
     });
@@ -866,17 +854,14 @@ export class CaptureRegionObserverImpl implements CaptureRegionObserver {
       reason: CaptureRegionErrorReasonMojo|null): void {
     const captureResult = captureRegionResultToClient(result);
     if (captureResult) {
-      // Use `sendWhenActive` to queue up all captured regions if the panel is
-      // inactive. This is important because the panel is inactive during region
-      // selection, and we don't want to lose any of the user's selections.
-      this.sender.sendWhenActive('captureRegionUpdate', {
+      // Send all captured regions.
+      this.sender.requestNoResponse('captureRegionUpdate', {
         result: captureResult,
         observationId: this.observationId,
       });
     } else {
-      // Use `sendWhenActive` to ensure the error is delivered, even if the
-      // panel is currently inactive.
-      this.sender.sendWhenActive('captureRegionUpdate', {
+      // Send the error.
+      this.sender.requestNoResponse('captureRegionUpdate', {
         reason: enumToClient(reason ?? CaptureRegionErrorReasonMojo.kUnknown),
         observationId: this.observationId,
       });
@@ -1008,7 +993,7 @@ class TabFaviconHandlerImpl implements TabFaviconHandlerInterface {
 export class PinCandidatesObserverImpl implements PinCandidatesObserver {
   receiver?: PinCandidatesObserverReceiver;
   constructor(
-      private sender: GatedSender<WebClient>,
+      private sender: PostMessageRemote<WebClient>,
       private handler: WebClientHandlerInterface,
       private options: GetPinCandidatesOptions, public observationId: number) {
     this.connectToSource();
@@ -1037,7 +1022,7 @@ export class PinCandidatesObserverImpl implements PinCandidatesObserver {
 
   onPinCandidatesChanged(candidates: PinCandidateMojo[]): void {
     const extras = new ResponseExtras();
-    this.sender.sendLatestWhenActive(
+    this.sender.requestNoResponse(
         'pinCandidatesChanged', {
           candidates:
               candidates.map(c => ({

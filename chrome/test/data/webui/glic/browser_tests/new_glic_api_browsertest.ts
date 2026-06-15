@@ -156,13 +156,6 @@ class ApiTests extends ApiTestFixtureBase {
         .waitFor(tabs => tabs.length === 2);
   }
 
-  async testCreateTabFailsIfNotActive() {
-    assertDefined(this.host.closePanel);
-    assertDefined(this.host.createTab);
-    await this.closePanelAndWaitUntilInactive();
-    this.assertCreateTabFails(location.href);
-  }
-
   async testFailureForCapturedApiTestError() {
     try {
       throw new ApiTestError('Non-throwing test error');
@@ -583,7 +576,7 @@ class ApiTests extends ApiTestFixtureBase {
       });
     } catch (e) {
       assertEquals(
-          ScrollToErrorReason.NOT_SUPPORTED, (e as ScrollToError).reason);
+          ScrollToErrorReason.NO_FOCUSED_TAB, (e as ScrollToError).reason);
       return;
     }
     assertTrue(false, 'scrollTo should have thrown an error');
@@ -1211,31 +1204,6 @@ class AdditionalContextQueuedTest extends ApiTestFixtureBase {
   }
 }
 
-class WebClientForCreateTabInInvoke extends WebClient {
-  createTabResult = Promise.withResolvers<TabData>();
-  override async invoke(_options: InvokeOptions): Promise<void> {
-    try {
-      const url = location.href + '#invoking';
-      const data = await this.host!.createTab!(url, {openInBackground: false});
-      this.createTabResult.resolve(data);
-    } catch (e) {
-      this.createTabResult.reject(e as Error);
-    }
-  }
-}
-
-class ApiTestCreateTabInInvoke extends ApiTestFixtureBase {
-  override createWebClient(): WebClient {
-    return new WebClientForCreateTabInInvoke();
-  }
-
-  async testCreateTabSucceedsIfInvoking() {
-    const data = await (this.client as WebClientForCreateTabInInvoke)
-                     .createTabResult.promise;
-    assertEquals(data.url, location.href + '#invoking');
-  }
-}
-
 class InitiallyNotResizableWebClient extends WebClient {
   override async notifyPanelWillOpen(_panelOpeningData: PanelOpeningData):
       Promise<OpenPanelInfo> {
@@ -1266,7 +1234,6 @@ const TEST_FIXTURES: Array<typeof ApiTestFixtureBase> = [
   InvokeTest,
   ApiTestFailsToInitialize,
   TriggeringUpdatesTest,
-  ApiTestCreateTabInInvoke,
 ];
 
 

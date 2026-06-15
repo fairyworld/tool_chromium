@@ -31,7 +31,6 @@ build_webui("build") {
     "glic_api_impl/enum_conversions.ts",
     "glic_api_impl/glic_api_injected_client.ts",
     "glic_api_impl/host/conversions.ts",
-    "glic_api_impl/host/gated_sender.ts",
     "glic_api_impl/host/glic_api_host.ts",
     "glic_api_impl/host/host_from_client.ts",
     "glic_api_impl/host/host_to_client.ts",

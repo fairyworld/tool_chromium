@@ -574,8 +574,6 @@ struct WebClientInitialState {
   array<HostCapability> host_capabilities;
   // Whether get page metadata is enabled.
   bool enable_get_page_metadata;
-  // Whether kGlicApiActivationGating is enabled.
-  bool enable_api_activation_gating;
   // Whether capture region is enabled.
   bool enable_capture_region;
   // Whether kGlicWebActuationSetting is enabled.
@@ -2013,9 +2011,6 @@ interface WebClient {
   // inactive if it's attached to a browser window, and that browser window is
   // not the active window.
   NotifyPanelActiveChange(bool panel_active);
-
-  // Informs the client whether the browser is currently invoking Glic.
-  NotifyIsInvoking(bool is_invoking);
 
   // Informs the client that whether the panel can be attached right now.
   NotifyPanelCanAttachChange(bool can_attach);

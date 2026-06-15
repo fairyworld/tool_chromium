@@ -547,11 +547,6 @@ BASE_DECLARE_FEATURE(kGlicDefaultContextPinOnBind);
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kGlicUnloadOnClose);
 
-// Causes certain glic API calls to fail or defer when the panel
-// is inactive (see ActiveStateCalculator).
-COMPONENT_EXPORT(CHROME_FEATURES)
-BASE_DECLARE_FEATURE(kGlicApiActivationGating);
-
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kGlicBindPinnedUnboundTab);
 

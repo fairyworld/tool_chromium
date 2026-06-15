@@ -700,8 +700,7 @@ class GlicWebClientHandler : public glic::mojom::WebClientHandler,
     }
     state->enable_get_page_metadata =
         base::FeatureList::IsEnabled(blink::features::kFrameMetadataObserver);
-    state->enable_api_activation_gating =
-        base::FeatureList::IsEnabled(features::kGlicApiActivationGating);
+
     if (base::FeatureList::IsEnabled(
             glic::mojom::features::kGlicAppendModelQualityClientId)) {
       state->host_capabilities.push_back(
@@ -1724,12 +1723,6 @@ class GlicWebClientHandler : public glic::mojom::WebClientHandler,
         std::move(handler), std::move(success_status_callback));
   }
 
-  void NotifyIsInvoking(bool is_invoking) override {
-    if (web_client_) {
-      web_client_->NotifyIsInvoking(is_invoking);
-    }
-  }
-
   // SkillsService::Observer implementation.
   void OnSkillUpdated(std::string_view skill_id,
                       skills::SkillsService::UpdateSource update_source,
@@ -1913,10 +1906,6 @@ class GlicWebClientHandler : public glic::mojom::WebClientHandler,
     web_client_->NotifyInstanceActivationChanged(is_active);
   }
 
-  bool ShouldDoApiActivationGating() const {
-    return base::FeatureList::IsEnabled(features::kGlicApiActivationGating) &&
-           !active_state_calculator_.IsActive();
-  }
 
   void MaybeNotifyFocusedTabChanged(
       glic::mojom::FocusedTabDataPtr focused_tab_data) {

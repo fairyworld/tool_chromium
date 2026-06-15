@@ -11,7 +11,6 @@ export type {PageHandlerInterface} from './glic.mojom-webui.js';
 export {ZoomAction} from './glic.mojom-webui.js';
 export type {ObservableSetByTabIdDelegate} from './glic_api_impl/client/glic_api_client.js';
 export {IdGenerator, ObservableSetByTabId} from './glic_api_impl/client/glic_api_client.js';
-export {GatedSender} from './glic_api_impl/host/gated_sender.js';
 export type {ApiHostEmbedder} from './glic_api_impl/host/glic_api_host.js';
 export type {WebClientHost} from './glic_api_impl/request_types.js';
 export {WebClientDef, WebClientHostDef} from './glic_api_impl/request_types.js';
