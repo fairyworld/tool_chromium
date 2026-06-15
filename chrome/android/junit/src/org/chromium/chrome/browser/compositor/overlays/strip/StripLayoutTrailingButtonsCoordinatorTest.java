@@ -148,7 +148,7 @@ public class StripLayoutTrailingButtonsCoordinatorTest {
                         /* isAppInDesktopWindow= */ false,
                         /* isTopResumedActivity= */ false,
                         mTaskTracker,
-                        () -> mIsIncognito,
+                        mIsIncognito,
                         () -> null,
                         mObserver);
         mCoordinator.onProfileAvailable(mProfile);
@@ -178,13 +178,13 @@ public class StripLayoutTrailingButtonsCoordinatorTest {
     }
 
     @Test
-    public void testGlicButton_HiddenInIncognito() {
+    public void testGlicButton_VisibleInIncognito() {
         assertTrue("Glic button should be visible initially.", mCoordinator.shouldGlicBeVisible());
 
         mIsIncognito = true;
 
-        assertFalse(
-                "Glic button should be hidden when supplier indicates incognito window.",
+        assertTrue(
+                "Glic button should be visible even when supplier indicates incognito window.",
                 mCoordinator.shouldGlicBeVisible());
     }
 
@@ -333,6 +333,63 @@ public class StripLayoutTrailingButtonsCoordinatorTest {
                 "Glic button text should have been restored to default",
                 mActivity.getString(R.string.glic_button_entrypoint_ask_gemini_label),
                 mGlicButton.getText());
+    }
+
+    @Test
+    public void testOnTabModelSwitched() {
+        // 1. Trigger the nudge in normal mode.
+        mCoordinator
+                .getGlicNudgeDelegateForTesting()
+                .onTriggerGlicNudgeUi("Glic Nudge Text", "", "");
+
+        // Verify initial state.
+        assertEquals(
+                "Glic button text should match nudge text.",
+                "Glic Nudge Text",
+                mGlicButton.getText());
+        assertTrue("Dismiss button should be visible.", mGlicDismissButton.isVisible());
+
+        int initialTint = mGlicButton.getTint();
+        int initialBgTint = mGlicButton.getBackgroundTint();
+
+        // 2. Switch to incognito mode.
+        mIsIncognito = true;
+        mCoordinator.onTabModelSwitched(true);
+
+        // Verify that:
+        // - Glic button text is reset to default in incognito mode.
+        assertEquals(
+                "Glic button text should be restored to default in incognito mode.",
+                mActivity.getString(R.string.glic_button_entrypoint_ask_gemini_label),
+                mGlicButton.getText());
+        // - Dismiss nudge button is hidden in incognito mode.
+        assertFalse(
+                "Glic dismiss nudge button should be hidden in incognito mode.",
+                mGlicDismissButton.isVisible());
+        // - Tints are updated for incognito mode.
+        assertTrue("Tint should change in incognito mode.", initialTint != mGlicButton.getTint());
+        assertTrue(
+                "Background tint should change in incognito mode.",
+                initialBgTint != mGlicButton.getBackgroundTint());
+
+        // 3. Switch back to normal mode.
+        mIsIncognito = false;
+        mCoordinator.onTabModelSwitched(false);
+
+        // Verify that:
+        // - Glic button text is restored to nudge text when returning to normal mode.
+        assertEquals(
+                "Glic button text should be restored to nudge text.",
+                "Glic Nudge Text",
+                mGlicButton.getText());
+        // - Dismiss nudge button is visible again when returning to normal mode.
+        assertTrue("Dismiss button should be visible again.", mGlicDismissButton.isVisible());
+        // - Tints are restored.
+        assertEquals("Tint should be restored.", initialTint, mGlicButton.getTint());
+        assertEquals(
+                "Background tint should be restored.",
+                initialBgTint,
+                mGlicButton.getBackgroundTint());
     }
 
     @Test

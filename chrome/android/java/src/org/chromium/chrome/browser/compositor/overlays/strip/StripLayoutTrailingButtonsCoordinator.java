@@ -38,6 +38,7 @@ import org.chromium.chrome.browser.glic.GlicButtonDelegate;
 import org.chromium.chrome.browser.glic.GlicButtonStateController;
 import org.chromium.chrome.browser.glic.GlicButtonStateController.ButtonState;
 import org.chromium.chrome.browser.glic.GlicEnabling;
+import org.chromium.chrome.browser.glic.GlicHelper;
 import org.chromium.chrome.browser.glic.GlicKeyedService;
 import org.chromium.chrome.browser.glic.GlicKeyedService.GlicInvocationSource;
 import org.chromium.chrome.browser.glic.GlicKeyedService.GlobalShowHideObserver;
@@ -86,6 +87,8 @@ public class StripLayoutTrailingButtonsCoordinator {
     private static final float GLIC_BUTTON_HOVER_BACKGROUND_PRESSED_OPACITY = 0.30f;
     private static final float GLIC_BUTTON_HOVER_BACKGROUND_DEFAULT_OPACITY = 0.20f;
     private static final float GLIC_BUTTON_UNFOCUSED_OPACITY = 0.65f;
+    private static final float GLIC_BUTTON_INCOGNITO_ICON_OPACITY = 0.38f;
+    private static final float GLIC_BUTTON_INCOGNITO_BACKGROUND_OPACITY = 0.10f;
     // Total vertical margin (Tab Strip Height(40dp) - Glic Background Height(32dp) = 8dp).
     public static final float GLIC_BUTTON_MARGIN_HEIGHT_DP = 8.f;
     public static final float GLIC_BUTTON_START_PADDING_DP = 6.f;
@@ -136,7 +139,7 @@ public class StripLayoutTrailingButtonsCoordinator {
     private final GlicKeyedService.AllowedChangedObserver mAllowedChangedObserver =
             () -> updateTrailingButtonsState(/* animate= */ false, /* forceLayoutChanged= */ false);
     private final @Nullable ChromeAndroidTaskTracker mTaskTracker;
-    private final Supplier<Boolean> mIsIncognitoSupplier;
+    private boolean mIsIncognito;
     private final Supplier<@Nullable TabModelSelector> mTabModelSelectorSupplier;
 
     // Lifecycle & Caching Objects
@@ -286,7 +289,7 @@ public class StripLayoutTrailingButtonsCoordinator {
             boolean isAppInDesktopWindow,
             boolean isTopResumedActivity,
             @Nullable ChromeAndroidTaskTracker taskTracker,
-            Supplier<Boolean> isIncognitoSupplier,
+            boolean isIncognito,
             Supplier<@Nullable TabModelSelector> tabModelSelectorSupplier,
             StripLayoutTrailingButtonsObserver observer) {
         mContext = context;
@@ -295,7 +298,7 @@ public class StripLayoutTrailingButtonsCoordinator {
         mGlicClickHandler = glicClickHandler;
         mDensity = density;
         mTaskTracker = taskTracker;
-        mIsIncognitoSupplier = isIncognitoSupplier;
+        mIsIncognito = isIncognito;
         mTabModelSelectorSupplier = tabModelSelectorSupplier;
         mObserver = observer;
         mWindowAndroid = windowAndroid;
@@ -355,29 +358,6 @@ public class StripLayoutTrailingButtonsCoordinator {
             mGlicButton.setDrawY(GLIC_BUTTON_BACKGROUND_Y_OFFSET_DP);
             mGlicButton.setVisible(false);
 
-            @ColorInt
-            int backgroundDefaultColor = SemanticColorUtils.getColorSurfaceContainerLow(mContext);
-
-            @ColorInt
-            int backgroundHoverColor =
-                    ColorUtils.setAlphaComponentWithFloat(
-                            SemanticColorUtils.getColorPrimary(mContext),
-                            GLIC_BUTTON_HOVER_BACKGROUND_DEFAULT_OPACITY);
-
-            @ColorInt
-            int backgroundPressedColor =
-                    ColorUtils.setAlphaComponentWithFloat(
-                            SemanticColorUtils.getColorPrimary(mContext),
-                            GLIC_BUTTON_HOVER_BACKGROUND_PRESSED_OPACITY);
-
-            mGlicButton.setBackgroundTint(
-                    backgroundDefaultColor,
-                    backgroundHoverColor,
-                    backgroundPressedColor,
-                    backgroundPressedColor);
-
-            mGlicButton.setTint(SemanticColorUtils.getDefaultIconColor(mContext));
-
             mGlicButton.setText(
                     mContext.getString(R.string.glic_button_entrypoint_ask_gemini_label));
             updateButtonAccessibilityDescription(/* isActor= */ false);
@@ -405,6 +385,21 @@ public class StripLayoutTrailingButtonsCoordinator {
             mGlicActorButton.setOpacity(0.0f);
             mGlicActorButton.setVisible(false);
 
+            @ColorInt
+            int backgroundDefaultColor = SemanticColorUtils.getColorSurfaceContainerLow(mContext);
+
+            @ColorInt
+            int backgroundHoverColor =
+                    ColorUtils.setAlphaComponentWithFloat(
+                            SemanticColorUtils.getColorPrimary(mContext),
+                            GLIC_BUTTON_HOVER_BACKGROUND_DEFAULT_OPACITY);
+
+            @ColorInt
+            int backgroundPressedColor =
+                    ColorUtils.setAlphaComponentWithFloat(
+                            SemanticColorUtils.getColorPrimary(mContext),
+                            GLIC_BUTTON_HOVER_BACKGROUND_PRESSED_OPACITY);
+
             mGlicActorButton.setBackgroundTint(
                     backgroundDefaultColor,
                     backgroundHoverColor,
@@ -417,6 +412,7 @@ public class StripLayoutTrailingButtonsCoordinator {
                     mContext.getString(R.string.actor_task_indicator_tooltip));
         }
 
+        updateButtonTints(mIsIncognito);
         updateGlicButtonOpacity(isAppInDesktopWindow, isTopResumedActivity);
     }
 
@@ -567,6 +563,18 @@ public class StripLayoutTrailingButtonsCoordinator {
         dismissTrailingButtonsMenu();
     }
 
+    /**
+     * Called when the active tab model switches. Updates Glic button tints and resets its
+     * text/nudge state if switching to incognito mode.
+     *
+     * @param incognito Whether the new tab model is incognito.
+     */
+    public void onTabModelSwitched(boolean incognito) {
+        mIsIncognito = incognito;
+        updateButtonTints(incognito);
+        updateTrailingButtonsState(/* animate= */ false, /* forceLayoutChanged= */ true);
+    }
+
     /** Sets the cache used for generating textures for the trailing buttons. */
     public void setLayerTitleCache(@Nullable LayerTitleCache titleCache) {
         mLayerTitleCache = titleCache;
@@ -660,6 +668,50 @@ public class StripLayoutTrailingButtonsCoordinator {
 
         mGlicButtonContextMenuCoordinator.showMenu(
                 anchorRectProvider, activity, mProfile, tabWidthDp);
+    }
+
+    private void updateButtonTints(boolean incognito) {
+        if (mGlicButton == null) return;
+
+        if (incognito) {
+            // Set tints to indicate button is disabled
+            @ColorInt int colorOnSurface = SemanticColorUtils.getColorOnSurface(mContext);
+            @ColorInt
+            int iconTint =
+                    ColorUtils.setAlphaComponentWithFloat(
+                            colorOnSurface, GLIC_BUTTON_INCOGNITO_ICON_OPACITY);
+            @ColorInt
+            int bgTint =
+                    ColorUtils.setAlphaComponentWithFloat(
+                            colorOnSurface, GLIC_BUTTON_INCOGNITO_BACKGROUND_OPACITY);
+
+            mGlicButton.setTint(iconTint);
+            mGlicButton.setBackgroundTint(bgTint, bgTint, bgTint, bgTint);
+        } else {
+            // Reset normal tints
+            @ColorInt
+            int backgroundDefaultColor = SemanticColorUtils.getColorSurfaceContainerLow(mContext);
+
+            @ColorInt
+            int backgroundHoverColor =
+                    ColorUtils.setAlphaComponentWithFloat(
+                            SemanticColorUtils.getColorPrimary(mContext),
+                            GLIC_BUTTON_HOVER_BACKGROUND_DEFAULT_OPACITY);
+
+            @ColorInt
+            int backgroundPressedColor =
+                    ColorUtils.setAlphaComponentWithFloat(
+                            SemanticColorUtils.getColorPrimary(mContext),
+                            GLIC_BUTTON_HOVER_BACKGROUND_PRESSED_OPACITY);
+
+            mGlicButton.setBackgroundTint(
+                    backgroundDefaultColor,
+                    backgroundHoverColor,
+                    backgroundPressedColor,
+                    backgroundPressedColor);
+
+            mGlicButton.setTint(SemanticColorUtils.getDefaultIconColor(mContext));
+        }
     }
 
     @VisibleForTesting
@@ -913,12 +965,12 @@ public class StripLayoutTrailingButtonsCoordinator {
             targetActorText = null;
         }
 
-        // 3. Apply visibility, text, and width updates
+        // 3. Apply visibility, tint, text, and width updates
         boolean layoutChanged = forceLayoutChanged;
-        boolean glicVisibilityChanged = mGlicButton.isVisible() != targetGlicVisible;
+        boolean glicVisibilityChanged = isGlicButtonVisible() != targetGlicVisible;
         boolean dismissVisibilityChanged =
                 isGlicDismissNudgeButtonVisible() != targetDismissVisible;
-        boolean actorVisibilityChanged = mGlicActorButton.isVisible() != targetActorVisible;
+        boolean actorVisibilityChanged = isGlicActorButtonVisible() != targetActorVisible;
 
         if (glicVisibilityChanged) {
             layoutChanged = true;
@@ -1253,7 +1305,7 @@ public class StripLayoutTrailingButtonsCoordinator {
      * @return true if the Glic button should be visible.
      */
     public boolean shouldGlicBeVisible() {
-        if (mGlicButton == null || mIsIncognitoSupplier.get() || mProfile == null) {
+        if (mGlicButton == null || mProfile == null) {
             return false;
         }
         return GlicEnabling.isEnabledForProfile(mProfile)
@@ -1261,7 +1313,7 @@ public class StripLayoutTrailingButtonsCoordinator {
     }
 
     private boolean shouldGlicDismissNudgeBeVisible() {
-        return mNudgeLabel != null && shouldGlicBeVisible();
+        return mNudgeLabel != null && shouldGlicBeVisible() && !mIsIncognito;
     }
 
     /**
@@ -1271,7 +1323,10 @@ public class StripLayoutTrailingButtonsCoordinator {
      */
     public boolean shouldGlicActorBeVisible() {
         GlicButtonStateController stateController = getOrCreateStateController();
-        if (!shouldGlicBeVisible() || mGlicActorButton == null || stateController == null) {
+        if (!shouldGlicBeVisible()
+                || mGlicActorButton == null
+                || stateController == null
+                || mIsIncognito) {
             return false;
         }
 
@@ -1296,7 +1351,7 @@ public class StripLayoutTrailingButtonsCoordinator {
         if (mStateController != null) return mStateController;
 
         Activity activity = mWindowAndroid.getActivity().get();
-        if (activity == null || mIsIncognitoSupplier.get()) return null;
+        if (activity == null || mIsIncognito) return null;
 
         mStateController =
                 new GlicButtonStateController(
@@ -1501,6 +1556,13 @@ public class StripLayoutTrailingButtonsCoordinator {
     }
 
     private void handleGlicButtonClick() {
+        if (mIsIncognito) {
+            Activity activity = mWindowAndroid.getActivity().get();
+            if (activity != null) {
+                GlicHelper.showNotAvailableInIncognitoSnackbar(activity);
+            }
+            return;
+        }
         if (mNudgeLabel != null) {
             GlicNudgeDelegateBridge.onNudgeActivity(
                     mWindowAndroid, GlicNudgeActivity.NUDGE_CLICKED);

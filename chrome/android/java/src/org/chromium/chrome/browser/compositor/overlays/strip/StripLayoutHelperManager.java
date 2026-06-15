@@ -609,7 +609,7 @@ public class StripLayoutHelperManager
                         isAppInDesktopWindow(),
                         mIsTopResumedActivity,
                         ChromeAndroidTaskTrackerFactory.getInstance(),
-                        () -> mIsIncognito,
+                        mIsIncognito,
                         () -> mTabModelSelector,
                         this::updateButtonMargins);
 
@@ -1744,6 +1744,7 @@ public class StripLayoutHelperManager
 
         mIncognitoHelper.tabModelSelected(mIsIncognito);
         mNormalHelper.tabModelSelected(!mIsIncognito);
+        mTrailingButtonsCoordinator.onTabModelSwitched(mIsIncognito);
 
         updateStripButtons();
 
@@ -1807,11 +1808,10 @@ public class StripLayoutHelperManager
                                 + getMsbStartPaddingForTouchTarget())
                         : 0.0f;
 
-        // In Incognito, glic is always hidden so use touch target size of 0.
         mNormalHelper.updateEndMarginForStripButtons(
                 trailingButtonsTouchTargetSize, msbTouchTargetSize);
         mIncognitoHelper.updateEndMarginForStripButtons(
-                /* trailingButtonsTouchTargetSize= */ 0.0f, msbTouchTargetSize);
+                trailingButtonsTouchTargetSize, msbTouchTargetSize);
     }
 
     private boolean shouldMsbBeVisible() {
