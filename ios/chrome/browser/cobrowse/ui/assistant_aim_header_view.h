@@ -29,6 +29,10 @@ enum class AssistantAIMHeaderViewMode {
 - (void)assistantAIMHeaderViewDidRequestSRPLogs:
     (AssistantAIMHeaderView*)headerView;
 
+// Called when the user requests to see the AIM Loaded URL.
+- (void)assistantAIMHeaderViewDidRequestLoadedURL:
+    (AssistantAIMHeaderView*)headerView;
+
 @end
 
 // Represents the header of cobrowse, containing the title and action buttons.

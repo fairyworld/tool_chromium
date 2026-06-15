@@ -18,6 +18,7 @@
 
 @protocol AssistantContainerCommands;
 @protocol SceneCommands;
+class GURL;
 @class CobrowseContext;
 @class AimSRPDebuggerEvent;
 
@@ -72,6 +73,10 @@ class WebState;
 
 // The logged events for AIM SRP communication.
 @property(nonatomic, readonly) NSArray<AimSRPDebuggerEvent*>* debugEvents;
+
+// The currently loaded AIM URL.
+@property(nonatomic, readonly) GURL loadedURL;
+
 // Returns YES if the AIM page supports the given capability. Returns NO if
 // the handshake has not completed yet or the capability is not supported.
 - (BOOL)supportsCapability:(lens::FeatureCapability)capability;

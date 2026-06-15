@@ -140,6 +140,10 @@
   return _logger.events;
 }
 
+- (GURL)loadedURL {
+  return _webState ? _webState->GetLastCommittedURL() : GURL();
+}
+
 - (void)setConsumer:(id<AssistantAIMConsumer>)consumer {
   if (_consumer == consumer) {
     return;

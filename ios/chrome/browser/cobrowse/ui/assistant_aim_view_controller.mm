@@ -506,6 +506,11 @@ constexpr CGFloat kThresholdForCompleteVisibility = 0.3;
   [self.delegate assistantAIMViewControllerDidRequestSRPLogs:self];
 }
 
+- (void)assistantAIMHeaderViewDidRequestLoadedURL:
+    (AssistantAIMHeaderView*)headerView {
+  [self.delegate assistantAIMViewControllerDidRequestLoadedURL:self];
+}
+
 #pragma mark - Private
 
 // Sets up a visual indicator when there is a Cobrowse GWS URL override.

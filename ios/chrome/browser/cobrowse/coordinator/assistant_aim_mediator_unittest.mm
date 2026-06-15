@@ -601,3 +601,15 @@ TEST_F(AssistantAIMMediatorTest, StartsNewThreadLoadsZeroState) {
             GURL("https://www.google.com/"
                  "search?udm=50&gsc=2&sourceid=chrome-mobile&gsas=4"));
 }
+
+// Tests that loadedURL returns the URL of the current WebState, and returns
+// GURL() if the WebState is null.
+TEST_F(AssistantAIMMediatorTest, LoadedURL) {
+  GURL expected_url("https://www.example.com");
+  fake_web_state_->SetCurrentURL(expected_url);
+  EXPECT_EQ(mediator_.loadedURL, expected_url);
+
+  fake_web_state_ = nullptr;
+  [mediator_ disconnect];
+  EXPECT_EQ(mediator_.loadedURL, GURL());
+}

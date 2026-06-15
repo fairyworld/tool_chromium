@@ -13,6 +13,7 @@
 #import "ios/chrome/browser/assistant/ui/assistant_container_view_controller.h"
 #import "ios/chrome/browser/cobrowse/coordinator/assistant_aim_mediator.h"
 #import "ios/chrome/browser/cobrowse/debugger/aim_srp_debugger_breadcrumbs_view_controller.h"
+#import "ios/chrome/browser/cobrowse/debugger/aim_srp_debugger_url_view_controller.h"
 #import "ios/chrome/browser/cobrowse/model/cobrowse_browser_agent.h"
 #import "ios/chrome/browser/cobrowse/model/cobrowse_context.h"
 #import "ios/chrome/browser/cobrowse/model/ios_contextual_tasks_service_factory.h"
@@ -36,6 +37,7 @@
 #import "ios/chrome/browser/tabs/model/tab_helper_util.h"
 #import "ios/chrome/browser/url_loading/model/url_loading_browser_agent.h"
 #import "ios/web/public/web_state.h"
+#import "url/gurl.h"
 
 @interface AssistantAIMCoordinator () <AssistantAIMViewControllerDelegate,
                                        AssistantContainerDelegate,
@@ -349,6 +351,17 @@ class AssistantAIMUIStateProvider
       [[AimSRPDebuggerBreadcrumbsViewController alloc] initWithEvents:events];
   UINavigationController* navController =
       [[UINavigationController alloc] initWithRootViewController:logsVC];
+  [_viewController presentViewController:navController
+                                animated:YES
+                              completion:nil];
+}
+
+- (void)assistantAIMViewControllerDidRequestLoadedURL:
+    (AssistantAIMViewController*)viewController {
+  AIMSRPDebuggerURLViewController* URLVC =
+      [[AIMSRPDebuggerURLViewController alloc] initWithURL:_mediator.loadedURL];
+  UINavigationController* navController =
+      [[UINavigationController alloc] initWithRootViewController:URLVC];
   [_viewController presentViewController:navController
                                 animated:YES
                               completion:nil];

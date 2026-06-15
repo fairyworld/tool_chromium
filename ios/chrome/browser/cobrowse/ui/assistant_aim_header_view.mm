@@ -245,6 +245,8 @@ UIButtonConfiguration* CreateHeaderButtonConfiguration(UIImage* image) {
   UIButton* button = [UIButton buttonWithConfiguration:config
                                          primaryAction:nil];
   button.translatesAutoresizingMaskIntoConstraints = NO;
+  button.accessibilityIdentifier =
+      kAssistantAIMContextMenuButtonAccessibilityIdentifier;
 
   NSMutableArray* actions = [[NSMutableArray alloc] init];
 
@@ -271,6 +273,15 @@ UIButtonConfiguration* CreateHeaderButtonConfiguration(UIImage* image) {
                   [weakSelf didTapShowLogsButton];
                 }];
     [actions addObject:showLogsAction];
+
+    UIAction* showURLAction =
+        [UIAction actionWithTitle:@"AIM Loaded URL"
+                            image:DefaultSymbolWithPointSize(@"link", 16)
+                       identifier:nil
+                          handler:^(UIAction* action) {
+                            [weakSelf didTapShowURLButton];
+                          }];
+    [actions addObject:showURLAction];
   }
 
   button.menu = [UIMenu menuWithTitle:@"" children:actions];
@@ -359,6 +370,10 @@ UIButtonConfiguration* CreateHeaderButtonConfiguration(UIImage* image) {
 
 - (void)didTapShowLogsButton {
   [self.delegate assistantAIMHeaderViewDidRequestSRPLogs:self];
+}
+
+- (void)didTapShowURLButton {
+  [self.delegate assistantAIMHeaderViewDidRequestLoadedURL:self];
 }
 
 - (void)didTapBackButton {
