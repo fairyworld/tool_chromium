@@ -14,6 +14,105 @@ import soong_ast
 import common
 
 
+class CommandLineUtility:
+    """Helper class to wrap and mutate a list of command line arguments."""
+
+    def __init__(self, args: List[str]):
+        self._args = self._normalize_args(args)
+
+    def _normalize_args(self, args: List[str]) -> List[str]:
+        # Convert ['--param=value'] to ['--param', 'value'] for consistency.
+        normalized_args = []
+        for arg in args:
+            if arg.startswith('-'):
+                normalized_args.extend(arg.split('='))
+            else:
+                normalized_args.append(arg)
+        return normalized_args
+
+    def get_args(self) -> List[str]:
+        return self._args
+
+    def set_args(self, args: List[str]):
+        self._args = self._normalize_args(args)
+
+    def has_arg(self, arg: str) -> bool:
+        return arg in self._args
+
+    def _get_arg_indices(self, target_arg: str) -> List[int]:
+        return [i for i, arg in enumerate(self._args) if arg == target_arg]
+
+    def _is_list_arg(self, arg: str) -> bool:
+        indices = self._get_arg_indices(arg)
+        return len(indices) > 0 and all((
+            i + 1 < len(self._args) and not self._args[i + 1].startswith('--'))
+                                        for i in indices)
+
+    def _is_value_arg(self, arg: str) -> bool:
+        return operator.countOf(self._args,
+                                arg) == 1 and self._is_list_arg(arg)
+
+    def get_flag_value(self, flag: str) -> str:
+        assert self._is_value_arg(
+            flag), f"Flag {flag} is not a single-value arg in {self._args}"
+        i = self._args.index(flag)
+        return self._args[i + 1]
+
+    def _should_fail_silently(self, arg: str, throw_if_absent: bool) -> bool:
+        return not throw_if_absent and not self.has_arg(arg)
+
+    def set_flag_value(self,
+                       flag: str,
+                       value: str,
+                       throw_if_absent: bool = True):
+        if self._should_fail_silently(flag, throw_if_absent):
+            return
+        assert self._is_value_arg(
+            flag), f"Flag {flag} is not a single-value arg in {self._args}"
+        i = self._args.index(flag)
+        self._args[i + 1] = value
+
+    def update_flag_value(self, flag: str, func, throw_if_absent: bool = True):
+        if self._should_fail_silently(flag, throw_if_absent):
+            return
+        self.set_flag_value(flag, func(self.get_flag_value(flag)),
+                            throw_if_absent)
+
+    def remove_flag(self, flag: str, throw_if_absent: bool = True):
+        if self._should_fail_silently(flag, throw_if_absent):
+            return
+        assert self._is_value_arg(
+            flag), f"Flag {flag} is not a single-value arg in {self._args}"
+        i = self._args.index(flag)
+        self._args.pop(i)
+        self._args.pop(i)
+
+    def append_flag_value(self, flag: str, value: str):
+        self._args.append(flag)
+        self._args.append(value)
+
+    def append_arg(self, arg: str):
+        self._args.append(arg)
+
+    def update_list_arg(self, flag: str, func, throw_if_absent: bool = True):
+        if self._should_fail_silently(flag, throw_if_absent):
+            return
+        assert self._is_list_arg(
+            flag), f"Flag {flag} is not a list arg in {self._args}"
+        indices = self._get_arg_indices(flag)
+        for i in indices:
+            self._args[i + 1] = func(self._args[i + 1])
+
+    def update_all_args(self, func):
+        self._args = [func(arg) for arg in self._args]
+
+    def set_arg_at(self, position: int, value: str):
+        self._args[position] = value
+
+    def update_arg_at(self, position: int, func):
+        self._args[position] = func(self._args[position])
+
+
 class BaseActionSanitizer():
 
     def __init__(self, target, arch, context):
@@ -29,96 +128,10 @@ class BaseActionSanitizer():
             self.target.args = self.target.args or arch.args
             self.target.response_file_contents = \
               self.target.response_file_contents or arch.response_file_contents
-        self.target.args = self._normalize_args()
+        self.args = CommandLineUtility(self.target.args or [])
 
     def get_name(self):
         return soong_ast.label_to_module_name(self.target.name, self.context)
-
-    def _normalize_args(self):
-        # Convert ['--param=value'] to ['--param', 'value'] for consistency.
-        normalized_args = []
-        for arg in self.target.args:
-            if arg.startswith('-'):
-                normalized_args.extend(arg.split('='))
-            else:
-                normalized_args.append(arg)
-        return normalized_args
-
-    # There are three types of args:
-    # - flags (--flag)
-    # - value args (--arg value)
-    # - list args (--arg value1 --arg value2)
-    # value args have exactly one arg value pair and list args have one or more arg value pairs.
-    # Note that the set of list args contains the set of value args.
-    # This is because list and value args are identical when the list args has only one arg value pair
-    # Some functions provide special implementations for each type, while others
-    # work on all of them.
-    def _has_arg(self, arg):
-        return arg in self.target.args
-
-    def _get_arg_indices(self, target_arg):
-        return [
-            i for i, arg in enumerate(self.target.args) if arg == target_arg
-        ]
-
-    # Whether an arg value pair appears once or more times
-    def _is_list_arg(self, arg):
-        indices = self._get_arg_indices(arg)
-        return len(indices) > 0 and all(
-            not self.target.args[i + 1].startswith('--') for i in indices)
-
-    def _update_list_arg(self, arg, func, throw_if_absent=True):
-        if self._should_fail_silently(arg, throw_if_absent):
-            return
-        assert (self._is_list_arg(arg))
-        indices = self._get_arg_indices(arg)
-        for i in indices:
-            self._set_arg_at(i + 1, func(self.target.args[i + 1]))
-
-    # Whether an arg value pair appears exactly once
-    def _is_value_arg(self, arg):
-        return operator.countOf(self.target.args,
-                                arg) == 1 and self._is_list_arg(arg)
-
-    def _get_value_arg(self, arg):
-        assert (self._is_value_arg(arg))
-        i = self.target.args.index(arg)
-        return self.target.args[i + 1]
-
-    # used to check whether a function call should cause an error when an arg is
-    # missing.
-    def _should_fail_silently(self, arg, throw_if_absent):
-        return not throw_if_absent and not self._has_arg(arg)
-
-    def _set_value_arg(self, arg, value, throw_if_absent=True):
-        if self._should_fail_silently(arg, throw_if_absent):
-            return
-        assert (self._is_value_arg(arg))
-        i = self.target.args.index(arg)
-        self.target.args[i + 1] = value
-
-    def _update_value_arg(self, arg, func, throw_if_absent=True):
-        if self._should_fail_silently(arg, throw_if_absent):
-            return
-        self._set_value_arg(arg, func(self._get_value_arg(arg)))
-
-    def _set_arg_at(self, position, value):
-        self.target.args[position] = value
-
-    def _update_arg_at(self, position, func):
-        self.target.args[position] = func(self.target.args[position])
-
-    def _delete_value_arg(self, arg, throw_if_absent=True):
-        if self._should_fail_silently(arg, throw_if_absent):
-            return
-        assert (self._is_value_arg(arg))
-        i = self.target.args.index(arg)
-        self.target.args.pop(i)
-        self.target.args.pop(i)
-
-    def _append_arg(self, arg, value):
-        self.target.args.append(arg)
-        self.target.args.append(value)
 
     def _sanitize_filepath_with_location_tag(self, arg):
         if arg.startswith('../../'):
@@ -140,10 +153,6 @@ class BaseActionSanitizer():
         filepath = re.sub('^gen', '$(genDir)', filepath)
         return filepath
 
-    # Iterate through all the args and apply function
-    def _update_all_args(self, func):
-        self.target.args = [func(arg) for arg in self.target.args]
-
     def get_pre_cmd(self):
         pre_cmd = []
         out_dirs = [
@@ -164,7 +173,7 @@ class BaseActionSanitizer():
         return (([f"echo {shlex.quote(self.target.response_file_contents)} |"]
                  if self.target.response_file_contents else []) +
                 [f"$(location {gn_utils.label_to_path(self.target.script)})"] +
-                [shlex.quote(arg) for arg in self.target.args])
+                [shlex.quote(arg) for arg in self.args.get_args()])
 
     def get_cmd(self):
         # Note: don't be confused by the return type. This function returns a list,
@@ -214,13 +223,11 @@ class BaseActionSanitizer():
         # Handle passing parameters via response file by piping them into the script
         # and reading them from /dev/stdin.
 
-        use_response_file = gn_utils.RESPONSE_FILE in self.target.args
+        use_response_file = self.args.has_arg(gn_utils.RESPONSE_FILE)
         if use_response_file:
             # Replace {{response_file_contents}} with /dev/stdin
-            self.target.args = [
-                '/dev/stdin' if it == gn_utils.RESPONSE_FILE else it
-                for it in self.target.args
-            ]
+            self.args.update_all_args(lambda it: '/dev/stdin'
+                                      if it == gn_utils.RESPONSE_FILE else it)
 
     def _sanitize_inputs(self):
         pass
@@ -241,7 +248,7 @@ class BaseActionSanitizer():
 class GenerateCanonicalLocalesListSanitizer(BaseActionSanitizer):
 
     def _sanitize_args(self):
-        self._set_arg_at(0, '$(out)')
+        self.args.set_arg_at(0, '$(out)')
         super()._sanitize_args()
 
     def is_header_generated(self):
@@ -251,32 +258,32 @@ class GenerateCanonicalLocalesListSanitizer(BaseActionSanitizer):
 class WriteBuildDateHeaderSanitizer(BaseActionSanitizer):
 
     def _sanitize_args(self):
-        self._set_arg_at(0, '$(out)')
+        self.args.set_arg_at(0, '$(out)')
         super()._sanitize_args()
 
 
 class WriteGenerateAllowlistFromHistogramsFileSanitizer(BaseActionSanitizer):
 
     def _sanitize_args(self):
-        self._set_value_arg('--output_dir', '.')
-        self._set_value_arg('--file', '$(out)')
-        self._update_value_arg('--input',
-                               self._sanitize_filepath_with_location_tag)
+        self.args.set_flag_value('--output_dir', '.')
+        self.args.set_flag_value('--file', '$(out)')
+        self.args.update_flag_value('--input',
+                                    self._sanitize_filepath_with_location_tag)
         super()._sanitize_args()
 
 
 class WriteBuildFlagHeaderSanitizer(BaseActionSanitizer):
 
     def _sanitize_args(self):
-        self._set_value_arg('--gen-dir', '.')
-        self._set_value_arg('--output', '$(out)')
+        self.args.set_flag_value('--gen-dir', '.')
+        self.args.set_flag_value('--output', '$(out)')
         super()._sanitize_args()
 
 
 class PerfettoWriteBuildFlagHeaderSanitizer(BaseActionSanitizer):
 
     def _sanitize_args(self):
-        self._set_value_arg('--out', '$(out)')
+        self.args.set_flag_value('--out', '$(out)')
         super()._sanitize_args()
 
 
@@ -288,7 +295,7 @@ class GnRunBinarySanitizer(BaseActionSanitizer):
             "clang_x64/transport_security_state_generator":
             f"{context.module_prefix}net_tools_transport_security_state_generator_transport_security_state_generator__toolchain_clang__testing",
         }
-        self.binary = self.binary_to_target[self.target.args[0]]
+        self.binary = self.binary_to_target[self.args.get_args()[0]]
 
     def _replace_gen_with_location_tag(self, arg):
         if arg.startswith("gen/"):
@@ -301,14 +308,13 @@ class GnRunBinarySanitizer(BaseActionSanitizer):
         return arg
 
     def _remove_python_args(self):
-        self.target.args = [
-            arg for arg in self.target.args if "python3" not in arg
-        ]
+        self.args.set_args(
+            [arg for arg in self.args.get_args() if "python3" not in arg])
 
     def _sanitize_args(self):
-        self._update_all_args(self._sanitize_filepath_with_location_tag)
-        self._update_all_args(self._replace_gen_with_location_tag)
-        self._update_all_args(self._replace_binary)
+        self.args.update_all_args(self._sanitize_filepath_with_location_tag)
+        self.args.update_all_args(self._replace_gen_with_location_tag)
+        self.args.update_all_args(self._replace_binary)
         self._remove_python_args()
         super()._sanitize_args()
 
@@ -320,7 +326,7 @@ class GnRunBinarySanitizer(BaseActionSanitizer):
     def get_cmd(self):
         # Remove the script and use the binary right away
         return self.get_pre_cmd() + [
-            shlex.quote(arg) for arg in self.target.args
+            shlex.quote(arg) for arg in self.args.get_args()
         ]
 
 
@@ -347,29 +353,30 @@ class JniGeneratorSanitizer(BaseActionSanitizer):
         return arg
 
     def _sanitize_args(self):
-        self._set_value_arg('--jar-file', '$(location :current_android_jar)',
-                            False)
-        if self._has_arg('--jar-file'):
-            self._set_value_arg('--javap', '$(location :javap)')
-        self._update_value_arg('--srcjar-path', self._sanitize_filepath, False)
-        self._update_value_arg('--output-dir', self._sanitize_filepath)
-        self._update_value_arg('--extra-include', self._sanitize_filepath,
-                               False)
-        self._update_value_arg('--placeholder-srcjar-path',
-                               self._sanitize_filepath, False)
-        self._update_list_arg('--input-file', self._sanitize_filepath)
-        self._update_list_arg('--input-file',
-                              self._add_location_tag_to_filepath)
+        self.args.set_flag_value('--jar-file',
+                                 '$(location :current_android_jar)', False)
+        if self.args.has_arg('--jar-file'):
+            self.args.set_flag_value('--javap', '$(location :javap)')
+        self.args.update_flag_value('--srcjar-path', self._sanitize_filepath,
+                                    False)
+        self.args.update_flag_value('--output-dir', self._sanitize_filepath)
+        self.args.update_flag_value('--extra-include', self._sanitize_filepath,
+                                    False)
+        self.args.update_flag_value('--placeholder-srcjar-path',
+                                    self._sanitize_filepath, False)
+        self.args.update_list_arg('--input-file', self._sanitize_filepath)
+        self.args.update_list_arg('--input-file',
+                                  self._add_location_tag_to_filepath)
 
-        self._delete_value_arg('--package-prefix', throw_if_absent=False)
-        self._delete_value_arg('--package-prefix-filter',
-                               throw_if_absent=False)
-        if not self.is_test_target and not self._has_arg('--jar-file'):
+        self.args.remove_flag('--package-prefix', throw_if_absent=False)
+        self.args.remove_flag('--package-prefix-filter', throw_if_absent=False)
+        if not self.is_test_target and not self.args.has_arg('--jar-file'):
             # Don't jarjar classes that already exists within the java SDK. The headers generated
             # from those genrule can simply call into the original class as it exists outside
             # of cronet's jar.
             # Only jarjar platform code
-            self._append_arg('--package-prefix', 'android.net.http.internal')
+            self.args.append_flag_value('--package-prefix',
+                                        'android.net.http.internal')
         super()._sanitize_args()
 
     def get_outputs(self):
@@ -404,7 +411,7 @@ class JniGeneratorSanitizer(BaseActionSanitizer):
 
     def get_tools(self):
         tools = super().get_tools()
-        if self._has_arg('--jar-file'):
+        if self.args.has_arg('--jar-file'):
             tools.add(":javap")
         return tools
 
@@ -467,21 +474,21 @@ class JniRegistrationGeneratorSanitizer(BaseActionSanitizer):
         return outputs
 
     def _sanitize_args(self):
-        self._update_value_arg('--depfile', self._sanitize_filepath)
-        self._update_value_arg('--srcjar-path', self._sanitize_filepath)
-        self._update_value_arg('--header-path', self._sanitize_filepath)
-        self._update_value_arg('--placeholder-srcjar-path',
-                               self._sanitize_filepath, False)
-        self._delete_value_arg('--depfile', False)
-        self._set_value_arg('--java-sources-file',
-                            '$(genDir)/java_sources.json')
+        self.args.update_flag_value('--depfile', self._sanitize_filepath)
+        self.args.update_flag_value('--srcjar-path', self._sanitize_filepath)
+        self.args.update_flag_value('--header-path', self._sanitize_filepath)
+        self.args.update_flag_value('--placeholder-srcjar-path',
+                                    self._sanitize_filepath, False)
+        self.args.remove_flag('--depfile', False)
+        self.args.set_flag_value('--java-sources-file',
+                                 '$(genDir)/java_sources.json')
 
-        self._delete_value_arg('--package-prefix', throw_if_absent=False)
-        self._delete_value_arg('--package-prefix-filter',
-                               throw_if_absent=False)
+        self.args.remove_flag('--package-prefix', throw_if_absent=False)
+        self.args.remove_flag('--package-prefix-filter', throw_if_absent=False)
         if not self.is_test_target:
             # Only jarjar platform code
-            self._append_arg('--package-prefix', 'android.net.http.internal')
+            self.args.append_flag_value('--package-prefix',
+                                        'android.net.http.internal')
         super()._sanitize_args()
 
     def get_cmd(self):
@@ -491,20 +498,33 @@ class JniRegistrationGeneratorSanitizer(BaseActionSanitizer):
         # Adding ../$(current_dir)/ to the head because jni_registration_generator.py uses the files
         # whose path startswith(..)
         module_name = ''
-        if '--module-name' in self.target.args:
-            module_name = self.target.args[
-                self.target.args.index('--module-name') + 1]
+        if self.args.has_arg('--module-name'):
+            module_name = self.args.get_flag_value('--module-name')
 
-        lines = [
-            'import json',
-            'import sys',
-            'd = {"java_files": [f"../{sys.argv[1]}/{f}" for f in sys.argv[2:]]}',
-        ]
+        # This script is used to generate a `java_sources.json` file which is
+        # required by the `jni_registration_generator.py` script.
+        # It takes the current directory name as the first argument, and the list
+        # of java source files as the remaining arguments.
+        # It outputs a JSON structure representing the input sources, prepending
+        # '../<current_dir>/' to each file path because the generator expects
+        # paths relative to the build directory.
+        jni_registration_helper_script = """
+import json
+import sys
+d = {"java_files": [f"../{sys.argv[1]}/{f}" for f in sys.argv[2:]]}
+"""
         if module_name:
-            lines.append(f'd["module_name"] = "{module_name}"')
-        lines.append('print(json.dumps([d]))')
+            jni_registration_helper_script += f'd["module_name"] = "{module_name}"\n'
+        jni_registration_helper_script += "print(json.dumps([d]))"
 
-        python_script = '; '.join(lines)
+        # Convert the multi-line script into a single semicolon-separated line.
+        # This is necessary because Soong's `cmd` field format doesn't support
+        # literal newlines inside string literals without breaking.
+        python_script = '; '.join(
+            line.strip()
+            for line in jni_registration_helper_script.strip().split('\n')
+            if line.strip())
+
         base_cmd = ([
             "current_dir=`basename \\`pwd\\``;",
             f"python3 -c '{python_script}' $$current_dir $(in) > $(genDir)/java_sources.json;",
@@ -541,10 +561,10 @@ class JavaJniRegistrationGeneratorSanitizer(JniRegistrationGeneratorSanitizer):
 class VersionSanitizer(BaseActionSanitizer):
 
     def _sanitize_args(self):
-        self._set_value_arg('-o', '$(out)')
+        self.args.set_flag_value('-o', '$(out)')
         # args for the version.py contain file path without leading --arg key. So apply sanitize
         # function for all the args.
-        self._update_all_args(self._sanitize_filepath_with_location_tag)
+        self.args.update_all_args(self._sanitize_filepath_with_location_tag)
         super()._sanitize_args()
 
     def get_tool_files(self):
@@ -557,8 +577,8 @@ class VersionSanitizer(BaseActionSanitizer):
 class JavaCppEnumSanitizer(BaseActionSanitizer):
 
     def _sanitize_args(self):
-        self._update_all_args(self._sanitize_filepath_with_location_tag)
-        self._set_value_arg('--srcjar', '$(out)')
+        self.args.update_all_args(self._sanitize_filepath_with_location_tag)
+        self.args.set_flag_value('--srcjar', '$(out)')
         super()._sanitize_args()
 
 
@@ -570,31 +590,31 @@ class MakeDafsaSanitizer(BaseActionSanitizer):
         return True
 
     def _sanitize_args(self):
-        self._update_all_args(self._sanitize_filepath_with_location_tag)
-        self._update_all_args(self._sanitize_filepath)
+        self.args.update_all_args(self._sanitize_filepath_with_location_tag)
+        self.args.update_all_args(self._sanitize_filepath)
         super()._sanitize_args()
 
 
 class JavaCppFeatureSanitizer(BaseActionSanitizer):
 
     def _sanitize_args(self):
-        self._update_all_args(self._sanitize_filepath_with_location_tag)
-        self._set_value_arg('--srcjar', '$(out)')
+        self.args.update_all_args(self._sanitize_filepath_with_location_tag)
+        self.args.set_flag_value('--srcjar', '$(out)')
         super()._sanitize_args()
 
 
 class JavaCppStringSanitizer(BaseActionSanitizer):
 
     def _sanitize_args(self):
-        self._update_all_args(self._sanitize_filepath_with_location_tag)
-        self._set_value_arg('--srcjar', '$(out)')
+        self.args.update_all_args(self._sanitize_filepath_with_location_tag)
+        self.args.set_flag_value('--srcjar', '$(out)')
         super()._sanitize_args()
 
 
 class WriteNativeLibrariesJavaSanitizer(BaseActionSanitizer):
 
     def _sanitize_args(self):
-        self._set_value_arg('--output', '$(out)')
+        self.args.set_flag_value('--output', '$(out)')
         super()._sanitize_args()
 
 
@@ -606,7 +626,7 @@ class CopyActionSanitizer(BaseActionSanitizer):
 
     def get_cmd(self):
         return (super().get_pre_cmd() + ['cp'] +
-                [shlex.quote(arg) for arg in self.target.args])
+                [shlex.quote(arg) for arg in self.args.get_args()])
 
     def get_srcs(self):
         srcs = super().get_srcs()
@@ -624,12 +644,12 @@ class CopyActionSanitizer(BaseActionSanitizer):
 
     def sanitize(self):
         # By convention, copy targets use their deps as args for the copy (see get_srcs).
-        if len(self.target.args) > 1:
+        if len(self.args.get_args()) > 1:
             raise Exception(
-                f'CopyAction {self.target.name} specifies {self.target.args=}. Only deps are supported'
+                f'CopyAction {self.target.name} specifies {self.args.get_args()=}. Only deps are supported'
             )
-        self.target.args = [f'$(location {src})' for src in self.get_srcs()]
-        self.target.args.append('$(out)')
+        self.args.set_args([f'$(location {src})' for src in self.get_srcs()])
+        self.args.append_arg('$(out)')
         super().sanitize()
 
 
@@ -645,19 +665,21 @@ class ProtocJavaSanitizer(BaseActionSanitizer):
 
     def _sanitize_args(self):
         super()._sanitize_args()
-        self._delete_value_arg('--depfile')
-        self._set_value_arg('--protoc', '$(location %s)' % self._protoc)
-        self._update_value_arg('--proto-path', self._sanitize_proto_path)
-        self._set_value_arg('--srcjar', '$(out)')
-        for i, arg in enumerate(self.target.args):
+        self.args.remove_flag('--depfile')
+        self.args.set_flag_value('--protoc', '$(location %s)' % self._protoc)
+        self.args.update_flag_value('--proto-path', self._sanitize_proto_path)
+        self.args.set_flag_value('--srcjar', '$(out)')
+        args_list = self.args.get_args()
+        for i, arg in enumerate(args_list):
             if arg == '--import-dir':
-                self.target.args[
-                    i +
-                    1] = f"{self.context.tree_path}/{self.target.args[i+1].removeprefix('../../')}"
+                self.args.set_arg_at(
+                    i + 1,
+                    f"{self.context.tree_path}/{args_list[i+1].removeprefix('../../')}"
+                )
             elif arg.startswith('../../') and arg.removeprefix(
                     '../../') in self.get_srcs():
-                self.target.args[
-                    i] = self._sanitize_filepath_with_location_tag(arg)
+                self.args.set_arg_at(
+                    i, self._sanitize_filepath_with_location_tag(arg))
 
     def _sanitize_inputs(self):
         super()._sanitize_inputs()
