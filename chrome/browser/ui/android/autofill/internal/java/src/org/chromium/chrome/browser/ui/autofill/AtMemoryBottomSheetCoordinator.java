@@ -77,10 +77,10 @@ public class AtMemoryBottomSheetCoordinator {
     }
 
     public void show(List<AutofillSuggestion> suggestions) {
-        mMediator.setSuggestions(suggestions);
-
         mBottomSheetController.addObserver(mBottomSheetObserver);
-        if (!mBottomSheetController.requestShowContent(mContent, /* animate= */ true)) {
+        if (mBottomSheetController.requestShowContent(mContent, /* animate= */ true)) {
+            mMediator.show(suggestions);
+        } else {
             onDismissed();
         }
     }
@@ -92,5 +92,9 @@ public class AtMemoryBottomSheetCoordinator {
     private void onDismissed() {
         mBottomSheetController.removeObserver(mBottomSheetObserver);
         mMediator.onDismissed();
+    }
+
+    AtMemoryBottomSheetContent getBottomSheetContentForTesting() {
+        return mContent;
     }
 }

@@ -35,13 +35,18 @@ class AtMemoryBottomSheetMediator {
         mDelegate = delegate;
     }
 
+    void show(List<AutofillSuggestion> suggestions) {
+        setSuggestions(suggestions);
+        mModel.set(AtMemoryBottomSheetProperties.VISIBLE, true);
+    }
+
     void onDismissed() {
         mModelList.clear();
         mModel.set(AtMemoryBottomSheetProperties.VISIBLE, false);
         mDelegate.onDismissed();
     }
 
-    void setSuggestions(List<AutofillSuggestion> suggestions) {
+    private void setSuggestions(List<AutofillSuggestion> suggestions) {
         mModelList.clear();
 
         for (AutofillSuggestion suggestion : suggestions) {
