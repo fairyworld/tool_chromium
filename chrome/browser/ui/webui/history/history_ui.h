@@ -53,6 +53,7 @@ class HistoryUIConfig : public content::WebUIConfig {
 
 class HistoryUI : public ui::MojoWebUIController,
                   public help_bubble::mojom::HelpBubbleHandlerFactory,
+                  public history_embeddings::mojom::PageHandlerFactory,
                   public history::mojom::ForeignSessionPageHandlerFactory {
  public:
   explicit HistoryUI(content::WebUI* web_ui);
@@ -65,8 +66,8 @@ class HistoryUI : public ui::MojoWebUIController,
 
   // Instantiates the implementors of mojom interfaces.
   void BindInterface(
-      mojo::PendingReceiver<history_embeddings::mojom::PageHandler>
-          pending_page_handler);
+      mojo::PendingReceiver<history_embeddings::mojom::PageHandlerFactory>
+          pending_page_handler_factory);
   void BindInterface(
       mojo::PendingReceiver<history::mojom::PageHandler> pending_page_handler);
   void BindInterface(
@@ -103,6 +104,12 @@ class HistoryUI : public ui::MojoWebUIController,
       mojo::PendingRemote<help_bubble::mojom::HelpBubbleClient> client,
       mojo::PendingReceiver<help_bubble::mojom::HelpBubbleHandler> handler)
       override;
+  // history_embeddings::mojom::PageHandlerFactory:
+  void CreatePageHandler(
+      mojo::PendingRemote<history_embeddings::mojom::Page> page,
+      mojo::PendingReceiver<history_embeddings::mojom::PageHandler> receiver)
+      override;
+
   std::unique_ptr<HistoryEmbeddingsHandler> history_embeddings_handler_;
   std::unique_ptr<history_clusters::HistoryClustersHandler>
       history_clusters_handler_;
@@ -114,6 +121,8 @@ class HistoryUI : public ui::MojoWebUIController,
   std::unique_ptr<user_education::HelpBubbleHandler> help_bubble_handler_;
   mojo::Receiver<help_bubble::mojom::HelpBubbleHandlerFactory>
       help_bubble_handler_factory_receiver_{this};
+  mojo::Receiver<history_embeddings::mojom::PageHandlerFactory>
+      history_embeddings_handler_factory_receiver_{this};
   mojo::Receiver<history::mojom::ForeignSessionPageHandlerFactory>
       foreign_session_page_handler_factory_receiver_{this};
 

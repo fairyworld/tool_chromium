@@ -28,9 +28,9 @@ import {HistoryResultType} from 'chrome://resources/cr_components/history/consta
 import type {ForeignSessionPageCallbackRouter} from 'chrome://resources/cr_components/history/foreign_sessions.mojom-webui.js';
 import {browserProxyFactory as foreignSessionBrowserProxyFactory} from 'chrome://resources/cr_components/history/foreign_sessions.mojom-webui.js';
 import type {PageCallbackRouter, QueryResult, QueryState} from 'chrome://resources/cr_components/history/history.mojom-webui.js';
-import {HistoryEmbeddingsBrowserProxyImpl} from 'chrome://resources/cr_components/history_embeddings/browser_proxy.js';
 import type {Suggestion} from 'chrome://resources/cr_components/history_embeddings/filter_chips.js';
 import type {HistoryEmbeddingsMoreActionsClickEvent} from 'chrome://resources/cr_components/history_embeddings/history_embeddings.js';
+import {browserProxyFactory as historyEmbeddingsBrowserProxyFactory} from 'chrome://resources/cr_components/history_embeddings/history_embeddings.mojom-webui.js';
 import {getInstance as getAnnouncerInstance} from 'chrome://resources/cr_elements/cr_a11y_announcer/cr_a11y_announcer.js';
 import type {CrDrawerElement} from 'chrome://resources/cr_elements/cr_drawer/cr_drawer.js';
 import type {CrLazyRenderLitElement} from 'chrome://resources/cr_elements/cr_lazy_render/cr_lazy_render_lit.js';
@@ -396,7 +396,8 @@ export class HistoryAppElement extends HistoryAppElementBase {
       //    to show the help bubble comes immediately after registering the
       //    anchor.
       setTimeout(() => {
-        HistoryEmbeddingsBrowserProxyImpl.getInstance().maybeShowFeaturePromo();
+        historyEmbeddingsBrowserProxyFactory.getInstance()
+            .handler.maybeShowFeaturePromo();
       }, 1000);
     }
   }

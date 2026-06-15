@@ -10,8 +10,9 @@ export {BrowserProxyImpl as HistoryClustersProxyImpl} from 'chrome://resources/c
 export {ClusterAction, PageCallbackRouter, PageHandlerRemote, RelatedSearchAction, VisitAction, VisitType} from 'chrome://resources/cr_components/history_clusters/history_clusters.mojom-webui.js';
 export type {MetricsProxy} from 'chrome://resources/cr_components/history_clusters/metrics_proxy.js';
 export {MetricsProxyImpl} from 'chrome://resources/cr_components/history_clusters/metrics_proxy.js';
-export {HistoryEmbeddingsBrowserProxyImpl} from 'chrome://resources/cr_components/history_embeddings/browser_proxy.js';
 export type {HistoryEmbeddingsMoreActionsClickEvent} from 'chrome://resources/cr_components/history_embeddings/history_embeddings.js';
+export {browserProxyFactory as historyEmbeddingsBrowserProxyFactory} from 'chrome://resources/cr_components/history_embeddings/history_embeddings.mojom-webui.js';
+export type {BrowserProxy as HistoryEmbeddingsBrowserProxy} from 'chrome://resources/cr_components/history_embeddings/history_embeddings.mojom-webui.js';
 export {PageHandlerRemote as HistoryEmbeddingsPageHandlerRemote} from 'chrome://resources/cr_components/history_embeddings/history_embeddings.mojom-webui.js';
 export type {CrA11yAnnouncerMessagesSentEvent} from 'chrome://resources/cr_elements/cr_a11y_announcer/cr_a11y_announcer.js';
 export {CrActionMenuElement} from 'chrome://resources/cr_elements/cr_action_menu/cr_action_menu.js';
