@@ -10005,7 +10005,9 @@ bool NavigationRequest::IsSignedExchangeInnerResponse() {
 }
 
 net::IPEndPoint NavigationRequest::GetSocketAddress() {
-  CHECK_GE(state_, WILL_PROCESS_RESPONSE);
+  // TODO(523173951): CHECK-exclusion: Convert to a CHECK once we are confident
+  // it won't be triggered.
+  DCHECK_GE(state_, WILL_PROCESS_RESPONSE);
   return response() ? response()->remote_endpoint : net::IPEndPoint();
 }
 
