@@ -18,6 +18,7 @@
 #import "components/contextual_tasks/public/features.h"
 #import "components/google/core/common/google_util.h"
 #import "components/search_engines/util.h"
+#import "components/strings/grit/components_strings.h"
 #import "ios/chrome/browser/assistant/coordinator/assistant_container_commands.h"
 #import "ios/chrome/browser/assistant/ui/assistant_container_detent.h"
 #import "ios/chrome/browser/cobrowse/debugger/aim_srp_message_logger.h"
@@ -33,6 +34,8 @@
 #import "ios/chrome/browser/shared/public/commands/scene_commands.h"
 #import "ios/chrome/browser/shared/public/features/features.h"
 #import "ios/chrome/browser/shared/public/features/system_flags.h"
+#import "ios/chrome/browser/signin/model/authentication_service.h"
+#import "ios/chrome/browser/signin/model/system_identity.h"
 #import "ios/chrome/browser/url_loading/model/url_loading_browser_agent.h"
 #import "ios/chrome/browser/url_loading/model/url_loading_params.h"
 #import "ios/web/public/js_messaging/web_frame.h"
@@ -45,6 +48,7 @@
 #import "ios/web/public/web_state_observer_bridge.h"
 #import "net/base/apple/url_conversions.h"
 #import "third_party/lens_server_proto/aim_communication.pb.h"
+#import "ui/base/l10n/l10n_util.h"
 #import "url/gurl.h"
 
 @interface AssistantAIMMediator () <CRWWebStatePolicyDecider,
@@ -75,6 +79,8 @@
   std::optional<std::vector<lens::FeatureCapability>> _capabilities;
   // Logger for AIM SRP messages.
   AimSRPMessageLogger* _logger;
+  // The authentication service.
+  raw_ptr<AuthenticationService> _authenticationService;
 }
 
 @synthesize consumer = _consumer;
@@ -85,7 +91,8 @@
                     (id<AssistantContainerCommands>)containerHandler
           contextualTasksService:
               (contextual_tasks::ContextualTasksService*)contextualTasksService
-                       URLLoader:(UrlLoadingBrowserAgent*)URLLoader {
+                       URLLoader:(UrlLoadingBrowserAgent*)URLLoader
+           authenticationService:(AuthenticationService*)authenticationService {
   self = [super init];
   if (self) {
     DCHECK(webState);
@@ -115,6 +122,7 @@
     _containerHandler = containerHandler;
     _contextualTasksService = contextualTasksService;
     _urlLoader = URLLoader;
+    _authenticationService = authenticationService;
 
     _webFramesManagerObserverBridge =
         std::make_unique<web::WebFramesManagerObserverBridge>(self);
@@ -173,6 +181,7 @@
   _cobrowseBrowserAgent = nullptr;
   _capabilities = std::nullopt;
   _logger = nil;
+  _authenticationService = nullptr;
 }
 
 #pragma mark - CRWWebStatePolicyDecider
@@ -327,6 +336,8 @@
     [_logger logClientToAimMessage:message];
   }
 
+  [self.consumer displayThread];
+
   // Execute the script in the page via the JavaScriptFeature.
   AimCobrowseJavaScriptFeature::GetInstance()->SendNativeToWeb(_webState.get(),
                                                                message);
@@ -357,6 +368,22 @@
   if (_cobrowseBrowserAgent) {
     _cobrowseBrowserAgent->SetCobrowseContext(_context);
   }
+
+  NSString* greeting = l10n_util::GetNSString(
+      IDS_AI_MODE_FRIENDLY_ZERO_STATE_TITLE_WITHOUT_NAME);
+
+  if (_authenticationService) {
+    id<SystemIdentity> identity = _authenticationService->GetPrimaryIdentity();
+    if (identity.userGivenName.length > 0) {
+      std::u16string userName =
+          base::SysNSStringToUTF16(identity.userGivenName);
+      std::u16string message = l10n_util::GetStringFUTF16(
+          IDS_AI_MODE_FRIENDLY_ZERO_STATE_TITLE, {userName});
+      greeting = base::SysUTF16ToNSString(message);
+    }
+  }
+
+  [self.consumer setGreetingMessage:greeting];
   [self loadAIMURL];
   [self.delegate assistantAIMMediatorDidStartNewThread:self];
 }

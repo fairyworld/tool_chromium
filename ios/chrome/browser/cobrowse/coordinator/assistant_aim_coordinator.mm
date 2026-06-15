@@ -34,6 +34,7 @@
 #import "ios/chrome/browser/shared/public/commands/open_new_tab_command.h"
 #import "ios/chrome/browser/shared/public/commands/scene_commands.h"
 #import "ios/chrome/browser/shared/public/features/features.h"
+#import "ios/chrome/browser/signin/model/authentication_service_factory.h"
 #import "ios/chrome/browser/tabs/model/tab_helper_filter.h"
 #import "ios/chrome/browser/tabs/model/tab_helper_util.h"
 #import "ios/chrome/browser/url_loading/model/url_loading_browser_agent.h"
@@ -124,7 +125,9 @@ class AssistantAIMUIStateProvider
         cobrowseBrowserAgent:agent
             containerHandler:_containerHandler
       contextualTasksService:contextualTasksService
-                   URLLoader:UrlLoadingBrowserAgent::FromBrowser(self.browser)];
+                   URLLoader:UrlLoadingBrowserAgent::FromBrowser(self.browser)
+       authenticationService:AuthenticationServiceFactory::GetForProfile(
+                                 self.browser->GetProfile())];
 
   _mediator.delegate = self;
   _mediator.sceneHandler =
