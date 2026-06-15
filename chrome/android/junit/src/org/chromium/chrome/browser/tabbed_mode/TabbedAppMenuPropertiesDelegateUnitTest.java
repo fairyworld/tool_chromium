@@ -210,7 +210,8 @@ import java.util.function.BiConsumer;
 })
 @EnableFeatures({
     ChromeFeatureList.SUBMENUS_IN_APP_MENU,
-    ChromeFeatureList.ANDROID_PAGE_INFO_AS_APP_MENU_ITEM
+    ChromeFeatureList.ANDROID_PAGE_INFO_AS_APP_MENU_ITEM,
+    ChromeFeatureList.ANDROID_VERTICAL_TABS
 })
 public class TabbedAppMenuPropertiesDelegateUnitTest {
     // Constants defining flags that determines multi-window menu items visibility.
@@ -1015,8 +1016,22 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         expectedItems.add(item(R.id.translate_id));
         expectedTitles.add(item(R.string.menu_translate));
 
-        expectedItems.add(item(R.id.more_tools_menu_id, item(R.id.reader_mode_menu_id)));
-        expectedTitles.add(item(R.string.menu_more_tools, item(R.string.show_reading_mode_text)));
+        if (mTabbedAppMenuPropertiesDelegate.isTabletSizeScreen()) {
+            expectedItems.add(
+                    item(
+                            R.id.more_tools_menu_id,
+                            item(R.id.reader_mode_menu_id),
+                            item(R.id.toggle_tab_layout_menu_id)));
+            expectedTitles.add(
+                    item(
+                            R.string.menu_more_tools,
+                            item(R.string.show_reading_mode_text),
+                            item(org.chromium.chrome.tab_ui.R.string.show_tabs_vertically)));
+        } else {
+            expectedItems.add(item(R.id.more_tools_menu_id, item(R.id.reader_mode_menu_id)));
+            expectedTitles.add(
+                    item(R.string.menu_more_tools, item(R.string.show_reading_mode_text)));
+        }
 
         if (!DeviceInfo.isDesktop()) {
             expectedItems.add(item(R.id.request_desktop_site_id));
@@ -1229,8 +1244,22 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         expectedItems.add(item(R.id.translate_id));
         expectedTitles.add(item(R.string.menu_translate));
 
-        expectedItems.add(item(R.id.more_tools_menu_id, item(R.id.reader_mode_menu_id)));
-        expectedTitles.add(item(R.string.menu_more_tools, item(R.string.show_reading_mode_text)));
+        if (mTabbedAppMenuPropertiesDelegate.isTabletSizeScreen()) {
+            expectedItems.add(
+                    item(
+                            R.id.more_tools_menu_id,
+                            item(R.id.reader_mode_menu_id),
+                            item(R.id.toggle_tab_layout_menu_id)));
+            expectedTitles.add(
+                    item(
+                            R.string.menu_more_tools,
+                            item(R.string.show_reading_mode_text),
+                            item(org.chromium.chrome.tab_ui.R.string.show_tabs_vertically)));
+        } else {
+            expectedItems.add(item(R.id.more_tools_menu_id, item(R.id.reader_mode_menu_id)));
+            expectedTitles.add(
+                    item(R.string.menu_more_tools, item(R.string.show_reading_mode_text)));
+        }
 
         if (!DeviceInfo.isDesktop()) {
             expectedItems.add(item(R.id.request_desktop_site_id));
