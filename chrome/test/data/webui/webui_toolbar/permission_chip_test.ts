@@ -195,6 +195,10 @@ suite('PermissionChipTest', function() {
     const messageEl = chip.shadowRoot.querySelector<HTMLElement>('#message');
     assertTrue(!!messageEl);
     assertEquals('Camera', messageEl.textContent);
+
+    // Verify it is a button for accessibility
+    assertEquals('BUTTON', chipEl.tagName);
+    assertEquals('Camera', chipEl.getAttribute('aria-label'));
   });
 
   test('Click events', async function() {
