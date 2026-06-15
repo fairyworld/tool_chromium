@@ -9318,10 +9318,6 @@ const FeatureEntry kFeatureEntries[] = {
      FEATURE_VALUE_TYPE(
          chrome::android::kTabSwitcherGroupSuggestionsTestModeAndroid)},
 
-    {"chrome-native-url-overriding",
-     flag_descriptions::kChromeNativeUrlOverridingName,
-     flag_descriptions::kChromeNativeUrlOverridingDescription, kOsAndroid,
-     FEATURE_VALUE_TYPE(chrome::android::kChromeNativeUrlOverriding)},
 #endif
 
     {"group-promo-prototype", flag_descriptions::kGroupPromoPrototypeName,

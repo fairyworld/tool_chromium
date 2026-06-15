@@ -24,8 +24,6 @@ import org.mockito.junit.MockitoRule;
 import org.robolectric.annotation.Config;
 
 import org.chromium.base.test.BaseRobolectricTestRunner;
-import org.chromium.base.test.util.Features.EnableFeatures;
-import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.fullscreen.BrowserControlsManager;
 import org.chromium.chrome.browser.pdf.PdfInfo;
 import org.chromium.chrome.browser.pdf.PdfPage;
@@ -261,7 +259,6 @@ public class NativePageFactoryTest {
     }
 
     @Test
-    @EnableFeatures(ChromeFeatureList.CHROME_NATIVE_URL_OVERRIDING)
     public void testExtensionUrlOverrides() {
         // Test NTP override
         String ntpUrl = "chrome://newtab";

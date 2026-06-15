@@ -1308,9 +1308,7 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
         super.initProfileDependentFeatures(currentlySelectedProfile);
         Profile originalProfile = currentlySelectedProfile.getOriginalProfile();
 
-        if (ChromeFeatureList.sChromeNativeUrlOverriding.isEnabled()) {
-            ExtensionsUrlOverrideRegistryManagerFactory.getForProfile(originalProfile);
-        }
+        ExtensionsUrlOverrideRegistryManagerFactory.getForProfile(originalProfile);
 
         if (TabGroupSyncFeatures.isTabGroupSyncEnabled(originalProfile)) {
             var tabGroupSyncService = TabGroupSyncServiceFactory.getForProfile(originalProfile);
