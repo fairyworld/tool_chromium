@@ -474,9 +474,11 @@ bool IOSChromeSavePasswordInfoBarDelegate::MaybeHandlePasswordError() {
     case password_manager::ActionableError::kInactionable:
     case password_manager::ActionableError::kInactionableTemporaryError:
     case password_manager::ActionableError::kKeychainError:
-    // TODO(crbug.com/464228247): Handle missing passphrase error.
-    case password_manager::ActionableError::kNeedsPassphrase:
       return false;
+    case password_manager::ActionableError::kNeedsPassphrase:
+      [sync_presenter_handler_
+          showSyncPassphraseSettingsWithDismissalCompletion:completion];
+      break;
     case password_manager::ActionableError::kSignInNeeded:
       [sync_presenter_handler_
           showPrimaryAccountReauthWithDismissalCompletion:completion];

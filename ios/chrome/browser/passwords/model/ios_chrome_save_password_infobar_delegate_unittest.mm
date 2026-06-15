@@ -917,6 +917,26 @@ TEST_F(IOSChromeSavePasswordInfoBarDelegateTest,
 }
 
 TEST_F(IOSChromeSavePasswordInfoBarDelegateTest,
+       Accept_ActionableError_NeedsPassphrase) {
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndEnableFeature(
+      password_manager::features::kInFlowTrustedVaultKeyRetrievalIos);
+
+  InitializeDelegate(
+      /*password_update=*/false,
+      password_manager::ActionableError::kNeedsPassphrase);
+
+  // Verify that the password manager does NOT save.
+  EXPECT_CALL(*form_manager_ptr_, Save).Times(0);
+
+  OCMExpect([mock_sync_presenter_
+      showSyncPassphraseSettingsWithDismissalCompletion:[OCMArg any]]);
+
+  // Tap on "Accept".
+  EXPECT_FALSE(delegate_->Accept());
+}
+
+TEST_F(IOSChromeSavePasswordInfoBarDelegateTest,
        Accept_ActionableError_NoError) {
   InitializeDelegate(
       /*password_update=*/false, password_manager::ActionableError::kNoError);

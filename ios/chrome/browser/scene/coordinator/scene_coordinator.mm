@@ -240,6 +240,8 @@ void OnListFamilyMembersResponse(
   base::CancelableOnceClosure _familyMembersTimeoutClosure;
   // Navigation View controller for the settings.
   SettingsNavigationController* _settingsNavigationController;
+  // Completion block called when Settings are dismissed.
+  ProceduralBlock _settingsDismissalCompletion;
   // Coordinator for the first step of the guided tour (NTP).
   GuidedTourCoordinator* _guidedTourCoordinator;
 }
@@ -1247,6 +1249,15 @@ void OnListFamilyMembersResponse(
 // TODO(crbug.com/41352590) : Do not pass baseViewController through dispatcher.
 - (void)showSyncPassphraseSettingsFromViewController:
     (UIViewController*)baseViewController {
+  [self showSyncPassphraseSettingsFromViewController:baseViewController
+                                          completion:nil];
+}
+
+// TODO(crbug.com/41352590) : Do not pass baseViewController through dispatcher.
+- (void)showSyncPassphraseSettingsFromViewController:
+            (UIViewController*)baseViewController
+                                          completion:
+                                              (ProceduralBlock)completion {
   DCHECK(!self.isSigninInProgress);
   if (_settingsNavigationController) {
     [_settingsNavigationController
@@ -1258,6 +1269,7 @@ void OnListFamilyMembersResponse(
     // simultaneous taps. See crbug.com/368310663.
     return;
   }
+  _settingsDismissalCompletion = [completion copy];
   _settingsNavigationController = [SettingsNavigationController
       syncPassphraseControllerForBrowser:_regularBrowser.get()
                                 delegate:self];
@@ -1634,6 +1646,10 @@ void OnListFamilyMembersResponse(
   [_settingsNavigationController cleanUpSettings];
   _settingsNavigationController = nil;
   [self stopPasswordCheckupCoordinator];
+  if (_settingsDismissalCompletion) {
+    _settingsDismissalCompletion();
+    _settingsDismissalCompletion = nil;
+  }
 }
 
 #pragma mark - Private
@@ -1642,6 +1658,10 @@ void OnListFamilyMembersResponse(
 // controller and call the completion if it is non nil.
 - (void)stopSettingsCallbackWithCompletion:(ProceduralBlock)completion {
   _settingsNavigationController = nil;
+  if (_settingsDismissalCompletion) {
+    _settingsDismissalCompletion();
+    _settingsDismissalCompletion = nil;
+  }
   if (completion) {
     completion();
   }

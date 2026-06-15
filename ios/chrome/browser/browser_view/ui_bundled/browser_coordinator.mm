@@ -4986,8 +4986,14 @@ const char kChromeAppStoreUrl[] =
 }
 
 - (void)showSyncPassphraseSettings {
+  [self showSyncPassphraseSettingsWithDismissalCompletion:nil];
+}
+
+- (void)showSyncPassphraseSettingsWithDismissalCompletion:
+    (SyncPresenterCompletionCallback)completion {
   [HandlerForProtocol(self.dispatcher, SettingsCommands)
-      showSyncPassphraseSettingsFromViewController:self.viewController];
+      showSyncPassphraseSettingsFromViewController:self.viewController
+                                        completion:completion];
 }
 
 - (void)showGoogleServicesSettings {
