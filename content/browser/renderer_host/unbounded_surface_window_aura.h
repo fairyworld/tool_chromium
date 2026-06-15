@@ -73,6 +73,8 @@ class UnboundedSurfaceWindowAura : public UnboundedSurfaceWindow,
       const gfx::Point& location) override;
   bool CanFocus() override;
   void OnCaptureLost() override {}
+
+  void Dismiss() override;
   void OnPaint(const ui::PaintContext& context) override {}
   void OnDeviceScaleFactorChanged(float old_device_scale_factor,
                                   float new_device_scale_factor) override {}
@@ -104,7 +106,6 @@ class UnboundedSurfaceWindowAura : public UnboundedSurfaceWindow,
       mojo::PendingAssociatedRemote<blink::mojom::UnboundedSurfaceClient>
           client);
   bool InitWindow(const gfx::Rect& bounds_in_dips);
-  void Dismiss();
   void OnConnectionError();
   gfx::Rect ConvertDIPToScreenBounds(const gfx::Rect& bounds_in_dips) const;
 

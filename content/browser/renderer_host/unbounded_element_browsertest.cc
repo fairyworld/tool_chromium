@@ -134,11 +134,7 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, InputEventRouting) {
   EXPECT_EQ(50, EvalJs(primary_main_frame_host(), "window.__mouse_y"));
 }
 
-// TODO(crbug.com/508672616): This test is currently broken because visibility
-// styles are not yet reset to "hidden" when
-// unbounded_surface_client_->OnDismissed() is called.
-IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
-                       DISABLED_LightDismissEscKey) {
+IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, LightDismissEscKey) {
   GURL url(embedded_test_server()->GetURL("/title1.html"));
   EXPECT_TRUE(NavigateToURL(shell(), url));
 
@@ -162,11 +158,7 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
   EXPECT_EQ("hidden", EvalJs(primary_main_frame_host(), get_style));
 }
 
-// TODO(crbug.com/508672616): This test is currently broken because visibility
-// styles are not yet reset to "hidden" when
-// unbounded_surface_client_->OnDismissed() is called.
-IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
-                       DISABLED_LightDismissClickOutside) {
+IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, LightDismissClickOutside) {
   GURL url(embedded_test_server()->GetURL("/title1.html"));
   EXPECT_TRUE(NavigateToURL(shell(), url));
 
@@ -627,6 +619,39 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
                      "document.getElementById('test_iframe').remove();"));
   RunUntilInputProcessed(primary_main_frame_host()->GetRenderWidgetHost());
   EXPECT_TRUE(window->is_valid());
+}
+
+IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
+                       DoesNotStealFocusWhenOpened) {
+  GURL url(embedded_test_server()->GetURL("/title1.html"));
+  EXPECT_TRUE(NavigateToURL(shell(), url));
+
+  std::string script = R"(
+    document.body.innerHTML = `
+      <div id="c" style="width: 100px; height: 100px;">
+        <input id="i">
+      </div>
+    `;
+    const i = document.getElementById('i');
+    const c = document.getElementById('c');
+    i.focus();
+    c.setAttribute('unbounded', '');
+    c.showUnboundedElement();
+  )";
+  EXPECT_TRUE(ExecJs(primary_main_frame_host(), script));
+
+  WaitForFrameReady();
+  UnboundedSurfaceWindow* window =
+      primary_main_frame_host()->GetUnboundedSurfaceWindow();
+  ASSERT_TRUE(window);
+  EXPECT_TRUE(window->is_valid());
+
+  SimulateKeyPress(web_contents(), ui::DomKey::FromCharacter('a'),
+                   ui::DomCode::US_A, ui::VKEY_A, false, false, false, false);
+  RunUntilInputProcessed(primary_main_frame_host()->GetRenderWidgetHost());
+
+  EXPECT_EQ("a", EvalJs(primary_main_frame_host(),
+                        "document.getElementById('i').value"));
 }
 
 }  // namespace content

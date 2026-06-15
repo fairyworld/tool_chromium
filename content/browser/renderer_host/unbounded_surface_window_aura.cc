@@ -142,7 +142,7 @@ bool UnboundedSurfaceWindowAura::ShouldDescendIntoChildForEventHandling(
 }
 
 bool UnboundedSurfaceWindowAura::CanFocus() {
-  return true;
+  return false;
 }
 
 void UnboundedSurfaceWindowAura::OnWindowDestroying(aura::Window* window) {
@@ -230,7 +230,6 @@ bool UnboundedSurfaceWindowAura::InitWindow(const gfx::Rect& bounds_in_dips) {
       cc::DeadlinePolicy::UseDefaultDeadline(),
       /*stretch_content_to_fill_bounds=*/false);
   window_->Show();
-  window_->Focus();
 
   if (client_remote_.is_bound()) {
     client_remote_->OnSurfaceAllocated(GetFrameSinkId(), GetLocalSurfaceId());
@@ -271,7 +270,7 @@ void UnboundedSurfaceWindowAura::Dismiss() {
   if (parent_view_) {
     base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
         FROM_HERE,
-        base::BindOnce(&RenderWidgetHostViewBase::DismissUnboundedSurface,
+        base::BindOnce(&RenderWidgetHostViewBase::DestroyUnboundedSurface,
                        parent_view_->GetWeakPtr()));
   }
 }

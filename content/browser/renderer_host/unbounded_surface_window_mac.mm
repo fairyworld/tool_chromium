@@ -13,6 +13,7 @@
 #include "components/input/render_widget_host_input_event_router.h"
 #include "components/input/web_input_event_builders_mac.h"
 #include "components/viz/host/host_frame_sink_manager.h"
+#import "content/app_shim_remote_cocoa/render_widget_host_view_cocoa.h"
 #include "content/browser/compositor/surface_utils.h"
 #include "content/browser/renderer_host/render_frame_host_impl.h"
 #include "content/browser/renderer_host/render_widget_host_impl.h"
@@ -61,14 +62,11 @@
 }
 
 - (BOOL)canBecomeKeyWindow {
-  return YES;
+  return NO;
 }
 
-- (void)resignKeyWindow {
-  [super resignKeyWindow];
-  if (_owner) {
-    _owner->OnWindowResignedKey();
-  }
+- (BOOL)canBecomeMainWindow {
+  return NO;
 }
 
 - (void)sendEvent:(NSEvent*)event {
@@ -125,6 +123,9 @@ UnboundedSurfaceWindowMac::~UnboundedSurfaceWindowMac() {
 
   if (window_) {
     [(UnboundedNSWindow*)window_ clearOwner];
+    if (NSWindow* parent = [window_ parentWindow]) {
+      [parent removeChildWindow:window_];
+    }
     [window_ orderOut:nil];
     [window_ close];
     window_ = nil;
@@ -162,6 +163,7 @@ void UnboundedSurfaceWindowMac::InitWindow(const gfx::Rect& bounds_in_dips) {
   [window_ setReleasedWhenClosed:NO];
   [window_ setBackgroundColor:[NSColor clearColor]];
   [window_ setOpaque:NO];
+  [window_ setLevel:NSFloatingWindowLevel];
 
   NSRect client_rect =
       NSMakeRect(0, 0, ns_rect.size.width, ns_rect.size.height);
@@ -216,8 +218,12 @@ void UnboundedSurfaceWindowMac::InitWindow(const gfx::Rect& bounds_in_dips) {
       cc::DeadlinePolicy::UseDefaultDeadline(),
       /*stretch_content_to_fill_bounds=*/false);
 
+  if (parent_view_ && parent_view_->GetInProcessNSView()) {
+    if (NSWindow* parent_window = [parent_view_->GetInProcessNSView() window]) {
+      [parent_window addChildWindow:window_ ordered:NSWindowAbove];
+    }
+  }
   [window_ orderFront:nil];
-  [window_ makeKeyAndOrderFront:nil];
 
   if (client_remote_.is_bound()) {
     client_remote_->OnSurfaceAllocated(GetFrameSinkId(), GetLocalSurfaceId());
@@ -348,19 +354,13 @@ void UnboundedSurfaceWindowMac::Dismiss() {
   if (parent_view_) {
     base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
         FROM_HERE,
-        base::BindOnce(&RenderWidgetHostViewBase::DismissUnboundedSurface,
+        base::BindOnce(&RenderWidgetHostViewBase::DestroyUnboundedSurface,
                        parent_view_->GetWeakPtr()));
   }
 }
 
 void UnboundedSurfaceWindowMac::OnConnectionError() {
-  if (!parent_view_) {
-    return;
-  }
-  base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
-      FROM_HERE,
-      base::BindOnce(&RenderWidgetHostViewBase::DismissUnboundedSurface,
-                     parent_view_->GetWeakPtr()));
+  Dismiss();
 }
 
 gfx::Rect UnboundedSurfaceWindowMac::ConvertDIPToScreenBounds(

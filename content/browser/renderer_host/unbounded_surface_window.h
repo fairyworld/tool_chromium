@@ -24,6 +24,7 @@ class UnboundedSurfaceWindow {
   virtual ~UnboundedSurfaceWindow() = default;
 
   virtual bool is_valid() const = 0;
+  virtual void Dismiss() = 0;
 
   virtual void SetBounds(const gfx::Rect& bounds_in_screen) = 0;
   virtual viz::FrameSinkId GetFrameSinkId() const = 0;

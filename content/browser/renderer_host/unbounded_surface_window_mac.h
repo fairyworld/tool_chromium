@@ -71,6 +71,8 @@ class UnboundedSurfaceWindowMac : public UnboundedSurfaceWindow,
   // Resign Key:
   void OnWindowResignedKey();
 
+  void Dismiss() override;
+
   // viz::HostFrameSinkClient overrides:
   void OnFirstSurfaceActivation(const viz::SurfaceInfo& surface_info) override {
   }
@@ -90,7 +92,6 @@ class UnboundedSurfaceWindowMac : public UnboundedSurfaceWindow,
 
   DisplayInfo GetDisplayInfo() const;
   void InitWindow(const gfx::Rect& bounds_in_dips);
-  void Dismiss();
   void OnConnectionError();
   gfx::Rect ConvertDIPToScreenBounds(const gfx::Rect& bounds_in_dips) const;
 

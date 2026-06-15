@@ -436,6 +436,7 @@ class CONTENT_EXPORT RenderWidgetHostViewBase
       const gfx::Rect& bounds_in_dips);
   virtual void UpdateUnboundedSurfaceBounds(const gfx::Rect& bounds_in_screen);
   virtual void DismissUnboundedSurface();
+  virtual void DestroyUnboundedSurface();
   virtual bool HasActiveUnboundedSurface() const;
   virtual viz::FrameSinkId GetUnboundedSurfaceFrameSinkId() const;
   virtual viz::LocalSurfaceId GetUnboundedSurfaceLocalSurfaceId() const;

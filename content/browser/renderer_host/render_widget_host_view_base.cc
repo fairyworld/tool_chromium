@@ -921,6 +921,12 @@ void RenderWidgetHostViewBase::UpdateUnboundedSurfaceBounds(
 }
 
 void RenderWidgetHostViewBase::DismissUnboundedSurface() {
+  if (unbounded_surface_window_) {
+    unbounded_surface_window_->Dismiss();
+  }
+}
+
+void RenderWidgetHostViewBase::DestroyUnboundedSurface() {
   unbounded_surface_window_.reset();
 }
 
