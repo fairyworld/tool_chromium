@@ -15648,7 +15648,8 @@
                 {
                     "name": "Enabled",
                     "enable_features": [
-                        "LiveCaptionOnDeviceTranslation"
+                        "LiveCaptionOnDeviceTranslation",
+                        "LiveCaptionOnDeviceTranslationEnglishOnly"
                     ]
                 }
             ]
