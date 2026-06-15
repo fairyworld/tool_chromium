@@ -38,7 +38,7 @@ namespace autofill {
 SaveUpdateAddressProfilePromptController::
     SaveUpdateAddressProfilePromptController(
         std::unique_ptr<SaveUpdateAddressProfilePromptView> prompt_view,
-        autofill::PersonalDataManager* personal_data,
+        PersonalDataManager* personal_data,
         const AutofillProfile& profile,
         const AutofillProfile* original_profile,
         SaveUpdateAddressProfilePromptMode prompt_mode,

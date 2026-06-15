@@ -43,7 +43,7 @@ class WalletPassAccessManager;
 
 // Android wrapper of the EntityDataManager which provides access from the
 // Java layer.
-class EntityDataManagerAndroid : public autofill::EntityDataManager::Observer {
+class EntityDataManagerAndroid : public EntityDataManager::Observer {
  public:
   EntityDataManagerAndroid(
       JNIEnv* env,

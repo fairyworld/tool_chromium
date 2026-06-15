@@ -110,12 +110,11 @@ class SaveUpdateAddressProfilePromptControllerTest
 
   signin::IdentityTestEnvironment identity_test_env_;
   syncer::TestSyncService sync_service_;
-  autofill::TestPersonalDataManager test_personal_data_;
+  TestPersonalDataManager test_personal_data_;
   raw_ptr<MockSaveUpdateAddressProfilePromptView> prompt_view_ = nullptr;
-  AutofillProfile profile_{
-      autofill::i18n_model_definition::kLegacyHierarchyCountryCode};
+  AutofillProfile profile_{i18n_model_definition::kLegacyHierarchyCountryCode};
   AutofillProfile original_profile_{
-      autofill::i18n_model_definition::kLegacyHierarchyCountryCode};
+      i18n_model_definition::kLegacyHierarchyCountryCode};
   base::MockCallback<AutofillClient::AddressProfileSavePromptCallback>
       decision_callback_;
   base::MockCallback<base::OnceCallback<void()>> dismissal_callback_;
