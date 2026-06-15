@@ -33,6 +33,9 @@ ScriptMessageValue CreateScriptMessageValue(id element) {
   if (type_id == CFDictionaryGetTypeID()) {
     return ScriptMessageValue(ScriptMessageDictValue(element));
   }
+  if (type_id == CFArrayGetTypeID()) {
+    return ScriptMessageValue(ScriptMessageListValue(element));
+  }
   NOTREACHED();
 }
 

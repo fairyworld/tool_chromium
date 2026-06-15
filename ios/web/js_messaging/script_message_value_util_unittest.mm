@@ -72,4 +72,15 @@ TEST_F(ScriptMessageValueUtilTest, ConvertNSDictionaryToScriptMessageValue) {
   EXPECT_EQ(value.GetDict().size(), 1u);
 }
 
+// Tests whether the CreateScriptMessageValue function can create a
+// ScriptMessageValue object from a NSArray.
+TEST_F(ScriptMessageValueUtilTest, ConvertNSArrayToScriptMessageValue) {
+  NSArray* array_element = @[ @"item1", @"item2" ];
+
+  ScriptMessageValue value = CreateScriptMessageValue(array_element);
+
+  ASSERT_EQ(base::Value::Type::LIST, value.type());
+  EXPECT_EQ(value.GetList().size(), 2u);
+}
+
 }  // namespace web
