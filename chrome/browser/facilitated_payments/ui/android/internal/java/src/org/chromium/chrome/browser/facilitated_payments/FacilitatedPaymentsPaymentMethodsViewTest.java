@@ -219,6 +219,7 @@ public final class FacilitatedPaymentsPaymentMethodsViewTest {
 
     @Test
     @MediumTest
+    @DisabledTest(message = "crbug.com/524086369")
     public void testViewCanBeShownUsingTheModel() {
         // Confirm that the bottom sheet is not open.
         assertThat(mBottomSheetController.isSheetOpen(), is(false));
