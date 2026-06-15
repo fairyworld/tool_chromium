@@ -11141,6 +11141,24 @@
             ]
         }
     ],
+    "FetchAccountInfoOnRestart": [
+        {
+            "platforms": [
+                "chromeos",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled_20260609",
+                    "enable_features": [
+                        "FetchAccountInfoOnRestart"
+                    ]
+                }
+            ]
+        }
+    ],
     "FetchLaterAPI": [
         {
             "platforms": [
