@@ -1350,4 +1350,64 @@ chrome.test.runTests([
 
     chrome.test.succeed();
   },
+
+  async function testCommitViewportRotationTracking() {
+    const manager = await setUpTextMode();
+    mockPlugin.clearMessages();
+
+    // Set viewport rotation to 270 degrees CW.
+    rotateViewport(3);
+
+    // Create a new text annotation.
+    const whenInitEvent = eventToPromise<CustomEvent<TextBoxInit>>(
+        'initialize-text-box', manager);
+    chrome.test.assertTrue(
+        await manager.initializeTextAnnotation({x: 100, y: 100}));
+    const initEvent = await whenInitEvent;
+    const annot = initEvent.detail.annotation;
+
+    // Verify the text annotation correctly captures the viewport rotations on
+    // commit.
+    chrome.test.assertEq(3, annot.viewportOrientation);
+
+    // Commit the annotation.
+    annot.text = 'Hello';
+    manager.commitTextAnnotation(annot, true, []);
+
+    // Verify that the finishTextAnnotation message correctly captures the
+    // viewport rotations on commit.
+    const finishMsg =
+        mockPlugin.findMessage<{type: string, data: TextAnnotationMessageData}>(
+            'finishTextAnnotation');
+    chrome.test.assertTrue(finishMsg !== undefined);
+    chrome.test.assertEq(3, finishMsg.data.viewportOrientation);
+    mockPlugin.clearMessages();
+
+    // Rotate the viewport to 0 degrees.
+    rotateViewport(0);
+
+    // Undo.
+    manager.undo();
+    const undoMsg =
+        mockPlugin.findMessage<{type: string, data: TextAnnotationMessageData}>(
+            'finishTextAnnotation');
+    chrome.test.assertTrue(undoMsg !== undefined);
+
+    // Undo should still maintain commit viewport rotations.
+    chrome.test.assertEq(3, undoMsg.data.viewportOrientation);
+    mockPlugin.clearMessages();
+
+    // Redo.
+    manager.redo();
+    const redoMsg =
+        mockPlugin.findMessage<{type: string, data: TextAnnotationMessageData}>(
+            'finishTextAnnotation');
+    chrome.test.assertTrue(redoMsg !== undefined);
+
+    // Redo should still maintain commit viewport rotations.
+    chrome.test.assertEq(3, redoMsg.data.viewportOrientation);
+
+    mockPlugin.clearMessages();
+    chrome.test.succeed();
+  },
 ]);

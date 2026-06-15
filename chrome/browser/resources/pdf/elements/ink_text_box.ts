@@ -332,6 +332,7 @@ export class InkTextBoxElement extends InkTextBoxElementBase {
                   width: this.width_,
                 },
                 textOrientation: this.textOrientation_,
+                viewportOrientation: this.viewportRotations_,
               };
 
               const result =

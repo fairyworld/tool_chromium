@@ -206,6 +206,7 @@ export class Ink2Manager extends EventTarget {
     }
 
     this.pageIndex_ = page;
+    const viewportRotations = this.viewport_.getClockwiseRotations();
     const annotation: TextAnnotation = existing ? existing : {
       id: this.nextAnnotationId_,
       mojoTextInfo: new ArrayBuffer(0),
@@ -219,7 +220,8 @@ export class Ink2Manager extends EventTarget {
         locationY: location.y,
         width: newBoxWidth,
       },
-      textOrientation: (4 - this.viewport_.getClockwiseRotations()) % 4,
+      textOrientation: (4 - viewportRotations) % 4,
+      viewportOrientation: viewportRotations,
     };
 
     if (existing) {

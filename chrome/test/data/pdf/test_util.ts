@@ -822,6 +822,7 @@ export function getTestAnnotation(id: number): TextAnnotation {
       width: 50,
     },
     textOrientation: 0,
+    viewportOrientation: 0,
   };
 }
 // </if>
