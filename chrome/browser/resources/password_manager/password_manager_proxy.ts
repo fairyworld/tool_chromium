@@ -8,6 +8,8 @@
  * testing. The chrome.passwordsPrivate API is being migrated to use Mojo.
  */
 
+import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
+
 import {PageCallbackRouter, PageHandlerFactory, PageHandlerRemote, PasswordManagerActionableError} from './password_manager.mojom-webui.js';
 import type {ActorLoginPermission} from './password_manager.mojom-webui.js';
 
@@ -791,11 +793,19 @@ export class PasswordManagerImpl implements PasswordManagerProxy {
   }
 
   disconnectCloudAuthenticator() {
-    return chrome.passwordsPrivate.disconnectCloudAuthenticator();
+    if (!loadTimeData.getBoolean('enablePasswordManagerMojoApi')) {
+      return chrome.passwordsPrivate.disconnectCloudAuthenticator();
+    }
+    return this.handler.disconnectCloudAuthenticator().then(
+        result => result.success);
   }
 
   isConnectedToCloudAuthenticator() {
-    return chrome.passwordsPrivate.isConnectedToCloudAuthenticator();
+    if (!loadTimeData.getBoolean('enablePasswordManagerMojoApi')) {
+      return chrome.passwordsPrivate.isConnectedToCloudAuthenticator();
+    }
+    return this.handler.isConnectedToCloudAuthenticator().then(
+        result => result.connected);
   }
 
   deleteAllPasswordManagerData() {

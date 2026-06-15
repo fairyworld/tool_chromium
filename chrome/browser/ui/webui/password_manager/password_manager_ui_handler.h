@@ -75,6 +75,12 @@ class PasswordManagerUIHandler : public password_manager::mojom::PageHandler {
 
   void ShowLastExportedFileInShell() override;
 
+  void DisconnectCloudAuthenticator(
+      DisconnectCloudAuthenticatorCallback callback) override;
+
+  void IsConnectedToCloudAuthenticator(
+      IsConnectedToCloudAuthenticatorCallback callback) override;
+
  private:
   password_manager::SavedPasswordsPresenter* GetSavedPasswordsPresenter();
 

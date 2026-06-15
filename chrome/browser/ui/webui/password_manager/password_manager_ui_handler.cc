@@ -161,3 +161,16 @@ void PasswordManagerUIHandler::GetPasswordManagerActionableError(
 void PasswordManagerUIHandler::ShowLastExportedFileInShell() {
   passwords_private_delegate_->ShowLastExportedFileInShell(web_contents_);
 }
+
+void PasswordManagerUIHandler::DisconnectCloudAuthenticator(
+    DisconnectCloudAuthenticatorCallback callback) {
+  passwords_private_delegate_->DisconnectCloudAuthenticator(
+      web_contents_, std::move(callback));
+}
+
+void PasswordManagerUIHandler::IsConnectedToCloudAuthenticator(
+    IsConnectedToCloudAuthenticatorCallback callback) {
+  std::move(callback).Run(
+      passwords_private_delegate_->IsConnectedToCloudAuthenticator(
+          web_contents_));
+}
