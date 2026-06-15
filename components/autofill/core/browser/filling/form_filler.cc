@@ -991,12 +991,18 @@ void FormFiller::FillOrPreviewForm(
 
     const bool is_newly_autofilled_or_emptied =
         field_filling_content.has_value();
-    const bool autofilled_value_did_not_change =
-        field.is_autofilled_according_to_renderer() &&
-        result_fields[i].is_autofilled_according_to_renderer() &&
-        field.value() == result_fields[i].value();
 
-    if (is_newly_autofilled_or_emptied && autofilled_value_did_not_change) {
+    // Denotes whether an autofilled field is eligible for filling (no
+    // `FieldFillingSkipReasons`), a value to fill is found by
+    // `GetFieldFillingData()`, but that value is the same as the one already
+    // autofilled in the field.
+    const bool autofilled_value_did_not_change =
+        is_newly_autofilled_or_emptied &&
+        field.is_autofilled_according_to_renderer() &&
+        field.value() == field_filling_content->value &&
+        field.selected_option_text() == field_filling_content->select_text;
+
+    if (autofilled_value_did_not_change) {
       skip_reasons[field.global_id()].insert(
           FieldFillingSkipReason::kAutofilledValueDidNotChange);
     } else if (!is_newly_autofilled_or_emptied) {
