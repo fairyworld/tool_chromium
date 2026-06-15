@@ -153,8 +153,10 @@ class BookmarkDragImageSource : public gfx::CanvasImageSource {
 
     // Draw icon image.
     canvas->DrawImageInt(
-        icon_, kContainerRadius - kIconSize / 2,
-        kContainerRadius + kIconContainerRadius - kIconSize / 2);
+        icon_, /*src_x=*/0, /*src_y=*/0, icon_.width(), icon_.height(),
+        kContainerRadius - kIconSize / 2,
+        kContainerRadius + kIconContainerRadius - kIconSize / 2, kIconSize,
+        kIconSize, /*filter=*/true);
 
     // Draw bookmark title.
     gfx::FontList font_list = views::TypographyProvider::Get().GetFont(
