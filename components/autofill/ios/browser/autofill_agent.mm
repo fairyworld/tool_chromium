@@ -72,8 +72,6 @@
 #import "components/autofill/ios/form_util/form_handlers_java_script_feature.h"
 #import "components/feature_engagement/public/feature_constants.h"
 #import "components/grit/components_resources.h"
-#import "components/plus_addresses/core/browser/grit/plus_addresses_strings.h"
-#import "components/plus_addresses/core/common/features.h"
 #import "components/prefs/ios/pref_observer_bridge.h"
 #import "components/prefs/pref_change_registrar.h"
 #import "components/prefs/pref_service.h"
