@@ -106,7 +106,6 @@ import org.chromium.components.bookmarks.BookmarkItem;
 import org.chromium.components.browser_ui.accessibility.PageZoomManager;
 import org.chromium.components.browser_ui.util.GlobalDiscardableReferencePool;
 import org.chromium.components.browser_ui.widget.RoundedIconGenerator;
-import org.chromium.components.dom_distiller.core.DomDistillerFeatures;
 import org.chromium.components.embedder_support.util.UrlConstants;
 import org.chromium.components.embedder_support.util.UrlUtilities;
 import org.chromium.components.image_fetcher.ImageFetcherConfig;
@@ -556,11 +555,6 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
 
         // Divider Line
         maybeAddDividerLine(modelList, R.id.divider_line_id);
-
-        // Reader Mode Prefs
-        if (shouldShowReaderModePrefs(currentTab)) {
-            modelList.add(buildReaderModePrefsItem());
-        }
 
         // Settings
         modelList.add(buildSettingsItem());
@@ -2044,7 +2038,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
             return false;
         }
 
-        return DomDistillerFeatures.sReaderModeDistillInApp.isEnabled();
+        return true;
     }
 
     @Contract("null -> false")

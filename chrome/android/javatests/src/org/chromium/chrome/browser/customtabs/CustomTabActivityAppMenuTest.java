@@ -369,7 +369,7 @@ public class CustomTabActivityAppMenuTest {
         ModelList menuItemsModelList =
                 AppMenuTestSupport.getMenuModelList(
                         mCustomTabActivityTestRule.getAppMenuCoordinator());
-        int expectedMenuSize = 2;
+        int expectedMenuSize = 1;
         if (BrowserUiUtils.isPageInfoMovedToAppMenu(mCustomTabActivityTestRule.getActivity())) {
             expectedMenuSize++;
         }
@@ -379,7 +379,7 @@ public class CustomTabActivityAppMenuTest {
         Assert.assertNotNull(
                 AppMenuTestSupport.getMenuItemPropertyModel(
                         mCustomTabActivityTestRule.getAppMenuCoordinator(), R.id.find_in_page_id));
-        Assert.assertNotNull(
+        Assert.assertNull(
                 AppMenuTestSupport.getMenuItemPropertyModel(
                         mCustomTabActivityTestRule.getAppMenuCoordinator(),
                         R.id.reader_mode_prefs_id));

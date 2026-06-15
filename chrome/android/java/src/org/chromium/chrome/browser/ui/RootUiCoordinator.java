@@ -236,7 +236,6 @@ import org.chromium.components.browser_ui.widget.MenuOrKeyboardActionController;
 import org.chromium.components.browser_ui.widget.gesture.BackPressHandler;
 import org.chromium.components.browser_ui.widget.scrim.ScrimManager;
 import org.chromium.components.browser_ui.widget.scrim.ScrimManager.ScrimClient;
-import org.chromium.components.dom_distiller.core.DomDistillerFeatures;
 import org.chromium.components.embedder_support.contextmenu.ContextMenuPopulatorFactory;
 import org.chromium.components.feature_engagement.EventConstants;
 import org.chromium.components.feature_engagement.Tracker;
@@ -1367,15 +1366,13 @@ public class RootUiCoordinator
         if (contextualSearchManager != null) {
             contextualSearchManager.addObserver(mReadAloudContextualSearchObserver);
         }
-        if (DomDistillerFeatures.sReaderModeDistillInApp.isEnabled()) {
-            mReaderModeBottomSheetManager =
-                    new ReaderModeBottomSheetManager(
-                            mActivity,
-                            assertNonNull(getBottomSheetController()),
-                            mActivityTabProvider,
-                            mBrowserControlsManager,
-                            mToolbarThemeColorProvider);
-        }
+        mReaderModeBottomSheetManager =
+                new ReaderModeBottomSheetManager(
+                        mActivity,
+                        assertNonNull(getBottomSheetController()),
+                        mActivityTabProvider,
+                        mBrowserControlsManager,
+                        mToolbarThemeColorProvider);
 
         if (DeviceInfo.isAutomotive()) {
             mAutomotiveBackButtonToolbarCoordinator =
