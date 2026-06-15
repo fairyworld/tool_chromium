@@ -234,11 +234,6 @@ const base::DictValue* ThemeInfo::GetDisplayProperties(
   return theme_info ? &theme_info->theme_display_properties_ : nullptr;
 }
 
-// static
-const base::DictValue* ThemeInfo::GetTabGroupColorPalette(
-    const Extension* extension) {
-  return nullptr;
-}
 
 ThemeHandler::ThemeHandler() = default;
 

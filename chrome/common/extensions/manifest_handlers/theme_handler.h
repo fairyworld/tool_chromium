@@ -34,8 +34,6 @@ struct ThemeInfo : public Extension::ManifestData {
   static const base::DictValue* GetTints(const Extension* extension);
   static const base::DictValue* GetDisplayProperties(
       const Extension* extension);
-  static const base::DictValue* GetTabGroupColorPalette(
-      const Extension* extension);
 
   // A map of resource ids to ExtensionResource entries.
   ThemeImages theme_images_;
