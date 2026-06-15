@@ -190,10 +190,10 @@ class TestPaymentsAutofillClient : public PaymentsAutofillClient {
       base::span<const Suggestion> suggestions) override;
   bool ShowTouchToFillIban(
       base::WeakPtr<TouchToFillPaymentMethodDelegate> delegate,
-      base::span<const autofill::Iban> ibans_to_suggest) override;
+      base::span<const Iban> ibans_to_suggest) override;
   bool ShowTouchToFillAffiliatedLoyaltyCard(
       base::WeakPtr<TouchToFillPaymentMethodDelegate> delegate,
-      std::vector<autofill::LoyaltyCard> loyalty_cards_to_suggest) override;
+      std::vector<LoyaltyCard> loyalty_cards_to_suggest) override;
   bool ShowTouchToFillForAllLoyaltyCards(
       base::WeakPtr<TouchToFillPaymentMethodDelegate> delegate,
       std::vector<LoyaltyCard> loyalty_cards_to_suggest) override;
