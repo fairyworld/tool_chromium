@@ -1647,7 +1647,7 @@ IN_PROC_BROWSER_TEST_P(SoftNavigationTest, BackForwardCache) {
         GetMetricFromUkmEntry(bfcache_restores[url_a_after_softnav2].get(),
                               kNumInteractionsBeforeSoftNav);
     std::optional<int64_t> num_interactions_soft_nav = GetMetricFromUkmEntry(
-        soft_navigation_entries[1],
+        soft_navigation_entries[2],
         SoftNavigation::kInteractiveTiming_NumInteractionsName);
     std::optional<int64_t> num_interactions = GetMetricFromUkmEntry(
         bfcache_restores[url_a_after_softnav2].get(),
