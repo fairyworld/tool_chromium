@@ -2,16 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/optimization_guide/private_ai_model_execution_fetcher.h"
+#include "components/optimization_guide/core/model_execution/private_ai_model_execution_fetcher.h"
 
 #include <utility>
 
 #include "base/strings/string_split.h"
 #include "base/types/expected.h"
-#include "chrome/browser/private_ai/private_ai_utils.h"
 #include "components/optimization_guide/core/model_execution/feature_keys.h"
 #include "components/optimization_guide/core/model_execution/model_execution_fetcher.h"
 #include "components/optimization_guide/core/model_execution/optimization_guide_model_execution_error.h"
+#include "components/optimization_guide/core/model_execution/private_ai_utils.h"
 #include "components/optimization_guide/core/optimization_guide_proto_util.h"
 #include "components/optimization_guide/proto/common_types.pb.h"
 #include "components/optimization_guide/proto/features/zero_state_suggestions.pb.h"

@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_PRIVATE_AI_PRIVATE_AI_UTILS_H_
-#define CHROME_BROWSER_PRIVATE_AI_PRIVATE_AI_UTILS_H_
+#ifndef COMPONENTS_OPTIMIZATION_GUIDE_CORE_MODEL_EXECUTION_PRIVATE_AI_UTILS_H_
+#define COMPONENTS_OPTIMIZATION_GUIDE_CORE_MODEL_EXECUTION_PRIVATE_AI_UTILS_H_
 
 #include "components/optimization_guide/proto/model_execution.pb.h"
 #include "components/private_ai/proto/private_ai.pb.h"
@@ -21,4 +21,4 @@ void PopulatePaicMessage(
 
 }  // namespace private_ai
 
-#endif  // CHROME_BROWSER_PRIVATE_AI_PRIVATE_AI_UTILS_H_
+#endif  // COMPONENTS_OPTIMIZATION_GUIDE_CORE_MODEL_EXECUTION_PRIVATE_AI_UTILS_H_

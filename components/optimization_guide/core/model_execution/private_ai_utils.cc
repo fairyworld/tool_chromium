@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/private_ai/private_ai_utils.h"
+#include "components/optimization_guide/core/model_execution/private_ai_utils.h"
 
 #include <set>
 #include <vector>

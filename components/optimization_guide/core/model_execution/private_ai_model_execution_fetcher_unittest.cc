@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/optimization_guide/private_ai_model_execution_fetcher.h"
+#include "components/optimization_guide/core/model_execution/private_ai_model_execution_fetcher.h"
 
 #include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
