@@ -461,14 +461,13 @@ when making any local modifications or forks.
 
 ### Restricted Licenses
 
-Restricted licenses (like GPL or LGPL) have stricter requirements and require
-case-by-case approval.
+Restricted licenses (like GPL) have stricter requirements and require
+case-by-case approval unless they have been added to the
+[allowlist](https://source.chromium.org/chromium/chromium/tools/depot_tools/+/main:metadata/fields/custom/license_allowlist.py)
+(e.g. LGPL).
 
 Common cases that are allowed (but still require a request):
 *   **[GPL-2.0](https://spdx.org/licenses/GPL-2.0.html)** licenses are allowed for all non-shipped dependencies.
-*   **[LGPL-2.1](https://spdx.org/licenses/LGPL-2.1.html)** is allowed if dynamically linked as part of a Chromium binary
-    (which ensures compliance for downstream proprietary builds like Google
-    Chrome).
 
 #### File a Restricted License Request
 
