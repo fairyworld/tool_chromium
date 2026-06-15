@@ -35,6 +35,7 @@ import org.mockito.junit.MockitoRule;
 import org.robolectric.Robolectric;
 
 import org.chromium.base.MathUtils;
+import org.chromium.base.UnownedUserDataHost;
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.base.test.util.Features.DisableFeatures;
 import org.chromium.base.test.util.Features.EnableFeatures;
@@ -53,6 +54,9 @@ import org.chromium.chrome.browser.glic.GlicButtonStateController.ButtonState;
 import org.chromium.chrome.browser.glic.GlicEnabling;
 import org.chromium.chrome.browser.glic.GlicKeyedService;
 import org.chromium.chrome.browser.glic.GlicKeyedServiceFactory;
+import org.chromium.chrome.browser.glic.GlicNudgeDelegate;
+import org.chromium.chrome.browser.glic.GlicNudgeDelegateBridge;
+import org.chromium.chrome.browser.glic.GlicNudgeDelegateBridgeJni;
 import org.chromium.chrome.browser.glic.GlicPrefNames;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.ui.browser_window.ChromeAndroidTask;
@@ -89,6 +93,7 @@ public class StripLayoutTrailingButtonsCoordinatorTest {
     @Mock private ChromeAndroidTaskTracker mTaskTracker;
     @Mock private ChromeAndroidTask mTask;
     @Mock private ActorKeyedService mActorKeyedService;
+    @Mock private GlicNudgeDelegateBridge.Natives mGlicNudgeDelegateBridgeJniMock;
     @Captor private ArgumentCaptor<List<Animator>> mAnimatorsListCaptor;
 
     private Activity mActivity;
@@ -103,6 +108,7 @@ public class StripLayoutTrailingButtonsCoordinatorTest {
     @Before
     public void setUp() {
         GlicEnabling.setEnabledForTesting(ChromeFeatureList.isEnabled(ChromeFeatureList.GLIC));
+        GlicNudgeDelegateBridgeJni.setInstanceForTesting(mGlicNudgeDelegateBridgeJniMock);
 
         PrefChangeRegistrarJni.setInstanceForTesting(mPrefChangeRegistrarJniMock);
         UserPrefsJni.setInstanceForTesting(mUserPrefsJniMock);
@@ -116,6 +122,7 @@ public class StripLayoutTrailingButtonsCoordinatorTest {
         mActivity = Robolectric.buildActivity(TestActivity.class).setup().get();
         mActivity.setTheme(R.style.Theme_BrowserUI_DayNight);
         when(mWindowAndroid.getActivity()).thenReturn(new WeakReference<>(mActivity));
+        when(mWindowAndroid.getUnownedUserDataHost()).thenReturn(new UnownedUserDataHost());
         when(mToolbarContainerView.getRootView()).thenReturn(mToolbarContainerView);
         when(mToolbarContainerView.getResources()).thenReturn(mActivity.getResources());
 
@@ -308,8 +315,9 @@ public class StripLayoutTrailingButtonsCoordinatorTest {
 
     @Test
     public void testGlicDismissNudgeButton() {
-        mCoordinator.setGlicButtonText("Glic Nudge Text", /* isActor= */ false);
-        mCoordinator.setGlicDismissNudgeButtonVisible(true);
+        mCoordinator
+                .getGlicNudgeDelegateForTesting()
+                .onTriggerGlicNudgeUi("Glic Nudge Text", "", "");
 
         // Verify initial state: Dismiss button visible, Glic button text correct.
         assertNotNull("Dismiss button should exist", mGlicDismissButton);
@@ -461,9 +469,7 @@ public class StripLayoutTrailingButtonsCoordinatorTest {
         StripLayoutTrailingButtonsCoordinator coordinatorSpy = Mockito.spy(mCoordinator);
 
         // 1. Test Glic Button Expansion Transition (Simulating contextual cueing nudge)
-        coordinatorSpy.setGlicDismissNudgeButtonVisible(true);
-        coordinatorSpy.setGlicButtonText("Glic Nudge", /* isActor= */ false);
-        coordinatorSpy.updateButtonTextProperties(mGlicButton);
+        coordinatorSpy.setNudgeLabelForTesting("Glic Nudge");
         Mockito.verify(coordinatorSpy, Mockito.atLeastOnce())
                 .startAnimations(mAnimatorsListCaptor.capture(), Mockito.any());
         assertEquals(
@@ -476,9 +482,7 @@ public class StripLayoutTrailingButtonsCoordinatorTest {
 
         // 2. Test Glic Button Shrink/Collapse Transition (Simulating contextual cueing nudge
         // dismissal)
-        coordinatorSpy.setGlicDismissNudgeButtonVisible(false);
-        coordinatorSpy.setGlicButtonText(null, /* isActor= */ false);
-        coordinatorSpy.updateButtonTextProperties(mGlicButton);
+        coordinatorSpy.setNudgeLabelForTesting(null);
         Mockito.verify(coordinatorSpy, Mockito.atLeastOnce())
                 .startAnimations(mAnimatorsListCaptor.capture(), Mockito.any());
         assertEquals(
@@ -561,6 +565,33 @@ public class StripLayoutTrailingButtonsCoordinatorTest {
                 "Primary Glic button text should be restored to default.",
                 mActivity.getString(R.string.glic_button_entrypoint_ask_gemini_label),
                 glicButton.getText());
+    }
+
+    @Test
+    public void testGlicNudgeDelegate() {
+        assertNotNull("Glic button should be created.", mGlicButton);
+        assertNotNull("Glic dismiss button should be created.", mGlicDismissButton);
+
+        GlicNudgeDelegate delegate = mCoordinator.getGlicNudgeDelegateForTesting();
+        assertNotNull("Glic nudge delegate should be created.", delegate);
+        assertFalse("Nudge should not be showing initially.", delegate.getIsShowingGlicNudge());
+
+        // 1. Trigger the nudge via delegate method
+        delegate.onTriggerGlicNudgeUi("Nudge Text", "", "");
+
+        assertTrue("Nudge should be showing after triggering.", delegate.getIsShowingGlicNudge());
+        assertEquals("Glic text should match trigger label.", "Nudge Text", mGlicButton.getText());
+        assertTrue("Dismiss button should be visible.", mGlicDismissButton.isVisible());
+
+        // 2. Hide the nudge via delegate method
+        delegate.onHideGlicNudgeUi();
+
+        assertFalse("Nudge should not be showing after hiding.", delegate.getIsShowingGlicNudge());
+        assertFalse("Dismiss button should not be visible.", mGlicDismissButton.isVisible());
+        assertEquals(
+                "Glic text should have been restored to default.",
+                mActivity.getString(R.string.glic_button_entrypoint_ask_gemini_label),
+                mGlicButton.getText());
     }
 
     private void showGlicActorButton() {

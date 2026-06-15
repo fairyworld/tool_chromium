@@ -665,7 +665,10 @@ if (is_android) {
       "src/org/chromium/chrome/browser/compositor/scene_layer/TabStripSceneLayerTest.java",
     ]
 
-    deps = [ ":chrome_junit_tests_helper" ]
+    deps = [
+      ":chrome_junit_tests_helper",
+      "//chrome/browser/glic/android:jni_headers_java",
+    ]
   }
 
   robolectric_library(
