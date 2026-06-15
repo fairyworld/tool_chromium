@@ -895,6 +895,13 @@ void AutofillDriverIOS::SendEmailVerificationToken(
   NOTIMPLEMENTED();
 }
 
+bool AutofillDriverIOS::IsSafeToFill(const FormFieldData& field,
+                                     FieldType filled_type,
+                                     const url::Origin& main_origin,
+                                     const url::Origin& trigger_origin) const {
+  return router_->IsSafeToFill(field, filled_type, main_origin, trigger_origin);
+}
+
 void AutofillDriverIOS::ScrollFieldIntoView(FieldGlobalId field_id) {
   // TODO(crbug.com/481379667): Implement scrolling logic on iOS.
   NOTIMPLEMENTED();

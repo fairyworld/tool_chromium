@@ -68,6 +68,7 @@
 #include "net/base/net_errors.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 #include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
 
 namespace autofill {
@@ -478,6 +479,14 @@ class ContentAutofillDriverTestWithAddressForm
 
   FormData& address_form() { return address_form_; }
 
+  absl::flat_hash_map<FieldGlobalId, FieldType> field_type_map() {
+    absl::flat_hash_map<FieldGlobalId, FieldType> map;
+    for (const FormFieldData& field : address_form_.fields()) {
+      map.emplace(field.global_id(), UNKNOWN_TYPE);
+    }
+    return map;
+  }
+
  private:
   FormData address_form_;
 };
@@ -699,7 +708,7 @@ TEST_F(ContentAutofillDriverTestWithAddressForm,
   driver().browser_events().ApplyFormAction(
       mojom::FormActionType::kFill, mojom::ActionPersistence::kFill,
       address_form().fields(), FillId::Create(),
-      /*supports_refill=*/false, triggered_origin, {}, Section());
+      /*supports_refill=*/false, triggered_origin, field_type_map(), Section());
 
   run_loop.RunUntilIdle();
 
@@ -726,7 +735,7 @@ TEST_F(ContentAutofillDriverTestWithAddressForm,
   driver().browser_events().ApplyFormAction(
       mojom::FormActionType::kFill, mojom::ActionPersistence::kPreview,
       address_form().fields(), FillId::Create(),
-      /*supports_refill=*/false, triggered_origin, {}, Section());
+      /*supports_refill=*/false, triggered_origin, field_type_map(), Section());
 
   run_loop.RunUntilIdle();
 

@@ -141,6 +141,10 @@ class AutofillDriverIOS final : public AutofillDriver,
       const std::string& email,
       FieldGlobalId token_field_id,
       const std::string& presentation_token) override;
+  bool IsSafeToFill(const FormFieldData& field,
+                    FieldType filled_type,
+                    const url::Origin& main_origin,
+                    const url::Origin& trigger_origin) const override;
 
   void RendererShouldSetSuggestionAvailability(
       const FieldGlobalId& field_id,

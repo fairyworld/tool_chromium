@@ -314,9 +314,16 @@ class ContentAutofillDriver : public AutofillDriver,
                           FieldRendererId field_id) override;
   void OnEmailVerificationTokenShared(FieldRendererId field_id) override;
 
+  // The functions below this line do not cross the IPC boundary.
+  bool IsSafeToFill(const FormFieldData& field,
+                    FieldType filled_type,
+                    const url::Origin& main_origin,
+                    const url::Origin& trigger_origin) const override;
+
   // The router must only route among ContentAutofillDrivers because
   // ContentAutofillDriver casts AutofillDrivers to ContentAutofillDrivers.
-  AutofillDriverRouter& router();
+  AutofillDriverRouter& router() { return owner_->router(); }
+  const AutofillDriverRouter& router() const { return owner_->router(); }
 
   const mojo::AssociatedRemote<mojom::AutofillAgent>& GetAutofillAgent();
 

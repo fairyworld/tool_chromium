@@ -120,6 +120,14 @@ class TestAutofillDriverTemplate : public T {
                                   FieldGlobalId token_field_id,
                                   const std::string& token) override {}
   void ScrollFieldIntoView(FieldGlobalId field_id) override {}
+  bool IsSafeToFill(const FormFieldData& field,
+                    FieldType filled_type,
+                    const url::Origin& main_origin,
+                    const url::Origin& trigger_origin) const override {
+    // Simplified security model which allows to filter (only) fields from the
+    // same origin.
+    return field.origin() == trigger_origin;
+  }
 
   // The return value contains the FieldGlobalIds of all elements (field_id,
   // type) of `field_type_map` for which

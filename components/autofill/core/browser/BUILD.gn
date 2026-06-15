@@ -1652,6 +1652,7 @@ source_set("unit_tests") {
     "form_structure_sectioning_util_unittest.cc",
     "form_structure_unittest.cc",
     "form_types_unittest.cc",
+    "foundations/autofill_driver_router_unittest.cc",
     "foundations/autofill_manager_unittest.cc",
     "foundations/browser_autofill_manager_unittest.cc",
     "foundations/form_forest_unittest.cc",
