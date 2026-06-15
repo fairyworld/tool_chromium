@@ -1549,6 +1549,8 @@ void RenderWidgetHostViewMac::GestureEventAck(
   // but not consumed.
   StopFlingingIfNecessary(event, ack_result);
 
+  mouse_wheel_phase_handler_.GestureEventAck(event, ack_result);
+
   bool consumed = ack_result == blink::mojom::InputEventResultState::kConsumed;
   switch (event.GetType()) {
     case WebInputEvent::Type::kGestureScrollBegin:
@@ -1564,7 +1566,6 @@ void RenderWidgetHostViewMac::GestureEventAck(
     default:
       break;
   }
-  mouse_wheel_phase_handler_.GestureEventAck(event, ack_result);
 }
 
 void RenderWidgetHostViewMac::ProcessAckedTouchEvent(
