@@ -451,7 +451,7 @@ public class TopToolbarCoordinator implements Toolbar, TopControlLayer {
         // difference with the toolbar background color defined by system color theme. So we still
         // enable the overlay on XR devices. See https://crbug.com/377982076.
         if (DeviceClassManager.enableFullscreen() || DeviceInfo.isXr()) {
-            int layoutsToShowOn = LayoutType.BROWSING | LayoutType.TAB_SWITCHER;
+            int layoutsToShowOn = LayoutType.BROWSING | LayoutType.HUB;
             mOverlayCoordinator =
                     new TopToolbarOverlayCoordinator(
                             mToolbarLayout.getContext(),

@@ -404,7 +404,7 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
 
         @Override
         public void onTitleUpdated(Tab tab) {
-            setActivityTitle(tab, /* isTabSwitcher= */ false);
+            setActivityTitle(tab, /* isHub= */ false);
         }
 
         private void swapToTab(@Nullable Tab tab) {
@@ -423,7 +423,7 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                             new BottomOverscrollHandler(mBrowserControlsManager));
                 }
             }
-            setActivityTitle(tab, /* isTabSwitcher= */ false);
+            setActivityTitle(tab, /* isHub= */ false);
         }
 
         @Override
@@ -634,10 +634,10 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                 new LayoutStateProvider.LayoutStateObserver() {
                     @Override
                     public void onStartedShowing(int layoutType) {
-                        if (layoutType == LayoutType.TAB_SWITCHER) {
+                        if (layoutType == LayoutType.HUB) {
                             assert mHistoryNavigationCoordinator != null;
                             mHistoryNavigationCoordinator.reset();
-                            setActivityTitle(/* tab= */ null, /* isTabSwitcher= */ true);
+                            setActivityTitle(/* tab= */ null, /* isHub= */ true);
                         }
                     }
                 };
@@ -2688,7 +2688,7 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
         return mKeyboardFocusRowManager;
     }
 
-    private void setActivityTitle(@Nullable Tab tab, boolean isTabSwitcher) {
+    private void setActivityTitle(@Nullable Tab tab, boolean isHub) {
         // Do not update title after Activity destruction.
         if (mActivity == null) {
             return;
@@ -2701,7 +2701,7 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                                 .getString(R.string.accessibility_default_app_label)
                         : mApplicationLabel.toString();
         String subTitle;
-        if (isTabSwitcher) {
+        if (isHub) {
             subTitle =
                     mActivity.getResources().getString(R.string.accessibility_tab_switcher_title);
         } else if (tab != null) {

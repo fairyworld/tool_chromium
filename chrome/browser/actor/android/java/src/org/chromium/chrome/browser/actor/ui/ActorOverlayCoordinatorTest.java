@@ -188,7 +188,7 @@ public class ActorOverlayCoordinatorTest {
         verify(mView).setVisibility(View.VISIBLE);
 
         // Change layout type to TAB_SWITCHER.
-        Mockito.when(mLayoutManager.getActiveLayoutType()).thenReturn(LayoutType.TAB_SWITCHER);
+        Mockito.when(mLayoutManager.getActiveLayoutType()).thenReturn(LayoutType.HUB);
         mediator.onStartedShowing(LayoutType.BROWSING);
 
         verify(mView).setVisibility(View.GONE);
@@ -196,7 +196,7 @@ public class ActorOverlayCoordinatorTest {
         // Change layout type back to BROWSING.
         Mockito.clearInvocations(mView);
         Mockito.when(mLayoutManager.getActiveLayoutType()).thenReturn(LayoutType.BROWSING);
-        mediator.onStartedShowing(LayoutType.TAB_SWITCHER);
+        mediator.onStartedShowing(LayoutType.HUB);
 
         verify(mView).setVisibility(View.VISIBLE);
     }
@@ -325,7 +325,7 @@ public class ActorOverlayCoordinatorTest {
         verify(mView, Mockito.atLeastOnce()).setVisibility(View.GONE);
 
         // Change layout to TAB_SWITCHER to prevent line 317 from showing it eagerly
-        Mockito.when(mLayoutManager.getActiveLayoutType()).thenReturn(LayoutType.TAB_SWITCHER);
+        Mockito.when(mLayoutManager.getActiveLayoutType()).thenReturn(LayoutType.HUB);
 
         // Set state back to active to ensure onShown shows it
         tabController.onUiTabStateChange(

@@ -386,19 +386,19 @@ public class ReadAloudControllerUnitTest {
     @Test
     public void testHideShowPlayer_tabSwitcher() {
         requestAndStartPlayback();
-        mLayoutStateObserver.getValue().onStartedShowing(LayoutType.TAB_SWITCHER);
+        mLayoutStateObserver.getValue().onStartedShowing(LayoutType.HUB);
         verify(mPlayerCoordinator).hidePlayers();
 
-        mLayoutStateObserver.getValue().onFinishedHiding(LayoutType.TAB_SWITCHER);
+        mLayoutStateObserver.getValue().onFinishedHiding(LayoutType.HUB);
         verify(mPlayerCoordinator).restorePlayers();
     }
 
     @Test
     public void testDontHidePlayerWithNoPlayback_tabSwitcherUi() {
-        mLayoutStateObserver.getValue().onStartedShowing(LayoutType.TAB_SWITCHER);
+        mLayoutStateObserver.getValue().onStartedShowing(LayoutType.HUB);
         verify(mPlayerCoordinator, never()).hidePlayers();
 
-        mLayoutStateObserver.getValue().onFinishedHiding(LayoutType.TAB_SWITCHER);
+        mLayoutStateObserver.getValue().onFinishedHiding(LayoutType.HUB);
         verify(mPlayerCoordinator, never()).restorePlayers();
     }
 
@@ -3116,13 +3116,13 @@ public class ReadAloudControllerUnitTest {
     public void testMaybeShowPlayer_suppressedByTabSwitcher() {
         requestAndStartPlayback();
 
-        mLayoutStateObserver.getValue().onStartedShowing(LayoutType.TAB_SWITCHER);
+        mLayoutStateObserver.getValue().onStartedShowing(LayoutType.HUB);
 
         reset(mPlayerCoordinator);
         mController.maybeShowPlayer();
         verify(mPlayerCoordinator, never()).restorePlayers();
 
-        mLayoutStateObserver.getValue().onFinishedHiding(LayoutType.TAB_SWITCHER);
+        mLayoutStateObserver.getValue().onFinishedHiding(LayoutType.HUB);
         verify(mPlayerCoordinator).restorePlayers();
     }
 

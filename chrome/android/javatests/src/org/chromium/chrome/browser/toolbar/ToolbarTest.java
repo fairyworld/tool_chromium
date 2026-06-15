@@ -582,7 +582,7 @@ public class ToolbarTest {
 
         // 4. Enter the tab switcher.
         LayoutTestUtils.startShowingAndWaitForLayout(
-                mActivity.getLayoutManager(), LayoutType.TAB_SWITCHER, false);
+                mActivity.getLayoutManager(), LayoutType.HUB, false);
 
         // 5. Verify accessibility order is reset upon entering tab switcher.
         verifyAccessibilityOrderIsReset(toolbarPhone, null);

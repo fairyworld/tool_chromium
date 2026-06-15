@@ -166,6 +166,7 @@ import org.chromium.components.search_engines.TemplateUrlService;
 import org.chromium.components.signin.identitymanager.IdentityManager;
 import org.chromium.components.sync.SyncService;
 import org.chromium.components.sync_device_info.FormFactor;
+import org.chromium.components.tab_groups.TabGroupColorId;
 import org.chromium.components.tab_groups.TabGroupsFeatureMap;
 import org.chromium.components.user_prefs.UserPrefs;
 import org.chromium.components.user_prefs.UserPrefsJni;
@@ -189,6 +190,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 /** Unit tests for {@link TabbedAppMenuPropertiesDelegate}. */
@@ -599,7 +601,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
     }
 
     private void setUpMocksForOverviewMenu() {
-        when(mLayoutStateProvider.isLayoutVisible(LayoutType.TAB_SWITCHER)).thenReturn(true);
+        when(mLayoutStateProvider.isLayoutVisible(LayoutType.HUB)).thenReturn(true);
         when(mTabModelSelector.getTotalTabCount()).thenReturn(1);
         setUpIncognitoMocks();
         assertEquals(MenuGroup.OVERVIEW_MODE_MENU, mTabbedAppMenuPropertiesDelegate.getMenuGroup());
@@ -1714,7 +1716,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         IncognitoUtils.setShouldOpenIncognitoAsWindowForTesting(true);
         when(mTabModel.getCount()).thenReturn(1);
         when(mTabModelSelector.getCurrentModel()).thenReturn(mTabModel);
-        when(mLayoutStateProvider.isLayoutVisible(LayoutType.TAB_SWITCHER)).thenReturn(true);
+        when(mLayoutStateProvider.isLayoutVisible(LayoutType.HUB)).thenReturn(true);
         when(mTabModelSelector.getTotalTabCount()).thenReturn(1);
         setUpIncognitoMocks();
         when(mTabbedAppMenuPropertiesDelegate.isMultiInstanceEnabled()).thenReturn(true);
@@ -1745,7 +1747,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         when(mIncognitoTabModel.getCount()).thenReturn(1);
         when(mTabModelSelector.getCurrentModel()).thenReturn(mIncognitoTabModel);
         when(mIncognitoTabModel.isIncognito()).thenReturn(true);
-        when(mLayoutStateProvider.isLayoutVisible(LayoutType.TAB_SWITCHER)).thenReturn(true);
+        when(mLayoutStateProvider.isLayoutVisible(LayoutType.HUB)).thenReturn(true);
         when(mTabModelSelector.getTotalTabCount()).thenReturn(1);
         setUpIncognitoMocks();
 
@@ -1774,7 +1776,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         when(mIncognitoTabModel.getCount()).thenReturn(1);
         when(mTabModelSelector.getCurrentModel()).thenReturn(mIncognitoTabModel);
         when(mIncognitoTabModel.isIncognito()).thenReturn(true);
-        when(mLayoutStateProvider.isLayoutVisible(LayoutType.TAB_SWITCHER)).thenReturn(true);
+        when(mLayoutStateProvider.isLayoutVisible(LayoutType.HUB)).thenReturn(true);
         when(mTabModelSelector.getTotalTabCount()).thenReturn(1);
         setUpIncognitoMocks();
         when(mTabbedAppMenuPropertiesDelegate.isMultiInstanceEnabled()).thenReturn(true);
@@ -1905,7 +1907,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
     private void checkOverviewMenuItems(boolean newIncognitoWindowEnabled) {
         setUpIncognitoMocks();
-        when(mLayoutStateProvider.isLayoutVisible(LayoutType.TAB_SWITCHER)).thenReturn(false);
+        when(mLayoutStateProvider.isLayoutVisible(LayoutType.HUB)).thenReturn(false);
         when(mTabModel.getCount()).thenReturn(0);
 
         assertEquals(
@@ -3348,7 +3350,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
     private void setUpMocksForPageMenu() {
         mActivityTabProvider.setForTesting(mTab);
-        when(mLayoutStateProvider.isLayoutVisible(LayoutType.TAB_SWITCHER)).thenReturn(false);
+        when(mLayoutStateProvider.isLayoutVisible(LayoutType.HUB)).thenReturn(false);
         doReturn(false)
                 .when(mTabbedAppMenuPropertiesDelegate)
                 .shouldCheckBookmarkStar(any(Tab.class));
@@ -3875,7 +3877,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
     @Test
     @EnableFeatures({ChromeFeatureList.SUBMENUS_IN_APP_MENU})
     public void testToggleBookmarksBarMenuItemString() {
-        when(mTab.getUrl()).thenReturn(org.chromium.url.JUnitTestGURLs.EXAMPLE_URL);
+        when(mTab.getUrl()).thenReturn(JUnitTestGURLs.EXAMPLE_URL);
         setUpMocksForPageMenu();
 
         // Bookmark bar is visible.
@@ -4116,10 +4118,9 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         Token token1 = new Token(1L, 1L);
         when(tabModel.getTabGroupCount()).thenReturn(1);
-        when(tabModel.getAllTabGroupIds()).thenReturn(java.util.Set.of(token1));
+        when(tabModel.getAllTabGroupIds()).thenReturn(Set.of(token1));
         when(tabModel.getTabGroupTitle(token1)).thenReturn("Group 1");
-        when(tabModel.getTabGroupColorWithFallback(token1))
-                .thenReturn(org.chromium.components.tab_groups.TabGroupColorId.BLUE);
+        when(tabModel.getTabGroupColorWithFallback(token1)).thenReturn(TabGroupColorId.BLUE);
 
         Tab tab1 = Mockito.mock(Tab.class);
         when(tab1.getId()).thenReturn(101);
@@ -4186,10 +4187,9 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
     private Tab setUpMockTabGroup(TabModel tabModel, boolean isIncognito, boolean hasGroupId) {
         Token token1 = new Token(1L, 1L);
         when(tabModel.getTabGroupCount()).thenReturn(1);
-        when(tabModel.getAllTabGroupIds()).thenReturn(java.util.Set.of(token1));
+        when(tabModel.getAllTabGroupIds()).thenReturn(Set.of(token1));
         when(tabModel.getTabGroupTitle(token1)).thenReturn("Group 1");
-        when(tabModel.getTabGroupColorWithFallback(token1))
-                .thenReturn(org.chromium.components.tab_groups.TabGroupColorId.BLUE);
+        when(tabModel.getTabGroupColorWithFallback(token1)).thenReturn(TabGroupColorId.BLUE);
 
         Tab tab = Mockito.mock(Tab.class);
         when(tab.getId()).thenReturn(101);
@@ -4223,8 +4223,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                 invocation -> {
                     FaviconHelper.FaviconImageCallback callback = invocation.getArgument(5);
                     callback.onFaviconAvailable(
-                            Bitmap.createBitmap(10, 10, android.graphics.Bitmap.Config.ARGB_8888),
-                            tabUrl);
+                            Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888), tabUrl);
                     return true;
                 };
 
@@ -4278,8 +4277,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                 invocation -> {
                     FaviconHelper.FaviconImageCallback callback = invocation.getArgument(5);
                     callback.onFaviconAvailable(
-                            Bitmap.createBitmap(10, 10, android.graphics.Bitmap.Config.ARGB_8888),
-                            tabUrl);
+                            Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888), tabUrl);
                     return true;
                 };
 

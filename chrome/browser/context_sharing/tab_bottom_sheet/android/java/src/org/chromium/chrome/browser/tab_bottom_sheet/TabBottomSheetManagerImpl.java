@@ -68,7 +68,7 @@ public class TabBottomSheetManagerImpl implements TabBottomSheetManager {
             new LayoutStateObserver() {
                 @Override
                 public void onStartedShowing(@LayoutType int layoutType) {
-                    if (layoutType == LayoutType.TAB_SWITCHER) {
+                    if (layoutType == LayoutType.HUB) {
                         mIsSuppressedOnTabSwitcher = true;
                         maybeCloseBottomSheet();
                     } else if (layoutType == LayoutType.TOOLBAR_SWIPE) {
@@ -79,7 +79,7 @@ public class TabBottomSheetManagerImpl implements TabBottomSheetManager {
 
                 @Override
                 public void onStartedHiding(@LayoutType int layoutType) {
-                    if (layoutType == LayoutType.TAB_SWITCHER) {
+                    if (layoutType == LayoutType.HUB) {
                         mIsSuppressedOnTabSwitcher = false;
                         maybeShowIfNextIsBrowsing();
                     } else if (layoutType == LayoutType.TOOLBAR_SWIPE) {

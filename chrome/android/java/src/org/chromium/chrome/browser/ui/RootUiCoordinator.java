@@ -2200,7 +2200,7 @@ public class RootUiCoordinator
                             }
                         }
 
-                        if (layoutType == LayoutType.TAB_SWITCHER) {
+                        if (layoutType == LayoutType.HUB) {
                             // Hide find toolbar and app menu.
                             if (mFindToolbarManager != null) mFindToolbarManager.hideToolbar();
                             hideAppMenu();
@@ -2219,7 +2219,7 @@ public class RootUiCoordinator
 
                     @Override
                     public void onFinishedShowing(int layoutType) {
-                        if (layoutType == LayoutType.TAB_SWITCHER) {
+                        if (layoutType == LayoutType.HUB) {
                             // Ideally we wouldn't allow the app menu to show while animating the
                             // overview mode. This is hard to track, however, because in some
                             // instances #onOverviewModeStartedShowing is called after
@@ -2233,14 +2233,14 @@ public class RootUiCoordinator
 
                     @Override
                     public void onStartedHiding(int layoutType) {
-                        if (layoutType == LayoutType.TAB_SWITCHER) {
+                        if (layoutType == LayoutType.HUB) {
                             hideAppMenu();
                         }
                     }
 
                     @Override
                     public void onFinishedHiding(int layoutType) {
-                        if (layoutType != LayoutType.TAB_SWITCHER) {
+                        if (layoutType != LayoutType.HUB) {
                             hideAppMenu();
                         }
                     }
@@ -2744,7 +2744,7 @@ public class RootUiCoordinator
         }
         if (mLayoutManager != null) {
             outPersistentState.putBoolean(
-                    IS_TAB_SWITCHER_SHOWN, mLayoutManager.isLayoutVisible(LayoutType.TAB_SWITCHER));
+                    IS_TAB_SWITCHER_SHOWN, mLayoutManager.isLayoutVisible(LayoutType.HUB));
         }
     }
 

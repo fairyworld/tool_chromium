@@ -799,13 +799,11 @@ public class StripLayoutHelperManagerTest {
     @Test
     public void testGetVirtualViews_TabSwitcher() {
         List<VirtualView> views = new ArrayList<>();
-        mStripLayoutHelperManager
-                .getTabSwitcherObserver()
-                .onFinishedShowing(LayoutType.TAB_SWITCHER);
+        mStripLayoutHelperManager.getTabSwitcherObserver().onFinishedShowing(LayoutType.HUB);
         mStripLayoutHelperManager.getVirtualViews(views);
         assertTrue("Views are empty when tab switcher is showing.", views.isEmpty());
 
-        mStripLayoutHelperManager.getTabSwitcherObserver().onStartedHiding(LayoutType.TAB_SWITCHER);
+        mStripLayoutHelperManager.getTabSwitcherObserver().onStartedHiding(LayoutType.HUB);
         mStripLayoutHelperManager.getVirtualViews(views);
         assertFalse("Views are not empty after tab switcher is hiding.", views.isEmpty());
     }

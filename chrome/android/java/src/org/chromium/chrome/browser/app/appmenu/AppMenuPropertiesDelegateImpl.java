@@ -280,12 +280,12 @@ public abstract class AppMenuPropertiesDelegateImpl implements AppMenuProperties
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     public boolean shouldShowPageMenu() {
-        boolean isInTabSwitcher = isInTabSwitcher();
+        boolean isInHub = isInHub();
         if (mIsTablet) {
             boolean hasTabs = mTabModelSelector.getCurrentModel().getCount() != 0;
-            return hasTabs && !isInTabSwitcher;
+            return hasTabs && !isInHub;
         } else {
-            return !isInTabSwitcher;
+            return !isInHub;
         }
     }
 
@@ -296,15 +296,15 @@ public abstract class AppMenuPropertiesDelegateImpl implements AppMenuProperties
         @MenuGroup int menuGroup = MenuGroup.INVALID;
         if (shouldShowPageMenu()) menuGroup = MenuGroup.PAGE_MENU;
 
-        boolean isInTabSwitcher = isInTabSwitcher();
+        boolean isInHub = isInHub();
         if (mIsTablet) {
             boolean hasTabs = mTabModelSelector.getCurrentModel().getCount() != 0;
-            if (hasTabs && isInTabSwitcher) {
+            if (hasTabs && isInHub) {
                 menuGroup = MenuGroup.OVERVIEW_MODE_MENU;
             } else if (!hasTabs) {
                 menuGroup = MenuGroup.TABLET_EMPTY_MODE_MENU;
             }
-        } else if (isInTabSwitcher) {
+        } else if (isInHub) {
             menuGroup = MenuGroup.OVERVIEW_MODE_MENU;
         }
         assert menuGroup != MenuGroup.INVALID;
@@ -312,12 +312,12 @@ public abstract class AppMenuPropertiesDelegateImpl implements AppMenuProperties
     }
 
     /**
-     * @return Whether the grid tab switcher is showing.
+     * @return Whether the Hub is showing.
      */
-    private boolean isInTabSwitcher() {
+    private boolean isInHub() {
         return mLayoutStateProvider != null
-                && mLayoutStateProvider.isLayoutVisible(LayoutType.TAB_SWITCHER)
-                && !mLayoutStateProvider.isLayoutStartingToHide(LayoutType.TAB_SWITCHER);
+                && mLayoutStateProvider.isLayoutVisible(LayoutType.HUB)
+                && !mLayoutStateProvider.isLayoutStartingToHide(LayoutType.HUB);
     }
 
     @Override

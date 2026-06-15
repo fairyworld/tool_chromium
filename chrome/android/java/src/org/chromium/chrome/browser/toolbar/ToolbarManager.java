@@ -1724,7 +1724,7 @@ public class ToolbarManager
                 new LayoutStateProvider.LayoutStateObserver() {
                     @Override
                     public void onStartedShowing(@LayoutType int layoutType) {
-                        if (layoutType == LayoutType.TAB_SWITCHER) {
+                        if (layoutType == LayoutType.HUB) {
                             mInTabSwitcherTransition = true;
                         }
                         updateForLayout(layoutType);
@@ -1732,7 +1732,7 @@ public class ToolbarManager
 
                     @Override
                     public void onFinishedShowing(int layoutType) {
-                        if (layoutType == LayoutType.TAB_SWITCHER) {
+                        if (layoutType == LayoutType.HUB) {
                             mInTabSwitcherTransition = false;
                             mToolbar.onTabSwitcherTransitionFinished();
                             mIsTabSwitcherFinishedShowingSupplier.set(true);
@@ -1745,7 +1745,7 @@ public class ToolbarManager
 
                     @Override
                     public void onStartedHiding(@LayoutType int layoutType) {
-                        if (layoutType == LayoutType.TAB_SWITCHER) {
+                        if (layoutType == LayoutType.HUB) {
                             mInTabSwitcherTransition = true;
                             mLocationBarModel.updateForNonStaticLayout();
                             mToolbar.setTabSwitcherMode(false);
@@ -1758,7 +1758,7 @@ public class ToolbarManager
 
                     @Override
                     public void onFinishedHiding(@LayoutType int layoutType) {
-                        if (layoutType == LayoutType.TAB_SWITCHER) {
+                        if (layoutType == LayoutType.HUB) {
                             mInTabSwitcherTransition = false;
                             mToolbar.onTabSwitcherTransitionFinished();
                             updateButtonStatus();
@@ -1932,7 +1932,7 @@ public class ToolbarManager
         mIsIncognitoNtpShowingSupplier.set(isIncognitoNewTabPageCurrentlyVisible());
         mIsTabSwitcherFinishedShowingSupplier.set(
                 mLayoutStateProvider != null
-                        && mLayoutStateProvider.getActiveLayoutType() == LayoutType.TAB_SWITCHER);
+                        && mLayoutStateProvider.getActiveLayoutType() == LayoutType.HUB);
         MonotonicObservableSupplier<ManualFillingComponent> manualFillingComponentSupplier =
                 ManualFillingComponentSupplier.from(mWindowAndroid);
         assert manualFillingComponentSupplier != null;
@@ -2021,14 +2021,14 @@ public class ToolbarManager
      * @param layoutType The layout being switched to.
      */
     private void updateForLayout(@LayoutType int layoutType) {
-        if (layoutType == LayoutType.TAB_SWITCHER) {
+        if (layoutType == LayoutType.HUB) {
             mLocationBarModel.updateForNonStaticLayout();
             mToolbar.setTabSwitcherMode(true);
             mToolbarNavControlsEnabledSupplier.set(false);
             updateButtonStatus();
         }
         mIsTabSwitcherFinishedShowingSupplier.set(
-                layoutType == LayoutType.TAB_SWITCHER && !mInTabSwitcherTransition);
+                layoutType == LayoutType.HUB && !mInTabSwitcherTransition);
         mToolbar.setContentAttached(layoutType == LayoutType.BROWSING);
     }
 
@@ -3506,10 +3506,9 @@ public class ToolbarManager
         // TODO(crbug.com/40187309): We shouldn't need to post this. Instead we should wait until
         // the dependencies are ready. This logic was introduced to move asynchronous observer
         // events from the infra (LayoutManager) into the feature using it.
-        if (mLayoutStateProvider.isLayoutVisible(LayoutType.TAB_SWITCHER)) {
+        if (mLayoutStateProvider.isLayoutVisible(LayoutType.HUB)) {
             mControlContainer.post(
-                    mCallbackController.makeCancelable(
-                            () -> updateForLayout(LayoutType.TAB_SWITCHER)));
+                    mCallbackController.makeCancelable(() -> updateForLayout(LayoutType.HUB)));
         }
 
         mAppThemeColorProvider.setLayoutStateProvider(mLayoutStateProvider);

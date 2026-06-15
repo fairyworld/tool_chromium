@@ -138,7 +138,7 @@ public class ClosableTabListEditorTest {
             if (mActivityTestRule
                     .getActivity()
                     .getLayoutManager()
-                    .isLayoutVisible(LayoutType.TAB_SWITCHER)) {
+                    .isLayoutVisible(LayoutType.HUB)) {
                 TabUiTestHelper.leaveTabSwitcher(mActivityTestRule.getActivity());
             }
         }

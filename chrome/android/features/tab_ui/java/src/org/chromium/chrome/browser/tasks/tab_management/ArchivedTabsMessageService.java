@@ -125,7 +125,7 @@ public class ArchivedTabsMessageService
             new LayoutStateObserver() {
                 @Override
                 public void onStartedHiding(@LayoutType int layoutType) {
-                    if (layoutType == LayoutType.TAB_SWITCHER) {
+                    if (layoutType == LayoutType.HUB) {
                         maybeDestroyArchivedTabsDialog();
                     }
                 }

@@ -293,7 +293,7 @@ public class ArchivedTabsMessageServiceUnitTest {
         verify(mArchivedTabsDialogCoordinator, times(0)).destroy();
         assertNotNull(mArchivedTabsMessageService.getArchivedTabsDialogCoordinatorForTesting());
 
-        mLayoutStateObserverCaptor.getValue().onStartedHiding(LayoutType.TAB_SWITCHER);
+        mLayoutStateObserverCaptor.getValue().onStartedHiding(LayoutType.HUB);
         verify(mArchivedTabsDialogCoordinator).destroy();
         assertNull(mArchivedTabsMessageService.getArchivedTabsDialogCoordinatorForTesting());
     }
