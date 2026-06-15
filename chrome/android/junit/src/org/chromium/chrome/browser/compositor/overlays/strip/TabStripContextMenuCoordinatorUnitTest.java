@@ -94,6 +94,7 @@ public class TabStripContextMenuCoordinatorUnitTest {
         when(mTabModel.getMostRecentlyClosedEntryType()).thenReturn(RecentlyClosedEntryType.TAB);
         when(mTabModel.getCount()).thenReturn(2);
         when(mTabModel.getProfile()).thenReturn(mProfile);
+        when(mProfile.getOriginalProfile()).thenReturn(mProfile);
 
         doAnswer(invocation -> Collections.emptyIterator()).when((TabList) mTabModel).iterator();
 

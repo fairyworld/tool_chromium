@@ -208,27 +208,19 @@ public class TabStripContextMenuCoordinator {
                             .build());
         }
         // Add "Pin Gemini" option with divider
-        if (!isIncognito) {
-            Profile profile = mTabModel.getProfile();
-            if (profile != null && GlicEnabling.isEnabledForProfile(profile)) {
-                itemList.add(BasicListMenu.buildMenuDivider(/* isIncognito= */ false));
+        Profile profile = mTabModel.getProfile();
+        if (profile != null) {
+            profile = profile.getOriginalProfile();
+            if (GlicEnabling.isEnabledForProfile(profile)) {
+                itemList.add(BasicListMenu.buildMenuDivider(isIncognito));
 
                 boolean isPinned = GlicUtils.isButtonPinnedToTabStrip(profile);
-                if (isPinned) {
-                    itemList.add(
-                            new ListItemBuilder()
-                                    .withTitleRes(R.string.glic_unpin)
-                                    .withMenuId(R.id.unpin_glic)
-                                    .withIsIncognito(false)
-                                    .build());
-                } else {
-                    itemList.add(
-                            new ListItemBuilder()
-                                    .withTitleRes(R.string.glic_pin)
-                                    .withMenuId(R.id.pin_glic)
-                                    .withIsIncognito(false)
-                                    .build());
-                }
+                itemList.add(
+                        new ListItemBuilder()
+                                .withTitleRes(isPinned ? R.string.glic_unpin : R.string.glic_pin)
+                                .withMenuId(isPinned ? R.id.unpin_glic : R.id.pin_glic)
+                                .withIsIncognito(isIncognito)
+                                .build());
             }
         }
     }
@@ -248,6 +240,9 @@ public class TabStripContextMenuCoordinator {
                 return;
             }
             Profile profile = mTabModel.getProfile();
+            if (profile != null) {
+                profile = profile.getOriginalProfile();
+            }
             if (model.get(MENU_ITEM_ID) == R.id.new_tab_menu_id) {
                 mOnNewTabClick.run();
             } else if (model.get(MENU_ITEM_ID) == R.id.reopen_closed_entry) {
@@ -263,12 +258,15 @@ public class TabStripContextMenuCoordinator {
                     controller.onMenuOrKeyboardAction(
                             R.id.toggle_tab_layout_menu_id, /* fromMenu= */ false);
                 }
-            } else if (model.get(MENU_ITEM_ID) == R.id.pin_glic) {
-                RecordUserAction.record("Android.TabStripMenu.PinGlic");
-                if (profile != null) GlicUtils.setButtonPinnedToTabStrip(profile, true);
-            } else if (model.get(MENU_ITEM_ID) == R.id.unpin_glic) {
-                RecordUserAction.record("Android.TabStripMenu.UnpinGlic");
-                if (profile != null) GlicUtils.setButtonPinnedToTabStrip(profile, false);
+            } else if (model.get(MENU_ITEM_ID) == R.id.pin_glic
+                    || model.get(MENU_ITEM_ID) == R.id.unpin_glic) {
+                boolean isPin = model.get(MENU_ITEM_ID) == R.id.pin_glic;
+                if (isPin) {
+                    RecordUserAction.record("Android.TabStripMenu.PinGlic");
+                } else {
+                    RecordUserAction.record("Android.TabStripMenu.UnpinGlic");
+                }
+                if (profile != null) GlicUtils.setButtonPinnedToTabStrip(profile, isPin);
             }
             assumeNonNull(mMenuWindow).dismiss();
         };
