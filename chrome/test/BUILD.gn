@@ -5070,7 +5070,6 @@ if (!is_android) {
         "//chrome/browser/chromeos:browser_tests",
         "//chrome/browser/chromeos/app_mode",
         "//chrome/browser/chromeos/arc",
-        "//chrome/browser/chromeos/cros_apps:all_browser_tests",
         "//chrome/browser/chromeos/enterprise/cloud_storage",
         "//chrome/browser/chromeos/network",
         "//chrome/browser/chromeos/platform_keys",
