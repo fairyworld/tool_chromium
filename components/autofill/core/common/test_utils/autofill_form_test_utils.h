@@ -63,6 +63,9 @@ struct FieldDescription {
   // the `role`. Only available in layers that have access to browser/.
   std::optional<typename TypeInjection::FieldType> heuristic_type;
 
+  // Exclude the members above since they are not used to describe a field and
+  // thus are not used in the comparison with a field.
+  // LINT.IfChange(FieldDescriptionDataMembers)
   std::optional<LocalFrameToken> host_frame;
   std::optional<FormSignature> host_form_signature;
   std::optional<FieldRendererId> renderer_id;
@@ -94,6 +97,7 @@ struct FieldDescription {
   std::optional<std::u16string> pattern;
   std::optional<std::u16string> css_classes;
   std::optional<base::i18n::TextDirection> text_direction;
+  // LINT.ThenChange(//components/autofill/core/common/test_utils/autofill_form_test_utils.cc:FormFieldDescriptionEq)
 };
 
 struct CreateFormFieldData {
@@ -146,6 +150,9 @@ template <typename FormDescriptionType = CommonFormDescription>
   requires base::is_instantiation<FormDescriptionType,
                                   internal::FormDescription>
 FormData GetFormData(const FormDescriptionType& description);
+
+testing::Matcher<FormFieldData> FormFieldDescriptionEq(
+    const test::CommonFieldDescription& expected);
 
 // Template implementations below.
 
