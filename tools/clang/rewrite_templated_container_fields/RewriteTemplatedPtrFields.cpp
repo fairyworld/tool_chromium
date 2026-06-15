@@ -67,6 +67,7 @@
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/TargetSelect.h"
+
 using namespace clang::ast_matchers;
 
 namespace {
@@ -166,7 +167,7 @@ struct Node {
   // {is_field\,is_excluded\,has_auto_type\,r:::<file
   // path>:::<offset>:::<length>:::<replacement
   // text>\,include-user-header:::<file path>:::-1:::-1:::<include text>}
-  // where is_field,is_excluded, and has_auto_type are booleans represendted as
+  // where is_field,is_excluded, and has_auto_type are booleans represented as
   // 0 or 1.
   std::string ToString() const {
     return llvm::formatv("{{{0:d}\\,{1:d}\\,{2:d}\\,{3}\\,{4}}", is_field,
@@ -353,7 +354,10 @@ static std::string GenerateNewType(const clang::ASTContext& ast_context,
 
   // Convert pointee type to string.
   clang::PrintingPolicy printing_policy(ast_context.getLangOpts());
-  printing_policy.SuppressScope = 1;  // s/blink::Pointee/Pointee/
+  // We want to preserve namespaces/scopes (e.g. keep `blink::Pointee` instead
+  // of suppressing it to `Pointee`). This avoids compile errors in the
+  // rewritten code if the reference is in a different namespace scope.
+  printing_policy.SuppressScope = 0;
   std::string pointee_type_as_string =
       pointee_type.getAsString(printing_policy);
   result += llvm::formatv("raw_ptr<{0}>", pointee_type_as_string);
@@ -806,7 +810,7 @@ AST_MATCHER_P(clang::Expr,
   auto search_calls = callExpr(callee(functionDecl(matchesName("find"))),
                                hasArgument(0, expr().bind("expr")));
 
-  auto unary_op = unaryOperator(has(expr().bind("expr")));
+  auto unary_op = unaryOperator(hasUnaryOperand(expr().bind("expr")));
 
   auto reversed_expr = callExpr(callee(functionDecl(hasName("base::Reversed"))),
                                 hasArgument(0, expr().bind("expr")));
@@ -982,9 +986,24 @@ class ContainerRewriter {
     // TODO: handle rewriting maps.
     auto excluded_containers = matchesName("map");
 
+    // Standard library containers inside uninstantiated/dependent template
+    // definitions (e.g., inside template classes or functions before they are
+    // instantiated) might fail to match method-based AST matchers (like
+    // `container_methods`) due to standard library implementation complexities
+    // (such as inheriting methods from hidden base classes).
+    // Explicitly listing standard containers here guarantees that they are
+    // correctly matched and rewritten in templated code.
+    auto std_containers = classTemplateDecl(hasAnyName(
+        "::std::vector", "::std::list", "::std::deque", "::std::set",
+        "::std::multiset", "::std::unordered_set", "::std::unordered_multiset",
+        "::std::stack", "::std::queue", "::std::priority_queue"));
+
     auto supported_containers = anyOf(
         hasDeclaration(classTemplateSpecializationDecl(
             container_methods, unless(excluded_containers))),
+        hasDeclaration(classTemplateDecl(has(
+            cxxRecordDecl(container_methods, unless(excluded_containers))))),
+        hasDeclaration(std_containers),
         hasDeclaration(typeAliasTemplateDecl(has(typeAliasDecl(
             hasType(qualType(hasDeclaration(classTemplateDecl(has(cxxRecordDecl(
                 container_methods, unless(excluded_containers))))))))))));
@@ -1303,7 +1322,7 @@ class ContainerRewriter {
     // cxxOpCallExprs excluded here since operator= can be invoked as a call
     // expr for classes/structs.
     auto call_expr = traverse(
-        clang::TK_IgnoreUnlessSpelledInSource,
+        clang::TK_AsIs,
         callExpr(forEachArgumentWithParam(
                      expr(anyOf(rhs_expr_variations,
                                 conditionalOperator(
