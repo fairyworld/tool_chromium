@@ -9,7 +9,6 @@
 #include <string_view>
 #include <utility>
 
-#include "base/feature_list.h"
 #include "base/memory/ptr_util.h"
 #include "components/autofill/core/browser/field_types.h"
 #include "components/autofill/core/browser/form_parsing/autofill_scanner.h"
@@ -206,8 +205,6 @@ FirstTwoLastNamesField::ParseComponentNames(ParsingContext& context,
     // Scan for the honorific prefix before checking for unrelated name fields
     // because a honorific prefix field is expected to have very specific labels
     // including "Title:". The latter is matched with |kNameIgnoredRe|.
-    // TODO(crbug.com/40137264): Remove check once feature is launched or
-    // removed.
     if (!v->honorific_prefix_ &&
         ParseField(context, scanner, "HONORIFIC_PREFIX",
                    &v->honorific_prefix_)) {
@@ -485,8 +482,7 @@ std::unique_ptr<FirstLastNameField> FirstLastNameField::Parse(
   if (!field) {
     field = ParseSpecificComponentSequence(context, scanner);
   }
-  if (!field && base::FeatureList::IsEnabled(
-                    features::kAutofillAddressParseSurnameNameSequence)) {
+  if (!field) {
     field = ParseSurnameNameLabelSequence(context, scanner);
   }
   return field;

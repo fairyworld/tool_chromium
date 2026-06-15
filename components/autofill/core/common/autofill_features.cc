@@ -65,13 +65,6 @@ BASE_FEATURE(kAutofillActorSuppressImport, base::FEATURE_DISABLED_BY_DEFAULT);
 // longer depends on address-based Autofill being enabled.
 BASE_FEATURE(kAutofillAddOtherDatatypesPref, base::FEATURE_DISABLED_BY_DEFAULT);
 
-
-// Kill switch: If enabled, NameFieldParser will parse 'Last name, First name'
-// sequence.
-// TODO(crbug.com/329016404): Remove after M146 branch point (2026-02-09).
-BASE_FEATURE(kAutofillAddressParseSurnameNameSequence,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 // Feature flag to control displaying of Autofill suggestions on
 // unclassified fields based on prefix matching. These suggestions are displayed
 // after the user typed a certain number of characters that match some data
