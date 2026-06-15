@@ -58,7 +58,7 @@ class UnboundedSurfaceWindowMac : public UnboundedSurfaceWindow,
       mojo::PendingRemote<viz::mojom::CompositorFrameSinkClient> client)
       override;
 
-  gfx::Rect GetBoundsForTesting() const override;
+  gfx::Rect GetBounds() const override;
 
   // blink::mojom::UnboundedSurfaceHost overrides:
   void UpdateBounds(const gfx::Rect& bounds) override;

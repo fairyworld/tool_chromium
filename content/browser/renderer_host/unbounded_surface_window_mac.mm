@@ -273,7 +273,7 @@ void UnboundedSurfaceWindowMac::GetCompositorFrameSink(
       /*render_input_router_config=*/nullptr);
 }
 
-gfx::Rect UnboundedSurfaceWindowMac::GetBoundsForTesting() const {
+gfx::Rect UnboundedSurfaceWindowMac::GetBounds() const {
   if (!window_) {
     return gfx::Rect();
   }

@@ -33,7 +33,7 @@ class UnboundedSurfaceWindow {
       mojo::PendingRemote<viz::mojom::CompositorFrameSinkClient> client) = 0;
 
   virtual void RouteMouseEvent(const blink::WebMouseEvent& event) = 0;
-  virtual gfx::Rect GetBoundsForTesting() const = 0;
+  virtual gfx::Rect GetBounds() const = 0;
 };
 
 }  // namespace content

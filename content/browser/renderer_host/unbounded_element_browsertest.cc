@@ -226,9 +226,9 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, CompositorPopupAllocation) {
   WaitForFrameReady();
 
   UnboundedSurfaceWindow* window =
-      primary_main_frame_host()->GetUnboundedSurfaceWindowForTesting();
+      primary_main_frame_host()->GetUnboundedSurfaceWindow();
   ASSERT_TRUE(window);
-  gfx::Rect bounds = window->GetBoundsForTesting();
+  gfx::Rect bounds = window->GetBounds();
   EXPECT_EQ(100, bounds.width());
   EXPECT_EQ(100, bounds.height());
 }
@@ -288,7 +288,7 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementHighDPIBrowserTest,
   WaitForFrameReady();
 
   UnboundedSurfaceWindow* window =
-      primary_main_frame_host()->GetUnboundedSurfaceWindowForTesting();
+      primary_main_frame_host()->GetUnboundedSurfaceWindow();
   ASSERT_TRUE(window);
 
   float dsf = primary_main_frame_host()
@@ -297,7 +297,7 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementHighDPIBrowserTest,
                   ->GetDeviceScaleFactor();
   EXPECT_EQ(2.0f, dsf);
 
-  gfx::Rect bounds = window->GetBoundsForTesting();
+  gfx::Rect bounds = window->GetBounds();
   EXPECT_EQ(100, bounds.width());
   EXPECT_EQ(100, bounds.height());
 }
@@ -333,9 +333,9 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
 
   RenderFrameHostImpl* rfh =
       static_cast<RenderFrameHostImpl*>(primary_main_frame_host());
-  UnboundedSurfaceWindow* window = rfh->GetUnboundedSurfaceWindowForTesting();
+  UnboundedSurfaceWindow* window = rfh->GetUnboundedSurfaceWindow();
   ASSERT_TRUE(window);
-  gfx::Rect popup_bounds = window->GetBoundsForTesting();
+  gfx::Rect popup_bounds = window->GetBounds();
   EXPECT_GE(popup_bounds.width(), 200);
   EXPECT_GE(popup_bounds.height(), 90);
 }
@@ -374,14 +374,14 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
 
   RenderFrameHostImpl* rfh =
       static_cast<RenderFrameHostImpl*>(primary_main_frame_host());
-  UnboundedSurfaceWindow* window = rfh->GetUnboundedSurfaceWindowForTesting();
+  UnboundedSurfaceWindow* window = rfh->GetUnboundedSurfaceWindow();
   ASSERT_TRUE(window);
 
   blink::WebMouseEvent event(blink::WebInputEvent::Type::kMouseMove,
                              blink::WebInputEvent::kNoModifiers,
                              base::TimeTicks::Now());
   event.button = blink::WebMouseEvent::Button::kNoButton;
-  gfx::Rect popup_bounds = window->GetBoundsForTesting();
+  gfx::Rect popup_bounds = window->GetBounds();
   const int kMouseOffsetX = 50;
   const int kMouseOffsetY = 50;
   event.SetPositionInWidget(kMouseOffsetX, kMouseOffsetY);
@@ -439,14 +439,14 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
 
   RenderFrameHostImpl* rfh =
       static_cast<RenderFrameHostImpl*>(primary_main_frame_host());
-  UnboundedSurfaceWindow* window = rfh->GetUnboundedSurfaceWindowForTesting();
+  UnboundedSurfaceWindow* window = rfh->GetUnboundedSurfaceWindow();
   ASSERT_TRUE(window);
 
   blink::WebMouseEvent event(blink::WebInputEvent::Type::kMouseMove,
                              blink::WebInputEvent::kNoModifiers,
                              base::TimeTicks::Now());
   event.button = blink::WebMouseEvent::Button::kNoButton;
-  gfx::Rect popup_bounds = window->GetBoundsForTesting();
+  gfx::Rect popup_bounds = window->GetBounds();
   const int kMouseOffsetX = 50;
   const int kMouseOffsetY = 70;
   event.SetPositionInWidget(kMouseOffsetX, kMouseOffsetY);
@@ -569,12 +569,12 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, DynamicBoundsSync) {
   WaitForFrameReady();
 
   UnboundedSurfaceWindow* window =
-      primary_main_frame_host()->GetUnboundedSurfaceWindowForTesting();
+      primary_main_frame_host()->GetUnboundedSurfaceWindow();
   ASSERT_TRUE(window);
 
   // Verify initial bounds
   {
-    gfx::Rect bounds = window->GetBoundsForTesting();
+    gfx::Rect bounds = window->GetBounds();
     EXPECT_EQ(100, bounds.width());
     EXPECT_EQ(100, bounds.height());
   }
@@ -596,7 +596,7 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, DynamicBoundsSync) {
 
   // Verify updated bounds
   {
-    gfx::Rect bounds = window->GetBoundsForTesting();
+    gfx::Rect bounds = window->GetBounds();
     EXPECT_EQ(150, bounds.width());
     EXPECT_EQ(200, bounds.height());
   }
@@ -618,7 +618,7 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
   WaitForFrameReady();
 
   UnboundedSurfaceWindow* window =
-      primary_main_frame_host()->GetUnboundedSurfaceWindowForTesting();
+      primary_main_frame_host()->GetUnboundedSurfaceWindow();
   ASSERT_TRUE(window);
   EXPECT_TRUE(window->is_valid());
 

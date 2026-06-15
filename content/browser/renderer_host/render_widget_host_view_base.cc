@@ -956,8 +956,10 @@ void RenderWidgetHostViewBase::GetUnboundedSurfaceCompositorFrameSink(
   }
 }
 
-UnboundedSurfaceWindow*
-RenderWidgetHostViewBase::GetUnboundedSurfaceWindowForTesting() const {
+UnboundedSurfaceWindow* RenderWidgetHostViewBase::GetUnboundedSurfaceWindow()
+    const {
+  DCHECK(!unbounded_surface_window_ ||
+         base::FeatureList::IsEnabled(blink::features::kUnboundedElement));
   return unbounded_surface_window_.get();
 }
 

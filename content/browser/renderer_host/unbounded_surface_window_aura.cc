@@ -113,7 +113,7 @@ viz::LocalSurfaceId UnboundedSurfaceWindowAura::GetLocalSurfaceId() const {
   return local_surface_id_allocator_.GetCurrentLocalSurfaceId();
 }
 
-gfx::Rect UnboundedSurfaceWindowAura::GetBoundsForTesting() const {
+gfx::Rect UnboundedSurfaceWindowAura::GetBounds() const {
   return window_ ? window_->GetBoundsInScreen() : gfx::Rect();
 }
 

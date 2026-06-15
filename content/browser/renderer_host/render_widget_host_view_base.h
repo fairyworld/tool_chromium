@@ -444,7 +444,7 @@ class CONTENT_EXPORT RenderWidgetHostViewBase
   virtual void GetUnboundedSurfaceCompositorFrameSink(
       mojo::PendingReceiver<viz::mojom::CompositorFrameSink> sink,
       mojo::PendingRemote<viz::mojom::CompositorFrameSinkClient> client);
-  virtual UnboundedSurfaceWindow* GetUnboundedSurfaceWindowForTesting() const;
+  virtual UnboundedSurfaceWindow* GetUnboundedSurfaceWindow() const;
 
   // Updates the tooltip text and its position and displays the requested
   // tooltip on the screen. The |bounds| parameter corresponds to the bounds of

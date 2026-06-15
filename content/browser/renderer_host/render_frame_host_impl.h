@@ -2668,7 +2668,7 @@ class CONTENT_EXPORT RenderFrameHostImpl
       mojo::PendingAssociatedRemote<blink::mojom::UnboundedSurfaceClient>
           client,
       const gfx::Rect& bounds) override;
-  UnboundedSurfaceWindow* GetUnboundedSurfaceWindowForTesting();
+  UnboundedSurfaceWindow* GetUnboundedSurfaceWindow();
   RenderWidgetHostViewBase* GetUnboundedSurfaceRootView(
       RenderWidgetHostViewBase** out_parent_view = nullptr);
 

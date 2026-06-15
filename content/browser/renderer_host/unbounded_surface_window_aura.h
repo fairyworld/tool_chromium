@@ -56,7 +56,7 @@ class UnboundedSurfaceWindowAura : public UnboundedSurfaceWindow,
       override;
 
   void RouteMouseEvent(const blink::WebMouseEvent& event) override;
-  gfx::Rect GetBoundsForTesting() const override;
+  gfx::Rect GetBounds() const override;
 
   // blink::mojom::UnboundedSurfaceHost overrides:
   void UpdateBounds(const gfx::Rect& bounds) override;

@@ -11278,12 +11278,13 @@ RenderWidgetHostViewBase* RenderFrameHostImpl::GetUnboundedSurfaceRootView(
   }
   return nullptr;
 }
-UnboundedSurfaceWindow*
-RenderFrameHostImpl::GetUnboundedSurfaceWindowForTesting() {
+UnboundedSurfaceWindow* RenderFrameHostImpl::GetUnboundedSurfaceWindow() {
+  UnboundedSurfaceWindow* window = nullptr;
   if (RenderWidgetHostViewBase* view = GetUnboundedSurfaceRootView()) {
-    return view->GetUnboundedSurfaceWindowForTesting();  // IN-TEST
+    CHECK(base::FeatureList::IsEnabled(blink::features::kUnboundedElement));
+    window = view->GetUnboundedSurfaceWindow();
   }
-  return nullptr;
+  return window;
 }
 
 void RenderFrameHostImpl::CreateNewPopupWidget(
