@@ -42,6 +42,11 @@ std::unique_ptr<ProfileManagementStepController> CreateFeatureShowcaseStep(
     Profile* profile,
     base::OnceClosure step_completed_callback);
 
+std::unique_ptr<ProfileManagementStepController> CreateFinishOrContinueStep(
+    ProfilePickerWebContentsHost* host,
+    base::OnceCallback<bool()> eligibility_callback,
+    base::OnceClosure step_completed_callback);
+
 class FirstRunFlowController : public ProfileManagementFlowControllerImpl {
  public:
   static constexpr audio::SoundsManager::SoundKey kAmbientSoundKey = 0;

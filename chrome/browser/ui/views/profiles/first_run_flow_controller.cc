@@ -116,6 +116,7 @@ bool IsPostIdentityStep(ProfileManagementFlowController::Step step) {
     case ProfileManagementFlowController::Step::kDefaultBrowser:
     case ProfileManagementFlowController::Step::kSearchEngineChoice:
     case ProfileManagementFlowController::Step::kFeatureShowcase:
+    case ProfileManagementFlowController::Step::kFinishOrContinue:
       return true;
   }
 }
@@ -406,16 +407,15 @@ class DefaultBrowserStepController : public ProfileManagementStepController {
 
 class FeatureShowcaseStepController : public ProfileManagementStepController {
  public:
-  explicit FeatureShowcaseStepController(
-      ProfilePickerWebContentsHost* host,
-      Profile* profile,
-      base::OnceClosure step_completed_callback)
+  FeatureShowcaseStepController(ProfilePickerWebContentsHost* host,
+                                Profile* profile,
+                                base::OnceClosure step_completed_callback)
       : ProfileManagementStepController(host),
         profile_(profile),
         step_completed_callback_(std::move(step_completed_callback)) {
+    CHECK(step_completed_callback_);
     std::vector<std::unique_ptr<FeatureShowcaseStepEligibilityChecker>>
         checkers;
-
     // Register checkers in order of priority (highest first).
     checkers.push_back(std::make_unique<GoogleLensStepEligibilityChecker>());
     checkers.push_back(
@@ -423,6 +423,8 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
     tracker_ = std::make_unique<FeatureShowcaseEligibilityTracker>(
         std::move(checkers));
   }
+
+  bool is_eligible() const { return is_eligible_; }
 
   ~FeatureShowcaseStepController() override = default;
 
@@ -452,7 +454,9 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
 
  private:
   void OnEligibilityDetermined(const std::vector<std::string>& eligible_steps) {
-    if (eligible_steps.empty()) {
+    is_eligible_ = !eligible_steps.empty();
+
+    if (!is_eligible_) {
       std::move(step_shown_callback_.value()).Run(/*success=*/false);
       std::move(step_completed_callback_).Run();
       return;
@@ -493,11 +497,65 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
   }
 
   raw_ptr<Profile> profile_;
+  bool is_eligible_ = false;
   base::OnceClosure step_completed_callback_;
   StepSwitchFinishedCallback step_shown_callback_;
   std::unique_ptr<FeatureShowcaseEligibilityTracker> tracker_;
 
   base::WeakPtrFactory<FeatureShowcaseStepController> weak_ptr_factory_{this};
+};
+
+class FinishOrContinueStepController : public ProfileManagementStepController {
+ public:
+  FinishOrContinueStepController(
+      ProfilePickerWebContentsHost* host,
+      base::OnceCallback<bool()> eligibility_callback,
+      base::OnceClosure step_completed_callback)
+      : ProfileManagementStepController(host),
+        eligibility_callback_(std::move(eligibility_callback)),
+        step_completed_callback_(std::move(step_completed_callback)) {}
+
+  ~FinishOrContinueStepController() override = default;
+
+  void Show(StepSwitchFinishedCallback step_shown_callback,
+            bool reset_state) override {
+    CHECK(reset_state);
+    CHECK(eligibility_callback_);
+    CHECK(!step_shown_callback->is_null());
+    step_shown_callback_ = std::move(step_shown_callback);
+
+    const GURL url = net::AppendQueryParameter(
+        GURL(chrome::kChromeUIIntroURL)
+            .Resolve(chrome::kChromeUIIntroFinishOrContinueSubPage),
+        "showcase", std::move(eligibility_callback_).Run() ? "true" : "false");
+
+    host()->ShowScreenInPickerContents(
+        url, base::BindOnce(&FinishOrContinueStepController::OnLoadFinished,
+                            weak_ptr_factory_.GetWeakPtr()));
+  }
+
+  void OnNavigateBackRequested() override {
+    // Navigating back is not allowed for the finish or continue step.
+    NOTREACHED();
+  }
+
+ private:
+  void OnLoadFinished() {
+    CHECK(!step_shown_callback_->is_null());
+    std::move(step_shown_callback_.value()).Run(/*success=*/true);
+    // TODO(crbug.com/516392211): Remove once button actions are implemented.
+    OnStepCompleted();
+  }
+
+  void OnStepCompleted() {
+    CHECK(step_completed_callback_);
+    std::move(step_completed_callback_).Run();
+  }
+
+  base::OnceCallback<bool()> eligibility_callback_;
+  base::OnceClosure step_completed_callback_;
+  StepSwitchFinishedCallback step_shown_callback_;
+  base::WeakPtrFactory<FinishOrContinueStepController> weak_ptr_factory_{this};
 };
 
 using IdentityStepsCompletedCallback =
@@ -599,6 +657,15 @@ std::unique_ptr<ProfileManagementStepController> CreateFeatureShowcaseStep(
     base::OnceClosure step_completed_callback) {
   return std::make_unique<FeatureShowcaseStepController>(
       host, profile, std::move(step_completed_callback));
+}
+
+std::unique_ptr<ProfileManagementStepController> CreateFinishOrContinueStep(
+    ProfilePickerWebContentsHost* host,
+    base::OnceCallback<bool()> eligibility_callback,
+    base::OnceClosure step_completed_callback) {
+  return std::make_unique<FinishOrContinueStepController>(
+      host, std::move(eligibility_callback),
+      std::move(step_completed_callback));
 }
 
 FirstRunFlowController::FirstRunFlowController(
@@ -859,12 +926,30 @@ FirstRunFlowController::RegisterPostIdentitySteps(
     auto feature_showcase_step_completed =
         base::BindOnce(&FirstRunFlowController::AdvanceToNextPostIdentityStep,
                        base::Unretained(this));
-    RegisterStep(
-        Step::kFeatureShowcase,
-        CreateFeatureShowcaseStep(host(), profile_,
-                                  std::move(feature_showcase_step_completed)));
+    auto feature_showcase_step =
+        std::make_unique<FeatureShowcaseStepController>(
+            host(), profile_, std::move(feature_showcase_step_completed));
+    FeatureShowcaseStepController* feature_showcase_step_ptr =
+        feature_showcase_step.get();
+    RegisterStep(Step::kFeatureShowcase, std::move(feature_showcase_step));
     post_identity_steps.emplace(
         ProfileManagementFlowController::Step::kFeatureShowcase);
+
+    auto finish_or_continue_step_completed =
+        base::BindOnce(&FirstRunFlowController::AdvanceToNextPostIdentityStep,
+                       base::Unretained(this));
+    RegisterStep(
+        Step::kFinishOrContinue,
+        CreateFinishOrContinueStep(
+            host(),
+            base::BindOnce(&FeatureShowcaseStepController::is_eligible,
+                           // Unretained ok: sibling step controllers are
+                           // guaranteed to have the same lifetime as the
+                           // flow controller
+                           base::Unretained(feature_showcase_step_ptr)),
+            std::move(finish_or_continue_step_completed)));
+    post_identity_steps.emplace(
+        ProfileManagementFlowController::Step::kFinishOrContinue);
   }
 
   RegisterStep(
