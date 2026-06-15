@@ -930,6 +930,30 @@ AST_MATCHER_P(clang::TypedefNameDecl,
   return InnerMatcher.matches(Node, Finder, Builder);
 }
 
+AST_MATCHER_P(clang::TypedefNameDecl,
+              typedefHasTypeLoc,
+              clang::ast_matchers::internal::Matcher<clang::TypeLoc>,
+              InnerMatcher) {
+  if (clang::TypeSourceInfo* TInfo = Node.getTypeSourceInfo()) {
+    clang::TypeLoc TLoc = TInfo->getTypeLoc();
+    while (auto QLoc = TLoc.getAs<clang::QualifiedTypeLoc>()) {
+      TLoc = QLoc.getUnqualifiedLoc();
+    }
+    return InnerMatcher.matches(TLoc, Finder, Builder);
+  }
+  return false;
+}
+
+using TypeLocMatcher = clang::ast_matchers::internal::Matcher<clang::TypeLoc>;
+
+TypeLocMatcher underlyingTypeLoc(TypeLocMatcher inner_matcher) {
+  auto typedef_matcher = loc(qualType(hasDeclaration(
+      typedefNameDecl(type_def_name_decl(typedefHasTypeLoc(inner_matcher))))));
+  return anyOf(inner_matcher,
+               qualifiedTypeLoc(hasUnqualifiedLoc(inner_matcher)),
+               typedef_matcher);
+}
+
 class ContainerRewriter {
  public:
   explicit ContainerRewriter(
@@ -1007,20 +1031,14 @@ class ContainerRewriter {
               allOf(raw_ptr_plugin::isInMacroLocation(),
                     unless(raw_ptr_plugin::isRawPtrExclusionAnnotated())));
 
-    // Explicit types are used here instead of auto (which would resolve to
-    // internal VariadicOperatorMatcher types) to avoid C++ template argument
-    // deduction failures when passing them to other matchers like
-    // hasDescendant().
-    clang::ast_matchers::internal::Matcher<clang::TypeLoc> lhs_type_loc =
-        anyOf(hasDescendant(loc(qualType(hasDeclaration(typedefNameDecl(
-                  type_def_name_decl(hasDescendant(lhs_location))))))),
-              hasDescendant(lhs_location));
+    TypeLocMatcher lhs_type_loc =
+        anyOf(underlyingTypeLoc(lhs_location),
+              hasDescendant(underlyingTypeLoc(lhs_location)));
 
     // Supports typedefs as well.
-    clang::ast_matchers::internal::Matcher<clang::TypeLoc> rhs_type_loc =
-        anyOf(hasDescendant(loc(qualType(hasDeclaration(typedefNameDecl(
-                  type_def_name_decl(hasDescendant(rhs_location))))))),
-              hasDescendant(rhs_location));
+    TypeLocMatcher rhs_type_loc =
+        anyOf(underlyingTypeLoc(rhs_location),
+              hasDescendant(underlyingTypeLoc(rhs_location)));
 
     auto lhs_field = fieldDecl(hasExplicitFieldTypeLoc(lhs_type_loc),
                                unless(field_exclusions))
