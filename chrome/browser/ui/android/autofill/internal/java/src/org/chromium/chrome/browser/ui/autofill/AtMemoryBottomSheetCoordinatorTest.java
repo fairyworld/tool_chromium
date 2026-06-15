@@ -92,6 +92,6 @@ public class AtMemoryBottomSheetCoordinatorTest {
         View contentView = mCoordinator.getBottomSheetContentForTesting().getContentView();
         View searchInput = contentView.findViewById(R.id.search_query_input);
         assertNotNull(searchInput);
-        assertTrue(searchInput.isFocused());
+        assertTrue(searchInput.hasFocus());
     }
 }
