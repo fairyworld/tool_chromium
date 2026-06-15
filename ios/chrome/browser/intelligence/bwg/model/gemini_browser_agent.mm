@@ -73,6 +73,7 @@
 #import "ios/chrome/browser/shared/public/commands/omnibox_commands.h"
 #import "ios/chrome/browser/shared/public/commands/settings_commands.h"
 #import "ios/chrome/browser/shared/public/commands/snackbar_commands.h"
+#import "ios/chrome/browser/shared/public/commands/tab_picker_commands.h"
 #import "ios/chrome/browser/shared/public/features/features.h"
 #import "ios/chrome/browser/shared/public/snackbar/snackbar_message.h"
 #import "ios/chrome/browser/shared/ui/symbols/symbols.h"
@@ -263,6 +264,23 @@ GeminiBrowserAgent::GeminiBrowserAgent(Browser* browser)
 
     if (IsGeminiMultiTabContextEnabled()) {
       gemini_tab_picker_handler_ = [[GeminiTabPickerHandler alloc] init];
+
+      CommandDispatcher* dispatcher = browser_->GetCommandDispatcher();
+      gemini_tab_picker_handler_.tabPickerHandler =
+          static_cast<id<TabPickerCommands>>(dispatcher);
+      gemini_tab_picker_handler_.snackbarHandler =
+          static_cast<id<SnackbarCommands>>(dispatcher);
+
+      base::WeakPtr<GeminiBrowserAgent> weak_this = weak_factory_.GetWeakPtr();
+      gemini_tab_picker_handler_.selectionCallback =
+          ^(std::set<web::WebStateID> selectedIDs,
+            std::set<web::WebStateID> cachedIDs) {
+            if (weak_this) {
+              // TODO(crbug.com/503002699): Use selected IDs to pass shared tabs
+              // to Gemini SDK.
+            }
+          };
+
       bwg_gateway_.tabPickerHandler = gemini_tab_picker_handler_;
     }
 
@@ -398,6 +416,7 @@ void GeminiBrowserAgent::BrowserDestroyed(Browser* browser) {
   gemini_link_opening_handler_ = nil;
 
   gemini_actuation_handler_ = nil;
+  gemini_tab_picker_handler_ = nil;
 
   if (identity_manager_) {
     identity_manager_->RemoveObserver(this);
