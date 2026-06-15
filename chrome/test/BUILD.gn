@@ -6404,6 +6404,7 @@ test("unit_tests") {
     "//chrome/browser/lifetime",
     "//chrome/browser/loader:unit_tests",
     "//chrome/browser/login_detection:unit_tests",
+    "//chrome/browser/media:unittests",
     "//chrome/browser/media/prefs",
     "//chrome/browser/media/router",
     "//chrome/browser/media/router:media_router_feature",

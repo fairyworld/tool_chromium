@@ -67,7 +67,7 @@ source_set("unittests") {
     "//services/audio/public/mojom",
     "//testing/gmock",
     "//testing/gtest",
-    "//third_party/blink/public/mojom:mojom_platform",
+    "//third_party/blink/public/common",
   ]
 }
 

@@ -261,6 +261,8 @@ chromium-metrics-reviews@google.com.
       summary="PWA: Show web app installation promotion"/>
   <variant name="WebRTCNeuralResidualEchoEstimator"
       summary="WebRTC Neural Residual Echo Estimator"/>
+  <variant name="WebRTCVoiceIsolationDenoiser"
+      summary="WebRTC Voice Isolation Denoiser"/>
 </variants>
 
 <variants name="OptimizationType">
