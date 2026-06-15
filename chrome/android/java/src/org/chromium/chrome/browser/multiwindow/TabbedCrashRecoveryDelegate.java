@@ -137,6 +137,12 @@ public class TabbedCrashRecoveryDelegate {
                     TAG,
                     "Skipping crash recovery dialog because all other windows already have live"
                             + " tasks.");
+            for (CrashRecoveryWindowInfo windowInfo : crashedWindows) {
+                int windowId = windowInfo.windowId;
+                if (windowId == hostActivity.getWindowId()) continue;
+                ChromeMultiInstancePersistentStore.writeIsRecoverable(
+                        windowId, /* isRecoverable= */ false);
+            }
             return false;
         }
 

@@ -328,6 +328,8 @@ public class TabbedCrashRecoveryDelegateUnitTest {
         assertFalse(shown);
         verifyNoInteractions(mModalDialogManager);
         initWatcher.assertExpected();
+        assertFalse(ChromeMultiInstancePersistentStore.readIsRecoverable(1));
+        assertFalse(ChromeMultiInstancePersistentStore.readIsRecoverable(2));
     }
 
     @Test
