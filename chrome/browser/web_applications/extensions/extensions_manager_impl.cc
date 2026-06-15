@@ -12,10 +12,15 @@
 #include "chrome/browser/extensions/extension_management.h"
 #include "chrome/browser/extensions/extension_service.h"
 #include "chrome/browser/extensions/extension_util.h"
+#include "chrome/browser/extensions/launch_util.h"
 #include "chrome/browser/extensions/preinstalled_extensions.h"
 #include "chrome/browser/profiles/profile.h"
+#include "chrome/browser/web_applications/extensions/web_app_extension_shortcut.h"
 #include "chrome/browser/web_applications/extensions_manager.h"
+#include "chrome/browser/web_applications/mojom/user_display_mode.mojom.h"
+#include "chrome/browser/web_applications/os_integration/web_app_shortcut.h"
 #include "content/public/browser/storage_partition.h"
+#include "extensions/browser/app_sorting.h"
 #include "extensions/browser/delayed_install_manager.h"
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/extension_registry.h"
@@ -145,6 +150,52 @@ bool ExtensionsManagerImpl::DidPreinstalledAppsPerformNewInstallation() {
 bool ExtensionsManagerImpl::IsPreinstalledExtensionAppId(
     const std::string& app_id) {
   return extensions::chrome_app_deprecation::IsPreinstalledAppId(app_id);
+}
+
+void ExtensionsManagerImpl::CopyAppSortingLayout(
+    const std::string& from_extension_id,
+    const std::string& to_web_app_id) {
+  extensions::AppSorting* app_sorting =
+      extensions::ExtensionSystem::Get(profile_)->app_sorting();
+  app_sorting->SetAppLaunchOrdinal(
+      to_web_app_id, app_sorting->GetAppLaunchOrdinal(from_extension_id));
+  app_sorting->SetPageOrdinal(to_web_app_id,
+                              app_sorting->GetPageOrdinal(from_extension_id));
+}
+
+mojom::UserDisplayMode ExtensionsManagerImpl::GetExtensionUserDisplayMode(
+    const std::string& extension_id) {
+  const extensions::Extension* extension =
+      registry_->GetInstalledExtension(extension_id);
+  CHECK(extension);
+
+  if (extension->is_platform_app()) {
+    return mojom::UserDisplayMode::kStandalone;
+  }
+
+  switch (extensions::GetLaunchContainer(
+      extensions::ExtensionPrefs::Get(profile_), extension)) {
+    case apps::LaunchContainer::kLaunchContainerWindow:
+    case apps::LaunchContainer::kLaunchContainerPanelDeprecated:
+      return mojom::UserDisplayMode::kStandalone;
+    case apps::LaunchContainer::kLaunchContainerTab:
+    case apps::LaunchContainer::kLaunchContainerNone:
+      return mojom::UserDisplayMode::kBrowser;
+  }
+}
+
+std::unique_ptr<ShortcutInfo> ExtensionsManagerImpl::GetExtensionShortcutInfo(
+    const std::string& extension_id) {
+  const extensions::Extension* extension =
+      registry_->GetInstalledExtension(extension_id);
+  CHECK(extension);
+  return web_app::ShortcutInfoForExtensionAndProfile(extension, profile_);
+}
+
+void ExtensionsManagerImpl::WaitForExtensionShortcutsDeleted(
+    const std::string& extension_id,
+    base::OnceClosure callback) {
+  web_app::WaitForExtensionShortcutsDeleted(extension_id, std::move(callback));
 }
 
 // Implementation of ExtensionsManager static methods:

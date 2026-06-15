@@ -13,12 +13,9 @@
 #include "base/functional/bind.h"
 #include "base/functional/callback.h"
 #include "build/build_config.h"
-#include "chrome/browser/apps/app_service/app_service_proxy.h"
-#include "chrome/browser/apps/app_service/app_service_proxy_factory.h"
-#include "chrome/browser/extensions/launch_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/web_applications/commands/set_user_display_mode_command.h"
-#include "chrome/browser/web_applications/extensions/web_app_extension_shortcut.h"
+#include "chrome/browser/web_applications/extensions_manager.h"
 #include "chrome/browser/web_applications/locks/with_app_resources.h"
 #include "chrome/browser/web_applications/mojom/user_display_mode.mojom.h"
 #include "chrome/browser/web_applications/os_integration/os_integration_manager.h"
@@ -30,50 +27,19 @@
 #include "chrome/browser/web_applications/web_app_registry_update.h"
 #include "chrome/browser/web_applications/web_app_sync_bridge.h"
 #include "chrome/browser/web_applications/web_app_ui_manager.h"
-#include "components/services/app_service/public/cpp/app_launch_util.h"
-#include "components/services/app_service/public/cpp/app_registry_cache.h"
-#include "components/services/app_service/public/cpp/app_types.h"
-#include "components/services/app_service/public/cpp/app_update.h"
-#include "components/services/app_service/public/cpp/types_util.h"
-#include "extensions/browser/app_sorting.h"
-#include "extensions/browser/extension_prefs.h"
-#include "extensions/browser/extension_registry.h"
-#include "extensions/browser/extension_system.h"
-#include "extensions/common/extension.h"
-#include "extensions/common/extension_set.h"
+#include "components/webapps/browser/installable/installable_metrics.h"
 
 namespace web_app {
 
 namespace {
 
-bool IsAppInstalled(Profile* profile, const webapps::AppId& app_id) {
-  bool installed = false;
-  auto* proxy = apps::AppServiceProxyFactory::GetForProfile(profile);
-  proxy->AppRegistryCache().ForOneApp(
-      app_id, [&installed](const apps::AppUpdate& update) {
-        installed = apps_util::IsInstalled(update.Readiness());
-      });
-  return installed;
-}
-
-mojom::UserDisplayMode GetExtensionUserDisplayMode(
-    Profile* profile,
-    const extensions::Extension* extension) {
-  // Platform apps always open in an app window and their user preference is
-  // meaningless.
-  if (extension->is_platform_app()) {
-    return mojom::UserDisplayMode::kStandalone;
+bool IsAppInstalled(ExtensionsManager& extensions_manager,
+                    const WebAppRegistrar& registrar,
+                    const webapps::AppId& app_id) {
+  if (registrar.GetInstallState(app_id).has_value()) {
+    return true;
   }
-
-  switch (extensions::GetLaunchContainer(
-      extensions::ExtensionPrefs::Get(profile), extension)) {
-    case apps::LaunchContainer::kLaunchContainerWindow:
-    case apps::LaunchContainer::kLaunchContainerPanelDeprecated:
-      return mojom::UserDisplayMode::kStandalone;
-    case apps::LaunchContainer::kLaunchContainerTab:
-    case apps::LaunchContainer::kLaunchContainerNone:
-      return mojom::UserDisplayMode::kBrowser;
-  }
+  return extensions_manager.IsExtensionInstalled(app_id);
 }
 
 }  // namespace
@@ -98,7 +64,8 @@ void WebAppUninstallAndReplaceJob::Start() {
 
   std::vector<webapps::AppId> apps_to_replace;
   for (const webapps::AppId& from_app : from_apps_or_extensions_) {
-    if (IsAppInstalled(&profile_.get(), from_app)) {
+    if (IsAppInstalled(to_app_lock_->extensions_manager(),
+                       to_app_lock_->registrar(), from_app)) {
       apps_to_replace.emplace_back(from_app);
     }
   }
@@ -116,8 +83,7 @@ void WebAppUninstallAndReplaceJob::Start() {
 
   apps_to_replace.erase(apps_to_replace.begin());
   for (const auto& app : apps_to_replace) {
-    auto* proxy = apps::AppServiceProxyFactory::GetForProfile(&profile_.get());
-    proxy->UninstallSilently(app, apps::UninstallSource::kMigration);
+    to_app_lock_->ui_manager().UninstallAppSilentlyForMigration(app);
   }
 }
 
@@ -140,25 +106,17 @@ void WebAppUninstallAndReplaceJob::OnMigrateLauncherState(
     base::OnceClosure on_complete) {
   // If migration of user/UI data is required for other app types consider
   // generalising this operation to be part of app service.
-  const extensions::Extension* from_extension =
-      extensions::ExtensionRegistry::Get(&profile_.get())
-          ->enabled_extensions()
-          .GetByID(from_app);
-  if (from_extension) {
-    // Grid position in chrome://apps.
-    extensions::AppSorting* app_sorting =
-        extensions::ExtensionSystem::Get(&profile_.get())->app_sorting();
-    app_sorting->SetAppLaunchOrdinal(
-        to_app_, app_sorting->GetAppLaunchOrdinal(from_app));
-    app_sorting->SetPageOrdinal(to_app_, app_sorting->GetPageOrdinal(from_app));
+  ExtensionsManager& extensions_manager = to_app_lock_->extensions_manager();
+
+  if (extensions_manager.IsExtensionInstalled(from_app)) {
+    extensions_manager.CopyAppSortingLayout(from_app, to_app_);
 
     SetUserDisplayModeCommand::DoSetDisplayMode(
         *to_app_lock_, to_app_,
-        GetExtensionUserDisplayMode(&profile_.get(), from_extension),
+        extensions_manager.GetExtensionUserDisplayMode(from_app),
         /*is_user_action=*/false);
 
-    auto shortcut_info = web_app::ShortcutInfoForExtensionAndProfile(
-        from_extension, &profile_.get());
+    auto shortcut_info = extensions_manager.GetExtensionShortcutInfo(from_app);
     to_app_lock_->os_integration_manager().GetAppExistingShortCutLocation(
         base::BindOnce(
             &WebAppUninstallAndReplaceJob::OnShortcutLocationGathered,
@@ -181,9 +139,7 @@ void WebAppUninstallAndReplaceJob::
         base::OnceClosure on_complete,
         std::unique_ptr<ShortcutInfo> shortcut_info) {
   if (!shortcut_info) {
-    auto* proxy = apps::AppServiceProxyFactory::GetForProfile(&profile_.get());
-    // The shortcut info couldn't be found, simply uninstall.
-    proxy->UninstallSilently(from_app, apps::UninstallSource::kMigration);
+    to_app_lock_->ui_manager().UninstallAppSilentlyForMigration(from_app);
     std::move(on_complete).Run();
     return;
   }
@@ -199,16 +155,15 @@ void WebAppUninstallAndReplaceJob::OnShortcutLocationGathered(
     const webapps::AppId& from_app,
     base::OnceClosure on_complete,
     ShortcutLocations from_app_locations) {
-  auto* proxy = apps::AppServiceProxyFactory::GetForProfile(&profile_.get());
+  ExtensionsManager& extensions_manager = to_app_lock_->extensions_manager();
 
-  const bool is_extension = proxy->AppRegistryCache().GetAppType(from_app) ==
-                            apps::AppType::kChromeApp;
+  const bool is_extension = extensions_manager.IsExtensionInstalled(from_app);
   bool run_on_os_login = from_app_locations.in_startup;
   if (is_extension) {
-    // Need to be called before `proxy->UninstallSilently` because
-    // UninstallSilently might synchronously finish, so the wait won't get
+    // Need to be called before `UninstallAppSilently` because
+    // UninstallAppSilently might synchronously finish, so the wait won't get
     // finished if called after.
-    WaitForExtensionShortcutsDeleted(
+    extensions_manager.WaitForExtensionShortcutsDeleted(
         from_app,
         base::BindOnce(&WebAppUninstallAndReplaceJob::
                            SynchronizeOSIntegrationForReplacementApp,
@@ -227,7 +182,7 @@ void WebAppUninstallAndReplaceJob::OnShortcutLocationGathered(
   // underlying schedules WebAppUninstallCommand which uses a `AllAppsLock`,
   // so the uninstall command won't get started until current command that holds
   // the `to_app_lock` finishes.
-  proxy->UninstallSilently(from_app, apps::UninstallSource::kMigration);
+  to_app_lock_->ui_manager().UninstallAppSilentlyForMigration(from_app);
 
   if (!is_extension) {
     SynchronizeOSIntegrationForReplacementApp(

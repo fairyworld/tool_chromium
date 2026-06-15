@@ -12,8 +12,11 @@
 #include "base/files/file_path.h"
 #include "base/functional/callback_forward.h"
 #include "chrome/browser/web_applications/extensions_manager.h"
+#include "chrome/browser/web_applications/mojom/user_display_mode.mojom-forward.h"
 
 namespace web_app {
+
+struct ShortcutInfo;
 
 // This class can be used to 'fake' the ExtensionsManager in tests, which
 // attempts to wrap the extensions dependency functionality used by the
@@ -42,6 +45,8 @@ class FakeExtensionsManager : public ExtensionsManager {
   void SetDidPreinstalledAppsPerformNewInstallation(bool perform);
   void SetPreinstalledExtensionAppId(const std::string& app_id,
                                      bool is_preinstalled);
+  void SetUserDisplayMode(const std::string& extension_id,
+                          mojom::UserDisplayMode user_display_mode);
 
   // ExtensionsManager:
   void OnExtensionSystemReady(base::OnceClosure) override;
@@ -58,6 +63,15 @@ class FakeExtensionsManager : public ExtensionsManager {
   bool DidPreinstalledAppsPerformNewInstallation() override;
   bool IsPreinstalledExtensionAppId(const std::string& app_id) override;
 
+  void CopyAppSortingLayout(const std::string& from_extension_id,
+                            const std::string& to_web_app_id) override;
+  mojom::UserDisplayMode GetExtensionUserDisplayMode(
+      const std::string& extension_id) override;
+  std::unique_ptr<ShortcutInfo> GetExtensionShortcutInfo(
+      const std::string& extension_id) override;
+  void WaitForExtensionShortcutsDeleted(const std::string& extension_id,
+                                        base::OnceClosure callback) override;
+
  private:
   bool extensions_system_ready_ = true;
   std::vector<base::OnceClosure> ready_waiters_;
@@ -70,6 +84,7 @@ class FakeExtensionsManager : public ExtensionsManager {
   std::unordered_set<std::string> external_uninstalled_;
   bool did_perform_new_installation_ = false;
   std::unordered_map<std::string, bool> preinstalled_app_ids_overrides_;
+  std::unordered_map<std::string, mojom::UserDisplayMode> user_display_modes_;
 };
 }  // namespace web_app
 

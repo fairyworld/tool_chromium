@@ -8,6 +8,8 @@
 
 #include "base/task/sequenced_task_runner.h"
 #include "chrome/browser/web_applications/extensions_manager.h"
+#include "chrome/browser/web_applications/mojom/user_display_mode.mojom.h"
+#include "chrome/browser/web_applications/os_integration/web_app_shortcut.h"
 
 namespace web_app {
 namespace {
@@ -87,6 +89,11 @@ void FakeExtensionsManager::SetPreinstalledExtensionAppId(
     bool is_preinstalled) {
   preinstalled_app_ids_overrides_[app_id] = is_preinstalled;
 }
+void FakeExtensionsManager::SetUserDisplayMode(
+    const std::string& extension_id,
+    mojom::UserDisplayMode user_display_mode) {
+  user_display_modes_[extension_id] = user_display_mode;
+}
 
 void FakeExtensionsManager::OnExtensionSystemReady(base::OnceClosure closure) {
   if (extensions_system_ready_) {
@@ -143,5 +150,33 @@ bool FakeExtensionsManager::IsPreinstalledExtensionAppId(
     return it->second;
   }
   return false;
+}
+
+void FakeExtensionsManager::CopyAppSortingLayout(
+    const std::string& from_extension_id,
+    const std::string& to_web_app_id) {
+  // No-op.
+}
+
+mojom::UserDisplayMode FakeExtensionsManager::GetExtensionUserDisplayMode(
+    const std::string& extension_id) {
+  auto it = user_display_modes_.find(extension_id);
+  if (it != user_display_modes_.end()) {
+    return it->second;
+  }
+  return mojom::UserDisplayMode::kStandalone;
+}
+
+std::unique_ptr<ShortcutInfo> FakeExtensionsManager::GetExtensionShortcutInfo(
+    const std::string& extension_id) {
+  auto shortcut_info = std::make_unique<ShortcutInfo>();
+  shortcut_info->app_id = extension_id;
+  return shortcut_info;
+}
+
+void FakeExtensionsManager::WaitForExtensionShortcutsDeleted(
+    const std::string& extension_id,
+    base::OnceClosure callback) {
+  std::move(callback).Run();
 }
 }  // namespace web_app

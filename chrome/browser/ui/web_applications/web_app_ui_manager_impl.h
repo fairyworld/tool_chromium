@@ -175,6 +175,8 @@ class WebAppUiManagerImpl : public BrowserCollectionObserver,
       UninstallCompleteCallback callback,
       UninstallScheduledCallback scheduled_callback) override;
 
+  void UninstallAppSilentlyForMigration(const webapps::AppId& app_id) override;
+
   void ShowProfileErrorDialogForCorruptDB() override;
 
   void ShowIntentPicker(const GURL& url,

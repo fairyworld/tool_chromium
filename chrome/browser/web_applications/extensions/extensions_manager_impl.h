@@ -11,9 +11,14 @@
 #include "base/functional/callback_forward.h"
 #include "base/memory/raw_ptr.h"
 #include "chrome/browser/web_applications/extensions_manager.h"
+#include "chrome/browser/web_applications/mojom/user_display_mode.mojom-forward.h"
 
 class Profile;
 class KeyedServiceBaseFactory;
+
+namespace web_app {
+struct ShortcutInfo;
+}
 
 namespace base {
 class FilePath;
@@ -50,6 +55,15 @@ class ExtensionsManagerImpl : public ExtensionsManager {
   bool IsExternalExtensionUninstalled(const std::string& extension_id) override;
   bool DidPreinstalledAppsPerformNewInstallation() override;
   bool IsPreinstalledExtensionAppId(const std::string& app_id) override;
+
+  void CopyAppSortingLayout(const std::string& from_extension_id,
+                            const std::string& to_web_app_id) override;
+  mojom::UserDisplayMode GetExtensionUserDisplayMode(
+      const std::string& extension_id) override;
+  std::unique_ptr<ShortcutInfo> GetExtensionShortcutInfo(
+      const std::string& extension_id) override;
+  void WaitForExtensionShortcutsDeleted(const std::string& extension_id,
+                                        base::OnceClosure callback) override;
 
   static KeyedServiceBaseFactory* GetExtensionSystemSharedFactory();
 

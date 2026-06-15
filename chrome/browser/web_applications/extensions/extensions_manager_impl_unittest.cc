@@ -7,12 +7,18 @@
 #include <memory>
 #include <string>
 
+#include "base/run_loop.h"
 #include "chrome/browser/extensions/chrome_app_deprecation.h"
 #include "chrome/browser/extensions/extension_management_test_util.h"
 #include "chrome/browser/extensions/extension_util.h"
+#include "chrome/browser/extensions/launch_util.h"
+#include "chrome/browser/web_applications/extensions/web_app_extension_shortcut.h"
+#include "chrome/browser/web_applications/mojom/user_display_mode.mojom.h"
+#include "chrome/browser/web_applications/os_integration/web_app_shortcut.h"
 #include "chrome/browser/web_applications/test/web_app_test.h"
 #include "components/prefs/scoped_user_pref_update.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
+#include "extensions/browser/app_sorting.h"
 #include "extensions/browser/extension_prefs.h"
 #include "extensions/browser/extension_registry.h"
 #include "extensions/browser/extension_system.h"
@@ -153,6 +159,75 @@ TEST_F(ExtensionsManagerImplTest, IsPreinstalledExtensionAppId) {
   // Check a real one (Gmail).
   EXPECT_TRUE(extensions_manager_->IsPreinstalledExtensionAppId(
       extension_misc::kGmailAppId));
+}
+
+TEST_F(ExtensionsManagerImplTest, CopyAppSortingLayout) {
+  constexpr char kFromAppId[] = "abcdefghijklmnopabcdefghijklmnop";
+  constexpr char kToAppId[] = "ponmlkjihgfedcbaponmlkjihgfedcba";
+
+  extensions::AppSorting* app_sorting =
+      extensions::ExtensionSystem::Get(profile())->app_sorting();
+
+  syncer::StringOrdinal page_ordinal =
+      syncer::StringOrdinal::CreateInitialOrdinal();
+  syncer::StringOrdinal launch_ordinal =
+      syncer::StringOrdinal::CreateInitialOrdinal();
+  app_sorting->SetPageOrdinal(kFromAppId, page_ordinal);
+  app_sorting->SetAppLaunchOrdinal(kFromAppId, launch_ordinal);
+
+  extensions_manager_->CopyAppSortingLayout(kFromAppId, kToAppId);
+
+  EXPECT_TRUE(app_sorting->GetPageOrdinal(kToAppId).Equals(page_ordinal));
+  EXPECT_TRUE(
+      app_sorting->GetAppLaunchOrdinal(kToAppId).Equals(launch_ordinal));
+}
+
+TEST_F(ExtensionsManagerImplTest, GetExtensionUserDisplayMode) {
+  constexpr char kTestAppId[] = "abcdefghijklmnopabcdefghijklmnop";
+  auto* registry = extensions::ExtensionRegistry::Get(profile());
+
+  scoped_refptr<const extensions::Extension> extension =
+      extensions::ExtensionBuilder("Test App").SetID(kTestAppId).Build();
+  registry->AddEnabled(extension);
+
+  EXPECT_EQ(extensions_manager_->GetExtensionUserDisplayMode(kTestAppId),
+            mojom::UserDisplayMode::kBrowser);
+
+  extensions::SetLaunchType(profile(), kTestAppId,
+                            extensions::LAUNCH_TYPE_WINDOW);
+  EXPECT_EQ(extensions_manager_->GetExtensionUserDisplayMode(kTestAppId),
+            mojom::UserDisplayMode::kStandalone);
+}
+
+TEST_F(ExtensionsManagerImplTest, GetExtensionShortcutInfo) {
+  constexpr char kTestAppId[] = "abcdefghijklmnopabcdefghijklmnop";
+  auto* registry = extensions::ExtensionRegistry::Get(profile());
+
+  scoped_refptr<const extensions::Extension> extension =
+      extensions::ExtensionBuilder("Test App").SetID(kTestAppId).Build();
+  registry->AddEnabled(extension);
+
+  auto shortcut_info =
+      extensions_manager_->GetExtensionShortcutInfo(kTestAppId);
+  ASSERT_TRUE(shortcut_info);
+  EXPECT_EQ(shortcut_info->app_id, kTestAppId);
+}
+
+TEST_F(ExtensionsManagerImplTest, WaitForExtensionShortcutsDeleted) {
+  constexpr char kTestAppId[] = "abcdefghijklmnopabcdefghijklmnop";
+  auto* registry = extensions::ExtensionRegistry::Get(profile());
+
+  scoped_refptr<const extensions::Extension> extension =
+      extensions::ExtensionBuilder("Test App").SetID(kTestAppId).Build();
+  registry->AddEnabled(extension);
+
+  base::RunLoop run_loop;
+  extensions_manager_->WaitForExtensionShortcutsDeleted(kTestAppId,
+                                                        run_loop.QuitClosure());
+
+  web_app::DeleteAllShortcuts(profile(), extension.get());
+
+  run_loop.Run();
 }
 
 }  // namespace web_app
