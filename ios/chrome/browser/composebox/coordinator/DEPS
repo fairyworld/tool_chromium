@@ -38,7 +38,7 @@ include_rules = [
   "+ios/chrome/browser/search_engines",
   "+ios/chrome/browser/signin/model",
   "+ios/chrome/browser/snapshots/model",
-  "+ios/chrome/browser/tab_picker/coordinator",
+  "+ios/chrome/browser/tab_picker/public",
   "+ios/chrome/browser/tab_switcher/ui_bundled/tab_utils.h",
   "+ios/chrome/browser/tabs/model/tab_helper_util.h",
   "+ios/chrome/browser/variations/model/client",
