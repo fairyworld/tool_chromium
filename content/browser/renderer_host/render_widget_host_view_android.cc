@@ -2019,16 +2019,6 @@ void RenderWidgetHostViewAndroid::CopySharedImageFromExactSurface(
       /*capture_exact_surface_id=*/true);
 }
 
-void RenderWidgetHostViewAndroid::EnsureSurfaceSynchronizedForWebTest() {
-  ++latest_capture_sequence_number_;
-  SynchronizeVisualProperties(cc::DeadlinePolicy::UseInfiniteDeadline(),
-                              std::nullopt);
-}
-
-uint32_t RenderWidgetHostViewAndroid::GetCaptureSequenceNumber() const {
-  return latest_capture_sequence_number_;
-}
-
 bool RenderWidgetHostViewAndroid::CanSynchronizeVisualProperties() {
   // When a rotation begins, the new visual properties are not all notified to
   // RenderWidgetHostViewAndroid at the same time. The process begins when

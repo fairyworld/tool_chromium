@@ -324,7 +324,6 @@ IN_PROC_BROWSER_TEST_F(SurfaceEmbedConnectorImplBrowserTest,
   visual_properties.screen_infos = display::ScreenInfos(screen_info);
   visual_properties.local_frame_size = gfx::Size(100, 200);
   visual_properties.rect_in_local_root = gfx::Rect(10, 20, 300, 400);
-  visual_properties.capture_sequence_number = 5u;
   visual_properties.css_zoom_factor = 1.25;
   visual_properties.local_surface_id =
       viz::LocalSurfaceId(1, base::UnguessableToken::CreateForTesting(2, 3));
@@ -352,8 +351,6 @@ IN_PROC_BROWSER_TEST_F(SurfaceEmbedConnectorImplBrowserTest,
 
   // Just check it returns valid reference
   connector->GetIntersectionState();
-
-  EXPECT_EQ(connector->GetCaptureSequenceNumber(), 5u);
 
   EXPECT_EQ(connector->GetRectInParentViewInDip(), gfx::Rect(5, 10, 150, 200));
   EXPECT_EQ(connector->GetLocalFrameSizeInDip(), gfx::Size(50, 100));

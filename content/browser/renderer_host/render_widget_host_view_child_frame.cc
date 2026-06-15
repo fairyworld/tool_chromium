@@ -252,17 +252,6 @@ bool RenderWidgetHostViewChildFrame::IsSurfaceAvailableForCopy() {
   return GetLocalSurfaceId().is_valid();
 }
 
-void RenderWidgetHostViewChildFrame::EnsureSurfaceSynchronizedForWebTest() {
-  // The capture sequence number which would normally be updated here is
-  // actually retrieved from the frame connector.
-}
-
-uint32_t RenderWidgetHostViewChildFrame::GetCaptureSequenceNumber() const {
-  if (!frame_connector_)
-    return 0u;
-  return frame_connector_->GetCaptureSequenceNumber();
-}
-
 void RenderWidgetHostViewChildFrame::ShowWithVisibility(
     PageVisibilityState /*page_visibility*/) {
   if (frame_connector_) {

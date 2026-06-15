@@ -674,12 +674,6 @@ bool RenderWidgetHostViewAura::IsSurfaceAvailableForCopy() {
   return delegated_frame_host_->CanCopyFromCompositingSurface();
 }
 
-void RenderWidgetHostViewAura::EnsureSurfaceSynchronizedForWebTest() {
-  ++latest_capture_sequence_number_;
-  SynchronizeVisualProperties(cc::DeadlinePolicy::UseInfiniteDeadline(),
-                              std::nullopt);
-}
-
 bool RenderWidgetHostViewAura::IsShowing() {
   return window_->IsVisible();
 }
@@ -1150,10 +1144,6 @@ void RenderWidgetHostViewAura::ClearKeyboardTriggeredTooltip() {
 
   SetTooltipText(std::u16string());
   tooltip_client->UpdateTooltipFromKeyboard(gfx::Rect(), window_);
-}
-
-uint32_t RenderWidgetHostViewAura::GetCaptureSequenceNumber() const {
-  return latest_capture_sequence_number_;
 }
 
 void RenderWidgetHostViewAura::CopyFromSurface(

@@ -171,7 +171,6 @@ class CONTENT_EXPORT RenderWidgetHostViewMac
   void UpdateTooltipUnderCursor(const std::u16string& tooltip_text) override;
   void UpdateTooltip(const std::u16string& tooltip_text) override;
   gfx::Size GetRequestedRendererSize() override;
-  uint32_t GetCaptureSequenceNumber() const override;
   bool IsSurfaceAvailableForCopy() override;
   void CopyFromSurface(
       const gfx::Rect& src_rect,
@@ -179,7 +178,6 @@ class CONTENT_EXPORT RenderWidgetHostViewMac
       base::TimeDelta timeout,
       base::OnceCallback<void(const content::CopyFromSurfaceResult&)> callback)
       override;
-  void EnsureSurfaceSynchronizedForWebTest() override;
   ui::FilteredGestureProvider* GetFilteredGestureProviderForTesting() override;
   void FocusedNodeChanged(bool is_editable_node,
                           const gfx::Rect& node_bounds_in_screen) override;
@@ -718,10 +716,6 @@ class CONTENT_EXPORT RenderWidgetHostViewMac
   // is locked.
   bool pointer_lock_unadjusted_movement_ = false;
 
-  // Latest capture sequence number which is incremented when the caller
-  // requests surfaces be synchronized via
-  // EnsureSurfaceSynchronizedForWebTest().
-  uint32_t latest_capture_sequence_number_ = 0u;
 
   // Remote accessibility objects corresponding to the NSWindow that this is
   // displayed to the user in.

@@ -155,12 +155,6 @@ gfx::Size RenderWidgetHostViewBase::GetRequestedRendererSizeDevicePx() {
                                 GetDeviceScaleFactor());
 }
 
-uint32_t RenderWidgetHostViewBase::GetCaptureSequenceNumber() const {
-  // TODO(vmpstr): Implement this for overrides other than aura and child frame.
-  NOTIMPLEMENTED_LOG_ONCE();
-  return 0u;
-}
-
 ui::TextInputClient* RenderWidgetHostViewBase::GetTextInputClient() {
   return nullptr;
 }

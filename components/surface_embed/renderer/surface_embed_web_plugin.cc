@@ -205,7 +205,6 @@ void SurfaceEmbedWebPlugin::SynchronizeVisualProperties(
   // - viewport segments, do these need any adjustment for plugin location/size?
   // - compositor viewport, does it need to be more accurate (See RemoteFrame)?
   //   Right now it's the part of the plugin that's visible.
-  // - capture_sequence_number
   // - cursor_accessibility_scale_factor
   // - propagate parameter (see RemoteFrame's implementation, do we need to do
   //   anything to propagate these changes through the embedded WebContents?)
@@ -247,7 +246,6 @@ void SurfaceEmbedWebPlugin::SynchronizeVisualProperties(
       gfx::Size(last_window_rect_.width(), last_window_rect_.height());
   pending_visual_properties.compositor_viewport = last_clip_rect_;
   pending_visual_properties.compositing_scale_factor = 1.0f;
-  pending_visual_properties.capture_sequence_number = 0;
   pending_visual_properties.cursor_accessibility_scale_factor = 1.0f;
 
   bool synchronized_props_changed =
@@ -282,8 +280,6 @@ void SurfaceEmbedWebPlugin::SynchronizeVisualProperties(
           pending_visual_properties.compositor_viewport ||
       sent_visual_properties_->root_widget_viewport_segments !=
           pending_visual_properties.root_widget_viewport_segments ||
-      sent_visual_properties_->capture_sequence_number !=
-          pending_visual_properties.capture_sequence_number ||
       !sent_last_is_visible_ || sent_last_is_visible_ != last_is_visible_;
 
   if (synchronized_props_changed) {

@@ -198,8 +198,6 @@ class CONTENT_EXPORT RenderWidgetHostViewAndroid
       base::OnceCallback<void(scoped_refptr<gpu::ClientSharedImage>,
                               viz::ReleaseCallback release_callback)> callback);
 
-  void EnsureSurfaceSynchronizedForWebTest() override;
-  uint32_t GetCaptureSequenceNumber() const override;
   int GetMouseWheelMinimumGranularity() const override;
   void UpdateCursor(const ui::Cursor& cursor) override;
   void DisplayCursor(const ui::Cursor& cursor) override;
@@ -773,11 +771,8 @@ class CONTENT_EXPORT RenderWidgetHostViewAndroid
   base::TimeTicks prev_mousedown_timestamp_;
   gfx::Point prev_mousedown_point_;
   int left_click_count_ = 0;
-
   base::ObserverList<DestructionObserver>::Unchecked destruction_observers_;
-
   MouseWheelPhaseHandler mouse_wheel_phase_handler_;
-  uint32_t latest_capture_sequence_number_ = 0u;
 
   viz::ParentLocalSurfaceIdAllocator local_surface_id_allocator_;
   bool in_rotation_ = false;

@@ -166,7 +166,6 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
   void UpdateTooltipFromKeyboard(const std::u16string& tooltip_text,
                                  const gfx::Rect& bounds) override;
   void ClearKeyboardTriggeredTooltip() override;
-  uint32_t GetCaptureSequenceNumber() const override;
   bool IsSurfaceAvailableForCopy() override;
   void CopyFromSurface(
       const gfx::Rect& src_rect,
@@ -175,7 +174,6 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
       base::OnceCallback<void(const content::CopyFromSurfaceResult&)> callback)
       override;
   ui::FilteredGestureProvider* GetFilteredGestureProviderForTesting() override;
-  void EnsureSurfaceSynchronizedForWebTest() override;
   void TransformPointToRootSurface(gfx::PointF* point) override;
   gfx::Rect GetBoundsInRootWindow() override;
   void WheelEventAck(const blink::WebMouseWheelEvent& event,
@@ -855,10 +853,6 @@ class CONTENT_EXPORT RenderWidgetHostViewAura
 
   std::unique_ptr<input::CursorManager> cursor_manager_;
 
-  // Latest capture sequence number which is incremented when the caller
-  // requests surfaces be synchronized via
-  // EnsureSurfaceSynchronizedForWebTest().
-  uint32_t latest_capture_sequence_number_ = 0u;
 
   // The pointer type of the most recent gesture/mouse/touch event.
   ui::EventPointerType last_pointer_type_ = ui::EventPointerType::kUnknown;

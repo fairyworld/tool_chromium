@@ -1098,9 +1098,6 @@ void RenderWidgetHostViewMac::SetShowingContextMenu(bool showing) {
   ns_view_->SetShowingContextMenu(showing);
 }
 
-uint32_t RenderWidgetHostViewMac::GetCaptureSequenceNumber() const {
-  return latest_capture_sequence_number_;
-}
 
 void RenderWidgetHostViewMac::CopyFromSurface(
     const gfx::Rect& src_subrect,
@@ -1124,10 +1121,6 @@ void RenderWidgetHostViewMac::CopyFromSurface(
       std::move(callback));
 }
 
-void RenderWidgetHostViewMac::EnsureSurfaceSynchronizedForWebTest() {
-  ++latest_capture_sequence_number_;
-  browser_compositor_->ForceNewSurfaceId();
-}
 
 ui::FilteredGestureProvider*
 RenderWidgetHostViewMac::GetFilteredGestureProviderForTesting() {

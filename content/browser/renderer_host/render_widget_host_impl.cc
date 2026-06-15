@@ -1215,8 +1215,6 @@ blink::VisualProperties RenderWidgetHostImpl::GetVisualProperties() {
         properties_from_parent_local_root_.root_widget_viewport_segments;
   }
 
-  visual_properties.capture_sequence_number = view_->GetCaptureSequenceNumber();
-
   // TODO(ccameron): GetLocalSurfaceId is not synchronized with the device
   // scale factor of the surface. Fix this.
   viz::LocalSurfaceId local_surface_id = view_->GetLocalSurfaceId();
@@ -3166,8 +3164,6 @@ bool RenderWidgetHostImpl::StoredVisualPropertiesNeedsUpdate(
              new_visual_properties.browser_controls_params ||
          old_visual_properties->visible_viewport_size_device_px !=
              new_visual_properties.visible_viewport_size_device_px ||
-         old_visual_properties->capture_sequence_number !=
-             new_visual_properties.capture_sequence_number ||
          old_visual_properties->page_scale_factor !=
              new_visual_properties.page_scale_factor ||
          old_visual_properties->compositing_scale_factor !=
