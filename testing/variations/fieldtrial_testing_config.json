@@ -20686,29 +20686,6 @@
             ]
         }
     ],
-    "RenderBlockingFullFrameRate": [
-        {
-            "platforms": [
-                "android",
-                "android_webview",
-                "chromeos",
-                "linux",
-                "mac",
-                "windows"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "params": {
-                        "throttle-frame-rate-on-initialization": "true"
-                    },
-                    "enable_features": [
-                        "RenderBlockingFullFrameRate"
-                    ]
-                }
-            ]
-        }
-    ],
     "RendererProcessLimitOnAndroid": [
         {
             "platforms": [
