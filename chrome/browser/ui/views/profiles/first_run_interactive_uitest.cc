@@ -47,9 +47,11 @@
 #include "chrome/browser/ui/views/profiles/profile_picker_toolbar.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_view.h"
 #include "chrome/browser/ui/webui/intro/intro_ui.h"
+#include "chrome/browser/ui/webui/signin/managed_user_profile_notice_ui.h"
 #include "chrome/browser/ui/webui/signin/signin_ui_error.h"
 #include "chrome/browser/ui/webui/signin/signin_url_utils.h"
 #include "chrome/common/webui_url_constants.h"
+#include "net/base/url_util.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/browser_resources.h"
 #include "chrome/test/base/ui_test_utils.h"
@@ -1302,7 +1304,8 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTest,
       WaitForWebContentsNavigation(
           kWebContentsId,
           UseRefreshedView()
-              ? GURL(chrome::kChromeUIManagedUserProfileNoticeRefreshURL)
+              ? ManagedUserProfileNoticeUI::GetURLForType(
+                    ManagedUserProfileNoticeUI::ScreenType::kFirstRun)
               : GURL(chrome::kChromeUIManagedUserProfileNoticeUrl)),
       EnsurePresent(kWebContentsId, GetDeclineManagementButtonQuery()),
       PressJsButton(kWebContentsId, GetDeclineManagementButtonQuery()),
@@ -1930,7 +1933,8 @@ IN_PROC_BROWSER_TEST_P(FirstRunWithHatsInteractiveUiTestWithSyncService,
       WaitForWebContentsNavigation(
           kWebContentsId,
           UseRefreshedView()
-              ? GURL(chrome::kChromeUIManagedUserProfileNoticeRefreshURL)
+              ? ManagedUserProfileNoticeUI::GetURLForType(
+                    ManagedUserProfileNoticeUI::ScreenType::kFirstRun)
               : GURL(chrome::kChromeUIManagedUserProfileNoticeUrl)),
       EnsurePresent(kWebContentsId, GetAcceptManagementButtonQuery()),
       PressJsButton(kWebContentsId, GetAcceptManagementButtonQuery()),
