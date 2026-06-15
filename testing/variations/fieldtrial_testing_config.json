@@ -24837,6 +24837,26 @@
             ]
         }
     ],
+    "V8HomomorphicIC": [
+        {
+            "platforms": [
+                "android",
+                "android_webview",
+                "chromeos",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "enable_features": [
+                        "V8Flag_homomorphic_ic"
+                    ]
+                }
+            ]
+        }
+    ],
     "V8InputHandlingLongerWindow": [
         {
             "platforms": [
