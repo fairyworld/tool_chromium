@@ -2428,6 +2428,14 @@ IN_PROC_BROWSER_TEST_P(AutofillInteractiveFencedFrameTest,
   ASSERT_TRUE(AutofillFlow(GetElementById("CREDIT_CARD_NUMBER"), this,
                            {.after_focus = base::BindLambdaForTesting(Wait),
                             .execution_target = cross_frame_host}));
+
+  // Verify that the credit card was actually filled into the cross-site frame.
+  EXPECT_EQ(
+      "Milton Waddams",
+      GetFieldValue(GetElementById("CREDIT_CARD_NAME_FULL"), cross_frame_host));
+  EXPECT_EQ(
+      "4111111111111111",
+      GetFieldValue(GetElementById("CREDIT_CARD_NUMBER"), cross_frame_host));
 }
 
 // Tests that deleting the subframe that has opened the Autofill popup closes
