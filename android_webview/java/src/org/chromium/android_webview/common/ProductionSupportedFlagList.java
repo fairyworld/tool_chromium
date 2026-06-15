@@ -1393,7 +1393,9 @@ public final class ProductionSupportedFlagList {
         Flag.baseFeature(
                 "NoVarySearchCacheLoadOnSeparateTaskRunner",
                 "Enable loading the No Vary Search cache on a separate task runner."),
-
+        Flag.baseFeature(
+                AwFeatures.WEBVIEW_DOWNLOAD_FAVICONS,
+                "Determines whether a Favicon will be downloaded upon navigation."),
         // Add new commandline switches and features above. The final entry should have a
         // trailing comma for cleaner diffs.
     };

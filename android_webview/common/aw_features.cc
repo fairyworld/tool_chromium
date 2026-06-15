@@ -4,6 +4,7 @@
 
 #include "android_webview/common/aw_features.h"
 
+#include "base/feature.h"
 #include "base/feature_list.h"
 #include "base/metrics/field_trial_params.h"
 
@@ -370,5 +371,10 @@ const base::FeatureParam<bool> kWebViewHttpCacheQuotaApiAffectsCodeCache{
 // it has not already been initialized. This may trigger evictions more readily.
 const base::FeatureParam<bool> kWebViewHttpCacheQuotaApiForceBackendInit{
     &kWebViewHttpCacheQuotaApi, "ForceBackendInit", true};
+
+// When enabled (which is the default state) a navigation will download a
+// Favicon. When disabled (which can be done through Finch or Flag UI) a
+// navigation will not download a Favicon.
+BASE_FEATURE(kWebViewDownloadFavicons, base::FEATURE_ENABLED_BY_DEFAULT);
 
 }  // namespace android_webview::features

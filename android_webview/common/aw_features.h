@@ -92,6 +92,8 @@ extern const base::FeatureParam<int> kWebViewHttpCacheQuotaApiMaximum;
 extern const base::FeatureParam<bool> kWebViewHttpCacheQuotaApiAffectsCodeCache;
 extern const base::FeatureParam<bool> kWebViewHttpCacheQuotaApiForceBackendInit;
 
+BASE_DECLARE_FEATURE(kWebViewDownloadFavicons);
+
 }  // namespace android_webview::features
 
 #endif  // ANDROID_WEBVIEW_COMMON_AW_FEATURES_H_
