@@ -7,8 +7,8 @@ import 'chrome://account-migration-welcome/account_migration_welcome_app.js';
 import {AccountManagerBrowserProxyImpl} from 'chrome://account-migration-welcome/account_manager_browser_proxy.js';
 import {assert} from 'chrome://resources/ash/common/assert.js';
 import {flush} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
+import {assertEquals} from 'chrome://webui-test/chai_assert.js';
 
-import {assertEquals} from 'chrome://webui-test/chromeos/chai_assert.js';
 import {TestAccountManagerBrowserProxy} from './test_account_manager_browser_proxy.js';
 
 suite('AccountMigrationWelcomeTest', () => {
