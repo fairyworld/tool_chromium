@@ -8,6 +8,9 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -155,6 +158,8 @@ public class SiteSearchTest {
 
         // Check omnibox becomes "" since the site search is triggered
         mOmniboxUtils.checkText(Matchers.equalTo(""), null);
+
+        verifySiteSearch("TestName", "test", /* enteredViaSpace= */ false);
     }
 
     @Test
@@ -170,6 +175,25 @@ public class SiteSearchTest {
 
         // Check omnibox becomes "" since the site search is triggered
         mOmniboxUtils.checkText(Matchers.equalTo(""), null);
+
+        verifySiteSearch("TestName", "test", /* enteredViaSpace= */ true);
+    }
+
+    private void verifySiteSearch(String name, String keyword, boolean enteredViaSpace) {
+        ThreadUtils.runOnUiThreadBlocking(
+                () -> {
+                    var dataProvider =
+                            mActivity.getToolbarManager().getLocationBarModelForTesting();
+                    var state = FuseboxSessionState.from(dataProvider);
+                    assertNotNull(state);
+                    var autocompleteInput = state.getAutocompleteInput();
+                    assertNotNull(autocompleteInput);
+                    var siteSearchData = autocompleteInput.getSiteSearchData();
+                    assertNotNull(siteSearchData);
+                    assertEquals(keyword, siteSearchData.keyword);
+                    assertEquals("Search " + name, siteSearchData.fullName);
+                    assertEquals(enteredViaSpace, siteSearchData.enteredViaSpace);
+                });
     }
 
     private void checkIsFirstSuggestionRowSelected() {
