@@ -1143,6 +1143,8 @@ chromium-metrics-reviews@google.com.
   <int value="0" label="Zoom In"/>
   <int value="1" label="Zoom Out"/>
   <int value="2" label="Reset"/>
+  <int value="3" label="Zoom In at Maximum"/>
+  <int value="4" label="Zoom Out at Minimum"/>
 </enum>
 
 <!-- LINT.ThenChange(//chrome/browser/glic/glic_enums.h:GlicZoomAction) -->

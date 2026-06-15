@@ -230,17 +230,6 @@ GlicUnpinTrigger FromMojomUnpinTrigger(mojom::UnpinTrigger trigger) {
   }
 }
 
-GlicZoomAction ToGlicZoomAction(mojom::ZoomAction action) {
-  switch (action) {
-    case mojom::ZoomAction::kZoomIn:
-      return GlicZoomAction::kZoomIn;
-    case mojom::ZoomAction::kZoomOut:
-      return GlicZoomAction::kZoomOut;
-    case mojom::ZoomAction::kReset:
-      return GlicZoomAction::kReset;
-  }
-}
-
 mojom::SkillPreviewPtr ToMojomSkillPreview(const skills::proto::Skill& skill) {
   std::optional<std::string> curated_by;
   if (!skill.curated_by().empty()) {
@@ -2109,8 +2098,26 @@ void GlicPageHandler::NotifyWindowIntentToShow() {
 }
 
 void GlicPageHandler::Zoom(mojom::ZoomAction zoom_action) {
-  base::UmaHistogramEnumeration("Glic.ZoomAction",
-                                ToGlicZoomAction(zoom_action));
+  auto* pref_service =
+      Profile::FromBrowserContext(browser_context_)->GetPrefs();
+  int current_zoom = pref_service->GetInteger(prefs::kGlicZoomLevel);
+
+  GlicZoomAction action_metric;
+  switch (zoom_action) {
+    case mojom::ZoomAction::kZoomIn:
+      action_metric = current_zoom >= 200 ? GlicZoomAction::kZoomInAtMax
+                                          : GlicZoomAction::kZoomIn;
+      break;
+    case mojom::ZoomAction::kZoomOut:
+      action_metric = current_zoom <= 100 ? GlicZoomAction::kZoomOutAtMin
+                                          : GlicZoomAction::kZoomOut;
+      break;
+    case mojom::ZoomAction::kReset:
+      action_metric = GlicZoomAction::kReset;
+      break;
+  }
+
+  base::UmaHistogramEnumeration("Glic.ZoomAction", action_metric);
   page_->Zoom(zoom_action);
 }
 
