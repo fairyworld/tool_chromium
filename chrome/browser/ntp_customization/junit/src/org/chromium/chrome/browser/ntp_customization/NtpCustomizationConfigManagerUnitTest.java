@@ -84,6 +84,8 @@ public class NtpCustomizationConfigManagerUnitTest {
     @Captor private ArgumentCaptor<BackgroundImageInfo> mBackgroundImageInfoCaptor;
     @Captor private ArgumentCaptor<Callback<Bitmap>> mBitmapCallbackCaptor;
 
+    private static final String FILE_ID_HASH = "fileIdHash";
+
     private Context mContext;
     private NtpCustomizationConfigManager mNtpCustomizationConfigManager;
     private Matrix mPortraitMatrix;
@@ -234,7 +236,8 @@ public class NtpCustomizationConfigManagerUnitTest {
                         /* lastUploadImageFilePath= */ "",
                         mBackgroundImageInfo,
                         mBitmap,
-                        /* primaryColor= */ null);
+                        /* primaryColor= */ null,
+                        FILE_ID_HASH);
         mNtpCustomizationConfigManager.onBackgroundDataChanged(mContext, uploadImageData);
         RobolectricUtil.runAllBackgroundAndUi();
 
@@ -283,7 +286,8 @@ public class NtpCustomizationConfigManagerUnitTest {
                         /* lastUploadImageFilePath= */ "",
                         mBackgroundImageInfo,
                         mBitmap,
-                        /* primaryColor= */ null);
+                        /* primaryColor= */ null,
+                        FILE_ID_HASH);
         mNtpCustomizationConfigManager.onBackgroundDataChanged(mContext, uploadImageData);
         RobolectricUtil.runAllBackgroundAndUi();
 
@@ -588,7 +592,8 @@ public class NtpCustomizationConfigManagerUnitTest {
                         /* lastUploadImageFilePath= */ "",
                         mBackgroundImageInfo,
                         mBitmap,
-                        /* primaryColor= */ null);
+                        /* primaryColor= */ null,
+                        FILE_ID_HASH);
         mNtpCustomizationConfigManager.onBackgroundDataChanged(mContext, uploadImageData);
         RobolectricUtil.runAllBackgroundAndUi();
         assertEquals(

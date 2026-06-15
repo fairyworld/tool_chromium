@@ -96,12 +96,17 @@ public class UploadImagePreviewCoordinator implements InsetObserver.WindowInsets
 
     /**
      * @param activity The activity context.
+     * @param profile The current user profile.
      * @param bitmap The bitmap to be previewed.
+     * @param fileIdHash The ID hash of the image file.
+     * @param onBottomSheetClickedCallback The callback to be notified when a bottom sheet button is
+     *     clicked.
      */
     public UploadImagePreviewCoordinator(
             Activity activity,
             Profile profile,
             Bitmap bitmap,
+            String fileIdHash,
             Callback<Boolean> onBottomSheetClickedCallback) {
         mPreviewPropertyModel = new PropertyModel(PREVIEW_KEYS);
         mActivity = activity;
@@ -148,7 +153,7 @@ public class UploadImagePreviewCoordinator implements InsetObserver.WindowInsets
         mPreviewPropertyModel.set(
                 NtpThemeProperty.PREVIEW_SAVE_CLICK_LISTENER,
                 v -> {
-                    onSaveButtonClicked(bitmap, onBottomSheetClickedCallback, mDialog);
+                    onSaveButtonClicked(bitmap, fileIdHash, onBottomSheetClickedCallback, mDialog);
                 });
 
         mPreviewPropertyModel.set(
@@ -343,13 +348,17 @@ public class UploadImagePreviewCoordinator implements InsetObserver.WindowInsets
      * Called when the save button is clicked.
      *
      * @param bitmap The selected bitmap.
+     * @param fileIdHash The ID hash of the image file.
      * @param onBottomSheetClickedCallback The callback to be notified when a bottom sheet button is
      *     clicked.
      * @param dialog The current preview dialog.
      */
     @VisibleForTesting
     void onSaveButtonClicked(
-            Bitmap bitmap, Callback<Boolean> onBottomSheetClickedCallback, ChromeDialog dialog) {
+            Bitmap bitmap,
+            String fileIdHash,
+            Callback<Boolean> onBottomSheetClickedCallback,
+            ChromeDialog dialog) {
         assumeNonNull(mCropImageView);
         // 1. Gets the matrices (source of truth or calculated estimate)
         Matrix portraitMatrix = mCropImageView.getPortraitMatrix();
@@ -370,7 +379,8 @@ public class UploadImagePreviewCoordinator implements InsetObserver.WindowInsets
                         NtpCustomizationUtils.createBackgroundImageFile().getAbsolutePath(),
                         info,
                         bitmap,
-                        /* primaryColor= */ null);
+                        /* primaryColor= */ null,
+                        fileIdHash);
 
         NtpCustomizationConfigManager.getInstance()
                 .onBackgroundDataChanged(mActivity, uploadImageData);

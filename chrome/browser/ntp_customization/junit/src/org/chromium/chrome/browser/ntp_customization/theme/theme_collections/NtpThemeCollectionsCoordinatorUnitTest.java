@@ -327,7 +327,8 @@ public class NtpThemeCollectionsCoordinatorUnitTest {
                         /* lastUploadImageFilePath= */ "",
                         backgroundImageInfo,
                         bitmap,
-                        /* primaryColor= */ null);
+                        /* primaryColor= */ null,
+                        "fileIdHash");
         mNtpCustomizationConfigManager.onBackgroundDataChanged(mContext, uploadImageData);
 
         mCoordinator.onBackgroundTypeChanged();

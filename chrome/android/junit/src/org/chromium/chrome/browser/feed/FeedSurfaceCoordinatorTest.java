@@ -117,6 +117,8 @@ import java.util.function.Supplier;
 public class FeedSurfaceCoordinatorTest {
     private static final @SurfaceType int SURFACE_TYPE = SurfaceType.NEW_TAB_PAGE;
     private static final long SURFACE_CREATION_TIME_NS = 1234L;
+    private static final String FILE_ID_HASH = "fileIdHash";
+
     private BackgroundImageInfo mBackgroundImageInfo;
     private Bitmap mBitmap;
 
@@ -475,7 +477,8 @@ public class FeedSurfaceCoordinatorTest {
                         /* lastUploadImageFilePath= */ "",
                         mBackgroundImageInfo,
                         mBitmap,
-                        /* primaryColor= */ null);
+                        /* primaryColor= */ null,
+                        FILE_ID_HASH);
         configManager.onBackgroundDataChanged(mActivity, uploadImageData);
 
         // Verifies the coordinator delegates the setBackground call to the custom view.

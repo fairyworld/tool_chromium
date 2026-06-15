@@ -79,6 +79,8 @@ public class NtpChromeColorsCoordinatorUnitTest {
     @Mock private TextWatcher mTextWatcher;
     @Captor private ArgumentCaptor<TextWatcher> mTextWatcherCaptor;
 
+    private static final String FILE_ID_HASH = "fileIdHash";
+
     private NtpChromeColorsCoordinator mCoordinator;
     private NtpCustomizationConfigManager mNtpCustomizationConfigManager;
     private PropertyModel mPropertyModel;
@@ -488,7 +490,8 @@ public class NtpChromeColorsCoordinatorUnitTest {
                         /* lastUploadImageFilePath= */ "",
                         backgroundImageInfo,
                         bitmap,
-                        /* primaryColor= */ null);
+                        /* primaryColor= */ null,
+                        FILE_ID_HASH);
         mNtpCustomizationConfigManager.onBackgroundDataChanged(mContext, uploadImageData);
 
         // Reshows the chrome color bottom sheet and chooses the original color info.
@@ -545,7 +548,8 @@ public class NtpChromeColorsCoordinatorUnitTest {
                         /* lastUploadImageFilePath= */ "",
                         backgroundImageInfo,
                         bitmap,
-                        /* primaryColor= */ null);
+                        /* primaryColor= */ null,
+                        FILE_ID_HASH);
         mNtpCustomizationConfigManager.onBackgroundDataChanged(mContext, uploadImageData);
 
         // Verifies that the Chrome color bottom sheet is opened without any highlighted item, and
@@ -577,7 +581,8 @@ public class NtpChromeColorsCoordinatorUnitTest {
                         /* lastUploadImageFilePath= */ "",
                         backgroundImageInfo,
                         bitmap,
-                        /* primaryColor= */ null);
+                        /* primaryColor= */ null,
+                        FILE_ID_HASH);
         mNtpCustomizationConfigManager.onBackgroundDataChanged(mContext, uploadImageData);
 
         mCoordinator.onBackgroundTypeChanged();

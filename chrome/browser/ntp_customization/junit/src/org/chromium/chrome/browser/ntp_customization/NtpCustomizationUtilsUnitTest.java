@@ -1611,13 +1611,18 @@ public class NtpCustomizationUtilsUnitTest {
         when(contentResolver.openInputStream(uri))
                 .thenAnswer(invocation -> new ByteArrayInputStream(bitmapBytes));
 
-        Callback<Bitmap> callback = MockitoHelper.mockCallback();
+        when(uri.getLastPathSegment()).thenReturn("test_file.png");
+
+        NtpCustomizationUtils.OnImageLoadedCallback callback =
+                mock(NtpCustomizationUtils.OnImageLoadedCallback.class);
         NtpCustomizationUtils.getBitmapFromUriAsync(context, uri, callback);
         RobolectricUtil.runAllBackgroundAndUi();
 
         ArgumentCaptor<Bitmap> captor = ArgumentCaptor.forClass(Bitmap.class);
-        verify(callback).onResult(captor.capture());
+        ArgumentCaptor<String> fileIdHashCaptor = ArgumentCaptor.forClass(String.class);
+        verify(callback).onImageLoaded(captor.capture(), fileIdHashCaptor.capture());
         Bitmap result = captor.getValue();
+        assertEquals("test_file.png_-1", fileIdHashCaptor.getValue());
         assertNotNull("The file reading flow should successfully load the bitmap.", result);
         assertEquals(
                 "The file reading flow should preserve width for small images.",

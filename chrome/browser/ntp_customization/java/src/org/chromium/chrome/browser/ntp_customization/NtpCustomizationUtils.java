@@ -90,6 +90,7 @@ import org.chromium.chrome.browser.ntp_customization.theme.daily_refresh.NtpThem
 import org.chromium.chrome.browser.ntp_customization.theme.theme_collections.CustomBackgroundInfo;
 import org.chromium.chrome.browser.ntp_customization.theme.upload_image.BackgroundImageInfo;
 import org.chromium.chrome.browser.ntp_customization.theme.upload_image.CropImageUtils;
+import org.chromium.chrome.browser.ntp_customization.theme_sync.data.NtpBackgroundDataUtils;
 import org.chromium.chrome.browser.preferences.ChromePreferenceKeys;
 import org.chromium.chrome.browser.preferences.ChromeSharedPreferences;
 import org.chromium.chrome.browser.profiles.Profile;
@@ -144,6 +145,27 @@ public class NtpCustomizationUtils {
         @Nullable
         @ColorInt
         Integer getPrimaryColor();
+    }
+
+    /** Callback interface for when an image is loaded from a URI. */
+    public interface OnImageLoadedCallback {
+        /**
+         * Called when the image is loaded.
+         *
+         * @param bitmap The loaded bitmap, or null if loading failed.
+         * @param fileIdHash The hash of the image file metadata.
+         */
+        void onImageLoaded(@Nullable Bitmap bitmap, String fileIdHash);
+    }
+
+    private static class ImageLoadResult {
+        public final @Nullable Bitmap bitmap;
+        public final String fileIdHash;
+
+        ImageLoadResult(@Nullable Bitmap bitmap, String fileIdHash) {
+            this.bitmap = bitmap;
+            this.fileIdHash = fileIdHash;
+        }
     }
 
     /** The time duration limit to refresh NTP's background. */
@@ -1652,10 +1674,11 @@ public class NtpCustomizationUtils {
      * @param callback The callback to invoke with the bitmap.
      */
     public static void getBitmapFromUriAsync(
-            Context context, Uri uri, Callback<@Nullable Bitmap> callback) {
-        new AsyncTask<@Nullable Bitmap>() {
+            Context context, Uri uri, OnImageLoadedCallback callback) {
+        new AsyncTask<ImageLoadResult>() {
             @Override
-            protected @Nullable Bitmap doInBackground() {
+            protected ImageLoadResult doInBackground() {
+                String fileIdHash = NtpBackgroundDataUtils.getMetadataFingerprint(context, uri);
                 try {
                     // 1. Decode with inJustDecodeBounds=true to check dimensions
                     BitmapFactory.Options options = new BitmapFactory.Options();
@@ -1671,17 +1694,18 @@ public class NtpCustomizationUtils {
                     // 3. Decode bitmap with inSampleSize set
                     options.inJustDecodeBounds = false;
                     try (var inputStream = context.getContentResolver().openInputStream(uri)) {
-                        return BitmapFactory.decodeStream(inputStream, null, options);
+                        return new ImageLoadResult(
+                                BitmapFactory.decodeStream(inputStream, null, options), fileIdHash);
                     }
                 } catch (Exception e) {
                     Log.e(TAG, "Error reading bitmap from URI", e);
-                    return null;
+                    return new ImageLoadResult(null, fileIdHash);
                 }
             }
 
             @Override
-            protected void onPostExecute(@Nullable Bitmap bitmap) {
-                callback.onResult(bitmap);
+            protected void onPostExecute(ImageLoadResult result) {
+                callback.onImageLoaded(result.bitmap, result.fileIdHash);
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }

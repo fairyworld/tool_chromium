@@ -45,6 +45,11 @@ public class NtpBackgroundDataUploadImageUnitTest {
     @Mock private Callback<Bitmap> mCallback;
     @Mock private Bitmap mBitmap;
 
+    private static final String FILE_ID_HASH = "fileIdHash";
+    private static final String FILE_ID_HASH_1 = "fileIdHash1";
+    private static final String FILE_ID_HASH_2 = "fileIdHash2";
+    private static final String TEST_FILE_ID_HASH = "test_file_id_hash";
+
     @Before
     public void setUp() {
         NtpCustomizationConfigManager.setInstanceForTesting(mNtpCustomizationConfigManager);
@@ -56,16 +61,40 @@ public class NtpBackgroundDataUploadImageUnitTest {
         BackgroundImageInfo info2 = new BackgroundImageInfo(new Matrix(), new Matrix(), null, null);
         NtpBackgroundDataUploadImage data1 =
                 new NtpBackgroundDataUploadImage(
-                        PlatformType.ANDROID_LOCAL, "path", info1, /* bitmap= */ null, Color.RED);
+                        PlatformType.ANDROID_LOCAL,
+                        "path",
+                        info1,
+                        /* bitmap= */ null,
+                        Color.RED,
+                        FILE_ID_HASH_1);
         NtpBackgroundDataUploadImage data2 =
                 new NtpBackgroundDataUploadImage(
-                        PlatformType.ANDROID_LOCAL, "path", info2, /* bitmap= */ null, Color.RED);
+                        PlatformType.ANDROID_LOCAL,
+                        "path",
+                        info2,
+                        /* bitmap= */ null,
+                        Color.RED,
+                        FILE_ID_HASH_1);
         NtpBackgroundDataUploadImage data3 =
                 new NtpBackgroundDataUploadImage(
-                        PlatformType.ANDROID_LOCAL, "path2", info1, /* bitmap= */ null, Color.RED);
+                        PlatformType.ANDROID_LOCAL,
+                        "path2",
+                        info1,
+                        /* bitmap= */ null,
+                        Color.RED,
+                        FILE_ID_HASH_1);
+        NtpBackgroundDataUploadImage data4 =
+                new NtpBackgroundDataUploadImage(
+                        PlatformType.ANDROID_LOCAL,
+                        "path",
+                        info1,
+                        /* bitmap= */ null,
+                        Color.RED,
+                        FILE_ID_HASH_2);
 
         assertEquals(data1, data2);
         assertNotEquals(data1, data3);
+        assertNotEquals(data1, data4);
         assertEquals(data1.hashCode(), data2.hashCode());
     }
 
@@ -87,7 +116,8 @@ public class NtpBackgroundDataUploadImageUnitTest {
                         filePath,
                         backgroundImageInfo,
                         /* bitmap= */ null,
-                        primaryColor);
+                        primaryColor,
+                        TEST_FILE_ID_HASH);
 
         JSONObject json = data.toJson();
         NtpBackgroundDataUploadImage restored = NtpBackgroundDataUploadImage.fromJson(json);
@@ -96,6 +126,7 @@ public class NtpBackgroundDataUploadImageUnitTest {
         assertEquals(NtpBackgroundType.IMAGE_FROM_DISK, restored.getBackgroundType());
         assertEquals(filePath, restored.getLastUploadImageFilePath());
         assertEquals(primaryColor, restored.getPrimaryColor());
+        assertEquals(TEST_FILE_ID_HASH, restored.getFileIdHash());
         assertNotNull(restored.getBackgroundImageInfo());
         assertEquals(
                 portraitMatrix.toShortString(),
@@ -114,7 +145,8 @@ public class NtpBackgroundDataUploadImageUnitTest {
                         "path",
                         info,
                         mBitmap,
-                        /* primaryColor= */ null);
+                        /* primaryColor= */ null,
+                        FILE_ID_HASH);
         assertEquals(mBitmap, data.getImageBitmapForTesting());
 
         NtpBackgroundDataUploadImage dataWithoutBitmap =
@@ -123,7 +155,8 @@ public class NtpBackgroundDataUploadImageUnitTest {
                         "path",
                         info,
                         /* bitmap= */ null,
-                        /* primaryColor= */ null);
+                        /* primaryColor= */ null,
+                        FILE_ID_HASH);
         assertNull(dataWithoutBitmap.getImageBitmapForTesting());
     }
 
@@ -136,7 +169,8 @@ public class NtpBackgroundDataUploadImageUnitTest {
                         "path",
                         info,
                         mBitmap,
-                        /* primaryColor= */ null);
+                        /* primaryColor= */ null,
+                        FILE_ID_HASH);
 
         data.getBitmapOrLoadImage(mCallback);
         verify(mCallback).onResult(mBitmap);
@@ -152,7 +186,8 @@ public class NtpBackgroundDataUploadImageUnitTest {
                         "path",
                         info,
                         mBitmap,
-                        /* primaryColor= */ null);
+                        /* primaryColor= */ null,
+                        FILE_ID_HASH);
         when(mNtpCustomizationConfigManager.getNtpBackgroundData()).thenReturn(currentData);
 
         // The testData does not have a bitmap, but is equal to currentData (same path).
@@ -162,7 +197,8 @@ public class NtpBackgroundDataUploadImageUnitTest {
                         "path",
                         info,
                         /* bitmap= */ null,
-                        /* primaryColor= */ null);
+                        /* primaryColor= */ null,
+                        FILE_ID_HASH);
 
         testData.getBitmapOrLoadImage(mCallback);
         verify(mCallback).onResult(mBitmap);
