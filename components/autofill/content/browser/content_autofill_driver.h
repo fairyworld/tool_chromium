@@ -313,6 +313,7 @@ class ContentAutofillDriver : public AutofillDriver,
   void TextFieldDidScroll(const FormData& form,
                           FieldRendererId field_id) override;
   void FormWithEmailVerificationTokenSubmitted(
+      const FormData& form,
       FieldRendererId field_id) override;
 
   // The functions below this line do not cross the IPC boundary.

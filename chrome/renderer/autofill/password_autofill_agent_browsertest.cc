@@ -479,7 +479,7 @@ class FakeAutofillDriver : public mojom::AutofillDriver {
   MOCK_METHOD(void, DidEndTextFieldEditing, (), (override));
   MOCK_METHOD(void,
               FormWithEmailVerificationTokenSubmitted,
-              (FieldRendererId field_id),
+              (const FormData& form, FieldRendererId field_id),
               (override));
 
  private:

@@ -127,6 +127,7 @@ class FakeContentAutofillDriver : public mojom::AutofillDriver {
                                    FieldRendererId field_id) override {}
 
   void FormWithEmailVerificationTokenSubmitted(
+      const FormData& form,
       FieldRendererId field_id) override {}
 
   // Records the form data received via FormSubmitted() call.

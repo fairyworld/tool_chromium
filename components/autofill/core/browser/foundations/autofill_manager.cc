@@ -267,6 +267,7 @@ void AutofillManager::OnFormSubmitted(const FormData& form,
 }
 
 void AutofillManager::OnFormWithEmailVerificationTokenSubmitted(
+    const FormData& form,
     const FieldGlobalId& field_id) {
   NotifyObservers(&Observer::OnFormWithEmailVerificationTokenSubmitted,
                   field_id);

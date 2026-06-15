@@ -143,6 +143,7 @@ class FakeContentAutofillDriver : public mojom::AutofillDriver {
                                    FieldRendererId field_id) override {}
 
   void FormWithEmailVerificationTokenSubmitted(
+      const FormData& form,
       FieldRendererId field_id) override {}
 
   std::unique_ptr<base::RunLoop> forms_seen_run_loop_;

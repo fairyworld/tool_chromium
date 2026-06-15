@@ -322,6 +322,7 @@ class AutofillManager
 
   // Invoked when a form with an email verification token is submitted.
   virtual void OnFormWithEmailVerificationTokenSubmitted(
+      const FormData& form,
       const FieldGlobalId& field_id);
 
   // Routes calls from external components to FormFiller::FillOrPreviewField.

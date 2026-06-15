@@ -225,6 +225,11 @@ class AutofillDriverRouter {
   void DidAutofillForm(RoutedCallback<const FormData&> callback,
                        AutofillDriver& source,
                        FormData form);
+  void FormWithEmailVerificationTokenSubmitted(
+      RoutedCallback<const FormData&, const FieldGlobalId&> callback,
+      AutofillDriver& source,
+      FormData form,
+      const FieldGlobalId& field_id);
   void FocusOnFormField(
       RoutedCallback<const FormData&, const FieldGlobalId&> callback,
       AutofillDriver& source,

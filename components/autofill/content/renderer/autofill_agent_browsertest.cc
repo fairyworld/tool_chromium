@@ -2341,7 +2341,7 @@ TEST_F(EmailVerificationObserverTest,
 
   EXPECT_CALL(autofill_driver(),
               FormWithEmailVerificationTokenSubmitted(
-                  form_util::GetFieldRendererId(verification_element)));
+                  _, form_util::GetFieldRendererId(verification_element)));
 
   test_api(autofill_agent())
       .email_verification_observer()
@@ -2378,7 +2378,7 @@ TEST_F(EmailVerificationObserverTest,
 
   EXPECT_CALL(autofill_driver(),
               FormWithEmailVerificationTokenSubmitted(
-                  form_util::GetFieldRendererId(verification_element)))
+                  _, form_util::GetFieldRendererId(verification_element)))
       .Times(0);
 
   test_api(autofill_agent())
@@ -2416,7 +2416,7 @@ TEST_F(EmailVerificationObserverTest,
 
   EXPECT_CALL(autofill_driver(),
               FormWithEmailVerificationTokenSubmitted(
-                  form_util::GetFieldRendererId(verification_element)))
+                  _, form_util::GetFieldRendererId(verification_element)))
       .Times(0);
 
   test_api(autofill_agent())

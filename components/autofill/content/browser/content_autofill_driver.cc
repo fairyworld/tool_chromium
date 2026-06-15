@@ -715,9 +715,12 @@ void ContentAutofillDriver::JavaScriptChangedAutofilledValue(
 }
 
 void ContentAutofillDriver::FormWithEmailVerificationTokenSubmitted(
+    const FormData& form,
     FieldRendererId field_id) {
-  FieldGlobalId global_id = {GetFrameToken(), field_id};
-  autofill_manager_->OnFormWithEmailVerificationTokenSubmitted(global_id);
+  RouteToManager(*this, router(),
+                 &AutofillDriverRouter::FormWithEmailVerificationTokenSubmitted,
+                 &AutofillManager::OnFormWithEmailVerificationTokenSubmitted,
+                 form, field_id);
 }
 
 const mojo::AssociatedRemote<mojom::AutofillAgent>&

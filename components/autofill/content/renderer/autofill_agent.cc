@@ -473,9 +473,10 @@ class AutofillAgent::DeferringAutofillDriver : public mojom::AutofillDriver {
              field_id, old_value);
   }
   void FormWithEmailVerificationTokenSubmitted(
+      const FormData& form,
       FieldRendererId field_id) override {
     DeferMsg(&mojom::AutofillDriver::FormWithEmailVerificationTokenSubmitted,
-             field_id);
+             form, field_id);
   }
 
   const raw_ref<AutofillAgent> agent_;
@@ -884,7 +885,13 @@ void AutofillAgent::EmailVerificationObserver::WillSendSubmitEvent(
       element.SetValue(WebString::FromUtf8(info.token));
 
       if (auto* driver = agent_->unsafe_autofill_driver()) {
-        driver->FormWithEmailVerificationTokenSubmitted(field_id);
+        if (std::optional<FormData> form_data = form_util::ExtractFormData(
+                form.GetDocument(), form, agent_->field_data_manager(),
+                agent_->GetCallTimerState(
+                    kFormWithEmailVerificationTokenSubmitted),
+                agent_->button_titles_cache())) {
+          driver->FormWithEmailVerificationTokenSubmitted(*form_data, field_id);
+        }
       }
       return;
     }
