@@ -1043,12 +1043,10 @@ TEST(ActorFormFillingServiceJournalTest,
   EXPECT_CALL(observer, WillAddJournalEntry(JournalEntryWithError(
                             "Autofill manager not available")));
 
-  autofill::ActorFormFillingServiceImpl service(journal.GetSafeRef(),
-                                                ::actor::TaskId(1));
+  ActorFormFillingServiceImpl service(journal.GetSafeRef(), ::actor::TaskId(1));
 
-  service.FillForm(
-      mock_tab, /*form_index=*/0,
-      autofill::ActorFormFillingSelection(autofill::ActorSuggestionId(123)));
+  service.FillForm(mock_tab, /*form_index=*/0,
+                   ActorFormFillingSelection(ActorSuggestionId(123)));
 }
 
 }  // namespace

@@ -123,7 +123,7 @@ class FakeContentAutofillDriver : public mojom::AutofillDriver {
 
   void DidEndTextFieldEditing() override {}
 
-  void SelectFieldOptionsDidChange(const autofill::FormData& form,
+  void SelectFieldOptionsDidChange(const FormData& form,
                                    FieldRendererId field_id) override {}
 
   void OnEmailVerificationTokenShared(FieldRendererId field_id) override {}

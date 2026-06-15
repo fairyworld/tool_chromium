@@ -92,7 +92,7 @@ void ActorOneTimeTokenFillingServiceImpl::RetrieveOtp(
   // Gemini should not be available in incognito, but should we check just to
   // be sure (and future-proof)?
   one_time_tokens::OneTimeTokenService* service =
-      autofill::OneTimeTokenServiceFactory::GetForProfile(profile_);
+      OneTimeTokenServiceFactory::GetForProfile(profile_);
   if (!service) {
     std::move(callback).Run("");
     return;

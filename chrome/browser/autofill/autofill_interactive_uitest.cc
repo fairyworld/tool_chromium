@@ -181,8 +181,8 @@ content::RenderFrameHost* RenderFrameHostForName(
       base::BindRepeating(&content::FrameMatchesName, name));
 }
 
-autofill::ElementExpr GetElementById(const std::string& id) {
-  return autofill::ElementExpr(
+ElementExpr GetElementById(const std::string& id) {
+  return ElementExpr(
       base::StringPrintf("document.getElementById(`%s`)", id.c_str()));
 }
 
@@ -230,7 +230,7 @@ std::vector<FieldValue> GetFieldValues(
 
 // Types the characters of `value` after focusing field `e`.
 [[nodiscard]] AssertionResult EnterTextIntoField(
-    const autofill::ElementExpr& e,
+    const ElementExpr& e,
     std::string_view value,
     AutofillUiTest* test,
     content::ToRenderFrameHost execution_target) {
@@ -1012,7 +1012,7 @@ IN_PROC_BROWSER_TEST_F(AutofillInteractiveTest, ModifyTextNotifiesObserver) {
   SetTestUrlResponse(kTestShippingFormString);
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetTestUrl()));
 
-  autofill::MockAutofillManagerObserver observer;
+  MockAutofillManagerObserver observer;
   BrowserAutofillManager* autofill_manager = GetBrowserAutofillManager();
   autofill_manager->AddObserver(&observer);
 
@@ -1063,7 +1063,7 @@ IN_PROC_BROWSER_TEST_F(AutofillInteractiveTest,
   SetTestUrlResponse(kForm);
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetTestUrl()));
 
-  autofill::MockAutofillManagerObserver observer;
+  MockAutofillManagerObserver observer;
   BrowserAutofillManager* autofill_manager = GetBrowserAutofillManager();
   autofill_manager->AddObserver(&observer);
 
