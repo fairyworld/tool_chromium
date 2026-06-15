@@ -812,6 +812,8 @@ TabSignals ContextualTasksContextService::ComputeTabSignals(
     candidate_tab_embeddings =
         page_embeddings_service_->GetEmbeddings(web_contents->GetPrimaryPage());
   }
+  base::UmaHistogramBoolean("ContextualTasks.Context.CandidateTabHasEmbeddings",
+                            !candidate_tab_embeddings.empty());
 
   tab_signals.similarity_scores =
       GetEmbeddingScores(query_state.query_embedding, candidate_tab_embeddings);
