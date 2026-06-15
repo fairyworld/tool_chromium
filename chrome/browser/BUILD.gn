@@ -1411,13 +1411,11 @@ source_set("core") {
       "OpenGL.framework",
       "QuartzCore.framework",
       "SafariServices.framework",
+      "ScreenCaptureKit.framework",
       "SecurityInterface.framework",
       "UserNotifications.framework",
       "UniformTypeIdentifiers.framework",
       "VideoToolbox.framework",
-    ]
-    weak_frameworks = [
-      "ScreenCaptureKit.framework",  # Available in macOS 12.3, stable in 13.2.
     ]
   }
 
