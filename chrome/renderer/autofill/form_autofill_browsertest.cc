@@ -2149,7 +2149,6 @@ TEST_F(FormAutofillTest, OnlyExtractNewForms) {
          newInput.setAttribute('id', 'telephone');
          newInput.value = '12345';
          document.getElementById('testform').appendChild(newInput);)");
-  base::RunLoop().RunUntilIdle();
 
   forms = UpdateFormCache().updated_forms;
   ASSERT_EQ(1U, forms.size());
@@ -2197,7 +2196,6 @@ TEST_F(FormAutofillTest, OnlyExtractNewForms) {
         newForm.appendChild(newLastname);
         newForm.appendChild(newEmail);
         document.body.appendChild(newForm);)");
-  base::RunLoop().RunUntilIdle();
 
   forms = UpdateFormCache().updated_forms;
   ASSERT_EQ(1U, forms.size());
