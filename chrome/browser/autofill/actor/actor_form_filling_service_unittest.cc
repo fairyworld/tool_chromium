@@ -850,14 +850,14 @@ TEST_F(ActorFormFillingServiceTest, FillWithInvalidSuggestionId) {
 // select field.
 TEST_F(ActorFormFillingServiceTest, TriggerOnSelect) {
   FormData form = SeeForm(
-      {.fields = {{.server_type = ADDRESS_HOME_COUNTRY,
-                   .form_control_type = FormControlType::kSelectOne,
-                   .select_options =
-                       {SelectOption{.value = u"US", .text = u"United States"},
-                        SelectOption{.value = u"CA", .text = u"Canada"},
-                        SelectOption{.value = u"DE", .text = u"Germany"}}},
-                  {.server_type = ADDRESS_HOME_LINE1},
-                  {.server_type = ADDRESS_HOME_CITY}}});
+      {.fields = {
+           {.server_type = ADDRESS_HOME_COUNTRY,
+            .form_control_type = FormControlType::kSelectOne,
+            .select_options = {{{.value = u"US", .text = u"United States"},
+                                {.value = u"CA", .text = u"Canada"},
+                                {.value = u"DE", .text = u"Germany"}}}},
+           {.server_type = ADDRESS_HOME_LINE1},
+           {.server_type = ADDRESS_HOME_CITY}}});
 
   GetSuggestionsFuture request_future;
   service().GetSuggestions(tab(),

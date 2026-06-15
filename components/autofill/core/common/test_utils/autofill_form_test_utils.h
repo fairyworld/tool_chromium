@@ -66,8 +66,8 @@ struct FieldDescription {
   std::optional<LocalFrameToken> host_frame;
   std::optional<FormSignature> host_form_signature;
   std::optional<FieldRendererId> renderer_id;
-  bool is_focusable = true;
-  bool is_visible = true;
+  std::optional<bool> is_focusable;
+  std::optional<bool> is_visible;
   std::optional<std::u16string> label;
   std::optional<std::u16string> name;
   std::optional<std::u16string> name_attribute;
@@ -79,16 +79,16 @@ struct FieldDescription {
   std::optional<std::u16string> aria_label;
   std::optional<std::u16string> aria_description;
   std::optional<uint64_t> max_length;
-  const std::string autocomplete_attribute;
+  std::optional<std::string> autocomplete_attribute;
   std::optional<AutocompleteParsingResult> parsed_autocomplete;
-  const FormControlType form_control_type = FormControlType::kInputText;
-  bool should_autocomplete = true;
+  std::optional<FormControlType> form_control_type;
+  std::optional<bool> should_autocomplete;
   std::optional<bool> is_autofilled_according_to_renderer;
   std::optional<url::Origin> origin;
-  std::vector<SelectOption> select_options;
-  std::vector<SelectOption> datalist_options;
-  FieldPropertiesMask properties_mask = 0;
-  bool checked = false;
+  std::optional<std::vector<SelectOption>> select_options;
+  std::optional<std::vector<SelectOption>> datalist_options;
+  std::optional<FieldPropertiesMask> properties_mask;
+  std::optional<bool> checked;
   std::optional<int32_t> form_control_ax_id;
   std::optional<FormFieldData::LabelSource> label_source;
   std::optional<std::u16string> pattern;
@@ -156,23 +156,22 @@ FormFieldData GetFormFieldData(const FieldDescriptionType& description) {
   FormFieldData field_data =
       typename FieldDescriptionType::RoleHandler{}(description.role);
 
-  field_data.set_form_control_type(description.form_control_type);
-  if (field_data.form_control_type() == FormControlType::kSelectOne &&
-      !description.select_options.empty()) {
-    field_data.set_options(description.select_options);
+  field_data.set_form_control_type(
+      description.form_control_type.value_or(FormControlType::kInputText));
+  if (field_data.form_control_type() == FormControlType::kSelectOne) {
+    field_data.set_options(description.select_options.value_or({}));
   }
-  if (!description.datalist_options.empty()) {
-    field_data.set_datalist_options(description.datalist_options);
-  }
+  field_data.set_datalist_options(description.datalist_options.value_or({}));
   field_data.set_renderer_id(
       description.renderer_id.value_or(MakeFieldRendererId()));
   field_data.set_host_form_id(MakeFormRendererId());
-  field_data.set_is_focusable(description.is_focusable);
-  field_data.set_is_visible(description.is_visible);
-  if (!description.autocomplete_attribute.empty()) {
-    field_data.set_autocomplete_attribute(description.autocomplete_attribute);
+  field_data.set_is_focusable(description.is_focusable.value_or(true));
+  field_data.set_is_visible(description.is_visible.value_or(true));
+  if (description.autocomplete_attribute &&
+      !description.autocomplete_attribute->empty()) {
+    field_data.set_autocomplete_attribute(*description.autocomplete_attribute);
     field_data.set_parsed_autocomplete(
-        ParseAutocompleteAttribute(description.autocomplete_attribute));
+        ParseAutocompleteAttribute(*description.autocomplete_attribute));
   }
   if (description.host_frame) {
     field_data.set_host_frame(*description.host_frame);
@@ -220,12 +219,13 @@ FormFieldData GetFormFieldData(const FieldDescriptionType& description) {
   }
   field_data.set_is_autofilled_according_to_renderer(
       description.is_autofilled_according_to_renderer.value_or(false));
-  field_data.set_should_autocomplete(description.should_autocomplete);
-  field_data.set_properties_mask(description.properties_mask);
-  if (field_data.form_control_type() == FormControlType::kInputCheckbox ||
-      field_data.form_control_type() == FormControlType::kInputRadio) {
+  field_data.set_should_autocomplete(
+      description.should_autocomplete.value_or(true));
+  field_data.set_properties_mask(description.properties_mask.value_or(0));
+  if ((field_data.form_control_type() == FormControlType::kInputCheckbox ||
+       field_data.form_control_type() == FormControlType::kInputRadio)) {
     field_data.set_check_status(
-        description.checked
+        description.checked.value_or(false)
             ? FormFieldData::CheckStatus::kChecked
             : FormFieldData::CheckStatus::kCheckableButUnchecked);
   }
@@ -244,7 +244,7 @@ FormFieldData GetFormFieldData(const FieldDescriptionType& description) {
   if (description.text_direction) {
     field_data.set_text_direction(*description.text_direction);
   }
-  CHECK(!description.checked ||
+  CHECK(!description.checked.value_or(false) ||
         field_data.form_control_type() == FormControlType::kInputCheckbox ||
         field_data.form_control_type() == FormControlType::kInputRadio)
       << "Only <input type=checkbox> and <input type=radio> are checkable";

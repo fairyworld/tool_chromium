@@ -372,10 +372,9 @@ TEST_F(FormFillerTest, SkipPreFilledFields) {
            {.role = ADDRESS_HOME_STATE,
             .value = kSelectedState,
             .form_control_type = FormControlType::kSelectOne,
-            .select_options = {SelectOption{.value = kSelectedState,
-                                            .text = kSelectedState},
-                               SelectOption{.value = kToBeFilledState,
-                                            .text = kToBeFilledState}}},
+            .select_options =
+                {{{.value = kSelectedState, .text = kSelectedState},
+                  {.value = kToBeFilledState, .text = kToBeFilledState}}}},
            // Value initialized with whitespace-only, expect field to be filled.
            {.role = ADDRESS_HOME_COUNTRY, .value = u" "}}});
   FormsSeen({form});
@@ -2638,22 +2637,22 @@ TEST_F(FormFillerTest, GlicFillingDoeNotSetIsAutofilled) {
 // multiple options with the same value.
 TEST_F(FormFillerTest, SelectElementWithDuplicateValuesAndDistinctTexts) {
   FormData us_filled_form = test::GetFormData(
-      {.fields = {
-           {.role = NAME_FULL},
-           {.role = PHONE_HOME_COUNTRY_CODE,
-            .form_control_type = FormControlType::kSelectOne,
-            .select_options = {{.value = u"1", .text = u"Canada (+1)"},
-                               {.value = u"1", .text = u"United States (+1)"}}},
-           {.role = PHONE_HOME_CITY_AND_NUMBER_WITHOUT_TRUNK_PREFIX}}});
+      {.fields = {{.role = NAME_FULL},
+                  {.role = PHONE_HOME_COUNTRY_CODE,
+                   .form_control_type = FormControlType::kSelectOne,
+                   .select_options = {{{.value = u"1", .text = u"Canada (+1)"},
+                                       {.value = u"1",
+                                        .text = u"United States (+1)"}}}},
+                  {.role = PHONE_HOME_CITY_AND_NUMBER_WITHOUT_TRUNK_PREFIX}}});
 
   FormData ca_filled_form = test::GetFormData(
-      {.fields = {
-           {.role = NAME_FULL},
-           {.role = PHONE_HOME_COUNTRY_CODE,
-            .form_control_type = FormControlType::kSelectOne,
-            .select_options = {{.value = u"1", .text = u"Canada (+1)"},
-                               {.value = u"1", .text = u"United States (+1)"}}},
-           {.role = PHONE_HOME_CITY_AND_NUMBER_WITHOUT_TRUNK_PREFIX}}});
+      {.fields = {{.role = NAME_FULL},
+                  {.role = PHONE_HOME_COUNTRY_CODE,
+                   .form_control_type = FormControlType::kSelectOne,
+                   .select_options = {{{.value = u"1", .text = u"Canada (+1)"},
+                                       {.value = u"1",
+                                        .text = u"United States (+1)"}}}},
+                  {.role = PHONE_HOME_CITY_AND_NUMBER_WITHOUT_TRUNK_PREFIX}}});
 
   FormsSeen({us_filled_form, ca_filled_form});
 
