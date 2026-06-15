@@ -221,7 +221,7 @@ class TouchToFillPaymentMethodControllerImplTest
   }
 
   void SetUpIbanFormField() {
-    some_form_data_ = autofill::test::CreateTestIbanFormData();
+    some_form_data_ = test::CreateTestIbanFormData();
     some_form_ = some_form_data_.global_id();
     some_field_ = test::MakeFieldGlobalId();
   }
@@ -328,8 +328,8 @@ class TouchToFillPaymentMethodControllerImplTest
   std::unique_ptr<content::WebContents> second_web_contents_;
 
   FormData some_form_data_ =
-      autofill::test::CreateTestCreditCardFormData(/*is_https=*/true,
-                                                   /*use_month_type=*/false);
+      test::CreateTestCreditCardFormData(/*is_https=*/true,
+                                         /*use_month_type=*/false);
   FormGlobalId some_form_ = some_form_data_.global_id();
   FieldGlobalId some_field_ = test::MakeFieldGlobalId();
 };
@@ -534,8 +534,7 @@ TEST_F(TouchToFillPaymentMethodControllerImplTest,
 TEST_F(TouchToFillPaymentMethodControllerImplTest,
        ShowBnplIssuersOnPreexistingView) {
   base::MockOnceClosure mock_cancel_callback;
-  base::MockOnceCallback<void(autofill::BnplIssuer)>
-      mock_selected_issuer_callback;
+  base::MockOnceCallback<void(BnplIssuer)> mock_selected_issuer_callback;
   EXPECT_CALL(*mock_view_,
               ShowPaymentMethods(
                   &payment_method_controller(), ElementsAreArray(suggestions_),
@@ -559,8 +558,7 @@ TEST_F(TouchToFillPaymentMethodControllerImplTest,
 TEST_F(TouchToFillPaymentMethodControllerImplTest,
        ShowBnplIssuersAbortsIfNoViewAvailable) {
   base::MockOnceClosure mock_cancel_callback;
-  base::MockOnceCallback<void(autofill::BnplIssuer)>
-      mock_selected_issuer_callback;
+  base::MockOnceCallback<void(BnplIssuer)> mock_selected_issuer_callback;
   EXPECT_CALL(*mock_view_, ShowBnplIssuers).Times(0);
   EXPECT_CALL(ttf_delegate(), SetCancelCallback).Times(0);
   EXPECT_CALL(ttf_delegate(), SetSelectedIssuerCallback).Times(0);

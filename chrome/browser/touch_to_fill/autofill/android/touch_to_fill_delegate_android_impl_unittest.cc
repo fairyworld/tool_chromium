@@ -86,37 +86,32 @@ class MockPaymentsAutofillClient : public payments::TestPaymentsAutofillClient {
               ScanCreditCard,
               (CreditCardScanCallback callback),
               (override));
-  MOCK_METHOD(
-      bool,
-      ShowTouchToFillCreditCard,
-      ((base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate> delegate),
-       (base::span<const Suggestion> suggestions)),
-      (override));
-  MOCK_METHOD(
-      bool,
-      ShowTouchToFillIban,
-      (base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate> delegate,
-       base::span<const Iban> ibans_to_suggest),
-      (override));
-  MOCK_METHOD(
-      bool,
-      ShowTouchToFillAffiliatedLoyaltyCard,
-      (base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate> delegate,
-       std::vector<LoyaltyCard> loyalty_cards_to_suggest),
-      (override));
-  MOCK_METHOD(
-      bool,
-      ShowTouchToFillForAllLoyaltyCards,
-      (base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate> delegate,
-       std::vector<LoyaltyCard> loyalty_cards_to_suggest),
-      (override));
+  MOCK_METHOD(bool,
+              ShowTouchToFillCreditCard,
+              ((base::WeakPtr<TouchToFillPaymentMethodDelegate> delegate),
+               (base::span<const Suggestion> suggestions)),
+              (override));
+  MOCK_METHOD(bool,
+              ShowTouchToFillIban,
+              (base::WeakPtr<TouchToFillPaymentMethodDelegate> delegate,
+               base::span<const Iban> ibans_to_suggest),
+              (override));
+  MOCK_METHOD(bool,
+              ShowTouchToFillAffiliatedLoyaltyCard,
+              (base::WeakPtr<TouchToFillPaymentMethodDelegate> delegate,
+               std::vector<LoyaltyCard> loyalty_cards_to_suggest),
+              (override));
+  MOCK_METHOD(bool,
+              ShowTouchToFillForAllLoyaltyCards,
+              (base::WeakPtr<TouchToFillPaymentMethodDelegate> delegate,
+               std::vector<LoyaltyCard> loyalty_cards_to_suggest),
+              (override));
   MOCK_METHOD(void, HideTouchToFillPaymentMethod, (), (override));
 
   void ExpectDelegateWeakPtrFromShowInvalidatedOnHideForCards() {
     EXPECT_CALL(*this, ShowTouchToFillCreditCard)
         .WillOnce(
-            [this](base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate>
-                       delegate,
+            [this](base::WeakPtr<TouchToFillPaymentMethodDelegate> delegate,
                    base::span<const Suggestion> suggestions) {
               captured_delegate_ = delegate;
               return true;
@@ -129,8 +124,7 @@ class MockPaymentsAutofillClient : public payments::TestPaymentsAutofillClient {
   void ExpectDelegateWeakPtrFromShowInvalidatedOnHideForIbans() {
     EXPECT_CALL(*this, ShowTouchToFillIban)
         .WillOnce(
-            [this](base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate>
-                       delegate,
+            [this](base::WeakPtr<TouchToFillPaymentMethodDelegate> delegate,
                    base::span<const Iban> ibans_to_suggest) {
               captured_delegate_ = delegate;
               return true;
@@ -144,8 +138,7 @@ class MockPaymentsAutofillClient : public payments::TestPaymentsAutofillClient {
   ExpectDelegateWeakPtrFromShowInvalidatedOnHideForAffiliatedLoyaltyCards() {
     EXPECT_CALL(*this, ShowTouchToFillAffiliatedLoyaltyCard)
         .WillOnce(
-            [this](base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate>
-                       delegate,
+            [this](base::WeakPtr<TouchToFillPaymentMethodDelegate> delegate,
                    base::span<const LoyaltyCard> loyalty_cards_to_suggest) {
               captured_delegate_ = delegate;
               return true;
@@ -158,8 +151,7 @@ class MockPaymentsAutofillClient : public payments::TestPaymentsAutofillClient {
   void ExpectDelegateWeakPtrFromShowInvalidatedOnHideForAllLoyaltyCards() {
     EXPECT_CALL(*this, ShowTouchToFillForAllLoyaltyCards)
         .WillOnce(
-            [this](base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate>
-                       delegate,
+            [this](base::WeakPtr<TouchToFillPaymentMethodDelegate> delegate,
                    base::span<const LoyaltyCard> loyalty_cards_to_suggest) {
               captured_delegate_ = delegate;
               return true;
@@ -170,7 +162,7 @@ class MockPaymentsAutofillClient : public payments::TestPaymentsAutofillClient {
   }
 
  private:
-  base::WeakPtr<autofill::TouchToFillPaymentMethodDelegate> captured_delegate_;
+  base::WeakPtr<TouchToFillPaymentMethodDelegate> captured_delegate_;
 };
 
 class MockAutofillClient : public TestAutofillClient {
@@ -964,7 +956,7 @@ TEST_F(TouchToFillDelegateAndroidImplCreditCardUnitTest,
       .GetPersonalDataManager()
       .test_payments_data_manager()
       .ClearCreditCards();
-  CreditCard credit_card = autofill::test::GetCreditCard();
+  CreditCard credit_card = test::GetCreditCard();
   CreditCard expired_card = test::GetExpiredCreditCard();
   autofill_client()
       .GetPersonalDataManager()
@@ -987,7 +979,7 @@ TEST_F(TouchToFillDelegateAndroidImplCreditCardUnitTest,
       .GetPersonalDataManager()
       .test_payments_data_manager()
       .ClearCreditCards();
-  CreditCard credit_card = autofill::test::GetCreditCard();
+  CreditCard credit_card = test::GetCreditCard();
   CreditCard expired_card = test::GetExpiredCreditCard();
   autofill_client()
       .GetPersonalDataManager()
@@ -1026,7 +1018,7 @@ TEST_F(TouchToFillDelegateAndroidImplCreditCardUnitTest,
       .GetPersonalDataManager()
       .test_payments_data_manager()
       .ClearCreditCards();
-  CreditCard credit_card = autofill::test::GetCreditCard();
+  CreditCard credit_card = test::GetCreditCard();
   CreditCard disused_expired_card = test::GetExpiredCreditCard();
   credit_card.usage_history().set_use_date(AutofillClock::Now());
   disused_expired_card.usage_history().set_use_date(
@@ -1060,7 +1052,7 @@ TEST_F(TouchToFillDelegateAndroidImplCreditCardUnitTest,
       .test_payments_data_manager()
       .ClearCreditCards();
   CreditCard credit_card =
-      autofill::test::GetMaskedServerCardEnrolledIntoVirtualCardNumber();
+      test::GetMaskedServerCardEnrolledIntoVirtualCardNumber();
   CreditCard virtual_card = CreditCard::CreateVirtualCard(credit_card);
   autofill_client()
       .GetPersonalDataManager()
@@ -1115,8 +1107,8 @@ TEST_F(TouchToFillDelegateAndroidImplCreditCardUnitTest,
       .GetPersonalDataManager()
       .test_payments_data_manager()
       .AddAsLocalIban(std::move(iban1));
-  CreditCard credit_card1 = autofill::test::GetCreditCard();
-  CreditCard credit_card2 = autofill::test::GetCreditCard2();
+  CreditCard credit_card1 = test::GetCreditCard();
+  CreditCard credit_card2 = test::GetCreditCard2();
   autofill_client()
       .GetPersonalDataManager()
       .payments_data_manager()
@@ -1155,7 +1147,7 @@ TEST_F(TouchToFillDelegateAndroidImplCreditCardUnitTest,
   EXPECT_CALL(payments_autofill_client(), ScanCreditCard);
   touch_to_fill_delegate_->ScanCreditCard();
 
-  CreditCard credit_card = autofill::test::GetCreditCard();
+  CreditCard credit_card = test::GetCreditCard();
   EXPECT_CALL(autofill_manager(), FillOrPreviewForm);
   touch_to_fill_delegate_->OnCreditCardScanned(credit_card);
   EXPECT_EQ(touch_to_fill_delegate_->IsShowingTouchToFill(), false);
@@ -1179,7 +1171,7 @@ TEST_F(TouchToFillDelegateAndroidImplCreditCardUnitTest,
       .GetPersonalDataManager()
       .test_payments_data_manager()
       .ClearCreditCards();
-  CreditCard credit_card = autofill::test::GetCreditCard();
+  CreditCard credit_card = test::GetCreditCard();
   autofill_client()
       .GetPersonalDataManager()
       .payments_data_manager()
@@ -1198,7 +1190,7 @@ TEST_F(TouchToFillDelegateAndroidImplCreditCardUnitTest,
       .GetPersonalDataManager()
       .test_payments_data_manager()
       .ClearCreditCards();
-  CreditCard credit_card = autofill::test::GetCreditCard();
+  CreditCard credit_card = test::GetCreditCard();
   autofill_client()
       .GetPersonalDataManager()
       .payments_data_manager()
@@ -1218,7 +1210,7 @@ TEST_F(TouchToFillDelegateAndroidImplCreditCardUnitTest,
       .test_payments_data_manager()
       .ClearCreditCards();
   CreditCard credit_card =
-      autofill::test::GetMaskedServerCardEnrolledIntoVirtualCardNumber();
+      test::GetMaskedServerCardEnrolledIntoVirtualCardNumber();
   autofill_client()
       .GetPersonalDataManager()
       .payments_data_manager()
@@ -1348,7 +1340,7 @@ TEST_F(TouchToFillDelegateAndroidImplIbanUnitTest, PassTheIbansToTheClient) {
   TestPaymentsDataManager& paydm =
       autofill_client().GetPersonalDataManager().test_payments_data_manager();
   paydm.ClearAllLocalData();
-  paydm.AddCreditCard(autofill::test::GetCreditCard());
+  paydm.AddCreditCard(test::GetCreditCard());
   Iban iban1;
   iban1.set_value(base::UTF8ToUTF16(std::string(test::kIbanValue_1)));
   paydm.AddAsLocalIban(std::move(iban1));
