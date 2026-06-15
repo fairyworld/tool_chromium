@@ -1234,409 +1234,6 @@ class FormAutofillTest : public test::AutofillRendererTest {
     EXPECT_EQ(5u, input_element.SelectionEnd());
   }
 
-  // Tests that loading, dynamically editing, and then autofilling the form in
-  // `html` yields a specific result.
-  //
-  // The form is expected to have a very specific structure. In particular, its
-  // fields are supposed to be first name, last name, phone, credit card number,
-  // city, and state, whose placeholder attributes are supposed to match the
-  // `placeholder_*` arguments.
-  //
-  // Each field's value is modified dynamically. The second one is explicitly
-  // marked as user-edited; the other ones are not. The third and fourth field's
-  // values are typical placeholder values are expected to be ignored.
-  //
-  // TODO(crbug.com/41483772): Remove implicit assumptions about `html` from
-  // this function.
-  void TestFillFormAndModifyValues(const char* html,
-                                   const char* placeholder_firstname,
-                                   const char* placeholder_lastname,
-                                   const char* placeholder_phone,
-                                   const char* placeholder_creditcard,
-                                   const char* placeholder_city,
-                                   const char* placeholder_state) {
-    LoadHTML(html);
-
-    std::vector<FormData> forms = UpdateFormCache().updated_forms;
-    ASSERT_EQ(1U, forms.size());
-
-    // Get the input element we want to find.
-    WebInputElement input_element = GetInputElementById("firstname");
-    WebFormElement form_element = input_element.Form();
-    std::vector<WebFormControlElement> control_elements =
-        GetOwnedAutofillableFormControls(input_element.GetDocument(),
-                                         form_element);
-
-    ASSERT_EQ(6U, control_elements.size());
-    // We now modify the values.
-    // This will be ignored, the string will be sanitized into an empty string.
-    control_elements[0].SetValue(WebString::FromUtf16(
-        std::u16string(1, base::i18n::kLeftToRightMark) + u"     "));
-
-    // This will be considered as a value entered by the user.
-    control_elements[1].SetValue(WebString::FromUtf16(u"Earp"));
-    control_elements[1].SetUserHasEditedTheField(true);
-
-    // This will be ignored, the string will be sanitized into an empty string.
-    control_elements[2].SetValue(WebString::FromUtf16(u"(___)-___-____"));
-
-    // This will be ignored, the string will be sanitized into an empty string.
-    control_elements[3].SetValue(WebString::FromUtf16(u"____-____-____-____"));
-
-    // This will be ignored, because it's injected by the website and not the
-    // user.
-    control_elements[4].SetValue(WebString::FromUtf16(u"Enter your city.."));
-
-    control_elements[5].SetValue(WebString::FromUtf16(u"AK"));
-
-    // Find the form that contains the input element.
-    FormData form = FindForm(input_element);
-    EXPECT_EQ(u"TestForm", form.name());
-    EXPECT_EQ(GURL("http://abc.com"), form.action());
-
-    const std::vector<FormFieldData>& fields = form.fields();
-    ASSERT_EQ(6U, fields.size());
-
-    // Preview the form and verify that the cursor position has been updated.
-    test_api(form).field(0).set_value(u"Wyatt");
-    test_api(form).field(1).set_value(u"Earpagus");
-    test_api(form).field(2).set_value(u"888-123-4567");
-    test_api(form).field(3).set_value(u"1111-2222-3333-4444");
-    test_api(form).field(4).set_value(u"Montreal");
-    test_api(form).field(5).set_value(u"AA");
-    test_api(form).field(0).set_is_autofilled_according_to_renderer(true);
-    test_api(form).field(1).set_is_autofilled_according_to_renderer(true);
-    test_api(form).field(2).set_is_autofilled_according_to_renderer(true);
-    test_api(form).field(3).set_is_autofilled_according_to_renderer(true);
-    test_api(form).field(4).set_is_autofilled_according_to_renderer(true);
-    test_api(form).field(5).set_is_autofilled_according_to_renderer(true);
-    ExecuteJavaScriptForTests("document.getElementById('firstname').focus();");
-    ApplyFieldsAction(input_element.GetDocument(), form.fields(),
-                      mojom::ActionPersistence::kPreview);
-
-    // Fill the form.
-    ApplyFieldsAction(input_element.GetDocument(), form.fields(),
-                      mojom::ActionPersistence::kFill);
-
-    // Find the newly-filled form that contains the input element.
-    FormData form2 = FindForm(input_element);
-    EXPECT_EQ(u"TestForm", form2.name());
-    EXPECT_EQ(GURL("http://abc.com"), form2.action());
-
-    const std::vector<FormFieldData>& fields2 = form2.fields();
-    ASSERT_EQ(6U, fields2.size());
-
-    FormFieldData expected;
-    expected.set_form_control_type(FormControlType::kInputText);
-    expected.set_max_length(FormFieldData::kDefaultMaxLength);
-
-    expected.set_id_attribute(u"firstname");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Wyatt");
-    if (placeholder_firstname) {
-      expected.set_label(ASCIIToUTF16(placeholder_firstname));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_firstname));
-    } else {
-      expected.set_label({});
-      expected.set_placeholder({});
-    }
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[0]);
-
-    // The last name field is not filled, because there is a value in it.
-    expected.set_id_attribute(u"lastname");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Earp");
-    if (placeholder_lastname) {
-      expected.set_label(ASCIIToUTF16(placeholder_lastname));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_lastname));
-    } else {
-      expected.set_label({});
-      expected.set_placeholder({});
-    }
-    expected.set_is_autofilled_according_to_renderer(false);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[1]);
-
-    expected.set_id_attribute(u"phone");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"888-123-4567");
-    if (placeholder_phone) {
-      expected.set_label(ASCIIToUTF16(placeholder_phone));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_phone));
-    } else {
-      expected.set_label({});
-      expected.set_placeholder({});
-    }
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[2]);
-
-    expected.set_id_attribute(u"cc");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"1111-2222-3333-4444");
-    if (placeholder_creditcard) {
-      expected.set_label(ASCIIToUTF16(placeholder_creditcard));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_creditcard));
-    } else {
-      expected.set_label({});
-      expected.set_placeholder({});
-    }
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[3]);
-
-    expected.set_id_attribute(u"city");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"Montreal");
-    if (placeholder_city) {
-      expected.set_label(ASCIIToUTF16(placeholder_city));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_city));
-    } else {
-      expected.set_label({});
-      expected.set_placeholder({});
-    }
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[4]);
-
-    expected.set_form_control_type(FormControlType::kSelectOne);
-    expected.set_id_attribute(u"state");
-    expected.set_name_attribute(u"state");
-    expected.set_name(expected.name_attribute());
-    expected.set_value(u"AA");
-    if (placeholder_state) {
-      expected.set_label(ASCIIToUTF16(placeholder_state));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_state));
-    } else {
-      expected.set_label({});
-      expected.set_placeholder({});
-    }
-    expected.set_is_autofilled_according_to_renderer(true);
-    expected.set_max_length(0);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[5]);
-  }
-
-  // Similar to TestFillFormAndModifyValues().
-  // TODO(crbug.com/41483772): Remove implicit assumptions about `html` from
-  // this function.
-  void TestFillFormAndModifyInitiatingValue(const char* html,
-                                            const char* placeholder_creditcard,
-                                            const char* placeholder_expiration,
-                                            const char* placeholder_name) {
-    LoadHTML(html);
-
-    std::vector<FormData> forms = UpdateFormCache().updated_forms;
-    ASSERT_EQ(1U, forms.size());
-
-    // Get the input element we want to find.
-    WebInputElement input_element = GetInputElementById("cc");
-    WebFormElement form_element = input_element.Form();
-    std::vector<WebFormControlElement> control_elements =
-        GetOwnedAutofillableFormControls(input_element.GetDocument(),
-                                         form_element);
-
-    ASSERT_EQ(3U, control_elements.size());
-    // We now modify the values.
-    // This will be ignored.
-    control_elements[0].SetValue(WebString::FromUtf16(u"____-____-____-____"));
-    // This will be ignored.
-    control_elements[1].SetValue(WebString::FromUtf16(u"____/__"));
-    control_elements[2].SetValue(WebString::FromUtf16(u"John Smith"));
-    control_elements[2].SetUserHasEditedTheField(true);
-
-    // Find the form that contains the input element.
-    FormData form = FindForm(input_element);
-    EXPECT_EQ(u"TestForm", form.name());
-    EXPECT_EQ(GURL("http://abc.com"), form.action());
-
-    const std::vector<FormFieldData>& fields = form.fields();
-    ASSERT_EQ(3U, fields.size());
-
-    // Preview the form and verify that the cursor position has been updated.
-    test_api(form).field(0).set_value(u"1111-2222-3333-4444");
-    test_api(form).field(1).set_value(u"03/2030");
-    test_api(form).field(2).set_value(u"Susan Smith");
-    test_api(form).field(0).set_is_autofilled_according_to_renderer(true);
-    test_api(form).field(1).set_is_autofilled_according_to_renderer(true);
-    test_api(form).field(2).set_is_autofilled_according_to_renderer(true);
-    ExecuteJavaScriptForTests("document.getElementById('cc').focus();");
-    ApplyFieldsAction(input_element.GetDocument(), form.fields(),
-                      mojom::ActionPersistence::kPreview);
-    // The selection should be set after the 19th character.
-    EXPECT_EQ(19u, input_element.SelectionStart());
-    EXPECT_EQ(19u, input_element.SelectionEnd());
-
-    // Fill the form.
-    ApplyFieldsAction(input_element.GetDocument(), form.fields(),
-                      mojom::ActionPersistence::kFill);
-
-    // Find the newly-filled form that contains the input element.
-    FormData form2 = FindForm(input_element);
-    EXPECT_EQ(u"TestForm", form2.name());
-    EXPECT_EQ(GURL("http://abc.com"), form2.action());
-
-    const std::vector<FormFieldData>& fields2 = form2.fields();
-    ASSERT_EQ(3U, fields2.size());
-
-    FormFieldData expected;
-    expected.set_form_control_type(FormControlType::kInputText);
-    expected.set_max_length(FormFieldData::kDefaultMaxLength);
-
-    expected.set_id_attribute(u"cc");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"1111-2222-3333-4444");
-    if (placeholder_creditcard) {
-      expected.set_label(ASCIIToUTF16(placeholder_creditcard));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_creditcard));
-    } else {
-      expected.set_label({});
-      expected.set_placeholder({});
-    }
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[0]);
-
-    expected.set_id_attribute(u"expiration_date");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"03/2030");
-    if (placeholder_expiration) {
-      expected.set_label(ASCIIToUTF16(placeholder_expiration));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_expiration));
-    } else {
-      expected.set_label({});
-      expected.set_placeholder({});
-    }
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[1]);
-
-    expected.set_id_attribute(u"name");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"John Smith");
-    if (placeholder_name) {
-      expected.set_label(ASCIIToUTF16(placeholder_name));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_name));
-    } else {
-      expected.set_label({});
-      expected.set_placeholder({});
-    }
-    expected.set_is_autofilled_according_to_renderer(false);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[2]);
-
-    // Verify that the cursor position has been updated.
-    EXPECT_EQ(19u, input_element.SelectionStart());
-    EXPECT_EQ(19u, input_element.SelectionEnd());
-  }
-
-  // Similar to TestFillFormAndModifyValues().
-  // TODO(crbug.com/41483772): Remove implicit assumptions about `html` from
-  // this function.
-  void TestFillFormJSModifiesUserInputValue(const char* html,
-                                            const char* placeholder_creditcard,
-                                            const char* placeholder_expiration,
-                                            const char* placeholder_name) {
-    LoadHTML(html);
-
-    std::vector<FormData> forms = UpdateFormCache().updated_forms;
-    ASSERT_EQ(1U, forms.size());
-
-    // Get the input element we want to find.
-    WebInputElement input_element = GetInputElementById("cc");
-    WebFormElement form_element = input_element.Form();
-    std::vector<WebFormControlElement> control_elements =
-        GetOwnedAutofillableFormControls(input_element.GetDocument(),
-                                         form_element);
-
-    ASSERT_EQ(3U, control_elements.size());
-    // We now modify the values.
-    // This will be ignored.
-    control_elements[0].SetValue(WebString::FromUtf16(u"____-____-____-____"));
-    // This will be ignored.
-    control_elements[1].SetValue(WebString::FromUtf16(u"____/__"));
-    control_elements[2].SetValue(WebString::FromUtf16(u"john smith"));
-    control_elements[2].SetUserHasEditedTheField(true);
-
-    // Sometimes the JS modifies the value entered by the user.
-    ExecuteJavaScriptForTests(
-        "document.getElementById('name').value = 'John Smith';");
-
-    // Find the form that contains the input element.
-    FormData form = FindForm(input_element);
-    EXPECT_EQ(u"TestForm", form.name());
-    EXPECT_EQ(GURL("http://abc.com"), form.action());
-
-    const std::vector<FormFieldData>& fields = form.fields();
-    ASSERT_EQ(3U, fields.size());
-
-    // Preview the form and verify that the cursor position has been updated.
-    test_api(form).field(0).set_value(u"1111-2222-3333-4444");
-    test_api(form).field(1).set_value(u"03/2030");
-    test_api(form).field(2).set_value(u"Susan Smith");
-    test_api(form).field(0).set_is_autofilled_according_to_renderer(true);
-    test_api(form).field(1).set_is_autofilled_according_to_renderer(true);
-    test_api(form).field(2).set_is_autofilled_according_to_renderer(true);
-    ExecuteJavaScriptForTests("document.getElementById('cc').focus();");
-    ApplyFieldsAction(input_element.GetDocument(), form.fields(),
-                      mojom::ActionPersistence::kPreview);
-    // The selection should be set after the 19th character.
-    EXPECT_EQ(19u, input_element.SelectionStart());
-    EXPECT_EQ(19u, input_element.SelectionEnd());
-
-    // Fill the form.
-    ApplyFieldsAction(input_element.GetDocument(), form.fields(),
-                      mojom::ActionPersistence::kFill);
-
-    // Find the newly-filled form that contains the input element.
-    FormData form2 = FindForm(input_element);
-    EXPECT_EQ(u"TestForm", form2.name());
-    EXPECT_EQ(GURL("http://abc.com"), form2.action());
-
-    const std::vector<FormFieldData>& fields2 = form2.fields();
-    ASSERT_EQ(3U, fields2.size());
-
-    FormFieldData expected;
-    expected.set_form_control_type(FormControlType::kInputText);
-    expected.set_max_length(FormFieldData::kDefaultMaxLength);
-
-    expected.set_id_attribute(u"cc");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"1111-2222-3333-4444");
-    if (placeholder_creditcard) {
-      expected.set_label(ASCIIToUTF16(placeholder_creditcard));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_creditcard));
-    } else {
-      expected.set_label({});
-      expected.set_placeholder({});
-    }
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[0]);
-
-    expected.set_id_attribute(u"expiration_date");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"03/2030");
-    if (placeholder_expiration) {
-      expected.set_label(ASCIIToUTF16(placeholder_expiration));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_expiration));
-    } else {
-      expected.set_label({});
-      expected.set_placeholder({});
-    }
-    expected.set_is_autofilled_according_to_renderer(true);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[1]);
-
-    expected.set_id_attribute(u"name");
-    expected.set_name(expected.id_attribute());
-    expected.set_value(u"John Smith");
-    if (placeholder_name) {
-      expected.set_label(ASCIIToUTF16(placeholder_name));
-      expected.set_placeholder(ASCIIToUTF16(placeholder_name));
-    } else {
-      expected.set_label({});
-      expected.set_placeholder({});
-    }
-    expected.set_is_autofilled_according_to_renderer(false);
-    EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[2]);
-
-    // Verify that the cursor position has been updated.
-    EXPECT_EQ(19u, input_element.SelectionStart());
-    EXPECT_EQ(19u, input_element.SelectionEnd());
-  }
-
   void TestClearPreviewedElements(const char* html) {
     LoadHTML(html);
 
@@ -4268,9 +3865,17 @@ TEST_F(FormAutofillTest, FillFormNonEmptyFieldsWithDefaultValues) {
       false, "Enter last name", "Enter email", nullptr, nullptr, nullptr);
 }
 
+// Tests that loading, dynamically editing, and then autofilling the form in
+// an HTML string yields a specific result.
+//
+// The form contains the fields first name, last name, phone, credit card
+// number, city, and state, each with the placeholder attribute set.
+//
+// Each field's value is modified dynamically. The second one is explicitly
+// marked as user-edited; the other ones are not. The third and fourth field's
+// values are typical placeholder values that are expected to be ignored.
 TEST_F(FormAutofillTest, FillFormModifyValues) {
-  TestFillFormAndModifyValues(
-      R"(<form name=TestForm action='http://abc.com'>
+  LoadHTML(R"(<form name=TestForm action='http://abc.com'>
            <input id=firstname placeholder='First Name' value='First Name'>
            <input id=lastname placeholder='Last Name' value='Last Name'>
            <input id=phone placeholder=Phone value=Phone>
@@ -4283,33 +3888,328 @@ TEST_F(FormAutofillTest, FillFormModifyValues) {
              <option>AK</option>
            </select>
            <input type=submit value=Send>
-         </form>)",
-      "First Name", "Last Name", "Phone", "Credit Card Number", "City",
-      "State");
+         </form>)");
+
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  // Get the input element we want to find.
+  WebInputElement input_element = GetInputElementById("firstname");
+  WebFormElement form_element = input_element.Form();
+  std::vector<WebFormControlElement> control_elements =
+      GetOwnedAutofillableFormControls(input_element.GetDocument(),
+                                       form_element);
+
+  ASSERT_EQ(6U, control_elements.size());
+  // We now modify the values.
+  // This will be ignored, the string will be sanitized into an empty string.
+  control_elements[0].SetValue(WebString::FromUtf16(
+      std::u16string(1, base::i18n::kLeftToRightMark) + u"     "));
+
+  // This will be considered as a value entered by the user.
+  control_elements[1].SetValue(WebString::FromUtf16(u"Earp"));
+  control_elements[1].SetUserHasEditedTheField(true);
+
+  // This will be ignored, the string will be sanitized into an empty string.
+  control_elements[2].SetValue(WebString::FromUtf16(u"(___)-___-____"));
+
+  // This will be ignored, the string will be sanitized into an empty string.
+  control_elements[3].SetValue(WebString::FromUtf16(u"____-____-____-____"));
+
+  // This will be ignored, because it's injected by the website and not the
+  // user.
+  control_elements[4].SetValue(WebString::FromUtf16(u"Enter your city.."));
+
+  control_elements[5].SetValue(WebString::FromUtf16(u"AK"));
+
+  // Find the form that contains the input element.
+  FormData form = FindForm(input_element);
+  EXPECT_EQ(u"TestForm", form.name());
+  EXPECT_EQ(GURL("http://abc.com"), form.action());
+
+  const std::vector<FormFieldData>& fields = form.fields();
+  ASSERT_EQ(6U, fields.size());
+
+  // Preview the form and verify that the cursor position has been updated.
+  test_api(form).field(0).set_value(u"Wyatt");
+  test_api(form).field(1).set_value(u"Earpagus");
+  test_api(form).field(2).set_value(u"888-123-4567");
+  test_api(form).field(3).set_value(u"1111-2222-3333-4444");
+  test_api(form).field(4).set_value(u"Montreal");
+  test_api(form).field(5).set_value(u"AA");
+  test_api(form).field(0).set_is_autofilled_according_to_renderer(true);
+  test_api(form).field(1).set_is_autofilled_according_to_renderer(true);
+  test_api(form).field(2).set_is_autofilled_according_to_renderer(true);
+  test_api(form).field(3).set_is_autofilled_according_to_renderer(true);
+  test_api(form).field(4).set_is_autofilled_according_to_renderer(true);
+  test_api(form).field(5).set_is_autofilled_according_to_renderer(true);
+  ExecuteJavaScriptForTests("document.getElementById('firstname').focus();");
+  ApplyFieldsAction(input_element.GetDocument(), form.fields(),
+                    mojom::ActionPersistence::kPreview);
+
+  // Fill the form.
+  ApplyFieldsAction(input_element.GetDocument(), form.fields(),
+                    mojom::ActionPersistence::kFill);
+
+  // Find the newly-filled form that contains the input element.
+  FormData form2 = FindForm(input_element);
+  EXPECT_EQ(u"TestForm", form2.name());
+  EXPECT_EQ(GURL("http://abc.com"), form2.action());
+
+  const std::vector<FormFieldData>& fields2 = form2.fields();
+  ASSERT_EQ(6U, fields2.size());
+
+  FormFieldData expected;
+  expected.set_form_control_type(FormControlType::kInputText);
+  expected.set_max_length(FormFieldData::kDefaultMaxLength);
+
+  expected.set_id_attribute(u"firstname");
+  expected.set_name(expected.id_attribute());
+  expected.set_value(u"Wyatt");
+  expected.set_label(u"First Name");
+  expected.set_placeholder(u"First Name");
+  expected.set_is_autofilled_according_to_renderer(true);
+  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[0]);
+
+  // The last name field is not filled, because there is a value in it.
+  expected.set_id_attribute(u"lastname");
+  expected.set_name(expected.id_attribute());
+  expected.set_value(u"Earp");
+  expected.set_label(u"Last Name");
+  expected.set_placeholder(u"Last Name");
+  expected.set_is_autofilled_according_to_renderer(false);
+  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[1]);
+
+  expected.set_id_attribute(u"phone");
+  expected.set_name(expected.id_attribute());
+  expected.set_value(u"888-123-4567");
+  expected.set_label(u"Phone");
+  expected.set_placeholder(u"Phone");
+  expected.set_is_autofilled_according_to_renderer(true);
+  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[2]);
+
+  expected.set_id_attribute(u"cc");
+  expected.set_name(expected.id_attribute());
+  expected.set_value(u"1111-2222-3333-4444");
+  expected.set_label(u"Credit Card Number");
+  expected.set_placeholder(u"Credit Card Number");
+  expected.set_is_autofilled_according_to_renderer(true);
+  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[3]);
+
+  expected.set_id_attribute(u"city");
+  expected.set_name(expected.id_attribute());
+  expected.set_value(u"Montreal");
+  expected.set_label(u"City");
+  expected.set_placeholder(u"City");
+  expected.set_is_autofilled_according_to_renderer(true);
+  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[4]);
+
+  expected.set_form_control_type(FormControlType::kSelectOne);
+  expected.set_id_attribute(u"state");
+  expected.set_name_attribute(u"state");
+  expected.set_name(expected.name_attribute());
+  expected.set_value(u"AA");
+  expected.set_label(u"State");
+  expected.set_placeholder(u"State");
+  expected.set_is_autofilled_according_to_renderer(true);
+  expected.set_max_length(0);
+  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[5]);
 }
 
+// Similar to test case `FillFormModifyValues`.
 TEST_F(FormAutofillTest, FillFormModifyInitiatingValue) {
-  TestFillFormAndModifyInitiatingValue(
-      R"(<form name=TestForm action='http://abc.com'>
+  LoadHTML(R"(<form name=TestForm action='http://abc.com'>
            <input id=cc placeholder='Credit Card Number' value='Credit Card'>
            <input id=expiration_date placeholder='Expiration Date'
                   value='Expiration Date'>
            <input id=name placeholder='Full Name' value='Full Name'>
            <input type=submit value=Send>
-         </form>)",
-      "Credit Card Number", "Expiration Date", "Full Name");
+         </form>)");
+
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  // Get the input element we want to find.
+  WebInputElement input_element = GetInputElementById("cc");
+  WebFormElement form_element = input_element.Form();
+  std::vector<WebFormControlElement> control_elements =
+      GetOwnedAutofillableFormControls(input_element.GetDocument(),
+                                       form_element);
+
+  ASSERT_EQ(3U, control_elements.size());
+  // We now modify the values.
+  // This will be ignored.
+  control_elements[0].SetValue(WebString::FromUtf16(u"____-____-____-____"));
+  // This will be ignored.
+  control_elements[1].SetValue(WebString::FromUtf16(u"____/__"));
+  control_elements[2].SetValue(WebString::FromUtf16(u"John Smith"));
+  control_elements[2].SetUserHasEditedTheField(true);
+
+  // Find the form that contains the input element.
+  FormData form = FindForm(input_element);
+  EXPECT_EQ(u"TestForm", form.name());
+  EXPECT_EQ(GURL("http://abc.com"), form.action());
+
+  const std::vector<FormFieldData>& fields = form.fields();
+  ASSERT_EQ(3U, fields.size());
+
+  // Preview the form and verify that the cursor position has been updated.
+  test_api(form).field(0).set_value(u"1111-2222-3333-4444");
+  test_api(form).field(1).set_value(u"03/2030");
+  test_api(form).field(2).set_value(u"Susan Smith");
+  test_api(form).field(0).set_is_autofilled_according_to_renderer(true);
+  test_api(form).field(1).set_is_autofilled_according_to_renderer(true);
+  test_api(form).field(2).set_is_autofilled_according_to_renderer(true);
+  ExecuteJavaScriptForTests("document.getElementById('cc').focus();");
+  ApplyFieldsAction(input_element.GetDocument(), form.fields(),
+                    mojom::ActionPersistence::kPreview);
+  // The selection should be set after the 19th character.
+  EXPECT_EQ(19u, input_element.SelectionStart());
+  EXPECT_EQ(19u, input_element.SelectionEnd());
+
+  // Fill the form.
+  ApplyFieldsAction(input_element.GetDocument(), form.fields(),
+                    mojom::ActionPersistence::kFill);
+
+  // Find the newly-filled form that contains the input element.
+  FormData form2 = FindForm(input_element);
+  EXPECT_EQ(u"TestForm", form2.name());
+  EXPECT_EQ(GURL("http://abc.com"), form2.action());
+
+  const std::vector<FormFieldData>& fields2 = form2.fields();
+  ASSERT_EQ(3U, fields2.size());
+
+  FormFieldData expected;
+  expected.set_form_control_type(FormControlType::kInputText);
+  expected.set_max_length(FormFieldData::kDefaultMaxLength);
+
+  expected.set_id_attribute(u"cc");
+  expected.set_name(expected.id_attribute());
+  expected.set_value(u"1111-2222-3333-4444");
+  expected.set_label(u"Credit Card Number");
+  expected.set_placeholder(u"Credit Card Number");
+  expected.set_is_autofilled_according_to_renderer(true);
+  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[0]);
+
+  expected.set_id_attribute(u"expiration_date");
+  expected.set_name(expected.id_attribute());
+  expected.set_value(u"03/2030");
+  expected.set_label(u"Expiration Date");
+  expected.set_placeholder(u"Expiration Date");
+  expected.set_is_autofilled_according_to_renderer(true);
+  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[1]);
+
+  expected.set_id_attribute(u"name");
+  expected.set_name(expected.id_attribute());
+  expected.set_value(u"John Smith");
+  expected.set_label(u"Full Name");
+  expected.set_placeholder(u"Full Name");
+  expected.set_is_autofilled_according_to_renderer(false);
+  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[2]);
+
+  // Verify that the cursor position has been updated.
+  EXPECT_EQ(19u, input_element.SelectionStart());
+  EXPECT_EQ(19u, input_element.SelectionEnd());
 }
 
+// Similar to test case `FillFormModifyValues`.
 TEST_F(FormAutofillTest, FillFormJSModifiesUserInputValue) {
-  TestFillFormJSModifiesUserInputValue(
-      R"(<form name=TestForm action='http://abc.com'>
+  LoadHTML(R"(<form name=TestForm action='http://abc.com'>
            <input id=cc placeholder='Credit Card Number' value='Credit Card'>
            <input id=expiration_date placeholder='Expiration Date'
                   value='Expiration Date'>
            <input id=name placeholder='Full Name' value='Full Name'>
            <input type=submit value=Send>
-         </form>)",
-      "Credit Card Number", "Expiration Date", "Full Name");
+         </form>)");
+
+  std::vector<FormData> forms = UpdateFormCache().updated_forms;
+  ASSERT_EQ(1U, forms.size());
+
+  // Get the input element we want to find.
+  WebInputElement input_element = GetInputElementById("cc");
+  WebFormElement form_element = input_element.Form();
+  std::vector<WebFormControlElement> control_elements =
+      GetOwnedAutofillableFormControls(input_element.GetDocument(),
+                                       form_element);
+
+  ASSERT_EQ(3U, control_elements.size());
+  // We now modify the values.
+  // This will be ignored.
+  control_elements[0].SetValue(WebString::FromUtf16(u"____-____-____-____"));
+  // This will be ignored.
+  control_elements[1].SetValue(WebString::FromUtf16(u"____/__"));
+  control_elements[2].SetValue(WebString::FromUtf16(u"john smith"));
+  control_elements[2].SetUserHasEditedTheField(true);
+
+  // Sometimes the JS modifies the value entered by the user.
+  ExecuteJavaScriptForTests(
+      "document.getElementById('name').value = 'John Smith';");
+
+  // Find the form that contains the input element.
+  FormData form = FindForm(input_element);
+  EXPECT_EQ(u"TestForm", form.name());
+  EXPECT_EQ(GURL("http://abc.com"), form.action());
+
+  const std::vector<FormFieldData>& fields = form.fields();
+  ASSERT_EQ(3U, fields.size());
+
+  // Preview the form and verify that the cursor position has been updated.
+  test_api(form).field(0).set_value(u"1111-2222-3333-4444");
+  test_api(form).field(1).set_value(u"03/2030");
+  test_api(form).field(2).set_value(u"Susan Smith");
+  test_api(form).field(0).set_is_autofilled_according_to_renderer(true);
+  test_api(form).field(1).set_is_autofilled_according_to_renderer(true);
+  test_api(form).field(2).set_is_autofilled_according_to_renderer(true);
+  ExecuteJavaScriptForTests("document.getElementById('cc').focus();");
+  ApplyFieldsAction(input_element.GetDocument(), form.fields(),
+                    mojom::ActionPersistence::kPreview);
+  // The selection should be set after the 19th character.
+  EXPECT_EQ(19u, input_element.SelectionStart());
+  EXPECT_EQ(19u, input_element.SelectionEnd());
+
+  // Fill the form.
+  ApplyFieldsAction(input_element.GetDocument(), form.fields(),
+                    mojom::ActionPersistence::kFill);
+
+  // Find the newly-filled form that contains the input element.
+  FormData form2 = FindForm(input_element);
+  EXPECT_EQ(u"TestForm", form2.name());
+  EXPECT_EQ(GURL("http://abc.com"), form2.action());
+
+  const std::vector<FormFieldData>& fields2 = form2.fields();
+  ASSERT_EQ(3U, fields2.size());
+
+  FormFieldData expected;
+  expected.set_form_control_type(FormControlType::kInputText);
+  expected.set_max_length(FormFieldData::kDefaultMaxLength);
+
+  expected.set_id_attribute(u"cc");
+  expected.set_name(expected.id_attribute());
+  expected.set_value(u"1111-2222-3333-4444");
+  expected.set_label(u"Credit Card Number");
+  expected.set_placeholder(u"Credit Card Number");
+  expected.set_is_autofilled_according_to_renderer(true);
+  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[0]);
+
+  expected.set_id_attribute(u"expiration_date");
+  expected.set_name(expected.id_attribute());
+  expected.set_value(u"03/2030");
+  expected.set_label(u"Expiration Date");
+  expected.set_placeholder(u"Expiration Date");
+  expected.set_is_autofilled_according_to_renderer(true);
+  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[1]);
+
+  expected.set_id_attribute(u"name");
+  expected.set_name(expected.id_attribute());
+  expected.set_value(u"John Smith");
+  expected.set_label(u"Full Name");
+  expected.set_placeholder(u"Full Name");
+  expected.set_is_autofilled_according_to_renderer(false);
+  EXPECT_FORM_FIELD_DATA_EQUALS(expected, fields2[2]);
+
+  // Verify that the cursor position has been updated.
+  EXPECT_EQ(19u, input_element.SelectionStart());
+  EXPECT_EQ(19u, input_element.SelectionEnd());
 }
 
 TEST_F(FormAutofillTest, FillFormNonEmptyFieldsWithPlaceholderValues) {
