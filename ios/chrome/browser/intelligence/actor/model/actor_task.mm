@@ -20,6 +20,7 @@
 #import "ios/chrome/browser/intelligence/actor/public/actor_task_updates_observer.h"
 #import "ios/chrome/browser/intelligence/actor/tools/model/actor_tool_factory.h"
 #import "ios/chrome/browser/intelligence/actor/tools/model/actor_tool_request.h"
+#import "ios/chrome/browser/intelligence/actor/tools/utils/logging_util.h"
 #import "ios/web/public/web_state.h"
 
 namespace actor {
@@ -51,37 +52,6 @@ std::string ActorTaskStateToString(ActorTaskState state) {
     case ActorTaskState::kFailed:
       return "Failed";
   }
-}
-
-// Logs a task state transition to the journal.
-void LogTaskStateTransition(AggregatedJournal* journal,
-                            ActorTaskId task_id,
-                            ActorTaskState old_state,
-                            ActorTaskState new_state) {
-  CHECK(journal);
-
-  std::vector<mojom::JournalDetailsPtr> details =
-      JournalDetailsBuilder()
-          .Add("current_state", ActorTaskStateToString(old_state))
-          .Add("new_state", ActorTaskStateToString(new_state))
-          .Build();
-
-  journal->Log(GURL(), task_id, "ActorTask::SetState", std::move(details));
-}
-
-// Logs adding a controlled WebState to the journal.
-void LogAddControlledWebState(AggregatedJournal* journal,
-                              ActorTaskId task_id,
-                              web::WebStateID web_state_id) {
-  CHECK(journal);
-
-  std::vector<mojom::JournalDetailsPtr> details =
-      JournalDetailsBuilder()
-          .Add("web_state_id", base::NumberToString(web_state_id.identifier()))
-          .Build();
-
-  journal->Log(GURL::EmptyGURL(), task_id, "ActorTask::AddControlledWebState",
-               std::move(details));
 }
 
 // Returns true if the task state corresponds to an actuating state.
@@ -178,8 +148,10 @@ void ActorTask::AddControlledWebState(web::WebState* web_state) {
 
   if (!std::ranges::contains(controlled_web_states_, web_state,
                              &base::WeakPtr<web::WebState>::get)) {
-    LogAddControlledWebState(journal_, task_id_,
-                             web_state->GetUniqueIdentifier());
+    LogJournalEvent(
+        GetJournal(), GURL(), task_id_, "ActorTask::AddControlledWebState",
+        {{"web_state_id", base::NumberToString(
+                              web_state->GetUniqueIdentifier().identifier())}});
     controlled_web_states_.push_back(web_state->GetWeakPtr());
     if (ActorTabHelper* tab_helper = ActorTabHelper::FromWebState(web_state)) {
       const bool is_actuating = IsActuatingState(state_);
@@ -325,7 +297,9 @@ void ActorTask::SetActuatingOnWebStates(bool actuating) {
 }
 
 void ActorTask::SetState(ActorTaskState new_state) {
-  LogTaskStateTransition(journal_, task_id_, state_, new_state);
+  LogJournalEvent(GetJournal(), GURL(), task_id_, "ActorTask::SetState",
+                  {{"current_state", ActorTaskStateToString(state_)},
+                   {"new_state", ActorTaskStateToString(new_state)}});
   ActorTaskState old_state = state_;
   state_ = new_state;
 
