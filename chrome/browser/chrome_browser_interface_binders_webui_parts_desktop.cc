@@ -286,11 +286,11 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
           Profile::FromBrowserContext(
               render_frame_host->GetBrowserContext()))) {
     RegisterWebUIControllerInterfaceBinder<
-        history::mojom::ForeignSessionPageHandler, HistoryUI,
+        history::mojom::ForeignSessionPageHandlerFactory, HistoryUI,
         TabsFromOtherDevicesSidePanelUI>(map);
   } else {
     RegisterWebUIControllerInterfaceBinder<
-        history::mojom::ForeignSessionPageHandler, HistoryUI>(map);
+        history::mojom::ForeignSessionPageHandlerFactory, HistoryUI>(map);
   }
 
   RegisterWebUIControllerInterfaceBinder<
@@ -688,7 +688,8 @@ void PopulateChromeWebUIFrameInterfaceBrokersTrustedPartsDesktop(
         .Add<tabs_api::mojom::TabStripUIController>();
   }
 
-  if (features::IsWebUIToolbarEnabled() || base::FeatureList::IsEnabled(
+  if (features::IsWebUIToolbarEnabled() ||
+      base::FeatureList::IsEnabled(
           features::kWebUIToolbarProcessOverheadExperiment)) {
     registry.ForWebUI<WebUIToolbarUI>()
         .Add<browser_controls_api::mojom::BrowserControlsService>()

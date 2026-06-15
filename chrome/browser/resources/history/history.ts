@@ -4,6 +4,7 @@
 
 import './app.js';
 
+export {browserProxyFactory as foreignSessionBrowserProxyFactory} from 'chrome://resources/cr_components/history/foreign_sessions.mojom-webui.js';
 export type {HistoryEntry, QueryResult} from 'chrome://resources/cr_components/history/history.mojom-webui.js';
 export {BrowserProxyImpl as HistoryClustersProxyImpl} from 'chrome://resources/cr_components/history_clusters/browser_proxy.js';
 export {ClusterAction, PageCallbackRouter, PageHandlerRemote, RelatedSearchAction, VisitAction, VisitType} from 'chrome://resources/cr_components/history_clusters/history_clusters.mojom-webui.js';
@@ -24,8 +25,6 @@ export type {BrowserProxy, RemoveVisitsRequest} from './browser_proxy.js';
 export {BrowserProxyImpl} from './browser_proxy.js';
 export {HistoryPageViewHistogram, HistorySignInState, SYNCED_TABS_HISTOGRAM_NAME, SyncedTabsHistogram, SyncState, VisitContextMenuAction} from './constants.js';
 export type {ForeignSession, ForeignSessionTab, ForeignSessionWindow, HistoryIdentityState} from './externs.js';
-export type {ForeignSessionBrowserProxy} from './foreign_session_browser_proxy.js';
-export {ForeignSessionBrowserProxyImpl} from './foreign_session_browser_proxy.js';
 export {HISTORY_EMBEDDINGS_ANSWERS_PROMO_SHOWN_KEY, HISTORY_EMBEDDINGS_PROMO_SHOWN_KEY, HistoryEmbeddingsPromoElement} from './history_embeddings_promo.js';
 export {HistoryFilterChipsElement} from './history_filter_chips.js';
 export {HistoryItemElement} from './history_item.js';
