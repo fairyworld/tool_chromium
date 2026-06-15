@@ -8199,10 +8199,12 @@ bool ChromeContentBrowserClient::AreV8OptimizationsEnabledForSite(
             content_settings::SettingSource::kUser);
 
   if (default_javascript_optimizer_setting !=
-      JavascriptOptimizerSetting::kBlockedForUnfamiliarSites) {
-    // If site familiarity is turned off, use content settings to set v8
-    // optimization. Use `site_content_setting` to honor exceptions for specific
-    // sites over a default policy that applies to all sites.
+          JavascriptOptimizerSetting::kBlockedForUnfamiliarSites ||
+      site_protection::IsV8OptimizerMigrationDryRun(profile)) {
+    // If site familiarity is turned off or we are in dry-run mode, use content
+    // settings to set v8 optimization. Use `site_content_setting` to honor
+    // exceptions for specific sites over a default policy that applies to all
+    // sites.
     return site_content_setting == CONTENT_SETTING_ALLOW;
   }
 
