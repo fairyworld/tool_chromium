@@ -268,7 +268,6 @@ if (is_android) {
       "initialize_feature_list_android.cc",
       "initialize_feature_list_android.h",
       "intent_handler.cc",
-      "media/document_picture_in_picture_bridge_android.cc",
       "media/media_capture_devices_dispatcher_android.cc",
       "media_state_observer.cc",
       "media_state_observer.h",
