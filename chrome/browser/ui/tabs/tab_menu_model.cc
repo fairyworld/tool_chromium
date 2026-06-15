@@ -454,8 +454,7 @@ void TabMenuModel::Build(int index) {
   }
 
   const bool show_glic_items =
-      glic::GlicEnabling::IsReadyForProfile(tab_strip_->profile()) &&
-      base::FeatureList::IsEnabled(features::kGlicMITabContextMenu);
+      glic::GlicEnabling::IsReadyForProfile(tab_strip_->profile());
   bool glic_displayed = false;
   if (features::IsMenuSimplificationEnabled() && show_glic_items) {
     AddSeparator(ui::NORMAL_SEPARATOR);
