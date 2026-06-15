@@ -131,7 +131,7 @@ ChromePaymentsAutofillClient::ChromePaymentsAutofillClient(
     : content::WebContentsObserver(&client->GetWebContents()),
       client_(CHECK_DEREF(client)),
       save_and_fill_manager_(
-          std::make_unique<payments::SaveAndFillManagerImpl>(&client_.get())) {
+          std::make_unique<SaveAndFillManagerImpl>(&client_.get())) {
 #if BUILDFLAG(IS_ANDROID)
   touch_to_fill_payment_method_controller_ =
       std::make_unique<TouchToFillPaymentMethodControllerImpl>(&client_.get());
@@ -1021,7 +1021,7 @@ bool ChromePaymentsAutofillClient::ShowTouchToFillForAllLoyaltyCards(
 }
 
 bool ChromePaymentsAutofillClient::OnPurchaseAmountExtracted(
-    base::span<const payments::BnplIssuerContext> bnpl_issuer_contexts,
+    base::span<const BnplIssuerContext> bnpl_issuer_contexts,
     std::optional<int64_t> extracted_amount,
     bool is_amount_supported_by_any_issuer,
     const std::optional<std::string>& app_locale,
@@ -1051,7 +1051,7 @@ bool ChromePaymentsAutofillClient::ShowTouchToFillProgress(
 }
 
 bool ChromePaymentsAutofillClient::ShowTouchToFillBnplIssuers(
-    base::span<const payments::BnplIssuerContext> bnpl_issuer_contexts,
+    base::span<const BnplIssuerContext> bnpl_issuer_contexts,
     const std::string& app_locale,
     base::OnceCallback<void(BnplIssuer)> selected_issuer_callback,
     base::OnceClosure cancel_callback) {
@@ -1131,11 +1131,11 @@ ChromePaymentsAutofillClient::CreateCreditCardInternalAuthenticator(
 #endif
 }
 
-payments::MandatoryReauthManager*
+MandatoryReauthManager*
 ChromePaymentsAutofillClient::GetOrCreatePaymentsMandatoryReauthManager() {
   if (!payments_mandatory_reauth_manager_) {
     payments_mandatory_reauth_manager_ =
-        std::make_unique<payments::MandatoryReauthManager>(&client_.get());
+        std::make_unique<MandatoryReauthManager>(&client_.get());
   }
 
   return payments_mandatory_reauth_manager_.get();
