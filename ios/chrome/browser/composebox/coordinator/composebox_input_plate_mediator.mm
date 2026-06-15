@@ -55,6 +55,7 @@
 #import "components/signin/public/base/consent_level.h"
 #import "ios/chrome/browser/cobrowse/model/cobrowse_browser_agent.h"
 #import "ios/chrome/browser/cobrowse/model/cobrowse_context.h"
+#import "ios/chrome/browser/cobrowse/model/cobrowse_util.h"
 #import "ios/chrome/browser/cobrowse/model/ios_contextual_tasks_service_factory.h"
 #import "ios/chrome/browser/composebox/coordinator/composebox_constants.h"
 #import "ios/chrome/browser/composebox/coordinator/composebox_query_contextualizer_delegate_bridge.h"
@@ -1441,7 +1442,7 @@ lens::ImageEncodingOptions GetDefaultImageEncodingOptions() {
     // If the active tab is attached to the composebox, an AIM query should
     // invoke the Assistant directly using the query URL instead of routing
     // through the standard search navigation flow.
-    if (IsAimCobrowseEnabled() && [self isActiveTabAttached]) {
+    if (IsAimCobrowseEligible(_profile) && [self isActiveTabAttached]) {
       CobrowseContext* context = [[CobrowseContext alloc] initWithURL:URL];
       context.attachedItems = _items.containedItems;
       if (_cobrowseBrowserAgent) {
@@ -1888,7 +1889,7 @@ lens::ImageEncodingOptions GetDefaultImageEncodingOptions() {
     [_sceneHandler hideAssistant];
   }
 
-  BOOL isAimFollowup = IsAimCobrowseEnabled() &&
+  BOOL isAimFollowup = IsAimCobrowseEligible(_profile) &&
                        (_entrypoint == ComposeboxEntrypoint::kCobrowse);
 
   if (isAimFollowup) {

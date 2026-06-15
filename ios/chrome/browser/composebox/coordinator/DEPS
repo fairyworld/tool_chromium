@@ -9,6 +9,7 @@ include_rules = [
   "+ios/chrome/browser/bookmarks/model",
   "+ios/chrome/browser/cobrowse/model/cobrowse_browser_agent.h",
   "+ios/chrome/browser/cobrowse/model/cobrowse_context.h",
+  "+ios/chrome/browser/cobrowse/model/cobrowse_util.h",
   "+ios/chrome/browser/cobrowse/model/ios_contextual_tasks_service_factory.h",
   "+ios/chrome/browser/context_menu/ui_bundled",
   "+ios/chrome/browser/default_browser/model",

@@ -16,6 +16,7 @@
 #import "ios/chrome/browser/cobrowse/debugger/aim_srp_debugger_url_view_controller.h"
 #import "ios/chrome/browser/cobrowse/model/cobrowse_browser_agent.h"
 #import "ios/chrome/browser/cobrowse/model/cobrowse_context.h"
+#import "ios/chrome/browser/cobrowse/model/cobrowse_util.h"
 #import "ios/chrome/browser/cobrowse/model/ios_contextual_tasks_service_factory.h"
 #import "ios/chrome/browser/cobrowse/ui/assistant_aim_ui_constants.h"
 #import "ios/chrome/browser/cobrowse/ui/assistant_aim_view_controller.h"
@@ -78,9 +79,13 @@ class AssistantAIMUIStateProvider
   __weak id<AssistantContainerCommands> _containerHandler;
 }
 
+- (instancetype)initWithBaseViewController:(UIViewController*)viewController
+                                   browser:(Browser*)browser {
+  CHECK(IsAimCobrowseEligible(browser->GetProfile()));
+  return [super initWithBaseViewController:viewController browser:browser];
+}
 
 - (void)start {
-  CHECK(IsAimCobrowseEnabled());
   if (base::FeatureList::IsEnabled(kAssistantAimMinimizedState)) {
     _currentDetent = AssistantContainerDetent::kMinimized;
   } else {

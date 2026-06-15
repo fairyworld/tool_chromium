@@ -11,6 +11,7 @@
 #import "ios/chrome/browser/aim/model/ios_chrome_aim_eligibility_service_factory.h"
 #import "ios/chrome/browser/cobrowse/model/cobrowse_browser_agent.h"
 #import "ios/chrome/browser/cobrowse/model/cobrowse_context.h"
+#import "ios/chrome/browser/composebox/public/features.h"
 #import "ios/chrome/browser/search_engines/model/template_url_service_factory.h"
 #import "ios/chrome/browser/shared/coordinator/scene/scene_state.h"
 #import "ios/chrome/browser/shared/coordinator/scene/state/tab_grid_state.h"
@@ -33,7 +34,8 @@
 class CobrowseTabHelperTest : public PlatformTest {
  protected:
   CobrowseTabHelperTest() {
-    feature_list_.InitAndEnableFeature(kAimCobrowse);
+    feature_list_.InitWithFeatures({kAimCobrowse, kAssistantContainer},
+                                   {kComposeboxAIMDisabled});
 
     TestProfileIOS::Builder builder;
     builder.AddTestingFactory(
@@ -353,5 +355,37 @@ TEST_F(CobrowseTabHelperTest, HideOnNtpAndRestoreOnNormalNavigation) {
   context3.SetUrl(normal_url);
   OCMExpect([mock_scene_commands_handler_ showAssistant]);
   new_tab_helper->DidStartNavigation(new_web_state_ptr, &context3);
+  [mock_scene_commands_handler_ verify];
+}
+
+// Tests that showAssistant is NOT called when navigating in a new tab from an
+// AIM URL if Cobrowse is ineligible at runtime (even if the feature flag is
+// enabled).
+TEST_F(CobrowseTabHelperTest, NoTriggerWhenNotEligible) {
+  MockAimEligibilityService* service = static_cast<MockAimEligibilityService*>(
+      IOSChromeAimEligibilityServiceFactory::GetForProfile(profile_.get()));
+  EXPECT_CALL(*service, IsCobrowseEligible())
+      .WillRepeatedly(testing::Return(false));
+
+  GURL aim_url("https://www.google.com/search?q=test&udm=50");
+  GURL next_url("https://www.example.com");
+
+  OCMStub([mock_tab_grid_state_ tabGridVisible]).andReturn(NO);
+
+  web::FakeWebState* opener_ptr = CreateAndInsertWebState(aim_url);
+  web::FakeWebState* new_web_state_ptr =
+      CreateAndInsertWebStateWithOpener(GURL::EmptyGURL(), opener_ptr);
+
+  CobrowseTabHelper* new_tab_helper =
+      CobrowseTabHelper::FromWebState(new_web_state_ptr);
+  ASSERT_NE(new_tab_helper, nullptr);
+
+  web::FakeNavigationContext context;
+  context.SetUrl(next_url);
+
+  [[mock_scene_commands_handler_ reject] showAssistant];
+
+  new_tab_helper->DidStartNavigation(new_web_state_ptr, &context);
+
   [mock_scene_commands_handler_ verify];
 }
