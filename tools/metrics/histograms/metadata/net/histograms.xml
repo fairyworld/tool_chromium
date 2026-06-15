@@ -231,6 +231,25 @@ chromium-metrics-reviews@google.com.
       summary="Recorded for Google servers (https) only when QUIC is used."/>
 </variants>
 
+<!-- LINT.IfChange(TpmOperation) -->
+
+<!-- Only operations that are defined for all platforms should be added here. -->
+
+<!-- Platform-specific operations should be added to specific histograms directly. -->
+
+<variants name="TpmOperation">
+  <variant name="MessageSigning" summary="message signing"/>
+  <variant name="NewKeyCreation" summary="new key creation"/>
+  <variant name="WrappedKeyCreation" summary="wrapped key creation"/>
+</variants>
+
+<!-- LINT.ThenChange(//crypto/unexportable_key_metrics.h:TPMOperation) -->
+
+<variants name="TpmSignatureAlgorithm">
+  <variant name="ECDSA"/>
+  <variant name="RSA"/>
+</variants>
+
 <variants name="TrustTokenOperationType">
   <variant name="Issuance" summary="Trust token issuance"/>
   <variant name="Redemption" summary="Trust token redemption"/>
@@ -343,11 +362,8 @@ chromium-metrics-reviews@google.com.
     SecureEnclave-protected ECDSA key. Represents the OSStatus code returned by
     the API corresponding with that operation.
   </summary>
-  <token key="Operation">
+  <token key="Operation" variants="TpmOperation">
     <variant name="KeyDeletion" summary="key deletion"/>
-    <variant name="MessageSigning" summary="signing"/>
-    <variant name="NewKeyCreation" summary="new key creation"/>
-    <variant name="WrappedKeyCreation" summary="wrapped key creation"/>
     <variant name="WrappedKeyExport" summary="wrapped key export"/>
   </token>
 </histogram>
@@ -368,11 +384,8 @@ chromium-metrics-reviews@google.com.
     Note: This histogram should be removed upon expiration and replaced by
     Crypto.SecureEnclaveOperation.Apple.{Operation}.Error
   </summary>
-  <token key="Operation">
+  <token key="Operation" variants="TpmOperation">
     <variant name="KeyDeletion" summary="key deletion"/>
-    <variant name="MessageSigning" summary="signing"/>
-    <variant name="NewKeyCreation" summary="new key creation"/>
-    <variant name="WrappedKeyCreation" summary="wrapped key creation"/>
     <variant name="WrappedKeyExport" summary="wrapped key export"/>
   </token>
 </histogram>
@@ -387,15 +400,8 @@ chromium-metrics-reviews@google.com.
     purposes. Note that if new key creation fails, wrapped key creation and
     message signing will not take place.
   </summary>
-  <token key="Operation">
-    <variant name="MessageSigning"/>
-    <variant name="NewKeyCreation"/>
-    <variant name="WrappedKeyCreation"/>
-  </token>
-  <token key="SignatureAlgorithm">
-    <variant name="ECDSA"/>
-    <variant name="RSA"/>
-  </token>
+  <token key="Operation" variants="TpmOperation"/>
+  <token key="SignatureAlgorithm" variants="TpmSignatureAlgorithm"/>
 </histogram>
 
 <histogram name="Crypto.TPMDuration.{Operation}{SignatureAlgorithm}" units="ms"
@@ -408,15 +414,10 @@ chromium-metrics-reviews@google.com.
     that if new key creation fails, wrapped key creation and message signing
     will not take place.
   </summary>
-  <token key="Operation">
-    <variant name="MessageSigning"/>
-    <variant name="NewKeyCreation"/>
-    <variant name="WrappedKeyCreation"/>
+  <token key="Operation" variants="TpmOperation">
+    <variant name="KeyCertification" summary="key certification"/>
   </token>
-  <token key="SignatureAlgorithm">
-    <variant name="ECDSA"/>
-    <variant name="RSA"/>
-  </token>
+  <token key="SignatureAlgorithm" variants="TpmSignatureAlgorithm"/>
 </histogram>
 
 <histogram name="Crypto.TpmError.VirtualCreateKey" units="win32 error code"
@@ -469,18 +470,10 @@ chromium-metrics-reviews@google.com.
     purposes. Note that if new key creation fails, wrapped key creation and
     message signing will not take place.
   </summary>
-<!-- TODO(crbug.com/501306222): Move variants to a central location. -->
-
-  <token key="Operation">
-    <variant name="MessageSigning"/>
-    <variant name="MessageVerify"/>
-    <variant name="NewKeyCreation"/>
-    <variant name="WrappedKeyCreation"/>
+  <token key="Operation" variants="TpmOperation">
+    <variant name="MessageVerify" summary="message verification"/>
   </token>
-  <token key="SignatureAlgorithm">
-    <variant name="ECDSA"/>
-    <variant name="RSA"/>
-  </token>
+  <token key="SignatureAlgorithm" variants="TpmSignatureAlgorithm"/>
 </histogram>
 
 <histogram name="Crypto.TPMOperation.Win.LoadTBSLibrary.Result" enum="Hresult"
@@ -575,12 +568,9 @@ chromium-metrics-reviews@google.com.
     {SignatureAlgorithm}. Represents the Win32 status returned by the API
     corresponding with that operation.
   </summary>
-  <token key="Operation">
+  <token key="Operation" variants="TpmOperation">
     <variant name="KeyCertification" summary="key certification"/>
-    <variant name="MessageSigning" summary="signing"/>
-    <variant name="NewKeyCreation" summary="new key creation"/>
     <variant name="SelectAlgorithm" summary="select algorithm"/>
-    <variant name="WrappedKeyCreation" summary="wrapped key creation"/>
     <variant name="WrappedKeyExport" summary="wrapped key export"/>
   </token>
   <token key="SignatureAlgorithm">
@@ -600,16 +590,11 @@ chromium-metrics-reviews@google.com.
     if new key creation fails, wrapped key creation and message signing will not
     take place.
   </summary>
-  <token key="Operation">
-    <variant name="MessageSigning"/>
-    <variant name="MessageVerify"/>
-    <variant name="NewKeyCreation"/>
-    <variant name="WrappedKeyCreation"/>
+  <token key="Operation" variants="TpmOperation">
+    <variant name="KeyCertification" summary="key certification"/>
+    <variant name="MessageVerify" summary="message verification"/>
   </token>
-  <token key="SignatureAlgorithm">
-    <variant name="ECDSA"/>
-    <variant name="RSA"/>
-  </token>
+  <token key="SignatureAlgorithm" variants="TpmSignatureAlgorithm"/>
 </histogram>
 
 <histogram name="Crypto.TPMSupport2" enum="TPMSupport"
