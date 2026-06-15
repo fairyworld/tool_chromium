@@ -451,6 +451,14 @@ void AutofillDriverRouter::SelectFieldOptionsDidChange(
   TriggerFormExtractionExcept(source);
 
   const FormData& browser_form = form_forest_.GetBrowserForm(form_id);
+  if (!std::ranges::contains(browser_form.fields(), field_id,
+                             &FormFieldData::global_id)) {
+    // To avoid very large flattened forms, UpdateTreeOfRendererForm() may have
+    // cut the tree into two and, as a result, may have lost some fields. We
+    // drop such events.
+    // See `kMaxVisits` in FormForest::UpdateTreeOfRendererForm() for details.
+    return;
+  }
   auto* target = DriverOfFrame(browser_form.host_frame());
   callback(CHECK_DEREF(target), browser_form, field_id);
 }
