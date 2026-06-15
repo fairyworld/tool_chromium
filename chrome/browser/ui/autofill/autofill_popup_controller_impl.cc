@@ -864,7 +864,7 @@ void AutofillPopupControllerImpl::SelectSuggestion(int index) {
     return;
   }
 
-  const autofill::Suggestion& suggestion = GetSuggestionAt(index);
+  const Suggestion& suggestion = GetSuggestionAt(index);
   if (!suggestion.IsAcceptable()) {
     UnselectSuggestion();
     return;

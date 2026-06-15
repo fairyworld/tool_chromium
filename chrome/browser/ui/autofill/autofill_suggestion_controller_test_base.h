@@ -235,7 +235,7 @@ class AutofillSuggestionControllerTestBase
   }
 
  private:
-  ::autofill::test::AutofillUnitTestEnvironment autofill_test_environment_;
+  test::AutofillUnitTestEnvironment autofill_test_environment_;
 
   TestAutofillClientInjector<Client> autofill_client_injector_;
   TestAutofillDriverInjector<Driver> autofill_driver_injector_;

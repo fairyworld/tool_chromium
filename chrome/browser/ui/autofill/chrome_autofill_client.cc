@@ -244,7 +244,7 @@ const base::Feature& GetFeature(AutofillClient::IphFeature iph_feature) {
 ui::ElementIdentifier GetElementId(AutofillClient::IphFeature iph_feature) {
   switch (iph_feature) {
     case AutofillClient::IphFeature::kAutofillAi:
-      return autofill::PopupViewViews::kAutofillAiOptInIphElementId;
+      return PopupViewViews::kAutofillAiOptInIphElementId;
   }
   NOTREACHED();
 }
@@ -747,7 +747,7 @@ void ChromeAutofillClient::ShowAutofillSettings(
         return;
       case SuggestionType::kManageAutofillAi:
         if (base::FeatureList::IsEnabled(
-                autofill::features::kYourSavedInfoSettingsPage)) {
+                features::kYourSavedInfoSettingsPage)) {
           base::UmaHistogramEnumeration(
               "Autofill.YourSavedInfoSettingsPage.VisitReferrer",
               autofill_metrics::AutofillSettingsReferrer::kFillingFlowDropdown);

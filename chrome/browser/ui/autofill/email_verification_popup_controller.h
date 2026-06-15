@@ -34,9 +34,8 @@ class EmailVerificationPopupView;
 
 // Controller for the email verification popup. It manages the lifecycle of
 // the popup widget and handles the user's decision.
-class EmailVerificationPopupController
-    : public autofill::AutofillPopupViewDelegate,
-      public content::WebContentsObserver {
+class EmailVerificationPopupController : public AutofillPopupViewDelegate,
+                                         public content::WebContentsObserver {
  public:
   explicit EmailVerificationPopupController(content::WebContents* web_contents);
   EmailVerificationPopupController(const EmailVerificationPopupController&) =
@@ -54,13 +53,13 @@ class EmailVerificationPopupController
             base::OnceCallback<void(
                 AutofillClient::EmailVerificationPermissionUiResult)> callback);
 
-  // autofill::AutofillPopupViewDelegate:
-  void Hide(autofill::SuggestionHidingReason reason) override;
+  // AutofillPopupViewDelegate:
+  void Hide(SuggestionHidingReason reason) override;
   void ViewDestroyed() override;
   gfx::NativeView container_view() const override;
   content::WebContents* GetWebContents() const override;
   const gfx::RectF& element_bounds() const override;
-  autofill::PopupAnchorType anchor_type() const override;
+  PopupAnchorType anchor_type() const override;
   base::i18n::TextDirection GetElementTextDirection() const override;
 
   // content::WebContentsObserver:
@@ -117,7 +116,7 @@ class EmailVerificationPopupController
   base::WeakPtr<EmailVerificationPopupView> view_;
 
   // Helper to handle hiding the popup on various events.
-  std::optional<autofill::AutofillPopupHideHelper> popup_hide_helper_;
+  std::optional<AutofillPopupHideHelper> popup_hide_helper_;
 
   // Factory function used to create the view in tests.
   ViewFactoryForTesting view_factory_for_testing_;

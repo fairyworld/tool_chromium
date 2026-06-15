@@ -68,7 +68,7 @@ void AtMemorySuggestionController::OnSuggestionsChanged() {
 
 void AtMemorySuggestionController::AcceptSuggestion(
     int index,
-    autofill::AutofillMetrics::SuggestionAcceptedMethod accept_method) {
+    AutofillMetrics::SuggestionAcceptedMethod accept_method) {
   if (base::checked_cast<size_t>(index) >= suggestions_.size()) {
     return;
   }

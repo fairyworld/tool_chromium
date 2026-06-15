@@ -10,59 +10,55 @@
 #include "content/public/browser/web_contents.h"
 #include "ui/views/widget/widget.h"
 
+namespace autofill {
+
 namespace {
 
-autofill::EmailVerificationPopupController::EvpPermissionUiStatus
-MapReasonToStatus(autofill::SuggestionHidingReason reason) {
+EmailVerificationPopupController::EvpPermissionUiStatus MapReasonToStatus(
+    SuggestionHidingReason reason) {
   switch (reason) {
-    case autofill::SuggestionHidingReason::kUserAborted:
-    case autofill::SuggestionHidingReason::kFocusChanged:
-    case autofill::SuggestionHidingReason::kEndEditing:
-      return autofill::EmailVerificationPopupController::EvpPermissionUiStatus::
+    case SuggestionHidingReason::kUserAborted:
+    case SuggestionHidingReason::kFocusChanged:
+    case SuggestionHidingReason::kEndEditing:
+      return EmailVerificationPopupController::EvpPermissionUiStatus::
           kUserAborted;
-    case autofill::SuggestionHidingReason::kNavigation:
-      return autofill::EmailVerificationPopupController::EvpPermissionUiStatus::
+    case SuggestionHidingReason::kNavigation:
+      return EmailVerificationPopupController::EvpPermissionUiStatus::
           kNavigation;
-    case autofill::SuggestionHidingReason::kTabGone:
-      return autofill::EmailVerificationPopupController::EvpPermissionUiStatus::
-          kTabGone;
-    case autofill::SuggestionHidingReason::kWidgetChanged:
-      return autofill::EmailVerificationPopupController::EvpPermissionUiStatus::
+    case SuggestionHidingReason::kTabGone:
+      return EmailVerificationPopupController::EvpPermissionUiStatus::kTabGone;
+    case SuggestionHidingReason::kWidgetChanged:
+      return EmailVerificationPopupController::EvpPermissionUiStatus::
           kWidgetChanged;
-    case autofill::SuggestionHidingReason::kOverlappingWithAnotherPrompt:
-    case autofill::SuggestionHidingReason::
-        kOverlappingWithPictureInPictureWindow:
-    case autofill::SuggestionHidingReason::
-        kOverlappingWithPasswordGenerationPopup:
-    case autofill::SuggestionHidingReason::kOverlappingWithTouchToFillSurface:
-    case autofill::SuggestionHidingReason::kOverlappingWithAutofillContextMenu:
-    case autofill::SuggestionHidingReason::kContextMenuOpened:
-      return autofill::EmailVerificationPopupController::EvpPermissionUiStatus::
+    case SuggestionHidingReason::kOverlappingWithAnotherPrompt:
+    case SuggestionHidingReason::kOverlappingWithPictureInPictureWindow:
+    case SuggestionHidingReason::kOverlappingWithPasswordGenerationPopup:
+    case SuggestionHidingReason::kOverlappingWithTouchToFillSurface:
+    case SuggestionHidingReason::kOverlappingWithAutofillContextMenu:
+    case SuggestionHidingReason::kContextMenuOpened:
+      return EmailVerificationPopupController::EvpPermissionUiStatus::
           kOverlappingPrompt;
-    case autofill::SuggestionHidingReason::kAcceptSuggestion:
-    case autofill::SuggestionHidingReason::kAttachInterstitialPage:
-    case autofill::SuggestionHidingReason::kContentAreaMoved:
-    case autofill::SuggestionHidingReason::kNoSuggestions:
-    case autofill::SuggestionHidingReason::kRendererEvent:
-    case autofill::SuggestionHidingReason::kStaleData:
-    case autofill::SuggestionHidingReason::kViewDestroyed:
-    case autofill::SuggestionHidingReason::kInsufficientSpace:
-    case autofill::SuggestionHidingReason::kElementOutsideOfContentArea:
-    case autofill::SuggestionHidingReason::kMouseLocked:
-    case autofill::SuggestionHidingReason::kNoFrameHasFocus:
-    case autofill::SuggestionHidingReason::kExpandedSuggestionCollapsedSubPopup:
-    case autofill::SuggestionHidingReason::kFieldValueChanged:
-    case autofill::SuggestionHidingReason::kFadeTimerExpired:
-    case autofill::SuggestionHidingReason::kSearchBarFocusLost:
-    case autofill::SuggestionHidingReason::kHiddenByCaller:
-      return autofill::EmailVerificationPopupController::EvpPermissionUiStatus::
-          kOther;
+    case SuggestionHidingReason::kAcceptSuggestion:
+    case SuggestionHidingReason::kAttachInterstitialPage:
+    case SuggestionHidingReason::kContentAreaMoved:
+    case SuggestionHidingReason::kNoSuggestions:
+    case SuggestionHidingReason::kRendererEvent:
+    case SuggestionHidingReason::kStaleData:
+    case SuggestionHidingReason::kViewDestroyed:
+    case SuggestionHidingReason::kInsufficientSpace:
+    case SuggestionHidingReason::kElementOutsideOfContentArea:
+    case SuggestionHidingReason::kMouseLocked:
+    case SuggestionHidingReason::kNoFrameHasFocus:
+    case SuggestionHidingReason::kExpandedSuggestionCollapsedSubPopup:
+    case SuggestionHidingReason::kFieldValueChanged:
+    case SuggestionHidingReason::kFadeTimerExpired:
+    case SuggestionHidingReason::kSearchBarFocusLost:
+    case SuggestionHidingReason::kHiddenByCaller:
+      return EmailVerificationPopupController::EvpPermissionUiStatus::kOther;
   }
 }
 
 }  // namespace
-
-namespace autofill {
 
 EmailVerificationPopupController::EmailVerificationPopupController(
     content::WebContents* web_contents)

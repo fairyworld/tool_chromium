@@ -262,7 +262,7 @@ class ChromeAutofillClientTest : public ChromeRenderViewHostTestHarness {
  protected:
   TestingProfile::TestingFactories GetTestingFactories() const override {
     return {TestingProfile::TestingFactory{
-        autofill::PersonalDataManagerFactory::GetInstance(),
+        PersonalDataManagerFactory::GetInstance(),
         base::BindRepeating(&CreateTestPersonalDataManager)}};
   }
 
@@ -276,7 +276,7 @@ class ChromeAutofillClientTest : public ChromeRenderViewHostTestHarness {
     return pdm;
   }
 
-  autofill::test::AutofillUnitTestEnvironment autofill_environment_{
+  test::AutofillUnitTestEnvironment autofill_environment_{
       {.disable_server_communication = true}};
 #if !BUILDFLAG(IS_ANDROID)
   raw_ptr<MockAutofillFieldPromoController> autofill_field_promo_controller_;
@@ -352,15 +352,14 @@ TEST_F(ChromeAutofillClientTest, ClassifiesLoginFormOnChildFrame) {
 
   // Ensure that the child frame is picked up as a child frame of `main_form`.
   {
-    autofill::FrameTokenWithPredecessor child_frame_information;
+    FrameTokenWithPredecessor child_frame_information;
     child_frame_information.token = child_form.host_frame();
     main_form.set_child_frames({child_frame_information});
   }
 
   {
-    autofill::TestAutofillManagerWaiter waiter(
-        main_driver->GetAutofillManager(),
-        {autofill::AutofillManagerEvent::kFormsSeen});
+    TestAutofillManagerWaiter waiter(main_driver->GetAutofillManager(),
+                                     {AutofillManagerEvent::kFormsSeen});
     main_driver->renderer_events().FormsSeen(/*updated_forms=*/{main_form},
                                              /*removed_forms=*/{});
     child_driver->renderer_events().FormsSeen(/*updated_forms=*/{child_form},

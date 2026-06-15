@@ -44,7 +44,7 @@ AutofillPopupControllerImplMac::~AutofillPopupControllerImplMac() = default;
 
 void AutofillPopupControllerImplMac::Show(
     UiSessionId ui_session_id,
-    std::vector<autofill::Suggestion> suggestions,
+    std::vector<Suggestion> suggestions,
     AutofillSuggestionTriggerSource trigger_source,
     AutoselectFirstSuggestion autoselect_first_suggestion,
     AutofillSuggestionsIgnoreFocusLoss ignore_focus_loss) {

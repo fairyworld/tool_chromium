@@ -392,7 +392,7 @@ void AutofillKeyboardAccessoryControllerImpl::OnSuggestionsChanged() {
 
 void AutofillKeyboardAccessoryControllerImpl::AcceptSuggestion(
     int index,
-    autofill::AutofillMetrics::SuggestionAcceptedMethod accept_method) {
+    AutofillMetrics::SuggestionAcceptedMethod accept_method) {
   // Ignore clicks immediately after the popup was shown. This is to prevent
   // users accidentally accepting suggestions (crbug.com/40058217).
   if (!barrier_for_accepting_.value() && !disable_threshold_for_testing_) {
