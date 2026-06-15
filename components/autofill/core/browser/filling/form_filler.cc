@@ -971,17 +971,6 @@ void FormFiller::FillOrPreviewForm(
   const AugmentedFillingPayload augmented_filling_payload =
       AugmentedFillingPayload(filling_payload, form, trigger_field);
 
-  LogBuffer buffer(IsLoggingActive(log_manager()));
-  LOG_AF(buffer) << "action_persistence: "
-                 << ActionPersistenceToString(action_persistence) << Br{};
-  LOG_AF(buffer) << "filling product: "
-                 << FillingProductToString(
-                        augmented_filling_payload.filling_product())
-                 << Br{};
-  LOG_AF(buffer) << "is refill: " << refill_options.is_refill() << Br{};
-  LOG_AF(buffer) << form << Br{};
-  LOG_AF(buffer) << Tag{"table"};
-
   const auto filling_content =
       base::MakeFlatMap<FieldGlobalId,
                         base::expected<ValueAndTypeAndOverride, std::string>>(
@@ -1009,50 +998,29 @@ void FormFiller::FillOrPreviewForm(
                                  trigger_source, manager_->client(),
                                  blocked_fields, filling_content);
 
+  // These are the fields that will be sent to the renderer so that the
+  // corresponding `blink::WebFormControlElement`s can be filled.
   std::vector<FormFieldData> result_fields = base::ToVector(
       form.fields(), [](const std::unique_ptr<AutofillField>& field) {
         return FormFieldData(*field);
       });
   absl::flat_hash_map<FieldGlobalId, FieldType> filled_field_types;
 
-  // This loop sets the values to fill in the `result_fields`. The
-  // `result_fields` are sent to the renderer, whereas the very similar
-  // `form.fields()` remains in the browser process.
-  // The fill value is determined by `GetFieldFillingData()`.
-  for (size_t i = 0; i < result_fields.size(); ++i) {
-    const AutofillField& field = CHECK_DEREF(form.field(i));
-    const base::expected<ValueAndTypeAndOverride, std::string>&
-        expected_content = filling_content.at(field.global_id());
-
-    if (!skip_reasons[field.global_id()].empty()) {
-      const FieldFillingSkipReason skip_reason =
-          *skip_reasons[field.global_id()].begin();
-      LOG_AF(buffer) << Tr{} << base::StringPrintf("Field %zu", i)
-                     << GetSkipFieldFillLogMessage(skip_reason) << " "
-                     << expected_content.error_or("");
+  for (auto [result_field, field] : base::zip(result_fields, form.fields())) {
+    if (!skip_reasons[field->global_id()].empty()) {
       continue;
     }
 
+    const base::expected<ValueAndTypeAndOverride, std::string>&
+        expected_content = filling_content.at(field->global_id());
     CHECK(expected_content.has_value());
-    FillField(
-        expected_content.value(), result_fields[i], action_persistence,
-        trigger_source,
-        AllowPaymentSwapping(trigger_field, field, refill_options.is_refill()));
-    filled_field_types.emplace(field.global_id(),
-                               expected_content->filling_type);
 
-    const bool has_value_before = !field.value().empty();
-    const bool has_value_after = !result_fields[i].value().empty();
-    const bool is_autofilled_before =
-        field.last_modifier() == FieldModifier::kAutofill;
-    const bool is_autofilled_after =
-        result_fields[i].is_autofilled_according_to_renderer();
-    LOG_AF(buffer)
-        << Tr{}
-        << base::StringPrintf(
-               "Field %zu Fillable - has value: %d->%d; autofilled: %d->%d.", i,
-               has_value_before, has_value_after, is_autofilled_before,
-               is_autofilled_after);
+    FillField(expected_content.value(), result_field, action_persistence,
+              trigger_source,
+              AllowPaymentSwapping(trigger_field, *field,
+                                   refill_options.is_refill()));
+    filled_field_types.emplace(field->global_id(),
+                               expected_content->filling_type);
   }
 
   const bool may_refill_in_future = MaybeInitializeRefillContext(
@@ -1100,10 +1068,9 @@ void FormFiller::FillOrPreviewForm(
                       filled_field_types, augmented_filling_payload);
   }
 
-  LOG_AF(buffer) << CTag{"table"};
-  LOG_AF(log_manager()) << LoggingScope::kFilling
-                        << LogMessage::kSendFillingData << Br{}
-                        << std::move(buffer);
+  LogFillingInternal(action_persistence, form, refill_options,
+                     augmented_filling_payload.filling_product(),
+                     filling_content, skip_reasons);
 
   // TODO(crbug.com/40227071): Remove.
   base::flat_set<FieldGlobalId> filled_field_ids;
@@ -1565,6 +1532,58 @@ void FormFiller::AppendFillLogEvents(
       }
     }
   }
+}
+
+void FormFiller::LogFillingInternal(
+    mojom::ActionPersistence action_persistence,
+    const FormStructure& form,
+    RefillOptions refill_options,
+    FillingProduct filling_product,
+    const base::flat_map<FieldGlobalId,
+                         base::expected<FormFiller::ValueAndTypeAndOverride,
+                                        std::string>>& filling_content,
+    const base::flat_map<FieldGlobalId, DenseSet<FieldFillingSkipReason>>&
+        skip_reasons) {
+  LogBuffer buffer(IsLoggingActive(log_manager()));
+  LOG_AF(buffer) << "action_persistence: "
+                 << ActionPersistenceToString(action_persistence) << Br{};
+  LOG_AF(buffer) << "filling product: "
+                 << FillingProductToString(filling_product) << Br{};
+  LOG_AF(buffer) << "is refill: " << refill_options.is_refill() << Br{};
+  LOG_AF(buffer) << form << Br{};
+  LOG_AF(buffer) << Tag{"table"};
+
+  for (size_t i = 0; i < form.fields().size(); ++i) {
+    const AutofillField& field = CHECK_DEREF(form.field(i));
+    const base::expected<ValueAndTypeAndOverride, std::string>&
+        expected_content = filling_content.at(field.global_id());
+    if (!skip_reasons.at(field.global_id()).empty()) {
+      const FieldFillingSkipReason skip_reason =
+          *skip_reasons.at(field.global_id()).begin();
+      LOG_AF(buffer) << Tr{} << base::StringPrintf("Field %zu", i)
+                     << GetSkipFieldFillLogMessage(skip_reason) << " "
+                     << expected_content.error_or("");
+      continue;
+    }
+    CHECK(expected_content.has_value());
+
+    const bool has_value_before = !field.value().empty();
+    const bool has_value_after = !expected_content->value.empty();
+    const bool is_autofilled_before =
+        field.last_modifier() == FieldModifier::kAutofill;
+    const bool is_autofilled_after = has_value_after;
+    LOG_AF(buffer)
+        << Tr{}
+        << base::StringPrintf(
+               "Field %zu Fillable - has value: %d->%d; autofilled: %d->%d.", i,
+               has_value_before, has_value_after, is_autofilled_before,
+               is_autofilled_after);
+  }
+
+  LOG_AF(buffer) << CTag{"table"};
+  LOG_AF(log_manager()) << LoggingScope::kFilling
+                        << LogMessage::kSendFillingData << Br{}
+                        << std::move(buffer);
 }
 
 }  // namespace autofill

@@ -313,6 +313,19 @@ class FormFiller {
                            base::expected<ValueAndTypeAndOverride,
                                           std::string>>& filling_content);
 
+  // Logs information about the ongoing fill operation on `form` to
+  // chrome://autofill-internals.
+  void LogFillingInternal(
+      mojom::ActionPersistence action_persistence,
+      const FormStructure& form,
+      RefillOptions refill_options,
+      FillingProduct filling_product,
+      const base::flat_map<FieldGlobalId,
+                           base::expected<FormFiller::ValueAndTypeAndOverride,
+                                          std::string>>& filling_content,
+      const base::flat_map<FieldGlobalId, DenseSet<FieldFillingSkipReason>>&
+          skip_reasons);
+
   LogManager* log_manager();
 
   // Container holding the history of Autofill filling operations. Used to undo
