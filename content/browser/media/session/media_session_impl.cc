@@ -47,6 +47,7 @@
 #include "third_party/blink/public/mojom/favicon/favicon_url.mojom.h"
 #include "third_party/blink/public/strings/grit/blink_strings.h"
 #include "ui/gfx/favicon_size.h"
+#include "ui/gfx/geometry/size.h"
 #include "url/url_constants.h"
 
 #if BUILDFLAG(IS_ANDROID)
@@ -62,6 +63,17 @@ using media_session::mojom::MediaSessionImageType;
 using media_session::mojom::MediaSessionInfo;
 
 namespace {
+
+// The minimum layout size of the video in the viewport (in CSS pixels) required
+// to allow browser-initiated Auto-Picture-in-Picture.
+//
+// Note that this is the layout size of the video element in the viewport, which
+// is different from the video's intrinsic natural resolution (e.g. 1920x1080).
+//
+// Blink checks this constraint by ensuring that the video's actual layout size
+// (with CSS transforms and zoom applied) is greater than or equal to both
+// dimensions of this constraint (i.e. width >= 100 AND height >= 100).
+constexpr gfx::Size kBrowserAutoPipMinSize(100, 100);
 
 const double kUnduckedVolumeMultiplier = 1.0;
 
@@ -1314,7 +1326,7 @@ void MediaSessionImpl::EnterPictureInPicture() {
   }
 
   normal_players_.begin()->first.observer->OnEnterPictureInPicture(
-      normal_players_.begin()->first.player_id);
+      normal_players_.begin()->first.player_id, std::nullopt);
   uma_helper_.RecordEnterPictureInPicture(
       MediaSessionUmaHelper::EnterPictureInPictureType::kDefaultManual);
 }
@@ -2322,7 +2334,8 @@ void MediaSessionImpl::MaybeEnterBrowserInitiatedAutomaticPictureInPicture() {
   if (base::FeatureList::IsEnabled(
           blink::features::kBrowserInitiatedAutomaticPictureInPicture)) {
     auto& first = normal_players_.begin()->first;
-    first.observer->OnEnterPictureInPicture(first.player_id);
+    first.observer->OnEnterPictureInPicture(first.player_id,
+                                            kBrowserAutoPipMinSize);
     RecordBrowserInitiatedAutomaticPictureInPictureUkm(false);
   } else {
     RecordBrowserInitiatedAutomaticPictureInPictureUkm(true);
