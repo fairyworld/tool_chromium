@@ -21,6 +21,7 @@ import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.R;
 import org.chromium.chrome.browser.gesturenav.NavigationBubble.CloseTarget;
+import org.chromium.ui.OverscrollActivationStatus;
 import org.chromium.ui.animation.EmptyAnimationListener;
 import org.chromium.ui.base.BackGestureEventSwipeEdge;
 import org.chromium.ui.interpolators.Interpolators;
@@ -351,7 +352,8 @@ public class SideSlideLayout extends ViewGroup {
     }
 
     /**
-     * @return {@code true} if swiped long enough to trigger navigation upon release.
+     * @return {@code true} if swiped long enough to trigger navigation upon release or force
+     *     activation
      */
     boolean willNavigate() {
         return getOverscroll() > mTotalDragDistance * THRESHOLD_MULTIPLIER;
@@ -383,14 +385,15 @@ public class SideSlideLayout extends ViewGroup {
      * Release the active pull. If no pull has started, the release will be ignored. If the pull was
      * sufficiently large, the navigation sequence will be initiated.
      *
-     * @param allowNav whether to allow a sufficiently large pull to trigger the navigation action
-     *     and animation sequence.
+     * @param status The activation status of the release gesture.
      */
-    public void release(boolean allowNav) {
+    public void release(@OverscrollActivationStatus int status) {
         if (!mIsBeingDragged) return;
 
         // See ACTION_UP handling in {@link #onTouchEvent(...)}.
         mIsBeingDragged = false;
+
+        boolean allowNav = status == OverscrollActivationStatus.ALLOW_ACTIVATION;
 
         boolean activated = mMaxOverscroll >= mArrowViewWidth / 3f;
         if (activated) {

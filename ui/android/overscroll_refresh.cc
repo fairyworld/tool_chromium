@@ -72,11 +72,16 @@ void OverscrollRefresh::OnScrollBegin(const gfx::PointF& pos) {
 }
 
 void OverscrollRefresh::OnScrollEnd(const gfx::Vector2dF& scroll_velocity) {
-  // If the velocity does not meet the activation threshold, we infer the user
-  // is trying to cancel the gesture.
+  // Reached when a user scrolls but not overscrolls
+  if (scroll_consumption_state_ != ScrollConsumptionState::kEnabled) {
+    CHECK(!active_action_.has_value());
+    Release(OverscrollActivationStatus::kReset);
+    return;
+  }
   bool allow_activation = GetVelocityInActiveActionDirection(scroll_velocity) >
                           kMinFlingVelocityForActivation;
-  Release(allow_activation);
+  Release(allow_activation ? OverscrollActivationStatus::kAllowActivation
+                           : OverscrollActivationStatus::kDisallowActivation);
 }
 
 void OverscrollRefresh::OnOverscrolled(const cc::OverscrollBehavior& behavior,
@@ -190,8 +195,7 @@ bool OverscrollRefresh::WillHandleScrollUpdate(
 }
 
 void OverscrollRefresh::ReleaseWithoutActivation() {
-  bool allow_activation = false;
-  Release(allow_activation);
+  Release(OverscrollActivationStatus::kReset);
 }
 
 bool OverscrollRefresh::IsActive() const {
@@ -224,19 +228,16 @@ void OverscrollRefresh::SetIsGestureNavigationMode(
   is_gesture_navigation_mode_ = is_gesture_navigation_mode;
 }
 
-void OverscrollRefresh::Release(bool allow_refresh) {
+void OverscrollRefresh::Release(OverscrollActivationStatus activation_status) {
   if (scroll_consumption_state_ == ScrollConsumptionState::kEnabled)
-    handler_->PullRelease(allow_refresh);
+    handler_->PullRelease(activation_status);
   scroll_consumption_state_ = ScrollConsumptionState::kDisabled;
   active_action_ = std::nullopt;
 }
 
 float OverscrollRefresh::GetVelocityInActiveActionDirection(
     const gfx::Vector2dF& velocity) {
-  if (!active_action_.has_value()) {  // Reached as kNone when a user scrolls
-                                      // but not overscrolls
-    return 0.f;
-  }
+  CHECK(active_action_.has_value());
   switch (active_action_->action) {
     case OverscrollAction::kPullToRefresh:
       return velocity.y();
@@ -249,8 +250,7 @@ float OverscrollRefresh::GetVelocityInActiveActionDirection(
         return -velocity.x();
       }
     default:
-      // Reached as kNone when a user scrolls but not overscrolls
-      return 0.f;
+      NOTREACHED();
   }
 }
 
