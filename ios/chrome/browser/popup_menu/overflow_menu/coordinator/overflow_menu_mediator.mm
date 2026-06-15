@@ -1811,6 +1811,16 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
 
 #pragma mark - Private
 
+// Returns the center of the tools menu button in window coordinates.
+- (CGPoint)toolsMenuButtonCenter {
+  UIView* toolsMenu =
+      [self.layoutGuideCenter referencedViewUnderName:kToolsMenuGuide];
+  if (!toolsMenu) {
+    return CGPointZero;
+  }
+  return [toolsMenu.superview convertPoint:toolsMenu.center toView:nil];
+}
+
 - (void)updateIdentityAction {
   if (!self.identityAction || !self.authenticationService ||
       !self.authenticationService->HasPrimaryIdentity()) {
@@ -2537,7 +2547,9 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
 
   [self dismissMenu];
   [self.sceneHandler
-      openURLInNewTab:[OpenNewTabCommand commandWithIncognito:NO]];
+      openURLInNewTab:[OpenNewTabCommand
+                          commandWithIncognito:NO
+                                   originPoint:[self toolsMenuButtonCenter]]];
 }
 
 // Dismisses the menu and opens a new incognito tab.
@@ -2545,7 +2557,9 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
   RecordAction(UserMetricsAction("MobileMenuNewIncognitoTab"));
   [self dismissMenu];
   [self.sceneHandler
-      openURLInNewTab:[OpenNewTabCommand commandWithIncognito:YES]];
+      openURLInNewTab:[OpenNewTabCommand
+                          commandWithIncognito:YES
+                                   originPoint:[self toolsMenuButtonCenter]]];
 }
 
 // Dismisses the menu and opens a new window.
@@ -2916,17 +2930,19 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
 
 - (void)enterpriseLearnMore {
   [self dismissMenu];
-  [self.sceneHandler
-      openURLInNewTab:[OpenNewTabCommand commandWithURLFromChrome:
-                                             GURL(kChromeUIManagementURL)]];
+  OpenNewTabCommand* command =
+      [OpenNewTabCommand commandWithURLFromChrome:GURL(kChromeUIManagementURL)];
+  command.originPoint = [self toolsMenuButtonCenter];
+  [self.sceneHandler openURLInNewTab:command];
 }
 
 - (void)parentLearnMore {
   [self dismissMenu];
   GURL familyLinkURL = GURL(supervised_user::kManagedByParentUiMoreInfoUrl);
-  [self.sceneHandler
-      openURLInNewTab:[OpenNewTabCommand
-                          commandWithURLFromChrome:familyLinkURL]];
+  OpenNewTabCommand* command =
+      [OpenNewTabCommand commandWithURLFromChrome:familyLinkURL];
+  command.originPoint = [self toolsMenuButtonCenter];
+  [self.sceneHandler openURLInNewTab:command];
 }
 
 - (void)openSpotlightDebugger {
