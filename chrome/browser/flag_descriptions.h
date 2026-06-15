@@ -5587,11 +5587,6 @@ inline constexpr char kChromeItemPickerUiName[] = "Chrome Item Picker Ui";
 inline constexpr char kChromeItemPickerUiDescription[] =
     "Enable the Chrome item picker to show";
 
-inline constexpr char kChimeAlwaysShowNotificationDescription[] =
-    "A debug flag to always show Chime notification after receiving a payload.";
-inline constexpr char kChimeAlwaysShowNotificationName[] =
-    "Always show Chime notification";
-
 inline constexpr char kChimeAndroidSdkDescription[] =
     "Enable Chime SDK to receive push notification.";
 inline constexpr char kChimeAndroidSdkName[] = "Use Chime SDK";

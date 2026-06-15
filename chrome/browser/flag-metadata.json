@@ -2263,11 +2263,6 @@
     "expiry_milestone": -1
   },
   {
-    "name": "debug-chime-notification",
-    "owners": [ "xingliu@chromium.org" ],
-    "expiry_milestone": 100
-  },
-  {
     "name": "debug-toolbar-positioning",
     "owners": [ "skavuluru@google.com", "clank-large-form-factors@google.com" ],
     "expiry_milestone": 160
