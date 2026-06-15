@@ -122,6 +122,7 @@ import org.chromium.content_public.browser.SelectionClient;
 import org.chromium.content_public.browser.SelectionPopupController;
 import org.chromium.content_public.browser.WebContents;
 import org.chromium.net.ConnectionType;
+import org.chromium.ui.accessibility.AccessibilityFeatures;
 import org.chromium.ui.base.ActivityWindowAndroid;
 import org.chromium.url.GURL;
 import org.chromium.url.JUnitTestGURLs;
@@ -456,6 +457,18 @@ public class ReadAloudControllerUnitTest {
         // test returns false when policy pref is false
         when(mPrefService.getBoolean("readaloud.listen_to_this_page_enabled")).thenReturn(false);
         assertFalse(mController.isAvailable());
+    }
+
+    @Test
+    @EnableFeatures(AccessibilityFeatures.READ_ALOUD_NATIVE)
+    public void testReadAloudNativeEnabled() {
+        assertTrue(ReadAloudFeatures.isNativeEnabled());
+    }
+
+    @Test
+    @DisableFeatures(AccessibilityFeatures.READ_ALOUD_NATIVE)
+    public void testReadAloudNativeDisabled() {
+        assertFalse(ReadAloudFeatures.isNativeEnabled());
     }
 
     @Test
