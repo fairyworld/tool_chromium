@@ -61,10 +61,9 @@ class CC_EXPORT ProxyMain : public Proxy {
   void RequestNewLayerTreeFrameSink();
   void DidInitializeLayerTreeFrameSink(bool success);
   void DidCompletePageScaleAnimation();
-  void RecordBeginMainFrameMetrics(
-      const std::bitset<BeginMainFrameReasonSize>& reasons,
-      const base::ElapsedTimer& timer,
-      std::string_view suffix) const;
+  void RecordBeginMainFrameMetrics(const BeginMainFrameReasons& reasons,
+                                   const base::ElapsedTimer& timer,
+                                   std::string_view suffix) const;
   void BeginMainFrame(
       std::unique_ptr<BeginMainFrameAndCommitState> begin_main_frame_state);
   void DidChangeBeginFrameSourcePaused(bool paused);
@@ -239,7 +238,7 @@ class CC_EXPORT ProxyMain : public Proxy {
   bool begin_frame_source_paused_ = false;
   int main_frames_in_flight_ = 0;
   bool needs_begin_main_frame_ = false;
-  std::bitset<BeginMainFrameReasonSize> begin_main_frame_reason_;
+  BeginMainFrameReasons begin_main_frame_reason_;
   viz::BeginFrameArgs last_begin_main_frame_args_;
   bool begin_impl_frame_idle_ = false;
   bool request_begin_main_frame_not_expected_ = false;
