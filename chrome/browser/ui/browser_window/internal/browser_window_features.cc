@@ -76,6 +76,7 @@
 #include "chrome/browser/ui/focus/browser_focus_controller_webui.h"
 #include "chrome/browser/ui/fullscreen/browser_window_fullscreen_controller.h"
 #include "chrome/browser/ui/lens/lens_overlay_entry_point_controller.h"
+#include "chrome/browser/ui/omnibox/ai_mode_button_service_factory.h"
 #include "chrome/browser/ui/omnibox/ai_mode_page_action_controller.h"
 #include "chrome/browser/ui/performance_controls/memory_saver_bubble_controller.h"
 #include "chrome/browser/ui/performance_controls/memory_saver_opt_in_iph_controller.h"
@@ -763,7 +764,8 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
           browser, browser_command_controller_.get(), location_bar);
     }
 
-    if (browser_view && IsPageActionMigrated(PageActionIconType::kAiMode)) {
+    if (browser_view && IsPageActionMigrated(PageActionIconType::kAiMode) &&
+        AiModeButtonServiceFactory::GetForProfile(profile)) {
       LocationBarView* location_bar_view = browser_view->GetLocationBarView();
       // TODO(crbug.com/491707187): Make it work with any LocationBar
       if (location_bar_view) {

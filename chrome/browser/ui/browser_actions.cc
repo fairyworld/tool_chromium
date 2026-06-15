@@ -474,8 +474,10 @@ void BrowserActions::InitializeSidePanelActions() {
                   if (!bwi) {
                     return;
                   }
-                  if (contextual_tasks::IsContextualTasksPinButtonInToolbarEnabled() &&
-                      contextual_tasks::GetEffectivePinState(bwi->GetProfile())) {
+                  if (contextual_tasks::
+                          IsContextualTasksPinButtonInToolbarEnabled() &&
+                      contextual_tasks::GetEffectivePinState(
+                          bwi->GetProfile())) {
                     chrome::ToggleContextualTasksSidePanelZeroState(bwi);
                   } else {
                     chrome::ToggleContextualTasksSidePanel(bwi);
@@ -1453,14 +1455,9 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
 
   auto* ai_mode_button_service =
       AiModeButtonServiceFactory::GetForProfile(base::to_address(profile_));
-  const ai_mode_button_config::AiModeButtonConfig* ai_config =
-      ai_mode_button_service ? ai_mode_button_service->GetCurrentConfig()
-                             : nullptr;
   if (ai_mode_button_service) {
     // If `ai_mode_button_service` is null, it will remain null and the button
-    // will not be needed. If `ai_config` is null, it may later become non-null;
-    // the config's nullness can swap multiple times during the profile's
-    // lifecycle; so add the button regardless of the config's nullness.
+    // will not be needed.
     root_action_item_->AddChild(
         actions::ActionItem::Builder(
             base::BindRepeating(
@@ -1496,9 +1493,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
                 },
                 bwi))
             .SetActionId(kActionAiMode)
-            .SetText(ai_config ? ai_config->text : std::u16string())
-            .SetTooltipText(ai_config ? ai_config->tooltip : std::u16string())
-            .SetEnabled(ai_config != nullptr)
             .SetImage(ui::ImageModel::FromVectorIcon(
                 features::IsRoundedIconsEnabled()
                     ? omnibox::kSearchSparkIcon

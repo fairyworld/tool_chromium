@@ -7,6 +7,7 @@
 #include "base/check.h"
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
+#include "base/functional/callback_helpers.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/types/to_address.h"
 #include "chrome/browser/autocomplete/aim_eligibility_service_factory.h"
@@ -103,8 +104,17 @@ AiModePageActionController::AiModePageActionController(
   CHECK(IsPageActionMigrated(PageActionIconType::kAiMode));
 
   if (auto* omnibox_controller = location_bar_view.GetOmniboxController()) {
-    observation_.Observe(omnibox_controller->edit_model());
+    omnibox_edit_model_observation_.Observe(omnibox_controller->edit_model());
   }
+
+  auto* ai_mode_button_service =
+      AiModeButtonServiceFactory::GetForProfile(&profile);
+  CHECK(ai_mode_button_service);
+  ai_mode_config_subscription_ =
+      ai_mode_button_service->RegisterOnConfigChanged(
+          base::IgnoreArgs<const ai_mode_button_config::AiModeButtonConfig*>(
+              base::BindRepeating(&AiModePageActionController::UpdatePageAction,
+                                  weak_factory_.GetWeakPtr())));
 }
 
 AiModePageActionController::~AiModePageActionController() = default;
@@ -127,7 +137,7 @@ void AiModePageActionController::UpdatePageAction() {
     NotifyOmniboxTriggeredFeatureService(
         *location_bar_view_->GetOmniboxController());
   }
-  SetPageActionVisibility(is_visible);
+  UpdatePageActionUi(is_visible);
 }
 
 // static
@@ -249,18 +259,25 @@ bool AiModePageActionController::ShouldShowPageAction(
   return has_focus;
 }
 
-void AiModePageActionController::SetPageActionVisibility(bool is_visible) {
+void AiModePageActionController::UpdatePageActionUi(bool is_visible) {
   if (!is_visible) {
     favicon_fetch_weak_factory_.InvalidateWeakPtrs();
     Hide(IconSource::kInvisible);
     return;
   }
 
+  page_actions::PageActionController* page_action_controller =
+      GetPageActionController(*bwi_);
+  CHECK(page_action_controller);
   auto* service =
       AiModeButtonServiceFactory::GetForProfile(base::to_address(profile_));
   CHECK(service);
   auto* config = service->GetCurrentConfig();
   CHECK(config);
+
+  page_action_controller->OverrideText(kActionAiMode, config->text);
+  page_action_controller->OverrideTooltip(kActionAiMode, config->tooltip);
+
   if (config->id == SearchEngineType::SEARCH_ENGINE_GOOGLE) {
     ShowAndOverrideImage(
         ui::ImageModel::FromImageGenerator(
