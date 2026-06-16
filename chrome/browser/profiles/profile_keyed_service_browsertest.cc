@@ -282,6 +282,7 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
     // in chrome: using `BrowserContextKeyedServiceShutdownNotifierFactory`:
     // which does not yet have an implementation using `ProfileSelections`.
     "BrowserManagerService",
+    "ExtensionKeybindingRegistryShutdownNotifierFactory",
 #if BUILDFLAG(IS_CHROMEOS)
     "GalleryWatchManager",
     "MediaFileSystemRegistry",
@@ -337,6 +338,7 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceBrowserTest,
     // in chrome: using `BrowserContextKeyedServiceShutdownNotifierFactory`:
     // which does not yet have an implementation using `ProfileSelections`.
     "BrowserManagerService",
+    "ExtensionKeybindingRegistryShutdownNotifierFactory",
 #if BUILDFLAG(IS_CHROMEOS)
     "GalleryWatchManager",
     "MediaFileSystemRegistry",
@@ -435,6 +437,7 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
 #endif
     "DeveloperToolsPolicyChecker",
     "EnterpriseReportingPrivateEventRouter",
+    "ExtensionKeybindingRegistryShutdownNotifierFactory",
     "ExtensionNavigationRegistry",
     "ExtensionSystem",
     "ExtensionProtocolShutdownNotifierFactory",
@@ -698,6 +701,7 @@ IN_PROC_BROWSER_TEST_F(ProfileKeyedServiceGuestBrowserTest,
 #if BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
     "ExtensionInstallEventRouter",
 #endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS)
+    "ExtensionKeybindingRegistryShutdownNotifierFactory",
     "ExtensionManagement",
     "ExtensionNavigationRegistry",
     "ExtensionPrefValueMap",
