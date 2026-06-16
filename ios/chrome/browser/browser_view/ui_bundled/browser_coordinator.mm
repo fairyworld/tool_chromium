@@ -72,6 +72,7 @@
 #import "ios/chrome/browser/autofill/manual_fill/coordinator/manual_fill_password_coordinator.h"
 #import "ios/chrome/browser/autofill/model/bottom_sheet/autofill_bottom_sheet_tab_helper.h"
 #import "ios/chrome/browser/autofill/payments/coordinator/payments_suggestion_bottom_sheet_coordinator.h"
+#import "ios/chrome/browser/autofill/public/autofill_settings_navigator.h"
 #import "ios/chrome/browser/autofill/scan_save_and_fill/coordinator/payments_scan_save_and_fill_offer_bottom_sheet_coordinator.h"
 #import "ios/chrome/browser/autofill/ui_bundled/address_editor/autofill_edit_profile_coordinator.h"
 #import "ios/chrome/browser/autofill/ui_bundled/bottom_sheet/infobar_autofill_edit_profile_bottom_sheet_handler.h"
@@ -423,6 +424,7 @@ const char kChromeAppStoreUrl[] =
     AutoDeletionCommands,
     AutofillAddCreditCardCoordinatorDelegate,
     AutofillCommands,
+    AutofillSettingsNavigator,
     BrowserCoordinatorCommands,
     BubblePresenterDelegate,
     CobaltCommands,
@@ -442,7 +444,6 @@ const char kChromeAppStoreUrl[] =
     EnterprisePromptCoordinatorDelegate,
     FileUploadPanelCommands,
     FindInPageCommands,
-    FormInputAccessoryCoordinatorNavigator,
     GeminiCommands,
     GoogleOneCommands,
     IOSPasskeyClientCommands,
@@ -4258,36 +4259,38 @@ const char kChromeAppStoreUrl[] =
   self.pageInfoCoordinator = nil;
 }
 
-#pragma mark - FormInputAccessoryCoordinatorNavigator
+#pragma mark - AutofillSettingsNavigator
 
-- (void)openPasswordManager {
-  [HandlerForProtocol(self.dispatcher, SettingsCommands)
-      showSavedPasswordsSettingsFromViewController:self.viewController];
-}
+- (void)openSettingsForPage:(AutofillSettingsPage)page {
+  switch (page) {
+    case AutofillSettingsPage::kPasswordManager:
+      [HandlerForProtocol(self.dispatcher, SettingsCommands)
+          showSavedPasswordsSettingsFromViewController:self.viewController];
+      break;
+    case AutofillSettingsPage::kPasswordSettings: {
+      // Not an invariant due to possible race conditions. DCHECKing for
+      // debugging purposes. See crbug.com/40067451.
+      DCHECK(!self.passwordSettingsCoordinator);
 
-- (void)openPasswordSettings {
-  // Not an invariant due to possible race conditions. DCHECKing for debugging
-  // purposes. See crbug.com/40067451.
-  DCHECK(!self.passwordSettingsCoordinator);
-
-  // Use main browser to open the password settings.
-  SceneState* sceneState = self.sceneState;
-  self.passwordSettingsCoordinator = [[PasswordSettingsCoordinator alloc]
-      initWithBaseViewController:self.viewController
-                         browser:sceneState.browserProviderInterface
-                                     .mainBrowserProvider.browser];
-  self.passwordSettingsCoordinator.delegate = self;
-  [self.passwordSettingsCoordinator start];
-}
-
-- (void)openAddressSettings {
-  [HandlerForProtocol(self.dispatcher, SettingsCommands)
-      showProfileSettingsFromViewController:self.viewController];
-}
-
-- (void)openCreditCardSettings {
-  [HandlerForProtocol(self.dispatcher, SettingsCommands)
-      showCreditCardSettings];
+      // Use main browser to open the password settings.
+      SceneState* sceneState = self.sceneState;
+      self.passwordSettingsCoordinator = [[PasswordSettingsCoordinator alloc]
+          initWithBaseViewController:self.viewController
+                             browser:sceneState.browserProviderInterface
+                                         .mainBrowserProvider.browser];
+      self.passwordSettingsCoordinator.delegate = self;
+      [self.passwordSettingsCoordinator start];
+      break;
+    }
+    case AutofillSettingsPage::kAddresses:
+      [HandlerForProtocol(self.dispatcher, SettingsCommands)
+          showProfileSettingsFromViewController:self.viewController];
+      break;
+    case AutofillSettingsPage::kCreditCards:
+      [HandlerForProtocol(self.dispatcher, SettingsCommands)
+          showCreditCardSettings];
+      break;
+  }
 }
 
 #pragma mark - RepostFormTabHelperDelegate
@@ -5802,7 +5805,7 @@ const char kChromeAppStoreUrl[] =
 // VC on top of BrowserViewController have been dismissed.
 - (void)stopQuickDeleteAndOpenPasswordSettingsPageAfterVCDismissed {
   [self stopQuickDelete];
-  [self openPasswordSettings];
+  [self openSettingsForPage:AutofillSettingsPage::kPasswordSettings];
 }
 
 - (void)stopQuickDeleteForAnimationWithCompletion:(ProceduralBlock)completion {

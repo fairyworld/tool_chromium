@@ -2222,7 +2222,10 @@
             <message name="IDS_IOS_CONTEXTUAL_PANEL_SAMPLE_MODEL_ENTRYPOINT_MESSAGE" desc="Message appearing as the entry point for the Contextual Panel's sample model, used as a demo of the entrypoint (appears in the omnibox)">
         Large entry point
       </message>
-            <message name="IDS_IOS_CONTEXT_MENU_SEARCHIMAGEWITHGOOGLE" desc="Context menu text for option to search an image with Google [Length: 25em] [iOS only]">
+            <message name="IDS_IOS_CONTEXT_MENU_OPEN_SETTINGS" desc="Title of the button in the context menu for suggestions on the form accessory view to open the settings page.">
+        Open settings
+      </message>
+      <message name="IDS_IOS_CONTEXT_MENU_SEARCHIMAGEWITHGOOGLE" desc="Context menu text for option to search an image with Google [Length: 25em] [iOS only]">
         Search Image with Google
       </message>
       <message name="IDS_IOS_CONTEXT_MENU_SEARCHWEBFORIMAGE" desc="Context menu text for option to perform a search for image [Length: 25em] [iOS only]">
