@@ -2855,7 +2855,18 @@ const char kChromeAppStoreUrl[] =
                              url:url
                            title:title];
   _sendTabToSelfCoordinator.delegate = self;
-  [_sendTabToSelfCoordinator start];
+
+  // If there is another transition going on (e.g. dismissal of the context
+  // menu from which the Send-tab-to-self action was triggered), postpone the
+  // start of the coordinator to allow the other transition to complete first.
+  // This is necessary to prevent a UIKit transition deadlock.
+  __weak SendTabToSelfCoordinator* weakSendTabToSelfCoordinator =
+      _sendTabToSelfCoordinator;
+  ExecuteWhenTransitionsComplete(
+      ^{
+        [weakSendTabToSelfCoordinator start];
+      },
+      self.viewController);
 }
 
 #if !defined(NDEBUG)
