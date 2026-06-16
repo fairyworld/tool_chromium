@@ -190,6 +190,7 @@ public class VerticalTabListCoordinator {
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+        recyclerView.setupCustomItemAnimator();
         recyclerView.setVisibility(View.VISIBLE);
 
         // Create the gesture detector to catch long-presses on VT empty space.

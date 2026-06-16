@@ -748,11 +748,10 @@ public class TabListMediator implements TabListNotificationHandler {
                     if (finalIndex == TabModel.INVALID_TAB_INDEX) {
                         mModelList.removeAt(index);
                     } else {
-                        finalIndex = Math.min(finalIndex, mModelList.size() - 1);
-                        if (index != finalIndex) {
-                            mModelList.move(index, finalIndex);
-                        }
-                        mModelList.update(finalIndex, mModelList.get(finalIndex));
+                        ListItem item = mModelList.get(index);
+                        mModelList.removeAt(index);
+                        finalIndex = Math.min(finalIndex, mModelList.size());
+                        mModelList.add(finalIndex, item);
                     }
                 }
             };
