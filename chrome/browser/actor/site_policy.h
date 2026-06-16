@@ -76,6 +76,7 @@ void MayActOnUrl(const GURL& url,
                  Profile* profile,
                  AggregatedJournal& journal,
                  TaskId task_id,
+                 const OriginGatingCache& origin_gating_cache,
                  const EnterprisePolicyChecker& policy_checker,
                  DecisionCallbackWithReason callback);
 
