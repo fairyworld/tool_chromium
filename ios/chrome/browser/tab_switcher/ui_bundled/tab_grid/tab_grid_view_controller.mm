@@ -257,6 +257,7 @@ NSUInteger GetPageIndexFromPage(TabGridPage page) {
   if (IsChromeNextIaEnabled() && !IsFullscreenRefactoringEnabled()) {
     [self setContentVisible:self.viewVisible];
   }
+  [self updateAccessibilityElements];
 }
 
 - (void)viewDidLoad {
@@ -767,6 +768,7 @@ NSUInteger GetPageIndexFromPage(TabGridPage page) {
   UIViewController* previousPageVC = self.currentPageViewController;
   _currentPage = currentPage;
   self.currentPageViewController.view.accessibilityElementsHidden = NO;
+  [self updateAccessibilityElements];
 
   if (_mode == TabGridMode::kSearch) {
     // `UIAccessibilityLayoutChangedNotification` doesn't change the current
@@ -1241,6 +1243,7 @@ NSUInteger GetPageIndexFromPage(TabGridPage page) {
     AddSameConstraints(self.scrimView, self.view);
     [self.view layoutIfNeeded];
   }
+  [self updateAccessibilityElements];
   self.currentPageViewController.accessibilityElementsHidden = YES;
   __weak __typeof(self) weakSelf = self;
   [UIView animateWithDuration:kAnimationDuration.InSecondsF()
@@ -1279,6 +1282,7 @@ NSUInteger GetPageIndexFromPage(TabGridPage page) {
           return;
         }
         strongSelf.scrimView.hidden = YES;
+        [strongSelf updateAccessibilityElements];
         strongSelf.currentPageViewController.accessibilityElementsHidden = NO;
       }];
 }
@@ -1681,6 +1685,7 @@ NSUInteger GetPageIndexFromPage(TabGridPage page) {
 
 - (void)pinnedTabsViewControllerVisibilityDidChange:
     (PinnedTabsViewController*)pinnedTabsViewController {
+  [self updateAccessibilityElements];
   UIEdgeInsets insets = [self calculateInsetsForRegularGridView];
   [UIView animateWithDuration:kPinnedViewInsetAnimationTime
                    animations:^{
@@ -2046,6 +2051,7 @@ NSUInteger GetPageIndexFromPage(TabGridPage page) {
   [self configureViewControllerForCurrentSizeClassesAndPage];
   [self.view setNeedsLayout];
   self.scrollView.scrollEnabled = (_mode == TabGridMode::kNormal);
+  [self updateAccessibilityElements];
 }
 
 #pragma mark - UIResponder
@@ -2261,6 +2267,8 @@ NSUInteger GetPageIndexFromPage(TabGridPage page) {
       updateFloatyVisibilityIfEligibleAnimated:NO
                                     fromSource:gemini::FloatyUpdateSource::
                                                    GestureIph];
+  self.swipeToIncognitoIPH = nil;
+  [self updateAccessibilityElements];
 }
 
 - (void)gestureInProductHelpView:(GestureInProductHelpView*)view
@@ -2307,6 +2315,38 @@ NSUInteger GetPageIndexFromPage(TabGridPage page) {
   return [activeVC respondsToSelector:@selector(activeContextMenuAnimator)]
              ? [activeVC activeContextMenuAnimator]
              : nil;
+}
+
+#pragma mark - Accessibility
+
+// Updates the accessibility elements on the root view to enforce a logical
+// focus order (Top Toolbar -> Scrim -> Scroll View/Active Page -> Pinned Tabs
+// -> Bottom Toolbar -> Transient Views).
+- (void)updateAccessibilityElements {
+  if (!_childViewsAreSetUp) {
+    return;
+  }
+  NSMutableArray* elements = [[NSMutableArray alloc] init];
+  if (self.topToolbar) {
+    [elements addObject:self.topToolbar];
+  }
+  if (self.scrimView && !self.scrimView.hidden) {
+    [elements addObject:self.scrimView];
+  }
+  if (self.scrollView) {
+    [elements addObject:self.scrollView];
+  }
+  if (IsPinnedTabsEnabled() && self.pinnedTabsViewController.view &&
+      !self.pinnedTabsViewController.view.hidden) {
+    [elements addObject:self.pinnedTabsViewController.view];
+  }
+  if (self.bottomToolbar) {
+    [elements addObject:self.bottomToolbar];
+  }
+  if (self.swipeToIncognitoIPH && !self.swipeToIncognitoIPH.hidden) {
+    [elements addObject:self.swipeToIncognitoIPH];
+  }
+  self.view.accessibilityElements = elements;
 }
 
 @end
