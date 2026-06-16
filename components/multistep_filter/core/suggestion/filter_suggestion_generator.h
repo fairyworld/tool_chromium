@@ -27,6 +27,11 @@ class MultistepFilterLogRouter;
 struct FilterAnnotation;
 struct FilterSuggestionCandidate;
 
+namespace internal {
+// Default maximum number of annotations to retrieve from the filter store.
+constexpr size_t kDefaultMaxResults = 100;
+}  // namespace internal
+
 // Responsible for orchestrating the suggestion generation process for a given
 // URL. This class is owned by the `MultistepFilterService` and shares its
 // lifecycle.

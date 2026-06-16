@@ -44,7 +44,7 @@ class FilterStore {
   // Only annotations created at or after `min_creation_time` are returned.
   // The callback is guaranteed to run safely on the calling sequence (UI
   // thread).
-  void GetAnnotationsForTaskSortedByCreationTimestamp(
+  virtual void GetAnnotationsForTaskSortedByCreationTimestamp(
       std::string task_type,
       base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
       size_t max_count,

@@ -38,7 +38,6 @@ namespace multistep_filter {
 
 namespace {
 
-constexpr size_t kDefaultMaxResults = 100;
 // TODO(b/514312241): Remove this fallback message when the JSON
 // configuration is being served properly.
 constexpr char16_t kTestingFallbackMessage[] = u"Continue where you left off?";
@@ -162,7 +161,8 @@ void FilterSuggestionGenerator::OnSupportedTaskTypesFetched(
   // filtering tasks.
   for (const std::string& task_type : *supported_task_types) {
     filter_store_->GetAnnotationsForTaskSortedByCreationTimestamp(
-        task_type, barrier_callback, kDefaultMaxResults, min_creation_time);
+        task_type, barrier_callback, internal::kDefaultMaxResults,
+        min_creation_time);
   }
 }
 
