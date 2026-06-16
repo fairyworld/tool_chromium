@@ -34,3 +34,7 @@ std::u16string_view OmniboxPopupView::GetAccessibleButtonTextForResult(
 OmniboxPopupViewBrowserView* OmniboxPopupView::AsOmniboxPopupViewBrowserView() {
   return nullptr;
 }
+
+bool OmniboxPopupView::is_switching_tab() const {
+  return false;
+}

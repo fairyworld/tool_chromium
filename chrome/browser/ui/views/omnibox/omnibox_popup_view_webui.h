@@ -61,6 +61,9 @@ class OmniboxPopupViewWebUI : public OmniboxPopupView,
   void OnCharTyped(base::TimeTicks timestamp) override {}
 
  protected:
+  LocationBar* location_bar() { return location_bar_; }
+  const LocationBar* location_bar() const { return location_bar_; }
+
   OmniboxPopupViewWebUI(OmniboxView* omnibox_view,
                         OmniboxController* controller,
                         LocationBar* location_bar,

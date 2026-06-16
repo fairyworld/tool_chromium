@@ -86,6 +86,9 @@ class OmniboxPopupView {
   // Called when the omnibox gains focus.
   virtual void OnFocus() {}
 
+  // Returns true if a tab switch is currently in progress.
+  virtual bool is_switching_tab() const;
+
   // Returns true if the popup controls its own selection state.
   virtual bool IsSelectionPopupControlled() const = 0;
 

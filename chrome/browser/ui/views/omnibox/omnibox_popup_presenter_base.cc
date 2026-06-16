@@ -437,3 +437,14 @@ void OmniboxPopupPresenterBase::OnEmbeddedPermissionDialogChanged(
 OmniboxController* OmniboxPopupPresenterBase::GetOmniboxController() {
   return controller();
 }
+
+void OmniboxPopupPresenterBase::SetHandlerBoundCallback(
+    WebUIPopupHandlerBoundCallback callback) {
+  handler_bound_callback_ = std::move(callback);
+}
+
+void OmniboxPopupPresenterBase::OnWebUIPopupHandlerBound() {
+  if (handler_bound_callback_) {
+    handler_bound_callback_.Run();
+  }
+}
