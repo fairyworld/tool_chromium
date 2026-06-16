@@ -228,8 +228,10 @@ export class PressHandler {
       return;
     }
 
+    // On Mac, Ctrl+LeftClick is a Context Menu action. We return early to
+    // bypass pointer capture and short-press logic, and let the native
+    // contextmenu event handle it.
     if (isMac && e.button === BUTTON_LEFT && e.ctrlKey) {
-      this.onLongPress_(getContextMenuSourceType(e));
       return;
     }
 
@@ -302,7 +304,7 @@ export class PressHandler {
       return;
     }
 
-    // If it's Ctrl+LeftClick on Mac, skip the rest.
+    // If it's Ctrl+LeftClick on Mac, abort the click.
     if (isMac && e.button === BUTTON_LEFT && e.ctrlKey) {
       this.resetContextMenuState_();
       return;
@@ -330,13 +332,9 @@ export class PressHandler {
 
   onContextmenu = (e: PointerEvent) => {
     e.preventDefault();
-    // If it's a Mac Ctrl+LeftClick, the browser natively fires a contextmenu
-    // event. We already showed the menu in pointerdown. We MUST suppress the
-    // native contextmenu event.
-    if (isMac && e.button === BUTTON_LEFT && e.ctrlKey) {
-      return;
-    }
-
+    // For Mac Ctrl+LeftClick, the browser natively fires this event immediately
+    // after pointerdown (no wait for pointerup), perfectly matching Views'
+    // context menu timing.
     this.onLongPress_(getContextMenuSourceType(e));
   };
 }

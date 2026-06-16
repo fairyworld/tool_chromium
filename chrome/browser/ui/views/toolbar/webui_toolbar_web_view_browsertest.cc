@@ -1105,8 +1105,18 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewPixelBrowserTest,
       web_view->GetWebContents(),
       DispatchPointerClick(kBackSelector, "mouse",
                            "detail: 1, button: 0, ctrlKey: true")));
+  // DispatchPointerClick only sends pointerdown and pointerup.
+  // Explicitly dispatch the contextmenu event to accurately simulate real-world
+  // browser behavior on Mac, where a real Ctrl+LeftClick natively triggers both
+  // pointerdown and contextmenu events.
+  EXPECT_TRUE(content::ExecJs(
+      web_view->GetWebContents(),
+      DispatchPointerEvent("contextmenu", kBackSelector, "mouse",
+                           "detail: 1, button: 0, ctrlKey: true")));
 
   auto* back_control = &webui_toolbar_view->back_control_;
+  ASSERT_TRUE(back_control->menu_runner_);
+  EXPECT_TRUE(back_control->menu_runner_->IsRunning());
   back_control->menu_runner_->Cancel();
 
   // Verify no new tab was opened.
