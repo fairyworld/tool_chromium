@@ -19,7 +19,7 @@
 #include "components/os_crypt/async/browser/test_utils.h"
 #include "components/os_crypt/async/common/algorithm.mojom.h"
 #include "components/os_crypt/async/common/encryptor.h"
-#include "crypto/hkdf.h"
+#include "crypto/kdf.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -59,9 +59,12 @@ class TestKeyProvider : public KeyProvider {
   Encryptor::Key GenerateKey() {
     // Make the key derive from the name to ensure different providers have
     // different keys.
-    std::string key = crypto::HkdfSha256(name_, "salt", "info",
-                                         Encryptor::Key::kAES256GCMKeySize);
-    return Encryptor::Key(std::vector<uint8_t>(key.begin(), key.end()),
+    constexpr auto kAlgo = crypto::hash::kSha256;
+    constexpr auto kSalt = std::to_array<uint8_t>({'s', 'a', 'l', 't'});
+    constexpr auto kInfo = std::to_array<uint8_t>({'i', 'n', 'f', 'o'});
+    constexpr auto kSize = Encryptor::Key::kAES256GCMKeySize;
+    const auto name = base::as_byte_span(name_);
+    return Encryptor::Key(crypto::kdf::Hkdf<kSize>(kAlgo, name, kSalt, kInfo),
                           mojom::Algorithm::kAES256GCM);
   }
 

@@ -16,7 +16,7 @@
 #include "build/build_config.h"
 #include "components/os_crypt/async/common/encryptor.h"
 #include "components/os_crypt/async/common/encryptor.mojom.h"
-#include "crypto/hkdf.h"
+#include "crypto/kdf.h"
 #include "crypto/random.h"
 #include "mojo/public/cpp/test_support/test_utils.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -81,11 +81,11 @@ class EncryptorTest : public ::testing::Test {
   }
 
   static Encryptor::Key DeriveAES256TestKey(std::string_view seed) {
-    auto key_data =
-        crypto::HkdfSha256(seed, {}, {}, Encryptor::Key::kAES256GCMKeySize);
-    Encryptor::Key key(base::as_byte_span(key_data),
-                       mojom::Algorithm::kAES256GCM);
-    return key;
+    const auto kSize = Encryptor::Key::kAES256GCMKeySize;
+    const auto kAlgo = crypto::hash::kSha256;
+    return Encryptor::Key(
+        crypto::kdf::Hkdf<kSize>(kAlgo, base::as_byte_span(seed), {}, {}),
+        mojom::Algorithm::kAES256GCM);
   }
 
   static Encryptor::Key CloneKey(const Encryptor::Key& key) {
