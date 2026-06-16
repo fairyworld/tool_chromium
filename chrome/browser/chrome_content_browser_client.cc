@@ -6767,6 +6767,10 @@ ChromeContentBrowserClient::
     CreateURLLoaderHandlerForServiceWorkerInitiatedNavigationRequest(
         content::FrameTreeNodeId frame_tree_node_id,
         const network::ResourceRequest& resource_request) {
+  // Note: SearchPrefetchService only applies to omnibox searches, which are not
+  // in scope for Connection Allowlist intervention. However, if we ever intend
+  // to create a loader in this function on behalf of a specific context, then
+  // that loader must respect the Connection Allowlist of that context.
   SearchPrefetchURLLoader::RequestHandler prefetch_handler =
       SearchPrefetchURLLoaderInterceptor::MaybeCreateLoaderForRequest(
           resource_request, frame_tree_node_id);
