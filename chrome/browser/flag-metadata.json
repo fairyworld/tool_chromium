@@ -6671,6 +6671,11 @@
     "expiry_milestone": 151
   },
   {
+    "name": "mobile-promo-on-desktop-with-qr-code-wave-2",
+    "owners": ["bmcclure@google.com", "bling-pandamonium@google.com"],
+    "expiry_milestone": 155
+  },
+  {
     "name": "mobile-promo-on-desktop-with-reminder",
     "owners": ["hiramahmood@google.com", "scottyoder@google.com", "bling-get-set-up@google.com"],
     "expiry_milestone": 152
@@ -6679,6 +6684,11 @@
     "name": "mobile-promo-on-desktop-with-reminder-wave-1",
     "owners": ["bmcclure@google.com", "bling-pandamonium@google.com"],
     "expiry_milestone": 151
+  },
+  {
+    "name": "mobile-promo-on-desktop-with-reminder-wave-2",
+    "owners": ["bmcclure@google.com", "bling-pandamonium@google.com"],
+    "expiry_milestone": 155
   },
   {
     "name": "model-based-page-classification",

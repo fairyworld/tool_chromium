@@ -4038,6 +4038,42 @@ const FeatureEntry::FeatureParam
         {kMobilePromoOnDesktopPromoTypeParam, "5"},
         {kMobilePromoOnDesktopNotificationParam, "true"}};
 
+const FeatureEntry::FeatureParam kMobilePromoOnDesktopSafety[] = {
+    {kMobilePromoOnDesktopPromoTypeParam, "6"},
+    {kMobilePromoOnDesktopNotificationParam, "false"}};
+const FeatureEntry::FeatureParam kMobilePromoOnDesktopSafetyNotification[] = {
+    {kMobilePromoOnDesktopPromoTypeParam, "6"},
+    {kMobilePromoOnDesktopNotificationParam, "true"}};
+
+const FeatureEntry::FeatureParam kMobilePromoOnDesktopBestOfGoogle[] = {
+    {kMobilePromoOnDesktopPromoTypeParam, "7"},
+    {kMobilePromoOnDesktopNotificationParam, "false"}};
+const FeatureEntry::FeatureParam
+    kMobilePromoOnDesktopBestOfGoogleNotification[] = {
+        {kMobilePromoOnDesktopPromoTypeParam, "7"},
+        {kMobilePromoOnDesktopNotificationParam, "true"}};
+
+const FeatureEntry::FeatureParam kMobilePromoOnDesktopAI[] = {
+    {kMobilePromoOnDesktopPromoTypeParam, "8"},
+    {kMobilePromoOnDesktopNotificationParam, "false"}};
+const FeatureEntry::FeatureParam kMobilePromoOnDesktopAINotification[] = {
+    {kMobilePromoOnDesktopPromoTypeParam, "8"},
+    {kMobilePromoOnDesktopNotificationParam, "true"}};
+
+const FeatureEntry::FeatureParam kMobilePromoOnDesktopYourChrome[] = {
+    {kMobilePromoOnDesktopPromoTypeParam, "9"},
+    {kMobilePromoOnDesktopNotificationParam, "false"}};
+const FeatureEntry::FeatureParam kMobilePromoOnDesktopYourChromeNotification[] =
+    {{kMobilePromoOnDesktopPromoTypeParam, "9"},
+     {kMobilePromoOnDesktopNotificationParam, "true"}};
+
+const FeatureEntry::FeatureParam kMobilePromoOnDesktopShopping[] = {
+    {kMobilePromoOnDesktopPromoTypeParam, "10"},
+    {kMobilePromoOnDesktopNotificationParam, "false"}};
+const FeatureEntry::FeatureParam kMobilePromoOnDesktopShoppingNotification[] = {
+    {kMobilePromoOnDesktopPromoTypeParam, "10"},
+    {kMobilePromoOnDesktopNotificationParam, "true"}};
+
 const FeatureEntry::FeatureVariation kMobilePromoOnDesktopVariations[] = {
     {" - ESB", kMobilePromoOnDesktopESB, nullptr},
     {" - ESB with push notification", kMobilePromoOnDesktopESBNotification,
@@ -4070,6 +4106,33 @@ const FeatureEntry::FeatureVariation
         {" - Tab Groups", kMobilePromoOnDesktopTabGroups, nullptr},
         {" - Price Tracking", kMobilePromoOnDesktopPriceTracking, nullptr},
         {" - Lens Promo", kMobilePromoOnDesktopLens, nullptr},
+};
+
+const FeatureEntry::FeatureVariation kMobilePromoOnDesktopVariationsWave2[] = {
+    {" - Safety", kMobilePromoOnDesktopSafety, nullptr},
+    {" - Safety with push notification",
+     kMobilePromoOnDesktopSafetyNotification, nullptr},
+    {" - Best of Google", kMobilePromoOnDesktopBestOfGoogle, nullptr},
+    {" - Best of Google with push notification",
+     kMobilePromoOnDesktopBestOfGoogleNotification, nullptr},
+    {" - AI", kMobilePromoOnDesktopAI, nullptr},
+    {" - AI with push notification", kMobilePromoOnDesktopAINotification,
+     nullptr},
+    {" - Your Chrome", kMobilePromoOnDesktopYourChrome, nullptr},
+    {" - Your Chrome with push notification",
+     kMobilePromoOnDesktopYourChromeNotification, nullptr},
+    {" - Shopping", kMobilePromoOnDesktopShopping, nullptr},
+    {" - Shopping with push notification",
+     kMobilePromoOnDesktopShoppingNotification, nullptr},
+};
+
+const FeatureEntry::FeatureVariation
+    kMobilePromoOnDesktopWithQRCodeVariationsWave2[] = {
+        {" - Safety", kMobilePromoOnDesktopSafety, nullptr},
+        {" - Best of Google", kMobilePromoOnDesktopBestOfGoogle, nullptr},
+        {" - AI", kMobilePromoOnDesktopAI, nullptr},
+        {" - Your Chrome", kMobilePromoOnDesktopYourChrome, nullptr},
+        {" - Shopping", kMobilePromoOnDesktopShopping, nullptr},
 };
 
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || \
@@ -13028,6 +13091,20 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kAllowMultipleMediaNotificationsDescription, kOsAndroid,
      FEATURE_VALUE_TYPE(chrome::android::kAllowMultipleMediaNotifications)},
 #endif
+    {"mobile-promo-on-desktop-with-qr-code-wave-2",
+     flag_descriptions::kMobilePromoOnDesktopWithQRCodeWave2Name,
+     flag_descriptions::kMobilePromoOnDesktopWithQRCodeWave2Description, kOsAll,
+     FEATURE_WITH_PARAMS_VALUE_TYPE(
+         kMobilePromoOnDesktopWithQRCodeWave2,
+         kMobilePromoOnDesktopWithQRCodeVariationsWave2,
+         "MobilePromoOnDesktopWithQRCodeWave2")},
+    {"mobile-promo-on-desktop-with-reminder-wave-2",
+     flag_descriptions::kMobilePromoOnDesktopWithReminderWave2Name,
+     flag_descriptions::kMobilePromoOnDesktopWithReminderWave2Description,
+     kOsAll,
+     FEATURE_WITH_PARAMS_VALUE_TYPE(kMobilePromoOnDesktopWithReminderWave2,
+                                    kMobilePromoOnDesktopVariationsWave2,
+                                    "MobilePromoOnDesktopWithReminderWave2")},
     // Add new entries above this line.
     // NOTE: Adding a new flag requires adding a corresponding entry to enum
     // "LoginCustomFlags" in tools/metrics/histograms/enums.xml. See "Flag

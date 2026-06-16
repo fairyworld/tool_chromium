@@ -7747,6 +7747,8 @@ from previous Chrome versions.
   <int value="-2141247271" label="AndroidOmniboxPreviewsBadge:enabled"/>
   <int value="-2141179322" label="ChromeOSSyncedSessionSharing:disabled"/>
   <int value="-2140371146" label="DrawCutoutEdgeToEdge:disabled"/>
+  <int value="-2140149107"
+      label="MobilePromoOnDesktopWithQRCodeWave2:disabled"/>
   <int value="-2140007754" label="HomepageSettingsUIConversion:disabled"/>
   <int value="-2139889252" label="AllowCrossDeviceFeatureSuite:disabled"/>
   <int value="-2139379065" label="StoragePressureUI:enabled"/>
@@ -15069,6 +15071,7 @@ from previous Chrome versions.
   <int value="222055978" label="OsFeedback:disabled"/>
   <int value="222184258"
       label="AutofillEnforceMinRequiredFieldsForHeuristics:disabled"/>
+  <int value="222715506" label="MobilePromoOnDesktopWithQRCodeWave2:enabled"/>
   <int value="222746839" label="UseNetworkFrameworkForLocalDiscovery:disabled"/>
   <int value="223075555" label="DisallowManagedProfileSignout:enabled"/>
   <int value="223591010" label="CastMediaRouteProvider:enabled"/>
@@ -17696,6 +17699,8 @@ from previous Chrome versions.
   <int value="1079017005" label="LayoutExtraction:disabled"/>
   <int value="1079032226" label="ParallelDownloading:enabled"/>
   <int value="1079035925" label="SysUiShouldHoldbackTaskManagement:disabled"/>
+  <int value="1079114788"
+      label="MobilePromoOnDesktopWithReminderWave2:disabled"/>
   <int value="1079302639" label="ArcEnableWebAppShare:disabled"/>
   <int value="1081546525" label="ash-enable-docked-windows"/>
   <int value="1082054180" label="PersistentWindowBounds:disabled"/>
@@ -20995,6 +21000,8 @@ from previous Chrome versions.
   <int value="2126203058" label="force-show-update-menu-badge"/>
   <int value="2126699423" label="MediaAppImageMantisMakeASticker:enabled"/>
   <int value="2126724836" label="TpcdHeuristicsGrants:disabled"/>
+  <int value="2127461683"
+      label="MobilePromoOnDesktopWithReminderWave2:enabled"/>
   <int value="2127648677" label="OmniboxExperimentalSuggestScoring:disabled"/>
   <int value="2127700228" label="NtpHistoryClustersModule:enabled"/>
   <int value="2129184006" label="NTPOfflinePageDownloadSuggestions:enabled"/>
