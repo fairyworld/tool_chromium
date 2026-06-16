@@ -212,6 +212,8 @@ source_set("misc") {
 
   if (is_win) {
     sources += [
+      "profile_load_tracker_win.cc",
+      "profile_load_tracker_win.h",
       "profile_shortcut_manager_win.cc",
       "profile_shortcut_manager_win.h",
     ]
