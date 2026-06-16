@@ -968,9 +968,13 @@ void ContextualTasksUI::CreateHelpBubbleHandler(
 
 bool ContextualTasksUIConfig::IsWebUIEnabled(
     content::BrowserContext* browser_context) {
-  // Disable for OTR profiles.
-  return base::FeatureList::IsEnabled(contextual_tasks::kContextualTasks) &&
-         !browser_context->IsOffTheRecord();
+  // Keep Contextual Tasks disabled for incognito profiles unless
+  // Lens Side Panel Unification is enabled.
+  if (browser_context->IsOffTheRecord() &&
+      !lens::features::IsLensSidePanelUnificationEnabled()) {
+    return false;
+  }
+  return base::FeatureList::IsEnabled(contextual_tasks::kContextualTasks);
 }
 
 bool ContextualTasksUIConfig::ShouldCrashOnJavascriptErrorInDevelopmentBuild()
