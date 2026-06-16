@@ -2414,12 +2414,6 @@ void OmniboxViewViews::AppendDropFormats(
   *formats = *formats | ui::OSExchangeData::URL;
 }
 
-DragOperation OmniboxViewViews::OnDrop(const ui::DropTargetEvent& event) {
-  ui::mojom::DragOperation output_drag_op = ui::mojom::DragOperation::kNone;
-  PerformDrop(event, output_drag_op, /*drag_image_layer_owner=*/nullptr);
-  return output_drag_op;
-}
-
 views::View::DropCallback OmniboxViewViews::CreateDropCallback(
     const ui::DropTargetEvent& event) {
   return base::BindOnce(&OmniboxViewViews::PerformDrop,
