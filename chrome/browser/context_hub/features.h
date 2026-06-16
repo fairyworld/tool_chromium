@@ -16,6 +16,9 @@ BASE_DECLARE_FEATURE(kContextHub);
 // The feature flag for the Auto Todos feature in Context Hub.
 BASE_DECLARE_FEATURE(kAutoTodos);
 
+// The feature flag for the Memory Banks feature in Context Hub.
+BASE_DECLARE_FEATURE(kMemoryBanks);
+
 }  // namespace context_hub::features
 
 #endif  // CHROME_BROWSER_CONTEXT_HUB_FEATURES_H_
