@@ -2530,6 +2530,8 @@ IN_PROC_BROWSER_TEST_F(WebAppBrowserTest, ManifestShareTarget) {
       "/banners/"
       "manifest_test_page.html?manifest=manifest_with_share_targets.json");
   NavigateViaLinkClickToURLAndWait(browser(), test_url);
+  test::WaitForLoadCompleteAndMaybeManifestSeen(
+      *browser()->tab_strip_model()->GetActiveWebContents());
 
   const webapps::AppId app_id = test::InstallPwaForCurrentUrl(browser());
 
