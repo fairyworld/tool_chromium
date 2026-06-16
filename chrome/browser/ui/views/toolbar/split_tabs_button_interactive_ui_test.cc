@@ -16,6 +16,7 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
+#include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/tabs/split_tab_menu_model.h"
 #include "chrome/browser/ui/tabs/tab_menu_model.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
@@ -103,6 +104,11 @@ DEFINE_LOCAL_STATE_IDENTIFIER_VALUE(
 DEFINE_LOCAL_STATE_IDENTIFIER_VALUE(
     ui::test::PollingElementStateObserver<ax::mojom::Role>,
     kSplitTabButtonRoleState);
+DEFINE_LOCAL_STATE_IDENTIFIER_VALUE(
+    ui::test::PollingStateObserver<split_tabs::SplitTabLayout>,
+    kSplitLayout);
+DEFINE_LOCAL_STATE_IDENTIFIER_VALUE(ui::test::PollingStateObserver<double>,
+                                    kSplitRatio);
 }  // namespace
 
 class SplitTabButtonInteractiveTest
@@ -116,6 +122,7 @@ class SplitTabButtonInteractiveTest
       features.push_back({::features::kWebUIReloadButton, {}});
       features.push_back({::features::kWebUISplitTabsButton, {}});
     }
+    features.push_back({tabs::kSplitViewHorizontal, {}});
     return features;
   }
 
@@ -264,6 +271,38 @@ class SplitTabButtonInteractiveTest
                   [this]() { return browser()->tab_strip_model()->count(); }),
         WaitForState(kTabCountState, expected_count),
         StopObservingState(kTabCountState));
+  }
+
+  auto WaitForSplitLayout(split_tabs::SplitTabLayout expected_layout) {
+    return Steps(
+        PollState(kSplitLayout,
+                  [this]() {
+                    TabStripModel* const tab_strip_model =
+                        browser()->tab_strip_model();
+                    return tab_strip_model
+                        ->GetSplitData(
+                            tab_strip_model->GetActiveTab()->GetSplit().value())
+                        ->visual_data()
+                        ->split_layout();
+                  }),
+        WaitForState(kSplitLayout, expected_layout),
+        StopObservingState(kSplitLayout));
+  }
+
+  auto WaitForSplitRatio(double expected_ratio) {
+    return Steps(
+        PollState(kSplitRatio,
+                  [this]() {
+                    TabStripModel* const tab_strip_model =
+                        browser()->tab_strip_model();
+                    return tab_strip_model
+                        ->GetSplitData(
+                            tab_strip_model->GetActiveTab()->GetSplit().value())
+                        ->visual_data()
+                        ->split_ratio();
+                  }),
+        WaitForState(kSplitRatio, expected_ratio),
+        StopObservingState(kSplitRatio));
   }
 
   auto CheckTabInSplit(int tab_index, bool expected_split_state) {
@@ -639,6 +678,30 @@ IN_PROC_BROWSER_TEST_P(SplitTabButtonInteractiveTest, ReverseSplitTabPosition) {
           },
           GetTestUrl()),
       CheckMenuHistogram(SplitTabMenuModel::CommandId::kReversePosition));
+}
+
+IN_PROC_BROWSER_TEST_P(SplitTabButtonInteractiveTest, ToggleOrientation) {
+  RunTestSequence(
+      InstrumentTab(kWebContents1Id),
+      AddInstrumentedTab(kWebContents2Id, GetTestUrl("/links.html")),
+      SelectTab(kTabStripElementId, 0), EnterSplitView(0, 1), Do([this]() {
+        TabStripModel* const tab_strip_model = browser()->tab_strip_model();
+        tab_strip_model->UpdateSplitRatio(
+            tab_strip_model->GetActiveTab()->GetSplit().value(), 0.7);
+      }),
+      WaitForShow(kToolbarSplitTabsToolbarButtonElementId),
+      WaitForElementNonzeroSize(kToolbarSplitTabsToolbarButtonElementId),
+      WaitForAXNode(), DoWaitForLayout(),
+      // Toggling the orientation should also reset the split ratio.
+      ClickSplitTabButton(),
+      WaitForShow(SplitTabMenuModel::kToggleOrientationMenuItem),
+      SelectMenuItem(SplitTabMenuModel::kToggleOrientationMenuItem),
+      WaitForSplitLayout(split_tabs::SplitTabLayout::kStacked),
+      WaitForSplitRatio(0.5),
+      CheckSplitTabButtonIcon(features::IsRoundedIconsEnabled()
+                                  ? kSplitSceneUpIcon
+                                  : kSplitSceneUpOldIcon),
+      CheckMenuHistogram(SplitTabMenuModel::CommandId::kToggleOrientation));
 }
 
 IN_PROC_BROWSER_TEST_P(SplitTabButtonInteractiveTest, CloseLeftRightTabs) {
