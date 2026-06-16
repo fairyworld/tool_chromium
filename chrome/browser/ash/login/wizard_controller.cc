@@ -2406,11 +2406,12 @@ void WizardController::OnAutoEnrollmentCheckScreenExit(
   // Check whether the device is disabled. OnDeviceDisabledChecked() will be
   // invoked when the result of this check is known. Until then, the current
   // screen will remain visible and will continue showing a spinner.
-  g_browser_process->platform_part()
-      ->device_disabling_manager()
-      ->CheckWhetherDeviceDisabledDuringOOBE(
-          base::BindRepeating(&WizardController::OnDeviceDisabledChecked,
-                              weak_factory_.GetWeakPtr()));
+  auto* device_disabling_manager =
+      g_browser_process->platform_part()->device_disabling_manager();
+  CHECK(device_disabling_manager);
+  device_disabling_manager->CheckWhetherDeviceDisabledDuringOOBE(
+      base::BindRepeating(&WizardController::OnDeviceDisabledChecked,
+                          weak_factory_.GetWeakPtr()));
 }
 
 void WizardController::OnEnrollmentScreenExit(EnrollmentScreen::Result result) {
