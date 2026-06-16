@@ -4,6 +4,7 @@
 
 #import <XCTest/XCTest.h>
 
+#import "base/strings/sys_string_conversions.h"
 #import "components/omnibox/browser/aim_eligibility_service_features.h"
 #import "ios/chrome/browser/assistant/ui/assistant_container_detent.h"
 #import "ios/chrome/browser/cobrowse/ui/assistant_aim_ui_constants.h"
@@ -113,6 +114,14 @@ id<GREYMatcher> CloseButton() {
   // Enable omnibox debugging flags.
   config.additional_args.push_back("-EnableOmniboxDebugging");
   config.additional_args.push_back("YES");
+
+  // Map localhost to 127.0.0.1 and set it as the google base URL
+  // to satisfy IsAimURL check while avoiding HSTS upgrades/SSL hangs on
+  // google.com.
+  config.additional_args.push_back(
+      "--host-resolver-rules=MAP localhost 127.0.0.1");
+  config.additional_args.push_back("--google-base-url=http://localhost");
+  config.additional_args.push_back("--ignore-google-port-numbers");
 
   return config;
 }
@@ -304,6 +313,94 @@ id<GREYMatcher> CloseButton() {
                  grey_accessibilityID(
                      kAIMSRPDebuggerURLViewControllerAccessibilityIdentifier)]
       assertWithMatcher:grey_nil()];
+}
+
+// Tests that the loaded AIM URL can be edited in the debugger, and that saving
+// the changes updates the URL and triggers a navigation.
+- (void)testLoadedURLDebuggerEditing {
+  if ([ComposeboxAppInterface isServerSideStateEnabled]) {
+    EARL_GREY_TEST_SKIPPED(
+        @"Skipped when kComposeboxServerSideState is enabled.");
+  }
+  OpenCoBrowse(self.testServer);
+
+  [ChromeEarlGrey waitForUIElementToAppearWithMatcher:CloseButton()];
+
+  // Open the debugger.
+  [[EarlGrey selectElementWithMatcher:
+                 grey_accessibilityID(
+                     kAssistantAIMContextMenuButtonAccessibilityIdentifier)]
+      performAction:grey_tap()];
+  [[EarlGrey selectElementWithMatcher:
+                 chrome_test_util::ContextMenuItemWithAccessibilityLabel(
+                     @"AIM Loaded URL")] performAction:grey_tap()];
+
+  // Verify debugger presented.
+  [ChromeEarlGrey
+      waitForUIElementToAppearWithMatcher:
+          grey_accessibilityID(
+              kAIMSRPDebuggerURLViewControllerAccessibilityIdentifier)];
+
+  // Tap "Edit".
+  [[EarlGrey
+      selectElementWithMatcher:
+          grey_accessibilityID(
+              kAIMSRPDebuggerURLViewControllerEditButtonAccessibilityIdentifier)]
+      performAction:grey_tap()];
+
+  // Edit full URL using the test server with localhost hostname to satisfy
+  // the IsAimURL check and allow it to load locally.
+  GURL editedURL =
+      self.testServer->GetURL("localhost", "/search?udm=50&q=editedquery");
+  NSString* editedURLString = base::SysUTF8ToNSString(editedURL.spec());
+  [[EarlGrey
+      selectElementWithMatcher:
+          grey_accessibilityID(
+              kAIMSRPDebuggerURLViewControllerTextViewAccessibilityIdentifier)]
+      performAction:grey_replaceText(editedURLString)];
+
+  // Tap "Done".
+  [[EarlGrey
+      selectElementWithMatcher:
+          grey_accessibilityID(
+              kAIMSRPDebuggerURLViewControllerDoneButtonAccessibilityIdentifier)]
+      performAction:grey_tap()];
+
+  // Verify debugger dismissed.
+  [[EarlGrey selectElementWithMatcher:
+                 grey_accessibilityID(
+                     kAIMSRPDebuggerURLViewControllerAccessibilityIdentifier)]
+      assertWithMatcher:grey_nil()];
+
+  // Open the debugger again to verify the loaded URL was updated.
+  [[EarlGrey selectElementWithMatcher:
+                 grey_accessibilityID(
+                     kAssistantAIMContextMenuButtonAccessibilityIdentifier)]
+      performAction:grey_tap()];
+  [[EarlGrey selectElementWithMatcher:
+                 chrome_test_util::ContextMenuItemWithAccessibilityLabel(
+                     @"AIM Loaded URL")] performAction:grey_tap()];
+
+  [ChromeEarlGrey
+      waitForUIElementToAppearWithMatcher:
+          grey_accessibilityID(
+              kAIMSRPDebuggerURLViewControllerAccessibilityIdentifier)];
+
+  // Verify the full URL displays the updated URL.
+  [[EarlGrey
+      selectElementWithMatcher:
+          grey_allOf(
+              grey_accessibilityID(
+                  kAIMSRPDebuggerURLViewControllerTextViewAccessibilityIdentifier),
+              grey_text(editedURLString), nil)]
+      assertWithMatcher:grey_notNil()];
+
+  // Close debugger.
+  [[EarlGrey
+      selectElementWithMatcher:
+          grey_accessibilityID(
+              kAIMSRPDebuggerURLViewControllerCloseButtonAccessibilityIdentifier)]
+      performAction:grey_tap()];
 }
 
 // Tests that the assistant starts in minimized state when the flag is enabled.

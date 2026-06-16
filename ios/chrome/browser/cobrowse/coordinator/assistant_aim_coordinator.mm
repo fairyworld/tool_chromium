@@ -46,9 +46,10 @@
 #import "ui/base/l10n/l10n_util_mac.h"
 #import "url/gurl.h"
 
-@interface AssistantAIMCoordinator () <AssistantAIMViewControllerDelegate,
-                                       AssistantContainerDelegate,
+@interface AssistantAIMCoordinator () <AIMSRPDebuggerURLViewControllerDelegate,
                                        AssistantAIMMediatorDelegate,
+                                       AssistantAIMViewControllerDelegate,
+                                       AssistantContainerDelegate,
                                        TabGridStateObserving>
 
 // Returns whether the tab grid is currently visible.
@@ -402,11 +403,20 @@ class AssistantAIMUIStateProvider
     (AssistantAIMViewController*)viewController {
   AIMSRPDebuggerURLViewController* URLVC =
       [[AIMSRPDebuggerURLViewController alloc] initWithURL:_mediator.loadedURL];
+  URLVC.delegate = self;
   UINavigationController* navController =
       [[UINavigationController alloc] initWithRootViewController:URLVC];
   [_viewController presentViewController:navController
                                 animated:YES
                               completion:nil];
+}
+
+#pragma mark - AIMSRPDebuggerURLViewControllerDelegate
+
+- (void)debuggerURLViewController:
+            (AIMSRPDebuggerURLViewController*)viewController
+                     didUpdateURL:(const GURL&)url {
+  [_mediator loadURL:url];
 }
 
 @end
