@@ -14,6 +14,7 @@ import type {CrIconElement} from 'chrome://resources/cr_elements/cr_icon/cr_icon
 import type {CrIconButtonElement} from 'chrome://resources/cr_elements/cr_icon_button/cr_icon_button.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {assertDeepEquals, assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
+import {fakeMetricsPrivate} from 'chrome://webui-test/metrics_test_support.js';
 import {eventToPromise, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 import {TestContextualTasksBrowserProxy} from './test_contextual_tasks_browser_proxy.js';
@@ -428,8 +429,8 @@ suite('TopToolbarTest', () => {
     });
 
     const isPhone = loadTimeData.getBoolean('isSmallDeviceFormFactor');
-    (isPhone ? test.skip :
-               test)('handles more menu interactions', async () => {
+    (isPhone ? test.skip : test)('handles more menu interactions', async () => {
+      const metrics = fakeMetricsPrivate();
       const moreButton =
           topToolbar.shadowRoot.querySelector<CrIconButtonElement>(
               '#overflowMenuButton');
@@ -442,6 +443,14 @@ suite('TopToolbarTest', () => {
 
       const buttons = menu.shadowRoot.querySelectorAll('button');
       assertEquals(3, buttons.length);
+
+      assertEquals(
+          2,
+          metrics.count('ContextualTasks.WebUI.UserAction.OpenOverflowMenu'));
+      assertEquals(
+          1,
+          metrics.count(
+              'ContextualTasks.WebUI.UserAction.OpenOverflowMenu', true));
     });
 
     test('menu button visibility independent of ai page state', async () => {
