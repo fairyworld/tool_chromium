@@ -713,7 +713,7 @@ public class StripLayoutTrailingButtonsCoordinator {
 
         if (incognito) {
             // Set tints to indicate button is disabled
-            @ColorInt int colorOnSurface = SemanticColorUtils.getColorOnSurface(mContext);
+            @ColorInt int colorOnSurface = mContext.getColor(R.color.default_icon_color_light);
             @ColorInt
             int iconTint =
                     ColorUtils.setAlphaComponentWithFloat(
@@ -757,7 +757,8 @@ public class StripLayoutTrailingButtonsCoordinator {
         boolean isActor = button == mGlicActorButton;
         String text = button.getText();
         if (mLayerTitleCache != null && !TextUtils.isEmpty(text)) {
-            button.setTextResourceId(mLayerTitleCache.getUpdatedGlicButtonText(text, isActor));
+            button.setTextResourceId(
+                    mLayerTitleCache.getUpdatedGlicButtonText(text, isActor, mIsIncognito));
         } else {
             button.setTextResourceId(Resources.ID_NULL);
         }
@@ -1023,8 +1024,8 @@ public class StripLayoutTrailingButtonsCoordinator {
             setGlicActorButtonVisible(targetActorVisible, animate);
         }
 
-        setGlicButtonText(targetGlicText, /* isActor= */ false);
-        setGlicButtonText(targetActorText, /* isActor= */ true);
+        setGlicButtonText(targetGlicText, /* isActor= */ false, forceLayoutChanged);
+        setGlicButtonText(targetActorText, /* isActor= */ true, forceLayoutChanged);
 
         // 4. Recalculate button widths and apply transitions
         float targetGlicWidth = calculateButtonWidth(mGlicButton, mLayerTitleCache);
@@ -1079,17 +1080,18 @@ public class StripLayoutTrailingButtonsCoordinator {
     }
 
     @VisibleForTesting
-    /* package */ void setGlicButtonText(@Nullable String text, boolean isActor) {
+    /* package */ void setGlicButtonText(
+            @Nullable String text, boolean isActor, boolean forceUpdate) {
         TintedCompositorTextButton button = isActor ? mGlicActorButton : mGlicButton;
         if (button == null) return;
-        if (TextUtils.equals(button.getText(), text)) return;
+        if (TextUtils.equals(button.getText(), text) && !forceUpdate) return;
 
         button.setText(text);
 
         if (mLayerTitleCache != null && !TextUtils.isEmpty(text)) {
             button.setTextResourceId(
                     mLayerTitleCache.getUpdatedGlicButtonText(
-                            text, /* isActor= */ button == mGlicActorButton));
+                            text, /* isActor= */ button == mGlicActorButton, mIsIncognito));
         } else {
             button.setTextResourceId(Resources.ID_NULL);
         }
@@ -1287,7 +1289,7 @@ public class StripLayoutTrailingButtonsCoordinator {
             mGlicActorButton.setVisible(true);
         } else {
             if (animate) {
-                setGlicButtonText(null, /* isActor= */ true);
+                setGlicButtonText(null, /* isActor= */ true, /* forceUpdate= */ false);
                 animateGlicButton(
                         mGlicActorButton,
                         0.0f,
