@@ -250,7 +250,7 @@ void GlicActorClientSession::CreateTask(
       &actor_policy_checker(), std::move(options), GetWeakPtr());
   CHECK(!current_task_id_.is_null());
 
-  manager_->SetActuating(true);
+  manager_->MaybeNotifyActuatingChanged();
 
   actor_task_state_changed_subscription_ =
       actor_keyed_service().AddTaskStateChangedCallback(base::BindRepeating(
@@ -989,7 +989,7 @@ void GlicActorClientSession::NotifyActorTaskStateChanged(
     attempted_reload_after_crash_ = false;
     reload_observer_.reset();
     actor_task_state_changed_subscription_.reset();
-    manager_->SetActuating(false);
+    manager_->MaybeNotifyActuatingChanged();
   }
 }
 
@@ -1041,15 +1041,16 @@ base::WeakPtr<GlicActorClientSession> GlicActorClientSession::GetWeakPtr() {
 
 void GlicActorTaskManager::UnbindSession() {
   session_.reset();
-  SetActuating(false);
+  MaybeNotifyActuatingChanged();
 }
 
-void GlicActorTaskManager::SetActuating(bool actuating) {
-  if (actuating_ == actuating) {
+void GlicActorTaskManager::MaybeNotifyActuatingChanged() {
+  const bool current_actuating_state = IsActuating();
+  if (last_notified_actuating_state_ == current_actuating_state) {
     return;
   }
-  actuating_ = actuating;
-  actuating_changed_callbacks_.Notify(actuating_);
+  last_notified_actuating_state_ = current_actuating_state;
+  actuating_changed_callbacks_.Notify(current_actuating_state);
 }
 
 void GlicActorClientSession::OnTabAddedToTask(

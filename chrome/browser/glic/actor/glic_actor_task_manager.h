@@ -97,7 +97,7 @@ class GlicActorTaskManager {
   GlicActorClientSessionInterface* GetClientSessionForTesting();
 
  private:
-  void SetActuating(bool actuating);
+  void MaybeNotifyActuatingChanged();
   friend class GlicActorClientSession;
 
   raw_ptr<Profile> profile_;
@@ -105,7 +105,7 @@ class GlicActorTaskManager {
   const raw_ref<GlicActorPolicyChecker> actor_policy_checker_;
   raw_ptr<GlicInstanceMetrics> instance_metrics_;
   raw_ptr<GlicSharingManagerInternal> sharing_manager_;
-  bool actuating_ = false;
+  bool last_notified_actuating_state_ = false;
   base::RepeatingCallbackList<void(bool)> actuating_changed_callbacks_;
   raw_ptr<Delegate> delegate_;
   std::unique_ptr<GlicActorClientSession> session_;
