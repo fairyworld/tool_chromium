@@ -37,6 +37,7 @@
 
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
+#include "chrome/browser/browser_process_platform_part.h"  // nogncheck
 #include "components/policy/core/common/cloud/mock_cloud_external_data_manager.h"
 #include "components/policy/core/common/cloud/mock_cloud_policy_store.h"
 #include "components/user_manager/scoped_user_manager.h"
@@ -191,8 +192,11 @@ class ExtensionInstallPolicyServiceTest : public testing::Test {
 
     return std::make_unique<UserCloudPolicyManagerAsh>(
         TestingBrowserProcess::GetGlobal()->local_state(),
-        test_url_loader_factory_.GetSafeWeakWrapper(), profile_,
-        std::move(mock_user_cloud_policy_store),
+        test_url_loader_factory_.GetSafeWeakWrapper(),
+        TestingBrowserProcess::GetGlobal()
+            ->platform_part()
+            ->browser_policy_connector_ash(),
+        profile_, std::move(mock_user_cloud_policy_store),
         std::move(mock_user_cloud_policy_extension_install_store),
         std::move(cloud_external_data_manager), base::FilePath(),
         UserCloudPolicyManagerAsh::PolicyEnforcement::kPolicyRequired,

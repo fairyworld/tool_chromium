@@ -20,6 +20,7 @@
 #include "base/time/time.h"
 #include "chrome/browser/ash/login/users/scoped_account_id_annotator.h"
 #include "chrome/browser/ash/policy/core/user_cloud_policy_manager_ash.h"
+#include "chrome/browser/browser_process_platform_part.h"
 #include "chrome/browser/signin/identity_test_environment_profile_adaptor.h"
 #include "chrome/test/base/testing_browser_process.h"
 #include "chrome/test/base/testing_profile.h"
@@ -74,6 +75,9 @@ class MockUserCloudPolicyManagerAsh : public UserCloudPolicyManagerAsh {
       : UserCloudPolicyManagerAsh(
             TestingBrowserProcess::GetGlobal()->local_state(),
             std::move(shared_url_loader_factory),
+            TestingBrowserProcess::GetGlobal()
+                ->platform_part()
+                ->browser_policy_connector_ash(),
             profile,
             std::make_unique<MockCloudPolicyStore>(
                 dm_protocol::GetChromeUserPolicyType()),

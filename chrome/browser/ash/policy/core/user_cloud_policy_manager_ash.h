@@ -52,6 +52,7 @@ class LocalFilesCleanup;
 }
 
 class ArcAppInstallEventLogUploader;
+class BrowserPolicyConnectorAsh;
 class CloudExternalDataManager;
 class DeviceManagementService;
 class PolicyOAuth2TokenFetcher;
@@ -104,12 +105,14 @@ class UserCloudPolicyManagerAsh
   //
   // `local_state` must not be null and must outlive this object.
   // `shared_url_loader_factory` must not be null.
+  // `browser_policy_connector_ash` must be non-null and must outlive `this`.
   //
   // |account_id| is the AccountId associated with the user's session.
   // |task_runner| is the runner for policy refresh tasks.
   UserCloudPolicyManagerAsh(
       PrefService* local_state,
       scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory,
+      BrowserPolicyConnectorAsh* browser_policy_connector_ash,
       Profile* profile,
       std::unique_ptr<CloudPolicyStore> store,
       std::unique_ptr<CloudPolicyStore> extension_install_store,
@@ -265,6 +268,8 @@ class UserCloudPolicyManagerAsh
 
   const scoped_refptr<network::SharedURLLoaderFactory>
       shared_url_loader_factory_;
+
+  const raw_ref<BrowserPolicyConnectorAsh> browser_policy_connector_ash_;
 
   // Profile associated with the current user.
   const raw_ptr<Profile, DanglingUntriaged> profile_;

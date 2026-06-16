@@ -117,7 +117,7 @@ std::unique_ptr<UserCloudPolicyManagerAsh> CreateUserCloudPolicyManagerAsh(
     return nullptr;
   }
 
-  BrowserPolicyConnectorAsh* connector =
+  BrowserPolicyConnectorAsh* browser_policy_connector_ash =
       g_browser_process->platform_part()->browser_policy_connector_ash();
   switch (account_id.GetAccountType()) {
     case AccountType::UNKNOWN:
@@ -217,7 +217,7 @@ std::unique_ptr<UserCloudPolicyManagerAsh> CreateUserCloudPolicyManagerAsh(
   }
 
   DeviceManagementService* device_management_service =
-      connector->device_management_service();
+      browser_policy_connector_ash->device_management_service();
   if (block_profile_init_on_policy_refresh) {
     device_management_service->ScheduleInitialization(0);
   }
@@ -262,10 +262,10 @@ std::unique_ptr<UserCloudPolicyManagerAsh> CreateUserCloudPolicyManagerAsh(
   std::unique_ptr<UserCloudPolicyManagerAsh> manager =
       std::make_unique<UserCloudPolicyManagerAsh>(
           g_browser_process->local_state(),
-          g_browser_process->shared_url_loader_factory(), profile,
-          std::move(store), std::move(extension_install_store),
-          std::move(external_data_manager), component_policy_cache_dir,
-          enforcement_type, policy_refresh_timeout,
+          g_browser_process->shared_url_loader_factory(),
+          browser_policy_connector_ash, profile, std::move(store),
+          std::move(extension_install_store), std::move(external_data_manager),
+          component_policy_cache_dir, enforcement_type, policy_refresh_timeout,
           base::BindOnce(&OnUserPolicyFatalError, account_id), account_id,
           base::SingleThreadTaskRunner::GetCurrentDefault());
 

@@ -28,6 +28,7 @@
 #include "chrome/browser/ash/policy/core/user_cloud_policy_token_forwarder.h"
 #include "chrome/browser/ash/profiles/profile_helper.h"
 #include "chrome/browser/ash/settings/scoped_testing_cros_settings.h"
+#include "chrome/browser/browser_process_platform_part.h"
 #include "chrome/browser/global_features.h"
 #include "chrome/browser/policy/cloud/cloud_policy_test_utils.h"
 #include "chrome/browser/prefs/browser_prefs.h"
@@ -414,6 +415,9 @@ class UserCloudPolicyManagerAshTest : public testing::Test {
     manager_ = std::make_unique<UserCloudPolicyManagerAsh>(
         TestingBrowserProcess::GetGlobal()->local_state(),
         test_url_loader_factory_.GetSafeWeakWrapper(),
+        TestingBrowserProcess::GetGlobal()
+            ->platform_part()
+            ->browser_policy_connector_ash(),
         ash::ProfileHelper::Get()->GetProfileByUser(active_user),
         std::move(store),
         /*extension_install_store=*/nullptr,

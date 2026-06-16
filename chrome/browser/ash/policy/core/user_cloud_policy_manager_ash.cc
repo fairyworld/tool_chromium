@@ -34,8 +34,6 @@
 #include "chrome/browser/ash/policy/remote_commands/user_commands_factory_ash.h"
 #include "chrome/browser/ash/policy/reporting/arc_app_install_event_log_uploader.h"
 #include "chrome/browser/ash/policy/skyvault/local_files_cleanup.h"
-#include "chrome/browser/browser_process.h"
-#include "chrome/browser/browser_process_platform_part.h"
 #include "chrome/browser/enterprise/reporting/report_scheduler_desktop.h"
 #include "chrome/browser/enterprise/reporting/reporting_delegate_factory_desktop.h"
 #include "chrome/browser/invalidation/profile_invalidation_provider_factory.h"
@@ -145,6 +143,7 @@ bool IsSkyVaultTTEnabled() {
 UserCloudPolicyManagerAsh::UserCloudPolicyManagerAsh(
     PrefService* local_state,
     scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory,
+    BrowserPolicyConnectorAsh* browser_policy_connector_ash,
     Profile* profile,
     std::unique_ptr<CloudPolicyStore> store,
     std::unique_ptr<CloudPolicyStore> extension_install_store,
@@ -164,6 +163,7 @@ UserCloudPolicyManagerAsh::UserCloudPolicyManagerAsh(
           base::BindRepeating(content::GetNetworkConnectionTracker)),
       local_state_(CHECK_DEREF(local_state)),
       shared_url_loader_factory_(std::move(shared_url_loader_factory)),
+      browser_policy_connector_ash_(CHECK_DEREF(browser_policy_connector_ash)),
       profile_(profile),
       external_data_manager_(std::move(external_data_manager)),
       component_policy_cache_path_(component_policy_cache_path),
@@ -517,12 +517,11 @@ void UserCloudPolicyManagerAsh::OnStoreLoaded(
 
     DCHECK(policy_data->has_username());
 
-    policy::BrowserPolicyConnectorAsh const* const connector =
-        g_browser_process->platform_part()->browser_policy_connector_ash();
     is_affiliated = policy::IsUserAffiliated(
         base::flat_set<std::string>(policy_data->user_affiliation_ids().begin(),
                                     policy_data->user_affiliation_ids().end()),
-        connector->device_affiliation_ids(), account_id_.GetUserEmail());
+        browser_policy_connector_ash_->device_affiliation_ids(),
+        account_id_.GetUserEmail());
   }
 
   user_manager::UserManager::Get()->SetUserPolicyStatus(account_id_, is_managed,
