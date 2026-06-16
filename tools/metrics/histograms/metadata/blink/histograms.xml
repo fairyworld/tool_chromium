@@ -5660,6 +5660,17 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Blink.Style.MatchedPropertiesCache.BucketSize" units="entries"
+    expires_after="2027-03-12">
+  <owner>etiennep@chromium.org</owner>
+  <owner>src/third_party/blink/renderer/core/css/OWNERS</owner>
+  <summary>
+    Size of the bucket (CachedMatchedProperties::entries) in which an item
+    landed in the MatchedPropertiesCache (MPC). Recorded when adding an entry to
+    the cache (subsampled to 1%).
+  </summary>
+</histogram>
+
 <histogram name="Blink.Style.UpdateTime{BlinkUpdateTimeSuffixes}"
     units="microseconds" expires_after="2026-11-29">
   <owner>pdr@chromium.org</owner>
