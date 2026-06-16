@@ -207,13 +207,8 @@ void BrowserViewLayoutImpl::Layout(views::View* host) {
     return;
   }
   base::AutoReset<bool> guard_reset(&reentrancy_guard_, true);
-  DoLayout(host, /*include_top_container=*/true);
-}
 
-void BrowserViewLayoutImpl::DoLayout(views::View* host,
-                                     bool include_top_container) {
-  const auto params =
-      delegate().GetBrowserLayoutParams(/*use_browser_bounds=*/true);
+  auto params = delegate().GetBrowserLayoutParams(/*use_browser_bounds=*/true);
   if (params.IsEmpty()) {
     return;
   }
@@ -221,10 +216,8 @@ void BrowserViewLayoutImpl::DoLayout(views::View* host,
   DoPreLayoutComputations(params);
 
   // If the top container is separate from the browser view, lay it out now.
-  if (include_top_container && views().top_container &&
+  if (views().top_container &&
       views().top_container->parent() != views().browser_view) {
-    const gfx::Size old_size = views().top_container->size();
-
     // In slide/immersive mode, animating the top container is handled by
     // someone else, but there are adjustments that are needed to be made.
     ProposedLayout top_container_layout;
@@ -244,18 +237,14 @@ void BrowserViewLayoutImpl::DoLayout(views::View* host,
     views().top_container->SetBoundsRect(
         GetTopContainerBoundsInParent(top_container_local_bounds, params));
 
-    // In fullscreen-with-toolbar, if the size of the top container changes,
-    // then the size of the browser view will change as well, so the layout
-    // properties must be recalculated.
-    //
-    // See https://crbug.com/519626620 for an example of what can happen if this
-    // is not done.
-    if (delegate().GetBrowserWindowState() ==
-            WindowState::kFullscreenWithToolbar &&
-        old_size != views().top_container->size()) {
-      DoPostLayoutCleanup();
-      DoLayout(host, /*include_top_container=*/false);
-      return;
+    // In (for example) fullscreen-with-toolbar, if the size of the top
+    // container changes, then the overall layout dimensions may also change.
+    // See https://crbug.com/519626620 for more information.
+    const auto new_params =
+        delegate().GetBrowserLayoutParams(/*use_browser_bounds=*/true);
+    if (params != new_params) {
+      OnLayoutParamsChanged(params, new_params);
+      params = new_params;
     }
   }
 
@@ -333,6 +322,10 @@ void BrowserViewLayoutImpl::DoPostLayoutVisualAdjustments(
     const BrowserLayoutParams& params) {}
 
 void BrowserViewLayoutImpl::DoPostLayoutCleanup() {}
+
+void BrowserViewLayoutImpl::OnLayoutParamsChanged(
+    const BrowserLayoutParams& old_params,
+    const BrowserLayoutParams& new_params) {}
 
 // Dialog positioning.
 
