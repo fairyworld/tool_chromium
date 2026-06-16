@@ -52,6 +52,7 @@
 #include "chrome/common/webui_url_constants.h"
 #include "components/contextual_search/contextual_search_metrics_recorder.h"
 #include "components/contextual_search/contextual_search_service.h"
+#include "components/contextual_search/contextual_search_session_handle.h"
 #include "components/contextual_tasks/public/account_utils.h"
 #include "components/contextual_tasks/public/contextual_task.h"
 #include "components/contextual_tasks/public/contextual_tasks_service.h"
@@ -1029,6 +1030,16 @@ void ContextualTasksUiService::InitializeTaskInSidePanel(
     std::unique_ptr<contextual_search::ContextualSearchSessionHandle>
         session_handle) {
   AssociateWebContentsToTask(web_contents, task_id);
+  // Retrieve the session handle from pending session handles if it was stored
+  // early to prevent race conditions where the NavigationThrottle checks
+  // eligibility before the handle is associated with the WebContents.
+  if (!session_handle) {
+    auto it = pending_session_handles_.find(task_id);
+    if (it != pending_session_handles_.end()) {
+      session_handle = std::move(it->second);
+      pending_session_handles_.erase(it);
+    }
+  }
   if (session_handle) {
     ContextualSearchWebContentsHelper::GetOrCreateForWebContents(web_contents)
         ->SetTaskSession(task_id, std::move(session_handle),
@@ -1067,12 +1078,26 @@ void ContextualTasksUiService::OnSearchResultsNavigationInSidePanel(
 }
 
 bool ContextualTasksUiService::ShouldRedirectIneligibleRequest(
-    const GURL& url) const {
+    const GURL& url,
+    content::WebContents* source_contents) const {
   // If it's a top-level frame refresh/navigation while viewing an internal
   // context, and the user environment isn't eligible, bounce immediately.
   bool is_eligible = eligibility_manager_ && eligibility_manager_->IsEligible();
 
   if (is_eligible) {
+    return false;
+  }
+
+  base::Uuid task_id;
+  std::string task_id_str;
+  if (net::GetValueForKeyInQuery(url, kTaskQueryParam, &task_id_str)) {
+    task_id = base::Uuid::ParseLowercase(task_id_str);
+  }
+
+  // Bypasses the redirect check if the session was started from Lens and the
+  // Lens side panel unification feature is enabled (either as an active
+  // session or a pending session for the given task ID).
+  if (IsSessionAllowedWhileIneligible(source_contents, task_id)) {
     return false;
   }
 
@@ -1091,6 +1116,52 @@ bool ContextualTasksUiService::ShouldRedirectIneligibleRequest(
   }
 
   return true;
+}
+
+bool ContextualTasksUiService::IsSessionAllowedWhileIneligible(
+    content::WebContents* web_contents,
+    const base::Uuid& task_id) const {
+  if (!lens::features::IsLensSidePanelUnificationEnabled()) {
+    return false;
+  }
+
+  if (web_contents) {
+    auto* helper =
+        ContextualSearchWebContentsHelper::FromWebContents(web_contents);
+    auto* session_handle = helper ? helper->session_handle() : nullptr;
+    if (session_handle) {
+      auto* metrics_recorder = session_handle->GetMetricsRecorder();
+      if (metrics_recorder &&
+          metrics_recorder->source() ==
+              contextual_search::ContextualSearchSource::kLens) {
+        return true;
+      }
+    }
+  }
+
+  if (task_id.is_valid()) {
+    auto it = pending_session_handles_.find(task_id);
+    if (it != pending_session_handles_.end()) {
+      auto* session_handle = it->second.get();
+      if (session_handle) {
+        auto* metrics_recorder = session_handle->GetMetricsRecorder();
+        if (metrics_recorder &&
+            metrics_recorder->source() ==
+                contextual_search::ContextualSearchSource::kLens) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+void ContextualTasksUiService::AddPendingSessionHandleForTesting(  // IN-TEST
+    const base::Uuid& task_id,
+    std::unique_ptr<contextual_search::ContextualSearchSessionHandle>
+        session_handle) {
+  pending_session_handles_.emplace(task_id, std::move(session_handle));
 }
 
 bool ContextualTasksUiService::HandleNavigation(
@@ -1285,8 +1356,8 @@ bool ContextualTasksUiService::HandleNavigationImpl(
               : "null");
 
   if (!is_from_embedded_page &&
-      ShouldRedirectIneligibleRequest(url_params.url)) {
-      ScheduleRedirectWebUIUrlToAim(
+      ShouldRedirectIneligibleRequest(url_params.url, source_contents)) {
+    ScheduleRedirectWebUIUrlToAim(
         std::move(url_params),
         source_contents ? source_contents->GetWeakPtr() : nullptr, tab);
     return true;
@@ -2423,10 +2494,14 @@ void ContextualTasksUiService::StartTaskUiInSidePanel(
       AssociateWebContentsToTask(tab_interface->GetContents(),
                                  task.GetTaskId());
     }
+    if (session_handle) {
+      pending_session_handles_.emplace(task.GetTaskId(),
+                                       std::move(session_handle));
+    }
     controller->Show();
 
     InitializeTaskInSidePanel(controller->GetActiveWebContents(),
-                              task.GetTaskId(), std::move(session_handle));
+                              task.GetTaskId(), nullptr);
     return;
   }
 
@@ -2476,10 +2551,14 @@ void ContextualTasksUiService::InitSidePanelWithGhostLoader(
   ContextualTask task = contextual_tasks_service_->CreateTask();
   tasks_waiting_for_url_[task.GetTaskId()] = base::NullCallback();
   AssociateWebContentsToTask(tab_interface->GetContents(), task.GetTaskId());
+  if (session_handle) {
+    pending_session_handles_.emplace(task.GetTaskId(),
+                                     std::move(session_handle));
+  }
   controller->Show();
 
   InitializeTaskInSidePanel(controller->GetActiveWebContents(),
-                            task.GetTaskId(), std::move(session_handle));
+                            task.GetTaskId(), nullptr);
 }
 
 void ContextualTasksUiService::StartTaskUiInSidePanelWithErrorPage(
@@ -2510,12 +2589,17 @@ void ContextualTasksUiService::StartTaskUiInSidePanelWithErrorPage(
       !panel_contents || !controller->IsPanelOpenForContextualTask();
   if (panel_was_closed) {
     pending_error_page_tasks_.emplace(task.GetTaskId(), source);
+    if (session_handle) {
+      pending_session_handles_.emplace(task.GetTaskId(),
+                                       std::move(session_handle));
+    }
     controller->Show();
   }
 
   content::WebContents* web_contents = controller->GetActiveWebContents();
-  InitializeTaskInSidePanel(web_contents, task.GetTaskId(),
-                            std::move(session_handle));
+  InitializeTaskInSidePanel(
+      web_contents, task.GetTaskId(),
+      panel_was_closed ? nullptr : std::move(session_handle));
 
   if (!panel_was_closed) {
     if (auto* web_ui_interface = GetWebUiInterface(web_contents)) {

@@ -623,8 +623,13 @@ ContextualTasksUI::ContextualTasksUI(content::WebUI* web_ui)
               contextual_search::ContextualSearchSource::kContextualTasks));
 #if !BUILDFLAG(IS_ANDROID)
   GURL url = web_ui->GetWebContents()->GetVisibleURL();
+  // Incognito browsers always use dark mode. This is checked explicitly
+  // because the ThemeService only tracks the parent profile's theme.
+  // See BrowserWidget::GetColorProviderKey() in
+  // chrome/browser/ui/views/frame/browser_widget.cc.
   bool is_dark_mode =
-      ThemeServiceFactory::GetForProfile(profile)->BrowserUsesDarkColors();
+      ThemeServiceFactory::GetForProfile(profile)->BrowserUsesDarkColors() ||
+      profile->IsOffTheRecord();
   is_dark_mode =
       contextual_tasks::GetDarkModeFromUrl(url).value_or(is_dark_mode);
   source->AddBoolean("darkMode", is_dark_mode);
