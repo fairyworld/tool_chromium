@@ -55,6 +55,7 @@ import org.chromium.base.test.util.DisableLeakChecks;
 import org.chromium.base.test.util.DisabledTest;
 import org.chromium.base.test.util.Features.DisableFeatures;
 import org.chromium.base.test.util.Features.EnableFeatures;
+import org.chromium.base.test.util.HistogramWatcher;
 import org.chromium.chrome.R;
 import org.chromium.chrome.browser.ChromeTabbedActivity;
 import org.chromium.chrome.browser.document.ChromeLauncherActivity;
@@ -150,9 +151,15 @@ public class SendTabToSelfCoordinatorTest {
                                         HTTP_URL.getSpec())
                                 .equals(EntryPointDisplayReason.OFFER_FEATURE));
 
+        var histogramWatcher =
+                HistogramWatcher.newBuilder()
+                        .expectIntRecord("Sharing.SendTabToSelf.AndroidDevicePickerTargetCount", 1)
+                        .build();
+
         buildAndShowCoordinator();
 
         onView(withId(R.id.device_picker_list)).check(matches(isDisplayed()));
+        histogramWatcher.assertExpected();
     }
 
     @Test
@@ -261,6 +268,11 @@ public class SendTabToSelfCoordinatorTest {
                                         HTTP_URL.getSpec())
                                 .equals(EntryPointDisplayReason.OFFER_FEATURE));
 
+        var histogramWatcher =
+                HistogramWatcher.newBuilder()
+                        .expectIntRecord("Sharing.SendTabToSelf.AndroidDevicePickerTargetCount", 3)
+                        .build();
+
         buildAndShowCoordinator();
 
         onView(withId(R.id.sheet_item_list)).check(matches(isDisplayed()));
@@ -290,6 +302,7 @@ public class SendTabToSelfCoordinatorTest {
         // Verify the Send button is still enabled and proceed
         onView(withId(R.id.send_button)).check(matches(isEnabled()));
         onView(withId(R.id.send_button)).perform(click());
+        histogramWatcher.assertExpected();
     }
 
     @Test

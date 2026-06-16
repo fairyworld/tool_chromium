@@ -15,6 +15,7 @@ import android.provider.Browser;
 
 import org.chromium.base.Callback;
 import org.chromium.base.IntentUtils;
+import org.chromium.base.metrics.RecordHistogram;
 import org.chromium.base.supplier.MonotonicObservableSupplier;
 import org.chromium.base.supplier.OneshotSupplierImpl;
 import org.chromium.base.supplier.SupplierUtils;
@@ -238,6 +239,9 @@ public class SendTabToSelfCoordinator
             case EntryPointDisplayReason.OFFER_FEATURE:
                 List<TargetDeviceInfo> targetDevices =
                         SendTabToSelfAndroidBridge.getAllTargetDeviceInfos(mProfile);
+                RecordHistogram.recordCount100Histogram(
+                        "Sharing.SendTabToSelf.AndroidDevicePickerTargetCount",
+                        targetDevices.size());
                 if (ChromeFeatureList.isEnabled(
                         ChromeFeatureList.SEND_TAB_TO_SELF_ENHANCED_BOTTOMSHEET)) {
                     showEnhancedTargetDevicePicker(targetDevices);
