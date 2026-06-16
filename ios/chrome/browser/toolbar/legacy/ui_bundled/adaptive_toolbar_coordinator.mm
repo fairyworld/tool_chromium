@@ -213,9 +213,6 @@ using tab_groups::VersioningMessageController;
   return nil;
 }
 
-- (void)didNavigateToNTPOnActiveWebState {
-  // Implemented in `ToolbarCoordinator`.
-}
 
 #pragma mark - ToolbarCommands
 

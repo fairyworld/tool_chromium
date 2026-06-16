@@ -692,9 +692,6 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
   return self.locationBarCoordinator.omniboxScribbleForwardingTarget;
 }
 
-- (void)didNavigateToNTPOnActiveWebState {
-  [self.legacyToolbarMediator didNavigateToNTPOnActiveWebState];
-}
 
 #pragma mark - OmniboxStateProvider
 

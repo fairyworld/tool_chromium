@@ -581,7 +581,6 @@
   [self restoreNTPScrollPosition];
   [self updateNTPIsVisible:YES];
   [self updateStartForVisibilityChange:YES];
-  [self.toolbarDelegate didNavigateToNTPOnActiveWebState];
 }
 
 - (void)didNavigateAwayFromNTP {
@@ -759,7 +758,8 @@
   headerView.delegate = self.NTPViewController;
   self.NTPViewController.headerView = headerView;
   headerView.layoutGuideCenter = LayoutGuideCenterForBrowser(self.browser);
-  headerView.toolbarDelegate = self.toolbarDelegate;
+  headerView.scribbleForwardingTarget =
+      [self.toolbarDelegate fakeboxScribbleForwardingTarget];
   headerView.mutator = self.NTPMediator;
   [headerView setupSubviews];
   headerView.searchEngineLogoView = _searchEngineLogoMediator.view;
@@ -1252,6 +1252,10 @@
 - (void)feedDidScroll {
   feature_engagement::TrackerFactory::GetForProfile(self.profile)
       ->NotifyEvent(feature_engagement::events::kIOSScrolledOnFeed);
+}
+
+- (void)didUpdateNTPTabOmniboxScrollProgress:(CGFloat)progress {
+  [self.toolbarDelegate setScrollProgressForTabletOmnibox:progress];
 }
 
 #pragma mark - NewTabPageDelegate
