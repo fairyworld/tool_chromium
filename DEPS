@@ -2364,7 +2364,7 @@ deps = {
 
   'src/third_party/jsoncpp/source':
     Var('chromium_git') + '/external/github.com/open-source-parsers/jsoncpp.git'
-      + '@' + '5f1f240f10a19a61929b5c573974900cb62e9dac',
+      + '@' + '43f3834e3ffd903370c504e357461e407b3d3983',
 
   'src/third_party/junit/src': {
       'url': Var('chromium_git') + '/external/junit.git' + '@' + '0eb5ce72848d730da5bd6d42902fdd6a8a42055d',
