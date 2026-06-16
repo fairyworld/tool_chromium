@@ -55,10 +55,13 @@ source_set("simple_message_box_headers") {
 # without depending on :ui. The .cc file remains in :ui.
 source_set("tab_modal_confirm_dialog_delegate") {
   public = [ "tab_modal_confirm_dialog_delegate.h" ]
+  sources = [ "tab_modal_confirm_dialog_delegate.cc" ]
   deps = [
     "//base",
+    "//components/strings:components_strings",
     "//content/public/browser",
     "//ui/base",
+    "//ui/base:types",
   ]
 }
 
@@ -99,6 +102,7 @@ if (!is_android) {
       "//chrome/browser/prefs",
       "//chrome/browser/search_engines",
       "//chrome/browser/sharing_hub",
+      "//chrome/browser/ui:accelerator_table",
       "//chrome/browser/ui:browser_action_prefs_listener",
       "//chrome/browser/ui:browser_element_identifiers",
       "//chrome/browser/ui:ui_features",
@@ -238,6 +242,113 @@ if (!is_android) {
       "//chrome/common",
       "//content/public/browser",
       "//ui/base",
+    ]
+  }
+}
+
+if (!is_android) {
+  source_set("accelerator_table") {
+    public = [ "accelerator_table.h" ]
+    sources = [ "accelerator_table.cc" ]
+    deps = [
+      "//chrome/app:command_ids",
+      "//chrome/browser/ui:ui_features",
+      "//chrome/browser/ui/tabs",
+      "//components/lens:buildflags",
+      "//components/lens:features",
+      "//ui/base",
+      "//ui/base:features",
+      "//ui/events:event_constants",
+      "//ui/events:events_base",
+    ]
+    if (is_mac) {
+      deps += [ "//chrome/browser:global_keyboard_shortcuts_mac" ]
+    }
+  }
+
+  source_set("breadcrumb_manager_browser_agent") {
+    public = [ "breadcrumb_manager_browser_agent.h" ]
+    sources = [ "breadcrumb_manager_browser_agent.cc" ]
+    deps = [
+      "//chrome/browser/breadcrumbs",
+      "//chrome/browser/ui/tabs:tab_strip",
+      "//chrome/browser/ui/tabs:tab_strip_model_observer",
+      "//components/breadcrumbs/core",
+    ]
+  }
+
+  source_set("browser_instant_controller") {
+    public = [ "browser_instant_controller.h" ]
+    sources = [ "browser_instant_controller.cc" ]
+    deps = [
+      "//chrome/browser/profiles:profile",
+      "//chrome/browser/search",
+      "//chrome/browser/search_engines",
+      "//chrome/browser/ui/search",
+      "//chrome/browser/ui/tabs:tab_strip",
+      "//chrome/common",
+      "//components/infobars/content",
+      "//content/public/browser",
+      "//content/public/common",
+      "//ui/base",
+    ]
+  }
+
+  source_set("browser_location_bar_model_delegate") {
+    public = [ "browser_location_bar_model_delegate.h" ]
+    sources = [ "browser_location_bar_model_delegate.cc" ]
+    deps = [
+      "//chrome/browser/ui/tabs:tab_strip",
+      "//chrome/browser/ui/toolbar",
+    ]
+  }
+
+  source_set("browser_select_file_dialog_controller") {
+    public = [ "browser_select_file_dialog_controller.h" ]
+    sources = [ "browser_select_file_dialog_controller.cc" ]
+    deps = [
+      "//chrome/browser/profiles:profile",
+      "//chrome/browser/ui/select_file_policy",
+      "//chrome/browser/ui/tabs:tab_strip",
+      "//content/public/browser",
+      "//ui/base",
+      "//ui/gfx",
+      "//ui/shell_dialogs",
+    ]
+  }
+
+  source_set("browser_tab_strip_tracker") {
+    sources = [ "browser_tab_strip_tracker.cc" ]
+    deps = [
+      "//chrome/browser/ui:browser_tab_strip",
+      "//chrome/browser/ui/browser_window",
+      "//chrome/browser/ui/tabs:tab_strip",
+    ]
+  }
+
+  source_set("browser_view_prefs") {
+    public = [ "browser_view_prefs.h" ]
+    sources = [ "browser_view_prefs.cc" ]
+    deps = [
+      "//chrome/common:constants",
+      "//components/pref_registry",
+    ]
+    if (use_ozone) {
+      deps += [ "//ui/ozone" ]
+    }
+  }
+  source_set("collected_cookies_infobar_delegate") {
+    public = [ "collected_cookies_infobar_delegate.h" ]
+    sources = [ "collected_cookies_infobar_delegate.cc" ]
+    deps = [
+      "//chrome/app:generated_resources",
+      "//chrome/browser/infobars",
+      "//components/infobars/content",
+      "//components/infobars/core",
+      "//components/vector_icons",
+      "//content/public/browser",
+      "//ui/base",
+      "//ui/base:features",
     ]
   }
 }
@@ -1299,10 +1410,6 @@ static_library("ui") {
   } else {
     # !is_android
     sources += [
-      "accelerator_table.cc",
-      "accelerator_table.h",
-      "breadcrumb_manager_browser_agent.cc",
-      "breadcrumb_manager_browser_agent.h",
       "browser.cc",
       "browser.h",
       "browser_command_controller.cc",
@@ -1311,29 +1418,20 @@ static_library("ui") {
       "browser_commands.h",
       "browser_content_setting_bubble_model_delegate.cc",
       "browser_content_setting_bubble_model_delegate.h",
-      "browser_instant_controller.cc",
-      "browser_instant_controller.h",
       "browser_live_tab_context.cc",
       "browser_live_tab_context.h",
-      "browser_location_bar_model_delegate.cc",
-      "browser_location_bar_model_delegate.h",
       "browser_manager_service.cc",
       "browser_manager_service.h",
       "browser_manager_service_factory.cc",
       "browser_manager_service_factory.h",
-      "browser_select_file_dialog_controller.cc",
-      "browser_select_file_dialog_controller.h",
       "browser_tab_menu_model_delegate.cc",
       "browser_tab_menu_model_delegate.h",
       "browser_tab_restorer.cc",
       "browser_tab_strip_model_delegate.cc",
-      "browser_tab_strip_tracker.cc",
       "browser_tabrestore.cc",
       "browser_tabrestore.h",
       "browser_tabstrip.cc",
       "browser_tabstrip.h",
-      "browser_view_prefs.cc",
-      "browser_view_prefs.h",
       "browser_window.h",
       "browser_window_deleter.cc",
       "browser_window_deleter.h",
@@ -1343,8 +1441,6 @@ static_library("ui") {
       "browser_window_theme_observer.h",
       "chrome_pages.cc",
       "chrome_pages.h",
-      "collected_cookies_infobar_delegate.cc",
-      "collected_cookies_infobar_delegate.h",
       "intent_picker_tab_helper.cc",
       "intent_picker_tab_helper.h",
       "sad_tab.cc",
@@ -1358,7 +1454,6 @@ static_library("ui") {
       "scoped_tabbed_browser_displayer.h",
       "singleton_tabs.cc",
       "singleton_tabs.h",
-      "tab_modal_confirm_dialog_delegate.cc",
       "uma_browsing_activity_observer.cc",
       "uma_browsing_activity_observer.h",
       "unload_controller.cc",
@@ -1545,8 +1640,11 @@ static_library("ui") {
 
     # Non-android deps for "ui" target.
     deps += [
+      ":accelerator_table",
       ":browser_actions",
+      ":browser_select_file_dialog_controller",
       ":browser_tab_strip",
+      ":collected_cookies_infobar_delegate",
       ":confirm_bubble_model",
       ":focus_tab_after_navigation_helper",
       ":layout_constants",

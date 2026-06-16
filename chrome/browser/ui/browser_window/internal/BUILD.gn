@@ -178,6 +178,15 @@ source_set("internal") {
   if (enable_extensions_core) {
     deps += [ "//chrome/browser/extensions" ]
   }
+
+  if (!is_android) {
+    deps += [
+      "//chrome/browser/ui:breadcrumb_manager_browser_agent",
+      "//chrome/browser/ui:browser_instant_controller",
+      "//chrome/browser/ui:browser_location_bar_model_delegate",
+      "//chrome/browser/ui:browser_select_file_dialog_controller",
+    ]
+  }
 }
 
 source_set("unit_tests") {

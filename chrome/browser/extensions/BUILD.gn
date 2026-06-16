@@ -1597,6 +1597,10 @@ source_set("extensions") {
   if (enable_devtools_frontend) {
     deps += [ "//chrome/browser/ui/webui/devtools" ]
   }
+
+  if (!is_android) {
+    deps += [ "//chrome/browser/ui:browser_tab_strip_tracker" ]
+  }
 }
 
 static_library("test_support") {
