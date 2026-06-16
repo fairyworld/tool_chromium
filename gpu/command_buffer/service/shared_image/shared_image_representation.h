@@ -929,6 +929,7 @@ class GPU_GLES2_EXPORT WebNNTensorRepresentation
 
 #if BUILDFLAG(IS_WIN)
   virtual Microsoft::WRL::ComPtr<ID3D12Resource> GetD3D12Buffer() const;
+  virtual base::win::ScopedHandle GetD3D12HeapHandle() const;
 #endif  // BUILDFLAG(IS_WIN)
 #if BUILDFLAG(IS_APPLE)
   virtual IOSurfaceRef GetIOSurface() const;

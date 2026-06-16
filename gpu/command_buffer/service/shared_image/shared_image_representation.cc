@@ -885,6 +885,11 @@ Microsoft::WRL::ComPtr<ID3D12Resource>
 WebNNTensorRepresentation::GetD3D12Buffer() const {
   NOTREACHED();
 }
+
+base::win::ScopedHandle WebNNTensorRepresentation::GetD3D12HeapHandle() const {
+  NOTREACHED();
+}
+
 #endif
 
 #if BUILDFLAG(IS_APPLE)
