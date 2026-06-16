@@ -499,35 +499,19 @@ export const WebClientHostDef = defInterface({
       name: 'subscribeToPinCandidates',
       request: defMessage<{
         options: GetPinCandidatesOptions,
-        observationId: number,
+        pinCandidatesPipe: PendingRemote<WebClientPinCandidatesObserver>,
       }>(),
       backgroundAllowed: false,
       histogram: {id: 52},
     },
     {
-      name: 'unsubscribeFromPinCandidates',
-      request: defMessage<{
-        observationId: number,
-      }>(),
-      backgroundAllowed: true,
-      histogram: {id: 53},
-    },
-    {
       name: 'subscribeToCaptureRegion',
       request: defMessage<{
-        observationId: number,
+        remote: PendingRemote<WebClientRegionCapture>,
         params?: CaptureRegionParams,
       }>(),
       backgroundAllowed: true,
       histogram: {id: 71},
-    },
-    {
-      name: 'unsubscribeFromCaptureRegion',
-      request: defMessage<{
-        observationId: number,
-      }>(),
-      backgroundAllowed: true,
-      histogram: {id: 72},
     },
     {
       name: 'deleteCapturedRegion',
@@ -594,8 +578,7 @@ export const WebClientHostDef = defInterface({
       name: 'subscribeToTabData',
       request: defMessage<{
         tabId: string,
-        observationId: number,
-        cancel: boolean,
+        remote: PendingRemote<WebClientTabDataObserver>,
       }>(),
       backgroundAllowed: true,
       histogram: {id: 81},
@@ -604,8 +587,7 @@ export const WebClientHostDef = defInterface({
       name: 'subscribeToTabFavicon',
       request: defMessage<{
         tabId: string,
-        observationId: number,
-        cancel: boolean,
+        remote: PendingRemote<WebClientTabFaviconObserver>,
       }>(),
       backgroundAllowed: true,
       histogram: {id: 94},
@@ -836,13 +818,7 @@ export const WebClientDef = defInterface({
       }>(),
       backgroundAllowed: true,
     },
-    {
-      name: 'pinCandidatesChanged',
-      request: defMessage<{
-        candidates: PinCandidatePrivate[],
-        observationId: number,
-      }>(),
-    },
+
     {
       name: 'zeroStateSuggestionsChanged',
       request: defMessage<{
@@ -863,13 +839,7 @@ export const WebClientDef = defInterface({
         context: AdditionalContextPrivate,
       }>(),
     },
-    {
-      name: 'captureRegionUpdate',
-      request: defMessage<{
-        result?: CaptureRegionResult,
-        reason?: CaptureRegionErrorReason, observationId: number,
-      }>(),
-    },
+
     {
       name: 'notifyActOnWebCapabilityChanged',
       request: defMessage<{
@@ -891,22 +861,7 @@ export const WebClientDef = defInterface({
       }>(),
       backgroundAllowed: true,
     },
-    {
-      name: 'tabDataChanged',
-      request: defMessage<{
-        tabData?: TabDataPrivate, observationId: number,
-      }>(),
-      backgroundAllowed: true,
-    },
-    {
-      name: 'tabFaviconChanged',
-      request: defMessage<{
-        observationId: number,
-        tabRemoved?: boolean,
-        favicon?: RgbaImage,
-      }>(),
-      backgroundAllowed: true,
-    },
+
     {
       name: 'invoke',
       request: defMessage<{
@@ -936,8 +891,66 @@ export const WebClientDef = defInterface({
 
 export type WebClient = typeof WebClientDef;
 
+export const WebClientRegionCaptureDef = defInterface({
+  name: 'WebClientRegionCapture',
+  methods: [
+    {
+      name: 'captureRegionUpdate',
+      request: defMessage<{
+        result?: CaptureRegionResult,
+        reason?: CaptureRegionErrorReason,
+      }>(),
+    },
+  ],
+});
+export type WebClientRegionCapture = typeof WebClientRegionCaptureDef;
+
+export const WebClientPinCandidatesObserverDef = defInterface({
+  name: 'WebClientPinCandidatesObserver',
+  methods: [
+    {
+      name: 'pinCandidatesChanged',
+      request: defMessage<{
+        candidates: PinCandidatePrivate[],
+      }>(),
+    },
+  ],
+});
+export type WebClientPinCandidatesObserver =
+    typeof WebClientPinCandidatesObserverDef;
+
+export const WebClientTabDataObserverDef = defInterface({
+  name: 'WebClientTabDataObserver',
+  methods: [
+    {
+      name: 'tabDataChanged',
+      request: defMessage<{
+        tabData: TabDataPrivate,
+      }>(),
+    },
+  ],
+});
+export type WebClientTabDataObserver = typeof WebClientTabDataObserverDef;
+
+export const WebClientTabFaviconObserverDef = defInterface({
+  name: 'WebClientTabFaviconObserver',
+  methods: [
+    {
+      name: 'tabFaviconChanged',
+      request: defMessage<{
+        favicon?: RgbaImage,
+      }>(),
+    },
+  ],
+});
+export type WebClientTabFaviconObserver = typeof WebClientTabFaviconObserverDef;
+
 export type WebClientRequestTypes =
-    InterfaceDefMethods<WebClient>&InterfaceDefMethods<ActorClient>;
+    InterfaceDefMethods<WebClient>&InterfaceDefMethods<ActorClient>&
+    InterfaceDefMethods<WebClientRegionCapture>&
+    InterfaceDefMethods<WebClientPinCandidatesObserver>&
+    InterfaceDefMethods<WebClientTabDataObserver>&
+    InterfaceDefMethods<WebClientTabFaviconObserver>;
 
 export type HostRequestTypes =
     InterfaceDefMethods<WebClientHost>&InterfaceDefMethods<ActorHost>;
@@ -1006,7 +1019,7 @@ export const RECORDED_REQUEST_IDS = {
   UnpinTabs: 50,
   UnpinAllTabs: 51,
   SubscribeToPinCandidates: 52,
-  UnsubscribeFromPinCandidates: 53,
+  // Do not reuse deleted request ID: 53,
   GetZeroStateSuggestionsForFocusedTab: 54,
   GetZeroStateSuggestionsAndSubscribe: 55,
   SetClosedCaptioningSetting: 56,
@@ -1025,7 +1038,7 @@ export const RECORDED_REQUEST_IDS = {
   SetActuationOnWebSetting: 69,
   OnModeChange: 70,
   SubscribeToCaptureRegion: 71,
-  UnsubscribeFromCaptureRegion: 72,
+  // Do not reuse deleted request ID: 72,
   // Do not reuse deleted request ID: 73,
   InterruptActorTask: 74,
   UninterruptActorTask: 75,
@@ -1092,7 +1105,6 @@ export function getHostRequestHistogramInfo(
 // have the same name, but different type. This ensures that we don't
 // accidentally leave the private data on the returned object.
 //
-
 
 export type WebClientInitialStatePrivate =
     ReplaceProperties<WebClientInitialState, {

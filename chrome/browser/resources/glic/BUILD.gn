@@ -34,6 +34,7 @@ build_webui("build") {
     "glic_api_impl/host/glic_api_host.ts",
     "glic_api_impl/host/host_from_client.ts",
     "glic_api_impl/host/host_to_client.ts",
+    "glic_api_impl/host/host_utils.ts",
     "glic_api_impl/host/types.ts",
     "glic_api_impl/request_types.ts",
     "glic_api_impl/transport/messaging.ts",

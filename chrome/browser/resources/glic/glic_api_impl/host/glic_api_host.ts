@@ -25,7 +25,7 @@ import {createBidirectionalPostMessageTransport} from '../transport/post_message
 import {ERROR_CODEC, getHostRequestHistogramInfo, MAX_REQUEST_ID, WebClientDef, WebClientHostDef} from './../request_types.js';
 import type {ActorClient, ActorHost, WebClient, WebClientHost} from './../request_types.js';
 import {urlFromClient} from './conversions.js';
-import {HostMessageHandler, TabDataHandlerSet, TabFaviconHandlerSet} from './host_from_client.js';
+import {HostMessageHandler} from './host_from_client.js';
 import type {CaptureRegionObserverImpl, PinCandidatesObserverImpl} from './host_from_client.js';
 import {ActorClientImpl} from './host_to_client.js';
 import {PanelOpenState} from './types.js';
@@ -78,7 +78,7 @@ export interface ApiHostEmbedder {
 // Sets up communication with the client.
 // This is separate from GlicApiHost to allow us to detect the client page
 // before our host is really ready to connect.
-export class GlicApiCommunicator implements PostMessageLifecycleObserver {
+export class GlicApiCommunicator {
   readonly postMessageReceiver: PostMessageRequestReceiver;
   readonly postMessageSender: PostMessageRequestSender;
   readonly pmRemote: PostMessageRemote<WebClient>;
@@ -93,7 +93,7 @@ export class GlicApiCommunicator implements PostMessageLifecycleObserver {
       private embeddedOrigin: string, private windowProxy: WindowProxy) {
     const {router, sender, receiver, rootRemote, rootReceiver} =
         createBidirectionalPostMessageTransport(
-            embeddedOrigin, windowProxy, this,
+            embeddedOrigin, windowProxy, /*lifecycleObserver=*/ {},
             this as unknown as PostMessageHandler<WebClientHost>,
             'glic_api_host', true, ERROR_CODEC, WebClientHostDef, WebClientDef);
     this.rootReceiver = rootReceiver;
@@ -149,13 +149,6 @@ export class GlicApiCommunicator implements PostMessageLifecycleObserver {
     }
     return await handleFn.call(h.hostMessageHandler, payload, extras);
   }
-  // Just ignore message callbacks before the host is connected.
-  onRequestReceived(_type: string, _interfaceDef: InterfaceDef|undefined):
-      void {}
-  onRequestHandlerException(
-      _type: string, _interfaceDef: InterfaceDef|undefined): void {}
-  onRequestCompleted(_type: string, _interfaceDef: InterfaceDef|undefined):
-      void {}
 
   private stopBootstrapPing() {
     if (this.bootstrapPingIntervalId !== undefined) {
@@ -217,8 +210,6 @@ export class GlicApiHost implements PostMessageLifecycleObserver {
   // Present while the client is monitoring pin candidates.
   pinCandidatesObserver?: PinCandidatesObserverImpl;
   captureRegionObserver?: CaptureRegionObserverImpl;
-  tabDataHandlerSet: TabDataHandlerSet;
-  tabFaviconHandlerSet: TabFaviconHandlerSet;
 
   actorHandler?: ActorHandlerRemote;
   private isSubscribedToZoomLevel = false;
@@ -245,15 +236,11 @@ export class GlicApiHost implements PostMessageLifecycleObserver {
       }
     });
     this.handler.$.close();
-    this.tabDataHandlerSet =
-        new TabDataHandlerSet(communicator.pmRemote, this.handler);
-    this.tabFaviconHandlerSet =
-        new TabFaviconHandlerSet(communicator.pmRemote, this.handler);
 
     this.browserProxy.pageHandler.createWebClient(
         this.handler.$.bindNewPipeAndPassReceiver());
     this.hostMessageHandler =
-        new HostMessageHandler(this.handler, this.sender, embedder, this);
+        new HostMessageHandler(this.handler, embedder, this);
     this.webClientErrorTimer = new OneShotTimer(
         loadTimeData.getInteger('clientUnresponsiveUiMaxTimeMs'));
 
@@ -266,7 +253,7 @@ export class GlicApiHost implements PostMessageLifecycleObserver {
     this.webClientErrorTimer.reset();
     this.hostMessageHandler.destroy();
     this.pinCandidatesObserver?.disconnectFromSource();
-    this.captureRegionObserver?.disconnectFromSource();
+    this.captureRegionObserver?.destroy();
     if (this.actorHandler) {
       this.actorHandler.$.close();
       this.actorHandler = undefined;

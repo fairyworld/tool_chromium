@@ -12,8 +12,7 @@ import {ObservableValue as ObservableValueImpl, Subject} from '../../observable.
 import {convertTabContextResultFromPrivate, convertTabDataFromPrivate} from '../client/glic_api_client.js';
 import {rgbaImageToBlob} from '../client/image_utils.js';
 import type {WebClientInitialStatePrivate} from '../request_types.js';
-import type {MessageHandlerInterface} from '../transport/messaging.js';
-import type {PendingReceiver, PendingRemote, PostMessageRemote, PostMessageRouter} from '../transport/post_message_transport.js';
+import type {PendingReceiver, PendingRemote, PostMessageHandler, PostMessageRemote, PostMessageRouter} from '../transport/post_message_transport.js';
 
 import {ActorClientDef, ConfirmationRequestErrorReason, SelectAutofillSuggestionsDialogErrorReason, SelectCredentialDialogErrorReason} from './actor_types.js';
 import type {ActorClient, ActorHost, CredentialPrivate, NavigationConfirmationRequestPrivate, NavigationConfirmationResponsePrivate, SelectAutofillSuggestionsDialogRequestPrivate, SelectAutofillSuggestionsDialogResponsePrivate, SelectCredentialDialogRequestPrivate, SelectCredentialDialogResponsePrivate, UserConfirmationDialogRequestPrivate, UserConfirmationDialogResponsePrivate} from './actor_types.js';
@@ -222,7 +221,7 @@ export class GlicBrowserHostActor implements Partial<GlicBrowserHost> {
 
 // Handles postMessage messages from the host.
 export class ActorWebClientMessageHandler implements
-    MessageHandlerInterface<ActorClient> {
+    PostMessageHandler<ActorClient> {
   constructor(private actorHost: GlicBrowserHostActor) {}
 
   notifyActorTaskStateChanged(payload: {taskId: number, state: ActorTaskState}):
@@ -401,7 +400,7 @@ export class ActorWebClientMessageHandler implements
 
 
 export class GlicBrowserHostJournalImpl implements GlicBrowserHostJournal {
-  constructor(public sender: PostMessageRemote<ActorHost>) {}
+  constructor(private sender: PostMessageRemote<ActorHost>) {}
 
   beginAsyncEvent(
       asyncEventId: number, taskId: number, event: string,
