@@ -6278,24 +6278,6 @@
             ]
         }
     ],
-    "ClientSideDetectionServerModelForScamDetectionAndroid": [
-        {
-            "platforms": [
-                "android"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "params": {
-                        "MaxIntelligentScansPerDay": "5"
-                    },
-                    "enable_features": [
-                        "ClientSideDetectionServerModelForScamDetectionAndroid"
-                    ]
-                }
-            ]
-        }
-    ],
     "ClientSideDetectionSkipErrorPage": [
         {
             "platforms": [
