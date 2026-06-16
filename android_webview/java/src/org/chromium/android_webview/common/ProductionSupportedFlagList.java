@@ -328,6 +328,9 @@ public final class ProductionSupportedFlagList {
                 "When enabled, two-part zip codes are splitted into two fields while filling and"
                         + " imported from two adjacent fields."),
         Flag.baseFeature(
+                AutofillFeatures.AUTOFILL_SUPPORT_STANDALONE_ZIP_CODE_GLOBALLY,
+                "When enabled, standalone zip code fields are detected globally."),
+        Flag.baseFeature(
                 AutofillFeatures.AUTOFILL_SUPPORT_COMBINED_ZIP_AND_CITY_FR,
                 "When enabled, fields that combine postal code and city in France will be parsed"
                         + " correctly."),

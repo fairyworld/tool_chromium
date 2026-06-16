@@ -947,6 +947,11 @@ BASE_FEATURE(kAutofillSupportPhoneticNameForJP,
 // TODO(crbug.com/369503318): Clean up when launched.
 BASE_FEATURE(kAutofillSupportSplitZipCode, base::FEATURE_DISABLED_BY_DEFAULT);
 
+// When enabled, standalone zip code fields are classified by local heuristics
+// globally, instead of just a handful of countries.
+BASE_FEATURE(kAutofillSupportStandaloneZipCodeGlobally,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
 #if BUILDFLAG(IS_ANDROID)
 // If enabled, Autofill Services can query whether Chrome provides forms as
 // virtual view structures to third party providers.
