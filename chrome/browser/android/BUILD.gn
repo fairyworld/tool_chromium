@@ -574,6 +574,7 @@ if (is_android) {
       "//chrome/browser/translate/android",
       "//chrome/browser/translate/android:android_impl",
       "//chrome/browser/translate/android:jni_headers",
+      "//chrome/browser/ui:recently_audible_helper",
       "//chrome/browser/ui/android",
       "//chrome/browser/ui/android:context_menu_helper",
       "//chrome/browser/ui/android/autofill",

@@ -113,7 +113,10 @@ source_set("cocoa") {
     "window_size_autosaver.mm",
   ]
 
-  deps = []
+  deps = [
+    "//chrome/browser/ui:recently_audible_helper",
+    "//chrome/browser/ui:simple_message_box_internal",
+  ]
 
   if (enable_updater) {
     public += [ "keystone_infobar_delegate.h" ]
