@@ -66,15 +66,9 @@ MimeHandlerBodyCache::~MimeHandlerBodyCache() = default;
 
 bool MimeHandlerBodyCache::InitializeForwarding(
     mojo::ScopedDataPipeConsumerHandle* out_forwarding_pipe) {
-  MojoCreateDataPipeOptions options;
-  options.struct_size = sizeof(MojoCreateDataPipeOptions);
-  options.flags = MOJO_CREATE_DATA_PIPE_FLAG_NONE;
-  options.element_num_bytes = 1;
-  options.capacity_num_bytes = kDefaultPipeCapacity;
-
   mojo::ScopedDataPipeConsumerHandle consumer;
-  if (mojo::CreateDataPipe(&options, forwarding_producer_, consumer) !=
-      MOJO_RESULT_OK) {
+  if (mojo::CreateDataPipe(kDefaultPipeCapacity, forwarding_producer_,
+                           consumer) != MOJO_RESULT_OK) {
     return false;
   }
 
@@ -189,14 +183,7 @@ mojo::ScopedDataPipeConsumerHandle MimeHandlerBodyCache::CreatePipe() {
 
   mojo::ScopedDataPipeProducerHandle producer_handle;
   mojo::ScopedDataPipeConsumerHandle consumer;
-
-  MojoCreateDataPipeOptions options;
-  options.struct_size = sizeof(MojoCreateDataPipeOptions);
-  options.flags = MOJO_CREATE_DATA_PIPE_FLAG_NONE;
-  options.element_num_bytes = 1;
-  options.capacity_num_bytes = kDefaultPipeCapacity;
-
-  if (mojo::CreateDataPipe(&options, producer_handle, consumer) !=
+  if (mojo::CreateDataPipe(kDefaultPipeCapacity, producer_handle, consumer) !=
       MOJO_RESULT_OK) {
     return mojo::ScopedDataPipeConsumerHandle();
   }
