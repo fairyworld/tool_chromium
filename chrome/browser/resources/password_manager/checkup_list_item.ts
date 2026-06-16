@@ -156,6 +156,10 @@ export class CheckupListItemElement extends CheckupListItemElementBase {
     }
   }
 
+  private onAutoChangePasswordClick_() {
+    // TODO(b/522268048): wire this to correctly call the expected method
+  }
+
   private onAlreadyChangedClick_(e: Event) {
     this.showEditPasswordDisclaimer_ = true;
     e.preventDefault();
@@ -201,6 +205,12 @@ export class CheckupListItemElement extends CheckupListItemElementBase {
 
   private getChangeButtonAriaLabel_(): string {
     return this.i18n('changePasswordAriaDescription', this.getGroupName_());
+  }
+
+  private getAutoChangeButtonAriaLabel_(): string {
+    return this.i18n(
+        'automatedPasswordChangeCheckupButtonAriaDescription',
+        this.getGroupName_());
   }
 
   private getMoreButtonAriaLabel_(): string {
