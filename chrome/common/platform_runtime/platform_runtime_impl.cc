@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include "base/compiler_specific.h"
 #include "base/files/file_path.h"
 #include "base/logging.h"
 #include "base/memory/ref_counted.h"
@@ -28,6 +29,7 @@ PlatformRuntimeLibrary::PlatformRuntimeLibrary(
   }
 }
 
+DISABLE_CFI_DLSYM
 const char* PlatformRuntimeLibrary::GetLibraryName() {
   if (get_library_name_) {
     return get_library_name_();
@@ -35,6 +37,7 @@ const char* PlatformRuntimeLibrary::GetLibraryName() {
   return nullptr;
 }
 
+DISABLE_CFI_DLSYM
 bool PlatformRuntimeLibrary::ProcessRequestHeaders(
     net::HttpRequestHeaders* headers,
     GetHeaderFunction get_header,
