@@ -667,6 +667,27 @@ TEST_F(HlsRenditionImplUnittest, TestRenditionHasEnoughDataFetchNewManifest) {
   task_environment_.RunUntilIdle();
 }
 
+TEST_F(HlsRenditionImplUnittest,
+       TestRenditionManifestUpdateTooSoonKeepSegmentDelay) {
+  auto rendition =
+      MakeLiveRendition(GURL("http://example.com"), kInitialFetchPlaylist);
+  ASSERT_NE(rendition, nullptr);
+  ASSERT_EQ(rendition->GetDuration(), std::nullopt);
+
+  Ranges<base::TimeDelta> loaded_ranges;
+  loaded_ranges.Add(base::Seconds(0), base::Seconds(12));
+  EXPECT_CALL(*mock_mdeh_, GetBufferedRanges(_))
+      .Times(2)
+      .WillRepeatedly(Return(loaded_ranges));
+
+  // We expect CheckState to return 7s, which is the segment delay,
+  // even though we cannot fetch a manifest update yet (which would require
+  // waiting longer).
+  rendition->CheckState(base::Seconds(0), 0.0,
+                        BindCheckState(base::Seconds(7)));
+  task_environment_.RunUntilIdle();
+}
+
 TEST_F(HlsRenditionImplUnittest, TestRenditionHasEnoughDataDeleteOldContent) {
   auto manifest_uri = GURL("http://example.com");
   auto rendition = MakeLiveRendition(manifest_uri, kInitialFetchPlaylist);
