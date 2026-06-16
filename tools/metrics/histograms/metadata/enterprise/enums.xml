@@ -2492,6 +2492,7 @@ chromium-metrics-reviews@google.com.
   <int value="1456" label="RestrictBackgroundFetchFromServiceWorkerEnabled"/>
   <int value="1457" label="GeminiEnterpriseSettings"/>
   <int value="1458" label="RestrictYouTubeCookiesDeletion"/>
+  <int value="1459" label="AutofillSettings"/>
 </enum>
 
 <enum name="EnterprisePoliciesSources">
