@@ -4486,6 +4486,11 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
       <message name="IDS_BOOKMARK_TOOLBAR_SEARCH_TITLE" desc="Toolbar search title [CHAR_LIMIT=32]">
         Search
       </message>
+      <message name="IDS_BOOKMARK_SEARCH_NUM_RESULTS" is_accessibility_with_no_ui="true" desc="Announcement when bookmarks search results are updated.">
+        {NUM_RESULTS, plural,
+          =1 {1 result found}
+          other {# results found}}
+      </message>
       <message name="IDS_EDIT_BOOKMARK" desc='The string prompting the user to edit the content of a bookmark. [CHAR_LIMIT=30]'>
         Edit bookmark
       </message>

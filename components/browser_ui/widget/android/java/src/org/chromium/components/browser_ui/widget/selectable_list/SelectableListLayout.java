@@ -669,4 +669,17 @@ public class SelectableListLayout<E> extends FrameLayout
                             }
                         }));
     }
+
+    /**
+     * Announce the given text for accessibility using the live region.
+     *
+     * @param text The text to announce.
+     */
+    public void announceAccessibilityText(CharSequence text) {
+        setAccessibilityLiveRegion(ACCESSIBILITY_LIVE_REGION_POLITE);
+        setContentDescription(text);
+        sendAccessibilityEvent(
+                android.view.accessibility.AccessibilityEvent.TYPE_VIEW_ACCESSIBILITY_FOCUSED);
+        setAccessibilityLiveRegion(ACCESSIBILITY_LIVE_REGION_NONE);
+    }
 }
