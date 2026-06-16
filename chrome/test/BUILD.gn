@@ -6028,6 +6028,7 @@ test("unit_tests") {
     "../browser/policy/cloud/user_policy_signin_service_util_unittest.cc",
     "../browser/policy/default_sensors_setting_policy_handler_unittest.cc",
     "../browser/policy/homepage_location_policy_handler_unittest.cc",
+    "../browser/policy/isolate_origins_policy_handler_unittest.cc",
     "../browser/policy/javascript_policy_handler_unittest.cc",
     "../browser/policy/messaging_layer/public/report_client_unittest.cc",
     "../browser/policy/messaging_layer/upload/configuration_file_controller_unittest.cc",
