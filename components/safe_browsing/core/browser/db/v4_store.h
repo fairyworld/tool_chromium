@@ -18,7 +18,9 @@
 #include "base/task/sequenced_task_runner.h"
 #include "base/time/time.h"
 #include "components/safe_browsing/core/browser/db/hash_prefix_map.h"
+#include "components/safe_browsing/core/browser/db/sb_store.h"
 #include "components/safe_browsing/core/browser/db/v4_protocol_manager_util.h"
+#include "components/safe_browsing/core/browser/db/v4_rice.h"
 #include "components/safe_browsing/core/common/proto/webui.pb.h"
 
 namespace safe_browsing {
@@ -119,7 +121,7 @@ class V4StoreFactory {
       const base::FilePath& store_path);
 };
 
-class V4Store {
+class V4Store : public SBStore {
  public:
   // The |task_runner| is used to ensure that the operations in this file are
   // performed on the correct thread. |store_path| specifies the location on
@@ -132,21 +134,13 @@ class V4Store {
   V4Store(const scoped_refptr<base::SequencedTaskRunner>& task_runner,
           const base::FilePath& store_path,
           int64_t old_file_size = 0);
-  virtual ~V4Store();
+  ~V4Store() override;
 
   // If a hash prefix in this store matches |full_hash|, returns that hash
   // prefix; otherwise returns an empty hash prefix.
   virtual HashPrefixStr GetMatchingHashPrefix(const FullHashStr& full_hash);
 
-  // True if this store has valid contents, either from a successful read
-  // from disk or a full update.  This does not mean the checksum was verified.
-  virtual bool HasValidData();
-
   const std::string& state() const { return state_; }
-
-  const base::FilePath& store_path() const { return store_path_; }
-
-  int64_t file_size() const { return file_size_; }
 
   void ApplyUpdate(std::unique_ptr<ListUpdateResponse> response,
                    const scoped_refptr<base::SequencedTaskRunner>& runner,
@@ -179,6 +173,8 @@ class V4Store {
       const std::string& base_metric);
 
  protected:
+  std::string GetMetricPrefix() const override;
+
   std::unique_ptr<HashPrefixMap> hash_prefix_map_;
 
  private:
@@ -410,6 +406,14 @@ class V4Store {
   // Same as above but uses a pre-populated |file_format|.
   StoreWriteResult WriteToDisk(V4StoreFileFormat* file_format);
 
+  static void RecordDecodeAdditionsResult(const std::string& base_metric,
+                                          V4DecodeResult result,
+                                          const base::FilePath& file_path);
+
+  static void RecordDecodeRemovalsResult(const std::string& base_metric,
+                                         V4DecodeResult result,
+                                         const base::FilePath& file_path);
+
   // Records the status of the update being applied to the database.
   ApplyUpdateResult last_apply_update_result_ = APPLY_UPDATE_RESULT_MAX;
 
@@ -420,16 +424,7 @@ class V4Store {
   // verified, it is cleared.
   std::string expected_checksum_;
 
-  // The size of the file on disk for this store.
-  int64_t file_size_;
 
-  // A counter used to manage how frequently the value of `has_valid_data_`
-  // below is recorded.
-  uint8_t record_has_valid_data_counter_ = 0;
-
-  // True if the file was successfully read+parsed or was populated from
-  // a full update.
-  bool has_valid_data_;
 
   // Records the number of times we have looked up the store.
   size_t checks_attempted_ = 0;
@@ -437,8 +432,6 @@ class V4Store {
   // The state of the store as returned by the PVer4 server in the last applied
   // update response.
   std::string state_;
-  const base::FilePath store_path_;
-  const scoped_refptr<base::SequencedTaskRunner> task_runner_;
 };
 
 std::ostream& operator<<(std::ostream& os, const V4Store& store);

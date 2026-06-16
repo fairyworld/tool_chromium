@@ -107,8 +107,8 @@ static_library("v4_database") {
 
   public_deps = [ ":safebrowsing_proto" ]
   deps = [
+    ":sb_store",
     ":v4_protocol_manager_util",
-    ":v4_store",
     "//base",
     "//components/safe_browsing/core/common",
     "//components/safe_browsing/core/common/proto:webui_proto",
@@ -235,7 +235,7 @@ source_set("v4_rice") {
   }
 }
 
-source_set("v4_store") {
+source_set("sb_store") {
   sources = [
     "hash_prefix_container.cc",
     "hash_prefix_container.h",
@@ -247,6 +247,8 @@ source_set("v4_store") {
   ]
   if (safe_browsing_mode != 0 || is_ios) {
     sources += [
+      "sb_store.cc",
+      "sb_store.h",
       "v4_store.cc",
       "v4_store.h",
     ]
@@ -364,6 +366,7 @@ source_set("unit_tests_local_db") {
   ]
   deps = [
     ":database_manager",
+    ":sb_store",
     ":sb_update_protocol_manager",
     ":unit_tests_shared",
     ":util",
@@ -371,7 +374,6 @@ source_set("unit_tests_local_db") {
     ":v4_local_database_manager",
     ":v4_protocol_manager_util",
     ":v4_rice",
-    ":v4_store",
     ":v4_store_proto",
     ":v4_test_util",
     "//base",
@@ -416,8 +418,8 @@ fuzzer_test("v4_get_hash_protocol_manager_fuzzer") {
 fuzzer_test("v4_store_fuzzer") {
   sources = [ "v4_store_fuzzer.cc" ]
   deps = [
+    ":sb_store",
     ":v4_protocol_manager_util",
-    ":v4_store",
     ":v4_test_util",
     "//base/test:test_support",
     "//testing/libfuzzer:libfuzzer_base_wrappers",

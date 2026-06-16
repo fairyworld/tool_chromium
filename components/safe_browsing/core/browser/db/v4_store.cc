@@ -71,7 +71,6 @@ const char kChromeExtMalwareUmaSuffix[] = ".ChromeExtMalware";
 const char kUrlMalBinUmaSuffix[] = ".UrlMalBin";
 const char kUrlSocengUmaSuffix[] = ".UrlSoceng";
 
-const uint32_t kFileMagic = 0x600D71FE;
 const uint32_t kFileVersion = 9;
 
 // The maximum size of additions hashes in a single update response.
@@ -90,14 +89,6 @@ void RecordEnumWithAndWithoutSuffix(const std::string& metric,
   base::UmaHistogramExactLinear(metric + kResult + suffix, value, maximum);
 }
 
-void RecordBooleanWithAndWithoutSuffix(const std::string& metric,
-                                       bool value,
-                                       const base::FilePath& file_path) {
-  base::UmaHistogramBoolean(metric, value);
-  std::string suffix = GetUmaSuffixForStore(file_path);
-  base::UmaHistogramBoolean(metric + suffix, value);
-}
-
 void RecordCountWithAndWithoutSuffix(const std::string& metric,
                                      int32_t value,
                                      int32_t maximum,
@@ -114,20 +105,6 @@ void RecordApplyUpdateResult(const std::string& base_metric,
                              const base::FilePath& file_path) {
   RecordEnumWithAndWithoutSuffix(base_metric + kApplyUpdate, result,
                                  APPLY_UPDATE_RESULT_MAX, file_path);
-}
-
-void RecordDecodeAdditionsResult(const std::string& base_metric,
-                                 V4DecodeResult result,
-                                 const base::FilePath& file_path) {
-  RecordEnumWithAndWithoutSuffix(base_metric + kDecodeAdditions, result,
-                                 DECODE_RESULT_MAX, file_path);
-}
-
-void RecordDecodeRemovalsResult(const std::string& base_metric,
-                                V4DecodeResult result,
-                                const base::FilePath& file_path) {
-  RecordEnumWithAndWithoutSuffix(base_metric + kDecodeRemovals, result,
-                                 DECODE_RESULT_MAX, file_path);
 }
 
 void RecordAdditionsHashesCount(const std::string& base_metric,
@@ -256,77 +233,6 @@ class BaseFileOutputStream
   CopyingBaseFileOutputStream stream_;
 };
 
-// A ZeroCopyInputStream that reads from a file using base::File. Any errors
-// during deserialization close the file.
-class BaseFileInputStream : public google::protobuf::io::ZeroCopyInputStream {
- public:
-  // Creates and opens `input_file`.
-  explicit BaseFileInputStream(const base::FilePath& input_file)
-      : stream_(input_file), impl_(&stream_) {}
-  BaseFileInputStream(const BaseFileInputStream&) = delete;
-  BaseFileInputStream& operator=(const BaseFileInputStream&) = delete;
-
-  // Closes the file, if it was still open.
-  ~BaseFileInputStream() override = default;
-
-  // Returns `base::File::FILE_OK` if no error and the file is still open; else
-  // the error that led to closure of the file.
-  base::File::Error GetError() const { return stream_.GetError(); }
-
-  // google::protobuf::io::ZeroCopyInputStream:
-  bool Next(const void** data, int* size) override {
-    return impl_.Next(data, size);
-  }
-  void BackUp(int count) override { return impl_.BackUp(count); }
-  bool Skip(int count) override { return impl_.Skip(count); }
-  int64_t ByteCount() const override { return impl_.ByteCount(); }
-
- private:
-  class CopyingBaseFileInputStream
-      : public google::protobuf::io::CopyingInputStream {
-   public:
-    explicit CopyingBaseFileInputStream(const base::FilePath& input_file)
-        : file_(input_file,
-                base::File::FLAG_OPEN | base::File::FLAG_READ |
-                    base::File::FLAG_WIN_EXCLUSIVE_WRITE |
-                    base::File::FLAG_WIN_SHARE_DELETE) {}
-    CopyingBaseFileInputStream(const CopyingBaseFileInputStream&) = delete;
-    CopyingBaseFileInputStream& operator=(const CopyingBaseFileInputStream&) =
-        delete;
-    ~CopyingBaseFileInputStream() override = default;
-
-    base::File::Error GetError() const { return file_.error_details(); }
-
-    // google::protobuf::io::CopyingInputStream:
-    int Read(void* buffer, int size) override {
-      if (!file_.IsValid()) {
-        return -1;
-      }
-      const std::optional<size_t> bytes_read = file_.ReadAtCurrentPos(
-          UNSAFE_TODO(base::span(reinterpret_cast<uint8_t*>(buffer),
-                                 base::checked_cast<size_t>(size))));
-      if (bytes_read) {
-        return base::checked_cast<int>(*bytes_read);
-      }
-      file_ = base::File(base::File::GetLastFileError());
-      return -1;
-    }
-
-    int Skip(int count) override {
-      if (file_.Seek(base::File::FROM_CURRENT, count) != -1) {
-        return count;
-      }
-      return CopyingInputStream::Skip(count);
-    }
-
-   private:
-    base::File file_;
-  };
-
-  CopyingBaseFileInputStream stream_;
-  google::protobuf::io::CopyingInputStreamAdaptor impl_;
-};
-
 }  // namespace
 
 using ::google::protobuf::RepeatedField;
@@ -355,26 +261,34 @@ void V4Store::Initialize() {
   RecordStoreReadResult(store_read_result);
 }
 
-bool V4Store::HasValidData() {
-  // Record every 256th time (`record_has_valid_data_counter_` is 8-bit).
-  if (++record_has_valid_data_counter_ == 1) {
-    RecordBooleanWithAndWithoutSuffix("SafeBrowsing.V4Store.IsStoreValid",
-                                      has_valid_data_, store_path_);
-  }
-  return has_valid_data_;
+std::string V4Store::GetMetricPrefix() const {
+  return "SafeBrowsing.V4Store";
 }
 
 V4Store::V4Store(const scoped_refptr<base::SequencedTaskRunner>& task_runner,
                  const base::FilePath& store_path,
                  const int64_t old_file_size)
-    : hash_prefix_map_(
-          std::make_unique<HashPrefixMap>(store_path, task_runner)),
-      file_size_(old_file_size),
-      has_valid_data_(false),
-      store_path_(store_path),
-      task_runner_(task_runner) {}
+    : SBStore(task_runner, store_path, old_file_size),
+      hash_prefix_map_(
+          std::make_unique<HashPrefixMap>(store_path, task_runner)) {}
 
 V4Store::~V4Store() = default;
+
+// static
+void V4Store::RecordDecodeAdditionsResult(const std::string& base_metric,
+                                          V4DecodeResult result,
+                                          const base::FilePath& file_path) {
+  RecordEnumWithAndWithoutSuffix(base_metric + kDecodeAdditions, result,
+                                 DECODE_RESULT_MAX, file_path);
+}
+
+// static
+void V4Store::RecordDecodeRemovalsResult(const std::string& base_metric,
+                                         V4DecodeResult result,
+                                         const base::FilePath& file_path) {
+  RecordEnumWithAndWithoutSuffix(base_metric + kDecodeRemovals, result,
+                                 DECODE_RESULT_MAX, file_path);
+}
 
 std::string V4Store::DebugString() const {
   std::string state_base64 = base::Base64Encode(state_);
