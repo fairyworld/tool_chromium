@@ -158,17 +158,16 @@ class MockQueryContextualizer : public contextual_tasks::QueryContextualizer {
       : QueryContextualizer(service, delegate) {}
   ~MockQueryContextualizer() override = default;
 
-  void Contextualize(const TaskIdType& task_id,
-                     const std::string& query_text,
-                     const TabIdList& tabs_to_recontextualize,
-                     const TabIdList& tabs_to_force_contextualize,
-                     IneligibleCallback on_ineligible_callback,
-                     ProcessedCallback on_processed_callback,
-                     ContCallback callback,
-                     bool enable_smart_tab_selection) override {
-    MockContextualize(task_id, query_text, tabs_to_recontextualize,
-                      tabs_to_force_contextualize);
-    std::move(callback).Run(nullptr);
+  void Contextualize(contextual_tasks::QueryContextualizer::ContextualizeParams
+                         params) override {
+    std::vector<contextual_tasks::QueryContextualizer::TabId> force_tabs =
+        params.auto_suggested_chip_tabs;
+    if (force_tabs.empty()) {
+      force_tabs = params.tabs_for_contextual_searchbox_first_turn;
+    }
+    MockContextualize(params.task_id, params.query_text,
+                      params.tabs_to_recontextualize, force_tabs);
+    std::move(params.complete_callback).Run(nullptr);
   }
 
   MOCK_METHOD(void,

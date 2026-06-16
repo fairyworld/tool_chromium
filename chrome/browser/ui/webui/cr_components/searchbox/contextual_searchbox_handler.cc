@@ -1597,24 +1597,24 @@ void ContextualSearchboxHandler::ContextualizeQueryAndOpenUrl(
   MaybeTriggerSmartTabSharingPromo(query_text, web_contents_);
 
   if (query_contextualizer_) {
-    query_contextualizer_->Contextualize(
-        GetTaskId(), query_text, /*tabs_to_recontextualize=*/{},
-        /*tabs_to_force_contextualize=*/{},
-        /*on_ineligible_callback=*/base::DoNothing(),
-        /*on_processed_callback=*/base::DoNothing(),
-        base::BindOnce(
-            [](ContextualSearchboxHandler* self, const std::string& query,
-               WindowOpenDisposition disp,
-               omnibox::ChromeAimEntryPoint entry_point,
-               std::map<std::string, std::string> params, bool voice,
-               base::WeakPtr<contextual_search::ContextualSearchSessionHandle>
-                   handle) {
-              self->ComputeAndOpenQueryUrl(query, disp, entry_point,
-                                           std::move(params), voice);
-            },
-            base::Unretained(this), query_text, disposition, aim_entry_point,
-            std::move(additional_params), is_voice_search),
-        /*enable_smart_tab_selection=*/IsSmartTabSharingActive());
+    contextual_tasks::QueryContextualizer::ContextualizeParams params;
+    params.task_id = GetTaskId();
+    params.query_text = query_text;
+    params.on_ineligible_callback = base::DoNothing();
+    params.on_processed_callback = base::DoNothing();
+    params.complete_callback = base::BindOnce(
+        [](ContextualSearchboxHandler* self, const std::string& query,
+           WindowOpenDisposition disp, omnibox::ChromeAimEntryPoint entry_point,
+           std::map<std::string, std::string> params, bool voice,
+           base::WeakPtr<contextual_search::ContextualSearchSessionHandle>
+               handle) {
+          self->ComputeAndOpenQueryUrl(query, disp, entry_point,
+                                       std::move(params), voice);
+        },
+        base::Unretained(this), query_text, disposition, aim_entry_point,
+        std::move(additional_params), is_voice_search);
+    params.enable_smart_tab_selection = IsSmartTabSharingActive();
+    query_contextualizer_->Contextualize(std::move(params));
     return;
   }
 
