@@ -184,11 +184,11 @@ class ExtensionInstallPolicyServiceTest : public testing::Test {
         mock_user_cloud_policy_store.get());
 
     return std::make_unique<UserCloudPolicyManagerAsh>(
-        profile_, std::move(mock_user_cloud_policy_store),
+        TestingBrowserProcess::GetGlobal()->local_state(), profile_,
+        std::move(mock_user_cloud_policy_store),
         std::move(mock_user_cloud_policy_extension_install_store),
         std::move(cloud_external_data_manager), base::FilePath(),
         UserCloudPolicyManagerAsh::PolicyEnforcement::kPolicyRequired,
-        profile_->GetPrefs(),
         /*policy_refresh_timeout=*/base::TimeDelta(),
         /*fatal_error_callback=*/base::OnceClosure(),
         AccountId::FromUserEmailGaiaId(kEmail, kTestGaiaId),

@@ -12,6 +12,7 @@
 #include "base/files/file_path.h"
 #include "base/functional/bind.h"
 #include "base/memory/raw_ptr.h"
+#include "base/memory/raw_ref.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/scoped_observation.h"
 #include "base/time/time.h"
@@ -101,16 +102,18 @@ class UserCloudPolicyManagerAsh
   //   will be invoked if the system could not load policy from either cache or
   //   the server.
   //
+  // `local_state` must not be null and must outlive this object.
+  //
   // |account_id| is the AccountId associated with the user's session.
   // |task_runner| is the runner for policy refresh tasks.
   UserCloudPolicyManagerAsh(
+      PrefService* local_state,
       Profile* profile,
       std::unique_ptr<CloudPolicyStore> store,
       std::unique_ptr<CloudPolicyStore> extension_install_store,
       std::unique_ptr<CloudExternalDataManager> external_data_manager,
       const base::FilePath& component_policy_cache_path,
       PolicyEnforcement enforcement_type,
-      PrefService* local_state,
       base::TimeDelta policy_refresh_timeout,
       base::OnceClosure fatal_error_callback,
       const AccountId& account_id,
@@ -263,6 +266,9 @@ class UserCloudPolicyManagerAsh
   // Called on profile shutdown.
   void ShutdownRemoteCommands();
 
+  // The pref service to pass to the refresh scheduler on initialization.
+  const raw_ref<PrefService> local_state_;
+
   // Profile associated with the current user.
   const raw_ptr<Profile, DanglingUntriaged> profile_;
 
@@ -292,9 +298,6 @@ class UserCloudPolicyManagerAsh
   // A timer that puts a hard limit on the maximum time to wait for a policy
   // refresh.
   base::OneShotTimer policy_refresh_timeout_;
-
-  // The pref service to pass to the refresh scheduler on initialization.
-  raw_ptr<PrefService> local_state_ = nullptr;
 
   // Used to fetch the policy OAuth token, when necessary. This object holds
   // a callback with an unretained reference to the manager, when it exists.

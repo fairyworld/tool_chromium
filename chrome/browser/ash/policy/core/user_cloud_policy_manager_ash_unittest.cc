@@ -192,8 +192,6 @@ class UserCloudPolicyManagerAshTest : public testing::Test {
     signin_profile_ = TestingProfile::Builder().BuildIncognito(profile_);
     ASSERT_EQ(signin_profile_, ash::ProfileHelper::GetSigninProfile());
 
-    RegisterLocalState(prefs_.registry());
-
     device_management_service_.ScheduleInitialization(0);
     base::RunLoop().RunUntilIdle();
 
@@ -388,7 +386,6 @@ class UserCloudPolicyManagerAshTest : public testing::Test {
   PolicyBundle expected_bundle_;
 
   // Policy infrastructure.
-  TestingPrefServiceSimple prefs_;
   MockConfigurationPolicyObserver observer_;
   testing::StrictMock<MockJobCreationHandler> job_creation_handler_;
   FakeDeviceManagementService device_management_service_{
@@ -425,12 +422,13 @@ class UserCloudPolicyManagerAshTest : public testing::Test {
     external_data_manager_->SetPolicyStore(store_);
     const user_manager::User* active_user = user_manager_->GetActiveUser();
     manager_ = std::make_unique<UserCloudPolicyManagerAsh>(
+        TestingBrowserProcess::GetGlobal()->local_state(),
         ash::ProfileHelper::Get()->GetProfileByUser(active_user),
         std::move(store),
         /*extension_install_store=*/nullptr,
         base::WrapUnique<MockCloudExternalDataManager>(
             external_data_manager_.get()),
-        base::FilePath(), enforcement_type, &prefs_, fetch_timeout,
+        base::FilePath(), enforcement_type, fetch_timeout,
         base::BindOnce(&UserCloudPolicyManagerAshTest::OnFatalErrorEncountered,
                        base::Unretained(this)),
         active_user->GetAccountId(), task_runner_);

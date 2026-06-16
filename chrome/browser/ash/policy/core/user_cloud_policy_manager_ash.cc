@@ -10,6 +10,7 @@
 
 #include "ash/constants/ash_features.h"
 #include "ash/constants/ash_switches.h"
+#include "base/check_deref.h"
 #include "base/command_line.h"
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
@@ -142,13 +143,13 @@ bool IsSkyVaultTTEnabled() {
 }  // namespace
 
 UserCloudPolicyManagerAsh::UserCloudPolicyManagerAsh(
+    PrefService* local_state,
     Profile* profile,
     std::unique_ptr<CloudPolicyStore> store,
     std::unique_ptr<CloudPolicyStore> extension_install_store,
     std::unique_ptr<CloudExternalDataManager> external_data_manager,
     const base::FilePath& component_policy_cache_path,
     PolicyEnforcement enforcement_type,
-    PrefService* local_state,
     base::TimeDelta policy_refresh_timeout,
     base::OnceClosure fatal_error_callback,
     const AccountId& account_id,
@@ -160,6 +161,7 @@ UserCloudPolicyManagerAsh::UserCloudPolicyManagerAsh(
           std::move(extension_install_store),
           task_runner,
           base::BindRepeating(content::GetNetworkConnectionTracker)),
+      local_state_(CHECK_DEREF(local_state)),
       profile_(profile),
       external_data_manager_(std::move(external_data_manager)),
       component_policy_cache_path_(component_policy_cache_path),
@@ -167,11 +169,9 @@ UserCloudPolicyManagerAsh::UserCloudPolicyManagerAsh(
                                     PolicyEnforcement::kServerCheckRequired ||
                                 !policy_refresh_timeout.is_zero()),
       enforcement_type_(enforcement_type),
-      local_state_(local_state),
       account_id_(account_id),
       fatal_error_callback_(std::move(fatal_error_callback)) {
   DCHECK(profile_);
-  DCHECK(local_state_);
 
   // If a refresh timeout was specified, set a timer to call us back.
   if (!policy_refresh_timeout.is_zero()) {
@@ -538,7 +538,7 @@ void UserCloudPolicyManagerAsh::OnStoreLoaded(
 
 void UserCloudPolicyManagerAsh::SetPolicyRequired(bool policy_required) {
   auto* user_manager = user_manager::UserManager::Get();
-  user_manager::KnownUser known_user(local_state_);
+  user_manager::KnownUser known_user(&local_state_.get());
   known_user.SetProfileRequiresPolicy(
       account_id_,
       policy_required ? user_manager::ProfileRequiresPolicy::kPolicyRequired
@@ -717,7 +717,7 @@ void UserCloudPolicyManagerAsh::StartRefreshSchedulerIfReady() {
     return;  // Still waiting for the initial, blocking fetch.
   }
 
-  if (!service() || !local_state_) {
+  if (!service()) {
     return;  // Not connected.
   }
 
@@ -736,7 +736,7 @@ void UserCloudPolicyManagerAsh::StartRefreshSchedulerIfReady() {
   }
 
   core()->StartRefreshScheduler();
-  core()->TrackRefreshDelayPref(local_state_,
+  core()->TrackRefreshDelayPref(&local_state_.get(),
                                 policy_prefs::kUserPolicyRefreshRate);
 }
 
