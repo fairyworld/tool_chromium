@@ -297,7 +297,6 @@ NSString* IOSChromeSavePasswordInfoBarDelegate::GetSubtitle() const {
         base::UTF8ToUTF16(*account_to_store_password_));
   }
 
-  // TODO(crbug.com/464228247): Check if it's possible to reach this case.
   return l10n_util::GetNSString(IDS_IOS_PASSWORD_MANAGER_LOCAL_SAVE_SUBTITLE);
 }
 
@@ -490,7 +489,6 @@ bool IOSChromeSavePasswordInfoBarDelegate::MaybeHandlePasswordError() {
 
   switch (GetPasswordStoreActionableError(profile_store_.get(),
                                           account_store_.get())) {
-    // TODO(crbug.com/464228247): Verify if the logic is correct for all errors.
     case password_manager::ActionableError::kNoError:
     case password_manager::ActionableError::kInactionable:
     case password_manager::ActionableError::kInactionableTemporaryError:
