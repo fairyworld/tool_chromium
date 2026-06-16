@@ -283,21 +283,21 @@ TEST_F(HistoryServiceTest, QueryUrlIds) {
   const URLID id_b = query_url_result_.row.id();
   ASSERT_NE(0, id_b);
 
-  base::test::TestFuture<std::vector<URLID>> future;
+  base::test::TestFuture<std::optional<std::vector<URLID>>> future;
   history_service_->QueryUrlIds({url_a, url_unknown, url_b},
                                 future.GetCallback(), &tracker_);
-  const std::vector<URLID> ids = future.Take();
-  ASSERT_EQ(3u, ids.size());
-  EXPECT_EQ(id_a, ids[0]);
-  EXPECT_EQ(0, ids[1]);
-  EXPECT_EQ(id_b, ids[2]);
+  const std::optional<std::vector<URLID>> ids = future.Take();
+  ASSERT_TRUE(ids.has_value());
+  EXPECT_THAT(*ids, testing::ElementsAre(id_a, 0, id_b));
 }
 
 TEST_F(HistoryServiceTest, QueryUrlIdsEmpty) {
   ASSERT_TRUE(history_service_.get());
-  base::test::TestFuture<std::vector<URLID>> future;
+  base::test::TestFuture<std::optional<std::vector<URLID>>> future;
   history_service_->QueryUrlIds({}, future.GetCallback(), &tracker_);
-  EXPECT_TRUE(future.Take().empty());
+  const std::optional<std::vector<URLID>> ids = future.Take();
+  ASSERT_TRUE(ids.has_value());
+  EXPECT_THAT(*ids, testing::IsEmpty());
 }
 
 TEST_F(HistoryServiceTest, AddPage) {

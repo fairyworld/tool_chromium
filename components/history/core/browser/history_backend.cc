@@ -10,6 +10,7 @@
 #include <limits>
 #include <map>
 #include <memory>
+#include <optional>
 #include <set>
 #include <utility>
 #include <vector>
@@ -38,6 +39,7 @@
 #include "base/trace_event/trace_event.h"
 #include "base/trace_event/typed_macros.h"
 #include "base/tracing/protos/chrome_track_event.pbzero.h"
+#include "base/types/zip.h"
 #include "build/build_config.h"
 #include "build/ios_buildflags.h"
 #include "components/favicon/core/favicon_backend.h"
@@ -2061,13 +2063,14 @@ QueryURLResult HistoryBackend::QueryURL(const GURL& url) {
   return result;
 }
 
-std::vector<URLID> HistoryBackend::QueryUrlIds(const std::vector<GURL>& urls) {
-  std::vector<URLID> result(urls.size(), 0);
+std::optional<std::vector<URLID>> HistoryBackend::QueryUrlIds(
+    const std::vector<GURL>& urls) {
   if (!db_) {
-    return result;
+    return std::nullopt;
   }
-  for (size_t i = 0; i < urls.size(); ++i) {
-    result[i] = db_->GetRowForURL(urls[i], nullptr);
+  std::vector<URLID> result(urls.size(), 0);
+  for (auto [url, id] : base::zip(urls, result)) {
+    id = db_->GetRowForURL(url, nullptr);
   }
   return result;
 }
