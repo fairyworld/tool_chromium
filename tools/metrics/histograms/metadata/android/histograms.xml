@@ -7556,112 +7556,6 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="Android.WebView.DarkMode.ForceDarkBehavior"
-    enum="WebViewForceDarkBehavior" expires_after="2023-06-01">
-  <owner>michaelbai@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Records WebView force dark behavior settings on each main frame navigation
-    entry committed.
-  </summary>
-</histogram>
-
-<histogram name="Android.WebView.DarkMode.InDarkMode" enum="Boolean"
-    expires_after="2023-06-01">
-  <owner>michaelbai@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Records if WebView applies the algorithmic darkening on each main frame
-    navigation entry committed.
-  </summary>
-</histogram>
-
-<histogram name="Android.WebView.DarkMode.InDarkModeVsNightMode"
-    enum="WebViewInDarkModeVsNightMode" expires_after="2023-06-01">
-  <owner>michaelbai@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Records if the application is in the night mode and if WebView applies the
-    algorithmic darkening on each main frame navigation entry committed.
-  </summary>
-</histogram>
-
-<histogram name="Android.WebView.DarkMode.LightTheme" enum="LightTheme"
-    expires_after="2023-06-01">
-  <owner>michaelbai@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Records if the application has light theme on each main frame navigation
-    entry committed.
-  </summary>
-</histogram>
-
-<histogram name="Android.WebView.DarkMode.NightMode" enum="NightMode"
-    expires_after="2023-06-01">
-  <owner>michaelbai@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Records application's night mode bit related to
-    android.content.res.Configuration.UI_MODE_NIGHT_MASK on each main frame
-    navigation entry committed.
-  </summary>
-</histogram>
-
-<histogram name="Android.WebView.DarkMode.NightModeVsLightTheme"
-    enum="WebViewNightModeVsLightTheme" expires_after="2023-06-01">
-  <owner>michaelbai@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Records if application is in night mode and if it has light theme on each
-    main frame navigation entry committed.
-  </summary>
-</histogram>
-
-<histogram name="Android.WebView.DarkMode.PageDarkenedAccordingToAppTheme"
-    enum="Boolean" expires_after="2023-06-01">
-  <owner>michaelbai@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Records WebView is darkened or not when the prefers-color-scheme is set to
-    dark according to the app theme not FORCE_DARK_AUTO setting. This histogram
-    is recorded on main frame's color scheme inferred for every committed
-    navigation.
-  </summary>
-</histogram>
-
-<histogram name="Android.WebView.DarkMode.PrefersDarkFromTheme"
-    enum="BooleanYesNo" expires_after="2023-06-01">
-  <owner>michaelbai@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Records if WebView shall set prefers-color-scheme to dark according to app's
-    theme after FORCE_DARK_AUTO fails. It is recorded on each main frame
-    navigation entry committed.
-  </summary>
-</histogram>
-
-<histogram name="Android.WebView.DarkMode.PrimaryTextLuminanceVsLightTheme"
-    enum="WebViewPrimaryTextLuminanceVsLightTheme" expires_after="2023-06-01">
-  <owner>michaelbai@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Records if the application has light theme and if its theme's
-    textColorPrimary attribute is light on each main frame navigation entry
-    committed.
-  </summary>
-</histogram>
-
-<histogram name="Android.WebView.DarkMode.PrimaryTextLuminanceVsNightMode"
-    enum="WebViewPrimaryTextLuminanceVsNightMode" expires_after="2023-06-01">
-  <owner>michaelbai@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Records if the application is in night mode and if its theme's
-    textColorPrimary attribute is light on each main frame navigation entry
-    committed.
-  </summary>
-</histogram>
-
 <histogram name="Android.WebView.DevUi.AppLaunch" enum="Boolean"
     expires_after="2026-07-15">
   <owner>ntfschr@chromium.org</owner>
@@ -7841,26 +7735,6 @@ chromium-metrics-reviews@google.com.
     enforced.
 
     Only logged for Android WebView.
-  </summary>
-</histogram>
-
-<histogram name="Android.WebView.ForceDarkBehavior"
-    enum="WebViewForceDarkBehavior" expires_after="2023-06-01">
-  <owner>peter@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Records strategy to be used by force dark in WebView when
-    setForceDarkBehavior API is called by the embedding application.
-  </summary>
-</histogram>
-
-<histogram name="Android.WebView.ForceDarkMode" enum="WebViewForceDarkMode"
-    expires_after="2023-06-01">
-  <owner>peter@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Records WebView's force dark setting and the UI's night mode when
-    setForceDark API is called by the embedding application.
   </summary>
 </histogram>
 
