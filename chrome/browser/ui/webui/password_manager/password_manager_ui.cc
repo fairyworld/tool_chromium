@@ -684,12 +684,9 @@ content::WebUIDataSource* CreateAndAddPasswordsUIHTMLSource(
       base::FeatureList::IsEnabled(
           password_manager::features::kEnablePasswordManagerMojoApi));
 
-  bool passwordUploadUiUpdateEnabled = false;
-#if !BUILDFLAG(IS_CHROMEOS)
-  passwordUploadUiUpdateEnabled =
-      base::FeatureList::IsEnabled(switches::kPasswordUploadUiUpdate);
-#endif  // !BUILDFLAG(IS_CHROMEOS)
-  source->AddBoolean("passwordUploadUiUpdate", passwordUploadUiUpdateEnabled);
+  source->AddBoolean(
+      "passwordUploadUiUpdate",
+      base::FeatureList::IsEnabled(switches::kPasswordUploadUiUpdate));
 
   source->AddString("webuiRefresh2026", features::IsWebuiRefresh2026Enabled()
                                             ? "webui-refresh-2026"
