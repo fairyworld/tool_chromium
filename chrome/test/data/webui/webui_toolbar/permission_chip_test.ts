@@ -150,7 +150,7 @@ suite('PermissionChipTest', function() {
       accessibilityName: 'Camera',
       tooltip: 'Camera in use',
       isVisible: true,
-      iconName: 'kVideocamChromeRefreshIcon',
+      iconName: 'kVideocamChromeRefreshOldIcon',
       theme: PermissionChipTheme.kNormalVisibility,
       promptStyle: PermissionPromptStyle.kChip,
       userDecision: PermissionAction.kGranted,
