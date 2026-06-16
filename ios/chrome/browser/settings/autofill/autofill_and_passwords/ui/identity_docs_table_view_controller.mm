@@ -171,7 +171,7 @@ BOOL ContainsLocalEntity(NSArray<TableViewItem*>* items) {
     }
     UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
     if (cell) {
-      [self updateOpacityAndInteractionForCell:cell atIndexPath:indexPath];
+      [self updateOpacityForCell:cell atIndexPath:indexPath];
     }
   }
 }
@@ -303,6 +303,15 @@ BOOL ContainsLocalEntity(NSArray<TableViewItem*>* items) {
   return ![self isServerWalletItemAtIndexPath:indexPath];
 }
 
+- (NSIndexPath*)tableView:(UITableView*)tableView
+    willSelectRowAtIndexPath:(NSIndexPath*)indexPath {
+  if (self.tableView.editing &&
+      [self isServerWalletItemAtIndexPath:indexPath]) {
+    return nil;
+  }
+  return [super tableView:tableView willSelectRowAtIndexPath:indexPath];
+}
+
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
   [super setEditing:editing animated:animated];
   if (_settingsAreDismissed) {
@@ -374,7 +383,7 @@ BOOL ContainsLocalEntity(NSArray<TableViewItem*>* items) {
     selectedBackgroundView.backgroundColor = selectedColor;
     cell.selectedBackgroundView = selectedBackgroundView;
   }
-  [self updateOpacityAndInteractionForCell:cell atIndexPath:indexPath];
+  [self updateOpacityForCell:cell atIndexPath:indexPath];
 
   return cell;
 }
@@ -410,15 +419,14 @@ BOOL ContainsLocalEntity(NSArray<TableViewItem*>* items) {
   return NO;
 }
 
-// Updates the opacity and interaction state of the given `cell` based on
-// whether it represents a server wallet entity and the table's editing state.
-- (void)updateOpacityAndInteractionForCell:(UITableViewCell*)cell
-                               atIndexPath:(NSIndexPath*)indexPath {
+// Updates the opacity of the given `cell` based on whether it represents a
+// server wallet entity and the table's editing state.
+- (void)updateOpacityForCell:(UITableViewCell*)cell
+                 atIndexPath:(NSIndexPath*)indexPath {
   BOOL shouldDisable =
       [self isServerWalletItemAtIndexPath:indexPath] && self.tableView.editing;
 
   cell.contentView.alpha = shouldDisable ? 0.5 : 1.0;
-  cell.userInteractionEnabled = !shouldDisable;
 }
 
 #pragma mark - SettingsControllerProtocol
