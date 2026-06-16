@@ -8843,17 +8843,6 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="Android.WebView.ScheduleOnVizAndBlockTime"
-    units="microseconds" expires_after="2024-11-20">
-  <owner>cduvall@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Records the total time spent running a blocking task in
-    TaskQueueWebView::ScheduleOnVizAndBlock(). This is recorded only on devices
-    that support high resolution timers.
-  </summary>
-</histogram>
-
 <histogram name="Android.WebView.SecureCookieAction" enum="SecureCookieAction"
     expires_after="2026-11-29">
   <owner>ntfschr@chromium.org</owner>
@@ -9075,28 +9064,6 @@ chromium-metrics-reviews@google.com.
     `checkNeedsPost` is called by various WebView APIs.
 
     Only recorded on Android WebView.
-  </summary>
-</histogram>
-
-<histogram
-    name="Android.WebView.Startup.ChromiumInitTime.AsyncToSyncSwitchReason2"
-    enum="WebViewStartupCallSite" expires_after="2026-03-01">
-  <owner>colibie@google.com</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    For asynchronous initialization, this metric tells us the callsite that
-    caused us to switch from a previously scheduled or running async startup, to
-    a synchronous startup.
-
-    This metric is only recorded for async startup and upon successful
-    completion of the initialization process.
-
-    The older version of this histogram
-    (Android.WebView.Startup.ChromiumInitTime.AsyncToSyncSwitchReason) used a
-    less granular callsite enum. If any WebView instance methods or static
-    method was the callsite, we couldn't know which exact method it was since it
-    was grouped together as the same callsite. This issue is fixed in this
-    histogram.
   </summary>
 </histogram>
 
@@ -9638,16 +9605,6 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="Android.WebView.TextSelectionMenuOrdering"
-    enum="AndroidWebViewTextSelectionMenuOrdering" expires_after="2024-12-31">
-  <owner>peconn@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Counts the number of times Samsung specific text selection menu item
-    ordering is used. Recorded when a WebView is initialized.
-  </summary>
-</histogram>
-
 <histogram name="Android.WebView.TracingInit.BackgroundInitMainThreadWaitTime"
     units="ms" expires_after="2027-04-01">
   <owner>pbirk@chromium.org</owner>
@@ -9703,16 +9660,6 @@ chromium-metrics-reviews@google.com.
     cases. This give us an idea to understand better how the user-agent metadata
     overrides and user-agent overrides work. This is recorded every time webview
     updates the user-agent or user-agent medatadata for the request.
-  </summary>
-</histogram>
-
-<histogram name="Android.WebView.VariationsHeaderLength" units="bytes"
-    expires_after="2023-07-22">
-  <owner>cduvall@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Records the length of the WebView variations header. Recorded every time
-    WebViewCompat.getVariationsHeader() is called.
   </summary>
 </histogram>
 
@@ -9838,17 +9785,6 @@ chromium-metrics-reviews@google.com.
     <variant name="javascript"/>
     <variant name="unknown"/>
   </token>
-</histogram>
-
-<histogram name="Android.WebView.VizCompositorRunnerPostTaskBlockTime"
-    units="microseconds" expires_after="2025-07-27">
-  <owner>cduvall@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Records the total time spent running a blocking task in
-    VizCompositorThreadRunnerWebView::PostTaskAndBlock(). This is recorded only
-    on devices that support high resolution timers.
-  </summary>
 </histogram>
 
 <histogram name="Android.WebView.WarmUpSpareRenderer.Duration" units="ms"
