@@ -37,6 +37,7 @@
 #include "chrome/browser/ui/layout_constants.h"
 #include "chrome/browser/ui/tabs/split_tab_util.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
+#include "chrome/browser/ui/toolbar_controller_util.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/view_ids.h"
@@ -1217,13 +1218,14 @@ gfx::Size WebUIToolbarWebView::ComputeLayout(
   // first. Unlike the views code, this code does not currently allow the split
   // tab button to overflow, due to issues with relative priorities.
   //
-  // TODO(crbug.com/517885636): Allow the split tab button to be hidden..
+  // TODO(crbug.com/517885636): Allow the split tab button to be hidden.
 
+  bool allow_overflow = !ToolbarControllerUtil::PreventOverflow();
   if (features::IsWebUIBackForwardButtonEnabled() &&
       forward_control_.IsPinned()) {
     int next_button_width = NextButtonWidth(size, gap, button_count);
     bool is_forward_button_overflowed =
-        available_width.is_bounded() &&
+        allow_overflow && available_width.is_bounded() &&
         next_button_width + width > available_width.value();
     if (!is_forward_button_overflowed) {
       ++button_count;
@@ -1238,7 +1240,7 @@ gfx::Size WebUIToolbarWebView::ComputeLayout(
   if (features::IsWebUIHomeButtonEnabled() && home_control_.IsPinned()) {
     int next_button_width = NextButtonWidth(size, gap, button_count);
     bool is_home_button_overflowed =
-        available_width.is_bounded() &&
+        allow_overflow && available_width.is_bounded() &&
         next_button_width + width > available_width.value();
     if (!is_home_button_overflowed) {
       ++button_count;
