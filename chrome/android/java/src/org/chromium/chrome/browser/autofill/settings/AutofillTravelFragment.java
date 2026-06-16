@@ -42,7 +42,9 @@ public class AutofillTravelFragment extends ChromeBaseSettingsFragment
                     PREF_OPT_IN_TOGGLE,
                     R.string.autofill_travel_opt_in_toggle_label,
                     R.string.autofill_travel_opt_in_toggle_sub_label,
-                    Pref.AUTOFILL_AI_TRAVEL_ENTITIES_ENABLED);
+                    Pref.AUTOFILL_AI_TRAVEL_ENTITIES_ENABLED,
+                    /* isPersonalContextSupported= */ true);
+
     private static final Set<Integer> TRAVEL_TYPES =
             Set.of(
                     EntityTypeName.FLIGHT_RESERVATION,

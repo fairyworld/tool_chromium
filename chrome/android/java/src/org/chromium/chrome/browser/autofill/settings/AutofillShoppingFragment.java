@@ -42,7 +42,8 @@ public class AutofillShoppingFragment extends ChromeBaseSettingsFragment
                     PREF_OPT_IN_TOGGLE,
                     R.string.autofill_shopping_opt_in_toggle_label,
                     R.string.autofill_shopping_opt_in_toggle_sub_label,
-                    Pref.AUTOFILL_AI_SHOPPING_ENTITIES_ENABLED);
+                    Pref.AUTOFILL_AI_SHOPPING_ENTITIES_ENABLED,
+                    /* isPersonalContextSupported= */ true);
 
     private static final Set<Integer> SHOPPING_TYPES =
             Set.of(EntityTypeName.ORDER, EntityTypeName.SHIPMENT);
