@@ -640,6 +640,44 @@ IN_PROC_BROWSER_TEST_F(GlicInvokeBrowserTest,
             GlicInvokeError::kAdditionalContextFailedCopyPolicy);
   EXPECT_FALSE(GetInstanceForTab(tab));
 }
+
+IN_PROC_BROWSER_TEST_F(GlicInvokeBrowserTest, InvokeWithInvalidContextData) {
+  tabs::TabInterface* tab = CreateAndActivateTab(GURL("about:blank"));
+  ASSERT_TRUE(content::NavigateToURL(tab->GetContents(), GURL("about:blank")));
+
+  // Create mock AdditionalContext with an invalid mime_type.
+  // ExtractThumbnailData() in glic_invoke_task.cc strictly checks for
+  // "image/png", so "image/jpeg" will cause thumbnail_data to be empty.
+  auto context_mojom = mojom::AdditionalContext::New();
+  context_mojom->source = mojom::AdditionalContextSource::kShareContextMenu;
+  context_mojom->name = "https://example.com/image.png";
+
+  auto context_data = mojom::ContextData::New();
+  context_data->mime_type = "image/jpeg";
+  context_data->data =
+      mojo_base::BigBuffer(std::vector<uint8_t>{0xFF, 0xD8, 0xFF, 0xE0});
+
+  context_mojom->parts.push_back(
+      mojom::AdditionalContextPart::NewData(std::move(context_data)));
+
+  base::test::TestFuture<GlicInvokeError> error_future;
+  GlicInvokeOptions options(glic::Target(*tab),
+                            mojom::InvocationSource::kOsButton);
+  options.on_error = error_future.GetCallback();
+
+  content::RenderFrameHost* rfh = tab->GetContents()->GetPrimaryMainFrame();
+  ASSERT_TRUE(rfh);
+
+  // Trigger clipboard policy check.
+  options.additional_context = AdditionalTabContext(
+      std::move(context_mojom), rfh->GetGlobalId(), PolicyCheck::kClipboard);
+
+  coordinator().Invoke(std::move(options));
+
+  EXPECT_EQ(error_future.Get(),
+            GlicInvokeError::kAdditionalContextNoClipboardMetadata);
+  EXPECT_TRUE(GetInstanceForTab(tab));
+}
 IN_PROC_BROWSER_TEST_F(GlicInvokeBrowserTest, InvokeWithTabsToPin) {
   tabs::TabInterface* tab1 = GetTabListInterface()->GetActiveTab();
   tabs::TabInterface* tab2 = CreateUserInitiatedTab(GURL("about:blank"));
