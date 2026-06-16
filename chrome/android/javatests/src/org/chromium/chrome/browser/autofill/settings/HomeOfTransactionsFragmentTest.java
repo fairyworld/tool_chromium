@@ -51,6 +51,7 @@ import org.chromium.base.test.util.Features.DisableFeatures;
 import org.chromium.base.test.util.Features.EnableFeatures;
 import org.chromium.base.test.util.HistogramWatcher;
 import org.chromium.base.test.util.PayloadCallbackHelper;
+import org.chromium.base.test.util.UserActionTester;
 import org.chromium.chrome.R;
 import org.chromium.chrome.browser.autofill.autofill_ai.EntityDataManager;
 import org.chromium.chrome.browser.autofill.autofill_ai.EntityDataManagerFactory;
@@ -604,11 +605,23 @@ public class HomeOfTransactionsFragmentTest {
         ChromeFeatureList.AUTOFILL_AI_WITH_DATA_SCHEMA
     })
     public void testClickPersonalContextLaunchesPersonalContext() {
-        mSettingsActivityTestRule.startSettingsActivity();
+        var userActionTester = new UserActionTester();
+        try {
+            mSettingsActivityTestRule.startSettingsActivity();
 
-        testItemClick(
-                R.string.personal_context_autofill_settings_title_android,
-                AutofillPersonalContextFragment.class);
+            testItemClick(
+                    R.string.personal_context_autofill_settings_title_android,
+                    AutofillPersonalContextFragment.class);
+
+            assertTrue(
+                    userActionTester
+                            .getActions()
+                            .contains(
+                                    AutofillPersonalContextFragment
+                                            .ACTION_ENTRY_FROM_AUTOFILL_AND_PASSWORDS));
+        } finally {
+            userActionTester.tearDown();
+        }
     }
 
     @Test

@@ -14,6 +14,7 @@ import androidx.lifecycle.Lifecycle;
 import androidx.preference.Preference;
 
 import org.chromium.base.metrics.RecordHistogram;
+import org.chromium.base.metrics.RecordUserAction;
 import org.chromium.base.supplier.MonotonicObservableSupplier;
 import org.chromium.base.supplier.ObservableSuppliers;
 import org.chromium.base.supplier.OneshotSupplier;
@@ -164,6 +165,9 @@ public class HomeOfTransactionsFragment extends ChromeBaseSettingsFragment {
                 AutofillPersonalContextFragment.shouldShowPersonalContext(getProfile()));
         personalContextPref.setOnPreferenceClickListener(
                 preference -> {
+                    RecordUserAction.record(
+                            AutofillPersonalContextFragment
+                                    .ACTION_ENTRY_FROM_AUTOFILL_AND_PASSWORDS);
                     SettingsNavigationHelper.showAutofillPersonalContextSettings(getActivity());
                     return true;
                 });

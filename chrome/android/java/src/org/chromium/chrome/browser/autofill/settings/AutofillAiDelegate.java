@@ -15,6 +15,7 @@ import androidx.preference.PreferenceScreen;
 
 import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.TimeUtils;
+import org.chromium.base.metrics.RecordUserAction;
 import org.chromium.base.task.PostTask;
 import org.chromium.base.task.TaskTraits;
 import org.chromium.build.annotations.NullMarked;
@@ -79,18 +80,21 @@ public class AutofillAiDelegate {
         public final int subLabelRes;
         public final String prefName;
         public final boolean isPersonalContextSupported;
+        public final @Nullable String personalContextUserAction;
 
         ToggleConfig(
                 String key,
                 int labelRes,
                 int subLabelRes,
                 String prefName,
-                boolean isPersonalContextSupported) {
+                boolean isPersonalContextSupported,
+                @Nullable String personalContextUserAction) {
             this.key = key;
             this.labelRes = labelRes;
             this.subLabelRes = subLabelRes;
             this.prefName = prefName;
             this.isPersonalContextSupported = isPersonalContextSupported;
+            this.personalContextUserAction = personalContextUserAction;
         }
     }
 
@@ -309,6 +313,10 @@ public class AutofillAiDelegate {
 
             personalContextPref.setOnPreferenceClickListener(
                     preference -> {
+                        if (mToggleConfig.personalContextUserAction != null) {
+                            RecordUserAction.record(mToggleConfig.personalContextUserAction);
+                        }
+
                         SettingsNavigationHelper.showAutofillPersonalContextSettings(
                                 mFragment.requireActivity());
                         return true;

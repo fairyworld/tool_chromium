@@ -52,6 +52,7 @@ import org.chromium.base.test.util.Criteria;
 import org.chromium.base.test.util.CriteriaHelper;
 import org.chromium.base.test.util.Features.DisableFeatures;
 import org.chromium.base.test.util.Features.EnableFeatures;
+import org.chromium.base.test.util.UserActionTester;
 import org.chromium.chrome.R;
 import org.chromium.chrome.browser.autofill.autofill_ai.EntityDataManager;
 import org.chromium.chrome.browser.autofill.autofill_ai.EntityDataManagerFactory;
@@ -433,12 +434,21 @@ public class AutofillShoppingFragmentTest {
         when(mEntityDataManager.isPersonalContextPreferenceVisible()).thenReturn(true);
         mSettingsActivityTestRule.startSettingsActivity();
 
-        SettingsNavigationFactory.setInstanceForTesting(mSettingsNavigation);
-        onView(withText(R.string.personal_context_autofill_settings_title_android))
-                .perform(scrollTo(), click());
+        var userActionTester = new UserActionTester();
+        try {
+            SettingsNavigationFactory.setInstanceForTesting(mSettingsNavigation);
+            onView(withText(R.string.personal_context_autofill_settings_title_android))
+                    .perform(scrollTo(), click());
 
-        verify(mSettingsNavigation)
-                .startSettings(any(), eq(AutofillPersonalContextFragment.class), any(), eq(true));
+            verify(mSettingsNavigation)
+                    .startSettings(
+                            any(), eq(AutofillPersonalContextFragment.class), any(), eq(true));
+
+            assertThat(userActionTester.getActions())
+                    .contains(AutofillPersonalContextFragment.ACTION_ENTRY_FROM_SHOPPING);
+        } finally {
+            userActionTester.tearDown();
+        }
     }
 
     private void setShoppingTogglePreference(boolean value) {
