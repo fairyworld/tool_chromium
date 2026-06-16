@@ -427,6 +427,10 @@ extern const base::FeatureParam<int> kSafeBrowsingDailyPhishingReportsLimitESB;
 BASE_DECLARE_FEATURE(kSafeBrowsingSyncCheckerCheckAllowlist);
 #endif
 
+// Allows Safe Browsing Real-Time URL lookups to wait for DNS resolution of the
+// main frame URL.
+BASE_DECLARE_FEATURE(kSafeBrowsingWaitForDnsForRealTimeLookup);
+
 // Enables saving gaia password hash from the Profile Picker sign-in flow.
 BASE_DECLARE_FEATURE(kSavePasswordHashFromProfilePicker);
 

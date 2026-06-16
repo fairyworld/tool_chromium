@@ -417,6 +417,9 @@ BASE_FEATURE(kSafeBrowsingSyncCheckerCheckAllowlist,
              base::FEATURE_DISABLED_BY_DEFAULT);
 #endif
 
+BASE_FEATURE(kSafeBrowsingWaitForDnsForRealTimeLookup,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
 BASE_FEATURE(kSavePasswordHashFromProfilePicker,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
@@ -490,6 +493,7 @@ base::ListValue GetFeatureStatusList() {
       &kNotificationTelemetrySwb,
       &kProactivePasswordProtection,
       &kReportNotificationContentDetectionData,
+      &kSafeBrowsingWaitForDnsForRealTimeLookup,
       &kShowManualNotificationRevocationsSafetyHub,
       &kShowWarningsForSuspiciousNotifications,
       &kSuspiciousSiteTriggerQuotaFeature,

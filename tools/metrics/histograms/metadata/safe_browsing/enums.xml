@@ -329,6 +329,16 @@ chromium-metrics-reviews@google.com.
   <int value="1" label="URL was classified as unsafe."/>
 </enum>
 
+<!-- LINT.IfChange(SafeBrowsingRtDnsResolutionResult) -->
+
+<enum name="SafeBrowsingDnsResolutionResult">
+  <int value="0" label="Success"/>
+  <int value="1" label="Timeout"/>
+  <int value="2" label="Error"/>
+</enum>
+
+<!-- LINT.ThenChange(//components/safe_browsing/core/browser/realtime/url_lookup_service_base.h:DnsResolutionResult) -->
+
 <enum name="SafeBrowsingEnhancedProtegoPingType">
   <int value="0" label="UnknownType"/>
   <int value="1" label="None"/>

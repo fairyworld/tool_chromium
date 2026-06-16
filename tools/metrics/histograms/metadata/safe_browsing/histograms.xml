@@ -2878,6 +2878,36 @@ useful for Chirp alerts (go/crca-alerts). -->
   </summary>
 </histogram>
 
+<histogram name="SafeBrowsing.RT.DnsResolution.Attempted" enum="Boolean"
+    expires_after="2027-06-04">
+  <owner>bcl@google.com</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Records whether a DNS resolution was attempted for the main frame URL during
+    a real-time Safe Browsing lookup.
+  </summary>
+</histogram>
+
+<histogram name="SafeBrowsing.RT.DnsResolution.Result"
+    enum="SafeBrowsingDnsResolutionResult" expires_after="2027-06-04">
+  <owner>bcl@google.com</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Records the result of the DNS resolution for the main frame URL during a
+    real-time Safe Browsing lookup.
+  </summary>
+</histogram>
+
+<histogram name="SafeBrowsing.RT.DnsResolution.Time" units="ms"
+    expires_after="2027-06-04">
+  <owner>bcl@google.com</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Records the time taken to resolve the DNS for the main frame URL during a
+    real-time Safe Browsing lookup.
+  </summary>
+</histogram>
+
 <histogram name="SafeBrowsing.RT.EnterpriseRealTimePolicyEnabled.HasDmToken"
     enum="BooleanHasToken" expires_after="2026-11-29">
   <owner>thefrog@chromium.org</owner>
@@ -3161,6 +3191,16 @@ useful for Chirp alerts (go/crca-alerts). -->
     {UserCategory}
   </summary>
   <token key="UserCategory" variants="RealTimeUrlCheckUserCategory"/>
+</histogram>
+
+<histogram name="SafeBrowsing.RT.Request.ReferrerIpAddressCount" units="count"
+    expires_after="2027-06-04">
+  <owner>bcl@google.com</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Records the number of IP addresses contained in a referrer chain entry in
+    the real-time lookup request. Logged for each referrer chain entry.
+  </summary>
 </histogram>
 
 <histogram name="SafeBrowsing.RT.Request.Size{UserCategory}" units="bytes"
