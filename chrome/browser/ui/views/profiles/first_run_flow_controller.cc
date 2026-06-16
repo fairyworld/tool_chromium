@@ -418,6 +418,8 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
     std::vector<std::unique_ptr<FeatureShowcaseStepEligibilityChecker>>
         checkers;
     // Register checkers in order of priority (highest first).
+    checkers.push_back(
+        std::make_unique<DefaultBrowserStepEligibilityChecker>());
     checkers.push_back(std::make_unique<GoogleLensStepEligibilityChecker>());
     checkers.push_back(
         std::make_unique<PasswordManagerFeatureShowcaseEligibilityChecker>());
@@ -463,10 +465,38 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
       return;
     }
 
+    if (std::find(eligible_steps.begin(), eligible_steps.end(),
+                  kFeatureShowcaseDefaultBrowserStepIdentifier) !=
+        eligible_steps.end()) {
+#if BUILDFLAG(IS_WIN)
+      browser_util::ShouldOfferToPin(
+          ShellUtil::GetBrowserModelId(InstallUtil::IsPerUserInstall()),
+          browser_util::PinAppToTaskbarChannel::kFirstRunExperience,
+          base::BindOnce(
+              &FeatureShowcaseStepController::OnCanPinToTaskbarResult,
+              weak_ptr_factory_.GetWeakPtr(), eligible_steps));
+#else
+      ShowScreen(eligible_steps, /*can_pin=*/false);
+#endif
+      return;
+    }
+
+    ShowScreen(eligible_steps, /*can_pin=*/false);
+  }
+
+#if BUILDFLAG(IS_WIN)
+  void OnCanPinToTaskbarResult(const std::vector<std::string>& eligible_steps,
+                               bool can_pin) {
+    ShowScreen(eligible_steps, can_pin);
+  }
+#endif
+
+  void ShowScreen(const std::vector<std::string>& eligible_steps,
+                  bool can_pin) {
     host()->ShowScreenInPickerContents(
         BuildFeatureShowcaseURL(eligible_steps),
         base::BindOnce(&FeatureShowcaseStepController::OnLoadFinished,
-                       weak_ptr_factory_.GetWeakPtr()));
+                       weak_ptr_factory_.GetWeakPtr(), can_pin));
   }
 
   GURL BuildFeatureShowcaseURL(const std::vector<std::string>& steps) {
@@ -475,7 +505,7 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
                                      base::JoinString(steps, ","));
   }
 
-  void OnLoadFinished() {
+  void OnLoadFinished(bool can_pin) {
     if (!step_shown_callback_->is_null()) {
       std::move(step_shown_callback_.value()).Run(/*success=*/true);
     }
@@ -486,6 +516,10 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
                             ->GetController()
                             ->GetAs<FeatureShowcaseUI>();
     CHECK(showcase_ui);
+
+    if (can_pin) {
+      showcase_ui->SetCanPinToTaskbar(can_pin);
+    }
 
     showcase_ui->SetFinishCallback(
         base::BindOnce(&FeatureShowcaseStepController::OnStepCompleted,
@@ -972,19 +1006,21 @@ FirstRunFlowController::RegisterPostIdentitySteps(
   post_identity_steps.emplace(
       ProfileManagementFlowController::Step::kSearchEngineChoice);
 
-  auto default_browser_promo_step_completed =
-      base::BindOnce(&FirstRunFlowController::AdvanceToNextPostIdentityStep,
-                     base::Unretained(this));
-  RegisterStep(
-      Step::kDefaultBrowser,
-      CreateDefaultBrowserStep(
-          host(), profile_, std::move(default_browser_promo_step_completed)));
-  post_identity_steps.emplace(
-      ProfileManagementFlowController::Step::kDefaultBrowser);
-
   const bool is_desktop_revamp_enabled =
       switches::IsFirstRunDesktopRevampEnabled(
           IsProfileInSearchEngineChoiceRegion(profile_));
+  if (!is_desktop_revamp_enabled) {
+    auto default_browser_promo_step_completed =
+        base::BindOnce(&FirstRunFlowController::AdvanceToNextPostIdentityStep,
+                       base::Unretained(this));
+    RegisterStep(
+        Step::kDefaultBrowser,
+        CreateDefaultBrowserStep(
+            host(), profile_, std::move(default_browser_promo_step_completed)));
+    post_identity_steps.emplace(
+        ProfileManagementFlowController::Step::kDefaultBrowser);
+  }
+
   if (is_desktop_revamp_enabled) {
     auto feature_showcase_step_completed =
         base::BindOnce(&FirstRunFlowController::AdvanceToNextPostIdentityStep,

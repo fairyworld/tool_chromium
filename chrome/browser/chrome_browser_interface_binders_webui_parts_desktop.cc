@@ -203,6 +203,7 @@
 #endif  // defined(OFFICIAL_BUILD)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
+#include "chrome/browser/ui/webui/feature_showcase/default_browser.mojom.h"
 #include "chrome/browser/ui/webui/feature_showcase/feature_showcase.mojom.h"
 #include "chrome/browser/ui/webui/feature_showcase/feature_showcase_ui.h"
 #include "chrome/browser/ui/webui/feature_showcase/google_lens.mojom.h"
@@ -351,6 +352,9 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
 #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
+  RegisterWebUIControllerInterfaceBinder<
+      feature_showcase::mojom::DefaultBrowserPageHandlerFactory,
+      FeatureShowcaseUI>(map);
   RegisterWebUIControllerInterfaceBinder<
       feature_showcase::mojom::FeatureShowcasePageHandlerFactory,
       FeatureShowcaseUI>(map);
