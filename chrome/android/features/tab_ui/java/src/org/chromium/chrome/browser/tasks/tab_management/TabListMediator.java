@@ -719,14 +719,8 @@ public class TabListMediator implements TabListNotificationHandler {
                     // update is unnecessary.
                     if (mLayoutType == TabListLayoutType.FLAT) return;
 
-                    int finalIndex;
-                    if (mLayoutType == TabListLayoutType.NESTED) {
-                        finalIndex = getInsertionIndexOfTabForNestedLayout(tab);
-                    } else {
-                        finalIndex =
-                                mModelList.indexOfNthTabCard(
-                                        getCurrentTabModelChecked().indexOf(tab));
-                    }
+                    int finalIndex =
+                            mModelList.indexOfNthTabCard(getCurrentTabModelChecked().indexOf(tab));
                     // indexOfNthTabCard returns n + 1 if the index is higher than the number of
                     // tabs in the model list. Moving is implemented as removal then addition.
                     // The last valid index to add to is the size of the model list after the
@@ -1761,7 +1755,6 @@ public class TabListMediator implements TabListNotificationHandler {
             return TabList.INVALID_TAB_INDEX;
         }
 
-        boolean isTargetTabPinned = tab.getIsPinned();
         Token targetTabGroupId = tab.getTabGroupId();
         if (targetTabGroupId != null
                 && tabModel.getTabGroupCollapsed(targetTabGroupId)
@@ -1793,25 +1786,6 @@ public class TabListMediator implements TabListNotificationHandler {
                 continue;
             }
 
-            // If the current card is pinned:
-            // - If target tab is regular, skip it (regular tabs go after pinned tabs).
-            // - If target tab is pinned, insert it here if its backend index is smaller than the
-            // current pinned card's backend index (to preserve relative order). Otherwise, skip it.
-            if (isPinnedCard(currentModel)) {
-                if (isTargetTabPinned) {
-                    if (hasHigherBackendIndex(currentTabModelIndex, targetTabModelIndex)) {
-                        return adjustIndexForTabMovement(currentIndex, targetTabCurrentIndex);
-                    }
-                }
-                continue;
-            }
-
-            // If we reach the first regular card and the target tab is pinned, it belongs at the
-            // end of the pinned tab section.
-            if (isTargetTabPinned) {
-                return adjustIndexForTabMovement(currentIndex, targetTabCurrentIndex);
-            }
-
             // Target tab matches the current top-level card's group id, insert it within that
             // group's bounds.
             if (targetTabGroupId != null && targetTabGroupId.equals(currentTab.getTabGroupId())) {
@@ -1841,8 +1815,8 @@ public class TabListMediator implements TabListNotificationHandler {
                     continue;
                 }
 
-                // Insert immediately before the first top-level item whose backend index is greater
-                // than the target tab's backend index.
+                // Insert immediately before the first top-level item (pinned, regular, or group
+                // header) whose backend index is greater than the target tab's backend index.
                 if (hasHigherBackendIndex(currentTabModelIndex, targetTabModelIndex)) {
                     return adjustIndexForTabMovement(currentIndex, targetTabCurrentIndex);
                 }
@@ -3178,10 +3152,6 @@ public class TabListMediator implements TabListNotificationHandler {
             return currentIndex - 1;
         }
         return currentIndex;
-    }
-
-    private boolean isPinnedCard(PropertyModel model) {
-        return model.get(CARD_TYPE) == TAB && model.get(TabProperties.IS_PINNED);
     }
 
     private boolean isTabGroupHeader(PropertyModel model) {

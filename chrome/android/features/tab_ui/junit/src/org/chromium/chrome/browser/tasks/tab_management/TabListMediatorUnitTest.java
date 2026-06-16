@@ -5188,7 +5188,7 @@ public class TabListMediatorUnitTest {
     }
 
     @Test
-    public void testIsTabPinned_TabSwitcher() {
+    public void isTabPinned_GroupedLayout() {
         mMediator.setComponentIdForTesting(TabComponentId.GRID_TAB_SWITCHER);
 
         List<Tab> tabsInModel = new ArrayList<>();
@@ -5222,7 +5222,7 @@ public class TabListMediatorUnitTest {
     }
 
     @Test
-    public void testOnTabPinnedStateChanged() {
+    public void onTabPinnedStateChanged_GroupedLayout() {
         mMediator.setComponentIdForTesting(TabComponentId.GRID_TAB_SWITCHER);
 
         List<Tab> tabsInModel = new ArrayList<>();
@@ -5254,7 +5254,7 @@ public class TabListMediatorUnitTest {
     }
 
     @Test
-    public void testOnTabPinnedStateChanged_MovesTab() {
+    public void onTabPinnedStateChanged_GroupedLayout_MovesTab() {
         mMediator.setComponentIdForTesting(TabComponentId.GRID_TAB_SWITCHER);
 
         Tab tab3 = prepareTab(TAB3_ID, TAB3_TITLE, TAB3_URL);
@@ -5328,7 +5328,7 @@ public class TabListMediatorUnitTest {
     }
 
     @Test
-    public void testOnTabPinnedStateChanged_MovesTab_OutOfBounds() {
+    public void onTabPinnedStateChanged_GroupedLayout_MovesTab_OutOfBounds() {
         mMediator.setComponentIdForTesting(TabComponentId.GRID_TAB_SWITCHER);
 
         Tab tab3 = prepareTab(TAB3_ID, TAB3_TITLE, TAB3_URL);
@@ -5373,6 +5373,170 @@ public class TabListMediatorUnitTest {
         assertEquals(TAB2_ID, mModelList.get(0).model.get(TabProperties.TAB_ID));
         assertEquals(TAB1_ID, mModelList.get(1).model.get(TabProperties.TAB_ID));
         assertFalse(mModelList.get(1).model.get(TabProperties.IS_PINNED));
+    }
+
+    @Test
+    public void onTabPinnedStateChanged_NestedLayout_PinTab() {
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
+        mMediator.initWithNative(mProfile);
+        mMediator.resetWithListOfTabs(null, null, false);
+
+        // Setup mTab2 as pinned, mTab1 as regular.
+        when(mTab2.getIsPinned()).thenReturn(true);
+        when(mTab1.getIsPinned()).thenReturn(false);
+
+        mockTabIndexes(mTab2, mTab1);
+
+        mMediator.resetWithListOfTabs(List.of(mTab2, mTab1), null, false);
+
+        // List contains: [0] Pinned Tab 2, [1] Regular Tab 1.
+        assertEquals(2, mModelList.size());
+        assertEquals(TAB2_ID, mModelList.get(0).model.get(TabProperties.TAB_ID));
+
+        // Pin mTab1.
+        when(mTab1.getIsPinned()).thenReturn(true);
+
+        // Mock observer callback.
+        mTabObserverCaptor.getValue().onTabPinnedStateChanged(mTab1, true);
+
+        // Verifies that both are now marked as pinned, mTab1 stays at index 1 (after mTab2).
+        assertTrue(mModelList.get(0).model.get(TabProperties.IS_PINNED));
+        assertTrue(mModelList.get(1).model.get(TabProperties.IS_PINNED));
+        assertEquals(TAB1_ID, mModelList.get(1).model.get(TabProperties.TAB_ID));
+    }
+
+    @Test
+    public void onTabPinnedStateChanged_NestedLayout_UnpinTab() {
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
+        mMediator.initWithNative(mProfile);
+        mMediator.resetWithListOfTabs(null, null, false);
+
+        // Initially, both mTab1 and mTab2 are pinned.
+        when(mTab1.getIsPinned()).thenReturn(true);
+        when(mTab2.getIsPinned()).thenReturn(true);
+
+        mockTabIndexes(mTab1, mTab2);
+
+        // Reset list with both pinned.
+        mMediator.resetWithListOfTabs(List.of(mTab1, mTab2), null, false);
+
+        // List contains: [0] Pinned Tab 1, [1] Pinned Tab 2.
+        assertEquals(2, mModelList.size());
+        assertEquals(TAB1_ID, mModelList.get(0).model.get(TabProperties.TAB_ID));
+        assertEquals(TAB2_ID, mModelList.get(1).model.get(TabProperties.TAB_ID));
+
+        // Unpin mTab1.
+        when(mTab1.getIsPinned()).thenReturn(false);
+
+        mockTabIndexes(mTab2, mTab1);
+
+        mTabObserverCaptor.getValue().onTabPinnedStateChanged(mTab1, false);
+
+        // Verifies that unpinned mTab1 moved to the regular section (index 1).
+        assertEquals(TAB2_ID, mModelList.get(0).model.get(TabProperties.TAB_ID));
+        assertEquals(TAB1_ID, mModelList.get(1).model.get(TabProperties.TAB_ID));
+        assertFalse(mModelList.get(1).model.get(TabProperties.IS_PINNED));
+    }
+
+    @Test
+    public void onTabPinnedStateChanged_NestedLayout_UnpinToGroup() {
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
+        mMediator.initWithNative(mProfile);
+
+        // Setup mTab1 as pinned.
+        when(mTab1.getIsPinned()).thenReturn(true);
+        when(mTab1.getTabGroupId()).thenReturn(null);
+
+        // Setup mTab2 and mTab3 as an expanded group.
+        Tab mTab3 = prepareTab(TAB3_ID, TAB3_TITLE, TAB3_URL);
+        Token tabGroupId = new Token(1L, 2L);
+        createTabGroup(List.of(mTab2, mTab3), tabGroupId);
+        when(mTab2.getIsPinned()).thenReturn(false);
+        when(mTab3.getIsPinned()).thenReturn(false);
+        when(mTabModel.getTabGroupCollapsed(tabGroupId)).thenReturn(false);
+        when(mTabModel.getTabsInGroup(tabGroupId)).thenReturn(List.of(mTab2, mTab3));
+
+        mockTabIndexes(mTab1, mTab2, mTab3);
+
+        mMediator.resetWithListOfTabs(null, null, false);
+        mMediator.resetWithListOfTabs(List.of(mTab1, mTab2), null, false);
+
+        // Initial UI: [0] Tab 1, [1] Group Header, [2] Tab 2, [3] Tab 3.
+        assertEquals(4, mModelList.size());
+        assertEquals(TAB1_ID, mModelList.get(0).model.get(TabProperties.TAB_ID));
+        assertEquals(CardProperties.ModelType.TAB_GROUP, mModelList.get(1).model.get(CARD_TYPE));
+
+        // Backend unpins mTab1 (moves it to unpinned boundary, backend index 0).
+        when(mTab1.getIsPinned()).thenReturn(false);
+        mockTabIndexes(mTab1, mTab2, mTab3);
+        mTabObserverCaptor.getValue().onTabPinnedStateChanged(mTab1, false);
+
+        // UI after unpinning but before grouping should move mTab1 to the unpinned boundary.
+        assertEquals(4, mModelList.size());
+        assertEquals(TAB1_ID, mModelList.get(0).model.get(TabProperties.TAB_ID));
+        assertEquals(CardProperties.ModelType.TAB_GROUP, mModelList.get(1).model.get(CARD_TYPE));
+
+        // Backend merges mTab1 into the group.
+        when(mTab1.getTabGroupId()).thenReturn(tabGroupId);
+        when(mTabModel.getRelatedTabList(TAB2_ID)).thenReturn(List.of(mTab2, mTab3, mTab1));
+        mockTabIndexes(mTab2, mTab3, mTab1);
+
+        // Observer: didMergeTabToGroup fires second (when moving into the group)
+        mTabGroupObserverCaptor.getValue().didMergeTabToGroup(mTab1, /* isDestinationTab= */ false);
+
+        // UI after merge should be: [0] Group Header, [1] Tab 2, [2] Tab 3, [3] Tab 1
+        assertEquals(4, mModelList.size());
+        assertEquals(CardProperties.ModelType.TAB_GROUP, mModelList.get(0).model.get(CARD_TYPE));
+        assertEquals(TAB2_ID, mModelList.get(1).model.get(TabProperties.TAB_ID));
+        assertEquals(TAB3_ID, mModelList.get(2).model.get(TabProperties.TAB_ID));
+        assertEquals(TAB1_ID, mModelList.get(3).model.get(TabProperties.TAB_ID));
+    }
+
+    @Test
+    public void onTabPinnedStateChanged_NestedLayout_PinGroupedTab() {
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
+        mMediator.initWithNative(mProfile);
+
+        // Setup mTab1 and mTab2 as an expanded group.
+        Token tabGroupId = new Token(1L, 2L);
+        createTabGroup(List.of(mTab1, mTab2), tabGroupId);
+        when(mTab1.getIsPinned()).thenReturn(false);
+        when(mTab2.getIsPinned()).thenReturn(false);
+        when(mTabModel.getTabGroupCollapsed(tabGroupId)).thenReturn(false);
+        when(mTabModel.getTabsInGroup(tabGroupId)).thenReturn(List.of(mTab1, mTab2));
+
+        mockTabIndexes(mTab1, mTab2);
+
+        mMediator.resetWithListOfTabs(null, null, false);
+        mMediator.resetWithListOfTabs(List.of(mTab1), null, false);
+
+        // Initial UI: [0] Group Header, [1] Tab 1, [2] Tab 2.
+        assertEquals(3, mModelList.size());
+        assertEquals(CardProperties.ModelType.TAB_GROUP, mModelList.get(0).model.get(CARD_TYPE));
+        assertEquals(TAB1_ID, mModelList.get(1).model.get(TabProperties.TAB_ID));
+        assertEquals(TAB2_ID, mModelList.get(2).model.get(TabProperties.TAB_ID));
+
+        // Move out of group and pin.
+        when(mTab2.getTabGroupId()).thenReturn(null);
+        when(mTab2.getIsPinned()).thenReturn(true);
+        when(mTabModel.getRelatedTabList(TAB1_ID)).thenReturn(List.of(mTab1));
+        mockTabIndexes(mTab2, mTab1);
+
+        mTabGroupObserverCaptor.getValue().didMoveTabOutOfGroup(mTab2, /* prevFilterIndex= */ 1);
+
+        // UI after move out: [0] Tab 2 (pinned), [1] Group Header, [2] Tab 1.
+        assertEquals(3, mModelList.size());
+        assertEquals(TAB2_ID, mModelList.get(0).model.get(TabProperties.TAB_ID));
+        assertEquals(CardProperties.ModelType.TAB_GROUP, mModelList.get(1).model.get(CARD_TYPE));
+        assertEquals(TAB1_ID, mModelList.get(2).model.get(TabProperties.TAB_ID));
+
+        mTabObserverCaptor.getValue().onTabPinnedStateChanged(mTab2, true);
+
+        // UI should now have Tab 2 at the top in the pinned section.
+        assertEquals(3, mModelList.size());
+        assertEquals(TAB2_ID, mModelList.get(0).model.get(TabProperties.TAB_ID)); // Pinned
+        assertEquals(CardProperties.ModelType.TAB_GROUP, mModelList.get(1).model.get(CARD_TYPE));
+        assertEquals(TAB1_ID, mModelList.get(2).model.get(TabProperties.TAB_ID));
     }
 
     @Test
@@ -7087,71 +7251,6 @@ public class TabListMediatorUnitTest {
                 UiType.PRICE_MESSAGE,
                 new PropertyModel.Builder(TabProperties.ALL_KEYS_TAB_GRID).build());
         assertEquals(initialSize, mModelList.size());
-    }
-
-    @Test
-    public void testVerticalTabs_onTabPinnedStateChanged_ToPinnedSection() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
-        mMediator.initWithNative(mProfile);
-        mMediator.resetWithListOfTabs(null, null, false);
-
-        // Setup mTab2 as pinned, mTab1 as regular.
-        when(mTab2.getIsPinned()).thenReturn(true);
-        when(mTab1.getIsPinned()).thenReturn(false);
-
-        mockTabIndexes(mTab2, mTab1);
-
-        // Reset list with mTab2 (pinned) and mTab1 (regular).
-        mMediator.resetWithListOfTabs(Arrays.asList(mTab2, mTab1), null, false);
-
-        // List contains: [0] Pinned Tab 2, [1] Regular Tab 1.
-        assertEquals(2, mModelList.size());
-        assertEquals(TAB2_ID, mModelList.get(0).model.get(TabProperties.TAB_ID));
-
-        // Pin mTab1.
-        when(mTab1.getIsPinned()).thenReturn(true);
-
-        // Mock observer callback.
-        mTabObserverCaptor.getValue().onTabPinnedStateChanged(mTab1, true);
-
-        // Verifies that both are now marked as pinned, mTab1 stays at index 1 (after mTab2).
-        assertTrue(mModelList.get(0).model.get(TabProperties.IS_PINNED));
-        assertTrue(mModelList.get(1).model.get(TabProperties.IS_PINNED));
-        assertEquals(TAB1_ID, mModelList.get(1).model.get(TabProperties.TAB_ID));
-    }
-
-    @Test
-    public void testVerticalTabs_onTabPinnedStateChanged_ToRegularSection() {
-        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
-        mMediator.initWithNative(mProfile);
-        mMediator.resetWithListOfTabs(null, null, false);
-
-        // Initially, both mTab1 and mTab2 are pinned.
-        when(mTab1.getIsPinned()).thenReturn(true);
-        when(mTab2.getIsPinned()).thenReturn(true);
-
-        mockTabIndexes(mTab1, mTab2);
-
-        // Reset list with both pinned.
-        mMediator.resetWithListOfTabs(Arrays.asList(mTab1, mTab2), null, false);
-
-        // List contains: [0] Pinned Tab 1, [1] Pinned Tab 2.
-        assertEquals(2, mModelList.size());
-        assertEquals(TAB1_ID, mModelList.get(0).model.get(TabProperties.TAB_ID));
-        assertEquals(TAB2_ID, mModelList.get(1).model.get(TabProperties.TAB_ID));
-
-        // Unpin mTab1.
-        when(mTab1.getIsPinned()).thenReturn(false);
-
-        mockTabIndexes(mTab2, mTab1);
-
-        // Trigger observer.
-        mTabObserverCaptor.getValue().onTabPinnedStateChanged(mTab1, false);
-
-        // Verifies that unpinned mTab1 moved to the regular section (index 1).
-        assertEquals(TAB2_ID, mModelList.get(0).model.get(TabProperties.TAB_ID));
-        assertEquals(TAB1_ID, mModelList.get(1).model.get(TabProperties.TAB_ID));
-        assertFalse(mModelList.get(1).model.get(TabProperties.IS_PINNED));
     }
 
     @Test
