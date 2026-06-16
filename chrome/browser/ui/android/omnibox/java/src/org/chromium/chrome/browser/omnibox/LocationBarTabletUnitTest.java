@@ -511,12 +511,17 @@ public class LocationBarTabletUnitTest {
         // Verify the InsetDrawable border was applied to the foreground.
         assertNotNull(mLocationBarTablet.getForeground());
         assertTrue(mLocationBarTablet.getForeground() instanceof InsetDrawable);
-        mLocationBarTablet.onFuseboxStateChanged(FuseboxState.EXPANDED);
+        mLocationBarTablet.onFuseboxStateChanged(FuseboxState.COMPACT);
         // Standby mode should override the fusebox state when deciding if to expand.
         var layoutParams = (LinearLayout.LayoutParams) mHolderView.getLayoutParams();
         assertEquals(0, layoutParams.leftMargin);
         assertEquals(0, layoutParams.rightMargin);
         assertEquals(0, layoutParams.topMargin);
+
+        View urlBar = mLocationBarTablet.findViewById(R.id.url_bar);
+        View statusView = mLocationBarTablet.findViewById(R.id.location_bar_status);
+        assertEquals(0, urlBar.getTranslationY(), MathUtils.EPSILON);
+        assertEquals(0, statusView.getTranslationY(), MathUtils.EPSILON);
 
         mLocationBarTablet.setIsInStandby(false);
         assertNull(mLocationBarTablet.getForeground());

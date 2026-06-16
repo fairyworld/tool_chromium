@@ -620,7 +620,7 @@ class LocationBarTablet extends LocationBarLayout implements OnLongClickListener
         MarginLayoutParams statusViewLayoutParams =
                 (MarginLayoutParams) mStatusView.getLayoutParams();
         Resources resources = getResources();
-        if (state == FuseboxState.COMPACT) {
+        if (state == FuseboxState.COMPACT && !mIsInStandby) {
             // In the compact fusebox state, the location bar is taller than its inner background,
             // creating the appearance of vertical misalignment. We resolve this by translating
             // constituent views to be centered withing the 56 dp inner background, shifting them
