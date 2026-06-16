@@ -71,12 +71,7 @@ BASE_FEATURE(kGlicLiveMode,
 );
 
 BASE_FEATURE(kGlicDefaultToLastActiveConversation,
-#if BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_DESKTOP_ANDROID)
-             base::FEATURE_ENABLED_BY_DEFAULT
-#else
-             base::FEATURE_DISABLED_BY_DEFAULT
-#endif
-);
+             base::FEATURE_DISABLED_BY_DEFAULT);
 
 const base::FeatureParam<base::TimeDelta>
     kGlicDefaultToLastActiveConversationMaxRecency{
