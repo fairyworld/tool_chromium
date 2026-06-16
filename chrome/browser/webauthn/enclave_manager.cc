@@ -627,9 +627,7 @@ cbor::Value BuildPINRenewalRequest(std::string cert_xml,
   request.emplace(enclave::kRecoveryKeyStoreSigXml, ToVector(sig_xml));
   request.emplace(enclave::kRequestWrappedSecretKey, wrapped_secret);
   request.emplace(enclave::kRequestWrappedPINDataKey, wrapped_pin);
-  if (base::FeatureList::IsEnabled(device::kWebAuthnNewRefreshFlow)) {
-    request.emplace(enclave::kRecoveryKeyStoreCreateNewVault, true);
-  }
+  request.emplace(enclave::kRecoveryKeyStoreCreateNewVault, true);
 
   return cbor::Value(std::move(request));
 }

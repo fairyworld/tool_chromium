@@ -202,11 +202,6 @@ BASE_FEATURE(kWebAuthnSendPinGeneration,
              "WebAuthenticationSendPinGeneration",
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-// Enabled by default in M146. Remove in or after M149.
-BASE_FEATURE(kWebAuthnNewRefreshFlow,
-             "WebAuthenticationNewRefreshFlow",
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 // Disabled by default.
 BASE_FEATURE(kWebAuthnOpportunisticRetrieval,
              base::FEATURE_DISABLED_BY_DEFAULT);
