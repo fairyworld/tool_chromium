@@ -39,7 +39,6 @@ source_set("browser_tests") {
 
   deps = [
     ":network",
-    "//chrome/browser/ash/net",
     "//chrome/browser/profiles:profile",
     "//chrome/browser/ui",
     "//chrome/browser/ui/browser_window",
