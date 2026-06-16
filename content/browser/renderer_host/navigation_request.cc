@@ -3668,6 +3668,11 @@ const blink::DocumentToken& NavigationRequest::GetDocumentToken() const {
   return *document_token_;
 }
 
+const std::optional<blink::DocumentToken>&
+NavigationRequest::GetInitiatorDocumentToken() const {
+  return initiator_document_token_;
+}
+
 const PolicyContainerPolicies& NavigationRequest::GetPolicyContainerPolicies()
     const {
   CHECK(state_ >= WILL_PROCESS_RESPONSE &&

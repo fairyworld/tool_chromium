@@ -943,6 +943,8 @@ class CONTENT_EXPORT NavigationRequest
   // - must not be called before the navigation is ready to commit
   const blink::DocumentToken& GetDocumentToken() const;
 
+  const std::optional<blink::DocumentToken>& GetInitiatorDocumentToken() const;
+
   // Returns the policies of the new document being navigated to.
   //
   // Must only be called after ReadyToCommitNavigation().
