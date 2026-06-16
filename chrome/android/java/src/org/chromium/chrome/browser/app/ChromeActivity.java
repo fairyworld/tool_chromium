@@ -2821,9 +2821,17 @@ public abstract class ChromeActivity extends AsyncInitializationActivity
         int type = Profile.getBrowserProfileTypeFromProfile(getCurrentTabModel().getProfile());
 
         if (id == R.id.preferences_id) {
-            SettingsNavigation settingsNavigation =
-                    SettingsNavigationFactory.createSettingsNavigation();
-            settingsNavigation.startSettings(this);
+            if (ChromeFeatureList.isEnabled(ChromeFeatureList.SETTINGS_IN_TAB)) {
+                LoadUrlParams params =
+                        new LoadUrlParams(UrlConstants.SETTINGS_URL, PageTransition.LINK);
+                // Settings are associated with the on-the-record profile, never incognito.
+                getTabCreator(/* incognito= */ false)
+                        .createNewTab(params, TabLaunchType.FROM_CHROME_UI, getActivityTab());
+            } else {
+                SettingsNavigation settingsNavigation =
+                        SettingsNavigationFactory.createSettingsNavigation();
+                settingsNavigation.startSettings(this);
+            }
             RecordUserAction.record("MobileMenuSettings");
             RecordHistogram.recordEnumeratedHistogram(
                     "Settings.OpenSettingsFromMenu.PerProfileType",
