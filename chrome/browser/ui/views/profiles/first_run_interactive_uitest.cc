@@ -51,7 +51,6 @@
 #include "chrome/browser/ui/webui/signin/signin_ui_error.h"
 #include "chrome/browser/ui/webui/signin/signin_url_utils.h"
 #include "chrome/common/webui_url_constants.h"
-#include "net/base/url_util.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/browser_resources.h"
 #include "chrome/test/base/ui_test_utils.h"
@@ -75,6 +74,7 @@
 #include "components/signin/public/identity_manager/account_info.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
+#include "components/signin/public/identity_manager/signin_constants.h"
 #include "components/sync/base/features.h"
 #include "components/sync/base/user_selectable_type.h"
 #include "components/sync/service/sync_service.h"
@@ -83,6 +83,7 @@
 #include "components/variations/variations_switches.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
+#include "net/base/url_util.h"
 #include "net/dns/mock_host_resolver.h"
 #include "services/audio/public/cpp/sounds/sounds_manager.h"
 #include "services/network/test/test_url_loader_factory.h"
@@ -98,6 +99,7 @@
 namespace {
 
 using ::testing::_;
+using ::testing::Bool;
 using ::testing::Eq;
 using ::testing::Mock;
 using ::testing::Not;
@@ -588,10 +590,13 @@ class FirstRunInteractiveUiBaseTest
     }
 
     // Controls behavior of sync buttons and supervision.
-    if (with_extended_info && account_email == kTestEnterpriseEmail) {
-      account_info = AccountInfo::Builder(account_info)
-                         .SetHostedDomain("chromium.org")
-                         .Build();
+    if (with_extended_info) {
+      account_info =
+          AccountInfo::Builder(account_info)
+              .SetHostedDomain(account_email == kTestEnterpriseEmail
+                                   ? "chromium.org"
+                                   : signin::constants::kNoHostedDomainFound)
+              .Build();
     }
     AccountCapabilitiesTestMutator mutator(&account_info);
     mutator.set_is_subject_to_enterprise_features(account_email ==
@@ -2164,7 +2169,8 @@ class FirstRunRevampInteractiveUiTest : public FirstRunInteractiveUiBaseTest {
             TestParam{
                 .refreshed_view_variant =
                     switches::FirstRunDesktopSignInPromoVariation::kDefault},
-            {{switches::kFirstRunDesktopRevamp, {}}}) {}
+            {{switches::kFirstRunDesktopRevamp, {}},
+             {syncer::kReplaceSyncPromosWithSignInPromos, {}}}) {}
 };
 
 IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest, InitSoundsOnFlowStart) {
@@ -2184,7 +2190,8 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest, InitSoundsOnFlowStart) {
                     return std::move(mock_sounds_manager);
                   }));
 
-  // Verify that the ambient and logo sounds are initialized at the start.
+  // Verify that the ambient, logo and welcome back sounds are initialized at
+  // the start.
   EXPECT_CALL(
       *mock_sounds_manager_ptr,
       Initialize(FirstRunFlowController::kAmbientSoundKey,
@@ -2194,6 +2201,11 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest, InitSoundsOnFlowStart) {
               Initialize(FirstRunFlowController::kLogoSoundKey,
                          IDR_INTRO_SOUND_LOGO_FLAC, media::AudioCodec::kFLAC,
                          /*loop=*/false))
+      .WillOnce(Return(true));
+  EXPECT_CALL(*mock_sounds_manager_ptr,
+              Initialize(FirstRunFlowController::kWelcomeBackSoundKey,
+                         IDR_INTRO_SOUND_WELCOME_BACK_FLAC,
+                         media::AudioCodec::kFLAC, /*loop=*/false))
       .WillOnce(Return(true));
   EXPECT_CALL(*mock_sounds_manager_ptr,
               Play(FirstRunFlowController::kAmbientSoundKey))
@@ -2224,7 +2236,7 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
                   }));
 
   EXPECT_CALL(*mock_sounds_manager_ptr, Initialize)
-      .Times(2)
+      .Times(3)
       .WillRepeatedly(Return(true));
   EXPECT_CALL(*mock_sounds_manager_ptr, Play)
       .Times(2)
@@ -2241,6 +2253,9 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
       .WillOnce(Return(true));
   EXPECT_CALL(*mock_sounds_manager_ptr,
               Stop(FirstRunFlowController::kLogoSoundKey))
+      .WillOnce(Return(true));
+  EXPECT_CALL(*mock_sounds_manager_ptr,
+              Stop(FirstRunFlowController::kWelcomeBackSoundKey))
       .WillOnce(Return(true));
 
   RunTestSequenceInContext(
@@ -2265,3 +2280,152 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
       views::ElementTrackerViews::GetContextForView(view()),
       PressButton(kProfilePickerToolbarEffectsControlButtonElementId));
 }
+
+class FirstRunRevampPostSignInInteractiveUiTest
+    : public FirstRunRevampInteractiveUiTest,
+      public testing::WithParamInterface<bool> {
+ protected:
+  void SetUpOnMainThread() override {
+    FirstRunRevampInteractiveUiTest::SetUpOnMainThread();
+    if (is_managed()) {
+      policy::UserPolicySigninServiceFactory::GetInstance()->SetTestingFactory(
+          profile(),
+          base::BindRepeating(
+              &policy::FakeUserPolicySigninService::BuildForEnterprise));
+    }
+  }
+
+  bool is_managed() const { return GetParam(); }
+
+  const std::string& GetTestEmail() const {
+    return is_managed() ? kTestEnterpriseEmail : kTestEmail;
+  }
+
+  GURL GetPostSignInPageUrl() const {
+    if (is_managed()) {
+      return ManagedUserProfileNoticeUI::GetURLForType(
+          ManagedUserProfileNoticeUI::ScreenType::kFirstRun);
+    }
+    return GURL(chrome::kChromeUIIntroURL)
+        .Resolve(chrome::kChromeUIIntroSignInCelebrationSubPage);
+  }
+};
+
+IN_PROC_BROWSER_TEST_P(FirstRunRevampPostSignInInteractiveUiTest,
+                       WelcomeBackSoundPlayed) {
+  ASSERT_TRUE(fre_service()->ShouldOpenFirstRun());
+
+  auto mock_sounds_manager = std::make_unique<StrictMock<MockSoundsManager>>();
+  MockSoundsManager* mock_sounds_manager_ptr = mock_sounds_manager.get();
+
+  base::AutoReset<FirstRunFlowController::SoundsManagerFactory>
+      sounds_factory_reset =
+          FirstRunFlowController::SetSoundsManagerFactoryForTesting(
+              base::BindLambdaForTesting(
+                  [&mock_sounds_manager](
+                      audio::SoundsManager::StreamFactoryBinder)
+                      -> std::unique_ptr<audio::SoundsManager> {
+                    return std::move(mock_sounds_manager);
+                  }));
+
+  EXPECT_CALL(*mock_sounds_manager_ptr, Initialize)
+      .Times(3)
+      .WillRepeatedly(Return(true));
+  EXPECT_CALL(*mock_sounds_manager_ptr, Play)
+      .Times(2)
+      .WillRepeatedly(Return(true));
+
+  base::test::TestFuture<bool> proceed_future;
+  OpenFirstRun(proceed_future.GetCallback());
+
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
+      // Wait for the profile picker to show the intro.
+      WaitForShow(kProfilePickerViewId),
+      InstrumentNonTabWebView(kWebContentsId, web_view()),
+      CompleteIntroStep(/*sign_in=*/true),
+      // Wait for switch to Gaia sign-in page.
+      WaitForWebContentsNavigation(kWebContentsId,
+                                   GetSigninChromeSyncDiceUrl()));
+
+  Mock::VerifyAndClearExpectations(mock_sounds_manager_ptr);
+
+  // Verify that the welcome back sound is played.
+  EXPECT_CALL(*mock_sounds_manager_ptr,
+              Play(FirstRunFlowController::kWelcomeBackSoundKey))
+      .WillOnce(Return(true));
+
+  SimulateSignIn(GetTestEmail(), kTestGivenName);
+
+  // Wait for the first post sign-in page to load and trigger the sound play
+  // call.
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
+      WaitForWebContentsNavigation(kWebContentsId, GetPostSignInPageUrl()));
+}
+
+IN_PROC_BROWSER_TEST_P(FirstRunRevampPostSignInInteractiveUiTest,
+                       WelcomeBackSoundNotPlayedWhenEffectsPaused) {
+  ASSERT_TRUE(fre_service()->ShouldOpenFirstRun());
+
+  auto mock_sounds_manager = std::make_unique<StrictMock<MockSoundsManager>>();
+  MockSoundsManager* mock_sounds_manager_ptr = mock_sounds_manager.get();
+
+  base::AutoReset<FirstRunFlowController::SoundsManagerFactory>
+      sounds_factory_reset =
+          FirstRunFlowController::SetSoundsManagerFactoryForTesting(
+              base::BindLambdaForTesting(
+                  [&mock_sounds_manager](
+                      audio::SoundsManager::StreamFactoryBinder)
+                      -> std::unique_ptr<audio::SoundsManager> {
+                    return std::move(mock_sounds_manager);
+                  }));
+
+  EXPECT_CALL(*mock_sounds_manager_ptr, Initialize)
+      .Times(3)
+      .WillRepeatedly(Return(true));
+  EXPECT_CALL(*mock_sounds_manager_ptr, Play)
+      .Times(2)
+      .WillRepeatedly(Return(true));
+  // Expect pause/stop calls.
+  EXPECT_CALL(*mock_sounds_manager_ptr, Pause)
+      .Times(1)
+      .WillRepeatedly(Return(true));
+  EXPECT_CALL(*mock_sounds_manager_ptr, Stop)
+      .Times(2)
+      .WillRepeatedly(Return(true));
+
+  base::test::TestFuture<bool> proceed_future;
+  OpenFirstRun(proceed_future.GetCallback());
+
+  const DeepQuery& sign_in_button = GetSignInButtonQuery();
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
+      // Wait for the profile picker to show the intro.
+      WaitForShow(kProfilePickerViewId),
+      InstrumentNonTabWebView(kWebContentsId, web_view()),
+      // Wait for the effects control button to be visible.
+      WaitForShow(kProfilePickerToolbarEffectsControlButtonElementId),
+      // Click the effects control button to pause the effects.
+      PressButton(kProfilePickerToolbarEffectsControlButtonElementId),
+      WaitForStateChange(kWebContentsId, IsVisible(sign_in_button)),
+      PressJsButton(kWebContentsId, sign_in_button),
+      // Wait for switch to Gaia sign-in page.
+      WaitForWebContentsNavigation(kWebContentsId,
+                                   GetSigninChromeSyncDiceUrl()));
+
+  SimulateSignIn(GetTestEmail(), kTestGivenName);
+
+  // Wait for the final page to load. Since effects are paused, the sound
+  // should not be played (enforced by `StrictMock`).
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
+      WaitForWebContentsNavigation(kWebContentsId, GetPostSignInPageUrl()));
+}
+
+INSTANTIATE_TEST_SUITE_P(,
+                         FirstRunRevampPostSignInInteractiveUiTest,
+                         Bool(),
+                         [](const TestParamInfo<bool>& info) {
+                           return info.param ? "Managed" : "Unmanaged";
+                         });

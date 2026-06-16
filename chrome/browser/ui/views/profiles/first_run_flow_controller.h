@@ -51,6 +51,7 @@ class FirstRunFlowController : public ProfileManagementFlowControllerImpl {
  public:
   static constexpr audio::SoundsManager::SoundKey kAmbientSoundKey = 0;
   static constexpr audio::SoundsManager::SoundKey kLogoSoundKey = 1;
+  static constexpr audio::SoundsManager::SoundKey kWelcomeBackSoundKey = 2;
 
   // Profile management flow controller that will run the FRE for `profile` in
   // `host`.
@@ -95,6 +96,8 @@ class FirstRunFlowController : public ProfileManagementFlowControllerImpl {
 
  private:
   void HandleIntroSigninChoice(IntroChoice choice);
+
+  void PlaySignInCelebrationSound();
 
   // Run the `finish_flow_callback_` if it's not empty.
   void RunFinishFlowCallback();

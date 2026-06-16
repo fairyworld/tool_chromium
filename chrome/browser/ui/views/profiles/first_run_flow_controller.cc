@@ -562,8 +562,9 @@ using IdentityStepsCompletedCallback =
     base::OnceCallback<void(PostHostClearedCallback post_host_cleared_callback,
                             bool is_continue_callback)>;
 
-// Instance allowing `TurnSyncOnHelper` to drive the interface in the
-// `kPostSignIn` step.
+// Instance allowing `TurnSyncOnHelper` (in legacy sync flow) or
+// `HistorySyncOptinHelper` (in new history sync flow) to drive the interface in
+// the `kPostSignIn` step.
 class FirstRunPostSignInAdapter : public ProfilePickerPostSignInAdapter {
  public:
   FirstRunPostSignInAdapter(
@@ -571,22 +572,26 @@ class FirstRunPostSignInAdapter : public ProfilePickerPostSignInAdapter {
       Profile* profile,
       const CoreAccountInfo& account_info,
       std::unique_ptr<content::WebContents> contents,
-      IdentityStepsCompletedCallback step_completed_callback)
+      IdentityStepsCompletedCallback step_completed_callback,
+      base::OnceClosure play_celebration_sound_callback)
       : ProfilePickerPostSignInAdapter(host,
                                        profile,
                                        account_info,
                                        std::move(contents),
                                        kAccessPoint,
                                        /*profile_color=*/std::nullopt),
-        step_completed_callback_(std::move(step_completed_callback)) {
+        step_completed_callback_(std::move(step_completed_callback)),
+        play_celebration_sound_callback_(
+            std::move(play_celebration_sound_callback)) {
     DCHECK(step_completed_callback_);
   }
 
   void Init(StepSwitchFinishedCallback step_switch_callback) override {
     // Stop with the sign-in navigation and show a spinner instead. The spinner
-    // will be shown until TurnSyncOnHelper figures out whether it's a
-    // managed account and whether sync is disabled by policies (which in some
-    // cases involves fetching policies and can take a couple of seconds).
+    // will be shown until TurnSyncOnHelper or HistorySyncOptinHelper figures
+    // out whether it's a managed account and whether sync/policies are resolved
+    // (which in some cases involves fetching policies/capabilities and can take
+    // a couple of seconds).
     host()->ShowScreen(contents(), GetSyncConfirmationURL(/*loading=*/true),
                        /*navigation_finished_closure=*/base::OnceClosure());
 
@@ -627,8 +632,27 @@ class FirstRunPostSignInAdapter : public ProfilePickerPostSignInAdapter {
         .Run(std::move(combined_callback), is_continue_callback);
   }
 
+  void ShowSignInCelebration(base::OnceClosure celebration_finished) override {
+    ProfilePickerPostSignInAdapter::ShowSignInCelebration(
+        std::move(celebration_finished));
+    if (play_celebration_sound_callback_) {
+      std::move(play_celebration_sound_callback_).Run();
+    }
+  }
+
+  void ShowAccountManagementScreen(
+      signin::SigninChoiceCallback on_account_management_screen_closed)
+      override {
+    ProfilePickerPostSignInAdapter::ShowAccountManagementScreen(
+        std::move(on_account_management_screen_closed));
+    if (play_celebration_sound_callback_) {
+      std::move(play_celebration_sound_callback_).Run();
+    }
+  }
+
  private:
   IdentityStepsCompletedCallback step_completed_callback_;
+  base::OnceClosure play_celebration_sound_callback_;
 };
 
 }  // namespace
@@ -725,12 +749,19 @@ void FirstRunFlowController::ToggleMediaEffects(bool active) {
       sounds_manager_->Pause(kAmbientSoundKey);
       // Stop one-shot sounds, safe to call even if not playing.
       sounds_manager_->Stop(kLogoSoundKey);
+      sounds_manager_->Stop(kWelcomeBackSoundKey);
     }
   }
 }
 
 bool FirstRunFlowController::AreEffectsEnabled() const {
   return host()->AreEffectsEnabled();
+}
+
+void FirstRunFlowController::PlaySignInCelebrationSound() {
+  if (sounds_manager_ && AreEffectsEnabled()) {
+    sounds_manager_->Play(kWelcomeBackSoundKey);
+  }
 }
 
 void FirstRunFlowController::Init() {
@@ -755,6 +786,9 @@ void FirstRunFlowController::Init() {
       sounds_manager_->Initialize(kAmbientSoundKey,
                                   IDR_INTRO_SOUND_AMBIENT_FLAC,
                                   media::AudioCodec::kFLAC, /*loop=*/true);
+      sounds_manager_->Initialize(kWelcomeBackSoundKey,
+                                  IDR_INTRO_SOUND_WELCOME_BACK_FLAC,
+                                  media::AudioCodec::kFLAC, /*loop=*/false);
       if (AreEffectsEnabled()) {
         sounds_manager_->Play(kLogoSoundKey);
         sounds_manager_->Play(kAmbientSoundKey);
@@ -825,7 +859,11 @@ FirstRunFlowController::CreatePostSignInAdapter(
       base::BindOnce(&FirstRunFlowController::HandleIdentityStepsCompleted,
                      // Unretained ok: the callback is passed to a step that
                      // the `this` will own and outlive.
-                     base::Unretained(this), base::Unretained(profile_)));
+                     base::Unretained(this), base::Unretained(profile_)),
+      base::BindOnce(&FirstRunFlowController::PlaySignInCelebrationSound,
+                     // Unretained ok: the callback is passed to a step
+                     // that the `this` will own and outlive.
+                     base::Unretained(this)));
 }
 
 void FirstRunFlowController::RunFinishFlowCallback() {
