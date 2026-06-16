@@ -65,8 +65,6 @@ void PasswordManagerUIHandler::ExtendAuthValidity() {
 
 void PasswordManagerUIHandler::DeleteAllPasswordManagerData(
     DeleteAllPasswordManagerDataCallback callback) {
-  // TODO(crbug.com/432409279): don't use the delegate, but instead use the
-  // password manager backend directly.
   passwords_private_delegate_->DeleteAllPasswordManagerData(
       web_contents_, std::move(callback));
 }
