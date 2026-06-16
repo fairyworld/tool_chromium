@@ -71,8 +71,6 @@ const char kChromeExtMalwareUmaSuffix[] = ".ChromeExtMalware";
 const char kUrlMalBinUmaSuffix[] = ".UrlMalBin";
 const char kUrlSocengUmaSuffix[] = ".UrlSoceng";
 
-const uint32_t kFileVersion = 9;
-
 // The maximum size of additions hashes in a single update response.
 const int32_t ADDITIONS_HASHES_COUNT_PARTIAL_UPDATE_MAX = 10000;
 const int32_t ADDITIONS_HASHES_COUNT_FULL_UPDATE_MAX = 5000000;
@@ -877,39 +875,11 @@ StoreReadResult V4Store::ReadFromDisk() {
   DCHECK(task_runner_->RunsTasksInCurrentSequence());
 
   V4StoreFileFormat file_format;
-  int64_t file_size;
-  {
-    BaseFileInputStream input_stream(store_path_);
-    if (!file_format.ParseFromZeroCopyStream(&input_stream)) {
-      return input_stream.GetError() != base::File::FILE_OK
-                 ? FILE_UNREADABLE_FAILURE
-                 : PROTO_PARSING_FAILURE;
-    }
-    // `ParseFromZeroCopyStream` will return true if the file didn't exist, so
-    // explicitly check for an error when reading from the file.
-    if (input_stream.GetError() != base::File::FILE_OK) {
-      return FILE_UNREADABLE_FAILURE;
-    }
-    file_size = input_stream.ByteCount();
-    if (!file_size) {
-      return FILE_EMPTY_FAILURE;
-    }
-  }
-
-  if (file_format.magic_number() != kFileMagic) {
-    return UNEXPECTED_MAGIC_NUMBER_FAILURE;
-  }
-
-  if (file_format.version_number() != kFileVersion) {
-    return FILE_VERSION_INCOMPATIBLE_FAILURE;
-  }
-
-  if (!file_format.has_list_update_response()) {
-    return HASH_PREFIX_INFO_MISSING_FAILURE;
-  }
-
-  if (!file_format.list_update_response().additions().empty()) {
-    return PRE_MMAP_MIGRATION_FILE_FORMAT_FAILURE;
+  int64_t file_size = 0;
+  StoreReadResult validation_result =
+      ParseAndValidateV4StoreFileFormat(store_path_, file_format, &file_size);
+  if (validation_result != READ_SUCCESS) {
+    return validation_result;
   }
 
   ApplyUpdateResult apply_update_result =
@@ -966,7 +936,7 @@ StoreWriteResult V4Store::WriteToDisk(V4StoreFileFormat* file_format) {
   if (auto write_session = hash_prefix_map_->WriteToDisk(sb_file_format);
       write_session) {
     file_format->set_magic_number(kFileMagic);
-    file_format->set_version_number(kFileVersion);
+    file_format->set_version_number(kV4FileVersion);
     {
       BaseFileOutputStream output_stream(new_filename);
       if (!file_format->SerializeToZeroCopyStream(&output_stream) ||

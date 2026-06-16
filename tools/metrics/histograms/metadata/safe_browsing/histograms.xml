@@ -4352,6 +4352,26 @@ parsed correctly. -->
   <token key="Store" variants="SafeBrowsing_SBStore_Metrics"/>
 </histogram>
 
+<histogram name="SafeBrowsing.V5Store.V4ToV5Migration.V4ReadFailureReason"
+    enum="SafeBrowsingV4StoreReadResult" expires_after="2027-05-05">
+  <owner>thefrog@chromium.org</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Records the reason why reading the V4 store failed during migration to V5.
+    Recorded when attempting to parse the v4 store from disk fails.
+  </summary>
+</histogram>
+
+<histogram name="SafeBrowsing.V5Store.V4ToV5MigrationResult"
+    enum="V4ToV5MigrationResult" expires_after="2027-05-05">
+  <owner>thefrog@chromium.org</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Track the result of migrating a SafeBrowsing store from v4 to v5 on disk.
+    Recorded when a migration is attempted even if it does not occur.
+  </summary>
+</histogram>
+
 <histogram name="SafeBrowsing.V5StoreRead.Result"
     enum="SafeBrowsingV5StoreReadResult" expires_after="2027-05-05">
   <owner>thefrog@chromium.org</owner>

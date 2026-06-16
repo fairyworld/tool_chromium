@@ -10,6 +10,7 @@
 #include "base/numerics/safe_conversions.h"
 #include "base/strings/string_util.h"
 #include "components/safe_browsing/core/browser/db/sb_protocol_manager_util.h"
+#include "components/safe_browsing/core/browser/db/v4_store.pb.h"
 
 namespace safe_browsing {
 
@@ -114,6 +115,51 @@ int BaseFileInputStream::CopyingBaseFileInputStream::Skip(int count) {
     return count;
   }
   return CopyingInputStream::Skip(count);
+}
+
+// static
+StoreReadResult SBStore::ParseAndValidateV4StoreFileFormat(
+    const base::FilePath& store_path,
+    V4StoreFileFormat& file_format,
+    int64_t* file_size) {
+  {
+    BaseFileInputStream input_stream(store_path);
+    if (!file_format.ParseFromZeroCopyStream(&input_stream)) {
+      return input_stream.GetError() != base::File::FILE_OK
+                 ? FILE_UNREADABLE_FAILURE
+                 : PROTO_PARSING_FAILURE;
+    }
+    // `ParseFromZeroCopyStream` will return true if the file didn't exist, so
+    // explicitly check for an error when reading from the file.
+    if (input_stream.GetError() != base::File::FILE_OK) {
+      return FILE_UNREADABLE_FAILURE;
+    }
+    int64_t bytes_read = input_stream.ByteCount();
+    if (!bytes_read) {
+      return FILE_EMPTY_FAILURE;
+    }
+    if (file_size) {
+      *file_size = bytes_read;
+    }
+  }
+
+  if (file_format.magic_number() != kFileMagic) {
+    return UNEXPECTED_MAGIC_NUMBER_FAILURE;
+  }
+
+  if (file_format.version_number() != kV4FileVersion) {
+    return FILE_VERSION_INCOMPATIBLE_FAILURE;
+  }
+
+  if (!file_format.has_list_update_response()) {
+    return HASH_PREFIX_INFO_MISSING_FAILURE;
+  }
+
+  if (!file_format.list_update_response().additions().empty()) {
+    return PRE_MMAP_MIGRATION_FILE_FORMAT_FAILURE;
+  }
+
+  return READ_SUCCESS;
 }
 
 }  // namespace safe_browsing

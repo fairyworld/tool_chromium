@@ -40,52 +40,6 @@ using UpdatedStoreReadyCallback =
 using IteratorMap =
     std::unordered_map<PrefixSize, HashPrefixesView::const_iterator>;
 
-// Enumerate different failure events while parsing the file read from disk for
-// histogramming purposes.  DO NOT CHANGE THE ORDERING OF THESE VALUES.
-enum StoreReadResult {
-  // No errors.
-  READ_SUCCESS = 0,
-
-  // Reserved for errors in parsing this enum.
-  UNEXPECTED_READ_FAILURE = 1,
-
-  // The contents of the file could not be read.
-  FILE_UNREADABLE_FAILURE = 2,
-
-  // The file was found to be empty.
-  FILE_EMPTY_FAILURE = 3,
-
-  // The contents of the file could not be interpreted as a valid
-  // V4StoreFileFormat proto.
-  PROTO_PARSING_FAILURE = 4,
-
-  // The magic number didn't match. We're most likely trying to read a file
-  // that doesn't contain hash prefixes.
-  UNEXPECTED_MAGIC_NUMBER_FAILURE = 5,
-
-  // The version of the file is different from expected and Chromium doesn't
-  // know how to interpret this version of the file.
-  FILE_VERSION_INCOMPATIBLE_FAILURE = 6,
-
-  // The rest of the file could not be parsed as a ListUpdateResponse protobuf.
-  // This can happen if the machine crashed before the file was fully written to
-  // disk or if there was disk corruption.
-  HASH_PREFIX_INFO_MISSING_FAILURE = 7,
-
-  // Unable to generate the hash prefix map from the updates on disk.
-  HASH_PREFIX_MAP_GENERATION_FAILURE = 8,
-
-  // There was a failure migrating between in-memory and mmap file formats.
-  MIGRATION_FAILURE = 9,
-
-  // The file is in a pre-mmap migration format, which is no longer supported.
-  PRE_MMAP_MIGRATION_FILE_FORMAT_FAILURE = 10,
-
-  // Memory space for histograms is determined by the max.  ALWAYS
-  // ADD NEW VALUES BEFORE THIS ONE.
-  STORE_READ_RESULT_MAX
-};
-
 // Enumerate different failure events while writing the file to disk after
 // applying updates for histogramming purposes.
 // DO NOT CHANGE THE ORDERING OF THESE VALUES.
