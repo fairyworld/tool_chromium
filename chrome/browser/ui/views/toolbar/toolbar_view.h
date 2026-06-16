@@ -148,6 +148,8 @@ class ToolbarView : public views::AccessiblePaneView,
 
   WebUIToolbarWebView* GetWebUIToolbarViewForTesting() override;
 
+  OverflowButton* overflow_button() { return overflow_button_; }
+
   void ShowIntentPickerBubble(
       std::vector<IntentPickerBubbleView::AppInfo> app_info,
       bool show_stay_in_chrome,

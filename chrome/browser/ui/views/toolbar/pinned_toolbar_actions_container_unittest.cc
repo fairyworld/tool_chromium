@@ -808,3 +808,32 @@ TEST_F(PinnedToolbarActionsContainerTest,
                 pinned_button->GetProperty(kToolbarButtonFlexPriorityKey)),
             PinnedToolbarActionFlexPriority::kMedium);
 }
+
+TEST_F(PinnedToolbarActionsContainerTest,
+       BubbleAnchorFallsBackToOverflowButtonWhenOverflowed) {
+  UpdateActionItem(actions::kActionCut);
+
+  container()->GetAnimatingLayoutManager()->disable_widget_check_for_testing();
+  container()->SetBounds(0, 0, 1000, 50);
+  container()->ShowActionEphemerallyInToolbar(actions::kActionCut, true);
+  container()->GetAnimatingLayoutManager()->ResetLayout();
+
+  // Set the overflow button visible on the toolbar.
+  auto* overflow_button = browser_view()->toolbar()->overflow_button();
+  ASSERT_TRUE(overflow_button);
+  overflow_button->SetVisible(true);
+
+  // When the container itself is visible, anchor should be the button itself.
+  container()->SetVisible(true);
+  EXPECT_FALSE(container()->IsOverflowed(actions::kActionCut));
+  auto normal_anchor = container()->GetBubbleAnchor(actions::kActionCut);
+  EXPECT_EQ(normal_anchor.GetIfView(),
+            container()->GetButtonFor(actions::kActionCut));
+
+  // When the container is not visible (simulating overflowed/hidden state),
+  // anchor should fall back to the overflow button.
+  container()->SetVisible(false);
+  EXPECT_TRUE(container()->IsOverflowed(actions::kActionCut));
+  auto overflow_anchor = container()->GetBubbleAnchor(actions::kActionCut);
+  EXPECT_EQ(overflow_anchor.GetIfView(), overflow_button);
+}
