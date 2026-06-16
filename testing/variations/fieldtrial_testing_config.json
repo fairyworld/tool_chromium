@@ -11142,14 +11142,16 @@
     "FetchAccountInfoOnRestart": [
         {
             "platforms": [
+                "android",
                 "chromeos",
+                "ios",
                 "linux",
                 "mac",
                 "windows"
             ],
             "experiments": [
                 {
-                    "name": "Enabled_20260609",
+                    "name": "Enabled",
                     "enable_features": [
                         "FetchAccountInfoOnRestart"
                     ]
