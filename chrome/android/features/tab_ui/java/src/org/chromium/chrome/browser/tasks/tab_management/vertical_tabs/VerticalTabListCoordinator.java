@@ -48,6 +48,9 @@ import org.chromium.chrome.browser.tasks.tab_management.TabProperties;
 import org.chromium.chrome.browser.tasks.tab_management.TabProperties.UiType;
 import org.chromium.chrome.browser.ui.messages.snackbar.SnackbarManager;
 import org.chromium.chrome.tab_ui.R;
+import org.chromium.components.browser_ui.desktop_windowing.AppHeaderState;
+import org.chromium.components.browser_ui.desktop_windowing.DesktopWindowStateManager;
+import org.chromium.components.browser_ui.desktop_windowing.DesktopWindowStateManager.AppHeaderObserver;
 import org.chromium.components.browser_ui.util.motion.MotionEventInfo;
 import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.modelutil.PropertyModel;
@@ -74,6 +77,9 @@ public class VerticalTabListCoordinator {
     // Create a mutable coordinate holder.
     private final Point mLastTouchPoint = new Point();
     private @Nullable TabStripContextMenuCoordinator mTabStripContextMenuCoordinator;
+    private final @Nullable DesktopWindowStateManager mDesktopWindowStateManager;
+    private final @Nullable AppHeaderObserver mAppHeaderObserver;
+    private final View mSpacerView;
 
     private class VerticalTabListClickHandler implements TabListItemOnClickListenerProvider {
         private final TabActionListener mTabGroupClickedListener =
@@ -134,7 +140,8 @@ public class VerticalTabListCoordinator {
             VerticalTabsActionDelegate verticalTabsActionDelegate,
             WindowAndroid windowAndroid,
             MultiInstanceManager multiInstanceManager,
-            SnackbarManager snackbarManager) {
+            SnackbarManager snackbarManager,
+            @Nullable DesktopWindowStateManager desktopWindowStateManager) {
         mModelList = new TabListModel();
         SimpleRecyclerViewAdapter adapter =
                 new SimpleRecyclerViewAdapter(mModelList) {
@@ -183,6 +190,8 @@ public class VerticalTabListCoordinator {
         mContainerView.setLayoutParams(
                 new ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        mSpacerView = mContainerView.findViewById(R.id.desktop_window_spacer);
 
         TabListRecyclerView recyclerView = mContainerView.findViewById(R.id.tab_list_recycler_view);
 
@@ -335,6 +344,26 @@ public class VerticalTabListCoordinator {
         tabModelSelector
                 .getCurrentTabModelSupplier()
                 .addSyncObserverAndCallIfNonNull(mCurrentTabModelObserver);
+
+        mDesktopWindowStateManager = desktopWindowStateManager;
+        if (mDesktopWindowStateManager != null) {
+            mAppHeaderObserver =
+                    new AppHeaderObserver() {
+                        @Override
+                        public void onAppHeaderStateChanged(AppHeaderState newState) {
+                            updateSpacerVisibility(newState);
+                        }
+
+                        @Override
+                        public void onDesktopWindowingModeChanged(boolean isInDesktopWindow) {
+                            updateSpacerVisibility(mDesktopWindowStateManager.getAppHeaderState());
+                        }
+                    };
+            mDesktopWindowStateManager.addObserver(mAppHeaderObserver);
+            updateSpacerVisibility(mDesktopWindowStateManager.getAppHeaderState());
+        } else {
+            mAppHeaderObserver = null;
+        }
     }
 
     /** Returns the root ViewGroup container representing the Left Rail sidebar. */
@@ -354,6 +383,10 @@ public class VerticalTabListCoordinator {
         if (mTabStripContextMenuCoordinator != null) {
             mTabStripContextMenuCoordinator.destroy();
             mTabStripContextMenuCoordinator = null;
+        }
+
+        if (mDesktopWindowStateManager != null && mAppHeaderObserver != null) {
+            mDesktopWindowStateManager.removeObserver(mAppHeaderObserver);
         }
     }
 
@@ -476,5 +509,10 @@ public class VerticalTabListCoordinator {
     @VisibleForTesting
     Point getLastTouchPointForTesting() {
         return mLastTouchPoint;
+    }
+
+    private void updateSpacerVisibility(@Nullable AppHeaderState appHeaderState) {
+        boolean isInDesktopWindow = appHeaderState != null && appHeaderState.isInDesktopWindow();
+        mSpacerView.setVisibility(isInDesktopWindow ? View.VISIBLE : View.GONE);
     }
 }

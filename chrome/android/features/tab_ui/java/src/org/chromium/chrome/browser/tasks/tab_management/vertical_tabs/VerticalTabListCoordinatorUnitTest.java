@@ -22,8 +22,10 @@ import static org.mockito.Mockito.when;
 
 import android.app.Activity;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.SystemClock;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
@@ -75,6 +77,8 @@ import org.chromium.chrome.browser.ui.favicon.FaviconHelper;
 import org.chromium.chrome.browser.ui.favicon.FaviconHelperJni;
 import org.chromium.chrome.browser.ui.messages.snackbar.SnackbarManager;
 import org.chromium.chrome.tab_ui.R;
+import org.chromium.components.browser_ui.desktop_windowing.AppHeaderState;
+import org.chromium.components.browser_ui.desktop_windowing.DesktopWindowStateManager;
 import org.chromium.components.collaboration.CollaborationService;
 import org.chromium.components.collaboration.ServiceStatus;
 import org.chromium.components.commerce.core.ShoppingService;
@@ -117,6 +121,7 @@ public class VerticalTabListCoordinatorUnitTest {
     @Mock private MultiInstanceManager mMultiInstanceManager;
     @Mock private SnackbarManager mSnackbarManager;
     @Mock private TabStripContextMenuCoordinator mTabStripContextMenuCoordinator;
+    @Mock private DesktopWindowStateManager mDesktopWindowStateManager;
 
     private Activity mActivity;
     private final SettableMonotonicObservableSupplier<TabModel> mCurrentTabModelSupplier =
@@ -171,7 +176,8 @@ public class VerticalTabListCoordinatorUnitTest {
                         mVerticalTabsActionDelegate,
                         mWindowAndroid,
                         mMultiInstanceManager,
-                        mSnackbarManager);
+                        mSnackbarManager,
+                        mDesktopWindowStateManager);
     }
 
     private Tab prepareMockTab(int id) {
@@ -560,5 +566,37 @@ public class VerticalTabListCoordinatorUnitTest {
         newTabButton.performClick();
         verify(mTabModel, never()).commitAllTabClosures();
         verify(mTabCreator).launchNtp(TabLaunchType.FROM_CHROME_UI);
+    }
+
+    @Test
+    @SmallTest
+    public void testSpacerViewVisibilityInDesktopWindow() {
+        // Mock DesktopWindowStateManager to say we are in desktop windowing mode.
+        var appHeaderState =
+                new AppHeaderState(new Rect(0, 0, 100, 100), new Rect(10, 0, 80, 100), true);
+        when(mDesktopWindowStateManager.getAppHeaderState()).thenReturn(appHeaderState);
+
+        // Capture AppHeaderObserver.
+        ArgumentCaptor<DesktopWindowStateManager.AppHeaderObserver> observerCaptor =
+                ArgumentCaptor.forClass(DesktopWindowStateManager.AppHeaderObserver.class);
+
+        createCoordinator();
+
+        verify(mDesktopWindowStateManager).addObserver(observerCaptor.capture());
+        var observer = observerCaptor.getValue();
+        assertNotNull(observer);
+
+        ViewGroup view = (ViewGroup) mCoordinator.getView();
+        View spacer = view.findViewById(R.id.desktop_window_spacer);
+        assertNotNull("Spacer view should exist.", spacer);
+        assertEquals("Spacer view should be visible.", View.VISIBLE, spacer.getVisibility());
+
+        // Exit desktop window.
+        var appHeaderState2 =
+                new AppHeaderState(new Rect(0, 0, 100, 100), new Rect(10, 0, 80, 100), false);
+        when(mDesktopWindowStateManager.getAppHeaderState()).thenReturn(appHeaderState2);
+        observer.onAppHeaderStateChanged(appHeaderState2);
+
+        assertEquals("Spacer view should be hidden.", View.GONE, spacer.getVisibility());
     }
 }

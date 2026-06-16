@@ -180,6 +180,57 @@ public class TabStripTransitionCoordinatorUnitTest {
     }
 
     @Test
+    public void suppressTabStrip_DesktopWindow() {
+        setUpTabStripTransitionCoordinator(
+                /* isInDesktopWindow= */ true, LARGE_DESKTOP_WINDOW_WIDTH);
+        verifyFadeTransitionState(/* expectedScrimOpacity= */ 0f);
+
+        int expectedHeight = TEST_TAB_STRIP_HEIGHT + mReservedTopPadding;
+        assertEquals(
+                "Tab strip height requested is incorrect.",
+                expectedHeight,
+                mTestHandler.heightRequested);
+
+        mTestHandler.reset();
+
+        mCoordinator.suppressTabStrip(true);
+        RobolectricUtil.runAllBackgroundAndUiIncludingDelayed();
+
+        verifyFadeTransitionState(/* expectedScrimOpacity= */ 1f);
+        assertEquals("Height requested should be 0.", 0, mTestHandler.heightRequested);
+    }
+
+    @Test
+    public void suppressTabStrip_DesktopWindow_Toggle() {
+        setUpTabStripTransitionCoordinator(
+                /* isInDesktopWindow= */ true, LARGE_DESKTOP_WINDOW_WIDTH);
+        verifyFadeTransitionState(/* expectedScrimOpacity= */ 0f);
+        int expectedHeight = TEST_TAB_STRIP_HEIGHT + mReservedTopPadding;
+        assertEquals(
+                "Tab strip height requested is incorrect.",
+                expectedHeight,
+                mTestHandler.heightRequested);
+
+        mTestHandler.reset();
+
+        mCoordinator.suppressTabStrip(true);
+        RobolectricUtil.runAllBackgroundAndUiIncludingDelayed();
+        verifyFadeTransitionState(/* expectedScrimOpacity= */ 1f);
+        assertEquals("Height requested should be 0.", 0, mTestHandler.heightRequested);
+
+        mTestHandler.reset();
+
+        mCoordinator.suppressTabStrip(false);
+        RobolectricUtil.runAllBackgroundAndUiIncludingDelayed();
+
+        verifyFadeTransitionState(/* expectedScrimOpacity= */ 0f);
+        assertEquals(
+                "Height requested should be restored.",
+                expectedHeight,
+                mTestHandler.heightRequested);
+    }
+
+    @Test
     public void hideTabStrip() {
         setDeviceWidthDp(NARROW_NORMAL_WINDOW_WIDTH);
 

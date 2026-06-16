@@ -266,6 +266,7 @@ public class TabStripTransitionCoordinator implements ComponentCallbacks, AppHea
     /** Set whether the tab strip should be suppressed for other UIs. */
     public void suppressTabStrip(boolean suppress) {
         mHeightTransitionHandler.suppressTabStrip(suppress);
+        mFadeTransitionHandler.suppressTabStrip(suppress);
     }
 
     /** Request the token to defer the tab strip height transition to a later time. */

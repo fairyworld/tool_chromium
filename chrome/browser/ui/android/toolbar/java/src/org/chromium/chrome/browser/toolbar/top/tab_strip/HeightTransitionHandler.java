@@ -334,8 +334,9 @@ class HeightTransitionHandler {
 
         mTabStripVisible = showTabStrip;
         int newHeight =
-                (mUpdateStripVisibility && showTabStrip)
-                                || (!mUpdateStripVisibility && mForceUpdateHeight)
+                !mTabStripSuppressed
+                                && ((mUpdateStripVisibility && showTabStrip)
+                                        || (!mUpdateStripVisibility && mForceUpdateHeight))
                         ? calculateTabStripHeight()
                         : 0;
 
