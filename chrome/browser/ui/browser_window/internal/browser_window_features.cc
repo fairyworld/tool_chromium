@@ -887,6 +887,10 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
           browser->profile(), browser->tab_strip_model(), browser->window(),
           browser);
 
+  if (browser_view) {
+    user_education_->Init(browser_view);
+  }
+
   // Initialize post-window dependent embedder features last.
   embedder_browser_window_features_->InitPostWindowConstruction(browser);
 }
@@ -1015,8 +1019,6 @@ void BrowserWindowFeatures::InitPostBrowserViewConstruction(
   zoom_bubble_coordinator_ =
       GetUserDataFactory().CreateInstance<ZoomBubbleCoordinator>(
           *browser_, *browser_, zoom_bubble_manager_.get());
-
-  user_education_->Init(browser_view);
 
   find_bar_owner_ = std::make_unique<FindBarOwnerViews>(browser_view);
 

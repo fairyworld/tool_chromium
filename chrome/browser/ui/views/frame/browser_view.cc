@@ -5347,6 +5347,11 @@ bool BrowserView::MaybeUpdateSplitView(content::WebContents* contents) {
 bool BrowserView::MaybeUpdateDevtools(content::WebContents* contents) {
   const tabs::TabInterface* const new_tab =
       contents ? tabs::TabInterface::GetFromContents(contents) : nullptr;
+  auto* devtools_ui_controller =
+      browser_->GetFeatures().devtools_ui_controller();
+  if (!devtools_ui_controller) {
+    return false;
+  }
 
   bool devtools_layout_updated = false;
   if (IsInSplitView()) {
@@ -5357,13 +5362,11 @@ bool BrowserView::MaybeUpdateDevtools(content::WebContents* contents) {
     std::vector<tabs::TabInterface*> split_tabs = split_data->ListTabs();
     for (tabs::TabInterface* tab : split_tabs) {
       devtools_layout_updated |=
-          browser_->GetFeatures().devtools_ui_controller()->UpdateDevtools(
-              tab->GetContents(), false);
+          devtools_ui_controller->UpdateDevtools(tab->GetContents(), false);
     }
   } else {
     devtools_layout_updated =
-        browser_->GetFeatures().devtools_ui_controller()->UpdateDevtools(
-            contents, false);
+        devtools_ui_controller->UpdateDevtools(contents, false);
   }
   return devtools_layout_updated;
 }
