@@ -854,6 +854,7 @@ chromium-metrics-reviews@google.com.
   <int value="11" label="Managed bookmark has sync metadata"/>
   <int value="12" label="Entity missing client tag hash"/>
   <int value="13" label="Entity missing favicon hash"/>
+  <int value="14" label="Invalid metadata (failed validation)"/>
 </enum>
 
 <!-- LINT.ThenChange(/components/sync_bookmarks/synced_bookmark_tracker.h:SyncBookmarkModelMetadataCorruptionReason) -->
