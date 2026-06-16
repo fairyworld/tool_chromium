@@ -33,12 +33,17 @@
 #import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
 #import "ios/chrome/browser/shared/public/commands/open_new_tab_command.h"
 #import "ios/chrome/browser/shared/public/commands/scene_commands.h"
+#import "ios/chrome/browser/shared/public/commands/snackbar_commands.h"
 #import "ios/chrome/browser/shared/public/features/features.h"
+#import "ios/chrome/browser/shared/public/snackbar/snackbar_message.h"
+#import "ios/chrome/browser/shared/public/snackbar/snackbar_message_action.h"
 #import "ios/chrome/browser/signin/model/authentication_service_factory.h"
 #import "ios/chrome/browser/tabs/model/tab_helper_filter.h"
 #import "ios/chrome/browser/tabs/model/tab_helper_util.h"
 #import "ios/chrome/browser/url_loading/model/url_loading_browser_agent.h"
+#import "ios/chrome/grit/ios_strings.h"
 #import "ios/web/public/web_state.h"
+#import "ui/base/l10n/l10n_util_mac.h"
 #import "url/gurl.h"
 
 @interface AssistantAIMCoordinator () <AssistantAIMViewControllerDelegate,
@@ -235,6 +240,7 @@ class AssistantAIMUIStateProvider
   CHECK(browserAgent);
   browserAgent->SetSessionActive(false);
   [self dismissAssistantContainerAnimated:YES];
+  [self showUndoSnackbar];
 }
 
 - (void)assistantAIMViewController:(AssistantAIMViewController*)viewController
@@ -291,6 +297,34 @@ class AssistantAIMUIStateProvider
                                                completion:nil];
     }
   }
+}
+
+// Shows the undo snackbar with a confirmation message.
+//
+// While the snackbar is shown the assistant is hidden. If the user presses
+// "undo" the assistant is revealed, otherwise it is permanently closed.
+- (void)showUndoSnackbar {
+  __weak id<SceneCommands> sceneHandler =
+      HandlerForProtocol(self.browser->GetCommandDispatcher(), SceneCommands);
+  __block BOOL didUndo = NO;
+  SnackbarMessage* message = [[SnackbarMessage alloc]
+      initWithTitle:l10n_util::GetNSString(IDS_IOS_AIM_CLOSE_SNACKBAR_TITLE)];
+
+  message.action = [[SnackbarMessageAction alloc] init];
+  message.action.title =
+      l10n_util::GetNSString(IDS_IOS_AIM_SNACKBAR_UNDO_BUTTON);
+  message.action.handler = ^{
+    didUndo = YES;
+    [sceneHandler revealAssistant];
+  };
+  message.completionHandler = ^(BOOL success) {
+    if (!didUndo) {
+      [sceneHandler closeAssistant];
+    }
+  };
+
+  [HandlerForProtocol(self.browser->GetCommandDispatcher(), SnackbarCommands)
+      showSnackbarMessage:message];
 }
 
 #pragma mark - AssistantContainerDelegate
