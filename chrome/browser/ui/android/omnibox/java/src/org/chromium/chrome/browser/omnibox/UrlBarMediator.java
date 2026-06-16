@@ -41,7 +41,6 @@ import java.util.Objects;
 class UrlBarMediator implements UrlBarTextContextMenuDelegate {
     private final Context mContext;
     private final PropertyModel mModel;
-    private final Callback<Boolean> mOnFocusChangeCallback;
 
     private boolean mIsInInputSession;
 
@@ -55,7 +54,6 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
     private boolean mShowOriginOnly;
     private final @Nullable Callback<String> mTextChangeListener;
     private final @Nullable Callback<UrlBarTextChangeInfo> mRichTextChangeListener;
-    private boolean mIsReparenting;
 
     /**
      * Creates a URLBarMediator.
@@ -71,17 +69,14 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
     public UrlBarMediator(
             Context context,
             PropertyModel model,
-            Callback<Boolean> focusChangeCallback,
             @Nullable Callback<String> textChangeListener,
             @Nullable Callback<UrlBarTextChangeInfo> richTextChangeListener,
             @Nullable OnKeyListener keyDownListener) {
         mContext = context;
         mModel = model;
-        mOnFocusChangeCallback = focusChangeCallback;
         mTextChangeListener = textChangeListener;
         mRichTextChangeListener = richTextChangeListener;
 
-        mModel.set(UrlBarProperties.FOCUS_CHANGE_CALLBACK, this::onUrlFocusChange);
         mModel.set(UrlBarProperties.TEXT_CONTEXT_MENU_DELEGATE, this);
         mModel.set(UrlBarProperties.HAS_URL_SUGGESTIONS, false);
         mModel.set(UrlBarProperties.TEXT_CHANGE_LISTENER, this::onTextChanged);
@@ -98,7 +93,6 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
     }
 
     public void destroy() {
-        mModel.set(UrlBarProperties.FOCUS_CHANGE_CALLBACK, null);
         mModel.set(UrlBarProperties.TEXT_CONTEXT_MENU_DELEGATE, null);
         mModel.set(UrlBarProperties.TEXT_CHANGE_LISTENER, null);
         mModel.set(UrlBarProperties.MANAGE_SEARCH_ENGINES_CALLBACK, null);
@@ -183,7 +177,7 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
         return mUrlBarData;
     }
 
-    private void pushTextToModel(boolean originChanged) {
+    /* package */ void pushTextToModel(boolean originChanged) {
         CharSequence text;
         if (mShowOriginOnly && mUrlBarData.originStartIndex != mUrlBarData.originEndIndex) {
             text =
@@ -286,25 +280,6 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
 
     private @Nullable GURL getOrigin(@Nullable GURL gurl) {
         return gurl != null ? gurl.getOrigin() : null;
-    }
-
-    void onUrlFocusChange(boolean focus) {
-        if (mIsReparenting) return;
-
-        if (focus) {
-            beginInput();
-        } else {
-            endInput();
-        }
-
-        UrlBarTextState preCallbackState = mModel.get(UrlBarProperties.TEXT_STATE);
-        mOnFocusChangeCallback.onResult(focus);
-        boolean textChangedInFocusCallback =
-                mModel.get(UrlBarProperties.TEXT_STATE) != preCallbackState;
-        if (!textChangedInFocusCallback) {
-            pushTextToModel(/* originChanged= */ false);
-        }
-        updateShowHintText(mUrlBarData.displayText.toString());
     }
 
     /**
@@ -492,13 +467,5 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
     /** Sets the accessibility warning text. */
     public void setAccessibilityWarning(@Nullable String warning) {
         mModel.set(UrlBarProperties.ACCESSIBILITY_WARNING, warning);
-    }
-
-    void startReparenting() {
-        mIsReparenting = true;
-    }
-
-    void finishReparenting() {
-        mIsReparenting = false;
     }
 }
