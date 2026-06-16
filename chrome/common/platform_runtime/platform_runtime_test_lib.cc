@@ -4,6 +4,8 @@
 
 #include <stddef.h>
 
+#include "base/compiler_specific.h"
+
 #if defined(_WIN32)
 #define PR_EXPORT __declspec(dllexport)
 #else
@@ -14,7 +16,7 @@ extern "C" PR_EXPORT const char* GetLibraryName() {
   return "platform_runtime_test_lib";
 }
 
-extern "C" PR_EXPORT bool ProcessRequestHeaders(
+extern "C" PR_EXPORT DISABLE_CFI_DLSYM bool ProcessRequestHeaders(
     void* headers,
     bool (*get_header)(void*, const char*, char*, size_t),
     void (*set_header)(void*, const char*, const char*),
