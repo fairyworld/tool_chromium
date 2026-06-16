@@ -415,7 +415,7 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
             }
             mTab = tab;
 
-            if (tab != null) {
+            if (tab != null && !tab.isDestroyed()) {
                 var swipeHandler = SwipeRefreshHandler.from(tab);
                 swipeHandler.setNavigationCoordinator(mHistoryNavigationCoordinator);
                 if (UiAndroidFeatureList.sReportBottomOverscrolls.isEnabled()) {

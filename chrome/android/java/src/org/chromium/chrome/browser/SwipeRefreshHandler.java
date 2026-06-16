@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.VisibleForTesting;
 
 import org.chromium.base.ThreadUtils;
 import org.chromium.base.TraceEvent;
@@ -109,12 +110,16 @@ public class SwipeRefreshHandler extends TabWebContentsUserData
     // state.
     private @Nullable BottomOverscrollHandler mBottomOverscrollHandler;
 
+    /**
+     * Returns a {@link SwipeRefreshHandler} for the given {@link Tab} creating a new one if needed.
+     */
     public static SwipeRefreshHandler from(Tab tab) {
         return SwipeRefreshHandler.from(tab, DEFAULT_SWIPE_REFRESH_LAYOUT_CREATOR);
     }
 
-    public static SwipeRefreshHandler from(
-            Tab tab, SwipeRefreshLayoutCreator swipeRefreshLayoutCreator) {
+    @VisibleForTesting
+    static SwipeRefreshHandler from(Tab tab, SwipeRefreshLayoutCreator swipeRefreshLayoutCreator) {
+        assert !tab.isDestroyed();
         SwipeRefreshHandler handler = get(tab);
         if (handler == null) {
             handler =
@@ -126,7 +131,9 @@ public class SwipeRefreshHandler extends TabWebContentsUserData
         return handler;
     }
 
+    /** Returns a {@link SwipeRefreshHandler} for the given {@link Tab} if it exists. */
     public static @Nullable SwipeRefreshHandler get(Tab tab) {
+        if (tab.isDestroyed()) return null;
         return tab.getUserDataHost().getUserData(USER_DATA_KEY);
     }
 
