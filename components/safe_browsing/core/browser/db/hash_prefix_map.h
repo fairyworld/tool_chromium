@@ -10,10 +10,8 @@
 #include <string_view>
 #include <unordered_map>
 
-#include "base/files/memory_mapped_file.h"
 #include "components/safe_browsing/core/browser/db/hash_prefix_container.h"
 #include "components/safe_browsing/core/browser/db/v4_protocol_manager_util.h"
-#include "components/safe_browsing/core/browser/db/v4_store.pb.h"
 
 namespace safe_browsing {
 
@@ -114,33 +112,6 @@ class HashPrefixMap : public HashPrefixContainer {
   void ClearAndWaitForTesting();
 
  private:
-  class BufferedFileWriter;
-  class FileInfo {
-   public:
-    FileInfo(const base::FilePath& store_path, PrefixSize size);
-    ~FileInfo();
-
-    // `initialize_after_write` will control some extra logging for
-    // investigating https://crbug.com/393395944.
-    // TODO(crbug.com/393395944): Remove `initialize_after_write`.
-    bool Initialize(const HashFile& hash_file, bool initialize_after_write);
-    bool Finalize(HashFile* hash_file);
-
-    HashPrefixesView GetView() const;
-    bool IsReadable() const { return file_.IsValid(); }
-    HashPrefixStr Matches(std::string_view full_hash) const;
-    BufferedFileWriter* GetOrCreateWriter(size_t buffer_size);
-
-    const std::string& GetExtensionForTesting() const;
-
-   private:
-    const base::FilePath store_path_;
-    const PrefixSize prefix_size_;
-
-    base::MemoryMappedFile file_;
-    std::unique_ptr<BufferedFileWriter> writer_;
-  };
-
   FileInfo& GetFileInfo(PrefixSize size);
   void ClearOnTaskRunner();
 

@@ -9,6 +9,7 @@
 
 #include "base/files/file_util.h"
 #include "base/files/scoped_temp_dir.h"
+#include "base/strings/string_number_conversions.h"
 #include "base/strings/string_util.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
@@ -287,6 +288,26 @@ TEST_F(HashPrefixMapTest, ValidAfterWrite) {
   HashPrefixMapView view = hash_prefix_map.view();
   EXPECT_EQ(view.size(), 1u);
   EXPECT_EQ(view[4], "fooo");
+}
+
+TEST_F(HashPrefixMapTest, ExtensionFormat) {
+  HashPrefixMap map(GetBasePath());
+  map.Append(4, "fooo");
+
+  V4StoreFileFormat file_format;
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(map.WriteToDisk(sb_file_format));
+  EXPECT_EQ(APPLY_UPDATE_SUCCESS, map.IsValid());
+
+  EXPECT_EQ(1, file_format.hash_files().size());
+  const std::string& extension = file_format.hash_files(0).extension();
+
+  // Confirm extension format is "{prefix_size}_{timestamp_in_microseconds}".
+  // Also check the prefix size directly.
+  EXPECT_TRUE(base::StartsWith(extension, "4_"));
+  std::string numeric_part = extension.substr(2);
+  uint64_t microsecond_timestamp;
+  EXPECT_TRUE(base::StringToUint64(numeric_part, &microsecond_timestamp));
 }
 
 }  // namespace

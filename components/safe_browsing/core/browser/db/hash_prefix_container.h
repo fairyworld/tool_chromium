@@ -6,12 +6,14 @@
 #define COMPONENTS_SAFE_BROWSING_CORE_BROWSER_DB_HASH_PREFIX_CONTAINER_H_
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 
 #include "base/files/file.h"
 #include "base/files/file_path.h"
+#include "base/files/memory_mapped_file.h"
 #include "base/task/sequenced_task_runner.h"
 #include "components/safe_browsing/core/browser/db/sb_protocol_manager_util.h"
 #include "components/safe_browsing/core/browser/db/sb_store_file_format.h"
@@ -29,6 +31,14 @@ using HashPrefixMapView = std::unordered_map<PrefixSize, HashPrefixesView>;
 
 class HashPrefixContainer {
  public:
+  // Metadata for a hash prefix file that has been written out.
+  struct FinalizedFileInfo {
+    // The extension generated for the written file.
+    std::string extension;
+    // The total size in bytes of the written file.
+    uint64_t file_size;
+  };
+
   // Represents an active disk write session. Instances returned by
   // WriteToDisk() must be kept alive until the corresponding
   // SBStoreFileFormat is fully committed to disk.
@@ -42,8 +52,78 @@ class HashPrefixContainer {
     WriteSession() = default;
   };
 
+  // Buffers disk writes to avoid issuing a file write call for each hash
+  // prefix.
+  class BufferedFileWriter {
+   public:
+    BufferedFileWriter(const base::FilePath& store_path,
+                       PrefixSize prefix_size,
+                       size_t buffer_size,
+                       const std::string& extension,
+                       std::string_view metric_prefix);
+
+    ~BufferedFileWriter();
+
+    void Write(HashPrefixesView data);
+    bool Finish();
+
+    size_t GetFileSize() const;
+
+    const std::string& extension() const;
+
+    bool has_error() const;
+
+   private:
+    void Flush();
+    void WriteToFile(HashPrefixesView data);
+
+    const std::string extension_;
+    const base::FilePath path_;
+    const size_t prefix_size_;
+    const size_t buffer_size_;
+    size_t cur_size_ = 0;
+    base::File file_;
+    std::string buffer_;
+    bool has_error_;
+    const std::string metric_prefix_;
+  };
+
   // Default buffer size for writing hash prefix files.
   static constexpr size_t kDefaultBufferSize = 1024 * 512;
+
+  // Manages the memory-mapped file for a specific prefix size and handles
+  // writing out updates.
+  class FileInfo {
+   public:
+    FileInfo(const base::FilePath& store_path, PrefixSize size);
+    ~FileInfo();
+
+    // `initialize_after_write` will control some extra logging for
+    // investigating https://crbug.com/393395944.
+    // TODO(crbug.com/393395944): Remove `initialize_after_write`.
+    bool Initialize(const std::string& extension,
+                    uint64_t expected_file_size,
+                    bool initialize_after_write,
+                    std::string_view metric_prefix);
+
+    std::optional<FinalizedFileInfo> Finalize(std::string_view metric_prefix);
+
+    HashPrefixesView GetView() const;
+    bool IsReadable() const;
+    HashPrefixStr Matches(std::string_view full_hash) const;
+    BufferedFileWriter* GetOrCreateWriter(size_t buffer_size,
+                                          const std::string& extension,
+                                          std::string_view metric_prefix);
+
+    const std::string& GetExtensionForTesting() const;
+
+   private:
+    const base::FilePath store_path_;
+    const PrefixSize prefix_size_;
+
+    base::MemoryMappedFile file_;
+    std::unique_ptr<BufferedFileWriter> writer_;
+  };
 
   explicit HashPrefixContainer(
       const base::FilePath& store_path,
@@ -56,6 +136,8 @@ class HashPrefixContainer {
   virtual void Clear() = 0;
 
   // Returns a read-only view of the data stored in this container.
+  // TODO(crbug.com/372395685): There shouldn't be any map references once
+  // HashPrefixList is all that remains.
   virtual HashPrefixMapView view() const = 0;
 
   // Appends |prefix| to the prefix list of size |size|.
