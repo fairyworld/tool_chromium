@@ -7407,6 +7407,7 @@ test("unit_tests") {
       "//chrome/browser/personal_context/first_run:unit_tests",
       "//chrome/browser/predictors:unit_tests",
       "//chrome/browser/predictors/lcp_critical_path_predictor:unit_tests",
+      "//chrome/browser/readaloud:unit_tests",
       "//chrome/browser/readaloud/android:native",
       "//chrome/browser/reading_list/android:reading_list",
       "//chrome/browser/reading_list/android:unit_tests",
