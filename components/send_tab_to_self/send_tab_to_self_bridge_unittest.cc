@@ -22,6 +22,7 @@
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/testing_pref_service.h"
 #include "components/send_tab_to_self/features.h"
+#include "components/send_tab_to_self/metrics_util.h"
 #include "components/send_tab_to_self/page_context.h"
 #include "components/send_tab_to_self/pref_names.h"
 #include "components/send_tab_to_self/proto/send_tab_to_self.pb.h"
@@ -1698,6 +1699,59 @@ TEST_F(SendTabToSelfBridgeTest, SendEntry_UsesFullName) {
 
   ASSERT_NE(nullptr, result);
   EXPECT_EQ(full_name, result->GetDeviceName());
+}
+
+TEST_F(SendTabToSelfBridgeTest, SendEntry_RecordsDeviceFormFactorCombination) {
+  InitializeBridge();
+  base::HistogramTester histogram_tester;
+
+  // Add the local device as a desktop.
+  std::unique_ptr<syncer::DeviceInfo> local_device =
+      syncer::TestDeviceInfoBuilder(syncer::DeviceInfo::OsType::kLinux)
+          .WithGuid("local_guid")
+          .WithFormFactor(syncer::DeviceInfo::FormFactor::kDesktop)
+          .Build();
+  AddTestDevice(local_device.get(), /*local=*/true);
+  SetLocalDeviceCacheGuid("local_guid");
+
+  // Add a target device as a phone.
+  std::unique_ptr<syncer::DeviceInfo> target_device =
+      syncer::TestDeviceInfoBuilder(syncer::DeviceInfo::OsType::kAndroid)
+          .WithGuid("target_phone_guid")
+          .WithFormFactor(syncer::DeviceInfo::FormFactor::kPhone)
+          .WithSendTabToSelfReceivingEnabled(true)
+          .Build();
+  AddTestDevice(target_device.get());
+
+  bridge()->SendEntry(GURL("https://example.com"), "Title", "target_phone_guid",
+                      PageContext(), NavigationHistory(), base::DoNothing());
+
+  histogram_tester.ExpectUniqueSample(
+      "Sharing.SendTabToSelf.DeviceFormFactorCombination",
+      SendTabToSelfFormFactorCombination::kDesktopToPhone, 1);
+}
+
+TEST_F(SendTabToSelfBridgeTest, SendEntry_RecordsDeviceFormFactorCombinationUnknown) {
+  InitializeBridge();
+  base::HistogramTester histogram_tester;
+
+  // Add the local device as a desktop.
+  std::unique_ptr<syncer::DeviceInfo> local_device =
+      syncer::TestDeviceInfoBuilder(syncer::DeviceInfo::OsType::kLinux)
+          .WithGuid("local_guid")
+          .WithFormFactor(syncer::DeviceInfo::FormFactor::kDesktop)
+          .Build();
+  AddTestDevice(local_device.get(), /*local=*/true);
+  SetLocalDeviceCacheGuid("local_guid");
+
+  // There is no DeviceInfo for the target device.
+
+  bridge()->SendEntry(GURL("https://example.com"), "Title", "target_phone_guid",
+                      PageContext(), NavigationHistory(), base::DoNothing());
+
+  histogram_tester.ExpectUniqueSample(
+      "Sharing.SendTabToSelf.DeviceFormFactorCombination",
+      SendTabToSelfFormFactorCombination::kDesktopToUnknown, 1);
 }
 
 TEST_F(SendTabToSelfBridgeTest, SendEntry_RecordsPageContextSize) {

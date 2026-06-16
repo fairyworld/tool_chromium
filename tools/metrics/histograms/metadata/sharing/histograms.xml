@@ -400,6 +400,18 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Sharing.SendTabToSelf.DeviceFormFactorCombination"
+    enum="SendTabToSelfFormFactorCombination" expires_after="2027-06-15">
+  <owner>treib@chromium.org</owner>
+  <owner>ankushkush@chromium.org</owner>
+  <owner>src/components/sync/OWNERS</owner>
+  <summary>
+    Records the form factor combination of the sending (local) device and the
+    target (destination) device when a tab is sent. Recorded on the sending
+    device at the moment the tab is sent.
+  </summary>
+</histogram>
+
 <histogram name="Sharing.SendTabToSelf.NotificationClicked.HasScrollPosition"
     enum="Boolean" expires_after="2027-03-04">
   <owner>mtatarski@google.com</owner>

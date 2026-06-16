@@ -474,6 +474,23 @@ const SendTabToSelfEntry* SendTabToSelfBridge::SendEntry(
   // due to the per-entity size limit.
   RecordPageContextSize(PageContextToProto(context).ByteSizeLong());
 
+  syncer::DeviceInfo::FormFactor sender_form_factor =
+      syncer::DeviceInfo::FormFactor::kUnknown;
+  const syncer::DeviceInfo* local_device = GetLocalDeviceInfo();
+  if (local_device) {
+    sender_form_factor = local_device->form_factor();
+  }
+
+  syncer::DeviceInfo::FormFactor target_form_factor =
+      syncer::DeviceInfo::FormFactor::kUnknown;
+  const syncer::DeviceInfo* target_device =
+      device_info_tracker_->GetDeviceInfo(target_device_cache_guid);
+  if (target_device) {
+    target_form_factor = target_device->form_factor();
+  }
+
+  RecordDeviceFormFactorCombination(sender_form_factor, target_form_factor);
+
   std::unique_ptr<DataTypeStore::WriteBatch> batch = store_->CreateWriteBatch();
   // This entry is new. Add it to the store and model.
   std::unique_ptr<syncer::EntityData> entity_data =
@@ -801,13 +818,19 @@ SendTabToSelfEntry* SendTabToSelfBridge::GetMutableEntryByGUID(
   return it->second.get();
 }
 
+const syncer::DeviceInfo* SendTabToSelfBridge::GetLocalDeviceInfo() const {
+  if (!change_processor()->IsTrackingMetadata()) {
+    return nullptr;
+  }
+  return device_info_tracker_->GetDeviceInfo(
+      change_processor()->TrackedCacheGuid());
+}
+
 std::string SendTabToSelfBridge::GetLocalFallbackFullName() const {
   if (local_device_name_for_testing_.has_value()) {
     return *local_device_name_for_testing_;
   }
-  CHECK(change_processor()->IsTrackingMetadata());
-  const syncer::DeviceInfo* local_device = device_info_tracker_->GetDeviceInfo(
-      change_processor()->TrackedCacheGuid());
+  const syncer::DeviceInfo* local_device = GetLocalDeviceInfo();
   CHECK(local_device, base::NotFatalUntil::M148);
 
   return syncer::GetDisplayNameCandidates(local_device).fallback_full_name;
