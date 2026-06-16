@@ -694,7 +694,16 @@ NavigationCapturingProcess::GetInitialNavigationParamsOverride(
 
       return AuxiliaryContextInAppWindow(app_window);
     }
+
+#if BUILDFLAG(IS_CHROMEOS)
+    // This case is only reachable on CrOS for apps that were specifically
+    // opted in to the original version of auxiliary context capturing. The
+    // generally available version only captures auxiliary contexts created by a
+    // web app, and in the score of that same web app.
     return AuxiliaryContext();
+#else
+    NOTREACHED();
+#endif
   }
   debug_data_.Set("is_auxiliary_browsing_context", false);
 
