@@ -3208,6 +3208,27 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
     }
 
     @Test
+    public void testReadAloudMenuItem_Submenu_notReadable() {
+        when(mTab.getUrl()).thenReturn(JUnitTestGURLs.EXAMPLE_URL);
+        when(mReadAloudController.isReadable(any())).thenReturn(false);
+        setUpMocksForPageMenu();
+        ModelList modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
+        assertFalse(
+                isMenuVisibleInSubmenu(modelList, R.id.more_tools_menu_id, R.id.readaloud_menu_id));
+    }
+
+    @Test
+    public void testReadAloudMenuItem_Submenu_readable() {
+        when(mTab.getUrl()).thenReturn(JUnitTestGURLs.EXAMPLE_URL);
+        when(mReadAloudController.isReadable(any())).thenReturn(true);
+        setUpMocksForPageMenu();
+        ModelList modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
+        assertTrue(
+                isMenuVisibleInSubmenu(modelList, R.id.more_tools_menu_id, R.id.readaloud_menu_id));
+    }
+
+    @Test
+    @DisableFeatures({ChromeFeatureList.SUBMENUS_IN_APP_MENU})
     public void testReadAloudMenuItem_readAloudNotEnabled() {
         when(mTab.getUrl()).thenReturn(JUnitTestGURLs.EXAMPLE_URL);
         setUpMocksForPageMenu();
@@ -3216,6 +3237,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
     }
 
     @Test
+    @DisableFeatures({ChromeFeatureList.SUBMENUS_IN_APP_MENU})
     public void testReadAloudMenuItem_notReadable() {
         when(mTab.getUrl()).thenReturn(JUnitTestGURLs.EXAMPLE_URL);
         when(mReadAloudController.isReadable(any())).thenReturn(false);
@@ -3225,6 +3247,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
     }
 
     @Test
+    @DisableFeatures({ChromeFeatureList.SUBMENUS_IN_APP_MENU})
     public void testReadAloudMenuItem_readable() {
         when(mTab.getUrl()).thenReturn(JUnitTestGURLs.EXAMPLE_URL);
         when(mReadAloudController.isReadable(any())).thenReturn(true);
@@ -3234,21 +3257,25 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
     }
 
     @Test
+    @DisableFeatures({ChromeFeatureList.SUBMENUS_IN_APP_MENU})
     public void testReadaloudMenuItem_readableBecomesUnreadable() {
         testReadAloudMenuItemUpdates(/* initiallyReadable= */ true, /* laterReadable= */ false);
     }
 
     @Test
+    @DisableFeatures({ChromeFeatureList.SUBMENUS_IN_APP_MENU})
     public void testReadaloudMenuItem_unreadableBecomesReadable() {
         testReadAloudMenuItemUpdates(/* initiallyReadable= */ false, /* laterReadable= */ true);
     }
 
     @Test
+    @DisableFeatures({ChromeFeatureList.SUBMENUS_IN_APP_MENU})
     public void testReadaloudMenuItem_noChangeInReadability_notReadable() {
         testReadAloudMenuItemUpdates(/* initiallyReadable= */ false, /* laterReadable= */ false);
     }
 
     @Test
+    @DisableFeatures({ChromeFeatureList.SUBMENUS_IN_APP_MENU})
     public void testReadaloudMenuItem_noChangeInReadability_readable() {
         testReadAloudMenuItemUpdates(/* initiallyReadable= */ true, /* laterReadable= */ true);
     }

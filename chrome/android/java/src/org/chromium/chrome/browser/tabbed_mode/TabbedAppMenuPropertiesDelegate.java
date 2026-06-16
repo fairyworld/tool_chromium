@@ -126,6 +126,7 @@ import org.chromium.ui.modaldialog.ModalDialogManager;
 import org.chromium.ui.modelutil.LayoutViewBuilder;
 import org.chromium.ui.modelutil.MVCListAdapter;
 import org.chromium.ui.modelutil.MVCListAdapter.ListItem;
+import org.chromium.ui.modelutil.MVCListAdapter.ModelList;
 import org.chromium.ui.modelutil.ModelListAdapter;
 import org.chromium.ui.modelutil.PropertyModel;
 import org.chromium.url.GURL;
@@ -501,7 +502,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
         }
 
         // Readaloud
-        observeAndMaybeAddReadAloud(modelList, currentTab);
+        if (!ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)) {
+            observeAndMaybeAddReadAloud(modelList, currentTab);
+        }
 
         // More tools
         if (shouldShowMoreToolsItem(currentTab)) {
@@ -1940,6 +1943,12 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
             return false;
         }
 
+        // TODO(crbug.com/521223427): Dynamically update while the menu is open.
+        ReadAloudController readAloudController = mReadAloudControllerSupplier.get();
+        if (readAloudController != null && readAloudController.isReadable(currentTab)) {
+            return true;
+        }
+
         if (shouldShowReaderModeItem(currentTab)) {
             return true;
         }
@@ -1970,30 +1979,43 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
     private ListItem buildMoreToolsItem(@Nullable Tab currentTab) {
         assert shouldShowMoreToolsItem(currentTab);
 
-        List<ListItem> submenuItems = new ArrayList<>();
-        if (shouldShowReaderModeItem(currentTab)) {
-            submenuItems.add(buildReaderModeItem(currentTab));
-        }
+        Supplier<List<ListItem>> submenuItemsSupplier =
+                () -> {
+                    List<ListItem> submenuItems = new ArrayList<>();
 
-        if (shouldShowTaskManagerItem()) {
-            submenuItems.add(buildTaskManagerItem());
-        }
+                    ReadAloudController readAloudController = mReadAloudControllerSupplier.get();
+                    if (ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)
+                            && readAloudController != null
+                            && readAloudController.isReadable(currentTab)) {
+                        submenuItems.add(buildReadAloudSubmenuItem());
+                    }
 
-        if (shouldShowNameWindowItem()) {
-            submenuItems.add(buildNameWindowItem());
-        }
+                    if (shouldShowReaderModeItem(currentTab)) {
+                        submenuItems.add(buildReaderModeItem(currentTab));
+                    }
 
-        if (shouldShowNtpCustomizations(currentTab)) {
-            submenuItems.add(buildNtpCustomizationsItem(currentTab));
-        }
+                    if (shouldShowTaskManagerItem()) {
+                        submenuItems.add(buildTaskManagerItem());
+                    }
 
-        if (shouldShowDevToolsItem(currentTab)) {
-            submenuItems.add(buildDevToolsItem(currentTab));
-        }
+                    if (shouldShowNameWindowItem()) {
+                        submenuItems.add(buildNameWindowItem());
+                    }
 
-        if (shouldShowTabLayoutToggleItem()) {
-            submenuItems.add(buildTabLayoutToggleItem());
-        }
+                    if (shouldShowNtpCustomizations(currentTab)) {
+                        submenuItems.add(buildNtpCustomizationsItem(currentTab));
+                    }
+
+                    if (shouldShowDevToolsItem(currentTab)) {
+                        submenuItems.add(buildDevToolsItem(currentTab));
+                    }
+
+                    if (shouldShowTabLayoutToggleItem()) {
+                        submenuItems.add(buildTabLayoutToggleItem());
+                    }
+
+                    return submenuItems;
+                };
 
         return new ListItem(
                 AppMenuHandler.AppMenuItemType.MENU_ITEM_WITH_SUBMENU,
@@ -2003,7 +2025,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                         shouldShowIconBeforeItem()
                                 ? R.drawable.ic_more_tools_24dp
                                 : Resources.ID_NULL,
-                        () -> submenuItems));
+                        submenuItemsSupplier));
     }
 
     private boolean shouldShowNameWindowItem() {
@@ -2526,6 +2548,27 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                 bookmarkModel.finishLoadingBookmarkModel(() -> {});
             }
         }
+    }
+
+    @Override
+    protected void observeAndMaybeAddReadAloud(ModelList modelList, @Nullable Tab currentTab) {
+        // TODO(crbug.com/521223427): This is not ideal. When SUBMENUS_IN_APP_MENU is enabled,
+        // we suppress the main menu insertion and rely on querying ReadAloudController live
+        // in the "More tools" submenu Supplier. Ideally, we should implement a mechanism to
+        // dynamically update the item visibility in the submenu, rather than requiring the user to
+        // reopen the App Menu.
+        if (!ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)) {
+            super.observeAndMaybeAddReadAloud(modelList, currentTab);
+        }
+    }
+
+    private ListItem buildReadAloudSubmenuItem() {
+        PropertyModel propertyModel =
+                buildModelForStandardMenuItem(
+                        R.id.readaloud_menu_id,
+                        R.string.menu_listen_to_this_page,
+                        shouldShowIconBeforeItem() ? R.drawable.ic_play_circle : 0);
+        return new ListItem(AppMenuHandler.AppMenuItemType.STANDARD, propertyModel);
     }
 
     private Profile getProfileFromTabModel() {
