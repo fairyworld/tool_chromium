@@ -72,6 +72,10 @@ source_set("webauthn") {
       "//google_apis",
     ]
   }
+
+  if (is_mac) {
+    public += [ "chrome_authenticator_request_delegate_mac.h" ]
+  }
 }
 
 source_set("impl") {
