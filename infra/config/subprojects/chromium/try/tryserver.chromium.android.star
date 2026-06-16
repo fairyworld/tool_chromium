@@ -82,7 +82,7 @@ try_.builder(
         ],
     ),
     experiments = {
-        "luci.buildbucket.run_in_turboci": 30,
+        "luci.buildbucket.run_in_turboci": 100,
     },
     main_list_view = "try",
 )
