@@ -7997,17 +7997,6 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="Android.WebView.IsInstantApp" enum="Boolean"
-    expires_after="2026-07-01">
-  <owner>peter@chromium.org</owner>
-  <owner>src/android_webview/OWNERS</owner>
-  <summary>
-    Records whether WebView is running in an Instant App. This is emitted once
-    during WebView global initialization. Recorded in an internal repository, so
-    code references might be missing.
-  </summary>
-</histogram>
-
 <histogram name="Android.WebView.JsInjection.RenderFrameCreatedTime" units="ms"
     expires_after="2026-06-01">
   <owner>peconn@chromium.org</owner>
