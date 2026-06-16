@@ -336,10 +336,23 @@ uploading your change for review.  These are checked by presubmit scripts.
   <int value="17" label="Package was updated"/>
 </enum>
 
+<!-- LINT.IfChange(AndroidWebViewPreconnectEvent) -->
+
 <enum name="AndroidWebViewPreconnectEvent">
   <int value="0" label="preconnect called"/>
-  <int value="1" label="session closed"/>
+  <int value="1" label="(Obsolete) session closed"/>
+  <int value="2" label="connection established, QUIC"/>
+  <int value="3" label="connection established, HTTP2"/>
+  <int value="4" label="connection established, other"/>
+  <int value="5" label="connection closed, was used, QUIC"/>
+  <int value="6" label="connection closed, was used, HTTP2"/>
+  <int value="7" label="connection closed, was used, other"/>
+  <int value="8" label="connection closed, wasn't used, QUIC"/>
+  <int value="9" label="connection closed, wasn't used, HTTP2"/>
+  <int value="10" label="connection closed, wasn't used, other"/>
 </enum>
+
+<!-- LINT.ThenChange(//android_webview/browser/aw_preconnector.cc:AwPreconnectEvent) -->
 
 <enum name="AnrSkippedReason">
   <int value="0" label="Filesystem Read Failure"/>
