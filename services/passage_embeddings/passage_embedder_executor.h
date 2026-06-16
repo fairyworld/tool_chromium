@@ -20,6 +20,11 @@ namespace passage_embeddings {
 
 class PassageEmbedderExecutionTask;
 
+struct EmbedderExecutionResult {
+  std::vector<float> embeddings;
+  uint32_t signature_length = 0;
+};
+
 class PassageEmbedderExecutor {
  public:
   PassageEmbedderExecutor() = default;
@@ -27,7 +32,7 @@ class PassageEmbedderExecutor {
   PassageEmbedderExecutor& operator=(const PassageEmbedderExecutor&) = delete;
   virtual ~PassageEmbedderExecutor() = default;
 
-  virtual std::optional<std::vector<float>> Execute(
+  virtual std::optional<EmbedderExecutionResult> Execute(
       const std::vector<int>& raw_tokens) = 0;
 };
 
@@ -41,7 +46,7 @@ class HistoryModelExecutor : public PassageEmbedderExecutor {
   HistoryModelExecutor& operator=(const HistoryModelExecutor&) = delete;
   ~HistoryModelExecutor() override;
 
-  std::optional<std::vector<float>> Execute(
+  std::optional<EmbedderExecutionResult> Execute(
       const std::vector<int>& raw_tokens) override;
 
   // Public for testing.
@@ -73,7 +78,7 @@ class GemmaModelExecutor : public PassageEmbedderExecutor {
   GemmaModelExecutor& operator=(const GemmaModelExecutor&) = delete;
   ~GemmaModelExecutor() override;
 
-  std::optional<std::vector<float>> Execute(
+  std::optional<EmbedderExecutionResult> Execute(
       const std::vector<int>& raw_tokens) override;
 
   // Public for testing.

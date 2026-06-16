@@ -13,6 +13,7 @@
 
 #include "base/containers/lru_cache.h"
 #include "base/files/file.h"
+#include "services/passage_embeddings/passage_embedder_executor.h"
 #include "services/passage_embeddings/public/mojom/passage_embeddings.mojom.h"
 
 namespace sentencepiece {
@@ -23,8 +24,6 @@ namespace passage_embeddings {
 
 inline constexpr char kCacheHitMetricName[] =
     "History.Embeddings.Embedder.CacheHit";
-
-class PassageEmbedderExecutor;
 
 // The actual implementation of the passage embedder, which is intended to run
 // on a background sequence.
@@ -60,7 +59,7 @@ class PassageEmbedderImpl {
   bool BuildExecutionTask();
 
   // Executes the model to generate text embeddings result for the input.
-  std::optional<std::vector<float>> Execute(const std::vector<int>& input);
+  std::optional<EmbedderExecutionResult> Execute(const std::vector<int>& input);
 
   std::unique_ptr<sentencepiece::SentencePieceProcessor> sp_processor_;
 

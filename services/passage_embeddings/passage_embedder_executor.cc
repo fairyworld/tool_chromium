@@ -31,9 +31,14 @@ HistoryModelExecutor::HistoryModelExecutor(
       eos_id_(eos_id) {}
 HistoryModelExecutor::~HistoryModelExecutor() = default;
 
-std::optional<std::vector<float>> HistoryModelExecutor::Execute(
+std::optional<EmbedderExecutionResult> HistoryModelExecutor::Execute(
     const std::vector<int>& raw_tokens) {
-  return task_->Execute(FormatInput(raw_tokens, input_window_size_, eos_id_));
+  auto output =
+      task_->Execute(FormatInput(raw_tokens, input_window_size_, eos_id_));
+  if (!output) {
+    return std::nullopt;
+  }
+  return EmbedderExecutionResult{std::move(*output), input_window_size_};
 }
 
 std::vector<int> HistoryModelExecutor::FormatInput(
@@ -112,7 +117,7 @@ GemmaModelExecutor::GemmaModelExecutor(
 }
 GemmaModelExecutor::~GemmaModelExecutor() = default;
 
-std::optional<std::vector<float>> GemmaModelExecutor::Execute(
+std::optional<EmbedderExecutionResult> GemmaModelExecutor::Execute(
     const std::vector<int>& raw_tokens) {
   const ModelSignature& signature = GetSignature(
       raw_tokens.size() + kControlTokensCount, available_signatures_);
@@ -140,7 +145,8 @@ std::optional<std::vector<float>> GemmaModelExecutor::Execute(
   std::vector<float> output;
   CHECK(tflite::task::core::PopulateVector<float>(output_tensor, &output).ok());
 
-  return output;
+  return EmbedderExecutionResult{
+      std::move(output), static_cast<uint32_t>(signature.sequence_length)};
 }
 
 // static
