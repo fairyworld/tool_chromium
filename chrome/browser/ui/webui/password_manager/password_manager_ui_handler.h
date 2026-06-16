@@ -81,6 +81,8 @@ class PasswordManagerUIHandler : public password_manager::mojom::PageHandler {
   void IsConnectedToCloudAuthenticator(
       IsConnectedToCloudAuthenticatorCallback callback) override;
 
+  void UndoRemoveSavedPasswordOrException() override;
+
  private:
   password_manager::SavedPasswordsPresenter* GetSavedPasswordsPresenter();
 

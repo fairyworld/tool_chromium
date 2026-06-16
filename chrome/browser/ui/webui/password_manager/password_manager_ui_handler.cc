@@ -174,3 +174,7 @@ void PasswordManagerUIHandler::IsConnectedToCloudAuthenticator(
       passwords_private_delegate_->IsConnectedToCloudAuthenticator(
           web_contents_));
 }
+
+void PasswordManagerUIHandler::UndoRemoveSavedPasswordOrException() {
+  passwords_private_delegate_->UndoRemoveSavedPasswordOrException();
+}
