@@ -144,6 +144,7 @@ bool IsSkyVaultTTEnabled() {
 
 UserCloudPolicyManagerAsh::UserCloudPolicyManagerAsh(
     PrefService* local_state,
+    scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory,
     Profile* profile,
     std::unique_ptr<CloudPolicyStore> store,
     std::unique_ptr<CloudPolicyStore> extension_install_store,
@@ -162,6 +163,7 @@ UserCloudPolicyManagerAsh::UserCloudPolicyManagerAsh(
           task_runner,
           base::BindRepeating(content::GetNetworkConnectionTracker)),
       local_state_(CHECK_DEREF(local_state)),
+      shared_url_loader_factory_(std::move(shared_url_loader_factory)),
       profile_(profile),
       external_data_manager_(std::move(external_data_manager)),
       component_policy_cache_path_(component_policy_cache_path),
@@ -171,6 +173,7 @@ UserCloudPolicyManagerAsh::UserCloudPolicyManagerAsh(
       enforcement_type_(enforcement_type),
       account_id_(account_id),
       fatal_error_callback_(std::move(fatal_error_callback)) {
+  CHECK(shared_url_loader_factory_);
   DCHECK(profile_);
 
   // If a refresh timeout was specified, set a timer to call us back.
@@ -199,32 +202,22 @@ void UserCloudPolicyManagerAsh::ForceTimeoutForTest() {
   OnPolicyRefreshTimeout();
 }
 
-void UserCloudPolicyManagerAsh::SetSignInURLLoaderFactoryForTests(
-    scoped_refptr<network::SharedURLLoaderFactory> signin_url_loader_factory) {
-  signin_url_loader_factory_for_tests_ = signin_url_loader_factory;
-}
 
-void UserCloudPolicyManagerAsh::SetSystemURLLoaderFactoryForTests(
-    scoped_refptr<network::SharedURLLoaderFactory> system_url_loader_factory) {
-  system_url_loader_factory_for_tests_ = system_url_loader_factory;
-}
 
 UserCloudPolicyManagerAsh::~UserCloudPolicyManagerAsh() = default;
 
 void UserCloudPolicyManagerAsh::ConnectManagementService(
-    DeviceManagementService* device_management_service,
-    scoped_refptr<network::SharedURLLoaderFactory> system_url_loader_factory) {
+    DeviceManagementService* device_management_service) {
   DCHECK(device_management_service);
 
   CHECK(!core()->client());
 
-  // Note: |system_url_loader_factory| can be null for tests.
   // Use the system URL loader context here instead of a context derived
   // from the Profile because Connect() is called before the profile is
   // fully initialized (required so we can perform the initial policy load).
   std::unique_ptr<CloudPolicyClient> cloud_policy_client =
       std::make_unique<CloudPolicyClient>(
-          device_management_service, system_url_loader_factory,
+          device_management_service, shared_url_loader_factory_,
           ash::GetDeviceDMTokenForUserPolicyGetter(account_id_));
   CreateComponentCloudPolicyService(
       dm_protocol::kChromeExtensionPolicyType, component_policy_cache_path_,
@@ -232,7 +225,7 @@ void UserCloudPolicyManagerAsh::ConnectManagementService(
   core()->Connect(std::move(cloud_policy_client));
   observed_cloud_policy_client_.Observe(client());
 
-  external_data_manager_->Connect(system_url_loader_factory);
+  external_data_manager_->Connect(shared_url_loader_factory_);
 
   // Determine the next step after the CloudPolicyService initializes.
   if (service()->IsInitializationComplete()) {
@@ -590,18 +583,6 @@ void UserCloudPolicyManagerAsh::FetchPolicyOAuthToken() {
     return;
   }
 
-  // TODO(jcivelli): Connect() is passed a SharedURLLoaderFactory but here we
-  // retrieve it from |g_browser_process|. We should move away from retrieving
-  // it from |g_browser_process| at which point we can remove
-  // SetSystemURLLoaderFactoryForTests().
-  scoped_refptr<network::SharedURLLoaderFactory> system_url_loader_factory =
-      system_url_loader_factory_for_tests_;
-  if (!system_url_loader_factory) {
-    system_url_loader_factory =
-        g_browser_process->system_network_context_manager()
-            ->GetSharedURLLoaderFactory();
-  }
-
   std::string refresh_token = user_context_refresh_token_for_tests_.value_or(
       ash::UserSessionManager::GetInstance()->user_context().GetRefreshToken());
 
@@ -609,7 +590,7 @@ void UserCloudPolicyManagerAsh::FetchPolicyOAuthToken() {
     token_fetcher_ =
         PolicyOAuth2TokenFetcher::CreateInstance(kOAuthConsumerName);
     token_fetcher_->StartWithRefreshToken(
-        refresh_token, system_url_loader_factory,
+        refresh_token, shared_url_loader_factory_,
         base::BindOnce(&UserCloudPolicyManagerAsh::OnOAuth2PolicyTokenFetched,
                        base::Unretained(this)));
     return;

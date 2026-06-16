@@ -261,9 +261,11 @@ std::unique_ptr<UserCloudPolicyManagerAsh> CreateUserCloudPolicyManagerAsh(
   // TODO(crbug.com/452305191): Create the right store for ChromeOS.
   std::unique_ptr<UserCloudPolicyManagerAsh> manager =
       std::make_unique<UserCloudPolicyManagerAsh>(
-          g_browser_process->local_state(), profile, std::move(store),
-          std::move(extension_install_store), std::move(external_data_manager),
-          component_policy_cache_dir, enforcement_type, policy_refresh_timeout,
+          g_browser_process->local_state(),
+          g_browser_process->shared_url_loader_factory(), profile,
+          std::move(store), std::move(extension_install_store),
+          std::move(external_data_manager), component_policy_cache_dir,
+          enforcement_type, policy_refresh_timeout,
           base::BindOnce(&OnUserPolicyFatalError, account_id), account_id,
           base::SingleThreadTaskRunner::GetCurrentDefault());
 
@@ -278,9 +280,7 @@ std::unique_ptr<UserCloudPolicyManagerAsh> CreateUserCloudPolicyManagerAsh(
   }
 
   manager->Init(profile->GetPolicySchemaRegistryService()->registry());
-  manager->ConnectManagementService(
-      device_management_service,
-      g_browser_process->shared_url_loader_factory());
+  manager->ConnectManagementService(device_management_service);
   return manager;
 }
 

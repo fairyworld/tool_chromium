@@ -45,6 +45,8 @@
 #include "google_apis/gaia/gaia_id.h"
 #include "google_apis/gaia/google_service_auth_error.h"
 #include "net/base/backoff_entry.h"
+#include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
+#include "services/network/test/test_url_loader_factory.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -65,11 +67,13 @@ constexpr base::TimeDelta kTokenLifetime = base::Minutes(30);
 class MockUserCloudPolicyManagerAsh : public UserCloudPolicyManagerAsh {
  public:
   MockUserCloudPolicyManagerAsh(
+      scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory,
       Profile* profile,
       const AccountId& account_id,
       const scoped_refptr<base::SequencedTaskRunner>& task_runner)
       : UserCloudPolicyManagerAsh(
             TestingBrowserProcess::GetGlobal()->local_state(),
+            std::move(shared_url_loader_factory),
             profile,
             std::make_unique<MockCloudPolicyStore>(
                 dm_protocol::GetChromeUserPolicyType()),
@@ -119,6 +123,8 @@ class UserCloudPolicyTokenForwarderTest : public testing::Test {
 
   void SetUp() override {
     ash::ConciergeClient::InitializeFake(/*fake_cicerone_client=*/nullptr);
+    TestingBrowserProcess::GetGlobal()->SetSharedURLLoaderFactory(
+        test_url_loader_factory_.GetSafeWeakWrapper());
     ASSERT_TRUE(profile_manager_->SetUp());
   }
 
@@ -126,6 +132,7 @@ class UserCloudPolicyTokenForwarderTest : public testing::Test {
     user_policy_manager_->core()->Disconnect();
     // Must be torn down before |profile_manager_|.
     user_policy_manager_.reset();
+    TestingBrowserProcess::GetGlobal()->SetSharedURLLoaderFactory(nullptr);
     ash::ConciergeClient::Shutdown();
   }
 
@@ -172,7 +179,8 @@ class UserCloudPolicyTokenForwarderTest : public testing::Test {
     ASSERT_TRUE(user_manager_->GetActiveUser());
 
     user_policy_manager_ = std::make_unique<MockUserCloudPolicyManagerAsh>(
-        profile, account_id, mock_time_task_runner_);
+        test_url_loader_factory_.GetSafeWeakWrapper(), profile, account_id,
+        mock_time_task_runner_);
     std::unique_ptr<MockCloudPolicyClient> client =
         std::make_unique<MockCloudPolicyClient>();
     CloudPolicyClient* client_ptr = client.get();
@@ -232,6 +240,7 @@ class UserCloudPolicyTokenForwarderTest : public testing::Test {
   std::unique_ptr<IdentityTestEnvironmentProfileAdaptor>
       identity_test_env_profile_adaptor_;
   std::unique_ptr<MockCloudPolicyStore> store_;
+  network::TestURLLoaderFactory test_url_loader_factory_;
 };
 
 TEST_F(UserCloudPolicyTokenForwarderTest,

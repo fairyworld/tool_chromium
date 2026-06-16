@@ -103,11 +103,13 @@ class UserCloudPolicyManagerAsh
   //   the server.
   //
   // `local_state` must not be null and must outlive this object.
+  // `shared_url_loader_factory` must not be null.
   //
   // |account_id| is the AccountId associated with the user's session.
   // |task_runner| is the runner for policy refresh tasks.
   UserCloudPolicyManagerAsh(
       PrefService* local_state,
+      scoped_refptr<network::SharedURLLoaderFactory> shared_url_loader_factory,
       Profile* profile,
       std::unique_ptr<CloudPolicyStore> store,
       std::unique_ptr<CloudPolicyStore> extension_install_store,
@@ -128,8 +130,7 @@ class UserCloudPolicyManagerAsh
   // Initializes the cloud connection. |local_state| and
   // |device_management_service| must stay valid until this object is deleted.
   void ConnectManagementService(
-      DeviceManagementService* device_management_service,
-      scoped_refptr<network::SharedURLLoaderFactory> system_url_loader_factory);
+      DeviceManagementService* device_management_service);
 
   // This class is one of the policy providers, and must be ready for the
   // creation of the Profile's PrefService; all the other KeyedServices depend
@@ -183,13 +184,6 @@ class UserCloudPolicyManagerAsh
 
   // Helper function to force a policy fetch timeout.
   void ForceTimeoutForTest();
-
-  // Sets the SharedURLLoaderFactory's that should be used for tests instead of
-  // retrieving one from the BrowserProcess object in FetchPolicyOAuthToken().
-  void SetSignInURLLoaderFactoryForTests(
-      scoped_refptr<network::SharedURLLoaderFactory> signin_url_loader_factory);
-  void SetSystemURLLoaderFactoryForTests(
-      scoped_refptr<network::SharedURLLoaderFactory> system_url_loader_factory);
 
   // Set a refresh token to be used in tests instead of the user context refresh
   // token when fetching the policy OAuth token.
@@ -269,6 +263,9 @@ class UserCloudPolicyManagerAsh
   // The pref service to pass to the refresh scheduler on initialization.
   const raw_ref<PrefService> local_state_;
 
+  const scoped_refptr<network::SharedURLLoaderFactory>
+      shared_url_loader_factory_;
+
   // Profile associated with the current user.
   const raw_ptr<Profile, DanglingUntriaged> profile_;
 
@@ -324,11 +321,6 @@ class UserCloudPolicyManagerAsh
   // Listening to notification that profile is destroyed.
   base::CallbackListSubscription shutdown_subscription_;
 
-  // The SharedURLLoaderFactory used in some tests to simulate network requests.
-  scoped_refptr<network::SharedURLLoaderFactory>
-      system_url_loader_factory_for_tests_;
-  scoped_refptr<network::SharedURLLoaderFactory>
-      signin_url_loader_factory_for_tests_;
 
   base::ScopedObservation<Profile, ProfileObserver> observed_profile_{this};
 

@@ -30,7 +30,9 @@
 #include "extensions/browser/pref_names.h"
 #include "extensions/common/extension_builder.h"
 #include "extensions/common/extension_urls.h"
+#include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
 #include "services/network/test/test_network_connection_tracker.h"
+#include "services/network/test/test_url_loader_factory.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 #if BUILDFLAG(IS_CHROMEOS)
@@ -72,6 +74,9 @@ class MockExtensionInstallPolicyServiceObserver
 class ExtensionInstallPolicyServiceTest : public testing::Test {
  public:
   void SetUp() override {
+    TestingBrowserProcess::GetGlobal()->SetSharedURLLoaderFactory(
+        test_url_loader_factory_.GetSafeWeakWrapper());
+
     policy_provider_ =
         std::make_unique<testing::NiceMock<MockConfigurationPolicyProvider>>();
     policy_provider_->SetDefaultReturns(
@@ -143,6 +148,7 @@ class ExtensionInstallPolicyServiceTest : public testing::Test {
     profile_ = nullptr;
     profile_manager_->DeleteAllTestingProfiles();
     profile_manager_ = nullptr;
+    TestingBrowserProcess::GetGlobal()->SetSharedURLLoaderFactory(nullptr);
   }
 
   TestingProfile* profile() { return profile_; }
@@ -184,7 +190,8 @@ class ExtensionInstallPolicyServiceTest : public testing::Test {
         mock_user_cloud_policy_store.get());
 
     return std::make_unique<UserCloudPolicyManagerAsh>(
-        TestingBrowserProcess::GetGlobal()->local_state(), profile_,
+        TestingBrowserProcess::GetGlobal()->local_state(),
+        test_url_loader_factory_.GetSafeWeakWrapper(), profile_,
         std::move(mock_user_cloud_policy_store),
         std::move(mock_user_cloud_policy_extension_install_store),
         std::move(cloud_external_data_manager), base::FilePath(),
@@ -209,6 +216,7 @@ class ExtensionInstallPolicyServiceTest : public testing::Test {
 #if BUILDFLAG(IS_CHROMEOS)
   std::unique_ptr<user_manager::ScopedUserManager> scoped_user_manager_;
 #endif
+  network::TestURLLoaderFactory test_url_loader_factory_;
 };
 
 TEST_F(ExtensionInstallPolicyServiceTest, IsExtensionAllowedUnknown) {
