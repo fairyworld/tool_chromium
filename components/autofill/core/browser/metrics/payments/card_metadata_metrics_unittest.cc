@@ -64,7 +64,7 @@ class CardMetadataFormEventMetricsTest
 
     // Add a Mastercard masked server card.
     card_ = test::WithCvc(test::GetMaskedServerCard());
-    card_.SetNetworkForMaskedCard(autofill::kMasterCard);
+    card_.SetNetworkForMaskedCard(kMasterCard);
     card_.set_guid(kCardGuid);
     card_.set_issuer_id(issuer_id());
     if (issuer_id() == kCapitalOneCardIssuerId && card_has_static_art_image()) {
