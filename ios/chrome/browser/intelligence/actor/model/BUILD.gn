@@ -31,7 +31,6 @@ source_set("model") {
     "//ios/chrome/browser/intelligence/actor/tools/public",
     "//ios/chrome/browser/intelligence/actor/tools/utils:actor_browser_utils",
     "//ios/chrome/browser/intelligence/actor/tools/utils:actor_tool_utils",
-    "//ios/chrome/browser/intelligence/actor/tools/utils:logging_util",
     "//ios/chrome/browser/intelligence/features",
     "//ios/chrome/browser/intelligence/proto_wrappers",
     "//ios/chrome/browser/shared/model/browser",

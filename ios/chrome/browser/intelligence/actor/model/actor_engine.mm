@@ -16,7 +16,6 @@
 #import "ios/chrome/browser/intelligence/actor/tools/model/observation_delay_controller.h"
 #import "ios/chrome/browser/intelligence/actor/tools/model/tool_delegate.h"
 #import "ios/chrome/browser/intelligence/actor/tools/public/actor_tool_types.h"
-#import "ios/chrome/browser/intelligence/actor/tools/utils/logging_util.h"
 #import "ios/chrome/browser/intelligence/features/features.h"
 #import "ios/web/public/web_state.h"
 
@@ -89,17 +88,35 @@ void WaitOrImmediatelyFinishTool(ActorTool* tool,
 }
 
 // TODO(crbug.com/503841160): Log the proper WebState URLs.
+// Logs an engine state transition to the journal.
+void LogEngineStateTransition(AggregatedJournal& journal,
+                              ActorTaskId task_id,
+                              ActorEngine::State old_state,
+                              ActorEngine::State new_state) {
+  std::vector<mojom::JournalDetailsPtr> details =
+      JournalDetailsBuilder()
+          .Add("current_state", ActorEngineStateToString(old_state))
+          .Add("new_state", ActorEngineStateToString(new_state))
+          .Build();
+
+  journal.Log(GURL(), task_id, "ExecutionEngine::StateChange",
+              std::move(details));
+}
+
+// TODO(crbug.com/503841160): Log the proper WebState URLs.
 // Logs the start of the Act sequence to the journal.
 void LogActStart(
     AggregatedJournal& journal,
     ActorTaskId task_id,
     const std::vector<std::unique_ptr<ActorToolRequest>>& actions) {
-  std::vector<std::pair<std::string_view, std::string_view>> details;
+  JournalDetailsBuilder builder;
   for (size_t i = 0; i < actions.size(); ++i) {
-    details.push_back({base::StringPrintf("Actions[%zu]", i),
-                       base::StringPrintf("Tool %zu", i)});
+    builder.Add(base::StringPrintf("Actions[%zu]", i),
+                base::StringPrintf("Tool %zu", i));
   }
-  LogJournalEvent(journal, GURL(), task_id, "ExecutionEngine::Act", details);
+
+  journal.Log(GURL(), task_id, "ExecutionEngine::Act",
+              std::move(builder).Build());
 }
 
 // TODO(crbug.com/503841160): Log the proper WebState URLs.
@@ -125,6 +142,28 @@ void EndAsyncEntry(AggregatedJournal::PendingAsyncEntry* entry,
   entry->EndEntry(std::move(builder).Build());
 }
 
+// Logs a ToolExecutionResult immediately to the journal.
+//
+// Note that `result` has a success code and can be used to carry errors
+// made before the tool was even executed.
+void LogToolExecutionResult(AggregatedJournal& journal,
+                            ActorTaskId task_id,
+                            std::string_view details_key,
+                            std::string_view event_name,
+                            const ToolExecutionResult& result) {
+  std::vector<mojom::JournalDetailsPtr> details;
+
+  if (result.IsOk()) {
+    details = JournalDetailsBuilder()
+                  .Add(details_key, GetToolExecutionResultMessage(result))
+                  .Build();
+  } else {
+    details = JournalDetailsBuilder()
+                  .AddError(GetToolExecutionResultMessage(result))
+                  .Build();
+  }
+  journal.Log(GURL(), task_id, event_name, std::move(details));
+}
 
 // Returns the WebStateID for the target WebState of `action`, or an invalid
 // WebStateID if `action` is null or has no target WebState.
@@ -178,9 +217,13 @@ void ActorEngine::CancelOngoingAndPendingActions(
 
   SetState(State::kFailed);
 
-  LogJournalEvent(tool_delegate_->GetJournal(), GURL(),
-                  tool_delegate_->GetTaskId(), "ExecutionEngine::Cancel",
-                  {{"reason", EngineResultToString(reason)}});
+  std::vector<mojom::JournalDetailsPtr> details =
+      JournalDetailsBuilder()
+          .Add("reason", EngineResultToString(reason))
+          .Build();
+  tool_delegate_->GetJournal().Log(GURL(), tool_delegate_->GetTaskId(),
+                                   "ExecutionEngine::Cancel",
+                                   std::move(details));
 
   if (completion_callback_) {
     std::move(completion_callback_).Run(std::move(action_results_));
@@ -188,11 +231,8 @@ void ActorEngine::CancelOngoingAndPendingActions(
 }
 
 void ActorEngine::SetState(State new_state) {
-  // TODO(crbug.com/503841160): Log the proper WebState URLs.
-  LogJournalEvent(tool_delegate_->GetJournal(), GURL(),
-                  tool_delegate_->GetTaskId(), "ExecutionEngine::StateChange",
-                  {{"current_state", ActorEngineStateToString(state_)},
-                   {"new_state", ActorEngineStateToString(new_state)}});
+  LogEngineStateTransition(tool_delegate_->GetJournal(),
+                           tool_delegate_->GetTaskId(), state_, new_state);
   state_ = new_state;
 }
 
@@ -255,11 +295,11 @@ void ActorEngine::FinishedUiPreInvoke(ActionResult result) {
     return;
   }
   LogToolExecutionResult(
-      tool_delegate_->GetJournal(), GURL(), tool_delegate_->GetTaskId(),
+      tool_delegate_->GetJournal(), tool_delegate_->GetTaskId(),
+      /*detail_key=*/"ActorEngine::FinishedUiPreInvoke",
       /*event_name=*/
       base::StringPrintf("CreateTool #%zu", InProgressActionIndex()),
-      create_tool_result,
-      /*success_details_key=*/"ActorEngine::FinishedUiPreInvoke");
+      create_tool_result);
 
   current_tool_ = std::move(maybe_created_tool).value();
   current_async_entry_ = CreateToolExecutionAsyncEntry(
