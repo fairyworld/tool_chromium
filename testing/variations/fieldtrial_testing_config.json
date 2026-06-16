@@ -17425,7 +17425,6 @@
                     "params": {
                         "DocumentProviderBackoffDuration": "60m",
                         "DocumentProviderBackoffOn429": "true",
-                        "DocumentProviderDebounceDelayMs": "600",
                         "DocumentProviderMinQueryLength": "5",
                         "DocumentProviderScopeBackoffToProfile": "true"
                     },

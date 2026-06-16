@@ -384,7 +384,7 @@ DocumentProvider::DocumentProvider() {
           .Get();
   debounce_delay_ms =
       base::FeatureParam<int>(&omnibox::kDocumentProvider,
-                              "DocumentProviderDebounceDelayMs", 300)
+                              "DocumentProviderDebounceDelayMs", 600)
           .Get();
   scope_backoff_to_profile =
       base::FeatureParam<bool>(&omnibox::kDocumentProvider,
