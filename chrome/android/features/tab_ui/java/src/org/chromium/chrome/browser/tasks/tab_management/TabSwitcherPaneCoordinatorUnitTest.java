@@ -71,6 +71,7 @@ import org.chromium.chrome.browser.data_sharing.DataSharingServiceFactory;
 import org.chromium.chrome.browser.data_sharing.DataSharingTabManager;
 import org.chromium.chrome.browser.feature_engagement.TrackerFactory;
 import org.chromium.chrome.browser.flags.ChromeFeatureList;
+import org.chromium.chrome.browser.glic.GlicEnabling;
 import org.chromium.chrome.browser.hub.SingleChildViewManager;
 import org.chromium.chrome.browser.multiwindow.MultiInstanceOrchestrator;
 import org.chromium.chrome.browser.multiwindow.MultiInstanceOrchestratorFactory;
@@ -212,6 +213,7 @@ public class TabSwitcherPaneCoordinatorUnitTest {
 
         PriceTrackingFeatures.setPriceAnnotationsEnabledForTesting(true);
         PriceTrackingFeatures.setIsSignedInAndSyncEnabledForTesting(true);
+        GlicEnabling.setEnabledForTesting(false);
 
         mTabModel = spy(new MockTabModel(mProfile, null));
         when(mTabModel.isTabModelRestored()).thenReturn(true);

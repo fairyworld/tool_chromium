@@ -118,6 +118,7 @@ import org.chromium.chrome.browser.data_sharing.DataSharingServiceFactory;
 import org.chromium.chrome.browser.data_sharing.DataSharingTabManager;
 import org.chromium.chrome.browser.feature_engagement.TrackerFactory;
 import org.chromium.chrome.browser.flags.ChromeFeatureList;
+import org.chromium.chrome.browser.glic.GlicEnabling;
 import org.chromium.chrome.browser.multiwindow.MultiInstanceOrchestrator;
 import org.chromium.chrome.browser.multiwindow.MultiInstanceOrchestratorFactory;
 import org.chromium.chrome.browser.optimization_guide.OptimizationGuideBridge;
@@ -548,6 +549,7 @@ public class TabListMediatorUnitTest {
         mModelList = new TabListModel();
         TemplateUrlServiceFactory.setInstanceForTesting(mTemplateUrlService);
         PriceTrackingFeatures.setPriceAnnotationsEnabledForTesting(false);
+        GlicEnabling.setEnabledForTesting(false);
 
         when(mTabListConfigDelegate.getLayoutType()).thenReturn(TabListLayoutType.GROUPED);
         when(mTabListConfigDelegate.supportsMessageCards()).thenReturn(true);
@@ -578,6 +580,7 @@ public class TabListMediatorUnitTest {
     }
 
     private void setUpActorState(Tab tab, @TabIndicatorStatus int status) {
+        GlicEnabling.setEnabledForTesting(true);
         UiTabState state =
                 new UiTabState(
                         tab.getId(),
@@ -2905,7 +2908,7 @@ public class TabListMediatorUnitTest {
                 .getValue()
                 .didSelectTab(mTab1, TabLaunchType.FROM_CHROME_UI, TAB1_ID);
 
-        // Swap mTab1 and mTab3.
+        // Swap mTab1 and tab3.
         doReturn(mTab1).when(mTabModel).getTabAt(2);
         doReturn(tab3).when(mTabModel).getTabAt(POSITION1);
         group = List.of(tab3, mTab2, mTab1);
@@ -5489,16 +5492,16 @@ public class TabListMediatorUnitTest {
         when(mTab1.getIsPinned()).thenReturn(true);
         when(mTab1.getTabGroupId()).thenReturn(null);
 
-        // Setup mTab2 and mTab3 as an expanded group.
-        Tab mTab3 = prepareTab(TAB3_ID, TAB3_TITLE, TAB3_URL);
+        // Setup mTab2 and tab3 as an expanded group.
+        Tab tab3 = prepareTab(TAB3_ID, TAB3_TITLE, TAB3_URL);
         Token tabGroupId = new Token(1L, 2L);
-        createTabGroup(List.of(mTab2, mTab3), tabGroupId);
+        createTabGroup(List.of(mTab2, tab3), tabGroupId);
         when(mTab2.getIsPinned()).thenReturn(false);
-        when(mTab3.getIsPinned()).thenReturn(false);
+        when(tab3.getIsPinned()).thenReturn(false);
         when(mTabModel.getTabGroupCollapsed(tabGroupId)).thenReturn(false);
-        when(mTabModel.getTabsInGroup(tabGroupId)).thenReturn(List.of(mTab2, mTab3));
+        when(mTabModel.getTabsInGroup(tabGroupId)).thenReturn(List.of(mTab2, tab3));
 
-        mockTabIndexes(mTab1, mTab2, mTab3);
+        mockTabIndexes(mTab1, mTab2, tab3);
 
         mMediator.resetWithListOfTabs(null, null, false);
         mMediator.resetWithListOfTabs(List.of(mTab1, mTab2), null, false);
@@ -5510,7 +5513,7 @@ public class TabListMediatorUnitTest {
 
         // Backend unpins mTab1 (moves it to unpinned boundary, backend index 0).
         when(mTab1.getIsPinned()).thenReturn(false);
-        mockTabIndexes(mTab1, mTab2, mTab3);
+        mockTabIndexes(mTab1, mTab2, tab3);
         mTabObserverCaptor.getValue().onTabPinnedStateChanged(mTab1, false);
 
         // UI after unpinning but before grouping should move mTab1 to the unpinned boundary.
@@ -5520,8 +5523,8 @@ public class TabListMediatorUnitTest {
 
         // Backend merges mTab1 into the group.
         when(mTab1.getTabGroupId()).thenReturn(tabGroupId);
-        when(mTabModel.getRelatedTabList(TAB2_ID)).thenReturn(List.of(mTab2, mTab3, mTab1));
-        mockTabIndexes(mTab2, mTab3, mTab1);
+        when(mTabModel.getRelatedTabList(TAB2_ID)).thenReturn(List.of(mTab2, tab3, mTab1));
+        mockTabIndexes(mTab2, tab3, mTab1);
 
         // Observer: didMergeTabToGroup fires second (when moving into the group)
         mTabGroupObserverCaptor.getValue().didMergeTabToGroup(mTab1, /* isDestinationTab= */ false);
