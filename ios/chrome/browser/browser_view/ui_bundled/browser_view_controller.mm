@@ -1612,7 +1612,6 @@ bool IsFullscreenNextIAEnabled() {
         viewController.view.translatesAutoresizingMaskIntoConstraints = NO;
         [self updateNTPConstraints];
       }
-      [NTPCoordinator constrainNamedGuideForFeedIPH];
     } else {
       self.browserContentViewController.contentView = view;
       if (IsFullscreenRefactoringEnabled()) {

@@ -303,8 +303,6 @@
   SafariDataImportExportCoordinator* _safariDataImportExportCoordinator;
 }
 
-// Synthesize NewTabPageConfiguring properties.
-@synthesize shouldScrollIntoFeed = _shouldScrollIntoFeed;
 @synthesize baseViewController = _baseViewController;
 
 #pragma mark - ChromeCoordinator
@@ -558,15 +556,6 @@
   [self.NTPViewController omniboxDidEndEditing];
 }
 
-- (void)constrainNamedGuideForFeedIPH {
-  if (self.isOffTheRecord) {
-    return;
-  }
-  [LayoutGuideCenterForBrowser(self.browser)
-      referenceView:self.headerView.customizationMenuButton
-          underName:kFeedIPHNamedGuide];
-}
-
 - (void)handleFeedModelDidEndUpdates:(FeedLayoutUpdateType)updateType {
   DCHECK(self.NTPViewController);
   if (!self.feedViewController) {
@@ -691,8 +680,6 @@
   id<NewTabPageComponentFactoryProtocol> componentFactory =
       self.componentFactory;
   self.NTPViewController = [componentFactory NTPViewController];
-  self.NTPViewController.engagementTracker =
-      feature_engagement::TrackerFactory::GetForProfile(self.profile);
   self.NTPViewController.incognitoDisabled =
       IsIncognitoModeDisabled(self.prefService);
   self.headerView = [componentFactory headerViewForProfile:self.profile];
