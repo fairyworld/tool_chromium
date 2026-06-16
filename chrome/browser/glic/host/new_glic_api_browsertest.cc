@@ -89,6 +89,8 @@
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/glic/widget/glic_widget.h"
 #include "chrome/browser/media/audio_ducker.h"
+#include "chrome/browser/resource_coordinator/lifecycle_unit_state.mojom.h"
+#include "chrome/browser/resource_coordinator/tab_lifecycle_unit_external.h"
 #include "chrome/browser/skills/skills_service_factory.h"
 #include "chrome/browser/skills/skills_ui_tab_controller.h"
 #include "chrome/browser/ui/browser.h"
@@ -1757,6 +1759,74 @@ IN_PROC_BROWSER_TEST_P(NewGlicApiTest, testGetPageMetadataUpdates) {
   ASSERT_OK(OpenGlicForActiveTab());
   ExecuteJsTest();
 }
+
+// TODO(crbug.com/449764057): Flakes/fails on all platforms except windows.
+#if BUILDFLAG(IS_WIN)
+#define MAYBE_testGetPageMetadataOnNavigation testGetPageMetadataOnNavigation
+#else
+#define MAYBE_testGetPageMetadataOnNavigation \
+  DISABLED_testGetPageMetadataOnNavigation
+#endif
+IN_PROC_BROWSER_TEST_P(NewGlicApiTest, MAYBE_testGetPageMetadataOnNavigation) {
+  ASSERT_TRUE(content::NavigateToURL(
+      GetTabListInterface()->GetActiveTab()->GetContents(),
+      embedded_test_server()->GetURL("/glic/browser_tests/test.html")));
+  ASSERT_OK(OpenGlicForActiveTab());
+  ExecuteJsTest();
+}
+
+// TODO(crbug.com/454086033): Re-enable this test once I figure out how to
+// discard the tab while preserving the test harness.
+#if !BUILDFLAG(IS_ANDROID)
+IN_PROC_BROWSER_TEST_P(NewGlicApiTest,
+                       DISABLED_testGetPageMetadataWebContentsChanged) {
+  // Navigate the first tab.
+  ASSERT_TRUE(content::NavigateToURL(
+      GetTabListInterface()->GetActiveTab()->GetContents(),
+      embedded_test_server()->GetURL("/glic/browser_tests/test.html")));
+
+  ASSERT_OK(OpenGlicForActiveTab());
+
+  // Runs the JS test until the first `advanceToNextStep()`.
+  ExecuteJsTest();
+
+  // The JS test is now paused.
+  // We first switch focus to the second tab (Tab 1) so that Tab 0 becomes
+  // inactive and can be safely discarded.
+  GetTabListInterface()->ActivateTab(
+      GetTabListInterface()->GetTab(1)->GetHandle());
+
+  content::WebContents* web_contents =
+      GetTabListInterface()->GetTab(0)->GetContents();
+  ASSERT_TRUE(web_contents);
+
+  // Discard the tab. This will destroy the WebContents.
+  resource_coordinator::TabLifecycleUnitExternal::FromWebContents(web_contents)
+      ->DiscardTab(::mojom::LifecycleUnitDiscardReason::PROACTIVE);
+
+  // Wait for the tab to be discarded.
+  ASSERT_TRUE(base::test::RunUntil([&]() {
+    return GetTabListInterface()->GetTab(0)->GetContents()->WasDiscarded();
+  }));
+
+  // Select the tab to reload it. This will create a new WebContents.
+  GetTabListInterface()->ActivateTab(
+      GetTabListInterface()->GetTab(0)->GetHandle());
+  content::WebContents* new_web_contents =
+      GetTabListInterface()->GetTab(0)->GetContents();
+  ASSERT_TRUE(new_web_contents);
+  ASSERT_TRUE(content::WaitForLoadStop(new_web_contents));
+
+  // Change the content of the 'author' meta tag from "George" to "Ruth".
+  const char* script =
+      "document.querySelector('meta[name=\"author\"]').setAttribute('content', "
+      "'Ruth')";
+  ASSERT_TRUE(content::ExecJs(new_web_contents, script));
+
+  // Continue the JS test to verify the metadata update.
+  ContinueJsTest();
+}
+#endif
 
 // TODO(harringtond): Times out on Android.
 #if BUILDFLAG(IS_ANDROID)
