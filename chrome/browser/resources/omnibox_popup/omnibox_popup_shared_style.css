@@ -43,8 +43,13 @@
   --color-searchbox-results-url: var(--color-omnibox-results-url);
   --color-searchbox-search-icon-background: var(--color-omnibox-results-icon);
   --cr-searchbox-match-text-padding-inline-start: 12px;
-  /* TODO(b/524326175): Move other non-shared composebox colors from app.css once
-   * aim_app.css / composebox CSS variables are refactored/reconciled. */
+  /* TODO(b/524320143): Move other non-shared composebox colors from app.css once
+   * aim_app.css / composebox CSS variables are refactored/reconciled.
+   * Remaining variables to reconcile:
+   *   - --color-composebox-context-entrypoint-background
+   *   - --color-composebox-context-entrypoint-hover-background
+   *   - --color-composebox-context-entrypoint-text
+   *   - --composebox-context-menu-entrypoint-button-color */
   --color-composebox-document-chip-icon: var(--color-sys-on-surface-subtle);
 
   /* Closely resembles the views Omnibox input font size.
