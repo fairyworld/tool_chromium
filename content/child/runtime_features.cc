@@ -275,6 +275,10 @@ void SetRuntimeFeaturesFromChromiumFeatures() {
           {wf::EnableWebOTPAssertionFeaturePolicy,
            raw_ref(features::kWebOTPAssertionFeaturePolicy),
            kSetOnlyIfOverridden},
+          {wf::EnablePrefetchActivationBeacon,
+           raw_ref(features::kPrefetchActivationBeacon), kSetOnlyIfOverridden},
+          {wf::EnablePrerenderActivationBeacon,
+           raw_ref(features::kPrerenderActivationBeacon), kSetOnlyIfOverridden},
           {wf::EnableWebUSB, raw_ref(features::kWebUsb)},
           {wf::EnableWebXR, raw_ref(features::kWebXr)},
 #if BUILDFLAG(ENABLE_VR)

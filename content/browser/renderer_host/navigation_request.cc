@@ -79,6 +79,7 @@
 #include "content/browser/preloading/prefetch/prefetch_features.h"
 #include "content/browser/preloading/prefetch/prefetch_serving_page_metrics_container.h"
 #include "content/browser/preloading/preload_activation_report_manager.h"
+#include "content/browser/preloading/preload_activation_report_utils.h"
 #include "content/browser/preloading/prerender/prerender_host_registry.h"
 #include "content/browser/preloading/prerender/prerender_metrics.h"
 #include "content/browser/preloading/prerender/prerender_navigation_utils.h"
@@ -4881,7 +4882,8 @@ void NavigationRequest::OnResponseStarted(
   // spoofing. Prerender commits are excluded here because the page is not yet
   // presented to the user; the beacon should be sent when the prerender is
   // activated.
-  if (base::FeatureList::IsEnabled(features::kPrefetchActivationBeacon) &&
+  if (IsPrefetchActivationBeaconEnabled(GetURL(),
+                                        response_head_->headers.get()) &&
       !IsInPrerenderedMainFrame() && response_head_->parsed_headers &&
       response_head_->parsed_headers->prefetch_activation_beacon_endpoint
           .has_value()) {
