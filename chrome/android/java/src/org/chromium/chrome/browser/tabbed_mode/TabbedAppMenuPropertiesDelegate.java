@@ -814,6 +814,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                 new ListItem(
                         AppMenuHandler.AppMenuItemType.DIVIDER,
                         buildModelForDivider(R.id.divider_line_id)));
+        submenuItems.add(buildHeaderItem(R.id.tab_groups_header_menu_id, R.string.menu_tab_groups));
 
         // TODO(crbug.com/509065807): Observe TabModel to update this while the menu is open.
         for (Token groupId : groupIds) {
@@ -1057,6 +1058,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                 new ListItem(
                                         AppMenuHandler.AppMenuItemType.DIVIDER,
                                         buildModelForDivider(R.id.divider_line_id)));
+                        submenuItems.add(
+                                buildHeaderItem(
+                                        R.id.recent_tabs_header_menu_id, R.string.recent_tabs));
                         submenuItems.addAll(recentEntries);
                     }
 
@@ -1082,6 +1086,14 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                         R.string.menu_history,
                         shouldShowIconBeforeItem() ? R.drawable.ic_history_24dp : Resources.ID_NULL,
                         submenuItemsSupplier));
+    }
+
+    private ListItem buildHeaderItem(@IdRes int id, @StringRes int titleRes) {
+        return new ListItem(
+                AppMenuHandler.AppMenuItemType.HEADER,
+                buildBaseModelForTextItem(id)
+                        .with(AppMenuItemProperties.TITLE, mContext.getString(titleRes))
+                        .build());
     }
 
     private List<ListItem> getRecentEntryMenuItemList() {
@@ -1414,6 +1426,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                     new ListItem(
                                             AppMenuHandler.AppMenuItemType.DIVIDER,
                                             buildModelForDivider(R.id.divider_line_id)));
+                            submenuItems.add(
+                                    buildHeaderItem(
+                                            R.id.bookmarks_header_menu_id, R.string.bookmarks));
                             submenuItems.addAll(bookmarksBarItems);
                         }
 

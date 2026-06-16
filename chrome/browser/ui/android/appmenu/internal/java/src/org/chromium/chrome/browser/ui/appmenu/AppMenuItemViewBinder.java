@@ -105,6 +105,17 @@ class AppMenuItemViewBinder {
         }
     }
 
+    public static void bindHeaderItem(PropertyModel model, View view, PropertyKey key) {
+        if (key == AppMenuItemProperties.MENU_ITEM_ID) {
+            int id = model.get(AppMenuItemProperties.MENU_ITEM_ID);
+            view.setId(id);
+        } else if (key == AppMenuItemProperties.TITLE) {
+            CharSequence title = model.get(AppMenuItemProperties.TITLE);
+            ((TextView) view.findViewById(R.id.menu_item_text)).setText(title);
+            view.setTooltipText(title);
+        }
+    }
+
     public static void bindTitleButtonItem(PropertyModel model, View view, PropertyKey key) {
         bindStandardItem(model, view, key);
 

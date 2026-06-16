@@ -577,7 +577,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                 (item, expectedId) -> {
                     if (item.type != AppMenuHandler.AppMenuItemType.BUTTON_ROW
                             && item.type != AppMenuHandler.AppMenuItemType.DIVIDER
-                            && item.type != AppMenuHandler.AppMenuItemType.EMPTY) {
+                            && item.type != AppMenuHandler.AppMenuItemType.EMPTY
+                            && item.type != AppMenuHandler.AppMenuItemType.HEADER) {
                         boolean hasIcon =
                                 item.model.containsKey(AppMenuItemProperties.ICON)
                                         && item.model.get(AppMenuItemProperties.ICON) != null;
@@ -728,6 +729,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                                 item(R.id.add_to_reading_list_menu_id),
                                                 item(R.id.show_reading_list_menu_id)),
                                         item(R.id.divider_line_id),
+                                        item(R.id.bookmarks_header_menu_id),
                                         item(R.id.bookmark_menu_id),
                                         item(R.id.bookmark_menu_id),
                                         item(
@@ -815,6 +817,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                                 item(R.id.add_to_reading_list_menu_id),
                                                 item(R.id.show_reading_list_menu_id)),
                                         item(R.id.divider_line_id),
+                                        item(R.id.bookmarks_header_menu_id),
                                         item(R.id.bookmark_menu_id),
                                         item(R.id.bookmark_menu_id),
                                         item(
@@ -946,6 +949,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.add_to_reading_list_menu_id),
                                 item(R.id.show_reading_list_menu_id)),
                         item(R.id.divider_line_id),
+                        item(R.id.bookmarks_header_menu_id),
                         item(R.id.bookmark_menu_id),
                         item(R.id.bookmark_menu_id),
                         item(
@@ -969,6 +973,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.string.menu_add_to_reading_list),
                                 item(R.string.menu_show_reading_list)),
                         item(0),
+                        item(R.string.bookmarks),
                         item("Bookmark 1"),
                         item("Bookmark 2"),
                         item(
@@ -1178,6 +1183,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.add_to_reading_list_menu_id),
                                 item(R.id.show_reading_list_menu_id)),
                         item(R.id.divider_line_id),
+                        item(R.id.bookmarks_header_menu_id),
                         item(R.id.bookmark_menu_id),
                         item(R.id.bookmark_menu_id),
                         item(
@@ -1201,6 +1207,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.string.menu_add_to_reading_list),
                                 item(R.string.menu_show_reading_list)),
                         item(0),
+                        item(R.string.bookmarks),
                         item("Bookmark 1"),
                         item("Bookmark 2"),
                         item(
@@ -1414,6 +1421,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.add_to_reading_list_menu_id),
                                 item(R.id.show_reading_list_menu_id)),
                         item(R.id.divider_line_id),
+                        item(R.id.bookmarks_header_menu_id),
                         item(R.id.bookmark_menu_id),
                         item(R.id.bookmark_menu_id),
                         item(
@@ -1437,6 +1445,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.string.menu_add_to_reading_list),
                                 item(R.string.menu_show_reading_list)),
                         item(0),
+                        item(R.string.bookmarks),
                         item("Bookmark 1"),
                         item("Bookmark 2"),
                         item(
@@ -1592,6 +1601,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                                 item(R.id.add_to_reading_list_menu_id),
                                                 item(R.id.show_reading_list_menu_id)),
                                         item(R.id.divider_line_id),
+                                        item(R.id.bookmarks_header_menu_id),
                                         item(R.id.bookmark_menu_id),
                                         item(R.id.bookmark_menu_id),
                                         item(
@@ -1692,6 +1702,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                                 item(R.id.add_to_reading_list_menu_id),
                                                 item(R.id.show_reading_list_menu_id)),
                                         item(R.id.divider_line_id),
+                                        item(R.id.bookmarks_header_menu_id),
                                         item(R.id.bookmark_menu_id),
                                         item(R.id.bookmark_menu_id),
                                         item(
@@ -2042,6 +2053,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                                 item(R.id.add_to_reading_list_menu_id),
                                                 item(R.id.show_reading_list_menu_id)),
                                         item(R.id.divider_line_id),
+                                        item(R.id.bookmarks_header_menu_id),
                                         item(R.id.bookmark_menu_id),
                                         item(R.id.bookmark_menu_id),
                                         item(
@@ -2175,6 +2187,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                                 item(R.id.add_to_reading_list_menu_id),
                                                 item(R.id.show_reading_list_menu_id)),
                                         item(R.id.divider_line_id),
+                                        item(R.id.bookmarks_header_menu_id),
                                         item(R.id.bookmark_menu_id),
                                         item(R.id.bookmark_menu_id),
                                         item(
@@ -2282,6 +2295,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                                 item(R.id.add_to_reading_list_menu_id),
                                                 item(R.id.show_reading_list_menu_id)),
                                         item(R.id.divider_line_id),
+                                        item(R.id.bookmarks_header_menu_id),
                                         item(R.id.bookmark_menu_id),
                                         item(R.id.bookmark_menu_id),
                                         item(
@@ -4032,6 +4046,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.add_to_reading_list_menu_id),
                                 item(R.id.show_reading_list_menu_id)),
                         item(R.id.divider_line_id),
+                        item(R.id.bookmarks_header_menu_id),
                         item(R.id.bookmark_menu_id),
                         item(R.id.bookmark_menu_id),
                         item(
@@ -4061,6 +4076,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.string.menu_add_to_reading_list),
                                 item(R.string.menu_show_reading_list)),
                         item(0),
+                        item(R.string.bookmarks),
                         item("Bookmark 1"),
                         item("Bookmark 2"),
                         item(
@@ -4103,6 +4119,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.add_to_reading_list_menu_id),
                                 item(R.id.show_reading_list_menu_id)),
                         item(R.id.divider_line_id),
+                        item(R.id.bookmarks_header_menu_id),
                         item(R.id.bookmark_menu_id),
                         item(R.id.bookmark_menu_id),
                         item(
@@ -4200,6 +4217,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         item(R.id.add_to_group_menu_id),
                         item(R.id.create_new_tab_group_menu_id),
                         item(R.id.divider_line_id),
+                        item(R.id.tab_groups_header_menu_id),
                         item(
                                 R.id.tab_group_menu_item_id,
                                 item(R.id.tab_group_tab_menu_item),
@@ -4211,10 +4229,11 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         item(R.string.menu_add_tab_to_group),
                         item(R.string.menu_create_new_tab_group),
                         item(0),
+                        item(R.string.menu_tab_groups),
                         item("Group 1", item("Tab 1"), item("Tab 2")));
         assertMenuTitlesAreEqual(tabGroupsSubmenuItems, expectedTitles);
 
-        ListItem groupItem = tabGroupsSubmenuItems.get(3);
+        ListItem groupItem = tabGroupsSubmenuItems.get(4);
         List<ListItem> tabsSubmenuItems =
                 groupItem.model.get(AppMenuItemWithSubmenuProperties.SUBMENU_PROVIDER).get();
 
@@ -4418,6 +4437,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.recent_tabs_menu_id),
                                 item(R.id.quick_delete_menu_id),
                                 item(R.id.divider_line_id),
+                                item(R.id.recent_tabs_header_menu_id),
                                 item(R.id.recent_entry_tab_menu_item),
                                 item(R.id.recent_entry_tab_menu_item)));
 
@@ -4480,6 +4500,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.recent_tabs_menu_id),
                                 item(R.id.quick_delete_menu_id),
                                 item(R.id.divider_line_id),
+                                item(R.id.recent_tabs_header_menu_id),
                                 item(
                                         R.id.recent_entry_menu_item,
                                         item(R.id.recent_entry_window_menu_item),
@@ -4518,6 +4539,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.string.menu_recent_tabs),
                                 item(R.string.menu_quick_delete),
                                 item(0),
+                                item(R.string.recent_tabs),
                                 item(
                                         context.getString(
                                                 R.string.menu_window_title_with_tab_count,
@@ -4532,7 +4554,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         // Index 4 is the first recently closed entry in the submenu (after the default history
         // actions: History, Recent Tabs, Quick Delete, and the Divider).
-        ListItem windowItem = items.get(4);
+        ListItem windowItem = items.get(5);
         List<ListItem> windowSubmenu =
                 windowItem.model.get(AppMenuItemWithSubmenuProperties.SUBMENU_PROVIDER).get();
         ListItem restoreItem = windowSubmenu.get(0);
@@ -4572,6 +4594,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.recent_tabs_menu_id),
                                 item(R.id.quick_delete_menu_id),
                                 item(R.id.divider_line_id),
+                                item(R.id.recent_tabs_header_menu_id),
                                 item(R.id.recent_entry_tab_menu_item),
                                 item(R.id.recent_entry_tab_menu_item)));
 
@@ -4600,15 +4623,16 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.string.menu_recent_tabs),
                                 item(R.string.menu_quick_delete),
                                 item(0),
+                                item(R.string.recent_tabs),
                                 item("Title 1"),
                                 item("Title 2")));
 
         assertMenuTitlesAreEqual(items, expectedTitles);
 
         // Verify that the RECENT_ENTRY property points to the individual tab, not the bulk event.
-        ListItem item1 = items.get(4);
+        ListItem item1 = items.get(5);
         assertEquals(tab1, item1.model.get(AppMenuRecentEntryItemProperties.RECENT_ENTRY));
-        ListItem item2 = items.get(5);
+        ListItem item2 = items.get(6);
         assertEquals(tab2, item2.model.get(AppMenuRecentEntryItemProperties.RECENT_ENTRY));
     }
 
@@ -4635,6 +4659,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.recent_tabs_menu_id),
                                 item(R.id.quick_delete_menu_id),
                                 item(R.id.divider_line_id),
+                                item(R.id.recent_tabs_header_menu_id),
                                 item(
                                         R.id.recent_entry_menu_item,
                                         item(R.id.recent_entry_window_menu_item))));
@@ -4670,6 +4695,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.string.menu_recent_tabs),
                                 item(R.string.menu_quick_delete),
                                 item(0),
+                                item(R.string.recent_tabs),
                                 item(tabsText, item(restoreText))));
 
         assertMenuTitlesAreEqual(items, expectedTitles);
@@ -4677,7 +4703,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         // Verify the recent entry itself in the model.
         // Index 4 is the first recently closed entry in the submenu (after the default history
         // actions: History, Recent Tabs, Quick Delete, and the Divider).
-        ListItem windowItem = items.get(4);
+        ListItem windowItem = items.get(5);
         List<ListItem> windowSubmenu =
                 windowItem.model.get(AppMenuItemWithSubmenuProperties.SUBMENU_PROVIDER).get();
         ListItem restoreItem = windowSubmenu.get(0);
@@ -4720,6 +4746,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.recent_tabs_menu_id),
                                 item(R.id.quick_delete_menu_id),
                                 item(R.id.divider_line_id),
+                                item(R.id.recent_tabs_header_menu_id),
                                 item(
                                         R.id.recent_entry_menu_item,
                                         item(R.id.recent_entry_group_menu_item),
@@ -4749,7 +4776,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         // Verify the recent entry itself in the model.
         // Index 4 is the first recently closed entry in the submenu.
-        ListItem groupItem = items.get(4);
+        ListItem groupItem = items.get(5);
         List<ListItem> groupSubmenu =
                 groupItem.model.get(AppMenuItemWithSubmenuProperties.SUBMENU_PROVIDER).get();
         ListItem restoreItem = groupSubmenu.get(0);
@@ -4772,6 +4799,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.string.menu_recent_tabs),
                                 item(R.string.menu_quick_delete),
                                 item(0),
+                                item(R.string.recent_tabs),
                                 item(
                                         context.getString(
                                                 R.string.menu_window_title_with_tab_count,
@@ -4800,6 +4828,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.string.menu_recent_tabs),
                                 item(R.string.menu_quick_delete),
                                 item(0),
+                                item(R.string.recent_tabs),
                                 item(
                                         tabsText,
                                         item(restoreText),
