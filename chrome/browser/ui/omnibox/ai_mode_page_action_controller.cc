@@ -277,6 +277,8 @@ void AiModePageActionController::UpdatePageActionUi(bool is_visible) {
 
   page_action_controller->OverrideText(kActionAiMode, config->text);
   page_action_controller->OverrideTooltip(kActionAiMode, config->tooltip);
+  page_action_controller->OverrideAccessibleName(kActionAiMode,
+                                                 config->a11y_label);
 
   if (config->id == SearchEngineType::SEARCH_ENGINE_GOOGLE) {
     ShowAndOverrideImage(
