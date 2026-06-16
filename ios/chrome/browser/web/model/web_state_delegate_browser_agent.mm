@@ -27,8 +27,8 @@
 #import "ios/chrome/browser/overlays/model/public/web_content_area/insecure_form_overlay.h"
 #import "ios/chrome/browser/permissions/model/permissions_tab_helper.h"
 #import "ios/chrome/browser/shared/model/profile/profile_ios.h"
-#import "ios/chrome/browser/shared/public/commands/bwg_commands.h"
 #import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
+#import "ios/chrome/browser/shared/public/commands/gemini_commands.h"
 #import "ios/chrome/browser/snapshots/model/snapshot_tab_helper.h"
 #import "ios/chrome/browser/supervised_user/model/supervised_user_capabilities.h"
 #import "ios/chrome/browser/tab_insertion/model/tab_insertion_browser_agent.h"
@@ -372,8 +372,8 @@ void WebStateDelegateBrowserAgent::ContextMenuConfiguration(
     const web::ContextMenuParams& params,
     void (^completion_handler)(UIContextMenuConfiguration*)) {
   if (IsGeminiCopresenceEnabled()) {
-    id<BWGCommands> geminiHandler =
-        HandlerForProtocol(browser_->GetCommandDispatcher(), BWGCommands);
+    id<GeminiCommands> geminiHandler =
+        HandlerForProtocol(browser_->GetCommandDispatcher(), GeminiCommands);
     [geminiHandler
         hideFloatyIfInvokedAnimated:YES
                          fromSource:gemini::FloatyUpdateSource::WebContextMenu];

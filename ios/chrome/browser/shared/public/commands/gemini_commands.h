@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef IOS_CHROME_BROWSER_SHARED_PUBLIC_COMMANDS_BWG_COMMANDS_H_
-#define IOS_CHROME_BROWSER_SHARED_PUBLIC_COMMANDS_BWG_COMMANDS_H_
+#ifndef IOS_CHROME_BROWSER_SHARED_PUBLIC_COMMANDS_GEMINI_COMMANDS_H_
+#define IOS_CHROME_BROWSER_SHARED_PUBLIC_COMMANDS_GEMINI_COMMANDS_H_
 
 #import <UIKit/UIKit.h>
 
@@ -21,12 +21,8 @@ enum class FloatyUpdateSource;
 
 @class GeminiStartupState;
 
-namespace web {
-class WebState;
-}  // namespace web
-
-// Commands relating to the BWG flow.
-@protocol BWGCommands <NSObject>
+// Commands relating to the Gemini flow.
+@protocol GeminiCommands <NSObject>
 
 // Starts the Gemini flow with the given startup state.
 - (void)startGeminiFlowWithStartupState:(GeminiStartupState*)startupState;
@@ -34,9 +30,9 @@ class WebState;
 // Dismiss the Gemini flow with a completion block.
 - (void)dismissGeminiFlowWithCompletion:(ProceduralBlock)completion;
 
-// Attempts to display the automatic BWG promo depending on whether the active
-// web state is eligible. If the page is ineligible, does nothing.
-- (void)showBWGPromoIfPageIsEligible;
+// Attempts to display the automatic Gemini promo depending on whether the
+// active web state is eligible. If the page is ineligible, does nothing.
+- (void)showGeminiPromoIfPageIsEligible;
 
 // Handles hiding the Gemini floaty from an update `source`. When in a hidden
 // state, the floaty still persists in memory and needs to be properly cleaned
@@ -88,4 +84,4 @@ class WebState;
 
 @end
 
-#endif  // IOS_CHROME_BROWSER_SHARED_PUBLIC_COMMANDS_BWG_COMMANDS_H_
+#endif  // IOS_CHROME_BROWSER_SHARED_PUBLIC_COMMANDS_GEMINI_COMMANDS_H_

@@ -36,10 +36,10 @@
 #import "ios/chrome/browser/shared/model/web_state_list/web_state_list.h"
 #import "ios/chrome/browser/shared/model/web_state_list/web_state_opener.h"
 #import "ios/chrome/browser/shared/public/commands/browser_coordinator_commands.h"
-#import "ios/chrome/browser/shared/public/commands/bwg_commands.h"
 #import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
 #import "ios/chrome/browser/shared/public/commands/contextual_panel_entrypoint_iph_commands.h"
 #import "ios/chrome/browser/shared/public/commands/contextual_sheet_commands.h"
+#import "ios/chrome/browser/shared/public/commands/gemini_commands.h"
 #import "ios/chrome/browser/shared/public/commands/help_commands.h"
 #import "ios/chrome/browser/shared/public/commands/lens_commands.h"
 #import "ios/chrome/browser/shared/public/commands/page_action_menu_commands.h"
@@ -200,9 +200,9 @@ class LocationBarCoordinatorTest : public PlatformTest {
     [dispatcher startDispatchingToTarget:mock_page_action_menu_handler
                              forProtocol:@protocol(PageActionMenuCommands)];
 
-    id mock_bwg_handler = OCMProtocolMock(@protocol(BWGCommands));
-    [dispatcher startDispatchingToTarget:mock_bwg_handler
-                             forProtocol:@protocol(BWGCommands)];
+    id mock_gemini_handler = OCMProtocolMock(@protocol(GeminiCommands));
+    [dispatcher startDispatchingToTarget:mock_gemini_handler
+                             forProtocol:@protocol(GeminiCommands)];
 
     mock_browser_coordinator_handler_ =
         OCMProtocolMock(@protocol(BrowserCoordinatorCommands));

@@ -67,9 +67,9 @@
 #import "ios/chrome/browser/shared/model/profile/profile_ios.h"
 #import "ios/chrome/browser/shared/model/profile/profile_manager_ios.h"
 #import "ios/chrome/browser/shared/model/web_state_list/web_state_list.h"
-#import "ios/chrome/browser/shared/public/commands/bwg_commands.h"
 #import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
 #import "ios/chrome/browser/shared/public/commands/fullscreen_commands.h"
+#import "ios/chrome/browser/shared/public/commands/gemini_commands.h"
 #import "ios/chrome/browser/shared/public/commands/omnibox_commands.h"
 #import "ios/chrome/browser/shared/public/commands/settings_commands.h"
 #import "ios/chrome/browser/shared/public/commands/snackbar_commands.h"
@@ -645,14 +645,14 @@ void GeminiBrowserAgent::StartGeminiFlow(UIViewController* base_view_controller,
     return;
   }
 
-  id<BWGCommands> gemini_commands_handler =
-      HandlerForProtocol(browser_->GetCommandDispatcher(), BWGCommands);
+  id<GeminiCommands> gemini_handler =
+      HandlerForProtocol(browser_->GetCommandDispatcher(), GeminiCommands);
 
   auto present_floaty_closure = base::BindRepeating(
       &GeminiBrowserAgent::PresentFloaty, weak_factory_.GetWeakPtr(),
       base_view_controller, startup_state, /*first_run_shown=*/true);
 
-  [gemini_commands_handler
+  [gemini_handler
       startGeminiFirstRunWithCompletion:BlockRunningClosureIfSuccess(
                                             std::move(present_floaty_closure))
                          fromEntryPoint:entry_point];
@@ -1040,9 +1040,9 @@ void GeminiBrowserAgent::DismissGeminiFromOtherWindows(
       barrier.Run();
       continue;
     }
-    id<BWGCommands> gemini_commands_handler =
-        HandlerForProtocol(browser->GetCommandDispatcher(), BWGCommands);
-    [gemini_commands_handler
+    id<GeminiCommands> gemini_handler =
+        HandlerForProtocol(browser->GetCommandDispatcher(), GeminiCommands);
+    [gemini_handler
         dismissGeminiFlowWithCompletion:base::CallbackToBlock(barrier)];
   }
 }
@@ -1312,8 +1312,8 @@ void GeminiBrowserAgent::OnScrollEvent() {
   // handler to do eligibility checks outside of this browser agent before
   // showing the floaty.
   if (is_floaty_temporarily_hidden_) {
-    id<BWGCommands> gemini_handler =
-        HandlerForProtocol(browser_->GetCommandDispatcher(), BWGCommands);
+    id<GeminiCommands> gemini_handler =
+        HandlerForProtocol(browser_->GetCommandDispatcher(), GeminiCommands);
     [gemini_handler
         updateFloatyVisibilityIfEligibleAnimated:NO
                                       fromSource:gemini::FloatyUpdateSource::
@@ -1713,8 +1713,8 @@ void GeminiBrowserAgent::ApplyUserPrefsToPageContext(
 void GeminiBrowserAgent::SetSessionCommandHandlers() {
   id<SettingsCommands> settings_handler =
       HandlerForProtocol(browser_->GetCommandDispatcher(), SettingsCommands);
-  id<BWGCommands> gemini_handler =
-      HandlerForProtocol(browser_->GetCommandDispatcher(), BWGCommands);
+  id<GeminiCommands> gemini_handler =
+      HandlerForProtocol(browser_->GetCommandDispatcher(), GeminiCommands);
 
   bwg_session_handler_.settingsHandler = settings_handler;
   bwg_session_handler_.geminiHandler = gemini_handler;

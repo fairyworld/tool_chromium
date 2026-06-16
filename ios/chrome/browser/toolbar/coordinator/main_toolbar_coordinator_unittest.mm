@@ -27,11 +27,11 @@
 #import "ios/chrome/browser/shared/model/web_state_list/web_state_opener.h"
 #import "ios/chrome/browser/shared/public/commands/activity_service_commands.h"
 #import "ios/chrome/browser/shared/public/commands/browser_coordinator_commands.h"
-#import "ios/chrome/browser/shared/public/commands/bwg_commands.h"
 #import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
 #import "ios/chrome/browser/shared/public/commands/contextual_panel_entrypoint_iph_commands.h"
 #import "ios/chrome/browser/shared/public/commands/contextual_sheet_commands.h"
 #import "ios/chrome/browser/shared/public/commands/find_in_page_commands.h"
+#import "ios/chrome/browser/shared/public/commands/gemini_commands.h"
 #import "ios/chrome/browser/shared/public/commands/help_commands.h"
 #import "ios/chrome/browser/shared/public/commands/lens_commands.h"
 #import "ios/chrome/browser/shared/public/commands/page_action_menu_commands.h"
@@ -142,10 +142,10 @@ class MainToolbarCoordinatorTest : public PlatformTest {
         startDispatchingToTarget:mock_page_action_menu_commands
                      forProtocol:@protocol(PageActionMenuCommands)];
 
-    id mock_bwg_commands = OCMProtocolMock(@protocol(BWGCommands));
+    id mock_gemini_commands = OCMProtocolMock(@protocol(GeminiCommands));
     [browser_->GetCommandDispatcher()
-        startDispatchingToTarget:mock_bwg_commands
-                     forProtocol:@protocol(BWGCommands)];
+        startDispatchingToTarget:mock_gemini_commands
+                     forProtocol:@protocol(GeminiCommands)];
 
     id mock_popup_menu_handler = OCMProtocolMock(@protocol(PopupMenuCommands));
     [browser_->GetCommandDispatcher()

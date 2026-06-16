@@ -45,8 +45,8 @@
 #import "ios/chrome/browser/shared/model/url/url_util.h"
 #import "ios/chrome/browser/shared/model/utils/first_run_util.h"
 #import "ios/chrome/browser/shared/model/web_state_list/web_state_list.h"
-#import "ios/chrome/browser/shared/public/commands/bwg_commands.h"
 #import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
+#import "ios/chrome/browser/shared/public/commands/gemini_commands.h"
 #import "ios/chrome/browser/shared/public/commands/page_action_menu_entry_point_commands.h"
 #import "ios/chrome/browser/shared/public/commands/popup_menu_commands.h"
 #import "ios/chrome/browser/shared/public/commands/tab_strip_commands.h"
@@ -885,10 +885,11 @@ constexpr CGFloat kAdditionalBorderMargin = 4;
   }
 }
 
-- (void)presentGeminiImageRemixBubbleWithBWGHandler:(id<BWGCommands>)BWGHandler
-                    pageActionMenuEntryPointHandler:
-                        (id<PageActionMenuEntryPointCommands>)
-                            pageActionMenuEntryPointHandler {
+- (void)presentGeminiImageRemixBubbleWithGeminiHandler:
+            (id<GeminiCommands>)geminiHandler
+                       pageActionMenuEntryPointHandler:
+                           (id<PageActionMenuEntryPointCommands>)
+                               pageActionMenuEntryPointHandler {
   if (![self canPresentBubbleWithCheckTabScrolledToTop:NO]) {
     return;
   }
@@ -943,7 +944,7 @@ constexpr CGFloat kAdditionalBorderMargin = 4;
             reason == IPHDismissalReasonType::kTappedAnchorView) {
           base::RecordAction(
               base::UserMetricsAction("MobileGeminiImageRemixIPHTapped"));
-          [BWGHandler
+          [geminiHandler
               startGeminiFlowWithStartupState:
                   [[GeminiStartupState alloc]
                       initWithEntryPoint:gemini::EntryPoint::ImageRemixIPH]];

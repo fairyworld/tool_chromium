@@ -23,8 +23,8 @@
 #import "ios/chrome/browser/shared/model/prefs/pref_names.h"
 #import "ios/chrome/browser/shared/model/profile/profile_ios.h"
 #import "ios/chrome/browser/shared/model/web_state_list/web_state_list.h"
-#import "ios/chrome/browser/shared/public/commands/bwg_commands.h"
 #import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
+#import "ios/chrome/browser/shared/public/commands/gemini_commands.h"
 #import "ios/chrome/browser/shared/public/commands/help_commands.h"
 #import "ios/chrome/browser/shared/public/commands/scene_commands.h"
 #import "ios/chrome/browser/shared/public/features/features.h"
@@ -48,7 +48,7 @@
   GeminiFirstRunWrapperViewController* _viewController;
 
   // Handler for sending Gemini commands.
-  id<BWGCommands> _geminiCommandsHandler;
+  id<GeminiCommands> _geminiHandler;
 
   // The `gemini::EntryPoint` the coordinator was initialized from.
   gemini::EntryPoint _entryPoint;
@@ -101,7 +101,7 @@
   }
 
   CommandDispatcher* dispatcher = self.browser->GetCommandDispatcher();
-  _geminiCommandsHandler = HandlerForProtocol(dispatcher, BWGCommands);
+  _geminiHandler = HandlerForProtocol(dispatcher, GeminiCommands);
   _helpCommandsHandler = HandlerForProtocol(dispatcher, HelpCommands);
 
   _mediator = [[GeminiFirstRunMediator alloc]
@@ -155,7 +155,7 @@
 
   [self presentPageActionMenuIPH];
   _viewController = nil;
-  _geminiCommandsHandler = nil;
+  _geminiHandler = nil;
   _helpCommandsHandler = nil;
   _mediator = nil;
   _prefService = nil;
@@ -187,7 +187,7 @@
 }
 
 - (void)dismissGeminiFlow {
-  [_geminiCommandsHandler dismissGeminiFlowWithCompletion:nil];
+  [_geminiHandler dismissGeminiFlowWithCompletion:nil];
 }
 
 #pragma mark - UISheetPresentationControllerDelegate
@@ -195,7 +195,7 @@
 // Handles the dismissal of the UI.
 - (void)presentationControllerDidDismiss:
     (UIPresentationController*)presentationController {
-  [_geminiCommandsHandler dismissGeminiFlowWithCompletion:nil];
+  [_geminiHandler dismissGeminiFlowWithCompletion:nil];
 }
 
 #pragma mark - Private

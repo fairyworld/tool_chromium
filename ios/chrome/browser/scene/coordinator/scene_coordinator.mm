@@ -87,8 +87,8 @@
 #import "ios/chrome/browser/shared/public/commands/app_bar_commands.h"
 #import "ios/chrome/browser/shared/public/commands/bookmarks_commands.h"
 #import "ios/chrome/browser/shared/public/commands/browser_coordinator_commands.h"
-#import "ios/chrome/browser/shared/public/commands/bwg_commands.h"
 #import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
+#import "ios/chrome/browser/shared/public/commands/gemini_commands.h"
 #import "ios/chrome/browser/shared/public/commands/open_new_tab_command.h"
 #import "ios/chrome/browser/shared/public/commands/policy_change_commands.h"
 #import "ios/chrome/browser/shared/public/commands/scene_commands.h"
@@ -2236,8 +2236,9 @@ void OnListFamilyMembersResponse(
 - (void)sceneViewControllerShowGeminiFloatyIfInvoked:
     (SceneViewController*)viewController {
   CommandDispatcher* dispatcher = _regularBrowser->GetCommandDispatcher();
-  if ([dispatcher dispatchingForProtocol:@protocol(BWGCommands)]) {
-    id<BWGCommands> geminiHandler = HandlerForProtocol(dispatcher, BWGCommands);
+  if ([dispatcher dispatchingForProtocol:@protocol(GeminiCommands)]) {
+    id<GeminiCommands> geminiHandler =
+        HandlerForProtocol(dispatcher, GeminiCommands);
     [geminiHandler
         updateFloatyVisibilityIfEligibleAnimated:NO
                                       fromSource:gemini::FloatyUpdateSource::

@@ -84,9 +84,9 @@
 #import "ios/chrome/browser/shared/model/profile/profile_ios.h"
 #import "ios/chrome/browser/shared/model/web_state_list/web_state_list.h"
 #import "ios/chrome/browser/shared/public/commands/browser_coordinator_commands.h"
-#import "ios/chrome/browser/shared/public/commands/bwg_commands.h"
 #import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
 #import "ios/chrome/browser/shared/public/commands/fullscreen_commands.h"
+#import "ios/chrome/browser/shared/public/commands/gemini_commands.h"
 #import "ios/chrome/browser/shared/public/commands/help_commands.h"
 #import "ios/chrome/browser/shared/public/commands/lens_commands.h"
 #import "ios/chrome/browser/shared/public/commands/lens_overlay_commands.h"
@@ -251,7 +251,7 @@ struct AIHubBadgeActiveWindowsData : public base::SupportsUserData::Data {
   self.viewController.pageActionMenuHandler = HandlerForProtocol(
       self.browser->GetCommandDispatcher(), PageActionMenuCommands);
   self.viewController.geminiHandler =
-      HandlerForProtocol(self.browser->GetCommandDispatcher(), BWGCommands);
+      HandlerForProtocol(self.browser->GetCommandDispatcher(), GeminiCommands);
   _tracker = feature_engagement::TrackerFactory::GetForProfile(self.profile);
   self.viewController.tracker = _tracker;
   self.viewController.voiceSearchEnabled =

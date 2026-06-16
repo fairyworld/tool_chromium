@@ -47,9 +47,9 @@
 #import "ios/chrome/browser/shared/model/web_state_list/test/fake_web_state_list_delegate.h"
 #import "ios/chrome/browser/shared/model/web_state_list/web_state_list.h"
 #import "ios/chrome/browser/shared/public/commands/browser_coordinator_commands.h"
-#import "ios/chrome/browser/shared/public/commands/bwg_commands.h"
 #import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
 #import "ios/chrome/browser/shared/public/commands/fullscreen_commands.h"
+#import "ios/chrome/browser/shared/public/commands/gemini_commands.h"
 #import "ios/chrome/browser/shared/public/commands/lens_commands.h"
 #import "ios/chrome/browser/shared/public/commands/open_lens_input_selection_command.h"
 #import "ios/chrome/browser/shared/public/commands/qr_scanner_commands.h"
@@ -249,7 +249,7 @@ class AppBarMediatorTest : public PlatformTest {
         startDispatchingToTarget:mock_lens_handler_
                      forProtocol:@protocol(LensCommands)];
     mediator_.lensHandler = mock_lens_handler_;
-    mock_gemini_handler_ = OCMProtocolMock(@protocol(BWGCommands));
+    mock_gemini_handler_ = OCMProtocolMock(@protocol(GeminiCommands));
     mediator_.geminiHandler = mock_gemini_handler_;
     mock_tab_groups_handler_ = OCMProtocolMock(@protocol(TabGroupsCommands));
     mediator_.regularTabGroupsCommands = mock_tab_groups_handler_;

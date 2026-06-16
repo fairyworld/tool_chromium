@@ -84,8 +84,8 @@
 #import "ios/chrome/browser/shared/public/commands/bring_android_tabs_commands.h"
 #import "ios/chrome/browser/shared/public/commands/browser_commands.h"
 #import "ios/chrome/browser/shared/public/commands/browser_coordinator_commands.h"
-#import "ios/chrome/browser/shared/public/commands/bwg_commands.h"
 #import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
+#import "ios/chrome/browser/shared/public/commands/gemini_commands.h"
 #import "ios/chrome/browser/shared/public/commands/open_new_tab_command.h"
 #import "ios/chrome/browser/shared/public/commands/page_action_menu_commands.h"
 #import "ios/chrome/browser/shared/public/commands/popup_menu_commands.h"
@@ -828,8 +828,8 @@ bool FindNavigatorShouldBePresentedInBrowser(Browser* browser) {
   _viewController.childViewControllerForStatusBarStyle = nil;
 
   if (IsGeminiCopresenceEnabled() && !IsChromeNextIaEnabled()) {
-    id<BWGCommands> geminiHandler = HandlerForProtocol(
-        self.regularBrowser->GetCommandDispatcher(), BWGCommands);
+    id<GeminiCommands> geminiHandler = HandlerForProtocol(
+        self.regularBrowser->GetCommandDispatcher(), GeminiCommands);
     [geminiHandler
         hideFloatyIfInvokedAnimated:NO
                          fromSource:gemini::FloatyUpdateSource::TabGrid];
@@ -1070,8 +1070,8 @@ bool FindNavigatorShouldBePresentedInBrowser(Browser* browser) {
 
   id<SceneCommands> sceneHandler =
       HandlerForProtocol(self.dispatcher, SceneCommands);
-  id<BWGCommands> geminiHandler =
-      HandlerForProtocol(_regularBrowser->GetCommandDispatcher(), BWGCommands);
+  id<GeminiCommands> geminiHandler = HandlerForProtocol(
+      _regularBrowser->GetCommandDispatcher(), GeminiCommands);
 
   _viewController = [[TabGridViewController alloc]
       initWithPageConfiguration:_pageConfiguration];

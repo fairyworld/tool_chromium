@@ -254,7 +254,6 @@
 #import "ios/chrome/browser/shared/public/commands/auto_deletion_commands.h"
 #import "ios/chrome/browser/shared/public/commands/autofill_commands.h"
 #import "ios/chrome/browser/shared/public/commands/browser_coordinator_commands.h"
-#import "ios/chrome/browser/shared/public/commands/bwg_commands.h"
 #import "ios/chrome/browser/shared/public/commands/cobalt_commands.h"
 #import "ios/chrome/browser/shared/public/commands/collaboration_group_commands.h"
 #import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
@@ -270,6 +269,7 @@
 #import "ios/chrome/browser/shared/public/commands/file_upload_panel_commands.h"
 #import "ios/chrome/browser/shared/public/commands/find_in_page_commands.h"
 #import "ios/chrome/browser/shared/public/commands/fullscreen_commands.h"
+#import "ios/chrome/browser/shared/public/commands/gemini_commands.h"
 #import "ios/chrome/browser/shared/public/commands/google_one_commands.h"
 #import "ios/chrome/browser/shared/public/commands/help_commands.h"
 #import "ios/chrome/browser/shared/public/commands/lens_overlay_commands.h"
@@ -443,7 +443,7 @@ const char kChromeAppStoreUrl[] =
     FileUploadPanelCommands,
     FindInPageCommands,
     FormInputAccessoryCoordinatorNavigator,
-    BWGCommands,
+    GeminiCommands,
     GoogleOneCommands,
     IOSPasskeyClientCommands,
     LevelUpCommands,
@@ -1381,7 +1381,7 @@ const char kChromeAppStoreUrl[] =
     @protocol(FileUploadPanelCommands),
     @protocol(FindInPageCommands),
     @protocol(IOSPasskeyClientCommands),
-    @protocol(BWGCommands),
+    @protocol(GeminiCommands),
     @protocol(CobaltCommands),
     @protocol(ReaderModeCommands),
     @protocol(NewTabPageCommands),
@@ -1572,7 +1572,7 @@ const char kChromeAppStoreUrl[] =
       HandlerForProtocol(_dispatcher, FindInPageCommands);
   if (IsGeminiCopresenceEnabled()) {
     _viewControllerDependencies.geminiHandler =
-        HandlerForProtocol(_dispatcher, BWGCommands);
+        HandlerForProtocol(_dispatcher, GeminiCommands);
   }
   _viewControllerDependencies.isOffTheRecord = profile->IsOffTheRecord();
   _viewControllerDependencies.urlLoadingBrowserAgent = _urlLoadingBrowserAgent;
@@ -3874,7 +3874,7 @@ const char kChromeAppStoreUrl[] =
   _countryCodePickerCoordinator = nil;
 }
 
-#pragma mark - BWGCommands
+#pragma mark - GeminiCommands
 
 - (void)startGeminiFlowWithStartupState:(GeminiStartupState*)startupState {
   [self startGeminiSessionWithStartupState:startupState];
@@ -3959,7 +3959,7 @@ const char kChromeAppStoreUrl[] =
   geminiBrowserAgent->UpdateForTraitCollection(traitCollection);
 }
 
-- (void)showBWGPromoIfPageIsEligible {
+- (void)showGeminiPromoIfPageIsEligible {
   GeminiService* geminiService =
       GeminiServiceFactory::GetForProfile(self.profile);
   GeminiTabHelper* geminiTabHelper =
