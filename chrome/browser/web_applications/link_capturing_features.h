@@ -10,8 +10,6 @@
 
 namespace apps::features {
 
-// TODO(crbug.com/377760841): Remove dead code flag; never enabled.
-BASE_DECLARE_FEATURE(kNavigationCapturingOnExistingFrames);
 
 // When enabled, updates the app settings string labels for browser-tab PWAs
 // that support target-existing client modes (focus-existing or
