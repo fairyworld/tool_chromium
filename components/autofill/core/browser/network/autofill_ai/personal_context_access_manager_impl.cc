@@ -17,6 +17,7 @@
 #include "base/location.h"
 #include "base/task/single_thread_task_runner.h"
 #include "components/autofill/core/browser/data_model/autofill_ai/entity_type.h"
+#include "components/autofill/core/browser/manual_testing_import.h"
 #include "components/autofill/core/browser/network/autofill_ai/personal_context_conversion_util.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/personal_context/core/personal_context_enablement_service.h"
@@ -110,6 +111,7 @@ PersonalContextAccessManagerImpl::PersonalContextAccessManagerImpl(
       personal_context_enablement_service_(
           CHECK_DEREF(personal_context_enablement_service)) {
   enablement_service_observation_.Observe(personal_context_enablement_service);
+  MaybeImportEntitiesForTesting(weak_factory_.GetWeakPtr());
 }
 
 PersonalContextAccessManagerImpl::~PersonalContextAccessManagerImpl() = default;
@@ -363,6 +365,20 @@ void PersonalContextAccessManagerImpl::OnEnablementStateChanged(
   if (!IsPersonalContextEnabled(new_state)) {
     WipeCaches();
   }
+}
+
+void PersonalContextAccessManagerImpl::SetTestingEntities(
+    const std::vector<EntityInstance>& test_entities) {
+  absl::flat_hash_map<EntityType, std::vector<EntityInstance>> grouped_entities;
+  absl::flat_hash_map<EntityInstance::EntityId, personal_context::proto::Entity>
+      protos;
+
+  for (const EntityInstance& entity : test_entities) {
+    grouped_entities[entity.type()].push_back(entity);
+    protos[entity.guid()] = personal_context::proto::Entity();
+  }
+
+  CachePrefetchedEntities(std::move(grouped_entities), std::move(protos));
 }
 
 void PersonalContextAccessManagerImpl::WipeCaches() {
