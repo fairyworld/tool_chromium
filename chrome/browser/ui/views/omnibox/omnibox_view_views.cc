@@ -2416,6 +2416,11 @@ void OmniboxViewViews::AppendDropFormats(
 
 views::View::DropCallback OmniboxViewViews::CreateDropCallback(
     const ui::DropTargetEvent& event) {
+  // Drags initiated within the omnibox should fallback to the default textfield
+  // drop handling: `Textfield::DropDraggedText()`.
+  if (HasTextBeingDragged()) {
+    return base::NullCallback();
+  }
   return base::BindOnce(&OmniboxViewViews::PerformDrop,
                         weak_factory_.GetWeakPtr());
 }
@@ -2623,10 +2628,10 @@ void OmniboxViewViews::PerformDrop(
     const ui::DropTargetEvent& event,
     ui::mojom::DragOperation& output_drag_op,
     std::unique_ptr<ui::LayerTreeOwner> drag_image_layer_owner) {
-  if (HasTextBeingDragged()) {
-    output_drag_op = DragOperation::kNone;
-    return;
-  }
+  // Drags initiated within the omnibox should be handled by the default
+  // textfield implementation. `CreateDropCallback()` should not create a
+  // `PerformDrop()` callback.
+  CHECK(!HasTextBeingDragged());
 
   const ui::OSExchangeData& data = event.data();
   std::u16string text;
