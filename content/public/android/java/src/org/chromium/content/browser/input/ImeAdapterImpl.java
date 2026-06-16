@@ -77,6 +77,7 @@ import org.chromium.content.browser.webcontents.WebContentsImpl;
 import org.chromium.content.common.ContentInternalFeatures;
 import org.chromium.content_public.browser.ContentFeatureList;
 import org.chromium.content_public.browser.ContentFeatureMap;
+import org.chromium.content_public.browser.HtmlMetadata;
 import org.chromium.content_public.browser.ImeAdapter;
 import org.chromium.content_public.browser.ImeEventObserver;
 import org.chromium.content_public.browser.InputMethodManagerWrapper;
@@ -188,6 +189,7 @@ public class ImeAdapterImpl
     private int mLastSelectionEnd;
 
     private String mLastText = "";
+    private HtmlMetadata mHtmlMetadata = HtmlMetadata.EMPTY;
 
     private int mLastCompositionStart;
     private int mLastCompositionEnd;
@@ -587,6 +589,7 @@ public class ImeAdapterImpl
                         mLastSelectionStart,
                         mLastSelectionEnd,
                         mLastText,
+                        mHtmlMetadata,
                         outAttrs));
         if (DEBUG_LOGS) Log.i(TAG, "onCreateInputConnection: " + mInputConnection);
 
@@ -754,6 +757,9 @@ public class ImeAdapterImpl
             boolean showIfNeeded,
             boolean alwaysHide,
             String text,
+            @Nullable String htmlLabel,
+            @Nullable String htmlFieldName,
+            @Nullable String htmlPlaceholder,
             int selectionStart,
             int selectionEnd,
             int compositionStart,
@@ -824,6 +830,9 @@ public class ImeAdapterImpl
             mLastSelectionEnd = selectionEnd;
             mLastCompositionStart = compositionStart;
             mLastCompositionEnd = compositionEnd;
+            if (!mHtmlMetadata.equals(htmlLabel, htmlFieldName, htmlPlaceholder)) {
+                mHtmlMetadata = HtmlMetadata.create(htmlLabel, htmlFieldName, htmlPlaceholder);
+            }
 
             // Check for the visibility request and policy if VK APIs are enabled.
             if (vkPolicy == VirtualKeyboardPolicy.MANUAL) {
