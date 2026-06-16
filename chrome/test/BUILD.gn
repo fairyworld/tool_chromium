@@ -7663,8 +7663,6 @@ test("unit_tests") {
       "../browser/ui/webui/history/foreign_session_handler_unittest.cc",
       "../browser/ui/webui/history/history_identity_state_watcher_unittest.cc",
       "../browser/ui/webui/managed_ui_handler_unittest.cc",
-      "../browser/ui/webui/ntp_microsoft_auth/ntp_microsoft_auth_page_handler_unittest.cc",
-      "../browser/ui/webui/ntp_microsoft_auth/ntp_microsoft_auth_response_capture_navigation_throttle_unittest.cc",
       "../browser/ui/webui/password_manager/promo_cards_handler_unittest.cc",
       "../browser/ui/webui/password_manager/sync_handler_unittest.cc",
       "../browser/ui/webui/searchbox/contextual_searchbox_handler_unittest.cc",
@@ -8213,6 +8211,7 @@ test("unit_tests") {
       deps += [
         "//chrome/browser/ui/webui/cr_components/most_visited:unit_tests",
         "//chrome/browser/ui/webui/new_tab_page:unit_tests",
+        "//chrome/browser/ui/webui/ntp_microsoft_auth:unit_tests",
       ]
     }
   }

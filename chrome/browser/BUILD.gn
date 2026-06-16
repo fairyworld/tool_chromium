@@ -1704,7 +1704,10 @@ source_set("core") {
   }
 
   if (enable_webui_ntp) {
-    deps += [ "//chrome/browser/new_tab_page" ]
+    deps += [
+      "//chrome/browser/new_tab_page",
+      "//chrome/browser/ui/webui/ntp_microsoft_auth",
+    ]
   }
 
   if ((!is_android && !is_ios) || enable_webui_ntp) {
@@ -2940,6 +2943,7 @@ static_library("browser") {
       "//chrome/browser/new_tab_page:impl",
       "//chrome/browser/ui/webui/new_tab_page/action_chips:mojo_bindings",
       "//chrome/browser/ui/webui/new_tab_page/composebox/variations",
+      "//chrome/browser/ui/webui/ntp_microsoft_auth",
     ]
   }
   if ((!is_ios && !is_android) || enable_webui_ntp) {

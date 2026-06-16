@@ -282,6 +282,10 @@ source_set("configs") {
   if (!is_chromeos && !is_android) {
     deps += [ "//chrome/browser/ui/webui/intro" ]
   }
+
+  if (enable_webui_ntp) {
+    deps += [ "//chrome/browser/ui/webui/ntp_microsoft_auth" ]
+  }
 }
 
 source_set("webui") {
