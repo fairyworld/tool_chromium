@@ -31,6 +31,20 @@ using HashPrefixMapView = std::unordered_map<PrefixSize, HashPrefixesView>;
 
 class HashPrefixContainer {
  public:
+  // These values are persisted to logs. Entries should not be renumbered and
+  // numeric values should never be reused.
+  // LINT.IfChange(WriteError)
+  enum class WriteError {
+    kFileWriteError = 0,
+    kInvalidTotalSize = 1,
+    kFileNotFound = 2,
+    kFileSizeMismatch = 3,
+    kFailedMmap = 4,
+    kMmapSizeMismatch = 5,
+    kMaxValue = kMmapSizeMismatch,
+  };
+  // LINT.ThenChange(//tools/metrics/histograms/metadata/safe_browsing/enums.xml:SBHashPrefixWriteError)
+
   // Metadata for a hash prefix file that has been written out.
   struct FinalizedFileInfo {
     // The extension generated for the written file.

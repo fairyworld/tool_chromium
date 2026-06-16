@@ -239,6 +239,8 @@ source_set("v4_store") {
   sources = [
     "hash_prefix_container.cc",
     "hash_prefix_container.h",
+    "hash_prefix_list.cc",
+    "hash_prefix_list.h",
     "hash_prefix_map.cc",
     "hash_prefix_map.h",
     "sb_store_file_format.h",
@@ -351,6 +353,7 @@ source_set("unit_tests_shared") {
 source_set("unit_tests_local_db") {
   testonly = true
   sources = [
+    "hash_prefix_list_unittest.cc",
     "hash_prefix_map_unittest.cc",
     "v4_database_unittest.cc",
     "v4_local_database_manager_unittest.cc",

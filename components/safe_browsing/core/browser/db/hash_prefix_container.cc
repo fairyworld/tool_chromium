@@ -21,20 +21,6 @@ namespace safe_browsing {
 
 namespace {
 
-// These values are persisted to logs. Entries should not be renumbered and
-// numeric values should never be reused.
-// LINT.IfChange(WriteError)
-enum class WriteError {
-  kFileWriteError = 0,
-  kInvalidTotalSize = 1,
-  kFileNotFound = 2,
-  kFileSizeMismatch = 3,
-  kFailedMmap = 4,
-  kMmapSizeMismatch = 5,
-  kMaxValue = kMmapSizeMismatch,
-};
-// LINT.ThenChange(//tools/metrics/histograms/metadata/safe_browsing/enums.xml:SBHashPrefixWriteError)
-
 // Returns true if |hash_prefix| with PrefixSize |size| exists in |prefixes|.
 bool HashPrefixMatches(std::string_view prefix,
                        HashPrefixesView prefixes,
@@ -45,9 +31,11 @@ bool HashPrefixMatches(std::string_view prefix,
                             PrefixIterator(prefixes, end, size), prefix);
 }
 
-void LogWriteError(WriteError error, std::string_view metric_prefix) {
+void LogWriteError(HashPrefixContainer::WriteError error,
+                   std::string_view metric_prefix) {
   base::UmaHistogramEnumeration(
       base::StrCat({"SafeBrowsing.", metric_prefix, "WriteError"}), error);
+  base::UmaHistogramEnumeration("SafeBrowsing.SBStoreWriteError", error);
 }
 
 }  // namespace
@@ -71,6 +59,9 @@ HashPrefixContainer::BufferedFileWriter::BufferedFileWriter(
     base::UmaHistogramExactLinear(
         base::StrCat({"SafeBrowsing.", metric_prefix_, "FileOpenError"}),
         -file_.error_details(), -base::File::FILE_ERROR_MAX);
+    base::UmaHistogramExactLinear("SafeBrowsing.SBStoreFileOpenError",
+                                  -file_.error_details(),
+                                  -base::File::FILE_ERROR_MAX);
   }
   buffer_.reserve(buffer_size);
 }
@@ -139,6 +130,9 @@ void HashPrefixContainer::BufferedFileWriter::WriteToFile(
       base::UmaHistogramExactLinear(
           base::StrCat({"SafeBrowsing.", metric_prefix_, "FileWriteError"}),
           -base::File::GetLastFileError(), -base::File::FILE_ERROR_MAX);
+      base::UmaHistogramExactLinear("SafeBrowsing.SBStoreFileWriteError",
+                                    -base::File::GetLastFileError(),
+                                    -base::File::FILE_ERROR_MAX);
       break;
     }
     bytes_written += *result;

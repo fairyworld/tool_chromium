@@ -137,6 +137,12 @@ chromium-metrics-reviews@google.com.
   <variant name=".UrlUws" summary=""/>
 </variants>
 
+<variants name="SafeBrowsingStore">
+  <variant name="SBStore" summary="Safe Browsing store"/>
+  <variant name="V4Store" summary="Safe Browsing V4 store"/>
+  <variant name="V5Store" summary="Safe Browsing V5 store"/>
+</variants>
+
 <variants name="SafeBrowsingUpdateProtocol">
   <variant name="SBUpdate" summary="Safe Browsing update"/>
   <variant name="V4Update" summary="Safe Browsing V4 update"/>
@@ -4256,28 +4262,6 @@ and applied correctly. -->
   </summary>
 </histogram>
 
-<histogram name="SafeBrowsing.V4StoreFileOpenError" enum="PlatformFileError"
-    expires_after="2026-10-25">
-  <owner>drubery@chromium.org</owner>
-  <owner>chrome-counter-abuse-alerts@google.com</owner>
-  <summary>
-    Records the file error when a V4 store hash prefix map fails to be opened on
-    disk. This can be logged once per map per database sync (roughly every 30
-    minutes).
-  </summary>
-</histogram>
-
-<histogram name="SafeBrowsing.V4StoreFileWriteError" enum="PlatformFileError"
-    expires_after="2026-10-25">
-  <owner>drubery@chromium.org</owner>
-  <owner>chrome-counter-abuse-alerts@google.com</owner>
-  <summary>
-    Records the file error when we fail to write to a previously opened V4 store
-    hash prefix map file. This can be logged once per map per database sync
-    (roughly every 30 minutes).
-  </summary>
-</histogram>
-
 <histogram name="SafeBrowsing.V4StoreRead.Result"
     enum="SafeBrowsingV4StoreReadResult" expires_after="2026-11-15">
 <!-- Note to owner: This histogram can be renewed 1 full year if it is still
@@ -4303,17 +4287,6 @@ security at risk. -->
   <summary>
     Track the results of writing the SafeBrowsing V4 store file to disk.
     Recorded every time a store is written to disk.
-  </summary>
-</histogram>
-
-<histogram name="SafeBrowsing.V4StoreWriteError" enum="SBHashPrefixWriteError"
-    expires_after="2026-10-25">
-  <owner>drubery@chromium.org</owner>
-  <owner>chrome-counter-abuse-alerts@google.com</owner>
-  <summary>
-    This records a more specific error for every UNEXPECTED_WRITE_FAILURE in
-    SafeBrowsing.V4StoreWrite.Result. This is logged at most once per hash
-    prefix map write (roughly every 30 minutes).
   </summary>
 </histogram>
 
@@ -4573,6 +4546,42 @@ failing to fetch the updates which puts users' security at risk. -->
     overlap, so the counts cannot be used as percentages.
   </summary>
   <token key="Protocol" variants="SafeBrowsingUpdateProtocolV4OrSB"/>
+</histogram>
+
+<histogram name="SafeBrowsing.{Store}FileOpenError" enum="PlatformFileError"
+    expires_after="2026-10-25">
+  <owner>drubery@chromium.org</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Records the file error when a {Store} hash prefix map fails to be opened on
+    disk. This can be logged once per map per database sync (roughly every 30
+    minutes).
+  </summary>
+  <token key="Store" variants="SafeBrowsingStore"/>
+</histogram>
+
+<histogram name="SafeBrowsing.{Store}FileWriteError" enum="PlatformFileError"
+    expires_after="2026-10-25">
+  <owner>drubery@chromium.org</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Records the file error when we fail to write to a previously opened {Store}
+    hash prefix map file. This can be logged once per map per database sync
+    (roughly every 30 minutes).
+  </summary>
+  <token key="Store" variants="SafeBrowsingStore"/>
+</histogram>
+
+<histogram name="SafeBrowsing.{Store}WriteError" enum="SBHashPrefixWriteError"
+    expires_after="2026-10-25">
+  <owner>drubery@chromium.org</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    This records a more specific error for every UNEXPECTED_WRITE_FAILURE in the
+    corresponding SafeBrowsing.*StoreWrite.Result histogram. This is logged at
+    most once per hash prefix map write (roughly every 30 minutes).
+  </summary>
+  <token key="Store" variants="SafeBrowsingStore"/>
 </histogram>
 
 <histogram name="SafeBrowsingBinaryUploadRequest.DlpResult"

@@ -681,7 +681,7 @@ chromium-metrics-reviews@google.com.
   <int value="5" label="Memory mapped region has wrong size"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/safe_browsing/core/browser/db/hash_prefix_container.cc:WriteError) -->
+<!-- LINT.ThenChange(//components/safe_browsing/core/browser/db/hash_prefix_container.h:WriteError) -->
 
 <enum name="SBMetricsCollectorEventType">
   <int value="0" label="USER_STATE_DISABLED"/>
