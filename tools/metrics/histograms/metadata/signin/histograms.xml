@@ -2579,6 +2579,16 @@ the browser and content area. -->
   </summary>
 </histogram>
 
+<histogram name="Signin.ListAccountsFailure.TriggerListAccountsIfStalePosted"
+    units="Boolean" expires_after="2027-06-11">
+  <owner>msarda@chromium.org</owner>
+  <owner>droger@chromium.org</owner>
+  <summary>
+    Logs whether a task to check and trigger list accounts if they are stale is
+    posted when ListAccounts fails.
+  </summary>
+</histogram>
+
 <histogram name="Signin.ListAccountsRetry" enum="GoogleServiceAuthError"
     expires_after="never">
 <!-- expires-never: ListAccounts calls are used to monitor the accounts in the
@@ -3069,6 +3079,16 @@ should be kept to monitor/debug signin Multilogin issues-->
     Records whether all external connections have been successfully checked (a
     value of &quot;true&quot;) or not (&quot;false&quot;) when the reconciler
     attempts to perform MergeSession.
+  </summary>
+</histogram>
+
+<histogram name="Signin.Reconciler.CookieJar.IsFresh" enum="Boolean"
+    expires_after="2026-10-01">
+  <owner>msarda@chromium.org</owner>
+  <owner>chrome-signin-team@google.com</owner>
+  <summary>
+    Records whether the accounts in the cookie jar are fresh when StartReconcile
+    is called on the AccountReconcilor.
   </summary>
 </histogram>
 

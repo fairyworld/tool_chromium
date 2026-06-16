@@ -81,6 +81,9 @@ base::TimeDelta GetAvatarSyncPromoFeatureMinimumCookeAgeParam() {
 #endif
 }
 
+BASE_FEATURE(kAvoidAutoTriggerListAccountsOnStale,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 BASE_FEATURE(kBeforeFirstRunDesktopRefreshSurvey,
              base::FEATURE_DISABLED_BY_DEFAULT);
