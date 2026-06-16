@@ -25,6 +25,7 @@ import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.tasks.tab_management.TabActionButtonData;
 import org.chromium.chrome.browser.tasks.tab_management.TabListViewBinderUtils;
 import org.chromium.chrome.browser.tasks.tab_management.TabProperties;
+import org.chromium.chrome.browser.tasks.tab_management.TabUiThemeUtil;
 import org.chromium.chrome.tab_ui.R;
 import org.chromium.components.browser_ui.styles.SemanticColorUtils;
 import org.chromium.components.tab_groups.TabGroupColorPickerUtils;
@@ -177,7 +178,7 @@ class TabVerticalViewBinder {
         }
 
         updateFavicon(model, view);
-        setupCloseButtonHoverListener(model, view);
+        setupTabHoverListener(model, view);
     }
 
     /**
@@ -325,7 +326,7 @@ class TabVerticalViewBinder {
 
     // Gesture & Interaction Layout Helpers
 
-    private static void setupCloseButtonHoverListener(PropertyModel model, ViewGroup view) {
+    private static void setupTabHoverListener(PropertyModel model, ViewGroup view) {
         @Nullable ImageView actionButton = view.findViewById(R.id.action_button);
         if (actionButton == null) return;
 
@@ -340,9 +341,17 @@ class TabVerticalViewBinder {
                     switch (motionEvent.getAction()) {
                         case MotionEvent.ACTION_HOVER_ENTER:
                             actionButton.setVisibility(View.VISIBLE);
+                            ViewCompat.setBackgroundTintList(
+                                    view,
+                                    ColorStateList.valueOf(
+                                            TabUiThemeUtil.getHoveredTabContainerColor(
+                                                    view.getContext(),
+                                                    model.get(TabProperties.IS_INCOGNITO))));
                             break;
                         case MotionEvent.ACTION_HOVER_EXIT:
                             actionButton.setVisibility(View.INVISIBLE);
+                            ViewCompat.setBackgroundTintList(
+                                    view, ColorStateList.valueOf(Color.TRANSPARENT));
                             break;
                     }
                     return false;

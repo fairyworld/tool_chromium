@@ -49,6 +49,7 @@ import org.chromium.chrome.browser.tasks.tab_management.TabActionButtonData;
 import org.chromium.chrome.browser.tasks.tab_management.TabActionButtonData.TabActionButtonType;
 import org.chromium.chrome.browser.tasks.tab_management.TabActionListener;
 import org.chromium.chrome.browser.tasks.tab_management.TabProperties;
+import org.chromium.chrome.browser.tasks.tab_management.TabUiThemeUtil;
 import org.chromium.chrome.tab_ui.R;
 import org.chromium.components.browser_ui.util.TextResolver;
 import org.chromium.components.tab_groups.TabGroupColorId;
@@ -222,6 +223,64 @@ public class TabVerticalViewBinderUnitTest {
         hoverExitEvent.setSource(InputDevice.SOURCE_MOUSE);
         mItemView.dispatchGenericMotionEvent(hoverExitEvent);
         assertEquals(View.VISIBLE, mCloseButton.getVisibility());
+    }
+
+    @Test
+    @SmallTest
+    public void testTabHoverBackground() {
+        mModel.set(TabProperties.IS_SELECTED, false);
+        TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.IS_SELECTED);
+
+        ColorStateList bgTint = mItemView.getBackgroundTintList();
+        assertNotNull(bgTint);
+        assertEquals(Color.TRANSPARENT, bgTint.getDefaultColor());
+
+        MotionEvent hoverEnterEvent =
+                MotionEvent.obtain(0, 0, MotionEvent.ACTION_HOVER_ENTER, 0f, 0f, 0);
+        hoverEnterEvent.setSource(InputDevice.SOURCE_MOUSE);
+        mItemView.dispatchGenericMotionEvent(hoverEnterEvent);
+
+        bgTint = mItemView.getBackgroundTintList();
+        assertNotNull(bgTint);
+        assertEquals(
+                TabUiThemeUtil.getHoveredTabContainerColor(
+                        mItemView.getContext(), /* isIncognito= */ false),
+                bgTint.getDefaultColor());
+
+        MotionEvent hoverExitEvent =
+                MotionEvent.obtain(0, 0, MotionEvent.ACTION_HOVER_EXIT, 0f, 0f, 0);
+        hoverExitEvent.setSource(InputDevice.SOURCE_MOUSE);
+        mItemView.dispatchGenericMotionEvent(hoverExitEvent);
+
+        bgTint = mItemView.getBackgroundTintList();
+        assertNotNull(bgTint);
+        assertEquals(Color.TRANSPARENT, bgTint.getDefaultColor());
+    }
+
+    @Test
+    @SmallTest
+    public void testTabHoverBackground_Selected() {
+        mModel.set(TabProperties.IS_SELECTED, true);
+        TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.IS_SELECTED);
+
+        ColorStateList bgTintBefore = mItemView.getBackgroundTintList();
+        assertNotNull("Background tint should not be null when selected", bgTintBefore);
+
+        MotionEvent hoverEnterEvent =
+                MotionEvent.obtain(0, 0, MotionEvent.ACTION_HOVER_ENTER, 0f, 0f, 0);
+        hoverEnterEvent.setSource(InputDevice.SOURCE_MOUSE);
+        mItemView.dispatchGenericMotionEvent(hoverEnterEvent);
+
+        ColorStateList bgTintAfter = mItemView.getBackgroundTintList();
+        assertEquals(bgTintBefore, bgTintAfter);
+
+        MotionEvent hoverExitEvent =
+                MotionEvent.obtain(0, 0, MotionEvent.ACTION_HOVER_EXIT, 0f, 0f, 0);
+        hoverExitEvent.setSource(InputDevice.SOURCE_MOUSE);
+        mItemView.dispatchGenericMotionEvent(hoverExitEvent);
+
+        bgTintAfter = mItemView.getBackgroundTintList();
+        assertEquals(bgTintBefore, bgTintAfter);
     }
 
     @Test
