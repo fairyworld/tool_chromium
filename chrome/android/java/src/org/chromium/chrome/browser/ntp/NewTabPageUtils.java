@@ -22,13 +22,13 @@ public class NewTabPageUtils {
      * and reduced to 16dp in a future UI polish pass.
      */
     public static void updateTilesLayoutTopMargin(
-            View view, boolean shouldShowLogo, boolean isTablet) {
+            View view, boolean shouldShowLogo, boolean isLff) {
         ViewGroup.MarginLayoutParams marginLayoutParams =
                 (ViewGroup.MarginLayoutParams) view.getLayoutParams();
         Resources resources = view.getResources();
         int topMargin =
                 resources.getDimensionPixelSize(
-                        (shouldShowLogo || isTablet)
+                        (shouldShowLogo || isLff)
                                 ? R.dimen.ntp_section_top_margin
                                 : R.dimen.tile_layout_no_logo_top_margin);
 

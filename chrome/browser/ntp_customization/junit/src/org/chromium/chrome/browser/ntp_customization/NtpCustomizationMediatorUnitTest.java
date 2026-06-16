@@ -426,7 +426,7 @@ public class NtpCustomizationMediatorUnitTest {
         // Condition Check:
         // 1. Feature Flag V2: Enabled via @EnableFeatures
         // 2. Policy: Enabled via setUp
-        // 3. !isTablet: True (Robolectric context is phone by default)
+        // 3. !isLff: True (Robolectric context is phone by default)
         // 4. SDK >= R: True via @Config
         // 5. E2E Enabled for Window: True via setUp (token acquired)
 

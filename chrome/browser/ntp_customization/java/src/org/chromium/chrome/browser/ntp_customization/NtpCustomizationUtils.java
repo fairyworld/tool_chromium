@@ -320,15 +320,15 @@ public class NtpCustomizationUtils {
      * Returns whether custom Ntp's background theme is enabled.
      *
      * @param windowAndroid The instance of {@link WindowAndroid}
-     * @param isTablet Whether the current device is a tablet.
+     * @param isLff Whether the current device is a large form factor (LFF) device.
      */
     public static boolean isNtpThemeCustomizationEnabled(
-            WindowAndroid windowAndroid, boolean isTablet) {
+            WindowAndroid windowAndroid, boolean isLff) {
         if (!isNtpThemeCustomizationEnabled()) {
             return false;
         }
 
-        if (isTablet) return true;
+        if (isLff) return true;
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return false;
 
@@ -1079,8 +1079,8 @@ public class NtpCustomizationUtils {
      * top.
      */
     public static boolean supportsEnableEdgeToEdgeOnTop(
-            WindowAndroid windowAndroid, boolean isTablet) {
-        return !isTablet
+            WindowAndroid windowAndroid, boolean isLff) {
+        return !isLff
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
                 && NtpCustomizationUtils.isNtpThemeCustomizationEnabled()
                 && EdgeToEdgeStateProvider.isEdgeToEdgeEnabledForWindow(windowAndroid);
@@ -1240,11 +1240,10 @@ public class NtpCustomizationUtils {
      * device is a phone, edge-to-edge is enabled and NTP has a customized background image.
      *
      * @param windowAndroid The instance of {@link WindowAndroid}.
-     * @param isTablet Whether the current device is a tablet.
+     * @param isLff Whether the current device is a large form factor (LFF) device.
      */
-    public static boolean shouldAdjustIconTintForNtp(
-            WindowAndroid windowAndroid, boolean isTablet) {
-        if (!supportsEnableEdgeToEdgeOnTop(windowAndroid, isTablet)) return false;
+    public static boolean shouldAdjustIconTintForNtp(WindowAndroid windowAndroid, boolean isLff) {
+        if (!supportsEnableEdgeToEdgeOnTop(windowAndroid, isLff)) return false;
 
         @NtpBackgroundType
         int backgroundType = NtpCustomizationConfigManager.getInstance().getBackgroundType();
@@ -1538,18 +1537,18 @@ public class NtpCustomizationUtils {
     }
 
     /**
-     * Determines if the app is running in a narrow layout (e.g., split-screen) on a tablet.
+     * Determines if the app is running in a narrow layout (e.g., split-screen) on a large form
+     * factor (LFF) device.
      *
-     * <p>A tablet is considered to be in a narrow window if its horizontal display style is less
-     * than {@link HorizontalDisplayStyle#WIDE}.
+     * <p>An LFF device is considered to be in a narrow window if its horizontal display style is
+     * less than {@link HorizontalDisplayStyle#WIDE}.
      *
-     * @param isTablet Whether the device is a tablet.
+     * @param isLff Whether the device is a large form factor (LFF) device.
      * @param uiConfig The {@link UiConfig} providing the current display style.
-     * @return True if the device is a tablet but the current window width is restricted.
+     * @return True if the device is an LFF device but the current window width is restricted.
      */
-    public static boolean isInNarrowWindowOnTablet(boolean isTablet, UiConfig uiConfig) {
-        return isTablet
-                && uiConfig.getCurrentDisplayStyle().horizontal < HorizontalDisplayStyle.WIDE;
+    public static boolean isInNarrowWindowOnLff(boolean isLff, UiConfig uiConfig) {
+        return isLff && uiConfig.getCurrentDisplayStyle().horizontal < HorizontalDisplayStyle.WIDE;
     }
 
     /**
@@ -1558,23 +1557,23 @@ public class NtpCustomizationUtils {
      * <p>The margin scales based on the device type and available window width:
      *
      * <ul>
-     *   <li>Tablets in narrow/split-screen: Uses narrow-window specific margins.
-     *   <li>Tablets in full/wide view: Uses wide-window specific margins.
+     *   <li>LFF devices in narrow/split-screen: Uses narrow-window specific margins.
+     *   <li>LFF devices in full/wide view: Uses wide-window specific margins.
      *   <li>Phones: Uses the standard Most Visited Tiles (MVT) container margin.
      * </ul>
      *
      * @param resource The {@link Resources} to retrieve dimension pixel sizes.
      * @param uiConfig The {@link UiConfig} to check the current display style.
-     * @param isTablet Whether the device is a tablet.
+     * @param isLff Whether the device is a large form factor (LFF) device.
      * @return The combined left and right margins in pixels.
      */
     public static int getSearchBoxTwoSideMargin(
-            Resources resource, UiConfig uiConfig, boolean isTablet) {
-        if (isInNarrowWindowOnTablet(isTablet, uiConfig)) {
+            Resources resource, UiConfig uiConfig, boolean isLff) {
+        if (isInNarrowWindowOnLff(isLff, uiConfig)) {
             return resource.getDimensionPixelSize(
                             R.dimen.ntp_search_box_lateral_margin_narrow_window_tablet)
                     * 2;
-        } else if (isTablet) {
+        } else if (isLff) {
             return resource.getDimensionPixelSize(R.dimen.ntp_search_box_lateral_margin_tablet) * 2;
         } else {
             return resource.getDimensionPixelSize(R.dimen.mvt_container_lateral_margin) * 2;
