@@ -94,7 +94,7 @@ public class ActorControlCoordinatorTest {
         mStateTracker = new ActorControlStateTracker(mProfileSupplier, mTabSupplier);
         mCoordinator =
                 new ActorControlCoordinator(
-                        mActivity, mTabBottomSheetManager, mStateTracker, mTabSelectionDelegate);
+                        mTabBottomSheetManager, mStateTracker, mTabSelectionDelegate);
 
         mModel = mCoordinator.getModelForTesting();
         mMediator = mCoordinator.getMediatorForTesting();
@@ -191,14 +191,15 @@ public class ActorControlCoordinatorTest {
         mProfileSupplier.set(mProfile);
 
         String expectedDesc =
-                mCoordinator.calculateContentDescription(TASK_TITLE, PeekViewUiState.ACTING);
-        mMediator.setContent(TASK_TITLE, expectedDesc, PeekViewUiState.ACTING);
+                ActorControlMediator.calculateContentDescription(
+                        mActivity, TASK_TITLE, PeekViewUiState.ACTING);
+        mMediator.setContent(TASK_TITLE, PeekViewUiState.ACTING);
 
         assertEquals(TASK_TITLE, mModel.get(TabBottomSheetPeekProperties.TITLE_TEXT));
         assertModelPropertiesMatchState(PeekViewUiState.ACTING);
         assertEquals(
                 expectedDesc,
-                mModel.get(TabBottomSheetPeekProperties.CONTENT_DESCRIPTION_A11Y));
+                mModel.get(TabBottomSheetPeekProperties.CONTENT_DESCRIPTION_A11Y).get(mActivity));
     }
 
     @Test
@@ -208,14 +209,15 @@ public class ActorControlCoordinatorTest {
         mProfileSupplier.set(mProfile);
 
         String expectedDesc =
-                mCoordinator.calculateContentDescription(TASK_TITLE, PeekViewUiState.PAUSED);
-        mMediator.setContent(TASK_TITLE, expectedDesc, PeekViewUiState.PAUSED);
+                ActorControlMediator.calculateContentDescription(
+                        mActivity, TASK_TITLE, PeekViewUiState.PAUSED);
+        mMediator.setContent(TASK_TITLE, PeekViewUiState.PAUSED);
 
         assertEquals(TASK_TITLE, mModel.get(TabBottomSheetPeekProperties.TITLE_TEXT));
         assertModelPropertiesMatchState(PeekViewUiState.PAUSED);
         assertEquals(
                 expectedDesc,
-                mModel.get(TabBottomSheetPeekProperties.CONTENT_DESCRIPTION_A11Y));
+                mModel.get(TabBottomSheetPeekProperties.CONTENT_DESCRIPTION_A11Y).get(mActivity));
     }
 
     @Test
@@ -225,14 +227,15 @@ public class ActorControlCoordinatorTest {
         mProfileSupplier.set(mProfile);
 
         String expectedDesc =
-                mCoordinator.calculateContentDescription(TASK_TITLE, PeekViewUiState.WAITING);
-        mMediator.setContent(TASK_TITLE, expectedDesc, PeekViewUiState.WAITING);
+                ActorControlMediator.calculateContentDescription(
+                        mActivity, TASK_TITLE, PeekViewUiState.WAITING);
+        mMediator.setContent(TASK_TITLE, PeekViewUiState.WAITING);
 
         assertEquals(TASK_TITLE, mModel.get(TabBottomSheetPeekProperties.TITLE_TEXT));
         assertModelPropertiesMatchState(PeekViewUiState.WAITING);
         assertEquals(
                 expectedDesc,
-                mModel.get(TabBottomSheetPeekProperties.CONTENT_DESCRIPTION_A11Y));
+                mModel.get(TabBottomSheetPeekProperties.CONTENT_DESCRIPTION_A11Y).get(mActivity));
     }
 
     @Test
@@ -242,14 +245,15 @@ public class ActorControlCoordinatorTest {
         mProfileSupplier.set(mProfile);
 
         String expectedDesc =
-                mCoordinator.calculateContentDescription(TASK_TITLE, PeekViewUiState.DEFAULT);
-        mMediator.setContent(TASK_TITLE, expectedDesc, PeekViewUiState.DEFAULT);
+                ActorControlMediator.calculateContentDescription(
+                        mActivity, TASK_TITLE, PeekViewUiState.DEFAULT);
+        mMediator.setContent(TASK_TITLE, PeekViewUiState.DEFAULT);
 
         assertEquals(TASK_TITLE, mModel.get(TabBottomSheetPeekProperties.TITLE_TEXT));
         assertModelPropertiesMatchState(PeekViewUiState.DEFAULT);
         assertEquals(
                 expectedDesc,
-                mModel.get(TabBottomSheetPeekProperties.CONTENT_DESCRIPTION_A11Y));
+                mModel.get(TabBottomSheetPeekProperties.CONTENT_DESCRIPTION_A11Y).get(mActivity));
     }
 
     @Test
@@ -258,20 +262,26 @@ public class ActorControlCoordinatorTest {
         assertEquals(
                 mActivity.getString(
                         R.string.peek_state_accessible_label, "Ask Gemini, Needs your attention"),
-                mCoordinator.calculateContentDescription("Ask Gemini", PeekViewUiState.WAITING));
+                ActorControlMediator.calculateContentDescription(
+                        mActivity, "Ask Gemini", PeekViewUiState.WAITING));
 
         // Case 2: Title only (Description visibility GONE / empty)
         assertEquals(
                 mActivity.getString(R.string.peek_state_accessible_label, "Ask Gemini"),
-                mCoordinator.calculateContentDescription("Ask Gemini", PeekViewUiState.DEFAULT));
+                ActorControlMediator.calculateContentDescription(
+                        mActivity, "Ask Gemini", PeekViewUiState.DEFAULT));
 
         // Case 3: Description only (Title empty)
         assertEquals(
                 mActivity.getString(R.string.peek_state_accessible_label, "Needs your attention"),
-                mCoordinator.calculateContentDescription("", PeekViewUiState.WAITING));
+                ActorControlMediator.calculateContentDescription(
+                        mActivity, "", PeekViewUiState.WAITING));
 
         // Case 4: Neither exist
-        assertEquals(null, mCoordinator.calculateContentDescription("", PeekViewUiState.DEFAULT));
+        assertEquals(
+                null,
+                ActorControlMediator.calculateContentDescription(
+                        mActivity, "", PeekViewUiState.DEFAULT));
     }
 
     @Test
