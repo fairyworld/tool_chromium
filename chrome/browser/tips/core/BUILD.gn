@@ -2,6 +2,10 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+source_set("types") {
+  sources = [ "tips_types.h" ]
+}
+
 static_library("core") {
   sources = [
     "tips_prefs.cc",
@@ -11,6 +15,8 @@ static_library("core") {
     "tips_utils.cc",
     "tips_utils.h",
   ]
+
+  public_deps = [ ":types" ]
 
   deps = [
     "//base",

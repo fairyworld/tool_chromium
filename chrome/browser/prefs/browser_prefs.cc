@@ -2163,7 +2163,7 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   registry->RegisterBooleanPref(ntp_tiles::prefs::kTipsHomeModuleEnabled, true);
 
 #if BUILDFLAG(IS_ANDROID)
-  notifications::tips::prefs::RegisterProfilePrefs(registry);
+  tips::prefs::RegisterProfilePrefs(registry);
 #endif  // BUILDFLAG(IS_ANDROID)
 
   registry->RegisterBooleanPref(prefs::kStaticStorageQuotaEnabled, false);
