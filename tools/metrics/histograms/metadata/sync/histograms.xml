@@ -1507,20 +1507,6 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="Sync.EntityEncryptionSucceeded{SyncDataType}"
-    enum="BooleanSuccess" expires_after="2026-07-26">
-  <owner>rushans@google.com</owner>
-  <owner>treib@chromium.org</owner>
-  <summary>
-    Recorded for each committed sync entity ({SyncDataType}) when encryption is
-    enabled (e.g. custom passphrase, always encrypted data type). The value is
-    whether the encryption succeeded.
-  </summary>
-  <token key="SyncDataType" variants="SyncDataType">
-    <variant name="" summary="Any type"/>
-  </token>
-</histogram>
-
 <histogram name="Sync.EntitySizeOnCommit.Entity.SpecificsOnly{SyncDataType}"
     units="bytes" expires_after="2026-12-06">
   <owner>ankushkush@google.com</owner>
