@@ -678,8 +678,8 @@ bool Surface::DoPlaceAboveOrBelow(Surface* child,
     return false;
   }
 
-  DCHECK(ListContainsEntry(list, child));
   auto it = FindListEntry(list, child);
+  CHECK(it != list.end()) << "Child surface not in parent list";
 
   if (place_above) {
     if (reference != this) {
