@@ -35,8 +35,6 @@ static_library("login") {
     "consolidated_consent_screen_handler.h",
     "consumer_update_screen_handler.cc",
     "consumer_update_screen_handler.h",
-    "cookie_waiter.cc",
-    "cookie_waiter.h",
     "core_oobe_handler.cc",
     "core_oobe_handler.h",
     "cryptohome_recovery_screen_handler.cc",
