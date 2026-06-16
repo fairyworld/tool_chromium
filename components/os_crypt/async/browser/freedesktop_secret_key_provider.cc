@@ -323,10 +323,6 @@ bool FreedesktopSecretKeyProvider::UseForEncryption() {
   return true;
 }
 
-bool FreedesktopSecretKeyProvider::IsCompatibleWithOsCryptSync() {
-  return true;
-}
-
 void FreedesktopSecretKeyProvider::InitializeFreedesktopSecretService() {
   dbus_utils::CheckForServiceAndStart(
       bus_, kSecretServiceName,

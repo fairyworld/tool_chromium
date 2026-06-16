@@ -89,7 +89,6 @@ class FreedesktopSecretKeyProvider : public KeyProvider {
   // KeyProvider:
   void GetKey(KeyCallback callback) override;
   bool UseForEncryption() override;
-  bool IsCompatibleWithOsCryptSync() override;
 
  private:
   FRIEND_TEST_ALL_PREFIXES(FreedesktopSecretKeyProviderTest, BasicHappyPath);

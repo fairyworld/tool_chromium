@@ -60,17 +60,8 @@ class EncryptorTest : public ::testing::Test {
   static scoped_refptr<Encryptor> GetEncryptor(
       Encryptor::KeyRing keys,
       const std::string& provider_for_encryption) {
-    return base::WrapRefCounted(new Encryptor(
-        std::move(keys), provider_for_encryption, provider_for_encryption));
-  }
-
-  static scoped_refptr<Encryptor> GetEncryptor(
-      Encryptor::KeyRing keys,
-      const std::string& provider_for_encryption,
-      const std::string& provider_for_os_crypt_sync_compatible_encryption) {
     return base::WrapRefCounted(
-        new Encryptor(std::move(keys), provider_for_encryption,
-                      provider_for_os_crypt_sync_compatible_encryption));
+        new Encryptor(std::move(keys), provider_for_encryption));
   }
 
   static Encryptor::Key GenerateRandomAES256TestKey() {
@@ -378,71 +369,6 @@ TEST_F(EncryptorTest, IsEncryptionAvailable) {
     // Decryption for data encrypted with TEST key is available, but encryption
     // is not available as there is no key BLAH.
     EXPECT_TRUE(encryptor->IsDecryptionAvailable());
-  }
-}
-
-// Test that Clone respects the option to a key that is os_crypt sync
-// compatible.
-TEST_F(EncryptorTest, Clone) {
-  {
-    Encryptor::KeyRing key_ring;
-    key_ring.emplace("BLAH", GenerateRandomAES256TestKey());
-    key_ring.emplace("TEST", GenerateRandomAES256TestKey());
-    scoped_refptr<Encryptor> encryptor =
-        GetEncryptor(std::move(key_ring), "TEST", "BLAH");
-
-    {
-      scoped_refptr<Encryptor> cloned_encryptor =
-          encryptor->Clone(Encryptor::Option::kNone);
-      EXPECT_EQ(cloned_encryptor->provider_for_encryption_, "TEST");
-      EXPECT_EQ(cloned_encryptor->keys_.size(), 2u);
-    }
-
-    {
-      auto cloned_encryptor =
-          encryptor->Clone(Encryptor::Option::kEncryptSyncCompat);
-      EXPECT_EQ(cloned_encryptor->provider_for_encryption_, "BLAH");
-      EXPECT_EQ(cloned_encryptor->keys_.size(), 2u);
-    }
-  }
-
-  // Test when the only key provider is not OSCrypt compatible. In this case, if
-  // kEncryptSyncCompat is requested, then encryption should fail.
-  {
-    Encryptor::KeyRing key_ring;
-    key_ring.emplace("BLAH", GenerateRandomAES256TestKey());
-    scoped_refptr<Encryptor> encryptor =
-        GetEncryptor(std::move(key_ring), "BLAH", std::string());
-    EXPECT_EQ(encryptor->provider_for_encryption_, "BLAH");
-
-    {
-      scoped_refptr<Encryptor> cloned_encryptor =
-          encryptor->Clone(Encryptor::Option::kNone);
-      EXPECT_EQ(cloned_encryptor->provider_for_encryption_, "BLAH");
-    }
-
-    {
-      auto cloned_encryptor =
-          encryptor->Clone(Encryptor::Option::kEncryptSyncCompat);
-      EXPECT_TRUE(cloned_encryptor->provider_for_encryption_.empty());
-    }
-  }
-
-  // Test empty keyring.
-  {
-    const scoped_refptr<Encryptor> empty_encryptor = GetEncryptor();
-    EXPECT_TRUE(empty_encryptor->provider_for_encryption_.empty());
-    {
-      auto cloned_encryptor =
-          empty_encryptor->Clone(Encryptor::Option::kEncryptSyncCompat);
-      EXPECT_TRUE(cloned_encryptor->provider_for_encryption_.empty());
-    }
-
-    {
-      auto cloned_encryptor =
-          empty_encryptor->Clone(Encryptor::Option::kEncryptSyncCompat);
-      EXPECT_TRUE(cloned_encryptor->provider_for_encryption_.empty());
-    }
   }
 }
 
