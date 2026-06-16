@@ -284,6 +284,8 @@ IN_PROC_BROWSER_TEST_F(MultistepFilterBrowserTest,
 
   fake_server().SetExtractResponse(CreateExtractTaskAttributesResponse(
       kTestTaskType, {{kTestAttributeKey, kTestAttributeValue}}));
+  fake_server().SetSupportedTasksResponse(
+      CreateSupportedTasksResponse({kTestTaskType}));
 
   ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), extraction_url));
   EXPECT_TRUE(extraction_future_.Take().has_value());

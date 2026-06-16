@@ -374,15 +374,23 @@ void AnnotationIndexClientImpl::GetFilterSuggestionCandidates(
       navigation_id, domain);
 }
 
-void AnnotationIndexClientImpl::GetSupportedTaskTypesForDomain(
-    std::string_view domain,
-    base::OnceCallback<void(std::optional<std::vector<std::string>>)> callback,
+void AnnotationIndexClientImpl::GetSupportedTasks(
+    const GURL& url,
+    base::OnceCallback<void(std::vector<std::string>)> callback,
     int64_t navigation_id) {
+  const std::string domain = GetEtldPlusOne(url);
+  if (!multistep_filter::IsUrlAllowed(url)) {
+    LogServerRequestFailed(log_router_, navigation_id, domain,
+                           "domain_not_allowed");
+    std::move(callback).Run(std::vector<std::string>());
+    return;
+  }
+
   GURL api_base_url = GetIndexServerApiBaseUrl();
   if (!api_base_url.is_valid()) {
     LogServerRequestFailed(log_router_, navigation_id, domain,
                            "invalid_api_base_url");
-    std::move(callback).Run(std::nullopt);
+    std::move(callback).Run(std::vector<std::string>());
     return;
   }
 
@@ -394,9 +402,16 @@ void AnnotationIndexClientImpl::GetSupportedTaskTypesForDomain(
   ExecuteRequest(
       CreatePostResourceRequest(api_base_url, kGetSupportedTasksEndpoint),
       proto.SerializeAsString(),
-      BindParseAndConvert(std::move(callback),
-                          base::BindOnce(&ToSupportedTasks), log_router_,
-                          navigation_id, std::string(domain)),
+      BindParseAndConvert(
+          base::BindOnce(
+              [](base::OnceCallback<void(std::vector<std::string>)> callback,
+                 std::optional<std::vector<std::string>> result) {
+                std::move(callback).Run(result ? std::move(*result)
+                                               : std::vector<std::string>());
+              },
+              std::move(callback)),
+          base::BindOnce(&ToSupportedTasks), log_router_, navigation_id,
+          domain),
       navigation_id, domain);
 }
 
