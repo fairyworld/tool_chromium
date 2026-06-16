@@ -361,6 +361,7 @@ template("generate_jar_jni_registration") {
 
   if (defined(_version_script_path)) {
     config("${target_name}_version_script") {
+      inputs = [ _version_script_path ]
       ldflags = [ "-Wl,--version-script=" +
                   rebase_path(_version_script_path, root_build_dir) ]
     }
