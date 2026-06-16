@@ -13,6 +13,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.annotation.Config;
 
 import org.chromium.base.test.BaseRobolectricTestRunner;
+import org.chromium.base.test.util.Features.DisableFeatures;
+import org.chromium.base.test.util.Features.EnableFeatures;
+import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.ui.native_page.NativePage.NativePageType;
 import org.chromium.url.GURL;
 
@@ -94,6 +97,28 @@ public class NativePageTest {
             Assert.assertFalse(invalidUrl, NativePage.isNativePageUrl(gurl, false, false));
             Assert.assertFalse(invalidUrl, NativePage.isNativePageUrl(gurl, true, false));
         }
+    }
+
+    @Test
+    @EnableFeatures(ChromeFeatureList.SETTINGS_IN_TAB)
+    public void testNativePageType_Settings() {
+        String url = "chrome://settings";
+        GURL gurl = new GURL(url);
+        Assert.assertEquals(
+                "Settings page should be a native page",
+                NativePageType.SETTINGS,
+                NativePage.nativePageType(gurl, null, false, false));
+    }
+
+    @Test
+    @DisableFeatures(ChromeFeatureList.SETTINGS_IN_TAB)
+    public void testNativePageType_SettingsDisabled() {
+        String url = "chrome://settings";
+        GURL gurl = new GURL(url);
+        Assert.assertEquals(
+                "Settings page should not be a native page",
+                NativePageType.NONE,
+                NativePage.nativePageType(gurl, null, false, false));
     }
 
     @Test

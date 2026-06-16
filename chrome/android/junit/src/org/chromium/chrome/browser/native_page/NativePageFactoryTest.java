@@ -24,6 +24,9 @@ import org.mockito.junit.MockitoRule;
 import org.robolectric.annotation.Config;
 
 import org.chromium.base.test.BaseRobolectricTestRunner;
+import org.chromium.base.test.util.Features.DisableFeatures;
+import org.chromium.base.test.util.Features.EnableFeatures;
+import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.fullscreen.BrowserControlsManager;
 import org.chromium.chrome.browser.pdf.PdfInfo;
 import org.chromium.chrome.browser.pdf.PdfPage;
@@ -79,6 +82,8 @@ public class NativePageFactoryTest {
                     return UrlConstants.RECENT_TABS_HOST;
                 case NativePageType.HISTORY:
                     return UrlConstants.HISTORY_HOST;
+                case NativePageType.SETTINGS:
+                    return UrlConstants.SETTINGS_HOST;
                 default:
                     Assert.fail("Unexpected NativePageType: " + type);
                     return null;
@@ -134,6 +139,11 @@ public class NativePageFactoryTest {
         @Override
         public NativePage buildHistoryPage(Tab tab, String url) {
             return new MockNativePage(NativePageType.HISTORY);
+        }
+
+        @Override
+        public NativePage buildSettingsPage(Tab tab) {
+            return new MockNativePage(NativePageType.SETTINGS);
         }
     }
 
@@ -195,6 +205,27 @@ public class NativePageFactoryTest {
                 }
             }
         }
+    }
+
+    @Test
+    @EnableFeatures(ChromeFeatureList.SETTINGS_IN_TAB)
+    public void testCreateSettingsPage() {
+        MockNativePage page =
+                (MockNativePage)
+                        mNativePageFactory.createNativePageForURL(
+                                UrlConstants.SETTINGS_URL, null, mTab, false, null);
+        Assert.assertNotNull(page);
+        Assert.assertEquals(NativePageType.SETTINGS, page.type);
+    }
+
+    @Test
+    @DisableFeatures(ChromeFeatureList.SETTINGS_IN_TAB)
+    public void testCreateSettingsPageDisabled() {
+        MockNativePage page =
+                (MockNativePage)
+                        mNativePageFactory.createNativePageForURL(
+                                UrlConstants.SETTINGS_URL, null, mTab, false, null);
+        Assert.assertNull(page);
     }
 
     /**
