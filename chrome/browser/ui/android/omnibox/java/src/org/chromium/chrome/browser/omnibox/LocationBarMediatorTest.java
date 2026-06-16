@@ -3211,4 +3211,22 @@ public class LocationBarMediatorTest {
         verify(mUrlCoordinator).startReparenting();
         verify(mUrlCoordinator).finishReparenting(true);
     }
+
+    @Test
+    public void testStandbyEndsWithRequestTypeChanged() {
+        mMediator.onFinishNativeInitialization();
+        mProfileSupplier.set(mProfile);
+        AutocompleteInput input = mSessionState.getAutocompleteInput();
+        input.setAutocompleteState(AutocompleteState.STANDBY);
+        mMediator.beginInput(input);
+        verify(mLocationBarLayout, atLeastOnce()).setIsInStandby(true);
+        verify(mLocationBarLayout, never()).setIsInStandby(false);
+        clearInvocations(mLocationBarLayout);
+
+        input.setAutocompleteState(AutocompleteState.ENABLED);
+        input.setRequestType(AutocompleteRequestType.AI_MODE);
+        ShadowLooper.runUiThreadTasksIncludingDelayedTasks();
+
+        verify(mLocationBarLayout).setIsInStandby(false);
+    }
 }

@@ -2208,6 +2208,10 @@ class LocationBarMediator
         }
         updateButtonVisibility();
         mLocationBarLayout.onSpecializedFuseboxModeActivated(isSpecializedRequestType);
+        // TODO(https://crbug.com/522911537): Move to an AutocompleteState observer.
+        mLocationBarLayout.setIsInStandby(
+                mCurrentInput != null
+                        && mCurrentInput.getAutocompleteState() == AutocompleteState.STANDBY);
     }
 
     private boolean isLensOnOmniboxEnabled() {
