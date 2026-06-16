@@ -25,7 +25,6 @@
 #include "content/browser/devtools/devtools_instrumentation.h"
 #include "content/browser/preloading/prefetch/no_vary_search_helper.h"
 #include "content/browser/preloading/preload_activation_report_manager.h"
-#include "content/browser/preloading/preload_activation_report_utils.h"
 #include "content/browser/preloading/preloading_attempt_impl.h"
 #include "content/browser/preloading/preloading_trigger_type_impl.h"
 #include "content/browser/preloading/prerender/devtools_prerender_attempt.h"
@@ -711,9 +710,7 @@ void PrerenderHost::ReadyToCommitNavigation(
           blink::mojom::WebFeature::kPrerender2CrossOriginIframes);
     }
 
-    if (IsPrerenderActivationBeaconEnabled(
-            navigation_request->GetURL(),
-            navigation_request->GetResponseHeaders())) {
+    if (base::FeatureList::IsEnabled(features::kPrerenderActivationBeacon)) {
       activation_beacon_url_ = FindActivationBeaconURL(*navigation_request);
     }
   }
@@ -803,7 +800,8 @@ std::unique_ptr<StoredPage> PrerenderHost::Activate(
   CHECK(is_ready_for_activation_);
   is_ready_for_activation_ = false;
 
-  if (!activation_beacon_url_.is_empty()) {
+  if (base::FeatureList::IsEnabled(features::kPrerenderActivationBeacon) &&
+      !activation_beacon_url_.is_empty()) {
     auto* manager =
         PreloadActivationReportManager::GetOrCreateForBrowserContext(
             web_contents_->GetBrowserContext());

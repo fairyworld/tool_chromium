@@ -1721,8 +1721,6 @@ source_set("browser") {
     "preloading/prefetcher.h",
     "preloading/preload_activation_report_manager.cc",
     "preloading/preload_activation_report_manager.h",
-    "preloading/preload_activation_report_utils.cc",
-    "preloading/preload_activation_report_utils.h",
     "preloading/preload_pipeline_info_impl.cc",
     "preloading/preload_pipeline_info_impl.h",
     "preloading/preload_serving_metrics.cc",
