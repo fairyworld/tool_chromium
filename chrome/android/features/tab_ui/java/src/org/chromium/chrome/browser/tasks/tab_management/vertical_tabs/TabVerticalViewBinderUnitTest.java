@@ -518,4 +518,54 @@ public class TabVerticalViewBinderUnitTest {
         TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.TAB_GROUP_ID);
         assertEquals(0, lp.getMarginStart());
     }
+
+    @Test
+    @SmallTest
+    public void testBindLoadingState_WithFavicon() {
+        View spinner = mItemView.findViewById(R.id.tab_loading_spinner);
+        assertNotNull(spinner);
+
+        TabFaviconFetcher mockFetcher1 = mock(TabFaviconFetcher.class);
+        mModel.set(TabProperties.FAVICON_FETCHER, mockFetcher1);
+
+        // 1. Loading
+        mModel.set(TabProperties.IS_LOADING, true);
+        TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.IS_LOADING);
+        assertEquals(View.VISIBLE, spinner.getVisibility());
+        assertEquals(View.INVISIBLE, mFaviconView.getVisibility());
+
+        // 2. Favicon fetcher updated while loading (should not break INVISIBLE state)
+        TabFaviconFetcher mockFetcher2 = mock(TabFaviconFetcher.class);
+        mModel.set(TabProperties.FAVICON_FETCHER, mockFetcher2);
+        TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.FAVICON_FETCHER);
+        assertEquals(View.VISIBLE, spinner.getVisibility());
+        assertEquals(View.INVISIBLE, mFaviconView.getVisibility());
+
+        // 3. Not Loading
+        mModel.set(TabProperties.IS_LOADING, false);
+        TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.IS_LOADING);
+        assertEquals(View.GONE, spinner.getVisibility());
+        assertEquals(View.VISIBLE, mFaviconView.getVisibility());
+    }
+
+    @Test
+    @SmallTest
+    public void testBindLoadingState_WithoutFavicon() {
+        View spinner = mItemView.findViewById(R.id.tab_loading_spinner);
+        assertNotNull(spinner);
+
+        mModel.set(TabProperties.FAVICON_FETCHER, null);
+
+        // 1. Loading
+        mModel.set(TabProperties.IS_LOADING, true);
+        TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.IS_LOADING);
+        assertEquals(View.VISIBLE, spinner.getVisibility());
+        assertEquals(View.GONE, mFaviconView.getVisibility());
+
+        // 2. Not Loading
+        mModel.set(TabProperties.IS_LOADING, false);
+        TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.IS_LOADING);
+        assertEquals(View.GONE, spinner.getVisibility());
+        assertEquals(View.GONE, mFaviconView.getVisibility());
+    }
 }

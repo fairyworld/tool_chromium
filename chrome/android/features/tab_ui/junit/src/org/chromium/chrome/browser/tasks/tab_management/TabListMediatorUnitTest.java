@@ -943,6 +943,48 @@ public class TabListMediatorUnitTest {
     }
 
     @Test
+    public void updatesLoadingState_ObserverEvents_VerticalTab() {
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
+        PropertyModel model = mModelList.get(0).model;
+        assertFalse(model.get(TabProperties.IS_LOADING));
+
+        // Same document navigation should not trigger loading state
+        mTabObserverCaptor.getValue().onLoadStarted(mTab1, false);
+        assertFalse(model.get(TabProperties.IS_LOADING));
+
+        // Different document navigation should trigger loading state
+        mTabObserverCaptor.getValue().onLoadStarted(mTab1, true);
+        assertTrue(model.get(TabProperties.IS_LOADING));
+
+        // Same document load stopped should not change state
+        mTabObserverCaptor.getValue().onLoadStopped(mTab1, false);
+        assertTrue(model.get(TabProperties.IS_LOADING));
+
+        // Different document load stopped should reset state
+        mTabObserverCaptor.getValue().onLoadStopped(mTab1, true);
+        assertFalse(model.get(TabProperties.IS_LOADING));
+
+        // Crash should reset state
+        mTabObserverCaptor.getValue().onLoadStarted(mTab1, true);
+        assertTrue(model.get(TabProperties.IS_LOADING));
+        mTabObserverCaptor.getValue().onCrash(mTab1);
+        assertFalse(model.get(TabProperties.IS_LOADING));
+    }
+
+    @Test
+    public void updatesLoadingState_NtpIgnored_VerticalTab() {
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
+        when(mTab1.getUrl()).thenReturn(new GURL("chrome-native://newtab/"));
+        mMediator.resetWithListOfTabs(Arrays.asList(mTab1), null, false);
+
+        PropertyModel model = mModelList.get(0).model;
+        assertFalse(model.get(TabProperties.IS_LOADING));
+
+        mTabObserverCaptor.getValue().onLoadStarted(mTab1, true);
+        assertFalse(model.get(TabProperties.IS_LOADING));
+    }
+
+    @Test
     public void sendsSelectSignalCorrectly() {
         mModelList
                 .get(1)

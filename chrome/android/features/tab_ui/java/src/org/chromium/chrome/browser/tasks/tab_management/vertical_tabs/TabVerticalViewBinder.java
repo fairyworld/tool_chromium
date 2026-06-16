@@ -20,6 +20,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.widget.ImageViewCompat;
 
+import com.google.android.material.progressindicator.CircularProgressIndicator;
+
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.tasks.tab_management.TabActionButtonData;
@@ -133,6 +135,8 @@ class TabVerticalViewBinder {
             PropertyModel model, ViewGroup view, PropertyKey propertyKey) {
         if (TabProperties.FAVICON_FETCHER == propertyKey) {
             updateFavicon(model, view);
+        } else if (TabProperties.IS_LOADING == propertyKey) {
+            updateLoadingState(model, view);
         } else if (TabProperties.TAB_CLICK_LISTENER == propertyKey) {
             TabListViewBinderUtils.setNullableClickListener(
                     model.get(TabProperties.TAB_CLICK_LISTENER), view, model);
@@ -147,9 +151,39 @@ class TabVerticalViewBinder {
 
     private static void updateFavicon(PropertyModel model, ViewGroup view) {
         @Nullable ImageView faviconView = view.findViewById(R.id.tab_favicon);
-        if (faviconView != null) {
-            TabListViewBinderUtils.updateFavicon(model, faviconView);
+        if (faviconView == null) return;
+
+        TabListViewBinderUtils.updateFaviconImage(model, faviconView);
+        adjustFaviconVisibility(model, faviconView);
+    }
+
+    private static void updateLoadingState(PropertyModel model, ViewGroup view) {
+        boolean isLoading = model.get(TabProperties.IS_LOADING);
+        @Nullable CircularProgressIndicator spinner = view.findViewById(R.id.tab_loading_spinner);
+
+        if (spinner != null) {
+            if (isLoading) {
+                boolean isIncognito = model.get(TabProperties.IS_INCOGNITO);
+                spinner.setIndicatorColor(getLoadingSpinnerColor(view.getContext(), isIncognito));
+                spinner.show();
+            } else {
+                spinner.setVisibility(View.GONE);
+            }
         }
+
+        @Nullable ImageView faviconView = view.findViewById(R.id.tab_favicon);
+        if (faviconView != null) {
+            adjustFaviconVisibility(model, faviconView);
+        }
+    }
+
+    private static void adjustFaviconVisibility(PropertyModel model, ImageView faviconView) {
+        if (model.get(TabProperties.FAVICON_FETCHER) == null) {
+            faviconView.setVisibility(View.GONE);
+            return;
+        }
+        boolean isLoading = model.get(TabProperties.IS_LOADING);
+        faviconView.setVisibility(isLoading ? View.INVISIBLE : View.VISIBLE);
     }
 
     // Row-Specific Layout Color Binder Helpers
@@ -322,6 +356,14 @@ class TabVerticalViewBinder {
                                 ? SemanticColorUtils.getDefaultIconColor(context)
                                 : SemanticColorUtils.getDefaultIconColorSecondary(context));
         return ColorStateList.valueOf(color);
+    }
+
+    private static @ColorInt int getLoadingSpinnerColor(Context context, boolean isIncognito) {
+        if (isIncognito) {
+            return Color.WHITE;
+        } else {
+            return SemanticColorUtils.getDefaultIconColorAccent1(context);
+        }
     }
 
     // Gesture & Interaction Layout Helpers
