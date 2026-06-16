@@ -2466,8 +2466,11 @@ class LocationBarMediator
     public void suspendInput() {
         if (mAutocompleteCoordinator == null || mCurrentInput == null || mIsReparenting) return;
 
+        AutocompleteInput input = mCurrentInput;
+        mCurrentInput = null;
+
         // Preserve editing state ahead of reparenting.
-        mCurrentInput.setSelection(
+        input.setSelection(
                 new TextSelection(
                         mUrlCoordinator.getSelectionStart(), mUrlCoordinator.getSelectionEnd()));
 
@@ -2480,7 +2483,7 @@ class LocationBarMediator
         mAutocompleteCoordinator.endInput();
         mStatusCoordinator.endInput();
         if (mScrimHandler != null) mScrimHandler.setVisibility(false);
-        mCurrentInput.getRequestTypeSupplier().removeObserver(mAutocompleteRequestTypeObserver);
+        input.getRequestTypeSupplier().removeObserver(mAutocompleteRequestTypeObserver);
         FuseboxSessionState state = FuseboxSessionState.from(mLocationBarDataProvider);
         if (state != null) {
             // Only for Contextual Tasks, we skip ending the Fusebox input to allow it to stay warm
@@ -2490,8 +2493,6 @@ class LocationBarMediator
             }
         }
         mHintTextUpdater.endInput();
-
-        mCurrentInput = null;
         setAttachmentModelList(null);
     }
 
