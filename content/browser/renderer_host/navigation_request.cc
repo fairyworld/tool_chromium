@@ -9168,7 +9168,7 @@ void NavigationRequest::DidCommitNavigation(
     auto* manager =
         PreloadActivationReportManager::GetOrCreateForBrowserContext(
             GetWebContents()->GetBrowserContext());
-    manager->ReportActivation(activation_beacon_url_, GetWebContents());
+    manager->ReportActivation(activation_beacon_url_, GetRenderFrameHost());
   }
 
   // DO NOT ADD CODE after this.

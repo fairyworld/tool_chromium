@@ -18227,11 +18227,23 @@ IN_PROC_BROWSER_TEST_F(PrerenderUntilScriptUpgradeDisabledBrowserTest,
             blink::mojom::SpeculationAction::kPrerenderUntilScript);
 }
 
-class PrerenderActivationBeaconBrowserTest : public PrerenderBrowserTest {
+class PrerenderActivationBeaconBrowserTest
+    : public PrerenderBrowserTest,
+      public ::testing::WithParamInterface<bool> {
  public:
   PrerenderActivationBeaconBrowserTest() {
-    scoped_feature_list_.InitAndEnableFeature(
-        features::kPrerenderActivationBeacon);
+    std::vector<base::test::FeatureRef> enabled_features = {
+        features::kPrerenderActivationBeacon};
+    std::vector<base::test::FeatureRef> disabled_features;
+
+    if (GetParam()) {
+      enabled_features.push_back(
+          features::kPreloadActivationReportWithExtensionInterception);
+    } else {
+      disabled_features.push_back(
+          features::kPreloadActivationReportWithExtensionInterception);
+    }
+    scoped_feature_list_.InitWithFeatures(enabled_features, disabled_features);
   }
 
   void SetUp() override {
@@ -18341,7 +18353,7 @@ class PrerenderActivationBeaconBrowserTest : public PrerenderBrowserTest {
   std::set<GURL> seen_beacons_;
 };
 
-IN_PROC_BROWSER_TEST_F(PrerenderActivationBeaconBrowserTest,
+IN_PROC_BROWSER_TEST_P(PrerenderActivationBeaconBrowserTest,
                        PrerenderOnlyActivationBeaconSent) {
   GURL referrer_url = GetUrl("/empty.html");
   GURL prerender_url = GetUrl("/prerender?beacon=/beacon");
@@ -18365,7 +18377,7 @@ IN_PROC_BROWSER_TEST_F(PrerenderActivationBeaconBrowserTest,
   EXPECT_TRUE(WasBeaconSeen(beacon_url));
 }
 
-IN_PROC_BROWSER_TEST_F(PrerenderActivationBeaconBrowserTest,
+IN_PROC_BROWSER_TEST_P(PrerenderActivationBeaconBrowserTest,
                        PrerenderOnlyActivationBeaconCrossOriginNotSent) {
   GURL referrer_url = GetUrl("/empty.html");
   GURL cross_origin_beacon_url = GetCrossSiteUrl("/beacon");
@@ -18432,7 +18444,7 @@ class PrerenderActivationBeaconRedirectBrowserTest
   }
 };
 
-IN_PROC_BROWSER_TEST_F(PrerenderActivationBeaconRedirectBrowserTest,
+IN_PROC_BROWSER_TEST_P(PrerenderActivationBeaconRedirectBrowserTest,
                        ActivationBeaconRedirected) {
   GURL referrer_url = GetUrl("/empty.html");
   GURL redirected_url = GetUrl("/redirected.html");
@@ -18461,7 +18473,7 @@ IN_PROC_BROWSER_TEST_F(PrerenderActivationBeaconRedirectBrowserTest,
   EXPECT_FALSE(HasHostForUrl(prerender_url));
 }
 
-IN_PROC_BROWSER_TEST_F(PrerenderActivationBeaconBrowserTest,
+IN_PROC_BROWSER_TEST_P(PrerenderActivationBeaconBrowserTest,
                        ActivationBeaconNavigatedAway) {
   GURL referrer_url = GetUrl("/empty.html");
   GURL prerender_url = GetUrl("/prerender?beacon=/beacon1");
@@ -18496,15 +18508,25 @@ class PrefetchToPrerenderActivationBeaconBrowserTest
     : public PrerenderActivationBeaconBrowserTest {
  public:
   PrefetchToPrerenderActivationBeaconBrowserTest() {
-    scoped_feature_list_.InitWithFeatures(
-        {features::kPrefetchTesting, features::kPrefetchActivationBeacon}, {});
+    std::vector<base::test::FeatureRef> enabled_features = {
+        features::kPrefetchTesting, features::kPrefetchActivationBeacon};
+    std::vector<base::test::FeatureRef> disabled_features;
+
+    if (GetParam()) {
+      enabled_features.push_back(
+          features::kPreloadActivationReportWithExtensionInterception);
+    } else {
+      disabled_features.push_back(
+          features::kPreloadActivationReportWithExtensionInterception);
+    }
+    scoped_feature_list_.InitWithFeatures(enabled_features, disabled_features);
   }
 
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-IN_PROC_BROWSER_TEST_F(PrefetchToPrerenderActivationBeaconBrowserTest,
+IN_PROC_BROWSER_TEST_P(PrefetchToPrerenderActivationBeaconBrowserTest,
                        PrefetchToPrerenderUpgradeActivationBeaconSent) {
   GURL referrer_url = GetUrl("/empty.html");
   GURL url = GetUrl("/prefetch_and_prerender?beacon=/beacon");
@@ -18550,7 +18572,7 @@ IN_PROC_BROWSER_TEST_F(PrefetchToPrerenderActivationBeaconBrowserTest,
   EXPECT_TRUE(WasBeaconSeen(beacon_url));
 }
 
-IN_PROC_BROWSER_TEST_F(PrerenderActivationBeaconBrowserTest,
+IN_PROC_BROWSER_TEST_P(PrerenderActivationBeaconBrowserTest,
                        SameSiteCrossOriginPrerenderSendsBeacon) {
   GURL referrer_url = GetUrl("/empty.html");
   GURL prerender_url = GetSameSiteCrossOriginUrl(
@@ -18665,7 +18687,7 @@ class PrerenderActivationBeaconRedirectSameSiteBrowserTest
   bool beacon_seen_ = false;
 };
 
-IN_PROC_BROWSER_TEST_F(
+IN_PROC_BROWSER_TEST_P(
     PrerenderActivationBeaconRedirectSameSiteBrowserTest,
     SameOriginRedirectToSameSiteCrossOrigin_BeaconInRedirectIgnored) {
   GURL referrer_url = GetUrl("/empty.html");
@@ -18690,7 +18712,7 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_FALSE(beacon_seen());
 }
 
-IN_PROC_BROWSER_TEST_F(
+IN_PROC_BROWSER_TEST_P(
     PrerenderActivationBeaconRedirectSameSiteBrowserTest,
     SameOriginRedirectToSameSiteCrossOrigin_BeaconInFinalResponseSent) {
   GURL referrer_url = GetUrl("/empty.html");
@@ -18714,7 +18736,7 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_TRUE(beacon_seen());
 }
 
-IN_PROC_BROWSER_TEST_F(
+IN_PROC_BROWSER_TEST_P(
     PrerenderActivationBeaconBrowserTest,
     SameSiteCrossOriginPrerender_CrossOriginBeaconDiscarded) {
   GURL referrer_url = GetUrl("/empty.html");
@@ -18739,7 +18761,7 @@ IN_PROC_BROWSER_TEST_F(
   EXPECT_FALSE(WasBeaconSeen(cross_origin_beacon_url));
 }
 
-IN_PROC_BROWSER_TEST_F(PrerenderActivationBeaconBrowserTest,
+IN_PROC_BROWSER_TEST_P(PrerenderActivationBeaconBrowserTest,
                        ActivationBeaconRedirectToCrossOriginDiscarded) {
   GURL referrer_url = GetUrl("/empty.html");
   GURL cross_origin_beacon_url = GetCrossSiteUrl("/beacon");
@@ -18772,6 +18794,19 @@ IN_PROC_BROWSER_TEST_F(PrerenderActivationBeaconBrowserTest,
   EXPECT_TRUE(WasBeaconSeen(beacon_url));
   EXPECT_FALSE(WasBeaconSeen(cross_origin_beacon_url));
 }
+
+INSTANTIATE_TEST_SUITE_P(All,
+                         PrerenderActivationBeaconBrowserTest,
+                         ::testing::Bool());
+INSTANTIATE_TEST_SUITE_P(All,
+                         PrerenderActivationBeaconRedirectBrowserTest,
+                         ::testing::Bool());
+INSTANTIATE_TEST_SUITE_P(All,
+                         PrefetchToPrerenderActivationBeaconBrowserTest,
+                         ::testing::Bool());
+INSTANTIATE_TEST_SUITE_P(All,
+                         PrerenderActivationBeaconRedirectSameSiteBrowserTest,
+                         ::testing::Bool());
 
 // Tests for the multi-RenderViewHost propagation of the
 // prerender-until-script to full prerender upgrade IPC. These exercise the
