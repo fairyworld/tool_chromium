@@ -297,7 +297,7 @@ class MagiPresubmitTest(unittest.TestCase):
             '{"type": "array"}, "conflict_report": {"type": "array"}, '
             '"next_stage": {"type": "string", "enum": ["CRITIQUE", '
             '"SCAFFOLDING", "PREPARATION", "IMPLEMENTATION", "SYNTHESIS", '
-            '"TEST_FILLING", "ANALYSIS", "TRAINING", '
+            '"TEST_FILLING", "TRAINING", '
             '"VALIDATION", "DEPLOYMENT", "ESCALATION"]}, '
             '"state_transport": {"type": "string", "enum": '
             '["FILE_IO", "EPHEMERAL_WITH_LOGS"]}}}}}')
@@ -520,10 +520,8 @@ class MagiPresubmitTest(unittest.TestCase):
             '"constraints": {"type": "array"}, '
             '"oscillation_detected": {"type": "boolean"}, '
             '"conflict_report": {"type": "array"}, '
-            '"next_stage": {"type": "string", "enum": ["CRITIQUE", '
-            '"SCAFFOLDING", "PREPARATION", "IMPLEMENTATION", "SYNTHESIS", '
-            '"TEST_FILLING", "ANALYSIS", "TRAINING", '
-            '"VALIDATION", "DEPLOYMENT", "ESCALATION"]}}}}}')
+            '"next_stage": {"type": "string", "enum": ["SYNTHESIS", '
+            '"VALIDATION", "ESCALATION"]}}}}}')
 
         with patch('builtins.open',
                    unittest.mock.mock_open(read_data=schema_json)):
@@ -558,7 +556,7 @@ class MagiPresubmitTest(unittest.TestCase):
             results = PRESUBMIT.CheckJsonFiles(self.mock_input,
                                                self.mock_output)
             self.assertTrue(
-                any('must signal SYNTHESIS, TRAINING, or ESCALATION' in r
+                any('must signal SYNTHESIS, VALIDATION, or ESCALATION' in r
                     for r in results))
 
     def testJsonPersonaDefValidation(self):

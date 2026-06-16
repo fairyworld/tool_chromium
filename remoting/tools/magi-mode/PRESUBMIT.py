@@ -295,7 +295,7 @@ def CheckMarkdownFiles(input_api, output_api):
             msg = (f'Unreachable Markdown File: {rel_path} cannot be reached '
                    'from SKILL.md. Even if it links to another file, it is '
                    'part of an isolated cycle. Please add a link to it in '
-                   'PERSONAS.md or another connected document.')
+                   'ROUTING.md or another connected document.')
 
             if is_active_violation:
                 results.append(output_api.PresubmitError(msg))
@@ -612,12 +612,12 @@ def CheckJsonFiles(input_api, output_api):
 
         elif filename.startswith('constraints'):
             if next_p and next_p not in [
-                    'SYNTHESIS', 'TRAINING', 'ESCALATION'
+                    'SYNTHESIS', 'VALIDATION', 'ESCALATION'
             ]:
                 results.append(
                     output_api.PresubmitError(
                         f'File {f.LocalPath()} must signal '
-                        f'SYNTHESIS, TRAINING, or ESCALATION, not {next_p}'))
+                        f'SYNTHESIS, VALIDATION, or ESCALATION, not {next_p}'))
 
     return results
 

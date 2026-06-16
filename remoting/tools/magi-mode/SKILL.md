@@ -39,8 +39,9 @@ To maintain focus and avoid context dilution, specialized tasks are delegated:
    Scanners into a strict list of actionable constraints in
    `constraints.magi.[iteration].json`.
 
-2. **Training:** Captures knowledge or systemic gaps discovered during the
-   process and upgrades the Scanner rulesets.
+2. **Training (Manual):** A manually-invoked module to capture knowledge or
+   systemic gaps discovered during the process and upgrade the Scanner rulesets.
+   This is NOT automatically called in the default consensus verification loop.
 
 3. **Release:** A terminal module invoked with a clean context to handle
    workspace hygiene, formatting, and final staging/upload of CLs.
@@ -100,9 +101,10 @@ successor. *Note: Scanners and Scoping sub-agents are exempt as their successors
 are deterministic.*
 
 - **Implementation / Test Expert:** `PREPARATION`
-- **Consolidation:** `SYNTHESIS` (if iteration needed) or `TRAINING`
-- **Synthesis:** `TEST_FILLING` (if implementation) or `ANALYSIS` (if review)
-- **Training:** `VALIDATION`
+- **Consolidation:** `SYNTHESIS` (if iteration needed) or `VALIDATION`
+- **Synthesis:** `TEST_FILLING` (if implementation) or `CRITIQUE` (if
+  review/audit)
+- **Training:** `VALIDATION` (if manually invoked)
 - **Validation:** `DEPLOYMENT`
 
 ## Workflow
@@ -175,7 +177,12 @@ are deterministic.*
 
 ### Stage 2: Generate
 
-*This stage is ONLY executed if `task_type` is `IMPLEMENTATION`.*
+*Note: Steps 1, 2, 4, 6, and 7 are ONLY executed if `task_type` is
+`IMPLEMENTATION`.* *Step 3 (Select Modules) is executed for all task types to
+initialize the State Block. Step 5 (Synthesize) is executed during the initial
+generation for `IMPLEMENTATION` tasks, but its synthesis logic is also invoked
+during Stage 3 (Refine) iteration for all task types if code changes are
+generated.*
 
 #### Step 1: Scaffold (Implementation)
 
@@ -263,9 +270,10 @@ are deterministic.*
    A".
    - **Failure:** If the code fails to compile, Synthesis MUST loop back to
      internal refinement and fix the syntax/link errors. It MUST NOT signal
-     `next_stage: TEST_FILLING` or `ANALYSIS` until the build is green.
+     `next_stage: TEST_FILLING` or `CRITIQUE` until the build is green.
    - **Success:** Once the build is verified, Synthesis MUST attach the build
-     logs to the synthesis report before signaling `next_stage: TEST_FILLING`.
+     logs to the synthesis report before signaling `next_stage: TEST_FILLING` or
+     `CRITIQUE`.
 
 #### Step 6: Implement Tests (The Test Expert)
 
@@ -309,18 +317,23 @@ are deterministic.*
 4. **Common Convergence:**
    - **Convergence & Iteration:** Synthesis reads `state_block.magi.json` and
      `constraints.magi.[iteration].json` to generate the next iteration.
+   - **Success Handoff:** Once consensus is reached (all checklist items in the
+     State Block are `true`), the Orchestrator proceeds directly to Stage 4:
+     Release.
    - **Escalation Gate:** If `oscillation_detected == true`, the Orchestrator
      MUST halt and present the `conflict_report` to the human for a strategic
      decision.
 
-#### Step 3: Train (Training)
+#### Step 3: Train (Training - Manual Workflow)
 
-1. **Continuous Improvement:** Once consensus is reached, the Orchestrator MUST
-   invoke a "Training" sub-agent. Training evaluates the final State Block and
-   Consolidation constraints to identify systemic gaps in the Scanners'
-   knowledge. If a Scanner made a recurring mistake or lacked domain context,
-   Training proposes an upgrade to the relevant `personas/*.json` ruleset by
-   adding a new Boolean constraint to its checklist.
+1. **Continuous Improvement (Manual):** Once consensus is reached, the automated
+   verification loop terminates and proceeds to Stage 4: Release. The developer
+   can manually invoke the "Training" sub-agent after a session is complete to
+   evaluate the final State Block and Consolidation constraints to identify
+   systemic gaps in the Scanners' knowledge. If a Scanner made a recurring
+   mistake or lacked domain context, Training proposes an upgrade to the
+   relevant `personas/*.json` ruleset by adding a new Boolean constraint to its
+   checklist.
 2. **Module Segmentation (Hierarchical Specialization):** Training MUST NOT let
    a ruleset's checklist exceed 10 items. If adding a new constraint exceeds
    this limit, Training MUST "segment" the module using a nested directory
@@ -328,8 +341,8 @@ are deterministic.*
    `core/security.json` into `core/security/memory.json` and
    `core/security/network.json`). Do not use flat files with underscores. The
    directory depth MUST NOT exceed 5 levels (counting from `/personas`). Migrate
-   the relevant checks and update `ROUTING.md`. Training MUST signal
-   `next_stage: VALIDATION`.
+   the relevant checks and update `ROUTING.md`. If manually invoked prior to
+   release, Training MUST signal `next_stage: VALIDATION` upon completion.
 
 ### Stage 4: Release
 
@@ -345,7 +358,7 @@ are deterministic.*
 1. **Handoff:** Once Validation passes, the Orchestrator pauses its own actions
    and delegates strictly to the **Release** sub-agent. The Orchestrator passes
    only two pieces of information: the name of the feature/bug, and the list of
-   MAGI files updated by Training.
+   MAGI files updated by Training (if Training was run manually).
 2. **Exclusive Mandate:** Release's exclusive mandate is:
    - **Workspace Hygiene:** Read the discovered VCS from
      `project.magi.json#environment/vcs`. Run `jj st` (for JJ) or `git status`
@@ -357,7 +370,7 @@ are deterministic.*
      source changes (using the VCS-specific track defined in the VCS Isolation
      Rule).
    - **The MAGI CL:** Create a separate change/bookmark (for JJ) or branch (for
-     Git). Stage and upload the `PERSONAS.md` and `personas/**/*.json` files
+     Git). Stage and upload the `ROUTING.md` and `personas/**/*.json` files
      updated by Training as a secondary CL.
 
 ### Specialized Modes
