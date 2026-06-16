@@ -581,46 +581,49 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
             modelList.add(buildNewIncognitoTabItem());
         }
 
-        // New Window
-        if (shouldShowNewWindow()) modelList.add(buildNewWindowItem());
-
-        // New Incognito Window
-        if (shouldShowNewIncognitoWindow()) modelList.add(buildNewIncognitoWindowItem());
-
-        // Move to other window
-        if (shouldShowMoveToOtherWindow()) modelList.add(buildMoveToOtherWindowItem());
-
-        // Manage windows
-        if (MultiWindowUtils.shouldShowManageWindowsMenu()) modelList.add(buildManageWindowsItem());
-
         // Tab groups
         if (shouldShowTabGroupsParentItem(currentTab)) {
             modelList.add(buildTabGroupsParentItem(currentTab));
         }
 
-        // Divider
-        maybeAddDividerLine(modelList, R.id.divider_line_id);
-
-        // Passwords and autofill parent
-        if (shouldShowPasswordsAndAutofillParentItem()) {
-            modelList.add(buildPasswordsAndAutofillParentItem());
+        // New Window
+        if (shouldShowNewWindow()) {
+            modelList.add(buildNewWindowItem());
         }
 
-        // History parent
+        // New Incognito Window
+        if (shouldShowNewIncognitoWindow()) {
+            modelList.add(buildNewIncognitoWindowItem());
+        }
+
+        // Move to other window
+        if (shouldShowMoveToOtherWindow()) {
+            modelList.add(buildMoveToOtherWindowItem());
+        }
+
+        // Manage windows
+        if (MultiWindowUtils.shouldShowManageWindowsMenu()) {
+            modelList.add(buildManageWindowsItem());
+        }
+
+        maybeAddDividerLine(modelList, R.id.divider_line_id);
+
+        // History and autofill parent
         if (shouldShowHistoryParentItem()) {
             modelList.add(buildHistoryParentItem());
         }
 
-        // Page info
-        if (shouldShowPageInfoItem()) {
-            modelList.add(buildPageInfoItem(currentTab));
-            maybeAddDividerLine(modelList, R.id.page_info_divider_line_id);
+        // Delete browsing data
+        if (shouldShowQuickDeleteItem()) {
+            modelList.add(buildQuickDeleteItem());
         }
 
         // Homepage
         if (currentTab != null && HomepageManager.getInstance().shouldShowHomepageMenuItem()) {
             modelList.add(buildHomepageItem());
         }
+
+        maybeAddDividerLine(modelList, R.id.divider_line_id);
 
         // Downloads
         modelList.add(buildDownloadsItem());
@@ -633,30 +636,30 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
             modelList.add(buildExtensionsParentItem());
         }
 
-        // Divider
-        modelList.add(
-                new ListItem(
-                        AppMenuHandler.AppMenuItemType.DIVIDER,
-                        buildModelForDivider(R.id.divider_line_id)));
-
-        // Page Zoom
-        // Disable page zoom menu item on Reading Mode pages.
-        if (shouldShowPageZoomItem(currentTab) && !isReaderModeShowing(currentTab)) {
-            modelList.add(buildPageZoomItem(currentTab));
-            // Divider
-            modelList.add(
-                    new ListItem(
-                            AppMenuHandler.AppMenuItemType.DIVIDER,
-                            buildModelForDivider(R.id.divider_line_id)));
+        // Passwords and autofill
+        if (shouldShowPasswordsAndAutofillParentItem()) {
+            modelList.add(buildPasswordsAndAutofillParentItem());
         }
 
-        // Save and print
+        maybeAddDividerLine(modelList, R.id.divider_line_id);
+
+        // Page Zoom
+        if (shouldShowPageZoomItem(currentTab) && !isReaderModeShowing(currentTab)) {
+            modelList.add(buildPageZoomItem(currentTab));
+            maybeAddDividerLine(modelList, R.id.divider_line_id);
+        }
+
+        // Save and share
         if (shouldShowSaveAndPrintParentItem(
                 currentTab, isNativePage, isFileScheme, isContentScheme, url)) {
             modelList.add(
                     buildSaveAndPrintParentItem(
                             currentTab, isNativePage, isFileScheme, isContentScheme, url));
         }
+
+        // Glic
+        ListItem openGlicItem = maybeBuildOpenGlicItem(currentTab);
+        if (openGlicItem != null) modelList.add(openGlicItem);
 
         // Print
         if (shouldShowPrintItem(currentTab)) {
@@ -667,10 +670,6 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
         ListItem priceTrackingItem =
                 maybeBuildPriceTrackingListItem(currentTab, shouldShowIconBeforeItem());
         if (priceTrackingItem != null) modelList.add(priceTrackingItem);
-
-        // Glic
-        ListItem openGlicItem = maybeBuildOpenGlicItem(currentTab);
-        if (openGlicItem != null) modelList.add(openGlicItem);
 
         // Find in page
         if (shouldShowFindInPageItem(currentTab)) modelList.add(buildFindInPageItem(currentTab));
@@ -764,6 +763,8 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
         };
     }
 
+    // TODO(crbug.com/404074424): Create the main item list as List<ListItem> so we can use the
+    // other method and remove this.
     private void maybeAddDividerLine(MVCListAdapter.ModelList modelList, @IdRes int id) {
         if (modelList.get(modelList.size() - 1).type == AppMenuHandler.AppMenuItemType.DIVIDER) {
             return;
@@ -771,6 +772,15 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
 
         modelList.add(
                 new ListItem(AppMenuHandler.AppMenuItemType.DIVIDER, buildModelForDivider(id)));
+    }
+
+    private void maybeAddDividerLine(List<ListItem> list, @IdRes int id) {
+        if (list.isEmpty()
+                || list.get(list.size() - 1).type == AppMenuHandler.AppMenuItemType.DIVIDER) {
+            return;
+        }
+
+        list.add(new ListItem(AppMenuHandler.AppMenuItemType.DIVIDER, buildModelForDivider(id)));
     }
 
     private void populateOverviewModeMenu(MVCListAdapter.ModelList modelList) {
@@ -1169,15 +1179,11 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
             return false;
         }
 
-        if (!IncognitoUtils.shouldOpenIncognitoAsWindow() || !isIncognitoShowing()) {
+        if (!IncognitoUtils.shouldOpenIncognitoAsWindow() && !isIncognitoShowing()) {
             return true;
         }
 
         if (shouldShowRecentTabsItem()) {
-            return true;
-        }
-
-        if (shouldShowQuickDeleteItem()) {
             return true;
         }
 
@@ -1190,16 +1196,12 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
         Supplier<List<ListItem>> submenuItemsSupplier =
                 () -> {
                     List<ListItem> submenuItems = new ArrayList<>();
-                    if (!IncognitoUtils.shouldOpenIncognitoAsWindow() || !isIncognitoShowing()) {
+                    if (!IncognitoUtils.shouldOpenIncognitoAsWindow() && !isIncognitoShowing()) {
                         submenuItems.add(buildHistoryItem());
                     }
 
                     if (shouldShowRecentTabsItem()) {
                         submenuItems.add(buildRecentTabsItem());
-                    }
-
-                    if (shouldShowQuickDeleteItem()) {
-                        submenuItems.add(buildQuickDeleteItem());
                     }
 
                     List<ListItem> recentEntries = getRecentEntryMenuItemList();
@@ -1956,6 +1958,20 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
 
         List<ListItem> submenuItems = new ArrayList<>();
 
+        if (ShareUtils.shouldEnableShare(currentTab)) {
+            submenuItems.add(buildShareListItem(shouldShowIconBeforeItem()));
+            submenuItems.add(buildCopyLinkItem());
+            submenuItems.add(buildSendToDevicesItem());
+            submenuItems.add(buildShareQrCodeItem());
+        }
+
+        if (shouldShowDownloadPageMenuItem(currentTab)
+                || shouldShowHomeScreenMenuItem(
+                        isNativePage, isFileScheme, isContentScheme, isIncognitoShowing(), url)
+                || shouldShowPaintPreview(isNativePage, currentTab)) {
+            maybeAddDividerLine(submenuItems, R.id.divider_line_id);
+        }
+
         if (shouldShowDownloadPageMenuItem(currentTab)) {
             submenuItems.add(buildDownloadPageItem(currentTab));
         }
@@ -1968,19 +1984,6 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
 
         if (shouldShowPaintPreview(isNativePage, currentTab)) {
             submenuItems.add(buildPaintPreviewItem(isNativePage, currentTab));
-        }
-
-        if (ShareUtils.shouldEnableShare(currentTab)) {
-            if (!submenuItems.isEmpty()) {
-                submenuItems.add(
-                        new ListItem(
-                                AppMenuHandler.AppMenuItemType.DIVIDER,
-                                buildModelForDivider(R.id.divider_line_id)));
-            }
-            submenuItems.add(buildShareListItem(shouldShowIconBeforeItem()));
-            submenuItems.add(buildCopyLinkItem());
-            submenuItems.add(buildSendToDevicesItem());
-            submenuItems.add(buildShareQrCodeItem());
         }
 
         return new ListItem(
@@ -2132,11 +2135,11 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
             return true;
         }
 
-        if (shouldShowTaskManagerItem()) {
+        if (shouldShowNameWindowItem()) {
             return true;
         }
 
-        if (shouldShowNameWindowItem()) {
+        if (shouldShowTabLayoutToggleItem()) {
             return true;
         }
 
@@ -2144,11 +2147,15 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
             return true;
         }
 
-        if (shouldShowDevToolsItem(currentTab)) {
+        if (shouldShowPageInfoItem()) {
             return true;
         }
 
-        if (shouldShowTabLayoutToggleItem()) {
+        if (shouldShowTaskManagerItem()) {
+            return true;
+        }
+
+        if (shouldShowDevToolsItem(currentTab)) {
             return true;
         }
 
@@ -2173,24 +2180,38 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                         submenuItems.add(buildReaderModeItem(currentTab));
                     }
 
-                    if (shouldShowTaskManagerItem()) {
-                        submenuItems.add(buildTaskManagerItem());
-                    }
+                    maybeAddDividerLine(submenuItems, R.id.divider_line_id);
 
                     if (shouldShowNameWindowItem()) {
                         submenuItems.add(buildNameWindowItem());
+                    }
+
+                    if (shouldShowTabLayoutToggleItem()) {
+                        submenuItems.add(buildTabLayoutToggleItem());
                     }
 
                     if (shouldShowNtpCustomizations(currentTab)) {
                         submenuItems.add(buildNtpCustomizationsItem(currentTab));
                     }
 
+                    maybeAddDividerLine(submenuItems, R.id.divider_line_id);
+
+                    if (shouldShowPageInfoItem()) {
+                        submenuItems.add(buildPageInfoItem(currentTab));
+                    }
+
+                    if (shouldShowTaskManagerItem()) {
+                        submenuItems.add(buildTaskManagerItem());
+                    }
+
                     if (shouldShowDevToolsItem(currentTab)) {
                         submenuItems.add(buildDevToolsItem(currentTab));
                     }
 
-                    if (shouldShowTabLayoutToggleItem()) {
-                        submenuItems.add(buildTabLayoutToggleItem());
+                    if (!submenuItems.isEmpty()
+                            && submenuItems.get(submenuItems.size() - 1).type
+                                    == AppMenuHandler.AppMenuItemType.DIVIDER) {
+                        submenuItems.remove(submenuItems.size() - 1);
                     }
 
                     return submenuItems;

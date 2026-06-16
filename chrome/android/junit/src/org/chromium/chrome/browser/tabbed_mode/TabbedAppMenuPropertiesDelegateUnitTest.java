@@ -708,15 +708,11 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                         item(R.id.create_new_tab_group_menu_id)),
                                 item(R.id.divider_line_id),
                                 item(
-                                        R.id.passwords_and_autofill_parent_menu_id,
-                                        item(R.id.google_password_manager_menu_id),
-                                        item(R.id.payment_methods_menu_id),
-                                        item(R.id.addresses_and_more_menu_id)),
-                                item(
                                         R.id.history_parent_menu_id,
                                         item(R.id.open_history_menu_id),
-                                        item(R.id.recent_tabs_menu_id),
-                                        item(R.id.quick_delete_menu_id)),
+                                        item(R.id.recent_tabs_menu_id)),
+                                item(R.id.quick_delete_menu_id),
+                                item(R.id.divider_line_id),
                                 item(R.id.downloads_menu_id),
                                 item(
                                         R.id.bookmarks_parent_menu_id,
@@ -750,6 +746,13 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                             item(R.id.manage_extensions_menu_id),
                             item(R.id.extensions_webstore_menu_id)));
         }
+
+        expectedItems.add(
+                item(
+                        R.id.passwords_and_autofill_parent_menu_id,
+                        item(R.id.google_password_manager_menu_id),
+                        item(R.id.payment_methods_menu_id),
+                        item(R.id.addresses_and_more_menu_id)));
 
         expectedItems.addAll(
                 Arrays.asList(
@@ -837,17 +840,11 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                         item(R.id.create_new_tab_group_menu_id)),
                                 item(R.id.divider_line_id),
                                 item(
-                                        R.id.passwords_and_autofill_parent_menu_id,
-                                        item(R.id.google_password_manager_menu_id),
-                                        item(R.id.payment_methods_menu_id),
-                                        item(R.id.addresses_and_more_menu_id)),
-                                item(
                                         R.id.history_parent_menu_id,
                                         item(R.id.open_history_menu_id),
-                                        item(R.id.recent_tabs_menu_id),
-                                        item(R.id.quick_delete_menu_id)),
-                                item(R.id.info_menu_id),
-                                item(R.id.page_info_divider_line_id),
+                                        item(R.id.recent_tabs_menu_id)),
+                                item(R.id.quick_delete_menu_id),
+                                item(R.id.divider_line_id),
                                 item(R.id.downloads_menu_id),
                                 item(
                                         R.id.bookmarks_parent_menu_id,
@@ -882,6 +879,13 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                             item(R.id.extensions_webstore_menu_id)));
         }
 
+        expectedItems.add(
+                item(
+                        R.id.passwords_and_autofill_parent_menu_id,
+                        item(R.id.google_password_manager_menu_id),
+                        item(R.id.payment_methods_menu_id),
+                        item(R.id.addresses_and_more_menu_id)));
+
         expectedItems.addAll(
                 Arrays.asList(
                         item(R.id.divider_line_id),
@@ -892,6 +896,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.send_to_devices_menu_id),
                                 item(R.id.qr_code_menu_id)),
                         item(R.id.find_in_page_id),
+                        item(R.id.more_tools_menu_id, item(R.id.info_menu_id)),
                         item(R.id.open_with_id),
                         item(R.id.divider_line_id),
                         item(R.id.preferences_id),
@@ -998,36 +1003,20 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         expectedItems.add(
                 item(
-                        R.id.passwords_and_autofill_parent_menu_id,
-                        item(R.id.google_password_manager_menu_id),
-                        item(R.id.payment_methods_menu_id),
-                        item(R.id.addresses_and_more_menu_id)));
-        expectedTitles.add(
-                item(
-                        R.string.menu_passwords_and_autofill,
-                        item(R.string.menu_google_password_manager),
-                        item(R.string.menu_payment_methods),
-                        item(R.string.menu_addresses_and_more)));
-        expectedItems.add(
-                item(
                         R.id.history_parent_menu_id,
                         item(R.id.open_history_menu_id),
-                        item(R.id.recent_tabs_menu_id),
-                        item(R.id.quick_delete_menu_id)));
+                        item(R.id.recent_tabs_menu_id)));
         expectedTitles.add(
                 item(
                         R.string.menu_history,
                         item(R.string.menu_history),
-                        item(R.string.menu_recent_tabs),
-                        item(R.string.menu_quick_delete)));
+                        item(R.string.menu_recent_tabs)));
 
-        if (!mTabbedAppMenuPropertiesDelegate.isTabletSizeScreen()) {
-            expectedItems.add(item(R.id.info_menu_id));
-            expectedTitles.add(item(R.string.menu_site_controls));
+        expectedItems.add(item(R.id.quick_delete_menu_id));
+        expectedTitles.add(item(R.string.menu_quick_delete));
 
-            expectedItems.add(item(R.id.page_info_divider_line_id));
-            expectedTitles.add(item(0));
-        }
+        expectedItems.add(item(R.id.divider_line_id));
+        expectedTitles.add(item(0));
 
         expectedItems.add(item(R.id.downloads_menu_id));
         expectedTitles.add(item(R.string.menu_downloads));
@@ -1094,27 +1083,40 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                             item(R.string.menu_chrome_webstore)));
         }
 
+        expectedItems.add(
+                item(
+                        R.id.passwords_and_autofill_parent_menu_id,
+                        item(R.id.google_password_manager_menu_id),
+                        item(R.id.payment_methods_menu_id),
+                        item(R.id.addresses_and_more_menu_id)));
+        expectedTitles.add(
+                item(
+                        R.string.menu_passwords_and_autofill,
+                        item(R.string.menu_google_password_manager),
+                        item(R.string.menu_payment_methods),
+                        item(R.string.menu_addresses_and_more)));
+
         expectedItems.add(item(R.id.divider_line_id));
         expectedTitles.add(item(0));
 
         expectedItems.add(
                 item(
                         R.id.save_and_share_parent_menu_id,
-                        item(R.id.universal_install),
-                        item(R.id.divider_line_id),
                         item(R.id.share_menu_id),
                         item(R.id.copy_link_menu_id),
                         item(R.id.send_to_devices_menu_id),
-                        item(R.id.qr_code_menu_id)));
+                        item(R.id.qr_code_menu_id),
+                        item(R.id.divider_line_id),
+                        item(R.id.universal_install)));
         expectedTitles.add(
                 item(
                         R.string.menu_save_and_share,
-                        item(R.string.menu_install_create_shortcut),
-                        item(0),
                         item(R.string.menu_share_page),
                         item(R.string.menu_copy_link),
                         item(R.string.menu_send_to_devices),
-                        item(R.string.menu_qr_code)));
+                        item(R.string.menu_qr_code),
+                        item(0),
+                        item(R.string.menu_install_create_shortcut)));
 
         expectedItems.add(item(R.id.find_in_page_id));
         expectedTitles.add(item(R.string.menu_find_in_page));
@@ -1127,16 +1129,27 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                     item(
                             R.id.more_tools_menu_id,
                             item(R.id.reader_mode_menu_id),
+                            item(R.id.divider_line_id),
                             item(R.id.toggle_tab_layout_menu_id)));
             expectedTitles.add(
                     item(
                             R.string.menu_more_tools,
                             item(R.string.show_reading_mode_text),
+                            item(0),
                             item(org.chromium.chrome.tab_ui.R.string.show_tabs_vertically)));
         } else {
-            expectedItems.add(item(R.id.more_tools_menu_id, item(R.id.reader_mode_menu_id)));
+            expectedItems.add(
+                    item(
+                            R.id.more_tools_menu_id,
+                            item(R.id.reader_mode_menu_id),
+                            item(R.id.divider_line_id),
+                            item(R.id.info_menu_id)));
             expectedTitles.add(
-                    item(R.string.menu_more_tools, item(R.string.show_reading_mode_text)));
+                    item(
+                            R.string.menu_more_tools,
+                            item(R.string.show_reading_mode_text),
+                            item(0),
+                            item(R.string.menu_site_controls)));
         }
 
         if (!DeviceInfo.isDesktop()) {
@@ -1382,31 +1395,6 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         expectedItems.add(item(R.id.divider_line_id));
         expectedTitles.add(item(0));
 
-        expectedItems.add(
-                item(
-                        R.id.passwords_and_autofill_parent_menu_id,
-                        item(R.id.google_password_manager_menu_id),
-                        item(R.id.payment_methods_menu_id),
-                        item(R.id.addresses_and_more_menu_id)));
-        expectedTitles.add(
-                item(
-                        R.string.menu_passwords_and_autofill,
-                        item(R.string.menu_google_password_manager),
-                        item(R.string.menu_payment_methods),
-                        item(R.string.menu_addresses_and_more)));
-        if (!IncognitoUtils.shouldOpenIncognitoAsWindow()) {
-            expectedItems.add(item(R.id.history_parent_menu_id, item(R.id.open_history_menu_id)));
-            expectedTitles.add(item(R.string.menu_history, item(R.string.menu_history)));
-        }
-
-        if (!mTabbedAppMenuPropertiesDelegate.isTabletSizeScreen()) {
-            expectedItems.add(item(R.id.info_menu_id));
-            expectedTitles.add(item(R.string.menu_site_controls));
-
-            expectedItems.add(item(R.id.page_info_divider_line_id));
-            expectedTitles.add(item(0));
-        }
-
         expectedItems.add(item(R.id.downloads_menu_id));
         expectedTitles.add(item(R.string.menu_downloads));
 
@@ -1472,6 +1460,19 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                             item(R.string.menu_chrome_webstore)));
         }
 
+        expectedItems.add(
+                item(
+                        R.id.passwords_and_autofill_parent_menu_id,
+                        item(R.id.google_password_manager_menu_id),
+                        item(R.id.payment_methods_menu_id),
+                        item(R.id.addresses_and_more_menu_id)));
+        expectedTitles.add(
+                item(
+                        R.string.menu_passwords_and_autofill,
+                        item(R.string.menu_google_password_manager),
+                        item(R.string.menu_payment_methods),
+                        item(R.string.menu_addresses_and_more)));
+
         expectedItems.add(item(R.id.divider_line_id));
         expectedTitles.add(item(0));
 
@@ -1501,16 +1502,27 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                     item(
                             R.id.more_tools_menu_id,
                             item(R.id.reader_mode_menu_id),
+                            item(R.id.divider_line_id),
                             item(R.id.toggle_tab_layout_menu_id)));
             expectedTitles.add(
                     item(
                             R.string.menu_more_tools,
                             item(R.string.show_reading_mode_text),
+                            item(0),
                             item(org.chromium.chrome.tab_ui.R.string.show_tabs_vertically)));
         } else {
-            expectedItems.add(item(R.id.more_tools_menu_id, item(R.id.reader_mode_menu_id)));
+            expectedItems.add(
+                    item(
+                            R.id.more_tools_menu_id,
+                            item(R.id.reader_mode_menu_id),
+                            item(R.id.divider_line_id),
+                            item(R.id.info_menu_id)));
             expectedTitles.add(
-                    item(R.string.menu_more_tools, item(R.string.show_reading_mode_text)));
+                    item(
+                            R.string.menu_more_tools,
+                            item(R.string.show_reading_mode_text),
+                            item(0),
+                            item(R.string.menu_site_controls)));
         }
 
         if (!DeviceInfo.isDesktop()) {
@@ -1738,33 +1750,19 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         expectedItems.add(
                 item(
-                        R.id.passwords_and_autofill_parent_menu_id,
-                        item(R.id.google_password_manager_menu_id),
-                        item(R.id.payment_methods_menu_id),
-                        item(R.id.addresses_and_more_menu_id)));
-        expectedTitles.add(
-                item(
-                        R.string.menu_passwords_and_autofill,
-                        item(R.string.menu_google_password_manager),
-                        item(R.string.menu_payment_methods),
-                        item(R.string.menu_addresses_and_more)));
-        expectedItems.add(
-                item(
                         R.id.history_parent_menu_id,
                         item(R.id.open_history_menu_id),
-                        item(R.id.recent_tabs_menu_id),
-                        item(R.id.quick_delete_menu_id)));
+                        item(R.id.recent_tabs_menu_id)));
         expectedTitles.add(
                 item(
                         R.string.menu_history,
                         item(R.string.menu_history),
-                        item(R.string.menu_recent_tabs),
-                        item(R.string.menu_quick_delete)));
+                        item(R.string.menu_recent_tabs)));
 
-        expectedItems.add(item(R.id.info_menu_id));
-        expectedTitles.add(item(R.string.menu_site_controls));
+        expectedItems.add(item(R.id.quick_delete_menu_id));
+        expectedTitles.add(item(R.string.menu_quick_delete));
 
-        expectedItems.add(item(R.id.page_info_divider_line_id));
+        expectedItems.add(item(R.id.divider_line_id));
         expectedTitles.add(item(0));
 
         expectedItems.add(item(R.id.downloads_menu_id));
@@ -1832,27 +1830,40 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                             item(R.string.menu_chrome_webstore)));
         }
 
+        expectedItems.add(
+                item(
+                        R.id.passwords_and_autofill_parent_menu_id,
+                        item(R.id.google_password_manager_menu_id),
+                        item(R.id.payment_methods_menu_id),
+                        item(R.id.addresses_and_more_menu_id)));
+        expectedTitles.add(
+                item(
+                        R.string.menu_passwords_and_autofill,
+                        item(R.string.menu_google_password_manager),
+                        item(R.string.menu_payment_methods),
+                        item(R.string.menu_addresses_and_more)));
+
         expectedItems.add(item(R.id.divider_line_id));
         expectedTitles.add(item(0));
 
         expectedItems.add(
                 item(
                         R.id.save_and_share_parent_menu_id,
-                        item(R.id.universal_install),
-                        item(R.id.divider_line_id),
                         item(R.id.share_menu_id),
                         item(R.id.copy_link_menu_id),
                         item(R.id.send_to_devices_menu_id),
-                        item(R.id.qr_code_menu_id)));
+                        item(R.id.qr_code_menu_id),
+                        item(R.id.divider_line_id),
+                        item(R.id.universal_install)));
         expectedTitles.add(
                 item(
                         R.string.menu_save_and_share,
-                        item(R.string.menu_install_create_shortcut),
-                        item(0),
                         item(R.string.menu_share_page),
                         item(R.string.menu_copy_link),
                         item(R.string.menu_send_to_devices),
-                        item(R.string.menu_qr_code)));
+                        item(R.string.menu_qr_code),
+                        item(0),
+                        item(R.string.menu_install_create_shortcut)));
 
         expectedItems.add(item(R.id.find_in_page_id));
         expectedTitles.add(item(R.string.menu_find_in_page));
@@ -1860,8 +1871,18 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         expectedItems.add(item(R.id.translate_id));
         expectedTitles.add(item(R.string.menu_translate));
 
-        expectedItems.add(item(R.id.more_tools_menu_id, item(R.id.reader_mode_menu_id)));
-        expectedTitles.add(item(R.string.menu_more_tools, item(R.string.show_reading_mode_text)));
+        expectedItems.add(
+                item(
+                        R.id.more_tools_menu_id,
+                        item(R.id.reader_mode_menu_id),
+                        item(R.id.divider_line_id),
+                        item(R.id.info_menu_id)));
+        expectedTitles.add(
+                item(
+                        R.string.menu_more_tools,
+                        item(R.string.show_reading_mode_text),
+                        item(0),
+                        item(R.string.menu_site_controls)));
 
         if (!DeviceInfo.isDesktop()) {
             expectedItems.add(item(R.id.request_desktop_site_id));
@@ -1939,17 +1960,11 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                         item(R.id.create_new_tab_group_menu_id)),
                                 item(R.id.divider_line_id),
                                 item(
-                                        R.id.passwords_and_autofill_parent_menu_id,
-                                        item(R.id.google_password_manager_menu_id),
-                                        item(R.id.payment_methods_menu_id),
-                                        item(R.id.addresses_and_more_menu_id)),
-                                item(
                                         R.id.history_parent_menu_id,
                                         item(R.id.open_history_menu_id),
-                                        item(R.id.recent_tabs_menu_id),
-                                        item(R.id.quick_delete_menu_id)),
-                                item(R.id.info_menu_id),
-                                item(R.id.page_info_divider_line_id),
+                                        item(R.id.recent_tabs_menu_id)),
+                                item(R.id.quick_delete_menu_id),
+                                item(R.id.divider_line_id),
                                 item(R.id.downloads_menu_id),
                                 item(
                                         R.id.bookmarks_parent_menu_id,
@@ -1984,20 +1999,31 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                             item(R.id.extensions_webstore_menu_id)));
         }
 
+        expectedItems.add(
+                item(
+                        R.id.passwords_and_autofill_parent_menu_id,
+                        item(R.id.google_password_manager_menu_id),
+                        item(R.id.payment_methods_menu_id),
+                        item(R.id.addresses_and_more_menu_id)));
+
         expectedItems.addAll(
                 Arrays.asList(
                         item(R.id.divider_line_id),
                         item(
                                 R.id.save_and_share_parent_menu_id,
-                                item(R.id.universal_install),
-                                item(R.id.divider_line_id),
                                 item(R.id.share_menu_id),
                                 item(R.id.copy_link_menu_id),
                                 item(R.id.send_to_devices_menu_id),
-                                item(R.id.qr_code_menu_id)),
+                                item(R.id.qr_code_menu_id),
+                                item(R.id.divider_line_id),
+                                item(R.id.universal_install)),
                         item(R.id.find_in_page_id),
                         item(R.id.translate_id),
-                        item(R.id.more_tools_menu_id, item(R.id.reader_mode_menu_id)),
+                        item(
+                                R.id.more_tools_menu_id,
+                                item(R.id.reader_mode_menu_id),
+                                item(R.id.divider_line_id),
+                                item(R.id.info_menu_id)),
                         // Request desktop site is hidden.
                         item(R.id.auto_dark_web_contents_id),
                         item(R.id.divider_line_id),
@@ -2040,17 +2066,11 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                         item(R.id.create_new_tab_group_menu_id)),
                                 item(R.id.divider_line_id),
                                 item(
-                                        R.id.passwords_and_autofill_parent_menu_id,
-                                        item(R.id.google_password_manager_menu_id),
-                                        item(R.id.payment_methods_menu_id),
-                                        item(R.id.addresses_and_more_menu_id)),
-                                item(
                                         R.id.history_parent_menu_id,
                                         item(R.id.open_history_menu_id),
-                                        item(R.id.recent_tabs_menu_id),
-                                        item(R.id.quick_delete_menu_id)),
-                                item(R.id.info_menu_id),
-                                item(R.id.page_info_divider_line_id),
+                                        item(R.id.recent_tabs_menu_id)),
+                                item(R.id.quick_delete_menu_id),
+                                item(R.id.divider_line_id),
                                 item(R.id.downloads_menu_id),
                                 item(
                                         R.id.bookmarks_parent_menu_id,
@@ -2085,20 +2105,31 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                             item(R.id.extensions_webstore_menu_id)));
         }
 
+        expectedItems.add(
+                item(
+                        R.id.passwords_and_autofill_parent_menu_id,
+                        item(R.id.google_password_manager_menu_id),
+                        item(R.id.payment_methods_menu_id),
+                        item(R.id.addresses_and_more_menu_id)));
+
         expectedItems.addAll(
                 Arrays.asList(
                         item(R.id.divider_line_id),
                         item(
                                 R.id.save_and_share_parent_menu_id,
-                                item(R.id.universal_install),
-                                item(R.id.divider_line_id),
                                 item(R.id.share_menu_id),
                                 item(R.id.copy_link_menu_id),
                                 item(R.id.send_to_devices_menu_id),
-                                item(R.id.qr_code_menu_id)),
+                                item(R.id.qr_code_menu_id),
+                                item(R.id.divider_line_id),
+                                item(R.id.universal_install)),
                         item(R.id.find_in_page_id),
                         item(R.id.translate_id),
-                        item(R.id.more_tools_menu_id, item(R.id.reader_mode_menu_id))));
+                        item(
+                                R.id.more_tools_menu_id,
+                                item(R.id.reader_mode_menu_id),
+                                item(R.id.divider_line_id),
+                                item(R.id.info_menu_id))));
 
         expectedItems.add(item(R.id.request_desktop_site_id));
 
@@ -2357,6 +2388,101 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
     }
 
     @Test
+    @DisableFeatures({
+        ChromeFeatureList.ANDROID_OPEN_INCOGNITO_AS_WINDOW,
+        ChromeFeatureList.SUBMENUS_IN_APP_MENU
+    })
+    public void testMenuItems_Accessibility_ImageDescriptions_SubmenusDisabled() {
+        setUpMocksForPageMenu();
+        when(mTab.getUrl()).thenReturn(JUnitTestGURLs.SEARCH_URL);
+        when(mTab.isNativePage()).thenReturn(false);
+        doReturn(false)
+                .when(mTabbedAppMenuPropertiesDelegate)
+                .shouldShowPaintPreview(anyBoolean(), any(Tab.class));
+        doReturn(false)
+                .when(mTabbedAppMenuPropertiesDelegate)
+                .shouldShowTranslateMenuItem(any(Tab.class));
+
+        // Ensure the get image descriptions option is shown as needed
+        when(mPrefService.getBoolean(Pref.ACCESSIBILITY_IMAGE_LABELS_ENABLED_ANDROID))
+                .thenReturn(false);
+
+        // Test specific setup
+        ThreadUtils.hasSubtleSideEffectsSetThreadAssertsDisabledForTesting(true);
+        AccessibilityState.setIsKnownScreenReaderEnabledForTesting(true);
+
+        ModelList modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
+
+        List<MenuItem> expectedItems =
+                new ArrayList<>(
+                        Arrays.asList(
+                                item(R.id.icon_row_menu_id),
+                                item(R.id.new_tab_menu_id),
+                                item(R.id.new_incognito_tab_menu_id),
+                                item(R.id.add_to_group_menu_id),
+                                item(R.id.divider_line_id),
+                                item(R.id.open_history_menu_id),
+                                item(R.id.quick_delete_menu_id),
+                                item(R.id.info_menu_id),
+                                item(R.id.page_info_divider_line_id),
+                                item(R.id.downloads_menu_id),
+                                item(R.id.all_bookmarks_menu_id),
+                                item(R.id.recent_tabs_menu_id)));
+
+        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+            expectedItems.add(item(R.id.extensions_menu_menu_id));
+        }
+
+        expectedItems.addAll(
+                Arrays.asList(
+                        item(R.id.divider_line_id),
+                        item(R.id.share_menu_id),
+                        item(R.id.find_in_page_id),
+                        item(R.id.reader_mode_menu_id),
+                        item(R.id.universal_install),
+                        item(R.id.request_desktop_site_id),
+                        item(R.id.auto_dark_web_contents_id),
+                        item(R.id.get_image_descriptions_id),
+                        item(R.id.divider_line_id),
+                        item(R.id.preferences_id),
+                        item(R.id.help_id)));
+
+        assertMenuItemsAreEqual(modelList, expectedItems);
+
+        // Ensure the text of the menu item is correct
+        assertEquals(
+                "Get image descriptions",
+                findItemById(modelList, R.id.get_image_descriptions_id)
+                        .model
+                        .get(AppMenuItemProperties.TITLE));
+
+        // Enable the feature and ensure text changes
+        when(mPrefService.getBoolean(Pref.ACCESSIBILITY_IMAGE_LABELS_ENABLED_ANDROID))
+                .thenReturn(true);
+
+        modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
+        assertEquals(
+                "Stop image descriptions",
+                findItemById(modelList, R.id.get_image_descriptions_id)
+                        .model
+                        .get(AppMenuItemProperties.TITLE));
+
+        // Setup no wifi condition, and "only on wifi" user option.
+        DeviceConditions noWifi =
+                new DeviceConditions(false, 75, ConnectionType.CONNECTION_2G, false, false, true);
+        DeviceConditions.setForTesting(noWifi);
+        when(mPrefService.getBoolean(Pref.ACCESSIBILITY_IMAGE_LABELS_ONLY_ON_WIFI))
+                .thenReturn(true);
+
+        modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
+        assertEquals(
+                "Get image descriptions",
+                findItemById(modelList, R.id.get_image_descriptions_id)
+                        .model
+                        .get(AppMenuItemProperties.TITLE));
+    }
+
+    @Test
     @DisableFeatures(ChromeFeatureList.ANDROID_OPEN_INCOGNITO_AS_WINDOW)
     public void testMenuItems_Accessibility_ImageDescriptions() {
         setUpMocksForPageMenu();
@@ -2391,17 +2517,11 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                         item(R.id.create_new_tab_group_menu_id)),
                                 item(R.id.divider_line_id),
                                 item(
-                                        R.id.passwords_and_autofill_parent_menu_id,
-                                        item(R.id.google_password_manager_menu_id),
-                                        item(R.id.payment_methods_menu_id),
-                                        item(R.id.addresses_and_more_menu_id)),
-                                item(
                                         R.id.history_parent_menu_id,
                                         item(R.id.open_history_menu_id),
-                                        item(R.id.recent_tabs_menu_id),
-                                        item(R.id.quick_delete_menu_id)),
-                                item(R.id.info_menu_id),
-                                item(R.id.page_info_divider_line_id),
+                                        item(R.id.recent_tabs_menu_id)),
+                                item(R.id.quick_delete_menu_id),
+                                item(R.id.divider_line_id),
                                 item(R.id.downloads_menu_id),
                                 item(
                                         R.id.bookmarks_parent_menu_id,
@@ -2436,19 +2556,30 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                             item(R.id.extensions_webstore_menu_id)));
         }
 
+        expectedItems.add(
+                item(
+                        R.id.passwords_and_autofill_parent_menu_id,
+                        item(R.id.google_password_manager_menu_id),
+                        item(R.id.payment_methods_menu_id),
+                        item(R.id.addresses_and_more_menu_id)));
+
         expectedItems.addAll(
                 Arrays.asList(
                         item(R.id.divider_line_id),
                         item(
                                 R.id.save_and_share_parent_menu_id,
-                                item(R.id.universal_install),
-                                item(R.id.divider_line_id),
                                 item(R.id.share_menu_id),
                                 item(R.id.copy_link_menu_id),
                                 item(R.id.send_to_devices_menu_id),
-                                item(R.id.qr_code_menu_id)),
+                                item(R.id.qr_code_menu_id),
+                                item(R.id.divider_line_id),
+                                item(R.id.universal_install)),
                         item(R.id.find_in_page_id),
-                        item(R.id.more_tools_menu_id, item(R.id.reader_mode_menu_id))));
+                        item(
+                                R.id.more_tools_menu_id,
+                                item(R.id.reader_mode_menu_id),
+                                item(R.id.divider_line_id),
+                                item(R.id.info_menu_id))));
 
         if (!DeviceInfo.isDesktop()) {
             expectedItems.add(item(R.id.request_desktop_site_id));
@@ -2525,17 +2656,11 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                         item(R.id.create_new_tab_group_menu_id)),
                                 item(R.id.divider_line_id),
                                 item(
-                                        R.id.passwords_and_autofill_parent_menu_id,
-                                        item(R.id.google_password_manager_menu_id),
-                                        item(R.id.payment_methods_menu_id),
-                                        item(R.id.addresses_and_more_menu_id)),
-                                item(
                                         R.id.history_parent_menu_id,
                                         item(R.id.open_history_menu_id),
-                                        item(R.id.recent_tabs_menu_id),
-                                        item(R.id.quick_delete_menu_id)),
-                                item(R.id.info_menu_id),
-                                item(R.id.page_info_divider_line_id),
+                                        item(R.id.recent_tabs_menu_id)),
+                                item(R.id.quick_delete_menu_id),
+                                item(R.id.divider_line_id),
                                 item(R.id.downloads_menu_id),
                                 item(
                                         R.id.bookmarks_parent_menu_id,
@@ -2570,19 +2695,30 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                             item(R.id.extensions_webstore_menu_id)));
         }
 
+        expectedItems.add(
+                item(
+                        R.id.passwords_and_autofill_parent_menu_id,
+                        item(R.id.google_password_manager_menu_id),
+                        item(R.id.payment_methods_menu_id),
+                        item(R.id.addresses_and_more_menu_id)));
+
         expectedItems.addAll(
                 Arrays.asList(
                         item(R.id.divider_line_id),
                         item(
                                 R.id.save_and_share_parent_menu_id,
-                                item(R.id.universal_install),
-                                item(R.id.divider_line_id),
                                 item(R.id.share_menu_id),
                                 item(R.id.copy_link_menu_id),
                                 item(R.id.send_to_devices_menu_id),
-                                item(R.id.qr_code_menu_id)),
+                                item(R.id.qr_code_menu_id),
+                                item(R.id.divider_line_id),
+                                item(R.id.universal_install)),
                         item(R.id.find_in_page_id),
-                        item(R.id.more_tools_menu_id, item(R.id.reader_mode_menu_id))));
+                        item(
+                                R.id.more_tools_menu_id,
+                                item(R.id.reader_mode_menu_id),
+                                item(R.id.divider_line_id),
+                                item(R.id.info_menu_id))));
 
         if (!DeviceInfo.isDesktop()) {
             expectedItems.add(item(R.id.request_desktop_site_id));
@@ -2633,17 +2769,11 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                         item(R.id.create_new_tab_group_menu_id)),
                                 item(R.id.divider_line_id),
                                 item(
-                                        R.id.passwords_and_autofill_parent_menu_id,
-                                        item(R.id.google_password_manager_menu_id),
-                                        item(R.id.payment_methods_menu_id),
-                                        item(R.id.addresses_and_more_menu_id)),
-                                item(
                                         R.id.history_parent_menu_id,
                                         item(R.id.open_history_menu_id),
-                                        item(R.id.recent_tabs_menu_id),
-                                        item(R.id.quick_delete_menu_id)),
-                                item(R.id.info_menu_id),
-                                item(R.id.page_info_divider_line_id),
+                                        item(R.id.recent_tabs_menu_id)),
+                                item(R.id.quick_delete_menu_id),
+                                item(R.id.divider_line_id),
                                 item(R.id.downloads_menu_id),
                                 item(
                                         R.id.bookmarks_parent_menu_id,
@@ -2678,19 +2808,30 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                             item(R.id.extensions_webstore_menu_id)));
         }
 
+        expectedItems.add(
+                item(
+                        R.id.passwords_and_autofill_parent_menu_id,
+                        item(R.id.google_password_manager_menu_id),
+                        item(R.id.payment_methods_menu_id),
+                        item(R.id.addresses_and_more_menu_id)));
+
         expectedItems.addAll(
                 Arrays.asList(
                         item(R.id.divider_line_id),
                         item(
                                 R.id.save_and_share_parent_menu_id,
-                                item(R.id.universal_install),
-                                item(R.id.divider_line_id),
                                 item(R.id.share_menu_id),
                                 item(R.id.copy_link_menu_id),
                                 item(R.id.send_to_devices_menu_id),
-                                item(R.id.qr_code_menu_id)),
+                                item(R.id.qr_code_menu_id),
+                                item(R.id.divider_line_id),
+                                item(R.id.universal_install)),
                         item(R.id.find_in_page_id),
-                        item(R.id.more_tools_menu_id, item(R.id.reader_mode_menu_id))));
+                        item(
+                                R.id.more_tools_menu_id,
+                                item(R.id.reader_mode_menu_id),
+                                item(R.id.divider_line_id),
+                                item(R.id.info_menu_id))));
 
         if (!DeviceInfo.isDesktop()) {
             expectedItems.add(item(R.id.request_desktop_site_id));
@@ -4823,7 +4964,6 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         Arrays.asList(
                                 item(R.id.open_history_menu_id),
                                 item(R.id.recent_tabs_menu_id),
-                                item(R.id.quick_delete_menu_id),
                                 item(R.id.divider_line_id),
                                 item(R.id.recent_tabs_header_menu_id),
                                 item(R.id.recent_entry_tab_menu_item),
@@ -4886,7 +5026,6 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         Arrays.asList(
                                 item(R.id.open_history_menu_id),
                                 item(R.id.recent_tabs_menu_id),
-                                item(R.id.quick_delete_menu_id),
                                 item(R.id.divider_line_id),
                                 item(R.id.recent_tabs_header_menu_id),
                                 item(
@@ -4925,7 +5064,6 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         Arrays.asList(
                                 item(R.string.menu_history),
                                 item(R.string.menu_recent_tabs),
-                                item(R.string.menu_quick_delete),
                                 item(0),
                                 item(R.string.recent_tabs),
                                 item(
@@ -4941,8 +5079,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         assertMenuTitlesAreEqual(items, expectedTitles);
 
         // Index 4 is the first recently closed entry in the submenu (after the default history
-        // actions: History, Recent Tabs, Quick Delete, and the Divider).
-        ListItem windowItem = items.get(5);
+        // actions: History, Recent Tabs, the Divider, and the Recent Tabs header).
+        ListItem windowItem = items.get(4);
         List<ListItem> windowSubmenu =
                 windowItem.model.get(AppMenuItemWithSubmenuProperties.SUBMENU_PROVIDER).get();
         ListItem restoreItem = windowSubmenu.get(0);
@@ -4980,7 +5118,6 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         Arrays.asList(
                                 item(R.id.open_history_menu_id),
                                 item(R.id.recent_tabs_menu_id),
-                                item(R.id.quick_delete_menu_id),
                                 item(R.id.divider_line_id),
                                 item(R.id.recent_tabs_header_menu_id),
                                 item(R.id.recent_entry_tab_menu_item),
@@ -5009,7 +5146,6 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         Arrays.asList(
                                 item(R.string.menu_history),
                                 item(R.string.menu_recent_tabs),
-                                item(R.string.menu_quick_delete),
                                 item(0),
                                 item(R.string.recent_tabs),
                                 item("Title 1"),
@@ -5018,9 +5154,9 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         assertMenuTitlesAreEqual(items, expectedTitles);
 
         // Verify that the RECENT_ENTRY property points to the individual tab, not the bulk event.
-        ListItem item1 = items.get(5);
+        ListItem item1 = items.get(4);
         assertEquals(tab1, item1.model.get(AppMenuRecentEntryItemProperties.RECENT_ENTRY));
-        ListItem item2 = items.get(6);
+        ListItem item2 = items.get(5);
         assertEquals(tab2, item2.model.get(AppMenuRecentEntryItemProperties.RECENT_ENTRY));
     }
 
@@ -5045,7 +5181,6 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         Arrays.asList(
                                 item(R.id.open_history_menu_id),
                                 item(R.id.recent_tabs_menu_id),
-                                item(R.id.quick_delete_menu_id),
                                 item(R.id.divider_line_id),
                                 item(R.id.recent_tabs_header_menu_id),
                                 item(
@@ -5081,7 +5216,6 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         Arrays.asList(
                                 item(R.string.menu_history),
                                 item(R.string.menu_recent_tabs),
-                                item(R.string.menu_quick_delete),
                                 item(0),
                                 item(R.string.recent_tabs),
                                 item(tabsText, item(restoreText))));
@@ -5090,8 +5224,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         // Verify the recent entry itself in the model.
         // Index 4 is the first recently closed entry in the submenu (after the default history
-        // actions: History, Recent Tabs, Quick Delete, and the Divider).
-        ListItem windowItem = items.get(5);
+        // actions: History, Recent Tabs, the Divider, and the Recent Tabs header).
+        ListItem windowItem = items.get(4);
         List<ListItem> windowSubmenu =
                 windowItem.model.get(AppMenuItemWithSubmenuProperties.SUBMENU_PROVIDER).get();
         ListItem restoreItem = windowSubmenu.get(0);
@@ -5132,7 +5266,6 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         Arrays.asList(
                                 item(R.id.open_history_menu_id),
                                 item(R.id.recent_tabs_menu_id),
-                                item(R.id.quick_delete_menu_id),
                                 item(R.id.divider_line_id),
                                 item(R.id.recent_tabs_header_menu_id),
                                 item(
@@ -5164,7 +5297,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         // Verify the recent entry itself in the model.
         // Index 4 is the first recently closed entry in the submenu.
-        ListItem groupItem = items.get(5);
+        ListItem groupItem = items.get(4);
         List<ListItem> groupSubmenu =
                 groupItem.model.get(AppMenuItemWithSubmenuProperties.SUBMENU_PROVIDER).get();
         ListItem restoreItem = groupSubmenu.get(0);
@@ -5185,7 +5318,6 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         Arrays.asList(
                                 item(R.string.menu_history),
                                 item(R.string.menu_recent_tabs),
-                                item(R.string.menu_quick_delete),
                                 item(0),
                                 item(R.string.recent_tabs),
                                 item(
@@ -5214,7 +5346,6 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         Arrays.asList(
                                 item(R.string.menu_history),
                                 item(R.string.menu_recent_tabs),
-                                item(R.string.menu_quick_delete),
                                 item(0),
                                 item(R.string.recent_tabs),
                                 item(
@@ -5248,7 +5379,6 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         Arrays.asList(
                                 item(R.id.open_history_menu_id),
                                 item(R.id.recent_tabs_menu_id),
-                                item(R.id.quick_delete_menu_id),
                                 item(R.id.divider_line_id),
                                 item(
                                         R.id.recent_entry_menu_item,
@@ -5260,7 +5390,6 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         Arrays.asList(
                                 item(R.string.menu_history),
                                 item(R.string.menu_recent_tabs),
-                                item(R.string.menu_quick_delete),
                                 item(0),
                                 item("Laptop", item("Tab 1 Title"), item("Tab 2 Title"))));
 
@@ -5284,7 +5413,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         assertMenuTitlesAreEqual(items, expectedTitles);
 
-        ListItem laptopSessionItem = items.get(4);
+        ListItem laptopSessionItem = items.get(3);
         List<ListItem> laptopSubmenu =
                 laptopSessionItem
                         .model
