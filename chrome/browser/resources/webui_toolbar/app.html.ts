@@ -47,6 +47,12 @@ ${this.isBackForwardButtonEnabled_ ? html`
         .locationBarState="${this.navigationControlsState_.locationBarState}">
     </location-bar>
   ` : ''}
+  ${this.isExtensionsContainerEnabled_ ? html`
+    <webui-toolbar-extensions id="extensions"
+        .state="${this.navigationControlsState_.extensionsState}"
+        .hidden="${this.navigationControlsState_.extensionsState.length === 0}">
+    </webui-toolbar-extensions>
+  ` : ''}
   ${this.isPinnedToolbarActionsEnabled_ ? html`
     <pinned-toolbar-actions id="pinnedToolbarActions"
         .state="${this.navigationControlsState_.pinnedToolbarActionsState}"

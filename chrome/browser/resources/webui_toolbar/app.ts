@@ -9,6 +9,7 @@ import './split_tabs_button.js';
 import './home_button.js';
 import './battery_saver_button.js';
 import './pinned_toolbar_actions.js';
+import './extensions.js';
 import './avatar_button.js';
 import '/shared/icon_table.js';
 import '/shared/icon_from_table.js';
@@ -38,7 +39,6 @@ import {setHasHelpBubble} from './toolbar_button.js';
 import type {IconFromTableElement} from '/shared/icon_from_table.js';
 import {
   ContentSettingImageType,
-  IconType,
   LhsChipIdentifier,
   OmniboxTextColor,
   PermissionAction,
@@ -46,6 +46,7 @@ import {
   PermissionPromptStyle,
   SplitTabActiveLocation,
 } from '/shared/toolbar_ui_api_data_model.mojom-webui.js';
+import {IconType} from '/shared/icon_handle.mojom-webui.js';
 import type {OmniboxAction, LocationBarState, PermissionChipState} from '/shared/toolbar_ui_api_data_model.mojom-webui.js';
 
 import {INVALID_FOCUS_REQUEST_HANDLE} from './browser_proxy.js';
@@ -138,6 +139,7 @@ export class ToolbarAppElement extends AppElementBase {
       navigationControlsState_: {type: Object},
       isBackForwardButtonEnabled_: {type: Boolean},
       isPinnedToolbarActionsEnabled_: {type: Boolean},
+      isExtensionsContainerEnabled_: {type: Boolean},
       isAvatarButtonEnabled_: {type: Boolean},
       isInitialized_: {type: Boolean},
     };
@@ -157,6 +159,8 @@ export class ToolbarAppElement extends AppElementBase {
       loadTimeData.getBoolean('enableBackForwardButtons');
   protected accessor isPinnedToolbarActionsEnabled_: boolean =
       loadTimeData.getBoolean('enablePinnedToolbarActions');
+  protected accessor isExtensionsContainerEnabled_: boolean =
+      loadTimeData.getBoolean('enableExtensionsContainer');
   protected accessor isAvatarButtonEnabled_: boolean =
       loadTimeData.getBoolean('enableAvatarButton');
   /**
@@ -248,6 +252,7 @@ export class ToolbarAppElement extends AppElementBase {
     layoutConstantsVersion: 0,
     touchUi: false,
     pinnedToolbarActionsState: [],
+    extensionsState: [],
   };
 
   private browserProxy_: BrowserProxy;

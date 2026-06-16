@@ -33,6 +33,7 @@
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
+#include "chrome/browser/extensions/chrome_test_extension_loader.h"
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/themes/theme_service.h"
@@ -56,6 +57,7 @@
 #include "chrome/browser/ui/test/test_browser_dialog.h"
 #include "chrome/browser/ui/toolbar/pinned_toolbar/pinned_toolbar_actions_ids.h"
 #include "chrome/browser/ui/toolbar/pinned_toolbar/pinned_toolbar_actions_model.h"
+#include "chrome/browser/ui/toolbar/toolbar_actions_model.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/frame/toolbar_button_provider.h"
@@ -115,6 +117,7 @@
 #include "content/public/test/navigation_handle_observer.h"
 #include "content/public/test/scoped_accessibility_mode_override.h"
 #include "content/public/test/test_navigation_observer.h"
+#include "extensions/common/extension.h"
 #include "net/base/filename_util.h"
 #include "net/dns/mock_host_resolver.h"
 #include "third_party/blink/public/common/features.h"
@@ -2904,6 +2907,57 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewBrowserTest, DropFileOnToolbar) {
                           ->tab_strip_model()
                           ->GetActiveWebContents()
                           ->GetLastCommittedURL());
+}
+
+IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewBrowserTest, LoadExtension) {
+  ui::TrackedElement* element = nullptr;
+  WebUIToolbarWebView* webui_toolbar_view = nullptr;
+  views::WebView* web_view = nullptr;
+  ASSERT_NO_FATAL_FAILURE(SetUpWebUI(kWebUIToolbarElementIdentifier, &element,
+                                     &webui_toolbar_view, &web_view,
+                                     browser()));
+  content::WebContents* web_contents = web_view->GetWebContents();
+
+  base::ScopedAllowBlockingForTesting allow_blocking;
+  base::ScopedTempDir temp_dir;
+  ASSERT_TRUE(temp_dir.CreateUniqueTempDir());
+
+  base::FilePath manifest_path =
+      temp_dir.GetPath().AppendASCII("manifest.json");
+  std::string manifest_content = R"({
+    "name": "Test Extension",
+    "version": "1.0",
+    "manifest_version": 3,
+    "action": {}
+  })";
+  ASSERT_TRUE(base::WriteFile(manifest_path, manifest_content));
+
+  extensions::ChromeTestExtensionLoader loader(browser()->profile());
+  scoped_refptr<const extensions::Extension> extension =
+      loader.LoadExtension(temp_dir.GetPath());
+  ASSERT_TRUE(extension);
+
+  // Pin the extension so it becomes visible.
+  ToolbarActionsModel::Get(browser()->profile())
+      ->SetActionVisibility(extension->id(), true);
+
+  std::string extension_id = extension->id();
+  EXPECT_TRUE(base::test::RunUntil([&]() {
+    return content::EvalJs(web_contents,
+                           base::StringPrintf(R"(
+      (() => {
+        const app = document.querySelector('toolbar-app');
+        if (!app) return false;
+        const extensionsContainer = app.shadowRoot.querySelector('#extensions');
+        if (!extensionsContainer) return false;
+        const extensionElements = extensionsContainer.shadowRoot
+            .querySelectorAll('webui-toolbar-extension');
+        return Array.from(extensionElements).some(el => el.state.id === '%s');
+      })();
+    )",
+                                              extension_id.c_str()))
+        .ExtractBool();
+  }));
 }
 
 // Tests for the home button. Also serve as the general PressHandler tests.

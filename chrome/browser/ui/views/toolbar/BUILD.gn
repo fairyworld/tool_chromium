@@ -51,6 +51,7 @@ source_set("toolbar") {
     "webui_pinned_toolbar_actions.h",
     "webui_reload_control.h",
     "webui_split_tabs_control.h",
+    "webui_toolbar_extensions_container_wrapper.h",
     "webui_toolbar_web_view.h",
   ]
 
@@ -146,6 +147,7 @@ source_set("impl") {
     "webui_pinned_toolbar_actions.cc",
     "webui_reload_control.cc",
     "webui_split_tabs_control.cc",
+    "webui_toolbar_extensions_container_wrapper.cc",
     "webui_toolbar_web_view.cc",
   ]
 

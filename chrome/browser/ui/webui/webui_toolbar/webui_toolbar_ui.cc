@@ -169,12 +169,6 @@ void WebUIToolbarUI::BindInterface(
 }
 
 void WebUIToolbarUI::BindInterface(
-    mojo::PendingReceiver<extensions_bar::mojom::PageHandlerFactory> receiver) {
-  extensions_bar_page_factory_receiver_.reset();
-  extensions_bar_page_factory_receiver_.Bind(std::move(receiver));
-}
-
-void WebUIToolbarUI::BindInterface(
     mojo::PendingReceiver<help_bubble::mojom::HelpBubbleHandlerFactory>
         receiver) {
   help_bubble_service_.reset();
@@ -288,18 +282,6 @@ void WebUIToolbarUI::CreateHelpBubbleHandler(
       std::move(handler), std::move(client),
       ui::TrackedElementHandlerDocumentSingleton::GetOrCreate(
           web_ui()->GetRenderFrameHost()));
-}
-
-void WebUIToolbarUI::CreatePageHandler(
-    mojo::PendingRemote<extensions_bar::mojom::Page> page,
-    mojo::PendingReceiver<extensions_bar::mojom::PageHandler> receiver) {
-  BrowserWindowInterface* browser_interface =
-      webui::GetBrowserWindowInterface(web_ui()->GetWebContents());
-  if (browser_interface) {
-    static_cast<WebUIToolbarExtensionsContainer*>(
-        ExtensionsContainer::From(*browser_interface))
-        ->Bind(std::move(page), std::move(receiver));
-  }
 }
 
 const std::vector<ui::ElementIdentifier>

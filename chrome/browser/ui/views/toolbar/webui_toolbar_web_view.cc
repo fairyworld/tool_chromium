@@ -33,7 +33,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/browser_window/public/desktop_browser_window_capabilities.h"
-#include "chrome/browser/ui/extensions/extensions_container.h"
 #include "chrome/browser/ui/layout_constants.h"
 #include "chrome/browser/ui/tabs/split_tab_util.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
@@ -47,12 +46,12 @@
 #include "chrome/browser/ui/views/profiles/profile_menu_coordinator.h"
 #include "chrome/browser/ui/views/toolbar/app_menu_control.h"
 #include "chrome/browser/ui/views/toolbar/webui_split_tabs_control.h"
+#include "chrome/browser/ui/views/toolbar/webui_toolbar_extensions_container_wrapper.h"
 #include "chrome/browser/ui/waap/initial_web_ui_manager.h"
 #include "chrome/browser/ui/waap/initial_webui_window_metrics_manager.h"
 #include "chrome/browser/ui/webui/webui_embedding_context.h"
 #include "chrome/browser/ui/webui/webui_toolbar/adapters/browser_controls_adapter_impl.h"
 #include "chrome/browser/ui/webui/webui_toolbar/adapters/navigation_controls_state_fetcher_impl.h"
-#include "chrome/browser/ui/webui/webui_toolbar/webui_toolbar_extensions_container.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/webui_url_constants.h"
@@ -78,7 +77,6 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/metadata/metadata_impl_macros.h"
 #include "ui/base/mojom/menu_source_type.mojom.h"
-#include "ui/base/unowned_user_data/scoped_unowned_user_data.h"
 #include "ui/gfx/geometry/point.h"
 #include "ui/gfx/geometry/rect_conversions.h"
 #include "ui/gfx/geometry/rect_f.h"
@@ -218,6 +216,7 @@ WebUIToolbarWebView::WebUIToolbarWebView(
       battery_saver_control_(this),
       avatar_control_(this, browser->GetBrowserForMigrationOnly()),
       location_bar_(std::move(location_bar)),
+      extensions_container_(this),
       back_control_(this, BackForwardButton::Direction::kBack),
       forward_control_(this, BackForwardButton::Direction::kForward),
       pinned_toolbar_actions_(this),
@@ -364,17 +363,7 @@ void WebUIToolbarWebView::AddedToWidget() {
       pinned_toolbar_actions_.Init();
     }
     if (features::IsWebUIExtensionsContainerEnabled()) {
-      extensions_container_ = std::make_unique<WebUIToolbarExtensionsContainer>(
-          *browser_, GetWidget(), web_contents()->GetWeakPtr(), &icon_table_,
-          /*push_icon_table_updates=*/false);
-      // Register `extensions_container_` as the `ExtensionsContainer` for
-      // `browser_`.
-      scoped_extensions_container_user_data_ =
-          std::make_unique<ui::ScopedUnownedUserData<ExtensionsContainer>>(
-              browser_->GetUnownedUserDataHost(), *extensions_container_);
-      active_tab_subscription_ = browser_->RegisterActiveTabDidChange(
-          base::BindRepeating(&WebUIToolbarWebView::OnActiveTabChanged,
-                              base::Unretained(this)));
+      extensions_container_.Init(web_contents());
     }
 
     // Safe-initialize page-dependent controls if the WebUI finished loading
@@ -393,10 +382,7 @@ void WebUIToolbarWebView::OnThemeChanged() {
   if (features::IsWebUIPinnedToolbarActionsEnabled()) {
     pinned_toolbar_actions_.OnThemeChanged();
   }
-  if (extensions_container_) {
-    // Icons may need re-rendering.
-    extensions_container_->NotifyOfAllActions();
-  }
+  extensions_container_.OnThemeChanged();
 }
 
 gfx::Size WebUIToolbarWebView::GetMinimumSize() const {
@@ -1103,6 +1089,14 @@ void WebUIToolbarWebView::OnPinnedToolbarActionsStateChanged(
   }
 }
 
+void WebUIToolbarWebView::OnExtensionsStateChanged(
+    std::vector<extensions_bar::mojom::ExtensionActionInfoPtr> state) {
+  if (!mojo::Equals(state, last_queued_state_.extensions_state)) {
+    last_queued_state_.extensions_state = std::move(state);
+    PostPushNavigationState();
+  }
+}
+
 void WebUIToolbarWebView::OnContentSettingChanged(
     std::vector<toolbar_ui_api::mojom::ContentSettingImageStatePtr> state) {
   if (!mojo::Equals(state, last_queued_state_.location_bar_state
@@ -1136,14 +1130,6 @@ void WebUIToolbarWebView::OnTouchUiChanged() {
   PostPushNavigationState();
 }
 
-void WebUIToolbarWebView::OnActiveTabChanged(
-    BrowserWindowInterface* browser_interface) {
-  if (extensions_container_) {
-    // State of extensions depends on what's active --- e.g. some may be
-    // disabled on some URLs.
-    extensions_container_->NotifyOfAllActions();
-  }
-}
 
 void WebUIToolbarWebView::PostPushNavigationState() {
   // The toolbar is implemented by many individual elements that all update
