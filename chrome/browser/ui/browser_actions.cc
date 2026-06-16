@@ -486,9 +486,9 @@ void BrowserActions::InitializeSidePanelActions() {
                 bwi))
             .SetActionId(kActionSidePanelShowContextualTasks)
             .SetText(l10n_util::GetStringUTF16(
-                IDS_CONTEXTUAL_TASKS_CONTEXTUAL_TASKS_TITLE))
+                IDS_CONTEXTUAL_TASKS_CUSTOMIZE_CHROME_LABEL))
             .SetTooltipText(l10n_util::GetStringUTF16(
-                IDS_CONTEXTUAL_TASKS_CONTEXTUAL_TASKS_TITLE))
+                IDS_CONTEXTUAL_TASKS_CUSTOMIZE_CHROME_LABEL))
             .SetImage(ui::ImageModel::FromVectorIcon(
                 features::IsRoundedIconsEnabled()
                     ? omnibox::kSearchSparkIcon
