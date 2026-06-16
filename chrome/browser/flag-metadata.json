@@ -8546,6 +8546,11 @@
     "expiry_milestone": -1
   },
   {
+    "name": "settings-in-tab",
+    "owners": [ "jamescook@google.com" ],
+    "expiry_milestone": 170
+  },
+  {
     "name": "settings-multi-column",
     "owners": ["hidehiko@chromium.org"],
     "expiry_milestone": 170

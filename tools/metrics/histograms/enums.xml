@@ -9265,6 +9265,7 @@ from previous Chrome versions.
   <int value="-1654293330" label="InfobarPrioritization:enabled"/>
   <int value="-1653991213" label="CrossOriginIsolated:disabled"/>
   <int value="-1653838003" label="PauseBackgroundTabs:enabled"/>
+  <int value="-1653443342" label="SettingsInTab:disabled"/>
   <int value="-1652906854" label="DsePreload2OnPress:disabled"/>
   <int value="-1652173255"
       label="OmniboxUIExperimentShowPlaceholderWhenCaretShowing:enabled"/>
@@ -9592,6 +9593,7 @@ from previous Chrome versions.
   <int value="-1549871007" label="OneGoogleBarOnLocalNtp:disabled"/>
   <int value="-1549356351" label="SyncPseudoUSSExtensionSettings:enabled"/>
   <int value="-1548904154" label="MediaAppMultiWindow:enabled"/>
+  <int value="-1548188271" label="SettingsInTab:enabled"/>
   <int value="-1547953198" label="FullRestore:enabled"/>
   <int value="-1547923809" label="JapaneseOSSettings:enabled"/>
   <int value="-1547247328" label="OverrideTranslateTriggerInIndia:disabled"/>
