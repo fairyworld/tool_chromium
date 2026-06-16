@@ -238,22 +238,6 @@ public class DisplayCutoutTestRule<T extends ChromeActivity> extends ChromeActiv
                 CriteriaHelper.DEFAULT_POLLING_INTERVAL);
     }
 
-    /** Wait for the main frame to report a positive top safe-area inset. */
-    public void waitForSafeAreaTopInset() {
-        CriteriaHelper.pollInstrumentationThread(
-                () -> {
-                    try {
-                        Criteria.checkThat(
-                                getAppliedSafeArea().top,
-                                Matchers.greaterThan(TEST_SAFE_AREA_WITHOUT_CUTOUT.top));
-                    } catch (TimeoutException ex) {
-                        throw new CriteriaNotSatisfiedException(ex);
-                    }
-                },
-                TEST_TIMEOUT,
-                CriteriaHelper.DEFAULT_POLLING_INTERVAL);
-    }
-
     /** Wait for the sub frame to have a certain applied safe area. */
     public void waitForSafeAreaOnSubframe(Rect expected) {
         CriteriaHelper.pollInstrumentationThread(
@@ -331,8 +315,7 @@ public class DisplayCutoutTestRule<T extends ChromeActivity> extends ChromeActiv
 
         CriteriaHelper.pollUiThread(
                 () -> mIsTabFullscreen, TEST_TIMEOUT, CriteriaHelper.DEFAULT_POLLING_INTERVAL);
-        // A subsequently call to exitFullscreen() seems not to work without this, at least for
-        // android-13 emulators.
+        // A subsequently call to exitFullscreen() seems not to work without this, at least for android-13 emulators.
         TestThreadUtils.sleep(500);
     }
 }
