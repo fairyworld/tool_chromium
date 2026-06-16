@@ -673,8 +673,6 @@ public abstract class ChromeFeatureList {
     public static final String STOP_APP_INDEXING_REPORT = "StopAppIndexingReport";
     public static final String SUBMENUS_IN_APP_MENU = "SubmenusInAppMenu";
     public static final String SUGGESTION_ANSWERS_COLOR_REVERSE = "SuggestionAnswersColorReverse";
-    public static final String SUPPRESS_TOOLBAR_CAPTURES_AT_GESTURE_END =
-            "SuppressToolbarCapturesAtGestureEnd";
     public static final String SYNC_ENABLE_NEW_SYNC_DASHBOARD_URL = "SyncEnableNewSyncDashboardUrl";
     public static final String SYNC_ENABLE_PASSWORDS_SYNC_ERROR_MESSAGE_ALTERNATIVE =
             "SyncEnablePasswordsSyncErrorMessageAlternative";
@@ -704,7 +702,6 @@ public abstract class ChromeFeatureList {
     public static final String TOOLBAR_PHONE_ANIMATION_REFACTOR = "ToolbarPhoneAnimationRefactor";
     public static final String TOOLBAR_SCROLL_ABLATION = "AndroidToolbarScrollAblation";
     public static final String TOOLBAR_SNAPSHOT_REFACTOR = "ToolbarSnapshotRefactor";
-    public static final String TOOLBAR_STALE_CAPTURE_BUG_FIX = "ToolbarStaleCaptureBugFix";
     public static final String TOOLBAR_TABLET_RESIZE_REFACTOR = "ToolbarTabletResizeRefactor";
     public static final String TOUCH_TO_SEARCH_CALLOUT = "TouchToSearchCallout";
     public static final String TRANSLATE_MESSAGE_UI = "TranslateMessageUI";
@@ -1209,11 +1206,6 @@ public abstract class ChromeFeatureList {
                     TOOLBAR_SNAPSHOT_REFACTOR,
                     /* defaultValue= */ false,
                     /* defaultValueInTests= */ true);
-    public static final CachedFlag sToolbarStaleCaptureBugFix =
-            newCachedFlag(
-                    TOOLBAR_STALE_CAPTURE_BUG_FIX,
-                    /* defaultValue= */ true,
-                    /* defaultValueInTests= */ true);
     public static final CachedFlag sToolbarTabletResizeRefactor =
             newCachedFlag(TOOLBAR_TABLET_RESIZE_REFACTOR, /* defaultValue= */ true);
     public static final CachedFlag sTouchToSearchCallout =
@@ -1416,7 +1408,6 @@ public abstract class ChromeFeatureList {
                     sToolbarCaptureFixForSPAs,
                     sToolbarPhoneAnimationRefactor,
                     sToolbarSnapshotRefactor,
-                    sToolbarStaleCaptureBugFix,
                     sToolbarTabletResizeRefactor,
                     sTouchToSearchCallout,
                     sUnparcelIntentFileDescriptors,
@@ -1516,8 +1507,6 @@ public abstract class ChromeFeatureList {
             newMutableFlagWithSafeDefault(SCHEDULE_WINDOW_CLEANING, false);
     public static final MutableFlagWithSafeDefault sShowTabListAnimations =
             newMutableFlagWithSafeDefault(SHOW_TAB_LIST_ANIMATIONS, false);
-    public static final MutableFlagWithSafeDefault sSuppressToolbarCapturesAtGestureEnd =
-            newMutableFlagWithSafeDefault(SUPPRESS_TOOLBAR_CAPTURES_AT_GESTURE_END, false);
     public static final MutableFlagWithSafeDefault sTabBottomSheet =
             newMutableFlagWithSafeDefault(TAB_BOTTOM_SHEET, false);
     public static final MutableFlagWithSafeDefault sTabBottomSheetResizeWebview =
