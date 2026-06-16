@@ -1433,7 +1433,6 @@ PasswordsPrivateDelegateImpl::CreatePasswordUiEntryFromCredentialUiEntry(
   if (change_password_url.has_value()) {
     entry.change_password_url = change_password_url->spec();
   }
-  entry.is_automatic_password_change_supported = false;
 
   if (credential.backup_password.has_value()) {
     api::passwords_private::BackupPasswordInfo backup_password_info;
