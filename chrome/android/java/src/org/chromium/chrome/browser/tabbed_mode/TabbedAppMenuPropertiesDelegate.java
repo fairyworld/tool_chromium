@@ -338,20 +338,35 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                     .registerObserver(mUpdateStateChangeObserver);
         }
 
-        // When the feature is enabled, show either "New Incognito tab" in incognito mode
-        // or "New tab" in normal mode. When the feature is disabled, show both.
-        if (!IncognitoUtils.shouldOpenIncognitoAsWindow() || !isIncognitoShowing()) {
+        if (ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)) {
+            populatePageModeMenuWithSubmenus(
+                    modelList, currentTab, url, isNativePage, isFileScheme, isContentScheme);
+        } else {
+            populatePageModeMenuWithoutSubmenus(
+                    modelList, currentTab, url, isNativePage, isFileScheme, isContentScheme);
+        }
+    }
+
+    private void populatePageModeMenuWithoutSubmenus(
+            MVCListAdapter.ModelList modelList,
+            @Nullable Tab currentTab,
+            GURL url,
+            boolean isNativePage,
+            boolean isFileScheme,
+            boolean isContentScheme) {
+        boolean separateIncognitoWindow = IncognitoUtils.shouldOpenIncognitoAsWindow();
+        boolean isIncognito = isIncognitoShowing();
+        if (!separateIncognitoWindow || !isIncognito) {
             modelList.add(buildNewTabItem());
         }
-        if (!IncognitoUtils.shouldOpenIncognitoAsWindow() || isIncognitoShowing()) {
+
+        if (!separateIncognitoWindow || isIncognito) {
             modelList.add(buildNewIncognitoTabItem());
         }
 
         // Add to Group
-        if (!ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)) {
-            if (shouldShowAddToGroup()) {
-                modelList.add(buildAddToGroupItem(currentTab));
-            }
+        if (shouldShowAddToGroup()) {
+            modelList.add(buildAddToGroupItem(currentTab));
         }
 
         // New Window
@@ -366,37 +381,18 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
         // Manage windows
         if (MultiWindowUtils.shouldShowManageWindowsMenu()) modelList.add(buildManageWindowsItem());
 
-        // Tab groups
-        if (ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)) {
-            if (shouldShowTabGroupsParentItem(currentTab)) {
-                modelList.add(buildTabGroupsParentItem(currentTab));
-            }
-        }
-
         // Divider
         maybeAddDividerLine(modelList, R.id.divider_line_id);
 
-        // Passwords and autofill parent
-        if (shouldShowPasswordsAndAutofillParentItem()) {
-            modelList.add(buildPasswordsAndAutofillParentItem());
-        }
-
-        // History parent
-        if (shouldShowHistoryParentItem()) {
-            modelList.add(buildHistoryParentItem());
-        }
-
         // Open History
-        if (!ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)
-                && (!IncognitoUtils.shouldOpenIncognitoAsWindow() || !isIncognitoShowing())) {
+        if (!IncognitoUtils.shouldOpenIncognitoAsWindow() || !isIncognitoShowing()) {
             modelList.add(buildHistoryItem());
         }
 
         boolean isPageInfoItemShown = shouldShowPageInfoItem();
 
         // Quick Delete
-        if (!ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)
-                && shouldShowQuickDeleteItem()) {
+        if (shouldShowQuickDeleteItem()) {
             modelList.add(buildQuickDeleteItem());
             if (!isPageInfoItemShown) {
                 maybeAddDividerLine(modelList, R.id.quick_delete_divider_line_id);
@@ -418,25 +414,16 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
         modelList.add(buildDownloadsItem());
 
         // Bookmarks
-        if (ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)) {
-            modelList.add(buildBookmarksParentItem());
-        } else {
-            modelList.add(buildBookmarksItem());
-        }
+        modelList.add(buildBookmarksItem());
 
         // Recent Tabs
-        if (!ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)
-                && shouldShowRecentTabsItem()) {
+        if (shouldShowRecentTabsItem()) {
             modelList.add(buildRecentTabsItem());
         }
 
         // Extensions
         if (shouldShowExtensionsItem()) {
-            if (ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)) {
-                modelList.add(buildExtensionsParentItem());
-            } else {
-                modelList.add(buildExtensionsMenuItem());
-            }
+            modelList.add(buildExtensionsMenuItem());
         }
 
         // Divider
@@ -457,22 +444,12 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
         }
 
         // Share
-        if (!ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)
-                && ShareUtils.shouldEnableShare(currentTab)) {
+        if (ShareUtils.shouldEnableShare(currentTab)) {
             modelList.add(buildShareListItem(shouldShowIconBeforeItem()));
         }
 
-        // Save and print
-        if (shouldShowSaveAndPrintParentItem(
-                currentTab, isNativePage, isFileScheme, isContentScheme, url)) {
-            modelList.add(
-                    buildSaveAndPrintParentItem(
-                            currentTab, isNativePage, isFileScheme, isContentScheme, url));
-        }
-
         // Download Page
-        if (!ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)
-                && shouldShowDownloadPageMenuItem(currentTab)) {
+        if (shouldShowDownloadPageMenuItem(currentTab)) {
             modelList.add(buildDownloadPageItem(currentTab));
         }
 
@@ -506,14 +483,8 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
             observeAndMaybeAddReadAloud(modelList, currentTab);
         }
 
-        // More tools
-        if (shouldShowMoreToolsItem(currentTab)) {
-            modelList.add(buildMoreToolsItem(currentTab));
-        }
-
         // Reader mode
-        if (!ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)
-                && shouldShowReaderModeItem(currentTab)) {
+        if (shouldShowReaderModeItem(currentTab)) {
             modelList.add(buildReaderModeItem(currentTab));
         }
 
@@ -523,9 +494,8 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
         }
 
         // Universal Install / Open Web APK
-        if (!ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)
-                && shouldShowHomeScreenMenuItem(
-                        isNativePage, isFileScheme, isContentScheme, isIncognitoShowing(), url)) {
+        if (shouldShowHomeScreenMenuItem(
+                isNativePage, isFileScheme, isContentScheme, isIncognitoShowing(), url)) {
             assert currentTab != null;
             modelList.add(buildAddToHomescreenListItem(currentTab, shouldShowIconBeforeItem()));
         }
@@ -547,8 +517,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
         }
 
         // Paint Preview
-        if (!ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)
-                && shouldShowPaintPreview(isNativePage, currentTab)) {
+        if (shouldShowPaintPreview(isNativePage, currentTab)) {
             modelList.add(buildPaintPreviewItem(isNativePage, currentTab));
         }
 
@@ -569,17 +538,195 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
         modelList.add(buildSettingsItem());
 
         // NTP Customizations
-        if (!ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)
-                && shouldShowNtpCustomizations(currentTab)) {
+        if (shouldShowNtpCustomizations(currentTab)) {
             modelList.add(buildNtpCustomizationsItem(currentTab));
         }
 
         // Help
-        if (ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)) {
-            modelList.add(buildHelpParentItem());
-        } else {
-            modelList.add(buildHelpItem());
+        modelList.add(buildHelpItem());
+
+        // Managed by
+        if (shouldShowManagedByMenuItem(currentTab)) {
+            maybeAddDividerLine(modelList, R.id.managed_by_divider_line_id);
+            modelList.add(buildManagedByItem(currentTab));
         }
+        if (shouldShowContentFilterHelpCenterMenuItem(currentTab)) {
+            maybeAddDividerLine(modelList, R.id.menu_item_content_filter_divider_line_id);
+            modelList.add(buildContentFilterHelpCenterMenuItem(currentTab));
+        }
+
+        // Default browser promo
+        if (shouldShowDefaultBrowserPromo()) {
+            RecordUserAction.record("MobileMenuDefaultBrowserPromoShown");
+
+            maybeAddDividerLine(modelList, R.id.divider_line_id);
+            modelList.add(buildDefaultBrowserPromoItem());
+        }
+    }
+
+    private void populatePageModeMenuWithSubmenus(
+            MVCListAdapter.ModelList modelList,
+            @Nullable Tab currentTab,
+            GURL url,
+            boolean isNativePage,
+            boolean isFileScheme,
+            boolean isContentScheme) {
+        boolean separateIncognitoWindow = IncognitoUtils.shouldOpenIncognitoAsWindow();
+        boolean isIncognito = isIncognitoShowing();
+        if (!separateIncognitoWindow || !isIncognito) {
+            modelList.add(buildNewTabItem());
+        }
+
+        if (!separateIncognitoWindow || isIncognito) {
+            modelList.add(buildNewIncognitoTabItem());
+        }
+
+        // New Window
+        if (shouldShowNewWindow()) modelList.add(buildNewWindowItem());
+
+        // New Incognito Window
+        if (shouldShowNewIncognitoWindow()) modelList.add(buildNewIncognitoWindowItem());
+
+        // Move to other window
+        if (shouldShowMoveToOtherWindow()) modelList.add(buildMoveToOtherWindowItem());
+
+        // Manage windows
+        if (MultiWindowUtils.shouldShowManageWindowsMenu()) modelList.add(buildManageWindowsItem());
+
+        // Tab groups
+        if (shouldShowTabGroupsParentItem(currentTab)) {
+            modelList.add(buildTabGroupsParentItem(currentTab));
+        }
+
+        // Divider
+        maybeAddDividerLine(modelList, R.id.divider_line_id);
+
+        // Passwords and autofill parent
+        if (shouldShowPasswordsAndAutofillParentItem()) {
+            modelList.add(buildPasswordsAndAutofillParentItem());
+        }
+
+        // History parent
+        if (shouldShowHistoryParentItem()) {
+            modelList.add(buildHistoryParentItem());
+        }
+
+        // Page info
+        if (shouldShowPageInfoItem()) {
+            modelList.add(buildPageInfoItem(currentTab));
+            maybeAddDividerLine(modelList, R.id.page_info_divider_line_id);
+        }
+
+        // Homepage
+        if (currentTab != null && HomepageManager.getInstance().shouldShowHomepageMenuItem()) {
+            modelList.add(buildHomepageItem());
+        }
+
+        // Downloads
+        modelList.add(buildDownloadsItem());
+
+        // Bookmarks
+        modelList.add(buildBookmarksParentItem());
+
+        // Extensions
+        if (shouldShowExtensionsItem()) {
+            modelList.add(buildExtensionsParentItem());
+        }
+
+        // Divider
+        modelList.add(
+                new ListItem(
+                        AppMenuHandler.AppMenuItemType.DIVIDER,
+                        buildModelForDivider(R.id.divider_line_id)));
+
+        // Page Zoom
+        // Disable page zoom menu item on Reading Mode pages.
+        if (shouldShowPageZoomItem(currentTab) && !isReaderModeShowing(currentTab)) {
+            modelList.add(buildPageZoomItem(currentTab));
+            // Divider
+            modelList.add(
+                    new ListItem(
+                            AppMenuHandler.AppMenuItemType.DIVIDER,
+                            buildModelForDivider(R.id.divider_line_id)));
+        }
+
+        // Save and print
+        if (shouldShowSaveAndPrintParentItem(
+                currentTab, isNativePage, isFileScheme, isContentScheme, url)) {
+            modelList.add(
+                    buildSaveAndPrintParentItem(
+                            currentTab, isNativePage, isFileScheme, isContentScheme, url));
+        }
+
+        // Print
+        if (shouldShowPrintItem(currentTab)) {
+            modelList.add(buildPrintItem(currentTab));
+        }
+
+        // Price Tracking (enable / disable)
+        ListItem priceTrackingItem =
+                maybeBuildPriceTrackingListItem(currentTab, shouldShowIconBeforeItem());
+        if (priceTrackingItem != null) modelList.add(priceTrackingItem);
+
+        // Glic
+        ListItem openGlicItem = maybeBuildOpenGlicItem(currentTab);
+        if (openGlicItem != null) modelList.add(openGlicItem);
+
+        // Find in page
+        if (shouldShowFindInPageItem(currentTab)) modelList.add(buildFindInPageItem(currentTab));
+
+        // Lens Overlay
+        if (shouldShowLensOverlayItem(currentTab)) modelList.add(buildLensOverlayItem(currentTab));
+
+        // Translate
+        if (shouldShowTranslateMenuItem(currentTab)) {
+            modelList.add(buildTranslateMenuItem(currentTab, shouldShowIconBeforeItem()));
+        }
+
+        // More tools
+        if (shouldShowMoreToolsItem(currentTab)) {
+            modelList.add(buildMoreToolsItem(currentTab));
+        }
+
+        // Open with ...
+        if (shouldShowOpenWithItem(currentTab)) {
+            modelList.add(buildOpenWithItem(currentTab, shouldShowIconBeforeItem()));
+        }
+
+        // Open in App
+        if (shouldShowOpenInAppItem()) {
+            modelList.add(buildOpenInAppItem());
+        }
+
+        // RDS
+        ListItem rdsListItem =
+                maybeBuildRequestDesktopSiteListItem(
+                        currentTab, isNativePage, shouldShowIconBeforeItem());
+        if (rdsListItem != null) modelList.add(rdsListItem);
+
+        // Auto Dark
+        if (shouldShowAutoDarkItem(currentTab, isNativePage)) {
+            modelList.add(buildAutoDarkItem(currentTab, isNativePage, shouldShowIconBeforeItem()));
+        }
+
+        // Get Image Descriptions
+        if (shouldShowGetImageDescriptionsItem(currentTab)) {
+            modelList.add(buildGetImageDescriptionsItem(currentTab));
+        }
+
+        // Listen to the Feed
+        if (shouldShowListenToFeedItem(currentTab)) {
+            modelList.add(buildListenToFeedItem());
+        }
+
+        // Divider Line
+        maybeAddDividerLine(modelList, R.id.divider_line_id);
+
+        // Settings
+        modelList.add(buildSettingsItem());
+
+        // Help
+        modelList.add(buildHelpParentItem());
 
         // Managed by
         if (shouldShowManagedByMenuItem(currentTab)) {

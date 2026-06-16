@@ -767,6 +767,49 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
     }
 
     @Test
+    @DisableFeatures(ChromeFeatureList.SUBMENUS_IN_APP_MENU)
+    public void testPageMenuItems_Phone_Ntp_SubmenusDisabled() {
+        setUpMocksForPageMenu();
+        when(mTab.getUrl()).thenReturn(JUnitTestGURLs.NTP_URL);
+        when(mTab.isNativePage()).thenReturn(true);
+        when(mNativePage.isPdf()).thenReturn(false);
+        when(mTab.getNativePage()).thenReturn(mNativePage);
+        doReturn(false)
+                .when(mTabbedAppMenuPropertiesDelegate)
+                .shouldShowTranslateMenuItem(any(Tab.class));
+
+        assertEquals(MenuGroup.PAGE_MENU, mTabbedAppMenuPropertiesDelegate.getMenuGroup());
+        ModelList modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
+        List<MenuItem> expectedItems =
+                new ArrayList<>(
+                        Arrays.asList(
+                                item(R.id.icon_row_menu_id),
+                                item(R.id.new_tab_menu_id),
+                                item(R.id.new_incognito_tab_menu_id),
+                                item(R.id.add_to_group_menu_id),
+                                item(R.id.divider_line_id),
+                                item(R.id.open_history_menu_id),
+                                item(R.id.quick_delete_menu_id),
+                                item(R.id.quick_delete_divider_line_id),
+                                item(R.id.downloads_menu_id),
+                                item(R.id.all_bookmarks_menu_id),
+                                item(R.id.recent_tabs_menu_id)));
+
+        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+            expectedItems.add(item(R.id.extensions_menu_menu_id));
+        }
+
+        expectedItems.addAll(
+                Arrays.asList(
+                        item(R.id.divider_line_id),
+                        item(R.id.preferences_id),
+                        item(R.id.ntp_customization_id),
+                        item(R.id.help_id)));
+
+        assertMenuItemsAreEqual(modelList, expectedItems);
+    }
+
+    @Test
     @Config(qualifiers = "sw320dp")
     @DisableFeatures(ChromeFeatureList.ANDROID_OPEN_INCOGNITO_AS_WINDOW)
     public void testPageMenuItems_Phone_Pdf() {
@@ -857,6 +900,58 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.about_chrome_menu_id),
                                 item(R.id.help_id),
                                 item(R.id.report_issue_menu_id))));
+
+        assertMenuItemsAreEqual(modelList, expectedItems);
+    }
+
+    @Test
+    @Config(qualifiers = "sw320dp")
+    @DisableFeatures({
+        ChromeFeatureList.ANDROID_OPEN_INCOGNITO_AS_WINDOW,
+        ChromeFeatureList.SUBMENUS_IN_APP_MENU
+    })
+    public void testPageMenuItems_Phone_Pdf_SubmenusDisabled() {
+        setUpMocksForPageMenu();
+        when(mTab.getUrl()).thenReturn(JUnitTestGURLs.URL_1_WITH_PDF_PATH);
+        when(mTab.isNativePage()).thenReturn(true);
+        when(mNativePage.isPdf()).thenReturn(true);
+        when(mTab.getNativePage()).thenReturn(mNativePage);
+        doReturn(false)
+                .when(mTabbedAppMenuPropertiesDelegate)
+                .shouldShowTranslateMenuItem(any(Tab.class));
+
+        assertEquals(MenuGroup.PAGE_MENU, mTabbedAppMenuPropertiesDelegate.getMenuGroup());
+        ModelList modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
+
+        List<MenuItem> expectedItems =
+                new ArrayList<>(
+                        Arrays.asList(
+                                item(R.id.icon_row_menu_id),
+                                item(R.id.new_tab_menu_id),
+                                item(R.id.new_incognito_tab_menu_id),
+                                item(R.id.add_to_group_menu_id),
+                                item(R.id.divider_line_id),
+                                item(R.id.open_history_menu_id),
+                                item(R.id.quick_delete_menu_id),
+                                item(R.id.info_menu_id),
+                                item(R.id.page_info_divider_line_id),
+                                item(R.id.downloads_menu_id),
+                                item(R.id.all_bookmarks_menu_id),
+                                item(R.id.recent_tabs_menu_id)));
+
+        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+            expectedItems.add(item(R.id.extensions_menu_menu_id));
+        }
+
+        expectedItems.addAll(
+                Arrays.asList(
+                        item(R.id.divider_line_id),
+                        item(R.id.share_menu_id),
+                        item(R.id.find_in_page_id),
+                        item(R.id.open_with_id),
+                        item(R.id.divider_line_id),
+                        item(R.id.preferences_id),
+                        item(R.id.help_id)));
 
         assertMenuItemsAreEqual(modelList, expectedItems);
     }
@@ -1105,6 +1200,150 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         testPageMenuItems_RegularPage();
     }
 
+    @Test
+    @DisableFeatures({ChromeFeatureList.SUBMENUS_IN_APP_MENU})
+    public void testPageMenuItems_Phone_RegularPage_SubmenusDisabled() {
+        testPageMenuItems_RegularPage_SubmenusDisabled();
+    }
+
+    @Test
+    @Config(qualifiers = "sw600dp")
+    @DisableFeatures({ChromeFeatureList.SUBMENUS_IN_APP_MENU})
+    public void testPageMenuItems_Tablet_RegularPage_SubmenusDisabled() {
+        testPageMenuItems_RegularPage_SubmenusDisabled();
+    }
+
+    private void testPageMenuItems_RegularPage_SubmenusDisabled() {
+        setUpMocksForPageMenu();
+        setMenuOptions(
+                new MenuOptions()
+                        .withShowTranslate()
+                        .withShowAddToHomeScreen()
+                        .withAutoDarkEnabled());
+        when(mTabModel.getCount()).thenReturn(1);
+
+        assertEquals(MenuGroup.PAGE_MENU, mTabbedAppMenuPropertiesDelegate.getMenuGroup());
+        ModelList modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
+
+        List<MenuItem> expectedItems = new ArrayList<>();
+        List<MenuItem> expectedTitles = new ArrayList<>();
+
+        expectedItems.add(item(R.id.icon_row_menu_id));
+        expectedTitles.add(item(0));
+
+        expectedItems.add(item(R.id.new_tab_menu_id));
+        expectedTitles.add(item(R.string.menu_new_tab));
+
+        if (!IncognitoUtils.shouldOpenIncognitoAsWindow()) {
+            expectedItems.add(item(R.id.new_incognito_tab_menu_id));
+            expectedTitles.add(item(R.string.menu_new_incognito_tab));
+        }
+
+        expectedItems.add(item(R.id.add_to_group_menu_id));
+        expectedTitles.add(item(R.string.menu_add_tab_to_new_group));
+
+        // Divider
+        expectedItems.add(item(R.id.divider_line_id));
+        expectedTitles.add(item(0));
+
+        // History
+        expectedItems.add(item(R.id.open_history_menu_id));
+        expectedTitles.add(item(R.string.menu_history));
+
+        // Quick delete
+        expectedItems.add(item(R.id.quick_delete_menu_id));
+        expectedTitles.add(item(R.string.menu_quick_delete));
+
+        if (!mTabbedAppMenuPropertiesDelegate.isTabletSizeScreen()) {
+            expectedItems.add(item(R.id.info_menu_id));
+            expectedTitles.add(item(R.string.menu_site_controls));
+
+            expectedItems.add(item(R.id.page_info_divider_line_id));
+            expectedTitles.add(item(0));
+        } else {
+            expectedItems.add(item(R.id.quick_delete_divider_line_id));
+            expectedTitles.add(item(0));
+        }
+
+        // Downloads
+        expectedItems.add(item(R.id.downloads_menu_id));
+        expectedTitles.add(item(R.string.menu_downloads));
+
+        // Bookmarks
+        expectedItems.add(item(R.id.all_bookmarks_menu_id));
+        expectedTitles.add(item(R.string.menu_bookmarks));
+
+        // Recent tabs
+        expectedItems.add(item(R.id.recent_tabs_menu_id));
+        expectedTitles.add(item(R.string.menu_recent_tabs));
+
+        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+            expectedItems.add(item(R.id.extensions_menu_menu_id));
+            expectedTitles.add(item(R.string.menu_extensions_menu));
+        }
+
+        expectedItems.add(item(R.id.divider_line_id));
+        expectedTitles.add(item(0));
+
+        // Share
+        expectedItems.add(item(R.id.share_menu_id));
+        expectedTitles.add(item(R.string.menu_share_page));
+
+        // Find in page
+        expectedItems.add(item(R.id.find_in_page_id));
+        expectedTitles.add(item(R.string.menu_find_in_page));
+
+        // Translate
+        expectedItems.add(item(R.id.translate_id));
+        expectedTitles.add(item(R.string.menu_translate));
+
+        // Reader mode
+        expectedItems.add(item(R.id.reader_mode_menu_id));
+        expectedTitles.add(item(R.string.show_reading_mode_text));
+
+        // Universal install
+        expectedItems.add(item(R.id.universal_install));
+        expectedTitles.add(item(R.string.menu_install_create_shortcut));
+
+        if (!DeviceInfo.isDesktop()) {
+            expectedItems.add(item(R.id.request_desktop_site_id));
+            expectedTitles.add(item(R.string.menu_request_desktop_site));
+        }
+
+        expectedItems.add(item(R.id.auto_dark_web_contents_id));
+        expectedTitles.add(item(R.string.menu_auto_dark_web_contents));
+
+        expectedItems.add(item(R.id.divider_line_id));
+        expectedTitles.add(item(0));
+
+        expectedItems.add(item(R.id.preferences_id));
+        expectedTitles.add(item(R.string.menu_settings));
+
+        expectedItems.add(item(R.id.help_id));
+        expectedTitles.add(item(R.string.menu_help));
+
+        Integer[] expectedActionBarItems =
+                ChromeFeatureList.sThreeDotMenuBackButton.isEnabled()
+                        ? new Integer[] {
+                            R.id.forward_menu_id,
+                            R.id.back_menu_id,
+                            R.id.bookmark_this_page_id,
+                            R.id.offline_page_id,
+                            R.id.reload_menu_id
+                        }
+                        : new Integer[] {
+                            R.id.forward_menu_id,
+                            R.id.bookmark_this_page_id,
+                            R.id.offline_page_id,
+                            R.id.info_menu_id,
+                            R.id.reload_menu_id
+                        };
+
+        assertMenuItemsAreEqual(modelList, expectedItems);
+        assertMenuTitlesAreEqual(modelList, expectedTitles);
+        assertActionBarItemsAreEqual(modelList, expectedActionBarItems);
+    }
+
     private void testPageMenuItems_IncognitoPage() {
         setUpMocksForPageMenu();
         when(mTab.isIncognito()).thenReturn(true);
@@ -1333,6 +1572,128 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
     @Config(qualifiers = "sw600dp")
     public void testPageMenuItems_Tablet_IncognitoPage() {
         testPageMenuItems_IncognitoPage();
+    }
+
+    @Test
+    @Config(qualifiers = "sw320dp")
+    @DisableFeatures({ChromeFeatureList.SUBMENUS_IN_APP_MENU})
+    public void testPageMenuItems_Phone_IncognitoPage_SubmenusDisabled() {
+        testPageMenuItems_IncognitoPage_SubmenusDisabled();
+    }
+
+    @Test
+    @Config(qualifiers = "sw600dp")
+    @DisableFeatures({ChromeFeatureList.SUBMENUS_IN_APP_MENU})
+    public void testPageMenuItems_Tablet_IncognitoPage_SubmenusDisabled() {
+        testPageMenuItems_IncognitoPage_SubmenusDisabled();
+    }
+
+    private void testPageMenuItems_IncognitoPage_SubmenusDisabled() {
+        setUpMocksForPageMenu();
+        when(mTab.isIncognito()).thenReturn(true);
+        when(mIncognitoTabModel.getCount()).thenReturn(1);
+        when(mTabModelSelector.getCurrentModel()).thenReturn(mIncognitoTabModel);
+        setMenuOptions(new MenuOptions().withShowTranslate().withAutoDarkEnabled());
+
+        assertEquals(MenuGroup.PAGE_MENU, mTabbedAppMenuPropertiesDelegate.getMenuGroup());
+        ModelList modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
+
+        List<MenuItem> expectedItems = new ArrayList<>();
+        List<MenuItem> expectedTitles = new ArrayList<>();
+
+        expectedItems.add(item(R.id.icon_row_menu_id));
+        expectedTitles.add(item(0));
+
+        if (!IncognitoUtils.shouldOpenIncognitoAsWindow()) {
+            expectedItems.add(item(R.id.new_tab_menu_id));
+            expectedTitles.add(item(R.string.menu_new_tab));
+        }
+
+        expectedItems.add(item(R.id.new_incognito_tab_menu_id));
+        expectedTitles.add(item(R.string.menu_new_incognito_tab));
+
+        expectedItems.add(item(R.id.add_to_group_menu_id));
+        expectedTitles.add(item(R.string.menu_add_tab_to_new_group));
+
+        expectedItems.add(item(R.id.divider_line_id));
+        expectedTitles.add(item(0));
+
+        if (!IncognitoUtils.shouldOpenIncognitoAsWindow()) {
+            expectedItems.add(item(R.id.open_history_menu_id));
+            expectedTitles.add(item(R.string.menu_history));
+        }
+
+        if (!mTabbedAppMenuPropertiesDelegate.isTabletSizeScreen()) {
+            expectedItems.add(item(R.id.info_menu_id));
+            expectedTitles.add(item(R.string.menu_site_controls));
+
+            expectedItems.add(item(R.id.page_info_divider_line_id));
+            expectedTitles.add(item(0));
+        }
+
+        expectedItems.add(item(R.id.downloads_menu_id));
+        expectedTitles.add(item(R.string.menu_downloads));
+
+        expectedItems.add(item(R.id.all_bookmarks_menu_id));
+        expectedTitles.add(item(R.string.menu_bookmarks));
+
+        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+            expectedItems.add(item(R.id.extensions_menu_menu_id));
+            expectedTitles.add(item(R.string.menu_extensions_menu));
+        }
+
+        expectedItems.add(item(R.id.divider_line_id));
+        expectedTitles.add(item(0));
+
+        expectedItems.add(item(R.id.share_menu_id));
+        expectedTitles.add(item(R.string.menu_share_page));
+
+        expectedItems.add(item(R.id.find_in_page_id));
+        expectedTitles.add(item(R.string.menu_find_in_page));
+
+        expectedItems.add(item(R.id.translate_id));
+        expectedTitles.add(item(R.string.menu_translate));
+
+        expectedItems.add(item(R.id.reader_mode_menu_id));
+        expectedTitles.add(item(R.string.show_reading_mode_text));
+
+        if (!DeviceInfo.isDesktop()) {
+            expectedItems.add(item(R.id.request_desktop_site_id));
+            expectedTitles.add(item(R.string.menu_request_desktop_site));
+        }
+
+        expectedItems.add(item(R.id.auto_dark_web_contents_id));
+        expectedTitles.add(item(R.string.menu_auto_dark_web_contents));
+
+        expectedItems.add(item(R.id.divider_line_id));
+        expectedTitles.add(item(0));
+
+        expectedItems.add(item(R.id.preferences_id));
+        expectedTitles.add(item(R.string.menu_settings));
+
+        expectedItems.add(item(R.id.help_id));
+        expectedTitles.add(item(R.string.menu_help));
+
+        assertMenuItemsAreEqual(modelList, expectedItems);
+        assertMenuTitlesAreEqual(modelList, expectedTitles);
+
+        Integer[] expectedActionBarItems =
+                ChromeFeatureList.sThreeDotMenuBackButton.isEnabled()
+                        ? new Integer[] {
+                            R.id.forward_menu_id,
+                            R.id.back_menu_id,
+                            R.id.bookmark_this_page_id,
+                            R.id.offline_page_id,
+                            R.id.reload_menu_id
+                        }
+                        : new Integer[] {
+                            R.id.forward_menu_id,
+                            R.id.bookmark_this_page_id,
+                            R.id.offline_page_id,
+                            R.id.info_menu_id,
+                            R.id.reload_menu_id
+                        };
+        assertActionBarItemsAreEqual(modelList, expectedActionBarItems);
     }
 
     @Test
