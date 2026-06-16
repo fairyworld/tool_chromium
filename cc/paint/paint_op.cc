@@ -1282,9 +1282,13 @@ static float ComputeEffectiveHdrHeadroom(const PaintFlags* flags,
   if (!flags) {
     return params.destination_hdr_headroom;
   }
+  // The effective HDR headroom should not be computed when doing no tone
+  // mapping.
+  DCHECK_NE(flags->getTargetedHdrHeadroom(),
+            PaintFlags::TargetedHdrHeadroom::kDisableEverything);
   const float targeted_hdr_headroom =
       flags->getTargetedHdrHeadroom() ==
-              PaintFlags::kTargetedHdrHeadroomFromPlaybackParams
+              PaintFlags::TargetedHdrHeadroom::kFromPlaybackParams
           ? params.destination_hdr_headroom
           : flags->getTargetedHdrHeadroom();
   return flags->getDynamicRangeLimit().ComputeEffectiveHdrHeadroom(
@@ -1375,21 +1379,27 @@ void DrawImageOp::RasterWithFlags(const DrawImageOp* op,
     return;
   }
 
-  // If this uses a gainmap shader, then replace DrawImage with a shader.
-  if (op->image.HasGainmapInfo() && gainmap_sk_image) {
-    skia::DrawGainmapImage(
-        canvas, sk_image, gainmap_sk_image, op->image.gainmap_info_.value(),
-        std::exp2(ComputeEffectiveHdrHeadroom(flags, params)), op->left,
-        op->top, sampling, paint);
-    return;
-  }
+  const bool disable_tone_mapping =
+      flags && flags->getTargetedHdrHeadroom() ==
+                   PaintFlags::TargetedHdrHeadroom::kDisableEverything;
+  if (!disable_tone_mapping) {
+    // If this uses a gainmap shader, then replace DrawImage with a shader.
+    if (op->image.HasGainmapInfo() && gainmap_sk_image) {
+      skia::DrawGainmapImage(
+          canvas, sk_image, gainmap_sk_image, op->image.gainmap_info_.value(),
+          std::exp2(ComputeEffectiveHdrHeadroom(flags, params)), op->left,
+          op->top, sampling, paint);
+      return;
+    }
 
-  // Add a tone mapping filter to `paint` if needed.
-  if (ToneMapUtil::UseGlobalToneMapFilter(sk_image.get(),
-                                          canvas->imageInfo().colorSpace())) {
-    ToneMapUtil::AddGlobalToneMapFilterToPaint(
-        paint, sk_image.get(), op->image.hdr_metadata_,
-        ComputeEffectiveHdrHeadroom(flags, params));
+    // Add a tone mapping filter to `paint` if needed.
+    if (ToneMapUtil::UseGlobalToneMapFilter(sk_image.get(),
+                                            op->image.hdr_metadata_,
+                                            canvas->imageInfo().colorSpace())) {
+      ToneMapUtil::AddGlobalToneMapFilterToPaint(
+          paint, sk_image.get(), op->image.hdr_metadata_,
+          ComputeEffectiveHdrHeadroom(flags, params));
+    }
   }
   SkTiledImageUtils::DrawImage(canvas, sk_image.get(), op->left, op->top,
                                sampling, &paint);
@@ -1497,27 +1507,33 @@ void DrawImageRectOp::RasterWithFlags(const DrawImageRectOp* op,
 
   auto draw_proc = [op, adjusted_src, sampling, sk_image, gainmap_sk_image,
                     flags, params](SkCanvas* c, const SkPaint& p) {
-    // If the PaintImage uses a gainmap shader, then replace DrawImage with
-    // a shader.
-    if (op->image.HasGainmapInfo() && gainmap_sk_image) {
-      skia::DrawGainmapImageRect(
-          c, sk_image, gainmap_sk_image, op->image.gainmap_info_.value(),
-          std::exp2(ComputeEffectiveHdrHeadroom(flags, params)), adjusted_src,
-          op->dst, sampling, p);
-      return;
-    }
+    const bool disable_tone_mapping =
+        flags && flags->getTargetedHdrHeadroom() ==
+                     PaintFlags::TargetedHdrHeadroom::kDisableEverything;
+    if (!disable_tone_mapping) {
+      // If the PaintImage uses a gainmap shader, then replace DrawImage with
+      // a shader.
+      if (op->image.HasGainmapInfo() && gainmap_sk_image) {
+        skia::DrawGainmapImageRect(
+            c, sk_image, gainmap_sk_image, op->image.gainmap_info_.value(),
+            std::exp2(ComputeEffectiveHdrHeadroom(flags, params)), adjusted_src,
+            op->dst, sampling, p);
+        return;
+      }
 
-    // If this uses a global tone map filter, then incorporate that filter
-    // into the paint.
-    if (ToneMapUtil::UseGlobalToneMapFilter(sk_image.get(),
-                                            c->imageInfo().colorSpace())) {
-      SkPaint tonemap_paint = p;
-      ToneMapUtil::AddGlobalToneMapFilterToPaint(
-          tonemap_paint, sk_image.get(), op->image.hdr_metadata_,
-          ComputeEffectiveHdrHeadroom(flags, params));
-      DrawImageRect(c, sk_image.get(), adjusted_src, op->dst, sampling,
-                    &tonemap_paint, op->constraint);
-      return;
+      // If this uses a global tone map filter, then incorporate that filter
+      // into the paint.
+      if (ToneMapUtil::UseGlobalToneMapFilter(sk_image.get(),
+                                              op->image.hdr_metadata_,
+                                              c->imageInfo().colorSpace())) {
+        SkPaint tonemap_paint = p;
+        ToneMapUtil::AddGlobalToneMapFilterToPaint(
+            tonemap_paint, sk_image.get(), op->image.hdr_metadata_,
+            ComputeEffectiveHdrHeadroom(flags, params));
+        DrawImageRect(c, sk_image.get(), adjusted_src, op->dst, sampling,
+                      &tonemap_paint, op->constraint);
+        return;
+      }
     }
 
     DrawImageRect(c, sk_image.get(), adjusted_src, op->dst, sampling, &p,
