@@ -419,11 +419,6 @@ void EtwConsumer::HandleStackWalkEvent(const EVENT_HEADER& header,
     return;
   }
 
-  // Before interning any data, clear previous incremental state if needed.
-  if (reset_emitted_state_.load(std::memory_order_relaxed)) {
-    ResetEmittedState();
-  }
-
   // Read and validate the contents of `packet_data`.
   base::BufferIterator<const uint8_t> iterator{packet_data};
   // Size of `StackWalk` event:
@@ -435,6 +430,9 @@ void EtwConsumer::HandleStackWalkEvent(const EVENT_HEADER& header,
   const auto qpc_timestamp = *iterator.CopyObject<uint64_t>();
   (void)*iterator.CopyObject<uint32_t>();  // StackProcess
   const auto stack_thread = *iterator.CopyObject<uint32_t>();
+  if (!inclusion_policy_.ShouldRecordCallStacks(stack_thread)) {
+    return;
+  }
 
   // The remainder of the packet consists of the call stack.
   const size_t remaining_bytes = packet_data.size_bytes() - iterator.position();
@@ -443,6 +441,11 @@ void EtwConsumer::HandleStackWalkEvent(const EVENT_HEADER& header,
   call_stack.reserve(num_frames);
   for (size_t i = 0; i < num_frames; ++i) {
     call_stack.push_back(CopyPointer(iterator, pointer_size));
+  }
+
+  // Before interning any data, clear previous incremental state if needed.
+  if (reset_emitted_state_.load(std::memory_order_relaxed)) {
+    ResetEmittedState();
   }
 
   // Use a hash of the call stack as a unique identifier for interning.
