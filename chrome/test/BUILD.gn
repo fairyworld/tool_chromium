@@ -6536,6 +6536,7 @@ test("unit_tests") {
     "//chrome/browser/ui/webui:log_web_ui_url",
     "//chrome/browser/ui/webui/chrome_urls:unit_tests",
     "//chrome/browser/ui/webui/components:unit_tests",
+    "//chrome/browser/ui/webui/context_hub:unit_tests",
     "//chrome/browser/ui/webui/internal_debug_pages_disabled",
     "//chrome/browser/ui/webui/intro:mojo_bindings",
     "//chrome/browser/unified_consent",
@@ -8027,6 +8028,7 @@ test("unit_tests") {
       "//chrome/browser/badging:unit_tests",
       "//chrome/browser/companion/text_finder:unit_tests",
       "//chrome/browser/content_settings:unit_tests",
+      "//chrome/browser/context_hub",
       "//chrome/browser/error_reporting:unit_test",
       "//chrome/browser/hid",
       "//chrome/browser/image_editor:image_editor_component_util",
@@ -8237,6 +8239,7 @@ test("unit_tests") {
       "//chrome/browser/ui/passwords/settings:unit_tests",
       "//chrome/browser/ui/search",
       "//chrome/browser/ui/views/location_bar",
+      "//chrome/browser/ui/webui/context_hub:unit_tests",
       "//chrome/browser/ui/webui/personal_context:unit_tests",
     ]
   }
