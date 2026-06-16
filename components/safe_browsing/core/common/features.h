@@ -248,6 +248,10 @@ BASE_DECLARE_FEATURE(kEsbAsASyncedSetting);
 //   safebrowsing.scout_reporting_enabled
 BASE_DECLARE_FEATURE(kExtendedReportingRemovePrefDependency);
 
+// Bypasses the Safe Browsing network query for extensions blocklist checks
+// because a subsequent check will retrieve the blocklist state.
+BASE_DECLARE_FEATURE(kExtensionBlocklistSkipNetworkQuery);
+
 // Allows the Extension Telemetry Service to accept and use configurations
 // sent by the server.
 BASE_DECLARE_FEATURE(kExtensionTelemetryConfiguration);
