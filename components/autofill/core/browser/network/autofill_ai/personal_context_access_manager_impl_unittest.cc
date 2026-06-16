@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+#include "base/scoped_observation.h"
 #include "base/test/gmock_callback_support.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
@@ -90,6 +91,7 @@ class PersonalContextAccessManagerImplTest : public testing::Test {
     ON_CALL(mock_enablement_service_, GetEnablementState)
         .WillByDefault(testing::Return(
             personal_context::PersonalContextEnablementState::kEnabled));
+    observation_.Observe(&access_manager_);
   }
   ~PersonalContextAccessManagerImplTest() override = default;
 
@@ -101,6 +103,10 @@ class PersonalContextAccessManagerImplTest : public testing::Test {
 
   MockPersonalContextEnablementService& mock_enablement_service() {
     return mock_enablement_service_;
+  }
+
+  MockPersonalContextAccessManagerObserver& mock_observer() {
+    return mock_observer_;
   }
 
   void FastForwardBy(base::TimeDelta delta) {
@@ -147,6 +153,10 @@ class PersonalContextAccessManagerImplTest : public testing::Test {
   MockPersonalContextEnablementService mock_enablement_service_;
   PersonalContextAccessManagerImpl access_manager_{
       &mock_personal_context_service_, &mock_enablement_service_};
+  MockPersonalContextAccessManagerObserver mock_observer_;
+  base::ScopedObservation<PersonalContextAccessManagerImpl,
+                          MockPersonalContextAccessManagerObserver>
+      observation_{&mock_observer_};
 };
 
 // Tests that PrefetchAmbientAutofillContext successfully requests context from
@@ -826,9 +836,6 @@ TEST_F(PersonalContextAccessManagerImplTest, FailureTriggersBackoff) {
 // `kPending` -> `kSuccess` -> `kNotStarted`) and the observer is notified
 // with success = true when a prefetch request succeeds.
 TEST_F(PersonalContextAccessManagerImplTest, PrefetchStatusAndObserverSuccess) {
-  MockPersonalContextAccessManagerObserver observer;
-  access_manager().AddObserver(&observer);
-
   const EntityType order_type = EntityType(EntityTypeName::kOrder);
 
   EXPECT_EQ(
@@ -851,7 +858,7 @@ TEST_F(PersonalContextAccessManagerImplTest, PrefetchStatusAndObserverSuccess) {
   personal_context::proto::Any any_response;
   response.SerializeToString(any_response.mutable_value());
 
-  EXPECT_CALL(observer, OnPrefetchAmbientAutofillContextComplete(true));
+  EXPECT_CALL(mock_observer(), OnPrefetchAmbientAutofillContextComplete(true));
   future.Take().Run(
       personal_context::FetchContextResult(base::ok(std::move(any_response))));
 
@@ -871,9 +878,6 @@ TEST_F(PersonalContextAccessManagerImplTest, PrefetchStatusAndObserverSuccess) {
 // `kPending` -> `kFailure` -> `kNotStarted`) and the observer is notified
 // with success = false when a prefetch request fails.
 TEST_F(PersonalContextAccessManagerImplTest, PrefetchStatusAndObserverFailure) {
-  MockPersonalContextAccessManagerObserver observer;
-  access_manager().AddObserver(&observer);
-
   const EntityType order_type = EntityType(EntityTypeName::kOrder);
 
   EXPECT_EQ(
@@ -892,7 +896,7 @@ TEST_F(PersonalContextAccessManagerImplTest, PrefetchStatusAndObserverFailure) {
 
   // 2. Resolve request with failure. Status should transition to `kFailure`,
   // and observer should be notified with success = false.
-  EXPECT_CALL(observer, OnPrefetchAmbientAutofillContextComplete(false));
+  EXPECT_CALL(mock_observer(), OnPrefetchAmbientAutofillContextComplete(false));
   ContextMemoryError expected_error = ContextMemoryError::FromExecutionError(
       ContextMemoryError::ExecutionError::kGenericFailure);
   future.Take().Run(
