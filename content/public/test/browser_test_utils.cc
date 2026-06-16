@@ -112,6 +112,7 @@
 #include "net/cookies/cookie_access_result.h"
 #include "net/cookies/cookie_constants.h"
 #include "net/cookies/cookie_util.h"
+#include "net/cookies/parsed_cookie.h"
 #include "net/filter/gzip_header.h"
 #include "net/filter/gzip_source_stream.h"
 #include "net/filter/mock_source_stream.h"
@@ -2231,7 +2232,7 @@ bool SetCookie(
   const bool has_partition_key = cookie_partition_key.has_value();
   const bool is_nonced =
       net::CookiePartitionKey::HasNonce(cookie_partition_key);
-  const bool has_attribute = base::ToLowerASCII(value).contains(";partitioned");
+  const bool has_attribute = net::ParsedCookie(value).IsPartitioned();
   if (!has_partition_key) {
     DCHECK(!has_attribute);
   }
