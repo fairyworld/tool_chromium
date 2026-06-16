@@ -623,6 +623,7 @@ void TaskManagerView::Init() {
     tab_table->SetRowPadding(views::DISTANCE_TABLE_VERTICAL_TEXT_PADDING);
   }
   tab_table->set_observer(this);
+  tab_table->SetSelectOnFocus(true);
   tab_table->set_context_menu_controller(this);
   set_context_menu_controller(this);
 
