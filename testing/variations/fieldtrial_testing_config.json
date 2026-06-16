@@ -26007,21 +26007,6 @@
             ]
         }
     ],
-    "WebRTC-EncoderSpeed": [
-        {
-            "platforms": [
-                "chromeos",
-                "linux",
-                "mac",
-                "windows"
-            ],
-            "experiments": [
-                {
-                    "name": "dynamic_speed:true,av1_camera:higher"
-                }
-            ]
-        }
-    ],
     "WebRTC-IPv6NetworkResolutionFixes": [
         {
             "platforms": [
