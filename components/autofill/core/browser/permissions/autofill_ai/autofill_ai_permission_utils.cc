@@ -673,8 +673,6 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
       break;
   }
 
-  // TODO(crbug.com/523168644): Check personal context eligibility requirements.
-
   // If the user changes their GeoIp, the feature might stop working, but the
   // data should not disappear.
   if (!IsPermittedGeoIp(country_code) &&
