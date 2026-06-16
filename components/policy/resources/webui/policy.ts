@@ -26,12 +26,17 @@ function getAllPolicyTables() {
 }
 
 function getAllPolicyRows(policyTable: PolicyTableElement) {
-  return policyTable.shadowRoot!.querySelectorAll('policy-row');
+  const shadowRoot = policyTable.shadowRoot;
+  return shadowRoot ? shadowRoot.querySelectorAll('policy-row') :
+                      [] as unknown as NodeListOf<PolicyRowElement>;
 }
 
 function getAllPolicyRowDivs(policyRow: PolicyRowElement) {
-  const row = policyRow.shadowRoot!.querySelector('.policy.row');
-  return row!.querySelectorAll('div');
+  const row = policyRow.shadowRoot ?
+      policyRow.shadowRoot.querySelector('.policy.row') :
+      null;
+  return row ? row.querySelectorAll('div') :
+               [] as unknown as NodeListOf<HTMLDivElement>;
 }
 
 function getPrecedenceRowValue() {

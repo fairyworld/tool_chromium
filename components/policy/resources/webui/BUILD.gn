@@ -18,10 +18,8 @@ build_webui("build") {
 
   # Files holding a Custom element definition AND have an equivalent .html file.
   web_component_files = [
-    "policy_conflict.ts",
     "policy_precedence_row.ts",
     "policy_promotion.ts",
-    "policy_row.ts",
     "policy_table.ts",
     "test/policy_test_row.ts",
     "test/policy_test_table.ts",
@@ -33,13 +31,21 @@ build_webui("build") {
     "policy.ts",
     "policy_base.ts",
     "browser_proxy.ts",
+    "policy_conflict.html.ts",
+    "policy_conflict.ts",
+    "policy_row.html.ts",
+    "policy_row.ts",
     "status_box.html.ts",
     "status_box.ts",
     "test/policy_test.ts",
     "test/policy_test_browser_proxy.ts",
   ]
 
-  css_files = [ "status_box.css" ]
+  css_files = [
+    "policy_conflict.css",
+    "policy_row.css",
+    "status_box.css",
+  ]
 
   mojo_files = [ "$root_gen_dir/components/policy/resources/webui/mojom/policy.mojom-webui.ts" ]
   mojo_files_deps = [

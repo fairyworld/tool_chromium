@@ -127,7 +127,7 @@ export class PolicyTableElement extends CustomElement {
         .forEach((policy: Policy) => {
           const policyRow: PolicyRowElement =
               document.createElement('policy-row');
-          policyRow.initialize(policy);
+          policyRow.policy = policy;
           mainContent.appendChild(policyRow);
         });
     this.filter();
@@ -138,7 +138,7 @@ export class PolicyTableElement extends CustomElement {
       const precedenceRowOld =
           this.shadowRoot!.querySelectorAll('.policy-precedence-data');
       precedenceRowOld.forEach(row => mainContent.removeChild(row));
-      if (this.dataModel.precedenceOrder != null) {
+      if (this.dataModel.precedenceOrder) {
         const precedenceRow = document.createElement('policy-precedence-row');
         precedenceRow.initialize(this.dataModel.precedenceOrder);
         mainContent.appendChild(precedenceRow);
@@ -167,7 +167,7 @@ export class PolicyTableElement extends CustomElement {
     const policies = this.shadowRoot!.querySelectorAll('.policy-data');
     for (let i = 0; i < policies.length; i++) {
       const policyDisplay = policies[i] as PolicyRowElement;
-      policyDisplay.hidden =
+      policyDisplay.hidden = !policyDisplay.policy ||
           policyDisplay.policy.value === undefined && !showUnset ||
           policyDisplay.policy.name.toLowerCase().indexOf(
               this.filterPattern) === -1;

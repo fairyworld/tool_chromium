@@ -12,12 +12,10 @@
 .row:not([hidden]) {
   display: flex;
 }
-
 .row > * {
   align-items: center;
   box-sizing: border-box;
   display: flex;
-  flex: 0 0 10%;
   flex-direction: row;
   gap: 5px;
   justify-content: space-between;
@@ -27,7 +25,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 .policy-table {
   margin-bottom: 5px;
   margin-top: 17px;
@@ -53,15 +50,35 @@
   border-inline-end: 1px solid var(--table-border);
 }
 
-.name,
-.value {
-  flex: 0 0 25%;
-}
-
 .row.header {
   background-color: var(--table-header);
   border-bottom: 1px solid var(--table-border);
   border-radius: var(--element-border-radius) var(--element-border-radius) 0 0;
+  display: grid;
+  grid-template-columns: 25% 30% 10% 10% 10% 10% 5%;
+  grid-template-areas: 'name value source scope level status toggle';
+}
+
+.row.header .name {
+  grid-area: name;
+}
+.row.header .value {
+  grid-area: value;
+}
+.row.header .source {
+  grid-area: source;
+}
+.row.header .scope {
+  grid-area: scope;
+}
+.row.header .level {
+  grid-area: level;
+}
+.row.header .status {
+  grid-area: status;
+}
+.row.header .toggle {
+  grid-area: toggle;
 }
 
 .sort-arrows {
@@ -113,50 +130,38 @@ a {
   cursor: pointer;
 }
 
+@media (max-width: 768px) {
+  .value,
+  .level,
+  .status,
+  .scope {
+    display: none;
+  }
+
+  .row.header {
+    grid-template-columns: 50% 25% 25%;
+    grid-template-areas: 'name source toggle';
+  }
+
+  .reload-show-unset-section {
+    flex-wrap: wrap;
+  }
+
+  .policy-table .main {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .policy-table .main .row > * {
+    overflow: visible;
+  }
+}
 <if expr="is_android or is_ios">
-.value,
-.level,
-.status,
-.scope {
-  display: none;
-}
-
-.name {
-  flex: 0 0 50%;
-}
-
-.toggle,
-.source,
-.status.row .name,
-.value.row .name {
-  flex: 0 0 25%;
-}
-
-.reload-show-unset-section {
-  flex-wrap: wrap;
-}
-
-.status.row .value,
-.value.row .value {
-  display: block;
-  flex: 1;
-}
-
 .sort-up-arrow,
 .sort-down-arrow {
   width: 48px;
   height: 48px;
 }
-
-.policy-table .main {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.policy-table .main .row > * {
-  overflow: visible;
-}
-
 </if>
 </style>
 <div class="policy-table" role="table" aria-labelledby="policy-header">
