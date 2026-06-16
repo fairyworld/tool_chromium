@@ -24,7 +24,6 @@ if (include_js2gtest_tests) {
       "assertions.js",
       "async_gen.js",
       "certificate_manager_dialog_browsertest.js",
-      "emoji_picker/emoji_picker_browsertest.js",
       "js2gtest_browsertest.js",
       "network_browsertest.js",
       "sys_internals/sys_internals_browsertest.js",

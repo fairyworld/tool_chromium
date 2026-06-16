@@ -184,6 +184,7 @@ source_set("browser_tests") {
       "chromeos/crostini_installer_browsertest.cc",
       "chromeos/diagnostics/diagnostics_browsertest.cc",
       "chromeos/edu_coexistence/edu_coexistence_browsertest.cc",
+      "chromeos/emoji_picker/emoji_picker_browsertest.cc",
       "chromeos/enterprise_reporting/enterprise_reporting_browsertest.cc",
       "chromeos/extended_updates/extended_updates_browsertest.cc",
       "chromeos/firmware_update/firmware_update_browsertest.cc",
