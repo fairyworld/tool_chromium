@@ -19420,6 +19420,26 @@
             ]
         }
     ],
+    "PrefetchActivationBeacon": [
+        {
+            "platforms": [
+                "android",
+                "chromeos",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "enable_features": [
+                        "PrefetchActivationBeacon",
+                        "PrerenderActivationBeacon"
+                    ]
+                }
+            ]
+        }
+    ],
     "PrefetchBlockUntilHeadTimeoutForWebViewPrefetch": [
         {
             "platforms": [
