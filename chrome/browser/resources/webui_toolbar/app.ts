@@ -246,6 +246,7 @@ export class ToolbarAppElement extends AppElementBase {
       accessibilityDescription: '',
     },
     layoutConstantsVersion: 0,
+    touchUi: false,
     pinnedToolbarActionsState: [],
   };
 

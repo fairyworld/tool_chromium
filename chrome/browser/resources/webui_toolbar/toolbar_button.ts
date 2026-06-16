@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import {loadTimeData} from '//resources/js/load_time_data.js';
 import type {CrLitElement} from '//resources/lit/v3_0/lit.rollup.js';
 import {MenuSourceType} from '//resources/mojo/ui/base/mojom/menu_source_type.mojom-webui.js';
 import {HelpBubbleMixinLit} from 'chrome://resources/cr_components/help_bubble/help_bubble_mixin_lit.js';
@@ -408,4 +409,8 @@ export function getEventDispositionFlags(
     flags.push(EventDispositionFlag.kAltGrKeyDown);
   }
   return flags;
+}
+
+export function roundedIconsEnabled() {
+  return loadTimeData.getBoolean('roundedIconsEnabled');
 }

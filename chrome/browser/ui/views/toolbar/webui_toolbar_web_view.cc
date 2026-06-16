@@ -255,6 +255,7 @@ WebUIToolbarWebView::WebUIToolbarWebView(
           std::vector<toolbar_ui_api::mojom::ContentSettingImageStatePtr>(),
           /*permission_dashboard=*/nullptr);
   last_queued_state_.layout_constants_version = 0;
+  last_queued_state_.touch_ui = ui::TouchUiController::Get()->touch_ui();
   last_queued_state_.back_forward_control_state = GetBackForwardState();
   last_queued_state_.app_menu_control_state = app_menu_control_.GetState();
   last_queued_state_.avatar_control_state =
@@ -1131,6 +1132,7 @@ void WebUIToolbarWebView::OnFocusRequested(
 
 void WebUIToolbarWebView::OnTouchUiChanged() {
   ++last_queued_state_.layout_constants_version;
+  last_queued_state_.touch_ui = ui::TouchUiController::Get()->touch_ui();
   PostPushNavigationState();
 }
 
