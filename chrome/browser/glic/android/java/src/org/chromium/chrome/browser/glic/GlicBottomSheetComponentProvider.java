@@ -15,16 +15,16 @@ import org.jni_zero.JNINamespace;
 
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.chrome.browser.profiles.Profile;
-import org.chromium.chrome.browser.tab_bottom_sheet.TabBottomSheetComponentProvider;
+import org.chromium.chrome.browser.tab_bottom_sheet.CoBrowseComponentProvider;
 import org.chromium.chrome.browser.tab_bottom_sheet.TabBottomSheetContent;
 
 /**
- * Concrete implementation of {@link TabBottomSheetComponentProvider} for Glic. Returns specialized
+ * Concrete implementation of {@link CoBrowseComponentProvider} for Glic. Returns specialized
  * components and handles agent task termination.
  */
 @JNINamespace("glic")
 @NullMarked
-public class GlicBottomSheetComponentProvider implements TabBottomSheetComponentProvider {
+public class GlicBottomSheetComponentProvider implements CoBrowseComponentProvider {
     private final Profile mProfile;
 
     /** JNI static factory method to create the provider. */

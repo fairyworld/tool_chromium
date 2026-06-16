@@ -14,13 +14,11 @@ import org.jni_zero.CalledByNative;
 
 import org.chromium.build.annotations.NullMarked;
 
-/**
- * Concrete test implementation of {@link TabBottomSheetComponentProvider} for automated testing.
- */
+/** Concrete test implementation of {@link CoBrowseComponentProvider} for automated testing. */
 @NullMarked
-public class TestTabBottomSheetComponentProvider implements TabBottomSheetComponentProvider {
+public class TestCoBrowseComponentProvider implements CoBrowseComponentProvider {
     @CalledByNative
-    public TestTabBottomSheetComponentProvider() {}
+    public TestCoBrowseComponentProvider() {}
 
     @Override
     public TabBottomSheetContent createContent(

@@ -16,7 +16,7 @@ import org.chromium.build.annotations.NullMarked;
 
 /** Interface providing specialized components for different client features. */
 @NullMarked
-public interface TabBottomSheetComponentProvider {
+public interface CoBrowseComponentProvider {
     /** Destroys the component provider and releases any resources. */
     @CalledByNative
     default void destroy() {}

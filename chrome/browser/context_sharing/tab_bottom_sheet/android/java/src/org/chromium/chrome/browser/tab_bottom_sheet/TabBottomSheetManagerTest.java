@@ -130,7 +130,7 @@ public class TabBottomSheetManagerTest {
                                     null,
                                     null,
                                     Color.WHITE,
-                                    new TestTabBottomSheetComponentProvider());
+                                    new TestCoBrowseComponentProvider());
                     mManager =
                             (TabBottomSheetManagerImpl)
                                     tabbedRootUiCoordinator.getTabBottomSheetManagerForTesting();
@@ -237,7 +237,7 @@ public class TabBottomSheetManagerTest {
                                         webContents,
                                         TabBottomSheetClientType.UNKNOWN,
                                         CoBrowseContainerType.BOTTOM_SHEET,
-                                        new TestTabBottomSheetComponentProvider()));
+                                        new TestCoBrowseComponentProvider()));
 
         ThreadUtils.runOnUiThreadBlocking(
                 () -> {
@@ -290,7 +290,7 @@ public class TabBottomSheetManagerTest {
                                         webContents,
                                         TabBottomSheetClientType.UNKNOWN,
                                         CoBrowseContainerType.BOTTOM_SHEET,
-                                        new TestTabBottomSheetComponentProvider()));
+                                        new TestCoBrowseComponentProvider()));
 
         ThreadUtils.runOnUiThreadBlocking(
                 () -> {
@@ -575,7 +575,7 @@ public class TabBottomSheetManagerTest {
                                         null,
                                         null,
                                         Color.WHITE,
-                                        new TestTabBottomSheetComponentProvider()));
+                                        new TestCoBrowseComponentProvider()));
 
         ThreadUtils.runOnUiThreadBlocking(
                 () -> {

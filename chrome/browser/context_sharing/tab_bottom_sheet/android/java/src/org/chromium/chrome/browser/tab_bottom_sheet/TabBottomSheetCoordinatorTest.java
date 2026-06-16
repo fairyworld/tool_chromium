@@ -116,7 +116,7 @@ public class TabBottomSheetCoordinatorTest {
     @Mock private WindowAndroid mWindowAndroid;
     @Mock private KeyboardVisibilityDelegate mKeyboardDelegate;
     @Mock private TabBottomSheetWebUi mMockWebUi;
-    @Mock private TabBottomSheetComponentProvider mMockContentProvider;
+    @Mock private CoBrowseComponentProvider mMockContentProvider;
 
     @Captor private ArgumentCaptor<TabBottomSheetContent> mBottomSheetContentArgumentCaptor;
     @Captor private ArgumentCaptor<BottomSheetObserver> mBottomSheetObserverArgumentCaptor;

@@ -40,7 +40,7 @@ public class CoBrowseViews {
     private final View mContainerView;
     private final @TabBottomSheetClientType int mClientType;
     private final @CoBrowseContainerType int mContainerType;
-    private final @Nullable TabBottomSheetComponentProvider mContentProvider;
+    private final @Nullable CoBrowseComponentProvider mContentProvider;
     private @Nullable View mPeekView;
 
     /**
@@ -61,7 +61,7 @@ public class CoBrowseViews {
             @Nullable TabBottomSheetWebUi webUi,
             @Nullable ContextualTasksFusebox fusebox,
             @ColorInt int backgroundColor,
-            @Nullable TabBottomSheetComponentProvider contentProvider) {
+            @Nullable CoBrowseComponentProvider contentProvider) {
         mClientType = clientType;
         mContainerType = containerType;
         mWebUi = webUi;
@@ -75,7 +75,7 @@ public class CoBrowseViews {
     }
 
     /** Returns the custom content provider if one was specified, null otherwise. */
-    public @Nullable TabBottomSheetComponentProvider getContentProvider() {
+    public @Nullable CoBrowseComponentProvider getContentProvider() {
         return mContentProvider;
     }
 

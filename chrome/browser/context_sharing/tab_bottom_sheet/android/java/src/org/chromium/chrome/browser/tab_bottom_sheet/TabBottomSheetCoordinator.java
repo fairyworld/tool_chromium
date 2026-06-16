@@ -229,8 +229,8 @@ public class TabBottomSheetCoordinator {
         mContentView = mCoBrowseViews.getView();
         mContentView.setOutlineProvider(mOutlineProvider);
         mContentView.setClipToOutline(true);
-        TabBottomSheetComponentProvider provider = mCoBrowseViews.getContentProvider();
-        assert provider != null : "TabBottomSheetComponentProvider must not be null";
+        CoBrowseComponentProvider provider = mCoBrowseViews.getContentProvider();
+        assert provider != null : "CoBrowseComponentProvider must not be null";
         mSheetContent =
                 provider.createContent(
                         mContentView,
