@@ -8,6 +8,7 @@
 #include <utility>
 #include <vector>
 
+#include "base/check.h"
 #include "base/debug/dump_without_crashing.h"
 #include "base/functional/bind.h"
 #include "base/location.h"
@@ -87,8 +88,16 @@ RenderWidgetHostViewChildFrame::~RenderWidgetHostViewChildFrame() {
   if (frame_connector_)
     DetachFromTouchSelectionClientManagerIfNecessary();
 
-  if (is_frame_sink_id_owner() && GetHostFrameSinkManager()) {
-    GetHostFrameSinkManager()->InvalidateFrameSinkId(frame_sink_id_, this, {});
+  if (auto* frame_sink_manager = GetHostFrameSinkManager()) {
+    if (has_frame_sink_hierarchy_registered_) {
+      CHECK(parent_frame_sink_id_.is_valid());
+      frame_sink_manager->UnregisterFrameSinkHierarchy(parent_frame_sink_id_,
+                                                       frame_sink_id_);
+      has_frame_sink_hierarchy_registered_ = false;
+    }
+    if (is_frame_sink_id_owner()) {
+      frame_sink_manager->InvalidateFrameSinkId(frame_sink_id_, this, {});
+    }
   }
 }
 
@@ -730,18 +739,23 @@ void RenderWidgetHostViewChildFrame::SetParentFrameSinkId(
 
   auto* host_frame_sink_manager = GetHostFrameSinkManager();
 
-  // Unregister hierarchy for the current parent, only if set.
-  if (parent_frame_sink_id_.is_valid()) {
-    host_frame_sink_manager->UnregisterFrameSinkHierarchy(parent_frame_sink_id_,
-                                                          frame_sink_id_);
+  // Unregister hierarchy for the current parent, only if set and registered.
+  if (parent_frame_sink_id_.is_valid() &&
+      has_frame_sink_hierarchy_registered_) {
+    if (host_frame_sink_manager) {
+      host_frame_sink_manager->UnregisterFrameSinkHierarchy(
+          parent_frame_sink_id_, frame_sink_id_);
+    }
+    has_frame_sink_hierarchy_registered_ = false;
   }
 
   parent_frame_sink_id_ = parent_frame_sink_id;
 
   // Register hierarchy for the new parent, only if set.
-  if (parent_frame_sink_id_.is_valid()) {
-    host_frame_sink_manager->RegisterFrameSinkHierarchy(parent_frame_sink_id_,
-                                                        frame_sink_id_);
+  if (parent_frame_sink_id_.is_valid() && host_frame_sink_manager) {
+    has_frame_sink_hierarchy_registered_ =
+        host_frame_sink_manager->RegisterFrameSinkHierarchy(
+            parent_frame_sink_id_, frame_sink_id_);
   }
 }
 
