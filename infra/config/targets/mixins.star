@@ -1851,11 +1851,6 @@ targets.mixin(
 )
 
 targets.mixin(
-    name = "retry_only_failed_tests",
-    retry_only_failed_tests = True,
-)
-
-targets.mixin(
     name = "skia_gold_test",
     args = [
         "--git-revision=${got_revision}",
