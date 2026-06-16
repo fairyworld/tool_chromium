@@ -644,9 +644,6 @@ class GlicBrowserTestMixin : public T {
 
   GURL GetGuestURL() { return glic_test_environment_.GetGuestURL(); }
 
-  void SetGlicFreUrlOverride(const GURL& url) {
-    glic_test_environment_.SetGlicFreUrlOverride(url);
-  }
 
   [[nodiscard]] TestResult<void> WaitForGlicClient(
       GlicInstance* instance = nullptr) {

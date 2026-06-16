@@ -15220,6 +15220,7 @@ should be able to be added at any place in this file.
 </action>
 
 <action name="Glic.Fre.CloseByClickOutside">
+  <obsolete>Deprecated in M151. Glic Unified FRE has been removed.</obsolete>
   <owner>birnie@google.com</owner>
   <description>
     User clicked outside of the Glic First Run Experience dialog to close it.
@@ -15227,6 +15228,7 @@ should be able to be added at any place in this file.
 </action>
 
 <action name="Glic.Fre.CloseByClosingHostTab">
+  <obsolete>Deprecated in M151. Glic Unified FRE has been removed.</obsolete>
   <owner>birnie@google.com</owner>
   <description>
     User closed the tab hosting the First Run Experience dialog to close it.
@@ -15234,6 +15236,7 @@ should be able to be added at any place in this file.
 </action>
 
 <action name="Glic.Fre.CloseByMovingHostTab">
+  <obsolete>Deprecated in M151. Glic Unified FRE has been removed.</obsolete>
   <owner>birnie@google.com</owner>
   <description>
     User moved the tab hosting the First Run Experience dialog which closes it.
@@ -15249,6 +15252,7 @@ should be able to be added at any place in this file.
 </action>
 
 <action name="Glic.Fre.CloseWithToggle">
+  <obsolete>Deprecated in M151. Glic Unified FRE has been removed.</obsolete>
   <owner>birnie@google.com</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
@@ -15257,6 +15261,7 @@ should be able to be added at any place in this file.
 </action>
 
 <action name="Glic.Fre.CloseWithX">
+  <obsolete>Deprecated in M151. Glic Unified FRE has been removed.</obsolete>
   <owner>birnie@google.com</owner>
   <description>
     User clicked the 'X' button to close the Glic First Run Experience dialog.
@@ -15301,6 +15306,7 @@ should be able to be added at any place in this file.
 </action>
 
 <action name="Glic.Fre.ErrorPanelTryAgainClicked">
+  <obsolete>Deprecated in M151. Glic Unified FRE has been removed.</obsolete>
   <owner>birnie@google.com</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
@@ -15309,6 +15315,7 @@ should be able to be added at any place in this file.
 </action>
 
 <action name="Glic.Fre.HelpCenterLinkOpened">
+  <obsolete>Deprecated in M151. Glic Unified FRE has been removed.</obsolete>
   <owner>dullweber@chromium.org</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
@@ -15335,6 +15342,7 @@ should be able to be added at any place in this file.
 </action>
 
 <action name="Glic.Fre.LoadSuccess">
+  <obsolete>Deprecated in M151. Glic Unified FRE has been removed.</obsolete>
   <owner>birnie@google.com</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
@@ -15344,6 +15352,7 @@ should be able to be added at any place in this file.
 </action>
 
 <action name="Glic.Fre.MyActivityLinkOpened">
+  <obsolete>Deprecated in M151. Glic Unified FRE has been removed.</obsolete>
   <owner>dullweber@chromium.org</owner>
   <owner>erikchen@chromium.org</owner>
   <description>Logged if a myactivity link is opened from the FRE.</description>
@@ -15366,12 +15375,14 @@ should be able to be added at any place in this file.
 </action>
 
 <action name="Glic.Fre.PolicyLinkOpened">
+  <obsolete>Deprecated in M151. Glic Unified FRE has been removed.</obsolete>
   <owner>dullweber@chromium.org</owner>
   <owner>erikchen@chromium.org</owner>
   <description>Logged if a policy link is opened from the FRE.</description>
 </action>
 
 <action name="Glic.Fre.PrivacyNoticeLinkOpened">
+  <obsolete>Deprecated in M151. Glic Unified FRE has been removed.</obsolete>
   <owner>dullweber@chromium.org</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
@@ -15415,6 +15426,7 @@ should be able to be added at any place in this file.
 </action>
 
 <action name="Glic.Fre.WebviewLoadAborted" not_user_triggered="true">
+  <obsolete>Deprecated in M151. Glic Unified FRE has been removed.</obsolete>
   <owner>birnie@google.com</owner>
   <description>
     Recorded when the Glic FRE webview fails to load for any reason other than a
@@ -15423,6 +15435,7 @@ should be able to be added at any place in this file.
 </action>
 
 <action name="Glic.Fre.WebviewLoadTimedOut" not_user_triggered="true">
+  <obsolete>Deprecated in M151. Glic Unified FRE has been removed.</obsolete>
   <owner>birnie@google.com</owner>
   <description>
     Recorded when the Glic FRE webview fails to load due to a timeout.

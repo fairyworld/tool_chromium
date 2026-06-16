@@ -93,9 +93,6 @@ struct ConfigInfo {
   // The URL from which the guest web client is loaded from.
   url.mojom.Url guest_url;
 
-  // The URL from which the FRE page is loaded from.
-  url.mojom.Url fre_guest_url;
-
   // User configured preset URLs for different environments of the guest web
   // client.
   url.mojom.Url autopush_guest_url;

@@ -621,13 +621,6 @@ BASE_FEATURE_PARAM(base::TimeDelta,
                    "glic-user-status-throttle-interval",
                    base::Seconds(5));
 
-BASE_FEATURE(kGlicFreURLConfig, base::FEATURE_ENABLED_BY_DEFAULT);
-BASE_FEATURE_PARAM(std::string,
-                   kGlicFreURL,
-                   &kGlicFreURLConfig,
-                   "glic-fre-url",
-                   "https://gemini.google.com/glic/intro?");
-
 BASE_FEATURE(kGlicLearnMoreURLConfig, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE_PARAM(std::string,
                    kGlicShortcutsLearnMoreURL,

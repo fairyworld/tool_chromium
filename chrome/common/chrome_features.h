@@ -422,10 +422,6 @@ COMPONENT_EXPORT(CHROME_FEATURES)
 extern const base::FeatureParam<base::TimeDelta>
     kGlicUserStatusThrottleInterval;
 
-COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicFreURLConfig);
-COMPONENT_EXPORT(CHROME_FEATURES)
-extern const base::FeatureParam<std::string> kGlicFreURL;
-
 // TODO(b/414418994): remove features/parameters when URLs are finalized.
 COMPONENT_EXPORT(CHROME_FEATURES) BASE_DECLARE_FEATURE(kGlicLearnMoreURLConfig);
 COMPONENT_EXPORT(CHROME_FEATURES)

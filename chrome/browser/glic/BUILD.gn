@@ -400,7 +400,6 @@ source_set("impl") {
     "//chrome/browser/glic/actor",
     "//chrome/browser/glic/browser_ui",
     "//chrome/browser/glic/common",
-    "//chrome/browser/glic/fre",
     "//chrome/browser/glic/media",
     "//chrome/browser/glic/suggestions",
     "//chrome/browser/lifetime:termination_notification",

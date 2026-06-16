@@ -734,39 +734,6 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="Glic.Fre.InteractionTime.Accepted" units="ms"
-    expires_after="2026-08-03">
-  <owner>birnie@google.com</owner>
-  <owner>carlosk@google.com</owner>
-  <summary>
-    Records the time elapsed between the FRE being fully loaded (the Ready
-    state) and the user clicking the accept/continue button. This is logged when
-    the user accepts the FRE.
-  </summary>
-</histogram>
-
-<histogram name="Glic.Fre.InteractionTime.Dismissed" units="ms"
-    expires_after="2026-08-03">
-  <owner>birnie@google.com</owner>
-  <owner>carlosk@google.com</owner>
-  <summary>
-    Records the time elapsed between the FRE being fully loaded (the Ready
-    state) and the user dismissing the dialog through an indirect action (e.g.,
-    closing the tab, pressing Esc, clicking outside the dialog).
-  </summary>
-</histogram>
-
-<histogram name="Glic.Fre.InteractionTime.NoThanks" units="ms"
-    expires_after="2026-08-03">
-  <owner>birnie@google.com</owner>
-  <owner>carlosk@google.com</owner>
-  <summary>
-    Records the time elapsed between the FRE being fully loaded (the Ready
-    state) and the user explicitly clicking the No thanks button. This is logged
-    when the user rejects the FRE.
-  </summary>
-</histogram>
-
 <histogram name="Glic.Fre.NoThanks.FlowSource" enum="GlicOptInFlowSource"
     expires_after="2027-05-18">
   <owner>sauski@google.com</owner>
@@ -826,57 +793,6 @@ chromium-metrics-reviews@google.com.
     Recorded when user input is first submitted after completing the onboarding
     steps. Records the last invocation source used before user input is
     submitted.
-  </summary>
-</histogram>
-
-<histogram name="Glic.Fre.WebClientLoadTime" units="ms"
-    expires_after="2026-09-13">
-  <owner>birnie@google.com</owner>
-  <owner>carlosk@chromium.org</owner>
-  <summary>
-    Records the time from when the Glic FRE WebUI begins loading the remote
-    content until the WebUI reports itself as fully loaded and ready.
-  </summary>
-</histogram>
-
-<histogram name="Glic.Fre.WebUiFrameworkLoadTime" units="ms"
-    expires_after="2026-09-13">
-  <owner>birnie@google.com</owner>
-  <owner>carlosk@chromium.org</owner>
-  <summary>
-    Records the time from when the Glic FRE native widget is visible until the
-    local WebUI framework has loaded and is ready to load the remote web
-    content.
-  </summary>
-</histogram>
-
-<histogram name="Glic.Fre.WebUITerminationStatus" enum="TerminationStatus"
-    expires_after="2026-08-30">
-  <owner>birnie@google.com</owner>
-  <owner>cuianthony@google.com</owner>
-  <summary>
-    Records the termination status of the FRE WebUI process. This is logged when
-    the WebUI process associated with the FRE is terminated for any reason.
-  </summary>
-</histogram>
-
-<histogram name="Glic.Fre.WebviewLoadAbortReason"
-    enum="GlicFreWebviewLoadAbortReason" expires_after="2026-08-30">
-  <owner>birnie@google.com</owner>
-  <owner>cuianthony@google.com</owner>
-  <summary>
-    Records the reason why the FRE webview failed to load. This is logged when
-    the webview's `loadabort` event is fired.
-  </summary>
-</histogram>
-
-<histogram name="Glic.FreErrorStateReason" enum="FreErrorStateReason"
-    expires_after="2026-09-27">
-  <owner>birnie@google.com</owner>
-  <owner>cuianthony@google.com</owner>
-  <summary>
-    Records the reason the error panel was shown. This is recorded either before
-    the FRE is shown if its an issue during auth, or after loading times out.
   </summary>
 </histogram>
 
@@ -3031,57 +2947,6 @@ chromium-metrics-reviews@google.com.
   <summary>
     Records the source of the turn, including the UI mode (Side Panel or Floaty)
     and the input mode (Text or Audio). Recorded at the end of each turn.
-  </summary>
-</histogram>
-
-<histogram name="Glic.UnifiedFre.TotalTime.AcceptedByOtherInstance" units="ms"
-    expires_after="2026-10-04">
-  <owner>michelleabreo@google.com</owner>
-  <owner>birnie@google.com</owner>
-  <summary>
-    Records the time elapsed from when an instance of a sidepanel FRE is first
-    opened until the user accepts it in another instance.
-  </summary>
-</histogram>
-
-<histogram name="Glic.UnifiedFre.TotalTime.Dismissed" units="ms"
-    expires_after="2026-10-04">
-  <owner>michelleabreo@google.com</owner>
-  <owner>birnie@google.com</owner>
-  <summary>
-    Records the time elapsed from when an instance of a sidepanel FRE is first
-    opened until it is dismissed by the user (e.g. closing the tab).
-  </summary>
-</histogram>
-
-<histogram name="Glic.UnifiedFre.TotalTime.NoThanks" units="ms"
-    expires_after="2026-10-04">
-  <owner>michelleabreo@google.com</owner>
-  <owner>birnie@google.com</owner>
-  <summary>
-    Records the time elapsed from when an instance of a sidepanel FRE is first
-    opened until the user clicks the No Thanks button.
-  </summary>
-</histogram>
-
-<histogram name="Glic.UnifiedFre.WebClientLoadTime" units="ms"
-    expires_after="2026-10-04">
-  <owner>michelleabreo@google.com</owner>
-  <owner>birnie@google.com</owner>
-  <summary>
-    Records the time from when the sidepanel Glic FRE WebUI begins loading the
-    remote content until the WebUI reports itself as fully loaded and ready.
-  </summary>
-</histogram>
-
-<histogram name="Glic.UnifiedFre.WebUiFrameworkLoadTime" units="ms"
-    expires_after="2026-10-04">
-  <owner>michelleabreo@google.com</owner>
-  <owner>birnie@google.com</owner>
-  <summary>
-    Records the time from when the Glic FRE in sidepanel is visible until the
-    local WebUI framework has loaded and is ready to load the remote web
-    content.
   </summary>
 </histogram>
 
