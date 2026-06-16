@@ -218,6 +218,10 @@ ProfilePickerToolbar::Builder::Builder(base::RepeatingClosure on_back_callback)
 
 ProfilePickerToolbar::Builder::~Builder() = default;
 
+ProfilePickerToolbar::Builder::Builder(Builder&&) = default;
+ProfilePickerToolbar::Builder& ProfilePickerToolbar::Builder::operator=(
+    Builder&&) = default;
+
 ProfilePickerToolbar::Builder&
 ProfilePickerToolbar::Builder::WithDontSignInButton(
     base::RepeatingClosure on_dont_sign_in_callback) {

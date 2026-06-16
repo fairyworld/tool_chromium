@@ -44,6 +44,7 @@
 #include "chrome/browser/ui/views/profiles/profile_management_step_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_management_types.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_post_sign_in_adapter.h"
+#include "chrome/browser/ui/views/profiles/profile_picker_toolbar.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_web_contents_host.h"
 #include "chrome/browser/ui/webui/feature_showcase/feature_showcase_ui.h"
 #include "chrome/browser/ui/webui/intro/intro_ui.h"
@@ -735,27 +736,28 @@ void FirstRunFlowController::ShowSigninError(Profile* profile,
   HandleSigninErrorInBrowser(profile, error);
 }
 
-void FirstRunFlowController::ToggleMediaEffects(bool active) {
-  if (ProfileManagementStepController* current_step_controller =
-          GetCurrentStepController()) {
-    current_step_controller->ToggleMediaEffects(active);
+ProfilePickerToolbar::Builder FirstRunFlowController::CreateToolbarBuilder() {
+  ProfilePickerToolbar::Builder builder =
+      ProfileManagementFlowController::CreateToolbarBuilder();
+  const bool is_in_search_engine_choice_region =
+      IsProfileInSearchEngineChoiceRegion(profile_);
+  if (switches::IsFirstRunDesktopRefreshEnabled(
+          is_in_search_engine_choice_region) &&
+      switches::kFirstRunDesktopSignInPromoVariation.Get() ==
+          switches::FirstRunDesktopSignInPromoVariation::
+              kDontSignInOnGaiaPage) {
+    builder.WithDontSignInButton(
+        base::BindRepeating(&FirstRunFlowController::CancelSigninFlow,
+                            weak_ptr_factory_.GetWeakPtr()));
   }
-  if (sounds_manager_) {
-    if (active) {
-      // Resume only the ambient sound, other (on action) sounds are played
-      // once, and resuming them may be confusing for the user.
-      sounds_manager_->Play(kAmbientSoundKey);
-    } else {
-      sounds_manager_->Pause(kAmbientSoundKey);
-      // Stop one-shot sounds, safe to call even if not playing.
-      sounds_manager_->Stop(kLogoSoundKey);
-      sounds_manager_->Stop(kWelcomeBackSoundKey);
-    }
-  }
-}
 
-bool FirstRunFlowController::AreEffectsEnabled() const {
-  return host()->AreEffectsEnabled();
+  if (switches::IsFirstRunDesktopRevampEnabled(
+          is_in_search_engine_choice_region)) {
+    builder.WithEffectsControlButton(
+        base::BindRepeating(&FirstRunFlowController::ToggleMediaEffects,
+                            weak_ptr_factory_.GetWeakPtr()));
+  }
+  return builder;
 }
 
 void FirstRunFlowController::PlaySignInCelebrationSound() {
@@ -879,6 +881,29 @@ std::string FirstRunFlowController::GetHatsSurveyTrigger() const {
   }
 
   return kHatsSurveyTriggerIdentityFirstRunCompleted;
+}
+
+void FirstRunFlowController::ToggleMediaEffects(bool active) {
+  if (ProfileManagementStepController* current_step_controller =
+          GetCurrentStepController()) {
+    current_step_controller->ToggleMediaEffects(active);
+  }
+  if (sounds_manager_) {
+    if (active) {
+      // Resume only the ambient sound, other (on action) sounds are played
+      // once, and resuming them may be confusing for the user.
+      sounds_manager_->Play(kAmbientSoundKey);
+    } else {
+      sounds_manager_->Pause(kAmbientSoundKey);
+      // Stop one-shot sounds, safe to call even if not playing.
+      sounds_manager_->Stop(kLogoSoundKey);
+      sounds_manager_->Stop(kWelcomeBackSoundKey);
+    }
+  }
+}
+
+bool FirstRunFlowController::AreEffectsEnabled() const {
+  return host()->AreEffectsEnabled();
 }
 
 void FirstRunFlowController::MaybeTriggerHatsSurvey() {

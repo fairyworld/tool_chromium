@@ -41,6 +41,9 @@ class ProfilePickerToolbar : public views::View {
     Builder(const Builder&) = delete;
     Builder& operator=(const Builder&) = delete;
 
+    Builder(Builder&&);
+    Builder& operator=(Builder&&);
+
     // Adds the "Don't sign in" button to the toolbar.
     Builder& WithDontSignInButton(
         base::RepeatingClosure on_dont_sign_in_callback);

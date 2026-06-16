@@ -18,6 +18,7 @@
 #include "chrome/browser/ui/views/profiles/profile_management_flow_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_management_flow_controller_impl.h"
 #include "chrome/browser/ui/views/profiles/profile_management_types.h"
+#include "chrome/browser/ui/views/profiles/profile_picker_toolbar.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_web_contents_host.h"
 #include "services/audio/public/cpp/sounds/sounds_manager.h"
 
@@ -70,8 +71,7 @@ class FirstRunFlowController : public ProfileManagementFlowControllerImpl {
       ProfilePicker::ProfilePickingArgs args,
       base::OnceCallback<void(bool)> pick_profile_complete_callback) override;
   void ShowSigninError(Profile* profile, const SigninUIError& error) override;
-  void ToggleMediaEffects(bool active) override;
-  bool AreEffectsEnabled() const;
+  ProfilePickerToolbar::Builder CreateToolbarBuilder() override;
 
   using SoundsManagerFactory =
       base::RepeatingCallback<std::unique_ptr<audio::SoundsManager>(
@@ -103,6 +103,10 @@ class FirstRunFlowController : public ProfileManagementFlowControllerImpl {
   void RunFinishFlowCallback();
 
   std::string GetHatsSurveyTrigger() const;
+
+  void ToggleMediaEffects(bool active);
+
+  bool AreEffectsEnabled() const;
 
   void MaybeTriggerHatsSurvey();
 
