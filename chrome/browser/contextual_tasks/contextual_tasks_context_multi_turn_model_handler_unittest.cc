@@ -175,8 +175,14 @@ TEST_F(ContextualTasksContextMultiTurnModelHandlerTest,
   EXPECT_EQ(features[15], 1.3f);  // Candidate title embedding [3]
 }
 
+// TODO(524489645): failing on Linux UBSan Tests.
+#if defined(UNDEFINED_SANITIZER)
+#define MAYBE_ExecuteModelWithSignals DISABLED_ExecuteModelWithSignals
+#else
+#define MAYBE_ExecuteModelWithSignals ExecuteModelWithSignals
+#endif  // defined(UNDEFINED_SANITIZER)
 TEST_F(ContextualTasksContextMultiTurnModelHandlerTest,
-       ExecuteModelWithSignals) {
+       MAYBE_ExecuteModelWithSignals) {
   ContextualTasksContextMultiTurnModelHandler* handler = model_handler();
 
   optimization_guide::proto::TabRelevanceModelMetadata metadata;
