@@ -196,7 +196,28 @@ password_manager::ActionableError GetPasswordStoreActionableError(
 // Returns true if `error` can be fixed by the user in save password flow.
 bool IsActionableError(password_manager::ActionableError error) {
   return error == password_manager::ActionableError::kSignInNeeded ||
-         error == password_manager::ActionableError::kTrustedVaultKeyNeeded;
+         error == password_manager::ActionableError::kTrustedVaultKeyNeeded ||
+         error == password_manager::ActionableError::kNeedsPassphrase;
+}
+
+NSString* GetSubtitleForActionableError(
+    password_manager::ActionableError error) {
+  switch (error) {
+    case password_manager::ActionableError::kNeedsPassphrase:
+      return l10n_util::GetNSString(
+          IDS_IOS_PASSWORD_MANAGER_PASSPHRASE_ERROR_INFOBAR_SUBTITLE);
+    case password_manager::ActionableError::kSignInNeeded:
+      return l10n_util::GetNSString(
+          IDS_IOS_PASSWORD_MANAGER_SIGN_IN_ERROR_INFOBAR_SUBTITLE);
+    case password_manager::ActionableError::kTrustedVaultKeyNeeded:
+      return l10n_util::GetNSString(
+          IDS_IOS_PASSWORD_MANAGER_TRUSTED_VAULT_ERROR_INFOBAR_SUBTITLE);
+    case password_manager::ActionableError::kNoError:
+    case password_manager::ActionableError::kInactionable:
+    case password_manager::ActionableError::kInactionableTemporaryError:
+    case password_manager::ActionableError::kKeychainError:
+      NOTREACHED();
+  }
 }
 
 }  // namespace
@@ -266,8 +287,7 @@ NSString* IOSChromeSavePasswordInfoBarDelegate::GetSubtitle() const {
   password_manager::ActionableError error = GetPasswordStoreActionableError(
       profile_store_.get(), account_store_.get());
   if (IsActionableError(error)) {
-    return l10n_util::GetNSString(
-        IDS_IOS_PASSWORD_MANAGER_FIX_PASSWORD_ERROR_INFOBAR_SUBTITLE);
+    return GetSubtitleForActionableError(error);
   }
 
   if (account_to_store_password_.has_value()) {
