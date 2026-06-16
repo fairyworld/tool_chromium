@@ -93,15 +93,6 @@ def label_to_path(label):
     return label[2:] or ""
 
 
-def label_without_toolchain(label):
-    """Strips the toolchain from a GN label.
-
-    Return a GN label (e.g //buildtools:protobuf(//gn/standalone/toolchain:
-    gcc_like_host) without the parenthesised toolchain part.
-    """
-    return label.split('(')[0]
-
-
 def _is_java_source(src):
     return os.path.splitext(src)[1] == '.java' and not src.startswith("//out/")
 
@@ -425,7 +416,8 @@ class GnParser:
         for target in self.all_targets.values():
             target.finalize()
 
-        return self.all_targets[label_without_toolchain(gn_target_name)]
+        return self.all_targets[gn2bp_common.label_without_toolchain(
+            gn_target_name)]
 
     def parse_gn_desc(self,
                       gn_desc,
@@ -440,7 +432,7 @@ class GnParser:
         """
         # Use name without toolchain for targets to support targets built for
         # multiple archs.
-        target_name = label_without_toolchain(gn_target_name)
+        target_name = gn2bp_common.label_without_toolchain(gn_target_name)
         desc = gn_desc[gn_target_name]
         arch, chromium_arch = self._get_arch(desc['toolchain'])
         metadata = desc.get("metadata", {})
@@ -659,7 +651,7 @@ class GnParser:
         target.arch[arch].rust_flags = desc.get("rustflags", list())
         target.arch[arch].rust_flags.extend(
             self.build_script_outputs.get(
-                label_without_toolchain(gn_target_name),
+                gn2bp_common.label_without_toolchain(gn_target_name),
                 {}).get(chromium_arch, list()))
 
         if "-frtti" in target.arch[arch].cflags:
