@@ -13,31 +13,34 @@ class PersonalContextEnablementService;
 
 namespace autofill {
 
-enum class AtMemoryInvocationCustomizationSettingVisibility {
-  kInvisible,
-  kVisibleGreyedOut,
-  kVisibleInteractable,
+// An AtMemory-related action that a user may take (directly or indirectly).
+enum class AtMemoryAction {
+  // Trigger main AtMemory component using the keyboard invocation.
+  kTriggerSearchUI,
+  // Show any AtMemory related settings in the Enhanced Autofill section of
+  // the settings. This evaluates to true regardless of the Personal Context
+  // toggle state.
+  // This does not imply that the settings are functional.
+  // E.g. for the AtMemoryShortcut customization there is a separate
+  // `AtMemoryAction`: `kAllowCustomizeAtMemoryShortcut` to verify if it's
+  // functional.
+  kShowAtMemoryInSettings,
+  // Allow the user to customize the AtMemory shortcut.
+  // This unlocks the ability to reconfigure the shortcut in Enhanced
+  // Autofill section of the Settings.
+  kAllowCustomizeAtMemoryShortcut,
 };
 
-// Returns true if AtMemory is enabled.
+// Returns whether all permission-related requirements are met for `action`.
 //
-// Checks that AtMemory feature flags are enabled, At-Memory eligibility
-// criteria are met and PersonalContext settings toggle is on.
-bool IsAtMemoryEnabled(personal_context::PersonalContextEnablementService*
-                           personal_context_service,
-                       PrefService* pref_service);
-
-// Returns visibility of the AtMemory invocation customization setting in
-// Autofill Settings.
-//
-// Checks the AtMemory feature flags, At-Memory eligibility criteria and the
-// PersonalContext state to determine the
-// `AtMemoryInvocationCustomizationSettingVisibility`.
-AtMemoryInvocationCustomizationSettingVisibility
-GetAtMemoryInvocationCustomizationSettingVisibility(
+// Checks that AtMemory feature flags are enabled, AtMemory eligibility
+// criteria are met and PersonalContext settings toggle is on if required by
+// the action.
+[[nodiscard]] bool MayPerformAtMemoryAction(
+    AtMemoryAction action,
     personal_context::PersonalContextEnablementService*
         personal_context_service,
-    PrefService* pref_service);
+    const PrefService* pref_service);
 
 }  // namespace autofill
 

@@ -15,7 +15,7 @@ namespace autofill {
 
 namespace {
 
-bool IsPersonalContextEligible(
+[[nodiscard]] bool IsPersonalContextEligible(
     personal_context::PersonalContextEnablementService*
         personal_context_service) {
   if (!personal_context_service) {
@@ -34,7 +34,7 @@ bool IsPersonalContextEligible(
   NOTREACHED();
 }
 
-bool IsPersonalContextToggleOn(PrefService* pref_service) {
+[[nodiscard]] bool IsPersonalContextToggleOn(const PrefService* pref_service) {
   if (!pref_service) {
     return false;
   }
@@ -46,9 +46,11 @@ bool IsPersonalContextToggleOn(PrefService* pref_service) {
 //
 // Checks that AtMemory feature flags are enabled, At-Memory eligibility
 // criteria and PersonalContext eligibility criteria are met.
-// Contrary to `IsAtMemoryEnabled`, does not check user-controlled toggles.
-bool IsAtMemorySupported(personal_context::PersonalContextEnablementService*
-                             personal_context_service) {
+// Contrary to `MayPerformAtMemoryAction`, does not check user-controlled
+// toggles.
+[[nodiscard]] bool IsAtMemorySupported(
+    personal_context::PersonalContextEnablementService*
+        personal_context_service) {
   // TODO(crbug.com/522695178) Allow overriding the eligibility checks for
   // testing and dogfooding.
 
@@ -64,29 +66,31 @@ bool IsAtMemorySupported(personal_context::PersonalContextEnablementService*
   return base::FeatureList::IsEnabled(features::kAutofillAtMemory);
 }
 
-}  // namespace
-
-bool IsAtMemoryEnabled(personal_context::PersonalContextEnablementService*
-                           personal_context_service,
-                       PrefService* pref_service) {
-  return IsAtMemorySupported(personal_context_service) &&
-         IsPersonalContextToggleOn(pref_service);
+[[nodiscard]] bool SatisfiesPersonalContextToggleRequirement(
+    AtMemoryAction action,
+    const PrefService* pref_service) {
+  switch (action) {
+    case AtMemoryAction::kTriggerSearchUI:
+    case AtMemoryAction::kAllowCustomizeAtMemoryShortcut:
+      return IsPersonalContextToggleOn(pref_service);
+    case AtMemoryAction::kShowAtMemoryInSettings:
+      return true;
+  }
+  NOTREACHED();
 }
 
-AtMemoryInvocationCustomizationSettingVisibility
-GetAtMemoryInvocationCustomizationSettingVisibility(
+}  // namespace
+
+bool MayPerformAtMemoryAction(
+    AtMemoryAction action,
     personal_context::PersonalContextEnablementService*
         personal_context_service,
-    PrefService* pref_service) {
+    const PrefService* pref_service) {
   if (!IsAtMemorySupported(personal_context_service)) {
-    return AtMemoryInvocationCustomizationSettingVisibility::kInvisible;
+    return false;
   }
 
-  return IsPersonalContextToggleOn(pref_service)
-             ? AtMemoryInvocationCustomizationSettingVisibility::
-                   kVisibleInteractable
-             : AtMemoryInvocationCustomizationSettingVisibility::
-                   kVisibleGreyedOut;
+  return SatisfiesPersonalContextToggleRequirement(action, pref_service);
 }
 
 }  // namespace autofill

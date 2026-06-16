@@ -42,107 +42,112 @@ class AtMemoryEnablementUtilsTest : public testing::Test {
   TestingPrefServiceSimple pref_service_;
 };
 
-// Tests that setting visibility is kInvisible when At-Memory is disabled.
-TEST_F(AtMemoryEnablementUtilsTest,
-       InvocationCustomizationSettingVisibility_AtMemoryDisabled) {
+// Tests that `MayPerformAtMemoryAction` returns false when AtMemory is
+// disabled.
+TEST_F(AtMemoryEnablementUtilsTest, MayPerformAtMemoryAction_AtMemoryDisabled) {
   base::test::ScopedFeatureList disabled_features;
   disabled_features.InitAndDisableFeature(features::kAutofillAtMemory);
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillRepeatedly(
           Return(personal_context::PersonalContextEnablementState::kEnabled));
-  EXPECT_EQ(GetAtMemoryInvocationCustomizationSettingVisibility(
-                &personal_context_service_, &pref_service_),
-            AtMemoryInvocationCustomizationSettingVisibility::kInvisible);
+
+  EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                        &personal_context_service_,
+                                        &pref_service_));
+  EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kShowAtMemoryInSettings,
+                                        &personal_context_service_,
+                                        &pref_service_));
+  EXPECT_FALSE(
+      MayPerformAtMemoryAction(AtMemoryAction::kAllowCustomizeAtMemoryShortcut,
+                               &personal_context_service_, &pref_service_));
 }
 
-// Tests that setting visibility is kInvisible when personal_context_service is
-// null.
+// Tests that `MayPerformAtMemoryAction` returns false when
+// `personal_context_service` is null.
 TEST_F(AtMemoryEnablementUtilsTest,
-       InvocationCustomizationSettingVisibility_NullPersonalContextService) {
-  EXPECT_EQ(GetAtMemoryInvocationCustomizationSettingVisibility(nullptr,
-                                                                &pref_service_),
-            AtMemoryInvocationCustomizationSettingVisibility::kInvisible);
+       MayPerformAtMemoryAction_NullPersonalContextService) {
+  EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                        nullptr, &pref_service_));
+  EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kShowAtMemoryInSettings,
+                                        nullptr, &pref_service_));
+  EXPECT_FALSE(
+      MayPerformAtMemoryAction(AtMemoryAction::kAllowCustomizeAtMemoryShortcut,
+                               nullptr, &pref_service_));
 }
 
-// Tests that setting visibility is kVisibleGreyedOut when pref_service is null.
-TEST_F(AtMemoryEnablementUtilsTest,
-       InvocationCustomizationSettingVisibility_NullPrefService) {
+// Tests `MayPerformAtMemoryAction` when `pref_service` is null.
+TEST_F(AtMemoryEnablementUtilsTest, MayPerformAtMemoryAction_NullPrefService) {
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillRepeatedly(
           Return(personal_context::PersonalContextEnablementState::kEnabled));
-  EXPECT_EQ(
-      GetAtMemoryInvocationCustomizationSettingVisibility(
-          &personal_context_service_, nullptr),
-      AtMemoryInvocationCustomizationSettingVisibility::kVisibleGreyedOut);
+
+  EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                        &personal_context_service_, nullptr));
+  EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kShowAtMemoryInSettings,
+                                       &personal_context_service_, nullptr));
+  EXPECT_FALSE(
+      MayPerformAtMemoryAction(AtMemoryAction::kAllowCustomizeAtMemoryShortcut,
+                               &personal_context_service_, nullptr));
 }
 
-// Tests setting visibility under various PersonalContext states.
-TEST_F(AtMemoryEnablementUtilsTest,
-       InvocationCustomizationSettingVisibility_States) {
+// Tests `MayPerformAtMemoryAction` under various Personal Context states.
+TEST_F(AtMemoryEnablementUtilsTest, MayPerformAtMemoryAction_States) {
   pref_service_.SetUserPref(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
       base::Value(true));
 
-  // State: kEnabled -> kVisibleInteractable
+  // State: kEnabled
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillOnce(
           Return(personal_context::PersonalContextEnablementState::kEnabled));
-  EXPECT_EQ(
-      GetAtMemoryInvocationCustomizationSettingVisibility(
-          &personal_context_service_, &pref_service_),
-      AtMemoryInvocationCustomizationSettingVisibility::kVisibleInteractable);
+  EXPECT_TRUE(
+      MayPerformAtMemoryAction(AtMemoryAction::kAllowCustomizeAtMemoryShortcut,
+                               &personal_context_service_, &pref_service_));
 
-  // State: kEnabledShouldShowNotice -> kVisibleInteractable
+  // State: kEnabledShouldShowNotice
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillOnce(Return(personal_context::PersonalContextEnablementState::
                            kEnabledShouldShowNotice));
   pref_service_.SetUserPref(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
       base::Value(true));
-  EXPECT_EQ(
-      GetAtMemoryInvocationCustomizationSettingVisibility(
-          &personal_context_service_, &pref_service_),
-      AtMemoryInvocationCustomizationSettingVisibility::kVisibleInteractable);
+  EXPECT_TRUE(
+      MayPerformAtMemoryAction(AtMemoryAction::kAllowCustomizeAtMemoryShortcut,
+                               &personal_context_service_, &pref_service_));
 
-  // State: kDisabledViaPersonalIntelligenceInAutofillToggle ->
-  // kVisibleGreyedOut
+  // State: kDisabledViaPersonalIntelligenceInAutofillToggle
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillOnce(Return(personal_context::PersonalContextEnablementState::
                            kDisabledViaPersonalIntelligenceInAutofillToggle));
   pref_service_.SetUserPref(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
       base::Value(false));
-  EXPECT_EQ(
-      GetAtMemoryInvocationCustomizationSettingVisibility(
-          &personal_context_service_, &pref_service_),
-      AtMemoryInvocationCustomizationSettingVisibility::kVisibleGreyedOut);
+  EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kShowAtMemoryInSettings,
+                                       &personal_context_service_,
+                                       &pref_service_));
 
-  // State: kDisabledNeedsOptIn -> kVisibleGreyedOut
-  // Note: the settings visibility is greyed out because the client supports the
-  // feature, even though opt-in is needed.
+  // State: kDisabledNeedsOptIn
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillOnce(Return(personal_context::PersonalContextEnablementState::
                            kDisabledNeedsOptIn));
   pref_service_.SetUserPref(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
       base::Value(false));
-  EXPECT_EQ(
-      GetAtMemoryInvocationCustomizationSettingVisibility(
-          &personal_context_service_, &pref_service_),
-      AtMemoryInvocationCustomizationSettingVisibility::kVisibleGreyedOut);
+  EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kShowAtMemoryInSettings,
+                                       &personal_context_service_,
+                                       &pref_service_));
 
-  // State: kDisabledNotEligible -> kInvisible
+  // State: kDisabledNotEligible
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillOnce(Return(personal_context::PersonalContextEnablementState::
                            kDisabledNotEligible));
-  EXPECT_EQ(GetAtMemoryInvocationCustomizationSettingVisibility(
-                &personal_context_service_, &pref_service_),
-            AtMemoryInvocationCustomizationSettingVisibility::kInvisible);
+  EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                        &personal_context_service_,
+                                        &pref_service_));
 }
 
-// Tests setting visibility when the toggle pref is off.
-TEST_F(AtMemoryEnablementUtilsTest,
-       InvocationCustomizationSettingVisibility_ToggleOff) {
+// Tests `MayPerformAtMemoryAction` when the toggle pref is off.
+TEST_F(AtMemoryEnablementUtilsTest, MayPerformAtMemoryAction_ToggleOff) {
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillRepeatedly(
           Return(personal_context::PersonalContextEnablementState::kEnabled));
@@ -150,57 +155,41 @@ TEST_F(AtMemoryEnablementUtilsTest,
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
       base::Value(false));
 
-  EXPECT_EQ(
-      GetAtMemoryInvocationCustomizationSettingVisibility(
-          &personal_context_service_, &pref_service_),
-      AtMemoryInvocationCustomizationSettingVisibility::kVisibleGreyedOut);
+  EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                        &personal_context_service_,
+                                        &pref_service_));
+  EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kShowAtMemoryInSettings,
+                                       &personal_context_service_,
+                                       &pref_service_));
+  EXPECT_FALSE(
+      MayPerformAtMemoryAction(AtMemoryAction::kAllowCustomizeAtMemoryShortcut,
+                               &personal_context_service_, &pref_service_));
 }
 
-// Tests that IsAtMemoryEnabled is false when personal_context_service is not
-// eligible.
-TEST_F(AtMemoryEnablementUtilsTest, IsAtMemoryEnabled_NotSupported) {
+// Tests that `MayPerformAtMemoryAction returns false when
+// `personal_context_service` returns `kDisabledNotEligible`.
+TEST_F(AtMemoryEnablementUtilsTest, MayPerformAtMemoryAction_NotSupported) {
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillRepeatedly(Return(personal_context::PersonalContextEnablementState::
                                  kDisabledNotEligible));
-  EXPECT_FALSE(IsAtMemoryEnabled(&personal_context_service_, &pref_service_));
+  EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                        &personal_context_service_,
+                                        &pref_service_));
 }
 
-// Tests that IsAtMemoryEnabled is false when personal_context_service is null.
+// Tests that `MayPerformAtMemoryAction` returns true when the client supports
+// AtMemory and the settings toggle is enabled.
 TEST_F(AtMemoryEnablementUtilsTest,
-       IsAtMemoryEnabled_NullPersonalContextService) {
-  EXPECT_FALSE(IsAtMemoryEnabled(nullptr, &pref_service_));
-}
-
-// Tests that IsAtMemoryEnabled is false when pref_service is null.
-TEST_F(AtMemoryEnablementUtilsTest, IsAtMemoryEnabled_NullPrefService) {
-  EXPECT_CALL(personal_context_service_, GetEnablementState)
-      .WillRepeatedly(
-          Return(personal_context::PersonalContextEnablementState::kEnabled));
-  EXPECT_FALSE(IsAtMemoryEnabled(&personal_context_service_, nullptr));
-}
-
-// Tests that IsAtMemoryEnabled is false when the client supports At-Memory but
-// the settings toggle is disabled.
-TEST_F(AtMemoryEnablementUtilsTest, IsAtMemoryEnabled_SupportedButToggleOff) {
-  EXPECT_CALL(personal_context_service_, GetEnablementState)
-      .WillRepeatedly(
-          Return(personal_context::PersonalContextEnablementState::kEnabled));
-  pref_service_.SetUserPref(
-      personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
-      base::Value(false));
-  EXPECT_FALSE(IsAtMemoryEnabled(&personal_context_service_, &pref_service_));
-}
-
-// Tests that IsAtMemoryEnabled is true when the client supports At-Memory and
-// the settings toggle is enabled.
-TEST_F(AtMemoryEnablementUtilsTest, IsAtMemoryEnabled_SupportedAndToggleOn) {
+       MayPerformAtMemoryAction_SupportedAndToggleOn) {
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillRepeatedly(
           Return(personal_context::PersonalContextEnablementState::kEnabled));
   pref_service_.SetUserPref(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
       base::Value(true));
-  EXPECT_TRUE(IsAtMemoryEnabled(&personal_context_service_, &pref_service_));
+  EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                       &personal_context_service_,
+                                       &pref_service_));
 }
 
 }  // namespace
