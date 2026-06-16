@@ -231,8 +231,7 @@ GlicInstanceImpl* GlicInstanceCoordinatorImpl::GetInstanceImplForTab(
   return nullptr;
 }
 
-std::vector<GlicInstanceImpl*>
-GlicInstanceCoordinatorImpl::GetInstancesForTesting() {
+std::vector<GlicInstanceImpl*> GlicInstanceCoordinatorImpl::GetInstances() {
   std::vector<GlicInstanceImpl*> instances;
   for (auto& entry : instances_) {
     instances.push_back(entry.second.get());
@@ -756,6 +755,16 @@ GlicInstanceImpl* GlicInstanceCoordinatorImpl::CreateGlicInstance(
   instance->instance_metrics().OnInstanceCreatedWithoutWarming();
   auto* instance_ptr = instance.get();
   instances_[instance->id()] = std::move(instance);
+
+  if (auto* task_manager = instance_ptr->GetActorTaskManager()) {
+    actuating_changed_subscriptions_[instance_ptr->id()] =
+        task_manager->AddActuatingChangedCallback(base::BindRepeating(
+            &GlicInstanceCoordinatorImpl::OnInstanceActuatingChanged,
+            base::Unretained(this)));
+  }
+
+  metrics_.RecordCountOnCreation();
+
   return instance_ptr;
 }
 
@@ -859,6 +868,7 @@ void GlicInstanceCoordinatorImpl::RemoveInstance(InstanceId id) {
   }
   GlicInstanceImpl* instance = it->second.get();
   OnInstanceActivationChanged(instance, false);
+  actuating_changed_subscriptions_.erase(id);
 
   // Remove the instance first, and then delete. This way,
   // instances_ will not include the instance being deleted while
@@ -1020,7 +1030,15 @@ void GlicInstanceCoordinatorImpl::ContextAccessIndicatorChanged(
 
 std::unique_ptr<WebUIContentsContainer>
 GlicInstanceCoordinatorImpl::CreateWebUIContentsContainer() {
+  metrics_.RecordCountAwakeOnContentsCreated();
   return web_contents_warming_pool_->TakeContainer();
+}
+
+void GlicInstanceCoordinatorImpl::OnInstanceActuatingChanged(bool actuating) {
+  if (!actuating) {
+    return;
+  }
+  metrics_.RecordCountActuatingOnTaskCreation();
 }
 
 void GlicInstanceCoordinatorImpl::SetWarmingEnabledForTesting(

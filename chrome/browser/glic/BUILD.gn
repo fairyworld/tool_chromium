@@ -248,8 +248,6 @@ source_set("glic_metrics") {
   sources = [
     "service/glic_state_tracker.cc",
     "service/glic_state_tracker.h",
-    "service/metrics/glic_instance_coordinator_metrics.cc",
-    "service/metrics/glic_instance_coordinator_metrics.h",
     "service/metrics/glic_instance_helper_metrics.cc",
     "service/metrics/glic_instance_helper_metrics.h",
     "service/metrics/glic_instance_metrics.cc",
@@ -373,6 +371,8 @@ source_set("impl") {
     "service/glic_invoke_task.h",
     "service/glic_ui_embedder.h",
     "service/glic_ui_types.cc",
+    "service/metrics/glic_instance_coordinator_metrics.cc",
+    "service/metrics/glic_instance_coordinator_metrics.h",
     "suggestions/caching_zero_state_suggestions_manager.cc",
     "suggestions/caching_zero_state_suggestions_manager.h",
     "widget/browser_conditions.cc",

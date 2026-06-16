@@ -1698,6 +1698,37 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Glic.Instances.Count.OnCreation" units="instances"
+    expires_after="2027-06-01">
+  <owner>bryantchandler@google.com</owner>
+  <owner>glic-dev@chromium.org</owner>
+  <summary>
+    The total number of Glic instances. Recorded every time a new GlicInstance
+    is created.
+  </summary>
+</histogram>
+
+<histogram name="Glic.Instances.CountActuating.OnTaskCreation"
+    units="instances" expires_after="2027-06-01">
+  <owner>bryantchandler@google.com</owner>
+  <owner>glic-dev@chromium.org</owner>
+  <summary>
+    The number of actuating Glic instances. Recorded every time an actor task is
+    created.
+  </summary>
+</histogram>
+
+<histogram name="Glic.Instances.CountAwake.OnContentsCreated" units="instances"
+    expires_after="2027-06-01">
+  <owner>bryantchandler@google.com</owner>
+  <owner>glic-dev@chromium.org</owner>
+  <summary>
+    The number of awake Glic instances (with WebUI contents loaded). Recorded
+    every time a GlicInstance has its WebUI contents created (either on initial
+    creation or when waking up from hibernation).
+  </summary>
+</histogram>
+
 <histogram name="Glic.Interaction.SwitchConversationTarget"
     enum="GlicSwitchConversationTarget" expires_after="2026-12-06">
   <owner>birnie@google.com</owner>
