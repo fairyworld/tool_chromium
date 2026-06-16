@@ -456,12 +456,16 @@ android_library("chrome_test_java_helper") {
 android_library("chrome_test_java_org.chromium.chrome.browser.actor") {
   resources_package = "org.chromium.chrome"
 
-  sources = [ "src/org/chromium/chrome/browser/actor/ActorOverlayPTTest.java" ]
+  sources = [
+    "src/org/chromium/chrome/browser/actor/ActorOverlayDesktopPTTest.java",
+    "src/org/chromium/chrome/browser/actor/ActorOverlayPTTest.java",
+  ]
 
   deps = [
     ":chrome_test_java_helper",
     "//chrome/browser/actor/android:java",
     "//chrome/browser/glic:public_java",
+    "//chrome/browser/glic/android:java",
     "//chrome/browser/glic/android:test_support_java",
     "//chrome/test/android:chrome_java_transit",
   ]

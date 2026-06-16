@@ -2348,6 +2348,10 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                 : null;
     }
 
+    public @Nullable GlicUiCoordinator getGlicUiCoordinatorForTesting() {
+        return mGlicUiCoordinator;
+    }
+
     public @Nullable TabBottomSheetManager getTabBottomSheetManagerForTesting() {
         return mTabBottomSheetManager;
     }
