@@ -29,7 +29,6 @@
 #include "chrome/browser/glic/public/glic_passkeys.h"
 #include "chrome/browser/glic/service/glic_instance_coordinator_impl.h"
 #include "chrome/browser/glic/suggestions/contextual_cueing_features.h"
-#include "chrome/browser/permissions/system/system_permission_settings.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/tab_list/tab_list_interface.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -474,12 +473,8 @@ void GlicInternalsPageHandler::GetInternalsDataPayload(
 
   boolean_settings["Microphone Permission Enabled"] =
       pref_service->GetBoolean(prefs::kGlicMicrophoneEnabled);
-  boolean_settings["Location Permission Enabled"] =
-      pref_service->GetBoolean(prefs::kGlicGeolocationEnabled);
   boolean_settings["Tab Context Permission Enabled"] =
       pref_service->GetBoolean(prefs::kGlicTabContextEnabled);
-  boolean_settings["OS Location Permission Enabled"] =
-      system_permission_settings::IsAllowed(ContentSettingsType::GEOLOCATION);
 
   boolean_settings["Zero State Suggestions Enabled"] =
       IsZeroStateSuggestionsEnabled();
