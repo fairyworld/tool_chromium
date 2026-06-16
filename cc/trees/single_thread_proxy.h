@@ -59,7 +59,7 @@ class CC_EXPORT SingleThreadProxy : public Proxy,
   void SetShouldWarmUp() override;
   void SetNeedsAnimate(BeginMainFrameReason, bool urgent) override;
   void SetNeedsUpdateLayers() override;
-  void SetNeedsCommit() override;
+  void SetNeedsCommit(bool urgent) override;
   void SetNeedsRedraw(const gfx::Rect& damage_rect) override;
   void SetTargetLocalSurfaceId(
       const viz::LocalSurfaceId& target_local_surface_id) override;
