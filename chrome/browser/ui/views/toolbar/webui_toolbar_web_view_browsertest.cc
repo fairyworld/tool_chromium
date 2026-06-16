@@ -2533,7 +2533,7 @@ class WebUIToolbarWebViewSplitTabsBrowserTest : public InProcessBrowserTest {
         {features::kInitialWebUI, features::kWebUISplitTabsButton,
          features::kSkipIPCChannelPausingForNonGuests,
          features::kWebUIInProcessResourceLoadingV2,
-         features::kInitialWebUISyncNavStartToCommit},
+         features::kInitialWebUISyncNavStartToCommit, features::kRoundedIcons},
         {});
   }
 
