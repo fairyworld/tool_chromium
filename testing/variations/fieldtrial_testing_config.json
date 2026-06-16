@@ -23927,22 +23927,6 @@
             ]
         }
     ],
-    "ThrottleSendingCustomUserTimings": [
-        {
-            "platforms": [
-                "android",
-                "android_webview"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "ThrottleSendingCustomUserTimings"
-                    ]
-                }
-            ]
-        }
-    ],
     "TokenHandleRefactoring": [
         {
             "platforms": [
