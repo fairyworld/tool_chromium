@@ -482,6 +482,21 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
       GetUserDataFactory().CreateInstance<BookmarksSidePanelCoordinator>(
           *browser, *browser);
 
+  if (HistorySidePanelCoordinator::IsSupported()) {
+    GetUserDataFactory().CreateInstance<HistorySidePanelCoordinator>(*browser,
+                                                                     browser);
+  }
+
+  history_clusters_side_panel_coordinator_ =
+      std::make_unique<HistoryClustersSidePanelCoordinator>(
+          browser, browser->GetProfile());
+
+  if (CommentsSidePanelCoordinator::IsSupported()) {
+    comments_side_panel_coordinator_ =
+        GetUserDataFactory().CreateInstance<CommentsSidePanelCoordinator>(
+            *browser, browser);
+  }
+
   if (base::FeatureList::IsEnabled(contextual_tasks::kContextualTasks)) {
     contextual_tasks_active_task_context_provider_ =
         std::make_unique<contextual_tasks::ActiveTaskContextProviderImpl>(
@@ -898,21 +913,6 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
 void BrowserWindowFeatures::InitPostBrowserViewConstruction(
     BrowserView* browser_view) {
   scrim_view_controller_ = std::make_unique<ScrimViewController>(browser_view);
-
-  if (HistorySidePanelCoordinator::IsSupported()) {
-    GetUserDataFactory().CreateInstance<HistorySidePanelCoordinator>(
-        *browser_view->browser(), browser_view->browser());
-  }
-
-  history_clusters_side_panel_coordinator_ =
-      std::make_unique<HistoryClustersSidePanelCoordinator>(
-          browser_, browser_->GetProfile());
-
-  if (CommentsSidePanelCoordinator::IsSupported()) {
-    comments_side_panel_coordinator_ =
-        GetUserDataFactory().CreateInstance<CommentsSidePanelCoordinator>(
-            *browser_view->browser(), browser_view->browser());
-  }
 
   extension_side_panel_manager_ =
       std::make_unique<extensions::ExtensionSidePanelManager>(
