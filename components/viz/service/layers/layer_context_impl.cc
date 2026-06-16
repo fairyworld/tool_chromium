@@ -955,6 +955,12 @@ void UpdateTileDisplayLayerExtra(const mojom::TileDisplayLayerExtraPtr& extra,
   layer.SetIsBackdropFilterMask(extra->is_backdrop_filter_mask);
   layer.SetIsDirectlyCompositedImage(extra->is_directly_composited_image);
   layer.SetNearestNeighbor(extra->nearest_neighbor);
+  if (extra->has_animated_image_update_rect) {
+    layer.set_has_animated_image_update_rect();
+  }
+  if (extra->has_non_animated_image_update_rect) {
+    layer.set_has_non_animated_image_update_rect();
+  }
   layer.SetContentColorUsage(extra->content_color_usage);
   layer.SetRecordedBounds(extra->recorded_bounds);
   layer.SetProposedTilingScalesForDeletion(
