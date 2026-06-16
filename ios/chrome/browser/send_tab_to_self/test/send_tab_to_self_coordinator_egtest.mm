@@ -33,6 +33,7 @@ namespace {
 NSString* const kTargetDeviceName = @"My other device";
 NSString* const kSendTabToSelfModalCancelButtonId =
     @"kSendTabToSelfModalCancelButton";
+NSString* const kExampleURL = @"https://www.example.com/";
 
 // Helpers for web element selectors.
 ElementSelector* TargetElement() {
@@ -46,6 +47,10 @@ ElementSelector* UsernameElement() {
 }  // namespace
 
 @interface SendTabToSelfCoordinatorTestCase : ChromeTestCase
+@end
+
+@interface SendTabToSelfCoordinatorAutoOpenTestCase
+    : SendTabToSelfCoordinatorTestCase
 @end
 
 @implementation SendTabToSelfCoordinatorTestCase
@@ -629,6 +634,78 @@ ElementSelector* UsernameElement() {
       performAction:grey_tap()];
   [ChromeEarlGrey waitForUIElementToDisappearWithMatcher:
                       grey_accessibilityID(kSendTabToSelfModalCancelButtonId)];
+}
+
+@end
+
+@implementation SendTabToSelfCoordinatorAutoOpenTestCase
+
+- (AppLaunchConfiguration)appConfigurationForTestCase {
+  AppLaunchConfiguration config = [super appConfigurationForTestCase];
+  config.features_enabled.push_back(send_tab_to_self::kSendTabToSelfAutoOpen);
+  return config;
+}
+
+// Tests that when kSendTabToSelfAutoOpen is enabled, receiving a shared tab
+// while active in the foreground automatically opens it as a background tab
+// and presents a snackbar banner.
+- (void)testSendTabToSelfAutoOpenWhenReceivedInForeground {
+  [SigninEarlGrey signinWithFakeIdentity:[FakeSystemIdentity fakeIdentity1]];
+  [ChromeEarlGrey addFakeSyncServerDeviceInfo:kTargetDeviceName
+                         lastUpdatedTimestamp:base::Time::Now()];
+
+  // Load a starting page so there is an active, visible WebState.
+  [ChromeEarlGrey loadURL:GURL("about:blank")];
+
+  NSUInteger initialTabCount = [ChromeEarlGrey mainTabCount];
+
+  [ChromeEarlGrey addFakeSyncServerSendTabToSelfEntryWithURL:kExampleURL
+                                                       title:@"AutoOpen Page"
+                                                  deviceName:@"remote_device"
+                                            targetDeviceGUID:@""];
+
+  [ChromeEarlGrey triggerSyncCycleForType:syncer::SEND_TAB_TO_SELF];
+
+  // Verify that a background tab was opened automatically (tab count increased
+  // by 1).
+  [ChromeEarlGrey waitForMainTabCount:initialTabCount + 1];
+}
+
+// Tests that when kSendTabToSelfAutoOpen is enabled and a shared tab is
+// received while the active WebState is hidden (e.g. in the Tab Grid), it is
+// not opened immediately but is automatically opened as a background tab when
+// an active WebState is brought back to the foreground.
+- (void)testSendTabToSelfAutoOpenWhenBroughtToForeground {
+  [SigninEarlGrey signinWithFakeIdentity:[FakeSystemIdentity fakeIdentity1]];
+  [ChromeEarlGrey addFakeSyncServerDeviceInfo:kTargetDeviceName
+                         lastUpdatedTimestamp:base::Time::Now()];
+
+  // Load a starting page.
+  [ChromeEarlGrey loadURL:GURL("about:blank")];
+
+  NSUInteger initialTabCount = [ChromeEarlGrey mainTabCount];
+
+  // Open the Tab Grid so the active WebState is no longer visible.
+  [ChromeEarlGreyUI openTabGrid];
+
+  [ChromeEarlGrey addFakeSyncServerSendTabToSelfEntryWithURL:kExampleURL
+                                                       title:@"AutoOpen Page"
+                                                  deviceName:@"remote_device"
+                                            targetDeviceGUID:@""];
+
+  [ChromeEarlGrey triggerSyncCycleForType:syncer::SEND_TAB_TO_SELF];
+
+  // While in the Tab Grid, the tab should not be opened automatically yet.
+  GREYAssertEqual(initialTabCount, [ChromeEarlGrey mainTabCount],
+                  @"Tab count should not change while in Tab Grid.");
+
+  // Leave the Tab Grid to bring the active WebState back to the foreground.
+  [[EarlGrey selectElementWithMatcher:chrome_test_util::TabGridDoneButton()]
+      performAction:grey_tap()];
+
+  // Verify that the pending entry was now opened automatically in the
+  // background.
+  [ChromeEarlGrey waitForMainTabCount:initialTabCount + 1];
 }
 
 @end
