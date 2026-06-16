@@ -9449,6 +9449,12 @@ Keep your key file in a safe place. You will need it to create new versions of y
       <message name="IDS_BOOKMARKS_COMPACT_VIEW" desc="Label for the compact view bookmarks menu option">
         Compact view
       </message>
+      <message name="IDS_BOOKMARKS_SWITCH_TO_COMPACT_VIEW" desc="Screen reader label for the button that switches the bookmarks side panel to compact view.">
+        Switch to compact view
+      </message>
+      <message name="IDS_BOOKMARKS_SWITCH_TO_VISUAL_VIEW" desc="Screen reader label for the button that switches the bookmarks side panel to visual view.">
+        Switch to visual view
+      </message>
       <message name="IDS_BOOKMARKS_SORT_MENU_A11Y_LABEL" is_accessibility_with_no_ui="true" desc="Screen reader label for the button which opens the sort menu in the bookmarks side panel.">
         Sorting and list options
       </message>
