@@ -25,6 +25,8 @@
 #include "components/optimization_guide/core/model_execution/model_execution_prefs.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
+#include "components/subscription_eligibility/subscription_eligibility_prefs.h"
+#include "components/subscription_eligibility/subscription_eligibility_service.h"
 #include "components/sync/test/test_sync_service.h"
 #include "google_apis/gaia/google_service_auth_error.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -110,12 +112,18 @@ class AutofillAiPermissionUtilsTest : public ::testing::Test {
         {{features::kAutofillAiWithDataSchema, {}},
          {features::kAutofillAiWalletVehicleRegistration, {}},
          {features::kAutofillAiWalletFlightReservation, {}},
-         {features::kAutofillAmbientAutofill, {}},
+         {features::kAutofillAmbientAutofill,
+          {{"ambient_autofill_eligible_tiers", "1"}}},
          {features::kAutofillAiServerModel,
           {{"autofill_ai_model_use_cache_results", "true"}}}},
         {});
 
     // Pref and identity state.
+    subscription_eligibility::prefs::RegisterProfilePrefs(
+        client().GetPrefs()->registry());
+    client().GetPrefs()->SetInteger(
+        subscription_eligibility::prefs::kAiSubscriptionTier, 1);
+
     client().set_entity_data_manager(std::make_unique<EntityDataManager>(
         client().GetPrefs(), client().GetIdentityManager(),
         client().GetSyncService(), webdata_helper_.autofill_webdata_service(),
@@ -571,6 +579,45 @@ TEST_F(AutofillAiPermissionUtilsTest, kAmbientAutofillFilling) {
       personal_context::PersonalContextEnablementState::kDisabledNotEligible);
   EXPECT_FALSE(MayPerformAutofillAiAction(
       client(), AutofillAiAction::kAmbientAutofillFilling));
+}
+
+TEST_F(AutofillAiPermissionUtilsTest, kAmbientAutofillFilling_G1Tiers) {
+  client().set_personal_context_enablement_state(
+      personal_context::PersonalContextEnablementState::kEnabled);
+
+  // Scenario 1: Tiers 1 and 2 are eligible.
+  {
+    base::test::ScopedFeatureList feature_list;
+    feature_list.InitAndEnableFeatureWithParameters(
+        features::kAutofillAmbientAutofill,
+        {{"ambient_autofill_eligible_tiers", "1,2"}});
+
+    client().GetPrefs()->SetInteger(
+        subscription_eligibility::prefs::kAiSubscriptionTier, 1);
+    EXPECT_TRUE(MayPerformAutofillAiAction(
+        client(), AutofillAiAction::kAmbientAutofillFilling));
+
+    client().GetPrefs()->SetInteger(
+        subscription_eligibility::prefs::kAiSubscriptionTier, 2);
+    EXPECT_TRUE(MayPerformAutofillAiAction(
+        client(), AutofillAiAction::kAmbientAutofillFilling));
+
+    client().GetPrefs()->SetInteger(
+        subscription_eligibility::prefs::kAiSubscriptionTier, 3);
+    EXPECT_FALSE(MayPerformAutofillAiAction(
+        client(), AutofillAiAction::kAmbientAutofillFilling));
+  }
+
+  // Scenario 2: Feature disabled.
+  {
+    base::test::ScopedFeatureList feature_list;
+    feature_list.InitAndDisableFeature(features::kAutofillAmbientAutofill);
+
+    client().GetPrefs()->SetInteger(
+        subscription_eligibility::prefs::kAiSubscriptionTier, 1);
+    EXPECT_FALSE(MayPerformAutofillAiAction(
+        client(), AutofillAiAction::kAmbientAutofillFilling));
+  }
 }
 
 INSTANTIATE_TEST_SUITE_P(

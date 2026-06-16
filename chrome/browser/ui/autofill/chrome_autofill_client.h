@@ -134,6 +134,8 @@ class ChromeAutofillClient : public ContentAutofillClient {
   const std::string& GetAppLocale() const final;
   version_info::Channel GetChannel() const final;
   bool IsOffTheRecord() const final;
+  const subscription_eligibility::SubscriptionEligibilityService*
+  GetSubscriptionEligibilityService() const final;
   scoped_refptr<network::SharedURLLoaderFactory> GetURLLoaderFactory() final;
   AutofillCrowdsourcingManager& GetCrowdsourcingManager() final;
   VotesUploader& GetVotesUploader() final;

@@ -82,6 +82,7 @@
 #include "components/prefs/pref_service.h"
 #include "components/signin/public/identity_manager/account_capabilities_test_mutator.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"
+#include "components/subscription_eligibility/subscription_eligibility_service.h"
 #include "components/translate/core/browser/language_state.h"
 #include "components/translate/core/browser/mock_translate_driver.h"
 #include "components/ukm/test_ukm_recorder.h"
@@ -196,6 +197,11 @@ class TestAutofillClientTemplate : public T {
   void set_personal_context_access_manager(
       PersonalContextAccessManager* personal_context_access_manager) {
     personal_context_access_manager_ = personal_context_access_manager;
+  }
+
+  const subscription_eligibility::SubscriptionEligibilityService*
+  GetSubscriptionEligibilityService() const override {
+    return &subscription_eligibility_service_;
   }
 
   consent_auditor::ConsentAuditor* GetConsentAuditor() override {
@@ -781,6 +787,8 @@ class TestAutofillClientTemplate : public T {
 
   std::unique_ptr<test::AutofillTestingPrefService> prefs_ =
       test::PrefServiceForTesting();
+  subscription_eligibility::SubscriptionEligibilityService
+      subscription_eligibility_service_{GetPrefs()};
   std::unique_ptr<TestStrikeDatabase> test_strike_database_;
 
   std::unique_ptr<TestPersonalDataManager> test_personal_data_manager_;

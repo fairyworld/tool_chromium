@@ -372,6 +372,11 @@ BASE_FEATURE(kAutofillAllowFillingModifiedInitialValues,
 
 // When enabled, the ambient autofill experience is enabled in Chrome.
 BASE_FEATURE(kAutofillAmbientAutofill, base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE_PARAM(std::string,
+                   kAutofillAmbientAutofillEligibleTiers,
+                   &kAutofillAmbientAutofill,
+                   "ambient_autofill_eligible_tiers",
+                   "");
 
 // If enabled, on Android desktop, the Autofill keyboard accessory will have a
 // new behavior and design.

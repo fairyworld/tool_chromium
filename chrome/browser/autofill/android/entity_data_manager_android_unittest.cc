@@ -63,6 +63,7 @@ class EntityDataManagerAndroidTest : public testing::Test {
         identity_test_env_.identity_manager(), &sync_service_,
         /*account_setting_service=*/nullptr, &consent_auditor_,
         /*personal_context_enablement_service=*/nullptr,
+        /*subscription_eligibility_service=*/nullptr,
         /*is_off_the_record=*/false, &mock_wallet_pass_access_manager_,
         entity_data_manager_.get());
   }

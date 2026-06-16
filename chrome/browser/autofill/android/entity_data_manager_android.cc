@@ -27,6 +27,7 @@
 #include "chrome/browser/personal_context/personal_context_enablement_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
+#include "chrome/browser/subscription_eligibility/subscription_eligibility_service_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "components/account_settings/account_setting_service.h"
 #include "components/autofill/core/browser/autofill_field.h"
@@ -67,6 +68,8 @@ EntityDataManagerAndroid::EntityDataManagerAndroid(
     consent_auditor::ConsentAuditor* consent_auditor,
     personal_context::PersonalContextEnablementService*
         personal_context_enablement_service,
+    subscription_eligibility::SubscriptionEligibilityService*
+        subscription_eligibility_service,
     bool is_off_the_record,
     WalletPassAccessManager* wallet_pass_access_manager,
     EntityDataManager* entity_data_manager)
@@ -78,6 +81,7 @@ EntityDataManagerAndroid::EntityDataManagerAndroid(
       account_setting_service_(account_setting_service),
       consent_auditor_(consent_auditor),
       personal_context_enablement_service_(personal_context_enablement_service),
+      subscription_eligibility_service_(subscription_eligibility_service),
       is_off_the_record_(is_off_the_record),
       wallet_pass_access_manager_(wallet_pass_access_manager),
       entity_data_manager_(CHECK_DEREF(entity_data_manager)) {
@@ -137,6 +141,8 @@ static int64_t JNI_EntityDataManager_Init(JNIEnv* env,
           AccountSettingServiceFactory::GetForBrowserContext(profile),
           ConsentAuditorFactory::GetForProfile(profile),
           PersonalContextEnablementServiceFactory::GetForProfile(profile),
+          subscription_eligibility::SubscriptionEligibilityServiceFactory::
+              GetForProfile(profile),
           profile->IsOffTheRecord(),
           WalletPassAccessManagerFactory::GetForProfile(profile),
           entity_data_manager);
@@ -182,7 +188,8 @@ bool EntityDataManagerAndroid::SetAutofillAiOptInStatus(
       google_groups_manager_, prefs_, &entity_data_manager(), identity_manager_,
       sync_service_, is_wallet_public_pass_storage_enabled, is_off_the_record_,
       entity_data_manager_->GetVariationCountryCode(),
-      personal_context_enablement_state, opt_in_status);
+      subscription_eligibility_service_, personal_context_enablement_state,
+      opt_in_status);
 }
 
 std::optional<EntityInstanceAndroid>
@@ -441,7 +448,8 @@ bool EntityDataManagerAndroid::RunMayPerformAutofillAiAction(
       google_groups_manager_, prefs_, &entity_data_manager(), identity_manager_,
       sync_service_, IsWalletPublicPassStorageEnabledHelper(),
       is_off_the_record_, entity_data_manager_->GetVariationCountryCode(),
-      personal_context_enablement_state, action, entity_type);
+      subscription_eligibility_service_, personal_context_enablement_state,
+      action, entity_type);
 }
 
 // Returns true if the `entity_type` supports wallet storage.

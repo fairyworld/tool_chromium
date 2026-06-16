@@ -17,6 +17,7 @@
 #include "base/functional/function_ref.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/notreached.h"
+#include "base/strings/string_number_conversions.h"
 #include "base/strings/string_split.h"
 #include "base/values.h"
 #include "build/buildflag.h"
@@ -38,6 +39,7 @@
 #include "components/signin/public/base/gaia_id_hash.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/signin/public/identity_manager/tribool.h"
+#include "components/subscription_eligibility/subscription_eligibility_service.h"
 #include "components/sync/base/account_pref_utils.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/user_selectable_type.h"
@@ -76,6 +78,22 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
         kDisabledViaPersonalIntelligenceInAutofillToggle:
       return false;
   }
+}
+
+base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
+  const std::string tier_list =
+      features::kAutofillAmbientAutofillEligibleTiers.Get();
+  const std::vector<std::string_view> tier_pieces = base::SplitStringPiece(
+      tier_list, ",", base::TRIM_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
+  base::flat_set<int32_t> eligible_tiers;
+  eligible_tiers.reserve(tier_pieces.size());
+  for (std::string_view piece : tier_pieces) {
+    int32_t tier_id = 0;
+    if (base::StringToInt(piece, &tier_id)) {
+      eligible_tiers.insert(tier_id);
+    }
+  }
+  return eligible_tiers;
 }
 
 // Checks whether `country_code` belongs to a country where Wallet is
@@ -434,6 +452,8 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
 // met.
 [[nodiscard]] bool SatisfiesAccountRequirements(
     const IdentityManager* identity_manager,
+    const subscription_eligibility::SubscriptionEligibilityService*
+        subscription_service,
     bool has_entity_data_saved,
     AutofillAiAction action,
     std::optional<EntityType> entity_type,
@@ -493,6 +513,21 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
       }
       break;
     }
+    case AutofillAiAction::kAmbientAutofillFilling: {
+      if (!subscription_service) {
+        MaybeOutputReason(debug_message,
+                          "Subscription eligibility service not available.");
+        return false;
+      }
+
+      const int32_t tier = subscription_service->GetAiSubscriptionTier();
+      if (!GetAutofillAmbientAutofillEligibleTiers().contains(tier)) {
+        MaybeOutputReason(debug_message,
+                          "User subscription tier is not eligible.");
+        return false;
+      }
+      break;
+    }
     case AutofillAiAction::kAddLocalEntityInstanceInSettings:
     case AutofillAiAction::kCrowdsourcingVote:
     case AutofillAiAction::kEditAndDeleteEntityInstanceInSettings:
@@ -506,7 +541,6 @@ void MaybeOutputReason(std::string* out, std::string_view message) {
     case AutofillAiAction::kServerClassificationModel:
     case AutofillAiAction::kUseCachedServerClassificationModelResults:
     case AutofillAiAction::kWalletDataSharingPromotion:
-    case AutofillAiAction::kAmbientAutofillFilling:
     case AutofillAiAction::kTypeSupportsPersonalContextData:
       break;
   }
@@ -666,6 +700,7 @@ bool MayPerformAutofillAiAction(const AutofillClient& client,
       client.GetIdentityManager(), client.GetSyncService(),
       client.IsWalletPublicPassStorageEnabled(), client.IsOffTheRecord(),
       client.GetVariationConfigCountryCode(),
+      client.GetSubscriptionEligibilityService(),
       client.GetPersonalContextEnablementState(), action, entity_type,
       debug_message);
 }
@@ -681,6 +716,8 @@ bool MayPerformAutofillAiAction(
     bool is_wallet_public_pass_storage_enabled,
     bool is_off_the_record,
     const GeoIpCountryCode& country_code,
+    const subscription_eligibility::SubscriptionEligibilityService*
+        subscription_service,
     personal_context::PersonalContextEnablementState
         personal_context_enablement_state,
     AutofillAiAction action,
@@ -707,8 +744,9 @@ bool MayPerformAutofillAiAction(
     return false;
   }
 
-  if (!SatisfiesAccountRequirements(identity_manager, has_entity_data_saved,
-                                    action, entity_type, debug_message)) {
+  if (!SatisfiesAccountRequirements(identity_manager, subscription_service,
+                                    has_entity_data_saved, action, entity_type,
+                                    debug_message)) {
     return false;
   }
 
@@ -775,6 +813,7 @@ bool SetAutofillAiOptInStatus(AutofillClient& client,
       client.GetIdentityManager(), client.GetSyncService(),
       client.IsWalletPublicPassStorageEnabled(), client.IsOffTheRecord(),
       client.GetVariationConfigCountryCode(),
+      client.GetSubscriptionEligibilityService(),
       client.GetPersonalContextEnablementState(), opt_in_status);
 }
 
@@ -789,6 +828,8 @@ bool SetAutofillAiOptInStatus(
     bool is_wallet_public_pass_storage_enabled,
     bool is_off_the_record,
     const GeoIpCountryCode& country_code,
+    const subscription_eligibility::SubscriptionEligibilityService*
+        subscription_service,
     personal_context::PersonalContextEnablementState
         personal_context_enablement_state,
     AutofillAiOptInStatus opt_in_status) {
@@ -798,7 +839,7 @@ bool SetAutofillAiOptInStatus(
 #endif
           prefs, edm, identity_manager, sync_service,
           is_wallet_public_pass_storage_enabled, is_off_the_record,
-          country_code, personal_context_enablement_state,
+          country_code, subscription_service, personal_context_enablement_state,
           AutofillAiAction::kOptIn)) {
     return false;
   }

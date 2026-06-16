@@ -107,6 +107,10 @@ namespace personal_context {
 enum class PersonalContextEnablementState;
 }
 
+namespace subscription_eligibility {
+class SubscriptionEligibilityService;
+}
+
 namespace metrics {
 class ProfileMetricsService;
 }
@@ -546,6 +550,10 @@ class AutofillClient {
 
   // Returns the profile type of the session.
   virtual profile_metrics::BrowserProfileType GetProfileType() const;
+
+  // Returns the subscription eligibility service for the user.
+  virtual const subscription_eligibility::SubscriptionEligibilityService*
+  GetSubscriptionEligibilityService() const;
 
   // Causes the Autofill settings UI to be shown.
   virtual void ShowAutofillSettings(SuggestionType suggestion_type) = 0;

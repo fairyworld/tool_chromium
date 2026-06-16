@@ -10,6 +10,7 @@
 #import "components/autofill/core/browser/data_model/autofill_ai/entity_type_names.h"
 #import "components/autofill/core/browser/permissions/autofill_ai/autofill_ai_permission_utils.h"
 #import "components/personal_context/core/personal_context_types.h"
+#import "components/subscription_eligibility/subscription_eligibility_service.h"
 #import "components/variations/service/variations_service.h"
 #import "ios/chrome/browser/account_settings/model/ios_account_setting_service_factory.h"
 #import "ios/chrome/browser/autofill/model/ios_autofill_entity_data_manager_factory.h"
@@ -18,6 +19,7 @@
 #import "ios/chrome/browser/shared/model/profile/profile_ios.h"
 #import "ios/chrome/browser/shared/ui/symbols/symbols.h"
 #import "ios/chrome/browser/signin/model/identity_manager_factory.h"
+#import "ios/chrome/browser/subscription_eligibility/model/subscription_eligibility_service_factory.h"
 #import "ios/chrome/browser/sync/model/sync_service_factory.h"
 #import "ios/chrome/common/ui/colors/semantic_color_names.h"
 
@@ -74,10 +76,10 @@ bool CanPerformAutofillAiAction(ProfileIOS* profile,
       SyncServiceFactory::GetForProfile(profile),
       IsWalletPublicPassStorageEnabled(profile), profile->IsOffTheRecord(),
       GeoIpCountryCode(GetCountryCodeFromVariations()),
+      SubscriptionEligibilityServiceFactory::GetForProfile(profile),
       personal_context::PersonalContextEnablementState::kDisabledNotEligible,
       action, entity_type);
 }
-
 bool IsEnhancedAutofillEnabled(ProfileIOS* profile) {
   ProfileIOS* original_profile = profile->GetOriginalProfile();
   return GetAutofillAiOptInStatus(
@@ -96,6 +98,7 @@ void SetEnhancedAutofillEnabled(ProfileIOS* profile, bool enabled) {
       IsWalletPublicPassStorageEnabled(original_profile),
       original_profile->IsOffTheRecord(),
       GeoIpCountryCode(GetCountryCodeFromVariations()),
+      SubscriptionEligibilityServiceFactory::GetForProfile(original_profile),
       personal_context::PersonalContextEnablementState::kDisabledNotEligible,
       enabled ? AutofillAiOptInStatus::kOptedIn
               : AutofillAiOptInStatus::kOptedOut);

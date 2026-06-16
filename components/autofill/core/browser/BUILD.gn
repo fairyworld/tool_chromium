@@ -1083,6 +1083,7 @@ static_library("browser") {
     "//components/signin/public/base",
     "//components/signin/public/identity_manager",
     "//components/strings",
+    "//components/subscription_eligibility",
     "//components/sync",
     "//components/translate/core/common",
     "//components/variations",
@@ -1431,6 +1432,7 @@ static_library("test_support") {
     "//components/personal_context/core",
     "//components/strike_database:proto",
     "//components/strike_database:test_support",
+    "//components/subscription_eligibility",
   ]
 
   deps = [
@@ -1937,6 +1939,7 @@ source_set("unit_tests") {
     "//components/signin/public/identity_manager:test_support",
     "//components/strike_database:features",
     "//components/strings",
+    "//components/subscription_eligibility",
     "//components/sync",
     "//components/sync:test_support",
     "//components/sync_preferences",

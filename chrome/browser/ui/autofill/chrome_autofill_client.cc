@@ -67,6 +67,7 @@
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/signin/signin_promo_util.h"
 #include "chrome/browser/strike_database/strike_database_factory.h"
+#include "chrome/browser/subscription_eligibility/subscription_eligibility_service_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ui/autofill/address_bubbles_controller.h"
@@ -374,6 +375,14 @@ version_info::Channel ChromeAutofillClient::GetChannel() const {
 bool ChromeAutofillClient::IsOffTheRecord() const {
   auto* mutable_this = const_cast<ChromeAutofillClient*>(this);
   return mutable_this->web_contents()->GetBrowserContext()->IsOffTheRecord();
+}
+
+const subscription_eligibility::SubscriptionEligibilityService*
+ChromeAutofillClient::GetSubscriptionEligibilityService() const {
+  Profile* profile =
+      Profile::FromBrowserContext(web_contents()->GetBrowserContext());
+  return subscription_eligibility::SubscriptionEligibilityServiceFactory::
+      GetForProfile(profile);
 }
 
 scoped_refptr<network::SharedURLLoaderFactory>

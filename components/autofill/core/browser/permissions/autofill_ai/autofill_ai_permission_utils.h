@@ -22,6 +22,10 @@ namespace personal_context {
 enum class PersonalContextEnablementState;
 }
 
+namespace subscription_eligibility {
+class SubscriptionEligibilityService;
+}
+
 namespace syncer {
 class SyncService;
 }
@@ -133,6 +137,8 @@ bool MayPerformAutofillAiAction(
     bool is_wallet_public_pass_storage_enabled,
     bool is_off_the_record,
     const GeoIpCountryCode& country_code,
+    const subscription_eligibility::SubscriptionEligibilityService*
+        subscription_service,
     personal_context::PersonalContextEnablementState
         personal_context_enablement_state,
     AutofillAiAction action,
@@ -176,6 +182,8 @@ bool SetAutofillAiOptInStatus(
     bool is_wallet_public_pass_storage_enabled,
     bool is_off_the_record,
     const GeoIpCountryCode& country_code,
+    const subscription_eligibility::SubscriptionEligibilityService*
+        subscription_service,
     personal_context::PersonalContextEnablementState
         personal_context_enablement_state,
     AutofillAiOptInStatus opt_in_status);
