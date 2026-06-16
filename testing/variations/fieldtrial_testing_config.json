@@ -20155,6 +20155,21 @@
             ]
         }
     ],
+    "ProfileLoadTracker": [
+        {
+            "platforms": [
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "enable_features": [
+                        "ProfileLoadTracker"
+                    ]
+                }
+            ]
+        }
+    ],
     "ProfileManagerDeferAsyncLoading": [
         {
             "platforms": [
