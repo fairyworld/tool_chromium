@@ -94,7 +94,6 @@ source_set("impl") {
     ":mojo_bindings_shared",
     ":utils",
     "//base",
-    "//chrome/app:generated_resources",
     "//chrome/browser:browser_process",
     "//chrome/browser/engagement",
     "//chrome/browser/metrics",

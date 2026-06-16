@@ -42,7 +42,6 @@
 #include "chrome/browser/ash/arc/privacy_items/arc_privacy_items_bridge.h"
 #include "chrome/browser/ash/borealis/borealis_util.h"
 #include "chrome/browser/ash/login/users/fake_chrome_user_manager.h"
-#include "chrome/grit/branded_strings.h"
 #include "chromeos/ash/components/login/login_state/login_state.h"
 #include "chromeos/ash/experiences/arc/test/fake_app_instance.h"
 #include "components/services/app_service/public/cpp/app_capability_access_cache.h"

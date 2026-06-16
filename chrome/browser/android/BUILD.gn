@@ -71,7 +71,6 @@ source_set("resource_mapper") {
   deps = [
     "//base",
     "//chrome/android:chrome_jni_headers",
-    "//chrome/app:generated_resources",
     "//chrome/app/theme:theme_resources",
     "//chrome/browser/page_info:page_info_buildflags",
     "//components/password_manager/core/browser:password_manager_buildflags",
