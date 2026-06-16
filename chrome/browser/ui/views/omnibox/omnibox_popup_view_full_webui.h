@@ -56,9 +56,6 @@ class OmniboxPopupViewFullWebUI : public OmniboxPopupViewWebUI {
   // True when a tab switch is in progress. Used to prevent updates to the
   // WebUI during the transition to avoid race conditions or flickering.
   bool is_switching_tab_ = false;
-  // Optional selection range to restore when pushing text to WebUI during or
-  // immediately after a tab switch.
-  std::optional<gfx::Range> tab_switch_selection_;
 };
 
 #endif  // CHROME_BROWSER_UI_VIEWS_OMNIBOX_OMNIBOX_POPUP_VIEW_FULL_WEBUI_H_
