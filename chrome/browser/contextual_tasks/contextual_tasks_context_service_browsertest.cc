@@ -11,6 +11,7 @@
 #include "base/test/scoped_feature_list.h"
 #include "base/test/simple_test_tick_clock.h"
 #include "base/test/test_future.h"
+#include "base/test/test_simple_task_runner.h"
 #include "base/threading/thread_restrictions.h"
 #include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
@@ -290,12 +291,14 @@ class ContextualTasksContextServiceTest : public InProcessBrowserTest {
 
   void UpdateModel(
       optimization_guide::proto::OptimizationTarget optimization_target,
-      const optimization_guide::ModelInfo& model_info) {
+      const optimization_guide::ModelInfo& model_info,
+      scoped_refptr<base::SequencedTaskRunner> background_task_runner =
+          base::SequencedTaskRunner::GetCurrentDefault()) {
     service()->model_handler_ =
         std::make_unique<ContextualTasksContextModelHandler>(
             OptimizationGuideKeyedServiceFactory::GetForProfile(
                 browser()->profile()),
-            base::SequencedTaskRunner::GetCurrentDefault());
+            background_task_runner);
     service()->model_handler_->OnModelUpdated(optimization_target, model_info);
   }
 
@@ -995,14 +998,8 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksContextServiceTest, TimedOut) {
       ContextDeterminationStatus::kTimedOut, 1);
 }
 
-// Flaky on windows: https://crbug.com/519755611.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_TimedOutDuringTabScoring DISABLED_TimedOutDuringTabScoring
-#else
-#define MAYBE_TimedOutDuringTabScoring TimedOutDuringTabScoring
-#endif
 IN_PROC_BROWSER_TEST_F(ContextualTasksContextServiceTest,
-                       MAYBE_TimedOutDuringTabScoring) {
+                       TimedOutDuringTabScoring) {
   base::ScopedAllowBlockingForTesting allow_blocking;
   base::HistogramTester histogram_tester;
 
@@ -1044,13 +1041,15 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksContextServiceTest,
     ASSERT_TRUE(base::PathExists(model_file_path));
   }
 
+  auto model_executor_task_runner =
+      base::MakeRefCounted<base::TestSimpleTaskRunner>();
   auto model_info = optimization_guide::TestModelInfoBuilder()
                         .SetModelFilePath(model_file_path)
                         .SetModelMetadata(any_metadata)
                         .Build();
   UpdateModel(optimization_guide::proto::
                   OPTIMIZATION_TARGET_CONTEXTUAL_TASKS_TAB_RELEVANCE,
-              *model_info);
+              *model_info, model_executor_task_runner);
 
   NavigateToValidURL();
 
@@ -1070,9 +1069,10 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksContextServiceTest,
   TabSelectionOptions options;
   options.tab_selection_mode = mojom::TabSelectionMode::kStaticSignalsMlModel;
   options.min_model_score = 0.5f;
-  // Set request timeout to 1ms so that during asynchronous model execution,
-  // the timeout task is guaranteed to run first.
-  options.tab_selection_timeout = base::Milliseconds(1);
+  // Set request timeout to 100ms so that the test finishes quickly after the
+  // timeout tasks runs. Since the model executor task runner is paused,
+  // model execution will not proceed and this request is guaranteed to time out.
+  options.tab_selection_timeout = base::Milliseconds(100);
 
   service()->GetRelevantTabsForQuery(options, "summarize the test page now",
                                      /*explicit_urls=*/{},
@@ -1080,6 +1080,8 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksContextServiceTest,
 
   // The request should time out and return no relevant tabs.
   EXPECT_TRUE(future.Get().empty());
+
+  model_executor_task_runner->RunPendingTasks();
 
   histogram_tester.ExpectUniqueSample(
       "ContextualTasks.Context.ContextDeterminationStatus",
