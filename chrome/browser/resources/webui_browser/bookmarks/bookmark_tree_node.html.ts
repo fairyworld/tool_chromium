@@ -22,7 +22,9 @@ ${this.node.folder ? html`
     </summary>
     <div class="folder-children">
       ${this.node.folder.children.map(item => html`
-        <webui-browser-bookmark-tree-node .node="${item}">
+        <webui-browser-bookmark-tree-node
+            id="${item.folder?.id?.value || item.url?.id?.value}"
+            .node="${item}">
         </webui-browser-bookmark-tree-node>
       `)}
     </div>
