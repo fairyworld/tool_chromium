@@ -10,6 +10,8 @@ source_set("testing") {
     "toy_drop_target.h",
     "toy_tab_drag_session_input_adapter.cc",
     "toy_tab_drag_session_input_adapter.h",
+    "toy_tab_drag_session_listener.cc",
+    "toy_tab_drag_session_listener.h",
     "toy_tab_drag_window_adapter.cc",
     "toy_tab_drag_window_adapter.h",
   ]

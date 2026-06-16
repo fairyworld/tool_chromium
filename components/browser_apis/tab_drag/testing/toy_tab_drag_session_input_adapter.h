@@ -37,23 +37,23 @@ class ToyTabDragSessionInputAdapter : public TabDragSessionInputAdapter {
   EventCallback callback_;
 };
 
+class TabDragSessionListener;
+
 class ToyTabDragSessionInjector : public TabDragSessionInjector {
  public:
   ToyTabDragSessionInjector(TabDragSessionInputAdapter& adapter,
-                            TabDragSessionInputListener& listener,
+                            TabDragSessionListener& listener,
                             DropTargetRegistry& registry)
       : adapter_(adapter), listener_(listener), registry_(registry) {}
   ~ToyTabDragSessionInjector() override = default;
 
   TabDragSessionInputAdapter& GetInputAdapter() override { return *adapter_; }
-  TabDragSessionInputListener& GetInputListener() override {
-    return *listener_;
-  }
+  TabDragSessionListener& GetSessionListener() override { return *listener_; }
   DropTargetRegistry& GetDropTargetRegistry() override { return *registry_; }
 
  private:
   const raw_ref<TabDragSessionInputAdapter> adapter_;
-  const raw_ref<TabDragSessionInputListener> listener_;
+  const raw_ref<TabDragSessionListener> listener_;
   const raw_ref<DropTargetRegistry> registry_;
 };
 

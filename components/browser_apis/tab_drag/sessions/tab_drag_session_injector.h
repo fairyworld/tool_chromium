@@ -5,14 +5,18 @@
 #ifndef COMPONENTS_BROWSER_APIS_TAB_DRAG_SESSIONS_TAB_DRAG_SESSION_INJECTOR_H_
 #define COMPONENTS_BROWSER_APIS_TAB_DRAG_SESSIONS_TAB_DRAG_SESSION_INJECTOR_H_
 
+#include <functional>
+#include <optional>
+
 #include "components/browser_apis/tab_drag/tab_drag_api.mojom-forward.h"
 #include "mojo/public/cpp/bindings/pending_associated_receiver.h"
 #include "mojo/public/cpp/bindings/pending_associated_remote.h"
+#include "ui/gfx/geometry/point.h"
 
 namespace tabs_api {
 
 class TabDragSessionInputAdapter;
-class TabDragSessionInputListener;
+class TabDragSessionListener;
 class TabDragWindowAdapter;
 
 class DropTargetRegistry {
@@ -34,6 +38,15 @@ class DropTargetRegistry {
   // This is typically called automatically when the `DropTargetRegistration`
   // pipe is closed.
   virtual void UnregisterDropTarget(TabDragWindowAdapter* window_adapter) = 0;
+
+  // Returns the window under `screen_point`, excluding `exclude_window`.
+  virtual std::optional<std::reference_wrapper<TabDragWindowAdapter>>
+  FindTargetWindow(const gfx::Point& screen_point,
+                   TabDragWindowAdapter* exclude_window) const = 0;
+
+  // Returns the Mojo remote for the given window.
+  virtual std::optional<std::reference_wrapper<mojom::DropTarget>>
+  GetDropTarget(TabDragWindowAdapter* window_adapter) const = 0;
 };
 
 class TabDragSessionInjector {
@@ -41,7 +54,7 @@ class TabDragSessionInjector {
   virtual ~TabDragSessionInjector() = default;
 
   virtual TabDragSessionInputAdapter& GetInputAdapter() = 0;
-  virtual TabDragSessionInputListener& GetInputListener() = 0;
+  virtual TabDragSessionListener& GetSessionListener() = 0;
   virtual DropTargetRegistry& GetDropTargetRegistry() = 0;
 };
 

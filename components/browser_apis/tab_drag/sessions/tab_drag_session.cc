@@ -9,7 +9,7 @@
 #include "components/browser_apis/tab_drag/adapters/tab_drag_session_input_adapter.h"
 #include "components/browser_apis/tab_drag/adapters/tab_drag_window_adapter.h"
 #include "components/browser_apis/tab_drag/sessions/tab_drag_session_injector.h"
-#include "components/browser_apis/tab_drag/sessions/tab_drag_session_input_listener.h"
+#include "components/browser_apis/tab_drag/sessions/tab_drag_session_listener.h"
 
 namespace tabs_api {
 
@@ -30,7 +30,8 @@ base::expected<void, mojo_base::mojom::ErrorPtr> TabDragSession::Start() {
           &TabDragSession::OnInputEvent, base::Unretained(this)));
   if (result.has_value()) {
     dragged_window_->SetCapture();
-    injector_->GetInputListener().OnSessionStarted(this);
+    injector_->GetSessionListener().OnSessionStarted(dragged_tabs_,
+                                                     dragged_window_);
   }
   return result;
 }
@@ -41,47 +42,57 @@ TabDragSession::~TabDragSession() {
 }
 
 void TabDragSession::EndSession() {
-  injector_->GetInputListener().OnSessionEnded();
   if (end_callback_) {
     std::move(end_callback_).Run();
   }
 }
 
 void TabDragSession::OnInputEvent(const TabDragInputEvent& event) {
-  TabDragSessionInputEvent::Type event_type;
-  bool should_end = false;
   switch (event.type) {
     case TabDragInputEvent::Type::kCancelled:
-      event_type = TabDragSessionInputEvent::Type::kCancelled;
-      should_end = true;
-      break;
-    case TabDragInputEvent::Type::kDropped:
-      event_type = TabDragSessionInputEvent::Type::kDropped;
-      last_mouse_screen_point_ = event.screen_point;
-      delta_ = event.screen_point - start_point_in_screen_;
-      should_end = true;
-      break;
-    case TabDragInputEvent::Type::kMoved:
-      event_type = TabDragSessionInputEvent::Type::kMoved;
-      last_mouse_screen_point_ = event.screen_point;
-      delta_ = event.screen_point - start_point_in_screen_;
+      injector_->GetSessionListener().OnSessionCancelled();
+      EndSession();
       break;
     case TabDragInputEvent::Type::kCaptureChanged:
       if (dragged_window_->HasCapture()) {
         // Window has capture - ignore.
         return;
       }
-      event_type = TabDragSessionInputEvent::Type::kCancelled;
-      should_end = true;
+      injector_->GetSessionListener().OnSessionCancelled();
+      EndSession();
       break;
-  }
-
-  TabDragSessionInputEvent session_event{.type = event_type,
-                                         .screen_point = event.screen_point};
-  injector_->GetInputListener().OnDragSessionEvent(session_event);
-
-  if (should_end) {
-    EndSession();
+    case TabDragInputEvent::Type::kDropped: {
+      last_mouse_screen_point_ = event.screen_point;
+      delta_ = event.screen_point - start_point_in_screen_;
+      auto new_target = injector_->GetDropTargetRegistry().FindTargetWindow(
+          event.screen_point, dragged_window_);
+      TabDragWindowAdapter* new_target_ptr =
+          new_target ? &new_target->get() : nullptr;
+      if (new_target_ptr != current_target_) {
+        current_target_ = new_target_ptr;
+        injector_->GetSessionListener().OnTargetWindowChanged(
+            current_target_, event.screen_point);
+      }
+      injector_->GetSessionListener().OnSessionDropped(event.screen_point);
+      EndSession();
+      break;
+    }
+    case TabDragInputEvent::Type::kMoved: {
+      last_mouse_screen_point_ = event.screen_point;
+      delta_ = event.screen_point - start_point_in_screen_;
+      auto new_target = injector_->GetDropTargetRegistry().FindTargetWindow(
+          event.screen_point, dragged_window_);
+      TabDragWindowAdapter* new_target_ptr =
+          new_target ? &new_target->get() : nullptr;
+      if (new_target_ptr != current_target_) {
+        current_target_ = new_target_ptr;
+        injector_->GetSessionListener().OnTargetWindowChanged(
+            current_target_, event.screen_point);
+      } else if (current_target_) {
+        injector_->GetSessionListener().OnDragMoved(event.screen_point);
+      }
+      break;
+    }
   }
 }
 

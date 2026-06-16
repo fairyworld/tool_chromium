@@ -12,8 +12,9 @@
 namespace tabs_api {
 
 class TabDragSessionInputAdapter;
-class TabDragSessionInputListener;
+class TabDragSessionListener;
 class TabDragEventRouter;
+class DropTargetRegistryImpl;
 
 class TabDragSessionDesktopInjector : public TabDragSessionInjector {
  public:
@@ -25,11 +26,12 @@ class TabDragSessionDesktopInjector : public TabDragSessionInjector {
 
   // TabDragSessionInjector:
   TabDragSessionInputAdapter& GetInputAdapter() override;
-  TabDragSessionInputListener& GetInputListener() override;
+  TabDragSessionListener& GetSessionListener() override;
   DropTargetRegistry& GetDropTargetRegistry() override;
 
  private:
   std::unique_ptr<TabDragSessionInputAdapter> adapter_;
+  std::unique_ptr<DropTargetRegistryImpl> registry_;
   std::unique_ptr<TabDragEventRouter> event_router_;
 };
 

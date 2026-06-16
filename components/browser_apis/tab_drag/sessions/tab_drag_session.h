@@ -68,6 +68,7 @@ class TabDragSession {
   gfx::Point last_mouse_screen_point_;
   gfx::Vector2d delta_;
   raw_ptr<TabDragWindowAdapter> dragged_window_ = nullptr;
+  raw_ptr<TabDragWindowAdapter> current_target_ = nullptr;
 };
 
 }  // namespace tabs_api
