@@ -855,6 +855,8 @@ public abstract class ChromeFeatureList {
             newCachedFlag(BOTTOM_SHEET_AS_BROWSER_CONTROLS, true);
     public static final CachedFlag sBrowserControlsDebugging =
             newCachedFlag(BROWSER_CONTROLS_DEBUGGING, false);
+    public static final CachedFlag sCacheIsGoogleSigned =
+            newCachedFlag(CACHE_IS_GOOGLE_SIGNED, false);
     public static final CachedFlag sCacheIsMultiInstanceApi31Enabled =
             newCachedFlag(CACHE_IS_MULTI_INSTANCE_API_31_ENABLED, true);
     public static final CachedFlag sCctAdaptiveButton =
@@ -1290,6 +1292,7 @@ public abstract class ChromeFeatureList {
                     sBookmarkPaneAndroid,
                     sBottomSheetAsBrowserControls,
                     sBrowserControlsDebugging,
+                    sCacheIsGoogleSigned,
                     sCacheIsMultiInstanceApi31Enabled,
                     sCctAdaptiveButton,
                     sCctAuthTabDisableAllExternalIntents,
