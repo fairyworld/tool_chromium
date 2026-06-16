@@ -2993,7 +2993,7 @@ deps = {
   },
 
   'src/third_party/text-fragments-polyfill/src':
-    Var('chromium_git') + '/external/github.com/GoogleChromeLabs/text-fragments-polyfill.git' + '@' + 'c036420683f672d685e27415de0a5f5e85bdc23f',
+    Var('chromium_git') + '/external/github.com/GoogleChromeLabs/text-fragments-polyfill.git' + '@' + 'abc6ed408b3f20e91d9cbda9977748459f5e3877',
 
   'src/third_party/tflite/src':
     Var('chromium_git') + '/external/github.com/tensorflow/tensorflow.git' + '@' + '55025ab1474f86f31c778837b5e188ea53736c38',
