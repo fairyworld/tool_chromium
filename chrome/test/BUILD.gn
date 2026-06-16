@@ -8215,10 +8215,12 @@ test("unit_tests") {
   }
 
   if (enable_webui_ntp) {
-    deps += [ "//chrome/browser/new_tab_page" ]
+    deps += [
+      "//chrome/browser/new_tab_page",
+      "//chrome/browser/ui/webui/cr_components/most_visited:unit_tests",
+    ]
     if (!is_android) {
       deps += [
-        "//chrome/browser/ui/webui/cr_components/most_visited:unit_tests",
         "//chrome/browser/ui/webui/new_tab_page:unit_tests",
         "//chrome/browser/ui/webui/ntp_microsoft_auth:unit_tests",
       ]
