@@ -350,6 +350,35 @@ suite('SyncStatusTests', function() {
     assertFalse(deleteProfile);
   });
 
+  test('SignOutDialogManagedProfileHtmlEscaping', async function() {
+    loadTimeData.overrideValues({
+      syncDisconnectManagedProfileExplanation: 'Explanation $1',
+    });
+
+    await syncBrowserProxy.whenCalled('getSyncStatus');
+    simulateSyncStatus({
+      signedInState: SignedInState.SYNCING,
+      domain: 'example.com<a href="http://example.com">link</a>',
+      syncSystemEnabled: true,
+      statusAction: StatusAction.NO_ACTION,
+    });
+
+    Router.getInstance().navigateTo(routes.SIGN_OUT);
+    await flushTasks();
+
+    const signoutDialog =
+        peoplePage.shadowRoot!.querySelector('settings-signout-dialog');
+    assertTrue(!!signoutDialog);
+    assertTrue(signoutDialog.$.dialog.open);
+
+    const dialogBody = signoutDialog.shadowRoot!.querySelector('[slot=body]');
+    assertTrue(!!dialogBody);
+    assertEquals(
+        'Explanation example.com<a href="http://example.com">link</a>',
+        dialogBody.textContent);
+    assertFalse(!!dialogBody.querySelector('a'));
+  });
+
   test('getProfileStatsCount', async function() {
     // Navigate to chrome://settings/signOut
     Router.getInstance().navigateTo(routes.SIGN_OUT);
