@@ -618,12 +618,20 @@ void CreditCardFormEventLogger::LogCardUnmaskAuthenticationPromptCompleted(
   current_authentication_flow_ = flow;
 }
 
-void CreditCardFormEventLogger::OnUserDecisionToUseBnpl() {
+void CreditCardFormEventLogger::OnUserDecisionToUseBnpl(
+    base::span<const Suggestion> suggestions_shown) {
   if (!has_logged_user_decision_to_use_bnpl_) {
     if (suggestion_contains_pay_later_tab_entry_) {
       LogPayLaterTabSelected(driver().GetPageUkmSourceId());
     } else {
-      LogBnplSuggestionAccepted(driver().GetPageUkmSourceId());
+      LogBnplSuggestionAccepted(
+          driver().GetPageUkmSourceId(),
+          std::ranges::count_if(
+              suggestions_shown, [](const Suggestion& suggestion) {
+                return suggestion.type == SuggestionType::kCreditCardEntry ||
+                       suggestion.type ==
+                           SuggestionType::kVirtualCreditCardEntry;
+              }));
     }
     has_logged_user_decision_to_use_bnpl_ = true;
   }

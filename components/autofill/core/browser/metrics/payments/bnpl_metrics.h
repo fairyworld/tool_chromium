@@ -244,8 +244,10 @@ void LogBnplFormEvent(BnplFormEvent event);
 void LogBnplSuggestionShown(ukm::SourceId ukm_source_id);
 
 // Logs that a BNPL suggestion was accepted on the current page. Logs to both
-// UMA and UKM.
-void LogBnplSuggestionAccepted(ukm::SourceId ukm_source_id);
+// UMA and UKM. `credit_card_suggestions_count` is the number of credit card
+// suggestions shown to the user.
+void LogBnplSuggestionAccepted(ukm::SourceId ukm_source_id,
+                               int credit_card_suggestions_count);
 
 // Logs that a form was filled with the BNPL issuer VCN.
 void LogFormFilledWithBnplVcn(BnplIssuer::IssuerId issuer_id);

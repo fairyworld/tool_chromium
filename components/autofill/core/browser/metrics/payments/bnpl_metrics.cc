@@ -175,11 +175,15 @@ void LogBnplSuggestionShown(ukm::SourceId ukm_source_id) {
       .Record(ukm::UkmRecorder::Get());
 }
 
-void LogBnplSuggestionAccepted(ukm::SourceId ukm_source_id) {
+void LogBnplSuggestionAccepted(ukm::SourceId ukm_source_id,
+                               int credit_card_suggestions_count) {
   LogBnplFormEvent(BnplFormEvent::kBnplSuggestionAccepted);
   ukm::builders::Autofill_BnplSuggestionAccepted(ukm_source_id)
       .SetAccepted(true)
       .Record(ukm::UkmRecorder::Get());
+  base::UmaHistogramCounts100(
+      "Autofill.Bnpl.SuggestionAccepted.CreditCardSuggestionsCount",
+      credit_card_suggestions_count);
 }
 
 void LogFormFilledWithBnplVcn(IssuerId issuer_id) {

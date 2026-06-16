@@ -122,7 +122,8 @@ void BnplManager::OnUserDecisionToUseBnpl(
     std::optional<int64_t> final_checkout_amount,
     OnBnplVcnFetchedCallback on_bnpl_vcn_fetched_callback) {
   browser_autofill_manager_->GetCreditCardFormEventLogger()
-      .OnUserDecisionToUseBnpl();
+      .OnUserDecisionToUseBnpl(
+          browser_autofill_manager_->client().GetAutofillSuggestions());
 
   if (ongoing_flow_state_ != nullptr &&
       base::FeatureList::IsEnabled(

@@ -2781,6 +2781,16 @@ Called by update_autofill_enums.py. This is a manual comment.-->
   </summary>
 </histogram>
 
+<histogram name="Autofill.Bnpl.SuggestionAccepted.CreditCardSuggestionsCount"
+    units="suggestions" expires_after="2027-04-30">
+  <owner>vinnypersky@google.com</owner>
+  <owner>payments-autofill-team@google.com</owner>
+  <summary>
+    Logs the number of credit card suggestions shown to a user at the time of
+    BNPL suggestion acceptance.
+  </summary>
+</histogram>
+
 <histogram name="Autofill.Bnpl.SuggestionUnavailableReason"
     enum="BnplSuggestionUnavailableReason" expires_after="2027-04-30">
   <owner>wilsonlow@google.com</owner>
