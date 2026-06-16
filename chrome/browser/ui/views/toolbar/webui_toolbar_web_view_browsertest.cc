@@ -3389,7 +3389,9 @@ class WebUIPinnedToolbarActionsBrowserTest
              features::kSkipIPCChannelPausingForNonGuests,
              features::kWebUIInProcessResourceLoadingV2,
              features::kInitialWebUISyncNavStartToCommit,
-             tabs::kHorizontalTabStripComboButton,
+             // `WebUIPinnedToolbarActionsBrowserTest.LensOverlayResultsIcon`
+             // depends on `kRoundedIcons`.
+             features::kRoundedIcons, tabs::kHorizontalTabStripComboButton,
              // Facilitate testing kActionSidePanelShowComments
              collaboration::features::kCollaborationComments,
              // Facilitate testing kActionsSidePanelShowContextualTasks
