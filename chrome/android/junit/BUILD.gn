@@ -1570,6 +1570,7 @@ if (is_android) {
       "src/org/chromium/chrome/browser/metrics/VariationsSessionTest.java",
       "src/org/chromium/chrome/browser/modaldialog/ChromeTabModalPresenterUnitTest.java",
       "src/org/chromium/chrome/browser/multiwindow/ChromeMultiInstancePersistentStoreUnitTest.java",
+      "src/org/chromium/chrome/browser/multiwindow/MultiInstanceHeadlessTabModelObserverUnitTest.java",
       "src/org/chromium/chrome/browser/multiwindow/MultiInstanceManagerApi31UnitTest.java",
       "src/org/chromium/chrome/browser/multiwindow/MultiInstanceManagerImplUnitTest.java",
       "src/org/chromium/chrome/browser/multiwindow/MultiInstanceOrchestratorImplUnitTest.java",

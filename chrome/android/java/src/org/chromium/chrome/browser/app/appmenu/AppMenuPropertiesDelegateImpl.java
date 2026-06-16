@@ -943,6 +943,11 @@ public abstract class AppMenuPropertiesDelegateImpl implements AppMenuProperties
             Bundle bundle = new Bundle();
             if (entry instanceof SessionRecentlyClosedEntry sessionEntry) {
                 bundle.putInt(RECENT_ENTRY_SESSION_ID_BUNDLE_KEY, sessionEntry.getSessionId());
+                if (model.containsKey(AppMenuRecentEntryItemProperties.WINDOW_ID)) {
+                    bundle.putInt(
+                            RECENT_ENTRY_INSTANCE_ID_BUNDLE_KEY,
+                            model.get(AppMenuRecentEntryItemProperties.WINDOW_ID));
+                }
             } else if (entry instanceof RecentlyClosedWindow window) {
                 bundle.putInt(RECENT_ENTRY_INSTANCE_ID_BUNDLE_KEY, window.getInstanceId());
             } else {

@@ -1236,7 +1236,8 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                         AppMenuHandler.AppMenuItemType.DIVIDER,
                                         buildModelForDivider(R.id.divider_line_id)));
                         for (RecentlyClosedTab tab : tabs) {
-                            submenuItems.add(buildClosedWindowTabMenuItem(tab));
+                            submenuItems.add(
+                                    buildClosedWindowTabMenuItem(tab, window.getInstanceId()));
                         }
                     }
                     return submenuItems;
@@ -1253,10 +1254,16 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                         shouldShowIconBeforeItem() ? R.drawable.ic_window_24dp : Resources.ID_NULL,
                         submenuItemsSupplier);
 
+        // TODO(crbug.com/521223427): Implement dynamic updates so we can re-enable this once the
+        // model loads.
+        model.set(AppMenuItemProperties.ENABLED, mTabModelSelector.isTabStateInitialized());
+
         return new ListItem(AppMenuHandler.AppMenuItemType.MENU_ITEM_WITH_SUBMENU, model);
     }
 
     private ListItem buildRestoreWindowMenuItem(RecentlyClosedWindow window) {
+        // TODO(crbug.com/521223427): Implement dynamic updates so we can re-enable this once the
+        // model loads.
         PropertyModel model =
                 populateBaseModelForTextItem(
                                 new PropertyModel.Builder(
@@ -1270,14 +1277,22 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                 AppMenuItemProperties.ICON,
                                 AppCompatResources.getDrawable(
                                         mContext, R.drawable.ic_open_in_new_24dp))
+                        .with(
+                                AppMenuItemProperties.ENABLED,
+                                mTabModelSelector.isTabStateInitialized())
                         .build();
+
         return new ListItem(AppMenuHandler.AppMenuItemType.RECENT_ENTRY, model);
     }
 
-    private ListItem buildClosedWindowTabMenuItem(RecentlyClosedTab tab) {
+    private ListItem buildClosedWindowTabMenuItem(RecentlyClosedTab tab, int windowInstanceId) {
+        // TODO(crbug.com/521223427): Implement dynamic updates so we can re-enable this once the
+        // model loads.
         PropertyModel model =
                 new PropertyModel.Builder(AppMenuRecentEntryItemProperties.ALL_KEYS)
-                        .with(AppMenuItemProperties.MENU_ITEM_ID, R.id.recent_entry_tab_menu_item)
+                        .with(
+                                AppMenuItemProperties.MENU_ITEM_ID,
+                                R.id.recent_entry_window_tab_menu_item)
                         .with(AppMenuItemProperties.TITLE, tab.getTitle())
                         .with(
                                 AppMenuItemProperties.ICON_SUPPLIER,
@@ -1288,8 +1303,11 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                         /* cachedFavicon= */ null,
                                         /* fallbackToHost= */ false))
                         .with(AppMenuItemProperties.ICON_NO_TINT, true)
-                        .with(AppMenuItemProperties.ENABLED, false)
+                        .with(
+                                AppMenuItemProperties.ENABLED,
+                                mTabModelSelector.isTabStateInitialized())
                         .with(AppMenuRecentEntryItemProperties.RECENT_ENTRY, tab)
+                        .with(AppMenuRecentEntryItemProperties.WINDOW_ID, windowInstanceId)
                         .build();
         return new ListItem(AppMenuHandler.AppMenuItemType.RECENT_ENTRY, model);
     }
@@ -1322,10 +1340,16 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                         submenuItemsSupplier);
         model.set(AppMenuItemProperties.ICON_NO_TINT, true);
 
+        // TODO(crbug.com/521223427): Implement dynamic updates so we can re-enable this once the
+        // model loads.
+        model.set(AppMenuItemProperties.ENABLED, mTabModelSelector.isTabStateInitialized());
+
         return new ListItem(AppMenuHandler.AppMenuItemType.MENU_ITEM_WITH_SUBMENU, model);
     }
 
     private ListItem buildRestoreGroupMenuItem(RecentlyClosedGroup group) {
+        // TODO(crbug.com/521223427): Implement dynamic updates so we can re-enable this once the
+        // model loads.
         PropertyModel model =
                 populateBaseModelForTextItem(
                                 new PropertyModel.Builder(
@@ -1339,6 +1363,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                 AppMenuItemProperties.ICON,
                                 AppCompatResources.getDrawable(
                                         mContext, R.drawable.ic_open_in_new_24dp))
+                        .with(
+                                AppMenuItemProperties.ENABLED,
+                                mTabModelSelector.isTabStateInitialized())
                         .build();
         return new ListItem(AppMenuHandler.AppMenuItemType.RECENT_ENTRY, model);
     }
@@ -1361,13 +1388,18 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
             RecentlyClosedEntry entry,
             String title,
             @Nullable LazyOneshotSupplier<Drawable> iconSupplier) {
+        // TODO(crbug.com/521223427): Implement dynamic updates so we can re-enable this once the
+        // model loads.
         PropertyModel.Builder builder =
                 populateBaseModelForTextItem(
                                 new PropertyModel.Builder(
                                         AppMenuRecentEntryItemProperties.ALL_KEYS),
                                 R.id.recent_entry_tab_menu_item)
                         .with(AppMenuItemProperties.TITLE, title)
-                        .with(AppMenuRecentEntryItemProperties.RECENT_ENTRY, entry);
+                        .with(AppMenuRecentEntryItemProperties.RECENT_ENTRY, entry)
+                        .with(
+                                AppMenuItemProperties.ENABLED,
+                                mTabModelSelector.isTabStateInitialized());
         if (shouldShowIconBeforeItem() && iconSupplier != null) {
             builder.with(AppMenuItemProperties.ICON_SUPPLIER, iconSupplier);
             builder.with(AppMenuItemProperties.ICON_NO_TINT, true);
@@ -2542,10 +2574,15 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
 
         if (ChromeFeatureList.isEnabled(ChromeFeatureList.SUBMENUS_IN_APP_MENU)) {
             // TODO(crbug.com/521223427): Implement dynamic updates so that we don't
-            // have to rely on timing to load the {@link BookmarkModel}.
+            // have to rely on timing to load the {@link BookmarkModel} and {@link
+            // HeadlessTabModel}.
             BookmarkModel bookmarkModel = mBookmarkModelSupplier.get();
             if (bookmarkModel != null && !bookmarkModel.isBookmarkModelLoaded()) {
                 bookmarkModel.finishLoadingBookmarkModel(() -> {});
+            }
+            RecentlyClosedEntriesManager manager = mRecentlyClosedEntriesManagerSupplier.get();
+            if (manager != null) {
+                manager.updateRecentlyClosedEntries();
             }
         }
     }

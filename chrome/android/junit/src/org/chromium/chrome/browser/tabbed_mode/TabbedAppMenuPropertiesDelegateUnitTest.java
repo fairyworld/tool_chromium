@@ -4532,8 +4532,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                         R.id.recent_entry_menu_item,
                                         item(R.id.recent_entry_window_menu_item),
                                         item(R.id.divider_line_id),
-                                        item(R.id.recent_entry_tab_menu_item),
-                                        item(R.id.recent_entry_tab_menu_item))));
+                                        item(R.id.recent_entry_window_tab_menu_item),
+                                        item(R.id.recent_entry_window_tab_menu_item))));
 
         List<ListItem> items =
                 findItemById(

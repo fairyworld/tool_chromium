@@ -816,6 +816,7 @@ chrome_java_sources = [
   "java/src/org/chromium/chrome/browser/modules/ModuleInstallUi.java",
   "java/src/org/chromium/chrome/browser/mojo/ChromeInterfaceRegistrar.java",
   "java/src/org/chromium/chrome/browser/multiwindow/ChromeMultiInstancePersistentStore.java",
+  "java/src/org/chromium/chrome/browser/multiwindow/MultiInstanceHeadlessTabModelObserver.java",
   "java/src/org/chromium/chrome/browser/multiwindow/MultiInstanceManagerApi31.java",
   "java/src/org/chromium/chrome/browser/multiwindow/MultiInstanceManagerFactory.java",
   "java/src/org/chromium/chrome/browser/multiwindow/MultiInstanceManagerImpl.java",
