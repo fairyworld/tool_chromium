@@ -14,7 +14,6 @@
 #include "base/functional/bind.h"
 #include "base/functional/callback_helpers.h"
 #include "base/logging.h"
-#include "base/memory/ptr_util.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/metrics/histogram_macros.h"
@@ -107,50 +106,6 @@ perfetto::NamedTrack GetTrack(const void* buffer_id) {
                               reinterpret_cast<uintptr_t>(buffer_id));
 }
 
-bool ValidateGpuMemoryBufferHandle(const gfx::GpuMemoryBufferHandle& handle,
-                                   const viz::SharedImageFormat& format,
-                                   const gfx::Size& size) {
-  if (handle.type == gfx::SHARED_MEMORY_BUFFER) {
-    const auto& region = handle.region();
-    if (!region.IsValid()) {
-      DLOG(ERROR) << "Invalid shared memory region.";
-      return false;
-    }
-    auto required_size = format.MaybeEstimatedSizeInBytes(size);
-    if (!required_size || region.GetSize() < *required_size) {
-      DLOG(ERROR) << "Shared memory region is too small. Required: "
-                  << (required_size ? *required_size : 0)
-                  << ", actual: " << region.GetSize();
-      return false;
-    }
-    if (handle.stride > 0 && size.height() > 0 &&
-        static_cast<size_t>(handle.stride) *
-                static_cast<size_t>(size.height()) >
-            region.GetSize()) {
-      DLOG(ERROR) << "Shared memory region is too small for stride. Required: "
-                  << handle.stride * size.height()
-                  << ", actual: " << region.GetSize();
-      return false;
-    }
-  }
-#if BUILDFLAG(IS_OZONE)
-  if (handle.type == gfx::NATIVE_PIXMAP) {
-    const auto& pixmap_handle = handle.native_pixmap_handle();
-    if (pixmap_handle.planes.empty()) {
-      DLOG(ERROR) << "Native pixmap handle has no planes.";
-      return false;
-    }
-    for (const auto& plane : pixmap_handle.planes) {
-      if (!plane.fd.is_valid()) {
-        DLOG(ERROR) << "Invalid plane FD.";
-        return false;
-      }
-    }
-  }
-#endif
-  return true;
-}
-
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -159,19 +114,17 @@ bool ValidateGpuMemoryBufferHandle(const gfx::GpuMemoryBufferHandle& handle,
 // Encapsulates the state and logic needed to bind a buffer to a SharedImage.
 class Buffer::Texture : public viz::ContextLostObserver {
  public:
-  static std::unique_ptr<Texture> Create(
-      scoped_refptr<viz::RasterContextProvider> context_provider,
-      const gfx::Size& size,
-      gfx::ColorSpace color_space);
-  static std::unique_ptr<Texture> Create(
-      scoped_refptr<viz::RasterContextProvider> context_provider,
-      gfx::GpuMemoryBufferHandle* gpu_memory_buffer_handle,
-      const viz::SharedImageFormat format,
-      const gfx::Size& size,
-      gfx::ColorSpace color_space,
-      unsigned query_type,
-      base::TimeDelta wait_for_release_delay,
-      bool is_overlay_candidate);
+  Texture(scoped_refptr<viz::RasterContextProvider> context_provider,
+          const gfx::Size& size,
+          gfx::ColorSpace color_space);
+  Texture(scoped_refptr<viz::RasterContextProvider> context_provider,
+          gfx::GpuMemoryBufferHandle* gpu_memory_buffer_handle,
+          const viz::SharedImageFormat buffer_format,
+          const gfx::Size& size,
+          gfx::ColorSpace color_space,
+          unsigned query_type,
+          base::TimeDelta wait_for_release_time,
+          bool is_overlay_candidate);
 
   Texture(const Texture&) = delete;
   Texture& operator=(const Texture&) = delete;
@@ -208,16 +161,6 @@ class Buffer::Texture : public viz::ContextLostObserver {
   gpu::SyncToken sync_token() { return sync_token_; }
 
  private:
-  Texture(scoped_refptr<viz::RasterContextProvider> context_provider,
-          scoped_refptr<gpu::ClientSharedImage> shared_image,
-          const gfx::Size& size);
-  Texture(scoped_refptr<viz::RasterContextProvider> context_provider,
-          scoped_refptr<gpu::ClientSharedImage> shared_image,
-          gfx::GpuMemoryBufferHandle* gpu_memory_buffer_handle,
-          const gfx::Size& size,
-          unsigned query_type,
-          base::TimeDelta wait_for_release_delay);
-
   void DestroyResources();
   static uintptr_t GetBufferIdHelper(gfx::GpuMemoryBufferHandle* handle);
   void ReleaseWhenQueryResultIsAvailable(base::OnceClosure callback);
@@ -254,92 +197,28 @@ uintptr_t Buffer::Texture::GetBufferIdHelper(
   return reinterpret_cast<uintptr_t>(handle);
 }
 
-// static
-std::unique_ptr<Buffer::Texture> Buffer::Texture::Create(
+Buffer::Texture::Texture(
     scoped_refptr<viz::RasterContextProvider> context_provider,
     const gfx::Size& size,
-    gfx::ColorSpace color_space) {
-  if (!context_provider) {
-    return nullptr;
-  }
-  gpu::SharedImageInterface* sii = context_provider->SharedImageInterface();
-  if (!sii) {
-    return nullptr;
-  }
+    gfx::ColorSpace color_space)
+    : buffer_id_(0),
+      size_(size),
+      context_provider_(std::move(context_provider)),
+      query_type_(GL_COMMANDS_COMPLETED_CHROMIUM) {
+  gpu::SharedImageInterface* sii = context_provider_->SharedImageInterface();
 
+  // These SharedImages are used over the raster interface as both the source
+  // and destination of writes. Note that as the browser process raster
+  // interface uses RasterImplementation (and not RasterImplementationGLES) as
+  // its implementation, GLES2 usage is not needed.
   const gpu::SharedImageUsageSet usage = gpu::SHARED_IMAGE_USAGE_RASTER_READ |
                                          gpu::SHARED_IMAGE_USAGE_RASTER_WRITE |
                                          gpu::SHARED_IMAGE_USAGE_DISPLAY_READ;
 
-  auto shared_image =
+  shared_image_ =
       sii->CreateSharedImage({viz::SinglePlaneFormat::kRGBA_8888, size,
                               color_space, usage, gpu::kExoTextureLabelPrefix},
                              gpu::kNullSurfaceHandle);
-  if (!shared_image) {
-    DLOG(ERROR) << "Failed to create shared image for texture";
-    return nullptr;
-  }
-
-  return base::WrapUnique(
-      new Texture(std::move(context_provider), std::move(shared_image), size));
-}
-
-// static
-std::unique_ptr<Buffer::Texture> Buffer::Texture::Create(
-    scoped_refptr<viz::RasterContextProvider> context_provider,
-    gfx::GpuMemoryBufferHandle* gpu_memory_buffer_handle,
-    const viz::SharedImageFormat format,
-    const gfx::Size& size,
-    gfx::ColorSpace color_space,
-    unsigned query_type,
-    base::TimeDelta wait_for_release_delay,
-    bool is_overlay_candidate) {
-  if (!context_provider || !gpu_memory_buffer_handle ||
-      gpu_memory_buffer_handle->is_null()) {
-    return nullptr;
-  }
-
-  // Use the central helper!
-  if (!ValidateGpuMemoryBufferHandle(*gpu_memory_buffer_handle, format, size)) {
-    return nullptr;
-  }
-
-  gpu::SharedImageInterface* sii = context_provider->SharedImageInterface();
-  if (!sii) {
-    return nullptr;
-  }
-
-  gpu::SharedImageUsageSet usage = gpu::SHARED_IMAGE_USAGE_RASTER_READ |
-                                   gpu::SHARED_IMAGE_USAGE_RASTER_WRITE |
-                                   gpu::SHARED_IMAGE_USAGE_DISPLAY_READ;
-
-  if (is_overlay_candidate &&
-      sii->GetCapabilities().supports_scanout_shared_images) {
-    usage |= gpu::SHARED_IMAGE_USAGE_SCANOUT;
-  }
-
-  auto shared_image = sii->CreateSharedImage(
-      {format, size, color_space, usage, gpu::kExoTextureLabelPrefix},
-      gpu_memory_buffer_handle->Clone());
-  if (!shared_image) {
-    DLOG(ERROR) << "Failed to create shared image from GMB handle";
-    return nullptr;
-  }
-
-  return base::WrapUnique(new Texture(
-      std::move(context_provider), std::move(shared_image),
-      gpu_memory_buffer_handle, size, query_type, wait_for_release_delay));
-}
-
-Buffer::Texture::Texture(
-    scoped_refptr<viz::RasterContextProvider> context_provider,
-    scoped_refptr<gpu::ClientSharedImage> shared_image,
-    const gfx::Size& size)
-    : buffer_id_(0),
-      size_(size),
-      context_provider_(std::move(context_provider)),
-      query_type_(GL_COMMANDS_COMPLETED_CHROMIUM),
-      shared_image_(std::move(shared_image)) {
   CHECK(shared_image_);
   sync_token_ = shared_image_->creation_sync_token();
 
@@ -349,17 +228,36 @@ Buffer::Texture::Texture(
 
 Buffer::Texture::Texture(
     scoped_refptr<viz::RasterContextProvider> context_provider,
-    scoped_refptr<gpu::ClientSharedImage> shared_image,
     gfx::GpuMemoryBufferHandle* gpu_memory_buffer_handle,
+    const viz::SharedImageFormat format,
     const gfx::Size& size,
+    gfx::ColorSpace color_space,
     unsigned query_type,
-    base::TimeDelta wait_for_release_delay)
+    base::TimeDelta wait_for_release_delay,
+    bool is_overlay_candidate)
     : buffer_id_(GetBufferIdHelper(gpu_memory_buffer_handle)),
       size_(size),
       context_provider_(std::move(context_provider)),
       query_type_(query_type),
-      shared_image_(std::move(shared_image)),
       wait_for_release_delay_(wait_for_release_delay) {
+  gpu::SharedImageInterface* sii = context_provider_->SharedImageInterface();
+
+  // These SharedImages are used over the raster interface as both the source
+  // and destination of writes. Note that as the browser process raster
+  // interface uses RasterImplementation (and not RasterImplementationGLES) as
+  // its implementation, GLES2 usage is not needed.
+  gpu::SharedImageUsageSet usage = gpu::SHARED_IMAGE_USAGE_RASTER_READ |
+                                   gpu::SHARED_IMAGE_USAGE_RASTER_WRITE |
+                                   gpu::SHARED_IMAGE_USAGE_DISPLAY_READ;
+
+  if (is_overlay_candidate &&
+      sii->GetCapabilities().supports_scanout_shared_images) {
+    usage |= gpu::SHARED_IMAGE_USAGE_SCANOUT;
+  }
+
+  shared_image_ = sii->CreateSharedImage(
+      {format, size_, color_space, usage, gpu::kExoTextureLabelPrefix},
+      gpu_memory_buffer_handle->Clone());
   CHECK(shared_image_);
   sync_token_ = shared_image_->creation_sync_token();
   if (query_type_ != 0) {
@@ -685,14 +583,10 @@ std::optional<viz::TransferableResource> Buffer::ProduceTransferableResource(
   // already exist. The contents of this buffer are copied to |texture| using a
   // call to CopyTexImage.
   if (!contents_texture_) {
-    contents_texture_ =
-        Texture::Create(context_provider, &gpu_memory_buffer_handle_, format_,
-                        size_, valid_color_space, query_type_,
-                        wait_for_release_delay_, is_overlay_candidate_);
-    if (!contents_texture_) {
-      DLOG(WARNING) << "Failed to create contents texture from client handle";
-      return std::nullopt;
-    }
+    contents_texture_ = std::make_unique<Texture>(
+        context_provider, &gpu_memory_buffer_handle_, format_, size_,
+        valid_color_space, query_type_, wait_for_release_delay_,
+        is_overlay_candidate_);
   }
   Texture* contents_texture = contents_texture_.get();
 
@@ -755,11 +649,8 @@ std::optional<viz::TransferableResource> Buffer::ProduceTransferableResource(
 
   // Create a mailbox texture that we copy the buffer contents to.
   if (!texture_) {
-    texture_ = Texture::Create(context_provider, GetSize(), valid_color_space);
-    if (!texture_) {
-      DLOG(WARNING) << "Failed to create copy texture";
-      return std::nullopt;
-    }
+    texture_ = std::make_unique<Texture>(context_provider, GetSize(),
+                                         valid_color_space);
   }
   Texture* texture = texture_.get();
 
@@ -890,11 +781,6 @@ SkBitmap Buffer::CreateBitmap() {
     return bitmap;
   }
 
-  if (!ValidateGpuMemoryBufferHandle(gpu_memory_buffer_handle_, format_,
-                                     size_)) {
-    return bitmap;
-  }
-
   // We only need to create this shared image in order to Map the
   // |gpu_memory_buffer_handle_| to cpu visible memory.
   auto shared_image =
@@ -902,14 +788,10 @@ SkBitmap Buffer::CreateBitmap() {
                               kDefaultMappableSIUsage, "ExoBufferCreateBitmap"},
                              gpu::kNullSurfaceHandle, buffer_usage_,
                              gpu_memory_buffer_handle_.Clone());
-  if (!shared_image) {
-    DLOG(ERROR) << "Failed to create SharedImage for mapping.";
-    return bitmap;
-  }
 
   auto mapping = shared_image->Map();
   if (!mapping) {
-    DLOG(ERROR) << "Failed to map MappableSI.";
+    LOG(ERROR) << "Failed to map MappableSI.";
     return bitmap;
   }
 
