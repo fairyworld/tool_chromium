@@ -7599,11 +7599,6 @@ inline constexpr char kHindiInscriptLayoutName[] =
 inline constexpr char kHindiInscriptLayoutDescription[] =
     "Enables Hindi Inscript Layout on ChromeOS.";
 
-inline constexpr char kLockScreenNotificationName[] =
-    "Lock screen notification";
-inline constexpr char kLockScreenNotificationDescription[] =
-    "Enable notifications on the lock screen.";
-
 inline constexpr char kMahiPanelResizableName[] = "Mahi panel resizing";
 inline constexpr char kMahiPanelResizableDescription[] =
     "Enable Mahi panel resizing on ChromeOS.";

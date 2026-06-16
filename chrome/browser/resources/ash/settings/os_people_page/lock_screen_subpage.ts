@@ -100,31 +100,6 @@ export class SettingsLockScreenElement extends SettingsLockScreenElementBase {
       },
 
       /**
-       * Whether notifications on the lock screen are enable by the feature
-       * flag.
-       */
-      lockScreenNotificationsEnabled_: {
-        type: Boolean,
-        value() {
-          return loadTimeData.getBoolean('lockScreenNotificationsEnabled');
-        },
-        readOnly: true,
-      },
-
-      /**
-       * Whether the "hide sensitive notification" option on the lock screen can
-       * be enable by the feature flag.
-       */
-      lockScreenHideSensitiveNotificationSupported_: {
-        type: Boolean,
-        value() {
-          return loadTimeData.getBoolean(
-              'lockScreenHideSensitiveNotificationsSupported');
-        },
-        readOnly: true,
-      },
-
-      /**
        * State of the recovery toggle. Is |null| iff recovery is not a
        * available.
        */

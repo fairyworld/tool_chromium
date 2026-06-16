@@ -5332,10 +5332,6 @@ const FeatureEntry kFeatureEntries[] = {
          feature_engagement::kIPHDemoModeChoiceVariations,
          "IPH_DemoMode")},
 #if BUILDFLAG(IS_CHROMEOS)
-    {"enable-lock-screen-notification",
-     flag_descriptions::kLockScreenNotificationName,
-     flag_descriptions::kLockScreenNotificationDescription, kOsCrOS,
-     FEATURE_VALUE_TYPE(ash::features::kLockScreenNotifications)},
     {"enterprise-reporting-ui", flag_descriptions::kEnterpriseReportingUIName,
      flag_descriptions::kEnterpriseReportingUIDescription, kOsCrOS,
      FEATURE_VALUE_TYPE(ash::features::kEnterpriseReportingUI)},

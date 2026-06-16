@@ -314,11 +314,6 @@ void AddLockScreenPageStrings(content::WebUIDataSource* html_source,
       "quickUnlockDisabledByPolicy",
       quick_unlock::IsPinDisabledByPolicy(profile->GetPrefs(),
                                           quick_unlock::Purpose::kAny));
-  html_source->AddBoolean("lockScreenNotificationsEnabled",
-                          ash::features::IsLockScreenNotificationsEnabled());
-  html_source->AddBoolean(
-      "lockScreenHideSensitiveNotificationsSupported",
-      ash::features::IsLockScreenHideSensitiveNotificationsSupported());
   html_source->AddString(
       "lockScreenSwitchLocalPasswordDescription",
       l10n_util::GetStringFUTF16(

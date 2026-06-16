@@ -1201,14 +1201,6 @@ BASE_FEATURE(kLocalAuthenticationWithPin, base::FEATURE_ENABLED_BY_DEFAULT);
 // to feedback reports.
 BASE_FEATURE(kLinkCrossDeviceInternals, base::FEATURE_DISABLED_BY_DEFAULT);
 
-// Supports the feature to hide sensitive content in notifications on the lock
-// screen. This option is effective when |kLockScreenNotification| is enabled.
-BASE_FEATURE(kLockScreenHideSensitiveNotificationsSupport,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-
-// Enables notifications on the lock screen.
-BASE_FEATURE(kLockScreenNotifications, base::FEATURE_DISABLED_BY_DEFAULT);
-
 // Feature to allow MAC address randomization to be enabled for WiFi networks.
 BASE_FEATURE(kMacAddressRandomization, base::FEATURE_DISABLED_BY_DEFAULT);
 
@@ -2824,21 +2816,12 @@ bool IsLobsterEnabledForManagedUsers() {
   return base::FeatureList::IsEnabled(kLobsterForManagedUsers);
 }
 
-bool IsLockScreenHideSensitiveNotificationsSupported() {
-  return base::FeatureList::IsEnabled(
-      kLockScreenHideSensitiveNotificationsSupport);
-}
-
 bool AreGameDashboardUtilitiesEnabled() {
   return base::FeatureList::IsEnabled(kGameDashboardUtilities);
 }
 
 bool IsAppLaunchShortcutEnabled() {
   return base::FeatureList::IsEnabled(kAppLaunchShortcut);
-}
-
-bool IsLockScreenNotificationsEnabled() {
-  return base::FeatureList::IsEnabled(kLockScreenNotifications);
 }
 
 bool IsProductivityLauncherImageSearchEnabled() {

@@ -3775,11 +3775,6 @@
     "expiry_milestone": 156
   },
   {
-    "name": "enable-lock-screen-notification",
-    "owners": [ "newcomer@chromium.org" ],
-    "expiry_milestone": 80
-  },
-  {
     "name": "enable-logging-js-console-messages",
     "owners": [ "hazems@chromium.org" ],
     // Never expires because it is used by developers to enable logging JS
