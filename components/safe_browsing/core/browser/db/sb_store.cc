@@ -8,6 +8,7 @@
 #include "base/containers/span.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/numerics/safe_conversions.h"
+#include "base/strings/string_util.h"
 #include "components/safe_browsing/core/browser/db/sb_protocol_manager_util.h"
 
 namespace safe_browsing {
@@ -25,19 +26,31 @@ SBStore::~SBStore() = default;
 bool SBStore::HasValidData() {
   // Record every 256th time (`record_has_valid_data_counter_` is 8-bit).
   if (++record_has_valid_data_counter_ == 1) {
-    RecordBooleanWithAndWithoutSuffix(GetMetricPrefix() + ".IsStoreValid",
-                                      has_valid_data_, store_path_);
+    LogHasValidDataHistograms();
   }
   return has_valid_data_;
 }
 
+void SBStore::LogHasValidDataHistograms() {
+  std::string suffix = GetUmaSuffixForStore(store_path_);
+  std::string sb_store_suffix = suffix;
+  // Make sure that the SBStore suffix does not have "_v5" at the end, that way
+  // the SBStore logs are directly comparable between v4 and v5.
+  // TODO(crbug.com/362791941): Pull out a shared constant for "_v5".
+  if (base::EndsWith(sb_store_suffix, "_v5", base::CompareCase::SENSITIVE)) {
+    sb_store_suffix = sb_store_suffix.substr(0, sb_store_suffix.length() - 3);
+  }
+  RecordBooleanWithAndWithoutSuffix("SafeBrowsing.SBStore.IsStoreValid",
+                                    has_valid_data_, sb_store_suffix);
+  RecordBooleanWithAndWithoutSuffix(GetMetricPrefix() + ".IsStoreValid",
+                                    has_valid_data_, suffix);
+}
+
 // static
-void SBStore::RecordBooleanWithAndWithoutSuffix(
-    const std::string& metric,
-    bool value,
-    const base::FilePath& file_path) {
+void SBStore::RecordBooleanWithAndWithoutSuffix(const std::string& metric,
+                                                bool value,
+                                                const std::string& suffix) {
   base::UmaHistogramBoolean(metric, value);
-  std::string suffix = GetUmaSuffixForStore(file_path);
   base::UmaHistogramBoolean(metric + suffix, value);
 }
 

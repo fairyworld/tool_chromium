@@ -141,6 +141,8 @@ void RecordVerifyChecksumDuration(const std::string& base_metric,
 void RecordStoreReadResult(StoreReadResult result) {
   UMA_HISTOGRAM_ENUMERATION("SafeBrowsing.V4StoreRead.Result", result,
                             STORE_READ_RESULT_MAX);
+  base::UmaHistogramBoolean("SafeBrowsing.SBStoreRead.Success",
+                            result == READ_SUCCESS);
 }
 
 void RecordStoreWriteResult(StoreWriteResult result) {

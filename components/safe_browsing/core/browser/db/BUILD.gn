@@ -251,6 +251,8 @@ source_set("sb_store") {
       "sb_store.h",
       "v4_store.cc",
       "v4_store.h",
+      "v5_store.cc",
+      "v5_store.h",
     ]
   }
 
@@ -362,6 +364,7 @@ source_set("unit_tests_local_db") {
     "v4_rice_unittest.cc",
     "v4_store_unittest.cc",
     "v4_update_protocol_manager_unittest.cc",
+    "v5_store_unittest.cc",
     "v5_update_protocol_manager_unittest.cc",
   ]
   deps = [

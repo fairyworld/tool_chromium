@@ -3293,6 +3293,27 @@ useful for Chirp alerts (go/crca-alerts). -->
   <token key="UserCategory" variants="RealTimeUrlCheckUserCategory"/>
 </histogram>
 
+<histogram name="SafeBrowsing.SBStore.IsStoreValid{Store}" enum="BooleanValid"
+    expires_after="2027-05-05">
+  <owner>thefrog@chromium.org</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Records whether a Safe Browsing store has valid data, when it is queried.
+    This is logged once for every 256 times a store is checked.
+  </summary>
+  <token key="Store" variants="SafeBrowsing_SBStore_Metrics"/>
+</histogram>
+
+<histogram name="SafeBrowsing.SBStoreRead.Success" enum="BooleanSuccess"
+    expires_after="2027-05-05">
+  <owner>thefrog@chromium.org</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Track whether parsing results of reading the SafeBrowsing store file from
+    disk succeeded. Recorded every time a store is read from disk.
+  </summary>
+</histogram>
+
 <histogram
     name="SafeBrowsing.SecuritySettingsBundle.BundleStateBeforeShowingEnhancedToast"
     enum="SafeBrowsingSecuritySettingsBundle" expires_after="2026-06-07">
@@ -4301,6 +4322,43 @@ risk. -->
   <owner>chrome-counter-abuse-alerts@google.com</owner>
   <summary>
     Track the parsing results of a status 200 GetV4Update request.
+  </summary>
+</histogram>
+
+<histogram name="SafeBrowsing.V5ReadFromDisk.ApplyUpdate.Result{Store}_v5"
+    enum="SafeBrowsingV5ApplyUpdateResult" expires_after="never">
+<!-- expires-never: This reports the reason for the failure to use the Safe
+Browsing database present on user's disk upon launch for V5. Having this information
+is crucial to know that the Safe Browsing updates are being read, applied, and
+parsed correctly. -->
+
+  <owner>thefrog@chromium.org</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Track the result of applying a V5StoreFileFormat read from disk after
+    parsing it successfully as a protobuf for V5.
+  </summary>
+  <token key="Store" variants="SafeBrowsing_SBStore_Metrics"/>
+</histogram>
+
+<histogram name="SafeBrowsing.V5Store.IsStoreValid{Store}_v5"
+    enum="BooleanValid" expires_after="2027-05-05">
+  <owner>thefrog@chromium.org</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Records whether a v5 store has valid data, when it is queried. This is
+    logged once for every 256 times a store is checked.
+  </summary>
+  <token key="Store" variants="SafeBrowsing_SBStore_Metrics"/>
+</histogram>
+
+<histogram name="SafeBrowsing.V5StoreRead.Result"
+    enum="SafeBrowsingV5StoreReadResult" expires_after="2027-05-05">
+  <owner>thefrog@chromium.org</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Track the parsing results of reading the SafeBrowsing V5 store file from
+    disk. Recorded every time a store is read from disk.
   </summary>
 </histogram>
 

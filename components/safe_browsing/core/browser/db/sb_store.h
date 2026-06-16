@@ -101,10 +101,11 @@ class SBStore {
   const scoped_refptr<base::SequencedTaskRunner> task_runner_;
 
  private:
-  static void RecordBooleanWithAndWithoutSuffix(
-      const std::string& metric,
-      bool value,
-      const base::FilePath& file_path);
+  static void RecordBooleanWithAndWithoutSuffix(const std::string& metric,
+                                                bool value,
+                                                const std::string& suffix);
+
+  void LogHasValidDataHistograms();
 
   // A counter used to manage how frequently the value of `has_valid_data_`
   // below is recorded.

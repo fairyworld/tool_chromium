@@ -623,6 +623,34 @@ chromium-metrics-reviews@google.com.
 
 <!-- LINT.ThenChange(//components/safe_browsing/core/browser/db/v4_store.h:ApplyUpdateType) -->
 
+<!-- LINT.IfChange(SafeBrowsingV5ApplyUpdateResult) -->
+
+<enum name="SafeBrowsingV5ApplyUpdateResult">
+  <int value="0" label="Unknown"/>
+  <int value="1" label="Success"/>
+  <int value="2" label="MmapFailure"/>
+  <int value="3" label="FileSizeNotMultipleOfPrefixSize"/>
+</enum>
+
+<!-- LINT.ThenChange(//components/safe_browsing/core/browser/db/hash_prefix_list.h:V5ApplyUpdateResult) -->
+
+<!-- LINT.IfChange(SafeBrowsingV5StoreReadResult) -->
+
+<enum name="SafeBrowsingV5StoreReadResult">
+  <int value="0" label="ReadSuccess"/>
+  <int value="1" label="UnexpectedReadFailure"/>
+  <int value="2" label="FileOpenFailure"/>
+  <int value="3" label="FileEmptyFailure"/>
+  <int value="4" label="ProtoParsingFailure"/>
+  <int value="5" label="UnexpectedMagicNumberFailure"/>
+  <int value="6" label="FileVersionIncompatibleFailure"/>
+  <int value="7" label="HashPrefixInfoMissingFailure"/>
+  <int value="8" label="HashPrefixListGenerationFailure"/>
+  <int value="9" label="FileReadFailure"/>
+</enum>
+
+<!-- LINT.ThenChange(//components/safe_browsing/core/browser/db/v5_store.h:V5StoreReadResult) -->
+
 <enum name="SafetyCheckWarningReason">
   <int value="1" label="Unpublished"/>
   <int value="2" label="Policy"/>

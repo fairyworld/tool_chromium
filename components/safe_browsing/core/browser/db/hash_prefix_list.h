@@ -16,20 +16,26 @@
 namespace safe_browsing {
 
 // Enumerate different events while applying the update fetched from the server
-// for V5 HashPrefixList, logged to histograms.
-// DO NOT CHANGE THE ORDERING OF THESE VALUES.
+// for V5 HashPrefixList. These values are persisted to logs. Entries should not
+// be renumbered and numeric values should never be reused.
+
+// LINT.IfChange(V5ApplyUpdateResult)
 enum class V5ApplyUpdateResult {
+  // Unknown or uninitialized state.
+  kUnknown = 0,
+
   // The operation completed successfully.
-  kSuccess = 0,
+  kSuccess = 1,
 
   // Failed to memory-map the file or initialize the FileInfo.
-  kMmapFailure = 1,
+  kMmapFailure = 2,
 
   // The file size is not a multiple of the expected prefix size.
-  kFileSizeNotMultipleOfPrefixSize = 2,
+  kFileSizeNotMultipleOfPrefixSize = 3,
 
   kMaxValue = kFileSizeNotMultipleOfPrefixSize,
 };
+// LINT.ThenChange(//tools/metrics/histograms/metadata/safe_browsing/enums.xml:SafeBrowsingV5ApplyUpdateResult)
 
 inline std::ostream& operator<<(std::ostream& os, V5ApplyUpdateResult result) {
   return os << static_cast<int>(result);
