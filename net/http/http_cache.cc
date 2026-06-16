@@ -344,10 +344,9 @@ void HttpCache::ActiveEntry::RestartHeadersPhaseTransactions() {
     RestartHeadersTransaction();
   }
 
-  auto it = done_headers_queue_.begin();
-  while (it != done_headers_queue_.end()) {
-    Transaction* done_headers_transaction = *it;
-    it = done_headers_queue_.erase(it);
+  while (!done_headers_queue_.empty()) {
+    Transaction* done_headers_transaction = done_headers_queue_.front();
+    done_headers_queue_.erase(done_headers_queue_.begin());
     done_headers_transaction->cache_io_callback().Run(ERR_CACHE_RACE);
   }
 }
@@ -1394,6 +1393,7 @@ void HttpCache::WritersDoneWritingToEntry(scoped_refptr<ActiveEntry> entry,
     // the truncated status of the entry.
     entry->RestartHeadersPhaseTransactions();
     entry->ReleaseWriters();
+    ProcessQueuedTransactions(std::move(entry));
     return;
   }
 
@@ -1521,7 +1521,8 @@ void HttpCache::ProcessDoneHeadersQueue(scoped_refptr<ActiveEntry> entry) {
   ParallelWritingPattern parallel_writing_pattern =
       CanTransactionJoinExistingWriters(transaction);
   if (entry->IsWritingInProgress()) {
-    if (parallel_writing_pattern != PARALLEL_WRITING_JOIN) {
+    if (parallel_writing_pattern != PARALLEL_WRITING_JOIN ||
+        !entry->writers()->CanJoin()) {
       // TODO(shivanisha): Returning from here instead of checking the next
       // transaction in the queue because the FIFO order is maintained
       // throughout, until it becomes a reader or writer. May be at this point
