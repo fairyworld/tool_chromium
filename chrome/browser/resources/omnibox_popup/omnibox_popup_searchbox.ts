@@ -154,6 +154,9 @@ export class OmniboxPopupSearchboxElement extends
     });
     this.eventTracker_.add(
         document, 'selectionchange', this.onSelectionChanged_.bind(this));
+    this.eventTracker_.add(
+        document, 'visibilitychange', this.onVisibilitychange_.bind(this));
+    this.onVisibilitychange_();
     // TODO(b/522957982): Establish closer IME parity with the native Views
     // Omnibox (e.g., render inline autocompletion in a separate overlaid span
     // rather than modifying input value during active composition).
@@ -331,6 +334,13 @@ export class OmniboxPopupSearchboxElement extends
     this.pageHandler().stopAutocomplete(/*clearResult=*/ false);
     this.lastQueriedInput = state.text;
     this.dropdownIsVisible = false;
+  }
+
+  private onVisibilitychange_() {
+    if (document.visibilityState !== 'visible') {
+      return;
+    }
+    this.focusInput();
   }
 
   protected onInputFocusin_() {

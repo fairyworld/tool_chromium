@@ -50,35 +50,58 @@ void OmniboxPopupViewFullWebUI::PushTextToWebUI(bool is_double_click) {
   if (is_switching_tab_) {
     return;
   }
-  controller()->edit_model()->ResetDisplayTexts();
-  if (auto* popup_handler = GetPopupHandler()) {
-    bool user_input_in_progress =
-        controller()->edit_model()->user_input_in_progress();
-    std::u16string text =
-        user_input_in_progress
-            ? controller()->edit_model()->user_text()
-            : controller()->edit_model()->GetPermanentDisplayText();
-    gfx::Range selection;
+
+  OmniboxEditModel* edit_model = controller()->edit_model();
+  edit_model->ResetDisplayTexts();
+
+  OmniboxPopupHandler* popup_handler = GetPopupHandler();
+  if (!popup_handler) {
+    return;
+  }
+
+  const bool user_input_in_progress = edit_model->user_input_in_progress();
+  const std::u16string text = user_input_in_progress
+                                  ? edit_model->user_text()
+                                  : edit_model->GetPermanentDisplayText();
+
+  // Determine the default selection range.
+  gfx::Range saved_selection = gfx::Range(0, text.length());
+  if (!last_sent_text_.has_value()) {
+    // Tab switch / activation restoration.
+    if (tab_switch_selection_.has_value()) {
+      saved_selection = *tab_switch_selection_;
+    }
+  } else if (user_input_in_progress) {
+    // Currently open and active steady-state or editing.
+    saved_selection = popup_handler->latest_selection();
+  }
+
+  const std::string text_utf8 = base::UTF16ToUTF8(text);
+
+  if (is_double_click) {
+    gfx::Range views_selection;
     if (auto* omnibox_view_views =
             static_cast<OmniboxViewViews*>(omnibox_view_)) {
-      selection = omnibox_view_views->GetSelectedRange();
+      views_selection = omnibox_view_views->GetSelectedRange();
     }
-
-    // `last_sent_text_` is null after a state reset (e.g., tab switch).
-    // Otherwise, check if `text` or `selection` has diverged.
-    bool text_changed = !last_sent_text_ || text != *last_sent_text_;
-    bool selection_changed = selection != popup_handler->latest_selection();
-
-    if (text_changed || selection_changed) {
-      // TODO(crbug.com/497883783): Consider adding a dedicated
-      // `SetSelectionRange` IPC method so that when only the selection
-      // changes (e.g. during double clicks or mouse dragging), we do not push
-      // the input text and risk resetting DOM input state or scroll position.
-      popup_handler->SetInputState(base::UTF16ToUTF8(text), selection,
+    if (saved_selection != views_selection) {
+      // TODO(crbug.com/514810983): Add a dedicated IPC method for selection
+      // changes (e.g. during double clicks), we do not push the input text
+      // and risk resetting DOM input state or scroll position.
+      popup_handler->SetInputState(text_utf8, views_selection,
                                    user_input_in_progress, is_double_click);
-      last_sent_text_ = text;
     }
   }
+
+  const bool text_changed =
+      !last_sent_text_.has_value() || text != *last_sent_text_;
+  if (text_changed || tab_switch_selection_.has_value()) {
+    popup_handler->SetInputState(text_utf8, saved_selection,
+                                 user_input_in_progress, is_double_click);
+  }
+
+  tab_switch_selection_ = std::nullopt;
+  last_sent_text_ = text;
 }
 
 void OmniboxPopupViewFullWebUI::SaveStateToTab(content::WebContents* tab) {
@@ -127,6 +150,8 @@ void OmniboxPopupViewFullWebUI::OnTabChanged(content::WebContents* contents) {
   OmniboxPopupState target_popup_state;
   auto* state = static_cast<OmniboxState*>(
       contents->GetUserData(OmniboxTabHelper::kOmniboxStateKey));
+  // TODO(b/523277158): Make sure that when the user manually closes
+  // the omnibox, no state is restored for it when the tab is switched back to.
   if (state) {
     // Restore the saved state for the tab.
     controller()->edit_model()->RestoreState(&state->model_state);
@@ -134,6 +159,7 @@ void OmniboxPopupViewFullWebUI::OnTabChanged(content::WebContents* contents) {
                           state->selection != gfx::Range(0, 0))
                              ? OmniboxPopupState::kFull
                              : OmniboxPopupState::kNone;
+    tab_switch_selection_ = state->selection;
   } else {
     // No saved state: revert to default and re-evaluate popup visibility based
     // on current focus.
@@ -142,34 +168,20 @@ void OmniboxPopupViewFullWebUI::OnTabChanged(content::WebContents* contents) {
     target_popup_state = controller()->edit_model()->has_focus()
                              ? OmniboxPopupState::kFull
                              : OmniboxPopupState::kNone;
+    tab_switch_selection_ = std::nullopt;
   }
 
-  // TODO(b/504668582): Fix flicker that occurs when switching between two tabs
-  //   that have an Omnibox with text.
-  UpdatePopupStateAndContent(target_popup_state);
   is_switching_tab_ = false;
 
   // Request focus before pushing content state so our `SetInputState` IPC
-  // overrides any OS-default focus selection (such as macOS Select-All).
+  // overrides any OS-default focus selection (such as macOS Select-All),
+  // and to avoid invalidating Blink layout while focus is changing.
   if (target_popup_state == OmniboxPopupState::kFull) {
     presenter()->RequestFocus();
   }
 
-  // Push the restored state to the WebUI handler so it can render the
-  // correct text and selection range for the newly selected tab.
-  if (auto* popup_handler = GetPopupHandler()) {
-    bool user_input_in_progress =
-        state ? state->model_state.user_input_in_progress : false;
-    std::u16string text =
-        user_input_in_progress
-            ? state->model_state.user_text
-            : controller()->edit_model()->GetPermanentDisplayText();
-    gfx::Range selection = state ? state->selection : gfx::Range(0, 0);
-    popup_handler->SetInputState(base::UTF16ToUTF8(text), selection,
-                                 user_input_in_progress,
-                                 /*is_double_click=*/false);
-    last_sent_text_ = text;
-  }
+  // Update popup state and push the restored content state exactly once.
+  UpdatePopupStateAndContent(target_popup_state);
 }
 
 void OmniboxPopupViewFullWebUI::OnFocus() {
