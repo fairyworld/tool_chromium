@@ -2043,6 +2043,7 @@ if (use_fuzzing_engine_with_lpm) {
       "//components/autofill/core/browser",
       "//components/autofill/core/browser:test_support",
       "//components/autofill/core/browser/proto",
+      "//components/autofill/core/browser/proto:proto_fuzzable",
       "//components/autofill/core/common",
       "//third_party/libprotobuf-mutator",
     ]

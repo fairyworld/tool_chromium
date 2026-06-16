@@ -52,6 +52,25 @@ def main():
     if syntax_count == 0:
       new_content = "package fuzzable;\n\n" + content
 
+
+  import_regex = re.compile(
+      r'^(?P<prefix>\s*import\s+(?:public\s+|weak\s+)?")'
+      r'(?P<path>.*?)'
+      r'\.proto(?P<suffix>";)',
+      re.MULTILINE
+  )
+
+  def import_replacement(match_obj):
+    path = match_obj.group("path")
+    if path.startswith("google/protobuf/"):
+      return match_obj.group(0)
+    return f'{match_obj.group("prefix")}{path}_fuzzable.proto{match_obj.group("suffix")}'
+
+  new_content = import_regex.sub(import_replacement, new_content)
+
+  # TODO(crbug.com/505034799): Support absolute type references by prepending
+  # 'fuzzable.' after leading dots.
+
   with open(args.outfile, "w", encoding="utf-8") as f:
     f.write(new_content)
 
