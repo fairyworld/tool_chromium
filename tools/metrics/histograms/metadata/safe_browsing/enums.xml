@@ -603,6 +603,7 @@ chromium-metrics-reviews@google.com.
   <int value="8" label="HASH_PREFIX_MAP_GENERATION_FAILURE"/>
   <int value="9" label="MIGRATION_FAILURE"/>
   <int value="10" label="PRE_MMAP_MIGRATION_FILE_FORMAT_FAILURE"/>
+  <int value="11" label="V5_TO_V4_MIGRATION_FAILURE"/>
 </enum>
 
 <enum name="SafeBrowsingV4StoreWriteResult">
@@ -650,7 +651,24 @@ chromium-metrics-reviews@google.com.
   <int value="10" label="V4ToV5MigrationFailure"/>
 </enum>
 
-<!-- LINT.ThenChange(//components/safe_browsing/core/browser/db/v5_store.h:V5StoreReadResult) -->
+<!-- LINT.ThenChange(//components/safe_browsing/core/browser/db/sb_store.h:V5StoreReadResult) -->
+
+<!-- LINT.IfChange(V5ToV4MigrationResult) -->
+
+<enum name="SafeBrowsingV5ToV4MigrationResult">
+  <int value="0" label="DiskAlreadyV4"/>
+  <int value="1" label="V5ToV4MigrationSucceeded"/>
+  <int value="2" label="V5StoreNotFound"/>
+  <int value="3" label="ReadV5Failed"/>
+  <int value="4" label="PrefixSizeMismatchFailure"/>
+  <int value="5" label="HashFileMissingFailure"/>
+  <int value="6" label="RenameHashFileFailure"/>
+  <int value="7" label="WriteV4FileFailure"/>
+  <int value="8" label="RenameV4StoreFileFailure"/>
+  <int value="9" label="ProtoSerializationFailure"/>
+</enum>
+
+<!-- LINT.ThenChange(//components/safe_browsing/core/browser/db/v4_store.h:V5ToV4MigrationResult) -->
 
 <enum name="SafetyCheckWarningReason">
   <int value="1" label="Unpublished"/>

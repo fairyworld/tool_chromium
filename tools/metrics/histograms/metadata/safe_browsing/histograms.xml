@@ -4283,6 +4283,26 @@ and applied correctly. -->
   </summary>
 </histogram>
 
+<histogram name="SafeBrowsing.V4Store.V5ToV4Migration.V5ReadFailureReason"
+    enum="SafeBrowsingV5StoreReadResult" expires_after="2027-05-05">
+  <owner>thefrog@chromium.org</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Records the reason why reading the V5 store failed during migration to V4.
+    Recorded when attempting to parse the v5 store from disk fails.
+  </summary>
+</histogram>
+
+<histogram name="SafeBrowsing.V4Store.V5ToV4MigrationResult"
+    enum="SafeBrowsingV5ToV4MigrationResult" expires_after="2027-05-05">
+  <owner>thefrog@chromium.org</owner>
+  <owner>chrome-counter-abuse-alerts@google.com</owner>
+  <summary>
+    Track the result of migrating a SafeBrowsing store from v5 to v4 on disk.
+    Recorded when a migration is attempted even if it does not occur.
+  </summary>
+</histogram>
+
 <histogram name="SafeBrowsing.V4StoreRead.Result"
     enum="SafeBrowsingV4StoreReadResult" expires_after="2026-11-15">
 <!-- Note to owner: This histogram can be renewed 1 full year if it is still

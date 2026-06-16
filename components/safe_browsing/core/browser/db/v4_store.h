@@ -72,8 +72,48 @@ class V4StoreFactory {
 
   virtual V4StorePtr CreateV4Store(
       const scoped_refptr<base::SequencedTaskRunner>& task_runner,
-      const base::FilePath& store_path);
+      const base::FilePath& store_path,
+      PrefixSize v5_prefix_size);
 };
+
+// Enumerate different results of the migration attempt from v5 to v4.
+// These values are persisted to logs. Entries should not be renumbered and
+// numeric values should never be reused.
+// LINT.IfChange(V5ToV4MigrationResult)
+enum class V5ToV4MigrationResult {
+  // The disk is already in v4 format (migration not needed).
+  kDiskAlreadyV4 = 0,
+
+  // The migration from v5 to v4 completed successfully.
+  kV5ToV4MigrationSucceeded = 1,
+
+  // The v5 store file was not found on disk.
+  kV5StoreNotFound = 2,
+
+  // Failed to read or validate the v5 store file from disk.
+  kReadV5Failed = 3,
+
+  // The prefix size in v5 hash file doesn't match the expected V4 prefix size.
+  kPrefixSizeMismatchFailure = 4,
+
+  // The referenced v5 hash file is missing from disk.
+  kHashFileMissingFailure = 5,
+
+  // Failed to rename/move the v5 hash file to the v4 path.
+  kRenameHashFileFailure = 6,
+
+  // Failed to write the new V4StoreFileFormat proto to disk.
+  kWriteV4FileFailure = 7,
+
+  // Failed to rename the temp V4 store file to the final path.
+  kRenameV4StoreFileFailure = 8,
+
+  // Failed to serialize the new V4StoreFileFormat proto.
+  kProtoSerializationFailure = 9,
+
+  kMaxValue = kProtoSerializationFailure
+};
+// LINT.ThenChange(//tools/metrics/histograms/metadata/safe_browsing/enums.xml:V5ToV4MigrationResult)
 
 class V4Store : public SBStore {
  public:
@@ -87,6 +127,7 @@ class V4Store : public SBStore {
   // applying an update.
   V4Store(const scoped_refptr<base::SequencedTaskRunner>& task_runner,
           const base::FilePath& store_path,
+          PrefixSize v5_prefix_size,
           int64_t old_file_size = 0);
   ~V4Store() override;
 
@@ -227,6 +268,27 @@ class V4Store : public SBStore {
   FRIEND_TEST_ALL_PREFIXES(V4StorePerftest, VerifyChecksumFast);
   FRIEND_TEST_ALL_PREFIXES(V4StorePerftest, MergeUpdateFast);
   FRIEND_TEST_ALL_PREFIXES(V4StoreTest, PreMmapMigrationFileFormatFails);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationAlreadyV4);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationDisabled);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationV5NotFound);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationSuccess);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationSuccessNoHashFile);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationPrefixSizeMismatch);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationHashFileMissing);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationFailureRename);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationFailureWrite);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationFailureRenameV4Store);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationSuccessButReadFailure);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationFailureInvalidV5);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationFailureOpenFailureV5);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationFailureEmptyV5);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationFailureCorruptedV5);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest,
+                           TestMigrationFailureIncompatibleVersionV5);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationFailureMissingDetailsV5);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest,
+                           TestMigrationInterruptedWipesEverything);
+  FRIEND_TEST_ALL_PREFIXES(V4StoreTest, TestMigrationLogsResult);
 
   friend class V4StoreTest;
   friend class V4StoreFuzzer;
@@ -345,6 +407,19 @@ class V4Store : public SBStore {
   // for the failure or reports success.
   StoreReadResult ReadFromDisk();
 
+  // Reads the state of the store from the v4 file on disk directly. Returns the
+  // reason for the failure or reports success.
+  StoreReadResult ReadFromDiskInternal();
+
+  // Attempts to migrate the store from v5 to v4 if needed. Returns the reason
+  // for the failure or reports success.
+  V5ToV4MigrationResult AttemptV5ToV4Migration();
+
+  // Performs the actual migration steps from the v5 store to v4.
+  // |v5_store_path| is the path to the V5 store file to migrate.
+  // Returns the reason for the failure or reports success.
+  V5ToV4MigrationResult MigrateFromV5(const base::FilePath& v5_store_path);
+
   // Updates the |additions_map| with the additions received in the partial
   // update from the server. The UMA metrics for all interesting sub-operations
   // use the prefix |metric|.
@@ -382,6 +457,9 @@ class V4Store : public SBStore {
 
   // Records the number of times we have looked up the store.
   size_t checks_attempted_ = 0;
+
+  // The expected prefix size for the hash prefixes in V5 store.
+  const PrefixSize v5_prefix_size_ = 0;
 
   // The state of the store as returned by the PVer4 server in the last applied
   // update response.

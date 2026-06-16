@@ -11,6 +11,7 @@
 #include "base/strings/string_util.h"
 #include "components/safe_browsing/core/browser/db/sb_protocol_manager_util.h"
 #include "components/safe_browsing/core/browser/db/v4_store.pb.h"
+#include "components/safe_browsing/core/common/proto/v5_store.pb.h"
 
 namespace safe_browsing {
 
@@ -160,6 +161,47 @@ StoreReadResult SBStore::ParseAndValidateV4StoreFileFormat(
   }
 
   return READ_SUCCESS;
+}
+
+// static
+V5StoreReadResult SBStore::ParseAndValidateV5StoreFileFormat(
+    const base::FilePath& store_path,
+    V5StoreFileFormat& file_format,
+    int64_t* file_size) {
+  {
+    BaseFileInputStream input_stream(store_path);
+    if (!file_format.ParseFromZeroCopyStream(&input_stream)) {
+      return input_stream.GetError() != base::File::FILE_OK
+                 ? V5StoreReadResult::kFileReadFailure
+                 : V5StoreReadResult::kProtoParsingFailure;
+    }
+    // `ParseFromZeroCopyStream` will return true if the file didn't exist, so
+    // explicitly check for an error when reading from the file.
+    if (input_stream.GetError() != base::File::FILE_OK) {
+      return V5StoreReadResult::kFileOpenFailure;
+    }
+    int64_t bytes_read = input_stream.ByteCount();
+    if (!bytes_read) {
+      return V5StoreReadResult::kFileEmptyFailure;
+    }
+    if (file_size) {
+      *file_size = bytes_read;
+    }
+  }
+
+  if (file_format.magic_number() != kFileMagic) {
+    return V5StoreReadResult::kUnexpectedMagicNumberFailure;
+  }
+
+  if (file_format.file_version() != kV5FileVersion) {
+    return V5StoreReadResult::kFileVersionIncompatibleFailure;
+  }
+
+  if (!file_format.has_list_details()) {
+    return V5StoreReadResult::kHashPrefixInfoMissingFailure;
+  }
+
+  return V5StoreReadResult::kReadSuccess;
 }
 
 }  // namespace safe_browsing

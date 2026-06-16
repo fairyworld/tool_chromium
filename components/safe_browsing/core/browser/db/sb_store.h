@@ -13,6 +13,8 @@
 #include "base/task/sequenced_task_runner.h"
 #include "third_party/protobuf/src/google/protobuf/io/zero_copy_stream.h"
 #include "third_party/protobuf/src/google/protobuf/io/zero_copy_stream_impl_lite.h"
+class V5StoreFileFormat;
+
 namespace safe_browsing {
 
 class V4StoreFileFormat;
@@ -58,10 +60,58 @@ enum StoreReadResult {
   // The file is in a pre-mmap migration format, which is no longer supported.
   PRE_MMAP_MIGRATION_FILE_FORMAT_FAILURE = 10,
 
+  // Failed to migrate from v5 to v4.
+  V5_TO_V4_MIGRATION_FAILURE = 11,
+
   // Memory space for histograms is determined by the max.  ALWAYS
   // ADD NEW VALUES BEFORE THIS ONE.
   STORE_READ_RESULT_MAX
 };
+
+// Enumerate different failure events while parsing the file read from disk for
+// histogramming purposes. These values are persisted to logs. Entries should
+// not be renumbered and numeric values should never be reused.
+// LINT.IfChange(V5StoreReadResult)
+enum class V5StoreReadResult {
+  // No errors.
+  kReadSuccess = 0,
+
+  // Reserved for errors in parsing this enum.
+  kUnexpectedReadFailure = 1,
+
+  // The store file could not be opened (e.g. missing, access denied).
+  kFileOpenFailure = 2,
+
+  // The file was found to be empty.
+  kFileEmptyFailure = 3,
+
+  // The contents of the file could not be interpreted as a valid
+  // V5StoreFileFormat proto.
+  kProtoParsingFailure = 4,
+
+  // The magic number didn't match. We're most likely trying to read a file
+  // that doesn't contain hash prefixes.
+  kUnexpectedMagicNumberFailure = 5,
+
+  // The version of the file is different from expected and Chromium doesn't
+  // know how to interpret this version of the file.
+  kFileVersionIncompatibleFailure = 6,
+
+  // The rest of the file could not be parsed.
+  kHashPrefixInfoMissingFailure = 7,
+
+  // Unable to generate the hash prefix list from the updates on disk.
+  kHashPrefixListGenerationFailure = 8,
+
+  // A read error occurred while parsing the file.
+  kFileReadFailure = 9,
+
+  // Failed to migrate from v4 to v5.
+  kV4ToV5MigrationFailure = 10,
+
+  kMaxValue = kV4ToV5MigrationFailure
+};
+// LINT.ThenChange(//tools/metrics/histograms/metadata/safe_browsing/enums.xml:SafeBrowsingV5StoreReadResult)
 
 // A ZeroCopyInputStream that reads from a file using base::File. Any errors
 // during deserialization close the file.
@@ -136,11 +186,18 @@ class SBStore {
  protected:
   static constexpr uint32_t kFileMagic = 0x600D71FE;
   static constexpr uint32_t kV4FileVersion = 9;
+  static constexpr uint32_t kV5FileVersion = 10;
 
   // Parses and validates a v4 store file format from disk.
   static StoreReadResult ParseAndValidateV4StoreFileFormat(
       const base::FilePath& store_path,
       V4StoreFileFormat& file_format,
+      int64_t* file_size = nullptr);
+
+  // Parses and validates a v5 store file format from disk.
+  static V5StoreReadResult ParseAndValidateV5StoreFileFormat(
+      const base::FilePath& store_path,
+      V5StoreFileFormat& file_format,
       int64_t* file_size = nullptr);
 
   virtual std::string GetMetricPrefix() const = 0;

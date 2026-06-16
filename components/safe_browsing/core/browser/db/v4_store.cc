@@ -23,6 +23,7 @@
 #include "base/logging.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/histogram_macros.h"
+#include "base/strings/string_number_conversions.h"
 #include "base/strings/string_view_util.h"
 #include "base/strings/stringprintf.h"
 #include "base/task/sequenced_task_runner.h"
@@ -33,6 +34,7 @@
 #include "components/safe_browsing/core/browser/db/v4_rice.h"
 #include "components/safe_browsing/core/browser/db/v4_store.pb.h"
 #include "components/safe_browsing/core/common/features.h"
+#include "components/safe_browsing/core/common/proto/v5_store.pb.h"
 #include "components/safe_browsing/core/common/proto/webui.pb.h"
 #include "crypto/hash.h"
 #include "third_party/abseil-cpp/absl/cleanup/cleanup.h"
@@ -245,8 +247,9 @@ std::ostream& operator<<(std::ostream& os, const V4Store& store) {
 
 V4StorePtr V4StoreFactory::CreateV4Store(
     const scoped_refptr<base::SequencedTaskRunner>& task_runner,
-    const base::FilePath& store_path) {
-  V4StorePtr new_store(new V4Store(task_runner, store_path),
+    const base::FilePath& store_path,
+    PrefixSize v5_prefix_size) {
+  V4StorePtr new_store(new V4Store(task_runner, store_path, v5_prefix_size),
                        V4StoreDeleter(task_runner));
   new_store->Initialize();
   return new_store;
@@ -267,10 +270,12 @@ std::string V4Store::GetMetricPrefix() const {
 
 V4Store::V4Store(const scoped_refptr<base::SequencedTaskRunner>& task_runner,
                  const base::FilePath& store_path,
+                 PrefixSize v5_prefix_size,
                  const int64_t old_file_size)
     : SBStore(task_runner, store_path, old_file_size),
       hash_prefix_map_(
-          std::make_unique<HashPrefixMap>(store_path, task_runner)) {}
+          std::make_unique<HashPrefixMap>(store_path, task_runner)),
+      v5_prefix_size_(v5_prefix_size) {}
 
 V4Store::~V4Store() = default;
 
@@ -430,8 +435,9 @@ void V4Store::ApplyUpdate(
     const scoped_refptr<base::SequencedTaskRunner>& callback_task_runner,
     UpdatedStoreReadyCallback callback) {
   base::ElapsedThreadTimer thread_timer;
-  V4StorePtr new_store(new V4Store(task_runner_, store_path_, file_size_),
-                       V4StoreDeleter(task_runner_));
+  V4StorePtr new_store(
+      new V4Store(task_runner_, store_path_, v5_prefix_size_, file_size_),
+      V4StoreDeleter(task_runner_));
   ApplyUpdateResult apply_update_result;
   std::optional<std::string> metric;
   ApplyUpdateType apply_update_type;
@@ -870,8 +876,49 @@ ApplyUpdateResult V4Store::MergeUpdate(
   return APPLY_UPDATE_SUCCESS;
 }
 
+V5ToV4MigrationResult V4Store::AttemptV5ToV4Migration() {
+  CHECK(task_runner_->RunsTasksInCurrentSequence());
+
+  if (base::PathExists(store_path_)) {
+    return V5ToV4MigrationResult::kDiskAlreadyV4;
+  }
+  base::FilePath v5_store_path =
+      store_path_.InsertBeforeExtension(FILE_PATH_LITERAL("_v5"));
+  if (!base::PathExists(v5_store_path)) {
+    return V5ToV4MigrationResult::kV5StoreNotFound;
+  }
+  return MigrateFromV5(v5_store_path);
+}
 
 StoreReadResult V4Store::ReadFromDisk() {
+  DCHECK(task_runner_->RunsTasksInCurrentSequence());
+
+  if (!base::FeatureList::IsEnabled(
+          kAllowSafeBrowsingV4StoreDiskMigrationChanges)) {
+    return ReadFromDiskInternal();
+  }
+
+  V5ToV4MigrationResult migration_result = AttemptV5ToV4Migration();
+  base::UmaHistogramEnumeration("SafeBrowsing.V4Store.V5ToV4MigrationResult",
+                                migration_result);
+  switch (migration_result) {
+    case V5ToV4MigrationResult::kDiskAlreadyV4:
+    case V5ToV4MigrationResult::kV5ToV4MigrationSucceeded:
+      return ReadFromDiskInternal();
+    case V5ToV4MigrationResult::kV5StoreNotFound:
+      return FILE_UNREADABLE_FAILURE;
+    case V5ToV4MigrationResult::kReadV5Failed:
+    case V5ToV4MigrationResult::kPrefixSizeMismatchFailure:
+    case V5ToV4MigrationResult::kHashFileMissingFailure:
+    case V5ToV4MigrationResult::kRenameHashFileFailure:
+    case V5ToV4MigrationResult::kWriteV4FileFailure:
+    case V5ToV4MigrationResult::kRenameV4StoreFileFailure:
+    case V5ToV4MigrationResult::kProtoSerializationFailure:
+      return V5_TO_V4_MIGRATION_FAILURE;
+  }
+}
+
+StoreReadResult V4Store::ReadFromDiskInternal() {
   DCHECK(task_runner_->RunsTasksInCurrentSequence());
 
   V4StoreFileFormat file_format;
@@ -905,6 +952,115 @@ StoreReadResult V4Store::ReadFromDisk() {
   }
 
   return READ_SUCCESS;
+}
+
+V5ToV4MigrationResult V4Store::MigrateFromV5(
+    const base::FilePath& v5_store_path) {
+  V5StoreFileFormat v5_file_format;
+  int64_t v5_file_size = 0;
+  base::FilePath v5_hash_file_path;
+  base::FilePath v4_hash_file_path;
+  base::FilePath temp_store_path = store_path_.AddExtensionASCII("tmp");
+  bool migration_succeeded = false;
+
+  // If we fail to migrate from v5, we wipe the v5 files and the attempted v4
+  // file format temp file.
+  absl::Cleanup cleanup_on_failure = [&v5_store_path, &v5_hash_file_path,
+                                      &v4_hash_file_path, &temp_store_path,
+                                      &migration_succeeded] {
+    if (!migration_succeeded) {
+      base::DeleteFile(v5_store_path);
+      if (!v5_hash_file_path.empty()) {
+        base::DeleteFile(v5_hash_file_path);
+      }
+      if (!v4_hash_file_path.empty()) {
+        base::DeleteFile(v4_hash_file_path);
+      }
+      base::DeleteFile(temp_store_path);
+    }
+  };
+
+  // Parse and validate the existing V5 store file.
+  V5StoreReadResult validation_result = ParseAndValidateV5StoreFileFormat(
+      v5_store_path, v5_file_format, &v5_file_size);
+  if (validation_result != V5StoreReadResult::kReadSuccess) {
+    base::UmaHistogramEnumeration(
+        "SafeBrowsing.V4Store.V5ToV4Migration.V5ReadFailureReason",
+        validation_result);
+    return V5ToV4MigrationResult::kReadV5Failed;
+  }
+
+  const auto& list_details = v5_file_format.list_details();
+  std::string v4_ext;
+  uint64_t file_size = 0;
+
+  // Move the V5 hash file to the V4 path if it exists.
+  if (list_details.has_hash_file()) {
+    const auto& hash_file = list_details.hash_file();
+    // This is used in `cleanup_on_failure` above so it needs to run as soon as
+    // we have the `hash_file.extension()` available.
+    v5_hash_file_path =
+        HashPrefixContainer::GetPath(v5_store_path, hash_file.extension());
+    // TODO(crbug.com/362791941): Eventually change `v5_prefix_size_ != 0` to a
+    // CHECK in the constructor.
+    if (v5_prefix_size_ == 0 || hash_file.file_size() % v5_prefix_size_ != 0) {
+      return V5ToV4MigrationResult::kPrefixSizeMismatchFailure;
+    }
+    file_size = hash_file.file_size();
+    v4_ext =
+        base::NumberToString(v5_prefix_size_) + "_" + hash_file.extension();
+    v4_hash_file_path = HashPrefixContainer::GetPath(store_path_, v4_ext);
+
+    if (!base::PathExists(v5_hash_file_path)) {
+      return V5ToV4MigrationResult::kHashFileMissingFailure;
+    }
+
+    if (!base::Move(v5_hash_file_path, v4_hash_file_path)) {
+      return V5ToV4MigrationResult::kRenameHashFileFailure;
+    }
+  }
+
+  // Construct the new V4StoreFileFormat proto.
+  V4StoreFileFormat v4_file_format;
+  v4_file_format.set_magic_number(v5_file_format.magic_number());
+  v4_file_format.set_version_number(kV4FileVersion);
+
+  ListUpdateResponse* response = v4_file_format.mutable_list_update_response();
+  if (list_details.has_version()) {
+    response->set_new_client_state(list_details.version());
+  }
+  if (list_details.has_checksum()) {
+    response->mutable_checksum()->set_sha256(list_details.checksum().sha256());
+  }
+  response->set_response_type(ListUpdateResponse::FULL_UPDATE);
+
+  if (list_details.has_hash_file()) {
+    HashFile* hash_file = v4_file_format.add_hash_files();
+    hash_file->set_prefix_size(v5_prefix_size_);
+    hash_file->set_extension(v4_ext);
+    hash_file->set_file_size(file_size);
+  }
+
+  // Serialize and write the new V4 proto to disk.
+  std::string v4_file_format_string;
+  if (!v4_file_format.SerializeToString(&v4_file_format_string)) {
+    return V5ToV4MigrationResult::kProtoSerializationFailure;
+  }
+
+  if (!base::WriteFile(temp_store_path, v4_file_format_string)) {
+    return V5ToV4MigrationResult::kWriteV4FileFailure;
+  }
+
+  if (!base::Move(temp_store_path, store_path_)) {
+    return V5ToV4MigrationResult::kRenameV4StoreFileFailure;
+  }
+
+  migration_succeeded = true;
+
+  // Delete the old V5 store file.
+  base::DeleteFile(v5_store_path);
+
+  return V5ToV4MigrationResult::kV5ToV4MigrationSucceeded;
 }
 
 StoreWriteResult V4Store::WriteToDisk(const Checksum& checksum) {

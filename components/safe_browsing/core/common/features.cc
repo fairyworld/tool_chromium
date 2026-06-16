@@ -41,6 +41,10 @@ BASE_FEATURE(kAdSamplerTriggerFeature,
 BASE_FEATURE(kAddWarningShownTSToClientSafeBrowsingReport,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
+BASE_FEATURE(kAllowSafeBrowsingV4StoreDiskMigrationChanges,
+             "SafeBrowsingAllowV4StoreDiskMigrationChanges",
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
 BASE_FEATURE(kAutoRevokeSuspiciousNotification,
              base::FEATURE_ENABLED_BY_DEFAULT);
 constexpr base::FeatureParam<int>
@@ -473,6 +477,7 @@ base::ListValue GetFeatureStatusList() {
   // chrome://safe-browsing. Features should be listed in alphabetical order.
   const base::Feature* kExperimentalFeatures[] = {
       // keep-sorted start
+      &kAllowSafeBrowsingV4StoreDiskMigrationChanges,
       &kAutoRevokeSuspiciousNotification,
       &kBundledSecuritySettings,
       &kBundledSecuritySettingsAskBeforeHttp,

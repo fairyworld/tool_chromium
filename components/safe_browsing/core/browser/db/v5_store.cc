@@ -19,7 +19,6 @@ namespace safe_browsing {
 
 namespace {
 
-const uint32_t kFileVersion = 10;
 const char kApplyUpdate[] = ".ApplyUpdate";
 const char kResult[] = ".Result";
 
@@ -116,34 +115,10 @@ V5StoreReadResult V5Store::ReadFromDiskInternal() {
 
   V5StoreFileFormat file_format;
   int64_t file_size;
-  {
-    BaseFileInputStream input_stream(store_path_);
-    if (!file_format.ParseFromZeroCopyStream(&input_stream)) {
-      return input_stream.GetError() != base::File::FILE_OK
-                 ? V5StoreReadResult::kFileReadFailure
-                 : V5StoreReadResult::kProtoParsingFailure;
-    }
-    // `ParseFromZeroCopyStream` will return true if the file didn't exist, so
-    // explicitly check for an error when reading from the file.
-    if (input_stream.GetError() != base::File::FILE_OK) {
-      return V5StoreReadResult::kFileOpenFailure;
-    }
-    file_size = input_stream.ByteCount();
-    if (!file_size) {
-      return V5StoreReadResult::kFileEmptyFailure;
-    }
-  }
-
-  if (file_format.magic_number() != kFileMagic) {
-    return V5StoreReadResult::kUnexpectedMagicNumberFailure;
-  }
-
-  if (file_format.file_version() != kFileVersion) {
-    return V5StoreReadResult::kFileVersionIncompatibleFailure;
-  }
-
-  if (!file_format.has_list_details()) {
-    return V5StoreReadResult::kHashPrefixInfoMissingFailure;
+  V5StoreReadResult validation_result =
+      ParseAndValidateV5StoreFileFormat(store_path_, file_format, &file_size);
+  if (validation_result != V5StoreReadResult::kReadSuccess) {
+    return validation_result;
   }
 
   V5ApplyUpdateResult apply_update_result =
@@ -254,7 +229,7 @@ V4ToV5MigrationResult V5Store::MigrateFromV4(
   // Construct the new V5StoreFileFormat proto.
   V5StoreFileFormat v5_file_format;
   v5_file_format.set_magic_number(v4_file_format.magic_number());
-  v5_file_format.set_file_version(kFileVersion);
+  v5_file_format.set_file_version(kV5FileVersion);
 
   ListDetails* list_details = v5_file_format.mutable_list_details();
   if (v4_file_format.list_update_response().has_new_client_state()) {

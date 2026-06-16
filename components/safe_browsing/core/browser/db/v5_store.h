@@ -17,51 +17,6 @@
 
 namespace safe_browsing {
 
-// Enumerate different failure events while parsing the file read from disk for
-// histogramming purposes. These values are persisted to logs. Entries should
-// not be renumbered and numeric values should never be reused.
-// LINT.IfChange(V5StoreReadResult)
-enum class V5StoreReadResult {
-  // No errors.
-  kReadSuccess = 0,
-
-  // Reserved for errors in parsing this enum.
-  kUnexpectedReadFailure = 1,
-
-  // The store file could not be opened (e.g. missing, access denied).
-  kFileOpenFailure = 2,
-
-  // The file was found to be empty.
-  kFileEmptyFailure = 3,
-
-  // The contents of the file could not be interpreted as a valid
-  // V5StoreFileFormat proto.
-  kProtoParsingFailure = 4,
-
-  // The magic number didn't match. We're most likely trying to read a file
-  // that doesn't contain hash prefixes.
-  kUnexpectedMagicNumberFailure = 5,
-
-  // The version of the file is different from expected and Chromium doesn't
-  // know how to interpret this version of the file.
-  kFileVersionIncompatibleFailure = 6,
-
-  // The rest of the file could not be parsed.
-  kHashPrefixInfoMissingFailure = 7,
-
-  // Unable to generate the hash prefix list from the updates on disk.
-  kHashPrefixListGenerationFailure = 8,
-
-  // A read error occurred while parsing the file.
-  kFileReadFailure = 9,
-
-  // Failed to migrate from v4 to v5.
-  kV4ToV5MigrationFailure = 10,
-
-  kMaxValue = kV4ToV5MigrationFailure
-};
-// LINT.ThenChange(//tools/metrics/histograms/metadata/safe_browsing/enums.xml:SafeBrowsingV5StoreReadResult)
-
 // Enumerate different results of the migration attempt from v4 to v5.
 // These values are persisted to logs. Entries should not be renumbered and
 // numeric values should never be reused.
