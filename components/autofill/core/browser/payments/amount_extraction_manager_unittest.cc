@@ -44,7 +44,8 @@ namespace autofill::payments {
 
 namespace {
 
-using base::test::EqualsProto;
+using ::autofill::autofill_metrics::AiAmountExtractionInvalidResponseReason;
+using ::base::test::EqualsProto;
 using ::testing::_;
 using ::testing::A;
 using ::testing::ElementsAre;
@@ -58,8 +59,6 @@ using ModelExecutionCallback = base::OnceCallback<void(
     std::unique_ptr<optimization_guide::ModelQualityLogEntry>)>;
 using ApcFetchCallback = base::OnceCallback<void(
     std::optional<optimization_guide::proto::AnnotatedPageContent>)>;
-using autofill_metrics::AiAmountExtractionInvalidResponseReason;
-}  // namespace
 
 class MockAutofillDriver : public TestAutofillDriver {
  public:
@@ -146,13 +145,13 @@ class AmountExtractionManagerTest
   }
 
   void FakeCheckoutAmountReceived(const std::string& extracted_amount) {
-    amount_extraction_manager_->OnCheckoutAmountReceived(base::TimeTicks::Now(),
-                                                         extracted_amount);
+    test_api(*amount_extraction_manager_)
+        .OnCheckoutAmountReceived(base::TimeTicks::Now(), extracted_amount);
   }
 
   void FakeAmountExtractionTimeout() {
     test_api(*amount_extraction_manager_).SetSearchRequestPending(true);
-    amount_extraction_manager_->OnTimeoutReached();
+    test_api(*amount_extraction_manager_).OnTimeoutReached();
   }
 
   void FakeCheckoutAmountReceivedFromAi(
@@ -175,12 +174,13 @@ class AmountExtractionManagerTest
         base::StrCat({"type.googleapis.com/", response.GetTypeName()}));
     any_result.set_value(serialized_metadata);
 
-    amount_extraction_manager_->OnCheckoutAmountReceivedFromAi(
-        is_mocking_empty_result
-            ? optimization_guide::OptimizationGuideModelExecutionResult()
-            : optimization_guide::OptimizationGuideModelExecutionResult(
-                  any_result, nullptr),
-        nullptr);
+    test_api(*amount_extraction_manager_)
+        .OnCheckoutAmountReceivedFromAi(
+            is_mocking_empty_result
+                ? optimization_guide::OptimizationGuideModelExecutionResult()
+                : optimization_guide::OptimizationGuideModelExecutionResult(
+                      any_result, nullptr),
+            nullptr);
   }
 
   void SetUpCheckoutAmountExtractionCall(const std::string& extracted_amount,
@@ -2136,4 +2136,5 @@ TEST_F(AmountExtractionManagerTest,
 #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
         // BUILDFLAG(IS_CHROMEOS)
 
+}  // namespace
 }  // namespace autofill::payments
