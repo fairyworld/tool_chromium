@@ -142,7 +142,7 @@ suite('ToolbarButtonTest', function() {
   let handler: PressHandler;
   let target: HTMLElement;
 
-  beforeEach(() => {
+  setup(() => {
     shortPressCount = 0;
     longPressCount = 0;
     handler = new PressHandler(
