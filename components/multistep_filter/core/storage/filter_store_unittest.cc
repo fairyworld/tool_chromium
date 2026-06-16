@@ -151,7 +151,7 @@ TEST_F(FilterStoreTest,
   EXPECT_THAT(get_future.Get(), SizeIs(0));
 }
 
-TEST_F(FilterStoreTest, DeleteAnnotationsForDomains) {
+TEST_F(FilterStoreTest, DeleteAnnotationsForHosts) {
   base::test::TestFuture<bool> store_future1;
   base::test::TestFuture<bool> store_future2;
   base::test::TestFuture<bool> store_future3;
@@ -162,13 +162,13 @@ TEST_F(FilterStoreTest, DeleteAnnotationsForDomains) {
   base::Time now = base::Time::Now();
   const base::Uuid id1 = base::Uuid::GenerateRandomV4();
   const FilterAnnotation annotation1(id1, "task1", "example1.com",
-                                     "sub.example1.com", now, {});
+                                     "sub1.example1.com", now, {});
   const base::Uuid id2 = base::Uuid::GenerateRandomV4();
   const FilterAnnotation annotation2(id2, "task1", "example2.com",
-                                     "sub.example2.com", now, {});
+                                     "sub2.example2.com", now, {});
   const base::Uuid id3 = base::Uuid::GenerateRandomV4();
   const FilterAnnotation annotation3(id3, "task2", "example1.com",
-                                     "sub.example1.com", now - base::Hours(2),
+                                     "sub1.example1.com", now - base::Hours(2),
                                      {});
 
   store()->StoreAnnotation(annotation1, store_future1.GetCallback());
@@ -178,11 +178,11 @@ TEST_F(FilterStoreTest, DeleteAnnotationsForDomains) {
   ASSERT_TRUE(store_future2.Get());
   ASSERT_TRUE(store_future3.Get());
 
-  // Delete data for example1.com in the last hour.
+  // Delete data for sub1.example1.com in the last hour.
   // It should only delete annotation1!
-  store()->DeleteAnnotationsForDomains({"example1.com"}, now - base::Hours(1),
-                                       now + base::Hours(1),
-                                       delete_future.GetCallback());
+  store()->DeleteAnnotationsForHosts({"sub1.example1.com"},
+                                     now - base::Hours(1), now + base::Hours(1),
+                                     delete_future.GetCallback());
   EXPECT_THAT(delete_future.Get(), Optional(1));
 
   // task1 should only have annotation2 remaining.

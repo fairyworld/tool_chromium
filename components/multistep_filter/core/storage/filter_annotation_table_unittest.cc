@@ -226,26 +226,27 @@ TEST_F(FilterAnnotationTableTest,
   EXPECT_THAT(annotations, SizeIs(0));
 }
 
-TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForDomains) {
+TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForHosts) {
   base::Time now = base::Time::Now();
   const base::Uuid id1 = base::Uuid::GenerateRandomV4();
   const FilterAnnotation annotation1(id1, "task1", "example1.com",
-                                     "sub.example1.com", now, {});
+                                     "sub1.example1.com", now, {});
   const base::Uuid id2 = base::Uuid::GenerateRandomV4();
   const FilterAnnotation annotation2(id2, "task1", "example2.com",
-                                     "sub.example2.com", now, {});
+                                     "sub2.example2.com", now, {});
   const base::Uuid id3 = base::Uuid::GenerateRandomV4();
   const FilterAnnotation annotation3(id3, "task2", "example1.com",
-                                     "sub.example1.com", now - base::Hours(2),
+                                     "sub1.example1.com", now - base::Hours(2),
                                      {});
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation1));
   ASSERT_TRUE(table()->StoreAnnotation(annotation2));
   ASSERT_TRUE(table()->StoreAnnotation(annotation3));
 
-  EXPECT_THAT(table()->DeleteAnnotationsForDomains(
-                  {"example1.com"}, now - base::Hours(1), now + base::Hours(1)),
-              Optional(1));
+  EXPECT_THAT(
+      table()->DeleteAnnotationsForHosts(
+          {"sub1.example1.com"}, now - base::Hours(1), now + base::Hours(1)),
+      Optional(1));
 
   const std::vector<FilterAnnotation> annotations1 =
       table()->GetAnnotationsForTaskSortedByCreationTimestamp(
@@ -260,17 +261,17 @@ TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForDomains) {
   EXPECT_EQ(annotations2[0].id, id3);
 }
 
-TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForDomains_BoundaryTimes) {
+TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForHosts_BoundaryTimes) {
   base::Time now = base::Time::Now();
   base::Time begin = now - base::Hours(1);
   base::Time end = now + base::Hours(1);
 
   const base::Uuid id1 = base::Uuid::GenerateRandomV4();
   const FilterAnnotation annotation1(id1, "task1", "example1.com",
-                                     "sub.example1.com", begin, {});
+                                     "sub1.example1.com", begin, {});
   const base::Uuid id2 = base::Uuid::GenerateRandomV4();
   const FilterAnnotation annotation2(id2, "task2", "example1.com",
-                                     "sub.example1.com", end, {});
+                                     "sub1.example1.com", end, {});
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation1));
   ASSERT_TRUE(table()->StoreAnnotation(annotation2));
@@ -278,7 +279,7 @@ TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForDomains_BoundaryTimes) {
   // Should only delete annotation1 (at begin) since ranges are half-open
   // [begin, end)
   EXPECT_THAT(
-      table()->DeleteAnnotationsForDomains({"example1.com"}, begin, end),
+      table()->DeleteAnnotationsForHosts({"sub1.example1.com"}, begin, end),
       Optional(1));
 
   // task2 should still have annotation2 (since it was exactly at end and
@@ -290,46 +291,46 @@ TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForDomains_BoundaryTimes) {
   EXPECT_EQ(annotations[0].id, id2);
 }
 
-TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForDomains_MultipleDomains) {
+TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForHosts_MultipleHosts) {
   base::Time now = base::Time::Now();
   const base::Uuid id1 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation1(id1, "task1", "a.com", "sub.a.com", now,
+  const FilterAnnotation annotation1(id1, "task1", "a.com", "sub1.a.com", now,
                                      {});
   const base::Uuid id2 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation2(id2, "task2", "b.com", "sub.b.com", now,
+  const FilterAnnotation annotation2(id2, "task2", "b.com", "sub1.b.com", now,
                                      {});
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation1));
   ASSERT_TRUE(table()->StoreAnnotation(annotation2));
 
-  EXPECT_THAT(
-      table()->DeleteAnnotationsForDomains(
-          {"a.com", "b.com"}, now - base::Hours(1), now + base::Hours(1)),
-      Optional(2));
+  EXPECT_THAT(table()->DeleteAnnotationsForHosts({"sub1.a.com", "sub1.b.com"},
+                                                 now - base::Hours(1),
+                                                 now + base::Hours(1)),
+              Optional(2));
 }
 
-TEST_F(FilterAnnotationTableTest,
-       DeleteAnnotationsForDomains_DeletesAttributes) {
+TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForHosts_DeletesAttributes) {
   base::Time now = base::Time::Now();
   const base::Uuid id1 = base::Uuid::GenerateRandomV4();
   std::vector<FilterAttribute> attributes1;
   attributes1.emplace_back("key1", "value1");
   const FilterAnnotation annotation1(id1, "task1", "example1.com",
-                                     "sub.example1.com", now, attributes1);
+                                     "sub1.example1.com", now, attributes1);
 
   const base::Uuid id2 = base::Uuid::GenerateRandomV4();
   std::vector<FilterAttribute> attributes2;
   attributes2.emplace_back("key2", "value2");
   const FilterAnnotation annotation2(id2, "task2", "example2.com",
-                                     "sub.example2.com", now, attributes2);
+                                     "sub2.example2.com", now, attributes2);
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation1));
   ASSERT_TRUE(table()->StoreAnnotation(annotation2));
 
-  // Delete data for example1.com.
-  EXPECT_THAT(table()->DeleteAnnotationsForDomains(
-                  {"example1.com"}, now - base::Hours(1), now + base::Hours(1)),
-              Optional(1));
+  // Delete data for sub1.example1.com.
+  EXPECT_THAT(
+      table()->DeleteAnnotationsForHosts(
+          {"sub1.example1.com"}, now - base::Hours(1), now + base::Hours(1)),
+      Optional(1));
 
   // Verify annotation1 is gone.
   const std::vector<FilterAnnotation> annotations1 =
@@ -346,21 +347,21 @@ TEST_F(FilterAnnotationTableTest,
 }
 
 TEST_F(FilterAnnotationTableTest,
-       DeleteAnnotationsForDomains_EmptyDomainsDeletesAll) {
+       DeleteAnnotationsForHosts_EmptyHostsDeletesAll) {
   base::Time now = base::Time::Now();
   const base::Uuid id1 = base::Uuid::GenerateRandomV4();
   const FilterAnnotation annotation1(id1, "task1", "example1.com",
-                                     "sub.example1.com", now, {});
+                                     "sub1.example1.com", now, {});
   const base::Uuid id2 = base::Uuid::GenerateRandomV4();
   const FilterAnnotation annotation2(id2, "task2", "example2.com",
-                                     "sub.example2.com", now, {});
+                                     "sub2.example2.com", now, {});
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation1));
   ASSERT_TRUE(table()->StoreAnnotation(annotation2));
 
-  // Delete data for all domains in the last hour.
-  EXPECT_THAT(table()->DeleteAnnotationsForDomains({}, now - base::Hours(1),
-                                                   now + base::Hours(1)),
+  // Delete data for all hosts in the last hour.
+  EXPECT_THAT(table()->DeleteAnnotationsForHosts({}, now - base::Hours(1),
+                                                 now + base::Hours(1)),
               Optional(2));
 
   // Verify both are gone.

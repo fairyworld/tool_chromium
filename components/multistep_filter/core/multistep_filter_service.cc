@@ -227,13 +227,13 @@ void MultistepFilterService::OnHistoryDeletions(
     return;
   }
 
-  std::vector<std::string> deleted_domains;
+  std::vector<std::string> deleted_hosts;
   for (const history::URLRow& url_row : deletion_info.deleted_rows()) {
-    deleted_domains.push_back(GetEtldPlusOne(url_row.url()));
+    deleted_hosts.push_back(url_row.url().GetHost());
   }
 
   // If the time range is invalid (e.g., when specific URLs are deleted from
-  // history), fall back to clearing the domains for all time. Reusing the
+  // history), fall back to clearing the hosts for all time. Reusing the
   // existing parameterized query with minimum/maximum boundaries avoids the
   // need to compile and index a separate no-time-range SQL query.
   base::Time begin_time = deletion_info.time_range().IsValid()
@@ -243,8 +243,8 @@ void MultistepFilterService::OnHistoryDeletions(
                             ? deletion_info.time_range().end()
                             : base::Time::Max();
 
-  filter_store_->DeleteAnnotationsForDomains(
-      std::move(deleted_domains), begin_time, end_time,
+  filter_store_->DeleteAnnotationsForHosts(
+      std::move(deleted_hosts), begin_time, end_time,
       base::BindOnce(&LogHistoryDeleted, log_router_,
                      /*is_all_history=*/false));
 }

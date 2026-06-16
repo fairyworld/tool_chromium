@@ -55,9 +55,9 @@ class FilterStore {
       std::string task_type,
       base::OnceCallback<void(std::optional<int64_t>)> callback);
 
-  // Asynchronously deletes annotations for specific domains and time range.
-  virtual void DeleteAnnotationsForDomains(
-      std::vector<std::string> domains,
+  // Asynchronously deletes annotations for specific hosts and time range.
+  virtual void DeleteAnnotationsForHosts(
+      std::vector<std::string> hosts,
       base::Time delete_begin,
       base::Time delete_end,
       base::OnceCallback<void(std::optional<int64_t>)> callback);

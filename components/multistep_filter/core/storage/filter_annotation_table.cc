@@ -99,16 +99,16 @@ bool FilterAnnotationTable::Init(sql::Database* db) {
         {"CREATE INDEX IF NOT EXISTS filter_annotations_task_host_idx ON ",
          filter_annotations::kTableName, "(", filter_annotations::kTaskType,
          ", ", filter_annotations::kSourceHost, ")"});
-    const std::string kCreateAnnotationsDomainTimestampIndexSql = base::StrCat(
+    const std::string kCreateAnnotationsHostTimestampIndexSql = base::StrCat(
         {"CREATE INDEX IF NOT EXISTS "
-         "filter_annotations_domain_timestamp_idx "
+         "filter_annotations_host_timestamp_idx "
          "ON ",
-         filter_annotations::kTableName, "(", filter_annotations::kSourceDomain,
+         filter_annotations::kTableName, "(", filter_annotations::kSourceHost,
          ", ", filter_annotations::kCreationTimestamp, ")"});
     return db_->Execute(kCreateFilterAnnotationsIndexSql) &&
            db_->Execute(kCreateAttributesIndexSql) &&
            db_->Execute(kCreateAnnotationsCompositeIndexSql) &&
-           db_->Execute(kCreateAnnotationsDomainTimestampIndexSql);
+           db_->Execute(kCreateAnnotationsHostTimestampIndexSql);
   };
 
   return create_filter_annotations_table() &&
@@ -276,11 +276,11 @@ std::optional<int64_t> FilterAnnotationTable::DeleteAnnotationsForTask(
   return deleted_count;
 }
 
-std::optional<int64_t> FilterAnnotationTable::DeleteAnnotationsForDomains(
-    const std::vector<std::string>& domains,
+std::optional<int64_t> FilterAnnotationTable::DeleteAnnotationsForHosts(
+    const std::vector<std::string>& hosts,
     base::Time delete_begin,
     base::Time delete_end) {
-  if (domains.empty()) {
+  if (hosts.empty()) {
     return DeleteAnnotationsForTimeRange(delete_begin, delete_end);
   }
 
@@ -290,9 +290,9 @@ std::optional<int64_t> FilterAnnotationTable::DeleteAnnotationsForDomains(
   }
 
   int64_t total_deleted = 0;
-  for (const std::string& domain : domains) {
+  for (const std::string& host : hosts) {
     std::optional<int64_t> deleted =
-        DeleteAnnotationsForDomain(domain, delete_begin, delete_end);
+        DeleteAnnotationsForHost(host, delete_begin, delete_end);
     if (!deleted.has_value()) {
       return std::nullopt;
     }
@@ -332,16 +332,16 @@ std::optional<int64_t> FilterAnnotationTable::DeleteAnnotationsForTimeRange(
   return db_->GetLastChangeCount();
 }
 
-std::optional<int64_t> FilterAnnotationTable::DeleteAnnotationsForDomain(
-    std::string_view domain,
+std::optional<int64_t> FilterAnnotationTable::DeleteAnnotationsForHost(
+    std::string_view host,
     base::Time begin,
     base::Time end) {
   sql::Statement delete_attributes(db_->GetCachedStatement(
       SQL_FROM_HERE, GetDeleteAttributesSql(base::StrCat(
-                         {filter_annotations::kSourceDomain, " = ? AND ",
+                         {filter_annotations::kSourceHost, " = ? AND ",
                           filter_annotations::kCreationTimestamp, " >= ? AND ",
                           filter_annotations::kCreationTimestamp, " < ?"}))));
-  delete_attributes.BindString(0, domain);
+  delete_attributes.BindString(0, host);
   delete_attributes.BindTime(1, begin);
   delete_attributes.BindTime(2, end);
   if (!delete_attributes.Run()) {
@@ -351,10 +351,10 @@ std::optional<int64_t> FilterAnnotationTable::DeleteAnnotationsForDomain(
   sql::Statement delete_annotations(db_->GetCachedStatement(
       SQL_FROM_HERE,
       base::StrCat({"DELETE FROM ", filter_annotations::kTableName, " WHERE ",
-                    filter_annotations::kSourceDomain, " = ? AND ",
+                    filter_annotations::kSourceHost, " = ? AND ",
                     filter_annotations::kCreationTimestamp, " >= ? AND ",
                     filter_annotations::kCreationTimestamp, " < ?"})));
-  delete_annotations.BindString(0, domain);
+  delete_annotations.BindString(0, host);
   delete_annotations.BindTime(1, begin);
   delete_annotations.BindTime(2, end);
   if (!delete_annotations.Run()) {
