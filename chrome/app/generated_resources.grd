@@ -10769,8 +10769,17 @@ Keep your key file in a safe place. You will need it to create new versions of y
       <message name="IDS_ACCNAME_SPLIT_TABS_TOOLBAR_BUTTON_PINNED" desc="The accessible name for the toolbar button for the split tabs feature, when it is pinned and disabled.">
         Open tab in split view
       </message>
-      <message name="IDS_ACCNAME_SPLIT_TABS_TOOLBAR_BUTTON_ENABLED" desc="The accessible name for the toolbar button for the split tabs feature, when it is enabled.">
-        Arrange split view
+      <message name="IDS_ACCNAME_SPLIT_TABS_TOOLBAR_BUTTON_ENABLED_LEFT_ACTIVE" desc="The accessible name for the toolbar button for the split tabs feature, when it is enabled while the left view is active.">
+        Arrange split view - left view active
+      </message>
+      <message name="IDS_ACCNAME_SPLIT_TABS_TOOLBAR_BUTTON_ENABLED_RIGHT_ACTIVE" desc="The accessible name for the toolbar button for the split tabs feature, when it is enabled while the right view is active.">
+        Arrange split view - right view active
+      </message>
+      <message name="IDS_ACCNAME_SPLIT_TABS_TOOLBAR_BUTTON_ENABLED_TOP_ACTIVE" desc="The accessible name for the toolbar button for the split tabs feature, when it is enabled while the top view is active.">
+        Arrange split view - top view active
+      </message>
+      <message name="IDS_ACCNAME_SPLIT_TABS_TOOLBAR_BUTTON_ENABLED_BOTTOM_ACTIVE" desc="The accessible name for the toolbar button for the split tabs feature, when it is enabled while the bottom view is active.">
+        Arrange split view - bottom view active
       </message>
       <message name="IDS_ACCNAME_FIND" desc="The accessible name for the find button.">
         Find
