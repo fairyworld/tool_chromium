@@ -9421,6 +9421,13 @@ interface SelectorDirective : Directive
     attribute @@toStringTag
     method constructor
     method getMatchingRange
+interface SemanticEmbedder
+    static method availability
+    static method create
+    attribute @@toStringTag
+    method constructor
+    method destroy
+    method embed
 interface Sensor : EventTarget
     attribute @@toStringTag
     getter activated
