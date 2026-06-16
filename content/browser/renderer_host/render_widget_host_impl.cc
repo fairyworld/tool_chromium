@@ -95,6 +95,7 @@
 #include "content/public/browser/browser_thread.h"
 #include "content/public/browser/content_browser_client.h"
 #include "content/public/browser/device_service.h"
+#include "content/public/browser/disallow_activation_reason.h"
 #include "content/public/browser/keyboard_event_processing_result.h"
 #include "content/public/browser/peak_gpu_memory_tracker_factory.h"
 #include "content/public/browser/render_frame_metadata_provider.h"
@@ -3099,6 +3100,12 @@ void RenderWidgetHostImpl::AsyncStartDragging(
     // This should be relatively rare: if the drag can't start because the
     // source document is already gone, the input sequence is consumed and
     // nothing will happen.
+    return;
+  }
+  if (source_rfh->IsInactiveAndDisallowActivation(
+          DisallowActivationReasonId::kStartDragging)) {
+    // Don't process dragging from inactive documents.
+    // TODO(crbug.com/523886022): Add more checks for e.g. visibility.
     return;
   }
 

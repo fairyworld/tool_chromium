@@ -5881,6 +5881,13 @@ shown properly on the user-facing crash UI.
   <int value="43" label="kDidChangeOpener">
     A request was received to change window.opener to a frame in BFCache.
   </int>
+  <int value="44" label="kDidCommitNavigation">
+    A request was received to finish committing a navigation within a BFCached
+    page.
+  </int>
+  <int value="45" label="kStartDragging">
+    A request was received to start dragging from within an inactive page.
+  </int>
 </enum>
 
 <enum name="IncidentType">
