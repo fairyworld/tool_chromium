@@ -152,9 +152,7 @@ class Buffer::Texture : public viz::ContextLostObserver {
 
   // Copy the contents of texture to |destination| and runs |callback| when
   // completed.
-  void CopyTexImage(std::unique_ptr<gfx::GpuFence> acquire_fence,
-                    Texture* destination,
-                    base::OnceClosure callback);
+  void CopyTexImage(Texture* destination, base::OnceClosure callback);
 
   // Returns the ClientSharedImage for this texture.
   gpu::ClientSharedImage* shared_image() const { return shared_image_.get(); }
@@ -307,22 +305,6 @@ void Buffer::Texture::Release(base::OnceClosure callback,
   std::move(callback).Run();
 }
 
-void Buffer::Texture::UpdateSharedImage(
-    std::unique_ptr<gfx::GpuFence> acquire_fence) {
-  if (context_provider_) {
-    gpu::SharedImageInterface* sii = context_provider_->SharedImageInterface();
-    CHECK(shared_image_);
-    // UpdateSharedImage gets called only after |mailbox_| can be reused.
-    // A buffer can be reattached to a surface only after it has been returned
-    // to wayland clients. We return buffers to clients only after the query
-    // |query_type_| is available.
-    sii->UpdateSharedImage(gpu::SyncToken(), std::move(acquire_fence),
-                           shared_image_->mailbox());
-    sync_token_ = sii->GenUnverifiedSyncToken();
-    TRACE_EVENT_INSTANT("exo", "bound", GetTrack(GetBufferId()));
-  }
-}
-
 void Buffer::Texture::ReleaseSharedImage(base::OnceClosure callback,
                                          viz::ReturnedResource resource) {
   if (context_provider_ && query_type_ != 0) {
@@ -347,14 +329,12 @@ void Buffer::Texture::ReleaseSharedImage(base::OnceClosure callback,
   std::move(callback).Run();
 }
 
-void Buffer::Texture::CopyTexImage(std::unique_ptr<gfx::GpuFence> acquire_fence,
-                                   Texture* destination,
+void Buffer::Texture::CopyTexImage(Texture* destination,
                                    base::OnceClosure callback) {
   if (context_provider_) {
     CHECK(shared_image_);
     gpu::SharedImageInterface* sii = context_provider_->SharedImageInterface();
-    sii->UpdateSharedImage(sync_token_, std::move(acquire_fence),
-                           shared_image_->mailbox());
+    sii->UpdateSharedImage(sync_token_, nullptr, shared_image_->mailbox());
     gpu::SyncToken sync_token = sii->GenUnverifiedSyncToken();
 
     gpu::raster::RasterInterface* ri = context_provider_->RasterInterface();
@@ -568,7 +548,6 @@ std::unique_ptr<Buffer> Buffer::CreateBuffer(
 
 std::optional<viz::TransferableResource> Buffer::ProduceTransferableResource(
     FrameSinkResourceManager* resource_manager,
-    std::unique_ptr<gfx::GpuFence> acquire_fence,
     bool secure_output_only,
     gfx::ColorSpace color_space,
     ProtectedNativePixmapQueryDelegate* protected_native_pixmap_query) {
@@ -646,15 +625,6 @@ std::optional<viz::TransferableResource> Buffer::ProduceTransferableResource(
   // Zero-copy means using the contents texture directly.
   if (use_zero_copy_) {
     // This binds the latest contents of this buffer to |contents_texture|.
-
-    // If there is no acquire fence there is no need to update the shared image.
-    // We can sync on the existing sync token if present. Examples of where this
-    // can happen is video, where there is no fence provided, or in
-    // raster/composite when the fence already signaled at this stage.
-    if (acquire_fence && !acquire_fence->GetGpuFenceHandle().is_null()) {
-      contents_texture->UpdateSharedImage(std::move(acquire_fence));
-    }
-
     viz::TransferableResource::MetadataOverride overrides;
     overrides.is_overlay_candidate = is_overlay_candidate_;
     auto resource = viz::TransferableResource::Make(
@@ -688,10 +658,9 @@ std::optional<viz::TransferableResource> Buffer::ProduceTransferableResource(
   // texture mailbox from the result in |texture|. The contents texture will
   // be released when copy has completed.
   contents_texture->CopyTexImage(
-      std::move(acquire_fence), texture,
-      base::BindOnce(&Buffer::ReleaseContentsTexture, AsWeakPtr(),
-                     std::move(contents_texture_),
-                     release_contents_callback_.callback()));
+      texture, base::BindOnce(&Buffer::ReleaseContentsTexture, AsWeakPtr(),
+                              std::move(contents_texture_),
+                              release_contents_callback_.callback()));
 
   auto resource = viz::TransferableResource::Make(
       texture->shared_image(),
@@ -860,7 +829,6 @@ SolidColorBuffer::~SolidColorBuffer() = default;
 std::optional<viz::TransferableResource>
 SolidColorBuffer::ProduceTransferableResource(
     FrameSinkResourceManager* resource_manager,
-    std::unique_ptr<gfx::GpuFence> acquire_fence,
     bool secure_output_only,
     gfx::ColorSpace color_space,
     ProtectedNativePixmapQueryDelegate* protected_native_pixmap_query) {
