@@ -7,6 +7,8 @@
 #import "ios/chrome/browser/level_up/model/task_info.h"
 #import "ios/chrome/browser/level_up/model/tasks/task_factories.h"
 #import "ios/chrome/browser/shared/ui/symbols/symbols.h"
+#import "ios/chrome/grit/ios_strings.h"
+#import "ui/base/l10n/l10n_util.h"
 
 class TabGroupsTaskInfo : public TaskInfo {
  public:
@@ -15,8 +17,12 @@ class TabGroupsTaskInfo : public TaskInfo {
 
   // TaskInfo implementation.
   TaskType GetTaskType() const override { return TaskType::kTabGroups; }
-  int GetTitleId() const override { return 0; }
-  int GetTaskDescriptionId() const override { return 0; }
+  std::string GetTitle() const override {
+    return l10n_util::GetStringUTF8(IDS_IOS_LEVEL_UP_FEATURE_TAB_GROUPS);
+  }
+  std::string GetTaskDescription() const override {
+    return "Stay organized with tab groups";
+  }
   std::string GetIconSymbolName() const override {
     return base::SysNSStringToUTF8(kTabsSymbol);
   }

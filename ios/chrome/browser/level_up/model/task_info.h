@@ -18,11 +18,11 @@ class TaskInfo {
   // The unique identifier for the task.
   virtual TaskType GetTaskType() const = 0;
 
-  // Resource ID for the localized title of the task.
-  virtual int GetTitleId() const = 0;
+  // The localized title of the task.
+  virtual std::string GetTitle() const = 0;
 
-  // Resource ID for the localized description of the task.
-  virtual int GetTaskDescriptionId() const = 0;
+  // The localized description of the task.
+  virtual std::string GetTaskDescription() const = 0;
 
   // Name of the icon asset associated with the task.
   virtual std::string GetIconSymbolName() const = 0;
