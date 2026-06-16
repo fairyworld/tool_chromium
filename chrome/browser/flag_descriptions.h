@@ -5018,6 +5018,12 @@ inline constexpr char kPromptAPIMultimodalInputDescription[] =
     "(e.g. answering knowledge questions). "
     "Please refer to the built-in AI documentation [1] for details.";
 
+inline constexpr char kPromptAPISamplingModeName[] = "Prompt API Sampling Mode";
+inline constexpr char kPromptAPISamplingModeDescription[] =
+    "Enables setting the sampling mode option during session creation. "
+    "When enabled, the model's creativity and predictability can be "
+    "configured using high-level sampling modes.";
+
 inline constexpr char kWriterAPIName[] = "Writer API";
 inline constexpr char kWriterAPIDescription[] =
     "Enables the Writer API, allowing you to write a piece of text with a "

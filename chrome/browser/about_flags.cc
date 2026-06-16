@@ -10027,6 +10027,10 @@ const FeatureEntry kFeatureEntries[] = {
      FEATURE_VALUE_TYPE(blink::features::kAIPromptAPIMultimodalInput),
      flag_descriptions::kAIAPIsLinks},
 
+    {"prompt-api-sampling-mode", flag_descriptions::kPromptAPISamplingModeName,
+     flag_descriptions::kPromptAPISamplingModeDescription, kOsDesktop,
+     FEATURE_VALUE_TYPE(blink::features::kAIPromptAPIParams)},
+
     {"writer-api", flag_descriptions::kWriterAPIName,
      flag_descriptions::kWriterAPIDescription, kOsDesktop,
      FEATURE_WITH_PARAMS_VALUE_TYPE(blink::features::kAIWriterAPI,

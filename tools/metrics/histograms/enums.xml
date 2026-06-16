@@ -16542,6 +16542,7 @@ from previous Chrome versions.
   <int value="696600628" label="VibrateRequiresUserGesture:disabled"/>
   <int value="696786796" label="EnableKeyboardRewriterFix:disabled"/>
   <int value="697211154" label="ContextManagementInOmnibox:enabled"/>
+  <int value="697247166" label="AIPromptAPIParams:enabled"/>
   <int value="697503858" label="SharingPeerConnectionSender:disabled"/>
   <int value="698253616"
       label="ExperimentalAccessibilityChromeVoxOobeDialogImprovements:disabled"/>
@@ -17610,6 +17611,7 @@ from previous Chrome versions.
   <int value="1049346775" label="OmniboxDocumentProviderAso:disabled"/>
   <int value="1049885154" label="OfflinePagesPrefetching:disabled"/>
   <int value="1050048304" label="enable-font-cache-scaling"/>
+  <int value="1050066370" label="prompt-api-sampling-mode:disabled"/>
   <int value="1050321458" label="new-profile-management"/>
   <int value="1050442356"
       label="OmniboxUIExperimentBlueTitlesOnPageSuggestions:enabled"/>
@@ -19429,6 +19431,7 @@ from previous Chrome versions.
   <int value="1632176267" label="PDFViewerUpdate:enabled"/>
   <int value="1632710463" label="TabGroupMenuImprovements:enabled"/>
   <int value="1632737896" label="AccessibilityFilterKeys:disabled"/>
+  <int value="1632986424" label="AIPromptAPIParams:disabled"/>
   <int value="1633120342" label="VisitedURLRankingDeduplication:enabled"/>
   <int value="1633456034" label="chrome-home-swipe-logic"/>
   <int value="1634273054" label="OsIntegrationSubManagers:enabled"/>
@@ -20652,6 +20655,7 @@ from previous Chrome versions.
   <int value="2009995411" label="GlicPanelResetOnSessionTimeout:enabled"/>
   <int value="2010329451"
       label="ProfileCreationFrictionReductionExperimentRemoveSigninStep:disabled"/>
+  <int value="2010787190" label="prompt-api-sampling-mode:enabled"/>
   <int value="2011785323" label="EnableSchemeBoundCookies:enabled"/>
   <int value="2011873998" label="LiveCaptionMultiLanguage:enabled"/>
   <int value="2012757088" label="EnergyEffect:disabled"/>
