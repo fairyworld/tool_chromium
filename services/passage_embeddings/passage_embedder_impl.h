@@ -5,21 +5,26 @@
 #ifndef SERVICES_PASSAGE_EMBEDDINGS_PASSAGE_EMBEDDER_IMPL_H_
 #define SERVICES_PASSAGE_EMBEDDINGS_PASSAGE_EMBEDDER_IMPL_H_
 
+#include <cstdint>
+#include <memory>
 #include <optional>
 #include <string>
 #include <vector>
 
 #include "base/containers/lru_cache.h"
 #include "base/files/file.h"
-#include "services/passage_embeddings/passage_embedder_execution_task.h"
 #include "services/passage_embeddings/public/mojom/passage_embeddings.mojom.h"
-#include "third_party/sentencepiece/src/src/sentencepiece_processor.h"
-#include "third_party/tflite_support/src/tensorflow_lite_support/cc/task/core/base_task_api.h"
+
+namespace sentencepiece {
+class SentencePieceProcessor;
+}
 
 namespace passage_embeddings {
 
 inline constexpr char kCacheHitMetricName[] =
     "History.Embeddings.Embedder.CacheHit";
+
+class PassageEmbedderExecutor;
 
 // The actual implementation of the passage embedder, which is intended to run
 // on a background sequence.
@@ -55,17 +60,20 @@ class PassageEmbedderImpl {
   bool BuildExecutionTask();
 
   // Executes the model to generate text embeddings result for the input.
-  std::optional<OutputType> Execute(InputType input);
+  std::optional<std::vector<float>> Execute(const std::vector<int>& input);
 
   std::unique_ptr<sentencepiece::SentencePieceProcessor> sp_processor_;
 
-  std::unique_ptr<PassageEmbedderExecutionTask> loaded_model_;
+  std::unique_ptr<PassageEmbedderExecutor> executor_;
 
   // The text embedding model file. Empty when not loaded.
   base::File embeddings_model_file_;
 
   // The input window size that the embeddings model expects.
   uint32_t embeddings_input_window_size_;
+
+  // Indicates if the model should be executed with Gemma specific logic.
+  bool execute_for_gemma_ = false;
 
   // The priority that the active tflite_engine is set up for.
   mojom::PassagePriority current_priority_ = mojom::PassagePriority::kUnknown;

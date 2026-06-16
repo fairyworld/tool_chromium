@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include "base/check.h"
 #include "base/files/file.h"
 #include "base/files/memory_mapped_file.h"
 #include "base/metrics/histogram_functions.h"
@@ -14,9 +15,11 @@
 #include "base/trace_event/trace_id_helper.h"
 #include "base/trace_event/typed_macros.h"
 #include "build/build_config.h"
-#include "services/passage_embeddings/passage_embedder.h"
+#include "services/passage_embeddings/passage_embedder_executor.h"
 #include "services/passage_embeddings/passage_embeddings_op_resolver.h"
 #include "third_party/sentencepiece/src/src/sentencepiece_model.pb.h"
+#include "third_party/sentencepiece/src/src/sentencepiece_processor.h"
+#include "third_party/tflite_support/src/tensorflow_lite_support/cc/task/core/tflite_engine.h"
 
 namespace {
 // Records duration and trace event for embeddings generation.
@@ -25,7 +28,7 @@ void RecordEmbeddingsDurationMetrics(
     base::TimeTicks start_time,
     base::TimeDelta elapsed_time,
     std::optional<base::TimeDelta> elapsed_thread_time) {
-  const auto trace_track =
+  const perfetto::Track trace_track =
       perfetto::Track(base::trace_event::GetNextGlobalTraceId());
 
   if (is_passive) {
@@ -103,7 +106,8 @@ bool PassageEmbedderImpl::LoadSentencePieceModelFile(base::File sp_file) {
     return false;
   }
 
-  auto model_proto = std::make_unique<sentencepiece::ModelProto>();
+  std::unique_ptr<sentencepiece::ModelProto> model_proto =
+      std::make_unique<sentencepiece::ModelProto>();
   model_proto->ParseFromArray(sp_model.bytes().data(), sp_model.bytes().size());
   sp_processor_ = std::make_unique<sentencepiece::SentencePieceProcessor>();
   if (!(sp_processor_->Load(std::move(model_proto)).ok())) {
@@ -115,12 +119,18 @@ bool PassageEmbedderImpl::LoadSentencePieceModelFile(base::File sp_file) {
 
 bool PassageEmbedderImpl::BuildExecutionTask() {
   CHECK_NE(current_priority_, mojom::PassagePriority::kUnknown);
+  executor_.reset();
 
-  loaded_model_.reset();
+  std::unique_ptr<tflite::OpResolver> op_resolver;
+  if (execute_for_gemma_) {
+    op_resolver = std::make_unique<GemmaOpResolver>();
+  } else {
+    op_resolver = std::make_unique<HistoryOpResolver>(allow_gpu_execution_);
+  }
 
-  // Build a new task from the model bytes and the task priority.
-  auto tflite_engine = std::make_unique<tflite::task::core::TfLiteEngine>(
-      std::make_unique<PassageEmbeddingsOpResolver>(allow_gpu_execution_));
+  std::unique_ptr<tflite::task::core::TfLiteEngine> tflite_engine =
+      std::make_unique<tflite::task::core::TfLiteEngine>(
+          std::move(op_resolver));
 
   base::ElapsedTimer embeddings_timer;
 #if BUILDFLAG(IS_WIN)
@@ -160,23 +170,30 @@ bool PassageEmbedderImpl::BuildExecutionTask() {
     return false;
   }
 
-  loaded_model_ =
-      std::make_unique<PassageEmbedderExecutionTask>(std::move(tflite_engine));
-
+  if (execute_for_gemma_) {
+    executor_ = std::make_unique<GemmaModelExecutor>(
+        sp_processor_->bos_id(), sp_processor_->eos_id(),
+        sp_processor_->pad_id(), std::move(tflite_engine));
+  } else {
+    executor_ = std::make_unique<HistoryModelExecutor>(
+        embeddings_input_window_size_, sp_processor_->eos_id(),
+        std::move(tflite_engine));
+  }
   return true;
 }
 
 void PassageEmbedderImpl::UnloadModelFiles() {
   sp_processor_.reset();
-  loaded_model_.reset();
+  executor_.reset();
   embeddings_model_file_.Close();
 }
 
-std::optional<OutputType> PassageEmbedderImpl::Execute(InputType input) {
-  if (!loaded_model_) {
+std::optional<std::vector<float>> PassageEmbedderImpl::Execute(
+    const std::vector<int>& input) {
+  if (!executor_) {
     return std::nullopt;
   }
-  return loaded_model_->Execute(input);
+  return executor_->Execute(input);
 }
 
 std::vector<mojom::PassageEmbeddingsResultPtr>
@@ -191,14 +208,18 @@ PassageEmbedderImpl::GenerateEmbeddings(const std::vector<std::string>& inputs,
   // Rebuild the execution task if necessary.
   if (current_priority_ != priority) {
     current_priority_ = priority;
-    BuildExecutionTask();
+    if (!BuildExecutionTask()) {
+      current_priority_ = mojom::PassagePriority::kUnknown;
+      return results;
+    }
   }
 
   for (const std::string& input : inputs) {
     mojom::PassageEmbeddingsResultPtr result =
         mojom::PassageEmbeddingsResult::New();
 
-    auto cache_value = embeddings_cache_.Get(input);
+    base::LRUCache<std::string, std::vector<float>>::iterator cache_value =
+        embeddings_cache_.Get(input);
     bool cache_hit = cache_value != embeddings_cache_.end();
     base::UmaHistogramBoolean(kCacheHitMetricName, cache_hit);
     if (cache_hit) {
@@ -209,7 +230,7 @@ PassageEmbedderImpl::GenerateEmbeddings(const std::vector<std::string>& inputs,
 
     std::vector<int> tokenized;
     base::ElapsedTimer tokenize_timer;
-    auto status = sp_processor_->Encode(input, &tokenized);
+    absl::Status status = sp_processor_->Encode(input, &tokenized);
     base::UmaHistogramBoolean(
         "History.Embeddings.Embedder.TokenizationSucceeded", status.ok());
     if (!status.ok()) {
@@ -217,18 +238,14 @@ PassageEmbedderImpl::GenerateEmbeddings(const std::vector<std::string>& inputs,
     }
     base::UmaHistogramCounts1000(
         "History.Embeddings.Embedder.PassageTokenCount", tokenized.size());
-    if (tokenized.size() < embeddings_input_window_size_) {
-      tokenized.push_back(sp_processor_->eos_id());
-    }
     base::UmaHistogramBoolean("History.Embeddings.Embedder.InputTruncated",
                               tokenized.size() > embeddings_input_window_size_);
-    tokenized.resize(embeddings_input_window_size_);
     base::TimeDelta tokenize_elapsed = tokenize_timer.Elapsed();
     base::UmaHistogramMediumTimes(
         "History.Embeddings.Embedder.TokenizationDuration", tokenize_elapsed);
 
-    const auto tokenize_start_time = tokenize_timer.start_time();
-    const auto trace_track =
+    const base::TimeTicks tokenize_start_time = tokenize_timer.start_time();
+    const perfetto::Track trace_track =
         perfetto::Track(base::trace_event::GetNextGlobalTraceId());
     TRACE_EVENT_BEGIN("loading", "PassageTokenization", trace_track,
                       tokenize_start_time);
