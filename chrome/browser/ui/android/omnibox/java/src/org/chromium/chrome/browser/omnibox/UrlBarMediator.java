@@ -43,7 +43,7 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
     private final PropertyModel mModel;
     private final Callback<Boolean> mOnFocusChangeCallback;
 
-    private boolean mHasFocus;
+    private boolean mIsInInputSession;
 
     private UrlBarData mUrlBarData = UrlBarData.EMPTY;
     private @ScrollType int mScrollType = ScrollType.NO_SCROLL;
@@ -104,6 +104,16 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
         mModel.set(UrlBarProperties.MANAGE_SEARCH_ENGINES_CALLBACK, null);
     }
 
+    /** Signals that the Omnibox input session has begun. */
+    void beginInput() {
+        mIsInInputSession = true;
+    }
+
+    /** Signals that the Omnibox input session has ended. */
+    void endInput() {
+        mIsInInputSession = false;
+    }
+
     private void onTextChanged(String text) {
         if (mTextChangeListener != null) {
             mTextChangeListener.onResult(text);
@@ -119,7 +129,7 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
     }
 
     private void updateShowHintText(String text) {
-        boolean showHintText = !mHasFocus || text.isEmpty();
+        boolean showHintText = !mIsInInputSession || text.isEmpty();
         mModel.set(UrlBarProperties.SHOW_HINT_TEXT, showHintText);
     }
 
@@ -154,7 +164,7 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
             }
         }
 
-        if (!mHasFocus
+        if (!mIsInInputSession
                 && isNewTextEquivalentToExistingText(mUrlBarData, data)
                 && mScrollType == scrollType) {
             return false;
@@ -180,15 +190,18 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
                     mUrlBarData.displayText.subSequence(
                             mUrlBarData.originStartIndex, mUrlBarData.originEndIndex);
         } else {
-            text = !mHasFocus ? mUrlBarData.displayText : mUrlBarData.getEditingOrDisplayText();
+            text =
+                    !mIsInInputSession
+                            ? mUrlBarData.displayText
+                            : mUrlBarData.getEditingOrDisplayText();
         }
         CharSequence textForAutofillServices = text;
 
-        if (!(mHasFocus || TextUtils.isEmpty(text) || mUrlBarData.url == null)) {
+        if (!(mIsInInputSession || TextUtils.isEmpty(text) || mUrlBarData.url == null)) {
             textForAutofillServices = mUrlBarData.url.getSpec();
         }
 
-        @ScrollType int scrollType = mHasFocus ? ScrollType.NO_SCROLL : mScrollType;
+        @ScrollType int scrollType = mIsInInputSession ? ScrollType.NO_SCROLL : mScrollType;
         if (text == null) text = "";
 
         UrlBarTextState state =
@@ -262,7 +275,7 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
             @Nullable String autocompleteText,
             @Nullable String additionalText,
             @Nullable String siteSearchLabel) {
-        if (!mHasFocus) {
+        if (!mIsInInputSession) {
             assert false : "Should not update autocomplete text when not focused";
             return;
         }
@@ -277,7 +290,12 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
 
     void onUrlFocusChange(boolean focus) {
         if (mIsReparenting) return;
-        mHasFocus = focus;
+
+        if (focus) {
+            beginInput();
+        } else {
+            endInput();
+        }
 
         UrlBarTextState preCallbackState = mModel.get(UrlBarProperties.TEXT_STATE);
         mOnFocusChangeCallback.onResult(focus);
