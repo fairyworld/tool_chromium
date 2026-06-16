@@ -380,12 +380,6 @@ suite('SyncStatusTests', function() {
         loadTimeData.getStringF(
             'deleteProfileWarningWithCountsPlural', 2, 'fakeUsername'),
         warningMessage.textContent.trim());
-
-    // Close the disconnect dialog.
-    signoutDialog.$.disconnectConfirm.click();
-    await new Promise(function(resolve) {
-      listenOnce(window, 'popstate', resolve);
-    });
   });
 
   test('NavigateDirectlyToSignOutURL', async function() {
@@ -401,13 +395,6 @@ suite('SyncStatusTests', function() {
     // handler if the user navigates directly to
     // chrome://settings/signOut. if so, it should not cause a crash.
     new ProfileInfoBrowserProxyImpl().getProfileStatsCount();
-
-    // Close the disconnect dialog.
-    peoplePage.shadowRoot!.querySelector('settings-signout-dialog')!.$
-        .disconnectConfirm.click();
-    await new Promise(function(resolve) {
-      listenOnce(window, 'popstate', resolve);
-    });
   });
 
   test('Signout dialog suppressed when not signed in', async function() {
