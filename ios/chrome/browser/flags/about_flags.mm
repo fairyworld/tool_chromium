@@ -148,14 +148,16 @@ const FeatureEntry::Choice kSendTabToSelfEnhancedHandoffChoices[] = {
      "SendTabToSelfPropagateFormFields,"
      "SendTabToSelfPropagateNavigationHistory,"
      "SendTabToSelfPropagateScrollPosition,"
-     "SendTabToSelfPostSendToast"},
+     "SendTabToSelfPostSendToast,"
+     "SyncSimplifyDeviceNaming"},
     {flags_ui::kGenericExperimentChoiceDisabled, switches::kDisableFeatures,
      "SendTabToSelfAutoOpen,"
      "SendTabToSelfImprovedLastActiveLabels,"
      "SendTabToSelfPropagateFormFields,"
      "SendTabToSelfPropagateNavigationHistory,"
      "SendTabToSelfPropagateScrollPosition,"
-     "SendTabToSelfPostSendToast"},
+     "SendTabToSelfPostSendToast,"
+     "SyncSimplifyDeviceNaming"},
 };
 
 const FeatureEntry::Choice

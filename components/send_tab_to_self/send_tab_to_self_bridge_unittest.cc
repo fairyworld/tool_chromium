@@ -29,6 +29,7 @@
 #include "components/send_tab_to_self/target_device_info.h"
 #include "components/sessions/core/serialized_navigation_entry.h"
 #include "components/sessions/core/serialized_navigation_entry_test_helper.h"
+#include "components/sync/base/features.h"
 #include "components/sync/model/entity_change.h"
 #include "components/sync/model/in_memory_metadata_change_list.h"
 #include "components/sync/model/metadata_batch.h"
@@ -57,6 +58,7 @@ namespace {
 using testing::_;
 using testing::AllOf;
 using testing::ElementsAre;
+using testing::Field;
 using testing::IsEmpty;
 using testing::Return;
 using testing::SizeIs;
@@ -1003,10 +1005,34 @@ TEST_F(SendTabToSelfBridgeTest, NotifyRemoteSendTabToSelfEntryAdded) {
   EXPECT_EQ(2ul, bridge()->GetAllGuids().size());
 }
 
-// Tests that only the most recent device's guid is returned when multiple
-// devices have the same name.
-TEST_F(SendTabToSelfBridgeTest,
-       GetTargetDeviceInfoSortedList_OneDevicePerName) {
+enum class DeviceNamingMode {
+  kLegacyWithDeduplication,
+  kSimplifiedWithoutDeduplication,
+};
+
+class SendTabToSelfBridgeNamingTest
+    : public SendTabToSelfBridgeTest,
+      public testing::WithParamInterface<DeviceNamingMode> {
+ public:
+  SendTabToSelfBridgeNamingTest() {
+    if (GetParam() == DeviceNamingMode::kSimplifiedWithoutDeduplication) {
+      scoped_feature_list_.InitAndEnableFeature(
+          syncer::kSyncSimplifyDeviceNaming);
+    } else {
+      scoped_feature_list_.InitAndDisableFeature(
+          syncer::kSyncSimplifyDeviceNaming);
+    }
+  }
+
+ private:
+  base::test::ScopedFeatureList scoped_feature_list_;
+};
+
+// Tests that GetTargetDeviceInfoSortedList handles deduplication correctly
+// based on the kSyncSimplifyDeviceNaming feature flag. Parameterized by whether
+// simplified device naming is enabled.
+TEST_P(SendTabToSelfBridgeNamingTest,
+       GetTargetDeviceInfoSortedList_DeduplicationBehavior) {
   const std::string kRecentGuid = "guid1";
   const std::string kOldGuid = "guid2";
   const std::string kOlderGuid = "guid3";
@@ -1026,12 +1052,32 @@ TEST_F(SendTabToSelfBridgeTest,
       CreateDevice(kOlderGuid, "device_name", clock()->Now() - base::Days(5));
   AddTestDevice(older_device.get());
 
-  TargetDeviceInfo target_device_info(
-      recent_device->client_name(), recent_device->guid(),
-      recent_device->form_factor(), recent_device->last_updated_timestamp());
+  if (GetParam() == DeviceNamingMode::kSimplifiedWithoutDeduplication) {
+    // With kSyncSimplifyDeviceNaming enabled: all devices should be returned
+    // (no deduplication). Sorted by recency.
+    TargetDeviceInfo target_device_info1(
+        recent_device->client_name(), recent_device->guid(),
+        recent_device->form_factor(), recent_device->last_updated_timestamp());
+    TargetDeviceInfo target_device_info2(
+        old_device->client_name(), old_device->guid(),
+        old_device->form_factor(), old_device->last_updated_timestamp());
+    TargetDeviceInfo target_device_info3(
+        older_device->client_name(), older_device->guid(),
+        older_device->form_factor(), older_device->last_updated_timestamp());
 
-  EXPECT_THAT(bridge()->GetTargetDeviceInfoSortedList(),
-              ElementsAre(target_device_info));
+    EXPECT_THAT(bridge()->GetTargetDeviceInfoSortedList(),
+                ElementsAre(target_device_info1, target_device_info2,
+                            target_device_info3));
+  } else {
+    // With kSyncSimplifyDeviceNaming disabled: only the most recent device's
+    // guid is returned.
+    TargetDeviceInfo target_device_info(
+        recent_device->client_name(), recent_device->guid(),
+        recent_device->form_factor(), recent_device->last_updated_timestamp());
+
+    EXPECT_THAT(bridge()->GetTargetDeviceInfoSortedList(),
+                ElementsAre(target_device_info));
+  }
 }
 
 // Tests that only devices that have the send tab to self receiving feature
@@ -1375,8 +1421,8 @@ TEST_F(SendTabToSelfBridgeTest,
               ElementsAre(expected_device_info));
 }
 
-TEST_F(SendTabToSelfBridgeTest,
-       GetTargetDeviceInfoSortedList_ShortNameCollisionFallsBackToFullName) {
+TEST_P(SendTabToSelfBridgeNamingTest,
+       GetTargetDeviceInfoSortedList_ShortNameCollisionBehavior) {
   InitializeBridge();
 
   // Create two devices with the same manufacturer and form factor, but
@@ -1417,8 +1463,13 @@ TEST_F(SendTabToSelfBridgeTest,
       bridge()->GetTargetDeviceInfoSortedList();
   ASSERT_EQ(2ul, list.size());
 
-  EXPECT_EQ("Manufacturer Phone model1", list[0].device_name);
-  EXPECT_EQ("Manufacturer Phone model2", list[1].device_name);
+  if (GetParam() == DeviceNamingMode::kSimplifiedWithoutDeduplication) {
+    EXPECT_EQ("Manufacturer Phone", list[0].device_name);
+    EXPECT_EQ("Manufacturer Phone", list[1].device_name);
+  } else {
+    EXPECT_EQ("Manufacturer Phone model1", list[0].device_name);
+    EXPECT_EQ("Manufacturer Phone model2", list[1].device_name);
+  }
 }
 
 TEST_F(SendTabToSelfBridgeTest,
@@ -1589,8 +1640,8 @@ TEST_F(SendTabToSelfBridgeTest, GetTargetDeviceInfo) {
 
 // Tests that the local device is not returned even if its full name matches
 // another device.
-TEST_F(SendTabToSelfBridgeTest,
-       GetTargetDeviceInfoSortedList_ExcludeLocalDeviceByFullName) {
+TEST_P(SendTabToSelfBridgeNamingTest,
+       GetTargetDeviceInfoSortedList_ExcludeLocalDeviceBehavior) {
   const std::string kMyLocalGuid = "unique_local_guid";
   const std::string kMyDuplicateGuid = "unique_duplicate_guid";
 
@@ -1614,9 +1665,17 @@ TEST_F(SendTabToSelfBridgeTest,
       kMyDuplicateGuid, "local_name", clock()->Now(), "local_model");
   device_info_tracker()->Add(std::move(duplicate_device));
 
-  // The duplicate device should be excluded because its fallback full name
-  // matches the local device's fallback full name.
-  EXPECT_THAT(bridge()->GetTargetDeviceInfoSortedList(), IsEmpty());
+  if (GetParam() == DeviceNamingMode::kSimplifiedWithoutDeduplication) {
+    // In simplified mode, name-based local device filtering is disabled.
+    EXPECT_THAT(bridge()->GetTargetDeviceInfoSortedList(),
+                ElementsAre(AllOf(
+                    Field(&TargetDeviceInfo::cache_guid, kMyDuplicateGuid),
+                    Field(&TargetDeviceInfo::device_name, "local_name"))));
+  } else {
+    // The duplicate device should be excluded because its fallback full name
+    // matches the local device's fallback full name.
+    EXPECT_THAT(bridge()->GetTargetDeviceInfoSortedList(), IsEmpty());
+  }
 }
 
 // Tests that SendEntry uses the fallback full name of the local device.
@@ -1950,6 +2009,12 @@ TEST_F(SendTabToSelfBridgeTest, GetUnopenedEntriesTargetedToLocalDevice) {
       unopened_entries,
       UnorderedElementsAre(GuidIs("guid1"), GuidIs("guid4"), GuidIs("guid5")));
 }
+
+INSTANTIATE_TEST_SUITE_P(
+    ,
+    SendTabToSelfBridgeNamingTest,
+    testing::Values(DeviceNamingMode::kLegacyWithDeduplication,
+                    DeviceNamingMode::kSimplifiedWithoutDeduplication));
 
 }  // namespace
 

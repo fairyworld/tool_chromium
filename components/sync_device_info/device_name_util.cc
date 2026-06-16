@@ -12,6 +12,7 @@
 #include "base/strings/strcat.h"
 #include "base/trace_event/trace_event.h"
 #include "components/strings/grit/components_strings.h"
+#include "components/sync/base/features.h"
 #include "components/sync_device_info/device_info.h"
 #include "third_party/abseil-cpp/absl/strings/ascii.h"
 #include "ui/base/l10n/l10n_util.h"
@@ -110,6 +111,12 @@ DisplayNameCandidates GetDisplayNameCandidates(const DeviceInfo* device) {
       base::StrCat({preferred_name_if_unique, " ", model});
   return {.preferred_name_if_unique = preferred_name_if_unique,
           .fallback_full_name = fallback_full_name};
+}
+
+std::string GetDeviceDisplayName(const DeviceInfo* device) {
+  CHECK(base::FeatureList::IsEnabled(kSyncSimplifyDeviceNaming));
+
+  return GetDisplayNameCandidates(device).preferred_name_if_unique;
 }
 
 // `devices` should be sorted by recency (most recent first) to ensure that

@@ -10,6 +10,7 @@
 
 #include "base/test/scoped_feature_list.h"
 #include "base/time/time.h"
+#include "components/sync/base/features.h"
 #include "components/sync/test/test_sync_service.h"
 #include "components/sync_device_info/device_info.h"
 #include "components/sync_device_info/device_info_util.h"
@@ -258,6 +259,36 @@ TEST_F(DeviceNameUtilTest,
   EXPECT_EQ("Google Phone", results[0].display_name);
   EXPECT_EQ(device2.get(), results[1].device);
   EXPECT_EQ("Dell Computer", results[1].display_name);
+}
+
+class DeviceNameUtilSimplifyNamingTest : public testing::Test {
+ public:
+  DeviceNameUtilSimplifyNamingTest() {
+    scoped_feature_list_.InitAndEnableFeature(kSyncSimplifyDeviceNaming);
+  }
+
+ protected:
+  base::test::ScopedFeatureList scoped_feature_list_;
+};
+
+// Tests that GetDeviceDisplayName returns the most user friendly name
+// (preferred name).
+TEST_F(DeviceNameUtilSimplifyNamingTest, ShouldUseMostUserFriendlyName) {
+  std::unique_ptr<DeviceInfo> device = CreateFakeDeviceInfo(
+      "guid1", "Pixel 6", DeviceInfo::OsType::kAndroid, "Google", "Pixel 6");
+
+  EXPECT_EQ("Google Phone", GetDeviceDisplayName(device.get()));
+}
+
+// Tests that when client name is empty, GetDeviceDisplayName still uses the
+// most user friendly name (preferred name, which falls back to manufacturer +
+// device type).
+TEST_F(DeviceNameUtilSimplifyNamingTest,
+       ShouldFallbackToModelWhenClientNameEmpty) {
+  std::unique_ptr<DeviceInfo> device = CreateFakeDeviceInfo(
+      "guid", "", DeviceInfo::OsType::kWindows, "Dell", "XPS 13");
+
+  EXPECT_EQ("Dell Computer", GetDeviceDisplayName(device.get()));
 }
 
 }  // namespace syncer

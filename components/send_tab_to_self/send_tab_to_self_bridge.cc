@@ -36,6 +36,7 @@
 #include "components/sync/base/client_tag_hash.h"
 #include "components/sync/base/data_type.h"
 #include "components/sync/base/deletion_origin.h"
+#include "components/sync/base/features.h"
 #include "components/sync/model/data_type_local_change_processor.h"
 #include "components/sync/model/entity_change.h"
 #include "components/sync/model/metadata_batch.h"
@@ -607,26 +608,42 @@ SendTabToSelfBridge::GetTargetDeviceInfoSortedList() {
         return a.last_active > b.last_active;
       });
 
-  std::vector<const syncer::DeviceInfo*> devices;
+  std::vector<DeviceWithTimestamp> devices;
   for (const auto& entry : devices_with_timestamps) {
     // Filter out devices that are too old or don't support the feature.
     if (clock_->Now() - entry.last_active > kDeviceExpiration) {
       break;
     }
     if (ShouldIncludeDevice(*entry.device)) {
-      devices.push_back(entry.device);
+      devices.push_back(entry);
     }
   }
+
+  if (base::FeatureList::IsEnabled(syncer::kSyncSimplifyDeviceNaming)) {
+    // Resolve display names for the filtered list by using the most user
+    // friendly name.
+    return base::ToVector(devices, [](const DeviceWithTimestamp& entry) {
+      return TargetDeviceInfo(syncer::GetDeviceDisplayName(entry.device),
+                              entry.device->guid(), entry.device->form_factor(),
+                              entry.last_active, entry.has_high_precision);
+    });
+  }
+
+  // TODO(crbug.com/522788942): Remove this temporary conversion when
+  // kSyncSimplifyDeviceNaming is fully launched.
+  std::vector<const syncer::DeviceInfo*> legacy_devices = base::ToVector(
+      devices,
+      [](const DeviceWithTimestamp& entry) { return entry.device.get(); });
 
   // Resolve display names for the filtered list. This handles de-duplication
   // by name and chooses between preferred/fallback names based on collisions.
   std::vector<syncer::DeviceInfoWithName> device_names =
-      syncer::DetermineDisplayNamesAndDeduplicate(devices,
+      syncer::DetermineDisplayNamesAndDeduplicate(legacy_devices,
                                                   GetLocalFallbackFullName());
 
   return base::ToVector(device_names, [&](const auto& info) {
-    auto it = std::ranges::find(devices_with_timestamps, info.device,
-                                &DeviceWithTimestamp::device);
+    auto it =
+        std::ranges::find(devices, info.device, &DeviceWithTimestamp::device);
     return TargetDeviceInfo(info.display_name, info.device->guid(),
                             info.device->form_factor(), it->last_active,
                             it->has_high_precision);
