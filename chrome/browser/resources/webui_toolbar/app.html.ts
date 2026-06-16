@@ -31,7 +31,8 @@ ${this.isBackForwardButtonEnabled_ ? html`
   ${this.isHomeButtonEnabled_ ? html`
     <home-button id="home"
       .state="${this.navigationControlsState_.homeControlState}"
-      .hidden="${!this.navigationControlsState_.homeControlState.shouldBeShown}">
+      .hidden="${!this.navigationControlsState_.homeControlState.shouldBeShown}"
+      .touchUi="${this.navigationControlsState_.touchUi}">
     </home-button>
   ` : ''}
   ${this.isSplitTabsButtonEnabled_ ? html`

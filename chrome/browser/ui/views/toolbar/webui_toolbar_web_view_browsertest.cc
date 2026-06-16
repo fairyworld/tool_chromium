@@ -2754,7 +2754,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewSplitTabsBrowserTest,
     return content::EvalJs(web_view->GetWebContents(),
                            base::StrCat({GetButtonIconJS(kSplitTabsSelector),
                                          "?.getAttribute('iron-icon') || ''"}))
-               .ExtractString() == "split-tabs-button:split-scene-right";
+               .ExtractString() == "webui-toolbar:split_scene_right";
   }));
 
   // Activate the other tab (Left/Start).
@@ -2766,7 +2766,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewSplitTabsBrowserTest,
     return content::EvalJs(web_view->GetWebContents(),
                            base::StrCat({GetButtonIconJS(kSplitTabsSelector),
                                          "?.getAttribute('iron-icon') || ''"}))
-               .ExtractString() == "split-tabs-button:split-scene-left";
+               .ExtractString() == "webui-toolbar:split_scene_left";
   }));
 }
 
@@ -2996,6 +2996,18 @@ class WebUIToolbarWebViewHomeButtonBrowserTest : public InProcessBrowserTest {
   base::test::ScopedFeatureList feature_list_;
 };
 
+// Home icon is different for touch only with old icon set.
+class WebUIToolbarWebViewHomeButtonOldIconsBrowserTest
+    : public WebUIToolbarWebViewHomeButtonBrowserTest {
+ public:
+  WebUIToolbarWebViewHomeButtonOldIconsBrowserTest() {
+    feature_list_.InitAndDisableFeature(features::kRoundedIcons);
+  }
+
+ private:
+  base::test::ScopedFeatureList feature_list_;
+};
+
 IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewHomeButtonBrowserTest,
                        ClickHomeButton) {
   WebUIToolbarWebView* webui_toolbar_view = SetUpAndPinHomeButton(browser());
@@ -3186,30 +3198,35 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewHomeButtonBrowserTest,
                            ->GetLastCommittedURL());
 }
 
-IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewHomeButtonBrowserTest,
+IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewHomeButtonOldIconsBrowserTest,
                        TouchModeChangesIcon) {
   WebUIToolbarWebView* webui_toolbar_view = SetUpAndPinHomeButton(browser());
   views::WebView* web_view = webui_toolbar_view->GetWebViewForTesting();
   content::WebContents* web_contents = web_view->GetWebContents();
 
-  std::string get_icon_js =
-      base::StrCat({"window.getComputedStyle(", GetButtonIconJS(kHomeSelector),
-                    ").getPropertyValue('--cr-icon-image')"});
+  std::string get_icon_js = base::StrCat(
+      {GetButtonIconJS(kHomeSelector), ".getAttribute('iron-icon')"});
+  std::string get_button_height_js =
+      base::StrCat({GetButtonIconJS(kHomeSelector), ".offsetHeight"});
 
   // Verify standard mode icon
-  EXPECT_TRUE(content::EvalJs(web_contents, get_icon_js)
-                  .ExtractString()
-                  .find("home_20.svg") != std::string::npos);
+  EXPECT_EQ("webui-toolbar:navigate_home_chrome_refresh_old",
+            content::EvalJs(web_contents, get_icon_js));
+
+  // Also its size.
+  EXPECT_EQ(GetLayoutConstant(LayoutConstant::kToolbarButtonHeight),
+            content::EvalJs(web_contents, get_button_height_js));
 
   {
     ui::TouchUiController::TouchUiScoperForTesting touch_ui_scoper(true);
 
     // Wait and verify Touch mode icon
     EXPECT_TRUE(base::test::RunUntil([&]() {
-      std::string current_icon =
-          content::EvalJs(web_contents, get_icon_js).ExtractString();
-      return current_icon.find("home_24.svg") != std::string::npos;
+      return GetLayoutConstant(LayoutConstant::kToolbarButtonHeight) ==
+             content::EvalJs(web_contents, get_button_height_js);
     }));
+    EXPECT_EQ("webui-toolbar:navigate_home_touch_old",
+              content::EvalJs(web_contents, get_icon_js));
   }
 
   // Revert to non-touch mode happens automatically when scoper goes out of
@@ -3217,10 +3234,11 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewHomeButtonBrowserTest,
 
   // Wait and verify standard mode icon again
   EXPECT_TRUE(base::test::RunUntil([&]() {
-    std::string current_icon =
-        content::EvalJs(web_contents, get_icon_js).ExtractString();
-    return current_icon.find("home_20.svg") != std::string::npos;
+    return GetLayoutConstant(LayoutConstant::kToolbarButtonHeight) ==
+           content::EvalJs(web_contents, get_button_height_js);
   }));
+  EXPECT_EQ("webui-toolbar:navigate_home_chrome_refresh_old",
+            content::EvalJs(web_contents, get_icon_js));
 }
 
 IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewHomeButtonBrowserTest,

@@ -166,28 +166,38 @@ class SplitTabButtonInteractiveTest
   }
 
   std::string GetWebUIIconName(const gfx::VectorIcon& icon) {
-    if (&icon == &(features::IsRoundedIconsEnabled() ? kSplitSceneIcon
-                                                     : kSplitSceneOldIcon)) {
-      return "split-tabs-button:split-scene";
-    }
-    if (&icon == &(features::IsRoundedIconsEnabled()
-                       ? kSplitSceneLeftIcon
-                       : kSplitSceneLeftOldIcon)) {
-      return "split-tabs-button:split-scene-left";
-    }
-    if (&icon == &(features::IsRoundedIconsEnabled()
-                       ? kSplitSceneRightIcon
-                       : kSplitSceneRightOldIcon)) {
-      return "split-tabs-button:split-scene-right";
-    }
-    if (&icon == &(features::IsRoundedIconsEnabled() ? kSplitSceneUpIcon
-                                                     : kSplitSceneUpOldIcon)) {
-      return "split-tabs-button:split-scene-up";
-    }
-    if (&icon == &(features::IsRoundedIconsEnabled()
-                       ? kSplitSceneDownIcon
-                       : kSplitSceneDownOldIcon)) {
-      return "split-tabs-button:split-scene-down";
+    if (features::IsRoundedIconsEnabled()) {
+      if (&icon == &kSplitSceneIcon) {
+        return "webui-toolbar:split_scene";
+      }
+      if (&icon == &kSplitSceneLeftIcon) {
+        return "webui-toolbar:split_scene_left";
+      }
+      if (&icon == &kSplitSceneRightIcon) {
+        return "webui-toolbar:split_scene_right";
+      }
+      if (&icon == &kSplitSceneUpIcon) {
+        return "webui-toolbar:split_scene_up";
+      }
+      if (&icon == &kSplitSceneDownIcon) {
+        return "webui-toolbar:split_scene_down";
+      }
+    } else {
+      if (&icon == &kSplitSceneOldIcon) {
+        return "webui-toolbar:split_scene_old";
+      }
+      if (&icon == &kSplitSceneLeftOldIcon) {
+        return "webui-toolbar:split_scene_left_old";
+      }
+      if (&icon == &kSplitSceneRightOldIcon) {
+        return "webui-toolbar:split_scene_right_old";
+      }
+      if (&icon == &kSplitSceneUpOldIcon) {
+        return "webui-toolbar:split_scene_up_old";
+      }
+      if (&icon == &kSplitSceneDownOldIcon) {
+        return "webui-toolbar:split_scene_down_old";
+      }
     }
     return "";
   }
