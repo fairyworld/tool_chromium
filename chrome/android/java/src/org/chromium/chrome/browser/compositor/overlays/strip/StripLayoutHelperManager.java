@@ -36,6 +36,7 @@ import org.chromium.base.metrics.RecordUserAction;
 import org.chromium.base.supplier.MonotonicObservableSupplier;
 import org.chromium.base.supplier.NonNullObservableSupplier;
 import org.chromium.base.supplier.ObservableSuppliers;
+import org.chromium.base.supplier.OneshotSupplier;
 import org.chromium.base.supplier.SettableNonNullObservableSupplier;
 import org.chromium.build.annotations.EnsuresNonNullIf;
 import org.chromium.build.annotations.MonotonicNonNull;
@@ -106,6 +107,7 @@ import org.chromium.chrome.browser.toolbar.ToolbarManager;
 import org.chromium.chrome.browser.ui.browser_window.ChromeAndroidTaskTrackerFactory;
 import org.chromium.chrome.browser.ui.desktop_windowing.AppHeaderUtils;
 import org.chromium.chrome.browser.ui.messages.snackbar.SnackbarManager;
+import org.chromium.chrome.browser.ui.side_ui.SideUiStateProvider;
 import org.chromium.chrome.browser.ui.system.StatusBarColorController;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
 import org.chromium.components.browser_ui.desktop_windowing.AppHeaderState;
@@ -526,7 +528,8 @@ public class StripLayoutHelperManager
             BackPressManager backPressManager,
             SnackbarManager snackbarManager,
             @Nullable ActivityResultTracker activityResultTracker,
-            GlicButtonDelegate glicClickHandler) {
+            GlicButtonDelegate glicClickHandler,
+            OneshotSupplier<SideUiStateProvider> sideUiStateProviderSupplier) {
         mContext = context;
         mWindowAndroid = windowAndroid;
         Resources res = context.getResources();
@@ -611,6 +614,7 @@ public class StripLayoutHelperManager
                         ChromeAndroidTaskTrackerFactory.getInstance(),
                         mIsIncognito,
                         () -> mTabModelSelector,
+                        sideUiStateProviderSupplier,
                         this::updateButtonMargins);
 
         if (!IncognitoUtils.shouldOpenIncognitoAsWindow()) {

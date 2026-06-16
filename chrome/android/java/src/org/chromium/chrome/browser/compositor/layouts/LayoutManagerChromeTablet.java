@@ -12,6 +12,7 @@ import org.chromium.base.Log;
 import org.chromium.base.supplier.MonotonicObservableSupplier;
 import org.chromium.base.supplier.NonNullObservableSupplier;
 import org.chromium.base.supplier.ObservableSuppliers;
+import org.chromium.base.supplier.OneshotSupplier;
 import org.chromium.base.supplier.SettableMonotonicObservableSupplier;
 import org.chromium.build.annotations.Initializer;
 import org.chromium.build.annotations.NullMarked;
@@ -40,6 +41,7 @@ import org.chromium.chrome.browser.theme.ToolbarThemeColorProvider;
 import org.chromium.chrome.browser.toolbar.ControlContainer;
 import org.chromium.chrome.browser.toolbar.ToolbarManager;
 import org.chromium.chrome.browser.ui.messages.snackbar.SnackbarManager;
+import org.chromium.chrome.browser.ui.side_ui.SideUiStateProvider;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
 import org.chromium.components.browser_ui.desktop_windowing.DesktopWindowStateManager;
 import org.chromium.ui.base.ActivityResultTracker;
@@ -129,7 +131,8 @@ public class LayoutManagerChromeTablet extends LayoutManagerChrome {
             BackPressManager backPressManager,
             SnackbarManager snackbarManager,
             ActivityResultTracker activityResultTracker,
-            GlicButtonDelegate glicClickHandler) {
+            GlicButtonDelegate glicClickHandler,
+            OneshotSupplier<SideUiStateProvider> sideUiStateProviderSupplier) {
         super(
                 host,
                 contentContainer,
@@ -172,7 +175,8 @@ public class LayoutManagerChromeTablet extends LayoutManagerChrome {
                         backPressManager,
                         snackbarManager,
                         activityResultTracker,
-                        glicClickHandler);
+                        glicClickHandler,
+                        sideUiStateProviderSupplier);
         addSceneOverlay(mTabStripLayoutHelperManager);
         addObserver(mTabStripLayoutHelperManager.getTabSwitcherObserver());
         mDesktopWindowStateManager = desktopWindowStateManager;

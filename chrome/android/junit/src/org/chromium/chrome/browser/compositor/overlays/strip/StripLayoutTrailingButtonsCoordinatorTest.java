@@ -33,9 +33,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.robolectric.Robolectric;
+import org.robolectric.shadows.ShadowLooper;
 
 import org.chromium.base.MathUtils;
 import org.chromium.base.UnownedUserDataHost;
+import org.chromium.base.supplier.OneshotSupplierImpl;
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.base.test.util.Features.DisableFeatures;
 import org.chromium.base.test.util.Features.EnableFeatures;
@@ -61,6 +63,10 @@ import org.chromium.chrome.browser.glic.GlicPrefNames;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.ui.browser_window.ChromeAndroidTask;
 import org.chromium.chrome.browser.ui.browser_window.ChromeAndroidTaskTracker;
+import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.SideUiId;
+import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.SideUiShowability;
+import org.chromium.chrome.browser.ui.side_ui.SideUiObserver;
+import org.chromium.chrome.browser.ui.side_ui.SideUiStateProvider;
 import org.chromium.components.prefs.PrefChangeRegistrar;
 import org.chromium.components.prefs.PrefChangeRegistrarJni;
 import org.chromium.components.prefs.PrefService;
@@ -94,6 +100,9 @@ public class StripLayoutTrailingButtonsCoordinatorTest {
     @Mock private ChromeAndroidTask mTask;
     @Mock private ActorKeyedService mActorKeyedService;
     @Mock private GlicNudgeDelegateBridge.Natives mGlicNudgeDelegateBridgeJniMock;
+    private final OneshotSupplierImpl<SideUiStateProvider> mSideUiStateProviderSupplier =
+            new OneshotSupplierImpl<>();
+    @Mock private SideUiStateProvider mSideUiStateProvider;
     @Captor private ArgumentCaptor<List<Animator>> mAnimatorsListCaptor;
 
     private Activity mActivity;
@@ -135,6 +144,9 @@ public class StripLayoutTrailingButtonsCoordinatorTest {
         PrefChangeRegistrarJni.setInstanceForTesting(mPrefChangeRegistrarJniMock);
         when(mPrefChangeRegistrarJniMock.init(any(), any())).thenReturn(1L);
 
+        when(mSideUiStateProvider.canShowSideUi(SideUiId.SIDE_PANEL)).thenReturn(true);
+        mSideUiStateProviderSupplier.set(mSideUiStateProvider);
+
         mCoordinator =
                 new StripLayoutTrailingButtonsCoordinator(
                         mActivity,
@@ -150,7 +162,9 @@ public class StripLayoutTrailingButtonsCoordinatorTest {
                         mTaskTracker,
                         mIsIncognito,
                         () -> null,
+                        mSideUiStateProviderSupplier,
                         mObserver);
+        ShadowLooper.idleMainLooper();
         mCoordinator.onProfileAvailable(mProfile);
         mCoordinator.setLayerTitleCache(mLayerTitleCache);
         mCoordinator.onSizeChanged(1000.f, 0.f, 0.f, 0.f);
@@ -185,6 +199,26 @@ public class StripLayoutTrailingButtonsCoordinatorTest {
 
         assertTrue(
                 "Glic button should be visible even when supplier indicates incognito window.",
+                mCoordinator.shouldGlicBeVisible());
+    }
+
+    @Test
+    public void testGlicButton_HiddenWhenSidePanelNotShowable() {
+        assertTrue("Glic button should be visible initially.", mCoordinator.shouldGlicBeVisible());
+
+        when(mSideUiStateProvider.canShowSideUi(SideUiId.SIDE_PANEL)).thenReturn(false);
+
+        // Notify observer of updates
+        ArgumentCaptor<SideUiObserver> observerCaptor =
+                ArgumentCaptor.forClass(SideUiObserver.class);
+        verify(mSideUiStateProvider).addObserver(observerCaptor.capture());
+        observerCaptor
+                .getValue()
+                .onShowableSideUisUpdated(
+                        new SideUiShowability(List.of(), List.of(SideUiId.SIDE_PANEL)));
+
+        assertFalse(
+                "Glic button should be hidden when side panel is not showable.",
                 mCoordinator.shouldGlicBeVisible());
     }
 

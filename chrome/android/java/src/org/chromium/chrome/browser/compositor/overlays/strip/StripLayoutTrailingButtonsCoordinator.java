@@ -18,6 +18,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.VisibleForTesting;
 
 import org.chromium.base.ContextUtils;
+import org.chromium.base.supplier.OneshotSupplier;
 import org.chromium.build.annotations.EnsuresNonNullIf;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
@@ -55,6 +56,11 @@ import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.tabmodel.TabModelSelector;
 import org.chromium.chrome.browser.ui.browser_window.ChromeAndroidTaskTracker;
 import org.chromium.chrome.browser.ui.side_panel.AndroidSidePanelEnabledFn;
+import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.SideUiId;
+import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.SideUiShowability;
+import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.SideUiSpecs;
+import org.chromium.chrome.browser.ui.side_ui.SideUiObserver;
+import org.chromium.chrome.browser.ui.side_ui.SideUiStateProvider;
 import org.chromium.components.browser_ui.styles.SemanticColorUtils;
 import org.chromium.components.prefs.PrefChangeRegistrar;
 import org.chromium.components.user_prefs.UserPrefs;
@@ -141,6 +147,23 @@ public class StripLayoutTrailingButtonsCoordinator {
     private final @Nullable ChromeAndroidTaskTracker mTaskTracker;
     private boolean mIsIncognito;
     private final Supplier<@Nullable TabModelSelector> mTabModelSelectorSupplier;
+    private final OneshotSupplier<SideUiStateProvider> mSideUiStateProviderSupplier;
+    private @Nullable SideUiStateProvider mSideUiStateProvider;
+    private final SideUiObserver mSideUiObserver =
+            new SideUiObserver() {
+                @Override
+                public void onSideUiSpecsChanged(SideUiSpecs sideUiSpecs) {}
+
+                @Override
+                public void onShowableSideUisUpdated(SideUiShowability sideUiShowability) {
+                    if (sideUiShowability.mShowableSideUiIds.contains(SideUiId.SIDE_PANEL)
+                            || sideUiShowability.mUnshowableSideUiIds.contains(
+                                    SideUiId.SIDE_PANEL)) {
+                        updateTrailingButtonsState(
+                                /* animate= */ false, /* forceLayoutChanged= */ false);
+                    }
+                }
+            };
 
     // Lifecycle & Caching Objects
     private @Nullable Profile mProfile;
@@ -291,6 +314,7 @@ public class StripLayoutTrailingButtonsCoordinator {
             @Nullable ChromeAndroidTaskTracker taskTracker,
             boolean isIncognito,
             Supplier<@Nullable TabModelSelector> tabModelSelectorSupplier,
+            OneshotSupplier<SideUiStateProvider> sideUiStateProviderSupplier,
             StripLayoutTrailingButtonsObserver observer) {
         mContext = context;
         mUpdateHost = updateHost;
@@ -300,17 +324,27 @@ public class StripLayoutTrailingButtonsCoordinator {
         mTaskTracker = taskTracker;
         mIsIncognito = isIncognito;
         mTabModelSelectorSupplier = tabModelSelectorSupplier;
+        mSideUiStateProviderSupplier = sideUiStateProviderSupplier;
         mObserver = observer;
         mWindowAndroid = windowAndroid;
         mToolbarControlContainer = toolbarControlContainer;
         mGlicUiObserver = this::updateIsPanelOpen;
 
-        StripLayoutViewOnClickHandler glicClickHandlerOnButton =
-                (time, view, motionEventButtonState, modifiers) -> {
-                    handleGlicButtonClick();
-                };
-
         if (GlicEnabling.isEnabledByFlags() && AndroidSidePanelEnabledFn.isEnabled()) {
+            mSideUiStateProviderSupplier.onAvailable(
+                    (provider) -> {
+                        mSideUiStateProvider = provider;
+                        mSideUiStateProvider.addObserver(mSideUiObserver);
+                        updateTrailingButtonsState(
+                                /* animate= */ false, /* forceLayoutChanged= */ false);
+                    });
+
+            StripLayoutViewOnClickHandler glicClickHandlerOnButton =
+                    (time, view, motionEventButtonState, modifiers) ->
+                            mGlicClickHandler.onClick(
+                                    /* preventClose= */ false,
+                                    GlicInvocationSource.TOP_CHROME_BUTTON);
+
             mGlicDismissNudgeButton =
                     new TintedCompositorButton(
                             mContext,
@@ -419,6 +453,10 @@ public class StripLayoutTrailingButtonsCoordinator {
     /** Destroys the coordinator and unregisters observers. */
     public void destroy() {
         GlicNudgeDelegateBridge.setDelegate(mWindowAndroid, null);
+        if (mSideUiStateProvider != null) {
+            mSideUiStateProvider.removeObserver(mSideUiObserver);
+            mSideUiStateProvider = null;
+        }
         if (mStateController != null) {
             mStateController.destroy();
             mStateController = null;
@@ -1306,6 +1344,11 @@ public class StripLayoutTrailingButtonsCoordinator {
      */
     public boolean shouldGlicBeVisible() {
         if (mGlicButton == null || mProfile == null) {
+            return false;
+        }
+        // TODO(crbug.com/519680563): Remove this side panel check once bottom sheet enabled on LFF.
+        if (mSideUiStateProvider == null
+                || !mSideUiStateProvider.canShowSideUi(SideUiId.SIDE_PANEL)) {
             return false;
         }
         return GlicEnabling.isEnabledForProfile(mProfile)
