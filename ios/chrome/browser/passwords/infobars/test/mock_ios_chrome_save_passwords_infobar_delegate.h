@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef IOS_CHROME_BROWSER_PASSWORDS_MODEL_TEST_MOCK_IOS_CHROME_SAVE_PASSWORDS_INFOBAR_DELEGATE_H_
-#define IOS_CHROME_BROWSER_PASSWORDS_MODEL_TEST_MOCK_IOS_CHROME_SAVE_PASSWORDS_INFOBAR_DELEGATE_H_
+#ifndef IOS_CHROME_BROWSER_PASSWORDS_INFOBARS_TEST_MOCK_IOS_CHROME_SAVE_PASSWORDS_INFOBAR_DELEGATE_H_
+#define IOS_CHROME_BROWSER_PASSWORDS_INFOBARS_TEST_MOCK_IOS_CHROME_SAVE_PASSWORDS_INFOBAR_DELEGATE_H_
 
 #import <Foundation/Foundation.h>
 
@@ -11,7 +11,7 @@
 #import <optional>
 
 #import "components/password_manager/core/browser/password_form.h"
-#import "ios/chrome/browser/passwords/model/ios_chrome_save_password_infobar_delegate.h"
+#import "ios/chrome/browser/passwords/infobars/model/ios_chrome_save_password_infobar_delegate.h"
 #import "testing/gmock/include/gmock/gmock.h"
 #import "url/gurl.h"
 
@@ -59,4 +59,4 @@ class MockIOSChromeSavePasswordInfoBarDelegate
       nullptr;
 };
 
-#endif  // IOS_CHROME_BROWSER_PASSWORDS_MODEL_TEST_MOCK_IOS_CHROME_SAVE_PASSWORDS_INFOBAR_DELEGATE_H_
+#endif  // IOS_CHROME_BROWSER_PASSWORDS_INFOBARS_TEST_MOCK_IOS_CHROME_SAVE_PASSWORDS_INFOBAR_DELEGATE_H_

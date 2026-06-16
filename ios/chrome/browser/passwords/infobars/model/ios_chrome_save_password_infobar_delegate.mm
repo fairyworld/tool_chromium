@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#import "ios/chrome/browser/passwords/model/ios_chrome_save_password_infobar_delegate.h"
+#import "ios/chrome/browser/passwords/infobars/model/ios_chrome_save_password_infobar_delegate.h"
 
 #import <string>
 #import <utility>
@@ -66,8 +66,9 @@ void RecordPresentationMetrics(
     bool current_password_saved,
     bool update_infobar,
     bool automatic) {
-  // TODO(b/318820862): Consider removing this block as it is theoretically
-  // impossible to save the password (e.g., tap on "Accept") before presenting.
+  // TODO(crbug.com/318820862): Consider removing this block as it is
+  // theoretically impossible to save the password (e.g., tap on "Accept")
+  // before presenting.
   if (current_password_saved) {
     // Password was already saved or updated.
     form_to_save->GetMetricsRecorder()->RecordPasswordBubbleShown(
