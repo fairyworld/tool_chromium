@@ -28,7 +28,6 @@ include_rules = [
   "+chrome/browser/extensions/install_tracker_factory.h",
   "+chrome/browser/extensions/mock_crx_installer.h",
   "+chrome/browser/extensions/updater",
-  "+chrome/browser/platform_util.h",
   "+chrome/browser/policy",
   "+chrome/browser/profiles",
   "+chrome/browser/spellchecker",

@@ -1,7 +1,6 @@
 include_rules = [
   "+chromeos/ash/experiences/system_web_apps/types",
   "+components/services/app_service/public",
-  "+components/app_restore/full_restore_utils.h",
   "+components/app_icon_loader",
 
   # Existing dependencies within //chrome. There is an active effort to
