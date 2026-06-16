@@ -8290,6 +8290,28 @@ TEST_F(ResidentKeyAuthenticatorImplTest, WinCredProtectApiVersion) {
   }
 }
 
+// Regression test for crbug.com/512385679.
+// Tests that Chrome supports the hmac secret extension on create on Windows 10.
+TEST_F(ResidentKeyAuthenticatorImplTest, WinCreateHmacSecret) {
+  virtual_device_factory_->set_discover_win_webauthn_api_authenticator(true);
+  fake_win_webauthn_api_.set_available(true);
+  fake_win_webauthn_api_.set_version(2);
+  NavigateAndCommit(GURL("https://acme.com"));
+  PublicKeyCredentialCreationOptionsPtr options = make_credential_options();
+  options->relying_party = device::PublicKeyCredentialRpEntity();
+  options->relying_party.id = device::test_data::kRelyingPartyId;
+  options->relying_party.name = "";
+  options->authenticator_selection->user_verification_requirement =
+      device::UserVerificationRequirement::kRequired;
+  options->authenticator_selection->resident_key =
+      device::ResidentKeyRequirement::kRequired;
+  options->hmac_create_secret = true;
+  MakeCredentialResult result = AuthenticatorMakeCredential(std::move(options));
+  EXPECT_EQ(result.status, AuthenticatorStatus::SUCCESS);
+  EXPECT_TRUE(result.response->echo_hmac_create_secret);
+  EXPECT_TRUE(result.response->hmac_create_secret);
+}
+
 // Tests that the incognito flag is plumbed through conditional UI requests.
 TEST_F(ResidentKeyAuthenticatorImplTest, ConditionalUI_Incognito) {
   virtual_device_factory_->set_discover_win_webauthn_api_authenticator(true);
