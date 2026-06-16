@@ -1578,6 +1578,10 @@ base::expected<void, std::string> DeserializeAnimationCurve(
     curve->AddKeyframe(std::move(keyframe));
   }
 
+  if (wire.group_id == cc::KeyframeModel::kInvalidGroup) {
+    return base::unexpected("Invalid group_id");
+  }
+
   auto model = cc::KeyframeModel::Create(
       std::move(curve), wire.id, wire.group_id,
       cc::KeyframeModel::TargetPropertyId(wire.target_property_type));
