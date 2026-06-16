@@ -88,7 +88,6 @@ static_library("login") {
     "//ash/constants",
     "//ash/webui/settings/public/constants:mojom",
     "//base:i18n",
-    "//chrome/app:command_ids",
     "//chrome/app:generated_resources",
     "//chrome/app/theme:theme_resources",
     "//chrome/browser:browser_process",

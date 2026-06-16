@@ -22,5 +22,4 @@ include_rules = [
 
   # Dependencies outside of //chrome:
   "+components/cross_device/logging",
-  "+components/push_notification",
 ]
