@@ -110,9 +110,7 @@ void ChromeLoginPerformer::RunOnlineAllowlistCheck(
   if (connector->IsCloudManaged() && wildcard_match &&
       signin::AccountManagedStatusFinder::MayBeEnterpriseUserBasedOnEmail(
           account_id.GetUserEmail())) {
-    // TODO(crbug.com/404133029): Avoid using g_browser_process.
-    wildcard_login_checker_ = std::make_unique<policy::WildcardLoginChecker>(
-        g_browser_process->shared_url_loader_factory());
+    wildcard_login_checker_ = std::make_unique<policy::WildcardLoginChecker>();
     if (refresh_token.empty()) {
       NOTREACHED() << "Refresh token must be present.";
     } else {

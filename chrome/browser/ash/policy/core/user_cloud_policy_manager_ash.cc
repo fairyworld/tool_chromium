@@ -277,9 +277,7 @@ void UserCloudPolicyManagerAsh::OnAccessTokenAvailable(
   access_token_ = access_token;
 
   if (!wildcard_username_.empty()) {
-    // TODO(crbug.com/404133022): Avoid using g_browser_process.
-    wildcard_login_checker_ = std::make_unique<WildcardLoginChecker>(
-        g_browser_process->shared_url_loader_factory());
+    wildcard_login_checker_ = std::make_unique<WildcardLoginChecker>();
     // Safe to set a callback with an unretained pointer because the
     // WildcardLoginChecker is owned by this object and won't invoke the
     // callback after we destroy it.
