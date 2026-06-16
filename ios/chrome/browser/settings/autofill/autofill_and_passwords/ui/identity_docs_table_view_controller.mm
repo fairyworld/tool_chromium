@@ -29,19 +29,6 @@ enum SectionIdentifier {
   SectionIdentifierNationalIdCards,
   SectionIdentifierPassports,
 };
-
-// Returns YES if `items` contains any local (non-server) entities.
-BOOL ContainsLocalEntity(NSArray<TableViewItem*>* items) {
-  for (TableViewItem* item in items) {
-    AutofillAIEntityItem* aiItem =
-        base::apple::ObjCCast<AutofillAIEntityItem>(item);
-    if (aiItem && !aiItem.isServerWalletItem) {
-      return YES;
-    }
-  }
-  return NO;
-}
-
 }  // namespace
 
 @interface IdentityDocsTableViewController () <
