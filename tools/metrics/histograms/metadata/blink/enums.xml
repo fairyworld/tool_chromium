@@ -6672,6 +6672,7 @@ Called by update_use_counter_feature_enum.py.-->
       label="V8ElementInternals_AriaActionsElements_AttributeSetter"/>
   <int value="5927" label="SVGPathElementGetPathData"/>
   <int value="5928" label="SVGPathElementGetPathDataNormalized"/>
+  <int value="5929" label="DownloadFromAdScript"/>
 </enum>
 
 <!-- LINT.ThenChange(//third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom:WebFeature) -->

@@ -8505,6 +8505,13 @@ void NavigationRequest::RecordDownloadUseCountersPrePolicyCheck() {
   if (download_policy().IsType(blink::NavigationDownloadType::kAdFrame)) {
     GetContentClient()->browser()->LogWebFeatureForCurrentPage(
         rfh, blink::mojom::WebFeature::kDownloadInAdFrame);
+  } else if (download_policy().IsType(
+                 blink::NavigationDownloadType::kAdScript)) {
+    // We only record kDownloadFromAdScript if kDownloadInAdFrame is not set.
+    // This avoids double counting and makes it easier to isolate the impact
+    // of ad scripts.
+    GetContentClient()->browser()->LogWebFeatureForCurrentPage(
+        rfh, blink::mojom::WebFeature::kDownloadFromAdScript);
   }
 }
 

@@ -599,7 +599,7 @@ blink::mojom::CommonNavigationParamsPtr MakeCommonNavigationParams(
     std::unique_ptr<blink::WebNavigationInfo> info,
     int load_flags,
     bool has_download_sandbox_flag,
-    bool from_ad,
+    bool from_ad_frame,
     bool is_history_navigation_in_new_child_frame,
     network::mojom::RequestDestination request_destination) {
   // A valid RequestorOrigin is always expected to be present.
@@ -637,7 +637,7 @@ blink::mojom::CommonNavigationParamsPtr MakeCommonNavigationParams(
   download_policy.ApplyDownloadFramePolicy(
       info->is_opener_navigation, info->url_request.HasUserGesture(),
       info->url_request.RequestorOrigin().CanAccess(current_origin),
-      has_download_sandbox_flag, from_ad);
+      has_download_sandbox_flag, from_ad_frame, info->is_ad_script_in_stack);
 
   std::optional<GURL> initiator_base_url;
   GURL requestor_base_url(info->requestor_base_url);
@@ -6009,13 +6009,13 @@ void RenderFrameImpl::OpenURL(std::unique_ptr<blink::WebNavigationInfo> info) {
   bool has_download_sandbox_flag =
       info->initiator_frame_has_download_sandbox_flag ||
       current_frame_has_download_sandbox_flag;
-  bool from_ad = info->initiator_frame_is_ad || frame_->IsAdFrame();
+  bool from_ad_frame = info->initiator_frame_is_ad || frame_->IsAdFrame();
 
   params->download_policy.ApplyDownloadFramePolicy(
       info->is_opener_navigation, info->url_request.HasUserGesture(),
       info->url_request.RequestorOrigin().CanAccess(
           frame_->GetSecurityOrigin()),
-      has_download_sandbox_flag, from_ad);
+      has_download_sandbox_flag, from_ad_frame, info->is_ad_script_in_stack);
 
   params->started_by_ad =
       info->initiator_frame_is_ad || info->is_ad_script_in_stack;
@@ -6334,7 +6334,7 @@ void RenderFrameImpl::BeginNavigationInternal(
   bool has_download_sandbox_flag =
       info->initiator_frame_has_download_sandbox_flag ||
       current_frame_has_download_sandbox_flag;
-  bool from_ad = info->initiator_frame_is_ad || frame_->IsAdFrame();
+  bool from_ad_frame = info->initiator_frame_is_ad || frame_->IsAdFrame();
 
   mojo::PendingRemote<blink::mojom::NavigationStateKeepAliveHandle>
       initiator_navigation_state_keep_alive_handle =
@@ -6348,10 +6348,10 @@ void RenderFrameImpl::BeginNavigationInternal(
           std::move(info->resume_defer_commit_listener));
 
   blink::mojom::CommonNavigationParamsPtr common_params =
-      MakeCommonNavigationParams(frame_->GetSecurityOrigin(), std::move(info),
-                                 load_flags, has_download_sandbox_flag, from_ad,
-                                 is_history_navigation_in_new_child_frame,
-                                 request_destination);
+      MakeCommonNavigationParams(
+          frame_->GetSecurityOrigin(), std::move(info), load_flags,
+          has_download_sandbox_flag, from_ad_frame,
+          is_history_navigation_in_new_child_frame, request_destination);
 
   bool is_duplicate_navigation = false;
   base::TimeDelta nav_start_diff;
@@ -6954,7 +6954,8 @@ WebView* RenderFrameImpl::CreateNewWindow(
       // `openee_can_access_opener_origin` only matters for opener navigations,
       // so its value here is irrelevant.
       /*openee_can_access_opener_origin=*/true,
-      !GetWebFrame()->IsAllowedToDownload(), GetWebFrame()->IsAdFrame());
+      !GetWebFrame()->IsAllowedToDownload(), GetWebFrame()->IsAdFrame(),
+      GetWebFrame()->IsAdScriptInStack());
 
   params->started_with_transient_activation = request.HasUserGesture();
   params->started_by_ad =
