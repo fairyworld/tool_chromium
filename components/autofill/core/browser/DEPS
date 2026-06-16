@@ -46,7 +46,7 @@ include_rules = [
   "+components/webdata/common",
   "+components/webdata_services",
   "+crypto/hash.h",
-  "+crypto/hkdf.h",
+  "+crypto/kdf.h",
   "+crypto/random.h",
   "+google_apis/common",
   "+google_apis/gaia",
