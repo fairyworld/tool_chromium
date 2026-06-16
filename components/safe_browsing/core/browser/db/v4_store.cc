@@ -29,6 +29,7 @@
 #include "base/timer/elapsed_timer.h"
 #include "base/types/to_address.h"
 #include "components/safe_browsing/core/browser/db/prefix_iterator.h"
+#include "components/safe_browsing/core/browser/db/sb_store_file_format.h"
 #include "components/safe_browsing/core/browser/db/v4_rice.h"
 #include "components/safe_browsing/core/browser/db/v4_store.pb.h"
 #include "components/safe_browsing/core/common/features.h"
@@ -996,7 +997,7 @@ StoreReadResult V4Store::ReadFromDisk() {
   }
 
   ApplyUpdateResult apply_update_result =
-      hash_prefix_map_->ReadFromDisk(file_format);
+      hash_prefix_map_->ReadFromDisk(SBStoreFileFormat(&file_format));
   if (apply_update_result == APPLY_UPDATE_SUCCESS) {
     std::unique_ptr<ListUpdateResponse> response(new ListUpdateResponse);
     response->Swap(file_format.mutable_list_update_response());
@@ -1045,7 +1046,8 @@ StoreWriteResult V4Store::WriteToDisk(V4StoreFileFormat* file_format) {
   // `write_session` must remain alive until `file_format` is committed to disk.
   // Additionally, note that `hash_prefix_map_` is unusable throughout the
   // lifetime of `write_session`.
-  if (auto write_session = hash_prefix_map_->WriteToDisk(file_format);
+  SBStoreFileFormat sb_file_format(file_format);
+  if (auto write_session = hash_prefix_map_->WriteToDisk(sb_file_format);
       write_session) {
     file_format->set_magic_number(kFileMagic);
     file_format->set_version_number(kFileVersion);

@@ -155,11 +155,7 @@ HashPrefixMap::HashPrefixMap(
     const base::FilePath& store_path,
     scoped_refptr<base::SequencedTaskRunner> task_runner,
     size_t buffer_size)
-    : store_path_(store_path),
-      task_runner_(task_runner
-                       ? std::move(task_runner)
-                       : base::SequencedTaskRunner::GetCurrentDefault()),
-      buffer_size_(buffer_size) {}
+    : HashPrefixContainer(store_path, std::move(task_runner), buffer_size) {}
 
 HashPrefixMap::~HashPrefixMap() {
   DCHECK(task_runner_->RunsTasksInCurrentSequence());
@@ -203,11 +199,12 @@ void HashPrefixMap::Append(PrefixSize size, HashPrefixesView prefix) {
 }
 
 ApplyUpdateResult HashPrefixMap::ReadFromDisk(
-    const V4StoreFileFormat& file_format) {
+    const SBStoreFileFormat& file_format) {
   base::ScopedBlockingCall scoped_blocking_call(FROM_HERE,
                                                 base::BlockingType::MAY_BLOCK);
-  DCHECK(file_format.list_update_response().additions().empty());
-  for (const auto& hash_file : file_format.hash_files()) {
+  const V4StoreFileFormat& v4_file_format = file_format.v4_file_format();
+  DCHECK(v4_file_format.list_update_response().additions().empty());
+  for (const auto& hash_file : v4_file_format.hash_files()) {
     PrefixSize prefix_size = hash_file.prefix_size();
     if (hash_file.file_size() % prefix_size != 0) {
       return ADDITIONS_SIZE_UNEXPECTED_FAILURE;
@@ -223,7 +220,7 @@ ApplyUpdateResult HashPrefixMap::ReadFromDisk(
 
 namespace {
 
-class HashPrefixMapWriteSession : public HashPrefixMap::WriteSession {
+class HashPrefixMapWriteSession : public HashPrefixContainer::WriteSession {
  public:
   HashPrefixMapWriteSession() = default;
   HashPrefixMapWriteSession(const HashPrefixMapWriteSession&) = delete;
@@ -234,10 +231,11 @@ class HashPrefixMapWriteSession : public HashPrefixMap::WriteSession {
 
 }  // namespace
 
-std::unique_ptr<HashPrefixMap::WriteSession> HashPrefixMap::WriteToDisk(
-    V4StoreFileFormat* file_format) {
+std::unique_ptr<HashPrefixContainer::WriteSession> HashPrefixMap::WriteToDisk(
+    SBStoreFileFormat& file_format) {
   base::ScopedBlockingCall scoped_blocking_call(FROM_HERE,
                                                 base::BlockingType::MAY_BLOCK);
+  V4StoreFileFormat* v4_file_format = file_format.v4_file_format_mutable();
   for (auto& [size, file_info] : map_) {
     HashFile hash_file;
     if (!file_info.Finalize(&hash_file)) {
@@ -252,7 +250,7 @@ std::unique_ptr<HashPrefixMap::WriteSession> HashPrefixMap::WriteToDisk(
       return nullptr;
     }
 
-    file_format->add_hash_files()->Swap(&hash_file);
+    v4_file_format->add_hash_files()->Swap(&hash_file);
   }
   return std::make_unique<HashPrefixMapWriteSession>();
 }
@@ -287,12 +285,6 @@ void HashPrefixMap::GetPrefixInfo(
     prefix_set->set_size(size);
     prefix_set->set_count(info.GetView().size() / size);
   }
-}
-
-// static
-base::FilePath HashPrefixMap::GetPath(const base::FilePath& store_path,
-                                      const std::string& extension) {
-  return store_path.AddExtensionASCII(extension);
 }
 
 const std::string& HashPrefixMap::GetExtensionForTesting(PrefixSize size) {

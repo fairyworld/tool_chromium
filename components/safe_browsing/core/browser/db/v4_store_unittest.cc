@@ -278,7 +278,8 @@ TEST_F(V4StoreTest, TestMergeUpdatesWithSameSizesInEachMap) {
                               PrefixMapToView(prefix_map_additions), nullptr,
                               expected_checksum));
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
 
   HashPrefixMapView prefix_map = store.hash_prefix_map_->view();
   EXPECT_EQ(2u, prefix_map.size());
@@ -320,7 +321,8 @@ TEST_F(V4StoreTest, TestMergeUpdatesWithDifferentSizesInEachMap) {
                               PrefixMapToView(prefix_map_additions), nullptr,
                               expected_checksum));
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
 
   HashPrefixMapView prefix_map = store.hash_prefix_map_->view();
   EXPECT_EQ(2u, prefix_map.size());
@@ -355,7 +357,8 @@ TEST_F(V4StoreTest, TestMergeUpdatesOldMapRunsOutFirst) {
                               PrefixMapToView(prefix_map_additions), nullptr,
                               expected_checksum));
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
 
   HashPrefixMapView prefix_map = store.hash_prefix_map_->view();
   EXPECT_EQ(1u, prefix_map.size());
@@ -387,7 +390,8 @@ TEST_F(V4StoreTest, TestMergeUpdatesAdditionsMapRunsOutFirst) {
                               PrefixMapToView(prefix_map_additions), nullptr,
                               expected_checksum));
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
 
   HashPrefixMapView prefix_map = store.hash_prefix_map_->view();
   EXPECT_EQ(1u, prefix_map.size());
@@ -469,7 +473,8 @@ TEST_F(V4StoreTest, TestMergeUpdateFastPathWithRemovals) {
                               &raw_removals, expected_checksum));
 
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
 
   EXPECT_THAT(
       store.hash_prefix_map_->view(),
@@ -487,7 +492,8 @@ TEST_F(V4StoreTest, TestMergeUpdateFastPathEmptyLists) {
             store.MergeUpdate(PrefixMapToView(prefix_map_old),
                               PrefixMapToView(prefix_map_empty), nullptr, ""));
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
   EXPECT_THAT(store.hash_prefix_map_->view(),
               UnorderedElementsAre(Pair(4, "11112222")));
 
@@ -495,7 +501,7 @@ TEST_F(V4StoreTest, TestMergeUpdateFastPathEmptyLists) {
   EXPECT_EQ(APPLY_UPDATE_SUCCESS,
             store.MergeUpdate(PrefixMapToView(prefix_map_empty),
                               PrefixMapToView(prefix_map_old), nullptr, ""));
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
   EXPECT_THAT(store.hash_prefix_map_->view(),
               UnorderedElementsAre(Pair(4, "11112222")));
 }
@@ -516,7 +522,8 @@ TEST_F(V4StoreTest, TestMergeUpdateFastPathMultipleRemovalsInARow) {
                               PrefixMapToView(prefix_map_additions),
                               &raw_removals, ""));
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
   EXPECT_THAT(store.hash_prefix_map_->view(),
               UnorderedElementsAre(Pair(4, "000015153333")));
 }
@@ -532,7 +539,8 @@ TEST_F(V4StoreTest, TestVerifyChecksumFastPath) {
   store.expected_checksum_ = std::string(checksum.begin(), checksum.end());
 
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
 
   EXPECT_TRUE(store.VerifyChecksum());
 
@@ -563,7 +571,8 @@ TEST_F(V4StoreTest, TestMergeUpdatesRemovesOnlyElement) {
                               PrefixMapToView(prefix_map_additions),
                               &raw_removals, expected_checksum));
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
 
   EXPECT_THAT(store.hash_prefix_map_->view(),
               UnorderedElementsAre(Pair(5, "1111133333")));
@@ -592,7 +601,8 @@ TEST_F(V4StoreTest, TestMergeUpdatesRemovesFirstElement) {
                               PrefixMapToView(prefix_map_additions),
                               &raw_removals, expected_checksum));
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
 
   HashPrefixMapView prefix_map = store.hash_prefix_map_->view();
   // The size is 2 since we reserve space anyway.
@@ -623,7 +633,8 @@ TEST_F(V4StoreTest, TestMergeUpdatesRemovesMiddleElement) {
                               PrefixMapToView(prefix_map_additions),
                               &raw_removals, expected_checksum));
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
 
   HashPrefixMapView prefix_map = store.hash_prefix_map_->view();
   // The size is 2 since we reserve space anyway.
@@ -653,7 +664,8 @@ TEST_F(V4StoreTest, TestMergeUpdatesRemovesLastElement) {
                               PrefixMapToView(prefix_map_additions),
                               &raw_removals, expected_checksum));
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
 
   HashPrefixMapView prefix_map = store.hash_prefix_map_->view();
   // The size is 2 since we reserve space anyway.
@@ -686,7 +698,8 @@ TEST_F(V4StoreTest, TestMergeUpdatesRemovesWhenOldHasDifferentSizes) {
                               PrefixMapToView(prefix_map_additions),
                               &raw_removals, expected_checksum));
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
 
   HashPrefixMapView prefix_map = store.hash_prefix_map_->view();
   // The size is 2 since we reserve space anyway.
@@ -721,7 +734,8 @@ TEST_F(V4StoreTest, TestMergeUpdatesRemovesMultipleAcrossDifferentSizes) {
                               PrefixMapToView(prefix_map_additions),
                               &raw_removals, expected_checksum));
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
 
   HashPrefixMapView prefix_map = store.hash_prefix_map_->view();
   // The size is 2 since we reserve space anyway.
@@ -789,7 +803,8 @@ TEST_F(V4StoreTest, TestHashPrefixExistsAtTheBeginning) {
   HashPrefixMap map(store_path_);
   map.Append(5, "abcdebbbbbccccc");
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(map.WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(map.WriteToDisk(sb_file_format));
   HashPrefixStr hash_prefix = "abcde";
   EXPECT_EQ(map.GetMatchingHashPrefix(hash_prefix), hash_prefix);
 }
@@ -798,7 +813,8 @@ TEST_F(V4StoreTest, TestHashPrefixExistsInTheMiddle) {
   HashPrefixMap map(store_path_);
   map.Append(5, "abcdebbbbbccccc");
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(map.WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(map.WriteToDisk(sb_file_format));
   HashPrefixStr hash_prefix = "bbbbb";
   EXPECT_EQ(map.GetMatchingHashPrefix(hash_prefix), hash_prefix);
 }
@@ -807,7 +823,8 @@ TEST_F(V4StoreTest, TestHashPrefixExistsAtTheEnd) {
   HashPrefixMap map(store_path_);
   map.Append(5, "abcdebbbbbccccc");
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(map.WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(map.WriteToDisk(sb_file_format));
   HashPrefixStr hash_prefix = "ccccc";
   EXPECT_EQ(map.GetMatchingHashPrefix(hash_prefix), hash_prefix);
 }
@@ -816,7 +833,8 @@ TEST_F(V4StoreTest, TestHashPrefixExistsAtTheBeginningOfEven) {
   HashPrefixMap map(store_path_);
   map.Append(5, "abcdebbbbb");
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(map.WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(map.WriteToDisk(sb_file_format));
   HashPrefixStr hash_prefix = "abcde";
   EXPECT_EQ(map.GetMatchingHashPrefix(hash_prefix), hash_prefix);
 }
@@ -825,7 +843,8 @@ TEST_F(V4StoreTest, TestHashPrefixExistsAtTheEndOfEven) {
   HashPrefixMap map(store_path_);
   map.Append(5, "abcdebbbbb");
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(map.WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(map.WriteToDisk(sb_file_format));
   HashPrefixStr hash_prefix = "bbbbb";
   EXPECT_EQ(map.GetMatchingHashPrefix(hash_prefix), hash_prefix);
 }
@@ -834,7 +853,8 @@ TEST_F(V4StoreTest, TestHashPrefixDoesNotExistInConcatenatedList) {
   HashPrefixMap map(store_path_);
   map.Append(5, "abcdebbbbb");
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(map.WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(map.WriteToDisk(sb_file_format));
   HashPrefixStr hash_prefix = "bbbbc";
   EXPECT_EQ(map.GetMatchingHashPrefix(hash_prefix), "");
 }
@@ -844,7 +864,8 @@ TEST_F(V4StoreTest, TestFullHashExistsInMapWithSingleSize) {
   store.hash_prefix_map_->Append(
       32, "0111222233334444555566667777888811112222333344445555666677778888");
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
   FullHashStr full_hash = "11112222333344445555666677778888";
   EXPECT_EQ("11112222333344445555666677778888",
             store.GetMatchingHashPrefix(full_hash));
@@ -855,7 +876,8 @@ TEST_F(V4StoreTest, TestFullHashExistsInMapWithDifferentSizes) {
   store.hash_prefix_map_->Append(4, "22223333aaaa");
   store.hash_prefix_map_->Append(32, "11112222333344445555666677778888");
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
 
   FullHashStr full_hash = "11112222333344445555666677778888";
   EXPECT_EQ("11112222333344445555666677778888",
@@ -866,7 +888,8 @@ TEST_F(V4StoreTest, TestHashPrefixExistsInMapWithSingleSize) {
   V4Store store(task_runner(), store_path_);
   store.hash_prefix_map_->Append(4, "22223333aaaa");
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
   FullHashStr full_hash = "22222222222222222222222222222222";
   EXPECT_EQ("2222", store.GetMatchingHashPrefix(full_hash));
 }
@@ -876,7 +899,8 @@ TEST_F(V4StoreTest, TestHashPrefixExistsInMapWithDifferentSizes) {
   store.hash_prefix_map_->Append(4, "22223333aaaa");
   store.hash_prefix_map_->Append(5, "11111hhhhh");
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
 
   FullHashStr full_hash = "22222222222222222222222222222222";
   EXPECT_EQ("2222", store.GetMatchingHashPrefix(full_hash));
@@ -887,7 +911,8 @@ TEST_F(V4StoreTest, TestHashPrefixDoesNotExistInMapWithDifferentSizes) {
   store.hash_prefix_map_->Append(4, "3333aaaa");
   store.hash_prefix_map_->Append(5, "11111hhhhh");
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
 
   FullHashStr full_hash = "22222222222222222222222222222222";
   EXPECT_TRUE(store.GetMatchingHashPrefix(full_hash).empty());
@@ -898,7 +923,8 @@ TEST_F(V4StoreTest, GetMatchingHashPrefixSize32Or21) {
   V4Store store(task_runner(), store_path_);
   store.hash_prefix_map_->Append(4, prefix);
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(store.hash_prefix_map_->WriteToDisk(sb_file_format));
 
   FullHashStr full_hash_21 = "0123456789ABCDEF01234";
   EXPECT_EQ(prefix, store.GetMatchingHashPrefix(full_hash_21));

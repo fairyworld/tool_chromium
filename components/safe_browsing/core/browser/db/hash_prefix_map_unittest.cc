@@ -12,6 +12,7 @@
 #include "base/strings/string_util.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
+#include "components/safe_browsing/core/browser/db/sb_store_file_format.h"
 #include "components/safe_browsing/core/common/features.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/platform_test.h"
@@ -57,7 +58,8 @@ TEST_F(HashPrefixMapTest, WriteFile) {
   map.Append(4, "fooo");
 
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(map.WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(map.WriteToDisk(sb_file_format));
   EXPECT_EQ(map.IsValid(), APPLY_UPDATE_SUCCESS);
 
   EXPECT_EQ(file_format.hash_files().size(), 1);
@@ -76,7 +78,8 @@ TEST_F(HashPrefixMapTest, FailedWrite) {
   map.Append(4, "foo");
 
   V4StoreFileFormat file_format;
-  EXPECT_FALSE(map.WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_FALSE(map.WriteToDisk(sb_file_format));
   EXPECT_EQ(map.IsValid(), MMAP_FAILURE);
 }
 
@@ -86,7 +89,8 @@ TEST_F(HashPrefixMapTest, WriteMultipleFiles) {
   map.Append(2, "ba");
 
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(map.WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(map.WriteToDisk(sb_file_format));
   EXPECT_EQ(map.IsValid(), APPLY_UPDATE_SUCCESS);
 
   auto hash_files = file_format.hash_files();
@@ -122,7 +126,8 @@ TEST_F(HashPrefixMapTest, BuffersWrites) {
   EXPECT_EQ(GetContents(map.GetExtensionForTesting(4)), "fooobarrsomemore");
 
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(map.WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(map.WriteToDisk(sb_file_format));
 
   EXPECT_EQ(file_format.hash_files().size(), 1);
   const auto& hash_file = file_format.hash_files(0);
@@ -140,7 +145,8 @@ TEST_F(HashPrefixMapTest, ReadFile) {
   hash_file->set_file_size(4);
 
   HashPrefixMap map(GetBasePath());
-  EXPECT_EQ(map.ReadFromDisk(file_format), APPLY_UPDATE_SUCCESS);
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_EQ(map.ReadFromDisk(sb_file_format), APPLY_UPDATE_SUCCESS);
   EXPECT_EQ(map.IsValid(), APPLY_UPDATE_SUCCESS);
 
   HashPrefixMapView view = map.view();
@@ -164,7 +170,8 @@ TEST_F(HashPrefixMapTest, ReadMultipleFiles) {
   hash_file->set_file_size(4);
 
   HashPrefixMap map(GetBasePath());
-  EXPECT_EQ(map.ReadFromDisk(file_format), APPLY_UPDATE_SUCCESS);
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_EQ(map.ReadFromDisk(sb_file_format), APPLY_UPDATE_SUCCESS);
   EXPECT_EQ(map.IsValid(), APPLY_UPDATE_SUCCESS);
 
   HashPrefixMapView view = map.view();
@@ -182,7 +189,8 @@ TEST_F(HashPrefixMapTest, ReadFileInvalid) {
   hash_file->set_file_size(4);
 
   HashPrefixMap map(GetBasePath());
-  EXPECT_EQ(map.ReadFromDisk(file_format), MMAP_FAILURE);
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_EQ(map.ReadFromDisk(sb_file_format), MMAP_FAILURE);
   EXPECT_EQ(map.IsValid(), MMAP_FAILURE);
 }
 
@@ -196,7 +204,8 @@ TEST_F(HashPrefixMapTest, ReadFileWrongSize) {
   hash_file->set_file_size(4);
 
   HashPrefixMap map(GetBasePath());
-  EXPECT_EQ(map.ReadFromDisk(file_format), MMAP_FAILURE);
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_EQ(map.ReadFromDisk(sb_file_format), MMAP_FAILURE);
 }
 
 TEST_F(HashPrefixMapTest, ReadFileInvalidSize) {
@@ -210,7 +219,9 @@ TEST_F(HashPrefixMapTest, ReadFileInvalidSize) {
   hash_file->set_file_size(3);
 
   HashPrefixMap map(GetBasePath());
-  EXPECT_EQ(map.ReadFromDisk(file_format), ADDITIONS_SIZE_UNEXPECTED_FAILURE);
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_EQ(map.ReadFromDisk(sb_file_format),
+            ADDITIONS_SIZE_UNEXPECTED_FAILURE);
 }
 
 TEST_F(HashPrefixMapTest, WriteAndReadFile) {
@@ -218,11 +229,13 @@ TEST_F(HashPrefixMapTest, WriteAndReadFile) {
   map.Append(4, "fooo");
 
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(map.WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(map.WriteToDisk(sb_file_format));
   EXPECT_EQ(map.IsValid(), APPLY_UPDATE_SUCCESS);
 
   HashPrefixMap map_read(GetBasePath());
-  EXPECT_EQ(map_read.ReadFromDisk(file_format), APPLY_UPDATE_SUCCESS);
+  SBStoreFileFormat sb_file_format_read(&file_format);
+  EXPECT_EQ(map_read.ReadFromDisk(sb_file_format_read), APPLY_UPDATE_SUCCESS);
   EXPECT_EQ(map_read.IsValid(), APPLY_UPDATE_SUCCESS);
 
   HashPrefixMapView view = map_read.view();
@@ -250,7 +263,8 @@ TEST_F(HashPrefixMapTest, GetMatchingHashPrefix) {
   map.Append(4, s);
 
   V4StoreFileFormat file_format;
-  EXPECT_TRUE(map.WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  EXPECT_TRUE(map.WriteToDisk(sb_file_format));
   EXPECT_EQ(map.IsValid(), APPLY_UPDATE_SUCCESS);
 
   EXPECT_EQ(file_format.hash_files().size(), 1);
@@ -267,7 +281,8 @@ TEST_F(HashPrefixMapTest, ValidAfterWrite) {
   hash_prefix_map.Append(4, "fooo");
 
   V4StoreFileFormat file_format;
-  ASSERT_TRUE(hash_prefix_map.WriteToDisk(&file_format));
+  SBStoreFileFormat sb_file_format(&file_format);
+  ASSERT_TRUE(hash_prefix_map.WriteToDisk(sb_file_format));
 
   HashPrefixMapView view = hash_prefix_map.view();
   EXPECT_EQ(view.size(), 1u);

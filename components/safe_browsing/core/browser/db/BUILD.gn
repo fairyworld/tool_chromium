@@ -237,8 +237,11 @@ source_set("v4_rice") {
 
 source_set("v4_store") {
   sources = [
+    "hash_prefix_container.cc",
+    "hash_prefix_container.h",
     "hash_prefix_map.cc",
     "hash_prefix_map.h",
+    "sb_store_file_format.h",
   ]
   if (safe_browsing_mode != 0 || is_ios) {
     sources += [
@@ -252,6 +255,7 @@ source_set("v4_store") {
   public_deps = [
     ":safebrowsing_proto",
     ":v4_store_proto",
+    "//components/safe_browsing/core/common/proto:v5_store_proto",
   ]
   deps = [
     ":prefix_iterator",
