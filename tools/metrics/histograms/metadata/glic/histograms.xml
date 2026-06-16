@@ -1978,6 +1978,17 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Glic.PageContextFetcher.ScreenshotInfo.IframeInfo.ProtoSize"
+    units="bytes" expires_after="2027-06-01">
+  <owner>linnan@google.com</owner>
+  <owner>chrome-ai-security@google.com</owner>
+  <summary>
+    Records the total serialized byte size of the individual IframeInfo messages
+    inside the ScreenshotInfo. Recorded when a page context fetcher successfully
+    generates the ScreenshotInfo.
+  </summary>
+</histogram>
+
 <histogram name="Glic.PageContextFetcher.ScreenshotRedacted" enum="Boolean"
     expires_after="2026-11-05">
   <owner>linnan@google.com</owner>
