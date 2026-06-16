@@ -2191,6 +2191,18 @@ Called by update_autofill_enums.py. This is a manual comment.-->
   </summary>
 </histogram>
 
+<histogram name="Autofill.AtMemory.Funnel.TimeToFetchUnmasked" units="ms"
+    expires_after="2027-03-09">
+  <owner>picarella@google.com</owner>
+  <owner>chrome-autofill-alerts@google.com</owner>
+  <summary>
+    Records the duration (latency) from the time a PII suggestion (IBAN, Credit
+    Card, or sensitive Autofill AI data) is requested, to the time the unmasked
+    value is successfully obtained. Recorded only for successful unmasking
+    flows.
+  </summary>
+</histogram>
+
 <histogram
     name="Autofill.Autocomplete.NotOff.EditedAutofilledFieldAtSubmission2{AutofillFormType}"
     enum="AutofilledFieldUserEditingStatus" expires_after="2027-04-12">

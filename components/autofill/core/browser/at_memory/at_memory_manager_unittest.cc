@@ -388,6 +388,8 @@ TEST_F(AtMemoryManagerTest, FillSensitiveAutofillAiData_EntitySuccess) {
       "Autofill.AtMemory.Funnel.SuggestionAccepted", true, 1);
   histogram_tester.ExpectUniqueSample(
       "Autofill.AtMemory.Funnel.SuggestionFilled", true, 1);
+  histogram_tester.ExpectTotalCount(
+      "Autofill.AtMemory.Funnel.TimeToFetchUnmasked", 1);
 }
 
 // Tests that when fetching the unmasked entity instance fails, the manager
@@ -445,6 +447,8 @@ TEST_F(AtMemoryManagerTest, FillSensitiveAutofillAiData_FetchFailed) {
       "Autofill.AtMemory.Funnel.SuggestionAccepted", true, 1);
   histogram_tester.ExpectUniqueSample(
       "Autofill.AtMemory.Funnel.SuggestionFilled", false, 1);
+  histogram_tester.ExpectTotalCount(
+      "Autofill.AtMemory.Funnel.TimeToFetchUnmasked", 0);
 }
 
 // Tests that SPII entries and metadata are filtered out from the search
@@ -643,14 +647,16 @@ TEST_F(AtMemoryManagerTest, FillOverlappingPopups) {
       histogram_tester.GetAllSamples("Autofill.AtMemory.Funnel.PopupDisplayed"),
       BucketsAre(
           Bucket(AutofillMetrics::AtMemoryTriggerSource::kTypedTrigger, 1)));
-  // - QuerySubmitted, SuggestionAccepted, SuggestionFilled are not logged yet
-  // because Popup 1's async fill is still pending.
+  // - QuerySubmitted, SuggestionAccepted, SuggestionFilled, TimeToFetchUnmasked
+  // are not logged yet because Popup 1's async fill is still pending.
   histogram_tester.ExpectTotalCount("Autofill.AtMemory.Funnel.QuerySubmitted",
                                     0);
   histogram_tester.ExpectTotalCount(
       "Autofill.AtMemory.Funnel.SuggestionAccepted", 0);
   histogram_tester.ExpectTotalCount("Autofill.AtMemory.Funnel.SuggestionFilled",
                                     0);
+  histogram_tester.ExpectTotalCount(
+      "Autofill.AtMemory.Funnel.TimeToFetchUnmasked", 0);
 
   // 4. Show Popup 2 (overlapping with the pending async fill of Popup 1).
   base::MockCallback<AtMemoryManager::UpdateSuggestionsCallback>
@@ -695,6 +701,9 @@ TEST_F(AtMemoryManagerTest, FillOverlappingPopups) {
   EXPECT_THAT(histogram_tester.GetAllSamples(
                   "Autofill.AtMemory.Funnel.SuggestionFilled"),
               BucketsAre(Bucket(true, 1)));
+  // - TimeToFetchUnmasked should be logged.
+  histogram_tester.ExpectTotalCount(
+      "Autofill.AtMemory.Funnel.TimeToFetchUnmasked", 1);
 }
 
 // Tests that the personal context notice is appended when the feature is
