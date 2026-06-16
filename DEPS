@@ -2219,7 +2219,7 @@ deps = {
     Var('chromium_git') + '/codecs/libgav1.git' + '@' + '66ac17620652635392f6ab24065c77b035e281c9',
 
   'src/third_party/google-truth/src': {
-      'url': Var('chromium_git') + '/external/github.com/google/truth.git' + '@' + '2b500d6f97654261163e6cc7848cb826bbec21c1',
+      'url': Var('chromium_git') + '/external/github.com/google/truth.git' + '@' + '3aff8b1e9f8806bb5041062cad8f84c2ccae361c',
       'condition': 'checkout_android',
   },
 
