@@ -145,7 +145,7 @@ disk_cache::BackendResult HttpCache::DefaultBackend::CreateBackend(
   disk_cache::ResetHandling reset_handling =
       hard_reset_ ? disk_cache::ResetHandling::kReset
                   : disk_cache::ResetHandling::kResetOnError;
-  LOCAL_HISTOGRAM_BOOLEAN("HttpCache.HardReset", hard_reset_);
+  UMA_HISTOGRAM_BOOLEAN("HttpCache.HardReset", hard_reset_);
 #if BUILDFLAG(IS_ANDROID)
   if (app_status_listener_getter_) {
     return disk_cache::CreateCacheBackend(

@@ -982,6 +982,17 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="HttpCache.HardReset" enum="Boolean" expires_after="2026-10-11">
+  <owner>horo@chromium.org</owner>
+  <owner>blink-network-stack@google.com</owner>
+  <summary>
+    Whether the HttpCache was forced to reset upon creation, effectively
+    clearing out its previous content. This is recorded when the cache is
+    created for the browsing session. Warning: this histogram was expired from
+    June 2021 to June 2026; data may be missing.
+  </summary>
+</histogram>
+
 <histogram name="HttpCache.IsNoStore{Type}" enum="Boolean"
     expires_after="2026-11-29">
   <owner>bashi@chromium.org</owner>
