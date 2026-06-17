@@ -8241,6 +8241,9 @@ Handoff must also be enabled in the General section of Settings, and your device
       <message name="IDS_IOS_TAB_GROUP_CREATION_PLACEHOLDER" desc="Placeholder shown in tab group creation view to indicate to the user the expected action which is to type the name of the group currently created. [iOS only]">
         Name group
       </message>
+      <message name="IDS_IOS_TAB_GROUP_CREATION_TEXT_FIELD_ACCESSIBILITY_LABEL" is_accessibility_with_no_ui="true" desc="Accessibility label for the tab group name text field in the creation screen. This is spoken by VoiceOver. [iOS only]">
+        Group name
+      </message>
       <message name="IDS_IOS_TAB_GROUP_EDITION_ACCESSIBILITY_HINT" desc="Accessibility hint for the tab group edition button. This is spoken by VoiceOver. [iOS only]">
         Edit Tab Group
       </message>
