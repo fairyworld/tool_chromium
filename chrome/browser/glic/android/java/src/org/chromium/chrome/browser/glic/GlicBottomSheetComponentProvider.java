@@ -40,9 +40,7 @@ public class GlicBottomSheetComponentProvider implements CoBrowseComponentProvid
 
     @Override
     public boolean setupPlaceholderView(TextViewWithCompoundDrawables placeholder) {
-        placeholder.setText(R.string.glic_inactive_view_card_text);
-        placeholder.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                0, R.drawable.ic_spark_filled_24dp, 0, 0);
+        GlicUiUtils.setupPlaceholderView(placeholder);
         return true;
     }
 

@@ -16,6 +16,7 @@ generate_jni("jni_headers") {
     "java/src/org/chromium/chrome/browser/glic/GlicKeyedServiceImpl.java",
     "java/src/org/chromium/chrome/browser/glic/GlicNavigationUtils.java",
     "java/src/org/chromium/chrome/browser/glic/GlicNudgeDelegateBridge.java",
+    "java/src/org/chromium/chrome/browser/glic/GlicSidePanelComponentProvider.java",
   ]
 }
 
@@ -133,8 +134,10 @@ android_library("java") {
     "java/src/org/chromium/chrome/browser/glic/GlicNavigationUtils.java",
     "java/src/org/chromium/chrome/browser/glic/GlicPromoCoordinator.java",
     "java/src/org/chromium/chrome/browser/glic/GlicSettings.java",
+    "java/src/org/chromium/chrome/browser/glic/GlicSidePanelComponentProvider.java",
     "java/src/org/chromium/chrome/browser/glic/GlicToolbarButtonController.java",
     "java/src/org/chromium/chrome/browser/glic/GlicUiCoordinator.java",
+    "java/src/org/chromium/chrome/browser/glic/GlicUiUtils.java",
     "java/src/org/chromium/chrome/browser/glic/GlicUtils.java",
   ]
   resources_package = "org.chromium.chrome.browser.glic"

@@ -241,6 +241,7 @@ public class TabBottomSheetCoordinator {
                                 .getDimensionPixelSize(R.dimen.tab_bottom_sheet_peek_height_total),
                         R.id.peek_view_container,
                         mOnBackPressed);
+        assert mSheetContent != null : "TabBottomSheetContent must not be null";
         mViewBinder =
                 PropertyModelChangeProcessor.create(
                         mModel, mContentView, TabBottomSheetViewBinder::bind);

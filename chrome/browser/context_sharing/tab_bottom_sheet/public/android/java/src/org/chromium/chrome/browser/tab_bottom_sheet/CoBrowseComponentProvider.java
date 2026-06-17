@@ -13,6 +13,7 @@ import androidx.annotation.Px;
 import org.jni_zero.CalledByNative;
 
 import org.chromium.build.annotations.NullMarked;
+import org.chromium.build.annotations.Nullable;
 import org.chromium.components.browser_ui.widget.text.TextViewWithCompoundDrawables;
 
 /** Interface providing specialized components for different client features. */
@@ -31,15 +32,17 @@ public interface CoBrowseComponentProvider {
      * @param peekViewHeight The height of the peek view in pixels.
      * @param peekViewContainerId The resource ID for the peek view container.
      * @param onBackPressed Callback run when the back button/swipe is triggered.
-     * @return A non-null custom or default {@link TabBottomSheetContent}.
+     * @return A custom or default {@link TabBottomSheetContent}, or null if not used.
      */
-    TabBottomSheetContent createContent(
+    default @Nullable TabBottomSheetContent createContent(
             View contentView,
             float fullHeightRatio,
             @ColorInt int backgroundColor,
             @Px int peekViewHeight,
             @IdRes int peekViewContainerId,
-            Runnable onBackPressed);
+            Runnable onBackPressed) {
+        return null;
+    }
 
     /**
      * Sets up the placeholder view.
