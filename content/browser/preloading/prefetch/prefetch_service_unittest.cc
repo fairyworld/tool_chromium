@@ -1506,6 +1506,17 @@ TEST_P(PrefetchServiceTest, FailureCase_Browser_NetError) {
 }
 
 TEST_P(PrefetchServiceTest, FailureCase_Browser_NotEligibleNonHttps) {
+  if (base::FeatureList::IsEnabled(
+          features::kPrefetchOffTheMainThreadForceForTesting)) {
+    // HTTPS eligibility check is currently implemented in `AwPrefetchManager`
+    // (Java side), so it is still checked in non-test code but is outside of
+    // `kPrefetchOffTheMainThreadForceForTesting` test path, so skipping this
+    // test for now.
+    // TODO(crbug.com/452389538): Add HTTPS eligibility check also to
+    // `//content/browser` side.
+    GTEST_SKIP();
+  }
+
   MakePrefetchService(
       std::make_unique<testing::NiceMock<MockPrefetchServiceDelegate>>(
           /*num_on_prefetch_likely_calls=*/std::nullopt));
