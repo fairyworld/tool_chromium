@@ -250,9 +250,9 @@ TEST_F(AppBarViewControllerTest, TestAssistantButtonHighlightState) {
   [button layoutIfNeeded];
 
   UIView* highlightView = assistantHighlightView();
-  // It might be nil if not created yet, or created and hidden.
+  // It might be nil if not created yet.
   if (highlightView) {
-    EXPECT_TRUE(highlightView.hidden);
+    EXPECT_EQ(highlightView.alpha, 0.0);
   }
   EXPECT_FALSE(button.accessibilityTraits & UIAccessibilityTraitSelected);
 
@@ -267,13 +267,14 @@ TEST_F(AppBarViewControllerTest, TestAssistantButtonHighlightState) {
 
   highlightView = assistantHighlightView();
   ASSERT_NE(highlightView, nil);
-  EXPECT_FALSE(highlightView.hidden);
+  EXPECT_EQ(highlightView.alpha, 1.0);
   EXPECT_TRUE(button.accessibilityTraits & UIAccessibilityTraitSelected);
 
-  // Verify button background color is clearColor (we use customView instead).
+  // Verify button background color is clearColor, and highlightView is a
+  // subview.
   UIButtonConfiguration* config = button.configuration;
   EXPECT_TRUE(config.background.backgroundColor == [UIColor clearColor]);
-  EXPECT_TRUE(config.background.customView != nil);
+  EXPECT_EQ(highlightView.superview, button);
 
   // Not highlighted again.
   [view_controller_ setAssistantButtonState:AppBarAssistantButtonState::kAsk
@@ -284,7 +285,7 @@ TEST_F(AppBarViewControllerTest, TestAssistantButtonHighlightState) {
   [button setNeedsUpdateConfiguration];
   [button layoutIfNeeded];
 
-  EXPECT_TRUE(highlightView.hidden);
+  EXPECT_EQ(highlightView.alpha, 0.0);
   EXPECT_FALSE(button.accessibilityTraits & UIAccessibilityTraitSelected);
 }
 

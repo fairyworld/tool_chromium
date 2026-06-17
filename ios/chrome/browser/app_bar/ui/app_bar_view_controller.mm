@@ -59,6 +59,8 @@ constexpr CGFloat kTabGroupLabelOffset = 3;
 // The size of the assistant button highlight.
 constexpr CGFloat kAssistantHighlightWidth = 44;
 constexpr CGFloat kAssistantHighlightHeight = 30;
+// The animation configuration for the assistant button highlight.
+constexpr CGFloat kAssistantHighlightDuration = 0.2;
 
 // The spacing inside the stack view.
 constexpr CGFloat kStackViewSpacing = 4;
@@ -117,6 +119,11 @@ UIFont* ButtonFontSize(UITraitCollection* traitCollection) {
 CGFloat ButtonHighlightAlpha(UIButton* button) {
   BOOL useEnabledColor = button.enabled && !button.isHighlighted;
   return useEnabledColor ? 1.0 : 0.5;
+}
+
+// Returns the background color of the assistant button highlight.
+UIColor* AssistantHighlightBackgroundColor() {
+  return [UIColor colorWithWhite:1.0 alpha:0.15];
 }
 
 }  // namespace
@@ -714,25 +721,7 @@ CGFloat ButtonHighlightAlpha(UIButton* button) {
   configuration.title = title;
   configuration.image = image ? image : CustomAppBarSymbol(kCameraLensSymbol);
 
-  // Set up custom background view if not already done
-  if (_assistantButtonHighlighted && !configuration.background.customView) {
-    UIView* customBackgroundView = [[UIView alloc] init];
-    customBackgroundView.backgroundColor = [UIColor clearColor];
-
-    _assistantHighlightView = [[UIView alloc] init];
-    _assistantHighlightView.translatesAutoresizingMaskIntoConstraints = NO;
-    _assistantHighlightView.backgroundColor = [UIColor colorWithWhite:1.0
-                                                                alpha:0.15];
-    _assistantHighlightView.layer.cornerRadius =
-        kAssistantHighlightHeight / 2.0;
-    _assistantHighlightView.layer.masksToBounds = YES;
-    _assistantHighlightView.hidden = YES;
-
-    [customBackgroundView addSubview:_assistantHighlightView];
-    configuration.background.backgroundColor = [UIColor clearColor];
-    configuration.background.customView = customBackgroundView;
-  }
-  _assistantHighlightView.hidden = !_assistantButtonHighlighted;
+  [self animateAssistantButtonHighlight:_assistantButtonHighlighted];
 
   if (_assistantButtonHighlighted) {
     configuration.baseForegroundColor = [UIColor whiteColor];
@@ -779,6 +768,7 @@ CGFloat ButtonHighlightAlpha(UIButton* button) {
   button.accessibilityIdentifier = kAppBarAssistantButtonId;
 
   _assistantButton = button;
+
   [self updateAssistantButton];
 
   [button
@@ -849,6 +839,31 @@ CGFloat ButtonHighlightAlpha(UIButton* button) {
   }
 
   button.accessibilityTraits = accessibilityTraits;
+}
+
+// Animates the visibility of the assistant button highlight.
+- (void)animateAssistantButtonHighlight:(BOOL)shouldShow {
+  if (shouldShow && !_assistantHighlightView) {
+    _assistantHighlightView = [[UIView alloc] init];
+    _assistantHighlightView.translatesAutoresizingMaskIntoConstraints = NO;
+    _assistantHighlightView.backgroundColor =
+        AssistantHighlightBackgroundColor();
+    _assistantHighlightView.layer.cornerRadius =
+        kAssistantHighlightHeight / 2.0;
+    _assistantHighlightView.layer.masksToBounds = YES;
+    _assistantHighlightView.alpha = 0.0;
+    [_assistantButton insertSubview:_assistantHighlightView atIndex:0];
+  }
+
+  CGFloat targetAlpha = shouldShow ? 1.0 : 0.0;
+  if (_assistantHighlightView.alpha == targetAlpha) {
+    return;
+  }
+  UIView* highlightView = _assistantHighlightView;
+  [UIView animateWithDuration:kAssistantHighlightDuration
+                   animations:^{
+                     highlightView.alpha = targetAlpha;
+                   }];
 }
 
 // Updates the configuration for standard buttons.
