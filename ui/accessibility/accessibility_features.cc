@@ -434,7 +434,6 @@ bool IsReadAnythingImagesViaAlgorithmEnabled() {
       ::features::kReadAnythingImagesViaAlgorithm);
 }
 
-BASE_FEATURE(kReadAnythingDocsIntegration, base::FEATURE_DISABLED_BY_DEFAULT);
 bool IsReadAnythingDocsIntegrationEnabled() {
   return base::FeatureList::IsEnabled(
       ax::mojom::features::kReadAnythingDocsIntegration);

@@ -264,6 +264,7 @@
 #include "third_party/blink/public/common/switches.h"
 #include "ui/accessibility/accessibility_features.h"
 #include "ui/accessibility/accessibility_switches.h"
+#include "ui/accessibility/ax_features.mojom.h"
 #include "ui/base/ozone_buildflags.h"
 #include "ui/base/ui_base_features.h"
 #include "ui/base/ui_base_switches.h"
@@ -7544,7 +7545,7 @@ const FeatureEntry kFeatureEntries[] = {
     {"read-anything-docs-integration",
      flag_descriptions::kReadAnythingDocsIntegrationName,
      flag_descriptions::kReadAnythingDocsIntegrationDescription, kOsDesktop,
-     FEATURE_VALUE_TYPE(features::kReadAnythingDocsIntegration)},
+     FEATURE_VALUE_TYPE(ax::mojom::features::kReadAnythingDocsIntegration)},
 
     {"read-anything-docs-load-more-button",
      flag_descriptions::kReadAnythingDocsLoadMoreButtonName,
