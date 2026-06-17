@@ -10,7 +10,10 @@ import 'chrome://resources/js/ios/web_ui.js';
 
 import './status_box.js';
 import './policy_table.js';
-import './policy_promotion.js';
+// <if expr="not is_ios and not is_android">
+import './promotion_banner_section_container.js';
+
+// </if>
 
 import {addWebUiListener, sendWithPromise} from 'chrome://resources/js/cr.js';
 import {FocusOutlineManager} from 'chrome://resources/js/focus_outline_manager.js';
@@ -77,38 +80,33 @@ export class Page {
     const policyElement = getRequiredElement('policy-ui');
 
     // <if expr="not is_ios and not is_android">
-    BrowserProxy.checkPromotionEligibility().then((shouldShowPromo: boolean) => {
-      if (!shouldShowPromo) {
-        return;
-      }
-      const promotionSection =
-          document.createElement('promotion-banner-section-container') as
-          HTMLElement;
+    BrowserProxy.checkPromotionEligibility().then(
+        (shouldShowPromo: boolean) => {
+          if (!shouldShowPromo) {
+            return;
+          }
+          const promotionSection =
+              document.createElement('promotion-banner-section-container') as
+              HTMLElement;
 
-      // Insert the promotion section before the policy element.
-      const policyParent = getRequiredElement('policy-ui-container');
-      policyParent.insertBefore(promotionSection, policyElement);
+          // Insert the promotion section before the policy element.
+          const policyParent = getRequiredElement('policy-ui-container');
+          policyParent.insertBefore(promotionSection, policyElement);
 
-      const promotionDismissButton =
-          promotionSection.shadowRoot!.getElementById(
-              'promotion-dismiss-button');
+          promotionSection.addEventListener('dismiss', () => {
+            BrowserProxy.setBannerDismissed();
+            promotionSection.remove();
+          });
 
-      promotionDismissButton?.addEventListener('click', () => {
-        BrowserProxy.setBannerDismissed();
-        promotionSection.remove();
-      });
-
-      const promotionRedirectButton =
-          promotionSection.shadowRoot!.getElementById(
-              'promotion-redirect-button');
-      promotionRedirectButton?.addEventListener('click', () => {
-        BrowserProxy.recordBannerRedirected();
-        window.open(
-            'https://admin.google.com/ac/chrome/guides/?ref=browser&utm_source=chrome_policy_cec',
-            '_blank',
-        );
-      });
-    });
+          promotionSection.addEventListener('redirect', () => {
+            BrowserProxy.recordBannerRedirected();
+            window.open(
+                'https://admin.google.com/ac/chrome/guides/' +
+                    '?ref=browser&utm_source=chrome_policy_cec',
+                '_blank',
+            );
+          });
+        });
     // </if>
 
     // Add or remove header shadow based on scroll position.

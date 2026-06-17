@@ -18,8 +18,6 @@ build_webui("build") {
 
   # Files holding a Custom element definition AND have an equivalent .html file.
   web_component_files = [
-    "policy_precedence_row.ts",
-    "policy_promotion.ts",
     "policy_table.ts",
     "test/policy_test_row.ts",
     "test/policy_test_table.ts",
@@ -37,12 +35,18 @@ build_webui("build") {
     "policy_row.ts",
     "status_box.html.ts",
     "status_box.ts",
+    "policy_precedence_row.html.ts",
+    "policy_precedence_row.ts",
+    "promotion_banner_section_container.html.ts",
+    "promotion_banner_section_container.ts",
     "test/policy_test.ts",
     "test/policy_test_browser_proxy.ts",
   ]
 
   css_files = [
     "policy_conflict.css",
+    "policy_precedence_row.css",
+    "promotion_banner_section_container.css",
     "policy_row.css",
     "status_box.css",
   ]

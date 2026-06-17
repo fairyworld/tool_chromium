@@ -140,7 +140,7 @@ export class PolicyTableElement extends CustomElement {
       precedenceRowOld.forEach(row => mainContent.removeChild(row));
       if (this.dataModel.precedenceOrder) {
         const precedenceRow = document.createElement('policy-precedence-row');
-        precedenceRow.initialize(this.dataModel.precedenceOrder);
+        precedenceRow.precedenceOrder = this.dataModel.precedenceOrder;
         mainContent.appendChild(precedenceRow);
       }
     }

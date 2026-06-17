@@ -46,7 +46,7 @@ function getPrecedenceRowValue() {
     const row: PolicyPrecedenceRowElement|null =
         table.shadowRoot!.querySelector('policy-precedence-row');
     if (row) {
-      precedenceRow = row.shadowRoot!.querySelector('.value');
+      precedenceRow = row.shadowRoot.querySelector('.value');
     }
   });
   return precedenceRow;
