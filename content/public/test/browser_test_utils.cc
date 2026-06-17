@@ -2364,11 +2364,14 @@ ui::AXNodeData GetFocusedAccessibilityNodeInfo(WebContents* web_contents) {
 
 bool AccessibilityTreeContainsNodeWithName(ui::BrowserAccessibility* node,
                                            std::string_view name) {
-  // If an image annotation is set, it plays the same role as a name, so it
-  // makes sense to check both in the same test helper.
+  // If an image or canvas annotation is set, it plays the same role as a name,
+  // so it makes sense to check them in the same test helper.
   if (node->GetStringAttribute(ax::mojom::StringAttribute::kName) == name ||
       node->GetStringAttribute(ax::mojom::StringAttribute::kImageAnnotation) ==
-          name) {
+          name ||
+      (node->GetRole() == ax::mojom::Role::kCanvas &&
+       node->GetStringAttribute(
+           ax::mojom::StringAttribute::kCanvasAnnotation) == name)) {
     return true;
   }
   for (unsigned i = 0; i < node->PlatformChildCount(); i++) {
