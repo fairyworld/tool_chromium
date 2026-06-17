@@ -83,15 +83,6 @@
     "expiry_milestone": 160
   },
   {
-    "name": "ai-mode-omnibox-entry-point",
-    "owners": [
-      "khalidpeer@chromium.org",
-      "jdonnelly@chromium.org",
-      "orinj@chromium.org",
-      "chrome-desktop-search@google.com"],
-    "expiry_milestone": 150
-  },
-  {
     "name": "ai-omnibox-ask-placeholder",
     "owners": [ "christianxu@chromium.org", "bling-search@google.com" ],
     "expiry_milestone": 155

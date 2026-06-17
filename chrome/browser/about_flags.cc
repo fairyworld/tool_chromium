@@ -6436,10 +6436,6 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kLensOverlayOmniboxEntryPointDescription, kOsDesktop,
      FEATURE_VALUE_TYPE(lens::features::kLensOverlayOmniboxEntryPoint)},
 
-    {"ai-mode-omnibox-entry-point",
-     flag_descriptions::kAiModeOmniboxEntryPointName,
-     flag_descriptions::kAiModeOmniboxEntryPointDescription, kOsDesktop,
-     FEATURE_VALUE_TYPE(omnibox::kAiModeOmniboxEntryPoint)},
 
     {"hide-aim-omnibox-entrypoint-on-user-input",
      flag_descriptions::kHideAimOmniboxEntrypointOnUserInputName,

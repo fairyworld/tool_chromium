@@ -561,8 +561,7 @@ void LocationBarView::Init() {
   // Because AIM eligibility can change during the lifecycle of the
   // `LocationBarView`, the AI Mode page action is added regardless of
   // eligibility, but its visibility is toggled to match eligibility.
-  if (browser_ &&
-      base::FeatureList::IsEnabled(omnibox::kAiModeOmniboxEntryPoint)) {
+  if (browser_) {
     // Position in the leading position, like the entrypoint for
     // kLensOverlayHomework above. While both chips may be enabled, they will
     // not appear at the same time due to different focus behavior. The
@@ -588,7 +587,6 @@ void LocationBarView::Init() {
   page_action_icon_controller_ = page_action_icon_container_->controller();
 
   if (!page_action_icon_container_->children().empty() &&
-      base::FeatureList::IsEnabled(omnibox::kAiModeOmniboxEntryPoint) &&
       !IsPageActionMigrated(PageActionIconType::kAiMode)) {
     auto* first_page_action_icon_view = static_cast<PageActionIconView*>(
         page_action_icon_container_->children().front());

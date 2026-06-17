@@ -45,10 +45,6 @@ inline constexpr char kAccelerated2dCanvasDescription[] =
     "Enables the use of the GPU to perform 2d canvas rendering instead of "
     "using software rendering.";
 
-inline constexpr char kAiModeOmniboxEntryPointName[] =
-    "AI Mode Omnibox entrypoint";
-inline constexpr char kAiModeOmniboxEntryPointDescription[] =
-    "Enables icon button for AI Mode entrypoint in the Omnibox.";
 
 inline constexpr char kAiModeEntryPointAlwaysNavigatesName[] =
     "AI Mode Omnibox Entrypoint always navigates";
