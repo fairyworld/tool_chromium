@@ -2517,5 +2517,45 @@ suite('ContextualActionMenu', () => {
           assertEquals(expectedTop, flyout.style.top);
           assertEquals(expectedMaxHeight, flyout.style.maxHeight);
         });
+
+    test('Share tabs flyout scrollbar styles', async () => {
+      // Arrange: Ensure tab suggestions exist so the flyout can be triggered.
+      const tabInfo = {
+        tabId: 101,
+        title: 'Scrollbar Test Tab 1',
+        url: {url: 'https://example.com/1'},
+        lastActiveTime: {internalValue: 0n},
+        showInCurrentTabChip: false,
+        showInPreviousTabChip: false,
+        lastActive: {internalValue: 0n},
+      } as any;
+      actionMenu.tabSuggestions = Array(15).fill(tabInfo);
+      actionMenu.inputState = new MockInputState({
+        allowedInputTypes: [InputType.kBrowserTab],
+      });
+
+      // Act: Show the action menu and trigger the share tabs flyout open.
+      actionMenu.showAt(actionMenu);
+      await microtasksFinished();
+
+      const trigger = $$(actionMenu, '#shareTabsTrigger') as HTMLElement;
+      assertTrue(!!trigger);
+      trigger.dispatchEvent(new PointerEvent('pointerenter'));
+      await microtasksFinished();
+
+      // Assert: Verify flyout container is rendered and properly styled.
+      const flyout = $$(actionMenu, '.share-tabs-flyout') as HTMLElement;
+      assertTrue(!!flyout);
+      assertFalse(flyout.hidden);
+
+      // Verify computed overflow and width styles match expectations.
+      const computedStyle = window.getComputedStyle(flyout);
+      assertEquals('auto', computedStyle.overflowY);
+      assertEquals('hidden', computedStyle.overflowX);
+      assertEquals('320px', computedStyle.width);
+
+      // Verify the flyout does not have inline scrollbar-width override.
+      assertFalse(flyout.style.getPropertyValue('scrollbar-width') === 'thin');
+    });
   });
 });
