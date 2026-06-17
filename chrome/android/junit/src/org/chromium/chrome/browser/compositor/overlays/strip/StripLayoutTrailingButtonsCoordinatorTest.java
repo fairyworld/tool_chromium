@@ -39,6 +39,7 @@ import org.chromium.base.MathUtils;
 import org.chromium.base.UnownedUserDataHost;
 import org.chromium.base.supplier.OneshotSupplierImpl;
 import org.chromium.base.test.BaseRobolectricTestRunner;
+import org.chromium.base.test.util.DisabledTest;
 import org.chromium.base.test.util.Features.DisableFeatures;
 import org.chromium.base.test.util.Features.EnableFeatures;
 import org.chromium.chrome.R;
@@ -81,6 +82,7 @@ import java.util.List;
 
 @RunWith(BaseRobolectricTestRunner.class)
 @EnableFeatures(ChromeFeatureList.GLIC)
+@DisabledTest(message = "crbug.com/525122514")
 public class StripLayoutTrailingButtonsCoordinatorTest {
     @Rule public MockitoRule mMockitoRule = MockitoJUnit.rule();
 
