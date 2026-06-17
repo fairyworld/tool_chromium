@@ -1068,6 +1068,14 @@ TEST_F(PdfViewWebPluginTest, GetAccessibilityDocInfoWithPDFDocTagged) {
   EXPECT_FALSE(doc_info->text_copyable);
 }
 
+TEST_F(PdfViewWebPluginTest, HasMeaningfulText) {
+  EXPECT_CALL(*engine_ptr_, HasMeaningfulText).WillOnce(Return(true));
+
+  base::test::TestFuture<bool> future;
+  plugin_->HasMeaningfulText(future.GetCallback());
+  EXPECT_TRUE(future.Get());
+}
+
 TEST_F(PdfViewWebPluginTest, GetAccessibilityDocInfoWithCopyAccessibleAllowed) {
   EXPECT_CALL(*engine_ptr_, HasPermission).WillRepeatedly(Return(false));
   EXPECT_CALL(*engine_ptr_, HasPermission(DocumentPermission::kCopyAccessible))
