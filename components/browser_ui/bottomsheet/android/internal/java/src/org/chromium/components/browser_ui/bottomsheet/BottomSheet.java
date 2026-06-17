@@ -1544,6 +1544,7 @@ class BottomSheet extends FrameLayout
      */
     protected void onSheetContentChanged(final @Nullable BottomSheetContent content) {
         mSheetContent = content;
+        resetCachedKeyboardState();
 
         boolean shouldLongPressMoveSheet =
                 content == null ? false : content.shouldLongPressMoveSheet();
@@ -1914,5 +1915,14 @@ class BottomSheet extends FrameLayout
      */
     private static @ColorInt int getNonModalBottomSheetBgColor(Context context) {
         return SemanticColorUtils.getColorSurface(context);
+    }
+
+    boolean hasKeyboardTokenForTesting() {
+        return mKeyboardToken != TokenHolder.INVALID_TOKEN;
+    }
+
+    @SheetState
+    int getStateBeforeKeyboardShownForTesting() {
+        return mStateBeforeKeyboardShown;
     }
 }

@@ -5,6 +5,8 @@
 package org.chromium.components.browser_ui.bottomsheet;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -614,5 +616,52 @@ public class BottomSheetUnitTest {
         mBottomSheet.setBottomMargin(100);
 
         assertEquals(SHEET_PEEK_HEIGHT - 100, mBottomSheet.getCurrentOffsetPx(), MathUtils.EPSILON);
+    }
+
+    @Test
+    public void testKeyboardStateResetOnContentChange() {
+        BottomSheet.setSmallScreenForTesting(false);
+        doReturn(new View(mActivity)).when(mSheetContent).getContentView();
+
+        // Configure content to be resizable.
+        doReturn(0.5f).when(mSheetContent).getHalfHeightRatio();
+        doReturn((float) HeightMode.RESIZE_CONTENT).when(mSheetContent).getFullHeightRatio();
+        doReturn(android.R.string.ok).when(mSheetContent).getSheetHalfHeightAccessibilityStringId();
+        doReturn(android.R.string.ok).when(mSheetContent).getSheetFullHeightAccessibilityStringId();
+
+        mBottomSheet.showContent(mSheetContent);
+        mBottomSheet.setSheetState(SheetState.HALF, false);
+
+        verify(mInsetObserver).addObserver(mInsetObserverCaptor.capture());
+        InsetObserver.WindowInsetObserver observer = mInsetObserverCaptor.getValue();
+
+        // Simulate keyboard showing -> token acquired.
+        mKeyboardInsetSupplier.set(100);
+        observer.onInsetChanged();
+
+        assertTrue("Keyboard token should be acquired.", mBottomSheet.hasKeyboardTokenForTesting());
+        assertEquals(
+                "State before keyboard shown should be cached.",
+                SheetState.HALF,
+                mBottomSheet.getStateBeforeKeyboardShownForTesting());
+
+        // Show different content (mock another content).
+        BottomSheetContent newContent = mock();
+        doReturn(new View(mActivity)).when(newContent).getContentView();
+        doReturn(0.5f).when(newContent).getHalfHeightRatio();
+        doReturn((float) HeightMode.DEFAULT).when(newContent).getFullHeightRatio();
+        doReturn(android.R.string.ok).when(newContent).getSheetHalfHeightAccessibilityStringId();
+        doReturn(android.R.string.ok).when(newContent).getSheetFullHeightAccessibilityStringId();
+
+        mBottomSheet.showContent(newContent);
+
+        // Verify token was released and state reset.
+        assertFalse(
+                "Keyboard token should be released on content change.",
+                mBottomSheet.hasKeyboardTokenForTesting());
+        assertEquals(
+                "State before keyboard shown should be reset to NONE.",
+                SheetState.NONE,
+                mBottomSheet.getStateBeforeKeyboardShownForTesting());
     }
 }
