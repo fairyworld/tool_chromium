@@ -2010,6 +2010,10 @@ BASE_FEATURE(kDeviceActiveClientChurnObservationCheckMembership,
 BASE_FEATURE(kDeviceActiveClientChurnObservationNewDeviceMetadata,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
+// Enables or disables persisting device config (networks, EULA acceptance...)
+// over a powerwash that happens as part of a device move to a new domain
+BASE_FEATURE(kDeviceMoveConfigSave, base::FEATURE_DISABLED_BY_DEFAULT);
+
 // Enables peripheral customization to be split per device.
 BASE_FEATURE(kPeripheralCustomization, base::FEATURE_ENABLED_BY_DEFAULT);
 
@@ -2469,6 +2473,10 @@ bool IsDemoModeSignInFileCleanupEnabled() {
 
 bool IsDeskTemplateSyncEnabled() {
   return base::FeatureList::IsEnabled(kDeskTemplateSync);
+}
+
+bool IsDeviceMoveConfigSaveEnabled() {
+  return base::FeatureList::IsEnabled(kDeviceMoveConfigSave);
 }
 
 bool IsDisplayPerformanceModeEnabled() {

@@ -226,6 +226,8 @@ BASE_DECLARE_FEATURE(kDeviceActiveClientChurnObservationCheckMembership);
 COMPONENT_EXPORT(ASH_CONSTANTS)
 BASE_DECLARE_FEATURE(kDeviceActiveClientChurnObservationNewDeviceMetadata);
 COMPONENT_EXPORT(ASH_CONSTANTS)
+BASE_DECLARE_FEATURE(kDeviceMoveConfigSave);
+COMPONENT_EXPORT(ASH_CONSTANTS)
 BASE_DECLARE_FEATURE(kPeripheralCustomization);
 COMPONENT_EXPORT(ASH_CONSTANTS)
 BASE_DECLARE_FEATURE(kDiacriticsOnPhysicalKeyboardLongpressDefaultOn);
