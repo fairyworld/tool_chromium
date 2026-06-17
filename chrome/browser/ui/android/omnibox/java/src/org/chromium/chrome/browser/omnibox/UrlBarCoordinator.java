@@ -386,7 +386,6 @@ public class UrlBarCoordinator
                         mUrlBar.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         mHasFocus = hasFocus;
         if (hasFocus) {
-            beginInput();
             // Explicitly tell InputMethodManager that the url bar is focused before any callbacks
             // so that it updates the active view accordingly. Otherwise, it may fail to update
             // the correct active view if ViewGroup.addView() or ViewGroup.removeView() is called
@@ -394,7 +393,6 @@ public class UrlBarCoordinator
             imm.viewClicked(mUrlBar);
             mUrlBar.setCursorVisible(true);
         } else {
-            endInput();
             // Moving focus away from UrlBar(EditText) to a non-editable focus holder, such as
             // ToolbarPhone, won't automatically hide keyboard app, but restart it with TYPE_NULL,
             // which will result in a visual glitch. Also, currently, we do not allow moving focus

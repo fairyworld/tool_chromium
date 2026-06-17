@@ -1040,11 +1040,11 @@ class LocationBarMediator
     /* package */ void setUrl(GURL currentUrl, UrlBarData urlBarData) {
         // If the URL is currently focused, do not replace the text they have entered with the URL.
         // Once they stop editing the URL, the current tab's URL will automatically be filled in.
-        if (mUrlCoordinator.hasFocus()) {
+        mOriginalUrl = currentUrl;
+        if (mCurrentInput != null) {
             return;
         }
 
-        mOriginalUrl = currentUrl;
         setUrlBarText(urlBarData, UrlBar.ScrollType.SCROLL_TO_TLD, TextSelection.SELECT_ALL);
     }
 
@@ -1229,6 +1229,7 @@ class LocationBarMediator
                     mFuseboxCoordinator.beginInput(session);
                     mStatusCoordinator.beginInput(session);
                     mHintTextUpdater.beginInput(mCurrentInput);
+                    mUrlCoordinator.beginInput();
                     // Trigger animation now that we have an up-to-date value for the fusebox state.
                     setupSuggestionsListShowAnimation();
                     setAttachmentModelList(session.getFuseboxAttachmentModelList());
@@ -2454,8 +2455,12 @@ class LocationBarMediator
         // The || !isParentedToSuggestionsContainer() is to handle if the URL bar already has focus
         // (e.g. restored after activity recreation) but hasn't been reparented to the suggestions
         // container. We need this to trigger the focus animation to complete the reparenting.
-        if (mUrlHasFocus
-                && (mUrlFocusedWithoutAnimations || !isParentedToSuggestionsContainer())
+        @FuseboxLayoutMode
+        int layoutMode = mFuseboxCoordinator.getFuseboxLayoutModeSupplier().get();
+        boolean isPopover = layoutMode == FuseboxLayoutMode.SUGGESTIONS_POPOVER;
+        if (input.getAutocompleteState() == AutocompleteState.ENABLED
+                && (mUrlFocusedWithoutAnimations
+                        || (isPopover && !isParentedToSuggestionsContainer()))
                 && !mIsReparenting) {
             handleUrlFocusAnimation(/* hasFocus= */ true);
         } else if (input.getAutocompleteState() != AutocompleteState.STANDBY_NO_FOCUS) {
@@ -2486,6 +2491,8 @@ class LocationBarMediator
 
         mAutocompleteCoordinator.endInput();
         mStatusCoordinator.endInput();
+        mUrlCoordinator.endInput();
+
         if (mScrimHandler != null) mScrimHandler.setVisibility(false);
         input.getRequestTypeSupplier().removeObserver(mAutocompleteRequestTypeObserver);
         FuseboxSessionState state = FuseboxSessionState.from(mLocationBarDataProvider);
@@ -2512,6 +2519,7 @@ class LocationBarMediator
 
         suspendInput();
         state.deactivate();
+        updateUrl();
         if (mUrlHasFocus) {
             mUrlCoordinator.clearFocus();
         }
