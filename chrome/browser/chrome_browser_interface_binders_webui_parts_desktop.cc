@@ -148,10 +148,12 @@
 #include "chrome/browser/ui/webui/app_home/app_home.mojom.h"
 #include "chrome/browser/ui/webui/app_home/app_home_ui.h"
 #include "chrome/browser/ui/webui/app_settings/web_app_settings_ui.h"
-#include "chrome/browser/ui/webui/intro/intro.mojom.h"
+// The intro mojom targets exist on ChromeOS but these headers are only
+// compiled on Win/Mac/Linux; gn check is static, so suppress it on ChromeOS.
+#include "chrome/browser/ui/webui/intro/intro.mojom.h"  // nogncheck
 #include "chrome/browser/ui/webui/intro/intro_ui.h"
-#include "chrome/browser/ui/webui/intro/sign_in_celebration.mojom.h"
-#include "chrome/browser/ui/webui/intro/sign_in_promo.mojom.h"
+#include "chrome/browser/ui/webui/intro/sign_in_celebration.mojom.h"  // nogncheck
+#include "chrome/browser/ui/webui/intro/sign_in_promo.mojom.h"  // nogncheck
 #include "chrome/browser/ui/webui/on_device_translation_internals/on_device_translation_internals_ui.h"
 #include "chrome/browser/ui/webui/signin/history_sync_optin/history_sync_optin.mojom.h"
 #include "chrome/browser/ui/webui/signin/history_sync_optin/history_sync_optin_ui.h"

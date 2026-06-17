@@ -1039,6 +1039,14 @@ static_library("ui") {
   # //chrome/browser/ui/views/relaunch_notification:impl sources include
   # :ui headers (browser.h, views/frame/browser_view.h).
   if (!is_android && !is_chromeos) {
+    deps += [
+      "//chrome/browser/ui/webui/app_home:mojo_bindings",
+      "//chrome/browser/ui/webui/default_browser:default_browser_modal",
+      "//chrome/browser/ui/webui/default_browser:modal_mojo_bindings",
+      "//chrome/browser/ui/webui/feature_showcase:mojo_bindings",
+      "//chrome/browser/ui/webui/signin/history_sync_optin:mojo_bindings",
+      "//chrome/browser/ui/webui/updater:mojo_bindings",
+    ]
     allow_circular_includes_from +=
         [ "//chrome/browser/ui/views/relaunch_notification:impl" ]
   }
@@ -1051,6 +1059,11 @@ static_library("ui") {
     # //chrome/browser/download:impl sources include headers from
     # //chrome/browser/ui.
     allow_circular_includes_from += [
+      # chrome_browser_interface_binders_webui_parts_desktop.cc (now part of
+      # this target) includes ai_overlay_dialog_untrusted_ui.h; that webui
+      # target depends back on :ui.
+      "//chrome/browser/ui/webui/ai_overlay_dialog",
+
       "//chrome/browser/download:impl",
 
       # bookmarks includes headers from //chrome/browser/ui (e.g. browser.h,
@@ -1410,6 +1423,10 @@ static_library("ui") {
   } else {
     # !is_android
     sources += [
+      # This file physically lives in //chrome/browser but is compiled here so
+      # that //chrome/browser:browser has no remaining sources. It registers
+      # WebUI interface binders for desktop, which need this target's headers.
+      "//chrome/browser/chrome_browser_interface_binders_webui_parts_desktop.cc",
       "browser.cc",
       "browser.h",
       "browser_command_controller.cc",
@@ -1650,6 +1667,7 @@ static_library("ui") {
       ":layout_constants",
       "//base",
       "//chrome/app/vector_icons",
+      "//chrome/browser:chrome_browser_interface_binders_webui_parts",
       "//chrome/browser:shell_integration",
       "//chrome/browser/actor/ui",
       "//chrome/browser/actor/ui:actor_overlay",
@@ -1664,6 +1682,7 @@ static_library("ui") {
       "//chrome/browser/background/glic",
       "//chrome/browser/bluetooth",
       "//chrome/browser/browsing_data:constants",
+      "//chrome/browser/contextual_tasks:mojo_bindings",
       "//chrome/browser/custom_handlers",
       "//chrome/browser/device_api",
       "//chrome/browser/first_party_sets",
@@ -1677,6 +1696,10 @@ static_library("ui") {
       "//chrome/browser/indigo",
       "//chrome/browser/indigo/resources:indigo_strings",
       "//chrome/browser/lifetime:termination_notification",
+      "//chrome/browser/new_tab_page/modules/file_suggestion:mojo_bindings",
+      "//chrome/browser/new_tab_page/modules/v2/authentication:mojo_bindings",
+      "//chrome/browser/new_tab_page/modules/v2/calendar:mojo_bindings",
+      "//chrome/browser/new_tab_page/modules/v2/tab_groups:mojo_bindings",
       "//chrome/browser/password_manager/actor_login:factories",
       "//chrome/browser/password_manager/factories",
       "//chrome/browser/privacy_sandbox:countries",
@@ -1725,25 +1748,64 @@ static_library("ui") {
       "//chrome/browser/ui/web_applications:launch_utils",
       "//chrome/browser/ui/webui/access_code_cast",
       "//chrome/browser/ui/webui/access_code_cast:impl",
+      "//chrome/browser/ui/webui/access_code_cast:mojo_bindings",
+      "//chrome/browser/ui/webui/ai_overlay_dialog",
+      "//chrome/browser/ui/webui/ai_overlay_dialog:mojo_bindings",
+      "//chrome/browser/ui/webui/app_service_internals:mojo_bindings",
       "//chrome/browser/ui/webui/bookmarks",
+      "//chrome/browser/ui/webui/customize_buttons:mojo_bindings",
       "//chrome/browser/ui/webui/data_sharing:impl",
+      "//chrome/browser/ui/webui/data_sharing:mojo_bindings",
+      "//chrome/browser/ui/webui/downloads:mojo_bindings",
+      "//chrome/browser/ui/webui/drive_picker_host",
+      "//chrome/browser/ui/webui/drive_picker_host:mojo_bindings",
+      "//chrome/browser/ui/webui/drive_picker_host/untrusted",
+      "//chrome/browser/ui/webui/drive_picker_host/untrusted:mojo_bindings",
       "//chrome/browser/ui/webui/feedback/report_unsafe_site:mojo_bindings",
       "//chrome/browser/ui/webui/history_clusters",
+      "//chrome/browser/ui/webui/infobar_internals:mojo_bindings",
+      "//chrome/browser/ui/webui/multistep_filter_internals:mojo_bindings",
+      "//chrome/browser/ui/webui/new_tab_footer:mojo_bindings",
+      "//chrome/browser/ui/webui/new_tab_page:mojo_bindings",
+      "//chrome/browser/ui/webui/new_tab_page/composebox/variations",
+      "//chrome/browser/ui/webui/new_tab_page/foo:mojo_bindings",
       "//chrome/browser/ui/webui/new_tab_page_third_party",
       "//chrome/browser/ui/webui/new_tab_page_third_party:impl",
       "//chrome/browser/ui/webui/ntp",
       "//chrome/browser/ui/webui/ntp:ntp_resource_cache",
+      "//chrome/browser/ui/webui/ntp_microsoft_auth",
+      "//chrome/browser/ui/webui/omnibox",
+      "//chrome/browser/ui/webui/omnibox/logging:mojo_bindings",
       "//chrome/browser/ui/webui/omnibox_popup",
       "//chrome/browser/ui/webui/omnibox_popup/mojom",
+      "//chrome/browser/ui/webui/personal_context",
+      "//chrome/browser/ui/webui/personal_context:mojo_bindings",
+      "//chrome/browser/ui/webui/search_engine_choice:mojo_bindings",
+      "//chrome/browser/ui/webui/side_panel/comments:mojo_bindings",
+      "//chrome/browser/ui/webui/side_panel/reading_list:mojo_bindings",
+      "//chrome/browser/ui/webui/suggest_internals:mojo_bindings",
       "//chrome/browser/ui/webui/support_tool",
       "//chrome/browser/ui/webui/tab_search",
+      "//chrome/browser/ui/webui/tab_search:mojo_bindings",
       "//chrome/browser/ui/webui/user_education_internals",
+      "//chrome/browser/ui/webui/user_education_internals:mojo_bindings",
       "//chrome/browser/ui/webui/util:impl",
       "//chrome/browser/ui/webui/web_app_internals",
+      "//chrome/browser/ui/webui/web_app_internals:mojo_bindings",
+      "//chrome/browser/ui/webui_browser:headers",
       "//chrome/browser/ui/window_feature_controller",
       "//chrome/browser/usb",
       "//chrome/browser/webauthn:local_credential_management",
+      "//components/browser_apis/bookmarks:mojom",
+      "//components/browser_apis/browser_controls:mojom",
+      "//components/browser_apis/ui_controllers/toolbar:mojom",
+      "//components/commerce/core/internals/mojom:mojo_bindings",
+      "//components/guest_contents/common:mojom",
       "//components/password_manager/core/browser/actor_login:permissions_manager_impl",
+      "//components/privacy_sandbox:features",
+      "//components/surface_embed/browser",
+      "//components/surface_embed/common",
+      "//components/surface_embed/common:mojom",
 
       # No reason for this dependencies be out of alphabetical order.
       "//chrome/browser/content_extraction",
@@ -2420,6 +2482,7 @@ static_library("ui") {
       "//ash/webui/files_internals",
       "//ash/webui/firmware_update_ui",
       "//ash/webui/focus_mode",
+      "//ash/webui/graduation",
       "//ash/webui/growth_internals",
       "//ash/webui/help_app_ui",
       "//ash/webui/help_app_ui/search:mojo_bindings",
@@ -2694,15 +2757,19 @@ static_library("ui") {
       "//chrome/browser/ui/views/select_file_dialog_extension",
       "//chrome/browser/ui/webui/ash/account_manager",
       "//chrome/browser/ui/webui/ash/add_supervision",
+      "//chrome/browser/ui/webui/ash/app_install",
+      "//chrome/browser/ui/webui/ash/bluetooth",
       "//chrome/browser/ui/webui/ash/cellular_setup",
       "//chrome/browser/ui/webui/ash/cloud_upload",
       "//chrome/browser/ui/webui/ash/crostini_installer",
+      "//chrome/browser/ui/webui/ash/curtain_ui",
       "//chrome/browser/ui/webui/ash/diagnostics_dialog",
       "//chrome/browser/ui/webui/ash/dlp_internals",
       "//chrome/browser/ui/webui/ash/edu_coexistence",
       "//chrome/browser/ui/webui/ash/emoji",
       "//chrome/browser/ui/webui/ash/extended_updates",
       "//chrome/browser/ui/webui/ash/floating_workspace",
+      "//chrome/browser/ui/webui/ash/internet",
       "//chrome/browser/ui/webui/ash/kerberos",
       "//chrome/browser/ui/webui/ash/lock_screen_reauth",
       "//chrome/browser/ui/webui/ash/login",
@@ -2711,6 +2778,7 @@ static_library("ui") {
       "//chrome/browser/ui/webui/ash/office_fallback",
       "//chrome/browser/ui/webui/ash/os_feedback_dialog",
       "//chrome/browser/ui/webui/ash/parent_access",
+      "//chrome/browser/ui/webui/ash/set_time",
       "//chrome/browser/ui/webui/ash/settings",
       "//chrome/browser/ui/webui/ash/settings/pages",
       "//chrome/browser/ui/webui/ash/settings/pages/a11y",
@@ -2964,6 +3032,11 @@ static_library("ui") {
       # can't be split out of this target yet.
       "//chrome/browser:browser_process_platform_part_ash",
       "//chrome/browser:platform_util_ash",
+
+      # chrome_browser_interface_binders_webui_parts_desktop.cc (compiled into
+      # this target) includes app_install_dialog.h; that webui target depends
+      # back on :ui.
+      "//chrome/browser/ui/webui/ash/app_install:app_install",
 
       "//chrome/browser/apps/browser_instance",
       "//chrome/browser/ash/accessibility",

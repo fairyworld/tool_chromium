@@ -2072,9 +2072,11 @@ source_set("core") {
   }
 }
 
-# Use a static library here because many test binaries depend on this but don't
-# require many files from it. This makes linking more efficient.
-static_library("browser") {
+# This target no longer has any sources of its own; it only aggregates
+# dependencies. It must be a source_set (not a static_library) because an empty
+# static_library produces an empty archive, which the Windows librarian
+# (lld-link /lib) rejects with "lib failed".
+source_set("browser") {
   sources = []
 
   configs += [
@@ -3288,12 +3290,6 @@ static_library("browser") {
       # TODO(crbug.com/504627103): Remove this circular dependency.
       "//chrome/browser/new_tab_page:impl",
       "//chrome/browser/payments:impl",
-    ]
-
-    sources += [
-      # This file includes many headers still owned by //chrome/browser/ui,
-      # so it can't move into :core until they get componentized.
-      "chrome_browser_interface_binders_webui_parts_desktop.cc",
     ]
 
     #!is_android
