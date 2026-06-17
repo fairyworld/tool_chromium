@@ -1903,7 +1903,7 @@ std::optional<StreamingBlobHandle> Database::GetStreamingBlob(
 void Database::OnStreamingBlobClosed(SqliteResultCode result,
                                      const char* error_source) {
   --outstanding_blob_count_;
-  if (handling_error_nesting_ == 0 && !IsSqliteSuccessCode(result)) {
+  if (!IsSqliteSuccessCode(result)) {
     OnSqliteError(ToSqliteErrorCode(result), nullptr, error_source);
   }
 }
@@ -2604,8 +2604,6 @@ void Database::OnSqliteError(SqliteErrorCode sqlite_error_code,
   DCHECK_NE(statement != nullptr, sql_statement != nullptr)
       << __func__ << " should either get a Statement or a raw SQL string";
 
-  ++handling_error_nesting_;
-
   // Use `base::UmaHistogramSparse` because sqlite result codes aren't
   // sequential. The large integers they represent make it so that the
   // non-sparse histograms end up with too many buckets.
@@ -2649,7 +2647,9 @@ void Database::OnSqliteError(SqliteErrorCode sqlite_error_code,
   // Inform the error expecter that we've encountered the error.
   std::ignore = IsExpectedSqliteError(static_cast<int>(sqlite_error_code));
 
-  if (!error_callback_.is_null()) {
+  if (!executing_error_callback_ && !error_callback_.is_null()) {
+    executing_error_callback_ = true;
+
     base::WeakPtr<Database> weak_this =
         weak_factory_lifetime_tracker_.GetWeakPtr();
 
@@ -2664,9 +2664,8 @@ void Database::OnSqliteError(SqliteErrorCode sqlite_error_code,
     if (!weak_this) {
       return;
     }
+    executing_error_callback_ = false;
   }
-
-  --handling_error_nesting_;
 }
 
 std::string Database::GetDiagnosticInfo(int sqlite_error_code,

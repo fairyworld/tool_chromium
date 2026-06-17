@@ -71,6 +71,8 @@ namespace sql {
 
 namespace {
 
+using ::base::Bucket;
+using ::base::BucketsAre;
 using ::base::test::ScopedFeatureList;
 using ::base::test::ValueIs;
 using ::sql::test::DriveErrorTestVfs;
@@ -554,6 +556,28 @@ TEST_P(SQLDatabaseTest, ResetErrorCallback) {
       << "Execute() should not report errors after reset_error_callback()";
   EXPECT_EQ(SQLITE_OK, error)
       << "Execute() should not report errors after reset_error_callback()";
+}
+
+// Check that the error callback doesn't recursively call itself.
+TEST_P(SQLDatabaseTest, ErrorCallbackCausingAnError) {
+  base::HistogramTester tester;
+  ASSERT_TRUE(db_->Execute("CREATE TABLE rows(id)"));
+
+  int invocation_count = 0;
+  db_->set_error_callback(base::BindLambdaForTesting(
+      [&](int sqlite_error, sql::Statement* statement) {
+        ++invocation_count;
+        // Trigger an error from inside the error callback.
+        EXPECT_FALSE(db_->Execute("SELECT invalid FROM rows"));
+      }));
+
+  // Trigger an error that will call the error callback.
+  EXPECT_FALSE(db_->Execute("SELECT invalid FROM rows"));
+
+  // The error callback is invoked once, but both errors are reported.
+  EXPECT_EQ(invocation_count, 1);
+  EXPECT_THAT(tester.GetAllSamples("Sql.Database.Statement.Error.Test"),
+              BucketsAre(Bucket(SqliteResultCode::kError, 2)));
 }
 
 // Regression test for https://crbug.com/1522873
