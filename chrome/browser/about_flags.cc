@@ -9928,6 +9928,12 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kTipsSelfServiceDescription, kOsAndroid,
      FEATURE_VALUE_TYPE(chrome::android::kTipsSelfService)},
 
+    {"tab-strip-height-transition-glitch-fix",
+     flag_descriptions::kTabStripHeightTransitionGlitchFixName,
+     flag_descriptions::kTabStripHeightTransitionGlitchFixDescription,
+     kOsAndroid,
+     FEATURE_VALUE_TYPE(chrome::android::kTabStripHeightTransitionGlitchFix)},
+
 #endif  // BUILDFLAG(IS_ANDROID)
 
     {"data-sharing-debug-logs", flag_descriptions::kDataSharingDebugLogsName,
