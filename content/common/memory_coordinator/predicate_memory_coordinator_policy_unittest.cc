@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "content/common/memory_coordinator/memory_coordinator_policy_state.h"
+#include "content/common/memory_coordinator/predicate_memory_coordinator_policy.h"
 
 #include <cstdint>
 #include <memory>
@@ -33,22 +33,9 @@ class MockMemoryConsumerGroupHost : public MemoryConsumerGroupHost {
               (override));
 };
 
-class TestPolicy : public MemoryCoordinatorPolicy {
- public:
-  TestPolicy(MemoryCoordinatorPolicyManager& manager,
-             MemoryCoordinatorPolicyState::ConsumerPredicate predicate)
-      : MemoryCoordinatorPolicy(manager),
-        state_(*this, manager, std::move(predicate)) {}
-
-  MemoryCoordinatorPolicyState& state() { return state_; }
-
- private:
-  MemoryCoordinatorPolicyState state_;
-};
-
 }  // namespace
 
-class MemoryCoordinatorPolicyStateTest : public testing::Test {
+class PredicateMemoryCoordinatorPolicyTest : public testing::Test {
  protected:
   MemoryCoordinatorPolicyManager& policy_manager() { return policy_manager_; }
 
@@ -57,7 +44,7 @@ class MemoryCoordinatorPolicyStateTest : public testing::Test {
   MemoryCoordinatorPolicyManager policy_manager_;
 };
 
-TEST_F(MemoryCoordinatorPolicyStateTest, Persistence) {
+TEST_F(PredicateMemoryCoordinatorPolicyTest, Persistence) {
   MockMemoryConsumerGroupHost host;
   const ChildProcessId kChildId;
   const ChildProcessId kOtherChildId(1);
@@ -65,7 +52,7 @@ TEST_F(MemoryCoordinatorPolicyStateTest, Persistence) {
   policy_manager().AddMemoryConsumerGroupHost(kChildId, &host);
   policy_manager().AddMemoryConsumerGroupHost(kOtherChildId, &host);
 
-  TestPolicy policy(
+  PredicateMemoryCoordinatorPolicy policy(
       policy_manager(),
       base::BindRepeating([](uint32_t consumer_id,
                              std::optional<base::MemoryConsumerTraits> traits,
@@ -74,8 +61,10 @@ TEST_F(MemoryCoordinatorPolicyStateTest, Persistence) {
         // Only match consumers in the primary process (kChildId).
         return child_process_id.is_null();
       }));
+  MemoryCoordinatorPolicyRegistration<PredicateMemoryCoordinatorPolicy>
+      registration(policy_manager(), policy);
 
-  policy.state().SetLimit(50, true);
+  policy.SetLimit(50, true);
 
   // A consumer added AFTER the limit was set should immediately receive it if
   // it matches the predicate.
@@ -104,7 +93,7 @@ TEST_F(MemoryCoordinatorPolicyStateTest, Persistence) {
   policy_manager().RemoveMemoryConsumerGroupHost(kOtherChildId);
 }
 
-TEST_F(MemoryCoordinatorPolicyStateTest, SetLimit) {
+TEST_F(PredicateMemoryCoordinatorPolicyTest, SetLimit) {
   MockMemoryConsumerGroupHost host;
   const ChildProcessId kChildId;
 
@@ -120,7 +109,7 @@ TEST_F(MemoryCoordinatorPolicyStateTest, SetLimit) {
   policy_manager().OnConsumerGroupAdded(kConsumerId2, kConsumerName2, {},
                                         PROCESS_TYPE_BROWSER, kChildId);
 
-  TestPolicy policy(
+  PredicateMemoryCoordinatorPolicy policy(
       policy_manager(),
       base::BindRepeating([](uint32_t consumer_id,
                              std::optional<base::MemoryConsumerTraits> traits,
@@ -128,19 +117,21 @@ TEST_F(MemoryCoordinatorPolicyStateTest, SetLimit) {
                              ChildProcessId child_process_id) {
         return child_process_id.is_null();
       }));
+  MemoryCoordinatorPolicyRegistration<PredicateMemoryCoordinatorPolicy>
+      registration(policy_manager(), policy);
 
   // Updating the limit should update all matching existing consumers.
   EXPECT_CALL(host, UpdateConsumers(UnorderedElementsAre(
                         MemoryConsumerUpdate{kConsumerId1, 50, true},
                         MemoryConsumerUpdate{kConsumerId2, 50, true})));
-  policy.state().SetLimit(50, true);
+  policy.SetLimit(50, true);
   Mock::VerifyAndClearExpectations(&host);
 
   // Resetting the limit should update all matching existing consumers.
   EXPECT_CALL(host, UpdateConsumers(UnorderedElementsAre(
                         MemoryConsumerUpdate{kConsumerId1, 100, false},
                         MemoryConsumerUpdate{kConsumerId2, 100, false})));
-  policy.state().SetLimit(100, false);
+  policy.SetLimit(100, false);
   Mock::VerifyAndClearExpectations(&host);
 
   policy_manager().OnConsumerGroupRemoved(kConsumerId1, kChildId);
@@ -148,7 +139,7 @@ TEST_F(MemoryCoordinatorPolicyStateTest, SetLimit) {
   policy_manager().RemoveMemoryConsumerGroupHost(kChildId);
 }
 
-TEST_F(MemoryCoordinatorPolicyStateTest, ChangeReleaseMemory) {
+TEST_F(PredicateMemoryCoordinatorPolicyTest, ChangeReleaseMemory) {
   MockMemoryConsumerGroupHost host;
   const ChildProcessId kChildId;
 
@@ -160,7 +151,7 @@ TEST_F(MemoryCoordinatorPolicyStateTest, ChangeReleaseMemory) {
   policy_manager().OnConsumerGroupAdded(kConsumerId, kConsumerName, {},
                                         PROCESS_TYPE_BROWSER, kChildId);
 
-  TestPolicy policy(
+  PredicateMemoryCoordinatorPolicy policy(
       policy_manager(),
       base::BindRepeating([](uint32_t consumer_id,
                              std::optional<base::MemoryConsumerTraits> traits,
@@ -168,31 +159,33 @@ TEST_F(MemoryCoordinatorPolicyStateTest, ChangeReleaseMemory) {
                              ChildProcessId child_process_id) {
         return child_process_id.is_null();
       }));
+  MemoryCoordinatorPolicyRegistration<PredicateMemoryCoordinatorPolicy>
+      registration(policy_manager(), policy);
 
   // Initial set limit.
   EXPECT_CALL(host, UpdateConsumers(UnorderedElementsAre(
                         MemoryConsumerUpdate{kConsumerId, 50, false})));
-  policy.state().SetLimit(50, false);
+  policy.SetLimit(50, false);
   Mock::VerifyAndClearExpectations(&host);
 
   // If the limit is the same but release_memory changes, the limit update
   // should be std::nullopt.
   EXPECT_CALL(host, UpdateConsumers(UnorderedElementsAre(MemoryConsumerUpdate{
                         kConsumerId, std::nullopt, true})));
-  policy.state().SetLimit(50, true);
+  policy.SetLimit(50, true);
   Mock::VerifyAndClearExpectations(&host);
 
   policy_manager().OnConsumerGroupRemoved(kConsumerId, kChildId);
   policy_manager().RemoveMemoryConsumerGroupHost(kChildId);
 }
 
-TEST_F(MemoryCoordinatorPolicyStateTest, DefaultStatePersistence) {
+TEST_F(PredicateMemoryCoordinatorPolicyTest, DefaultStatePersistence) {
   MockMemoryConsumerGroupHost host;
   const ChildProcessId kChildId;
 
   policy_manager().AddMemoryConsumerGroupHost(kChildId, &host);
 
-  TestPolicy policy(
+  PredicateMemoryCoordinatorPolicy policy(
       policy_manager(),
       base::BindRepeating([](uint32_t consumer_id,
                              std::optional<base::MemoryConsumerTraits> traits,
@@ -200,6 +193,8 @@ TEST_F(MemoryCoordinatorPolicyStateTest, DefaultStatePersistence) {
                              ChildProcessId child_process_id) {
         return child_process_id.is_null();
       }));
+  MemoryCoordinatorPolicyRegistration<PredicateMemoryCoordinatorPolicy>
+      registration(policy_manager(), policy);
 
   // Adding a consumer when the policy is in its default state (100% limit,
   // no release) should NOT trigger an update.
@@ -215,8 +210,8 @@ TEST_F(MemoryCoordinatorPolicyStateTest, DefaultStatePersistence) {
   policy_manager().RemoveMemoryConsumerGroupHost(kChildId);
 }
 
-TEST_F(MemoryCoordinatorPolicyStateTest, ObserverLifecycle) {
-  MemoryCoordinatorPolicyState::ConsumerPredicate predicate =
+TEST_F(PredicateMemoryCoordinatorPolicyTest, ObserverLifecycle) {
+  PredicateMemoryCoordinatorPolicy::ConsumerPredicate predicate =
       base::BindRepeating([](uint32_t consumer_id,
                              std::optional<base::MemoryConsumerTraits> traits,
                              ProcessType process_type,
@@ -232,8 +227,10 @@ TEST_F(MemoryCoordinatorPolicyStateTest, ObserverLifecycle) {
   const uint32_t kConsumerId = base::PersistentHash(kConsumerName);
 
   {
-    TestPolicy policy(policy_manager(), predicate);
-    policy.state().SetLimit(50, false);
+    PredicateMemoryCoordinatorPolicy policy(policy_manager(), predicate);
+    MemoryCoordinatorPolicyRegistration<PredicateMemoryCoordinatorPolicy>
+        registration(policy_manager(), policy);
+    policy.SetLimit(50, false);
 
     EXPECT_CALL(host, UpdateConsumers(_)).Times(1);
     policy_manager().OnConsumerGroupAdded(kConsumerId, kConsumerName, {},
@@ -252,7 +249,8 @@ TEST_F(MemoryCoordinatorPolicyStateTest, ObserverLifecycle) {
   policy_manager().RemoveMemoryConsumerGroupHost(kChildId);
 }
 
-TEST_F(MemoryCoordinatorPolicyStateTest, RepeatedReleaseForStatelessConsumers) {
+TEST_F(PredicateMemoryCoordinatorPolicyTest,
+       RepeatedReleaseForStatelessConsumers) {
   MockMemoryConsumerGroupHost host;
   const ChildProcessId kChildId;
 
@@ -289,7 +287,7 @@ TEST_F(MemoryCoordinatorPolicyStateTest, RepeatedReleaseForStatelessConsumers) {
   policy_manager().OnConsumerGroupAdded(
       kNoTraitsId, kNoTraitsName, std::nullopt, PROCESS_TYPE_BROWSER, kChildId);
 
-  TestPolicy policy(
+  PredicateMemoryCoordinatorPolicy policy(
       policy_manager(),
       base::BindRepeating([](uint32_t consumer_id,
                              std::optional<base::MemoryConsumerTraits> traits,
@@ -297,6 +295,8 @@ TEST_F(MemoryCoordinatorPolicyStateTest, RepeatedReleaseForStatelessConsumers) {
                              ChildProcessId child_process_id) {
         return child_process_id.is_null();
       }));
+  MemoryCoordinatorPolicyRegistration<PredicateMemoryCoordinatorPolicy>
+      registration(policy_manager(), policy);
 
   // Critical pressure (limit 0, release true): all should be notified
   // initially.
@@ -304,7 +304,7 @@ TEST_F(MemoryCoordinatorPolicyStateTest, RepeatedReleaseForStatelessConsumers) {
                         MemoryConsumerUpdate{kStatefulId, 0, true},
                         MemoryConsumerUpdate{kStatelessId, 0, true},
                         MemoryConsumerUpdate{kNoTraitsId, 0, true})));
-  policy.state().SetLimit(0, true);
+  policy.SetLimit(0, true);
   Mock::VerifyAndClearExpectations(&host);
 
   // Simulate repeated critical pressure: stateless and no_traits consumers
@@ -313,7 +313,7 @@ TEST_F(MemoryCoordinatorPolicyStateTest, RepeatedReleaseForStatelessConsumers) {
               UpdateConsumers(UnorderedElementsAre(
                   MemoryConsumerUpdate{kStatelessId, std::nullopt, true},
                   MemoryConsumerUpdate{kNoTraitsId, std::nullopt, true})));
-  policy.state().SetLimit(0, true);
+  policy.SetLimit(0, true);
   Mock::VerifyAndClearExpectations(&host);
 
   // Transition to Moderate pressure (limit 50, release true): all should be
@@ -322,7 +322,7 @@ TEST_F(MemoryCoordinatorPolicyStateTest, RepeatedReleaseForStatelessConsumers) {
                         MemoryConsumerUpdate{kStatefulId, 50, true},
                         MemoryConsumerUpdate{kStatelessId, 50, true},
                         MemoryConsumerUpdate{kNoTraitsId, 50, true})));
-  policy.state().SetLimit(50, true);
+  policy.SetLimit(50, true);
   Mock::VerifyAndClearExpectations(&host);
 
   // Simulate repeated moderate pressure: stateless and no_traits consumers
@@ -331,7 +331,7 @@ TEST_F(MemoryCoordinatorPolicyStateTest, RepeatedReleaseForStatelessConsumers) {
               UpdateConsumers(UnorderedElementsAre(
                   MemoryConsumerUpdate{kStatelessId, std::nullopt, true},
                   MemoryConsumerUpdate{kNoTraitsId, std::nullopt, true})));
-  policy.state().SetLimit(50, true);
+  policy.SetLimit(50, true);
   Mock::VerifyAndClearExpectations(&host);
 
   // Stop pressure (limit 100, release true): all should be reset to 100%.
@@ -339,13 +339,13 @@ TEST_F(MemoryCoordinatorPolicyStateTest, RepeatedReleaseForStatelessConsumers) {
                         MemoryConsumerUpdate{kStatefulId, 100, true},
                         MemoryConsumerUpdate{kStatelessId, 100, true},
                         MemoryConsumerUpdate{kNoTraitsId, 100, true})));
-  policy.state().SetLimit(100, true);
+  policy.SetLimit(100, true);
   Mock::VerifyAndClearExpectations(&host);
 
   // Simulate repeated no pressure: should NOT notify because limit is 100 (not
   // under pressure).
   EXPECT_CALL(host, UpdateConsumers(_)).Times(0);
-  policy.state().SetLimit(100, true);
+  policy.SetLimit(100, true);
   Mock::VerifyAndClearExpectations(&host);
 
   policy_manager().OnConsumerGroupRemoved(kStatefulId, kChildId);

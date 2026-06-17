@@ -2,25 +2,25 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CONTENT_COMMON_MEMORY_COORDINATOR_MEMORY_COORDINATOR_POLICY_STATE_H_
-#define CONTENT_COMMON_MEMORY_COORDINATOR_MEMORY_COORDINATOR_POLICY_STATE_H_
+#ifndef CONTENT_COMMON_MEMORY_COORDINATOR_PREDICATE_MEMORY_COORDINATOR_POLICY_H_
+#define CONTENT_COMMON_MEMORY_COORDINATOR_PREDICATE_MEMORY_COORDINATOR_POLICY_H_
 
 #include <optional>
 #include <string_view>
 
 #include "base/functional/callback.h"
 #include "base/memory/raw_ref.h"
+#include "base/memory_coordinator/traits.h"
 #include "content/common/content_export.h"
+#include "content/common/memory_coordinator/memory_coordinator_policy.h"
 #include "content/common/memory_coordinator/memory_coordinator_policy_manager.h"
 
 namespace content {
 
-class MemoryCoordinatorPolicy;
-
-// A component that helps memory coordinator policies apply memory limits or
+// A base class for memory coordinator policies that apply memory limits or
 // release requests to all memory consumers that match a single predicate.
 //
-// This component manages the lifecycle of these "predicate-based" rules. When
+// This base class manages the lifecycle of these "predicate-based" rules. When
 // a limit is set via SetLimit(), it is automatically applied to all currently
 // registered consumers that match the predicate. It also observes the
 // registration of new consumers and ensures the rule is applied if they match
@@ -29,8 +29,9 @@ class MemoryCoordinatorPolicy;
 // This allows policies to implement "persistent" settings (e.g., "all
 // renderers should be capped at 50%") without manually tracking every consumer
 // registration.
-class CONTENT_EXPORT MemoryCoordinatorPolicyState
-    : public MemoryCoordinatorPolicyManager::Observer {
+class CONTENT_EXPORT PredicateMemoryCoordinatorPolicy
+    : public MemoryCoordinatorPolicy,
+      public MemoryCoordinatorPolicyManager::Observer {
  public:
   using ConsumerPredicate = base::RepeatingCallback<bool(
       uint32_t consumer_id,
@@ -38,15 +39,15 @@ class CONTENT_EXPORT MemoryCoordinatorPolicyState
       ProcessType process_type,
       ChildProcessId child_process_id)>;
 
-  MemoryCoordinatorPolicyState(MemoryCoordinatorPolicy& policy,
-                               MemoryCoordinatorPolicyManager& manager,
-                               ConsumerPredicate predicate);
+  PredicateMemoryCoordinatorPolicy(MemoryCoordinatorPolicyManager& manager,
+                                   ConsumerPredicate predicate);
 
-  MemoryCoordinatorPolicyState(const MemoryCoordinatorPolicyState&) = delete;
-  MemoryCoordinatorPolicyState& operator=(const MemoryCoordinatorPolicyState&) =
+  PredicateMemoryCoordinatorPolicy(const PredicateMemoryCoordinatorPolicy&) =
       delete;
+  PredicateMemoryCoordinatorPolicy& operator=(
+      const PredicateMemoryCoordinatorPolicy&) = delete;
 
-  ~MemoryCoordinatorPolicyState() override;
+  ~PredicateMemoryCoordinatorPolicy() override;
 
   // MemoryCoordinatorPolicyManager::Observer:
   void OnConsumerGroupAdded(uint32_t consumer_id,
@@ -63,9 +64,6 @@ class CONTENT_EXPORT MemoryCoordinatorPolicyState
   void SetLimit(int percentage, bool release_memory);
 
  private:
-  // `policy_` and `manager_` must outlive this.
-  const raw_ref<MemoryCoordinatorPolicy> policy_;
-  const raw_ref<MemoryCoordinatorPolicyManager> manager_;
   const ConsumerPredicate predicate_;
   int percentage_ = base::MemoryConsumer::kDefaultMemoryLimit;
   bool release_memory_ = false;
@@ -75,4 +73,4 @@ class CONTENT_EXPORT MemoryCoordinatorPolicyState
 
 }  // namespace content
 
-#endif  // CONTENT_COMMON_MEMORY_COORDINATOR_MEMORY_COORDINATOR_POLICY_STATE_H_
+#endif  // CONTENT_COMMON_MEMORY_COORDINATOR_PREDICATE_MEMORY_COORDINATOR_POLICY_H_
