@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PROXY_SWITCHES_H_
-#define MOJO_PROXY_SWITCHES_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_SERVICE_SWITCHES_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_SERVICE_SWITCHES_H_
 
 namespace switches {
 
@@ -15,4 +15,4 @@ extern const char kNumAttachments[];
 
 }  // namespace switches
 
-#endif  // MOJO_PROXY_SWITCHES_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_SERVICE_SWITCHES_H_

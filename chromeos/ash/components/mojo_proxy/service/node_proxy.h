@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PROXY_NODE_PROXY_H_
-#define MOJO_PROXY_NODE_PROXY_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_SERVICE_NODE_PROXY_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_SERVICE_NODE_PROXY_H_
 
 #include <memory>
 #include <set>
@@ -48,4 +48,4 @@ class NodeProxy {
 
 }  // namespace mojo_proxy
 
-#endif  // MOJO_PROXY_NODE_PROXY_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_SERVICE_NODE_PROXY_H_

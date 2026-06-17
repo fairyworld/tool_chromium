@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/proxy/node_proxy.h"
+#include "chromeos/ash/components/mojo_proxy/service/node_proxy.h"
 
 #include <utility>
 
 #include "base/check.h"
-#include "mojo/proxy/portal_proxy.h"
+#include "chromeos/ash/components/mojo_proxy/service/portal_proxy.h"
 
 namespace mojo_proxy {
 

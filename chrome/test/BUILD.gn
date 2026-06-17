@@ -1304,7 +1304,7 @@ if (is_chromeos && is_chromeos_device) {
     ]
 
     if (build_mojo_proxy) {
-      data_deps += [ "//mojo/proxy:mojo_proxy" ]
+      data_deps += [ "//chromeos/ash/components/mojo_proxy/service:mojo_proxy" ]
     }
   }
 }

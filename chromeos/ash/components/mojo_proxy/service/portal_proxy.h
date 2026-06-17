@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef MOJO_PROXY_PORTAL_PROXY_H_
-#define MOJO_PROXY_PORTAL_PROXY_H_
+#ifndef CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_SERVICE_PORTAL_PROXY_H_
+#define CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_SERVICE_PORTAL_PROXY_H_
 
 #include <cstdint>
 
@@ -73,4 +73,4 @@ class PortalProxy {
 
 }  // namespace mojo_proxy
 
-#endif  // MOJO_PROXY_PORTAL_PROXY_H_
+#endif  // CHROMEOS_ASH_COMPONENTS_MOJO_PROXY_SERVICE_PORTAL_PROXY_H_

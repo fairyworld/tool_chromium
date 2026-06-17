@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/proxy/portal_proxy.h"
+#include "chromeos/ash/components/mojo_proxy/service/portal_proxy.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -13,10 +13,10 @@
 #include "base/memory/platform_shared_memory_region.h"
 #include "base/memory/raw_ref.h"
 #include "base/notreached.h"
+#include "chromeos/ash/components/mojo_proxy/service/node_proxy.h"
 #include "mojo/core/ipcz_driver/object.h"
 #include "mojo/core/ipcz_driver/shared_buffer.h"
 #include "mojo/core/ipcz_driver/wrapped_platform_handle.h"
-#include "mojo/proxy/node_proxy.h"
 #include "mojo/public/c/system/buffer.h"
 #include "mojo/public/c/system/platform_handle.h"
 #include "mojo/public/c/system/trap.h"

@@ -178,7 +178,8 @@ if (!is_android && !is_mac) {
     if (is_chromeos) {
       data_deps += [ "//sandbox/linux:chrome_sandbox" ]
       if (build_mojo_proxy) {
-        data_deps += [ "//mojo/proxy:mojo_proxy" ]
+        data_deps +=
+            [ "//chromeos/ash/components/mojo_proxy/service:mojo_proxy" ]
       }
       deps += [ "//components/exo/wayland:ui_controls_protocol_stub" ]
     }

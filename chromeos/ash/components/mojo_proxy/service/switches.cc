@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "mojo/proxy/switches.h"
+#include "chromeos/ash/components/mojo_proxy/service/switches.h"
 
 namespace switches {
 
