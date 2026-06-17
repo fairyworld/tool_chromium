@@ -33,8 +33,6 @@ public class TabStateAttributes {
 
     /** Marker interface for keys used in {@link TabStateAttributesRegistry}. */
     public interface StoreKey {}
-    @Deprecated
-    private static class LegacyKey implements StoreKey {}
 
     private @Nullable WebContents mWebContents;
     @VisibleForTesting static final long DEFAULT_LOW_PRIORITY_SAVE_DELAY_MS = 30 * 1000L;
@@ -84,15 +82,6 @@ public class TabStateAttributes {
          * @param dirtiness Tne state of dirtiness for the tab state.
          */
         void onTabStateDirtinessChanged(Tab tab, @DirtinessState int dirtiness);
-    }
-    @Deprecated
-    public static void createForTab(Tab tab, @Nullable @TabCreationState Integer creationState) {
-        TabStateAttributesRegistry.createAttributesForTab(tab, LegacyKey.class, creationState);
-    }
-
-    @Deprecated
-    public static @Nullable TabStateAttributes from(Tab tab) {
-        return TabStateAttributesRegistry.getAttributesFor(tab, LegacyKey.class);
     }
 
     TabStateAttributes(Tab tab, @Nullable @TabCreationState Integer creationState) {
@@ -273,7 +262,6 @@ public class TabStateAttributes {
     }
 
     public void destroy() {
-
         if (mWebContents != null) {
             cleanupWebContents(mWebContents);
             mWebContents = null;

@@ -36,7 +36,6 @@ public final class TabHelpers {
     static void initTabHelpers(Tab tab, @Nullable Tab parentTab) {
         TabUma.createForTab(tab);
 
-        TabStateAttributes.createForTab(tab, ((TabImpl) tab).getCreationState());
         TabStateAttributesRegistry.createAttributesForTab(
                 tab, TabPersistentStoreImpl.class, ((TabImpl) tab).getCreationState());
         TabStateAttributesRegistry.createAttributesForTab(
