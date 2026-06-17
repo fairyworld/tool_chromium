@@ -4533,6 +4533,34 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Android.Omnibox.SuggestionsDropdown.ForcedSyncInflation"
+    enum="Boolean" expires_after="2026-11-01">
+  <owner>peterkang@google.com</owner>
+  <owner>chrome-mobile-search@google.com</owner>
+  <summary>
+    Records whether forced synchronous inflation occurred for the suggestions
+    dropdown. True indicates inflation had to be forced synchronously because
+    the UI requested the container before background inflation completed. False
+    indicates background inflation completed successfully on time.
+
+    Recorded at most once per activity start upon the first time the suggestions
+    container is requested/inflated.
+  </summary>
+</histogram>
+
+<histogram name="Android.Omnibox.SuggestionsDropdown.InflationThreadMatches"
+    enum="Boolean" expires_after="2026-11-01">
+  <owner>peterkang@google.com</owner>
+  <owner>chrome-mobile-search@google.com</owner>
+  <summary>
+    Records whether the Omnibox suggestions dropdown inflation thread matches
+    the expected thread (background thread if async inflation is enabled, UI
+    thread otherwise).
+
+    Recorded once per activity start when inflation is initialized.
+  </summary>
+</histogram>
+
 <histogram name="Android.Omnibox.SuggestionsDropdown.PreWarmedViewsCount"
     units="count" expires_after="2026-11-01">
   <owner>peterkang@google.com</owner>
@@ -4544,6 +4572,19 @@ chromium-metrics-reviews@google.com.
 
     Recorded once per activity start when pre-warming finishes or gets cut off
     by user interaction.
+  </summary>
+</histogram>
+
+<histogram name="Android.Omnibox.SuggestionsDropdown.PreWarmingThreadMatches"
+    enum="Boolean" expires_after="2026-11-01">
+  <owner>peterkang@google.com</owner>
+  <owner>chrome-mobile-search@google.com</owner>
+  <summary>
+    Records whether the Omnibox suggestions dropdown pre-warming thread matches
+    the expected thread (background thread if async inflation is enabled, UI
+    thread otherwise).
+
+    Recorded once per activity start when pre-warming is initialized.
   </summary>
 </histogram>
 
