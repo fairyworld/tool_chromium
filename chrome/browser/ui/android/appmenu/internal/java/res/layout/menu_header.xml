@@ -22,6 +22,7 @@ found in the LICENSE file.
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
-        android:minHeight="?attr/listItemHeight" />
+        android:paddingTop="@dimen/menu_header_padding_top"
+        android:paddingBottom="@dimen/menu_header_padding_bottom" />
 
 </LinearLayout>
