@@ -285,6 +285,7 @@ source_set("ondevice") {
     ":features",
     "//base",
     "//base/version_info",
+    "//build:branding_buildflags",
     "//components/optimization_guide:optimization_guide_buildflags",
     "//components/optimization_guide/optimization_guide_internals/webui:mojo_bindings",
     "//components/optimization_guide/proto:optimization_guide_proto",
@@ -852,7 +853,9 @@ source_set("model_execution_unit_tests") {
     "//testing/gtest",
   ]
 
-  if (build_with_model_execution) {
+  # CfT bypasses On Device model installation throttling breaking most of the
+  # tests below. See https://crbug.com/514435730.
+  if (build_with_model_execution && !is_chrome_for_testing) {
     sources += [
       "model_execution/aqa_response_parser_unittest.cc",
       "model_execution/fieldwise_response_parser_unittest.cc",

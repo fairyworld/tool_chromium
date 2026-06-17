@@ -6319,7 +6319,6 @@ test("unit_tests") {
     "//chrome/browser/actor/ui:unit_tests",
     "//chrome/browser/ai",
     "//chrome/browser/ai:test_support",
-    "//chrome/browser/ai:unit_tests",
     "//chrome/browser/apps:unit_tests",
     "//chrome/browser/autocomplete",
     "//chrome/browser/autocomplete:unit_tests",
@@ -6943,6 +6942,12 @@ test("unit_tests") {
 
   if (enable_devtools_frontend) {
     deps += [ "//chrome/browser/ui/webui/devtools:unit_tests" ]
+  }
+
+  # CfT bypasses On Device model installation throttling breaking most of the
+  # tests below. See https://crbug.com/514435730.
+  if (!is_chrome_for_testing) {
+    deps += [ "//chrome/browser/ai:unit_tests" ]
   }
 
   # TODO(crbug.com/437811373): Remove this dependency when
