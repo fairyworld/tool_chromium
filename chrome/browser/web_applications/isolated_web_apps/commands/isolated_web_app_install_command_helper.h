@@ -51,8 +51,6 @@ enum class VersionChangeValidationResult {
   kAllowed
 };
 
-
-
 // Provides the key rotation data associated with a particular IWA.
 struct KeyRotationData {
   base::raw_span<const uint8_t> rotated_key;
@@ -91,25 +89,6 @@ class IsolatedWebAppInstallCommandHelper {
       const IsolatedWebAppInstallCommandHelper&) = delete;
   IsolatedWebAppInstallCommandHelper& operator=(
       const IsolatedWebAppInstallCommandHelper&) = delete;
-
-  // Checks trust and signatures of IWA.
-  // Returns the integrity block if the IWA is backed by a signed web bundle.
-  void CheckTrustAndSignatures(
-      const IwaSourceWithMode& location,
-      const IwaOperation& operation,
-      Profile* profile,
-      base::OnceCallback<
-          void(base::expected<
-               std::optional<web_package::SignedWebBundleIntegrityBlock>,
-               std::string>)> callback);
-
-  // Checks trust and signatures of IWA.
-  // Use this overload if you don't need the returned integrity block.
-  void CheckTrustAndSignatures(
-      const IwaSourceWithMode& location,
-      const IwaOperation& operation,
-      Profile* profile,
-      base::OnceCallback<void(base::expected<void, std::string>)> callback);
 
   void CreateStoragePartitionIfNotPresent(Profile& profile);
 

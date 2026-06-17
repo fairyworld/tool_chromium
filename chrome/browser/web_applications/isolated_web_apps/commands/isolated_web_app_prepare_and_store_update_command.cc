@@ -35,6 +35,7 @@
 #include "chrome/browser/web_applications/isolated_web_apps/isolation_data.h"
 #include "chrome/browser/web_applications/isolated_web_apps/jobs/prepare_install_info_job.h"
 #include "chrome/browser/web_applications/isolated_web_apps/storage_util.h"
+#include "chrome/browser/web_applications/isolated_web_apps/trust_and_signature_verifier.h"
 #include "chrome/browser/web_applications/locks/app_lock.h"
 #include "chrome/browser/web_applications/web_app.h"
 #include "chrome/browser/web_applications/web_app_install_info.h"
@@ -248,8 +249,9 @@ void IsolatedWebAppUpdatePrepareAndStoreCommand::OnCopiedToProfileDirectory(
 
 void IsolatedWebAppUpdatePrepareAndStoreCommand::CheckTrustAndSignatures(
     base::OnceClosure next_step_callback) {
-  command_helper_->CheckTrustAndSignatures(
-      *destination_location_, IwaUpdateOperation{}, &profile(),
+  web_app::CheckTrustAndSignatures(
+      url_info_.web_bundle_id(), *destination_location_, IwaUpdateOperation{},
+      &profile(),
       base::BindOnce(&IsolatedWebAppUpdatePrepareAndStoreCommand::
                          OnTrustAndSignaturesChecked,
                      weak_factory_.GetWeakPtr(),

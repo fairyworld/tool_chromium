@@ -36,6 +36,7 @@
 #include "chrome/browser/web_applications/isolated_web_apps/jobs/prepare_install_info_job.h"
 #include "chrome/browser/web_applications/isolated_web_apps/remove_isolated_web_app_data.h"
 #include "chrome/browser/web_applications/isolated_web_apps/storage_util.h"
+#include "chrome/browser/web_applications/isolated_web_apps/trust_and_signature_verifier.h"
 #include "chrome/browser/web_applications/jobs/finalize_update_job.h"
 #include "chrome/browser/web_applications/locks/app_lock.h"
 #include "chrome/browser/web_applications/web_app.h"
@@ -130,7 +131,8 @@ void IsolatedWebAppApplyUpdateCommand::CheckIfUpdateIsStillPending(
 
 void IsolatedWebAppApplyUpdateCommand::CheckTrustAndSignatures(
     base::OnceClosure next_step_callback) {
-  command_helper_->CheckTrustAndSignatures(
+  web_app::CheckTrustAndSignatures(
+      url_info_.web_bundle_id(),
       IwaSourceWithMode::FromStorageLocation(profile().GetPath(),
                                              pending_update_info().location),
       IwaUpdateOperation{}, &profile(),

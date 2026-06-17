@@ -69,11 +69,6 @@ IsolatedWebAppUrlInfo CreateRandomIsolatedWebAppUrlInfo() {
       signed_web_bundle_id);
 }
 
-IwaSourceWithMode CreateDevProxySource(
-    std::string_view dev_mode_proxy_url = "http://default-proxy-url.org/") {
-  return IwaSourceProxy{url::Origin::Create(GURL(dev_mode_proxy_url))};
-}
-
 class IsolatedWebAppInstallCommandHelperTest : public ::testing::Test {
  public:
   void SetUp() override {
@@ -102,42 +97,6 @@ class IsolatedWebAppInstallCommandHelperTest : public ::testing::Test {
   }();
   std::unique_ptr<content::WebContents> web_contents_;
 };
-
-using IsolatedWebAppInstallCommandHelperTrustAndSignaturesTest =
-    IsolatedWebAppInstallCommandHelperTest;
-
-TEST_F(IsolatedWebAppInstallCommandHelperTrustAndSignaturesTest,
-       DevProxySucceeds) {
-  IsolatedWebAppUrlInfo url_info = CreateRandomIsolatedWebAppUrlInfo();
-  auto command_helper =
-      std::make_unique<IsolatedWebAppInstallCommandHelper>(url_info);
-
-  base::test::TestFuture<base::expected<void, std::string>> future;
-  command_helper->CheckTrustAndSignatures(
-      CreateDevProxySource(),
-      IwaInstallOperation{.source = webapps::WebappInstallSource::IWA_DEV_UI},
-      &*profile(), future.GetCallback());
-  EXPECT_THAT(future.Get(), HasValue());
-}
-
-TEST_F(IsolatedWebAppInstallCommandHelperTrustAndSignaturesTest,
-       DevProxyFailsWhenDevModeIsDisabled) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndDisableFeature(features::kIsolatedWebAppDevMode);
-
-  IsolatedWebAppUrlInfo url_info = CreateRandomIsolatedWebAppUrlInfo();
-  auto command_helper =
-      std::make_unique<IsolatedWebAppInstallCommandHelper>(url_info);
-
-  base::test::TestFuture<base::expected<void, std::string>> future;
-  command_helper->CheckTrustAndSignatures(
-      CreateDevProxySource(),
-      IwaInstallOperation{.source = webapps::WebappInstallSource::IWA_DEV_UI},
-      &*profile(), future.GetCallback());
-  EXPECT_THAT(
-      future.Take(),
-      ErrorIs(HasSubstr("Isolated Web App Developer Mode is not enabled")));
-}
 
 using IsolatedWebAppInstallCommandHelperStoragePartitionTest =
     IsolatedWebAppInstallCommandHelperTest;

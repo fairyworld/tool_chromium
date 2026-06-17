@@ -15,10 +15,10 @@
 #include "base/types/expected_macros.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/web_applications/callback_utils.h"
-#include "chrome/browser/web_applications/isolated_web_apps/commands/isolated_web_app_install_command_helper.h"
 #include "chrome/browser/web_applications/isolated_web_apps/install/non_installed_bundle_inspection_context.h"
 #include "chrome/browser/web_applications/isolated_web_apps/jobs/prepare_install_info_job.h"
 #include "chrome/browser/web_applications/isolated_web_apps/runtime_data/chrome_iwa_runtime_data_provider.h"
+#include "chrome/browser/web_applications/isolated_web_apps/trust_and_signature_verifier.h"
 #include "chrome/browser/web_applications/model/dialog_image_info.h"
 #include "chrome/browser/web_applications/web_app_install_info.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
@@ -43,9 +43,7 @@ class WebAppInstallInfoFetcher {
       : profile_(*profile),
         provider_(*provider),
         source_(source),
-        url_info_(url_info),
-        helper_(
-            std::make_unique<IsolatedWebAppInstallCommandHelper>(url_info)) {}
+        url_info_(url_info) {}
 
   void FetchAndReply(WebAppInstalInfoCallback callback) {
     callback_ = std::move(callback);
@@ -66,8 +64,9 @@ class WebAppInstallInfoFetcher {
   }
 
   void CheckTrustAndSignatures(base::OnceClosure next_step_callback) {
-    helper_->CheckTrustAndSignatures(
-        source_, IwaMetadataReadingOperation{}, &*profile_,
+    web_app::CheckTrustAndSignatures(
+        url_info_.web_bundle_id(), source_, IwaMetadataReadingOperation{},
+        &*profile_,
         base::BindOnce(&WebAppInstallInfoFetcher::OnTrustAndSignaturesChecked,
                        weak_factory_.GetWeakPtr(),
                        std::move(next_step_callback)));
@@ -109,8 +108,6 @@ class WebAppInstallInfoFetcher {
   IwaSourceBundleWithMode source_;
   IsolatedWebAppUrlInfo url_info_;
   WebAppInstalInfoCallback callback_;
-
-  std::unique_ptr<IsolatedWebAppInstallCommandHelper> helper_;
 
   std::unique_ptr<PrepareInstallInfoJob> prepare_install_info_job_;
 

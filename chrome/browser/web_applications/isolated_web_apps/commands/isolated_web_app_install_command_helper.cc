@@ -62,14 +62,6 @@ bool IntegrityBlockDataHasRotatedKey(
          integrity_block_data->HasPublicKey(rotated_key);
 }
 
-base::expected<std::optional<SignedWebBundleIntegrityBlock>, std::string>
-ExpectedToExpectedOptional(
-    base::expected<SignedWebBundleIntegrityBlock, std::string> result) {
-  return result.transform([](SignedWebBundleIntegrityBlock value) {
-    return std::make_optional(value);
-  });
-}
-
 }  // namespace
 
 std::optional<KeyRotationData> GetKeyRotationData(
@@ -121,55 +113,6 @@ IsolatedWebAppInstallCommandHelper::IsolatedWebAppInstallCommandHelper(
 
 IsolatedWebAppInstallCommandHelper::~IsolatedWebAppInstallCommandHelper() =
     default;
-
-void IsolatedWebAppInstallCommandHelper::CheckTrustAndSignatures(
-    const IwaSourceWithMode& location,
-    const IwaOperation& operation,
-    Profile* profile,
-    base::OnceCallback<
-        void(base::expected<
-             std::optional<web_package::SignedWebBundleIntegrityBlock>,
-             std::string>)> callback) {
-  RETURN_IF_ERROR(
-      IsolatedWebAppTrustChecker::IsOperationAllowed(
-          *profile, url_info_.web_bundle_id(), location.dev_mode(), operation),
-      [&](const std::string& error) {
-        std::move(callback).Run(base::unexpected(error));
-      });
-
-  std::visit(
-      absl::Overload{
-          [&](const IwaSourceBundleWithMode& location) {
-            CHECK(!url_info_.web_bundle_id().is_for_proxy_mode());
-            ValidateSignedWebBundleSignatures(
-                profile, location.path(), url_info_.web_bundle_id(),
-                base::BindOnce(&ExpectedToExpectedOptional)
-                    .Then(std::move(callback)));
-          },
-          [&](const IwaSourceProxy& location) {
-            CHECK(url_info_.web_bundle_id().is_for_proxy_mode());
-            // Dev mode proxy mode does not use Web Bundles, hence there is no
-            // bundle to validate / trust and no signatures to check.
-            std::move(callback).Run(base::ok(std::nullopt));
-          }},
-      location.variant());
-}
-
-void IsolatedWebAppInstallCommandHelper::CheckTrustAndSignatures(
-    const IwaSourceWithMode& location,
-    const IwaOperation& operation,
-    Profile* profile,
-    base::OnceCallback<void(base::expected<void, std::string>)> callback) {
-  CheckTrustAndSignatures(
-      location, operation, profile,
-      base::BindOnce(
-          [](base::expected<
-              std::optional<web_package::SignedWebBundleIntegrityBlock>,
-              std::string> result) {
-            return result.transform([](const auto&) -> void {});
-          })
-          .Then(std::move(callback)));
-}
 
 void IsolatedWebAppInstallCommandHelper::CreateStoragePartitionIfNotPresent(
     Profile& profile) {
