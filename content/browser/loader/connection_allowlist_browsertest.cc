@@ -30,6 +30,7 @@
 #include "content/public/test/content_browser_test_utils.h"
 #include "content/public/test/prerender_test_util.h"
 #include "content/public/test/service_worker_test_helpers.h"
+#include "content/public/test/test_devtools_protocol_client.h"
 #include "content/public/test/test_navigation_observer.h"
 #include "content/public/test/url_loader_monitor.h"
 #include "content/shell/browser/shell.h"
@@ -2942,6 +2943,166 @@ IN_PROC_BROWSER_TEST_F(ConnectionAllowlistTest,
                 ? net::ERR_ABORTED
                 : net::ERR_UNSAFE_REDIRECT);
   EXPECT_FALSE(prerender_helper().GetHostForUrl(redirect_url));
+}
+
+class ConnectionAllowlistDevToolsTest : public ConnectionAllowlistTest,
+                                        public TestDevToolsProtocolClient {
+ public:
+  ConnectionAllowlistDevToolsTest() = default;
+  ~ConnectionAllowlistDevToolsTest() override = default;
+};
+
+IN_PROC_BROWSER_TEST_F(ConnectionAllowlistDevToolsTest,
+                       DevToolsLoadNetworkResourceEnforcesConnectionAllowlist) {
+  RegisterResponse(
+      kSameOriginAllowlistedPage,
+      ResponseEntry("<html><body>Hello</body></html>",
+                    {{"Connection-Allowlist", "(response-origin)"}}));
+
+  RegisterResponse(
+      "/cross-origin-resource",
+      ResponseEntry("allowed-content", {{"Access-Control-Allow-Origin", "*"}}));
+
+  ASSERT_TRUE(embedded_https_test_server().Start());
+
+  GURL main_url =
+      embedded_https_test_server().GetURL("a.test", kSameOriginAllowlistedPage);
+  GURL cross_origin_url =
+      embedded_https_test_server().GetURL("b.test", "/cross-origin-resource");
+
+  EXPECT_TRUE(NavigateToURL(shell(), main_url));
+
+  AttachToWebContents(shell()->web_contents());
+
+  SendCommandSync("Network.enable");
+
+  // Load the cross-origin resource using DevTools
+  // Network.loadNetworkResource. Since the page has Connection-Allowlist:
+  // (response-origin), which only allows connections to its own origin
+  // (a.test), the fetch to b.test via DevTools should fail/be blocked.
+  base::DictValue params;
+  params.Set("frameId", shell()
+                            ->web_contents()
+                            ->GetPrimaryMainFrame()
+                            ->GetDevToolsFrameToken()
+                            .ToString());
+  params.Set("url", cross_origin_url.spec());
+
+  base::DictValue options;
+  options.Set("disableCache", true);
+  options.Set("includeCredentials", false);
+  params.Set("options", std::move(options));
+
+  const base::DictValue* response =
+      SendCommandSync("Network.loadNetworkResource", std::move(params));
+  ASSERT_TRUE(response) << (error() ? error()->DebugString() : "Unknown error");
+
+  const base::DictValue* resource = response->FindDict("resource");
+  ASSERT_TRUE(resource);
+
+  // The request is blocked, so success should be false.
+  EXPECT_FALSE(resource->FindBool("success").value_or(true));
+
+  EXPECT_EQ(resource->FindInt("netError").value_or(0),
+            net::ERR_NETWORK_ACCESS_REVOKED);
+
+  DetachProtocolClient();
+}
+
+IN_PROC_BROWSER_TEST_F(
+    ConnectionAllowlistDevToolsTest,
+    DevToolsLoadNetworkResourceEnforcesConnectionAllowlistOnServiceWorker) {
+  RegisterResponse(
+      "/sw.js",
+      ResponseEntry(
+          "self.addEventListener('install', e => self.skipWaiting());\n"
+          "self.addEventListener('activate', e => "
+          "e.waitUntil(self.clients.claim()));\n"
+          "self.addEventListener('fetch', event => {});",
+          {{"Content-Type", "text/javascript"},
+           {"Connection-Allowlist", "(response-origin)"}}));
+
+  RegisterResponse(kSameOriginAllowlistedPage,
+                   ResponseEntry("<html><body>Hello</body></html>", {}));
+
+  RegisterResponse(
+      "/cross-origin-resource",
+      ResponseEntry("allowed-content", {{"Access-Control-Allow-Origin", "*"}}));
+
+  ASSERT_TRUE(embedded_https_test_server().Start());
+
+  GURL main_url =
+      embedded_https_test_server().GetURL("a.test", kSameOriginAllowlistedPage);
+  GURL cross_origin_url =
+      embedded_https_test_server().GetURL("b.test", "/cross-origin-resource");
+
+  EXPECT_TRUE(NavigateToURL(shell(), main_url));
+
+  AttachToWebContents(shell()->web_contents());
+
+  // Enable auto-attach to attach the Service Worker.
+  base::DictValue auto_attach_params;
+  auto_attach_params.Set("autoAttach", true);
+  auto_attach_params.Set("waitForDebuggerOnStart", false);
+  auto_attach_params.Set("flatten", true);
+  SendCommandSync("Target.setAutoAttach", std::move(auto_attach_params));
+
+  // Register and activate the Service Worker.
+  EXPECT_EQ(true, EvalJs(shell()->web_contents()->GetPrimaryMainFrame(),
+                         R"(
+              (async () => {
+                const reg = await navigator.serviceWorker.register('/sw.js');
+                await new Promise(resolve => {
+                  const worker = reg.installing || reg.waiting || reg.active;
+                  if (worker.state === 'activated') {
+                    resolve();
+                  } else {
+                    worker.addEventListener('statechange', () => {
+                      if (worker.state === 'activated') {
+                        resolve();
+                      }
+                    });
+                  }
+                });
+                return !!navigator.serviceWorker.controller;
+              })();
+            )"));
+
+  // Get session id of the service worker target.
+  auto notification = WaitForNotification("Target.attachedToTarget", true);
+  const std::string* session_id_ptr = notification.FindString("sessionId");
+  ASSERT_TRUE(session_id_ptr);
+  std::string session_id = *session_id_ptr;
+
+  SendSessionCommand("Network.enable", base::DictValue(), session_id, true);
+
+  // Load the cross-origin resource using DevTools
+  // Network.loadNetworkResource from the Service Worker target session.
+  // Since the Service Worker has Connection-Allowlist: (response-origin),
+  // which only allows connections to its own origin (a.test),
+  // the fetch to b.test via DevTools should fail/be blocked.
+  base::DictValue load_params;
+  load_params.Set("url", cross_origin_url.spec());
+
+  base::DictValue options;
+  options.Set("disableCache", true);
+  options.Set("includeCredentials", false);
+  load_params.Set("options", std::move(options));
+
+  const base::DictValue* response = SendSessionCommand(
+      "Network.loadNetworkResource", std::move(load_params), session_id, true);
+  ASSERT_TRUE(response) << (error() ? error()->DebugString() : "Unknown error");
+
+  const base::DictValue* resource = response->FindDict("resource");
+  ASSERT_TRUE(resource);
+
+  // The request is blocked, so success should be false.
+  EXPECT_FALSE(resource->FindBool("success").value_or(true));
+
+  EXPECT_EQ(resource->FindInt("netError").value_or(0),
+            net::ERR_NETWORK_ACCESS_REVOKED);
+
+  DetachProtocolClient();
 }
 
 // Verifies that if the initiating document's Connection-Allowlist blocks the
