@@ -60,9 +60,6 @@ import org.chromium.ui.modelutil.PropertyModel;
 import java.util.concurrent.TimeUnit;
 
 /** Unit tests for {@link TabVerticalViewBinder}. */
-// TODO(crbug.com/515147675): Create an instrumented RenderTest class once Pinned Tabs and
-//  Tab Group Spines are implemented, to capture pixel snapshots of the rows in all visual states
-//  (resting, selected, incognito, pinned, etc.).
 @RunWith(BaseRobolectricTestRunner.class)
 public class TabVerticalViewBinderUnitTest {
     @Rule public MockitoRule mMockitoRule = MockitoJUnit.rule();
