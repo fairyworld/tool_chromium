@@ -5470,6 +5470,15 @@ class PrefetchServiceLimitsTest
  public:
   PrefetchServiceLimitsTest() : WithPrefetchRearchParam(GetParam()) {}
 
+  void SetUp() override {
+    PrefetchServiceTestBase::SetUp();
+
+    if (base::FeatureList::IsEnabled(
+            features::kPrefetchOffTheMainThreadForceForTesting)) {
+      GTEST_SKIP() << "Prefetch limit doesn't work for PrePrefetch";
+    }
+  }
+
   void InitScopedFeatureList() override {
     InitBaseParams();
     InitRearchFeatures();
