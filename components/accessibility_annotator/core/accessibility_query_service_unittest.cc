@@ -12,8 +12,8 @@
 #include "base/test/task_environment.h"
 #include "base/test/test_future.h"
 #include "components/accessibility_annotator/core/accessibility_query_service_delegate.h"
-#include "components/accessibility_annotator/core/annotation_reducer/entry_type.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_data_provider.h"
+#include "components/accessibility_annotator/core/annotation_reducer/memory_data_type.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_search_result.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -22,7 +22,7 @@ namespace accessibility_annotator {
 
 namespace {
 
-using ::accessibility_annotator::EntryType;
+using ::accessibility_annotator::MemoryDataType;
 
 class MockAccessibilityQueryServiceDelegate
     : public AccessibilityQueryServiceDelegate {
@@ -36,7 +36,7 @@ class MockAccessibilityQueryServiceDelegate
 
 class FakeMemoryDataProvider : public MemoryDataProvider {
  public:
-  void RetrieveAll(EntryType type,
+  void RetrieveAll(MemoryDataType type,
                    base::OnceCallback<void(std::vector<MemorySearchResult>)>
                        callback) override {
     last_type_ = type;
@@ -45,7 +45,7 @@ class FakeMemoryDataProvider : public MemoryDataProvider {
   void SetResults(std::vector<MemorySearchResult> results) {
     results_ = std::move(results);
   }
-  EntryType last_type() const { return last_type_; }
+  MemoryDataType last_type() const { return last_type_; }
 
   std::string_view GetHistogramSuffix() const override {
     return "FakeMemoryDataProvider";
@@ -53,7 +53,7 @@ class FakeMemoryDataProvider : public MemoryDataProvider {
 
  private:
   std::vector<MemorySearchResult> results_;
-  EntryType last_type_ = EntryType::kUnknown;
+  MemoryDataType last_type_ = MemoryDataType::kUnknown;
 };
 
 class FakeOnePResolver : public OnePResolver {
@@ -76,7 +76,7 @@ class FakeOnePResolver : public OnePResolver {
 
 class DelayedMemoryDataProvider : public MemoryDataProvider {
  public:
-  void RetrieveAll(EntryType type,
+  void RetrieveAll(MemoryDataType type,
                    base::OnceCallback<void(std::vector<MemorySearchResult>)>
                        callback) override {
     callbacks_.push_back(std::move(callback));
@@ -151,7 +151,7 @@ TEST_F(AccessibilityQueryServiceTest, Query_Success) {
       std::move(data_provider), /*one_p_resolver=*/nullptr,
       /*remote_model_executor=*/nullptr);
 
-  MemorySearchResult result(EntryType::kNameFull, u"Name", u"John Doe");
+  MemorySearchResult result(MemoryDataType::kNameFull, u"Name", u"John Doe");
   fake_data_provider->SetResults({result});
 
   base::test::TestFuture<MemorySearchResults> future;
@@ -162,7 +162,7 @@ TEST_F(AccessibilityQueryServiceTest, Query_Success) {
   EXPECT_THAT(search_results.entries,
               testing::ElementsAre(
                   testing::Field(&MemorySearchResult::value, u"John Doe")));
-  EXPECT_EQ(fake_data_provider->last_type(), EntryType::kNameFull);
+  EXPECT_EQ(fake_data_provider->last_type(), MemoryDataType::kNameFull);
 }
 
 // Tests that the query service returns an empty list when the intent is
@@ -217,7 +217,7 @@ TEST_F(AccessibilityQueryServiceTest, Query_UnknownIntent_QueriesOnePResolver) {
       std::make_unique<FakeMemoryDataProvider>(), std::move(one_p_resolver),
       /*remote_model_executor=*/nullptr);
 
-  MemorySearchResult one_p_entry(EntryType::kUnknown, u"Custom Type",
+  MemorySearchResult one_p_entry(MemoryDataType::kUnknown, u"Custom Type",
                                  u"Some 1P Value");
   fake_one_p_resolver->set_results({one_p_entry});
 
@@ -261,7 +261,8 @@ TEST_F(AccessibilityQueryServiceTest, Query_NoLocalData_QueriesOnePResolver) {
       std::make_unique<FakeMemoryDataProvider>(), std::move(one_p_resolver),
       /*remote_model_executor=*/nullptr);
 
-  MemorySearchResult one_p_entry(EntryType::kNameFull, u"Name", u"Jane Doe");
+  MemorySearchResult one_p_entry(MemoryDataType::kNameFull, u"Name",
+                                 u"Jane Doe");
   fake_one_p_resolver->set_results({one_p_entry});
 
   base::test::TestFuture<MemorySearchResults> future;
@@ -309,9 +310,9 @@ TEST_F(AccessibilityQueryServiceTest, Query_WithFilterWords) {
       std::move(data_provider), /*one_p_resolver=*/nullptr,
       /*remote_model_executor=*/nullptr);
 
-  MemorySearchResult entry1(EntryType::kAddressFull, u"Address",
+  MemorySearchResult entry1(MemoryDataType::kAddressFull, u"Address",
                             u"123 San Diego St Home San Diego");
-  MemorySearchResult entry2(EntryType::kAddressFull, u"Address",
+  MemorySearchResult entry2(MemoryDataType::kAddressFull, u"Address",
                             u"456 Mountain View Rd Work Mountain View");
 
   fake_data_provider->SetResults({entry1, entry2});
@@ -325,7 +326,7 @@ TEST_F(AccessibilityQueryServiceTest, Query_WithFilterWords) {
   EXPECT_THAT(result.entries, testing::ElementsAre(testing::Field(
                                   &MemorySearchResult::value,
                                   u"123 San Diego St Home San Diego")));
-  EXPECT_EQ(fake_data_provider->last_type(), EntryType::kAddressFull);
+  EXPECT_EQ(fake_data_provider->last_type(), MemoryDataType::kAddressFull);
 }
 
 // Tests that the query service falls back to returning all results for the
@@ -339,7 +340,7 @@ TEST_F(AccessibilityQueryServiceTest,
       std::move(data_provider), /*one_p_resolver=*/nullptr,
       /*remote_model_executor=*/nullptr);
 
-  MemorySearchResult entry(EntryType::kAddressFull, u"Address",
+  MemorySearchResult entry(MemoryDataType::kAddressFull, u"Address",
                            u"123 San Diego St Home San Diego");
   fake_data_provider->SetResults({entry});
 
@@ -354,7 +355,7 @@ TEST_F(AccessibilityQueryServiceTest,
   EXPECT_THAT(result.entries, testing::ElementsAre(testing::Field(
                                   &MemorySearchResult::value,
                                   u"123 San Diego St Home San Diego")));
-  EXPECT_EQ(fake_data_provider->last_type(), EntryType::kAddressFull);
+  EXPECT_EQ(fake_data_provider->last_type(), MemoryDataType::kAddressFull);
 }
 
 // Tests that the query service records the provider result count metric.
@@ -368,8 +369,8 @@ TEST_F(AccessibilityQueryServiceTest, RecordsProviderResultCountMetric) {
       /*one_p_resolver=*/nullptr,
       /*remote_model_executor=*/nullptr);
 
-  MemorySearchResult result1(EntryType::kNameFull, u"Name", u"John Doe");
-  MemorySearchResult result2(EntryType::kNameFull, u"Name", u"Jane Doe");
+  MemorySearchResult result1(MemoryDataType::kNameFull, u"Name", u"John Doe");
+  MemorySearchResult result2(MemoryDataType::kNameFull, u"Name", u"Jane Doe");
   fake_data_provider->SetResults({result1, result2});
 
   base::test::TestFuture<MemorySearchResults> future;
@@ -398,11 +399,11 @@ TEST_F(AccessibilityQueryServiceTest,
       std::move(data_provider), std::move(one_p_resolver),
       /*remote_model_executor=*/nullptr);
 
-  MemorySearchResult local_entry(EntryType::kAddressFull, u"Address",
+  MemorySearchResult local_entry(MemoryDataType::kAddressFull, u"Address",
                                  u"123 San Diego St Home San Diego");
   fake_data_provider->SetResults({local_entry});
 
-  MemorySearchResult one_p_entry(EntryType::kAddressFull, u"Address",
+  MemorySearchResult one_p_entry(MemoryDataType::kAddressFull, u"Address",
                                  u"456 New York Ave Home New York");
   fake_one_p_resolver->set_results({one_p_entry});
 
@@ -436,7 +437,7 @@ TEST_F(AccessibilityQueryServiceTest,
       std::move(data_provider), std::move(one_p_resolver),
       /*remote_model_executor=*/nullptr);
 
-  MemorySearchResult local_entry(EntryType::kAddressFull, u"Address",
+  MemorySearchResult local_entry(MemoryDataType::kAddressFull, u"Address",
                                  u"123 San Diego St Home San Diego");
   fake_data_provider->SetResults({local_entry});
 
@@ -470,10 +471,12 @@ TEST_F(AccessibilityQueryServiceTest, Query_NoOnePIfLocalDataFound) {
       std::move(data_provider), std::move(one_p_resolver),
       /*remote_model_executor=*/nullptr);
 
-  MemorySearchResult local_entry(EntryType::kNameFull, u"Name", u"John Doe");
+  MemorySearchResult local_entry(MemoryDataType::kNameFull, u"Name",
+                                 u"John Doe");
   fake_data_provider->SetResults({local_entry});
 
-  MemorySearchResult one_p_entry(EntryType::kNameFull, u"Name", u"Jane Doe");
+  MemorySearchResult one_p_entry(MemoryDataType::kNameFull, u"Name",
+                                 u"Jane Doe");
   fake_one_p_resolver->set_results({one_p_entry});
 
   base::test::TestFuture<MemorySearchResults> future;
@@ -529,11 +532,11 @@ TEST_F(AccessibilityQueryServiceTest,
       std::move(data_provider1), /*one_p_resolver=*/nullptr,
       /*remote_model_executor=*/nullptr);
 
-  MemorySearchResult result1(EntryType::kNameFull, u"Name", u"Alice");
-  MemorySearchResult result2(EntryType::kNameFull, u"Name", u"Bob");
-  MemorySearchResult result3(EntryType::kNameFull, u"Name",
+  MemorySearchResult result1(MemoryDataType::kNameFull, u"Name", u"Alice");
+  MemorySearchResult result2(MemoryDataType::kNameFull, u"Name", u"Bob");
+  MemorySearchResult result3(MemoryDataType::kNameFull, u"Name",
                              u"Alice");  // duplicate of result1
-  MemorySearchResult result4(EntryType::kNameFull, u"Name", u"Charlie");
+  MemorySearchResult result4(MemoryDataType::kNameFull, u"Name", u"Charlie");
 
   fake_data_provider1->SetResults({result1, result2, result3, result4});
 
@@ -561,15 +564,15 @@ TEST_F(AccessibilityQueryServiceTest,
       std::move(data_provider1), /*one_p_resolver=*/nullptr,
       /*remote_model_executor=*/nullptr);
 
-  EntryMetadata metadata(EntryType::kAddressCity, u"City", u"San Diego");
+  EntryMetadata metadata(MemoryDataType::kAddressCity, u"City", u"San Diego");
 
-  MemorySearchResult result1(EntryType::kNameFull, u"Name", u"John Doe",
+  MemorySearchResult result1(MemoryDataType::kNameFull, u"Name", u"John Doe",
                              /*confidence_score=*/0.9);
   result1.metadata_list.push_back(metadata);
   result1.sources.push_back(
       MemoryEntrySource(MemoryEntrySourceType::kAutofill));
 
-  MemorySearchResult result2(EntryType::kNameFull, u"Name", u"John Doe",
+  MemorySearchResult result2(MemoryDataType::kNameFull, u"Name", u"John Doe",
                              /*confidence_score=*/0.5);
   result2.metadata_list.push_back(metadata);
   result2.sources.push_back(MemoryEntrySource(MemoryEntrySourceType::kGmail));
@@ -604,22 +607,23 @@ TEST_F(AccessibilityQueryServiceTest,
       std::move(data_provider1), /*one_p_resolver=*/nullptr,
       /*remote_model_executor=*/nullptr);
 
-  EntryMetadata metadata_sd(EntryType::kAddressCity, u"City", u"San Diego");
-  EntryMetadata metadata_ny(EntryType::kAddressCity, u"City", u"New York");
+  EntryMetadata metadata_sd(MemoryDataType::kAddressCity, u"City",
+                            u"San Diego");
+  EntryMetadata metadata_ny(MemoryDataType::kAddressCity, u"City", u"New York");
 
   // Same value, different metadata
-  MemorySearchResult result1(EntryType::kNameFull, u"Name", u"John Doe");
+  MemorySearchResult result1(MemoryDataType::kNameFull, u"Name", u"John Doe");
   result1.metadata_list.push_back(metadata_sd);
 
-  MemorySearchResult result2(EntryType::kNameFull, u"Name", u"John Doe");
+  MemorySearchResult result2(MemoryDataType::kNameFull, u"Name", u"John Doe");
   result2.metadata_list.push_back(metadata_ny);
 
   // Different value, same metadata
-  MemorySearchResult result3(EntryType::kNameFull, u"Name", u"Jane Doe");
+  MemorySearchResult result3(MemoryDataType::kNameFull, u"Name", u"Jane Doe");
   result3.metadata_list.push_back(metadata_sd);
 
   // Same value and metadata, different type
-  MemorySearchResult result4(EntryType::kUnknown, u"Unknown", u"John Doe");
+  MemorySearchResult result4(MemoryDataType::kUnknown, u"Unknown", u"John Doe");
   result4.metadata_list.push_back(metadata_sd);
 
   fake_data_provider1->SetResults({result1, result2, result3, result4});
@@ -633,22 +637,22 @@ TEST_F(AccessibilityQueryServiceTest,
   EXPECT_EQ(result.entries[0].value, u"John Doe");
   ASSERT_EQ(result.entries[0].metadata_list.size(), 1u);
   EXPECT_EQ(result.entries[0].metadata_list[0].value, u"San Diego");
-  EXPECT_EQ(result.entries[0].type, EntryType::kNameFull);
+  EXPECT_EQ(result.entries[0].type, MemoryDataType::kNameFull);
 
   EXPECT_EQ(result.entries[1].value, u"John Doe");
   ASSERT_EQ(result.entries[1].metadata_list.size(), 1u);
   EXPECT_EQ(result.entries[1].metadata_list[0].value, u"New York");
-  EXPECT_EQ(result.entries[1].type, EntryType::kNameFull);
+  EXPECT_EQ(result.entries[1].type, MemoryDataType::kNameFull);
 
   EXPECT_EQ(result.entries[2].value, u"Jane Doe");
   ASSERT_EQ(result.entries[2].metadata_list.size(), 1u);
   EXPECT_EQ(result.entries[2].metadata_list[0].value, u"San Diego");
-  EXPECT_EQ(result.entries[2].type, EntryType::kNameFull);
+  EXPECT_EQ(result.entries[2].type, MemoryDataType::kNameFull);
 
   EXPECT_EQ(result.entries[3].value, u"John Doe");
   ASSERT_EQ(result.entries[3].metadata_list.size(), 1u);
   EXPECT_EQ(result.entries[3].metadata_list[0].value, u"San Diego");
-  EXPECT_EQ(result.entries[3].type, EntryType::kUnknown);
+  EXPECT_EQ(result.entries[3].type, MemoryDataType::kUnknown);
 }
 
 }  // namespace

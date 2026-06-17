@@ -16,7 +16,7 @@
 #include "base/test/task_environment.h"
 #include "base/test/test_future.h"
 #include "base/types/expected.h"
-#include "components/accessibility_annotator/core/annotation_reducer/entry_type.h"
+#include "components/accessibility_annotator/core/annotation_reducer/memory_data_type.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_search_result.h"
 #include "components/personal_context/core/mock_personal_context_service.h"
 #include "components/personal_context/proto/features/at_memory.pb.h"
@@ -149,7 +149,7 @@ TEST_F(PersonalContextResolverImplTest,
 
   std::vector<MemorySearchResult> parsed_results = future.Get();
   ASSERT_EQ(parsed_results.size(), 1u);
-  EXPECT_EQ(parsed_results[0].type, EntryType::kNameFull);
+  EXPECT_EQ(parsed_results[0].type, MemoryDataType::kNameFull);
   EXPECT_EQ(parsed_results[0].value, u"John Doe");
   EXPECT_DOUBLE_EQ(parsed_results[0].confidence_score, 1.0);
 
@@ -162,7 +162,7 @@ TEST_F(PersonalContextResolverImplTest,
             "http://photos.google.com/item/2");
 
   ASSERT_EQ(parsed_results[0].metadata_list.size(), 1u);
-  EXPECT_EQ(parsed_results[0].metadata_list[0].type, EntryType::kEmail);
+  EXPECT_EQ(parsed_results[0].metadata_list[0].type, MemoryDataType::kEmail);
   EXPECT_EQ(parsed_results[0].metadata_list[0].value, u"johndoe@example.com");
 }
 

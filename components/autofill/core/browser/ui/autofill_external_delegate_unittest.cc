@@ -850,11 +850,12 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryFlyoutChildrenFirstPartySources) {
 
   std::vector<accessibility_annotator::MemorySearchResult> entries;
   accessibility_annotator::MemorySearchResult entry(
-      accessibility_annotator::EntryType::kUnknown, u"Shoe size", u"42");
-  entry.metadata_list.emplace_back(accessibility_annotator::EntryType::kUnknown,
-                                   u"Store", u"example.com");
+      accessibility_annotator::MemoryDataType::kUnknown, u"Shoe size", u"42");
   entry.metadata_list.emplace_back(
-      accessibility_annotator::EntryType::kNameFull, u"Name",
+      accessibility_annotator::MemoryDataType::kUnknown, u"Store",
+      u"example.com");
+  entry.metadata_list.emplace_back(
+      accessibility_annotator::MemoryDataType::kNameFull, u"Name",
       u"Marian Paździoch");
   entry.sources.emplace_back(
       accessibility_annotator::MemoryEntrySourceType::kGmail);
@@ -898,13 +899,13 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryFlyoutChildrenAutofillSource) {
 
   std::vector<accessibility_annotator::MemorySearchResult> entries;
   accessibility_annotator::MemorySearchResult entry(
-      accessibility_annotator::EntryType::kAddressFull, u"Address",
+      accessibility_annotator::MemoryDataType::kAddressFull, u"Address",
       u"1600 Amphitheatre Pkwy");
   entry.metadata_list.emplace_back(
-      accessibility_annotator::EntryType::kAddressCity, u"City",
+      accessibility_annotator::MemoryDataType::kAddressCity, u"City",
       u"Mountain View");
   entry.metadata_list.emplace_back(
-      accessibility_annotator::EntryType::kAddressState, u"State", u"CA");
+      accessibility_annotator::MemoryDataType::kAddressState, u"State", u"CA");
   entry.sources.emplace_back(
       accessibility_annotator::MemoryEntrySourceType::kAutofill);
   entries.push_back(std::move(entry));
@@ -950,7 +951,7 @@ TEST_F(AutofillExternalDelegateTest,
 
   std::vector<accessibility_annotator::MemorySearchResult> entries1;
   accessibility_annotator::MemorySearchResult entry(
-      accessibility_annotator::EntryType::kAddressFull, u"Address",
+      accessibility_annotator::MemoryDataType::kAddressFull, u"Address",
       u"1600 Amphitheatre Pkwy");
   entries1.push_back(std::move(entry));
 
@@ -998,7 +999,7 @@ TEST_F(AutofillExternalDelegateTest,
 
   // Now simulate results arriving for the second query.
   std::vector<accessibility_annotator::MemorySearchResult> entries2;
-  entries2.emplace_back(accessibility_annotator::EntryType::kAddressFull,
+  entries2.emplace_back(accessibility_annotator::MemoryDataType::kAddressFull,
                         u"Address", u"1600 Amphitheatre Pkwy NW");
   accessibility_annotator::MemorySearchResults search_results2(
       accessibility_annotator::MemorySearchStatus::kFinalResponseSuccess,
@@ -1036,7 +1037,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryPartialResponseKeepsSearching) {
 
   // Simulate first result arriving with kPartialResponseSuccess.
   std::vector<accessibility_annotator::MemorySearchResult> entries1;
-  entries1.emplace_back(accessibility_annotator::EntryType::kAddressFull,
+  entries1.emplace_back(accessibility_annotator::MemoryDataType::kAddressFull,
                         u"Address", u"1600 Amphitheatre Pkwy");
   accessibility_annotator::MemorySearchResults search_results1(
       accessibility_annotator::MemorySearchStatus::kPartialResponseSuccess,
@@ -1053,7 +1054,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryPartialResponseKeepsSearching) {
 
   // Simulate second results arriving for the same query (e.g. final results).
   std::vector<accessibility_annotator::MemorySearchResult> entries2;
-  entries2.emplace_back(accessibility_annotator::EntryType::kAddressFull,
+  entries2.emplace_back(accessibility_annotator::MemoryDataType::kAddressFull,
                         u"Address", u"1600 Amphitheatre Pkwy NW");
   accessibility_annotator::MemorySearchResults search_results2(
       accessibility_annotator::MemorySearchStatus::kFinalResponseSuccess,
@@ -1094,7 +1095,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryFinalResponseStopsSearching) {
 
   // Simulate first result arriving with kFinalResponseSuccess.
   std::vector<accessibility_annotator::MemorySearchResult> entries1;
-  entries1.emplace_back(accessibility_annotator::EntryType::kAddressFull,
+  entries1.emplace_back(accessibility_annotator::MemoryDataType::kAddressFull,
                         u"Address", u"1600 Amphitheatre Pkwy");
   accessibility_annotator::MemorySearchResults search_results1(
       accessibility_annotator::MemorySearchStatus::kFinalResponseSuccess,
@@ -1111,7 +1112,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryFinalResponseStopsSearching) {
 
   // Simulate second results arriving for the same query.
   std::vector<accessibility_annotator::MemorySearchResult> entries2;
-  entries2.emplace_back(accessibility_annotator::EntryType::kAddressFull,
+  entries2.emplace_back(accessibility_annotator::MemoryDataType::kAddressFull,
                         u"Address", u"1600 Amphitheatre Pkwy NW");
   accessibility_annotator::MemorySearchResults search_results2(
       accessibility_annotator::MemorySearchStatus::kFinalResponseSuccess,
@@ -1156,7 +1157,7 @@ TEST_F(AutofillExternalDelegateTest,
 
   // Now simulate late results arriving for the first query.
   std::vector<accessibility_annotator::MemorySearchResult> entries;
-  entries.emplace_back(accessibility_annotator::EntryType::kAddressFull,
+  entries.emplace_back(accessibility_annotator::MemoryDataType::kAddressFull,
                        u"Address", u"1600 Amphitheatre Pkwy");
   accessibility_annotator::MemorySearchResults search_results(
       accessibility_annotator::MemorySearchStatus::kFinalResponseSuccess,
@@ -1205,7 +1206,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryStaleResponseIgnored) {
 
   // Now simulate results arriving for the FIRST query.
   std::vector<accessibility_annotator::MemorySearchResult> entries1;
-  entries1.emplace_back(accessibility_annotator::EntryType::kAddressFull,
+  entries1.emplace_back(accessibility_annotator::MemoryDataType::kAddressFull,
                         u"Address", u"1600 Amphitheatre Pkwy");
   accessibility_annotator::MemorySearchResults search_results1(
       accessibility_annotator::MemorySearchStatus::kFinalResponseSuccess,
@@ -1222,7 +1223,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryStaleResponseIgnored) {
 
   // Now simulate results arriving for the SECOND query.
   std::vector<accessibility_annotator::MemorySearchResult> entries2;
-  entries2.emplace_back(accessibility_annotator::EntryType::kAddressFull,
+  entries2.emplace_back(accessibility_annotator::MemoryDataType::kAddressFull,
                         u"Address", u"1600 Amphitheatre Pkwy NW");
   accessibility_annotator::MemorySearchResults search_results2(
       accessibility_annotator::MemorySearchStatus::kFinalResponseSuccess,
@@ -3918,7 +3919,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemorySearchResult_UsesSpecialAction) {
   StartAtMemorySession();
   Suggestion suggestion(u"some result", SuggestionType::kAtMemorySearchResult);
   suggestion.payload = Suggestion::AtMemoryPayload(
-      u"pasted text", accessibility_annotator::EntryType::kUnknown);
+      u"pasted text", accessibility_annotator::MemoryDataType::kUnknown);
 
   // 1. Test Preview
   EXPECT_CALL(
@@ -3950,9 +3951,10 @@ TEST_F(AutofillExternalDelegateTest, AtMemorySearchResult_RevealsIban) {
 
   Suggestion::AtMemoryPayload at_memory_payload(
       iban.GetIdentifierStringForAutofillDisplay(),
-      accessibility_annotator::EntryType::kIban);
+      accessibility_annotator::MemoryDataType::kIban);
   at_memory_payload.identifier = Iban::Guid(iban.guid());
-  at_memory_payload.entry_type = accessibility_annotator::EntryType::kIban;
+  at_memory_payload.memory_data_type =
+      accessibility_annotator::MemoryDataType::kIban;
   suggestion.payload = std::move(at_memory_payload);
 
   EXPECT_CALL(*payments_autofill_client().GetIbanAccessManager(), FetchValue)
@@ -3982,10 +3984,10 @@ TEST_F(AutofillExternalDelegateTest, AtMemorySearchResult_RevealsCreditCard) {
   Suggestion suggestion(u"some result", SuggestionType::kAtMemorySearchResult);
 
   Suggestion::AtMemoryPayload at_memory_payload(
-      u"some text", accessibility_annotator::EntryType::kCreditCardNumber);
+      u"some text", accessibility_annotator::MemoryDataType::kCreditCardNumber);
   at_memory_payload.identifier = card.guid();
-  at_memory_payload.entry_type =
-      accessibility_annotator::EntryType::kCreditCardNumber;
+  at_memory_payload.memory_data_type =
+      accessibility_annotator::MemoryDataType::kCreditCardNumber;
   suggestion.payload = std::move(at_memory_payload);
 
   TestCreditCardAccessManager* access_manager =
@@ -4025,10 +4027,10 @@ TEST_F(AutofillExternalDelegateTest, AtMemorySearchResult_RevealsAutofillAi) {
   Suggestion suggestion(u"some result", SuggestionType::kAtMemorySearchResult);
 
   Suggestion::AtMemoryPayload at_memory_payload(
-      u"some text", accessibility_annotator::EntryType::kPassportNumber);
+      u"some text", accessibility_annotator::MemoryDataType::kPassportNumber);
   at_memory_payload.identifier = passport.guid();
-  at_memory_payload.entry_type =
-      accessibility_annotator::EntryType::kPassportNumber;
+  at_memory_payload.memory_data_type =
+      accessibility_annotator::MemoryDataType::kPassportNumber;
   suggestion.payload = std::move(at_memory_payload);
 
   base::optional_ref<const AttributeInstance> passport_attribute =
@@ -4068,10 +4070,10 @@ TEST_F(AutofillExternalDelegateWithWalletPrivatePassesTest,
   Suggestion suggestion(u"some result", SuggestionType::kAtMemorySearchResult);
 
   Suggestion::AtMemoryPayload at_memory_payload(
-      u"some text", accessibility_annotator::EntryType::kPassportNumber);
+      u"some text", accessibility_annotator::MemoryDataType::kPassportNumber);
   at_memory_payload.identifier = masked_passport.guid();
-  at_memory_payload.entry_type =
-      accessibility_annotator::EntryType::kPassportNumber;
+  at_memory_payload.memory_data_type =
+      accessibility_annotator::MemoryDataType::kPassportNumber;
   suggestion.payload = std::move(at_memory_payload);
 
   base::optional_ref<const AttributeInstance> passport_attribute =

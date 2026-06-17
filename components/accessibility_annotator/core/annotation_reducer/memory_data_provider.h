@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "base/functional/callback.h"
-#include "components/accessibility_annotator/core/annotation_reducer/entry_type.h"
+#include "components/accessibility_annotator/core/annotation_reducer/memory_data_type.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_search_result.h"
 
 namespace accessibility_annotator {
@@ -22,7 +22,7 @@ class MemoryDataProvider {
 
   // Retrieves all data entries for a given entry type.
   virtual void RetrieveAll(
-      EntryType type,
+      MemoryDataType type,
       base::OnceCallback<void(std::vector<MemorySearchResult>)> callback) = 0;
 
   // Returns a unique suffix to identify the provider in histograms. If this

@@ -48,14 +48,14 @@ source_set("personal_context_resolver") {
 
 source_set("annotation_reducer") {
   sources = [
-    "entry_type.h",
-    "entry_type_util.cc",
-    "entry_type_util.h",
     "ingested_content_annotation.cc",
     "ingested_content_annotation.h",
     "ingested_content_annotation_utils.cc",
     "ingested_content_annotation_utils.h",
     "memory_data_provider.h",
+    "memory_data_type.h",
+    "memory_data_type_util.cc",
+    "memory_data_type_util.h",
     "memory_search_result.cc",
     "memory_search_result.h",
     "query_classifier.cc",
@@ -77,8 +77,8 @@ source_set("annotation_reducer") {
 source_set("unit_tests") {
   testonly = true
   sources = [
-    "entry_type_util_unittest.cc",
     "ingested_content_annotation_utils_unittest.cc",
+    "memory_data_type_util_unittest.cc",
     "memory_search_result_unittest.cc",
     "personal_context_resolver_impl_unittest.cc",
     "query_classifier_unittest.cc",

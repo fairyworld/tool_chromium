@@ -17,8 +17,8 @@
 #include "base/metrics/histogram_functions.h"
 #include "base/strings/strcat.h"
 #include "base/strings/string_util.h"
-#include "components/accessibility_annotator/core/annotation_reducer/entry_type.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_data_provider.h"
+#include "components/accessibility_annotator/core/annotation_reducer/memory_data_type.h"
 #include "components/accessibility_annotator/core/annotation_reducer/one_p_resolver.h"
 #include "components/accessibility_annotator/core/annotation_reducer/query_classifier.h"
 
@@ -137,14 +137,14 @@ void AccessibilityQueryService::OnClassificationComplete(
     ClassifiedQuery classified_query) {
   // If the classifier couldn't figure out what the user is asking for, we try
   // the 1P resolver as a fallback.
-  if (classified_query.intent == EntryType::kUnknown) {
+  if (classified_query.intent == MemoryDataType::kUnknown) {
     QueryOnePResolver(std::move(query), update_callback,
                       /*fallback_entries=*/{},
                       MemorySearchStatus::kUnsupportedQuery);
     return;
   }
 
-  EntryType intent = classified_query.intent;
+  MemoryDataType intent = classified_query.intent;
 
   auto callback =
       base::BindOnce(&AccessibilityQueryService::OnDataRetrieved,

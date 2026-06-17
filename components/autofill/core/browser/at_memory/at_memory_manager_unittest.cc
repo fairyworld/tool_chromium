@@ -161,15 +161,15 @@ class AtMemoryManagerTest : public testing::Test,
 };
 
 Matcher<Suggestion> EqualsAtMemorySuggestion(
-    accessibility_annotator::EntryType entry_type,
+    accessibility_annotator::MemoryDataType memory_data_type,
     Matcher<std::vector<Suggestion>> children_matcher = IsEmpty()) {
   return AllOf(
       Field(&Suggestion::type, SuggestionType::kAtMemorySearchResult),
       ResultOf(
           [](const Suggestion& s) {
-            return s.GetPayload<Suggestion::AtMemoryPayload>().entry_type;
+            return s.GetPayload<Suggestion::AtMemoryPayload>().memory_data_type;
           },
-          entry_type),
+          memory_data_type),
       Field(&Suggestion::children, children_matcher));
 }
 
@@ -240,7 +240,7 @@ TEST_F(AtMemoryManagerTest,
 
   // Simulate search results returning from the query service.
   std::vector<accessibility_annotator::MemorySearchResult> entries;
-  entries.emplace_back(accessibility_annotator::EntryType::kAddressFull,
+  entries.emplace_back(accessibility_annotator::MemoryDataType::kAddressFull,
                        u"Address", u"Full Address");
   accessibility_annotator::MemorySearchResults results(
       accessibility_annotator::MemorySearchStatus::kFinalResponseSuccess,
@@ -288,7 +288,7 @@ TEST_F(AtMemoryManagerTest, FillSensitiveAutofillAiData_AttributeSuccess) {
   Suggestion suggestion(u"some result", SuggestionType::kAtMemorySearchResult);
 
   Suggestion::AtMemoryPayload at_memory_payload(
-      u"some text", accessibility_annotator::EntryType::kPassportNumber);
+      u"some text", accessibility_annotator::MemoryDataType::kPassportNumber);
   at_memory_payload.identifier = passport.guid();
   suggestion.payload = std::move(at_memory_payload);
 
@@ -350,7 +350,7 @@ TEST_F(AtMemoryManagerTest, FillSensitiveAutofillAiData_EntitySuccess) {
   Suggestion suggestion(u"some result", SuggestionType::kAtMemorySearchResult);
 
   Suggestion::AtMemoryPayload at_memory_payload(
-      u"some text", accessibility_annotator::EntryType::kPassportFull);
+      u"some text", accessibility_annotator::MemoryDataType::kPassportFull);
   at_memory_payload.identifier = passport.guid();
   suggestion.payload = std::move(at_memory_payload);
 
@@ -419,7 +419,7 @@ TEST_F(AtMemoryManagerTest, FillSensitiveAutofillAiData_FetchFailed) {
   Suggestion suggestion(u"some result", SuggestionType::kAtMemorySearchResult);
 
   Suggestion::AtMemoryPayload at_memory_payload(
-      u"some text", accessibility_annotator::EntryType::kPassportNumber);
+      u"some text", accessibility_annotator::MemoryDataType::kPassportNumber);
   at_memory_payload.identifier = passport.guid();
   suggestion.payload = std::move(at_memory_payload);
 
@@ -473,19 +473,19 @@ TEST_F(AtMemoryManagerTest, FiltersSpiiInInsecureContext) {
 
   std::vector<accessibility_annotator::MemorySearchResult> entries;
   // Non-SPII entry.
-  entries.emplace_back(accessibility_annotator::EntryType::kAddressFull,
+  entries.emplace_back(accessibility_annotator::MemoryDataType::kAddressFull,
                        u"Address", u"Full Address");
   // SPII entry.
-  entries.emplace_back(accessibility_annotator::EntryType::kPassportNumber,
+  entries.emplace_back(accessibility_annotator::MemoryDataType::kPassportNumber,
                        u"IBAN", u"1234");
 
   // Non-SPII entry with mixed metadata.
   accessibility_annotator::MemorySearchResult mixed_entry(
-      accessibility_annotator::EntryType::kPhone, u"Phone", u"123");
+      accessibility_annotator::MemoryDataType::kPhone, u"Phone", u"123");
   mixed_entry.metadata_list.emplace_back(
-      accessibility_annotator::EntryType::kPhone, u"Phone meta", u"123");
+      accessibility_annotator::MemoryDataType::kPhone, u"Phone meta", u"123");
   mixed_entry.metadata_list.emplace_back(
-      accessibility_annotator::EntryType::kPassportNumber, u"IBAN meta",
+      accessibility_annotator::MemoryDataType::kPassportNumber, u"IBAN meta",
       u"1234");
   entries.push_back(std::move(mixed_entry));
 
@@ -498,11 +498,11 @@ TEST_F(AtMemoryManagerTest, FiltersSpiiInInsecureContext) {
   EXPECT_THAT(
       resulting_suggestions,
       ElementsAre(EqualsAtMemorySuggestion(
-                      accessibility_annotator::EntryType::kAddressFull),
+                      accessibility_annotator::MemoryDataType::kAddressFull),
                   EqualsAtMemorySuggestion(
-                      accessibility_annotator::EntryType::kPhone,
+                      accessibility_annotator::MemoryDataType::kPhone,
                       ElementsAre(EqualsAtMemorySuggestion(
-                          accessibility_annotator::EntryType::kPhone)))));
+                          accessibility_annotator::MemoryDataType::kPhone)))));
 }
 
 // Tests that SPII entries and metadata are retained in the search results
@@ -527,19 +527,19 @@ TEST_F(AtMemoryManagerTest, KeepsSpiiInSecureContext) {
 
   std::vector<accessibility_annotator::MemorySearchResult> entries;
   // Non-SPII entry.
-  entries.emplace_back(accessibility_annotator::EntryType::kAddressFull,
+  entries.emplace_back(accessibility_annotator::MemoryDataType::kAddressFull,
                        u"Address", u"Full Address");
   // SPII entry.
-  entries.emplace_back(accessibility_annotator::EntryType::kPassportNumber,
+  entries.emplace_back(accessibility_annotator::MemoryDataType::kPassportNumber,
                        u"IBAN", u"1234");
 
   // Non-SPII entry with mixed metadata.
   accessibility_annotator::MemorySearchResult mixed_entry(
-      accessibility_annotator::EntryType::kPhone, u"Phone", u"123");
+      accessibility_annotator::MemoryDataType::kPhone, u"Phone", u"123");
   mixed_entry.metadata_list.emplace_back(
-      accessibility_annotator::EntryType::kPhone, u"Phone meta", u"123");
+      accessibility_annotator::MemoryDataType::kPhone, u"Phone meta", u"123");
   mixed_entry.metadata_list.emplace_back(
-      accessibility_annotator::EntryType::kPassportNumber, u"IBAN meta",
+      accessibility_annotator::MemoryDataType::kPassportNumber, u"IBAN meta",
       u"1234");
   entries.push_back(std::move(mixed_entry));
 
@@ -553,16 +553,16 @@ TEST_F(AtMemoryManagerTest, KeepsSpiiInSecureContext) {
       resulting_suggestions,
       ElementsAre(
           EqualsAtMemorySuggestion(
-              accessibility_annotator::EntryType::kAddressFull),
+              accessibility_annotator::MemoryDataType::kAddressFull),
           EqualsAtMemorySuggestion(
-              accessibility_annotator::EntryType::kPassportNumber),
+              accessibility_annotator::MemoryDataType::kPassportNumber),
           EqualsAtMemorySuggestion(
-              accessibility_annotator::EntryType::kPhone,
-              ElementsAre(
-                  EqualsAtMemorySuggestion(
-                      accessibility_annotator::EntryType::kPhone),
-                  EqualsAtMemorySuggestion(
-                      accessibility_annotator::EntryType::kPassportNumber)))));
+              accessibility_annotator::MemoryDataType::kPhone,
+              ElementsAre(EqualsAtMemorySuggestion(
+                              accessibility_annotator::MemoryDataType::kPhone),
+                          EqualsAtMemorySuggestion(
+                              accessibility_annotator::MemoryDataType::
+                                  kPassportNumber)))));
 }
 
 // Tests that non-SPII data fills correctly and records the funnel metrics.
@@ -580,7 +580,7 @@ TEST_F(AtMemoryManagerTest, FillNonSensitiveData_Success) {
   Suggestion suggestion(u"some result", SuggestionType::kAtMemorySearchResult);
 
   Suggestion::AtMemoryPayload at_memory_payload(
-      u"John Doe", accessibility_annotator::EntryType::kNameFull);
+      u"John Doe", accessibility_annotator::MemoryDataType::kNameFull);
   suggestion.payload = std::move(at_memory_payload);
 
   std::u16string expected_value = u"John Doe";
@@ -617,7 +617,7 @@ TEST_F(AtMemoryManagerTest, FillOverlappingPopups) {
   Suggestion suggestion(u"some result", SuggestionType::kAtMemorySearchResult);
 
   Suggestion::AtMemoryPayload at_memory_payload(
-      u"some text", accessibility_annotator::EntryType::kIban);
+      u"some text", accessibility_annotator::MemoryDataType::kIban);
   at_memory_payload.identifier =
       Iban::Guid("12345678-1234-1234-1234-123456789012");
   suggestion.payload = std::move(at_memory_payload);

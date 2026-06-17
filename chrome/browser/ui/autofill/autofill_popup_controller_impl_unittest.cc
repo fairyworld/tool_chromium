@@ -100,7 +100,7 @@ class AutofillPopupControllerImplTest
     // 1. Prepare the backend mock results.
     std::vector<accessibility_annotator::MemorySearchResult> entries;
     for (const auto& value : results) {
-      entries.emplace_back(accessibility_annotator::EntryType::kNameFull,
+      entries.emplace_back(accessibility_annotator::MemoryDataType::kNameFull,
                            u"Name", value);
     }
     accessibility_annotator::MemorySearchResults search_results(

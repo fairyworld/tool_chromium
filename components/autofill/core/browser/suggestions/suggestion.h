@@ -23,7 +23,7 @@
 #include "base/memory/raw_ptr.h"
 #include "base/types/strong_alias.h"
 #include "build/build_config.h"
-#include "components/accessibility_annotator/core/annotation_reducer/entry_type.h"
+#include "components/accessibility_annotator/core/annotation_reducer/memory_data_type.h"
 #include "components/autofill/core/browser/data_model/autofill_ai/entity_instance.h"
 #include "components/autofill/core/browser/data_model/payments/bnpl_issuer.h"
 #include "components/autofill/core/browser/data_model/payments/iban.h"
@@ -207,7 +207,7 @@ struct Suggestion {
     AtMemoryPayload();
     // `value` is the value to be shown in the suggestion UI and the preview.
     AtMemoryPayload(std::u16string value,
-                    accessibility_annotator::EntryType entry_type);
+                    accessibility_annotator::MemoryDataType memory_data_type);
     AtMemoryPayload(const AtMemoryPayload&);
     AtMemoryPayload(AtMemoryPayload&&);
     AtMemoryPayload& operator=(const AtMemoryPayload&);
@@ -224,8 +224,8 @@ struct Suggestion {
     Identifier identifier;
 
     // The type of the entry from accessibility annotator.
-    accessibility_annotator::EntryType entry_type =
-        accessibility_annotator::EntryType::kUnknown;
+    accessibility_annotator::MemoryDataType memory_data_type =
+        accessibility_annotator::MemoryDataType::kUnknown;
   };
 
   struct OpenGeminiPayload final {
