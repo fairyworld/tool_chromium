@@ -3876,6 +3876,8 @@ data/accessibility/html/custom-element-empty-slot.html
 data/accessibility/html/custom-element-expected-blink.txt
 data/accessibility/html/custom-element-hidden-expected-blink.txt
 data/accessibility/html/custom-element-hidden.html
+data/accessibility/html/custom-element-nested-slots-aria-expected-blink.txt
+data/accessibility/html/custom-element-nested-slots-aria.html
 data/accessibility/html/custom-element-nested-slots-expected-auralinux.txt
 data/accessibility/html/custom-element-nested-slots-expected-blink.txt
 data/accessibility/html/custom-element-nested-slots.html
