@@ -4,13 +4,13 @@
 
 #include "components/passage_embeddings/core/passage_embeddings_service_controller.h"
 
-#include <ranges>
+#include <algorithm>
+#include <utility>
 
 #include "base/functional/bind.h"
 #include "base/functional/callback_helpers.h"
 #include "base/logging.h"
 #include "base/metrics/histogram_functions.h"
-#include "base/not_fatal_until.h"
 #include "base/notreached.h"
 #include "base/task/thread_pool.h"
 #include "components/optimization_guide/core/optimization_guide_util.h"
@@ -227,7 +227,8 @@ void PassageEmbeddingsServiceController::GetEmbeddings(
     base::ElapsedTimer service_launch_timer;
     MaybeLaunchService();
 
-    auto receiver = embedder_remote_.BindNewPipeAndPassReceiver();
+    mojo::PendingReceiver<mojom::PassageEmbedder> receiver =
+        embedder_remote_.BindNewPipeAndPassReceiver();
     // Unretained is safe because `this` owns `embedder_remote_`, which
     // synchronously calls the disconnect and idle handlers.
     embedder_remote_.set_disconnect_handler(
@@ -249,14 +250,18 @@ void PassageEmbeddingsServiceController::GetEmbeddings(
 
   pending_requests_.push_back(next_request_id_);
   base::ElapsedTimer generate_embeddings_timer;
+  std::pair<GetEmbeddingsResultCallback, GetEmbeddingsResultCallback>
+      callbacks = base::SplitOnceCallback(std::move(callback));
   embedder_remote_->GenerateEmbeddings(
       std::move(passages), PassagePriorityToMojom(priority),
-      mojo::WrapCallbackWithDefaultInvokeIfNotRun(
+      mojo::WrapCallbackWithDropHandler(
           base::BindOnce(&PassageEmbeddingsServiceController::OnGotEmbeddings,
                          weak_ptr_factory_.GetWeakPtr(), next_request_id_,
-                         std::move(callback),
+                         std::move(callbacks.first),
                          std::move(generate_embeddings_timer), priority),
-          std::vector<mojom::PassageEmbeddingsResultPtr>()));
+          base::BindOnce(&PassageEmbeddingsServiceController::OnDisconnected,
+                         weak_ptr_factory_.GetWeakPtr(), next_request_id_,
+                         std::move(callbacks.second))));
   next_request_id_++;
 }
 
@@ -288,21 +293,14 @@ void PassageEmbeddingsServiceController::OnGotEmbeddings(
     PassagePriority priority,
     std::vector<mojom::PassageEmbeddingsResultPtr> results) {
   // Mojo invokes the callbacks in the order in which `GenerateEmbeddings()` was
-  // called. Therefore, `request_id` should be expected at the front of
-  // `pending_requests_`. However, when `embedder_remote_` disconnects and the
-  // callbacks are dropped, `mojo::WrapCallbackWithDefaultInvokeIfNotRun()`
-  // invokes the callbacks in the reverse order in which they were bound.
-  auto it = std::ranges::find(pending_requests_, request_id);
-  if (it != pending_requests_.end()) {
-    pending_requests_.erase(it);
-  } else {
-    NOTREACHED(base::NotFatalUntil::M140);
-  }
+  // called.
+  CHECK(!pending_requests_.empty());
+  CHECK_EQ(pending_requests_.front(), request_id);
+  pending_requests_.pop_front();
 
-  auto status = results.empty() ? ComputeEmbeddingsStatus::kExecutionFailure
-                                : ComputeEmbeddingsStatus::kSuccess;
-
-  std::move(callback).Run(std::move(results), status);
+  ComputeEmbeddingsStatus status =
+      results.empty() ? ComputeEmbeddingsStatus::kExecutionFailure
+                      : ComputeEmbeddingsStatus::kSuccess;
 
   if (status == ComputeEmbeddingsStatus::kSuccess) {
     const base::TimeDelta duration = generate_embeddings_timer.Elapsed();
@@ -330,6 +328,22 @@ void PassageEmbeddingsServiceController::OnGotEmbeddings(
       base::UmaHistogramTimes(priority_histogram, duration);
     }
   }
+
+  // Run the callback last to prevent UAF if the callback destroys `this`.
+  std::move(callback).Run(std::move(results), status);
+}
+
+void PassageEmbeddingsServiceController::OnDisconnected(
+    RequestId request_id,
+    GetEmbeddingsResultCallback callback) {
+  // On disconnect, drop handlers are invoked in an undefined order, so we must
+  // be able to remove arbitrary request IDs.
+  auto it = std::ranges::find(pending_requests_, request_id);
+  CHECK(it != pending_requests_.end());
+  pending_requests_.erase(it);
+
+  std::move(callback).Run(std::vector<mojom::PassageEmbeddingsResultPtr>(),
+                          ComputeEmbeddingsStatus::kExecutionFailure);
 }
 
 }  // namespace passage_embeddings
