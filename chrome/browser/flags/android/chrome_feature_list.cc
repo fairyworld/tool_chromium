@@ -151,6 +151,7 @@ const base::Feature* const kFeaturesExposedToJava[] = {
     &blink::features::kForceWebContentsDarkMode,
     &blink::features::kPrerender2,
     &browsing_data::features::kBrowsingDataModel,
+    &browsing_data::features::kDbdPasswordRemovalOnAndroid,
     &commerce::kCommerceMerchantViewer,
     &commerce::kEnableDiscountInfoApi,
     &commerce::kPriceAnnotations,

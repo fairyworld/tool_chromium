@@ -9251,6 +9251,11 @@ const FeatureEntry kFeatureEntries[] = {
     {"browsing-data-model-clank", flag_descriptions::kBrowsingDataModelName,
      flag_descriptions::kBrowsingDataModelDescription, kOsAndroid,
      FEATURE_VALUE_TYPE(browsing_data::features::kBrowsingDataModel)},
+
+    {"dbd-password-removal-on-android",
+     flag_descriptions::kDbdPasswordRemovalOnAndroidName,
+     flag_descriptions::kDbdPasswordRemovalOnAndroidDescription, kOsAndroid,
+     FEATURE_VALUE_TYPE(browsing_data::features::kDbdPasswordRemovalOnAndroid)},
 #endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_CHROMEOS)

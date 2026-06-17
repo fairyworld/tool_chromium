@@ -483,6 +483,13 @@ inline constexpr char kDataSharingSharedDataTypesEnabledWithUi[] =
     "Version out-of-date, show UI ";
 // LINT.ThenChange(//ios/chrome/browser/flags/ios_chrome_flag_descriptions.cc:DataSharingVersioning)
 
+inline constexpr char kDbdPasswordRemovalOnAndroidName[] =
+    "Remove bulk password deletion from Delete Browsing Data on Android.";
+inline constexpr char kDbdPasswordRemovalOnAndroidDescription[] =
+    "Removes bulk password deletion from Delete Browsing Data "
+    "on Android, instead directing users to manage passwords and other Google "
+    "data via link-outs to relevant Google services.";
+
 inline constexpr char kDefaultBrowserChangedOsNotificationDescription[] =
     "Enables the framework to show OS Notification when Chrome is no longer "
     "the default browser.";
@@ -8466,7 +8473,6 @@ inline constexpr char kEnableDlpFileSystemApiName[] =
 inline constexpr char kEnableDlpFileSystemApiDescription[] =
     "Enable DLP upload scan support for FileSystem API-backed cloud storage on "
     "ChromeOS.";
-
 // ============================================================================
 // Don't just add flags to the end, put them in the alphabetical order.
 // ============================================================================
