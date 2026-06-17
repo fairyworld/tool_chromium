@@ -3977,16 +3977,6 @@ static_library("ui") {
       "views/content_setting_bubble_contents.h",
       "views/content_setting_site_row_view.cc",
       "views/content_setting_site_row_view.h",
-      "views/controls/hover_button.cc",
-      "views/controls/page_switcher_view.cc",
-      "views/controls/rich_controls_container_view.cc",
-      "views/controls/rich_controls_container_view.h",
-      "views/controls/rich_hover_button.cc",
-      "views/controls/rich_hover_button.h",
-      "views/controls/site_icon_text_and_origin_view.cc",
-      "views/controls/site_icon_text_and_origin_view.h",
-      "views/controls/subpage_view.cc",
-      "views/controls/subpage_view.h",
       "views/data_sharing/account_card_view.cc",
       "views/data_sharing/account_card_view.h",
       "views/data_sharing/collaboration_controller_delegate_desktop.cc",
@@ -4858,7 +4848,6 @@ static_library("ui") {
       "views/web_apps/web_app_update_review_dialog.cc",
       "views/web_apps/web_app_update_review_dialog.h",
       "views/web_apps/web_app_views_utils.cc",
-      "views/web_apps/web_app_views_utils.h",
       "views/webauthn/ambient/ambient_signin_bubble_view.cc",
       "views/webauthn/ambient/ambient_signin_bubble_view.h",
       "views/webauthn/authenticator_bio_enrollment_sheet_view.cc",
@@ -4986,6 +4975,7 @@ static_library("ui") {
       "//chrome/browser/ui/views/commerce",
       "//chrome/browser/ui/views/commerce:impl",
       "//chrome/browser/ui/views/controls",
+      "//chrome/browser/ui/views/controls:impl",
       "//chrome/browser/ui/views/digital_credentials",
       "//chrome/browser/ui/views/digital_credentials:impl",
       "//chrome/browser/ui/views/download",
@@ -5019,6 +5009,7 @@ static_library("ui") {
       "//chrome/browser/ui/views/tabs/vertical",
       "//chrome/browser/ui/views/tabs/vertical:impl",
       "//chrome/browser/ui/views/user_education",
+      "//chrome/browser/ui/views/web_apps",
       "//chrome/browser/ui/views/web_dialogs",
       "//chrome/browser/ui/views/webid",
       "//chrome/browser/ui/views/webid:impl",
@@ -5116,7 +5107,6 @@ static_library("ui") {
       # TODO(crbug.com/408801109): Remove this circular dependency when the
       # following headers get componentized:
       # c/b/ui/browser.h, browser_window.h
-      # c/b/ui/views/controls/rich_controls_container_view.h, rich_hover_button.h
       # c/b/ui/views/frame/browser_view.h
       "//chrome/browser/ui/views/location_bar/cookie_controls:impl",
 
@@ -5185,7 +5175,6 @@ static_library("ui") {
       # the following headers get modularized:
       # - c/b/ui/chrome_pages.h
       # - c/b/ui/scoped_tabbed_browser_displayer.h
-      # - c/b/ui/views/controls/subpage_view.h
       "//chrome/browser/ui/views/commerce:impl",
 
       # TODO(crbug.com/353332589): Remove this circular dependency when
@@ -5199,6 +5188,11 @@ static_library("ui") {
       # - c/b/ui/views/extensions/security_dialog_tracker.h
       # - c/b/ui/views/frame/browser_view.h
       "//chrome/browser/ui/views/webid:impl",
+
+      # TODO(crbug.com/353332589): Remove this circular dependency when
+      # the following headers get modularized:
+      # - c/b/ui/views/hover_button_controller.h
+      "//chrome/browser/ui/views/controls:impl",
     ]
 
     if (is_linux) {
