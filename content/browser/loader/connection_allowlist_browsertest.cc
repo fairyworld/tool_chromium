@@ -2944,4 +2944,225 @@ IN_PROC_BROWSER_TEST_F(ConnectionAllowlistTest,
   EXPECT_FALSE(prerender_helper().GetHostForUrl(redirect_url));
 }
 
+// Verifies that if the initiating document's Connection-Allowlist blocks the
+// prefetch URL, the speculation rules prefetch is blocked immediately during
+// eligibility check. It is not intercepted by the controlling Service Worker.
+IN_PROC_BROWSER_TEST_F(
+    ConnectionAllowlistTest,
+    SpeculationRulesPrefetchServiceWorkerBlockedByDocumentAllowlist) {
+  RegisterResponse("/sw.js",
+                   ResponseEntry(R"(
+          self.addEventListener('install', e => self.skipWaiting());
+          self.addEventListener('activate', e =>
+          e.waitUntil(self.clients.claim()));
+          self.addEventListener('fetch', event => {
+            if (event.request.url.indexOf('controlled-page') !== -1) {
+              event.waitUntil(
+                caches.open('prefetch-intercepted').then(cache => {
+                  return cache.put('/intercepted', new Response('true'));
+                })
+              );
+              event.respondWith(fetch(event.request));
+            }
+          });
+      )",
+                                 {{"Content-Type", "text/javascript"}}));
+
+  // /register.html has no connection allowlist so it can register the Service
+  // Worker.
+  RegisterResponse(
+      "/register.html",
+      ResponseEntry("<html><body>Register page</body></html>", {}));
+
+  // /initiator.html has Connection-Allowlist: () which blocks all
+  // connections (including the prefetch).
+  RegisterResponse("/initiator.html",
+                   ResponseEntry(R"(
+        <html>
+          <head>
+            <script type="speculationrules">
+            {
+              "prefetch": [
+                {
+                  "source": "list",
+                  "urls": ["/controlled-page"],
+                  "eagerness": "immediate"
+                }
+              ]
+            }
+            </script>
+          </head>
+          <body>Initiator page</body>
+        </html>
+      )",
+                                 {{"Connection-Allowlist", "()"}}));
+
+  RegisterResponse("/controlled-page",
+                   ResponseEntry("controlled-page-content", {}));
+
+  ASSERT_TRUE(embedded_https_test_server().Start());
+
+  GURL register_url =
+      embedded_https_test_server().GetURL("a.test", "/register.html");
+  GURL initiator_url =
+      embedded_https_test_server().GetURL("a.test", "/initiator.html");
+  GURL controlled_url =
+      embedded_https_test_server().GetURL("a.test", "/controlled-page");
+
+  // Go to the register page.
+  EXPECT_TRUE(NavigateToURL(shell(), register_url));
+  EXPECT_EQ(true, EvalJs(shell()->web_contents()->GetPrimaryMainFrame(),
+                         R"(
+            (async () => {
+              const reg = await navigator.serviceWorker.register(
+                  '/sw.js');
+              await new Promise(resolve => {
+                const worker = reg.installing || reg.waiting || reg.active;
+                if (worker.state === 'activated') {
+                  resolve();
+                } else {
+                  worker.addEventListener('statechange', () => {
+                    if (worker.state === 'activated') {
+                      resolve();
+                    }
+                  });
+                }
+              });
+              return reg.active && reg.active.state === 'activated';
+            })();
+          )"));
+
+  // Navigate to the initiator page, which initiates the prefetch.
+  EXPECT_TRUE(NavigateToURL(shell(), initiator_url));
+
+  // The prefetch should be blocked by the initiator document's
+  // Connection-Allowlist.
+  EXPECT_TRUE(WaitForSpeculationRulesPrefetch(
+      controlled_url, PrefetchContainer::LoadState::kFailedIneligible,
+      PrefetchStatus::kPrefetchIneligibleBlockedByConnectionAllowlist));
+
+  // Verify that the Service Worker did not intercept the prefetch request.
+  EXPECT_EQ(false, EvalJs(shell()->web_contents(),
+                          R"(
+                            caches.open('prefetch-intercepted')
+                              .then(c => c.match('/intercepted'))
+                              .then(r => !!r)
+                          )"));
+}
+
+// Verifies that a speculation rules prefetch controlled by a Service Worker is
+// subject to the Service Worker's Connection-Allowlist. The document does not
+// have a connection allow (so it allows the prefetch). It is then intercepted
+// by the controlling Service Worker. Then the prefetch is subject to the
+// Service Worker's allowlist. The fetch gets blocked because it does not match
+// the Service Worker's allowlist.
+IN_PROC_BROWSER_TEST_F(
+    ConnectionAllowlistTest,
+    SpeculationRulesPrefetchServiceWorkerBlockedByServiceWorkerAllowlist) {
+  // Service Worker has Connection-Allowlist: () which blocks all connections.
+  RegisterResponse("/sw.js", ResponseEntry(R"(
+          self.addEventListener('install', e => self.skipWaiting());
+          self.addEventListener('activate', e =>
+          e.waitUntil(self.clients.claim()));
+          self.addEventListener('fetch', event => {
+            if (event.request.url.indexOf('controlled-page') !== -1) {
+              event.waitUntil(
+                caches.open('prefetch-intercepted').then(cache => {
+                  return cache.put('/intercepted', new Response('true'));
+                })
+              );
+              event.respondWith(fetch(event.request));
+            }
+          });
+      )",
+                                           {{"Content-Type", "text/javascript"},
+                                            {"Connection-Allowlist", "()"}}));
+
+  RegisterResponse(
+      "/register.html",
+      ResponseEntry("<html><body>Register page</body></html>", {}));
+
+  // /initiator.html has no connection allowlist (so it allows the prefetch).
+  RegisterResponse("/initiator.html", ResponseEntry(
+                                          R"(
+        <html>
+          <head>
+            <script type="speculationrules">
+            {
+              "prefetch": [
+                {
+                  "source": "list",
+                  "urls": ["/controlled-page"],
+                  "eagerness": "immediate"
+                }
+              ]
+            }
+            </script>
+          </head>
+          <body>Initiator page</body>
+        </html>
+      )",
+                                          {}));
+
+  RegisterResponse("/controlled-page",
+                   ResponseEntry("controlled-page-content", {}));
+
+  ASSERT_TRUE(embedded_https_test_server().Start());
+
+  GURL register_url =
+      embedded_https_test_server().GetURL("a.test", "/register.html");
+  GURL initiator_url =
+      embedded_https_test_server().GetURL("a.test", "/initiator.html");
+  GURL controlled_url =
+      embedded_https_test_server().GetURL("a.test", "/controlled-page");
+
+  URLLoaderMonitor monitor;
+
+  // Go to the register page and register the Service Worker.
+  EXPECT_TRUE(NavigateToURL(shell(), register_url));
+  EXPECT_EQ(true, EvalJs(shell()->web_contents()->GetPrimaryMainFrame(),
+                         R"(
+            (async () => {
+              const reg = await navigator.serviceWorker.register('/sw.js');
+              await new Promise(resolve => {
+                const worker = reg.installing || reg.waiting || reg.active;
+                if (worker.state === 'activated') {
+                  resolve();
+                } else {
+                  worker.addEventListener('statechange', () => {
+                    if (worker.state === 'activated') {
+                      resolve();
+                    }
+                  });
+                }
+              });
+              return reg.active && reg.active.state === 'activated';
+            })();
+          )"));
+
+  // Navigate to the initiator page, which initiates the prefetch.
+  EXPECT_TRUE(NavigateToURL(shell(), initiator_url));
+
+  // The prefetch is intercepted by the Service Worker. Since the Service
+  // Worker's allowlist is empty (), the prefetch by the Service Worker is
+  // blocked. The speculation rules prefetch container completes with the net
+  // error failure status.
+  EXPECT_TRUE(WaitForSpeculationRulesPrefetch(
+      controlled_url, PrefetchContainer::LoadState::kFailed,
+      PrefetchStatus::kPrefetchFailedNetError));
+  EXPECT_EQ(monitor.WaitForRequestCompletion(controlled_url).error_code,
+            net::ERR_NETWORK_ACCESS_REVOKED);
+
+  // Verify that the Service Worker did intercept the prefetch request.
+  EXPECT_TRUE(base::test::RunUntil([&]() {
+    return EvalJs(shell()->web_contents(),
+                  R"(
+                           caches.open('prefetch-intercepted')
+                             .then(c => c.match('/intercepted'))
+                             .then(r => !!r)
+                         )")
+        .ExtractBool();
+  }));
+}
+
 }  // namespace content
