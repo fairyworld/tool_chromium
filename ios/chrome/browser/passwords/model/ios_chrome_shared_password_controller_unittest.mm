@@ -144,9 +144,9 @@ class IOSChromeSharedPasswordControllerTest : public PlatformTest {
  protected:
   base::test::TaskEnvironment task_environment_;
   autofill::test::AutofillUnitTestEnvironment autofill_test_environment_;
-  raw_ptr<web::FakeWebFramesManager, DanglingUntriaged> web_frames_manager_;
   web::FakeWebState fake_web_state_;
-  raw_ptr<web::WebFrame> frame_;
+  raw_ptr<web::FakeWebFramesManager> web_frames_manager_ = nullptr;
+  raw_ptr<web::WebFrame> frame_ = nullptr;
   testing::StrictMock<password_manager::MockPasswordManager> password_manager_;
   id suggestion_helper_;
   id driver_helper_;
