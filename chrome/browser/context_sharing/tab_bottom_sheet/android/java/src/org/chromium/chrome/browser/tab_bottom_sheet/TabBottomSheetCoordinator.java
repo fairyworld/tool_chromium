@@ -221,8 +221,6 @@ public class TabBottomSheetCoordinator {
         if (mIsShowingTabBottomSheet || mSheetEventsCallback == null) {
             return false;
         }
-        assert mSheetContent == null;
-        assert mViewBinder == null;
         if (mCoBrowseViews.hasPeekView()) {
             mMediator.onSheetStateChanged(startsExpanded ? SheetState.FULL : SheetState.PEEK);
         }
@@ -530,18 +528,6 @@ public class TabBottomSheetCoordinator {
                         mMediator.onSheetStateChanged(BottomSheetController.SheetState.HIDDEN);
                         mSheetEventsCallback.onBottomSheetClosed();
                         stopObservingCompositorViewInteractions();
-
-                        // Destroy sheet content and view binder when the sheet hides so that they
-                        // do not remain active while hidden, and can be cleanly recreated if the
-                        // sheet is reshown after suppression.
-                        if (mSheetContent != null) {
-                            mSheetContent.destroy();
-                            mSheetContent = null;
-                        }
-                        if (mViewBinder != null) {
-                            mViewBinder.destroy();
-                            mViewBinder = null;
-                        }
                     }
                     mIsShowingTabBottomSheet = false;
                 }
