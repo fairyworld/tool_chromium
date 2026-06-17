@@ -441,7 +441,7 @@ class WellKnownTest extends TestBase {
         }
     }
 
-    public static function enumNameValueConversionDataProvider()
+    public function enumNameValueConversionDataProvider()
     {
         return [
             ['\Google\Protobuf\Field\Cardinality'],
@@ -467,7 +467,7 @@ class WellKnownTest extends TestBase {
         self::assertNull($reflectionProperty->getValue($testMessage));
     }
 
-    public static function optionalFieldsDataProvider()
+    public function optionalFieldsDataProvider()
     {
         return [
             ['true_optional_int32', 0],

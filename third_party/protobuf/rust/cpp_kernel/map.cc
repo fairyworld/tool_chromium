@@ -188,6 +188,7 @@ google::protobuf::internal::UntypedMapBase* proto2_rust_map_new(
     google::protobuf::rust::MapValue key_prototype,
     google::protobuf::rust::MapValue value_prototype) {
   return new google::protobuf::internal::UntypedMapBase(
+      /* arena = */ nullptr,
       google::protobuf::internal::UntypedMapBase::GetTypeInfoDynamic(
           key_prototype.tag, value_prototype.tag,
           value_prototype.tag == google::protobuf::rust::MapValueTag::kMessage
@@ -205,12 +206,12 @@ google::protobuf::internal::UntypedMapIterator proto2_rust_map_iter(
 }
 
 void proto2_rust_map_free(google::protobuf::internal::UntypedMapBase* m) {
-  m->ClearTable(m->arena(), /*reset=*/false);
+  m->ClearTable(false);
   delete m;
 }
 
 void proto2_rust_map_clear(google::protobuf::internal::UntypedMapBase* m) {
-  m->ClearTable(m->arena(), /*reset=*/true);
+  m->ClearTable(true);
 }
 
 #define DEFINE_KEY_SPECIFIC_MAP_OPERATIONS(cpp_type, suffix)                \

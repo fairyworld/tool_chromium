@@ -45,7 +45,7 @@ internal sealed partial class FeatureSetDescriptor
         // based on that.
         var supportedEditions = ((Edition[]) Enum.GetValues(typeof(Edition)))
             .OrderBy(x => x)
-            .Where(e => e >= featureSetDefaults.MinimumEdition && (e <= featureSetDefaults.MaximumEdition || e == Edition.Unstable));
+            .Where(e => e >= featureSetDefaults.MinimumEdition && e <= featureSetDefaults.MaximumEdition);
 
         // We assume the embedded defaults will always contain "legacy".
         var currentDescriptor = MaybeCreateDescriptor(Edition.Legacy);

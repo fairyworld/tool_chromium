@@ -69,7 +69,7 @@ def populate_message_from_dict(message, data_dict):
 
     if field_descriptor.type == field_descriptor.TYPE_MESSAGE:
       nested_message = getattr(message, key)
-      if field_descriptor.is_repeated:
+      if field_descriptor.label == field_descriptor.LABEL_REPEATED:
         for sub_dict in value:
           new_item = nested_message.add()
           populate_message_from_dict(new_item, sub_dict)

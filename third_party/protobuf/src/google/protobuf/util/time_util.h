@@ -17,7 +17,6 @@
 
 #include "google/protobuf/duration.pb.h"
 #include "google/protobuf/timestamp.pb.h"
-#include "absl/strings/string_view.h"
 
 // Must be included last.
 #include "google/protobuf/port_def.inc"

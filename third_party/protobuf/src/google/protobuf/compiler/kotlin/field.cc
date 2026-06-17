@@ -12,7 +12,6 @@
 #include "google/protobuf/compiler/java/internal_helpers.h"
 #include "google/protobuf/compiler/java/name_resolver.h"
 #include "google/protobuf/descriptor.h"
-#include "google/protobuf/io/printer.h"
 
 namespace google {
 namespace protobuf {
@@ -34,20 +33,6 @@ FieldGenerator::FieldGenerator(const FieldDescriptor* descriptor,
 
 void FieldGenerator::Generate(io::Printer* printer) const {
   auto cleanup = printer->WithVars(variables_);
-  auto cleanup2 = printer->WithVars({
-      io::Printer::Sub("kt_name", variables_.at("kt_name"))
-          .AnnotatedAs(descriptor_),
-      io::Printer::Sub("getter", "get").AnnotatedAs(descriptor_),
-      io::Printer::Sub("setter", "set")
-          .AnnotatedAs({descriptor_, io::AnnotationCollector::kSet}),
-      io::Printer::Sub(
-          "clearer",
-          absl::StrCat("clear", variables_.at("kt_capitalized_name")))
-          .AnnotatedAs({descriptor_, io::AnnotationCollector::kSet}),
-      io::Printer::Sub(
-          "haser", absl::StrCat("has", variables_.at("kt_capitalized_name")))
-          .AnnotatedAs(descriptor_),
-  });
   switch (java::GetJavaType(descriptor_)) {
     case java::JAVATYPE_MESSAGE:
       if (descriptor_->is_repeated() &&
@@ -93,9 +78,9 @@ void FieldGenerator::GeneratePritimiveField(io::Printer* printer) const {
         "// TODO: b/336400327 - remove this hack; we should access properties\n"
         "$kt_deprecation$public var $kt_name$: $kt_type$\n"
         "  $jvm_name_get$"
-        "  $getter$() = $kt_dsl_builder$.get${$$kt_capitalized_name$$}$()\n"
+        "  get() = $kt_dsl_builder$.get${$$kt_capitalized_name$$}$()\n"
         "  $jvm_name_set$"
-        "  $setter$(value) {\n"
+        "  set(value) {\n"
         "    $kt_dsl_builder$.${$set$kt_capitalized_name$$}$(value)\n"
         "  }\n");
   } else {
@@ -108,9 +93,9 @@ void FieldGenerator::GeneratePritimiveField(io::Printer* printer) const {
         },
         "$kt_deprecation$public var $kt_name$: $kt_type$\n"
         "  $jvm_name_get$"
-        "  $getter$() = $kt_dsl_builder$.${$$kt_safe_name$$}$\n"
+        "  get() = $kt_dsl_builder$.${$$kt_safe_name$$}$\n"
         "  $jvm_name_set$"
-        "  $setter$(value) {\n"
+        "  set(value) {\n"
         "    $kt_dsl_builder$.${$$kt_safe_name$$}$ = value\n"
         "  }\n");
   }
@@ -119,7 +104,7 @@ void FieldGenerator::GeneratePritimiveField(io::Printer* printer) const {
                                context_->options(), /* builder */ false,
                                /* kdoc */ true);
   printer->Print(
-      "public fun $clearer$() {\n"
+      "public fun ${$clear$kt_capitalized_name$$}$() {\n"
       "  $kt_dsl_builder$.${$clear$capitalized_name$$}$()\n"
       "}\n");
 
@@ -128,7 +113,7 @@ void FieldGenerator::GeneratePritimiveField(io::Printer* printer) const {
                                  context_->options(), /* builder */ false,
                                  /* kdoc */ true);
     printer->Print(
-        "public fun $haser$(): kotlin.Boolean {\n"
+        "public fun ${$has$kt_capitalized_name$$}$(): kotlin.Boolean {\n"
         "  return $kt_dsl_builder$.${$has$capitalized_name$$}$()\n"
         "}\n");
   }
@@ -279,9 +264,9 @@ void FieldGenerator::GenerateMessageField(io::Printer* printer) const {
       },
       "$kt_deprecation$public var $kt_name$: $kt_type$\n"
       "  $jvm_name_get$"
-      "  $getter$() = $kt_dsl_builder$.${$$kt_safe_name$$}$\n"
+      "  get() = $kt_dsl_builder$.${$$kt_safe_name$$}$\n"
       "  $jvm_name_set$"
-      "  $setter$(value) {\n"
+      "  set(value) {\n"
       "    $kt_dsl_builder$.${$$kt_safe_name$$}$ = value\n"
       "  }\n");
 
@@ -289,7 +274,7 @@ void FieldGenerator::GenerateMessageField(io::Printer* printer) const {
                                context_->options(), /* builder */ false,
                                /* kdoc */ true);
   printer->Print(
-      "public fun $clearer$() {\n"
+      "public fun ${$clear$kt_capitalized_name$$}$() {\n"
       "  $kt_dsl_builder$.${$clear$capitalized_name$$}$()\n"
       "}\n");
 
@@ -297,7 +282,7 @@ void FieldGenerator::GenerateMessageField(io::Printer* printer) const {
                                context_->options(), /* builder */ false,
                                /* kdoc */ true);
   printer->Print(
-      "public fun $haser$(): kotlin.Boolean {\n"
+      "public fun ${$has$kt_capitalized_name$$}$(): kotlin.Boolean {\n"
       "  return $kt_dsl_builder$.${$has$capitalized_name$$}$()\n"
       "}\n");
   if (descriptor_->has_presence() &&
@@ -447,9 +432,9 @@ void FieldGenerator::GenerateStringField(io::Printer* printer) const {
       },
       "$kt_deprecation$public var $kt_name$: kotlin.String\n"
       "  $jvm_name_get$"
-      "  $getter$() = $kt_dsl_builder$.${$$kt_safe_name$$}$\n"
+      "  get() = $kt_dsl_builder$.${$$kt_safe_name$$}$\n"
       "  $jvm_name_set$"
-      "  $setter$(value) {\n"
+      "  set(value) {\n"
       "    $kt_dsl_builder$.${$$kt_safe_name$$}$ = value\n"
       "  }\n");
 
@@ -457,7 +442,7 @@ void FieldGenerator::GenerateStringField(io::Printer* printer) const {
                                context_->options(), /* builder */ false,
                                /* kdoc */ true);
   printer->Print(
-      "public fun $clearer$() {\n"
+      "public fun ${$clear$kt_capitalized_name$$}$() {\n"
       "  $kt_dsl_builder$.${$clear$capitalized_name$$}$()\n"
       "}\n");
 
@@ -466,7 +451,7 @@ void FieldGenerator::GenerateStringField(io::Printer* printer) const {
                                  context_->options(), /* builder */ false,
                                  /* kdoc */ true);
     printer->Print(
-        "public fun $haser$(): kotlin.Boolean {\n"
+        "public fun ${$has$kt_capitalized_name$$}$(): kotlin.Boolean {\n"
         "  return $kt_dsl_builder$.${$has$capitalized_name$$}$()\n"
         "}\n");
   }
@@ -623,9 +608,9 @@ void FieldGenerator::GenerateEnumField(io::Printer* printer) const {
       },
       "$kt_deprecation$public var $kt_name$: $kt_type$\n"
       "  $jvm_name_get$"
-      "  $getter$() = $kt_dsl_builder$.${$$kt_safe_name$$}$\n"
+      "  get() = $kt_dsl_builder$.${$$kt_safe_name$$}$\n"
       "  $jvm_name_set$"
-      "  $setter$(value) {\n"
+      "  set(value) {\n"
       "    $kt_dsl_builder$.${$$kt_safe_name$$}$ = value\n"
       "  }\n");
 
@@ -639,9 +624,9 @@ void FieldGenerator::GenerateEnumField(io::Printer* printer) const {
         },
         "$kt_deprecation$public var $kt_name$Value: kotlin.Int\n"
         "  $jvm_name_get$"
-        "  $getter$() = $kt_dsl_builder$.${$$kt_property_name$Value$}$\n"
+        "  get() = $kt_dsl_builder$.${$$kt_property_name$Value$}$\n"
         "  $jvm_name_set$"
-        "  $setter$(value) {\n"
+        "  set(value) {\n"
         "    $kt_dsl_builder$.${$$kt_property_name$Value$}$ = value\n"
         "  }\n");
   }
@@ -650,7 +635,7 @@ void FieldGenerator::GenerateEnumField(io::Printer* printer) const {
                                context_->options(),
                                /* builder */ false, /* kdoc */ true);
   printer->Print(
-      "public fun $clearer$() {\n"
+      "public fun ${$clear$kt_capitalized_name$$}$() {\n"
       "  $kt_dsl_builder$.${$clear$capitalized_name$$}$()\n"
       "}\n");
 
@@ -659,7 +644,7 @@ void FieldGenerator::GenerateEnumField(io::Printer* printer) const {
                                  context_->options(),
                                  /* builder */ false, /* kdoc */ true);
     printer->Print(
-        "public fun $haser$(): kotlin.Boolean {\n"
+        "public fun ${$has$kt_capitalized_name$$}$(): kotlin.Boolean {\n"
         "  return $kt_dsl_builder$.${$has$capitalized_name$$}$()\n"
         "}\n");
   }

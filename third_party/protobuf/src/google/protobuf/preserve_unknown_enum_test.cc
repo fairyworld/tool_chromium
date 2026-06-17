@@ -6,7 +6,6 @@
 // https://developers.google.com/open-source/licenses/bsd
 
 #include <gtest/gtest.h>
-#include "absl/log/absl_check.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/dynamic_message.h"
 #include "google/protobuf/unittest.pb.h"
@@ -69,14 +68,14 @@ TEST(PreserveUnknownEnumTest, PreserveParseAndSerialize) {
   proto3_preserve_unknown_enum_unittest::MyMessagePlusExtra orig_message;
   FillMessage(&orig_message);
   std::string serialized;
-  ABSL_CHECK(orig_message.SerializeToString(&serialized));
+  orig_message.SerializeToString(&serialized);
 
   proto3_preserve_unknown_enum_unittest::MyMessage message;
   EXPECT_EQ(true, message.ParseFromString(serialized));
   CheckMessage(message);
 
   serialized.clear();
-  ABSL_CHECK(message.SerializeToString(&serialized));
+  message.SerializeToString(&serialized);
   EXPECT_EQ(true, orig_message.ParseFromString(serialized));
   CheckMessage(orig_message);
 }
@@ -108,7 +107,7 @@ TEST(PreserveUnknownEnumTest, Proto2HidesUnknownValues) {
   FillMessage(&orig_message);
 
   std::string serialized;
-  ABSL_CHECK(orig_message.SerializeToString(&serialized));
+  orig_message.SerializeToString(&serialized);
 
   proto2_preserve_unknown_enum_unittest::MyMessage message;
   EXPECT_EQ(true, message.ParseFromString(serialized));
@@ -119,7 +118,7 @@ TEST(PreserveUnknownEnumTest, Proto2HidesUnknownValues) {
 
   // But when we pass it to the correct structure, all values are there.
   serialized.clear();
-  ABSL_CHECK(message.SerializeToString(&serialized));
+  message.SerializeToString(&serialized);
   EXPECT_EQ(true, orig_message.ParseFromString(serialized));
   CheckMessage(orig_message);
 }
@@ -130,7 +129,7 @@ TEST(PreserveUnknownEnumTest, DynamicProto2HidesUnknownValues) {
   FillMessage(&orig_message);
 
   std::string serialized;
-  ABSL_CHECK(orig_message.SerializeToString(&serialized));
+  orig_message.SerializeToString(&serialized);
 
   DynamicMessageFactory factory;
   std::unique_ptr<Message> message(
@@ -147,7 +146,7 @@ TEST(PreserveUnknownEnumTest, DynamicProto2HidesUnknownValues) {
 
   // But when we pass it to the correct structure, all values are there.
   serialized.clear();
-  ABSL_CHECK(message->SerializeToString(&serialized));
+  message->SerializeToString(&serialized);
   EXPECT_EQ(true, orig_message.ParseFromString(serialized));
   CheckMessage(orig_message);
 }
@@ -157,7 +156,7 @@ TEST(PreserveUnknownEnumTest, DynamicEnumValueDescriptors) {
   proto3_preserve_unknown_enum_unittest::MyMessagePlusExtra orig_message;
   FillMessage(&orig_message);
   std::string serialized;
-  ABSL_CHECK(orig_message.SerializeToString(&serialized));
+  orig_message.SerializeToString(&serialized);
 
   proto3_preserve_unknown_enum_unittest::MyMessage message;
   EXPECT_EQ(true, message.ParseFromString(serialized));

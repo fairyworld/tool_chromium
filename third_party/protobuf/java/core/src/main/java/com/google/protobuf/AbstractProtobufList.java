@@ -77,7 +77,6 @@ abstract class AbstractProtobufList<E> extends AbstractList<E> implements Protob
   }
 
   @Override
-  @CanIgnoreReturnValue
   public boolean add(E e) {
     ensureIsMutable();
     return super.add(e);
@@ -90,14 +89,12 @@ abstract class AbstractProtobufList<E> extends AbstractList<E> implements Protob
   }
 
   @Override
-  @CanIgnoreReturnValue
   public boolean addAll(Collection<? extends E> c) {
     ensureIsMutable();
     return super.addAll(c);
   }
 
   @Override
-  @CanIgnoreReturnValue
   public boolean addAll(int index, Collection<? extends E> c) {
     ensureIsMutable();
     return super.addAll(index, c);
@@ -122,14 +119,12 @@ abstract class AbstractProtobufList<E> extends AbstractList<E> implements Protob
   }
 
   @Override
-  @CanIgnoreReturnValue
   public E remove(int index) {
     ensureIsMutable();
     return super.remove(index);
   }
 
   @Override
-  @CanIgnoreReturnValue
   public boolean remove(Object o) {
     ensureIsMutable();
     int index = indexOf(o);
@@ -141,21 +136,18 @@ abstract class AbstractProtobufList<E> extends AbstractList<E> implements Protob
   }
 
   @Override
-  @CanIgnoreReturnValue
   public boolean removeAll(Collection<?> c) {
     ensureIsMutable();
     return super.removeAll(c);
   }
 
   @Override
-  @CanIgnoreReturnValue
   public boolean retainAll(Collection<?> c) {
     ensureIsMutable();
     return super.retainAll(c);
   }
 
   @Override
-  @CanIgnoreReturnValue
   public E set(int index, E element) {
     ensureIsMutable();
     return super.set(index, element);

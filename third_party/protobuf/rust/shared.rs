@@ -14,9 +14,6 @@ use std::fmt;
 // This problem is referred to as "perfect derive".
 // https://smallcultfollowing.com/babysteps/blog/2022/04/12/implied-bounds-and-perfect-derive/
 
-pub use crate::__internal::runtime::message_eq;
-#[cfg(all(cpp_kernel, not(lite_runtime)))]
-pub use crate::codegen_traits::interop::MessageDescriptorInterop;
 pub use crate::codegen_traits::{
     create::Parse,
     interop::{MessageMutInterop, MessageViewInterop, OwnedMessageInterop},
@@ -28,7 +25,8 @@ pub use crate::cord::{ProtoBytesCow, ProtoStringCow};
 pub use crate::map::{Map, MapIter, MapMut, MapView, ProxiedInMapValue};
 pub use crate::optional::Optional;
 pub use crate::proxied::{
-    AsMut, AsView, IntoMut, IntoProxied, IntoView, Mut, MutProxied, Proxied, View,
+    AsMut, AsView, IntoMut, IntoProxied, IntoView, Mut, MutProxied, MutProxy, Proxied, Proxy, View,
+    ViewProxy,
 };
 pub use crate::r#enum::{Enum, UnknownEnumValue};
 pub use crate::repeated::{ProxiedInRepeated, Repeated, RepeatedIter, RepeatedMut, RepeatedView};
@@ -70,10 +68,18 @@ mod string;
 #[path = "upb/lib.rs"]
 mod upb;
 
+#[cfg(not(bzl))]
+mod utf8;
+
+// Forces the utf8 crate to be accessible from crate::.
+#[cfg(bzl)]
+#[allow(clippy::single_component_path_imports)]
+use utf8;
+
 // If the Upb and C++ kernels are both linked into the same binary, this symbol
 // will be defined twice and cause a link error.
-#[unsafe(no_mangle)]
-unsafe extern "C" fn __Disallow_Upb_And_Cpp_In_Same_Binary() {}
+#[no_mangle]
+extern "C" fn __Disallow_Upb_And_Cpp_In_Same_Binary() {}
 
 /// An error that happened during parsing.
 #[derive(Debug, Clone)]

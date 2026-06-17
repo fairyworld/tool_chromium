@@ -31,7 +31,7 @@ struct ParseOptions {
 #endif
 };
 
-inline ParseOptions DefaultParseOptions() { return ParseOptions(); }
+inline ParseOptions ParseOptionsDefault() { return ParseOptions(); }
 
 #if HPB_INTERNAL_BACKEND == HPB_INTERNAL_BACKEND_UPB
 // The empty registry is provided here as a convenience for extant users.

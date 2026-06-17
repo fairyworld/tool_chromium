@@ -73,7 +73,7 @@ void GetNodeOptions(const CalculatorGraphConfig::Node& node_config, T* result) {
 #else
   for (const mediapipe::protobuf::Any& options : node_config.node_options()) {
     if (options.Is<T>()) {
-      (void)options.UnpackTo(result);
+      options.UnpackTo(result);
     }
   }
 #endif

@@ -11,7 +11,6 @@
 #include "google/protobuf/reflection_ops.h"
 
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "absl/base/optimization.h"
@@ -21,7 +20,6 @@
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/descriptor.pb.h"
 #include "google/protobuf/map_field.h"
-#include "google/protobuf/message_lite.h"
 #include "google/protobuf/port.h"
 #include "google/protobuf/unknown_field_set.h"
 
@@ -79,7 +77,7 @@ void ReflectionOps::Merge(const Message& from, Message* to) {
             from_reflection->GetMapData(from, field);
         MapFieldBase* to_field = to_reflection->MutableMapData(to, field);
         if (to_field->IsMapValid() && from_field->IsMapValid()) {
-          to_field->MergeFrom(to->GetArena(), *from_field);
+          to_field->MergeFrom(*from_field);
           continue;
         }
       }
@@ -238,8 +236,7 @@ bool ReflectionOps::IsInitialized(const Message& message, bool check_fields,
     // referenced.
     const Message* extendee =
         MessageFactory::generated_factory()->GetPrototype(descriptor);
-    if (!reflection->GetExtensionSet(message).IsInitialized(message.GetArena(),
-                                                            extendee)) {
+    if (!reflection->GetExtensionSet(message).IsInitialized(extendee)) {
       return false;
     }
   }
@@ -435,14 +432,13 @@ void GenericSwap(Message* lhs, Message* rhs) {
 
   // Improve efficiency by placing the temporary on an arena so that messages
   // are copied twice rather than three times.
-  const ClassData* class_data = GetClassData(*lhs);
-  Message* tmp = static_cast<Message*>(class_data->New(arena));
-  tmp->MergeFromWithClassData(*lhs, class_data);
+  Message* tmp = rhs->New(arena);
+  tmp->CheckTypeAndMergeFrom(*lhs);
   lhs->Clear();
-  lhs->MergeFromWithClassData(*rhs, class_data);
+  lhs->CheckTypeAndMergeFrom(*rhs);
   if (internal::DebugHardenForceCopyInSwap()) {
     rhs->Clear();
-    rhs->MergeFromWithClassData(*tmp, class_data);
+    rhs->CheckTypeAndMergeFrom(*tmp);
     if (arena == nullptr) delete tmp;
   } else {
     rhs->GetReflection()->Swap(tmp, rhs);

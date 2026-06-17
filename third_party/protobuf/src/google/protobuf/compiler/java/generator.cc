@@ -148,8 +148,7 @@ bool JavaGenerator::Generate(const FileDescriptor* file,
     if (file_options.annotate_code) {
       std::unique_ptr<io::ZeroCopyOutputStream> info_output(
           context->Open(info_full_path));
-      // TODO: Remove this suppression.
-      (void)annotations.SerializeToZeroCopyStream(info_output.get());
+      annotations.SerializeToZeroCopyStream(info_output.get());
     }
   }
 

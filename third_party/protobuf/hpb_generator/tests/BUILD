@@ -12,16 +12,12 @@ load(
 )
 load("//bazel:proto_library.bzl", "proto_library")
 load(
+    "//bazel:upb_proto_library.bzl",
+    "upb_c_proto_library",
+)
+load(
     "//hpb/bazel:hpb_proto_library.bzl",
     "hpb_proto_library",
-)
-load(
-    "//upb/bazel:upb_minitable_proto_library.bzl",
-    "upb_minitable_proto_library",
-)
-load(
-    "//upb/bazel:upb_proto_library.bzl",
-    "upb_c_proto_library",
 )
 
 package(default_applicable_licenses = ["//:license"])
@@ -62,14 +58,6 @@ proto_library(
 
 upb_c_proto_library(
     name = "test_model_upb_proto",
-    visibility = [
-        "//hpb:__subpackages__",
-    ],
-    deps = [":test_model_proto"],
-)
-
-upb_minitable_proto_library(
-    name = "test_model_upb_minitable_proto",
     visibility = [
         "//hpb:__subpackages__",
     ],
