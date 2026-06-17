@@ -160,11 +160,9 @@ task_manager::TaskManagerTableModel* TaskManagerView::Show(
   g_task_manager_view->SelectTaskOfActiveTab(browser);
   g_task_manager_view->GetWidget()->Show();
 
-  if (g_task_manager_view->table_config_.layout_refresh &&
-      ui::AXPlatform::GetInstance().IsScreenReaderActive()) {
-    // For a11y: with the refreshed layout, the top-left most item should be
-    // focused by default so screen readers read out the layout ltr (or flipped
-    // for rtl).
+  if (ui::AXPlatform::GetInstance().IsScreenReaderActive()) {
+    // For a11y: the top-left most item should be focused by default so screen
+    // readers read out the layout ltr (or flipped for rtl).
     g_task_manager_view->tabs_->GetSelectedTab()->RequestFocus();
   }
 #if BUILDFLAG(IS_CHROMEOS)
@@ -405,7 +403,6 @@ TaskManagerView::TableConfigs TaskManagerView::GetTableConfigs() {
       .header_style = true,
       .table_refresh = true,
       .scroll_view_rounded = true,
-      .layout_refresh = true,
       .dialog_button_disabled = true,
       .sort_on_cpu_by_default = true,
   };
@@ -576,18 +573,15 @@ std::unique_ptr<views::View> TaskManagerView::CreateSearchBar(
 
 std::unique_ptr<views::ScrollView> TaskManagerView::CreateProcessView(
     std::unique_ptr<views::TableView> tab_table,
-    bool table_has_border,
-    bool layout_refresh) {
+    bool table_has_border) {
   auto scroll_view = views::TableView::CreateScrollViewWithTable(
       std::move(tab_table), table_has_border);
 
-  if (layout_refresh) {
-    scroll_view->SetLayoutManager(std::make_unique<views::FillLayout>());
-    scroll_view->SetProperty(
-        views::kFlexBehaviorKey,
-        views::FlexSpecification(views::MinimumFlexSizeRule::kScaleToZero,
-                                 views::MaximumFlexSizeRule::kUnbounded));
-  }
+  scroll_view->SetLayoutManager(std::make_unique<views::FillLayout>());
+  scroll_view->SetProperty(
+      views::kFlexBehaviorKey,
+      views::FlexSpecification(views::MinimumFlexSizeRule::kScaleToZero,
+                               views::MaximumFlexSizeRule::kUnbounded));
 
   return scroll_view;
 }
@@ -608,20 +602,16 @@ void TaskManagerView::Init() {
       nullptr, columns_, views::TableType::kIconAndText, false);
   tab_table_ = tab_table.get();
   table_model_ = std::make_unique<TaskManagerTableModel>(
-      this, table_config_.layout_refresh ? DisplayCategory::kTabsAndExtensions
-                                         : DisplayCategory::kAll);
+      this, DisplayCategory::kTabsAndExtensions);
   tab_table->SetModel(table_model_.get());
   tab_table->SetGrouper(this);
-  tab_table->SetGrouperVisibility(!table_config_.layout_refresh);
+  tab_table->SetGrouperVisibility(false);
   tab_table->SetSortOnPaint(true);
-  if (table_config_.layout_refresh) {
-    // Disables alternating row colors on all platforms, including macOS.
-    tab_table->SetAlternatingRowColorsEnabled(base::PassKey<TaskManagerView>(),
-                                              false);
-    tab_table->SetMouseHoveringEnabled(true);
-
-    tab_table->SetRowPadding(views::DISTANCE_TABLE_VERTICAL_TEXT_PADDING);
-  }
+  // Disables alternating row colors on all platforms, including macOS.
+  tab_table->SetAlternatingRowColorsEnabled(base::PassKey<TaskManagerView>(),
+                                            false);
+  tab_table->SetMouseHoveringEnabled(true);
+  tab_table->SetRowPadding(views::DISTANCE_TABLE_VERTICAL_TEXT_PADDING);
   tab_table->set_observer(this);
   tab_table->SetSelectOnFocus(true);
   tab_table->set_context_menu_controller(this);
@@ -629,9 +619,7 @@ void TaskManagerView::Init() {
 
   SetButtons(static_cast<int>(ui::mojom::DialogButton::kOk));
   SetButtonLabel(ui::mojom::DialogButton::kOk,
-                 l10n_util::GetStringUTF16(table_config_.layout_refresh
-                                               ? IDS_TASK_MANAGER_KILL_V2
-                                               : IDS_TASK_MANAGER_KILL));
+                 l10n_util::GetStringUTF16(IDS_TASK_MANAGER_KILL_V2));
 
   const auto* provider = ChromeLayoutProvider::Get();
   const float corner_radius =
@@ -669,9 +657,8 @@ void TaskManagerView::Init() {
   }
 
   // Margins around all contents
-  const gfx::Insets dialog_insets = provider->GetInsetsMetric(
-      table_config_.layout_refresh ? static_cast<int>(INSETS_TASK_MANAGER)
-                                   : views::INSETS_DIALOG);
+  const gfx::Insets dialog_insets =
+      provider->GetInsetsMetric(static_cast<int>(INSETS_TASK_MANAGER));
   // We don't use ChromeLayoutProvider::GetDialogInsetsForContentType because we
   // don't have a title.
   const auto content_insets = gfx::Insets::TLBR(
@@ -682,20 +669,16 @@ void TaskManagerView::Init() {
   SetBorder(views::CreateEmptyBorder(content_insets));
 
   // Setup Layout Manager for Dialog
-  if (table_config_.layout_refresh) {
-    views::FlexLayout* content_layout =
-        SetLayoutManager(std::make_unique<views::FlexLayout>());
-    content_layout->SetOrientation(views::LayoutOrientation::kVertical);
+  views::FlexLayout* content_layout =
+      SetLayoutManager(std::make_unique<views::FlexLayout>());
+  content_layout->SetOrientation(views::LayoutOrientation::kVertical);
 
-    CreateHeader(provider);
-  } else {
-    SetUseDefaultFillLayout(true);
-  }
+  // Create a TableHeader for the Task Manager
+  CreateHeader(provider);
 
   // Add Process List (a.k.a Scroll View)
   auto* tab_table_parent = AddChildView(
-      CreateProcessView(std::move(tab_table), table_config_.table_has_border,
-                        table_config_.layout_refresh));
+      CreateProcessView(std::move(tab_table), table_config_.table_has_border));
 
   if (table_config_.scroll_view_rounded) {
     tab_table_parent->SetPaintToLayer(ui::LAYER_TEXTURED);
@@ -709,9 +692,7 @@ void TaskManagerView::Init() {
   table_model_->RetrieveSavedColumnsSettingsAndUpdateTable(
       table_config_.sort_on_cpu_by_default);
 
-  if (table_config_.layout_refresh) {
-    RestoreSavedCategory();
-  }
+  RestoreSavedCategory();
 
   AddAccelerator(ui::Accelerator(ui::VKEY_W, ui::EF_CONTROL_DOWN));
   AddAccelerator(
@@ -809,9 +790,7 @@ void TaskManagerView::EndSelectedProcess() {
   }
 
   // AX: Announce the result of ending a task group.
-  if (table_config_.layout_refresh) {
-    AnnounceTaskEnded(any_task_ended);
-  }
+  AnnounceTaskEnded(any_task_ended);
 
   base::TimeTicks current_time = base::TimeTicks::Now();
   if (end_process_count_ < 5) {
