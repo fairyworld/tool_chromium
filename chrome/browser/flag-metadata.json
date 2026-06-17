@@ -1223,11 +1223,6 @@
     "expiry_milestone": 170
   },
   {
-    "name": "bluetooth-use-floss",
-    "owners": ["abhishekpandit@chromium.org", "chromeos-bt-champs@google.com"],
-    "expiry_milestone": 170
-  },
-  {
     "name": "bluetooth-use-llprivacy",
     "owners": ["jiangzp@chromium.org", "chromeos-bt-champs@google.com"],
     "expiry_milestone": 170
