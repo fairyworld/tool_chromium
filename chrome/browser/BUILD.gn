@@ -2077,8 +2077,6 @@ source_set("core") {
 # static_library produces an empty archive, which the Windows librarian
 # (lld-link /lib) rejects with "lib failed".
 source_set("browser") {
-  sources = []
-
   configs += [
     "//build/config/compiler:wexit_time_destructors",
     "//build/config:precompiled_headers",
@@ -2091,9 +2089,6 @@ source_set("browser") {
 
   libs = []
   ldflags = []
-
-  # Do NOT add any new circular includes.
-  allow_circular_includes_from = []
 
   public_deps = [
     # WARNING WARNING WARNING
@@ -3188,7 +3183,6 @@ source_set("browser") {
 
       # Targets containing Android-specific implementations that have to be
       # linked into the browser.
-      # These mirror the allow_circular_includes_from list below.
       "//chrome/browser/auxiliary_search:impl",
       "//chrome/browser/bookmarks/android:impl",
       "//chrome/browser/facilitated_payments",
@@ -3203,61 +3197,6 @@ source_set("browser") {
       "//chrome/browser/translate/android:android_impl",
       "//chrome/browser/ui/android:context_menu_helper",
       "//chrome/browser/ui/android/tab_model:impl",
-      "//chrome/browser/ui/webui/notifications_internals:impl",
-      "//chrome/browser/webapps:android_impl",
-      "//chrome/browser/webapps/installable:impl",
-    ]
-
-    # //chrome/browser/android contains Android-specific implementations that
-    # include monolith headers (e.g. browser_process.h). These circular
-    # includes will be resolved as more monolith headers get modularized.
-    allow_circular_includes_from += [
-      "//chrome/browser/android",
-
-      # The following targets contain Android implementations whose files
-      # still include headers owned by :browser. When those headers get
-      # componentized, the entries below can be removed.
-      "//chrome/browser/autocomplete:impl",
-      "//chrome/browser/auxiliary_search:impl",
-      "//chrome/browser/background_sync:impl",
-      "//chrome/browser/bookmarks/android:impl",
-      "//chrome/browser/browsing_data:impl",
-      "//chrome/browser/complex_tasks:impl",
-      "//chrome/browser/content_index:impl",
-      "//chrome/browser/devtools",
-      "//chrome/browser/dom_distiller:impl",
-      "//chrome/browser/download:impl",
-      "//chrome/browser/facilitated_payments",
-      "//chrome/browser/feed:impl",
-      "//chrome/browser/glic:impl",
-      "//chrome/browser/history:impl",
-      "//chrome/browser/keyboard_accessory/android:impl",
-      "//chrome/browser/lens:impl",
-      "//chrome/browser/metrics:impl",
-      "//chrome/browser/notifications:impl",
-      "//chrome/browser/optimization_guide:impl",
-      "//chrome/browser/partnerbookmarks:android_impl",
-      "//chrome/browser/password_manager:impl",
-      "//chrome/browser/permissions",
-      "//chrome/browser/prefs:impl",
-      "//chrome/browser/privacy:secure_dns_bridge",
-      "//chrome/browser/privacy_sandbox:impl",
-      "//chrome/browser/profiles:misc",
-      "//chrome/browser/profiles:profiles_extra_parts_impl",
-      "//chrome/browser/push_messaging:impl",
-      "//chrome/browser/safe_browsing",
-      "//chrome/browser/signin:impl",
-      "//chrome/browser/sync",
-      "//chrome/browser/task_manager:impl",
-      "//chrome/browser/touch_to_fill/autofill/android:impl",
-      "//chrome/browser/touch_to_fill/password_manager:impl",
-      "//chrome/browser/translate/android:android_impl",
-      "//chrome/browser/ui",
-      "//chrome/browser/ui/android/tab_model:impl",
-      "//chrome/browser/ui/autofill:impl",
-      "//chrome/browser/ui/autofill/payments:impl",
-      "//chrome/browser/ui/blocked_content:impl",
-      "//chrome/browser/ui/startup:impl",
       "//chrome/browser/ui/webui/notifications_internals:impl",
       "//chrome/browser/webapps:android_impl",
       "//chrome/browser/webapps/installable:impl",
@@ -3284,12 +3223,6 @@ source_set("browser") {
       "//chrome/browser/web_applications/isolated_web_apps/window_management:impl",
       "//chrome/browser/webapps:desktop",
       "//chrome/browser/webapps:desktop_impl",
-    ]
-
-    allow_circular_includes_from += [
-      # TODO(crbug.com/504627103): Remove this circular dependency.
-      "//chrome/browser/new_tab_page:impl",
-      "//chrome/browser/payments:impl",
     ]
 
     #!is_android
@@ -3569,169 +3502,6 @@ source_set("browser") {
     }
 
     #!is_android
-    # Any circular includes must depend on the target
-    # "browser_public_dependencies".
-    allow_circular_includes_from += [
-      # TODO(crbug.com/40251079): Remove circular dependencies.
-      "//chrome/browser/apps/app_service",
-
-      # TODO(crbug.com/441649482): Remove this circular dependency with cleaning
-      # up
-      # - c/b/apps/app_service/publishers.
-      "//chrome/browser/apps/app_service/publishers",
-
-      # TODO(b/220386256): Remove circular dependency from the browser.
-      "//chrome/browser/media/router/discovery/access_code:access_code_sink_service",
-      "//chrome/browser/media/router:mojo_impl",
-
-      # This is needed because profile_resetter.cc depends on
-      # chrome/browser/net/system_network_context_manager.h.
-      # TODO(crbug.com/353332589): Remove this circular dependency when
-      # //c/b/net is modularized.
-      "//chrome/browser/profile_resetter:impl",
-
-      # TODO(crbug.com/40761673): Remove cycles and simplify all dependencies.
-      "//chrome/browser/web_applications",
-
-      "//chrome/browser/external_protocol",
-      "//chrome/browser/external_protocol:impl",
-
-      # TODO(crbug.com/40251079): Remove circular dependencies.
-      "//chrome/browser/web_applications/app_service",
-
-      # Needs //chrome/browser/content_settings, but its sources are in
-      # //chrome/browser instead.
-      "//chrome/browser/smart_card",
-
-      # TODO(crbug.com/345487716): Remove this circular dependency.
-      "//chrome/browser/ui/read_anything",
-      "//chrome/browser/ui/views/side_panel",
-
-      # TODO(crbug/com/387527798): Remove circular dependencies.
-      "//chrome/browser/ui/views/download",
-
-      # TODO(crbug.com/359593415): //c/b/ui/apps/chrome_app_delegate.cc includes
-      # - //c/b/app_mode/app_mode_utils.h,
-      # - //c/b/lifetime/termination_notification.h,
-      # - //c/b/file_system_access/file_system_access_permission_request_manager.h
-      # ... and more. Remove circular include entry when these directories get
-      # modularized.
-      "//chrome/browser/ui/apps:impl",
-
-      # TODO(crbug.com/369756821): Remove this circular dependency when
-      # //c/b/feature_engagement gets modularized.
-      "//chrome/browser/ui/global_media_controls:impl",
-
-      # TODO(crbug.com/364501603): Remove this circular dependency when the
-      # following files get
-      # componentized:
-      # - c/b/resource_coordinator/tab_lifecycle_unit_source.h"
-      # - c/b/resource_coordinator/tab_manager.h"
-      # - c/b/resource_coordinator/time.h"
-      # - c/b/enterprise/browser_management/management_service_factory.h"
-      # - c/b/page_content_annotations/page_content_annotations_service_factory.h"
-      "//chrome/browser/ui/browser_window/internal",
-
-      # TODO(crbug.com/434882143): Remove this circular dependency when the
-      # following files get
-      # componentized:
-      # - c/b/lifetime/browser_close_manager.h
-      # - c/b/command_observer.h
-      "//chrome/browser/ui/views/toolbar",
-
-      "//chrome/browser/ui/views/toolbar:impl",
-      "//chrome/browser/ui/views/new_tab_footer",
-      "//chrome/browser/ui/webui/searchbox",
-      "//chrome/browser/ui/webui/cr_components/searchbox:searchbox_impl",
-      "//chrome/browser/ui/webui/top_chrome:impl",
-      "//chrome/browser/ui/webui/watermark",
-      "//chrome/browser/ui/content_settings:impl",
-      "//chrome/browser/ui/commerce:impl",
-      "//chrome/browser/picture_in_picture:impl",
-      "//chrome/browser/ui/signin:impl",
-      "//chrome/browser/ui/webui/whats_new:impl",
-      "//chrome/browser/importer:impl",
-      "//chrome/browser/ui/webui/commerce:impl",
-      "//chrome/browser/ui/webui/customize_buttons",
-      "//chrome/browser/ui/tabs/saved_tab_groups:impl",
-      "//chrome/browser/ui/webui/settings:impl",
-      "//chrome/browser/ui/webui/new_tab_footer:impl",
-      "//chrome/browser/ui/webui/signin:signin_impl",
-      "//chrome/browser/ui/webui/signin:signin_utils_impl",
-      "//chrome/browser/ui/webui_browser:impl",
-      "//chrome/browser/ui/media_router:impl",
-      "//chrome/browser/ui/tabs:impl",
-      "//chrome/browser/ui/tabs:tab_menu_impl",
-      "//chrome/browser/ui/tabs:tab_group_impl",
-      "//chrome/browser/ui/tabs:tab_model_impl",
-      "//chrome/browser/ui/tabs:tab_strip_impl",
-      "//chrome/browser/ui/bookmarks:impl",
-      "//chrome/browser/ui/desktop_to_mobile_promos:impl",
-
-      # TODO(crbug.com/437811373): Remove this circular dependency when
-      # c/b/password_manager/password_store_utils.h gets componentized.
-      "//chrome/browser/ui/passwords/bubble_controllers:impl",
-
-      # TODO(crbug.com/438226511): Remove this circular dependency when:
-      # - c/b/sessions/app_session_service.h
-      # - c/b/sessions/app_session_service_factory.h
-      # - c/b/sessions/session_service_base.h
-      # - c/b/sessions/session_service_lookup.h
-      # - c/b/after_startup_task_utils.h
-      # ... get componentized.
-      "//chrome/browser/ui/web_applications:impl",
-
-      # TODO(crbug.com/434882143): Remove this circular dependency when the
-      # following headers get
-      # componentized:
-      # - c/b/history_embeddings/history_embeddings_utils.h
-      # - c/b/defaults.h"
-      # - c/b/translate/translate_service.h
-      "//chrome/browser/ui/views/location_bar:impl",
-
-      # TODO(crbug.com/434882143): Remove this circular dependency when the
-      # following headers get
-      # componentized:
-      # - c/b/sharing/click_to_call/click_to_call_ui_controller.h
-      # - c/b/sharing/sms/sms_remote_fetcher_ui_controller.h
-      "//chrome/browser/ui/views/page_action:impl",
-
-      # TODO(crbug.com/441020158): Remove this circular dependency when the
-      # following headers get
-      # componentized:
-      # - c/b/enterprise/browser_management/management_service_factory.h
-      # - c/b/lifetime/application_lifetime.h
-      "//chrome/browser/upgrade_detector:impl",
-
-      # TODO(crbug.com/353332589): Remove this circular dependency when:
-      # - c/b/browser_process_platform_part.h
-      # - c/b/net/system_network_context_manager.h
-      "//chrome/browser/device_api:impl",
-
-      "//chrome/browser/glic/media",
-
-      # TODO(crbug.com/353332589): Remove this circular dependency when
-      # c/b/net/system_network_context_manager.h gets componentized.
-      "//chrome/browser/digital_credentials:impl",
-
-      # Circular dependency on file_select_helper.h.
-      "//chrome/browser/indigo/onboarding",
-
-      # support_tool's :impl includes chrome/browser/signin/
-      # about_signin_internals_factory.h from //chrome/browser.
-      "//chrome/browser/support_tool:impl",
-
-      # hid's :impl includes chrome/browser/browser_process.h from
-      # //chrome/browser.
-      "//chrome/browser/hid:impl",
-    ]
-
-    if (is_win || is_chromeos) {
-      allow_circular_includes_from +=
-          [ "//chrome/browser/ui/webui/signin:inline_login_impl" ]
-    }
-
-    #!is_android
     if (!is_chromeos) {
       deps += [
         "//chrome/browser/default_browser",
@@ -3755,33 +3525,6 @@ source_set("browser") {
         deps +=
             [ "//chrome/browser/ui/webui/default_browser:visual_guided_setter" ]
       }
-
-      if (is_linux) {
-        # Any circular includes must depend on the target
-        # "browser_public_dependencies".
-        allow_circular_includes_from += [
-          # TODO(crbug.com/335727004): Split out linux dependencies into
-          # separate targets.
-          "//chrome/browser/shortcuts",
-        ]
-      }
-
-      #!is_android && !is_chromeos
-      # Any circular includes must depend on the target
-      # "browser_public_dependencies".
-      allow_circular_includes_from += [
-        "//chrome/browser/ui/webui/signin:profile_impl",
-
-        # TODO(crbug.com/368831367):
-        # //c/b/ui/download/download_bubble_security_view_info.cc includes
-        # //c/b/signin/identity_manager_factory.h.
-        # Remove circular include entry when this directory gets modularized.
-        "//chrome/browser/ui/download:impl",
-
-        # TODO(crbug.com/369883710): Remove this circular dependency when
-        # profiles/profile_manager.h gets componentized.
-        "//chrome/browser/ui/startup/default_browser_prompt:impl",
-      ]
     }
 
     if (!is_win) {
@@ -4421,335 +4164,6 @@ source_set("browser") {
       "//ui/wm/public",
     ]
 
-    # Any circular includes must depend on the target
-    # "browser_public_dependencies".
-    allow_circular_includes_from += [
-      "//chrome/browser/apps/browser_instance",
-      "//chrome/browser/ash/accessibility",
-      "//chrome/browser/ash/accessibility/live_caption",
-      "//chrome/browser/ash/account_manager",
-      "//chrome/browser/ash/ambient",
-      "//chrome/browser/ash/android_sms",
-      "//chrome/browser/ash/api/tasks",
-      "//chrome/browser/ash/app_list",
-      "//chrome/browser/ash/app_list/arc",
-      "//chrome/browser/ash/app_list/search",
-      "//chrome/browser/ash/app_list/search/arc",
-      "//chrome/browser/ash/app_list/search/files",
-      "//chrome/browser/ash/app_list/search/omnibox",
-      "//chrome/browser/ash/app_mode",
-      "//chrome/browser/ash/app_mode/auto_sleep",
-      "//chrome/browser/ash/app_mode/web_app",
-      "//chrome/browser/ash/app_restore",
-      "//chrome/browser/ash/apps",
-      "//chrome/browser/ash/arc",
-      "//chrome/browser/ash/arc:arc_util_impl",
-      "//chrome/browser/ash/arc/auth",
-      "//chrome/browser/ash/arc/boot_phase_monitor",
-      "//chrome/browser/ash/arc/enterprise/cert_store",
-      "//chrome/browser/ash/arc/error_notification",
-      "//chrome/browser/ash/arc/fileapi",
-      "//chrome/browser/ash/arc/input_method_manager",
-      "//chrome/browser/ash/arc/input_overlay",
-      "//chrome/browser/ash/arc/instance_throttle",
-      "//chrome/browser/ash/arc/intent_helper",
-      "//chrome/browser/ash/arc/memory_pressure",
-      "//chrome/browser/ash/arc/metrics",
-      "//chrome/browser/ash/arc/nearby_share",
-      "//chrome/browser/ash/arc/nearby_share/ui",
-      "//chrome/browser/ash/arc/net",
-      "//chrome/browser/ash/arc/notification",
-      "//chrome/browser/ash/arc/optin",
-      "//chrome/browser/ash/arc/pip",
-      "//chrome/browser/ash/arc/policy",
-      "//chrome/browser/ash/arc/print_spooler",
-      "//chrome/browser/ash/arc/screen_capture",
-      "//chrome/browser/ash/arc/session",
-      "//chrome/browser/ash/arc/tracing",
-      "//chrome/browser/ash/arc/tts",
-      "//chrome/browser/ash/arc/window_predictor",
-      "//chrome/browser/ash/attestation",
-      "//chrome/browser/ash/audio",
-      "//chrome/browser/ash/auth",
-      "//chrome/browser/ash/bluetooth",
-      "//chrome/browser/ash/boca",
-      "//chrome/browser/ash/boca/babelorca",
-      "//chrome/browser/ash/boca/on_task",
-      "//chrome/browser/ash/boca/receiver",
-      "//chrome/browser/ash/boca/spotlight",
-      "//chrome/browser/ash/borealis",
-      "//chrome/browser/ash/bruschetta",
-      "//chrome/browser/ash/browser_delegate:impl",
-      "//chrome/browser/ash/calendar",
-      "//chrome/browser/ash/camera",
-      "//chrome/browser/ash/camera_mic",
-      "//chrome/browser/ash/cert_provisioning",
-      "//chrome/browser/ash/child_accounts",
-      "//chrome/browser/ash/child_accounts/on_device_controls",
-      "//chrome/browser/ash/child_accounts/parent_access_code",
-      "//chrome/browser/ash/child_accounts/time_limits",
-      "//chrome/browser/ash/crosapi",
-      "//chrome/browser/ash/crostini",
-      "//chrome/browser/ash/cryptauth",
-      "//chrome/browser/ash/customization",
-      "//chrome/browser/ash/dbus",
-      "//chrome/browser/ash/dbus/vm",
-      "//chrome/browser/ash/device_sync",
-      "//chrome/browser/ash/drive",
-      "//chrome/browser/ash/early_prefs",
-      "//chrome/browser/ash/eche_app",
-      "//chrome/browser/ash/events",
-      "//chrome/browser/ash/exo",
-      "//chrome/browser/ash/extended_updates",
-      "//chrome/browser/ash/extensions",
-      "//chrome/browser/ash/extensions/autotest_private",
-      "//chrome/browser/ash/extensions/file_manager",
-      "//chrome/browser/ash/extensions/speech",
-      "//chrome/browser/ash/extensions/users_private",
-      "//chrome/browser/ash/external_metrics",
-      "//chrome/browser/ash/fileapi",
-      "//chrome/browser/ash/fileapi:impl",
-      "//chrome/browser/ash/file_manager",
-      "//chrome/browser/ash/file_manager/virtual_tasks",
-      "//chrome/browser/ash/file_suggest",
-      "//chrome/browser/ash/file_system_provider",
-      "//chrome/browser/ash/file_system_provider/fileapi",
-      "//chrome/browser/ash/first_run",
-      "//chrome/browser/ash/floating_workspace",
-      "//chrome/browser/ash/fusebox",
-      "//chrome/browser/ash/growth",
-      "//chrome/browser/ash/guest_os",
-      "//chrome/browser/ash/guest_os/public",
-      "//chrome/browser/ash/hats",
-      "//chrome/browser/ash/input_device_settings",
-      "//chrome/browser/ash/input_method",
-      "//chrome/browser/ash/kcer",
-      "//chrome/browser/ash/kcer/nssdb_migration",
-      "//chrome/browser/ash/kerberos",
-      "//chrome/browser/ash/keyed_service",
-      "//chrome/browser/ash/lobster",
-      "//chrome/browser/ash/locale",
-      "//chrome/browser/ash/login",
-      "//chrome/browser/ash/login/app_mode",
-      "//chrome/browser/ash/login/auth",
-      "//chrome/browser/ash/login/auth_factors_policy",
-      "//chrome/browser/ash/login/demo_mode",
-      "//chrome/browser/ash/login/demo_mode:demo_mode_login",
-      "//chrome/browser/ash/login/enrollment",
-      "//chrome/browser/ash/login/extensions",
-      "//chrome/browser/ash/login/lock",
-      "//chrome/browser/ash/login/osauth",
-      "//chrome/browser/ash/login/quick_unlock",
-      "//chrome/browser/ash/login/reporting",
-      "//chrome/browser/ash/login/saml",
-      "//chrome/browser/ash/login/screens",
-      "//chrome/browser/ash/login/screens/osauth",
-      "//chrome/browser/ash/login/session",
-      "//chrome/browser/ash/login/signin",
-      "//chrome/browser/ash/login/smart_lock",
-      "//chrome/browser/ash/login/users",
-      "//chrome/browser/ash/magic_boost",
-      "//chrome/browser/ash/mahi",
-      "//chrome/browser/ash/mahi:mahi_availability",
-      "//chrome/browser/ash/mahi/web_contents",
-      "//chrome/browser/ash/main_parts",
-      "//chrome/browser/ash/nearby",
-      "//chrome/browser/ash/nearby/presence",
-      "//chrome/browser/ash/net",
-      "//chrome/browser/ash/net/dns_over_https",
-      "//chrome/browser/ash/net/network_diagnostics",
-      "//chrome/browser/ash/net/network_health",
-      "//chrome/browser/ash/net/rollback_network_config",
-      "//chrome/browser/ash/note_taking",
-      "//chrome/browser/ash/notifications",
-      "//chrome/browser/ash/os_feedback",
-      "//chrome/browser/ash/ownership",
-      "//chrome/browser/ash/phonehub",
-      "//chrome/browser/ash/platform_keys",
-      "//chrome/browser/ash/platform_keys:keystore_service",
-      "//chrome/browser/ash/platform_keys/key_permissions",
-      "//chrome/browser/ash/plugin_vm",
-      "//chrome/browser/ash/policy/core",
-      "//chrome/browser/ash/policy/dlp",
-      "//chrome/browser/ash/policy/dlp/dialogs",
-      "//chrome/browser/ash/policy/enrollment",
-      "//chrome/browser/ash/policy/external_data",
-      "//chrome/browser/ash/policy/handlers",
-      "//chrome/browser/ash/policy/login",
-      "//chrome/browser/ash/policy/remote_commands",
-      "//chrome/browser/ash/policy/remote_commands/crd",
-      "//chrome/browser/ash/policy/reporting",
-      "//chrome/browser/ash/policy/reporting/event_based_logs",
-      "//chrome/browser/ash/policy/reporting/event_based_logs/event_observers",
-      "//chrome/browser/ash/policy/reporting/os_updates",
-      "//chrome/browser/ash/policy/reporting/user_added_removed",
-      "//chrome/browser/ash/policy/reporting/user_session_activity",
-      "//chrome/browser/ash/policy/scheduled_task_handler",
-      "//chrome/browser/ash/policy/server_backed_state",
-      "//chrome/browser/ash/policy/skyvault",
-      "//chrome/browser/ash/policy/status_collector",
-      "//chrome/browser/ash/policy/uploading",
-      "//chrome/browser/ash/power",
-      "//chrome/browser/ash/power/auto_screen_brightness",
-      "//chrome/browser/ash/power/ml",
-      "//chrome/browser/ash/power/smart_charging",
-      "//chrome/browser/ash/preferences",
-      "//chrome/browser/ash/printing",
-      "//chrome/browser/ash/printing/enterprise",
-      "//chrome/browser/ash/printing/history",
-      "//chrome/browser/ash/printing/print_management",
-      "//chrome/browser/ash/privacy_hub",
-      "//chrome/browser/ash/profiles",
-      "//chrome/browser/ash/profiles:signin_profile_handler",
-      "//chrome/browser/ash/quick_pair",
-      "//chrome/browser/ash/release_notes",
-      "//chrome/browser/ash/report_controller_initializer",
-      "//chrome/browser/ash/sanitize",
-      "//chrome/browser/ash/scanner",
-      "//chrome/browser/ash/settings",
-      "//chrome/browser/ash/sharesheet",
-      "//chrome/browser/ash/shimless_rma",
-      "//chrome/browser/ash/smb_client",
-      "//chrome/browser/ash/sync",
-      "//chrome/browser/ash/system",
-      "//chrome/browser/ash/system_logs",
-      "//chrome/browser/ash/system_web_apps",
-      "//chrome/browser/ash/system_web_apps/apps",
-      "//chrome/browser/ash/system_web_apps/apps/camera_app",
-      "//chrome/browser/ash/system_web_apps/apps/help_app",
-      "//chrome/browser/ash/system_web_apps/apps/media_app",
-      "//chrome/browser/ash/system_web_apps/apps/personalization_app",
-      "//chrome/browser/ash/system_web_apps/apps/recorder_app",
-      "//chrome/browser/ash/tpm",
-      "//chrome/browser/ash/usb",
-      "//chrome/browser/ash/video_conference",
-      "//chrome/browser/ash/wallpaper_handlers",
-      "//chrome/browser/chromeos/app_mode",
-      "//chrome/browser/chromeos/arc",
-      "//chrome/browser/chromeos/extensions/desk_api",
-      "//chrome/browser/chromeos/extensions/echo_private",
-      "//chrome/browser/chromeos/extensions/info_private",
-      "//chrome/browser/chromeos/extensions/login_screen/login/cleanup",
-      "//chrome/browser/chromeos/extensions/vpn_provider",
-      "//chrome/browser/chromeos/extensions/wallpaper",
-      "//chrome/browser/chromeos/network",
-      "//chrome/browser/chromeos/platform_keys",
-      "//chrome/browser/chromeos/policy/dlp",
-      "//chrome/browser/chromeos/reporting",
-      "//chrome/browser/chromeos/tablet_mode",
-      "//chrome/browser/chromeos/upload_office_to_cloud",
-      "//chrome/browser/extensions/api/document_scan",
-      "//chrome/browser/extensions/api/enterprise_networking_attributes",
-
-      # TODO(crbug.com/353332589): Remove this circular dependency when
-      # c/b/browser_process_platform_part_ash.h gets modularized.
-      "//chrome/browser/invalidation:impl",
-      "//chrome/browser/media_galleries/fileapi:impl",
-
-      # nearby_sharing's :impl includes chrome/browser/browser_process.h and
-      # chrome/browser/platform_util.h from //chrome/browser.
-      "//chrome/browser/nearby_sharing:impl",
-      "//chrome/browser/policy:onc",
-      "//chrome/browser/support_tool/ash",
-      "//chrome/browser/ui/ash/accelerator",
-      "//chrome/browser/ui/ash/app_access",
-      "//chrome/browser/ui/ash/arc",
-      "//chrome/browser/ui/ash/assistant",
-      "//chrome/browser/ui/ash/birch",
-      "//chrome/browser/ui/ash/capture_mode",
-      "//chrome/browser/ui/ash/desks",
-      "//chrome/browser/ui/ash/device_scheduled_reboot",
-      "//chrome/browser/ui/ash/focus_mode",
-      "//chrome/browser/ui/ash/game_dashboard",
-      "//chrome/browser/ui/ash/glanceables",
-      "//chrome/browser/ui/ash/global_media_controls",
-      "//chrome/browser/ui/ash/google_one",
-      "//chrome/browser/ui/ash/graduation",
-      "//chrome/browser/ui/ash/holding_space",
-      "//chrome/browser/ui/ash/in_session_auth",
-      "//chrome/browser/ui/ash/keyboard",
-      "//chrome/browser/ui/ash/login",
-      "//chrome/browser/ui/ash/main_extra_parts",
-      "//chrome/browser/ui/ash/management_disclosure",
-      "//chrome/browser/ui/ash/media_client",
-      "//chrome/browser/ui/ash/multi_user",
-      "//chrome/browser/ui/ash/network",
-      "//chrome/browser/ui/ash/new_window",
-      "//chrome/browser/ui/ash/projector",
-      "//chrome/browser/ui/ash/quick_insert",
-      "//chrome/browser/ui/ash/session",
-      "//chrome/browser/ui/ash/sharesheet",
-      "//chrome/browser/ui/ash/shelf",
-      "//chrome/browser/ui/ash/shelf/app_service",
-      "//chrome/browser/ui/ash/shell_delegate",
-      "//chrome/browser/ui/ash/system",
-      "//chrome/browser/ui/ash/user_education",
-      "//chrome/browser/ui/ash/wallpaper",
-      "//chrome/browser/ui/ash/web_view",
-      "//chrome/browser/ui/views/select_file_dialog_extension",
-      "//chrome/browser/ui/webui/ash/add_supervision",
-      "//chrome/browser/ui/webui/ash/arc_overview_tracing",
-      "//chrome/browser/ui/webui/ash/arc_power_control",
-      "//chrome/browser/ui/webui/ash/cellular_setup",
-      "//chrome/browser/ui/webui/ash/cloud_upload",
-      "//chrome/browser/ui/webui/ash/diagnostics_dialog",
-      "//chrome/browser/ui/webui/ash/drive_internals",
-      "//chrome/browser/ui/webui/ash/edu_coexistence",
-      "//chrome/browser/ui/webui/ash/emoji",
-      "//chrome/browser/ui/webui/ash/enterprise_reporting",
-      "//chrome/browser/ui/webui/ash/extended_updates",
-      "//chrome/browser/ui/webui/ash/floating_workspace",
-      "//chrome/browser/ui/webui/ash/kerberos",
-      "//chrome/browser/ui/webui/ash/lobster",
-      "//chrome/browser/ui/webui/ash/lock_screen_reauth",
-      "//chrome/browser/ui/webui/ash/login",
-      "//chrome/browser/ui/webui/ash/login/testapi",
-      "//chrome/browser/ui/webui/ash/multidevice_setup",
-      "//chrome/browser/ui/webui/ash/network_ui",
-      "//chrome/browser/ui/webui/ash/parent_access",
-      "//chrome/browser/ui/webui/ash/sensor_info",
-      "//chrome/browser/ui/webui/ash/settings",
-      "//chrome/browser/ui/webui/ash/settings/calculator",
-      "//chrome/browser/ui/webui/ash/settings/pages/a11y",
-      "//chrome/browser/ui/webui/ash/settings/pages/about",
-      "//chrome/browser/ui/webui/ash/settings/pages/crostini",
-      "//chrome/browser/ui/webui/ash/settings/pages/date_time",
-      "//chrome/browser/ui/webui/ash/settings/pages/device",
-      "//chrome/browser/ui/webui/ash/settings/pages/device/input_device_settings",
-      "//chrome/browser/ui/webui/ash/settings/pages/files",
-      "//chrome/browser/ui/webui/ash/settings/pages/main",
-      "//chrome/browser/ui/webui/ash/settings/pages/multidevice",
-      "//chrome/browser/ui/webui/ash/settings/pages/people",
-      "//chrome/browser/ui/webui/ash/settings/pages/printing",
-      "//chrome/browser/ui/webui/ash/settings/pages/privacy",
-      "//chrome/browser/ui/webui/ash/settings/pages/storage",
-      "//chrome/browser/ui/webui/ash/settings/services/metrics",
-      "//chrome/browser/ui/webui/ash/settings/services/settings_manager",
-      "//chrome/browser/ui/webui/ash/skyvault",
-      "//chrome/browser/ui/webui/ash/system_web_dialog",
-      "//chrome/browser/ui/webui/nearby_share",
-      "//chrome/browser/ui/webui/signin/ash",
-
-      # TODO(crbug.com/215757706): Remove this circular dependency when
-      # c/b/profiles/profile_manager.h gets componentized.
-      "//chrome/browser/ui/ash/quick_answers",
-
-      # browser_interop's use of ProfileNetworkContextService causes a circular
-      # dependency:
-      # c/b -> ... ->
-      # c/b/ash/policy/remote_commands -> ... ->
-      # remoting/host/chromeos:browser_interop ->
-      # c/b
-      # TODO: crbug.com/395179599 - Remove once //chrome/browser/net has its own
-      # build target.
-      "//remoting/host/chromeos:browser_interop",
-
-      # TODO(crbug.com/353332589): Remove this circular dependency when:
-      # - c/b/profiles/profile_manager.h"
-      # gets componentized.
-      "//chrome/browser/ash/certificate_provider:impl",
-    ]
-
     if (is_chrome_branded) {
       deps += [ "//chrome/browser/nearby_sharing/internal/icons:vector_icons" ]
     }
@@ -4767,14 +4181,6 @@ source_set("browser") {
 
     if (is_cfm) {
       deps += [
-        "//chrome/browser/ash/chromebox_for_meetings/browser",
-        "//chrome/browser/ash/chromebox_for_meetings/meet_browser",
-        "//chrome/browser/ash/chromebox_for_meetings/xu_camera",
-      ]
-
-      # Any circular includes must depend on the target
-      # "browser_public_dependencies".
-      allow_circular_includes_from += [
         "//chrome/browser/ash/chromebox_for_meetings/browser",
         "//chrome/browser/ash/chromebox_for_meetings/meet_browser",
         "//chrome/browser/ash/chromebox_for_meetings/xu_camera",
@@ -4805,9 +4211,6 @@ source_set("browser") {
       "//chrome/browser/background/extensions",
       "//chrome/browser/background/extensions:impl",
     ]
-
-    allow_circular_includes_from +=
-        [ "//chrome/browser/background/extensions:impl" ]
   }
 
   if (is_mac || is_win) {
@@ -4816,26 +4219,9 @@ source_set("browser") {
       "//chrome/browser/ui/startup/default_browser_prompt/pin_infobar:impl",
       "//chrome/common/notifications",
     ]
-
-    # Any circular includes must depend on the target
-    # "browser_public_dependencies".
-    allow_circular_includes_from += [
-      # Due to dependencies on:
-      # * `//chrome/browser/win/taskbar_manager.h`(Windows)
-      # * `//chrome/browser/dock.h` (MacOS)
-      "//chrome/browser/ui/startup/default_browser_prompt/pin_infobar:impl",
-    ]
   }
 
   if (is_win) {
-    # taskbar_decorator_win.cc in c/b/taskbar includes
-    # chrome/browser/profiles/avatar_menu.h which is in this target, hence
-    # causing a circular dependency.
-    allow_circular_includes_from += [
-      "//chrome/browser/taskbar",
-      "//chrome/browser/win:impl",
-    ]
-
     public_deps += [
       "//chrome/browser/win",
       "//chrome/browser/win:jumplist",
@@ -4993,11 +4379,6 @@ source_set("browser") {
       "//chrome/browser/webshare",
       "//chrome/browser/webshare:impl",
     ]
-
-    # TODO(crbug.com/353332589): Remove this circular dependency when
-    # chrome/browser/bad_message.h and chrome/browser/browser_process.h
-    # are fully componentized.
-    allow_circular_includes_from += [ "//chrome/browser/webshare:impl" ]
   }
 
   if (is_win || is_mac || is_linux) {
@@ -5007,13 +4388,6 @@ source_set("browser") {
       "//chrome/browser/ui/webui/on_device_translation_internals",
       "//chrome/browser/ui/webui/updater",
     ]
-
-    allow_circular_includes_from += [
-      # TODO(crbug.com/353332589): Remove this circular dependency when:
-      # - c/b/policy/profile_policy_connector.h
-      # gets componentized.
-      "//chrome/browser/browser_switcher:impl",
-    ]
   }
 
   if (is_win || is_mac || is_linux || is_chromeos) {
@@ -5021,16 +4395,10 @@ source_set("browser") {
       "//chrome/browser/ui/webui/ai_overlay_dialog",
       "//chrome/browser/ui/webui/ai_overlay_dialog:mojo_bindings",
     ]
-
-    allow_circular_includes_from += [
-      "//chrome/browser/ui/webui/ai_overlay_dialog",
-      "//chrome/browser/ui/webui/ai_overlay_dialog:mojo_bindings",
-    ]
   }
 
   if (enable_downgrade_processing) {
     public_deps += [ "//chrome/browser/downgrade:impl" ]
-    allow_circular_includes_from += [ "//chrome/browser/downgrade:impl" ]
   }
 
   if (is_posix && !is_mac) {
@@ -5067,14 +4435,6 @@ source_set("browser") {
     ]
   }
 
-  if (enable_background_contents) {
-    allow_circular_includes_from += [
-      # TODO(crbug.com/353332589): Remove this circular dependency when
-      # c/b/profiles/profile_manager.h gets componentized.
-      "//chrome/browser/background:impl",
-    ]
-  }
-
   if (enable_printing) {
     # Some form of printing support.
     deps += [
@@ -5083,17 +4443,10 @@ source_set("browser") {
       "//chrome/common/printing",
       "//components/printing/browser/headless",
     ]
-
-    allow_circular_includes_from += [ "//chrome/browser/printing:impl" ]
   }
 
   if (enable_paint_preview) {
     deps += [ "//chrome/browser/paint_preview:services" ]
-
-    # Any circular includes must depend on the target
-    # "browser_public_dependencies".
-    allow_circular_includes_from +=
-        [ "//chrome/browser/paint_preview:services" ]
   }
 
   if (enable_captive_portal_detection) {
@@ -5135,8 +4488,6 @@ source_set("browser") {
     # TODO(crbug.com/364667553, crbug.com/365680821): Remove once
     # modularizations of `//c/b/signin` and `//c/b/profiles` are complete.
     deps += [ "//chrome/browser/ui/webui/unexportable_keys_internals:impl" ]
-    allow_circular_includes_from +=
-        [ "//chrome/browser/ui/webui/unexportable_keys_internals:impl" ]
   }
 
   if (enable_media_remoting) {
@@ -5153,23 +4504,8 @@ source_set("browser") {
         "//chrome/browser/guest_view",
         "//chrome/browser/guest_view:impl",
       ]
-
-      # Any circular includes must depend on the target
-      # "browser_public_dependencies".
-      allow_circular_includes_from += [ "//chrome/browser/guest_view:impl" ]
     }
 
-    # Any circular includes must depend on the target
-    # "browser_public_dependencies".
-    allow_circular_includes_from += [
-      "//chrome/browser/extensions:chrome_extensions_browser_client",
-
-      # Has dependencies on signin code in //chrome/browser.
-      "//chrome/browser/extensions/api/browsing_data",
-
-      # Has dependencies on notification code in //chrome/browser.
-      "//chrome/browser/extensions/api/notifications",
-    ]
     public_deps += [
       "//chrome/browser/extensions:chrome_extensions_browser_client",
       "//chrome/browser/extensions/api",
@@ -5209,23 +4545,6 @@ source_set("browser") {
       "//ui/base/mojom:ui_base_types",
     ]
 
-    # Any circular includes must depend on the target
-    # "browser_public_dependencies".
-    allow_circular_includes_from += [
-      "//chrome/browser/apps/platform_apps",
-      "//chrome/browser/ui/extensions:impl",
-
-      # TODO(crbug.com/40593486): This is unfortunate, but not easy to
-      # fix. Ideally, //chrome/browser:browser shouldn't depend on these APIs
-      # (though the APIs likely will depend on //chrome/browser), but we need
-      # to pull them in here to allow registration of keyed services.
-      "//chrome/browser/apps/platform_apps/api",
-
-      "//chrome/browser/extensions",
-
-      # TODO(crbug.com/40761673): Remove cycles and simplify all dependencies.
-      "//chrome/browser/web_applications/extensions",
-    ]
     deps += [
       "//apps",
       "//chrome/browser/clipboard:impl",
@@ -5278,18 +4597,6 @@ source_set("browser") {
       "//chrome/browser/ui/android/extensions",
       "//extensions/browser:keepalive",
     ]
-
-    # Circular dependency due to some utility function in
-    # //chrome/browser/extensions/extension_util.cc calling
-    # DesktopAndroidExtensionSystem to reload extension as a temporary
-    # workaround before ExtensionService is available on desktop android.
-    # TODO(https://crbug.com/356905053): Remove the circular dependency once
-    # we port ExtensionService and migrate away from
-    # extensions/desktop_android/desktop_android_extension_system.cc.
-    allow_circular_includes_from += [
-      "//chrome/browser/extensions",
-      "//chrome/browser/ui/android:context_menu_helper",
-    ]
   }
 
   if (enable_library_cdms) {
@@ -5311,12 +4618,6 @@ source_set("browser") {
       "//chrome/browser/offline_pages",
       "//chrome/browser/offline_pages:impl",
     ]
-
-    # TODO(crbug.com/497946889): Remove this circular dependency once the
-    # following headers get componentized:
-    # //chrome/browser/net/net_error_tab_helper.h
-    # //chrome/browser/ssl/chrome_security_state_tab_helper.h
-    allow_circular_includes_from += [ "//chrome/browser/offline_pages:impl" ]
   }
   if (enable_on_device_translation) {
     deps += [
@@ -5359,14 +4660,6 @@ source_set("browser") {
       "//chrome/browser/ui/webui/tab_strip_internals",
       "//chrome/browser/ui/webui/tab_strip_internals:impl",
     ]
-
-    # TODO(crbug.com/427204855): Remove this circular include once
-    # "chrome/browser/sessions/tab_restore_service_factory.h",
-    # "chrome/browser/sessions/session_service_factory.h", and
-    # "chrome/browser/sessions/session_service_base.h"
-    # are fully componentized.
-    allow_circular_includes_from +=
-        [ "//chrome/browser/ui/webui/tab_strip_internals:impl" ]
   }
 
   if (is_linux || is_mac) {
@@ -5430,6 +4723,13 @@ source_set("browser") {
   if (!is_android) {
     deps += [ "//chrome/browser/contextual_cueing/internals" ]
   }
+
+  # This target intentionally has no sources of its own and no
+  # allow_circular_includes_from; it only aggregates dependencies. Do NOT add
+  # sources here -- new code belongs in a dedicated, properly-scoped target.
+  # Kept last so an accidental `sources += [...]` above is reset to empty and
+  # is easy to catch in review.
+  sources = []
 }
 
 # These are the dependencies for the "browser" target that are outside of
