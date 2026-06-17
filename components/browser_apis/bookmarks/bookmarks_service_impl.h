@@ -44,6 +44,10 @@ class BookmarksServiceImpl : public BookmarksService,
       mojom::BookmarkNodePtr node) override;
   mojom::BookmarksService::UpdateBookmarkNodeResult UpdateBookmarkNode(
       mojom::BookmarkNodePtr node) override;
+  mojom::BookmarksService::MoveBookmarkNodeResult MoveBookmarkNode(
+      const base::Uuid& id,
+      const base::Uuid& new_parent_id,
+      std::optional<int32_t> index) override;
   mojom::BookmarksService::DeleteBookmarkNodeResult DeleteBookmarkNode(
       const base::Uuid& id) override;
 

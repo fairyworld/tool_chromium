@@ -21,6 +21,7 @@ struct Url {
   mojo_base.mojom.Uuid? id;
   string title;
   url.mojom.Url url;
+  url.mojom.Url? favicon_url;
 };
 
 // Represents a folder node.
@@ -99,6 +100,13 @@ interface BookmarksService {
   // All mutable fields provided in `node` will be applied.
   UpdateBookmarkNode(BookmarkNode node)
       => result<BookmarkNode, mojo_base.mojom.Error>;
+
+  // Moves a bookmark node to a new parent folder.
+  // If index is not provided, the node is appended to the end of the folder.
+  MoveBookmarkNode(mojo_base.mojom.Uuid id,
+                   mojo_base.mojom.Uuid new_parent_id,
+                   int32? index)
+      => result<mojo_base.mojom.Empty, mojo_base.mojom.Error>;
 
   // Deletes a bookmark node.
   // ID must not refer to a permanent node.

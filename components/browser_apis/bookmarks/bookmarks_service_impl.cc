@@ -225,6 +225,48 @@ BookmarksServiceImpl::UpdateBookmarkNode(mojom::BookmarkNodePtr node) {
   }
 }
 
+mojom::BookmarksService::MoveBookmarkNodeResult
+BookmarksServiceImpl::MoveBookmarkNode(const base::Uuid& id,
+                                       const base::Uuid& new_parent_id,
+                                       std::optional<int32_t> index) {
+  ASSIGN_OR_RETURN(
+      const bookmarks::BookmarkNode* node, finder_.FindNodeByUuid(id),
+      &MakeError, mojo_base::mojom::Code::kNotFound, "Bookmark node not found");
+
+  if (bookmark_model_->is_permanent_node(node)) {
+    return base::unexpected(
+        mojo_base::mojom::Error::New(mojo_base::mojom::Code::kInvalidArgument,
+                                     "Cannot move permanent node"));
+  }
+
+  ASSIGN_OR_RETURN(const bookmarks::BookmarkNode* new_parent,
+                   finder_.FindNodeByUuid(new_parent_id), &MakeError,
+                   mojo_base::mojom::Code::kNotFound,
+                   "New parent folder not found");
+
+  if (!new_parent->is_folder()) {
+    return base::unexpected(
+        mojo_base::mojom::Error::New(mojo_base::mojom::Code::kInvalidArgument,
+                                     "New parent node is not a folder"));
+  }
+
+  size_t target_index;
+  if (index.has_value()) {
+    if (index.value() < 0 ||
+        static_cast<size_t>(index.value()) > new_parent->children().size()) {
+      return base::unexpected(mojo_base::mojom::Error::New(
+          mojo_base::mojom::Code::kInvalidArgument, "Index out of range"));
+    }
+    target_index = static_cast<size_t>(index.value());
+  } else {
+    target_index = new_parent->children().size();
+  }
+
+  bookmark_model_->Move(node, new_parent, target_index);
+
+  return std::monostate();
+}
+
 mojom::BookmarksService::DeleteBookmarkNodeResult
 BookmarksServiceImpl::DeleteBookmarkNode(const base::Uuid& id) {
   ASSIGN_OR_RETURN(

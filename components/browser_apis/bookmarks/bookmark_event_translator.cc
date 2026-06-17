@@ -36,6 +36,9 @@ mojom::BookmarkNodePtr BookmarkEventTranslator::ConvertNode(
       url_node->id = node->uuid();
       url_node->title = base::UTF16ToUTF8(node->GetTitle());
       url_node->url = node->url();
+      if (node->icon_url()) {
+        url_node->favicon_url = *node->icon_url();
+      }
       return mojom::BookmarkNode::NewUrl(std::move(url_node));
     }
     case bookmarks::BookmarkNode::FOLDER:
