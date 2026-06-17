@@ -65,10 +65,10 @@
 #include "ui/views/view_utils.h"
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/private_ai/private_ai_service.h"
 #include "chrome/browser/private_ai/private_ai_service_factory.h"
 #include "components/private_ai/client.h"
 #include "components/private_ai/features.h"
+#include "components/private_ai/private_ai_service.h"
 #include "components/private_ai/testing/mock_private_ai_client.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #endif  // !BUILDFLAG(IS_ANDROID)

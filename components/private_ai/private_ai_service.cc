@@ -2,70 +2,73 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/private_ai/private_ai_service.h"
+#include "components/private_ai/private_ai_service.h"
 
 #include "base/sequence_checker.h"
-#include "chrome/browser/profiles/profile.h"
-#include "chrome/common/channel_info.h"
-#include "components/prefs/pref_service.h"
 #include "components/private_ai/client.h"
 #include "components/private_ai/common/private_ai_logger.h"
 #include "components/private_ai/features.h"
 #include "components/private_ai/phosphor/blind_sign_auth_factory.h"
 #include "components/private_ai/phosphor/token_fetcher_impl.h"
 #include "components/private_ai/phosphor/token_manager_impl.h"
+#include "components/private_ai/private_ai_network_driver.h"
+#include "components/private_ai/private_ai_oak_session_driver.h"
 #include "components/signin/public/base/consent_level.h"
 #include "components/signin/public/base/oauth_consumer_id.h"
 #include "components/signin/public/identity_manager/access_token_info.h"
 #include "components/signin/public/identity_manager/primary_account_access_token_fetcher.h"
-#include "content/public/browser/storage_partition.h"
+#include "components/version_info/channel.h"
 #include "google_apis/google_api_keys.h"
-#include "services/network/public/cpp/shared_url_loader_factory.h"
-#include "services/network/public/mojom/network_context.mojom.h"
 
 namespace private_ai {
 
 // static
-bool PrivateAiService::CanPrivateAiBeEnabled() {
-  return base::FeatureList::IsEnabled(kPrivateAi) && !GetApiKey().empty();
-}
-
-// static
-std::string PrivateAiService::GetApiKey() {
+std::string PrivateAiService::GetApiKey(version_info::Channel channel) {
   std::string api_key = kPrivateAiApiKey.Get();
   if (api_key.empty() && google_apis::IsGoogleChromeAPIKeyUsed()) {
-    return google_apis::GetAPIKey(chrome::GetChannel());
+    return google_apis::GetAPIKey(channel);
   }
   return api_key;
 }
 
+// static
+bool PrivateAiService::CanPrivateAiBeEnabled(version_info::Channel channel) {
+  return base::FeatureList::IsEnabled(kPrivateAi) &&
+         !GetApiKey(channel).empty();
+}
+
 PrivateAiService::PrivateAiService(
     signin::IdentityManager* identity_manager,
-    PrefService* pref_service,
-    Profile* profile,
-    std::unique_ptr<phosphor::BlindSignAuthFactory> bsa_factory)
-    : profile_(profile),
-      identity_manager_(identity_manager),
-      pref_service_(pref_service),
-      bsa_factory_(std::move(bsa_factory)) {
+    phosphor::BlindSignAuthFactory* bsa_factory,
+    scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
+    std::unique_ptr<PrivateAiNetworkDriver> network_driver,
+    std::unique_ptr<PrivateAiOakSessionDriver> oak_session_driver,
+    network::mojom::NetworkContext* network_context,
+    const std::string& url,
+    const std::string& api_key,
+    const std::string& proxy_url,
+    bool use_token_attestation)
+    : identity_manager_(identity_manager),
+      network_driver_(std::move(network_driver)),
+      oak_session_driver_(std::move(oak_session_driver)) {
+  CHECK(identity_manager_);
+  CHECK(bsa_factory);
+  CHECK(url_loader_factory);
+  CHECK(network_driver_);
+  CHECK(oak_session_driver_);
+  CHECK(network_context);
   identity_manager_->AddObserver(this);
 
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
-  auto url_loader_factory = profile_->GetDefaultStoragePartition()
-                                ->GetURLLoaderFactoryForBrowserProcess();
-  auto bsa = bsa_factory_->CreateBlindSignAuth(url_loader_factory->Clone());
+  auto bsa = bsa_factory->CreateBlindSignAuth(url_loader_factory->Clone());
   auto token_fetcher = std::make_unique<phosphor::TokenFetcherImpl>(
       this, std::move(bsa), &logger_);
   token_fetcher_ = token_fetcher.get();
   token_manager_ = std::make_unique<phosphor::TokenManagerImpl>(
       std::move(token_fetcher), &logger_);
 
-  client_ = Client::Create(
-      kPrivateAiUrl.Get(), GetApiKey(), kPrivateAiProxyServerUrl.Get(),
-      base::FeatureList::IsEnabled(kPrivateAiUseTokenAttestation),
-      profile_->GetDefaultStoragePartition()->GetNetworkContext(),
-      token_manager_.get(), &logger_, &oak_session_driver_, &network_driver_);
+  client_ = Client::Create(url, api_key, proxy_url, use_token_attestation,
+                           network_context, GetTokenManager(), GetLogger(),
+                           oak_session_driver_.get(), network_driver_.get());
 }
 
 PrivateAiService::~PrivateAiService() {
@@ -81,7 +84,6 @@ void PrivateAiService::Shutdown() {
 
 phosphor::TokenManager* PrivateAiService::GetTokenManager() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
   return token_manager_.get();
 }
 
@@ -106,7 +108,6 @@ bool PrivateAiService::IsTokenFetchEnabled() {
       !identity_manager_->HasPrimaryAccount(signin::ConsentLevel::kSignin)) {
     return false;
   }
-
   return true;
 }
 

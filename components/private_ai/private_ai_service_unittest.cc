@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/private_ai/private_ai_service.h"
+#include "components/private_ai/private_ai_service.h"
 
 #include <memory>
 #include <optional>
@@ -14,18 +14,21 @@
 #include "base/test/task_environment.h"
 #include "base/test/test_future.h"
 #include "base/time/time.h"
-#include "chrome/browser/private_ai/test_private_ai_service.h"
-#include "chrome/common/channel_info.h"
-#include "chrome/test/base/testing_profile.h"
 #include "components/private_ai/features.h"
+#include "components/private_ai/phosphor/blind_sign_auth_factory.h"
 #include "components/private_ai/phosphor/data_types.h"
-#include "components/private_ai/phosphor/token_fetcher_helper.h"
+#include "components/private_ai/phosphor/mock_blind_sign_auth.h"
 #include "components/private_ai/phosphor/token_manager.h"
+#include "components/private_ai/testing/fake_private_ai_network_driver.h"
+#include "components/private_ai/testing/fake_private_ai_oak_session_driver.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"
-#include "content/public/test/browser_task_environment.h"
+#include "components/version_info/channel.h"
+#include "google_apis/gaia/google_service_auth_error.h"
 #include "google_apis/google_api_keys.h"
 #include "net/third_party/quiche/src/quiche/blind_sign_auth/proto/spend_token_data.pb.h"
+#include "services/network/public/cpp/shared_url_loader_factory.h"
 #include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
+#include "services/network/test/test_network_context.h"
 #include "services/network/test/test_url_loader_factory.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -54,6 +57,62 @@ quiche::BlindSignToken CreateBlindSignTokenForTesting(std::string token_value,
 
 constexpr char kTestEmail[] = "test@example.com";
 
+class TestBlindSignAuthFactory : public phosphor::BlindSignAuthFactory {
+ public:
+  TestBlindSignAuthFactory() = default;
+  ~TestBlindSignAuthFactory() override = default;
+
+  std::unique_ptr<quiche::BlindSignAuthInterface> CreateBlindSignAuth(
+      std::unique_ptr<network::PendingSharedURLLoaderFactory>
+          pending_url_loader_factory) override {
+    auto bsa = std::make_unique<phosphor::MockBlindSignAuth>();
+    bsa_ = bsa.get();
+    return bsa;
+  }
+
+  phosphor::MockBlindSignAuth* mock_bsa() { return bsa_; }
+
+  void ResetBsa() { bsa_ = nullptr; }
+
+ private:
+  raw_ptr<phosphor::MockBlindSignAuth> bsa_ = nullptr;
+};
+
+class TestPrivateAiService : public PrivateAiService {
+ public:
+  TestPrivateAiService(
+      signin::IdentityManager* identity_manager,
+      std::unique_ptr<TestBlindSignAuthFactory> test_bsa_factory,
+      scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
+      network::mojom::NetworkContext* network_context)
+      : PrivateAiService(
+            identity_manager,
+            test_bsa_factory.get(),
+            std::move(url_loader_factory),
+            std::make_unique<FakePrivateAiNetworkDriver>(),
+            std::make_unique<FakePrivateAiOakSessionDriver>(),
+            network_context,
+            "dummy.com",
+            PrivateAiService::GetApiKey(version_info::Channel::STABLE),
+            "dummy-proxy.com",
+            /*use_token_attestation=*/false),
+        test_bsa_factory_(std::move(test_bsa_factory)) {}
+
+  ~TestPrivateAiService() override = default;
+
+  void Shutdown() override {
+    test_bsa_factory_->ResetBsa();
+    PrivateAiService::Shutdown();
+  }
+
+  phosphor::MockBlindSignAuth* mock_bsa() {
+    return test_bsa_factory_->mock_bsa();
+  }
+
+ private:
+  std::unique_ptr<TestBlindSignAuthFactory> test_bsa_factory_;
+};
+
 }  // namespace
 
 class PrivateAiServiceTest : public testing::Test {
@@ -62,10 +121,14 @@ class PrivateAiServiceTest : public testing::Test {
     feature_list_.InitAndEnableFeatureWithParameters(
         kPrivateAi, {{kPrivateAiApiKey.name, "test-api-key"}});
     auto test_bsa_factory = std::make_unique<TestBlindSignAuthFactory>();
-    auto* test_bsa_factory_ptr = test_bsa_factory.get();
+
+    auto shared_url_loader_factory =
+        base::MakeRefCounted<network::WeakWrapperSharedURLLoaderFactory>(
+            &test_url_loader_factory_);
+
     private_ai_service_ = std::make_unique<TestPrivateAiService>(
-        identity_test_env_.identity_manager(), profile_.GetPrefs(), &profile_,
-        test_bsa_factory_ptr, std::move(test_bsa_factory));
+        identity_test_env_.identity_manager(), std::move(test_bsa_factory),
+        std::move(shared_url_loader_factory), &test_network_context_);
   }
 
   void TearDown() override {
@@ -73,11 +136,11 @@ class PrivateAiServiceTest : public testing::Test {
     private_ai_service_.reset();
   }
 
-  content::BrowserTaskEnvironment task_environment_{
+  base::test::TaskEnvironment task_environment_{
       base::test::TaskEnvironment::TimeSource::MOCK_TIME};
   signin::IdentityTestEnvironment identity_test_env_;
-
-  TestingProfile profile_;
+  network::TestURLLoaderFactory test_url_loader_factory_;
+  network::TestNetworkContext test_network_context_;
 
  private:
   base::test::ScopedFeatureList feature_list_;
@@ -154,17 +217,18 @@ TEST_F(PrivateAiServiceUtilTest, GetApiKey) {
     base::test::ScopedFeatureList scoped_feature_list;
     scoped_feature_list.InitWithFeaturesAndParameters(
         {{kPrivateAi, {{"api-key", "provided-api-key"}}}}, {});
-    EXPECT_EQ(PrivateAiService::GetApiKey(), "provided-api-key");
+    EXPECT_EQ(PrivateAiService::GetApiKey(version_info::Channel::STABLE),
+              "provided-api-key");
   }
 
   // If API key is not set, it should return default Chrome API key (if used) or
   // empty. This depends on the build configuration.
   {
     if (google_apis::IsGoogleChromeAPIKeyUsed()) {
-      EXPECT_EQ(PrivateAiService::GetApiKey(),
-                google_apis::GetAPIKey(chrome::GetChannel()));
+      EXPECT_EQ(PrivateAiService::GetApiKey(version_info::Channel::STABLE),
+                google_apis::GetAPIKey(version_info::Channel::STABLE));
     } else {
-      EXPECT_EQ(PrivateAiService::GetApiKey(), "");
+      EXPECT_EQ(PrivateAiService::GetApiKey(version_info::Channel::STABLE), "");
     }
   }
 }
@@ -175,7 +239,8 @@ TEST_F(PrivateAiServiceUtilTest, CanPrivateAiBeEnabled) {
     base::test::ScopedFeatureList scoped_feature_list;
     scoped_feature_list.InitWithFeaturesAndParameters(
         {{kPrivateAi, {{"api-key", "test-key"}}}}, {});
-    EXPECT_TRUE(PrivateAiService::CanPrivateAiBeEnabled());
+    EXPECT_TRUE(
+        PrivateAiService::CanPrivateAiBeEnabled(version_info::Channel::STABLE));
   }
 
   // Disabled if API key is empty AND not using default key.
@@ -184,9 +249,11 @@ TEST_F(PrivateAiServiceUtilTest, CanPrivateAiBeEnabled) {
     // enabled because GetApiKey() will return the default key. We need to
     // account for that.
     if (google_apis::IsGoogleChromeAPIKeyUsed()) {
-      EXPECT_TRUE(PrivateAiService::CanPrivateAiBeEnabled());
+      EXPECT_TRUE(PrivateAiService::CanPrivateAiBeEnabled(
+          version_info::Channel::STABLE));
     } else {
-      EXPECT_FALSE(PrivateAiService::CanPrivateAiBeEnabled());
+      EXPECT_FALSE(PrivateAiService::CanPrivateAiBeEnabled(
+          version_info::Channel::STABLE));
     }
   }
 }

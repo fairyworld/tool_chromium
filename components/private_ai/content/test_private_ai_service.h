@@ -2,25 +2,24 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_PRIVATE_AI_TEST_PRIVATE_AI_SERVICE_H_
-#define CHROME_BROWSER_PRIVATE_AI_TEST_PRIVATE_AI_SERVICE_H_
+#ifndef COMPONENTS_PRIVATE_AI_CONTENT_TEST_PRIVATE_AI_SERVICE_H_
+#define COMPONENTS_PRIVATE_AI_CONTENT_TEST_PRIVATE_AI_SERVICE_H_
 
 #include <memory>
+#include <string>
 
 #include "base/memory/raw_ptr.h"
-#include "chrome/browser/private_ai/private_ai_service.h"
+#include "base/memory/scoped_refptr.h"
 #include "components/private_ai/phosphor/blind_sign_auth_factory.h"
 #include "components/private_ai/phosphor/mock_blind_sign_auth.h"
-
-class PrefService;
-class Profile;
+#include "components/private_ai/private_ai_service.h"
 
 namespace network {
-class PendingSharedURLLoaderFactory;
+class SharedURLLoaderFactory;
 }
 
-namespace quiche {
-class BlindSignAuthInterface;
+namespace network::mojom {
+class NetworkContext;
 }
 
 namespace signin {
@@ -50,14 +49,12 @@ class TestPrivateAiService : public PrivateAiService {
  public:
   TestPrivateAiService(
       signin::IdentityManager* identity_manager,
-      PrefService* pref_service,
-      Profile* profile,
-      // This factory is owned by `PrivateAiService`, so we need to keep a
-      // raw pointer to it.
-      TestBlindSignAuthFactory* test_bsa_factory,
-      std::unique_ptr<phosphor::BlindSignAuthFactory> bsa_factory);
+      scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
+      network::mojom::NetworkContext* network_context,
+      const std::string& api_key,
+      std::unique_ptr<TestBlindSignAuthFactory> test_bsa_factory);
 
-  ~TestPrivateAiService() override = default;
+  ~TestPrivateAiService() override;
 
   // PrivateAiService override:
   void Shutdown() override;
@@ -67,9 +64,9 @@ class TestPrivateAiService : public PrivateAiService {
   }
 
  private:
-  raw_ptr<TestBlindSignAuthFactory> test_bsa_factory_;
+  std::unique_ptr<TestBlindSignAuthFactory> test_bsa_factory_;
 };
 
 }  // namespace private_ai
 
-#endif  // CHROME_BROWSER_PRIVATE_AI_TEST_PRIVATE_AI_SERVICE_H_
+#endif  // COMPONENTS_PRIVATE_AI_CONTENT_TEST_PRIVATE_AI_SERVICE_H_
