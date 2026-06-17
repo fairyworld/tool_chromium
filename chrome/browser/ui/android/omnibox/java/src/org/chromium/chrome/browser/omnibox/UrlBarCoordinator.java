@@ -17,7 +17,6 @@ import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.omnibox.UrlBar.ScrollType;
 import org.chromium.chrome.browser.omnibox.UrlBar.UrlBarDelegate;
-import org.chromium.chrome.browser.omnibox.UrlBarProperties.UrlBarTextState;
 import org.chromium.chrome.browser.ui.theme.BrandedColorScheme;
 import org.chromium.components.omnibox.TextSelection;
 import org.chromium.ui.KeyboardVisibilityDelegate;
@@ -405,11 +404,7 @@ public class UrlBarCoordinator
             mMediator.onUrlBarSuggestionsChanged(false);
         }
 
-        UrlBarTextState preCallbackState = mModel.get(UrlBarProperties.TEXT_STATE);
         mFocusChangeCallback.onResult(hasFocus);
-        if (mModel.get(UrlBarProperties.TEXT_STATE) == preCallbackState) {
-            mMediator.pushTextToModel(/* originChanged= */ false);
-        }
     }
 
     /** Signals that's it safe to call code that requires native to be loaded. */
