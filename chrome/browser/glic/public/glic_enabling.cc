@@ -1424,6 +1424,14 @@ void GlicEnabling::OnPrimaryAccountChanged(
   UpdateEnabledStatus();
 }
 
+void GlicEnabling::OnIdentityManagerShutdown(
+    signin::IdentityManager* identity_manager) {
+  identity_manager_observation_.Reset();
+  subscription_eligibility_service_observation_.Reset();
+  pref_registrar_.RemoveAll();
+  glic_user_status_fetcher_.reset();
+}
+
 void GlicEnabling::OnExtendedAccountInfoUpdated(const AccountInfo& info) {
   UpdateEnabledStatus();
 }

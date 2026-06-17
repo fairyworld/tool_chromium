@@ -502,6 +502,8 @@ class GlicEnabling final : public signin::IdentityManager::Observer,
   // IdentityManagerObserver:
   void OnPrimaryAccountChanged(
       const signin::PrimaryAccountChangeEvent& event_details) override;
+  void OnIdentityManagerShutdown(
+      signin::IdentityManager* identity_manager) override;
 
   // subscription_eligibility::SubscriptionEligibilityService::Observer:
   void OnAiSubscriptionTierUpdated(int32_t new_subscription_tier) override;
