@@ -21804,6 +21804,22 @@
             ]
         }
     ],
+    "SearchSettingsUpdateV2": [
+        {
+            "platforms": [
+                "android",
+                "ios"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled_20260410",
+                    "enable_features": [
+                        "SearchSettingsUpdateV2"
+                    ]
+                }
+            ]
+        }
+    ],
     "SecurityPageHats": [
         {
             "platforms": [
