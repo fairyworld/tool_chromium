@@ -141,8 +141,11 @@ class FindBarHost : public FindBar,
   // where it would be if we place it on the left of the selection and if it
   // doesn't fit on the screen we try the right side. The parameter
   // |selection_rect| is expected to have coordinates relative to the top of
-  // the web page area.
-  void MoveWindowIfNecessaryWithRect(const gfx::Rect& selection_rect);
+  // the web page area. If |update_ui| is true, this will relayout and repaint
+  // the `view_`.
+  // TODO(oshima): Remove `update_ui`.
+  void MoveWindowIfNecessaryWithRect(const gfx::Rect& selection_rect,
+                                     bool update_ui);
 
   // Saves the focus tracker for potential restoration later during a
   // WebContents change.

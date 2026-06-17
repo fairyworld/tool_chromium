@@ -12,6 +12,8 @@
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_context.h"
+#include "chrome/browser/ui/find_bar/find_bar.h"
+#include "chrome/browser/ui/find_bar/find_bar_controller.h"
 #include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/tabs/vertical_tab_strip_state_controller.h"
 #include "chrome/browser/ui/views/bubble/webui_bubble_manager.h"
@@ -22,6 +24,7 @@
 #include "chrome/browser/ui/views/frame/immersive_mode_tester.h"
 #include "chrome/browser/ui/views/frame/tab_strip_region_view.h"
 #include "chrome/browser/ui/views/fullscreen_control/fullscreen_control_host.h"
+#include "chrome/browser/ui/views/location_bar/location_bar_view.h"
 #include "chrome/browser/ui/views/tab_search_bubble_host.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
@@ -503,6 +506,65 @@ IN_PROC_BROWSER_TEST_P(ImmersiveModeBrowserViewVerticalTabsTest,
   Browser* new_browser = CreateBrowser(browser()->profile());
   verify_no_reveal(new_browser, "2nd browser");
 }
+
+#if BUILDFLAG(IS_CHROMEOS)
+IN_PROC_BROWSER_TEST_P(ImmersiveModeBrowserViewTest,
+                       FindBarRepositionOnRevealAndEnd) {
+  auto* const immersive_mode_controller =
+      ImmersiveModeController::From(browser());
+
+  EnterImmersiveFullscreenMode(browser());
+
+  chrome::Find(browser());
+  FindBar* find_bar =
+      browser()->GetFeatures().GetFindBarController()->find_bar();
+  ASSERT_TRUE(find_bar);
+
+  gfx::Rect unrevealed_bounds =
+      find_bar->GetHostWidget()->GetWindowBoundsInScreen();
+
+  aura::Window* window = browser()->GetWindow()->GetNativeWindow();
+  EXPECT_EQ(window->GetBoundsInScreen().y(), unrevealed_bounds.y());
+
+  ui::test::EventGenerator event_generator(window->GetRootWindow());
+  ImmersiveModeTester tester(browser());
+
+  // Reveal using the mouse.
+  gfx::Point top_center(std::roundl(window->bounds().width() / 2), 0);
+  event_generator.MoveMouseTo(top_center);
+  tester.WaitForRevealStarted();
+
+  BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser());
+  browser_view->InvalidateLayout();
+  RunScheduledLayouts();
+
+  ASSERT_TRUE(immersive_mode_controller->IsRevealed());
+
+  gfx::Rect revealed_bounds =
+      find_bar->GetHostWidget()->GetWindowBoundsInScreen();
+
+  // The find bar should have moved when the topchrome is revealed.
+  EXPECT_GE(revealed_bounds.y(), browser_view->GetLocationBarView()
+                                     ->GetBoundsInScreen()
+                                     .CenterPoint()
+                                     .y());
+
+  // Unreveal by clicking the content area.
+  gfx::Point center(window->bounds().width() / 2,
+                    window->bounds().height() / 2);
+  event_generator.MoveMouseTo(center);
+  event_generator.ClickLeftButton();
+  tester.WaitForRevealEnded();
+
+  browser_view->InvalidateLayout();
+  RunScheduledLayouts();
+  ASSERT_FALSE(immersive_mode_controller->IsRevealed());
+
+  gfx::Rect re_unrevealed_bounds =
+      find_bar->GetHostWidget()->GetWindowBoundsInScreen();
+  EXPECT_EQ(re_unrevealed_bounds.y(), unrevealed_bounds.y());
+}
+#endif
 
 #define INSTANTIATE_TEST_SUITE(name) \
   INSTANTIATE_TEST_SUITE_P(All, name, ::testing::Values(false, true))

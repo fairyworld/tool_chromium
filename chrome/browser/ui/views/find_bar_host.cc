@@ -96,6 +96,7 @@ gfx::Rect GetLocationForFindBarView(gfx::Rect view_location,
   } else {
     view_location.set_x(std::max(view_location.x(), clipping_box.x()));
   }
+  view_location.set_y(std::max(view_location.y(), clipping_box.y()));
 
   gfx::Rect new_pos = view_location;
 
@@ -352,7 +353,7 @@ void FindBarHost::StopAnimation() {
 }
 
 void FindBarHost::MoveWindowIfNecessary() {
-  MoveWindowIfNecessaryWithRect(gfx::Rect());
+  MoveWindowIfNecessaryWithRect(gfx::Rect(), /*update_ui=*/false);
 }
 
 void FindBarHost::SetFindTextAndSelectedRange(
@@ -379,7 +380,7 @@ void FindBarHost::UpdateUIForFindResult(
   }
 
   // We now need to check if the window is obscuring the search results.
-  MoveWindowIfNecessaryWithRect(result.selection_rect());
+  MoveWindowIfNecessaryWithRect(result.selection_rect(), /*update_ui=*/true);
 
   // Once we find a match we no longer want to keep track of what had
   // focus. EndFindSession will then set the focus to the page content.
@@ -543,8 +544,8 @@ void FindBarHost::GetWidgetPositionNative(gfx::Rect* avoid_overlapping_rect) {
   avoid_overlapping_rect->Offset(0, webcontents_rect.y() - frame_rect.y());
 }
 
-void FindBarHost::MoveWindowIfNecessaryWithRect(
-    const gfx::Rect& selection_rect) {
+void FindBarHost::MoveWindowIfNecessaryWithRect(const gfx::Rect& selection_rect,
+                                                bool update_ui) {
   // We only move the window if one is active for the current WebContents. If we
   // don't check this, then SetDialogPosition below will end up making the Find
   // Bar visible.
@@ -561,9 +562,11 @@ void FindBarHost::MoveWindowIfNecessaryWithRect(
   gfx::Rect new_pos = GetDialogPosition(selection_rect);
   SetDialogPosition(new_pos);
 
-  // May need to redraw our frame to accommodate bookmark bar styles.
-  view_->DeprecatedLayoutImmediately();  // Bounds may have changed.
-  view_->SchedulePaint();
+  if (update_ui) {
+    // May need to redraw our frame to accommodate bookmark bar styles.
+    view_->DeprecatedLayoutImmediately();  // Bounds may have changed.
+    view_->SchedulePaint();
+  }
 }
 
 void FindBarHost::SaveFocusTracker() {
