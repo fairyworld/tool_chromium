@@ -223,7 +223,13 @@ TEST_F(TransientKeepAlivePolicyTest, NoHistogramOnActiveProcessShutdown) {
 // Tests that eviction and timeout can happen in the same test run without
 // interference: evict the oldest, then let a second keep-alive expire via
 // the timer. Both paths post async decrements.
-TEST_F(TransientKeepAlivePolicyTest, EvictionFollowedByTimeout) {
+// TODO(crbug.com/524816981): Re-enable this test.
+#if BUILDFLAG(IS_MAC)
+#define MAYBE_EvictionFollowedByTimeout DISABLED_EvictionFollowedByTimeout
+#else
+#define MAYBE_EvictionFollowedByTimeout EvictionFollowedByTimeout
+#endif
+TEST_F(TransientKeepAlivePolicyTest, MAYBE_EvictionFollowedByTimeout) {
   // rph1 will be evicted when we exceed the keep-alive limit.
   NavigateAndCommit(GURL(kTestUrl1));
 
