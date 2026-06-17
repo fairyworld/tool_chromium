@@ -4417,6 +4417,7 @@ public class TabListMediatorUnitTest {
                 .thenReturn(Collections.singletonList(mTab1));
         when(mTabModel.isTabInTabGroup(mTab1)).thenReturn(true);
 
+        mTabGroupObserverCaptor.getValue().didMergeTabToGroup(mTab1, /* isDestinationTab= */ true);
         mTabGroupObserverCaptor.getValue().didCreateNewGroup(mTab1, mTabModel);
 
         // After creating the group, a new Header should be injected.

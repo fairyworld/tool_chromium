@@ -1039,14 +1039,6 @@ public class TabListMediator implements TabListNotificationHandler {
 
                         ensureGroupHeaderExistsInNestedLayout(
                                 destinationTab, tabGroupId, destUiIndex);
-
-                        // On group merges, `didMergeTabToGroup` fires before `didCreateNewGroup`,
-                        // temporarily dumping source tabs at the bottom. Re-evaluate related
-                        // tabs to correctly position them under the new header.
-                        List<Tab> relatedTabs = tabModel.getRelatedTabList(destinationTab.getId());
-                        for (Tab tab : relatedTabs) {
-                            syncChildTabInNestedLayout(tab, /* oldTabGroupId= */ null);
-                        }
                         return;
                     }
 
