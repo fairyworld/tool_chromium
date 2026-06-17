@@ -649,7 +649,7 @@ void RenderViewHostImpl::EnterBackForwardCache(
 
   TRACE_EVENT("navigation", "RenderViewHostImpl::EnterBackForwardCache",
               ChromeTrackEvent::kRenderViewHost, *this);
-  DCHECK(registered_with_frame_tree_);
+  CHECK(registered_with_frame_tree_, base::NotFatalUntil::M152);
   // Only unregister the RenderViewHost if the FrameTree is the primary
   // FrameTree, inner FrameTrees hold their state when they enter back/forward
   // cache.
@@ -918,7 +918,7 @@ void RenderViewHostImpl::PostRenderViewReady() {
 }
 
 void RenderViewHostImpl::RenderViewReady() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   delegate_->RenderViewReady(this);
 }
 
