@@ -556,6 +556,13 @@ UIColor* AssistantHighlightBackgroundColor() {
 
 #pragma mark - Private
 
+// Clears the currently previewed button and updates its configuration.
+- (void)clearPreviewedButtonForInteraction:
+    (UIContextMenuInteraction*)interaction {
+  _previewedButton = nil;
+  [interaction.view setNeedsUpdateConfiguration];
+}
+
 // Conditionally registers the Tab Switcher layout guide.
 // It should only be registered to the App Bar if the App Bar is visible.
 - (void)updateTabSwitcherGuide {
@@ -1300,11 +1307,7 @@ UIColor* AssistantHighlightBackgroundColor() {
   if (interaction.view == _previewedButton) {
     __weak __typeof(self) weakSelf = self;
     [animator addAnimations:^{
-      __strong __typeof(weakSelf) strongSelf = weakSelf;
-      if (strongSelf) {
-        strongSelf->_previewedButton = nil;
-        [interaction.view setNeedsUpdateConfiguration];
-      }
+      [weakSelf clearPreviewedButtonForInteraction:interaction];
     }];
   }
 }
