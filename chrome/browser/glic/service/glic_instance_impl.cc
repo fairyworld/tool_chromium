@@ -1075,7 +1075,7 @@ void GlicInstanceImpl::MaybeShowShortcutSnoozePromo() {
           kIPHGlicTrustFirstOnboardingShortcutSnoozePromoFeature);
   params.body_params = l10n_util::GetStringFUTF16(
       IDS_GLIC_SHORTCUT_IPH_TEXT,
-      glic::GlicLauncherConfiguration::GetGlobalHotkey().GetShortcutText());
+      glic::GlicLauncherConfiguration::GetToggleHotkey().GetShortcutText());
 
   BrowserUserEducationInterface::From(browser)->MaybeShowFeaturePromo(
       std::move(params));

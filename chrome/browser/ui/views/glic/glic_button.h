@@ -689,7 +689,7 @@ class GlicButton : public GlicBaseShim<T>,
   void AnnounceNudgeShown() {
     auto announcement = l10n_util::GetStringFUTF16(
         IDS_GLIC_CONTEXTUAL_CUEING_ANNOUNCEMENT,
-        GlicLauncherConfiguration::GetGlobalHotkey().GetShortcutText());
+        GlicLauncherConfiguration::GetToggleHotkey().GetShortcutText());
     this->GetViewAccessibility().AnnounceAlert(announcement);
   }
 

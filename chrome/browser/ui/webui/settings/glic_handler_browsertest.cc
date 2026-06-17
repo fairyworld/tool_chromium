@@ -154,7 +154,7 @@ IN_PROC_BROWSER_TEST_F(GlicHandlerBrowserTest, UpdateGlicShortcut) {
           .Append("callback_id")
           .Append(ui::Command::AcceleratorToString(invalid_shortcut)));
   ui::Accelerator saved_hotkey =
-      glic::GlicLauncherConfiguration::GetGlobalHotkey();
+      glic::GlicLauncherConfiguration::GetToggleHotkey();
   EXPECT_EQ(ui::VKEY_UNKNOWN, saved_hotkey.key_code());
   EXPECT_EQ(ui::EF_NONE, saved_hotkey.modifiers());
 
@@ -163,7 +163,7 @@ IN_PROC_BROWSER_TEST_F(GlicHandlerBrowserTest, UpdateGlicShortcut) {
       base::ListValue()
           .Append("callback_id")
           .Append(ui::Command::AcceleratorToString(valid_shortcut)));
-  saved_hotkey = glic::GlicLauncherConfiguration::GetGlobalHotkey();
+  saved_hotkey = glic::GlicLauncherConfiguration::GetToggleHotkey();
   EXPECT_EQ(valid_shortcut.key_code(), saved_hotkey.key_code());
   EXPECT_EQ(valid_shortcut.modifiers(), saved_hotkey.modifiers());
 }

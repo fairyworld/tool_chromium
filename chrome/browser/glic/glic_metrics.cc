@@ -838,7 +838,7 @@ void GlicMetrics::OnImpressionTimerFired() {
 
 #if !BUILDFLAG(IS_ANDROID)
   ui::Accelerator saved_hotkey =
-      glic::GlicLauncherConfiguration::GetGlobalHotkey();
+      glic::GlicLauncherConfiguration::GetToggleHotkey();
   base::UmaHistogramBoolean("Glic.OsEntrypoint.Settings.ShortcutStatus",
                             saved_hotkey != ui::Accelerator());
 #endif
