@@ -224,4 +224,7 @@ BASE_FEATURE(kSyncFixWebSigninSessionDurationForShortLivedSessions,
 
 BASE_FEATURE(kSyncSimplifyDeviceNaming, base::FEATURE_DISABLED_BY_DEFAULT);
 
+BASE_FEATURE(kSyncUseServerDeterminedDeviceName,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
 }  // namespace syncer

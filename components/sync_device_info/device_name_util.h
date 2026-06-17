@@ -41,7 +41,9 @@ struct DeviceInfoWithName {
   std::string display_name;
 };
 
-// Returns display name candidates (primary and fallback) for `device`.
+// Returns display name candidates (primary and fallback) for `device`,
+// combining various sources such as hardware heuristics, server-provided
+// marketing names, and client-defined names.
 DisplayNameCandidates GetDisplayNameCandidates(const DeviceInfo* device);
 
 // Returns the display name for the given device.

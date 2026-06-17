@@ -81,6 +81,26 @@ DisplayNameCandidates GetDisplayNameCandidates(const DeviceInfo* device) {
     }
   }
 
+  if (device->server_determined_model_name().has_value() &&
+      !device->server_determined_model_name()->empty() &&
+      base::FeatureList::IsEnabled(kSyncUseServerDeterminedDeviceName)) {
+    std::string preferred_name = *device->server_determined_model_name();
+
+    // Using the marketing name as the fallback as well, as naming collisions
+    // are less likely with specific marketing names (e.g., "Galaxy S21" and
+    // "Galaxy S17" instead of two "Samsung Phone"s).
+    //
+    // Additionally, appending the model name could result in redundant names
+    // (e.g., "Pixel 9 Pixel 9") if the OEM has already populated the model
+    // field with the marketing name.
+    //
+    // TODO(crbug.com/522788942): Remove this fallback construction once
+    // kSyncUseServerDeterminedDeviceName and kSyncSimplifyDeviceNaming are
+    // fully launched.
+    return {.preferred_name_if_unique = preferred_name,
+            .fallback_full_name = preferred_name};
+  }
+
   // 1. Skip renaming for M78- devices where HardwareInfo is not available.
   // 2. Skip renaming if client_name is high quality.
   if (model.empty() || client_name_is_high_quality) {
