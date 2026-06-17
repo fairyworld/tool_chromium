@@ -1885,8 +1885,8 @@ void BrowserView::UpdateLoadingAnimations(bool is_visible) {
   }
   if (!should_animate) {
     // Loads are now complete, update the state if a task was scheduled.
-    LoadingAnimationCallback(base::TimeTicks::Now());
     loading_animation_start_ = base::TimeTicks();
+    LoadingAnimationCallback(base::TimeTicks::Now());
   }
 }
 
