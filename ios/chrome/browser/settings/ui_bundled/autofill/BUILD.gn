@@ -68,6 +68,7 @@ source_set("autofill") {
     "//ios/chrome/browser/net/model:crurl",
     "//ios/chrome/browser/settings/autofill/autofill_ai/coordinator",
     "//ios/chrome/browser/settings/autofill/autofill_ai/ui",
+    "//ios/chrome/browser/settings/autofill/autofill_and_passwords/utils:autofill_and_passwords_item_utils",
     "//ios/chrome/browser/settings/autofill/ui",
     "//ios/chrome/browser/settings/autofill/utils:autofill_settings_ui_util",
     "//ios/chrome/browser/settings/ui_bundled:settings_root",
