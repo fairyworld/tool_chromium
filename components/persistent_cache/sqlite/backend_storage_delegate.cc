@@ -29,7 +29,8 @@ std::optional<PendingBackend> BackendStorageDelegate::MakePendingBackend(
   ASSIGN_OR_RETURN(auto pending_file_set,
                    sqlite_vfs::MakePendingFileSet(
                        VfsClientFromClient(client), directory, base_name,
-                       single_connection, journal_mode_wal));
+                       single_connection, journal_mode_wal),
+                   [](sqlite_vfs::FileSetError) { return std::nullopt; });
   return PendingBackend(std::move(pending_file_set));
 }
 
@@ -56,7 +57,8 @@ std::optional<PendingBackend> BackendStorageDelegate::ShareReadOnlyConnection(
       sqlite_vfs::ShareConnection(
           directory, base_name,
           static_cast<const SqliteBackendImpl&>(backend).file_set(),
-          /*read_write=*/false));
+          /*read_write=*/false),
+      [](sqlite_vfs::FileSetError) { return std::nullopt; });
   return PendingBackend(std::move(pending_file_set));
 }
 
@@ -69,7 +71,8 @@ std::optional<PendingBackend> BackendStorageDelegate::ShareReadWriteConnection(
       sqlite_vfs::ShareConnection(
           directory, base_name,
           static_cast<const SqliteBackendImpl&>(backend).file_set(),
-          /*read_write=*/true));
+          /*read_write=*/true),
+      [](sqlite_vfs::FileSetError) { return std::nullopt; });
   return PendingBackend(std::move(pending_file_set));
 }
 
