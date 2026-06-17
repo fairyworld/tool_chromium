@@ -31,6 +31,7 @@
 #include "third_party/blink/public/common/features.h"
 #include "third_party/blink/public/common/storage_key/storage_key.h"
 #include "third_party/blink/public/mojom/service_worker/service_worker_registration_options.mojom.h"
+#include "third_party/perfetto/include/perfetto/tracing/track.h"
 
 namespace content {
 
@@ -300,9 +301,10 @@ void ServiceWorkerContainerHostForClient::GetRegistrationForReady(
     return;
   }
 
-  TRACE_EVENT_BEGIN("ServiceWorker",
-                    "ServiceWorkerContainerHost::GetRegistrationForReady",
-                    perfetto::Track::FromPointer(this));
+  TRACE_EVENT_BEGIN(
+      "ServiceWorker", "ServiceWorkerContainerHost::GetRegistrationForReady",
+      perfetto::NamedTrack::FromPointer(
+          "ServiceWorkerContainerHost::GetRegistrationForReady", this));
   DCHECK(!get_ready_callback_);
   get_ready_callback_ =
       std::make_unique<GetRegistrationForReadyCallback>(std::move(callback));
@@ -839,8 +841,11 @@ void ServiceWorkerContainerHostForClient::ReturnRegistrationForReadyIfNeeded() {
   if (!registration || !registration->active_version())
     return;
   // ServiceWorkerContainerHost::GetRegistrationForReady
-  TRACE_EVENT_END("ServiceWorker", perfetto::Track::FromPointer(this),
-                  "Registration ID", registration->id());
+  TRACE_EVENT_END(
+      "ServiceWorker",
+      perfetto::NamedTrack::FromPointer(
+          "ServiceWorkerContainerHost::GetRegistrationForReady", this),
+      "Registration ID", registration->id());
   if (!context()) {
     // Here no need to run or destroy |get_ready_callback_|, which will destroy
     // together with |receiver_| when |this| destroys.

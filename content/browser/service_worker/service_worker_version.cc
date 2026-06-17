@@ -70,6 +70,7 @@
 #include "third_party/blink/public/common/service_worker/service_worker_type_converters.h"
 #include "third_party/blink/public/common/storage_key/storage_key.h"
 #include "third_party/blink/public/mojom/service_worker/service_worker.mojom.h"
+#include "third_party/perfetto/include/perfetto/tracing/track.h"
 
 namespace content {
 namespace {
@@ -776,8 +777,9 @@ int ServiceWorkerVersion::StartRequestWithCustomTimeout(
   InflightRequest* request_rawptr = request.get();
   int request_id = inflight_requests_.Add(std::move(request));
   TRACE_EVENT_BEGIN("ServiceWorker", "ServiceWorkerVersion::Request",
-                    perfetto::Track::FromPointer(request_rawptr), "Request id",
-                    request_id, "Event type",
+                    perfetto::NamedTrack::FromPointer(
+                        "ServiceWorkerVersion::Request", request_rawptr),
+                    "Request id", request_id, "Event type",
                     ServiceWorkerMetrics::EventTypeToString(event_type));
 
   base::TimeTicks expiration_time = tick_clock_->NowTicks() + timeout;
@@ -862,7 +864,9 @@ bool ServiceWorkerVersion::FinishRequestWithFetchCount(int request_id,
   }
 
   // ServiceWorkerVersion::Request
-  TRACE_EVENT_END("ServiceWorker", perfetto::Track::FromPointer(request),
+  TRACE_EVENT_END("ServiceWorker",
+                  perfetto::NamedTrack::FromPointer(
+                      "ServiceWorkerVersion::Request", request),
                   "Handled", was_handled);
   if (base::FeatureList::IsEnabled(
           features::kServiceWorkerOptionalTimeoutIterator)) {
@@ -2989,7 +2993,9 @@ bool ServiceWorkerVersion::MaybeTimeoutRequest(
   }
 
   // ServiceWorkerVersion::Request
-  TRACE_EVENT_END("ServiceWorker", perfetto::Track::FromPointer(request),
+  TRACE_EVENT_END("ServiceWorker",
+                  perfetto::NamedTrack::FromPointer(
+                      "ServiceWorkerVersion::Request", request),
                   "Error", "Timeout");
 
   // Move the callback to a local variable before removing the request from the
@@ -3171,9 +3177,11 @@ void ServiceWorkerVersion::OnStoppedInternal(
       &inflight_requests_);
   while (!iter.IsAtEnd()) {
     // ServiceWorkerVersion::Request
-    TRACE_EVENT_END("ServiceWorker",
-                    perfetto::Track::FromPointer(iter.GetCurrentValue()),
-                    "Error", "Worker Stopped");
+    TRACE_EVENT_END(
+        "ServiceWorker",
+        perfetto::NamedTrack::FromPointer("ServiceWorkerVersion::Request",
+                                          iter.GetCurrentValue()),
+        "Error", "Worker Stopped");
     std::move(iter.GetCurrentValue()->error_callback)
         .Run(blink::ServiceWorkerStatusCode::kErrorFailed);
     iter.Advance();

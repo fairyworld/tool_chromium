@@ -56,11 +56,18 @@
 #include "third_party/blink/public/common/service_worker/service_worker_loader_helpers.h"
 #include "third_party/blink/public/mojom/service_worker/service_worker_fetch_handler_bypass_option.mojom-shared.h"
 #include "third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom-shared.h"
+#include "third_party/perfetto/include/perfetto/tracing/track.h"
 #include "third_party/perfetto/include/perfetto/tracing/track_event_args.h"
 
 namespace content {
 
 namespace {
+
+perfetto::NamedTrack GetTracingTrack(
+    const ServiceWorkerMainResourceLoader* loader) {
+  return perfetto::NamedTrack::FromPointer(
+      "content::ServiceWorkerMainResourceLoader", loader);
+}
 
 using SyntheticResponseStatus =
     ServiceWorkerSyntheticResponseManager::SyntheticResponseStatus;
@@ -1651,11 +1658,10 @@ bool ServiceWorkerMainResourceLoader::IsEligibleForRecordingTimingMetrics() {
 }
 
 void ServiceWorkerMainResourceLoader::RecordFindRegistrationToCompletedTrace() {
-  TRACE_EVENT_BEGIN(
-      "ServiceWorker", kHistogramLoadTiming, perfetto::Track::FromPointer(this),
-      find_registration_start_time_, "url", resource_request_.url);
-  TRACE_EVENT_END("ServiceWorker", perfetto::Track::FromPointer(this),
-                  completion_time_);
+  TRACE_EVENT_BEGIN("ServiceWorker", kHistogramLoadTiming,
+                    GetTracingTrack(this), find_registration_start_time_, "url",
+                    resource_request_.url);
+  TRACE_EVENT_END("ServiceWorker", GetTracingTrack(this), completion_time_);
 }
 
 void ServiceWorkerMainResourceLoader::
@@ -1663,11 +1669,9 @@ void ServiceWorkerMainResourceLoader::
   const base::TimeTicks request_start =
       response_head_->load_timing.request_start;
   TRACE_EVENT_BEGIN("ServiceWorker", "FindRegistrationToRequestStart",
-                    perfetto::Track::FromPointer(this),
-                    find_registration_start_time_, "url",
+                    GetTracingTrack(this), find_registration_start_time_, "url",
                     resource_request_.url);
-  TRACE_EVENT_END("ServiceWorker", perfetto::Track::FromPointer(this),
-                  request_start);
+  TRACE_EVENT_END("ServiceWorker", GetTracingTrack(this), request_start);
 
   base::UmaHistogramMediumTimes(
       base::StrCat({kHistogramLoadTiming, ".FindRegistrationToRequestStart"}),
@@ -1718,9 +1722,8 @@ void ServiceWorkerMainResourceLoader::
                     GetInitialServiceWorkerStatusString()}),
       load_timing.service_worker_start_time - load_timing.request_start);
   TRACE_EVENT_BEGIN("ServiceWorker", "RequestStartToForwardServiceWorker",
-                    perfetto::Track::FromPointer(this),
-                    load_timing.request_start);
-  TRACE_EVENT_END("ServiceWorker", perfetto::Track::FromPointer(this),
+                    GetTracingTrack(this), load_timing.request_start);
+  TRACE_EVENT_END("ServiceWorker", GetTracingTrack(this),
                   load_timing.service_worker_start_time);
 }
 
@@ -1761,9 +1764,9 @@ void ServiceWorkerMainResourceLoader::
                         navigation_type_string, ".",
                         is_browser_startup_completed_str})
               .c_str()),
-      perfetto::Track::FromPointer(this), load_timing.service_worker_start_time,
+      GetTracingTrack(this), load_timing.service_worker_start_time,
       "initial_service_worker_status", GetInitialServiceWorkerStatusString());
-  TRACE_EVENT_END("ServiceWorker", perfetto::Track::FromPointer(this),
+  TRACE_EVENT_END("ServiceWorker", GetTracingTrack(this),
                   load_timing.service_worker_ready_time);
 }
 
@@ -1781,9 +1784,9 @@ void ServiceWorkerMainResourceLoader::
       fetch_event_timing_->dispatch_event_time -
           load_timing.service_worker_ready_time);
   TRACE_EVENT_BEGIN("ServiceWorker", "WorkerReadyToFetchHandlerStart",
-                    perfetto::Track::FromPointer(this),
+                    GetTracingTrack(this),
                     load_timing.service_worker_ready_time);
-  TRACE_EVENT_END("ServiceWorker", perfetto::Track::FromPointer(this),
+  TRACE_EVENT_END("ServiceWorker", GetTracingTrack(this),
                   fetch_event_timing_->dispatch_event_time);
 }
 
@@ -1800,9 +1803,9 @@ void ServiceWorkerMainResourceLoader::
                           fetch_event_timing_->respond_with_settled_time -
                               fetch_event_timing_->dispatch_event_time);
   TRACE_EVENT_BEGIN("ServiceWorker", "FetchHandlerStartToFetchHandlerEnd",
-                    perfetto::Track::FromPointer(this),
+                    GetTracingTrack(this),
                     fetch_event_timing_->dispatch_event_time);
-  TRACE_EVENT_END("ServiceWorker", perfetto::Track::FromPointer(this),
+  TRACE_EVENT_END("ServiceWorker", GetTracingTrack(this),
                   fetch_event_timing_->respond_with_settled_time);
 }
 
@@ -1820,9 +1823,9 @@ void ServiceWorkerMainResourceLoader::
       load_timing.receive_headers_end -
           fetch_event_timing_->respond_with_settled_time);
   TRACE_EVENT_BEGIN("ServiceWorker", "FetchHandlerEndToResponseReceived",
-                    perfetto::Track::FromPointer(this),
+                    GetTracingTrack(this),
                     fetch_event_timing_->respond_with_settled_time);
-  TRACE_EVENT_END("ServiceWorker", perfetto::Track::FromPointer(this),
+  TRACE_EVENT_END("ServiceWorker", GetTracingTrack(this),
                   load_timing.receive_headers_end);
 }
 
@@ -1837,13 +1840,11 @@ void ServiceWorkerMainResourceLoader::
                     GetInitialServiceWorkerStatusString()}),
       completion_time_ - load_timing.receive_headers_end);
   TRACE_EVENT_BEGIN(
-      "ServiceWorker", "ResponseReceivedToCompleted",
-      perfetto::Track::FromPointer(this), load_timing.receive_headers_end,
-      "fetch_response_source",
+      "ServiceWorker", "ResponseReceivedToCompleted", GetTracingTrack(this),
+      load_timing.receive_headers_end, "fetch_response_source",
       blink::ServiceWorkerLoaderHelpers::FetchResponseSourceToSuffix(
           response_source_));
-  TRACE_EVENT_END("ServiceWorker", perfetto::Track::FromPointer(this),
-                  completion_time_);
+  TRACE_EVENT_END("ServiceWorker", GetTracingTrack(this), completion_time_);
   // Same as above, breakdown by response source.
   base::UmaHistogramMediumTimes(
       base::StrCat(
@@ -1916,10 +1917,9 @@ void ServiceWorkerMainResourceLoader::
                     GetInitialServiceWorkerStatusString()}),
       completion_time_ - fetch_event_timing_->respond_with_settled_time);
   TRACE_EVENT_BEGIN("ServiceWorker", "FetchHandlerEndToFallbackNetwork",
-                    perfetto::Track::FromPointer(this),
+                    GetTracingTrack(this),
                     fetch_event_timing_->respond_with_settled_time);
-  TRACE_EVENT_END("ServiceWorker", perfetto::Track::FromPointer(this),
-                  completion_time_);
+  TRACE_EVENT_END("ServiceWorker", GetTracingTrack(this), completion_time_);
 }
 
 void ServiceWorkerMainResourceLoader::RecordFetchEventHandlerMetrics(
