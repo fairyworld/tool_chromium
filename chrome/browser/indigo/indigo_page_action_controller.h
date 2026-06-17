@@ -148,13 +148,16 @@ class IndigoPageActionController : public tabs::ContentsObservingTabFeature,
     explicit TestApi(IndigoPageActionController* controller)
         : controller_(controller) {}
 
-    void CheckEligibilityForOnboarding(const CombinedEligibility& eligibility) {
-      controller_->CheckEligibilityForOnboarding(eligibility);
+    void CheckEligibilityForOnboarding(bool skip_glic_invoke,
+                                       const CombinedEligibility& eligibility) {
+      controller_->CheckEligibilityForOnboarding(skip_glic_invoke, eligibility);
     }
 
     void CheckOnboardingResult(OnboardingDisposition disposition,
+                               bool skip_glic_invoke,
                                const OnboardingResult& result) {
-      controller_->OnOnboardingDialogClosed(disposition, result);
+      controller_->OnOnboardingDialogClosed(disposition, skip_glic_invoke,
+                                            result);
     }
 
     void SetOnboardingDialogFactory(OnboardingDialogFactory factory) {
@@ -170,13 +173,16 @@ class IndigoPageActionController : public tabs::ContentsObservingTabFeature,
   void UpdateEntryPointsState();
 
   // Shows the onboarding dialog with the appropriate URL based on disposition.
-  void ShowOnboardingDialog(OnboardingDisposition disposition);
+  void ShowOnboardingDialog(OnboardingDisposition disposition,
+                            bool skip_glic_invoke);
 
   // Called when the eligibility has been fetched.
-  void CheckEligibilityForOnboarding(const CombinedEligibility& eligibility);
+  void CheckEligibilityForOnboarding(bool skip_glic_invoke,
+                                     const CombinedEligibility& eligibility);
 
   // Called when eligibility is known and onboarding is completed (if needed).
-  void ContinueInvoke(const CombinedEligibility& eligibility);
+  void ContinueInvoke(bool skip_glic_invoke,
+                      const CombinedEligibility& eligibility);
 
   // Helper to invoke IndigoAgent.
   void TriggerIndigoAgent();
@@ -185,6 +191,7 @@ class IndigoPageActionController : public tabs::ContentsObservingTabFeature,
 
   // Updates state and handles preference changes when the dialog closes.
   void OnOnboardingDialogClosed(OnboardingDisposition disposition,
+                                bool skip_glic_invoke,
                                 const OnboardingResult& result);
 
   // Called when the delete request completes.

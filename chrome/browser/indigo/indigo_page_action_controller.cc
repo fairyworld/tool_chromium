@@ -217,18 +217,20 @@ void IndigoPageActionController::InvokeAction(EntryPoint entry_point) {
     return;
   }
 
+  const bool skip_glic_invoke = (entry_point == EntryPoint::kErrorToast);
+
   switch (entry_point) {
     case EntryPoint::kErrorToast:
     case EntryPoint::kAnchoredMessage:
       indigo_service_->GetCombinedEligibility(base::BindOnce(
           &IndigoPageActionController::CheckEligibilityForOnboarding,
-          invoke_weak_ptr_factory_.GetWeakPtr()));
+          invoke_weak_ptr_factory_.GetWeakPtr(), skip_glic_invoke));
       return;
     case EntryPoint::kSuggestionChip:
       if (glic::GlicSidePanelCoordinator::IsShowing(&tab())) {
         indigo_service_->GetCombinedEligibility(base::BindOnce(
             &IndigoPageActionController::CheckEligibilityForOnboarding,
-            invoke_weak_ptr_factory_.GetWeakPtr()));
+            invoke_weak_ptr_factory_.GetWeakPtr(), skip_glic_invoke));
         return;
       }
       ShowAnchoredMessage(
@@ -238,6 +240,7 @@ void IndigoPageActionController::InvokeAction(EntryPoint entry_point) {
 }
 
 void IndigoPageActionController::CheckEligibilityForOnboarding(
+    bool skip_glic_invoke,
     const CombinedEligibility& eligibility) {
   if (eligibility.local_eligibility ==
       LocalEligibility::kRefreshTokenInPersistentErrorState) {
@@ -261,14 +264,15 @@ void IndigoPageActionController::CheckEligibilityForOnboarding(
 
   // Show onboarding if the user is ready to onboard, or if it's forced.
   if (eligibility.ReadyToOnboard() || force_onboarding) {
-    ShowOnboardingDialog(OnboardingDisposition::kDefault);
+    ShowOnboardingDialog(OnboardingDisposition::kDefault, skip_glic_invoke);
     return;
   }
 
-  ContinueInvoke(eligibility);
+  ContinueInvoke(skip_glic_invoke, eligibility);
 }
 
 void IndigoPageActionController::ContinueInvoke(
+    bool skip_glic_invoke,
     const CombinedEligibility& eligibility) {
   content::WebContents* web_contents = tab().GetContents();
   if (!web_contents) {
@@ -284,7 +288,8 @@ void IndigoPageActionController::ContinueInvoke(
     return;
   }
 
-  if (base::FeatureList::IsEnabled(features::kIndigoOpenGlic) &&
+  if (!skip_glic_invoke &&
+      base::FeatureList::IsEnabled(features::kIndigoOpenGlic) &&
       !glic::GlicSidePanelCoordinator::IsShowing(&tab())) {
     Profile* profile =
         Profile::FromBrowserContext(web_contents->GetBrowserContext());
@@ -363,7 +368,8 @@ void IndigoPageActionController::TriggerIndigoAgentWithDelay() {
 }
 
 void IndigoPageActionController::ShowOnboardingDialog(
-    OnboardingDisposition disposition) {
+    OnboardingDisposition disposition,
+    bool skip_glic_invoke) {
   if (onboarding_dialog_) {
     return;
   }
@@ -383,9 +389,9 @@ void IndigoPageActionController::ShowOnboardingDialog(
     base::RecordAction(base::UserMetricsAction("Indigo.Onboarding.Trigger"));
   }
 
-  auto callback =
-      base::BindOnce(&IndigoPageActionController::OnOnboardingDialogClosed,
-                     invoke_weak_ptr_factory_.GetWeakPtr(), disposition);
+  auto callback = base::BindOnce(
+      &IndigoPageActionController::OnOnboardingDialogClosed,
+      invoke_weak_ptr_factory_.GetWeakPtr(), disposition, skip_glic_invoke);
 
   if (onboarding_dialog_factory_for_testing_) {
     onboarding_dialog_ = onboarding_dialog_factory_for_testing_.Run(
@@ -523,7 +529,8 @@ void IndigoPageActionController::OnRegenerate(IndigoToolbar* toolbar) {
 
 void IndigoPageActionController::OnReplaceOriginalPhoto(
     IndigoToolbar* toolbar) {
-  ShowOnboardingDialog(OnboardingDisposition::kReplacePhoto);
+  ShowOnboardingDialog(OnboardingDisposition::kReplacePhoto,
+                       /*skip_glic_invoke=*/true);
 }
 
 void IndigoPageActionController::OnDeleteOriginalPhoto(IndigoToolbar* toolbar) {
@@ -585,6 +592,7 @@ void IndigoPageActionController::UpdateEntryPointsState() {
 
 void IndigoPageActionController::OnOnboardingDialogClosed(
     OnboardingDisposition disposition,
+    bool skip_glic_invoke,
     const OnboardingResult& result) {
   const bool acknowledged = result.acknowledge_chrome_disclaimer;
   onboarding_dialog_.reset();
@@ -613,9 +621,9 @@ void IndigoPageActionController::OnOnboardingDialogClosed(
     if (disposition == OnboardingDisposition::kReplacePhoto) {
       OnRegenerate(toolbar_.get());
     } else {
-      indigo_service_->GetCombinedEligibility(
-          base::BindOnce(&IndigoPageActionController::ContinueInvoke,
-                         invoke_weak_ptr_factory_.GetWeakPtr()));
+      indigo_service_->GetCombinedEligibility(base::BindOnce(
+          &IndigoPageActionController::ContinueInvoke,
+          invoke_weak_ptr_factory_.GetWeakPtr(), skip_glic_invoke));
     }
   }
 }
