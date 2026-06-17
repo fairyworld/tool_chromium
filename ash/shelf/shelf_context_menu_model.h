@@ -40,6 +40,7 @@ class ASH_EXPORT ShelfContextMenuModel : public ui::SimpleMenuModel,
     MENU_SHOW_CONTINUE_SECTION = 508,
     MENU_HIDE_DESK_NAME = 509,
     MENU_SHOW_DESK_NAME = 510,
+    MENU_TASK_MANAGER = 511,
     MENU_ASH_END
   };
 

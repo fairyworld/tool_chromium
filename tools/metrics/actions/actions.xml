@@ -44593,6 +44593,14 @@ should be able to be added at any place in this file.
   </description>
 </action>
 
+<action name="Shelf_ContextMenu_Task_Manager">
+  <owner>oshima@chromium.org</owner>
+  <owner>cros-system-ui-eng@google.com</owner>
+  <description>
+    User selected Task Manager from the shelf context menu on ChromeOS.
+  </description>
+</action>
+
 <action name="Shelf_ItemPinned">
   <owner>mmourgos@chromium.org</owner>
   <owner>gzadina@google.com</owner>

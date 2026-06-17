@@ -434,6 +434,9 @@ chromium-metrics-reviews@google.com.
   <int value="506" label="Personalization Hub"/>
   <int value="507" label="Hide Continue Section"/>
   <int value="508" label="Show Continue Section"/>
+  <int value="509" label="Hide Desk Name"/>
+  <int value="510" label="Show Desk Name"/>
+  <int value="511" label="Task Manager"/>
 </enum>
 
 <enum name="CopyShortcutResult">
