@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "base/test/scoped_feature_list.h"
+#include "build/branding_buildflags.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/personal_context/core/mock_personal_context_enablement_service.h"
 #include "components/personal_context/core/personal_context_prefs.h"
@@ -41,6 +42,8 @@ class AtMemoryEnablementUtilsTest : public testing::Test {
       personal_context_service_;
   TestingPrefServiceSimple pref_service_;
 };
+
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 // Tests that `MayPerformAtMemoryAction` returns false when AtMemory is
 // disabled.
@@ -191,6 +194,26 @@ TEST_F(AtMemoryEnablementUtilsTest,
                                        &personal_context_service_,
                                        &pref_service_));
 }
+
+#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
+
+// Tests for non-branded Chromium builds.
+#if !BUILDFLAG(GOOGLE_CHROME_BRANDING)
+// Tests that MayPerformAtMemoryAction returns false for non-branded Chromium
+// build even when all conditions are met.
+TEST_F(AtMemoryEnablementUtilsTest,
+       MayPerformAtMemoryAction_SupportedAndToggleOn) {
+  EXPECT_CALL(personal_context_service_, GetEnablementState)
+      .WillRepeatedly(
+          Return(personal_context::PersonalContextEnablementState::kEnabled));
+  pref_service_.SetUserPref(
+      personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
+      base::Value(true));
+  EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                        &personal_context_service_,
+                                        &pref_service_));
+}
+#endif  // !BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 }  // namespace
 }  // namespace autofill
