@@ -84,6 +84,8 @@ std::string_view ConvertIconToPrintableString(Suggestion::Icon icon) {
       return "kError";
     case Suggestion::Icon::kFlight:
       return "kFlight";
+    case Suggestion::Icon::kFlightSpark:
+      return "kFlightSpark";
     case Suggestion::Icon::kGlobe:
       return "kGlobe";
     case Suggestion::Icon::kGoogle:
@@ -102,6 +104,12 @@ std::string_view ConvertIconToPrintableString(Suggestion::Icon icon) {
       return "kHome";
     case Suggestion::Icon::kIdCard:
       return "kIdCard";
+    case Suggestion::Icon::kIdCard2:
+      return "kIdCard2";
+    case Suggestion::Icon::kIdCard2Spark:
+      return "kIdCard2Spark";
+    case Suggestion::Icon::kIdCardSpark:
+      return "kIdCardSpark";
     case Suggestion::Icon::kKey:
       return "kKey";
     case Suggestion::Icon::kLocation:
@@ -112,8 +120,14 @@ std::string_view ConvertIconToPrintableString(Suggestion::Icon icon) {
       return "kMagic";
     case Suggestion::Icon::kOfferTag:
       return "kOfferTag";
+    case Suggestion::Icon::kOrder:
+      return "kOrder";
+    case Suggestion::Icon::kOrderSpark:
+      return "kOrderSpark";
     case Suggestion::Icon::kPassport:
       return "kPassport";
+    case Suggestion::Icon::kPassportSpark:
+      return "kPassportSpark";
     case Suggestion::Icon::kPenSpark:
       return "kPenSpark";
     case Suggestion::Icon::kPersonCheck:
@@ -126,12 +140,18 @@ std::string_view ConvertIconToPrintableString(Suggestion::Icon icon) {
       return "kScanCreditCard";
     case Suggestion::Icon::kSettings:
       return "kSettings";
+    case Suggestion::Icon::kShipment:
+      return "kShipment";
+    case Suggestion::Icon::kShipmentSpark:
+      return "kShipmentSpark";
     case Suggestion::Icon::kSpark:
       return "kSpark";
     case Suggestion::Icon::kUndo:
       return "kUndo";
     case Suggestion::Icon::kVehicle:
       return "kVehicle";
+    case Suggestion::Icon::kVehicleSpark:
+      return "kVehicleSpark";
     case Suggestion::Icon::kWork:
       return "kWork";
     case Suggestion::Icon::kGmail:

@@ -444,7 +444,7 @@ TEST_F(AutofillAiSuggestionGeneratorTest,
 
   std::vector<Suggestion> suggestions =
       CreateAutofillAiFillingSuggestions(field(0));
-  EXPECT_THAT(suggestions[0], HasIcon(Suggestion::Icon::kSpark));
+  EXPECT_THAT(suggestions[0], HasIcon(Suggestion::Icon::kFlightSpark));
 }
 
 TEST_F(AutofillAiSuggestionGeneratorTest, GetFillingSuggestion_PrefixMatching) {

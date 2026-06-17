@@ -372,33 +372,36 @@ Suggestion::Icon GetSuggestionIcon(
     return Suggestion::Icon::kNoIcon;
   }
 #endif
-  if (trigger_entity_record_type ==
-      EntityInstance::RecordType::kPersonalContext) {
-    return Suggestion::Icon::kSpark;
-  }
+  const bool is_personal_context = trigger_entity_record_type ==
+                                   EntityInstance::RecordType::kPersonalContext;
   switch (trigger_entity_type.name()) {
     case EntityTypeName::kDriversLicense:
-      return Suggestion::Icon::kIdCard;
-    case EntityTypeName::kFlightReservation:
-      return Suggestion::Icon::kFlight;
     case EntityTypeName::kNationalIdCard:
-      return Suggestion::Icon::kIdCard;
+      return is_personal_context ? Suggestion::Icon::kIdCardSpark
+                                 : Suggestion::Icon::kIdCard;
+    case EntityTypeName::kFlightReservation:
+      return is_personal_context ? Suggestion::Icon::kFlightSpark
+                                 : Suggestion::Icon::kFlight;
     case EntityTypeName::kOrder:
-      return Suggestion::Icon::kNoIcon;
+      return is_personal_context ? Suggestion::Icon::kOrderSpark
+                                 : Suggestion::Icon::kOrder;
     case EntityTypeName::kPassport:
-      return base::FeatureList::IsEnabled(
-                 features::kAutofillAiWalletPrivatePasses)
-                 ? Suggestion::Icon::kPassport
-                 : Suggestion::Icon::kIdCard;
+      if (base::FeatureList::IsEnabled(
+              features::kAutofillAiWalletPrivatePasses)) {
+        return is_personal_context ? Suggestion::Icon::kPassportSpark
+                                   : Suggestion::Icon::kPassport;
+      }
+      return Suggestion::Icon::kIdCard;
     case EntityTypeName::kKnownTravelerNumber:
-      return Suggestion::Icon::kPersonCheck;
     case EntityTypeName::kRedressNumber:
-      return Suggestion::Icon::kPersonCheck;
+      return is_personal_context ? Suggestion::Icon::kIdCard2Spark
+                                 : Suggestion::Icon::kIdCard2;
     case EntityTypeName::kVehicle:
-      return Suggestion::Icon::kVehicle;
+      return is_personal_context ? Suggestion::Icon::kVehicleSpark
+                                 : Suggestion::Icon::kVehicle;
     case EntityTypeName::kShipment:
-      NOTIMPLEMENTED();
-      return Suggestion::Icon::kNoIcon;
+      return is_personal_context ? Suggestion::Icon::kShipmentSpark
+                                 : Suggestion::Icon::kShipment;
   }
   NOTREACHED();
 }
