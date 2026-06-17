@@ -73,7 +73,6 @@ TEST(PdfInkTextSplitTypefaceRunsTest, NoOffset) {
                                   /*typeface_run_total_advance=*/
                                   {
                                       {0.0f, 10.0f, 20.0f},
-                                      {},
                                   },
                                   {}));
 
@@ -138,11 +137,9 @@ TEST(PdfInkTextSplitTypefaceRunsTest, HorizontalOffset) {
                   /*typeface_run_total_advance=*/
                   {
                       {0.0f, 10.0f, 20.0f},
-                      {},
                   },
                   {{gfx::Vector2dF(-4.0f, 0.0f), gfx::Vector2dF(5.0f, 0.0f),
-                    gfx::Vector2dF(3.0f, 0.0f)},
-                   {}}));
+                    gfx::Vector2dF(3.0f, 0.0f)}}));
 
   std::vector<InkTextInfo> ink_info =
       InkTextInfo::SplitTypefaceRuns(text_runs, 10.0f);
@@ -189,11 +186,9 @@ TEST(PdfInkTextSplitTypefaceRunsTest, 2DOffset) {
                   /*typeface_run_total_advance=*/
                   {
                       {0.0f, 10.0f, 20.0f},
-                      {},
                   },
                   {{gfx::Vector2dF(-4.0f, 0.0f), gfx::Vector2dF(5.0f, 0.0f),
-                    gfx::Vector2dF(3.0f, 5.0f)},
-                   {}}));
+                    gfx::Vector2dF(3.0f, 5.0f)}}));
 
   std::vector<InkTextInfo> ink_info =
       InkTextInfo::SplitTypefaceRuns(text_runs, 10.0f);

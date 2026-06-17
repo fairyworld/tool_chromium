@@ -191,12 +191,12 @@ std::vector<InkTextInfo> InkTextInfo::SplitTypefaceRuns(
     for (size_t i = 0; i < text_run->typeface_runs.size(); ++i) {
       const pdf::mojom::InkTypefaceRunPtr& typeface_run =
           text_run->typeface_runs[i];
+      CHECK(!typeface_run->glyphs.empty());
       // TODO(crbug.com/510015130): handle vertical text.
       CHECK(typeface_run->is_horizontal);
 
       const float right_edge_advance =
-          i + 1 < text_run->typeface_runs.size() &&
-                  !text_run->typeface_runs[i + 1]->glyphs.empty()
+          i + 1 < text_run->typeface_runs.size()
               ? text_run->typeface_runs[i + 1]->glyphs.front()->total_advance
               : text_run->location.width();
       const float right_edge = right_edge_advance + text_run->location.x();
@@ -230,9 +230,6 @@ std::vector<InkTextInfo> InkTextInfo::SplitTypefaceRuns(
       prev_right_edge_advance = right_edge_advance;
 
       CHECK_EQ(glyphs.size(), glyph_positions.size());
-      if (glyphs.empty()) {
-        continue;
-      }
       InkTextInfo output_info(FontId(typeface_run->typeface_id),
                               std::move(glyphs), std::move(glyph_positions),
                               run_location, typeface_run->is_horizontal);
