@@ -6707,6 +6707,7 @@ interface Navigator
     getter mediaDevices
     getter mimeTypes
     getter modelContext
+    getter modelContextTesting
     getter onLine
     getter pdfViewerEnabled
     getter permissions
@@ -6747,6 +6748,7 @@ interface Navigator
     method share
     method vibrate
     method webkitGetUserMedia
+    setter modelContextTesting
 interface NavigatorManagedData : EventTarget
     attribute @@toStringTag
     getter onmanagedconfigurationchange
