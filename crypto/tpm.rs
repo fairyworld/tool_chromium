@@ -153,19 +153,6 @@ pub mod ffi {
         signature: Vec<u8>,
     }
 
-    /// Response containing the extracted signature algorithms from a TPM
-    /// signature. Used to pass algorithm information across the FFI
-    /// boundary to C++.
-    struct SignatureAlgorithmsResponse {
-        /// Indicates whether signature algorithms were successfully extracted.
-        /// If false, the following fields will be zero.
-        has_algorithms: bool,
-        /// The signature algorithm ID (e.g., TPM_ALG_RSASSA or TPM_ALG_ECDSA).
-        sig_alg: u16,
-        /// The hash algorithm ID (e.g., TPM_ALG_SHA256).
-        hash_alg: u16,
-    }
-
     /// Results that can occur during TPM signature verification.
     // LINT.IfChange(VerificationResult)
     enum VerificationResult {
@@ -188,6 +175,22 @@ pub mod ffi {
     }
     // LINT.ThenChange(//tools/metrics/histograms/metadata/net/enums.xml:
     // TpmCertifyVerifyResult)
+
+    /// Struct containing the parsed raw components of a TPM signature.
+    struct RawSignatureComponents {
+        /// The outcome of the parsing operation.
+        status: VerificationResult,
+        /// The signature algorithm ID (e.g., TPM_ALG_RSASSA or TPM_ALG_ECDSA).
+        sig_alg: u16,
+        /// The hash algorithm ID (e.g., TPM_ALG_SHA256).
+        hash_alg: u16,
+        /// The raw RSA signature bytes, if sig_alg is TPM_ALG_RSASSA.
+        rsa_sig: Vec<u8>,
+        /// The raw ECDSA r coordinate, if sig_alg is TPM_ALG_ECDSA.
+        ecdsa_r: Vec<u8>,
+        /// The raw ECDSA s coordinate, if sig_alg is TPM_ALG_ECDSA.
+        ecdsa_s: Vec<u8>,
+    }
 
     extern "Rust" {
         /// Builds a TPM2_Certify command buffer.
@@ -239,23 +242,8 @@ pub mod ffi {
         /// serialized `TPMT_SIGNATURE`.
         fn parse_certify_response(resp: &[u8], nonce: &[u8]) -> CertifyResponse;
 
-        /// Verifies a generic TPM signature over an arbitrary byte payload.
-        ///
-        /// * `payload` - The arbitrary bytes over which the signature was
-        ///   computed.
-        /// * `signature` - The serialized `TPMT_SIGNATURE` returned by the TPM.
-        /// * `spki` - The Subject Public Key Info (SPKI) of the key used to
-        ///   verify the signature.
-        ///
-        /// Note: This verification is strictly best-effort. It is entirely
-        /// possible that the signature is mathematically valid, but we
-        /// simply haven't implemented the necessary verification
-        /// algorithms yet (e.g., P-384 or specific hash algorithms).
-        fn verify_signature(payload: &[u8], signature: &[u8], spki: &[u8]) -> VerificationResult;
-
-        /// Extracts the signature algorithms from a serialized `TPMT_SIGNATURE`
-        /// payload.
-        fn extract_signature_algorithms(payload: &[u8]) -> SignatureAlgorithmsResponse;
+        /// Parses a serialized `TPMT_SIGNATURE` and returns its raw components.
+        fn parse_tpm_signature(signature: &[u8]) -> RawSignatureComponents;
     }
 }
 
@@ -634,8 +622,8 @@ fn parse_certify_response_impl<'a>(
     // The entire rest of the parameter section is treated as the signature
     let signature = param_reader.read_all();
     // Sanity check that the signature at least contains the algorithms
-    let _algs =
-        extract_signature_algorithms_impl(signature).ok_or(TpmParseError::BufferTooSmall)?;
+    let _algs = SignatureAlgorithms::parse(&mut Reader::new(signature))
+        .ok_or(TpmParseError::BufferTooSmall)?;
 
     // The remaining bytes in the main reader are the response authorization
     // sessions.
@@ -779,106 +767,57 @@ impl<'a> TpmtSignature<'a> {
     }
 }
 
-/// Verifies a generic TPM signature over an arbitrary byte payload.
-///
-/// * `payload` - The arbitrary bytes over which the signature was computed.
-/// * `signature` - The serialized `TPMT_SIGNATURE` returned by the TPM.
-/// * `spki` - The Subject Public Key Info (SPKI) of the key used to verify the
-///   signature.
-///
-/// Note: This verification is strictly best-effort. It is entirely possible
-/// that the signature is mathematically valid, but we simply haven't
-/// implemented the necessary verification algorithms yet (e.g., P-384 or
-/// specific hash algorithms).
-fn verify_signature_impl(
-    payload: &[u8],
+/// Parses a serialized `TPMT_SIGNATURE` and returns its raw components.
+pub fn parse_tpm_signature(signature: &[u8]) -> ffi::RawSignatureComponents {
+    match parse_tpm_signature_impl(signature) {
+        Ok(components) => components,
+        Err(err) => ffi::RawSignatureComponents {
+            status: match err {
+                TpmVerifyError::BufferTooSmall => ffi::VerificationResult::BufferTooSmall,
+                TpmVerifyError::TrailingBytes => ffi::VerificationResult::TrailingBytes,
+                TpmVerifyError::UnsupportedSignatureAlgorithm => {
+                    ffi::VerificationResult::UnsupportedSignatureAlgorithm
+                }
+                TpmVerifyError::UnsupportedHashAlgorithm => {
+                    ffi::VerificationResult::UnsupportedHashAlgorithm
+                }
+                TpmVerifyError::InvalidPublicKey => ffi::VerificationResult::InvalidPublicKey,
+                TpmVerifyError::InvalidSignature => ffi::VerificationResult::InvalidSignature,
+            },
+            sig_alg: 0,
+            hash_alg: 0,
+            rsa_sig: Vec::new(),
+            ecdsa_r: Vec::new(),
+            ecdsa_s: Vec::new(),
+        },
+    }
+}
+
+fn parse_tpm_signature_impl(
     signature: &[u8],
-    spki: &[u8],
-) -> Result<(), TpmVerifyError> {
+) -> Result<ffi::RawSignatureComponents, TpmVerifyError> {
     let mut sig_reader = Reader::new(signature);
     let tpm_sig = TpmtSignature::parse(&mut sig_reader)?;
-    let hash_alg = tpm_sig.algorithms.hash_alg;
 
     // Reject trailing garbage after the signature.
     if !sig_reader.is_empty() {
         return Err(TpmVerifyError::TrailingBytes);
     }
 
-    match tpm_sig.signature_data {
-        SignatureData::Rsa(sig) => {
-            bssl_crypto::rsa::PublicKey::from_der_subject_public_key_info(spki)
-                .ok_or(TpmVerifyError::InvalidPublicKey)
-                .and_then(|key| match hash_alg {
-                    TPM_ALG_SHA256 => key
-                        .verify_pkcs1::<bssl_crypto::digest::Sha256>(payload, sig)
-                        .map_err(|_| TpmVerifyError::InvalidSignature),
-                    TPM_ALG_SHA1 => key
-                        .verify_pkcs1::<bssl_crypto::digest::InsecureSha1>(payload, sig)
-                        .map_err(|_| TpmVerifyError::InvalidSignature),
-                    _ => Err(TpmVerifyError::UnsupportedHashAlgorithm),
-                })
-        }
-        SignatureData::Ecdsa { r, s } => {
-            // Note: We perform the coordinate size bounds check here rather than in the
-            // parser because the TPM 2.0 ECC signature structure does not
-            // encode the curve ID. We currently only support P-256 (and
-            // SHA-256) for ECDSA. If P-384 support is ever added, this bounds
-            // check must dynamically inspect the curve type from the public key.
-            const P256_COORDINATE_SIZE: usize = 32;
-            if hash_alg != TPM_ALG_SHA256 {
-                Err(TpmVerifyError::UnsupportedHashAlgorithm)
-            } else if r.len() != P256_COORDINATE_SIZE || s.len() != P256_COORDINATE_SIZE {
-                Err(TpmVerifyError::InvalidSignature)
-            } else {
-                bssl_crypto::ecdsa::PublicKey::<bssl_crypto::ec::P256>::from_der_subject_public_key_info(spki)
-                    .ok_or(TpmVerifyError::InvalidPublicKey)
-                    .and_then(|key| {
-                        key.verify_p1363(payload, &[r, s].concat())
-                            .map_err(|_| TpmVerifyError::InvalidSignature)
-                    })
-            }
-        }
-    }?;
+    let sig_alg = tpm_sig.algorithms.sig_alg;
+    let hash_alg = tpm_sig.algorithms.hash_alg;
 
-    Ok(())
-}
+    let (rsa_sig, ecdsa_r, ecdsa_s) = match tpm_sig.signature_data {
+        SignatureData::Rsa(sig) => (sig.to_vec(), Vec::new(), Vec::new()),
+        SignatureData::Ecdsa { r, s } => (Vec::new(), r.to_vec(), s.to_vec()),
+    };
 
-/// Verifies a generic TPM signature over an arbitrary byte payload.
-pub fn verify_signature(payload: &[u8], signature: &[u8], spki: &[u8]) -> ffi::VerificationResult {
-    match verify_signature_impl(payload, signature, spki) {
-        Ok(()) => ffi::VerificationResult::Ok,
-        Err(err) => match err {
-            TpmVerifyError::BufferTooSmall => ffi::VerificationResult::BufferTooSmall,
-            TpmVerifyError::TrailingBytes => ffi::VerificationResult::TrailingBytes,
-            TpmVerifyError::UnsupportedSignatureAlgorithm => {
-                ffi::VerificationResult::UnsupportedSignatureAlgorithm
-            }
-            TpmVerifyError::UnsupportedHashAlgorithm => {
-                ffi::VerificationResult::UnsupportedHashAlgorithm
-            }
-            TpmVerifyError::InvalidPublicKey => ffi::VerificationResult::InvalidPublicKey,
-            TpmVerifyError::InvalidSignature => ffi::VerificationResult::InvalidSignature,
-        },
-    }
-}
-
-/// Extracts the signature algorithms from a serialized `TPMT_SIGNATURE`
-/// payload.
-pub fn extract_signature_algorithms_impl(payload: &[u8]) -> Option<SignatureAlgorithms> {
-    let mut reader = Reader::new(payload);
-    SignatureAlgorithms::parse(&mut reader)
-}
-
-impl From<Option<SignatureAlgorithms>> for ffi::SignatureAlgorithmsResponse {
-    fn from(result: Option<SignatureAlgorithms>) -> Self {
-        ffi::SignatureAlgorithmsResponse {
-            has_algorithms: result.is_some(),
-            sig_alg: result.map(|a| a.sig_alg).unwrap_or(0),
-            hash_alg: result.map(|a| a.hash_alg).unwrap_or(0),
-        }
-    }
-}
-
-pub fn extract_signature_algorithms(payload: &[u8]) -> ffi::SignatureAlgorithmsResponse {
-    extract_signature_algorithms_impl(payload).into()
+    Ok(ffi::RawSignatureComponents {
+        status: ffi::VerificationResult::Ok,
+        sig_alg,
+        hash_alg,
+        rsa_sig,
+        ecdsa_r,
+        ecdsa_s,
+    })
 }

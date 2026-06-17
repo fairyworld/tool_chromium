@@ -9,6 +9,7 @@
 #include <tuple>
 
 #include "base/check.h"
+#include "base/compiler_specific.h"
 #include "base/containers/span_reader.h"
 #include "base/containers/span_rust.h"
 #include "base/containers/span_writer.h"
@@ -17,6 +18,7 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
+#include "crypto/ecdsa_utils.h"
 #include "crypto/hash.h"
 #include "crypto/keypair.h"
 #include "crypto/mock_unexportable_key.h"
@@ -37,6 +39,11 @@
 
 namespace {
 
+constexpr uint16_t kTpmAlgRsaSsa = 0x0014;
+constexpr uint16_t kTpmAlgEcdsa = 0x0018;
+constexpr uint16_t kTpmAlgSha1 = 0x0004;
+constexpr uint16_t kTpmAlgSha256 = 0x000B;
+
 using ::testing::ElementsAre;
 using ::testing::Return;
 
@@ -56,6 +63,29 @@ std::vector<uint8_t> ConstructFakeTpmResponse(
   writer.Write(signature);
   CHECK_EQ(writer.remaining(), 0u);
   return resp;
+}
+
+std::optional<crypto::sign::SignatureKind> GetSignatureKind(uint16_t sig_alg,
+                                                            uint16_t hash_alg) {
+  switch (sig_alg) {
+    case kTpmAlgRsaSsa:
+      switch (hash_alg) {
+        case kTpmAlgSha256:
+          return crypto::sign::SignatureKind::RSA_PKCS1_SHA256;
+        case kTpmAlgSha1:
+          return crypto::sign::SignatureKind::RSA_PKCS1_SHA1;
+      }
+      break;
+    case kTpmAlgEcdsa:
+      switch (hash_alg) {
+        case kTpmAlgSha256:
+          return crypto::sign::SignatureKind::ECDSA_SHA256;
+        case kTpmAlgSha1:
+          return crypto::sign::SignatureKind::ECDSA_SHA1;
+      }
+      break;
+  }
+  return std::nullopt;
 }
 
 enum class Provider {
@@ -484,6 +514,8 @@ TEST_P(UnexportableKeyTest, AttestationKeyMock) {
 }
 
 TEST_P(UnexportableKeyTest, FakeAttestationWorkflows) {
+  // TODO(crbug.com/525047253): This only tests SHA256 hash algos. We should add
+  // coverage for SHA1 as well.
   if (provider_type() != Provider::kFake) {
     GTEST_SKIP() << "Test is only for fake provider.";
   }
@@ -515,11 +547,35 @@ TEST_P(UnexportableKeyTest, FakeAttestationWorkflows) {
   EXPECT_EQ(base::span(parsed.statement), base::span(statement.statement));
   EXPECT_EQ(base::span(parsed.signature), base::span(statement.signature));
 
-  crypto::tpm::VerificationResult verified = crypto::tpm::verify_signature(
-      base::SpanToRustSlice(parsed.statement),
-      base::SpanToRustSlice(parsed.signature),
-      base::SpanToRustSlice(attestation_key->GetSubjectPublicKeyInfo()));
-  EXPECT_EQ(verified, crypto::tpm::VerificationResult::Ok);
+  crypto::tpm::RawSignatureComponents parsed_sig =
+      crypto::tpm::parse_tpm_signature(
+          base::SpanToRustSlice(statement.signature));
+  EXPECT_EQ(parsed_sig.status, crypto::tpm::VerificationResult::Ok);
+
+  ASSERT_OK_AND_ASSIGN(auto public_key,
+                       crypto::keypair::PublicKey::FromSubjectPublicKeyInfo(
+                           attestation_key->GetSubjectPublicKeyInfo()));
+
+  ASSERT_OK_AND_ASSIGN(
+      crypto::sign::SignatureKind kind,
+      GetSignatureKind(parsed_sig.sig_alg, parsed_sig.hash_alg));
+
+  switch (parsed_sig.sig_alg) {
+    case kTpmAlgRsaSsa:
+      EXPECT_TRUE(crypto::sign::Verify(kind, public_key, statement.statement,
+                                       parsed_sig.rsa_sig));
+      break;
+    case kTpmAlgEcdsa: {
+      ASSERT_OK_AND_ASSIGN(std::vector<uint8_t> der_sig,
+                           crypto::ConvertEcdsaRawComponentsToDer(
+                               parsed_sig.ecdsa_r, parsed_sig.ecdsa_s));
+      EXPECT_TRUE(
+          crypto::sign::Verify(kind, public_key, statement.statement, der_sig));
+      break;
+    }
+    default:
+      NOTREACHED();
+  }
 
   std::vector<uint8_t> wrapped_attestation = attestation_key->GetWrappedKey();
   auto loaded_attestation_key =
