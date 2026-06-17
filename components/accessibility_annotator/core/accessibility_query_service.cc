@@ -173,17 +173,15 @@ void AccessibilityQueryService::OnClassificationComplete(
                      std::move(classified_query), update_callback);
 
   auto log_and_call_retrieved = base::BindOnce(
-      [](std::string_view provider_histogram_suffix,
-         base::OnceCallback<void(std::vector<MemorySearchResult>)> callback,
+      [](base::OnceCallback<void(std::vector<MemorySearchResult>)> callback,
          std::vector<MemorySearchResult> results) {
         base::UmaHistogramCounts1000(
-            base::StrCat({"AccessibilityAnnotator.AccessibilityQueryService."
-                          "ProviderResultCount.",
-                          provider_histogram_suffix}),
+            "AccessibilityAnnotator.AccessibilityQueryService."
+            "ProviderResultCount.AutofillDataProvider",
             results.size());
         std::move(callback).Run(std::move(results));
       },
-      data_provider_->GetHistogramSuffix(), std::move(callback));
+      std::move(callback));
 
   data_provider_->RetrieveAll(intent, std::move(log_and_call_retrieved));
 }

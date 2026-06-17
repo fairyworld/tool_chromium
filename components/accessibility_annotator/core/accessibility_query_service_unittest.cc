@@ -51,10 +51,6 @@ class FakeMemoryDataProvider : public MemoryDataProvider {
   }
   MemoryDataType last_type() const { return last_type_; }
 
-  std::string_view GetHistogramSuffix() const override {
-    return "FakeMemoryDataProvider";
-  }
-
  private:
   std::vector<MemorySearchResult> results_;
   MemoryDataType last_type_ = MemoryDataType::kUnknown;
@@ -99,10 +95,6 @@ class DelayedMemoryDataProvider : public MemoryDataProvider {
       std::move(callbacks_.front()).Run({});
       callbacks_.erase(callbacks_.begin());
     }
-  }
-
-  std::string_view GetHistogramSuffix() const override {
-    return "DelayedMemoryDataProvider";
   }
 
  private:
@@ -408,7 +400,7 @@ TEST_F(AccessibilityQueryServiceTest, RecordsProviderResultCountMetric) {
 
   histogram_tester.ExpectUniqueSample(
       "AccessibilityAnnotator.AccessibilityQueryService.ProviderResultCount."
-      "FakeMemoryDataProvider",
+      "AutofillDataProvider",
       /*sample=*/2, /*expected_bucket_count=*/1);
 }
 
