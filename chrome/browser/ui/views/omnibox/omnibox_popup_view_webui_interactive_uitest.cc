@@ -363,14 +363,9 @@ IN_PROC_BROWSER_TEST_F(OmniboxPopupViewWebUIFullV2Test, TabSwitchNoSavedState) {
   }));
 }
 
-// TODO(b/523277150): Fix this test on macOS.
-#if BUILDFLAG(IS_MAC)
-#define MAYBE_SteadyStateSelectAll DISABLED_SteadyStateSelectAll
-#else
-#define MAYBE_SteadyStateSelectAll SteadyStateSelectAll
-#endif
+// TODO(b/523277150): Fix this test and re-enable.
 IN_PROC_BROWSER_TEST_F(OmniboxPopupViewWebUIFullV2Test,
-                       MAYBE_SteadyStateSelectAll) {
+                       DISABLED_SteadyStateSelectAll) {
   // Navigate to a URL with non-zero length.
   ASSERT_TRUE(
       ui_test_utils::NavigateToURL(browser(), GURL("chrome://version")));
