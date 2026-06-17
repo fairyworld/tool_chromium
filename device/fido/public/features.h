@@ -151,10 +151,6 @@ BASE_DECLARE_FEATURE_PARAM(int, kWebAuthnImmediateMediationTimeoutMilliseconds);
 COMPONENT_EXPORT(FIDO_PUBLIC)
 BASE_DECLARE_FEATURE(kWebAuthnIWARemoteDesktopAllowedOriginsPolicy);
 
-// Sends a PIN generation number to the enclave on a PIN wrapping request.
-COMPONENT_EXPORT(FIDO_PUBLIC)
-BASE_DECLARE_FEATURE(kWebAuthnSendPinGeneration);
-
 // Enables to save keys from out of context ("opportunistic") retrieval.
 COMPONENT_EXPORT(FIDO_PUBLIC)
 BASE_DECLARE_FEATURE(kWebAuthnOpportunisticRetrieval);
