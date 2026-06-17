@@ -40,20 +40,23 @@ class MockAccessibilityQueryServiceDelegate
 
 class FakeMemoryDataProvider : public MemoryDataProvider {
  public:
-  void RetrieveAll(MemoryDataType type,
+  void RetrieveAll(const std::vector<MemoryDataType>& types,
                    base::OnceCallback<void(std::vector<MemorySearchResult>)>
                        callback) override {
-    last_type_ = type;
+    last_types_ = types;
     std::move(callback).Run(results_);
   }
   void SetResults(std::vector<MemorySearchResult> results) {
     results_ = std::move(results);
   }
-  MemoryDataType last_type() const { return last_type_; }
+  const std::vector<MemoryDataType>& last_types() const { return last_types_; }
+  MemoryDataType last_type() const {
+    return last_types_.empty() ? MemoryDataType::kUnknown : last_types_[0];
+  }
 
  private:
   std::vector<MemorySearchResult> results_;
-  MemoryDataType last_type_ = MemoryDataType::kUnknown;
+  std::vector<MemoryDataType> last_types_;
 };
 
 class FakePersonalContextResolver : public PersonalContextResolver {
@@ -85,7 +88,7 @@ class FakePersonalContextResolver : public PersonalContextResolver {
 
 class DelayedMemoryDataProvider : public MemoryDataProvider {
  public:
-  void RetrieveAll(MemoryDataType type,
+  void RetrieveAll(const std::vector<MemoryDataType>& types,
                    base::OnceCallback<void(std::vector<MemorySearchResult>)>
                        callback) override {
     callbacks_.push_back(std::move(callback));

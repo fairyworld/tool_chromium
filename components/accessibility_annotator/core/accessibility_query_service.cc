@@ -183,7 +183,7 @@ void AccessibilityQueryService::OnClassificationComplete(
       },
       std::move(callback));
 
-  data_provider_->RetrieveAll(intent, std::move(log_and_call_retrieved));
+  data_provider_->RetrieveAll({intent}, std::move(log_and_call_retrieved));
 }
 
 void AccessibilityQueryService::OnDataRetrieved(

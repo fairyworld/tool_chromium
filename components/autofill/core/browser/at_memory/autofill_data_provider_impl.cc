@@ -16,6 +16,7 @@
 
 #include "base/check.h"
 #include "base/check_op.h"
+#include "base/containers/extend.h"
 #include "base/functional/callback.h"
 #include "base/strings/string_util.h"
 #include "base/time/time.h"
@@ -301,15 +302,19 @@ AutofillDataProviderImpl::AutofillDataProviderImpl(
 AutofillDataProviderImpl::~AutofillDataProviderImpl() = default;
 
 void AutofillDataProviderImpl::RetrieveAll(
-    MemoryDataType memory_data_type,
+    const std::vector<MemoryDataType>& types,
     base::OnceCallback<void(std::vector<MemorySearchResult>)> callback) {
-  std::optional<AtMemoryDataType> at_memory_type =
-      ToAtMemoryDataType(memory_data_type);
-  if (!at_memory_type) {
-    std::move(callback).Run({});
-    return;
+  std::vector<MemorySearchResult> combined_results;
+  for (MemoryDataType memory_data_type : types) {
+    std::optional<AtMemoryDataType> at_memory_type =
+        ToAtMemoryDataType(memory_data_type);
+    if (!at_memory_type) {
+      continue;
+    }
+    base::Extend(combined_results,
+                 GetAutofillData(memory_data_type, *at_memory_type));
   }
-  std::move(callback).Run(GetAutofillData(memory_data_type, *at_memory_type));
+  std::move(callback).Run(std::move(combined_results));
 }
 
 std::vector<MemorySearchResult> AutofillDataProviderImpl::GetAutofillData(

@@ -34,7 +34,7 @@ class AutofillDataProviderImpl
 
   // accessibility_annotator::MemoryDataProvider:
   void RetrieveAll(
-      accessibility_annotator::MemoryDataType type,
+      const std::vector<accessibility_annotator::MemoryDataType>& types,
       base::OnceCallback<void(
           std::vector<accessibility_annotator::MemorySearchResult>)> callback)
       override;

@@ -20,9 +20,9 @@ class MemoryDataProvider {
  public:
   virtual ~MemoryDataProvider() = default;
 
-  // Retrieves all data entries for a given entry type.
+  // Retrieves all data entries for the given entry types.
   virtual void RetrieveAll(
-      MemoryDataType type,
+      const std::vector<MemoryDataType>& types,
       base::OnceCallback<void(std::vector<MemorySearchResult>)> callback) = 0;
 };
 

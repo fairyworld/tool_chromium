@@ -71,7 +71,7 @@ std::vector<MemorySearchResult> RetrieveAllHelper(
     AutofillDataProviderImpl& retriever,
     accessibility_annotator::MemoryDataType type) {
   base::test::TestFuture<std::vector<MemorySearchResult>> future;
-  retriever.RetrieveAll(type, future.GetCallback());
+  retriever.RetrieveAll({type}, future.GetCallback());
   return future.Take();
 }
 
@@ -480,6 +480,24 @@ TEST_F(AutofillDataProviderImplTest, RetrieveAll_AddressFull_PartialAddress) {
                          u"742 Evergreen Terrace"),
               IsMetadata(MemoryDataType::kAddressCity, u"Springfield"),
               IsMetadata(MemoryDataType::kAddressCountry, u"United States")))));
+}
+
+// Tests that RetrieveAll can fetch multiple types at once (e.g. City and Zip).
+TEST_F(AutofillDataProviderImplTest, RetrieveAll_MultipleTypes) {
+  AutofillProfile profile = test::GetFullProfile();
+  client().GetPersonalDataManager().address_data_manager().AddProfile(profile);
+
+  base::test::TestFuture<std::vector<MemorySearchResult>> future;
+  retriever().RetrieveAll(
+      {MemoryDataType::kAddressCity, MemoryDataType::kAddressZip},
+      future.GetCallback());
+  std::vector<MemorySearchResult> results = future.Take();
+
+  EXPECT_THAT(
+      results,
+      testing::UnorderedElementsAre(
+          Field(&MemorySearchResult::type, Eq(MemoryDataType::kAddressCity)),
+          Field(&MemorySearchResult::type, Eq(MemoryDataType::kAddressZip))));
 }
 
 }  // namespace
