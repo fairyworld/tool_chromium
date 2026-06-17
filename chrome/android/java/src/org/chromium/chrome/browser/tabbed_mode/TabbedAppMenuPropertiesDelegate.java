@@ -2009,7 +2009,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                         R.id.save_and_share_parent_menu_id,
                         R.string.menu_save_and_share,
                         shouldShowIconBeforeItem()
-                                ? R.drawable.ic_file_save_24dp
+                                ? R.drawable.ic_share_white_24dp
                                 : Resources.ID_NULL,
                         () -> submenuItems));
     }
