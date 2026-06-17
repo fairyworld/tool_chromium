@@ -30,6 +30,8 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.robolectric.annotation.Config;
 
+import org.chromium.base.supplier.ObservableSuppliers;
+import org.chromium.base.supplier.SettableNullableObservableSupplier;
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.chrome.browser.context_sharing.R;
 import org.chromium.chrome.browser.contextual_tasks.fusebox.ContextualTasksFusebox;
@@ -193,7 +195,7 @@ public class CoBrowseViewsTest {
     }
 
     @Test
-    public void testPlaceholder_usePlaceholderTrue() {
+    public void testPlaceholder_isPlaceholderSetUpTrue() {
         when(mMockContentProvider.setupPlaceholderView(any())).thenReturn(true);
         View rootView = LayoutInflater.from(mContext).inflate(R.layout.tab_bottom_sheet, null);
         CoBrowseViews coBrowseViews =
@@ -205,12 +207,12 @@ public class CoBrowseViewsTest {
                         mFusebox,
                         Color.WHITE,
                         mMockContentProvider);
-        assertTrue(coBrowseViews.usePlaceholder());
+        assertTrue(coBrowseViews.isPlaceholderSetUp());
         verify(mMockContentProvider).setupPlaceholderView(any());
     }
 
     @Test
-    public void testPlaceholder_usePlaceholderFalse() {
+    public void testPlaceholder_isPlaceholderSetUpFalse() {
         when(mMockContentProvider.setupPlaceholderView(any())).thenReturn(false);
         View rootView = LayoutInflater.from(mContext).inflate(R.layout.tab_bottom_sheet, null);
         CoBrowseViews coBrowseViews =
@@ -222,7 +224,36 @@ public class CoBrowseViewsTest {
                         mFusebox,
                         Color.WHITE,
                         mMockContentProvider);
-        assertTrue(!coBrowseViews.usePlaceholder());
+        assertTrue(!coBrowseViews.isPlaceholderSetUp());
         verify(mMockContentProvider).setupPlaceholderView(any());
+    }
+
+    @Test
+    public void testPlaceholderAllowedSupplier() {
+        when(mMockContentProvider.setupPlaceholderView(any())).thenReturn(true);
+        View rootView = LayoutInflater.from(mContext).inflate(R.layout.tab_bottom_sheet, null);
+        CoBrowseViews coBrowseViews =
+                new CoBrowseViews(
+                        rootView,
+                        TabBottomSheetClientType.CONTEXTUAL_TASKS,
+                        CoBrowseContainerType.BOTTOM_SHEET,
+                        mWebUi,
+                        mFusebox,
+                        Color.WHITE,
+                        mMockContentProvider);
+
+        View placeholderView = rootView.findViewById(R.id.empty_placeholder_container);
+        assertEquals(View.VISIBLE, placeholderView.getVisibility());
+
+        SettableNullableObservableSupplier<Boolean> supplier =
+                ObservableSuppliers.createNullable(false);
+        coBrowseViews.setPlaceholderAllowedSupplier(supplier);
+        assertEquals(View.GONE, placeholderView.getVisibility());
+
+        supplier.set(true);
+        assertEquals(View.VISIBLE, placeholderView.getVisibility());
+
+        coBrowseViews.setPlaceholderAllowedSupplier(null);
+        assertEquals(View.VISIBLE, placeholderView.getVisibility());
     }
 }

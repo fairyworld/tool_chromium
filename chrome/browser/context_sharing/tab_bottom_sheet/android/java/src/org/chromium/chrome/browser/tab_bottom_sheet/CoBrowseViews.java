@@ -16,6 +16,7 @@ import androidx.annotation.VisibleForTesting;
 import org.jni_zero.CalledByNative;
 import org.jni_zero.JniType;
 
+import org.chromium.base.Callback;
 import org.chromium.base.supplier.NullableObservableSupplier;
 import org.chromium.base.supplier.ObservableSuppliers;
 import org.chromium.base.supplier.SettableNullableObservableSupplier;
@@ -43,7 +44,12 @@ public class CoBrowseViews {
     private final @CoBrowseContainerType int mContainerType;
     private final @Nullable CoBrowseComponentProvider mContentProvider;
     private @Nullable View mPeekView;
-    private boolean mUsePlaceholder;
+    private boolean mIsPlaceholderSetUp;
+    private @Nullable View mPlaceholderView;
+    private @Nullable NullableObservableSupplier<Boolean> mPlaceholderAllowedSupplier;
+    private final Callback<@Nullable Boolean> mPlaceholderAllowedCallback =
+            this::onPlaceholderAllowedChanged;
+    private final Callback<@Nullable WebContents> mWebContentsObserver = this::onWebContentsChanged;
 
     /**
      * Constructor for CoBrowseViews.
@@ -86,6 +92,10 @@ public class CoBrowseViews {
     @CalledByNative
     @VisibleForTesting
     void destroy() {
+        mWebContentsSupplier.removeObserver(mWebContentsObserver);
+        if (mPlaceholderAllowedSupplier != null) {
+            mPlaceholderAllowedSupplier.removeObserver(mPlaceholderAllowedCallback);
+        }
         ViewGroup webUiContainer = mContainerView.findViewById(R.id.web_ui_container);
         ViewGroup fuseboxContainer = mContainerView.findViewById(R.id.fusebox_container);
         ViewGroup peekContainer = mContainerView.findViewById(R.id.peek_view_container);
@@ -170,6 +180,27 @@ public class CoBrowseViews {
         }
     }
 
+    /**
+     * Sets the supplier that determines whether the placeholder is allowed to be shown.
+     *
+     * @param supplier The supplier that determines whether the placeholder is allowed to be shown.
+     */
+    public void setPlaceholderAllowedSupplier(NullableObservableSupplier<Boolean> supplier) {
+        if (mPlaceholderAllowedSupplier != null) {
+            mPlaceholderAllowedSupplier.removeObserver(mPlaceholderAllowedCallback);
+        }
+        mPlaceholderAllowedSupplier = supplier;
+        if (mPlaceholderAllowedSupplier != null) {
+            mPlaceholderAllowedSupplier.addSyncObserver(mPlaceholderAllowedCallback);
+        }
+        updatePlaceholderVisibility();
+    }
+
+    /** Returns whether the placeholder view is set up. */
+    boolean isPlaceholderSetUp() {
+        return mIsPlaceholderSetUp;
+    }
+
     void setIgnoreClearFocus(boolean ignoreClearFocus) {
         if (mWebUi != null) {
             mWebUi.setIgnoreClearFocus(ignoreClearFocus);
@@ -243,19 +274,34 @@ public class CoBrowseViews {
             webUiContainer.setLayoutParams(layoutParams);
         }
     }
-
     private void setupPlaceholder() {
-        View placeholder = mContainerView.findViewById(R.id.empty_placeholder_container);
-        assert placeholder instanceof TextViewWithCompoundDrawables;
+        mPlaceholderView = mContainerView.findViewById(R.id.empty_placeholder_container);
+        assert mPlaceholderView instanceof TextViewWithCompoundDrawables;
 
         if (mContentProvider != null) {
-            mUsePlaceholder =
+            mIsPlaceholderSetUp =
                     mContentProvider.setupPlaceholderView(
-                            (TextViewWithCompoundDrawables) placeholder);
+                            (TextViewWithCompoundDrawables) mPlaceholderView);
         }
+        mWebContentsSupplier.addSyncObserverAndCallIfNonNull(mWebContentsObserver);
     }
 
-    public boolean usePlaceholder() {
-        return mUsePlaceholder;
+    private void onPlaceholderAllowedChanged(@Nullable Boolean allowed) {
+        updatePlaceholderVisibility();
+    }
+
+    private void onWebContentsChanged(@Nullable WebContents webContents) {
+        updatePlaceholderVisibility();
+    }
+
+    private void updatePlaceholderVisibility() {
+        if (mPlaceholderView == null) return;
+
+        boolean webContentsNull = mWebContentsSupplier.get() == null;
+        boolean isPlaceholderAllowed =
+                mPlaceholderAllowedSupplier == null
+                        || Boolean.TRUE.equals(mPlaceholderAllowedSupplier.get());
+        boolean showPlaceholder = mIsPlaceholderSetUp && isPlaceholderAllowed && webContentsNull;
+        mPlaceholderView.setVisibility(showPlaceholder ? View.VISIBLE : View.GONE);
     }
 }
