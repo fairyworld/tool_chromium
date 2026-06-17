@@ -78,10 +78,10 @@ std::string GetTestSuffix(
       return "kImportToWallet";
     case AutofillAiAction::kWalletDataSharingPromotion:
       return "kWalletDataSharingPromotion";
-    case AutofillAiAction::kAmbientAutofillFilling:
-      return "kAmbientAutofillFilling";
-    case AutofillAiAction::kTypeSupportsPersonalContextData:
-      return "kTypeSupportsPersonalContextData";
+    case AutofillAiAction::kAmbientAutofill:
+      return "kAmbientAutofill";
+    case AutofillAiAction::kTypeSupportsAmbientAutofillData:
+      return "kTypeSupportsAmbientAutofillData";
   }
   NOTREACHED();
 }
@@ -258,8 +258,8 @@ TEST_P(AutofillAiMayPerformActionTest,
                 AutofillAiAction::kFilling, AutofillAiAction::kImport,
                 AutofillAiAction::kListEntityInstancesInSettings,
                 AutofillAiAction::kUseCachedServerClassificationModelResults,
-                AutofillAiAction::kAmbientAutofillFilling,
-                AutofillAiAction::kTypeSupportsPersonalContextData});
+                AutofillAiAction::kAmbientAutofill,
+                AutofillAiAction::kTypeSupportsAmbientAutofillData});
   EXPECT_EQ(
       MayPerformAutofillAiAction(client(), GetParam(), EntityType(kPassport)),
       kAllowedActions.contains(GetParam()));
@@ -297,8 +297,8 @@ TEST_P(AutofillAiMayPerformActionTest, ActionsWhenNotOptedIntoAutofillAi) {
                 AutofillAiAction::kListEntityInstancesInSettings,
                 AutofillAiAction::kOptIn,
                 AutofillAiAction::kUseCachedServerClassificationModelResults,
-                AutofillAiAction::kAmbientAutofillFilling,
-                AutofillAiAction::kTypeSupportsPersonalContextData});
+                AutofillAiAction::kAmbientAutofill,
+                AutofillAiAction::kTypeSupportsAmbientAutofillData});
   EXPECT_EQ(
       MayPerformAutofillAiAction(client(), GetParam(), EntityType(kPassport)),
       kAllowedActions.contains(GetParam()));
@@ -552,33 +552,33 @@ TEST_P(AutofillAiMayPerformActionTest,
       MayPerformAutofillAiAction(client(), GetParam(), EntityType(kPassport)),
       !kForbiddenActions.contains(GetParam()));
 }
-TEST_F(AutofillAiPermissionUtilsTest, kTypeSupportsPersonalContextData) {
+TEST_F(AutofillAiPermissionUtilsTest, kTypeSupportsAmbientAutofillData) {
   client().set_personal_context_enablement_state(
       personal_context::PersonalContextEnablementState::kEnabled);
   for (const EntityTypeName type : {kPassport, kDriversLicense, kNationalIdCard,
                                     kFlightReservation, kShipment, kOrder}) {
     EXPECT_TRUE(MayPerformAutofillAiAction(
-        client(), AutofillAiAction::kTypeSupportsPersonalContextData,
+        client(), AutofillAiAction::kTypeSupportsAmbientAutofillData,
         EntityType(type)));
   }
   for (const EntityTypeName type :
        {kVehicle, kRedressNumber, kKnownTravelerNumber}) {
     EXPECT_FALSE(MayPerformAutofillAiAction(
-        client(), AutofillAiAction::kTypeSupportsPersonalContextData,
+        client(), AutofillAiAction::kTypeSupportsAmbientAutofillData,
         EntityType(type)));
   }
 }
 
-TEST_F(AutofillAiPermissionUtilsTest, kAmbientAutofillFilling) {
+TEST_F(AutofillAiPermissionUtilsTest, kAmbientAutofill) {
   client().set_personal_context_enablement_state(
       personal_context::PersonalContextEnablementState::kEnabled);
-  EXPECT_TRUE(MayPerformAutofillAiAction(
-      client(), AutofillAiAction::kAmbientAutofillFilling));
+  EXPECT_TRUE(
+      MayPerformAutofillAiAction(client(), AutofillAiAction::kAmbientAutofill));
 
   client().set_personal_context_enablement_state(
       personal_context::PersonalContextEnablementState::kDisabledNotEligible);
-  EXPECT_FALSE(MayPerformAutofillAiAction(
-      client(), AutofillAiAction::kAmbientAutofillFilling));
+  EXPECT_FALSE(
+      MayPerformAutofillAiAction(client(), AutofillAiAction::kAmbientAutofill));
 }
 
 TEST_F(AutofillAiPermissionUtilsTest, AmbientAutofillFillingRequiresOptIn) {
@@ -590,16 +590,16 @@ TEST_F(AutofillAiPermissionUtilsTest, AmbientAutofillFillingRequiresOptIn) {
 
   // Opted out.
   SetAutofillAiOptInStatus(client(), AutofillAiOptInStatus::kOptedOut);
-  EXPECT_FALSE(MayPerformAutofillAiAction(
-      client(), AutofillAiAction::kAmbientAutofillFilling));
+  EXPECT_FALSE(
+      MayPerformAutofillAiAction(client(), AutofillAiAction::kAmbientAutofill));
 
   // Opted in.
   SetAutofillAiOptInStatus(client(), AutofillAiOptInStatus::kOptedIn);
-  EXPECT_TRUE(MayPerformAutofillAiAction(
-      client(), AutofillAiAction::kAmbientAutofillFilling));
+  EXPECT_TRUE(
+      MayPerformAutofillAiAction(client(), AutofillAiAction::kAmbientAutofill));
 }
 
-TEST_F(AutofillAiPermissionUtilsTest, kAmbientAutofillFilling_G1Tiers) {
+TEST_F(AutofillAiPermissionUtilsTest, kAmbientAutofill_G1Tiers) {
   client().set_personal_context_enablement_state(
       personal_context::PersonalContextEnablementState::kEnabled);
 
@@ -612,18 +612,18 @@ TEST_F(AutofillAiPermissionUtilsTest, kAmbientAutofillFilling_G1Tiers) {
 
     client().GetPrefs()->SetInteger(
         subscription_eligibility::prefs::kAiSubscriptionTier, 1);
-    EXPECT_TRUE(MayPerformAutofillAiAction(
-        client(), AutofillAiAction::kAmbientAutofillFilling));
+    EXPECT_TRUE(MayPerformAutofillAiAction(client(),
+                                           AutofillAiAction::kAmbientAutofill));
 
     client().GetPrefs()->SetInteger(
         subscription_eligibility::prefs::kAiSubscriptionTier, 2);
-    EXPECT_TRUE(MayPerformAutofillAiAction(
-        client(), AutofillAiAction::kAmbientAutofillFilling));
+    EXPECT_TRUE(MayPerformAutofillAiAction(client(),
+                                           AutofillAiAction::kAmbientAutofill));
 
     client().GetPrefs()->SetInteger(
         subscription_eligibility::prefs::kAiSubscriptionTier, 3);
     EXPECT_FALSE(MayPerformAutofillAiAction(
-        client(), AutofillAiAction::kAmbientAutofillFilling));
+        client(), AutofillAiAction::kAmbientAutofill));
   }
 
   // Scenario 2: Feature disabled.
@@ -634,7 +634,7 @@ TEST_F(AutofillAiPermissionUtilsTest, kAmbientAutofillFilling_G1Tiers) {
     client().GetPrefs()->SetInteger(
         subscription_eligibility::prefs::kAiSubscriptionTier, 1);
     EXPECT_FALSE(MayPerformAutofillAiAction(
-        client(), AutofillAiAction::kAmbientAutofillFilling));
+        client(), AutofillAiAction::kAmbientAutofill));
   }
 }
 
@@ -653,8 +653,8 @@ INSTANTIATE_TEST_SUITE_P(
            AutofillAiAction::kServerClassificationModel,
            AutofillAiAction::kUseCachedServerClassificationModelResults,
            AutofillAiAction::kWalletDataSharingPromotion,
-           AutofillAiAction::kAmbientAutofillFilling,
-           AutofillAiAction::kTypeSupportsPersonalContextData),
+           AutofillAiAction::kAmbientAutofill,
+           AutofillAiAction::kTypeSupportsAmbientAutofillData),
     GetTestSuffix);
 
 #if !BUILDFLAG(IS_CHROMEOS)  // Signing out does not work on ChromeOS.

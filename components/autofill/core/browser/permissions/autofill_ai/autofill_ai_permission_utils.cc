@@ -218,8 +218,8 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
     case AutofillAiAction::kUseCachedServerClassificationModelResults:
     case AutofillAiAction::kImportToWallet:
     case AutofillAiAction::kWalletDataSharingPromotion:
-    case AutofillAiAction::kAmbientAutofillFilling:
-    case AutofillAiAction::kTypeSupportsPersonalContextData:
+    case AutofillAiAction::kAmbientAutofill:
+    case AutofillAiAction::kTypeSupportsAmbientAutofillData:
       return false;
     case AutofillAiAction::kEditAndDeleteEntityInstanceInSettings:
     case AutofillAiAction::kListEntityInstancesInSettings:
@@ -292,8 +292,8 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
       return true;
     case AutofillAiAction::kEnableOrDisable:
       return is_enabled(features::kAutofillAiAvailableByDefault);
-    case AutofillAiAction::kAmbientAutofillFilling:
-    case AutofillAiAction::kTypeSupportsPersonalContextData:
+    case AutofillAiAction::kAmbientAutofill:
+    case AutofillAiAction::kTypeSupportsAmbientAutofillData:
       return is_enabled(features::kAutofillAmbientAutofill);
   }
   NOTREACHED();
@@ -322,8 +322,8 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
     case AutofillAiAction::kLogToMqls:
     case AutofillAiAction::kOptIn:
     case AutofillAiAction::kEnableOrDisable:
-    case AutofillAiAction::kAmbientAutofillFilling:
-    case AutofillAiAction::kTypeSupportsPersonalContextData:
+    case AutofillAiAction::kAmbientAutofill:
+    case AutofillAiAction::kTypeSupportsAmbientAutofillData:
       return true;
   }
   NOTREACHED();
@@ -381,8 +381,8 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
       return policy_pref_enabled && autofill_ai_available;
     case AutofillAiAction::kFilling:
     case AutofillAiAction::kImport:
-    case AutofillAiAction::kTypeSupportsPersonalContextData:
-      if (action == AutofillAiAction::kTypeSupportsPersonalContextData) {
+    case AutofillAiAction::kTypeSupportsAmbientAutofillData:
+      if (action == AutofillAiAction::kTypeSupportsAmbientAutofillData) {
         // TODO(crbug.com/523168644): Check `kGeminiSettings` pref enablement.
         if (!entity_type) {
           return false;
@@ -409,7 +409,7 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
         return true;
       }
       return policy_pref_enabled && autofill_ai_available;
-    case AutofillAiAction::kAmbientAutofillFilling:
+    case AutofillAiAction::kAmbientAutofill:
       // TODO(crbug.com/523168644): Check `kGeminiSettings` pref enablement.
       if (base::FeatureList::IsEnabled(
               features::kAutofillAiAvailableByDefault)) {
@@ -519,7 +519,7 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
       }
       break;
     }
-    case AutofillAiAction::kAmbientAutofillFilling: {
+    case AutofillAiAction::kAmbientAutofill: {
       if (!subscription_service) {
         MaybeOutputReason(debug_message,
                           "Subscription eligibility service not available.");
@@ -547,7 +547,7 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
     case AutofillAiAction::kServerClassificationModel:
     case AutofillAiAction::kUseCachedServerClassificationModelResults:
     case AutofillAiAction::kWalletDataSharingPromotion:
-    case AutofillAiAction::kTypeSupportsPersonalContextData:
+    case AutofillAiAction::kTypeSupportsAmbientAutofillData:
       break;
   }
   return true;
@@ -579,8 +579,8 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
     case AutofillAiAction::kImportToWallet:
     case AutofillAiAction::kWalletDataSharingPromotion:
     case AutofillAiAction::kServerClassificationModel:
-    case AutofillAiAction::kAmbientAutofillFilling:
-    case AutofillAiAction::kTypeSupportsPersonalContextData: {
+    case AutofillAiAction::kAmbientAutofill:
+    case AutofillAiAction::kTypeSupportsAmbientAutofillData: {
       if (is_off_the_record) {
         MaybeOutputReason(debug_message, "Off the record.");
         return false;
@@ -613,8 +613,8 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
     case AutofillAiAction::kServerClassificationModel:
     case AutofillAiAction::kFilling:
     case AutofillAiAction::kUseCachedServerClassificationModelResults:
-    case AutofillAiAction::kAmbientAutofillFilling:
-    case AutofillAiAction::kTypeSupportsPersonalContextData:
+    case AutofillAiAction::kAmbientAutofill:
+    case AutofillAiAction::kTypeSupportsAmbientAutofillData:
       break;
   }
 
@@ -635,8 +635,8 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
     case AutofillAiAction::kFilling:
     case AutofillAiAction::kUseCachedServerClassificationModelResults:
       break;
-    case AutofillAiAction::kAmbientAutofillFilling:
-    case AutofillAiAction::kTypeSupportsPersonalContextData: {
+    case AutofillAiAction::kAmbientAutofill:
+    case AutofillAiAction::kTypeSupportsAmbientAutofillData: {
       if (!IsPersonalContextEligible(personal_context_enablement_state)) {
         return false;
       }
@@ -674,8 +674,8 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
     case AutofillAiAction::kFilling:
     case AutofillAiAction::kUseCachedServerClassificationModelResults:
     // TODO(crbug.com/523168644): Check reauth availability.
-    case AutofillAiAction::kAmbientAutofillFilling:
-    case AutofillAiAction::kTypeSupportsPersonalContextData:
+    case AutofillAiAction::kAmbientAutofill:
+    case AutofillAiAction::kTypeSupportsAmbientAutofillData:
       break;
   }
 
