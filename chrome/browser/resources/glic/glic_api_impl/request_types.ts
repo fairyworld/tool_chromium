@@ -3,9 +3,10 @@
 // found in the LICENSE file.
 
 import type {WebClientInitialState} from '../glic.mojom-webui.js';
-import type {AdditionalContext, AdditionalContextPart, AnnotatedPageData, CaptureRegionErrorReason, CaptureRegionParams, CaptureRegionResult, ChromeVersion, ClientCapabilities, ClientErrorDialogType, ConversationInfo, CounterAbuseVerdict, CreateSkillRequest, ErrorReasonTypes, ErrorWithReason, ExperimentalTriggeringUpdate, FocusedTabDataHasFocus, FocusedTabDataHasNoFocus, FormFactor, GeminiEnterpriseSettings, GetPinCandidatesOptions, HostCapability, InvokeOptions, MetricUserInputReactionType, MicrophoneStatus, OnResponseStoppedDetails, OpenPanelInfo, OpenSettingsOptions, PageMetadata, PanelOpeningData, PanelState, PdfDocumentData, PinCandidate, PinTabsOptions, Platform, ResumeActorTaskResult, Screenshot, ScrollToParams, Skill, SkillPreview, SkillsWebClientEvent, TabContextOptions, TabContextResult, TabData, UnpinTabsOptions, UpdateSkillRequest, UserProfileInfo, WebClientMode, ZeroStateSuggestions, ZeroStateSuggestionsOptions, ZeroStateSuggestionsV2} from '../glic_api/glic_api.js';
+import type {AdditionalContext, AdditionalContextPart, AnnotatedPageData, CaptureRegionErrorReason, CaptureRegionParams, CaptureRegionResult, ChromeVersion, ClientCapabilities, ClientErrorDialogType, ConversationInfo, CounterAbuseVerdict, CreateSkillRequest, ErrorReasonTypes, ErrorWithReason, ExperimentalTriggeringUpdate, FocusedTabDataHasFocus, FocusedTabDataHasNoFocus, FormFactor, GeminiEnterpriseSettings, GetPinCandidatesOptions, HostCapability, InvokeOptions, MetricUserInputReactionType, MicrophoneStatus, OnResponseStoppedDetails, OpenPanelInfo, OpenSettingsOptions, PageMetadata, PanelOpeningData, PanelState, PdfDocumentData, PinCandidate, PinTabsOptions, Platform, ResumeActorTaskResult, Screenshot, Skill, SkillPreview, SkillsWebClientEvent, TabContextOptions, TabContextResult, TabData, UnpinTabsOptions, UpdateSkillRequest, UserProfileInfo, WebClientMode, ZeroStateSuggestions, ZeroStateSuggestionsOptions, ZeroStateSuggestionsV2} from '../glic_api/glic_api.js';
 
 import type {ActorClient, ActorHost} from './actor/actor_types.js';
+import type {AnnotationClient, AnnotationHost} from './annotation/annotation_types.js';
 import type {InterfaceDef, InterfaceDefMethods, ReplaceProperties} from './transport/messaging.js';
 import {defInterface, defMessage} from './transport/messaging.js';
 import type {ErrorCodec, PendingReceiver, PendingRemote, TransferableException} from './transport/post_message_transport.js';
@@ -13,6 +14,8 @@ import type {ErrorCodec, PendingReceiver, PendingRemote, TransferableException} 
 export type {
   ActorClient,
   ActorHost,
+  AnnotationClient,
+  AnnotationHost,
 };
 
 /*
@@ -338,17 +341,6 @@ export const WebClientHostDef = defInterface({
       histogram: {id: 93},
     },
     {
-      name: 'scrollTo',
-      request: defMessage<{
-        params: ScrollToParams,
-      }>(),
-      histogram: {id: 45},
-    },
-    {
-      name: 'dropScrollToHighlight',
-      histogram: {id: 57},
-    },
-    {
       name: 'setSyntheticExperimentState',
       request: defMessage<{
         trialName: string,
@@ -571,6 +563,12 @@ export const WebClientHostDef = defInterface({
     {
       name: 'unsubscribeFromZoomLevel',
       histogram: {id: 97},
+    },
+    {
+      name: 'createAnnotationHandler',
+      request: defMessage<{
+        annotationReceiver: PendingReceiver<AnnotationHost>,
+      }>(),
     },
   ],
 });
@@ -855,8 +853,8 @@ export type WebClientRequestTypes =
     InterfaceDefMethods<WebClientTabDataObserver>&
     InterfaceDefMethods<WebClientTabFaviconObserver>;
 
-export type HostRequestTypes =
-    InterfaceDefMethods<WebClientHost>&InterfaceDefMethods<ActorHost>;
+export type HostRequestTypes = InterfaceDefMethods<WebClientHost>&
+    InterfaceDefMethods<ActorHost>&InterfaceDefMethods<AnnotationHost>;
 
 type InterfaceHistogramIds<I extends InterfaceDef> = {
   [M in I['methods'][number] as M['histogram'] extends {id: number} ?
@@ -970,11 +968,12 @@ export const RECORDED_REQUEST_IDS = {
   OnOptinImpression: 99,
   ProcessCounterAbuseVerdict: 100,
   GetImageBytesFromTab: 101,
-} as const satisfies InterfaceHistogramIds<WebClientHost>&
-    InterfaceHistogramIds<ActorHost>;
+} as const satisfies
 // LINT.ThenChange(
 // //tools/metrics/histograms/metadata/glic/histograms.xml:ApiRequestType,
 // //tools/metrics/histograms/metadata/glic/enums.xml:GlicHostApiRequestType)
+InterfaceHistogramIds<WebClientHost>&InterfaceHistogramIds<ActorHost>&
+    InterfaceHistogramIds<AnnotationHost>;
 export const MAX_REQUEST_ID = Math.max(...Object.values(RECORDED_REQUEST_IDS));
 
 // Provides metrics histogram information for a host request type.

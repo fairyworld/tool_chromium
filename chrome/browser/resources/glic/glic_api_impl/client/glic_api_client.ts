@@ -3,9 +3,10 @@
 // found in the LICENSE file.
 
 import {CaptureRegionErrorReason, HostCapability} from '../../glic_api/glic_api.js';
-import type {AdditionalContext, AnnotatedPageData, CaptureRegionParams, CaptureRegionResult, ChromeVersion, ClientCapabilities, ClientErrorDialogType, ConversationInfo, CounterAbuseVerdict, CreateSkillRequest, CreateTabOptions, ExperimentalTriggeringUpdate, FocusedTabData, FormFactor, GeminiEnterpriseSettings, GetPinCandidatesOptions, GlicBrowserHost, GlicBrowserHostMetrics, GlicHostRegistry, GlicWebClient, ImageBytesResult, ImageInfo, InvokeOptions, MicrophoneStatus, Observable, ObservableValue, OnResponseStoppedDetails, OpenPanelInfo, OpenSettingsOptions, PageMetadata, PanelOpeningData, PanelState, PdfDocumentData, PinCandidate, PinTabsOptions, Platform, ResizeWindowOptions, ResumeActorTaskResult, Screenshot, ScrollToParams, SelectAutofillSuggestionsDialogRequest, Skill, SkillPreview, SkillsWebClientEvent, TabContextOptions, TabContextResult, TabData, UnpinTabsOptions, UpdateSkillRequest, UserProfileInfo, WebClientMode, ZeroStateSuggestions, ZeroStateSuggestionsOptions, ZeroStateSuggestionsV2} from '../../glic_api/glic_api.js';
+import type {AdditionalContext, AnnotatedPageData, CaptureRegionParams, CaptureRegionResult, ChromeVersion, ClientCapabilities, ClientErrorDialogType, ConversationInfo, CounterAbuseVerdict, CreateSkillRequest, CreateTabOptions, ExperimentalTriggeringUpdate, FocusedTabData, FormFactor, GeminiEnterpriseSettings, GetPinCandidatesOptions, GlicBrowserHost, GlicBrowserHostMetrics, GlicHostRegistry, GlicWebClient, ImageBytesResult, ImageInfo, InvokeOptions, MicrophoneStatus, Observable, ObservableValue, OnResponseStoppedDetails, OpenPanelInfo, OpenSettingsOptions, PageMetadata, PanelOpeningData, PanelState, PdfDocumentData, PinCandidate, PinTabsOptions, Platform, ResizeWindowOptions, ResumeActorTaskResult, Screenshot, SelectAutofillSuggestionsDialogRequest, Skill, SkillPreview, SkillsWebClientEvent, TabContextOptions, TabContextResult, TabData, UnpinTabsOptions, UpdateSkillRequest, UserProfileInfo, WebClientMode, ZeroStateSuggestions, ZeroStateSuggestionsOptions, ZeroStateSuggestionsV2} from '../../glic_api/glic_api.js';
 import {ObservableValue as ObservableValueImpl, Subject} from '../../observable.js';
 import {GlicBrowserHostActor} from '../actor/actor_client.js';
+import {glicBrowserHostAnnotationMixin} from '../annotation/annotation_client.js';
 import type {ResponseExtras} from '../transport/messaging.js';
 import {createBidirectionalPostMessageTransport} from '../transport/post_message_transport.js';
 import type {PendingRemote, PostMessageHandler, PostMessageReceiver, PostMessageRemote, PostMessageRouter} from '../transport/post_message_transport.js';
@@ -386,8 +387,8 @@ class WebClientRegionCaptureHandler implements
   }
 }
 
-export class GlicBrowserHostImpl extends GlicBrowserHostActor implements
-    GlicBrowserHost {
+export class GlicBrowserHostImpl extends glicBrowserHostAnnotationMixin
+(GlicBrowserHostActor) implements GlicBrowserHost {
   readonly router: PostMessageRouter;
   readonly clientRemote: PostMessageRemote<WebClientHost>;
   private webClientMessageHandler: WebClientMessageHandler;
@@ -498,6 +499,8 @@ export class GlicBrowserHostImpl extends GlicBrowserHostActor implements
           response.initialState, this.router, response.actorRemote,
           response.actorReceiver);
     }
+    this.initializeAnnotation(
+        response.initialState, this.router, this.clientRemote);
     const state = response.initialState;
     this.geminiEnterpriseSettings.assignAndSignal(
         state.geminiEnterpriseSettings ?? undefined);
@@ -965,9 +968,6 @@ export class GlicBrowserHostImpl extends GlicBrowserHostActor implements
     return this.metrics;
   }
 
-  scrollTo?(params: ScrollToParams): Promise<void> {
-    return this.clientRemote.requestWithResponse('scrollTo', {params});
-  }
 
   setSyntheticExperimentState(trialName: string, groupName: string): void {
     this.clientRemote.requestNoResponse(
@@ -1111,9 +1111,6 @@ export class GlicBrowserHostImpl extends GlicBrowserHostActor implements
     return this.currentZeroStateObserver;
   }
 
-  dropScrollToHighlight?(): void {
-    this.clientRemote.requestNoResponse('dropScrollToHighlight', undefined);
-  }
 
   maybeRefreshUserStatus?(): void {
     this.cachedUserProfile = undefined;

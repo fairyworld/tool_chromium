@@ -257,7 +257,7 @@ class ActiveStateCalculator : public PanelStateObserver {
 
   explicit ActiveStateCalculator(Host* host) : host_(host) {
     host_->AddPanelStateObserver(this);
-    PanelStateChanged(host_->GetPanelState(nullptr));
+    PanelStateChanged(host_->GetPanelState());
     // Calculate state immediately to avoid having an outdated state before
     // calc_timer_ triggers recalculation and any observers are attached.
     RecalculateAndNotify();
@@ -442,7 +442,7 @@ class GlicWebClientHandler : public glic::mojom::WebClientHandler,
         browser_is_open_calculator_(profile_, this),
         receiver_(this, std::move(receiver)),
         annotation_manager_(
-            std::make_unique<GlicAnnotationManager>(glic_service_)) {
+            std::make_unique<GlicAnnotationManager>(glic_service_, &host())) {
     VLOG(1) << "Glic [WebClientHandler] Constructor";
     active_state_calculator_.AddObserver(this);
   }
@@ -612,7 +612,7 @@ class GlicWebClientHandler : public glic::mojom::WebClientHandler,
     state->os_location_permission_enabled =
         system_permission_settings::IsAllowed(ContentSettingsType::GEOLOCATION);
 
-    state->panel_state = host().GetPanelState(this).Clone();
+    state->panel_state = host().GetPanelState().Clone();
 
     state->focused_tab_data =
         CreateFocusedTabData(GetSharingManagerInternal().GetFocusedTabData());
@@ -741,7 +741,7 @@ class GlicWebClientHandler : public glic::mojom::WebClientHandler,
     if (page_handler_->webui_contents() != host().webui_contents()) {
       mojom::PanelOpeningDataPtr panel_opening_data =
           mojom::PanelOpeningData::New();
-      panel_opening_data->panel_state = host().GetPanelState(this).Clone();
+      panel_opening_data->panel_state = host().GetPanelState().Clone();
       panel_opening_data->invocation_source =
           mojom::InvocationSource::kUnsupported;
       base::UmaHistogramBoolean("Glic.Host.OpenedInRegularTab", true);
@@ -962,6 +962,17 @@ class GlicWebClientHandler : public glic::mojom::WebClientHandler,
       mojo::PendingRemote<mojom::ActorClient> client) override {
     host().instance_delegate().CreateActorHandler(std::move(receiver),
                                                   std::move(client));
+  }
+
+  void CreateAnnotationHandler(
+      mojo::PendingReceiver<mojom::AnnotationHandler> receiver) override {
+    if (!base::FeatureList::IsEnabled(features::kGlicScrollTo)) {
+      receiver_.ReportBadMessage(
+          "CreateAnnotationHandler cannot be called without GlicScrollTo "
+          "enabled.");
+      return;
+    }
+    annotation_manager_->Bind(std::move(receiver));
   }
 
   void CreateSkill(mojom::CreateSkillRequestPtr request,
@@ -1469,28 +1480,6 @@ class GlicWebClientHandler : public glic::mojom::WebClientHandler,
     host().instance_metrics().OnActionSubmitted(is_retry);
   }
 
-  void ScrollTo(mojom::ScrollToParamsPtr params,
-                ScrollToCallback callback) override {
-    if (!base::FeatureList::IsEnabled(features::kGlicScrollTo)) {
-      receiver_.ReportBadMessage(
-          "Client should not be able to call ScrollTo without the GlicScrollTo "
-          "feature enabled.");
-      return;
-    }
-    annotation_manager_->ScrollTo(std::move(params), std::move(callback),
-                                  &host(), this);
-  }
-
-  void DropScrollToHighlight() override {
-    if (!base::FeatureList::IsEnabled(features::kGlicScrollTo)) {
-      receiver_.ReportBadMessage(
-          "Client should not be able to call DropScrollToHighlight without the "
-          "GlicScrollTo feature enabled.");
-      return;
-    }
-    annotation_manager_->RemoveAnnotation(
-        mojom::ScrollToErrorReason::kDroppedByWebClient);
-  }
 
   void SetSyntheticExperimentState(const std::string& trial_name,
                                    const std::string& group_name) override {
@@ -2033,7 +2022,7 @@ GlicPageHandler::GlicPageHandler(
   MarkProcessAsGlic(webui_contents->GetPrimaryMainFrame()->GetProcess());
   host_->WebUIPageHandlerAdded(this);
   host_->AddPanelStateObserver(this);
-  UpdatePageState(host_->GetPanelState(web_client_handler_.get()).kind);
+  UpdatePageState(host_->GetPanelState().kind);
   subscriptions_.push_back(
       GetGlicService()->enabling().RegisterProfileReadyStateChanged(
           base::BindRepeating(&GlicPageHandler::UpdateProfileReadyState,
