@@ -17,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.accessibility.AccessibilityEvent;
 import android.widget.FrameLayout;
 
 import androidx.annotation.ColorInt;
@@ -775,6 +776,7 @@ class BottomSheet extends FrameLayout
         mIsSheetOpen = true;
 
         for (BottomSheetObserver o : mObservers) o.onSheetOpened(reason);
+        sendPaneChangeAccessibilityEvent(true);
     }
 
     /**
@@ -801,6 +803,7 @@ class BottomSheet extends FrameLayout
         setFocusable(false);
         setFocusableInTouchMode(false);
         setContentDescription(null);
+        sendPaneChangeAccessibilityEvent(false);
     }
 
     /** Cancels and nulls the height animation if it exists. */
@@ -1183,6 +1186,15 @@ class BottomSheet extends FrameLayout
 
         cancelAnimation();
         mTargetState = state;
+        if (getCurrentSheetContent() != null
+                && (state == SheetState.HALF || state == SheetState.FULL)) {
+            @StringRes
+            int resId =
+                    state == SheetState.FULL
+                            ? getCurrentSheetContent().getSheetFullHeightAccessibilityStringId()
+                            : getCurrentSheetContent().getSheetHalfHeightAccessibilityStringId();
+            updateA11yPaneTitle(getResources().getString(resId));
+        }
 
         if (animate
                 && (state != mCurrentState
@@ -1259,12 +1271,6 @@ class BottomSheet extends FrameLayout
 
         if (mCurrentState == SheetState.HALF || mCurrentState == SheetState.FULL) {
             assumeNonNull(getCurrentSheetContent());
-            @StringRes
-            int resId =
-                    mCurrentState == SheetState.FULL
-                            ? getCurrentSheetContent().getSheetFullHeightAccessibilityStringId()
-                            : getCurrentSheetContent().getSheetHalfHeightAccessibilityStringId();
-            updateA11yPaneTitle(getResources().getString(resId));
 
             // TalkBack will announce the content description if it has changed, so wait to set the
             // content description until after announcing full/half height.
@@ -1838,7 +1844,20 @@ class BottomSheet extends FrameLayout
     }
 
     private void updateA11yPaneTitle(CharSequence msg) {
-        ViewCompat.setAccessibilityPaneTitle(this, msg);
+        // Set the pane title for the container. The bottom sheet view is not always
+        // accessible e.g. when sheet is dismissed.
+        ViewCompat.setAccessibilityPaneTitle(mSheetContainer, msg);
+    }
+
+    private void sendPaneChangeAccessibilityEvent(boolean isShowing) {
+        AccessibilityEvent event =
+                AccessibilityEvent.obtain(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+        if (isShowing) {
+            event.setContentChangeTypes(AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_APPEARED);
+        } else {
+            event.setContentChangeTypes(AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED);
+        }
+        AccessibilityState.sendAccessibilityEvent(event);
     }
 
     private void resetCachedKeyboardState() {

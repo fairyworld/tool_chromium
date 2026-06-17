@@ -23,6 +23,7 @@ import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.FrameLayout;
 
 import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import org.junit.After;
@@ -591,17 +592,29 @@ public class BottomSheetUnitTest {
 
     @Test
     public void testUpdateA11yPaneTitle() {
-        int stringId = android.R.string.ok;
-        doReturn(stringId).when(mSheetContent).getSheetFullHeightAccessibilityStringId();
+        int openStringId = android.R.string.ok;
+        int closedStringId = android.R.string.cancel;
+        doReturn(openStringId).when(mSheetContent).getSheetFullHeightAccessibilityStringId();
+        doReturn(closedStringId).when(mSheetContent).getSheetClosedAccessibilityStringId();
 
         mBottomSheet.showContent(mSheetContent);
-        mBottomSheet.setSheetState(SheetState.FULL, false);
 
-        CharSequence expectedTitle = mActivity.getResources().getString(stringId);
+        // Verify title when opened (Full Height)
+        mBottomSheet.setSheetState(SheetState.FULL, false);
+        CharSequence expectedOpenTitle = mActivity.getResources().getString(openStringId);
         assertEquals(
-                "Accessibility pane title should be set on the BottomSheet itself",
-                expectedTitle,
-                androidx.core.view.ViewCompat.getAccessibilityPaneTitle(mBottomSheet));
+                "Accessibility pane title should be set on the sheet container when opened",
+                expectedOpenTitle,
+                ViewCompat.getAccessibilityPaneTitle(mSheetContainer));
+
+        // Verify title when closed
+        mBottomSheet.setSheetState(SheetState.HIDDEN, false);
+        CharSequence expectedClosedTitle = mActivity.getResources().getString(closedStringId);
+        assertEquals(
+                "Accessibility pane title should be set to closed on the sheet container when"
+                        + " closed",
+                expectedClosedTitle,
+                ViewCompat.getAccessibilityPaneTitle(mSheetContainer));
     }
 
     @Test
