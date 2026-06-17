@@ -192,12 +192,6 @@ void OmniboxPopupFullPresenter::OnWidgetActivationChanged(views::Widget* widget,
       controller()->popup_state_manager()->popup_state() ==
           OmniboxPopupState::kFull &&
       !location_bar()->in_popup_state_transition()) {
-    // Defer closing the popup during tab switches. `OmniboxPopupViewFullWebUI`
-    // will close it later if necessary after the transition completes.
-    auto* popup_view = location_bar()->GetOmniboxPopupView();
-    if (popup_view && popup_view->is_switching_tab()) {
-      return;
-    }
     // Don't close popup if there's an active permission prompt.
     if (auto* content = GetWebUIContent()) {
       auto* permission_manager =

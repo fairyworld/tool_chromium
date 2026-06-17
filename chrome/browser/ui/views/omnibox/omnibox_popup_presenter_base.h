@@ -93,12 +93,6 @@ class OmniboxPopupPresenterBase : public content::WebContentsObserver,
   // content::WebContentsObserver
   void PrimaryPageChanged(content::Page& page) override;
 
-  // Callback registered by the view to be notified when the WebUI page handler
-  // is bound.
-  using WebUIPopupHandlerBoundCallback = base::RepeatingClosure;
-  void SetHandlerBoundCallback(WebUIPopupHandlerBoundCallback callback);
-  void OnWebUIPopupHandlerBound();
-
   // SearchboxHandler::Delegate:
   void OnEmbeddedPermissionDialogChanged(bool is_showing,
                                          const gfx::Size& prompt_size) override;
@@ -222,8 +216,6 @@ class OmniboxPopupPresenterBase : public content::WebContentsObserver,
 
   // Minimum size bounds of omnibox popup.
   gfx::Size minimum_size_;
-
-  WebUIPopupHandlerBoundCallback handler_bound_callback_;
 
   base::WeakPtrFactory<OmniboxPopupPresenterBase> weak_factory_{this};
 };

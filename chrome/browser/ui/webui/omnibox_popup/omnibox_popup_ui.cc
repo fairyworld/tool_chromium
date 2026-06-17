@@ -283,9 +283,6 @@ void OmniboxPopupUI::CreatePageHandler(
   popup_handler_ = std::make_unique<OmniboxPopupHandler>(
       std::move(receiver), std::move(page), web_ui()->GetWebContents());
   popup_handler_->set_embedder(embedder());
-  if (presenter_delegate_) {
-    presenter_delegate_->OnWebUIPopupHandlerBound();
-  }
 }
 
 void OmniboxPopupUI::BindInterface(
@@ -360,14 +357,7 @@ void OmniboxPopupUI::ClearContextualSessionHandle() {
 }
 
 void OmniboxPopupUI::SetPresenterDelegate(OmniboxPopupPresenterBase* delegate) {
-  if (presenter_delegate_ == delegate) {
-    return;
-  }
   presenter_delegate_ = delegate;
-
-  if (presenter_delegate_ && popup_handler_) {
-    presenter_delegate_->OnWebUIPopupHandlerBound();
-  }
 
   // If the handler is initialized already, set the delegate in the handler so
   // the handler can notify the delegate when there are embedded permissions

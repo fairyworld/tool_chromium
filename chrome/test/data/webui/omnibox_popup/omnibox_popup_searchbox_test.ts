@@ -5,7 +5,6 @@
 import {omniboxPopupBrowserProxyFactory, OmniboxPopupPageHandlerRemote, SearchboxBrowserProxy} from 'chrome://omnibox-popup.top-chrome/omnibox_popup.js';
 import type {OmniboxPopupPageRemote, OmniboxPopupSearchboxElement} from 'chrome://omnibox-popup.top-chrome/omnibox_popup.js';
 import {createAutocompleteResultForTesting, createSearchMatchForTesting} from 'chrome://resources/cr_components/searchbox/searchbox_browser_proxy.js';
-import {getDeepActiveElement} from 'chrome://resources/js/util.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {TestMock} from 'chrome://webui-test/test_mock.js';
 import {microtasksFinished} from 'chrome://webui-test/test_util.js';
@@ -31,18 +30,6 @@ suite('OmniboxPopupSearchboxTest', function() {
     searchbox = document.createElement('omnibox-popup-searchbox');
     document.body.appendChild(searchbox);
     await microtasksFinished();
-  });
-
-  test('FocusesInputOnVisibilityChange', async function() {
-    Object.defineProperty(document, 'visibilityState', {
-      value: 'visible',
-      writable: true,
-      configurable: true,
-    });
-    document.dispatchEvent(new Event('visibilitychange'));
-    await microtasksFinished();
-
-    assertEquals(searchbox.$.input.inputElement, getDeepActiveElement());
   });
 
   test('HandlesSetInputState', async () => {
@@ -100,10 +87,6 @@ suite('OmniboxPopupSearchboxTest', function() {
   });
 
   test('IgnoresSelectionChangeWhenNotActive', async () => {
-    // `onSelectionChanged` might have been called during setup, e.g. when the
-    // input focuses itself after the document becomes visible.
-    handler.reset();
-
     // Ensure input isn't focused.
     const input = searchbox.$.input.inputElement;
     input.blur();
