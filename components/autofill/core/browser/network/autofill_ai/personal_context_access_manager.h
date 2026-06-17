@@ -24,7 +24,19 @@ class PersonalContextAccessManager : public KeyedService {
  public:
   class Observer : public base::CheckedObserver {
    public:
+    // Called when asynchronous prefetching of entities through
+    // `PrefetchAmbientAutofillContext()` finishes. In case it succeeds and
+    // fetched entities, the entities themselves are broadcast through
+    // `OnMaskedAmbientAutofillEntitiesPrefetched()`.
     virtual void OnPrefetchAmbientAutofillContextComplete(bool success) {}
+    // Called with the result of a prefetch call in case entities were fetched.
+    // TODO(crbug.com/516721244): At the moment, this is called once per
+    // prefetched entity type instead of just once.
+    virtual void OnMaskedAmbientAutofillEntitiesPrefetched(
+        base::span<const EntityInstance> entities) {}
+    // Called whenever a prefetched entity reaches its TTL or expires for
+    // another reason (eligibility to pContext changed, etc).
+    virtual void OnMaskedAmbientAutofillEntityTypeEvicted(EntityType type) {}
   };
 
   enum class RequestStatus {
@@ -55,11 +67,6 @@ class PersonalContextAccessManager : public KeyedService {
   virtual RequestStatus GetPrefetchAmbientAutofillStatusByEntityType(
       EntityType type) const = 0;
 
-  // Returns the cached `EntityInstance` with the given `id` if it is
-  // currently cached.
-  virtual std::optional<EntityInstance> GetCachedEntity(
-      const EntityInstance::EntityId& id) const = 0;
-
   // Retrieves the unmasked SPII `EntityInstance` with the given `id`. If it is
   // in the cache, runs the `callback` immediately with the cached value.
   // Otherwise, triggers a network request and runs the `callback` with the
@@ -69,12 +76,9 @@ class PersonalContextAccessManager : public KeyedService {
       const EntityInstance::EntityId& id,
       GetUnmaskedSpiiEntityCallback callback) = 0;
 
-  // Returns all currently cached entities.
-  virtual std::vector<EntityInstance> GetCachedEntities() const = 0;
-
-  // Returns true if all entities of the given `type_name` have been cached and
-  // the cache has not expired.
-  virtual bool IsTypeCached(EntityType type) const = 0;
+  // Returns true if all entities of the given `type_name` have been prefetched
+  // and the validity of the result has not expired.
+  virtual bool IsTypePrefetched(EntityType type) const = 0;
 };
 
 }  // namespace autofill

@@ -72,6 +72,9 @@ using RequestStatus = PersonalContextAccessManager::RequestStatus;
       ElementsAreArray(types));
 }
 
+ACTION_P(SaveSpanToVector, vector_ptr) {
+  vector_ptr->assign(arg0.begin(), arg0.end());
+}
 
 class MockPersonalContextAccessManagerObserver
     : public PersonalContextAccessManager::Observer {
@@ -82,6 +85,14 @@ class MockPersonalContextAccessManagerObserver
   MOCK_METHOD(void,
               OnPrefetchAmbientAutofillContextComplete,
               (bool success),
+              (override));
+  MOCK_METHOD(void,
+              OnMaskedAmbientAutofillEntitiesPrefetched,
+              (base::span<const EntityInstance> entities),
+              (override));
+  MOCK_METHOD(void,
+              OnMaskedAmbientAutofillEntityTypeEvicted,
+              (EntityType type),
               (override));
 };
 
@@ -160,7 +171,8 @@ class PersonalContextAccessManagerImplTest : public testing::Test {
 };
 
 // Tests that PrefetchAmbientAutofillContext successfully requests context from
-// the backend, parses the returned entities, and caches them with their TTL.
+// the backend and parses the returned entities, notifying observers about the
+// result.
 TEST_F(PersonalContextAccessManagerImplTest,
        PrefetchAmbientAutofillContextSuccess) {
   const std::vector<EntityType> requested_types = {
@@ -172,45 +184,34 @@ TEST_F(PersonalContextAccessManagerImplTest,
   entity->mutable_order()->set_order_id("12345");
   entity->mutable_order()->set_merchant_name("Amazon");
 
+  std::vector<EntityInstance> entities;
+  EXPECT_CALL(mock_observer(), OnMaskedAmbientAutofillEntitiesPrefetched)
+      .WillOnce(SaveSpanToVector(&entities));
   PrefetchAmbientAutofillContextSync(requested_types, expected_response);
 
   EXPECT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kOrder)));
-  EXPECT_THAT(access_manager().GetCachedEntities(),
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kOrder)));
+  EXPECT_THAT(entities,
               UnorderedElementsAre(AllOf(
                   Property(&EntityInstance::type,
                            Property(&EntityType::name, EntityTypeName::kOrder)),
                   HasAttributeWithValue(AttributeTypeName::kOrderId, u"12345"),
                   HasAttributeWithValue(AttributeTypeName::kOrderMerchantName,
                                         u"Amazon"))));
-
-  std::vector<EntityInstance> cached = access_manager().GetCachedEntities();
-  ASSERT_EQ(cached.size(), 1u);
-  EXPECT_EQ(cached[0].type(), EntityType(EntityTypeName::kOrder));
-
-  base::optional_ref<const AttributeInstance> order_id_attr =
-      cached[0].attribute(AttributeType(AttributeTypeName::kOrderId));
-  ASSERT_TRUE(order_id_attr.has_value());
-  EXPECT_EQ(order_id_attr->GetCompleteRawInfo(), u"12345");
-
-  base::optional_ref<const AttributeInstance> merchant_attr =
-      cached[0].attribute(AttributeType(AttributeTypeName::kOrderMerchantName));
-  ASSERT_TRUE(merchant_attr.has_value());
-  EXPECT_EQ(merchant_attr->GetCompleteRawInfo(), u"Amazon");
 }
 
 // Tests that PrefetchAmbientAutofillContext filters out and only requests
-// entity types that are not currently cached.
+// entity types that don't have a valid prefetching result available.
 TEST_F(PersonalContextAccessManagerImplTest,
-       PrefetchAmbientAutofillContextOnlyRequestsUncachedTypes) {
-  // 1. First, cache Passport.
+       PrefetchAmbientAutofillContextOnlyRequestsUnfetchedTypes) {
+  // 1. First, prefetch Passport.
   personal_context::proto::ContextMemoryAmbientAutofillResponse
       passport_response;
   passport_response.add_entities()->mutable_passport()->set_number("P123");
   PrefetchAmbientAutofillContextSync({EntityType(EntityTypeName::kPassport)},
                                      passport_response);
   ASSERT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
 
   // 2. Now call PrefetchAmbientAutofillContext for both Passport and Driver's
   // License. It should only request Driver's License.
@@ -239,25 +240,25 @@ TEST_F(PersonalContextAccessManagerImplTest,
 
   access_manager().PrefetchAmbientAutofillContext(requested_types);
 
-  // Both should now be cached.
+  // Both should now be prefetched.
   EXPECT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
-  EXPECT_TRUE(access_manager().IsTypeCached(
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
+  EXPECT_TRUE(access_manager().IsTypePrefetched(
       EntityType(EntityTypeName::kDriversLicense)));
 }
 
 // Tests that PrefetchAmbientAutofillContext immediately returns and triggers
-// no network requests when all requested entity types are already cached.
+// no network requests when all requested entity types are already prefetched.
 TEST_F(PersonalContextAccessManagerImplTest,
-       PrefetchAmbientAutofillContextAllCachedNoRequest) {
-  // 1. Cache Passport.
+       PrefetchAmbientAutofillContextAllPrefetchedNoRequest) {
+  // 1. Prefetch Passport.
   personal_context::proto::ContextMemoryAmbientAutofillResponse
       passport_response;
   passport_response.add_entities()->mutable_passport()->set_number("P123");
   PrefetchAmbientAutofillContextSync({EntityType(EntityTypeName::kPassport)},
                                      passport_response);
   ASSERT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
 
   // 2. Call PrefetchAmbientAutofillContext for Passport.
   // No network request should be made.
@@ -268,8 +269,8 @@ TEST_F(PersonalContextAccessManagerImplTest,
   access_manager().PrefetchAmbientAutofillContext(requested_types);
 }
 
-// Tests that PrefetchAmbientAutofillContext does not cache anything or
-// mark types as cached when the fetch context request fails.
+// Tests that PrefetchAmbientAutofillContext does not notify observers or mark
+// types as prefetched when the fetch context request fails.
 TEST_F(PersonalContextAccessManagerImplTest,
        PrefetchAmbientAutofillContextFailure) {
   const std::vector<EntityType> requested_types = {
@@ -287,18 +288,17 @@ TEST_F(PersonalContextAccessManagerImplTest,
           _, _))
       .WillOnce(RunOnceCallback<3>(personal_context::FetchContextResult(
           base::unexpected(expected_error))));
-
+  EXPECT_CALL(mock_observer(), OnMaskedAmbientAutofillEntitiesPrefetched)
+      .Times(0);
   access_manager().PrefetchAmbientAutofillContext(requested_types);
-
   EXPECT_FALSE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kOrder)));
-  EXPECT_THAT(access_manager().GetCachedEntities(), IsEmpty());
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kOrder)));
 }
 
-// Tests that `PrefetchAmbientAutofillContext` marks requested types as cached
-// even when the response is empty.
+// Tests that `PrefetchAmbientAutofillContext` marks requested types as
+// prefetched even when the response is empty.
 TEST_F(PersonalContextAccessManagerImplTest,
-       PrefetchAmbientAutofillContextNegativeCaching) {
+       PrefetchAmbientAutofillContextEmptyResponse) {
   const std::vector<EntityType> requested_types = {
       EntityType(EntityTypeName::kOrder),
       EntityType(EntityTypeName::kPassport)};
@@ -307,54 +307,58 @@ TEST_F(PersonalContextAccessManagerImplTest,
   personal_context::proto::ContextMemoryAmbientAutofillResponse empty_response;
   PrefetchAmbientAutofillContextSync(requested_types, empty_response);
 
-  // Both types should be marked as cached, but have no entities.
+  // Both types should be marked as prefetched.
   EXPECT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kOrder)));
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kOrder)));
   EXPECT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
-  EXPECT_THAT(access_manager().GetCachedEntities(), IsEmpty());
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
 }
 
-// Tests that prefetched entities are cached with a 30-minute TTL, and that the
+// Tests that prefetched entities are evicted with a 30-minute TTL, and that the
 // TTL is tracked per entity type.
-TEST_F(PersonalContextAccessManagerImplTest, CachePrefetchedEntities_TTL) {
-  // 1. Cache Passport.
+TEST_F(PersonalContextAccessManagerImplTest, PrefetchedEntities_TTL) {
+  // 1. Prefetch Passport.
   personal_context::proto::ContextMemoryAmbientAutofillResponse
       passport_response;
   passport_response.add_entities()->mutable_passport()->set_number("P123");
   PrefetchAmbientAutofillContextSync({EntityType(EntityTypeName::kPassport)},
                                      passport_response);
   EXPECT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
-  EXPECT_FALSE(access_manager().IsTypeCached(
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
+  EXPECT_FALSE(access_manager().IsTypePrefetched(
       EntityType(EntityTypeName::kDriversLicense)));
 
   // Fast forward 15 minutes (Passport still valid).
   FastForwardBy(base::Minutes(15));
   EXPECT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
 
-  // 2. Cache DL at T+15.
+  // 2. Prefetch DL at T+15.
   personal_context::proto::ContextMemoryAmbientAutofillResponse dl_response;
   dl_response.add_entities()->mutable_drivers_license()->set_number("DL987");
   PrefetchAmbientAutofillContextSync(
       {EntityType(EntityTypeName::kDriversLicense)}, dl_response);
   EXPECT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
-  EXPECT_TRUE(access_manager().IsTypeCached(
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
+  EXPECT_TRUE(access_manager().IsTypePrefetched(
       EntityType(EntityTypeName::kDriversLicense)));
 
   // Fast forward another 15 minutes (Total T+30). Passport should expire, DL
   // should be valid.
+  EXPECT_CALL(mock_observer(), OnMaskedAmbientAutofillEntityTypeEvicted(
+                                   EntityType(EntityTypeName::kPassport)));
   FastForwardBy(base::Minutes(15));
   EXPECT_FALSE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
-  EXPECT_TRUE(access_manager().IsTypeCached(
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
+  EXPECT_TRUE(access_manager().IsTypePrefetched(
       EntityType(EntityTypeName::kDriversLicense)));
 
   // Fast forward another 15 minutes (Total T+45). DL should expire.
+  EXPECT_CALL(mock_observer(),
+              OnMaskedAmbientAutofillEntityTypeEvicted(
+                  EntityType(EntityTypeName::kDriversLicense)));
   FastForwardBy(base::Minutes(15));
-  EXPECT_FALSE(access_manager().IsTypeCached(
+  EXPECT_FALSE(access_manager().IsTypePrefetched(
       EntityType(EntityTypeName::kDriversLicense)));
 }
 
@@ -375,80 +379,54 @@ TEST_F(PersonalContextAccessManagerImplTest, CacheUnmaskedSpiiEntity_TTL) {
   EXPECT_EQ(GetUnmaskedSpiiEntitySync(passport.guid()), std::nullopt);
 }
 
-// Tests that resetting the cache for a type clears any existing cached entities
-// of that type (useful for caching empty results).
-TEST_F(PersonalContextAccessManagerImplTest, ResetCacheForType) {
-  // Cache passport.
+// Tests that resetting the state for a type evicts any existing prefetched
+// entities of that type.
+TEST_F(PersonalContextAccessManagerImplTest, ResetStateForType) {
+  // Prefetch passport.
   personal_context::proto::ContextMemoryAmbientAutofillResponse
       passport_response;
   passport_response.add_entities()->mutable_passport()->set_number("P123");
   PrefetchAmbientAutofillContextSync({EntityType(EntityTypeName::kPassport)},
                                      passport_response);
   EXPECT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
 
-  std::vector<EntityInstance> cached = access_manager().GetCachedEntities();
-  ASSERT_EQ(cached.size(), 1u);
-  EntityInstance::EntityId passport_guid = cached[0].guid();
-
-  // Reset cache (empty). Should clear passport.
+  // Reset the prefetch state. Should evict the passport.
+  EXPECT_CALL(mock_observer(), OnMaskedAmbientAutofillEntityTypeEvicted(
+                                   EntityType(EntityTypeName::kPassport)));
   test_api(access_manager())
-      .ResetCacheForType(EntityType(EntityTypeName::kPassport));
+      .ResetStateForType(EntityType(EntityTypeName::kPassport));
   EXPECT_FALSE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
-  EXPECT_EQ(access_manager().GetCachedEntity(passport_guid), std::nullopt);
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
 }
 
-// Tests that GetCachedEntities returns only the prefetched (masked)
-// entities and excludes any unmasked SPII entities.
-TEST_F(PersonalContextAccessManagerImplTest, GetCachedEntities) {
-  // 1. Cache prefetched (masked Passport and DL).
-  personal_context::proto::ContextMemoryAmbientAutofillResponse response;
-  response.add_entities()->mutable_passport()->set_number("P123");
-  response.add_entities()->mutable_drivers_license()->set_number("DL987");
-  PrefetchAmbientAutofillContextSync(
-      {EntityType(EntityTypeName::kPassport),
-       EntityType(EntityTypeName::kDriversLicense)},
-      response);
-
-  // GetCachedEntities should return masked Passport and DL.
-  std::vector<EntityInstance> cached = access_manager().GetCachedEntities();
-  EXPECT_EQ(cached.size(), 2u);
-
-  // Now cache unmasked Passport.
-  EntityInstance passport_unmasked = test::GetPassportEntityInstance(
-      {.record_type = EntityInstance::RecordType::kPersonalContext});
-  test_api(access_manager()).CacheUnmaskedSpiiEntity(passport_unmasked);
-
-  // GetCachedEntities should STILL return masked Passport and DL (size 2).
-  EXPECT_EQ(access_manager().GetCachedEntities().size(), 2u);
-}
-
-// Tests that natural expiration of the prefetched cache also evicts any
+// Tests that natural expiration of the prefetched state also evicts any
 // corresponding unmasked SPII entities, even if they haven't reached their
 // individual TTL yet.
 TEST_F(PersonalContextAccessManagerImplTest,
-       CachePrefetchedEntities_ExpirationResetsUnmaskedCache) {
-  // 1. Cache prefetched (masked) Passport at T=0.
+       PrefetchedEntities_ExpirationResetsUnmaskedCache) {
+  // 1. Prefetch a (masked) Passport at T=0.
   personal_context::proto::ContextMemoryAmbientAutofillResponse
       passport_response;
   passport_response.add_entities()->mutable_passport()->set_number("P123");
+
+  std::vector<EntityInstance> entities;
+  EXPECT_CALL(mock_observer(), OnMaskedAmbientAutofillEntitiesPrefetched)
+      .WillOnce(SaveSpanToVector(&entities));
   PrefetchAmbientAutofillContextSync({EntityType(EntityTypeName::kPassport)},
                                      passport_response);
   EXPECT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
 
-  std::vector<EntityInstance> cached = access_manager().GetCachedEntities();
-  ASSERT_EQ(cached.size(), 1u);
-  EntityInstance::EntityId passport_guid = cached[0].guid();
+  ASSERT_EQ(entities.size(), 1u);
+  EntityInstance::EntityId passport_guid = entities[0].guid();
 
   // 2. Fast forward 29.5 minutes.
   FastForwardBy(base::Minutes(29) + base::Seconds(30));
 
-  // The prefetched cache is still valid (expires in 30 seconds).
+  // The prefetched state is still valid (expires in 30 seconds).
   EXPECT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
-  EXPECT_TRUE(access_manager().GetCachedEntity(passport_guid).has_value());
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
 
   // 3. Cache unmasked SPII Passport at T=29.5.
   EntityInstance passport_unmasked = test::GetPassportEntityInstance(
@@ -458,13 +436,13 @@ TEST_F(PersonalContextAccessManagerImplTest,
   test_api(access_manager()).CacheUnmaskedSpiiEntity(passport_unmasked);
   EXPECT_EQ(GetUnmaskedSpiiEntitySync(passport_guid), passport_unmasked);
 
-  // 4. Fast forward 30 seconds (Total T+30). The prefetched cache expires.
+  // 4. Fast forward 30 seconds (Total T+30). The prefetched entity expires.
   // This should also trigger the eviction of the unmasked SPII cache.
+  EXPECT_CALL(mock_observer(), OnMaskedAmbientAutofillEntityTypeEvicted(
+                                   EntityType(EntityTypeName::kPassport)));
   FastForwardBy(base::Seconds(30));
-
   EXPECT_FALSE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
-  EXPECT_EQ(access_manager().GetCachedEntity(passport_guid), std::nullopt);
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
   EXPECT_EQ(GetUnmaskedSpiiEntitySync(passport_guid), std::nullopt);
 }
 
@@ -489,14 +467,16 @@ TEST_F(PersonalContextAccessManagerImplTest,
   // 1. Prefetch (masked) Passport.
   personal_context::proto::ContextMemoryAmbientAutofillResponse response;
   response.add_entities()->mutable_passport()->set_number("P123");
+
+  std::vector<EntityInstance> entities;
+  EXPECT_CALL(mock_observer(), OnMaskedAmbientAutofillEntitiesPrefetched)
+      .WillOnce(SaveSpanToVector(&entities));
   PrefetchAmbientAutofillContextSync({EntityType(EntityTypeName::kPassport)},
                                      response);
   ASSERT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
-
-  std::vector<EntityInstance> cached = access_manager().GetCachedEntities();
-  ASSERT_EQ(cached.size(), 1u);
-  EntityInstance passport_masked = cached[0];
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
+  ASSERT_EQ(entities.size(), 1u);
+  EntityInstance passport_masked = entities[0];
 
   // 2. Prepare unmasked response.
   personal_context::proto::FetchPiiEntitiesResponse expected_response;
@@ -535,9 +515,9 @@ TEST_F(PersonalContextAccessManagerImplTest,
 }
 
 // Tests that `GetUnmaskedSpiiEntity` returns `std::nullopt` immediately
-// if the requested entity is not even in the prefetched (masked) cache.
+// if the requested entity is not prefetched.
 TEST_F(PersonalContextAccessManagerImplTest,
-       GetUnmaskedSpiiEntity_CacheMiss_NotPrefetched) {
+       GetUnmaskedSpiiEntity_NotPrefetched) {
   EntityInstance::EntityId unknown_id("unknown_id");
 
   // No service call expected because it's not prefetched.
@@ -548,16 +528,17 @@ TEST_F(PersonalContextAccessManagerImplTest,
 // Tests that `GetUnmaskedSpiiEntity` returns `std::nullopt` if the service call
 // fails.
 TEST_F(PersonalContextAccessManagerImplTest,
-       GetUnmaskedSpiiEntity_CacheMiss_ServiceFailure) {
+       GetUnmaskedSpiiEntity_ServiceFailure) {
   // 1. Prefetch (masked) Passport.
   personal_context::proto::ContextMemoryAmbientAutofillResponse response;
   response.add_entities()->mutable_passport()->set_number("P123");
+  std::vector<EntityInstance> entities;
+  EXPECT_CALL(mock_observer(), OnMaskedAmbientAutofillEntitiesPrefetched)
+      .WillOnce(SaveSpanToVector(&entities));
   PrefetchAmbientAutofillContextSync({EntityType(EntityTypeName::kPassport)},
                                      response);
-
-  std::vector<EntityInstance> cached = access_manager().GetCachedEntities();
-  ASSERT_EQ(cached.size(), 1u);
-  EntityInstance::EntityId passport_guid = cached[0].guid();
+  ASSERT_EQ(entities.size(), 1u);
+  EntityInstance::EntityId passport_guid = entities[0].guid();
 
   using personal_context::ContextMemoryError;
   ContextMemoryError expected_error = ContextMemoryError::FromExecutionError(
@@ -583,7 +564,7 @@ TEST_F(PersonalContextAccessManagerImplTest,
   EXPECT_CALL(mock_personal_context_service(), FetchContext).Times(0);
   access_manager().PrefetchAmbientAutofillContext(requested_types);
   EXPECT_FALSE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kOrder)));
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kOrder)));
 }
 
 // Tests that PrefetchAmbientAutofillContext is not executed if the
@@ -601,7 +582,7 @@ TEST_F(PersonalContextAccessManagerImplTest,
   EXPECT_CALL(mock_personal_context_service(), FetchContext).Times(0);
   access_manager().PrefetchAmbientAutofillContext(requested_types);
   EXPECT_FALSE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kOrder)));
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kOrder)));
 }
 
 // Tests that PrefetchAmbientAutofillContext is executed if the
@@ -639,43 +620,43 @@ TEST_F(PersonalContextAccessManagerImplTest,
   access_manager().PrefetchAmbientAutofillContext(requested_types);
 
   EXPECT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kOrder)));
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kOrder)));
 }
 
 // Tests that when OnEnablementStateChanged is called with a disabled state, all
-// caches are wiped.
-TEST_F(PersonalContextAccessManagerImplTest, WipeCachesOnDisablement) {
-  // 1. Cache prefetched (masked) passport.
+// state is wiped.
+TEST_F(PersonalContextAccessManagerImplTest, WipeStateOnDisablement) {
+  // 1. Prefetch a (masked) passport.
   personal_context::proto::ContextMemoryAmbientAutofillResponse
       passport_response;
   passport_response.add_entities()->mutable_passport()->set_number("P123");
+  std::vector<EntityInstance> entities;
+  EXPECT_CALL(mock_observer(), OnMaskedAmbientAutofillEntitiesPrefetched)
+      .WillOnce(SaveSpanToVector(&entities));
   PrefetchAmbientAutofillContextSync({EntityType(EntityTypeName::kPassport)},
                                      passport_response);
   EXPECT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
+  ASSERT_EQ(entities.size(), 1u);
+  EntityInstance::EntityId passport_guid = entities[0].guid();
 
-  std::vector<EntityInstance> cached = access_manager().GetCachedEntities();
-  ASSERT_EQ(cached.size(), 1u);
-  EntityInstance::EntityId passport_guid = cached[0].guid();
-  EntityInstance passport = cached[0];
-
-  // 2. Call OnEnablementStateChanged with an ENABLED state. Caches should not
+  // 2. Call OnEnablementStateChanged with an ENABLED state. State should not
   // be wiped.
   access_manager().OnEnablementStateChanged(
       personal_context::PersonalContextEnablementState::
           kEnabledShouldShowNotice);
   EXPECT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
-  EXPECT_EQ(access_manager().GetCachedEntity(passport_guid), passport);
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
 
-  // 3. Call OnEnablementStateChanged with a DISABLED state. Caches should be
+  // 3. Call OnEnablementStateChanged with a DISABLED state. State should be
   // wiped.
+  EXPECT_CALL(mock_observer(), OnMaskedAmbientAutofillEntityTypeEvicted(
+                                   EntityType(EntityTypeName::kPassport)));
   access_manager().OnEnablementStateChanged(
       personal_context::PersonalContextEnablementState::
           kDisabledViaPersonalIntelligenceInAutofillToggle);
   EXPECT_FALSE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kPassport)));
-  EXPECT_EQ(access_manager().GetCachedEntity(passport_guid), std::nullopt);
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
 }
 
 // Tests that a pending request blocks subsequent requests for the same type.
@@ -699,9 +680,9 @@ TEST_F(PersonalContextAccessManagerImplTest, PendingRequestBlocksSubsequent) {
   EXPECT_CALL(mock_personal_context_service(), FetchContext).Times(0);
   access_manager().PrefetchAmbientAutofillContext(requested_types);
 
-  // It isn't cachet yet.
+  // It isn't prefetched yet.
   EXPECT_FALSE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kOrder)));
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kOrder)));
 
   // Resolve the first request.
   personal_context::proto::ContextMemoryAmbientAutofillResponse response;
@@ -710,9 +691,9 @@ TEST_F(PersonalContextAccessManagerImplTest, PendingRequestBlocksSubsequent) {
   future.Take().Run(
       personal_context::FetchContextResult(base::ok(std::move(any_response))));
 
-  // Now it is cached.
+  // Now it is prefetched.
   EXPECT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kOrder)));
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kOrder)));
 }
 
 // Tests that failed requests trigger exponential backoff.
@@ -788,7 +769,7 @@ TEST_F(PersonalContextAccessManagerImplTest, FailureTriggersBackoff) {
   // 1. First failure.
   access_manager().PrefetchAmbientAutofillContext(requested_types);
   EXPECT_FALSE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kOrder)));
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kOrder)));
   check.Call("1. First failure");
 
   // 2. Immediate retry should be blocked by backoff (1s delay).
@@ -818,13 +799,13 @@ TEST_F(PersonalContextAccessManagerImplTest, FailureTriggersBackoff) {
   FastForwardBy(base::Milliseconds(500));
   access_manager().PrefetchAmbientAutofillContext(requested_types);
   EXPECT_TRUE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kOrder)));
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kOrder)));
   check.Call("7. Success");
 
-  // 8. Expire the cache (30 mins).
+  // 8. Expire the prefetched state (30 mins).
   FastForwardBy(base::Minutes(30));
   EXPECT_FALSE(
-      access_manager().IsTypeCached(EntityType(EntityTypeName::kOrder)));
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kOrder)));
 
   // 9. Request again, should succeed immediately because failure count was
   // reset on success.
@@ -906,7 +887,7 @@ TEST_F(PersonalContextAccessManagerImplTest, PrefetchStatusAndObserverFailure) {
       access_manager().GetPrefetchAmbientAutofillStatusByEntityType(order_type),
       RequestStatus::kFailure);
 
-  // 3. Wipe caches. Status should transition back to `kNotStarted`.
+  // 3. Wipe state. Status should transition back to `kNotStarted`.
   access_manager().OnEnablementStateChanged(
       personal_context::PersonalContextEnablementState::
           kDisabledViaPersonalIntelligenceInAutofillToggle);
@@ -915,14 +896,14 @@ TEST_F(PersonalContextAccessManagerImplTest, PrefetchStatusAndObserverFailure) {
       RequestStatus::kNotStarted);
 }
 
-// Tests that calling PrefetchAmbientAutofillContext when all types are cached
-// indeed notifies the observer synchronously.
+// Tests that calling PrefetchAmbientAutofillContext when all types are
+// prefetched indeed notifies the observer synchronously.
 TEST_F(PersonalContextAccessManagerImplTest,
-       PrefetchWhenAlreadyCachedNotifiesObserver) {
+       PrefetchWhenAlreadyPrefetchedNotifiesObserver) {
   MockPersonalContextAccessManagerObserver observer;
   access_manager().AddObserver(&observer);
 
-  // 1. Cache Passport.
+  // 1. Prefetch Passport.
   personal_context::proto::ContextMemoryAmbientAutofillResponse response;
   response.add_entities()->mutable_passport()->set_number("P123");
   PrefetchAmbientAutofillContextSync({EntityType(EntityTypeName::kPassport)},
