@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "base/check_op.h"
 #include "base/functional/callback_helpers.h"
 #include "base/no_destructor.h"
 #include "base/strings/strcat.h"
@@ -127,6 +128,23 @@ class FirstRunFeatureShowcasePixelTest
         base::StrCat({test_info->test_suite_name(), "_", test_info->name(), "_",
                       GetParam().step});
 
+    // Wait for all cr-lotties to initialize to prevent flakiness.
+    CHECK_EQ(true, content::EvalJs(profile_picker_view_->GetPickerContents(), R"(
+      Promise.all(
+        Array.from(document.querySelector('feature-showcase-app')
+            .shadowRoot.querySelectorAll('cr-lottie')).map(
+          anim => new Promise(resolve => {
+            if (anim.hasAttribute('is-animation-loaded')) {
+              resolve(true);
+            } else {
+              anim.addEventListener('cr-lottie-initialized',
+                                    () => resolve(true));
+            }
+          })
+        )
+      ).then(() => true);
+    )").ExtractBool());
+
     return VerifyPixelUi(widget, "FirstRunFeatureShowcasePixelTest",
                          screenshot_name) != ui::test::ActionResult::kFailed;
   }
@@ -158,14 +176,8 @@ class FirstRunFeatureShowcasePixelTest
       gfx::ScopedAnimationDurationScaleMode::ZERO_DURATION};
 };
 
-// TODO(crbug.com/519129009): Flaky on Windows.
-#if BUILDFLAG(IS_WIN)
-#define MAYBE_InvokeUi_default DISABLED_InvokeUi_default
-#else
-#define MAYBE_InvokeUi_default InvokeUi_default
-#endif
 IN_PROC_BROWSER_TEST_P(FirstRunFeatureShowcasePixelTest,
-                       MAYBE_InvokeUi_default) {
+                       InvokeUi_default) {
   ShowAndVerifyUi();
 }
 
