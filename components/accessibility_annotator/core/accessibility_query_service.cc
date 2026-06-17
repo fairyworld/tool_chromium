@@ -11,8 +11,6 @@
 #include <utility>
 #include <vector>
 
-#include "base/barrier_callback.h"
-#include "base/containers/extend.h"
 #include "base/containers/flat_set.h"
 #include "base/functional/bind.h"
 #include "base/i18n/break_iterator.h"
@@ -96,18 +94,18 @@ void DeduplicateResults(std::vector<MemorySearchResult>& results) {
 
 AccessibilityQueryService::AccessibilityQueryService(
     std::unique_ptr<AccessibilityQueryServiceDelegate> delegate,
-    std::vector<std::unique_ptr<MemoryDataProvider>> data_providers,
+    std::unique_ptr<MemoryDataProvider> data_provider,
     std::unique_ptr<OnePResolver> one_p_resolver,
     optimization_guide::RemoteModelExecutor* remote_model_executor)
     : delegate_(std::move(delegate)),
-      data_providers_(std::move(data_providers)),
+      data_provider_(std::move(data_provider)),
       one_p_resolver_(std::move(one_p_resolver)),
       classifier_(CreateQueryClassifier(remote_model_executor)) {}
 
 AccessibilityQueryService::~AccessibilityQueryService() = default;
 
 void AccessibilityQueryService::Shutdown() {
-  data_providers_.clear();
+  data_provider_.reset();
   one_p_resolver_.reset();
 }
 
@@ -118,7 +116,7 @@ void AccessibilityQueryService::Query(
   weak_ptr_factory_.InvalidateWeakPtrs();
 
   // We can't query if we don't have any data providers configured.
-  if (data_providers_.empty()) {
+  if (!data_provider_) {
     update_callback.Run(
         MemorySearchResults(MemorySearchStatus::kInternalFailure));
     return;
@@ -148,46 +146,32 @@ void AccessibilityQueryService::OnClassificationComplete(
 
   EntryType intent = classified_query.intent;
 
-  // Use a barrier callback to wait for all data providers to return their
-  // results. This ensures we don't process partial results. Once all providers
-  // finish, `OnDataRetrieved` will be called with the combined results.
-  base::RepeatingCallback<void(std::vector<MemorySearchResult>)>
-      barrier_callback = base::BarrierCallback<std::vector<MemorySearchResult>>(
-          data_providers_.size(),
-          base::BindOnce(&AccessibilityQueryService::OnDataRetrieved,
-                         weak_ptr_factory_.GetWeakPtr(), std::move(query),
-                         std::move(classified_query), update_callback));
+  auto callback =
+      base::BindOnce(&AccessibilityQueryService::OnDataRetrieved,
+                     weak_ptr_factory_.GetWeakPtr(), std::move(query),
+                     std::move(classified_query), update_callback);
 
-  // Request all data providers to fetch entries matching the classified intent.
-  for (const std::unique_ptr<MemoryDataProvider>& provider : data_providers_) {
-    auto log_and_call_barrier_callback = base::BindOnce(
-        [](std::string_view provider_histogram_suffix,
-           base::RepeatingCallback<void(std::vector<MemorySearchResult>)>
-               barrier_callback,
-           std::vector<MemorySearchResult> results) {
-          base::UmaHistogramCounts1000(
-              base::StrCat({"AccessibilityAnnotator.AccessibilityQueryService."
-                            "ProviderResultCount.",
-                            provider_histogram_suffix}),
-              results.size());
-          barrier_callback.Run(std::move(results));
-        },
-        provider->GetHistogramSuffix(), barrier_callback);
-    provider->RetrieveAll(intent, std::move(log_and_call_barrier_callback));
-  }
+  auto log_and_call_retrieved = base::BindOnce(
+      [](std::string_view provider_histogram_suffix,
+         base::OnceCallback<void(std::vector<MemorySearchResult>)> callback,
+         std::vector<MemorySearchResult> results) {
+        base::UmaHistogramCounts1000(
+            base::StrCat({"AccessibilityAnnotator.AccessibilityQueryService."
+                          "ProviderResultCount.",
+                          provider_histogram_suffix}),
+            results.size());
+        std::move(callback).Run(std::move(results));
+      },
+      data_provider_->GetHistogramSuffix(), std::move(callback));
+
+  data_provider_->RetrieveAll(intent, std::move(log_and_call_retrieved));
 }
 
 void AccessibilityQueryService::OnDataRetrieved(
     std::u16string query,
     ClassifiedQuery classified_query,
     base::RepeatingCallback<void(MemorySearchResults)> update_callback,
-    std::vector<std::vector<MemorySearchResult>> entries_list) {
-  // Flatten the list of lists into a single vector of results.
-  std::vector<MemorySearchResult> entries;
-  for (std::vector<MemorySearchResult>& list : entries_list) {
-    base::Extend(entries, std::move(list));
-  }
-
+    std::vector<MemorySearchResult> entries) {
   DeduplicateResults(entries);
 
   // If we couldn't find any local results, try the 1P resolver.

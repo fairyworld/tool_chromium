@@ -56,13 +56,10 @@ AccessibilityQueryServiceFactory::BuildServiceInstanceForBrowserContext(
   }
 
   Profile* profile = Profile::FromBrowserContext(context);
-  std::vector<std::unique_ptr<accessibility_annotator::MemoryDataProvider>>
-      data_providers;
-
-  data_providers.push_back(std::make_unique<autofill::AutofillDataProviderImpl>(
-      autofill::PersonalDataManagerFactory::GetForBrowserContext(context),
-      autofill::AutofillEntityDataManagerFactory::GetForProfile(profile)));
-
+  std::unique_ptr<autofill::AutofillDataProviderImpl> data_provider =
+      std::make_unique<autofill::AutofillDataProviderImpl>(
+          autofill::PersonalDataManagerFactory::GetForBrowserContext(context),
+          autofill::AutofillEntityDataManagerFactory::GetForProfile(profile));
 
   auto* optimization_guide_service =
       OptimizationGuideKeyedServiceFactory::GetForProfile(profile);
@@ -83,7 +80,7 @@ AccessibilityQueryServiceFactory::BuildServiceInstanceForBrowserContext(
       std::make_unique<
           accessibility_annotator::AccessibilityQueryServiceDelegateImpl>(
           profile),
-      std::move(data_providers), std::move(one_p_resolver),
+      std::move(data_provider), std::move(one_p_resolver),
       optimization_guide_service);
 }
 

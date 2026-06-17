@@ -29,7 +29,7 @@ class StubAccessibilityQueryServiceDelegate
 MockAccessibilityQueryService::MockAccessibilityQueryService()
     : accessibility_annotator::AccessibilityQueryService(
           std::make_unique<StubAccessibilityQueryServiceDelegate>(),
-          /*data_providers=*/{},
+          /*data_provider=*/nullptr,
           /*one_p_resolver=*/nullptr,
           /*remote_model_executor=*/nullptr) {}
 

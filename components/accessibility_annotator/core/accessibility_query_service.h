@@ -32,7 +32,7 @@ class AccessibilityQueryService : public KeyedService {
  public:
   AccessibilityQueryService(
       std::unique_ptr<AccessibilityQueryServiceDelegate> delegate,
-      std::vector<std::unique_ptr<MemoryDataProvider>> data_providers,
+      std::unique_ptr<MemoryDataProvider> data_provider,
       std::unique_ptr<OnePResolver> one_p_resolver,
       optimization_guide::RemoteModelExecutor* remote_model_executor);
   AccessibilityQueryService(const AccessibilityQueryService&) = delete;
@@ -61,7 +61,7 @@ class AccessibilityQueryService : public KeyedService {
       std::u16string query,
       ClassifiedQuery classified_query,
       base::RepeatingCallback<void(MemorySearchResults)> update_callback,
-      std::vector<std::vector<MemorySearchResult>> entries_list);
+      std::vector<MemorySearchResult> entries);
 
   void QueryOnePResolver(
       std::u16string query,
@@ -76,7 +76,7 @@ class AccessibilityQueryService : public KeyedService {
       std::vector<MemorySearchResult> one_p_entries);
 
   std::unique_ptr<AccessibilityQueryServiceDelegate> delegate_;
-  std::vector<std::unique_ptr<MemoryDataProvider>> data_providers_;
+  std::unique_ptr<MemoryDataProvider> data_provider_;
   std::unique_ptr<OnePResolver> one_p_resolver_;
   QueryClassifier classifier_;
 
