@@ -363,14 +363,14 @@ TEST_F(UserSessionManagerTest, InitializeDeviceIdForExistingUsers) {
 }
 
 TEST_F(UserSessionManagerTest,
-       MaybeMigrateConsentLevelToSync_UpgradeToSyncWhenRollbackFlagEnabled) {
+       MaybeMigrateConsentLevelToSync_UpgradeToSyncWhenFlagDisabled) {
   base::test::ScopedFeatureList features;
-  // Enable ReplaceSyncPromosWithSignInPromos and
-  // UndoChromeOsUseConsentLevelSignin.
+  // Enable ReplaceSyncPromosWithSignInPromos but DISABLE
+  // ChromeOsUseConsentLevelSigninForNewUsers.
   features.InitWithFeatures(
-      /*enabled_features=*/{syncer::kReplaceSyncPromosWithSignInPromos,
-                            ::switches::kUndoChromeOsUseConsentLevelSignin},
-      /*disabled_features=*/{});
+      /*enabled_features=*/{syncer::kReplaceSyncPromosWithSignInPromos},
+      /*disabled_features=*/{
+          ::switches::kChromeOsUseConsentLevelSigninForNewUsers});
 
   TestingProfile* profile = LoginGaiaTestUser();
   signin::IdentityManager* identity_manager =
@@ -394,13 +394,14 @@ TEST_F(UserSessionManagerTest,
 }
 
 TEST_F(UserSessionManagerTest,
-       MaybeMigrateConsentLevelToSync_KeepSigninWhenRollbackFlagDisabled) {
+       MaybeMigrateConsentLevelToSync_KeepSigninWhenFlagEnabled) {
   base::test::ScopedFeatureList features;
-  // Enable ReplaceSyncPromosWithSignInPromos but disable
-  // UndoChromeOsUseConsentLevelSignin.
+  // Enable BOTH features.
   features.InitWithFeatures(
-      /*enabled_features=*/{syncer::kReplaceSyncPromosWithSignInPromos},
-      /*disabled_features=*/{::switches::kUndoChromeOsUseConsentLevelSignin});
+      /*enabled_features=*/{syncer::kReplaceSyncPromosWithSignInPromos,
+                            ::switches::
+                                kChromeOsUseConsentLevelSigninForNewUsers},
+      /*disabled_features=*/{});
 
   TestingProfile* profile = LoginGaiaTestUser();
   signin::IdentityManager* identity_manager =

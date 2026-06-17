@@ -114,9 +114,7 @@ void SyncConsentScreenHandler::DeclareLocalizedValues(
       (base::FeatureList::IsEnabled(
            syncer::kReplaceSyncPromosWithSignInPromos) &&
        base::FeatureList::IsEnabled(
-           ::switches::kChromeOsUseConsentLevelSigninForNewUsers) &&
-       !base::FeatureList::IsEnabled(
-           ::switches::kUndoChromeOsUseConsentLevelSignin))
+           ::switches::kChromeOsUseConsentLevelSigninForNewUsers))
           ? IDS_LOGIN_SYNC_CONSENT_SCREEN_CHROME_BROWSER_SYNC_NAME_3
           : IDS_LOGIN_SYNC_CONSENT_SCREEN_CHROME_BROWSER_SYNC_NAME_2,
       builder);
