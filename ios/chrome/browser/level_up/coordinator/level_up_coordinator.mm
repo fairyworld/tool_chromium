@@ -4,6 +4,7 @@
 
 #import "ios/chrome/browser/level_up/coordinator/level_up_coordinator.h"
 
+#import "components/prefs/pref_service.h"
 #import "ios/chrome/browser/level_up/coordinator/level_up_mediator.h"
 #import "ios/chrome/browser/level_up/model/level_up_service.h"
 #import "ios/chrome/browser/level_up/model/level_up_service_factory.h"
@@ -37,9 +38,11 @@
       AuthenticationServiceFactory::GetForProfile(self.browser->GetProfile());
   LevelUpService* levelUpService =
       LevelUpServiceFactory::GetForProfile(self.browser->GetProfile());
+  PrefService* prefService = self.browser->GetProfile()->GetPrefs();
   self.mediator =
       [[LevelUpMediator alloc] initWithAuthenticationService:authService
-                                              levelUpService:levelUpService];
+                                              levelUpService:levelUpService
+                                                 prefService:prefService];
   self.mediator.profileConsumer = self.viewController;
   self.mediator.consumer = self.viewController;
 
@@ -76,6 +79,10 @@
       [[LevelUpAllTasksViewController alloc] init];
   [self.navigationController pushViewController:allTasksVC animated:YES];
   [self.mediator configureAllTasksConsumer:allTasksVC];
+}
+
+- (void)didTapToggleProgressUpdates:(LevelUpViewController*)controller {
+  [self.mediator toggleProgressUpdates];
 }
 
 @end

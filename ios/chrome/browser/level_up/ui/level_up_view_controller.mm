@@ -69,6 +69,10 @@ const CGFloat kTasksCellHeight = 350.0;
   NSArray<LevelUpStat*>* _stats;
   // The diffable data source.
   UICollectionViewDiffableDataSource<NSString*, NSString*>* _diffableDataSource;
+  // The menu button in the navigation bar.
+  UIButton* _menuButton;
+  // Whether progress updates are enabled.
+  BOOL _progressUpdatesEnabled;
 }
 
 @synthesize delegate = _delegate;
@@ -88,6 +92,11 @@ const CGFloat kTasksCellHeight = 350.0;
 
 - (void)setStats:(NSArray<LevelUpStat*>*)stats {
   _stats = [stats copy];
+}
+
+- (void)setProgressUpdatesEnabled:(BOOL)enabled {
+  _progressUpdatesEnabled = enabled;
+  [self updateMenuButtonMenu];
 }
 
 #pragma mark - LevelUpProfileConsumer
@@ -147,16 +156,16 @@ const CGFloat kTasksCellHeight = 350.0;
   self.view.backgroundColor = [UIColor colorNamed:kSecondaryBackgroundColor];
   self.title = l10n_util::GetNSString(IDS_IOS_TOOLS_MENU_LEVEL_UP);
 
-  UIButton* menuButton = [UIButton buttonWithType:UIButtonTypeSystem];
-  menuButton.backgroundColor = UIColor.clearColor;
-  menuButton.tintColor = [UIColor colorNamed:kTextPrimaryColor];
-  [menuButton setImage:DefaultSymbolTemplateWithPointSize(
-                           kEllipsisSymbol, kSymbolAccessoryPointSize)
-              forState:UIControlStateNormal];
-  menuButton.menu = [UIMenu menuWithTitle:@"" children:@[]];
-  menuButton.showsMenuAsPrimaryAction = YES;
+  _menuButton = [UIButton buttonWithType:UIButtonTypeSystem];
+  _menuButton.backgroundColor = UIColor.clearColor;
+  _menuButton.tintColor = [UIColor colorNamed:kTextPrimaryColor];
+  [_menuButton setImage:DefaultSymbolTemplateWithPointSize(
+                            kEllipsisSymbol, kSymbolAccessoryPointSize)
+               forState:UIControlStateNormal];
+  _menuButton.showsMenuAsPrimaryAction = YES;
+  [self updateMenuButtonMenu];
   self.navigationItem.leftBarButtonItem =
-      [[UIBarButtonItem alloc] initWithCustomView:menuButton];
+      [[UIBarButtonItem alloc] initWithCustomView:_menuButton];
 
   UIButton* dismissButton = [UIButton buttonWithType:UIButtonTypeSystem];
   dismissButton.backgroundColor = UIColor.clearColor;
@@ -169,6 +178,33 @@ const CGFloat kTasksCellHeight = 350.0;
           forControlEvents:UIControlEventTouchUpInside];
   self.navigationItem.rightBarButtonItem =
       [[UIBarButtonItem alloc] initWithCustomView:dismissButton];
+}
+
+// Re-creates and applies the menu to the left bar button item.
+- (void)updateMenuButtonMenu {
+  NSString* title =
+      _progressUpdatesEnabled
+          ? l10n_util::GetNSString(IDS_IOS_LEVEL_UP_TURN_OFF_PROGRESS_UPDATES)
+          : l10n_util::GetNSString(IDS_IOS_LEVEL_UP_TURN_ON_PROGRESS_UPDATES);
+  NSString* symbolName =
+      _progressUpdatesEnabled ? kBellSlashSymbol : kBellSymbol;
+  UIImage* image =
+      DefaultSymbolTemplateWithPointSize(symbolName, kSymbolAccessoryPointSize);
+
+  __weak __typeof(self) weakSelf = self;
+  UIAction* toggleAction = [UIAction actionWithTitle:title
+                                               image:image
+                                          identifier:nil
+                                             handler:^(UIAction* action) {
+                                               [weakSelf toggleProgressUpdates];
+                                             }];
+
+  _menuButton.menu = [UIMenu menuWithTitle:@"" children:@[ toggleAction ]];
+}
+
+// Calls the delegate to toggle the progress updates.
+- (void)toggleProgressUpdates {
+  [self.delegate didTapToggleProgressUpdates:self];
 }
 
 // Sets up the collection view layout.

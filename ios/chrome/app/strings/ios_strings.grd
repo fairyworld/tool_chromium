@@ -4446,6 +4446,12 @@ To continue from your computer, switch to <ph name="OTHER_EMAIL">$2<ex>john.doe@
           =1 {Complete 1 more task to level up}
           other {Complete {count} more tasks to level up}}
       </message>
+      <message name="IDS_IOS_LEVEL_UP_TURN_OFF_PROGRESS_UPDATES" desc="The context menu item to turn off Level Up progress updates. [iOS only]">
+        Turn off progress updates
+      </message>
+      <message name="IDS_IOS_LEVEL_UP_TURN_ON_PROGRESS_UPDATES" desc="The context menu item to turn on Level Up progress updates. [iOS only]">
+        Turn on progress updates
+      </message>
       <message name="IDS_IOS_LEVEL_UP_WELCOME" desc="The welcome text displayed in the user profile header of the Level Up feature screen. [iOS only]">
         Welcome
       </message>

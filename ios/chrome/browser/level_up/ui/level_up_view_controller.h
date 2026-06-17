@@ -19,6 +19,9 @@
 // Called when the user taps the "See All" button on the tasks card.
 - (void)didTapSeeAllTasks:(LevelUpViewController*)controller;
 
+// Called when the user toggles the progress updates menu item.
+- (void)didTapToggleProgressUpdates:(LevelUpViewController*)controller;
+
 @end
 
 // View controller displaying Level Up bottom sheet.

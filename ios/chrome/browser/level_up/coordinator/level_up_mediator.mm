@@ -6,6 +6,9 @@
 
 #import "base/memory/raw_ptr.h"
 #import "base/strings/sys_string_conversions.h"
+#import "components/prefs/ios/pref_observer_bridge.h"
+#import "components/prefs/pref_change_registrar.h"
+#import "components/prefs/pref_service.h"
 #import "ios/chrome/browser/level_up/coordinator/level_up_category.h"
 #import "ios/chrome/browser/level_up/coordinator/level_up_stat.h"
 #import "ios/chrome/browser/level_up/coordinator/level_up_task.h"
@@ -14,6 +17,7 @@
 #import "ios/chrome/browser/level_up/model/task_types.h"
 #import "ios/chrome/browser/level_up/ui/level_up_consumer.h"
 #import "ios/chrome/browser/level_up/ui/level_up_profile_consumer.h"
+#import "ios/chrome/browser/shared/model/prefs/pref_names.h"
 #import "ios/chrome/browser/shared/ui/symbols/symbols.h"
 #import "ios/chrome/browser/signin/model/authentication_service.h"
 #import "ios/chrome/browser/signin/model/avatar/resized_avatar_cache.h"
@@ -22,26 +26,43 @@
 #import "ios/chrome/grit/ios_strings.h"
 #import "ui/base/l10n/l10n_util.h"
 
+@interface LevelUpMediator () <PrefObserverDelegate>
+@end
+
 @implementation LevelUpMediator {
   // The authentication service.
   raw_ptr<AuthenticationService> _authService;
   // The level up service.
   raw_ptr<LevelUpService> _levelUpService;
+  // The pref service.
+  raw_ptr<PrefService> _prefService;
   // Image cache for user avatars.
   ResizedAvatarCache* _avatarCache;
   // The list of task categories.
   NSArray<LevelUpCategory*>* _categories;
+
+  // Registrar for user Pref changes notifications.
+  PrefChangeRegistrar _prefChangeRegistrar;
+  // Bridge to listen to Pref changes.
+  std::unique_ptr<PrefObserverBridge> _prefObserverBridge;
 }
 
 - (instancetype)initWithAuthenticationService:
                     (AuthenticationService*)authService
-                               levelUpService:(LevelUpService*)levelUpService {
+                               levelUpService:(LevelUpService*)levelUpService
+                                  prefService:(PrefService*)prefService {
   self = [super init];
   if (self) {
     _authService = authService;
     _levelUpService = levelUpService;
+    _prefService = prefService;
     _avatarCache = [[ResizedAvatarCache alloc]
         initWithIdentityAvatarSize:IdentityAvatarSize::Large];
+
+    _prefObserverBridge = std::make_unique<PrefObserverBridge>(self);
+    _prefChangeRegistrar.Init(prefService);
+    _prefObserverBridge->ObserveChangesForPreference(prefs::kLevelUpUIEnabled,
+                                                     &_prefChangeRegistrar);
   }
   return self;
 }
@@ -52,6 +73,12 @@
   id<SystemIdentity> identity = _authService->GetPrimaryIdentity();
   NSString* userFullName = identity.userFullName;
   UIImage* userAvatar = [_avatarCache resizedAvatarForIdentity:identity];
+
+  if ([self.consumer
+          respondsToSelector:@selector(setProgressUpdatesEnabled:)]) {
+    BOOL updatesEnabled = _prefService->GetBoolean(prefs::kLevelUpUIEnabled);
+    [self.consumer setProgressUpdatesEnabled:updatesEnabled];
+  }
 
   int level = _levelUpService->GetCurrentLevel();
 
@@ -124,6 +151,18 @@
   }
 }
 
+#pragma mark - PrefObserverDelegate
+
+- (void)onPreferenceChanged:(const std::string&)preferenceName {
+  if (preferenceName == prefs::kLevelUpUIEnabled) {
+    BOOL updatesEnabled = _prefService->GetBoolean(prefs::kLevelUpUIEnabled);
+    if ([self.consumer
+            respondsToSelector:@selector(setProgressUpdatesEnabled:)]) {
+      [self.consumer setProgressUpdatesEnabled:updatesEnabled];
+    }
+  }
+}
+
 #pragma mark - Private
 
 // Configures the task stat.
@@ -177,6 +216,16 @@
 
   if ([self.consumer respondsToSelector:@selector(setStats:)]) {
     [self.consumer setStats:stats];
+  }
+}
+
+- (void)toggleProgressUpdates {
+  BOOL oldValue = _prefService->GetBoolean(prefs::kLevelUpUIEnabled);
+  BOOL newValue = !oldValue;
+  _prefService->SetBoolean(prefs::kLevelUpUIEnabled, newValue);
+  if ([self.consumer
+          respondsToSelector:@selector(setProgressUpdatesEnabled:)]) {
+    [self.consumer setProgressUpdatesEnabled:newValue];
   }
 }
 

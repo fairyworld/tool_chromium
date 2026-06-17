@@ -9,6 +9,7 @@
 
 class AuthenticationService;
 class LevelUpService;
+class PrefService;
 @protocol LevelUpConsumer;
 @protocol LevelUpProfileConsumer;
 
@@ -20,17 +21,21 @@ class LevelUpService;
 // The consumer for user profile credentials updates.
 @property(nonatomic, weak) id<LevelUpProfileConsumer> profileConsumer;
 
-// Initializes this mediator with the authentication service and level up
-// service.
+// Initializes this mediator with the authentication service, level up service,
+// and pref service.
 - (instancetype)initWithAuthenticationService:
                     (AuthenticationService*)authService
                                levelUpService:(LevelUpService*)levelUpService
+                                  prefService:(PrefService*)prefService
     NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)init NS_UNAVAILABLE;
 
 // Configures the consumer for all tasks.
 - (void)configureAllTasksConsumer:(id<LevelUpConsumer>)allTasksConsumer;
+
+// Toggles the progress updates enabled status.
+- (void)toggleProgressUpdates;
 
 @end
 
