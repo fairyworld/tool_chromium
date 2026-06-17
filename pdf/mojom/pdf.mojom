@@ -124,6 +124,8 @@ struct InkTextInfo {
   // 1.0 is 100%.
   // See blink::WebElement::GetEffectiveZoom()
   float effective_zoom;
+  // In physical pixels. Based on the <textarea> font size.
+  float primary_ascent;
 };
 
 // Browser-side interface used by PDF renderers.
