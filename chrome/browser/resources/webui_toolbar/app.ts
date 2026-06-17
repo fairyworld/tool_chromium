@@ -240,6 +240,7 @@ export class ToolbarAppElement extends AppElementBase {
         activityIndicators: [],
         permissionDashboard: null,
       },
+      pageActionStates: [],
     },
     avatarControlState: {
       state: AvatarToolbarButtonState.kNormal,
