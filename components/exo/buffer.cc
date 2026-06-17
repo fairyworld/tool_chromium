@@ -333,9 +333,8 @@ void Buffer::Texture::CopyTexImage(Texture* destination,
                                    base::OnceClosure callback) {
   if (context_provider_) {
     CHECK(shared_image_);
-    gpu::SharedImageInterface* sii = context_provider_->SharedImageInterface();
-    sii->UpdateSharedImage(sync_token_, nullptr, shared_image_->mailbox());
-    gpu::SyncToken sync_token = sii->GenUnverifiedSyncToken();
+    gpu::SyncToken sync_token =
+        shared_image_->BackingWasExternallyUpdated(sync_token_);
 
     gpu::raster::RasterInterface* ri = context_provider_->RasterInterface();
     std::unique_ptr<gpu::RasterScopedAccess> ri_src_access =
