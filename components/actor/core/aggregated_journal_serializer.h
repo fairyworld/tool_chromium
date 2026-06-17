@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_ACTOR_AGGREGATED_JOURNAL_SERIALIZER_H_
-#define CHROME_BROWSER_ACTOR_AGGREGATED_JOURNAL_SERIALIZER_H_
+#ifndef COMPONENTS_ACTOR_CORE_AGGREGATED_JOURNAL_SERIALIZER_H_
+#define COMPONENTS_ACTOR_CORE_AGGREGATED_JOURNAL_SERIALIZER_H_
 
 #include <set>
 
@@ -43,4 +43,4 @@ class AggregatedJournalSerializer : public AggregatedJournal::Observer {
 
 }  // namespace actor
 
-#endif  // CHROME_BROWSER_ACTOR_AGGREGATED_JOURNAL_SERIALIZER_H_
+#endif  // COMPONENTS_ACTOR_CORE_AGGREGATED_JOURNAL_SERIALIZER_H_

@@ -2,11 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/actor/aggregated_journal_serializer.h"
+#include "components/actor/core/aggregated_journal_serializer.h"
 
 #include "base/containers/span.h"
+#include "build/build_config.h"
 #include "components/actor/core/journal_details_builder.h"
+#if !BUILDFLAG(IS_IOS)
 #include "components/tracing/common/system_profile_metadata_recorder.h"
+#endif
 #include "third_party/abseil-cpp/absl/strings/str_format.h"
 #include "third_party/perfetto/include/perfetto/ext/tracing/core/trace_packet.h"
 #include "third_party/perfetto/include/perfetto/protozero/scattered_heap_buffer.h"
@@ -79,7 +82,7 @@ void AggregatedJournalSerializer::WriteTracePreamble() {
     service_event->set_tracing_started(true);
     WriteTracePacket(msg.SerializeAsArray());
   }
-  // Write tracting active.
+  // Write tracing active.
   {
     protozero::HeapBuffered<perfetto::protos::pbzero::TracePacket> msg;
     msg->set_trusted_packet_sequence_id(sequence_id_++);
@@ -91,12 +94,14 @@ void AggregatedJournalSerializer::WriteTracePreamble() {
     WriteTracePacket(msg.SerializeAsArray());
   }
 
+#if !BUILDFLAG(IS_IOS)
   // Record the system info in the actor journal.
   {
     protozero::HeapBuffered<perfetto::protos::pbzero::TracePacket> msg;
     tracing::RecordSystemProfileMetadata(msg->set_chrome_events());
     WriteTracePacket(msg.SerializeAsArray());
   }
+#endif
 }
 
 AggregatedJournalSerializer::~AggregatedJournalSerializer() {
