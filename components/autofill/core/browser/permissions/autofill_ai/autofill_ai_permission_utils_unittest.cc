@@ -581,6 +581,24 @@ TEST_F(AutofillAiPermissionUtilsTest, kAmbientAutofillFilling) {
       client(), AutofillAiAction::kAmbientAutofillFilling));
 }
 
+TEST_F(AutofillAiPermissionUtilsTest, AmbientAutofillFillingRequiresOptIn) {
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndDisableFeature(features::kAutofillAiAvailableByDefault);
+
+  client().set_personal_context_enablement_state(
+      personal_context::PersonalContextEnablementState::kEnabled);
+
+  // Opted out.
+  SetAutofillAiOptInStatus(client(), AutofillAiOptInStatus::kOptedOut);
+  EXPECT_FALSE(MayPerformAutofillAiAction(
+      client(), AutofillAiAction::kAmbientAutofillFilling));
+
+  // Opted in.
+  SetAutofillAiOptInStatus(client(), AutofillAiOptInStatus::kOptedIn);
+  EXPECT_TRUE(MayPerformAutofillAiAction(
+      client(), AutofillAiAction::kAmbientAutofillFilling));
+}
+
 TEST_F(AutofillAiPermissionUtilsTest, kAmbientAutofillFilling_G1Tiers) {
   client().set_personal_context_enablement_state(
       personal_context::PersonalContextEnablementState::kEnabled);

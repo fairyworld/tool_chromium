@@ -383,6 +383,7 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
     case AutofillAiAction::kImport:
     case AutofillAiAction::kTypeSupportsPersonalContextData:
       if (action == AutofillAiAction::kTypeSupportsPersonalContextData) {
+        // TODO(crbug.com/523168644): Check `kGeminiSettings` pref enablement.
         if (!entity_type) {
           return false;
         }
@@ -403,6 +404,13 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
       if (!EntityTypeIsEnabledInSettings(*prefs, *entity_type)) {
         return false;
       }
+      if (base::FeatureList::IsEnabled(
+              features::kAutofillAiAvailableByDefault)) {
+        return true;
+      }
+      return policy_pref_enabled && autofill_ai_available;
+    case AutofillAiAction::kAmbientAutofillFilling:
+      // TODO(crbug.com/523168644): Check `kGeminiSettings` pref enablement.
       if (base::FeatureList::IsEnabled(
               features::kAutofillAiAvailableByDefault)) {
         return true;
@@ -441,8 +449,6 @@ base::flat_set<int32_t> GetAutofillAmbientAutofillEligibleTiers() {
                   features::kAutofillAiAvailableByDefault));
     case AutofillAiAction::kEnableOrDisable:
     case AutofillAiAction::kListEntityInstancesInSettings:
-    // TODO(crbug.com/523168644): Add pref check for ambient autofill.
-    case AutofillAiAction::kAmbientAutofillFilling:
       return true;
   }
   NOTREACHED();
