@@ -445,7 +445,7 @@ public class SearchActivity extends AsyncInitializationActivity
         boolean isIncognito = SearchActivityUtils.getIntentIncognitoStatus(getIntent());
         ActivityProfileProvider profileProvider =
                 new ActivityProfileProvider(getLifecycleDispatcher());
-        profileProvider.onAvailable(
+        profileProvider.runSyncOrOnAvailable(
                 (provider) -> {
                     mProfileSupplier.set(ProfileProvider.getOrCreateProfile(provider, isIncognito));
                 });
