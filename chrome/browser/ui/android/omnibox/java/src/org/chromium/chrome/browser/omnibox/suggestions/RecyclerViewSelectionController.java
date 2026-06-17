@@ -158,6 +158,10 @@ public class RecyclerViewSelectionController extends SelectionController
 
     /** Removes a virtual view from the logical list. */
     public void removeVirtualView(int logicalIndex) {
+        Integer position = getPosition();
+        if (position != null && position == logicalIndex) {
+            reset();
+        }
         mVirtualViews.remove(logicalIndex);
     }
 
