@@ -1022,6 +1022,11 @@
     "expiry_milestone": 145
   },
   {
+    "name": "autofill-enable-resurrecting-payments-users",
+    "owners": [ "vinnypersky@google.com", "payments-autofill-team@google.com" ],
+    "expiry_milestone": 160
+  },
+  {
     "name": "autofill-enable-save-and-fill",
     "owners": ["siyua@chromium.org", "averina@google.com", "payments-autofill-team@google.com"],
     "expiry_milestone": 155

@@ -1101,6 +1101,13 @@ inline constexpr char
         "When enabled, risk data is prefetched during payments autofill flows "
         "to reduce user-perceived latency.";
 
+inline constexpr char kAutofillEnableResurrectingPaymentsUsersName[] =
+    "Enable resurrecting churned payments users";
+inline constexpr char kAutofillEnableResurrectingPaymentsUsersDescription[] =
+    "When enabled, users that have previously turned off payments autofill "
+    "will be prompted to turn it back on in instances where they can benefit "
+    "from it.";
+
 inline constexpr char kAutofillEnableSaveAndFillName[] = "Enable Save and Fill";
 inline constexpr char kAutofillEnableSaveAndFillDescription[] =
     "When enabled, show an option to offer saving and filling a credit card "

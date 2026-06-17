@@ -13096,6 +13096,7 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kAllowMultipleMediaNotificationsDescription, kOsAndroid,
      FEATURE_VALUE_TYPE(chrome::android::kAllowMultipleMediaNotifications)},
 #endif
+
     {"mobile-promo-on-desktop-with-qr-code-wave-2",
      flag_descriptions::kMobilePromoOnDesktopWithQRCodeWave2Name,
      flag_descriptions::kMobilePromoOnDesktopWithQRCodeWave2Description, kOsAll,
@@ -13110,6 +13111,14 @@ const FeatureEntry kFeatureEntries[] = {
      FEATURE_WITH_PARAMS_VALUE_TYPE(kMobilePromoOnDesktopWithReminderWave2,
                                     kMobilePromoOnDesktopVariationsWave2,
                                     "MobilePromoOnDesktopWithReminderWave2")},
+
+    {"autofill-enable-resurrecting-payments-users",
+     flag_descriptions::kAutofillEnableResurrectingPaymentsUsersName,
+     flag_descriptions::kAutofillEnableResurrectingPaymentsUsersDescription,
+     kOsAll,
+     FEATURE_VALUE_TYPE(
+         autofill::features::kAutofillEnableResurrectingPaymentsUsers)},
+
     // Add new entries above this line.
     // NOTE: Adding a new flag requires adding a corresponding entry to enum
     // "LoginCustomFlags" in tools/metrics/histograms/enums.xml. See "Flag

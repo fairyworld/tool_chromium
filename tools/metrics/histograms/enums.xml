@@ -12699,6 +12699,8 @@ from previous Chrome versions.
   <int value="-560750110"
       label="ClearingCookiesKeepsSupervisedUsersSignedIn:enabled"/>
   <int value="-560719609" label="AccessibilityOSSettingsVisibility:disabled"/>
+  <int value="-560633650"
+      label="AutofillEnableResurrectingPaymentsUsers:disabled"/>
   <int value="-560551550" label="use-memory-pressure-chromeos"/>
   <int value="-560525911" label="SearchEngineChoiceTrigger:disabled"/>
   <int value="-560246178" label="IwaControlledFrame:enabled"/>
@@ -12821,6 +12823,8 @@ from previous Chrome versions.
   <int value="-519345823" label="CrOSEnforceSystemAecNsAgc:enabled"/>
   <int value="-519342886" label="PrintWithPostScriptType42Fonts:disabled"/>
   <int value="-519153241" label="DynamicProfileCountry:enabled"/>
+  <int value="-518715384"
+      label="AutofillEnableResurrectingPaymentsUsers:enabled"/>
   <int value="-518104091" label="NewAudioRenderingMixingStrategy:enabled"/>
   <int value="-518037829" label="ProjectorExcludeTranscript:disabled"/>
   <int value="-517913118" label="OmahaMinSdkVersionAndroid:enabled"/>
