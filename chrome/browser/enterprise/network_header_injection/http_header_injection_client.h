@@ -19,6 +19,9 @@ class HttpHeaderInjectionService;
 // Implements TrustedHeaderClient to inject custom HTTP headers based on policy.
 class HttpHeaderInjectionClient : public network::mojom::TrustedHeaderClient {
  public:
+  // Creates an instance and binds it to `receiver`. If `target_client` is
+  // valid, this instance acts as a proxy, forwarding calls to it after
+  // performing enterprise header injection.
   static void Create(
       base::WeakPtr<HttpHeaderInjectionService> service,
       mojo::PendingReceiver<network::mojom::TrustedHeaderClient> receiver,

@@ -3,21 +3,29 @@
 # found in the LICENSE file.
 
 static_library("network_header_injection") {
+  public = [
+    "http_header_injection_client.h",
+    "http_header_injection_service_factory.h",
+    "http_header_injection_url_loader_header_client.h",
+  ]
+
   sources = [
     "http_header_injection_client.cc",
-    "http_header_injection_client.h",
     "http_header_injection_service_factory.cc",
-    "http_header_injection_service_factory.h",
+    "http_header_injection_url_loader_header_client.cc",
+  ]
+
+  public_deps = [
+    "//base",
+    "//chrome/browser/profiles:profile",
+    "//services/network/public/mojom",
   ]
 
   deps = [
-    "//base",
-    "//chrome/browser/profiles:profile",
     "//components/enterprise/network_header_injection/core",
     "//components/keyed_service/core",
     "//components/prefs",
     "//services/network/public/cpp",
-    "//services/network/public/mojom",
     "//url",
   ]
 }
@@ -25,7 +33,10 @@ static_library("network_header_injection") {
 source_set("unit_tests") {
   testonly = true
 
-  sources = [ "http_header_injection_client_unittest.cc" ]
+  sources = [
+    "http_header_injection_client_unittest.cc",
+    "http_header_injection_url_loader_header_client_unittest.cc",
+  ]
 
   deps = [
     ":network_header_injection",
