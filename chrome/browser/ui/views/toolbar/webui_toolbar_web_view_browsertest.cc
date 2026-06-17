@@ -2746,8 +2746,14 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewSplitTabsBrowserTest,
                       DispatchPointerEvent("pointerup", kSplitTabsSelector)));
 }
 
+// TODO(crbug.com/524808223): Re-enable this test.
+#if BUILDFLAG(IS_WIN)
+#define MAYBE_VerifySplitTabLocations DISABLED_VerifySplitTabLocations
+#else
+#define MAYBE_VerifySplitTabLocations VerifySplitTabLocations
+#endif
 IN_PROC_BROWSER_TEST_F(WebUIToolbarWebViewSplitTabsBrowserTest,
-                       VerifySplitTabLocations) {
+                       MAYBE_VerifySplitTabLocations) {
   WebUIToolbarWebView* webui_toolbar_view = GetWebUIToolbarWebView(browser());
   views::WebView* web_view = webui_toolbar_view->GetWebViewForTesting();
   PinButton(browser(), web_view, prefs::kPinSplitTabButton);
