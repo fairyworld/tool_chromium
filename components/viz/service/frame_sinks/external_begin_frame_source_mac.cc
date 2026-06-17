@@ -232,7 +232,12 @@ void ExternalBeginFrameSourceMac::SetVSyncDisplayID(int64_t display_id,
 
     preferred_interval_ = min_refresh_interval_ = max_refresh_interval_ =
         GetMinimumFrameInterval();
-    CreateDelayBasedTimeSourceIfNeeded();
+    if (time_source_) {
+      time_source_->SetTimebaseAndInterval(last_frame_time_,
+                                           preferred_interval_);
+    } else {
+      CreateDelayBasedTimeSourceIfNeeded();
+    }
 
     if (update_vsync_params_callback_) {
       update_vsync_params_callback_.Run(base::TimeTicks::Now(),
