@@ -23,6 +23,7 @@ import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.context_sharing.R;
 import org.chromium.chrome.browser.contextual_tasks.fusebox.ContextualTasksFusebox;
+import org.chromium.components.browser_ui.widget.text.TextViewWithCompoundDrawables;
 import org.chromium.content_public.browser.WebContents;
 
 /**
@@ -42,6 +43,7 @@ public class CoBrowseViews {
     private final @CoBrowseContainerType int mContainerType;
     private final @Nullable CoBrowseComponentProvider mContentProvider;
     private @Nullable View mPeekView;
+    private boolean mUsePlaceholder;
 
     /**
      * Constructor for CoBrowseViews.
@@ -72,6 +74,7 @@ public class CoBrowseViews {
         mWebContentsSupplier.set(getWebContents());
         populateViewHierarchy();
         updateForContainerType();
+        setupPlaceholder();
     }
 
     /** Returns the custom content provider if one was specified, null otherwise. */
@@ -239,5 +242,20 @@ public class CoBrowseViews {
             layoutParams.topMargin = 0;
             webUiContainer.setLayoutParams(layoutParams);
         }
+    }
+
+    private void setupPlaceholder() {
+        View placeholder = mContainerView.findViewById(R.id.empty_placeholder_container);
+        assert placeholder instanceof TextViewWithCompoundDrawables;
+
+        if (mContentProvider != null) {
+            mUsePlaceholder =
+                    mContentProvider.setupPlaceholderView(
+                            (TextViewWithCompoundDrawables) placeholder);
+        }
+    }
+
+    public boolean usePlaceholder() {
+        return mUsePlaceholder;
     }
 }

@@ -140,6 +140,45 @@ public class TabBottomSheetCoordinatorTest {
     @Before
     public void setUp() {
         mActivityScenarioRule.getScenario().onActivity(activity -> mContext = spy(activity));
+
+        doAnswer(
+                        invocation -> {
+                            View view = invocation.getArgument(0);
+                            float heightRatio = invocation.getArgument(1);
+                            int bgColor = invocation.getArgument(2);
+                            int peekViewHeight = invocation.getArgument(3);
+                            int actorControlContainerId = invocation.getArgument(4);
+                            Runnable onBackPressed = invocation.getArgument(5);
+                            return new TestTabBottomSheetContent(
+                                    view,
+                                    heightRatio,
+                                    bgColor,
+                                    peekViewHeight,
+                                    actorControlContainerId,
+                                    onBackPressed);
+                        })
+                .when(mMockContentProvider)
+                .createContent(
+                        any(View.class),
+                        anyFloat(),
+                        anyInt(),
+                        anyInt(),
+                        anyInt(),
+                        any(Runnable.class));
+
+        initialize(/* usePlaceholder= */ false);
+    }
+
+    @After
+    public void tearDown() {
+        if (mCoordinator != null) {
+            mCoordinator.destroy();
+        }
+    }
+
+    private void initialize(boolean usePlaceholder) {
+        doReturn(usePlaceholder).when(mMockContentProvider).setupPlaceholderView(any());
+
         View containerView = LayoutInflater.from(mContext).inflate(R.layout.tab_bottom_sheet, null);
         containerView.setFocusable(true);
         containerView.setFocusableInTouchMode(true);
@@ -161,34 +200,6 @@ public class TabBottomSheetCoordinatorTest {
         when(mMockWebUi.getWebViewResizingHelper()).thenReturn(mWebViewResizingHelper);
         View webUiView = new View(mContext);
         when(mMockWebUi.getWebUiView()).thenReturn(webUiView);
-
-        doAnswer(
-                        invocation -> {
-                            View view = invocation.getArgument(0);
-                            float heightRatio = invocation.getArgument(1);
-                            int bgColor = invocation.getArgument(2);
-                            int peekViewHeight = invocation.getArgument(3);
-                            int actorControlContainerId = invocation.getArgument(4);
-                            int emptyPlaceholderContainerId = invocation.getArgument(5);
-                            Runnable onBackPressed = invocation.getArgument(6);
-                            return new TestTabBottomSheetContent(
-                                    view,
-                                    heightRatio,
-                                    bgColor,
-                                    peekViewHeight,
-                                    actorControlContainerId,
-                                    emptyPlaceholderContainerId,
-                                    onBackPressed);
-                        })
-                .when(mMockContentProvider)
-                .createContent(
-                        any(View.class),
-                        anyFloat(),
-                        anyInt(),
-                        anyInt(),
-                        anyInt(),
-                        anyInt(),
-                        any(Runnable.class));
 
         mCoBrowseViews =
                 spy(
@@ -231,14 +242,6 @@ public class TabBottomSheetCoordinatorTest {
                         () -> {});
 
         mCoordinatorModel = mCoordinator.getModelForTesting();
-    }
-
-    @After
-    public void tearDown() {
-        if (mCoordinator != null) {
-            mCoordinator.destroy();
-        }
-        TestTabBottomSheetContent.setUsePlaceholderForTesting(false);
     }
 
     /**
@@ -1122,7 +1125,6 @@ public class TabBottomSheetCoordinatorTest {
 
     @Test
     public void testPlaceholderVisibility_usePlaceholderFalse() {
-        TestTabBottomSheetContent.setUsePlaceholderForTesting(false);
         BottomSheetObserver observer = simulateShowSuccessAndGetObserver();
         View placeholder = mView.findViewById(R.id.empty_placeholder_container);
         assertNotNull(placeholder);
@@ -1141,7 +1143,7 @@ public class TabBottomSheetCoordinatorTest {
 
     @Test
     public void testPlaceholderVisibility_usePlaceholderTrue_noWebContents() {
-        TestTabBottomSheetContent.setUsePlaceholderForTesting(true);
+        initialize(/* usePlaceholder= */ true);
         BottomSheetObserver observer = simulateShowSuccessAndGetObserver();
         View placeholder = mView.findViewById(R.id.empty_placeholder_container);
         assertNotNull(placeholder);
@@ -1165,13 +1167,13 @@ public class TabBottomSheetCoordinatorTest {
 
     @Test
     public void testPlaceholderVisibility_usePlaceholderTrue_withWebContents() {
-        TestTabBottomSheetContent.setUsePlaceholderForTesting(true);
+        initialize(/* usePlaceholder= */ true);
         BottomSheetObserver observer = simulateShowSuccessAndGetObserver();
         View placeholder = mView.findViewById(R.id.empty_placeholder_container);
         assertNotNull(placeholder);
 
         WebContents mockWebContents = mock();
-        mCoBrowseViews.setWebContents(mockWebContents, false);
+        mCoBrowseViews.setWebContents(mockWebContents, /* requestFocus= */ false);
 
         when(mMockBottomSheetController.getSheetState()).thenReturn(SheetState.HALF);
         observer.onSheetStateChanged(SheetState.HALF, StateChangeReason.NONE);

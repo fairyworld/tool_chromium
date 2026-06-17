@@ -240,7 +240,6 @@ public class TabBottomSheetCoordinator {
                                 .getResources()
                                 .getDimensionPixelSize(R.dimen.tab_bottom_sheet_peek_height_total),
                         R.id.peek_view_container,
-                        R.id.empty_placeholder_container,
                         mOnBackPressed);
         mViewBinder =
                 PropertyModelChangeProcessor.create(
@@ -745,7 +744,7 @@ public class TabBottomSheetCoordinator {
 
         @SheetState int state = mBottomSheetController.getSheetState();
         boolean isExpanded = state == SheetState.HALF || state == SheetState.FULL;
-        boolean usePlaceholder = mSheetContent.usePlaceholder();
+        boolean usePlaceholder = mCoBrowseViews.usePlaceholder();
         boolean webContentsNull = mCoBrowseViews.getWebContentsSupplier().get() == null;
 
         boolean showPlaceholder = usePlaceholder && isExpanded && webContentsNull;
