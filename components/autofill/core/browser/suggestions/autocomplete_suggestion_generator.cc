@@ -43,8 +43,10 @@ constexpr int kMaxAutocompleteMenuItems = 6;
 }  // namespace
 
 AutocompleteSuggestionGenerator::AutocompleteSuggestionGenerator(
-    scoped_refptr<AutofillWebDataService> profile_database)
-    : profile_database_(profile_database) {}
+    scoped_refptr<AutofillWebDataService> profile_database,
+    bool at_memory_enabled)
+    : profile_database_(profile_database),
+      at_memory_enabled_(at_memory_enabled) {}
 
 AutocompleteSuggestionGenerator::~AutocompleteSuggestionGenerator() {
   CancelPendingQuery();
@@ -183,8 +185,8 @@ void AutocompleteSuggestionGenerator::OnAutofillValuesReturned(
         suggestion.payload = std::move(entry);
         return suggestion;
       });
-  if (base::FeatureList::IsEnabled(features::kShowAutocompleteAtMemoryButton) &&
-      base::FeatureList::IsEnabled(features::kAutofillAtMemory)) {
+  if (at_memory_enabled_ &&
+      base::FeatureList::IsEnabled(features::kShowAutocompleteAtMemoryButton)) {
     suggestions.emplace_back(SuggestionType::kSeparator);
     // TODO(crbug.com/494131942): Localize the string.
     suggestions.emplace_back(u"Try searching in Chrome Memory",

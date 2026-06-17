@@ -91,7 +91,8 @@ EntityDataManagerAndroid::EntityDataManagerAndroid(
 EntityDataManagerAndroid::~EntityDataManagerAndroid() = default;
 
 bool EntityDataManagerAndroid::IsPersonalContextPreferenceVisible(JNIEnv* env) {
-  if (!autofill::AreAutofillPersonalContextFeaturesSupported()) {
+  if (!autofill::AreAutofillPersonalContextFeaturesSupported(
+          google_groups_manager_)) {
     return false;
   }
 

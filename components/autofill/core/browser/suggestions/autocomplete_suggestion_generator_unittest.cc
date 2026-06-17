@@ -42,8 +42,7 @@ class AutocompleteSuggestionGeneratorTest : public testing::Test {
  protected:
   AutocompleteSuggestionGeneratorTest() {
     web_data_service_ = base::MakeRefCounted<MockAutofillWebDataService>();
-    generator_ =
-        std::make_unique<AutocompleteSuggestionGenerator>(web_data_service_);
+    RecreateGenerator();
   }
 
   AutofillClient& client() { return autofill_client_; }
@@ -61,6 +60,11 @@ class AutocompleteSuggestionGeneratorTest : public testing::Test {
     return web_data_service_;
   }
   AutocompleteSuggestionGenerator& generator() { return *generator_; }
+  void RecreateGenerator() {
+    generator_ = std::make_unique<AutocompleteSuggestionGenerator>(
+        web_data_service_,
+        base::FeatureList::IsEnabled(features::kAutofillAtMemory));
+  }
 
  private:
   std::unique_ptr<AutocompleteSuggestionGenerator> generator_;
@@ -189,6 +193,7 @@ TEST_F(AutocompleteSuggestionGeneratorTest,
       /*enabled_features=*/
       {features::kShowAutocompleteAtMemoryButton, features::kAutofillAtMemory},
       /*disabled_features=*/{});
+  RecreateGenerator();
 
   FormFieldData field_data =
       test::CreateTestFormField(/*label=*/"", "Some Field Name", "SomePrefix",
@@ -265,6 +270,7 @@ TEST_F(AutocompleteSuggestionGeneratorTest,
       /*enabled_features=*/
       {features::kShowAutocompleteAtMemoryButton, features::kAutofillAtMemory},
       /*disabled_features=*/{});
+  RecreateGenerator();
 
   FormFieldData field_data =
       test::CreateTestFormField(/*label=*/"", "Some Field Name", "SomePrefix",

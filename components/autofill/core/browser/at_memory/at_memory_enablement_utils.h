@@ -5,6 +5,7 @@
 #ifndef COMPONENTS_AUTOFILL_CORE_BROWSER_AT_MEMORY_AT_MEMORY_ENABLEMENT_UTILS_H_
 #define COMPONENTS_AUTOFILL_CORE_BROWSER_AT_MEMORY_AT_MEMORY_ENABLEMENT_UTILS_H_
 
+class GoogleGroupsManager;
 class PrefService;
 
 namespace personal_context {
@@ -41,6 +42,24 @@ enum class AtMemoryAction {
     personal_context::PersonalContextEnablementService*
         personal_context_service,
     const PrefService* pref_service);
+
+// Returns whether the AtMemory feature is enabled.
+//
+// To be used instead of `base::FeatureList::(features::kAutofillAtMemory)` -
+// use the functions above if you require more extensive permission checks.
+//
+// Since the AtMemory feature has a server-side component, whether the feature
+// works correctly is both installation and GAIA-id specific.
+// Put differently, `base::Feature` has the same state for all installed
+// profiles, but the AtMemory server enforces that the user request has a
+// permitted GAIA id. This function checks that both the `kAutofillAtMemory` is
+// enabled and that `google_groups_manager` confirms that the user is a member
+// of the relevant Google Group.
+//
+// If `google_groups_manager` is null, this falls back to the standard,
+// profile-independent feature check.
+[[nodiscard]] bool IsAtMemoryFeatureEnabled(
+    const GoogleGroupsManager* google_groups_manager);
 
 }  // namespace autofill
 

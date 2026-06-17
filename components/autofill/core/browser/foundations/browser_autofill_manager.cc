@@ -48,6 +48,7 @@
 #include "base/strings/stringprintf.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
+#include "components/autofill/core/browser/at_memory/at_memory_enablement_utils.h"
 #include "components/autofill/core/browser/at_memory/at_memory_manager.h"
 #include "components/autofill/core/browser/autofill_browser_util.h"
 #include "components/autofill/core/browser/autofill_field.h"
@@ -1209,9 +1210,10 @@ void BrowserAutofillManager::OnAskForValuesToFillImpl(
   // TODO(crbug.com/519061643): Rely on central atMemory eligibility logic
   // instead.
   if (IsAtMemoryTriggerSource(trigger_source) &&
-      client().GetPersonalContextEnablementState() ==
-          personal_context::PersonalContextEnablementState::
-              kDisabledNotEligible) {
+      (client().GetPersonalContextEnablementState() ==
+           personal_context::PersonalContextEnablementState::
+               kDisabledNotEligible ||
+       !IsAtMemoryFeatureEnabled(client().GetGoogleGroupsManager()))) {
     return;
   }
 
@@ -3445,7 +3447,8 @@ void BrowserAutofillManager::InitializeSuggestionGenerators(
       client().GetAutocompleteHistoryManager()) {
     suggestion_generators_.push_back(
         std::make_unique<AutocompleteSuggestionGenerator>(
-            client().GetAutocompleteHistoryManager()->GetProfileDatabase()));
+            client().GetAutocompleteHistoryManager()->GetProfileDatabase(),
+            IsAtMemoryFeatureEnabled(client().GetGoogleGroupsManager())));
   }
   if (relevant_filling_products.contains(FillingProduct::kLoyaltyCard) &&
       client().GetValuablesDataManager()) {

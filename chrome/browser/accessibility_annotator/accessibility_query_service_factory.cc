@@ -11,6 +11,7 @@
 #include "chrome/browser/accessibility_annotator/accessibility_query_service_delegate_impl.h"
 #include "chrome/browser/autofill/autofill_entity_data_manager_factory.h"
 #include "chrome/browser/autofill/personal_data_manager_factory.h"
+#include "chrome/browser/metrics/variations/google_groups_manager_factory.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
@@ -18,8 +19,8 @@
 #include "components/accessibility_annotator/core/accessibility_annotator_features.h"
 #include "components/accessibility_annotator/core/accessibility_query_service.h"
 #include "components/accessibility_annotator/core/annotation_reducer/one_p_resolver_impl.h"
+#include "components/autofill/core/browser/at_memory/at_memory_enablement_utils.h"
 #include "components/autofill/core/browser/at_memory/autofill_data_provider_impl.h"
-#include "components/autofill/core/common/autofill_features.h"
 #include "content/public/browser/storage_partition.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
@@ -44,6 +45,7 @@ AccessibilityQueryServiceFactory::AccessibilityQueryServiceFactory()
   DependsOn(autofill::AutofillEntityDataManagerFactory::GetInstance());
   DependsOn(OptimizationGuideKeyedServiceFactory::GetInstance());
   DependsOn(IdentityManagerFactory::GetInstance());
+  DependsOn(GoogleGroupsManagerFactory::GetInstance());
 }
 
 AccessibilityQueryServiceFactory::~AccessibilityQueryServiceFactory() = default;
@@ -51,7 +53,8 @@ AccessibilityQueryServiceFactory::~AccessibilityQueryServiceFactory() = default;
 std::unique_ptr<KeyedService>
 AccessibilityQueryServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
-  if (!base::FeatureList::IsEnabled(autofill::features::kAutofillAtMemory)) {
+  if (!autofill::IsAtMemoryFeatureEnabled(
+          GoogleGroupsManagerFactory::GetForBrowserContext(context))) {
     return nullptr;
   }
 

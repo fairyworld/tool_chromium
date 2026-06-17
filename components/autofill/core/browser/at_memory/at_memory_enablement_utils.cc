@@ -5,11 +5,16 @@
 #include "components/autofill/core/browser/at_memory/at_memory_enablement_utils.h"
 
 #include "base/feature_list.h"
+#include "build/build_config.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/personal_context/core/personal_context_enablement_service.h"
 #include "components/personal_context/core/personal_context_prefs.h"
 #include "components/personal_context/core/personal_context_types.h"
 #include "components/prefs/pref_service.h"
+
+#if !BUILDFLAG(IS_FUCHSIA)
+#include "components/variations/service/google_groups_manager.h"  // nogncheck
+#endif
 
 namespace autofill {
 
@@ -91,6 +96,18 @@ bool MayPerformAtMemoryAction(
   }
 
   return SatisfiesPersonalContextToggleRequirement(action, pref_service);
+}
+
+bool IsAtMemoryFeatureEnabled(
+    const GoogleGroupsManager* google_groups_manager) {
+#if !BUILDFLAG(IS_FUCHSIA)
+  return google_groups_manager
+             ? google_groups_manager->IsFeatureEnabledForProfile(
+                   features::kAutofillAtMemory)
+             : base::FeatureList::IsEnabled(features::kAutofillAtMemory);
+#else
+  return base::FeatureList::IsEnabled(features::kAutofillAtMemory);
+#endif
 }
 
 }  // namespace autofill

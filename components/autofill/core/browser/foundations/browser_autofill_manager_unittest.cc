@@ -1319,6 +1319,7 @@ class BrowserAutofillManagerTest
 };
 
 TEST_F(BrowserAutofillManagerTest, AtMemoryTriggersEmptySuggestions) {
+  base::test::ScopedFeatureList features(features::kAutofillAtMemory);
   FormData form = CreateTestAddressFormData();
   FormsSeen({form});
 
@@ -1332,6 +1333,7 @@ TEST_F(BrowserAutofillManagerTest, AtMemoryTriggersEmptySuggestions) {
 // Tests that when `PersonalContextEnablementState` is `kDisabledNotEligible`
 // for a given profile, the AtMemory popup doesn't trigger.
 TEST_F(BrowserAutofillManagerTest, AtMemoryTriggerDroppedWhenNotEligible) {
+  base::test::ScopedFeatureList features(features::kAutofillAtMemory);
   FormData form = CreateTestAddressFormData();
   FormsSeen({form});
 
