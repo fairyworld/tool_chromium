@@ -9,6 +9,8 @@
 
 // Consumer for AutofillBnplMediator.
 @protocol AutofillBnplConsumer <NSObject>
+// The current state of the BNPL switch.
+@property(nonatomic, assign) BOOL bnplSwitchIsOn;
 @end
 
 #endif  // IOS_CHROME_BROWSER_SETTINGS_AUTOFILL_BNPL_UI_AUTOFILL_BNPL_CONSUMER_H_

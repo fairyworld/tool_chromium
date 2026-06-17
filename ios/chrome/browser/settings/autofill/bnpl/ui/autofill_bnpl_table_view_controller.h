@@ -12,6 +12,9 @@
 
 // Delegate for AutofillBnplTableViewController.
 @protocol AutofillBnplTableViewControllerDelegate
+// Informs the delegate that the BNPL switch has changed value.
+- (void)viewController:(AutofillBnplTableViewController*)controller
+    didChangeBnplSwitchTo:(BOOL)isOn;
 @end
 
 // This class is responsible for displaying the Buy Now Pay Later
