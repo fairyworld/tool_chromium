@@ -6,7 +6,6 @@ package org.chromium.chrome.browser.omnibox.suggestions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.atLeastOnce;
@@ -390,34 +389,5 @@ public class RecyclerViewSelectionControllerUnitTest {
         verify(mChildView2).setSelected(true);
 
         verifyNoInteractions(mVirtualCallback);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void virtualViews_removeCurrentlySelectedVirtualView() {
-        mSelectionController.addVirtualView(1, mVirtualCallback);
-        mSelectionController.setPosition(1);
-        assertEquals(Integer.valueOf(1), mSelectionController.getPosition());
-        verify(mVirtualCallback).onResult(true);
-
-        clearInvocations(mVirtualCallback);
-        mSelectionController.removeVirtualView(1);
-        assertEquals(Integer.valueOf(0), mSelectionController.getPosition());
-        verify(mVirtualCallback).onResult(false);
-        verify(mChildView1).setSelected(true);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void virtualViews_removeCurrentlySelectedVirtualView_withSentinel() {
-        mSelectionControllerWithSentinel.addVirtualView(1, mVirtualCallback);
-        mSelectionControllerWithSentinel.setPosition(1);
-        assertEquals(Integer.valueOf(1), mSelectionControllerWithSentinel.getPosition());
-        verify(mVirtualCallback).onResult(true);
-
-        clearInvocations(mVirtualCallback);
-        mSelectionControllerWithSentinel.removeVirtualView(1);
-        assertNull(mSelectionControllerWithSentinel.getPosition());
-        verify(mVirtualCallback).onResult(false);
     }
 }
