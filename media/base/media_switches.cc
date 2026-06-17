@@ -365,9 +365,15 @@ BASE_FEATURE(kVideoPipForceTrustedForMediaPlaybackForTesting,
              base::FEATURE_DISABLED_BY_DEFAULT);
 #endif  // !BUILDFLAG(IS_ANDROID)
 
-// Enables tracking the occlusion of encrypted video elements.
+// Enables tracking the occlusion of HW secure encrypted video elements.
+// The HW secure check is OS agnostic, but this switch is currently only
+// enabled by default on Windows, and not used for other platforms.
 BASE_FEATURE(kEncryptedMediaOcclusionTracking,
+#if BUILDFLAG(IS_WIN)
+             base::FEATURE_ENABLED_BY_DEFAULT);
+#else
              base::FEATURE_DISABLED_BY_DEFAULT);
+#endif  // BUILDFLAG(IS_WIN)
 
 // Enables extended video bitstream validation for H.264 and H.265.
 BASE_FEATURE(kExtendedVideoBitstreamValidation,
