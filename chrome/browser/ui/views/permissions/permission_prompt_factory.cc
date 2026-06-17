@@ -39,8 +39,23 @@
 
 namespace {
 
-bool IsFullScreenMode(Browser* browser) {
-  DCHECK(browser);
+BrowserWindowInterface* GetBrowser(content::WebContents* web_contents) {
+  tabs::TabInterface* tab =
+      web_contents ? tabs::TabInterface::MaybeGetFromContents(web_contents)
+                   : nullptr;
+  BrowserWindowInterface* browser_window_interface =
+      tab ? tab->GetBrowserWindowInterface() : nullptr;
+  if (!browser_window_interface) {
+    browser_window_interface = webui::GetBrowserWindowInterface(web_contents);
+  }
+  return browser_window_interface;
+}
+
+bool IsFullScreenMode(content::WebContents* web_contents) {
+  BrowserWindowInterface* browser = GetBrowser(web_contents);
+  if (!browser) {
+    return false;
+  }
 
   // PWA uses the title bar as a substitute for LocationBarView.
   if (web_app::AppBrowserController::IsWebApp(browser)) {
@@ -58,7 +73,11 @@ bool IsFullScreenMode(Browser* browser) {
          location_bar->IsFullscreen();
 }
 
-LocationBar* GetLocationBar(Browser* browser) {
+LocationBar* GetLocationBar(content::WebContents* web_contents) {
+  BrowserWindowInterface* browser = GetBrowser(web_contents);
+  if (!browser) {
+    return nullptr;
+  }
   BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser);
   return browser_view ? browser_view->GetLocationBar() : nullptr;
 }
@@ -71,10 +90,8 @@ LocationBar* GetLocationBar(Browser* browser) {
 //      prompts until the Lens Overlay is closed.
 bool ShouldIgnorePermissionRequest(
     content::WebContents* web_contents,
-    Browser* browser,
     permissions::PermissionPrompt::Delegate* delegate) {
   DCHECK(web_contents);
-  DCHECK(browser);
 
   // Allow permission prompts for WebUI pages that should bypass the omnibox
   // empty or editing state check:
@@ -90,18 +107,22 @@ bool ShouldIgnorePermissionRequest(
   }
 
   // Suppress permission prompts if the omnibox is being edited or is empty.
-  LocationBar* location_bar = GetLocationBar(browser);
+  LocationBar* location_bar = GetLocationBar(web_contents);
   bool can_display_prompt = !(location_bar && location_bar->IsEditingOrEmpty());
 
-  LensOverlayController* lens_overlay_controller =
-      browser->tab_strip_model()
-          ->GetActiveTab()
-          ->GetTabFeatures()
-          ->lens_overlay_controller();
-  // Don't show prompt if Lens Overlay is showing
-  // TODO(b/331940245): Refactor to be decoupled from LensOverlayController
-  if (lens_overlay_controller && lens_overlay_controller->IsOverlayShowing()) {
-    can_display_prompt = false;
+  BrowserWindowInterface* browser = GetBrowser(web_contents);
+  if (browser) {
+    LensOverlayController* lens_overlay_controller =
+        browser->GetTabStripModel()
+            ->GetActiveTab()
+            ->GetTabFeatures()
+            ->lens_overlay_controller();
+    // Don't show prompt if Lens Overlay is showing
+    // TODO(b/331940245): Refactor to be decoupled from LensOverlayController
+    if (lens_overlay_controller &&
+        lens_overlay_controller->IsOverlayShowing()) {
+      can_display_prompt = false;
+    }
   }
 
   permissions::PermissionUmaUtil::RecordPermissionPromptAttempt(
@@ -127,8 +148,8 @@ bool ShouldUseChip(permissions::PermissionPrompt::Delegate* delegate) {
       });
 }
 
-bool IsLocationBarDisplayed(Browser* browser) {
-  LocationBar* lb = GetLocationBar(browser);
+bool IsLocationBarDisplayed(content::WebContents* web_contents) {
+  LocationBar* lb = GetLocationBar(web_contents);
   return lb && lb->IsDrawn() && !lb->IsFullscreen();
 }
 
@@ -220,7 +241,7 @@ std::unique_ptr<permissions::PermissionPrompt> CreateNormalPrompt(
                ? std::make_unique<EmbeddedPermissionPrompt>(
                      browser, web_contents, delegate)
                : nullptr;
-  } else if (ShouldUseChip(delegate) && IsLocationBarDisplayed(browser)) {
+  } else if (ShouldUseChip(delegate) && IsLocationBarDisplayed(web_contents)) {
     return std::make_unique<PermissionPromptChip>(browser, web_contents,
                                                   delegate);
   } else {
@@ -234,7 +255,7 @@ std::unique_ptr<permissions::PermissionPrompt> CreateQuietPrompt(
     content::WebContents* web_contents,
     permissions::PermissionPrompt::Delegate* delegate) {
   if (ShouldCurrentRequestUseQuietChip(delegate)) {
-    if (IsLocationBarDisplayed(browser)) {
+    if (IsLocationBarDisplayed(web_contents)) {
       return std::make_unique<PermissionPromptChip>(browser, web_contents,
                                                     delegate);
     } else {
@@ -273,11 +294,11 @@ std::unique_ptr<permissions::PermissionPrompt> CreatePermissionPrompt(
   }
 
   if (delegate->ShouldDropCurrentRequestIfCannotShowQuietly() &&
-      IsFullScreenMode(browser)) {
+      IsFullScreenMode(web_contents)) {
     return nullptr;
   }
 
-  if (ShouldIgnorePermissionRequest(web_contents, browser, delegate)) {
+  if (ShouldIgnorePermissionRequest(web_contents, delegate)) {
     return nullptr;
   }
 
