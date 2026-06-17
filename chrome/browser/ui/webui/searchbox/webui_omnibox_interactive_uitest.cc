@@ -47,6 +47,7 @@
 #include "components/contextual_search/pref_names.h"
 #include "components/keyed_service/content/browser_context_dependency_manager.h"
 #include "components/omnibox/browser/aim_eligibility_service.h"
+#include "components/omnibox/browser/aim_eligibility_service_features.h"
 #include "components/omnibox/browser/omnibox_field_trial.h"
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/prefs/pref_service.h"
@@ -124,8 +125,6 @@ class OmniboxWebUiInteractiveTestBase
           {omnibox::kShowLensSearchChip.name, "true"}};
       features.emplace_back(omnibox::internal::kWebUIOmniboxSimplification,
                             simplification_params);
-      features.emplace_back(omnibox::kAiModeOmniboxEntryPoint,
-                            base::FieldTrialParams());
       features.emplace_back(omnibox::kAimEnabled, base::FieldTrialParams());
       features.emplace_back(
           features::kPageActionsMigration,

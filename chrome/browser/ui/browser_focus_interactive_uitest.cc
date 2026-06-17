@@ -168,14 +168,6 @@ DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kWebContentsId);
 
 class BrowserFocusTest : public InteractiveBrowserTest {
  public:
-  BrowserFocusTest() {
-    // TODO(crbug.com/441102004): `kAiModeOmniboxEntryPoint` changes the focus
-    //   and popup opening order of the omnibox. If it launches, update the
-    //   tests to match the new expectations.
-    scoped_feature_list_.InitAndDisableFeature(
-        omnibox::kAiModeOmniboxEntryPoint);
-  }
-
   // InteractiveBrowserTest overrides:
   void SetUpOnMainThread() override {
     ASSERT_TRUE(embedded_test_server()->Start());
@@ -356,9 +348,14 @@ IN_PROC_BROWSER_TEST_F(BrowserFocusTest, TabsRememberFocus) {
       ViewID vid =
           kFocusPage[i][j % 5] ? VIEW_ID_TAB_CONTAINER : VIEW_ID_OMNIBOX;
       ui_test_utils::WaitForViewFocus(browser(), vid, true);
-
       ASSERT_TRUE(ui_test_utils::SendKeyPressSync(browser(), ui::VKEY_TAB, true,
                                                   false, false, false));
+      // Wait for tab switch to complete.
+      int expected_next_tab = (j + 1) % 5;
+      ASSERT_TRUE(base::test::RunUntil([&]() {
+        return browser()->tab_strip_model()->active_index() ==
+               expected_next_tab;
+      }));
     }
 
     // As above, but with ctrl+shift+tab.
@@ -369,9 +366,14 @@ IN_PROC_BROWSER_TEST_F(BrowserFocusTest, TabsRememberFocus) {
       ViewID vid =
           kFocusPage[i][j % 5] ? VIEW_ID_TAB_CONTAINER : VIEW_ID_OMNIBOX;
       ui_test_utils::WaitForViewFocus(browser(), vid, true);
-
       ASSERT_TRUE(ui_test_utils::SendKeyPressSync(browser(), ui::VKEY_TAB, true,
                                                   true, false, false));
+      // Wait for tab switch to complete.
+      int expected_next_tab = (j + 4) % 5;
+      ASSERT_TRUE(base::test::RunUntil([&]() {
+        return browser()->tab_strip_model()->active_index() ==
+               expected_next_tab;
+      }));
     }
   }
 }

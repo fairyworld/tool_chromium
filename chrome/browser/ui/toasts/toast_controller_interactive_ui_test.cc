@@ -123,10 +123,7 @@ class ToastControllerInteractiveTest : public InteractiveBrowserTest {
         {toast_features::kLinkCopiedToast, toast_features::kImageCopiedToast,
          toast_features::kReadingListToast,
          plus_addresses::features::kPlusAddressesEnabled},
-        // Disable `kAiModeOmniboxEntryPoint` as it changes the focus and popup
-        // opening order of the omnibox. If it launches, updates the tests to
-        // match the new expectations.
-        {omnibox::kAiModeOmniboxEntryPoint});
+        {});
     InteractiveBrowserTest::SetUp();
   }
 

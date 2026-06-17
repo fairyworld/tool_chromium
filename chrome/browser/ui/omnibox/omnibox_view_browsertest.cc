@@ -57,6 +57,7 @@
 #include "components/contextual_tasks/public/mock_contextual_tasks_service.h"
 #include "components/history/core/browser/history_service.h"
 #include "components/lens/lens_features.h"
+#include "components/omnibox/browser/aim_eligibility_service_features.h"
 #include "components/omnibox/browser/autocomplete_input.h"
 #include "components/omnibox/browser/autocomplete_match.h"
 #include "components/omnibox/browser/history_quick_provider.h"
@@ -181,11 +182,7 @@ const int kCtrlOrCmdMask = ui::EF_CONTROL_DOWN;
 
 class OmniboxViewTest : public InProcessBrowserTest {
  public:
-  OmniboxViewTest() {
-    scoped_feature_list_.InitAndDisableFeature(
-        omnibox::kAiModeOmniboxEntryPoint);
-  }
-
+  OmniboxViewTest() = default;
   OmniboxViewTest(const OmniboxViewTest&) = delete;
   OmniboxViewTest& operator=(const OmniboxViewTest&) = delete;
 
@@ -1732,10 +1729,8 @@ INSTANTIATE_TEST_SUITE_P(All,
 class OmniboxViewAiModeTest : public OmniboxViewTest {
  public:
   OmniboxViewAiModeTest() {
-    ai_mode_feature_list_.InitWithFeatures(
-        {omnibox::kAiModeOmniboxEntryPoint,
-         lens::features::kLensSendUrlsInComposeboxes},
-        {});
+    ai_mode_feature_list_.InitAndEnableFeature(
+        lens::features::kLensSendUrlsInComposeboxes);
   }
 
  private:

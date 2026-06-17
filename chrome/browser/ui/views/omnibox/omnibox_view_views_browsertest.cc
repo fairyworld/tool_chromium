@@ -52,6 +52,7 @@
 #include "components/contextual_tasks/public/features.h"
 #include "components/keyed_service/core/keyed_service.h"
 #include "components/lens/lens_features.h"
+#include "components/omnibox/browser/aim_eligibility_service_features.h"
 #include "components/omnibox/browser/autocomplete_match.h"
 #include "components/omnibox/browser/location_bar_model.h"
 #include "components/omnibox/browser/mock_aim_eligibility_service.h"
@@ -131,10 +132,7 @@ class OmniboxViewViewsTest : public InProcessBrowserTest {
   OmniboxViewViewsTest& operator=(const OmniboxViewViewsTest&) = delete;
 
  protected:
-  OmniboxViewViewsTest() {
-    scoped_feature_list_.InitAndDisableFeature(
-        omnibox::kAiModeOmniboxEntryPoint);
-  }
+  OmniboxViewViewsTest() = default;
   ~OmniboxViewViewsTest() override = default;
 
   void SetUpOnMainThread() override {
@@ -1538,14 +1536,7 @@ class OmniboxViewViewsHintTextLimitingBrowserTest
     : public OmniboxViewViewsAIMBrowserTest {
  public:
   OmniboxViewViewsHintTextLimitingBrowserTest() {
-    scoped_feature_list_.InitWithFeaturesAndParameters(
-        {
-            {omnibox::kAiModeOmniboxEntryPoint,
-             {{"AimHintImpressionLimitDaily", "2"},
-              {"AimHintImpressionLimitTotal", "5"},
-              {"EnableHintImpressionLimits", "true"}}},
-        },
-        {lens::features::kLensOverlay});
+    scoped_feature_list_.InitAndDisableFeature(lens::features::kLensOverlay);
   }
 
  protected:
@@ -1644,18 +1635,20 @@ IN_PROC_BROWSER_TEST_F(OmniboxViewViewsHintTextLimitingBrowserTest,
       &GetMockTime, /* time_ticks_override */ nullptr,
       /* thread_ticks_override */ nullptr);
 
-  // Two impressions to hit the daily limit of 2.
+  // Three impressions to hit the daily limit of 3.
   FocusAndPaint();
   ClickBrowserWindowCenter();
   FocusAndPaint();
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 2);
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 2);
+  ClickBrowserWindowCenter();
+  FocusAndPaint();
+  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 3);
+  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 3);
 
   // Try to record another impression. Prefs should not change.
   ClickBrowserWindowCenter();
   FocusAndPaint();
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 2);
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 2);
+  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 3);
+  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 3);
 }
 
 IN_PROC_BROWSER_TEST_F(OmniboxViewViewsHintTextLimitingBrowserTest,
@@ -1666,11 +1659,11 @@ IN_PROC_BROWSER_TEST_F(OmniboxViewViewsHintTextLimitingBrowserTest,
       /* thread_ticks_override */ nullptr);
 
   // Hit the total limit.
-  prefs()->SetInteger(omnibox::kAimHintTotalImpressions, 5);
+  prefs()->SetInteger(omnibox::kAimHintTotalImpressions, 15);
 
   // Try to record another impression. Prefs should not change.
   FocusAndPaint();
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 5);
+  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 15);
   // Daily count should not have been reset or incremented.
   EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 0);
 }
@@ -1692,34 +1685,12 @@ IN_PROC_BROWSER_TEST_F(OmniboxViewViewsHintTextLimitingBrowserTest,
   EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 2);
 }
 
-class OmniboxViewViewsHintTextLimitingDisabledBrowserTest
-    : public OmniboxViewViewsHintTextLimitingBrowserTest {
- public:
-  OmniboxViewViewsHintTextLimitingDisabledBrowserTest() {
-    scoped_feature_list_.InitWithFeaturesAndParameters(
-        {{omnibox::kAiModeOmniboxEntryPoint,
-          {{"EnableHintImpressionLimits", "false"}}}},
-        {lens::features::kLensOverlay});
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
-IN_PROC_BROWSER_TEST_F(OmniboxViewViewsHintTextLimitingDisabledBrowserTest,
-                       HintTextPrefsNoIncrementWhenDisabled) {
-  FocusAndPaint();
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintTotalImpressions), 0);
-  EXPECT_EQ(prefs()->GetInteger(omnibox::kAimHintDailyImpressionsCount), 0);
-}
-
 class OmniboxViewViewsAIMButtonPreferenceTest
     : public OmniboxViewViewsAIMBrowserTest {
  public:
   OmniboxViewViewsAIMButtonPreferenceTest() {
     scoped_feature_list_.InitWithFeaturesAndParameters(
-        {{omnibox::kAiModeOmniboxEntryPoint, {}},
-         {features::kPageActionsMigration, {}}},
+        {{features::kPageActionsMigration, {}}},
         {lens::features::kLensOverlay});
   }
 
