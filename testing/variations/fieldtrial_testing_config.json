@@ -9721,7 +9721,8 @@
                 {
                     "name": "Enabled",
                     "enable_features": [
-                        "EnableAppBackgroundRefresh"
+                        "EnableAppBackgroundRefresh",
+                        "MigrateIOSKeychainAccessibility"
                     ]
                 }
             ]
@@ -16252,21 +16253,6 @@
                     "name": "Enabled",
                     "enable_features": [
                         "MigrateToBlockV8OptimizerOnUnfamiliarSites"
-                    ]
-                }
-            ]
-        }
-    ],
-    "MigrateIOSKeychainAccessibility": [
-        {
-            "platforms": [
-                "ios"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "MigrateIOSKeychainAccessibility"
                     ]
                 }
             ]
