@@ -4,6 +4,8 @@
 
 static_library("network_header_injection") {
   sources = [
+    "http_header_injection_client.cc",
+    "http_header_injection_client.h",
     "http_header_injection_service_factory.cc",
     "http_header_injection_service_factory.h",
   ]
@@ -14,5 +16,27 @@ static_library("network_header_injection") {
     "//components/enterprise/network_header_injection/core",
     "//components/keyed_service/core",
     "//components/prefs",
+    "//services/network/public/cpp",
+    "//services/network/public/mojom",
+    "//url",
+  ]
+}
+
+source_set("unit_tests") {
+  testonly = true
+
+  sources = [ "http_header_injection_client_unittest.cc" ]
+
+  deps = [
+    ":network_header_injection",
+    "//base",
+    "//base/test:test_support",
+    "//chrome/test:test_support",
+    "//components/enterprise/network_header_injection/core",
+    "//components/prefs:test_support",
+    "//content/test:test_support",
+    "//services/network:test_support",
+    "//services/network/public/cpp",
+    "//testing/gtest",
   ]
 }

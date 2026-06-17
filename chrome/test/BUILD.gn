@@ -7021,6 +7021,7 @@ test("unit_tests") {
 
   if (is_win || is_mac || is_linux || is_chromeos) {
     deps += [
+      "//chrome/browser/enterprise/network_header_injection:unit_tests",
       "//chrome/browser/multistep_filter:unit_tests",
       "//chrome/browser/skills:unit_tests",
       "//chrome/browser/ui/read_anything:unit_tests",
