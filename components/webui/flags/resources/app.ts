@@ -28,6 +28,22 @@ import {FlagsBrowserProxyImpl} from './flags_browser_proxy.js';
 
 
 /**
+ * Map of updated flag entry names to redirect legacy hashes to new hashes.
+ * TODO(crbug.com/524236481): Remove built-in AI API flag entries by June 2027.
+ */
+// LINT.IfChange(FLAG_REDIRECTS)
+const FLAG_REDIRECTS: Record<string, string> = {
+  '#classifier-api-for-tiny-model': '#classifier-api',
+  '#prompt-api-for-gemini-nano': '#prompt-api',
+  '#prompt-api-for-gemini-nano-multimodal-input':
+      '#prompt-api-multimodal-input',
+  '#rewriter-api-for-gemini-nano': '#rewriter-api',
+  '#summarizer-api-for-gemini-nano': '#summarizer-api',
+  '#writer-api-for-gemini-nano': '#writer-api',
+};
+// LINT.ThenChange(//components/webui/flags/flags_state.cc:kRenamedFlags)
+
+/**
  * Goes through all experiment text and highlights the relevant matches.
  * Only the first instance of a match in each experiment text block is
  * highlighted. This prevents the sea of yellow that happens using the
@@ -156,6 +172,7 @@ export class FlagsAppElement extends CrLitElement {
   private announceStatusDelayMs: number = 100;
   private featuresResolver: PromiseResolver<void> = new PromiseResolver();
   private flagSearch: FlagSearch|null = null;
+  private flagsRedirects_: Record<string, string> = FLAG_REDIRECTS;
   private lastChanged: HTMLElement|null = null;
   // <if expr="not is_ios">
   private lastFocused: HTMLElement|null = null;
@@ -305,6 +322,10 @@ export class FlagsAppElement extends CrLitElement {
     this.flagSearch.setSearchDebounceDelayMsForTesting(delay);
   }
 
+  setFlagRedirectsForTesting(redirects: Record<string, string>) {
+    this.flagsRedirects_ = redirects;
+  }
+
   experimentalFeaturesReadyForTesting() {
     return this.featuresResolver.promise;
   }
@@ -410,12 +431,19 @@ export class FlagsAppElement extends CrLitElement {
       return;
     }
 
+    let hash = window.location.hash;
+    const redirectedHash = this.flagsRedirects_[hash];
+    if (redirectedHash) {
+      hash = redirectedHash;
+      window.history.replaceState(null, '', hash);
+    }
+
     let experiment = null;
     try {
-      experiment = this.shadowRoot.querySelector(window.location.hash);
+      experiment = this.shadowRoot.querySelector(hash);
     } catch {
       // Remove invalid hash from the URL.
-      window.history.replaceState(null, '', window.location.origin);
+      window.history.replaceState(null, '', window.location.pathname);
       return;
     }
     if (!experiment || experiment.classList.contains('referenced')) {
