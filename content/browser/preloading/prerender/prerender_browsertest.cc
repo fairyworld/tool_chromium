@@ -18255,7 +18255,7 @@ class PrerenderActivationBeaconBrowserTest
 
   void SetBeaconCallback(const GURL& url, base::OnceClosure callback) {
     DCHECK_CURRENTLY_ON(BrowserThread::UI);
-    if (seen_beacons_.contains(url)) {
+    if (GetBeaconRequestCount(url) > 0) {
       std::move(callback).Run();
       return;
     }
@@ -18264,7 +18264,13 @@ class PrerenderActivationBeaconBrowserTest
 
   bool WasBeaconSeen(const GURL& url) {
     DCHECK_CURRENTLY_ON(BrowserThread::UI);
-    return seen_beacons_.contains(url);
+    return GetBeaconRequestCount(url) > 0;
+  }
+
+  int GetBeaconRequestCount(const GURL& url) {
+    DCHECK_CURRENTLY_ON(BrowserThread::UI);
+    auto it = beacon_request_counts_.find(url);
+    return it != beacon_request_counts_.end() ? it->second : 0;
   }
 
  private:
@@ -18337,7 +18343,7 @@ class PrerenderActivationBeaconBrowserTest
 
   void SetBeaconSeenOnUIThread(const GURL& url) {
     DCHECK_CURRENTLY_ON(BrowserThread::UI);
-    seen_beacons_.insert(url);
+    beacon_request_counts_[url]++;
     auto it = beacon_callbacks_.find(url);
     if (it != beacon_callbacks_.end()) {
       auto cb = std::move(it->second);
@@ -18350,7 +18356,7 @@ class PrerenderActivationBeaconBrowserTest
 
   // These must only be accessed on the UI thread.
   std::map<GURL, base::OnceClosure> beacon_callbacks_;
-  std::set<GURL> seen_beacons_;
+  std::map<GURL, int> beacon_request_counts_;
 };
 
 IN_PROC_BROWSER_TEST_P(PrerenderActivationBeaconBrowserTest,
@@ -18509,7 +18515,8 @@ class PrefetchToPrerenderActivationBeaconBrowserTest
  public:
   PrefetchToPrerenderActivationBeaconBrowserTest() {
     std::vector<base::test::FeatureRef> enabled_features = {
-        features::kPrefetchTesting, features::kPrefetchActivationBeacon};
+        features::kPrefetchTesting, features::kPrefetchActivationBeacon,
+        features::kPrerenderActivationBeacon};
     std::vector<base::test::FeatureRef> disabled_features;
 
     if (GetParam()) {
@@ -18570,6 +18577,7 @@ IN_PROC_BROWSER_TEST_P(PrefetchToPrerenderActivationBeaconBrowserTest,
   beacon_run_loop.Run();
 
   EXPECT_TRUE(WasBeaconSeen(beacon_url));
+  EXPECT_EQ(GetBeaconRequestCount(beacon_url), 1);
 }
 
 IN_PROC_BROWSER_TEST_P(PrerenderActivationBeaconBrowserTest,

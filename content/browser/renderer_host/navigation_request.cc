@@ -4896,9 +4896,13 @@ void NavigationRequest::OnResponseStarted(
         response_head_->was_in_prefetch_cache ||
         response_head_->navigation_delivery_type ==
             network::mojom::NavigationDeliveryType::kNavigationalPrefetch;
+    bool is_prerender_activation_sending_beacon =
+        IsPrerenderedPageActivation() &&
+        base::FeatureList::IsEnabled(features::kPrerenderActivationBeacon);
     if (is_prefetched && endpoint.is_valid() &&
         url::Origin::Create(endpoint).IsSameOriginWith(
-            url::Origin::Create(GetURL()))) {
+            url::Origin::Create(GetURL())) &&
+        !is_prerender_activation_sending_beacon) {
       activation_beacon_url_ = endpoint;
     }
   }
