@@ -6695,6 +6695,18 @@ Called by update_autofill_enums.py. This is a manual comment.-->
   </summary>
 </histogram>
 
+<histogram name="Autofill.ProfileImport.SilentUpdateFieldMergeCategoryBitmask"
+    enum="AutofillSilentUpdateFieldMergeCategory" expires_after="2027-05-05">
+  <owner>perkowski@google.com</owner>
+  <owner>chrome-autofill-alerts@google.com</owner>
+  <summary>
+    Records the reasons for the `kSilentUpdate` type import. If the value is 0,
+    then there was no known reason for silent update. Metadata-only silent
+    updates don't record this metric. Emitted once per silently updated profile
+    at the end of an import process once the import decision is final.
+  </summary>
+</histogram>
+
 <histogram name="Autofill.ProfileImport.SilentUpdatesProfileImportType"
     enum="AutofillProfileImportType" expires_after="2026-11-15">
   <owner>koerber@google.com</owner>

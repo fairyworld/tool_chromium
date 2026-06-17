@@ -4143,6 +4143,22 @@ Called by update_autofill_enums.py.-->
   <int value="13" label="AlternativeName"/>
 </enum>
 
+<enum name="AutofillSilentUpdateFieldMergeCategory">
+  <int value="0" label="No categories matched (Other)"/>
+  <int value="1" label="Capitalization update only"/>
+  <int value="2" label="Diacritic and capitalization update only"/>
+  <int value="3"
+      label="(Error) Capitalization only and Capitalization and diacritic
+             only update"/>
+  <int value="4" label="Empty to non-empty update only"/>
+  <int value="5" label="Capitalization and empty to non-empty update"/>
+  <int value="6"
+      label="Diacritic and capitalization, and empty to non-empty update"/>
+  <int value="7"
+      label="(Error) Capitalization only and Capitalization and diacritic
+             only and empty to non-empty update"/>
+</enum>
+
 <enum name="AutofillSingleEntryRemovalMethod">
   <int value="0" label="Keyboard shift + delete pressed"/>
   <int value="1" label="Delete button clicked"/>
