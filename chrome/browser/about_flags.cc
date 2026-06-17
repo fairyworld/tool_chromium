@@ -1932,45 +1932,29 @@ constexpr FeatureEntry::FeatureParam kOmniboxDiagInputConnection[]{
 constexpr FeatureEntry::FeatureVariation kOmniboxDiagnosticsAndroidVaiants[] = {
     {"- InputConnection", kOmniboxDiagInputConnection, nullptr}};
 
-const FeatureEntry::FeatureParam kOmniboxAimCompactFusebox[] = {
-    {"compact_fusebox", "true"}};
 const FeatureEntry::FeatureParam kOmniboxAimRedirectComposeplate[] = {
     {"redirect_composeplate_button", "true"}};
 const FeatureEntry::FeatureParam kOmniboxAimModelPickerAndCanvas[] = {
     {"show_model_picker", "true"}};
-const FeatureEntry::FeatureParam kOmniboxAimModelPickerCompact[] = {
+const FeatureEntry::FeatureParam kOmniboxAimModelPickerBottomSheet_1[] = {
     {"show_model_picker", "true"},
-    {"compact_fusebox", "true"}};
-const FeatureEntry::FeatureParam kOmniboxAimModelPickerCompactBottomSheet_1[] =
-    {{"show_model_picker", "true"},
-     {"compact_fusebox", "true"},
-     {"show_bottom_sheet_popup", "true"},
-     {"show_ntp_plus_button", "true"},
-     {"use_ask_hint_for_ntp", "true"}};
-const FeatureEntry::FeatureParam kOmniboxAimModelPickerCompactBottomSheet_2[] =
-    {{"show_model_picker", "true"},
-     {"compact_fusebox", "true"},
-     {"show_bottom_sheet_popup", "true"},
-     {"show_ntp_plus_button", "true"},
-     {"use_ask_hint_for_ntp", "false"}};
-const FeatureEntry::FeatureParam kOmniboxAimModelPickerCompactBottomSheet_3[] =
-    {{"show_model_picker", "true"},
-     {"compact_fusebox", "true"},
-     {"show_bottom_sheet_popup", "true"},
-     {"show_ntp_plus_button", "false"},
-     {"use_ask_hint_for_ntp", "false"}};
+    {"show_bottom_sheet_popup", "true"},
+    {"show_ntp_plus_button", "true"},
+    {"use_ask_hint_for_ntp", "true"}};
+const FeatureEntry::FeatureParam kOmniboxAimModelPickerBottomSheet_2[] = {
+    {"show_model_picker", "true"},
+    {"show_bottom_sheet_popup", "true"},
+    {"show_ntp_plus_button", "true"}};
+const FeatureEntry::FeatureParam kOmniboxAimModelPickerBottomSheet_3[] = {
+    {"show_model_picker", "true"},
+    {"show_bottom_sheet_popup", "true"}};
 
 const FeatureEntry::FeatureVariation kOmniboxMultimodalInputVariants[] = {
-    {"Compact", kOmniboxAimCompactFusebox, nullptr},
     {"Redirect Composeplate", kOmniboxAimRedirectComposeplate, nullptr},
     {"Model Picker & Tools", kOmniboxAimModelPickerAndCanvas, nullptr},
-    {"Model Picker Compact", kOmniboxAimModelPickerCompact, nullptr},
-    {"^ + Bottom Sheet (1)", kOmniboxAimModelPickerCompactBottomSheet_1,
-     nullptr},
-    {"^ + Bottom Sheet (2)", kOmniboxAimModelPickerCompactBottomSheet_2,
-     nullptr},
-    {"^ + Bottom Sheet (3)", kOmniboxAimModelPickerCompactBottomSheet_3,
-     nullptr},
+    {"^ + Bottom Sheet (1)", kOmniboxAimModelPickerBottomSheet_1, nullptr},
+    {"^ + Bottom Sheet (2)", kOmniboxAimModelPickerBottomSheet_2, nullptr},
+    {"^ + Bottom Sheet (3)", kOmniboxAimModelPickerBottomSheet_3, nullptr},
 };
 const FeatureEntry::FeatureParam kOmniboxMultilineEditFieldForAutocomplete[] = {
     {"wrap_autocomplete_text", "true"}};
