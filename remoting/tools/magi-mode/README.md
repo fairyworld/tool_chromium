@@ -31,26 +31,36 @@ Think of it as a multi-threaded validation pipeline:
 
 ## Why use MAGI?
 
-- **Context Efficiency:** By isolating agents to specific tasks and
-  communicating through strict JSON contracts on disk, MAGI prevents the
-  "context bloat" that causes standard AIs to forget instructions.
-- **Specialized Expertise:** Instead of one generalist, you get focused experts
-  (e.g., "Windows C++ Security Expert") who evaluate code against strict,
-  domain-specific checklists.
-- **Built-in TDD:** Code isn't written until failing tests are established and
-  verified to fail.
-- **Self-Improving (Manual Workflow):** If the team misses a bug, the developer
-  can manually invoke **Training** to analyze the failure and permanently
-  upgrade the relevant Scanner checklists for future runs.
-- **Deterministic Verification:** Progress is measured by a strict Boolean state
-  machine. Code doesn't ship until all experts flip their checklist items to
-  `true`.
+Stochastic LLMs are powerful generators, but they lack the deterministic
+verification and domain specialization necessary to maintain high engineering
+standards in large, complex codebases. Left unguided, they frequently introduce
+regressions, memory safety bugs, or threading violations.
+
+MAGI solves this by bringing **systematic engineering rigor** to LLM-driven
+coding:
+
+- **Context Isolation & Efficiency:** By isolating agents to specific, narrow
+  tasks and communicating through strict JSON contracts on disk, MAGI prevents
+  the "context bloat" that causes standard AIs to forget instructions.
+- **Specialized Expert Scanners:** Instead of a single generalist, code is
+  audited against strict, domain-specific checklists by specialized virtual
+  experts (e.g., "C++ Security Expert", "Concurrency Expert").
+- **Strict Test-Driven Development (TDD):** Code is not synthesized until
+  failing test boundaries are established and verified to fail on mock/stubbed
+  implementations first.
+- **Consensus-Driven Verification:** Progress is governed by a deterministic
+  boolean state machine. Changes cannot be deployed until all selected experts
+  audit the output and assert `true` for all checklist items.
+- **Training Loops:** Gaps in knowledge found during reviews can be codified
+  back into the expert checklists (via a manual Training phase), permanently
+  improving the model's future performance.
 
 ## How to Invoke
 
-When interacting with the Gemini CLI, simply request:
+To trigger the MAGI workflow, describe your task—especially if it is complex,
+multi-platform, or security-sensitive—and request the skill. For example:
 
-> "I have a complex IPC issue in the Windows host that's causing deadlocks.
+> "I have a complex IPC issue in the Windows service that's causing deadlocks.
 > Please invoke the magi-mode skill to investigate and fix it."
 
 The Orchestrator will handle the rest, keeping you informed at every major

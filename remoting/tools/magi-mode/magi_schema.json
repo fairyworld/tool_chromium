@@ -96,6 +96,10 @@
         },
         "output_directory": {
           "type": "string"
+        },
+        "temp_directory": {
+          "type": "string",
+          "description": "The workspace-relative path to a directory where interim files are stored."
         }
       },
       "required": [
@@ -105,7 +109,8 @@
         "use_reclient",
         "is_debug_build",
         "repo_type",
-        "output_directory"
+        "output_directory",
+        "temp_directory"
       ]
     },
     "StateBlock": {

@@ -12,10 +12,10 @@ protocol.
   "execution_path": "RIGOR_PATH",
   "complexity_level": "MEDIUM",
   "goal": "A one-sentence summary of the fix/feature.",
-  "target_files": ["Absolute paths to the files that must be modified."],
+  "target_files": ["Repository-relative paths to the files that must be modified (e.g., ['chrome/browser/...'])."],
   "anti_goals": ["What should explicitly NOT be changed."],
   "edge_cases": ["Specific warnings from logs or code context."],
-  "build_targets": ["//remoting:remoting_unittests"],
+  "build_targets": ["//chrome:chrome"],
   "context_resolved": true,
   "approach_confirmed": true,
   "ambiguity_level": "LOW",
@@ -26,7 +26,8 @@ protocol.
     "orchestration_pattern": "CENTRALIZED",
     "use_reclient": true,
     "is_debug_build": true,
-    "output_directory": "out/Default"
+    "output_directory": "out/Default",
+    "temp_directory": "agents/skills/magi-mode/.temp"
   }
 }
 ```

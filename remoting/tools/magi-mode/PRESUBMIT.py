@@ -481,11 +481,12 @@ def CheckJsonFiles(input_api, output_api):
             fmt_ok, lint_errs = check_json_format.CheckFormatting(
                 f.AbsoluteLocalPath(), fix=False)
             if not fmt_ok:
+                local_check_script = input_api.os_path.join(
+                    input_api.PresubmitLocalPath(), 'check_json_format.py')
                 results.append(
                     output_api.PresubmitError(
                         f'File {f.LocalPath()} has incorrect JSON '
-                        'formatting. Please run: python3 '
-                        'remoting/tools/magi-mode/check_json_format.py '
+                        f'formatting. Please run: python3 {local_check_script} '
                         '--fix'))
             for err in lint_errs:
                 results.append(output_api.PresubmitError(f'LINT: {err}'))
@@ -610,6 +611,20 @@ def CheckJsonFiles(input_api, output_api):
                                 f'a string, got {type(output_directory).__name__}'
                             ))
 
+                    temp_directory = environment.get('temp_directory')
+                    if 'temp_directory' not in environment:
+                        results.append(
+                            output_api.PresubmitError(
+                                f'File {f.LocalPath()} environment is '
+                                'missing required key "temp_directory".'))
+                    elif not isinstance(temp_directory, str):
+                        results.append(
+                            output_api.PresubmitError(
+                                f'File {f.LocalPath()} '
+                                'environment.temp_directory must be '
+                                f'a string, got {type(temp_directory).__name__}'
+                            ))
+
         elif filename.startswith('constraints'):
             if next_p and next_p not in [
                     'SYNTHESIS', 'VALIDATION', 'ESCALATION'
@@ -627,11 +642,12 @@ def CheckTestJsonFiles(input_api, output_api):
     magi_dir = input_api.PresubmitLocalPath()
 
     def FileFilter(affected_file):
-        return input_api.FilterSourceFile(
-            affected_file,
-            files_to_check=(r".*remoting/tools/magi-mode/tests/"
-                            r"magi_stage_.*_tests\.json$", ),
-        )
+        absolute_path = affected_file.AbsoluteLocalPath()
+        expected_dir = input_api.os_path.join(magi_dir, 'tests')
+        filename = input_api.os_path.basename(absolute_path)
+        return input_api.os_path.dirname(
+            absolute_path) == expected_dir and bool(
+                re.match(r'^magi_stage_.*_tests\.json$', filename))
 
     for f in input_api.AffectedFiles(file_filter=FileFilter,
                                      include_deletes=False):

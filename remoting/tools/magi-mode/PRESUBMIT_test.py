@@ -414,7 +414,8 @@ class MagiPresubmitTest(unittest.TestCase):
             '"execution_path": "RIGOR_PATH", '
             '"complexity_level": "MEDIUM", '
             '"environment": {"repo_type": "CHROMIUM", "vcs": "JJ", '
-            '"harness": "JETSKI", "output_directory": "out/Default"}}')
+            '"harness": "JETSKI", "output_directory": "out/Default", "temp_directory": "remoting/tools/magi-mode/.temp"}}'
+        )
         self.mock_input.affected_files = [
             MockAffectedFile('remoting/tools/magi-mode/project.magi.json')
         ]
@@ -723,6 +724,40 @@ class MagiPresubmitTest(unittest.TestCase):
                 any('environment.output_directory must be a string' in r
                     for r in results))
 
+        # Missing temp_directory
+        invalid_env_4 = (
+            '{"task_type": "IMPLEMENTATION", "goal": "Test", "target_files": [], '
+            '"anti_goals": [], "edge_cases": [], '
+            '"environment": {"vcs": "JJ", "harness": "JETSKI", "repo_type": "CHROMIUM", "output_directory": "out/Default"}}'
+        )
+        self.mock_input.files_content = {
+            'remoting/tools/magi-mode/project.magi.json': invalid_env_4
+        }
+        with patch('builtins.open',
+                   unittest.mock.mock_open(read_data=schema_json)):
+            results = PRESUBMIT.CheckJsonFiles(self.mock_input,
+                                               self.mock_output)
+            self.assertTrue(
+                any('environment is missing required key "temp_directory"' in r
+                    for r in results))
+
+        # Invalid temp_directory type
+        invalid_env_5 = (
+            '{"task_type": "IMPLEMENTATION", "goal": "Test", "target_files": [], '
+            '"anti_goals": [], "edge_cases": [], '
+            '"environment": {"vcs": "JJ", "harness": "JETSKI", "repo_type": "CHROMIUM", "output_directory": "out/Default", "temp_directory": 123}}'
+        )
+        self.mock_input.files_content = {
+            'remoting/tools/magi-mode/project.magi.json': invalid_env_5
+        }
+        with patch('builtins.open',
+                   unittest.mock.mock_open(read_data=schema_json)):
+            results = PRESUBMIT.CheckJsonFiles(self.mock_input,
+                                               self.mock_output)
+            self.assertTrue(
+                any('environment.temp_directory must be a string' in r
+                    for r in results))
+
     def testCheckTestJsonFiles(self):
         # Valid test JSON
         valid_json = ('{"name": "Test", "base_inputs": {}, "cases": ['
@@ -752,9 +787,9 @@ class MagiPresubmitTest(unittest.TestCase):
 
         # Invalid override_inputs
         invalid_override_json = (
-            '{"name": "Test", "base_inputs": {}, "cases": ['
-            '{"name": "Case 1", "expected_outputs": {}, "override_inputs": {"invalid_key": {}}}]}'
-        )
+            '{"name": "Test", "base_inputs": {}, "cases": [{'
+            '"name": "Case 1", "expected_outputs": {}, '
+            '"override_inputs": {"invalid_key": {}}}]}')
         self.mock_input.files_content = {
             'remoting/tools/magi-mode/tests/magi_stage_generate_tests.json':
             invalid_override_json

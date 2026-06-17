@@ -109,13 +109,28 @@ class MockOutputApi:
             return f"PROMPT/NOTIFY: {self.message}"
 
 
+def find_repo_root(start_dir):
+    current = start_dir
+    while True:
+        if os.path.exists(os.path.join(current, '.git')) or os.path.exists(
+                os.path.join(current, '.jj')):
+            return current
+        parent = os.path.dirname(current)
+        if parent == current:
+            # Fallback to 3 levels up
+            return os.path.abspath(os.path.join(start_dir, '../../..'))
+        current = parent
+
+
 def main():
     # Collect all files in the current directory and tests directory
     files = []
     magi_dir = os.path.dirname(os.path.abspath(__file__))
-    repo_root = os.path.abspath(os.path.join(magi_dir, '../../..'))
+    repo_root = find_repo_root(magi_dir)
 
     for root, dirs, filenames in os.walk(magi_dir):
+        if '.temp' in root.split(os.sep):
+            continue
         for filename in filenames:
             if filename.endswith(('.py', '.md', '.json')):
                 files.append(os.path.abspath(os.path.join(root, filename)))

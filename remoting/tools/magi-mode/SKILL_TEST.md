@@ -19,7 +19,7 @@ verifying specific expected outputs.
 
 To allow for real builds without risking side effects on the actual codebase,
 all tests operate on **static, checked-in dummy files** located in:
-`remoting/tools/magi-mode/tests/testdata/`
+`tests/testdata/` (relative to the skill's root directory)
 
 This directory contains its own `BUILD.gn` file to allow running real builds on
 the test outputs!
@@ -71,18 +71,17 @@ ______________________________________________________________________
 
 ## How to Run Tests
 
-Run a specific test file:
-`python3 remoting/tools/magi-mode/run_magi_tests.py --tests \`
-`  remoting/tools/magi-mode/tests/magi_stage_generate_tests.json`
+Run a specific test file from the skill's root directory:
+`python3 run_magi_tests.py --tests tests/magi_stage_generate_tests.json`
 
-Run all tests using a shell loop:
-`for f in remoting/tools/magi-mode/tests/magi_stage_*_tests.json; do \`
-`  python3 remoting/tools/magi-mode/run_magi_tests.py --tests "$f"; done`
+Run all tests using a shell loop from the skill's root directory:
+`for f in tests/magi_stage_*_tests.json; do \`
+`  python3 run_magi_tests.py --tests "$f"; done`
 
 ## How to Run Presubmit Checks
 
 To run the presubmit checks locally without uploading to Gerrit:
-`python3 remoting/tools/magi-mode/run_presubmit.py`
+`python3 run_presubmit.py`
 
 ## Manual Test Execution via Agent
 
@@ -91,8 +90,8 @@ with `agentapi`), an agent can manually execute the tests by interpreting the
 JSON files:
 
 1. **Read the Test JSON**: Locate the test case you want to run.
-2. **Setup**: Create an isolated directory under
-   `remoting/tools/magi-mode/.temp/` and copy `testdata` into it.
+2. **Setup**: Create an isolated directory under the configured `temp_directory`
+   (e.g. `agents/skills/magi-mode/.temp/`) and copy `testdata` into it.
 3. **Extract Prompt and Inputs**: Construct a clear prompt for a subagent,
    explaining the role (e.g., Supervisor) and providing the `base_inputs` and
    `override_inputs` from the test case. Instruct the agent to work in the
