@@ -1551,21 +1551,6 @@
             ]
         }
     ],
-    "AndroidVerticalTabs": [
-        {
-            "platforms": [
-                "android"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "AndroidVerticalTabs"
-                    ]
-                }
-            ]
-        }
-    ],
     "AndroidWindowManagementWebApi": [
         {
             "platforms": [

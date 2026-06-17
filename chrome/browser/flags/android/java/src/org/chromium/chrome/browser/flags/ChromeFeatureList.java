@@ -825,10 +825,7 @@ public abstract class ChromeFeatureList {
     public static final CachedFlag sAndroidUseAdminsForEnterpriseInfo =
             newCachedFlag(ANDROID_USE_ADMINS_FOR_ENTERPRISE_INFO, true);
     public static final CachedFlag sAndroidVerticalTabs =
-            newCachedFlag(
-                    ANDROID_VERTICAL_TABS,
-                    /* defaultValue= */ false,
-                    /* defaultValueInTests= */ true);
+            newCachedFlag(ANDROID_VERTICAL_TABS, false);
     public static final CachedFlag sAndroidWindowManagementWebApi =
             newCachedFlag(
                     ANDROID_WINDOW_MANAGEMENT_WEB_API,
