@@ -5,8 +5,10 @@
 #ifndef CONTENT_BROWSER_RENDERER_HOST_UNBOUNDED_SURFACE_WINDOW_H_
 #define CONTENT_BROWSER_RENDERER_HOST_UNBOUNDED_SURFACE_WINDOW_H_
 
+#include "base/functional/callback.h"
 #include "components/viz/common/surfaces/frame_sink_id.h"
 #include "components/viz/common/surfaces/local_surface_id.h"
+#include "content/public/browser/render_widget_host_view.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "services/viz/public/mojom/compositing/compositor_frame_sink.mojom.h"
@@ -35,6 +37,13 @@ class UnboundedSurfaceWindow {
 
   virtual void RouteMouseEvent(const blink::WebMouseEvent& event) = 0;
   virtual gfx::Rect GetBounds() const = 0;
+  virtual void CopyFromSurface(
+      const gfx::Rect& src_subrect,
+      const gfx::Size& dst_size,
+      base::TimeDelta timeout,
+      base::OnceCallback<void(const content::CopyFromSurfaceResult&)>
+          callback) = 0;
+  virtual void EnsureSurfaceSynchronizedForWebTest() = 0;
 };
 
 }  // namespace content

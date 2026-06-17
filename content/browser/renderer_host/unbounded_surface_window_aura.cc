@@ -9,6 +9,8 @@
 #include "base/task/single_thread_task_runner.h"
 #include "components/input/native_web_keyboard_event.h"
 #include "components/input/render_widget_host_input_event_router.h"
+#include "components/viz/common/frame_sinks/copy_output_request.h"
+#include "components/viz/common/frame_sinks/copy_output_result.h"
 #include "components/viz/host/host_frame_sink_manager.h"
 #include "content/browser/compositor/surface_utils.h"
 #include "content/browser/renderer_host/render_widget_host_impl.h"
@@ -19,6 +21,7 @@
 #include "ui/aura/client/screen_position_client.h"
 #include "ui/aura/client/transient_window_client.h"
 #include "ui/aura/client/window_parenting_client.h"
+#include "ui/compositor/compositor.h"
 #include "ui/compositor/layer.h"
 #include "ui/display/display.h"
 #include "ui/display/screen.h"
@@ -113,6 +116,46 @@ viz::LocalSurfaceId UnboundedSurfaceWindowAura::GetLocalSurfaceId() const {
 
 gfx::Rect UnboundedSurfaceWindowAura::GetBounds() const {
   return window_ ? window_->GetBoundsInScreen() : gfx::Rect();
+}
+
+void UnboundedSurfaceWindowAura::CopyFromSurface(
+    const gfx::Rect& src_subrect,
+    const gfx::Size& dst_size,
+    base::TimeDelta timeout,
+    base::OnceCallback<void(const content::CopyFromSurfaceResult&)> callback) {
+  if (!window_ || !window_->layer()) {
+    std::move(callback).Run(content::CopyFromSurfaceResult());
+    return;
+  }
+  auto request = std::make_unique<viz::CopyOutputRequest>(
+      viz::CopyOutputRequest::ResultFormat::RGBA,
+      viz::CopyOutputRequest::ResultDestination::kSystemMemory,
+      base::BindOnce(
+          [](base::OnceCallback<void(const content::CopyFromSurfaceResult&)>
+                 callback,
+             std::unique_ptr<viz::CopyOutputResult> result) {
+            std::move(callback).Run(
+                ToCopyFromSurfaceResult(result->ScopedAccessSkBitmap()
+                                            .GetOutScopedBitmapAndMetadata()));
+          },
+          std::move(callback)));
+  request->set_result_task_runner(
+      base::SingleThreadTaskRunner::GetCurrentDefault());
+
+  window_->layer()->RequestCopyOfOutput(std::move(request));
+  if (window_->layer()->GetCompositor()) {
+    window_->layer()->GetCompositor()->ScheduleFullRedraw();
+  }
+}
+
+void UnboundedSurfaceWindowAura::EnsureSurfaceSynchronizedForWebTest() {
+  if (window_ && window_->layer()) {
+    window_->layer()->SetShowSurface(
+        viz::SurfaceId(frame_sink_id_, GetLocalSurfaceId()),
+        window_->GetBoundsInScreen().size(), SK_ColorTRANSPARENT,
+        cc::DeadlinePolicy::UseInfiniteDeadline(),
+        /*stretch_content_to_fill_bounds=*/false);
+  }
 }
 
 gfx::Size UnboundedSurfaceWindowAura::GetMinimumSize() const {

@@ -59,6 +59,13 @@ class UnboundedSurfaceWindowMac : public UnboundedSurfaceWindow,
       override;
 
   gfx::Rect GetBounds() const override;
+  void CopyFromSurface(
+      const gfx::Rect& src_subrect,
+      const gfx::Size& dst_size,
+      base::TimeDelta timeout,
+      base::OnceCallback<void(const content::CopyFromSurfaceResult&)> callback)
+      override;
+  void EnsureSurfaceSynchronizedForWebTest() override;
 
   // blink::mojom::UnboundedSurfaceHost overrides:
   void UpdateBounds(const gfx::Rect& bounds) override;

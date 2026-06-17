@@ -3949,7 +3949,6 @@ interface HTMLElement : Element
     getter tabIndex
     getter title
     getter translate
-    getter unbounded
     getter virtualKeyboardPolicy
     getter writingSuggestions
     method attachInternals
@@ -3960,7 +3959,6 @@ interface HTMLElement : Element
     method hidePopover
     method scrollParent
     method showPopover
-    method showUnboundedElement
     method togglePopover
     setter accessKey
     setter autocapitalize
@@ -4098,7 +4096,6 @@ interface HTMLElement : Element
     setter tabIndex
     setter title
     setter translate
-    setter unbounded
     setter virtualKeyboardPolicy
     setter writingSuggestions
 interface HTMLEmbedElement : HTMLElement
