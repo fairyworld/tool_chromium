@@ -359,8 +359,6 @@ public class AccessibilityState {
     private static boolean sHasRegisteredObservers;
     private static boolean sIsInTestingMode;
     private static @Nullable Boolean sPreInitCachedValuePerformGesturesEnabled;
-    private static @Nullable List<AccessibilityServiceInfo> sServiceInfoListForTesting;
-    private static @Nullable String sEnabledServiceStringForTesting;
 
     // A flag indicating whether the "extra state" values `sDisplayInversionEnabled`,
     // `sHighContrastEnabled`, `sTextCursorBlinkInterval`, and `sAnimatorDurationScale` have been
@@ -690,23 +688,11 @@ public class AccessibilityState {
     }
 
     protected static List<AccessibilityServiceInfo> getRunningServiceInfoList() {
-        if (sIsInTestingMode
-                && sServiceInfoListForTesting != null
-                && !sServiceInfoListForTesting.isEmpty()) {
-            return sServiceInfoListForTesting;
-        }
-
         return fetchAccessibilityManager()
                 .getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK);
     }
 
     protected static String getEnabledServiceString(Context context) {
-        if (sIsInTestingMode
-                && sEnabledServiceStringForTesting != null
-                && !sEnabledServiceStringForTesting.isEmpty()) {
-            return sEnabledServiceStringForTesting;
-        }
-
         return Settings.Secure.getString(
                 context.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
     }
@@ -1398,43 +1384,10 @@ public class AccessibilityState {
         updateAndNotifyStateChange(newState);
     }
 
-    public enum StateIdentifierForTesting {
-        EVENT_TYPE_MASK,
-        FEEDBACK_TYPE_MASK,
-        FLAGS_MASK,
-        CAPABILITIES_MASK,
-        EVENT_TYPE_MASK_HEURISTIC,
-        FEEDBACK_TYPE_MASK_HEURISTIC,
-        FLAGS_MASK_HEURISTIC,
-        CAPABILITIES_MASK_HEURISTIC,
-    };
-
-    public static void setStateMaskForTesting(StateIdentifierForTesting state, int value) {
+    public static void setEventMaskForTesting(int eventMask) {
         if (!sInitialized) initializeForTesting();
 
-        switch (state) {
-            case EVENT_TYPE_MASK -> sEventTypeMask = value;
-            case FEEDBACK_TYPE_MASK -> sFeedbackTypeMask = value;
-            case FLAGS_MASK -> sFlagsMask = value;
-            case CAPABILITIES_MASK -> sCapabilitiesMask = value;
-            case EVENT_TYPE_MASK_HEURISTIC -> sEventTypeMaskHeuristic = value;
-            case FEEDBACK_TYPE_MASK_HEURISTIC -> sFeedbackTypeMaskHeuristic = value;
-            case FLAGS_MASK_HEURISTIC -> sFlagsMaskHeuristic = value;
-            case CAPABILITIES_MASK_HEURISTIC -> sCapabilitiesMaskHeuristic = value;
-        }
-    }
-
-    public static void setEnabledServiceInfoListForTesting(
-            List<AccessibilityServiceInfo> serviceInfoList) {
-        if (!sInitialized) initializeForTesting();
-
-        sServiceInfoListForTesting = serviceInfoList;
-    }
-
-    public static void setEnabledServiceStringForTesting(String enabledServiceString) {
-        if (!sInitialized) initializeForTesting();
-
-        sEnabledServiceStringForTesting = enabledServiceString;
+        sEventTypeMask = eventMask;
     }
 
     public static void setServiceIdsForTesting(String newServiceId, boolean isAccessibilityTool) {
