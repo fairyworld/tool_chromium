@@ -20,7 +20,6 @@
 #include "chrome/browser/new_tab_page/modules/v2/authentication/microsoft_auth.mojom.h"
 #include "chrome/browser/new_tab_page/modules/v2/calendar/google_calendar.mojom.h"
 #include "chrome/browser/new_tab_page/modules/v2/calendar/outlook_calendar.mojom.h"
-#include "chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption/most_relevant_tab_resumption.mojom.h"
 #include "chrome/browser/new_tab_page/modules/v2/tab_groups/tab_groups.mojom.h"
 #include "chrome/browser/new_tab_page/new_tab_page_util.h"
 #include "chrome/browser/ui/lens/lens_overlay_untrusted_ui.h"
@@ -422,13 +421,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
   if (base::FeatureList::IsEnabled(ntp_features::kNtpTabGroupsModule)) {
     RegisterWebUIControllerInterfaceBinder<ntp::tab_groups::mojom::PageHandler,
                                            NewTabPageUI>(map);
-  }
-
-  if (base::FeatureList::IsEnabled(
-          ntp_features::kNtpMostRelevantTabResumptionModule)) {
-    RegisterWebUIControllerInterfaceBinder<
-        ntp::most_relevant_tab_resumption::mojom::PageHandler, NewTabPageUI>(
-        map);
   }
 
   if (base::FeatureList::IsEnabled(ntp_features::kNtpCalendarModule)) {

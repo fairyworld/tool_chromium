@@ -13,6 +13,7 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/mock_callback.h"
 #include "base/time/time.h"
+#include "build/build_config.h"
 #include "chrome/browser/new_tab_page/modules/modules_constants.h"
 #include "chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption/url_visit_types.mojom.h"
 #include "chrome/browser/visited_url_ranking/visited_url_ranking_service_factory.h"
@@ -493,8 +494,13 @@ TEST_F(MostRelevantTabResumptionPageHandlerTest,
   ASSERT_EQ(
       ntp::most_relevant_tab_resumption::mojom::DecorationType::kVisitedXAgo,
       url_visits_mojom[0]->decoration->type);
+#if BUILDFLAG(IS_ANDROID)
+  ASSERT_EQ("You visited 5 min ago",
+            url_visits_mojom[1]->decoration->display_string);
+#else
   ASSERT_EQ("You visited 5 mins ago",
             url_visits_mojom[1]->decoration->display_string);
+#endif
   ASSERT_EQ(
       ntp::most_relevant_tab_resumption::mojom::DecorationType::kVisitedXAgo,
       url_visits_mojom[1]->decoration->type);
