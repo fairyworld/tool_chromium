@@ -118,9 +118,18 @@ BASE_FEATURE(kCctSignInPrompt, base::FEATURE_ENABLED_BY_DEFAULT);
 // the response count for 1 week to give around 2000 responses per milestone for
 // total stable population.
 BASE_FEATURE(kChromeAndroidIdentitySurveyFirstRun,
-             base::FEATURE_DISABLED_BY_DEFAULT);
-BASE_FEATURE(kChromeAndroidIdentitySurveyWeb,
-             base::FEATURE_DISABLED_BY_DEFAULT);
+             base::FEATURE_ENABLED_BY_DEFAULT);
+BASE_FEATURE_PARAM(double,
+                   kChromeAndroidIdentitySurveyFirstRunProbability,
+                   &kChromeAndroidIdentitySurveyFirstRun,
+                   kHatsSurveyProbabilityName,
+                   0.004);
+BASE_FEATURE(kChromeAndroidIdentitySurveyWeb, base::FEATURE_ENABLED_BY_DEFAULT);
+BASE_FEATURE_PARAM(double,
+                   kChromeAndroidIdentitySurveyWebProbability,
+                   &kChromeAndroidIdentitySurveyWeb,
+                   kHatsSurveyProbabilityName,
+                   1.0);
 BASE_FEATURE(kChromeAndroidIdentitySurveyNtpSigninButton,
              base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE_PARAM(double,
