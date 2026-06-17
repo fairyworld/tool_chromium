@@ -68,7 +68,7 @@ class MockFilterSuggestionGenerator : public FilterSuggestionGenerator {
       void,
       GenerateSuggestion,
       (const GURL& url,
-       const std::vector<std::string>& supported_task_types,
+       std::vector<std::string> supported_task_types,
        base::OnceCallback<void(std::optional<UrlFilterSuggestion>)> callback,
        int64_t navigation_id,
        std::string_view domain),

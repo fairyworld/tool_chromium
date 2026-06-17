@@ -27,10 +27,6 @@ class MultistepFilterLogRouter;
 struct FilterAnnotation;
 struct FilterSuggestionCandidate;
 
-namespace internal {
-// Default maximum number of annotations to retrieve from the filter store.
-constexpr size_t kDefaultMaxResults = 100;
-}  // namespace internal
 
 // Responsible for orchestrating the suggestion generation process for a given
 // URL. This class is owned by the `MultistepFilterService` and shares its
@@ -62,7 +58,7 @@ class FilterSuggestionGenerator {
   //    otherwise.
   virtual void GenerateSuggestion(
       const GURL& url,
-      const std::vector<std::string>& supported_task_types,
+      std::vector<std::string> supported_task_types,
       base::OnceCallback<void(std::optional<UrlFilterSuggestion>)> callback,
       int64_t navigation_id,
       std::string_view domain);
@@ -76,7 +72,7 @@ class FilterSuggestionGenerator {
       base::ScopedClosureRunner failure_callback,
       int64_t navigation_id,
       std::string_view domain,
-      std::vector<std::vector<FilterAnnotation>> filter_annotations);
+      std::vector<FilterAnnotation> filter_annotations);
   void OnFilterSuggestionCandidatesFetched(
       const GURL& url,
       base::OnceCallback<void(std::optional<UrlFilterSuggestion>)>

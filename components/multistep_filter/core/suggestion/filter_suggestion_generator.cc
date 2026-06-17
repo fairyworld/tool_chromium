@@ -11,10 +11,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-#include "base/barrier_callback.h"
 #include "base/command_line.h"
-#include "base/containers/extend.h"
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
 #include "base/functional/bind.h"
@@ -106,7 +103,7 @@ FilterSuggestionGenerator::~FilterSuggestionGenerator() = default;
 
 void FilterSuggestionGenerator::GenerateSuggestion(
     const GURL& url,
-    const std::vector<std::string>& supported_task_types,
+    std::vector<std::string> supported_task_types,
     base::OnceCallback<void(std::optional<UrlFilterSuggestion>)> callback,
     int64_t navigation_id,
     std::string_view domain) {
@@ -114,26 +111,17 @@ void FilterSuggestionGenerator::GenerateSuggestion(
   base::ScopedClosureRunner failure_callback(
       base::BindOnce(std::move(split_callback.first), std::nullopt));
 
-  // Fetch annotations for multiple task types asynchronously from the
-  // FilterStore. The BarrierCallback waits until all these individual queries
-  // complete before aggregating and processing them in
-  // `OnAllAnnotationsFetched()`.
-  auto barrier_callback = base::BarrierCallback<std::vector<FilterAnnotation>>(
-      supported_task_types.size(),
-      base::BindOnce(
-          &FilterSuggestionGenerator::OnAllAnnotationsFetched,
-          weak_ptr_factory_.GetWeakPtr(), url, std::move(split_callback.second),
-          std::move(failure_callback), navigation_id, std::string(domain)));
-
   const base::Time min_creation_time =
       base::Time::Now() - kMultistepFilterSessionDuration.Get();
   // TODO(crbug.com/493485174): Filter supported task types to only include
   // filtering tasks.
-  for (const std::string& task_type : supported_task_types) {
-    filter_store_->GetAnnotationsForTaskSortedByCreationTimestamp(
-        task_type, barrier_callback, internal::kDefaultMaxResults,
-        min_creation_time);
-  }
+  filter_store_->GetAnnotationsForTasksSortedByCreationTimestamp(
+      std::move(supported_task_types),
+      base::BindOnce(
+          &FilterSuggestionGenerator::OnAllAnnotationsFetched,
+          weak_ptr_factory_.GetWeakPtr(), url, std::move(split_callback.second),
+          std::move(failure_callback), navigation_id, std::string(domain)),
+      kMultistepFilterSuggestionMaxCandidates.Get(), min_creation_time);
 }
 
 void FilterSuggestionGenerator::OnAllAnnotationsFetched(
@@ -143,23 +131,12 @@ void FilterSuggestionGenerator::OnAllAnnotationsFetched(
     base::ScopedClosureRunner failure_callback,
     int64_t navigation_id,
     std::string_view domain,
-    std::vector<std::vector<FilterAnnotation>> filter_annotations) {
-  std::vector<FilterAnnotation> all_annotations;
-  for (std::vector<FilterAnnotation>& annotations_for_task_type :
-       filter_annotations) {
-    base::Extend(all_annotations, std::move(annotations_for_task_type));
-  }
+    std::vector<FilterAnnotation> all_annotations) {
 
   if (all_annotations.empty()) {
     LogNoRelevantAnnotations(log_router_, navigation_id, domain);
     return;
   }
-
-  // Sort the aggregated list of annotations by `creation_timestamp` in
-  // descending order to prioritize the most recently created annotations when
-  // limiting the number of candidates.
-  std::ranges::sort(all_annotations, std::ranges::greater(),
-                    &FilterAnnotation::creation_timestamp);
 
   // Suppress suggestions if the latest annotation is for the same domain and
   // within the throttle duration.
@@ -170,14 +147,6 @@ void FilterSuggestionGenerator::OnAllAnnotationsFetched(
     LogSuggestionSuppressed(log_router_, navigation_id, domain,
                             "recent_extraction");
     return;
-  }
-
-  // Limit the number of candidates to bound the size of the payload sent to the
-  // server.
-  const size_t max_candidates = kMultistepFilterSuggestionMaxCandidates.Get();
-  if (all_annotations.size() > max_candidates) {
-    all_annotations.erase(all_annotations.begin() + max_candidates,
-                          all_annotations.end());
   }
 
   LogServerRequestSent(log_router_, navigation_id, domain,

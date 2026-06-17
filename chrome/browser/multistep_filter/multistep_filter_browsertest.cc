@@ -294,8 +294,8 @@ IN_PROC_BROWSER_TEST_F(MultistepFilterBrowserTest,
   base::test::TestFuture<std::vector<FilterAnnotation>> get_future1;
   test_api(*service_)
       .filter_store()
-      ->GetAnnotationsForTaskSortedByCreationTimestamp(
-          kTestTaskType, get_future1.GetCallback(), 10, base::Time());
+      ->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {kTestTaskType}, get_future1.GetCallback(), 10, base::Time());
   EXPECT_THAT(get_future1.Get(), testing::SizeIs(1));
 
   // Now clear history!
@@ -315,8 +315,8 @@ IN_PROC_BROWSER_TEST_F(MultistepFilterBrowserTest,
   base::test::TestFuture<std::vector<FilterAnnotation>> get_future2;
   test_api(*service_)
       .filter_store()
-      ->GetAnnotationsForTaskSortedByCreationTimestamp(
-          kTestTaskType, get_future2.GetCallback(), 10, base::Time());
+      ->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {kTestTaskType}, get_future2.GetCallback(), 10, base::Time());
   EXPECT_THAT(get_future2.Get(), testing::SizeIs(0));
 }
 

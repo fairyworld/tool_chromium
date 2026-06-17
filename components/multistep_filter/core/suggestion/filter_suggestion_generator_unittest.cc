@@ -29,7 +29,6 @@ namespace multistep_filter {
 
 namespace {
 
-using internal::kDefaultMaxResults;
 constexpr char kTestUrl[] = "https://example.com";
 constexpr char kTestDomain[] = "example.com";
 constexpr char kShoppingTask[] = "SHOPPING";
@@ -64,8 +63,8 @@ class MockFilterStore : public FilterStore {
   ~MockFilterStore() override = default;
 
   MOCK_METHOD(void,
-              GetAnnotationsForTaskSortedByCreationTimestamp,
-              (std::string task_type,
+              GetAnnotationsForTasksSortedByCreationTimestamp,
+              (std::vector<std::string> task_types,
                base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
                size_t max_count,
                base::Time min_creation_time),
@@ -101,7 +100,6 @@ class FilterSuggestionGeneratorTest : public testing::Test {
   FilterSuggestionGenerator* generator() { return generator_.get(); }
   void DestroyGenerator() { generator_.reset(); }
   base::test::TaskEnvironment& task_environment() { return task_environment_; }
-
   const std::vector<std::string> kSupportedTaskTypes = {kShoppingTask};
 
  private:
@@ -125,11 +123,11 @@ TEST_F(FilterSuggestionGeneratorTest,
   FilterAnnotation annotation =
       CreateDummyAnnotation(kShoppingTask, kTestDomain, attributes);
 
-  EXPECT_CALL(*store(), GetAnnotationsForTaskSortedByCreationTimestamp(
-                            kShoppingTask, _, kDefaultMaxResults, _))
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            kSupportedTaskTypes, _, 10u, _))
       .WillOnce(
           [annotation](
-              std::string task_type,
+              std::vector<std::string> task_types,
               base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
               size_t max_count, base::Time min_creation_time) {
             std::move(callback).Run(std::vector<FilterAnnotation>{annotation});
@@ -193,11 +191,11 @@ TEST_F(FilterSuggestionGeneratorTest,
   FilterAnnotation annotation =
       CreateDummyAnnotation(kShoppingTask, kTestDomain, attributes);
 
-  EXPECT_CALL(*store(), GetAnnotationsForTaskSortedByCreationTimestamp(
-                            kShoppingTask, _, kDefaultMaxResults, _))
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            kSupportedTaskTypes, _, 10u, _))
       .WillOnce(
           [annotation](
-              std::string task_type,
+              std::vector<std::string> task_types,
               base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
               size_t max_count, base::Time min_creation_time) {
             std::move(callback).Run(std::vector<FilterAnnotation>{annotation});
@@ -244,11 +242,11 @@ TEST_F(FilterSuggestionGeneratorTest,
   FilterAnnotation annotation =
       CreateDummyAnnotation(kShoppingTask, kTestDomain, attributes);
 
-  EXPECT_CALL(*store(), GetAnnotationsForTaskSortedByCreationTimestamp(
-                            kShoppingTask, _, kDefaultMaxResults, _))
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            kSupportedTaskTypes, _, 10u, _))
       .WillOnce(
           [annotation](
-              std::string task_type,
+              std::vector<std::string> task_types,
               base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
               size_t max_count, base::Time min_creation_time) {
             std::move(callback).Run(std::vector<FilterAnnotation>{annotation});
@@ -291,11 +289,11 @@ TEST_F(FilterSuggestionGeneratorTest,
   FilterAnnotation annotation =
       CreateDummyAnnotation(kShoppingTask, kTestDomain, attributes);
 
-  EXPECT_CALL(*store(), GetAnnotationsForTaskSortedByCreationTimestamp(
-                            kShoppingTask, _, kDefaultMaxResults, _))
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            kSupportedTaskTypes, _, 10u, _))
       .WillOnce(
           [annotation](
-              std::string task_type,
+              std::vector<std::string> task_types,
               base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
               size_t max_count, base::Time min_creation_time) {
             std::move(callback).Run(std::vector<FilterAnnotation>{annotation});
@@ -341,11 +339,11 @@ TEST_F(FilterSuggestionGeneratorTest,
   FilterAnnotation annotation =
       CreateDummyAnnotation(kShoppingTask, kTestDomain, attributes);
 
-  EXPECT_CALL(*store(), GetAnnotationsForTaskSortedByCreationTimestamp(
-                            kShoppingTask, _, kDefaultMaxResults, _))
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            kSupportedTaskTypes, _, 10u, _))
       .WillOnce(
           [annotation](
-              std::string task_type,
+              std::vector<std::string> task_types,
               base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
               size_t max_count, base::Time min_creation_time) {
             std::move(callback).Run(std::vector<FilterAnnotation>{annotation});
@@ -389,11 +387,11 @@ TEST_F(FilterSuggestionGeneratorTest,
   FilterAnnotation annotation =
       CreateDummyAnnotation(kShoppingTask, kTestDomain, attributes);
 
-  EXPECT_CALL(*store(), GetAnnotationsForTaskSortedByCreationTimestamp(
-                            kShoppingTask, _, kDefaultMaxResults, _))
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            kSupportedTaskTypes, _, 10u, _))
       .WillOnce(
           [annotation](
-              std::string task_type,
+              std::vector<std::string> task_types,
               base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
               size_t max_count, base::Time min_creation_time) {
             std::move(callback).Run(std::vector<FilterAnnotation>{annotation});
@@ -434,11 +432,11 @@ TEST_F(FilterSuggestionGeneratorTest,
                             {{kTestAttributeKey, kTestAttributeValue},
                              {kTestAttributeKey3, kTestAttributeValue3}});
 
-  EXPECT_CALL(*store(), GetAnnotationsForTaskSortedByCreationTimestamp(
-                            kShoppingTask, _, kDefaultMaxResults, _))
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            kSupportedTaskTypes, _, 10u, _))
       .WillOnce(
           [annotation](
-              std::string task_type,
+              std::vector<std::string> task_types,
               base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
               size_t max_count, base::Time min_creation_time) {
             std::move(callback).Run(std::vector<FilterAnnotation>{annotation});
@@ -493,11 +491,11 @@ TEST_F(FilterSuggestionGeneratorTest, GenerateSuggestion_NoMatchingKeys) {
   FilterAnnotation annotation =
       CreateDummyAnnotation(kShoppingTask, kTestDomain, {{"key1", "val1"}});
 
-  EXPECT_CALL(*store(), GetAnnotationsForTaskSortedByCreationTimestamp(
-                            kShoppingTask, _, kDefaultMaxResults, _))
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            kSupportedTaskTypes, _, 10u, _))
       .WillOnce(
           [annotation](
-              std::string task_type,
+              std::vector<std::string> task_types,
               base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
               size_t max_count, base::Time min_creation_time) {
             std::move(callback).Run(std::vector<FilterAnnotation>{annotation});
@@ -548,10 +546,10 @@ TEST_F(FilterSuggestionGeneratorTest,
        GenerateSuggestion_NoAnnotationsReturnsNullopt) {
   const GURL url(kTestUrl);
 
-  EXPECT_CALL(*store(), GetAnnotationsForTaskSortedByCreationTimestamp(
-                            kShoppingTask, _, kDefaultMaxResults, _))
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            kSupportedTaskTypes, _, 10u, _))
       .WillOnce(
-          [](std::string task_type,
+          [](std::vector<std::string> task_types,
              base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
              size_t max_count, base::Time min_creation_time) {
             std::move(callback).Run(std::vector<FilterAnnotation>());
@@ -576,11 +574,11 @@ TEST_F(FilterSuggestionGeneratorTest,
   FilterAnnotation annotation =
       CreateDummyAnnotation(kShoppingTask, kTestDomain, attributes);
 
-  EXPECT_CALL(*store(), GetAnnotationsForTaskSortedByCreationTimestamp(
-                            kShoppingTask, _, kDefaultMaxResults, _))
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            kSupportedTaskTypes, _, 10u, _))
       .WillOnce(
           [annotation](
-              std::string task_type,
+              std::vector<std::string> task_types,
               base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
               size_t max_count, base::Time min_creation_time) {
             std::move(callback).Run(std::vector<FilterAnnotation>{annotation});
@@ -621,8 +619,8 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   FilterAnnotation annotation =
       CreateDummyAnnotation(kShoppingTask, kTestDomain, {{"key1", "val1"}});
-  EXPECT_CALL(*store(), GetAnnotationsForTaskSortedByCreationTimestamp(
-                            kShoppingTask, _, kDefaultMaxResults, _))
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            kSupportedTaskTypes, _, 10u, _))
       .WillOnce(base::test::RunOnceCallback<1>(
           std::vector<FilterAnnotation>{annotation}));
 
@@ -660,8 +658,8 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   FilterAnnotation annotation =
       CreateDummyAnnotation(kShoppingTask, kTestDomain, {{"key1", "val1"}});
-  EXPECT_CALL(*store(), GetAnnotationsForTaskSortedByCreationTimestamp(
-                            kShoppingTask, _, kDefaultMaxResults, _))
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            kSupportedTaskTypes, _, 10u, _))
       .WillOnce(base::test::RunOnceCallback<1>(
           std::vector<FilterAnnotation>{annotation}));
 
@@ -706,11 +704,11 @@ TEST_F(FilterSuggestionGeneratorTest,
   FilterAnnotation annotation =
       CreateDummyAnnotation("NON_SHOPPING", kTestDomain, attributes);
 
-  EXPECT_CALL(*store(), GetAnnotationsForTaskSortedByCreationTimestamp(
-                            "NON_SHOPPING", _, kDefaultMaxResults, _))
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            std::vector<std::string>{"NON_SHOPPING"}, _, 10u, _))
       .WillOnce(
           [annotation](
-              std::string task_type,
+              std::vector<std::string> task_types,
               base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
               size_t max_count, base::Time min_creation_time) {
             std::move(callback).Run(std::vector<FilterAnnotation>{annotation});
@@ -765,11 +763,11 @@ TEST_F(FilterSuggestionGeneratorTest,
       CreateDummyAnnotation(kShoppingTask, kTestDomain, attributes);
   annotation.creation_timestamp = now;
 
-  EXPECT_CALL(*store(), GetAnnotationsForTaskSortedByCreationTimestamp(
-                            kShoppingTask, _, kDefaultMaxResults, _))
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            kSupportedTaskTypes, _, 10u, _))
       .WillRepeatedly(
           [annotation](
-              std::string task_type,
+              std::vector<std::string> task_types,
               base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
               size_t max_count, base::Time min_creation_time) {
             std::move(callback).Run(std::vector<FilterAnnotation>{annotation});
@@ -833,11 +831,11 @@ TEST_F(FilterSuggestionGeneratorTest,
       CreateDummyAnnotation(kShoppingTask, "different-domain.com", attributes);
   annotation.creation_timestamp = now;
 
-  EXPECT_CALL(*store(), GetAnnotationsForTaskSortedByCreationTimestamp(
-                            kShoppingTask, _, kDefaultMaxResults, _))
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            kSupportedTaskTypes, _, 10u, _))
       .WillOnce(
           [annotation](
-              std::string task_type,
+              std::vector<std::string> task_types,
               base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
               size_t max_count, base::Time min_creation_time) {
             std::move(callback).Run(std::vector<FilterAnnotation>{annotation});
@@ -870,6 +868,33 @@ TEST_F(FilterSuggestionGeneratorTest,
                                   kTestDomain);
 
   EXPECT_TRUE(future1.Get().has_value());
+}
+
+TEST_F(FilterSuggestionGeneratorTest,
+       GenerateSuggestion_PicksConfiguredMaxCandidates) {
+  const GURL url(kTestUrl);
+
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitAndEnableFeatureWithParameters(
+      kMultistepFilter,
+      {{"CueTemplatesMap", "{\"SHOPPING\": {\"template\": \"Template\"}}"},
+       {"SameDomainSuggestionSuppressionDuration", "0s"},
+       {"suggestion_max_candidates", "5"}});
+
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            kSupportedTaskTypes, _, 5u, _))
+      .WillOnce(
+          [](std::vector<std::string> task_types,
+             base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
+             size_t max_count, base::Time min_creation_time) {
+            std::move(callback).Run(std::vector<FilterAnnotation>());
+          });
+
+  base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
+  generator()->GenerateSuggestion(url, kSupportedTaskTypes,
+                                  future.GetCallback(), kTestNavigationId,
+                                  kTestDomain);
+  EXPECT_EQ(future.Get(), std::nullopt);
 }
 
 }  // namespace

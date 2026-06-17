@@ -13,6 +13,7 @@
 #include "base/check.h"
 #include "base/notimplemented.h"
 #include "base/strings/strcat.h"
+#include "base/strings/string_util.h"
 #include "components/multistep_filter/core/data_models/filter_annotation.h"
 #include "sql/database.h"
 #include "sql/statement.h"
@@ -183,26 +184,37 @@ bool FilterAnnotationTable::StoreAnnotation(
 }
 
 std::vector<FilterAnnotation>
-FilterAnnotationTable::GetAnnotationsForTaskSortedByCreationTimestamp(
-    std::string_view task_type,
+FilterAnnotationTable::GetAnnotationsForTasksSortedByCreationTimestamp(
+    base::span<const std::string> task_types,
     size_t max_count,
     base::Time min_creation_time) {
+  if (task_types.empty()) {
+    return {};
+  }
+
   std::vector<FilterAnnotation> annotations;
 
-  sql::Statement select_annotations(db_->GetCachedStatement(
-      SQL_FROM_HERE,
+  std::string task_types_str =
+      base::JoinString(std::vector<std::string>(task_types.size(), "?"), ", ");
+  std::string query =
       base::StrCat({"SELECT ", filter_annotations::kId, ", ",
                     filter_annotations::kTaskType, ", ",
                     filter_annotations::kSourceDomain, ", ",
                     filter_annotations::kSourceHost, ", ",
                     filter_annotations::kCreationTimestamp, " FROM ",
                     filter_annotations::kTableName, " WHERE ",
-                    filter_annotations::kTaskType, " = ? AND ",
-                    filter_annotations::kCreationTimestamp, " >= ? ORDER BY ",
-                    filter_annotations::kCreationTimestamp, " DESC LIMIT ?"})));
-  select_annotations.BindString(0, task_type);
-  select_annotations.BindTime(1, min_creation_time);
-  select_annotations.BindInt64(2, max_count);
+                    filter_annotations::kTaskType, " IN (", task_types_str,
+                    ") AND ", filter_annotations::kCreationTimestamp,
+                    " >= ? ORDER BY ", filter_annotations::kCreationTimestamp,
+                    " DESC LIMIT ?"});
+  sql::Statement select_annotations(db_->GetUniqueStatement(query));
+
+  int param_index = 0;
+  for (const std::string& task_type : task_types) {
+    select_annotations.BindString(param_index++, task_type);
+  }
+  select_annotations.BindTime(param_index++, min_creation_time);
+  select_annotations.BindInt64(param_index++, max_count);
 
   while (select_annotations.Step()) {
     std::string id_str = select_annotations.ColumnString(0);

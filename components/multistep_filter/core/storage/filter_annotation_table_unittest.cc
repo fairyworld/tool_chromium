@@ -59,15 +59,15 @@ TEST_F(FilterAnnotationTableTest, StoreAndRetrieveAnnotation) {
   ASSERT_TRUE(table()->StoreAnnotation(annotation));
 
   std::vector<FilterAnnotation> annotations =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task1", kMaxCount, base::Time());
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task1"}, kMaxCount, base::Time());
   ASSERT_THAT(annotations, SizeIs(1));
 
   EXPECT_EQ(annotations.front(), annotation);
 }
 
 TEST_F(FilterAnnotationTableTest,
-       GetAnnotationsForTaskSortedByCreationTimestamp_FiltersByTaskType) {
+       GetAnnotationsForTasksSortedByCreationTimestamp_FiltersByTaskType) {
   base::Uuid id1 = base::Uuid::GenerateRandomV4();
   FilterAnnotation annotation1(id1, "task1", "example.com", "sub.example.com",
                                base::Time::Now(), {});
@@ -79,15 +79,15 @@ TEST_F(FilterAnnotationTableTest,
   ASSERT_TRUE(table()->StoreAnnotation(annotation2));
 
   std::vector<FilterAnnotation> annotations =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task1", kMaxCount, base::Time());
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task1"}, kMaxCount, base::Time());
   ASSERT_THAT(annotations, SizeIs(1));
 
   EXPECT_EQ(annotations.front(), annotation1);
 }
 
 TEST_F(FilterAnnotationTableTest,
-       GetAnnotationsForTaskSortedByCreationTimestamp_SortsByTimestamp) {
+       GetAnnotationsForTasksSortedByCreationTimestamp_SortsByTimestamp) {
   base::Uuid id1 = base::Uuid::GenerateRandomV4();
   FilterAnnotation annotation1(id1, "task1", "example1.com", "sub.example1.com",
                                base::Time::FromTimeT(100), {});
@@ -103,15 +103,15 @@ TEST_F(FilterAnnotationTableTest,
   ASSERT_TRUE(table()->StoreAnnotation(annotation3));
 
   std::vector<FilterAnnotation> annotations =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task1", kMaxCount, base::Time());
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task1"}, kMaxCount, base::Time());
   ASSERT_THAT(annotations, SizeIs(3));
 
   EXPECT_THAT(annotations, ElementsAre(annotation2, annotation3, annotation1));
 }
 
 TEST_F(FilterAnnotationTableTest,
-       GetAnnotationsForTaskSortedByCreationTimestamp_FiltersByCreationTime) {
+       GetAnnotationsForTasksSortedByCreationTimestamp_FiltersByCreationTime) {
   base::Uuid id1 = base::Uuid::GenerateRandomV4();
   FilterAnnotation annotation1(id1, "task1", "example1.com", "sub.example1.com",
                                base::Time::FromTimeT(100), {});
@@ -124,8 +124,8 @@ TEST_F(FilterAnnotationTableTest,
 
   // Retrieve annotations created after t=150. Should only get annotation2.
   std::vector<FilterAnnotation> annotations =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task1", kMaxCount, base::Time::FromTimeT(150));
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task1"}, kMaxCount, base::Time::FromTimeT(150));
   ASSERT_THAT(annotations, SizeIs(1));
 
   EXPECT_EQ(annotations.front(), annotation2);
@@ -149,8 +149,8 @@ TEST_F(FilterAnnotationTableTest,
   ASSERT_TRUE(table()->StoreAnnotation(annotation2));
 
   std::vector<FilterAnnotation> annotations =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task1", kMaxCount, base::Time());
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task1"}, kMaxCount, base::Time());
   ASSERT_THAT(annotations, SizeIs(1));
 
   EXPECT_EQ(annotations.front(), annotation2);
@@ -173,13 +173,13 @@ TEST_F(FilterAnnotationTableTest,
   ASSERT_TRUE(table()->StoreAnnotation(annotation3));
 
   std::vector<FilterAnnotation> annotations1 =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task1", kMaxCount, base::Time());
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task1"}, kMaxCount, base::Time());
   ASSERT_THAT(annotations1, SizeIs(2));
 
   std::vector<FilterAnnotation> annotations2 =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task2", kMaxCount, base::Time());
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task2"}, kMaxCount, base::Time());
   ASSERT_THAT(annotations2, SizeIs(1));
 }
 TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForTask) {
@@ -200,13 +200,13 @@ TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForTask) {
   EXPECT_THAT(table()->DeleteAnnotationsForTask("task1"), Optional(2));
 
   const std::vector<FilterAnnotation> annotations1 =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task1", kMaxCount, base::Time());
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task1"}, kMaxCount, base::Time());
   EXPECT_THAT(annotations1, SizeIs(0));
 
   const std::vector<FilterAnnotation> annotations2 =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task2", kMaxCount, base::Time());
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task2"}, kMaxCount, base::Time());
   EXPECT_THAT(annotations2, SizeIs(1));
 }
 
@@ -221,9 +221,32 @@ TEST_F(FilterAnnotationTableTest,
   EXPECT_THAT(table()->DeleteAnnotationsForTask("task1"), Optional(1));
 
   const std::vector<FilterAnnotation> annotations =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task1", kMaxCount, base::Time());
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task1"}, kMaxCount, base::Time());
   EXPECT_THAT(annotations, SizeIs(0));
+}
+
+TEST_F(FilterAnnotationTableTest,
+       GetAnnotationsForTasksSortedByCreationTimestamp_MultipleTaskTypes) {
+  base::Uuid id1 = base::Uuid::GenerateRandomV4();
+  FilterAnnotation annotation1(id1, "task1", "example1.com", "sub.example1.com",
+                               base::Time::FromTimeT(100), {});
+  base::Uuid id2 = base::Uuid::GenerateRandomV4();
+  FilterAnnotation annotation2(id2, "task2", "example2.com", "sub.example2.com",
+                               base::Time::FromTimeT(200), {});
+  base::Uuid id3 = base::Uuid::GenerateRandomV4();
+  FilterAnnotation annotation3(id3, "task3", "example3.com", "sub.example3.com",
+                               base::Time::FromTimeT(150), {});
+
+  ASSERT_TRUE(table()->StoreAnnotation(annotation1));
+  ASSERT_TRUE(table()->StoreAnnotation(annotation2));
+  ASSERT_TRUE(table()->StoreAnnotation(annotation3));
+
+  std::vector<FilterAnnotation> annotations =
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task1", "task2"}, kMaxCount, base::Time());
+  ASSERT_THAT(annotations, SizeIs(2));
+  EXPECT_THAT(annotations, ElementsAre(annotation2, annotation1));
 }
 
 TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForHosts) {
@@ -249,14 +272,14 @@ TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForHosts) {
       Optional(1));
 
   const std::vector<FilterAnnotation> annotations1 =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task1", kMaxCount, base::Time());
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task1"}, kMaxCount, base::Time());
   ASSERT_THAT(annotations1, SizeIs(1));
   EXPECT_EQ(annotations1[0].id, id2);
 
   const std::vector<FilterAnnotation> annotations2 =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task2", kMaxCount, base::Time());
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task2"}, kMaxCount, base::Time());
   ASSERT_THAT(annotations2, SizeIs(1));
   EXPECT_EQ(annotations2[0].id, id3);
 }
@@ -285,8 +308,8 @@ TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForHosts_BoundaryTimes) {
   // task2 should still have annotation2 (since it was exactly at end and
   // excluded).
   const std::vector<FilterAnnotation> annotations =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task2", kMaxCount, base::Time());
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task2"}, kMaxCount, base::Time());
   ASSERT_THAT(annotations, SizeIs(1));
   EXPECT_EQ(annotations[0].id, id2);
 }
@@ -334,14 +357,14 @@ TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForHosts_DeletesAttributes) {
 
   // Verify annotation1 is gone.
   const std::vector<FilterAnnotation> annotations1 =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task1", kMaxCount, base::Time());
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task1"}, kMaxCount, base::Time());
   EXPECT_THAT(annotations1, SizeIs(0));
 
   // Verify annotation2 still has its attributes.
   const std::vector<FilterAnnotation> annotations2 =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task2", kMaxCount, base::Time());
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task2"}, kMaxCount, base::Time());
   ASSERT_THAT(annotations2, SizeIs(1));
   EXPECT_EQ(annotations2[0].attributes, attributes2);
 }
@@ -366,13 +389,13 @@ TEST_F(FilterAnnotationTableTest,
 
   // Verify both are gone.
   const std::vector<FilterAnnotation> res1 =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task1", kMaxCount, base::Time());
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task1"}, kMaxCount, base::Time());
   EXPECT_THAT(res1, SizeIs(0));
 
   const std::vector<FilterAnnotation> res2 =
-      table()->GetAnnotationsForTaskSortedByCreationTimestamp(
-          "task2", kMaxCount, base::Time());
+      table()->GetAnnotationsForTasksSortedByCreationTimestamp(
+          {"task2"}, kMaxCount, base::Time());
   EXPECT_THAT(res2, SizeIs(0));
 }
 

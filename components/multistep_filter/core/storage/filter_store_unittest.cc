@@ -56,8 +56,8 @@ TEST_F(FilterStoreTest, StoreAndRetrieveAnnotation) {
                               base::Time::Now(), attributes);
 
   store()->StoreAnnotation(annotation, store_future.GetCallback());
-  store()->GetAnnotationsForTaskSortedByCreationTimestamp(
-      "task1", get_future.GetCallback(), kMaxResults, base::Time());
+  store()->GetAnnotationsForTasksSortedByCreationTimestamp(
+      {"task1"}, get_future.GetCallback(), kMaxResults, base::Time());
 
   std::vector<FilterAnnotation> result = get_future.Get();
   ASSERT_THAT(result, SizeIs(1));
@@ -84,8 +84,8 @@ TEST_F(FilterStoreTest, StoreAndRetrieveAnnotation_FiltersByCreationTime) {
   ASSERT_TRUE(store_future1.Get());
   ASSERT_TRUE(store_future2.Get());
 
-  store()->GetAnnotationsForTaskSortedByCreationTimestamp(
-      "task1", get_future.GetCallback(), kMaxResults,
+  store()->GetAnnotationsForTasksSortedByCreationTimestamp(
+      {"task1"}, get_future.GetCallback(), kMaxResults,
       base::Time::Now() - base::Minutes(30));
 
   std::vector<FilterAnnotation> result = get_future.Get();
@@ -121,12 +121,12 @@ TEST_F(FilterStoreTest, DeleteAnnotationsForTask) {
   store()->DeleteAnnotationsForTask("task1", expire_future.GetCallback());
   EXPECT_THAT(expire_future.Get(), Optional(2));
 
-  store()->GetAnnotationsForTaskSortedByCreationTimestamp(
-      "task1", get_future1.GetCallback(), kMaxResults, base::Time());
+  store()->GetAnnotationsForTasksSortedByCreationTimestamp(
+      {"task1"}, get_future1.GetCallback(), kMaxResults, base::Time());
   EXPECT_THAT(get_future1.Get(), SizeIs(0));
 
-  store()->GetAnnotationsForTaskSortedByCreationTimestamp(
-      "task2", get_future2.GetCallback(), kMaxResults, base::Time());
+  store()->GetAnnotationsForTasksSortedByCreationTimestamp(
+      {"task2"}, get_future2.GetCallback(), kMaxResults, base::Time());
   EXPECT_THAT(get_future2.Get(), SizeIs(1));
 }
 
@@ -146,8 +146,8 @@ TEST_F(FilterStoreTest,
   store()->DeleteAnnotationsForTask("task1", expire_future.GetCallback());
   EXPECT_THAT(expire_future.Get(), Optional(1));
 
-  store()->GetAnnotationsForTaskSortedByCreationTimestamp(
-      "task1", get_future.GetCallback(), kMaxResults, base::Time());
+  store()->GetAnnotationsForTasksSortedByCreationTimestamp(
+      {"task1"}, get_future.GetCallback(), kMaxResults, base::Time());
   EXPECT_THAT(get_future.Get(), SizeIs(0));
 }
 
@@ -186,15 +186,15 @@ TEST_F(FilterStoreTest, DeleteAnnotationsForHosts) {
   EXPECT_THAT(delete_future.Get(), Optional(1));
 
   // task1 should only have annotation2 remaining.
-  store()->GetAnnotationsForTaskSortedByCreationTimestamp(
-      "task1", get_future1.GetCallback(), kMaxResults, base::Time());
+  store()->GetAnnotationsForTasksSortedByCreationTimestamp(
+      {"task1"}, get_future1.GetCallback(), kMaxResults, base::Time());
   std::vector<FilterAnnotation> result1 = get_future1.Get();
   ASSERT_THAT(result1, SizeIs(1));
   EXPECT_EQ(result1[0].id, id2);
 
   // task2 should still have annotation3 (since it was out of time range).
-  store()->GetAnnotationsForTaskSortedByCreationTimestamp(
-      "task2", get_future2.GetCallback(), kMaxResults, base::Time());
+  store()->GetAnnotationsForTasksSortedByCreationTimestamp(
+      {"task2"}, get_future2.GetCallback(), kMaxResults, base::Time());
   std::vector<FilterAnnotation> result2 = get_future2.Get();
   ASSERT_THAT(result2, SizeIs(1));
   EXPECT_EQ(result2[0].id, id3);

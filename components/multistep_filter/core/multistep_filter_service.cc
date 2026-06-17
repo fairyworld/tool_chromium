@@ -233,7 +233,7 @@ void MultistepFilterService::OnUrlAllowedForSuggestion(
   LogSuggestionGenerationStarted(log_router_, navigation_id, domain, url);
 
   filter_suggestion_generator_->GenerateSuggestion(
-      url, supported_task_types,
+      url, std::move(supported_task_types),
       base::BindOnce(&MultistepFilterService::OnSuggestionGenerated,
                      weak_ptr_factory_.GetWeakPtr(), std::move(callback)),
       navigation_id, domain);
