@@ -333,7 +333,9 @@ content::WebUIDataSource* CreateAndAddNewTabPageUiHtmlSource(
   source->AddBoolean(
       "voiceSearchCoherenceSearchboxEnabled",
       base::FeatureList::IsEnabled(omnibox::kVoiceSearchCoherenceSearchbox));
-
+  source->AddBoolean(
+      "voiceSearchCoherenceAnySearchboxExperimentEnabled",
+      SearchboxHandler::GetVoiceSearchCoherenceAnySearchboxExperimentEnabled());
   source->AddBoolean(
       "voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled",
       omnibox::kVoiceSearchCoherenceSearchboxWithLiveTranscription.Get());

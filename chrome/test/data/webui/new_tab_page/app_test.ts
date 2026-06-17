@@ -2656,6 +2656,7 @@ suite('NewTabPageAppTest', () => {
     test(
         'Enabled: dialog handles cancel, error, and final result', async () => {
           loadTimeData.overrideValues({
+            voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
             voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: true,
           });
           await recreateApp();
@@ -2664,7 +2665,7 @@ suite('NewTabPageAppTest', () => {
           $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
           await microtasksFinished();
 
-          const dialog = app.shadowRoot.querySelector<HTMLDialogElement>(
+          let dialog = app.shadowRoot.querySelector<HTMLDialogElement>(
               '#voiceSearchDialog');
           assertTrue(!!dialog);
           assertTrue(dialog.open);
@@ -2696,13 +2697,17 @@ suite('NewTabPageAppTest', () => {
           voiceSearch.dispatchEvent(new Event('voice-search-cancel'));
           await microtasksFinished();
 
-          // Assert dialog is closed and error state is reset.
-          assertFalse(dialog.open);
+          // Assert dialog is closed (removed from DOM) and error state is
+          // reset.
+          assertFalse(!!app.shadowRoot.querySelector('#voiceSearchDialog'));
           assertFalse(app.hasVoiceSearchError);
 
           // Re-open dialog for final result testing.
           $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
           await microtasksFinished();
+          dialog = app.shadowRoot.querySelector<HTMLDialogElement>(
+              '#voiceSearchDialog');
+          assertTrue(!!dialog);
           assertTrue(dialog.open);
 
           // Simulate final result event.
@@ -2710,9 +2715,10 @@ suite('NewTabPageAppTest', () => {
               new CustomEvent('voice-search-final-result', {
                 detail: 'hello world',
               }));
+          await microtasksFinished();
 
-          // Assert dialog is closed.
-          assertFalse(dialog.open);
+          // Assert dialog is closed (removed from DOM).
+          assertFalse(!!app.shadowRoot.querySelector('#voiceSearchDialog'));
 
           // Assert submitQuery was called on the searchbox page handler with
           // correct arguments.
@@ -2725,6 +2731,146 @@ suite('NewTabPageAppTest', () => {
           assertEquals(false, args[4]);          // metaKey
           assertEquals(false, args[5]);          // shiftKey
           assertEquals(true, args[6]);           // isVoiceSearch
+        });
+
+    test('Enabled: dialog handles recording stopped event', async () => {
+      loadTimeData.overrideValues({
+        voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
+        voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: true,
+      });
+      await recreateApp();
+
+      // Open voice search dialog.
+      $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
+      await microtasksFinished();
+
+      let dialog =
+          app.shadowRoot.querySelector<HTMLDialogElement>('#voiceSearchDialog');
+      assertTrue(!!dialog);
+      assertTrue(dialog.open);
+
+      const voiceSearch =
+          app.shadowRoot.querySelector('cr-composebox-voice-search');
+      assertTrue(!!voiceSearch);
+
+      // Simulate recording stopped event with empty query.
+      voiceSearch.dispatchEvent(new CustomEvent('recording-stopped', {
+        detail: '   ',
+      }));
+      await microtasksFinished();
+
+      // Assert dialog is closed (removed from DOM) and query not submitted.
+      assertFalse(!!app.shadowRoot.querySelector('#voiceSearchDialog'));
+      assertEquals(0, searchboxHandler.getCallCount('submitQuery'));
+
+      // Re-open dialog for recording stopped with valid query testing.
+      $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
+      await microtasksFinished();
+      dialog =
+          app.shadowRoot.querySelector<HTMLDialogElement>('#voiceSearchDialog');
+      assertTrue(!!dialog);
+      assertTrue(dialog.open);
+
+      // Simulate recording stopped event with valid query.
+      voiceSearch.dispatchEvent(new CustomEvent('recording-stopped', {
+        detail: 'hello world',
+      }));
+      await microtasksFinished();
+
+      // Assert dialog is closed (removed from DOM).
+      assertFalse(!!app.shadowRoot.querySelector('#voiceSearchDialog'));
+
+      // Assert submitQuery was called on the searchbox page handler with
+      // correct arguments.
+      assertEquals(1, searchboxHandler.getCallCount('submitQuery'));
+      const args = searchboxHandler.getArgs('submitQuery')[0];
+      assertEquals('hello world', args[0]);  // queryText
+      assertEquals(0, args[1]);              // button
+      assertEquals(false, args[2]);          // altKey
+      assertEquals(false, args[3]);          // ctrlKey
+      assertEquals(false, args[4]);          // metaKey
+      assertEquals(false, args[5]);          // shiftKey
+      assertEquals(true, args[6]);           // isVoiceSearch
+    });
+
+    test(
+        'Without Transcript: renders TicTac animation and stop/submit buttons',
+        async () => {
+          loadTimeData.overrideValues({
+            voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
+            voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: false,
+          });
+          await recreateApp();
+
+          // Act: Open voice search overlay.
+          $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
+          await microtasksFinished();
+
+          // Assert: Dialog is open.
+          const dialog = app.shadowRoot.querySelector('dialog');
+          assertTrue(!!dialog);
+          assertTrue(dialog.open);
+
+          // Verify TicTac animation (search-animated-glow) IS rendered.
+          const glow = app.shadowRoot.querySelector('search-animated-glow');
+          assertTrue(!!glow);
+          assertTrue(glow.coloredTicTacVoiceAnimationEnabled);
+          assertEquals('', glow.transcript);
+          assertFalse(glow.receivedSpeech);
+
+          // Verify voice search element has correct properties.
+          const voiceSearch =
+              app.shadowRoot.querySelector('cr-composebox-voice-search');
+          assertTrue(!!voiceSearch);
+          assertFalse(voiceSearch.liveTranscriptEnabled);
+          assertTrue(voiceSearch.submitStopButtonsEnabled);
+
+          // Simulate transcript update and speech received events.
+          voiceSearch.dispatchEvent(new CustomEvent('transcript-update', {
+            detail: 'listening...',
+          }));
+          voiceSearch.dispatchEvent(new Event('speech-received'));
+          await microtasksFinished();
+
+          assertEquals('listening...', glow.transcript);
+          assertTrue(glow.receivedSpeech);
+
+          // Simulate clicking Stop button and verify dialog closes.
+          $$<HTMLElement>(voiceSearch, '#stopButton')!.click();
+          await microtasksFinished();
+
+          // Verify the dialog is closed.
+          assertFalse(dialog.open);
+        });
+
+    test(
+        'With Transcript: renders only transcript without animation or buttons',
+        async () => {
+          loadTimeData.overrideValues({
+            voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
+            voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: true,
+          });
+          await recreateApp();
+
+          // Act: Open voice search overlay.
+          $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
+          await microtasksFinished();
+
+          // Assert: Dialog is open.
+          const dialog = app.shadowRoot.querySelector('dialog');
+          assertTrue(!!dialog);
+          assertTrue(dialog.open);
+
+          // Verify TicTac animation (search-animated-glow) is NOT rendered.
+          const glow = app.shadowRoot.querySelector('search-animated-glow');
+          assertFalse(!!glow);
+
+          // Verify voice search element has correct properties.
+          const voiceSearch =
+              app.shadowRoot.querySelector('cr-composebox-voice-search');
+          assertTrue(!!voiceSearch);
+          assertTrue(voiceSearch.liveTranscriptEnabled);
+          assertFalse(voiceSearch.submitStopButtonsEnabled);
         });
   });
 });
@@ -2920,6 +3066,8 @@ suite('NewTabPageAppReducedMotionTest', () => {
           });
     });
   });
+
+
 });
 
 suite('NewTabPageAppContextMenuAnimationTest', () => {

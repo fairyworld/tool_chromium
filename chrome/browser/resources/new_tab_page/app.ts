@@ -16,6 +16,7 @@ import 'chrome://resources/cr_components/composebox/threads_rail.js';
 import 'chrome://resources/cr_components/composebox/composebox_voice_search.js';
 import 'chrome://resources/cr_components/search/animated_glow.js';
 
+import {SearchboxBrowserProxy} from '//resources/cr_components/searchbox/searchbox_browser_proxy.js';
 import type {CustomizeButtonsElement} from 'chrome://new-tab-page/shared/customize_buttons/customize_buttons.js';
 import {ColorChangeUpdater} from 'chrome://resources/cr_components/color_change_listener/colors_css_updater.js';
 import {GlifAnimationState} from 'chrome://resources/cr_components/composebox/common.js';
@@ -36,6 +37,7 @@ import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {getTrustedScriptURL} from 'chrome://resources/js/static_types.js';
 import {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 import type {PropertyValues} from 'chrome://resources/lit/v3_0/lit.rollup.js';
+import type {PageCallbackRouter as SearchboxPageCallbackRouter} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import type {SkColor} from 'chrome://resources/mojo/skia/public/mojom/skcolor.mojom-webui.js';
 
 import {ActionChipsRetrievalState} from './action_chips/action_chips.js';
@@ -232,8 +234,14 @@ export class AppElement extends AppElementBase {
       showCustomizeChromeText_: {type: Boolean},
       showWallpaperSearch_: {type: Boolean},
       showVoiceSearchOverlay_: {type: Boolean},
+      voiceSearchCoherenceAnySearchboxExperimentEnabled_: {type: Boolean},
       voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled_:
           {type: Boolean},
+
+      voiceSearchTranscript_: {type: String},
+      voiceSearchReceivedSpeech_: {type: Boolean},
+      voiceSearchListening_: {type: Boolean},
+      searchboxCallbackRouter_: {type: Object},
 
       showBackgroundImage_: {
         reflect: true,
@@ -379,9 +387,18 @@ export class AppElement extends AppElementBase {
   protected accessor showCustomizeChromeText_: boolean = false;
   protected accessor showWallpaperSearch_: boolean = false;
   protected accessor showVoiceSearchOverlay_: boolean = false;
+  protected accessor voiceSearchCoherenceAnySearchboxExperimentEnabled_:
+      boolean = loadTimeData.getBoolean(
+                    'voiceSearchCoherenceAnySearchboxExperimentEnabled') ||
+      loadTimeData.getBoolean(
+          'voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled');
   protected accessor voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled_:
       boolean = loadTimeData.getBoolean(
           'voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled');
+
+  protected accessor voiceSearchTranscript_: string = '';
+  protected accessor voiceSearchReceivedSpeech_: boolean = false;
+  protected accessor voiceSearchListening_: boolean = false;
   protected accessor showBackgroundImage_: boolean = false;
   protected accessor backgroundImageAttribution1_: string = '';
   protected accessor backgroundImageAttribution2_: string = '';
@@ -469,6 +486,7 @@ export class AppElement extends AppElementBase {
       loadTimeData.getBoolean('isAndroid');
   protected contextMenuAnimationLimitingEnabled_: boolean =
       loadTimeData.getBoolean('contextMenuAnimationLimitingEnabled');
+  protected accessor searchboxCallbackRouter_: SearchboxPageCallbackRouter;
   private accessor selectedCustomizeDialogPage_: string|null = null;
   private accessor middleSlotPromoLoaded_: boolean = false;
   private accessor modulesLoadedStatus_: ModuleLoadStatus =
@@ -496,6 +514,8 @@ export class AppElement extends AppElementBase {
     performance.mark('app-creation-start');
     super();
     this.callbackRouter_ = NewTabPageProxy.getInstance().callbackRouter;
+    this.searchboxCallbackRouter_ =
+        SearchboxBrowserProxy.getInstance().callbackRouter;
     this.pageHandler_ = NewTabPageProxy.getInstance().handler;
     this.customizeButtonsCallbackRouter_ =
         CustomizeButtonsProxy.getInstance().callbackRouter;
@@ -824,19 +844,23 @@ export class AppElement extends AppElementBase {
     }
 
     if (changedPrivateProperties.has('showVoiceSearchOverlay_') &&
-        this.showVoiceSearchOverlay_ &&
-        this.voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled_) {
-      const dialog = this.shadowRoot.querySelector<HTMLDialogElement>(
-          '#voiceSearchDialog');
-      if (dialog) {
-        dialog.showModal();
-      }
+        this.voiceSearchCoherenceAnySearchboxExperimentEnabled_) {
+      if (this.showVoiceSearchOverlay_) {
+        this.voiceSearchListening_ = true;
+        this.voiceSearchReceivedSpeech_ = false;
+        this.voiceSearchTranscript_ = '';
 
-      const voiceSearch =
-          this.shadowRoot.querySelector<ComposeboxVoiceSearchElement>(
-              '#voiceSearch');
-      assert(voiceSearch);
-      voiceSearch.start();
+        const dialog = this.shadowRoot.querySelector<HTMLDialogElement>(
+            '#voiceSearchDialog');
+        assert(dialog);
+        dialog.showModal();
+
+        const voiceSearch =
+            this.shadowRoot.querySelector<ComposeboxVoiceSearchElement>(
+                '#voiceSearch');
+        assert(voiceSearch);
+        voiceSearch.start();
+      }
     }
   }
 
@@ -1065,8 +1089,14 @@ export class AppElement extends AppElementBase {
   }
 
   onVoiceSearchOverlayClose() {
+    const dialog =
+        this.shadowRoot.querySelector<HTMLDialogElement>('#voiceSearchDialog');
+    if (dialog && dialog.open) {
+      return;
+    }
     this.showVoiceSearchOverlay_ = false;
     this.hasVoiceSearchError = false;
+    this.voiceSearchListening_ = false;
   }
 
   protected onVoiceSearchCancel_() {
@@ -1078,6 +1108,14 @@ export class AppElement extends AppElementBase {
     this.onVoiceSearchOverlayClose();
   }
 
+  protected onVoiceSearchTranscriptUpdate_(e: CustomEvent<string>) {
+    this.voiceSearchTranscript_ = e.detail;
+  }
+
+  protected onVoiceSearchSpeechReceived_() {
+    this.voiceSearchReceivedSpeech_ = true;
+  }
+
   protected onVoiceSearchDialogClick_(e: MouseEvent) {
     const dialog = e.currentTarget as HTMLDialogElement;
     if (e.target === dialog) {
@@ -1086,6 +1124,7 @@ export class AppElement extends AppElementBase {
   }
 
   protected onVoiceSearchFinalResult_(e: CustomEvent<string>) {
+    // Receiving a final result also closes the voice search dialog.
     const dialog =
         this.shadowRoot.querySelector<HTMLDialogElement>('#voiceSearchDialog');
     if (dialog) {
@@ -1103,6 +1142,19 @@ export class AppElement extends AppElementBase {
     );
   }
 
+  protected onVoiceSearchRecordingStopped_(e: CustomEvent<string>) {
+    const query = e.detail;
+    if (query && query.trim().length > 0) {
+      this.onVoiceSearchFinalResult_(e);
+    } else {
+      const dialog = this.shadowRoot.querySelector<HTMLDialogElement>(
+          '#voiceSearchDialog');
+      if (dialog) {
+        dialog.close();
+      }
+      this.onVoiceSearchOverlayClose();
+    }
+  }
   /**
    * Handles <CTRL> + <SHIFT> + <.> (also <CMD> + <SHIFT> + <.> on mac) to open
    * voice search.
