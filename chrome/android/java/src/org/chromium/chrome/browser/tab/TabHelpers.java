@@ -10,6 +10,7 @@ import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.SwipeRefreshHandler;
 import org.chromium.chrome.browser.accessibility.AccessibilityTabHelper;
+import org.chromium.chrome.browser.app.tabmodel.TabStateStore;
 import org.chromium.chrome.browser.complex_tasks.TaskTabHelper;
 import org.chromium.chrome.browser.contextualsearch.ContextualSearchTabHelper;
 import org.chromium.chrome.browser.display_cutout.DisplayCutoutTabHelper;
@@ -38,6 +39,8 @@ public final class TabHelpers {
         TabStateAttributes.createForTab(tab, ((TabImpl) tab).getCreationState());
         TabStateAttributesRegistry.createAttributesForTab(
                 tab, TabPersistentStoreImpl.class, ((TabImpl) tab).getCreationState());
+        TabStateAttributesRegistry.createAttributesForTab(
+                tab, TabStateStore.class, ((TabImpl) tab).getCreationState());
         InterceptNavigationDelegateTabHelper.createForTab(tab);
         TaskTabHelper.createForTab(tab, parentTab);
         TabBrowserControlsConstraintsHelper.createForTab(tab);
