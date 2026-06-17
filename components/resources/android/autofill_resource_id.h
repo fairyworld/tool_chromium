@@ -60,6 +60,10 @@ LINK_RESOURCE_ID(IDR_AUTOFILL_GOOGLE_PAY_PILL_WITH_GRADIENT,
                  R.drawable.googlepay_pill_with_gradient)
 LINK_RESOURCE_ID(IDR_AUTOFILL_GOOGLE_WALLET, R.drawable.googlewallet)
 LINK_RESOURCE_ID(IDR_AUTOFILL_GOOGLE_WALLET_ICON, R.drawable.google_wallet_24dp)
+// Note that R.drawable.googlewallet_icon_with_gradient is always present, but
+// the icon in branded builds is different from the one in unbranded builds.
+LINK_RESOURCE_ID(IDR_AUTOFILL_GOOGLE_WALLET_ICON_WITH_GRADIENT,
+                 R.drawable.googlewallet_icon_with_gradient)
 LINK_RESOURCE_ID(IDR_AUTOFILL_METADATA_BNPL_GENERIC,
                  R.drawable.bnpl_icon_generic)
 LINK_RESOURCE_ID(IDR_AUTOFILL_METADATA_BNPL_GENERIC_OLD,
