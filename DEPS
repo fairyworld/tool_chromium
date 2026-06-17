@@ -1918,7 +1918,7 @@ deps = {
           },
           {
               'package': 'chromium/third_party/android_sdk/public/cmdline-tools/linux',
-              'version': 'LZa8CWNVWS6UUQgQ7IJdFCqRV1Bmx2-alTNqEDJpJkcC',
+              'version': 'SQn_d_SRBd0UVmvwPIxRfe0eqk13464obO8MZzuGD-kC',
           },
       ],
       'condition': 'checkout_android and non_git_source',
