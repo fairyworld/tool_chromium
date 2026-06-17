@@ -294,7 +294,9 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
             assert !tabIds.isEmpty() : "Empty tab id list provided";
             TabModel tabModel = tabModelSupplier.get();
             List<Tab> tabs = TabModelUtils.getTabsById(tabIds, tabModel, /* allowClosing= */ false);
-            assert !tabs.isEmpty() : "Empty tab list provided";
+            // Anchored tab(s) may have been moved to another window or closed between menu open
+            // and item click. Drop the action if any tabs are no longer in this TabModel.
+            if (tabs.size() < tabIds.size()) return;
             recordMenuAction(menuId, tabs.size() > 1, tabModel.isIncognitoBranded());
 
             if (menuId == R.id.add_to_tab_group) {
