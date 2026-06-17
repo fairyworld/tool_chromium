@@ -1848,6 +1848,11 @@ ci.thin_tester(
             "webgpu_cts_shared_worker_tests": targets.remove(
                 reason = "We only need coverage on one GPU per OS, so remove from lower capacity configs.",
             ),
+            "webgpu_cts_tests": targets.mixin(
+                swarming = targets.swarming(
+                    shards = 20,
+                ),
+            ),
         },
     ),
     targets_settings = targets.settings(
