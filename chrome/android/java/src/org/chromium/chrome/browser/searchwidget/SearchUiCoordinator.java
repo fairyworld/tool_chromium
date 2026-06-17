@@ -277,6 +277,8 @@ public class SearchUiCoordinator {
         assertNonNull(mLocationBarCoordinator);
         assertNonNull(mSearchBox);
 
+        setColorScheme(mSearchBoxDataProvider.isIncognitoBranded());
+
         mLocationBarCoordinator.setUrlBarFocus(
                 new AutocompleteInput(OmniboxFocusReason.OMNIBOX_TAP)
                         .setUserText(query != null ? query : "")
