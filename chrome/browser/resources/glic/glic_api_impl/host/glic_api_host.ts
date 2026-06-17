@@ -16,7 +16,7 @@ import {ObservableValue} from '../../observable.js';
 import type {ObservableValueReadOnly} from '../../observable.js';
 import {TaskQueue} from '../../task_queue.js';
 import {OneShotTimer} from '../../timer.js';
-import {ActorHostMessageHandler} from '../actor/actor_host.js';
+import {ActorClientImpl, ActorHostMessageHandler} from '../actor/actor_host.js';
 import {ActorClientDef, ActorHostDef} from '../actor/actor_types.js';
 import type {ResponseExtras} from '../transport/messaging.js';
 import type {InterfaceDef, PendingReceiver, PendingRemote, PostMessageHandler, PostMessageLifecycleObserver, PostMessageReceiver, PostMessageRemote, PostMessageRequestReceiver, PostMessageRequestSender, PostMessageRouter} from '../transport/post_message_transport.js';
@@ -27,7 +27,6 @@ import type {ActorClient, ActorHost, WebClient, WebClientHost} from './../reques
 import {urlFromClient} from './conversions.js';
 import {HostMessageHandler} from './host_from_client.js';
 import type {CaptureRegionObserverImpl, PinCandidatesObserverImpl} from './host_from_client.js';
-import {ActorClientImpl} from './host_to_client.js';
 import {PanelOpenState} from './types.js';
 
 
@@ -188,7 +187,6 @@ type HandlerFunction = (payload: unknown, extras: ResponseExtras) =>
 export class GlicApiHost implements PostMessageLifecycleObserver {
   hostMessageHandler: HostMessageHandler;
   sender: PostMessageRemote<WebClient>;
-  actorSender?: PostMessageRemote<ActorClient>;
   panelIsActive = false;
 
   private handler: WebClientHandlerRemote;
@@ -276,9 +274,8 @@ export class GlicApiHost implements PostMessageLifecycleObserver {
     this.actorHandler = new ActorHandlerRemote();
     const {remote: clientRemote, receiver: actorReceiver} =
         this.communicator.router.newPipeWithRemote(ActorClientDef);
-    this.actorSender = clientRemote;
     const actorClientReceiver =
-        new ActorClientReceiver(new ActorClientImpl(this.actorSender));
+        new ActorClientReceiver(new ActorClientImpl(clientRemote));
     this.handler.createActorHandler(
         this.actorHandler.$.bindNewPipeAndPassReceiver(),
         actorClientReceiver.$.bindNewPipeAndPassRemote());

@@ -6,21 +6,22 @@
 // to the browser via mojo.
 
 import type * as actorWebUiMojom from '../../actor_webui.mojom-webui.js';
-import type {ActorHandlerInterface} from '../../glic.mojom-webui.js';
+import type {ActorClientInterface, ActorHandlerInterface, ActorTaskState as ActorTaskStateMojo} from '../../glic.mojom-webui.js';
 import type * as api from '../../glic_api/glic_api.js';
 import type {ActorTaskInterruptReason, ActorTaskPauseReason, ActorTaskStopReason, CancelActionsResult, FormFillingResponse, Journal, TabContextOptions, TaskOptions} from '../../glic_api/glic_api.js';
 import {CreateTaskErrorReason, PerformActionsErrorReason} from '../../glic_api/glic_api.js';
 import type {CheckEnumCompatibility} from '../conversions.js';
 import {enumFromClient, enumToClient} from '../enum_conversions.js';
-import {byteArrayFromClient, getArrayBufferFromBigBuffer, idFromClient, idToClient, optionalToClient, resumeActorTaskResultToClient, tabContextOptionsFromClient, tabContextToClient, taskOptionsToMojo, urlToClient} from '../host/conversions.js';
+import {byteArrayFromClient, getArrayBufferFromBigBuffer, idFromClient, idToClient, navigationConfirmationRequestToClient, navigationConfirmationResponseToMojo, optionalToClient, resumeActorTaskResultToClient, selectAutofillSuggestionsDialogRequestToClient, selectAutofillSuggestionsDialogResponseToMojo, selectCredentialDialogRequestToClient, selectCredentialDialogResponseToMojo, tabContextOptionsFromClient, tabContextToClient, taskOptionsToMojo, urlToClient, userConfirmationDialogRequestToClient, userConfirmationDialogResponseToMojo} from '../host/conversions.js';
 import {ErrorWithReasonImpl} from '../request_types.js';
 import type {ResumeActorTaskResultPrivate, TabContextResultPrivate} from '../request_types.js';
 import {assertNever} from '../transport/messaging.js';
 import type {ResponseExtras} from '../transport/messaging.js';
-import type {PostMessageHandler} from '../transport/post_message_transport.js';
+import type {PostMessageHandler, PostMessageRemote} from '../transport/post_message_transport.js';
 
+import type {NavigationConfirmationRequest as NavigationConfirmationRequestMojo, NavigationConfirmationResponse as NavigationConfirmationResponseMojo, SelectAutofillSuggestionsDialogRequest as SelectAutofillSuggestionsDialogRequestMojo, SelectAutofillSuggestionsDialogResponse as SelectAutofillSuggestionsDialogResponseMojo, SelectCredentialDialogRequest as SelectCredentialDialogRequestMojo, SelectCredentialDialogResponse as SelectCredentialDialogResponseMojo, UserConfirmationDialogRequest as UserConfirmationDialogRequestMojo, UserConfirmationDialogResponse as UserConfirmationDialogResponseMojo} from './../../actor_webui.mojom-webui.js';
 import type * as actorTypes from './actor_types.js';
-import type {ActorHost} from './actor_types.js';
+import type {ActorClient, ActorHost} from './actor_types.js';
 
 export class ActorHostMessageHandler implements PostMessageHandler<ActorHost> {
   constructor(private actorHandler: ActorHandlerInterface) {}
@@ -249,6 +250,61 @@ export class ActorHostMessageHandler implements PostMessageHandler<ActorHost> {
   }): void {
     this.actorHandler.autofillSuggestionDialogOnFormConfirmed(
         payload.taskId, payload.params);
+  }
+}
+
+
+export class ActorClientImpl implements ActorClientInterface {
+  constructor(private sender: PostMessageRemote<ActorClient>) {}
+
+  notifyActorTaskStateChanged(taskId: number, state: ActorTaskStateMojo): void {
+    const clientState = enumToClient(state);
+    this.sender.requestNoResponse(
+        'notifyActorTaskStateChanged', {taskId, state: clientState});
+  }
+
+  async requestToShowCredentialSelectionDialog(
+      request: SelectCredentialDialogRequestMojo):
+      Promise<{response: SelectCredentialDialogResponseMojo}> {
+    const clientResponse = await this.sender.requestWithResponse(
+        'requestToShowDialog',
+        {request: selectCredentialDialogRequestToClient(request)});
+    return {
+      response: selectCredentialDialogResponseToMojo(clientResponse.response),
+    };
+  }
+
+  async requestToShowUserConfirmationDialog(
+      request: UserConfirmationDialogRequestMojo):
+      Promise<{response: UserConfirmationDialogResponseMojo}> {
+    const clientResponse = await this.sender.requestWithResponse(
+        'requestToShowConfirmationDialog',
+        {request: userConfirmationDialogRequestToClient(request)});
+    return {
+      response: userConfirmationDialogResponseToMojo(clientResponse.response),
+    };
+  }
+
+  async requestToConfirmNavigation(request: NavigationConfirmationRequestMojo):
+      Promise<{response: NavigationConfirmationResponseMojo}> {
+    const clientResponse = await this.sender.requestWithResponse(
+        'requestToConfirmNavigation',
+        {request: navigationConfirmationRequestToClient(request)});
+    return {
+      response: navigationConfirmationResponseToMojo(clientResponse.response),
+    };
+  }
+
+  async requestToShowAutofillSuggestionsDialog(
+      request: SelectAutofillSuggestionsDialogRequestMojo):
+      Promise<{response: SelectAutofillSuggestionsDialogResponseMojo}> {
+    const clientResponse = await this.sender.requestWithResponse(
+        'requestToShowAutofillSuggestionsDialog',
+        {request: selectAutofillSuggestionsDialogRequestToClient(request)});
+    return {
+      response: selectAutofillSuggestionsDialogResponseToMojo(
+          clientResponse.response),
+    };
   }
 }
 
