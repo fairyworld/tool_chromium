@@ -19,6 +19,7 @@
 #include "components/autofill/core/browser/data_model/autofill_ai/entity_type.h"
 #include "components/autofill/core/browser/manual_testing_import.h"
 #include "components/autofill/core/browser/network/autofill_ai/personal_context_conversion_util.h"
+#include "components/autofill/core/common/autofill_debug_features.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/personal_context/core/personal_context_enablement_service.h"
 #include "components/personal_context/core/personal_context_service.h"
@@ -96,6 +97,11 @@ bool IsPrefetchAmbientAutofillContextEnabled(
     personal_context::PersonalContextEnablementService& enablement_service) {
   if (!base::FeatureList::IsEnabled(features::kAutofillAmbientAutofill)) {
     return false;
+  }
+
+  if (base::FeatureList::IsEnabled(
+          features::debug::kAutofillAmbientAutofillSkipEligibilityChecks)) {
+    return true;
   }
 
   return IsPersonalContextEnabled(enablement_service.GetEnablementState());
