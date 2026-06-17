@@ -3524,12 +3524,13 @@ public class TabListMediatorUnitTest {
     @Test
     public void getLatestTitle_NoTitleUrlFallback() {
         assertEquals(
-                TAB1_TITLE, mMediator.getLatestTitleForTab(mTab1, null, /* useDefault= */ true));
+                TAB1_TITLE,
+                mMediator.getLatestTitleForTabOrGroup(mTab1, null, /* useDefault= */ true));
 
         when(mTab1.getTitle()).thenReturn("");
         assertEquals(
                 TAB1_URL.getSpec(),
-                mMediator.getLatestTitleForTab(mTab1, null, /* useDefault= */ true));
+                mMediator.getLatestTitleForTabOrGroup(mTab1, null, /* useDefault= */ true));
     }
 
     @Test
@@ -3549,7 +3550,7 @@ public class TabListMediatorUnitTest {
 
         // Even if we have a stored title, we only show it in tab switcher.
         assertThat(
-                mMediator.getLatestTitleForTab(mTab1, null, /* useDefault= */ true),
+                mMediator.getLatestTitleForTabOrGroup(mTab1, null, /* useDefault= */ true),
                 equalTo(TAB1_TITLE));
     }
 
@@ -3568,7 +3569,7 @@ public class TabListMediatorUnitTest {
 
         // We never show stored title for single tab.
         assertThat(
-                mMediator.getLatestTitleForTab(mTab1, null, /* useDefault= */ true),
+                mMediator.getLatestTitleForTabOrGroup(mTab1, null, /* useDefault= */ true),
                 equalTo(CUSTOMIZED_DIALOG_TITLE1));
     }
 
@@ -3588,7 +3589,7 @@ public class TabListMediatorUnitTest {
 
         // We never show stored title for single tab.
         assertThat(
-                mMediator.getLatestTitleForTab(mTab1, null, /* useDefault= */ true),
+                mMediator.getLatestTitleForTabOrGroup(mTab1, null, /* useDefault= */ true),
                 equalTo(TAB1_TITLE));
     }
 
@@ -3606,7 +3607,7 @@ public class TabListMediatorUnitTest {
         createTabGroup(tabs, TAB_GROUP_ID);
 
         assertThat(
-                mMediator.getLatestTitleForTab(mTab1, null, /* useDefault= */ true),
+                mMediator.getLatestTitleForTabOrGroup(mTab1, null, /* useDefault= */ true),
                 equalTo(CUSTOMIZED_DIALOG_TITLE1));
     }
 
@@ -3617,7 +3618,7 @@ public class TabListMediatorUnitTest {
         createTabGroup(tabs, TAB_GROUP_ID);
 
         assertThat(
-                mMediator.getLatestTitleForTab(mTab1, null, /* useDefault= */ true),
+                mMediator.getLatestTitleForTabOrGroup(mTab1, null, /* useDefault= */ true),
                 equalTo("2 tabs"));
     }
 
@@ -3628,7 +3629,8 @@ public class TabListMediatorUnitTest {
         createTabGroup(tabs, TAB_GROUP_ID);
 
         assertThat(
-                mMediator.getLatestTitleForTab(mTab1, null, /* useDefault= */ false), equalTo(""));
+                mMediator.getLatestTitleForTabOrGroup(mTab1, null, /* useDefault= */ false),
+                equalTo(""));
     }
 
     @Test
@@ -4582,6 +4584,49 @@ public class TabListMediatorUnitTest {
     }
 
     @Test
+    public void testTabDescriptionString_Archived_EmptyTitle() {
+        mMediator =
+                new TabListMediator(
+                        mActivity,
+                        mModelList,
+                        TabListMode.GRID,
+                        mModalDialogManager,
+                        mCurrentTabModelSupplier,
+                        getTabThumbnailCallback(),
+                        mTabListFaviconProvider,
+                        () -> mSelectionDelegate,
+                        null,
+                        mTabListConfigDelegate,
+                        null,
+                        null,
+                        TabComponentId.ARCHIVED_TABS_DIALOG,
+                        TabProperties.TabActionState.CLOSABLE,
+                        mDataSharingTabManager,
+                        /* onTabGroupCreation= */ null,
+                        mUndoBarExplicitTrigger,
+                        /* snackbarManager= */ null,
+                        /* allowedSelectionCount= */ 0,
+                        /* isSingleContextMode= */ false,
+                        CallbackUtils.emptyRunnable());
+        initAndAssertAllProperties();
+
+        Tab newTab = prepareTab(TAB3_ID, "", TAB3_URL);
+        List<Tab> tabs = List.of(mTab1, newTab);
+        mMediator.resetWithListOfTabs(tabs, null, false);
+
+        String targetString =
+                mResources.getString(R.string.accessibility_restore_tab, TAB3_URL.getSpec());
+
+        assertThat(
+                mModelList
+                        .get(POSITION2)
+                        .model
+                        .get(TabProperties.CONTENT_DESCRIPTION_TEXT_RESOLVER)
+                        .resolve(mContext),
+                equalTo(targetString));
+    }
+
+    @Test
     public void testTabDescriptionString_withTabGroupType_Archived() {
         Tab newTab = prepareTab(TAB3_ID, TAB3_TITLE, TAB3_URL);
         List<Tab> tabs = List.of(mTab1, newTab);
@@ -4731,6 +4776,25 @@ public class TabListMediatorUnitTest {
         mTabGroupObserverCaptor
                 .getValue()
                 .didChangeTabGroupTitle(mTab1.getTabGroupId(), CUSTOMIZED_DIALOG_TITLE1);
+        assertThat(
+                mModelList
+                        .get(POSITION1)
+                        .model
+                        .get(TabProperties.ACTION_BUTTON_DESCRIPTION_TEXT_RESOLVER)
+                        .resolve(mContext),
+                equalTo(targetString));
+    }
+
+    @Test
+    public void testActionButtonDescriptionString_SingleTab_EmptyTitle() {
+        Tab newTab = prepareTab(TAB3_ID, "", TAB3_URL);
+        List<Tab> tabs = List.of(newTab);
+        mMediator.resetWithListOfTabs(tabs, null, false);
+
+        String targetString =
+                mResources.getString(
+                        R.string.accessibility_tabstrip_btn_close_tab, TAB3_URL.getSpec());
+
         assertThat(
                 mModelList
                         .get(POSITION1)

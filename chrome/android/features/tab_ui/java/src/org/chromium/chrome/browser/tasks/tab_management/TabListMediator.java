@@ -619,7 +619,7 @@ public class TabListMediator implements TabListNotificationHandler {
                     }
                     model.set(
                             TabProperties.TITLE,
-                            getLatestTitleForTab(updatedTab, model, /* useDefault= */ true));
+                            getLatestTitleForTabOrGroup(updatedTab, model, /* useDefault= */ true));
                 }
 
                 @Override
@@ -2305,7 +2305,9 @@ public class TabListMediator implements TabListNotificationHandler {
         model.set(TabProperties.TAB_CLICK_LISTENER, getTabActionListener(tab, isInTabGroup));
         model.set(TabProperties.IS_SELECTED, isTabSelected);
         model.set(TabProperties.SHOULD_SHOW_PRICE_DROP_TOOLTIP, false);
-        model.set(TabProperties.TITLE, getLatestTitleForTab(tab, model, /* useDefault= */ true));
+        model.set(
+                TabProperties.TITLE,
+                getLatestTitleForTabOrGroup(tab, model, /* useDefault= */ true));
         model.set(TabProperties.MEDIA_INDICATOR, getTabGridMediaIndicator(tab));
         model.set(TabProperties.IS_PINNED, tab.getIsPinned());
 
@@ -2794,7 +2796,8 @@ public class TabListMediator implements TabListNotificationHandler {
         tabInfo.set(
                 TabProperties.TAB_GROUP_ID, shouldShowAsNestedChild ? tab.getTabGroupId() : null);
         tabInfo.set(
-                TabProperties.TITLE, getLatestTitleForTab(tab, tabInfo, /* useDefault= */ false));
+                TabProperties.TITLE,
+                getLatestTitleForTabOrGroup(tab, tabInfo, /* useDefault= */ false));
         tabInfo.set(TabProperties.URL_DOMAIN, getDomainForTab(tab, tabInfo));
         tabInfo.set(TabProperties.IS_PINNED, tab.getIsPinned());
         tabInfo.set(TabProperties.MEDIA_INDICATOR, getTabGridMediaIndicator(tab));
@@ -2842,7 +2845,8 @@ public class TabListMediator implements TabListNotificationHandler {
         groupInfo.set(TabProperties.TAB_GROUP_ID, null);
         updateTabGroupProperties(tab, groupInfo, colorId);
         groupInfo.set(
-                TabProperties.TITLE, getLatestTitleForTab(tab, groupInfo, /* useDefault= */ true));
+                TabProperties.TITLE,
+                getLatestTitleForTabOrGroup(tab, groupInfo, /* useDefault= */ true));
         groupInfo.set(TabProperties.IS_COLLAPSED, isCollapsed);
         groupInfo.set(TabProperties.FAVICON_FETCHER, null);
 
@@ -2947,11 +2951,11 @@ public class TabListMediator implements TabListNotificationHandler {
                     if (!isInTabGroup) {
                         if (mComponentId == TabComponentId.ARCHIVED_TABS_DIALOG) {
                             return context.getString(
-                                    R.string.accessibility_restore_tab, tab.getTitle());
+                                    R.string.accessibility_restore_tab, getTabTitleOrUrl(tab));
                         }
                         return "";
                     }
-                    String title = getLatestTitleForTab(tab, model, /* useDefault= */ false);
+                    String title = getLatestTitleForTabOrGroup(tab, model, /* useDefault= */ false);
                     Resources res = context.getResources();
                     TabModel tabModel = getCurrentTabModelChecked();
                     @TabGroupColorId
@@ -3068,7 +3072,7 @@ public class TabListMediator implements TabListNotificationHandler {
             boolean isInTabGroup = isTabInTabGroup(tab);
             int numOfRelatedTabs = getRelatedTabsForId(tab.getId()).size();
             if (isInTabGroup) {
-                String title = getLatestTitleForTab(tab, model, /* useDefault= */ false);
+                String title = getLatestTitleForTabOrGroup(tab, model, /* useDefault= */ false);
 
                 descriptionTextResolver =
                         getActionButtonDescriptionTextResolver(numOfRelatedTabs, title, tab);
@@ -3082,7 +3086,7 @@ public class TabListMediator implements TabListNotificationHandler {
         descriptionTextResolver =
                 (context) -> {
                     return context.getString(
-                            R.string.accessibility_tabstrip_btn_close_tab, tab.getTitle());
+                            R.string.accessibility_tabstrip_btn_close_tab, getTabTitleOrUrl(tab));
                 };
         model.set(TabProperties.ACTION_BUTTON_DESCRIPTION_TEXT_RESOLVER, descriptionTextResolver);
     }
@@ -3179,8 +3183,29 @@ public class TabListMediator implements TabListNotificationHandler {
                 && model.get(TabProperties.TAB_GROUP_HEADER_ID) != null;
     }
 
+    private String getTabTitleOrUrl(Tab tab) {
+        String title = tab.getTitle();
+        if (TextUtils.isEmpty(title)) {
+            String url = tab.getUrl().getSpec();
+            return TextUtils.isEmpty(url) ? "" : url;
+        }
+        return title;
+    }
+
+    /**
+     * Returns the latest title for the given tab or its tab group. If the tab is in a group (and
+     * the layout supports groups), this returns the title of the tab group. If the tab is a single
+     * tab and its title is empty, it falls back to the tab's URL.
+     *
+     * @param tab The tab to get the title for.
+     * @param model The {@link PropertyModel} associated with the tab or tab group. If null, group
+     *     status is determined from the tab and layout type.
+     * @param useDefault Whether to use a default displayable title (e.g. "2 tabs") if the group
+     *     title is empty.
+     * @return The latest title for the tab or its group, or the URL fallback.
+     */
     @VisibleForTesting
-    String getLatestTitleForTab(Tab tab, @Nullable PropertyModel model, boolean useDefault) {
+    String getLatestTitleForTabOrGroup(Tab tab, @Nullable PropertyModel model, boolean useDefault) {
         boolean isTabGroup;
         if (model == null) {
             isTabGroup = mLayoutType != TabListLayoutType.FLAT && isTabInTabGroup(tab);
@@ -3199,12 +3224,7 @@ public class TabListMediator implements TabListNotificationHandler {
             }
         }
 
-        String originalTitle = tab.getTitle();
-        if (TextUtils.isEmpty(originalTitle)) {
-            String url = tab.getUrl().getSpec();
-            return TextUtils.isEmpty(url) ? "" : url;
-        }
-        return originalTitle;
+        return getTabTitleOrUrl(tab);
     }
 
     int selectedTabId() {
@@ -4111,7 +4131,7 @@ public class TabListMediator implements TabListNotificationHandler {
         PropertyModel headerModel = mModelList.get(headerIndexAndTab.first).model;
         Tab tab = headerIndexAndTab.second;
         // Do not trust the `newTitle`, it may be necessary to apply a default/fallback.
-        String title = getLatestTitleForTab(tab, headerModel, /* useDefault= */ true);
+        String title = getLatestTitleForTabOrGroup(tab, headerModel, /* useDefault= */ true);
         headerModel.set(TabProperties.TITLE, title);
         updateDescriptionString(tab, headerModel);
         updateActionButtonDescriptionString(tab, headerModel);
