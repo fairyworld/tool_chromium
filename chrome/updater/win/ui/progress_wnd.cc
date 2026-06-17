@@ -599,24 +599,10 @@ void ProgressWnd::OnDownloading(
 
   if (is_canceled_) {
     s = GetLocalizedString(IDS_CANCELING_BASE, lang());
-  } else if (!time_remaining) {
-    s = GetLocalizedString(IDS_DOWNLOADING_BASE, lang());
-  } else if (!time_remaining->InSeconds()) {
+  } else if (time_remaining && time_remaining->InSeconds() == 0) {
     s = GetLocalizedString(IDS_DOWNLOADING_COMPLETED_BASE, lang());
-  } else if (!time_remaining->InMinutes()) {
-    // Less than one minute remaining.
-    s = GetLocalizedStringF(IDS_DOWNLOADING_SHORT_BASE,
-                            base::NumberToWString(time_remaining->InSeconds()),
-                            lang());
-  } else if (!time_remaining->InHours()) {
-    // Less than one hour remaining.
-    s = GetLocalizedStringF(IDS_DOWNLOADING_LONG_BASE,
-                            base::NumberToWString(time_remaining->InMinutes()),
-                            lang());
   } else {
-    s = GetLocalizedStringF(IDS_DOWNLOADING_VERY_LONG_BASE,
-                            base::NumberToWString(time_remaining->InHours()),
-                            lang());
+    s = GetLocalizedString(IDS_DOWNLOADING_BASE, lang());
   }
 
   SetControlText(IDC_INSTALLER_STATE_TEXT, s.c_str());
