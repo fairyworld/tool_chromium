@@ -914,7 +914,7 @@ public final class ProductionSupportedFlagList {
                 ContentFeatures.IDB_SQLITE_ON_DISK_ROLLOUT,
                 "Enables the SQLite backing store rollout for on-disk IndexedDB."),
         Flag.baseFeature(
-                ContentFeatures.IGNORE_DUPLICATE_NAVS,
+                "WebViewIgnoreDuplicateNavs",
                 "Ignore duplicate navigations, keeping the older navigations instead."),
         Flag.baseFeature("OverrideAPIKey"),
         Flag.baseFeature("CacheStylusSettings", "Cache stylus related settings."),
