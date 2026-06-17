@@ -42,7 +42,6 @@ enum class WebAppUrlLoaderResult;
 namespace web_app {
 
 enum class IconsDownloadedResult;
-class IwaSourceWithModeAndFileOp;
 class WebAppDataRetriever;
 class WebAppRegistrar;
 
@@ -52,19 +51,7 @@ enum class VersionChangeValidationResult {
   kAllowed
 };
 
-// Copies the file being installed to the profile directory.
-// On success returns a new owned location in the callback.
-void UpdateBundlePathAndCreateStorageLocation(
-    const base::FilePath& profile_dir,
-    const IwaSourceWithModeAndFileOp& source,
-    base::OnceCallback<void(
-        base::expected<IsolatedWebAppStorageLocation, std::string>)> callback);
 
-// Removes the IWA's randomly named directory in the profile directory.
-// Calls the closure on complete.
-void CleanupLocationIfOwned(const base::FilePath& profile_dir,
-                            const IsolatedWebAppStorageLocation& location,
-                            base::OnceClosure closure);
 
 // Provides the key rotation data associated with a particular IWA.
 struct KeyRotationData {

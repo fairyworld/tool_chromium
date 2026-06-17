@@ -34,6 +34,7 @@
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_features.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolation_data.h"
 #include "chrome/browser/web_applications/isolated_web_apps/jobs/prepare_install_info_job.h"
+#include "chrome/browser/web_applications/isolated_web_apps/storage_util.h"
 #include "chrome/browser/web_applications/locks/app_lock.h"
 #include "chrome/browser/web_applications/web_app.h"
 #include "chrome/browser/web_applications/web_app_install_info.h"
