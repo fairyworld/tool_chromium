@@ -239,4 +239,48 @@ IN_PROC_BROWSER_TEST_F(BrowserInfoBarManagerBrowserTest,
   EXPECT_EQ(0u, infobar_manager2->infobars().size());
 }
 
+IN_PROC_BROWSER_TEST_F(BrowserInfoBarManagerBrowserTest, FullscreenHiding) {
+  // 1. Register a spec with should_hide_in_fullscreen = true.
+  auto spec_hide = InfoBarSpec::Builder(InfoBarDelegate::TEST_INFOBAR)
+                       .SetMessageText(u"Hide in fullscreen")
+                       .SetShouldHideInFullscreen(true)
+                       .Build();
+  manager()->Register(std::move(spec_hide));
+
+  // 2. Register a spec with should_hide_in_fullscreen = false.
+  // We use a different identifier.
+  auto spec_show =
+      InfoBarSpec::Builder(InfoBarDelegate::DEV_TOOLS_INFOBAR_DELEGATE)
+          .SetMessageText(u"Show in fullscreen")
+          // should_hide_in_fullscreen defaults to false
+          .Build();
+  manager()->Register(std::move(spec_show));
+
+  // 3. Show them.
+  manager()->Show(InfoBarDelegate::TEST_INFOBAR);
+  manager()->Show(InfoBarDelegate::DEV_TOOLS_INFOBAR_DELEGATE);
+
+  content::WebContents* web_contents =
+      browser()->tab_strip_model()->GetActiveWebContents();
+  auto* infobar_manager = ContentInfoBarManager::FromWebContents(web_contents);
+  ASSERT_EQ(2u, infobar_manager->infobars().size());
+
+  infobars::InfoBar* ib_hide = nullptr;
+  infobars::InfoBar* ib_show = nullptr;
+  for (infobars::InfoBar* ib : infobar_manager->infobars()) {
+    if (ib->delegate()->GetIdentifier() == InfoBarDelegate::TEST_INFOBAR) {
+      ib_hide = ib;
+    } else if (ib->delegate()->GetIdentifier() ==
+               InfoBarDelegate::DEV_TOOLS_INFOBAR_DELEGATE) {
+      ib_show = ib;
+    }
+  }
+  ASSERT_TRUE(ib_hide);
+  ASSERT_TRUE(ib_show);
+
+  // 4. Verify their ShouldHideInFullscreen() implementation.
+  EXPECT_TRUE(ib_hide->delegate()->ShouldHideInFullscreen());
+  EXPECT_FALSE(ib_show->delegate()->ShouldHideInFullscreen());
+}
+
 }  // namespace infobars

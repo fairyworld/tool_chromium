@@ -99,6 +99,10 @@ class RegistryInfoBarDelegate final : public ConfirmInfoBarDelegate {
            ConfirmInfoBarDelegate::ShouldExpire(details);
   }
 
+  bool ShouldHideInFullscreen() const override {
+    return spec_.should_hide_in_fullscreen();
+  }
+
  private:
   content::WebContents* GetWebContents() {
     if (!infobar()) {
