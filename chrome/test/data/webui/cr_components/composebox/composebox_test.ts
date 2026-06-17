@@ -13,7 +13,7 @@ import type {ContextualEntrypointAndMenuElement} from 'chrome://resources/cr_com
 import {WindowProxy} from 'chrome://resources/cr_components/composebox/window_proxy.js';
 import {createAutocompleteResultForTesting, createSearchMatchForTesting} from 'chrome://resources/cr_components/searchbox/searchbox_browser_proxy.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
-import {DriveDisclaimerStatus, PageCallbackRouter as SearchboxPageCallbackRouter, PageHandlerRemote as SearchboxPageHandlerRemote, SuggestInventory} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
+import {DriveDisclaimerStatus, DriveUploadError, PageCallbackRouter as SearchboxPageCallbackRouter, PageHandlerRemote as SearchboxPageHandlerRemote, SuggestInventory} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import type {PageRemote as SearchboxPageRemote} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import {InputType} from 'chrome://resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
 import type {UnguessableToken} from 'chrome://resources/mojo/mojo/public/mojom/base/unguessable_token.mojom-webui.js';
@@ -72,6 +72,9 @@ suite('ComposeboxTest', () => {
       composeboxDeleteFileTitle: 'Delete',
       contextManagementInComposeboxEnabled: false,
       tabFaviconChipsToCoinsEnabled: false,
+      maxFilesReachedError: 'Max files reached',
+      composeboxFileUploadInvalidTooLarge: 'File too large',
+      composeboxFileUploadStartedText: 'Upload started',
     });
 
     handler = installMock(
@@ -791,6 +794,58 @@ suite('ComposeboxTest', () => {
 
     assertEquals(1, searchboxHandler.getCallCount('getDriveDisclaimerStatus'));
     assertEquals(1, searchboxHandler.getCallCount('onDriveUploadClicked'));
+  });
+
+  test('addDriveUploads adds files to composebox', async () => {
+    const token = {high: 1n, low: 1n} as unknown as UnguessableToken;
+    composebox.addDriveUploads([{
+      token,
+      mimeType: 'image/png',
+      fileName: 'file.png',
+      thumbnailUrl: 'thumb',
+      iconUrl: 'icon',
+    }]);
+
+    await composebox.updateComplete;
+    assertTrue(composebox.files.has(token));
+    const file = composebox.files.get(token)!;
+    assertEquals('file.png', file.name);
+    assertEquals('image/png', file.type);
+    assertFalse(composebox.showDropdown);
+  });
+
+  test('addDriveUploads handles max files exceeded error', async () => {
+    composebox.addDriveUploads([], DriveUploadError.kMaxFilesExceeded);
+    await composebox.updateComplete;
+    assertEquals(
+        composebox.i18n('maxFilesReachedError'), composebox.errorMessage);
+  });
+
+  test('addDriveUploads handles size limit exceeded error', async () => {
+    composebox.addDriveUploads([], DriveUploadError.kSizeLimitExceeded);
+    await composebox.updateComplete;
+    assertEquals(
+        composebox.i18n('composeboxFileUploadInvalidTooLarge', 0),
+        composebox.errorMessage);
+  });
+
+  test('updateState calls addDriveUploads for drive uploads', async () => {
+    const token = {high: 2n, low: 2n} as unknown as UnguessableToken;
+    composebox.state = {
+      text: 'hello',
+      files: [{
+        token,
+        mimeType: 'image/png',
+        fileName: 'file.png',
+        thumbnailUrl: 'thumb',
+        iconUrl: 'icon',
+      }],
+      mode: 0,
+      model: 0,
+    };
+    await composebox.updateComplete;
+    assertTrue(composebox.files.has(token));
+    assertEquals('hello', composebox.input);
   });
 });
 

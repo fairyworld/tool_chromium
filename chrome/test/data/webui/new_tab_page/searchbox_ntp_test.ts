@@ -2936,4 +2936,31 @@ suite('SearchboxTest', () => {
     assertEquals(1, event.detail.error.errorType);
     assertEquals(1, testProxy.handler.getCallCount('onDriveUploadClicked'));
   });
+
+  test('onOpenDriveUpload_ handles empty selection without opening composebox', async () => {
+    testProxy.handler.setResultFor('getDriveDisclaimerStatus', Promise.resolve({
+      status: DriveDisclaimerStatus.kAccepted,
+    }));
+    testProxy.handler.setResultFor('onDriveUploadClicked', Promise.resolve({
+      response: {
+        files: [],
+        error: null,
+      },
+    }));
+
+    let openComposeboxCalled = false;
+    realbox.addEventListener('open-composebox', () => {
+      openComposeboxCalled = true;
+    });
+
+    // Call the protected method.
+    await (realbox as unknown as {
+      onOpenDriveUpload_: () => Promise<void>,
+    }).onOpenDriveUpload_();
+
+    await microtasksFinished();
+
+    assertFalse(openComposeboxCalled);
+    assertEquals(1, testProxy.handler.getCallCount('onDriveUploadClicked'));
+  });
 });
