@@ -305,11 +305,11 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
       history_clusters_service->is_journeys_feature_flag_enabled()) {
     if (HistorySidePanelCoordinator::IsSupported()) {
       RegisterWebUIControllerInterfaceBinder<
-          history_clusters::mojom::PageHandler, HistoryUI, HistorySidePanelUI>(
-          map);
+          history_clusters::mojom::PageHandlerFactory, HistoryUI,
+          HistorySidePanelUI>(map);
     } else {
       RegisterWebUIControllerInterfaceBinder<
-          history_clusters::mojom::PageHandler, HistoryUI,
+          history_clusters::mojom::PageHandlerFactory, HistoryUI,
           HistoryClustersSidePanelUI>(map);
     }
   }
