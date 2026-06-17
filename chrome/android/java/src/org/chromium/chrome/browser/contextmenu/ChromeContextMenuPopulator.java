@@ -517,6 +517,7 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
                     Tab tab = getTab();
                     boolean isEnabled = !LensOverlayTabHelper.isOverlayShowing(tab);
                     pageGroup.add(createListItem(Item.LENS_OVERLAY, false, isEnabled));
+                    maybeRecordUkmLensShown();
                 }
             }
             groupedItems.add(pageGroup);
@@ -703,9 +704,11 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
                     }
 
                     boolean shouldShowSearchImageWithLens =
-                            supportStatus != null
-                                    && supportStatus
-                                            == LensMetrics.LensSupportStatus.LENS_SEARCH_SUPPORTED;
+                            (supportStatus != null
+                                            && supportStatus
+                                                    == LensMetrics.LensSupportStatus
+                                                            .LENS_SEARCH_SUPPORTED)
+                                    || shouldShowLensOverlay();
                     if (shouldShowSearchImageWithLens) {
                         imageGroup.add(createListItem(Item.SEARCH_WITH_GOOGLE_LENS, true));
                         maybeRecordUkmLensShown();
@@ -1113,7 +1116,15 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
                             ShareOrigin.CONTEXT_MENU);
         } else if (itemId == R.id.contextmenu_search_with_google_lens) {
             recordContextMenuSelection(ContextMenuUma.Action.SEARCH_WITH_GOOGLE_LENS);
-            searchWithGoogleLens(LensEntryPoint.CONTEXT_MENU_SEARCH_MENU_ITEM);
+            if (shouldShowLensOverlay()) {
+                Tab tab = getTab();
+                if (tab != null) {
+                    LensOverlayCoordinator.getOrCreateForTab(tab)
+                            .start(LensOverlayInvocationSource.CONTEXT_MENU);
+                }
+            } else {
+                searchWithGoogleLens(LensEntryPoint.CONTEXT_MENU_SEARCH_MENU_ITEM);
+            }
             SharedPreferencesManager prefManager = ChromeSharedPreferences.getInstance();
             prefManager.writeBoolean(
                     ChromePreferenceKeys.CONTEXT_MENU_SEARCH_WITH_GOOGLE_LENS_CLICKED, true);

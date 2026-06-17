@@ -3003,6 +3003,17 @@ const FeatureEntry::FeatureVariation kLensOverlayVariations[] = {
 };
 #endif  // !BUILDFLAG(IS_ANDROID)
 
+#if BUILDFLAG(IS_ANDROID)
+const FeatureEntry::FeatureParam kLensOverlayAndroidAGSAIntent[] = {
+    {"implementation_type", lens::features::kLensOverlayAndroidImplIntent}};
+const FeatureEntry::FeatureParam kLensOverlayAndroidWebUI[] = {
+    {"implementation_type", lens::features::kLensOverlayAndroidImplWebUI}};
+
+const FeatureEntry::FeatureVariation kLensOverlayAndroidVariations[] = {
+    {"(AGSA Intent)", kLensOverlayAndroidAGSAIntent, nullptr},
+    {"(WebUI Overlay)", kLensOverlayAndroidWebUI, nullptr}};
+#endif  // BUILDFLAG(IS_ANDROID)
+
 #if !BUILDFLAG(IS_ANDROID)
 const FeatureEntry::FeatureParam kLensOverlayImageContextMenuActionsCopy[] = {
     {"enable-copy-as-image", "true"},
@@ -8623,7 +8634,9 @@ const FeatureEntry kFeatureEntries[] = {
 #if BUILDFLAG(IS_ANDROID)
     {"enable-lens-overlay-android", flag_descriptions::kLensOverlayAndroidName,
      flag_descriptions::kLensOverlayAndroidDescription, kOsAndroid,
-     FEATURE_VALUE_TYPE(lens::features::kLensOverlayAndroid)},
+     FEATURE_WITH_PARAMS_VALUE_TYPE(lens::features::kLensOverlayAndroid,
+                                    kLensOverlayAndroidVariations,
+                                    "LensOverlayAndroid")},
 #else
     {"enable-lens-overlay", flag_descriptions::kLensOverlayName,
      flag_descriptions::kLensOverlayDescription, kOsDesktop,
