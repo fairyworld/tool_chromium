@@ -235,7 +235,9 @@ if (!is_android) {
     deps = [
       ":test_support",
       "//base",
+      "//chrome/browser/autofill",
       "//chrome/browser/ui",
+      "//chrome/browser/ui/hats:test_support",
       "//chrome/browser/ui/page_action:icon_type",
       "//chrome/common",
       "//chrome/test:test_support",
@@ -322,6 +324,7 @@ source_set("unit_tests") {
       "//chrome/browser/ui/hats",
       "//chrome/browser/ui/hats:test_support",
       "//chrome/browser/ui/page_action:test_support",
+      "//chrome/browser/ui/tabs:test_support",
       "//components/commerce/core:feature_list",
       "//components/tabs:test_support",
       "//content/test:test_support",
