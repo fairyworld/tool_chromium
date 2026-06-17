@@ -4,7 +4,13 @@
 
 #include "components/sqlite_vfs/vfs_utils.h"
 
+#include <stdint.h>
+
+#include <array>
+#include <optional>
+
 #include "base/check.h"
+#include "base/containers/span.h"
 #include "base/files/file.h"
 #include "base/files/file_path.h"
 #include "base/files/file_util.h"
@@ -68,6 +74,29 @@ base::File DuplicateFile(const base::File& source_file,
   return base::File(source_file_path,
                     base::File::FLAG_OPEN | base::File::FLAG_READ);
 #endif
+}
+
+// Returns true if `db_file` plausibly looks like it was last written to using a
+// write-ahead log rather than a rollback journal. Returns false for all errors.
+bool IsWalMode(base::File& db_file) {
+  // https://sqlite.org/fileformat.html#file_format_version_numbers
+  static constexpr int64_t kReadVersionOffset = 19;
+
+  std::array<uint8_t, 1> read_version_byte;
+
+  if (db_file.Read(kReadVersionOffset, read_version_byte) !=
+      read_version_byte.size()) {
+    return false;  // Either an I/O error or an empty file.
+  }
+
+  // While all database files are required to begin with "SQLite format 3\0", do
+  // not check for that here. The file will be rejected by SQLite when it is
+  // opened. Check only whether or not the read version is 2; see
+  // https://crsrc.org/c/third_party/sqlite/src/src/btree.c?q=%22read%20version%20is%20set%20to%202%22.
+
+  static constexpr uint8_t kWalJournalingMode = 2;
+
+  return read_version_byte[0] == kWalJournalingMode;
 }
 
 }  // namespace
@@ -139,32 +168,49 @@ std::optional<PendingFileSet> MakePendingFileSet(
     return std::nullopt;
   }
 
-  // The rollback journal file is always needed; even if write-ahead logging is
-  // desired.
-  pending_file_set.journal_file = base::File(journal_file_path, create_flags);
-  base::UmaHistogramExactLinear(
-      GetHistogramName(client, "CreateResult", FileType::kMainJournal),
-      -pending_file_set.journal_file.error_details(),
-      -base::File::FILE_ERROR_MAX);
-  if (!pending_file_set.journal_file.IsValid()) {
-    return std::nullopt;
+  // Check the state of the main database file to determine whether the rollback
+  // journal and/or the write-ahead log are needed.
+  const bool db_is_wal = IsWalMode(pending_file_set.db_file);
+  const bool need_journal = !journal_mode_wal || !db_is_wal;
+  const bool need_wal = journal_mode_wal || db_is_wal;
+
+  if (need_journal) {
+    pending_file_set.journal_file = base::File(journal_file_path, create_flags);
+    base::UmaHistogramExactLinear(
+        GetHistogramName(client, "CreateResult", FileType::kMainJournal),
+        -pending_file_set.journal_file.error_details(),
+        -base::File::FILE_ERROR_MAX);
+    if (!pending_file_set.journal_file.IsValid()) {
+      return std::nullopt;
+    }
+  } else {
+    // Delete a stray -journal file left behind by a previous migration to
+    // WAL-mode.
+    base::DeleteFile(journal_file_path);
   }
 
-  // The write-ahead log file must be created if WAL-mode is requested. An
-  // existing one must be opened even if WAL-mode is not requested to enable
-  // migration from WAL back to use of a rollback journal.
-  pending_file_set.wal_file = base::File(
-      wal_file_path,
-      (journal_mode_wal ? create_flags
-                        : ((create_flags & ~base::File::FLAG_OPEN_ALWAYS) |
-                           base::File::FLAG_OPEN)));
-  base::UmaHistogramExactLinear(
-      GetHistogramName(client, "CreateResult", FileType::kWal),
-      -pending_file_set.wal_file.error_details(), -base::File::FILE_ERROR_MAX);
-  if (!pending_file_set.wal_file.IsValid() &&
-      (journal_mode_wal || pending_file_set.wal_file.error_details() !=
-                               base::File::FILE_ERROR_NOT_FOUND)) {
-    return std::nullopt;
+  if (need_wal) {
+    // The write-ahead log file must be created if WAL-mode is requested. An
+    // existing one must be opened even if WAL-mode is not requested to enable
+    // migration from WAL back to use of a rollback journal.
+    pending_file_set.wal_file = base::File(
+        wal_file_path,
+        (journal_mode_wal ? create_flags
+                          : ((create_flags & ~base::File::FLAG_OPEN_ALWAYS) |
+                             base::File::FLAG_OPEN)));
+    base::UmaHistogramExactLinear(
+        GetHistogramName(client, "CreateResult", FileType::kWal),
+        -pending_file_set.wal_file.error_details(),
+        -base::File::FILE_ERROR_MAX);
+    if (!pending_file_set.wal_file.IsValid() &&
+        (journal_mode_wal || pending_file_set.wal_file.error_details() !=
+                                 base::File::FILE_ERROR_NOT_FOUND)) {
+      return std::nullopt;
+    }
+  } else {
+    // Delete a stray -wal file left behind by a previous migration to rollback
+    // journaling.
+    base::DeleteFile(wal_file_path);
   }
 
   if (!single_connection && pending_file_set.wal_file.IsValid()) {
@@ -290,12 +336,14 @@ std::optional<PendingFileSet> ShareConnection(const base::FilePath& directory,
     return std::nullopt;
   }
 
-  pending_file_set.journal_file = DuplicateFile(
-      file_set.GetJournalFile(),
-      directory.Append(base_name).AddExtension(kJournalFileExtension),
-      !file_set.read_only(), read_write);
-  if (!pending_file_set.journal_file.IsValid()) {
-    return std::nullopt;
+  if (file_set.has_journal_file()) {
+    pending_file_set.journal_file = DuplicateFile(
+        file_set.GetJournalFile(),
+        directory.Append(base_name).AddExtension(kJournalFileExtension),
+        !file_set.read_only(), read_write);
+    if (!pending_file_set.journal_file.IsValid()) {
+      return std::nullopt;
+    }
   }
 
   pending_file_set.shared_lock = file_set.GetSharedLock().Duplicate();
