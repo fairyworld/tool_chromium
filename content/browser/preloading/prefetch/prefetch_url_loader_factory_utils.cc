@@ -15,6 +15,11 @@
 
 namespace content {
 
+namespace {
+static network::SharedURLLoaderFactory* g_url_loader_factory_for_testing =
+    nullptr;
+}  // namespace
+
 network::mojom::URLLoaderFactoryParamsPtr
 CreatePrefetchURLLoaderFactoryParams() {
   auto factory_params = network::mojom::URLLoaderFactoryParams::New();
@@ -22,6 +27,11 @@ CreatePrefetchURLLoaderFactoryParams() {
   factory_params->is_trusted = true;
   factory_params->is_orb_enabled = false;
   return factory_params;
+}
+
+void SetTerminalPrefetchURLLoaderFactoryForTesting(  // IN-TEST
+    network::SharedURLLoaderFactory* url_loader_factory) {
+  g_url_loader_factory_for_testing = url_loader_factory;
 }
 
 scoped_refptr<network::SharedURLLoaderFactory> CreatePrefetchURLLoaderFactory(
@@ -50,14 +60,28 @@ scoped_refptr<network::SharedURLLoaderFactory> CreatePrefetchURLLoaderFactory(
 
   bool bypass_redirect_checks = false;
 
-  url_loader_factory::TerminalParams terminal_params =
-      pre_prefetch_url_loader_factory
-          ? url_loader_factory::TerminalParams::ForNonNetwork(
-                std::move(pre_prefetch_url_loader_factory),
-                network::mojom::kBrowserProcessId)
-          : url_loader_factory::TerminalParams::ForNetworkContext(
-                network_context, CreatePrefetchURLLoaderFactoryParams(),
-                url_loader_factory::HeaderClientOption::kAllow);
+  url_loader_factory::TerminalParams terminal_params = [&]() {
+    // If this is for PrePrefetch-promoted request, serve from the PrePrefetched
+    // result.
+    if (pre_prefetch_url_loader_factory) {
+      return url_loader_factory::TerminalParams::ForNonNetwork(
+          std::move(pre_prefetch_url_loader_factory),
+          network::mojom::kBrowserProcessId);
+    }
+
+    // Intercept the request for testing, if any (but not for
+    // PrePrefetch-promoted cases, see the method comment in the header).
+    if (g_url_loader_factory_for_testing) {
+      return url_loader_factory::TerminalParams::ForNonNetwork(
+          base::WrapRefCounted(g_url_loader_factory_for_testing),
+          network::mojom::kBrowserProcessId);
+    }
+
+    // Otherwise, send the request to the network.
+    return url_loader_factory::TerminalParams::ForNetworkContext(
+        network_context, CreatePrefetchURLLoaderFactoryParams(),
+        url_loader_factory::HeaderClientOption::kAllow);
+  }();
 
   return url_loader_factory::Create(
       ContentBrowserClient::URLLoaderFactoryType::kPrefetch,

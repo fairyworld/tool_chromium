@@ -39,6 +39,7 @@
 #include "content/browser/preloading/prefetch/prefetch_streaming_url_loader.h"
 #include "content/browser/preloading/prefetch/prefetch_test_util_internal.h"
 #include "content/browser/preloading/prefetch/prefetch_type.h"
+#include "content/browser/preloading/prefetch/prefetch_url_loader_factory_utils.h"
 #include "content/browser/preloading/preloading.h"
 #include "content/browser/preloading/preloading_attempt_impl.h"
 #include "content/browser/preloading/preloading_data_impl.h"
@@ -405,7 +406,13 @@ class PrefetchServiceTestBase : public PrefetchingMetricsTestBase {
 
     InitScopedFeatureList();
 
-    PrefetchService::SetURLLoaderFactoryForTesting(
+    SetTerminalPrefetchURLLoaderFactoryForTesting(
+        test_shared_url_loader_factory_.get());
+    // `PrePrefetchServiceImpl::SetURLLoaderFactoryForTesting()` is called for
+    // catching network requests in:
+    // - PrePrefetch-related tests, and
+    // - Tests with `kPrefetchOffTheMainThreadForceForTesting` enabled.
+    PrePrefetchServiceImpl::SetURLLoaderFactoryForTesting(
         test_shared_url_loader_factory_.get());
 
     PrefetchService::SetHostNonUniqueFilterForTesting(
@@ -420,10 +427,12 @@ class PrefetchServiceTestBase : public PrefetchingMetricsTestBase {
     }
     PrefetchDocumentManager::SetPrefetchServiceForTesting(nullptr);
     mock_navigation_handle_.reset();
-    PrefetchService::SetURLLoaderFactoryForTesting(nullptr);
+
+    SetTerminalPrefetchURLLoaderFactoryForTesting(nullptr);
+    PrePrefetchServiceImpl::SetURLLoaderFactoryForTesting(nullptr);
+
     PrefetchService::SetHostNonUniqueFilterForTesting(nullptr);
     PrefetchService::SetServiceWorkerContextForTesting(nullptr);
-    PrefetchService::SetURLLoaderFactoryForTesting(nullptr);
     test_content_browser_client_.reset();
     request_handler_keep_alive_.clear();
     service_worker_context_.reset();
@@ -1194,13 +1203,10 @@ class PrefetchServicePrePrefetchTest : public PrefetchServiceTest {
         url::Origin::Create(GURL("https://example.com")),
         /*initial_javascript_enabled_hint=*/true,
         /*initial_should_append_variations_header_hint=*/false);
-    PrePrefetchServiceImpl::SetURLLoaderFactoryForTesting(
-        test_shared_url_loader_factory_.get());
   }
 
   void TearDown() override {
     pre_prefetch_service_.reset();
-    PrePrefetchServiceImpl::SetURLLoaderFactoryForTesting(nullptr);
     PrefetchServiceTest::TearDown();
   }
 

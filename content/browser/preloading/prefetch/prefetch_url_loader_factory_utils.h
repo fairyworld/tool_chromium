@@ -39,6 +39,22 @@ CreatePrefetchURLLoaderFactory(network::mojom::NetworkContext* network_context,
                                scoped_refptr<network::SharedURLLoaderFactory>
                                    pre_prefetch_url_loader_factory = nullptr);
 
+// Sets the URLLoaderFactory to intercept *network requests* just before being
+// sent to a NetworkContext. This intercepts both Default and Isolated network
+// requests, but does NOT intercept PrePrefetch-backed prefetches, because the
+// request doesn't go to the network. Use
+// `PrePrefetchServiceImpl::SetURLLoaderFactoryForTesting()` for intercepting
+// PrePrefetch requests just before going to the network instead.
+//
+// This is inserted at the last step of the URLLoaderFactory chain and not e.g.
+// at `PrefetchService::GetURLLoaderFactoryForCurrentPrefetch()`, to fully
+// exercise PrePrefetch-backed Prefetch code path.
+//
+// Note that this does not take ownership of `url_loader_factory`, and caller
+// must keep ownership over the course of the test.
+CONTENT_EXPORT void SetTerminalPrefetchURLLoaderFactoryForTesting(
+    network::SharedURLLoaderFactory* url_loader_factory);
+
 }  // namespace content
 
 #endif  // CONTENT_BROWSER_PRELOADING_PREFETCH_PREFETCH_URL_LOADER_FACTORY_UTILS_H_

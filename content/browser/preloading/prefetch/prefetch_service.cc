@@ -96,9 +96,6 @@ static ServiceWorkerContext* g_service_worker_context_for_testing = nullptr;
 
 bool (*g_host_non_unique_filter)(std::string_view) = nullptr;
 
-static network::SharedURLLoaderFactory* g_url_loader_factory_for_testing =
-    nullptr;
-
 static network::mojom::NetworkContext*
     g_network_context_for_proxy_lookup_for_testing = nullptr;
 
@@ -1759,10 +1756,6 @@ PrefetchService::CreateIsolatedNetworkContextForTesting(  // IN-TEST
 scoped_refptr<network::SharedURLLoaderFactory>
 PrefetchService::GetURLLoaderFactoryForCurrentPrefetch(
     PrefetchContainer& prefetch_container) {
-  if (g_url_loader_factory_for_testing) {
-    return base::WrapRefCounted(g_url_loader_factory_for_testing);
-  }
-
   // We can only use PrePrefetch's `URLLoaderFactory` for the initial request.
   // E.g., assume the page 4 redirects (1)A -> (2)A -> (3)B -> (4)A,
   // and B is a cross-site redirect. In this case,
@@ -2007,12 +2000,6 @@ void PrefetchService::SetServiceWorkerContextForTesting(
 void PrefetchService::SetHostNonUniqueFilterForTesting(
     bool (*filter)(std::string_view)) {
   g_host_non_unique_filter = filter;
-}
-
-// static
-void PrefetchService::SetURLLoaderFactoryForTesting(
-    network::SharedURLLoaderFactory* url_loader_factory) {
-  g_url_loader_factory_for_testing = url_loader_factory;
 }
 
 // static
