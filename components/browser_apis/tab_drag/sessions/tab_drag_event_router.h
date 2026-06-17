@@ -39,7 +39,8 @@ class TabDragEventRouter : public TabDragSessionListener {
 
   // TabDragSessionListener overrides:
   void OnSessionStarted(std::vector<tabs_api::NodeId> dragged_tabs,
-                        TabDragWindowAdapter* source_window) override;
+                        TabDragWindowAdapter* source_window,
+                        const gfx::Point& start_point) override;
   void OnTargetWindowChanged(TabDragWindowAdapter* new_target,
                              const gfx::Point& screen_point) override;
   void OnDragMoved(const gfx::Point& screen_point) override;

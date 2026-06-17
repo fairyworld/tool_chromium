@@ -43,6 +43,10 @@ class TabDragSession {
   // Starts the session by initiating input capture.
   base::expected<void, mojo_base::mojom::ErrorPtr> Start();
 
+  // Updates the window hosting the drag session and transfers input capture
+  // to it.
+  void UpdateDraggedWindow(TabDragWindowAdapter* new_window);
+
   const gfx::Point& start_point_in_screen() const {
     return start_point_in_screen_;
   }
@@ -53,11 +57,20 @@ class TabDragSession {
   const std::vector<tabs_api::NodeId>& dragged_tabs() const {
     return dragged_tabs_;
   }
-  TabDragWindowAdapter* dragged_window() const { return dragged_window_; }
+  TabDragSessionInjector* injector() const { return &*injector_; }
 
  private:
+  enum class DragMode {
+    kAttachedToWindow,
+    kDetachedWindow,
+  };
+
   void EndSession();
   void OnInputEvent(const TabDragInputEvent& event);
+
+  void HandleMovedEvent(const gfx::Point& screen_point);
+  void HandleAttachedMove(const gfx::Point& screen_point);
+  void HandleDetachedMove(const gfx::Point& screen_point);
 
   std::vector<tabs_api::NodeId> dragged_tabs_;
   const raw_ref<TabDragSessionInjector> injector_;
@@ -68,7 +81,7 @@ class TabDragSession {
   gfx::Point last_mouse_screen_point_;
   gfx::Vector2d delta_;
   raw_ptr<TabDragWindowAdapter> dragged_window_ = nullptr;
-  raw_ptr<TabDragWindowAdapter> current_target_ = nullptr;
+  DragMode drag_mode_ = DragMode::kAttachedToWindow;
 };
 
 }  // namespace tabs_api

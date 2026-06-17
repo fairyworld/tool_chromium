@@ -22,8 +22,10 @@ TabDragEventRouter::~TabDragEventRouter() = default;
 
 void TabDragEventRouter::OnSessionStarted(
     std::vector<tabs_api::NodeId> dragged_tabs,
-    TabDragWindowAdapter* source_window) {
+    TabDragWindowAdapter* source_window,
+    const gfx::Point& start_point) {
   dragged_tabs_ = std::move(dragged_tabs);
+  TransitionToTargetWindow(source_window, start_point);
 }
 
 void TabDragEventRouter::OnTargetWindowChanged(TabDragWindowAdapter* new_target,

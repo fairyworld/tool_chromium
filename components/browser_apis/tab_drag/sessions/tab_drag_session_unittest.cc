@@ -174,6 +174,7 @@ TEST_F(TabDragSessionTest, ListenerNotification) {
   ToyTabDragSessionListener listener;
   ToyDropTargetRegistry registry;
   ToyTabDragSessionInjector injector(toy_adapter, listener, registry);
+  ToyTabDragWindowAdapter target_window(gfx::Rect(0, 0, 100, 100));
 
   std::vector<tabs_api::NodeId> tab_ids = {
       NodeId(NodeId::Type::kContent, "tab1")};
@@ -190,9 +191,17 @@ TEST_F(TabDragSessionTest, ListenerNotification) {
             ToyTabDragSessionListener::Event::Type::kStarted);
   EXPECT_EQ(listener.events()[0].dragged_tabs, tab_ids);
   EXPECT_EQ(listener.events()[0].window, &dummy_window_);
+  EXPECT_EQ(listener.events()[0].point, gfx::Point());
 
-  // Move to a target window
-  ToyTabDragWindowAdapter target_window(gfx::Rect(0, 0, 100, 100));
+  // Move outside source window to trigger tear-off.
+  // dummy_window_ is (0,0, 100,100). Threshold is 15.
+  gfx::Point tear_point(120, 120);
+  toy_adapter.SendToyEvent(TabDragInputEvent::Type::kMoved, tear_point);
+
+  // No event is fired during tear-off in the simplified design.
+  ASSERT_EQ(listener.events().size(), 1u);
+
+  // Move to a target window (simulate merge)
   registry.set_target_window(&target_window);
   gfx::Point move_point1(10, 20);
   toy_adapter.SendToyEvent(TabDragInputEvent::Type::kMoved, move_point1);

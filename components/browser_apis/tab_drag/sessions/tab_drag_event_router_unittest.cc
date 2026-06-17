@@ -48,7 +48,7 @@ TEST_F(TabDragEventRouterTest, RouteMoveEvents) {
       registration.BindNewEndpointAndPassDedicatedReceiver());
 
   std::vector<NodeId> tabs = {NodeId(NodeId::Type::kContent, "tab1")};
-  router_.OnSessionStarted(tabs, nullptr);
+  router_.OnSessionStarted(tabs, nullptr, gfx::Point());
 
   // Simulate entering the window
   router_.OnTargetWindowChanged(&window, gfx::Point(50, 50));
@@ -95,7 +95,7 @@ TEST_F(TabDragEventRouterTest, MultiWindowRouting) {
   registry_.RegisterDropTarget(&window_b, remote_b.Unbind(),
                                reg_b.BindNewEndpointAndPassDedicatedReceiver());
 
-  router_.OnSessionStarted({}, nullptr);
+  router_.OnSessionStarted({}, nullptr, gfx::Point());
 
   // Enter A
   router_.OnTargetWindowChanged(&window_a, gfx::Point(50, 50));
@@ -134,7 +134,7 @@ TEST_F(TabDragEventRouterTest, DropEvent) {
                                reg.BindNewEndpointAndPassDedicatedReceiver());
 
   std::vector<NodeId> tabs = {NodeId(NodeId::Type::kContent, "tab1")};
-  router_.OnSessionStarted(tabs, nullptr);
+  router_.OnSessionStarted(tabs, nullptr, gfx::Point());
 
   router_.OnTargetWindowChanged(&window, gfx::Point(50, 50));
   router_.OnSessionDropped(gfx::Point(60, 60));
@@ -158,7 +158,7 @@ TEST_F(TabDragEventRouterTest, CancelEvent) {
   registry_.RegisterDropTarget(&window, remote.Unbind(),
                                reg.BindNewEndpointAndPassDedicatedReceiver());
 
-  router_.OnSessionStarted({}, nullptr);
+  router_.OnSessionStarted({}, nullptr, gfx::Point());
 
   router_.OnTargetWindowChanged(&window, gfx::Point(50, 50));
   router_.OnSessionCancelled();

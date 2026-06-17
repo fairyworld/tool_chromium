@@ -30,8 +30,8 @@ base::expected<void, mojo_base::mojom::ErrorPtr> TabDragSession::Start() {
           &TabDragSession::OnInputEvent, base::Unretained(this)));
   if (result.has_value()) {
     dragged_window_->SetCapture();
-    injector_->GetSessionListener().OnSessionStarted(dragged_tabs_,
-                                                     dragged_window_);
+    injector_->GetSessionListener().OnSessionStarted(
+        dragged_tabs_, dragged_window_, start_point_in_screen_);
   }
   return result;
 }
@@ -47,7 +47,20 @@ void TabDragSession::EndSession() {
   }
 }
 
+void TabDragSession::UpdateDraggedWindow(TabDragWindowAdapter* new_window) {
+  CHECK(new_window);
+  dragged_window_->ReleaseCapture();
+  dragged_window_ = new_window;
+  dragged_window_->SetCapture();
+}
+
 void TabDragSession::OnInputEvent(const TabDragInputEvent& event) {
+  if (event.type == TabDragInputEvent::Type::kMoved ||
+      event.type == TabDragInputEvent::Type::kDropped) {
+    last_mouse_screen_point_ = event.screen_point;
+    delta_ = event.screen_point - start_point_in_screen_;
+  }
+
   switch (event.type) {
     case TabDragInputEvent::Type::kCancelled:
       injector_->GetSessionListener().OnSessionCancelled();
@@ -55,43 +68,57 @@ void TabDragSession::OnInputEvent(const TabDragInputEvent& event) {
       break;
     case TabDragInputEvent::Type::kCaptureChanged:
       if (dragged_window_->HasCapture()) {
-        // Window has capture - ignore.
-        return;
+        break;
       }
       injector_->GetSessionListener().OnSessionCancelled();
       EndSession();
       break;
-    case TabDragInputEvent::Type::kDropped: {
-      last_mouse_screen_point_ = event.screen_point;
-      delta_ = event.screen_point - start_point_in_screen_;
-      auto new_target = injector_->GetDropTargetRegistry().FindTargetWindow(
-          event.screen_point, dragged_window_);
-      TabDragWindowAdapter* new_target_ptr =
-          new_target ? &new_target->get() : nullptr;
-      if (new_target_ptr != current_target_) {
-        current_target_ = new_target_ptr;
-        injector_->GetSessionListener().OnTargetWindowChanged(
-            current_target_, event.screen_point);
-      }
+    case TabDragInputEvent::Type::kDropped:
       injector_->GetSessionListener().OnSessionDropped(event.screen_point);
       EndSession();
       break;
-    }
-    case TabDragInputEvent::Type::kMoved: {
-      last_mouse_screen_point_ = event.screen_point;
-      delta_ = event.screen_point - start_point_in_screen_;
-      auto new_target = injector_->GetDropTargetRegistry().FindTargetWindow(
-          event.screen_point, dragged_window_);
-      TabDragWindowAdapter* new_target_ptr =
-          new_target ? &new_target->get() : nullptr;
-      if (new_target_ptr != current_target_) {
-        current_target_ = new_target_ptr;
-        injector_->GetSessionListener().OnTargetWindowChanged(
-            current_target_, event.screen_point);
-      } else if (current_target_) {
-        injector_->GetSessionListener().OnDragMoved(event.screen_point);
-      }
+    case TabDragInputEvent::Type::kMoved:
+      HandleMovedEvent(event.screen_point);
       break;
+  }
+}
+
+void TabDragSession::HandleMovedEvent(const gfx::Point& screen_point) {
+  switch (drag_mode_) {
+    case DragMode::kAttachedToWindow:
+      HandleAttachedMove(screen_point);
+      break;
+    case DragMode::kDetachedWindow:
+      HandleDetachedMove(screen_point);
+      break;
+  }
+}
+
+void TabDragSession::HandleAttachedMove(const gfx::Point& screen_point) {
+  CHECK(dragged_window_);
+  gfx::Rect bounds = dragged_window_->GetBoundsInScreen();
+  constexpr int kTearThreshold = 15;
+  bounds.Inset(-kTearThreshold);
+
+  if (!bounds.Contains(screen_point)) {
+    drag_mode_ = DragMode::kDetachedWindow;
+  } else {
+    injector_->GetSessionListener().OnDragMoved(screen_point);
+  }
+}
+
+void TabDragSession::HandleDetachedMove(const gfx::Point& screen_point) {
+  auto new_target = injector_->GetDropTargetRegistry().FindTargetWindow(
+      screen_point, dragged_window_);
+
+  if (new_target) {
+    TabDragWindowAdapter& target_window = new_target->get();
+    if (target_window.GetBoundsInScreen().Contains(screen_point)) {
+      drag_mode_ = DragMode::kAttachedToWindow;
+      dragged_window_ = &target_window;
+      injector_->GetSessionListener().OnTargetWindowChanged(dragged_window_,
+                                                            screen_point);
+      return;
     }
   }
 }

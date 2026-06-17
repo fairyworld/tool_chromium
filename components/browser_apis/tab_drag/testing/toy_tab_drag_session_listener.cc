@@ -15,9 +15,11 @@ ToyTabDragSessionListener::~ToyTabDragSessionListener() = default;
 
 void ToyTabDragSessionListener::OnSessionStarted(
     std::vector<tabs_api::NodeId> dragged_tabs,
-    TabDragWindowAdapter* source_window) {
+    TabDragWindowAdapter* source_window,
+    const gfx::Point& start_point) {
   events_.push_back({.type = Event::Type::kStarted,
                      .window = source_window,
+                     .point = start_point,
                      .dragged_tabs = std::move(dragged_tabs)});
 }
 

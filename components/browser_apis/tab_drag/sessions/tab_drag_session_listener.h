@@ -20,7 +20,8 @@ class TabDragSessionListener {
 
   // Called when a new drag session starts.
   virtual void OnSessionStarted(std::vector<tabs_api::NodeId> dragged_tabs,
-                                TabDragWindowAdapter* source_window) = 0;
+                                TabDragWindowAdapter* source_window,
+                                const gfx::Point& start_point) = 0;
 
   // Called when the active target window for the drag changes.
   // `new_target` is the window now under the cursor, or nullptr if none.
