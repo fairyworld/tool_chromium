@@ -2236,7 +2236,7 @@ void StoragePartitionImpl::OnLocalNetworkAccessPermissionRequired(
       rfh = context.navigation_or_document()->GetDocument();
     } else if (context.navigation_or_document()->GetNavigationRequest()) {
       // Currently the LNA permission only applies to subframe navigations.
-      // See content/browser/renderer_host/private_network_access_util.cc for
+      // See content/browser/renderer_host/local_network_access_util.cc for
       // current feature state to policy mapping logic.
       //
       // For other types of navigation, we either default-allow or default-block

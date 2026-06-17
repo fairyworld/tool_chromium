@@ -623,7 +623,7 @@ class CONTENT_EXPORT ContentBrowserClient {
   // Computes the IPAddressSpace of the given URL with embedder knowledge.
   // This is used to assign values to special schemes recognized only by the
   // embedders of content/. Returns kUnknown if no such scheme was found.
-  // See https://wicg.github.io/private-network-access/ for details on what
+  // See https://wicg.github.io/local-network-access/ for details on what
   // the IPAddressSpace represents.
   virtual network::mojom::IPAddressSpace DetermineAddressSpaceFromURL(
       const GURL& url);
@@ -2835,11 +2835,11 @@ class CONTENT_EXPORT ContentBrowserClient {
     kDefault,
   };
 
-  // Returns whether and how we should override the default private network
+  // Returns whether and how we should override the default local network
   // request policy.
   //
   // See the Private Network Access spec for more details:
-  // https://wicg.github.io/private-network-access.
+  // https://wicg.github.io/local-network-access.
   //
   // |browser_context| must not be nullptr. Caller retains ownership.
   // |origin| is the origin of a navigation ready to commit.
