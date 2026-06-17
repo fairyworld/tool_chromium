@@ -43,6 +43,7 @@ import org.robolectric.shadows.ShadowLooper;
 import org.chromium.base.Callback;
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.base.test.util.Features.DisableFeatures;
+import org.chromium.chrome.browser.tab.MediaState;
 import org.chromium.chrome.browser.tab_ui.TabListFaviconProvider.TabFavicon;
 import org.chromium.chrome.browser.tab_ui.TabListFaviconProvider.TabFaviconFetcher;
 import org.chromium.chrome.browser.tasks.tab_management.TabActionButtonData;
@@ -68,6 +69,7 @@ public class TabVerticalViewBinderUnitTest {
     private TextView mTitleView;
     private ImageView mFaviconView;
     private ImageView mCloseButton;
+    private ImageView mMediaIndicatorView;
     private PropertyModel mModel;
 
     @Before
@@ -81,6 +83,7 @@ public class TabVerticalViewBinderUnitTest {
         mTitleView = mItemView.findViewById(R.id.tab_title);
         mFaviconView = mItemView.findViewById(R.id.tab_favicon);
         mCloseButton = mItemView.findViewById(R.id.action_button);
+        mMediaIndicatorView = mItemView.findViewById(R.id.media_indicator_icon);
 
         mModel =
                 new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
@@ -163,6 +166,20 @@ public class TabVerticalViewBinderUnitTest {
 
         assertEquals(View.GONE, mFaviconView.getVisibility());
         assertNull(mFaviconView.getDrawable());
+    }
+
+    @Test
+    @SmallTest
+    public void testBindMediaIndicator() {
+        mModel.set(TabProperties.MEDIA_INDICATOR, MediaState.AUDIBLE);
+        TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.MEDIA_INDICATOR);
+
+        assertEquals(View.VISIBLE, mMediaIndicatorView.getVisibility());
+
+        mModel.set(TabProperties.MEDIA_INDICATOR, MediaState.NONE);
+        TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.MEDIA_INDICATOR);
+
+        assertEquals(View.GONE, mMediaIndicatorView.getVisibility());
     }
 
     @Test

@@ -439,7 +439,7 @@ public class TabListMediator implements TabListNotificationHandler {
                         updateActorUiState(model, state);
                     }
 
-                    if (mLayoutType != TabListLayoutType.FLAT && isTabInTabGroup(tab)) {
+                    if (mLayoutType == TabListLayoutType.GROUPED && isTabInTabGroup(tab)) {
                         int index = getIndexForTabIdWithRelatedTabs(tabId);
                         if (index != TabModel.INVALID_TAB_INDEX) {
                             PropertyModel groupModel = mModelList.get(index).model;
@@ -595,7 +595,7 @@ public class TabListMediator implements TabListNotificationHandler {
                     }
                     @Nullable PropertyModel model = mModelList.getModelFromTabId(tab.getId());
                     if (model == null
-                            || (mLayoutType != TabListLayoutType.FLAT
+                            || (mLayoutType == TabListLayoutType.GROUPED
                                     && getCurrentTabModelChecked().isTabInTabGroup(tab))) {
                         return;
                     }
@@ -649,7 +649,7 @@ public class TabListMediator implements TabListNotificationHandler {
 
                     @Nullable PropertyModel tabInfo = null;
                     @Nullable Tab tab = null;
-                    if (mLayoutType != TabListLayoutType.FLAT && isTabInTabGroup(updatedTab)) {
+                    if (mLayoutType == TabListLayoutType.GROUPED && isTabInTabGroup(updatedTab)) {
                         @Nullable Pair<Integer, Tab> indexAndTab =
                                 getIndexAndTabForTabGroupId(updatedTab.getTabGroupId());
                         if (indexAndTab == null) return;
@@ -704,7 +704,7 @@ public class TabListMediator implements TabListNotificationHandler {
                     @Nullable PropertyModel model;
                     Tab representativeTab = updatedTab;
                     boolean isTabGroupTabGrid =
-                            mLayoutType != TabListLayoutType.FLAT && isTabInTabGroup(updatedTab);
+                            mLayoutType == TabListLayoutType.GROUPED && isTabInTabGroup(updatedTab);
                     if (isTabGroupTabGrid) {
                         Token tabGroupId = updatedTab.getTabGroupId();
                         assumeNonNull(tabGroupId);
@@ -722,7 +722,7 @@ public class TabListMediator implements TabListNotificationHandler {
                     }
                     model.set(
                             TabProperties.MEDIA_INDICATOR,
-                            getTabGridMediaIndicator(representativeTab));
+                            getTabGridMediaIndicator(representativeTab, model));
                     if (isTabGroupTabGrid) {
                         updateDescriptionString(representativeTab, model);
                     }
@@ -2300,8 +2300,8 @@ public class TabListMediator implements TabListNotificationHandler {
         model.set(
                 TabProperties.TITLE,
                 getLatestTitleForTabOrGroup(tab, model, /* useDefault= */ true));
-        model.set(TabProperties.MEDIA_INDICATOR, getTabGridMediaIndicator(tab));
         model.set(TabProperties.IS_PINNED, tab.getIsPinned());
+        model.set(TabProperties.MEDIA_INDICATOR, getTabGridMediaIndicator(tab, model));
 
         bindTabActionStateProperties(model.get(TabProperties.TAB_ACTION_STATE), tab, model);
 
@@ -2349,7 +2349,16 @@ public class TabListMediator implements TabListNotificationHandler {
         return tabModel.isTabInTabGroup(tab);
     }
 
-    private @MediaState int getTabGridMediaIndicator(Tab representativeTab) {
+    private @MediaState int getTabGridMediaIndicator(Tab representativeTab, PropertyModel model) {
+        if (mLayoutType == TabListLayoutType.NESTED) {
+            if (model.get(TabProperties.IS_PINNED) || isTabGroupHeader(model)) {
+                return MediaState.NONE;
+            }
+            // For nested layout child tabs, we do not aggregate the media state of the entire
+            // group.
+            return representativeTab.getMediaState();
+        }
+
         @MediaState int stateToReturn = representativeTab.getMediaState();
         // If the tab is not in a group, or the  state has the highest priority, then return
         // the state of the representative tab.
@@ -2792,7 +2801,7 @@ public class TabListMediator implements TabListNotificationHandler {
                 getLatestTitleForTabOrGroup(tab, tabInfo, /* useDefault= */ false));
         tabInfo.set(TabProperties.URL_DOMAIN, getDomainForTab(tab, tabInfo));
         tabInfo.set(TabProperties.IS_PINNED, tab.getIsPinned());
-        tabInfo.set(TabProperties.MEDIA_INDICATOR, getTabGridMediaIndicator(tab));
+        tabInfo.set(TabProperties.MEDIA_INDICATOR, getTabGridMediaIndicator(tab, tabInfo));
         tabInfo.set(TabProperties.SHOULD_SHOW_PRICE_DROP_TOOLTIP, false);
         tabInfo.set(TabProperties.USE_SHRINK_CLOSE_ANIMATION, false);
         tabInfo.set(
@@ -3019,7 +3028,7 @@ public class TabListMediator implements TabListNotificationHandler {
                                                 numOfRelatedTabs,
                                                 colorDesc);
                     }
-                    String mediaStateString = getMediaStateAccessibilityString(tab, res);
+                    String mediaStateString = getMediaStateAccessibilityString(tab, model, res);
                     if (!TextUtils.isEmpty(mediaStateString)) {
                         description += " " + mediaStateString;
                     }
@@ -4226,8 +4235,8 @@ public class TabListMediator implements TabListNotificationHandler {
         mSnackbarManager.dismissAllSnackbars();
     }
 
-    private String getMediaStateAccessibilityString(Tab tab, Resources res) {
-        @MediaState int mediaState = getTabGridMediaIndicator(tab);
+    private String getMediaStateAccessibilityString(Tab tab, PropertyModel model, Resources res) {
+        @MediaState int mediaState = getTabGridMediaIndicator(tab, model);
         switch (mediaState) {
             case MediaState.AUDIBLE:
                 return res.getString(R.string.accessibility_tab_group_audible);

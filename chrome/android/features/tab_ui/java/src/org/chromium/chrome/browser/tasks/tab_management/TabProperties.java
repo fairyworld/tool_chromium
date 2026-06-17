@@ -318,6 +318,7 @@ public class TabProperties {
                 IS_LOADING,
                 IS_PINNED,
                 IS_SELECTED,
+                MEDIA_INDICATOR,
                 TAB_ACTION_BUTTON_DATA,
                 TAB_CLICK_LISTENER,
                 TAB_CONTEXT_CLICK_LISTENER,

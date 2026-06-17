@@ -769,7 +769,7 @@ public class TabListMediatorUnitTest {
     }
 
     @Test
-    public void updatesFaviconFetcher_SingleTab_Gts() {
+    public void updatesFaviconFetcher_SingleTab_GroupedLayout() {
         mModelList.get(0).model.set(TabProperties.FAVICON_FETCHER, null);
         assertNull(mModelList.get(0).model.get(TabProperties.FAVICON_FETCHER));
 
@@ -790,7 +790,7 @@ public class TabListMediatorUnitTest {
     }
 
     @Test
-    public void updatesFaviconFetcher_SingleTabGroup_Gts() {
+    public void updatesFaviconFetcher_SingleTabGroup_GroupedLayout() {
         mModelList.get(0).model.set(TabProperties.FAVICON_FETCHER, null);
         assertNull(mModelList.get(0).model.get(TabProperties.FAVICON_FETCHER));
 
@@ -805,7 +805,7 @@ public class TabListMediatorUnitTest {
     }
 
     @Test
-    public void updatesFaviconFetcher_SingleTab_NonGts() {
+    public void updatesFaviconFetcher_SingleTab_FlatLayout() {
         mModelList.get(0).model.set(TabProperties.FAVICON_FETCHER, null);
         assertNull(mModelList.get(0).model.get(TabProperties.FAVICON_FETCHER));
 
@@ -826,7 +826,7 @@ public class TabListMediatorUnitTest {
     }
 
     @Test
-    public void updatesFaviconFetcher_TabGroup_Gts() {
+    public void updatesFaviconFetcher_TabGroup_GroupedLayout() {
         assertNotNull(mModelList.get(0).model.get(TabProperties.FAVICON_FETCHER));
         mModelList.get(0).model.set(TabProperties.FAVICON_FETCHER, null);
         // Assert that tab1 is in a tab group.
@@ -840,6 +840,19 @@ public class TabListMediatorUnitTest {
         assertNull(mModelList.get(0).model.get(TabProperties.FAVICON_FETCHER));
         assertNotEquals(
                 oldThumbnailFetcher, mModelList.get(0).model.get(TabProperties.THUMBNAIL_FETCHER));
+    }
+
+    @Test
+    public void updatesFaviconFetcher_TabGroup_NestedLayout() {
+        Tab tab3 = setUpNestedLayoutWithTwoTabGroup(/* isCollapsed= */ false);
+
+        PropertyModel child1 = mModelList.get(1).model;
+        child1.set(TabProperties.FAVICON_FETCHER, null);
+        assertNull(child1.get(TabProperties.FAVICON_FETCHER));
+
+        mTabObserverCaptor.getValue().onFaviconUpdated(mTab1, mFaviconBitmap, mFaviconUrl);
+
+        assertNotNull(child1.get(TabProperties.FAVICON_FETCHER));
     }
 
     @Test
@@ -929,7 +942,7 @@ public class TabListMediatorUnitTest {
     }
 
     @Test
-    public void updatesFaviconFetcher_Navigation_NoOpTabGroup() {
+    public void updatesFaviconFetcher_Navigation_NoOpGroupedLayout() {
         mModelList.get(0).model.set(TabProperties.FAVICON_FETCHER, null);
         assertNull(mModelList.get(0).model.get(TabProperties.FAVICON_FETCHER));
         when(mTabModel.isTabInTabGroup(mTab1)).thenReturn(true);
@@ -943,6 +956,25 @@ public class TabListMediatorUnitTest {
                 .onDidStartNavigationInPrimaryMainFrame(mTab1, navigationHandle);
 
         assertNull(mModelList.get(0).model.get(TabProperties.FAVICON_FETCHER));
+    }
+
+    @Test
+    public void updatesFaviconFetcher_Navigation_NestedLayout() {
+        Tab tab3 = setUpNestedLayoutWithTwoTabGroup(/* isCollapsed= */ false);
+
+        PropertyModel child1 = mModelList.get(1).model;
+        child1.set(TabProperties.FAVICON_FETCHER, null);
+        assertNull(child1.get(TabProperties.FAVICON_FETCHER));
+
+        NavigationHandle navigationHandle = mock(NavigationHandle.class);
+
+        when(navigationHandle.isSameDocument()).thenReturn(false);
+        when(navigationHandle.getUrl()).thenReturn(TAB2_URL);
+        mTabObserverCaptor
+                .getValue()
+                .onDidStartNavigationInPrimaryMainFrame(mTab1, navigationHandle);
+
+        assertNotNull(child1.get(TabProperties.FAVICON_FETCHER));
     }
 
     @Test
@@ -6609,6 +6641,62 @@ public class TabListMediatorUnitTest {
     }
 
     @Test
+    public void testMediaState_NestedLayout() {
+        Tab tab3 = setUpNestedLayoutWithTwoTabGroup(/* isCollapsed= */ false);
+
+        assertEquals(3, mModelList.size());
+
+        PropertyModel groupHeader = mModelList.get(0).model;
+        PropertyModel child1 = mModelList.get(1).model;
+        PropertyModel child2 = mModelList.get(2).model;
+
+        // Group Header should initially have no media indicator.
+        assertEquals(MediaState.NONE, groupHeader.get(TabProperties.MEDIA_INDICATOR));
+
+        // Update states.
+        updateTabMediaState(mTab1, MediaState.MUTED);
+        updateTabMediaState(tab3, MediaState.AUDIBLE);
+
+        // Child tabs should reflect their individual media states.
+        assertEquals(MediaState.MUTED, child1.get(TabProperties.MEDIA_INDICATOR));
+        assertEquals(MediaState.AUDIBLE, child2.get(TabProperties.MEDIA_INDICATOR));
+
+        // Update tab 3 media state.
+        updateTabMediaState(tab3, MediaState.RECORDING);
+
+        // Group header remains NONE.
+        assertEquals(MediaState.NONE, groupHeader.get(TabProperties.MEDIA_INDICATOR));
+        // Child tab 3 updates directly.
+        assertEquals(MediaState.RECORDING, child2.get(TabProperties.MEDIA_INDICATOR));
+    }
+
+    @Test
+    public void testMediaState_FlatLayout() {
+        setUpTabListMediator(TabListMediatorType.TAB_GRID_DIALOG, TabListMode.GRID);
+        when(mTab1.getMediaState()).thenReturn(MediaState.MUTED);
+        when(mTab2.getMediaState()).thenReturn(MediaState.AUDIBLE);
+
+        List<Tab> tabs = List.of(mTab1, mTab2);
+        createTabGroup(tabs, TAB_GROUP_ID);
+        mMediator.resetWithListOfTabs(tabs, null, false);
+
+        // Media states should NOT aggregate to a group header.
+        assertEquals(2, mModelList.size());
+
+        // Child tabs should reflect their individual media states.
+        assertEquals(MediaState.MUTED, mModelList.get(0).model.get(TabProperties.MEDIA_INDICATOR));
+        assertEquals(
+                MediaState.AUDIBLE, mModelList.get(1).model.get(TabProperties.MEDIA_INDICATOR));
+
+        // Update tab 2 media state.
+        updateTabMediaState(mTab2, MediaState.RECORDING);
+
+        // Child tab 2 updates directly.
+        assertEquals(
+                MediaState.RECORDING, mModelList.get(1).model.get(TabProperties.MEDIA_INDICATOR));
+    }
+
+    @Test
     public void testContextClickListener() {
         mMediator =
                 new TabListMediator(
@@ -6746,7 +6834,7 @@ public class TabListMediatorUnitTest {
 
     @EnableFeatures(ChromeFeatureList.GLIC)
     @Test
-    public void testActorUiState_TabGroup() {
+    public void testActorUiState_GroupedLayout() {
         // Create a tab group with Tab 1 and Tab 2.
         List<Tab> groupTabs = List.of(mTab1, mTab2);
         Token tabGroupId = new Token(1L, 2L);
@@ -6790,6 +6878,40 @@ public class TabListMediatorUnitTest {
         actorObserver.onUiTabStateChanged(newState1);
 
         assertNull(groupModel.get(TabProperties.ACTOR_UI_STATE));
+    }
+
+    @EnableFeatures(ChromeFeatureList.GLIC)
+    @Test
+    public void testActorUiState_NestedLayout() {
+        Tab tab3 = setUpNestedLayoutWithTwoTabGroup(/* isCollapsed= */ false);
+
+        setUpActorState(mTab1, TabIndicatorStatus.NONE);
+        setUpActorState(tab3, TabIndicatorStatus.NONE);
+
+        // Reset again so that the newly attached UserDataHost ActorUiTabControllers are picked up
+        // during property model creation.
+        mMediator.resetWithListOfTabs(List.of(mTab1), null, false);
+
+        assertEquals(3, mModelList.size()); // GROUP_HEADER, mTab1, tab3
+        PropertyModel child1Model = mModelList.get(1).model;
+        assertNull(child1Model.get(TabProperties.ACTOR_UI_STATE));
+
+        ArgumentCaptor<ActorUiTabController.Observer> observerCaptor =
+                ArgumentCaptor.forClass(ActorUiTabController.Observer.class);
+        // addObserver is called for mTab1 and tab3 during resetWithListOfTabs.
+        verify(mActorUiTabController, atLeastOnce()).addObserver(observerCaptor.capture());
+        ActorUiTabController.Observer actorObserver = observerCaptor.getValue();
+
+        // Set actor state on Tab 1 (child tab).
+        setUpActorState(mTab1, TabIndicatorStatus.DYNAMIC);
+        UiTabState newState1 =
+                new UiTabState(TAB1_ID, null, null, TabIndicatorStatus.DYNAMIC, false);
+        actorObserver.onUiTabStateChanged(newState1);
+
+        assertNotNull(child1Model.get(TabProperties.ACTOR_UI_STATE));
+        assertEquals(
+                TabIndicatorStatus.DYNAMIC,
+                child1Model.get(TabProperties.ACTOR_UI_STATE).tabIndicator);
     }
 
     @EnableFeatures(ChromeFeatureList.GLIC)

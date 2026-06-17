@@ -34,6 +34,7 @@ import org.chromium.base.test.util.CommandLineFlags;
 import org.chromium.base.test.util.CriteriaHelper;
 import org.chromium.base.test.util.Feature;
 import org.chromium.chrome.browser.flags.ChromeSwitches;
+import org.chromium.chrome.browser.tab.MediaState;
 import org.chromium.chrome.browser.tab_ui.TabListFaviconProvider.TabFavicon;
 import org.chromium.chrome.browser.tab_ui.TabListFaviconProvider.TabFaviconFetcher;
 import org.chromium.chrome.browser.tasks.tab_management.TabActionButtonData;
@@ -218,6 +219,34 @@ public class TabVerticalViewBinderRenderTest {
         CriteriaHelper.pollUiThread(() -> view[0].getHeight() > 0);
 
         mRenderTestRule.render(mRenderView, "standard_tab_loading");
+    }
+
+    @Test
+    @MediumTest
+    @Feature({"RenderTest"})
+    public void testStandardTab_MediaIndicator() throws IOException {
+        ViewGroup[] view = new ViewGroup[1];
+        ThreadUtils.runOnUiThreadBlocking(
+                () -> {
+                    view[0] = inflateAndAttachView(R.layout.vertical_tab_item);
+                    PropertyModel model =
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
+                                    .with(TabProperties.IS_INCOGNITO, false)
+                                    .build();
+                    PropertyModelChangeProcessor.create(
+                            model, view[0], TabVerticalViewBinder::bindTab);
+                    model.set(TabProperties.TITLE, "Media Tab");
+                    model.set(TabProperties.IS_SELECTED, false);
+                    model.set(TabProperties.FAVICON_FETCHER, createFaviconFetcher());
+                    model.set(TabProperties.MEDIA_INDICATOR, MediaState.AUDIBLE);
+                    model.set(
+                            TabProperties.TAB_ACTION_BUTTON_DATA,
+                            new TabActionButtonData(
+                                    TabActionButtonType.CLOSE, /* tabActionListener= */ null));
+                });
+        CriteriaHelper.pollUiThread(() -> view[0].getHeight() > 0);
+
+        mRenderTestRule.render(mRenderView, "standard_tab_media_indicator");
     }
 
     @Test

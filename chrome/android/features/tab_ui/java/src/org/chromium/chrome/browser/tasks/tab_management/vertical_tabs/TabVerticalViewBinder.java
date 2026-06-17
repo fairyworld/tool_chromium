@@ -24,6 +24,8 @@ import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
+import org.chromium.chrome.browser.tab.MediaState;
+import org.chromium.chrome.browser.tab.TabUtils;
 import org.chromium.chrome.browser.tasks.tab_management.TabActionButtonData;
 import org.chromium.chrome.browser.tasks.tab_management.TabListViewBinderUtils;
 import org.chromium.chrome.browser.tasks.tab_management.TabProperties;
@@ -70,9 +72,9 @@ class TabVerticalViewBinder {
             updateChildRowPadding(model, view);
         } else if (TabProperties.CONTENT_DESCRIPTION_TEXT_RESOLVER == propertyKey) {
             TabListViewBinderUtils.updateContentDescription(model, view);
+        } else if (TabProperties.MEDIA_INDICATOR == propertyKey) {
+            updateMediaIndicator(model, view);
         }
-        // TODO(crbug.com/509226293): Add MEDIA_INDICATOR to TabProperties.ALL_KEYS_VERTICAL_TAB
-        // and implement binder logic to display/update playing/muted audio icons.
     }
 
     /**
@@ -184,6 +186,19 @@ class TabVerticalViewBinder {
         }
         boolean isLoading = model.get(TabProperties.IS_LOADING);
         faviconView.setVisibility(isLoading ? View.INVISIBLE : View.VISIBLE);
+    }
+
+    private static void updateMediaIndicator(PropertyModel model, ViewGroup view) {
+        ImageView mediaIndicator = view.findViewById(R.id.media_indicator_icon);
+        if (mediaIndicator == null) return;
+
+        @MediaState int mediaState = model.get(TabProperties.MEDIA_INDICATOR);
+        if (mediaState != MediaState.NONE) {
+            mediaIndicator.setImageResource(TabUtils.getMediaIndicatorDrawable(mediaState));
+            mediaIndicator.setVisibility(View.VISIBLE);
+        } else {
+            mediaIndicator.setVisibility(View.GONE);
+        }
     }
 
     // Row-Specific Layout Color Binder Helpers
