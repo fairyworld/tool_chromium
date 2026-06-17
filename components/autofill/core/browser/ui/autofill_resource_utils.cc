@@ -82,6 +82,7 @@ constexpr auto kOldDataResources = base::MakeFixedFlatMap<Suggestion::Icon,
     // TODO(crbug.com/503303085): Correctly handle android icons.
     {Suggestion::Icon::kPassportSpark, IDR_ANDROID_AUTOFILL_PASSPORT},
     {Suggestion::Icon::kSpark, IDR_ANDROID_AUTOFILL_SPARK},
+    {Suggestion::Icon::kEmail, IDR_ANDROID_AUTOFILL_EMAIL},
 #endif  // BUILDFLAG(IS_ANDROID)
 });
 
@@ -134,6 +135,7 @@ constexpr auto kDataResources = base::MakeFixedFlatMap<Suggestion::Icon, int>({
     // TODO(crbug.com/503303085): Correctly handle android icons.
     {Suggestion::Icon::kPassportSpark, IDR_ANDROID_AUTOFILL_PASSPORT},
     {Suggestion::Icon::kSpark, IDR_ANDROID_AUTOFILL_SPARK},
+    {Suggestion::Icon::kEmail, IDR_ANDROID_AUTOFILL_EMAIL},
 #endif  // BUILDFLAG(IS_ANDROID)
 });
 
