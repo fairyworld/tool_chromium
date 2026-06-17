@@ -18,6 +18,7 @@ import org.chromium.chrome.browser.dom_distiller.TabDistillabilityProvider;
 import org.chromium.chrome.browser.media.ui.MediaSessionTabHelper;
 import org.chromium.chrome.browser.price_tracking.PriceTrackingFeatures;
 import org.chromium.chrome.browser.tab.state.ShoppingPersistedTabData;
+import org.chromium.chrome.browser.tabmodel.TabPersistentStoreImpl;
 import org.chromium.chrome.browser.ui.edge_to_edge.EdgeToEdgeUtils;
 
 /** Helper class that initializes various tab UserData objects. */
@@ -33,7 +34,10 @@ public final class TabHelpers {
      */
     static void initTabHelpers(Tab tab, @Nullable Tab parentTab) {
         TabUma.createForTab(tab);
+
         TabStateAttributes.createForTab(tab, ((TabImpl) tab).getCreationState());
+        TabStateAttributesRegistry.createAttributesForTab(
+                tab, TabPersistentStoreImpl.class, ((TabImpl) tab).getCreationState());
         InterceptNavigationDelegateTabHelper.createForTab(tab);
         TaskTabHelper.createForTab(tab, parentTab);
         TabBrowserControlsConstraintsHelper.createForTab(tab);
