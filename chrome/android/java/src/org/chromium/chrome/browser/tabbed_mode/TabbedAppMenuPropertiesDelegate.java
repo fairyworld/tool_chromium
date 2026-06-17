@@ -1607,16 +1607,23 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                 () -> {
                     List<ListItem> submenuItems = new ArrayList<>();
 
-                    submenuItems.add(buildBookmarksItem(/* showIcon= */ false));
                     submenuItems.add(buildBookmarkThisPageItem());
-                    submenuItems.add(buildToggleBookmarksBarItem());
 
                     submenuItems.add(
                             new ListItem(
                                     AppMenuHandler.AppMenuItemType.DIVIDER,
                                     buildModelForDivider(R.id.divider_line_id)));
 
+                    submenuItems.add(buildBookmarksItem(/* showIcon= */ false));
+
                     submenuItems.add(buildReadingListItem());
+
+                    submenuItems.add(
+                            new ListItem(
+                                    AppMenuHandler.AppMenuItemType.DIVIDER,
+                                    buildModelForDivider(R.id.divider_line_id)));
+
+                    submenuItems.add(buildToggleBookmarksBarItem());
 
                     BookmarkModel bookmarkModel = mBookmarkModelSupplier.get();
 
@@ -1709,6 +1716,13 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
 
     private ListItem buildReadingListItem() {
         List<ListItem> submenuItems = new ArrayList<>();
+        submenuItems.add(
+                createStandardListItem(
+                        buildModelForStandardMenuItem(
+                                R.id.show_reading_list_menu_id,
+                                R.string.menu_show_reading_list,
+                                Resources.ID_NULL),
+                        /* showIcon= */ false));
 
         submenuItems.add(
                 createStandardListItem(
@@ -1716,15 +1730,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                 R.id.add_to_reading_list_menu_id,
                                 R.string.menu_add_to_reading_list,
                                 Resources.ID_NULL),
-                        false));
-
-        submenuItems.add(
-                createStandardListItem(
-                        buildModelForStandardMenuItem(
-                                R.id.show_reading_list_menu_id,
-                                R.string.menu_show_reading_list,
-                                Resources.ID_NULL),
-                        false));
+                        /* showIcon= */ false));
 
         PropertyModel model =
                 buildModelForMenuItemWithSubmenu(

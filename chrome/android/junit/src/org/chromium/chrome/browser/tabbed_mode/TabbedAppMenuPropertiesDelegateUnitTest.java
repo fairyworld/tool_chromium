@@ -31,6 +31,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.InsetDrawable;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import android.view.View;
@@ -711,14 +712,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.downloads_menu_id),
                                 item(
                                         R.id.bookmarks_parent_menu_id,
-                                        item(R.id.all_bookmarks_menu_id),
                                         item(R.id.bookmark_this_page_menu_id),
-                                        item(R.id.toggle_bookmarks_bar_menu_id),
                                         item(R.id.divider_line_id),
+                                        item(R.id.all_bookmarks_menu_id),
                                         item(
                                                 R.id.reading_list_parent_menu_id,
-                                                item(R.id.add_to_reading_list_menu_id),
-                                                item(R.id.show_reading_list_menu_id)),
+                                                item(R.id.show_reading_list_menu_id),
+                                                item(R.id.add_to_reading_list_menu_id)),
+                                        item(R.id.divider_line_id),
+                                        item(R.id.toggle_bookmarks_bar_menu_id),
                                         item(R.id.divider_line_id),
                                         item(R.id.bookmarks_header_menu_id),
                                         item(R.id.bookmark_menu_id),
@@ -843,14 +845,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.downloads_menu_id),
                                 item(
                                         R.id.bookmarks_parent_menu_id,
-                                        item(R.id.all_bookmarks_menu_id),
                                         item(R.id.bookmark_this_page_menu_id),
-                                        item(R.id.toggle_bookmarks_bar_menu_id),
                                         item(R.id.divider_line_id),
+                                        item(R.id.all_bookmarks_menu_id),
                                         item(
                                                 R.id.reading_list_parent_menu_id,
-                                                item(R.id.add_to_reading_list_menu_id),
-                                                item(R.id.show_reading_list_menu_id)),
+                                                item(R.id.show_reading_list_menu_id),
+                                                item(R.id.add_to_reading_list_menu_id)),
+                                        item(R.id.divider_line_id),
+                                        item(R.id.toggle_bookmarks_bar_menu_id),
                                         item(R.id.divider_line_id),
                                         item(R.id.bookmarks_header_menu_id),
                                         item(R.id.bookmark_menu_id),
@@ -1019,14 +1022,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         expectedItems.add(
                 item(
                         R.id.bookmarks_parent_menu_id,
-                        item(R.id.all_bookmarks_menu_id),
                         item(R.id.bookmark_this_page_menu_id),
-                        item(R.id.toggle_bookmarks_bar_menu_id),
                         item(R.id.divider_line_id),
+                        item(R.id.all_bookmarks_menu_id),
                         item(
                                 R.id.reading_list_parent_menu_id,
-                                item(R.id.add_to_reading_list_menu_id),
-                                item(R.id.show_reading_list_menu_id)),
+                                item(R.id.show_reading_list_menu_id),
+                                item(R.id.add_to_reading_list_menu_id)),
+                        item(R.id.divider_line_id),
+                        item(R.id.toggle_bookmarks_bar_menu_id),
                         item(R.id.divider_line_id),
                         item(R.id.bookmarks_header_menu_id),
                         item(R.id.bookmark_menu_id),
@@ -1043,14 +1047,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         expectedTitles.add(
                 item(
                         R.string.menu_bookmarks,
-                        item(R.string.menu_bookmarks),
                         item(R.string.menu_bookmark_this_page),
-                        item(R.string.menu_show_bookmarks_bar),
                         item(0),
+                        item(R.string.menu_bookmarks),
                         item(
                                 R.string.menu_reading_list,
-                                item(R.string.menu_add_to_reading_list),
-                                item(R.string.menu_show_reading_list)),
+                                item(R.string.menu_show_reading_list),
+                                item(R.string.menu_add_to_reading_list)),
+                        item(0),
+                        item(R.string.menu_show_bookmarks_bar),
                         item(0),
                         item(R.string.bookmarks),
                         item("Bookmark 1"),
@@ -1396,14 +1401,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         expectedItems.add(
                 item(
                         R.id.bookmarks_parent_menu_id,
-                        item(R.id.all_bookmarks_menu_id),
                         item(R.id.bookmark_this_page_menu_id),
-                        item(R.id.toggle_bookmarks_bar_menu_id),
                         item(R.id.divider_line_id),
+                        item(R.id.all_bookmarks_menu_id),
                         item(
                                 R.id.reading_list_parent_menu_id,
-                                item(R.id.add_to_reading_list_menu_id),
-                                item(R.id.show_reading_list_menu_id)),
+                                item(R.id.show_reading_list_menu_id),
+                                item(R.id.add_to_reading_list_menu_id)),
+                        item(R.id.divider_line_id),
+                        item(R.id.toggle_bookmarks_bar_menu_id),
                         item(R.id.divider_line_id),
                         item(R.id.bookmarks_header_menu_id),
                         item(R.id.bookmark_menu_id),
@@ -1420,14 +1426,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         expectedTitles.add(
                 item(
                         R.string.menu_bookmarks,
-                        item(R.string.menu_bookmarks),
                         item(R.string.menu_bookmark_this_page),
-                        item(R.string.menu_show_bookmarks_bar),
                         item(0),
+                        item(R.string.menu_bookmarks),
                         item(
                                 R.string.menu_reading_list,
-                                item(R.string.menu_add_to_reading_list),
-                                item(R.string.menu_show_reading_list)),
+                                item(R.string.menu_show_reading_list),
+                                item(R.string.menu_add_to_reading_list)),
+                        item(0),
+                        item(R.string.menu_show_bookmarks_bar),
                         item(0),
                         item(R.string.bookmarks),
                         item("Bookmark 1"),
@@ -1766,14 +1773,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         expectedItems.add(
                 item(
                         R.id.bookmarks_parent_menu_id,
-                        item(R.id.all_bookmarks_menu_id),
                         item(R.id.bookmark_this_page_menu_id),
-                        item(R.id.toggle_bookmarks_bar_menu_id),
                         item(R.id.divider_line_id),
+                        item(R.id.all_bookmarks_menu_id),
                         item(
                                 R.id.reading_list_parent_menu_id,
-                                item(R.id.add_to_reading_list_menu_id),
-                                item(R.id.show_reading_list_menu_id)),
+                                item(R.id.show_reading_list_menu_id),
+                                item(R.id.add_to_reading_list_menu_id)),
+                        item(R.id.divider_line_id),
+                        item(R.id.toggle_bookmarks_bar_menu_id),
                         item(R.id.divider_line_id),
                         item(R.id.bookmarks_header_menu_id),
                         item(R.id.bookmark_menu_id),
@@ -1790,14 +1798,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         expectedTitles.add(
                 item(
                         R.string.menu_bookmarks,
-                        item(R.string.menu_bookmarks),
                         item(R.string.menu_bookmark_this_page),
-                        item(R.string.menu_show_bookmarks_bar),
                         item(0),
+                        item(R.string.menu_bookmarks),
                         item(
                                 R.string.menu_reading_list,
-                                item(R.string.menu_add_to_reading_list),
-                                item(R.string.menu_show_reading_list)),
+                                item(R.string.menu_show_reading_list),
+                                item(R.string.menu_add_to_reading_list)),
+                        item(0),
+                        item(R.string.menu_show_bookmarks_bar),
                         item(0),
                         item(R.string.bookmarks),
                         item("Bookmark 1"),
@@ -1963,14 +1972,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.downloads_menu_id),
                                 item(
                                         R.id.bookmarks_parent_menu_id,
-                                        item(R.id.all_bookmarks_menu_id),
                                         item(R.id.bookmark_this_page_menu_id),
-                                        item(R.id.toggle_bookmarks_bar_menu_id),
                                         item(R.id.divider_line_id),
+                                        item(R.id.all_bookmarks_menu_id),
                                         item(
                                                 R.id.reading_list_parent_menu_id,
-                                                item(R.id.add_to_reading_list_menu_id),
-                                                item(R.id.show_reading_list_menu_id)),
+                                                item(R.id.show_reading_list_menu_id),
+                                                item(R.id.add_to_reading_list_menu_id)),
+                                        item(R.id.divider_line_id),
+                                        item(R.id.toggle_bookmarks_bar_menu_id),
                                         item(R.id.divider_line_id),
                                         item(R.id.bookmarks_header_menu_id),
                                         item(R.id.bookmark_menu_id),
@@ -2069,14 +2079,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.downloads_menu_id),
                                 item(
                                         R.id.bookmarks_parent_menu_id,
-                                        item(R.id.all_bookmarks_menu_id),
                                         item(R.id.bookmark_this_page_menu_id),
-                                        item(R.id.toggle_bookmarks_bar_menu_id),
                                         item(R.id.divider_line_id),
+                                        item(R.id.all_bookmarks_menu_id),
                                         item(
                                                 R.id.reading_list_parent_menu_id,
-                                                item(R.id.add_to_reading_list_menu_id),
-                                                item(R.id.show_reading_list_menu_id)),
+                                                item(R.id.show_reading_list_menu_id),
+                                                item(R.id.add_to_reading_list_menu_id)),
+                                        item(R.id.divider_line_id),
+                                        item(R.id.toggle_bookmarks_bar_menu_id),
                                         item(R.id.divider_line_id),
                                         item(R.id.bookmarks_header_menu_id),
                                         item(R.id.bookmark_menu_id),
@@ -2520,14 +2531,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.downloads_menu_id),
                                 item(
                                         R.id.bookmarks_parent_menu_id,
-                                        item(R.id.all_bookmarks_menu_id),
                                         item(R.id.bookmark_this_page_menu_id),
-                                        item(R.id.toggle_bookmarks_bar_menu_id),
                                         item(R.id.divider_line_id),
+                                        item(R.id.all_bookmarks_menu_id),
                                         item(
                                                 R.id.reading_list_parent_menu_id,
-                                                item(R.id.add_to_reading_list_menu_id),
-                                                item(R.id.show_reading_list_menu_id)),
+                                                item(R.id.show_reading_list_menu_id),
+                                                item(R.id.add_to_reading_list_menu_id)),
+                                        item(R.id.divider_line_id),
+                                        item(R.id.toggle_bookmarks_bar_menu_id),
                                         item(R.id.divider_line_id),
                                         item(R.id.bookmarks_header_menu_id),
                                         item(R.id.bookmark_menu_id),
@@ -2659,14 +2671,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.downloads_menu_id),
                                 item(
                                         R.id.bookmarks_parent_menu_id,
-                                        item(R.id.all_bookmarks_menu_id),
                                         item(R.id.bookmark_this_page_menu_id),
-                                        item(R.id.toggle_bookmarks_bar_menu_id),
                                         item(R.id.divider_line_id),
+                                        item(R.id.all_bookmarks_menu_id),
                                         item(
                                                 R.id.reading_list_parent_menu_id,
-                                                item(R.id.add_to_reading_list_menu_id),
-                                                item(R.id.show_reading_list_menu_id)),
+                                                item(R.id.show_reading_list_menu_id),
+                                                item(R.id.add_to_reading_list_menu_id)),
+                                        item(R.id.divider_line_id),
+                                        item(R.id.toggle_bookmarks_bar_menu_id),
                                         item(R.id.divider_line_id),
                                         item(R.id.bookmarks_header_menu_id),
                                         item(R.id.bookmark_menu_id),
@@ -2772,14 +2785,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.downloads_menu_id),
                                 item(
                                         R.id.bookmarks_parent_menu_id,
-                                        item(R.id.all_bookmarks_menu_id),
                                         item(R.id.bookmark_this_page_menu_id),
-                                        item(R.id.toggle_bookmarks_bar_menu_id),
                                         item(R.id.divider_line_id),
+                                        item(R.id.all_bookmarks_menu_id),
                                         item(
                                                 R.id.reading_list_parent_menu_id,
-                                                item(R.id.add_to_reading_list_menu_id),
-                                                item(R.id.show_reading_list_menu_id)),
+                                                item(R.id.show_reading_list_menu_id),
+                                                item(R.id.add_to_reading_list_menu_id)),
+                                        item(R.id.divider_line_id),
+                                        item(R.id.toggle_bookmarks_bar_menu_id),
                                         item(R.id.divider_line_id),
                                         item(R.id.bookmarks_header_menu_id),
                                         item(R.id.bookmark_menu_id),
@@ -4523,14 +4537,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         List<MenuItem> expectedSubItems =
                 Arrays.asList(
-                        item(R.id.all_bookmarks_menu_id),
                         item(R.id.bookmark_this_page_menu_id),
-                        item(R.id.toggle_bookmarks_bar_menu_id),
                         item(R.id.divider_line_id),
+                        item(R.id.all_bookmarks_menu_id),
                         item(
                                 R.id.reading_list_parent_menu_id,
-                                item(R.id.add_to_reading_list_menu_id),
-                                item(R.id.show_reading_list_menu_id)),
+                                item(R.id.show_reading_list_menu_id),
+                                item(R.id.add_to_reading_list_menu_id)),
+                        item(R.id.divider_line_id),
+                        item(R.id.toggle_bookmarks_bar_menu_id),
                         item(R.id.divider_line_id),
                         item(
                                 R.id.bookmark_folder_menu_id,
@@ -4561,14 +4576,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         List<MenuItem> expectedSubItems =
                 Arrays.asList(
-                        item(R.id.all_bookmarks_menu_id),
                         item(R.id.bookmark_this_page_menu_id),
-                        item(R.id.toggle_bookmarks_bar_menu_id),
                         item(R.id.divider_line_id),
+                        item(R.id.all_bookmarks_menu_id),
                         item(
                                 R.id.reading_list_parent_menu_id,
-                                item(R.id.add_to_reading_list_menu_id),
-                                item(R.id.show_reading_list_menu_id)),
+                                item(R.id.show_reading_list_menu_id),
+                                item(R.id.add_to_reading_list_menu_id)),
+                        item(R.id.divider_line_id),
+                        item(R.id.toggle_bookmarks_bar_menu_id),
                         item(R.id.divider_line_id),
                         item(R.id.bookmarks_header_menu_id),
                         item(R.id.bookmark_menu_id),
@@ -4591,14 +4607,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         List<MenuItem> expectedTitles =
                 Arrays.asList(
-                        item(R.string.menu_bookmarks),
                         item(R.string.menu_bookmark_this_page),
-                        item(R.string.menu_show_bookmarks_bar),
                         item(0),
+                        item(R.string.menu_bookmarks),
                         item(
                                 R.string.menu_reading_list,
-                                item(R.string.menu_add_to_reading_list),
-                                item(R.string.menu_show_reading_list)),
+                                item(R.string.menu_show_reading_list),
+                                item(R.string.menu_add_to_reading_list)),
+                        item(0),
+                        item(R.string.menu_show_bookmarks_bar),
                         item(0),
                         item(R.string.bookmarks),
                         item("Bookmark 1"),
@@ -4634,14 +4651,15 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         List<MenuItem> expectedSubItems =
                 Arrays.asList(
-                        item(R.id.all_bookmarks_menu_id),
                         item(R.id.bookmark_this_page_menu_id),
-                        item(R.id.toggle_bookmarks_bar_menu_id),
                         item(R.id.divider_line_id),
+                        item(R.id.all_bookmarks_menu_id),
                         item(
                                 R.id.reading_list_parent_menu_id,
-                                item(R.id.add_to_reading_list_menu_id),
-                                item(R.id.show_reading_list_menu_id)),
+                                item(R.id.show_reading_list_menu_id),
+                                item(R.id.add_to_reading_list_menu_id)),
+                        item(R.id.divider_line_id),
+                        item(R.id.toggle_bookmarks_bar_menu_id),
                         item(R.id.divider_line_id),
                         item(R.id.bookmarks_header_menu_id),
                         item(R.id.bookmark_menu_id),
@@ -4695,7 +4713,11 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         iconSupplier.get();
 
         verify(mBookmarkImageFetcher).fetchFaviconForBookmark(eq(bookmarkItem), any());
-        assertEquals(mockFavicon, iconSupplier.get());
+        Drawable actualIcon = iconSupplier.get();
+        if (actualIcon instanceof InsetDrawable insetDrawable) {
+            actualIcon = insetDrawable.getDrawable();
+        }
+        assertEquals(mockFavicon, actualIcon);
     }
 
     @Test
