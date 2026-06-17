@@ -162,6 +162,8 @@ constexpr int kMaxPasswordTries = 3;
 
 constexpr base::TimeDelta kTouchLongPressTimeout = base::Milliseconds(300);
 
+constexpr size_t kMinCharsForMeaningfulText = 100;
+
 #if BUILDFLAG(ENABLE_PDF_INK2)
 constexpr int kMinTextboxId = 0;
 constexpr int kMaxTextboxId = std::numeric_limits<int>::max();
@@ -5104,6 +5106,33 @@ void PDFiumEngine::MaybeUnloadPage(int page_index) {
   }
 }
 #endif  // BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
+
+bool PDFiumEngine::HasMeaningfulText() const {
+  if (!document_loaded_) {
+    return false;
+  }
+
+  size_t total_char_count = 0;
+
+  for (const auto& page : pages_) {
+#if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
+    // PDFium determines the character count, but pages requiring Searchify
+    // are bypassed via `page->IsPageSearchified()`. Since Searchify only
+    // processes textless pages, these are assigned a count of zero.
+    int page_char_count = page->IsPageSearchified() ? 0 : page->GetCharCount();
+#else   // BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
+    int page_char_count = page->GetCharCount();
+#endif  // BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
+    if (page_char_count > 0) {
+      total_char_count += static_cast<size_t>(page_char_count);
+      if (total_char_count >= kMinCharsForMeaningfulText) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
 
 void PDFiumEngine::UpdateLinkUnderCursor(const std::string& target_url) {
   client_->SetLinkUnderCursor(target_url);

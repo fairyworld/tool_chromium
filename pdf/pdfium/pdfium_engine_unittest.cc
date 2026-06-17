@@ -569,6 +569,81 @@ TEST_P(PDFiumEngineTest, GetEmptyDocumentMetadata) {
   EXPECT_TRUE(doc_metadata.mod_date.is_null());
 }
 
+TEST_P(PDFiumEngineTest, HasMeaningfulText) {
+  NiceMock<MockTestClient> client(GetParam());
+  std::unique_ptr<PDFiumEngine> engine =
+      InitializeEngine(&client, FILE_PATH_LITERAL("hello_world2.pdf"));
+  ASSERT_TRUE(engine);
+  EXPECT_FALSE(engine->HasMeaningfulText());
+}
+
+TEST_P(PDFiumEngineTest, HasMeaningfulTextBlank) {
+  NiceMock<MockTestClient> client(GetParam());
+  std::unique_ptr<PDFiumEngine> engine =
+      InitializeEngine(&client, FILE_PATH_LITERAL("blank.pdf"));
+  ASSERT_TRUE(engine);
+  EXPECT_FALSE(engine->HasMeaningfulText());
+}
+
+// Tests that a document containing an image but having at least 100 characters
+// of native text (such as `image_with_text_101.pdf`) is considered to have
+// meaningful text.
+TEST_P(PDFiumEngineTest, HasMeaningfulTextWithImageAndTooMuchText) {
+  NiceMock<MockTestClient> client(GetParam());
+  std::unique_ptr<PDFiumEngine> engine =
+      InitializeEngine(&client, FILE_PATH_LITERAL("image_with_text_101.pdf"));
+  ASSERT_TRUE(engine);
+  EXPECT_TRUE(engine->HasMeaningfulText());
+}
+
+TEST_P(PDFiumEngineTest, HasMeaningfulTextTooMuchText) {
+  NiceMock<MockTestClient> client(GetParam());
+  std::unique_ptr<PDFiumEngine> engine =
+      InitializeEngine(&client, FILE_PATH_LITERAL("text_long.pdf"));
+  ASSERT_TRUE(engine);
+  EXPECT_TRUE(engine->HasMeaningfulText());
+}
+
+#if BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
+// Tests that a document where all pages are searchified (meaning they consist
+// entirely of OCR-ed image text) is not considered to have meaningful native
+// text.
+TEST_P(PDFiumEngineTest, HasMeaningfulTextWhenAllPagesSearchified) {
+  NiceMock<MockTestClient> client(GetParam());
+  std::unique_ptr<PDFiumEngine> engine =
+      InitializeEngine(&client, FILE_PATH_LITERAL("image_with_text_101.pdf"));
+  ASSERT_TRUE(engine);
+  ASSERT_EQ(1, engine->GetNumberOfPages());
+
+  // Initially, it has 101 characters of native text and has images.
+  // It is considered to have meaningful text because native text >= 100
+  // characters.
+  EXPECT_TRUE(engine->HasMeaningfulText());
+
+  // Mark the page as searchified.
+  PDFiumPage* page = engine->GetPage(0);
+  ASSERT_TRUE(page);
+  page->OnSearchifyGotOcrResult(/*added_text=*/true);
+
+  // Now, all pages are searchified (meaning they consist entirely of images).
+  // Under the new heuristic, the document should NOT be categorized as having
+  // meaningful text.
+  EXPECT_FALSE(engine->HasMeaningfulText());
+}
+#endif  // BUILDFLAG(ENABLE_SCREEN_AI_SERVICE)
+
+TEST_P(PDFiumEngineTest, HasMeaningfulTextNotLoaded) {
+  NiceMock<MockTestClient> client(GetParam());
+  InitializeEngineResult initialize_result = InitializeEngineWithoutLoading(
+      &client, FILE_PATH_LITERAL("image_with_text_101.pdf"));
+  ASSERT_TRUE(initialize_result.engine);
+  PDFiumEngine& engine = *initialize_result.engine;
+
+  // Before loading any data, the page count should be 0.
+  ASSERT_EQ(0, engine.GetNumberOfPages());
+  EXPECT_FALSE(engine.HasMeaningfulText());
+}
+
 TEST_P(PDFiumEngineTest, GetLinearizedDocumentMetadata) {
   TestClient client(/*use_skia_renderer=*/GetParam());
   std::unique_ptr<PDFiumEngine> engine =
