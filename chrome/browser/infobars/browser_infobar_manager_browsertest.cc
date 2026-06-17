@@ -10,6 +10,7 @@
 #include "chrome/browser/infobars/infobar_features.h"
 #include "chrome/browser/infobars/infobar_spec.h"
 #include "chrome/browser/ui/browser.h"
+#include "chrome/browser/ui/browser_tabstrip.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/test/base/in_process_browser_test.h"
 #include "components/infobars/content/content_infobar_manager.h"
@@ -129,6 +130,113 @@ IN_PROC_BROWSER_TEST_F(BrowserInfoBarManagerBrowserTest, ButtonConfiguration) {
   // Simulating an accept action.
   EXPECT_TRUE(delegate->Accept());
   EXPECT_TRUE(ok_called);
+}
+
+IN_PROC_BROWSER_TEST_F(BrowserInfoBarManagerBrowserTest,
+                       RegisterAndShowGlobal) {
+  const auto identifier = InfoBarDelegate::TEST_INFOBAR;
+  auto spec = InfoBarSpec::Builder(identifier)
+                  .SetMessageText(u"Test Message")
+                  .SetScope(InfoBarScope::kGlobal)
+                  .Build();
+
+  manager()->Register(std::move(spec));
+
+  // 1. Show on current browser.
+  content::WebContents* web_contents1 =
+      browser()->tab_strip_model()->GetActiveWebContents();
+  auto* infobar_manager1 =
+      ContentInfoBarManager::FromWebContents(web_contents1);
+  ASSERT_EQ(0u, infobar_manager1->infobars().size());
+
+  manager()->Show(identifier);
+  EXPECT_EQ(1u, infobar_manager1->infobars().size());
+
+  // 2. Open a new browser window.
+  Browser* browser2 = CreateBrowser(browser()->profile());
+  content::WebContents* web_contents2 =
+      browser2->tab_strip_model()->GetActiveWebContents();
+  auto* infobar_manager2 =
+      ContentInfoBarManager::FromWebContents(web_contents2);
+
+  // It should automatically have the infobar.
+  EXPECT_EQ(1u, infobar_manager2->infobars().size());
+  if (infobar_manager2->infobars().size() > 0) {
+    EXPECT_EQ(identifier,
+              infobar_manager2->infobars()[0]->delegate()->GetIdentifier());
+  }
+}
+
+IN_PROC_BROWSER_TEST_F(BrowserInfoBarManagerBrowserTest,
+                       GlobalFollowsActiveTab) {
+  const auto identifier = InfoBarDelegate::TEST_INFOBAR;
+  auto spec = InfoBarSpec::Builder(identifier)
+                  .SetMessageText(u"Test Message")
+                  .SetScope(InfoBarScope::kGlobal)
+                  .Build();
+
+  manager()->Register(std::move(spec));
+
+  // Show the infobar.
+  manager()->Show(identifier);
+
+  content::WebContents* web_contents1 =
+      browser()->tab_strip_model()->GetActiveWebContents();
+  auto* infobar_manager1 =
+      ContentInfoBarManager::FromWebContents(web_contents1);
+  EXPECT_EQ(1u, infobar_manager1->infobars().size());
+
+  // Open a new tab (this will make it active).
+  chrome::AddTabAt(browser(), GURL("about:blank"), -1, true);
+
+  content::WebContents* web_contents2 =
+      browser()->tab_strip_model()->GetActiveWebContents();
+  ASSERT_NE(web_contents1, web_contents2);
+
+  auto* infobar_manager2 =
+      ContentInfoBarManager::FromWebContents(web_contents2);
+
+  // The new active tab should have the infobar.
+  EXPECT_EQ(1u, infobar_manager2->infobars().size());
+
+  // The old active tab should NOT have the infobar anymore.
+  EXPECT_EQ(0u, infobar_manager1->infobars().size());
+}
+
+IN_PROC_BROWSER_TEST_F(BrowserInfoBarManagerBrowserTest,
+                       GlobalDismissalCascade) {
+  const auto identifier = InfoBarDelegate::TEST_INFOBAR;
+  auto spec = InfoBarSpec::Builder(identifier)
+                  .SetMessageText(u"Test Message")
+                  .SetScope(InfoBarScope::kGlobal)
+                  .Build();
+
+  manager()->Register(std::move(spec));
+
+  manager()->Show(identifier);
+
+  // Open a second browser.
+  Browser* browser2 = CreateBrowser(browser()->profile());
+
+  content::WebContents* web_contents1 =
+      browser()->tab_strip_model()->GetActiveWebContents();
+  auto* infobar_manager1 =
+      ContentInfoBarManager::FromWebContents(web_contents1);
+
+  content::WebContents* web_contents2 =
+      browser2->tab_strip_model()->GetActiveWebContents();
+  auto* infobar_manager2 =
+      ContentInfoBarManager::FromWebContents(web_contents2);
+
+  ASSERT_EQ(1u, infobar_manager1->infobars().size());
+  ASSERT_EQ(1u, infobar_manager2->infobars().size());
+
+  // Manually dismiss the infobar on browser2.
+  infobar_manager2->RemoveInfoBar(infobar_manager2->infobars()[0]);
+
+  // It should be removed from browser1 as well (global cascade).
+  EXPECT_EQ(0u, infobar_manager1->infobars().size());
+  EXPECT_EQ(0u, infobar_manager2->infobars().size());
 }
 
 }  // namespace infobars
