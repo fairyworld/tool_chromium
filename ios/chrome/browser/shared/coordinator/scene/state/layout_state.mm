@@ -137,6 +137,16 @@ UIInterfaceOrientation GetTargetInterfaceOrientation(
   [_observers layoutState:self didChangeAppBarPosition:appBarPosition];
 }
 
+- (void)setAssistantContainerCutoutRadius:
+    (CGFloat)assistantContainerCutoutRadius {
+  if (_assistantContainerCutoutRadius == assistantContainerCutoutRadius) {
+    return;
+  }
+  _assistantContainerCutoutRadius = assistantContainerCutoutRadius;
+  [_observers layoutState:self
+      didChangeAssistantContainerCutoutRadius:assistantContainerCutoutRadius];
+}
+
 - (void)updateAppBarPositionWithView:(UIView*)view
                          coordinator:(id<UIViewControllerTransitionCoordinator>)
                                          coordinator {

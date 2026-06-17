@@ -44,6 +44,11 @@ enum class AppBarPosition {
 - (void)layoutState:(LayoutState*)layoutState
     didChangeAppBarPosition:(AppBarPosition)appBarPosition;
 
+// Called when the assistant container cutout radius changes.
+- (void)layoutState:(LayoutState*)layoutState
+    didChangeAssistantContainerCutoutRadius:
+        (CGFloat)assistantContainerCutoutRadius;
+
 @end
 
 // Object containing the state of the layout.
@@ -64,6 +69,9 @@ enum class AppBarPosition {
 
 // The position of the app bar.
 @property(nonatomic, assign) AppBarPosition appBarPosition;
+
+// The cutout corner radius of the App Bar matching the assistant container.
+@property(nonatomic, assign) CGFloat assistantContainerCutoutRadius;
 
 // Sets `containedLayoutActive` with a transition coordinator to
 // synchronize animations. `coordinator` must not be nil.

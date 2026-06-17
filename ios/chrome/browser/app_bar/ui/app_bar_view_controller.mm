@@ -25,6 +25,7 @@
 #import "ios/chrome/browser/shared/public/features/features.h"
 #import "ios/chrome/browser/shared/ui/buildflags.h"
 #import "ios/chrome/browser/shared/ui/symbols/symbols.h"
+#import "ios/chrome/browser/shared/ui/util/layout_constants.h"
 #import "ios/chrome/browser/shared/ui/util/layout_guide_names.h"
 #import "ios/chrome/browser/shared/ui/util/uikit_ui_util.h"
 #import "ios/chrome/browser/shared/ui/util/util_swift.h"
@@ -228,6 +229,9 @@ UIColor* AssistantHighlightBackgroundColor() {
   // block.
   [self setButtonsTitleAlpha:_fullscreenProgress animationDuration:0];
   [self updateTabSwitcherGuide];
+  if (appBarPosition != AppBarPosition::kBottom) {
+    _backgroundView.cornerRadius = kAppBarCornerRadius;
+  }
 }
 
 #pragma mark - Accessors & Mutators
@@ -295,6 +299,14 @@ UIColor* AssistantHighlightBackgroundColor() {
   [self setNeedsUpdateConfiguration:_tabGridButton animationDuration:0];
   [_stackView setNeedsLayout];
   [_stackView layoutIfNeeded];
+}
+
+- (void)updateCornerRadius:(CGFloat)cornerRadius {
+  if (self.layoutState.appBarPosition != AppBarPosition::kBottom) {
+    _backgroundView.cornerRadius = kAppBarCornerRadius;
+    return;
+  }
+  _backgroundView.cornerRadius = cornerRadius;
 }
 
 - (void)toggleSpotlightView:(BOOL)shouldShow {
@@ -405,8 +417,10 @@ UIColor* AssistantHighlightBackgroundColor() {
     [_backgroundView.trailingAnchor
         constraintEqualToAnchor:view.trailingAnchor],
     [_backgroundView.bottomAnchor constraintEqualToAnchor:view.bottomAnchor],
+    // Ensures the background view has enough height to animate the corner
+    // radius changes.
     [_backgroundView.topAnchor constraintEqualToAnchor:view.topAnchor
-                                              constant:-kAppBarCornerRadius],
+                                              constant:-kAppBarCornerRadiusMax],
     _stackViewLeadingConstraint,
     [_stackView.topAnchor constraintEqualToAnchor:view.topAnchor],
     _stackViewTrailingConstraint,

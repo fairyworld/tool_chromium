@@ -20,6 +20,8 @@ source_set("util") {
     "date_localized_util.mm",
     "file_size_util.h",
     "file_size_util.mm",
+    "layout_constants.h",
+    "layout_constants.mm",
     "layout_guide_names.h",
     "layout_guide_names.mm",
     "named_guide.h",
