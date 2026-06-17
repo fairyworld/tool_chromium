@@ -7429,6 +7429,10 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kTabSwitcherDragDropDescription, kOsAndroid,
      FEATURE_VALUE_TYPE(chrome::android::kTabSwitcherDragDropAndroid)},
 
+    {"tab-search-for-al", flag_descriptions::kTabSearchForALName,
+     flag_descriptions::kTabSearchForALDescription, kOsAndroid,
+     FEATURE_VALUE_TYPE(chrome::android::kTabSearchForAL)},
+
     {"most-visited-tiles-customization",
      flag_descriptions::kMostVisitedTilesCustomizationName,
      flag_descriptions::kMostVisitedTilesCustomizationDescription, kOsAndroid,

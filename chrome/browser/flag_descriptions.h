@@ -6163,6 +6163,10 @@ inline constexpr char kTabClosureMethodRefactorDescription[] =
     "Enables the refactored changes for tab closure methods where existing "
     "methods usages are switched off and newly introduced are made active.";
 
+inline constexpr char kTabSearchForALName[] = "Tab Search for AL";
+inline constexpr char kTabSearchForALDescription[] =
+    "Enable the Tab Search for AL feature.";
+
 inline constexpr char kTabStripHeightTransitionGlitchFixName[] =
     "Tab strip height transition glitch fix";
 inline constexpr char kTabStripHeightTransitionGlitchFixDescription[] =
