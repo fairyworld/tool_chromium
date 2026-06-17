@@ -43,8 +43,8 @@ void ExternalBeginFrameSourceMojoMac::IssueExternalVSync(
       base::TimeTicks::Now() - params.ipc_begin_timestamp;
   if (base::ShouldRecordSubsampledMetric(0.001)) {
     UMA_HISTOGRAM_CUSTOM_MICROSECONDS_TIMES(
-        "Viz.BeginFrameSource.IPC.Latency", ipc_duration,
-        base::Microseconds(10), base::Milliseconds(34), 50);
+        "Viz.BeginFrameSource.IPC.LatencyUs2", ipc_duration,
+        base::Microseconds(10), base::Minutes(1), 50);
   }
 
   ui::VSyncParamsMac ui_params(true, params.timestamp, params.interval, true,
