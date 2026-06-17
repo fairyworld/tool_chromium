@@ -145,6 +145,63 @@ public class TabbedCrashRecoveryDelegateUnitTest {
         assertFalse(shown);
         verifyNoInteractions(mModalDialogManager);
         initWatcher.assertExpected();
+        assertTrue(ChromeMultiInstancePersistentStore.readIsRecoverable(HOST_WINDOW_ID));
+    }
+
+    @Test
+    public void testMaybeShowCrashRecoveryDialog_singleWindowNotHost_triggersDialog() {
+        // Setup: Clear host window from crashed windows.
+        mCrashedWindows.clear();
+        ChromeMultiInstancePersistentStore.resetForTesting();
+        ChromeMultiInstancePersistentStore.ensureInitialized();
+        // Setup: Only 1 crashed window, and it is NOT the host window (say window 1).
+        ChromeMultiInstancePersistentStore.writeLastAccessedTime(1);
+        ChromeMultiInstancePersistentStore.writeTabCount(1, 1, 0);
+        ChromeMultiInstancePersistentStore.writeIsVisible(1, true);
+        ChromeMultiInstancePersistentStore.writeIsRecoverable(1, true);
+        mCrashedWindows.add(new CrashRecoveryWindowInfo(1, null, /* isVisible= */ true));
+
+        writeCrashExitReasonToPrefs();
+
+        // Act.
+        mDelegate.initializeCrashRecoveryMetadata();
+        boolean shown =
+                mDelegate.maybeShowCrashRecoveryDialog(mModalDialogManagerSupplier, mHostActivity);
+
+        // Verify.
+        assertTrue(shown);
+        verify(mModalDialogManager).showDialog(any(), anyInt());
+        assertTrue(ChromeMultiInstancePersistentStore.readIsRecoverable(1));
+    }
+
+    @Test
+    public void
+            testMaybeShowCrashRecoveryDialog_singleWindowNotHostWithLiveTask_skipsRecoveryPrompt() {
+        // Setup: Clear host window from crashed windows.
+        mCrashedWindows.clear();
+        ChromeMultiInstancePersistentStore.resetForTesting();
+        ChromeMultiInstancePersistentStore.ensureInitialized();
+        // Setup: Only 1 crashed window, and it is NOT the host window (say window 1).
+        ChromeMultiInstancePersistentStore.writeLastAccessedTime(1);
+        ChromeMultiInstancePersistentStore.writeTabCount(1, 1, 0);
+        ChromeMultiInstancePersistentStore.writeIsVisible(1, true);
+        ChromeMultiInstancePersistentStore.writeIsRecoverable(1, true);
+        mCrashedWindows.add(new CrashRecoveryWindowInfo(1, null, /* isVisible= */ true));
+
+        // Setup: Window 1 has a live task.
+        setupPreRecoveryAppTasks(HOST_WINDOW_ID, 1);
+
+        writeCrashExitReasonToPrefs();
+
+        // Act.
+        mDelegate.initializeCrashRecoveryMetadata();
+        boolean shown =
+                mDelegate.maybeShowCrashRecoveryDialog(mModalDialogManagerSupplier, mHostActivity);
+
+        // Verify.
+        assertFalse(shown);
+        verifyNoInteractions(mModalDialogManager);
+        assertFalse(ChromeMultiInstancePersistentStore.readIsRecoverable(1));
     }
 
     @Test
@@ -180,11 +237,16 @@ public class TabbedCrashRecoveryDelegateUnitTest {
 
         // Act & Verify.
         for (int reason : nonCrashReasons) {
+            ChromeMultiInstancePersistentStore.writeIsRecoverable(HOST_WINDOW_ID, true);
+            ChromeMultiInstancePersistentStore.writeIsRecoverable(1, true);
+
             mDelegate.resetState();
             writeExitReasonToPrefs(reason);
             assertFalse(
                     "Reason " + reason + " should not need crash recovery.",
                     mDelegate.didLastSessionCrashWithRecoverableWindows());
+            assertFalse(ChromeMultiInstancePersistentStore.readIsRecoverable(HOST_WINDOW_ID));
+            assertFalse(ChromeMultiInstancePersistentStore.readIsRecoverable(1));
         }
     }
 
@@ -280,6 +342,9 @@ public class TabbedCrashRecoveryDelegateUnitTest {
         // Verify.
         assertFalse(
                 mDelegate.maybeShowCrashRecoveryDialog(mModalDialogManagerSupplier, mHostActivity));
+        assertFalse(ChromeMultiInstancePersistentStore.readIsRecoverable(HOST_WINDOW_ID));
+        assertFalse(ChromeMultiInstancePersistentStore.readIsRecoverable(1));
+        assertFalse(ChromeMultiInstancePersistentStore.readIsRecoverable(2));
     }
 
     @Test
@@ -295,6 +360,40 @@ public class TabbedCrashRecoveryDelegateUnitTest {
 
         // Act.
         mDelegate.initializeCrashRecoveryMetadata();
+
+        // Verify.
+        boolean shown =
+                mDelegate.maybeShowCrashRecoveryDialog(mModalDialogManagerSupplier, mHostActivity);
+        assertTrue(shown);
+        assertFalse(ChromeMultiInstancePersistentStore.readIsCrashRecoveryPending());
+    }
+
+    @Test
+    public void
+            testInitializeCrashRecoveryMetadata_pendingRecoveryWithNonCrashExitReason_preservesMetadataAndTriggersDialog() {
+        // Setup: 1 host + 2 other windows = 3 total.
+        setupOtherCrashedWindows(
+                /* numNonVisibleWindows= */ 0,
+                /* numDefaultDisplayWindows= */ 2,
+                /* numNonDefaultDisplayWindows= */ 0);
+
+        // Setup: Simulate pending recovery.
+        writeCrashExitReasonToPrefs();
+        mDelegate.maybeDeferCrashRecovery();
+
+        // Setup: Write non-crash exit reason for the current session.
+        SharedPreferencesManager prefs = ChromeSharedPreferences.getInstance();
+        prefs.writeInt(
+                ChromePreferenceKeys.LAST_SESSION_BROWSER_EXIT_REASON,
+                ApplicationExitInfo.REASON_USER_REQUESTED);
+
+        // Act.
+        mDelegate.initializeCrashRecoveryMetadata();
+
+        // Verify: The recovery states of all windows are preserved (not cleared).
+        assertTrue(ChromeMultiInstancePersistentStore.readIsRecoverable(HOST_WINDOW_ID));
+        assertTrue(ChromeMultiInstancePersistentStore.readIsRecoverable(1));
+        assertTrue(ChromeMultiInstancePersistentStore.readIsRecoverable(2));
 
         // Verify.
         boolean shown =
