@@ -34,6 +34,7 @@ import org.chromium.chrome.browser.lifecycle.ActivityLifecycleDispatcher;
 import org.chromium.chrome.browser.multiwindow.MultiInstanceManager;
 import org.chromium.chrome.browser.share.ShareDelegate;
 import org.chromium.chrome.browser.tab.TabLaunchType;
+import org.chromium.chrome.browser.tab.TabObscuringHandler;
 import org.chromium.chrome.browser.tab_ui.ActionConfirmationManager;
 import org.chromium.chrome.browser.tab_ui.TabContentManager;
 import org.chromium.chrome.browser.tab_ui.TabSwitcher;
@@ -135,7 +136,8 @@ public class LayoutManagerChromeTablet extends LayoutManagerChrome {
             SnackbarManager snackbarManager,
             ActivityResultTracker activityResultTracker,
             GlicButtonDelegate glicClickHandler,
-            OneshotSupplier<SideUiStateProvider> sideUiStateProviderSupplier) {
+            OneshotSupplier<SideUiStateProvider> sideUiStateProviderSupplier,
+            TabObscuringHandler tabObscuringHandler) {
         super(
                 host,
                 contentContainer,
@@ -179,7 +181,8 @@ public class LayoutManagerChromeTablet extends LayoutManagerChrome {
                         snackbarManager,
                         activityResultTracker,
                         glicClickHandler,
-                        sideUiStateProviderSupplier);
+                        sideUiStateProviderSupplier,
+                        tabObscuringHandler);
         addSceneOverlay(mTabStripLayoutHelperManager);
         addObserver(mTabStripLayoutHelperManager.getTabSwitcherObserver());
         mDesktopWindowStateManager = desktopWindowStateManager;

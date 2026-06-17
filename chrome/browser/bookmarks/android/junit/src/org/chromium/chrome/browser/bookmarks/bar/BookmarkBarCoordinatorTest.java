@@ -75,6 +75,7 @@ import org.chromium.chrome.browser.lifecycle.ActivityLifecycleDispatcher;
 import org.chromium.chrome.browser.page_image_service.ImageServiceBridgeJni;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.tab.Tab;
+import org.chromium.chrome.browser.tab.TabObscuringHandler;
 import org.chromium.chrome.browser.theme.ThemeUtils;
 import org.chromium.chrome.browser.theme.TopUiThemeColorProvider;
 import org.chromium.chrome.browser.ui.favicon.FaviconHelperJni;
@@ -127,6 +128,7 @@ public class BookmarkBarCoordinatorTest {
     @Mock private TopControlsStacker mTopControlsStacker;
     @Mock private TopUiThemeColorProvider mTopUiThemeColorProvider;
     @Mock private SideUiStateProvider mSideUiStateProvider;
+    @Mock private TabObscuringHandler mTabObscuringHandler;
 
     private ShadowLooper mShadowLooper;
     private BookmarkBarCoordinator mCoordinator;
@@ -218,7 +220,8 @@ public class BookmarkBarCoordinatorTest {
                         mTopControlsStacker,
                         ObservableSuppliers.alwaysNull(),
                         mTopUiThemeColorProvider,
-                        mSideUiStateProviderSupplier);
+                        mSideUiStateProviderSupplier,
+                        mTabObscuringHandler);
 
         assertNotNull("Verify view stub inflation during construction.", mView);
 
@@ -691,5 +694,22 @@ public class BookmarkBarCoordinatorTest {
         assertNotEquals(initialStartMargin, params.getMarginStart());
         assertNotEquals(initialEndMargin, params.getMarginEnd());
         assertNotEquals(initialWidth, mView.getWidth());
+    }
+
+    @Test
+    @SmallTest
+    public void testUpdateObscured() {
+        assertEquals(View.IMPORTANT_FOR_ACCESSIBILITY_YES, mView.getImportantForAccessibility());
+
+        mCoordinator.updateObscured(/* obscureTabContent= */ true, /* obscureToolbar= */ false);
+        assertEquals(View.IMPORTANT_FOR_ACCESSIBILITY_YES, mView.getImportantForAccessibility());
+
+        mCoordinator.updateObscured(/* obscureTabContent= */ true, /* obscureToolbar= */ true);
+        assertEquals(
+                View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS,
+                mView.getImportantForAccessibility());
+
+        mCoordinator.updateObscured(/* obscureTabContent= */ false, /* obscureToolbar= */ false);
+        assertEquals(View.IMPORTANT_FOR_ACCESSIBILITY_YES, mView.getImportantForAccessibility());
     }
 }
