@@ -9,6 +9,7 @@
 
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
+#include "chrome/browser/dictation/dictation_multiplexer.h"
 #include "chrome/browser/dictation/session_controller.h"
 #include "chrome/browser/dictation/session_controller_delegate.h"
 #include "components/keyed_service/core/keyed_service.h"
@@ -72,8 +73,12 @@ class DictationKeyedService : public KeyedService,
     return const_cast<DictationKeyedService*>(this)->session_controller();
   }
 
+  DictationMultiplexer& multiplexer() { return multiplexer_; }
+
  private:
   raw_ptr<Profile> profile_;
+
+  DictationMultiplexer multiplexer_;
 
   struct SessionState {
     SessionState(SessionControllerDelegate& delegate,

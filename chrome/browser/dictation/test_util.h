@@ -23,6 +23,11 @@ class MockStreamProvider : public StreamProvider {
 
   MOCK_METHOD(void, BindToTarget, (Target & target), (override));
   MOCK_METHOD(void, Stop, (), (override));
+  MOCK_METHOD(void,
+              OnTranscriptionUpdated,
+              (const std::string& data, bool is_final),
+              (override));
+  MOCK_METHOD(void, OnStreamStateChanged, (StreamState state), (override));
 };
 
 class MockSessionUi : public SessionUi {
