@@ -118,6 +118,14 @@ chromium-metrics-reviews@google.com.
   <variant name="Unknown"/>
 </variants>
 
+<variants name="NetworkTransactionProtocol">
+  <variant name="" summary="all protocols"/>
+  <variant name=".H1" summary="HTTP/1.1"/>
+  <variant name=".H2" summary="HTTP/2"/>
+  <variant name=".H3" summary="HTTP/3"/>
+  <variant name=".Unknown" summary="unknown protocol"/>
+</variants>
+
 <variants name="PlatformNotifications">
   <variant name=".OnIPAddressChanged"
       summary="When IP address change is detected"/>
@@ -4559,13 +4567,15 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram
-    name="Net.NetworkTransaction.AsyncRetryOnTooManyConnectionErrors.{Occurrence}"
+    name="Net.NetworkTransaction.AsyncRetryOnTooManyConnectionErrors.{Occurrence}{Protocol}"
     enum="Boolean" expires_after="2026-10-01">
   <owner>horo@chromium.org</owner>
+  <owner>hayato@chromium.org</owner>
   <owner>src/net/OWNERS</owner>
   <summary>
     Recorded when the mitigation for priority starvation (switching to async
     retry after a threshold of connection errors) is triggered. {Occurrence}
+    This is for {Protocol}.
   </summary>
   <token key="Occurrence">
     <variant name="Every" summary="Recorded every time it is triggered."/>
@@ -4573,6 +4583,7 @@ chromium-metrics-reviews@google.com.
         summary="Recorded only the first time it is triggered for a
                  transaction."/>
   </token>
+  <token key="Protocol" variants="NetworkTransactionProtocol"/>
 </histogram>
 
 <histogram name="Net.NetworkTransaction.ConnectedCallbackDelay" units="ms"
@@ -4718,16 +4729,19 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="Net.NetworkTransaction.RetryAttemptsOnConnectionErrors"
+<histogram
+    name="Net.NetworkTransaction.RetryAttemptsOnConnectionErrors{Protocol}"
     units="count" expires_after="2026-10-01">
   <owner>horo@chromium.org</owner>
+  <owner>hayato@chromium.org</owner>
   <owner>src/net/OWNERS</owner>
   <summary>
     The number of retry attempts made for connection errors during the lifetime
     of a single HttpNetworkTransaction. Recorded when the transaction is
     destroyed, if there was at least one retry attempt. The maximum value is
-    kMaxRetryAttemptsOnConnectionErrors (50).
+    kMaxRetryAttemptsOnConnectionErrors (50). This is for {Protocol}.
   </summary>
+  <token key="Protocol" variants="NetworkTransactionProtocol"/>
 </histogram>
 
 <histogram name="Net.NetworkTransaction.SessionSource3.{Protocol}"
@@ -4814,15 +4828,17 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="Net.NetworkTransaction.TooManyRetriesOnConnectionErrors"
+<histogram
+    name="Net.NetworkTransaction.TooManyRetriesOnConnectionErrors{Protocol}"
     enum="Boolean" expires_after="2026-11-01">
   <owner>hayato@chromium.org</owner>
   <owner>src/net/OWNERS</owner>
   <summary>
     Recorded when an HTTP network transaction has reached the maximum number of
     retries for connection errors. Recorded every time when the retry reached
-    kMaxRetryAttemptsOnConnectionErrors (50).
+    kMaxRetryAttemptsOnConnectionErrors (50). This is for {Protocol}.
   </summary>
+  <token key="Protocol" variants="NetworkTransactionProtocol"/>
 </histogram>
 
 <histogram

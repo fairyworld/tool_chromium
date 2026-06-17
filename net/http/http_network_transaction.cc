@@ -350,6 +350,12 @@ HttpNetworkTransaction::~HttpNetworkTransaction() {
         "Net.NetworkTransaction.RetryAttemptsOnConnectionErrors",
         retry_attempts_on_connection_errors_,
         kMaxRetryAttemptsOnConnectionErrors + 1);
+    base::UmaHistogramExactLinear(
+        base::StrCat(
+            {"Net.NetworkTransaction.RetryAttemptsOnConnectionErrors.",
+             NegotiatedProtocolToHistogramSuffix(negotiated_protocol_)}),
+        retry_attempts_on_connection_errors_,
+        kMaxRetryAttemptsOnConnectionErrors + 1);
   }
 
 #if BUILDFLAG(ENABLE_REPORTING)
@@ -2112,6 +2118,11 @@ int HttpNetworkTransaction::HandleIOError(int error) {
             kMaxRetryAttemptsOnConnectionErrors) {
           base::UmaHistogramBoolean(
               "Net.NetworkTransaction.TooManyRetriesOnConnectionErrors", true);
+          base::UmaHistogramBoolean(
+              base::StrCat(
+                  {"Net.NetworkTransaction.TooManyRetriesOnConnectionErrors.",
+                   NegotiatedProtocolToHistogramSuffix(negotiated_protocol_)}),
+              true);
           return ERR_TOO_MANY_RETRIES;
         }
         retry_attempts_on_connection_errors_++;
@@ -2141,11 +2152,24 @@ int HttpNetworkTransaction::HandleIOError(int error) {
               "Net.NetworkTransaction.AsyncRetryOnTooManyConnectionErrors."
               "Every",
               true);
+          base::UmaHistogramBoolean(
+              base::StrCat(
+                  {"Net.NetworkTransaction.AsyncRetryOnTooManyConnectionErrors."
+                   "Every.",
+                   NegotiatedProtocolToHistogramSuffix(negotiated_protocol_)}),
+              true);
           if (retry_attempts_on_connection_errors_ ==
               kAsyncRetryThresholdOnConnectionErrors) {
             base::UmaHistogramBoolean(
                 "Net.NetworkTransaction.AsyncRetryOnTooManyConnectionErrors."
                 "First",
+                true);
+            base::UmaHistogramBoolean(
+                base::StrCat({"Net.NetworkTransaction."
+                              "AsyncRetryOnTooManyConnectionErrors."
+                              "First.",
+                              NegotiatedProtocolToHistogramSuffix(
+                                  negotiated_protocol_)}),
                 true);
           }
           // Use WeakPtr to prevent a potential dangling pointer crash. See
