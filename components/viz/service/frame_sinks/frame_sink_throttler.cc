@@ -74,16 +74,11 @@ void FrameSinkThrottler::UpdateBeginFrameInterval() {
     //
     // For now, simple cadence wins to avoid stuttering.
     interval = cadence_throttle_interval_;
-  } else if (throttled_due_to_interaction_) {
+  } else if (throttled_due_to_interaction_ &&
+             last_known_vsync_unthrottled_interval_.is_positive()) {
     // Halve the framerate of the last known vsync interval
     constexpr int kInteractiveThrottleScalar = 2;
-    base::TimeDelta vsync_interval = BeginFrameArgs::DefaultInterval();
-
-    // If the unthrottled vsync interval is known, use it instead of the
-    // default.
-    if (last_known_vsync_unthrottled_interval_.is_positive()) {
-      vsync_interval = last_known_vsync_unthrottled_interval_;
-    }
+    base::TimeDelta vsync_interval = last_known_vsync_unthrottled_interval_;
 
     // Longest interval wins
     interval = std::max(interval, vsync_interval * kInteractiveThrottleScalar);

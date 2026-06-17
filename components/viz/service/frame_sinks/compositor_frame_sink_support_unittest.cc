@@ -2077,7 +2077,15 @@ TEST_P(CompositorFrameSinkSupportTest, BeginFrameInterval) {
 TEST_P(CompositorFrameSinkSupportTest, InteractionsThrottleToHalfFrameRate) {
   constexpr base::TimeDelta kNativeInterval = BeginFrameArgs::DefaultInterval();
   constexpr base::TimeDelta kThrottledInterval = kNativeInterval * 2;
+
+  // No throttling before vsync is known.
   support_->SetThrottledDueToInteraction(true);
+  EXPECT_EQ(support_->GetThrottlerForTesting().begin_frame_interval(),
+            base::TimeDelta());
+
+  // Throttles once vsync is known.
+  support_->GetThrottlerForTesting().SetLastKnownVsync(kNativeInterval,
+                                                       kNativeInterval);
   EXPECT_EQ(support_->GetThrottlerForTesting().begin_frame_interval(),
             kThrottledInterval);
 }

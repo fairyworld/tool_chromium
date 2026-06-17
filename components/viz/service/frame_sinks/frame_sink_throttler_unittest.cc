@@ -134,11 +134,9 @@ TEST_F(FrameSinkThrottlerTest, ScreenCaptureUnthrottlesVideoCadence) {
 
 // SetThrottledDueToInteraction interval changes with to known vsync
 TEST_F(FrameSinkThrottlerTest, ThrottleInteractionsBasic) {
-  // Set throttle on interactions to true causes the throttling cadence
-  // to be half the dfault framerate.
+  // Set throttle on interactions to true has no effect if vsync is unknown.
   throttler_.SetThrottledDueToInteraction(true);
-  EXPECT_EQ(throttler_.begin_frame_interval(),
-            BeginFrameArgs::DefaultInterval() * 2);
+  EXPECT_EQ(throttler_.begin_frame_interval(), base::TimeDelta());
 
   // Vsync interval is used if it is known.
   throttler_.SetLastKnownVsync(base::Hertz(144), base::Hertz(144));
