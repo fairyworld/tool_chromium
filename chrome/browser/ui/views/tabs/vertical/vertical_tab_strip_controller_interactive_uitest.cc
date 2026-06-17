@@ -28,7 +28,6 @@
 #include "ui/events/keycodes/keyboard_codes.h"
 #include "ui/menus/simple_menu_model.h"
 #include "ui/views/controls/scroll_view.h"
-#include "ui/views/interaction/interactive_views_test.h"
 #include "ui/views/test/views_test_utils.h"
 #include "ui/views/view_utils.h"
 
