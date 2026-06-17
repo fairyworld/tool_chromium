@@ -1770,7 +1770,7 @@ inline constexpr char kSendTabToSelfEnhancedHandoffName[] =
     "Send Tab To Self enhanced handoff";
 inline constexpr char kSendTabToSelfEnhancedHandoffDescription[] =
     "Enables an enhanced version of Send Tab To Self that propagates more "
-    "information, such as form fields.";
+    "information, such as form fields, and updates various UIs.";
 
 inline constexpr char kShareInOmniboxLongPressName[] =
     "Share in Omnibox Long Press";

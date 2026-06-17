@@ -44,6 +44,7 @@
 #import "ios/chrome/browser/send_tab_to_self/model/send_tab_to_self_browser_agent.h"
 #import "ios/chrome/browser/send_tab_to_self/model/send_tab_to_self_text_fragment_selector_generator.h"
 #import "ios/chrome/browser/send_tab_to_self/model/send_tab_to_self_util.h"
+#import "ios/chrome/browser/send_tab_to_self/ui/send_tab_to_self_bottom_sheet_view_controller.h"
 #import "ios/chrome/browser/send_tab_to_self/ui/send_tab_to_self_modal_delegate.h"
 #import "ios/chrome/browser/send_tab_to_self/ui/send_tab_to_self_modal_presentation_controller.h"
 #import "ios/chrome/browser/send_tab_to_self/ui/send_tab_to_self_table_view_controller.h"
@@ -289,8 +290,7 @@ void OpenManageDevicesTab(CommandDispatcher* dispatcher) {
 
 // The TableViewController that shows the Send Tab To Self UI. This is NOT the
 // presented controller, it is wrapped in a UINavigationController.
-@property(nonatomic, strong)
-    SendTabToSelfTableViewController* sendTabToSelfViewController;
+@property(nonatomic, strong) UIViewController* sendTabToSelfViewController;
 // If non-null, this is called when iOS finishes the animated dismissal of the
 // view controllers. This is called after this object is destroyed so it must
 // NOT rely on self. Instead the block should retain its dependencies.
@@ -602,22 +602,46 @@ void OpenManageDevicesTab(CommandDispatcher* dispatcher) {
           ->GetPrimaryIdentity();
   DCHECK(account) << "The user must be signed in to share a tab";
 
-  self.sendTabToSelfViewController = [[SendTabToSelfTableViewController alloc]
-      initWithDeviceList:syncService->GetSendTabToSelfModel()
-                             ->GetTargetDeviceInfoSortedList()
-                delegate:self
-           accountAvatar:GetApplicationContext()
-                             ->GetIdentityAvatarProvider()
-                             ->GetIdentityAvatar(
-                                 account, IdentityAvatarSize::TableViewIcon)
-            accountEmail:account.userEmail];
-  _navigationController = [[UINavigationController alloc]
-      initWithRootViewController:self.sendTabToSelfViewController];
-  _navigationController.transitioningDelegate = self;
-  _navigationController.modalPresentationStyle = UIModalPresentationCustom;
-  [self.baseViewController presentViewController:_navigationController
-                                        animated:YES
-                                      completion:nil];
+  if (base::FeatureList::IsEnabled(
+          send_tab_to_self::kSendTabToSelfEnhancedBottomsheet)) {
+    SendTabToSelfBottomSheetViewController* bottomSheet =
+        [[SendTabToSelfBottomSheetViewController alloc]
+            initWithDeviceList:syncService->GetSendTabToSelfModel()
+                                   ->GetTargetDeviceInfoSortedList()
+                  accountEmail:account.userEmail
+                      delegate:self];
+    bottomSheet.parentViewControllerHeight =
+        self.baseViewController.view.frame.size.height;
+    self.sendTabToSelfViewController = bottomSheet;
+    _navigationController = [[UINavigationController alloc]
+        initWithRootViewController:self.sendTabToSelfViewController];
+    _navigationController.modalPresentationStyle = UIModalPresentationPageSheet;
+    UISheetPresentationController* sheet =
+        _navigationController.sheetPresentationController;
+    if (sheet) {
+      sheet.prefersGrabberVisible = YES;
+    }
+    [self.baseViewController presentViewController:_navigationController
+                                          animated:YES
+                                        completion:nil];
+  } else {
+    self.sendTabToSelfViewController = [[SendTabToSelfTableViewController alloc]
+        initWithDeviceList:syncService->GetSendTabToSelfModel()
+                               ->GetTargetDeviceInfoSortedList()
+                  delegate:self
+             accountAvatar:GetApplicationContext()
+                               ->GetIdentityAvatarProvider()
+                               ->GetIdentityAvatar(
+                                   account, IdentityAvatarSize::TableViewIcon)
+              accountEmail:account.userEmail];
+    _navigationController = [[UINavigationController alloc]
+        initWithRootViewController:self.sendTabToSelfViewController];
+    _navigationController.transitioningDelegate = self;
+    _navigationController.modalPresentationStyle = UIModalPresentationCustom;
+    [self.baseViewController presentViewController:_navigationController
+                                          animated:YES
+                                        completion:nil];
+  }
 }
 
 // Shows a signin promo, for the case where the user is not signed in yet and

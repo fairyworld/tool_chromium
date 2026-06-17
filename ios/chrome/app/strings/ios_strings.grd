@@ -7006,14 +7006,29 @@ Handoff must also be enabled in the General section of Settings, and your device
       <message name="IDS_IOS_SEND_TAB_PROMO_TITLE" desc="Title for the Send Tab to Self promo Magic Stack module.">
         Get Tabs Notifications
       </message>
+      <message name="IDS_IOS_SEND_TAB_TO_SELF_BOTTOM_SHEET_SEND_BUTTON" desc="Button label for the Send Tab To Self bottom sheet dialog that sends the current tab to a user's other device. [iOS only]">
+        Send
+      </message>
+      <message name="IDS_IOS_SEND_TAB_TO_SELF_BOTTOM_SHEET_TITLE" desc="Title for the Send Tab To Self bottom sheet dialog that chooses the device to which the current tab will be sent. [iOS only]">
+        Choose a device
+      </message>
       <message name="IDS_IOS_SEND_TAB_TO_SELF_HIDE_CONTEXT_MENU_DESCRIPTION" desc="Description for the long-press context menu hide action of the send tab to self module.">
         Hide "<ph name="Module_Name"><ex>Get Tabs Notifications</ex>$1</ph>"
+      </message>
+      <message name="IDS_IOS_SEND_TAB_TO_SELF_MANAGE_DEVICES" desc="Label for a menu item to manage the devices that can receive tabs. [iOS only]">
+        Manage your devices
       </message>
       <message name="IDS_IOS_SEND_TAB_TO_SELF_NOTIFICATION_SETTINGS_BODY" desc="Body text of the Send Tabs notifications entry in the Notification Settings Screen.">
         Alerts when you receive tabs from your other devices.
       </message>
       <message name="IDS_IOS_SEND_TAB_TO_SELF_NOTIFICATION_SETTINGS_TITLE" desc="Title text of the Send Tabs notifications entry in the Notification Settings Screen.">
         Tabs
+      </message>
+      <message name="IDS_IOS_SEND_TAB_TO_SELF_NO_DEVICES_FOUND_TITLE" desc="Title of the Send Tab to Self bottom sheet when there are no target devices. [iOS only]">
+        No devices found
+      </message>
+      <message name="IDS_IOS_SEND_TAB_TO_SELF_NO_TARGET_DEVICE_LABEL_WITH_EMAIL" desc="Label shown when a user with no available target devices attempts to use send-tab-to-self, displaying the email they should sign in with. [iOS only]">
+        To send this link, sign in to your other device using <ph name="USER_EMAIL">$1<ex>user@email.com</ex></ph>
       </message>
       <message name="IDS_IOS_SEND_TAB_TO_SELF_SNACKBAR_MESSAGE" desc="Message briefly displayed at the bottom of the screen to the user to inform that the tab is being sent to the target device. [Length: 35em]" meaning="The is being sent to the target device. [Length: 35em]">
         Sending to <ph name="DEVICE_NAME">$1<ex>IPhone</ex></ph>…
