@@ -487,7 +487,12 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
 
         if (mParams.isPage() && shouldShowEmptySpaceContextMenu()) {
             ModelList pageGroup = new ModelList();
-            if (mMode != ContextMenuMode.THIN_WEB_VIEW) {
+            if (mMode == ContextMenuMode.THIN_WEB_VIEW) {
+                pageGroup.add(createListItem(Item.RELOAD));
+                if (mItemDelegate.isPrintSupported()) {
+                    pageGroup.add(createListItem(Item.PRINT_PAGE));
+                }
+            } else {
                 if (mItemDelegate instanceof TabContextMenuItemDelegate) {
                     TabContextMenuItemDelegate tabDelegate =
                             (TabContextMenuItemDelegate) mItemDelegate;
@@ -497,10 +502,7 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
                             createListItem(
                                     Item.FORWARD, false, tabDelegate.canCurrentTabGoForward()));
                 }
-            }
-            pageGroup.add(createListItem(Item.RELOAD));
-
-            if (mMode != ContextMenuMode.THIN_WEB_VIEW) {
+                pageGroup.add(createListItem(Item.RELOAD));
                 if (UrlUtilities.isDownloadableScheme(mParams.getPageUrl())) {
                     pageGroup.add(
                             createListItem(Item.SAVE_PAGE, false, !mIsDownloadRestrictedByPolicy));

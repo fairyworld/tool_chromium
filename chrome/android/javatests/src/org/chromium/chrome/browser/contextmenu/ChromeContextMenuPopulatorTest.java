@@ -2613,9 +2613,7 @@ public class ChromeContextMenuPopulatorTest {
         initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.NETWORK_BOUND_TAB, params);
         checkMenuOptions(expected);
 
-        int[][] expectedThinWebView = {
-            {R.id.contextmenu_reload},
-        };
+        int[][] expectedThinWebView = {{R.id.contextmenu_reload, R.id.contextmenu_print_page}};
         initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.THIN_WEB_VIEW, params);
         checkMenuOptions(expectedThinWebView);
     }
@@ -2701,7 +2699,8 @@ public class ChromeContextMenuPopulatorTest {
         checkMenuOptions(expected);
 
         int[][] expectedThinWebView = {
-            {R.id.contextmenu_reload}, {R.id.contextmenu_inspect_element},
+            {R.id.contextmenu_reload, R.id.contextmenu_print_page},
+            {R.id.contextmenu_inspect_element}
         };
 
         initializePopulator(
@@ -2739,7 +2738,7 @@ public class ChromeContextMenuPopulatorTest {
         initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.NETWORK_BOUND_TAB, params);
         checkMenuOptions(expectedDisabled, expectedPage);
 
-        int[] expectedPageThinWebView = {R.id.contextmenu_reload};
+        int[] expectedPageThinWebView = {R.id.contextmenu_reload, R.id.contextmenu_print_page};
         initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.THIN_WEB_VIEW, params);
         checkMenuOptions(expectedPageThinWebView);
     }

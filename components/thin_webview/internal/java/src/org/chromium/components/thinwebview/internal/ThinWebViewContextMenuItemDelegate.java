@@ -13,10 +13,12 @@ import android.provider.ContactsContract;
 import androidx.browser.customtabs.CustomTabsIntent;
 
 import org.chromium.base.IntentUtils;
+import org.chromium.base.ServiceLoaderUtil;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.components.embedder_support.contextmenu.ContextMenuItemDelegate;
 import org.chromium.components.embedder_support.util.UrlUtilities;
+import org.chromium.components.thinwebview.ThinWebViewPrintingController;
 import org.chromium.content_public.browser.WebContents;
 import org.chromium.content_public.common.Referrer;
 import org.chromium.ui.base.Clipboard;
@@ -31,6 +33,7 @@ public class ThinWebViewContextMenuItemDelegate implements ContextMenuItemDelega
     private final WebContents mWebContents;
     private final @Nullable String mIntentTargetClassName;
     private final @Nullable BiConsumer<GURL, String> mEphemeralTabOpener;
+    private final @Nullable ThinWebViewPrintingController mPrintingController;
 
     /** Builds a {@link ThinWebViewContextMenuItemDelegate} instance. */
     public ThinWebViewContextMenuItemDelegate(WebContents webContents) {
@@ -53,6 +56,7 @@ public class ThinWebViewContextMenuItemDelegate implements ContextMenuItemDelega
         mWebContents = webContents;
         mIntentTargetClassName = intentTargetClassName;
         mEphemeralTabOpener = ephemeralTabOpener;
+        mPrintingController = ServiceLoaderUtil.maybeCreate(ThinWebViewPrintingController.class);
     }
 
     @Override
@@ -191,6 +195,18 @@ public class ThinWebViewContextMenuItemDelegate implements ContextMenuItemDelega
             intent.setData(Uri.parse(url.getSpec()));
             intent.putExtra(CustomTabsIntent.EXTRA_ENABLE_EPHEMERAL_BROWSING, true);
             safeStartActivity(intent);
+        }
+    }
+
+    @Override
+    public boolean isPrintSupported() {
+        return mPrintingController != null && mPrintingController.isPrintSupported(mWebContents);
+    }
+
+    @Override
+    public void startPrint() {
+        if (mPrintingController != null) {
+            mPrintingController.startPrint(mWebContents);
         }
     }
 
