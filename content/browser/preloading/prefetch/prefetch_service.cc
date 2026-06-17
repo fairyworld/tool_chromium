@@ -285,7 +285,7 @@ bool IsAllowedByConnectionAllowlist(const PrefetchRequest& request,
   // enabled. In order to check the origin trial status, the initiator policy
   // container policies need to be retrieved.
   if (!base::FeatureList::IsEnabled(network::features::kConnectionAllowlists)) {
-    return false;
+    return true;
   }
 
   const PrefetchRendererInitiatorInfo* renderer_initiator_info =
