@@ -421,4 +421,14 @@ interface PrintManagerHost {
   [EnableIf=enable_print_preview]
   SetAccessibilityTree(
       int32 cookie, ax.mojom.AXTreeUpdate accessibility_tree);
+
+  // Tells the browser to set up the print dialog requested by the script on
+  // Android. This is the Android-equivalent of SetupScriptedPrintPreview().
+  // It runs a nested run loop in the renderer until the print dialog
+  // for window.print() finishes.
+  // The run loop continues until the done callback is invoked, which allows
+  // the browser process to finish any UI work it needs to do to set up the
+  // print.
+  [EnableIf=is_android]
+  SetupScriptedPrintAndroid() => ();
 };

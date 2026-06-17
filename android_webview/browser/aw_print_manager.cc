@@ -61,6 +61,14 @@ void AwPrintManager::BindPrintManagerHost(
   print_manager->BindReceiver(std::move(receiver), rfh);
 }
 
+void AwPrintManager::SetupScriptedPrintAndroid(
+    SetupScriptedPrintAndroidCallback callback) {
+  // WebView does not support the print dialog triggered by window.print().
+  // Run the callback immediately to unblock the renderer, maintaining the
+  // previous behavior where window.print() was essentially a no-op.
+  std::move(callback).Run();
+}
+
 void AwPrintManager::PdfWritingDone(int page_count) {
   // The fd_ should have been reset when printing started.
   CHECK_EQ(fd_, base::kInvalidFd);

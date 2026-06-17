@@ -30,6 +30,8 @@ class AwPrintManager : public printing::PrintManager,
       content::RenderFrameHost* rfh);
 
   // printing::PrintManager:
+  void SetupScriptedPrintAndroid(
+      SetupScriptedPrintAndroidCallback callback) override;
   void PdfWritingDone(int page_count) override;
 
   bool PrintNow();

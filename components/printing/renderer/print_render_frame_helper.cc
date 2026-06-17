@@ -46,6 +46,7 @@
 #include "components/printing/common/print_params.h"
 #include "content/public/renderer/render_frame.h"
 #include "content/public/renderer/render_thread.h"
+#include "mojo/public/cpp/bindings/callback_helpers.h"
 #include "mojo/public/cpp/bindings/pending_associated_remote.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "printing/buildflags/buildflags.h"
@@ -1262,7 +1263,24 @@ void PrintRenderFrameHelper::ScriptedPrint(bool user_initiated) {
     return;
   }
 
+#if BUILDFLAG(IS_ANDROID)
+  // On Android, the PDF rendering process is driven asynchronously by the
+  // system's PrintDocumentAdapter. The browser process shows the system print
+  // dialog, and the framework later requests the document's content.
+  // To ensure window.print() behaves synchronously from the web page's
+  // perspective, start a nested run loop. This blocks JS execution until the
+  // user completes the print dialog and the system signals the end of the
+  // print session.
+  // Since the actual printing is triggered later by the system, do not call
+  // Print() here directly.
+  base::RunLoop loop{base::RunLoop::Type::kNestableTasksAllowed};
+  base::OnceClosure quit_closure = loop.QuitClosure();
+  GetPrintManagerHost()->SetupScriptedPrintAndroid(
+      mojo::WrapCallbackWithDefaultInvokeIfNotRun(std::move(quit_closure)));
+  loop.Run();
+#else
   Print(web_frame, blink::WebNode(), PrintRequestType::kScripted);
+#endif
   if (!weak_this) {
     return;
   }
@@ -1306,7 +1324,13 @@ void PrintRenderFrameHelper::PrintRequestedPagesInternal(
 
   blink::WebLocalFrame* frame = render_frame()->GetWebFrame();
 
-  if (!already_notified_frame) {
+#if BUILDFLAG(IS_ANDROID)
+  bool is_scripted = print_in_progress_;
+#else
+  constexpr bool is_scripted = false;
+#endif
+
+  if (!already_notified_frame && !is_scripted) {
     frame->DispatchBeforePrintEvent(/*print_client=*/nullptr);
     // Don't print if the RenderFrame is gone.
     if (render_frame_gone_) {
@@ -1333,7 +1357,9 @@ void PrintRenderFrameHelper::PrintRequestedPagesInternal(
     return;
   }
 
-  frame->DispatchAfterPrintEvent();
+  if (!is_scripted) {
+    frame->DispatchAfterPrintEvent();
+  }
   // WARNING: `this` may be gone at this point. Do not do any more work here and
   // just return.
 }
