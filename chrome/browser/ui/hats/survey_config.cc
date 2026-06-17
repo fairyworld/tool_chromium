@@ -979,30 +979,6 @@ std::optional<uint64_t> SurveyConfig::ValidateHatsSurveyUkmId(
              : std::nullopt;
 }
 
-std::optional<base::TimeDelta> SurveyConfig::GetCooldownPeriodOverride(
-    Profile* profile) const {
-  if (!cooldown_period_override_) {
-    return std::nullopt;
-  }
-
-  GoogleGroupsManager* groups_manager =
-      GoogleGroupsManagerFactory::GetForBrowserContext(profile);
-
-  if (!groups_manager) {
-    return std::nullopt;
-  }
-
-  if (!groups_manager->IsFeatureEnabledForProfile(*survey_feature) ||
-      !groups_manager->IsFeatureGroupControlled(*survey_feature)) {
-    return std::nullopt;
-  }
-
-  return cooldown_period_override_;
-}
-
-bool SurveyConfig::IsCooldownOverrideEnabled(Profile* profile) const {
-  return GetCooldownPeriodOverride(profile).has_value();
-}
 
 void GetActiveSurveyConfigs(SurveyConfigs& survey_configs_by_triggers_) {
   auto surveys = GetAllSurveyConfigs();
