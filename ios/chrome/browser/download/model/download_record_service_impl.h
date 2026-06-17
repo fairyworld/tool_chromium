@@ -77,8 +77,21 @@ class DownloadRecordServiceImpl : public DownloadRecordService,
 
   // Initializes database operations, called on database_task_runner_.
   void InitializeDatabase(const base::FilePath& profile_path);
+
+  // Legacy startup loader (flag-OFF path). Loads every persisted row into
+  // `record_cache_` and flips any kInProgress/kNotStarted row to kFailed.
+  // Only used when `IsDownloadListPaginationEnabled()` is false.
+  // TODO(crbug.com/524790428): Remove this legacy startup path (and the
+  // `record_cache_`-based readers) once the pagination flag has shipped to
+  // stable and is retired.
   void LoadHistoricalRecords();
   void CleanupInconsistentStates();
+
+  // Pagination-aware startup cleanup (flag-ON path). Issues a single
+  // UPDATE ... WHERE state IN (kInProgress, kNotStarted) against the DB
+  // via `DownloadRecordDatabase::MarkUnfinishedDownloadsAsFailed` (no
+  // full-table load).
+  void MarkUnfinishedDownloadsAsFailed();
 
   // Database CRUD operations, called on database_task_runner_.
   bool InsertRecord(const DownloadRecord& record);
@@ -113,6 +126,13 @@ class DownloadRecordServiceImpl : public DownloadRecordService,
 
   // Task runner for database operations.
   scoped_refptr<base::SequencedTaskRunner> database_task_runner_;
+
+  // Snapshot of `IsDownloadListPaginationEnabled()` taken at construction
+  // time. Held as a member so any in-process Finch flip during the lifetime
+  // of this service cannot change the path chosen at startup. Every code
+  // path in this service that needs to gate on pagination reads this
+  // member, not the live function.
+  const bool pagination_enabled_;
 
   // Main thread sequence checker for public API calls.
   SEQUENCE_CHECKER(main_sequence_checker_);

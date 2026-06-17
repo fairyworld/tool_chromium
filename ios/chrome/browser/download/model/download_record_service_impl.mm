@@ -7,6 +7,7 @@
 #import <memory>
 #import <optional>
 #import <string_view>
+#import <tuple>
 #import <vector>
 
 #import "base/files/file_path.h"
@@ -25,7 +26,8 @@ DownloadRecordServiceImpl::DownloadRecordServiceImpl(
     const base::FilePath& profile_path)
     : database_task_runner_(base::ThreadPool::CreateSequencedTaskRunner(
           {base::MayBlock(), base::TaskPriority::USER_VISIBLE,
-           base::TaskShutdownBehavior::BLOCK_SHUTDOWN})) {
+           base::TaskShutdownBehavior::BLOCK_SHUTDOWN})),
+      pagination_enabled_(IsDownloadListPaginationEnabled()) {
   CHECK(IsDownloadListEnabled());
   CHECK(!profile_path.empty());
 
@@ -33,16 +35,21 @@ DownloadRecordServiceImpl::DownloadRecordServiceImpl(
   DETACH_FROM_SEQUENCE(database_sequence_checker_);
 
   database_task_runner_->PostTask(
-      FROM_HERE, base::BindOnce(
-                     [](base::WeakPtr<DownloadRecordServiceImpl> service,
-                        const base::FilePath& profile_path) {
-                       if (!service) {
-                         return;
-                       }
-                       service->InitializeDatabase(profile_path);
-                       service->LoadHistoricalRecords();
-                     },
-                     weak_ptr_factory_.GetWeakPtr(), profile_path));
+      FROM_HERE,
+      base::BindOnce(
+          [](base::WeakPtr<DownloadRecordServiceImpl> service,
+             const base::FilePath& profile_path, bool pagination_enabled) {
+            if (!service) {
+              return;
+            }
+            service->InitializeDatabase(profile_path);
+            if (pagination_enabled) {
+              service->MarkUnfinishedDownloadsAsFailed();
+              return;
+            }
+            service->LoadHistoricalRecords();
+          },
+          weak_ptr_factory_.GetWeakPtr(), profile_path, pagination_enabled_));
 }
 
 DownloadRecordServiceImpl::~DownloadRecordServiceImpl() {
@@ -367,6 +374,29 @@ void DownloadRecordServiceImpl::CleanupInconsistentStates() {
   }
 
   UpdateRecordsState(records_to_fix, web::DownloadTask::State::kFailed);
+}
+
+void DownloadRecordServiceImpl::MarkUnfinishedDownloadsAsFailed() {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(database_sequence_checker_);
+
+  if (!database_ || !database_->IsInitialized()) {
+    return;
+  }
+
+  // Single SQL UPDATE — no full-table load. Any record found in
+  // kInProgress / kNotStarted at startup is treated as interrupted by
+  // app termination and flipped to kFailed.
+  //
+  // Return value is intentionally discarded: a transient SQL failure
+  // here is self-healing (the next OnDownload* update for the row, or
+  // the next session's identical UPDATE, will repair the state) and no
+  // caller depends on its success.
+  std::ignore = database_->MarkUnfinishedDownloadsAsFailed();
+
+  // Caches are intentionally not populated here. `record_cache_` is only
+  // populated by `LoadHistoricalRecords` on the flag-OFF path; on the
+  // flag-ON path it stays empty by design. This keeps service
+  // construction O(1) instead of O(N) on the persisted-row count.
 }
 
 bool DownloadRecordServiceImpl::InsertRecord(const DownloadRecord& record) {
