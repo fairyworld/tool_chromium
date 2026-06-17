@@ -212,7 +212,10 @@ class TabVerticalViewBinder {
         }
 
         updateFavicon(model, view);
-        setupTabHoverListener(model, view);
+        setupTabHoverListener(
+                model,
+                view,
+                /* defaultBackgroundColor= */ ColorStateList.valueOf(Color.TRANSPARENT));
     }
 
     /**
@@ -238,6 +241,7 @@ class TabVerticalViewBinder {
             ViewCompat.setBackgroundTintList(view, tintList);
         }
         updateFavicon(model, view);
+        setupTabHoverListener(model, view, /* defaultBackgroundColor= */ null);
     }
 
     /**
@@ -369,21 +373,25 @@ class TabVerticalViewBinder {
 
     // Gesture & Interaction Layout Helpers
 
-    private static void setupTabHoverListener(PropertyModel model, ViewGroup view) {
+    private static void setupTabHoverListener(
+            PropertyModel model, ViewGroup view, @Nullable ColorStateList defaultBackgroundColor) {
         @Nullable ImageView actionButton = view.findViewById(R.id.action_button);
-        if (actionButton == null) return;
 
         view.setOnHoverListener(
                 (rowView, motionEvent) -> {
                     boolean isSelected = model.get(TabProperties.IS_SELECTED);
                     if (isSelected) {
-                        actionButton.setVisibility(View.VISIBLE);
+                        if (actionButton != null) {
+                            actionButton.setVisibility(View.VISIBLE);
+                        }
                         return false;
                     }
 
                     switch (motionEvent.getAction()) {
                         case MotionEvent.ACTION_HOVER_ENTER:
-                            actionButton.setVisibility(View.VISIBLE);
+                            if (actionButton != null) {
+                                actionButton.setVisibility(View.VISIBLE);
+                            }
                             ViewCompat.setBackgroundTintList(
                                     view,
                                     ColorStateList.valueOf(
@@ -392,9 +400,10 @@ class TabVerticalViewBinder {
                                                     model.get(TabProperties.IS_INCOGNITO))));
                             break;
                         case MotionEvent.ACTION_HOVER_EXIT:
-                            actionButton.setVisibility(View.INVISIBLE);
-                            ViewCompat.setBackgroundTintList(
-                                    view, ColorStateList.valueOf(Color.TRANSPARENT));
+                            if (actionButton != null) {
+                                actionButton.setVisibility(View.INVISIBLE);
+                            }
+                            ViewCompat.setBackgroundTintList(view, defaultBackgroundColor);
                             break;
                     }
                     return false;

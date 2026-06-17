@@ -591,4 +591,82 @@ public class TabVerticalViewBinderUnitTest {
         assertEquals(View.GONE, spinner.getVisibility());
         assertEquals(View.GONE, mFaviconView.getVisibility());
     }
+
+    @Test
+    @SmallTest
+    public void testPinnedTabHoverBackground() {
+        Activity activity = Robolectric.buildActivity(Activity.class).setup().get();
+        activity.setTheme(R.style.Theme_BrowserUI_DayNight);
+        ViewGroup pinnedView =
+                (ViewGroup)
+                        LayoutInflater.from(activity)
+                                .inflate(R.layout.vertical_tab_pinned_item, null, false);
+
+        // Pinned tabs should not have an action button
+        assertNull(pinnedView.findViewById(R.id.action_button));
+
+        mModel.set(TabProperties.IS_SELECTED, false);
+        TabVerticalViewBinder.bindPinnedTab(mModel, pinnedView, TabProperties.IS_SELECTED);
+
+        // Initially, background tint should be null for resting pinned tab
+        assertNull(pinnedView.getBackgroundTintList());
+
+        // Hover enter
+        MotionEvent hoverEnterEvent =
+                MotionEvent.obtain(0, 0, MotionEvent.ACTION_HOVER_ENTER, 0f, 0f, 0);
+        hoverEnterEvent.setSource(InputDevice.SOURCE_MOUSE);
+        pinnedView.dispatchGenericMotionEvent(hoverEnterEvent);
+
+        ColorStateList bgTint = pinnedView.getBackgroundTintList();
+        assertNotNull(bgTint);
+        assertEquals(
+                TabUiThemeUtil.getHoveredTabContainerColor(
+                        pinnedView.getContext(), /* isIncognito= */ false),
+                bgTint.getDefaultColor());
+
+        // Hover exit
+        MotionEvent hoverExitEvent =
+                MotionEvent.obtain(0, 0, MotionEvent.ACTION_HOVER_EXIT, 0f, 0f, 0);
+        hoverExitEvent.setSource(InputDevice.SOURCE_MOUSE);
+        pinnedView.dispatchGenericMotionEvent(hoverExitEvent);
+
+        // Should go back to null (not TRANSPARENT) to allow XML background to show
+        assertNull(pinnedView.getBackgroundTintList());
+    }
+
+    @Test
+    @SmallTest
+    public void testPinnedTabHoverBackground_Selected() {
+        Activity activity = Robolectric.buildActivity(Activity.class).setup().get();
+        activity.setTheme(R.style.Theme_BrowserUI_DayNight);
+        ViewGroup pinnedView =
+                (ViewGroup)
+                        LayoutInflater.from(activity)
+                                .inflate(R.layout.vertical_tab_pinned_item, null, false);
+
+        mModel.set(TabProperties.IS_SELECTED, true);
+        TabVerticalViewBinder.bindPinnedTab(mModel, pinnedView, TabProperties.IS_SELECTED);
+
+        ColorStateList bgTintBefore = pinnedView.getBackgroundTintList();
+        assertNotNull("Background tint should not be null when selected", bgTintBefore);
+
+        // Hover enter
+        MotionEvent hoverEnterEvent =
+                MotionEvent.obtain(0, 0, MotionEvent.ACTION_HOVER_ENTER, 0f, 0f, 0);
+        hoverEnterEvent.setSource(InputDevice.SOURCE_MOUSE);
+        pinnedView.dispatchGenericMotionEvent(hoverEnterEvent);
+
+        // Hovering shouldn't change the selected background tint
+        ColorStateList bgTintAfter = pinnedView.getBackgroundTintList();
+        assertEquals(bgTintBefore, bgTintAfter);
+
+        // Hover exit
+        MotionEvent hoverExitEvent =
+                MotionEvent.obtain(0, 0, MotionEvent.ACTION_HOVER_EXIT, 0f, 0f, 0);
+        hoverExitEvent.setSource(InputDevice.SOURCE_MOUSE);
+        pinnedView.dispatchGenericMotionEvent(hoverExitEvent);
+
+        bgTintAfter = pinnedView.getBackgroundTintList();
+        assertEquals(bgTintBefore, bgTintAfter);
+    }
 }
