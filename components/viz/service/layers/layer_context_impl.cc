@@ -240,6 +240,12 @@ base::expected<void, std::string> UpdatePropertyTreeNode(
     cc::PropertyTrees& trees,
     cc::TransformNode& node,
     const mojom::TransformNode& wire) {
+  if (wire.id == cc::kSecondaryRootPropertyNodeId &&
+      wire.parent_id == cc::kInvalidPropertyNodeId) {
+    return base::unexpected(
+        "Invalid parent_id for non-root property tree node");
+  }
+
   auto& tree = trees.transform_tree_mutable();
   if (!IsOptionalPropertyTreeIndexValid(tree, wire.parent_frame_id)) {
     return base::unexpected("Invalid parent_frame_id");
