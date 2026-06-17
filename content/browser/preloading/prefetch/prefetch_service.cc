@@ -1513,16 +1513,6 @@ void PrefetchService::EvictPrefetch(base::PassKey<PrefetchScheduler>,
 bool PrefetchService::StartSinglePrefetch(
     base::PassKey<PrefetchScheduler>,
     PrefetchContainer& prefetch_container) {
-  return StartSinglePrefetch(prefetch_container);
-}
-
-bool PrefetchService::StartSinglePrefetchForTesting(
-    PrefetchContainer& prefetch_container) {
-  return StartSinglePrefetch(prefetch_container);
-}
-
-bool PrefetchService::StartSinglePrefetch(
-    PrefetchContainer& prefetch_container) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   CHECK_EQ(prefetch_container.GetLoadState(),
            PrefetchContainer::LoadState::kEligible);

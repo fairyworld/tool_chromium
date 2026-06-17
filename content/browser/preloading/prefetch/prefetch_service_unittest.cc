@@ -7848,7 +7848,7 @@ TEST_P(PrefetchServiceAddPrefetchContainerTest, PreserveOldIfOldIsStarted) {
       document_token, GURL("https://example.com"), PreloadingType::kPrefetch);
   PreloadingAttempt* attempt1 = prefetch_container1->request().attempt();
   prefetch_container1->SimulatePrefetchEligibleForTest();
-  prefetch_service().StartSinglePrefetchForTesting(*prefetch_container1);
+  prefetch_container1->SimulatePrefetchStartedForTest();
 
   auto prefetch_container2 = CreateSpeculationRulesPrefetchContainer(
       document_token, GURL("https://example.com"), PreloadingType::kPrefetch);

@@ -246,8 +246,6 @@ class CONTENT_EXPORT PrefetchService : public PrefetchContainerObserver {
   bool StartSinglePrefetch(base::PassKey<PrefetchScheduler>,
                            PrefetchContainer& prefetch_container);
 
-  bool StartSinglePrefetchForTesting(PrefetchContainer& prefetch_container);
-
   const PrefetchScheduler& GetPrefetchSchedulerForMetrics() {
     return *scheduler_;
   }
@@ -352,8 +350,6 @@ class CONTENT_EXPORT PrefetchService : public PrefetchContainerObserver {
   // `PrefetchContainerDefaultTtlInPrefetchService()` returns a value less than
   // or equal to zero, the prefetch is kept indefinitely.
   void OnPrefetchTimeout(base::WeakPtr<PrefetchContainer> prefetch);
-
-  bool StartSinglePrefetch(PrefetchContainer& prefetch_container);
 
   // Creates a new URL loader and starts a network request for
   // |prefetch_container|. |MakePrefetchRequest| must have been previously
