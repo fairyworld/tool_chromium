@@ -354,7 +354,8 @@ class AssistantAIMUIStateProvider
            didChangeDetent:(AssistantContainerDetent)newDetent {
   _currentDetent = newDetent;
   // Attempt to dismiss the keyboard when the sheet is collapsing.
-  if (newDetent == AssistantContainerDetent::kMedium) {
+  if (newDetent == AssistantContainerDetent::kMedium ||
+      newDetent == AssistantContainerDetent::kMinimized) {
     [self dismissKeyboard];
   }
 }
