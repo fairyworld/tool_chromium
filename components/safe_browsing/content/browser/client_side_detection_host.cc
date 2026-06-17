@@ -2013,9 +2013,11 @@ void ClientSideDetectionHost::MaybeStartIntelligentScanForScamDetection(
     std::optional<bool> did_match_high_confidence_allowlist,
     bool is_invalid_ip) {
   // Use the address of the verdict object as the unique track_id.
-  TRACE_EVENT_BEGIN(/*category=*/"safe_browsing",
-                    /*name=*/"IntelligentScanScamDetection",
-                    perfetto::Track::FromPointer(verdict.get()));
+  TRACE_EVENT_BEGIN(
+      /*category=*/"safe_browsing",
+      /*name=*/"IntelligentScanScamDetection",
+      perfetto::NamedTrack::FromPointer("safe_browsing::ClientPhishingRequest",
+                                        verdict.get()));
 
   if (verdict->client_side_detection_type() ==
       ClientSideDetectionType::FORCE_REQUEST) {
@@ -2185,7 +2187,9 @@ void ClientSideDetectionHost::MaybeGetAccessToken(
     bool is_invalid_ip,
     bool is_intelligent_scan_invoked) {
   TRACE_EVENT_END(
-      /*category=*/"safe_browsing", perfetto::Track::FromPointer(verdict.get()),
+      /*category=*/"safe_browsing",
+      perfetto::NamedTrack::FromPointer("safe_browsing::ClientPhishingRequest",
+                                        verdict.get()),
       /*arg=*/"inquired_intelligent_scan",
       /*value=*/is_intelligent_scan_invoked);
   if (CanGetAccessToken()) {
