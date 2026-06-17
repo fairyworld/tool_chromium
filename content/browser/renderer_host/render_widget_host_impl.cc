@@ -1464,6 +1464,13 @@ void RenderWidgetHostImpl::SetPageFocus(bool focused) {
   if (owner_delegate_ && frame_tree_) {
     frame_tree_->ReplicatePageFocus(focused);
   }
+
+  if (!focused && view_) {
+    auto* root_view = view_->GetRootView();
+    if (root_view && root_view->HasActiveUnboundedSurface()) {
+      root_view->DismissUnboundedSurface();
+    }
+  }
 }
 
 void RenderWidgetHostImpl::LostCapture() {

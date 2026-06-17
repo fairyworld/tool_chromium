@@ -332,9 +332,6 @@ void UnboundedSurfaceWindowMac::RouteKeyboardEvent(NSEvent* ns_event) {
   }
 }
 
-void UnboundedSurfaceWindowMac::OnWindowResignedKey() {
-  Dismiss();
-}
 
 void UnboundedSurfaceWindowMac::UpdateBounds(const gfx::Rect& bounds) {
   if (!parent_view_) {

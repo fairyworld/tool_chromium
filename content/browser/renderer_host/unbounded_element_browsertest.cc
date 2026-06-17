@@ -654,4 +654,34 @@ IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest,
                         "document.getElementById('i').value"));
 }
 
+IN_PROC_BROWSER_TEST_F(UnboundedElementBrowserTest, CloseOnWindowFocusLost) {
+  GURL url(embedded_test_server()->GetURL("/title1.html"));
+  EXPECT_TRUE(NavigateToURL(shell(), url));
+
+  std::string script = R"(
+    document.body.innerHTML = `
+      <div id="target" style="width:50px; height:50px;" unbounded></div>
+    `;
+    document.getElementById('target').showUnboundedElement();
+  )";
+  ASSERT_TRUE(ExecJs(primary_main_frame_host(), script));
+  WaitForFrameReady();
+
+  RenderFrameHostImpl* rfh =
+      static_cast<RenderFrameHostImpl*>(primary_main_frame_host());
+  UnboundedSurfaceWindow* window = rfh->GetUnboundedSurfaceWindow();
+  ASSERT_TRUE(window);
+  EXPECT_TRUE(window->is_valid());
+
+  // Simulate the browser window losing focus.
+  primary_main_frame_host()->GetRenderWidgetHost()->Blur();
+
+  RunUntilInputProcessed(primary_main_frame_host()->GetRenderWidgetHost());
+  EXPECT_FALSE(rfh->GetUnboundedSurfaceWindow());
+
+  std::string get_style =
+      "getComputedStyle(document.getElementById('target')).visibility";
+  EXPECT_EQ("hidden", EvalJs(primary_main_frame_host(), get_style));
+}
+
 }  // namespace content

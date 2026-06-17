@@ -68,9 +68,6 @@ class UnboundedSurfaceWindowMac : public UnboundedSurfaceWindow,
   void RouteMouseEvent(const blink::WebMouseEvent& event) override;
   void RouteKeyboardEvent(NSEvent* event);
 
-  // Resign Key:
-  void OnWindowResignedKey();
-
   void Dismiss() override;
 
   // viz::HostFrameSinkClient overrides:

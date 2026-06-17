@@ -16,7 +16,6 @@
 #include "content/browser/renderer_host/render_widget_host_view_base.h"
 #include "third_party/blink/public/common/input/web_mouse_event.h"
 #include "third_party/blink/public/common/input/web_touch_event.h"
-#include "ui/aura/client/focus_change_observer.h"
 #include "ui/aura/client/screen_position_client.h"
 #include "ui/aura/client/transient_window_client.h"
 #include "ui/aura/client/window_parenting_client.h"
@@ -89,7 +88,6 @@ UnboundedSurfaceWindowAura::~UnboundedSurfaceWindowAura() {
     root_window_ = nullptr;
   }
   if (window_) {
-    aura::client::SetFocusChangeObserver(window_.get(), nullptr);
     window_.reset();
   }
   if (frame_sink_id_.is_valid()) {
@@ -147,7 +145,6 @@ bool UnboundedSurfaceWindowAura::CanFocus() {
 
 void UnboundedSurfaceWindowAura::OnWindowDestroying(aura::Window* window) {
   if (window == window_.get()) {
-    aura::client::SetFocusChangeObserver(window_.get(), nullptr);
     // Relinquish ownership of window_ so that when UnboundedSurfaceWindowAura
     // is destructed, it does not attempt to double-free or re-entrantly destroy
     // the aura::Window.
@@ -215,8 +212,6 @@ bool UnboundedSurfaceWindowAura::InitWindow(const gfx::Rect& bounds_in_dips) {
 
   aura::client::ParentWindowWithContext(window_.get(), root, bounds_in_screen,
                                         display::kInvalidDisplayId);
-
-  aura::client::SetFocusChangeObserver(window_.get(), this);
 
   local_surface_id_allocator_.GenerateId();
 
@@ -413,13 +408,6 @@ void UnboundedSurfaceWindowAura::OnTouchEvent(ui::TouchEvent* event) {
       event->latency() ? *event->latency() : ui::LatencyInfo();
   router->RouteTouchEvent(parent_view_, &touch_event, latency_info);
   event->SetHandled();
-}
-
-void UnboundedSurfaceWindowAura::OnWindowFocused(aura::Window* gained_focus,
-                                                 aura::Window* lost_focus) {
-  if (window_.get() == lost_focus) {
-    Dismiss();
-  }
 }
 
 }  // namespace content
