@@ -509,6 +509,7 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
     if (!step_shown_callback_->is_null()) {
       std::move(step_shown_callback_.value()).Run(/*success=*/true);
     }
+    host()->SetNativeToolbarStartBrowsingButtonVisible(true);
 
     auto* showcase_ui = host()
                             ->GetPickerContents()
@@ -524,6 +525,10 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
     showcase_ui->SetFinishCallback(
         base::BindOnce(&FeatureShowcaseStepController::OnStepCompleted,
                        weak_ptr_factory_.GetWeakPtr()));
+  }
+
+  void OnHidden() override {
+    host()->SetNativeToolbarStartBrowsingButtonVisible(false);
   }
 
   void OnStepCompleted() {
@@ -790,6 +795,10 @@ ProfilePickerToolbar::Builder FirstRunFlowController::CreateToolbarBuilder() {
     builder.WithEffectsControlButton(
         base::BindRepeating(&FirstRunFlowController::ToggleMediaEffects,
                             weak_ptr_factory_.GetWeakPtr()));
+
+    builder.WithStartBrowsingButton(
+        base::BindRepeating(&FirstRunFlowController::StartBrowsing,
+                            weak_ptr_factory_.GetWeakPtr()));
   }
   return builder;
 }
@@ -798,6 +807,12 @@ void FirstRunFlowController::PlaySignInCelebrationSound() {
   if (sounds_manager_ && AreEffectsEnabled()) {
     sounds_manager_->Play(kWelcomeBackSoundKey);
   }
+}
+
+void FirstRunFlowController::StartBrowsing() {
+  // TODO(crbug.com/498008195): Add metrics indicating at which step the user
+  // decided to start browsing.
+  SwitchToStep(Step::kFinishFlow, /*reset_state=*/true);
 }
 
 void FirstRunFlowController::Init() {

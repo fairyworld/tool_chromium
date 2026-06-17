@@ -2429,3 +2429,26 @@ INSTANTIATE_TEST_SUITE_P(,
                          [](const TestParamInfo<bool>& info) {
                            return info.param ? "Managed" : "Unmanaged";
                          });
+
+IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
+                       StartBrowsingFromFeatureShowcase) {
+  ASSERT_TRUE(fre_service()->ShouldOpenFirstRun());
+
+  base::test::TestFuture<bool> proceed_future;
+  OpenFirstRun(proceed_future.GetCallback());
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
+      WaitForShow(kProfilePickerViewId),
+      InstrumentNonTabWebView(kWebContentsId, web_view()),
+      // Do not sign in to proceed to the feature showcase immediately.
+      CompleteIntroStep(/*sign_in=*/false),
+      WaitForShow(kProfilePickerToolbarStartBrowsingButtonElementId),
+      PressButton(kProfilePickerToolbarStartBrowsingButtonElementId));
+
+  WaitForPickerClosed();
+  EXPECT_TRUE(proceed_future.Get());
+  EXPECT_TRUE(GetFirstRunFinishedPrefValue());
+  ExpectStepHistograms(Step::kIntro, /*shown=*/true);
+  ExpectStepHistograms(Step::kFeatureShowcase, /*shown=*/true);
+  ExpectStepHistograms(Step::kFinishFlow, /*shown=*/true, /*with_exit=*/true);
+}

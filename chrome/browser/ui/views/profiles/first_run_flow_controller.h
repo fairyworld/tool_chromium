@@ -99,6 +99,8 @@ class FirstRunFlowController : public ProfileManagementFlowControllerImpl {
 
   void PlaySignInCelebrationSound();
 
+  void StartBrowsing();
+
   // Run the `finish_flow_callback_` if it's not empty.
   void RunFinishFlowCallback();
 

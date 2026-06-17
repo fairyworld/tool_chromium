@@ -490,6 +490,11 @@ void ProfilePickerView::SetNativeToolbarDontSignInButtonVisible(bool visible) {
   CHECK_DEREF(toolbar_).SetDontSignInButtonVisible(visible);
 }
 
+void ProfilePickerView::SetNativeToolbarStartBrowsingButtonVisible(
+    bool visible) {
+  CHECK_DEREF(toolbar_).SetStartBrowsingButtonVisible(visible);
+}
+
 bool ProfilePickerView::AreNativeToolbarSigninButtonsVisibleForTesting() const {
   return CHECK_DEREF(toolbar_).AreSigninButtonsVisibleForTesting();  // IN-TEST
 }

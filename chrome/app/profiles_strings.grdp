@@ -1217,6 +1217,9 @@
     <message name="IDS_FRE_NATIVE_TOOLBAR_DONT_SIGN_IN_BUTTON_LABEL" desc="A label for a button on the native toolbar to decline a prompt to sign in. Once clicked, the sign-in flow will be cancelled.">
       Don't sign in
     </message>
+    <message name="IDS_FRE_NATIVE_TOOLBAR_START_BROWSING_BUTTON_LABEL" desc="A label for a button on the native toolbar of the first run feature showcase screen to start browsing directly. Once clicked, the first run flow will close and open the New Tab Page.">
+      Start browsing
+    </message>
     <message name="IDS_FRE_NEXT_BUTTON_TITLE" desc="A title for a button that advances a user to the next step (sign in screen) in the first run experience flow.">
       Next
     </message>
