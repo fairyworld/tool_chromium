@@ -4,6 +4,8 @@
 
 package org.chromium.chrome.browser.tasks.tab_management.vertical_tabs;
 
+import static org.chromium.build.NullUtil.assumeNonNull;
+
 import android.app.Activity;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -56,6 +58,7 @@ import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.modelutil.PropertyModel;
 import org.chromium.ui.modelutil.PropertyModelChangeProcessor;
 import org.chromium.ui.modelutil.SimpleRecyclerViewAdapter;
+import org.chromium.ui.recyclerview.widget.ItemTouchHelper2;
 import org.chromium.ui.widget.RectProvider;
 
 import java.util.function.Supplier;
@@ -268,10 +271,29 @@ public class VerticalTabListCoordinator {
                         TabFavicon::getBitmap);
 
         // TODO(crbug.com/509226293):
-        // 1. Wire up header container (R.id.vertical_tab_header_container) for search & grid
+        // Wire up header container (R.id.vertical_tab_header_container) for search & grid
         // buttons.
-        // 3. Attach ItemTouchHelper for vertical row dragging & reordering.
-        // 4. Register Right-click / Long-press Context Menu listener for tab interactions.
+
+        VerticalTabListItemTouchHelperCallback touchHelperCallback =
+                new VerticalTabListItemTouchHelperCallback(
+                        activity,
+                        mModelList,
+                        () -> assumeNonNull(tabModelSelector.getCurrentTabModelSupplier().get()));
+
+        recyclerView.addOnItemTouchListener(
+                VerticalTabListItemTouchHelperCallback.createBeforeOnItemTouchListener(
+                        touchHelperCallback));
+
+        ItemTouchHelper2 itemTouchHelper =
+                new ItemTouchHelper2(touchHelperCallback, /* externalLongPressHandler= */ null);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        recyclerView.addOnItemTouchListener(
+                VerticalTabListItemTouchHelperCallback.createAfterOnItemTouchListener(
+                        touchHelperCallback));
+
+        // TODO(crbug.com/509226293):
+        // Register Right-click / Long-press Context Menu listener for tab interactions.
 
         mTabModelSelector = tabModelSelector;
         mWindowAndroid = windowAndroid;
