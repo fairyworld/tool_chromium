@@ -231,8 +231,6 @@ public class SendTabToSelfCoordinator
         SendTabToSelfMetricsRecorder.recordCrossDeviceTabJourney();
         switch (displayReason) {
             case EntryPointDisplayReason.INFORM_NO_TARGET_DEVICE:
-                // TODO(crbug.com/493866368): Refactor NoTargetDeviceBottomSheetContent to MVC for
-                // consistency.
                 mBottomSheetController.requestShowContent(
                         new NoTargetDeviceBottomSheetContent(mContext, mProfile), true);
                 return;
