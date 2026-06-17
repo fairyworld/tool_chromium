@@ -1373,7 +1373,7 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorAndroidBrowserTest,
   WaitUntilOpened(coordinator_);
   EXPECT_TRUE(
       coordinator_->SidePanelUIBase::IsSidePanelEntryShowing(entry_key));
-  EXPECT_FALSE(coordinator_->IsClosing());
+  EXPECT_NE(coordinator_->GetStateForTesting(), SidePanelState::kClosing);
 
   // Act: Close the side panel (suppressing animations).
   coordinator_->Close(SidePanelEntryHideReason::kSidePanelClosed,
@@ -1382,7 +1382,7 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorAndroidBrowserTest,
   // Verify it is closed. We must wait for the asynchronous layout pass to
   // complete for the JNI callbacks to finish and update the C++ state.
   WaitUntilClosed(coordinator_);
-  EXPECT_FALSE(coordinator_->IsClosing());
+  EXPECT_NE(coordinator_->GetStateForTesting(), SidePanelState::kClosing);
   EXPECT_FALSE(
       coordinator_->SidePanelUIBase::IsSidePanelEntryShowing(entry_key));
 
@@ -1392,7 +1392,7 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorAndroidBrowserTest,
                                       /*suppress_animations=*/true);
 
   WaitUntilOpened(coordinator_);
-  EXPECT_FALSE(coordinator_->IsClosing());
+  EXPECT_NE(coordinator_->GetStateForTesting(), SidePanelState::kClosing);
   EXPECT_TRUE(
       coordinator_->SidePanelUIBase::IsSidePanelEntryShowing(entry_key));
 }

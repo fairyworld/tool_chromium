@@ -74,7 +74,7 @@ public interface SidePanelContainerCoordinator {
      * @param startingBounds Optional bounds for the animation to start from.
      * @param suppressAnimations Whether or not to suppress animations for this populate request.
      */
-    void populateContent(
+    void startPopulatingContent(
             SidePanelContent content,
             Callback<@Nullable Void> onAnimationFinishedCallback,
             @Nullable Rect startingBounds,
@@ -88,7 +88,7 @@ public interface SidePanelContainerCoordinator {
      * @param onAnimationFinishedCallback Callback to invoke after content is removed.
      * @param suppressAnimations Whether or not to suppress animations for this removal.
      */
-    void removeContentAndClose(
+    void startRemovingContent(
             Callback<@Nullable Void> onAnimationFinishedCallback, boolean suppressAnimations);
 
     /** Returns whether the given {@link SidePanelContent} is shown in this side panel container. */

@@ -41,7 +41,7 @@ final class SidePanelContainerCoordinatorImpl
     private final FrameLayout mContainerView;
     private final SideUiCoordinator mSideUiCoordinator;
 
-    // TODO(crbug.com/496407828): Use this to notify native side of events like "animation ended".
+    // TODO(crbug.com/496407828): Use this to notify native side of events like panel opened/closed.
     private @Nullable SidePanelCoordinatorAndroid mSidePanelCoordinatorAndroid;
 
     private @Nullable SidePanelContent mCurrentContent;
@@ -79,12 +79,12 @@ final class SidePanelContainerCoordinatorImpl
     }
 
     @Override
-    public void populateContent(
+    public void startPopulatingContent(
             SidePanelContent content,
             Callback<@Nullable Void> onAnimationFinishedCallback,
             @Nullable Rect startingBounds,
             boolean suppressAnimations) {
-        log(TAG, "populateContent", content, startingBounds, suppressAnimations);
+        log(TAG, "startPopulatingContent", content, startingBounds, suppressAnimations);
         ThreadUtils.assertOnUiThread();
         mCurrentContent = content;
 
@@ -104,9 +104,9 @@ final class SidePanelContainerCoordinatorImpl
     }
 
     @Override
-    public void removeContentAndClose(
+    public void startRemovingContent(
             Callback<@Nullable Void> onAnimationFinishedCallback, boolean suppressAnimations) {
-        log(TAG, "removeContentAndClose", suppressAnimations);
+        log(TAG, "startRemovingContent", suppressAnimations);
         ThreadUtils.assertOnUiThread();
         mSideUiCoordinator.requestUpdateContainer(
                 new SideUiContainerProperties(
