@@ -24,9 +24,12 @@
 #include "chrome/browser/ui/tabs/split_tab_metrics.h"
 #include "chrome/browser/ui/tabs/split_tab_util.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
+#include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/toolbar/pinned_action_toolbar_button_menu_model.h"
 #include "chrome/browser/ui/views/toolbar/pinned_toolbar_button_status_indicator.h"
 #include "chrome/browser/ui/views/toolbar/toolbar_button.h"
+#include "chrome/browser/ui/views/toolbar/toolbar_controller.h"
+#include "chrome/browser/ui/views/toolbar/toolbar_view.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/prefs/pref_service.h"
@@ -44,6 +47,8 @@
 #include "ui/menus/simple_menu_model.h"
 #include "ui/views/accessibility/view_accessibility.h"
 #include "ui/views/controls/button/menu_button_controller.h"
+#include "ui/views/controls/menu/menu_item_view.h"
+#include "ui/views/controls/menu/menu_model_adapter.h"
 #include "ui/views/controls/menu/menu_runner.h"
 #include "ui/views/view_class_properties.h"
 
@@ -57,6 +62,7 @@ SplitTabsToolbarButton::SplitTabsToolbarButton(Browser* browser)
       browser_(browser) {
   SetProperty(views::kElementIdentifierKey,
               kToolbarSplitTabsToolbarButtonElementId);
+  set_menu_identifier(kToolbarSplitTabsMenuElementId);
   SetButtonController(std::make_unique<views::MenuButtonController>(
       this,
       base::BindRepeating(&SplitTabsToolbarButton::ButtonPressed,
@@ -151,8 +157,26 @@ void SplitTabsToolbarButton::ButtonPressed(const ui::Event& event) {
       menu_runner_->Cancel();
       return;
     }
+
+    // Force the button to pop out and lay itself out before calculating bounds.
+    BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser_);
+    if (browser_view && browser_view->toolbar() &&
+        browser_view->toolbar()->toolbar_controller()) {
+      browser_view->toolbar()->toolbar_controller()->PopOut(
+          kToolbarSplitTabsToolbarButtonElementId,
+          /*show_synchronously=*/true);
+    }
+
+    menu_runner_.reset();
+    menu_model_adapter_.reset();
+
+    menu_model_adapter_ =
+        std::make_unique<views::MenuModelAdapter>(split_tab_menu_.get());
+    std::unique_ptr<views::MenuItemView> root =
+        menu_model_adapter_->CreateMenu();
+    root->SetSubmenuId(menu_identifier());
     menu_runner_ = std::make_unique<views::MenuRunner>(
-        split_tab_menu_.get(), views::MenuRunner::HAS_MNEMONICS);
+        std::move(root), views::MenuRunner::HAS_MNEMONICS);
     menu_runner_->RunMenuAt(
         GetWidget(),
         static_cast<views::MenuButtonController*>(button_controller()),

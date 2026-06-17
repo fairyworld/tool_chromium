@@ -197,6 +197,7 @@ class ToolbarView : public views::AccessiblePaneView,
   AppMenuIconController* app_menu_icon_controller() {
     return &app_menu_icon_controller_;
   }
+  ToolbarController* toolbar_controller() { return toolbar_controller_.get(); }
   const ToolbarController* toolbar_controller() const {
     return toolbar_controller_.get();
   }
