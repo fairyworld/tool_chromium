@@ -1836,6 +1836,21 @@ void AIManager::StartModelPathValidationIfOverrideSet() {
   }
 }
 
+void AIManager::CanCreateSemanticEmbedder(
+    CanCreateSemanticEmbedderCallback callback) {
+  // To be implemented in a subsequent CL.
+  receivers_.ReportBadMessage(
+      "AIManager::CanCreateSemanticEmbedder is not implemented yet.");
+}
+
+void AIManager::CreateSemanticEmbedder(
+    mojo::PendingRemote<blink::mojom::AIManagerCreateSemanticEmbedderClient>
+        client) {
+  // To be implemented in a subsequent CL.
+  receivers_.ReportBadMessage(
+      "AIManager::CreateSemanticEmbedder is not implemented yet.");
+}
+
 void AIManager::RenderWidgetHostVisibilityChanged(
     content::RenderWidgetHost* widget_host,
     bool became_visible) {
