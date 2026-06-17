@@ -1347,6 +1347,18 @@ public class StripLayoutHelperManager
             rects.add(ntbRect);
         }
 
+        if (mModelSelectorButton != null && mModelSelectorButton.isVisible()) {
+            var msbTouchRect = new RectF();
+            mModelSelectorButton.getTouchTarget(msbTouchRect);
+            Rect msbRect =
+                    new Rect(
+                            (int) Math.floor(msbTouchRect.left * mDensity),
+                            (int) Math.floor(Math.max(msbTouchRect.top, mTopPadding) * mDensity),
+                            (int) Math.ceil(msbTouchRect.right * mDensity),
+                            (int) Math.ceil(Math.min(msbTouchRect.bottom, mHeight) * mDensity));
+            rects.add(msbRect);
+        }
+
         TintedCompositorTextButton glicButton = mTrailingButtonsCoordinator.getGlicButton();
         if (glicButton != null && glicButton.isVisible()) {
             var glicTouchRect = new RectF();
@@ -1360,17 +1372,20 @@ public class StripLayoutHelperManager
             rects.add(glicRect);
         }
 
-        if (mModelSelectorButton != null && mModelSelectorButton.isVisible()) {
-            var msbTouchRect = new RectF();
-            mModelSelectorButton.getTouchTarget(msbTouchRect);
-            Rect msbRect =
+        TintedCompositorTextButton glicActorButton =
+                mTrailingButtonsCoordinator.getGlicActorButton();
+        if (glicActorButton != null && glicActorButton.isVisible()) {
+            var actorTouchRect = new RectF();
+            glicActorButton.getTouchTarget(actorTouchRect);
+            Rect actorRect =
                     new Rect(
-                            (int) Math.floor(msbTouchRect.left * mDensity),
-                            (int) Math.floor(Math.max(msbTouchRect.top, mTopPadding) * mDensity),
-                            (int) Math.ceil(msbTouchRect.right * mDensity),
-                            (int) Math.ceil(Math.min(msbTouchRect.bottom, mHeight) * mDensity));
-            rects.add(msbRect);
+                            (int) Math.floor(actorTouchRect.left * mDensity),
+                            (int) Math.floor(Math.max(actorTouchRect.top, mTopPadding) * mDensity),
+                            (int) Math.ceil(actorTouchRect.right * mDensity),
+                            (int) Math.ceil(Math.min(actorTouchRect.bottom, mHeight) * mDensity));
+            rects.add(actorRect);
         }
+
         mControlContainer.setSystemGestureExclusionRects(rects);
     }
 
