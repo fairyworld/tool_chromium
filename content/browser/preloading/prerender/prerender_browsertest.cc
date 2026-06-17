@@ -16267,6 +16267,38 @@ IN_PROC_BROWSER_TEST_P(PrerenderSessionHistoryBrowserTest,
 }
 
 IN_PROC_BROWSER_TEST_P(PrerenderSessionHistoryBrowserTest,
+                       PredictionForInterceptedBackNavigation) {
+  const GURL url1 = GetUrl("/title1.html");
+  const GURL url2 = GetCrossSiteUrl("/title2.html");
+  PerformInitialNavigations(web_contents_impl(), url1, url2);
+
+  ClearBackForwardCache(web_contents_impl());
+
+  base::HistogramTester histogram_tester;
+
+  content::URLLoaderInterceptor interceptor(base::BindRepeating(
+      [](const GURL& url,
+         content::URLLoaderInterceptor::RequestParams* params) {
+        if (params->url_request.url != url) {
+          return false;
+        }
+        content::URLLoaderInterceptor::WriteResponse(
+            "HTTP/1.1 200 OK\nContent-Type: text/html\n\n",
+            "<html><body>Mocked Content</body></html>", params->client.get());
+        return true;
+      },
+      url1));
+
+  PredictBackNavigation(web_contents_impl());
+
+  // The eligibility should be kNoHttpCacheEntry because the interceptor did
+  // not return it from the cache.
+  histogram_tester.ExpectUniqueSample(
+      "Preloading.PrerenderBackNavigationEligibility.MouseBackButton",
+      PrerenderBackNavigationEligibility::kNoHttpCacheEntry, 1);
+}
+
+IN_PROC_BROWSER_TEST_P(PrerenderSessionHistoryBrowserTest,
                        NoPredictionDueToBfcache) {
   if (!BackForwardCache::IsBackForwardCacheFeatureEnabled()) {
     GTEST_SKIP()
