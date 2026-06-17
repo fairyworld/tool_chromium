@@ -31,7 +31,7 @@
 namespace web_app {
 namespace {
 
-using WebAppInstalInfoCallback =
+using WebAppInstallInfoCallback =
     base::OnceCallback<void(base::expected<WebAppInstallInfo, std::string>)>;
 
 class WebAppInstallInfoFetcher {
@@ -45,7 +45,7 @@ class WebAppInstallInfoFetcher {
         source_(source),
         url_info_(url_info) {}
 
-  void FetchAndReply(WebAppInstalInfoCallback callback) {
+  void FetchAndReply(WebAppInstallInfoCallback callback) {
     callback_ = std::move(callback);
 
     RunChainedWeakCallbacks(
@@ -107,7 +107,7 @@ class WebAppInstallInfoFetcher {
 
   IwaSourceBundleWithMode source_;
   IsolatedWebAppUrlInfo url_info_;
-  WebAppInstalInfoCallback callback_;
+  WebAppInstallInfoCallback callback_;
 
   std::unique_ptr<PrepareInstallInfoJob> prepare_install_info_job_;
 
