@@ -36,6 +36,7 @@ source_set("autofill") {
     "enhanced_autofill_table_view_controller.mm",
   ]
   public_deps = [
+    "//ios/chrome/browser/settings/autofill/bnpl/coordinator",
     "//ios/chrome/browser/settings/autofill/bnpl/ui",
     "//ios/chrome/browser/settings/autofill/ui",
   ]
