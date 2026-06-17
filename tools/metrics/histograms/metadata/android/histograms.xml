@@ -8607,6 +8607,7 @@ chromium-metrics-reviews@google.com.
 <histogram name="Android.WebView.OnRenderProcessGoneResult2"
     enum="AndroidWebViewRenderProcessGoneResult" expires_after="2027-06-21">
   <owner>ntfschr@chromium.org</owner>
+  <owner>ziadyoussef@chromium.org</owner>
   <owner>src/android_webview/OWNERS</owner>
   <summary>
     This captures three pieces of information about renderer crashes: did the
