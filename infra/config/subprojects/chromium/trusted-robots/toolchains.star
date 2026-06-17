@@ -16,5 +16,5 @@ ci.builder(
         short_name = "lnx",
     ),
     contact_team_email = "dlf@google.com",
-    service_account = "chromium-toolchains-builder@lexan-release-infra-prod.iam.gserviceaccount.com",
+    service_account = "lexan-swarming-prod@lexan-release-infra-prod.iam.gserviceaccount.com",
 )
