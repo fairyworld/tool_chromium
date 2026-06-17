@@ -2451,6 +2451,8 @@ static_library("ui") {
       "//ash/webui/vc_background_ui",
       "//ash/webui/web_applications",
       "//chrome/app:generated_resources",
+      "//chrome/browser:browser_process_platform_part_ash",
+      "//chrome/browser:platform_util_ash",
       "//chrome/browser/apps/app_discovery_service",
       "//chrome/browser/apps/app_preload_service",
       "//chrome/browser/apps/browser_instance",
@@ -2957,6 +2959,12 @@ static_library("ui") {
     # Any circular includes must depend on the target
     # "//chrome/browser:browser_public_dependencies".
     allow_circular_includes_from += [
+      # browser_process_platform_part_ash.cc and platform_util_ash.cc include
+      # //chrome/browser/ui headers (e.g. browser.h, browser_window.h) that
+      # can't be split out of this target yet.
+      "//chrome/browser:browser_process_platform_part_ash",
+      "//chrome/browser:platform_util_ash",
+
       "//chrome/browser/apps/browser_instance",
       "//chrome/browser/ash/accessibility",
       "//chrome/browser/ash/accessibility/live_caption",
@@ -3685,6 +3693,13 @@ static_library("ui") {
 
   if (is_linux || is_chromeos) {
     sources += [ "process_singleton_dialog_linux.h" ]
+
+    # process_singleton_posix.cc includes process_singleton_dialog_linux.h,
+    # owned by this target, on Linux and ChromeOS.
+    deps += [ "//chrome/browser:process_singleton_posix" ]
+    allow_circular_includes_from +=
+        [ "//chrome/browser:process_singleton_posix" ]
+
     if (use_aura) {
       deps += [ "//third_party/fontconfig" ]
     }

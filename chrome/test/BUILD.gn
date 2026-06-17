@@ -2333,6 +2333,7 @@ if (!is_android) {
       "//chrome/browser:global_features",
       "//chrome/browser:icon_loader",
       "//chrome/browser:main_extra_parts",
+      "//chrome/browser:platform_util_internal",
       "//chrome/browser:primitives",
       "//chrome/browser:shell_integration",
       "//chrome/browser/accessibility",
