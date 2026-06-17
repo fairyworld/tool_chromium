@@ -203,8 +203,12 @@ class AssistantAIMUIStateProvider
 - (void)setVisible:(BOOL)visible {
   if (visible) {
     if (_viewController) {
+      AssistantContainerDetent targetDetent = _currentDetent;
       [_containerHandler showAssistantContainerWithContent:_viewController
                                                   delegate:self];
+      // Restore `_currentDetent` in case `showAssistantContainerWithContent:`
+      // triggered intermediate layout passes that incorrectly reset it.
+      _currentDetent = targetDetent;
       [_containerHandler
           animateAssistantContainerToDetent:_currentDetent
                                    duration:kSheetDetentAnimationDuration
@@ -236,10 +240,7 @@ class AssistantAIMUIStateProvider
 
 - (void)assistantAIMViewControllerDidTapClose:
     (AssistantAIMViewController*)viewController {
-  CobrowseBrowserAgent* browserAgent =
-      CobrowseBrowserAgent::FromBrowser(self.browser);
-  CHECK(browserAgent);
-  browserAgent->SetSessionActive(false);
+  [_mediator endSession];
   [self dismissAssistantContainerAnimated:YES];
   [self showUndoSnackbar];
 }
@@ -336,6 +337,9 @@ class AssistantAIMUIStateProvider
     _isHiding = NO;
     return;
   }
+  id<SceneCommands> sceneCommands =
+      HandlerForProtocol(self.browser->GetCommandDispatcher(), SceneCommands);
+  [sceneCommands closeAssistant];
 }
 
 - (void)assistantContainer:(AssistantContainerViewController*)container
@@ -362,6 +366,7 @@ class AssistantAIMUIStateProvider
 
 - (void)assistantContainerDidRequestDismissal:
     (AssistantContainerViewController*)container {
+  [_mediator endSession];
   [self dismissAssistantContainerAnimated:YES];
 }
 

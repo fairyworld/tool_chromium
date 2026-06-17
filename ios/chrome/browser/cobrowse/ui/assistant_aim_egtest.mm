@@ -128,6 +128,17 @@ id<GREYMatcher> CloseButton() {
 
 - (void)setUp {
   [self addTeardownBlock:^{
+    // Explicitly close the Co-browse assistant sheet if it remains open.
+    // This acts as a safety net to ensure that an open sheet does not bleed
+    // into subsequent tests, even if a test case errors or fails prematurely.
+    NSError* error = nil;
+    [[EarlGrey selectElementWithMatcher:CloseButton()]
+        assertWithMatcher:grey_sufficientlyVisible()
+                    error:&error];
+    if (!error) {
+      [[EarlGrey selectElementWithMatcher:CloseButton()]
+          performAction:grey_tap()];
+    }
     [ComposeboxAppInterface setAllToolsEnabled:NO];
     [ComposeboxAppInterface setFuseboxEligible:NO];
     [ComposeboxAppInterface setTabUploadAutoSucceed:NO];
@@ -565,6 +576,87 @@ id<GREYMatcher> CloseButton() {
 
   // Verify the assistant is still visible in the first window.
   [ChromeEarlGrey waitForUIElementToAppearWithMatcher:CloseButton()];
+}
+
+// Tests that when the assistant detent is changed (e.g., to minimized),
+// this detent persists when switching to the tab grid and selecting another
+// tab.
+- (void)testAssistantDetentPersistsAcrossTabs {
+  if ([ComposeboxAppInterface isServerSideStateEnabled]) {
+    EARL_GREY_TEST_SKIPPED(
+        @"Skipped when kComposeboxServerSideState is enabled.");
+  }
+  // 1. Load a page in the first tab.
+  [ChromeEarlGrey loadURL:self.testServer->GetURL("/pony.html")];
+  [ChromeEarlGrey waitForPageToFinishLoading];
+
+  // 2. Open a second tab and start Co-browse.
+  [ChromeEarlGrey openNewTab];
+  OpenCoBrowse(self.testServer);
+
+  // Wait for Assistant to appear and start in Medium state.
+  [ChromeEarlGrey waitForUIElementToAppearWithMatcher:CloseButton()];
+  WaitForDetent(AssistantContainerDetent::kMedium);
+
+  // 3. Switch to minimized.
+  [[EarlGrey
+      selectElementWithMatcher:grey_accessibilityID(
+                                   kAssistantContainerDetentMediumIdentifier)]
+      performAction:grey_swipeFastInDirection(kGREYDirectionDown)];
+  WaitForDetent(AssistantContainerDetent::kMinimized);
+
+  // 4. Go to tab grid, check no cobrowse.
+  [ChromeEarlGreyUI openTabGrid];
+  [ChromeEarlGrey
+      waitForUIElementToAppearWithMatcher:grey_accessibilityID(
+                                              kTabGridScrollViewIdentifier)];
+  [[EarlGrey selectElementWithMatcher:CloseButton()]
+      assertWithMatcher:grey_nil()];
+
+  // 5. Go to another tab (the first tab at index 0).
+  [[EarlGrey selectElementWithMatcher:grey_accessibilityID(
+                                          @"GridCellIdentifierPrefix0")]
+      performAction:grey_tap()];
+  [ChromeEarlGrey waitForWebStateContainingText:"pony"];
+
+  // 6. Check cobrowse is here and minimized.
+  [ChromeEarlGrey waitForUIElementToAppearWithMatcher:CloseButton()];
+  WaitForDetent(AssistantContainerDetent::kMinimized);
+}
+
+// Tests that when the assistant is closed (killed) and reopened,
+// it starts in the default detent rather than the last used detent.
+- (void)testReopenAssistantStartsInDefaultDetent {
+  if ([ComposeboxAppInterface isServerSideStateEnabled]) {
+    EARL_GREY_TEST_SKIPPED(
+        @"Skipped when kComposeboxServerSideState is enabled.");
+  }
+
+  // 1. Open Co-browse.
+  OpenCoBrowse(self.testServer);
+
+  // Wait for Assistant to appear and start in Medium state.
+  [ChromeEarlGrey waitForUIElementToAppearWithMatcher:CloseButton()];
+  WaitForDetent(AssistantContainerDetent::kMedium);
+
+  // 2. Expand to Large state.
+  [[EarlGrey
+      selectElementWithMatcher:grey_accessibilityID(
+                                   kAssistantContainerDetentMediumIdentifier)]
+      performAction:grey_swipeFastInDirection(kGREYDirectionUp)];
+  WaitForDetent(AssistantContainerDetent::kLarge);
+
+  // 3. Close the assistant explicitly (killing it).
+  [[EarlGrey selectElementWithMatcher:CloseButton()] performAction:grey_tap()];
+  [[EarlGrey selectElementWithMatcher:CloseButton()]
+      assertWithMatcher:grey_nil()];
+
+  // 4. Reopen Co-browse.
+  OpenCoBrowse(self.testServer);
+
+  // 5. Verify it starts in the default Medium detent (NOT Large).
+  [ChromeEarlGrey waitForUIElementToAppearWithMatcher:CloseButton()];
+  WaitForDetent(AssistantContainerDetent::kMedium);
 }
 
 @end
