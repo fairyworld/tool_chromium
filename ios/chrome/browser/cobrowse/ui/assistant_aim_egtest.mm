@@ -11,6 +11,7 @@
 #import "ios/chrome/browser/composebox/eg_tests/composebox_app_interface.h"
 #import "ios/chrome/browser/composebox/public/features.h"
 #import "ios/chrome/browser/composebox/shared/ui/composebox_ui_constants.h"
+#import "ios/chrome/browser/scene/ui/scene_ui_constants.h"
 #import "ios/chrome/browser/shared/public/features/features.h"
 #import "ios/chrome/browser/tab_switcher/ui_bundled/tab_grid/tab_grid_constants.h"
 #import "ios/chrome/grit/ios_strings.h"
@@ -85,6 +86,14 @@ void OpenCoBrowse(net::EmbeddedTestServer* testServer) {
       selectElementWithMatcher:
           grey_accessibilityID(kComposeboxSendButtonAccessibilityIdentifier)]
       performAction:grey_tap()];
+}
+
+// Returns the matcher for the Main WebState scroll view, ignoring Co-browse's.
+id<GREYMatcher> MainWebStateScrollView() {
+  return grey_allOf(
+      chrome_test_util::WebStateScrollViewMatcher(),
+      grey_ancestor(grey_accessibilityID(kAppContentAccessibilityIdentifier)),
+      nil);
 }
 
 // Returns the matcher for the Assistant AIM close button.
@@ -657,6 +666,53 @@ id<GREYMatcher> CloseButton() {
   // 5. Verify it starts in the default Medium detent (NOT Large).
   [ChromeEarlGrey waitForUIElementToAppearWithMatcher:CloseButton()];
   WaitForDetent(AssistantContainerDetent::kMedium);
+}
+
+// Tests that Co-browse Assistant is hidden when toolbars are hidden.
+- (void)testCobrowseHidesWhenToolbarsHide {
+  if ([ComposeboxAppInterface isServerSideStateEnabled]) {
+    EARL_GREY_TEST_SKIPPED(
+        @"Skipped when kComposeboxServerSideState is enabled.");
+  }
+  OpenCoBrowse(self.testServer);
+
+  // Wait for the assistant to appear.
+  [ChromeEarlGrey waitForUIElementToAppearWithMatcher:CloseButton()];
+
+  // Minimize the Assistant so the Main page is exposed and can be scrolled.
+  [[EarlGrey
+      selectElementWithMatcher:grey_accessibilityID(
+                                   kAssistantContainerDetentMediumIdentifier)]
+      performAction:grey_swipeFastInDirection(kGREYDirectionDown)];
+  WaitForDetent(AssistantContainerDetent::kMinimized);
+
+  // Make the Main page tall so we can scroll to hide the toolbar.
+  NSString* script = @"document.body.style.height = '2000px';";
+  [ChromeEarlGrey evaluateJavaScriptForSideEffect:script];
+
+  // Scroll down on the Main page to hide the toolbar.
+  [[EarlGrey selectElementWithMatcher:MainWebStateScrollView()]
+      performAction:grey_swipeSlowInDirection(kGREYDirectionUp)];
+
+  // Verify that the toolbar is hidden.
+  [ChromeEarlGreyUI waitForToolbarVisible:NO];
+
+  // Verify that Co-browse is no longer visible.
+  [[EarlGrey selectElementWithMatcher:CloseButton()]
+      assertWithMatcher:grey_not(grey_sufficientlyVisible())];
+
+  // Scroll up on the Main page to show the toolbar again.
+  [[EarlGrey selectElementWithMatcher:MainWebStateScrollView()]
+      performAction:grey_swipeFastInDirection(kGREYDirectionDown)];
+
+  // Verify that the toolbar is visible.
+  [ChromeEarlGreyUI waitForToolbarVisible:YES];
+
+  // Verify that Co-browse is visible again.
+  [ChromeEarlGrey
+      waitForUIElementToAppearWithMatcher:grey_allOf(CloseButton(),
+                                                     grey_sufficientlyVisible(),
+                                                     nil)];
 }
 
 @end
