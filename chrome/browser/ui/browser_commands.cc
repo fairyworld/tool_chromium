@@ -751,7 +751,9 @@ bool ExecuteCommandWithDisposition(BrowserWindowInterface* browser,
       ->ExecuteCommandWithDisposition(command, disposition);
 }
 
-void UpdateCommandEnabled(BrowserWindowInterface* browser, int command, bool enabled) {
+void UpdateCommandEnabled(BrowserWindowInterface* browser,
+                          int command,
+                          bool enabled) {
   browser->GetFeatures().browser_command_controller()->UpdateCommandEnabled(
       command, enabled);
 }
@@ -875,7 +877,6 @@ void OpenURLOffTheRecord(Profile* profile, const GURL& url) {
       profile->GetPrimaryOTRProfile(/*create_if_needed=*/true));
   AddSelectedTabWithURL(displayer.browser(), url, ui::PAGE_TRANSITION_LINK);
 }
-
 
 bool CanGoBack(const BrowserWindowInterface* browser) {
   return CanGoBack(browser->GetTabStripModel()->GetActiveWebContents());
@@ -2192,7 +2193,8 @@ void ScreenshotCapture(BrowserWindowInterface* browser) {
 
 void SavePage(BrowserWindowInterface* browser) {
   base::RecordAction(UserMetricsAction("SavePage"));
-  WebContents* current_tab = browser->GetTabStripModel()->GetActiveWebContents();
+  WebContents* current_tab =
+      browser->GetTabStripModel()->GetActiveWebContents();
   DCHECK(current_tab);
   if (current_tab->GetContentsMimeType() == "application/pdf") {
     base::RecordAction(UserMetricsAction("PDF.SavePage"));
@@ -2263,7 +2265,8 @@ bool CanPrint(BrowserWindowInterface* browser) {
 
 #if BUILDFLAG(ENABLE_PRINTING)
 void BasicPrint(BrowserWindowInterface* browser) {
-  printing::StartBasicPrint(browser->GetTabStripModel()->GetActiveWebContents());
+  printing::StartBasicPrint(
+      browser->GetTabStripModel()->GetActiveWebContents());
 }
 
 bool CanBasicPrint(BrowserWindowInterface* browser) {
@@ -2315,7 +2318,9 @@ void FindPrevious(BrowserWindowInterface* browser) {
   FindInPage(browser, true, false);
 }
 
-void FindInPage(BrowserWindowInterface* browser, bool find_next, bool forward_direction) {
+void FindInPage(BrowserWindowInterface* browser,
+                bool find_next,
+                bool forward_direction) {
   browser->GetFeatures().GetFindBarController()->Show(find_next,
                                                       forward_direction);
 }
@@ -2359,7 +2364,6 @@ void ToggleContextualTasksSidePanelZeroState(BrowserWindowInterface* browser) {
   }
 }
 
-
 void ToggleVerticalTabs(BrowserWindowInterface* browser) {
   tabs::VerticalTabStripStateController* controller =
       tabs::VerticalTabStripStateController::From(browser);
@@ -2379,7 +2383,8 @@ void ToggleVerticalTabsExpandOnHover(BrowserWindowInterface* browser) {
 }
 
 bool CanCloseFind(BrowserWindowInterface* browser) {
-  WebContents* current_tab = browser->GetTabStripModel()->GetActiveWebContents();
+  WebContents* current_tab =
+      browser->GetTabStripModel()->GetActiveWebContents();
   if (!current_tab) {
     return false;
   }
@@ -2412,7 +2417,10 @@ void FocusLocationBar(BrowserWindowInterface* browser) {
 void FocusSearch(BrowserWindowInterface* browser) {
   // TODO(beng): replace this with FocusLocationBar
   base::RecordAction(UserMetricsAction("FocusSearch"));
-  browser->GetBrowserForMigrationOnly()->window()->GetLocationBar()->FocusSearch();
+  browser->GetBrowserForMigrationOnly()
+      ->window()
+      ->GetLocationBar()
+      ->FocusSearch();
 }
 
 void FocusAppMenu(BrowserWindowInterface* browser) {
@@ -2514,15 +2522,15 @@ void ToggleShowFullURLs(BrowserWindowInterface* browser) {
 void ToggleShowGoogleLensShortcut(BrowserWindowInterface* browser) {
   bool pref_enabled = browser->GetProfile()->GetPrefs()->GetBoolean(
       omnibox::kShowGoogleLensShortcut);
-  browser->GetProfile()->GetPrefs()->SetBoolean(omnibox::kShowGoogleLensShortcut,
-                                                !pref_enabled);
+  browser->GetProfile()->GetPrefs()->SetBoolean(
+      omnibox::kShowGoogleLensShortcut, !pref_enabled);
 }
 
 void ToggleShowAiModeOmniboxButton(BrowserWindowInterface* browser) {
   bool pref_enabled = browser->GetProfile()->GetPrefs()->GetBoolean(
       omnibox::kShowAiModeOmniboxButton);
-  browser->GetProfile()->GetPrefs()->SetBoolean(omnibox::kShowAiModeOmniboxButton,
-                                                !pref_enabled);
+  browser->GetProfile()->GetPrefs()->SetBoolean(
+      omnibox::kShowAiModeOmniboxButton, !pref_enabled);
 }
 
 void ToggleShowSearchTools(BrowserWindowInterface* browser) {
@@ -2538,8 +2546,10 @@ void ShowAppMenu(BrowserWindowInterface* browser) {
 }
 
 void ShowAvatarMenu(BrowserWindowInterface* browser) {
-  browser->GetBrowserForMigrationOnly()->window()->ShowAvatarBubbleFromAvatarButton(
-      /*is_source_accelerator=*/true);
+  browser->GetBrowserForMigrationOnly()
+      ->window()
+      ->ShowAvatarBubbleFromAvatarButton(
+          /*is_source_accelerator=*/true);
 }
 
 // TODO(crbug.com/345770406): Rename the function name.
@@ -2572,7 +2582,8 @@ bool CanRequestTabletSite(WebContents* current_tab) {
 }
 
 bool IsRequestingTabletSite(BrowserWindowInterface* browser) {
-  WebContents* current_tab = browser->GetTabStripModel()->GetActiveWebContents();
+  WebContents* current_tab =
+      browser->GetTabStripModel()->GetActiveWebContents();
   if (!current_tab) {
     return false;
   }
@@ -2585,7 +2596,8 @@ bool IsRequestingTabletSite(BrowserWindowInterface* browser) {
 }
 
 void ToggleRequestTabletSite(BrowserWindowInterface* browser) {
-  WebContents* current_tab = browser->GetTabStripModel()->GetActiveWebContents();
+  WebContents* current_tab =
+      browser->GetTabStripModel()->GetActiveWebContents();
   if (!current_tab) {
     return;
   }
@@ -2776,11 +2788,14 @@ void ShowIncognitoClearBrowsingDataDialog(BrowserWindowInterface* browser) {
 }
 
 void ShowIncognitoHistoryDisclaimerDialog(BrowserWindowInterface* browser) {
-  browser->GetBrowserForMigrationOnly()->window()->ShowIncognitoHistoryDisclaimerDialog();
+  browser->GetBrowserForMigrationOnly()
+      ->window()
+      ->ShowIncognitoHistoryDisclaimerDialog();
 }
 
-bool ShouldInterceptChromeURLNavigationInIncognito(BrowserWindowInterface* browser,
-                                                   const GURL& url) {
+bool ShouldInterceptChromeURLNavigationInIncognito(
+    BrowserWindowInterface* browser,
+    const GURL& url) {
   if (!browser || !browser->GetProfile()->IsIncognitoProfile()) {
     return false;
   }
@@ -2795,8 +2810,9 @@ bool ShouldInterceptChromeURLNavigationInIncognito(BrowserWindowInterface* brows
   return show_clear_browsing_data_dialog || show_history_disclaimer_dialog;
 }
 
-void ProcessInterceptedChromeURLNavigationInIncognito(BrowserWindowInterface* browser,
-                                                      const GURL& url) {
+void ProcessInterceptedChromeURLNavigationInIncognito(
+    BrowserWindowInterface* browser,
+    const GURL& url) {
   if (url == GURL(chrome::kChromeUISettingsURL)
                  .Resolve(chrome::kClearBrowserDataSubPage)) {
     ShowIncognitoClearBrowsingDataDialog(browser);
