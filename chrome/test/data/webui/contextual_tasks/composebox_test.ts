@@ -22,8 +22,8 @@ import {$$, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.j
 
 import {TestContextualTasksBrowserProxy} from './test_contextual_tasks_browser_proxy.js';
 import {setupAutocompleteResults} from './test_searchbox_utils.js';
-import {createCtComposeboxApp, fixtureUrl, getSubmitButton, simulateUserInput} from './test_utils.js';
-import type {CtComposeboxAppParts} from './test_utils.js';
+import {createCtComposeboxApp, fixtureUrl, getSubmitButton, simulateUserInput} from './contextual_tasks_test_utils.js';
+import type {CtComposeboxAppParts} from './contextual_tasks_test_utils.js';
 
 declare global {
   interface Window {

@@ -18,7 +18,7 @@ import {fakeMetricsPrivate} from 'chrome://webui-test/metrics_test_support.js';
 import {eventToPromise, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 import {TestContextualTasksBrowserProxy} from './test_contextual_tasks_browser_proxy.js';
-import {assertHTMLElement} from './test_utils.js';
+import {assertHTMLElement} from './contextual_tasks_test_utils.js';
 
 suite('TopToolbarTest', () => {
   let topToolbar: TopToolbarElement;

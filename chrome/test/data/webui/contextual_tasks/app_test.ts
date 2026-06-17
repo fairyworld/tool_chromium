@@ -12,13 +12,13 @@ import {fakeMetricsPrivate} from 'chrome://webui-test/metrics_test_support.js';
 import { microtasksFinished } from 'chrome://webui-test/test_util.js';
 
 import {TestContextualTasksBrowserProxy} from './test_contextual_tasks_browser_proxy.js';
-import { createContextualTasksAppElement, fixtureUrl } from './test_utils.js';
+import { createContextualTasksAppElement, fixtureUrl } from './contextual_tasks_test_utils.js';
 
 // <if expr="not is_android or enable_webui_contextual_tasks_composebox">
 import { isVisible } from 'chrome://webui-test/test_util.js';
 // </if>
 // <if expr="not is_android">
-import { simulateLoadCommit } from './test_utils.js';
+import { simulateLoadCommit } from './contextual_tasks_test_utils.js';
 // </if>
 
 // <if expr="not is_android or enable_webui_contextual_tasks_composebox">

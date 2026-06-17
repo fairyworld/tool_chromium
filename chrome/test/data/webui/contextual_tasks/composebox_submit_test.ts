@@ -24,8 +24,8 @@ import {isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 import {TestContextualTasksBrowserProxy} from './test_contextual_tasks_browser_proxy.js';
 import {ADD_TAB_CONTEXT_FN, setupAutocompleteResults, uploadFileAndVerify} from './test_searchbox_utils.js';
-import {assertStyle, createCtComposeboxApp, FAKE_TOKEN_STRING, FAKE_TOKEN_STRING_2, fixtureUrl, getSubmitButton, getSubmitContainer, installMock, simulateUserInput} from './test_utils.js';
-import type {CtComposeboxAppParts} from './test_utils.js';
+import {assertStyle, createCtComposeboxApp, FAKE_TOKEN_STRING, FAKE_TOKEN_STRING_2, fixtureUrl, getSubmitButton, getSubmitContainer, installMock, simulateUserInput} from './contextual_tasks_test_utils.js';
+import type {CtComposeboxAppParts} from './contextual_tasks_test_utils.js';
 
 function pressEnter(element: HTMLElement) {
   element.dispatchEvent(new KeyboardEvent('keydown', {
