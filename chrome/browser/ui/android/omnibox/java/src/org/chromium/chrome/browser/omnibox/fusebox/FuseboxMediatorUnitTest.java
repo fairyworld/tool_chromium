@@ -2585,4 +2585,42 @@ public class FuseboxMediatorUnitTest {
         mInputStateSupplier.set(secondInputState);
         assertEquals("AI Mode", mModel.get(FuseboxProperties.REQUEST_TYPE_BUTTON_TEXT));
     }
+
+    @Test
+    public void testUpdateClientControlledToolButtonList_setsCorrectIcons_desktopPlatform() {
+        OmniboxFeatures.sShowModelPicker.setForTesting(false);
+        OmniboxCapabilities.setIsDesktopPlatformForTesting(true);
+        recreateMediator();
+        RobolectricUtil.runAllBackgroundAndUi();
+
+        List<PopupButtonData> toolButtons =
+                mModel.get(FuseboxProperties.POPUP_TOOL_BUTTON_DATA_LIST);
+        assertThat(toolButtons).hasSize(1);
+        assertEquals(IconResourceIds.BANANA_VALUE, toolButtons.get(0).iconId);
+    }
+
+    @Test
+    public void testOnInputStateChange_desktopPlatform() {
+        OmniboxFeatures.sShowModelPicker.setForTesting(true);
+        OmniboxCapabilities.setIsDesktopPlatformForTesting(true);
+        recreateMediator();
+        mInput.setRequestType(AutocompleteRequestType.AI_MODE);
+
+        ToolConfig deepSearchConfig =
+                ToolConfig.newBuilder()
+                        .setTool(ToolMode.TOOL_MODE_DEEP_SEARCH)
+                        .setMenuLabel("Deep Search")
+                        .build();
+        InputState state =
+                new InputState.Builder()
+                        .withAllowedTools(ToolMode.TOOL_MODE_DEEP_SEARCH_VALUE)
+                        .withToolConfigs(new byte[][] {deepSearchConfig.toByteArray()})
+                        .build();
+        mInputStateSupplier.set(state);
+
+        List<PopupButtonData> tools = mModel.get(FuseboxProperties.POPUP_TOOL_BUTTON_DATA_LIST);
+        assertEquals(1, tools.size());
+        assertEquals("Deep Search", tools.get(0).text);
+        assertFalse(isToolVisible(ToolMode.TOOL_MODE_UNSPECIFIED_VALUE));
+    }
 }

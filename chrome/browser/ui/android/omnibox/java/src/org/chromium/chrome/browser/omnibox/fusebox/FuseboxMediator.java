@@ -1058,21 +1058,28 @@ import java.util.function.Supplier;
         mModel.set(FuseboxProperties.POPUP_ATTACH_FILE_ENABLED, allowNonImage);
     }
 
+    private PopupButtonData createAiModeToolButtonData() {
+        boolean selected =
+                mInput != null && mInput.getRequestType() == AutocompleteRequestType.AI_MODE;
+        return new PopupButtonData(
+                this::onDynamicButtonClicked,
+                mContext.getString(R.string.ai_mode_entrypoint_label),
+                IconResourceIds.SEARCH_LOUPE_WITH_SPARKLE_VALUE,
+                /* enabled= */ true,
+                selected,
+                PopupButtonType.TOOL,
+                ToolMode.TOOL_MODE_UNSPECIFIED_VALUE,
+                /* hasColor= */ false);
+    }
+
     private void updateClientControlledToolButtonList() {
         assert !OmniboxFeatures.sShowModelPicker.getValue();
         if (!isInInputSession()) return;
         List<PopupButtonData> toolButtons = new ArrayList<>();
 
-        toolButtons.add(
-                new PopupButtonData(
-                        this::onDynamicButtonClicked,
-                        mContext.getString(R.string.ai_mode_entrypoint_label),
-                        IconResourceIds.SEARCH_LOUPE_WITH_SPARKLE_VALUE,
-                        /* enabled= */ true,
-                        mInput.getRequestType() == AutocompleteRequestType.AI_MODE,
-                        PopupButtonType.TOOL,
-                        ToolMode.TOOL_MODE_UNSPECIFIED_VALUE,
-                        /* hasColor= */ false));
+        if (!OmniboxCapabilities.isDesktopPlatform()) {
+            toolButtons.add(createAiModeToolButtonData());
+        }
 
         if (mComposeboxQueryControllerBridge.isCreateImagesEligible()) {
             toolButtons.add(
@@ -1323,17 +1330,9 @@ import java.util.function.Supplier;
                 inputState.toolsSectionConfig.getHeader());
 
         List<PopupButtonData> toolButtonDataList = new ArrayList<>();
-        toolButtonDataList.add(
-                new PopupButtonData(
-                        this::onDynamicButtonClicked,
-                        mContext.getString(R.string.ai_mode_entrypoint_label),
-                        IconResourceIds.SEARCH_LOUPE_WITH_SPARKLE_VALUE,
-                        /* enabled= */ true,
-                        mInput != null
-                                && mInput.getRequestType() == AutocompleteRequestType.AI_MODE,
-                        PopupButtonType.TOOL,
-                        ToolMode.TOOL_MODE_UNSPECIFIED_VALUE,
-                        /* hasColor= */ false));
+        if (!OmniboxCapabilities.isDesktopPlatform()) {
+            toolButtonDataList.add(createAiModeToolButtonData());
+        }
 
         for (ToolConfig toolConfig : inputState.toolConfigs) {
             int toolMode = toolConfig.getToolValue();
