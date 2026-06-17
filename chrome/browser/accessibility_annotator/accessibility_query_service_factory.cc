@@ -11,14 +11,16 @@
 #include "chrome/browser/accessibility_annotator/accessibility_query_service_delegate_impl.h"
 #include "chrome/browser/autofill/autofill_entity_data_manager_factory.h"
 #include "chrome/browser/autofill/personal_data_manager_factory.h"
+#include "chrome/browser/browser_process.h"
 #include "chrome/browser/metrics/variations/google_groups_manager_factory.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
+#include "chrome/browser/personal_context/personal_context_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "components/accessibility_annotator/core/accessibility_annotator_features.h"
 #include "components/accessibility_annotator/core/accessibility_query_service.h"
-#include "components/accessibility_annotator/core/annotation_reducer/one_p_resolver_impl.h"
+#include "components/accessibility_annotator/core/annotation_reducer/personal_context_resolver_impl.h"
 #include "components/autofill/core/browser/at_memory/at_memory_enablement_utils.h"
 #include "components/autofill/core/browser/at_memory/autofill_data_provider_impl.h"
 #include "content/public/browser/storage_partition.h"
@@ -46,6 +48,7 @@ AccessibilityQueryServiceFactory::AccessibilityQueryServiceFactory()
   DependsOn(OptimizationGuideKeyedServiceFactory::GetInstance());
   DependsOn(IdentityManagerFactory::GetInstance());
   DependsOn(GoogleGroupsManagerFactory::GetInstance());
+  DependsOn(PersonalContextServiceFactory::GetInstance());
 }
 
 AccessibilityQueryServiceFactory::~AccessibilityQueryServiceFactory() = default;
@@ -67,23 +70,23 @@ AccessibilityQueryServiceFactory::BuildServiceInstanceForBrowserContext(
   auto* optimization_guide_service =
       OptimizationGuideKeyedServiceFactory::GetForProfile(profile);
 
-  std::unique_ptr<accessibility_annotator::OnePResolver> one_p_resolver;
-  if (base::FeatureList::IsEnabled(
-          accessibility_annotator::features::
-              kAccessibilityAnnotationReducerOnePResolver)) {
-    one_p_resolver =
-        std::make_unique<accessibility_annotator::OnePResolverImpl>(
-            profile->GetDefaultStoragePartition()
-                ->GetURLLoaderFactoryForBrowserProcess(),
-            IdentityManagerFactory::GetForProfile(profile),
-            optimization_guide_service);
+  personal_context::PersonalContextService* personal_context_service =
+      PersonalContextServiceFactory::GetForProfile(profile);
+
+  std::unique_ptr<accessibility_annotator::PersonalContextResolver>
+      personal_context_resolver;
+  if (personal_context_service) {
+    personal_context_resolver =
+        std::make_unique<accessibility_annotator::PersonalContextResolverImpl>(
+            personal_context_service,
+            g_browser_process->GetApplicationLocale());
   }
 
   return std::make_unique<accessibility_annotator::AccessibilityQueryService>(
       std::make_unique<
           accessibility_annotator::AccessibilityQueryServiceDelegateImpl>(
           profile),
-      std::move(data_provider), std::move(one_p_resolver),
+      std::move(data_provider), std::move(personal_context_resolver),
       optimization_guide_service);
 }
 

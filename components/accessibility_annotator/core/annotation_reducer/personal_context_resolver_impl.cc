@@ -284,7 +284,11 @@ void PersonalContextResolverImpl::Query(std::u16string query,
   // empty result set. This enforces the contract that only one request can
   // be active at a time.
   if (in_flight_query_callback_) {
-    std::move(in_flight_query_callback_).Run({});
+    std::move(in_flight_query_callback_)
+        .Run(base::unexpected(
+            personal_context::ContextMemoryError::FromExecutionError(
+                personal_context::ContextMemoryError::ExecutionError::
+                    kCancelled)));
   }
 
   // Cancel any asynchronous operations tied to the previous request.
@@ -293,7 +297,12 @@ void PersonalContextResolverImpl::Query(std::u16string query,
   if (!personal_context_service_) {
     base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
         FROM_HERE,
-        base::BindOnce(std::move(callback), std::vector<MemorySearchResult>()));
+        base::BindOnce(
+            std::move(callback),
+            base::unexpected(
+                personal_context::ContextMemoryError::FromExecutionError(
+                    personal_context::ContextMemoryError::ExecutionError::
+                        kGenericFailure))));
     return;
   }
 
@@ -321,13 +330,18 @@ void PersonalContextResolverImpl::OnPersonalContextRetrieved(
   }
 
   if (!result.response.has_value()) {
-    std::move(in_flight_query_callback_).Run({});
+    std::move(in_flight_query_callback_)
+        .Run(base::unexpected(result.response.error()));
     return;
   }
 
   personal_context::proto::AtMemoryQueryResponse response;
   if (!response.ParseFromString(result.response.value().value())) {
-    std::move(in_flight_query_callback_).Run({});
+    std::move(in_flight_query_callback_)
+        .Run(base::unexpected(
+            personal_context::ContextMemoryError::FromExecutionError(
+                personal_context::ContextMemoryError::ExecutionError::
+                    kResponseParseError)));
     return;
   }
 

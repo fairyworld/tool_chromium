@@ -7,10 +7,12 @@
 #include <algorithm>
 #include <iterator>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
+#include "base/containers/extend.h"
 #include "base/containers/flat_set.h"
 #include "base/functional/bind.h"
 #include "base/i18n/break_iterator.h"
@@ -19,7 +21,7 @@
 #include "base/strings/string_util.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_data_provider.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_data_type.h"
-#include "components/accessibility_annotator/core/annotation_reducer/one_p_resolver.h"
+#include "components/accessibility_annotator/core/annotation_reducer/personal_context_resolver.h"
 #include "components/accessibility_annotator/core/annotation_reducer/query_classifier.h"
 
 namespace accessibility_annotator {
@@ -90,23 +92,38 @@ void DeduplicateResults(std::vector<MemorySearchResult>& results) {
   results = std::move(unique_results);
 }
 
+std::vector<MemorySearchResult> FilterResults(
+    const std::vector<MemorySearchResult>& entries,
+    const base::flat_set<std::u16string>& filter_words) {
+  if (filter_words.empty()) {
+    return entries;
+  }
+  std::vector<MemorySearchResult> filtered_entries;
+  filtered_entries.reserve(entries.size());
+  std::ranges::copy_if(entries, std::back_inserter(filtered_entries),
+                       [&](const MemorySearchResult& entry) {
+                         return EntryMatchesAnyFilterWord(entry, filter_words);
+                       });
+  return filtered_entries;
+}
+
 }  // namespace
 
 AccessibilityQueryService::AccessibilityQueryService(
     std::unique_ptr<AccessibilityQueryServiceDelegate> delegate,
     std::unique_ptr<MemoryDataProvider> data_provider,
-    std::unique_ptr<OnePResolver> one_p_resolver,
+    std::unique_ptr<PersonalContextResolver> personal_context_resolver,
     optimization_guide::RemoteModelExecutor* remote_model_executor)
     : delegate_(std::move(delegate)),
       data_provider_(std::move(data_provider)),
-      one_p_resolver_(std::move(one_p_resolver)),
+      personal_context_resolver_(std::move(personal_context_resolver)),
       classifier_(CreateQueryClassifier(remote_model_executor)) {}
 
 AccessibilityQueryService::~AccessibilityQueryService() = default;
 
 void AccessibilityQueryService::Shutdown() {
   data_provider_.reset();
-  one_p_resolver_.reset();
+  personal_context_resolver_.reset();
 }
 
 void AccessibilityQueryService::Query(
@@ -114,6 +131,7 @@ void AccessibilityQueryService::Query(
     base::RepeatingCallback<void(MemorySearchResults)> update_callback) {
   // Invalidate any in-flight queries.
   weak_ptr_factory_.InvalidateWeakPtrs();
+  personal_context_weak_ptr_factory_.InvalidateWeakPtrs();
 
   // We can't query if we don't have any data providers configured.
   if (!data_provider_) {
@@ -124,6 +142,9 @@ void AccessibilityQueryService::Query(
 
   // Run the query classifier to understand the user's intent, extracting
   // intent type and filter words.
+  // TODO(crbug.com/524177036): The `PersonalContextResolver` query should
+  // return the AutofillFetchPlan, which then should be used to access the data
+  // from `AutofillDataProvider`.
   classifier_.Run(
       std::u16string(query),
       base::BindOnce(&AccessibilityQueryService::OnClassificationComplete,
@@ -136,11 +157,11 @@ void AccessibilityQueryService::OnClassificationComplete(
     base::RepeatingCallback<void(MemorySearchResults)> update_callback,
     ClassifiedQuery classified_query) {
   // If the classifier couldn't figure out what the user is asking for, we try
-  // the 1P resolver as a fallback.
+  // the personal context resolver as a fallback.
   if (classified_query.intent == MemoryDataType::kUnknown) {
-    QueryOnePResolver(std::move(query), update_callback,
-                      /*fallback_entries=*/{},
-                      MemorySearchStatus::kUnsupportedQuery);
+    QueryPersonalContextResolver(std::move(query), classified_query,
+                                 update_callback, /*filtered_local_entries=*/{},
+                                 /*fallback_local_entries=*/{});
     return;
   }
 
@@ -173,88 +194,105 @@ void AccessibilityQueryService::OnDataRetrieved(
     base::RepeatingCallback<void(MemorySearchResults)> update_callback,
     std::vector<MemorySearchResult> entries) {
   DeduplicateResults(entries);
+  std::vector<MemorySearchResult> filtered_entries =
+      FilterResults(entries, classified_query.filter_words);
 
-  // If we couldn't find any local results, try the 1P resolver.
-  if (entries.empty()) {
-    QueryOnePResolver(std::move(query), update_callback,
-                      /*fallback_entries=*/{},
-                      MemorySearchStatus::kFinalResponseSuccess);
-    return;
-  }
-
-  // If there are no filter words, we don't need to filter anything out.
-  // We can just return all the entries we got from the local providers.
-  if (classified_query.filter_words.empty()) {
+  if (!personal_context_resolver_) {
     update_callback.Run(MemorySearchResults(
-        MemorySearchStatus::kFinalResponseSuccess, std::move(entries)));
+        MemorySearchStatus::kFinalResponseSuccess,
+        filtered_entries.empty() ? std::move(entries)
+                                 : std::move(filtered_entries)));
     return;
   }
 
-  base::flat_set<std::u16string> filter_words_set =
-      classified_query.filter_words;
-
-  auto any_filter_words_present = [&](const MemorySearchResult& entry) {
-    return EntryMatchesAnyFilterWord(entry, filter_words_set);
-  };
-
-  // Filters results by ensuring at least one filter word in response is
-  // present in the result's value (case-insensitive).
-  std::vector<MemorySearchResult> filtered_entries;
-  std::ranges::copy_if(entries, std::back_inserter(filtered_entries),
-                       any_filter_words_present);
-
-  // If the strict filtering removes all items, it falls back to querying
-  // the 1P resolver if one is available.
-  // The 1P resolver might be able to find relevant results that the strict
-  // local filtering missed.
   if (filtered_entries.empty()) {
-    QueryOnePResolver(std::move(query), update_callback, std::move(entries),
-                      MemorySearchStatus::kFinalResponseSuccess);
+    QueryPersonalContextResolver(std::move(query), std::move(classified_query),
+                                 update_callback,
+                                 /*filtered_local_entries=*/{},
+                                 /*fallback_local_entries=*/std::move(entries));
     return;
   }
 
-  // We successfully filtered the local entries. Return the filtered results.
+  // Report the matching local results as a partial response.
   update_callback.Run(MemorySearchResults(
-      MemorySearchStatus::kFinalResponseSuccess, std::move(filtered_entries)));
+      MemorySearchStatus::kPartialResponseSuccess, filtered_entries));
+
+  // Query the personal context resolver in the background. If it finds matches,
+  // they will be merged with the filtered local entries. Otherwise, we fallback
+  // to the filtered local entries.
+  std::vector<MemorySearchResult> fallback_local_entries = filtered_entries;
+  QueryPersonalContextResolver(std::move(query), classified_query,
+                               update_callback, std::move(filtered_entries),
+                               std::move(fallback_local_entries));
 }
 
-void AccessibilityQueryService::QueryOnePResolver(
+void AccessibilityQueryService::QueryPersonalContextResolver(
     std::u16string query,
+    ClassifiedQuery classified_query,
     base::RepeatingCallback<void(MemorySearchResults)> update_callback,
-    std::vector<MemorySearchResult> fallback_entries,
-    MemorySearchStatus fallback_status) {
-  // If the 1P resolver is not available or disabled, immediately return the
-  // provided fallback results and status.
-  if (!one_p_resolver_) {
+    std::vector<MemorySearchResult> filtered_local_entries,
+    std::vector<MemorySearchResult> fallback_local_entries) {
+  // Invalidate any in-flight personal context queries.
+  personal_context_weak_ptr_factory_.InvalidateWeakPtrs();
+
+  if (!personal_context_resolver_) {
     update_callback.Run(
-        MemorySearchResults(fallback_status, std::move(fallback_entries)));
+        MemorySearchResults(classified_query.intent == MemoryDataType::kUnknown
+                                ? MemorySearchStatus::kUnsupportedQuery
+                                : MemorySearchStatus::kFinalResponseSuccess,
+                            std::move(fallback_local_entries)));
     return;
   }
 
-  // Query the 1P resolver as a fallback data source.
-  one_p_resolver_->Query(
-      query, base::BindOnce(&AccessibilityQueryService::OnOnePResolverComplete,
-                            weak_ptr_factory_.GetWeakPtr(), update_callback,
-                            std::move(fallback_entries), fallback_status));
+  personal_context_resolver_->Query(
+      query, base::BindOnce(
+                 &AccessibilityQueryService::OnPersonalContextResolverComplete,
+                 personal_context_weak_ptr_factory_.GetWeakPtr(),
+                 std::move(classified_query), update_callback,
+                 std::move(filtered_local_entries),
+                 std::move(fallback_local_entries)));
 }
 
-void AccessibilityQueryService::OnOnePResolverComplete(
+void AccessibilityQueryService::OnPersonalContextResolverComplete(
+    ClassifiedQuery classified_query,
     base::RepeatingCallback<void(MemorySearchResults)> update_callback,
-    std::vector<MemorySearchResult> fallback_entries,
-    MemorySearchStatus fallback_status,
-    std::vector<MemorySearchResult> one_p_entries) {
-  // If the 1P resolver didn't find any results, we fall back to
-  // the provided local entries and status.
-  if (one_p_entries.empty()) {
-    update_callback.Run(
-        MemorySearchResults(fallback_status, std::move(fallback_entries)));
-  } else {
-    // The 1P resolver successfully found relevant results, so we
-    // return those instead of the fallback.
-    DeduplicateResults(one_p_entries);
-    update_callback.Run(MemorySearchResults(
-        MemorySearchStatus::kFinalResponseSuccess, std::move(one_p_entries)));
+    std::vector<MemorySearchResult> filtered_local_entries,
+    std::vector<MemorySearchResult> fallback_local_entries,
+    base::expected<std::vector<MemorySearchResult>,
+                   personal_context::ContextMemoryError>
+        personal_context_entries) {
+  if (!personal_context_entries.has_value()) {
+    if (personal_context_entries.error().error() ==
+        personal_context::ContextMemoryError::ExecutionError::kCancelled) {
+      return;
+    }
+    // TODO(crbug.com/524937997): Show the error in the UI.
+    return;
   }
+
+  std::vector<MemorySearchResult> filtered_personal_context_entries =
+      FilterResults(personal_context_entries.value(),
+                    classified_query.filter_words);
+
+  if (filtered_personal_context_entries.empty()) {
+    // TODO(crbug.com/524937997): Handle errors and return meaningful
+    // `MemorySearchStatus`.
+    update_callback.Run(
+        MemorySearchResults(classified_query.intent == MemoryDataType::kUnknown
+                                ? MemorySearchStatus::kUnsupportedQuery
+                                : MemorySearchStatus::kFinalResponseSuccess,
+                            std::move(fallback_local_entries)));
+    return;
+  }
+
+  // In order to avoid extra allocations, remote results are merged into the
+  // `filtered_local_entries` vector.
+  base::Extend(filtered_local_entries,
+               std::move(filtered_personal_context_entries));
+  DeduplicateResults(filtered_local_entries);
+  update_callback.Run(
+      MemorySearchResults(MemorySearchStatus::kFinalResponseSuccess,
+                          std::move(filtered_local_entries)));
 }
 
 }  // namespace accessibility_annotator
