@@ -558,13 +558,34 @@ base::WeakPtr<PrefetchContainer> PrefetchService::CreatePrefetchContainer(
     std::unique_ptr<PrePrefetchContainer> pre_prefetch_container) {
   if (base::FeatureList::IsEnabled(
           features::kPrefetchOffTheMainThreadForceForTesting)) {
-    // - If `pre_prefetch_container` is non-null, it's already from the
-    //   off-the-main-thread path and thus don't force the off-the-main-thread
-    //   path again.
-    // - Currently off-the-main-thread prefetch is only for same-site requests.
-    if (!pre_prefetch_container &&
-        !prefetch_request->IsCrossSiteRequest(
-            url::Origin::Create(prefetch_request->key().url()))) {
+    const bool is_eligible_for_force_pre_prefetch = [&]() {
+      // If `pre_prefetch_container` is non-null, it's already from the
+      // off-the-main-thread path and thus don't force the off-the-main-thread
+      // path again.
+      if (pre_prefetch_container) {
+        return false;
+      }
+
+      const auto origin = url::Origin::Create(prefetch_request->key().url());
+
+      // Currently off-the-main-thread prefetch is only for same-site requests.
+      if (prefetch_request->IsCrossSiteRequest(origin)) {
+        return false;
+      }
+
+      // Also don't trigger off-the-main-thread prefetch if still we need a
+      // proxy. This mirrors the condition for
+      // `PreloadingEligibility::kSameSiteCrossOriginPrefetchRequiredProxy`.
+      if (prefetch_request->IsProxyRequiredForURL(origin) &&
+          !ShouldPrefetchBypassProxyForTestHost(
+              prefetch_request->key().url().GetHost())) {
+        return false;
+      }
+
+      return true;
+    }();
+
+    if (is_eligible_for_force_pre_prefetch) {
       base::WeakPtr<PrefetchContainer> prefetch_container =
           CreatePrefetchContainerFromPrePrefetchForTesting(  // IN-TEST
               std::move(prefetch_request));
