@@ -398,6 +398,8 @@ chromium-metrics-reviews@google.com.
   <int value="13" label="Default Blocked"/>
 </enum>
 
+<!-- LINT.IfChange(ChromeOSUICommands) -->
+
 <enum name="ChromeOSUICommands">
 <!-- Please put in checks to ensure Command IDs are stable before adding them to this enum. -->
 
@@ -438,6 +440,8 @@ chromium-metrics-reviews@google.com.
   <int value="510" label="Show Desk Name"/>
   <int value="511" label="Task Manager"/>
 </enum>
+
+<!-- LINT.ThenChange(//ash/public/cpp/app_menu_constants.h:CommandId, //ash/shelf/shelf_context_menu_model.h:CommandId) -->
 
 <enum name="CopyShortcutResult">
   <summary>Result of copying the app shortcut.</summary>
