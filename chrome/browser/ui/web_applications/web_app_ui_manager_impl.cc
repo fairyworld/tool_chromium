@@ -41,6 +41,7 @@
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "chrome/browser/ui/profiles/profile_error_dialog.h"
+#include "chrome/browser/ui/unload_controller.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/web_apps/web_app_blocked_migration_infobar_delegate.h"
@@ -270,6 +271,11 @@ void WebAppUiManagerImpl::CloseAppWindows(const webapps::AppId& app_id) {
         const auto* const app_controller =
             AppBrowserController::From(browser_window_interface);
         if (app_controller && app_controller->app_id() == app_id) {
+          UnloadController* const unload_controller =
+              UnloadController::From(browser_window_interface);
+          if (unload_controller) {
+            unload_controller->set_force_skip_warning_user_on_close(true);
+          }
           browser_window_interface->GetWindow()->Close();
         }
         return true;
