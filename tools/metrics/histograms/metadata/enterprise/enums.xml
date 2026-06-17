@@ -2493,6 +2493,7 @@ chromium-metrics-reviews@google.com.
   <int value="1457" label="GeminiEnterpriseSettings"/>
   <int value="1458" label="RestrictYouTubeCookiesDeletion"/>
   <int value="1459" label="AutofillSettings"/>
+  <int value="1460" label="IsolateOriginsShortlist"/>
 </enum>
 
 <enum name="EnterprisePoliciesSources">
