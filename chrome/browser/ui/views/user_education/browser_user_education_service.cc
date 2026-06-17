@@ -85,6 +85,7 @@
 #include "chrome/browser/user_education/user_education_service.h"
 #include "chrome/browser/user_education/user_education_service_factory.h"
 #include "chrome/browser/web_applications/web_app_tab_helper.h"
+#include "chrome/browser/web_applications/web_app_utils.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/common/url_constants.h"
@@ -286,6 +287,8 @@ CreateNavigationAction(GURL target) {
       std::move(target));
 }
 
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
+    BUILDFLAG(IS_CHROMEOS)
 void NavigateToSettingsPage(ContextPtr ctx,
                             user_education::FeaturePromoHandle promo_handle) {
   BrowserWindowInterface* const browser = GetBrowser(ctx);
@@ -300,16 +303,12 @@ void NavigateToSettingsPage(ContextPtr ctx,
   if (!app_id) {
     return;
   }
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  const GURL final_url(chrome::kChromeUIWebAppSettingsURL + *app_id);
-  if (web_contents) {
-    NavigateParams params(browser->GetProfile(), final_url,
-                          ui::PAGE_TRANSITION_LINK);
-    params.disposition = WindowOpenDisposition::NEW_FOREGROUND_TAB;
-    Navigate(&params);
-  }
-#endif
+  chrome::ShowWebAppSettings(
+      browser, *app_id,
+      web_app::AppSettingsPageEntryPoint::kNavigationCapturingIphBubble);
 }
+#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
+        // BUILDFLAG(IS_CHROMEOS)
 
 }  // namespace
 

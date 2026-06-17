@@ -76,6 +76,8 @@
 #include "ash/constants/webui_url_constants.h"
 #include "ash/webui/settings/public/constants/routes_util.h"
 #include "chrome/browser/ui/ash/system_web_apps/system_web_app_ui_utils.h"
+#include "chrome/browser/ui/settings_window_manager_chromeos.h"
+#include "chromeos/ash/experiences/settings_ui/settings_app_manager.h"
 #else
 #include "chrome/browser/ui/signin/signin_view_controller.h"
 #endif
@@ -83,19 +85,11 @@
 #if !BUILDFLAG(IS_ANDROID)
 #include "base/metrics/histogram_functions.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
+#include "chrome/browser/web_applications/web_app_utils.h"
 #include "components/signin/public/base/signin_pref_names.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
-#endif
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-#include "chrome/browser/web_applications/web_app_utils.h"
-#endif
-
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
 #include "components/webapps/isolated_web_apps/scheme.h"
-#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-        // BUILDFLAG(IS_CHROMEOS)
+#endif  //! BUILDFLAG(IS_ANDROID)
 
 using base::UserMetricsAction;
 
@@ -706,19 +700,23 @@ void ShowSharedTabGroupActivity(Profile* profile) {
                    GURL(data_sharing::features::kActivityLogsURL.Get()));
 }
 
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+#if !BUILDFLAG(IS_ANDROID)
 void ShowWebAppSettingsImpl(BrowserWindowInterface* browser,
                             Profile* profile,
                             const std::string& app_id,
                             web_app::AppSettingsPageEntryPoint entry_point) {
   base::UmaHistogramEnumeration(
       web_app::kAppSettingsPageEntryPointsHistogramName, entry_point);
-
+#if BUILDFLAG(IS_CHROMEOS)
+  chrome::SettingsWindowManager::GetInstance()->ShowOSSettings(
+      profile, ash::SettingsAppManager::CreateAppManagementPagePath(app_id));
+#else
   const GURL link_destination(chrome::kChromeUIWebAppSettingsURL + app_id);
   NavigateParams params(profile, link_destination, ui::PAGE_TRANSITION_TYPED);
   params.disposition = WindowOpenDisposition::NEW_FOREGROUND_TAB;
   params.browser = browser;
   Navigate(&params);
+#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 void ShowWebAppSettings(BrowserWindowInterface* browser,
@@ -732,6 +730,6 @@ void ShowWebAppSettings(Profile* profile,
                         web_app::AppSettingsPageEntryPoint entry_point) {
   ShowWebAppSettingsImpl(/*browser=*/nullptr, profile, app_id, entry_point);
 }
-#endif
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace chrome

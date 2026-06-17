@@ -56,6 +56,7 @@
 #include "chrome/browser/ui/web_applications/web_app_run_on_os_login_notification.h"
 #include "chrome/browser/user_education/user_education_service.h"
 #include "chrome/browser/user_education/user_education_service_factory.h"
+#include "chrome/browser/web_applications/link_capturing_features.h"
 #include "chrome/browser/web_applications/web_app_command_scheduler.h"
 #include "chrome/browser/web_applications/web_app_icon_manager.h"
 #include "chrome/browser/web_applications/web_app_pref_guardrails.h"
@@ -176,18 +177,6 @@ void ShowNonclosableAppToast(const web_app::WebAppRegistrar& registrar,
 }
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-bool IsNavigationCapturingIphEnabled() {
-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
-    BUILDFLAG(IS_CHROMEOS)
-  return base::FeatureList::IsEnabled(features::kPwaNavigationCapturing) &&
-         (features::kNavigationCapturingDefaultState.Get() ==
-              features::CapturingState::kReimplDefaultOn ||
-          features::kNavigationCapturingDefaultState.Get() ==
-              features::CapturingState::kReimplOnViaClientMode);
-#else
-  return false;
-#endif
-}
 
 }  // namespace
 
@@ -680,7 +669,7 @@ void WebAppUiManagerImpl::MaybeShowIPHPromoForAppsLaunchedViaLinkCapturing(
     Browser* browser,
     Profile* profile,
     const std::string& app_id) {
-  if (!IsNavigationCapturingIphEnabled()) {
+  if (!apps::features::IsNavigationCapturingOnByDefault()) {
     return;
   }
 
@@ -951,8 +940,13 @@ void WebAppUiManagerImpl::ShowIPHPromoForAppsLaunchedViaLinkCapturing(
   // window.
   if (&feature ==
       &feature_engagement::kIPHDesktopPWAsLinkCapturingLaunchAppInTab) {
-    WebAppTabHelper* const tab_helper = WebAppTabHelper::FromWebContents(
-        browser->tab_strip_model()->GetActiveWebContents());
+    content::WebContents* const active_contents =
+        browser->tab_strip_model()->GetActiveWebContents();
+    if (!active_contents) {
+      return;
+    }
+    WebAppTabHelper* const tab_helper =
+        WebAppTabHelper::FromWebContents(active_contents);
     CHECK(tab_helper);
     tab_helper->SetCallbackToRunOnTabChanges(base::BindOnce(
         &WebAppUiManagerImpl::OnTabChangedDuringIph,
