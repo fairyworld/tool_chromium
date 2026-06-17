@@ -33,6 +33,7 @@ import org.robolectric.annotation.Config;
 import org.chromium.base.supplier.ObservableSuppliers;
 import org.chromium.base.supplier.SettableNullableObservableSupplier;
 import org.chromium.base.test.BaseRobolectricTestRunner;
+import org.chromium.base.test.util.DisabledTest;
 import org.chromium.chrome.browser.context_sharing.R;
 import org.chromium.chrome.browser.contextual_tasks.fusebox.ContextualTasksFusebox;
 import org.chromium.content_public.browser.WebContents;
@@ -228,6 +229,7 @@ public class CoBrowseViewsTest {
         verify(mMockContentProvider).setupPlaceholderView(any());
     }
 
+    @DisabledTest(message = "crbug.com/525122374")
     @Test
     public void testPlaceholderAllowedSupplier() {
         when(mMockContentProvider.setupPlaceholderView(any())).thenReturn(true);

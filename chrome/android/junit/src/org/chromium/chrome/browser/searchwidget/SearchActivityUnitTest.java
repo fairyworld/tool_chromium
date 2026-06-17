@@ -55,6 +55,7 @@ import org.chromium.base.supplier.MonotonicObservableSupplier;
 import org.chromium.base.supplier.OneshotSupplier;
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.base.test.RobolectricUtil;
+import org.chromium.base.test.util.DisabledTest;
 import org.chromium.base.test.util.Features.EnableFeatures;
 import org.chromium.base.test.util.HistogramWatcher;
 import org.chromium.base.test.util.UserActionTester;
@@ -1097,6 +1098,7 @@ public class SearchActivityUnitTest {
         histograms.assertExpected();
     }
 
+    @DisabledTest(message = "crbug.com/525122669")
     @Test
     public void verifySearchBoxColorScheme_toggleIncognitoStatus() {
         mActivity.handleNewIntent(buildTestServiceIntent(IntentOrigin.HUB), false);

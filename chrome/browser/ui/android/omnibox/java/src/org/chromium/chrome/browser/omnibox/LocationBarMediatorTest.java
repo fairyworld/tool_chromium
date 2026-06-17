@@ -72,6 +72,7 @@ import org.chromium.base.supplier.SettableNonNullObservableSupplier;
 import org.chromium.base.supplier.SettableNullableObservableSupplier;
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.base.test.RobolectricUtil;
+import org.chromium.base.test.util.DisabledTest;
 import org.chromium.base.test.util.Features.DisableFeatures;
 import org.chromium.base.test.util.Features.EnableFeatures;
 import org.chromium.build.BuildConfig;
@@ -2963,6 +2964,7 @@ public class LocationBarMediatorTest {
         verify(mLocationBarLayout).setBackButtonVisibility(true);
     }
 
+    @DisabledTest(message = "crbug.com/525121822")
     @Test
     public void testOnSuggestionsChanged_triggersScrimVisibility() {
         mMediator.onFinishNativeInitialization();
