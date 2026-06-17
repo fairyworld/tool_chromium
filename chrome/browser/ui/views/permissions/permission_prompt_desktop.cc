@@ -15,7 +15,11 @@ PermissionPromptDesktop::PermissionPromptDesktop(
     Browser* browser,
     content::WebContents* web_contents,
     Delegate* delegate)
-    : web_contents_(web_contents), delegate_(delegate), browser_(browser) {}
+    : web_contents_(web_contents), delegate_(delegate), browser_(browser) {
+  if (!browser_) {
+    UpdateBrowser();
+  }
+}
 
 PermissionPromptDesktop::~PermissionPromptDesktop() = default;
 

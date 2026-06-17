@@ -201,7 +201,6 @@ bool CanCurrentRequestUseModalUI(
 }
 
 std::unique_ptr<permissions::PermissionPrompt> CreatePwaPrompt(
-    Browser* browser,
     content::WebContents* web_contents,
     permissions::PermissionPrompt::Delegate* delegate) {
   if (permissions::PermissionUtil::
@@ -210,19 +209,18 @@ std::unique_ptr<permissions::PermissionPrompt> CreatePwaPrompt(
     // type for embedded permission prompts.
     return CanCurrentRequestUseModalUI(web_contents, delegate)
                ? std::make_unique<EmbeddedPermissionPrompt>(
-                     browser, web_contents, delegate)
+                     /*browser=*/nullptr, web_contents, delegate)
                : nullptr;
   } else if (delegate->ShouldCurrentRequestUseQuietUI()) {
-    return std::make_unique<PermissionPromptQuietIcon>(browser, web_contents,
-                                                       delegate);
+    return std::make_unique<PermissionPromptQuietIcon>(/*browser=*/nullptr,
+                                                       web_contents, delegate);
   } else {
-    return std::make_unique<PermissionPromptBubble>(browser, web_contents,
-                                                    delegate);
+    return std::make_unique<PermissionPromptBubble>(/*browser=*/nullptr,
+                                                    web_contents, delegate);
   }
 }
 
 std::unique_ptr<permissions::PermissionPrompt> CreateNormalPrompt(
-    Browser* browser,
     content::WebContents* web_contents,
     permissions::PermissionPrompt::Delegate* delegate) {
   DCHECK(!delegate->ShouldCurrentRequestUseQuietUI());
@@ -230,7 +228,7 @@ std::unique_ptr<permissions::PermissionPrompt> CreateNormalPrompt(
   if (ShouldCurrentRequestUseExclusiveAccessUI(delegate)) {
     return CanCurrentRequestUseModalUI(web_contents, delegate)
                ? std::make_unique<ExclusiveAccessPermissionPrompt>(
-                     browser, web_contents, delegate)
+                     /*browser=*/nullptr, web_contents, delegate)
                : nullptr;
   } else if (permissions::PermissionUtil::
                  ShouldCurrentRequestUsePermissionElementSecondaryUI(
@@ -239,35 +237,34 @@ std::unique_ptr<permissions::PermissionPrompt> CreateNormalPrompt(
     // type for embedded permission prompts.
     return CanCurrentRequestUseModalUI(web_contents, delegate)
                ? std::make_unique<EmbeddedPermissionPrompt>(
-                     browser, web_contents, delegate)
+                     /*browser=*/nullptr, web_contents, delegate)
                : nullptr;
   } else if (ShouldUseChip(delegate) && IsLocationBarDisplayed(web_contents)) {
-    return std::make_unique<PermissionPromptChip>(browser, web_contents,
-                                                  delegate);
+    return std::make_unique<PermissionPromptChip>(/*browser=*/nullptr,
+                                                  web_contents, delegate);
   } else {
-    return std::make_unique<PermissionPromptBubble>(browser, web_contents,
-                                                    delegate);
+    return std::make_unique<PermissionPromptBubble>(/*browser=*/nullptr,
+                                                    web_contents, delegate);
   }
 }
 
 std::unique_ptr<permissions::PermissionPrompt> CreateQuietPrompt(
-    Browser* browser,
     content::WebContents* web_contents,
     permissions::PermissionPrompt::Delegate* delegate) {
   if (ShouldCurrentRequestUseQuietChip(delegate)) {
     if (IsLocationBarDisplayed(web_contents)) {
-      return std::make_unique<PermissionPromptChip>(browser, web_contents,
-                                                    delegate);
+      return std::make_unique<PermissionPromptChip>(/*browser=*/nullptr,
+                                                    web_contents, delegate);
     } else {
       // If LocationBar is not displayed (Fullscreen mode), display a default
       // bubble only for non-abusive origins.
       DCHECK(!delegate->ShouldDropCurrentRequestIfCannotShowQuietly());
-      return std::make_unique<PermissionPromptBubble>(browser, web_contents,
-                                                      delegate);
+      return std::make_unique<PermissionPromptBubble>(/*browser=*/nullptr,
+                                                      web_contents, delegate);
     }
   } else {
-    return std::make_unique<PermissionPromptQuietIcon>(browser, web_contents,
-                                                       delegate);
+    return std::make_unique<PermissionPromptQuietIcon>(/*browser=*/nullptr,
+                                                       web_contents, delegate);
   }
 }
 
@@ -276,18 +273,7 @@ std::unique_ptr<permissions::PermissionPrompt> CreateQuietPrompt(
 std::unique_ptr<permissions::PermissionPrompt> CreatePermissionPrompt(
     content::WebContents* web_contents,
     permissions::PermissionPrompt::Delegate* delegate) {
-  BrowserWindowInterface* browser_window_interface =
-      GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(web_contents);
-  if (!browser_window_interface) {
-    // For embedded WebUIs (e.g., Omnibox Popup and Contextual Tasks), try
-    // getting the browser window that contains this WebContents.
-    browser_window_interface = webui::GetBrowserWindowInterface(web_contents);
-  }
-  Browser* browser =
-      browser_window_interface
-          ? browser_window_interface->GetBrowserForMigrationOnly()
-          : nullptr;
-  if (!browser) {
+  if (!GetBrowser(web_contents)) {
     DLOG(WARNING) << "Permission prompt suppressed because the WebContents is "
                      "not attached to any Browser window.";
     return nullptr;
@@ -317,10 +303,10 @@ std::unique_ptr<permissions::PermissionPrompt> CreatePermissionPrompt(
   }
 #endif
 
-  if (web_app::AppBrowserController::IsWebApp(browser)) {
-    return CreatePwaPrompt(browser, web_contents, delegate);
+  if (web_app::AppBrowserController::IsWebApp(GetBrowser(web_contents))) {
+    return CreatePwaPrompt(web_contents, delegate);
   } else if (delegate->ShouldCurrentRequestUseQuietUI()) {
-    return CreateQuietPrompt(browser, web_contents, delegate);
+    return CreateQuietPrompt(web_contents, delegate);
   }
-  return CreateNormalPrompt(browser, web_contents, delegate);
+  return CreateNormalPrompt(web_contents, delegate);
 }
