@@ -301,14 +301,25 @@ void ClientSideDetectionService::StartClientReportPhishingRequest(
               "Safe Browsing agrees the page is dangerous, Chrome will show a "
               "full-page interstitial warning."
             trigger:
-              "Whenever the clinet-side detector machine learning model "
+              "Whenever the client-side detector machine learning model "
               "computes a phishy-ness score above a threshold, after page-load."
+            internal {
+              contacts {
+                email: "chrome-counter-abuse-alerts@google.com"
+              }
+            }
+            user_data {
+              type: ACCESS_TOKEN
+              type: SENSITIVE_URL
+              type: WEB_CONTENT
+            }
             data:
               "Top-level page URL without CGI parameters, boolean and double "
               "features extracted from DOM, such as the number of resources "
               "loaded in the page, if certain likely phishing and social "
               "engineering terms found on the page, etc."
             destination: GOOGLE_OWNED_SERVICE
+            last_reviewed: "2026-06-17"
           }
           policy {
             cookies_allowed: YES
