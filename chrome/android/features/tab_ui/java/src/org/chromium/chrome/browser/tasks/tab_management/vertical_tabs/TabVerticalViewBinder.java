@@ -255,24 +255,25 @@ class TabVerticalViewBinder {
         @Nullable Drawable bg = view.getBackground();
         if (bg != null && colorId != null) {
             bg.mutate();
-            int color =
+            int backgroundColor =
                     TabGroupColorPickerUtils.getTabGroupColorPickerItemColor(
                             context, colorId, isIncognito);
-            ViewCompat.setBackgroundTintList(view, ColorStateList.valueOf(color));
+            ViewCompat.setBackgroundTintList(view, ColorStateList.valueOf(backgroundColor));
 
             @ColorInt
-            int textColor = ContextCompat.getColor(context, R.color.default_text_color_light);
-            @ColorInt
-            int iconColor = ContextCompat.getColor(context, R.color.default_icon_color_light);
+            int foregroundColor =
+                    TabGroupColorPickerUtils.getTabGroupColorPickerItemTextColor(
+                            context, colorId, isIncognito);
 
             TextView titleView = view.findViewById(R.id.group_title);
             if (titleView != null) {
-                titleView.setTextColor(textColor);
+                titleView.setTextColor(foregroundColor);
             }
 
             @Nullable ImageView expandChevron = view.findViewById(R.id.expand_chevron);
             if (expandChevron != null) {
-                ImageViewCompat.setImageTintList(expandChevron, ColorStateList.valueOf(iconColor));
+                ImageViewCompat.setImageTintList(
+                        expandChevron, ColorStateList.valueOf(foregroundColor));
             }
         }
     }

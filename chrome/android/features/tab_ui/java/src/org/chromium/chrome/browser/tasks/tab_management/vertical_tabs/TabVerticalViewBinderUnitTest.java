@@ -102,6 +102,17 @@ public class TabVerticalViewBinderUnitTest {
 
     @Test
     @SmallTest
+    public void testBindContentDescription() {
+        TextResolver resolver = context -> "Accessibility Tab Description";
+        mModel.set(TabProperties.CONTENT_DESCRIPTION_TEXT_RESOLVER, resolver);
+        TabVerticalViewBinder.bindTab(
+                mModel, mItemView, TabProperties.CONTENT_DESCRIPTION_TEXT_RESOLVER);
+
+        assertEquals("Accessibility Tab Description", mItemView.getContentDescription().toString());
+    }
+
+    @Test
+    @SmallTest
     public void testBindSelectionColors_Selected() {
         mModel.set(TabProperties.IS_SELECTED, true);
         TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.IS_SELECTED);
@@ -400,6 +411,7 @@ public class TabVerticalViewBinderUnitTest {
                         LayoutInflater.from(activity)
                                 .inflate(R.layout.vertical_tab_group_header, null, false);
         TextView titleView = headerView.findViewById(R.id.group_title);
+        ImageView expandChevron = headerView.findViewById(R.id.expand_chevron);
 
         // 1. Test Title binding
         mModel.set(TabProperties.TITLE, "My Research Group");
@@ -417,10 +429,16 @@ public class TabVerticalViewBinderUnitTest {
         ColorStateList tintList = headerView.getBackgroundTintList();
         assertNotNull("Background tint list should be set", tintList);
 
-        int expectedColor =
+        int expectedBackgroundColor =
                 TabGroupColorPickerUtils.getTabGroupColorPickerItemColor(
                         activity, TabGroupColorId.RED, /* isIncognito= */ false);
-        assertEquals(expectedColor, tintList.getDefaultColor());
+        assertEquals(expectedBackgroundColor, tintList.getDefaultColor());
+
+        int expectedForegroundColor =
+                TabGroupColorPickerUtils.getTabGroupColorPickerItemTextColor(
+                        activity, TabGroupColorId.RED, /* isIncognito= */ false);
+        assertEquals(expectedForegroundColor, titleView.getCurrentTextColor());
+        assertEquals(expectedForegroundColor, expandChevron.getImageTintList().getDefaultColor());
 
         // 3. Test Colors tinting in Incognito mode
         PropertyModel incognitoModel =
@@ -433,10 +451,18 @@ public class TabVerticalViewBinderUnitTest {
 
         tintList = headerView.getBackgroundTintList();
         assertNotNull("Background tint list should be set in Incognito", tintList);
-        int expectedIncognitoColor =
+        int expectedIncognitoBackgroundColor =
                 TabGroupColorPickerUtils.getTabGroupColorPickerItemColor(
                         activity, TabGroupColorId.RED, /* isIncognito= */ true);
-        assertEquals(expectedIncognitoColor, tintList.getDefaultColor());
+        assertEquals(expectedIncognitoBackgroundColor, tintList.getDefaultColor());
+
+        int expectedIncognitoForegroundColor =
+                TabGroupColorPickerUtils.getTabGroupColorPickerItemTextColor(
+                        activity, TabGroupColorId.RED, /* isIncognito= */ true);
+        assertEquals(expectedIncognitoForegroundColor, titleView.getCurrentTextColor());
+        assertEquals(
+                expectedIncognitoForegroundColor,
+                expandChevron.getImageTintList().getDefaultColor());
     }
 
     @Test
