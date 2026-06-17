@@ -2517,6 +2517,9 @@ public class ChromeContextMenuPopulatorTest {
 
         int[][] expected = {
             {
+                R.id.contextmenu_back,
+                R.id.contextmenu_forward,
+                R.id.contextmenu_reload,
                 R.id.contextmenu_save_page,
                 R.id.contextmenu_share_page,
                 R.id.contextmenu_print_page,
@@ -2539,7 +2542,14 @@ public class ChromeContextMenuPopulatorTest {
         ContextMenuParams params = getPageParams();
 
         int[][] expected = {
-            {R.id.contextmenu_save_page, R.id.contextmenu_share_page, R.id.contextmenu_print_page},
+            {
+                R.id.contextmenu_back,
+                R.id.contextmenu_forward,
+                R.id.contextmenu_reload,
+                R.id.contextmenu_save_page,
+                R.id.contextmenu_share_page,
+                R.id.contextmenu_print_page
+            },
         };
 
         initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.NORMAL, params);
@@ -2555,7 +2565,14 @@ public class ChromeContextMenuPopulatorTest {
         ContextMenuParams params = getPageParams();
 
         int[][] expected = {
-            {R.id.contextmenu_save_page, R.id.contextmenu_share_page, R.id.contextmenu_print_page},
+            {
+                R.id.contextmenu_back,
+                R.id.contextmenu_forward,
+                R.id.contextmenu_reload,
+                R.id.contextmenu_save_page,
+                R.id.contextmenu_share_page,
+                R.id.contextmenu_print_page
+            },
         };
 
         initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.NORMAL, params);
@@ -2574,7 +2591,14 @@ public class ChromeContextMenuPopulatorTest {
         ContextMenuParams params = getPageParams();
 
         int[][] expected = {
-            {R.id.contextmenu_save_page, R.id.contextmenu_share_page, R.id.contextmenu_print_page},
+            {
+                R.id.contextmenu_back,
+                R.id.contextmenu_forward,
+                R.id.contextmenu_reload,
+                R.id.contextmenu_save_page,
+                R.id.contextmenu_share_page,
+                R.id.contextmenu_print_page
+            },
         };
 
         initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.NORMAL, params);
@@ -2599,12 +2623,60 @@ public class ChromeContextMenuPopulatorTest {
     @Test
     @SmallTest
     @UiThreadTest
+    public void testPageNavigation() {
+        FirstRunStatus.setFirstRunFlowComplete(true);
+        ContextMenuParams params = getPageParams();
+
+        int[][] expected = {
+            {
+                R.id.contextmenu_back,
+                R.id.contextmenu_forward,
+                R.id.contextmenu_reload,
+                R.id.contextmenu_save_page,
+                R.id.contextmenu_share_page,
+                R.id.contextmenu_print_page
+            },
+        };
+
+        // All items are present and enabled.
+        initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.NORMAL, params);
+        checkMenuOptions(expected);
+
+        // Only back is disabled.
+        when(mItemDelegate.canCurrentTabGoBack()).thenReturn(false);
+        List<Integer> expectedDisabled = Arrays.asList(R.id.contextmenu_back);
+        initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.NORMAL, params);
+        checkMenuOptions(expectedDisabled, expected);
+
+        // Both back and forward are disabled.
+        when(mItemDelegate.canCurrentTabGoForward()).thenReturn(false);
+        expectedDisabled = Arrays.asList(R.id.contextmenu_back, R.id.contextmenu_forward);
+        initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.NORMAL, params);
+        checkMenuOptions(expectedDisabled, expected);
+
+        // Only forward is disabled.
+        when(mItemDelegate.canCurrentTabGoBack()).thenReturn(true);
+        expectedDisabled = Arrays.asList(R.id.contextmenu_forward);
+        initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.NORMAL, params);
+        checkMenuOptions(expectedDisabled, expected);
+    }
+
+    @Test
+    @SmallTest
+    @UiThreadTest
     public void testPageWithDevMenu() {
         setAllMandatoryFlowsComplete();
         ContextMenuParams params = getPageParams();
 
         int[][] expected = {
-            {R.id.contextmenu_save_page, R.id.contextmenu_share_page, R.id.contextmenu_print_page},
+            {
+                R.id.contextmenu_back,
+                R.id.contextmenu_forward,
+                R.id.contextmenu_reload,
+                R.id.contextmenu_save_page,
+                R.id.contextmenu_share_page,
+                R.id.contextmenu_print_page
+            },
             {R.id.contextmenu_view_page_source, R.id.contextmenu_inspect_element},
         };
 
@@ -2646,7 +2718,12 @@ public class ChromeContextMenuPopulatorTest {
         DownloadUtils.setIsDownloadRestrictedByPolicyForTesting(true);
 
         int[] expectedPage = {
-            R.id.contextmenu_save_page, R.id.contextmenu_share_page, R.id.contextmenu_print_page
+            R.id.contextmenu_back,
+            R.id.contextmenu_forward,
+            R.id.contextmenu_reload,
+            R.id.contextmenu_save_page,
+            R.id.contextmenu_share_page,
+            R.id.contextmenu_print_page
         };
         List<Integer> expectedDisabled = Arrays.asList(R.id.contextmenu_save_page);
 
@@ -2675,7 +2752,13 @@ public class ChromeContextMenuPopulatorTest {
         ContextMenuParams params = getPageParams();
 
         int[][] expected = {
-            {R.id.contextmenu_save_page, R.id.contextmenu_share_page},
+            {
+                R.id.contextmenu_back,
+                R.id.contextmenu_forward,
+                R.id.contextmenu_reload,
+                R.id.contextmenu_save_page,
+                R.id.contextmenu_share_page
+            },
         };
 
         initializePopulator(

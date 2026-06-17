@@ -241,6 +241,8 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
             Action.SAVE_PAGE,
             Action.SHARE_PAGE,
             Action.PRINT_PAGE,
+            Action.BACK,
+            Action.FORWARD,
             Action.RELOAD,
             Action.INSPECT_ELEMENT,
             Action.SHOW_INTEREST_IN_ELEMENT,
@@ -297,8 +299,8 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
             int SAVE_PAGE = 41;
             int SHARE_PAGE = 42;
             int PRINT_PAGE = 43;
-            // int BACK = 44;  Deprecated since 05/2025.
-            // int FORWARD = 45;  Deprecated since 05/2025.
+            int BACK = 44;
+            int FORWARD = 45;
             int RELOAD = 46;
             int INSPECT_ELEMENT = 47;
             int SHOW_INTEREST_IN_ELEMENT = 48;
@@ -485,9 +487,20 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
 
         if (mParams.isPage() && shouldShowEmptySpaceContextMenu()) {
             ModelList pageGroup = new ModelList();
-            if (mMode == ContextMenuMode.THIN_WEB_VIEW) {
-                pageGroup.add(createListItem(Item.RELOAD));
-            } else {
+            if (mMode != ContextMenuMode.THIN_WEB_VIEW) {
+                if (mItemDelegate instanceof TabContextMenuItemDelegate) {
+                    TabContextMenuItemDelegate tabDelegate =
+                            (TabContextMenuItemDelegate) mItemDelegate;
+                    pageGroup.add(
+                            createListItem(Item.BACK, false, tabDelegate.canCurrentTabGoBack()));
+                    pageGroup.add(
+                            createListItem(
+                                    Item.FORWARD, false, tabDelegate.canCurrentTabGoForward()));
+                }
+            }
+            pageGroup.add(createListItem(Item.RELOAD));
+
+            if (mMode != ContextMenuMode.THIN_WEB_VIEW) {
                 if (UrlUtilities.isDownloadableScheme(mParams.getPageUrl())) {
                     pageGroup.add(
                             createListItem(Item.SAVE_PAGE, false, !mIsDownloadRestrictedByPolicy));
@@ -1194,7 +1207,13 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
         assert mItemDelegate instanceof TabContextMenuItemDelegate;
         TabContextMenuItemDelegate tabItemDelegate = (TabContextMenuItemDelegate) mItemDelegate;
 
-        if (itemId == R.id.contextmenu_open_in_new_tab) {
+        if (itemId == R.id.contextmenu_back) {
+            recordContextMenuSelection(ContextMenuUma.Action.BACK);
+            tabItemDelegate.onCurrentTabGoBack();
+        } else if (itemId == R.id.contextmenu_forward) {
+            recordContextMenuSelection(ContextMenuUma.Action.FORWARD);
+            tabItemDelegate.onCurrentTabGoForward();
+        } else if (itemId == R.id.contextmenu_open_in_new_tab) {
             recordContextMenuSelection(ContextMenuUma.Action.OPEN_IN_NEW_TAB);
             RecordUserAction.record("TabContextMenu.OpenInNewTab");
             tabItemDelegate.onOpenInNewTab(
