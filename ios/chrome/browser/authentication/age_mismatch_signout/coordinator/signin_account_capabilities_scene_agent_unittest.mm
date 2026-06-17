@@ -155,10 +155,10 @@ class SigninAccountCapabilitiesSceneAgentTest : public PlatformTest {
         account_manager_service,
         base::BindRepeating(^(const CoreAccountId& account_id,
                               const AccountCapabilities& capabilities) {
-          AccountInfo updated_account = account;
-          updated_account.capabilities = capabilities;
+          AccountInfo::Builder builder(account);
+          builder.UpdateAccountCapabilitiesWith(capabilities);
           signin::UpdateAccountInfoForAccount(identity_manager,
-                                              updated_account);
+                                              builder.Build());
         }),
         base::BindOnce([](base::RunLoop* run_loop,
                           const CoreAccountId&) { run_loop->Quit(); },
