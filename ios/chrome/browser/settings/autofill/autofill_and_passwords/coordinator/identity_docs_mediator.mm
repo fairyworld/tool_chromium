@@ -6,9 +6,13 @@
 
 #import "base/apple/foundation_util.h"
 #import "base/notreached.h"
+#import "components/autofill/core/common/autofill_prefs.h"
+#import "components/prefs/pref_service.h"
 #import "ios/chrome/browser/settings/autofill/autofill_ai/ui/autofill_ai_entity_item.h"
 #import "ios/chrome/browser/settings/autofill/autofill_and_passwords/coordinator/autofill_ai_base_mediator_protected.h"
 #import "ios/chrome/browser/settings/autofill/autofill_and_passwords/ui/identity_docs_consumer.h"
+#import "ios/chrome/browser/shared/model/prefs/pref_backed_boolean.h"
+#import "ios/chrome/browser/shared/model/utils/observable_boolean.h"
 
 namespace {
 
@@ -20,8 +24,30 @@ static constexpr autofill::DenseSet<autofill::EntityTypeName> kIdentityDocs = {
 
 }  // namespace
 
+@interface IdentityDocsMediator () <BooleanObserver>
+@end
+
 // Mediator implementation for Identity Docs.
-@implementation IdentityDocsMediator
+@implementation IdentityDocsMediator {
+  PrefBackedBoolean* _identityDocsEnabled;
+}
+
+- (instancetype)initWithEntityDataManager:
+                    (autofill::EntityDataManager*)entityDataManager
+                              prefService:(PrefService*)prefService {
+  self = [super initWithEntityDataManager:entityDataManager
+                              prefService:prefService];
+  if (self) {
+    if (prefService) {
+      _identityDocsEnabled = [[PrefBackedBoolean alloc]
+          initWithPrefService:prefService
+                     prefName:autofill::prefs::
+                                  kAutofillAiIdentityEntitiesEnabled];
+      _identityDocsEnabled.observer = self;
+    }
+  }
+  return self;
+}
 
 - (void)setConsumer:(id<IdentityDocsConsumer>)consumer {
   if (_consumer == consumer) {
@@ -31,12 +57,32 @@ static constexpr autofill::DenseSet<autofill::EntityTypeName> kIdentityDocs = {
   if (_consumer) {
     // Trigger initial push.
     [self pushEntitiesToConsumer];
+
+    if (_identityDocsEnabled) {
+      [_consumer setIdentityDocsToggleState:_identityDocsEnabled.value];
+    }
   }
 }
 
 - (void)disconnect {
   [super disconnect];
+  _identityDocsEnabled.observer = nil;
+  _identityDocsEnabled = nil;
   _consumer = nil;
+}
+
+#pragma mark - BooleanObserver
+
+- (void)booleanDidChange:(PrefBackedBoolean*)boolean {
+  if (boolean == _identityDocsEnabled) {
+    [self.consumer setIdentityDocsToggleState:_identityDocsEnabled.value];
+  }
+}
+
+#pragma mark - IdentityDocsMutator
+
+- (void)didToggleIdentityDocs:(BOOL)enabled {
+  _identityDocsEnabled.value = enabled;
 }
 
 #pragma mark - AutofillAIBaseMediator

@@ -14,8 +14,11 @@
 #import "ios/chrome/browser/settings/autofill/autofill_ai/ui/autofill_ai_entity_item.h"
 #import "ios/chrome/browser/settings/autofill/autofill_and_passwords/ui/autofill_ai_base_item_type.h"
 #import "ios/chrome/browser/settings/autofill/autofill_and_passwords/ui/autofill_ai_base_mutator.h"
+#import "ios/chrome/browser/settings/autofill/autofill_and_passwords/ui/identity_docs_mutator.h"
 #import "ios/chrome/browser/settings/autofill/utils/autofill_settings_ui_util.h"
 #import "ios/chrome/browser/settings/ui_bundled/settings_root_table_view_controller+toolbar_add.h"
+#import "ios/chrome/browser/shared/ui/table_view/cells/table_view_link_header_footer_item.h"
+#import "ios/chrome/browser/shared/ui/table_view/cells/table_view_switch_item.h"
 #import "ios/chrome/browser/shared/ui/table_view/cells/table_view_text_header_footer_item.h"
 #import "ios/chrome/browser/shared/ui/table_view/table_view_utils.h"
 #import "ios/chrome/common/ui/colors/semantic_color_names.h"
@@ -25,10 +28,17 @@
 
 namespace {
 enum SectionIdentifier {
-  SectionIdentifierDriversLicenses = kSectionIdentifierEnumZero,
+  SectionIdentifierToggle = kSectionIdentifierEnumZero,
+  SectionIdentifierDriversLicenses,
   SectionIdentifierNationalIdCards,
   SectionIdentifierPassports,
 };
+
+enum ItemType {
+  ItemTypeToggle = kAutofillAIBaseItemTypeEntity + 1,
+  ItemTypeFooter,
+};
+
 }  // namespace
 
 @interface IdentityDocsTableViewController () <
@@ -44,6 +54,7 @@ enum SectionIdentifier {
   std::vector<autofill::EntityType> _writableEntityTypes;
   UIBarButtonItem* _addButtonInToolbar;
   BOOL _hasLocalEntities;
+  BOOL _identityDocsEnabled;
 }
 
 - (instancetype)init {
@@ -69,6 +80,22 @@ enum SectionIdentifier {
   [super loadModel];
 
   TableViewModel* model = self.tableViewModel;
+
+  [model addSectionWithIdentifier:SectionIdentifierToggle];
+  TableViewSwitchItem* toggleItem =
+      [[TableViewSwitchItem alloc] initWithType:ItemTypeToggle];
+  toggleItem.text =
+      l10n_util::GetNSString(IDS_AUTOFILL_IDENTITY_DOCS_OPT_IN_TOGGLE_LABEL);
+  toggleItem.on = _identityDocsEnabled;
+  toggleItem.target = self;
+  toggleItem.selector = @selector(identityDocsToggleChanged:);
+  [model addItem:toggleItem toSectionWithIdentifier:SectionIdentifierToggle];
+
+  TableViewLinkHeaderFooterItem* footer =
+      [[TableViewLinkHeaderFooterItem alloc] initWithType:ItemTypeFooter];
+  footer.text = l10n_util::GetNSString(
+      IDS_AUTOFILL_IDENTITY_DOCS_OPT_IN_TOGGLE_SUB_LABEL);
+  [model setFooter:footer forSectionWithIdentifier:SectionIdentifierToggle];
 
   if (_driversLicenses.count > 0) {
     [model addSectionWithIdentifier:SectionIdentifierDriversLicenses];
@@ -130,6 +157,46 @@ enum SectionIdentifier {
     [self updateUIForEditState];
     [self reloadData];
   }
+}
+
+- (void)setIdentityDocsToggleState:(BOOL)enabled {
+  if (_identityDocsEnabled == enabled) {
+    return;
+  }
+  _identityDocsEnabled = enabled;
+  if (self.isViewLoaded) {
+    TableViewModel* model = self.tableViewModel;
+    NSIndexPath* switchPath =
+        [model indexPathForItemType:ItemTypeToggle
+                  sectionIdentifier:SectionIdentifierToggle];
+    if (switchPath) {
+      TableViewSwitchItem* switchItem =
+          base::apple::ObjCCastStrict<TableViewSwitchItem>(
+              [model itemAtIndexPath:switchPath]);
+      switchItem.on = enabled;
+      [self reconfigureCellsForItems:@[ switchItem ]];
+    }
+    [self updateAddButtonInToolbar];
+  }
+}
+
+- (void)identityDocsToggleChanged:(UISwitch*)switchView {
+  BOOL switchOn = [switchView isOn];
+  _identityDocsEnabled = switchOn;
+
+  TableViewModel* model = self.tableViewModel;
+  NSIndexPath* switchPath =
+      [model indexPathForItemType:ItemTypeToggle
+                sectionIdentifier:SectionIdentifierToggle];
+  if (switchPath) {
+    TableViewSwitchItem* switchItem =
+        base::apple::ObjCCastStrict<TableViewSwitchItem>(
+            [model itemAtIndexPath:switchPath]);
+    switchItem.on = switchOn;
+  }
+
+  [self updateAddButtonInToolbar];
+  [self.mutator didToggleIdentityDocs:switchOn];
 }
 
 - (void)setWritableEntityTypes:
@@ -198,9 +265,10 @@ enum SectionIdentifier {
   _addButtonInToolbar.menu =
       [AutofillAIAddEntitiesMenuBuilder buildMenuWithTypes:_writableEntityTypes
                                             profileEnabled:NO
-                                           entitiesEnabled:YES
+                                           entitiesEnabled:_identityDocsEnabled
                                                   delegate:self];
-  _addButtonInToolbar.enabled = !_writableEntityTypes.empty();
+  _addButtonInToolbar.enabled =
+      _identityDocsEnabled && !_writableEntityTypes.empty();
 }
 
 #pragma mark - AutofillAIAddEntitiesMenuDelegate
