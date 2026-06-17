@@ -24121,6 +24121,20 @@
                     ]
                 }
             ]
+        },
+        {
+            "platforms": [
+                "android",
+                "ios"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled_20260615",
+                    "enable_features": [
+                        "TranslateElementExperimentFeatures"
+                    ]
+                }
+            ]
         }
     ],
     "TranslateElementRegionalization": [
