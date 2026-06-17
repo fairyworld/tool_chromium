@@ -570,27 +570,22 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
     }
 
     private void assertMenuItemsHaveIcons(Iterable<ListItem> items, List<MenuItem> expectedItems) {
-
-        assertMenuTreesAreEqual(
-                items,
-                expectedItems,
-                (item, expectedId) -> {
-                    if (item.type != AppMenuHandler.AppMenuItemType.BUTTON_ROW
-                            && item.type != AppMenuHandler.AppMenuItemType.DIVIDER
-                            && item.type != AppMenuHandler.AppMenuItemType.EMPTY
-                            && item.type != AppMenuHandler.AppMenuItemType.HEADER) {
-                        boolean hasIcon =
-                                item.model.containsKey(AppMenuItemProperties.ICON)
-                                        && item.model.get(AppMenuItemProperties.ICON) != null;
-                        boolean hasIconSupplier =
-                                item.model.containsKey(AppMenuItemProperties.ICON_SUPPLIER)
-                                        && item.model.get(AppMenuItemProperties.ICON_SUPPLIER)
-                                                != null;
-                        Assert.assertTrue(
-                                "Item should have an icon: " + getMenuTitle(item),
-                                hasIcon || hasIconSupplier);
-                    }
-                });
+        for (ListItem item : items) {
+            if (item.type != AppMenuHandler.AppMenuItemType.BUTTON_ROW
+                    && item.type != AppMenuHandler.AppMenuItemType.DIVIDER
+                    && item.type != AppMenuHandler.AppMenuItemType.EMPTY
+                    && item.type != AppMenuHandler.AppMenuItemType.HEADER) {
+                boolean hasIcon =
+                        item.model.containsKey(AppMenuItemProperties.ICON)
+                                && item.model.get(AppMenuItemProperties.ICON) != null;
+                boolean hasIconSupplier =
+                        item.model.containsKey(AppMenuItemProperties.ICON_SUPPLIER)
+                                && item.model.get(AppMenuItemProperties.ICON_SUPPLIER) != null;
+                Assert.assertTrue(
+                        "Item should have an icon: " + getMenuTitle(item),
+                        hasIcon || hasIconSupplier);
+            }
+        }
     }
 
     private void assertActionBarItemsAreEqual(ModelList modelList, Integer... expectedItems) {

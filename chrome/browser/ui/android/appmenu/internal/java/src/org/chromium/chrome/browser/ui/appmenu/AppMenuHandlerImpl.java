@@ -580,6 +580,10 @@ class AppMenuHandlerImpl
                 new LayoutViewBuilder<>(standardItemResId),
                 AppMenuItemViewBinder::bindStandardItem);
         adapter.registerType(
+                AppMenuItemType.STANDARD_NO_ICON,
+                new LayoutViewBuilder<>(R.layout.menu_item_no_icon),
+                AppMenuItemViewBinder::bindStandardItem);
+        adapter.registerType(
                 AppMenuItemType.TITLE_BUTTON,
                 new LayoutViewBuilder<ViewGroup>(R.layout.title_button_menu_item) {
                     @Override
@@ -599,6 +603,10 @@ class AppMenuHandlerImpl
         adapter.registerType(
                 AppMenuItemType.MENU_ITEM_WITH_SUBMENU,
                 new LayoutViewBuilder<>(R.layout.menu_item_with_submenu),
+                AppMenuItemViewBinder::bindItemWithSubmenu);
+        adapter.registerType(
+                AppMenuItemType.MENU_ITEM_WITH_SUBMENU_NO_ICON,
+                new LayoutViewBuilder<>(R.layout.menu_item_with_submenu_no_icon),
                 AppMenuItemViewBinder::bindItemWithSubmenu);
         adapter.registerType(
                 AppMenuItemType.SUBMENU_HEADER,
