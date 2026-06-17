@@ -21313,9 +21313,6 @@
             "experiments": [
                 {
                     "name": "Enabled",
-                    "params": {
-                        "count": "98"
-                    },
                     "enable_features": [
                         "SandboxedProcessServiceLimitOnAndroid"
                     ]

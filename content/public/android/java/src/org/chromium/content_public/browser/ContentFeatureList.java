@@ -10,9 +10,7 @@ import org.chromium.base.MutableBooleanParamWithSafeDefault;
 import org.chromium.base.MutableFlagWithSafeDefault;
 import org.chromium.base.MutableIntParamWithSafeDefault;
 import org.chromium.build.annotations.NullMarked;
-import org.chromium.components.cached_flags.CachedFeatureParam;
 import org.chromium.components.cached_flags.CachedFlag;
-import org.chromium.components.cached_flags.IntCachedFeatureParam;
 import org.chromium.content.common.ContentInternalFeatures;
 import org.chromium.content_public.common.ContentFeatures;
 import org.chromium.ui.accessibility.AccessibilityFeatures;
@@ -200,20 +198,6 @@ public class ContentFeatureList {
                     /* defaultValue= */ false,
                     /* defaultValueInTests= */ true);
 
-    public static final IntCachedFeatureParam sSandboxedProcessServiceLimitOnAndroidCount =
-            new IntCachedFeatureParam(
-                    ContentFeatureMap.getInstance(),
-                    ContentInternalFeatures.SANDBOXED_PROCESS_SERVICE_LIMIT_ON_ANDROID,
-                    "count",
-                    98);
-
     public static final List<CachedFlag> sCachedFlags =
             List.of(sSandboxedProcessServiceLimitOnAndroid);
-
-    public static final List<CachedFeatureParam<?>> sParamsCached =
-            List.of(
-                    // keep-sorted start
-                    sSandboxedProcessServiceLimitOnAndroidCount
-                    // keep-sorted end
-                    );
 }
