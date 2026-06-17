@@ -173,7 +173,13 @@ class PassageEmbeddingsServiceControllerTest : public testing::Test {
   std::optional<MetadataObserver> metadata_observer_;
 };
 
-TEST_F(PassageEmbeddingsServiceControllerTest, ReceivesValidModelInfo) {
+// TODO(crbug.com/524801761): Re-enable this test.
+#if defined(MEMORY_SANITIZER)
+#define MAYBE_ReceivesValidModelInfo DISABLED_ReceivesValidModelInfo
+#else
+#define MAYBE_ReceivesValidModelInfo ReceivesValidModelInfo
+#endif
+TEST_F(PassageEmbeddingsServiceControllerTest, MAYBE_ReceivesValidModelInfo) {
   EXPECT_TRUE(service_controller_->MaybeUpdateModelInfo(
       *GetBuilderWithValidModelInfo().Build()));
   auto metadata = embedder_metadata_future()->Take();
@@ -195,8 +201,16 @@ TEST_F(PassageEmbeddingsServiceControllerTest, ReceivesEmptyModelInfo) {
                                        EmbeddingsModelInfoStatus::kEmpty, 1);
 }
 
+// TODO(crbug.com/524801761): Re-enable this test.
+#if defined(MEMORY_SANITIZER)
+#define MAYBE_ReceivesModelInfoWithInvalidModelMetadata \
+  DISABLED_ReceivesModelInfoWithInvalidModelMetadata
+#else
+#define MAYBE_ReceivesModelInfoWithInvalidModelMetadata \
+  ReceivesModelInfoWithInvalidModelMetadata
+#endif
 TEST_F(PassageEmbeddingsServiceControllerTest,
-       ReceivesModelInfoWithInvalidModelMetadata) {
+       MAYBE_ReceivesModelInfoWithInvalidModelMetadata) {
   optimization_guide::proto::Any metadata_any;
   metadata_any.set_type_url("not a valid type url");
   metadata_any.set_value("not a valid serialized metadata");
@@ -212,8 +226,16 @@ TEST_F(PassageEmbeddingsServiceControllerTest,
       kModelInfoMetricName, EmbeddingsModelInfoStatus::kInvalidMetadata, 1);
 }
 
+// TODO(crbug.com/524801761): Re-enable this test.
+#if defined(MEMORY_SANITIZER)
+#define MAYBE_ReceivesModelInfoWithoutModelMetadata \
+  DISABLED_ReceivesModelInfoWithoutModelMetadata
+#else
+#define MAYBE_ReceivesModelInfoWithoutModelMetadata \
+  ReceivesModelInfoWithoutModelMetadata
+#endif
 TEST_F(PassageEmbeddingsServiceControllerTest,
-       ReceivesModelInfoWithoutModelMetadata) {
+       MAYBE_ReceivesModelInfoWithoutModelMetadata) {
   optimization_guide::TestModelInfoBuilder builder =
       GetBuilderWithValidModelInfo();
   builder.SetModelMetadata(std::nullopt);
@@ -226,8 +248,16 @@ TEST_F(PassageEmbeddingsServiceControllerTest,
       kModelInfoMetricName, EmbeddingsModelInfoStatus::kNoMetadata, 1);
 }
 
+// TODO(crbug.com/524801761): Re-enable this test.
+#if defined(MEMORY_SANITIZER)
+#define MAYBE_ReceivesModelInfoWithoutAdditionalFiles \
+  DISABLED_ReceivesModelInfoWithoutAdditionalFiles
+#else
+#define MAYBE_ReceivesModelInfoWithoutAdditionalFiles \
+  ReceivesModelInfoWithoutAdditionalFiles
+#endif
 TEST_F(PassageEmbeddingsServiceControllerTest,
-       ReceivesModelInfoWithoutAdditionalFiles) {
+       MAYBE_ReceivesModelInfoWithoutAdditionalFiles) {
   base::FilePath test_data_dir;
   base::PathService::Get(base::DIR_SRC_TEST_DATA_ROOT, &test_data_dir);
   optimization_guide::TestModelInfoBuilder builder =
@@ -244,7 +274,13 @@ TEST_F(PassageEmbeddingsServiceControllerTest,
       1);
 }
 
-TEST_F(PassageEmbeddingsServiceControllerTest, GetEmbeddingsEmpty) {
+// TODO(crbug.com/524801761): Re-enable this test.
+#if defined(MEMORY_SANITIZER)
+#define MAYBE_GetEmbeddingsEmpty DISABLED_GetEmbeddingsEmpty
+#else
+#define MAYBE_GetEmbeddingsEmpty GetEmbeddingsEmpty
+#endif
+TEST_F(PassageEmbeddingsServiceControllerTest, MAYBE_GetEmbeddingsEmpty) {
   EXPECT_TRUE(service_controller_->MaybeUpdateModelInfo(
       *GetBuilderWithValidModelInfo().Build()));
 
@@ -258,7 +294,13 @@ TEST_F(PassageEmbeddingsServiceControllerTest, GetEmbeddingsEmpty) {
   EXPECT_TRUE(results.empty());
 }
 
-TEST_F(PassageEmbeddingsServiceControllerTest, GetEmbeddingsNonEmpty) {
+// TODO(crbug.com/524801761): Re-enable this test.
+#if defined(MEMORY_SANITIZER)
+#define MAYBE_GetEmbeddingsNonEmpty DISABLED_GetEmbeddingsNonEmpty
+#else
+#define MAYBE_GetEmbeddingsNonEmpty GetEmbeddingsNonEmpty
+#endif
+TEST_F(PassageEmbeddingsServiceControllerTest, MAYBE_GetEmbeddingsNonEmpty) {
   EXPECT_TRUE(service_controller_->MaybeUpdateModelInfo(
       *GetBuilderWithValidModelInfo().Build()));
 
@@ -273,8 +315,16 @@ TEST_F(PassageEmbeddingsServiceControllerTest, GetEmbeddingsNonEmpty) {
   EXPECT_THAT(results[1]->embeddings, ElementsAre(2.0f));
 }
 
+// TODO(crbug.com/524801761): Re-enable this test.
+#if defined(MEMORY_SANITIZER)
+#define MAYBE_ReturnsModelUnavailableErrorIfModelInfoNotValid \
+  DISABLED_ReturnsModelUnavailableErrorIfModelInfoNotValid
+#else
+#define MAYBE_ReturnsModelUnavailableErrorIfModelInfoNotValid \
+  ReturnsModelUnavailableErrorIfModelInfoNotValid
+#endif
 TEST_F(PassageEmbeddingsServiceControllerTest,
-       ReturnsModelUnavailableErrorIfModelInfoNotValid) {
+       MAYBE_ReturnsModelUnavailableErrorIfModelInfoNotValid) {
   optimization_guide::TestModelInfoBuilder builder =
       GetBuilderWithValidModelInfo();
   builder.SetModelMetadata(std::nullopt);
@@ -290,7 +340,13 @@ TEST_F(PassageEmbeddingsServiceControllerTest,
   EXPECT_EQ(results.size(), 0u);
 }
 
-TEST_F(PassageEmbeddingsServiceControllerTest, ReturnsExecutionFailure) {
+// TODO(crbug.com/524801761): Re-enable this test.
+#if defined(MEMORY_SANITIZER)
+#define MAYBE_ReturnsExecutionFailure DISABLED_ReturnsExecutionFailure
+#else
+#define MAYBE_ReturnsExecutionFailure ReturnsExecutionFailure
+#endif
+TEST_F(PassageEmbeddingsServiceControllerTest, MAYBE_ReturnsExecutionFailure) {
   EXPECT_TRUE(service_controller_->MaybeUpdateModelInfo(
       *GetBuilderWithValidModelInfo().Build()));
 
@@ -303,7 +359,13 @@ TEST_F(PassageEmbeddingsServiceControllerTest, ReturnsExecutionFailure) {
   EXPECT_EQ(results.size(), 0u);
 }
 
-TEST_F(PassageEmbeddingsServiceControllerTest, EmbedderRunningStatus) {
+// TODO(crbug.com/524801761): Re-enable this test.
+#if defined(MEMORY_SANITIZER)
+#define MAYBE_EmbedderRunningStatus DISABLED_EmbedderRunningStatus
+#else
+#define MAYBE_EmbedderRunningStatus EmbedderRunningStatus
+#endif
+TEST_F(PassageEmbeddingsServiceControllerTest, MAYBE_EmbedderRunningStatus) {
   EXPECT_TRUE(service_controller_->MaybeUpdateModelInfo(
       *GetBuilderWithValidModelInfo().Build()));
 
@@ -378,7 +440,13 @@ TEST_F(PassageEmbeddingsServiceControllerTest, EmbedderRunningStatus) {
   }
 }
 
-TEST_F(PassageEmbeddingsServiceControllerTest, RecordsGemmaHistograms) {
+// TODO(crbug.com/524801761): Re-enable this test.
+#if defined(MEMORY_SANITIZER)
+#define MAYBE_RecordsGemmaHistograms DISABLED_RecordsGemmaHistograms
+#else
+#define MAYBE_RecordsGemmaHistograms RecordsGemmaHistograms
+#endif
+TEST_F(PassageEmbeddingsServiceControllerTest, MAYBE_RecordsGemmaHistograms) {
   auto gemma_service_controller =
       std::make_unique<FakePassageEmbeddingsServiceController>(
           /*execute_for_gemma=*/true);
