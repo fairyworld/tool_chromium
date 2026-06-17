@@ -161,7 +161,6 @@ TEST_F(FieldTrialsProviderTest, NoSyntheticTrials) {
 
 TEST_F(FieldTrialsProviderTest, ProvideCurrentSessionData) {
   metrics::ChromeUserMetricsExtension uma_log;
-  uma_log.system_profile();
 
   // {1, 1} should not be in the resulting proto as ProvideCurrentSessionData()
   // clears existing trials and sets the trials to be those determined by
@@ -185,7 +184,6 @@ TEST_F(FieldTrialsProviderTest, ProvideCurrentSessionData) {
 
 TEST_F(FieldTrialsProviderTest, GetAndWriteFieldTrialsWithSuffixes) {
   metrics::ChromeUserMetricsExtension uma_log;
-  uma_log.system_profile();
 
   FieldTrialsProvider provider(&registry_, kSuffix);
   RegisterExpectedSyntheticTrials();
