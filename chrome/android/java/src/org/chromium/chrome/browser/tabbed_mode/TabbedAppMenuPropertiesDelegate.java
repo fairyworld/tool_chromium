@@ -129,6 +129,7 @@ import org.chromium.ui.modelutil.MVCListAdapter.ListItem;
 import org.chromium.ui.modelutil.MVCListAdapter.ModelList;
 import org.chromium.ui.modelutil.ModelListAdapter;
 import org.chromium.ui.modelutil.PropertyModel;
+import org.chromium.ui.util.AttrUtils;
 import org.chromium.url.GURL;
 
 import java.lang.annotation.Retention;
@@ -1047,26 +1048,28 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
 
                 if (cachedFavicon != null) {
                     set(
-                            FaviconUtils.getIconDrawableWithFilter(
-                                    cachedFavicon,
-                                    faviconUrl,
-                                    mRoundedIconGenerator,
-                                    mDefaultFaviconHelper,
-                                    mContext,
-                                    faviconDisplaySize));
+                            createInsetFaviconDrawable(
+                                    FaviconUtils.getIconDrawableWithFilter(
+                                            cachedFavicon,
+                                            faviconUrl,
+                                            mRoundedIconGenerator,
+                                            mDefaultFaviconHelper,
+                                            mContext,
+                                            faviconDisplaySize)));
                     return;
                 }
 
                 FaviconHelper.FaviconImageCallback faviconCallback =
                         (image, iconUrl) -> {
                             set(
-                                    FaviconUtils.getIconDrawableWithFilter(
-                                            image,
-                                            faviconUrl,
-                                            mRoundedIconGenerator,
-                                            mDefaultFaviconHelper,
-                                            mContext,
-                                            faviconDisplaySize));
+                                    createInsetFaviconDrawable(
+                                            FaviconUtils.getIconDrawableWithFilter(
+                                                    image,
+                                                    faviconUrl,
+                                                    mRoundedIconGenerator,
+                                                    mDefaultFaviconHelper,
+                                                    mContext,
+                                                    faviconDisplaySize)));
                         };
 
                 Profile profile = getProfileFromTabModel();
@@ -1089,6 +1092,17 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                 }
             }
         };
+    }
+
+    private Drawable createInsetFaviconDrawable(Drawable icon) {
+        int menuItemIconSize = AttrUtils.getDimensionPixelSize(mContext, R.attr.listItemIconSize);
+        int faviconDisplaySize =
+                mContext.getResources().getDimensionPixelSize(R.dimen.default_favicon_size);
+        int inset = (menuItemIconSize - faviconDisplaySize) / 2;
+        if (inset <= 0) {
+            return icon;
+        }
+        return new InsetDrawable(icon, inset);
     }
 
     private ListItem buildNewWindowItem() {
@@ -1820,7 +1834,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
         return new LazyOneshotSupplierImpl<>() {
             @Override
             public void doSet() {
-                getImageFetcher().fetchFaviconForBookmark(item, this::set);
+                getImageFetcher()
+                        .fetchFaviconForBookmark(
+                                item, icon -> set(createInsetFaviconDrawable(icon)));
             }
         };
     }
