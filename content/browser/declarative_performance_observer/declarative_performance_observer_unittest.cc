@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "content/browser/network/declarative_performance_observer.h"
+#include "content/browser/declarative_performance_observer/declarative_performance_observer.h"
 
 #include <memory>
 #include <optional>
