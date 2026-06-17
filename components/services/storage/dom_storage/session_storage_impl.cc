@@ -342,12 +342,7 @@ void SessionStorageImpl::ShutDown() {
     // Flush any uncommitted data.
     for (const auto& it : data_maps_) {
       auto* area = it.second->storage_area();
-      base::UmaHistogramBoolean("Storage.SessionStorage.ShutdownDroppedChanges",
-                                area->has_pending_load_read_write_tasks());
       area->ScheduleImmediateCommit();
-      // TODO(crbug.com/503422295): Monitor the above histogram, and if dropping
-      // changes is common then handle that here.
-      area->CancelAllPendingRequests();
     }
   }
 }
@@ -470,24 +465,6 @@ void SessionStorageImpl::FlushAreaForTesting(
   if (it == namespaces_.end())
     return;
   it->second->FlushStorageKeyForTesting(storage_key);
-}
-
-void SessionStorageImpl::PutValueForTesting(
-    const std::string& namespace_id,
-    const blink::StorageKey& storage_key,
-    const std::vector<uint8_t>& key,
-    const std::vector<uint8_t>& value,
-    base::OnceCallback<void(bool)> callback) {
-  if (connection_state_ != CONNECTION_FINISHED) {
-    return;
-  }
-
-  const auto& it = namespaces_.find(namespace_id);
-  if (it == namespaces_.end()) {
-    return;
-  }
-
-  it->second->PutValueForTesting(storage_key, key, value, std::move(callback));
 }
 
 void SessionStorageImpl::SetDatabaseOpenCallbackForTesting(
@@ -778,11 +755,6 @@ void SessionStorageImpl::OnConnectionFinished() {
 }
 
 void SessionStorageImpl::PurgeAllNamespaceDataMaps() {
-  // Drop all pending load tasks to avoid the DCHECK in `~StorageAreaImpl()`.
-  for (const auto& it : data_maps_) {
-    it.second->storage_area()->CancelAllPendingRequests();
-  }
-
   // Destroy all `SessionStorageDataMap` instances by re-initializing each
   // namespace.
   for (const auto& [namespace_id, namespace_impl] : namespaces_) {

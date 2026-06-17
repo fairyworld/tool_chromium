@@ -37,8 +37,9 @@ class StorageKey;
 }  // namespace blink
 
 namespace storage {
-
+class StorageAreaImpl;
 class StorageServiceImpl;
+
 // The Local Storage implementation. An instance of this class exists for each
 // profile directory (within the user data directory) that is using Local
 // Storage. It manages storage for all StorageKeys and namespaces within that
@@ -57,11 +58,9 @@ class LocalStorageImpl : public base::trace_event::MemoryDumpProvider,
                    mojo::PendingReceiver<mojom::LocalStorageControl> receiver);
   ~LocalStorageImpl() override;
 
+  StorageAreaImpl* GetStorageAreaForTesting(
+      const blink::StorageKey& storage_key);
   void FlushStorageKeyForTesting(const blink::StorageKey& storage_key);
-  void PutValueForTesting(const blink::StorageKey& storage_key,
-                          const std::vector<uint8_t>& key,
-                          const std::vector<uint8_t>& value,
-                          base::OnceCallback<void(bool)> callback);
 
   // Used by content settings to alter the behavior around
   // what data to keep and what data to discard at shutdown.
@@ -121,10 +120,6 @@ class LocalStorageImpl : public base::trace_event::MemoryDumpProvider,
   // delays running |callback| untill after a connection has been established.
   // Initiates connecting to the database if no connection is in progress yet.
   void RunWhenConnected(base::OnceClosure callback);
-
-  // StorageAreas held by this LocalStorageImpl retain an unmanaged reference to
-  // `database_`. This deletes them and is used any time `database_` is reset.
-  void PurgeAllStorageAreas();
 
   // Part of asynchronous database opening called from `RunWhenConnected()`. If
   // opening the database on disk fails twice, falls back to in memory. If

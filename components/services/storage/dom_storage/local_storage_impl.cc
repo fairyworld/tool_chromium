@@ -280,32 +280,25 @@ void LocalStorageImpl::Flush() {
     it.second->storage_area()->ScheduleImmediateCommit();
 }
 
-void LocalStorageImpl::FlushStorageKeyForTesting(
+StorageAreaImpl* LocalStorageImpl::GetStorageAreaForTesting(
     const blink::StorageKey& storage_key) {
-  if (connection_state_ != CONNECTION_FINISHED)
-    return;
-  const auto& it = areas_.find(storage_key);
-  if (it == areas_.end())
-    return;
-  it->second->storage_area()->ScheduleImmediateCommit();
-}
-
-void LocalStorageImpl::PutValueForTesting(
-    const blink::StorageKey& storage_key,
-    const std::vector<uint8_t>& key,
-    const std::vector<uint8_t>& value,
-    base::OnceCallback<void(bool)> callback) {
   if (connection_state_ != CONNECTION_FINISHED) {
-    return;
+    return nullptr;
   }
-
   const auto& it = areas_.find(storage_key);
   if (it == areas_.end()) {
+    return nullptr;
+  }
+  return it->second->storage_area();
+}
+
+void LocalStorageImpl::FlushStorageKeyForTesting(
+    const blink::StorageKey& storage_key) {
+  StorageAreaImpl* storage_area = GetStorageAreaForTesting(storage_key);
+  if (!storage_area) {
     return;
   }
-
-  it->second->storage_area()->Put(key, value, /*client_old_value=*/std::nullopt,
-                                  /*source=*/nullptr, std::move(callback));
+  storage_area->ScheduleImmediateCommit();
 }
 
 base::FilePath LocalStorageImpl::GetDatabasePath() const {
@@ -321,12 +314,7 @@ void LocalStorageImpl::ShutDown() {
     // Flush any uncommitted data.
     for (const auto& it : areas_) {
       auto* area = it.second->storage_area();
-      base::UmaHistogramBoolean("Storage.LocalStorage.ShutdownDroppedChanges",
-                                area->has_pending_load_read_write_tasks());
       area->ScheduleImmediateCommit();
-      // TODO(crbug.com/503422295): Monitor the above histogram, and if dropping
-      // changes is common then handle that here.
-      area->CancelAllPendingRequests();
     }
 
     if (database_ && !force_keep_session_state_ &&
@@ -472,12 +460,6 @@ void LocalStorageImpl::RunWhenConnected(base::OnceClosure callback) {
   std::move(callback).Run();
 }
 
-void LocalStorageImpl::PurgeAllStorageAreas() {
-  for (const auto& it : areas_)
-    it.second->storage_area()->CancelAllPendingRequests();
-  areas_.clear();
-}
-
 void LocalStorageImpl::InitiateConnection(bool in_memory_only) {
   CHECK_EQ(connection_state_, CONNECTION_IN_PROGRESS);
 
@@ -558,7 +540,7 @@ void LocalStorageImpl::DeleteAndRecreateDatabase(
 
   // We're about to set database_ to null, so delete the StorageAreaImpls
   // that might still be using the old database.
-  PurgeAllStorageAreas();
+  areas_.clear();
 
   // Reset state to be in process of connecting. This will cause requests for
   // StorageAreas to be queued until the connection is complete.

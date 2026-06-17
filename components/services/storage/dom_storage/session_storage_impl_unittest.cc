@@ -19,12 +19,15 @@
 #include "base/functional/callback_helpers.h"
 #include "base/run_loop.h"
 #include "base/strings/stringprintf.h"
+#include "base/system/sys_info.h"
 #include "base/task/sequenced_task_runner.h"
+#include "base/task/thread_pool.h"
 #include "base/test/bind.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
 #include "base/test/test_future.h"
+#include "base/threading/thread_restrictions.h"
 #include "base/token.h"
 #include "base/uuid.h"
 #include "build/build_config.h"
@@ -35,7 +38,6 @@
 #include "components/services/storage/dom_storage/test_support/fake_dom_storage_database.h"
 #include "components/services/storage/dom_storage/test_support/fake_dom_storage_database_factory.h"
 #include "components/services/storage/dom_storage/test_support/storage_area_test_util.h"
-#include "components/services/storage/public/mojom/storage_service.mojom.h"
 #include "mojo/public/cpp/bindings/remote.h"
 #include "mojo/public/cpp/system/functions.h"
 #include "testing/gtest/include/gtest/gtest.h"
@@ -80,8 +82,9 @@ class SessionStorageImplTestBase : public testing::Test {
   }
 
   void TearDown() override {
-    if (session_storage_)
+    if (session_storage_) {
       ShutDownSessionStorage();
+    }
     mojo::SetDefaultProcessErrorHandler(base::NullCallback());
   }
 
@@ -315,6 +318,9 @@ TEST_P(SessionStorageImplTest, StartupShutdownSave) {
   // namespace so it can be loaded again.
   session_storage()->DeleteNamespace(namespace_id1, true);
   ShutDownSessionStorage();
+  int expected_storage_areas_shutdown = 1;
+  histograms.ExpectUniqueSample("Storage.SessionStorage.ShutdownDroppedChanges",
+                                false, expected_storage_areas_shutdown);
 
   // This will re-initialize Session Storage and load the persisted namespace.
   session_storage()->CreateNamespace(namespace_id1);
@@ -326,10 +332,21 @@ TEST_P(SessionStorageImplTest, StartupShutdownSave) {
   EXPECT_EQ(1ul, data.size());
   area_n1.reset();
 
+  // On low end devices, `BindStorageArea()` purges the storage area loaded from
+  // disk before rebinding.
+  if (base::SysInfo::IsLowEndDeviceOrPartialLowEndModeEnabled()) {
+    ++expected_storage_areas_shutdown;
+  }
+  histograms.ExpectUniqueSample("Storage.SessionStorage.ShutdownDroppedChanges",
+                                false, expected_storage_areas_shutdown);
+
   // Delete the namespace, shut down Session Storage, and do not persist the
   // data.
   session_storage()->DeleteNamespace(namespace_id1, false);
   ShutDownSessionStorage();
+  ++expected_storage_areas_shutdown;
+  histograms.ExpectUniqueSample("Storage.SessionStorage.ShutdownDroppedChanges",
+                                false, expected_storage_areas_shutdown);
 
   // This will re-initialize Session Storage and the namespace should be empty.
   session_storage()->CreateNamespace(namespace_id1);
@@ -372,9 +389,9 @@ TEST_P(SessionStorageImplTest, StartupShutdownSave) {
       "Storage.SessionStorage.Duration.PutMetadata.OnDisk", 2);
 
   ShutDownSessionStorage();
-
+  ++expected_storage_areas_shutdown;
   histograms.ExpectUniqueSample("Storage.SessionStorage.ShutdownDroppedChanges",
-                                false, 1);
+                                false, expected_storage_areas_shutdown);
 }
 
 TEST_P(SessionStorageImplTest, ShutdownDroppedChanges) {
@@ -400,33 +417,138 @@ TEST_P(SessionStorageImplTest, ShutdownDroppedChanges) {
 
   // Reload the database.
   ShutDownSessionStorage();
-
+  int expected_storage_areas_shutdown = 1;
   histograms.ExpectUniqueSample("Storage.SessionStorage.ShutdownDroppedChanges",
-                                false, 1);
-
+                                false, expected_storage_areas_shutdown);
+  histograms.ExpectTotalCount("Storage.SessionStorage.ShutdownDroppedChanges",
+                              expected_storage_areas_shutdown);
   EnsureDatabaseOpen();
 
+  // Re-open the namespace.
   session_storage_impl()->CreateNamespace(namespace_id);
+  SessionStorageNamespaceImpl* namespace_impl =
+      session_storage_impl()->GetNamespaceForTesting(namespace_id);
+  ASSERT_NE(namespace_impl, nullptr);
 
+  // Re-open the storage area.
   area.reset();
   session_storage_impl()->BindStorageArea(storage_key, namespace_id,
                                           area.BindNewPipeAndPassReceiver());
+  StorageAreaImpl* storage_area_impl =
+      namespace_impl->GetStorageAreaForTesting(storage_key);
+  ASSERT_NE(storage_area_impl, nullptr);
 
-  auto key2 = StringViewToUint8Vector("key2");
-  auto value2 = StringViewToUint8Vector("value2");
+  // On low end devices, `BindStorageArea()` purges the storage area loaded from
+  // disk before rebinding.
+  if (base::SysInfo::IsLowEndDeviceOrPartialLowEndModeEnabled()) {
+    ++expected_storage_areas_shutdown;
+  }
+  histograms.ExpectUniqueSample("Storage.SessionStorage.ShutdownDroppedChanges",
+                                false, expected_storage_areas_shutdown);
+  histograms.ExpectTotalCount("Storage.SessionStorage.ShutdownDroppedChanges",
+                              expected_storage_areas_shutdown);
+
+  // Create a `RunLoop` that quits when the storage area starts loading.
+  base::RunLoop storage_area_loading_run_loop;
+  storage_area_impl->SetLoadingStartedCallbackForTesting(
+      storage_area_loading_run_loop.QuitClosure());
 
   // Put a value in the area, forcing the area to load and then immediately
   // shutdown while the area is loading.
-  session_storage_impl()->PutValueForTesting(
-      namespace_id, storage_key, key2, value2, /*callback=*/base::DoNothing());
+  auto key2 = StringViewToUint8Vector("key2");
+  auto value2 = StringViewToUint8Vector("value2");
+  area->Put(key2, value2, /*client_old_value=*/std::nullopt, /*source=*/nullptr,
+            /*callback=*/base::DoNothing());
+
+  // Shutdown immediately after the area starts loading.
+  storage_area_loading_run_loop.Run();
   ResetSessionStorage();
+  ++expected_storage_areas_shutdown;
 
   // Shutdown discards the put, which prevents `key2` and `value2` from
   // persisting to the database.
   histograms.ExpectBucketCount("Storage.SessionStorage.ShutdownDroppedChanges",
                                true, 1);
+  histograms.ExpectBucketCount("Storage.SessionStorage.ShutdownDroppedChanges",
+                               false, expected_storage_areas_shutdown - 1);
   histograms.ExpectTotalCount("Storage.SessionStorage.ShutdownDroppedChanges",
-                              2);
+                              expected_storage_areas_shutdown);
+
+  // Re-open the database, which allows test tear down to wait for shutdown to
+  // complete.
+  EnsureDatabaseOpen();
+}
+
+TEST_P(SessionStorageImplTest, ShutdownWithPendingSyncGetAll) {
+  std::string namespace_id = base::Uuid::GenerateRandomV4().AsLowercaseString();
+  session_storage()->CreateNamespace(namespace_id);
+
+  blink::StorageKey storage_key =
+      blink::StorageKey::CreateFromStringForTesting("http://foobar.com");
+
+  mojo::Remote<blink::mojom::StorageArea> area;
+  session_storage()->BindStorageArea(storage_key, namespace_id,
+                                     area.BindNewPipeAndPassReceiver());
+
+  // Add a key/value pair to the storage area.  Next time, the area will load as
+  // non-empty, providing the test an opportunity to drop tasks on shutdown
+  // during the load.
+  EXPECT_TRUE(
+      test::PutSync(area.get(), StringViewToUint8Vector("key1"),
+                    StringViewToUint8Vector("value1"), std::nullopt,
+                    test::MakeStorageAreaSource(GURL(), kTestSourceToken)));
+
+  // Reload the database.
+  ShutDownSessionStorage();
+  EnsureDatabaseOpen();
+
+  // Re-open the namespace.
+  session_storage_impl()->CreateNamespace(namespace_id);
+  SessionStorageNamespaceImpl* namespace_impl =
+      session_storage_impl()->GetNamespaceForTesting(namespace_id);
+  ASSERT_NE(namespace_impl, nullptr);
+
+  // Re-open the storage area.
+  area.reset();
+  session_storage_impl()->BindStorageArea(storage_key, namespace_id,
+                                          area.BindNewPipeAndPassReceiver());
+  StorageAreaImpl* storage_area_impl =
+      namespace_impl->GetStorageAreaForTesting(storage_key);
+  ASSERT_NE(storage_area_impl, nullptr);
+
+  // Create a `RunLoop` that quits when the storage area starts loading.
+  base::RunLoop storage_area_loading_run_loop;
+  storage_area_impl->SetLoadingStartedCallbackForTesting(
+      storage_area_loading_run_loop.QuitClosure());
+
+  // Use another sequence to simulate a renderer that uses synchronous mojo to
+  // get all of the map's key/value pairs.
+  base::RunLoop sync_get_all_run_loop;
+  mojo::PendingRemote<blink::mojom::StorageArea> pending_area = area.Unbind();
+  scoped_refptr<base::SequencedTaskRunner> mojo_task_runner =
+      base::ThreadPool::CreateSequencedTaskRunner(
+          /*task_traits=*/{});
+
+  mojo_task_runner->PostTask(
+      FROM_HERE, base::BindLambdaForTesting([&]() {
+        base::ScopedAllowBaseSyncPrimitivesForTesting sync_primitives;
+        mojo::Remote<blink::mojom::StorageArea> area(std::move(pending_area));
+
+        std::vector<blink::mojom::KeyValuePtr> data;
+        area->GetAll(/*new_observer=*/mojo::NullRemote(), &data);
+
+        // `SessionStorageImpl` dropped the `GetAll()` request during shutdown
+        // before it completed.
+        EXPECT_EQ(data.size(), 0u);
+        sync_get_all_run_loop.Quit();
+      }));
+
+  // Shutdown immediately after the area starts loading.
+  storage_area_loading_run_loop.Run();
+  ResetSessionStorage();
+
+  // Wait for the synchronous get all to finish.
+  sync_get_all_run_loop.Run();
 
   // Re-open the database, which allows test tear down to wait for shutdown to
   // complete.

@@ -16,6 +16,7 @@
 #include "base/run_loop.h"
 #include "base/strings/stringprintf.h"
 #include "base/task/sequenced_task_runner.h"
+#include "base/task/thread_pool.h"
 #include "base/test/bind.h"
 #include "base/test/gmock_expected_support.h"
 #include "base/test/metrics/histogram_tester.h"
@@ -23,17 +24,18 @@
 #include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
 #include "base/test/test_future.h"
+#include "base/threading/thread_restrictions.h"
 #include "build/build_config.h"
 #include "components/services/storage/dom_storage/db_status.h"
 #include "components/services/storage/dom_storage/dom_storage_constants.h"
 #include "components/services/storage/dom_storage/dom_storage_histogram_helper.h"
 #include "components/services/storage/dom_storage/features.h"
+#include "components/services/storage/dom_storage/storage_area_impl.h"
 #include "components/services/storage/dom_storage/test_support/dom_storage_database_testing.h"
 #include "components/services/storage/dom_storage/test_support/fake_dom_storage_database.h"
 #include "components/services/storage/dom_storage/test_support/fake_dom_storage_database_factory.h"
 #include "components/services/storage/dom_storage/test_support/storage_area_test_util.h"
 #include "components/services/storage/public/cpp/constants.h"
-#include "components/services/storage/public/mojom/storage_service.mojom.h"
 #include "components/services/storage/public/mojom/storage_usage_info.mojom.h"
 #include "mojo/public/cpp/bindings/remote.h"
 #include "net/base/features.h"
@@ -479,22 +481,104 @@ TEST_P(LocalStorageImplTest, ShutdownDroppedChanges) {
   blink::StorageKey storage_key =
       blink::StorageKey::CreateFromStringForTesting("http://foobar.com");
 
+  // Create the storage area.
   mojo::Remote<blink::mojom::StorageArea> area;
   context()->BindStorageArea(storage_key, area.BindNewPipeAndPassReceiver());
+  StorageAreaImpl* storage_area_impl =
+      context()->GetStorageAreaForTesting(storage_key);
+  ASSERT_NE(storage_area_impl, nullptr);
 
-  auto key = StdStringToUint8Vector("key");
-  auto value = StdStringToUint8Vector("value");
+  // Create a `RunLoop` that quits when the storage area starts loading.
+  base::RunLoop storage_area_loading_run_loop;
+  storage_area_impl->SetLoadingStartedCallbackForTesting(
+      storage_area_loading_run_loop.QuitClosure());
 
   // Put a value in the area, forcing the area to load and then immediately
   // shutdown while the area is loading.
-  context()->PutValueForTesting(storage_key, key, value,
-                                /*callback=*/base::DoNothing());
+  auto key = StdStringToUint8Vector("key");
+  auto value = StdStringToUint8Vector("value");
+  area->Put(key, value, /*client_old_value=*/std::nullopt, /*source=*/nullptr,
+            /*callback=*/base::DoNothing());
+
+  // Shutdown immediately after the area starts loading.
+  storage_area_loading_run_loop.Run();
   ResetStorage();
 
   // Shutdown discards the put, which prevents `key` and `value` from persisting
   // to the database.
   histograms.ExpectUniqueSample("Storage.LocalStorage.ShutdownDroppedChanges",
                                 true, 1);
+
+  // Re-open the database, which allows test tear down to wait for shutdown to
+  // complete.
+  InitializeStorage(storage_path());
+  WaitForDatabaseOpen();
+}
+
+TEST_P(LocalStorageImplTest, ShutdownWithPendingSyncGetAll) {
+  WaitForDatabaseOpen();
+
+  blink::StorageKey storage_key =
+      blink::StorageKey::CreateFromStringForTesting("http://foobar.com");
+
+  // Populate a storage area with one key/value pair.  This makes the get all
+  // request dropped during shutdown observable since it retrieves no key/value
+  // pairs.
+  mojo::Remote<blink::mojom::StorageArea> area;
+  context()->BindStorageArea(storage_key, area.BindNewPipeAndPassReceiver());
+
+  auto key = StdStringToUint8Vector("key");
+  auto value = StdStringToUint8Vector("value");
+
+  base::test::TestFuture<bool> success_future;
+  area->Put(key, value, std::nullopt, test::MakeStorageAreaSource(),
+            success_future.GetCallback());
+  EXPECT_TRUE(success_future.Take());
+
+  // Reload the database.
+  ShutDownStorage();
+  InitializeStorage(storage_path());
+  WaitForDatabaseOpen();
+
+  // Re-open the storage area.
+  area.reset();
+  context()->BindStorageArea(storage_key, area.BindNewPipeAndPassReceiver());
+  StorageAreaImpl* storage_area_impl =
+      context()->GetStorageAreaForTesting(storage_key);
+  ASSERT_NE(storage_area_impl, nullptr);
+
+  // Create a `RunLoop` that quits when the storage area starts loading.
+  base::RunLoop storage_area_loading_run_loop;
+  storage_area_impl->SetLoadingStartedCallbackForTesting(
+      storage_area_loading_run_loop.QuitClosure());
+
+  // Use another sequence to simulate a renderer that uses synchronous mojo to
+  // get all of the map's key/value pairs.
+  base::RunLoop sync_get_all_run_loop;
+  mojo::PendingRemote<blink::mojom::StorageArea> pending_area = area.Unbind();
+
+  scoped_refptr<base::SequencedTaskRunner> mojo_task_runner =
+      base::ThreadPool::CreateSequencedTaskRunner(/*task_traits=*/{});
+  mojo_task_runner->PostTask(
+      FROM_HERE, base::BindLambdaForTesting([&]() {
+        base::ScopedAllowBaseSyncPrimitivesForTesting sync_primitives;
+        mojo::Remote<blink::mojom::StorageArea> area(std::move(pending_area));
+
+        std::vector<blink::mojom::KeyValuePtr> data;
+        area->GetAll(/*new_observer=*/mojo::NullRemote(), &data);
+
+        // `LocalStorageImpl` dropped the `GetAll()` request during shutdown
+        // before it completed.
+        EXPECT_EQ(data.size(), 0u);
+        sync_get_all_run_loop.Quit();
+      }));
+
+  // Shutdown immediately after the area starts loading.
+  storage_area_loading_run_loop.Run();
+  ResetStorage();
+
+  // Wait for the synchronous get all to finish.
+  sync_get_all_run_loop.Run();
 
   // Re-open the database, which allows test tear down to wait for shutdown to
   // complete.
