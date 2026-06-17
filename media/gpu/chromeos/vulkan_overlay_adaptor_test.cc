@@ -802,7 +802,7 @@ TEST_P(VulkanOverlayAdaptorTest, Correctness) {
   auto in_mailbox = gpu::Mailbox::Generate();
   auto out_mailbox = gpu::Mailbox::Generate();
 
-  test::Image image(media::g_source_directory.Append(
+  test::Image image(media::GetSourceDir().Append(
       base::FilePath(is_10bit ? kMT2TImage : kMM21Image)));
   ASSERT_TRUE(image.Load());
   gfx::Size size(
@@ -1035,9 +1035,9 @@ int main(int argc, char** argv) {
     }
 
     if (it->first == "source_directory") {
-      media::g_source_directory = base::FilePath(it->second);
+      media::GetSourceDir() = base::FilePath(it->second);
     } else if (it->first == "output_directory") {
-      media::g_output_directory = base::FilePath(it->second);
+      media::GetOutputDir() = base::FilePath(it->second);
     } else {
       std::cout << "unknown option: --" << it->first << "\n"
                 << media::usage_msg;
