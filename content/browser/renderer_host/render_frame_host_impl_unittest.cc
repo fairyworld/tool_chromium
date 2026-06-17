@@ -452,18 +452,21 @@ TEST_F(RenderFrameHostImplTest, FaviconURLsSet) {
 
   std::vector<blink::mojom::FaviconURLPtr> one_favicon_url;
   one_favicon_url.push_back(blink::mojom::FaviconURL::New(kFavicon));
-  main_rfh->UpdateFaviconURL(std::move(one_favicon_url));
+  main_rfh->UpdateFaviconURL(std::move(one_favicon_url),
+                             blink::mojom::FaviconUpdateReason::kPageLoad);
   EXPECT_EQ(1u, contents()->GetFaviconURLs().size());
 
   std::vector<blink::mojom::FaviconURLPtr> two_favicon_urls;
   two_favicon_urls.push_back(blink::mojom::FaviconURL::New(kFavicon));
   two_favicon_urls.push_back(blink::mojom::FaviconURL::New(kFavicon));
-  main_rfh->UpdateFaviconURL(std::move(two_favicon_urls));
+  main_rfh->UpdateFaviconURL(std::move(two_favicon_urls),
+                             blink::mojom::FaviconUpdateReason::kPageLoad);
   EXPECT_EQ(2u, contents()->GetFaviconURLs().size());
 
   std::vector<blink::mojom::FaviconURLPtr> another_one_favicon_url;
   another_one_favicon_url.push_back(blink::mojom::FaviconURL::New(kFavicon));
-  main_rfh->UpdateFaviconURL(std::move(another_one_favicon_url));
+  main_rfh->UpdateFaviconURL(std::move(another_one_favicon_url),
+                             blink::mojom::FaviconUpdateReason::kPageLoad);
   EXPECT_EQ(1u, contents()->GetFaviconURLs().size());
 }
 
@@ -483,7 +486,8 @@ TEST_F(RenderFrameHostImplTest, FaviconURLsResetWithNavigation) {
   navigation->Commit();
 
   EXPECT_EQ(0u, contents()->GetFaviconURLs().size());
-  main_rfh->UpdateFaviconURL(std::move(favicon_urls));
+  main_rfh->UpdateFaviconURL(std::move(favicon_urls),
+                             blink::mojom::FaviconUpdateReason::kPageLoad);
   EXPECT_EQ(1u, contents()->GetFaviconURLs().size());
 
   navigation = NavigationSimulator::CreateBrowserInitiated(

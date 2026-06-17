@@ -2558,8 +2558,8 @@ class CONTENT_EXPORT RenderFrameHostImpl
                               RunBeforeUnloadConfirmCallback callback) override;
   void MaybeStartOutermostMainFrameNavigation(
       const std::vector<GURL>& urls) override;
-  void UpdateFaviconURL(
-      std::vector<blink::mojom::FaviconURLPtr> favicon_urls) override;
+  void UpdateFaviconURL(std::vector<blink::mojom::FaviconURLPtr> favicon_urls,
+                        blink::mojom::FaviconUpdateReason reason) override;
   void DownloadURL(blink::mojom::DownloadURLParamsPtr params) override;
   void FocusedElementChanged(bool is_editable_element,
                              bool is_richly_editable_element,
