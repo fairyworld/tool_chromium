@@ -10,17 +10,13 @@ import static org.chromium.chrome.browser.share.ShareDelegate.ShareOrigin.TAB_ST
 import static org.chromium.chrome.browser.tabmodel.TabGroupUtils.createNewGroupForTabs;
 import static org.chromium.chrome.browser.tabmodel.TabGroupUtils.mergeTabsToDest;
 import static org.chromium.chrome.browser.tasks.tab_management.GroupWindowState.IN_CURRENT_CLOSING;
-import static org.chromium.components.tab_groups.TabGroupColorPickerUtils.getTabGroupColorPickerItemColor;
 import static org.chromium.ui.listmenu.BasicListMenu.buildMenuDivider;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.view.View.OnClickListener;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.IdRes;
 import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
@@ -1107,7 +1103,12 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
                             .withTitle(label)
                             .withClickListener(clickListener)
                             .withIsIncognito(false)
-                            .withStartIconDrawable(getCircleDrawable(colorId, false))
+                            .withStartIconDrawable(
+                                    TabGroupUtils.createColorDrawableForMenu(
+                                            mActivity,
+                                            colorId,
+                                            /* isIncognito= */ false,
+                                            mCircleSize))
                             .withStartIconWidth(mCircleSize)
                             .withShouldTintIcon(false)
                             .build());
@@ -1139,28 +1140,16 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
                             .withClickListener(clickListener)
                             .withIsIncognito(true)
                             .withStartIconDrawable(
-                                    getCircleDrawable(
-                                            getTabModel().getTabGroupColor(groupId), true))
+                                    TabGroupUtils.createColorDrawableForMenu(
+                                            mActivity,
+                                            getTabModel().getTabGroupColor(groupId),
+                                            /* isIncognito= */ true,
+                                            mCircleSize))
                             .withStartIconWidth(mCircleSize)
                             .withShouldTintIcon(false)
                             .build());
         }
         return result;
-    }
-
-    private @Nullable Drawable getCircleDrawable(
-            @TabGroupColorId int colorId, boolean isIncognito) {
-        Drawable sourceDrawable = mActivity.getDrawable(R.drawable.tab_group_dialog_color_icon);
-
-        if (sourceDrawable == null) return null;
-
-        GradientDrawable circleDrawable = (GradientDrawable) sourceDrawable.mutate();
-        @ColorInt int color = getTabGroupColorPickerItemColor(mActivity, colorId, isIncognito);
-        circleDrawable.setColor(color);
-
-        circleDrawable.setSize(mCircleSize, mCircleSize);
-
-        return circleDrawable;
     }
 
     @Override

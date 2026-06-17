@@ -10,7 +10,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.InsetDrawable;
 import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.View;
@@ -82,6 +82,7 @@ import org.chromium.chrome.browser.supervised_user.SupervisedUserServiceBridge;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabFavicon;
 import org.chromium.chrome.browser.tabmodel.TabGroupTitleUtils;
+import org.chromium.chrome.browser.tabmodel.TabGroupUtils;
 import org.chromium.chrome.browser.tabmodel.TabModel;
 import org.chromium.chrome.browser.tabmodel.TabModelSelector;
 import org.chromium.chrome.browser.toolbar.ToolbarManager;
@@ -115,7 +116,6 @@ import org.chromium.components.image_fetcher.ImageFetcherConfig;
 import org.chromium.components.image_fetcher.ImageFetcherFactory;
 import org.chromium.components.sync_device_info.FormFactor;
 import org.chromium.components.tab_groups.TabGroupColorId;
-import org.chromium.components.tab_groups.TabGroupColorPickerUtils;
 import org.chromium.components.user_prefs.UserPrefs;
 import org.chromium.content_public.browser.ContentFeatureList;
 import org.chromium.content_public.browser.ContentFeatureMap;
@@ -943,16 +943,18 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
     }
 
     private Drawable getTabGroupDrawable(@TabGroupColorId int color) {
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setShape(GradientDrawable.OVAL);
-        drawable.setColor(
-                TabGroupColorPickerUtils.getTabGroupColorPickerItemColor(
-                        mContext, color, isIncognitoShowing()));
-        int size =
+        int circleSize =
                 mContext.getResources()
-                        .getDimensionPixelSize(R.dimen.compositor_tab_title_favicon_size);
-        drawable.setSize(size, size);
-        return drawable;
+                        .getDimensionPixelSize(R.dimen.tab_group_nested_menu_color_icon_size);
+        int iconSize =
+                mContext.getResources()
+                        .getDimensionPixelSize(org.chromium.ui.R.dimen.list_menu_item_icon_size);
+        Drawable colorDrawable =
+                TabGroupUtils.createColorDrawableForMenu(
+                        mContext, color, isIncognitoShowing(), circleSize);
+        int inset = (iconSize - circleSize) / 2;
+        return new InsetDrawable(
+                colorDrawable, /* leftInset= */ 0, inset, /* rightInset= */ 0, inset);
     }
 
     private List<ListItem> getTabGroupsSubmenuItems(@Nullable Tab currentTab) {
