@@ -52,6 +52,8 @@
 #import "ios/chrome/browser/shared/public/commands/scene_commands.h"
 #import "ios/chrome/browser/shared/public/commands/settings_commands.h"
 #import "ios/chrome/browser/shared/public/commands/snackbar_commands.h"
+#import "ios/chrome/browser/signin/model/authentication_service.h"
+#import "ios/chrome/browser/signin/model/authentication_service_factory.h"
 #import "ios/chrome/browser/signin/model/identity_manager_factory.h"
 #import "ios/chrome/browser/sync/model/sync_service_factory.h"
 #import "ios/chrome/grit/ios_strings.h"
@@ -650,6 +652,14 @@
       IdentityManagerFactory::GetForProfile(self.profile);
   if (identityManager->HasPrimaryAccount(signin::ConsentLevel::kSignin)) {
     [self startCredentialImportCoordinator];
+    return;
+  }
+
+  AuthenticationService* authenticationService =
+      AuthenticationServiceFactory::GetForProfile(self.profile);
+  if (!authenticationService->SigninEnabled()) {
+    // TODO(crbug.com/450982128): Display some error message to the user.
+    self.credentialImportUUID = nil;
     return;
   }
 
