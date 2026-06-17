@@ -35,12 +35,6 @@ chromium-metrics-reviews@google.com.
 
 <!-- LINT.ThenChange(//chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ChromeContextMenuPopulator.java:ContextualCustomActionType) -->
 
-<enum name="CustomTabsAuthScheme">
-  <int value="0" label="Other/Custom"/>
-  <int value="1" label="HTTP"/>
-  <int value="2" label="HTTPS"/>
-</enum>
-
 <enum name="CustomTabsBrandingAppIdType">
   <summary>Used by CustomTabs.Branding.AppIdType</summary>
   <int value="0" label="INVALID"/>
