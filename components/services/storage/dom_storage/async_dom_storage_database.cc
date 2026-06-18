@@ -7,19 +7,20 @@
 #include "base/files/file_path.h"
 #include "base/functional/callback_helpers.h"
 #include "base/metrics/histogram_functions.h"
+#include "base/strings/strcat.h"
 #include "base/task/bind_post_task.h"
 
 namespace storage {
 
 namespace {
 
-// Records the duration of an operation to a histogram suffixed with
-// ".InMemory" or ".OnDisk".
+// Records the duration of an operation to a histogram with the suffix
+// corresponding to `metrics_type`.
 void RecordDuration(const std::string& histogram_name,
-                    bool in_memory,
+                    DatabaseMetricsType metrics_type,
                     base::TimeTicks start_time) {
   base::UmaHistogramTimes(
-      histogram_name + (in_memory ? ".InMemory" : ".OnDisk"),
+      base::StrCat({histogram_name, GetHistogramSuffix(metrics_type)}),
       base::TimeTicks::Now() - start_time);
 }
 
@@ -27,26 +28,26 @@ void RecordDuration(const std::string& histogram_name,
 template <typename T>
 void RecordExpectedAndDuration(const std::string& status_histogram_name,
                                const std::string& duration_histogram_name,
-                               bool in_memory,
+                               DatabaseMetricsType metrics_type,
                                base::TimeTicks start_time,
                                const StatusOr<T>& result) {
-  RecordDuration(duration_histogram_name, in_memory, start_time);
+  RecordDuration(duration_histogram_name, metrics_type, start_time);
 
   if (result.has_value()) {
-    DbStatus::OK().Log(status_histogram_name, in_memory);
+    DbStatus::OK().Log(status_histogram_name, metrics_type);
   } else {
-    result.error().Log(status_histogram_name, in_memory);
+    result.error().Log(status_histogram_name, metrics_type);
   }
 }
 
 // Records status and duration histograms for a `DbStatus` result.
 void RecordStatusAndDuration(const std::string& status_histogram_name,
                              const std::string& duration_histogram_name,
-                             bool in_memory,
+                             DatabaseMetricsType metrics_type,
                              base::TimeTicks start_time,
                              const DbStatus& status) {
-  RecordDuration(duration_histogram_name, in_memory, start_time);
-  status.Log(status_histogram_name, in_memory);
+  RecordDuration(duration_histogram_name, metrics_type, start_time);
+  status.Log(status_histogram_name, metrics_type);
 }
 
 }  // namespace
@@ -302,16 +303,18 @@ void AsyncDomStorageDatabase::RunTaskOnDbSequenceAndRecordHistograms(
   database_.PostTaskWithThisObject(base::BindOnce(
       [](base::OnceCallback<DbStatus(DomStorageDatabase*)> db_task,
          std::string status_histogram_name, std::string duration_histogram_name,
-         bool in_memory, StatusCallback callback,
+         DatabaseMetricsType metrics_type, StatusCallback callback,
          DomStorageDatabase* database) {
         base::TimeTicks start = base::TimeTicks::Now();
         DbStatus status = std::move(db_task).Run(database);
         RecordStatusAndDuration(status_histogram_name, duration_histogram_name,
-                                in_memory, start, status);
+                                metrics_type, start, status);
         std::move(callback).Run(std::move(status));
       },
       std::move(db_task), GetHistogram(operation),
-      GetDurationHistogram(operation), in_memory_,
+      GetDurationHistogram(operation),
+      in_memory_ ? DatabaseMetricsType::kInMemory
+                 : DatabaseMetricsType::kOnDisk,
       base::BindPostTaskToCurrentDefault(std::move(callback))));
 }
 
@@ -323,17 +326,20 @@ void AsyncDomStorageDatabase::RunTaskOnDbSequenceAndRecordHistograms(
   database_.PostTaskWithThisObject(base::BindOnce(
       [](base::OnceCallback<StatusOr<T>(DomStorageDatabase*)> db_task,
          std::string status_histogram_name, std::string duration_histogram_name,
-         bool in_memory, base::OnceCallback<void(StatusOr<T>)> callback,
+         DatabaseMetricsType metrics_type,
+         base::OnceCallback<void(StatusOr<T>)> callback,
          DomStorageDatabase* database) {
         base::TimeTicks start = base::TimeTicks::Now();
         StatusOr<T> result = std::move(db_task).Run(database);
         RecordExpectedAndDuration(status_histogram_name,
-                                  duration_histogram_name, in_memory, start,
+                                  duration_histogram_name, metrics_type, start,
                                   result);
         std::move(callback).Run(std::move(result));
       },
       std::move(db_task), GetHistogram(operation),
-      GetDurationHistogram(operation), in_memory_,
+      GetDurationHistogram(operation),
+      in_memory_ ? DatabaseMetricsType::kInMemory
+                 : DatabaseMetricsType::kOnDisk,
       base::BindPostTaskToCurrentDefault(std::move(callback))));
 }
 

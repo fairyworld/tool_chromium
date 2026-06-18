@@ -820,7 +820,8 @@ void SessionStorageImpl::OnDBDestroyed(bool recreate_in_memory,
                                        DbStatus status) {
   // Destroy is only called when the database is on disk (see !in_memory_ guard
   // in DeleteAndRecreateDatabase), so in_memory is always false here.
-  status.Log("Storage.SessionStorage.DestroyDatabase", /*in_memory=*/false);
+  status.Log("Storage.SessionStorage.DestroyDatabase",
+             DatabaseMetricsType::kOnDisk);
   CHECK(recovery_state_);
   recovery_state_->AddDestroyResult(status.ok());
   InitiateConnection(recreate_in_memory);
