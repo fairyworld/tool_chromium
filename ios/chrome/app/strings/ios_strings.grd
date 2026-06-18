@@ -6859,6 +6859,15 @@ Handoff must also be enabled in the General section of Settings, and your device
       <message name="IDS_IOS_SAVE_TO_DRIVE_ACCOUNT_PICKER_TITLE" desc="Dialog title to invite the user to pick a destination for their download (e.g. Files or Drive) and if applicable (e.g. they choose Drive) an account to save a file as. [iOS only]">
         Save in…
       </message>
+      <message name="IDS_IOS_SAVE_TO_DRIVE_CONFIRM_CHANGE_PROFILE_BUTTON" desc="Button label for a confirmation dialog that appears when a user tries to save a file to Google Drive while a different profile is active. [Length: 25em] [iOS only]" meaning="User is in the process of saving a file to Google Drive, and then tries to switch profiles. This dialog is shown to confirm the profile switch.">
+        Switch Profiles
+      </message>
+      <message name="IDS_IOS_SAVE_TO_DRIVE_CONFIRM_CHANGE_PROFILE_MESSAGE" desc="Message for a confirmation dialog that appears when a user tries to save a file to Google Drive while a different profile is active. [Length: 25em] [iOS only]" meaning="User is in the process of saving a file to Google Drive, and then tries to switch profiles. This dialog is shown to confirm the profile switch.">
+        This means you will lose your unsaved file and current tabs
+      </message>
+      <message name="IDS_IOS_SAVE_TO_DRIVE_CONFIRM_CHANGE_PROFILE_TITLE" desc="Title for a confirmation dialog that appears when a user tries to save a file to Google Drive while a different profile is active. [Length: 25em] [iOS only]" meaning="User is in the process of saving a file to Google Drive, and then tries to switch profiles. This dialog is shown to confirm the profile switch.">
+        You're about to switch profiles
+      </message>
       <message name="IDS_IOS_SAVE_TO_PHOTOS_ACCOUNT_PICKER_ASK_EVERY_TIME" desc="Switch label to let the user choose whether they want to pick an account every time. [iOS only]">
         Ask which account to use every time
       </message>

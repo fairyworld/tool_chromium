@@ -146,6 +146,7 @@ source_set("eg2_tests") {
     ":file_destination_picker_constants",
     "//components/policy:policy_code_generate",
     "//components/policy/core/common",
+    "//components/strings:components_strings_grit",
     "//ios/chrome/app/strings",
     "//ios/chrome/browser/account_picker/ui_bundled/account_picker_confirmation:constants",
     "//ios/chrome/browser/account_picker/ui_bundled/account_picker_screen",
