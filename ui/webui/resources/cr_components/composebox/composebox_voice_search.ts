@@ -197,8 +197,6 @@ export class ComposeboxVoiceSearchElement extends
       /**
        * Maximum number of characters recognized before force-submitting a
        * query. Includes characters of non-confident recognition transcripts.
-       * TODO(crbug.com/510393520): Enforce a 120-character limit for the
-       * Searchbox surface.
        */
       queryLengthLimit: {type: Number},
       /**

@@ -2638,23 +2638,29 @@ suite('NewTabPageAppTest', () => {
       await microtasksFinished();
     }
 
-    test('Disabled: renders legacy overlay and not new dialog', async () => {
-      loadTimeData.overrideValues({
-        voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: false,
-      });
-      await recreateApp();
+    test(
+        'renders legacy overlay when NTP searchbox (realbox) voice search ' +
+            'coherence with live transcription is disabled',
+        async () => {
+          loadTimeData.overrideValues({
+            voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: false,
+          });
+          await recreateApp();
 
-      // Act.
-      $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
-      await microtasksFinished();
+          // Act.
+          $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
+          await microtasksFinished();
 
-      // Assert.
-      assertTrue(!!app.shadowRoot.querySelector('ntp-voice-search-overlay'));
-      assertFalse(!!app.shadowRoot.querySelector('#voiceSearchDialog'));
-    });
+          // Assert.
+          assertTrue(
+              !!app.shadowRoot.querySelector('ntp-voice-search-overlay'));
+          assertFalse(!!app.shadowRoot.querySelector('#voiceSearchDialog'));
+        });
 
     test(
-        'Enabled: dialog handles cancel, error, and final result', async () => {
+        'dialog handles cancel, error, and final result when NTP searchbox ' +
+            '(realbox) voice search coherence with live transcription is enabled',
+        async () => {
           loadTimeData.overrideValues({
             voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
             voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: true,
@@ -2733,7 +2739,10 @@ suite('NewTabPageAppTest', () => {
           assertEquals(true, args[6]);           // isVoiceSearch
         });
 
-    test('Enabled: dialog handles recording stopped event', async () => {
+    test(
+        'dialog handles recording stopped event when NTP searchbox (realbox) ' +
+            'voice search coherence with live transcription is enabled',
+        async () => {
       loadTimeData.overrideValues({
         voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
         voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: true,
@@ -2794,7 +2803,8 @@ suite('NewTabPageAppTest', () => {
     });
 
     test(
-        'Without Transcript: renders TicTac animation and stop/submit buttons',
+        'renders TicTac animation and stop/submit buttons when NTP searchbox ' +
+            '(realbox) voice search coherence with live transcription is disabled',
         async () => {
           loadTimeData.overrideValues({
             voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
@@ -2844,7 +2854,8 @@ suite('NewTabPageAppTest', () => {
         });
 
     test(
-        'With Transcript: renders live transcript textarea and action buttons',
+        'renders live transcript textarea and action buttons when NTP searchbox ' +
+            '(realbox) voice search coherence with live transcription is enabled',
         async () => {
           loadTimeData.overrideValues({
             voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
@@ -3084,35 +3095,46 @@ suite('NewTabPageAppTest', () => {
             assertEquals('test query', submitArgs[0]);
           });
 
-      test('queryLengthLimit = 120 force-submits long queries', async () => {
-        loadTimeData.overrideValues({
-          voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
-        });
-        await recreateApp();
+      test(
+          'force-submits query when voice recognition text exceeds 120 ' +
+              'character limit and NTP searchbox (realbox) voice search ' +
+              'coherence experiment is enabled',
+          async () => {
+            loadTimeData.overrideValues({
+              voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
+            });
+            await recreateApp();
 
-        // Open voice search dialog.
-        const searchbox = $$(app, '#searchbox');
-        assertTrue(!!searchbox);
-        searchbox.dispatchEvent(new Event('open-voice-search'));
-        await microtasksFinished();
+            // Open voice search dialog.
+            const searchbox = $$(app, '#searchbox');
+            assertTrue(!!searchbox);
+            searchbox.dispatchEvent(new Event('open-voice-search'));
+            await microtasksFinished();
 
-        const voiceSearch =
-            app.shadowRoot.querySelector('cr-composebox-voice-search');
-        assertTrue(!!voiceSearch);
+            const voiceSearch =
+                app.shadowRoot.querySelector('cr-composebox-voice-search');
+            assertTrue(!!voiceSearch);
+            assertEquals(120, voiceSearch.queryLengthLimit);
 
-        // Construct a long transcript exceeding the limit (120 chars).
-        const longTranscript = 'a'.repeat(121);
+            // Send an interim result within the limit (120 chars) and verify no
+            // submit.
+            const exactLimitTranscript = 'a'.repeat(120);
+            mockSpeechRecognition.onresult!
+                (createResults(exactLimitTranscript, /*isFinal=*/ false));
+            await microtasksFinished();
+            assertEquals(0, searchboxHandler.getCallCount('submitQuery'));
 
-        // Send an interim result (isFinal = false).
-        const results = createResults(longTranscript, /*isFinal=*/ false);
-        mockSpeechRecognition.onresult!(results);
-        await microtasksFinished();
+            // Construct a long transcript exceeding the limit (121 chars).
+            const longTranscript = 'a'.repeat(121);
+            mockSpeechRecognition.onresult!
+                (createResults(longTranscript, /*isFinal=*/ false));
+            await microtasksFinished();
 
-        // Verify that the query is force-submitted.
-        assertEquals(1, searchboxHandler.getCallCount('submitQuery'));
-        const submitArgs = searchboxHandler.getArgs('submitQuery')[0];
-        assertEquals(longTranscript, submitArgs[0]);
-      });
+            // Verify that the query is force-submitted.
+            assertEquals(1, searchboxHandler.getCallCount('submitQuery'));
+            const submitArgs = searchboxHandler.getArgs('submitQuery')[0];
+            assertEquals(longTranscript, submitArgs[0]);
+          });
 
       test(
           'dynamicTimeoutEnabled = true configures speech recognition and ' +
