@@ -60,11 +60,13 @@
 
 #showcase-description {
   align-items: flex-start;
+  color: var(--color-sys-on-surface);
   flex-direction: column;
   justify-content: flex-start;
 }
 
 #showcase-text {
+  color: var(--color-sys-on-surface);
   display: flex;
   flex-direction: column;
   gap: var(--showcase-text-gap_);

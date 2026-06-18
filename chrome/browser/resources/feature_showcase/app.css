@@ -12,6 +12,10 @@
   --child-max-width: 500px;
   --content-gap: 24px;
   --content-width: calc(2 * var(--child-max-width) + var(--content-gap));
+  --color-button-background-prominent: var(--color-sys-primary);
+  --color-button-foreground-prominent: var(--color-sys-on-primary);
+  --color-button-foreground: var(--color-sys-primary);
+  --color-button-border: var(--color-sys-tonal-outline);
 }
 
 #viewManager {
