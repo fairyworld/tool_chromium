@@ -60,6 +60,7 @@ import org.chromium.base.Callback;
 import org.chromium.base.ThreadUtils;
 import org.chromium.base.test.util.Batch;
 import org.chromium.base.test.util.CommandLineFlags;
+import org.chromium.base.test.util.Criteria;
 import org.chromium.base.test.util.CriteriaHelper;
 import org.chromium.base.test.util.DisableIf;
 import org.chromium.base.test.util.Features.DisableFeatures;
@@ -458,7 +459,8 @@ public class TouchToFillViewTest {
                 });
 
         BottomSheetTestSupport.waitForOpen(mBottomSheetController);
-        assertThat(getCredentials().getChildCount(), is(4));
+        pollUiThread(() -> Criteria.checkThat(getCredentials().getChildCount(), is(4)));
+
         assertThat(getCredentialOriginAt(0).getVisibility(), is(View.GONE));
         assertThat(getCredentialNameAt(0).getText(), is(ANA.getFormattedUsername()));
         assertThat(getCredentialPasswordOrContextAt(0).getText(), is(ANA.getPassword()));
