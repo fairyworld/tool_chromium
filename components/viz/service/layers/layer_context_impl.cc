@@ -1641,15 +1641,8 @@ base::expected<void, std::string> DeserializeAnimation(
                 *wire_model, *animation));
         break;
       case mojom::AnimationKeyframeValue::Tag::kSize:
-        RETURN_IF_ERROR(
-            DeserializeAnimationCurve<gfx::KeyframedSizeAnimationCurve>(
-                *wire_model, *animation));
-        break;
       case mojom::AnimationKeyframeValue::Tag::kRect:
-        RETURN_IF_ERROR(
-            DeserializeAnimationCurve<gfx::KeyframedRectAnimationCurve>(
-                *wire_model, *animation));
-        break;
+        return base::unexpected("Unsupported keyframe value type");
       case mojom::AnimationKeyframeValue::Tag::kTransform:
         RETURN_IF_ERROR(
             DeserializeAnimationCurve<gfx::KeyframedTransformAnimationCurve>(
