@@ -1951,4 +1951,35 @@ IN_PROC_BROWSER_TEST_F(SearchPreloadBrowserTest_Throttle,
       {SearchPreloadSignalResult::kNotTriggeredThrottledByPrewarm});
 }
 
+// Browser tests for Search Preload with initial No-Vary-Search hint.
+class SearchPreloadBrowserTest_InitialNoVarySearch
+    : public SearchPreloadBrowserTestBase {
+  void InitFeatures(
+      base::test::ScopedFeatureList& scoped_feature_list) override {
+    scoped_feature_list.InitWithFeaturesAndParameters(
+        {
+            {
+                features::kDsePreload2,
+                {
+                    {"kDsePreload2DeviceMemoryThresholdMiB", "0"},
+                    {"dse_preload2_initial_no_vary_search_hint",
+                     "key-order, params, except=(\"q\")"},
+                },
+            },
+        },
+        /*disabled_features=*/{});
+  }
+};
+
+// Verifies that the initial No-Vary-Search hint is loaded from the feature
+// parameter.
+IN_PROC_BROWSER_TEST_F(SearchPreloadBrowserTest_InitialNoVarySearch,
+                       InitialHintLoaded) {
+  std::optional<net::HttpNoVarySearchData> expected =
+      ParseNoVarySearchData(R"(key-order, params, except=("q"))");
+  ASSERT_TRUE(expected.has_value());
+  EXPECT_EQ(GetSearchPreloadService().GetNoVarySearchDataCacheForTesting(),
+            expected);
+}
+
 }  // namespace
