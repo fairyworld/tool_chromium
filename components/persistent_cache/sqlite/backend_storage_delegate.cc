@@ -14,23 +14,42 @@
 #include "components/persistent_cache/sqlite/sqlite_backend_impl.h"
 #include "components/persistent_cache/sqlite/vfs_util.h"
 #include "components/sqlite_vfs/client.h"
+#include "components/sqlite_vfs/file_set_error.h"
 #include "components/sqlite_vfs/pending_file_set.h"
 #include "components/sqlite_vfs/sqlite_database_vfs_file_set.h"
 #include "components/sqlite_vfs/vfs_utils.h"
 
 namespace persistent_cache::sqlite {
 
-std::optional<PendingBackend> BackendStorageDelegate::MakePendingBackend(
-    Client client,
-    const base::FilePath& directory,
-    const base::FilePath& base_name,
-    bool single_connection,
-    bool journal_mode_wal) {
+namespace {
+
+TransactionError FileSetErrorToTransactionError(
+    sqlite_vfs::FileSetError error) {
+  switch (error) {
+    case sqlite_vfs::FileSetError::kTransient:
+      return TransactionError::kTransient;
+
+    case sqlite_vfs::FileSetError::kPermanent:
+      return TransactionError::kConnectionError;
+
+    case sqlite_vfs::FileSetError::kPermanentRequireDeletion:
+      return TransactionError::kPermanent;
+  }
+}
+
+}  // namespace
+
+base::expected<PendingBackend, TransactionError>
+BackendStorageDelegate::MakePendingBackend(Client client,
+                                           const base::FilePath& directory,
+                                           const base::FilePath& base_name,
+                                           bool single_connection,
+                                           bool journal_mode_wal) {
   ASSIGN_OR_RETURN(auto pending_file_set,
                    sqlite_vfs::MakePendingFileSet(
                        VfsClientFromClient(client), directory, base_name,
                        single_connection, journal_mode_wal),
-                   [](sqlite_vfs::FileSetError) { return std::nullopt; });
+                   &FileSetErrorToTransactionError);
   return PendingBackend(std::move(pending_file_set));
 }
 
@@ -40,12 +59,10 @@ BackendStorageDelegate::MakeBackend(Client client,
                                     const base::FilePath& base_name,
                                     bool single_connection,
                                     bool journal_mode_wal) {
-  if (auto pending_backend = MakePendingBackend(
-          client, directory, base_name, single_connection, journal_mode_wal);
-      pending_backend.has_value()) {
-    return SqliteBackendImpl::Bind(*std::move(pending_backend), client);
-  }
-  return base::unexpected(TransactionError::kConnectionError);
+  ASSIGN_OR_RETURN(auto pending_backend,
+                   MakePendingBackend(client, directory, base_name,
+                                      single_connection, journal_mode_wal));
+  return SqliteBackendImpl::Bind(std::move(pending_backend), client);
 }
 
 std::optional<PendingBackend> BackendStorageDelegate::ShareReadOnlyConnection(
