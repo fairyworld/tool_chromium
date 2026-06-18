@@ -12,6 +12,7 @@ import {PageCallbackRouter, PageHandlerRemote} from 'chrome://resources/cr_compo
 import type {ComposeboxFaviconGroupElement} from 'chrome://resources/cr_components/composebox/composebox_favicon_group.js';
 import {ContextUploadErrorType, ContextUploadStatus, InputType, ToolMode} from 'chrome://resources/cr_components/composebox/composebox_query.mojom-webui.js';
 import type {InputState} from 'chrome://resources/cr_components/composebox/composebox_query.mojom-webui.js';
+import type {ContextualEntrypointButtonElement} from 'chrome://resources/cr_components/composebox/contextual_entrypoint_button.js';
 import type {ComposeboxFileCarouselElement} from 'chrome://resources/cr_components/composebox/file_carousel.js';
 import {WindowProxy} from 'chrome://resources/cr_components/composebox/window_proxy.js';
 import {GlowAnimationState} from 'chrome://resources/cr_components/search/constants.js';
@@ -24,6 +25,12 @@ import {TestMock} from 'chrome://webui-test/test_mock.js';
 import {microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 import {TestSearchboxBrowserProxy} from './test_searchbox_browser_proxy.js';
+
+interface TestOmniboxComposeboxElement extends OmniboxComposeboxElement {
+  keepMenuOpenForMultiSelection: () => void;
+  keepMenuOpenOnTabSelectForRealbox: boolean;
+  composeboxSource: string;
+}
 
 suite('OmniboxComposeboxTest', () => {
   let omniboxComposebox: OmniboxComposeboxElement;
@@ -1753,6 +1760,76 @@ suite('OmniboxComposeboxTest', () => {
     });
   });
 
+  test(
+      'keepMenuOpenForMultiSelection called on add/delete tab context',
+      async () => {
+        let keepMenuOpenCalled = false;
+        const testElement = omniboxComposebox as TestOmniboxComposeboxElement;
+        testElement.keepMenuOpenForMultiSelection = () => {
+          keepMenuOpenCalled = true;
+        };
+
+        await omniboxComposebox.onAddTabContext(
+            new CustomEvent('add-tab-context', {
+              detail: {
+                id: 1,
+                title: 'Test',
+                url: 'about:blank',  // Mojo converts obj to str.
+                delayUpload: false,
+                origin: TabUploadOrigin.CONTEXT_MENU,
+              },
+            }));
+        assertTrue(keepMenuOpenCalled);
+
+        keepMenuOpenCalled = false;
+        await omniboxComposebox.onDeleteTabContext(
+            new CustomEvent('delete-tab-context', {
+              detail: {
+                uuid: '0',
+              },
+            }));
+        assertTrue(keepMenuOpenCalled);
+      });
+
+  test('onContextMenuClosed sets shareTabsFlyoutOpen to false', async () => {
+    omniboxComposebox.shareTabsFlyoutOpen = true;
+    await omniboxComposebox.onContextMenuClosed();
+    assertFalse(omniboxComposebox.shareTabsFlyoutOpen);
+  });
+
+  test(
+      'keepMenuOpenForMultiSelection is gated' +
+          ' by keepMenuOpenOnTabSelectForRealbox',
+      () => {
+        let openMenuCalled = false;
+        omniboxComposebox.getContextEntrypointElement = () => {
+          return {
+            openMenuForMultiSelection: () => {
+              openMenuCalled = true;
+            },
+          } as unknown as ContextualEntrypointButtonElement;
+        };
+
+        const testElement = omniboxComposebox as TestOmniboxComposeboxElement;
+
+        // Omnibox source: always returns early
+        testElement.composeboxSource = 'Omnibox';
+        testElement.keepMenuOpenForMultiSelection();
+        assertFalse(openMenuCalled);
+
+        // NewTabPage source, flag off: returns early
+        testElement.composeboxSource = 'NewTabPage';
+        testElement.keepMenuOpenOnTabSelectForRealbox = false;
+        testElement.keepMenuOpenForMultiSelection();
+        assertFalse(openMenuCalled);
+
+        // NewTabPage source, flag on: calls openMenuForMultiSelection
+        testElement.composeboxSource = 'NewTabPage';
+        testElement.keepMenuOpenOnTabSelectForRealbox = true;
+        testElement.keepMenuOpenForMultiSelection();
+        assertTrue(openMenuCalled);
+      });
+
   suite('SmartCompose', () => {
     setup(async () => {
       loadTimeData.overrideValues({composeboxSmartComposeEnabled: true});
@@ -1952,7 +2029,7 @@ suite('OmniboxComposeboxTest', () => {
           tabAttachment: {
             tabId: 42,
             title: 'Google Search',
-            url: {url: 'https://google.com'},
+            url: 'about:blank',  // Mojo converts obj to str.
           },
         }],
         toolMode: 0,

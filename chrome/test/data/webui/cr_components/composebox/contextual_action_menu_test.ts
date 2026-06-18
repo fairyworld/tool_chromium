@@ -13,6 +13,7 @@ import {AnchorAlignment} from 'chrome://resources/cr_elements/cr_action_menu/cr_
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {PluralStringProxyImpl} from 'chrome://resources/js/plural_string_proxy.js';
 import type {TabInfo} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
+import type {InputState} from 'chrome://resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
 import {InputType, ModelMode, ToolMode} from 'chrome://resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {TestPluralStringProxy} from 'chrome://webui-test/test_plural_string_proxy.js';
@@ -2348,6 +2349,143 @@ suite('ContextualActionMenu', () => {
         });
   });
 
+  suite('ShareTabsFlyoutBehaviors', () => {
+    setup(async () => {
+      loadTimeData.overrideValues({
+        contextManagementInComposeboxEnabled: true,
+      });
+      actionMenu.remove();
+      actionMenu =
+          document.createElement('cr-composebox-contextual-action-menu');
+      actionMenu.tabSuggestions = [
+        {
+          tabId: 1,
+          title: 'Tab 1',
+          url: 'about:blank',
+          lastActiveTime: {internalValue: 0n},
+          showInCurrentTabChip: false,
+          showInPreviousTabChip: false,
+          lastActive: {internalValue: 0n},
+        } as unknown as TabInfo,
+      ];
+      actionMenu.inputState = new MockInputState({
+                                allowedInputTypes: [InputType.kBrowserTab],
+                              }) as unknown as InputState;
+      document.body.appendChild(actionMenu);
+      await microtasksFinished();
+    });
+
+    test('shareTabFlyoutOpen changes based on events', async () => {
+      actionMenu.showAt(actionMenu);
+      await microtasksFinished();
+
+      const trigger = $$(actionMenu, '#shareTabsTrigger') as HTMLElement;
+      assertTrue(!!trigger);
+
+      // row pointer enter sets true
+      trigger.dispatchEvent(new PointerEvent('pointerenter'));
+      await microtasksFinished();
+      assertTrue(actionMenu.shareTabsFlyoutOpen);
+
+      // arrow left sets false
+      const flyout = $$(actionMenu, '.share-tabs-flyout') as HTMLElement;
+      const firstTabItem =
+          flyout.querySelector<HTMLElement>('button.dropdown-item');
+      assertTrue(!!firstTabItem);
+      firstTabItem.dispatchEvent(new KeyboardEvent(
+          'keydown',
+          {
+            key: 'ArrowLeft',
+            bubbles: true,
+          },
+          ));
+      await microtasksFinished();
+      assertFalse(actionMenu.shareTabsFlyoutOpen);
+
+      // arrow right sets true
+      trigger.dispatchEvent(
+          new KeyboardEvent('keydown', {key: 'ArrowRight', bubbles: true}));
+      await microtasksFinished();
+      assertTrue(actionMenu.shareTabsFlyoutOpen);
+
+      // resetShareTabsFlyout makes it false
+      actionMenu['resetShareTabsFlyout_']();
+      assertFalse(actionMenu.shareTabsFlyoutOpen);
+    });
+
+    test(
+        'showAt calls updateFlyoutPosition if open, same with updated()',
+        async () => {
+          let updateFlyoutPositionCalled = false;
+          actionMenu['updateFlyoutPosition_'] = () => {
+            updateFlyoutPositionCalled = true;
+          };
+
+          actionMenu.shareTabsFlyoutOpen = true;
+          actionMenu.showAt(actionMenu);
+          assertTrue(updateFlyoutPositionCalled);
+
+          updateFlyoutPositionCalled = false;
+          // trigger updated
+          actionMenu.tabSuggestions = [...actionMenu.tabSuggestions];
+          await actionMenu.updateComplete;
+          assertTrue(updateFlyoutPositionCalled);
+        });
+
+    test(
+        'pointerLeave is ignored for 1 second after 1st tab added',
+        async () => {
+          actionMenu.showAt(actionMenu);
+          await microtasksFinished();
+
+          const trigger = $$(actionMenu, '#shareTabsTrigger') as HTMLElement;
+          trigger.dispatchEvent(new PointerEvent('pointerenter'));
+          await microtasksFinished();
+          assertTrue(actionMenu.shareTabsFlyoutOpen);
+
+          const flyout = $$(actionMenu, '.share-tabs-flyout') as HTMLElement;
+          const tabButton =
+              flyout.querySelector<HTMLElement>('button.dropdown-item')!;
+
+          // Click tab to trigger 1 sec ignore
+          tabButton.click();
+
+          let scheduleCloseTimerCalled = false;
+          actionMenu['scheduleCloseTimer_'] = () => {
+            scheduleCloseTimerCalled = true;
+          };
+
+          // Pointer leave should be ignored
+          trigger.dispatchEvent(new PointerEvent('pointerleave'));
+          assertFalse(scheduleCloseTimerCalled);
+        });
+
+    test(
+        'deleteTabContext, addTabContext close menu if ntp flag is off', () => {
+          // Set to NTP source and flag off
+          actionMenu['metricsSource_'] = 'NewTabPage';
+          actionMenu['closeMenuOnSelect'] = true;  // this means ntp flag is off
+
+          actionMenu.showAt(actionMenu);
+          assertTrue(actionMenu.$.menu.open);
+
+          // test addTabContext
+          actionMenu['addTabContext_']({
+            tabId: 1,
+            title: 'Test',
+            url: 'about:blank',
+          } as unknown as TabInfo);
+          assertFalse(actionMenu.$.menu.open);
+
+          actionMenu.showAt(actionMenu);
+          assertTrue(actionMenu.$.menu.open);
+
+          // test deleteTabContext
+          actionMenu['deleteTabContext_']('0');
+          assertFalse(actionMenu.$.menu.open);
+        });
+  });
+
   suite('ShareTabsFlyoutViewportPositioning', () => {
     let trigger: HTMLElement;
     let flyout: HTMLElement;
@@ -2379,7 +2517,7 @@ suite('ContextualActionMenu', () => {
       actionMenu.tabSuggestions = Array(50).fill({
         tabId: 1,
         title: 'Tab',
-        url: {url: 'about:blank'},
+        url: 'about:blank',
         lastActiveTime: {internalValue: 0n},
         showInCurrentTabChip: false,
         showInPreviousTabChip: false,
