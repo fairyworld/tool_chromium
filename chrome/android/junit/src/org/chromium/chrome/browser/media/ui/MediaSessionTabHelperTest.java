@@ -19,7 +19,6 @@ import org.junit.runner.RunWith;
 import org.robolectric.annotation.Config;
 
 import org.chromium.base.test.BaseRobolectricTestRunner;
-import org.chromium.base.test.util.DisabledTest;
 import org.chromium.base.test.util.Features.DisableFeatures;
 import org.chromium.base.test.util.Features.EnableFeatures;
 import org.chromium.base.test.util.HistogramWatcher;
@@ -149,7 +148,6 @@ public class MediaSessionTabHelperTest {
         histogramWatcher.assertExpected();
     }
 
-    @DisabledTest(message = "crbug.com/525122375")
     @Test
     @DisableFeatures(MediaFeatureList.NO_PAUSE_MEDIA_ON_HEADPHONE_UNPLUG)
     public void testAudioBecomingNoisy_TimeToResumeMetric() {
@@ -210,7 +208,6 @@ public class MediaSessionTabHelperTest {
         histogramWatcher.assertExpected();
     }
 
-    @DisabledTest(message = "crbug.com/525122375")
     @Test
     public void testAudioBecomingNoisyReceiver_UnregistersWhenNoObservers() {
         AudioBecomingNoisyReceiver receiver = AudioBecomingNoisyReceiver.getInstance();
