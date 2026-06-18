@@ -304,7 +304,6 @@ class AutofillAiManagerTest
       std::make_unique<EntityTable>()};
   syncer::TestSyncService sync_service_;
   NiceMock<MockPersonalContextAccessManager> personal_context_access_manager_;
-  NiceMock<MockAutofillClient> autofill_client_;
   TestStrikeDatabase strike_database_;
   std::unique_ptr<AutofillAiManager> manager_;
 };
