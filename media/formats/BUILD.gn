@@ -349,6 +349,7 @@ source_set("unit_tests") {
     sources += [
       "mp4/aac_unittest.cc",
       "mp4/avc_unittest.cc",
+      "mp4/box_definitions_unittest.cc",
       "mp4/box_reader_unittest.cc",
       "mp4/dolby_vision_unittest.cc",
       "mp4/es_descriptor_unittest.cc",
