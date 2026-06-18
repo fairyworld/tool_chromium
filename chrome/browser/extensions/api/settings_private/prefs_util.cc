@@ -204,11 +204,11 @@ PrefsUtil::PrefsUtil(Profile* profile) : profile_(profile) {}
 PrefsUtil::~PrefsUtil() = default;
 
 const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
-  static PrefsUtil::TypedPrefMap* s_allowlist = nullptr;
-  if (s_allowlist) {
-    return *s_allowlist;
+  if (allowlist_) {
+    return *allowlist_;
   }
-  s_allowlist = new PrefsUtil::TypedPrefMap();
+  allowlist_ = std::make_unique<TypedPrefMap>();
+  TypedPrefMap* s_allowlist = allowlist_.get();
 
   // Miscellaneous
   (*s_allowlist)[::embedder_support::kAlternateErrorPagesEnabled] =
@@ -1353,7 +1353,8 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       settings_api::PrefType::kNumber;
 
   // Glic prefs
-  if (glic::GlicEnabling::IsEnabledByGlobalCriteria()) {
+  if (glic::GlicEnabling::EnablementForProfile(profile_)
+          .ShouldShowSettingsPage()) {
     (*s_allowlist)[glic::prefs::kGlicPinnedToTabstrip] =
         settings_api::PrefType::kBoolean;
     (*s_allowlist)[glic::prefs::kGlicLauncherEnabled] =

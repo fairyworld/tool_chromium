@@ -69,7 +69,7 @@ class SettingsBrowserTest : public WebUIMochaBrowserTest {
  protected:
   SettingsBrowserTest() {
     scoped_feature_list_.InitWithFeatures(
-        {},
+        {optimization_guide::features::kAiSettingsPageForceAvailable},
         /*disabled_features=*/
         {features::kGlicDefaultTabContextSetting});
     set_test_loader_host(chrome::kChromeUISettingsHost);
