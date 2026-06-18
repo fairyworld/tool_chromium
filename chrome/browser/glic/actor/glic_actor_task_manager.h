@@ -63,6 +63,8 @@ class GlicActorTaskManager {
     virtual void OnTabAddedToTask(
         actor::TaskId task_id,
         const tabs::TabInterface::Handle& tab_handle) = 0;
+
+    virtual void OnTaskIdChanged(std::optional<int> task_id) = 0;
   };
   explicit GlicActorTaskManager(
       Profile* profile,
@@ -82,6 +84,9 @@ class GlicActorTaskManager {
 
   // Returns the last acted tabs for the current task.
   std::vector<tabs::TabInterface*> GetLastActedTabs() const;
+
+  // Returns the ID of the current active task, if any.
+  std::optional<int> current_task_id() const;
 
   // Adds a callback that is run when the actuating state changes.
   base::CallbackListSubscription AddActuatingChangedCallback(

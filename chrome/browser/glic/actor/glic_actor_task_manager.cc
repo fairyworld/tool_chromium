@@ -250,6 +250,9 @@ void GlicActorClientSession::CreateTask(
       &actor_policy_checker(), std::move(options), GetWeakPtr());
   CHECK(!current_task_id_.is_null());
 
+  if (manager_->delegate_) {
+    manager_->delegate_->OnTaskIdChanged(current_task_id_.value());
+  }
   manager_->MaybeNotifyActuatingChanged();
 
   actor_task_state_changed_subscription_ =
@@ -842,6 +845,13 @@ std::vector<tabs::TabInterface*> GlicActorTaskManager::GetLastActedTabs()
   return target_tabs;
 }
 
+std::optional<int> GlicActorTaskManager::current_task_id() const {
+  if (session_ && !session_->current_task_id().is_null()) {
+    return session_->current_task_id().value();
+  }
+  return std::nullopt;
+}
+
 base::CallbackListSubscription
 GlicActorTaskManager::AddActuatingChangedCallback(
     base::RepeatingCallback<void(bool)> callback) {
@@ -986,6 +996,9 @@ void GlicActorClientSession::NotifyActorTaskStateChanged(
 
   if (task.IsCompleted()) {
     current_task_id_ = actor::TaskId();
+    if (manager_->delegate_) {
+      manager_->delegate_->OnTaskIdChanged(std::nullopt);
+    }
     attempted_reload_after_crash_ = false;
     reload_observer_.reset();
     actor_task_state_changed_subscription_.reset();

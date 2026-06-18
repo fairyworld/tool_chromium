@@ -184,13 +184,13 @@ void GlicInstanceImpl::NotifyVisibilityChange() {
   }
 }
 
-void GlicInstanceImpl::NotifyConversationTitleChanged() {
+void GlicInstanceImpl::NotifyInstanceChanged() {
 #if BUILDFLAG(IS_ANDROID)
-  // Notify bound helpers that the instance info (title) changed.
+  // Notify bound helpers that the instance info changed.
   for (const auto& [key, entry] : embedders_) {
     if (auto* const* tab_ptr = std::get_if<tabs::TabInterface*>(&key)) {
       if (auto* helper = GlicInstanceHelper::From(*tab_ptr)) {
-        helper->OnConversationTitleChanged();
+        helper->OnInstanceChanged();
       }
     }
   }
@@ -603,7 +603,7 @@ void GlicInstanceImpl::RegisterConversation(
   }
 
   conversation_info_ = std::move(info);
-  NotifyConversationTitleChanged();
+  NotifyInstanceChanged();
   conversation_info_changed_callback_list_.Notify(*conversation_info_);
 
   std::move(callback).Run(std::nullopt);
@@ -888,6 +888,11 @@ std::optional<std::string> GlicInstanceImpl::conversation_id() const {
 
 std::string GlicInstanceImpl::conversation_title() const {
   return conversation_info_->conversation_title;
+}
+
+std::optional<int> GlicInstanceImpl::task_id() const {
+  return actor_task_manager_ ? actor_task_manager_->current_task_id()
+                             : std::nullopt;
 }
 
 std::vector<tabs::TabInterface*> GlicInstanceImpl::GetBoundTabs() const {
@@ -1605,6 +1610,10 @@ void GlicInstanceImpl::OnTabAddedToTask(
   }
   instance_metrics_.OnDaisyChain(DaisyChainSource::kActorAddTab,
                                  /*success=*/true, tab);
+}
+
+void GlicInstanceImpl::OnTaskIdChanged(std::optional<int> task_id) {
+  NotifyInstanceChanged();
 }
 
 bool GlicInstanceImpl::HasFocus() {
