@@ -33,6 +33,7 @@
 #include "base/i18n/character_encoding.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
+#include "base/memory/self_deleting.h"
 #include "base/metrics/field_trial_params.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/no_destructor.h"
@@ -6351,23 +6352,25 @@ class SpecialAccessFileURLLoaderFactory
     // The SpecialAccessFileURLLoaderFactory will delete itself when there are
     // no more receivers - see the
     // network::SelfDeletingURLLoaderFactory::OnDisconnect method.
-    new SpecialAccessFileURLLoaderFactory(
+    base::MakeSelfDeleting<SpecialAccessFileURLLoaderFactory>(
         child_id, pending_remote.InitWithNewPipeAndPassReceiver());
 
     return pending_remote;
   }
 
+  SpecialAccessFileURLLoaderFactory(
+      int child_id,
+      mojo::PendingReceiver<network::mojom::URLLoaderFactory> factory_receiver,
+      base::SelfDeletingPassKey key)
+      : network::SelfDeletingURLLoaderFactory(std::move(factory_receiver), key),
+        child_id_(child_id) {}
   SpecialAccessFileURLLoaderFactory(const SpecialAccessFileURLLoaderFactory&) =
       delete;
   SpecialAccessFileURLLoaderFactory& operator=(
       const SpecialAccessFileURLLoaderFactory&) = delete;
 
  private:
-  explicit SpecialAccessFileURLLoaderFactory(
-      int child_id,
-      mojo::PendingReceiver<network::mojom::URLLoaderFactory> factory_receiver)
-      : network::SelfDeletingURLLoaderFactory(std::move(factory_receiver)),
-        child_id_(child_id) {}
+  ~SpecialAccessFileURLLoaderFactory() override = default;
 
   // network::mojom::URLLoaderFactory:
   void CreateLoaderAndStart(
