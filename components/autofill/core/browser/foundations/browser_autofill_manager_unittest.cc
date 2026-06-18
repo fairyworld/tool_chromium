@@ -1347,6 +1347,33 @@ TEST_F(BrowserAutofillManagerTest, AtMemoryTriggerDroppedWhenNotEligible) {
   EXPECT_FALSE(external_delegate()->on_suggestions_returned_seen());
 }
 
+TEST_F(BrowserAutofillManagerTest, ComposeDelayedNudgeDoesNotHideAtMemory) {
+  base::test::ScopedFeatureList features(features::kAutofillAtMemory);
+  const FormData form = CreateTestAddressFormData();
+  FormsSeen({form});
+
+  // Trigger suggestions with AtMemory.
+  OnAskForValuesToFill(form, form.fields()[0],
+                       AutofillSuggestionTriggerSource::kAtMemory);
+
+  // Verify that suggestions were shown (empty suggestions for AtMemory).
+  EXPECT_TRUE(autofill_client().IsShowingAutofillPopup());
+  EXPECT_EQ(external_delegate()->trigger_source(),
+            AutofillSuggestionTriggerSource::kAtMemory);
+
+  // Trigger suggestions with ComposeDelayedProactiveNudge.
+  // This should be ignored because AtMemory suggestions are already showing.
+  OnAskForValuesToFill(
+      form, form.fields()[0],
+      AutofillSuggestionTriggerSource::kComposeDelayedProactiveNudge);
+
+  // Verify that the AtMemory suggestions are still showing (popup is not hidden
+  // or replaced by the nudge).
+  EXPECT_TRUE(autofill_client().IsShowingAutofillPopup());
+  EXPECT_EQ(external_delegate()->trigger_source(),
+            AutofillSuggestionTriggerSource::kAtMemory);
+}
+
 TEST_F(BrowserAutofillManagerTest, IgnoreInactivityQueryIfPopupVisible) {
   FormData form = CreateTestAddressFormData();
   FormsSeen({form});

@@ -431,6 +431,40 @@ bool IsTriggerSourceOnlyRelevantForCompose(
     case AutofillSuggestionTriggerSource::kAtMemoryInactivityNudge:
       return false;
   }
+  NOTREACHED();
+}
+
+// Returns `true` if this suggestion trigger source should replace the currently
+// showing suggestions. `true` for everything but IPH-like nudges to start using
+// a product (Compose, AtMemory).
+bool CanReplaceCurrentSuggestions(AutofillSuggestionTriggerSource source) {
+  switch (source) {
+    case mojom::AutofillSuggestionTriggerSource::kUnspecified:
+    case mojom::AutofillSuggestionTriggerSource::kFormControlElementClicked:
+    case mojom::AutofillSuggestionTriggerSource::kTextareaFocusedWithoutClick:
+    case mojom::AutofillSuggestionTriggerSource::kContentEditableClicked:
+    case mojom::AutofillSuggestionTriggerSource::kTextFieldValueChanged:
+    case mojom::AutofillSuggestionTriggerSource::kTextFieldDidReceiveKeyDown:
+    case mojom::AutofillSuggestionTriggerSource::kOpenTextDataListChooser:
+    case mojom::AutofillSuggestionTriggerSource::kPasswordManager:
+    case mojom::AutofillSuggestionTriggerSource::kiOS:
+    case mojom::AutofillSuggestionTriggerSource::kManualFallbackPasswords:
+    case mojom::AutofillSuggestionTriggerSource::kComposeDialogLostFocus:
+
+    case mojom::AutofillSuggestionTriggerSource::
+        kPasswordManagerProcessedFocusedField:
+    case mojom::AutofillSuggestionTriggerSource::
+        kPlusAddressUpdatedInBrowserProcess:
+    case mojom::AutofillSuggestionTriggerSource::kProactivePasswordRecovery:
+    case mojom::AutofillSuggestionTriggerSource::kGlic:
+    case mojom::AutofillSuggestionTriggerSource::kAtMemory:
+    case mojom::AutofillSuggestionTriggerSource::kAtMemoryContextMenu:
+      return true;
+    case mojom::AutofillSuggestionTriggerSource::kComposeDelayedProactiveNudge:
+    case mojom::AutofillSuggestionTriggerSource::kAtMemoryInactivityNudge:
+      return false;
+  }
+  NOTREACHED();
 }
 
 void LogSuggestionsCount(const SuggestionsContext& context,
@@ -1201,8 +1235,7 @@ void BrowserAutofillManager::OnAskForValuesToFillImpl(
     autofill_field->set_was_focused(true);
   }
 
-  if (trigger_source ==
-          AutofillSuggestionTriggerSource::kAtMemoryInactivityNudge &&
+  if (!CanReplaceCurrentSuggestions(trigger_source) &&
       client().GetSessionIdForCurrentAutofillSuggestions().has_value()) {
     return;
   }
