@@ -113,6 +113,9 @@ if (is_apple || webnn_use_tflite || webnn_use_litert) {
 }
 
 component("webnn_service") {
+  _configs = configs
+  configs = []
+  configs = [ "//third_party/tflite:tflite_shim_config" ] + _configs
   defines = [ "IS_WEBNN_SERVICE_IMPL" ]
 
   sources = []

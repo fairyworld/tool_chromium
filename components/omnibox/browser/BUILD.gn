@@ -151,6 +151,9 @@ proto_library("partner_location_descriptor_proto") {
 }
 
 static_library("browser") {
+  _configs = configs
+  configs = []
+  configs = [ "//third_party/tflite:tflite_shim_config" ] + _configs
   sources = [
     "actions/contextual_search_action.cc",
     "actions/contextual_search_action.h",
