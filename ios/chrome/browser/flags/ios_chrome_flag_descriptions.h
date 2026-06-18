@@ -48,6 +48,10 @@ inline constexpr char kActorServiceLoggingName[] = "ActorServiceLogging";
 inline constexpr char kActorServiceLoggingDescription[] =
     "Enables Actor logging, which is for debugging only.";
 
+inline constexpr char kAiAvatarRingIosName[] = "AiAvatarRing";
+inline constexpr char kAiAvatarRingIosDescription[] =
+    "Display a ring around the avatar if the primary account has a AI Tier";
+
 inline constexpr char kAimCobrowseHeaderName[] = "AimCobrowseHeader";
 inline constexpr char kAimCobrowseHeaderDescription[] =
     "Changes the design of the AIM cobrowse header.";

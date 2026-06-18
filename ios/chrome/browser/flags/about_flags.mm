@@ -2853,6 +2853,9 @@ constexpr auto kFeatureEntries = std::to_array<flags_ui::FeatureEntry>({
      flag_descriptions::kDownloadListPaginationName,
      flag_descriptions::kDownloadListPaginationDescription, flags_ui::kOsIos,
      FEATURE_VALUE_TYPE(kDownloadListPagination)},
+    {"ai-avatar-ring-ios", flag_descriptions::kAiAvatarRingIosName,
+     flag_descriptions::kAiAvatarRingIosDescription, flags_ui::kOsIos,
+     FEATURE_VALUE_TYPE(kAiAvatarRingIos)},
 });
 
 bool SkipConditionalFeatureEntry(const flags_ui::FeatureEntry& entry) {

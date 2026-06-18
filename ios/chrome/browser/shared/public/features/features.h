@@ -1052,4 +1052,10 @@ BASE_DECLARE_FEATURE(kIdentityAwareness);
 // Returns true if the IdentityAwareness feature is enabled.
 bool IsIdentityAwarenessEnabled();
 
+// Display a ring around the avatar if the user has a AI Tier
+BASE_DECLARE_FEATURE(kAiAvatarRingIos);
+
+// Returns true if the AiAvatarRing feature is enabled.
+bool IsAiAvatarRingIosEnabled();
+
 #endif  // IOS_CHROME_BROWSER_SHARED_PUBLIC_FEATURES_FEATURES_H_
