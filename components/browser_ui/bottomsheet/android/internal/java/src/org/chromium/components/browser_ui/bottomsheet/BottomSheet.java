@@ -53,7 +53,6 @@ import org.chromium.ui.accessibility.AccessibilityState;
 import org.chromium.ui.base.LocalizationUtils;
 import org.chromium.ui.base.ViewUtils;
 import org.chromium.ui.insets.InsetObserver;
-import org.chromium.ui.insets.InsetObserver.WindowInsetObserver;
 import org.chromium.ui.insets.InsetObserver.WindowInsetsAnimationListener;
 import org.chromium.ui.interpolators.Interpolators;
 import org.chromium.ui.util.ColorUtils;
@@ -503,14 +502,6 @@ class BottomSheet extends FrameLayout
                         for (BottomSheetObserver obs : mObservers) {
                             obs.onInsetAnimationEnd();
                         }
-                    }
-                });
-
-        mInsetObserver.addObserver(
-                new WindowInsetObserver() {
-                    @Override
-                    public void onInsetChanged() {
-                        BottomSheet.this.onInsetChanged();
                     }
                 });
 

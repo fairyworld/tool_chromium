@@ -73,7 +73,6 @@ public class BottomSheetUnitTest {
             mInsetsAnimationListenerCaptor;
 
     @Captor private ArgumentCaptor<KeyboardVisibilityListener> mKeyboardListenerCaptor;
-    @Captor private ArgumentCaptor<InsetObserver.WindowInsetObserver> mInsetObserverCaptor;
 
     private SettableNonNullObservableSupplier<Integer> mKeyboardInsetSupplier;
     private BottomSheet mBottomSheet;
@@ -480,18 +479,20 @@ public class BottomSheetUnitTest {
         mBottomSheet.setSheetState(SheetState.HALF, false);
 
         // Simulate keyboard showing
-        verify(mInsetObserver).addObserver(mInsetObserverCaptor.capture());
-        InsetObserver.WindowInsetObserver observer = mInsetObserverCaptor.getValue();
+        verify(mInsetObserver)
+                .addWindowInsetsAnimationListener(mInsetsAnimationListenerCaptor.capture());
+        InsetObserver.WindowInsetsAnimationListener listener =
+                mInsetsAnimationListenerCaptor.getValue();
 
         mKeyboardInsetSupplier.set(100);
-        observer.onInsetChanged();
+        listener.onStart(null, null);
 
         // Simulate layout change while keyboard is showing (Pass 1)
         mSheetContainer.layout(0, 0, SHEET_CONTAINER_WIDTH, SHEET_CONTAINER_HEIGHT - 10);
 
         // Simulate keyboard hiding.
         mKeyboardInsetSupplier.set(0);
-        observer.onInsetChanged();
+        listener.onEnd(null);
         mSheetContainer.layout(0, 0, SHEET_CONTAINER_WIDTH, SHEET_CONTAINER_HEIGHT);
 
         // Verify that state is restored to HALF.
@@ -516,11 +517,13 @@ public class BottomSheetUnitTest {
         mSheetContainer.layout(0, 0, SHEET_CONTAINER_WIDTH, SHEET_CONTAINER_HEIGHT);
 
         // Simulate keyboard showing
-        verify(mInsetObserver).addObserver(mInsetObserverCaptor.capture());
-        InsetObserver.WindowInsetObserver observer = mInsetObserverCaptor.getValue();
+        verify(mInsetObserver)
+                .addWindowInsetsAnimationListener(mInsetsAnimationListenerCaptor.capture());
+        InsetObserver.WindowInsetsAnimationListener listener =
+                mInsetsAnimationListenerCaptor.getValue();
 
         mKeyboardInsetSupplier.set(100);
-        observer.onInsetChanged();
+        listener.onStart(null, null);
 
         // Simulate layout change while keyboard is showing
         mSheetContainer.layout(0, 0, SHEET_CONTAINER_WIDTH, SHEET_CONTAINER_HEIGHT - 10);
@@ -533,7 +536,7 @@ public class BottomSheetUnitTest {
 
         // Simulate keyboard hiding.
         mKeyboardInsetSupplier.set(0);
-        observer.onInsetChanged();
+        listener.onEnd(null);
 
         // Trigger layout change on container
         mSheetContainer.layout(0, 0, SHEET_CONTAINER_WIDTH, SHEET_CONTAINER_HEIGHT);
@@ -558,10 +561,12 @@ public class BottomSheetUnitTest {
         decorView.layout(0, 0, 1080, 1920);
         mSheetContainer.layout(0, 0, SHEET_CONTAINER_WIDTH, SHEET_CONTAINER_HEIGHT);
 
-        verify(mInsetObserver).addObserver(mInsetObserverCaptor.capture());
-        InsetObserver.WindowInsetObserver observer = mInsetObserverCaptor.getValue();
+        verify(mInsetObserver)
+                .addWindowInsetsAnimationListener(mInsetsAnimationListenerCaptor.capture());
+        InsetObserver.WindowInsetsAnimationListener listener =
+                mInsetsAnimationListenerCaptor.getValue();
         mKeyboardInsetSupplier.set(100);
-        observer.onInsetChanged();
+        listener.onStart(null, null);
 
         // Simulate layout change while keyboard is showing.
         mSheetContainer.layout(0, 0, SHEET_CONTAINER_WIDTH, SHEET_CONTAINER_HEIGHT - 10);
@@ -571,7 +576,7 @@ public class BottomSheetUnitTest {
         mSheetContainer.layout(0, 0, SHEET_CONTAINER_WIDTH, SHEET_CONTAINER_HEIGHT);
 
         mKeyboardInsetSupplier.set(150);
-        observer.onInsetChanged();
+        listener.onStart(null, null);
     }
 
     @Test
@@ -630,12 +635,14 @@ public class BottomSheetUnitTest {
         mBottomSheet.showContent(mSheetContent);
         mBottomSheet.setSheetState(SheetState.HALF, false);
 
-        verify(mInsetObserver).addObserver(mInsetObserverCaptor.capture());
-        InsetObserver.WindowInsetObserver observer = mInsetObserverCaptor.getValue();
+        verify(mInsetObserver)
+                .addWindowInsetsAnimationListener(mInsetsAnimationListenerCaptor.capture());
+        InsetObserver.WindowInsetsAnimationListener listener =
+                mInsetsAnimationListenerCaptor.getValue();
 
         // Simulate keyboard showing -> token acquired.
         mKeyboardInsetSupplier.set(100);
-        observer.onInsetChanged();
+        listener.onStart(null, null);
 
         assertTrue("Keyboard token should be acquired.", mBottomSheet.hasKeyboardTokenForTesting());
         assertEquals(
@@ -653,7 +660,7 @@ public class BottomSheetUnitTest {
 
         mBottomSheet.showContent(newContent);
 
-        // Verify token was released and state reset.
+        // Verify token was erased and state reset.
         assertFalse(
                 "Keyboard token should be released on content change.",
                 mBottomSheet.hasKeyboardTokenForTesting());
