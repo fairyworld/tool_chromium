@@ -16,16 +16,6 @@ source_set("controls") {
     "site_icon_text_and_origin_view.h",
     "subpage_view.h",
   ]
-  public_deps = [
-    "//base",
-    "//chrome/browser/ui/views:layout_provider",
-    "//components/content_settings/core/common",
-    "//ui/base",
-    "//ui/views",
-  ]
-}
-
-source_set("impl") {
   sources = [
     "hover_button.cc",
     "hover_button_controller.cc",
@@ -35,12 +25,19 @@ source_set("impl") {
     "site_icon_text_and_origin_view.cc",
     "subpage_view.cc",
   ]
+  public_deps = [
+    "//base",
+    "//chrome/browser/ui/views:layout_provider",
+    "//components/content_settings/core/common",
+    "//ui/base",
+    "//ui/views",
+  ]
   deps = [
-    ":controls",
     "//chrome/browser/ui:layout_constants",
     "//chrome/browser/ui:ui_features",
     "//chrome/browser/ui/color:color_headers",
     "//chrome/browser/ui/views/accessibility",
+    "//chrome/browser/ui/views/page_info",
     "//chrome/browser/ui/views/web_apps",
     "//components/constrained_window",
     "//components/content_settings/browser/ui",
