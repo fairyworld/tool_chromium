@@ -126,7 +126,6 @@
 #include "chrome/browser/ui/tabs/vertical_tab_strip_state_controller.h"
 #include "chrome/browser/ui/toolbar/app_menu_model.h"
 #include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_utils.h"
-#include "chrome/browser/ui/toolbar/pinned_toolbar/tab_search_toolbar_button_controller.h"
 #include "chrome/browser/ui/toolbar/toolbar_pref_names.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
@@ -2922,23 +2921,6 @@ void BrowserView::MaybeShowReadingListInSidePanelIPH() {
   }
 }
 
-void BrowserView::MaybeShowTabStripToolbarButtonIPH() {
-  if (!browser()->is_type_normal()) {
-    return;
-  }
-
-  bool should_show =
-      tabs::GetTabSearchPosition(browser()) ==
-          tabs::TabSearchPosition::kToolbarButton &&
-      toolbar_button_provider()->GetPinnedToolbarActions()->IsActionPinned(
-          kActionTabSearch);
-  if (should_show) {
-    BrowserUserEducationInterface::From(browser())
-        ->MaybeShowStartupFeaturePromo(
-            feature_engagement::kIPHTabSearchToolbarButtonFeature);
-  }
-}
-
 bool BrowserView::IsBookmarkBarVisible() const {
   if (!browser_->SupportsWindowFeature(
           Browser::WindowFeature::kFeatureBookmarkBar)) {
@@ -4230,18 +4212,6 @@ void BrowserView::UpdateTabSearchBubbleHost() {
     tab_search_bubble_host_ = std::make_unique<TabSearchBubbleHost>(
         combo_button->end_button(), browser_.get());
     combo_button->SetTabSearchBubbleHost(tab_search_bubble_host_.get());
-  } else if (tabs::GetTabSearchPosition(browser_) ==
-             tabs::TabSearchPosition::kToolbarButton) {
-    tab_search_bubble_host_ = std::make_unique<TabSearchBubbleHost>(
-        toolbar_->tab_search_button(), browser_.get());
-    auto* toolbar_button_controller =
-        TabSearchToolbarButtonController::From(browser_.get());
-    // If TabSearchToolbarButtonController has not yet been instantiated at this
-    // point it will update the TabSearchBubbleHost when it is constructed.
-    if (toolbar_button_controller) {
-      toolbar_button_controller->UpdateBubbleHost(
-          tab_search_bubble_host_.get());
-    }
   } else {
     tab_search_bubble_host_ = std::make_unique<TabSearchBubbleHost>(
         BrowserElementsViews::From(browser_.get())
@@ -5062,7 +5032,6 @@ void BrowserView::AddedToWidget() {
   frame_view->UpdateMinimumSize();
   using_native_frame_ = browser_widget_->ShouldUseNativeFrame();
 
-  MaybeShowTabStripToolbarButtonIPH();
   MaybeShowSignInBenefitsIPH();
 
   // Want to show this promo, but not right at startup.

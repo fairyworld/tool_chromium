@@ -1559,20 +1559,6 @@ void MaybeRegisterChromeFeaturePromos(
                        "sync yet, after the sync-to-signin migration.")));
 #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
-  // kIPHTabSearchToolbarButtonFeature:
-  registry.RegisterFeature(std::move(
-      FeaturePromoSpecification::CreateForToastPromo(
-          feature_engagement::kIPHTabSearchToolbarButtonFeature,
-          kTabSearchButtonElementId, IDS_TAB_SEARCH_TOOLBAR_BUTTON_PROMO_BODY,
-          IDS_TAB_SEARCH_TOOLBAR_BUTTON_PROMO_BODY,
-          FeaturePromoSpecification::AcceleratorInfo())
-          .SetBubbleArrow(HelpBubbleArrow::kTopRight)
-          .SetBubbleIcon(kLightbulbOutlineIcon)
-          .SetBubbleTitleText(IDS_TAB_SEARCH_TOOLBAR_BUTTON_PROMO_TITLE)
-          .SetMetadata(136, "emshack@chromium.org",
-                       "Triggered when the tab search button has been moved "
-                       "into the toolbar.")));
-
   // kIPHTabSearchComboButtonFeature:
   registry.RegisterFeature(std::move(
       FeaturePromoSpecification::CreateForToastPromo(

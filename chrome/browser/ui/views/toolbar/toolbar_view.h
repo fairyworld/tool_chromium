@@ -187,9 +187,6 @@ class ToolbarView : public views::AccessiblePaneView,
   }
   MediaToolbarButtonView* media_button() const { return media_button_; }
   HomeButton* home_button() const { return home_; }
-  PinnedActionToolbarButton* tab_search_button() const {
-    return tab_search_button_;
-  }
 
   // TODO(crbug.com/513238408): Remove this once toolbar layout/overflow is
   // fixed.
@@ -402,7 +399,6 @@ class ToolbarView : public views::AccessiblePaneView,
   raw_ptr<AvatarToolbarButton> avatar_ = nullptr;
   raw_ptr<MediaToolbarButtonView> media_button_ = nullptr;
   raw_ptr<BrowserAppMenuButton> app_menu_button_ = nullptr;
-  raw_ptr<PinnedActionToolbarButton> tab_search_button_ = nullptr;
 
   // The button currently holding the lock to be shown/hidden.
   raw_ptr<glic::GlicButtonInterface> locked_expansion_button_ = nullptr;

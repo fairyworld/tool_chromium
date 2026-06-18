@@ -261,8 +261,6 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[::prefs::kVerticalTabsExpandOnHoverEnabled] =
       settings_api::PrefType::kBoolean;
-  (*s_allowlist)[::prefs::kTabSearchRightAligned] =
-      settings_api::PrefType::kBoolean;
   (*s_allowlist)[::prefs::kTabSearchPinnedToTabstrip] =
       settings_api::PrefType::kBoolean;
   (*s_allowlist)[::prefs::kProjectsPanelPinnedToTabstrip] =

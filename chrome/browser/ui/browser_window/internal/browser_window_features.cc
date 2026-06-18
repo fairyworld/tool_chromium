@@ -86,7 +86,6 @@
 #include "chrome/browser/ui/side_panel/side_panel_ui.h"
 #include "chrome/browser/ui/signin/signin_view_controller.h"
 #include "chrome/browser/ui/sync/browser_synced_window_delegate.h"
-#include "chrome/browser/ui/tab_search_feature.h"
 #include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/tabs/projects/projects_panel_state_controller.h"
 #include "chrome/browser/ui/tabs/saved_tab_groups/most_recent_shared_tab_update_store.h"
@@ -110,7 +109,6 @@
 #include "chrome/browser/ui/toasts/toast_features.h"
 #include "chrome/browser/ui/toasts/toast_service.h"
 #include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_utils.h"
-#include "chrome/browser/ui/toolbar/pinned_toolbar/tab_search_toolbar_button_controller.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/unload_controller.h"
 #include "chrome/browser/ui/views/animations/side_panel_animations.h"
@@ -820,15 +818,6 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
       browser, browser->GetTabStripModel(), browser->GetSessionID(),
       browser->GetType());
 
-  if (browser_view) {
-    if (features::HasTabSearchToolbarButton() ||
-        tabs::IsVerticalTabsFeatureEnabled()) {
-      tab_search_toolbar_button_controller_ =
-          GetUserDataFactory().CreateInstance<TabSearchToolbarButtonController>(
-              *browser_, browser_.get(), browser_view);
-    }
-  }
-
   if (browser->is_type_normal() || browser->is_type_app()) {
     toast_service_ = std::make_unique<ToastService>(browser);
   }
@@ -1170,7 +1159,6 @@ void BrowserWindowFeatures::TearDownPreBrowserWindowDestruction() {
   }
   upgrade_notification_controller_.reset();
   toast_service_.reset();
-  tab_search_toolbar_button_controller_.reset();
   // TODO(crbug.com/346148093): This logic should not be gated behind a
   // conditional.
   if (side_panel_coordinator_) {

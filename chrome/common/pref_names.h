@@ -1214,25 +1214,10 @@ inline constexpr char kSidePanelIdToWidth[] = "side_panel.id_to_width";
 // Corresponds to the enterprise policy.
 inline constexpr char kGoogleSearchSidePanelEnabled[] =
     "side_panel.google_search_side_panel_enabled";
-// Boolean determining the side the tab search will be appear on (left / right).
-// True when the tab search button is on the right side of the tab strip even in
-// RTL.
-inline constexpr char kTabSearchRightAligned[] = "tab_search.is_right_aligned";
 
 // Boolean determining whether the tab search button is pinned to the tab strip.
 inline constexpr char kTabSearchPinnedToTabstrip[] =
     "tab_search.pinned_to_tabstrip";
-
-// Boolean indicating whether the tab search pinning migration to the tab strip
-// is complete.
-inline constexpr char kTabSearchPinnedToTabstripMigrationComplete[] =
-    "tab_search.pinned_to_tabstrip_migration_complete";
-
-// Boolean indicating whether the tab search pinning migration to the tab strip
-// is complete. This was created to fix a bug in the initial implementation,
-// which referenced kTabSearchPinnedToTabstripMigrationComplete.
-inline constexpr char kTabSearchPinnedToTabstripMigrationComplete2[] =
-    "tab_search.pinned_to_tabstrip_migration_complete_2";
 
 // Boolean determining whether the projects panel button is pinned to the tab
 // strip.

@@ -4895,7 +4895,6 @@ static_library("ui") {
       "//chrome/browser/preloading/prerender",
       "//chrome/browser/profiles/keep_alive",
       "//chrome/browser/sharing/click_to_call",
-      "//chrome/browser/ui:tab_search_feature",
       "//chrome/browser/ui/actions",
       "//chrome/browser/ui/actions:actions_headers",
       "//chrome/browser/ui/actions:actions_util",
@@ -5721,20 +5720,6 @@ source_set("ui_features") {
     "//components/webui/flags",
     "//content/public/common",
     "//ui/base:features",
-  ]
-}
-
-source_set("tab_search_feature") {
-  sources = [
-    "tab_search_feature.cc",
-    "tab_search_feature.h",
-  ]
-  deps = [
-    "//base",
-    "//chrome/browser:browser_process",
-    "//chrome/browser/glic",
-    "//chrome/common:buildflags",
-    "//components/variations/service",
   ]
 }
 

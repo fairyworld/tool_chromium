@@ -83,7 +83,6 @@ class SplitViewIphController;
 class TabDragServiceFeature;
 class TabListBridge;
 class TabMenuModelDelegate;
-class TabSearchToolbarButtonController;
 class TabStripModel;
 class TabStripServiceFeature;
 class TabsFromOtherDevicesSidePanelCoordinator;
@@ -735,8 +734,6 @@ class BrowserWindowFeatures {
       skills_ui_window_controller_;
   std::unique_ptr<split_tabs::SplitTabHighlightController>
       split_tab_highlight_controller_;
-  std::unique_ptr<TabSearchToolbarButtonController>
-      tab_search_toolbar_button_controller_;
 
   // Members owned only when a WebUIBrowserWindow is used.
   std::unique_ptr<WebUIBrowserExclusiveAccessContext>

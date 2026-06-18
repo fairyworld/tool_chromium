@@ -12232,15 +12232,6 @@ Check your passwords anytime in <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google 
       </if>
 
       <!-- Tab Search -->
-      <message name="IDS_TAB_SEARCH_TOOLBAR_BUTTON_PROMO_TITLE" desc="Title text on the tab search toolbar button promo UI.">
-        Tab search is now pinned to your toolbar
-      </message>
-      <message name="IDS_TAB_SEARCH_TOOLBAR_BUTTON_PROMO_BODY" desc="Body text on the tab search toolbar button promo UI.">
-        You can unpin it and open it from the menu
-      </message>
-      <message name="IDS_TAB_SEARCH_TOOLBAR_BUTTON_PROMO_ACTION" desc="Action button text on the tab search toolbar button promo UI.">
-        Unpin
-      </message>
       <message name="IDS_TAB_SEARCH_COMBO_BUTTON_PROMO_TITLE" desc="The body text for a bubble that appears on the tab search button in the tab strip when the user has previously used tab search from the toolbar.">
         Tab search has moved
       </message>

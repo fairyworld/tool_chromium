@@ -133,11 +133,6 @@ class TabStyleViewsImpl : public TabStyleViews {
   // be the same as GetHoverAnimationValue.
   float GetHoverOpacity() const;
 
-  // In some platforms, the window caption buttons and tab search may not be on
-  // the left side of the tabstrip. The leading edge should be modified for
-  // those cases.
-  bool ShouldCompactLeadingEdge(TabStyle::PathType path_type) const;
-
   // Painting helper functions:
   void PaintTabBackground(gfx::Canvas* canvas,
                           bool hovered,
@@ -339,16 +334,8 @@ SkPath TabStyleViewsImpl::GetPath(TabStyle::PathType path_type,
     tab_bottom -= 0.5f * stroke_adjustment;
     extension_corner_radius -= 0.5f * stroke_adjustment;
   }
-  const bool compact_left_to_bottom = ShouldCompactLeadingEdge(path_type);
 
   float left_extension_corner_radius = extension_corner_radius;
-  if (compact_left_to_bottom) {
-    left_extension_corner_radius =
-        (tab_style()->GetBottomCornerRadius() -
-         GetLayoutConstant(LayoutConstant::kToolbarCornerRadius)) *
-        scale;
-  }
-
   if (IsLeftSplitTab(tab())) {
     top_right_corner_radius = 0;
     // Assign half of the tab overlap to each of the split tabs.
@@ -898,14 +885,6 @@ TabStyle::TabSelectionState TabStyleViewsImpl::GetSelectionState() const {
   }
 
   return TabStyle::TabSelectionState::kInactive;
-}
-
-bool TabStyleViewsImpl::ShouldCompactLeadingEdge(
-    TabStyle::PathType path_type) const {
-  // If the tab is the first in the list
-  return tab_->controller()->GetTabCount() > 0 &&
-         tab_->controller()->tab_at(0) == tab_ &&
-         tab_->controller()->ShouldCompactLeadingEdge();
 }
 
 void TabStyleViewsImpl::PaintTabBackground(gfx::Canvas* canvas,

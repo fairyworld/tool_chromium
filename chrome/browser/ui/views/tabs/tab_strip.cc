@@ -1856,15 +1856,6 @@ bool TabStrip::IsFocusInTabStrip() const {
   return GetFocusManager() && Contains(GetFocusManager()->GetFocusedView());
 }
 
-bool TabStrip::ShouldCompactLeadingEdge() const {
-  return !BrowserView::GetBrowserViewForBrowser(GetBrowserWindowInterface())
-              ->browser_widget()
-              ->GetFrameView()
-              ->CaptionButtonsOnLeadingEdge() &&
-         (tabs::GetTabSearchPosition(GetBrowserWindowInterface()) ==
-          tabs::TabSearchPosition::kTrailingHorizontalTabstrip);
-}
-
 void TabStrip::MaybeStartDrag(TabSlotView* source,
                               const ui::LocatedEvent& event,
                               ui::ListSelectionModel original_selection) {

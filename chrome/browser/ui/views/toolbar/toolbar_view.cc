@@ -56,14 +56,12 @@
 #include "chrome/browser/ui/layout_constants.h"
 #include "chrome/browser/ui/omnibox/omnibox_view.h"
 #include "chrome/browser/ui/page_action/page_action_properties_provider.h"
-#include "chrome/browser/ui/tab_search_feature.h"
 #include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/tabs/public/tab_features.h"
 #include "chrome/browser/ui/tabs/tab_strip_prefs.h"
 #include "chrome/browser/ui/tabs/vertical_tab_strip_state_controller.h"
 #include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_prefs.h"
 #include "chrome/browser/ui/toolbar/chrome_labs/chrome_labs_utils.h"
-#include "chrome/browser/ui/toolbar/pinned_toolbar/tab_search_toolbar_button_controller.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/view_ids.h"
 #include "chrome/browser/ui/views/bookmarks/bookmark_bubble_view.h"
@@ -507,19 +505,6 @@ void ToolbarView::Init() {
     pinned_toolbar_actions_ = pinned_toolbar_actions_container_;
   } else {
     pinned_toolbar_actions_ = toolbar_webview_->GetPinnedToolbarActions();
-  }
-
-  if (!base::FeatureList::IsEnabled(tabs::kHorizontalTabStripComboButton) &&
-      features::HasTabSearchToolbarButton()) {
-    CHECK(!features::IsWebUIPinnedToolbarActionsEnabled())
-        << "WebUIPinnedToolbarActions does not support "
-           "CreatePermanentButtonFor, consider enabling "
-           "HorizontalTabStripComboButton";
-    tab_search_button_ =
-        pinned_toolbar_actions_container_->CreatePermanentButtonFor(
-            kActionTabSearch);
-    tab_search_button_->SetProperty(views::kElementIdentifierKey,
-                                    kTabSearchButtonElementId);
   }
 
   if (IsChromeLabsEnabled()) {

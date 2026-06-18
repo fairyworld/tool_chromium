@@ -92,10 +92,6 @@ class ToolbarControllerUiTest : public InteractiveFeaturePromoTest,
     PinnedToolbarActionsModel* const actions_model =
         PinnedToolbarActionsModel::Get(browser()->profile());
     actions_model->UpdatePinnedState(kActionShowChromeLabs, false);
-    if (tabs::GetTabSearchPosition(browser()) ==
-        tabs::TabSearchPosition::kToolbarButton) {
-      actions_model->UpdatePinnedState(kActionTabSearch, false);
-    }
     CHECK(!features::IsWebUIPinnedToolbarActionsEnabled())
         << "Test needs modification to support WebUIPinnedToolbarActions";
     views::test::WaitForAnimatingLayoutManager(

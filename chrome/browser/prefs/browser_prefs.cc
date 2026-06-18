@@ -986,6 +986,14 @@ constexpr char kGlicSelectionWidgetDismissCount[] =
 inline constexpr char kRealboxContextMenuAnimationState[] =
     "realbox.context_menu_animation_state";
 
+// Deprecated 06/2026.
+inline constexpr char kTabSearchMigrationComplete[] =
+    "toolbar.tab_search_migration_complete";
+inline constexpr char kTabSearchPinnedToTabstripMigrationComplete[] =
+    "tab_search.pinned_to_tabstrip_migration_complete";
+inline constexpr char kTabSearchPinnedToTabstripMigrationComplete2[] =
+    "tab_search.pinned_to_tabstrip_migration_complete_2";
+
 // Register local state used only for migration (clearing or moving to a new
 // key).
 void RegisterLocalStatePrefsForMigration(PrefRegistrySimple* registry) {
@@ -1324,6 +1332,13 @@ void RegisterProfilePrefsForMigration(
 
   // Deprecated 06/2026.
   registry->RegisterDictionaryPref(kRealboxContextMenuAnimationState);
+
+  // Deprecated 06/2026.
+  registry->RegisterBooleanPref(kTabSearchMigrationComplete, true);
+  registry->RegisterBooleanPref(kTabSearchPinnedToTabstripMigrationComplete,
+                                true);
+  registry->RegisterBooleanPref(kTabSearchPinnedToTabstripMigrationComplete2,
+                                true);
 }
 
 }  // namespace
@@ -2538,11 +2553,6 @@ void MigrateObsoleteProfilePrefs(PrefService* profile_prefs,
   // Added 03/2026.
   profile_prefs->ClearPref(kTabSearchTabIndex);
 
-#if !BUILDFLAG(IS_ANDROID)
-  // Added 02/2026.
-  tabs::MigrateTabSearchPref(profile_prefs);
-#endif  // !BUILDFLAG(IS_ANDROID)
-
   // Added 03/2026
   profile_prefs->ClearPref(
       kSigninFromBookmarksBubbleSyntheticTrialGroupNamePref);
@@ -2598,6 +2608,11 @@ void MigrateObsoleteProfilePrefs(PrefService* profile_prefs,
 
   // Added 06/2026.
   profile_prefs->ClearPref(kRealboxContextMenuAnimationState);
+
+  // Added 06/2026
+  profile_prefs->ClearPref(kTabSearchMigrationComplete);
+  profile_prefs->ClearPref(kTabSearchPinnedToTabstripMigrationComplete);
+  profile_prefs->ClearPref(kTabSearchPinnedToTabstripMigrationComplete2);
 
   // Please don't delete the following line. It is used by PRESUBMIT.py.
   // END_MIGRATE_OBSOLETE_PROFILE_PREFS
