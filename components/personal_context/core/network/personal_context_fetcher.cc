@@ -97,10 +97,20 @@ net::NetworkTrafficAnnotationTag GetNetworkTrafficAnnotation(
   }
 }
 
-void RecordErrorStatusHistogram(proto::ContextMemoryFeature feature,
-                                ContextMemoryError::ExecutionError error) {
+void RecordFetchContextErrorStatusHistogram(
+    proto::ContextMemoryFeature feature,
+    ContextMemoryError::ExecutionError error) {
   base::UmaHistogramEnumeration(
       base::StrCat({"PersonalContext.FetchContext.ErrorStatus.",
+                    GetStringNameForContextMemoryFeature(feature)}),
+      error);
+}
+
+void RecordFetchPiiEntitiesErrorStatusHistogram(
+    proto::ContextMemoryFeature feature,
+    ContextMemoryError::ExecutionError error) {
+  base::UmaHistogramEnumeration(
+      base::StrCat({"PersonalContext.FetchPiiEntities.ErrorStatus.",
                     GetStringNameForContextMemoryFeature(feature)}),
       error);
 }
@@ -171,12 +181,15 @@ void PersonalContextFetcher::RunErrorCallback(ContextMemoryError error) {
   std::visit(absl::Overload{
                  [&](FetchContextResponseCallback& callback) {
                    if (callback) {
-                     RecordErrorStatusHistogram(feature_, error.error());
+                     RecordFetchContextErrorStatusHistogram(feature_,
+                                                            error.error());
                      std::move(callback).Run(base::unexpected(error));
                    }
                  },
                  [&](FetchPiiEntitiesResponseCallback& callback) {
                    if (callback) {
+                     RecordFetchPiiEntitiesErrorStatusHistogram(feature_,
+                                                                error.error());
                      std::move(callback).Run(base::unexpected(error));
                    }
                  },
