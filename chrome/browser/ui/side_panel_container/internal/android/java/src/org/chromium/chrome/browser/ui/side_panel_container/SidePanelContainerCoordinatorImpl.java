@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import androidx.annotation.Px;
 import androidx.annotation.VisibleForTesting;
 
+import org.chromium.base.ResettersForTesting;
 import org.chromium.base.ThreadUtils;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
@@ -36,6 +37,9 @@ final class SidePanelContainerCoordinatorImpl
     private static final String TAG = "SidePanelContainerCoordinatorImpl";
 
     private static final @AnchorSide int SIDE_PANEL_DEFAULT_ANCHOR_SIDE = AnchorSide.RIGHT;
+
+    /** Used to override the return value of {@link #hasContentToShow()} for tests. */
+    private static @Nullable Boolean sHasContentToShowForTesting;
 
     private final Activity mParentActivity;
     private final FrameLayout mContainerView;
@@ -97,12 +101,8 @@ final class SidePanelContainerCoordinatorImpl
         mContainerView.removeAllViews();
         mContainerView.addView(content.mView);
 
-        // It's fine to always _request_ the max width. The final width will be determined in
-        // determineContainerWidth().
-        @Px int sidePanelMaxWidth = ViewUtils.dpToPx(mParentActivity, WIDE_SIDE_PANEL_WIDTH_DP);
         mSideUiCoordinator.requestUpdateContainer(
-                new SideUiContainerProperties(
-                        SideUiId.SIDE_PANEL, SIDE_PANEL_DEFAULT_ANCHOR_SIDE, sidePanelMaxWidth),
+                new SideUiContainerProperties(SideUiId.SIDE_PANEL, SIDE_PANEL_DEFAULT_ANCHOR_SIDE),
                 suppressAnimations);
         // TODO(crbug.com/496407828): Move this around so it actually runs after the animation is
         //  finished.
@@ -115,8 +115,7 @@ final class SidePanelContainerCoordinatorImpl
         ThreadUtils.assertOnUiThread();
 
         mSideUiCoordinator.requestUpdateContainer(
-                new SideUiContainerProperties(
-                        SideUiId.SIDE_PANEL, SIDE_PANEL_DEFAULT_ANCHOR_SIDE, /* width= */ 0),
+                new SideUiContainerProperties(SideUiId.SIDE_PANEL, SIDE_PANEL_DEFAULT_ANCHOR_SIDE),
                 suppressAnimations);
         // TODO(crbug.com/496407828): Move this around so it actually runs after the animation is
         //  finished.
@@ -164,14 +163,9 @@ final class SidePanelContainerCoordinatorImpl
 
     @Override
     @Px
-    public int determineContainerWidth(
-            @Px int requestedWidth, @Px int availableWidth, @Px int windowWidth) {
-        log(TAG, "determineContainerWidth", requestedWidth, availableWidth, windowWidth);
+    public int determineContainerWidth(@Px int availableWidth, @Px int windowWidth) {
+        log(TAG, "determineContainerWidth", availableWidth, windowWidth);
         ThreadUtils.assertOnUiThread();
-
-        if (requestedWidth == 0) {
-            return 0;
-        }
 
         int availableWidthDp = ViewUtils.pxToDp(mParentActivity, availableWidth);
         int windowWidthDp = ViewUtils.pxToDp(mParentActivity, windowWidth);
@@ -190,6 +184,9 @@ final class SidePanelContainerCoordinatorImpl
     @Override
     public boolean hasContentToShow() {
         ThreadUtils.assertOnUiThread();
+        if (sHasContentToShowForTesting != null) {
+            return sHasContentToShowForTesting;
+        }
 
         // The pure-Java dev feature doesn't use SidePanelCoordinatorAndroid since
         // SidePanelCoordinatorAndroid is a bridge to the C++ side panel state management.
@@ -263,5 +260,10 @@ final class SidePanelContainerCoordinatorImpl
 
         // 4. Return 0 if available space can't accommodate the minimum side panel width.
         return 0;
+    }
+
+    static void setHasContentToShowForTesting(boolean hasContentToShow) {
+        sHasContentToShowForTesting = hasContentToShow;
+        ResettersForTesting.register(() -> sHasContentToShowForTesting = null);
     }
 }

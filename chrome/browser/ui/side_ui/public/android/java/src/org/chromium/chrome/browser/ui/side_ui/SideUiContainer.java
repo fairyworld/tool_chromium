@@ -36,32 +36,35 @@ public interface SideUiContainer {
     View getView();
 
     /**
-     * Returns the unique ID assigned to this {@lin SideUiContainer}. The value should be one of the
-     * entries listed in {@link SideUiCoordinator#SideUiId}.
+     * Returns the unique ID assigned to this {@link SideUiContainer}. The value should be one of
+     * the entries listed in {@link SideUiId}.
      */
     @SideUiId
     int getSideUiId();
 
+    /** Returns the container's current anchor side. */
+    @AnchorSide
+    int getAnchorSide();
+
     /**
-     * Called by {@link SideUiCoordinator} for this container to determine its final width given the
-     * constraints of {@code availableWidth} and {@code windowWidth}.
+     * Called by {@link SideUiCoordinator} for this container to determine its <i>showable</i>
+     * width, given the constraints of {@code availableWidth} and {@code windowWidth}.
      *
-     * <p>Notably, no UI changes should actually occur in this method. The {@link SideUiCoordinator}
-     * that is hosting this container is responsible for calling {@link #setWidth}, etc. to actually
-     * apply the final width.
+     * <p>"Showable width" is the width for <i>when</i> this {@link SideUiContainer} is shown. A
+     * non-zero showable width means there is enough space for this {@link SideUiContainer}, but it
+     * does <i>not</i> mean the {@link SideUiContainer} will actually be shown.
      *
-     * @param requestedWidth The width requested by this container via {@link
-     *     SideUiCoordinator#requestUpdateContainer}, in px.
+     * <p>Therefore, the return value of this method should depend on {@code availableWidth} and
+     * {@code windowWidth}, but it should <i>not</i> depend on states like whether there is content
+     * to show.
+     *
+     * <p>TODO(crbug.com/478338737): Rename this method as "determineShowableWidth()".
+     *
      * @param availableWidth The available width that this container can consume in px.
      * @param windowWidth The new window width in px.
      */
     @Px
-    int determineContainerWidth(
-            @Px int requestedWidth, @Px int availableWidth, @Px int windowWidth);
-
-    /** Returns the container's current anchor side. */
-    @AnchorSide
-    int getAnchorSide();
+    int determineContainerWidth(@Px int availableWidth, @Px int windowWidth);
 
     /**
      * Returns whether the container has content to show.

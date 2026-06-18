@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import androidx.annotation.Px;
 import androidx.test.filters.SmallTest;
 
 import org.junit.After;
@@ -94,10 +95,16 @@ public class VerticalTabsSideUiCoordinatorUnitTest {
     @Test
     @SmallTest
     public void testDetermineContainerWidth() {
-        int viewWidth = ViewUtils.dpToPx(mActivity, VIEW_WIDTH_DP);
-        assertEquals(0, mCoordinator.determineContainerWidth(VIEW_WIDTH_DP, 500, 800));
-        mCoordinator.setVisible(true);
-        assertEquals(VIEW_WIDTH_DP, mCoordinator.determineContainerWidth(VIEW_WIDTH_DP, 500, 800));
+        @Px int viewWidth = ViewUtils.dpToPx(mActivity, VIEW_WIDTH_DP);
+
+        assertEquals(
+                0,
+                mCoordinator.determineContainerWidth(
+                        /* availableWidth= */ viewWidth - 1, /* windowWidth= */ viewWidth + 100));
+        assertEquals(
+                viewWidth,
+                mCoordinator.determineContainerWidth(
+                        /* availableWidth= */ viewWidth, /* windowWidth= */ viewWidth + 100));
     }
 
     @Test

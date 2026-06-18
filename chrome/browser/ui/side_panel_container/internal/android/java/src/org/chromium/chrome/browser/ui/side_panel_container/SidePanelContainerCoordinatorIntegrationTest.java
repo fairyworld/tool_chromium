@@ -73,6 +73,9 @@ public class SidePanelContainerCoordinatorIntegrationTest {
 
     @Before
     public void setUp() {
+        SidePanelContainerCoordinatorImpl.setHasContentToShowForTesting(
+                /* hasContentToShow= */ true);
+
         String responsivePageUrl =
                 mFreshCtaTransitTestRule.getTestServer().getURL(RESPONSIVE_WEB_PAGE_URL);
         mResponsivePageStation = mFreshCtaTransitTestRule.startOnUrl(responsivePageUrl);
@@ -214,6 +217,8 @@ public class SidePanelContainerCoordinatorIntegrationTest {
         FrameLayout containerView = waitForContainerViewOpen(coordinator);
 
         // Act.
+        SidePanelContainerCoordinatorImpl.setHasContentToShowForTesting(
+                /* hasContentToShow= */ false);
         ThreadUtils.runOnUiThreadBlocking(
                 () -> coordinator.startRemovingContent(DO_NOTHING_RUNNABLE, true));
         waitForContainerViewClose(coordinator);
@@ -254,6 +259,8 @@ public class SidePanelContainerCoordinatorIntegrationTest {
                 ThreadUtils.runOnUiThreadBlocking(webContents::getWidth);
 
         // Act: Close the side panel.
+        SidePanelContainerCoordinatorImpl.setHasContentToShowForTesting(
+                /* hasContentToShow= */ false);
         ThreadUtils.runOnUiThreadBlocking(
                 () ->
                         coordinator.startRemovingContent(
@@ -302,6 +309,8 @@ public class SidePanelContainerCoordinatorIntegrationTest {
         waitForContainerViewOpen(coordinator);
 
         // Arrange: Close the side panel.
+        SidePanelContainerCoordinatorImpl.setHasContentToShowForTesting(
+                /* hasContentToShow= */ false);
         ThreadUtils.runOnUiThreadBlocking(
                 () ->
                         coordinator.startRemovingContent(
@@ -384,6 +393,9 @@ public class SidePanelContainerCoordinatorIntegrationTest {
                                 /* startingBounds= */ null,
                                 true));
         waitForContainerViewOpen(coordinator);
+
+        SidePanelContainerCoordinatorImpl.setHasContentToShowForTesting(
+                /* hasContentToShow= */ false);
         ThreadUtils.runOnUiThreadBlocking(
                 () -> coordinator.startRemovingContent(DO_NOTHING_RUNNABLE, true));
         waitForContainerViewClose(coordinator);

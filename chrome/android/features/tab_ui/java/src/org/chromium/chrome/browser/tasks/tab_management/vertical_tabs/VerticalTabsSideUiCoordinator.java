@@ -29,7 +29,6 @@ import org.chromium.ui.base.ViewUtils;
 public class VerticalTabsSideUiCoordinator implements SideUiContainer {
     static final int VIEW_WIDTH_DP = 206;
 
-    private final Activity mActivity;
     private final SideUiCoordinator mSideUiCoordinator;
     private final FrameLayout mRootView;
     private final @AnchorSide int mAnchorSide;
@@ -53,7 +52,6 @@ public class VerticalTabsSideUiCoordinator implements SideUiContainer {
             SettableNonNullObservableSupplier<Boolean> isVerticalTabsActiveSupplier) {
         mAnchorSide = AnchorSide.LEFT;
 
-        mActivity = activity;
         mSideUiCoordinator = sideUiCoordinator;
         mTabListCoordinator = tabListCoordinator;
         mIsVerticalTabsActiveSupplier = isVerticalTabsActiveSupplier;
@@ -69,13 +67,8 @@ public class VerticalTabsSideUiCoordinator implements SideUiContainer {
 
     public void setVisible(boolean show) {
         mManualVisible = show;
-        requestShow(show);
-    }
-
-    private void requestShow(boolean show) {
-        @Px int viewWidth = show ? ViewUtils.dpToPx(mActivity, VIEW_WIDTH_DP) : 0;
         mSideUiCoordinator.requestUpdateContainer(
-                new SideUiContainerProperties(getSideUiId(), mAnchorSide, viewWidth),
+                new SideUiContainerProperties(getSideUiId(), mAnchorSide),
                 /* suppressAnimations= */ false);
     }
 
@@ -90,14 +83,9 @@ public class VerticalTabsSideUiCoordinator implements SideUiContainer {
     }
 
     @Override
-    public int determineContainerWidth(int requestedWidth, int availableWidth, int windowWidth) {
+    public int determineContainerWidth(int availableWidth, int windowWidth) {
         // TODO(crbug.com/509226293): Implement layout threshold negotiation to auto-hide rail.
-        // Respond with the requested width only if currently on.
-        @Px int width = 0;
-        if (mManualVisible) {
-            width = availableWidth < mViewWidth ? 0 : mViewWidth;
-        }
-        return width;
+        return availableWidth < mViewWidth ? 0 : mViewWidth;
     }
 
     @Override
