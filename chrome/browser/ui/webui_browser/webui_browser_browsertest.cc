@@ -126,7 +126,7 @@ class WebUIBrowserSurfaceEmbedPixelTest : public InProcessBrowserTest {
 
 // Ensures that WebUIBrowser does not crash on startup and can shutdown.
 IN_PROC_BROWSER_TEST_F(WebUIBrowserTest, StartupAndShutdown) {
-  auto* window = browser()->window();
+  auto* window = WebUIBrowserWindow::FromBrowser(browser());
   ASSERT_TRUE(window);
 
   content::WebContents* web_contents =
@@ -150,7 +150,7 @@ IN_PROC_BROWSER_TEST_F(WebUIBrowserTest, AllowKeyboardLockForInnerContents) {
 
 // Navigation at chrome/ layer, which hits some focus management paths.
 IN_PROC_BROWSER_TEST_F(WebUIBrowserTest, NavigatePage) {
-  auto* window = browser()->window();
+  auto* window = WebUIBrowserWindow::FromBrowser(browser());
   ASSERT_TRUE(window);
 
   content::WebContents* web_contents =
@@ -172,7 +172,7 @@ IN_PROC_BROWSER_TEST_F(WebUIBrowserTest, NavigatePage) {
 
 // Verify DevTools targets enumeration for browser UI and tabs.
 IN_PROC_BROWSER_TEST_F(WebUIBrowserTest, EnumerateDevToolsTargets) {
-  auto* window = browser()->window();
+  auto* window = WebUIBrowserWindow::FromBrowser(browser());
   ASSERT_TRUE(window);
 
   content::WebContents* web_contents =
@@ -216,7 +216,7 @@ IN_PROC_BROWSER_TEST_F(WebUIBrowserTest, EnumerateDevToolsTargets) {
 
 // Test entering and exiting fullscreen mode.
 IN_PROC_BROWSER_TEST_F(WebUIBrowserTest, FullscreenEnterAndExit) {
-  auto* window = browser()->window();
+  auto* window = WebUIBrowserWindow::FromBrowser(browser());
   ASSERT_TRUE(window);
 
   content::WebContents* web_contents =
@@ -238,7 +238,7 @@ IN_PROC_BROWSER_TEST_F(WebUIBrowserTest, FullscreenEnterAndExit) {
 
 // Test entering and exiting tab fullscreen mode, including tab switching.
 IN_PROC_BROWSER_TEST_F(WebUIBrowserTest, TabFullscreenEnterAndExit) {
-  auto* window = browser()->window();
+  auto* window = WebUIBrowserWindow::FromBrowser(browser());
   ASSERT_TRUE(window);
 
   content::WebContents* web_contents =
@@ -397,7 +397,7 @@ IN_PROC_BROWSER_TEST_F(WebUIBrowserSurfaceEmbedPixelTest,
 #endif
 IN_PROC_BROWSER_TEST_F(WebUIBrowserTest,
                        MAYBE_CloseTabDoesNotMakeRemainingTabBlank) {
-  auto* window = browser()->window();
+  auto* window = WebUIBrowserWindow::FromBrowser(browser());
   ASSERT_TRUE(window);
 
   content::WebContents* ui_web_contents =

@@ -714,8 +714,8 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
 
   browser_select_file_dialog_controller_ =
       std::make_unique<BrowserSelectFileDialogController>(
-          browser->profile(), browser->tab_strip_model(), browser->window(),
-          browser);
+          browser->profile(), browser->tab_strip_model(),
+          BrowserWindow::FromBrowser(browser), browser);
 
   if (browser_view) {
     color_provider_browser_helper_ =
@@ -731,12 +731,12 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
   desktop_browser_window_capabilities_ =
       GetUserDataFactory().CreateInstance<DesktopBrowserWindowCapabilities>(
           *browser, browser_window_modal_dialog_delegate_.get(),
-          unload_controller_.get(), browser->window(),
+          unload_controller_.get(), BrowserWindow::FromBrowser(browser),
           browser->GetUnownedUserDataHost());
 
   // Must be before exclusive_access_manager_ (whose construction calls
-  // browser->window()->GetExclusiveAccessContext(), which resolves to this
-  // WebUI-specific implementation for WebUIBrowserWindow).
+  // BrowserWindow::FromBrowser(browser)->GetExclusiveAccessContext(), which
+  // resolves to this WebUI-specific implementation for WebUIBrowserWindow).
   if (webui_browser_window) {
     webui_browser_exclusive_access_context_ =
         std::make_unique<WebUIBrowserExclusiveAccessContext>(
@@ -745,7 +745,8 @@ void BrowserWindowFeatures::InitPostWindowConstruction(Browser* browser) {
   }
 
   exclusive_access_manager_ = std::make_unique<ExclusiveAccessManager>(
-      browser, browser->window()->GetExclusiveAccessContext());
+      browser,
+      BrowserWindow::FromBrowser(browser)->GetExclusiveAccessContext());
 
   // Must be after exclusive_access_manager_.
 #if !BUILDFLAG(IS_CHROMEOS)
@@ -1247,7 +1248,7 @@ LocationBar* BrowserWindowFeatures::location_bar() {
   if (!browser_) {
     return nullptr;
   }
-  return browser_->GetBrowserForMigrationOnly()->window()->GetLocationBar();
+  return BrowserWindow::FromBrowser(browser_)->GetLocationBar();
 }
 
 const LocationBar* BrowserWindowFeatures::location_bar() const {
@@ -1256,14 +1257,14 @@ const LocationBar* BrowserWindowFeatures::location_bar() const {
   if (!browser_) {
     return nullptr;
   }
-  return browser_->GetBrowserForMigrationOnly()->window()->GetLocationBar();
+  return BrowserWindow::FromBrowser(browser_)->GetLocationBar();
 }
 
 FindBarController* BrowserWindowFeatures::GetFindBarController() {
   if (!find_bar_controller_.get()) {
     CHECK(browser_);
     find_bar_controller_ = std::make_unique<FindBarController>(
-        browser_->GetBrowserForMigrationOnly()->window()->CreateFindBar());
+        BrowserWindow::FromBrowser(browser_)->CreateFindBar());
     find_bar_controller_->find_bar()->SetFindBarController(
         find_bar_controller_.get());
     find_bar_controller_->ChangeWebContents(
