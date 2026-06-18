@@ -10,6 +10,7 @@ import android.view.View;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.ui.side_panel.SidePanelCoordinatorAndroid;
+import org.chromium.chrome.browser.ui.side_panel_container.dev.SidePanelDevFeature;
 
 /** Coordinator of the side panel container UI. */
 @NullMarked
@@ -57,8 +58,12 @@ public interface SidePanelContainerCoordinator {
      *
      * @param sidePanelCoordinatorAndroid For communicating with the native {@code
      *     SidePanelCoordinatorAndroid}, which manages states for all side panel features.
+     * @param sidePanelDevFeature For communicating with the dev feature. This should always be null
+     *     in production.
      */
-    void init(SidePanelCoordinatorAndroid sidePanelCoordinatorAndroid);
+    void init(
+            SidePanelCoordinatorAndroid sidePanelCoordinatorAndroid,
+            @Nullable SidePanelDevFeature sidePanelDevFeature);
 
     /**
      * Populates {@link SidePanelContent} into this side panel container.

@@ -19,8 +19,9 @@ import androidx.annotation.VisibleForTesting;
 import org.chromium.base.ThreadUtils;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
-import org.chromium.chrome.browser.ui.side_panel.AndroidSidePanelEnabledFn;
 import org.chromium.chrome.browser.ui.side_panel.SidePanelCoordinatorAndroid;
+import org.chromium.chrome.browser.ui.side_panel_container.dev.SidePanelDevFeature;
+import org.chromium.chrome.browser.ui.side_panel_container.dev.SidePanelDevFeatureImpl;
 import org.chromium.chrome.browser.ui.side_ui.SideUiContainer;
 import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator;
 import org.chromium.chrome.browser.ui.side_ui.SideUiCoordinator.AnchorSide;
@@ -43,6 +44,8 @@ final class SidePanelContainerCoordinatorImpl
     // TODO(crbug.com/496407828): Use this to notify native side of events like panel opened/closed.
     private @Nullable SidePanelCoordinatorAndroid mSidePanelCoordinatorAndroid;
 
+    private @Nullable SidePanelDevFeatureImpl mSidePanelPureJavaDevFeature;
+
     private @Nullable SidePanelContent mCurrentContent;
 
     /**
@@ -63,7 +66,9 @@ final class SidePanelContainerCoordinatorImpl
     }
 
     @Override
-    public void init(SidePanelCoordinatorAndroid sidePanelCoordinatorAndroid) {
+    public void init(
+            SidePanelCoordinatorAndroid sidePanelCoordinatorAndroid,
+            @Nullable SidePanelDevFeature sidePanelDevFeature) {
         log(TAG, "init");
         ThreadUtils.assertOnUiThread();
         mSideUiCoordinator.registerSideUiContainer(this);
@@ -71,7 +76,9 @@ final class SidePanelContainerCoordinatorImpl
         // SidePanelCoordinatorAndroid connects the Java UI with the state management logic in C++.
         // We should _not_ initialize SidePanelCoordinatorAndroid for the pure-Java dev feature,
         // otherwise the pure-Java dev feature will drive the C++ side into invalid states.
-        if (!AndroidSidePanelEnabledFn.isPureJavaDevFeatureEnabled()) {
+        if (sidePanelDevFeature instanceof SidePanelDevFeatureImpl) {
+            mSidePanelPureJavaDevFeature = (SidePanelDevFeatureImpl) sidePanelDevFeature;
+        } else {
             mSidePanelCoordinatorAndroid = sidePanelCoordinatorAndroid;
             mSidePanelCoordinatorAndroid.init();
         }
@@ -178,6 +185,23 @@ final class SidePanelContainerCoordinatorImpl
         log(TAG, "getAnchorSide");
         ThreadUtils.assertOnUiThread();
         return SIDE_PANEL_DEFAULT_ANCHOR_SIDE;
+    }
+
+    @Override
+    public boolean hasContentToShow() {
+        ThreadUtils.assertOnUiThread();
+
+        // The pure-Java dev feature doesn't use SidePanelCoordinatorAndroid since
+        // SidePanelCoordinatorAndroid is a bridge to the C++ side panel state management.
+        if (mSidePanelPureJavaDevFeature != null) {
+            return mSidePanelPureJavaDevFeature.hasDevContentToShow();
+        }
+
+        if (mSidePanelCoordinatorAndroid != null) {
+            return mSidePanelCoordinatorAndroid.hasContentToShow();
+        }
+
+        return false;
     }
 
     @Override

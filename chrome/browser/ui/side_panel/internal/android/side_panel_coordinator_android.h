@@ -53,6 +53,7 @@ class SidePanelCoordinatorAndroid : public SidePanelUIBase {
   // called from Java via JNI, see `SidePanelCoordinatorAndroidImpl.java`.
   void Init(JNIEnv* env);
   void Destroy(JNIEnv* env);
+  bool HasContentToShow(JNIEnv* env);
   void OnContentRemoved(JNIEnv* env);
   void OnContentPopulated(JNIEnv* env);
   void OnWindowResized(JNIEnv* env, bool can_show_side_panel);

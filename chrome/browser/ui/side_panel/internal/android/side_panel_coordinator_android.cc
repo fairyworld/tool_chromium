@@ -71,6 +71,35 @@ void SidePanelCoordinatorAndroid::Destroy(JNIEnv* env) {
   delete this;
 }
 
+bool SidePanelCoordinatorAndroid::HasContentToShow(JNIEnv* env) {
+  switch (state_) {
+    case SidePanelState::kOpening:
+    case SidePanelState::kShown:
+      return true;
+    case SidePanelState::kClosing:
+      // Unlike `kClosed`, we shouldn't check whether there is a deferred entry
+      // for `kClosing`.
+      //
+      // This is because a deferred entry is added before `Close()`, so by the
+      // time the state is `kClosing`, a deferred entry already exists.
+      // For the side panel to be closed, we have to return `false` without
+      // checking whether there is a deferred entry.
+      return false;
+    case SidePanelState::kClosed: {
+      // When the side panel is `kClosed`, whether there is content to show
+      // depends on whether there is a deferred entry.
+      //
+      // A deferred entry is an entry that could have been shown, but was
+      // deferred due to Android constraints such as narrow window size.
+      tabs::TabInterface* active_tab =
+          TabListInterface::From(browser())->GetActiveTab();
+      return active_tab &&
+             deferred_entry_tracker_.GetEntry(active_tab->GetHandle())
+                 .has_value();
+    }
+  }
+}
+
 void SidePanelCoordinatorAndroid::OnContentPopulated(JNIEnv* env) {
   SPLOG("OnContentPopulated");
 

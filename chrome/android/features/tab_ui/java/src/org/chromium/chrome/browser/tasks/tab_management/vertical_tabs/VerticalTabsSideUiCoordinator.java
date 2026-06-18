@@ -107,6 +107,11 @@ public class VerticalTabsSideUiCoordinator implements SideUiContainer {
     }
 
     @Override
+    public boolean hasContentToShow() {
+        return mManualVisible;
+    }
+
+    @Override
     public void setWidth(int width) {
         ViewGroup.LayoutParams layoutParams = mRootView.getLayoutParams();
         if (layoutParams != null) {

@@ -2184,8 +2184,6 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                             mWindowAndroid),
                     SidePanelRegistryBridgeFactory::createWindowScopedBridge);
 
-            mSidePanelContainerCoordinator.init(sidePanelCoordinatorAndroid);
-
             // TODO(crbug.com/489548570): Remove SidePanelDevFeature when it's not needed.
             mSidePanelDevFeature =
                     SidePanelDevFeatureFactory.create(
@@ -2193,7 +2191,10 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                             mSidePanelContainerCoordinator,
                             mWindowAndroid,
                             mActivityTabProvider);
+
+            mSidePanelContainerCoordinator.init(sidePanelCoordinatorAndroid, mSidePanelDevFeature);
         }
+
         if (VerticalTabUtils.isVerticalTabsEligible(mActivity)) {
             mVerticalTabsSideUiCoordinator =
                     new VerticalTabsSideUiCoordinator(

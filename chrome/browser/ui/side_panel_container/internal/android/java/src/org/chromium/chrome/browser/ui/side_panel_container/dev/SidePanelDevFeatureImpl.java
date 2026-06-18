@@ -130,6 +130,11 @@ public final class SidePanelDevFeatureImpl implements SidePanelDevFeature {
         }
     }
 
+    /** Returns whether there is {@link SidePanelDevFeatureContent} to show. */
+    public boolean hasDevContentToShow() {
+        return mDevContent != null;
+    }
+
     @Nullable SidePanelDevFeatureContent getDevFeatureContentForTesting() {
         ThreadUtils.assertOnUiThread();
         return mDevContent;

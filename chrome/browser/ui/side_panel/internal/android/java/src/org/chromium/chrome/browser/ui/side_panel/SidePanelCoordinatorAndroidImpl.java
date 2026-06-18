@@ -64,6 +64,18 @@ public final class SidePanelCoordinatorAndroidImpl implements SidePanelCoordinat
     }
 
     @Override
+    public boolean hasContentToShow() {
+        boolean hasContentToShow =
+                mNativeSidePanelCoordinatorAndroid != 0
+                        ? SidePanelCoordinatorAndroidImplJni.get()
+                                .hasContentToShow(mNativeSidePanelCoordinatorAndroid)
+                        : false;
+
+        log(TAG, "hasContentToShow", hasContentToShow);
+        return hasContentToShow;
+    }
+
+    @Override
     public void init() {
         log(TAG, "init");
         if (mNativeSidePanelCoordinatorAndroid != 0) {
@@ -231,5 +243,14 @@ public final class SidePanelCoordinatorAndroidImpl implements SidePanelCoordinat
          *     SidePanelCoordinatorAndroid}.
          */
         void init(long nativeSidePanelCoordinatorAndroid);
+
+        /**
+         * Returns whether the native coordinator has content to show.
+         *
+         * @param nativeSidePanelCoordinatorAndroid The address of the native {@code
+         *     SidePanelCoordinatorAndroid}.
+         * @see org.chromium.chrome.browser.ui.side_ui.SideUiContainer#hasContentToShow
+         */
+        boolean hasContentToShow(long nativeSidePanelCoordinatorAndroid);
     }
 }

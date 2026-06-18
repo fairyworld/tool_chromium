@@ -47,7 +47,8 @@ public class SidePanelContainerCoordinatorImplUnitTest {
     public void init_registerSelfAsSideUiContainer() {
         var sidePanelContainerCoordinator = createSidePanelContainerCoordinator();
 
-        sidePanelContainerCoordinator.init(mock(SidePanelCoordinatorAndroid.class));
+        sidePanelContainerCoordinator.init(
+                mock(SidePanelCoordinatorAndroid.class), /* sidePanelDevFeature= */ null);
 
         verify(mMockSideUiCoordinator).registerSideUiContainer(sidePanelContainerCoordinator);
     }

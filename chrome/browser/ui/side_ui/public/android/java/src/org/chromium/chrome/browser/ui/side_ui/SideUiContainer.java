@@ -64,6 +64,21 @@ public interface SideUiContainer {
     int getAnchorSide();
 
     /**
+     * Returns whether the container has content to show.
+     *
+     * <p>Note: This is not the same as whether the container is currently shown.
+     *
+     * <ul>
+     *   <li>When the container is currently shown, it definitely has content to show.
+     *   <li>When the container is currently hidden, it <i>may</i> have content to show. For
+     *       example, a container with content to show may need to be hidden due to insufficient
+     *       window real estate. This method should return true in this case to remind {@link
+     *       SideUiCoordinator} to restore the container when the window becomes large enough.
+     * </ul>
+     */
+    boolean hasContentToShow();
+
+    /**
      * Sets the new width. <strong>Important:</strong> this should only be called by the {@link
      * SideUiCoordinator} that this container is registered to.
      *

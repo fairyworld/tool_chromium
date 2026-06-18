@@ -23,6 +23,13 @@ public final class TestSideUiContainer implements SideUiContainer {
     /** The last {@code requestedWidth} received by {@link #determineContainerWidth}. */
     public @Nullable @Px Integer mLastRequestedWidth;
 
+    /**
+     * Whether the container has content to show.
+     *
+     * <p>This will be returned by {@link #hasContentToShow()}.
+     */
+    public boolean mHasContentToShow = true;
+
     /** The last {@code availableWidth} received by {@link #determineContainerWidth}. */
     public @Nullable @Px Integer mLastAvailableWidth;
 
@@ -84,6 +91,11 @@ public final class TestSideUiContainer implements SideUiContainer {
     @AnchorSide
     public int getAnchorSide() {
         return mAnchorSide;
+    }
+
+    @Override
+    public boolean hasContentToShow() {
+        return mHasContentToShow;
     }
 
     @Override

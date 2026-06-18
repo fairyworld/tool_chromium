@@ -2261,3 +2261,66 @@ IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorAndroidBrowserTest,
   EXPECT_TRUE(coordinator_->IsSidePanelShowing());
   EXPECT_TRUE(coordinator_->IsSidePanelEntryShowing(entry_key));
 }
+
+IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorAndroidBrowserTest,
+                       HasContentToShow_InitialState_ReturnsFalse) {
+  EXPECT_FALSE(coordinator_->HasContentToShow(/*env=*/nullptr));
+}
+
+IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorAndroidBrowserTest,
+                       HasContentToShow_AfterSidePanelIsShown_ReturnsTrue) {
+  // Arrange:
+  auto entry_key = SidePanelEntryKey(SidePanelEntryId::kAboutThisSite);
+  auto* registry = SidePanelRegistry::From(browser_);
+  registry->Register(CreateSidePanelEntry(entry_key, browser_));
+
+  coordinator_->SidePanelUIBase::Show(entry_key,
+                                      SidePanelOpenTrigger::kToolbarButton,
+                                      /*suppress_animations=*/true);
+  WaitUntilOpened(coordinator_);
+
+  // Assert:
+  EXPECT_TRUE(coordinator_->HasContentToShow(/*env=*/nullptr));
+}
+
+IN_PROC_BROWSER_TEST_F(SidePanelCoordinatorAndroidBrowserTest,
+                       HasContentToShow_AfterSidePanelIsClosed_ReturnsFalse) {
+  // Arrange:
+  auto entry_key = SidePanelEntryKey(SidePanelEntryId::kAboutThisSite);
+  auto* registry = SidePanelRegistry::From(browser_);
+  registry->Register(CreateSidePanelEntry(entry_key, browser_));
+
+  coordinator_->SidePanelUIBase::Show(entry_key,
+                                      SidePanelOpenTrigger::kToolbarButton,
+                                      /*suppress_animations=*/true);
+  WaitUntilOpened(coordinator_);
+
+  coordinator_->Close(SidePanelEntryHideReason::kSidePanelClosed,
+                      /*suppress_animations=*/true);
+  WaitUntilClosed(coordinator_);
+
+  // Assert:
+  EXPECT_FALSE(coordinator_->HasContentToShow(/*env=*/nullptr));
+}
+
+IN_PROC_BROWSER_TEST_F(
+    SidePanelCoordinatorAndroidBrowserTest,
+    HasContentToShow_AfterSidePanelIsClosedWithDeferredEntry_ReturnsTrue) {
+  // Arrange: Show a side panel entry.
+  auto entry_key = SidePanelEntryKey(SidePanelEntryId::kAboutThisSite);
+  auto* registry = SidePanelRegistry::From(browser_);
+  registry->Register(CreateSidePanelEntry(entry_key, browser_));
+
+  coordinator_->SidePanelUIBase::Show(entry_key,
+                                      SidePanelOpenTrigger::kToolbarButton,
+                                      /*suppress_animations=*/true);
+  WaitUntilOpened(coordinator_);
+
+  // Arrange: Make window too small, which will create a deferred entry and
+  // close the side panel.
+  coordinator_->OnWindowResized(/*env=*/nullptr, /*can_show_side_panel=*/false);
+  WaitUntilClosed(coordinator_);
+
+  // Assert:
+  EXPECT_TRUE(coordinator_->HasContentToShow(/*env=*/nullptr));
+}
