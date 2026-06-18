@@ -4707,6 +4707,21 @@
             ]
         }
     ],
+    "CacheIsGoogleSignedPhone": [
+        {
+            "platforms": [
+                "android"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "enable_features": [
+                        "CacheIsGoogleSigned"
+                    ]
+                }
+            ]
+        }
+    ],
     "Canvas2DAutoFlushParams": [
         {
             "platforms": [

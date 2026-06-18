@@ -860,7 +860,7 @@ public abstract class ChromeFeatureList {
     public static final CachedFlag sBrowserControlsDebugging =
             newCachedFlag(BROWSER_CONTROLS_DEBUGGING, false);
     public static final CachedFlag sCacheIsGoogleSigned =
-            newCachedFlag(CACHE_IS_GOOGLE_SIGNED, false);
+            newCachedFlag(CACHE_IS_GOOGLE_SIGNED, false, /* defaultValueInTests= */ true);
     public static final CachedFlag sCacheIsMultiInstanceApi31Enabled =
             newCachedFlag(CACHE_IS_MULTI_INSTANCE_API_31_ENABLED, true);
     public static final CachedFlag sCctAdaptiveButton =
