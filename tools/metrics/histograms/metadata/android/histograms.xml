@@ -211,6 +211,11 @@ chromium-metrics-reviews@google.com.
 
 <!-- LINT.ThenChange(//tools/metrics/histograms/metadata/android/enums.xml:MessageIdentifier) -->
 
+<variants name="PageContentProvider_Consumer">
+  <variant name="" summary="an external app"/>
+  <variant name=".Aga" summary="the Google App (AGA)"/>
+</variants>
+
 <variants name="PageContentProvider_OutputFormat">
   <variant name="Proto" summary="Annotated page content proto format"/>
   <variant name="Text" summary="Text"/>
@@ -692,34 +697,38 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="Android.AssistContent.WebPageContentProvider.Events"
-    enum="WebPageContentProviderEvent" expires_after="2026-12-06">
-  <owner>salg@google.com</owner>
-  <owner>ssid@google.com</owner>
-  <summary>
-    Records events related to WebPageContentProvider as it generates a URI for
-    an external app and as it handles queries from said external app.
-  </summary>
-</histogram>
-
 <histogram
-    name="Android.AssistContent.WebPageContentProvider.Events.{RequestType}.{Format}"
-    enum="WebPageContentProviderEvent" expires_after="2026-12-06">
+    name="Android.AssistContent.WebPageContentProvider.Events.{RequestType}.{Format}{Consumer}"
+    enum="WebPageContentProviderEvent" expires_after="2027-05-25">
   <owner>salg@google.com</owner>
   <owner>ssid@google.com</owner>
+  <owner>tivi@google.com</owner>
   <summary>
     Records events related to WebPageContentProvider as it generates a URI for
-    an external app and as it handles queries from said external app.
+    {Consumer} and as it handles queries from said external app.
 
-    Recorded when an external app requests {Format} with a {RequestType}.
+    Recorded when {Consumer} requests {Format} with a {RequestType}.
   </summary>
   <token key="RequestType" variants="PageContentProvider_RequestType"/>
   <token key="Format" variants="PageContentProvider_OutputFormat"/>
+  <token key="Consumer" variants="PageContentProvider_Consumer"/>
+</histogram>
+
+<histogram name="Android.AssistContent.WebPageContentProvider.Events{Consumer}"
+    enum="WebPageContentProviderEvent" expires_after="2027-05-25">
+  <owner>salg@google.com</owner>
+  <owner>ssid@google.com</owner>
+  <owner>tivi@google.com</owner>
+  <summary>
+    Records events related to WebPageContentProvider as it generates a URI for
+    {Consumer} and as it handles queries from said external app.
+  </summary>
+  <token key="Consumer" variants="PageContentProvider_Consumer"/>
 </histogram>
 
 <histogram
     name="Android.AssistContent.WebPageContentProvider.GetAssistantPackageResult"
-    enum="BooleanSuccess" expires_after="2026-12-06">
+    enum="BooleanSuccess" expires_after="2027-05-25">
   <owner>salg@google.com</owner>
   <owner>ssid@google.com</owner>
   <summary>
@@ -733,47 +742,54 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram
-    name="Android.AssistContent.WebPageContentProvider.Latency.CreateToExtractionStart.{RequestType}.{Format}"
-    units="ms" expires_after="2026-12-06">
+    name="Android.AssistContent.WebPageContentProvider.Latency.CreateToExtractionStart.{RequestType}.{Format}{Consumer}"
+    units="ms" expires_after="2027-05-25">
   <owner>salg@google.com</owner>
   <owner>ssid@google.com</owner>
+  <owner>tivi@google.com</owner>
   <summary>
     Records the amount of time passed between sending a web page content
-    provider URI to an external app and receiving a query from an external app
-    with the same URI (this starts a content extraction task).
+    provider URI to {Consumer} and receiving a query from {Consumer} with the
+    same URI (this starts a content extraction task).
   </summary>
   <token key="RequestType" variants="PageContentProvider_RequestType"/>
   <token key="Format" variants="PageContentProvider_OutputFormat"/>
+  <token key="Consumer" variants="PageContentProvider_Consumer"/>
 </histogram>
 
 <histogram
-    name="Android.AssistContent.WebPageContentProvider.Latency.ExtractionStartToEnd.{RequestType}.{Format}"
-    units="ms" expires_after="2026-12-06">
+    name="Android.AssistContent.WebPageContentProvider.Latency.ExtractionStartToEnd.{RequestType}.{Format}{Consumer}"
+    units="ms" expires_after="2027-05-25">
   <owner>salg@google.com</owner>
   <owner>ssid@google.com</owner>
+  <owner>tivi@google.com</owner>
   <summary>
-    Records the amount of time passed while extracting a web page's contents.
+    Records the amount of time passed while extracting a web page's contents for
+    {Consumer}.
   </summary>
   <token key="RequestType" variants="PageContentProvider_RequestType"/>
   <token key="Format" variants="PageContentProvider_OutputFormat"/>
+  <token key="Consumer" variants="PageContentProvider_Consumer"/>
 </histogram>
 
 <histogram
-    name="Android.AssistContent.WebPageContentProvider.Latency.TotalLatency.{RequestType}.{Format}"
-    units="ms" expires_after="2026-12-06">
+    name="Android.AssistContent.WebPageContentProvider.Latency.TotalLatency.{RequestType}.{Format}{Consumer}"
+    units="ms" expires_after="2027-05-25">
   <owner>salg@google.com</owner>
   <owner>ssid@google.com</owner>
+  <owner>tivi@google.com</owner>
   <summary>
     Records the total amount of time passed between sending a web page content
-    provider URI to an external app and it receiving the web page's contents.
+    provider URI to {Consumer} and it receiving the web page's contents.
   </summary>
   <token key="RequestType" variants="PageContentProvider_RequestType"/>
   <token key="Format" variants="PageContentProvider_OutputFormat"/>
+  <token key="Consumer" variants="PageContentProvider_Consumer"/>
 </histogram>
 
 <histogram
     name="Android.AssistContent.WebPageContentProvider.TargetPackageProvided"
-    enum="Boolean" expires_after="2026-12-06">
+    enum="Boolean" expires_after="2027-05-25">
   <owner>salg@google.com</owner>
   <owner>tivi@google.com</owner>
   <summary>
