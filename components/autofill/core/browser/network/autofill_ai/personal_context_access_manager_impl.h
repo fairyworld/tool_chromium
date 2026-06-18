@@ -11,6 +11,7 @@
 #include "base/containers/flat_map.h"
 #include "base/containers/flat_set.h"
 #include "base/containers/span.h"
+#include "base/memory/raw_ptr.h"
 #include "base/memory/raw_ref.h"
 #include "base/memory/weak_ptr.h"
 #include "base/observer_list.h"
@@ -22,8 +23,11 @@
 #include "components/personal_context/core/personal_context_enablement_service.h"
 #include "components/personal_context/core/personal_context_types.h"
 #include "components/personal_context/proto/features/common_data.pb.h"
+#include "components/prefs/pref_change_registrar.h"
 #include "net/base/backoff_entry.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
+
+class PrefService;
 
 namespace personal_context {
 class PersonalContextService;
@@ -52,7 +56,8 @@ class PersonalContextAccessManagerImpl
   PersonalContextAccessManagerImpl(
       personal_context::PersonalContextService* personal_context_service,
       personal_context::PersonalContextEnablementService*
-          personal_context_enablement_service);
+          personal_context_enablement_service,
+      PrefService* pref_service);
 
   PersonalContextAccessManagerImpl(const PersonalContextAccessManagerImpl&) =
       delete;
@@ -89,6 +94,14 @@ class PersonalContextAccessManagerImpl
     base::TimeTicks last_update_time;
     std::unique_ptr<net::BackoffEntry> backoff_entry;
   };
+
+  // Resets the prefetch and unmasked caches for all types, notifying observers
+  // to evict any cached data.
+  void WipeCache();
+
+  // Callback triggered when the user-visible toggle in Autofill settings
+  // changes.
+  void OnPersonalContextSettingsToggleChanged();
 
   // Resets the state for `type` by:
   // - Evicting masked entities for all prefetched types.
@@ -139,6 +152,7 @@ class PersonalContextAccessManagerImpl
       personal_context_service_;
   const raw_ref<personal_context::PersonalContextEnablementService>
       personal_context_enablement_service_;
+  const raw_ptr<PrefService> pref_service_;
 
   // Map from EntityId to the original proto Entity received during prefetch.
   absl::flat_hash_map<EntityInstance::EntityId, personal_context::proto::Entity>
@@ -166,6 +180,8 @@ class PersonalContextAccessManagerImpl
       personal_context::PersonalContextEnablementService,
       personal_context::PersonalContextEnablementService::Observer>
       enablement_service_observation_{this};
+
+  PrefChangeRegistrar pref_registrar_;
 
   base::WeakPtrFactory<PersonalContextAccessManagerImpl> weak_factory_{this};
 };

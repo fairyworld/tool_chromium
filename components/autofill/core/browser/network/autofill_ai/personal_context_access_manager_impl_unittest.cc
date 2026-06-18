@@ -22,9 +22,11 @@
 #include "components/personal_context/core/mock_personal_context_enablement_service.h"
 #include "components/personal_context/core/mock_personal_context_service.h"
 #include "components/personal_context/core/personal_context_enablement_service.h"
+#include "components/personal_context/core/personal_context_prefs.h"
 #include "components/personal_context/core/personal_context_service.h"
 #include "components/personal_context/core/personal_context_types.h"
 #include "components/personal_context/proto/features/ambient_autofill.pb.h"
+#include "components/prefs/testing_pref_service.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -99,14 +101,20 @@ class MockPersonalContextAccessManagerObserver
 class PersonalContextAccessManagerImplTest : public testing::Test {
  public:
   PersonalContextAccessManagerImplTest() {
+    personal_context::prefs::RegisterProfilePrefs(pref_service_.registry());
+    access_manager_ = std::make_unique<PersonalContextAccessManagerImpl>(
+        &mock_personal_context_service_, &mock_enablement_service_,
+        &pref_service_);
     ON_CALL(mock_enablement_service_, GetEnablementState)
         .WillByDefault(testing::Return(
             personal_context::PersonalContextEnablementState::kEnabled));
-    observation_.Observe(&access_manager_);
+    observation_.Observe(access_manager_.get());
   }
   ~PersonalContextAccessManagerImplTest() override = default;
 
-  PersonalContextAccessManagerImpl& access_manager() { return access_manager_; }
+  PersonalContextAccessManagerImpl& access_manager() {
+    return *access_manager_;
+  }
 
   MockPersonalContextService& mock_personal_context_service() {
     return mock_personal_context_service_;
@@ -155,6 +163,9 @@ class PersonalContextAccessManagerImplTest : public testing::Test {
     access_manager().PrefetchAmbientAutofillContext(requested_types);
   }
 
+ protected:
+  TestingPrefServiceSimple pref_service_;
+
  private:
   base::test::ScopedFeatureList feature_list_{
       features::kAutofillAmbientAutofill};
@@ -162,8 +173,7 @@ class PersonalContextAccessManagerImplTest : public testing::Test {
       base::test::TaskEnvironment::TimeSource::MOCK_TIME};
   MockPersonalContextService mock_personal_context_service_;
   MockPersonalContextEnablementService mock_enablement_service_;
-  PersonalContextAccessManagerImpl access_manager_{
-      &mock_personal_context_service_, &mock_enablement_service_};
+  std::unique_ptr<PersonalContextAccessManagerImpl> access_manager_;
   MockPersonalContextAccessManagerObserver mock_observer_;
   base::ScopedObservation<PersonalContextAccessManagerImpl,
                           MockPersonalContextAccessManagerObserver>
@@ -913,6 +923,34 @@ TEST_F(PersonalContextAccessManagerImplTest,
   EXPECT_CALL(observer, OnPrefetchAmbientAutofillContextComplete(true));
   access_manager().PrefetchAmbientAutofillContext(
       {EntityType(EntityTypeName::kPassport)});
+}
+
+// Tests that the state is reset when the personal context settings toggle is
+// turned off.
+TEST_F(PersonalContextAccessManagerImplTest,
+       ResetAllStateOnTogglePrefChangedOff) {
+  personal_context::proto::ContextMemoryAmbientAutofillResponse response;
+  response.add_entities()->mutable_passport()->set_number("P123");
+
+  std::vector<EntityInstance> entities;
+  EXPECT_CALL(mock_observer(), OnMaskedAmbientAutofillEntitiesPrefetched)
+      .WillOnce(SaveSpanToVector(&entities));
+  PrefetchAmbientAutofillContextSync({EntityType(EntityTypeName::kPassport)},
+                                     response);
+  ASSERT_TRUE(
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
+  ASSERT_EQ(entities.size(), 1u);
+
+  // Set the toggle pref to false. This should trigger eviction.
+  EXPECT_CALL(mock_observer(), OnMaskedAmbientAutofillEntityTypeEvicted(
+                                   EntityType(EntityTypeName::kPassport)));
+  pref_service_.SetBoolean(
+      personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
+      false);
+
+  // Verify that the state is wiped.
+  EXPECT_FALSE(
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
 }
 
 }  // namespace

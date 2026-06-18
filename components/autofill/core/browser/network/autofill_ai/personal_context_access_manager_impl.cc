@@ -22,10 +22,12 @@
 #include "components/autofill/core/common/autofill_debug_features.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/personal_context/core/personal_context_enablement_service.h"
+#include "components/personal_context/core/personal_context_prefs.h"
 #include "components/personal_context/core/personal_context_service.h"
 #include "components/personal_context/core/personal_context_types.h"
 #include "components/personal_context/proto/context_memory_service.pb.h"
 #include "components/personal_context/proto/features/ambient_autofill.pb.h"
+#include "components/prefs/pref_service.h"
 #include "net/base/backoff_entry.h"
 
 namespace autofill {
@@ -94,7 +96,8 @@ bool IsPersonalContextEnabled(
 }
 
 bool IsPrefetchAmbientAutofillContextEnabled(
-    personal_context::PersonalContextEnablementService& enablement_service) {
+    personal_context::PersonalContextEnablementService& enablement_service,
+    PrefService* pref_service) {
   if (!base::FeatureList::IsEnabled(features::kAutofillAmbientAutofill)) {
     return false;
   }
@@ -112,11 +115,21 @@ bool IsPrefetchAmbientAutofillContextEnabled(
 PersonalContextAccessManagerImpl::PersonalContextAccessManagerImpl(
     personal_context::PersonalContextService* personal_context_service,
     personal_context::PersonalContextEnablementService*
-        personal_context_enablement_service)
+        personal_context_enablement_service,
+    PrefService* pref_service)
     : personal_context_service_(CHECK_DEREF(personal_context_service)),
       personal_context_enablement_service_(
-          CHECK_DEREF(personal_context_enablement_service)) {
+          CHECK_DEREF(personal_context_enablement_service)),
+      pref_service_(pref_service) {
   enablement_service_observation_.Observe(personal_context_enablement_service);
+  if (pref_service_) {
+    pref_registrar_.Init(pref_service_);
+    pref_registrar_.Add(
+        personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
+        base::BindRepeating(&PersonalContextAccessManagerImpl::
+                                OnPersonalContextSettingsToggleChanged,
+                            base::Unretained(this)));
+  }
   MaybeImportEntitiesForTesting(weak_factory_.GetWeakPtr());
 }
 
@@ -125,7 +138,7 @@ PersonalContextAccessManagerImpl::~PersonalContextAccessManagerImpl() = default;
 void PersonalContextAccessManagerImpl::PrefetchAmbientAutofillContext(
     base::span<const EntityType> requested_types) {
   if (!IsPrefetchAmbientAutofillContextEnabled(
-          *personal_context_enablement_service_)) {
+          *personal_context_enablement_service_, pref_service_)) {
     return;
   }
 
@@ -340,18 +353,32 @@ void PersonalContextAccessManagerImpl::CacheUnmaskedSpiiEntity(
       kUnmaskedSpiiCacheTTL);
 }
 
+void PersonalContextAccessManagerImpl::WipeCache() {
+  // Invalidate weak pointers to cancel any pending fetches.
+  weak_factory_.InvalidateWeakPtrs();
+  // Copy the keys since `ResetStateForType()` invalidates iterators to
+  // `prefetch_state_`.
+  std::vector<EntityType> prefetched_types = base::ToVector(
+      prefetch_state_, [](const auto& item) { return item.first; });
+  for (EntityType type : prefetched_types) {
+    ResetStateForType(type);
+  }
+}
+
 void PersonalContextAccessManagerImpl::OnEnablementStateChanged(
     personal_context::PersonalContextEnablementState new_state) {
   if (!IsPersonalContextEnabled(new_state)) {
-    // Reset all state.
-    weak_factory_.InvalidateWeakPtrs();
-    // Copy the keys since `ResetStateForType()` invalidates iterators to
-    // `prefetch_state_`.
-    std::vector<EntityType> prefetched_types = base::ToVector(
-        prefetch_state_, [](const auto& item) { return item.first; });
-    for (EntityType type : prefetched_types) {
-      ResetStateForType(type);
-    }
+    WipeCache();
+  }
+}
+
+void PersonalContextAccessManagerImpl::
+    OnPersonalContextSettingsToggleChanged() {
+  if (pref_service_ &&
+      !pref_service_->GetBoolean(
+          personal_context::prefs::
+              kPersonalContextInAutofillSettingsToggleStatus)) {
+    WipeCache();
   }
 }
 
