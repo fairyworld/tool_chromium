@@ -18461,12 +18461,12 @@
                 {
                     "name": "enabled_512K_20260420",
                     "params": {
-                        "PartitionAllocSchedulerLoopQuarantineConfig": "{\"*\":{\"main\":{\"branch-capacity-in-bytes\":524288,\"enable-quarantine\":true,\"enable-zapping\":true,\"leak-on-destruction\":false},\"amsc\":{\"branch-capacity-in-bytes\":524288,\"enable-quarantine\":true,\"enable-zapping\":true,\"leak-on-destruction\":false}},\"gpu-process\":{\"*\":{\"branch-capacity-in-bytes\":524288,\"enable-quarantine\":true,\"enable-zapping\":true,\"leak-on-destruction\":false}}}",
+                        "PartitionAllocSchedulerLoopQuarantineConfig": "{\"*\":{\"main\":{\"branch-capacity-in-bytes\":524288,\"enable-quarantine\":true,\"enable-zapping\":true,\"leak-on-destruction\":false},\"amsc\":{\"branch-capacity-in-bytes\":524288,\"enable-quarantine\":true,\"enable-zapping\":true,\"leak-on-destruction\":false}},\"gpu-process\":{\"*\":{\"branch-capacity-in-bytes\":524288,\"enable-quarantine\":true,\"enable-task-controlled-purge\":true,\"enable-zapping\":true,\"leak-on-destruction\":false}}}",
                         "enabled-processes": "browser-and-gpu"
                     },
                     "enable_features": [
                         "PartitionAllocSchedulerLoopQuarantine",
-                        "PartitionAllocSchedulerLoopQuarantineTaskControlledPurge",
+                        "PartitionAllocSchedulerLoopQuarantineTaskObserverForBrowserUIThread",
                         "PartitionAllocWithAdvancedChecks"
                     ],
                     "disable_features": [
