@@ -5,6 +5,7 @@
 #ifndef CHROME_BROWSER_DICTATION_STREAM_PROVIDER_H_
 #define CHROME_BROWSER_DICTATION_STREAM_PROVIDER_H_
 
+#include <memory>
 #include <string>
 
 namespace dictation {
@@ -19,8 +20,9 @@ class StreamProvider {
 
   virtual ~StreamProvider() = default;
 
-  // Sets the target that the stream provider's output will be committed to.
-  virtual void BindToTarget(Target& target) = 0;
+  // Sets the target that the stream provider's output will be committed to, and
+  // requests the stream provider to start listening and transcribing.
+  virtual void BindToTargetAndConnect(std::unique_ptr<Target> target) = 0;
 
   // Requests the stream provider to stop listening and transcribing.
   virtual void Stop() = 0;

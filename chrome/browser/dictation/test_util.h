@@ -5,6 +5,7 @@
 #ifndef CHROME_BROWSER_DICTATION_TEST_UTIL_H_
 #define CHROME_BROWSER_DICTATION_TEST_UTIL_H_
 
+#include <memory>
 #include <string>
 
 #include "base/memory/raw_ptr.h"
@@ -21,7 +22,10 @@ class MockStreamProvider : public StreamProvider {
   MockStreamProvider();
   ~MockStreamProvider() override;
 
-  MOCK_METHOD(void, BindToTarget, (Target & target), (override));
+  MOCK_METHOD(void,
+              BindToTargetAndConnect,
+              (std::unique_ptr<Target> target),
+              (override));
   MOCK_METHOD(void, Stop, (), (override));
   MOCK_METHOD(void,
               OnTranscriptionUpdated,

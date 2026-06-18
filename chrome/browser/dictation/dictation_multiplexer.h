@@ -26,6 +26,9 @@ class DictationMultiplexer {
 
   using StreamId = base::IdType32<class StreamIdTag>;
 
+  // Generates a unique stream ID.
+  StreamId GenerateStreamId();
+
   // Forwards transcription update to the StreamProvider associated with
   // `stream_id`. Returns true if a matching provider was found.
   bool UpdateTranscription(StreamId stream_id,
@@ -43,6 +46,7 @@ class DictationMultiplexer {
   void UnregisterStreamProvider(StreamId stream_id);
 
  private:
+  StreamId::Generator generator_;
   absl::flat_hash_map<StreamId, raw_ptr<StreamProvider>> stream_providers_;
 };
 

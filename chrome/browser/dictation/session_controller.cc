@@ -13,6 +13,7 @@
 #include "chrome/browser/dictation/session_controller_delegate.h"
 #include "chrome/browser/dictation/session_ui.h"
 #include "chrome/browser/dictation/stream_provider.h"
+#include "chrome/browser/dictation/target.h"
 
 namespace dictation {
 
@@ -30,12 +31,12 @@ void SessionController::Initialize() {
   ui_ = delegate_->CreateUi(*this);
 }
 
-void SessionController::StartDictationStream(Target& target) {
+void SessionController::StartDictationStream(std::unique_ptr<Target> target) {
   CHECK_EQ(state_, State::kInactive);
 
   std::unique_ptr<StreamProvider> stream_provider =
       delegate_->CreateStreamProvider(*this);
-  stream_provider->BindToTarget(target);
+  stream_provider->BindToTargetAndConnect(std::move(target));
   attached_stream_provider_ = std::move(stream_provider);
 
   MoveToState(State::kStreamInitializing);

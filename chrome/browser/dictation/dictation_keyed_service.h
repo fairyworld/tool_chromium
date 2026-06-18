@@ -57,7 +57,8 @@ class DictationKeyedService : public KeyedService,
   // If a target is provided, the new session will immediately start up a
   // stream. Otherwise, if nullptr is passed the session is created without a
   // stream.
-  void StartSession(BrowserWindowInterface& window, Target* target);
+  void StartSession(BrowserWindowInterface& window,
+                    std::unique_ptr<Target> target);
 
   // Returns true if there is no active session.
   bool ShouldShowContextMenuItem() const;

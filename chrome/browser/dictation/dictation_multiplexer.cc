@@ -12,6 +12,10 @@ DictationMultiplexer::DictationMultiplexer() = default;
 
 DictationMultiplexer::~DictationMultiplexer() = default;
 
+DictationMultiplexer::StreamId DictationMultiplexer::GenerateStreamId() {
+  return generator_.GenerateNextId();
+}
+
 bool DictationMultiplexer::UpdateTranscription(StreamId stream_id,
                                                const std::string& data,
                                                bool is_final) {

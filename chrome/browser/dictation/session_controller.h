@@ -57,7 +57,7 @@ class SessionController : public SessionUiDelegate {
   // Starts a new dictation stream by creating and attaching a new stream
   // provider. An existing stream must have been detached before calling this
   // method.
-  void StartDictationStream(Target& target);
+  void StartDictationStream(std::unique_ptr<Target> target);
 
   // Ends the current dictation stream and detaches the stream provider.
   void EndDictationStream();

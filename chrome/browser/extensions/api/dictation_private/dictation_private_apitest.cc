@@ -47,7 +47,9 @@ class ExtensionApiTestStreamProvider : public dictation::StreamProvider {
   ~ExtensionApiTestStreamProvider() override = default;
 
   // StreamProvider:
-  void BindToTarget(dictation::Target& target) override {
+  void BindToTargetAndConnect(
+      std::unique_ptr<dictation::Target> target) override {
+    target_ = std::move(target);
     api::dictation_private::StartStreamDetails details;
     details.stream_id = stream_id_.value();
     details.page_context = "Page context";
@@ -105,6 +107,7 @@ class ExtensionApiTestStreamProvider : public dictation::StreamProvider {
   }
 
  private:
+  std::unique_ptr<dictation::Target> target_;
   raw_ptr<content::BrowserContext> browser_context_;
   ExtensionId extension_id_;
   dictation::DictationMultiplexer::StreamId stream_id_;
@@ -155,8 +158,8 @@ IN_PROC_BROWSER_TEST_F(DictationPrivateApiTest, Basic) {
       profile(), extension->id(), test_stream_id);
   multiplexer.RegisterStreamProvider(test_stream_id, &test_stream_provider);
 
-  dictation::MockTarget mock_target;
-  test_stream_provider.BindToTarget(mock_target);
+  auto mock_target = std::make_unique<dictation::MockTarget>();
+  test_stream_provider.BindToTargetAndConnect(std::move(mock_target));
 
   ASSERT_TRUE(catcher.GetNextResult()) << catcher.message();
 
