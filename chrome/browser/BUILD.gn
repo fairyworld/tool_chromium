@@ -5127,8 +5127,6 @@ static_library("test_support") {
     "media/webrtc/fake_desktop_media_list.h",
     "media/webrtc/fake_desktop_media_picker_factory.cc",
     "media/webrtc/fake_desktop_media_picker_factory.h",
-    "net/dns_probe_test_util.cc",
-    "net/dns_probe_test_util.h",
   ]
 
   configs += [ "//build/config:precompiled_headers" ]
@@ -5159,6 +5157,7 @@ static_library("test_support") {
     "//build:chromeos_buildflags",
     "//chrome/app/theme:theme_resources",
     "//chrome/browser/history",
+    "//chrome/browser/net:test_support",
     "//chrome/browser/payments/browser_binding:test_support",
     "//chrome/browser/policy/messaging_layer/proto:crd_event_proto",
     "//chrome/browser/search_engine_choice",
@@ -5281,10 +5280,6 @@ static_library("test_support") {
   }
 
   if (use_nss_certs) {
-    sources += [
-      "net/fake_nss_service.cc",
-      "net/fake_nss_service.h",
-    ]
     deps += [ "//crypto:test_support" ]
   }
 
