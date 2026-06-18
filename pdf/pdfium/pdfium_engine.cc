@@ -5282,6 +5282,7 @@ void PDFiumEngine::DiscardText(InkTextId id) {
 void PDFiumEngine::DrawText(int page_index,
                             InkTextId id,
                             base::span<const InkTextInfo> text_info,
+                            float ascent,
                             double pdf_zoom,
                             const InkTextBoxAttributes& attributes) {
   std::vector<gfx::Rect> canceled_rects = CancelPaints();
@@ -5298,18 +5299,14 @@ void PDFiumEngine::DrawText(int page_index,
   const float pdf_font_size =
       CSSFontSizeToPdfFontSize(attributes.css_font_size);
 
+  ascent /= pdf_zoom;
+
   std::vector<FPDF_PAGEOBJECT> page_objects;
   page_objects.reserve(text_info.size());
   FPDF_PAGEOBJECTMARK mark = nullptr;
   for (const InkTextInfo& item : text_info) {
     FPDF_FONT font = GetAddedFont(item.font_id);
     CHECK(font);
-
-    // TODO(crbug.com/502083480): This baseline alignment isn't exactly right.
-    // Blink actually uses the primary font ascent for alignment. Also Blink
-    // uses a special platform-specific rounded number.
-    float ascent;
-    CHECK(FPDFFont_GetAscent(font, attributes.css_font_size, &ascent));
 
     ScopedFPDFPageObject text_object(
         FPDFPageObj_CreateTextObj(doc(), font, pdf_font_size));

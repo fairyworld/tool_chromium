@@ -327,9 +327,11 @@ class PdfViewWebPlugin::PdfInkModuleClientImpl : public PdfInkModuleClient {
   void DrawText(int page_index,
                 InkTextId id,
                 base::span<const InkTextInfo> text_info,
+                float ascent,
                 double pdf_zoom,
                 const InkTextBoxAttributes& attributes) override {
-    plugin_->engine_->DrawText(page_index, id, text_info, pdf_zoom, attributes);
+    plugin_->engine_->DrawText(page_index, id, text_info, ascent, pdf_zoom,
+                               attributes);
   }
 
   void ExtendSelectionByPoint(const gfx::PointF& point) override {

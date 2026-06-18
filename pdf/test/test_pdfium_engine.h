@@ -123,6 +123,7 @@ class TestPDFiumEngine : public PDFiumEngine {
               (int,
                InkTextId,
                base::span<const InkTextInfo>,
+               float,
                double,
                const InkTextBoxAttributes&),
               (override));

@@ -294,6 +294,7 @@ class FakeClient : public PdfInkModuleClient {
               (int page_index,
                InkTextId id,
                base::span<const InkTextInfo> text_info,
+               float ascent,
                double pdf_zoom,
                const InkTextBoxAttributes& attributes),
               (override));
@@ -1099,6 +1100,7 @@ class PdfInkModuleTextTest : public testing::Test {
   static base::BlobStorage SampleInkTextInfoBlob(FontId typeface_id) {
     auto mojo_text_info = pdf::mojom::InkTextInfo::New();
     mojo_text_info->effective_zoom = 10.0f;
+    mojo_text_info->primary_ascent = 5.0f;
     auto mojo_text_run = pdf::mojom::InkTextRun::New();
     mojo_text_run->location = gfx::RectF(100.0f, 200.0f, 300.0f, 400.0f);
     auto mojo_typeface_run = pdf::mojom::InkTypefaceRun::New();
@@ -1198,12 +1200,14 @@ TEST_F(PdfInkModuleTextTest, HandleEditTextAnnotationMessage) {
   static constexpr FontId kFontId(123);
   static constexpr double kPdfZoom = 2.0;
   static constexpr InkTextId kBackendId(0);
+  static constexpr float kAscent = 0.5f;
 
   {
     base::DictValue data = SampleFinishTextAnnotationData(kFrontendId, kFontId,
                                                           kPageIndex, kPdfZoom);
 
-    EXPECT_CALL(client(), DrawText(kPageIndex, kBackendId, _, kPdfZoom, _));
+    EXPECT_CALL(client(),
+                DrawText(kPageIndex, kBackendId, _, kAscent, kPdfZoom, _));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);
 
@@ -1216,7 +1220,7 @@ TEST_F(PdfInkModuleTextTest, HandleEditTextAnnotationMessage) {
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(TextId(kBackendId),
                                                         /*active=*/false));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
-    EXPECT_CALL(client(), DrawText(_, _, _, _, _)).Times(0);
+    EXPECT_CALL(client(), DrawText(_, _, _, _, _, _)).Times(0);
 
     EXPECT_TRUE(
         ink_module().OnMessage(CreateEditTextAnnotationMessage(kFrontendId)));
@@ -1232,6 +1236,7 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageNew) {
   static constexpr auto kTypefaceBlob =
       std::to_array<const uint8_t>({1, 2, 3, 4});
   static constexpr InkTextId kTextId(0);
+  static constexpr float kAscent = 0.5f;
 
   base::DictValue data = SampleFinishTextAnnotationData(kFrontendId, kFontId,
                                                         kPageIndex, kPdfZoom);
@@ -1244,8 +1249,8 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageNew) {
   EXPECT_CALL(client(), AddFont(kFontId, ElementsAreArray(kTypefaceBlob)));
   EXPECT_CALL(client(),
               DrawText(kPageIndex, kTextId,
-                       ElementsAre(SampleInkTextInfoMatcher(kFontId)), kPdfZoom,
-                       SampleInkTextBoxAttributesMatcher()));
+                       ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
+                       kPdfZoom, SampleInkTextBoxAttributesMatcher()));
   EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);
 
   EXPECT_TRUE(ink_module().OnMessage(
@@ -1260,6 +1265,7 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageNoEdit) {
   static constexpr auto kTypefaceBlob =
       std::to_array<const uint8_t>({1, 2, 3, 4});
   static constexpr InkTextId kTextId0(0);
+  static constexpr float kAscent = 0.5f;
 
   {
     base::DictValue data = SampleFinishTextAnnotationData(kFrontendId, kFontId,
@@ -1271,10 +1277,11 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageNoEdit) {
 
     InSequence seq;
     EXPECT_CALL(client(), AddFont(kFontId, ElementsAreArray(kTypefaceBlob)));
-    EXPECT_CALL(client(),
-                DrawText(kPageIndex, kTextId0,
-                         ElementsAre(SampleInkTextInfoMatcher(kFontId)),
-                         kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(
+        client(),
+        DrawText(kPageIndex, kTextId0,
+                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
+                 kPdfZoom, SampleInkTextBoxAttributesMatcher()));
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);
 
@@ -1292,7 +1299,7 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageNoEdit) {
                                                         /*active=*/true));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
-    EXPECT_CALL(client(), DrawText(_, _, _, _, _)).Times(0);
+    EXPECT_CALL(client(), DrawText(_, _, _, _, _, _)).Times(0);
 
     EXPECT_TRUE(ink_module().OnMessage(
         CreateFinishTextAnnotationMessage(std::move(data))));
@@ -1309,6 +1316,7 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageEdit) {
       std::to_array<const uint8_t>({1, 2, 3, 4});
   static constexpr InkTextId kTextId0(0);
   static constexpr InkTextId kTextId1(1);
+  static constexpr float kAscent = 0.5f;
 
   {
     base::DictValue data = SampleFinishTextAnnotationData(kFrontendId, kFontId,
@@ -1320,10 +1328,11 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageEdit) {
 
     InSequence seq;
     EXPECT_CALL(client(), AddFont(kFontId, ElementsAreArray(kTypefaceBlob)));
-    EXPECT_CALL(client(),
-                DrawText(kPageIndex, kTextId0,
-                         ElementsAre(SampleInkTextInfoMatcher(kFontId)),
-                         kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(
+        client(),
+        DrawText(kPageIndex, kTextId0,
+                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
+                 kPdfZoom, SampleInkTextBoxAttributesMatcher()));
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);
 
@@ -1343,7 +1352,8 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageEdit) {
     EXPECT_CALL(
         client(),
         DrawText(kPageIndex, kTextId1,
-                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kPdfZoom,
+                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
+                 kPdfZoom,
                  InkTextBoxAttributesEq(
                      /*rect=*/gfx::RectF(10.0f, 20.0f, 100.0f, 15.0f),
                      /*color=*/SkColorSetRGB(255, 111, 99),
@@ -1371,6 +1381,7 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageDelete) {
   static constexpr auto kTypefaceBlob =
       std::to_array<const uint8_t>({1, 2, 3, 4});
   static constexpr InkTextId kTextId(0);
+  static constexpr float kAscent = 0.5f;
 
   {
     base::DictValue data = SampleFinishTextAnnotationData(kFrontendId, kFontId,
@@ -1382,10 +1393,11 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageDelete) {
 
     InSequence seq;
     EXPECT_CALL(client(), AddFont(kFontId, ElementsAreArray(kTypefaceBlob)));
-    EXPECT_CALL(client(),
-                DrawText(kPageIndex, kTextId,
-                         ElementsAre(SampleInkTextInfoMatcher(kFontId)),
-                         kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(
+        client(),
+        DrawText(kPageIndex, kTextId,
+                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
+                 kPdfZoom, SampleInkTextBoxAttributesMatcher()));
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);
 
@@ -1404,7 +1416,7 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageDelete) {
                                                         /*active=*/false));
     EXPECT_CALL(client(), DiscardText(kTextId));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
-    EXPECT_CALL(client(), DrawText(_, _, _, _, _)).Times(0);
+    EXPECT_CALL(client(), DrawText(_, _, _, _, _, _)).Times(0);
 
     EXPECT_TRUE(ink_module().OnMessage(
         CreateFinishTextAnnotationMessage(std::move(data))));
@@ -1422,6 +1434,7 @@ TEST_F(PdfInkModuleTextTest,
       std::to_array<const uint8_t>({1, 2, 3, 4});
   static constexpr InkTextId kTextId0(0);
   static constexpr InkTextId kTextId1(1);
+  static constexpr float kAscent = 0.5f;
 
   {
     // Draw text annotation `kTextId0`.
@@ -1434,10 +1447,11 @@ TEST_F(PdfInkModuleTextTest,
 
     InSequence seq;
     EXPECT_CALL(client(), AddFont(kFontId, ElementsAreArray(kTypefaceBlob)));
-    EXPECT_CALL(client(),
-                DrawText(kPageIndex, kTextId0,
-                         ElementsAre(SampleInkTextInfoMatcher(kFontId)),
-                         kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(
+        client(),
+        DrawText(kPageIndex, kTextId0,
+                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
+                 kPdfZoom, SampleInkTextBoxAttributesMatcher()));
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);
 
@@ -1458,7 +1472,7 @@ TEST_F(PdfInkModuleTextTest,
                                                         /*active=*/false));
     EXPECT_CALL(client(), DiscardText(kTextId0));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
-    EXPECT_CALL(client(), DrawText(_, _, _, _, _)).Times(0);
+    EXPECT_CALL(client(), DrawText(_, _, _, _, _, _)).Times(0);
 
     EXPECT_TRUE(ink_module().OnMessage(
         CreateFinishTextAnnotationMessage(std::move(data))));
@@ -1472,10 +1486,11 @@ TEST_F(PdfInkModuleTextTest,
         kFrontendId, kFontId, kPageIndex, kPdfZoom, /*source=*/"redo");
 
     InSequence seq;
-    EXPECT_CALL(client(),
-                DrawText(kPageIndex, kTextId0,
-                         ElementsAre(SampleInkTextInfoMatcher(kFontId)),
-                         kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(
+        client(),
+        DrawText(kPageIndex, kTextId0,
+                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
+                 kPdfZoom, SampleInkTextBoxAttributesMatcher()));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);
@@ -1496,10 +1511,11 @@ TEST_F(PdfInkModuleTextTest,
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(TextId(kTextId0),
                                                         /*active=*/false));
     EXPECT_CALL(client(), DiscardText(kTextId0));
-    EXPECT_CALL(client(),
-                DrawText(kPageIndex, kTextId1,
-                         ElementsAre(SampleInkTextInfoMatcher(kFontId)),
-                         kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(
+        client(),
+        DrawText(kPageIndex, kTextId1,
+                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
+                 kPdfZoom, SampleInkTextBoxAttributesMatcher()));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
 
     EXPECT_TRUE(ink_module().OnMessage(
@@ -1517,10 +1533,11 @@ TEST_F(PdfInkModuleTextTest,
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(TextId(kTextId1),
                                                         /*active=*/false));
     EXPECT_CALL(client(), DiscardText(kTextId1));
-    EXPECT_CALL(client(),
-                DrawText(kPageIndex, kTextId0,
-                         ElementsAre(SampleInkTextInfoMatcher(kFontId)),
-                         kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(
+        client(),
+        DrawText(kPageIndex, kTextId0,
+                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
+                 kPdfZoom, SampleInkTextBoxAttributesMatcher()));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
 
     EXPECT_TRUE(ink_module().OnMessage(
@@ -1541,7 +1558,7 @@ TEST_F(PdfInkModuleTextTest,
                                                         /*active=*/false));
     EXPECT_CALL(client(), DiscardText(kTextId0));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
-    EXPECT_CALL(client(), DrawText(_, _, _, _, _)).Times(0);
+    EXPECT_CALL(client(), DrawText(_, _, _, _, _, _)).Times(0);
 
     EXPECT_TRUE(ink_module().OnMessage(
         CreateFinishTextAnnotationMessage(std::move(data))));
@@ -1557,10 +1574,11 @@ TEST_F(PdfInkModuleTextTest,
                                                           kPageIndex, kPdfZoom);
 
     InSequence seq;
-    EXPECT_CALL(client(),
-                DrawText(kPageIndex, kTextId0,
-                         ElementsAre(SampleInkTextInfoMatcher(kFontId)),
-                         kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(
+        client(),
+        DrawText(kPageIndex, kTextId0,
+                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
+                 kPdfZoom, SampleInkTextBoxAttributesMatcher()));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);
@@ -1580,6 +1598,7 @@ TEST_F(PdfInkModuleTextTest,
   static constexpr auto kTypefaceBlob =
       std::to_array<const uint8_t>({1, 2, 3, 4});
   static constexpr InkTextId kTextId0(0);
+  static constexpr float kAscent = 0.5f;
 
   {
     // Draw text annotation `kTextId0`.
@@ -1592,10 +1611,11 @@ TEST_F(PdfInkModuleTextTest,
 
     InSequence seq;
     EXPECT_CALL(client(), AddFont(kFontId, ElementsAreArray(kTypefaceBlob)));
-    EXPECT_CALL(client(),
-                DrawText(kPageIndex, kTextId0,
-                         ElementsAre(SampleInkTextInfoMatcher(kFontId)),
-                         kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(
+        client(),
+        DrawText(kPageIndex, kTextId0,
+                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
+                 kPdfZoom, SampleInkTextBoxAttributesMatcher()));
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);
 
@@ -1615,7 +1635,7 @@ TEST_F(PdfInkModuleTextTest,
                                                         /*active=*/false));
     EXPECT_CALL(client(), DiscardText(kTextId0));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
-    EXPECT_CALL(client(), DrawText(_, _, _, _, _)).Times(0);
+    EXPECT_CALL(client(), DrawText(_, _, _, _, _, _)).Times(0);
 
     EXPECT_TRUE(ink_module().OnMessage(
         CreateFinishTextAnnotationMessage(std::move(data))));
@@ -1627,10 +1647,11 @@ TEST_F(PdfInkModuleTextTest,
     base::DictValue data = SampleFinishTextAnnotationDataWithSource(
         kFrontendId, kFontId, kPageIndex, kPdfZoom, /*source=*/"undo");
 
-    EXPECT_CALL(client(),
-                DrawText(kPageIndex, kTextId0,
-                         ElementsAre(SampleInkTextInfoMatcher(kFontId)),
-                         kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(
+        client(),
+        DrawText(kPageIndex, kTextId0,
+                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
+                 kPdfZoom, SampleInkTextBoxAttributesMatcher()));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);
@@ -1652,7 +1673,7 @@ TEST_F(PdfInkModuleTextTest,
                                                         /*active=*/false));
     EXPECT_CALL(client(), DiscardText(kTextId0));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
-    EXPECT_CALL(client(), DrawText(_, _, _, _, _)).Times(0);
+    EXPECT_CALL(client(), DrawText(_, _, _, _, _, _)).Times(0);
 
     EXPECT_TRUE(ink_module().OnMessage(
         CreateFinishTextAnnotationMessage(std::move(data))));
@@ -1671,6 +1692,7 @@ TEST_F(PdfInkModuleTextTest,
   static constexpr InkTextId kNewTextId(0);
   static constexpr char kOriginalText[] = "hi";
   static constexpr char kModifiedText[] = "modified";
+  static constexpr float kAscent = 0.5f;
 
   LoadSampleTextAnnotation();
 
@@ -1684,7 +1706,8 @@ TEST_F(PdfInkModuleTextTest,
     // Deactivate loaded text and draw new text.
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(TextId(kLoadedTextId),
                                                         /*active=*/false));
-    EXPECT_CALL(client(), DrawText(kPageIndex, kNewTextId, _, kPdfZoom, _));
+    EXPECT_CALL(client(),
+                DrawText(kPageIndex, kNewTextId, _, kAscent, kPdfZoom, _));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
 
@@ -1708,7 +1731,7 @@ TEST_F(PdfInkModuleTextTest,
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(TextId(kLoadedTextId),
                                                         /*active=*/true));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
-    EXPECT_CALL(client(), DrawText(_, _, _, _, _)).Times(0);
+    EXPECT_CALL(client(), DrawText(_, _, _, _, _, _)).Times(0);
 
     EXPECT_TRUE(ink_module().OnMessage(
         CreateFinishTextAnnotationMessage(std::move(data))));
@@ -1726,7 +1749,8 @@ TEST_F(PdfInkModuleTextTest,
     // Deactivate loaded text and draw new text.
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(TextId(kLoadedTextId),
                                                         /*active=*/false));
-    EXPECT_CALL(client(), DrawText(kPageIndex, kNewTextId, _, kPdfZoom, _));
+    EXPECT_CALL(client(),
+                DrawText(kPageIndex, kNewTextId, _, kAscent, kPdfZoom, _));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
 
@@ -1749,6 +1773,7 @@ TEST_F(PdfInkModuleTextTest,
   static constexpr InkLoadedTextId kLoadedTextId(0);
   static constexpr char kOriginalText[] = "hi";
   static constexpr char kModifiedText[] = "modified";
+  static constexpr float kAscent = 0.5f;
 
   // Set viewport to 90 degrees CW.
   client().set_orientation(PageOrientation::kClockwise90);
@@ -1770,12 +1795,12 @@ TEST_F(PdfInkModuleTextTest,
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(TextId(kLoadedTextId),
                                                         /*active=*/false));
     EXPECT_CALL(client(), AddFont(kFontId, ElementsAreArray(kTypefaceBlob)));
-    EXPECT_CALL(
-        client(),
-        DrawText(kPageIndex, kTextId0,
-                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kPdfZoom,
-                 SampleInkTextBoxAttributesMatcherWith(
-                     kModifiedText, PageOrientation::kClockwise90)));
+    EXPECT_CALL(client(),
+                DrawText(kPageIndex, kTextId0,
+                         ElementsAre(SampleInkTextInfoMatcher(kFontId)),
+                         kAscent, kPdfZoom,
+                         SampleInkTextBoxAttributesMatcherWith(
+                             kModifiedText, PageOrientation::kClockwise90)));
 
     EXPECT_TRUE(ink_module().OnMessage(
         CreateFinishTextAnnotationMessage(std::move(data))));
@@ -1816,12 +1841,12 @@ TEST_F(PdfInkModuleTextTest,
     InSequence seq;
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(TextId(kLoadedTextId),
                                                         /*active=*/false));
-    EXPECT_CALL(
-        client(),
-        DrawText(kPageIndex, kTextId0,
-                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kPdfZoom,
-                 SampleInkTextBoxAttributesMatcherWith(
-                     kModifiedText, PageOrientation::kClockwise90)));
+    EXPECT_CALL(client(),
+                DrawText(kPageIndex, kTextId0,
+                         ElementsAre(SampleInkTextInfoMatcher(kFontId)),
+                         kAscent, kPdfZoom,
+                         SampleInkTextBoxAttributesMatcherWith(
+                             kModifiedText, PageOrientation::kClockwise90)));
 
     EXPECT_TRUE(ink_module().OnMessage(
         CreateFinishTextAnnotationMessage(std::move(data))));
@@ -1839,6 +1864,7 @@ TEST_F(PdfInkModuleTextTest,
   static constexpr auto kTypefaceBlob =
       std::to_array<const uint8_t>({1, 2, 3, 4});
   static constexpr InkTextId kTextId0(0);
+  static constexpr float kAscent = 0.5f;
 
   // Set viewport to 90 degrees CW.
   client().set_orientation(PageOrientation::kClockwise90);
@@ -1855,12 +1881,12 @@ TEST_F(PdfInkModuleTextTest,
 
     InSequence seq;
     EXPECT_CALL(client(), AddFont(kFontId, ElementsAreArray(kTypefaceBlob)));
-    EXPECT_CALL(
-        client(),
-        DrawText(kPageIndex, kTextId0,
-                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kPdfZoom,
-                 SampleInkTextBoxAttributesMatcherWith(
-                     "hi", PageOrientation::kClockwise90)));
+    EXPECT_CALL(client(),
+                DrawText(kPageIndex, kTextId0,
+                         ElementsAre(SampleInkTextInfoMatcher(kFontId)),
+                         kAscent, kPdfZoom,
+                         SampleInkTextBoxAttributesMatcherWith(
+                             "hi", PageOrientation::kClockwise90)));
 
     EXPECT_TRUE(ink_module().OnMessage(
         CreateFinishTextAnnotationMessage(std::move(data))));
@@ -1894,12 +1920,12 @@ TEST_F(PdfInkModuleTextTest,
         kFrontendId, kFontId, kPageIndex, kPdfZoom, /*source=*/"redo");
     data.Set("viewportOrientation", 1);
 
-    EXPECT_CALL(
-        client(),
-        DrawText(kPageIndex, kTextId0,
-                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kPdfZoom,
-                 SampleInkTextBoxAttributesMatcherWith(
-                     "hi", PageOrientation::kClockwise90)));
+    EXPECT_CALL(client(),
+                DrawText(kPageIndex, kTextId0,
+                         ElementsAre(SampleInkTextInfoMatcher(kFontId)),
+                         kAscent, kPdfZoom,
+                         SampleInkTextBoxAttributesMatcherWith(
+                             "hi", PageOrientation::kClockwise90)));
 
     EXPECT_TRUE(ink_module().OnMessage(
         CreateFinishTextAnnotationMessage(std::move(data))));
@@ -1917,6 +1943,7 @@ TEST_F(PdfInkModuleTextTest,
   static constexpr auto kTypefaceBlob =
       std::to_array<const uint8_t>({1, 2, 3, 4});
   static constexpr InkTextId kTextId0(0);
+  static constexpr float kAscent = 0.5f;
 
   // Start editing at original view.
   client().set_orientation(PageOrientation::kOriginal);
@@ -1936,12 +1963,12 @@ TEST_F(PdfInkModuleTextTest,
 
     InSequence seq;
     EXPECT_CALL(client(), AddFont(kFontId, ElementsAreArray(kTypefaceBlob)));
-    EXPECT_CALL(
-        client(),
-        DrawText(kPageIndex, kTextId0,
-                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kPdfZoom,
-                 SampleInkTextBoxAttributesMatcherWith(
-                     "hi", PageOrientation::kClockwise270)));
+    EXPECT_CALL(client(),
+                DrawText(kPageIndex, kTextId0,
+                         ElementsAre(SampleInkTextInfoMatcher(kFontId)),
+                         kAscent, kPdfZoom,
+                         SampleInkTextBoxAttributesMatcherWith(
+                             "hi", PageOrientation::kClockwise270)));
 
     EXPECT_TRUE(ink_module().OnMessage(
         CreateFinishTextAnnotationMessage(std::move(data))));
@@ -1974,12 +2001,12 @@ TEST_F(PdfInkModuleTextTest,
         kFrontendId, kFontId, kPageIndex, kPdfZoom, /*source=*/"redo");
     data.Set("viewportOrientation", 3);
 
-    EXPECT_CALL(
-        client(),
-        DrawText(kPageIndex, kTextId0,
-                 ElementsAre(SampleInkTextInfoMatcher(kFontId)), kPdfZoom,
-                 SampleInkTextBoxAttributesMatcherWith(
-                     "hi", PageOrientation::kClockwise270)));
+    EXPECT_CALL(client(),
+                DrawText(kPageIndex, kTextId0,
+                         ElementsAre(SampleInkTextInfoMatcher(kFontId)),
+                         kAscent, kPdfZoom,
+                         SampleInkTextBoxAttributesMatcherWith(
+                             "hi", PageOrientation::kClockwise270)));
 
     EXPECT_TRUE(ink_module().OnMessage(
         CreateFinishTextAnnotationMessage(std::move(data))));

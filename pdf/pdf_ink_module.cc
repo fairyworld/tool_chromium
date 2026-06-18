@@ -1769,8 +1769,10 @@ void PdfInkModule::HandleFinishTextAnnotationMessage(
   }
 
   text_id_map_[frontend_id] = new_id;
-  client_->DrawText(page_index, new_id, ink_info, pdf_zoom,
-                    GetTextBoxAttributesFromDict(data));
+  client_->DrawText(
+      page_index, new_id, ink_info,
+      text_info_mojo->primary_ascent / text_info_mojo->effective_zoom, pdf_zoom,
+      GetTextBoxAttributesFromDict(data));
 
   if (modify_undo_redo_model) {
     CHECK(undo_redo_model_.Add(new_id));

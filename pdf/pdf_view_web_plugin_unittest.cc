@@ -3609,8 +3609,10 @@ TEST_P(PdfViewWebPluginInkTest, DrawText) {
   static constexpr int kPageIndex = 0;
   static constexpr InkTextId kTextId(1);
   static constexpr double kZoom = 1.5;
+  static constexpr float kAscent = 5;
 
-  EXPECT_CALL(*engine_ptr_, DrawText(kPageIndex, kTextId, _, kZoom, _));
+  EXPECT_CALL(*engine_ptr_,
+              DrawText(kPageIndex, kTextId, _, kAscent, kZoom, _));
 
   const InkTextBoxAttributes text_box_attributes(
       /*rect=*/gfx::RectF(20.0f, 20.0f, 100.0f, 100.0f),
@@ -3624,7 +3626,7 @@ TEST_P(PdfViewWebPluginInkTest, DrawText) {
       /*is_italic=*/false,
       /*text=*/"Hello");
   plugin_->ink_module_client_for_testing()->DrawText(
-      kPageIndex, kTextId, {}, kZoom, text_box_attributes);
+      kPageIndex, kTextId, {}, kAscent, kZoom, text_box_attributes);
 }
 
 TEST_P(PdfViewWebPluginInkTest, UpdateTextActiveAndInvalidate) {
