@@ -400,7 +400,6 @@ TaskManagerView* TaskManagerView::GetInstanceForTests() {
 TaskManagerView::TableConfigs TaskManagerView::GetTableConfigs() {
   return TableConfigs{
       .table_has_border = false,
-      .header_style = true,
       .table_refresh = true,
       .scroll_view_rounded = true,
       .dialog_button_disabled = true,
@@ -625,19 +624,17 @@ void TaskManagerView::Init() {
   const float corner_radius =
       provider->GetCornerRadiusMetric(views::Emphasis::kHigh);
 
-  if (table_config_.header_style) {
-    views::TableHeaderStyle header_style(
-        /*cell_vertical_padding=*/14, /*cell_horizontal_padding=*/12,
-        /*resize_bar_vertical_padding=*/16,
-        /*separator_horizontal_padding=*/0,
-        /*font_weight=*/gfx::Font::Weight::MEDIUM,
-        /*separator_horizontal_color_id=*/ui::kColorSysDivider,
-        /*separator_vertical_color_id=*/ui::kColorSysDivider,
-        /*background_color_id=*/kColorTaskManagerTableHeaderBackground,
-        /*focus_ring_upper_corner_radius=*/corner_radius,
-        /*header_sort_state=*/true);
-    tab_table->SetHeaderStyle(header_style);
-  }
+  views::TableHeaderStyle header_style(
+      /*cell_vertical_padding=*/14, /*cell_horizontal_padding=*/12,
+      /*resize_bar_vertical_padding=*/16,
+      /*separator_horizontal_padding=*/0,
+      /*font_weight=*/gfx::Font::Weight::MEDIUM,
+      /*separator_horizontal_color_id=*/ui::kColorSysDivider,
+      /*separator_vertical_color_id=*/ui::kColorSysDivider,
+      /*background_color_id=*/kColorTaskManagerTableHeaderBackground,
+      /*focus_ring_upper_corner_radius=*/corner_radius,
+      /*header_sort_state=*/true);
+  tab_table->SetHeaderStyle(header_style);
 
   if (table_config_.table_refresh) {
     views::TableStyle table_style = {
