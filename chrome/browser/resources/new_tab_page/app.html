@@ -241,7 +241,10 @@ ${this.voiceSearchCoherenceAnySearchboxExperimentEnabled_ &&
           @recording-stopped="${this.onVoiceSearchRecordingStopped_}"
           .hasErrorTimer="${true}"
           .pageCallbackRouter="${this.searchboxCallbackRouter_}"
-          .autosubmitEnabled="${true}"
+          .autosubmitEnabled="${false}"
+          .dynamicTimeoutEnabled="${true}"
+          .queryLengthLimit="${this.voiceQueryLengthLimit_}"
+          .idleTimeout="${this.voiceIdleTimeoutMs_}"
           .liveTranscriptEnabled="${
             this.voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled_}"
           .submitStopButtonsEnabled="${

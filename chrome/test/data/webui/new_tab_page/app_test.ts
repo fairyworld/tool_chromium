@@ -2872,6 +2872,210 @@ suite('NewTabPageAppTest', () => {
           assertTrue(voiceSearch.liveTranscriptEnabled);
           assertFalse(voiceSearch.submitStopButtonsEnabled);
         });
+
+    suite('VoiceSearchAndSpeechRecognition', () => {
+      interface SpeechRecognitionAlternative {
+        transcript: string;
+        confidence: number;
+      }
+
+      interface SpeechRecognitionResult {
+        isFinal: boolean;
+        0: SpeechRecognitionAlternative;
+      }
+
+      interface SpeechRecognitionEvent {
+        results: SpeechRecognitionResult[];
+        resultIndex: number;
+      }
+
+      interface WindowWithSpeech {
+        webkitSpeechRecognition: unknown;
+      }
+
+      let originalSpeechRecognition: unknown;
+      let mockSpeechRecognition: MockSpeechRecognition;
+
+      class MockSpeechRecognition {
+        voiceSearchInProgress: boolean = false;
+        onresult:
+            ((this: MockSpeechRecognition,
+              ev: SpeechRecognitionEvent) => void)|null = null;
+        onend: (() => void)|null = null;
+        onaudiostart:
+            ((this: MockSpeechRecognition, ev: Event) => void)|null = null;
+        onspeechstart:
+            ((this: MockSpeechRecognition, ev: Event) => void)|null = null;
+        onnomatch:
+            ((this: MockSpeechRecognition, ev: Event) => void)|null = null;
+        interimResults = true;
+        continuous = false;
+
+        constructor() {
+          mockSpeechRecognition = this;
+        }
+
+        start() {
+          this.voiceSearchInProgress = true;
+        }
+
+        stop() {
+          this.voiceSearchInProgress = false;
+        }
+
+        abort() {
+          this.voiceSearchInProgress = false;
+          if (this.onend) {
+            setTimeout(() => this.onend!(), 0);
+          }
+        }
+      }
+
+      setup(() => {
+        const win = window as unknown as WindowWithSpeech;
+        originalSpeechRecognition = win.webkitSpeechRecognition;
+        win.webkitSpeechRecognition = MockSpeechRecognition;
+
+        interface VoiceSearchStatic {
+          activeRecognition_: unknown;
+          pendingStartInstance_: unknown;
+        }
+        const vsClass = customElements.get('cr-composebox-voice-search') as
+            unknown as VoiceSearchStatic;
+        if (vsClass) {
+          vsClass.activeRecognition_ = null;
+          vsClass.pendingStartInstance_ = null;
+        }
+      });
+
+      teardown(() => {
+        const win = window as unknown as WindowWithSpeech;
+        win.webkitSpeechRecognition = originalSpeechRecognition;
+
+        interface VoiceSearchStatic {
+          activeRecognition_: unknown;
+          pendingStartInstance_: unknown;
+        }
+        const vsClass = customElements.get('cr-composebox-voice-search') as
+            unknown as VoiceSearchStatic;
+        if (vsClass) {
+          vsClass.activeRecognition_ = null;
+          vsClass.pendingStartInstance_ = null;
+        }
+      });
+
+      function createResults(
+          transcript: string, isFinal: boolean): SpeechRecognitionEvent {
+        return {
+          results: [{
+            isFinal: isFinal,
+            0: {
+              transcript: transcript,
+              confidence: isFinal ? 1.0 : 0.4,
+            },
+          }],
+          resultIndex: 0,
+        };
+      }
+
+      test(
+          'autosubmitEnabled = false prevents automatic submission and ' +
+              'relies on recording-stopped',
+          async () => {
+            loadTimeData.overrideValues({
+              voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
+            });
+            await recreateApp();
+
+            // Open voice search dialog.
+            const searchbox = $$(app, '#searchbox');
+            assertTrue(!!searchbox);
+            searchbox.dispatchEvent(new Event('open-voice-search'));
+            await microtasksFinished();
+
+            const voiceSearch =
+                app.shadowRoot.querySelector('cr-composebox-voice-search');
+            assertTrue(!!voiceSearch);
+
+            // Verify that autosubmitEnabled is false.
+            assertFalse(voiceSearch.autosubmitEnabled);
+
+            // Simulate speech recognition result (user speaks).
+            const results = createResults('test query', /*isFinal=*/ true);
+            mockSpeechRecognition.onresult!(results);
+            await microtasksFinished();
+
+            // Simulate speech recognition natural finish.
+            mockSpeechRecognition.onend!();
+            await microtasksFinished();
+
+            // Verify that the query is submitted to searchbox handler.
+            assertEquals(1, searchboxHandler.getCallCount('submitQuery'));
+            const submitArgs = searchboxHandler.getArgs('submitQuery')[0];
+            assertEquals('test query', submitArgs[0]);
+          });
+
+      test('queryLengthLimit = 120 force-submits long queries', async () => {
+        loadTimeData.overrideValues({
+          voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
+        });
+        await recreateApp();
+
+        // Open voice search dialog.
+        const searchbox = $$(app, '#searchbox');
+        assertTrue(!!searchbox);
+        searchbox.dispatchEvent(new Event('open-voice-search'));
+        await microtasksFinished();
+
+        const voiceSearch =
+            app.shadowRoot.querySelector('cr-composebox-voice-search');
+        assertTrue(!!voiceSearch);
+
+        // Construct a long transcript exceeding the limit (120 chars).
+        const longTranscript = 'a'.repeat(121);
+
+        // Send an interim result (isFinal = false).
+        const results = createResults(longTranscript, /*isFinal=*/ false);
+        mockSpeechRecognition.onresult!(results);
+        await microtasksFinished();
+
+        // Verify that the query is force-submitted.
+        assertEquals(1, searchboxHandler.getCallCount('submitQuery'));
+        const submitArgs = searchboxHandler.getArgs('submitQuery')[0];
+        assertEquals(longTranscript, submitArgs[0]);
+      });
+
+      test(
+          'dynamicTimeoutEnabled = true configures speech recognition and ' +
+              'disables idle timer',
+          async () => {
+            loadTimeData.overrideValues({
+              voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
+            });
+            await recreateApp();
+
+            windowProxy.resetResolver('setTimeout');
+            windowProxy.reset();
+
+            // Open voice search dialog.
+            const searchbox = $$(app, '#searchbox');
+            assertTrue(!!searchbox);
+            searchbox.dispatchEvent(new Event('open-voice-search'));
+            await microtasksFinished();
+
+            // Verify speech recognition continuous property is false.
+            assertFalse(mockSpeechRecognition.continuous);
+
+            // Verify setTimeout is NOT called for idle timeout (only called for
+            // outside click listener registration).
+            const setTimeoutCalls = windowProxy.getArgs('setTimeout');
+            const has8000Timeout =
+                setTimeoutCalls.some(args => args[1] === 8000);
+            assertFalse(
+                has8000Timeout,
+                'Should not start idle timer when dynamicTimeout is enabled');
+          });
+    });
   });
 });
 

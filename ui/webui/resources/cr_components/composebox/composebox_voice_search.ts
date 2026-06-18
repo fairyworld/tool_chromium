@@ -568,6 +568,10 @@ export class ComposeboxVoiceSearchElement extends
         // decided to time out.
         if (!this.dynamicTimeoutEnabled) {
           this.onError_(VoiceSearchError.NO_MATCH);
+        } else if (this.transcript_) {
+          this.onFinalResult_(this.transcript_);
+        } else {
+          this.onError_(VoiceSearchError.NO_MATCH);
         }
         return;
       case State.UNINITIALIZED:
