@@ -5149,7 +5149,6 @@ static_library("ui") {
       # the following headers get modularized:
       # - c/b/ui/browser.h
       # - c/b/ui/tab_ui_helper.h
-      # - c/b/ui/views/frame/browser_view.h
       "//chrome/browser/ui/views/performance_controls:impl",
     ]
 

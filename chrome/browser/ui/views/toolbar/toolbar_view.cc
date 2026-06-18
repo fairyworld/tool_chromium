@@ -533,7 +533,7 @@ void ToolbarView::Init() {
   if (!performance_manager::user_tuning::IsBatterySaverModeManagedByOS() &&
       !features::IsWebUIBatterySaverButtonEnabled()) {
     battery_saver_button_ =
-        AddChildView(std::make_unique<BatterySaverButton>(browser_view_));
+        AddChildView(std::make_unique<BatterySaverButton>(browser_));
   }
 
   if (!features::IsWebUIPerformanceInterventionButtonEnabled()) {
