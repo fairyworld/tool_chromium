@@ -144,7 +144,7 @@ public class SupportLibWebViewChromiumFactory implements WebViewProviderFactoryB
                 Features.IGNORE_DUPLICATE_NAV + Features.DEV_SUFFIX,
                 Features.WEBVIEW_NAVIGATE_V1,
                 Features.DOWNLOAD_FAVICONS_ENABLED + Features.DEV_SUFFIX,
-                Features.HTTP_CACHE_MANAGER + Features.DEV_SUFFIX,
+                Features.HTTP_CACHE_MANAGER,
                 // Add new features above. New features must include `+ Features.DEV_SUFFIX`
                 // when they're initially added (this can be removed in a future CL). The final
                 // feature should have a trailing comma for cleaner diffs.
