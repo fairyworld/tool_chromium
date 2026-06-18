@@ -5,4 +5,5 @@ rootWebArea
 ++++++++menuListPopup invisible ispopup=auto
 ++++++++++group invisible name='A' nameFrom=title
 ++++++++++++genericContainer ignored invisible
+++++++++++++genericContainer ignored invisible
 ++++++++++++++menuListOption selected=true

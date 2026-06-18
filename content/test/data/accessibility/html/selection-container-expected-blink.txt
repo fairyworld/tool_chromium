@@ -5,6 +5,7 @@ rootWebArea
 ++++++++genericContainer ignored
 ++++++++++group name='Enabled'
 ++++++++++++genericContainer ignored
+++++++++++++genericContainer ignored
 ++++++++++++++listBoxOption name='One' selected=false
 ++++++++++++++listBoxOption name='Two' selected=false
 ++++++++++++++listBoxOption name='Three' selected=false
