@@ -1,8 +1,8 @@
 diff --git a/src/google/protobuf/compiler/cpp/file.cc b/src/google/protobuf/compiler/cpp/file.cc
-index 4dcfef611aa92..d09961fdd5a56 100644
+index e281953a8f325..616c4f6278ef5 100644
 --- a/src/google/protobuf/compiler/cpp/file.cc
 +++ b/src/google/protobuf/compiler/cpp/file.cc
-@@ -592,7 +592,7 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx, io::Printer* p) {
+@@ -595,7 +595,7 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx, io::Printer* p) {
              };
            };
  
@@ -11,7 +11,7 @@ index 4dcfef611aa92..d09961fdd5a56 100644
                PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 const $type$ $name$;
          )cc");
    }
-@@ -620,7 +620,7 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx, io::Printer* p) {
+@@ -623,7 +623,7 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx, io::Printer* p) {
              };
            };
  
@@ -20,7 +20,7 @@ index 4dcfef611aa92..d09961fdd5a56 100644
                PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 $type$ $name$;
          )cc");
    } else if (UsingImplicitWeakDescriptor(file_, options_)) {
-@@ -646,7 +646,7 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx, io::Printer* p) {
+@@ -649,7 +649,7 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx, io::Printer* p) {
                  file_default_instances + $index$, sizeof($type$)};
            };
  
@@ -29,7 +29,7 @@ index 4dcfef611aa92..d09961fdd5a56 100644
                PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 $type$ $name$
                __attribute__((section("$section$")));
          )cc");
-@@ -666,7 +666,7 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx, io::Printer* p) {
+@@ -669,7 +669,7 @@ void FileGenerator::GenerateSourceDefaultInstance(int idx, io::Printer* p) {
              };
            };
  
@@ -39,10 +39,10 @@ index 4dcfef611aa92..d09961fdd5a56 100644
          )cc");
    }
 diff --git a/src/google/protobuf/compiler/cpp/message.cc b/src/google/protobuf/compiler/cpp/message.cc
-index 5325fb671fd8d..2566bec49c3ce 100644
+index 62b59e197d1e4..ef63531b8c7f5 100644
 --- a/src/google/protobuf/compiler/cpp/message.cc
 +++ b/src/google/protobuf/compiler/cpp/message.cc
-@@ -4174,7 +4174,7 @@ void MessageGenerator::GenerateClassData(io::Printer* p) {
+@@ -4193,7 +4193,7 @@ void MessageGenerator::GenerateClassData(io::Printer* p) {
              };
            }
  
@@ -52,10 +52,10 @@ index 5325fb671fd8d..2566bec49c3ce 100644
                    $classname$::InternalGenerateClassData_();
  
 diff --git a/src/google/protobuf/compiler/cpp/parse_function_generator.cc b/src/google/protobuf/compiler/cpp/parse_function_generator.cc
-index 2baad4bf145d4..9391b1ae4d559 100644
+index c9892b91a2541..4bbe21c5d40bb 100644
 --- a/src/google/protobuf/compiler/cpp/parse_function_generator.cc
 +++ b/src/google/protobuf/compiler/cpp/parse_function_generator.cc
-@@ -479,7 +479,7 @@ void ParseFunctionGenerator::GenerateTailCallTable(io::Printer* p) {
+@@ -472,7 +472,7 @@ void ParseFunctionGenerator::GenerateTailCallTable(io::Printer* p) {
          // FileDescriptorProto is safe from this.
          IsFileDescriptorProto(descriptor_->file(), options_)
              ? "constexpr"
@@ -65,12 +65,12 @@ index 2baad4bf145d4..9391b1ae4d559 100644
         {"ordered_size", ordered_fields_.size()},
         {"aux_size", tc_table_info_->aux_entries.size()},
 diff --git a/src/google/protobuf/extension_set.cc b/src/google/protobuf/extension_set.cc
-index 9f70d85acc4ec..ab6084cbc98f5 100644
+index 741e369cebc10..8d1fffe09a78a 100644
 --- a/src/google/protobuf/extension_set.cc
 +++ b/src/google/protobuf/extension_set.cc
-@@ -164,7 +164,8 @@ void ExtensionSet::RegisterMessageExtension(const MessageLite* extendee,
-   ExtensionInfo info(extendee, number, type, is_repeated, is_packed,
-                      verify_func, is_lazy);
+@@ -166,7 +166,8 @@ void ExtensionSet::RegisterMessageExtension(
+                      verify_func,
+                      is_lazy);
    info.message_info = {prototype,
 -#if defined(PROTOBUF_CONSTINIT_DEFAULT_INSTANCES)
 +#if defined(PROTOBUF_CONSTINIT_DEFAULT_INSTANCES) && \
@@ -79,10 +79,10 @@ index 9f70d85acc4ec..ab6084cbc98f5 100644
  #else
                         nullptr
 diff --git a/src/google/protobuf/port_def.inc b/src/google/protobuf/port_def.inc
-index 22c87f21587aa..a12a49e9971af 100644
+index 59e4bb7392558..abe6c649ed1a6 100644
 --- a/src/google/protobuf/port_def.inc
 +++ b/src/google/protobuf/port_def.inc
-@@ -334,19 +334,31 @@ static_assert(PROTOBUF_ABSL_MIN(20230125, 3),
+@@ -330,19 +330,31 @@ static_assert(PROTOBUF_ABSL_MIN(20230125, 3),
  #  define PROTOBUF_EXPORT __declspec(dllexport)
  #  define PROTOBUF_EXPORT_TEMPLATE_DECLARE
  #  define PROTOBUF_EXPORT_TEMPLATE_DEFINE __declspec(dllexport)
@@ -115,14 +115,14 @@ index 22c87f21587aa..a12a49e9971af 100644
  
  #ifdef PROTOC_EXPORT
 diff --git a/src/google/protobuf/port_undef.inc b/src/google/protobuf/port_undef.inc
-index bbb2848c5a33d..9600b3876ba54 100644
+index 3150bc258e96a..b6f81706f9bce 100644
 --- a/src/google/protobuf/port_undef.inc
 +++ b/src/google/protobuf/port_undef.inc
-@@ -43,6 +43,7 @@
+@@ -44,6 +44,7 @@
  #undef PROTOBUF_ALIGNAS
  #undef PROTOBUF_THREAD_LOCAL
  #undef PROTOBUF_CONSTINIT
 +#undef PROTOBUF_CONSTINIT_WITH_PTR
- #undef PROTOBUF_CONSTEXPR
  #undef PROTOBUF_CONSTINIT_DEFAULT_INSTANCES
  #undef PROTOBUF_ATTRIBUTE_WEAK
+ #undef PROTOBUF_HAVE_ATTRIBUTE_WEAK
