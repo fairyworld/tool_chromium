@@ -11,7 +11,6 @@ import android.webkit.WebView;
 
 import androidx.annotation.GuardedBy;
 import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.android.webview.chromium.CallbackConverter;
@@ -651,7 +650,7 @@ public class SupportLibWebViewChromiumFactory implements WebViewProviderFactoryB
         public void setSafeBrowsingWhitelist(List<String> hosts, ValueCallback<Boolean> callback) {
             try (TraceEvent event =
                     TraceEvent.scoped(
-                            "WebView.APICall.AndroidX.SET_SAFE_BROWSING_ALLOWLIST_DEPRECATED_NAME")) {
+                            "WebView.APICall.AndroidX.SET_SAFE_BROWSING_ALLOWLIST_DEPRECATED")) {
                 recordApiCall(ApiCall.SET_SAFE_BROWSING_ALLOWLIST_DEPRECATED_NAME);
                 mSharedStatics.setSafeBrowsingAllowlist(
                         hosts, CallbackConverter.fromValueCallback(callback));
@@ -703,7 +702,6 @@ public class SupportLibWebViewChromiumFactory implements WebViewProviderFactoryB
                 mSharedStatics.setDefaultTrafficStatsUid(uid);
             }
         }
-
     }
 
     @Override
@@ -819,9 +817,9 @@ public class SupportLibWebViewChromiumFactory implements WebViewProviderFactoryB
 
     @Override
     public void startUpWebView(
-            @NonNull Consumer<BiConsumer<@StartUpConfigField Integer, Object>> config,
-            @NonNull Consumer<Consumer<BiConsumer<@StartUpResultField Integer, Object>>> onSuccess,
-            @NonNull Consumer<Consumer<BiConsumer<@StartupErrorType Integer, Object>>> onFailure) {
+            Consumer<BiConsumer<@StartUpConfigField Integer, Object>> config,
+            Consumer<Consumer<BiConsumer<@StartUpResultField Integer, Object>>> onSuccess,
+            Consumer<Consumer<BiConsumer<@StartupErrorType Integer, Object>>> onFailure) {
         try (TraceEvent event = TraceEvent.scoped("WebView.APICall.AndroidX.START_UP_WEBVIEW")) {
             recordApiCall(ApiCall.START_UP_WEBVIEW);
 
