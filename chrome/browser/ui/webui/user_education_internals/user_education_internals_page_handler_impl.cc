@@ -695,7 +695,8 @@ void UserEducationInternalsPageHandlerImpl::ClearFeaturePromoData(
     return;
   }
 
-  tracker->ClearEventData(*feature);
+  tracker->ClearEventData(
+      *feature, base::PassKey<UserEducationInternalsPageHandlerImpl>());
   storage_service->Reset(*feature);
   std::move(callback).Run(std::string());
 }
