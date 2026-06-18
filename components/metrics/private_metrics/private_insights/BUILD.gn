@@ -8,6 +8,8 @@ component("private_insights") {
     "private_insights_service.h",
   ]
   sources = [
+    "fcp_flags.cc",
+    "fcp_flags.h",
     "private_insights_features.cc",
     "private_insights_service.cc",
   ]
