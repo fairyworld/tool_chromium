@@ -26,9 +26,7 @@ function getAllPolicyTables() {
 }
 
 function getAllPolicyRows(policyTable: PolicyTableElement) {
-  const shadowRoot = policyTable.shadowRoot;
-  return shadowRoot ? shadowRoot.querySelectorAll('policy-row') :
-                      [] as unknown as NodeListOf<PolicyRowElement>;
+  return policyTable.shadowRoot.querySelectorAll('policy-row');
 }
 
 function getAllPolicyRowDivs(policyRow: PolicyRowElement) {
@@ -44,7 +42,7 @@ function getPrecedenceRowValue() {
   let precedenceRow = null;
   tables.forEach(table => {
     const row: PolicyPrecedenceRowElement|null =
-        table.shadowRoot!.querySelector('policy-precedence-row');
+        table.shadowRoot.querySelector('policy-precedence-row');
     if (row) {
       precedenceRow = row.shadowRoot.querySelector('.value');
     }

@@ -16,7 +16,9 @@ import './promotion_banner_section_container.js';
 // </if>
 
 import {addWebUiListener, sendWithPromise} from 'chrome://resources/js/cr.js';
-import {FocusOutlineManager} from 'chrome://resources/js/focus_outline_manager.js';
+import {
+    FocusOutlineManager,
+} from 'chrome://resources/js/focus_outline_manager.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {getRequiredElement} from 'chrome://resources/js/util.js';
 
@@ -136,7 +138,7 @@ export class Page {
       sendWithPromise<void>('reloadPolicies');
     };
 
-    this.setupMoreActionsMenuNavigation_();
+    this.setupMoreActionsMenuNavigation();
 
     const exportButton = getRequiredElement('export-policies');
     const hideExportButton = loadTimeData.valueExists('hideExportButton') &&
@@ -173,9 +175,11 @@ export class Page {
       this.createToast(loadTimeData.getString('copyPoliciesDone'));
     };
 
-    getRequiredElement('show-unset').onchange = () => {
-      for (const policyTable in this.policyTables) {
-        this.policyTables[policyTable]?.filter();
+    const showUnsetCheckbox =
+        getRequiredElement<HTMLInputElement>('show-unset');
+    showUnsetCheckbox.onchange = () => {
+      for (const id in this.policyTables) {
+        this.policyTables[id]!.showUnset = showUnsetCheckbox.checked;
       }
     };
 
@@ -186,10 +190,10 @@ export class Page {
     addWebUiListener(
         'policies-updated',
         (names: PolicyNamesResponse, values: PolicyValuesResponse) =>
-            this.onPoliciesReceived_(names, values));
+            this.onPoliciesReceived(names, values));
   }
 
-  private onPoliciesReceived_(
+  private onPoliciesReceived(
       policyNames: PolicyNamesResponse,
       policyValuesResponse: PolicyValuesResponse) {
     const policyValues: PolicyValues = policyValuesResponse.policyValues;
@@ -256,7 +260,7 @@ export class Page {
    * respectively.
    * The menu is closed when the escape key is pressed.
    */
-  private setupMoreActionsMenuNavigation_() {
+  private setupMoreActionsMenuNavigation() {
     const moreActionsButton = getRequiredElement('more-actions-button');
     const moreActionsIcon = getRequiredElement('dropdown-icon');
     const moreActionsList = getRequiredElement('more-actions-list');
@@ -386,9 +390,15 @@ export class Page {
   createOrUpdatePolicyTable(dataModel: PolicyTableModel) {
     const id = `${dataModel.name}-${dataModel.id}`;
     if (!this.policyTables[id]) {
-      this.policyTables[id] = document.createElement('policy-table');
+      const policyTable =
+          document.createElement('policy-table');
+      const showUnsetCheckbox =
+          document.getElementById('show-unset') as HTMLInputElement | null;
+      if (showUnsetCheckbox) {
+        policyTable.showUnset = showUnsetCheckbox.checked;
+      }
+      this.policyTables[id] = policyTable;
       this.mainSection.appendChild(this.policyTables[id]);
-      this.policyTables[id].addEventListeners();
     }
     this.policyTables[id].updateDataModel(dataModel);
   }
