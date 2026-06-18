@@ -173,8 +173,6 @@ SendTabToSelfBridge::~SendTabToSelfBridge() {
   }
 }
 
-
-
 std::optional<syncer::ModelError> SendTabToSelfBridge::MergeFullSyncData(
     std::unique_ptr<syncer::MetadataChangeList> metadata_change_list,
     syncer::EntityChangeList entity_data) {
@@ -382,8 +380,6 @@ SendTabToSelfBridge::OnCommitAttemptFailed(syncer::SyncCommitError error) {
   return CommitAttemptFailedBehavior::kShouldRetryOnNextCycle;
 }
 
-
-
 std::vector<std::string> SendTabToSelfBridge::GetAllGuids() const {
   std::vector<std::string> keys;
   for (const auto& it : entries_) {
@@ -425,8 +421,13 @@ const SendTabToSelfEntry* SendTabToSelfBridge::SendEntry(
     const std::string& target_device_cache_guid,
     const PageContext& context,
     NavigationHistory navigation_history,
-    base::OnceCallback<void(SendTabToSelfResult)> commit_confirmation) {
+    base::OnceCallback<void(SendTabToSelfResult)> commit_confirmation,
+    std::optional<ShareEntryPoint> entry_point) {
   CHECK(commit_confirmation);
+
+  if (entry_point) {
+    RecordEntryPointSent(*entry_point);
+  }
 
   if (!change_processor()->IsTrackingMetadata()) {
     std::move(commit_confirmation)

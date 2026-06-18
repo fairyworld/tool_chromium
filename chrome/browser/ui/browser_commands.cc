@@ -2148,7 +2148,8 @@ bool CanSendTabToSelf(BrowserWindowInterface* browser) {
 void SendTabToSelf(BrowserWindowInterface* browser) {
   WebContents* web_contents =
       browser->GetTabStripModel()->GetActiveWebContents();
-  send_tab_to_self::ShowBubble(web_contents);
+  send_tab_to_self::ShowBubble(web_contents,
+                               send_tab_to_self::ShareEntryPoint::kShareMenu);
 }
 
 bool CanGenerateQrCode(BrowserWindowInterface* browser) {

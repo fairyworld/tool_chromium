@@ -748,7 +748,7 @@ void OmniboxViewViews::ExecuteCommand(int command_id, int event_flags) {
     case IDC_SEND_TAB_TO_SELF:
       send_tab_to_self::SendTabToSelfBubbleController::
           GetOrCreateForWebContents(location_bar_view_->GetWebContents())
-              ->ShowBubble();
+              ->ShowBubble(send_tab_to_self::ShareEntryPoint::kOmniboxMenu);
       return;
 
     // These commands do invoke the popup.

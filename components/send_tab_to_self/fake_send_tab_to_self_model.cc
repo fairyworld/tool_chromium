@@ -58,7 +58,8 @@ const SendTabToSelfEntry* FakeSendTabToSelfModel::SendEntry(
     const std::string& target_device_cache_guid,
     const PageContext& context,
     NavigationHistory navigation_history,
-    base::OnceCallback<void(SendTabToSelfResult)> commit_confirmation) {
+    base::OnceCallback<void(SendTabToSelfResult)> commit_confirmation,
+    std::optional<ShareEntryPoint> entry_point) {
   if (!IsReady()) {
     if (commit_confirmation) {
       std::move(commit_confirmation)

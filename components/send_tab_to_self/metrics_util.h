@@ -17,15 +17,32 @@ namespace send_tab_to_self {
 
 // GENERATED_JAVA_ENUM_PACKAGE: (
 //   org.chromium.chrome.browser.share.send_tab_to_self)
+// LINT.IfChange(SendTabToSelfShareEntryPoint)
 enum class ShareEntryPoint {
-  kContentMenu,
-  kLinkMenu,
-  kOmniboxIcon,
-  kOmniboxMenu,
-  kShareMenu,
-  kShareSheet,
-  kTabMenu,
+  // The context menu on a WebContents.
+  kContentMenu = 0,
+  // The context menu on a link.
+  kLinkMenu = 1,
+  // The icon in the toolbar, next to the Omnibox.
+  kToolbarIcon = 2,
+  // The context menu on the Omnibox.
+  kOmniboxMenu = 3,
+  // The Share menu in the 3dot menu.
+  kShareMenu = 4,
+  // The OS-level Share Sheet.
+  kShareSheet = 5,
+  // The context menu on a tab (in the tab strip or tab switcher).
+  kTabMenu = 6,
+  kMaxValue = kTabMenu,
 };
+// LINT.ThenChange(/tools/metrics/histograms/metadata/sharing/enums.xml:SendTabToSelfShareEntryPoint)
+
+// Records the entry point from which the Send Tab to Self feature was invoked.
+void RecordEntryPointInvoked(ShareEntryPoint entry_point);
+
+// Records the entry point from which the Send Tab to Self feature successfully
+// sent a tab.
+void RecordEntryPointSent(ShareEntryPoint entry_point);
 
 // Records when a received STTS notification is shown.
 void RecordNotificationShown();

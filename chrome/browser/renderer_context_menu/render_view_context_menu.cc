@@ -3863,7 +3863,11 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
       break;
 
     case IDC_SEND_TAB_TO_SELF:
-      send_tab_to_self::ShowBubble(embedder_web_contents_);
+      send_tab_to_self::ShowBubble(
+          embedder_web_contents_,
+          params_.link_url.is_valid()
+              ? send_tab_to_self::ShareEntryPoint::kLinkMenu
+              : send_tab_to_self::ShareEntryPoint::kContentMenu);
       break;
 
     case IDC_CONTENT_CONTEXT_GENERATE_QR_CODE: {
@@ -4554,7 +4558,10 @@ void RenderViewContextMenu::AppendSendTabToSelfItem(bool add_separator) {
       *reason == send_tab_to_self::EntryPointDisplayReason::kOfferFeature) {
     send_tab_to_self_submenu_delegate_ =
         std::make_unique<send_tab_to_self::SendTabToSelfContextMenuDelegate>(
-            embedder_web_contents_);
+            embedder_web_contents_,
+            params_.link_url.is_valid()
+                ? send_tab_to_self::ShareEntryPoint::kLinkMenu
+                : send_tab_to_self::ShareEntryPoint::kContentMenu);
     send_tab_to_self_submenu_ = std::make_unique<ui::SimpleMenuModel>(
         send_tab_to_self_submenu_delegate_.get());
     send_tab_to_self_submenu_delegate_->PopulateSubmenu(
@@ -4578,9 +4585,9 @@ void RenderViewContextMenu::AppendSendTabToSelfItem(bool add_separator) {
     menu_model_.AddSubMenuWithStringIdAndIcon(
         IDC_SEND_TAB_TO_SELF, IDS_MENU_SEND_TAB_TO_SELF,
         send_tab_to_self_submenu_.get(),
-        ui::ImageModel::FromVectorIcon(
-            features::IsRoundedIconsEnabled()   ? kDevicesIcon
-                                                : kDevicesOldIcon));
+        ui::ImageModel::FromVectorIcon(features::IsRoundedIconsEnabled()
+                                           ? kDevicesIcon
+                                           : kDevicesOldIcon));
 #endif
 
     // TODO(crbug.com/516708776): Remove new feature tag when no longer new.
@@ -4609,8 +4616,7 @@ void RenderViewContextMenu::AppendSendTabToSelfItem(bool add_separator) {
       IDC_SEND_TAB_TO_SELF,
       l10n_util::GetStringUTF16(IDS_MENU_SEND_TAB_TO_SELF),
       ui::ImageModel::FromVectorIcon(
-          features::IsRoundedIconsEnabled()   ? kDevicesIcon
-                                              : kDevicesOldIcon));
+          features::IsRoundedIconsEnabled() ? kDevicesIcon : kDevicesOldIcon));
 #endif
 }
 

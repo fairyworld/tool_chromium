@@ -339,7 +339,8 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfPostSendToastBrowserTest,
   TestSendTabToSelfModelObserver observer(
       sync_service->GetSendTabToSelfModel());
 
-  SendTabToSelfContextMenuDelegate delegate(web_contents);
+  SendTabToSelfContextMenuDelegate delegate(web_contents,
+                                            ShareEntryPoint::kContentMenu);
   delegate.ExecuteCommand(IDC_CONTENT_CONTEXT_SEND_TAB_TO_SELF_DEVICE1, 0);
 
   observer.WaitForEntryAdded();
@@ -593,7 +594,7 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfBubbleControllerBrowserTest,
   SendTabToSelfBubbleController* controller =
       SendTabToSelfBubbleController::GetOrCreateForWebContents(web_contents);
 
-  controller->ShowBubble();
+  controller->ShowBubble(ShareEntryPoint::kToolbarIcon);
   EXPECT_TRUE(controller->IsBubbleShown());
 
   // Navigate to a new URL. This should hide the bubble.
@@ -628,7 +629,7 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfBubbleControllerBrowserTest,
   SendTabToSelfBubbleController* controller =
       SendTabToSelfBubbleController::GetOrCreateForWebContents(web_contents);
 
-  controller->ShowBubble();
+  controller->ShowBubble(ShareEntryPoint::kToolbarIcon);
   EXPECT_TRUE(controller->IsBubbleShown());
 
   histogram_tester.ExpectUniqueSample(
@@ -651,7 +652,7 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfBubbleControllerBrowserTest,
   SendTabToSelfBubbleController* controller =
       SendTabToSelfBubbleController::GetOrCreateForWebContents(web_contents);
 
-  controller->ShowBubble();
+  controller->ShowBubble(ShareEntryPoint::kToolbarIcon);
 
   EXPECT_TRUE(controller->IsBubbleShown());
   EXPECT_NE(nullptr, controller->send_tab_to_self_bubble_view());
@@ -672,7 +673,7 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfBubbleControllerBrowserTest,
 
   SendTabToSelfBubbleController* controller =
       SendTabToSelfBubbleController::GetOrCreateForWebContents(web_contents);
-  controller->ShowBubble();
+  controller->ShowBubble(ShareEntryPoint::kToolbarIcon);
 
   ASSERT_TRUE(controller->IsBubbleShown());
   SendTabToSelfBubbleView* bubble = controller->send_tab_to_self_bubble_view();

@@ -21,6 +21,7 @@
 #include "components/keyed_service/core/keyed_service.h"
 #include "components/send_tab_to_self/fake_send_tab_to_self_model.h"
 #include "components/send_tab_to_self/features.h"
+#include "components/send_tab_to_self/metrics_util.h"
 #include "components/send_tab_to_self/send_tab_to_self_model.h"
 #include "components/send_tab_to_self/send_tab_to_self_sync_service.h"
 #include "components/send_tab_to_self/stub_send_tab_to_self_sync_service.h"
@@ -85,7 +86,8 @@ TEST_F(SendTabToSelfContextMenuDelegateTest, GetDevicesForDisplayLimitsToFive) {
   }
   model()->SetTargetDeviceInfoSortedList(devices);
 
-  SendTabToSelfContextMenuDelegate delegate(web_contents());
+  SendTabToSelfContextMenuDelegate delegate(web_contents(),
+                                            ShareEntryPoint::kContentMenu);
   ui::SimpleMenuModel menu_model(&delegate);
   delegate.PopulateSubmenu(&menu_model);
 
@@ -113,7 +115,8 @@ TEST_F(SendTabToSelfContextMenuDelegateTest, ExecuteCommandSendsToDevice) {
       web_contents()->GetController().GetLastCommittedEntry();
   web_contents()->UpdateTitleForEntry(entry, kExampleTitle);
 
-  SendTabToSelfContextMenuDelegate delegate(web_contents());
+  SendTabToSelfContextMenuDelegate delegate(web_contents(),
+                                            ShareEntryPoint::kContentMenu);
   ui::SimpleMenuModel menu_model(&delegate);
   delegate.PopulateSubmenu(&menu_model);
 
@@ -137,7 +140,8 @@ TEST_F(SendTabToSelfContextMenuDelegateTest,
                        syncer::DeviceInfo::FormFactor::kDesktop, now);
   model()->SetTargetDeviceInfoSortedList(devices);
 
-  SendTabToSelfContextMenuDelegate delegate(web_contents());
+  SendTabToSelfContextMenuDelegate delegate(web_contents(),
+                                            ShareEntryPoint::kContentMenu);
   ui::SimpleMenuModel menu_model(&delegate);
   delegate.PopulateSubmenu(&menu_model);
 
@@ -162,7 +166,8 @@ TEST_F(SendTabToSelfContextMenuDelegateTest, OnMenuWillShowRecordsMetrics) {
 
   base::HistogramTester histogram_tester;
 
-  SendTabToSelfContextMenuDelegate delegate(web_contents());
+  SendTabToSelfContextMenuDelegate delegate(web_contents(),
+                                            ShareEntryPoint::kContentMenu);
   ui::SimpleMenuModel menu_model(&delegate);
   delegate.PopulateSubmenu(&menu_model);
 

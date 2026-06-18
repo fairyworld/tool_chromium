@@ -95,9 +95,12 @@ static void JNI_SendTabToSelfAndroidBridge_SendTabToDevice(
   content::WebContents* web_contents =
       content::WebContents::FromJavaWebContents(j_web_contents);
   if (web_contents) {
+    // TODO(crbug.com/503283050): Plumb the correct ShareEntryPoint through from
+    // the Java side.
     SendTabToSelfPageHandler::GetOrCreateForWebContents(web_contents)
         ->SendTabToDevice(target_device_sync_cache_guid, GURL(url), title,
-                          std::move(commit_confirmation));
+                          std::move(commit_confirmation),
+                          ShareEntryPoint::kShareSheet);
     return;
   }
 
@@ -140,7 +143,6 @@ static void JNI_SendTabToSelfAndroidBridge_DismissEntry(
     model->DismissEntry(guid);
   }
 }
-
 
 static ScopedJavaLocalRef<jobject>
 JNI_SendTabToSelfAndroidBridge_GetEntryPointDisplayReason(

@@ -225,4 +225,14 @@ void RecordTargetDeviceCount(EntryPointDisplayReason display_reason,
       GetSendTabToSelfDeviceCount(display_reason, device_count));
 }
 
+void RecordEntryPointInvoked(ShareEntryPoint entry_point) {
+  base::UmaHistogramEnumeration("Sharing.SendTabToSelf.InvokedEntryPoint",
+                                entry_point);
+}
+
+void RecordEntryPointSent(ShareEntryPoint entry_point) {
+  base::UmaHistogramEnumeration("Sharing.SendTabToSelf.SentEntryPoint",
+                                entry_point);
+}
+
 }  // namespace send_tab_to_self

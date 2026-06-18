@@ -1054,7 +1054,8 @@ void BrowserActions::InitializeChromeMenuActions() {
                     bubble_controller->HideBubble();
                   } else {
                     send_tab_to_self::ShowBubble(
-                        tab_strip_model->GetActiveWebContents());
+                        tab_strip_model->GetActiveWebContents(),
+                        send_tab_to_self::ShareEntryPoint::kToolbarIcon);
                   }
                 },
                 bwi, tab_strip_model),
