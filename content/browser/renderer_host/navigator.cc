@@ -35,6 +35,7 @@
 #include "content/browser/web_package/prefetched_signed_exchange_cache.h"
 #include "content/browser/webui/web_ui_controller_factory_registry.h"
 #include "content/browser/webui/web_ui_impl.h"
+#include "content/common/content_navigation_policy.h"
 #include "content/common/features.h"
 #include "content/common/navigation_params_utils.h"
 #include "content/public/browser/browser_context.h"
@@ -839,14 +840,6 @@ void Navigator::DidNavigate(
 
   delegate_->DidNavigateAnyFramePostCommit(render_frame_host, details);
 }
-// LINT.IfChange(DuplicateNavsCookieStatus)
-enum class DuplicateNavsCookieStatus {
-  kNoListener = 0,
-  kCookiesChanged = 1,
-  kCookiesNotChanged = 2,
-  kMaxValue = kCookiesNotChanged,
-};
-// LINT.ThenChange(//tools/metrics/histograms/metadata/navigation/enums.xml:DuplicateNavsCookieStatus)
 
 void Navigator::Navigate(std::unique_ptr<NavigationRequest> request,
                          ReloadType reload_type) {
@@ -906,6 +899,10 @@ void Navigator::Navigate(std::unique_ptr<NavigationRequest> request,
           ongoing_navigation_request->common_params().referrer &&
       request->common_params().transition ==
           ongoing_navigation_request->common_params().transition) {
+    // Note: The browser-initiated duplicate navigation cookie check differs
+    // from the renderer-initiated check. Since browser-initiated navigations
+    // don't pose cross-site leak risks, we can check all cookie changes here
+    // (including HttpOnly cookie and cross-document).
     DuplicateNavsCookieStatus cookie_status;
     if (!ongoing_navigation_request->HasCookieChangeListener()) {
       cookie_status = DuplicateNavsCookieStatus::kNoListener;

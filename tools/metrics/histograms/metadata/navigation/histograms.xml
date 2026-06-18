@@ -893,19 +893,6 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="Navigation.BrowserInitiated.DuplicateNavCookieStatus"
-    enum="DuplicateNavsCookieStatus" expires_after="2026-10-18">
-  <owner>annasato@google.com</owner>
-  <owner>rakina@google.com</owner>
-  <owner>chrome-navigation@google.com</owner>
-  <summary>
-    Records the cookie change status only for potential duplicate navigations
-    where criteria such as URL, initiator, method, and transition match. It
-    distinguishes whether a CookieChangeListener was missing, cookies actually
-    changed since the ongoing navigation started, or cookies remained the same.
-  </summary>
-</histogram>
-
 <histogram
     name="Navigation.BrowserInitiated.DuplicateNavCookieStatus.UnderThreshold{DuplicateNavTargetScope}"
     enum="DuplicateNavsCookieStatus" expires_after="2026-10-25">
@@ -3645,6 +3632,20 @@ chromium-metrics-reviews@google.com.
     engaged sites data. Recorded whenever a navigation is deferred waiting for
     engaged sites.
   </summary>
+</histogram>
+
+<histogram name="Navigation{Initiator}.DuplicateNavCookieStatus"
+    enum="DuplicateNavsCookieStatus" expires_after="2026-10-18">
+  <owner>annasato@google.com</owner>
+  <owner>rakina@google.com</owner>
+  <owner>chrome-navigation@google.com</owner>
+  <summary>
+    Records the cookie change status only for potential duplicate navigations
+    where criteria such as URL, initiator, method, and transition match. It
+    distinguishes whether a CookieChangeListener was missing, cookies actually
+    changed since the ongoing navigation started, or cookies remained the same.
+  </summary>
+  <token key="Initiator" variants="Initiator"/>
 </histogram>
 
 <histogram name="Navigation{Initiator}.DuplicateNavigationInputStartPresence2"
