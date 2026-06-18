@@ -555,6 +555,7 @@ android_library("chrome_test_java_org.chromium.chrome.browser.app") {
     "src/org/chromium/chrome/browser/app/tabmodel/ArchivedTabsTest.java",
     "src/org/chromium/chrome/browser/app/tabmodel/ChromeNextTabPolicySupplierTest.java",
     "src/org/chromium/chrome/browser/app/tabmodel/PersistentStoreCleanerTest.java",
+    "src/org/chromium/chrome/browser/app/tabmodel/TabbedModeTabModelStoreTest.java",
   ]
 
   deps = [
