@@ -1026,6 +1026,182 @@
       <message name="IDS_ENTERPRISE_AND_FAMILY_LINK_LOGIN_ERROR_ALLOWLIST" desc="Couldn't sign in because user is not authorized by the administrator.">
         You are not authorized to use this device. Please contact the administrator for sign-in permission or sign in with a Google account supervised by Family Link.
       </message>
+
+      <message name="IDS_LOGIN_ERROR_GOOGLE_ACCOUNT_NOT_ALLOWED" desc="Couldn't sign into Google account on the Active Directory managed device.">
+        Sorry, Google accounts are not allowed on this device.
+      </message>
+      <message name="IDS_LOGIN_ERROR_AUTHENTICATING_NEW" desc="Couldn't sign in because username or password invalid">
+        Sorry, your email or password could not be verified. Please try again.
+      </message>
+      <message name="IDS_LOGIN_ERROR_OFFLINE_FAILED_NETWORK_NOT_CONNECTED" desc="Couldn't sign in because offline sign-in has failed and network is not connected">
+        Sorry, your email or password could not be verified. Try connecting to a network first.
+      </message>
+      <message name="IDS_LOGIN_ERROR_KEYBOARD_SWITCH_HINT" desc="A hint text for the login and lock screens about correct layout">
+        Check your keyboard layout and try again.
+      </message>
+      <message name="IDS_LOGIN_ERROR_CAPTIVE_PORTAL" desc="An error message shown when we suggest that user may be behind the captive portal.">
+        Before signing in, please enter as Guest to activate the network <ph name="NETWORK_ID">$1<ex>Public Wifi</ex></ph>
+      </message>
+      <message name="IDS_LOGIN_ERROR_OWNER_REQUIRED" desc="Couldn't sign in because the machine is in policy safe mode and needs owner login">
+        Sign-in has been restricted to the owner account only. Please reboot and sign in with the owner account. The machine will auto reboot in 30 seconds.
+      </message>
+      <message name="IDS_LOGIN_ERROR_OWNER_KEY_LOST" desc="Couldn't sign in because the owner key has been lost, device settings corruption or incorrect local time.">
+        Sign-in failed, please connect to the internet and try again.
+      </message>
+      <message name="IDS_LOGIN_ERROR_TPM_FAILURE_TITLE" desc="Title of the screen notifying user about TPM error.">
+        Something went wrong with signing in
+      </message>
+      <message name="IDS_LOGIN_ERROR_TPM_DBUS_ERROR_TITLE" desc="Title of the screen notifying user about TPM error." translateable="false">
+        Something went wrong during TPM check
+      </message>
+      <message name="IDS_LOGIN_ERROR_TPM_FAILURE_REBOOT" desc="Suggestion to restart device in case of the TPM error.">
+        Please restart your device to fix this error.
+      </message>
+      <message name="IDS_LOGIN_ERROR_ENROLLMENT_TPM_FAILURE_TITLE" desc="Title of the screen notifying user about TPM error.">
+        Trusted Platform Module (TPM) detected
+      </message>
+      <message name="IDS_LOGIN_ERROR_ENROLLMENT_TPM_FAILURE_SUBTITLE" desc="Subtitile of the screen notifying user about TPM ownership error.">
+        <ph name="DEVICE_OS">$1<ex>ChromeOS Flex</ex></ph> detected an active TPM which can store your data more securely.
+      </message>
+      <message name="IDS_LOGIN_ERROR_ENROLLMENT_TPM_FAILURE_CONTENT" desc="Steps that can help users to properly setup TPM manually.">
+        <ph name="BEGIN_PARAGRAPH1">&lt;p&gt;</ph>Before enrolling you need to clear the TPM so <ph name="DEVICE_OS">$1<ex>ChromeOS Flex</ex></ph> can take ownership of the device.<ph name="END_PARAGRAPH1">&lt;/p&gt;</ph>
+        <ph name="BEGIN_PARAGRAPH2">&lt;p&gt;</ph>You can also turn off the TPM device entirely. Your data will still be stored safely with software encryption, but certain security features such as hardware-backed certificates will be disabled.<ph name="END_PARAGRAPH2">&lt;/p&gt;</ph>
+        <ph name="BEGIN_PARAGRAPH3">&lt;p&gt;</ph>You can change your TPM settings by rebooting and entering the system BIOS/UEFI settings. Steps vary based on the device model. For more info, open the <ph name="DEVICE_OS">$1<ex>ChromeOS Flex</ex></ph> documentation on a separate device before you reboot: g.co/flex/TPMHelp.<ph name="END_PARAGRAPH3">&lt;/p&gt;</ph>
+      </message>
+      <message name="IDS_LOGIN_ERROR_TPM_FAILURE_REBOOT_BUTTON" desc="Label on button that restarts device.">
+        Restart
+      </message>
+      <message name="IDS_LOGIN_ERROR_TITLE" desc="A title of screen containing a message about login error, like proxy error or corruption of the local state.">
+        Oops, something went wrong with signing in
+      </message>
+      <message name="IDS_LOGIN_ERROR_TPM_UPDATE_REQUIRED" desc="Text for error dialog shown on the login screen when the Trusted Platform Module needs to be updated due to a vulnerability.">
+        An update for the Trusted Platform Module firmware needs to be installed. See <ph name="TPM_FIRMWARE_UPDATE_LINK">https://www.chromium.org/chromium-os/tpm_firmware_update</ph>
+      </message>
+      <message name="IDS_LOGIN_PROXY_ERROR_MESSAGE" desc="An offline message shown when a proxy error has appeared.">
+        The sign-in page failed to load using the current proxy settings. Please <ph name="GAIA_RELOAD_LINK_START">$1<ex>&gt;a&lt;</ex></ph>try to sign in again<ph name="GAIA_RELOAD_LINK_END">$2<ex>&gt;/a&lt;</ex></ph>, or use different <ph name="PROXY_SETTINGS_LINK_START">$3<ex>&gt;a&lt;</ex></ph>proxy settings<ph name="PROXY_SETTINGS_LINK_END">$4<ex>&gt;/a&lt;</ex></ph>.
+      </message>
+      <message name="IDS_LOGIN_CAPTIVE_PORTAL_WINDOW_TITLE" desc="Title of the window which is opened to sign in to the captive portal.">
+        To use the network <ph name="NETWORK_ID">$1<ex>Adelaide Airport Wireless</ex></ph>, first complete your connection to the Internet below.
+      </message>
+      <message name="IDS_LOGIN_MAYBE_CAPTIVE_PORTAL_TITLE" desc="An offline message title shown when we suggest that user may be behind the captive portal.">
+        Network not available
+      </message>
+      <message name="IDS_LOGIN_AUTO_ENROLLMENT_OFFLINE_TITLE" desc="A message title shown when we suggest that user can't reach proper servers during auto-enrollment.">
+        Can't reach Google
+      </message>
+      <message name="IDS_LOGIN_MAYBE_CAPTIVE_PORTAL" desc="An offline message shown when we suggest that user may be behind the captive portal. Translation note: enter as Guest - could also be said enter as Guest user. Word user may be added to the translation if needed.">
+        To use <ph name="NETWORK_ID">$1<ex>&gt;b&lt;Public Wifi&gt;/b&lt;</ex></ph> you may first need to <ph name="LINK_START">$2<ex>&gt;a&lt;</ex></ph>visit the network's sign-in page<ph name="LINK_END">$3<ex>&gt;/a&lt;</ex></ph>, which will open automatically in a few seconds. If it doesn't happen, the network can't be used.
+      </message>
+      <message name="IDS_LOGIN_MAYBE_CAPTIVE_PORTAL_PROXY" desc="An offline mssage shown when we suggest that user should configure the proxy.">
+        If you are using a proxy server, check your proxy settings or
+        contact your network administrator to check that the proxy
+        server is working. If you don't believe you should be using a
+        proxy server, adjust your <ph name="LINK_START">$1<ex>&gt;a&lt;</ex></ph>proxy settings<ph name="LINK_END">$2<ex>&gt;/a&lt;</ex></ph>.
+      </message>
+      <message name="IDS_LOGIN_MAYBE_CAPTIVE_PORTAL_NETWORK_SELECT" desc="An offline message shown when we suggest that user may select other network.">
+        You may also select another network.
+      </message>
+      <message name="IDS_LOGIN_OFFLINE_MESSAGE" desc="An offline message that shows up in OOBE sign-in screen.">
+        Please connect to the Internet to sign in to your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph>.
+      </message>
+      <message name="IDS_KIOSK_OFFLINE_MESSAGE" desc="An offline message that shows up when a kiosk app can't launch without network connectivity.">
+        Please connect to the Internet to launch your app in kiosk mode.
+      </message>
+      <message name="IDS_LOGIN_NETWORK_RESTORED_TITLE" desc="An message title shown when network connectivity is restored during kiosk app launch.">
+        Network connectivity restored
+      </message>
+      <message name="IDS_KIOSK_ONLINE_MESSAGE" desc="An message that shows up when a kiosk app is ready to launch after established network connectivity.">
+        Your network connectivity is restored. Please select a different network or press 'Continue' button below to launch your kiosk app.
+      </message>
+      <message name="IDS_UPDATE_OFFLINE_MESSAGE" desc="An offline message that shows up in the OOBE update screen.">
+        Please connect to the Internet to update your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph>.
+      </message>
+      <message name="IDS_LOGIN_AUTO_ENROLLMENT_OFFLINE_MESSAGE" desc="An offline message that shows in the error screen when auto-enrollment state failed to be downloaded.">
+        We can't reach Google through the connected network. Try choosing a different network or checking your network settings or proxy settings (if you are using a proxy).
+      </message>
+      <message name="IDS_UPDATE_PROXY_ERROR_MESSAGE" desc="An offline message that shows up when a proxy error has appeared in the OOBE update screen.">
+        The update check failed using the current proxy settings. Please adjust your <ph name="PROXY_SETTINGS_LINK_START">$1<ex>&gt;a&lt;</ex></ph>proxy settings<ph name="PROXY_SETTINGS_LINK_END">$2<ex>&gt;/a&lt;</ex></ph>.
+      </message>
+      <message name="IDS_LOGIN_VERSION_LABEL_FORMAT" desc="Login screen version text format.">
+        <ph name="PRODUCT_NAME">$1<ex>Google Chrome</ex></ph> <ph name="PRODUCT_VERSION">$2<ex>15.0.0.0</ex></ph> (Platform <ph name="PLATFORM_VERSION">$3<ex>900.0-11.09.01</ex></ph>) <ph name="DEVICE_SERIAL_NUMBER">$4<ex>SN:123456789ABC</ex></ph>
+      </message>
+      <message name="IDS_LOGIN_API_KEYS_NOTICE" desc="Notice displayed on the login screen in case if API keys are missing.">
+        You will not be able to add users because Google API keys are missing. See <ph name="DETAILS_URL">$1<ex>http://www.example.com</ex></ph> for details.
+      </message>
+      <message name="IDS_LOGIN_GUEST_SIGNIN_FIX_NETWORK">
+        You may also try to <ph name="GUEST_SIGNIN_LINK_START">$1<ex>&gt;a&lt;</ex></ph>browse as guest<ph name="GUEST_SIGNIN_LINK_END">$2<ex>&gt;/a&lt;</ex></ph> to fix this network error.
+      </message>
+      <message name="IDS_LOGIN_CONNECTING_INDICATOR_TEXT" desc="A message to show telling the user that the device is attempting to re-connect to the network.">
+        Connecting and verifying
+      </message>
+      <message name="IDS_LOGIN_SSH_WARNING" desc="A message telling user that the device has SSH server configured. So they should be carefule with accounts they use to sign in.">
+        Device has SSH server configured. Do not sign in with sensitive accounts.
+      </message>
+
+      <!-- Encryption migration dialog -->
+      <message name="IDS_ENCRYPTION_MIGRATION_READY_TITLE" desc="Title shown in encryption migration screen, which asks the user to install an OS update.">
+        Install critical update
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_READY_DESCRIPTION" desc="Description shown in encryption migration screen, which asks the user to install an OS update.">
+        To download and use Android apps, first you need to install this required update. While your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> is updating, you can’t use it. After installation completes, your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> will restart.
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_MIGRATING_TITLE" desc="Title shown in encryption migration screen when the migration is ongoing.">
+        Installing OS update
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_MIGRATING_DESCRIPTION" desc="Description shown in encryption migration screen when the migration is ongoing.">
+        Don’t turn off or close your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> until the update finishes. Your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> will restart after installation completes.
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_PROGRESS_LABEL" desc="Label to show the progress of the migration.">
+        <ph name="PROGRESS_PERCENT">$1<ex>90</ex></ph>% done
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_BATTERY_WARNING_LABEL" desc="Label to tell the user that the battery level is too low to start the migration.">
+        Battery too low for update (<ph name="BATTERY_PERCENT">$1<ex>10</ex></ph>%)
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_ASK_CHARGE_MESSAGE" desc="Label to ask the user to charge the device.">
+        Please plug your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> into a power source.
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_NECESSARY_BATTERY_LEVEL_MESSAGE" desc="Explanation about how to start migration when the battery level is low.">
+        Update will begin when battery reaches <ph name="BATTERY_LEVEL">$1<ex>30</ex></ph>%.
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_CHARGING_LABEL" desc="Label which is shown when the device is charging.">
+        Charging.
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_FAILED_TITLE" desc="Title shown in encryption migration screen when the migration fails.">
+        Something went wrong
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_FAILED_SUBTITLE" desc="In encryption migration screen, explanation about the failure of migration.">
+        Sorry, some files were damaged and the update wasn’t successful. Your synced files are safe.
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_FAILED_MESSAGE" desc="In encryption migration screen, label to ask user to create the account again.">
+        Unfortunately, you'll need to add your account to this <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> again.
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_NOSPACE_WARNING_LABEL" desc="Label to tell the user that migration can not start due to low storage space.">
+        Not enough storage for update
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_ASK_FREE_SPACE_MESSAGE" desc="In encryption migration screen, message to ask the user to free some space on the device.">
+        Please free up some space on your device.
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_AVAILABLE_SPACE_LABEL" desc="In encryption migration screen, label to tell the user how much space is available now.">
+        Available: <ph name="AVAILABLE_SPACE">$1<ex>5 MB</ex></ph>
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_NECESSARY_SPACE_LABEL" desc="In encryption migration screen, label to tell the user how much space is necessary to start migration.">
+        Needed to update: <ph name="NECESSARY_SPACE">$1<ex>10 MB</ex></ph>
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_BUTTON_UPDATE" desc="In encryption migration screen, button label to start migration (i.e. update the encryption of user data).">
+        Update
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_BUTTON_SKIP" desc="In encryption migration screen, button label to skip the migration.">
+        Skip
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_BUTTON_RESTART" desc="In encryption migration screen, button label to restart the device.">
+        Restart
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_BUTTON_CONTINUE" desc="In encryption migration screen, button label to continue to sign in to the user's session.">
+        Continue
+      </message>
+      <message name="IDS_ENCRYPTION_MIGRATION_BUTTON_SIGNIN" desc="In encryption migration screen, button label to sign in to the user's session.">
+        Sign in
+      </message>
     </messages>
   </release>
 </grit>
