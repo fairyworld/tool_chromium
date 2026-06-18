@@ -945,7 +945,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                         R.id.tab_groups_parent_menu_id,
                         R.string.menu_tab_groups,
                         shouldShowIconBeforeItem() ? R.drawable.ic_widgets : Resources.ID_NULL,
-                        () -> getTabGroupsSubmenuItems(currentTab, /* showIcons= */ false)));
+                        () -> getTabGroupsSubmenuItems(currentTab, shouldShowIconBeforeItem())));
     }
 
     private Drawable getTabGroupDrawable(@TabGroupColorId int color) {
