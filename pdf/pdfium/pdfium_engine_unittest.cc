@@ -1255,6 +1255,17 @@ TEST_P(PDFiumEngineSelectionTest, SelectCroppedText) {
             engine->GetSelectedText());
 }
 
+TEST_P(PDFiumEngineSelectionTest, SelectActualTextRtl) {
+  PDFiumEngine* engine = CreateEngine(FILE_PATH_LITERAL("actual_text_rtl.pdf"));
+  ASSERT_TRUE(engine);
+
+  engine->SelectAll();
+  // TODO(crbug.com/525087036): `kExpectedText` is wrong. RTL text is backwards.
+  constexpr char kExpectedText[] = "Hello is םולש\nWater is water םימ";
+  EXPECT_EQ(GetPlatformTextExpectation(kExpectedText),
+            engine->GetSelectedText());
+}
+
 TEST_P(PDFiumEngineSelectionTest, SelectTextWithDoubleClick) {
   PDFiumEngine* engine = CreateEngine(FILE_PATH_LITERAL("hello_world2.pdf"));
   ASSERT_TRUE(engine);
