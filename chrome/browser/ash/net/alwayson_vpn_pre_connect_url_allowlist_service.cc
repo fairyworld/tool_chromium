@@ -21,8 +21,9 @@ AlwaysOnVpnPreConnectUrlAllowlistService::
         PolicyBlocklistService* policy_blocklist_service)
     : pref_service_(pref_service),
       policy_blocklist_service_(policy_blocklist_service) {
-  // TODO(crbug.com/7768231): Remove this once the root cause is identified.
-  DUMP_WILL_BE_CHECK(ash::NetworkHandler::Get());
+  // TODO(crbug.com/501330749): Remove this once the root cause is identified.
+  DUMP_WILL_BE_CHECK(ash::NetworkHandler::HasEverBeenInitialized());
+  DUMP_WILL_BE_CHECK(ash::NetworkHandler::IsInitialized());
 
   network_state_handler_observer_.Observe(
       ash::NetworkHandler::Get()->network_state_handler());
