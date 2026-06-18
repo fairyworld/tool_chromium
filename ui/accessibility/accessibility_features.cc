@@ -180,6 +180,15 @@ CanvasAccessibilityMode GetCanvasAccessibilityMode() {
   return kCanvasAccessibilityMode.Get();
 }
 
+BASE_FEATURE(kEnableCollectAccessibilityHeuristicInCanvasUkm,
+             "EnableCollectAccessibilityHeuristicInCanvasUkm",
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
+bool IsCollectAccessibilityHeuristicInCanvasUkmEnabled() {
+  return base::FeatureList::IsEnabled(
+      ::features::kEnableCollectAccessibilityHeuristicInCanvasUkm);
+}
+
 #if BUILDFLAG(IS_WIN)
 BASE_FEATURE(kAccessibilityWinAXFragmentRootParent,
              base::FEATURE_ENABLED_BY_DEFAULT);

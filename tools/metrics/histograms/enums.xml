@@ -12973,6 +12973,8 @@ from previous Chrome versions.
   <int value="-472409457" label="ChromeFindsInternals:disabled"/>
   <int value="-472014137" label="HomepageTile:disabled"/>
   <int value="-472013317" label="WebRTC-H264WithOpenH264FFmpeg:disabled"/>
+  <int value="-471530359"
+      label="EnableCollectAccessibilityHeuristicInCanvasUkm:disabled"/>
   <int value="-471405972" label="ViewsProfileChooser:disabled"/>
   <int value="-471085510" label="MultiDeviceApi:enabled"/>
   <int value="-470247915"
@@ -13793,6 +13795,8 @@ from previous Chrome versions.
   <int value="-199690952" label="PageInfoV2:enabled"/>
   <int value="-199443830"
       label="ReadingListEnableSyncTransportModeUponSignIn:enabled"/>
+  <int value="-199375204"
+      label="EnableCollectAccessibilityHeuristicInCanvasUkm:enabled"/>
   <int value="-199266098" label="FluidResize:enabled"/>
   <int value="-198725896" label="AlmanacGameMigration:enabled"/>
   <int value="-198595821"

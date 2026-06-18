@@ -4338,6 +4338,12 @@ inline constexpr char kCanvasAccessibilityDescription[] =
     "Enables canvas accessibility and allows selecting the algorithm to add "
     "text for inaccessible canvas content.";
 
+inline constexpr char kCollectAccessibilityHeuristicInCanvasUkmName[] =
+    "Collect accessibility heuristic result in Canvas UKM";
+inline constexpr char kCollectAccessibilityHeuristicInCanvasUkmDescription[] =
+    "Allows collecting canvas accessibility heuristic results in the "
+    "Accessibility.Canvas UKM event.";
+
 inline constexpr char kDefaultSiteInstanceGroupsName[] =
     "Default SiteInstanceGroups";
 inline constexpr char kDefaultSiteInstanceGroupsDescription[] =

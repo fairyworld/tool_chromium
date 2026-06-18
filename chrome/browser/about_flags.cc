@@ -6434,7 +6434,6 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kLensOverlayOmniboxEntryPointDescription, kOsDesktop,
      FEATURE_VALUE_TYPE(lens::features::kLensOverlayOmniboxEntryPoint)},
 
-
     {"hide-aim-omnibox-entrypoint-on-user-input",
      flag_descriptions::kHideAimOmniboxEntrypointOnUserInputName,
      flag_descriptions::kHideAimOmniboxEntrypointOnUserInputDescription,
@@ -12974,10 +12973,18 @@ const FeatureEntry kFeatureEntries[] = {
          autofill::features::kAutofillEnableGradientGoogleLogos)},
 
     {"canvas-accessibility", flag_descriptions::kCanvasAccessibilityName,
-     flag_descriptions::kCanvasAccessibilityDescription, kOsAll,
+     flag_descriptions::kCanvasAccessibilityDescription,
+     kOsDesktop | kOsAndroid,
      FEATURE_WITH_PARAMS_VALUE_TYPE(::features::kAccessibilityCanvas,
                                     kCanvasAccessibilityChoices,
                                     "CanvasAccessibility")},
+
+    {"collect-accessibility-heuristic-in-canvas-ukm",
+     flag_descriptions::kCollectAccessibilityHeuristicInCanvasUkmName,
+     flag_descriptions::kCollectAccessibilityHeuristicInCanvasUkmDescription,
+     kOsDesktop | kOsAndroid,
+     FEATURE_VALUE_TYPE(
+         ::features::kEnableCollectAccessibilityHeuristicInCanvasUkm)},
 
 #if BUILDFLAG(IS_ANDROID)
     {"android-open-incognito-as-window-restrictions",

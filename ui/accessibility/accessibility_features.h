@@ -149,6 +149,12 @@ enum class CanvasAccessibilityMode {
 
 AX_BASE_EXPORT CanvasAccessibilityMode GetCanvasAccessibilityMode();
 
+// Controls whether canvas accessibility heuristic results are collected via
+// UKM.
+AX_BASE_EXPORT BASE_DECLARE_FEATURE(
+    kEnableCollectAccessibilityHeuristicInCanvasUkm);
+AX_BASE_EXPORT bool IsCollectAccessibilityHeuristicInCanvasUkmEnabled();
+
 #if BUILDFLAG(IS_WIN)
 // This is a killswitch. Controls whether
 // HWNDMessageHandler::GetParentOfAXFragmentRoot returns nullptr (legacy) or
