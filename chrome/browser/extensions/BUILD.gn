@@ -369,6 +369,8 @@ source_set("extensions") {
     "forced_extensions/force_installed_tracker.h",
     "forced_extensions/install_stage_tracker_factory.cc",
     "forced_extensions/install_stage_tracker_factory.h",
+    "glic_util.cc",
+    "glic_util.h",
     "initial_external_extension_loader.cc",
     "initial_external_extension_loader.h",
     "install_tracker_factory.cc",

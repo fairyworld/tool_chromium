@@ -27,6 +27,7 @@
 #include "chrome/browser/extensions/component_extensions_allowlist/allowlist.h"
 #include "chrome/browser/extensions/component_loader_factory.h"
 #include "chrome/browser/extensions/data_deleter.h"
+#include "chrome/browser/extensions/glic_util.h"
 #include "chrome/browser/extensions/profile_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/channel_info.h"
@@ -395,7 +396,7 @@ void ComponentLoader::AddNetworkSpeechSynthesisExtension() {
 }
 
 void ComponentLoader::AddGlicExtension() {
-  if (base::FeatureList::IsEnabled(extensions_features::kApiGlicPrivate)) {
+  if (IsApiGlicPrivateEnabled()) {
     Add(IDR_GLIC_EXTENSION_MANIFEST,
         base::FilePath(FILE_PATH_LITERAL("glic_extension")));
   }
