@@ -682,6 +682,8 @@ try_.builder(
     experiments = {
         # crbug/940930
         "chromium.enable_cleandead": 50,
+        # TODO(https://crbug.com/521401232): Increase to 100
+        "luci.buildbucket.run_in_turboci": 50,
     },
     main_list_view = "try",
 )
