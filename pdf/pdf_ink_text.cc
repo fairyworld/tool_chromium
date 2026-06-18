@@ -53,6 +53,7 @@ InkTextInfo MakeSubstrTextInfo(const InkTextInfo& input,
                       /*height=*/input.location.height());
   return InkTextInfo(input.font_id, std::move(glyphs),
                      std::move(glyph_positions), location, input.is_horizontal,
+                     input.is_synthetic_bold, input.is_synthetic_italic,
                      std::move(substr));
 }
 
@@ -203,11 +204,29 @@ InkTextInfo::InkTextInfo(FontId font_id,
                          gfx::RectF location,
                          bool is_horizontal,
                          std::u16string text)
+    : InkTextInfo(font_id,
+                  std::move(glyphs),
+                  std::move(glyph_positions),
+                  location,
+                  is_horizontal,
+                  /*is_synthetic_bold=*/false,
+                  /*is_synthetic_italic=*/false,
+                  std::move(text)) {}
+InkTextInfo::InkTextInfo(FontId font_id,
+                         std::vector<uint32_t> glyphs,
+                         std::vector<float> glyph_positions,
+                         gfx::RectF location,
+                         bool is_horizontal,
+                         bool is_synthetic_bold,
+                         bool is_synthetic_italic,
+                         std::u16string text)
     : font_id(font_id),
-      glyphs(glyphs),
-      glyph_positions(glyph_positions),
+      glyphs(std::move(glyphs)),
+      glyph_positions(std::move(glyph_positions)),
       location(location),
       is_horizontal(is_horizontal),
+      is_synthetic_bold(is_synthetic_bold),
+      is_synthetic_italic(is_synthetic_italic),
       text(std::move(text)) {}
 InkTextInfo::InkTextInfo(InkTextInfo&&) noexcept = default;
 InkTextInfo& InkTextInfo::operator=(InkTextInfo&&) noexcept = default;
@@ -287,7 +306,10 @@ std::vector<InkTextInfo> InkTextInfo::SplitTypefaceRuns(
       CHECK_EQ(glyphs.size(), glyph_positions.size());
       InkTextInfo output_info(
           FontId(typeface_run->typeface_id), std::move(glyphs),
-          std::move(glyph_positions), run_location, typeface_run->is_horizontal,
+          std::move(glyph_positions), run_location,
+          /*is_horizontal=*/typeface_run->is_horizontal,
+          /*is_synthetic_bold=*/typeface_run->is_synthetic_bold,
+          /*is_synthetic_italic=*/typeface_run->is_synthetic_italic,
           !is_rtl ? text_run->text.substr(first_index, last_index - first_index)
                   : u"");
       MaybeCorrectNonZeroFirstOffset(output_info);

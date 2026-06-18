@@ -313,4 +313,31 @@ TEST(PdfInkTextSplitTypefaceRunsTest, SplitText) {
                             /*is_horizontal=*/true, u"8"));
 }
 
+TEST(PdfInkTextSplitTypefaceRunsTest, SyntheticBoldItalic) {
+  auto glyph = pdf::mojom::InkGlyphInfo::New();
+  glyph->glyph = 1;
+  glyph->total_advance = 0.0f;
+
+  auto typeface_run = pdf::mojom::InkTypefaceRun::New();
+  typeface_run->typeface_id = 0;
+  typeface_run->glyphs.push_back(std::move(glyph));
+  typeface_run->is_horizontal = true;
+  typeface_run->is_synthetic_bold = true;
+  typeface_run->is_synthetic_italic = true;
+
+  auto text_run = pdf::mojom::InkTextRun::New();
+  text_run->typeface_runs.push_back(std::move(typeface_run));
+  text_run->location = gfx::RectF(100.0f, 100.0f, 70.0f, 20.0f);
+  text_run->text = u"X";
+
+  std::vector<pdf::mojom::InkTextRunPtr> text_runs;
+  text_runs.push_back(std::move(text_run));
+
+  std::vector<InkTextInfo> ink_info =
+      InkTextInfo::SplitTypefaceRuns(text_runs, 10.0f);
+  ASSERT_EQ(ink_info.size(), 1u);
+  EXPECT_TRUE(ink_info[0].is_synthetic_bold);
+  EXPECT_TRUE(ink_info[0].is_synthetic_italic);
+}
+
 }  // namespace chrome_pdf

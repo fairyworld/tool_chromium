@@ -3285,6 +3285,43 @@ TEST_P(PDFiumEngineInkDrawTextTest, DrawText) {
   CheckPdfRendering(page.GetPage(), kPageSizeInPoints, kAppliedTextFilePath);
 }
 
+TEST_P(PDFiumEngineInkDrawTextTest, DrawTextSyntheticBoldItalic) {
+  TestClient client(/*use_skia_renderer=*/GetParam());
+  std::unique_ptr<PDFiumEngine> engine =
+      InitializeEngine(&client, FILE_PATH_LITERAL("blank.pdf"));
+  ASSERT_TRUE(engine);
+  int page_count = FPDF_GetPageCount(engine->doc());
+  ASSERT_EQ(page_count, 1);
+
+  constexpr int kPageIndex = 0;
+  PDFiumPage& page = GetPDFiumPage(*engine, kPageIndex);
+
+  FontId font_id = AddDefaultFont(engine.get());
+  constexpr std::string_view kTextToDraw = "Hello!";
+  constexpr float kFontSize = 24.0f;
+  DrawTextData text_data =
+      GetGlyphsForText(kTextToDraw, /*font_size=*/kFontSize);
+  ASSERT_FALSE(text_data.glyphs.empty());
+
+  // Draw some text with synthetic bold and italic.
+  InkTextBoxAttributes attribute = SampleInkTextBoxAttributes();
+  attribute.css_font_size = kFontSize;
+  engine->DrawText(
+      kPageIndex, InkTextId(0),
+      {InkTextInfo(font_id, text_data.glyphs, text_data.glyph_positions,
+                   /*location=*/gfx::RectF(0.0f, 0.0f, 100.0f, 20.0f),
+                   /*is_horizontal=*/true,
+                   /*is_synthetic_bold=*/true,
+                   /*is_synthetic_italic=*/true, text_data.text)},
+      /*pdf_zoom=*/1.0, attribute);
+
+  // Verify the rendering of text with synthetic bold and italic.
+  const gfx::Size& kPageSizeInPoints = kBlankPageSizeInPoints;
+  const base::FilePath kExpectedFilePath(GetInkTestDataFilePath(
+      GetTestDataPathWithPlatformSuffix("applied_text_bold_italic.png")));
+  CheckPdfRendering(page.GetPage(), kPageSizeInPoints, kExpectedFilePath);
+}
+
 TEST_P(PDFiumEngineInkDrawTextTest, RotatedTextbox90Degrees) {
   TestClient client(/*use_skia_renderer=*/GetParam());
   std::unique_ptr<PDFiumEngine> engine =

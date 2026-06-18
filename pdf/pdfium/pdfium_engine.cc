@@ -5322,6 +5322,22 @@ void PDFiumEngine::DrawText(int page_index,
     CHECK(FPDFText_SetCharcodes(text_object.get(), item.glyphs.data(),
                                 item.glyphs.size()));
 
+    if (item.is_synthetic_bold) {
+      // This matches `SK_OUTLINE_EMBOLDEN_DIVISOR` in Skia.
+      static constexpr float kOutlineEmboldenDivisor = 24.0f;
+      // This matches Skia synthetic bold logic.
+      CHECK(FPDFTextObj_SetTextRenderMode(text_object.get(),
+                                          FPDF_TEXTRENDERMODE_FILL_STROKE));
+      CHECK(FPDFPageObj_SetStrokeColor(text_object.get(),
+                                       /*R=*/SkColorGetR(color),
+                                       /*G=*/SkColorGetG(color),
+                                       /*B=*/SkColorGetB(color),
+                                       /*A=*/255));
+      CHECK(FPDFPageObj_SetStrokeWidth(
+          text_object.get(), pdf_font_size / kOutlineEmboldenDivisor));
+      CHECK(FPDFPageObj_SetLineJoin(text_object.get(), FPDF_LINEJOIN_MITER));
+    }
+
     if (item.glyph_positions.size() > 1) {
       std::vector<float> positions;
       base::span<const float> unscaled_positions =
@@ -5333,6 +5349,16 @@ void PDFiumEngine::DrawText(int page_index,
                              });
       CHECK(FPDFText_SetPositions(text_object.get(), positions.data(),
                                   positions.size()));
+    }
+
+    if (item.is_synthetic_italic) {
+      // This matches `-SK_Scalar1 / 4` in Blink and Skia code. The value is
+      // positive because the PDF coordinate system has a bottom-left origin,
+      // instead of a top-left screen origin.
+      static constexpr float kSkew = 0.25f;
+      const FS_MATRIX skew_matrix{1.0f, 0.0f, kSkew, 1.0f, 0.0f, 0.0f};
+      // This matches Skia synthetic italic logic.
+      CHECK(FPDFPageObj_TransformF(text_object.get(), &skew_matrix));
     }
 
     FS_MATRIX text_origin_matrix =
