@@ -4468,22 +4468,6 @@ static_library("ui") {
       "views/payments/validation_delegate.h",
       "views/payments/view_stack.cc",
       "views/payments/view_stack.h",
-      "views/performance_controls/battery_saver_bubble_view.cc",
-      "views/performance_controls/battery_saver_bubble_view.h",
-      "views/performance_controls/battery_saver_button.cc",
-      "views/performance_controls/battery_saver_button.h",
-      "views/performance_controls/memory_saver_bubble_view.cc",
-      "views/performance_controls/memory_saver_bubble_view.h",
-      "views/performance_controls/memory_saver_resource_view.cc",
-      "views/performance_controls/memory_saver_resource_view.h",
-      "views/performance_controls/performance_intervention_bubble.cc",
-      "views/performance_controls/performance_intervention_bubble.h",
-      "views/performance_controls/performance_intervention_button.cc",
-      "views/performance_controls/performance_intervention_button.h",
-      "views/performance_controls/tab_list_row_view.cc",
-      "views/performance_controls/tab_list_row_view.h",
-      "views/performance_controls/tab_list_view.cc",
-      "views/performance_controls/tab_list_view.h",
       "views/permissions/chip/multi_image_container.cc",
       "views/permissions/chip/multi_image_container.h",
       "views/permissions/chip/permission_dashboard_controller.cc",
@@ -4991,6 +4975,8 @@ static_library("ui") {
       "//chrome/browser/ui/views/page_action:impl",
       "//chrome/browser/ui/views/page_info",
       "//chrome/browser/ui/views/page_info:impl",
+      "//chrome/browser/ui/views/performance_controls",
+      "//chrome/browser/ui/views/performance_controls:impl",
       "//chrome/browser/ui/views/permissions",
       "//chrome/browser/ui/views/permissions/chip",
       "//chrome/browser/ui/views/permissions/chip:impl",
@@ -5185,6 +5171,13 @@ static_library("ui") {
       # - c/b/ui/views/extensions/security_dialog_tracker.h
       # - c/b/ui/views/frame/browser_view.h
       "//chrome/browser/ui/views/webid:impl",
+
+      # TODO(crbug.com/353332589): Remove this circular dependency when
+      # the following headers get modularized:
+      # - c/b/ui/browser.h
+      # - c/b/ui/tab_ui_helper.h
+      # - c/b/ui/views/frame/browser_view.h
+      "//chrome/browser/ui/views/performance_controls:impl",
     ]
 
     if (is_linux) {

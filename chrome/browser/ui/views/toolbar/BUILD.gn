@@ -220,6 +220,7 @@ source_set("impl") {
     "//chrome/browser/ui/views/glic",
     "//chrome/browser/ui/views/interaction",
     "//chrome/browser/ui/views/page_action",
+    "//chrome/browser/ui/views/performance_controls",
     "//chrome/browser/ui/views/tabs/glic",
     "//chrome/browser/ui/waap",
     "//chrome/browser/ui/waap:manager",
@@ -363,7 +364,10 @@ if (!is_android) {
         "webui_toolbar_web_view_browsertest.cc",
       ]
 
-      deps += [ "//chrome/browser/ui/webui:webui_util" ]
+      deps += [
+        "//chrome/browser/ui/views/performance_controls",
+        "//chrome/browser/ui/webui:webui_util",
+      ]
     }
   }
 }

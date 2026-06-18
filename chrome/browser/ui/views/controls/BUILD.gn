@@ -41,7 +41,7 @@ source_set("controls") {
     "//chrome/browser/ui/views/web_apps",
     "//components/constrained_window",
     "//components/content_settings/browser/ui",
-    "//components/strings:components_strings__strings_grit",
+    "//components/strings:components_strings",
     "//components/web_modal",
     "//content/public/browser",
   ]
