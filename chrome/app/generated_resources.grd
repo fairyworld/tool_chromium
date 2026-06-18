@@ -6982,6 +6982,12 @@ Keep your key file in a safe place. You will need it to create new versions of y
       <message name="IDS_PASSWORD_BUBBLES_FOOTER_SYNCED_TO_ACCOUNT" desc="The footer text of the bubbles that offers users to save, update or manage stored passwords in Chrome and synced to their Google account.">
         You can use saved passwords on any device. They're saved to <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google Password Manager</ex></ph> for <ph name="EMAIL">$2<ex>user@gmail.com</ex></ph>.
       </message>
+      <message name="IDS_PASSWORD_BUBBLES_FOOTER_TRUSTED_VAULT_ERROR" desc="The footer text of the bubbles when there is a trusted vault error, telling the user their passwords are saved to Google Password Manager.">
+        Your passwords are saved to <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google Password Manager</ex></ph> for <ph name="EMAIL">$2<ex>user@gmail.com</ex></ph>.
+      </message>
+      <message name="IDS_PASSWORD_BUBBLES_SUBTITLE_TRUSTED_VAULT_ERROR" desc="The subtitle of the password bubble when saving is blocked by a trusted vault error, telling the user they need to verify their identity to get passwords on all devices.">
+        Verify it's you to get it on all devices with your Google Account
+      </message>
       <message name="IDS_PASSWORD_BUBBLES_FOOTER_SAVING_ON_DEVICE" desc="The footer text of the bubbles that offers users to save, update or manage stored passwords only locally in Chrome.">
         Passwords are saved to <ph name="GOOGLE_PASSWORD_MANAGER">$1<ex>Google Password Manager</ex></ph> on this device.
       </message>
