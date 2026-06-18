@@ -847,7 +847,7 @@ third_party/tflite_support/src/tensorflow_lite_support/python/task/core/proto
 third_party/tflite_support/src/tensorflow_lite_support/scann_ondevice
 third_party/tflite_support/src/tensorflow_lite_support/tools/ci_build/builds
 third_party/tflite_support/src/tensorflow_lite_support/tools/docs
-third_party/usb_ids
+third_party/usb_ids/src
 third_party/utf/src/share
 third_party/webxr_test_pages
 third_party/webxr_test_pages/webxr-samples
