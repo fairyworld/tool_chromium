@@ -23,6 +23,7 @@
 #import "ios/chrome/browser/fullscreen/model/fullscreen_browser_agent.h"
 #import "ios/chrome/browser/fullscreen/model/fullscreen_browser_agent_observer_bridge.h"
 #import "ios/chrome/browser/fullscreen/ui_bundled/test/test_fullscreen_controller.h"
+#import "ios/chrome/browser/intelligence/bwg/model/fake_gemini_service.h"
 #import "ios/chrome/browser/intelligence/bwg/model/gemini_browser_agent.h"
 #import "ios/chrome/browser/intelligence/bwg/model/gemini_configuration.h"
 #import "ios/chrome/browser/intelligence/bwg/model/gemini_service_factory.h"
@@ -1207,4 +1208,64 @@ TEST_F(AppBarMediatorTest, TestWebStateSelectionNTPUpdatesConsumer) {
       WebStateList::InsertionParams::AtIndex(1).Activate());
 
   EXPECT_OCMOCK_VERIFY(consumer_);
+}
+
+// Tests that when GeminiService's eligibility changes, the mediator receives
+// the notification and updates the assistant button's state on the consumer.
+TEST_F(AppBarMediatorTest, TestGeminiEligibilityChangeUpdatesAssistantButton) {
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitWithFeatures({kPageActionMenu}, {});
+
+  FakeGeminiService fake_gemini_service;
+  fake_gemini_service.SetIsEligible(false);
+
+  BrowserActionFactory* regular_action_factory =
+      [[BrowserActionFactory alloc] initWithBrowser:regular_browser_.get()
+                                           scenario:kTestMenuScenario];
+  BrowserActionFactory* incognito_action_factory =
+      [[BrowserActionFactory alloc] initWithBrowser:incognito_browser_.get()
+                                           scenario:kTestMenuScenario];
+
+  AppBarMediator* mediator = [[AppBarMediator alloc]
+          initWithRegularWebStateList:regular_web_state_list_
+                incognitoWebStateList:incognito_web_state_list_
+          regularFullscreenController:TestFullscreenController::FromBrowser(
+                                          regular_browser_.get())
+        incognitoFullscreenController:TestFullscreenController::FromBrowser(
+                                          incognito_browser_.get())
+        regularFullscreenBrowserAgent:FullscreenBrowserAgent::FromBrowser(
+                                          regular_browser_.get())
+      incognitoFullscreenBrowserAgent:FullscreenBrowserAgent::FromBrowser(
+                                          incognito_browser_.get())
+                 regularActionFactory:regular_action_factory
+               incognitoActionFactory:incognito_action_factory
+                          prefService:regular_profile_->GetTestingPrefService()
+                   templateURLService:search_engines_test_environment_
+                                          .template_url_service()
+                authenticationService:auth_service_
+                      identityManager:IdentityManagerFactory::GetForProfile(
+                                          regular_profile_.get())
+                        geminiService:&fake_gemini_service
+                   geminiBrowserAgent:GeminiBrowserAgent::FromBrowser(
+                                          regular_browser_.get())
+                            URLLoader:url_loader_
+                         tabGridState:tab_grid_state_
+                       incognitoState:incognito_state_];
+
+  id consumer = OCMProtocolMock(@protocol(TestAppBarConsumer));
+  mediator.consumer = consumer;
+
+  // Change from ineligible (no kAsk button or disabled fallback) to eligible.
+  // When eligible, it should update state to kAsk.
+  OCMExpect([consumer setAssistantButtonState:AppBarAssistantButtonState::kAsk
+                                  highlighted:NO
+                                      enabled:NO
+                                       avatar:nil
+                                     signedIn:NO]);
+
+  fake_gemini_service.SetIsEligible(true);
+
+  EXPECT_OCMOCK_VERIFY(consumer);
+
+  [mediator disconnect];
 }

@@ -49,8 +49,8 @@ constexpr CGFloat kButtonShadowRadius = 3;
 constexpr CGFloat kButtonShadowOpacity = 0.2;
 // The shadow offset for the buttons.
 constexpr CGFloat kButtonShadowOffset = 1;
-// The duration of the animation to update the TabGrid button.
-constexpr CGFloat kTabGridAnimationDuration = 0.25;
+// The duration of animations in the App Bar.
+constexpr CGFloat kAppBarAnimationDuration = 0.25;
 // Spacing between tab grid button and the tab grid spotlight view anchor.
 constexpr CGFloat kSpotlightViewHorizontalInset = 12;
 constexpr CGFloat kSpotlightViewVerticalInset = 2;
@@ -507,13 +507,26 @@ UIColor* AssistantHighlightBackgroundColor() {
                         enabled:(BOOL)enabled
                          avatar:(UIImage*)avatar
                        signedIn:(BOOL)signedIn {
+  BOOL imageChanged =
+      (_assistantButtonState != state || _assistantButtonAvatar != avatar);
+
   _assistantButtonState = state;
   _assistantButtonHighlighted = highlighted;
   _assistantButtonEnabled = enabled;
   _assistantButtonAvatar = avatar;
   _signedIn = signedIn;
 
-  [self updateAssistantButton];
+  if (imageChanged && self.view.window) {
+    [UIView transitionWithView:_assistantButton
+                      duration:kAppBarAnimationDuration
+                       options:UIViewAnimationOptionTransitionCrossDissolve
+                    animations:^{
+                      [self updateAssistantButton];
+                    }
+                    completion:nil];
+  } else {
+    [self updateAssistantButton];
+  }
 }
 
 - (void)setTabGroupsPageVisible:(BOOL)tabGroupsPageVisible {
@@ -1177,7 +1190,7 @@ UIColor* AssistantHighlightBackgroundColor() {
   UIColor* labelColor =
       _isTabGridVisible ? UIColor.blackColor : ButtonsForegroundColor();
   [UIView transitionWithView:label
-                    duration:kTabGridAnimationDuration
+                    duration:kAppBarAnimationDuration
                      options:UIViewAnimationOptionTransitionCrossDissolve
                   animations:^{
                     label.textColor = labelColor;

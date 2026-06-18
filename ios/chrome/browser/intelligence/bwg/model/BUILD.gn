@@ -218,6 +218,8 @@ source_set("gemini_service") {
     "gemini_service.h",
     "gemini_service_impl.h",
     "gemini_service_impl.mm",
+    "gemini_service_observer_bridge.h",
+    "gemini_service_observer_bridge.mm",
   ]
   deps = [
     "//components/keyed_service/core",
@@ -238,6 +240,7 @@ source_set("gemini_service") {
     "//ios/web/public",
     "//ios/web/util",
   ]
+  public_deps = [ "//base" ]
 }
 
 source_set("gemini_service_factory") {
