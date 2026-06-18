@@ -566,7 +566,8 @@ IN_PROC_BROWSER_TEST_F(BubbleSignInPromoInteractiveUITest,
   // Signin metrics - WebSignin (WithDefault) metrics are also recorded.
   histogram_tester.ExpectBucketCount(
       "Signin.SignIn.Offered", signin_metrics::AccessPoint::kPasswordBubble, 1);
-  histogram_tester.ExpectTotalCount("Signin.SignIn.Started", 0);
+  histogram_tester.ExpectBucketCount(
+      "Signin.SignIn.Started", signin_metrics::AccessPoint::kPasswordBubble, 1);
   histogram_tester.ExpectBucketCount(
       "Signin.SignIn.Completed", signin_metrics::AccessPoint::kPasswordBubble,
       1);
@@ -812,7 +813,8 @@ IN_PROC_BROWSER_TEST_F(BubbleSignInPromoInteractiveUITest,
   // Signin metrics - WebSignin (WithDefault) metrics are also recorded.
   histogram_tester.ExpectBucketCount(
       "Signin.SignIn.Offered", signin_metrics::AccessPoint::kAddressBubble, 1);
-  histogram_tester.ExpectTotalCount("Signin.SignIn.Started", 0);
+  histogram_tester.ExpectBucketCount(
+      "Signin.SignIn.Started", signin_metrics::AccessPoint::kAddressBubble, 1);
   histogram_tester.ExpectBucketCount(
       "Signin.SignIn.Completed", signin_metrics::AccessPoint::kAddressBubble,
       1);
@@ -1147,7 +1149,8 @@ IN_PROC_BROWSER_TEST_F(BubbleSignInPromoInteractiveUITest,
   // Signin metrics - WebSignin (WithDefault) metrics are also recorded.
   histogram_tester.ExpectBucketCount(
       "Signin.SignIn.Offered", signin_metrics::AccessPoint::kBookmarkBubble, 1);
-  histogram_tester.ExpectTotalCount("Signin.SignIn.Started", 0);
+  histogram_tester.ExpectBucketCount(
+      "Signin.SignIn.Started", signin_metrics::AccessPoint::kBookmarkBubble, 1);
   histogram_tester.ExpectBucketCount(
       "Signin.SignIn.Completed", signin_metrics::AccessPoint::kBookmarkBubble,
       1);
@@ -1480,7 +1483,9 @@ IN_PROC_BROWSER_TEST_F(BubbleSignInPromoInteractiveUITest,
   histogram_tester.ExpectBucketCount(
       "Signin.SignIn.Offered",
       signin_metrics::AccessPoint::kExtensionInstallBubble, 1);
-  histogram_tester.ExpectTotalCount("Signin.SignIn.Started", 0);
+  histogram_tester.ExpectBucketCount(
+      "Signin.SignIn.Started",
+      signin_metrics::AccessPoint::kExtensionInstallBubble, 1);
   histogram_tester.ExpectBucketCount(
       "Signin.SignIn.Completed",
       signin_metrics::AccessPoint::kExtensionInstallBubble, 1);
@@ -1896,7 +1901,8 @@ IN_PROC_BROWSER_TEST_F(BubbleSignInPromoInteractiveUITestWithoutPhase2FollowUp,
   // Signin metrics - WebSignin (WithDefault) metrics are also recorded.
   histogram_tester.ExpectBucketCount(
       "Signin.SignIn.Offered", signin_metrics::AccessPoint::kBookmarkBubble, 1);
-  histogram_tester.ExpectTotalCount("Signin.SignIn.Started", 0);
+  histogram_tester.ExpectBucketCount(
+      "Signin.SignIn.Started", signin_metrics::AccessPoint::kBookmarkBubble, 1);
   histogram_tester.ExpectBucketCount(
       "Signin.SignIn.Completed", signin_metrics::AccessPoint::kBookmarkBubble,
       1);
