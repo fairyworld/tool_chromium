@@ -120,7 +120,7 @@
 
 #bottomActions {
   align-items: center;
-  bottom: 12px;
+  bottom: var(--voice-bottom-actions-bottom, 12px);
   display: flex;
   gap: var(--voice-bottom-actions-gap, 8px);
   inset-inline-end: var(--voice-bottom-actions-inset-inline-end, 12px);

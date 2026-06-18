@@ -2681,7 +2681,7 @@ suite('NewTabPageAppTest', () => {
               app.shadowRoot.querySelector('cr-composebox-voice-search');
           assertTrue(!!voiceSearch);
           assertTrue(voiceSearch.liveTranscriptEnabled);
-          assertFalse(voiceSearch.submitStopButtonsEnabled);
+          assertTrue(voiceSearch.submitStopButtonsEnabled);
 
           // Simulate error event.
           voiceSearch.dispatchEvent(new Event('voice-search-error'));
@@ -2844,7 +2844,7 @@ suite('NewTabPageAppTest', () => {
         });
 
     test(
-        'With Transcript: renders only transcript without animation or buttons',
+        'With Transcript: renders live transcript textarea and action buttons',
         async () => {
           loadTimeData.overrideValues({
             voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
@@ -2870,7 +2870,76 @@ suite('NewTabPageAppTest', () => {
               app.shadowRoot.querySelector('cr-composebox-voice-search');
           assertTrue(!!voiceSearch);
           assertTrue(voiceSearch.liveTranscriptEnabled);
-          assertFalse(voiceSearch.submitStopButtonsEnabled);
+          assertTrue(voiceSearch.submitStopButtonsEnabled);
+
+          // Verify shadow DOM structure contains both live transcript textarea
+          // and bottom action buttons simultaneously.
+          const bottomActions = $$(voiceSearch, '#bottomActions');
+          assertTrue(!!bottomActions);
+          assertFalse(bottomActions.classList.contains('hidden'));
+
+          const stopButton = $$(voiceSearch, '#stopButton');
+          assertTrue(!!stopButton);
+
+          const submitButton = $$(voiceSearch, '#submitButton');
+          assertTrue(!!submitButton);
+
+          const inputArea = $$(voiceSearch, '#input');
+          assertTrue(!!inputArea);
+
+          // Standalone close button should not be rendered when action buttons
+          // are active.
+          const closeButton = $$(voiceSearch, '#closeButton');
+          assertFalse(!!closeButton);
+        });
+
+    test(
+        'With Transcript: updates live transcript textarea and handles stop',
+        async () => {
+          loadTimeData.overrideValues({
+            voiceSearchCoherenceAnySearchboxExperimentEnabled: true,
+            voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled: true,
+          });
+          await recreateApp();
+
+          // Act: Open voice search overlay.
+          $$(app, '#searchbox')!.dispatchEvent(new Event('open-voice-search'));
+          await microtasksFinished();
+
+          const dialog = app.shadowRoot.querySelector('dialog');
+          assertTrue(!!dialog);
+          assertTrue(dialog.open);
+
+          const voiceSearch =
+              app.shadowRoot.querySelector('cr-composebox-voice-search');
+          assertTrue(!!voiceSearch);
+
+          // Simulate transcript update event from speech recognition.
+          (voiceSearch as unknown as {
+            transcript_: string,
+            finalResult_: string,
+          }).transcript_ = 'hello live voice query';
+          (voiceSearch as unknown as {
+            transcript_: string,
+            finalResult_: string,
+          }).finalResult_ = 'hello live voice query';
+          voiceSearch.dispatchEvent(new CustomEvent('transcript-update', {
+            detail: 'hello live voice query',
+          }));
+          await microtasksFinished();
+
+          // Verify that the live transcript textarea displays the spoken text.
+          const inputArea =
+              $$<HTMLTextAreaElement>(voiceSearch, '#input');
+          assertTrue(!!inputArea);
+          assertEquals('hello live voice query', inputArea.value);
+
+          // Simulate clicking Stop button and verify dialog closes.
+          $$<HTMLElement>(voiceSearch, '#stopButton')!.click();
+          await microtasksFinished();
+
+          // Verify the dialog is closed.
+          assertFalse(dialog.open);
         });
 
     suite('VoiceSearchAndSpeechRecognition', () => {

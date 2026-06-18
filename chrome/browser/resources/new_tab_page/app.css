@@ -449,6 +449,8 @@ ntp-lens-upload-dialog {
   width: 100%;
   --composebox-voice-search-top-padding: 9px;
   --composebox-cancel-button-top: 10px;
+  --voice-bottom-actions-bottom: 14px;
+  --voice-bottom-actions-inset-inline-end: 14px;
 }
 
 #voiceSearch::part(voice-stop-button) {
