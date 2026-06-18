@@ -7,7 +7,6 @@ package org.chromium.chrome.browser.ui.side_panel_container;
 import android.graphics.Rect;
 import android.view.View;
 
-import org.chromium.base.Callback;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.ui.side_panel.SidePanelCoordinatorAndroid;
@@ -70,13 +69,13 @@ public interface SidePanelContainerCoordinator {
      * already has content, the existing content will be replaced with no animation.
      *
      * @param content Wrapper object for the content to show in the side panel.
-     * @param onAnimationFinishedCallback Callback to invoke after content is populated.
+     * @param onContentPopulated Runnable to invoke after content is populated.
      * @param startingBounds Optional bounds for the animation to start from.
      * @param suppressAnimations Whether or not to suppress animations for this populate request.
      */
     void startPopulatingContent(
             SidePanelContent content,
-            Callback<@Nullable Void> onAnimationFinishedCallback,
+            Runnable onContentPopulated,
             @Nullable Rect startingBounds,
             boolean suppressAnimations);
 
@@ -85,11 +84,10 @@ public interface SidePanelContainerCoordinator {
      *
      * <p>This method is for a side panel feature. Calling it will also close the container.
      *
-     * @param onAnimationFinishedCallback Callback to invoke after content is removed.
+     * @param onContentRemoved Runnable to invoke after content is removed.
      * @param suppressAnimations Whether or not to suppress animations for this removal.
      */
-    void startRemovingContent(
-            Callback<@Nullable Void> onAnimationFinishedCallback, boolean suppressAnimations);
+    void startRemovingContent(Runnable onContentRemoved, boolean suppressAnimations);
 
     /** Returns whether the given {@link SidePanelContent} is shown in this side panel container. */
     boolean isShowing(SidePanelContent sidePanelContent);

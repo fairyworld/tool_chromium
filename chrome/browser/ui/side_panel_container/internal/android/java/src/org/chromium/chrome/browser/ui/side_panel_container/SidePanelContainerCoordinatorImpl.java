@@ -16,7 +16,6 @@ import android.widget.FrameLayout;
 import androidx.annotation.Px;
 import androidx.annotation.VisibleForTesting;
 
-import org.chromium.base.Callback;
 import org.chromium.base.ThreadUtils;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
@@ -81,7 +80,7 @@ final class SidePanelContainerCoordinatorImpl
     @Override
     public void startPopulatingContent(
             SidePanelContent content,
-            Callback<@Nullable Void> onAnimationFinishedCallback,
+            Runnable onContentPopulated,
             @Nullable Rect startingBounds,
             boolean suppressAnimations) {
         log(TAG, "startPopulatingContent", content, startingBounds, suppressAnimations);
@@ -100,21 +99,21 @@ final class SidePanelContainerCoordinatorImpl
                 suppressAnimations);
         // TODO(crbug.com/496407828): Move this around so it actually runs after the animation is
         //  finished.
-        onAnimationFinishedCallback.onResult(null);
+        onContentPopulated.run();
     }
 
     @Override
-    public void startRemovingContent(
-            Callback<@Nullable Void> onAnimationFinishedCallback, boolean suppressAnimations) {
+    public void startRemovingContent(Runnable onContentRemoved, boolean suppressAnimations) {
         log(TAG, "startRemovingContent", suppressAnimations);
         ThreadUtils.assertOnUiThread();
+
         mSideUiCoordinator.requestUpdateContainer(
                 new SideUiContainerProperties(
                         SideUiId.SIDE_PANEL, SIDE_PANEL_DEFAULT_ANCHOR_SIDE, /* width= */ 0),
                 suppressAnimations);
         // TODO(crbug.com/496407828): Move this around so it actually runs after the animation is
         //  finished.
-        onAnimationFinishedCallback.onResult(null);
+        onContentRemoved.run();
     }
 
     @Override

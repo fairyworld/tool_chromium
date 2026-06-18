@@ -109,14 +109,14 @@ public final class SidePanelDevFeatureImpl implements SidePanelDevFeature {
             mDevContent = createDevContent(mProfileSupplier, mWindowAndroid);
             mSidePanelContainerCoordinator.startPopulatingContent(
                     assumeNonNull(mDevContent.mSidePanelContent),
-                    result -> {},
+                    () -> {},
                     /* startingBounds= */ null,
                     /* suppressAnimations= */ false);
         } else {
             mDevContent.destroy();
             mDevContent = null;
             mSidePanelContainerCoordinator.startRemovingContent(
-                    result -> {}, /* suppressAnimations= */ false);
+                    () -> {}, /* suppressAnimations= */ false);
         }
     }
 

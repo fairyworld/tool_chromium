@@ -26,7 +26,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.chromium.base.Callback;
 import org.chromium.base.ThreadUtils;
 import org.chromium.base.test.util.Batch;
 import org.chromium.base.test.util.CommandLineFlags;
@@ -35,7 +34,6 @@ import org.chromium.base.test.util.Feature;
 import org.chromium.base.test.util.Features.EnableFeatures;
 import org.chromium.base.test.util.Restriction;
 import org.chromium.build.annotations.NullMarked;
-import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.flags.ChromeSwitches;
 import org.chromium.chrome.browser.tabbed_mode.TabbedRootUiCoordinator;
@@ -59,9 +57,9 @@ public class SidePanelContainerCoordinatorIntegrationTest {
             "/chrome/browser/ui/side_panel_container/test/data/responsive_page.html";
     private static final @ColorInt int SIDE_PANEL_CONTENT_BACKGROUND_COLOR =
             Color.rgb(204, 85, 0); // Dark Orange
+    private static final Runnable DO_NOTHING_RUNNABLE = () -> {};
 
     private WebPageStation mResponsivePageStation;
-    private Callback<@Nullable Void> mOnAnimationFinishedCallbackMock;
 
     @Rule
     public final FreshCtaTransitTestRule mFreshCtaTransitTestRule =
@@ -79,8 +77,6 @@ public class SidePanelContainerCoordinatorIntegrationTest {
                 mFreshCtaTransitTestRule.getTestServer().getURL(RESPONSIVE_WEB_PAGE_URL);
         mResponsivePageStation = mFreshCtaTransitTestRule.startOnUrl(responsivePageUrl);
         ChromeTabUtils.waitForTabPageLoaded(mResponsivePageStation.getTab(), responsivePageUrl);
-
-        mOnAnimationFinishedCallbackMock = result -> {};
     }
 
     @Test
@@ -95,7 +91,7 @@ public class SidePanelContainerCoordinatorIntegrationTest {
                 () ->
                         coordinator.startPopulatingContent(
                                 sidePanelContent,
-                                mOnAnimationFinishedCallbackMock,
+                                DO_NOTHING_RUNNABLE,
                                 /* startingBounds= */ null,
                                 true));
         FrameLayout containerView = waitForContainerViewOpen(coordinator);
@@ -115,7 +111,7 @@ public class SidePanelContainerCoordinatorIntegrationTest {
                 () ->
                         coordinator.startPopulatingContent(
                                 sidePanelContent1,
-                                mOnAnimationFinishedCallbackMock,
+                                DO_NOTHING_RUNNABLE,
                                 /* startingBounds= */ null,
                                 true));
         waitForContainerViewOpen(coordinator);
@@ -126,7 +122,7 @@ public class SidePanelContainerCoordinatorIntegrationTest {
                 () ->
                         coordinator.startPopulatingContent(
                                 sidePanelContent2,
-                                mOnAnimationFinishedCallbackMock,
+                                DO_NOTHING_RUNNABLE,
                                 /* startingBounds= */ null,
                                 true));
         FrameLayout containerView = waitForContainerViewOpen(coordinator);
@@ -148,10 +144,7 @@ public class SidePanelContainerCoordinatorIntegrationTest {
         ThreadUtils.runOnUiThreadBlocking(
                 () ->
                         coordinator.startPopulatingContent(
-                                sidePanelContent,
-                                mOnAnimationFinishedCallbackMock,
-                                startingBounds,
-                                true));
+                                sidePanelContent, DO_NOTHING_RUNNABLE, startingBounds, true));
         FrameLayout containerView = waitForContainerViewOpen(coordinator);
 
         // Assert.
@@ -171,7 +164,7 @@ public class SidePanelContainerCoordinatorIntegrationTest {
                 () ->
                         coordinator.startPopulatingContent(
                                 sidePanelContent,
-                                mOnAnimationFinishedCallbackMock,
+                                DO_NOTHING_RUNNABLE,
                                 /* startingBounds= */ null,
                                 true));
 
@@ -196,7 +189,7 @@ public class SidePanelContainerCoordinatorIntegrationTest {
                 () ->
                         coordinator.startPopulatingContent(
                                 sidePanelContent,
-                                mOnAnimationFinishedCallbackMock,
+                                DO_NOTHING_RUNNABLE,
                                 /* startingBounds= */ null,
                                 /* suppressAnimations= */ true));
         FrameLayout containerView = waitForContainerViewOpen(coordinator);
@@ -215,14 +208,14 @@ public class SidePanelContainerCoordinatorIntegrationTest {
                 () ->
                         coordinator.startPopulatingContent(
                                 sidePanelContent,
-                                mOnAnimationFinishedCallbackMock,
+                                DO_NOTHING_RUNNABLE,
                                 /* startingBounds= */ null,
                                 true));
         FrameLayout containerView = waitForContainerViewOpen(coordinator);
 
         // Act.
         ThreadUtils.runOnUiThreadBlocking(
-                () -> coordinator.startRemovingContent(mOnAnimationFinishedCallbackMock, true));
+                () -> coordinator.startRemovingContent(DO_NOTHING_RUNNABLE, true));
         waitForContainerViewClose(coordinator);
 
         // Assert.
@@ -244,7 +237,7 @@ public class SidePanelContainerCoordinatorIntegrationTest {
                 () ->
                         coordinator.startPopulatingContent(
                                 sidePanelContent,
-                                mOnAnimationFinishedCallbackMock,
+                                DO_NOTHING_RUNNABLE,
                                 /* startingBounds= */ null,
                                 /* suppressAnimations= */ true));
         waitForContainerViewOpen(coordinator);
@@ -264,7 +257,7 @@ public class SidePanelContainerCoordinatorIntegrationTest {
         ThreadUtils.runOnUiThreadBlocking(
                 () ->
                         coordinator.startRemovingContent(
-                                mOnAnimationFinishedCallbackMock, /* suppressAnimations= */ true));
+                                DO_NOTHING_RUNNABLE, /* suppressAnimations= */ true));
         waitForContainerViewClose(coordinator);
 
         // Assert: The WebContents width should become larger.
@@ -290,7 +283,7 @@ public class SidePanelContainerCoordinatorIntegrationTest {
                 () ->
                         coordinator.startPopulatingContent(
                                 sidePanelContent,
-                                mOnAnimationFinishedCallbackMock,
+                                DO_NOTHING_RUNNABLE,
                                 /* startingBounds= */ null,
                                 /* suppressAnimations= */ true));
         waitForContainerViewOpen(coordinator);
@@ -312,7 +305,7 @@ public class SidePanelContainerCoordinatorIntegrationTest {
         ThreadUtils.runOnUiThreadBlocking(
                 () ->
                         coordinator.startRemovingContent(
-                                mOnAnimationFinishedCallbackMock, /* suppressAnimations= */ true));
+                                DO_NOTHING_RUNNABLE, /* suppressAnimations= */ true));
         waitForContainerViewClose(coordinator);
 
         // Act: Open the grid tab switcher again.
@@ -346,7 +339,7 @@ public class SidePanelContainerCoordinatorIntegrationTest {
                 () ->
                         coordinator.startPopulatingContent(
                                 sidePanelContent,
-                                mOnAnimationFinishedCallbackMock,
+                                DO_NOTHING_RUNNABLE,
                                 /* startingBounds= */ null,
                                 true));
         waitForContainerViewOpen(coordinator);
@@ -367,7 +360,7 @@ public class SidePanelContainerCoordinatorIntegrationTest {
                 () ->
                         coordinator.startPopulatingContent(
                                 sidePanelContent1,
-                                mOnAnimationFinishedCallbackMock,
+                                DO_NOTHING_RUNNABLE,
                                 /* startingBounds= */ null,
                                 true));
         waitForContainerViewOpen(coordinator);
@@ -387,12 +380,12 @@ public class SidePanelContainerCoordinatorIntegrationTest {
                 () ->
                         coordinator.startPopulatingContent(
                                 sidePanelContent,
-                                mOnAnimationFinishedCallbackMock,
+                                DO_NOTHING_RUNNABLE,
                                 /* startingBounds= */ null,
                                 true));
         waitForContainerViewOpen(coordinator);
         ThreadUtils.runOnUiThreadBlocking(
-                () -> coordinator.startRemovingContent(mOnAnimationFinishedCallbackMock, true));
+                () -> coordinator.startRemovingContent(DO_NOTHING_RUNNABLE, true));
         waitForContainerViewClose(coordinator);
 
         // Assert.

@@ -128,7 +128,7 @@ public final class SidePanelCoordinatorAndroidImpl implements SidePanelCoordinat
         log(TAG, "startPopulatingContent", sidePanelNativeView, x, y, width, height);
         mSidePanelContainerCoordinator.startPopulatingContent(
                 new SidePanelContent(sidePanelNativeView),
-                result -> onContentPopulated(),
+                () -> onContentPopulated(),
                 createRectFromCoordinates(x, y, width, height),
                 suppressAnimations || mDisableAnimationsForTesting);
     }
@@ -142,7 +142,7 @@ public final class SidePanelCoordinatorAndroidImpl implements SidePanelCoordinat
     private void startRemovingContent(boolean suppressAnimations) {
         log(TAG, "startRemovingContent", suppressAnimations);
         mSidePanelContainerCoordinator.startRemovingContent(
-                result -> onContentRemoved(), suppressAnimations || mDisableAnimationsForTesting);
+                () -> onContentRemoved(), suppressAnimations || mDisableAnimationsForTesting);
     }
 
     @CalledByNativeForTesting
