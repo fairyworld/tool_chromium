@@ -623,8 +623,8 @@ useful for Chirp alerts (go/crca-alerts). -->
 
 <histogram
     name="SafeBrowsing.ClientSafeBrowsingReport.DownloadWarningActionSize"
-    units="units" expires_after="2026-07-19">
-  <owner>chlily@chromium.org</owner>
+    units="units" expires_after="2027-01-19">
+  <owner>yawfrempong@google.com</owner>
   <owner>chrome-counter-abuse-alerts@google.com</owner>
   <summary>
     Counts the length of the download_warning_actions field in a client Safe
