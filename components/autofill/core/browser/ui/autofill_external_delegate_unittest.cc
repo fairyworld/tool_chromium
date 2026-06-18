@@ -130,7 +130,9 @@ using ::testing::Return;
 using ::testing::SaveArg;
 using ::testing::SizeIs;
 using ::testing::StartsWith;
+using ::testing::Values;
 using ::testing::VariantWith;
+using ::testing::WithParamInterface;
 
 // Action `SaveArgElementsTo<k>(pointer)` saves the value pointed to by the
 // `k`th (0-based) argument of the mock function by moving it to `*pointer`.
@@ -1326,41 +1328,68 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryRemoteQuery_NoData) {
   external_delegate().OnSearchSubmitted(u"shoe size");
 }
 
-class AutofillExternalDelegateAtMemoryErrorTest
-    : public AutofillExternalDelegateTest,
-      public testing::WithParamInterface<accessibility_annotator::MemorySearchStatus> {};
-
-INSTANTIATE_TEST_SUITE_P(
-    All,
-    AutofillExternalDelegateAtMemoryErrorTest,
-    testing::Values(accessibility_annotator::MemorySearchStatus::kDataFetchFailure,
-                    accessibility_annotator::MemorySearchStatus::kInferenceFailure,
-                    accessibility_annotator::MemorySearchStatus::kInternalFailure));
-
-// Tests that when a remote query returns no entries and an error status
-// (fetch, inference, or internal failure), the delegate shows a "No server connection" suggestion.
-TEST_P(AutofillExternalDelegateAtMemoryErrorTest, AtMemoryRemoteQuery_NoConnection) {
+TEST_F(AutofillExternalDelegateTest, AtMemoryRemoteQuery_NoConnection) {
   StartAtMemorySession();
 
-  SetupMockAccessibilityQueryService(u"shoe size", {GetParam(), {}});
+  SetupMockAccessibilityQueryService(
+      u"shoe size",
+      {accessibility_annotator::MemorySearchStatus::kDataFetchFailure, {}});
 
   EXPECT_CALL(autofill_client(), UpdateAutofillSuggestions)
-      .WillOnce(testing::Return())
+      .WillOnce(Return())
       .WillOnce([this](const std::vector<Suggestion>& suggestions,
                        FillingProduct product,
                        AutofillSuggestionTriggerSource source,
                        AutofillSuggestionsIgnoreFocusLoss ignore) {
         EXPECT_THAT(
             suggestions,
-            testing::ElementsAre(testing::AllOf(
+            ElementsAre(AllOf(
                 HasMainText(l10n_util::GetStringUTF16(
                     IDS_AUTOFILL_AT_MEMORY_NO_CONNECTION)),
-                testing::Field(&Suggestion::type,
-                               SuggestionType::kAtMemoryNoConnection),
-                testing::Field(&Suggestion::icon, Suggestion::Icon::kSadTab),
-                testing::Field(&Suggestion::acceptability,
-                               Suggestion::Acceptability::
-                                   kUnacceptableWithDeactivatedStyle))));
+                Field(&Suggestion::type, SuggestionType::kAtMemoryNoConnection),
+                Field(&Suggestion::icon, Suggestion::Icon::kSadTab),
+                Field(&Suggestion::acceptability,
+                      Suggestion::Acceptability::
+                          kUnacceptableWithDeactivatedStyle))));
+      });
+
+  external_delegate().OnSearchSubmitted(u"shoe size");
+}
+
+class AutofillExternalDelegateAtMemoryGenericErrorTest
+    : public AutofillExternalDelegateTest,
+      public WithParamInterface<accessibility_annotator::MemorySearchStatus> {};
+
+INSTANTIATE_TEST_SUITE_P(
+    All,
+    AutofillExternalDelegateAtMemoryGenericErrorTest,
+    Values(accessibility_annotator::MemorySearchStatus::kInferenceFailure,
+           accessibility_annotator::MemorySearchStatus::kInternalFailure));
+
+// Tests that when a remote query returns no entries and an internal or
+// inference failure status, the delegate shows a generic error suggestion.
+TEST_P(AutofillExternalDelegateAtMemoryGenericErrorTest,
+       AtMemoryRemoteQuery_GenericError) {
+  StartAtMemorySession();
+
+  SetupMockAccessibilityQueryService(u"shoe size", {GetParam(), {}});
+
+  EXPECT_CALL(autofill_client(), UpdateAutofillSuggestions)
+      .WillOnce(Return())
+      .WillOnce([this](const std::vector<Suggestion>& suggestions,
+                       FillingProduct product,
+                       AutofillSuggestionTriggerSource source,
+                       AutofillSuggestionsIgnoreFocusLoss ignore) {
+        EXPECT_THAT(
+            suggestions,
+            ElementsAre(AllOf(
+                HasMainText(l10n_util::GetStringUTF16(
+                    IDS_AUTOFILL_AT_MEMORY_GENERIC_ERROR)),
+                Field(&Suggestion::type, SuggestionType::kAtMemoryGenericError),
+                Field(&Suggestion::icon, Suggestion::Icon::kSadTab),
+                Field(&Suggestion::acceptability,
+                      Suggestion::Acceptability::
+                          kUnacceptableWithDeactivatedStyle))));
       });
 
   external_delegate().OnSearchSubmitted(u"shoe size");

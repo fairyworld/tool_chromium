@@ -443,12 +443,25 @@ Suggestion CreateNoDataSuggestion() {
   return suggestion;
 }
 
-// Creates a suggestion to display when @memory search fails to connect to the
+// Creates a suggestion to display when AtMemory search fails to connect to the
 // server.
 Suggestion CreateNoConnectionSuggestion() {
   Suggestion suggestion(
       l10n_util::GetStringUTF16(IDS_AUTOFILL_AT_MEMORY_NO_CONNECTION),
       SuggestionType::kAtMemoryNoConnection);
+  suggestion.acceptability =
+      Suggestion::Acceptability::kUnacceptableWithDeactivatedStyle;
+  suggestion.filtration_policy = Suggestion::FiltrationPolicy::kStatic;
+  suggestion.icon = Suggestion::Icon::kSadTab;
+  return suggestion;
+}
+
+// Creates a catch-all suggestion to display when AtMemory search fails due to
+// an unexpected or generic error.
+Suggestion CreateGenericErrorSuggestion() {
+  Suggestion suggestion(
+      l10n_util::GetStringUTF16(IDS_AUTOFILL_AT_MEMORY_GENERIC_ERROR),
+      SuggestionType::kAtMemoryGenericError);
   suggestion.acceptability =
       Suggestion::Acceptability::kUnacceptableWithDeactivatedStyle;
   suggestion.filtration_policy = Suggestion::FiltrationPolicy::kStatic;
@@ -764,10 +777,12 @@ void AtMemoryManager::OnSearchResultsReceived(
       break;
     case accessibility_annotator::MemorySearchStatus::kPartialResponseSuccess:
       break;
-    case accessibility_annotator::MemorySearchStatus::kInferenceFailure:
     case accessibility_annotator::MemorySearchStatus::kDataFetchFailure:
-    case accessibility_annotator::MemorySearchStatus::kInternalFailure:
       suggestions.push_back(CreateNoConnectionSuggestion());
+      break;
+    case accessibility_annotator::MemorySearchStatus::kInferenceFailure:
+    case accessibility_annotator::MemorySearchStatus::kInternalFailure:
+      suggestions.push_back(CreateGenericErrorSuggestion());
       break;
   }
   SendSuggestions(std::move(suggestions));
