@@ -95,8 +95,8 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="Compositing.BeginMainFrame.BMFReason9{FrameType}{Suffix}"
-    units="reasons" expires_after="2026-10-30">
+<histogram name="Compositing.BeginMainFrame.BMFReason10{FrameType}{Suffix}"
+    units="reasons" expires_after="2027-06-30">
   <owner>thiabaud@google.com</owner>
   <owner>jonross@chromium.org</owner>
   <summary>
