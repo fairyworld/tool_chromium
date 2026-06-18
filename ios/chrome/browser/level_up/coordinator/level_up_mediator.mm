@@ -17,10 +17,11 @@
 #import "ios/chrome/browser/level_up/model/task_types.h"
 #import "ios/chrome/browser/level_up/ui/level_up_consumer.h"
 #import "ios/chrome/browser/level_up/ui/level_up_profile_consumer.h"
+#import "ios/chrome/browser/shared/model/application_context/application_context.h"
 #import "ios/chrome/browser/shared/model/prefs/pref_names.h"
 #import "ios/chrome/browser/shared/ui/symbols/symbols.h"
 #import "ios/chrome/browser/signin/model/authentication_service.h"
-#import "ios/chrome/browser/signin/model/avatar/resized_avatar_cache.h"
+#import "ios/chrome/browser/signin/model/avatar/avatar_provider.h"
 #import "ios/chrome/browser/signin/model/constants.h"
 #import "ios/chrome/browser/signin/model/system_identity.h"
 #import "ios/chrome/grit/ios_strings.h"
@@ -36,8 +37,6 @@
   raw_ptr<LevelUpService> _levelUpService;
   // The pref service.
   raw_ptr<PrefService> _prefService;
-  // Image cache for user avatars.
-  ResizedAvatarCache* _avatarCache;
   // The list of task categories.
   NSArray<LevelUpCategory*>* _categories;
 
@@ -56,8 +55,6 @@
     _authService = authService;
     _levelUpService = levelUpService;
     _prefService = prefService;
-    _avatarCache = [[ResizedAvatarCache alloc]
-        initWithIdentityAvatarSize:IdentityAvatarSize::Large];
 
     _prefObserverBridge = std::make_unique<PrefObserverBridge>(self);
     _prefChangeRegistrar.Init(prefService);
@@ -72,7 +69,9 @@
 
   id<SystemIdentity> identity = _authService->GetPrimaryIdentity();
   NSString* userFullName = identity.userFullName;
-  UIImage* userAvatar = [_avatarCache resizedAvatarForIdentity:identity];
+  UIImage* userAvatar = userAvatar =
+      GetApplicationContext()->GetIdentityAvatarProvider()->GetIdentityAvatar(
+          identity, IdentityAvatarSize::Large);
 
   if ([self.consumer
           respondsToSelector:@selector(setProgressUpdatesEnabled:)]) {
