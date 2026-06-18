@@ -32,21 +32,18 @@ NSString* const kNSHTTPCookieSameSiteNone = @"none";
 std::unique_ptr<net::CanonicalCookie> CanonicalCookieFromSystemCookie(
     NSHTTPCookie* cookie,
     const base::Time& ceation_time) {
-  net::CookieSameSite same_site = net::CookieSameSite::NO_RESTRICTION;
-  if (@available(iOS 13, *)) {
-    same_site = net::CookieSameSite::UNSPECIFIED;
-    if ([cookie.sameSitePolicy isEqual:NSHTTPCookieSameSiteLax]) {
-      same_site = net::CookieSameSite::LAX_MODE;
-    }
+  net::CookieSameSite same_site = net::CookieSameSite::UNSPECIFIED;
+  if ([cookie.sameSitePolicy isEqual:NSHTTPCookieSameSiteLax]) {
+    same_site = net::CookieSameSite::LAX_MODE;
+  }
 
-    if ([cookie.sameSitePolicy isEqual:NSHTTPCookieSameSiteStrict]) {
-      same_site = net::CookieSameSite::STRICT_MODE;
-    }
+  if ([cookie.sameSitePolicy isEqual:NSHTTPCookieSameSiteStrict]) {
+    same_site = net::CookieSameSite::STRICT_MODE;
+  }
 
-    if ([[cookie.sameSitePolicy lowercaseString]
-            isEqual:kNSHTTPCookieSameSiteNone]) {
-      same_site = net::CookieSameSite::NO_RESTRICTION;
-    }
+  if ([[cookie.sameSitePolicy lowercaseString]
+          isEqual:kNSHTTPCookieSameSiteNone]) {
+    same_site = net::CookieSameSite::NO_RESTRICTION;
   }
 
   return net::CanonicalCookie::FromStorage(
