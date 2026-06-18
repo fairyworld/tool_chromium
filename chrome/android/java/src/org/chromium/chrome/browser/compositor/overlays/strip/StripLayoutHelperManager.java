@@ -118,7 +118,6 @@ import org.chromium.components.browser_ui.styles.SemanticColorUtils;
 import org.chromium.components.browser_ui.widget.gesture.BackPressHandler;
 import org.chromium.content_public.browser.LoadUrlParams;
 import org.chromium.ui.base.ActivityResultTracker;
-import org.chromium.ui.base.LocalizationUtils;
 import org.chromium.ui.base.PageTransition;
 import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.display.DisplayUtil;
@@ -602,6 +601,17 @@ public class StripLayoutHelperManager
         // Use toolbar menu button padding to align MSB with menu button.
         mStripEndPadding = res.getDimension(R.dimen.button_end_padding) / mDensity;
 
+        if (!IncognitoUtils.shouldOpenIncognitoAsWindow()) {
+            StripLayoutViewOnClickHandler selectorClickHandler =
+                    (time, view, motionEventButtonState, modifiers) ->
+                            handleModelSelectorButtonClick();
+            StripLayoutViewOnKeyboardFocusHandler selectorKeyboardFocusHandler =
+                    (isFocused, view) -> {
+                        getActiveStripLayoutHelper().onKeyboardFocus(isFocused, view);
+                    };
+            createModelSelectorButton(context, selectorClickHandler, selectorKeyboardFocusHandler);
+        }
+
         StripLayoutViewOnKeyboardFocusHandler glicKeyboardFocusHandler =
                 (isFocused, view) -> mRenderHost.requestRender();
         mTrailingButtonsCoordinator =
@@ -620,18 +630,8 @@ public class StripLayoutHelperManager
                         mIsIncognito,
                         () -> mTabModelSelector,
                         sideUiStateProviderSupplier,
+                        mModelSelectorButton,
                         this::updateButtonMargins);
-
-        if (!IncognitoUtils.shouldOpenIncognitoAsWindow()) {
-            StripLayoutViewOnClickHandler selectorClickHandler =
-                    (time, view, motionEventButtonState, modifiers) ->
-                            handleModelSelectorButtonClick();
-            StripLayoutViewOnKeyboardFocusHandler selectorKeyboardFocusHandler =
-                    (isFocused, view) -> {
-                        getActiveStripLayoutHelper().onKeyboardFocus(isFocused, view);
-                    };
-            createModelSelectorButton(context, selectorClickHandler, selectorKeyboardFocusHandler);
-        }
 
         mTabHoverCardViewStub = tabHoverCardViewStub;
 
@@ -992,12 +992,6 @@ public class StripLayoutHelperManager
         if (mModelSelectorButton != null) {
             mModelSelectorButton.setDrawY(MODEL_SELECTOR_BUTTON_BACKGROUND_Y_OFFSET_DP);
             mModelSelectorButton.setTouchTargetInsets(null, mTopPadding, null, -mTopPadding);
-            if (!LocalizationUtils.isLayoutRtl()) {
-                mModelSelectorButton.setDrawX(
-                        mWidth - mRightPadding - getModelSelectorButtonWidthWithEndPadding());
-            } else {
-                mModelSelectorButton.setDrawX(mLeftPadding + mStripEndPadding);
-            }
         }
 
         mNormalHelper.onSizeChanged(
@@ -1313,10 +1307,10 @@ public class StripLayoutHelperManager
         if (mBrowserControlsStateProvider.getTopControlOffset() < 0) return;
 
         getActiveStripLayoutHelper().getVirtualViews(views);
-        mTrailingButtonsCoordinator.getVirtualViews(views);
         if (mModelSelectorButton != null && mModelSelectorButton.isVisible()) {
             views.add(mModelSelectorButton);
         }
+        mTrailingButtonsCoordinator.getVirtualViews(views);
     }
 
     /** Allow / disallow system gestures on touchable areas on the strip. */
@@ -1816,10 +1810,8 @@ public class StripLayoutHelperManager
                 newGlicActorVisibility, /* animate= */ false);
         if (mModelSelectorButton != null) mModelSelectorButton.setVisible(newMsbVisibility);
 
-        // The Glic button position depends on the MSB's visibility.
-        if (msbChanged) {
-            mTrailingButtonsCoordinator.setModelSelectorButtonVisible(newMsbVisibility);
-        }
+        // Reposition the trailing buttons now that visibilities have changed.
+        mTrailingButtonsCoordinator.updateButtonPositions();
 
         updateButtonMargins();
     }
