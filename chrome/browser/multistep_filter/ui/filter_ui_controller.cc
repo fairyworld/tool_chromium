@@ -74,12 +74,12 @@ void LogSuggestionUiDecision(
 
   if (decision == FilterUiController::SuggestionUserDecision::kAccepted) {
     MULTISTEP_FILTER_LOG(log_router, state.suggestion.triggering_navigation_id,
-                         event_type, state.suggestion.triggering_domain)
+                         event_type, state.suggestion.triggering_host)
         << LogDetail{"navigation_attempted", true}
         << LogDetail{"trigger_source", trigger_source};
   } else {
     MULTISTEP_FILTER_LOG(log_router, state.suggestion.triggering_navigation_id,
-                         event_type, state.suggestion.triggering_domain)
+                         event_type, state.suggestion.triggering_host)
         << LogDetail{"trigger_source", trigger_source};
   }
 }
@@ -89,7 +89,7 @@ void LogSuggestionUiShown(MultistepFilterLogRouter* log_router,
                           bool ui_shown) {
   MULTISTEP_FILTER_LOG(log_router, suggestion.triggering_navigation_id,
                        LogEventType::kSuggestionShown,
-                       suggestion.triggering_domain)
+                       suggestion.triggering_host)
       << LogDetail{"ui_shown", ui_shown};
 }
 
@@ -279,7 +279,7 @@ void FilterUiController::OnPageActionAnchoredMessageShown(
         service_->DeleteAnnotationsForTask(
             suggestion_state_->suggestion.task_type,
             suggestion_state_->suggestion.triggering_navigation_id,
-            suggestion_state_->suggestion.triggering_domain);
+            suggestion_state_->suggestion.triggering_host);
       }
       break;
     case SuggestionViewState::kCollapsedInOmnibox:

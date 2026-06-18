@@ -85,7 +85,7 @@ class MockMultistepFilterService : public MultistepFilterService {
               DeleteAnnotationsForTask,
               (std::string_view task_type,
                int64_t navigation_id,
-               std::string_view domain),
+               std::string_view host),
               (override));
 };
 
