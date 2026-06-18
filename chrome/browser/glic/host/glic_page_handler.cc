@@ -600,17 +600,7 @@ class GlicWebClientHandler : public glic::mojom::WebClientHandler,
     }
 
     auto state = glic::mojom::WebClientInitialState::New();
-    state->chrome_version = version_info::GetVersion();
-    state->platform = GetGlicPlatform();
-    state->form_factor = GetGlicFormFactor(ui::GetDeviceFormFactor());
-    state->microphone_permission_enabled =
-        pref_service_->GetBoolean(prefs::kGlicMicrophoneEnabled);
-    state->location_permission_enabled =
-        pref_service_->GetBoolean(prefs::kGlicGeolocationEnabled);
-    state->tab_context_permission_enabled =
-        pref_service_->GetBoolean(prefs::kGlicTabContextEnabled);
-    state->os_location_permission_enabled =
-        system_permission_settings::IsAllowed(ContentSettingsType::GEOLOCATION);
+    PopulateGlobalClientInitialState(state.get(), profile_);
 
     state->panel_state = host().GetPanelState().Clone();
 
@@ -624,107 +614,13 @@ class GlicWebClientHandler : public glic::mojom::WebClientHandler,
     state->browser_is_open = browser_is_open_calculator_.IsOpen();
     state->instance_is_active = host().instance_delegate().IsActive();
 
-    state->enable_act_in_focused_tab =
-        base::FeatureList::IsEnabled(features::kGlicActor);
-    state->enable_scroll_to =
-        base::FeatureList::IsEnabled(features::kGlicScrollTo);
-    state->enable_zero_state_suggestions = IsZeroStateSuggestionsEnabled();
-    state->enable_cached_get_user_profile_info = base::FeatureList::IsEnabled(
-        features::kGlicEnableCachedGetUserProfileInfo);
-
     local_state_pref_change_registrar_.Init(g_browser_process->local_state());
 #if !BUILDFLAG(IS_ANDROID)  // NEEDS_ANDROID_IMPL
     local_state_pref_change_registrar_.Add(
         prefs::kGlicLauncherHotkey,
         base::BindRepeating(&GlicWebClientHandler::OnLocalStatePrefChanged,
                             base::Unretained(this)));
-    state->hotkey = GetHotkeyString();
 #endif
-    state->enable_default_tab_context_setting_feature =
-        base::FeatureList::IsEnabled(features::kGlicDefaultTabContextSetting);
-    state->default_tab_context_setting_enabled =
-        pref_service_->GetBoolean(prefs::kGlicDefaultTabContextEnabled);
-    state->closed_captioning_setting_enabled =
-        pref_service_->GetBoolean(prefs::kGlicClosedCaptioningEnabled);
-    state->enable_maybe_refresh_user_status =
-        base::FeatureList::IsEnabled(features::kGlicUserStatusCheck) &&
-        features::kGlicUserStatusRefreshApi.Get();
-    state->enable_get_context_actor = base::FeatureList::IsEnabled(
-        glic::mojom::features::kGlicActorTabContext);
-    state->enable_web_actuation_setting_feature =
-        base::FeatureList::IsEnabled(features::kGlicWebActuationSetting);
-    state->actuation_on_web_setting_enabled =
-        glic_service_->enabling().GetUserEnabledActuationOnWeb();
-
-#if BUILDFLAG(ENABLE_PDF)
-    if (features::kGlicScrollToPDF.Get()) {
-      state->host_capabilities.push_back(mojom::HostCapability::kScrollToPdf);
-    }
-#endif
-    state->host_capabilities.push_back(mojom::HostCapability::kMultiInstance);
-
-    if (base::FeatureList::IsEnabled(features::kGlicNoWebUiLoader)) {
-      state->host_capabilities.push_back(mojom::HostCapability::kNoWebUiLoader);
-    }
-
-    if (GlicEnabling::IsAutoOpenForPdfEnabled(profile_)) {
-      state->host_capabilities.push_back(mojom::HostCapability::kPdfZeroState);
-    }
-
-    if (base::FeatureList::IsEnabled(features::kGlicInvoke)) {
-      state->host_capabilities.push_back(mojom::HostCapability::kInvoke);
-    }
-
-    if (!GlicEnabling::HasConsentedForProfile(profile_)) {
-      state->host_capabilities.push_back(
-          mojom::HostCapability::kTrustFirstOnboardingArm2);
-    }
-    if (GlicEnabling::IsShareImageEnabledForProfile(profile_)) {
-      // TODO(b:468877076): Ideally this would be a dynamic capability.
-      state->host_capabilities.push_back(
-          mojom::HostCapability::kShareAdditionalImageContext);
-    }
-    if (!GlicEnabling::IsLiveAndFloatyEnabledByFlags()) {
-      state->host_capabilities.push_back(mojom::HostCapability::kNoLiveMode);
-    }
-    if (base::FeatureList::IsEnabled(features::kFedCmEmbedderInitiatedLogin)) {
-      state->host_capabilities.push_back(
-          mojom::HostCapability::kAutoLoginSignInWithGoogle);
-    }
-    state->enable_get_page_metadata =
-        base::FeatureList::IsEnabled(blink::features::kFrameMetadataObserver);
-
-    if (base::FeatureList::IsEnabled(
-            glic::mojom::features::kGlicAppendModelQualityClientId)) {
-      state->host_capabilities.push_back(
-          mojom::HostCapability::kGetModelQualityClientId);
-    }
-    state->enable_capture_region =
-        base::FeatureList::IsEnabled(features::kGlicCaptureRegion);
-    state->can_act_on_web = false;
-    if (base::FeatureList::IsEnabled(features::kGlicActor)) {
-      state->can_act_on_web =
-          glic_service_->actor_policy_checker().CanActOnWeb();
-    }
-    state->enable_activate_tab = base::FeatureList::IsEnabled(
-        glic::mojom::features::kGlicActivateTabApi);
-    state->enable_get_tab_by_id =
-        base::FeatureList::IsEnabled(features::kGlicGetTabByIdApi);
-    state->enable_open_password_manager_settings_page =
-        base::FeatureList::IsEnabled(
-            features::kGlicOpenPasswordManagerSettingsPageApi);
-    state->enable_trust_first_onboarding =
-        !GlicEnabling::HasConsentedForProfile(profile_);
-    state->onboarding_completed =
-        GlicEnabling::HasConsentedForProfile(profile_);
-    state->enable_skills =
-        base::FeatureList::IsEnabled(features::kSkillsEnabled);
-    state->enable_get_tab_favicon_by_id =
-        base::FeatureList::IsEnabled(features::kGlicGetTabFaviconById);
-    state->enable_process_counter_abuse_verdict =
-        base::FeatureList::IsEnabled(features::kGlicProcessCounterAbuseVerdict);
-
-    state->gemini_enterprise_settings = GetGeminiEnterpriseSettingsPtr();
 
     std::move(callback).Run(std::move(state));
   }
