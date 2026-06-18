@@ -2281,7 +2281,14 @@ void BrowserAutofillManager::DidShowSuggestions(
                           })) {
     ai_manager->OnAutofillAiSuggestionsShown(
         CHECK_DEREF(form_structure), CHECK_DEREF(autofill_field), suggestions,
-        driver().GetPageUkmSourceId());
+        driver().GetPageUkmSourceId(),
+        base::BindRepeating(
+            [](AutofillExternalDelegate::UpdateSuggestionsCallback callback,
+               AutofillSuggestionTriggerSource trigger_source,
+               std::vector<Suggestion> suggestions) {
+              callback.Run(std::move(suggestions), trigger_source);
+            },
+            update_suggestions_callback, trigger_source));
   }
 
   // Notify the BNPL manager about suggestion shown if the current shown
