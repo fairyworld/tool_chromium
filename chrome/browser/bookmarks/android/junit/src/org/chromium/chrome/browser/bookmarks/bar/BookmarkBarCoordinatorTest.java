@@ -13,11 +13,12 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+
+import static org.chromium.ui.test.util.MockitoHelper.clearInvocations;
 
 import android.app.Activity;
 import android.content.res.ColorStateList;
@@ -294,8 +295,6 @@ public class BookmarkBarCoordinatorTest {
 
     @Test
     @SmallTest
-    // Mockito's clearInvocations(T...) triggers unchecked generic array creation for varargs.
-    @SuppressWarnings("unchecked")
     public void testOnBookmarkBarHeightChanged() {
         // Verify initial state. Height is read from minHeight and hairline's height.
         assertEquals("Verify initial state.", 41, mCoordinator.getTopControlHeight());

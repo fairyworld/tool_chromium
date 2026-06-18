@@ -15,7 +15,6 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyFloat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
@@ -25,6 +24,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+
+import static org.chromium.ui.test.util.MockitoHelper.clearInvocations;
 
 import android.app.Activity;
 import android.graphics.Paint.FontMetrics;
@@ -1151,8 +1152,6 @@ public class UrlBarUnitTest {
     }
 
     @Test
-    // clearInvocations() takes generic T... varargs.
-    @SuppressWarnings("unchecked")
     public void testTextWrappingCallback() {
         Callback<Boolean> callback = MockitoHelper.mockCallback();
         mUrlBar.setUrlTextWrappingChangeListener(callback);

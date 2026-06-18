@@ -10,7 +10,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
@@ -18,6 +17,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+
+import static org.chromium.ui.test.util.MockitoHelper.clearInvocations;
 
 import android.view.View;
 
@@ -393,7 +394,6 @@ public class RecyclerViewSelectionControllerUnitTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void virtualViews_removeCurrentlySelectedVirtualView() {
         mSelectionController.addVirtualView(1, mVirtualCallback);
         mSelectionController.setPosition(1);
@@ -408,7 +408,6 @@ public class RecyclerViewSelectionControllerUnitTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void virtualViews_removeCurrentlySelectedVirtualView_withSentinel() {
         mSelectionControllerWithSentinel.addVirtualView(1, mVirtualCallback);
         mSelectionControllerWithSentinel.setPosition(1);
