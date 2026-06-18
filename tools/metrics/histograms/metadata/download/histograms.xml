@@ -1143,6 +1143,9 @@ chromium-metrics-reviews@google.com.
     time on chrome://downloads, once per Chrome session (i.e. may be logged
     again after Chrome restarts). Value logs the type of danger.
 
+    Note: This histogram is recorded each time a warning is shown for a
+    download, even when attempting to download the same file.
+
     Warning: this histogram was expired from 2025-09-08 to 2026-01-27; data may
     be missing.
   </summary>
