@@ -327,6 +327,7 @@ source_set("web_applications") {
     "preinstalled_web_app_manager.h",
     "preinstalled_web_app_utils.cc",
     "preinstalled_web_app_utils.h",
+    "preinstalled_web_apps/extension_ids_to_replace.h",
     "preinstalled_web_apps/preinstalled_web_app_definition_utils.cc",
     "preinstalled_web_apps/preinstalled_web_app_definition_utils.h",
     "preinstalled_web_apps/preinstalled_web_apps.cc",
@@ -595,6 +596,7 @@ source_set("web_applications") {
     "//chrome/browser/profiles:profile",
     "//chrome/browser/profiles:profile_manager",
     "//chrome/browser/profiles/keep_alive",
+    "//chrome/browser/resources:app_icon_resources",
     "//chrome/browser/shortcuts",
     "//chrome/browser/ssl",
     "//chrome/browser/sync:factories",
@@ -687,7 +689,6 @@ source_set("web_applications") {
         "preinstalled_web_apps/vids.cc",
         "preinstalled_web_apps/vids.h",
       ]
-      deps += [ "//extensions/common:common_constants" ]
     }
 
     deps += [ "//chrome/browser/resources:preinstalled_web_apps_resources" ]
@@ -723,7 +724,6 @@ source_set("web_applications") {
       "//chrome/browser/ash/profiles",
       "//chrome/browser/chromeos/upload_office_to_cloud",
       "//chrome/browser/policy:system_features_disable_list",
-      "//chrome/browser/resources:app_icon_resources",
       "//chrome/browser/web_applications/ash/migrations",
       "//chrome/common/chromeos/extensions",
       "//chromeos/ash/components/browser_context_helper",
