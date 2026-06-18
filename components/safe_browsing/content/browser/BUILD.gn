@@ -240,6 +240,7 @@ source_set("client_side_detection_images_cache") {
   ]
 
   deps = [
+    "//components/safe_browsing/core/browser:client_side_detection_service_base",
     "//components/safe_browsing/core/common/fbs:client_model",
     "//components/safe_browsing/core/common/proto:csd_proto",
     "//content/public/browser",

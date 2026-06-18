@@ -66,6 +66,8 @@ source_set("browser") {
 
 source_set("client_side_detection_service_base") {
   sources = [
+    "client_side_detection_feature_cache_base.cc",
+    "client_side_detection_feature_cache_base.h",
     "client_side_detection_service_base.cc",
     "client_side_detection_service_base.h",
     "csd_model_type.h",
@@ -88,7 +90,10 @@ source_set("client_side_detection_service_base") {
 
 source_set("client_side_detection_service_base_unittest") {
   testonly = true
-  sources = [ "client_side_detection_service_base_unittest.cc" ]
+  sources = [
+    "client_side_detection_feature_cache_base_unittest.cc",
+    "client_side_detection_service_base_unittest.cc",
+  ]
   deps = [
     ":browser",
     ":client_side_detection_service_base",

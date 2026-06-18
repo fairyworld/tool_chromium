@@ -845,7 +845,7 @@ IN_PROC_BROWSER_TEST_F(
     prerender_helper().NavigatePrimaryPage(prerender_url);
   }
 
-  feature_cache_map->Clear();
+  feature_cache_map->ClearForTesting();
 
   // Bypass the pre-classification checks.
   csd_host->OnPhishingPreClassificationDone(
