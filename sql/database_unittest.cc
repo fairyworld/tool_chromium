@@ -617,6 +617,34 @@ TEST_P(SQLDatabaseTest, ErrorCallbackThatClosesDb) {
   }
 }
 
+// Regression test for https://crbug.com/1522873
+TEST_P(SQLDatabaseTest, ErrorCallbackThatFreesDatabase) {
+  static constexpr char kCreateSql[] =
+      "CREATE TABLE rows(id INTEGER PRIMARY KEY NOT NULL)";
+  ASSERT_TRUE(db_->Execute(kCreateSql));
+  ASSERT_TRUE(db_->Execute("INSERT INTO rows(id) VALUES(12)"));
+
+  bool error_callback_called = false;
+  int error = SQLITE_OK;
+  db_->set_error_callback(
+      base::BindLambdaForTesting([&](int sqlite_error, Statement* statement) {
+        error_callback_called = true;
+        error = sqlite_error;
+        db_.reset();
+      }));
+
+  {
+    sql::test::ScopedErrorExpecter expecter;
+    expecter.ExpectError(SQLITE_CONSTRAINT);
+    EXPECT_FALSE(db_->Execute("INSERT INTO rows(id) VALUES(12)"))
+        << "Inserting a duplicate primary key should have failed";
+    EXPECT_TRUE(expecter.SawExpectedErrors())
+        << "Inserting a duplicate primary key should have failed";
+  }
+  EXPECT_TRUE(error_callback_called);
+  EXPECT_EQ(SQLITE_CONSTRAINT_PRIMARYKEY, error);
+}
+
 TEST_P(SQLDatabaseTest, DetachFromSequence) {
   base::test::TaskEnvironment task_environment;
 
@@ -644,34 +672,6 @@ TEST_P(SQLDatabaseTest, DetachFromSequence) {
           std::move(db_)),
       run_loop.QuitClosure());
   run_loop.Run();
-}
-
-// Regression test for https://crbug.com/1522873
-TEST_P(SQLDatabaseTest, ErrorCallbackThatFreesDatabase) {
-  static constexpr char kCreateSql[] =
-      "CREATE TABLE rows(id INTEGER PRIMARY KEY NOT NULL)";
-  ASSERT_TRUE(db_->Execute(kCreateSql));
-  ASSERT_TRUE(db_->Execute("INSERT INTO rows(id) VALUES(12)"));
-
-  bool error_callback_called = false;
-  int error = SQLITE_OK;
-  db_->set_error_callback(
-      base::BindLambdaForTesting([&](int sqlite_error, Statement* statement) {
-        error_callback_called = true;
-        error = sqlite_error;
-        db_.reset();
-      }));
-
-  {
-    sql::test::ScopedErrorExpecter expecter;
-    expecter.ExpectError(SQLITE_CONSTRAINT);
-    EXPECT_FALSE(db_->Execute("INSERT INTO rows(id) VALUES(12)"))
-        << "Inserting a duplicate primary key should have failed";
-    EXPECT_TRUE(expecter.SawExpectedErrors())
-        << "Inserting a duplicate primary key should have failed";
-  }
-  EXPECT_TRUE(error_callback_called);
-  EXPECT_EQ(SQLITE_CONSTRAINT_PRIMARYKEY, error);
 }
 
 // Sets a flag to true/false to track being alive.
