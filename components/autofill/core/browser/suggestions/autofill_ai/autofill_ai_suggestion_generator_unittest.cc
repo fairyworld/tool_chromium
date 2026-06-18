@@ -23,6 +23,7 @@
 #include "components/autofill/core/browser/form_processing/autofill_ai/determine_attribute_types.h"
 #include "components/autofill/core/browser/form_structure.h"
 #include "components/autofill/core/browser/foundations/test_autofill_client.h"
+#include "components/autofill/core/browser/network/autofill_ai/mock_personal_context_access_manager.h"
 #include "components/autofill/core/browser/suggestions/suggestion.h"
 #include "components/autofill/core/browser/suggestions/suggestion_test_helpers.h"
 #include "components/autofill/core/browser/suggestions/suggestion_type.h"
@@ -1110,6 +1111,87 @@ TEST_F(AutofillAiSuggestionGeneratorTest, WalletSuggestionsShowIPH) {
   raw_ptr<const base::Feature> kIphFeature =
       &feature_engagement::kIPHAutofillAiValuablesFeature;
   EXPECT_THAT(suggestions, SuggestionsAre(HasIphFeature(kIphFeature)));
+}
+
+TEST_F(AutofillAiSuggestionGeneratorTest, ShowFetchingSuggestionWhenPending) {
+  testing::NiceMock<MockPersonalContextAccessManager> access_manager;
+  client().set_personal_context_access_manager(&access_manager);
+
+  SetForm({PASSPORT_NUMBER});
+  SetEntities({});
+
+  using RequestStatus = PersonalContextAccessManager::RequestStatus;
+  EXPECT_CALL(access_manager, GetPrefetchAmbientAutofillStatusByEntityType(
+                                  EntityType(EntityTypeName::kPassport)))
+      .WillRepeatedly(testing::Return(RequestStatus::kPending));
+
+  EXPECT_THAT(CreateAutofillAiFillingSuggestions(field(0)),
+              SuggestionsAre(HasType(SuggestionType::kFetchingAmbientData)));
+}
+
+TEST_F(AutofillAiSuggestionGeneratorTest, NoFetchingSuggestionWhenNotPending) {
+  testing::NiceMock<MockPersonalContextAccessManager> access_manager;
+  client().set_personal_context_access_manager(&access_manager);
+
+  SetForm({PASSPORT_NUMBER});
+  SetEntities({});
+
+  using RequestStatus = PersonalContextAccessManager::RequestStatus;
+  EXPECT_CALL(access_manager, GetPrefetchAmbientAutofillStatusByEntityType(
+                                  EntityType(EntityTypeName::kPassport)))
+      .WillRepeatedly(testing::Return(RequestStatus::kSuccess));
+
+  EXPECT_THAT(CreateAutofillAiFillingSuggestions(field(0)), IsEmpty());
+}
+
+TEST_F(AutofillAiSuggestionGeneratorTest,
+       NoFetchingSuggestionWhenNoMatchingField) {
+  testing::NiceMock<MockPersonalContextAccessManager> access_manager;
+  client().set_personal_context_access_manager(&access_manager);
+
+  SetForm({PASSPORT_NUMBER});
+  SetEntities({});
+
+  using RequestStatus = PersonalContextAccessManager::RequestStatus;
+  EXPECT_CALL(access_manager, GetPrefetchAmbientAutofillStatusByEntityType(
+                                  EntityType(EntityTypeName::kNationalIdCard)))
+      .WillRepeatedly(testing::Return(RequestStatus::kPending));
+  EXPECT_CALL(access_manager, GetPrefetchAmbientAutofillStatusByEntityType(
+                                  EntityType(EntityTypeName::kPassport)))
+      .WillRepeatedly(testing::Return(RequestStatus::kSuccess));
+
+  EXPECT_THAT(CreateAutofillAiFillingSuggestions(field(0)), IsEmpty());
+}
+
+TEST_F(AutofillAiSuggestionGeneratorTest,
+       NoFetchingSuggestionWhenTriggerFieldIsNotPending) {
+  testing::NiceMock<MockPersonalContextAccessManager> access_manager;
+  client().set_personal_context_access_manager(&access_manager);
+
+  // Form has Passport and National ID.
+  SetForm({PASSPORT_NUMBER, NATIONAL_ID_CARD_NUMBER});
+
+  // Passport has local data.
+  SetEntities({test::GetPassportEntityInstance()});
+
+  using RequestStatus = PersonalContextAccessManager::RequestStatus;
+  // National ID is fetching.
+  EXPECT_CALL(access_manager, GetPrefetchAmbientAutofillStatusByEntityType(
+                                  EntityType(EntityTypeName::kNationalIdCard)))
+      .WillRepeatedly(testing::Return(RequestStatus::kPending));
+  // Passport is not fetching (success).
+  EXPECT_CALL(access_manager, GetPrefetchAmbientAutofillStatusByEntityType(
+                                  EntityType(EntityTypeName::kPassport)))
+      .WillRepeatedly(testing::Return(RequestStatus::kSuccess));
+
+  // User clicks Passport field.
+  std::vector<Suggestion> suggestions =
+      CreateAutofillAiFillingSuggestions(field(0));
+
+  // Should contain Passport suggestions, but NOT fetching suggestion.
+  EXPECT_THAT(suggestions, Not(IsEmpty()));
+  EXPECT_THAT(suggestions,
+              Not(Contains(HasType(SuggestionType::kFetchingAmbientData))));
 }
 
 class AutofillAiSuggestionGeneratorSplitManageSuggestionTest
