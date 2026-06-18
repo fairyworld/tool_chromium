@@ -1587,6 +1587,16 @@ inline constexpr char kPreSmartRestartSessionState[] =
 // Whether Extensions are enabled.
 inline constexpr char kDisableExtensions[] = "extensions.disabled";
 
+#if BUILDFLAG(IS_ANDROID)
+// Dictionary pref for custom background information.
+inline constexpr char kNtpAndroidCustomBackgroundDict[] =
+    "ntp.android_custom_background_dict";
+
+// Boolean pref for whether the custom background is local to device.
+inline constexpr char kNtpAndroidCustomBackgroundLocalToDevice[] =
+    "ntp.android_custom_background_local_to_device";
+#endif  // BUILDFLAG(IS_ANDROID)
+
 // Keeps track of which sessions are collapsed in the Other Devices menu.
 inline constexpr char kNtpCollapsedForeignSessions[] =
     "ntp.collapsed_foreign_sessions";

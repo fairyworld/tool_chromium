@@ -362,6 +362,7 @@ source_set("impl") {
       "//chrome/browser/lens",
       "//chrome/browser/notifications",
       "//chrome/browser/notifications:notifications_java_enum_srcjar",
+      "//chrome/browser/ntp_customization",
       "//chrome/browser/partnerbookmarks:android",
       "//chrome/browser/password_manager/android:utils",
       "//chrome/browser/readaloud/android:native",
