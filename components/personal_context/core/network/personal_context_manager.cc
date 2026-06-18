@@ -34,8 +34,9 @@ constexpr char kContextMemoryServiceBaseUrl[] =
     "https://contextmemoryservice.pa.googleapis.com/v1";
 
 // Returns the base URL of the Context Memory Service. If the
-// `kContextMemoryServiceBaseUrlSwitch` is set, its value is returned.
-// Otherwise, the production URL is returned.
+// `kContextMemoryServiceBaseUrlSwitch` is set, its value is returned. If the
+// `kContextMemoryServiceBaseUrlParam` feature parameter is set, its value is
+// returned. Otherwise, the production URL is returned.
 GURL GetContextMemoryServiceBaseUrl() {
   base::CommandLine* command_line = base::CommandLine::ForCurrentProcess();
   if (command_line->HasSwitch(
@@ -43,6 +44,12 @@ GURL GetContextMemoryServiceBaseUrl() {
     return GURL(command_line->GetSwitchValueASCII(
         features::debug::kContextMemoryServiceBaseUrlSwitch));
   }
+  const std::string base_url_override =
+      features::debug::kContextMemoryServiceBaseUrlParam.Get();
+  if (!base_url_override.empty()) {
+    return GURL(base_url_override);
+  }
+
   return GURL(kContextMemoryServiceBaseUrl);
 }
 
