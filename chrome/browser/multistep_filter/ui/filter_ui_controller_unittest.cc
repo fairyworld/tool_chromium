@@ -114,12 +114,10 @@ UrlFilterSuggestion CreateDummySuggestion(
     std::vector<FilterAttributeUiLabel> attribute_ui_labels = {}) {
   return UrlFilterSuggestion(
       {.navigation_url = url,
-       .source_domain = base::UTF8ToUTF16(GetEtldPlusOne(url)),
        .source_host = base::UTF8ToUTF16(url.GetHost()),
        .extraction_timestamp = base::Time::Now(),
        .attribute_ui_labels = std::move(attribute_ui_labels),
        .triggering_navigation_id = kTestNavigationId,
-       .triggering_domain = GetEtldPlusOne(url),
        .triggering_host = url.GetHost(),
        .task_type = "task1",
        .suggestion_message = u"Test Message"});
