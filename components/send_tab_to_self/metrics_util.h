@@ -5,11 +5,18 @@
 #ifndef COMPONENTS_SEND_TAB_TO_SELF_METRICS_UTIL_H_
 #define COMPONENTS_SEND_TAB_TO_SELF_METRICS_UTIL_H_
 
+#include <stddef.h>
+
+#include <optional>
+
 #include "base/time/time.h"
+#include "components/send_tab_to_self/entry_point_display_reason.h"
 #include "components/sync_device_info/device_info.h"
 
 namespace send_tab_to_self {
 
+// GENERATED_JAVA_ENUM_PACKAGE: (
+//   org.chromium.chrome.browser.share.send_tab_to_self)
 enum class ShareEntryPoint {
   kContentMenu,
   kLinkMenu,
@@ -151,6 +158,26 @@ enum class SendTabToSelfFormFactorCombination {
 void RecordDeviceFormFactorCombination(
     syncer::DeviceInfo::FormFactor sender_form_factor,
     syncer::DeviceInfo::FormFactor target_form_factor);
+
+// Keep in sync with SendTabToSelfDeviceCount in enums.xml.
+// These values are persisted to logs. Entries should not be renumbered and
+// numeric values should never be reused.
+// LINT.IfChange(SendTabToSelfDeviceCount)
+enum class SendTabToSelfDeviceCount {
+  kNoTargetDevicesBecauseSignedOut = 0,
+  kZeroDevices = 1,
+  kOneDevice = 2,
+  kTwoDevices = 3,
+  kThreeDevices = 4,
+  kFourDevices = 5,
+  kFiveDevices = 6,
+  kMoreThanFiveDevices = 7,
+  kMaxValue = kMoreThanFiveDevices,
+};
+// LINT.ThenChange(/tools/metrics/histograms/enums.xml:SendTabToSelfDeviceCount)
+
+void RecordTargetDeviceCount(EntryPointDisplayReason display_reason,
+                             size_t device_count);
 
 }  // namespace send_tab_to_self
 

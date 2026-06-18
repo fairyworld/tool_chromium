@@ -94,6 +94,33 @@ SendTabToSelfFormFactorCombination GetFormFactorCombination(
   }
 }
 
+SendTabToSelfDeviceCount GetSendTabToSelfDeviceCount(
+    EntryPointDisplayReason reason,
+    size_t device_count) {
+  switch (reason) {
+    case EntryPointDisplayReason::kOfferSignIn:
+      return SendTabToSelfDeviceCount::kNoTargetDevicesBecauseSignedOut;
+    case EntryPointDisplayReason::kInformNoTargetDevice:
+      return SendTabToSelfDeviceCount::kZeroDevices;
+    case EntryPointDisplayReason::kOfferFeature:
+      if (device_count == 0) {
+        return SendTabToSelfDeviceCount::kZeroDevices;
+      } else if (device_count == 1) {
+        return SendTabToSelfDeviceCount::kOneDevice;
+      } else if (device_count == 2) {
+        return SendTabToSelfDeviceCount::kTwoDevices;
+      } else if (device_count == 3) {
+        return SendTabToSelfDeviceCount::kThreeDevices;
+      } else if (device_count == 4) {
+        return SendTabToSelfDeviceCount::kFourDevices;
+      } else if (device_count == 5) {
+        return SendTabToSelfDeviceCount::kFiveDevices;
+      } else {
+        return SendTabToSelfDeviceCount::kMoreThanFiveDevices;
+      }
+  }
+}
+
 }  // namespace
 
 void RecordNotificationShown() {
@@ -189,6 +216,13 @@ void RecordDeviceFormFactorCombination(
   base::UmaHistogramEnumeration(
       "Sharing.SendTabToSelf.DeviceFormFactorCombination",
       GetFormFactorCombination(sender_form_factor, target_form_factor));
+}
+
+void RecordTargetDeviceCount(EntryPointDisplayReason display_reason,
+                             size_t device_count) {
+  base::UmaHistogramEnumeration(
+      "Sharing.SendTabToSelf.TargetDeviceCount",
+      GetSendTabToSelfDeviceCount(display_reason, device_count));
 }
 
 }  // namespace send_tab_to_self

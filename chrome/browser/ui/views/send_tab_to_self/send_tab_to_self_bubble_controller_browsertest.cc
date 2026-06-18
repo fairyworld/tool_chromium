@@ -601,6 +601,41 @@ IN_PROC_BROWSER_TEST_F(SendTabToSelfBubbleControllerBrowserTest,
   EXPECT_FALSE(controller->IsBubbleShown());
 }
 
+IN_PROC_BROWSER_TEST_F(SendTabToSelfBubbleControllerBrowserTest,
+                       ShowBubbleRecordsMetrics) {
+  content::WebContents* web_contents =
+      browser()->tab_strip_model()->GetActiveWebContents();
+  ASSERT_TRUE(content::NavigateToURL(web_contents, GURL("about:blank")));
+
+  identity_test_env()->MakePrimaryAccountAvailable(
+      "user@gmail.com", signin::ConsentLevel::kSignin);
+
+  StubSendTabToSelfSyncService* sync_service = GetStubSyncService();
+  ASSERT_TRUE(sync_service);
+  sync_service->SetEntryPointDisplayReason(
+      EntryPointDisplayReason::kOfferFeature);
+  // Set up 2 target devices.
+  sync_service->GetFakeSendTabToSelfModel()->SetTargetDeviceInfoSortedList(
+      {TargetDeviceInfo("device_name_0", "device_0",
+                        syncer::DeviceInfo::FormFactor::kDesktop,
+                        base::Time::Now()),
+       TargetDeviceInfo("device_name_1", "device_1",
+                        syncer::DeviceInfo::FormFactor::kDesktop,
+                        base::Time::Now())});
+
+  base::HistogramTester histogram_tester;
+
+  SendTabToSelfBubbleController* controller =
+      SendTabToSelfBubbleController::GetOrCreateForWebContents(web_contents);
+
+  controller->ShowBubble();
+  EXPECT_TRUE(controller->IsBubbleShown());
+
+  histogram_tester.ExpectUniqueSample(
+      "Sharing.SendTabToSelf.TargetDeviceCount",
+      static_cast<int>(SendTabToSelfDeviceCount::kTwoDevices), 1);
+}
+
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
 IN_PROC_BROWSER_TEST_F(SendTabToSelfBubbleControllerBrowserTest,
                        ShowPromoBubble) {

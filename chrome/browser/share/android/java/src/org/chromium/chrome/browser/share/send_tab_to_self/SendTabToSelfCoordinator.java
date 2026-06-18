@@ -237,6 +237,8 @@ public class SendTabToSelfCoordinator
             case EntryPointDisplayReason.OFFER_FEATURE:
                 List<TargetDeviceInfo> targetDevices =
                         SendTabToSelfAndroidBridge.getAllTargetDeviceInfos(mProfile);
+                // TODO(crbug.com/503283050): Remove this metric in favor of the unified
+                // Sharing.SendTabToSelf.TargetDeviceCount metric implemented in C++.
                 RecordHistogram.recordCount100Histogram(
                         "Sharing.SendTabToSelf.AndroidDevicePickerTargetCount",
                         targetDevices.size());
