@@ -125,6 +125,7 @@ class BaseAutofillAiTest : public testing::Test {
             autofill_client().GetSyncService(),
             webdata_helper_.autofill_webdata_service(),
             /*history_service=*/nullptr,
+            /*pcontext_manager=*/nullptr,
             /*strike_database=*/nullptr,
             /*variation_country_code=*/GeoIpCountryCode("US")));
     RecreateManager();
@@ -139,9 +140,17 @@ class BaseAutofillAiTest : public testing::Test {
   std::unique_ptr<AutofillAiManager>& manager_ptr() { return manager_; }
 
   void AddOrUpdateEntityInstance(EntityInstance entity) {
-    autofill_client().GetEntityDataManager()->AddOrUpdateEntityInstance(
-        std::move(entity));
-    webdata_helper_.WaitUntilIdle();
+    EntityDataManager& edm = *autofill_client().GetEntityDataManager();
+    switch (entity.record_type()) {
+      case EntityInstance::RecordType::kLocal:
+      case EntityInstance::RecordType::kServerWallet:
+        edm.AddOrUpdateEntityInstance(std::move(entity));
+        webdata_helper_.WaitUntilIdle();
+        break;
+      case EntityInstance::RecordType::kPersonalContext:
+        edm.OnMaskedAmbientAutofillEntitiesPrefetched({entity});
+        break;
+    }
   }
 
   [[nodiscard]] std::unique_ptr<FormStructure> CreateFormStructure(

@@ -393,6 +393,7 @@ class AutofillExternalDelegateTest : public testing::Test,
             autofill_client().GetSyncService(),
             webdata_helper_.autofill_webdata_service(),
             /*history_service=*/nullptr,
+            /*pcontext_manager=*/nullptr,
             /*strike_database=*/nullptr,
             /*variation_country_code=*/GeoIpCountryCode("US")));
     CreateAutofillDriver();
@@ -3134,7 +3135,9 @@ TEST_F(AutofillExternalDelegateWithAmbientAutofillTest,
   ASSERT_NE(
       full_passport.attribute(kPassportNumberType)->GetCompleteRawInfo(),
       masked_passport.attribute(kPassportNumberType)->GetCompleteRawInfo());
-  AddOrUpdateEntityInstance(masked_passport);
+  autofill_client()
+      .GetEntityDataManager()
+      ->OnMaskedAmbientAutofillEntitiesPrefetched({masked_passport});
 
   IssueOnQuery({.fields = {{.role = PASSPORT_NUMBER}}});
   Suggestion fill_suggestion(SuggestionType::kFillAutofillAi);

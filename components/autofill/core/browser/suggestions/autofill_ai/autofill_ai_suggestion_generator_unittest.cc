@@ -121,6 +121,7 @@ class AutofillAiSuggestionGeneratorTest : public testing::Test {
             autofill_client_.GetSyncService(),
             webdata_helper_.autofill_webdata_service(),
             /*history_service=*/nullptr,
+            /*pcontext_manager=*/nullptr,
             /*strike_database=*/nullptr,
             /*variation_country_code=*/GeoIpCountryCode("US")));
     autofill_client_.SetUpPrefsAndIdentityForAutofillAi();
@@ -152,7 +153,15 @@ class AutofillAiSuggestionGeneratorTest : public testing::Test {
   void SetEntities(std::vector<EntityInstance> entities) {
     entities_ = std::move(entities);
     for (EntityInstance& entity : entities_) {
-      edm().AddOrUpdateEntityInstance(entity);
+      switch (entity.record_type()) {
+        case EntityInstance::RecordType::kLocal:
+        case EntityInstance::RecordType::kServerWallet:
+          edm().AddOrUpdateEntityInstance(entity);
+          break;
+        case EntityInstance::RecordType::kPersonalContext:
+          edm().OnMaskedAmbientAutofillEntitiesPrefetched({entity});
+          break;
+      }
     }
     webdata_helper().WaitUntilIdle();
   }

@@ -89,6 +89,7 @@ class AutofillDataProviderImplTest : public testing::Test {
         /*identity_manager=*/nullptr, &sync_service_,
         webdata_helper_.autofill_webdata_service(),
         /*history_service=*/nullptr,
+        /*pcontext_manager=*/nullptr,
         /*strike_database=*/nullptr,
         /*variation_country_code=*/GeoIpCountryCode("US"));
     entity_data_manager_ = entity_data_manager.get();

@@ -213,7 +213,7 @@ class AutofillAiManagerTest
             autofill_client().GetIdentityManager(),
             autofill_client().GetSyncService(),
             webdata_helper_.autofill_webdata_service(),
-            /*history_service=*/nullptr,
+            /*history_service=*/nullptr, &personal_context_access_manager_,
             /*strike_database=*/nullptr,
             /*variation_country_code=*/GeoIpCountryCode("US")));
     autofill_client().SetUpPrefsAndIdentityForAutofillAi();
