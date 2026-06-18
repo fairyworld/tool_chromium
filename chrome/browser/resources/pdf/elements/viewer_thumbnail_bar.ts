@@ -21,7 +21,6 @@ import {getHtml} from './viewer_thumbnail_bar.html.js';
 export interface Ink2ThumbnailData {
   type: string;
   pageNumber: number;
-  isInk: boolean;
   imageData: ArrayBuffer;
   width: number;
   height: number;
@@ -248,12 +247,7 @@ export class ViewerThumbnailBarElement extends CrLitElement {
     const thumbnail = this.getThumbnailForPage(data.pageNumber);
     if (thumbnail && thumbnail.isPainted()) {
       const array = new Uint8ClampedArray(data.imageData);
-      const imageData = new ImageData(array, data.width);
-      if (data.isInk) {
-        thumbnail.ink2Image = imageData;
-      } else {
-        thumbnail.image = imageData;
-      }
+      thumbnail.image = new ImageData(array, data.width);
     }
   }
   // </if>
