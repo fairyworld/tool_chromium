@@ -20,6 +20,7 @@
 #include "chrome/browser/send_tab_to_self/send_tab_to_self_page_handler.h"
 #include "chrome/browser/sync/send_tab_to_self_sync_service_factory.h"
 #include "components/send_tab_to_self/entry_point_display_reason.h"
+#include "components/send_tab_to_self/metrics_util.h"
 #include "components/send_tab_to_self/page_context.h"
 #include "components/send_tab_to_self/send_tab_to_self_entry.h"
 #include "components/send_tab_to_self/send_tab_to_self_model.h"
@@ -165,6 +166,18 @@ JNI_SendTabToSelfAndroidBridge_GetEntryPointDisplayReason(
   // hidden entry point doesn't seem worth it after all. Make that just another
   // value in the enum, sparing the complexity here.
   return jni_zero::ToJavaInteger(env, static_cast<int32_t>(*reason));
+}
+
+static void JNI_SendTabToSelfAndroidBridge_RecordTargetDeviceCount(
+    JNIEnv* env,
+    jint j_display_reason,
+    jint j_device_count) {
+  CHECK_LE(0, j_display_reason);
+  CHECK_LE(j_display_reason,
+           static_cast<jint>(EntryPointDisplayReason::kMaxValue));
+  RecordTargetDeviceCount(
+      static_cast<EntryPointDisplayReason>(j_display_reason),
+      static_cast<size_t>(j_device_count));
 }
 
 void AttachTabLabel(TabAndroid* tab, std::string_view device_name) {

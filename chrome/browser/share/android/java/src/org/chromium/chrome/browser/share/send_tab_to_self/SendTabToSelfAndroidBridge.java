@@ -168,6 +168,20 @@ public class SendTabToSelfAndroidBridge {
     }
 
     /**
+     * Records the target device count when the Send Tab to Self UI is invoked.
+     *
+     * @param profile The profile to use.
+     * @param displayReason The reason the entry point is displayed.
+     * @param deviceCount The number of target devices.
+     */
+    public static void recordTargetDeviceCount(
+            @EntryPointDisplayReason int displayReason,
+            int deviceCount) {
+        SendTabToSelfAndroidBridgeJni.get()
+                .recordTargetDeviceCount(displayReason, deviceCount);
+    }
+
+    /**
      * Attaches SendTabToSelfTabCardLabelData to a Tab to indicate which device sent it.
      *
      * @param tab The Tab to attach the user data to.
@@ -263,7 +277,11 @@ public class SendTabToSelfAndroidBridge {
         @JniType("std::vector")
         List<TargetDeviceInfo> getAllTargetDeviceInfos(@JniType("Profile*") Profile profile);
 
-        @Nullable Integer getEntryPointDisplayReason(
+        @Nullable @EntryPointDisplayReason Integer getEntryPointDisplayReason(
                 @JniType("Profile*") Profile profile, String url);
+
+        void recordTargetDeviceCount(
+                @EntryPointDisplayReason int displayReason,
+                int deviceCount);
     }
 }

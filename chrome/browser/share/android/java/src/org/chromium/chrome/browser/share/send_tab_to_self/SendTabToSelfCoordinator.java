@@ -15,7 +15,6 @@ import android.provider.Browser;
 
 import org.chromium.base.Callback;
 import org.chromium.base.IntentUtils;
-import org.chromium.base.metrics.RecordHistogram;
 import org.chromium.base.supplier.MonotonicObservableSupplier;
 import org.chromium.base.supplier.OneshotSupplierImpl;
 import org.chromium.base.supplier.SupplierUtils;
@@ -232,6 +231,14 @@ public class SendTabToSelfCoordinator
                 SendTabToSelfAndroidBridge.getEntryPointDisplayReason(mProfile, mUrl);
         assert displayReason != null;
 
+        int deviceCount = 0;
+        if (displayReason == EntryPointDisplayReason.OFFER_FEATURE) {
+            List<TargetDeviceInfo> targetDevices =
+                    SendTabToSelfAndroidBridge.getAllTargetDeviceInfos(mProfile);
+            deviceCount = targetDevices.size();
+        }
+        SendTabToSelfAndroidBridge.recordTargetDeviceCount(displayReason, deviceCount);
+
         SendTabToSelfMetricsRecorder.recordCrossDeviceTabJourney();
         SendTabToSelfMetricsRecorder.recordEntryPointInvoked(mEntryPoint);
         switch (displayReason) {
@@ -242,11 +249,6 @@ public class SendTabToSelfCoordinator
             case EntryPointDisplayReason.OFFER_FEATURE:
                 List<TargetDeviceInfo> targetDevices =
                         SendTabToSelfAndroidBridge.getAllTargetDeviceInfos(mProfile);
-                // TODO(crbug.com/503283050): Remove this metric in favor of the unified
-                // Sharing.SendTabToSelf.TargetDeviceCount metric implemented in C++.
-                RecordHistogram.recordCount100Histogram(
-                        "Sharing.SendTabToSelf.AndroidDevicePickerTargetCount",
-                        targetDevices.size());
                 if (ChromeFeatureList.isEnabled(
                         ChromeFeatureList.SEND_TAB_TO_SELF_ENHANCED_BOTTOMSHEET)) {
                     showEnhancedTargetDevicePicker(targetDevices);

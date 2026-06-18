@@ -379,16 +379,6 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="Sharing.SendTabToSelf.AndroidDevicePickerTargetCount"
-    units="devices" expires_after="2027-06-16">
-  <owner>mtatarski@google.com</owner>
-  <owner>src/components/sync/OWNERS</owner>
-  <summary>
-    The number of target devices shown in the Android device picker UI. Recorded
-    when the device picker bottom sheet is shown to the user.
-  </summary>
-</histogram>
-
 <histogram name="Sharing.SendTabToSelf.AutoOpenOutcome"
     enum="SendTabToSelfAutoOpenOutcome" expires_after="2027-03-30">
   <owner>ankushkush@google.com</owner>
