@@ -28,6 +28,7 @@
 #include "build/build_config.h"
 #include "components/services/storage/dom_storage/db_status.h"
 #include "components/services/storage/dom_storage/dom_storage_constants.h"
+#include "components/services/storage/dom_storage/dom_storage_database.h"
 #include "components/services/storage/dom_storage/dom_storage_histogram_helper.h"
 #include "components/services/storage/dom_storage/features.h"
 #include "components/services/storage/dom_storage/storage_area_impl.h"
@@ -35,7 +36,6 @@
 #include "components/services/storage/dom_storage/test_support/fake_dom_storage_database.h"
 #include "components/services/storage/dom_storage/test_support/fake_dom_storage_database_factory.h"
 #include "components/services/storage/dom_storage/test_support/storage_area_test_util.h"
-#include "components/services/storage/public/cpp/constants.h"
 #include "components/services/storage/public/mojom/storage_usage_info.mojom.h"
 #include "mojo/public/cpp/bindings/remote.h"
 #include "net/base/features.h"
@@ -1266,7 +1266,8 @@ TEST_P(LocalStorageImplTest, InMemory) {
   // Should not have created any files.
   ShutDownStorage();
 
-  base::FilePath database_path = GetLocalStorageDatabasePath(storage_path());
+  base::FilePath database_path =
+      DomStorageDatabase::GetPath(StorageType::kLocalStorage, storage_path());
   EXPECT_FALSE(base::PathExists(database_path));
 
   // Re-opening should get fresh data.
@@ -1292,7 +1293,8 @@ TEST_P(LocalStorageImplTest, InMemoryInvalidPath) {
   ShutDownStorage();
 
   // Should not have created any files.
-  base::FilePath database_path = GetLocalStorageDatabasePath(storage_path());
+  base::FilePath database_path =
+      DomStorageDatabase::GetPath(StorageType::kLocalStorage, storage_path());
   EXPECT_FALSE(base::PathExists(database_path));
 }
 
@@ -1309,7 +1311,8 @@ TEST_P(LocalStorageImplTest, OnDisk) {
   ShutDownStorage();
 
   // Writing map entries must create the database on disk.
-  base::FilePath database_path = GetLocalStorageDatabasePath(storage_path());
+  base::FilePath database_path =
+      DomStorageDatabase::GetPath(StorageType::kLocalStorage, storage_path());
   EXPECT_TRUE(base::PathExists(database_path));
 
   // Should be able to re-open.
@@ -1334,7 +1337,8 @@ TEST_P(LocalStorageImplTest, InvalidVersionOnDisk) {
 
   {
     // Re-open the database.
-    base::FilePath db_path = GetLocalStorageDatabasePath(storage_path());
+    base::FilePath db_path =
+        DomStorageDatabase::GetPath(StorageType::kLocalStorage, storage_path());
     base::RunLoop open_db_run_loop;
     DbStatus status;
 
@@ -1379,7 +1383,8 @@ TEST_P(LocalStorageImplTest, CorruptionOnDisk) {
 
   ShutDownStorage();
 
-  base::FilePath db_path = GetLocalStorageDatabasePath(storage_path());
+  base::FilePath db_path =
+      DomStorageDatabase::GetPath(StorageType::kLocalStorage, storage_path());
   if (IsSqliteEnabled()) {
     // Replace the SQLite database file with plain text.
     ASSERT_TRUE(base::WriteFile(db_path, "Corrupt database"));

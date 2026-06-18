@@ -389,8 +389,10 @@ bool LocalStorageImpl::OnMemoryDump(
   auto* global_dump = pmd->CreateSharedGlobalAllocatorDump(memory_dump_id_);
   // The size of the database dump will be added by the database service.
   auto* db_mad = pmd->CreateAllocatorDump(
-      context_name +
-      (ShouldUseSqliteBackend(in_memory_) ? "/sqlite" : "/leveldb"));
+      context_name + (ShouldUseSqlite(GetSqliteRolloutStage(in_memory_),
+                                      /*leveldb_exists=*/true)
+                          ? "/sqlite"
+                          : "/leveldb"));
   // Specifies that the current context is responsible for keeping memory alive.
   int kImportance = 2;
   pmd->AddOwnershipEdge(db_mad->guid(), global_dump->guid(), kImportance);

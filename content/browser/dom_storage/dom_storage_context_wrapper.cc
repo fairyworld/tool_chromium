@@ -24,9 +24,9 @@
 #include "base/task/single_thread_task_runner.h"
 #include "base/task/thread_pool.h"
 #include "build/build_config.h"
+#include "components/services/storage/dom_storage/dom_storage_database.h"
 #include "components/services/storage/dom_storage/local_storage_impl.h"
 #include "components/services/storage/dom_storage/session_storage_impl.h"
-#include "components/services/storage/public/cpp/constants.h"
 #include "components/services/storage/public/mojom/storage_policy_update.mojom.h"
 #include "components/services/storage/public/mojom/storage_service.mojom.h"
 #include "components/services/storage/public/mojom/storage_usage_info.mojom.h"
@@ -116,7 +116,8 @@ DOMStorageContextWrapper::DOMStorageContextWrapper(
   // Report on disk LocalStorage db size.
   if (partition_->GetStoragePartitionPath()) {
     // Path to the LocalStorage leveldb directory.
-    base::FilePath db_path = storage::GetLocalStorageDatabasePath(
+    base::FilePath db_path = storage::DomStorageDatabase::GetPath(
+        storage::StorageType::kLocalStorage,
         *partition_->GetStoragePartitionPath());
 
     // Offload the blocking file operation and report the result.

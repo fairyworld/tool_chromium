@@ -34,6 +34,9 @@ chromium-metrics-reviews@google.com.
 <variants name="DomStorageBackingStoreLifetime">
   <variant name="InMemory" summary="in-memory database"/>
   <variant name="OnDisk" summary="on-disk database"/>
+  <variant name="OnDiskExperimental"
+      summary="experimental (belongs to the treatment or control group of an
+               experiment targeting on-disk databases for new databases)"/>
 </variants>
 
 <variants name="DomStorageRecoveryReason">

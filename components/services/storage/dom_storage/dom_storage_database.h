@@ -265,6 +265,24 @@ class DomStorageDatabase {
   static base::FilePath GetPath(StorageType storage_type,
                                 const base::FilePath& storage_partition_dir);
 
+  // Returns the LevelDB database path for `storage_type` under
+  // `storage_partition_dir`. The path is a directory:
+  //
+  // `storage_partition_dir`/Local Storage/leveldb     (for `kLocalStorage`)
+  // `storage_partition_dir`/Session Storage           (for `kSessionStorage`)
+  static base::FilePath GetLevelDbPath(
+      StorageType storage_type,
+      const base::FilePath& storage_partition_dir);
+
+  // Returns the SQLite database path for `storage_type` under
+  // `storage_partition_dir`. The path is a file:
+  //
+  // `storage_partition_dir`/LocalStorage              (for `kLocalStorage`)
+  // `storage_partition_dir`/SessionStorage            (for `kSessionStorage`)
+  static base::FilePath GetSqlitePath(
+      StorageType storage_type,
+      const base::FilePath& storage_partition_dir);
+
   virtual ~DomStorageDatabase() = default;
 
   // Opens an on-disk or in-memory database and returns the result. To create an

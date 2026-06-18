@@ -28,28 +28,6 @@
 #include "sql/database.h"
 
 namespace storage {
-namespace {
-
-// Constructs an absolute path to the session storage database using
-// `storage_partition_dir`.  For LevelDB, the path is a directory:
-//
-// `storage_partition_dir`/Session Storage
-//
-// When the `kDomStorageSqlite` feature flag is enabled, the path is a file:
-//
-// `storage_partition_dir`/SessionStorage
-base::FilePath GetSessionStorageDatabasePath(
-    const base::FilePath& storage_partition_dir) {
-  CHECK(!storage_partition_dir.empty());
-  CHECK(storage_partition_dir.IsAbsolute());
-
-  if (base::FeatureList::IsEnabled(kDomStorageSqlite)) {
-    return storage_partition_dir.AppendASCII("SessionStorage");
-  }
-  return storage_partition_dir.AppendASCII("Session Storage");
-}
-
-}  // namespace
 
 DomStorageDatabase::KeyValuePair::KeyValuePair() = default;
 
@@ -171,11 +149,44 @@ DomStorageDatabase::MapBatchUpdate::operator=(MapBatchUpdate&&) = default;
 base::FilePath DomStorageDatabase::GetPath(
     StorageType storage_type,
     const base::FilePath& storage_partition_dir) {
+  CHECK(!storage_partition_dir.empty());
+  CHECK(storage_partition_dir.IsAbsolute());
+
+  const DomStorageSqliteRolloutStage stage =
+      GetSqliteRolloutStage(/*in_memory=*/false);
+  if (ShouldUseSqlite(stage, /*leveldb_exists=*/true)) {
+    return GetSqlitePath(storage_type, storage_partition_dir);
+  }
+  return GetLevelDbPath(storage_type, storage_partition_dir);
+}
+
+// static
+base::FilePath DomStorageDatabase::GetLevelDbPath(
+    StorageType storage_type,
+    const base::FilePath& storage_partition_dir) {
+  CHECK(!storage_partition_dir.empty());
+  CHECK(storage_partition_dir.IsAbsolute());
   switch (storage_type) {
     case StorageType::kLocalStorage:
-      return GetLocalStorageDatabasePath(storage_partition_dir);
+      return storage_partition_dir.AppendASCII("Local Storage")
+          .AppendASCII("leveldb");
     case StorageType::kSessionStorage:
-      return GetSessionStorageDatabasePath(storage_partition_dir);
+      return storage_partition_dir.AppendASCII("Session Storage");
+  }
+  NOTREACHED();
+}
+
+// static
+base::FilePath DomStorageDatabase::GetSqlitePath(
+    StorageType storage_type,
+    const base::FilePath& storage_partition_dir) {
+  CHECK(!storage_partition_dir.empty());
+  CHECK(storage_partition_dir.IsAbsolute());
+  switch (storage_type) {
+    case StorageType::kLocalStorage:
+      return storage_partition_dir.AppendASCII("LocalStorage");
+    case StorageType::kSessionStorage:
+      return storage_partition_dir.AppendASCII("SessionStorage");
   }
   NOTREACHED();
 }
@@ -212,7 +223,8 @@ base::SequenceBound<DomStorageDatabase> DomStorageDatabaseFactory::CreateImpl(
     scoped_refptr<base::SequencedTaskRunner> blocking_task_runner) {
   switch (storage_type) {
     case StorageType::kLocalStorage: {
-      if (ShouldUseSqliteBackend(is_in_memory)) {
+      if (ShouldUseSqlite(GetSqliteRolloutStage(is_in_memory),
+                          /*leveldb_exists=*/true)) {
         return base::SequenceBound<LocalStorageSqlite>(
             std::move(blocking_task_runner), PassKey());
       }
@@ -220,7 +232,8 @@ base::SequenceBound<DomStorageDatabase> DomStorageDatabaseFactory::CreateImpl(
           std::move(blocking_task_runner), PassKey());
     }
     case StorageType::kSessionStorage: {
-      if (ShouldUseSqliteBackend(is_in_memory)) {
+      if (ShouldUseSqlite(GetSqliteRolloutStage(is_in_memory),
+                          /*leveldb_exists=*/true)) {
         return base::SequenceBound<SessionStorageSqlite>(
             std::move(blocking_task_runner), PassKey());
       }
