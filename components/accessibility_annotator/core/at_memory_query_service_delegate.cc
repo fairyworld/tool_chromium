@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/accessibility_annotator/core/accessibility_query_service_delegate.h"
+#include "components/accessibility_annotator/core/at_memory_query_service_delegate.h"
 
 namespace accessibility_annotator {
 

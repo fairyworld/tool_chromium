@@ -22,7 +22,7 @@
 #include "base/notreached.h"
 #include "base/scoped_observation.h"
 #include "build/build_config.h"
-#include "components/accessibility_annotator/core/accessibility_query_service.h"
+#include "components/accessibility_annotator/core/at_memory_query_service.h"
 #include "components/autofill/core/browser/country_type.h"
 #include "components/autofill/core/browser/crowdsourcing/autofill_crowdsourcing_manager.h"
 #include "components/autofill/core/browser/crowdsourcing/mock_autofill_crowdsourcing_manager.h"
@@ -226,9 +226,9 @@ class TestAutofillClientTemplate : public T {
     return &mock_autocomplete_history_manager_;
   }
 
-  accessibility_annotator::AccessibilityQueryService*
-  GetAccessibilityQueryService() override {
-    return accessibility_query_service_.get();
+  accessibility_annotator::AtMemoryQueryService* GetAtMemoryQueryService()
+      override {
+    return at_memory_query_service_.get();
   }
 
   personal_context::PersonalContextEnablementState
@@ -678,10 +678,10 @@ class TestAutofillClientTemplate : public T {
     test_shared_loader_factory_ = url_loader_factory;
   }
 
-  void set_accessibility_query_service(
-      std::unique_ptr<accessibility_annotator::AccessibilityQueryService>
-          accessibility_query_service) {
-    accessibility_query_service_ = std::move(accessibility_query_service);
+  void set_at_memory_query_service(
+      std::unique_ptr<accessibility_annotator::AtMemoryQueryService>
+          at_memory_query_service) {
+    at_memory_query_service_ = std::move(at_memory_query_service);
   }
 
   void set_identity_credential_delegate(
@@ -757,8 +757,8 @@ class TestAutofillClientTemplate : public T {
   raw_ptr<PersonalContextAccessManager> personal_context_access_manager_ =
       nullptr;
   std::unique_ptr<OtpPhishGuardDelegate> otp_phish_guard_delegate_;
-  std::unique_ptr<accessibility_annotator::AccessibilityQueryService>
-      accessibility_query_service_;
+  std::unique_ptr<accessibility_annotator::AtMemoryQueryService>
+      at_memory_query_service_;
   personal_context::PersonalContextEnablementState
       personal_context_enablement_state_ =
           personal_context::PersonalContextEnablementState::kEnabled;

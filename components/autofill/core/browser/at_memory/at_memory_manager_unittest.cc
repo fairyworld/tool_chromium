@@ -18,7 +18,7 @@
 #include "base/test/task_environment.h"
 #include "base/types/expected.h"
 #include "build/build_config.h"
-#include "components/accessibility_annotator/core/mock_accessibility_query_service.h"
+#include "components/accessibility_annotator/core/mock_at_memory_query_service.h"
 #include "components/autofill/core/browser/at_memory/at_memory_data_type.h"
 #include "components/autofill/core/browser/at_memory/at_memory_utils.h"
 #include "components/autofill/core/browser/data_manager/autofill_ai/entity_data_manager.h"
@@ -114,10 +114,10 @@ class AtMemoryManagerTest : public testing::Test,
  public:
   void SetUp() override {
     InitAutofillClient();
-    auto mock_query_service = std::make_unique<testing::NiceMock<
-        accessibility_annotator::MockAccessibilityQueryService>>();
+    auto mock_query_service = std::make_unique<
+        testing::NiceMock<accessibility_annotator::MockAtMemoryQueryService>>();
     mock_query_service_ptr_ = mock_query_service.get();
-    autofill_client().set_accessibility_query_service(
+    autofill_client().set_at_memory_query_service(
         std::move(mock_query_service));
 
     autofill_client().set_entity_data_manager(
@@ -142,7 +142,7 @@ class AtMemoryManagerTest : public testing::Test,
  protected:
   AtMemoryManager& manager() { return autofill_manager().GetAtMemoryManager(); }
 
-  accessibility_annotator::MockAccessibilityQueryService& mock_query_service() {
+  accessibility_annotator::MockAtMemoryQueryService& mock_query_service() {
     return *mock_query_service_ptr_;
   }
 
@@ -178,7 +178,7 @@ class AtMemoryManagerTest : public testing::Test,
 
   test::AutofillUnitTestEnvironment autofill_test_environment_;
   base::test::TaskEnvironment task_environment_;
-  raw_ptr<accessibility_annotator::MockAccessibilityQueryService>
+  raw_ptr<accessibility_annotator::MockAtMemoryQueryService>
       mock_query_service_ptr_ = nullptr;
   AutofillWebDataServiceTestHelper webdata_helper_{
       std::make_unique<EntityTable>()};

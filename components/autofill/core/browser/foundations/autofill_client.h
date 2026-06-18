@@ -100,7 +100,7 @@ enum class Channel;
 }
 
 namespace accessibility_annotator {
-class AccessibilityQueryService;
+class AtMemoryQueryService;
 }
 
 namespace personal_context {
@@ -469,10 +469,10 @@ class AutofillClient {
 
   virtual IdentityCredentialDelegate* GetIdentityCredentialDelegate();
 
-  // Returns the `AccessibilityQueryService` associated with the profile of
+  // Returns the `AtMemoryQueryService` associated with the profile of
   // the window of this tab.
-  virtual accessibility_annotator::AccessibilityQueryService*
-  GetAccessibilityQueryService();
+  virtual accessibility_annotator::AtMemoryQueryService*
+  GetAtMemoryQueryService();
 
   // Returns the enablement state of the Accessibility Annotator.
   virtual personal_context::PersonalContextEnablementState

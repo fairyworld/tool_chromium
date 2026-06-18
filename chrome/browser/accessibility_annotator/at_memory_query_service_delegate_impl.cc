@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/accessibility_annotator/accessibility_query_service_delegate_impl.h"
+#include "chrome/browser/accessibility_annotator/at_memory_query_service_delegate_impl.h"
 
 #include <utility>
 
@@ -41,16 +41,16 @@ Embedder* GetEmbedder(Profile* profile) {
 }  // namespace
 
 // Production constructor that fetches service dependencies from profile.
-AccessibilityQueryServiceDelegateImpl::AccessibilityQueryServiceDelegateImpl(
+AtMemoryQueryServiceDelegateImpl::AtMemoryQueryServiceDelegateImpl(
     Profile* profile)
-    : AccessibilityQueryServiceDelegateImpl(
+    : AtMemoryQueryServiceDelegateImpl(
           profile,
           PageContentExtractionServiceFactory::GetForProfile(profile),
           PageEmbeddingsServiceFactory::GetForProfile(profile),
           GetEmbedder(profile)) {}
 
 // Test constructor that allows service dependency injection.
-AccessibilityQueryServiceDelegateImpl::AccessibilityQueryServiceDelegateImpl(
+AtMemoryQueryServiceDelegateImpl::AtMemoryQueryServiceDelegateImpl(
     Profile* profile,
     page_content_annotations::PageContentExtractionService* extraction_service,
     page_content_annotations::PageEmbeddingsService* embeddings_service,
@@ -62,10 +62,9 @@ AccessibilityQueryServiceDelegateImpl::AccessibilityQueryServiceDelegateImpl(
   }
 }
 
-AccessibilityQueryServiceDelegateImpl::
-    ~AccessibilityQueryServiceDelegateImpl() = default;
+AtMemoryQueryServiceDelegateImpl::~AtMemoryQueryServiceDelegateImpl() = default;
 
-void AccessibilityQueryServiceDelegateImpl::RetrieveLiveTabContext(
+void AtMemoryQueryServiceDelegateImpl::RetrieveLiveTabContext(
     LiveTabContextQuery query,
     base::OnceCallback<void(LiveTabContextResponse)> callback) {
   if (!live_tab_retriever_) {

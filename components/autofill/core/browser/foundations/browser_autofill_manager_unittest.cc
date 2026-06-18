@@ -42,7 +42,7 @@
 #include "base/test/task_environment.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
-#include "components/accessibility_annotator/core/mock_accessibility_query_service.h"
+#include "components/accessibility_annotator/core/mock_at_memory_query_service.h"
 #include "components/autofill/core/browser/autofill_field.h"
 #include "components/autofill/core/browser/autofill_format_string.h"
 #include "components/autofill/core/browser/crowdsourcing/mock_autofill_crowdsourcing_manager.h"
@@ -5247,12 +5247,11 @@ TEST_F(BrowserAutofillManagerTest, DidShowSuggestions_FormNonSecureAction) {
       GURL("https://example.com"));
   ASSERT_TRUE(autofill_client().IsContextSecure());
 
-  auto mock_query_service = std::make_unique<testing::NiceMock<
-      accessibility_annotator::MockAccessibilityQueryService>>();
-  accessibility_annotator::MockAccessibilityQueryService*
-      mock_query_service_ptr = mock_query_service.get();
-  autofill_client().set_accessibility_query_service(
-      std::move(mock_query_service));
+  auto mock_query_service = std::make_unique<
+      testing::NiceMock<accessibility_annotator::MockAtMemoryQueryService>>();
+  accessibility_annotator::MockAtMemoryQueryService* mock_query_service_ptr =
+      mock_query_service.get();
+  autofill_client().set_at_memory_query_service(std::move(mock_query_service));
 
   // Create a form that submits to an insecure HTTP action.
   FormData insecure_form;

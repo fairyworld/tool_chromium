@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/accessibility_annotator/accessibility_query_service_factory.h"
+#include "chrome/browser/accessibility_annotator/at_memory_query_service_factory.h"
 
 #include <memory>
 #include <vector>
 
 #include "base/no_destructor.h"
-#include "chrome/browser/accessibility_annotator/accessibility_query_service_delegate_impl.h"
+#include "chrome/browser/accessibility_annotator/at_memory_query_service_delegate_impl.h"
 #include "chrome/browser/autofill/autofill_entity_data_manager_factory.h"
 #include "chrome/browser/autofill/personal_data_manager_factory.h"
 #include "chrome/browser/browser_process.h"
@@ -19,29 +19,28 @@
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "components/accessibility_annotator/core/accessibility_annotator_features.h"
-#include "components/accessibility_annotator/core/accessibility_query_service.h"
 #include "components/accessibility_annotator/core/annotation_reducer/personal_context_resolver_impl.h"
+#include "components/accessibility_annotator/core/at_memory_query_service.h"
 #include "components/autofill/core/browser/at_memory/at_memory_enablement_utils.h"
 #include "components/autofill/core/browser/at_memory/autofill_data_provider_impl.h"
 #include "content/public/browser/storage_partition.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
 // static
-AccessibilityQueryServiceFactory*
-AccessibilityQueryServiceFactory::GetInstance() {
-  static base::NoDestructor<AccessibilityQueryServiceFactory> instance;
+AtMemoryQueryServiceFactory* AtMemoryQueryServiceFactory::GetInstance() {
+  static base::NoDestructor<AtMemoryQueryServiceFactory> instance;
   return instance.get();
 }
 
 // static
-accessibility_annotator::AccessibilityQueryService*
-AccessibilityQueryServiceFactory::GetForProfile(Profile* profile) {
-  return static_cast<accessibility_annotator::AccessibilityQueryService*>(
+accessibility_annotator::AtMemoryQueryService*
+AtMemoryQueryServiceFactory::GetForProfile(Profile* profile) {
+  return static_cast<accessibility_annotator::AtMemoryQueryService*>(
       GetInstance()->GetServiceForBrowserContext(profile, /*create=*/true));
 }
 
-AccessibilityQueryServiceFactory::AccessibilityQueryServiceFactory()
-    : ProfileKeyedServiceFactory("AccessibilityQueryService",
+AtMemoryQueryServiceFactory::AtMemoryQueryServiceFactory()
+    : ProfileKeyedServiceFactory("AtMemoryQueryService",
                                  ProfileSelections::BuildForRegularProfile()) {
   DependsOn(autofill::PersonalDataManagerFactory::GetInstance());
   DependsOn(autofill::AutofillEntityDataManagerFactory::GetInstance());
@@ -51,10 +50,10 @@ AccessibilityQueryServiceFactory::AccessibilityQueryServiceFactory()
   DependsOn(PersonalContextServiceFactory::GetInstance());
 }
 
-AccessibilityQueryServiceFactory::~AccessibilityQueryServiceFactory() = default;
+AtMemoryQueryServiceFactory::~AtMemoryQueryServiceFactory() = default;
 
 std::unique_ptr<KeyedService>
-AccessibilityQueryServiceFactory::BuildServiceInstanceForBrowserContext(
+AtMemoryQueryServiceFactory::BuildServiceInstanceForBrowserContext(
     content::BrowserContext* context) const {
   if (!autofill::IsAtMemoryFeatureEnabled(
           GoogleGroupsManagerFactory::GetForBrowserContext(context))) {
@@ -82,15 +81,13 @@ AccessibilityQueryServiceFactory::BuildServiceInstanceForBrowserContext(
             g_browser_process->GetApplicationLocale());
   }
 
-  return std::make_unique<accessibility_annotator::AccessibilityQueryService>(
+  return std::make_unique<accessibility_annotator::AtMemoryQueryService>(
       std::make_unique<
-          accessibility_annotator::AccessibilityQueryServiceDelegateImpl>(
-          profile),
+          accessibility_annotator::AtMemoryQueryServiceDelegateImpl>(profile),
       std::move(data_provider), std::move(personal_context_resolver),
       optimization_guide_service);
 }
 
-bool AccessibilityQueryServiceFactory::ServiceIsCreatedWithBrowserContext()
-    const {
+bool AtMemoryQueryServiceFactory::ServiceIsCreatedWithBrowserContext() const {
   return false;
 }

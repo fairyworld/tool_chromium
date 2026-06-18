@@ -20,9 +20,9 @@
 #include "base/memory/weak_ptr.h"
 #include "base/notreached.h"
 #include "build/build_config.h"
-#include "components/accessibility_annotator/core/accessibility_query_service.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_data_type.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_search_result.h"
+#include "components/accessibility_annotator/core/at_memory_query_service.h"
 #include "components/autofill/core/browser/at_memory/at_memory_data_type.h"
 #include "components/autofill/core/browser/at_memory/at_memory_funnel_metrics.h"
 #include "components/autofill/core/browser/at_memory/at_memory_utils.h"
@@ -662,8 +662,8 @@ void AtMemoryManager::MaybeAppendPersonalContextNotice(
 }
 
 void AtMemoryManager::ExecuteQuery(const std::u16string& filter) {
-  accessibility_annotator::AccessibilityQueryService* query_service =
-      owner_->client().GetAccessibilityQueryService();
+  accessibility_annotator::AtMemoryQueryService* query_service =
+      owner_->client().GetAtMemoryQueryService();
   if (!query_service || !IsAtMemoryTriggerSource(trigger_source_) ||
       !update_callback_) {
     return;

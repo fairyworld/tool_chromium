@@ -2,22 +2,22 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_MOCK_ACCESSIBILITY_QUERY_SERVICE_H_
-#define COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_MOCK_ACCESSIBILITY_QUERY_SERVICE_H_
+#ifndef COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_MOCK_AT_MEMORY_QUERY_SERVICE_H_
+#define COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_MOCK_AT_MEMORY_QUERY_SERVICE_H_
 
 #include <vector>
 
-#include "components/accessibility_annotator/core/accessibility_query_service.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_search_result.h"
+#include "components/accessibility_annotator/core/at_memory_query_service.h"
 #include "testing/gmock/include/gmock/gmock.h"
 
 namespace accessibility_annotator {
 
-class MockAccessibilityQueryService
-    : public accessibility_annotator::AccessibilityQueryService {
+class MockAtMemoryQueryService
+    : public accessibility_annotator::AtMemoryQueryService {
  public:
-  MockAccessibilityQueryService();
-  ~MockAccessibilityQueryService() override;
+  MockAtMemoryQueryService();
+  ~MockAtMemoryQueryService() override;
 
   MOCK_METHOD(
       void,
@@ -30,4 +30,4 @@ class MockAccessibilityQueryService
 
 }  // namespace accessibility_annotator
 
-#endif  // COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_MOCK_ACCESSIBILITY_QUERY_SERVICE_H_
+#endif  // COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_MOCK_AT_MEMORY_QUERY_SERVICE_H_

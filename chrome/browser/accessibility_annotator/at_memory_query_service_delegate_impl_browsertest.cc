@@ -8,7 +8,7 @@
 
 #include "base/functional/callback.h"
 #include "base/test/test_future.h"
-#include "chrome/browser/accessibility_annotator/accessibility_query_service_delegate_impl.h"
+#include "chrome/browser/accessibility_annotator/at_memory_query_service_delegate_impl.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_tabstrip.h"
 #include "chrome/test/base/in_process_browser_test.h"
@@ -31,17 +31,17 @@ using ::testing::NiceMock;
 using ::testing::Return;
 using ::testing::UnorderedElementsAre;
 
-class AccessibilityQueryServiceDelegateImplBrowserTest
+class AtMemoryQueryServiceDelegateImplBrowserTest
     : public InProcessBrowserTest {
  public:
-  AccessibilityQueryServiceDelegateImplBrowserTest() = default;
-  ~AccessibilityQueryServiceDelegateImplBrowserTest() override = default;
+  AtMemoryQueryServiceDelegateImplBrowserTest() = default;
+  ~AtMemoryQueryServiceDelegateImplBrowserTest() override = default;
 };
 
 // RetrieveLiveTabContext returns an empty response when dependencies missing.
-IN_PROC_BROWSER_TEST_F(AccessibilityQueryServiceDelegateImplBrowserTest,
+IN_PROC_BROWSER_TEST_F(AtMemoryQueryServiceDelegateImplBrowserTest,
                        RetrieveLiveTabContext_MissingDependencies) {
-  AccessibilityQueryServiceDelegateImpl delegate(browser()->profile());
+  AtMemoryQueryServiceDelegateImpl delegate(browser()->profile());
 
   LiveTabContextQuery query;
   query.query = u"test query";
@@ -54,7 +54,7 @@ IN_PROC_BROWSER_TEST_F(AccessibilityQueryServiceDelegateImplBrowserTest,
 }
 
 // RetrieveLiveTabContext returns valid response when dependencies available.
-IN_PROC_BROWSER_TEST_F(AccessibilityQueryServiceDelegateImplBrowserTest,
+IN_PROC_BROWSER_TEST_F(AtMemoryQueryServiceDelegateImplBrowserTest,
                        RetrieveLiveTabContext_Success) {
   // Setup mock services.
   Profile* profile = browser()->profile();
@@ -74,9 +74,9 @@ IN_PROC_BROWSER_TEST_F(AccessibilityQueryServiceDelegateImplBrowserTest,
       .WillOnce(Return(CreatePassageEmbeddings("passage 2")))
       .WillOnce(Return(CreatePassageEmbeddings("passage 3")));
 
-  AccessibilityQueryServiceDelegateImpl delegate(
-      profile, &mock_extraction_service, &mock_embeddings_service,
-      &test_embedder);
+  AtMemoryQueryServiceDelegateImpl delegate(profile, &mock_extraction_service,
+                                            &mock_embeddings_service,
+                                            &test_embedder);
 
   // Create 3 tabs.
   // The browser starts with 1 tab by default. We add 2 more.

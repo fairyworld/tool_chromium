@@ -133,8 +133,8 @@ const AutofillComposeDelegate* AutofillClient::GetComposeDelegate() const {
   return const_cast<AutofillClient*>(this)->GetComposeDelegate();
 }
 
-accessibility_annotator::AccessibilityQueryService*
-AutofillClient::GetAccessibilityQueryService() {
+accessibility_annotator::AtMemoryQueryService*
+AutofillClient::GetAtMemoryQueryService() {
   return nullptr;
 }
 

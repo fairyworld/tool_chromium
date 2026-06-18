@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/accessibility_annotator/core/accessibility_query_service.h"
+#include "components/accessibility_annotator/core/at_memory_query_service.h"
 
 #include <algorithm>
 #include <iterator>
@@ -130,8 +130,8 @@ MemorySearchStatus MapContextMemoryError(
 
 }  // namespace
 
-AccessibilityQueryService::AccessibilityQueryService(
-    std::unique_ptr<AccessibilityQueryServiceDelegate> delegate,
+AtMemoryQueryService::AtMemoryQueryService(
+    std::unique_ptr<AtMemoryQueryServiceDelegate> delegate,
     std::unique_ptr<MemoryDataProvider> data_provider,
     std::unique_ptr<PersonalContextResolver> personal_context_resolver,
     optimization_guide::RemoteModelExecutor* remote_model_executor)
@@ -140,14 +140,14 @@ AccessibilityQueryService::AccessibilityQueryService(
       personal_context_resolver_(std::move(personal_context_resolver)),
       classifier_(CreateQueryClassifier(remote_model_executor)) {}
 
-AccessibilityQueryService::~AccessibilityQueryService() = default;
+AtMemoryQueryService::~AtMemoryQueryService() = default;
 
-void AccessibilityQueryService::Shutdown() {
+void AtMemoryQueryService::Shutdown() {
   data_provider_.reset();
   personal_context_resolver_.reset();
 }
 
-void AccessibilityQueryService::Query(
+void AtMemoryQueryService::Query(
     std::u16string_view query,
     base::RepeatingCallback<void(MemorySearchResults)> update_callback) {
   // Invalidate any in-flight queries.
@@ -168,12 +168,12 @@ void AccessibilityQueryService::Query(
   // from `AutofillDataProvider`.
   classifier_.Run(
       std::u16string(query),
-      base::BindOnce(&AccessibilityQueryService::OnClassificationComplete,
+      base::BindOnce(&AtMemoryQueryService::OnClassificationComplete,
                      weak_ptr_factory_.GetWeakPtr(), std::u16string(query),
                      std::move(update_callback)));
 }
 
-void AccessibilityQueryService::OnClassificationComplete(
+void AtMemoryQueryService::OnClassificationComplete(
     std::u16string query,
     base::RepeatingCallback<void(MemorySearchResults)> update_callback,
     ClassifiedQuery classified_query) {
@@ -188,16 +188,15 @@ void AccessibilityQueryService::OnClassificationComplete(
 
   MemoryDataType intent = classified_query.intent;
 
-  auto callback =
-      base::BindOnce(&AccessibilityQueryService::OnDataRetrieved,
-                     weak_ptr_factory_.GetWeakPtr(), std::move(query),
-                     std::move(classified_query), update_callback);
+  auto callback = base::BindOnce(
+      &AtMemoryQueryService::OnDataRetrieved, weak_ptr_factory_.GetWeakPtr(),
+      std::move(query), std::move(classified_query), update_callback);
 
   auto log_and_call_retrieved = base::BindOnce(
       [](base::OnceCallback<void(std::vector<MemorySearchResult>)> callback,
          std::vector<MemorySearchResult> results) {
         base::UmaHistogramCounts1000(
-            "AccessibilityAnnotator.AccessibilityQueryService."
+            "AccessibilityAnnotator.AtMemoryQueryService."
             "ProviderResultCount.AutofillDataProvider",
             results.size());
         std::move(callback).Run(std::move(results));
@@ -207,7 +206,7 @@ void AccessibilityQueryService::OnClassificationComplete(
   data_provider_->RetrieveAll({intent}, std::move(log_and_call_retrieved));
 }
 
-void AccessibilityQueryService::OnDataRetrieved(
+void AtMemoryQueryService::OnDataRetrieved(
     std::u16string query,
     ClassifiedQuery classified_query,
     base::RepeatingCallback<void(MemorySearchResults)> update_callback,
@@ -245,7 +244,7 @@ void AccessibilityQueryService::OnDataRetrieved(
                                std::move(fallback_local_entries));
 }
 
-void AccessibilityQueryService::QueryPersonalContextResolver(
+void AtMemoryQueryService::QueryPersonalContextResolver(
     std::u16string query,
     ClassifiedQuery classified_query,
     base::RepeatingCallback<void(MemorySearchResults)> update_callback,
@@ -264,15 +263,15 @@ void AccessibilityQueryService::QueryPersonalContextResolver(
   }
 
   personal_context_resolver_->Query(
-      query, base::BindOnce(
-                 &AccessibilityQueryService::OnPersonalContextResolverComplete,
-                 personal_context_weak_ptr_factory_.GetWeakPtr(),
-                 std::move(classified_query), update_callback,
-                 std::move(filtered_local_entries),
-                 std::move(fallback_local_entries)));
+      query,
+      base::BindOnce(&AtMemoryQueryService::OnPersonalContextResolverComplete,
+                     personal_context_weak_ptr_factory_.GetWeakPtr(),
+                     std::move(classified_query), update_callback,
+                     std::move(filtered_local_entries),
+                     std::move(fallback_local_entries)));
 }
 
-void AccessibilityQueryService::OnPersonalContextResolverComplete(
+void AtMemoryQueryService::OnPersonalContextResolverComplete(
     ClassifiedQuery classified_query,
     base::RepeatingCallback<void(MemorySearchResults)> update_callback,
     std::vector<MemorySearchResult> filtered_local_entries,

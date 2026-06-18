@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_ACCESSIBILITY_QUERY_SERVICE_H_
-#define COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_ACCESSIBILITY_QUERY_SERVICE_H_
+#ifndef COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_AT_MEMORY_QUERY_SERVICE_H_
+#define COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_AT_MEMORY_QUERY_SERVICE_H_
 
 #include <memory>
 #include <string>
@@ -13,11 +13,11 @@
 #include "base/functional/callback.h"
 #include "base/memory/weak_ptr.h"
 #include "base/types/expected.h"
-#include "components/accessibility_annotator/core/accessibility_query_service_delegate.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_data_provider.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_search_result.h"
 #include "components/accessibility_annotator/core/annotation_reducer/personal_context_resolver.h"
 #include "components/accessibility_annotator/core/annotation_reducer/query_classifier.h"
+#include "components/accessibility_annotator/core/at_memory_query_service_delegate.h"
 #include "components/keyed_service/core/keyed_service.h"
 #include "components/personal_context/core/context_memory_error.h"
 
@@ -30,17 +30,16 @@ namespace accessibility_annotator {
 class MemoryDataProvider;
 
 // Service for querying @memory suggestions.
-class AccessibilityQueryService : public KeyedService {
+class AtMemoryQueryService : public KeyedService {
  public:
-  AccessibilityQueryService(
-      std::unique_ptr<AccessibilityQueryServiceDelegate> delegate,
+  AtMemoryQueryService(
+      std::unique_ptr<AtMemoryQueryServiceDelegate> delegate,
       std::unique_ptr<MemoryDataProvider> data_provider,
       std::unique_ptr<PersonalContextResolver> personal_context_resolver,
       optimization_guide::RemoteModelExecutor* remote_model_executor);
-  AccessibilityQueryService(const AccessibilityQueryService&) = delete;
-  AccessibilityQueryService& operator=(const AccessibilityQueryService&) =
-      delete;
-  ~AccessibilityQueryService() override;
+  AtMemoryQueryService(const AtMemoryQueryService&) = delete;
+  AtMemoryQueryService& operator=(const AtMemoryQueryService&) = delete;
+  ~AtMemoryQueryService() override;
 
   // KeyedService:
   void Shutdown() override;
@@ -86,16 +85,16 @@ class AccessibilityQueryService : public KeyedService {
                      personal_context::ContextMemoryError>
           personal_context_entries);
 
-  std::unique_ptr<AccessibilityQueryServiceDelegate> delegate_;
+  std::unique_ptr<AtMemoryQueryServiceDelegate> delegate_;
   std::unique_ptr<MemoryDataProvider> data_provider_;
   std::unique_ptr<PersonalContextResolver> personal_context_resolver_;
   QueryClassifier classifier_;
 
-  base::WeakPtrFactory<AccessibilityQueryService> weak_ptr_factory_{this};
-  base::WeakPtrFactory<AccessibilityQueryService>
-      personal_context_weak_ptr_factory_{this};
+  base::WeakPtrFactory<AtMemoryQueryService> weak_ptr_factory_{this};
+  base::WeakPtrFactory<AtMemoryQueryService> personal_context_weak_ptr_factory_{
+      this};
 };
 
 }  // namespace accessibility_annotator
 
-#endif  // COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_ACCESSIBILITY_QUERY_SERVICE_H_
+#endif  // COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_AT_MEMORY_QUERY_SERVICE_H_

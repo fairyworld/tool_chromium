@@ -25,7 +25,7 @@
 #include "base/task/single_thread_task_runner.h"
 #include "base/time/time.h"
 #include "build/build_config.h"
-#include "chrome/browser/accessibility_annotator/accessibility_query_service_factory.h"
+#include "chrome/browser/accessibility_annotator/at_memory_query_service_factory.h"
 #include "chrome/browser/account_settings/account_setting_service_factory.h"
 #include "chrome/browser/actor/actor_keyed_service.h"
 #include "chrome/browser/autofill/actor/actor_key_metrics_recorder.h"
@@ -489,11 +489,11 @@ AutofillComposeDelegate* ChromeAutofillClient::GetComposeDelegate() {
 #endif
 }
 
-accessibility_annotator::AccessibilityQueryService*
-ChromeAutofillClient::GetAccessibilityQueryService() {
+accessibility_annotator::AtMemoryQueryService*
+ChromeAutofillClient::GetAtMemoryQueryService() {
   Profile* profile =
       Profile::FromBrowserContext(web_contents()->GetBrowserContext());
-  return AccessibilityQueryServiceFactory::GetForProfile(profile);
+  return AtMemoryQueryServiceFactory::GetForProfile(profile);
 }
 
 personal_context::PersonalContextEnablementState

@@ -26,11 +26,11 @@
 #include "base/uuid.h"
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
-#include "components/accessibility_annotator/core/accessibility_query_service.h"
-#include "components/accessibility_annotator/core/accessibility_query_service_delegate.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_data_provider.h"
 #include "components/accessibility_annotator/core/annotation_reducer/memory_search_result.h"
-#include "components/accessibility_annotator/core/mock_accessibility_query_service.h"
+#include "components/accessibility_annotator/core/at_memory_query_service.h"
+#include "components/accessibility_annotator/core/at_memory_query_service_delegate.h"
+#include "components/accessibility_annotator/core/mock_at_memory_query_service.h"
 #include "components/autofill/core/browser/autofill_trigger_source.h"
 #include "components/autofill/core/browser/data_manager/addresses/address_data_manager.h"
 #include "components/autofill/core/browser/data_manager/payments/payments_data_manager.h"
@@ -368,8 +368,8 @@ class MockBrowserAutofillManager : public TestBrowserAutofillManager {
   MOCK_METHOD(void, OnSuggestionsHidden, (SuggestionHidingReason), (override));
 };
 
-class StubAccessibilityQueryServiceDelegate
-    : public accessibility_annotator::AccessibilityQueryServiceDelegate {
+class StubAtMemoryQueryServiceDelegate
+    : public accessibility_annotator::AtMemoryQueryServiceDelegate {
  public:
   void RetrieveLiveTabContext(
       accessibility_annotator::LiveTabContextQuery query,
@@ -495,17 +495,17 @@ class AutofillExternalDelegateTest : public testing::Test,
             testing::Field(&Suggestion::Text::value, label))));
   }
 
-  // Set up the mock AccessibilityQueryService to return the provided results
+  // Set up the mock AtMemoryQueryService to return the provided results
   // for a specific query.
-  void SetupMockAccessibilityQueryService(
+  void SetupMockAtMemoryQueryService(
       const std::u16string& query,
       accessibility_annotator::MemorySearchResults results) {
-    auto mock_service = std::make_unique<testing::NiceMock<
-        accessibility_annotator::MockAccessibilityQueryService>>();
+    auto mock_service = std::make_unique<
+        testing::NiceMock<accessibility_annotator::MockAtMemoryQueryService>>();
     EXPECT_CALL(*mock_service, Query(Eq(query), _))
         .WillOnce(base::test::RunOnceCallback<1>(std::move(results)));
     // Inject the mock service into the client.
-    autofill_client().set_accessibility_query_service(std::move(mock_service));
+    autofill_client().set_at_memory_query_service(std::move(mock_service));
   }
 
   void StartAtMemorySession(AutofillSuggestionTriggerSource trigger_source =
@@ -868,7 +868,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryFlyoutChildrenFirstPartySources) {
       accessibility_annotator::MemorySearchStatus::kFinalResponseSuccess,
       std::move(entries));
 
-  SetupMockAccessibilityQueryService(u"shoe size", std::move(search_results));
+  SetupMockAtMemoryQueryService(u"shoe size", std::move(search_results));
 
   std::u16string expected_label = l10n_util::GetStringFUTF16(
       IDS_AUTOFILL_AT_MEMORY_SOURCE_ATTRIBUTION_DESCRIPTION,
@@ -917,7 +917,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryFlyoutChildrenAutofillSource) {
       accessibility_annotator::MemorySearchStatus::kFinalResponseSuccess,
       std::move(entries));
 
-  SetupMockAccessibilityQueryService(u"addr", std::move(search_results));
+  SetupMockAtMemoryQueryService(u"addr", std::move(search_results));
 
   auto matcher = testing::ElementsAre(testing::AllOf(
       HasMainText(u"1600 Amphitheatre Pkwy"),
@@ -962,11 +962,11 @@ TEST_F(AutofillExternalDelegateTest,
       accessibility_annotator::MemorySearchStatus::kFinalResponseSuccess,
       std::move(entries1));
 
-  auto mock_service = std::make_unique<testing::NiceMock<
-      accessibility_annotator::MockAccessibilityQueryService>>();
-  accessibility_annotator::MockAccessibilityQueryService* mock_service_ptr =
+  auto mock_service = std::make_unique<
+      testing::NiceMock<accessibility_annotator::MockAtMemoryQueryService>>();
+  accessibility_annotator::MockAtMemoryQueryService* mock_service_ptr =
       mock_service.get();
-  autofill_client().set_accessibility_query_service(std::move(mock_service));
+  autofill_client().set_at_memory_query_service(std::move(mock_service));
 
   EXPECT_CALL(*mock_service_ptr, Query(std::u16string_view(u"addr"), _))
       .WillOnce(base::test::RunOnceCallback<1>(std::move(search_results1)));
@@ -1022,11 +1022,11 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryPartialResponseKeepsSearching) {
       AutofillClient::SuggestionUiSessionId(1));
   external_delegate().OnSuggestionsShown({});
 
-  auto mock_service = std::make_unique<testing::NiceMock<
-      accessibility_annotator::MockAccessibilityQueryService>>();
-  accessibility_annotator::MockAccessibilityQueryService* mock_service_ptr =
+  auto mock_service = std::make_unique<
+      testing::NiceMock<accessibility_annotator::MockAtMemoryQueryService>>();
+  accessibility_annotator::MockAtMemoryQueryService* mock_service_ptr =
       mock_service.get();
-  autofill_client().set_accessibility_query_service(std::move(mock_service));
+  autofill_client().set_at_memory_query_service(std::move(mock_service));
 
   base::RepeatingCallback<void(accessibility_annotator::MemorySearchResults)>
       received_callback;
@@ -1080,11 +1080,11 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryFinalResponseStopsSearching) {
       AutofillClient::SuggestionUiSessionId(1));
   external_delegate().OnSuggestionsShown({});
 
-  auto mock_service = std::make_unique<testing::NiceMock<
-      accessibility_annotator::MockAccessibilityQueryService>>();
-  accessibility_annotator::MockAccessibilityQueryService* mock_service_ptr =
+  auto mock_service = std::make_unique<
+      testing::NiceMock<accessibility_annotator::MockAtMemoryQueryService>>();
+  accessibility_annotator::MockAtMemoryQueryService* mock_service_ptr =
       mock_service.get();
-  autofill_client().set_accessibility_query_service(std::move(mock_service));
+  autofill_client().set_at_memory_query_service(std::move(mock_service));
 
   base::RepeatingCallback<void(accessibility_annotator::MemorySearchResults)>
       received_callback;
@@ -1138,11 +1138,11 @@ TEST_F(AutofillExternalDelegateTest,
       AutofillClient::SuggestionUiSessionId(1));
   external_delegate().OnSuggestionsShown({});
 
-  auto mock_service = std::make_unique<testing::NiceMock<
-      accessibility_annotator::MockAccessibilityQueryService>>();
-  accessibility_annotator::MockAccessibilityQueryService* mock_service_ptr =
+  auto mock_service = std::make_unique<
+      testing::NiceMock<accessibility_annotator::MockAtMemoryQueryService>>();
+  accessibility_annotator::MockAtMemoryQueryService* mock_service_ptr =
       mock_service.get();
-  autofill_client().set_accessibility_query_service(std::move(mock_service));
+  autofill_client().set_at_memory_query_service(std::move(mock_service));
 
   base::RepeatingCallback<void(accessibility_annotator::MemorySearchResults)>
       received_callback;
@@ -1181,11 +1181,11 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryStaleResponseIgnored) {
       AutofillClient::SuggestionUiSessionId(1));
   external_delegate().OnSuggestionsShown({});
 
-  auto mock_service = std::make_unique<testing::NiceMock<
-      accessibility_annotator::MockAccessibilityQueryService>>();
-  accessibility_annotator::MockAccessibilityQueryService* mock_service_ptr =
+  auto mock_service = std::make_unique<
+      testing::NiceMock<accessibility_annotator::MockAtMemoryQueryService>>();
+  accessibility_annotator::MockAtMemoryQueryService* mock_service_ptr =
       mock_service.get();
-  autofill_client().set_accessibility_query_service(std::move(mock_service));
+  autofill_client().set_at_memory_query_service(std::move(mock_service));
 
   base::RepeatingCallback<void(accessibility_annotator::MemorySearchResults)>
       received_callback1;
@@ -1273,7 +1273,7 @@ TEST_P(AutofillExternalDelegateAutoSuggestInactivityTest,
 TEST_F(AutofillExternalDelegateTest, AtMemoryRemoteQuery_UnsupportedQuery) {
   StartAtMemorySession();
 
-  SetupMockAccessibilityQueryService(
+  SetupMockAtMemoryQueryService(
       u"shoe size",
       {accessibility_annotator::MemorySearchStatus::kUnsupportedQuery, {}});
 
@@ -1303,7 +1303,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryRemoteQuery_UnsupportedQuery) {
 TEST_F(AutofillExternalDelegateTest, AtMemoryRemoteQuery_NoData) {
   StartAtMemorySession();
 
-  SetupMockAccessibilityQueryService(
+  SetupMockAtMemoryQueryService(
       u"shoe size",
       {accessibility_annotator::MemorySearchStatus::kFinalResponseSuccess, {}});
 
@@ -1331,7 +1331,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryRemoteQuery_NoData) {
 TEST_F(AutofillExternalDelegateTest, AtMemoryRemoteQuery_NoConnection) {
   StartAtMemorySession();
 
-  SetupMockAccessibilityQueryService(
+  SetupMockAtMemoryQueryService(
       u"shoe size",
       {accessibility_annotator::MemorySearchStatus::kDataFetchFailure, {}});
 
@@ -1372,7 +1372,7 @@ TEST_P(AutofillExternalDelegateAtMemoryGenericErrorTest,
        AtMemoryRemoteQuery_GenericError) {
   StartAtMemorySession();
 
-  SetupMockAccessibilityQueryService(u"shoe size", {GetParam(), {}});
+  SetupMockAtMemoryQueryService(u"shoe size", {GetParam(), {}});
 
   EXPECT_CALL(autofill_client(), UpdateAutofillSuggestions)
       .WillOnce(Return())

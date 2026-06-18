@@ -109,7 +109,7 @@ class AutofillPopupControllerImplTest
 
     // 2. Setup the backend expectation if the query is non-empty.
     if (!query.empty()) {
-      EXPECT_CALL(*client().accessibility_query_service(),
+      EXPECT_CALL(*client().at_memory_query_service(),
                   Query(std::u16string_view(query), _))
           .WillOnce(base::test::RunOnceCallback<1>(std::move(search_results)));
     }

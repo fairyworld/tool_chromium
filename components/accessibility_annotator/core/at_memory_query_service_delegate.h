@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_ACCESSIBILITY_QUERY_SERVICE_DELEGATE_H_
-#define COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_ACCESSIBILITY_QUERY_SERVICE_DELEGATE_H_
+#ifndef COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_AT_MEMORY_QUERY_SERVICE_DELEGATE_H_
+#define COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_AT_MEMORY_QUERY_SERVICE_DELEGATE_H_
 
 #include <string>
 #include <vector>
@@ -32,11 +32,11 @@ struct LiveTabContextResponse {
   std::vector<std::u16string> results;
 };
 
-// A delegate interface for the AccessibilityQueryService to interface with
+// A delegate interface for the AtMemoryQueryService to interface with
 // browser-level services.
-class AccessibilityQueryServiceDelegate {
+class AtMemoryQueryServiceDelegate {
  public:
-  virtual ~AccessibilityQueryServiceDelegate() = default;
+  virtual ~AtMemoryQueryServiceDelegate() = default;
   virtual void RetrieveLiveTabContext(
       LiveTabContextQuery query,
       base::OnceCallback<void(LiveTabContextResponse)> callback) = 0;
@@ -44,4 +44,4 @@ class AccessibilityQueryServiceDelegate {
 
 }  // namespace accessibility_annotator
 
-#endif  // COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_ACCESSIBILITY_QUERY_SERVICE_DELEGATE_H_
+#endif  // COMPONENTS_ACCESSIBILITY_ANNOTATOR_CORE_AT_MEMORY_QUERY_SERVICE_DELEGATE_H_

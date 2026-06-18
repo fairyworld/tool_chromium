@@ -5,7 +5,7 @@
 source_set("accessibility_annotator") {
   sources = [
     "accessibility_annotator_backend_factory.h",
-    "accessibility_query_service_factory.h",
+    "at_memory_query_service_factory.h",
   ]
 
   deps = [
@@ -24,9 +24,9 @@ source_set("accessibility_annotator") {
 source_set("impl") {
   sources = [
     "accessibility_annotator_backend_factory.cc",
-    "accessibility_query_service_delegate_impl.cc",
-    "accessibility_query_service_delegate_impl.h",
-    "accessibility_query_service_factory.cc",
+    "at_memory_query_service_delegate_impl.cc",
+    "at_memory_query_service_delegate_impl.h",
+    "at_memory_query_service_factory.cc",
   ]
   deps = [
     ":accessibility_annotator",
@@ -83,7 +83,7 @@ if (!is_android) {
   source_set("browser_tests") {
     testonly = true
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
-    sources = [ "accessibility_query_service_delegate_impl_browsertest.cc" ]
+    sources = [ "at_memory_query_service_delegate_impl_browsertest.cc" ]
     deps = [
       ":accessibility_annotator",
       ":impl",
