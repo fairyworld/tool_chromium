@@ -17212,6 +17212,24 @@
             ]
         }
     ],
+    "OAuthMultiloginYoutubeCookiesBinding": [
+        {
+            "platforms": [
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "EnabledLiveLaunch",
+                    "params": {
+                        "OAuthMultiloginYoutubeCookieBindingEnforced": "true"
+                    },
+                    "enable_features": [
+                        "EnableOAuthMultiloginYoutubeCookiesBinding"
+                    ]
+                }
+            ]
+        }
+    ],
     "OcclusionCullingQuadSplitLimit": [
         {
             "platforms": [
