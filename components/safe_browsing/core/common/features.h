@@ -161,10 +161,6 @@ BASE_DECLARE_FEATURE(kClientSideDetectionRedirectChainKillswitch);
 BASE_DECLARE_FEATURE(kClientSideDetectionRetryLimit);
 extern const base::FeatureParam<int> kClientSideDetectionRetryLimitTime;
 
-// Send a sample CSPP ping when a URL matches the CSD allowlist and all other
-// preclassification check conditions pass.
-BASE_DECLARE_FEATURE(kClientSideDetectionSamplePing);
-
 #if BUILDFLAG(IS_ANDROID)
 // Inquire the server-side model instead of the on-device model for scam
 // detection.

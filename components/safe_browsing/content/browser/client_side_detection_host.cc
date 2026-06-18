@@ -765,8 +765,7 @@ class ClientSideDetectionHost::ShouldClassifyUrlRequest {
                ClientSideDetectionType::TRIGGER_MODELS &&
            host_ && host_->delegate_->GetPrefs() &&
            IsEnhancedProtectionEnabled(*host_->delegate_->GetPrefs()) &&
-           base::RandDouble() <= kProbabilityForSendingSampleRequest &&
-           base::FeatureList::IsEnabled(kClientSideDetectionSamplePing);
+           base::RandDouble() <= kProbabilityForSendingSampleRequest;
   }
 
   bool ShouldAcceptHCAllowlist() {
