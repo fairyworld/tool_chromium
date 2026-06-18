@@ -163,14 +163,14 @@ final class SidePanelContainerCoordinatorImpl
 
     @Override
     @Px
-    public int determineContainerWidth(@Px int availableWidth, @Px int windowWidth) {
-        log(TAG, "determineContainerWidth", availableWidth, windowWidth);
+    public int determineShowableWidth(@Px int availableWidth, @Px int windowWidth) {
+        log(TAG, "determineShowableWidth", availableWidth, windowWidth);
         ThreadUtils.assertOnUiThread();
 
         int availableWidthDp = ViewUtils.pxToDp(mParentActivity, availableWidth);
         int windowWidthDp = ViewUtils.pxToDp(mParentActivity, windowWidth);
-        int containerWidthDp = determineContainerWidthDp(availableWidthDp, windowWidthDp);
-        return ViewUtils.dpToPx(mParentActivity, containerWidthDp);
+        int showableWidthDp = determineShowableWidthDp(availableWidthDp, windowWidthDp);
+        return ViewUtils.dpToPx(mParentActivity, showableWidthDp);
     }
 
     @Override
@@ -240,7 +240,7 @@ final class SidePanelContainerCoordinatorImpl
      * Returns the final width (in dp) of the side panel given the available width in the window.
      */
     @VisibleForTesting
-    static int determineContainerWidthDp(int availableWidthDp, int windowWidthDp) {
+    static int determineShowableWidthDp(int availableWidthDp, int windowWidthDp) {
         // 1. Check if we can use the fixed, larger width.
         if (windowWidthDp >= MIN_WINDOW_WIDTH_DP_FOR_WIDE_SIDE_PANEL) {
             assert availableWidthDp >= WIDE_SIDE_PANEL_WIDTH_DP;

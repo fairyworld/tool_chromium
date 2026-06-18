@@ -28,10 +28,10 @@ public final class TestSideUiContainer implements SideUiContainer {
      */
     public boolean mHasContentToShow = true;
 
-    /** The last {@code availableWidth} received by {@link #determineContainerWidth}. */
+    /** The last {@code availableWidth} received by {@link #determineShowableWidth}. */
     public @Nullable @Px Integer mLastAvailableWidth;
 
-    /** The last {@code windowWidth} received by {@link #determineContainerWidth}. */
+    /** The last {@code windowWidth} received by {@link #determineShowableWidth}. */
     public @Nullable @Px Integer mLastWindowWidth;
 
     /** Maximum width for this {@link SideUiContainer}. */
@@ -67,7 +67,7 @@ public final class TestSideUiContainer implements SideUiContainer {
     }
 
     @Override
-    public int determineContainerWidth(@Px int availableWidth, @Px int windowWidth) {
+    public int determineShowableWidth(@Px int availableWidth, @Px int windowWidth) {
         assert availableWidth <= windowWidth;
         assert mMinWidthDp <= mMaxWidthDp;
         assert mMaxWidthDp <= windowWidth;

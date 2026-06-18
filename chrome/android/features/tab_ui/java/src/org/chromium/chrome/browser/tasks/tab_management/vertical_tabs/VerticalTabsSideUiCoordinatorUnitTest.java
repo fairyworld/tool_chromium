@@ -94,16 +94,16 @@ public class VerticalTabsSideUiCoordinatorUnitTest {
 
     @Test
     @SmallTest
-    public void testDetermineContainerWidth() {
+    public void testDetermineShowableWidth() {
         @Px int viewWidth = ViewUtils.dpToPx(mActivity, VIEW_WIDTH_DP);
 
         assertEquals(
                 0,
-                mCoordinator.determineContainerWidth(
+                mCoordinator.determineShowableWidth(
                         /* availableWidth= */ viewWidth - 1, /* windowWidth= */ viewWidth + 100));
         assertEquals(
                 viewWidth,
-                mCoordinator.determineContainerWidth(
+                mCoordinator.determineShowableWidth(
                         /* availableWidth= */ viewWidth, /* windowWidth= */ viewWidth + 100));
     }
 

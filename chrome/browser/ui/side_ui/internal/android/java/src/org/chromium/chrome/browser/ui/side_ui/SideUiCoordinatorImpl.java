@@ -190,12 +190,12 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
 
         for (var container : mSideUiContainers) {
             if (container.getSideUiId() == sideUiId) {
-                return container.determineContainerWidth(availableWidth, windowWidth) > 0;
+                return container.determineShowableWidth(availableWidth, windowWidth) > 0;
             }
             if (container.hasContentToShow()) {
                 @Px
-                int containerWidth = container.determineContainerWidth(availableWidth, windowWidth);
-                availableWidth = Math.max(availableWidth - containerWidth, 0);
+                int showableWidth = container.determineShowableWidth(availableWidth, windowWidth);
+                availableWidth = Math.max(availableWidth - showableWidth, 0);
             }
         }
         return false;
@@ -383,7 +383,7 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
         for (var container : mSideUiContainers) {
             int newSideUiWidth =
                     container.hasContentToShow()
-                            ? container.determineContainerWidth(availableWidth, windowWidth)
+                            ? container.determineShowableWidth(availableWidth, windowWidth)
                             : 0;
             sideUiWidths.put(container.getAnchorSide(), newSideUiWidth);
             availableWidth = Math.max(availableWidth - newSideUiWidth, 0);

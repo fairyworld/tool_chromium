@@ -318,7 +318,7 @@ public class SideUiCoordinatorImplTest {
     }
 
     @Test
-    public void testRequestUpdateContainer_InvokeDetermineContainerWidth() {
+    public void testRequestUpdateContainer_InvokeDetermineShowableWidth() {
         var sideUiContainer =
                 new TestSideUiContainer(
                         mCoordinator, mSideUiContainerView, SideUiId.SIDE_PANEL, AnchorSide.RIGHT);
@@ -330,7 +330,7 @@ public class SideUiCoordinatorImplTest {
                 /* suppressAnimations= */ true);
         RobolectricUtil.runAllBackgroundAndUi();
 
-        // Verify SideUiContainer#determineContainerWidth() is invoked with correct parameters.
+        // Verify SideUiContainer#determineShowableWidth() is invoked with correct parameters.
         int minWebContentsWidthPx = ViewUtils.dpToPx(mTestActivity, MIN_WEB_CONTENTS_WIDTH_DP);
         assertEquals(
                 Integer.valueOf(WINDOW_SIZE_PX.getWidth() - minWebContentsWidthPx),
@@ -434,7 +434,7 @@ public class SideUiCoordinatorImplTest {
         RobolectricUtil.runAllBackgroundAndUi();
 
         // Simulate a configuration change that the window becomes too narrow.
-        // The new configuration should force TestSideUiContainer#determineContainerWidth() to
+        // The new configuration should force TestSideUiContainer#determineShowableWidth() to
         // return 0.
         int minWindowWidthDpForVisibleSideUi =
                 MIN_WEB_CONTENTS_WIDTH_DP + sideUiContainer.mMinWidthDp;
@@ -447,7 +447,7 @@ public class SideUiCoordinatorImplTest {
         assertEquals(0, getSideUiContainerViewWidth());
 
         // Simulate another configuration change that the window becomes wide enough again.
-        // The new configuration should make TestSideUiContainer#determineContainerWidth() return
+        // The new configuration should make TestSideUiContainer#determineShowableWidth() return
         // a positive value.
         RuntimeEnvironment.setQualifiers(
                 "w" + minWindowWidthDpForVisibleSideUi + "dp-h1080dp-mdpi");

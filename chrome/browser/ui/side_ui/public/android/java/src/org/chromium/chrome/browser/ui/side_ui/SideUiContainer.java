@@ -58,13 +58,11 @@ public interface SideUiContainer {
      * {@code windowWidth}, but it should <i>not</i> depend on states like whether there is content
      * to show.
      *
-     * <p>TODO(crbug.com/478338737): Rename this method as "determineShowableWidth()".
-     *
      * @param availableWidth The available width that this container can consume in px.
      * @param windowWidth The new window width in px.
      */
     @Px
-    int determineContainerWidth(@Px int availableWidth, @Px int windowWidth);
+    int determineShowableWidth(@Px int availableWidth, @Px int windowWidth);
 
     /**
      * Returns whether the container has content to show.
