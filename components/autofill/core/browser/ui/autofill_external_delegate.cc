@@ -107,27 +107,6 @@ std::optional<AutofillProfile> GetTestAddressByGUID(
   return *it;
 }
 
-// Returns a pointer to the first Suggestion whose GUID matches that of a
-// AutofillClient::GetTestAddresses() profile.
-const Suggestion* FindTestSuggestion(AutofillClient& client,
-                                     base::span<const Suggestion> suggestions,
-                                     int index) {
-  auto is_test_suggestion = [&client](const Suggestion& suggestion) {
-    auto* guid = std::get_if<Suggestion::Guid>(&suggestion.payload);
-    base::span<const AutofillProfile> test_addresses =
-        client.GetTestAddresses();
-
-    return guid && std::ranges::contains(test_addresses, guid->value(),
-                                         &AutofillProfile::guid);
-  };
-  for (const Suggestion& suggestion : suggestions) {
-    if (is_test_suggestion(suggestion) && index-- == 0) {
-      return &suggestion;
-    }
-  }
-  return nullptr;
-}
-
 // Removes the warning suggestions if `suggestions` also contains suggestions
 // that are not a warning.
 void PossiblyRemoveAutofillWarnings(std::vector<Suggestion>& suggestions) {
@@ -235,8 +214,6 @@ bool HasAutofillSuggestionsForA11y(SuggestionType type) {
 }
 
 }  // namespace
-
-int AutofillExternalDelegate::shortcut_test_suggestion_index_ = -1;
 
 // Loads the AutofillProfile from the address data manager and returns a copy
 // of it if exists or `std::nullopt` otherwise. In case the payload contains a
@@ -439,14 +416,6 @@ void AutofillExternalDelegate::AttemptToDisplayAutofillSuggestions(
                                          /*product=*/std::nullopt);
       return;
     }
-  }
-
-  if (shortcut_test_suggestion_index_ >= 0) {
-    const Suggestion* test_suggestion = FindTestSuggestion(
-        manager_->client(), suggestions, shortcut_test_suggestion_index_);
-    CHECK(test_suggestion) << "Only test suggestions can shortcut the UI";
-    DidAcceptSuggestion(*test_suggestion, {});
-    return;
   }
 
   // Send to display.

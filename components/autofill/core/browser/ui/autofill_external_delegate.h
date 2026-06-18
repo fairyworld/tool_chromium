@@ -58,7 +58,6 @@ std::optional<AutofillProfile> GetProfileFromPayload(
 // Delegate for in-browser Autocomplete and Autofill display and selection.
 class AutofillExternalDelegate : public AutofillSuggestionDelegate {
  public:
-  class ScopedSuggestionSelectionShortcut;
   using UpdateSuggestionsCallback =
       base::RepeatingCallback<void(std::vector<Suggestion>,
                                    AutofillSuggestionTriggerSource)>;
@@ -257,11 +256,6 @@ class AutofillExternalDelegate : public AutofillSuggestionDelegate {
 
   base::WeakPtr<AutofillExternalDelegate> GetWeakPtr();
 
-  // If non-negative, OnSuggestionsReturned() passes one of the suggestions
-  // directly to DidAcceptSuggestion(). See ScopedSuggestionSelectionShortcut
-  // for details.
-  static int shortcut_test_suggestion_index_;
-
   const raw_ref<BrowserAutofillManager> manager_;
 
   // The current form and field selected by Autofill.
@@ -283,39 +277,6 @@ class AutofillExternalDelegate : public AutofillSuggestionDelegate {
   std::unique_ptr<device_reauth::DeviceAuthenticator> authenticator_;
 
   base::WeakPtrFactory<AutofillExternalDelegate> weak_ptr_factory_{this};
-};
-
-// When in scope, OnSuggestionsReturned() directly passes one of the Suggestions
-// to DidAcceptSuggestion() rather than displaying the Autofill popup.
-//
-// Specifically, the passed suggestion is the `index`th testing suggestion.
-// Testing suggestions come from PersonalDataManager::test_*().
-//
-// For security reasons, the passed suggestion must correspond to a testing
-// profile from PersonalDataManager. This is asserted by a CHECK(). The CHECK()
-// also fails if no `index`th test suggestion exists.
-//
-// Typical usage is as a member of a test fixture. It can also be used at a
-// narrower scope around, for example, AutofillDriver::AskForValuesToFill(),
-// but beware of potential asynchronicity (e.g., due to asynchronous parsing or
-// asynchronous fetching of suggestions).
-class AutofillExternalDelegate::ScopedSuggestionSelectionShortcut {
- public:
-  explicit ScopedSuggestionSelectionShortcut(int index = 0) {
-    DCHECK(index >= 0);
-    DCHECK(shortcut_test_suggestion_index_ < 0);
-    shortcut_test_suggestion_index_ = index;
-  }
-
-  ScopedSuggestionSelectionShortcut(const ScopedSuggestionSelectionShortcut&) =
-      delete;
-  ScopedSuggestionSelectionShortcut& operator=(
-      const ScopedSuggestionSelectionShortcut&) = delete;
-
-  ~ScopedSuggestionSelectionShortcut() {
-    DCHECK(shortcut_test_suggestion_index_ >= 0);
-    shortcut_test_suggestion_index_ = -1;
-  }
 };
 
 }  // namespace autofill
