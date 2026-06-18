@@ -177,7 +177,10 @@ export class ComposeboxVoiceSearchElement extends
       detailsUrl_: {type: String},
       detailedError_: {type: Number},
       hasErrorTimer: {type: Boolean},
-      isPermissionPromptOpen_: {type: Boolean, reflect: true},
+      isPermissionPromptOpen_: {
+        type: Boolean,
+        reflect: true,
+      },
       submitButtonIconType: {type: String},
       /**
        * Determines whether to automatically submit the query upon receiving a
