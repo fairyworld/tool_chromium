@@ -1435,7 +1435,7 @@ public class LocationBarMediatorTest {
                 ArgumentCaptor.forClass(FuseboxSessionState.class);
         verify(mFuseboxCoordinator).beginInput(captor.capture());
         verify(mStatusCoordinator).beginInput(captor.getValue());
-        verify(mUrlCoordinator).beginInput();
+        verify(mUrlCoordinator).beginInput(captor.getValue().getAutocompleteInput());
 
         assertEquals(
                 OmniboxFocusReason.NTP_AI_MODE,
@@ -1456,7 +1456,7 @@ public class LocationBarMediatorTest {
         ArgumentCaptor<FuseboxSessionState> captor =
                 ArgumentCaptor.forClass(FuseboxSessionState.class);
         verify(mAutocompleteCoordinator).beginInput(captor.capture());
-        verify(mUrlCoordinator).beginInput();
+        verify(mUrlCoordinator).beginInput(captor.getValue().getAutocompleteInput());
         assertEquals("pastedText", captor.getValue().getAutocompleteInput().getUserText());
     }
 

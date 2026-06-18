@@ -16,6 +16,7 @@ import androidx.annotation.VisibleForTesting;
 
 import org.chromium.base.Callback;
 import org.chromium.base.ContextUtils;
+import org.chromium.build.annotations.EnsuresNonNullIf;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.omnibox.UrlBar.ScrollType;
@@ -28,6 +29,7 @@ import org.chromium.chrome.browser.search_engines.settings.SiteSearchSettings;
 import org.chromium.chrome.browser.settings.SettingsNavigationFactory;
 import org.chromium.chrome.browser.ui.theme.BrandedColorScheme;
 import org.chromium.components.browser_ui.styles.SemanticColorUtils;
+import org.chromium.components.omnibox.AutocompleteInput;
 import org.chromium.components.omnibox.OmniboxFeatures;
 import org.chromium.components.omnibox.OmniboxUrlEmphasizer.UrlEmphasisSpan;
 import org.chromium.components.omnibox.TextSelection;
@@ -42,8 +44,7 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
     private final Context mContext;
     private final PropertyModel mModel;
 
-    private boolean mIsInInputSession;
-
+    private @Nullable AutocompleteInput mCurrentInput;
     private UrlBarData mUrlBarData = UrlBarData.EMPTY;
     private @ScrollType int mScrollType = ScrollType.NO_SCROLL;
     private TextSelection mSelection = TextSelection.SELECT_ALL;
@@ -99,13 +100,26 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
     }
 
     /** Signals that the Omnibox input session has begun. */
-    void beginInput() {
-        mIsInInputSession = true;
+    void beginInput(AutocompleteInput input) {
+        mCurrentInput = input;
+        pushCurrentInputToModel();
     }
 
     /** Signals that the Omnibox input session has ended. */
     void endInput() {
-        mIsInInputSession = false;
+        mCurrentInput = null;
+    }
+
+    /* package */ void pushCurrentInputToModel() {
+        if (!isInInputSession()) return;
+        var data =
+                UrlBarData.forUrlAndText(mCurrentInput.getPageUrl(), mCurrentInput.getUserText());
+        setUrlBarData(data, ScrollType.SCROLL_TO_BEGINNING, mCurrentInput.getSelection());
+    }
+
+    @EnsuresNonNullIf("mCurrentInput")
+    private boolean isInInputSession() {
+        return mCurrentInput != null;
     }
 
     private void onTextChanged(String text) {
@@ -123,7 +137,7 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
     }
 
     private void updateShowHintText(String text) {
-        boolean showHintText = !mIsInInputSession || text.isEmpty();
+        boolean showHintText = !isInInputSession() || text.isEmpty();
         mModel.set(UrlBarProperties.SHOW_HINT_TEXT, showHintText);
     }
 
@@ -158,7 +172,7 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
             }
         }
 
-        if (!mIsInInputSession
+        if (!isInInputSession()
                 && isNewTextEquivalentToExistingText(mUrlBarData, data)
                 && mScrollType == scrollType) {
             return false;
@@ -185,17 +199,17 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
                             mUrlBarData.originStartIndex, mUrlBarData.originEndIndex);
         } else {
             text =
-                    !mIsInInputSession
+                    !isInInputSession()
                             ? mUrlBarData.displayText
                             : mUrlBarData.getEditingOrDisplayText();
         }
         CharSequence textForAutofillServices = text;
 
-        if (!(mIsInInputSession || TextUtils.isEmpty(text) || mUrlBarData.url == null)) {
+        if (!(isInInputSession() || TextUtils.isEmpty(text) || mUrlBarData.url == null)) {
             textForAutofillServices = mUrlBarData.url.getSpec();
         }
 
-        @ScrollType int scrollType = mIsInInputSession ? ScrollType.NO_SCROLL : mScrollType;
+        @ScrollType int scrollType = isInInputSession() ? ScrollType.NO_SCROLL : mScrollType;
         if (text == null) text = "";
 
         UrlBarTextState state =
@@ -269,7 +283,7 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
             @Nullable String autocompleteText,
             @Nullable String additionalText,
             @Nullable String siteSearchLabel) {
-        if (!mIsInInputSession) {
+        if (!isInInputSession()) {
             assert false : "Should not update autocomplete text when not focused";
             return;
         }

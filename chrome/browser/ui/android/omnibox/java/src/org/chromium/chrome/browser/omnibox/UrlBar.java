@@ -311,6 +311,7 @@ public class UrlBar extends AutocompleteEditText {
         // Always select all content if the focus is triggered by the user.
         // Software triggered focus can apply selection at will, but when focus comes from
         // the click/touch - the OS overrides.
+        // TODO(crbug.com/507111601): remove this after moving focus control to ViewBinder.
         setSelectAllOnFocus(true);
 
         setTextClassifier(TextClassifier.NO_OP);

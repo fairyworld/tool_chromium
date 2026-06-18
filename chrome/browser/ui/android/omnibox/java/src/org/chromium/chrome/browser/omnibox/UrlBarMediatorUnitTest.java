@@ -38,6 +38,7 @@ import org.chromium.chrome.browser.omnibox.styles.OmniboxResourceProvider;
 import org.chromium.chrome.browser.search_engines.settings.SiteSearchSettings;
 import org.chromium.chrome.browser.settings.SettingsNavigationFactory;
 import org.chromium.components.browser_ui.settings.SettingsNavigation;
+import org.chromium.components.omnibox.AutocompleteInput;
 import org.chromium.components.omnibox.OmniboxFeatureList;
 import org.chromium.components.omnibox.OmniboxUrlEmphasizer;
 import org.chromium.components.omnibox.OmniboxUrlEmphasizer.UrlEmphasisColorSpan;
@@ -376,6 +377,7 @@ public class UrlBarMediatorUnitTest {
 
     @Test
     public void hintVisibility() {
+        var input = new AutocompleteInput();
         UrlBarData baseData =
                 UrlBarData.create(
                         new GURL("http://www.example.com"),
@@ -386,7 +388,7 @@ public class UrlBarMediatorUnitTest {
         mMediator.setUrlBarHintText("Hint 1");
         assertTrue(mModel.get(UrlBarProperties.SHOW_HINT_TEXT));
         mMediator.setUrlBarData(baseData, ScrollType.NO_SCROLL, TextSelection.SELECT_END);
-        mMediator.beginInput();
+        mMediator.beginInput(input);
         mModel.get(UrlBarProperties.TEXT_CHANGE_LISTENER).onResult("");
 
         assertTrue(mModel.get(UrlBarProperties.SHOW_HINT_TEXT));

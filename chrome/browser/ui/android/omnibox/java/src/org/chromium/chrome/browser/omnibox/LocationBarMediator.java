@@ -1229,7 +1229,7 @@ class LocationBarMediator
                     mFuseboxCoordinator.beginInput(session);
                     mStatusCoordinator.beginInput(session);
                     mHintTextUpdater.beginInput(mCurrentInput);
-                    mUrlCoordinator.beginInput();
+                    mUrlCoordinator.beginInput(mCurrentInput);
                     // Trigger animation now that we have an up-to-date value for the fusebox state.
                     setupSuggestionsListShowAnimation();
                     setAttachmentModelList(session.getFuseboxAttachmentModelList());
