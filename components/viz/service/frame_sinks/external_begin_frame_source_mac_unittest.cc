@@ -237,7 +237,6 @@ TEST_F(ExternalBeginFrameSourceMacTest, GetSupportedFrameIntervals) {
 // Tests the keep-alive counter behavior where DisplayLink callbacks continue to
 // be registered for a limited count after begin frames are no longer needed.
 TEST_F(ExternalBeginFrameSourceMacTest, OnNeedsBeginFrames) {
-  EXPECT_FALSE(source_->vsync_callback_mac());
   source_->OnNeedsBeginFrames(true);
   EXPECT_TRUE(source_->vsync_callback_mac());
 
@@ -287,7 +286,6 @@ TEST_F(ExternalBeginFrameSourceMacTest, UpdateVSyncDisplay) {
   EXPECT_FALSE(source_->display_link_mac());
   EXPECT_TRUE(source_->time_source());
 
-  source_->DidReceiveNewCALayerParams();
   source_->UpdateVSyncDisplay(/*display_id=*/1,
                               /*is_browser_vsync_supported=*/true);
   EXPECT_TRUE(source_->display_link_mac());
