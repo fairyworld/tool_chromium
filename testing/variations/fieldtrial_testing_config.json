@@ -4967,7 +4967,8 @@
                     },
                     "enable_features": [
                         "ChromeNextIa",
-                        "FullscreenRefactoring"
+                        "FullscreenRefactoring",
+                        "UseSceneViewController"
                     ]
                 }
             ]
@@ -24761,21 +24762,6 @@
                     "name": "Enabled",
                     "enable_features": [
                         "UseSCContentSharingPicker"
-                    ]
-                }
-            ]
-        }
-    ],
-    "UseSceneViewController": [
-        {
-            "platforms": [
-                "ios"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "UseSceneViewController"
                     ]
                 }
             ]
