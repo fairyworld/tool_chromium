@@ -2,22 +2,21 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import {hexToColor, TEXT_COLORS, TextAlignment, TextStyle, TextTypeface} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
 import type {DocumentDimensions} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
 import {eventToPromise, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
-import {assertPositionAndSize, initializeBox, setupTextBoxTest} from './ink2_text_box_test_utils.js';
+import {assertPositionAndSize, getTestAnnotation, initializeBox, setupTextBoxTest} from './ink2_text_box_test_utils.js';
 import {MockDocumentDimensions} from './test_util.js';
 
 chrome.test.runTests([
   async function testViewportChanges() {
     // Use 300x300 viewport so that the 800x1000 page is larger and scrollable.
     // We use zeroScrollbars = true here to simplify layout math.
-    const {manager, textbox, viewport} =
+    const {textbox, viewport} =
         await setupTextBoxTest(300, 300, 800, 1000, /*zeroScrollbars=*/ true);
 
-    // Initialize to a 100x100 box at 410, 303.
-    initializeBox(manager, 100, 100, 410, 303);
+    initializeBox(100, 100, 410, 303);
+    await microtasksFinished();
     textbox.viewportChanged();  // Sync with real viewport initially.
     await microtasksFinished();
 
@@ -85,35 +84,24 @@ chrome.test.runTests([
     // Rot 3). Pass zeroScrollbars = true. This aligns the real Viewport page
     // screen offsets exactly with the original test's mock offsets (x=15 for
     // portrait, x=5 for landscape).
-    const {manager, textbox, viewport} =
+    const {textbox, viewport} =
         await setupTextBoxTest(100, 100, 100, 80, /*zeroScrollbars=*/ true);
 
     function initializeBoxWithOrientation(
         width: number, height: number, x: number, y: number,
         orientation: number) {
       const pageDimensions = viewport.getPageScreenRect(0);
-      manager.dispatchEvent(new CustomEvent('initialize-text-box', {
-        detail: {
-          annotation: {
-            text: '',
-            textAttributes: {
-              size: 12,
-              typeface: TextTypeface.SANS_SERIF,
-              styles: {
-                [TextStyle.BOLD]: false,
-                [TextStyle.ITALIC]: false,
-              },
-              alignment: TextAlignment.LEFT,
-              color: hexToColor(TEXT_COLORS[0]!.color),
-            },
-            textBoxRect: {height, locationX: x, locationY: y, width},
-            textOrientation: orientation,
-            id: 0,
-            pageIndex: 0,
-          },
-          pageDimensions,
-        },
-      }));
+      const annotation = getTestAnnotation({
+        height,
+        width,
+        locationX: x,
+        locationY: y,
+      });
+      annotation.text = '';
+      annotation.textOrientation = orientation;
+
+      textbox.annotation = annotation;
+      textbox.pageDimensions = pageDimensions;
     }
 
     function initAndSyncBox(
@@ -249,17 +237,19 @@ chrome.test.runTests([
   },
 
   async function testMoveViewportOnFocus() {
-    const {manager, mockPlugin, textbox, viewport} = await setupTextBoxTest();
+    const {mockPlugin, textbox, viewport} = await setupTextBoxTest();
     // Ensure the viewport is scrollable by zooming in. Also ensure it is
     // located top/left, where it is expected.
     viewport.setZoom(2.0);
     viewport.goToPageAndXy(0, 0, 0);
 
-    // Using manager initialization to get correct coordinates for the zoom
-    // level. A click position of 72 will offset the y location by
-    // zoom * text size / 2 = text size = 12 by default. So this initializes
-    // the top left corner to 60, 60.
-    await manager.initializeTextAnnotation({x: 60, y: 72});
+    // Initialize the top left corner to 60, 60 with default textbox width (222)
+    // and height at 2x zoom (34).
+    const annotation = getTestAnnotation(
+        {height: 34, locationX: 60, locationY: 60, width: 222}, 2.0);
+    annotation.text = '';
+    textbox.annotation = annotation;
+    textbox.pageDimensions = viewport.getPageScreenRect(0);
     await eventToPromise('textbox-focused-for-test', textbox);
     await microtasksFinished();
     const styles = getComputedStyle(textbox);

@@ -10,7 +10,7 @@ import {getRequiredElement} from './test_util.js';
 chrome.test.runTests([
   // Test drawing the box based on data from the manager.
   async function testDrawsBox() {
-    const {manager, textbox} = await setupTextBoxTest();
+    const {textbox} = await setupTextBoxTest();
     // Initial state. Textbox is not visible because it hasn't received an
     // initialize-text-box event yet.
     chrome.test.assertTrue(textbox.hidden);
@@ -25,7 +25,7 @@ chrome.test.runTests([
     // height = 2 * y - 2 * outer padding = 20px + specified height
 
     // Create a 160x40 box at 80, 120.
-    initializeBox(manager, 160, 40, 80, 120);
+    initializeBox(160, 40, 80, 120);
     await microtasksFinished();
     chrome.test.assertFalse(textbox.hidden);
     assertPositionAndSize(textbox, '184px', '60px', '63px', '105px');
@@ -39,7 +39,7 @@ chrome.test.runTests([
     chrome.test.assertEq('', textbox.$.textbox.value);
 
     // Update to a 100x200 box at 400, 300 with "Hello World" text.
-    initializeBox(manager, 100, 200, 400, 300);
+    initializeBox(100, 200, 400, 300);
     await microtasksFinished();
     textbox.$.textbox.value = 'Hello World';
     textbox.$.textbox.dispatchEvent(new CustomEvent('input'));
@@ -59,7 +59,7 @@ chrome.test.runTests([
   async function testTextbox() {
     const {manager, textbox} = await setupTextBoxTest();
     // Update to a 100x200 box at 400, 300.
-    initializeBox(manager, 100, 200, 400, 300);
+    initializeBox(100, 200, 400, 300);
     await microtasksFinished();
     chrome.test.assertFalse(textbox.hidden);
     chrome.test.assertEq('', textbox.$.textbox.value);
@@ -119,9 +119,9 @@ chrome.test.runTests([
   },
 
   async function testDragHandles() {
-    const {manager, textbox} = await setupTextBoxTest(1015, 500, 1000, 1000);
+    const {textbox} = await setupTextBoxTest(1015, 500, 1000, 1000);
     // Initialize to a 100x200 box at 400, 300.
-    initializeBox(manager, 100, 200, 400, 300);
+    initializeBox(100, 200, 400, 300);
     await microtasksFinished();
     chrome.test.assertFalse(textbox.hidden);
     assertPositionAndSize(textbox, '124px', '220px', '383px', '285px');
@@ -207,8 +207,8 @@ chrome.test.runTests([
   },
 
   async function testAutoResize() {
-    const {manager, textbox} = await setupTextBoxTest(1015, 500, 1000, 1000);
-    initializeBox(manager, 24, 24, 416, 300);
+    const {textbox} = await setupTextBoxTest(1015, 500, 1000, 1000);
+    initializeBox(24, 24, 416, 300);
     await microtasksFinished();
     // Textbox is initialized to the minimum clamped size.
     const clampedTextareaWidth = textbox.$.textbox.clientWidth;
@@ -255,9 +255,9 @@ chrome.test.runTests([
   },
 
   async function testResizeClampedToPageBoundaries() {
-    const {manager, textbox} = await setupTextBoxTest(1015, 500, 1000, 1000);
+    const {textbox} = await setupTextBoxTest(1015, 500, 1000, 1000);
     // Initialize to a 100x100 box at 400, 300.
-    initializeBox(manager, 100, 100, 400, 300);
+    initializeBox(100, 100, 400, 300);
     await microtasksFinished();
     assertPositionAndSize(textbox, '124px', '120px', '383px', '285px');
 
@@ -339,9 +339,9 @@ chrome.test.runTests([
   },
 
   async function testMove() {
-    const {manager, textbox} = await setupTextBoxTest(1015, 500, 1000, 1000);
+    const {textbox} = await setupTextBoxTest(1015, 500, 1000, 1000);
     // Initialize to a 100x100 box at 400, 300.
-    initializeBox(manager, 100, 100, 400, 300);
+    initializeBox(100, 100, 400, 300);
     await microtasksFinished();
     assertPositionAndSize(textbox, '124px', '120px', '383px', '285px');
     await dragHandle(textbox, 100, 100);
@@ -359,9 +359,9 @@ chrome.test.runTests([
   },
 
   async function testMoveToPageBoundaries() {
-    const {manager, textbox} = await setupTextBoxTest(1015, 500, 1000, 1000);
+    const {textbox} = await setupTextBoxTest(1015, 500, 1000, 1000);
     // Initialize to a 100x100 box at 400, 300.
-    initializeBox(manager, 100, 100, 400, 300);
+    initializeBox(100, 100, 400, 300);
     await microtasksFinished();
     assertPositionAndSize(textbox, '124px', '120px', '383px', '285px');
 
@@ -393,8 +393,8 @@ chrome.test.runTests([
   },
 
   async function testFocusEventDispatchesTextboxFocused() {
-    const {manager, textbox} = await setupTextBoxTest();
-    initializeBox(manager, 100, 100, 400, 300);
+    const {textbox} = await setupTextBoxTest();
+    initializeBox(100, 100, 400, 300);
     await microtasksFinished();
 
     const whenFocused = eventToPromise<CustomEvent>('textbox-focused', textbox);

@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import {hexToColor, Ink2Manager, PdfViewerPrivateProxyImpl, TEXT_COLORS, TextAlignment, TextAnnotationSource, TextStyle, TextTypeface} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
-import type {TextAnnotation, TextAnnotationMessageData, TextBoxRect} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
+import {hexToColor, Ink2Manager, pageToScreenCoordinates, PdfViewerPrivateProxyImpl, TEXT_COLORS, TextAlignment, TextAnnotationSource, TextStyle, TextTypeface} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
+import type {InkTextBoxElement, TextAnnotation, TextAnnotationMessageData, TextBoxRect, Viewport} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
 import {keyDownOn, keyUpOn} from 'chrome://webui-test/keyboard_mock_interactions.js';
 import {microtasksFinished} from 'chrome://webui-test/test_util.js';
 
@@ -69,8 +69,10 @@ export function getTestAnnotation(
 }
 
 export function initializeBox(
-    manager: Ink2Manager, width: number, height: number, x: number, y: number,
-    orientation?: number) {
+    width: number, height: number, x: number, y: number, orientation?: number) {
+  const textbox = document.body.querySelector('ink-text-box');
+  chrome.test.assertTrue(!!textbox, 'ink-text-box element not found');
+
   const annotation =
       getTestAnnotation({height, locationX: x, locationY: y, width});
   annotation.text = '';
@@ -78,14 +80,10 @@ export function initializeBox(
     annotation.textOrientation = orientation;
   }
 
-  manager.dispatchEvent(new CustomEvent('initialize-text-box', {
-    detail: {
-      annotation,
-      // Large width and height so we don't need to worry about size clamping
-      // in tests where we don't want to explicitly validate it.
-      pageDimensions: {x: 10, y: 3, width: 1000, height: 1000},
-    },
-  }));
+  textbox.annotation = annotation;
+  // Large width and height so size does not clamp in tests that are not
+  // intended to explicitly validate it.
+  textbox.pageDimensions = {x: 10, y: 3, width: 1000, height: 1000};
 }
 
 export function assertPositionAndSize(
@@ -171,4 +169,23 @@ export function verifyFinishTextAnnotationMessage(
     source: TextAnnotationSource.USER,
   };
   assertDeepEquals(expectedMessageData, message.data);
+}
+
+/**
+ * Simulates reactivating an existing text annotation for editing.
+ * It converts the annotation's page-relative coordinates to screen coordinates
+ * and sets the textbox's `annotation` and `pageDimensions` properties to
+ * trigger the transition to the active/editing state.
+ */
+export function reactivateBox(
+    textbox: InkTextBoxElement, viewport: Viewport,
+    annotation: TextAnnotation) {
+  const pageRect = viewport.getPageScreenRect(annotation.pageIndex);
+  const screenRect = pageToScreenCoordinates(
+      annotation.pageIndex, annotation.textBoxRect, viewport);
+  const annotationToPass = structuredClone(annotation);
+  annotationToPass.textBoxRect = screenRect;
+
+  textbox.annotation = annotationToPass;
+  textbox.pageDimensions = pageRect;
 }

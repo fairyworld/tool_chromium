@@ -16,13 +16,15 @@ export function getHtml(this: InkTextAnnotationsElement) {
         data-rotations="${this.getPlaceholderRotations_(annotation)}"
         role="listitem"
         aria-label="${annotation.text}"
-        tabindex="0"
+        tabindex="${this.activeAnnotation_ ? '-1' : '0'}"
         @focus="${this.onPlaceholderFocus_}">
     </div>
   `)}
 </div>
 <ink-text-box id="textBox"
     .viewport="${this.viewport}"
+    .annotation="${this.activeAnnotation_}"
+    .pageDimensions="${this.activePageDimensions_}"
     @state-changed="${this.onTextBoxStateChanged_}"
     @textbox-focused="${this.onTextboxFocused_}">
 </ink-text-box>

@@ -630,7 +630,7 @@ export class PdfViewerElement extends PdfViewerBaseElement {
   // <if expr="enable_pdf_ink2">
   private async maybeCreateTextAnnotation_(location?: Point) {
     const created =
-        await Ink2Manager.getInstance().initializeTextAnnotation(location);
+        Ink2Manager.getInstance().initializeTextAnnotation(location);
     if (!created && this.textboxState_ !== TextBoxState.INACTIVE) {
       const annotations = this.shadowRoot.querySelector('ink-text-annotations');
       assert(annotations);

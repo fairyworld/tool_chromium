@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import type {InkTextAnnotationsElement, Viewport} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
-import {DEFAULT_TEXTBOX_WIDTH, Ink2Manager, PdfViewerPrivateProxyImpl, TextStyle} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
+import type {InkTextAnnotationsElement, TextAnnotationMessageData, Viewport} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
+import {DEFAULT_TEXTBOX_WIDTH, Ink2Manager, PdfViewerPrivateProxyImpl, TextBoxState, TextStyle} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
 import {assert} from 'chrome://resources/js/assert.js';
 import {eventToPromise, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
@@ -395,7 +395,7 @@ chrome.test.runTests([
     // (7) Validate that deactivating the text box commits Box B with a
     // different ID and text content from Box A.
     const stateChanged = eventToPromise('state-changed', textbox);
-    manager.dispatchEvent(new CustomEvent('deactivate-text-box'));
+    await annotationsElement.commitActiveAnnotation();
     await stateChanged;
     await microtasksFinished();
 
@@ -497,6 +497,144 @@ chrome.test.runTests([
 
     verifyFinishTextAnnotationMessage(
         mockPlugin, expectedAnnotationEdited, true);
+
+    chrome.test.succeed();
+  },
+
+  async function testInitializeTextBoxForwarding() {
+    const {manager, viewport} = setUpTest();
+
+    const annotationsElement = createAnnotationsElement(viewport);
+    await microtasksFinished();
+
+    // Initially, textbox should be hidden.
+    chrome.test.assertTrue(annotationsElement.$.textBox.hidden);
+
+    // Manually dispatch 'initialize-text-box' on manager.
+    const annotation = getTestAnnotation(1);
+    annotation.textBoxRect.height = DEFAULT_HEIGHT;
+    annotation.textBoxRect.width = DEFAULT_TEXTBOX_WIDTH;
+    const expectedPageDimensions = viewport.getPageScreenRect(0);
+    manager.dispatchEvent(new CustomEvent('initialize-text-box', {
+      detail: {
+        annotation,
+        pageDimensions: expectedPageDimensions,
+      },
+    }));
+    await microtasksFinished();
+
+    // Verify that the textbox child is visible and has correct content.
+    chrome.test.assertFalse(annotationsElement.$.textBox.hidden);
+    chrome.test.assertEq(
+        annotation.text, annotationsElement.$.textBox.$.textbox.value);
+
+    // Verify the position and size.
+    assertPositionAndSize(
+        annotationsElement.$.textBox, '246px', '44px', '43px', '10px');
+
+    chrome.test.succeed();
+  },
+
+  async function testPlaceholdersTabindexWithActiveAnnotation() {
+    const {manager, viewport} = setUpTest();
+
+    // Add one annotation so a placeholder is in the DOM.
+    const annotation = {
+      ...getTestAnnotation(1),
+      text: 'Test',
+      textBoxRect: {height: 20, locationX: 105, locationY: 53, width: 100},
+    };
+    manager.commitTextAnnotation(annotation, true, []);
+
+    const annotationsElement = createAnnotationsElement(viewport);
+    await microtasksFinished();
+
+    const placeholders = getPlaceholders(annotationsElement);
+    chrome.test.assertEq(1, placeholders.length);
+
+    // Initially, tabindex should be 0.
+    chrome.test.assertEq('0', placeholders[0]!.getAttribute('tabindex'));
+
+    // Activate the annotation manually.
+    const activeAnnotation = getTestAnnotation(2);
+    const pageDimensions = viewport.getPageScreenRect(0);
+    manager.dispatchEvent(new CustomEvent('initialize-text-box', {
+      detail: {
+        annotation: activeAnnotation,
+        pageDimensions,
+      },
+    }));
+    await microtasksFinished();
+
+    // Now tabindex should be -1.
+    chrome.test.assertEq('-1', placeholders[0]!.getAttribute('tabindex'));
+
+    // Deactivate the annotation (simulate via event).
+    annotationsElement.$.textBox.dispatchEvent(
+        new CustomEvent('state-changed', {
+          detail: TextBoxState.INACTIVE,
+        }));
+    await microtasksFinished();
+
+    // Tabindex should be back to 0.
+    chrome.test.assertEq('0', placeholders[0]!.getAttribute('tabindex'));
+
+    chrome.test.succeed();
+  },
+
+  async function testCommitActiveAnnotationOnNewInit() {
+    const {manager, viewport, mockPlugin} = setUpTest();
+
+    const annotationsElement = createAnnotationsElement(viewport);
+    await microtasksFinished();
+
+    // 1. Initialize Annotation A (id=1).
+    const annotationA = {...getTestAnnotation(1), text: 'Annotation A'};
+    const pageDimensions = viewport.getPageScreenRect(0);
+    manager.dispatchEvent(new CustomEvent('initialize-text-box', {
+      detail: {
+        annotation: annotationA,
+        pageDimensions,
+      },
+    }));
+    await microtasksFinished();
+
+    // Verify Annotation A is active in the textbox.
+    chrome.test.assertFalse(annotationsElement.$.textBox.hidden);
+    chrome.test.assertEq(
+        'Annotation A', annotationsElement.$.textBox.$.textbox.value);
+
+    // 2. Simulate user editing the text.
+    annotationsElement.$.textBox.$.textbox.value = 'Annotation A Edited';
+    annotationsElement.$.textBox.$.textbox.dispatchEvent(new Event('input'));
+    await microtasksFinished();
+
+    // 3. Initialize Annotation B (id=2).
+    // This should trigger the parent to commit Annotation A first.
+    mockPlugin.clearMessages();
+    const annotationB = {...getTestAnnotation(2), text: 'Annotation B'};
+    manager.dispatchEvent(new CustomEvent('initialize-text-box', {
+      detail: {
+        annotation: annotationB,
+        pageDimensions,
+      },
+    }));
+    await microtasksFinished();
+
+    // 4. Verify that Annotation A was committed.
+    const finishMessage =
+        mockPlugin.findMessage<{type: string, data: TextAnnotationMessageData}>(
+            'finishTextAnnotation');
+    chrome.test.assertTrue(finishMessage !== undefined);
+    chrome.test.assertEq('finishTextAnnotation', finishMessage.type);
+    chrome.test.assertEq(1, finishMessage.data.id);
+    chrome.test.assertEq('Annotation A Edited', finishMessage.data.text);
+    chrome.test.assertTrue(finishMessage.data.isEdited);
+
+    // 5. Verify that Annotation B is now active in the textbox.
+    chrome.test.assertFalse(annotationsElement.$.textBox.hidden);
+    chrome.test.assertEq(
+        'Annotation B', annotationsElement.$.textBox.$.textbox.value);
 
     chrome.test.succeed();
   },

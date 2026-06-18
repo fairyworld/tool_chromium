@@ -58,7 +58,6 @@ export class Ink2Manager extends EventTarget {
   private existingAnnotationAttributes_: TextAttributes|null = null;
   private pluginController_: PluginController = PluginController.getInstance();
   private textResolver_: PromiseResolver<void>|null = null;
-  private textboxActiveResolver_: PromiseResolver<void>|null = null;
   private viewport_: Viewport|null = null;
   private nextAnnotationId_: number = 0;
   // Keeps track of fonts that have been sent to the backend so that each font
@@ -94,20 +93,11 @@ export class Ink2Manager extends EventTarget {
   // exists at `location`, activates it for editing.
   // If `location` is not provided, creates the annotation at the center of
   // the visible portion of the most visible page.
-  // If an annotation is already actively being edited, fires a
-  // deactivate-text-box event and waits for the active text box to deactivate
-  // before creating or activating another annotation.
-  // Returns a promise that resolves to true if an annotation was initialized
-  // or reactivated for editing, and false otherwise.
-  async initializeTextAnnotation(location?: Point): Promise<boolean> {
+  // Returns true if an annotation was initialized or reactivated for editing,
+  // and false otherwise.
+  initializeTextAnnotation(location?: Point): boolean {
     assert(this.isTextInitializationComplete());
     assert(this.viewport_);
-
-    if (this.textboxActiveResolver_) {
-      const resolver = this.textboxActiveResolver_;
-      this.dispatchEvent(new CustomEvent('deactivate-text-box'));
-      await resolver.promise;
-    }
 
     const isMouse = !!location;
     const page = location ? this.viewport_.getPageAtPoint(location) :
@@ -540,16 +530,6 @@ export class Ink2Manager extends EventTarget {
     this.stack_.setSaved();
   }
 
-  setTextBoxActive(active: boolean) {
-    if (active && !this.textboxActiveResolver_) {
-      this.textboxActiveResolver_ = new PromiseResolver();
-      return;
-    }
-    if (!active && this.textboxActiveResolver_) {
-      this.textboxActiveResolver_.resolve();
-      this.textboxActiveResolver_ = null;
-    }
-  }
 
   static getInstance(): Ink2Manager {
     return instance || (instance = new Ink2Manager());

@@ -10,12 +10,14 @@ import {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 
 import type {TextAnnotation, TextBoxRect} from '../constants.js';
 import {Ink2Manager} from '../ink2_manager.js';
+import type {TextBoxInit} from '../ink2_manager.js';
 import {pageToScreenCoordinates} from '../ink_text_annotation_utils.js';
-import type {Viewport} from '../viewport.js';
+import type {Viewport, ViewportRect} from '../viewport.js';
 
 import {getCss} from './ink_text_annotations.css.js';
 import {getHtml} from './ink_text_annotations.html.js';
-import type {InkTextBoxElement, TextBoxState} from './ink_text_box.js';
+import type {InkTextBoxElement} from './ink_text_box.js';
+import {TextBoxState} from './ink_text_box.js';
 
 export interface InkTextAnnotationsElement {
   $: {
@@ -41,11 +43,15 @@ export class InkTextAnnotationsElement extends CrLitElement {
     return {
       annotations_: {type: Array},
       viewport: {type: Object},
+      activeAnnotation_: {type: Object},
+      activePageDimensions_: {type: Object},
     };
   }
 
   protected accessor annotations_: TextAnnotation[] = [];
   accessor viewport: Viewport|null = null;
+  protected accessor activeAnnotation_: TextAnnotation|null = null;
+  protected accessor activePageDimensions_: ViewportRect|null = null;
   private eventTracker_: EventTracker = new EventTracker();
 
   override connectedCallback() {
@@ -54,6 +60,10 @@ export class InkTextAnnotationsElement extends CrLitElement {
     const manager = Ink2Manager.getInstance();
     this.eventTracker_.add(
         manager, 'annotations-updated', () => this.updateAnnotations_());
+    this.eventTracker_.add(
+        manager, 'initialize-text-box',
+        (e: Event) =>
+            this.onInitializeTextBox_((e as CustomEvent<TextBoxInit>).detail));
     this.updateAnnotations_();
   }
 
@@ -146,7 +156,19 @@ export class InkTextAnnotationsElement extends CrLitElement {
   }
 
   protected onTextBoxStateChanged_(e: CustomEvent<TextBoxState>) {
+    if (e.detail === TextBoxState.INACTIVE) {
+      this.activeAnnotation_ = null;
+      this.activePageDimensions_ = null;
+    }
     this.fire('state-changed', e.detail);
+  }
+
+  private async onInitializeTextBox_(data: TextBoxInit) {
+    if (this.activeAnnotation_) {
+      await this.$.textBox.commitTextAnnotation();
+    }
+    this.activeAnnotation_ = data.annotation;
+    this.activePageDimensions_ = data.pageDimensions;
   }
 
   protected onTextboxFocused_(e: CustomEvent<TextBoxRect>) {
