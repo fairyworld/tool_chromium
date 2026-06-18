@@ -78,7 +78,7 @@ MultiFileErrorCollector::~MultiFileErrorCollector() = default;
 class SourceTreeDescriptorDatabase::SingleFileErrorCollector
     : public io::ErrorCollector {
  public:
-  SingleFileErrorCollector(absl::string_view filename,
+  SingleFileErrorCollector(StringViewArg filename,
                            MultiFileErrorCollector* multi_file_error_collector)
       : filename_(filename),
         multi_file_error_collector_(multi_file_error_collector),
@@ -129,7 +129,7 @@ SourceTreeDescriptorDatabase::SourceTreeDescriptorDatabase(
 
 SourceTreeDescriptorDatabase::~SourceTreeDescriptorDatabase() = default;
 
-bool SourceTreeDescriptorDatabase::FindFileByName(absl::string_view filename,
+bool SourceTreeDescriptorDatabase::FindFileByName(StringViewArg filename,
                                                   FileDescriptorProto* output) {
   std::unique_ptr<io::ZeroCopyInputStream> input(source_tree_->Open(filename));
   if (input == nullptr) {
@@ -164,12 +164,12 @@ bool SourceTreeDescriptorDatabase::FindFileByName(absl::string_view filename,
 }
 
 bool SourceTreeDescriptorDatabase::FindFileContainingSymbol(
-    absl::string_view symbol_name, FileDescriptorProto* output) {
+    StringViewArg symbol_name, FileDescriptorProto* output) {
   return false;
 }
 
 bool SourceTreeDescriptorDatabase::FindFileContainingExtension(
-    absl::string_view containing_type, int field_number,
+    StringViewArg containing_type, int field_number,
     FileDescriptorProto* output) {
   return false;
 }

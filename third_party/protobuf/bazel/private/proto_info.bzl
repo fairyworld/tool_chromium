@@ -124,6 +124,7 @@ def _create_proto_info(*, srcs, deps, descriptor_set, option_deps = [], proto_pa
         proto_source_root = proto_source_root,
         transitive_proto_path = transitive_proto_path,
         check_deps_sources = check_deps_sources,
+        transitive_imports = transitive_sources,
         transitive_extension_declarations = transitive_extension_declarations,
     )
     if allow_exports:
@@ -169,6 +170,9 @@ ProtoInfo, _ = provider(
         "transitive_extension_declarations": """(depset[File]) The extension
             declaration files associated with this rule and all transitive
             dependencies.""",
+
+        # Deprecated fields:
+        "transitive_imports": """(depset[File]) Deprecated: use `transitive_sources` instead.""",
     },
     init = _create_proto_info,
 )

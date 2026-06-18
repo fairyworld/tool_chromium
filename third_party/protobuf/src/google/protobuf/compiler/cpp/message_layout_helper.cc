@@ -26,10 +26,11 @@ namespace cpp {
 namespace {
 
 bool EndsWithMsgPtr(const std::vector<const FieldDescriptor*>& fields,
-                    const Options& options) {
+                    const Options& options, MessageSCCAnalyzer* scc_analyzer) {
   auto* last_field = fields.back();
   return last_field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE &&
-         !IsLazy(last_field, options) && !last_field->is_repeated();
+         !IsLazy(last_field, options, scc_analyzer) &&
+         !last_field->is_repeated();
 }
 
 auto FindIncompleteBlock(std::vector<FieldGroup>& aligned_to_8) {
@@ -67,12 +68,14 @@ bool FieldGroup::UpdatePreferredLocationAndInsertOtherFields(
 }
 
 MessageLayoutHelper::FieldVector MessageLayoutHelper::DoOptimizeLayout(
-    const FieldVector& fields, const Options& options) const {
-  auto field_alignment_groups = BuildFieldAlignmentGroups(fields, options);
+    const FieldVector& fields, const Options& options,
+    MessageSCCAnalyzer* scc_analyzer) const {
+  auto field_alignment_groups =
+      BuildFieldAlignmentGroups(fields, options, scc_analyzer);
   auto field_groups =
       MergeFieldAlignmentGroups(std::move(field_alignment_groups));
   auto ordered_fields =
-      BuildFieldDescriptorOrder(std::move(field_groups), options);
+      BuildFieldDescriptorOrder(std::move(field_groups), options, scc_analyzer);
   return ordered_fields;
 }
 
@@ -107,14 +110,15 @@ constexpr size_t MessageLayoutHelper::FieldHotnessIndex(FieldHotness hotness) {
 }
 
 MessageLayoutHelper::FieldFamily MessageLayoutHelper::GetFieldFamily(
-    const FieldDescriptor* field, const Options& options) {
+    const FieldDescriptor* field, const Options& options,
+    MessageSCCAnalyzer* scc_analyzer) {
   if (field->is_repeated()) {
     return ShouldSplit(field, options) ? OTHER : REPEATED;
   } else if (field->cpp_type() == FieldDescriptor::CPPTYPE_STRING) {
     return STRING;
   } else if (field->cpp_type() == FieldDescriptor::CPPTYPE_MESSAGE) {
     return MESSAGE;
-  } else if (CanInitializeByZeroing(field, options)) {
+  } else if (CanInitializeByZeroing(field, options, scc_analyzer)) {
     return ZERO_INITIALIZABLE;
   } else {
     return OTHER;
@@ -122,7 +126,8 @@ MessageLayoutHelper::FieldFamily MessageLayoutHelper::GetFieldFamily(
 }
 
 std::vector<internal::TailCallTableInfo::FastFieldInfo>
-MessageLayoutHelper::BuildFastParseTable(const Options& options) const {
+MessageLayoutHelper::BuildFastParseTable(
+    const Options& options, MessageSCCAnalyzer* scc_analyzer) const {
   FieldVector ordered_fields;
   for (const auto* field : GetOrderedFields(descriptor_)) {
     if (IsLayoutOptimized(field, options)) {
@@ -130,8 +135,8 @@ MessageLayoutHelper::BuildFastParseTable(const Options& options) const {
     }
   }
   auto field_options = ParseFunctionGenerator::BuildFieldOptions(
-      descriptor_, ordered_fields, options,
-      /*has_bit_indices=*/{});
+      descriptor_, ordered_fields, options, scc_analyzer,
+      /*has_bit_indices=*/{}, /*inlined_string_indices=*/{});
   auto table_info = ParseFunctionGenerator::BuildTcTableInfoFromDescriptor(
       descriptor_, options, field_options);
   return table_info.fast_path_fields;
@@ -167,13 +172,14 @@ bool MessageLayoutHelper::ShouldPromoteToFastParse(
 }
 
 MessageLayoutHelper::FieldAlignmentGroups
-MessageLayoutHelper::BuildFieldAlignmentGroups(const FieldVector& fields,
-                                               const Options& options) const {
+MessageLayoutHelper::BuildFieldAlignmentGroups(
+    const FieldVector& fields, const Options& options,
+    MessageSCCAnalyzer* scc_analyzer) const {
   FieldAlignmentGroups field_alignment_groups;
-  const auto fast_path_fields = BuildFastParseTable(options);
+  const auto fast_path_fields = BuildFastParseTable(options, scc_analyzer);
 
   for (const auto* field : fields) {
-    FieldFamily f = GetFieldFamily(field, options);
+    FieldFamily f = GetFieldFamily(field, options, scc_analyzer);
 
     FieldHotness hotness;
     if (ShouldSplit(field, options)) {
@@ -181,7 +187,7 @@ MessageLayoutHelper::BuildFieldAlignmentGroups(const FieldVector& fields,
     } else if (field->is_repeated()) {
       hotness = FieldHotness::kRepeated;
     } else {
-      hotness = GetFieldHotness(field, options);
+      hotness = GetFieldHotness(field, options, scc_analyzer);
     }
 
     if (ShouldPromoteToFastParse(field, hotness, fast_path_fields)) {
@@ -246,7 +252,8 @@ MessageLayoutHelper::MergeFieldAlignmentGroups(
 }
 
 MessageLayoutHelper::FieldVector MessageLayoutHelper::BuildFieldDescriptorOrder(
-    FieldPartitionArray&& field_groups, const Options& options) const {
+    FieldPartitionArray&& field_groups, const Options& options,
+    MessageSCCAnalyzer* scc_analyzer) const {
   enum { kZeroLast = 0, kZeroFirst = 1, kRecipeMax };
   constexpr FieldFamily profiled_orders[kRecipeMax][kMaxFamily] = {
       {REPEATED, STRING, OTHER, MESSAGE, ZERO_INITIALIZABLE},
@@ -300,8 +307,9 @@ MessageLayoutHelper::FieldVector MessageLayoutHelper::BuildFieldDescriptorOrder(
       }
     }
 
-    if (!fields.empty() && (EndsWithMsgPtr(fields, options) ||
-                            CanInitializeByZeroing(fields.back(), options))) {
+    if (!fields.empty() &&
+        (EndsWithMsgPtr(fields, options, scc_analyzer) ||
+         CanInitializeByZeroing(fields.back(), options, scc_analyzer))) {
       recipe = kZeroFirst;
     } else {
       recipe = kZeroLast;

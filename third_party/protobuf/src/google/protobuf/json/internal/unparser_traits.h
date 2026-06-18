@@ -212,8 +212,7 @@ struct UnparseProto2Descriptor : Proto2Descriptor {
                                          absl::string_view data, F body) {
     DynamicMessageFactory factory;
     std::unique_ptr<Message> unerased(factory.GetPrototype(&desc)->New());
-    // TODO: Remove this suppression.
-    (void)unerased->ParsePartialFromString(data);
+    unerased->ParsePartialFromString(data);
 
     // Explicitly create a const reference, so that we do not accidentally pass
     // a mutable reference to `body`.

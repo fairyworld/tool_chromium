@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <optional>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -17,7 +18,6 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_replace.h"
 #include "absl/strings/string_view.h"
-#include "absl/types/optional.h"
 #include "google/protobuf/descriptor.h"
 #include "google/protobuf/descriptor_database.h"
 #include "google/protobuf/descriptor_visitor.h"
@@ -55,9 +55,9 @@ TcFieldData Xor2SerializedBytes(TcFieldData tfd, const char* ptr) {
   return tfd;
 }
 
-absl::optional<const char*> fallback_ptr_received;
-absl::optional<uint64_t> fallback_hasbits_received;
-absl::optional<uint64_t> fallback_tag_received;
+std::optional<const char*> fallback_ptr_received;
+std::optional<uint64_t> fallback_hasbits_received;
+std::optional<uint64_t> fallback_tag_received;
 PROTOBUF_CC const char* FastParserGaveUp(
     ::google::protobuf::MessageLite*, const char* ptr, ::google::protobuf::internal::ParseContext*,
     ::google::protobuf::internal::TcFieldData data,
@@ -89,25 +89,21 @@ TEST(FastVarints, NameHere) {
   constexpr uint8_t kHasBitIndex = 0;
   constexpr uint8_t kFieldOffset = 24;
 
-  const ClassData class_data(
-      nullptr, nullptr, nullptr, nullptr, MessageCreator(), nullptr, nullptr,
-      nullptr, nullptr, /*cached_size_offset=*/16, /*is_lite*/ true);
-
+  // clang-format on
   const TcParseTable<0, 1, 0, 0, 2> parse_table = {
       {
           kHasBitsOffset,  //
           0,               // no _extensions_
-          1,
-          0,  // max_field_number, fast_idx_mask
+          1, 0,            // max_field_number, fast_idx_mask
           offsetof(decltype(parse_table), field_lookup_table),
           0xFFFFFFFF - 1,  // skipmap
           offsetof(decltype(parse_table), field_entries),
           1,                                             // num_field_entries
           0,                                             // num_aux_entries
           offsetof(decltype(parse_table), field_names),  // no aux_entries
-          &class_data,
-          nullptr,           // post_loop_handler
-          FastParserGaveUp,  // fallback
+          nullptr,                                       // default instance
+          nullptr,                                       // post_loop_handler
+          FastParserGaveUp,                              // fallback
 #ifdef PROTOBUF_PREFETCH_PARSE_TABLE
           nullptr,  // to_prefetch
 #endif              // PROTOBUF_PREFETCH_PARSE_TABLE
@@ -129,6 +125,7 @@ TEST(FastVarints, NameHere) {
       // no aux_entries
       {{}},
   };
+  // clang-format on
   uint8_t serialize_buffer[64];
 
   for (int size : {8, 32, 64}) {
@@ -205,9 +202,9 @@ TEST(FastVarints, NameHere) {
             fn = &TcParser::FastV64S1;
             break;
         }
-        fallback_ptr_received = absl::nullopt;
-        fallback_hasbits_received = absl::nullopt;
-        fallback_tag_received = absl::nullopt;
+        fallback_ptr_received = std::nullopt;
+        fallback_hasbits_received = std::nullopt;
+        fallback_tag_received = std::nullopt;
         end_ptr = fn(reinterpret_cast<MessageLite*>(fake_msg), ptr, &ctx,
                      Xor2SerializedBytes(parse_table.fast_entries[0].bits, ptr),
                      &parse_table.header, /*hasbits=*/0);
@@ -365,7 +362,7 @@ TEST_F(FindFieldEntryTest, FieldNumberWorksForAllFields) {
   // calculation works for all the fields.
   auto* gen_db = DescriptorPool::internal_generated_database();
   std::vector<std::string> all_file_names;
-  ASSERT_TRUE(gen_db->FindAllFileNames(&all_file_names));
+  gen_db->FindAllFileNames(&all_file_names);
 
   for (const auto& filename : all_file_names) {
     SCOPED_TRACE(filename);
@@ -901,7 +898,7 @@ TEST(GeneratedMessageTctableLiteTest, PackedEnumSmallRange) {
   }
 
   proto2_unittest::TestPackedEnumSmallRange new_proto;
-  ABSL_CHECK(new_proto.ParseFromString(proto.SerializeAsString()));
+  new_proto.ParseFromString(proto.SerializeAsString());
 
   // We should have reserved exactly the right size for new_proto's `vals`,
   // rather than growing it on demand like we did in `proto`.
@@ -985,8 +982,7 @@ TEST(GeneratedMessageTctableLiteTest,
   // field 1, because it notices that the input serialized proto is much smaller
   // than 2^20 bytes.
   proto2_unittest::TestPackedEnumSmallRange proto;
-  // TODO: Remove this suppression.
-  (void)proto.MergeFromString(serialized);
+  proto.MergeFromString(serialized);
   EXPECT_LE(proto.vals().Capacity(), 2048);
 }
 

@@ -130,8 +130,7 @@ std::string StringifyMessage(const Message& message, Option option,
   printer.SetRandomizeDebugString(true);
   printer.SetReportSensitiveFields(reporter);
   std::string result;
-  // TODO: Remove this suppression.
-  (void)printer.PrintToString(message, &result);
+  printer.PrintToString(message, &result);
 
   if (option == Option::kShort) {
     TrimTrailingSpace(result);
@@ -337,7 +336,7 @@ class TextFormat::Parser::ParserImpl {
   }
   ParserImpl(const ParserImpl&) = delete;
   ParserImpl& operator=(const ParserImpl&) = delete;
-  ~ParserImpl() = default;
+  ~ParserImpl() {}
 
   // Parses the ASCII representation specified in input and saves the
   // information into the output pointer (a Message). Returns
@@ -668,8 +667,7 @@ class TextFormat::Parser::ParserImpl {
         DO(ConsumeString(&tmp));
         MessageFactory* factory =
             finder_ ? finder_->FindExtensionFactory(field) : nullptr;
-        // TODO: Remove this suppression.
-        (void)reflection->MutableMessage(message, field, factory)
+        reflection->MutableMessage(message, field, factory)
             ->ParseFromString(tmp);
         return skip_parsing(true);
       }
@@ -1285,8 +1283,7 @@ class TextFormat::Parser::ParserImpl {
     DO(ConsumeMessage(value.get(), sub_delimiter));
 
     if (allow_partial_) {
-      // TODO: Remove this suppression.
-      (void)value->AppendPartialToString(serialized_value);
+      value->AppendPartialToString(serialized_value);
     } else {
       if (!value->IsInitialized()) {
         std::vector<std::string> missing_fields;
@@ -1297,8 +1294,7 @@ class TextFormat::Parser::ParserImpl {
             absl::StrJoin(missing_fields, ", ")));
         return false;
       }
-      // TODO: Remove this suppression.
-      (void)value->AppendToString(serialized_value);
+      value->AppendToString(serialized_value);
     }
     return true;
   }
@@ -1373,7 +1369,7 @@ class TextFormat::Parser::ParserImpl {
 
     ParserErrorCollector(const ParserErrorCollector&) = delete;
     ParserErrorCollector& operator=(const ParserErrorCollector&) = delete;
-    ~ParserErrorCollector() override = default;
+    ~ParserErrorCollector() override {}
 
     void RecordError(int line, int column, absl::string_view message) override {
       parser_->ReportError(line, column, message);
@@ -1718,7 +1714,7 @@ class TextFormat::Printer::FastFieldValuePrinterUtf8Escaping
 
 // ===========================================================================
 // Implementation of the default Finder for extensions.
-TextFormat::Finder::~Finder() = default;
+TextFormat::Finder::~Finder() {}
 
 const FieldDescriptor* TextFormat::Finder::FindExtension(
     Message* message, const std::string& name) const {
@@ -1756,6 +1752,8 @@ TextFormat::Parser::Parser()
       allow_relaxed_whitespace_(false),
       allow_singular_overwrites_(false),
       recursion_limit_(std::numeric_limits<int>::max()) {}
+
+TextFormat::Parser::~Parser() {}
 
 namespace {
 
@@ -1881,7 +1879,7 @@ bool TextFormat::Parser::ParseFieldValueFromString(absl::string_view input,
 
 // ===========================================================================
 
-TextFormat::BaseTextGenerator::~BaseTextGenerator() = default;
+TextFormat::BaseTextGenerator::~BaseTextGenerator() {}
 
 namespace {
 
@@ -1903,7 +1901,7 @@ class StringBaseTextGenerator : public TextFormat::BaseTextGenerator {
 // The default implementation for FieldValuePrinter. We just delegate the
 // implementation to the default FastFieldValuePrinter to avoid duplicating the
 // logic.
-TextFormat::FieldValuePrinter::FieldValuePrinter() = default;
+TextFormat::FieldValuePrinter::FieldValuePrinter() {}
 TextFormat::FieldValuePrinter::~FieldValuePrinter() {}
 
 #define FORWARD_IMPL(fn, ...)            \
@@ -1963,8 +1961,8 @@ std::string TextFormat::FieldValuePrinter::PrintMessageEnd(
 }
 #undef FORWARD_IMPL
 
-TextFormat::FastFieldValuePrinter::FastFieldValuePrinter() = default;
-TextFormat::FastFieldValuePrinter::~FastFieldValuePrinter() = default;
+TextFormat::FastFieldValuePrinter::FastFieldValuePrinter() {}
+TextFormat::FastFieldValuePrinter::~FastFieldValuePrinter() {}
 void TextFormat::FastFieldValuePrinter::PrintBool(
     bool val, BaseTextGenerator* generator) const {
   if (val) {
@@ -2184,8 +2182,8 @@ bool TextFormat::Printer::RegisterFieldValuePrinter(
   if (field == nullptr || printer == nullptr) {
     return false;
   }
-  std::unique_ptr<FieldValuePrinterWrapper> wrapper =
-      std::make_unique<FieldValuePrinterWrapper>(nullptr);
+  std::unique_ptr<FieldValuePrinterWrapper> wrapper(
+      new FieldValuePrinterWrapper(nullptr));
   auto pair = custom_printers_.emplace(field, nullptr);
   if (pair.second) {
     wrapper->SetDelegate(printer);
@@ -2358,8 +2356,7 @@ void TextFormat::Printer::Print(const Message& message,
     {
       std::string serialized = message.SerializeAsString();
       io::ArrayInputStream input(serialized.data(), serialized.size());
-      // TODO: Remove this suppression.
-      (void)unknown_fields.ParseFromZeroCopyStream(&input);
+      unknown_fields.ParseFromZeroCopyStream(&input);
     }
     PrintUnknownFields(unknown_fields, generator, kUnknownFieldRecursionLimit);
     return;

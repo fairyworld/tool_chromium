@@ -155,13 +155,11 @@ final class FloatArrayList extends AbstractProtobufList<Float>
   }
 
   @Override
-  @CanIgnoreReturnValue
   public Float set(int index, Float element) {
     return setFloat(index, element);
   }
 
   @Override
-  @CanIgnoreReturnValue
   public float setFloat(int index, float element) {
     ensureIsMutable();
     ensureIndexInRange(index);
@@ -171,7 +169,6 @@ final class FloatArrayList extends AbstractProtobufList<Float>
   }
 
   @Override
-  @CanIgnoreReturnValue
   public boolean add(Float element) {
     addFloat(element);
     return true;
@@ -225,7 +222,6 @@ final class FloatArrayList extends AbstractProtobufList<Float>
   }
 
   @Override
-  @CanIgnoreReturnValue
   public boolean addAll(Collection<? extends Float> collection) {
     ensureIsMutable();
 
@@ -259,7 +255,6 @@ final class FloatArrayList extends AbstractProtobufList<Float>
   }
 
   @Override
-  @CanIgnoreReturnValue
   public Float remove(int index) {
     ensureIsMutable();
     ensureIndexInRange(index);

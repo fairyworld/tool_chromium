@@ -608,6 +608,9 @@ void GenerateRs(Context& ctx, const Descriptor& msg, const upb::DefPool& pool) {
         // - `$Msg$View` does not use thread-local data.
         unsafe impl Send for $Msg$View<'_> {}
 
+        impl<'msg> $pb$::Proxy<'msg> for $Msg$View<'msg> {}
+        impl<'msg> $pb$::ViewProxy<'msg> for $Msg$View<'msg> {}
+
         impl<'msg> $pb$::AsView for $Msg$View<'msg> {
           type Proxied = $Msg$;
           fn as_view(&self) -> $pb$::View<'msg, $Msg$> {
@@ -680,11 +683,14 @@ void GenerateRs(Context& ctx, const Descriptor& msg, const upb::DefPool& pool) {
         // - `$Msg$Mut` does not perform any shared mutation.
         unsafe impl Sync for $Msg$Mut<'_> {}
 
+        impl<'msg> $pb$::Proxy<'msg> for $Msg$Mut<'msg> {}
+        impl<'msg> $pb$::MutProxy<'msg> for $Msg$Mut<'msg> {}
+
         impl<'msg> $pb$::AsView for $Msg$Mut<'msg> {
           type Proxied = $Msg$;
           fn as_view(&self) -> $pb$::View<'_, $Msg$> {
             $Msg$View {
-              inner: $pbr$::MessageViewInner::view_of_mut(self.inner)
+              inner: $pbr$::MessageViewInner::view_of_mut(self.inner.clone())
             }
           }
         }
@@ -694,7 +700,7 @@ void GenerateRs(Context& ctx, const Descriptor& msg, const upb::DefPool& pool) {
           where
               'msg: 'shorter {
             $Msg$View {
-              inner: $pbr$::MessageViewInner::view_of_mut(self.inner)
+              inner: $pbr$::MessageViewInner::view_of_mut(self.inner.clone())
             }
           }
         }
@@ -741,7 +747,6 @@ void GenerateRs(Context& ctx, const Descriptor& msg, const upb::DefPool& pool) {
         //~ We implement drop unconditionally, so that `$Msg$: Drop` regardless
         //~ of kernel.
         impl $std$::ops::Drop for $Msg$ {
-          #[inline]
           fn drop(&mut self) {
             $Msg::drop$
           }
@@ -790,7 +795,7 @@ void GenerateRs(Context& ctx, const Descriptor& msg, const upb::DefPool& pool) {
              }},
         },
         R"rs(
-        unsafe extern "C" {
+        extern "C" {
           $message_externs$
           $accessor_externs$
           $oneof_externs$
@@ -858,18 +863,6 @@ void GenerateRs(Context& ctx, const Descriptor& msg, const upb::DefPool& pool) {
         }
       }
     )rs");
-
-    if (!ctx.opts().force_lite_runtime &&
-        msg.file()->options().optimize_for() != FileOptions::LITE_RUNTIME) {
-      ctx.Emit({{"Msg", RsSafeName(msg.name())}},
-               R"rs(
-              impl $pb$::MessageDescriptorInterop for $Msg$ {
-                fn __unstable_get_descriptor() -> *const $std$::ffi::c_void {
-                  unsafe { $pbr$::proto2_rust_Message_get_descriptor(<$Msg$View as Default>::default().raw_msg()) }
-                }
-              }
-            )rs");
-    }
   }
 }  // NOLINT(readability/fn_size)
 

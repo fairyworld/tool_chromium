@@ -953,7 +953,7 @@ class Proto2Test {
   @Test
   fun testGetOrNull() {
     val noNestedMessage = testAllTypes {}
-    assertThat(noNestedMessage.optionalNestedMessageOrNull).isNull()
+    assertThat(noNestedMessage.optionalNestedMessageOrNull).isEqualTo(null)
 
     val someNestedMessage = testAllTypes {
       optionalNestedMessage = TestAllTypesKt.nestedMessage { bb = 118 }

@@ -94,13 +94,7 @@ class FileGenerator {
   void EmitRootImplementation(
       io::Printer* p,
       const std::vector<const FileDescriptor*>& deps_with_extensions) const;
-  void EmitRootExtensionRegistryMigrationClassMethods(
-      io::Printer* p,
-      const std::vector<const FileDescriptor*>& deps_with_extensions) const;
-  void EmitRootExtensionRegistryClassBasedClassMethods(
-      io::Printer* p,
-      const std::vector<const FileDescriptor*>& deps_with_extensions) const;
-  void EmitExtensionRegistryAndDescriptorFunctions(
+  void EmitRootExtensionRegistryImplementation(
       io::Printer* p,
       const std::vector<const FileDescriptor*>& deps_with_extensions) const;
   void EmitFileDescription(io::Printer* p) const;
@@ -126,8 +120,6 @@ class FileGenerator {
   const GenerationOptions& generation_options_;
   mutable CommonState* common_state_;
   const std::string root_class_name_;
-  const std::string file_unique_symbol_name_;
-  const std::string file_registry_function_name_;
   const std::string file_description_name_;
   const bool is_bundled_proto_;
 

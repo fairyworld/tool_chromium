@@ -114,7 +114,7 @@ class PROTOBUF_EXPORT InternalFeatureHelper {
 
     auto lang_features_ret =
         ParseAndGetEditionResolvedFeatureSet(
-            ::google::protobuf::internal::GetFeatureSetDefaultsData<ExtType>(),
+            ::pb::internal::GetFeatureSetDefaultsData<ExtType>(),
             GetEdition(descriptor))
             .GetExtension(extension);
     lang_features_ret.MergeFrom(lang_features);

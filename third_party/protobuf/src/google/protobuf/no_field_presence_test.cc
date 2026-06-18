@@ -312,7 +312,6 @@ TEST(NoFieldPresenceTest, CopyTwiceDefaultStringFieldTest) {
 
   dst = src;
   dst = src;
-  (void)dst;
 }
 
 TEST(NoFieldPresenceTest, CopyTwiceAllocatedStringFieldTest) {
@@ -326,7 +325,6 @@ TEST(NoFieldPresenceTest, CopyTwiceAllocatedStringFieldTest) {
 
   dst = src;
   dst = src;
-  (void)dst;
 }
 
 TEST(NoFieldPresenceTest, CopyTwiceEmptyStringFieldTest) {
@@ -341,7 +339,6 @@ TEST(NoFieldPresenceTest, CopyTwiceEmptyStringFieldTest) {
 
   dst = src;
   dst = src;
-  (void)dst;
 }
 
 class NoFieldPresenceSwapFieldTest : public testing::Test {
@@ -883,7 +880,7 @@ TEST(NoFieldPresenceTest, ParseEmptyStringFromWire) {
                          2);
 
   TestAllTypes message;
-  ABSL_CHECK(message.MergeFromString(wire));
+  message.MergeFromString(wire);
 
   // Implicit-presence fields don't have hazzers, so we can only verify that the
   // empty bytes field is not overwritten.
@@ -906,7 +903,7 @@ TEST(MessageTest, ParseEmptyStringFromWireOverwritesExistingField) {
   //   encoded on the wire.
   absl::string_view wire("\172\x00",  // 3:LEN 0
                          2);
-  ABSL_CHECK(message.MergeFromString(wire));
+  message.MergeFromString(wire);
 
   // Implicit-presence fields don't have hazzers, so we can only verify that the
   // empty bytes field is overwritten.
@@ -929,7 +926,7 @@ TEST(MessageTest, MergeEmptyMessageFromWire) {
   TestAllTypes message;
   ASSERT_EQ(TestAllTypes::GetDescriptor()->FindFieldByNumber(19)->name(),
             "optional_foreign_message");
-  ABSL_CHECK(message.MergeFromString(wire));
+  message.MergeFromString(wire);
 
   // Message fields always have explicit presence, so serializing the message
   // will write the original bytes back out onto the wire.
@@ -953,7 +950,7 @@ TEST(MessageTest, MergeEmptyMessageFromWireDoesNotOverwiteExisting) {
   std::string original_output_data;
   EXPECT_TRUE(message.SerializeToString(&original_output_data));
 
-  ABSL_CHECK(message.MergeFromString(wire));
+  message.MergeFromString(wire);
   EXPECT_TRUE(message.has_optional_foreign_message());
   EXPECT_EQ(message.optional_foreign_message().c(), 12);
 
@@ -1212,7 +1209,7 @@ TYPED_TEST(NoFieldPresenceSerializeTest, LazyMessageFieldHasBit) {
   TypeParam& output_sink = this->GetOutputSinkRef();
   ASSERT_TRUE(TestSerialize(message, &output_sink));
   TestAllTypes message2;
-  ABSL_CHECK(message2.ParseFromString(this->GetOutput()));
+  message2.ParseFromString(this->GetOutput());
 
   EXPECT_EQ(true, message2.has_optional_lazy_message());
   EXPECT_EQ(true, r->HasField(message2, field));

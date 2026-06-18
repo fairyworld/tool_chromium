@@ -9,7 +9,7 @@ Most users should depend upon public aliases in the root:
 """
 
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_files", "strip_prefix")
 load("@rules_python//python:defs.bzl", "py_library")
 load("//:protobuf.bzl", "internal_py_proto_library")
@@ -55,6 +55,7 @@ def build_targets(name):
         srcs = [":copied_wkt_proto_files"],
         include = ".",
         default_runtime = "",
+        protoc = "//:protoc",
         srcs_version = "PY2AND3",
         visibility = [
             "//:__pkg__",
@@ -97,7 +98,10 @@ def build_targets(name):
             # https://docs.bazel.build/versions/master/be/common-definitions.html#common-attributes
             "manual",
         ],
-        deps = ["@system_python//:python_headers"],
+        deps = select({
+            "//conditions:default": [],
+            ":use_fast_cpp_protos": ["@system_python//:python_headers"],
+        }),
     )
 
     native.config_setting(
@@ -141,16 +145,16 @@ def build_targets(name):
             "//src/google/protobuf/io:tokenizer",
             "//src/google/protobuf/stubs:lite",
             "//src/google/protobuf/util:differencer",
-            "@abseil-cpp//absl/base:core_headers",
             "@abseil-cpp//absl/container:flat_hash_map",
             "@abseil-cpp//absl/log:absl_check",
             "@abseil-cpp//absl/log:absl_log",
             "@abseil-cpp//absl/status",
             "@abseil-cpp//absl/status:statusor",
             "@abseil-cpp//absl/strings",
-            "@abseil-cpp//absl/synchronization",
-            "@system_python//:python_headers",
-        ],
+        ] + select({
+            "//conditions:default": [],
+            ":use_fast_cpp_protos": ["@system_python//:python_headers"],
+        }),
     )
 
     aarch64_test(
@@ -285,6 +289,7 @@ def build_targets(name):
         ],
         include = ".",
         default_runtime = "",
+        protoc = "//:protoc",
         srcs_version = "PY2AND3",
         visibility = [
             "//:__pkg__",
@@ -299,6 +304,7 @@ def build_targets(name):
         srcs = [":copied_test_proto_files"],
         include = ".",
         default_runtime = "",
+        protoc = "//:protoc",
         srcs_version = "PY2AND3",
         visibility = ["//:__pkg__"],
         deps = [":well_known_types_py_pb2", ":test_dependency_proto_py_pb2"],
@@ -313,6 +319,7 @@ def build_targets(name):
         ]),
         include = ".",
         default_runtime = ":protobuf_python",
+        protoc = "//:protoc",
         srcs_version = "PY2AND3",
         visibility = ["//:__pkg__"],
         deps = [":python_common_test_protos"],
@@ -324,6 +331,7 @@ def build_targets(name):
         srcs = [":copied_conformance_test_files"],
         include = ".",
         default_runtime = "//:protobuf_python",
+        protoc = "//:protoc",
         visibility = [
             "//conformance:__pkg__",
             "//python:__subpackages__",

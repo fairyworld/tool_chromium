@@ -98,10 +98,9 @@ struct MapTestPeer {
   static bool InsertOrReplaceNode(T& map, typename T::key_type key,
                                   typename T::mapped_type value) {
     using Node = typename T::Node;
-    auto* node = static_cast<Node*>(map.arena(),
-                                    map.AllocNode(map.arena(), sizeof(Node)));
+    auto* node = static_cast<Node*>(map.AllocNode(sizeof(Node)));
     ::new (static_cast<void*>(&node->kv)) typename T::value_type{key, value};
-    return GetKeyMapBase(map).InsertOrReplaceNode(map.arena(), node);
+    return GetKeyMapBase(map).InsertOrReplaceNode(node);
   }
 
   template <typename T>
@@ -291,17 +290,17 @@ TEST_F(MapImplTest, MutableAt) {
 #if GTEST_HAS_DEATH_TEST
 
 TEST_F(MapImplTest, MutableAtNonExistDeathTest) {
-  EXPECT_DEATH((void)map_.at(0), "");
+  EXPECT_DEATH(map_.at(0), "");
 }
 
 TEST_F(MapImplTest, ImmutableAtNonExistDeathTest) {
-  EXPECT_DEATH((void)const_map_.at(0), "");
+  EXPECT_DEATH(const_map_.at(0), "");
 }
 
 TEST_F(MapImplTest, UsageErrors) {
   MapKey key;
   key.SetInt64Value(1);
-  EXPECT_DEATH((void)key.GetUInt64Value(),
+  EXPECT_DEATH(key.GetUInt64Value(),
                "Protocol Buffer map usage error:\n"
                "MapKey::GetUInt64Value type does not match\n"
                "  Expected : uint64\n"
@@ -1461,8 +1460,8 @@ void TestTransparent(const Key& key, const Key& miss_key) {
   EXPECT_EQ(cm.at(key), 1);
 
 #if GTEST_HAS_DEATH_TEST
-  EXPECT_DEATH((void)m.at(miss_key), "");
-  EXPECT_DEATH((void)cm.at(miss_key), "");
+  EXPECT_DEATH(m.at(miss_key), "");
+  EXPECT_DEATH(cm.at(miss_key), "");
 #endif  // GTEST_HAS_DEATH_TEST
 
   EXPECT_EQ(m.count(key), 1);
@@ -2621,9 +2620,9 @@ TEST(GeneratedMapFieldTest, DynamicMessageMergeFromDynamicMessage) {
   // Test MergeFrom does not sync to repeated fields and
   // there is no duplicate keys in text format.
   std::string output1, output2, output3;
-  ASSERT_TRUE(TextFormat::PrintToString(*message1, &output1));
-  ASSERT_TRUE(TextFormat::PrintToString(*message2, &output2));
-  ASSERT_TRUE(TextFormat::PrintToString(*message3, &output3));
+  TextFormat::PrintToString(*message1, &output1);
+  TextFormat::PrintToString(*message2, &output2);
+  TextFormat::PrintToString(*message3, &output3);
   EXPECT_EQ(output1, output2);
   EXPECT_EQ(output1, output3);
 }
@@ -2696,8 +2695,8 @@ TEST(GeneratedMapFieldTest, NonEmptyMergeFrom) {
   message2.MergeFrom(message1);
 
   std::string output1, output2;
-  ASSERT_TRUE(TextFormat::PrintToString(message1, &output1));
-  ASSERT_TRUE(TextFormat::PrintToString(message2, &output2));
+  TextFormat::PrintToString(message1, &output1);
+  TextFormat::PrintToString(message2, &output2);
   EXPECT_EQ(output1, output2);
 }
 
@@ -2785,7 +2784,7 @@ TEST(GeneratedMapFieldTest, Proto2UnknownEnum) {
   (*from.mutable_known_map_field())[0] = UNITTEST::E_PROTO2_MAP_ENUM_FOO;
   (*from.mutable_unknown_map_field())[0] = UNITTEST::E_PROTO2_MAP_ENUM_EXTRA;
   std::string data;
-  ABSL_CHECK(from.SerializeToString(&data));
+  from.SerializeToString(&data);
 
   UNITTEST::TestEnumMap to;
   EXPECT_TRUE(to.ParseFromString(data));
@@ -2796,7 +2795,7 @@ TEST(GeneratedMapFieldTest, Proto2UnknownEnum) {
 
   data.clear();
   from.Clear();
-  ABSL_CHECK(to.SerializeToString(&data));
+  to.SerializeToString(&data);
   EXPECT_TRUE(from.ParseFromString(data));
   EXPECT_EQ(from.GetReflection()->GetUnknownFields(from).field_count(), 0);
   EXPECT_THAT(from.known_map_field(),
@@ -2959,23 +2958,6 @@ TEST(GeneratedMapFieldTest, DuplicatedKeyWireFormat) {
   EXPECT_FALSE(map_message.map_field().find(key)->second.has_dummy4());
   ASSERT_TRUE(map_message.map_field().find(key)->second.has_dummy5());
   EXPECT_EQ(12, map_message.map_field().find(key)->second.dummy5());
-}
-
-TEST(GeneratedMapFieldTest, DuplicateEntriesInWireFormatLastOneWins) {
-  UNITTEST::TestMap message;
-
-  std::string bytes;
-  {
-    UNITTEST::TestMap tmp;
-    (*tmp.mutable_map_int32_int32())[1] = 1;
-    bytes = tmp.SerializeAsString();
-
-    (*tmp.mutable_map_int32_int32())[1] = 2;
-    absl::StrAppend(&bytes, tmp.SerializeAsString());
-  }
-
-  ASSERT_TRUE(message.ParseFromString(bytes));
-  EXPECT_THAT(message.map_int32_int32(), ElementsAre(Pair(1, 2)));
 }
 
 // Exhaustive combinations of keys, values, and junk in any order.
@@ -3583,14 +3565,14 @@ TEST_F(MapFieldInDynamicMessageTest, MapValueReferernceValidAfterSerialize) {
   // from map to repeated field, which will invalidate the submsg we previously
   // got.
   std::string data;
-  ABSL_CHECK(message->SerializeToString(&data));
+  message->SerializeToString(&data);
 
   const Reflection* submsg_reflection = submsg->GetReflection();
   const Descriptor* submsg_desc = submsg->GetDescriptor();
   const FieldDescriptor* submsg_field = submsg_desc->FindFieldByName("c");
   submsg_reflection->SetInt32(submsg, submsg_field, 128);
 
-  ABSL_CHECK(message->SerializeToString(&data));
+  message->SerializeToString(&data);
   TestMap to;
   ASSERT_TRUE(to.ParseFromString(data));
   EXPECT_EQ(128, to.map_int32_foreign_message().at(0).c());
@@ -3615,16 +3597,16 @@ TEST_F(MapFieldInDynamicMessageTest, MapEntryReferernceValidAfterSerialize) {
   // from repeated field to map, which will invalidate the map_entry we
   // previously got.
   std::string data;
-  ABSL_CHECK(message->SerializeToString(&data));
+  message->SerializeToString(&data);
 
   const Reflection* submsg_reflection = submsg->GetReflection();
   const Descriptor* submsg_desc = submsg->GetDescriptor();
   const FieldDescriptor* submsg_field = submsg_desc->FindFieldByName("c");
   submsg_reflection->SetInt32(submsg, submsg_field, 128);
 
-  ABSL_CHECK(message->SerializeToString(&data));
+  message->SerializeToString(&data);
   TestMap to;
-  ABSL_CHECK(to.ParseFromString(data));
+  to.ParseFromString(data);
   EXPECT_EQ(128, to.map_int32_foreign_message().at(0).c());
 }
 
@@ -3712,12 +3694,12 @@ TEST(WireFormatForMapFieldTest, ParseMap) {
 
   // Serialize using the generated code.
   MapTestUtil::SetMapFields(&source);
-  ABSL_CHECK(source.SerializeToString(&data));
+  source.SerializeToString(&data);
 
   // Parse using WireFormat.
   io::ArrayInputStream raw_input(data.data(), data.size());
   io::CodedInputStream input(&raw_input);
-  ASSERT_TRUE(WireFormat::ParseAndMergePartial(&input, &dest));
+  WireFormat::ParseAndMergePartial(&input, &dest);
 
   // Check.
   MapTestUtil::ExpectMapFieldsSet(dest);
@@ -3742,7 +3724,7 @@ TEST(WireFormatForMapFieldTest, SerializeMap) {
 
   // Serialize using the generated code.
   {
-    ASSERT_GT(message.ByteSizeLong(), 0);
+    message.ByteSizeLong();
     io::StringOutputStream raw_output(&generated_data);
     io::CodedOutputStream output(&raw_output);
     message.SerializeWithCachedSizes(&output);
@@ -3780,8 +3762,8 @@ TEST(WireFormatForMapFieldTest, SerializeMapDynamicMessage) {
   std::string dynamic_data;
 
   // Serialize.
-  ABSL_CHECK(generated_message.SerializeToString(&generated_data));
-  ABSL_CHECK(dynamic_message->SerializeToString(&dynamic_data));
+  generated_message.SerializeToString(&generated_data);
+  dynamic_message->SerializeToString(&dynamic_data);
 
   // Because map serialization doesn't guarantee order, we just compare
   // serialized size here. This is enough to tell dynamic message doesn't miss
@@ -3798,11 +3780,11 @@ TEST(WireFormatForMapFieldTest, MapByteSizeDynamicMessage) {
   reflection_tester.SetMapFieldsViaReflection(dynamic_message.get());
   reflection_tester.ExpectMapFieldsSetViaReflection(*dynamic_message);
   std::string expected_serialized_data;
-  ABSL_CHECK(dynamic_message->SerializeToString(&expected_serialized_data));
+  dynamic_message->SerializeToString(&expected_serialized_data);
   int expected_size = expected_serialized_data.size();
   EXPECT_EQ(dynamic_message->ByteSizeLong(), expected_size);
   TestMap expected_message;
-  ABSL_CHECK(expected_message.ParseFromString(expected_serialized_data));
+  expected_message.ParseFromString(expected_serialized_data);
 
   std::unique_ptr<Message> message2;
   message2.reset(factory.GetPrototype(UNITTEST::TestMap::descriptor())->New());
@@ -3821,7 +3803,7 @@ TEST(WireFormatForMapFieldTest, MapByteSizeDynamicMessage) {
   size_t duplicate_size = dynamic_message->ByteSizeLong();
   EXPECT_TRUE(duplicate_size > expected_size);
   std::string duplicate_serialized_data;
-  ABSL_CHECK(dynamic_message->SerializeToString(&duplicate_serialized_data));
+  dynamic_message->SerializeToString(&duplicate_serialized_data);
   EXPECT_EQ(dynamic_message->ByteSizeLong(), duplicate_serialized_data.size());
 
   // Force the map field to mark with map CLEAN
@@ -3857,7 +3839,7 @@ TEST(WireFormatForMapFieldTest, MapByteSizeDynamicMessage) {
   // warning was raised at parse back if user use SerializeWithCachedSizes()
   // which avoids size check at serialize.
   std::string serialized_data;
-  ABSL_CHECK(dynamic_message->SerializeToString(&serialized_data));
+  dynamic_message->SerializeToString(&serialized_data);
   EXPECT_TRUE(dynamic_message->ParseFromString(serialized_data));
 }
 
@@ -3868,7 +3850,7 @@ TEST(WireFormatForMapFieldTest, MapParseHelpers) {
     // Set up.
     UNITTEST::TestMap message;
     MapTestUtil::SetMapFields(&message);
-    ABSL_CHECK(message.SerializeToString(&data));
+    message.SerializeToString(&data);
   }
 
   {
@@ -3946,7 +3928,7 @@ static std::string DeterministicSerializationWithSerializePartialToCodedStream(
   io::ArrayOutputStream array_stream(&result[0], size);
   io::CodedOutputStream output_stream(&array_stream);
   output_stream.SetSerializationDeterministic(true);
-  ABSL_CHECK(t.SerializePartialToCodedStream(&output_stream));
+  t.SerializePartialToCodedStream(&output_stream);
   EXPECT_FALSE(output_stream.HadError());
   EXPECT_EQ(size, output_stream.ByteCount());
   return result;
@@ -3960,7 +3942,7 @@ static std::string DeterministicSerializationWithSerializeToCodedStream(
   io::ArrayOutputStream array_stream(&result[0], size);
   io::CodedOutputStream output_stream(&array_stream);
   output_stream.SetSerializationDeterministic(true);
-  ABSL_CHECK(t.SerializeToCodedStream(&output_stream));
+  t.SerializeToCodedStream(&output_stream);
   EXPECT_FALSE(output_stream.HadError());
   EXPECT_EQ(size, output_stream.ByteCount());
   return result;
@@ -4058,11 +4040,10 @@ static std::string GetGoldenMessageBinary() {
   static std::string* golden_message_binary = [] {
     UNITTEST::TestMaps t;
     TextFormat::Parser parser;
-    // TODO: Remove this suppression.
-    (void) parser.ParseFromString(GetGoldenMessageTextProto(), &t);
+    parser.ParseFromString(GetGoldenMessageTextProto(), &t);
 
     std::string* result = new std::string;
-    ABSL_CHECK(t.SerializeToString(result));
+    t.SerializeToString(result);
     return result;
   }();
   return *golden_message_binary;
@@ -4071,7 +4052,7 @@ static std::string GetGoldenMessageBinary() {
 TEST(MapSerializationTest, DeterministicSubmessage) {
   UNITTEST::TestSubmessageMaps p;
   UNITTEST::TestMaps t;
-  ABSL_CHECK(t.ParseFromString(GetGoldenMessageBinary()));
+  t.ParseFromString(GetGoldenMessageBinary());
   *(p.mutable_m()) = t;
   std::vector<std::string> v;
   // Use multiple attempts to increase the chance of a failure if something is
@@ -4095,7 +4076,7 @@ TEST(TextFormatMapTest, SerializeAndParse) {
 
   // Test compact ASCII
   TextFormat::Printer printer;
-  ASSERT_TRUE(printer.PrintToString(source, &output));
+  printer.PrintToString(source, &output);
   TextFormat::Parser parser;
   EXPECT_TRUE(parser.ParseFromString(output, &dest));
   MapTestUtil::ExpectMapFieldsSet(dest);
@@ -4110,7 +4091,7 @@ TEST(TextFormatMapTest, DynamicMessage) {
   tester.SetMapFieldsViaReflection(message.get());
 
   std::string actual_text;
-  ASSERT_TRUE(TextFormat::PrintToString(*message, &actual_text));
+  TextFormat::PrintToString(*message, &actual_text);
   EXPECT_EQ(actual_text, GetGoldenMessageTextProto());
 }
 
@@ -4121,14 +4102,14 @@ TEST(TextFormatMapTest, Sorted) {
 
   TextFormat::Printer printer;
   std::string actual_text;
-  ASSERT_TRUE(printer.PrintToString(message, &actual_text));
+  printer.PrintToString(message, &actual_text);
   EXPECT_EQ(actual_text, GetGoldenMessageTextProto());
 
   // Test again on the reverse order.
   UNITTEST::TestMap message2;
   tester.SetMapFieldsViaReflection(&message2);
   tester.SwapMapsViaReflection(&message2);
-  ASSERT_TRUE(printer.PrintToString(message2, &actual_text));
+  printer.PrintToString(message2, &actual_text);
   EXPECT_EQ(actual_text, GetGoldenMessageTextProto());
 }
 
@@ -4147,7 +4128,7 @@ TEST(TextFormatMapTest, NoDisableIterator) {
   // iterator previously.
   std::string output;
   TextFormat::Printer printer;
-  ASSERT_TRUE(printer.PrintToString(source, &output));
+  printer.PrintToString(source, &output);
 
   // Modify map via the iterator (invalidated in previous implementation.).
   iter->second = 2;
@@ -4155,7 +4136,7 @@ TEST(TextFormatMapTest, NoDisableIterator) {
   // In previous implementation, the new change won't be reflected in text
   // format, because the previous iterator has been invalidated.
   output.clear();
-  ASSERT_TRUE(printer.PrintToString(source, &output));
+  printer.PrintToString(source, &output);
   std::string expected =
       "map_int32_int32 {\n"
       "  key: 1\n"
@@ -4183,7 +4164,7 @@ TEST(TextFormatMapTest, NoDisableReflectionIterator) {
   // iterator previously.
   std::string output;
   TextFormat::Printer printer;
-  ASSERT_TRUE(printer.PrintToString(source, &output));
+  printer.PrintToString(source, &output);
 
   // Modify map via the iterator (invalidated in previous implementation.).
   const Reflection* map_entry_reflection = iter->GetReflection();
@@ -4194,7 +4175,7 @@ TEST(TextFormatMapTest, NoDisableReflectionIterator) {
   // In previous implementation, the new change won't be reflected in text
   // format, because the previous iterator has been invalidated.
   output.clear();
-  ASSERT_TRUE(printer.PrintToString(source, &output));
+  printer.PrintToString(source, &output);
   std::string expected =
       "map_int32_int32 {\n"
       "  key: 1\n"
@@ -4221,10 +4202,10 @@ TEST(ArenaTest, ParsingAndSerializingNoHeapAllocation) {
     UNITTEST::TestArenaMap* from =
         Arena::Create<UNITTEST::TestArenaMap>(&arena);
     MapTestUtil::SetArenaMapFields(from);
-    ABSL_CHECK(from->SerializeToString(&data));
+    from->SerializeToString(&data);
 
     UNITTEST::TestArenaMap* to = Arena::Create<UNITTEST::TestArenaMap>(&arena);
-    ABSL_CHECK(to->ParseFromString(data));
+    to->ParseFromString(data);
     MapTestUtil::ExpectArenaMapFieldsSet(*to);
   }
 }
@@ -4250,7 +4231,7 @@ TEST(ArenaTest, ReflectionInTextFormat) {
   UNITTEST::TestArenaMap* to = Arena::Create<UNITTEST::TestArenaMap>(&arena);
 
   MapTestUtil::SetArenaMapFields(from);
-  ASSERT_TRUE(printer.PrintToString(*from, &data));
+  printer.PrintToString(*from, &data);
 
   EXPECT_TRUE(parser.ParseFromString(data, to));
   MapTestUtil::ExpectArenaMapFieldsSet(*to);
@@ -4269,7 +4250,7 @@ TEST(ArenaTest, StringMapNoLeak) {
   }
   (*message->mutable_map_string_string())[data] = data;
   // Now we recreate the map via parsing
-  ABSL_CHECK(message->ParseFromString(message->SerializeAsString()));
+  message->ParseFromString(message->SerializeAsString());
   // And we cause value strings to grow to make sure they are handled correctly.
   std::string& value = (*message->mutable_map_string_string())[data];
   ASSERT_EQ(value, data);

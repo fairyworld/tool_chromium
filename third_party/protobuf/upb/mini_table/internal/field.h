@@ -23,10 +23,9 @@ struct upb_MiniTableField {
   uint16_t UPB_ONLYBITS(offset);
   int16_t presence;  // If >0, hasbit_index.  If <0, ~oneof_index
 
-  // Offset from this upb_MiniTableField to the upb_MiniTableSubInternal
-  // for this field, in uint32_t units (so bytes/4).
+  // Indexes into `upb_MiniTable.subs`
   // Will be set to `kUpb_NoSub` if `descriptortype` != MESSAGE/GROUP/ENUM
-  uint16_t UPB_PRIVATE(submsg_ofs);
+  uint16_t UPB_PRIVATE(submsg_index);
 
   uint8_t UPB_PRIVATE(descriptortype);
 
@@ -35,7 +34,6 @@ struct upb_MiniTableField {
 };
 
 #define kUpb_NoSub ((uint16_t)-1)
-#define kUpb_SubmsgOffsetBytes 4
 
 typedef enum {
   kUpb_FieldMode_Map = 0,

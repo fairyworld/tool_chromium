@@ -103,16 +103,15 @@ pub struct InnerProtoString {
     owned_ptr: CppStdString,
 }
 
-unsafe extern "C" {
+extern "C" {
     pub fn proto2_rust_Message_delete(m: RawMessage);
     pub fn proto2_rust_Message_clear(m: RawMessage);
     pub fn proto2_rust_Message_parse(m: RawMessage, input: PtrAndLen) -> bool;
     pub fn proto2_rust_Message_parse_dont_enforce_required(m: RawMessage, input: PtrAndLen)
         -> bool;
     pub fn proto2_rust_Message_serialize(m: RawMessage, output: &mut SerializedData) -> bool;
-    pub fn proto2_rust_Message_copy_from(dst: RawMessage, src: RawMessage);
-    pub fn proto2_rust_Message_merge_from(dst: RawMessage, src: RawMessage);
-    pub fn proto2_rust_Message_get_descriptor(m: RawMessage) -> *const std::ffi::c_void;
+    pub fn proto2_rust_Message_copy_from(dst: RawMessage, src: RawMessage) -> bool;
+    pub fn proto2_rust_Message_merge_from(dst: RawMessage, src: RawMessage) -> bool;
 }
 
 impl Drop for InnerProtoString {
@@ -150,7 +149,7 @@ impl From<&[u8]> for InnerProtoString {
     }
 }
 
-unsafe extern "C" {
+extern "C" {
     fn proto2_rust_cpp_new_string(src: PtrAndLen) -> CppStdString;
     fn proto2_rust_cpp_delete_string(src: CppStdString);
     fn proto2_rust_cpp_string_to_view(src: CppStdString) -> PtrAndLen;
@@ -325,7 +324,7 @@ impl From<RustStringRawParts> for String {
     }
 }
 
-unsafe extern "C" {
+extern "C" {
     fn proto2_rust_utf8_debug_string(raw: RawMessage) -> RustStringRawParts;
 }
 
@@ -336,7 +335,7 @@ pub fn debug_string(raw: RawMessage, f: &mut fmt::Formatter<'_>) -> fmt::Result 
     write!(f, "{dbg_str}")
 }
 
-unsafe extern "C" {
+extern "C" {
     /// # Safety
     /// - `raw1` and `raw2` legally dereferenceable MessageLite* pointers.
     #[link_name = "proto2_rust_messagelite_equals"]
@@ -573,13 +572,12 @@ where
         unsafe { proto2_rust_RepeatedField_Message_free(f.as_view().as_raw(Private)) }
     }
 
-    fn repeated_len(_private: Private, f: View<Repeated<Self>>) -> usize {
+    fn repeated_len(f: View<Repeated<Self>>) -> usize {
         // SAFETY: `f.as_raw()` is a valid `RepeatedPtrField*`.
         unsafe { proto2_rust_RepeatedField_Message_size(f.as_raw(Private)) }
     }
 
     unsafe fn repeated_set_unchecked(
-        _private: Private,
         mut f: Mut<Repeated<Self>>,
         i: usize,
         v: impl IntoProxied<Self>,
@@ -596,11 +594,7 @@ where
         }
     }
 
-    unsafe fn repeated_get_unchecked(
-        _private: Private,
-        f: View<Repeated<Self>>,
-        i: usize,
-    ) -> View<Self> {
+    unsafe fn repeated_get_unchecked(f: View<Repeated<Self>>, i: usize) -> View<Self> {
         // SAFETY:
         // - `f.as_raw()` is a valid `const RepeatedPtrField&`.
         // - `i < len(f)` is promised by caller.
@@ -609,11 +603,7 @@ where
         inner.into()
     }
 
-    unsafe fn repeated_get_mut_unchecked(
-        _private: Private,
-        mut f: Mut<Repeated<Self>>,
-        i: usize,
-    ) -> Mut<Self> {
+    unsafe fn repeated_get_mut_unchecked(mut f: Mut<Repeated<Self>>, i: usize) -> Mut<Self> {
         // SAFETY:
         // - `f.as_raw()` is a valid `RepeatedPtrField*`.
         // - `i < len(f)` is promised by caller.
@@ -622,13 +612,13 @@ where
         inner.into()
     }
 
-    fn repeated_clear(_private: Private, mut f: Mut<Repeated<Self>>) {
+    fn repeated_clear(mut f: Mut<Repeated<Self>>) {
         // SAFETY:
         // - `f.as_raw()` is a valid `RepeatedPtrField*`.
         unsafe { proto2_rust_RepeatedField_Message_clear(f.as_raw(Private)) };
     }
 
-    fn repeated_push(_private: Private, mut f: Mut<Repeated<Self>>, v: impl IntoProxied<Self>) {
+    fn repeated_push(mut f: Mut<Repeated<Self>>, v: impl IntoProxied<Self>) {
         // SAFETY:
         // - `f.as_raw()` is a valid `RepeatedPtrField*`.
         // - The second argument below is a valid `const Message&`.
@@ -643,11 +633,7 @@ where
         }
     }
 
-    fn repeated_copy_from(
-        _private: Private,
-        src: View<Repeated<Self>>,
-        mut dest: Mut<Repeated<Self>>,
-    ) {
+    fn repeated_copy_from(src: View<Repeated<Self>>, mut dest: Mut<Repeated<Self>>) {
         // SAFETY:
         // - `dest.as_raw()` is a valid `RepeatedPtrField*`.
         // - `src.as_raw()` is a valid `const RepeatedPtrField&`.
@@ -656,7 +642,7 @@ where
         }
     }
 
-    fn repeated_reserve(_private: Private, mut f: Mut<Repeated<Self>>, additional: usize) {
+    fn repeated_reserve(mut f: Mut<Repeated<Self>>, additional: usize) {
         // SAFETY:
         // - `f.as_raw()` is a valid `RepeatedPtrField*`.
         unsafe { proto2_rust_RepeatedField_Message_reserve(f.as_raw(Private), additional) }
@@ -676,7 +662,7 @@ macro_rules! impl_repeated_primitives {
         $reserve_thunk:ident $(,)?
     ]),* $(,)?) => {
         $(
-            unsafe extern "C" {
+            extern "C" {
                 fn $new_thunk() -> RawRepeatedField;
                 fn $free_thunk(f: RawRepeatedField);
                 fn $add_thunk(f: RawRepeatedField, v: <$t as CppTypeConversions>::InsertElemType);
@@ -709,32 +695,32 @@ macro_rules! impl_repeated_primitives {
                     unsafe { $free_thunk(f.as_mut().as_raw(Private)) }
                 }
                 #[inline]
-                fn repeated_len(_private: Private, f: View<Repeated<$t>>) -> usize {
+                fn repeated_len(f: View<Repeated<$t>>) -> usize {
                     unsafe { $size_thunk(f.as_raw(Private)) }
                 }
                 #[inline]
-                fn repeated_push(_private: Private, mut f: Mut<Repeated<$t>>, v: impl IntoProxied<$t>) {
+                fn repeated_push(mut f: Mut<Repeated<$t>>, v: impl IntoProxied<$t>) {
                     unsafe { $add_thunk(f.as_raw(Private), <$t as CppTypeConversions>::into_insertelem(v.into_proxied(Private))) }
                 }
                 #[inline]
-                fn repeated_clear(_private: Private, mut f: Mut<Repeated<$t>>) {
+                fn repeated_clear(mut f: Mut<Repeated<$t>>) {
                     unsafe { $clear_thunk(f.as_raw(Private)) }
                 }
                 #[inline]
-                unsafe fn repeated_get_unchecked(_private: Private, f: View<Repeated<$t>>, i: usize) -> View<$t> {
+                unsafe fn repeated_get_unchecked(f: View<Repeated<$t>>, i: usize) -> View<$t> {
                     <$t as CppTypeConversions>::elem_to_view(
                         unsafe { $get_thunk(f.as_raw(Private), i) })
                 }
                 #[inline]
-                unsafe fn repeated_set_unchecked(_private: Private, mut f: Mut<Repeated<$t>>, i: usize, v: impl IntoProxied<$t>) {
+                unsafe fn repeated_set_unchecked(mut f: Mut<Repeated<$t>>, i: usize, v: impl IntoProxied<$t>) {
                     unsafe { $set_thunk(f.as_raw(Private), i, <$t as CppTypeConversions>::into_insertelem(v.into_proxied(Private))) }
                 }
                 #[inline]
-                fn repeated_copy_from(_private: Private, src: View<Repeated<$t>>, mut dest: Mut<Repeated<$t>>) {
+                fn repeated_copy_from(src: View<Repeated<$t>>, mut dest: Mut<Repeated<$t>>) {
                     unsafe { $copy_from_thunk(src.as_raw(Private), dest.as_raw(Private)) }
                 }
                 #[inline]
-                fn repeated_reserve(_private: Private, mut f: Mut<Repeated<$t>>, additional: usize) {
+                fn repeated_reserve(mut f: Mut<Repeated<$t>>, additional: usize) {
                     unsafe { $reserve_thunk(f.as_raw(Private), additional) }
                 }
             }
@@ -761,7 +747,7 @@ macro_rules! impl_repeated_primitives {
 
 impl_repeated_primitives!(i32, u32, i64, u64, f32, f64, bool, ProtoString, ProtoBytes);
 
-unsafe extern "C" {
+extern "C" {
     pub fn proto2_rust_RepeatedField_Message_new() -> RawRepeatedField;
     pub fn proto2_rust_RepeatedField_Message_free(field: RawRepeatedField);
     pub fn proto2_rust_RepeatedField_Message_size(field: RawRepeatedField) -> usize;
@@ -818,7 +804,7 @@ pub fn reserve_enum_repeated_mut<E: Enum + ProxiedInRepeated>(
     additional: usize,
 ) {
     let int_repeated = cast_enum_repeated_mut(repeated);
-    ProxiedInRepeated::repeated_reserve(Private, int_repeated, additional);
+    ProxiedInRepeated::repeated_reserve(int_repeated, additional);
 }
 
 pub fn new_enum_repeated<E: Enum + ProxiedInRepeated>() -> Repeated<E> {
@@ -1286,18 +1272,17 @@ where
         }
     }
 
-    fn map_clear(_private: Private, mut map: MapMut<Key, Self>) {
+    fn map_clear(mut map: MapMut<Key, Self>) {
         unsafe {
             proto2_rust_map_clear(map.as_raw(Private));
         }
     }
 
-    fn map_len(_private: Private, map: MapView<Key, Self>) -> usize {
+    fn map_len(map: MapView<Key, Self>) -> usize {
         unsafe { proto2_rust_map_size(map.as_raw(Private)) }
     }
 
     fn map_insert(
-        _private: Private,
         mut map: MapMut<Key, Self>,
         key: View<'_, Key>,
         value: impl IntoProxied<Self>,
@@ -1305,11 +1290,7 @@ where
         unsafe { Key::insert(map.as_raw(Private), key, value.into_proxied(Private).to_map_value()) }
     }
 
-    fn map_get<'a>(
-        _private: Private,
-        map: MapView<'a, Key, Self>,
-        key: View<'_, Key>,
-    ) -> Option<View<'a, Self>> {
+    fn map_get<'a>(map: MapView<'a, Key, Self>, key: View<'_, Key>) -> Option<View<'a, Self>> {
         let mut value = std::mem::MaybeUninit::uninit();
         let found = unsafe { Key::get(map.as_raw(Private), key, value.as_mut_ptr()) };
         if !found {
@@ -1318,11 +1299,7 @@ where
         unsafe { Some(Self::from_map_value(value.assume_init())) }
     }
 
-    fn map_get_mut<'a>(
-        _private: Private,
-        mut map: MapMut<'a, Key, Self>,
-        key: View<'_, Key>,
-    ) -> Option<Mut<'a, Self>>
+    fn map_get_mut<'a>(mut map: MapMut<'a, Key, Self>, key: View<'_, Key>) -> Option<Mut<'a, Self>>
     where
         Value: Message,
     {
@@ -1337,11 +1314,11 @@ where
         unsafe { Some(Self::mut_from_map_value(value.assume_init())) }
     }
 
-    fn map_remove(_private: Private, mut map: MapMut<Key, Self>, key: View<'_, Key>) -> bool {
+    fn map_remove(mut map: MapMut<Key, Self>, key: View<'_, Key>) -> bool {
         unsafe { Key::remove(map.as_raw(Private), key) }
     }
 
-    fn map_iter(_private: Private, map: MapView<Key, Self>) -> MapIter<Key, Self> {
+    fn map_iter(map: MapView<Key, Self>) -> MapIter<Key, Self> {
         // SAFETY:
         // - The backing map for `map.as_raw` is valid for at least '_.
         // - A View that is live for '_ guarantees the backing map is unmodified for '_.
@@ -1351,7 +1328,6 @@ where
     }
 
     fn map_iter_next<'a>(
-        _private: Private,
         iter: &mut MapIter<'a, Key, Self>,
     ) -> Option<(View<'a, Key>, View<'a, Self>)> {
         // SAFETY:
@@ -1378,7 +1354,7 @@ macro_rules! impl_map_primitives {
         $remove_thunk:ident,
     ]),* $(,)?) => {
         $(
-            unsafe extern "C" {
+            extern "C" {
                 pub fn $insert_thunk(
                     m: RawMap,
                     key: $cpp_type,
@@ -1421,7 +1397,7 @@ impl_map_primitives!(
     ProtoString, PtrAndLen;
 );
 
-unsafe extern "C" {
+extern "C" {
     fn proto2_rust_thunk_UntypedMapIterator_increment(iter: &mut UntypedMapIterator);
 
     pub fn proto2_rust_map_new(key_prototype: MapValue, value_prototype: MapValue) -> RawMap;
@@ -1515,54 +1491,18 @@ where
     }
 }
 
-/// Message equality definition which may have both false-negatives and false-positives in the face
-/// of unknown fields.
-///
-/// This behavior is deliberately held back from being exposed as an `Eq` trait for messages. The
-/// reason is that it is impossible to properly compare unknown fields for message equality, since
-/// without the schema you cannot know how to interpret the wire format properly for comparison.
-///
-/// False negative cases (where message_eq will return false on unknown fields where it
-/// would return true if the fields were known) are common and will occur in production: for
-/// example, as map and repeated fields look exactly the same, map field order is unstable, the
-/// comparison cannot know to treat it as unordered and will return false when it was the same
-/// map but in a different order.
-///
-/// False positives cases (where message_eq will return true on unknown fields where it would have
-/// return false if the fields were known) are possible but uncommon in practice. One example
-/// of this direction can occur if two fields are defined in the same oneof and both are present on
-/// the wire but in opposite order, without the schema these messages appear equal but with the
-/// schema they are not-equal.
-///
-/// This lossy behavior in the face of unknown fields is especially problematic in the face of
-/// extensions and other treeshaking behaviors where a given field being known or not to binary is a
-/// spooky-action-at-a-distance behavior, which may lead to surprising changes in outcome in
-/// equality tests based on changes made arbitrarily distant from the code performing the equality
-/// check.
-///
-/// Broadly this is recommended for use in tests (where unknown field behaviors are rarely a
-/// concern), and in limited/targeted cases where the lossy behavior in the face of unknown fields
-/// behavior is unlikely to be a problem.
-pub fn message_eq<T>(a: &T, b: &T) -> bool
-where
-    T: AsView + Debug,
-    for<'a> View<'a, <T as AsView>::Proxied>: CppGetRawMessage,
-{
-    unsafe {
-        raw_message_equals(
-            a.as_view().get_raw_message(Private),
-            b.as_view().get_raw_message(Private),
-        )
-    }
-}
-
 impl<T> MatcherEq for T
 where
     Self: AsView + Debug,
     for<'a> View<'a, <Self as AsView>::Proxied>: CppGetRawMessage,
 {
     fn matches(&self, o: &Self) -> bool {
-        message_eq(self, o)
+        unsafe {
+            raw_message_equals(
+                self.as_view().get_raw_message(Private),
+                o.as_view().get_raw_message(Private),
+            )
+        }
     }
 }
 
