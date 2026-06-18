@@ -234,6 +234,7 @@ class TestContextualTasksPageHandler extends TestBrowserProxy implements
       'registerWindow',
       'onWindowClosed',
       'closeWindow',
+      'maybeTriggerPinningPromo',
     ]);
 
     this.url_ = url;
@@ -451,6 +452,10 @@ class TestContextualTasksPageHandler extends TestBrowserProxy implements
 
   closeWindow(windowId: ContextualWindowId) {
     this.methodCalled('closeWindow', windowId);
+  }
+
+  maybeTriggerPinningPromo() {
+    this.methodCalled('maybeTriggerPinningPromo');
   }
 }
 

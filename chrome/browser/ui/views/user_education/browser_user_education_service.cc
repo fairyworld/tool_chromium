@@ -1948,6 +1948,20 @@ void MaybeRegisterChromeFeaturePromos(
               "the size of the tabs are shrunk significantly compared to their "
               "ideal width.")));
 
+  registry.RegisterFeature(std::move(
+      FeaturePromoSpecification::CreateForTutorialPromo(
+          feature_engagement::kIPHSidePanelContextualTasksPinnableFeature,
+          kContextualTasksWebUIToolbarElementId,
+          IDS_SIDE_PANEL_CONTEXTUAL_TASKS_PINNABLE_IPH,
+          kContextualTasksTutorialId)
+          .SetBubbleArrow(HelpBubbleArrow::kNone)
+          .SetBubbleIcon(kLightbulbOutlineIcon)
+          .SetInAnyContext(true)
+          .SetMetadata(
+              147, "dianaou@google.com",
+              "Triggered automatically when the user opens Contextual Tasks "
+              "to smoothly onboard them into the pinning tutorial.")));
+
   // kIPHVerticalTabsExpandOnHoverFeature:
   const auto expand_on_hover_iph_body_string_id =
       tabs::kVerticalTabsExpandOnHoverDefaultEnabled.Get()
@@ -2390,7 +2404,6 @@ void MaybeRegisterChromeTutorials(
             // Completion of the tutorial after side panel appears.
             BubbleStep(
                 kPinnedToolbarActionShowSidePanelContextualTasksElementId)
-                .SetBubbleTitleText(IDS_TUTORIAL_GENERIC_SUCCESS_TITLE)
                 .SetBubbleBodyText(IDS_TUTORIAL_CONTEXTUAL_TASKS_STEP3)
                 .SetBubbleArrow(HelpBubbleArrow::kTopRight)
                 .InAnyContext());

@@ -719,6 +719,7 @@ ContextualTasksUI::ContextualTasksUI(content::WebUI* web_ui)
       this, std::vector<ui::ElementIdentifier>{
                 kSmartTabSharingMenuItemElementId,
                 kContextualTasksWebUIPinButtonElementId,
+                kContextualTasksWebUIToolbarElementId,
                 kContextualTasksWebUIOverflowMenuElementId,
                 kContextualTasksWebUIOverflowMenuPinButtonElementId});
 #endif

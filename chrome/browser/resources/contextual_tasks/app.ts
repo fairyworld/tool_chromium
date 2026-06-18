@@ -278,6 +278,7 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
         type: Boolean,
         reflect: true,
       },
+      onboardingTooltipShowing_: {type: Boolean},
     };
   }
 
@@ -287,6 +288,7 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
       loadTimeData.getBoolean('showOnboardingTooltip');
   protected accessor showSmartTabSharingTryItIph_: boolean = false;
   protected accessor showSmartTabSharingDefaultOnIph_: boolean = false;
+  protected accessor onboardingTooltipShowing_: boolean = false;
   protected accessor userName_: string =
       loadTimeData.getString('friendlyZeroStateGaiaName');
   protected accessor friendlyZeroStateTitleBeforeName_: string =
@@ -827,8 +829,13 @@ export class ContextualTasksAppElement extends ContextualTasksAppElementBase {
     const crComposebox = this.composebox_.getComposebox();
     if (tooltip && crComposebox) {
       tooltip.updateTooltipVisibility(composeboxContainer, crComposebox);
+      this.onboardingTooltipShowing_ = tooltip.shouldShow;
     }
     // </if>
+  }
+
+  protected onOnboardingTooltipDismissed_() {
+    this.onboardingTooltipShowing_ = false;
   }
 
   private playZeroStateAnimations_() {

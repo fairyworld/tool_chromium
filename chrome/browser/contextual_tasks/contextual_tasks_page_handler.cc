@@ -9,6 +9,7 @@
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/uuid.h"
+#include "build/build_config.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/contextual_tasks/ai_mode_context_library_converter.h"
 #include "chrome/browser/contextual_tasks/contextual_tasks.mojom-shared.h"
@@ -25,8 +26,12 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/actions/chrome_action_id.h"
+#include "chrome/browser/ui/browser.h"
+#include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/toolbar/pinned_toolbar/pinned_toolbar_actions_model.h"
+#include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #endif
+#include "base/task/single_thread_task_runner.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "chrome/browser/ui/side_panel/side_panel_ui.h"
@@ -39,6 +44,7 @@
 #include "components/contextual_tasks/public/features.h"
 #include "components/contextual_tasks/public/prefs.h"
 #include "components/contextual_tasks/public/query_contextualizer.h"
+#include "components/feature_engagement/public/feature_constants.h"
 #include "components/lens/lens_url_utils.h"
 #include "components/omnibox/browser/searchbox.mojom.h"
 #include "components/omnibox/common/composebox_features.h"
@@ -872,4 +878,46 @@ void ContextualTasksPageHandler::OnActionsChanged() {
       contextual_tasks::GetEffectivePinState(
           web_ui_controller_ ? web_ui_controller_->GetProfile() : nullptr);
   OnPinStateChanged(effective_pin_state);
+}
+
+void ContextualTasksPageHandler::MaybeTriggerPinningPromo() {
+#if BUILDFLAG(IS_ANDROID)
+  return;
+#else
+  if (!web_ui_controller_) {
+    return;
+  }
+
+  if (!panel_controller_ ||
+      !panel_controller_->IsPanelOpenForContextualTask()) {
+    return;
+  }
+
+  Profile* profile = web_ui_controller_->GetProfile();
+  if (!profile) {
+    return;
+  }
+
+  // 1. Verify we are still in AI Mode.
+  bool is_ai_page = ui_service_ && ui_service_->IsAiUrl(
+                                       web_ui_controller_->GetInnerFrameUrl());
+  if (!is_ai_page) {
+    return;
+  }
+
+  // 2. Verify the button is not already pinned.
+  bool is_pinned = contextual_tasks::GetEffectivePinState(profile);
+  if (is_pinned) {
+    return;
+  }
+
+  // 3. Attempt to show the IPH!
+  BrowserWindowInterface* browser_window = web_ui_controller_->GetBrowser();
+  if (!browser_window) {
+    return;
+  }
+  BrowserUserEducationInterface::From(browser_window)
+      ->MaybeShowFeaturePromo(
+          feature_engagement::kIPHSidePanelContextualTasksPinnableFeature);
+#endif
 }

@@ -527,6 +527,37 @@ suite('TopToolbarTest', () => {
       helpButton.click();
       await proxy.handler.whenCalled('openFeedbackUi');
     });
+
+    test('calls maybeTriggerPinningPromo when AI page is shown', async () => {
+      topToolbar.isAiPage = false;
+      await microtasksFinished();
+      proxy.handler.reset();
+
+      topToolbar.isAiPage = true;
+      await microtasksFinished();
+
+      // <if expr="is_android">
+      assertEquals(0, proxy.handler.getCallCount('maybeTriggerPinningPromo'));
+      // </if>
+      // <if expr="not is_android">
+      await proxy.handler.whenCalled('maybeTriggerPinningPromo');
+      // </if>
+    });
+
+    test(
+        'does not call maybeTriggerPinningPromo when onboarding tooltip is showing',
+        async () => {
+          topToolbar.isAiPage = false;
+          topToolbar.onboardingTooltipShowing = true;
+          await microtasksFinished();
+          proxy.handler.reset();
+
+          topToolbar.isAiPage = true;
+          await microtasksFinished();
+
+          assertEquals(
+              0, proxy.handler.getCallCount('maybeTriggerPinningPromo'));
+        });
   });
 
   (loadTimeData.getBoolean('isSmallDeviceFormFactor') ? suite.skip : suite)(

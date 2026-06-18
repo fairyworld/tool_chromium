@@ -1974,8 +1974,11 @@ Google Chrome is unable to recover your settings.
           Pinned! You can access Google Lens again from the new button on the toolbar
         </message>
 
+        <message name="IDS_SIDE_PANEL_CONTEXTUAL_TASKS_PINNABLE_IPH" desc="The body text of the IPH describing that the Contextual Tasks side panel is pinnable.">
+          You can pin Google Search AI Mode to ask questions as you browse
+        </message>
         <message name="IDS_TUTORIAL_CONTEXTUAL_TASKS_STEP1" desc="The body text of the first step of the Contextual Tasks tutorial.">
-          You can pin Google Search AI Mode to easily ask questions as you browse
+          Open the overflow menu
         </message>
         <message name="IDS_TUTORIAL_CONTEXTUAL_TASKS_STEP2" desc="The body text of the second step of the Contextual Tasks tutorial.">
           Select "Pin to toolbar"

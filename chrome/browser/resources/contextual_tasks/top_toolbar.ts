@@ -87,6 +87,7 @@ export class TopToolbarElement extends TopToolbarElementBase {
         type: Boolean,
         reflect: true,
       },
+      onboardingTooltipShowing: {type: Boolean},
     };
   }
 
@@ -97,6 +98,7 @@ export class TopToolbarElement extends TopToolbarElementBase {
   accessor isAimEligible: boolean = loadTimeData.getBoolean('isAimEligible');
   accessor enableOpenInNewTabButton: boolean = false;
   accessor showReopenTabs_: boolean = false;
+  accessor onboardingTooltipShowing: boolean = false;
   private browserProxy_: BrowserProxy = BrowserProxyImpl.getInstance();
   private listenerIds_: number[] = [];
   protected accessor isExpandButtonEnabled: boolean =
@@ -139,19 +141,29 @@ export class TopToolbarElement extends TopToolbarElementBase {
     this.listenerIds_ = [];
   }
 
+  // <if expr="not is_android">
+  override firstUpdated(_changedProperties: PropertyValues) {
+    super.firstUpdated(_changedProperties);
+    this.registerHelpBubble(
+        'kContextualTasksWebUIToolbarElementId', '#top-row');
+    this.registerHelpBubble(
+        'kContextualTasksWebUIOverflowMenuElementId',
+        '#overflowMenuButton');
+  }
+  // </if>
+
   override updated(changedProperties: PropertyValues<this>) {
     super.updated(changedProperties);
 
-    if (changedProperties.has('isAiPage')) {
+    if (changedProperties.has('isAiPage') ||
+        changedProperties.has('onboardingTooltipShowing')) {
       this.hideOverflowMenuButton_ =
           this.isAiPage && this.hideOverflowMenuOnAiPageEnabled_;
       // <if expr="not is_android">
       if (this.isAiPage) {
-        this.registerHelpBubble(
-            'kContextualTasksWebUIOverflowMenuElementId',
-            '#overflowMenuButton');
-      } else {
-        this.unregisterHelpBubble('kContextualTasksWebUIOverflowMenuElementId');
+        if (!this.onboardingTooltipShowing) {
+          this.browserProxy_.handler.maybeTriggerPinningPromo();
+        }
       }
       // </if>
     }
