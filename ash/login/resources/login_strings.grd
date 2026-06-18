@@ -647,6 +647,158 @@
       <message name="IDS_LOGIN_CRYPTOHOME_RECOVERY_REAUTH_NOTIFICATION_SUBTITLE" desc="The subtitle message when reauth is required during Cryptohome recovery.">
         Enter your Google Account password again on the next screen to finish recovery
       </message>
+
+      <message name="IDS_LOGIN_GENERIC_RETRY_BUTTON" desc="Label for the button to retry operation during login process.">
+        Retry
+      </message>
+      <message name="IDS_LOGIN_GENERIC_DONE_BUTTON" desc="Label for the button on the information dialogs to close the dialog and proceed as expected.">
+        Done
+      </message>
+      <message name="IDS_LOGIN_SAML_NOTICE_SHORT" desc="Text message displayed above SAML portal to early indicate that the user is being redirected to another sign-in provider. This is the version of the string used in the GAIA flow.">
+        Sign-in hosted by <ph name="SAML_DOMAIN">$1<ex>saml.com</ex></ph>
+      </message>
+      <message name="IDS_LOGIN_SAML_PASSWORD_CHANGE_NOTICE" desc="Text message displayed in the system dialog title. The dialog shows a web-page where the user can change their SAML password while staying in the session">
+        This authentication service is hosted by <ph name="SAML_DOMAIN">$1<ex>saml.com</ex></ph>
+      </message>
+      <message name="IDS_LOGIN_SAML_NOTICE_WITH_VIDEO" desc="Text message displayed above SAML portal to early indicate that the user is being redirected to another sign-in provider which has requested video media access.">
+        This sign-in service, hosted by <ph name="SAML_DOMAIN">$1<ex>saml.com</ex></ph>, is accessing your camera.
+      </message>
+      <message name="IDS_LOGIN_SAML_CHANGE_PROVIDER_MESSAGE" desc="Text message displayed below SAML portal to let user change sign-in provider.">
+        Wrong sign-in option?
+      </message>
+      <message name="IDS_LOGIN_SAML_CHANGE_PROVIDER_BUTTON" desc="Button to change sign-in provider.">
+        Enter Google Account info
+      </message>
+      <message name="IDS_LOGIN_CONFIRM_PASSWORD_TITLE" desc="Title for the confirm password dialog.">
+        Please re-enter your password to update your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> profile.
+      </message>
+      <message name="IDS_LOGIN_LOCAL_PASSWORD_SETUP_TITLE" desc="Title for the local password setup dialog.">
+        Set a <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> password to make it easier to sign in
+      </message>
+      <message name="IDS_LOGIN_LOCAL_PASSWORD_SETUP_SUBTITLE" desc="Subtitle for the local password setup dialog.">
+        Instead of entering your Google Account password to sign in, you can create a <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> password for this device
+      </message>
+      <message name="IDS_LOGIN_LOCAL_PASSWORD_RESET_TITLE" desc="Title for the local password reset dialog.">
+        Reset <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> password
+      </message>
+      <message name="IDS_LOGIN_FACTOR_SETUP_SUCCESS_LOCAL_PASSWORD_SET_TITLE" desc="Title for the factor setup informational dialog to show that the local password was set successfully.">
+        Your password is set
+      </message>
+      <message name="IDS_LOGIN_FACTOR_SETUP_SUCCESS_LOCAL_PASSWORD_UPDATED_TITLE" desc="Title for the factor setup informational dialog to show that local password was updated successfuly.">
+        Your password has been updated
+      </message>
+      <message name="IDS_LOGIN_FACTOR_SETUP_SUCCESS_LOCAL_PASSWORD_SUBTITLE" desc="Subtitle for the factor setup informational dialog, shown when local password was set up (to indicate that it only applies to the current device).">
+        You can use this password to sign in to your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph>.
+      </message>
+      <message name="IDS_LOGIN_FACTORS_REMOVED_TITLE" desc="Title for the factor removed informational dialog, shown when all local auth factors are successuly removed.">
+       Sign-in method updated
+     </message>
+      <message name="IDS_LOGIN_FACTORS_REMOVED_SUBTITLE" desc="Subtitle for the factor removed informational dialog, shown when all local auth factors are successuly removed..">
+       For security reasons, your administrator disabled your device PIN and password. From now on, use your <ph name="MANAGER">$1<ex>user@example.com</ex></ph> password.
+     </message>
+      <message name="IDS_LOGIN_MANUAL_PASSWORD_TITLE" desc="Title for the manual password setting dialog.">
+        Please create a password to protect your local data.
+      </message>
+      <message name="IDS_LOGIN_MANUAL_PASSWORD_INPUT_LABEL" desc="Label for the password input when setting the password manually.">
+        Enter your password
+      </message>
+      <message name="IDS_LOGIN_MANUAL_PASSWORD_MISMATCH" desc="Error shown when passwords don't match when setting the password manually.">
+        Passwords don't match
+      </message>
+      <message name="IDS_LOGIN_CONFIRM_PASSWORD_LABEL" desc="Label for the password field on the confirm password dialog.">
+        Confirm your password
+      </message>
+      <message name="IDS_LOGIN_CONFIRM_PASSWORD_INCORRECT_PASSWORD" desc="Error that is shown when incorrect password was supplied.">
+        Incorrect password
+      </message>
+      <message name="IDS_LOGIN_ACCOUNT_SETUP_CANCEL_DIALOG_TITLE" desc="Text to show in confirmation cancel dialog.">
+        Cancel account setup?
+      </message>
+      <message name="IDS_LOGIN_ACCOUNT_SETUP_CANCEL_DIALOG_NO" desc="Text to show on button to decline cancelation.">
+        No
+      </message>
+      <message name="IDS_LOGIN_ACCOUNT_SETUP_CANCEL_DIALOG_YES" desc="Text to show on button to accept cancelation.">
+        Yes
+      </message>
+      <message name="IDS_LOGIN_DEVICE_MANAGED_BY_NOTICE" desc="Text for notifications showing that this is managed device. MANAGER can be a domain or an email address.">
+        Managed by <ph name="MANAGER">$1<ex>acmecorp.com</ex></ph>
+      </message>
+      <message name="IDS_LOGIN_FATAL_ERROR_NO_ACCOUNT_DETAILS" desc="Message to show when the authentication could not be completed because the user's account details could not be retrieved.">
+        Sign-in failed because your account details could not be retrieved. Please contact your administrator or try again.
+      </message>
+      <message name="IDS_LOGIN_FATAL_ERROR_NO_PASSWORD" desc="Message to show when the authentication could not be completed because the user's password could not be retrieved.">
+        Sign-in failed. Please contact your administrator or try again.
+      </message>
+      <message name="IDS_LOGIN_FATAL_ERROR_PASSWORD_VERIFICATION" desc="Message to show when the authentication could not be completed because two attempts to verify the user's password failed.">
+        Sign-in failed because your password could not be verified. Please contact your administrator or try again.
+      </message>
+      <message name="IDS_LOGIN_FATAL_ERROR_TEXT_INSECURE_URL" desc="Message to show when the authentication could not be completed because a redirect to an insecure URL was detected and blocked.">
+        Sign-in failed because it was configured to use a non-secure URL (<ph name="BLOCKED_URL">$1<ex>http://www.example.com/login.html</ex></ph>). Please contact your administrator.
+      </message>
+      <message name="IDS_LOGIN_FATAL_ERROR_TRY_AGAIN_BUTTON" desc="Label for a button which starts sign-in from the beginning after fatal error.">
+        Try again
+      </message>
+      <message name="IDS_LOGIN_FATAL_ERROR_NO_AUTH_TOKEN" desc="Message to show when the authentication could not be completed because the user's auth token retrieved.">
+        Sign-in failed because your access token could not be retrieved. Please check your network connection and try again.
+      </message>
+      <message name="IDS_LOGIN_FATAL_ERROR_AUTO_ENROLLMENT_SKIPPED" desc="Message to show when the auto enrollment check is skipped.">
+        Sign-in failed due to a device configuration check issue. Please powerwash your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> and try again.
+      </message>
+      <message name="IDS_LOGIN_FATAL_ERROR_RESTART_AND_POWERWASH_BUTTON" desc="Button to trigger a reboot and a powerwash.">
+        Restart and Powerwash
+      </message>
+
+      <message name="IDS_LOGIN_SAML_INTERSTITIAL_MESSAGE" desc="Message to show on the SAML interstitial page to tell the user to continue signing in using their enterprise account. MANAGER can be a domain or an email address.">
+        This device is managed by <ph name="MANAGER">$1<ex>acmecorp.com</ex></ph> and requires you to sign in every time.
+      </message>
+      <message name="IDS_LOGIN_SAML_INTERSTITIAL_CHANGE_ACCOUNT_LINK_TEXT" desc="Text of the link that allows the user to change the login account.">
+        Sign in with a different account
+      </message>
+      <message name="IDS_LOGIN_SAML_INTERSTITIAL_NEXT_BUTTON_TEXT" desc="Text shown on the Next button.">
+        Next
+      </message>
+      <message name="IDS_LOGIN_WELCOME_MESSAGE" desc="Message shown at the header of the login screens.">
+        Sign in to your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph>
+      </message>
+      <message name="IDS_OFFLINE_LOGIN_EMAIL" desc="Email field text on the offline login screen. Note: should be the same as the one used on the Gaia sign-in page.">
+        Enter your email
+      </message>
+      <message name="IDS_OFFLINE_LOGIN_PASSWORD" desc="Password field text on the offline login screen. Note: should be the same as the one used on the Gaia sign-in page.">
+        Enter your password
+      </message>
+      <message name="IDS_OFFLINE_LOGIN_PIN" desc="PIN field placeholder text on the offline login screen.">
+        Enter your PIN
+      </message>
+      <message name="IDS_OFFLINE_LOGIN_INVALID_EMAIL" desc="Alert message about invalid email on the offline login screen. Note: should be the same as the one used on the Gaia sign-in page.">
+        Please enter a valid email address
+      </message>
+      <message name="IDS_OFFLINE_LOGIN_INVALID_PASSWORD" desc="Alert message about mismatching email and password on the device">
+        The email and password you entered don't match
+      </message>
+      <message name="IDS_OFFLINE_LOGIN_INVALID_PIN" desc="Alert message about mismatching email and PIN on the device">
+        The email and PIN you entered don't match
+      </message>
+      <message name="IDS_OFFLINE_LOGIN_NEXT_BUTTON_TEXT" desc="Text shown on next button during offline signin flow dialog. Note: should be the same as the one used on the Gaia sign-in page.">
+        Next
+      </message>
+      <message name="IDS_OFFLINE_LOGIN_FORGOT_PASSWORD_BUTTON_TEXT" desc="Text shown on forgot password button during offline signin flow. Note: should be the same as the one used on the Gaia sign-in page.">
+        Forgot password?
+      </message>
+      <message name="IDS_OFFLINE_LOGIN_FORGOT_PASSWORD_DIALOG_TEXT" desc="Text shown on forgot password dialog during offline signin flow.">
+        To recover your account information, go to: google.com/accounts/recovery
+      </message>
+      <message name="IDS_OFFLINE_LOGIN_CLOSE_BUTTON_TEXT" desc="Text shown on forgot password dialog close button during offline signin flow.">
+        Close
+      </message>
+      <message name="IDS_OFFLINE_LOGIN_WARNING_TITLE" desc="Title shown on warning dialog when policy does not allow to proceed with offline login.">
+        Network connection required
+      </message>
+      <message name="IDS_OFFLINE_LOGIN_WARNING_TEXT" desc="Text shown on warning dialog when policy does not allow to proceed with offline login.">
+        <ph name="DOMAIN_NAME">$1<ex>google.com</ex></ph> requires the device to be online when signing into <ph name="EMAIL">$2<ex>user@google.com</ex></ph>
+      </message>
+      <message name="IDS_OFFLINE_LOGIN_OK_BUTTON_TEXT" desc="Text shown on the ok button of warning dialog during offline signin flow.">
+        Ok
+      </message>
     </messages>
   </release>
 </grit>
