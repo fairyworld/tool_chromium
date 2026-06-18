@@ -30,7 +30,7 @@ void LogExtractionFailed(MultistepFilterLogRouter* log_router,
                          std::string_view detail_key) {
   MULTISTEP_FILTER_LOG(log_router, navigation_id,
                        LogEventType::kAnnotationsExtracted, domain)
-      << LogDetail{std::string(detail_key), false};
+      << LogDetail{detail_key, false};
 }
 
 void LogAnnotationFetched(MultistepFilterLogRouter* log_router,
