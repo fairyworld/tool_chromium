@@ -154,6 +154,7 @@ class PaymentRequestState : public PaymentAppFactory::Delegate,
       mojom::PaymentResponsePtr payment_response) override;
   void OnPaymentResponseError(mojom::PaymentEventResponseType error,
                               const std::string& error_message) override;
+  bool WasPaymentHandlerWindowInteractedWith() const override;
 
   // PaymentRequestSpec::Observer
   void OnStartUpdating(PaymentRequestSpec::UpdateReason reason) override {}

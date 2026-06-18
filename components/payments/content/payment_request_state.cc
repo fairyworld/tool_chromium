@@ -721,6 +721,13 @@ bool PaymentRequestState::GetHasEnrolledInstrumentValue() const {
 void PaymentRequestState::set_user_interaction_in_web_payment_app(
     bool user_interaction) {
   user_interaction_in_web_payment_app_ = user_interaction;
+  if (user_interaction_in_web_payment_app_ && response_helper_) {
+    response_helper_->OnUserInteractionCaptured();
+  }
+}
+
+bool PaymentRequestState::WasPaymentHandlerWindowInteractedWith() const {
+  return user_interaction_in_web_payment_app();
 }
 
 }  // namespace payments
