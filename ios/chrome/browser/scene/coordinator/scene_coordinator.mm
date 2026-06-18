@@ -623,28 +623,36 @@ void OnListFamilyMembersResponse(
     baseViewController = self.activeViewController;
   }
 
-  if (self.isSigninInProgress) {
+  BOOL signinInProgress = self.isSigninInProgress;
+  if (signinInProgress) {
     [self stopSigninCoordinatorWithCompletionAnimated:NO];
   }
 
   if (_settingsNavigationController) {
     DCHECK(_settingsNavigationController.presentingViewController)
+        << "Settings present but presentingViewController is nil. "
+        << "Active VC: " << [self.activeViewController description]
+        << ", Settings stack: "
         << base::SysNSStringToUTF8(
                [_settingsNavigationController.viewControllers description]);
     return;
   }
-  [self.sceneState.profileState.appState.deferredRunner
-      runBlockNamed:kStartupInitPrefObservers];
 
-  Browser* browser = _regularBrowser.get();
+  __weak __typeof(self) weakSelf = self;
+  auto presentSettings = ^{
+    [weakSelf presentSettingsWithBaseViewController:baseViewController
+                           hasDefaultBrowserBlueDot:hasDefaultBrowserBlueDot];
+  };
 
-  _settingsNavigationController = [SettingsNavigationController
-      mainSettingsControllerForBrowser:browser
-                              delegate:self
-              hasDefaultBrowserBlueDot:hasDefaultBrowserBlueDot];
-  [baseViewController presentViewController:_settingsNavigationController
-                                   animated:YES
-                                 completion:nil];
+  if (signinInProgress) {
+    // Defer presentation to the next runloop tick to allow the sign-in UI
+    // dismissal to complete and clean up the view hierarchy. `dispatch_async`
+    // is used instead of a Chromium task runner to closely align with UIKit's
+    // GCD dispatching.
+    dispatch_async(dispatch_get_main_queue(), presentSettings);
+  } else {
+    presentSettings();
+  }
 }
 
 - (void)showPriceTrackingNotificationsSettings {
@@ -1679,6 +1687,23 @@ void OnListFamilyMembersResponse(
 }
 
 #pragma mark - Private
+
+// Presents the Settings UI using the regular browser, base view controller,
+// and blue dot promo state.
+- (void)presentSettingsWithBaseViewController:
+            (UIViewController*)baseViewController
+                     hasDefaultBrowserBlueDot:(BOOL)hasDefaultBrowserBlueDot {
+  [self.sceneState.profileState.appState.deferredRunner
+      runBlockNamed:kStartupInitPrefObservers];
+
+  _settingsNavigationController = [SettingsNavigationController
+      mainSettingsControllerForBrowser:_regularBrowser.get()
+                              delegate:self
+              hasDefaultBrowserBlueDot:hasDefaultBrowserBlueDot];
+  [baseViewController presentViewController:_settingsNavigationController
+                                   animated:YES
+                                 completion:nil];
+}
 
 // Callbacks for `stopSettingsAnimated:completion:`. It releases the navigation
 // controller and call the completion if it is non nil.
