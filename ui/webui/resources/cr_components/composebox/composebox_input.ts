@@ -63,7 +63,7 @@ export class ComposeboxInputElement extends I18nMixinLit
   accessor cancelButtonTitle: string = '';
   accessor isBackspacing_: boolean = false;
 
-  private resizeObserver_: ResizeObserver|null = null;
+  private widthResizeObserver_: ResizeObserver|null = null;
   private smartComposeResizeObserver_: ResizeObserver|null = null;
   private smartComposeHeightUpdateFrame_: number|null = null;
   private lastObservedInputWrapperWidth_: number = -1;
@@ -73,9 +73,6 @@ export class ComposeboxInputElement extends I18nMixinLit
   private cachedPaddingRight_: number = -1;
   private cachedFont_: string = '';
   private cachedContentWidth_: number = -1;
-  // Min height of the input wrapper so that it doesn't collapse when text is
-  // deleted.
-  private lockedMinHeight_: number = 0;
   private isRtl_: boolean = false;
 
   get inputElement(): HTMLInputElement|HTMLTextAreaElement {
@@ -85,7 +82,7 @@ export class ComposeboxInputElement extends I18nMixinLit
   override connectedCallback() {
     super.connectedCallback();
     this.updateDirection();
-    this.setupResizeObservers_();
+    this.setupWidthResizeObserver_();
     this.smartComposeResizeObserver_ = new ResizeObserver(() => {
       this.scheduleSmartComposeHeightUpdate_();
     });
@@ -93,9 +90,9 @@ export class ComposeboxInputElement extends I18nMixinLit
 
   override disconnectedCallback() {
     super.disconnectedCallback();
-    if (this.resizeObserver_) {
-      this.resizeObserver_.disconnect();
-      this.resizeObserver_ = null;
+    if (this.widthResizeObserver_) {
+      this.widthResizeObserver_.disconnect();
+      this.widthResizeObserver_ = null;
     }
     if (this.smartComposeResizeObserver_) {
       this.smartComposeResizeObserver_.disconnect();
@@ -184,6 +181,16 @@ export class ComposeboxInputElement extends I18nMixinLit
     if (input.style.minHeight === desiredMinHeight) {
       return;
     }
+
+    // Always invoked via scheduleSmartComposeHeightUpdate_() from a frame
+    // separate ResizeObserver delivery. Running this synchronously inside
+    // the ResizeObserver callback triggered "ResizeObserver loop completed
+    // with undelivered notifications." in the browser_tests, even though the
+    // observed (#smartCompose) and written (#input) targets were disjoint.
+    // Re-measure smartCompose.scrollHeight after the clear so shrink cases
+    // (hint -> shorter, or input typed past hint length) can return
+    // input.minHeight to '' instead of a stale value.
+    input.style.minHeight = '';
 
     const inputHeight = input.scrollHeight;
     const smartComposeHeight = smartCompose.scrollHeight;
@@ -325,41 +332,27 @@ export class ComposeboxInputElement extends I18nMixinLit
   // The width guard skips height-only changes (e.g. field-sizing: content
   // growth Windows non-overlay scrollbar toggling) that would otherwise
   // feed back into a ResizeObserver loop.
-  private setupResizeObservers_() {
-    if (this.resizeObserver_) {
-      return;
-    }
+  private setupWidthResizeObserver_() {
     const inputWrapper = this.shadowRoot.getElementById('inputWrapper');
     if (!inputWrapper) {
       return;
     }
 
     this.lastObservedInputWrapperWidth_ = inputWrapper.clientWidth;
-    this.resizeObserver_ = new ResizeObserver(() => {
-      // Handle width changes.
+    this.widthResizeObserver_ = new ResizeObserver(() => {
       const currentWidth = inputWrapper.clientWidth;
-      if (currentWidth !== this.lastObservedInputWrapperWidth_) {
-        this.lastObservedInputWrapperWidth_ = currentWidth;
-        this.cachedContentWidth_ = -1;  // Invalidate cache
-        if (!this.disableCaretColorAnimation) {
-          requestAnimationFrame(() => {
-            this.updateCaret_();
-          });
-        }
+      if (currentWidth === this.lastObservedInputWrapperWidth_) {
+        return;
       }
-
-      // Handle height changes.
-      const currentHeight = inputWrapper.clientHeight;
-      if (currentHeight > this.lockedMinHeight_) {
+      this.lastObservedInputWrapperWidth_ = currentWidth;
+      this.cachedContentWidth_ = -1;  // Invalidate cache
+      if (!this.disableCaretColorAnimation) {
         requestAnimationFrame(() => {
-          if (currentHeight > this.lockedMinHeight_) {
-            this.lockedMinHeight_ = currentHeight;
-            inputWrapper.style.minHeight = `${currentHeight}px`;
-          }
+          this.updateCaret_();
         });
       }
     });
-    this.resizeObserver_.observe(inputWrapper);
+    this.widthResizeObserver_.observe(inputWrapper);
   }
 
   // Update RTL status when the direction of the component changes.
@@ -460,15 +453,6 @@ export class ComposeboxInputElement extends I18nMixinLit
       firstSpan.style.anchorName = '--cursor-char';
       this.anchoredSpan_ = firstSpan;
       caret.classList.add('at-start');
-    }
-  }
-
-  resetHeight() {
-    this.lockedMinHeight_ = 0;
-    this.$.input.style.minHeight = '';
-    const inputWrapper = this.shadowRoot.querySelector<HTMLElement>('#inputWrapper');
-    if (inputWrapper) {
-      inputWrapper.style.minHeight = '';
     }
   }
 }

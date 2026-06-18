@@ -1524,7 +1524,6 @@ export const ComposeboxEmbedderMixin =
         clearAllInputs(
             querySubmitted: boolean, shouldBlockAutoSuggestedTabs: boolean) {
           this.clearInput();
-          this.getInputElement().resetHeight();
           // Let `querySubmit` handle clearing files if the tool mode is a tool
           // mode that should be cleared after submitting. For all other general
           // clearing, clear input here.
