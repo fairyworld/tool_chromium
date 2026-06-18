@@ -84,20 +84,6 @@ MATCHER(MissingProjectionType, "") {
       arg, "Projection element is incomplete; ProjectionType required.");
 }
 
-MATCHER(MissingProjectionPoseYaw, "") {
-  return CONTAINS_STRING(
-      arg, "Projection element is incomplete; ProjectionPoseYaw required.");
-}
-
-MATCHER(MissingProjectionPosePitch, "") {
-  return CONTAINS_STRING(
-      arg, "Projection element is incomplete; ProjectionPosePitch required.");
-}
-
-MATCHER(MissingProjectionPoseRoll, "") {
-  return CONTAINS_STRING(
-      arg, "Projection element is incomplete; ProjectionPoseRoll required.");
-}
 
 constexpr auto kEquirectPrivateData = std::to_array<uint8_t>({
     0x00, 0x00, 0x00, 0x00,  // top
@@ -205,28 +191,21 @@ TEST_F(WebMProjectionParserTest, MissingProjectionType) {
   VideoClientOnListEnd(kWebMIdProjection);
 }
 
-TEST_F(WebMProjectionParserTest, MissingProjectionPosYaw) {
+TEST_F(WebMProjectionParserTest, PartialProjectionPose) {
   auto* parser = VideoClientOnListStart(kWebMIdProjection);
-  parser->OnUInt(kWebMIdProjectionType, 1);
-  EXPECT_MEDIA_LOG(MissingProjectionPoseYaw());
-  VideoClientOnListEnd(kWebMIdProjection);
-}
-
-TEST_F(WebMProjectionParserTest, MissingProjectionPosePitch) {
-  auto* parser = VideoClientOnListStart(kWebMIdProjection);
+  EXPECT_TRUE(parser->OnBinary(kWebMIdProjectionPrivate,
+                               kEquirectPrivateData.data(),
+                               kEquirectPrivateData.size()));
   parser->OnUInt(kWebMIdProjectionType, 1);
   parser->OnFloat(kWebMIdProjectionPoseYaw, 90);
-  EXPECT_MEDIA_LOG(MissingProjectionPosePitch());
   VideoClientOnListEnd(kWebMIdProjection);
-}
 
-TEST_F(WebMProjectionParserTest, MissingProjectionPoseRoll) {
-  auto* parser = VideoClientOnListStart(kWebMIdProjection);
-  parser->OnUInt(kWebMIdProjectionType, 1);
-  parser->OnFloat(kWebMIdProjectionPoseYaw, 90);
-  parser->OnFloat(kWebMIdProjectionPosePitch, 90);
-  EXPECT_MEDIA_LOG(MissingProjectionPoseRoll());
-  VideoClientOnListEnd(kWebMIdProjection);
+  auto* projection_parser = static_cast<WebMProjectionParser*>(parser);
+  EXPECT_EQ(projection_parser->GetProjectionType(),
+            VideoProjectionType::kEquirect360);
+  auto transform = projection_parser->GetVideoTransformation();
+  EXPECT_EQ(transform.rotation, VIDEO_ROTATION_0);
+  EXPECT_FALSE(transform.mirrored);
 }
 
 TEST_F(WebMProjectionParserTest, ProjectionPrivateUnexpectedId) {

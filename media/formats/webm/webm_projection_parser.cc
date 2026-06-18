@@ -11,7 +11,6 @@
 #include "media/formats/webm/webm_constants.h"
 
 namespace {
-double INVALID_ANGLE = -1000;
 
 bool IsValidAngle(double val, double min, double max) {
   return (val >= min && val <= max);
@@ -39,9 +38,9 @@ WebMProjectionParser::~WebMProjectionParser() = default;
 void WebMProjectionParser::Reset() {
   projection_type_ = std::nullopt;
   projection_private_.clear();
-  pose_yaw_ = INVALID_ANGLE;
-  pose_pitch_ = INVALID_ANGLE;
-  pose_roll_ = INVALID_ANGLE;
+  pose_yaw_ = std::nullopt;
+  pose_pitch_ = std::nullopt;
+  pose_roll_ = std::nullopt;
   video_projection_type_ = VideoProjectionType::kNone;
   video_transformation_ = VideoTransformation();
 }
@@ -97,7 +96,7 @@ bool WebMProjectionParser::OnBinary(int id, const uint8_t* data, int size) {
 
 // WebMParserClient
 bool WebMProjectionParser::OnFloat(int id, double val) {
-  double* dst = nullptr;
+  std::optional<double>* dst = nullptr;
   bool is_valid = false;
 
   switch (id) {
@@ -125,10 +124,10 @@ bool WebMProjectionParser::OnFloat(int id, double val) {
       return false;
   }
 
-  if (*dst != INVALID_ANGLE) {
+  if (dst->has_value()) {
     MEDIA_LOG(ERROR, media_log_)
         << "Multiple values for id: 0x" << std::hex << id << " specified ("
-        << *dst << " and " << val << ")";
+        << dst->value() << " and " << val << ")";
     return false;
   }
 
@@ -178,11 +177,13 @@ bool WebMProjectionParser::OnListEnd(int id) {
     video_projection_type_ = VideoProjectionType::kNone;
   }
 
-  CHECK_GE(pose_yaw_, -180.0);
-  CHECK_LE(pose_yaw_, 180.0);
+  double yaw = pose_yaw_.value_or(0.0);
+  double roll = pose_roll_.value_or(0.0);
+  CHECK_GE(yaw, -180.0);
+  CHECK_LE(yaw, 180.0);
   constexpr double kYawMirrorThreshold = 1.0;
   video_transformation_ = media::VideoTransformation(
-      pose_roll_, std::abs(std::abs(pose_yaw_) - 180.0) < kYawMirrorThreshold);
+      roll, std::abs(std::abs(yaw) - 180.0) < kYawMirrorThreshold);
 
   return true;
 }
@@ -194,23 +195,10 @@ bool WebMProjectionParser::Validate() const {
     return false;
   }
 
-  if (pose_yaw_ == INVALID_ANGLE) {
-    MEDIA_LOG(ERROR, media_log_)
-        << "Projection element is incomplete; ProjectionPoseYaw required.";
-    return false;
-  }
-
-  if (pose_pitch_ == INVALID_ANGLE) {
-    MEDIA_LOG(ERROR, media_log_)
-        << "Projection element is incomplete; ProjectionPosePitch required.";
-    return false;
-  }
-
-  if (pose_roll_ == INVALID_ANGLE) {
-    MEDIA_LOG(ERROR, media_log_)
-        << "Projection element is incomplete; ProjectionPoseRoll required.";
-    return false;
-  }
+  // According to the EBML/Matroska specification, orientation angle elements
+  // (ProjectionPoseYaw, ProjectionPosePitch, and ProjectionPoseRoll) are
+  // optional and default to 0.0 degrees if omitted by the Muxer. Therefore, we
+  // do not require them to be present during validation.
 
   switch (projection_type_.value()) {
     case kWebMProjectionTypeRectangular:
