@@ -387,12 +387,13 @@ Suggestion::Icon GetSuggestionIcon(
       return is_personal_context ? Suggestion::Icon::kOrderSpark
                                  : Suggestion::Icon::kOrder;
     case EntityTypeName::kPassport:
-      if (base::FeatureList::IsEnabled(
-              features::kAutofillAiWalletPrivatePasses)) {
-        return is_personal_context ? Suggestion::Icon::kPassportSpark
-                                   : Suggestion::Icon::kPassport;
+      if (is_personal_context) {
+        return Suggestion::Icon::kPassportSpark;
       }
-      return Suggestion::Icon::kIdCard;
+      return base::FeatureList::IsEnabled(
+                 features::kAutofillAiWalletPrivatePasses)
+                 ? Suggestion::Icon::kPassport
+                 : Suggestion::Icon::kIdCard;
     case EntityTypeName::kKnownTravelerNumber:
     case EntityTypeName::kRedressNumber:
       return is_personal_context ? Suggestion::Icon::kIdCard2Spark
