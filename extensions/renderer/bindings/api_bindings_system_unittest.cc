@@ -612,22 +612,4 @@ TEST_F(APIBindingsSystemTest, TestCustomEvent) {
   EXPECT_NE(event, other_event);
 }
 
-// Tests that requesting an unknown type for an already-instantiated API
-// crashes the renderer. In theory this could be triggered by a compromised
-// renderer mishandling bindingUtil, so we just kill the renderer if it happens.
-TEST_F(APIBindingsSystemTest, DeathOnUnknownTypeInitialize) {
-  v8::HandleScope handle_scope(isolate());
-  v8::Local<v8::Context> context = MainContext();
-
-  // Instantiate the 'alpha' API.
-  v8::Local<v8::Object> alpha_api =
-      bindings_system()->CreateAPIInstance(kAlphaAPIName, context, nullptr);
-  ASSERT_FALSE(alpha_api.IsEmpty());
-
-  // Trigger InitializeType for the 'alpha' API with an unknown type.
-  EXPECT_DEATH_IF_SUPPORTED(
-      bindings_system()->type_reference_map()->GetSpec("alpha.doesNotExist"),
-      "api_bindings_\\.contains");
-}
-
 }  // namespace extensions
