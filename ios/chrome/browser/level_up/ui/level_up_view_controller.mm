@@ -105,6 +105,7 @@ const CGFloat kTasksCellHeight = 350.0;
              userAvatar:(UIImage*)userAvatar {
   _userFullName = userFullName;
   _userAvatar = userAvatar;
+  [self applyDataSnapshotAnimated:YES];
 }
 
 #pragma mark - LevelUpTaskCollectionViewCellDelegate
@@ -240,11 +241,7 @@ const CGFloat kTasksCellHeight = 350.0;
                configurationHandler:^(LevelUpWelcomeHeaderView* cell,
                                       NSIndexPath* indexPath,
                                       NSString* itemIdentifier) {
-                 __strong __typeof(weakSelf) strongSelf = weakSelf;
-                 if (!strongSelf) {
-                   return;
-                 }
-                 [strongSelf configureWelcomeHeaderCell:cell];
+                 [weakSelf configureWelcomeHeaderCell:cell];
                }];
 
   UICollectionViewCellRegistration* progressRegistration =
@@ -253,11 +250,7 @@ const CGFloat kTasksCellHeight = 350.0;
                configurationHandler:^(LevelUpProgressView* cell,
                                       NSIndexPath* indexPath,
                                       NSString* itemIdentifier) {
-                 __strong __typeof(weakSelf) strongSelf = weakSelf;
-                 if (!strongSelf) {
-                   return;
-                 }
-                 [strongSelf configureProgressCell:cell];
+                 [weakSelf configureProgressCell:cell];
                }];
 
   UICollectionViewCellRegistration* tasksRegistration =
@@ -266,11 +259,7 @@ const CGFloat kTasksCellHeight = 350.0;
                configurationHandler:^(LevelUpTaskCollectionViewCell* cell,
                                       NSIndexPath* indexPath,
                                       NSString* itemIdentifier) {
-                 __strong __typeof(weakSelf) strongSelf = weakSelf;
-                 if (!strongSelf) {
-                   return;
-                 }
-                 [strongSelf configureTasksCell:cell];
+                 [weakSelf configureTasksCell:cell];
                }];
 
   UICollectionViewCellRegistration* statRegistration =
@@ -279,12 +268,8 @@ const CGFloat kTasksCellHeight = 350.0;
                configurationHandler:^(LevelUpStatView* cell,
                                       NSIndexPath* indexPath,
                                       NSString* itemIdentifier) {
-                 __strong __typeof(weakSelf) strongSelf = weakSelf;
-                 if (!strongSelf) {
-                   return;
-                 }
-                 [strongSelf configureStatCell:cell
-                                itemIdentifier:itemIdentifier];
+                 [weakSelf configureStatCell:cell
+                              itemIdentifier:itemIdentifier];
                }];
 
   _diffableDataSource = [[UICollectionViewDiffableDataSource alloc]
@@ -370,6 +355,8 @@ const CGFloat kTasksCellHeight = 350.0;
 
   [snapshot appendItemsWithIdentifiers:@[ kTasksItemIdentifier ]
              intoSectionWithIdentifier:kTasksSectionIdentifier];
+
+  [snapshot reconfigureItemsWithIdentifiers:@[ kWelcomeItemIdentifier ]];
 
   [_diffableDataSource applySnapshot:snapshot animatingDifferences:animated];
 }

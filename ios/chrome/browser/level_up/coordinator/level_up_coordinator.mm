@@ -15,8 +15,10 @@
 #import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
 #import "ios/chrome/browser/shared/public/commands/level_up_commands.h"
 #import "ios/chrome/browser/signin/model/authentication_service_factory.h"
+#import "ios/chrome/browser/signin/model/identity_manager_factory.h"
 
-@interface LevelUpCoordinator () <LevelUpViewControllerDelegate>
+@interface LevelUpCoordinator () <LevelUpMediatorDelegate,
+                                  LevelUpViewControllerDelegate>
 
 @property(nonatomic, strong) LevelUpMediator* mediator;
 @property(nonatomic, strong) LevelUpViewController* viewController;
@@ -36,13 +38,17 @@
 
   AuthenticationService* authService =
       AuthenticationServiceFactory::GetForProfile(self.browser->GetProfile());
+  signin::IdentityManager* identityManager =
+      IdentityManagerFactory::GetForProfile(self.browser->GetProfile());
   LevelUpService* levelUpService =
       LevelUpServiceFactory::GetForProfile(self.browser->GetProfile());
   PrefService* prefService = self.browser->GetProfile()->GetPrefs();
   self.mediator =
       [[LevelUpMediator alloc] initWithAuthenticationService:authService
+                                             identityManager:identityManager
                                               levelUpService:levelUpService
                                                  prefService:prefService];
+  self.mediator.delegate = self;
   self.mediator.profileConsumer = self.viewController;
   self.mediator.consumer = self.viewController;
 
@@ -66,6 +72,10 @@
       dismissViewControllerAnimated:YES
                          completion:nil];
   self.viewController = nil;
+  [self.mediator disconnect];
+  self.mediator.delegate = nil;
+  self.mediator.profileConsumer = nil;
+  self.mediator.consumer = nil;
   self.mediator = nil;
   self.navigationController = nil;
 
@@ -83,6 +93,13 @@
 
 - (void)didTapToggleProgressUpdates:(LevelUpViewController*)controller {
   [self.mediator toggleProgressUpdates];
+}
+
+#pragma mark - LevelUpMediatorDelegate
+
+- (void)levelUpMediatorWantsToBeDismissed:(LevelUpMediator*)mediator {
+  [HandlerForProtocol(self.browser->GetCommandDispatcher(), LevelUpCommands)
+      dismissLevelUp];
 }
 
 @end

@@ -8,25 +8,40 @@
 #import <Foundation/Foundation.h>
 
 class AuthenticationService;
+@protocol LevelUpConsumer;
+@class LevelUpMediator;
+@protocol LevelUpProfileConsumer;
 class LevelUpService;
 class PrefService;
-@protocol LevelUpConsumer;
-@protocol LevelUpProfileConsumer;
+namespace signin {
+class IdentityManager;
+}
+
+// Delegate for the Level Up mediator.
+@protocol LevelUpMediatorDelegate <NSObject>
+
+// Called when the mediator wants to dismiss the Level Up view.
+- (void)levelUpMediatorWantsToBeDismissed:(LevelUpMediator*)mediator;
+
+@end
 
 // Mediator for the Level Up feature.
 @interface LevelUpMediator : NSObject
 
+// The delegate for this mediator.
+@property(nonatomic, weak) id<LevelUpMediatorDelegate> delegate;
 // The consumer for this mediator.
 @property(nonatomic, weak) id<LevelUpConsumer> consumer;
 // The consumer for user profile credentials updates.
 @property(nonatomic, weak) id<LevelUpProfileConsumer> profileConsumer;
 
-// Initializes this mediator with the authentication service, level up service,
-// and pref service.
-- (instancetype)initWithAuthenticationService:
-                    (AuthenticationService*)authService
-                               levelUpService:(LevelUpService*)levelUpService
-                                  prefService:(PrefService*)prefService
+// Initializes this mediator with the authentication service, identity manager,
+// level up service, and pref service.
+- (instancetype)
+    initWithAuthenticationService:(AuthenticationService*)authService
+                  identityManager:(signin::IdentityManager*)identityManager
+                   levelUpService:(LevelUpService*)levelUpService
+                      prefService:(PrefService*)prefService
     NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -36,6 +51,9 @@ class PrefService;
 
 // Toggles the progress updates enabled status.
 - (void)toggleProgressUpdates;
+
+// Disconnects the mediator by releasing observed objects and pointers.
+- (void)disconnect;
 
 @end
 

@@ -9,6 +9,8 @@
 #import "components/prefs/ios/pref_observer_bridge.h"
 #import "components/prefs/pref_change_registrar.h"
 #import "components/prefs/pref_service.h"
+#import "components/signin/public/identity_manager/identity_manager.h"
+#import "components/signin/public/identity_manager/objc/identity_manager_observer_bridge.h"
 #import "ios/chrome/browser/level_up/coordinator/level_up_category.h"
 #import "ios/chrome/browser/level_up/coordinator/level_up_stat.h"
 #import "ios/chrome/browser/level_up/coordinator/level_up_task.h"
@@ -27,16 +29,24 @@
 #import "ios/chrome/grit/ios_strings.h"
 #import "ui/base/l10n/l10n_util.h"
 
-@interface LevelUpMediator () <PrefObserverDelegate>
+@interface LevelUpMediator () <IdentityManagerObserverBridgeDelegate,
+                               PrefObserverDelegate>
 @end
 
 @implementation LevelUpMediator {
   // The authentication service.
   raw_ptr<AuthenticationService> _authService;
+  // The identity manager.
+  raw_ptr<signin::IdentityManager> _identityManager;
+  // Bridge to register for IdentityManager changes.
+  std::unique_ptr<signin::IdentityManagerObserverBridge>
+      _identityManagerObserverBridge;
   // The level up service.
   raw_ptr<LevelUpService> _levelUpService;
   // The pref service.
   raw_ptr<PrefService> _prefService;
+  // The currently displayed identity.
+  id<SystemIdentity> _currentIdentity;
   // The list of task categories.
   NSArray<LevelUpCategory*>* _categories;
 
@@ -46,16 +56,22 @@
   std::unique_ptr<PrefObserverBridge> _prefObserverBridge;
 }
 
-- (instancetype)initWithAuthenticationService:
-                    (AuthenticationService*)authService
-                               levelUpService:(LevelUpService*)levelUpService
-                                  prefService:(PrefService*)prefService {
+- (instancetype)
+    initWithAuthenticationService:(AuthenticationService*)authService
+                  identityManager:(signin::IdentityManager*)identityManager
+                   levelUpService:(LevelUpService*)levelUpService
+                      prefService:(PrefService*)prefService {
   self = [super init];
   if (self) {
+    CHECK(authService);
+    CHECK(identityManager);
     _authService = authService;
+    _identityManager = identityManager;
+    _identityManagerObserverBridge =
+        std::make_unique<signin::IdentityManagerObserverBridge>(
+            _identityManager, self);
     _levelUpService = levelUpService;
     _prefService = prefService;
-
     _prefObserverBridge = std::make_unique<PrefObserverBridge>(self);
     _prefChangeRegistrar.Init(prefService);
     _prefObserverBridge->ObserveChangesForPreference(prefs::kLevelUpUIEnabled,
@@ -67,11 +83,7 @@
 - (void)setConsumer:(id<LevelUpConsumer>)consumer {
   _consumer = consumer;
 
-  id<SystemIdentity> identity = _authService->GetPrimaryIdentity();
-  NSString* userFullName = identity.userFullName;
-  UIImage* userAvatar = userAvatar =
-      GetApplicationContext()->GetIdentityAvatarProvider()->GetIdentityAvatar(
-          identity, IdentityAvatarSize::Large);
+  [self updateProfileInfo];
 
   if ([self.consumer
           respondsToSelector:@selector(setProgressUpdatesEnabled:)]) {
@@ -138,8 +150,6 @@
     }
   }
   [self configureTaskStat:allTasks];
-
-  [self.profileConsumer setUserFullName:userFullName userAvatar:userAvatar];
 }
 
 - (void)configureAllTasksConsumer:(id<LevelUpConsumer>)allTasksConsumer {
@@ -148,6 +158,16 @@
       [allTasksConsumer addCategoryCard:category];
     }
   }
+}
+
+- (void)disconnect {
+  _identityManagerObserverBridge.reset();
+  _prefObserverBridge.reset();
+  _prefChangeRegistrar.RemoveAll();
+  _authService = nullptr;
+  _identityManager = nullptr;
+  _levelUpService = nullptr;
+  _prefService = nullptr;
 }
 
 #pragma mark - PrefObserverDelegate
@@ -226,6 +246,50 @@
           respondsToSelector:@selector(setProgressUpdatesEnabled:)]) {
     [self.consumer setProgressUpdatesEnabled:newValue];
   }
+}
+
+// Updates the profile consumer with the primary identity credentials.
+- (void)updateProfileInfo {
+  id<SystemIdentity> identity = _authService->GetPrimaryIdentity();
+  if (_currentIdentity == identity) {
+    return;
+  }
+  _currentIdentity = identity;
+
+  if (!identity) {
+    [self.delegate levelUpMediatorWantsToBeDismissed:self];
+    return;
+  }
+
+  NSString* userFullName = identity.userFullName;
+  UIImage* userAvatar =
+      GetApplicationContext()->GetIdentityAvatarProvider()->GetIdentityAvatar(
+          identity, IdentityAvatarSize::Large);
+  [self.profileConsumer setUserFullName:userFullName userAvatar:userAvatar];
+}
+
+#pragma mark - IdentityManagerObserverBridgeDelegate
+
+- (void)onPrimaryAccountChanged:
+    (const signin::PrimaryAccountChangeEvent&)event {
+  if (_identityManager->IsBatchOfPrimaryAccountChangesInProgress()) {
+    return;
+  }
+  switch (event.GetEventTypeFor(signin::ConsentLevel::kSignin)) {
+    case signin::PrimaryAccountChangeEvent::Type::kNone:
+      break;
+    case signin::PrimaryAccountChangeEvent::Type::kSet:
+    case signin::PrimaryAccountChangeEvent::Type::kCleared:
+      [self updateProfileInfo];
+      break;
+  }
+}
+
+- (void)onExtendedAccountInfoUpdated:(const AccountInfo&)info {
+  if (_identityManager->IsBatchOfPrimaryAccountChangesInProgress()) {
+    return;
+  }
+  [self updateProfileInfo];
 }
 
 @end
