@@ -721,6 +721,7 @@ android_library("content_javatests") {
     "//content/test/data/accessibility/css/",
     "//content/test/data/accessibility/event/",
     "//content/test/data/accessibility/html/",
+    "//content/test/data/accessibility/mathml/",
     "//content/test/data/android/",
     "//content/test/data/media/",
   ]

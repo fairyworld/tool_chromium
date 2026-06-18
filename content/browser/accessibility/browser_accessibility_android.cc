@@ -2829,6 +2829,21 @@ BrowserAccessibilityAndroid::GenerateAccessibilityNodeInfoString() const {
   return manager->GenerateAccessibilityNodeInfoString(GetUniqueId());
 }
 
+const std::string& BrowserAccessibilityAndroid::GetMathTag() const {
+  if (!ui::IsMath(GetRole())) {
+    return base::EmptyString();
+  }
+  return GetStringAttribute(ax::mojom::StringAttribute::kHtmlTag);
+}
+
+const std::string& BrowserAccessibilityAndroid::GetMathIntent() const {
+  return GetStringAttribute(ax::mojom::StringAttribute::kMathIntent);
+}
+
+const std::string& BrowserAccessibilityAndroid::GetMathArg() const {
+  return GetStringAttribute(ax::mojom::StringAttribute::kMathArg);
+}
+
 int BrowserAccessibilityAndroid::GetPaintOrder() const {
   return GetIntAttribute(ax::mojom::IntAttribute::kPaintOrder);
 }
