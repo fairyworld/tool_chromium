@@ -283,7 +283,8 @@ class ToolbarControllerUiTest : public InteractiveFeaturePromoTest,
             views::test::RunScheduledLayout(browser_view_);
           }
         }).SetDescription("ForceOverflow"),
-        WaitForShow(kToolbarOverflowButtonElementId), WaitForHide(id));
+        WaitForShow(kToolbarOverflowButtonElementId),
+        WaitForElementVisibility(id, false));
     AddDescriptionPrefix(
         result,
         "AddDummyButtonsToToolbarTillElementOverflowsWithoutResizing()");
@@ -380,7 +381,7 @@ class ToolbarControllerUiTest : public InteractiveFeaturePromoTest,
   }
 
   auto ForceForwardButtonOverflow() {
-    return Steps(AddDummyButtonsToToolbarTillElementOverflows(
+    return Steps(AddDummyButtonsToToolbarTillElementOverflowsWithoutResizing(
         kToolbarForwardButtonElementId));
   }
 
@@ -826,11 +827,16 @@ IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest, ActivateActionElementFromMenu) {
   EXPECT_EQ(0, user_action_tester.GetActionCount(
                    "ResponsiveToolbar.MenuItemActivated.ForwardButton"));
   RunTestSequence(
-      InstrumentTab(kPrimaryTabPageElementId),
+      InstrumentToolbarWebUiIfNeeded(), InstrumentTab(kPrimaryTabPageElementId),
       NavigateWebContents(kPrimaryTabPageElementId, back_url),
       NavigateWebContents(kPrimaryTabPageElementId, forward_url),
       PressButton(kToolbarBackButtonElementId),
       WaitForWebContentsNavigation(kPrimaryTabPageElementId, back_url),
+      // Wait for forward button to be displayed before advancing the test
+      // further else. When using the Javascript toolbar, it make take a little
+      // time to tell Javascript to display the forward button. It will likely
+      // be displayed by this point, anyways, but best to be sure.
+      WaitForElementVisibility(kToolbarForwardButtonElementId, true),
       ForceForwardButtonOverflow(),
       PressButton(kToolbarOverflowButtonElementId),
       ActivateMenuItemWithElementId(kToolbarForwardButtonElementId),
@@ -889,22 +895,19 @@ IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest,
                   }));
 }
 
-// TODO(crbug.com/522524976): Flaky on TSan and MSan Linux bots
-#if (defined(THREAD_SANITIZER) || defined(MEMORY_SANITIZER)) && \
-    BUILDFLAG(IS_LINUX)
-#define MAYBE_ActivatedActionItemsDoNotOverflow \
-  DISABLED_ActivatedActionItemsDoNotOverflow
-#else
-#define MAYBE_ActivatedActionItemsDoNotOverflow \
-  ActivatedActionItemsDoNotOverflow
-#endif
 IN_PROC_BROWSER_TEST_P(ToolbarControllerUiTest,
-                       MAYBE_ActivatedActionItemsDoNotOverflow) {
+                       ActivatedActionItemsDoNotOverflow) {
   RunTestSequence(
-      PinBookmarkToToolbar(),
+      InstrumentToolbarWebUiIfNeeded(), PinBookmarkToToolbar(),
       CheckActionItemOverflowed(ChromeActionIds::kActionSidePanelShowBookmarks,
                                 false),
       EnsureNotPresent(kSidePanelElementId),
+
+      // Wait for forward button to be displayed before advancing the test
+      // further else. When using the Javascript toolbar, it make take a little
+      // time to tell Javascript to display the forward button. It will likely
+      // be displayed by this point, anyways, but best to be sure.
+      WaitForElementVisibility(kToolbarForwardButtonElementId, true),
 
       // Open bookmark side panel.
       Do([=, this]() {
