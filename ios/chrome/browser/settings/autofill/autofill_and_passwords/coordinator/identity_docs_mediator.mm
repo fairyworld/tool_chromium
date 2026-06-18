@@ -67,14 +67,15 @@ static constexpr autofill::DenseSet<autofill::EntityTypeName> kIdentityDocs = {
 - (void)disconnect {
   [super disconnect];
   _identityDocsEnabled.observer = nil;
+  [_identityDocsEnabled stop];
   _identityDocsEnabled = nil;
   _consumer = nil;
 }
 
 #pragma mark - BooleanObserver
 
-- (void)booleanDidChange:(PrefBackedBoolean*)boolean {
-  if (boolean == _identityDocsEnabled) {
+- (void)booleanDidChange:(id<ObservableBoolean>)observableBoolean {
+  if (observableBoolean == _identityDocsEnabled) {
     [self.consumer setIdentityDocsToggleState:_identityDocsEnabled.value];
   }
 }
