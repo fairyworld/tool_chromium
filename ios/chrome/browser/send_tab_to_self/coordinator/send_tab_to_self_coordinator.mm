@@ -574,6 +574,19 @@ void OpenManageDevicesTab(CommandDispatcher* dispatcher) {
     [self.delegate sendTabToSelfCoordinatorWantsToBeStopped:self];
     return;
   }
+
+  size_t deviceCount = 0;
+  if (*displayReason == send_tab_to_self::EntryPointDisplayReason::kOfferFeature) {
+    send_tab_to_self::SendTabToSelfSyncService* syncService =
+        SendTabToSelfSyncServiceFactory::GetForProfile(self.profile);
+    if (syncService && syncService->GetSendTabToSelfModel()) {
+      deviceCount = syncService->GetSendTabToSelfModel()
+                        ->GetTargetDeviceInfoSortedList()
+                        .size();
+    }
+  }
+  send_tab_to_self::RecordTargetDeviceCount(*displayReason, deviceCount);
+
   switch (*displayReason) {
     case send_tab_to_self::EntryPointDisplayReason::kInformNoTargetDevice:
     case send_tab_to_self::EntryPointDisplayReason::kOfferFeature:
