@@ -10,6 +10,7 @@ ci.builder(
     name = "linux_clang",
     description_html = "Builder for Clang toolchain",
     executable = "recipe:chromium",
+    schedule = "triggered",
     cores = 2,
     console_view_entry = consoles.console_view_entry(
         console_view = "chromium.trusted-robots",
