@@ -12069,26 +12069,6 @@
             ]
         }
     ],
-    "GlicEnableMultiInstanceBasedOnTier": [
-        {
-            "platforms": [
-                "linux",
-                "mac",
-                "windows"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "GlicDefaultTabContextSetting",
-                        "GlicEnableMultiInstanceBasedOnTier",
-                        "GlicLiveModeOnlyGlow",
-                        "GlicMultiInstance"
-                    ]
-                }
-            ]
-        }
-    ],
     "GlicExperimentalTriggering": [
         {
             "platforms": [
