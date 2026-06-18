@@ -38,13 +38,11 @@
 using Variant = permissions::EmbeddedPermissionPromptFlowModel::Variant;
 
 EmbeddedPermissionPrompt::EmbeddedPermissionPrompt(
-    Browser* browser,
     content::WebContents* web_contents,
     permissions::PermissionPrompt::Delegate* delegate)
-    : PermissionPromptDesktop(browser, web_contents, delegate),
-      delegate_(delegate) {
-  if (browser) {
-    if (auto* browser_view = BrowserView::GetBrowserViewForBrowser(browser)) {
+    : PermissionPromptDesktop(web_contents, delegate), delegate_(delegate) {
+  if (browser()) {
+    if (auto* browser_view = BrowserView::GetBrowserViewForBrowser(browser())) {
       if (auto* focus_manager = browser_view->GetFocusManager()) {
         previously_focused_view_tracker_.SetView(
             focus_manager->GetFocusedView());

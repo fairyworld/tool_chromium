@@ -208,15 +208,13 @@ std::unique_ptr<permissions::PermissionPrompt> CreatePwaPrompt(
     // Run this check inside the if statement to avoid creating another prompt
     // type for embedded permission prompts.
     return CanCurrentRequestUseModalUI(web_contents, delegate)
-               ? std::make_unique<EmbeddedPermissionPrompt>(
-                     /*browser=*/nullptr, web_contents, delegate)
+               ? std::make_unique<EmbeddedPermissionPrompt>(web_contents,
+                                                            delegate)
                : nullptr;
   } else if (delegate->ShouldCurrentRequestUseQuietUI()) {
-    return std::make_unique<PermissionPromptQuietIcon>(/*browser=*/nullptr,
-                                                       web_contents, delegate);
+    return std::make_unique<PermissionPromptQuietIcon>(web_contents, delegate);
   } else {
-    return std::make_unique<PermissionPromptBubble>(/*browser=*/nullptr,
-                                                    web_contents, delegate);
+    return std::make_unique<PermissionPromptBubble>(web_contents, delegate);
   }
 }
 
@@ -227,8 +225,8 @@ std::unique_ptr<permissions::PermissionPrompt> CreateNormalPrompt(
 
   if (ShouldCurrentRequestUseExclusiveAccessUI(delegate)) {
     return CanCurrentRequestUseModalUI(web_contents, delegate)
-               ? std::make_unique<ExclusiveAccessPermissionPrompt>(
-                     /*browser=*/nullptr, web_contents, delegate)
+               ? std::make_unique<ExclusiveAccessPermissionPrompt>(web_contents,
+                                                                   delegate)
                : nullptr;
   } else if (permissions::PermissionUtil::
                  ShouldCurrentRequestUsePermissionElementSecondaryUI(
@@ -236,15 +234,13 @@ std::unique_ptr<permissions::PermissionPrompt> CreateNormalPrompt(
     // Run this check inside the if statement to avoid creating another prompt
     // type for embedded permission prompts.
     return CanCurrentRequestUseModalUI(web_contents, delegate)
-               ? std::make_unique<EmbeddedPermissionPrompt>(
-                     /*browser=*/nullptr, web_contents, delegate)
+               ? std::make_unique<EmbeddedPermissionPrompt>(web_contents,
+                                                            delegate)
                : nullptr;
   } else if (ShouldUseChip(delegate) && IsLocationBarDisplayed(web_contents)) {
-    return std::make_unique<PermissionPromptChip>(/*browser=*/nullptr,
-                                                  web_contents, delegate);
+    return std::make_unique<PermissionPromptChip>(web_contents, delegate);
   } else {
-    return std::make_unique<PermissionPromptBubble>(/*browser=*/nullptr,
-                                                    web_contents, delegate);
+    return std::make_unique<PermissionPromptBubble>(web_contents, delegate);
   }
 }
 
@@ -253,18 +249,15 @@ std::unique_ptr<permissions::PermissionPrompt> CreateQuietPrompt(
     permissions::PermissionPrompt::Delegate* delegate) {
   if (ShouldCurrentRequestUseQuietChip(delegate)) {
     if (IsLocationBarDisplayed(web_contents)) {
-      return std::make_unique<PermissionPromptChip>(/*browser=*/nullptr,
-                                                    web_contents, delegate);
+      return std::make_unique<PermissionPromptChip>(web_contents, delegate);
     } else {
       // If LocationBar is not displayed (Fullscreen mode), display a default
       // bubble only for non-abusive origins.
       DCHECK(!delegate->ShouldDropCurrentRequestIfCannotShowQuietly());
-      return std::make_unique<PermissionPromptBubble>(/*browser=*/nullptr,
-                                                      web_contents, delegate);
+      return std::make_unique<PermissionPromptBubble>(web_contents, delegate);
     }
   } else {
-    return std::make_unique<PermissionPromptQuietIcon>(/*browser=*/nullptr,
-                                                       web_contents, delegate);
+    return std::make_unique<PermissionPromptQuietIcon>(web_contents, delegate);
   }
 }
 

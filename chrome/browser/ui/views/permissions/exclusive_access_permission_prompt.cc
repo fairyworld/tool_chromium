@@ -11,11 +11,9 @@
 #include "content/public/browser/web_contents.h"
 
 ExclusiveAccessPermissionPrompt::ExclusiveAccessPermissionPrompt(
-    Browser* browser,
     content::WebContents* web_contents,
     permissions::PermissionPrompt::Delegate* delegate)
-    : PermissionPromptDesktop(browser, web_contents, delegate),
-      delegate_(delegate) {
+    : PermissionPromptDesktop(web_contents, delegate), delegate_(delegate) {
   if (ShowPrompt()) {
     LocationBar* lb = GetLocationBar();
 

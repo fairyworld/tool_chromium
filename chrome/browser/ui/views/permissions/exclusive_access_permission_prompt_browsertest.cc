@@ -91,7 +91,7 @@ class ExclusiveAccessPermissionPromptInteractiveTest
       std::vector<std::unique_ptr<permissions::PermissionRequest>> requests) {
     prompt_delegate_->set_requests(std::move(requests));
     return std::make_unique<ExclusiveAccessPermissionPrompt>(
-        browser(), browser()->tab_strip_model()->GetActiveWebContents(),
+        browser()->tab_strip_model()->GetActiveWebContents(),
         prompt_delegate_.get());
   }
 

@@ -16,10 +16,9 @@
 #include "ui/display/types/display_constants.h"
 
 PermissionPromptBubble::PermissionPromptBubble(
-    Browser* browser,
     content::WebContents* web_contents,
     Delegate* delegate)
-    : PermissionPromptDesktop(browser, web_contents, delegate) {
+    : PermissionPromptDesktop(web_contents, delegate) {
   LocationBar* lb = GetLocationBar();
   if (lb && lb->IsDrawn() &&
       delegate->Requests()[0]->IsConfirmationChipSupported()) {
