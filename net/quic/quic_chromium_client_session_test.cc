@@ -2930,5 +2930,53 @@ TEST_P(QuicChromiumClientSessionTest,
       MIGRATION_STATUS_ALREADY_MIGRATED, 1);
 }
 
+TEST_P(QuicChromiumClientSessionTest, GoingAwaySessionDoesNotKeepAlive) {
+  MockQuicData quic_data(version_);
+  quic_data.AddWrite(SYNCHRONOUS, client_maker_.MakeInitialSettingsPacket(1));
+  quic_data.AddRead(ASYNC, ERR_IO_PENDING);
+  quic_data.AddRead(ASYNC, ERR_CONNECTION_CLOSED);
+  quic_data.AddSocketDataToFactory(&socket_factory_);
+  Initialize();
+  CompleteCryptoHandshake();
+
+  // Enable periodic ping.
+  session_->SetPeriodicConnectionKeepAlive(true);
+  EXPECT_TRUE(session_->ShouldKeepConnectionAlive());
+
+  // Mark session as going away.
+  session_->SetGoingAwayForTesting(true);
+
+  // If there are no active streams, it should NOT keep connection alive.
+  EXPECT_EQ(0u, session_->GetNumActiveStreams());
+  EXPECT_FALSE(session_->ShouldKeepConnectionAlive());
+}
+
+TEST_P(QuicChromiumClientSessionTest,
+       GoingAwaySessionWithActiveStreamsKeepsAlive) {
+  MockQuicData quic_data(version_);
+  quic_data.AddWrite(SYNCHRONOUS, client_maker_.MakeInitialSettingsPacket(1));
+  quic_data.AddRead(ASYNC, ERR_IO_PENDING);
+  quic_data.AddRead(ASYNC, ERR_CONNECTION_CLOSED);
+  quic_data.AddSocketDataToFactory(&socket_factory_);
+  Initialize();
+  CompleteCryptoHandshake();
+
+  // Enable periodic ping.
+  session_->SetPeriodicConnectionKeepAlive(true);
+  EXPECT_TRUE(session_->ShouldKeepConnectionAlive());
+
+  // Create an active stream.
+  QuicChromiumClientStream* stream =
+      QuicChromiumClientSessionPeer::CreateOutgoingStream(session_.get());
+  EXPECT_TRUE(stream);
+  EXPECT_EQ(1u, session_->GetNumActiveStreams());
+
+  // Mark session as going away.
+  session_->SetGoingAwayForTesting(true);
+
+  // If there are active streams, it should STILL keep connection alive.
+  EXPECT_TRUE(session_->ShouldKeepConnectionAlive());
+}
+
 }  // namespace
 }  // namespace net::test
