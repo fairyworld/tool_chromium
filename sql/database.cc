@@ -721,6 +721,7 @@ void Database::CloseInternal(bool forced) {
     // not call `RollbackAllTransactions()`, but we still must account for the
     // implicit rollback in our internal bookkeeping.
     transaction_nesting_ = 0;
+    needs_rollback_ = false;
   }
 }
 
