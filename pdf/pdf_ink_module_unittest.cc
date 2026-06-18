@@ -1251,6 +1251,7 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageNew) {
               DrawText(kPageIndex, kTextId,
                        ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
                        kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+  EXPECT_CALL(client(), RequestThumbnail(kPageIndex, _));
   EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);
 
   EXPECT_TRUE(ink_module().OnMessage(
@@ -1282,6 +1283,7 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageNoEdit) {
         DrawText(kPageIndex, kTextId0,
                  ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
                  kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(client(), RequestThumbnail(kPageIndex, _));
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);
 
@@ -1300,6 +1302,7 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageNoEdit) {
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
     EXPECT_CALL(client(), DrawText(_, _, _, _, _, _)).Times(0);
+    EXPECT_CALL(client(), RequestThumbnail(_, _)).Times(0);
 
     EXPECT_TRUE(ink_module().OnMessage(
         CreateFinishTextAnnotationMessage(std::move(data))));
@@ -1333,6 +1336,7 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageEdit) {
         DrawText(kPageIndex, kTextId0,
                  ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
                  kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(client(), RequestThumbnail(kPageIndex, _));
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);
 
@@ -1365,6 +1369,7 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageEdit) {
                      /*is_bold=*/true,
                      /*is_italic=*/true,
                      /*text=*/"ah")));
+    EXPECT_CALL(client(), RequestThumbnail(kPageIndex, _));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
 
     EXPECT_TRUE(ink_module().OnMessage(
@@ -1398,6 +1403,7 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageDelete) {
         DrawText(kPageIndex, kTextId,
                  ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
                  kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(client(), RequestThumbnail(kPageIndex, _));
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);
 
@@ -1415,6 +1421,7 @@ TEST_F(PdfInkModuleTextTest, HandleFinishTextAnnotationMessageDelete) {
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(TextId(kTextId),
                                                         /*active=*/false));
     EXPECT_CALL(client(), DiscardText(kTextId));
+    EXPECT_CALL(client(), RequestThumbnail(kPageIndex, _));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
     EXPECT_CALL(client(), DrawText(_, _, _, _, _, _)).Times(0);
 
@@ -1452,6 +1459,7 @@ TEST_F(PdfInkModuleTextTest,
         DrawText(kPageIndex, kTextId0,
                  ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
                  kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(client(), RequestThumbnail(kPageIndex, _));
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);
 
@@ -1471,6 +1479,7 @@ TEST_F(PdfInkModuleTextTest,
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(TextId(kTextId0),
                                                         /*active=*/false));
     EXPECT_CALL(client(), DiscardText(kTextId0));
+    EXPECT_CALL(client(), RequestThumbnail(kPageIndex, _));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
     EXPECT_CALL(client(), DrawText(_, _, _, _, _, _)).Times(0);
 
@@ -1491,6 +1500,7 @@ TEST_F(PdfInkModuleTextTest,
         DrawText(kPageIndex, kTextId0,
                  ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
                  kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(client(), RequestThumbnail(kPageIndex, _));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);
@@ -1516,6 +1526,7 @@ TEST_F(PdfInkModuleTextTest,
         DrawText(kPageIndex, kTextId1,
                  ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
                  kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(client(), RequestThumbnail(kPageIndex, _));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
 
     EXPECT_TRUE(ink_module().OnMessage(
@@ -1538,6 +1549,7 @@ TEST_F(PdfInkModuleTextTest,
         DrawText(kPageIndex, kTextId0,
                  ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
                  kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(client(), RequestThumbnail(kPageIndex, _));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
 
     EXPECT_TRUE(ink_module().OnMessage(
@@ -1557,6 +1569,7 @@ TEST_F(PdfInkModuleTextTest,
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(TextId(kTextId0),
                                                         /*active=*/false));
     EXPECT_CALL(client(), DiscardText(kTextId0));
+    EXPECT_CALL(client(), RequestThumbnail(kPageIndex, _));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
     EXPECT_CALL(client(), DrawText(_, _, _, _, _, _)).Times(0);
 
@@ -1579,6 +1592,7 @@ TEST_F(PdfInkModuleTextTest,
         DrawText(kPageIndex, kTextId0,
                  ElementsAre(SampleInkTextInfoMatcher(kFontId)), kAscent,
                  kPdfZoom, SampleInkTextBoxAttributesMatcher()));
+    EXPECT_CALL(client(), RequestThumbnail(kPageIndex, _));
     EXPECT_CALL(client(), AddFont(_, _)).Times(0);
     EXPECT_CALL(client(), DiscardText(_)).Times(0);
     EXPECT_CALL(client(), UpdateTextActiveAndInvalidate(_, _)).Times(0);

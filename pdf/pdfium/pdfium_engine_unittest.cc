@@ -3347,6 +3347,80 @@ TEST_P(PDFiumEngineInkDrawTextTest, DrawTextSyntheticBoldItalic) {
   CheckPdfRendering(page.GetPage(), kPageSizeInPoints, kExpectedFilePath);
 }
 
+TEST_P(PDFiumEngineInkDrawTextTest, StrokeTextStrokeOverlap) {
+  TestClient client(/*use_skia_renderer=*/GetParam());
+  std::unique_ptr<PDFiumEngine> engine =
+      InitializeEngine(&client, FILE_PATH_LITERAL("blank.pdf"));
+  ASSERT_TRUE(engine);
+
+  constexpr int kPageIndex = 0;
+  PDFiumPage& page = GetPDFiumPage(*engine, kPageIndex);
+
+  // 1. Draw a red stroke.
+  auto pen_brush1 = std::make_unique<PdfInkBrush>(PdfInkBrush::Type::kPen,
+                                                  SK_ColorRED, /*size=*/5.0f);
+  static constexpr auto kPenInputs1 = std::to_array<PdfInkInputData>({
+      {{10.0f, 25.0f}, base::Seconds(0.0f)},
+      {{90.0f, 25.0f}, base::Seconds(0.1f)},
+  });
+  std::optional<ink::StrokeInputBatch> pen_inputs1 =
+      CreateInkInputBatch(kPenInputs1);
+  ASSERT_TRUE(pen_inputs1.has_value());
+  ink::Stroke stroke1(pen_brush1->ink_brush(), pen_inputs1.value());
+  constexpr InkStrokeId kStrokeId1(1);
+  engine->ApplyStroke(kPageIndex, kStrokeId1, stroke1);
+
+  // 2. Draw text that overlaps the first stroke.
+  FontId font_id = AddDefaultFont(engine.get());
+  static constexpr char kTextToDraw[] = "Overlap";
+  DrawTextData text_data = GetGlyphsForText(kTextToDraw, /*font_size=*/20.0f);
+  ASSERT_FALSE(text_data.glyphs.empty());
+  ASSERT_FALSE(text_data.glyph_positions.empty());
+
+  // Place the text box such that it overlaps the first stroke (which is at
+  // y=25). The text box rect will be from y=15 to y=35.
+  InkTextBoxAttributes attributes(
+      /*rect=*/gfx::RectF(10.0f, 15.0f, 80.0f, 20.0f),
+      /*color=*/SK_ColorBLACK,
+      /*css_font_size=*/20.0f,
+      /*typeface=*/TextTypeface::kSansSerif,
+      /*alignment=*/TextAlignment::kLeft,
+      /*orientation=*/0,
+      /*viewport_orientation=*/PageOrientation::kOriginal,
+      /*is_bold=*/false,
+      /*is_italic=*/false,
+      /*text=*/kTextToDraw);
+  engine->DrawText(
+      kPageIndex, InkTextId(0),
+      {InkTextInfo(font_id, text_data.glyphs, text_data.glyph_positions,
+                   /*location=*/gfx::RectF(0.0f, 0.0f, 80.0f, 20.0f),
+                   /*is_horizontal=*/true, text_data.text)},
+      FontAscent(engine.get(), font_id, attributes.css_font_size),
+      /*pdf_zoom=*/1.0, attributes);
+
+  // 3. Draw a blue stroke that overlaps both the first stroke and the text.
+  // Draw it vertically from y=5 to y=45, crossing y=25 (stroke1) and the text
+  // box (y=15 to 35).
+  auto pen_brush2 = std::make_unique<PdfInkBrush>(PdfInkBrush::Type::kPen,
+                                                  SK_ColorBLUE, /*size=*/5.0f);
+  static constexpr auto kPenInputs2 = std::to_array<PdfInkInputData>({
+      {{18.0f, 5.0f}, base::Seconds(0.0f)},
+      {{18.0f, 45.0f}, base::Seconds(0.1f)},
+  });
+  std::optional<ink::StrokeInputBatch> pen_inputs2 =
+      CreateInkInputBatch(kPenInputs2);
+  ASSERT_TRUE(pen_inputs2.has_value());
+  ink::Stroke stroke2(pen_brush2->ink_brush(), pen_inputs2.value());
+  constexpr InkStrokeId kStrokeId2(2);
+  engine->ApplyStroke(kPageIndex, kStrokeId2, stroke2);
+
+  // Verify the rendering of stroke text stroke overlaps.
+  const gfx::Size& kPageSizeInPoints = kBlankPageSizeInPoints;
+  const base::FilePath kExpectedFilePath(GetInkTestDataFilePath(
+      GetTestDataPathWithPlatformSuffix("stroke_text_stroke_overlap.png")));
+  CheckPdfRendering(page.GetPage(), kPageSizeInPoints, kExpectedFilePath);
+}
+
 TEST_P(PDFiumEngineInkDrawTextTest, RotatedTextbox90Degrees) {
   TestClient client(/*use_skia_renderer=*/GetParam());
   std::unique_ptr<PDFiumEngine> engine =

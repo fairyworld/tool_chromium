@@ -1601,6 +1601,8 @@ void PdfInkModule::HandleFinishTextAnnotationMessage(
     return;
   }
 
+  const int page_index = data.FindInt("pageIndex").value();
+
   // Figure out if this message is for a user action, or for handling undo/redo.
   // If this is for handling undo/redo, then do not modify `undo_redo_model_`.
   const bool modify_undo_redo_model = source == "user";
@@ -1641,6 +1643,7 @@ void PdfInkModule::HandleFinishTextAnnotationMessage(
       if (modify_undo_redo_model) {
         CHECK(undo_redo_model_.Finish());
       }
+      RequestThumbnailUpdates({page_index});
       return;
     }
   }
@@ -1657,6 +1660,7 @@ void PdfInkModule::HandleFinishTextAnnotationMessage(
             std::get<InkLoadedTextId>(undo_redo_text_id.value());
         text_id_map_[frontend_id] = loaded_id;
         client_->UpdateTextActiveAndInvalidate(loaded_id, /*active=*/true);
+        RequestThumbnailUpdates({page_index});
         return;
       }
     } else {
@@ -1683,8 +1687,6 @@ void PdfInkModule::HandleFinishTextAnnotationMessage(
   std::vector<InkTextInfo> ink_info = InkTextInfo::SplitTypefaceRuns(
       text_info_mojo->text_runs, text_info_mojo->effective_zoom);
 
-  const int page_index = data.FindInt("pageIndex").value();
-
   // Note: `pdf_zoom` is similar to GetZoom() but GetZoom() is multiplied by
   // device scale factor while this value isn't. Additionally `pdf_zoom` comes
   // from the frontend at the exact same time as the annotation commit happens
@@ -1710,6 +1712,7 @@ void PdfInkModule::HandleFinishTextAnnotationMessage(
     CHECK(undo_redo_model_.Add(new_id));
     CHECK(undo_redo_model_.Finish());
   }
+  RequestThumbnailUpdates({page_index});
 }
 
 bool PdfInkModule::IsHighlightingTextAtPosition(
