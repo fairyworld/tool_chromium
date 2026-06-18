@@ -31,6 +31,7 @@
 #include "base/time/default_clock.h"
 #include "base/time/default_tick_clock.h"
 #include "base/trace_event/trace_event.h"
+#include "base/trace_event/trace_id_helper.h"
 #include "base/uuid.h"
 #include "build/android_buildflags.h"
 #include "components/services/storage/public/mojom/cache_storage_control.mojom.h"
@@ -117,18 +118,6 @@ void ClearTick(base::TimeTicks* time) {
 }
 
 const int kInvalidTraceId = -1;
-
-int NextTraceId() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
-  static int trace_id = 0;
-  if (trace_id == std::numeric_limits<int>::max()) {
-    trace_id = 0;
-  } else {
-    ++trace_id;
-  }
-  DCHECK_NE(kInvalidTraceId, trace_id);
-  return trace_id;
-}
 
 void OnConnectionError(base::WeakPtr<EmbeddedWorkerInstance> embedded_worker) {
   if (!embedded_worker) {
@@ -548,7 +537,7 @@ void ServiceWorkerVersion::set_has_usb_event_handlers(
 void ServiceWorkerVersion::StartWorker(ServiceWorkerMetrics::EventType purpose,
                                        StatusCallback callback) {
   TRACE_EVENT_INSTANT("ServiceWorker",
-                      "ServiceWorkerVersion::StartWorker (instant)", "Script",
+                      "ServiceWorkerVersion::StartWorkerRequested", "Script",
                       script_url_.spec(), "Purpose",
                       ServiceWorkerMetrics::EventTypeToString(purpose));
 
@@ -776,11 +765,11 @@ int ServiceWorkerVersion::StartRequestWithCustomTimeout(
       event_type);
   InflightRequest* request_rawptr = request.get();
   int request_id = inflight_requests_.Add(std::move(request));
-  TRACE_EVENT_BEGIN("ServiceWorker", "ServiceWorkerVersion::Request",
-                    perfetto::NamedTrack::FromPointer(
-                        "ServiceWorkerVersion::Request", request_rawptr),
-                    "Request id", request_id, "Event type",
-                    ServiceWorkerMetrics::EventTypeToString(event_type));
+  TRACE_EVENT_INSTANT("ServiceWorker", "ServiceWorkerVersion::Request",
+                      perfetto::Flow::FromPointer(
+                          request_rawptr, "ServiceWorkerVersion::Request"),
+                      "Request id", request_id, "Event type",
+                      ServiceWorkerMetrics::EventTypeToString(event_type));
 
   base::TimeTicks expiration_time = tick_clock_->NowTicks() + timeout;
   auto [iter, is_inserted] = request_timeouts_.emplace(
@@ -864,10 +853,10 @@ bool ServiceWorkerVersion::FinishRequestWithFetchCount(int request_id,
   }
 
   // ServiceWorkerVersion::Request
-  TRACE_EVENT_END("ServiceWorker",
-                  perfetto::NamedTrack::FromPointer(
-                      "ServiceWorkerVersion::Request", request),
-                  "Handled", was_handled);
+  TRACE_EVENT_INSTANT("ServiceWorker", "ServiceWorkerVersion::RequestCompleted",
+                      perfetto::TerminatingFlow::FromPointer(
+                          request, "ServiceWorkerVersion::Request"),
+                      "Handled", was_handled);
   if (base::FeatureList::IsEnabled(
           features::kServiceWorkerOptionalTimeoutIterator)) {
     if (request->timeout_iter.has_value()) {
@@ -1678,10 +1667,10 @@ void ServiceWorkerVersion::OnStopping() {
   TRACE_EVENT0("ServiceWorker", "ServiceWorkerVersion::OnStopping");
   DCHECK(stop_time_.is_null());
   RestartTick(&stop_time_);
-  TRACE_EVENT_BEGIN(
+  TRACE_EVENT_INSTANT(
       "ServiceWorker", "ServiceWorkerVersion::StopWorker",
-      perfetto::NamedTrack("ServiceWorkerVersion::StopWorker",
-                           stop_time_.since_origin().InMicroseconds()),
+      perfetto::Flow::ProcessScoped(stop_time_.since_origin().InMicroseconds(),
+                                    "ServiceWorkerVersion::StopWorker"),
       "Script", script_url_.spec(), "Version Status",
       VersionStatusToString(status_));
 
@@ -1765,10 +1754,11 @@ void ServiceWorkerVersion::SetCachedMetadata(const GURL& url,
                                              base::span<const uint8_t> data) {
   int64_t callback_id =
       base::Time::Now().ToDeltaSinceWindowsEpoch().InMicroseconds();
-  TRACE_EVENT_BEGIN("ServiceWorker", "ServiceWorkerVersion::SetCachedMetadata",
-                    perfetto::NamedTrack(
-                        "ServiceWorkerVersion::SetCachedMetadata", callback_id),
-                    "URL", url.spec());
+  TRACE_EVENT_INSTANT(
+      "ServiceWorker", "ServiceWorkerVersion::SetCachedMetadata",
+      perfetto::Flow::ProcessScoped(callback_id,
+                                    "ServiceWorkerVersion::SetCachedMetadata"),
+      "URL", url.spec());
   script_cache_map_.WriteMetadata(
       url, data,
       base::BindOnce(&ServiceWorkerVersion::OnSetCachedMetadataFinished,
@@ -1778,10 +1768,10 @@ void ServiceWorkerVersion::SetCachedMetadata(const GURL& url,
 void ServiceWorkerVersion::ClearCachedMetadata(const GURL& url) {
   int64_t callback_id =
       base::Time::Now().ToDeltaSinceWindowsEpoch().InMicroseconds();
-  TRACE_EVENT_BEGIN(
+  TRACE_EVENT_INSTANT(
       "ServiceWorker", "ServiceWorkerVersion::ClearCachedMetadata",
-      perfetto::NamedTrack("ServiceWorkerVersion::ClearCachedMetadata",
-                           callback_id),
+      perfetto::Flow::ProcessScoped(
+          callback_id, "ServiceWorkerVersion::ClearCachedMetadata"),
       "URL", url.spec());
   script_cache_map_.ClearMetadata(
       url, base::BindOnce(&ServiceWorkerVersion::OnClearCachedMetadataFinished,
@@ -2224,10 +2214,11 @@ void ServiceWorkerVersion::OnSetCachedMetadataFinished(int64_t callback_id,
                                                        size_t size,
                                                        int result) {
   // ServiceWorkerVersion::SetCachedMetadata
-  TRACE_EVENT_END("ServiceWorker",
-                  perfetto::NamedTrack(
-                      "ServiceWorkerVersion::SetCachedMetadata", callback_id),
-                  "result", result);
+  TRACE_EVENT_INSTANT(
+      "ServiceWorker", "ServiceWorkerVersion::OnSetCachedMetadataFinished",
+      perfetto::TerminatingFlow::ProcessScoped(
+          callback_id, "ServiceWorkerVersion::SetCachedMetadata"),
+      "result", result);
   for (auto& observer : observers_) {
     observer.OnCachedMetadataUpdated(this, size);
   }
@@ -2236,10 +2227,11 @@ void ServiceWorkerVersion::OnSetCachedMetadataFinished(int64_t callback_id,
 void ServiceWorkerVersion::OnClearCachedMetadataFinished(int64_t callback_id,
                                                          int result) {
   // ServiceWorkerVersion::ClearCachedMetadata
-  TRACE_EVENT_END("ServiceWorker",
-                  perfetto::NamedTrack(
-                      "ServiceWorkerVersion::ClearCachedMetadata", callback_id),
-                  "result", result);
+  TRACE_EVENT_INSTANT(
+      "ServiceWorker", "ServiceWorkerVersion::OnClearCachedMetadataFinished",
+      perfetto::TerminatingFlow::ProcessScoped(
+          callback_id, "ServiceWorkerVersion::ClearCachedMetadata"),
+      "result", result);
   for (auto& observer : observers_) {
     observer.OnCachedMetadataUpdated(this, 0);
   }
@@ -2534,13 +2526,13 @@ void ServiceWorkerVersion::DidEnsureLiveRegistrationForStartWorker(
                                  blink::ServiceWorkerStatusCode::kOk));
           return;
         } else {
-          int trace_id = NextTraceId();
-          TRACE_EVENT_BEGIN("ServiceWorker",
-                            "ServiceWorkerVersion::StartWorker",
-                            perfetto::NamedTrack(
-                                "ServiceWorkerVersion::StartWorker", trace_id),
-                            "Script", script_url_.spec(), "Purpose",
-                            ServiceWorkerMetrics::EventTypeToString(purpose));
+          int trace_id = base::trace_event::GetNextGlobalTraceId();
+          TRACE_EVENT_INSTANT(
+              "ServiceWorker", "ServiceWorkerVersion::StartWorker",
+              perfetto::Flow::ProcessScoped(
+                  trace_id, "ServiceWorkerVersion::StartWorker"),
+              "Script", script_url_.spec(), "Purpose",
+              ServiceWorkerMetrics::EventTypeToString(purpose));
 
           embedded_worker_->ResumeInitializingGlobalScope();
 
@@ -2559,32 +2551,33 @@ void ServiceWorkerVersion::DidEnsureLiveRegistrationForStartWorker(
         embedded_worker_->SetPauseInitializingGlobalScope();
 
         if (warm_up_callbacks_.empty()) {
-          int trace_id = NextTraceId();
-          TRACE_EVENT_BEGIN("ServiceWorker",
-                            "ServiceWorkerVersion::WarmUpWorker",
-                            perfetto::NamedTrack(
-                                "ServiceWorkerVersion::WarmUpWorker", trace_id),
-                            "Script", script_url_.spec());
+          int trace_id = base::trace_event::GetNextGlobalTraceId();
+          TRACE_EVENT_INSTANT(
+              "ServiceWorker", "ServiceWorkerVersion::WarmUpWorker",
+              perfetto::Flow::ProcessScoped(
+                  trace_id, "ServiceWorkerVersion::WarmUpWorker"),
+              "Script", script_url_.spec());
           warm_up_callbacks_.push_back(base::BindOnce(
               [](int trace_id, blink::ServiceWorkerStatusCode status) {
                 // ServiceWorkerVersion::WarmUpWorker
-                TRACE_EVENT_END(
+                TRACE_EVENT_INSTANT(
                     "ServiceWorker",
-                    perfetto::NamedTrack("ServiceWorkerVersion::WarmUpWorker",
-                                         trace_id),
+                    "ServiceWorkerVersion::WarmUpWorkerFinished",
+                    perfetto::TerminatingFlow::ProcessScoped(
+                        trace_id, "ServiceWorkerVersion::WarmUpWorker"),
                     "Status", blink::ServiceWorkerStatusToString(status));
               },
               trace_id));
         }
       } else {
         if (start_callbacks_.empty()) {
-          int trace_id = NextTraceId();
-          TRACE_EVENT_BEGIN("ServiceWorker",
-                            "ServiceWorkerVersion::StartWorker",
-                            perfetto::NamedTrack(
-                                "ServiceWorkerVersion::StartWorker", trace_id),
-                            "Script", script_url_.spec(), "Purpose",
-                            ServiceWorkerMetrics::EventTypeToString(purpose));
+          int trace_id = base::trace_event::GetNextGlobalTraceId();
+          TRACE_EVENT_INSTANT(
+              "ServiceWorker", "ServiceWorkerVersion::StartWorker",
+              perfetto::Flow::ProcessScoped(
+                  trace_id, "ServiceWorkerVersion::StartWorker"),
+              "Script", script_url_.spec(), "Purpose",
+              ServiceWorkerMetrics::EventTypeToString(purpose));
           start_callbacks_.push_back(base::BindOnce(
               &ServiceWorkerVersion::RecordStartWorkerResult,
               weak_factory_.GetWeakPtr(), purpose, prestart_status, trace_id,
@@ -2938,10 +2931,11 @@ void ServiceWorkerVersion::RecordStartWorkerResult(
     blink::ServiceWorkerStatusCode status) {
   if (trace_id != kInvalidTraceId) {
     // ServiceWorkerVersion::StartWorker
-    TRACE_EVENT_END(
-        "ServiceWorker",
-        perfetto::NamedTrack("ServiceWorkerVersion::StartWorker", trace_id),
-        "Status", blink::ServiceWorkerStatusToString(status));
+    TRACE_EVENT_INSTANT("ServiceWorker",
+                        "ServiceWorkerVersion::StartWorkerFinished",
+                        perfetto::TerminatingFlow::ProcessScoped(
+                            trace_id, "ServiceWorkerVersion::StartWorker"),
+                        "Status", blink::ServiceWorkerStatusToString(status));
   }
   base::TimeTicks start_time = start_time_;
   ClearTick(&start_time_);
@@ -2993,10 +2987,10 @@ bool ServiceWorkerVersion::MaybeTimeoutRequest(
   }
 
   // ServiceWorkerVersion::Request
-  TRACE_EVENT_END("ServiceWorker",
-                  perfetto::NamedTrack::FromPointer(
-                      "ServiceWorkerVersion::Request", request),
-                  "Error", "Timeout");
+  TRACE_EVENT_INSTANT("ServiceWorker", "ServiceWorkerVersion::RequestTimedOut",
+                      perfetto::TerminatingFlow::FromPointer(
+                          request, "ServiceWorkerVersion::Request"),
+                      "Error", "Timeout");
 
   // Move the callback to a local variable before removing the request from the
   // map, as the request object will be destroyed.
@@ -3141,11 +3135,11 @@ void ServiceWorkerVersion::OnStoppedInternal(
 
   if (!stop_time_.is_null()) {
     // ServiceWorkerVersion::StopWorker
-    TRACE_EVENT_END(
-        "ServiceWorker",
-        perfetto::NamedTrack("ServiceWorkerVersion::StopWorker",
-                             stop_time_.since_origin().InMicroseconds()),
-        "Restart", should_restart);
+    TRACE_EVENT_INSTANT("ServiceWorker", "ServiceWorkerVersion::OnStopped",
+                        perfetto::TerminatingFlow::ProcessScoped(
+                            stop_time_.since_origin().InMicroseconds(),
+                            "ServiceWorkerVersion::StopWorker"),
+                        "Restart", should_restart);
     ClearTick(&stop_time_);
   }
   StopTimeoutTimer();
@@ -3177,10 +3171,10 @@ void ServiceWorkerVersion::OnStoppedInternal(
       &inflight_requests_);
   while (!iter.IsAtEnd()) {
     // ServiceWorkerVersion::Request
-    TRACE_EVENT_END(
-        "ServiceWorker",
-        perfetto::NamedTrack::FromPointer("ServiceWorkerVersion::Request",
-                                          iter.GetCurrentValue()),
+    TRACE_EVENT_INSTANT(
+        "ServiceWorker", "ServiceWorkerVersion::RequestAborted",
+        perfetto::TerminatingFlow::FromPointer(iter.GetCurrentValue(),
+                                               "ServiceWorkerVersion::Request"),
         "Error", "Worker Stopped");
     std::move(iter.GetCurrentValue()->error_callback)
         .Run(blink::ServiceWorkerStatusCode::kErrorFailed);

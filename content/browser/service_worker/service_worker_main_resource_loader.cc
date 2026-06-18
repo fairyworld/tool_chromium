@@ -1757,14 +1757,14 @@ void ServiceWorkerMainResourceLoader::
            GetInitialServiceWorkerStatusString(), ".", navigation_type_string}),
       time);
   TRACE_EVENT_BEGIN(
-      "ServiceWorker",
-      perfetto::StaticString(
-          base::StrCat({"ForwardServiceWorkerToWorkerReady.",
-                        GetInitialServiceWorkerStatusString(), ".",
-                        navigation_type_string, ".",
-                        is_browser_startup_completed_str})
-              .c_str()),
-      GetTracingTrack(this), load_timing.service_worker_start_time,
+      "ServiceWorker", nullptr, GetTracingTrack(this),
+      load_timing.service_worker_start_time,
+      [&](perfetto::EventContext& ctx) {
+        ctx.event()->set_name(base::StrCat(
+            {"ForwardServiceWorkerToWorkerReady.",
+             GetInitialServiceWorkerStatusString(), ".", navigation_type_string,
+             ".", is_browser_startup_completed_str}));
+      },
       "initial_service_worker_status", GetInitialServiceWorkerStatusString());
   TRACE_EVENT_END("ServiceWorker", GetTracingTrack(this),
                   load_timing.service_worker_ready_time);
