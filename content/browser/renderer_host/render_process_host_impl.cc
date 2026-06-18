@@ -4920,6 +4920,8 @@ bool RenderProcessHostImpl::IsSuitableHost(
   if (host->IsPdf() != site_info.is_pdf())
     return false;
 
+  ProcessLock process_lock = host->GetProcessLock();
+
   // Check whether the given host and the intended site_info will be using the
   // same StoragePartition, since a RenderProcessHost can only support a
   // single StoragePartition.  This is relevant for packaged apps.
@@ -4943,7 +4945,6 @@ bool RenderProcessHostImpl::IsSuitableHost(
   bool host_has_web_ui_bindings =
       ChildProcessSecurityPolicyImpl::GetInstance()->HasWebUIBindings(
           host->GetDeprecatedID());
-  ProcessLock process_lock = host->GetProcessLock();
   if (host->HostHasNotBeenUsed()) {
     // If the host hasn't been used, it won't have the expected WebUI bindings
     // or origin locks just *yet* - skip the checks in this case.  One example
@@ -4987,6 +4988,17 @@ bool RenderProcessHostImpl::IsSuitableHost(
         !IsUnusedAndTiedToBrowsingInstance(host, isolation_context)) {
       TRACE_EVENT_INSTANT("navigation",
                           "NotSuitableHost: no WebUI bindings, url is WebUI");
+      return false;
+    }
+
+    // Hosts and destinations with different embedder-imposed isolation (e.g.
+    // PDF vs non-PDF, or differing unique-instance ids) cannot share a
+    // process. Note that the explicit `IsPdf()` check above is still needed
+    // to disallow spare processes from being used for PDF, because PDF
+    // processes (but not unique-instance processes) require a custom
+    // command-line flag that spare processes don't have.
+    if (process_lock.embedder_isolation_info() !=
+        site_info.embedder_isolation_info()) {
       return false;
     }
 

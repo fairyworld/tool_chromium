@@ -1236,15 +1236,20 @@ double GetUkmSamplingRate() {
 }
 
 // Builds the final `EmbedderIsolationInfo` for a navigation. `kPdf` is
-// preserved as-is so the PDF renderer carve-out is never lost. Otherwise,
-// a unique-instance EII is inherited from the parent SiteInstance when
-// present, so descendants of a unique-instance frame stay in the same
-// isolation domain.
+// preserved as-is so the PDF renderer carve-out is never lost.
+// `kUniqueInstance` mints a fresh per-instance id from `navigation_id`, which
+// is unique per NavigationRequest. Otherwise, a unique-instance EII is
+// inherited from the parent SiteInstance when present, so descendants of a
+// unique-instance frame stay in the same isolation domain.
 EmbedderIsolationInfo ResolveEmbedderIsolationInfo(
     FrameTreeNode* frame_tree_node,
-    EmbedderIsolationInfo::Mode mode) {
+    EmbedderIsolationInfo::Mode mode,
+    int64_t navigation_id) {
   if (mode == EmbedderIsolationInfo::Mode::kPdf) {
     return EmbedderIsolationInfo::CreateForPdf();
+  }
+  if (mode == EmbedderIsolationInfo::Mode::kUniqueInstance) {
+    return EmbedderIsolationInfo::CreateForUniqueInstance(navigation_id);
   }
   // Inherit a unique-instance ancestor's id when present so that a descendant
   // frame stays in its parent's isolation domain.
@@ -1821,7 +1826,8 @@ NavigationRequest::NavigationRequest(
                               base::Unretained(this)))),
       embedder_isolation_info_(
           ResolveEmbedderIsolationInfo(frame_tree_node,
-                                       embedder_isolation_mode)),
+                                       embedder_isolation_mode,
+                                       navigation_id_)),
       is_embedder_initiated_fenced_frame_navigation_(
           is_embedder_initiated_fenced_frame_navigation),
       fenced_frame_properties_(

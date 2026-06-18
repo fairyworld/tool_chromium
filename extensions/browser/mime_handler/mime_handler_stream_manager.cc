@@ -689,6 +689,11 @@ void MimeHandlerStreamManager::NavigateToExtensionUrl(
       stream_info->stream()->handler_url());
   params.frame_tree_node_id = extension_host_frame_tree_node_id;
   params.source_site_instance = source_site_instance;
+
+  if (stream_info->delegate()->RequiresPerInstanceProcessIsolation()) {
+    params.requests_unique_instance_isolation = true;
+  }
+
   web_contents()->GetController().LoadURLWithParams(params);
 }
 

@@ -4792,6 +4792,16 @@ NavigationControllerImpl::CreateNavigationRequestFromLoadParams(
   bool started_with_transient_activation =
       params.is_renderer_initiated && params.has_user_gesture;
 
+  // PDF and unique-instance content each commit with a distinct
+  // embedder-imposed isolation mode.
+  EmbedderIsolationInfo::Mode embedder_isolation_mode =
+      EmbedderIsolationInfo::Mode::kNone;
+  if (params.is_pdf) {
+    embedder_isolation_mode = EmbedderIsolationInfo::Mode::kPdf;
+  } else if (params.requests_unique_instance_isolation) {
+    embedder_isolation_mode = EmbedderIsolationInfo::Mode::kUniqueInstance;
+  }
+
   auto navigation_request = NavigationRequest::Create(
       node, std::move(common_params), std::move(commit_params),
       !params.is_renderer_initiated, params.was_opener_suppressed,
@@ -4799,9 +4809,7 @@ NavigationControllerImpl::CreateNavigationRequestFromLoadParams(
       extra_headers_crlf, frame_entry, entry, params.is_form_submission,
       params.navigation_ui_data ? params.navigation_ui_data->Clone() : nullptr,
       params.impression, started_with_transient_activation,
-      params.started_by_ad,
-      params.is_pdf ? EmbedderIsolationInfo::Mode::kPdf
-                    : EmbedderIsolationInfo::Mode::kNone,
+      params.started_by_ad, embedder_isolation_mode,
       is_embedder_initiated_fenced_frame_navigation, is_container_initiated,
       params.has_rel_opener, embedder_shared_storage_context);
 
