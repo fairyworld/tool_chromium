@@ -2615,7 +2615,7 @@ void BrowserCommandController::UpdateCommandsForEnableGlicChanged() {
 }
 
 BrowserWindow* BrowserCommandController::window() {
-  return browser_->window();
+  return BrowserWindow::FromBrowser(browser_);
 }
 
 Profile* BrowserCommandController::profile() {

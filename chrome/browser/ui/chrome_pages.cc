@@ -333,9 +333,7 @@ void ShowHistory(BrowserWindowInterface* browser,
   // disclaimer bubble should show up. This also updates the behavior of history
   // keyboard shortcts in Incognito.
   if (browser->GetProfile()->IsOffTheRecord()) {
-    browser->GetBrowserForMigrationOnly()
-        ->window()
-        ->ShowIncognitoHistoryDisclaimerDialog();
+    BrowserWindow::FromBrowser(browser)->ShowIncognitoHistoryDisclaimerDialog();
     return;
   }
 
@@ -366,7 +364,7 @@ void ShowDownloads(BrowserWindowInterface* browser) {
 #if !BUILDFLAG(IS_CHROMEOS)
   // Hide the download bubble if it is showing, to avoid redundancy with the
   // chrome://downloads page we are about to open.
-  auto* browser_window = browser->GetBrowserForMigrationOnly()->window();
+  auto* browser_window = BrowserWindow::FromBrowser(browser);
   if (browser_window && browser_window->GetDownloadBubbleUIController() &&
       browser_window->GetDownloadBubbleUIController()
           ->GetDownloadDisplayController()) {

@@ -594,10 +594,7 @@ WebContents* GetTabAndRevertIfNecessaryHelper(BrowserWindowInterface* browser,
       return raw_new_tab;
     }
     default:
-      browser->GetBrowserForMigrationOnly()
-          ->window()
-          ->GetLocationBar()
-          ->Revert();
+      BrowserWindow::FromBrowser(browser)->GetLocationBar()->Revert();
       return current_tab;
   }
 }
@@ -1105,7 +1102,7 @@ base::WeakPtr<content::NavigationHandle> OpenCurrentURL(
   // TODO(crbug.com/40820294): Eliminate extra checks once source of
   //  bad pointer dereference is identified. See also TODO comment below.
   CHECK(browser);
-  BrowserWindow* window = browser->GetBrowserForMigrationOnly()->window();
+  BrowserWindow* window = BrowserWindow::FromBrowser(browser);
   CHECK(window);
   LocationBar* location_bar = window->GetLocationBar();
   if (!location_bar) {
@@ -1876,7 +1873,7 @@ void BookmarkCurrentTab(BrowserWindowInterface* browser) {
   if (browser->GetWindow()->IsActive() && is_bookmarked_by_user) {
     // Only show the bubble if the window is active, otherwise we may get into
     // weird situations where the bubble is deleted as soon as it is shown.
-    browser->GetBrowserForMigrationOnly()->window()->ShowBookmarkBubble(
+    BrowserWindow::FromBrowser(browser)->ShowBookmarkBubble(
         url, was_bookmarked_by_user);
   }
 
@@ -2119,7 +2116,7 @@ void ShowTranslateBubble(BrowserWindowInterface* browser) {
   } else if (language_state->IsPageTranslated()) {
     step = translate::TRANSLATE_STEP_AFTER_TRANSLATE;
   }
-  browser->GetBrowserForMigrationOnly()->window()->ShowTranslateBubble(
+  BrowserWindow::FromBrowser(browser)->ShowTranslateBubble(
       web_contents, step, source_language, target_language,
       translate::TranslateErrors::NONE, true);
 }
@@ -2326,11 +2323,11 @@ void FindInPage(BrowserWindowInterface* browser,
 }
 
 void ShowTabSearch(BrowserWindowInterface* browser) {
-  browser->GetBrowserForMigrationOnly()->window()->CreateTabSearchBubble();
+  BrowserWindow::FromBrowser(browser)->CreateTabSearchBubble();
 }
 
 void CloseTabSearch(BrowserWindowInterface* browser) {
-  browser->GetBrowserForMigrationOnly()->window()->CloseTabSearchBubble();
+  BrowserWindow::FromBrowser(browser)->CloseTabSearchBubble();
 }
 
 void ToggleTabSearchPin(BrowserWindowInterface* browser) {
@@ -2406,26 +2403,23 @@ void Zoom(BrowserWindowInterface* browser, content::PageZoom zoom) {
 
 void FocusToolbar(BrowserWindowInterface* browser) {
   base::RecordAction(UserMetricsAction("FocusToolbar"));
-  browser->GetBrowserForMigrationOnly()->window()->FocusToolbar();
+  BrowserWindow::FromBrowser(browser)->FocusToolbar();
 }
 
 void FocusLocationBar(BrowserWindowInterface* browser) {
   base::RecordAction(UserMetricsAction("FocusLocation"));
-  browser->GetBrowserForMigrationOnly()->window()->SetFocusToLocationBar(true);
+  BrowserWindow::FromBrowser(browser)->SetFocusToLocationBar(true);
 }
 
 void FocusSearch(BrowserWindowInterface* browser) {
   // TODO(beng): replace this with FocusLocationBar
   base::RecordAction(UserMetricsAction("FocusSearch"));
-  browser->GetBrowserForMigrationOnly()
-      ->window()
-      ->GetLocationBar()
-      ->FocusSearch();
+  BrowserWindow::FromBrowser(browser)->GetLocationBar()->FocusSearch();
 }
 
 void FocusAppMenu(BrowserWindowInterface* browser) {
   base::RecordAction(UserMetricsAction("FocusAppMenu"));
-  browser->GetBrowserForMigrationOnly()->window()->FocusAppMenu();
+  BrowserWindow::FromBrowser(browser)->FocusAppMenu();
 }
 
 void FocusBookmarksToolbar(BrowserWindowInterface* browser) {
@@ -2542,14 +2536,12 @@ void ToggleShowSearchTools(BrowserWindowInterface* browser) {
 
 void ShowAppMenu(BrowserWindowInterface* browser) {
   // We record the user metric for this event in AppMenu::RunMenu.
-  browser->GetBrowserForMigrationOnly()->window()->ShowAppMenu();
+  BrowserWindow::FromBrowser(browser)->ShowAppMenu();
 }
 
 void ShowAvatarMenu(BrowserWindowInterface* browser) {
-  browser->GetBrowserForMigrationOnly()
-      ->window()
-      ->ShowAvatarBubbleFromAvatarButton(
-          /*is_source_accelerator=*/true);
+  BrowserWindow::FromBrowser(browser)->ShowAvatarBubbleFromAvatarButton(
+      /*is_source_accelerator=*/true);
 }
 
 // TODO(crbug.com/345770406): Rename the function name.
@@ -2572,7 +2564,7 @@ void OpenUpdateChromeDialog(BrowserWindowInterface* browser) {
     }
 #endif
     base::RecordAction(UserMetricsAction("UpdateChrome"));
-    browser->GetBrowserForMigrationOnly()->window()->ShowUpdateChromeDialog();
+    BrowserWindow::FromBrowser(browser)->ShowUpdateChromeDialog();
   }
 }
 
@@ -2756,7 +2748,7 @@ void ToggleCaretBrowsing(BrowserWindowInterface* browser) {
   if (prefService->GetBoolean(prefs::kShowCaretBrowsingDialog) &&
       !base::CommandLine::ForCurrentProcess()->HasSwitch(
           switches::kEnableCaretBrowsing)) {
-    browser->GetBrowserForMigrationOnly()->window()->ShowCaretBrowsingDialog();
+    BrowserWindow::FromBrowser(browser)->ShowCaretBrowsingDialog();
   } else {
     base::RecordAction(base::UserMetricsAction(
         "Accessibility.CaretBrowsing.EnableWithKeyboard"));
@@ -2770,7 +2762,7 @@ void PromptToNameWindow(BrowserWindowInterface* browser) {
 
 #if BUILDFLAG(IS_CHROMEOS)
 void ToggleMultitaskMenu(BrowserWindowInterface* browser) {
-  browser->GetBrowserForMigrationOnly()->window()->ToggleMultitaskMenu();
+  BrowserWindow::FromBrowser(browser)->ToggleMultitaskMenu();
 }
 #endif
 
@@ -2782,15 +2774,11 @@ std::optional<int> GetKeyboardFocusedTabIndex(
 #endif
 
 void ShowIncognitoClearBrowsingDataDialog(BrowserWindowInterface* browser) {
-  browser->GetBrowserForMigrationOnly()
-      ->window()
-      ->ShowIncognitoClearBrowsingDataDialog();
+  BrowserWindow::FromBrowser(browser)->ShowIncognitoClearBrowsingDataDialog();
 }
 
 void ShowIncognitoHistoryDisclaimerDialog(BrowserWindowInterface* browser) {
-  browser->GetBrowserForMigrationOnly()
-      ->window()
-      ->ShowIncognitoHistoryDisclaimerDialog();
+  BrowserWindow::FromBrowser(browser)->ShowIncognitoHistoryDisclaimerDialog();
 }
 
 bool ShouldInterceptChromeURLNavigationInIncognito(

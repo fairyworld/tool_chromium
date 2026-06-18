@@ -234,7 +234,7 @@ class BrowserFocusTest : public InteractiveBrowserTest {
   }
 
   views::FocusManager* GetFocusManager() {
-    BrowserWindow* browser_window = browser()->window();
+    BrowserWindow* browser_window = BrowserWindow::FromBrowser(browser());
     DCHECK(browser_window);
     gfx::NativeWindow window = browser_window->GetNativeWindow();
     DCHECK(window);
@@ -644,7 +644,8 @@ IN_PROC_BROWSER_TEST_F(BrowserFocusTest, NavigateFromOmnibox) {
   // Focus the Omnibox.
   ASSERT_TRUE(ui_test_utils::BringBrowserWindowToFront(browser()));
   chrome::FocusLocationBar(browser());
-  OmniboxView* view = browser()->window()->GetLocationBar()->GetOmniboxView();
+  OmniboxView* view =
+      BrowserWindow::FromBrowser(browser())->GetLocationBar()->GetOmniboxView();
 
   // Simulate typing a URL into the omnibox.
   view->SetUserText(base::UTF8ToUTF16(url.spec()));
@@ -691,8 +692,10 @@ IN_PROC_BROWSER_TEST_F(BrowserFocusTest, NavigateFromOmniboxIntoNewTab) {
   // Focus the omnibox.
   chrome::FocusLocationBar(browser());
 
-  OmniboxClient* omnibox_client =
-      browser()->window()->GetLocationBar()->GetOmniboxController()->client();
+  OmniboxClient* omnibox_client = BrowserWindow::FromBrowser(browser())
+                                      ->GetLocationBar()
+                                      ->GetOmniboxController()
+                                      ->client();
 
   // Simulate an alt-enter.
   omnibox_client->OnAutocompleteAccept(
