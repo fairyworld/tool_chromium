@@ -7,6 +7,7 @@ package org.chromium.chrome.browser.share.send_tab_to_self;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.text.TextUtils;
 
 import org.jni_zero.CalledByNative;
 import org.jni_zero.JNINamespace;
@@ -174,13 +175,17 @@ public class SendTabToSelfAndroidBridge {
      */
     @CalledByNative
     public static void attachTabLabel(Tab tab, String senderDeviceName) {
-        if (tab == null || senderDeviceName == null || senderDeviceName.isEmpty()) return;
+        if (tab == null || tab.getUserDataHost() == null || TextUtils.isEmpty(senderDeviceName))
+            return;
 
         tab.getUserDataHost()
                 .setUserData(
                         SendTabToSelfTabCardLabelData.class,
                         new SendTabToSelfTabCardLabelData(
                                 tab, senderDeviceName, System.currentTimeMillis()));
+        // TODO(crbug.com/488072250): Inform SendTabToSelfTabLabeller to update the UI. This
+        // specifically affects the case where the tab switcher is already opened and a tab gets
+        // auto-opened.
     }
 
     @CalledByNative

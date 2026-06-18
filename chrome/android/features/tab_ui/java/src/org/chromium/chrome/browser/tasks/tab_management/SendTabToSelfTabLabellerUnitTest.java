@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,6 +32,7 @@ import org.chromium.base.UserDataHost;
 import org.chromium.base.supplier.ObservableSuppliers;
 import org.chromium.base.supplier.SettableNullableObservableSupplier;
 import org.chromium.base.test.BaseRobolectricTestRunner;
+import org.chromium.base.test.RobolectricUtil;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabObserver;
 import org.chromium.chrome.browser.tab.TabSelectionType;
@@ -47,6 +49,7 @@ public class SendTabToSelfTabLabellerUnitTest {
     @Rule public final MockitoRule mMockitoRule = MockitoJUnit.rule();
 
     private static final int TAB_ID = 1;
+    private static final String SENDER_DEVICE_NAME = "Example Phone";
 
     @Mock private TabListNotificationHandler mTabListNotificationHandler;
     @Mock private TabModel mTabModel;
@@ -62,6 +65,29 @@ public class SendTabToSelfTabLabellerUnitTest {
     private UserDataHost mUserDataHost;
     private SendTabToSelfTabLabeller mLabeller;
 
+    private SendTabToSelfTabCardLabelData createAndSetLabelData() {
+        SendTabToSelfTabCardLabelData sttsData =
+                new SendTabToSelfTabCardLabelData(
+                        mTab, SENDER_DEVICE_NAME, System.currentTimeMillis());
+        mUserDataHost.setUserData(SendTabToSelfTabCardLabelData.class, sttsData);
+        return sttsData;
+    }
+
+    private void verifyTabCardLabelUpdated(String expectedText, int verifyTimes) {
+        verify(mTabListNotificationHandler, times(verifyTimes))
+                .updateTabCardLabels(mLabelDataCaptor.capture());
+        Map<Integer, TabCardLabelData> labelDataMap = mLabelDataCaptor.getValue();
+
+        assertTrue(labelDataMap.containsKey(TAB_ID));
+        TabCardLabelData labelData = labelDataMap.get(TAB_ID);
+        if (expectedText == null) {
+            assertNull(labelData);
+        } else {
+            assertNotNull(labelData);
+            assertEquals(expectedText, labelData.textResolver.resolve(mContext));
+        }
+    }
+
     @Before
     public void setUp() {
         // Required to allow SendTabToSelfTabCardLabelData to be initialized.
@@ -71,6 +97,7 @@ public class SendTabToSelfTabLabellerUnitTest {
         mUserDataHost = new UserDataHost();
 
         when(mTab.getId()).thenReturn(TAB_ID);
+        when(mTab.isInitialized()).thenReturn(true);
         when(mTab.getUserDataHost()).thenReturn(mUserDataHost);
 
         mTabModelSupplier.set(mTabModel);
@@ -82,119 +109,109 @@ public class SendTabToSelfTabLabellerUnitTest {
 
     @Test
     public void testShowAll_ValidLabelPushed() {
-        SendTabToSelfTabCardLabelData sttsData =
-                new SendTabToSelfTabCardLabelData(
-                        mTab, "Example Phone", System.currentTimeMillis());
-        mUserDataHost.setUserData(SendTabToSelfTabCardLabelData.class, sttsData);
+        createAndSetLabelData();
 
         mLabeller.showAll(Collections.singletonList(mTab));
+        RobolectricUtil.runAllBackgroundAndUi();
 
-        verify(mTabListNotificationHandler).updateTabCardLabels(mLabelDataCaptor.capture());
-        Map<Integer, TabCardLabelData> labelDataMap = mLabelDataCaptor.getValue();
+        verifyTabCardLabelUpdated("From Example Phone", 1);
+    }
 
-        assertTrue(labelDataMap.containsKey(TAB_ID));
-        TabCardLabelData labelData = labelDataMap.get(TAB_ID);
-        assertNotNull(labelData);
-        assertEquals("From Example Phone", labelData.textResolver.resolve(mContext));
+    @Test
+    public void testShowAll_LabelLoadedFromDB() {
+        SendTabToSelfTabCardLabelData sttsData = createAndSetLabelData();
+        // Assume the data exists on the db and not in the UserDataHost.
+        mUserDataHost.removeUserData(SendTabToSelfTabCardLabelData.class);
+        sttsData.save();
+        RobolectricUtil.runAllBackgroundAndUi();
+
+        mLabeller.showAll(Collections.singletonList(mTab));
+        RobolectricUtil.runAllBackgroundAndUi();
+
+        verifyTabCardLabelUpdated("From Example Phone", 1);
+
+        // To avoid leaking the data to other tests, delete it from the db.
+        PersistedTabDataConfiguration.TEST_CONFIG
+                .getStorage()
+                .delete(
+                        TAB_ID,
+                        PersistedTabDataConfiguration.SEND_TAB_TO_SELF_TAB_CARD_LABEL_DATA.getId());
+    }
+
+    @Test
+    public void testShowAll_NoLabel() {
+        mLabeller.showAll(Collections.singletonList(mTab));
+        RobolectricUtil.runAllBackgroundAndUi();
+
+        verifyTabCardLabelUpdated(null, 1);
     }
 
     @Test
     public void testShowAll_Expired() {
-        SendTabToSelfTabCardLabelData data =
-                new SendTabToSelfTabCardLabelData(
-                        mTab, "Example Phone", System.currentTimeMillis());
-        data.setAdditionTimestampMsForTesting(
+        SendTabToSelfTabCardLabelData sttsData = createAndSetLabelData();
+        sttsData.setAdditionTimestampMsForTesting(
                 System.currentTimeMillis() - 6L * 24 * 60 * 60 * 1000); // 6 days old
-        mUserDataHost.setUserData(SendTabToSelfTabCardLabelData.class, data);
 
         mLabeller.showAll(Collections.singletonList(mTab));
+        RobolectricUtil.runAllBackgroundAndUi();
 
-        verify(mTabListNotificationHandler).updateTabCardLabels(mLabelDataCaptor.capture());
-        Map<Integer, TabCardLabelData> labelDataMap = mLabelDataCaptor.getValue();
-
-        assertTrue(labelDataMap.containsKey(TAB_ID));
-        assertNull(labelDataMap.get(TAB_ID));
-        assertNull(mUserDataHost.getUserData(SendTabToSelfTabCardLabelData.class));
+        verifyTabCardLabelUpdated(null, 1);
     }
 
     @Test
-    public void testShowAll_StaleLabelClearedOnUpdate() {
-        SendTabToSelfTabCardLabelData sttsData =
-                new SendTabToSelfTabCardLabelData(
-                        mTab, "Example Phone", System.currentTimeMillis());
-        mUserDataHost.setUserData(SendTabToSelfTabCardLabelData.class, sttsData);
+    public void testShowAll_LabelClearedOnUpdate() {
+        createAndSetLabelData();
         verify(mTab).addObserver(mTabObserverCaptor.capture());
 
         // Initial showAll pushes mTab's label.
         mLabeller.showAll(Collections.singletonList(mTab));
+        RobolectricUtil.runAllBackgroundAndUi();
 
-        verify(mTabListNotificationHandler).updateTabCardLabels(mLabelDataCaptor.capture());
-        assertNotNull(mLabelDataCaptor.getValue().get(TAB_ID));
+        verifyTabCardLabelUpdated("From Example Phone", 1);
 
-        // Simulate user interaction on mTab, which deletes sttsData from mUserDataHost.
+        // Simulate user interaction on mTab, which deletes the label data from mUserDataHost.
         mTabObserverCaptor.getValue().onShown(mTab, TabSelectionType.FROM_USER);
 
         // Re-run showAll. mTab now has no data, so it pushes null to clear the label.
+        reset(mTabListNotificationHandler);
         mLabeller.showAll(Collections.singletonList(mTab));
+        RobolectricUtil.runAllBackgroundAndUi();
 
-        verify(mTabListNotificationHandler, times(2))
-                .updateTabCardLabels(mLabelDataCaptor.capture());
-        assertNull(mLabelDataCaptor.getValue().get(TAB_ID));
+        verifyTabCardLabelUpdated(null, 1);
     }
 
     @Test
     public void testShowAll_LabelPreservedIfDifferentTabInteracted() {
-        SendTabToSelfTabCardLabelData sttsData =
-                new SendTabToSelfTabCardLabelData(
-                        mTab, "Example Phone", System.currentTimeMillis());
-        mUserDataHost.setUserData(SendTabToSelfTabCardLabelData.class, sttsData);
+        createAndSetLabelData();
         verify(mTab).addObserver(mTabObserverCaptor.capture());
 
         // Initial showAll pushes mTab's label.
         mLabeller.showAll(Collections.singletonList(mTab));
+        RobolectricUtil.runAllBackgroundAndUi();
 
-        verify(mTabListNotificationHandler).updateTabCardLabels(mLabelDataCaptor.capture());
-        assertNotNull(mLabelDataCaptor.getValue().get(TAB_ID));
+        verifyTabCardLabelUpdated("From Example Phone", 1);
 
-        // Simulate user interaction on a different tab. mTab's sttsData remains active.
+        // Simulate user interaction on a different tab. mTab's label data remains active.
         Tab otherTab = mock(Tab.class);
         when(otherTab.getUserDataHost()).thenReturn(new UserDataHost());
         mTabObserverCaptor.getValue().onShown(otherTab, TabSelectionType.FROM_USER);
 
         // Re-run showAll. mTab's label is perfectly preserved.
         mLabeller.showAll(Collections.singletonList(mTab));
+        RobolectricUtil.runAllBackgroundAndUi();
 
-        verify(mTabListNotificationHandler, times(2))
-                .updateTabCardLabels(mLabelDataCaptor.capture());
-        assertNotNull(mLabelDataCaptor.getValue().get(TAB_ID));
+        verifyTabCardLabelUpdated("From Example Phone", 2);
     }
 
     @Test
     public void testShowAll_NullList() {
-        SendTabToSelfTabCardLabelData sttsData =
-                new SendTabToSelfTabCardLabelData(
-                        mTab, "Example Phone", System.currentTimeMillis());
-        mUserDataHost.setUserData(SendTabToSelfTabCardLabelData.class, sttsData);
+        createAndSetLabelData();
 
         // Passing null triggers the fallback to mCurrentTabModel/mTabModelSupplier.
         mLabeller.showAll(null);
+        RobolectricUtil.runAllBackgroundAndUi();
 
-        verify(mTabListNotificationHandler).updateTabCardLabels(mLabelDataCaptor.capture());
-        Map<Integer, TabCardLabelData> labelDataMap = mLabelDataCaptor.getValue();
-        assertNotNull(labelDataMap.get(TAB_ID));
-    }
-
-    @Test
-    public void testDidAddTab() {
-        SendTabToSelfTabCardLabelData sttsData =
-                new SendTabToSelfTabCardLabelData(
-                        mTab, "Example Phone", System.currentTimeMillis());
-        mUserDataHost.setUserData(SendTabToSelfTabCardLabelData.class, sttsData);
-
-        mLabeller.didAddTab(mTab, 0, 0, false);
-
-        verify(mTabListNotificationHandler).updateTabCardLabels(mLabelDataCaptor.capture());
-        assertNotNull(mLabelDataCaptor.getValue().get(TAB_ID));
+        verifyTabCardLabelUpdated("From Example Phone", 1);
     }
 
     @Test
