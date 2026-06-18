@@ -45,6 +45,7 @@
 #include "chrome/browser/ui/browser_command_controller.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
+#include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/desktop_browser_window_capabilities.h"
 #include "chrome/browser/ui/browser_window/test/mock_browser_window_interface.h"
 #include "chrome/browser/ui/interaction/browser_elements.h"
@@ -1785,7 +1786,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarLifecyclePrewarmedBrowserTest,
   views::Widget::InitParams widget_params(
       views::Widget::InitParams::CLIENT_OWNS_WIDGET,
       views::Widget::InitParams::TYPE_WINDOW);
-  widget_params.context = browser()->window()->GetNativeWindow();
+  widget_params.context = browser()->GetWindow()->GetNativeWindow();
   widget_params.bounds = gfx::Rect(0, 0, 100, 100);
   widget->Init(std::move(widget_params));
 
@@ -1816,7 +1817,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarLifecyclePrewarmedBrowserTest,
   views::Widget::InitParams widget_params(
       views::Widget::InitParams::CLIENT_OWNS_WIDGET,
       views::Widget::InitParams::TYPE_WINDOW);
-  widget_params.context = browser()->window()->GetNativeWindow();
+  widget_params.context = browser()->GetWindow()->GetNativeWindow();
   widget_params.bounds = gfx::Rect(0, 0, 100, 100);
   widget->Init(std::move(widget_params));
 
@@ -1845,7 +1846,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarLifecycleNonPrewarmedBrowserTest,
   views::Widget::InitParams widget_params(
       views::Widget::InitParams::CLIENT_OWNS_WIDGET,
       views::Widget::InitParams::TYPE_WINDOW);
-  widget_params.context = browser()->window()->GetNativeWindow();
+  widget_params.context = browser()->GetWindow()->GetNativeWindow();
   widget_params.bounds = gfx::Rect(0, 0, 100, 100);
   widget->Init(std::move(widget_params));
 
@@ -1932,7 +1933,7 @@ IN_PROC_BROWSER_TEST_F(WebUIToolbarLifecyclePrewarmedDeferredBrowserTest,
   views::Widget::InitParams widget_params(
       views::Widget::InitParams::CLIENT_OWNS_WIDGET,
       views::Widget::InitParams::TYPE_WINDOW);
-  widget_params.context = browser()->window()->GetNativeWindow();
+  widget_params.context = browser()->GetWindow()->GetNativeWindow();
   widget_params.bounds = gfx::Rect(0, 0, 100, 100);
   widget->Init(std::move(widget_params));
   widget->GetContentsView()->AddChildView(std::move(toolbar_view));
@@ -3990,7 +3991,7 @@ IN_PROC_BROWSER_TEST_F(WebUIPinnedToolbarActionsBrowserTest,
   PinAction(action_id, mojom_action);
 
   // Show translate bubble.
-  browser()->window()->ShowTranslateBubble(
+  BrowserWindow::FromBrowser(browser())->ShowTranslateBubble(
       browser()->tab_strip_model()->GetActiveWebContents(),
       translate::TRANSLATE_STEP_BEFORE_TRANSLATE, "fr", "en",
       translate::TranslateErrors::NONE, true);

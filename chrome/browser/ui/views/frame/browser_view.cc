@@ -1191,9 +1191,7 @@ BrowserView* BrowserView::GetBrowserViewForNativeWindow(
 // static
 BrowserView* BrowserView::GetBrowserViewForBrowser(
     const BrowserWindowInterface* browser) {
-  // It might look like this method should be implemented as:
-  //   return static_cast<BrowserView*>(browser->window())
-  // but in fact in unit tests browser->window() may not be a BrowserView even
+  // In unit tests, the BrowserWindow may not be a BrowserView even
   // in Views Browser builds. Always go through the ForNativeWindow path, which
   // is robust against being given any kind of native window.
   //
@@ -1201,7 +1199,7 @@ BrowserView* BrowserView::GetBrowserViewForBrowser(
   // BrowserWindow, so be sure to check for that as well.
   //
   // Lastly note that this function can be called during construction of
-  // Browser, at which point browser->window() might return nullptr.
+  // Browser, at which point `browser->GetWindow()` might return nullptr.
   if (!browser->GetWindow() || !browser->GetWindow()->GetNativeWindow()) {
     return nullptr;
   }
@@ -4098,7 +4096,7 @@ void BrowserView::OnWidgetDestroying(views::Widget* widget) {
 
 void BrowserView::OnWidgetActivationChanged(views::Widget* widget,
                                             bool active) {
-  if (browser_->window()) {
+  if (browser_->GetWindow()) {
     if (active) {
       if (restore_focus_on_activation_.has_value() &&
           restore_focus_on_activation_.value()) {

@@ -132,7 +132,7 @@ void ExclusiveAccessPermissionPromptView::Show() {
 }
 
 void ExclusiveAccessPermissionPromptView::CreateWidget() {
-  DCHECK(browser_->window());
+  DCHECK(browser_->GetWindow());
   views::Widget* widget = views::BubbleDialogDelegateView::CreateBubble(this);
 
   widget->SetZOrderSublevel(ChromeWidgetSublevel::kSublevelSecurity);

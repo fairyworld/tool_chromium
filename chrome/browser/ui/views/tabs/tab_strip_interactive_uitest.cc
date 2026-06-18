@@ -152,7 +152,7 @@ IN_PROC_BROWSER_TEST_F(TestNewTabButtonContextMenu,
       EnsurePresent(NewTabButtonMenuModel::kNewSplitView),
       SelectMenuItem(NewTabButtonMenuModel::kNewSplitView));
 
-  BrowserView* browser_view = static_cast<BrowserView*>(browser()->window());
+  BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser());
 
   // Split view should be open
   EXPECT_TRUE(browser_view->IsInSplitView());
@@ -179,7 +179,7 @@ IN_PROC_BROWSER_TEST_F(TestNewTabButtonContextMenu,
       SendAccelerator(NewTabButtonMenuModel::kNewTab,
                       ui::Accelerator(ui::VKEY_ESCAPE, ui::EF_NONE)));
 
-  BrowserView* browser_view = static_cast<BrowserView*>(browser()->window());
+  BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser());
 
   // Split view should be open
   EXPECT_TRUE(browser_view->IsInSplitView());

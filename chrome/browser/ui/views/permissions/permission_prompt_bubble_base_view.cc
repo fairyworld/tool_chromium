@@ -204,7 +204,7 @@ void PermissionPromptBubbleBaseView::Show() {
 }
 
 void PermissionPromptBubbleBaseView::CreateWidget() {
-  CHECK(browser()->window());
+  CHECK(browser()->GetWindow());
 
   UpdateAnchorPosition();
 

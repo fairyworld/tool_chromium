@@ -52,8 +52,9 @@ class OmniboxPopupFileSelectorBrowserTest : public InProcessBrowserTest {
 
 IN_PROC_BROWSER_TEST_F(OmniboxPopupFileSelectorBrowserTest,
                        ReopensAiModeOnCancelIfPreviouslyOpen) {
-  auto* omnibox_controller =
-      browser()->window()->GetLocationBar()->GetOmniboxController();
+  auto* omnibox_controller = BrowserWindow::FromBrowser(browser())
+                                 ->GetLocationBar()
+                                 ->GetOmniboxController();
   MockOmniboxEditModel mock_edit_model(omnibox_controller);
 
   OmniboxPopupFileSelector file_selector(
@@ -70,8 +71,9 @@ IN_PROC_BROWSER_TEST_F(OmniboxPopupFileSelectorBrowserTest,
 
 IN_PROC_BROWSER_TEST_F(OmniboxPopupFileSelectorBrowserTest,
                        DoesNotReopenAiModeOnCancelIfPreviouslyClosed) {
-  auto* omnibox_controller =
-      browser()->window()->GetLocationBar()->GetOmniboxController();
+  auto* omnibox_controller = BrowserWindow::FromBrowser(browser())
+                                 ->GetLocationBar()
+                                 ->GetOmniboxController();
   MockOmniboxEditModel mock_edit_model(omnibox_controller);
 
   OmniboxPopupFileSelector file_selector(
@@ -88,8 +90,9 @@ IN_PROC_BROWSER_TEST_F(OmniboxPopupFileSelectorBrowserTest,
 
 IN_PROC_BROWSER_TEST_F(OmniboxPopupFileSelectorBrowserTest,
                        UploadUnsupportedTextFileUpdatesContextData) {
-  auto* omnibox_controller =
-      browser()->window()->GetLocationBar()->GetOmniboxController();
+  auto* omnibox_controller = BrowserWindow::FromBrowser(browser())
+                                 ->GetLocationBar()
+                                 ->GetOmniboxController();
   MockOmniboxEditModel mock_edit_model(omnibox_controller);
 
   OmniboxPopupFileSelector file_selector(
@@ -137,8 +140,9 @@ IN_PROC_BROWSER_TEST_F(OmniboxPopupFileSelectorBrowserTest,
                        RecordHistogramOnFileSelected) {
   base::HistogramTester histogram_tester;
 
-  auto* omnibox_controller =
-      browser()->window()->GetLocationBar()->GetOmniboxController();
+  auto* omnibox_controller = BrowserWindow::FromBrowser(browser())
+                                 ->GetLocationBar()
+                                 ->GetOmniboxController();
   MockOmniboxEditModel mock_edit_model(omnibox_controller);
 
   OmniboxPopupFileSelector file_selector(

@@ -448,7 +448,7 @@ IN_PROC_BROWSER_TEST_F(BrowserTabStripControllerTestFocusedGroup,
 IN_PROC_BROWSER_TEST_F(BrowserTabStripControllerTestFocusedGroup,
                        FocusedGroupUpdatesThemeMultipleTimes) {
   BrowserWidget* widget =
-      static_cast<BrowserView*>(browser()->window())->browser_widget();
+      BrowserView::GetBrowserViewForBrowser(browser())->browser_widget();
   EXPECT_EQ(widget->user_color_override(), std::nullopt);
 
   // Create a tab and a group.

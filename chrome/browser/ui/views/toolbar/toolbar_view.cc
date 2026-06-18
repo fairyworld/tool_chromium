@@ -1177,11 +1177,13 @@ void ToolbarView::AnimationEnded(const gfx::Animation* animation) {
   if (animation->GetCurrentValue() == 0) {
     SetToolbarVisibility(false);
   }
-  browser()->window()->ToolbarSizeChanged(/*is_animating=*/false);
+  BrowserWindow::FromBrowser(browser())->ToolbarSizeChanged(
+      /*is_animating=*/false);
 }
 
 void ToolbarView::AnimationProgressed(const gfx::Animation* animation) {
-  browser()->window()->ToolbarSizeChanged(/*is_animating=*/true);
+  BrowserWindow::FromBrowser(browser())->ToolbarSizeChanged(
+      /*is_animating=*/true);
 }
 
 void ToolbarView::Update(WebContents* tab) {
@@ -1227,7 +1229,8 @@ void ToolbarView::UpdateCustomTabBarVisibility(bool visible, bool animate) {
   if (!animate) {
     size_animation_.Reset(visible ? 1.0 : 0.0);
     SetToolbarVisibility(visible);
-    browser()->window()->ToolbarSizeChanged(/*is_animating=*/false);
+    BrowserWindow::FromBrowser(browser())->ToolbarSizeChanged(
+        /*is_animating=*/false);
     return;
   }
 
@@ -1660,8 +1663,8 @@ void ToolbarView::LayoutCommon() {
   // Extend buttons to the window edge if we're either in a maximized or
   // fullscreen window. This makes the buttons easier to hit, see Fitts' law.
   const bool extend_buttons_to_edge =
-      browser_->window() && (browser_->GetWindow()->IsMaximized() ||
-                             browser_->GetWindow()->IsFullscreen());
+      browser_->GetWindow() && (browser_->GetWindow()->IsMaximized() ||
+                                browser_->GetWindow()->IsFullscreen());
   const int margin = extend_buttons_to_edge ? interior_margin.left() : 0;
   if (features::IsWebUIBackForwardButtonEnabled()) {
     toolbar_webview_->SetBackButtonLeadingMargin(margin);

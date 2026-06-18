@@ -40,7 +40,7 @@ class AlertIndicatorButtonBrowserTest
 
     // Assign the alert_indicator_button_.
     TabStripRegionView* tab_strip_view =
-        browser()->window()->AsBrowserView()->tab_strip_view();
+        BrowserView::GetBrowserViewForBrowser(browser())->tab_strip_view();
     views::View* tab = tab_strip_view->GetTabAnchorViewAt(
         browser()->tab_strip_model()->active_index());
     alert_indicator_button_ = views::AsViewClass<AlertIndicatorButton>(

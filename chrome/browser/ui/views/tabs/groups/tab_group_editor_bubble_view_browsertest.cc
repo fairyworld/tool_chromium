@@ -360,7 +360,7 @@ class TabGroupEditorBubbleViewDialogBrowserTestWithFreezingEnabled
 IN_PROC_BROWSER_TEST_F(
     TabGroupEditorBubbleViewDialogBrowserTestWithFreezingEnabled,
     CollapsingGroupFreezesAllTabs) {
-  BrowserView* browser_view = static_cast<BrowserView*>(browser()->window());
+  BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser());
   InProcessBrowserTest::AddBlankTabAndShow(browser());
   InProcessBrowserTest::AddBlankTabAndShow(browser());
 
@@ -446,7 +446,7 @@ IN_PROC_BROWSER_TEST_F(TabGroupEditorBubbleViewDialogBrowserTestWithSavedGroup,
 
 IN_PROC_BROWSER_TEST_F(TabGroupEditorBubbleViewDialogBrowserTestWithSavedGroup,
                        CloseGroupedTab) {
-  BrowserView* browser_view = static_cast<BrowserView*>(browser()->window());
+  BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser());
   InProcessBrowserTest::AddBlankTabAndShow(browser());
   InProcessBrowserTest::AddBlankTabAndShow(browser());
 
@@ -470,7 +470,7 @@ IN_PROC_BROWSER_TEST_F(TabGroupEditorBubbleViewDialogBrowserTestWithSavedGroup,
 
 IN_PROC_BROWSER_TEST_F(TabGroupEditorBubbleViewDialogBrowserTestWithSavedGroup,
                        CloseGroupedTabWithPreventShowDialog) {
-  BrowserView* browser_view = static_cast<BrowserView*>(browser()->window());
+  BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser());
   InProcessBrowserTest::AddBlankTabAndShow(browser());
   InProcessBrowserTest::AddBlankTabAndShow(browser());
 

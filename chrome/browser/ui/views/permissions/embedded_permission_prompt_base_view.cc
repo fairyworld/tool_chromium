@@ -157,7 +157,7 @@ bool EmbeddedPermissionPromptBaseView::ShowLoadingIcon() const {
 }
 
 void EmbeddedPermissionPromptBaseView::CreateWidget() {
-  DCHECK(browser()->window());
+  DCHECK(browser()->GetWindow());
   views::Widget* widget = views::BubbleDialogDelegateView::CreateBubble(this);
 
   widget->SetZOrderSublevel(ChromeWidgetSublevel::kSublevelSecurity);
