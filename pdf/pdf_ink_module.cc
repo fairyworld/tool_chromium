@@ -82,18 +82,14 @@ constexpr ink::AffineTransform kIdentityTransform;
 constexpr SkColor kEraserColor = SK_ColorWHITE;
 constexpr int kEraserSize = 3;
 
-// TODO(crbug.com/478206470): Update the message once thumbnail generation is
-// simplified.
 base::DictValue CreateUpdateThumbnailMessage(int page_index,
                                              std::vector<uint8_t> image_data,
                                              const gfx::Size& thumbnail_size) {
   return base::DictValue()
-      .Set("type", "updateInk2Thumbnail")
+      .Set("type", "updateThumbnail")
       .Set("pageNumber", page_index + 1)
-      .Set("isInk", false)
       .Set("imageData", std::move(image_data))
-      .Set("width", thumbnail_size.width())
-      .Set("height", thumbnail_size.height());
+      .Set("width", thumbnail_size.width());
 }
 
 ink::StrokeInput::ToolType GetToolTypeFromTouchEvent(

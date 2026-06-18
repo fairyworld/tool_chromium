@@ -61,7 +61,7 @@ import type {ViewerPasswordDialogElement} from './elements/viewer_password_dialo
 import type {ViewerSaveToDriveBubbleElement} from './elements/viewer_save_to_drive_bubble.js';
 // </if> enable_pdf_save_to_drive
 // <if expr="enable_pdf_ink2">
-import type {Ink2ThumbnailData} from './elements/viewer_thumbnail_bar.js';
+import type {ThumbnailData} from './elements/viewer_thumbnail_bar.js';
 //</if>
 import type {ViewerToolbarElement} from './elements/viewer_toolbar.js';
 // <if expr="enable_pdf_ink2">
@@ -1059,6 +1059,24 @@ export class PdfViewerElement extends PdfViewerBaseElement {
         this.caretBrowsingEnabled_ =
             caretBrowsingEnabledData.caretBrowsingEnabled;
         return;
+      // <if expr="enable_pdf_ink2">
+      case 'sendClickEvent':
+        // Ignore click events outside of text annotation mode.
+        if (this.annotationMode_ !== AnnotationMode.TEXT) {
+          return;
+        }
+        const location = data as unknown as Point;
+        // Clicks on a scrollbar should allow the plugin to take focus.
+        if (this.viewport.isPointOnScrollbar(location)) {
+          const annotations =
+              this.shadowRoot.querySelector('ink-text-annotations');
+          assert(annotations);
+          annotations.blurActiveAnnotation();
+        } else {
+          this.maybeCreateTextAnnotation_(data as unknown as Point);
+        }
+        return;
+      // </if>
       case 'sendKeyEvent':
         const keyEvent = convertSendKeyEventMessage(data);
         keyEvent.fromPlugin = true;
@@ -1096,31 +1114,15 @@ export class PdfViewerElement extends PdfViewerBaseElement {
           type: 'touchSelectionOccurred',
         });
         return;
-        // <if expr="enable_pdf_ink2">
-      case 'updateInk2Thumbnail':
-        const thumbnailData = data as unknown as Ink2ThumbnailData;
+      // <if expr="enable_pdf_ink2">
+      case 'updateThumbnail':
+        const thumbnailData = data as unknown as ThumbnailData;
         this.pluginController_.getEventTarget().dispatchEvent(
-            new CustomEvent<Ink2ThumbnailData>(
-                PluginControllerEventType.UPDATE_INK_THUMBNAIL,
+            new CustomEvent<ThumbnailData>(
+                PluginControllerEventType.UPDATE_THUMBNAIL,
                 {detail: thumbnailData}));
         return;
-      case 'sendClickEvent':
-        // Ignore click events outside of text annotation mode.
-        if (this.annotationMode_ !== AnnotationMode.TEXT) {
-          return;
-        }
-        const location = data as unknown as Point;
-        // Clicks on a scrollbar should allow the plugin to take focus.
-        if (this.viewport.isPointOnScrollbar(location)) {
-          const annotations =
-              this.shadowRoot.querySelector('ink-text-annotations');
-          assert(annotations);
-          annotations.blurActiveAnnotation();
-        } else {
-          this.maybeCreateTextAnnotation_(data as unknown as Point);
-        }
-        return;
-        // </if>
+      // </if>
       default:
         assertNotReached('Unknown message type received: ' + data.type);
     }

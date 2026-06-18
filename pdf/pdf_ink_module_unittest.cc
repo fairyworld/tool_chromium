@@ -2057,7 +2057,7 @@ class PdfInkModuleStrokeTest : public PdfInkModuleTest {
         .WillByDefault([&](const base::DictValue& dict) {
           const std::string* type = dict.FindString("type");
           ASSERT_TRUE(type);
-          if (*type != "updateInk2Thumbnail") {
+          if (*type != "updateThumbnail") {
             return;
           }
 
