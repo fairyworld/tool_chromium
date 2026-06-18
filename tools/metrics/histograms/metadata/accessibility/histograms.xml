@@ -4029,6 +4029,17 @@ even if they fit the naming pattern. -->
   </summary>
 </histogram>
 
+<histogram name="Accessibility.WebSpeech.DownloadRelaxed" enum="Boolean"
+    expires_after="2027-06-01">
+  <owner>evliu@google.com</owner>
+  <owner>chrome-media-ux@google.com</owner>
+  <summary>
+    Recorded when Web Speech API relaxes the user activation requirement for
+    downloading a language pack because it is present in the Accept-Language
+    header.
+  </summary>
+</histogram>
+
 <histogram name="Accessibility.WebSpeech.ErrorOccurred"
     enum="SpeechRecognitionErrorCode" expires_after="2027-04-20">
   <owner>evliu@google.com</owner>
@@ -4090,6 +4101,19 @@ even if they fit the naming pattern. -->
   <summary>
     Whether on-device speech recognition available for use with the Web Speech
     API. Logged when the speech recognition session is created.
+  </summary>
+</histogram>
+
+<histogram name="Accessibility.WebSpeech.RelaxedLanguageUsed" enum="Boolean"
+    expires_after="2027-06-01">
+  <owner>evliu@google.com</owner>
+  <owner>chrome-media-ux@google.com</owner>
+  <summary>
+    Recorded when a Web Speech API speech recognition session starts. Logs true
+    if the requested language is present in the user's Accept-Language header
+    (navigator.languages). This serves as a proxy metric to estimate the usage
+    of language packs downloaded via the relaxed user activation flow, though it
+    may overcount packs installed through other legitimate means.
   </summary>
 </histogram>
 
