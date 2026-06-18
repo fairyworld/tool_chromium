@@ -5518,11 +5518,6 @@ inline constexpr char kBrowserControlsDebuggingName[] =
 inline constexpr char kBrowserControlsDebuggingDescription[] =
     "Enables logs to debug Android browser controls.";
 
-inline constexpr char kBrowserWindowInterfaceMobileName[] =
-    "Browser Window Interface Mobile";
-inline constexpr char kBrowserWindowInterfaceMobileDescription[] =
-    "Enables the Browser Window Interface on Mobile.";
-
 inline constexpr char kBrowsingDataModelName[] = "Browsing Data Model";
 inline constexpr char kBrowsingDataModelDescription[] =
     "Enables BDM on Android.";

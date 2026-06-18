@@ -148,7 +148,6 @@ class GlicBrowserTestMixin : public T {
     std::vector<base::test::FeatureRefAndParams> enabled_features = {
         {features::kGlicMultiInstance, {}},
 #if BUILDFLAG(IS_ANDROID)
-        {chrome::android::kBrowserWindowInterfaceMobile, {}},
         {chrome::android::kTabBottomSheet, {}},
 #endif
     // TODO(crbug.com/516793173): Remove this compile-time check once C++

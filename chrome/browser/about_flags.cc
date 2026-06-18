@@ -11193,10 +11193,6 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kBrowserControlsDebuggingDescription, kOsAndroid,
      FEATURE_VALUE_TYPE(chrome::android::kBrowserControlsDebugging)},
 
-    {"browser-window-interface-mobile",
-     flag_descriptions::kBrowserWindowInterfaceMobileName,
-     flag_descriptions::kBrowserWindowInterfaceMobileDescription, kOsAndroid,
-     FEATURE_VALUE_TYPE(chrome::android::kBrowserWindowInterfaceMobile)},
 #endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_CHROMEOS)

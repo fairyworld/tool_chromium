@@ -99,7 +99,6 @@ BASE_DECLARE_FEATURE(kBrowserControlsDebugging);
 BASE_DECLARE_FEATURE(kBrowserControlsEarlyResize);
 BASE_DECLARE_FEATURE(kBrowserControlsPersistsOnCvh);
 BASE_DECLARE_FEATURE(kBrowserControlsRenderDrivenShowConstraint);
-BASE_DECLARE_FEATURE(kBrowserWindowInterfaceMobile);
 BASE_DECLARE_FEATURE(kCCTAdaptiveButton);
 BASE_DECLARE_FEATURE(kCCTAdaptiveButtonTestSwitch);
 BASE_DECLARE_FEATURE(kCCTAuthTabDisableAllExternalIntents);

@@ -272,9 +272,6 @@ class NewGlicApiTest : public GlicApiBrowserTest,
           {{features::kGlicUserStatusRefreshApi.name, "true"},
            {features::kGlicUserStatusThrottleInterval.name, "2s"}}},
          {features::kGlicOpenPasswordManagerSettingsPageApi, {}},
-#if BUILDFLAG(IS_ANDROID)
-         {chrome::android::kBrowserWindowInterfaceMobile, {}},
-#endif
          {features::kGlicActor,
           {{features::kGlicActorPolicyControlExemption.name, "true"}}},
          {blink::features::kAIPageContentTrackedElementsIframe, {}}},

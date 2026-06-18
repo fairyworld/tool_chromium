@@ -144,7 +144,7 @@ public class StripLayoutTrailingButtonsCoordinator {
     private final GlobalShowHideObserver mGlicUiObserver;
     private final GlicKeyedService.AllowedChangedObserver mAllowedChangedObserver =
             () -> updateTrailingButtonsState(/* animate= */ false, /* forceLayoutChanged= */ false);
-    private final @Nullable ChromeAndroidTaskTracker mTaskTracker;
+    private final ChromeAndroidTaskTracker mTaskTracker;
     private boolean mIsIncognito;
     private final Supplier<@Nullable TabModelSelector> mTabModelSelectorSupplier;
     private final OneshotSupplier<SideUiStateProvider> mSideUiStateProviderSupplier;
@@ -311,7 +311,7 @@ public class StripLayoutTrailingButtonsCoordinator {
             StripLayoutViewOnKeyboardFocusHandler keyboardFocusHandler,
             boolean isAppInDesktopWindow,
             boolean isTopResumedActivity,
-            @Nullable ChromeAndroidTaskTracker taskTracker,
+            ChromeAndroidTaskTracker taskTracker,
             boolean isIncognito,
             Supplier<@Nullable TabModelSelector> tabModelSelectorSupplier,
             OneshotSupplier<SideUiStateProvider> sideUiStateProviderSupplier,
@@ -525,7 +525,7 @@ public class StripLayoutTrailingButtonsCoordinator {
     }
 
     private void updateIsPanelOpen() {
-        if (mProfile == null || mGlicKeyedService == null || mTaskTracker == null) return;
+        if (mProfile == null || mGlicKeyedService == null) return;
         Activity activity = ContextUtils.activityFromContext(mContext);
         if (activity == null) return;
         var task = mTaskTracker.get(activity.getTaskId());
@@ -1420,7 +1420,7 @@ public class StripLayoutTrailingButtonsCoordinator {
                 new GlicButtonStateController(
                         activity,
                         this::onGlicActorButtonStateChanged,
-                        () -> mTaskTracker != null ? mTaskTracker.get(activity.getTaskId()) : null,
+                        () -> mTaskTracker.get(activity.getTaskId()),
                         /* browserControlsVisibilityManager= */ null);
         if (mProfile != null) {
             mStateController.updateObservations(mProfile);

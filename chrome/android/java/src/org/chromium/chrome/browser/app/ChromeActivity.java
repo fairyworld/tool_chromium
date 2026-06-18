@@ -1097,9 +1097,6 @@ public abstract class ChromeActivity extends AsyncInitializationActivity
             @Nullable MultiInstanceManager multiInstanceManager) {
         try (TraceEvent e = TraceEvent.scoped("ChromeActivity.initializeChromeAndroidTask")) {
             var chromeAndroidTaskTracker = ChromeAndroidTaskTrackerFactory.getInstance();
-            if (chromeAndroidTaskTracker == null) {
-                return;
-            }
 
             // 1. Obtain ChromeAndroidTask dependencies.
             var activityWindowAndroid = getWindowAndroid();
