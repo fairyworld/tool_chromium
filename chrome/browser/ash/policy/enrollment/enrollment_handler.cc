@@ -569,8 +569,8 @@ void EnrollmentHandler::HandlePolicyValidationResult(
 
   domain_ = gaia::ExtractDomainName(gaia::CanonicalizeEmail(username));
   SetStep(STEP_ROBOT_AUTH_FETCH);
-  device_account_initializer_ =
-      std::make_unique<DeviceAccountInitializer>(client_.get(), this);
+  device_account_initializer_ = std::make_unique<DeviceAccountInitializer>(
+      shared_url_loader_factory_, client_.get(), this);
   device_account_initializer_->FetchToken();
 }
 
@@ -610,11 +610,6 @@ EnrollmentHandler::GetRobotAuthCodeDeviceType() {
 
 std::set<std::string> EnrollmentHandler::GetRobotOAuthScopes() {
   return {GaiaConstants::kAnyApiOAuth2Scope};
-}
-
-scoped_refptr<network::SharedURLLoaderFactory>
-EnrollmentHandler::GetURLLoaderFactory() {
-  return shared_url_loader_factory_;
 }
 
 void EnrollmentHandler::SetFirmwareManagementParametersData() {

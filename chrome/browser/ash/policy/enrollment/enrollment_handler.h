@@ -131,7 +131,6 @@ class EnrollmentHandler : public CloudPolicyClient::Observer,
   enterprise_management::DeviceServiceApiAccessRequest::DeviceType
   GetRobotAuthCodeDeviceType() override;
   std::set<std::string> GetRobotOAuthScopes() override;
-  scoped_refptr<network::SharedURLLoaderFactory> GetURLLoaderFactory() override;
 
  private:
   // Indicates what step of the process is currently pending. These steps need
