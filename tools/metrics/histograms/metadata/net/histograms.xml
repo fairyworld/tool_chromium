@@ -301,6 +301,10 @@ chromium-metrics-reviews@google.com.
 
 <!-- LINT.ThenChange(//components/unexportable_keys/background_task_type.h:BackgroundTaskType) -->
 
+<variants name="UnexportableKeysSpareKeyPoolType">
+  <variant name="Signing" summary="signing"/>
+</variants>
+
 <variants name="URLLoaderThrottleStages">
   <variant name="BeforeWillProcessResponse"/>
   <variant name="WillOnCompleteWithError"/>
@@ -783,65 +787,70 @@ chromium-metrics-reviews@google.com.
   </token>
 </histogram>
 
-<histogram name="Crypto.UnexportableKeys.SparePool.Signing.GenerateError"
+<histogram name="Crypto.UnexportableKeys.SparePool.{KeyType}.GenerateError"
     enum="UnexportableKeyServiceResult" expires_after="2027-01-01">
   <owner>amraboelkher@chromium.org</owner>
   <owner>jdoerrie@chromium.org</owner>
   <summary>
-    Recorded when a background task finishes generating a spare signing key to
+    Recorded when a background task finishes generating a spare {KeyType} key to
     replenish the pool, regardless of success or failure. Records 'Success' (0,
     corresponding to kNoServiceErrorForMetrics in C++) or the specific
     ServiceError code on failure.
   </summary>
+  <token key="KeyType" variants="UnexportableKeysSpareKeyPoolType"/>
 </histogram>
 
-<histogram name="Crypto.UnexportableKeys.SparePool.Signing.PoolSize"
+<histogram name="Crypto.UnexportableKeys.SparePool.{KeyType}.PoolSize"
     units="keys" expires_after="2027-01-01">
   <owner>amraboelkher@chromium.org</owner>
   <owner>jdoerrie@chromium.org</owner>
   <summary>
-    Recorded when an asynchronous signing key generation request is received,
+    Recorded when an asynchronous {KeyType} key generation request is received,
     immediately before checking the pool for a hit or triggering replenishment.
-    Records the total number of spare signing keys currently sitting idle in the
-    pool for the requested algorithm.
+    Records the total number of spare {KeyType} keys currently sitting idle in
+    the pool for the requested algorithm.
   </summary>
+  <token key="KeyType" variants="UnexportableKeysSpareKeyPoolType"/>
 </histogram>
 
 <histogram
-    name="Crypto.UnexportableKeys.SparePool.Signing.ReplenishmentLatency"
+    name="Crypto.UnexportableKeys.SparePool.{KeyType}.ReplenishmentLatency"
     units="ms" expires_after="2027-01-01">
   <owner>amraboelkher@chromium.org</owner>
   <owner>jdoerrie@chromium.org</owner>
   <summary>
-    Recorded when a background task successfully generates a spare signing key
+    Recorded when a background task successfully generates a spare {KeyType} key
     to replenish the pool. Records the duration (in milliseconds) of the
     background task from its launch until completion.
   </summary>
+  <token key="KeyType" variants="UnexportableKeysSpareKeyPoolType"/>
 </histogram>
 
-<histogram name="Crypto.UnexportableKeys.SparePool.Signing.RequestLatency"
+<histogram name="Crypto.UnexportableKeys.SparePool.{KeyType}.RequestLatency"
     units="ms" expires_after="2027-01-01">
   <owner>amraboelkher@chromium.org</owner>
   <owner>jdoerrie@chromium.org</owner>
   <summary>
-    Recorded when an asynchronous signing key generation request completes (its
-    callback is executed), regardless of whether the spare pool feature is
+    Recorded when an asynchronous {KeyType} key generation request completes
+    (its callback is executed), regardless of whether the spare pool feature is
     enabled or disabled. Records the duration (in milliseconds) from the initial
     request until callback execution, covering both instantaneous pool hits and
     slow fallback background generations.
   </summary>
+  <token key="KeyType" variants="UnexportableKeysSpareKeyPoolType"/>
 </histogram>
 
-<histogram name="Crypto.UnexportableKeys.SparePool.Signing.RetrievalResult"
+<histogram name="Crypto.UnexportableKeys.SparePool.{KeyType}.RetrievalResult"
     enum="SpareKeyPoolRetrievalResult" expires_after="2027-01-01">
   <owner>amraboelkher@chromium.org</owner>
   <owner>jdoerrie@chromium.org</owner>
   <summary>
-    Recorded when a consumer requests a signing key asynchronously. Records the
-    outcome (hit, various miss reasons, or hardware support failure) of
-    attempting to retrieve a pre-generated spare signing key from the background
-    pool.
+    Recorded when a consumer requests a {KeyType} key asynchronously. Records
+    the outcome (hit, various miss reasons, or hardware support failure) of
+    attempting to retrieve a pre-generated spare {KeyType} key from the
+    background pool.
   </summary>
+  <token key="KeyType" variants="UnexportableKeysSpareKeyPoolType"/>
 </histogram>
 
 <histogram name="Crypto.VirtualKeySupport" enum="TPMSupport"
