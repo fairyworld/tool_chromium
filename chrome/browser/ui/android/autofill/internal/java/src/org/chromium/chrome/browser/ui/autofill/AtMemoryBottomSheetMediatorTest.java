@@ -89,8 +89,28 @@ public class AtMemoryBottomSheetMediatorTest {
     @Test
     public void testOnDismissed() {
         mModel.set(AtMemoryBottomSheetProperties.VISIBLE, true);
+        mModel.set(AtMemoryBottomSheetProperties.IS_LOADING, true);
         mMediator.onDismissed();
         assertFalse(mModel.get(AtMemoryBottomSheetProperties.VISIBLE));
+        assertFalse(mModel.get(AtMemoryBottomSheetProperties.IS_LOADING));
         verify(mDelegate).onDismissed();
+    }
+
+    @Test
+    public void testOnQuerySubmitted() {
+        mMediator.onQuerySubmitted("flight");
+        assertTrue(mModel.get(AtMemoryBottomSheetProperties.IS_LOADING));
+        verify(mDelegate).onQuerySubmitted("flight");
+
+        mMediator.show(List.of());
+        assertTrue(mModel.get(AtMemoryBottomSheetProperties.IS_LOADING));
+
+        mMediator.show(
+                List.of(
+                        new AutofillSuggestion.Builder()
+                                .setLabel("No data")
+                                .setSubLabel("")
+                                .build()));
+        assertFalse(mModel.get(AtMemoryBottomSheetProperties.IS_LOADING));
     }
 }

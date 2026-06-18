@@ -4,6 +4,7 @@
 
 package org.chromium.chrome.browser.ui.autofill;
 
+import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.IS_LOADING;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.ON_QUERY_SUBMITTED_CALLBACK;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.VISIBLE;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetSuggestionProperties.ALL_PROPERTIES;
@@ -41,11 +42,18 @@ class AtMemoryBottomSheetMediator {
 
     void show(List<AutofillSuggestion> suggestions) {
         setSuggestions(suggestions);
-        mModel.set(AtMemoryBottomSheetProperties.VISIBLE, true);
+        // When an async search begins, the backend clears old results by sending an empty list.
+        // We only reset the loading indicator when non-empty suggestions arrive. Completed searches
+        // always return non-empty lists (using fallback items when no data is found).
+        if (!suggestions.isEmpty()) {
+            mModel.set(IS_LOADING, false);
+        }
+        mModel.set(VISIBLE, true);
     }
 
     void onDismissed() {
         mModelList.clear();
+        mModel.set(IS_LOADING, false);
         mModel.set(VISIBLE, false);
         mDelegate.onDismissed();
     }
@@ -77,6 +85,7 @@ class AtMemoryBottomSheetMediator {
     }
 
     void onQuerySubmitted(String query) {
+        mModel.set(IS_LOADING, true);
         mDelegate.onQuerySubmitted(query);
     }
 }
