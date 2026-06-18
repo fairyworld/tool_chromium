@@ -2,7 +2,7 @@ Name: International Phone Number Library
 Short Name: libphonenumber
 URL: https://github.com/googlei18n/libphonenumber/
 Version: N/A
-Revision: b0ed82faafca95751b1f8067a60edd26bd4760bf
+Revision: 593719a5e7eaf6f374064c18f2809d9fdbca0838
 Update Mechanism: Autoroll
 License: Apache-2.0
 License File: LICENSE
