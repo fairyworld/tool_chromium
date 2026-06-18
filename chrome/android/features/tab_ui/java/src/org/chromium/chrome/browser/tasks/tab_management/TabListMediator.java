@@ -1317,6 +1317,43 @@ public class TabListMediator implements TabListNotificationHandler {
                     }
 
                     @Override
+                    public void didMoveTab(Tab tab, int newIndex, int curIndex) {
+                        assert mShowingTabs;
+
+                        // Standalone tab moves triggered from external sources need to be
+                        // explicitly synced to the ModelList, especially for NESTED layouts like
+                        // Vertical Tabs, which do not frequently rebuild the mModelList from
+                        // scratch.
+                        if (mLayoutType != TabListLayoutType.NESTED) return;
+
+                        // Intra-group move or merging into group.
+                        if (tab.getTabGroupId() != null) {
+                            return;
+                        }
+
+                        int currentUiIndex = mModelList.indexFromTabId(tab.getId());
+                        if (currentUiIndex == TabModel.INVALID_TAB_INDEX) return;
+
+                        // Moving out of a group.
+                        // This assumes the move event is dispatched before the ungroup event
+                        // (didMoveTabOutOfGroup) is processed, meaning the UI model still has the
+                        // old grouping metadata.
+                        if (mModelList.get(currentUiIndex).model.get(TabProperties.TAB_GROUP_ID)
+                                != null) {
+                            return;
+                        }
+
+                        // Standalone tab movement.
+                        int targetUiIndex = getInsertionIndexOfTabForNestedLayout(tab);
+                        if (targetUiIndex == TabModel.INVALID_TAB_INDEX
+                                || targetUiIndex == currentUiIndex) {
+                            return;
+                        }
+
+                        mModelList.move(currentUiIndex, targetUiIndex);
+                    }
+
+                    @Override
                     public void didRemoveTabForClosure(Tab tab) {
                         onTabClose(tab);
                     }
