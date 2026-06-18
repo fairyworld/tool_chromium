@@ -75,10 +75,10 @@ bool IsBetterMatchStored(const StoredCredential& lhs,
 // Trusted Vault key recovery.
 bool ShouldAllowSavingPasswordsWithInFlowRecovery(
     password_manager::ActionableError error) {
-  return base::FeatureList::IsEnabled(
+  return error == password_manager::ActionableError::kTrustedVaultKeyNeeded &&
+         base::FeatureList::IsEnabled(
              password_manager::features::
-                 kInFlowTrustedVaultKeyRetrievalAndroid) &&
-         error == password_manager::ActionableError::kTrustedVaultKeyNeeded;
+                 kInFlowTrustedVaultKeyRetrievalAndroid);
 }
 #endif
 
