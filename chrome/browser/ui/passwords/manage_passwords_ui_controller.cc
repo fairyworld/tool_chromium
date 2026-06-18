@@ -1272,16 +1272,13 @@ void ManagePasswordsUIController::UpdatePasswordIconAndBubbleState(
     ManagePasswordsPageActionController* controller,
     actions::ActionItem* passwords_action_item) {
   password_manager::ui::State state = GetState();
-  const bool is_blocklisted = IsExplicitlyBlocklisted();
-  // If the UI state or blocklist status has changed since the last update,
+  // If the UI state has changed since the last update,
   // close the current bubble to ensure that the UI reflects the new state.
-  if (state != last_page_action_state_ ||
-      is_blocklisted != last_page_action_is_blocklisted_) {
+  if (state != last_page_action_state_) {
     PasswordBubbleViewBase::CloseCurrentBubble();
   }
-  // Update the last known state and blocklist status.
+  // Update the last known state.
   last_page_action_state_ = state;
-  last_page_action_is_blocklisted_ = is_blocklisted;
   // Determine whether the bubble should be shown automatically based on
   // current conditions.
   const bool show_bubble =
@@ -1302,10 +1299,9 @@ void ManagePasswordsUIController::UpdatePasswordIconAndBubbleState(
     state = password_manager::ui::INACTIVE_STATE;
   }
 
-  // Update the visibility of the page action based on the current state,
-  // blocklist status, and the passwords action item.
-  controller->UpdateVisibility(state, is_blocklisted, *this,
-                               *passwords_action_item);
+  // Update the visibility of the page action based on the current state
+  // and the passwords action item.
+  controller->UpdateVisibility(state, *this, *passwords_action_item);
 
   if (show_bubble) {
     PasswordBubbleViewBase::CloseCurrentBubble();

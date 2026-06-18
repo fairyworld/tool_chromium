@@ -300,10 +300,6 @@ BASE_DECLARE_FEATURE_PARAM(bool, kPageActionsMigrationBookmarkStar);
 
 BASE_DECLARE_FEATURE(kPageActionsPrioritySelector);
 
-// Determines whether the "save password" page action displays different UI if
-// the user has said to never save passwords for that site.
-BASE_DECLARE_FEATURE(kSavePasswordsContextualUi);
-
 #if BUILDFLAG(IS_MAC)
 // Add tab group colours when viewing tab groups using the top mac OS menu bar.
 BASE_DECLARE_FEATURE(kShowTabGroupsMacSystemMenu);

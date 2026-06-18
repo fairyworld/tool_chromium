@@ -6615,12 +6615,6 @@ inline constexpr char kMainNodeAnnotationsDescription[] =
     "Uses Screen2x main content extractor to annotate the accessibility tree "
     "with the main landmark on the node identified as main.";
 
-inline constexpr char kSavePasswordsContextualUiName[] =
-    "Save Password Contextual UI";
-inline constexpr char kSavePasswordsContextualUiDescription[] =
-    "Improved page action indicator and dialog UI when the user has "
-    "blocklisted the current site for password saving.";
-
 inline constexpr char kTranslateOpenSettingsName[] = "Translate Open Settings";
 inline constexpr char kTranslateOpenSettingsDescription[] =
     "Add an option to the translate bubble menu to open language settings.";

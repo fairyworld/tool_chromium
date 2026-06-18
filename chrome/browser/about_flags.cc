@@ -9829,14 +9829,6 @@ const FeatureEntry kFeatureEntries[] = {
 
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if !BUILDFLAG(IS_ANDROID)
-    {"save-passwords-contextual-ui",
-     flag_descriptions::kSavePasswordsContextualUiName,
-     flag_descriptions::kSavePasswordsContextualUiDescription, kOsDesktop,
-     FEATURE_VALUE_TYPE(features::kSavePasswordsContextualUi)},
-
-#endif  // !BUILDFLAG(IS_ANDROID)
-
     {"enable-unrestricted-usb", flag_descriptions::kEnableUnrestrictedUsbName,
      flag_descriptions::kEnableUnrestrictedUsbDescription, kOsAll,
      FEATURE_VALUE_TYPE(blink::features::kUnrestrictedUsb)},

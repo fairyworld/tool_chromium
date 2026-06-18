@@ -439,7 +439,6 @@ class ManagePasswordsUIController
 
   password_manager::ui::State last_page_action_state_ =
       password_manager::ui::INACTIVE_STATE;
-  bool last_page_action_is_blocklisted_ = false;
 
   // Whether the mouse is currently hovering over the bubble.
   bool is_mouse_hovered_ = false;

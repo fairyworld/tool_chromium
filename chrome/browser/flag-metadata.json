@@ -8454,11 +8454,6 @@
     "expiry_milestone": 150
   },
   {
-    "name": "save-passwords-contextual-ui",
-    "owners": [ "dfried@chromium.org", "cjgrant@chromium.org" ],
-    "expiry_milestone": 145
-  },
-  {
     "name": "schedule-window-cleaning",
     "owners": [ "mfiaz@google.com", "clank-tab-dev@google.com" ],
     "expiry_milestone": 152
