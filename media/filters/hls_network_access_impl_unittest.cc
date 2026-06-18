@@ -70,10 +70,7 @@ class HlsNetworkAccessImplUnittest : public testing::Test {
       auto key_uri = GURL(*key_location);
       enc_data = base::MakeRefCounted<hls::MediaSegment::EncryptionData>(
           GURL(*key_location), hls::XKeyTagMethod::kAES128,
-          hls::XKeyTagKeyFormat::kIdentity, std::make_tuple(0, 0),
-          key_uri.host() == manifest_uri.host()
-              ? hls::MediaSegment::EncryptionData::KeyLocation::kSafeOrigin
-              : hls::MediaSegment::EncryptionData::KeyLocation::kUnsafeOrigin);
+          hls::XKeyTagKeyFormat::kIdentity, std::make_tuple(0, 0));
     }
     return base::MakeRefCounted<hls::MediaSegment>(
         base::Seconds(1), 0, 0, resource_uri, url::Origin::Create(manifest_uri),
