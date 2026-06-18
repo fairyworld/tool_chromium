@@ -18,7 +18,6 @@
 #include "content/public/test/browser_test.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/events/event.h"
-#include "ui/views/test/views_test_utils.h"
 
 namespace {
 ui::MouseEvent dummy_event_ = ui::MouseEvent(ui::EventType::kMousePressed,

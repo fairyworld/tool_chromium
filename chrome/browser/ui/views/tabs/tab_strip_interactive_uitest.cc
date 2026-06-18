@@ -21,13 +21,9 @@
 #include "chrome/test/interaction/interactive_browser_test.h"
 #include "components/tabs/public/tab_group.h"
 #include "content/public/test/browser_test.h"
-#include "net/dns/mock_host_resolver.h"
-#include "ui/base/mojom/menu_source_type.mojom.h"
 #include "ui/base/test/ui_controls.h"
-#include "ui/views/controls/menu/menu_item_view.h"
 #include "ui/views/interaction/polling_view_observer.h"
 #include "ui/views/view_observer.h"
-#include "url/gurl.h"
 
 namespace {
 DEFINE_LOCAL_ELEMENT_IDENTIFIER_VALUE(kFirstTabContents);
