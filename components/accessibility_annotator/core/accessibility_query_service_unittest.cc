@@ -526,6 +526,77 @@ TEST_F(AccessibilityQueryServiceTest,
   EXPECT_EQ(fake_personal_context_resolver->last_query(), u"what is my name");
 }
 
+// Tests that the query service returns the appropriate error status when the
+// personal context resolver fails.
+TEST_F(AccessibilityQueryServiceTest, Query_PersonalContextResolverError) {
+  auto personal_context_resolver =
+      std::make_unique<FakePersonalContextResolver>();
+  auto* fake_personal_context_resolver = personal_context_resolver.get();
+
+  auto service = std::make_unique<AccessibilityQueryService>(
+      std::make_unique<MockAccessibilityQueryServiceDelegate>(),
+      std::make_unique<FakeMemoryDataProvider>(),
+      std::move(personal_context_resolver),
+      /*remote_model_executor=*/nullptr);
+
+  fake_personal_context_resolver->set_error(
+      personal_context::ContextMemoryError::FromExecutionError(
+          personal_context::ContextMemoryError::ExecutionError::
+              kPermissionDenied));
+
+  base::test::TestFuture<MemorySearchResults> future;
+  service->Query(u"random query", future.GetRepeatingCallback());
+
+  ASSERT_TRUE(future.Wait());
+  const auto& result = future.Get();
+  EXPECT_EQ(result.status, MemorySearchStatus::kDataFetchFailure);
+  EXPECT_TRUE(result.entries.empty());
+}
+
+// Tests that the query service returns the local fallback entries even when
+// the personal context resolver fails.
+TEST_F(AccessibilityQueryServiceTest,
+       Query_PersonalContextResolverError_ReturnsLocalFallback) {
+  auto data_provider = std::make_unique<FakeMemoryDataProvider>();
+  auto* fake_data_provider = data_provider.get();
+
+  auto personal_context_resolver =
+      std::make_unique<FakePersonalContextResolver>();
+  auto* fake_personal_context_resolver = personal_context_resolver.get();
+
+  auto service = std::make_unique<AccessibilityQueryService>(
+      std::make_unique<MockAccessibilityQueryServiceDelegate>(),
+      std::move(data_provider), std::move(personal_context_resolver),
+      /*remote_model_executor=*/nullptr);
+
+  MemorySearchResult local_entry(MemoryDataType::kNameFull, u"Name",
+                                 u"John Doe");
+  fake_data_provider->SetResults({local_entry});
+
+  fake_personal_context_resolver->set_error(
+      personal_context::ContextMemoryError::FromExecutionError(
+          personal_context::ContextMemoryError::ExecutionError::
+              kPermissionDenied));
+
+  base::test::RepeatingTestFuture<MemorySearchResults> future;
+  service->Query(u"what is my name", future.GetCallback());
+
+  // We should first get the partial success with local entries.
+  MemorySearchResults partial_result = future.Take();
+  EXPECT_EQ(partial_result.status, MemorySearchStatus::kPartialResponseSuccess);
+  EXPECT_THAT(partial_result.entries,
+              testing::UnorderedElementsAre(
+                  testing::Field(&MemorySearchResult::value, u"John Doe")));
+
+  // Then we should get the final result indicating the error, but containing
+  // the fallback local entries.
+  MemorySearchResults final_result = future.Take();
+  EXPECT_EQ(final_result.status, MemorySearchStatus::kDataFetchFailure);
+  EXPECT_THAT(final_result.entries,
+              testing::UnorderedElementsAre(
+                  testing::Field(&MemorySearchResult::value, u"John Doe")));
+}
+
 // Tests that the query service does not send results for a query that has been
 // superseded by a newer query.
 TEST_F(AccessibilityQueryServiceTest, StaleResultsAreNotSent) {

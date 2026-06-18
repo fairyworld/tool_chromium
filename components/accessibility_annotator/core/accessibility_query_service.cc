@@ -107,6 +107,27 @@ std::vector<MemorySearchResult> FilterResults(
   return filtered_entries;
 }
 
+MemorySearchStatus MapContextMemoryError(
+    personal_context::ContextMemoryError::ExecutionError error) {
+  switch (error) {
+    case personal_context::ContextMemoryError::ExecutionError::
+        kPermissionDenied:
+    case personal_context::ContextMemoryError::ExecutionError::
+        kRequestThrottled:
+    case personal_context::ContextMemoryError::ExecutionError::kRetryableError:
+    case personal_context::ContextMemoryError::ExecutionError::
+        kNonRetryableError:
+    case personal_context::ContextMemoryError::ExecutionError::kCancelled:
+      return MemorySearchStatus::kDataFetchFailure;
+    case personal_context::ContextMemoryError::ExecutionError::
+        kResponseParseError:
+    case personal_context::ContextMemoryError::ExecutionError::kInvalidRequest:
+    case personal_context::ContextMemoryError::ExecutionError::kGenericFailure:
+    case personal_context::ContextMemoryError::ExecutionError::kUnknown:
+      return MemorySearchStatus::kInternalFailure;
+  }
+}
+
 }  // namespace
 
 AccessibilityQueryService::AccessibilityQueryService(
@@ -264,7 +285,9 @@ void AccessibilityQueryService::OnPersonalContextResolverComplete(
         personal_context::ContextMemoryError::ExecutionError::kCancelled) {
       return;
     }
-    // TODO(crbug.com/524937997): Show the error in the UI.
+    update_callback.Run(MemorySearchResults(
+        MapContextMemoryError(personal_context_entries.error().error()),
+        std::move(fallback_local_entries)));
     return;
   }
 
@@ -272,9 +295,9 @@ void AccessibilityQueryService::OnPersonalContextResolverComplete(
       FilterResults(personal_context_entries.value(),
                     classified_query.filter_words);
 
+  // If the query completed successfully but returned no additional results
+  // after filtering, return the fallback local entries with the final status.
   if (filtered_personal_context_entries.empty()) {
-    // TODO(crbug.com/524937997): Handle errors and return meaningful
-    // `MemorySearchStatus`.
     update_callback.Run(
         MemorySearchResults(classified_query.intent == MemoryDataType::kUnknown
                                 ? MemorySearchStatus::kUnsupportedQuery
