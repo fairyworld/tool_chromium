@@ -969,9 +969,26 @@ void PopulateBinderMapWithContext(
   map->Add<blink::mojom::IdleManager>(
       &BindRenderFrameHostImpl<&RenderFrameHostImpl::BindIdleManager>);
 
+#if BUILDFLAG(IS_P2P_ENABLED) || BUILDFLAG(ENABLE_MDNS)
+  // TODO(447954811): Remove the fenced frames check if we end up supporting
+  // Connection Allowlist for fenced frames.
+  bool should_ban_p2p_for_connection_allowlist =
+      host->HasPolicyContainerHost() &&
+      host->policy_container_host()
+          ->connection_allowlists()
+          .enforced.has_value() &&
+      host->policy_container_host()
+              ->connection_allowlists()
+              .enforced->webrtc_behavior ==
+          network::ConnectionAllowlist::WebRtcBehavior::kBlock &&
+      !host->IsNestedWithinFencedFrame();
+# endif  // BUILDFLAG(IS_P2P_ENABLED) || BUILDFLAG(ENABLE_MDNS)
+
 #if BUILDFLAG(ENABLE_MDNS)
-  map->Add<network::mojom::MdnsResponder>(
+  if (!should_ban_p2p_for_connection_allowlist) {
+    map->Add<network::mojom::MdnsResponder>(
       &BindRenderFrameHostImpl<&RenderFrameHostImpl::CreateMdnsResponder>);
+  }
 #endif  // BUILDFLAG(ENABLE_MDNS)
 
   // BrowserMainLoop::GetInstance() may be null on unit tests.
@@ -996,15 +1013,6 @@ void PopulateBinderMapWithContext(
           blink::features::kFencedFramesLocalUnpartitionedDataAccess) &&
       host->IsNestedWithinFencedFrame();
 
-  bool should_ban_p2p_for_connection_allowlist =
-      host->HasPolicyContainerHost() &&
-      host->policy_container_host()
-          ->connection_allowlists()
-          .enforced.has_value() &&
-      host->policy_container_host()
-              ->connection_allowlists()
-              .enforced->webrtc_behavior ==
-          network::ConnectionAllowlist::WebRtcBehavior::kBlock;
   if (!should_ban_p2p_for_fenced_frames &&
       !should_ban_p2p_for_connection_allowlist) {
     map->Add<network::mojom::P2PSocketManager>(&BindSocketManager);
