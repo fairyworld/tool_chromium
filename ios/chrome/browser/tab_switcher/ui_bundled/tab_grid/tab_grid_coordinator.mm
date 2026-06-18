@@ -827,7 +827,7 @@ bool FindNavigatorShouldBePresentedInBrowser(Browser* browser) {
                 (BOOL)shouldDisplayBringAndroidTabsPrompt {
   _viewController.childViewControllerForStatusBarStyle = nil;
 
-  if (IsGeminiCopresenceEnabled() && !IsChromeNextIaEnabled()) {
+  if (!IsChromeNextIaEnabled()) {
     id<GeminiCommands> geminiHandler = HandlerForProtocol(
         self.regularBrowser->GetCommandDispatcher(), GeminiCommands);
     [geminiHandler

@@ -78,8 +78,7 @@ class GeminiBrowserAgentTest : public PlatformTest {
       : web_client_(std::make_unique<web::FakeWebClient>()),
         task_environment_(base::test::TaskEnvironment::TimeSource::MOCK_TIME) {
     feature_list_.InitWithFeatures(
-        {kPageActionMenu, kPageContextExtractorRefactored, kGeminiCopresence},
-        {});
+        {kPageActionMenu, kPageContextExtractorRefactored}, {});
     static_cast<web::FakeWebClient*>(web_client_.Get())
         ->SetJavaScriptFeatures(
             {web::FindInPageJavaScriptFeature::GetInstance(),
@@ -201,11 +200,6 @@ class GeminiBrowserAgentTest : public PlatformTest {
   // Setter for `is_floaty_invoked_`.
   void SetIsFloatyInvoked(bool is_invoked) {
     gemini_browser_agent_->is_floaty_invoked_ = is_invoked;
-  }
-
-  // Clear `active_hiding_sources_`.
-  void ClearActiveHidingSources() {
-    gemini_browser_agent_->active_hiding_sources_.clear();
   }
 
   // Setter for `is_floaty_temporarily_hidden_`.
@@ -365,9 +359,6 @@ TEST_F(GeminiBrowserAgentTest, TestGeminiBrowserAgentStartGeminiFlow) {
 
 // Tests that switching active web states handles observations correctly.
 TEST_F(GeminiBrowserAgentTest, TestActiveWebStateChanged) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeature(kGeminiCopresence);
-
   // Create a new browser to ensure the GeminiBrowserAgent is initialized with
   // the feature flag enabled.
 
@@ -526,40 +517,6 @@ TEST_F(GeminiBrowserAgentTest,
   EXPECT_EQ(ios::provider::GeminiViewState::kExpanded, GetLastShownViewState());
 }
 
-// Tests that the floaty remains hidden if the keyboard dismisses but a view
-// controller is still presenting.
-TEST_F(GeminiBrowserAgentTest,
-       TestFloatyRemainsHiddenWhenKeyboardDismissedIfViewPresent) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeatureWithParameters(
-      kGeminiCopresence, {{kGeminiCopresenceTrackSources, "true"}});
-  SetIsFloatyInvoked(true);
-  gemini_browser_agent_->HideFloatyIfInvoked(
-      /*animated=*/true, /*source=*/gemini::FloatyUpdateSource::ViewTransition);
-  gemini_browser_agent_->HideFloatyIfInvoked(
-      /*animated=*/true, /*source=*/gemini::FloatyUpdateSource::Keyboard);
-  gemini_browser_agent_->SetLastShownViewState(
-      ios::provider::GeminiViewState::kExpanded);
-
-  // Emulate a user typing for some time.
-  SetFloatyHiddenTimestamp(base::TimeTicks::Now() - base::Seconds(5));
-
-  // Emulate keyboard dismissing.
-  gemini_browser_agent_->ShowFloatyIfInvoked(
-      /*animated=*/true, /*source=*/gemini::FloatyUpdateSource::Keyboard);
-
-  // The floaty should still be considered temporarily hidden.
-  EXPECT_TRUE(IsFloatyTemporarilyHidden());
-
-  // Emulate view controller dismissing.
-  gemini_browser_agent_->ShowFloatyIfInvoked(
-      /*animated=*/true, /*source=*/gemini::FloatyUpdateSource::ViewTransition);
-
-  // The floaty should now be shown.
-  EXPECT_FALSE(IsFloatyTemporarilyHidden());
-  EXPECT_EQ(ios::provider::GeminiViewState::kExpanded, GetLastShownViewState());
-}
-
 // Tests that the floaty is not dismissed when `DismissFloaty` is called to
 // clean up properties but a user has not interacted with floaty UI to properly
 // dismiss it.
@@ -579,7 +536,6 @@ TEST_F(GeminiBrowserAgentTest, TestDismissFloatyWhenTemporarilyHidden) {
 // floaty i.e. when the floaty is shown.
 TEST_F(GeminiBrowserAgentTest, TestDismissFloatyWhenFloatyIsShown) {
   SetIsFloatyInvoked(true);
-  ClearActiveHidingSources();
   gemini_browser_agent_->DismissFloaty();
 
   EXPECT_FALSE(IsFloatyInvoked());
@@ -629,7 +585,6 @@ TEST_F(GeminiBrowserAgentTest, TestDismissGeminiFromOtherWindows) {
 // Tests that the floaty is dismissed when the primary account changes.
 TEST_F(GeminiBrowserAgentTest, TestDismissedOnPrimaryAccountChanged) {
   SetIsFloatyInvoked(true);
-  ClearActiveHidingSources();
 
   signin::PrimaryAccountChangeEvent::State previous_state;
   CoreAccountInfo account_info;
@@ -843,7 +798,6 @@ TEST_F(GeminiBrowserAgentTest, TestGeminiLiveIPHAndNewBadgeFET) {
 
   // Emulate the floaty being invoked so DismissFloaty actually runs fully.
   SetIsFloatyInvoked(true);
-  ClearActiveHidingSources();
 
   gemini_browser_agent_->DismissFloaty();
 }

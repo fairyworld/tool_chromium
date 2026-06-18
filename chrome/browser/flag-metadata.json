@@ -5065,16 +5065,6 @@
     "expiry_milestone": 160
   },
   {
-    "name": "gemini-copresence",
-    "owners": [
-      "adamta@chromium.org",
-      "joemerramos@google.com",
-      "tarekmakkouk@google.com",
-      "bling-alchemy-eng@google.com"
-    ],
-    "expiry_milestone": 160
-  },
-  {
     "name": "gemini-image-remix-tool",
     "owners": [
       "nicolasmacbeth@google.com",

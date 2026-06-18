@@ -43,10 +43,8 @@
   self = [super initWithBaseViewController:baseViewController browser:browser];
   if (self) {
     _delegate = delegate;
-    if (IsGeminiCopresenceEnabled()) {
-      _geminiHandler = HandlerForProtocol(self.browser->GetCommandDispatcher(),
-                                          GeminiCommands);
-    }
+    _geminiHandler = HandlerForProtocol(self.browser->GetCommandDispatcher(),
+                                        GeminiCommands);
   }
   return self;
 }

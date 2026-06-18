@@ -722,8 +722,7 @@ TEST_F(AppBarMediatorTest, TestFullscreenEvent) {
 // floaty invocation state changes and Gemini is available.
 TEST_F(AppBarMediatorTest, TestAssistantButtonHighlighted_GeminiAvailable) {
   base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitWithFeatures({kPageActionMenu, kGeminiCopresence},
-                                       {});
+  scoped_feature_list.InitWithFeatures({kPageActionMenu}, {});
 
   GeminiBrowserAgent* agent =
       GeminiBrowserAgent::FromBrowser(regular_browser_.get());

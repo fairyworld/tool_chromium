@@ -436,28 +436,6 @@ bool IsGeminiLiveDormantReasonsEnabled() {
   return base::FeatureList::IsEnabled(kGeminiLiveDormantReasons);
 }
 
-BASE_FEATURE(kGeminiCopresence, base::FEATURE_ENABLED_BY_DEFAULT);
-
-bool IsGeminiCopresenceEnabled() {
-  if (!IsPageActionMenuEnabled()) {
-    return false;
-  }
-  return base::FeatureList::IsEnabled(kGeminiCopresence);
-}
-
-// TODO(crbug.com/522712050): Remove once Gemini Config Params are merged.
-const char kGeminiCopresenceResponseReadyInterval[] =
-    "GeminiCopresenceResponseReadyInterval";
-
-// The response ready interval default.
-constexpr double kGeminiCopresenceResponseReadyIntervalDefault = 7.0;
-
-double GetGeminiCopresenceResponseReadyInterval() {
-  return base::GetFieldTrialParamByFeatureAsDouble(
-      kGeminiCopresence, kGeminiCopresenceResponseReadyInterval,
-      kGeminiCopresenceResponseReadyIntervalDefault);
-}
-
 BASE_FEATURE(kGeminiChatPersistence, base::FEATURE_DISABLED_BY_DEFAULT);
 
 bool IsGeminiChatPersistenceEnabled() {
@@ -465,29 +443,6 @@ bool IsGeminiChatPersistenceEnabled() {
     return false;
   }
   return base::FeatureList::IsEnabled(kGeminiChatPersistence);
-}
-
-const char kGeminiCopresenceWithFullscreenDisabler[] =
-    "GeminiCopresenceWithFullscreenDisabler";
-
-bool IsGeminiCopresenceWithFullscreenDisablerEnabled() {
-  if (!IsGeminiCopresenceEnabled()) {
-    return false;
-  }
-
-  return base::GetFieldTrialParamByFeatureAsBool(
-      kGeminiCopresence, kGeminiCopresenceWithFullscreenDisabler, false);
-}
-
-const char kGeminiCopresenceTrackSources[] = "GeminiCopresenceTrackSources";
-
-bool IsGeminiCopresenceTrackSourcesEnabled() {
-  if (!IsGeminiCopresenceEnabled()) {
-    return false;
-  }
-
-  return base::GetFieldTrialParamByFeatureAsBool(
-      kGeminiCopresence, kGeminiCopresenceTrackSources, false);
 }
 
 BASE_FEATURE(kGeminiConfigParams, base::FEATURE_ENABLED_BY_DEFAULT);
@@ -864,6 +819,6 @@ bool IsActorServiceLoggingEnabled() {
 BASE_FEATURE(kIOSGeminiBottomSheetMigration, base::FEATURE_DISABLED_BY_DEFAULT);
 
 bool IsIOSGeminiBottomSheetMigrationEnabled() {
-  return IsGeminiCopresenceEnabled() && IsAssistantContainerEnabled() &&
+  return IsAssistantContainerEnabled() &&
          base::FeatureList::IsEnabled(kIOSGeminiBottomSheetMigration);
 }

@@ -827,11 +827,6 @@ inline constexpr char kGeminiClientMigrationDescription[] =
     "Enables the client migration for Gemini, adding the infrastructure for "
     "several key features that render more than just text.";
 
-inline constexpr char kGeminiCopresenceName[] = "Gemini Copresence";
-inline constexpr char kGeminiCopresenceDescription[] =
-    "Enables the Gemini Copresence feature, which provides a persistent Gemini "
-    "overlay.";
-
 inline constexpr char kGeminiImageRemixToolName[] = "Gemini Image Remix Tool";
 inline constexpr char kGeminiImageRemixToolDescription[] =
     "Enables the image remix tool in the Gemini floaty.";

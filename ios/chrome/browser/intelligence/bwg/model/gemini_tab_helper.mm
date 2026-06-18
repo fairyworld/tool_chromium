@@ -379,9 +379,9 @@ bool GeminiTabHelper::IsGeminiChatAvailableForWebState() {
   bool is_ntp = IsUrlNtp(url);
   bool is_aim_url = IsAimZeroStateURL(url) || IsAimURL(url);
 
-  // With copresence, AIM and NTP are ineligible, and SRP is conditionally
+  // With Page Action Menu, AIM and NTP are ineligible, and SRP is conditionally
   // enabled.
-  if (IsGeminiCopresenceEnabled()) {
+  if (IsPageActionMenuEnabled()) {
     return !is_aim_url && !is_ntp;
   }
 
@@ -423,7 +423,7 @@ void GeminiTabHelper::WasShown(web::WebState* web_state) {
   // visible tab.
   if (IsNextIaOrLiveMode()) {
     NotifyPageContextUpdated(web_state);
-  } else if (IsGeminiCopresenceEnabled()) {
+  } else {
     [gemini_handler_
         updateFloatyVisibilityIfEligibleAnimated:NO
                                       fromSource:gemini::FloatyUpdateSource::
@@ -437,7 +437,7 @@ void GeminiTabHelper::WasHidden(web::WebState* web_state) {
   // immediately to ensure the hidden tab's content is detached and blocked.
   if (IsNextIaOrLiveMode()) {
     NotifyPageContextUpdated(web_state);
-  } else if (IsGeminiCopresenceEnabled()) {
+  } else {
     [gemini_handler_
         hideFloatyIfInvokedAnimated:NO
                          fromSource:gemini::FloatyUpdateSource::WebNavigation];
@@ -460,9 +460,7 @@ void GeminiTabHelper::DidStartNavigation(
 
   weak_ptr_factory_.InvalidateWeakPtrs();
   current_url_ = new_url;
-  if (IsGeminiCopresenceEnabled()) {
-    NotifyPageContextUpdated(web_state_);
-  }
+  NotifyPageContextUpdated(web_state_);
 
   // Reset gemini eligibility. The eligibility is decided by the optimization
   // guide with GLIC_ZERO_STATE_SUGGESTIONS.
@@ -509,27 +507,23 @@ void GeminiTabHelper::DidStartNavigation(
 void GeminiTabHelper::DidFinishNavigation(
     web::WebState* web_state,
     web::NavigationContext* navigation_context) {
-  if (IsGeminiCopresenceEnabled()) {
-    if (IsGeminiAvailableForWebState()) {
-      RecordGeminiPageAvailability(IOSGeminiPageAvailability::kAvailable);
-    } else {
-      RecordGeminiPageAvailability(IOSGeminiPageAvailability::kUnavailable);
-    }
-    [gemini_handler_
-        updateFloatyVisibilityIfEligibleAnimated:NO
-                                      fromSource:gemini::FloatyUpdateSource::
-                                                     WebNavigation];
+  if (IsGeminiAvailableForWebState()) {
+    RecordGeminiPageAvailability(IOSGeminiPageAvailability::kAvailable);
+  } else {
+    RecordGeminiPageAvailability(IOSGeminiPageAvailability::kUnavailable);
   }
+  [gemini_handler_
+      updateFloatyVisibilityIfEligibleAnimated:NO
+                                    fromSource:gemini::FloatyUpdateSource::
+                                                   WebNavigation];
 
   const GURL& current_url = navigation_context->GetUrl().GetWithoutRef();
   if (previous_main_frame_url_ == current_url) {
     return;
   }
 
-  if (IsGeminiCopresenceEnabled()) {
-    current_title_ = web_state->GetTitle();
-    NotifyPageContextUpdated(web_state_);
-  }
+  current_title_ = web_state->GetTitle();
+  NotifyPageContextUpdated(web_state_);
 
   previous_main_frame_url_ = current_url;
 
@@ -549,12 +543,10 @@ void GeminiTabHelper::DidFinishNavigation(
 }
 
 void GeminiTabHelper::TitleWasSet(web::WebState* web_state) {
-  if (IsGeminiCopresenceEnabled()) {
-    const std::u16string& new_title = web_state->GetTitle();
-    if (new_title != current_title_) {
-      current_title_ = new_title;
-      NotifyPageContextUpdated(web_state);
-    }
+  const std::u16string& new_title = web_state->GetTitle();
+  if (new_title != current_title_) {
+    current_title_ = new_title;
+    NotifyPageContextUpdated(web_state);
   }
 }
 
@@ -571,31 +563,29 @@ void GeminiTabHelper::PageLoaded(
 void GeminiTabHelper::FaviconUrlUpdated(
     web::WebState* web_state,
     const std::vector<web::FaviconURL>& candidates) {
-  if (IsGeminiCopresenceEnabled()) {
-    favicon::WebFaviconDriver* driver =
-        favicon::WebFaviconDriver::FromWebState(web_state);
-    if (!driver) {
-      return;
-    }
+  favicon::WebFaviconDriver* driver =
+      favicon::WebFaviconDriver::FromWebState(web_state);
+  if (!driver) {
+    return;
+  }
 
-    UIImage* new_favicon = nil;
-    gfx::Image cached_favicon = driver->GetFavicon();
-    if (!cached_favicon.IsEmpty()) {
-      new_favicon = cached_favicon.ToUIImage();
-    } else {
-      UIImageConfiguration* configuration = [UIImageSymbolConfiguration
-          configurationWithPointSize:gfx::kFaviconSize
-                              weight:UIImageSymbolWeightBold
-                               scale:UIImageSymbolScaleMedium];
-      new_favicon =
-          DefaultSymbolWithConfiguration(kGlobeAmericasSymbol, configuration);
-    }
+  UIImage* new_favicon = nil;
+  gfx::Image cached_favicon = driver->GetFavicon();
+  if (!cached_favicon.IsEmpty()) {
+    new_favicon = cached_favicon.ToUIImage();
+  } else {
+    UIImageConfiguration* configuration = [UIImageSymbolConfiguration
+        configurationWithPointSize:gfx::kFaviconSize
+                            weight:UIImageSymbolWeightBold
+                             scale:UIImageSymbolScaleMedium];
+    new_favicon =
+        DefaultSymbolWithConfiguration(kGlobeAmericasSymbol, configuration);
+  }
 
-    if (new_favicon != current_favicon_ &&
-        ![new_favicon isEqual:current_favicon_]) {
-      current_favicon_ = new_favicon;
-      NotifyPageContextUpdated(web_state_);
-    }
+  if (new_favicon != current_favicon_ &&
+      ![new_favicon isEqual:current_favicon_]) {
+    current_favicon_ = new_favicon;
+    NotifyPageContextUpdated(web_state_);
   }
 }
 

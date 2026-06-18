@@ -1154,22 +1154,6 @@ const FeatureEntry::FeatureVariation
     kWalletApiPrivatePassesEnabledVariations[] = {
         {"1P URL", kWalletApiPrivatePassesUrl, nullptr}};
 
-const FeatureEntry::FeatureParam kGeminiCopresenceResponseReadyIntervalParam[] =
-    {{kGeminiCopresenceResponseReadyInterval, "7.0"}};
-const FeatureEntry::FeatureParam
-    kGeminiCopresenceWithFullscreenDisablerParam[] = {
-        {kGeminiCopresenceWithFullscreenDisabler, "true"}};
-const FeatureEntry::FeatureParam kGeminiCopresenceTrackSourcesParam[] = {
-    {kGeminiCopresenceTrackSources, "true"}};
-
-const FeatureEntry::FeatureVariation kGeminiCopresenceVariations[] = {
-    {"Response Ready Interval", kGeminiCopresenceResponseReadyIntervalParam,
-     nullptr},
-    {"With Fullscreen Disabler", kGeminiCopresenceWithFullscreenDisablerParam,
-     nullptr},
-    {"Track Sources", kGeminiCopresenceTrackSourcesParam, nullptr},
-};
-
 const char kFRESignInHeaderTextUpdateParamName[] =
     "FRESignInHeaderTextUpdateParam";
 const FeatureEntry::FeatureParam kFRESignInHeaderTextUpdateArm0[] = {
@@ -2035,11 +2019,6 @@ constexpr auto kFeatureEntries = std::to_array<flags_ui::FeatureEntry>({
      flag_descriptions::kAskGeminiChipIgnoreCriteriaName,
      flag_descriptions::kAskGeminiChipIgnoreCriteriaDescription,
      flags_ui::kOsIos, FEATURE_VALUE_TYPE(kAskGeminiChipIgnoreCriteria)},
-    {"gemini-copresence", flag_descriptions::kGeminiCopresenceName,
-     flag_descriptions::kGeminiCopresenceDescription, flags_ui::kOsIos,
-     FEATURE_WITH_PARAMS_VALUE_TYPE(kGeminiCopresence,
-                                    kGeminiCopresenceVariations,
-                                    "GeminiCopresence")},
     {"bwg-promo-consent", flag_descriptions::kBWGPromoConsentName,
      flag_descriptions::kBWGPromoConsentDescription, flags_ui::kOsIos,
      FEATURE_WITH_PARAMS_VALUE_TYPE(kBWGPromoConsent,

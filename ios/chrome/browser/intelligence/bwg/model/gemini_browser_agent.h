@@ -294,12 +294,6 @@ class GeminiBrowserAgent : public BrowserUserData<GeminiBrowserAgent>,
       gemini::FloatyUpdateSource source,
       bool is_presented);
 
-  // Returns true if the floaty has active hiding sources.
-  bool DoesFloatyHaveActiveHidingSources() const;
-
-  // Returns true if the floaty is only hidden by the keyboard.
-  bool IsOnlyHiddenByKeyboard() const;
-
   // Returns true if the omnibox is focused.
   bool IsOmniboxFocused() const;
 
@@ -312,11 +306,6 @@ class GeminiBrowserAgent : public BrowserUserData<GeminiBrowserAgent>,
   // Updates the Gemini Live mode UI and page context. Returns true if page
   // context update was performed.
   bool UpdateLiveModeUIAndMaybeContext();
-
-  // Returns true if the source expects the floaty to re-show after hiding it.
-  // New sources must be added to the switch statement depending on if we
-  // expect the source to re-show the floaty after hiding it.
-  bool ShouldSourceReshowFloaty(gemini::FloatyUpdateSource source) const;
 
   // Returns true if the update from `source` should be ignored because the Live
   // session dormant snackbar is active.
@@ -395,10 +384,6 @@ class GeminiBrowserAgent : public BrowserUserData<GeminiBrowserAgent>,
 
   // Whether the keyboard is currently visible.
   bool is_keyboard_visible_ = false;
-
-  // Set of sources currently hiding the floaty. If this set is not empty, the
-  // floaty is considered temporarily hidden.
-  std::set<gemini::FloatyUpdateSource> active_hiding_sources_;
 
   // Used to track the last shown view state of an invoked floaty. Used to show
   // a hidden floaty with the previous view state.

@@ -2340,7 +2340,7 @@ void OnListFamilyMembersResponse(
 - (void)updateFloatyWithTraitCollection:(UITraitCollection*)traitCollection {
   GeminiBrowserAgent* geminiBrowserAgent =
       GeminiBrowserAgent::FromBrowser(_regularBrowser.get());
-  if (!IsGeminiCopresenceEnabled() || !geminiBrowserAgent) {
+  if (!geminiBrowserAgent) {
     return;
   }
 
@@ -2413,7 +2413,7 @@ void OnListFamilyMembersResponse(
                          fromSource:(gemini::FloatyUpdateSource)source {
   GeminiBrowserAgent* geminiBrowserAgent =
       GeminiBrowserAgent::FromBrowser(_regularBrowser.get());
-  if (!IsGeminiCopresenceEnabled() || !geminiBrowserAgent) {
+  if (!geminiBrowserAgent) {
     return;
   }
 
@@ -2438,8 +2438,7 @@ void OnListFamilyMembersResponse(
       GeminiServiceFactory::GetForProfile(self.profile);
   GeminiTabHelper* geminiTabHelper =
       GeminiTabHelper::FromWebState(activeWebState);
-  if (!IsGeminiCopresenceEnabled() || !geminiBrowserAgent || !geminiTabHelper ||
-      !geminiService) {
+  if (!geminiBrowserAgent || !geminiTabHelper || !geminiService) {
     return;
   }
 

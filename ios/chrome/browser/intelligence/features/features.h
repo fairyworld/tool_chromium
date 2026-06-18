@@ -234,29 +234,9 @@ bool IsGeminiLiveEnabled();
 BASE_DECLARE_FEATURE(kGeminiLiveDormantReasons);
 bool IsGeminiLiveDormantReasonsEnabled();
 
-// Feature flag for Gemini Copresence.
-BASE_DECLARE_FEATURE(kGeminiCopresence);
-bool IsGeminiCopresenceEnabled();
-
-// The threshold interval for displaying the response ready state in seconds.
-// TODO(crbug.com/522712050): Remove once Gemini Config Params are merged.
-extern const char kGeminiCopresenceResponseReadyInterval[];
-double GetGeminiCopresenceResponseReadyInterval();
-
-// Feature parameter for kGeminiCopresence to skip checking for a Search
-// Related Page.
-
 // Returns true if the Gemini chat persistence is enabled.
 bool IsGeminiChatPersistenceEnabled();
 BASE_DECLARE_FEATURE(kGeminiChatPersistence);
-
-// Returns true if the fullscreen disabler is enabled with Gemini Copresence.
-bool IsGeminiCopresenceWithFullscreenDisablerEnabled();
-extern const char kGeminiCopresenceWithFullscreenDisabler[];
-
-// Returns true if Gemini Copresence tracks multiple hiding sources.
-bool IsGeminiCopresenceTrackSourcesEnabled();
-extern const char kGeminiCopresenceTrackSources[];
 
 // Feature flag for Gemini configurable parameters.
 BASE_DECLARE_FEATURE(kGeminiConfigParams);

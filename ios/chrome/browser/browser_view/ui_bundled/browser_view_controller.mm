@@ -1915,10 +1915,7 @@ bool IsFullscreenNextIAEnabled() {
   // TODO(crbug.com/40842406): Remove this and let
   // `PrimaryToolbarViewController` or `ToolbarCoordinator` call the update ?
   [self.toolbarCoordinator updateToolbar];
-
-  if (IsGeminiCopresenceEnabled()) {
-    [self.geminiHandler updateFloatyWithTraitCollection:self.traitCollection];
-  }
+  [self.geminiHandler updateFloatyWithTraitCollection:self.traitCollection];
 
   self.fullscreenController->BrowserTraitCollectionChangedEnd();
 }
@@ -3150,9 +3147,6 @@ bool IsFullscreenNextIAEnabled() {
 #pragma mark - LensOverlayPresentationEnvironment
 
 - (void)lensOverlayDidPrepare {
-  if (!IsGeminiCopresenceEnabled()) {
-    return;
-  }
 
   [self.sceneHandler hideAssistant];
   [self.geminiHandler
@@ -3174,9 +3168,6 @@ bool IsFullscreenNextIAEnabled() {
 }
 
 - (void)lensOverlayDidDisappear {
-  if (!IsGeminiCopresenceEnabled()) {
-    return;
-  }
 
   [self.geminiHandler
       updateFloatyVisibilityIfEligibleAnimated:NO

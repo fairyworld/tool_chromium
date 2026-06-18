@@ -124,9 +124,6 @@ const CGFloat kFloatyShownOpacity = 1.0;
 // Opacity for a hidden floaty.
 const CGFloat kFloatyHiddenOpacity = 0.0;
 
-// The timeout for the fullscreen disabler.
-const double kFullscreenDisablerTimeoutSeconds = 3.0;
-
 // Used to check if floaty visibility updates are part of a UIView dismissal or
 // presentation.
 const double kViewTransitionTime = 0.8;
@@ -213,15 +210,13 @@ NotificationCenterBlock ClosureToNotificationCenterBlock(
 GeminiBrowserAgent::GeminiBrowserAgent(Browser* browser)
     : BrowserUserData(browser) {
   browser_->AddObserver(this);
-  if (IsGeminiCopresenceEnabled()) {
-    StartObserving(browser_);
+  StartObserving(browser_);
 
-    pref_change_registrar_.Init(browser_->GetProfile()->GetPrefs());
-    pref_change_registrar_.Add(
-        prefs::kIOSBWGPageContentSetting,
-        base::BindRepeating(&GeminiBrowserAgent::OnPageContentPrefChanged,
-                            base::Unretained(this)));
-  }
+  pref_change_registrar_.Init(browser_->GetProfile()->GetPrefs());
+  pref_change_registrar_.Add(
+      prefs::kIOSBWGPageContentSetting,
+      base::BindRepeating(&GeminiBrowserAgent::OnPageContentPrefChanged,
+                          base::Unretained(this)));
 
   bwg_gateway_ = ios::provider::CreateBWGGateway();
 
@@ -237,13 +232,11 @@ GeminiBrowserAgent::GeminiBrowserAgent(Browser* browser)
         initWithWebStateList:browser_->GetWebStateList()
                      tracker:feature_engagement::TrackerFactory::GetForProfile(
                                  browser_->GetProfile())];
-    if (IsGeminiCopresenceEnabled()) {
-      gemini_view_state_handler_ =
-          [[GeminiViewStateChangeHandler alloc] initWithTarget:this];
-      bwg_session_handler_.geminiViewStateDelegate = gemini_view_state_handler_;
-      gemini_link_opening_handler_.geminiViewStateDelegate =
-          gemini_view_state_handler_;
-    }
+    gemini_view_state_handler_ =
+        [[GeminiViewStateChangeHandler alloc] initWithTarget:this];
+    bwg_session_handler_.geminiViewStateDelegate = gemini_view_state_handler_;
+    gemini_link_opening_handler_.geminiViewStateDelegate =
+        gemini_view_state_handler_;
     bwg_gateway_.sessionHandler = bwg_session_handler_;
     bwg_gateway_.linkOpeningHandler = gemini_link_opening_handler_;
 
@@ -296,59 +289,57 @@ GeminiBrowserAgent::GeminiBrowserAgent(Browser* browser)
   }
 
   // Sets up observation of fullscreen state.
-  if (IsGeminiCopresenceEnabled()) {
-    if (IsFullscreenRefactoringEnabled()) {
-      FullscreenBrowserAgent* agent =
-          FullscreenBrowserAgent::FromBrowser(browser_);
-      CHECK(agent);
-      fullscreen_observation_.Observe(agent);
-    } else {
-      FullscreenController::CreateForBrowser(browser_);
-      fullscreen_controller_ = FullscreenController::FromBrowser(browser_);
-      CHECK(fullscreen_controller_);
-      fullscreen_controller_->AddObserver(this);
+  if (IsFullscreenRefactoringEnabled()) {
+    FullscreenBrowserAgent* agent =
+        FullscreenBrowserAgent::FromBrowser(browser_);
+    CHECK(agent);
+    fullscreen_observation_.Observe(agent);
+  } else {
+    FullscreenController::CreateForBrowser(browser_);
+    fullscreen_controller_ = FullscreenController::FromBrowser(browser_);
+    CHECK(fullscreen_controller_);
+    fullscreen_controller_->AddObserver(this);
+  }
+
+  keyboard_show_observer_ = [[NSNotificationCenter defaultCenter]
+      addObserverForName:UIKeyboardWillShowNotification
+                  object:nil
+                   queue:nil
+              usingBlock:ClosureToNotificationCenterBlock(base::BindRepeating(
+                             &GeminiBrowserAgent::OnKeyboardStateChanged,
+                             weak_factory_.GetWeakPtr(),
+                             /*is_visible=*/true))];
+
+  keyboard_hide_observer_ = [[NSNotificationCenter defaultCenter]
+      addObserverForName:UIKeyboardWillHideNotification
+                  object:nil
+                   queue:nil
+              usingBlock:ClosureToNotificationCenterBlock(base::BindRepeating(
+                             &GeminiBrowserAgent::OnKeyboardStateChanged,
+                             weak_factory_.GetWeakPtr(),
+                             /*is_visible=*/false))];
+
+  SceneState* scene_state = browser_->GetSceneState();
+  if (scene_state) {
+    scene_state_observer_ =
+        [[GeminiSceneStateObserver alloc] initWithBrowserAgent:this
+                                                    sceneState:scene_state];
+    if (IsChromeNextIaEnabled()) {
+      tab_grid_state_observer_bridge_ =
+          [[TabGridStateObserverBridge alloc] initWithObserver:this];
+      [scene_state.tabGridState addObserver:tab_grid_state_observer_bridge_];
     }
+  }
 
-    keyboard_show_observer_ = [[NSNotificationCenter defaultCenter]
-        addObserverForName:UIKeyboardWillShowNotification
-                    object:nil
-                     queue:nil
-                usingBlock:ClosureToNotificationCenterBlock(base::BindRepeating(
-                               &GeminiBrowserAgent::OnKeyboardStateChanged,
-                               weak_factory_.GetWeakPtr(),
-                               /*is_visible=*/true))];
+  scroll_observer_ = [[GeminiScrollObserver alloc]
+      initWithScrollCallback:base::BindRepeating(
+                                 &GeminiBrowserAgent::OnScrollEvent,
+                                 weak_factory_.GetWeakPtr())];
 
-    keyboard_hide_observer_ = [[NSNotificationCenter defaultCenter]
-        addObserverForName:UIKeyboardWillHideNotification
-                    object:nil
-                     queue:nil
-                usingBlock:ClosureToNotificationCenterBlock(base::BindRepeating(
-                               &GeminiBrowserAgent::OnKeyboardStateChanged,
-                               weak_factory_.GetWeakPtr(),
-                               /*is_visible=*/false))];
-
-    SceneState* scene_state = browser_->GetSceneState();
-    if (scene_state) {
-      scene_state_observer_ =
-          [[GeminiSceneStateObserver alloc] initWithBrowserAgent:this
-                                                      sceneState:scene_state];
-      if (IsChromeNextIaEnabled()) {
-        tab_grid_state_observer_bridge_ =
-            [[TabGridStateObserverBridge alloc] initWithObserver:this];
-        [scene_state.tabGridState addObserver:tab_grid_state_observer_bridge_];
-      }
-    }
-
-    scroll_observer_ = [[GeminiScrollObserver alloc]
-        initWithScrollCallback:base::BindRepeating(
-                                   &GeminiBrowserAgent::OnScrollEvent,
-                                   weak_factory_.GetWeakPtr())];
-
-    identity_manager_ =
-        IdentityManagerFactory::GetForProfile(browser_->GetProfile());
-    if (identity_manager_) {
-      identity_manager_->AddObserver(this);
-    }
+  identity_manager_ =
+      IdentityManagerFactory::GetForProfile(browser_->GetProfile());
+  if (identity_manager_) {
+    identity_manager_->AddObserver(this);
   }
   last_known_gemini_availability_ = IsGeminiAvailableForActiveWebState();
 }
@@ -402,10 +393,6 @@ GeminiBrowserAgent::~GeminiBrowserAgent() {
   if (fullscreen_controller_) {
     fullscreen_controller_->RemoveObserver(this);
     fullscreen_controller_ = nullptr;
-  }
-
-  if (IsGeminiCopresenceWithFullscreenDisablerEnabled()) {
-    ResetFullscreenDisabler();
   }
 
   StopObserving();
@@ -465,7 +452,6 @@ void GeminiBrowserAgent::OnPrimaryAccountChanged(
     ConfigureGemini();
   }
 
-  CHECK(IsGeminiCopresenceEnabled());
   if (event_type != signin::PrimaryAccountChangeEvent::Type::kNone) {
     browser_->GetProfile()->GetPrefs()->ClearPref(prefs::kGeminiConversationId);
 
@@ -504,7 +490,6 @@ void GeminiBrowserAgent::OnIdentityManagerShutdown(
 }
 
 void GeminiBrowserAgent::OnKeyboardStateChanged(bool is_visible) {
-  CHECK(IsGeminiCopresenceEnabled());
   if (is_visible == is_keyboard_visible_) {
     return;
   }
@@ -531,7 +516,7 @@ void GeminiBrowserAgent::OnKeyboardStateChanged(bool is_visible) {
     return;
   }
 
-  if (IsOnlyHiddenByKeyboard()) {
+  if (is_hidden_by_keyboard_) {
     if (IsOmniboxFocused()) {
       return;
     }
@@ -792,11 +777,6 @@ CGFloat GeminiBrowserAgent::GetFloatyProgress() {
 }
 
 void GeminiBrowserAgent::InvokeFloaty(GeminiConfiguration* config) {
-  if (!IsGeminiCopresenceEnabled()) {
-    ios::provider::StartBwgOverlay(config);
-    return;
-  }
-
   PrepareFloatyToBeShown();
   ios::provider::StartBwgOverlay(config);
   last_shown_view_state_ = ios::provider::GetCurrentGeminiViewState();
@@ -883,7 +863,7 @@ void GeminiBrowserAgent::PresentFloaty(UIViewController* base_view_controller,
   UIImage* image_attachment = startup_state.imageAttachment;
   NSString* prepopulated_prompt = startup_state.prepopulatedPrompt;
 
-  if (IsGeminiCopresenceEnabled() && is_floaty_invoked_) {
+  if (is_floaty_invoked_) {
     if (image_attachment) {
       ios::provider::AttachImage(image_attachment);
     }
@@ -981,9 +961,6 @@ void GeminiBrowserAgent::SetLastShownViewState(
     RecordFloatyMinimizedTime(elapsed_minimized_floaty_time_);
     elapsed_minimized_floaty_time_ = base::TimeTicks();
   } else if (view_state == ios::provider::GeminiViewState::kCollapsed) {
-    if (IsGeminiCopresenceWithFullscreenDisablerEnabled()) {
-      ResetFullscreenDisabler();
-    }
     RecordFloatyExpandedToCollapsed();
     elapsed_minimized_floaty_time_ = base::TimeTicks::Now();
   }
@@ -1039,10 +1016,6 @@ void GeminiBrowserAgent::DismissGeminiFromOtherWindows(
 }
 
 void GeminiBrowserAgent::DismissFloaty() {
-  if (IsGeminiCopresenceWithFullscreenDisablerEnabled()) {
-    ResetFullscreenDisabler();
-  }
-
   // If the floaty is temporarily hidden i.e. as part of a view controller being
   // shown underneath the Gemini floaty, don't clean up and reset internal
   // Gemini properties. Clean up should occur if a user taps the floaty to
@@ -1086,52 +1059,17 @@ void GeminiBrowserAgent::DismissFloaty() {
   for (auto& observer : observers_) {
     observer.OnFloatyInvokedChanged(is_floaty_invoked_);
   }
-  active_hiding_sources_.clear();
   is_hidden_by_keyboard_ = false;
   processing_status_ = ios::provider::GeminiClientMode::kUnknown;
   elapsed_minimized_floaty_time_ = base::TimeTicks();
-  // TODO(crbug.com/484045717): Refactor to merge these two provider calls.
-  if (IsGeminiCopresenceEnabled()) {
-    ios::provider::UpdateGeminiViewState(
-        ios::provider::GeminiViewState::kHidden,
-        /*animated=*/false);
-  } else {
-    ios::provider::ResetGemini();
-  }
+  ios::provider::UpdateGeminiViewState(ios::provider::GeminiViewState::kHidden,
+                                       /*animated=*/false);
   UpdateGeminiLiveIconVisibility();
 }
 
 void GeminiBrowserAgent::ForceDismissFloaty() {
   is_floaty_temporarily_hidden_ = false;
   DismissFloaty();
-}
-
-bool GeminiBrowserAgent::ShouldSourceReshowFloaty(
-    gemini::FloatyUpdateSource source) const {
-  if (!IsGeminiCopresenceTrackSourcesEnabled()) {
-    return false;
-  }
-
-  switch (source) {
-    case gemini::FloatyUpdateSource::Unknown:
-    case gemini::FloatyUpdateSource::ContextMenu:
-    case gemini::FloatyUpdateSource::WebContextMenu:
-    case gemini::FloatyUpdateSource::IneligibleSite:
-    case gemini::FloatyUpdateSource::SearchRelatedPage:
-    case gemini::FloatyUpdateSource::ForcedFromQueryResponse:
-    case gemini::FloatyUpdateSource::TabGrid:
-    case gemini::FloatyUpdateSource::Banner:
-    case gemini::FloatyUpdateSource::Alert:
-    case gemini::FloatyUpdateSource::Snackbar:
-    case gemini::FloatyUpdateSource::Overlay:
-    case gemini::FloatyUpdateSource::ForcedFromScroll:
-    case gemini::FloatyUpdateSource::WebNavigation:
-    case gemini::FloatyUpdateSource::GestureIph:
-      return false;
-    case gemini::FloatyUpdateSource::ViewTransition:
-    case gemini::FloatyUpdateSource::Keyboard:
-      return true;
-  }
 }
 
 bool GeminiBrowserAgent::ShouldIgnoreUpdateForDormantSnackbar(
@@ -1165,9 +1103,6 @@ void GeminiBrowserAgent::HideFloatyIfInvoked(
   }
 
   floaty_hidden_timestamp_ = base::TimeTicks::Now();
-  if (ShouldSourceReshowFloaty(source)) {
-    active_hiding_sources_.insert(source);
-  }
 
   if (is_floaty_temporarily_hidden_) {
     return;
@@ -1226,15 +1161,6 @@ void GeminiBrowserAgent::ShowFloatyIfInvoked(
   bool should_block =
       gemini_tab_helper && gemini_tab_helper->ShouldBlockFloatyFromShowing();
   if ((!is_web_navigation && triggered_during_transition) || should_block) {
-    return;
-  }
-
-  active_hiding_sources_.erase(source);
-  if (is_web_navigation) {
-    active_hiding_sources_.clear();
-  }
-
-  if (DoesFloatyHaveActiveHidingSources()) {
     return;
   }
 
@@ -1331,7 +1257,7 @@ void GeminiBrowserAgent::OnPageContextUpdated(web::WebState* web_state) {
   }
 
   GeminiTabHelper* tab_helper = GetActiveTabHelper(web_state);
-  if (!tab_helper || (!is_floaty_invoked_ && IsGeminiCopresenceEnabled())) {
+  if (!tab_helper || !is_floaty_invoked_) {
     return;
   }
 
@@ -1381,21 +1307,6 @@ void GeminiBrowserAgent::FullscreenDidAnimate(FullscreenController* controller,
   } else {
     FullscreenProgressUpdated(controller, kFullscreenDisabled);
   }
-}
-
-bool GeminiBrowserAgent::DoesFloatyHaveActiveHidingSources() const {
-  if (!IsGeminiCopresenceTrackSourcesEnabled()) {
-    return false;
-  }
-  return !active_hiding_sources_.empty();
-}
-
-bool GeminiBrowserAgent::IsOnlyHiddenByKeyboard() const {
-  if (!IsGeminiCopresenceTrackSourcesEnabled()) {
-    return is_hidden_by_keyboard_;
-  }
-  return active_hiding_sources_.size() == 1 &&
-         active_hiding_sources_.contains(gemini::FloatyUpdateSource::Keyboard);
 }
 
 bool GeminiBrowserAgent::IsOmniboxFocused() const {
@@ -1546,8 +1457,7 @@ void GeminiBrowserAgent::PropagatePageContextToProvider(
     // detached the context via the paperclip UI, respect that choice over the
     // default attached state. Skip for Gemini Live where the paperclip UI
     // is absent and context streams continuously.
-    if (IsGeminiCopresenceEnabled() &&
-        gemini_page_context.geminiPageContextAttachmentState ==
+    if (gemini_page_context.geminiPageContextAttachmentState ==
             ios::provider::GeminiPageContextAttachmentState::kAttached &&
         ios::provider::GetCurrentPageContextAttachmentState() ==
             ios::provider::GeminiPageContextAttachmentState::kDetached &&
@@ -1622,9 +1532,7 @@ GeminiConfiguration* GeminiBrowserAgent::CreateGeminiConfiguration(
   config.geminiLocationPermissionState =
       ios::provider::GeminiLocationPermissionState::kUnknown;
   config.pageContext = page_context;
-  if (IsGeminiCopresenceEnabled()) {
-    config.initialBottomOffset = GetFloatyOffset();
-  }
+  config.initialBottomOffset = GetFloatyOffset();
   config.hostWindowScene = browser_->GetSceneState().scene;
   GeminiService* gemini_service =
       GeminiServiceFactory::GetForProfile(browser_->GetProfile());
@@ -1640,34 +1548,14 @@ void GeminiBrowserAgent::PrepareFloatyToBeShown() {
   if (!IsFullscreenInitialized() || !web_state) {
     return;
   }
-
-  if (!IsGeminiCopresenceWithFullscreenDisablerEnabled()) {
-    if (IsFullscreenRefactoringEnabled()) {
-      [HandlerForProtocol(browser_->GetCommandDispatcher(), FullscreenCommands)
-          exitFullscreenWithTrigger:FullscreenModeTransitionTrigger::
-                                        kUserInitiatedFinishedByCode
-                           animated:YES];
-    } else {
-      fullscreen_controller_->ExitFullscreen();
-    }
-    return;
+  if (IsFullscreenRefactoringEnabled()) {
+    [HandlerForProtocol(browser_->GetCommandDispatcher(), FullscreenCommands)
+        exitFullscreenWithTrigger:FullscreenModeTransitionTrigger::
+                                      kUserInitiatedFinishedByCode
+                         animated:YES];
+  } else {
+    fullscreen_controller_->ExitFullscreen();
   }
-
-  CRWWebViewScrollViewProxy* scroll_view_proxy =
-      web_state->GetWebViewProxy().scrollViewProxy;
-  CGPoint current_offset = scroll_view_proxy.contentOffset;
-  [scroll_view_proxy setContentOffset:current_offset animated:NO];
-  fullscreen_disabler_ =
-      IsFullscreenRefactoringEnabled()
-          ? std::make_unique<ScopedFullscreenDisabler>(
-                HandlerForProtocol(browser_->GetCommandDispatcher(),
-                                   FullscreenCommands),
-                /*animated=*/true)
-          : std::make_unique<ScopedFullscreenDisabler>(fullscreen_controller_);
-  fullscreen_disabler_timer_.Start(
-      FROM_HERE, base::Seconds(kFullscreenDisablerTimeoutSeconds),
-      base::BindOnce(&GeminiBrowserAgent::ResetFullscreenDisabler,
-                     weak_factory_.GetWeakPtr()));
 }
 
 bool GeminiBrowserAgent::IsFullscreenInitialized() {
@@ -1745,7 +1633,6 @@ void GeminiBrowserAgent::OnViewStateChanged(
   if (view_state == ios::provider::GeminiViewState::kExpanded) {
     if (is_floaty_temporarily_hidden_) {
       ForceShowFloatyIfInvoked();
-      active_hiding_sources_.clear();
       is_hidden_by_keyboard_ = false;
     }
     RequestPageContextGeneration();

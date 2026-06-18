@@ -43,9 +43,6 @@ class GeminiServiceImplTest : public PlatformTest {
  protected:
   void SetUp() override {
     PlatformTest::SetUp();
-
-    scoped_feature_list_.InitWithFeatures({kGeminiCopresence}, {});
-
     TestProfileIOS::Builder builder;
     builder.AddTestingFactory(
         AuthenticationServiceFactory::GetInstance(),
