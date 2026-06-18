@@ -10,7 +10,7 @@ import './test_bookmarks.js';
 import type {DocumentDimensions, LayoutOptions, PdfViewerElement, SaveMessage, ViewerToolbarElement, TextAnnotation} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
 import {PostMessageDataType, resetForTesting as resetMetricsForTesting, UserAction, Viewport} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
 // <if expr="enable_pdf_ink2">
-import type {AnnotationBrush, AnnotationBrushMessage, InkBrushSelectorElement, InkColorSelectorElement, InkSizeSelectorElement, SelectableIconButtonElement, ViewerBottomToolbarDropdownElement} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
+import type {AnnotationBrush, AnnotationBrushMessage, InkBrushSelectorElement, InkColorSelectorElement, InkSizeSelectorElement, SelectableIconButtonElement, ViewerBottomToolbarDropdownElement, InkTextBoxElement, InkTextAnnotationsElement} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
 import {AnnotationBrushType, DEFAULT_TEXTBOX_WIDTH, MIN_TEXTBOX_SIZE_PX, hexToColor, Ink2Manager, TEXT_COLORS, TextAlignment, PluginController, PluginControllerEventType, TextTypeface} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
 // </if>
 // <if expr="enable_pdf_save_to_drive">
@@ -796,6 +796,13 @@ export function createTextBox() {
           pageDimensions: {x: 10, y: 3, width: 390, height: 490},
         },
       }));
+}
+
+export function getTextBox(viewer: PdfViewerElement): InkTextBoxElement|null {
+  const annotations =
+      viewer.shadowRoot.querySelector<InkTextAnnotationsElement>(
+          'ink-text-annotations');
+  return annotations ? annotations.$.textBox : null;
 }
 
 export function getTestAnnotation(id: number): TextAnnotation {

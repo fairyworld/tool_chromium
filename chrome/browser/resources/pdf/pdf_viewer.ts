@@ -11,7 +11,6 @@ import './elements/viewer_error_dialog.js';
 import './elements/viewer_password_dialog.js';
 // <if expr="enable_pdf_ink2">
 import './elements/ink_text_annotations.js';
-import './elements/ink_text_box.js';
 import './elements/viewer_bottom_toolbar.js';
 import './elements/viewer_side_panel.js';
 import './elements/viewer_text_bottom_toolbar.js';
@@ -633,9 +632,9 @@ export class PdfViewerElement extends PdfViewerBaseElement {
     const created =
         await Ink2Manager.getInstance().initializeTextAnnotation(location);
     if (!created && this.textboxState_ !== TextBoxState.INACTIVE) {
-      const textbox = this.shadowRoot.querySelector('ink-text-box');
-      assert(textbox);
-      await textbox.commitTextAnnotation();
+      const annotations = this.shadowRoot.querySelector('ink-text-annotations');
+      assert(annotations);
+      await annotations.commitActiveAnnotation();
     }
   }
 
@@ -1110,9 +1109,10 @@ export class PdfViewerElement extends PdfViewerBaseElement {
         const location = data as unknown as Point;
         // Clicks on a scrollbar should allow the plugin to take focus.
         if (this.viewport.isPointOnScrollbar(location)) {
-          const textbox = this.shadowRoot.querySelector('ink-text-box');
-          assert(textbox);
-          textbox.blur();
+          const annotations =
+              this.shadowRoot.querySelector('ink-text-annotations');
+          assert(annotations);
+          annotations.blurActiveAnnotation();
         } else {
           this.maybeCreateTextAnnotation_(data as unknown as Point);
         }
@@ -1927,9 +1927,9 @@ export class PdfViewerElement extends PdfViewerBaseElement {
       return Promise.resolve();
     }
 
-    const textbox = this.shadowRoot.querySelector('ink-text-box');
-    assert(textbox);
-    return textbox.commitTextAnnotation();
+    const annotations = this.shadowRoot.querySelector('ink-text-annotations');
+    assert(annotations);
+    return annotations.commitActiveAnnotation();
   }
 
   protected isInTextAnnotationMode_(): boolean {

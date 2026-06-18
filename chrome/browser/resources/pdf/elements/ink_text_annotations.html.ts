@@ -21,6 +21,9 @@ export function getHtml(this: InkTextAnnotationsElement) {
     </div>
   `)}
 </div>
+<ink-text-box id="textBox"
+    @state-changed="${this.onTextBoxStateChanged_}">
+</ink-text-box>
 <!--_html_template_end_-->`;
   // clang-format on
 }

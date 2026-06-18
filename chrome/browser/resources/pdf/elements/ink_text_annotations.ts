@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import './ink_text_box.js';
+
 import {assert} from 'chrome://resources/js/assert.js';
 import {EventTracker} from 'chrome://resources/js/event_tracker.js';
 import {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
@@ -13,10 +15,12 @@ import type {Viewport} from '../viewport.js';
 
 import {getCss} from './ink_text_annotations.css.js';
 import {getHtml} from './ink_text_annotations.html.js';
+import type {InkTextBoxElement, TextBoxState} from './ink_text_box.js';
 
 export interface InkTextAnnotationsElement {
   $: {
     container: HTMLElement,
+    textBox: InkTextBoxElement,
   };
 }
 
@@ -126,6 +130,18 @@ export class InkTextAnnotationsElement extends CrLitElement {
     const screenRect = pageToScreenCoordinates(
         annotation.pageIndex, annotation.textBoxRect, this.viewport);
     Ink2Manager.getInstance().textBoxFocused(screenRect);
+  }
+
+  commitActiveAnnotation(): Promise<void> {
+    return this.$.textBox.commitTextAnnotation();
+  }
+
+  blurActiveAnnotation() {
+    this.$.textBox.blur();
+  }
+
+  protected onTextBoxStateChanged_(e: CustomEvent<TextBoxState>) {
+    this.fire('state-changed', e.detail);
   }
 }
 
