@@ -202,7 +202,10 @@ source_set("impl") {
   ]
 
   if (enable_print_preview) {
-    deps += [ "//chrome/browser/printing" ]
+    deps += [
+      "//chrome/browser/printing",
+      "//chrome/browser/ui/webui/print_preview",
+    ]
   }
 
   if (enable_extensions_core) {
@@ -448,6 +451,7 @@ source_set("impl") {
       "//chrome/browser/hid",
       "//chrome/browser/ui/read_anything:prefs",
       "//chrome/browser/ui/webui/cr_components/theme_color_picker:impl",
+      "//chrome/browser/ui/webui/history",
       "//chrome/browser/ui/webui/tab_search",
     ]
   }

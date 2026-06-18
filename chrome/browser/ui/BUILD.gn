@@ -676,6 +676,7 @@ static_library("ui") {
     "//chrome/browser/ui/webui/crashes",
     "//chrome/browser/ui/webui/download_internals",
     "//chrome/browser/ui/webui/family_link_user_internals",
+    "//chrome/browser/ui/webui/history",
     "//chrome/browser/ui/webui/net_internals",
     "//chrome/browser/ui/webui/sanitized_image:sanitized_image_source",
     "//chrome/browser/ui/webui/sync_internals",
@@ -1330,11 +1331,7 @@ static_library("ui") {
   }
 
   if (is_android) {
-    sources += [
-      "screen_capture_notification_ui_stub.cc",
-      "webui/history/history_ui_android.cc",
-      "webui/history/history_ui_android.h",
-    ]
+    sources += [ "screen_capture_notification_ui_stub.cc" ]
 
     deps += [
       "//cc/slim",
@@ -1483,18 +1480,6 @@ static_library("ui") {
       "webui/chrome_web_contents_handler.h",
       "webui/extension_control_handler.cc",
       "webui/extension_control_handler.h",
-      "webui/history/browsing_history_handler.cc",
-      "webui/history/browsing_history_handler.h",
-      "webui/history/foreign_session_handler.cc",
-      "webui/history/foreign_session_handler.h",
-      "webui/history/history_identity_state_watcher.cc",
-      "webui/history/history_identity_state_watcher.h",
-      "webui/history/history_login_handler.cc",
-      "webui/history/history_login_handler.h",
-      "webui/history/history_ui.cc",
-      "webui/history/history_ui.h",
-      "webui/history/navigation_handler.cc",
-      "webui/history/navigation_handler.h",
       "webui/password_manager/password_manager_ui.cc",
       "webui/password_manager/password_manager_ui.h",
       "webui/password_manager/promo_card.cc",
@@ -2097,6 +2082,10 @@ static_library("ui") {
       # browser.h, browser_window.h) that can't be split out yet.
       "//chrome/browser/ui/webui/cr_components/history_embeddings",
 
+      # history includes headers from //chrome/browser/ui (e.g. browser.h)
+      # that can't be split out yet.
+      "//chrome/browser/ui/webui/history",
+
       # browser_command_handler.cc includes browser.h, browser_commands.h,
       # chrome_pages.h, etc. from //chrome/browser/ui:ui.
       "//chrome/browser/ui/webui/browser_command",
@@ -2427,22 +2416,6 @@ static_library("ui") {
       "views/web_apps/protocol_handler_picker_dialog.h",
       "webui/certificate_provisioning_ui_handler.cc",
       "webui/certificate_provisioning_ui_handler.h",
-      "webui/nearby_internals/nearby_internals_contact_handler.cc",
-      "webui/nearby_internals/nearby_internals_contact_handler.h",
-      "webui/nearby_internals/nearby_internals_http_handler.cc",
-      "webui/nearby_internals/nearby_internals_http_handler.h",
-      "webui/nearby_internals/nearby_internals_logs_handler.cc",
-      "webui/nearby_internals/nearby_internals_logs_handler.h",
-      "webui/nearby_internals/nearby_internals_prefs_handler.cc",
-      "webui/nearby_internals/nearby_internals_prefs_handler.h",
-      "webui/nearby_internals/nearby_internals_ui.cc",
-      "webui/nearby_internals/nearby_internals_ui.h",
-      "webui/nearby_internals/nearby_internals_ui_presence_handler.cc",
-      "webui/nearby_internals/nearby_internals_ui_presence_handler.h",
-      "webui/nearby_internals/nearby_internals_ui_trigger_handler.cc",
-      "webui/nearby_internals/nearby_internals_ui_trigger_handler.h",
-      "webui/nearby_internals/quick_pair/quick_pair_handler.cc",
-      "webui/nearby_internals/quick_pair/quick_pair_handler.h",
     ]
 
     deps += [
@@ -2813,6 +2786,7 @@ static_library("ui") {
       "//chrome/browser/ui/webui/ash/user_image",
       "//chrome/browser/ui/webui/ash/vm",
       "//chrome/browser/ui/webui/chromeos/chrome_url_disabled",
+      "//chrome/browser/ui/webui/nearby_internals",
       "//chrome/browser/ui/webui/nearby_share",
       "//chrome/browser/ui/webui/signin/ash",
       "//chrome/browser/web_applications",
@@ -5512,30 +5486,10 @@ static_library("ui") {
   }
 
   if (enable_print_preview) {
-    sources += [
-      "webui/print_preview/extension_printer_handler.cc",
-      "webui/print_preview/extension_printer_handler.h",
-      "webui/print_preview/parse_data_path.cc",
-      "webui/print_preview/parse_data_path.h",
-      "webui/print_preview/pdf_printer_handler.cc",
-      "webui/print_preview/pdf_printer_handler.h",
-      "webui/print_preview/policy_settings.cc",
-      "webui/print_preview/policy_settings.h",
-      "webui/print_preview/print_preview_handler.cc",
-      "webui/print_preview/print_preview_handler.h",
-      "webui/print_preview/print_preview_metrics.cc",
-      "webui/print_preview/print_preview_metrics.h",
-      "webui/print_preview/print_preview_ui.cc",
-      "webui/print_preview/print_preview_ui.h",
-      "webui/print_preview/print_preview_ui_untrusted.cc",
-      "webui/print_preview/print_preview_ui_untrusted.h",
-      "webui/print_preview/print_preview_utils.cc",
-      "webui/print_preview/print_preview_utils.h",
-      "webui/print_preview/printer_handler.cc",
-      "webui/print_preview/printer_handler.h",
-    ]
     deps += [
       "//chrome/browser/pdf:pdf_pref_names",
+      "//chrome/browser/ui/webui/print_preview",
+      "//chrome/browser/ui/webui/print_preview:impl",
       "//chrome/common/printing",
       "//chrome/services/printing/public/mojom",
       "//components/printing/common:mojo_interfaces",
@@ -5547,21 +5501,16 @@ static_library("ui") {
       "//services/device/public/mojom:usb",
     ]
 
+    # print_preview includes headers from //chrome/browser/ui (e.g.
+    # chrome_pages.h, browser_tabstrip.h, managed_ui_handler.h,
+    # metrics_handler.h) that can't be split out yet.
+    allow_circular_includes_from +=
+        [ "//chrome/browser/ui/webui/print_preview:impl" ]
+
     if (is_chromeos) {
-      sources += [
-        "webui/print_preview/local_printer_handler_chromeos.cc",
-        "webui/print_preview/local_printer_handler_chromeos.h",
-        "webui/print_preview/print_preview_handler_chromeos.cc",
-        "webui/print_preview/print_preview_handler_chromeos.h",
-      ]
       deps += [
         "//chromeos/crosapi/mojom",
         "//chromeos/printing",
-      ]
-    } else {
-      sources += [
-        "webui/print_preview/local_printer_handler_default.cc",
-        "webui/print_preview/local_printer_handler_default.h",
       ]
     }
   }

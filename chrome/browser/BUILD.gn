@@ -1272,6 +1272,7 @@ source_set("core") {
       "//chrome/browser/ui/tabs/tab_drag_api/desktop_tab_drag_impl",
       "//chrome/browser/ui/waap:waap_utils",
       "//chrome/browser/ui/webui:chrome_content_browser_client_webui_part",
+      "//chrome/browser/ui/webui/history",
       "//chrome/browser/ui/webui/image",
       "//chrome/browser/ui/webui/indigo_internals",
       "//chrome/browser/ui/webui/indigo_internals:mojo_bindings",
@@ -3254,6 +3255,7 @@ source_set("browser") {
       "//chrome/browser/ui/webui/data_sharing",
       "//chrome/browser/ui/webui/downloads",
       "//chrome/browser/ui/webui/feedback/report_unsafe_site:mojo_bindings",
+      "//chrome/browser/ui/webui/history",
       "//chrome/browser/ui/webui/infobar_internals",
       "//chrome/browser/ui/webui/infobar_internals:impl",
       "//chrome/browser/ui/webui/metrics_reporter",
@@ -5109,9 +5111,11 @@ static_library("test_support") {
     "//chrome/browser/bookmarks:browser_tests",
     "//chrome/browser/browsing_data:browser_tests",
     "//chrome/browser/extensions:test_support",
+    "//chrome/browser/printing:test_support",
     "//chrome/browser/search_engine_choice:browser_tests",
     "//chrome/browser/subresource_filter:android_test_support",
     "//chrome/browser/ui/bookmarks:browser_tests",
+    "//chrome/browser/ui/webui/print_preview:unit_tests",
     "//chrome/test:test_support",
   ]
 

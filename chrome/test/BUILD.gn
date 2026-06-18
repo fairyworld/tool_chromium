@@ -5430,11 +5430,12 @@ if (!is_android) {
         "../browser/printing/pwg_raster_converter_browsertest.cc",
         "../browser/printing/test_print_view_manager.cc",
         "../browser/printing/test_print_view_manager.h",
-        "../browser/ui/webui/print_preview/print_preview_ui_browsertest.cc",
       ]
       deps += [
         ":print_preview_test_support",
         "//chrome/browser/printing:test_support",
+        "//chrome/browser/ui/webui/print_preview",
+        "//chrome/browser/ui/webui/print_preview:browser_tests",
         "//printing:test_support",
       ]
 
@@ -5447,14 +5448,6 @@ if (!is_android) {
       if (!is_chromeos) {
         sources +=
             [ "../browser/printing/system_access_process_print_browsertest.cc" ]
-      }
-
-      if (is_posix) {
-        sources += [ "../browser/ui/webui/print_preview/pdf_printer_handler_posix_browsertest.cc" ]
-      }
-
-      if (is_win) {
-        sources += [ "../browser/ui/webui/print_preview/pdf_printer_handler_win_browsertest.cc" ]
       }
     }
     if (enable_paint_preview) {
@@ -7675,9 +7668,6 @@ test("unit_tests") {
       "../browser/ui/webui/commerce/price_tracking_handler_unittest.cc",
       "../browser/ui/webui/commerce/shopping_list_context_menu_controller_unittest.cc",
       "../browser/ui/webui/constrained_web_dialog_ui_unittest.cc",
-      "../browser/ui/webui/history/browsing_history_handler_unittest.cc",
-      "../browser/ui/webui/history/foreign_session_handler_unittest.cc",
-      "../browser/ui/webui/history/history_identity_state_watcher_unittest.cc",
       "../browser/ui/webui/managed_ui_handler_unittest.cc",
       "../browser/ui/webui/password_manager/promo_cards_handler_unittest.cc",
       "../browser/ui/webui/password_manager/sync_handler_unittest.cc",
@@ -7852,6 +7842,7 @@ test("unit_tests") {
       "//chrome/browser/ui/webui/data_sharing:unit_tests",
       "//chrome/browser/ui/webui/feedback:unit_tests",
       "//chrome/browser/ui/webui/flags:unit_tests",
+      "//chrome/browser/ui/webui/history:unit_tests",
       "//chrome/browser/ui/webui/image:unit_tests",
       "//chrome/browser/ui/webui/metrics_reporter:test_support",
       "//chrome/browser/ui/webui/metrics_reporter:unit_tests",
@@ -8632,6 +8623,7 @@ test("unit_tests") {
       "//components/services/app_service",
       "//components/session_manager/core",
       "//components/session_manager/core:test_support",
+      "//components/session_manager/test:test_support",
       "//components/soda",
       "//components/webapk:proto",
       "//mojo/public/cpp/test_support:test_utils",
@@ -9315,29 +9307,12 @@ test("unit_tests") {
     if (enable_print_preview) {
       sources += [
         "../browser/printing/print_preview_sticky_settings_unittest.cc",
-        "../browser/printing/print_preview_test.cc",
-        "../browser/printing/print_preview_test.h",
         "../browser/printing/print_view_manager_unittest.cc",
-        "../browser/ui/webui/print_preview/extension_printer_handler_unittest.cc",
-        "../browser/ui/webui/print_preview/fake_print_render_frame.cc",
-        "../browser/ui/webui/print_preview/fake_print_render_frame.h",
-        "../browser/ui/webui/print_preview/parse_data_path_unittest.cc",
-        "../browser/ui/webui/print_preview/pdf_printer_handler_unittest.cc",
-        "../browser/ui/webui/print_preview/print_preview_handler_unittest.cc",
-        "../browser/ui/webui/print_preview/print_preview_ui_unittest.cc",
-        "../browser/ui/webui/print_preview/print_preview_ui_untrusted_unittest.cc",
-        "../browser/ui/webui/print_preview/print_preview_utils_unittest.cc",
       ]
-
-      if (is_chromeos) {
-        sources += [
-          "../browser/ui/webui/print_preview/local_printer_handler_chromeos_unittest.cc",
-          "../browser/ui/webui/print_preview/print_preview_handler_chromeos_unittest.cc",
-        ]
-        deps += [ "//components/session_manager/test:test_support" ]
-      } else {
-        sources += [ "../browser/ui/webui/print_preview/local_printer_handler_default_unittest.cc" ]
-      }
+      deps += [
+        "//chrome/browser/printing:test_support",
+        "//chrome/browser/ui/webui/print_preview:unit_tests",
+      ]
     } else {
       sources += [ "../browser/printing/print_view_manager_basic_unittest.cc" ]
     }
@@ -10746,6 +10721,7 @@ if (!is_android && !is_chromeos_device) {
       "//chrome/browser/ui/views/location_bar:interactive_ui_tests",
       "//chrome/browser/ui/views/location_bar/cookie_controls:interactive_ui_tests",
       "//chrome/browser/ui/views/tabs/groups:interactive_ui_tests",
+      "//chrome/browser/ui/webui/print_preview:interactive_ui_tests",
     ]
 
     if (!is_chrome_for_testing) {
@@ -11099,7 +11075,6 @@ if (!is_android && !is_chromeos_device) {
         sources += [
           "../browser/signin/mirror_interactive_uitest.cc",
           "../browser/ui/web_applications/test/system_web_app_interactive_uitest.cc",
-          "../browser/ui/webui/print_preview/print_preview_chromeos_interactive_uitest.cc",
           "//ash/drag_drop/drag_drop_interactive_uitest.cc",
         ]
 
@@ -11441,6 +11416,7 @@ if (!is_android && !is_chromeos_device) {
         deps += [
           ":print_preview_test_support",
           "//chrome/browser/printing:test_support",
+          "//chrome/browser/ui/webui/print_preview",
           "//printing:test_support",
         ]
       }
