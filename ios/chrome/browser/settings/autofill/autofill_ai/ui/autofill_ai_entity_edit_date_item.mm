@@ -32,9 +32,8 @@ const CGFloat kDatePickerPopoverAnchorWidthRatio = 0.25;
 
 #pragma mark - TableViewItem
 
-- (void)configureCell:(TableViewTextEditCell*)cell
-           withStyler:(ChromeTableViewStyler*)styler {
-  [super configureCell:cell withStyler:styler];
+- (void)configureCell:(TableViewTextEditCell*)cell {
+  [super configureCell:cell];
 
   if (self.editingEnabled &&
       (ui::GetDeviceFormFactor() != ui::DEVICE_FORM_FACTOR_TABLET)) {
