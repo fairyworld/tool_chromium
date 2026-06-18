@@ -237,6 +237,7 @@ source_set("impl") {
 
     deps += [
       "//chrome/browser/extensions",
+      "//chrome/browser/ui:ui_features",
       "//chrome/browser/ui/extensions",
     ]
   }

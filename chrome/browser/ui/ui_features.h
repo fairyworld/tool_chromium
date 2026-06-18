@@ -53,14 +53,18 @@ bool IsMenuSimplificationEnabled();
 bool IsTabGroupColorRefreshEnabled();
 bool IsWebuiRefresh2026Enabled();
 
-#if BUILDFLAG(ENABLE_EXTENSIONS)
+#if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
 // Controls how extensions show up in the main menu. When enabled, if the
 // current profile has no extensions, instead of a full extensions submenu, only
 // the "Discover Chrome Extensions" item will be present.
 BASE_DECLARE_FEATURE(kExtensionsCollapseMainMenu);
 
-#endif  // BUILDFLAG(ENABLE_EXTENSIONS)
+// When enabled, newly installed extensions are pinned to the toolbar by
+// default.
+BASE_DECLARE_FEATURE(kExtensionsPinnedByDefault);
+
+#endif  // BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC)
 BASE_DECLARE_FEATURE(kPdfInfoBar);
