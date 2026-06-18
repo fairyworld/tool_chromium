@@ -185,7 +185,7 @@ export class PowerBookmarksListElement extends CrLitElement implements
   private shownBookmarksResizeObserver_?: ResizeObserver;
   private recordCountMetricsOnNextUpdate_: boolean = false;
   private rebuildNavigationElementsTimerId_: number = -1;
-  private expandedFolderIds_: Set<string> = new Set();
+  protected expandedFolderIds_: Set<string> = new Set();
 
   accessor activeFolderPath: BookmarksTreeNode[] = [];
   protected accessor activeSortIndex: number = 0;
@@ -348,7 +348,10 @@ export class PowerBookmarksListElement extends CrLitElement implements
         getAnnouncerInstance().announce(loadTimeData.getStringF(
             'bookmarkFolderCreated', getBookmarkName(bookmark)));
       }
-      this.scrollToBookmark_(bookmark);
+      this.updateComplete.then(async () => {
+        await this.$.list.updateComplete;
+        this.scrollToBookmark_(bookmark);
+      });
     }
     this.updatedElementIds_ = [bookmark.id, parent.id];
   }
