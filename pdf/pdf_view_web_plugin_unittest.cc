@@ -3200,7 +3200,7 @@ TEST_P(PdfViewWebPluginInkTest, LoadV2InkPathsForPageAndUpdateShapeActive) {
       /*active=*/false);
 }
 
-TEST_P(PdfViewWebPluginInkTest, SendThumbnailUpdatesInkThumbnail) {
+TEST_P(PdfViewWebPluginInkTest, SendThumbnail) {
   SetUpWithTrivialInkStrokes();
 
   EXPECT_CALL(*client_ptr_, PostMessage)
@@ -3208,20 +3208,6 @@ TEST_P(PdfViewWebPluginInkTest, SendThumbnailUpdatesInkThumbnail) {
         auto expected = base::test::ParseJsonDict(R"({
             "type": "getThumbnailReply",
             "messageId": "foo",
-            "width": 216,
-            "height": 108,
-        })");
-        EXPECT_THAT(dict, base::test::DictionaryHasValues(expected));
-
-        // Test `dict` contains the image data, but not the exact value.
-        const auto* blob = dict.FindBlob("imageData");
-        ASSERT_TRUE(blob);
-        EXPECT_FALSE(blob->empty());
-      })
-      .WillOnce([](const base::DictValue& dict) {
-        auto expected = base::test::ParseJsonDict(R"({
-            "type": "updateInk2Thumbnail",
-            "pageNumber": 1,
             "width": 216,
             "height": 108,
         })");

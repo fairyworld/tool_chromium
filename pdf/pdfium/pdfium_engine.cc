@@ -710,27 +710,6 @@ void ParamsTransformPageToScreen(unsigned long view_fit_type,
 }
 
 #if BUILDFLAG(ENABLE_PDF_INK2)
-class ScopedPageObjectDeactivator {
- public:
-  explicit ScopedPageObjectDeactivator(
-      std::vector<FPDF_PAGEOBJECT> page_objects)
-      : page_objects_(std::move(page_objects)) {
-    for (FPDF_PAGEOBJECT page_object : page_objects_) {
-      bool result = FPDFPageObj_SetIsActive(page_object, /*active=*/false);
-      CHECK(result);
-    }
-  }
-  ~ScopedPageObjectDeactivator() {
-    for (FPDF_PAGEOBJECT page_object : page_objects_) {
-      bool result = FPDFPageObj_SetIsActive(page_object, /*active=*/true);
-      CHECK(result);
-    }
-  }
-
- private:
-  std::vector<FPDF_PAGEOBJECT> page_objects_;
-};
-
 // TODO(crbug.com/482060888): Remove this once SkData::MakeFromStream() is able
 // to do this itself.
 sk_sp<const SkData> MakeDataAvoidingCopy(SkStreamAsset* stream) {
@@ -5160,11 +5139,6 @@ void PDFiumEngine::RequestThumbnail(int page_index,
   // being progressively painted. Otherwise, wait for progressive painting to
   // finish.
   if (!GetProgressiveIndex(page_index).has_value()) {
-#if BUILDFLAG(ENABLE_PDF_INK2)
-    ScopedPageObjectDeactivator deactivator(
-        GetActiveInkPageObjectsForPage(page_index));
-#endif
-
     pages_[page_index]->RequestThumbnail(device_pixel_ratio,
                                          std::move(send_callback));
     return;
@@ -5655,27 +5629,6 @@ void PDFiumEngine::OnTextOrLinkAreaClick(const gfx::PointF& point,
   }
 
   OnTextOrLinkAreaClickInternal(GetPointData(point), click_count);
-}
-
-std::vector<FPDF_PAGEOBJECT> PDFiumEngine::GetActiveInkPageObjectsForPage(
-    int page_index) const {
-  std::vector<FPDF_PAGEOBJECT> active_page_objects;
-  for (const auto& it : ink_stroke_data_) {
-    const InkStrokeData& datum = it.second;
-    if (datum.page_index != page_index) {
-      continue;
-    }
-
-    for (FPDF_PAGEOBJECT page_object : datum.page_objects) {
-      FPDF_BOOL active = false;
-      bool result = FPDFPageObj_GetIsActive(page_object, &active);
-      CHECK(result);
-      if (active) {
-        active_page_objects.push_back(page_object);
-      }
-    }
-  }
-  return active_page_objects;
 }
 
 int PDFiumEngine::GetNextTextboxId() {

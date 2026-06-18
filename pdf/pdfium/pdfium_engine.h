@@ -1168,9 +1168,6 @@ class PDFiumEngine : public DocumentLoader::Client,
     std::vector<FPDF_PAGEOBJECT> page_objects;
   };
 
-  std::vector<FPDF_PAGEOBJECT> GetActiveInkPageObjectsForPage(
-      int page_index) const;
-
   // Returns the next available textbox ID, avoiding collisions with
   // `existing_textbox_ids_` and handling integer overflow. Adds the returned
   // ID to `existing_textbox_ids_`.

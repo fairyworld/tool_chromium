@@ -3045,7 +3045,7 @@ TEST_P(PDFiumEngineInkDrawTest, LoadedV2InkPathsAndApplyAndDiscardStroke) {
       kPageIndex));
 }
 
-TEST_P(PDFiumEngineInkDrawTest, ThumbnailsDoNotContainStrokes) {
+TEST_P(PDFiumEngineInkDrawTest, ThumbnailsContainStrokes) {
   TestClient client(/*use_skia_renderer=*/GetParam());
   std::unique_ptr<PDFiumEngine> engine =
       InitializeEngine(&client, FILE_PATH_LITERAL("blank.pdf"));
@@ -3105,8 +3105,9 @@ TEST_P(PDFiumEngineInkDrawTest, ThumbnailsDoNotContainStrokes) {
 
     Thumbnail thumbnail = future.Take();
     ASSERT_EQ(kExpectedImageSize, thumbnail.image_size());
-    EXPECT_THAT(thumbnail.GetImageData(),
-                Contains(0xFF).Times(kExpectedWhiteComponentCount));
+    // The thumbnail should now contain the strokes, so it should contain
+    // non-white pixels.
+    EXPECT_THAT(thumbnail.GetImageData(), Contains(testing::Ne(0xFF)));
   }
 }
 

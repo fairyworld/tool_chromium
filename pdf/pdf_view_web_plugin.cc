@@ -3195,13 +3195,6 @@ void PdfViewWebPlugin::SendThumbnail(base::DictValue reply,
   reply.Set("width", thumbnail.image_size().width());
   reply.Set("height", thumbnail.image_size().height());
   client_->PostMessage(std::move(reply));
-
-#if BUILDFLAG(ENABLE_PDF_INK2)
-  if (ink_module_) {
-    ink_module_->GenerateAndSendInkThumbnail(page_index,
-                                             thumbnail.image_size());
-  }
-#endif
 }
 
 #if BUILDFLAG(ENABLE_PDF_INK2)
