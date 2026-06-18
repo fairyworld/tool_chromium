@@ -173,8 +173,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
   generator()->GenerateSuggestion(url, kSupportedTaskTypes,
-                                  future.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future.GetCallback(), kTestNavigationId);
 
   EXPECT_EQ(future.Get(), expected_suggestion);
 }
@@ -225,8 +224,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
   generator()->GenerateSuggestion(url, kSupportedTaskTypes,
-                                  future.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future.GetCallback(), kTestNavigationId);
 
   EXPECT_EQ(future.Get(), std::nullopt);
 }
@@ -272,8 +270,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
   generator()->GenerateSuggestion(url, kSupportedTaskTypes,
-                                  future.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future.GetCallback(), kTestNavigationId);
   EXPECT_EQ(future.Get(), std::nullopt);
 }
 
@@ -322,8 +319,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
   generator()->GenerateSuggestion(url, kSupportedTaskTypes,
-                                  future.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future.GetCallback(), kTestNavigationId);
   EXPECT_TRUE(future.Get().has_value());
 }
 
@@ -372,8 +368,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
   generator()->GenerateSuggestion(url, kSupportedTaskTypes,
-                                  future.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future.GetCallback(), kTestNavigationId);
   EXPECT_TRUE(future.Get().has_value());
 }
 
@@ -416,8 +411,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
   generator()->GenerateSuggestion(url, kSupportedTaskTypes,
-                                  future.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future.GetCallback(), kTestNavigationId);
   EXPECT_EQ(future.Get(), std::nullopt);
 }
 
@@ -467,8 +461,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
   generator()->GenerateSuggestion(url, kSupportedTaskTypes,
-                                  future.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future.GetCallback(), kTestNavigationId);
 
   std::optional<UrlFilterSuggestion> result = future.Get();
   ASSERT_TRUE(result.has_value());
@@ -520,8 +513,7 @@ TEST_F(FilterSuggestionGeneratorTest, GenerateSuggestion_NoMatchingKeys) {
 
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
   generator()->GenerateSuggestion(url, kSupportedTaskTypes,
-                                  future.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future.GetCallback(), kTestNavigationId);
 
   EXPECT_EQ(future.Get(), std::nullopt);
 }
@@ -534,8 +526,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
   generator()->GenerateSuggestion(url, std::vector<std::string>(),
-                                  future.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future.GetCallback(), kTestNavigationId);
 
   EXPECT_EQ(future.Get(), std::nullopt);
 }
@@ -557,8 +548,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
   generator()->GenerateSuggestion(url, kSupportedTaskTypes,
-                                  future.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future.GetCallback(), kTestNavigationId);
 
   EXPECT_EQ(future.Get(), std::nullopt);
 }
@@ -605,8 +595,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
   generator()->GenerateSuggestion(url, kSupportedTaskTypes,
-                                  future.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future.GetCallback(), kTestNavigationId);
 
   EXPECT_EQ(future.Get(), std::nullopt);
 }
@@ -639,8 +628,7 @@ TEST_F(FilterSuggestionGeneratorTest,
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
 
   generator()->GenerateSuggestion(url, kSupportedTaskTypes,
-                                  future.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future.GetCallback(), kTestNavigationId);
 
   ASSERT_FALSE(future.IsReady());
 
@@ -678,8 +666,7 @@ TEST_F(FilterSuggestionGeneratorTest,
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
 
   generator()->GenerateSuggestion(url, kSupportedTaskTypes,
-                                  future.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future.GetCallback(), kTestNavigationId);
 
   ASSERT_FALSE(future.IsReady());
 
@@ -736,8 +723,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
   generator()->GenerateSuggestion(url, std::vector<std::string>{"NON_SHOPPING"},
-                                  future.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future.GetCallback(), kTestNavigationId);
 
   // Should be suppressed (returns nullopt) because message generation failed!
   EXPECT_EQ(future.Get(), std::nullopt);
@@ -777,8 +763,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future1;
   generator()->GenerateSuggestion(url, kSupportedTaskTypes,
-                                  future1.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future1.GetCallback(), kTestNavigationId);
 
   EXPECT_EQ(future1.Get(), std::nullopt);
 
@@ -805,8 +790,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future2;
   generator()->GenerateSuggestion(url, kSupportedTaskTypes,
-                                  future2.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future2.GetCallback(), kTestNavigationId);
 
   EXPECT_TRUE(future2.Get().has_value());
 }
@@ -864,8 +848,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future1;
   generator()->GenerateSuggestion(url, kSupportedTaskTypes,
-                                  future1.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future1.GetCallback(), kTestNavigationId);
 
   EXPECT_TRUE(future1.Get().has_value());
 }
@@ -892,8 +875,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
   generator()->GenerateSuggestion(url, kSupportedTaskTypes,
-                                  future.GetCallback(), kTestNavigationId,
-                                  kTestDomain);
+                                  future.GetCallback(), kTestNavigationId);
   EXPECT_EQ(future.Get(), std::nullopt);
 }
 

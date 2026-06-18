@@ -60,8 +60,7 @@ class FilterSuggestionGenerator {
       const GURL& url,
       std::vector<std::string> supported_task_types,
       base::OnceCallback<void(std::optional<UrlFilterSuggestion>)> callback,
-      int64_t navigation_id,
-      std::string_view domain);
+      int64_t navigation_id);
 
  private:
   // See documentation of `GenerateSuggestion()` for more details.
@@ -71,7 +70,6 @@ class FilterSuggestionGenerator {
           success_callback,
       base::ScopedClosureRunner failure_callback,
       int64_t navigation_id,
-      std::string_view domain,
       std::vector<FilterAnnotation> filter_annotations);
   void OnFilterSuggestionCandidatesFetched(
       const GURL& url,
@@ -80,7 +78,6 @@ class FilterSuggestionGenerator {
       base::ScopedClosureRunner failure_callback,
       std::vector<FilterAnnotation> annotations,
       int64_t navigation_id,
-      std::string_view domain,
       std::optional<std::vector<FilterSuggestionCandidate>> candidates);
 
   // Loads the cue configuration from file or feature flag.

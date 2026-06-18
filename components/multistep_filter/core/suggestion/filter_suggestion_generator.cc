@@ -41,37 +41,37 @@ constexpr char16_t kTestingFallbackMessage[] = u"Continue where you left off?";
 
 void LogServerRequestSent(MultistepFilterLogRouter* log_router,
                           int64_t navigation_id,
-                          std::string_view domain,
+                          std::string_view host,
                           size_t annotation_count) {
   MULTISTEP_FILTER_LOG(log_router, navigation_id,
-                       LogEventType::kServerRequestSent, domain)
+                       LogEventType::kServerRequestSent, host)
       << LogDetail{"annotation_count", static_cast<int>(annotation_count)};
 }
 
 void LogServerResponseReceived(MultistepFilterLogRouter* log_router,
                                int64_t navigation_id,
-                               std::string_view domain,
+                               std::string_view host,
                                size_t candidate_count) {
   MULTISTEP_FILTER_LOG(log_router, navigation_id,
-                       LogEventType::kServerResponseReceived, domain)
+                       LogEventType::kServerResponseReceived, host)
       << LogDetail{"candidate_count", static_cast<int>(candidate_count)};
 }
 
 void LogSuggestionSuppressed(MultistepFilterLogRouter* log_router,
                              int64_t navigation_id,
-                             std::string_view domain,
+                             std::string_view host,
                              std::string_view reason) {
   MULTISTEP_FILTER_LOG(log_router, navigation_id,
-                       LogEventType::kSuggestionSuppressed, domain)
+                       LogEventType::kSuggestionSuppressed, host)
       << LogDetail{"reason", std::string(reason)};
 }
 
 void LogSuggestionGenerated(MultistepFilterLogRouter* log_router,
                             int64_t navigation_id,
-                            std::string_view domain,
+                            std::string_view host,
                             const UrlFilterSuggestion& suggestion) {
   MULTISTEP_FILTER_LOG(log_router, navigation_id,
-                       LogEventType::kSuggestionGenerated, domain)
+                       LogEventType::kSuggestionGenerated, host)
       << LogDetail{"valid", true}
       << LogDetail{"filters_count",
                    static_cast<int>(suggestion.attribute_ui_labels.size())}
@@ -81,9 +81,9 @@ void LogSuggestionGenerated(MultistepFilterLogRouter* log_router,
 
 void LogNoRelevantAnnotations(MultistepFilterLogRouter* log_router,
                               int64_t navigation_id,
-                              std::string_view domain) {
+                              std::string_view host) {
   MULTISTEP_FILTER_LOG(log_router, navigation_id,
-                       LogEventType::kNoRelevantAnnotations, domain);
+                       LogEventType::kNoRelevantAnnotations, host);
 }
 
 }  // namespace
@@ -105,8 +105,7 @@ void FilterSuggestionGenerator::GenerateSuggestion(
     const GURL& url,
     std::vector<std::string> supported_task_types,
     base::OnceCallback<void(std::optional<UrlFilterSuggestion>)> callback,
-    int64_t navigation_id,
-    std::string_view domain) {
+    int64_t navigation_id) {
   auto split_callback = base::SplitOnceCallback(std::move(callback));
   base::ScopedClosureRunner failure_callback(
       base::BindOnce(std::move(split_callback.first), std::nullopt));
@@ -120,7 +119,7 @@ void FilterSuggestionGenerator::GenerateSuggestion(
       base::BindOnce(
           &FilterSuggestionGenerator::OnAllAnnotationsFetched,
           weak_ptr_factory_.GetWeakPtr(), url, std::move(split_callback.second),
-          std::move(failure_callback), navigation_id, std::string(domain)),
+          std::move(failure_callback), navigation_id),
       kMultistepFilterSuggestionMaxCandidates.Get(), min_creation_time);
 }
 
@@ -130,11 +129,10 @@ void FilterSuggestionGenerator::OnAllAnnotationsFetched(
         success_callback,
     base::ScopedClosureRunner failure_callback,
     int64_t navigation_id,
-    std::string_view domain,
     std::vector<FilterAnnotation> all_annotations) {
 
   if (all_annotations.empty()) {
-    LogNoRelevantAnnotations(log_router_, navigation_id, domain);
+    LogNoRelevantAnnotations(log_router_, navigation_id, url.GetHost());
     return;
   }
 
@@ -144,12 +142,12 @@ void FilterSuggestionGenerator::OnAllAnnotationsFetched(
       all_annotations.front().source_host == url.GetHost() &&
       base::Time::Now() - all_annotations.front().creation_timestamp <
           kSameDomainSuggestionSuppressionDuration.Get()) {
-    LogSuggestionSuppressed(log_router_, navigation_id, domain,
+    LogSuggestionSuppressed(log_router_, navigation_id, url.GetHost(),
                             "recent_extraction");
     return;
   }
 
-  LogServerRequestSent(log_router_, navigation_id, domain,
+  LogServerRequestSent(log_router_, navigation_id, url.GetHost(),
                        all_annotations.size());
 
   base::span<const FilterAnnotation> all_annotations_span = all_annotations;
@@ -159,7 +157,7 @@ void FilterSuggestionGenerator::OnAllAnnotationsFetched(
           &FilterSuggestionGenerator::OnFilterSuggestionCandidatesFetched,
           weak_ptr_factory_.GetWeakPtr(), url, std::move(success_callback),
           std::move(failure_callback), std::move(all_annotations),
-          navigation_id, std::string(domain)),
+          navigation_id),
       navigation_id);
 }
 
@@ -170,13 +168,12 @@ void FilterSuggestionGenerator::OnFilterSuggestionCandidatesFetched(
     base::ScopedClosureRunner failure_callback,
     std::vector<FilterAnnotation> annotations,
     int64_t navigation_id,
-    std::string_view domain,
     std::optional<std::vector<FilterSuggestionCandidate>> candidates) {
-  LogServerResponseReceived(log_router_, navigation_id, domain,
+  LogServerResponseReceived(log_router_, navigation_id, url.GetHost(),
                             candidates ? candidates->size() : 0);
 
   if (!candidates || candidates->empty()) {
-    LogSuggestionSuppressed(log_router_, navigation_id, domain,
+    LogSuggestionSuppressed(log_router_, navigation_id, url.GetHost(),
                             !candidates ? "fetch_failed" : "no_candidates");
     return;
   }
@@ -186,14 +183,14 @@ void FilterSuggestionGenerator::OnFilterSuggestionCandidatesFetched(
   FilterSuggestionCandidate& candidate = candidates->front();
 
   if (IsUrlSubsumedBy(candidate.navigation_url, url)) {
-    LogSuggestionSuppressed(log_router_, navigation_id, domain, "subsumed");
+    LogSuggestionSuppressed(log_router_, navigation_id, url.GetHost(), "subsumed");
     return;
   }
 
   auto matching_annotation_it = std::ranges::find(
       annotations, candidate.filter_annotation_id, &FilterAnnotation::id);
   if (matching_annotation_it == annotations.end()) {
-    LogSuggestionSuppressed(log_router_, navigation_id, domain,
+    LogSuggestionSuppressed(log_router_, navigation_id, url.GetHost(),
                             "annotation_not_found");
     return;
   }
@@ -213,7 +210,7 @@ void FilterSuggestionGenerator::OnFilterSuggestionCandidatesFetched(
   }
 
   if (attribute_ui_labels.size() <= 1) {
-    LogSuggestionSuppressed(log_router_, navigation_id, domain,
+    LogSuggestionSuppressed(log_router_, navigation_id, url.GetHost(),
                             "too_few_attributes");
     return;
   }
@@ -227,7 +224,7 @@ void FilterSuggestionGenerator::OnFilterSuggestionCandidatesFetched(
     message = GenerateMessageWithConfig(matching_annotation_it->task_type,
                                         attribute_ui_labels, cue_config_);
     if (!message || base::TrimWhitespace(*message, base::TRIM_ALL).empty()) {
-      LogSuggestionSuppressed(log_router_, navigation_id, domain,
+      LogSuggestionSuppressed(log_router_, navigation_id, url.GetHost(),
                               "message_generation_failed");
       return;
     }
@@ -244,11 +241,11 @@ void FilterSuggestionGenerator::OnFilterSuggestionCandidatesFetched(
       .extraction_timestamp = matching_annotation_it->creation_timestamp,
       .attribute_ui_labels = std::move(attribute_ui_labels),
       .triggering_navigation_id = navigation_id,
-      .triggering_domain = std::string(domain),
+      .triggering_domain = url.GetHost(),
       .triggering_host = url.GetHost(),
       .task_type = std::move(matching_annotation_it->task_type),
       .suggestion_message = std::move(*message)});
-  LogSuggestionGenerated(log_router_, navigation_id, domain, suggestion);
+  LogSuggestionGenerated(log_router_, navigation_id, url.GetHost(), suggestion);
   std::move(success_callback).Run(std::move(suggestion));
 }
 

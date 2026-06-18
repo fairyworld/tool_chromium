@@ -51,7 +51,6 @@ source_set("core") {
     "//url",
   ]
   public_deps = [
-    ":util",
     "//components/multistep_filter/core/annotation_index",
     "//components/multistep_filter/core/data_models",
     "//components/multistep_filter/core/extraction",
