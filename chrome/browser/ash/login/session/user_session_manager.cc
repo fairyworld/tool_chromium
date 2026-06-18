@@ -2497,6 +2497,10 @@ void UserSessionManager::DoBrowserLaunchInternal(Profile* profile,
     hats_notification_controller_ =
         new HatsNotificationController(profile, kHatsGeneralSurvey);
   } else if (HatsNotificationController::ShouldShowSurveyToProfile(
+                 profile, kHatsSlowAndLaggyDeepDive)) {
+    hats_notification_controller_ =
+        new HatsNotificationController(profile, kHatsSlowAndLaggyDeepDive);
+  } else if (HatsNotificationController::ShouldShowSurveyToProfile(
                  profile, kHatsEntSurvey)) {
     hats_notification_controller_ =
         new HatsNotificationController(profile, kHatsEntSurvey);

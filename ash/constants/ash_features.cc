@@ -2171,6 +2171,10 @@ BASE_FEATURE(kHappinessTrackingLauncherAppsNeeding,
 // Enables the Happiness Tracking System for the Office integration.
 BASE_FEATURE(kHappinessTrackingOffice, base::FEATURE_DISABLED_BY_DEFAULT);
 
+// Enables the Happiness Tracking System for the slow and laggy survery.
+BASE_FEATURE(kHappinessTrackingSystemSlowAndLaggyDeepDive,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
 // Enables new UX for files policy restrictions on ChromeOS.
 BASE_FEATURE(kNewFilesPolicyUX, base::FEATURE_ENABLED_BY_DEFAULT);
 

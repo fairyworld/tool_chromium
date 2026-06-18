@@ -1871,6 +1871,7 @@ and mapped to the variant by `StatisticNameToMachineStatisticVariant()` -->
     <variant name="GeneralWithLocaleForTest"/>
     <variant name="Performance"/>
     <variant name="Peripherals"/>
+    <variant name="SlowAndLaggyDeepDive"/>
     <variant name="Stability"/>
   </token>
 </histogram>

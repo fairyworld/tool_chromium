@@ -3768,6 +3768,16 @@ inline constexpr char kHatsStabilityDeviceIsSelected[] =
     "hats_stability_device_is_selected";
 
 // An int64 pref. This is the timestamp, microseconds after epoch, that
+// indicates the end of the slow and laggy deep dive HaTS survey.
+inline constexpr char kHatsSlowAndLaggyDeepDiveSurveyCycleEndTs[] =
+    "hats_slow_and_laggy_deep_dive_cycle_end_timestamp";
+
+// A boolean pref. Indicates if the device is selected for the slow and laggy
+// deep dive HaTS survey.
+inline constexpr char kHatsSlowAndLaggyDeepDiveSurveyIsSelected[] =
+    "hats_slow_and_laggy_deep_dive_device_is_selected";
+
+// An int64 pref. This is the timestamp, microseconds after epoch, that
 // indicates the end of the most recent survey cycle (general survey).
 inline constexpr char kHatsSurveyCycleEndTimestamp[] =
     "hats_survey_cycle_end_timestamp";
