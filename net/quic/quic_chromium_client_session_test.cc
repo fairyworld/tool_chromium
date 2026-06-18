@@ -2930,6 +2930,35 @@ TEST_P(QuicChromiumClientSessionTest,
       MIGRATION_STATUS_ALREADY_MIGRATED, 1);
 }
 
+TEST_P(QuicChromiumClientSessionTest, NoMigrationForProxiedSessionOnHandshake) {
+  ProxyChain proxy_chain(ProxyServer::SCHEME_HTTPS,
+                         HostPortPair("proxy.example.com", 443));
+  session_key_ = QuicSessionKey(
+      kServerHostname, kServerPort, PRIVACY_MODE_DISABLED, proxy_chain,
+      SessionUsage::kDestination, SocketTag(), NetworkAnonymizationKey(),
+      SecureDnsPolicy::kAllow, /*require_dns_https_alpn=*/false,
+      /*disable_cert_verification_network_fetches=*/false,
+      handles::kInvalidNetworkHandle);
+
+  // Initialize with kInvalidNetworkHandle so the test socket gets bound to it
+  // (simulating QuicProxyDatagramClientSocket's behavior).
+  default_network_ = handles::kInvalidNetworkHandle;
+  Initialize(/*migrate_session_on_network_change_v2=*/true);
+
+  // Now set the session's default_network_ to a valid handle, simulating the
+  // physical user's network. This creates the exact mismatch condition for the
+  // bug.
+  QuicChromiumClientSessionPeer::SetDefaultNetwork(
+      session_.get(), handles::kInvalidNetworkHandle + 1);
+
+  QuicChromiumClientSessionPeer::OnCryptoHandshakeComplete(session_.get());
+
+  // The timer MUST NOT be running for a proxied session.
+  EXPECT_FALSE(
+      QuicChromiumClientSessionPeer::IsMigrateBackToDefaultNetworkTimerRunning(
+          session_.get()));
+}
+
 TEST_P(QuicChromiumClientSessionTest, GoingAwaySessionDoesNotKeepAlive) {
   MockQuicData quic_data(version_);
   quic_data.AddWrite(SYNCHRONOUS, client_maker_.MakeInitialSettingsPacket(1));
