@@ -844,6 +844,7 @@ void RenderFrameHostManager::InitRoot(
               // hashes of hosts for insecure request upgrades
               std::vector<uint32_t>(),
               false /* has_potentially_trustworthy_unique_origin */,
+              false /* is_secure_context_root */,
               false /* has_active_user_gesture */,
               false /* has_received_user_gesture_before_nav */,
               false /* is_ad_frame */),
@@ -899,6 +900,7 @@ void RenderFrameHostManager::InitChild(
               // hashes of hosts for insecure request upgrades
               std::vector<uint32_t>(),
               false /* has_potentially_trustworthy_unique_origin */,
+              false /* is_secure_context_root */,
               false /* has_active_user_gesture */,
               false /* has_received_user_gesture_before_nav */,
               false /* is_ad_frame */),

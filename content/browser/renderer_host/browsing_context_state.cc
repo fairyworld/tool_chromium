@@ -371,6 +371,25 @@ bool BrowsingContextState::IsAdFrame() const {
   return replication_state_->is_ad_frame;
 }
 
+void BrowsingContextState::SetIsSecureContextRoot(bool is_secure_context_root) {
+  if (is_secure_context_root == replication_state_->is_secure_context_root) {
+    return;
+  }
+
+  replication_state_->is_secure_context_root = is_secure_context_root;
+  {
+    TRACE_EVENT("navigation",
+                "BrowsingContextState::SetIsSecureContextRoot broadcast",
+                "is_secure_context_root", is_secure_context_root);
+    ExecuteRemoteFramesBroadcastMethod(
+        [is_secure_context_root](RenderFrameProxyHost* proxy) {
+          proxy->GetAssociatedRemoteFrame()->SetReplicatedIsSecureContextRoot(
+              is_secure_context_root);
+        },
+        /*group_to_skip=*/nullptr, /*outer_delegate_proxy=*/nullptr);
+  }
+}
+
 void BrowsingContextState::ActiveFrameCountIsZero(
     SiteInstanceGroup* site_instance_group) {
   CheckIfSiteInstanceGroupIsUnused(site_instance_group, kActiveFrameCount);

@@ -21,6 +21,7 @@
 #include "services/network/public/mojom/referrer_policy.mojom-shared.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "third_party/blink/public/common/features.h"
 #include "url/url_constants.h"
 
 namespace content {
@@ -195,7 +196,8 @@ TEST_F(NavigationPolicyContainerBuilderTest, DefaultFinalPolicies) {
   MockNavigationHandle navigation_handle(GURL(), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   PolicyContainerPolicies expected_policies;
   EXPECT_EQ(builder.FinalPolicies(), expected_policies);
@@ -225,7 +227,8 @@ TEST_F(NavigationPolicyContainerBuilderTest, FinalPoliciesNormalUrl) {
   MockNavigationHandle navigation_handle(GURL("https://foo.test"), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies(), delivered_policies);
 }
@@ -242,7 +245,8 @@ TEST_F(NavigationPolicyContainerBuilderTest,
   MockNavigationHandle navigation_handle(AboutBlankUrl(), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies(), delivered_policies);
 }
@@ -256,7 +260,8 @@ TEST_F(NavigationPolicyContainerBuilderTest, MHTMLSandboxFlags) {
   builder.ComputePolicies(&navigation_handle,
                           /*is_inside_mhtml=*/true,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies().sandbox_flags,
             // MHTML archives receive all sandbox flags except these:
@@ -277,7 +282,8 @@ TEST_F(NavigationPolicyContainerBuilderTest,
   builder.ComputePolicies(&navigation_handle,
                           /*is_inside_mhtml=*/true,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies().sandbox_flags,
             // When kMHTML_Improvements is enabled, MHTML archives receive all
@@ -301,7 +307,8 @@ TEST_F(NavigationPolicyContainerBuilderTest,
   MockNavigationHandle navigation_handle(AboutBlankUrl(), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies(), delivered_policies);
 }
@@ -346,7 +353,8 @@ TEST_F(NavigationPolicyContainerBuilderTest,
   MockNavigationHandle navigation_handle(GURL("https://foo.test"), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
   EXPECT_EQ(builder.FinalPolicies(), expected_policies);
 
   builder.ComputePoliciesForError();
@@ -364,7 +372,8 @@ TEST_F(NavigationPolicyContainerBuilderTest,
   MockNavigationHandle navigation_handle(GURL("https://foo.test"), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
   EXPECT_THAT(builder.FinalPolicies().content_security_policies, SizeIs(1));
 
   builder.ComputePoliciesForError();
@@ -419,7 +428,8 @@ TEST_F(NavigationPolicyContainerBuilderTest,
   MockNavigationHandle navigation_handle(AboutSrcdocUrl(), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies(), parent_policies);
 }
@@ -440,7 +450,8 @@ TEST_F(NavigationPolicyContainerBuilderTest,
   MockNavigationHandle navigation_handle(GURL(), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies(), delivered_policies);
 }
@@ -461,7 +472,8 @@ TEST_F(NavigationPolicyContainerBuilderTest,
   MockNavigationHandle navigation_handle(GURL(), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies(), delivered_policies);
 }
@@ -484,7 +496,8 @@ TEST_F(NavigationPolicyContainerBuilderTest,
   MockNavigationHandle navigation_handle(GURL("https://foo.test"), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_FALSE(builder.FinalPolicies().is_web_secure_context);
 }
@@ -511,7 +524,8 @@ TEST_F(NavigationPolicyContainerBuilderTest,
   MockNavigationHandle navigation_handle(GURL("http://foo.test"), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies(), delivered_policies);
 }
@@ -538,9 +552,66 @@ TEST_F(NavigationPolicyContainerBuilderTest,
   MockNavigationHandle navigation_handle(GURL("https://foo.test"), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies(), delivered_policies);
+}
+
+// When `ComputePolicies()` is called with `is_secure_context_root=true`,
+// the navigating frame's `is_web_secure_context` is decided solely by its
+// own origin's trustworthiness, ignoring the parent's secure-context status.
+// Used by callers at embedder-identified inheritance boundaries (e.g.,
+// MIME-handler OOPIFs) where the frame acts as an independent security
+// boundary that does not inherit an insecure state from its embedder.
+TEST_F(NavigationPolicyContainerBuilderTest, IsSecureContextRootOverride) {
+  PolicyContainerPolicies parent_policies = MakeTestPolicies();
+  parent_policies.is_web_secure_context = false;
+
+  TestRenderFrameHost* parent = contents()->GetPrimaryMainFrame();
+  parent->SetPolicyContainerHost(NewHost(parent_policies.Clone()));
+
+  NavigationPolicyContainerBuilder builder(
+      parent, nullptr, kInvalidChildProcessUniqueId, nullptr, nullptr);
+
+  // The real parent's policies are still visible - the override only changes
+  // how the final secure-context bit is computed, not what the builder sees
+  // as parent.
+  EXPECT_THAT(builder.ParentPolicies(), Pointee(Eq(ByRef(parent_policies))));
+
+  builder.SetIsOriginPotentiallyTrustworthy(true);
+  MockNavigationHandle navigation_handle(GURL("https://foo.test"), nullptr);
+  builder.ComputePolicies(&navigation_handle, false,
+                          network::mojom::WebSandboxFlags::kNone,
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/true);
+
+  EXPECT_TRUE(builder.FinalPolicies().is_web_secure_context);
+}
+
+// Verifies the secure-context root flag cannot turn an untrustworthy origin
+// (e.g. an http: URL) into a secure context. The flag only stops a frame
+// from inheriting its parent's secure-context status; it never grants secure
+// context on its own.
+TEST_F(NavigationPolicyContainerBuilderTest,
+       IsSecureContextRootDoesNotOverrideUntrustworthyOrigin) {
+  PolicyContainerPolicies parent_policies = MakeTestPolicies();
+  parent_policies.is_web_secure_context = true;
+
+  TestRenderFrameHost* parent = contents()->GetPrimaryMainFrame();
+  parent->SetPolicyContainerHost(NewHost(parent_policies.Clone()));
+
+  NavigationPolicyContainerBuilder builder(
+      parent, nullptr, kInvalidChildProcessUniqueId, nullptr, nullptr);
+
+  builder.SetIsOriginPotentiallyTrustworthy(false);
+  MockNavigationHandle navigation_handle(GURL("http://foo.test"), nullptr);
+  builder.ComputePolicies(&navigation_handle, false,
+                          network::mojom::WebSandboxFlags::kNone,
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/true);
+
+  EXPECT_FALSE(builder.FinalPolicies().is_web_secure_context);
 }
 
 // Verifies that when the the URL of the document to commit is `about:srcdoc`,
@@ -562,7 +633,8 @@ TEST_F(NavigationPolicyContainerBuilderTest,
   MockNavigationHandle navigation_handle(AboutSrcdocUrl(), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   parent_policies.content_security_policies.push_back(std::move(test_csp));
   EXPECT_EQ(builder.FinalPolicies(), parent_policies);
@@ -575,10 +647,11 @@ TEST_F(NavigationPolicyContainerBuilderTest, ComputePoliciesTwiceDCHECK) {
   MockNavigationHandle navigation_handle(GURL("https://foo.test"), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
   EXPECT_DCHECK_DEATH(builder.ComputePolicies(
       &navigation_handle, false, network::mojom::WebSandboxFlags::kNone,
-      /*is_credentialless=*/false));
+      /*is_credentialless=*/false, /*is_secure_context_root=*/false));
 }
 
 // Calling ComputePolicies() followed by ComputePoliciesForError() is supported.
@@ -588,7 +661,8 @@ TEST_F(NavigationPolicyContainerBuilderTest, ComputePoliciesThenError) {
   MockNavigationHandle navigation_handle(GURL("https://foo.test"), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
   builder.ComputePoliciesForError();
 }
 
@@ -607,7 +681,8 @@ TEST_F(NavigationPolicyContainerBuilderTest,
   MockNavigationHandle navigation_handle(GURL("https://foo.test"), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
   EXPECT_THAT(builder.ParentPolicies(), Pointee(Eq(ByRef(parent_policies))));
 
   builder.ComputePoliciesForError();
@@ -628,7 +703,8 @@ TEST_F(NavigationPolicyContainerBuilderTest,
   MockNavigationHandle navigation_handle(GURL("https://foo.test"), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
   EXPECT_EQ(builder.FinalPolicies(), PolicyContainerPolicies());
 
   builder.ResetForCrossDocumentRestart();
@@ -637,7 +713,8 @@ TEST_F(NavigationPolicyContainerBuilderTest,
   navigation_handle.set_url(AboutSrcdocUrl());
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
   EXPECT_EQ(builder.FinalPolicies(), parent_policies);
 }
 

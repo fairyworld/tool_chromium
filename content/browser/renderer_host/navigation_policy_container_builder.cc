@@ -222,11 +222,13 @@ void NavigationPolicyContainerBuilder::ComputePoliciesForError() {
   DCHECK(HasComputedPolicies());
 }
 
-void NavigationPolicyContainerBuilder::ComputeIsWebSecureContext() {
+void NavigationPolicyContainerBuilder::ComputeIsWebSecureContext(
+    bool is_secure_context_root) {
   DCHECK(!HasComputedPolicies());
 
-  if (!parent_policies_) {
-    // No parent. Only the trustworthiness of the origin matters.
+  if (!parent_policies_ || is_secure_context_root) {
+    // No parent, or the new document is a secure-context inheritance root.
+    // Only the trustworthiness of the origin matters.
     return;
   }
 
@@ -362,9 +364,10 @@ void NavigationPolicyContainerBuilder::ComputePolicies(
     NavigationHandle* navigation_handle,
     bool is_inside_mhtml,
     network::mojom::WebSandboxFlags frame_sandbox_flags,
-    bool is_credentialless) {
+    bool is_credentialless,
+    bool is_secure_context_root) {
   DCHECK(!HasComputedPolicies());
-  ComputeIsWebSecureContext();
+  ComputeIsWebSecureContext(is_secure_context_root);
   SetFinalPolicies(ComputeFinalPolicies(navigation_handle, is_inside_mhtml,
                                         frame_sandbox_flags,
                                         is_credentialless));

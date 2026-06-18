@@ -32,7 +32,9 @@
 #include "content/browser/renderer_host/render_view_host_impl.h"
 #include "content/common/navigation_params_utils.h"
 #include "content/public/browser/browser_thread.h"
+#include "content/public/browser/content_browser_client.h"
 #include "content/public/browser/site_isolation_policy.h"
+#include "content/public/common/content_client.h"
 #include "content/public/common/content_features.h"
 #include "services/network/public/cpp/web_sandbox_flags.h"
 #include "services/network/public/mojom/web_sandbox_flags.mojom-shared.h"
@@ -852,6 +854,13 @@ bool FrameTreeNode::AreAncestorsSecure() {
     if (!network::IsOriginPotentiallyTrustworthy(
             frame->GetLastCommittedOrigin())) {
       return false;
+    }
+    // Stop walking at an embedder-identified secure-context root; see
+    // `ContentBrowserClient::IsSecureContextRoot()`.
+    if (GetContentClient()->browser()->IsSecureContextRoot(
+            frame->GetParent(), frame->GetFrameTreeNodeId(),
+            frame->GetLastCommittedURL())) {
+      return true;
     }
     frame = frame->GetParent();
   }

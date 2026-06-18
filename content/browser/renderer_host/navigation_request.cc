@@ -1514,7 +1514,8 @@ std::unique_ptr<NavigationRequest> NavigationRequest::CreateRendererInitiated(
           /*commit_target_frame_token=*/std::nullopt,
           /*is_initial_webui=*/false,
           /*isolated_app_policy=*/std::nullopt,
-          /*internal_scroll_to_text_fragment=*/std::nullopt);
+          /*internal_scroll_to_text_fragment=*/std::nullopt,
+          /*is_secure_context_root=*/false);
 #if !BUILDFLAG(IS_ANDROID)
   CHECK(!GetContentClient()->browser()->IsInitialWebUIURL(common_params->url));
 #endif
@@ -1681,7 +1682,8 @@ NavigationRequest::CreateForSynchronousRendererCommit(
           /*commit_target_frame_token=*/std::nullopt,
           /*is_initial_webui=*/false,
           /*isolated_app_policy=*/std::nullopt,
-          /*internal_scroll_to_text_fragment=*/std::nullopt);
+          /*internal_scroll_to_text_fragment=*/std::nullopt,
+          /*is_secure_context_root=*/false);
   blink::mojom::BeginNavigationParamsPtr begin_params =
       blink::mojom::BeginNavigationParams::New();
   std::unique_ptr<NavigationRequest> navigation_request(new NavigationRequest(
@@ -11259,9 +11261,15 @@ void NavigationRequest::ComputePoliciesToCommit() {
   CHECK(!HasCommitted());
   CHECK(!IsErrorPage());
 
+  // Computed here, at commit time, so the final (post-redirect) `url` is used
+  // and error-page commits (`ComputePoliciesToCommitForError()`) are excluded.
+  commit_params_->is_secure_context_root =
+      GetContentClient()->browser()->IsSecureContextRoot(
+          GetParentFrame(), GetFrameTreeNodeId(), url);
+
   policy_container_builder_->ComputePolicies(
       this, IsMhtmlOrSubframe(), commit_params_->frame_policy.sandbox_flags,
-      is_credentialless());
+      is_credentialless(), commit_params_->is_secure_context_root);
 }
 
 void NavigationRequest::ComputePoliciesToCommitForError() {

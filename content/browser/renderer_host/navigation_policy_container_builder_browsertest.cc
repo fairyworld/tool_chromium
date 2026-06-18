@@ -200,7 +200,8 @@ IN_PROC_BROWSER_TEST_F(NavigationPolicyContainerBuilderBrowserTest,
   MockNavigationHandle navigation_handle(GURL(), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   // This must be called on a task runner, hence the need for this test to be
   // a browser test and not a simple unit test.
@@ -258,7 +259,8 @@ IN_PROC_BROWSER_TEST_F(NavigationPolicyContainerBuilderBrowserTest,
   MockNavigationHandle navigation_handle(AboutBlankUrl(), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies(), history_policies);
 }
@@ -305,7 +307,8 @@ IN_PROC_BROWSER_TEST_F(NavigationPolicyContainerBuilderBrowserTest,
   MockNavigationHandle navigation_handle(AboutSrcdocUrl(), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies(), history_policies);
 }
@@ -352,7 +355,8 @@ IN_PROC_BROWSER_TEST_F(NavigationPolicyContainerBuilderBrowserTest,
   MockNavigationHandle navigation_handle(AboutBlankUrl(), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
   EXPECT_THAT(builder.HistoryPolicies(), Pointee(Eq(ByRef(history_policies))));
 
   builder.ComputePoliciesForError();
@@ -450,7 +454,8 @@ IN_PROC_BROWSER_TEST_F(NavigationPolicyContainerBuilderBrowserTest,
   MockNavigationHandle navigation_handle(GURL("http://foo.test"), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies(), PolicyContainerPolicies());
 
@@ -460,7 +465,8 @@ IN_PROC_BROWSER_TEST_F(NavigationPolicyContainerBuilderBrowserTest,
   navigation_handle.set_url(AboutBlankUrl());
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies(), history_policies);
 }
@@ -504,7 +510,8 @@ IN_PROC_BROWSER_TEST_F(NavigationPolicyContainerBuilderBrowserTest,
   MockNavigationHandle navigation_handle(AboutBlankUrl(), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies(), initiator_policies);
 }
@@ -528,7 +535,8 @@ IN_PROC_BROWSER_TEST_F(NavigationPolicyContainerBuilderBrowserTest,
       nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies(), initiator_policies);
 }
@@ -554,7 +562,8 @@ IN_PROC_BROWSER_TEST_F(NavigationPolicyContainerBuilderBrowserTest,
   MockNavigationHandle navigation_handle(AboutBlankUrl(), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   initiator_policies.content_security_policies.push_back(std::move(test_csp));
   EXPECT_EQ(builder.FinalPolicies(), initiator_policies);
@@ -580,7 +589,8 @@ IN_PROC_BROWSER_TEST_F(NavigationPolicyContainerBuilderBrowserTest,
   MockNavigationHandle navigation_handle(GURL("https://foo.test"), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
   EXPECT_THAT(builder.InitiatorPolicies(),
               Pointee(Eq(ByRef(initiator_policies))));
 
@@ -604,7 +614,8 @@ IN_PROC_BROWSER_TEST_F(NavigationPolicyContainerBuilderBrowserTest,
   MockNavigationHandle navigation_handle(GURL("https://foo.test"), nullptr);
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
   EXPECT_EQ(builder.FinalPolicies(), PolicyContainerPolicies());
 
   builder.ResetForCrossDocumentRestart();
@@ -614,7 +625,8 @@ IN_PROC_BROWSER_TEST_F(NavigationPolicyContainerBuilderBrowserTest,
   navigation_handle.set_url(AboutBlankUrl());
   builder.ComputePolicies(&navigation_handle, false,
                           network::mojom::WebSandboxFlags::kNone,
-                          /*is_credentialless=*/false);
+                          /*is_credentialless=*/false,
+                          /*is_secure_context_root=*/false);
 
   EXPECT_EQ(builder.FinalPolicies(),
             initiator->policy_container_host()->policies());

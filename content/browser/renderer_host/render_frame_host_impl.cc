@@ -16474,6 +16474,16 @@ void RenderFrameHostImpl::DidCommitNewDocument(
   CHECK(!navigation_request->IsSameDocument());
   CHECK(!navigation_request->IsPageActivation());
 
+  // Replicate the browser-authoritative secure-context-root bit so
+  // descendants' Blink ancestor walks can consult it. The browser is
+  // authoritative because the renderer cannot independently determine
+  // whether a frame is a MIME handler (which requires browser-side state).
+  // The value was already computed at commit time in
+  // `ComputePoliciesToCommit()`; error commits never set it and so are
+  // correctly false.
+  browsing_context_state()->SetIsSecureContextRoot(
+      navigation_request->commit_params().is_secure_context_root);
+
   const GURL& request_url = navigation_request->common_params().url;
   if (request_url.IsAboutBlank() || request_url.IsAboutSrcdoc()) {
     const std::optional<::GURL>& initiator_base_url =

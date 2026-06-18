@@ -4769,7 +4769,8 @@ NavigationControllerImpl::CreateNavigationRequestFromLoadParams(
 #endif
           /*permissions_policy_override=*/std::nullopt,
           /*internal_scroll_to_text_fragment=*/
-          params.internal_scroll_to_text_fragment);
+          params.internal_scroll_to_text_fragment,
+          /*is_secure_context_root=*/false);
 
   // internal_scroll_to_text_fragment should only be set for browser-initiated
   // navigations.

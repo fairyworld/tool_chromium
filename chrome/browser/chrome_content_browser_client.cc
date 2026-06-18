@@ -8819,6 +8819,28 @@ ChromeContentBrowserClient::GetPostMessageTargetOverride(
   return nullptr;
 }
 
+bool ChromeContentBrowserClient::IsSecureContextRoot(
+    content::RenderFrameHost* parent_frame,
+    content::FrameTreeNodeId frame_tree_node_id,
+    const GURL& url) {
+#if BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_ANDROID)
+  if (!parent_frame) {
+    return false;
+  }
+  // The boundary only applies to chrome-extension documents.
+  if (!url.SchemeIs(extensions::kExtensionScheme)) {
+    return false;
+  }
+  auto* manager =
+      extensions::mime_handler::MimeHandlerStreamManager::FromRenderFrameHost(
+          parent_frame);
+  return manager && manager->IsExtensionFrameTreeNodeIdForUrl(
+                        parent_frame, frame_tree_node_id, url);
+#else
+  return false;
+#endif  // BUILDFLAG(ENABLE_EXTENSIONS) && !BUILDFLAG(IS_ANDROID)
+}
+
 bool ChromeContentBrowserClient::IsCrossOriginSubframeAllowedToShowFilePicker(
     content::RenderFrameHost* render_frame_host,
     const url::Origin& requesting_origin) {
