@@ -44,12 +44,15 @@
 #include "content/public/browser/web_contents_observer.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/mock_navigation_handle.h"
+#include "content/public/test/permissions_test_utils.h"
 #include "content/public/test/prerender_test_util.h"
 #include "net/dns/mock_host_resolver.h"
 #include "net/http/http_status_code.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "third_party/blink/public/common/permissions/permission_utils.h"
+#include "third_party/blink/public/mojom/permissions/permission_status.mojom.h"
 #include "third_party/skia/include/core/SkBitmap.h"
 #include "ui/gfx/image/image_unittest_util.h"
 #include "url/gurl.h"
@@ -1229,6 +1232,15 @@ class ClientSideDetectionHostClipboardTest
     flatbuffer_model_str_ = set_up_client_side_model();
     host_resolver()->AddRule("*", "127.0.0.1");
     ASSERT_TRUE(embedded_test_server()->Start());
+
+    content::PermissionController* permission_controller =
+        browser()->profile()->GetPermissionController();
+    url::Origin origin =
+        url::Origin::Create(embedded_test_server()->GetURL("/title1.html"));
+    content::SetPermissionControllerOverride(
+        permission_controller, origin, origin,
+        blink::PermissionType::CLIPBOARD_SANITIZED_WRITE,
+        blink::mojom::PermissionStatus::GRANTED);
   }
 
   std::string client_side_model() { return flatbuffer_model_str_; }
