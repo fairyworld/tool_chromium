@@ -15,36 +15,33 @@ an automated process. This makes toolchain upgrades prohibitively difficult.
 
 When an exception is required, consider:
 
--   Whether the unstable feature brings significant value that is unattainable
+- Whether the unstable feature brings significant value that is unattainable
     in stable alternatives
--   The risk of breaking changes to the feature
--   Ways to fallback in case a backward-incompatible toolchain change is
+- The risk of breaking changes to the feature
+- Ways to fallback in case a backward-incompatible toolchain change is
     introduced
 
 The following directories have a stricter policy toward unstable features:
 
-* `//build` accepts patches for community-maintained support
+- `//build` accepts patches for community-maintained support
   for working with a stable version of the Rust compiler.
-  See also `rustc_nightly_capability` and https://crbug.com/410596442
-* `//v8` tentatively disallows unstable features to provide
+  See also `rustc_nightly_capability` and <https://crbug.com/410596442>
+- `//v8` tentatively disallows unstable features to provide
   community-maintained support for building V8 with a stable
   version of the Rust compiler.
-  See also https://crbug.com/450577984
+  See also <https://crbug.com/450577984>
 
 ## Exceptions
 
 This section maintains a list of exceptions from the policy above:
 
 - `#![feature(portable_simd)]` needed by the ETC1 encoder (see
-  [the discussion in the doc here](https://docs.google.com/document/d/1lh9x43gtqXFh5bP1LeYevWj0EcIRgIu0XGahHY08aeY/edit?tab=t.0)
-    - `//ui/android/texture_compressor`
-    - `//third_party/rust/bytemuck`
+  [the discussion in the doc here](https://docs.google.com/document/d/1lh9x43gtqXFh5bP1LeYevWj0EcIRgIu0XGahHY08aeY/edit?tab=t.0))
+  - `//ui/android/texture_compressor`
+  - `//third_party/rust/bytemuck`
 - `#![feature(linkage)]` and `#![feature(rustc_attrs)]` needed to use
-  PartitionAlloc from Rust (removal is tracked by https://crbug.com/410596442)
-    - `//build/rust/allocator`
-- `maybe_uninit_write_slice`, `assert_matches`, `maybe_uninit_slice`:
-  Grandfathered-in exception in prototype code (i.e. not used and not shipping)
-    - `mojo/public/rust/...`
+  PartitionAlloc from Rust (removal is tracked by <https://crbug.com/410596442>)
+  - `//build/rust/allocator`
 
 ### How to allow unstable features in BUILD.gn
 
