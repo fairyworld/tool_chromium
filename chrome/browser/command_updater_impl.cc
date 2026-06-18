@@ -84,7 +84,7 @@ void CommandUpdaterImpl::DisableAllCommands() {
     UpdateCommandEnabled(command_pair.first, false);
 }
 
-std::vector<int> CommandUpdaterImpl::GetAllIds() {
+std::vector<int> CommandUpdaterImpl::GetAllIds() const {
   std::vector<int> result;
   for (const auto& command_pair : commands_)
     result.push_back(command_pair.first);

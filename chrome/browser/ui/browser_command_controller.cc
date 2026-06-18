@@ -1561,6 +1561,14 @@ bool BrowserCommandController::UpdateCommandEnabled(int id, bool state) {
   return command_updater_.UpdateCommandEnabled(id, state);
 }
 
+void BrowserCommandController::DisableAllCommands() {
+  command_updater_.DisableAllCommands();
+}
+
+std::vector<int> BrowserCommandController::GetAllIds() const {
+  return command_updater_.GetAllIds();
+}
+
 // BrowserCommandController, TabStripModelObserver implementation:
 
 void BrowserCommandController::OnTabStripModelChanged(

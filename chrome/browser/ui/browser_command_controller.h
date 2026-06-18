@@ -100,6 +100,8 @@ class BrowserCommandController : public CommandUpdater,
   void RemoveCommandObserver(int id, CommandObserver* observer) override;
   void RemoveCommandObserver(CommandObserver* observer) override;
   bool UpdateCommandEnabled(int id, bool state) override;
+  void DisableAllCommands() override;
+  std::vector<int> GetAllIds() const override;
 
   // Shared state updating: these functions are static and public to share with
   // outside code.
