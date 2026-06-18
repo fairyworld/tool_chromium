@@ -132,7 +132,7 @@ void ToolController::CreateToolAndValidate(const ActorToolRequest& request,
 
   ActorToolFactory& factory = tool_delegate_->GetToolFactory();
   base::expected<std::unique_ptr<ActorTool>, ToolExecutionResult> tool_result =
-      factory.CreateTool(request.action());
+      factory.CreateTool(request.action(), tool_delegate_);
 
   if (!tool_result.has_value()) {
     LogToolExecutionResult(journal(), GURL(), task_id(),

@@ -12,6 +12,7 @@ source_set("actor_tool_factory") {
   ]
   deps = [
     ":actor_tool_interface",
+    ":attempt_login_tool",
     ":click_tool",
     ":history_tool",
     ":navigate_tool",
@@ -95,6 +96,21 @@ source_set("wait_tool") {
   sources = [
     "wait_tool.h",
     "wait_tool.mm",
+  ]
+
+  deps = [
+    ":actor_tool_interface",
+    "//base",
+    "//components/optimization_guide/proto:optimization_guide_proto",
+    "//ios/chrome/browser/intelligence/actor/tools/public",
+    "//ios/web/public",
+  ]
+}
+
+source_set("attempt_login_tool") {
+  sources = [
+    "attempt_login_tool.h",
+    "attempt_login_tool.mm",
   ]
 
   deps = [
@@ -419,6 +435,7 @@ source_set("unit_tests") {
     ":actor_tool_factory",
     ":actor_tool_interface",
     ":actor_tool_java_script_feature_test_base",
+    ":attempt_login_tool",
     ":click_tool",
     ":click_tool_ts",
     ":history_tool",
