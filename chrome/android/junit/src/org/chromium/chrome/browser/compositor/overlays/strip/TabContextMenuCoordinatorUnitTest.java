@@ -2728,9 +2728,25 @@ public class TabContextMenuCoordinatorUnitTest {
     @Feature("Tab Strip Context Menu")
     @EnableFeatures(ChromeFeatureList.ANDROID_VERTICAL_TABS)
     @Config(qualifiers = "sw600dp")
-    public void testListMenuItems_verticalTabsEligible() {
+    public void testListMenuItems_verticalTabsEligible_showTabsVertically() {
+        runToggleLayoutMenuTest(/* isVerticalTabsEnabled= */ false, R.string.show_tabs_vertically);
+    }
+
+    @Test
+    @Feature("Tab Strip Context Menu")
+    @EnableFeatures(ChromeFeatureList.ANDROID_VERTICAL_TABS)
+    @Config(qualifiers = "sw600dp")
+    public void testListMenuItems_verticalTabsEligible_showTabsHorizontally() {
+        runToggleLayoutMenuTest(/* isVerticalTabsEnabled= */ true, R.string.show_tabs_horizontally);
+    }
+
+    // --------------------------------------------------------------//
+    // ----------------------  UTILITY METHODS ----------------------//
+    // --------------------------------------------------------------//
+
+    private void runToggleLayoutMenuTest(boolean isVerticalTabsEnabled, int expectedTitleRes) {
         ChromeSharedPreferences.getInstance()
-                .writeBoolean(ChromePreferenceKeys.VERTICAL_TABS_ENABLED, false);
+                .writeBoolean(ChromePreferenceKeys.VERTICAL_TABS_ENABLED, isVerticalTabsEnabled);
 
         Activity mockMenuActivity =
                 Mockito.mock(
@@ -2771,14 +2787,14 @@ public class TabContextMenuCoordinatorUnitTest {
         ListItem verticalTabsItem = modelList.get(11);
         assertEquals(ListItemType.MENU_ITEM, verticalTabsItem.type);
         assertEquals(
-                R.id.show_tabs_vertically_menu_id,
+                R.id.toggle_tab_layout_menu_id,
                 verticalTabsItem.model.get(ListMenuItemProperties.MENU_ITEM_ID));
-        assertEquals(R.string.show_tabs_vertically, verticalTabsItem.model.get(TITLE_ID));
+        assertEquals(expectedTitleRes, verticalTabsItem.model.get(TITLE_ID));
         assertEquals(ListItemType.DIVIDER, modelList.get(12).type);
 
         // Simulate selecting the item.
         mOnItemClickedCallback.onClick(
-                R.id.show_tabs_vertically_menu_id,
+                R.id.toggle_tab_layout_menu_id,
                 new AnchorInfo(TAB_ID, Collections.singletonList(TAB_ID)),
                 /* collaborationId= */ null,
                 /* listViewTouchTracker= */ null);
@@ -2788,10 +2804,6 @@ public class TabContextMenuCoordinatorUnitTest {
         verify((MenuOrKeyboardActionController) mockMenuActivity, times(1))
                 .onMenuOrKeyboardAction(eq(R.id.toggle_tab_layout_menu_id), eq(false));
     }
-
-    // --------------------------------------------------------------//
-    // ----------------------  UTILITY METHODS ----------------------//
-    // --------------------------------------------------------------//
 
     private void verifyAddToGroupSubmenuForTabOutsideOfGroup(
             ModelList modelList,

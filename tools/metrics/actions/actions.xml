@@ -33543,9 +33543,11 @@ should be able to be added at any place in this file.
     <variant name=".Shown.MultiTab"
         summary="Recorded when the tab context menu is shown with multiple
                  tabs selected."/>
-    <variant name=".ShowTabsVertically"
-        summary="User switched the layout to the vertical tabs view via the
-                 tab context menu on tab strip on Android."/>
+    <variant name=".ToggleTabLayout"
+        summary="Recorded when the user taps 'Show tabs vertically' in the
+                 Android tab strip context menu or 'Show tabs horizontally'
+                 in the Android Vertical Tabs context menu to switch the tab
+                 layout."/>
     <variant name=".UnmuteSite"
         summary="User unmuted a site via the tab context menu on tab strip on
                  Android."/>

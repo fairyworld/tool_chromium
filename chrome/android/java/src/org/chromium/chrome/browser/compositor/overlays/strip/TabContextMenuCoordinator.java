@@ -170,22 +170,22 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
         sSendTabToSelfCreator = creator;
     }
 
-    private final TabGroupCreationCallback mTabGroupCreationCallback;
+    private final @Nullable TabGroupCreationCallback mTabGroupCreationCallback;
     private final WindowAndroid mWindowAndroid;
     private final Activity mActivity;
     private final int mCircleSize;
 
     private TabContextMenuCoordinator(
             Supplier<TabModel> tabModelSupplier,
-            TabGroupListBottomSheetCoordinator tabGroupListBottomSheetCoordinator,
-            TabGroupCreationCallback tabGroupCreationCallback,
+            @Nullable TabGroupListBottomSheetCoordinator tabGroupListBottomSheetCoordinator,
+            @Nullable TabGroupCreationCallback tabGroupCreationCallback,
             MultiInstanceManager multiInstanceManager,
             MonotonicObservableSupplier<ShareDelegate> shareDelegateSupplier,
             WindowAndroid windowAndroid,
             Activity activity,
             @Nullable TabGroupSyncService tabGroupSyncService,
             CollaborationService collaborationService,
-            Supplier<TabBookmarker> tabBookmarkerSupplier,
+            @Nullable Supplier<TabBookmarker> tabBookmarkerSupplier,
             BiConsumer<AnchorInfo, Boolean> reorderFunction,
             SnackbarManager snackbarManager,
             @Nullable ActivityResultTracker activityResultTracker,
@@ -240,13 +240,13 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
      */
     public static TabContextMenuCoordinator createContextMenuCoordinator(
             Supplier<TabModel> tabModelSupplier,
-            TabGroupListBottomSheetCoordinator tabGroupListBottomSheetCoordinator,
-            TabGroupCreationCallback tabGroupCreationCallback,
+            @Nullable TabGroupListBottomSheetCoordinator tabGroupListBottomSheetCoordinator,
+            @Nullable TabGroupCreationCallback tabGroupCreationCallback,
             MultiInstanceManager multiInstanceManager,
             MonotonicObservableSupplier<ShareDelegate> shareDelegateSupplier,
             WindowAndroid windowAndroid,
             Activity activity,
-            Supplier<TabBookmarker> tabBookmarkerSupplier,
+            @Nullable Supplier<TabBookmarker> tabBookmarkerSupplier,
             BiConsumer<AnchorInfo, Boolean> reorderFunction,
             SnackbarManager snackbarManager,
             @Nullable ActivityResultTracker activityResultTracker,
@@ -279,11 +279,11 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
     @VisibleForTesting
     static OnItemClickedCallback<AnchorInfo> getMenuItemClickedCallback(
             Supplier<TabModel> tabModelSupplier,
-            TabGroupListBottomSheetCoordinator tabGroupListBottomSheetCoordinator,
-            TabGroupCreationCallback tabGroupCreationCallback,
+            @Nullable TabGroupListBottomSheetCoordinator tabGroupListBottomSheetCoordinator,
+            @Nullable TabGroupCreationCallback tabGroupCreationCallback,
             MultiInstanceManager multiInstanceManager,
             MonotonicObservableSupplier<ShareDelegate> shareDelegateSupplier,
-            Supplier<TabBookmarker> tabBookmarkerSupplier,
+            @Nullable Supplier<TabBookmarker> tabBookmarkerSupplier,
             WindowAndroid windowAndroid,
             Activity activity,
             SnackbarManager snackbarManager,
@@ -300,9 +300,13 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
             recordMenuAction(menuId, tabs.size() > 1, tabModel.isIncognitoBranded());
 
             if (menuId == R.id.add_to_tab_group) {
-                addToTabGroupItemCallback(tabGroupListBottomSheetCoordinator, tabs);
+                if (tabGroupListBottomSheetCoordinator != null) {
+                    addToTabGroupItemCallback(tabGroupListBottomSheetCoordinator, tabs);
+                }
             } else if (menuId == R.id.add_to_new_tab_group) {
-                addToNewTabGroupItemCallback(tabModel, tabs, tabGroupCreationCallback);
+                if (tabGroupCreationCallback != null) {
+                    addToNewTabGroupItemCallback(tabModel, tabs, tabGroupCreationCallback);
+                }
             } else if (menuId == R.id.remove_from_tab_group) {
                 removeFromTabGroupItemCallback(tabModel, tabs);
             } else if (menuId == R.id.move_to_other_window_menu_id) {
@@ -331,7 +335,9 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
             } else if (menuId == R.id.new_tab_to_the_right_menu_id) {
                 newTabToTheRightItemCallback(tabModel, anchorInfo);
             } else if (menuId == R.id.add_tab_to_reading_list_menu_id) {
-                addTabToReadingListItemCallback(tabBookmarkerSupplier, tabs);
+                if (tabBookmarkerSupplier != null) {
+                    addTabToReadingListItemCallback(tabBookmarkerSupplier, tabs);
+                }
             } else if (menuId == R.id.send_to_your_devices_menu_id) {
                 sendTabToYourDevicesItemCallback(
                         tabModel,
@@ -341,7 +347,7 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
                         snackbarManager,
                         activityResultTracker,
                         modalDialogManager);
-            } else if (menuId == R.id.show_tabs_vertically_menu_id) {
+            } else if (menuId == R.id.toggle_tab_layout_menu_id) {
                 if (activity instanceof MenuOrKeyboardActionController controller) {
                     controller.onMenuOrKeyboardAction(
                             R.id.toggle_tab_layout_menu_id, /* fromMenu= */ false);
@@ -558,7 +564,7 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
      *     coordinates.
      * @param anchorInfo The {@link AnchorInfo} for the context menu to be shown.
      */
-    protected void showMenu(RectProvider anchorViewRectProvider, AnchorInfo anchorInfo) {
+    public void showMenu(RectProvider anchorViewRectProvider, AnchorInfo anchorInfo) {
         createAndShowMenu(
                 anchorViewRectProvider,
                 anchorInfo,
@@ -950,16 +956,18 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
     }
 
     private void addVerticalTabsItems(ModelList itemList, boolean isIncognito) {
-        if (VerticalTabUtils.shouldShowVerticalTabsEntryPoint(mActivity)) {
+        if (VerticalTabUtils.isVerticalTabsEligible(mActivity)) {
             if (itemList.isEmpty()
                     || itemList.get(itemList.size() - 1).type != ListItemType.DIVIDER) {
                 itemList.add(buildMenuDivider(isIncognito));
             }
+            int layoutTitleRes =
+                    VerticalTabUtils.isVerticalTabsEnabled(mActivity)
+                            ? R.string.show_tabs_horizontally
+                            : R.string.show_tabs_vertically;
+
             itemList.add(
-                    buildListItem(
-                            R.string.show_tabs_vertically,
-                            R.id.show_tabs_vertically_menu_id,
-                            isIncognito));
+                    buildListItem(layoutTitleRes, R.id.toggle_tab_layout_menu_id, isIncognito));
             itemList.add(buildMenuDivider(isIncognito));
         }
     }
@@ -1028,12 +1036,8 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
             recordUserAction("AddTabToReadingList", isMultipleTabs);
         } else if (menuId == R.id.send_to_your_devices_menu_id) {
             recordUserAction("SendToYourDevices", false);
-        } else if (menuId == R.id.show_tabs_vertically_menu_id) {
-            // TODO(crbug.com/516961384): Replace show_tabs_vertically_menu_id with
-            // toggle_tab_layout_menu_id once we add context menus to vertical tabs.
-            // Force false since switching to a vertical layout is a global UI state toggle
-            // and doesn't benefit from distinguishing single vs multi-tab context.
-            recordUserAction("ShowTabsVertically", /* isMultipleTabs= */ false);
+        } else if (menuId == R.id.toggle_tab_layout_menu_id) {
+            recordUserAction("ToggleTabLayout", /* isMultipleTabs= */ false);
         } else {
             assert false : "Unknown menu id: " + menuId;
         }
