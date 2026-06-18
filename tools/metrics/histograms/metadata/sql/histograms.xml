@@ -44,6 +44,7 @@ chromium-metrics-reviews@google.com.
       summary="CollaborationMessageStorage"/>
   <variant name="Conversions" summary="Conversions"/>
   <variant name="Cookie" summary="Cookie"/>
+  <variant name="CriticalActions" summary="CriticalActions"/>
   <variant name="DatabaseTracker" summary="DatabaseTracker"/>
   <variant name="DataSharingGroupStorage" summary="DataSharingGroupStorage"/>
   <variant name="DataSharingMigrationStateStorage"
