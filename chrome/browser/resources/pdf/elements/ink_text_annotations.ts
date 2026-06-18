@@ -147,6 +147,52 @@ export class InkTextAnnotationsElement extends CrLitElement {
     this.scrollToShowTextBox_(screenRect);
   }
 
+  protected async onPlaceholderClick_(e: MouseEvent) {
+    const index = Number((e.currentTarget as HTMLElement).dataset['index']);
+    await this.activateAnnotationByIndex_(index);
+  }
+
+  protected async onPlaceholderKeydown_(e: KeyboardEvent) {
+    if (e.key !== 'Enter' && e.key !== ' ') {
+      return;
+    }
+    e.preventDefault();
+    const index = Number((e.currentTarget as HTMLElement).dataset['index']);
+    await this.activateAnnotationByIndex_(index);
+  }
+
+  private async activateAnnotationByIndex_(index: number) {
+    // Grab the annotation first, since committing may update the annotations
+    // list and make `index` refer to a different annotation than intended.
+    const annotation = this.annotations_[index];
+    assert(annotation);
+
+    if (this.activeAnnotation_) {
+      // The requested annotation is already active. This also ensures that if
+      // committing deletes an annotation, it isn't the one being activated.
+      if (this.activeAnnotation_.id === annotation.id) {
+        return;
+      }
+      await this.$.textBox.commitTextAnnotation();
+    }
+
+    assert(this.viewport);
+
+    // Convert box to screen coordinates.
+    const screenRect = pageToScreenCoordinates(
+        annotation.pageIndex, annotation.textBoxRect, this.viewport);
+
+    // Create a copy of the annotation with screen coordinates for the textbox.
+    const annotationToActivate = structuredClone(annotation);
+    annotationToActivate.textBoxRect = screenRect;
+
+    // Notify the backend.
+    Ink2Manager.getInstance().reactivateTextAnnotation(annotation);
+    this.activeAnnotation_ = annotationToActivate;
+    this.activePageDimensions_ =
+        this.viewport.getPageScreenRect(annotation.pageIndex);
+  }
+
   commitActiveAnnotation(): Promise<void> {
     return this.$.textBox.commitTextAnnotation();
   }

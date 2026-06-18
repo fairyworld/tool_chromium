@@ -24,7 +24,8 @@
 
 .placeholder {
   position: absolute;
-  pointer-events: none; /* Let clicks pass through to PDF plugin */
+  pointer-events: auto;
+  cursor: text;
   border: var(--viewer-text-annotation-border-width) solid transparent;
   box-sizing: border-box;
   outline: none;
@@ -53,4 +54,8 @@
 /* Show focus ring when tabbed to */
 .placeholder:focus-visible {
   border-color: var(--viewer-text-annotation-active-color);
+}
+
+ink-text-box {
+  pointer-events: auto;
 }

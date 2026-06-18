@@ -463,13 +463,9 @@ chrome.test.runTests([
     mockPlugin.clearMessages();
 
     // (4) Re-activate this annotation.
-    // Center X = 100 + DEFAULT_TEXTBOX_WIDTH / 2 = 211.
-    // Center Y = 60 + DEFAULT_HEIGHT / 2 = 72.
-    const clickXReactivate = clickXA + DEFAULT_TEXTBOX_WIDTH / 2;
-    const clickYReactivate = (clickYA - CLICK_OFFSET) + DEFAULT_HEIGHT / 2;
-    const clicked = await manager.initializeTextAnnotation(
-        {x: clickXReactivate, y: clickYReactivate});
-    chrome.test.assertTrue(clicked, 'Failed to click existing annotation');
+    const placeholders = getPlaceholders(annotationsElement);
+    chrome.test.assertEq(1, placeholders.length);
+    placeholders[0]!.click();
     await microtasksFinished();
     chrome.test.assertTrue(isVisible(textbox));
     chrome.test.assertEq('Hello', textbox.$.textbox.value);
@@ -635,6 +631,103 @@ chrome.test.runTests([
     chrome.test.assertFalse(annotationsElement.$.textBox.hidden);
     chrome.test.assertEq(
         'Annotation B', annotationsElement.$.textBox.$.textbox.value);
+
+    chrome.test.succeed();
+  },
+
+  async function testActivatePlaceholder() {
+    const {manager, viewport, mockPlugin} = setUpTest();
+
+    // Add one annotation to create a placeholder.
+    const testAnnotation = getTestAnnotation(0);
+    testAnnotation.text = 'Hello World';
+    testAnnotation.textBoxRect.width = DEFAULT_TEXTBOX_WIDTH;
+    testAnnotation.textBoxRect.height = DEFAULT_HEIGHT;
+    // Position: x=60, y=25, w=200, h=24. Page offsets: x=55, y=3.
+    // Screen position: x=115, y=28, w=200, h=24.
+    mockPlugin.setMessageReply('getAllTextAnnotations', {
+      annotations: [testAnnotation],
+    });
+    await manager.initializeTextAnnotations();
+
+    const annotationsElement = createAnnotationsElement(viewport);
+    await microtasksFinished();
+
+    const placeholders = getPlaceholders(annotationsElement);
+    chrome.test.assertEq(1, placeholders.length);
+    const placeholder = placeholders[0]!;
+
+    function verifyEditTextAnnotation(expected: boolean, id: number = 0) {
+      const editTextAnnotationMessage =
+          mockPlugin.findMessage<{type: string, data: number}>(
+              'editTextAnnotation');
+      chrome.test.assertEq(expected, editTextAnnotationMessage !== undefined);
+      if (expected) {
+        chrome.test.assertEq(
+            'editTextAnnotation', editTextAnnotationMessage!.type);
+        chrome.test.assertEq(id, editTextAnnotationMessage!.data);
+      }
+    }
+
+    // 1. Verify click activates it.
+    mockPlugin.clearMessages();
+    placeholder.click();
+    await microtasksFinished();
+
+    // Verify textbox is active with the correct annotation (in screen coords).
+    chrome.test.assertFalse(annotationsElement.$.textBox.hidden);
+    const activeAnnotation1 = annotationsElement.$.textBox.annotation;
+    chrome.test.assertTrue(activeAnnotation1 !== null);
+    chrome.test.assertEq(testAnnotation.id, activeAnnotation1.id);
+    chrome.test.assertEq(testAnnotation.text, activeAnnotation1.text);
+    // Screen coords: x = 60 + 55 = 115, y = 25 + 3 = 28.
+    chrome.test.assertEq(115, activeAnnotation1.textBoxRect.locationX);
+    chrome.test.assertEq(28, activeAnnotation1.textBoxRect.locationY);
+    chrome.test.assertEq(
+        DEFAULT_TEXTBOX_WIDTH, activeAnnotation1.textBoxRect.width);
+    chrome.test.assertEq(DEFAULT_HEIGHT, activeAnnotation1.textBoxRect.height);
+    // Verify manager was notified.
+    verifyEditTextAnnotation(true, testAnnotation.id);
+
+    // Deactivate it.
+    annotationsElement.$.textBox.dispatchEvent(
+        new CustomEvent('state-changed', {
+          detail: TextBoxState.INACTIVE,
+        }));
+    await microtasksFinished();
+    chrome.test.assertTrue(annotationsElement.$.textBox.hidden);
+
+    // 2. Verify Keyboard (Enter) activates it.
+    mockPlugin.clearMessages();
+    placeholder.focus();
+    placeholder.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter'}));
+    await microtasksFinished();
+
+    chrome.test.assertFalse(annotationsElement.$.textBox.hidden);
+    const activeAnnotation2 = annotationsElement.$.textBox.annotation;
+    chrome.test.assertTrue(activeAnnotation2 !== null);
+    chrome.test.assertEq(testAnnotation.id, activeAnnotation2.id);
+    verifyEditTextAnnotation(true, testAnnotation.id);
+
+    // Deactivate it.
+    annotationsElement.$.textBox.dispatchEvent(
+        new CustomEvent('state-changed', {
+          detail: TextBoxState.INACTIVE,
+        }));
+    await microtasksFinished();
+    chrome.test.assertTrue(annotationsElement.$.textBox.hidden);
+
+    // 3. Verify Keyboard (Space) activates it.
+    mockPlugin.clearMessages();
+    placeholder.focus();
+    placeholder.dispatchEvent(new KeyboardEvent('keydown', {key: ' '}));
+    await microtasksFinished();
+
+    chrome.test.assertFalse(annotationsElement.$.textBox.hidden);
+    const activeAnnotation3 = annotationsElement.$.textBox.annotation;
+    chrome.test.assertTrue(activeAnnotation3 !== null);
+    chrome.test.assertEq(testAnnotation.id, activeAnnotation3.id);
+    verifyEditTextAnnotation(true, testAnnotation.id);
 
     chrome.test.succeed();
   },
