@@ -1154,10 +1154,14 @@ RasterImageRepresentation::BeginScopedWriteAccess(
     const SkSurfaceProps& surface_props,
     const std::optional<SkColor4f>& clear_color,
     bool visible) {
-  return std::make_unique<ScopedWriteAccess>(
-      base::PassKey<RasterImageRepresentation>(), this,
+  auto* paint_op_buffer =
       BeginWriteAccess(std::move(context_state), final_msaa_count,
-                       surface_props, clear_color, visible));
+                       surface_props, clear_color, visible);
+  if (!paint_op_buffer) {
+    return nullptr;
+  }
+  return std::make_unique<ScopedWriteAccess>(
+      base::PassKey<RasterImageRepresentation>(), this, paint_op_buffer);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
