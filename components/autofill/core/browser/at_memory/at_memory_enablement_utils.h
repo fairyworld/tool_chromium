@@ -41,7 +41,8 @@ enum class AtMemoryAction {
     AtMemoryAction action,
     personal_context::PersonalContextEnablementService*
         personal_context_service,
-    const PrefService* pref_service);
+    const PrefService* pref_service,
+    const GoogleGroupsManager* google_groups_manager);
 
 // Returns whether the AtMemory feature is enabled.
 //

@@ -64,7 +64,8 @@ namespace {
 // toggles.
 [[nodiscard]] bool IsAtMemorySupported(
     personal_context::PersonalContextEnablementService*
-        personal_context_service) {
+        personal_context_service,
+    const GoogleGroupsManager* google_groups_manager) {
   if (base::FeatureList::IsEnabled(
           features::debug::kAtMemorySkipEligibilityChecks)) {
     return base::FeatureList::IsEnabled(features::kAutofillAtMemory);
@@ -82,7 +83,7 @@ namespace {
   }
 
   // TODO(crbug.com/509479886) Add unit test to ensure this is checked last.
-  return base::FeatureList::IsEnabled(features::kAutofillAtMemory);
+  return IsAtMemoryFeatureEnabled(google_groups_manager);
 }
 
 [[nodiscard]] bool SatisfiesPersonalContextToggleRequirement(
@@ -104,8 +105,9 @@ bool MayPerformAtMemoryAction(
     AtMemoryAction action,
     personal_context::PersonalContextEnablementService*
         personal_context_service,
-    const PrefService* pref_service) {
-  if (!IsAtMemorySupported(personal_context_service)) {
+    const PrefService* pref_service,
+    const GoogleGroupsManager* google_groups_manager) {
+  if (!IsAtMemorySupported(personal_context_service, google_groups_manager)) {
     return false;
   }
 
