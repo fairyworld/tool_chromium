@@ -45,6 +45,9 @@ BASE_FEATURE(kAllowSafeBrowsingV4StoreDiskMigrationChanges,
              "SafeBrowsingAllowV4StoreDiskMigrationChanges",
              base::FEATURE_DISABLED_BY_DEFAULT);
 
+BASE_FEATURE(kAntivirusTelemetryForDownloads,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
 BASE_FEATURE(kAutoRevokeSuspiciousNotification,
              base::FEATURE_ENABLED_BY_DEFAULT);
 constexpr base::FeatureParam<int>

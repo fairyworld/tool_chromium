@@ -13118,6 +13118,13 @@ const FeatureEntry kFeatureEntries[] = {
      FEATURE_VALUE_TYPE(
          autofill::features::kAutofillEnableResurrectingPaymentsUsers)},
 
+#if BUILDFLAG(IS_WIN)
+    {"antivirus-telemetry-for-downloads",
+     flag_descriptions::kAntivirusTelemetryForDownloadsName,
+     flag_descriptions::kAntivirusTelemetryForDownloadsDescription, kOsWin,
+     FEATURE_VALUE_TYPE(safe_browsing::kAntivirusTelemetryForDownloads)},
+#endif  // BUILDFLAG(IS_WIN)
+
     // Add new entries above this line.
     // NOTE: Adding a new flag requires adding a corresponding entry to enum
     // "LoginCustomFlags" in tools/metrics/histograms/enums.xml. See "Flag

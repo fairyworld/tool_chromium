@@ -36,6 +36,9 @@ BASE_DECLARE_FEATURE(kAddWarningShownTSToClientSafeBrowsingReport);
 // partially implemented.
 BASE_DECLARE_FEATURE(kAllowSafeBrowsingV4StoreDiskMigrationChanges);
 
+// Enables antivirus product info to be included in download pings.
+BASE_DECLARE_FEATURE(kAntivirusTelemetryForDownloads);
+
 // Enables automatic revocation of notification permissions after the user has
 // received a number of notifications with a suspicious verdict from the
 // on-device model.

@@ -494,6 +494,11 @@
     "expiry_milestone": 150
   },
   {
+    "name": "antivirus-telemetry-for-downloads",
+    "owners": [ "yawfrempong@google.com", "chrome-counter-abuse-alerts@google.com" ],
+    "expiry_milestone": 154
+  },
+  {
     "name": "apb144-patch1",
     "owners": ["peilinwang@google.com"],
     "expiry_milestone": 160

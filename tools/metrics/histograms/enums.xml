@@ -12625,6 +12625,7 @@ from previous Chrome versions.
   <int value="-585982114" label="DisableInstanceLimit:enabled"/>
   <int value="-585955151" label="WebSerialWiredDevicesAndroid:disabled"/>
   <int value="-585508682" label="DownloadRange:enabled"/>
+  <int value="-584947728" label="AntivirusTelemetryForDownloads:enabled"/>
   <int value="-584866456" label="LacrosProfileMigrationForceOff:disabled"/>
   <int value="-583842972"
       label="WebAuthenticationPasskeysUIExperiment:enabled"/>
@@ -12911,6 +12912,7 @@ from previous Chrome versions.
   <int value="-496879081" label="disable-ip-privacy-proxy"/>
   <int value="-496551818" label="ReadAloudPlayback:enabled"/>
   <int value="-496351912" label="sparky-feature-key:enabled"/>
+  <int value="-496290445" label="AntivirusTelemetryForDownloads:disabled"/>
   <int value="-496119023" label="WebXR:enabled"/>
   <int value="-495991146" label="CustomizeChromeSidePanel:disabled"/>
   <int value="-495585885" label="enable-spdy-proxy-dev-auth-origin"/>
