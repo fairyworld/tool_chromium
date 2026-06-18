@@ -785,9 +785,13 @@ IN_PROC_BROWSER_TEST_F(
   LoginReputationClientRequest::DebuggingMetadata* debugging_metadata =
       feature_cache_map->GetOrCreateDebuggingMetadataForURL(prerender_url);
 
-  // The value remains private ip since we bypassed it in the test.
-  EXPECT_EQ(debugging_metadata->preclassification_check_result(),
-            PreClassificationCheckResult::NO_CLASSIFY_PRIVATE_IP);
+  // The value remains private ip or local resource since we bypassed it in the
+  // test.
+  EXPECT_EQ(
+      debugging_metadata->preclassification_check_result(),
+      base::FeatureList::IsEnabled(kClientSideDetectionLocalResourceCheckFix)
+          ? PreClassificationCheckResult::NO_CLASSIFY_LOCAL_RESOURCE
+          : PreClassificationCheckResult::NO_CLASSIFY_PRIVATE_IP);
   EXPECT_EQ(debugging_metadata->network_result(), net::HTTP_OK);
   EXPECT_EQ(debugging_metadata->phishing_detector_result(),
             PhishingDetectorResult::CLASSIFICATION_SUCCESS);
@@ -865,10 +869,14 @@ IN_PROC_BROWSER_TEST_F(
   LoginReputationClientRequest::DebuggingMetadata* debugging_metadata =
       feature_cache_map->GetOrCreateDebuggingMetadataForURL(prerender_url);
 
-  // The value remains private ip since we bypassed it in the test, but we
-  // cleared the cache before bypassing, so this should not equal anymore.
-  EXPECT_NE(debugging_metadata->preclassification_check_result(),
-            PreClassificationCheckResult::NO_CLASSIFY_PRIVATE_IP);
+  // The value remains private ip or local resource since we bypassed it in the
+  // test, but we cleared the cache before bypassing, so this should not equal
+  // anymore.
+  EXPECT_NE(
+      debugging_metadata->preclassification_check_result(),
+      base::FeatureList::IsEnabled(kClientSideDetectionLocalResourceCheckFix)
+          ? PreClassificationCheckResult::NO_CLASSIFY_LOCAL_RESOURCE
+          : PreClassificationCheckResult::NO_CLASSIFY_PRIVATE_IP);
   EXPECT_EQ(debugging_metadata->network_result(), net::HTTP_OK);
   EXPECT_EQ(debugging_metadata->phishing_detector_result(),
             PhishingDetectorResult::CLASSIFICATION_SUCCESS);

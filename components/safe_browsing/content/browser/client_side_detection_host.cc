@@ -72,6 +72,7 @@
 #include "mojo/public/cpp/base/proto_wrapper.h"
 #include "net/base/ip_endpoint.h"
 #include "net/base/registry_controlled_domains/registry_controlled_domain.h"
+#include "net/base/url_util.h"
 #include "net/http/http_response_headers.h"
 #include "services/network/public/mojom/url_response_head.mojom.h"
 #include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
@@ -399,7 +400,12 @@ class ClientSideDetectionHost::ShouldClassifyUrlRequest {
 
     if (base::FeatureList::IsEnabled(
             kClientSideDetectionLocalResourceCheckFix)) {
-      if (url_.SchemeIsFile()) {
+      // safe_browsing::CanGetReputationOfUrl() is another option to be
+      // comprehensive, but since IsPrivateIPAddress and SchemeIsHTTPOrHTTPS
+      // are checked below, using net::IsLocalhost() is sufficient.
+      // TODO: Consider safe_browsing::CanGetReputationOfUrl() in the future to
+      // have a consolidated preclassification check result.
+      if (url_.SchemeIsFile() || net::IsLocalhost(url_)) {
         DontClassifyForPhishing(
             PreClassificationCheckResult::NO_CLASSIFY_LOCAL_RESOURCE);
       }
