@@ -69,13 +69,6 @@ extern const char kCrostiniStabilityHistogram[];
 
 class CrostiniSshfs;
 
-class PendingAppListUpdatesObserver : public base::CheckedObserver {
- public:
-  // Called whenever the kPendingAppListUpdatesMethod signal is sent.
-  virtual void OnPendingAppListUpdates(const guest_os::GuestId& container_id,
-                                       int count) = 0;
-};
-
 class ExportContainerProgressObserver {
  public:
   // A successfully started container export will continually fire progress
@@ -441,12 +434,6 @@ class CrostiniManager : public KeyedService,
   using RemoveCrostiniCallback = CrostiniResultCallback;
   void AddRemoveCrostiniCallback(RemoveCrostiniCallback remove_callback);
 
-  // Add/remove observers for pending app list updates.
-  void AddPendingAppListUpdatesObserver(
-      PendingAppListUpdatesObserver* observer);
-  void RemovePendingAppListUpdatesObserver(
-      PendingAppListUpdatesObserver* observer);
-
   // Add/remove observers for container export/import.
   void AddExportContainerProgressObserver(
       ExportContainerProgressObserver* observer);
@@ -504,8 +491,6 @@ class CrostiniManager : public KeyedService,
   void OnImportLxdContainerProgress(
       const vm_tools::cicerone::ImportLxdContainerProgressSignal& signal)
       override;
-  void OnPendingAppListUpdates(
-      const vm_tools::cicerone::PendingAppListUpdatesSignal& signal) override;
   void OnStartLxdProgress(
       const vm_tools::cicerone::StartLxdProgressSignal& signal) override;
 
@@ -836,9 +821,6 @@ class CrostiniManager : public KeyedService,
       container_os_releases_;
 
   std::vector<RemoveCrostiniCallback> remove_crostini_callbacks_;
-
-  base::ObserverList<PendingAppListUpdatesObserver>
-      pending_app_list_updates_observers_;
 
   base::ObserverList<ExportContainerProgressObserver>::
       UncheckedAndDanglingUntriaged export_container_progress_observers_;
