@@ -533,20 +533,18 @@ void GeminiTabHelper::DidFinishNavigation(
 
   previous_main_frame_url_ = current_url;
 
-  if (IsAskGeminiChipEnabled()) {
-    latest_load_contextual_cueing_metadata_.reset();
+  latest_load_contextual_cueing_metadata_.reset();
 
-    if (!optimization_guide_decider_ || !current_url.SchemeIsHTTPOrHTTPS()) {
-      return;
-    }
+  if (!optimization_guide_decider_ || !current_url.SchemeIsHTTPOrHTTPS()) {
+    return;
+  }
 
-    // Don't re-trigger Gemini contextual cues for same-document navigations.
-    if (!navigation_context->IsSameDocument()) {
-      optimization_guide_decider_->CanApplyOptimization(
-          current_url, optimization_guide::proto::GLIC_CONTEXTUAL_CUEING,
-          base::BindOnce(&GeminiTabHelper::OnCanApplyContextualCueingDecision,
-                         weak_ptr_factory_.GetWeakPtr(), current_url));
-    }
+  // Don't re-trigger Gemini contextual cues for same-document navigations.
+  if (!navigation_context->IsSameDocument()) {
+    optimization_guide_decider_->CanApplyOptimization(
+        current_url, optimization_guide::proto::GLIC_CONTEXTUAL_CUEING,
+        base::BindOnce(&GeminiTabHelper::OnCanApplyContextualCueingDecision,
+                       weak_ptr_factory_.GetWeakPtr(), current_url));
   }
 }
 
@@ -606,10 +604,8 @@ void GeminiTabHelper::WebStateDestroyed(web::WebState* web_state) {
   weak_ptr_factory_.InvalidateWeakPtrs();
   web_state_observation_.Reset();
   web_state_ = nullptr;
-  if (IsAskGeminiChipEnabled()) {
-    optimization_guide_decider_ = nullptr;
-    latest_load_contextual_cueing_metadata_.reset();
-  }
+  optimization_guide_decider_ = nullptr;
+  latest_load_contextual_cueing_metadata_.reset();
 }
 
 #pragma mark - Private
@@ -697,7 +693,6 @@ void GeminiTabHelper::OnCanApplyContextualCueingDecision(
     const GURL& main_frame_url,
     optimization_guide::OptimizationGuideDecision decision,
     const optimization_guide::OptimizationMetadata& metadata) {
-  CHECK(IsAskGeminiChipEnabled());
 
   // Record every decision before checking if the url changed.
   RecordGeminiGlicContextualCueDecision(decision);

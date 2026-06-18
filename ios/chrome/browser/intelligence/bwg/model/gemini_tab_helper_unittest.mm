@@ -204,7 +204,7 @@ class GeminiTabHelperTest : public PlatformTest {
 
 TEST_F(GeminiTabHelperTest, TestContextualChipCommandSent) {
   feature_list_.InitWithFeatures(
-      /*enabled_features=*/{kPageActionMenu, kAskGeminiChip},
+      /*enabled_features=*/{kPageActionMenu},
       /*disabled_features=*/{});
   GURL url("https://www.chromium.org");
   AddOptimizationGuideHint(url);
@@ -222,7 +222,7 @@ TEST_F(GeminiTabHelperTest, TestContextualChipCommandSent) {
 
 TEST_F(GeminiTabHelperTest, TestContextualChipCommandNotSentWhenHidden) {
   feature_list_.InitWithFeatures(
-      /*enabled_features=*/{kPageActionMenu, kAskGeminiChip},
+      /*enabled_features=*/{kPageActionMenu},
       /*disabled_features=*/{});
   GURL url("https://www.chromium.org");
   AddOptimizationGuideHint(url);
@@ -395,7 +395,7 @@ TEST_F(GeminiTabHelperTest, TestDidStartNavigation_ShowsPromo) {
   feature_engagement::test::ScopedIphFeatureList iph_feature_list;
   iph_feature_list.InitAndEnableFeatures(
       {feature_engagement::kIPHiOSGeminiFullscreenPromoFeature, kPageActionMenu,
-       kGeminiNavigationPromo, kAskGeminiChip});
+       kGeminiNavigationPromo});
 
   feature_engagement::Tracker* tracker = InitializeTracker();
 
@@ -415,8 +415,7 @@ TEST_F(GeminiTabHelperTest, TestDidStartNavigation_ShowsPromo) {
 
 TEST_F(GeminiTabHelperTest,
        TestDidStartNavigation_DoesNotShowPromoIfConsentGiven) {
-  feature_list_.InitWithFeatures(
-      {kGeminiNavigationPromo, kAskGeminiChip, kPageActionMenu}, {});
+  feature_list_.InitWithFeatures({kGeminiNavigationPromo, kPageActionMenu}, {});
 
   feature_engagement::Tracker* tracker = InitializeTracker();
 
@@ -438,8 +437,7 @@ TEST_F(GeminiTabHelperTest,
 }
 
 TEST_F(GeminiTabHelperTest, TestDidStartNavigation_DoesNotShowPromoForNewUser) {
-  feature_list_.InitWithFeatures(
-      {kGeminiNavigationPromo, kAskGeminiChip, kPageActionMenu}, {});
+  feature_list_.InitWithFeatures({kGeminiNavigationPromo, kPageActionMenu}, {});
 
   feature_engagement::Tracker* tracker = InitializeTracker();
 
@@ -459,8 +457,7 @@ TEST_F(GeminiTabHelperTest, TestDidStartNavigation_DoesNotShowPromoForNewUser) {
 
 TEST_F(GeminiTabHelperTest,
        TestDidStartNavigation_DoesNotShowPromoIfBWGStarted) {
-  feature_list_.InitWithFeatures(
-      {kGeminiNavigationPromo, kAskGeminiChip, kPageActionMenu}, {});
+  feature_list_.InitWithFeatures({kGeminiNavigationPromo, kPageActionMenu}, {});
 
   feature_engagement::Tracker* tracker = InitializeTracker();
 
@@ -486,7 +483,6 @@ TEST_F(GeminiTabHelperTest,
 TEST_F(GeminiTabHelperTest, TestDidStartNavigation_ShowsPromoPrefs) {
   feature_list_.InitWithFeatures(
       /*enabled_features=*/{kPageActionMenu, kGeminiNavigationPromo,
-                            kAskGeminiChip,
                             feature_engagement::
                                 kIPHiOSGeminiFullscreenPromoFeature},
       /*disabled_features=*/{});
@@ -514,8 +510,7 @@ TEST_F(GeminiTabHelperTest, TestDidStartNavigation_ShowsPromoPrefs) {
 
 TEST_F(GeminiTabHelperTest, TestDidStartNavigation_DoesNotShowPromoPrefs) {
   feature_list_.InitWithFeatures(
-      /*enabled_features=*/{kPageActionMenu, kGeminiNavigationPromo,
-                            kAskGeminiChip},
+      /*enabled_features=*/{kPageActionMenu, kGeminiNavigationPromo},
       /*disabled_features=*/{});
 
   OCMReject([mock_gemini_handler_ showGeminiPromoIfPageIsEligible]);

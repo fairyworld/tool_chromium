@@ -125,55 +125,13 @@ bool IsProactiveSuggestionsFrameworkPopupBlockerEnabled() {
       kProactiveSuggestionsFrameworkPopupBlocker, false);
 }
 
-BASE_FEATURE(kAskGeminiChip, base::FEATURE_ENABLED_BY_DEFAULT);
+BASE_FEATURE(kAskGeminiChipIgnoreCriteria, base::FEATURE_DISABLED_BY_DEFAULT);
 
-const char kAskGeminiChipIgnoreCriteria[] = "AskGeminiChipIgnoreCriteria";
-
-const char kAskGeminiChipPrepopulateFloaty[] = "AskGeminiChipPrepopulateFloaty";
-
-const char kAskGeminiChipPrepopulateAndIgnoreCriteria[] =
-    "AskGeminiChipPrepopulateAndIgnoreCriteria";
-
-const char kAskGeminiChipAllowNonconsentedUsers[] =
-    "AskGeminiChipAllowNonconsentedUsers";
-
-bool IsAskGeminiChipEnabled() {
+bool IsAskGeminiChipIgnoreCriteriaEnabled() {
   if (!IsPageActionMenuEnabled()) {
     return false;
   }
-  return base::FeatureList::IsEnabled(kAskGeminiChip);
-}
-
-bool IsAskGeminiChipIgnoreCriteria() {
-  if (!IsAskGeminiChipEnabled()) {
-    return false;
-  }
-  if (base::GetFieldTrialParamByFeatureAsBool(
-          kAskGeminiChip, kAskGeminiChipPrepopulateAndIgnoreCriteria, false)) {
-    return true;
-  }
-  return base::GetFieldTrialParamByFeatureAsBool(
-      kAskGeminiChip, kAskGeminiChipIgnoreCriteria, false);
-}
-
-bool IsAskGeminiChipPrepopulateFloatyEnabled() {
-  if (!IsAskGeminiChipEnabled()) {
-    return false;
-  }
-  if (base::GetFieldTrialParamByFeatureAsBool(
-          kAskGeminiChip, kAskGeminiChipPrepopulateAndIgnoreCriteria, false)) {
-    return true;
-  }
-  return base::GetFieldTrialParamByFeatureAsBool(
-      kAskGeminiChip, kAskGeminiChipPrepopulateFloaty, false);
-}
-
-bool IsAskGeminiChipAllowNonconsentedUsersEnabled() {
-  if (!IsAskGeminiChipEnabled()) {
-    return false;
-  }
-  return base::GetFieldTrialParamByFeatureAsBool(
-      kAskGeminiChip, kAskGeminiChipAllowNonconsentedUsers, false);
+  return base::FeatureList::IsEnabled(kAskGeminiChipIgnoreCriteria);
 }
 
 bool IsDirectBWGEntryPoint() {

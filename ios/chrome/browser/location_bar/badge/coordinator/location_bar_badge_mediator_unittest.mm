@@ -151,7 +151,6 @@ class LocationBarBadgeMediatorTest : public PlatformTest {
   LocationBarBadgeMediatorTest() {
     scoped_feature_list_.InitWithFeaturesAndParameters(
         {{kPageActionMenu, {}},
-         {kAskGeminiChip, {{kAskGeminiChipPrepopulateFloaty, "true"}}},
          {kLocationBarBadgeMigration, {}}},
         {kGeminiCopresence});
 
@@ -388,9 +387,7 @@ TEST_F(LocationBarBadgeMediatorTest, TestGeminiChipTapped) {
       startGeminiFlowWithStartupState:[OCMArg checkWithBlock:^BOOL(
                                                   GeminiStartupState* state) {
         return state.entryPoint == gemini::EntryPoint::OmniboxChip &&
-               [state.prepopulatedPrompt
-                   isEqualToString:l10n_util::GetNSString(
-                                       IDS_IOS_ASK_GEMINI_CHIP_PREFILL_PROMPT)];
+               state.prepopulatedPrompt == nil;
       }]]);
 
   EXPECT_CALL(

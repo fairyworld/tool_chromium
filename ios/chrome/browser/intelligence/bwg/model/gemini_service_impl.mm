@@ -40,11 +40,9 @@ GeminiServiceImpl::GeminiServiceImpl(
   identity_manager_observation_.Observe(identity_manager_);
   pref_service_ = pref_service;
 
-  if (IsAskGeminiChipEnabled()) {
-    optimization_guide_ = optimization_guide;
-    optimization_guide_->RegisterOptimizationTypes(
-        {optimization_guide::proto::GLIC_CONTEXTUAL_CUEING});
-  }
+  optimization_guide_ = optimization_guide;
+  optimization_guide_->RegisterOptimizationTypes(
+      {optimization_guide::proto::GLIC_CONTEXTUAL_CUEING});
 
   if (IsZeroStateSuggestionsEnabled()) {
     optimization_guide_ = optimization_guide;

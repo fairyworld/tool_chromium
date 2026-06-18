@@ -694,7 +694,7 @@
     "expiry_milestone": 152
   },
   {
-    "name": "ask-gemini-chip",
+    "name": "ask-gemini-chip-ignore-criteria",
     "owners": [
       "joemerramos@google.com",
       "bling-alchemy-eng@google.com"

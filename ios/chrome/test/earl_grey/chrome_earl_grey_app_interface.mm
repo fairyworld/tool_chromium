@@ -1411,10 +1411,6 @@ UIViewController* FindBrowserViewController(UIViewController* root) {
   return base::FeatureList::IsEnabled(metrics::kDemographicMetricsReporting);
 }
 
-+ (BOOL)isAskGeminiChipEnabled {
-  return IsAskGeminiChipEnabled();
-}
-
 + (BOOL)isProactiveSuggestionsFrameworkEnabled {
   return IsProactiveSuggestionsFrameworkEnabled();
 }

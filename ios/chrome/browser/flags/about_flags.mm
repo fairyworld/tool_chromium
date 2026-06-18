@@ -1040,30 +1040,6 @@ const FeatureEntry::FeatureVariation
         {"Popup Blocker", kProactiveSuggestionsFrameworkPopupBlockerParam,
          nullptr}};
 
-const FeatureEntry::FeatureParam kAskGeminiChipIgnoreCriteriaVariation[] = {
-    {kAskGeminiChipIgnoreCriteria, "true"},
-};
-const FeatureEntry::FeatureParam kAskGeminiChipPrepopulateFloatyVariation[] = {
-    {kAskGeminiChipPrepopulateFloaty, "true"},
-};
-const FeatureEntry::FeatureParam
-    kAskGeminiChipPrepopulateAndIgnoreCriteriaVariation[] = {
-        {kAskGeminiChipPrepopulateAndIgnoreCriteria, "true"},
-};
-const FeatureEntry::FeatureParam
-    kAskGeminiChipAllowNonconsentedUsersVariation[] = {
-        {kAskGeminiChipAllowNonconsentedUsers, "true"},
-};
-const FeatureEntry::FeatureVariation kAskGeminiChipVariations[] = {
-    {"Ignore FET and Time Criteria", kAskGeminiChipIgnoreCriteriaVariation,
-     nullptr},
-    {"Prepopulate Floaty", kAskGeminiChipPrepopulateFloatyVariation, nullptr},
-    {"Prepopulate Floaty and Ignore Criteria",
-     kAskGeminiChipPrepopulateAndIgnoreCriteriaVariation, nullptr},
-    {"Allow non-consented users", kAskGeminiChipAllowNonconsentedUsersVariation,
-     nullptr},
-};
-
 // LINT.IfChange(DataSharingVersioningChoices)
 const FeatureEntry::Choice kDataSharingVersioningStateChoices[] = {
     {"Default", "", ""},
@@ -2076,11 +2052,10 @@ constexpr auto kFeatureEntries = std::to_array<flags_ui::FeatureEntry>({
      FEATURE_WITH_PARAMS_VALUE_TYPE(kProactiveSuggestionsFramework,
                                     kProactiveSuggestionsFrameworkVariations,
                                     "ProactiveSuggestionsFramework")},
-    {"ask-gemini-chip", flag_descriptions::kAskGeminiChipName,
-     flag_descriptions::kAskGeminiChipDescription, flags_ui::kOsIos,
-     FEATURE_WITH_PARAMS_VALUE_TYPE(kAskGeminiChip,
-                                    kAskGeminiChipVariations,
-                                    "IOSAskGeminiChip")},
+    {"ask-gemini-chip-ignore-criteria",
+     flag_descriptions::kAskGeminiChipIgnoreCriteriaName,
+     flag_descriptions::kAskGeminiChipIgnoreCriteriaDescription,
+     flags_ui::kOsIos, FEATURE_VALUE_TYPE(kAskGeminiChipIgnoreCriteria)},
     {"gemini-copresence", flag_descriptions::kGeminiCopresenceName,
      flag_descriptions::kGeminiCopresenceDescription, flags_ui::kOsIos,
      FEATURE_WITH_PARAMS_VALUE_TYPE(kGeminiCopresence,

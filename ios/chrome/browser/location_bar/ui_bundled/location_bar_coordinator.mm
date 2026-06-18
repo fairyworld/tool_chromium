@@ -294,7 +294,7 @@ struct AIHubBadgeActiveWindowsData : public base::SupportsUserData::Data {
         [self.omniboxCoordinator offsetProvider];
   }
 
-  if (IsAskGeminiChipEnabled() || IsProactiveSuggestionsFrameworkEnabled() ||
+  if (IsPageActionMenuEnabled() || IsProactiveSuggestionsFrameworkEnabled() ||
       IsLocationBarBadgeMigrationEnabled()) {
     self.locationBarBadgeCoordinator = [[LocationBarBadgeCoordinator alloc]
         initWithBaseViewController:self.viewController
@@ -488,7 +488,7 @@ struct AIHubBadgeActiveWindowsData : public base::SupportsUserData::Data {
       stopDispatchingToTarget:self.viewController
                                   .pageActionMenuEntryPointHandler];
 
-  if (IsAskGeminiChipEnabled() || IsProactiveSuggestionsFrameworkEnabled() ||
+  if (IsPageActionMenuEnabled() || IsProactiveSuggestionsFrameworkEnabled() ||
       IsLocationBarBadgeMigrationEnabled()) {
     [self.locationBarBadgeCoordinator stop];
     self.locationBarBadgeCoordinator = nil;

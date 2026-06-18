@@ -42,6 +42,7 @@ BASE_DECLARE_FEATURE(kPageActionMenu);
 // launched ones.
 BASE_DECLARE_FEATURE(kGeminiKillSwitch);
 
+// TODO(crbug.com/494235953): Clean up when feature is enabled by default.
 // Returns true if the page action menu is enabled.
 bool IsPageActionMenuEnabled();
 
@@ -51,29 +52,13 @@ BASE_DECLARE_FEATURE(kPageActionMenuAuthFlow);
 // Returns true if the Ask Gemini auth flow in the Page Action Menu is enabled.
 bool IsPageActionMenuAuthFlowEnabled();
 
-// Feature flag controlling the Ask Gemini chip.
-BASE_DECLARE_FEATURE(kAskGeminiChip);
-
-// Returns true if the Ask Gemini chip is enabled.
-bool IsAskGeminiChipEnabled();
+// Feature flag controlling if the Ask Gemini chip should ignore FET and time
+// criteria.
+BASE_DECLARE_FEATURE(kAskGeminiChipIgnoreCriteria);
 
 // Returns true if the Ask Gemini chip should be shown without checking the FET
 // and time criteria.
-bool IsAskGeminiChipIgnoreCriteria();
-extern const char kAskGeminiChipIgnoreCriteria[];
-
-// Returns true if the Ask Gemini chip should prepopulate the Gemini Floaty with
-// a prompt.
-bool IsAskGeminiChipPrepopulateFloatyEnabled();
-extern const char kAskGeminiChipPrepopulateFloaty[];
-
-// A variation that combines `kAskGeminiChipIgnoreCriteria` and
-// `kAskGeminiChipPrepopulateFloaty`.
-extern const char kAskGeminiChipPrepopulateAndIgnoreCriteria[];
-
-// Returns true if the Ask Gemini chip should allow non-consented users.
-bool IsAskGeminiChipAllowNonconsentedUsersEnabled();
-extern const char kAskGeminiChipAllowNonconsentedUsers[];
+bool IsAskGeminiChipIgnoreCriteriaEnabled();
 
 // Whether the omnibox entry point opens the BWG overlay immediately, skipping
 // the AI hub.

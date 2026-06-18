@@ -94,9 +94,10 @@ inline constexpr char kAskAboutThisPageName[] = "AskAboutThisPage";
 inline constexpr char kAskAboutThisPageDescription[] =
     "Enables the AskAboutThisPage feature.";
 
-inline constexpr char kAskGeminiChipName[] = "Ask Gemini Chip";
-inline constexpr char kAskGeminiChipDescription[] =
-    "Enables the Ask Gemini Chip feature.";
+inline constexpr char kAskGeminiChipIgnoreCriteriaName[] =
+    "Ask Gemini Chip Ignore Criteria";
+inline constexpr char kAskGeminiChipIgnoreCriteriaDescription[] =
+    "Enables the Ask Gemini Chip ignoring FET and time criteria.";
 
 inline constexpr char kAssistantAimMinimizedStateName[] =
     "AssistantAimMinimizedState";
