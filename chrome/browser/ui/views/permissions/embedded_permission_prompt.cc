@@ -73,12 +73,12 @@ void EmbeddedPermissionPrompt::CloseCurrentViewAndMaybeShowNext(
   switch (prompt_variant()) {
     case Variant::kAsk:
       prompt_view = new EmbeddedPermissionPromptAskView(
-          browser(), weak_factory_.GetWeakPtr());
+          web_contents(), weak_factory_.GetWeakPtr());
       break;
     case Variant::kPreviouslyGranted:
       if (first_prompt) {
         prompt_view = new EmbeddedPermissionPromptPreviouslyGrantedView(
-            browser(), weak_factory_.GetWeakPtr());
+            web_contents(), weak_factory_.GetWeakPtr());
       } else {
         FinalizePrompt();
         return;
@@ -86,11 +86,11 @@ void EmbeddedPermissionPrompt::CloseCurrentViewAndMaybeShowNext(
       break;
     case Variant::kPreviouslyDenied:
       prompt_view = new EmbeddedPermissionPromptPreviouslyDeniedView(
-          browser(), weak_factory_.GetWeakPtr());
+          web_contents(), weak_factory_.GetWeakPtr());
       break;
     case Variant::kOsPrompt:
       prompt_view = new EmbeddedPermissionPromptShowSystemPromptView(
-          browser(), weak_factory_.GetWeakPtr());
+          web_contents(), weak_factory_.GetWeakPtr());
       prompt_model_->StartFirstDisplayTime();
       // This view has no buttons, so the OS level prompt should be triggered at
       // the same time as the |EmbeddedPermissionPromptShowSystemPromptView|.
@@ -98,17 +98,17 @@ void EmbeddedPermissionPrompt::CloseCurrentViewAndMaybeShowNext(
       break;
     case Variant::kOsSystemSettings:
       prompt_view = new EmbeddedPermissionPromptSystemSettingsView(
-          browser(), weak_factory_.GetWeakPtr());
+          web_contents(), weak_factory_.GetWeakPtr());
       prompt_model_->StartFirstDisplayTime();
       break;
     case Variant::kAdministratorGranted:
       prompt_view = new EmbeddedPermissionPromptPolicyView(
-          browser(), weak_factory_.GetWeakPtr(),
+          web_contents(), weak_factory_.GetWeakPtr(),
           /*is_permission_allowed=*/true);
       break;
     case Variant::kAdministratorDenied:
       prompt_view = new EmbeddedPermissionPromptPolicyView(
-          browser(), weak_factory_.GetWeakPtr(),
+          web_contents(), weak_factory_.GetWeakPtr(),
           /*is_permission_allowed=*/false);
       break;
     case Variant::kUninitialized:

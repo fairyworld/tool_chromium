@@ -37,15 +37,15 @@ PermissionPromptBubble::~PermissionPromptBubble() {
 }
 
 void PermissionPromptBubble::ShowBubble() {
-    auto blocker =
-        web_contents()->ForSecurityDropFullscreen(display::kInvalidDisplayId);
-    if (!blocker) {
-      return;
-    }
-    fullscreen_blocker_ = std::move(*blocker);
+  auto blocker =
+      web_contents()->ForSecurityDropFullscreen(display::kInvalidDisplayId);
+  if (!blocker) {
+    return;
+  }
+  fullscreen_blocker_ = std::move(*blocker);
 
   raw_ptr<PermissionPromptBubbleBaseView> prompt_bubble =
-      CreatePermissionPromptBubbleView(browser(), delegate()->GetWeakPtr(),
+      CreatePermissionPromptBubbleView(web_contents(), delegate()->GetWeakPtr(),
                                        PermissionPromptStyle::kBubbleOnly);
   prompt_bubble_tracker_.SetView(prompt_bubble);
   prompt_bubble->Show();

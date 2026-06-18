@@ -53,7 +53,7 @@ ExclusiveAccessPermissionPrompt::GetViewForTesting() {
 
 bool ExclusiveAccessPermissionPrompt::ShowPrompt() {
   raw_ptr<ExclusiveAccessPermissionPromptView> prompt_view =
-      new ExclusiveAccessPermissionPromptView(browser(),
+      new ExclusiveAccessPermissionPromptView(web_contents(),
                                               GetPermissionPromptDelegate());
   prompt_view_tracker_.SetView(prompt_view);
   scoped_ignore_input_events_ = web_contents()->IgnoreInputEvents(std::nullopt);

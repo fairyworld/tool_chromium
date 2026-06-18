@@ -87,7 +87,7 @@ int GetPermissionIconSize() {
   return 20;
 }
 
-float GetScreenScaleFactor(Browser* browser) {
+float GetScreenScaleFactor(BrowserWindowInterface* browser) {
   BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser);
   return browser_view ? display::Screen::Get()
                             ->GetPreferredScaleFactorForWindow(
@@ -96,7 +96,7 @@ float GetScreenScaleFactor(Browser* browser) {
                       : 1.0f;
 }
 
-views::View* GetContentsWebView(Browser* browser) {
+views::View* GetContentsWebView(BrowserWindowInterface* browser) {
   BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser);
   return browser_view ? browser_view->contents_web_view() : nullptr;
 }
@@ -104,9 +104,9 @@ views::View* GetContentsWebView(Browser* browser) {
 }  // namespace
 
 EmbeddedPermissionPromptBaseView::EmbeddedPermissionPromptBaseView(
-    Browser* browser,
+    content::WebContents* web_contents,
     base::WeakPtr<EmbeddedPermissionPromptViewDelegate> delegate)
-    : PermissionPromptBaseView(browser,
+    : PermissionPromptBaseView(web_contents,
                                delegate->GetPermissionPromptDelegate()),
       delegate_(delegate) {
   SetProperty(views::kElementIdentifierKey, kMainViewId);
@@ -126,11 +126,11 @@ EmbeddedPermissionPromptBaseView::EmbeddedPermissionPromptBaseView(
   }
 
   // Scale the element position according to the device scale factor.
-  element_rect_ = gfx::ScaleToEnclosedRect(element_rect_,
-                                           1.f / GetScreenScaleFactor(browser));
+  element_rect_ = gfx::ScaleToEnclosedRect(
+      element_rect_, 1.f / GetScreenScaleFactor(GetBrowser()));
 
   // Convert the position into screen coordinates.
-  auto* content_view = GetContentsWebView(browser);
+  auto* content_view = GetContentsWebView(GetBrowser());
   views::View::ConvertRectToScreen(content_view, &element_rect_);
 }
 
@@ -157,7 +157,7 @@ bool EmbeddedPermissionPromptBaseView::ShowLoadingIcon() const {
 }
 
 void EmbeddedPermissionPromptBaseView::CreateWidget() {
-  DCHECK(browser()->GetWindow());
+  DCHECK(GetBrowser()->GetWindow());
   views::Widget* widget = views::BubbleDialogDelegateView::CreateBubble(this);
 
   widget->SetZOrderSublevel(ChromeWidgetSublevel::kSublevelSecurity);

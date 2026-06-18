@@ -13,6 +13,10 @@
 #include "ui/views/layout/flex_layout_view.h"
 #include "ui/views/view_observer.h"
 
+namespace content {
+class WebContents;
+}
+
 // Bubble that prompts the user to grant or deny a permission request from from
 // a pair of origins.
 //
@@ -32,7 +36,7 @@ class PermissionPromptBubbleTwoOriginsView
       public views::ViewObserver {
  public:
   PermissionPromptBubbleTwoOriginsView(
-      Browser* browser,
+      content::WebContents* web_contents,
       base::WeakPtr<permissions::PermissionPrompt::Delegate> delegate,
       PermissionPromptStyle prompt_style);
   PermissionPromptBubbleTwoOriginsView(

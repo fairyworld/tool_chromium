@@ -73,11 +73,9 @@ std::string_view GetPermissionActionString(
 }  // namespace
 
 ExclusiveAccessPermissionPromptView::ExclusiveAccessPermissionPromptView(
-    Browser* browser,
+    content::WebContents* web_contents,
     base::WeakPtr<permissions::PermissionPrompt::Delegate> delegate)
-    : PermissionPromptBaseView(browser, delegate),
-      browser_(browser),
-      delegate_(delegate) {
+    : PermissionPromptBaseView(web_contents, delegate), delegate_(delegate) {
   SetProperty(views::kElementIdentifierKey, kMainViewId);
 }
 
@@ -132,7 +130,7 @@ void ExclusiveAccessPermissionPromptView::Show() {
 }
 
 void ExclusiveAccessPermissionPromptView::CreateWidget() {
-  DCHECK(browser_->GetWindow());
+  DCHECK(GetBrowser()->GetWindow());
   views::Widget* widget = views::BubbleDialogDelegateView::CreateBubble(this);
 
   widget->SetZOrderSublevel(ChromeWidgetSublevel::kSublevelSecurity);
@@ -173,8 +171,10 @@ void ExclusiveAccessPermissionPromptView::ShowWidget() {
 
 void ExclusiveAccessPermissionPromptView::UpdateAnchor(views::Widget* widget) {
   SetAnchorView(widget->GetContentsView());
-  set_parent_window(platform_util::GetViewForWindow(
-      browser_->GetWindow()->GetNativeWindow()));
+  if (GetBrowser() && GetBrowser()->GetWindow()) {
+    set_parent_window(platform_util::GetViewForWindow(
+        GetBrowser()->GetWindow()->GetNativeWindow()));
+  }
   SetArrow(views::BubbleBorder::Arrow::FLOAT);
 }
 
