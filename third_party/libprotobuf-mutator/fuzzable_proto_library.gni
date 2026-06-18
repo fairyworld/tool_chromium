@@ -28,11 +28,6 @@ template("fuzzable_proto_library") {
            "proto_library_deps is deprecated and not supported with " +
                "use_experimental_fuzzable_proto = true. Use deps instead.")
 
-    # TODO(crbug.com/505034799): Support proto_out_dir.
-    assert(!defined(invoker.proto_out_dir),
-           "proto_out_dir is not supported yet with " +
-               "use_experimental_fuzzable_proto = true.")
-
     _source_abspaths = rebase_path(invoker.sources, "//")
     _rebased_root_gen_dir = rebase_path(root_gen_dir, "//") + "/"
 
@@ -80,6 +75,18 @@ template("fuzzable_proto_library") {
 
     _fuzzable_proto_target = "${target_name}_fuzzable__proto"
     proto_library(_fuzzable_proto_target) {
+      forward_variables_from(invoker,
+                             "*",
+                             [
+                               "sources",
+                               "deps",
+                               "proto_deps",
+                               "proto_in_dir",
+                               "proto_out_dir",
+                               "component_build_force_source_set",
+                               "use_experimental_fuzzable_proto",
+                             ])
+
       testonly = true
       sources = _prepended_protos
       proto_deps = [ ":$_prepend_fuzzable_target" ]
@@ -90,18 +97,12 @@ template("fuzzable_proto_library") {
         _src_relative_in_dir = rebase_path(".", "//")
       }
       proto_in_dir = "$root_gen_dir/$_src_relative_in_dir"
-      proto_out_dir = _src_relative_in_dir
+      if (defined(invoker.proto_out_dir)) {
+        proto_out_dir = invoker.proto_out_dir
+      } else {
+        proto_out_dir = _src_relative_in_dir
+      }
 
-      forward_variables_from(invoker,
-                             "*",
-                             [
-                               "sources",
-                               "deps",
-                               "proto_in_dir",
-                               "proto_out_dir",
-                               "component_build_force_source_set",
-                               "use_experimental_fuzzable_proto",
-                             ])
       if (defined(invoker.deps)) {
         deps = []
         foreach(dep, invoker.deps) {
