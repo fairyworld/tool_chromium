@@ -179,6 +179,20 @@ using PlusAddressCallback = base::OnceCallback<void(const std::string&)>;
 // with" (e.g. for the tab the BrowserAutofillManager is attached to).
 class AutofillClient {
  public:
+  // Categories of Autofill data that can be blocked or allowed on specific GURL
+  // patterns by enterprise policies.
+  enum class AutofillPolicyDataCategory {
+    // Address, name, email, phone, and profile configuration details.
+    kContactInfo,
+    // Credit cards, virtual cards, bank accounts, and IBANs.
+    kPayments,
+    // Autofill AI identity document details (e.g. passports, driver's licenses,
+    // national IDs).
+    kIdentityDocs,
+    // Autofill AI travel/booking details (e.g. flights, vehicles).
+    kTravel,
+  };
+
   // Represents the user's possible decisions or outcomes in response to a
   // prompt related to address saving, updating, or migrating.
   // These values are persisted to logs. Entries should not be renumbered and
@@ -673,6 +687,12 @@ class AutofillClient {
 
   // Whether the Autocomplete feature of Autofill should be enabled.
   virtual bool IsAutocompleteEnabled() const = 0;
+
+  // Returns true if the specified Autofill type is blocked by enterprise policy
+  // on GURL.
+  virtual bool IsAutofillTypeBlockedByPolicy(
+      const GURL& url,
+      AutofillPolicyDataCategory category) const;
 
   // Returns whether password management is enabled as per the user preferences.
   virtual bool IsPasswordManagerEnabled() const = 0;

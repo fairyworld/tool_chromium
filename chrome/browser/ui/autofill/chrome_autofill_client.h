@@ -227,6 +227,9 @@ class ChromeAutofillClient : public ContentAutofillClient {
   ActorKeyMetricsRecorder* GetActorKeyMetricsRecorder() final;
   bool IsAutofillEnabled() const final;
   bool IsAutofillProfileEnabled() const final;
+  bool IsAutofillTypeBlockedByPolicy(
+      const GURL& url,
+      AutofillPolicyDataCategory category) const final;
   bool IsAutocompleteEnabled() const final;
   bool IsWalletPublicPassStorageEnabled() const final;
   bool IsPasswordManagerEnabled() const final;

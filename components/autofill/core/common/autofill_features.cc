@@ -544,6 +544,11 @@ BASE_FEATURE_PARAM(bool,
 BASE_FEATURE(kAutofillEnableAddressFieldParserNG,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
+// When enabled, Autofill will support per domain and per data type enterprise
+// policy.
+BASE_FEATURE(kAutofillEnableAutofillSettingsEnterprisePolicy,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
 // When enabled, FormFieldParser::MatchesRegexWithCache tries to avoid
 // re-computing whether a regex matches an input string by caching the result.
 // The result size is controlled by

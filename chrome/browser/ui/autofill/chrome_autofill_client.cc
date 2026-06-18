@@ -35,6 +35,7 @@
 #include "chrome/browser/autofill/autocomplete_history_manager_factory.h"
 #include "chrome/browser/autofill/autofill_ai_model_cache_factory.h"
 #include "chrome/browser/autofill/autofill_ai_model_executor_factory.h"
+#include "chrome/browser/autofill/autofill_enterprise_policy_service_factory.h"
 #include "chrome/browser/autofill/autofill_entity_data_manager_factory.h"
 #include "chrome/browser/autofill/autofill_field_classification_model_service_factory.h"
 #include "chrome/browser/autofill/autofill_optimization_guide_decider_factory.h"
@@ -121,6 +122,7 @@
 #include "components/autofill/core/browser/metrics/autofill_settings_metrics.h"
 #include "components/autofill/core/browser/ml_model/field_classification_model_handler.h"
 #include "components/autofill/core/browser/payments/payments_network_interface.h"
+#include "components/autofill/core/browser/permissions/enterprise_policy/autofill_enterprise_policy_service.h"
 #include "components/autofill/core/browser/single_field_fillers/single_field_fill_router.h"
 #include "components/autofill/core/browser/studies/autofill_experiments.h"
 #include "components/autofill/core/browser/suggestions/suggestion_hiding_reason.h"
@@ -1018,6 +1020,14 @@ bool ChromeAutofillClient::IsAutofillEnabled() const {
 
 bool ChromeAutofillClient::IsAutofillProfileEnabled() const {
   return prefs::IsAutofillProfileEnabled(GetPrefs());
+}
+
+bool ChromeAutofillClient::IsAutofillTypeBlockedByPolicy(
+    const GURL& url,
+    AutofillPolicyDataCategory category) const {
+  AutofillEnterprisePolicyService* service =
+      AutofillEnterprisePolicyServiceFactory::GetForProfile(GetProfile());
+  return service && service->IsAutofillTypeBlockedByPolicy(url, category);
 }
 
 bool ChromeAutofillClient::IsAutocompleteEnabled() const {

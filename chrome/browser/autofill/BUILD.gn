@@ -18,6 +18,8 @@ static_library("autofill") {
     "autofill_ai_model_cache_factory.h",
     "autofill_ai_model_executor_factory.cc",
     "autofill_ai_model_executor_factory.h",
+    "autofill_enterprise_policy_service_factory.cc",
+    "autofill_enterprise_policy_service_factory.h",
     "autofill_entity_data_manager_factory.cc",
     "autofill_entity_data_manager_factory.h",
     "autofill_field_classification_model_service_factory.cc",

@@ -442,4 +442,10 @@ void AutofillClient::OpenGeminiInSidebar(const std::u16string& prompt) {
   NOTIMPLEMENTED();
 }
 
+bool AutofillClient::IsAutofillTypeBlockedByPolicy(
+    const GURL& url,
+    AutofillPolicyDataCategory category) const {
+  return false;
+}
+
 }  // namespace autofill
