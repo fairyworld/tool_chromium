@@ -374,7 +374,7 @@ IN_PROC_BROWSER_TEST_P(GlicProfileManagerPreloadingTest,
   GlicProfileManager::ForceProfileForLaunchForTesting(std::nullopt);
   SetGlicCapability(browser()->profile(), false);
   EXPECT_EQ(WaitForShouldPreload(),
-            GlicPrewarmingChecksResult::kProfileNotEligible);
+            GlicPrewarmingChecksResult::kProfileNotEligibleAccountCapabilities);
 }
 
 IN_PROC_BROWSER_TEST_P(GlicProfileManagerPreloadingTest,
