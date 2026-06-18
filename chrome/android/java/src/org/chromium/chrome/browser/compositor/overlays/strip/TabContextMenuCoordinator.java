@@ -44,6 +44,7 @@ import org.chromium.chrome.browser.share.ShareDelegate;
 import org.chromium.chrome.browser.share.ShareUtils;
 import org.chromium.chrome.browser.share.send_tab_to_self.SendTabToSelfAndroidBridge;
 import org.chromium.chrome.browser.share.send_tab_to_self.SendTabToSelfCoordinator;
+import org.chromium.chrome.browser.share.send_tab_to_self.ShareEntryPoint;
 import org.chromium.chrome.browser.signin.SigninAndHistorySyncActivityLauncherImpl;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabLaunchType;
@@ -160,7 +161,8 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
                 SigninAndHistorySyncActivityLauncher signinAndHistorySyncActivityLauncher,
                 ActivityResultTracker activityResultTracker,
                 MonotonicObservableSupplier<ModalDialogManager> modalDialogManagerSupplier,
-                SnackbarManager snackbarManager);
+                SnackbarManager snackbarManager,
+                @ShareEntryPoint int entryPoint);
     }
 
     private static SendTabToSelfCoordinatorCreator sSendTabToSelfCreator =
@@ -553,7 +555,8 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
                         SigninAndHistorySyncActivityLauncherImpl.get(),
                         activityResultTracker,
                         ObservableSuppliers.createMonotonic(modalDialogManager),
-                        snackbarManager);
+                        snackbarManager,
+                        ShareEntryPoint.TAB_MENU);
         sttsCoordinator.show();
     }
 
@@ -945,9 +948,7 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
 
     private ListItem createSendTabToSelfMenuItem() {
         String title =
-                mActivity
-                        .getResources()
-                        .getString(R.string.send_tab_to_self_context_menu_title);
+                mActivity.getResources().getString(R.string.send_tab_to_self_context_menu_title);
 
         return new ListItemBuilder()
                 .withTitle(title)

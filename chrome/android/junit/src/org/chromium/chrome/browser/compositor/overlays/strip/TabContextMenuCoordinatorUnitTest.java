@@ -92,6 +92,7 @@ import org.chromium.chrome.browser.share.send_tab_to_self.EntryPointDisplayReaso
 import org.chromium.chrome.browser.share.send_tab_to_self.SendTabToSelfAndroidBridge;
 import org.chromium.chrome.browser.share.send_tab_to_self.SendTabToSelfAndroidBridgeJni;
 import org.chromium.chrome.browser.share.send_tab_to_self.SendTabToSelfCoordinator;
+import org.chromium.chrome.browser.share.send_tab_to_self.ShareEntryPoint;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabCreationState;
 import org.chromium.chrome.browser.tab.TabLaunchType;
@@ -2232,9 +2233,11 @@ public class TabContextMenuCoordinatorUnitTest {
                         launcher,
                         tracker,
                         mdm,
-                        sm) -> {
+                        sm,
+                        entryPoint) -> {
                     assertEquals(EXAMPLE_URL.getSpec(), url);
                     assertEquals(mTab1, tabSupplier.get());
+                    assertEquals(ShareEntryPoint.TAB_MENU, entryPoint);
                     return mockSttsCoordinator;
                 });
 

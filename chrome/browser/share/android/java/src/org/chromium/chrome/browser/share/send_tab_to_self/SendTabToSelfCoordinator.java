@@ -193,6 +193,8 @@ public class SendTabToSelfCoordinator
     private @Nullable PropertyModelChangeProcessor mChangeProcessor;
     private @Nullable EnhancedTargetDevicePickerView mView;
 
+    private final @ShareEntryPoint int mEntryPoint;
+
     public SendTabToSelfCoordinator(
             Context context,
             @Nullable WindowAndroid windowAndroid,
@@ -206,7 +208,8 @@ public class SendTabToSelfCoordinator
             SigninAndHistorySyncActivityLauncher signinAndHistorySyncActivityLauncher,
             ActivityResultTracker activityResultTracker,
             MonotonicObservableSupplier<ModalDialogManager> modalDialogManagerSupplier,
-            SnackbarManager snackbarManager) {
+            SnackbarManager snackbarManager,
+            @ShareEntryPoint int entryPoint) {
         mContext = context;
         mWindowAndroid = windowAndroid;
         mUrl = url;
@@ -220,6 +223,7 @@ public class SendTabToSelfCoordinator
         mActivityResultTracker = activityResultTracker;
         mModalDialogManagerSupplier = modalDialogManagerSupplier;
         mSnackbarManager = snackbarManager;
+        mEntryPoint = entryPoint;
     }
 
     public void show() {
@@ -229,6 +233,7 @@ public class SendTabToSelfCoordinator
         assert displayReason != null;
 
         SendTabToSelfMetricsRecorder.recordCrossDeviceTabJourney();
+        SendTabToSelfMetricsRecorder.recordEntryPointInvoked(mEntryPoint);
         switch (displayReason) {
             case EntryPointDisplayReason.INFORM_NO_TARGET_DEVICE:
                 mBottomSheetController.requestShowContent(
@@ -381,7 +386,7 @@ public class SendTabToSelfCoordinator
         PropertyModel model = EnhancedTargetDevicePickerProperties.createDefaultModel();
 
         new EnhancedTargetDevicePickerMediator(
-                mUrl, mTitle, targetDevices, mProfile, mTabProvider, model);
+                mUrl, mTitle, targetDevices, mProfile, mTabProvider, model, mEntryPoint);
 
         mChangeProcessor =
                 PropertyModelChangeProcessor.create(
@@ -432,7 +437,8 @@ public class SendTabToSelfCoordinator
                         mBottomSheetController,
                         targetDevices,
                         mProfile,
-                        mTabProvider),
+                        mTabProvider,
+                        mEntryPoint),
                 true);
     }
 }

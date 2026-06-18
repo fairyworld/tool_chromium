@@ -158,6 +158,7 @@ chromium-metrics-reviews@google.com.
   <int value="4" label="Share Menu"/>
   <int value="5" label="Share Sheet"/>
   <int value="6" label="Tab Menu"/>
+  <int value="7" label="Gesture"/>
 </enum>
 
 <!-- LINT.ThenChange(/components/send_tab_to_self/metrics_util.h:SendTabToSelfShareEntryPoint) -->

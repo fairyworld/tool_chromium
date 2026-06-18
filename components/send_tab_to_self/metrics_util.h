@@ -33,7 +33,9 @@ enum class ShareEntryPoint {
   kShareSheet = 5,
   // The context menu on a tab (in the tab strip or tab switcher).
   kTabMenu = 6,
-  kMaxValue = kTabMenu,
+  // A physical gesture.
+  kGesture = 7,
+  kMaxValue = kGesture,
 };
 // LINT.ThenChange(/tools/metrics/histograms/metadata/sharing/enums.xml:SendTabToSelfShareEntryPoint)
 

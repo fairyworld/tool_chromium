@@ -77,7 +77,8 @@ public class SendTabToSelfAndroidBridge {
             String targetDeviceName,
             String url,
             String title,
-            @Nullable CommitConfirmationCallback commitConfirmation) {
+            @Nullable CommitConfirmationCallback commitConfirmation,
+            @ShareEntryPoint int entryPoint) {
         SendTabToSelfAndroidBridgeJni.get()
                 .sendTabToDevice(
                         profile,
@@ -90,7 +91,8 @@ public class SendTabToSelfAndroidBridge {
                             if (commitConfirmation != null) {
                                 commitConfirmation.onResult(result);
                             }
-                        });
+                        },
+                        entryPoint);
     }
 
     private static void showPostSendToast(
@@ -158,7 +160,6 @@ public class SendTabToSelfAndroidBridge {
         // assert mIsNativeSendTabToSelfModelLoaded;
         return SendTabToSelfAndroidBridgeJni.get().getAllTargetDeviceInfos(profile);
     }
-
 
     public static @Nullable @EntryPointDisplayReason Integer getEntryPointDisplayReason(
             Profile profile, String url) {
@@ -247,7 +248,8 @@ public class SendTabToSelfAndroidBridge {
                 String targetDeviceSyncCacheGuid,
                 String url,
                 String title,
-                CommitConfirmationCallback commitConfirmation);
+                CommitConfirmationCallback commitConfirmation,
+                int entryPoint);
 
         void markEntryOpened(@JniType("Profile*") Profile profile, String guid);
 

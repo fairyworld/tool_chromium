@@ -71,11 +71,14 @@ static void JNI_SendTabToSelfAndroidBridge_SendTabToDevice(
     const JavaRef<jstring>& j_target_device_sync_cache_guid,
     const JavaRef<jstring>& j_url,
     const JavaRef<jstring>& j_title,
-    const JavaRef<jobject>& j_callback) {
+    const JavaRef<jobject>& j_callback,
+    int32_t j_entry_point) {
   const std::string target_device_sync_cache_guid =
       ConvertJavaStringToUTF8(env, j_target_device_sync_cache_guid);
   const std::string url = ConvertJavaStringToUTF8(env, j_url);
   const std::string title = ConvertJavaStringToUTF8(env, j_title);
+  const ShareEntryPoint entry_point =
+      static_cast<ShareEntryPoint>(j_entry_point);
 
   // TODO(crbug.com/492072882) Consider adding a `CHECK` once Android is updated
   // to always provide the callback.
@@ -95,12 +98,9 @@ static void JNI_SendTabToSelfAndroidBridge_SendTabToDevice(
   content::WebContents* web_contents =
       content::WebContents::FromJavaWebContents(j_web_contents);
   if (web_contents) {
-    // TODO(crbug.com/503283050): Plumb the correct ShareEntryPoint through from
-    // the Java side.
     SendTabToSelfPageHandler::GetOrCreateForWebContents(web_contents)
         ->SendTabToDevice(target_device_sync_cache_guid, GURL(url), title,
-                          std::move(commit_confirmation),
-                          ShareEntryPoint::kShareSheet);
+                          std::move(commit_confirmation), entry_point);
     return;
   }
 
@@ -113,7 +113,7 @@ static void JNI_SendTabToSelfAndroidBridge_SendTabToDevice(
   CHECK(model);
   model->SendEntry(GURL(url), title, target_device_sync_cache_guid,
                    PageContext(), NavigationHistory(),
-                   std::move(commit_confirmation));
+                   std::move(commit_confirmation), entry_point);
 }
 
 // Marks the entry with the associated GUID as opened.

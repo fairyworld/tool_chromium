@@ -394,7 +394,8 @@ public class SendTabToSelfCoordinatorTest {
                                     SigninAndHistorySyncActivityLauncherImpl.get(),
                                     activity.getActivityResultTracker(),
                                     activity.getModalDialogManagerSupplier(),
-                                    activity.getSnackbarManager());
+                                    activity.getSnackbarManager(),
+                                    ShareEntryPoint.SHARE_SHEET);
                     coordinator.show();
                 });
     }
