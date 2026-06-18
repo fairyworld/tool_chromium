@@ -71,6 +71,16 @@ p {
   padding-inline: var(--cr-section-padding);
 }
 
+.if-empty {
+  display: block;
+}
+
+.promo-list:has(:is(
+    user-education-internals-card,
+    user-education-whats-new-internals-card):not([hidden])) > .if-empty {
+  display: none;
+}
+
 #container {
   align-items: flex-start;
   color: var(--cr-primary-text-color);
@@ -93,6 +103,10 @@ p {
 
 #sidebar {
   width: var(--side-bar-width);
+}
+
+#menu {
+  flex-direction: column;
 }
 
 #main {
