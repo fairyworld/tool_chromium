@@ -4,14 +4,10 @@
 import {addWebUIListener} from 'chrome://resources/ash/common/cr.m.js';
 import {$} from 'chrome://resources/ash/common/util.js';
 
-/** @type {boolean} */
-let initialized = false;
-
 function initialize() {
   $('slow-disable').addEventListener('click', () => disableTracing());
   $('slow-enable').addEventListener('click', () => enableTracing());
   addWebUIListener('tracing-pref-changed', tracingPrefChanged);
-  initialized = true;
 }
 
 function disableTracing() {
@@ -22,8 +18,7 @@ function enableTracing() {
   chrome.send('enableTracing');
 }
 
-/** @param {boolean} enabled */
-function tracingPrefChanged(enabled) {
+function tracingPrefChanged(enabled: boolean) {
   $('slow-disable').hidden = !enabled;
   $('slow-enable').hidden = enabled;
 }
