@@ -3157,7 +3157,7 @@ void RenderProcessHostImpl::DisableRefCounts() {
 }
 
 bool RenderProcessHostImpl::AreRefCountsDisabled() {
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   return are_ref_counts_disabled_;
 }
 
@@ -3214,7 +3214,7 @@ void RenderProcessHostImpl::RemoveRoute(int32_t routing_id) {
                                   ->set_render_process_host_listener_changed();
                 proto->set_routing_id(routing_id);
               });
-  DCHECK(listeners_.Lookup(routing_id) != nullptr);
+  CHECK(listeners_.Lookup(routing_id) != nullptr, base::NotFatalUntil::M152);
   listeners_.Remove(routing_id);
   Cleanup();
 }
@@ -3291,7 +3291,7 @@ void RenderProcessHostImpl::ShutdownForBadMessage(
 
 void RenderProcessHostImpl::UpdateClientPriority(
     RenderProcessHostPriorityClient* client) {
-  DCHECK(client);
+  CHECK(client, base::NotFatalUntil::M152);
   DCHECK_EQ(1u, priority_clients_.count(client));
   UpdateProcessPriorityInputs();
 }
@@ -4289,7 +4289,7 @@ void RenderProcessHostImpl::OnChannelConnected(int32_t peer_pid) {
 #endif
 
   if (IsReady()) {
-    DCHECK(!sent_render_process_ready_);
+    CHECK(!sent_render_process_ready_, base::NotFatalUntil::M152);
     sent_render_process_ready_ = true;
     // Send RenderProcessReady only if we already received the process handle.
     for (auto& observer : observers_)
@@ -4421,7 +4421,8 @@ bool RenderProcessHostImpl::HasOnlyNonLiveRenderFrameHosts() {
     return false;
 
   // We should never find more than render_frame_host_count_.
-  DCHECK_EQ(GetRenderFrameHostCount(), found_rfh_count);
+  CHECK_EQ(GetRenderFrameHostCount(), found_rfh_count,
+           base::NotFatalUntil::M152);
 
   // We accounted for all the RenderFrameHosts (at least one), and none were
   // live.
@@ -4431,7 +4432,7 @@ bool RenderProcessHostImpl::HasOnlyNonLiveRenderFrameHosts() {
 void RenderProcessHostImpl::Cleanup() {
   TRACE_EVENT("shutdown", "RenderProcessHostImpl::Cleanup",
               ChromeTrackEvent::kRenderProcessHost, *this);
-  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  CHECK_CURRENTLY_ON(BrowserThread::UI, base::NotFatalUntil::M152);
   base::UmaHistogramBoolean("BrowserRenderProcessHost.Cleanup.Total", true);
   // Keep the one renderer thread around forever in single process mode.
   if (run_renderer_in_process()) {
@@ -4552,7 +4553,7 @@ void RenderProcessHostImpl::Cleanup() {
   // safe for the process to cleanly exit but not for the RenderProcessHost to
   // be deleted.
   if (has_only_non_live_rfhs) {
-    DCHECK(!listeners_.IsEmpty());
+    CHECK(!listeners_.IsEmpty(), base::NotFatalUntil::M152);
 
     // No need to terminate the renderer if it is already gone.
     if (!IsInitializedAndNotDead())
@@ -4588,7 +4589,7 @@ void RenderProcessHostImpl::Cleanup() {
         base::BindOnce(&WebRtcLog::ClearLogMessageCallback, GetDeprecatedID()));
   }
 
-  DCHECK_EQ(0, pending_views_);
+  CHECK_EQ(0, pending_views_, base::NotFatalUntil::M152);
 
   // If the process associated with this RenderProcessHost is still alive,
   // notify all observers that the process has exited cleanly, even though it
@@ -4652,7 +4653,7 @@ void RenderProcessHostImpl::AddPendingView() {
 }
 
 void RenderProcessHostImpl::RemovePendingView() {
-  DCHECK(pending_views_);
+  CHECK(pending_views_, base::NotFatalUntil::M152);
   --pending_views_;
   if (!pending_views_)
     UpdateProcessPriority();
