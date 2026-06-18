@@ -229,7 +229,7 @@ class OmniboxViewTest : public InProcessBrowserTest {
 
   static void GetOmniboxViewForBrowser(const Browser* browser,
                                        OmniboxView** omnibox_view) {
-    BrowserWindow* window = browser->window();
+    const BrowserWindow* window = BrowserWindow::FromBrowser(browser);
     ASSERT_TRUE(window);
     LocationBar* location_bar = window->GetLocationBar();
     ASSERT_TRUE(location_bar);
@@ -242,13 +242,13 @@ class OmniboxViewTest : public InProcessBrowserTest {
   }
 
   OmniboxEditModel* GetOmniboxEditModel() {
-    BrowserWindow* window = browser()->window();
+    BrowserWindow* window = BrowserWindow::FromBrowser(browser());
     LocationBar* location_bar = window->GetLocationBar();
     return location_bar->GetOmniboxController()->edit_model();
   }
 
   OmniboxController* GetOmniboxController() {
-    BrowserWindow* window = browser()->window();
+    BrowserWindow* window = BrowserWindow::FromBrowser(browser());
     LocationBar* location_bar = window->GetLocationBar();
     return location_bar->GetOmniboxController();
   }
@@ -311,7 +311,7 @@ class OmniboxViewTest : public InProcessBrowserTest {
   }
 
   void WaitForAutocompleteControllerDone() {
-    BrowserWindow* window = browser()->window();
+    BrowserWindow* window = BrowserWindow::FromBrowser(browser());
     ASSERT_TRUE(window);
     LocationBar* location_bar = window->GetLocationBar();
     ASSERT_TRUE(location_bar);
@@ -414,7 +414,7 @@ class OmniboxViewTest : public InProcessBrowserTest {
   }
 
   void SetTestToolbarPermanentText(const std::u16string& text) {
-    BrowserWindow* window = browser()->window();
+    BrowserWindow* window = BrowserWindow::FromBrowser(browser());
     ASSERT_TRUE(window);
     LocationBar* location_bar = window->GetLocationBar();
     ASSERT_TRUE(location_bar);

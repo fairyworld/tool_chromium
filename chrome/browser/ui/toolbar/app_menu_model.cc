@@ -2114,7 +2114,8 @@ void AppMenuModel::Build() {
 
 #if !BUILDFLAG(IS_CHROMEOS)
   sub_menus_.push_back(std::make_unique<ProfileSubMenuModel>(
-      this, browser()->profile(), browser()->window()->GetColorProvider()));
+      this, browser()->profile(),
+      BrowserWindow::FromBrowser(browser())->GetColorProvider()));
   auto* const profile_submenu_model =
       static_cast<ProfileSubMenuModel*>(sub_menus_.back().get());
   AddSubMenu(IDC_PROFILE_MENU_IN_APP_MENU,
