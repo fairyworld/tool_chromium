@@ -7,6 +7,7 @@
 #include "base/feature_list.h"
 #include "build/branding_buildflags.h"
 #include "build/build_config.h"
+#include "components/autofill/core/common/autofill_debug_features.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/personal_context/core/personal_context_enablement_service.h"
 #include "components/personal_context/core/personal_context_prefs.h"
@@ -64,8 +65,10 @@ namespace {
 [[nodiscard]] bool IsAtMemorySupported(
     personal_context::PersonalContextEnablementService*
         personal_context_service) {
-  // TODO(crbug.com/522695178) Allow overriding the eligibility checks for
-  // testing and dogfooding.
+  if (base::FeatureList::IsEnabled(
+          features::debug::kAtMemorySkipEligibilityChecks)) {
+    return base::FeatureList::IsEnabled(features::kAutofillAtMemory);
+  }
 
   if (!IsPersonalContextEligible(personal_context_service)) {
     return false;

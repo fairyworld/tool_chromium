@@ -8,6 +8,7 @@
 
 #include "base/test/scoped_feature_list.h"
 #include "build/branding_buildflags.h"
+#include "components/autofill/core/common/autofill_debug_features.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/personal_context/core/mock_personal_context_enablement_service.h"
 #include "components/personal_context/core/personal_context_prefs.h"
@@ -190,6 +191,23 @@ TEST_F(AtMemoryEnablementUtilsTest,
   pref_service_.SetUserPref(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
       base::Value(true));
+  EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                       &personal_context_service_,
+                                       &pref_service_));
+}
+
+// Tests that when `kAtMemorySkipEligibilityChecks` is enabled,
+// `MayPerformAtMemoryAction` returns true even if the user is not eligible,
+// provided that the base `kAutofillAtMemory` feature is enabled.
+TEST_F(AtMemoryEnablementUtilsTest,
+       MayPerformAtMemoryAction_SkipEligibilityChecks) {
+  base::test::ScopedFeatureList debug_features(
+      features::debug::kAtMemorySkipEligibilityChecks);
+
+  EXPECT_CALL(personal_context_service_, GetEnablementState)
+      .WillRepeatedly(Return(personal_context::PersonalContextEnablementState::
+                                 kDisabledNotEligible));
+
   EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
                                        &personal_context_service_,
                                        &pref_service_));
