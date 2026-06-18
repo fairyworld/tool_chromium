@@ -556,8 +556,11 @@ static_library("common") {
       "mojo_video_capturer.h",
       "mojo_video_capturer_list.cc",
       "mojo_video_capturer_list.h",
+      "peer_connection_process.cc",
+      "peer_connection_process.h",
       "peer_connection_process_handler.cc",
       "peer_connection_process_handler.h",
+      "peer_connection_process_main.cc",
       "worker_process_launcher.cc",
     ]
   }
