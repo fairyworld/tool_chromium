@@ -4764,6 +4764,30 @@
             ]
         }
     ],
+    "CanvasAccessibility": [
+        {
+            "platforms": [
+                "android",
+                "android_webview",
+                "chromeos",
+                "fuchsia",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled_Basic",
+                    "params": {
+                        "CanvasAccessibilityMode": "Basic"
+                    },
+                    "enable_features": [
+                        "AccessibilityCanvas"
+                    ]
+                }
+            ]
+        }
+    ],
     "CanvasHibernationExperimentsV2": [
         {
             "platforms": [
