@@ -10,6 +10,7 @@
 #include "chrome/browser/chromeos/extensions/telemetry/api/common/api_guard_delegate.h"
 #include "chrome/browser/chromeos/extensions/telemetry/api/common/base_telemetry_extension_browser_test.h"
 #include "chrome/browser/chromeos/extensions/telemetry/api/common/fake_api_guard_delegate.h"
+#include "chrome/browser/chromeos/extensions/telemetry/api/common/hardware_info_delegate.h"
 #include "chrome/common/chromeos/extensions/chromeos_system_extension_info.h"
 #include "chrome/test/base/mixin_based_in_process_browser_test.h"
 #include "chrome/test/base/ui_test_utils.h"
@@ -783,9 +784,10 @@ class TelemetryExtensionApiGuardRealDelegateBrowserTest
 };
 
 // Smoke test to verify that real ApiGuardDelegate works in prod.
-// TODO(b/338199240): Test is flaky.
 IN_PROC_BROWSER_TEST_F(TelemetryExtensionApiGuardRealDelegateBrowserTest,
-                       DISABLED_CanAccessRunBatteryCapacityRoutine) {
+                       CanAccessRunBatteryCapacityRoutine) {
+  chromeos::HardwareInfoDelegate::Get().ClearCacheForTesting();
+
   // Make sure PWA UI is open and secure.
   auto* pwa_page_rfh =
       ui_test_utils::NavigateToURL(browser(), GURL(pwa_page_url()));
@@ -820,9 +822,10 @@ IN_PROC_BROWSER_TEST_F(TelemetryExtensionApiGuardRealDelegateBrowserTest,
 
 // Verify that manufacturer will be cached and only one call to probe service
 // will be made.
-// TODO(b/346211419): The test shows excessive flakiness.
 IN_PROC_BROWSER_TEST_F(TelemetryExtensionApiGuardRealDelegateBrowserTest,
-                       DISABLED_UseCacheForMultipleApiAccess) {
+                       UseCacheForMultipleApiAccess) {
+  chromeos::HardwareInfoDelegate::Get().ClearCacheForTesting();
+
   // Make sure PWA UI is open and secure.
   auto* pwa_page_rfh =
       ui_test_utils::NavigateToURL(browser(), GURL(pwa_page_url()));
