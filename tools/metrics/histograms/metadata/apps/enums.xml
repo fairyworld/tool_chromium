@@ -396,6 +396,7 @@ chromium-metrics-reviews@google.com.
   <int value="11" label="Not Chrome App Allowed"/>
   <int value="12" label="Default Allowed"/>
   <int value="13" label="Default Blocked"/>
+  <int value="14" label="KioskMode BlockedButAllowedByAdminPolicy"/>
 </enum>
 
 <!-- LINT.IfChange(ChromeOSUICommands) -->
