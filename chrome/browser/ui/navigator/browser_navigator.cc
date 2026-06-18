@@ -1007,8 +1007,10 @@ base::WeakPtr<content::NavigationHandle> Navigate(NavigateParams* params) {
       params->web_app_navigation_data->launch_params()) {
     auto* user_data = web_app::WebAppLaunchNavigationHandleUserData::
         GetOrCreateForNavigationHandle(*navigation_handle);
+    const auto& web_app_navigation_data = params->web_app_navigation_data;
     user_data->SetLaunchParams(
-        std::move(*params->web_app_navigation_data->launch_params()));
+        std::move(*web_app_navigation_data->launch_params()));
+    user_data->SetLaunchSource(web_app_navigation_data->launch_source());
   }
 
   if (app_navigation) {

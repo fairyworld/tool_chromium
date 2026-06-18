@@ -1075,7 +1075,7 @@ void WebAppUiManagerImpl::NotifyDidFinishNavigation(
 
   // Enqueue launch params once the navigation has committed and the navigation
   // was successful.
-  if (navigation_handle->HasCommitted() && !navigation_handle->IsErrorPage()) {
+  if (navigation_handle->HasCommitted()) {
     user_data->MaybePerformAppHandlingTasksInWebContents();
   }
 }
