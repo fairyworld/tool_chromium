@@ -5,7 +5,7 @@
 import {assert} from 'chrome://resources/js/assert.js';
 import {PromiseResolver} from 'chrome://resources/js/promise_resolver.js';
 
-import type {AnnotationBrush, Color, Point, TextAnnotation, TextAnnotationMessageData, TextAttributes, TextBoxRect, TextStyles} from './constants.js';
+import type {AnnotationBrush, Color, Point, TextAnnotation, TextAnnotationMessageData, TextAttributes, TextStyles} from './constants.js';
 import {AnnotationBrushType, TextAlignment, TextAnnotationSource, TextStyle, TextTypeface} from './constants.js';
 import {PluginController, PluginControllerEventType} from './controller.js';
 import {pageToScreenCoordinates, screenToPageCoordinates} from './ink_text_annotation_utils.js';
@@ -477,36 +477,6 @@ export class Ink2Manager extends EventTarget {
     this.pluginController_.finishTextAnnotation(messageData);
     this.existingAnnotationAttributes_ = null;
     this.dispatchEvent(new CustomEvent('annotations-updated'));
-  }
-
-  textBoxFocused(textBoxRect: TextBoxRect) {
-    assert(this.viewport_);
-    const viewportPosition = this.viewport_.position;
-    const viewportSize = this.viewport_.size;
-
-    let scrollX: number|undefined;
-    let scrollY: number|undefined;
-    if (textBoxRect.locationX < 0 ||
-        textBoxRect.locationX + textBoxRect.width > viewportSize.width) {
-      // Adjusting by 10% of viewport, rather than putting the text box on the
-      // exact edge of the viewport.
-      scrollX = viewportPosition.x + textBoxRect.locationX -
-          Math.floor(viewportSize.width / 10);
-    }
-
-    if (textBoxRect.locationY < 0 ||
-        textBoxRect.locationY + textBoxRect.height > viewportSize.height) {
-      scrollY = viewportPosition.y + textBoxRect.locationY -
-          Math.floor(viewportSize.height / 10);
-    }
-
-    if (scrollX !== undefined || scrollY !== undefined) {
-      // TODO(crbug.com/40218278): Re-enable smooth scrolling for all codepaths.
-      this.viewport_.scrollTo({
-        x: scrollX,
-        y: scrollY,
-      });
-    }
   }
 
   /**

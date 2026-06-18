@@ -217,7 +217,7 @@ export class InkTextBoxElement extends InkTextBoxElementBase {
       return;
     }
 
-    Ink2Manager.getInstance().textBoxFocused({
+    this.fire('textbox-focused', {
       height: this.height_,
       locationX: this.locationX_,
       locationY: this.locationY_,

@@ -225,7 +225,7 @@ chrome.test.runTests([
   async function testMoveViewportOnFocus() {
     const {manager, mockPlugin, textbox, viewport} = await setupTextBoxTest();
     // Ensure the viewport is scrollable by zooming in. Also ensure it is
-    // located top/left, where we expect it.
+    // located top/left, where it is expected.
     viewport.setZoom(2.0);
     viewport.goToPageAndXy(0, 0, 0);
 
@@ -253,23 +253,22 @@ chrome.test.runTests([
     chrome.test.assertEq('-27px', styles.getPropertyValue('left'));
     chrome.test.assertEq('-25px', styles.getPropertyValue('top'));
 
-    // Focus the textbox, which should cause the manager to scroll the viewport.
-    // This won't actually scroll the viewport in the test, since the plugin
-    // won't send a corresponding scroll message back.
+    // Focus the textbox, which should cause it to dispatch 'textbox-focused'.
+    const focusEventPromise = eventToPromise('textbox-focused', textbox);
     mockPlugin.clearMessages();
     // Manually fire the focus event. Browser focus is not guaranteed in tests.
     textbox.focus();
     textbox.dispatchEvent(new FocusEvent('focus'));
-    const syncScrollMessage =
-        mockPlugin.findMessage<{type: string, x: number, y: number}>(
-            'syncScrollToRemote');
-    chrome.test.assertTrue(syncScrollMessage !== undefined);
-    chrome.test.assertEq('syncScrollToRemote', syncScrollMessage.type);
-    // The box is at 60, 60 in viewport coordinates, and the viewport is 500px
-    // wide. The manager specifies a margin of 10% of the viewport when
-    // scrolling, so both of these end up at 10.
-    chrome.test.assertEq(10, syncScrollMessage.x);
-    chrome.test.assertEq(10, syncScrollMessage.y);
+
+    const focusEvent = (await focusEventPromise) as CustomEvent;
+    chrome.test.assertTrue(!!focusEvent);
+    // The box is at 60, 60 in viewport coordinates, and the viewport was
+    // scrolled by 70, 70 (35 page pixels at 2x zoom). So the new
+    // viewport-relative coordinates should be 60 - 70 = -10.
+    chrome.test.assertEq(-10, focusEvent.detail.locationX);
+    chrome.test.assertEq(-10, focusEvent.detail.locationY);
+    chrome.test.assertEq(222, focusEvent.detail.width);
+    chrome.test.assertEq(34, focusEvent.detail.height);
 
     chrome.test.succeed();
   },

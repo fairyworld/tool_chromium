@@ -8,7 +8,7 @@ import {assert} from 'chrome://resources/js/assert.js';
 import {EventTracker} from 'chrome://resources/js/event_tracker.js';
 import {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 
-import type {TextAnnotation} from '../constants.js';
+import type {TextAnnotation, TextBoxRect} from '../constants.js';
 import {Ink2Manager} from '../ink2_manager.js';
 import {pageToScreenCoordinates} from '../ink_text_annotation_utils.js';
 import type {Viewport} from '../viewport.js';
@@ -129,7 +129,7 @@ export class InkTextAnnotationsElement extends CrLitElement {
 
     const screenRect = pageToScreenCoordinates(
         annotation.pageIndex, annotation.textBoxRect, this.viewport);
-    Ink2Manager.getInstance().textBoxFocused(screenRect);
+    this.scrollToShowTextBox_(screenRect);
   }
 
   commitActiveAnnotation(): Promise<void> {
@@ -142,6 +142,42 @@ export class InkTextAnnotationsElement extends CrLitElement {
 
   protected onTextBoxStateChanged_(e: CustomEvent<TextBoxState>) {
     this.fire('state-changed', e.detail);
+  }
+
+  protected onTextboxFocused_(e: CustomEvent<TextBoxRect>) {
+    this.scrollToShowTextBox_(e.detail);
+  }
+
+  private scrollToShowTextBox_(textBoxRect: TextBoxRect) {
+    assert(this.viewport);
+    const viewportPosition = this.viewport.position;
+    const viewportSize = this.viewport.size;
+
+    let scrollX: number|undefined;
+    let scrollY: number|undefined;
+    if (textBoxRect.locationX < 0 ||
+        textBoxRect.locationX + textBoxRect.width > viewportSize.width) {
+      // Adjusting by 10% of viewport, rather than putting the text box on the
+      // exact edge of the viewport.
+      scrollX = viewportPosition.x + textBoxRect.locationX -
+          Math.floor(viewportSize.width / 10);
+    }
+
+    if (textBoxRect.locationY < 0 ||
+        textBoxRect.locationY + textBoxRect.height > viewportSize.height) {
+      // Adjusting by 10% of viewport, rather than putting the text box on the
+      // exact edge of the viewport.
+      scrollY = viewportPosition.y + textBoxRect.locationY -
+          Math.floor(viewportSize.height / 10);
+    }
+
+    if (scrollX !== undefined || scrollY !== undefined) {
+      // TODO(crbug.com/40218278): Re-enable smooth scrolling for all codepaths.
+      this.viewport.scrollTo({
+        x: scrollX,
+        y: scrollY,
+      });
+    }
   }
 }
 
