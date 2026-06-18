@@ -10,8 +10,8 @@
 #include "build/build_config.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
-#include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
+#include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/page_action/page_action_icon_type.h"
 #include "chrome/browser/ui/performance_controls/memory_saver_bubble_delegate.h"
 #include "chrome/browser/ui/performance_controls/memory_saver_bubble_observer.h"
@@ -91,7 +91,7 @@ void AddCancelButton(ui::DialogModel::Builder* dialog_model_builder,
 
 // static
 views::BubbleDialogModelHost* MemorySaverBubbleView::ShowBubble(
-    Browser* browser,
+    BrowserWindowInterface* browser,
     views::BubbleAnchor anchor,
     MemorySaverBubbleObserver* observer) {
   auto bubble_delegate_unique =
@@ -101,7 +101,7 @@ views::BubbleDialogModelHost* MemorySaverBubbleView::ShowBubble(
       ui::DialogModel::Builder(std::move(bubble_delegate_unique));
 
   content::WebContents* web_contents =
-      browser->tab_strip_model()->GetActiveWebContents();
+      browser->GetTabStripModel()->GetActiveWebContents();
 
   dialog_model_builder
       .SetTitle(l10n_util::GetStringUTF16(IDS_MEMORY_SAVER_DIALOG_TITLE))
@@ -119,7 +119,7 @@ views::BubbleDialogModelHost* MemorySaverBubbleView::ShowBubble(
   ui::DialogModelLabel::TextReplacement memory_savings_text =
       ui::DialogModelLabel::CreatePlainText(ui::FormatBytes(memory_savings));
 
-  Profile* const profile = browser->profile();
+  Profile* const profile = browser->GetProfile();
   const bool is_guest = profile->IsGuestSession();
 
   if (memory_savings > kMemoryUsageThreshold) {

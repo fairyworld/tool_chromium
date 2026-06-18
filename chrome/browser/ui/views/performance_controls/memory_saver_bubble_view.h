@@ -9,7 +9,7 @@
 #include "ui/views/bubble/bubble_dialog_model_host.h"
 #include "ui/views/view.h"
 
-class Browser;
+class BrowserWindowInterface;
 
 class MemorySaverBubbleView {
  public:
@@ -23,7 +23,7 @@ class MemorySaverBubbleView {
   DECLARE_CLASS_ELEMENT_IDENTIFIER_VALUE(kMemorySaverDialogCancelButton);
 
   static views::BubbleDialogModelHost* ShowBubble(
-      Browser* browser,
+      BrowserWindowInterface* browser,
       views::BubbleAnchor anchor,
       MemorySaverBubbleObserver* observer);
 
