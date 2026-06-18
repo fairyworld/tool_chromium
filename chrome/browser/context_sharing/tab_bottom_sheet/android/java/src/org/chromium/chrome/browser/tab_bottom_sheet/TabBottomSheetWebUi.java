@@ -97,7 +97,11 @@ public class TabBottomSheetWebUi {
         mContainerType = containerType;
         mEphemeralTabOpener = ephemeralTabOpener;
         mWebViewResizingHelper =
-                new WebViewResizingHelper(containerView, windowAndroid, backgroundColor);
+                new WebViewResizingHelper(
+                        containerView,
+                        windowAndroid,
+                        backgroundColor,
+                        containerType == CoBrowseContainerType.SIDE_PANEL);
     }
 
     @SuppressLint("ClickableViewAccessibility")

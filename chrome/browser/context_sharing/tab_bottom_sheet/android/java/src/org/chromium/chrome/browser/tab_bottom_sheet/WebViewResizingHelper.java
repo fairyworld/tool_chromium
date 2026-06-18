@@ -23,6 +23,7 @@ import androidx.annotation.Px;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.context_sharing.R;
+import org.chromium.chrome.browser.ui.side_panel_container.SidePanelContainerCoordinator;
 import org.chromium.components.thinwebview.ThinWebView;
 import org.chromium.content_public.browser.WebContents;
 import org.chromium.ui.animation.AnimationHandler;
@@ -50,6 +51,7 @@ public class WebViewResizingHelper {
     private @Nullable WebContents mWebContents;
     private final View mExpandedContentGroup;
     private final WindowAndroid mWindowAndroid;
+    private final boolean mIsSidePanel;
 
     private boolean mIsViewportSizeFixed;
 
@@ -60,8 +62,17 @@ public class WebViewResizingHelper {
      */
     public WebViewResizingHelper(
             View containerView, WindowAndroid windowAndroid, @ColorInt int backgroundColor) {
+        this(containerView, windowAndroid, backgroundColor, /* isSidePanel= */ false);
+    }
+
+    public WebViewResizingHelper(
+            View containerView,
+            WindowAndroid windowAndroid,
+            @ColorInt int backgroundColor,
+            boolean isSidePanel) {
         mContext = containerView.getContext();
         mWindowAndroid = windowAndroid;
+        mIsSidePanel = isSidePanel;
         mExpandedContentGroup = containerView.findViewById(R.id.expanded_content_group);
 
         mResizingContainer = new FrameLayout(mContext);
@@ -252,10 +263,22 @@ public class WebViewResizingHelper {
         @Px int webContentsWidth = ViewUtils.dpToPx(mContext, mWebContents.getWidth());
         @Px int webContentsHeight = ViewUtils.dpToPx(mContext, mWebContents.getHeight());
 
-        if (resizingContainerWidth == 0
-                || resizingContainerHeight == 0
-                || (resizingContainerWidth == webContentsWidth
-                        && resizingContainerHeight == webContentsHeight)) {
+        // TODO(crbug.com/524719583): Make this feature-agnostic.
+        if (mIsSidePanel) {
+            if (resizingContainerWidth == 0) {
+                resizingContainerWidth =
+                        ViewUtils.dpToPx(
+                                mContext, SidePanelContainerCoordinator.WIDE_SIDE_PANEL_WIDTH_DP);
+            }
+            if (resizingContainerHeight == 0) {
+                resizingContainerHeight = getDecorViewHeight();
+            }
+        } else if (resizingContainerWidth == 0 || resizingContainerHeight == 0) {
+            return;
+        }
+
+        if (resizingContainerWidth == webContentsWidth
+                && resizingContainerHeight == webContentsHeight) {
             return;
         }
 
