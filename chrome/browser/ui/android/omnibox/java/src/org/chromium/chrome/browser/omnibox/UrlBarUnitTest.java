@@ -243,6 +243,54 @@ public class UrlBarUnitTest {
         ShadowChoreographer.setPaused(false);
     }
 
+    private void verifySelectionState(
+            String text,
+            String inlineAutocomplete,
+            String additionalText,
+            int selectionStart,
+            int selectionEnd,
+            boolean expectedHasAutocomplete,
+            String expectedTextWithoutAutocomplete,
+            String expectedTextWithAutocomplete,
+            String expectedAdditionalText) {
+        mUrlBar.setText(text);
+        mUrlBar.setSelection(text.length());
+        try {
+            Field modelField = AutocompleteEditText.class.getDeclaredField("mModel");
+            modelField.setAccessible(true);
+            AutocompleteEditTextModelBase model =
+                    (AutocompleteEditTextModelBase) modelField.get(mUrlBar);
+            if (model == null) {
+                Method ensureModelMethod =
+                        AutocompleteEditText.class.getDeclaredMethod("ensureModel");
+                ensureModelMethod.setAccessible(true);
+                ensureModelMethod.invoke(mUrlBar);
+                model = (AutocompleteEditTextModelBase) modelField.get(mUrlBar);
+            }
+            model.onCreateInputConnection(mock(android.view.inputmethod.InputConnection.class));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        mUrlBar.setAutocompleteText(text, inlineAutocomplete, additionalText, null);
+
+        mUrlBar.setSelection(selectionStart, selectionEnd);
+        mUrlBar.onSelectionChanged(selectionStart, selectionEnd);
+
+        assertEquals("Has autocomplete", expectedHasAutocomplete, mUrlBar.hasAutocomplete());
+        assertEquals(
+                "Text w/o Autocomplete",
+                expectedTextWithoutAutocomplete,
+                mUrlBar.getTextWithoutAutocomplete());
+        assertEquals(
+                "Text w/ Autocomplete",
+                expectedTextWithAutocomplete,
+                mUrlBar.getTextWithAutocomplete());
+        assertEquals(
+                "Addition Text",
+                expectedAdditionalText,
+                mUrlBar.getAdditionalText() != null ? mUrlBar.getAdditionalText() : "");
+    }
+
     @Test
     public void testAutofillStructureReceivesFullURL() {
         mUrlBar.setTextForAutofillServices("https://www.google.com");
@@ -1527,53 +1575,5 @@ public class UrlBarUnitTest {
         measureLayoutAndTriggerFirstDraw();
 
         assertEquals(UrlBar.DESKTOP_MULTILINE_EDIT_MAX_LINES, mUrlBar.getMaxLines());
-    }
-
-    private void verifySelectionState(
-            String text,
-            String inlineAutocomplete,
-            String additionalText,
-            int selectionStart,
-            int selectionEnd,
-            boolean expectedHasAutocomplete,
-            String expectedTextWithoutAutocomplete,
-            String expectedTextWithAutocomplete,
-            String expectedAdditionalText) {
-        mUrlBar.setText(text);
-        mUrlBar.setSelection(text.length());
-        try {
-            Field modelField = AutocompleteEditText.class.getDeclaredField("mModel");
-            modelField.setAccessible(true);
-            AutocompleteEditTextModelBase model =
-                    (AutocompleteEditTextModelBase) modelField.get(mUrlBar);
-            if (model == null) {
-                Method ensureModelMethod =
-                        AutocompleteEditText.class.getDeclaredMethod("ensureModel");
-                ensureModelMethod.setAccessible(true);
-                ensureModelMethod.invoke(mUrlBar);
-                model = (AutocompleteEditTextModelBase) modelField.get(mUrlBar);
-            }
-            model.onCreateInputConnection(mock(android.view.inputmethod.InputConnection.class));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        mUrlBar.setAutocompleteText(text, inlineAutocomplete, additionalText, null);
-
-        mUrlBar.setSelection(selectionStart, selectionEnd);
-        mUrlBar.onSelectionChanged(selectionStart, selectionEnd);
-
-        assertEquals("Has autocomplete", expectedHasAutocomplete, mUrlBar.hasAutocomplete());
-        assertEquals(
-                "Text w/o Autocomplete",
-                expectedTextWithoutAutocomplete,
-                mUrlBar.getTextWithoutAutocomplete());
-        assertEquals(
-                "Text w/ Autocomplete",
-                expectedTextWithAutocomplete,
-                mUrlBar.getTextWithAutocomplete());
-        assertEquals(
-                "Addition Text",
-                expectedAdditionalText,
-                mUrlBar.getAdditionalText() != null ? mUrlBar.getAdditionalText() : "");
     }
 }
