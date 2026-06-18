@@ -425,8 +425,8 @@ public class OmniboxSuggestionsDropdownUnitTest {
                 KeyEvent.KEYCODE_ENTER, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER));
         verify(mFuseboxCoordinator).onActivationChipClicked();
 
-        clearInvocations(mFuseboxCoordinator);
         mChipVisibilitySupplier.set(false);
+        clearInvocations(mFuseboxCoordinator);
 
         controller.setPosition(1);
         verify(mFuseboxCoordinator, never()).onActivationChipSelectionChanged(anyBoolean());
