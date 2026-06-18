@@ -489,6 +489,9 @@ export class InkTextBoxElement extends InkTextBoxElementBase {
       return;
     }
 
+    e.preventDefault();
+    e.stopPropagation();
+
     // Reset state if this is a new arrow key.
     if (this.currentArrowKey_ !== null && this.currentArrowKey_ !== e.key) {
       this.onHandleKeyUp_();

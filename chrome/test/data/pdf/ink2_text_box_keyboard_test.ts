@@ -283,4 +283,52 @@ chrome.test.runTests([
 
     chrome.test.succeed();
   },
+
+  async function testArrowKeysPropagation() {
+    const {manager, textbox} = await setupTextBoxTest();
+
+    // Initialize to a 100x100 box at 400, 300.
+    initializeBox(manager, 100, 100, 400, 300);
+    await microtasksFinished();
+
+    let keydownEvents: KeyboardEvent[] = [];
+    const listener = (e: KeyboardEvent) => {
+      keydownEvents.push(e);
+    };
+    window.addEventListener('keydown', listener);
+
+    // Case 1: Focused on the outer textbox (moving).
+    // Arrow keys should not propagate.
+    for (const key of ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']) {
+      keydownEvents = [];
+      keyDownOn(textbox, 0, [], key);
+      await microtasksFinished();
+      chrome.test.assertEq(
+          0, keydownEvents.length,
+          `Key ${key} on textbox should not propagate`);
+    }
+
+    // Case 2: After Esc (committed and inactive).
+    // Arrow keys should propagate.
+    keyDownOn(textbox.$.textbox, 0, [], 'Escape');
+    await microtasksFinished();
+    // Escape on the outer box commits it.
+    keyDownOn(textbox, 0, [], 'Escape');
+    await microtasksFinished();
+    chrome.test.assertTrue(textbox.hidden);
+    chrome.test.assertFalse(isVisible(textbox));
+
+    // Now send arrows to document.body. They should propagate to window.
+    for (const key of ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']) {
+      keydownEvents = [];
+      keyDownOn(document.body, 0, [], key);
+      await microtasksFinished();
+      chrome.test.assertEq(
+          1, keydownEvents.length, `Key ${key} after commit should propagate`);
+      chrome.test.assertEq(key, keydownEvents[0]!.key);
+    }
+
+    window.removeEventListener('keydown', listener);
+    chrome.test.succeed();
+  },
 ]);
