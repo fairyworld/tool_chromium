@@ -272,7 +272,10 @@ class GTestsApp(object):
     dyld_library_paths = [dyld_path]
     dyld_framework_paths = [dyld_path]
 
-    if self.xcode_platform_dir_name == 'iPhoneSimulator.platform':
+    # Prepend the packaged frameworks only for XCUITests (which have a host
+    # app).
+    if (self.xcode_platform_dir_name == 'iPhoneSimulator.platform' and
+        self.host_app_path):
       frameworks_dir = os.path.join(self.test_app_path, 'Frameworks')
       dyld_library_paths.append(frameworks_dir)
       dyld_framework_paths.append(frameworks_dir)
