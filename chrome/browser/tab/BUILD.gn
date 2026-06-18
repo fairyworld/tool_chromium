@@ -126,6 +126,7 @@ android_library("java") {
     "//components/tabs/public/android:java",
     "//content/public/android:content_java",
     "//net/android:net_java",
+    "//third_party/android_deps:com_google_errorprone_error_prone_annotations_java",
     "//third_party/android_deps:guava_android_java",
     "//third_party/android_deps:protobuf_lite_runtime_java",
     "//third_party/androidx:androidx_annotation_annotation_java",
