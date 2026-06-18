@@ -76,3 +76,27 @@ source_set("unit_tests") {
     "//testing/gtest",
   ]
 }
+
+if (!is_android) {
+  source_set("browser_tests") {
+    testonly = true
+
+    sources = [ "command_action_updater_browsertest.cc" ]
+
+    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+    deps = [
+      ":actions",
+      "//base",
+      "//base/test:test_support",
+      "//chrome/browser/ui",
+      "//chrome/browser/ui:browser_actions",
+      "//chrome/browser/ui:ui_features",
+      "//chrome/test:test_support",
+      "//content/test:test_support",
+      "//testing/gmock",
+      "//testing/gtest",
+      "//ui/actions",
+    ]
+  }
+}

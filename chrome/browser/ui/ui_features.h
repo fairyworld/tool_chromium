@@ -19,6 +19,8 @@ namespace features {
 // All features in alphabetical order. The features should be documented
 // alongside the definition of their values in the .cc file.
 
+BASE_DECLARE_FEATURE(kUseActionsForBrowserCommands);
+
 BASE_DECLARE_FEATURE(kAllowEyeDropperWGCScreenCapture);
 
 // Enables a compositor-driven rotation animation for the tab load throbber.

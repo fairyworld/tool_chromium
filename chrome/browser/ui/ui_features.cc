@@ -29,6 +29,9 @@ bool IsProcessOverheadExperimentActive() {
 
 namespace features {
 
+// Enables the migration of browser commands to Action API.
+BASE_FEATURE(kUseActionsForBrowserCommands, base::FEATURE_DISABLED_BY_DEFAULT);
+
 // Enables the use of WGC for the Eye Dropper screen capture.
 BASE_FEATURE(kAllowEyeDropperWGCScreenCapture,
 #if BUILDFLAG(IS_WIN)

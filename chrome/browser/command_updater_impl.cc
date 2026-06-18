@@ -46,7 +46,7 @@ bool CommandUpdaterImpl::ExecuteCommandWithDisposition(
     WindowOpenDisposition disposition,
     base::TimeTicks time_stamp) {
   if (SupportsCommand(id) && IsCommandEnabled(id)) {
-    delegate_->ExecuteCommandWithDisposition(id, disposition);
+    delegate_->HandleCommandWithDisposition(id, disposition, time_stamp);
     return true;
   }
   return false;

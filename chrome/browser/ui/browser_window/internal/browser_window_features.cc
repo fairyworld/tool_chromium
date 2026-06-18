@@ -285,8 +285,6 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
             browser->GetTabStripModel(), profile);
   }
 
-  browser_actions_ = std::make_unique<BrowserActions>(browser);
-
   // Foundational members hoisted out of alphabetical order:
   //   bookmark_bar_controller_ depends on fullscreen_controller_.
   //   window_feature_controller_ depends on fullscreen_controller_.
@@ -304,11 +302,20 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
           browser->GetType(),
           browser->GetBrowserForMigrationOnly()->is_trusted_source(),
           browser->GetUnownedUserDataHost());
-  browser_command_controller_ =
-      std::make_unique<chrome::BrowserCommandController>(browser);
-  browser_actions_->InitializeBrowserActions();
+
   side_panel_registry_ =
       GetUserDataFactory().CreateInstance<SidePanelRegistry>(*browser, browser);
+
+  // IMPORTANT: BrowserActions must be initialized before
+  // BrowserCommandController. When BrowserCommandController is created, it
+  // initializes the default enabled states for UI commands
+  // (InitCommandState). If BrowserActions is not built first, those initial
+  // enabled updates will be completely dropped.
+  browser_actions_ = std::make_unique<BrowserActions>(browser);
+  browser_actions_->InitializeBrowserActions();
+
+  browser_command_controller_ =
+      std::make_unique<chrome::BrowserCommandController>(browser);
 
   browser_animation_controller_ =
       GetUserDataFactory().CreateInstance<BrowserAnimationController>(*browser,
