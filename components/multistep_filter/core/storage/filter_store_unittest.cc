@@ -52,7 +52,7 @@ TEST_F(FilterStoreTest, StoreAndRetrieveAnnotation) {
   base::Uuid id = base::Uuid::GenerateRandomV4();
   std::vector<FilterAttribute> attributes;
   attributes.emplace_back("key1", "value1");
-  FilterAnnotation annotation(id, "task1", "example.com", "sub.example.com",
+  FilterAnnotation annotation(id, "task1", "sub.example.com",
                               base::Time::Now(), attributes);
 
   store()->StoreAnnotation(annotation, store_future.GetCallback());
@@ -71,12 +71,12 @@ TEST_F(FilterStoreTest, StoreAndRetrieveAnnotation_FiltersByCreationTime) {
   base::test::TestFuture<std::vector<FilterAnnotation>> get_future;
 
   base::Uuid id1 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation old_annotation(id1, "task1", "example.com",
+  FilterAnnotation old_annotation(id1, "task1",
                                   "sub.example.com",
                                   base::Time::Now() - base::Minutes(31), {});
 
   base::Uuid id2 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation recent_annotation(id2, "task1", "example.com",
+  FilterAnnotation recent_annotation(id2, "task1",
                                      "sub.example.com", base::Time::Now(), {});
 
   store()->StoreAnnotation(old_annotation, store_future1.GetCallback());
@@ -102,13 +102,13 @@ TEST_F(FilterStoreTest, DeleteAnnotationsForTask) {
   base::test::TestFuture<std::vector<FilterAnnotation>> get_future2;
 
   const base::Uuid id1 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation1(id1, "task1", "example1.com",
+  const FilterAnnotation annotation1(id1, "task1",
                                      "sub.example1.com", base::Time::Now(), {});
   const base::Uuid id2 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation2(id2, "task1", "example2.com",
+  const FilterAnnotation annotation2(id2, "task1",
                                      "sub.example2.com", base::Time::Now(), {});
   const base::Uuid id3 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation3(id3, "task2", "example3.com",
+  const FilterAnnotation annotation3(id3, "task2",
                                      "sub.example3.com", base::Time::Now(), {});
 
   store()->StoreAnnotation(annotation1, store_future1.GetCallback());
@@ -137,7 +137,7 @@ TEST_F(FilterStoreTest,
   base::test::TestFuture<std::vector<FilterAnnotation>> get_future;
 
   const base::Uuid id = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation(id, "task1", "example.com",
+  const FilterAnnotation annotation(id, "task1",
                                     "sub.example.com", base::Time::Now(), {});
 
   store()->StoreAnnotation(annotation, store_future.GetCallback());
@@ -161,13 +161,13 @@ TEST_F(FilterStoreTest, DeleteAnnotationsForHosts) {
 
   base::Time now = base::Time::Now();
   const base::Uuid id1 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation1(id1, "task1", "example1.com",
+  const FilterAnnotation annotation1(id1, "task1",
                                      "sub1.example1.com", now, {});
   const base::Uuid id2 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation2(id2, "task1", "example2.com",
+  const FilterAnnotation annotation2(id2, "task1",
                                      "sub2.example2.com", now, {});
   const base::Uuid id3 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation3(id3, "task2", "example1.com",
+  const FilterAnnotation annotation3(id3, "task2",
                                      "sub1.example1.com", now - base::Hours(2),
                                      {});
 

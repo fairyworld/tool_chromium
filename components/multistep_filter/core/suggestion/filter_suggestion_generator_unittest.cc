@@ -50,8 +50,8 @@ FilterAnnotation CreateDummyAnnotation(
     std::vector<FilterAttribute> attributes) {
   std::string host = "sub." + source_domain;
   return FilterAnnotation(base::Uuid::GenerateRandomV4(), std::move(task_type),
-                          std::move(source_domain), std::move(host),
-                          base::Time::Now(), std::move(attributes));
+                          std::move(host), base::Time::Now(),
+                          std::move(attributes));
 }
 
 using testing::_;

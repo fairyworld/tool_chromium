@@ -103,9 +103,8 @@ ExtractTaskAttributesRequest ToExtractTaskAttributesRequest(const GURL& url) {
 std::optional<FilterAnnotation> ToFilterAnnotation(
     const GURL& url,
     const ExtractTaskAttributesResponse& response) {
-  const std::string domain = GetEtldPlusOne(url);
   const std::string host(url.host());
-  if (domain.empty() || host.empty() || response.task_type().empty() ||
+  if (host.empty() || response.task_type().empty() ||
       response.task_attributes().empty()) {
     return std::nullopt;
   }
@@ -116,7 +115,7 @@ std::optional<FilterAnnotation> ToFilterAnnotation(
   }
 
   return FilterAnnotation(base::Uuid::GenerateRandomV4(), response.task_type(),
-                          domain, host, base::Time::Now(),
+                          host, base::Time::Now(),
                           std::move(attributes));
 }
 

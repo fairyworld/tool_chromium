@@ -19,7 +19,6 @@ namespace {
 
 using ::testing::_;
 
-constexpr char kTestDomain[] = "example.com";
 constexpr char kTestHost[] = "example.com";
 constexpr char kTestAttributeKey[] = "category";
 constexpr char kTestAttributeValue[] = "shoes";
@@ -62,7 +61,7 @@ TEST_F(FilterExtractorTest, ExtractAnnotationFromUrl_Success) {
   base::Uuid id = base::Uuid::GenerateRandomV4();
   std::vector<FilterAttribute> attributes = {
       {kTestAttributeKey, kTestAttributeValue}};
-  FilterAnnotation annotation(id, kTestTask, kTestDomain, kTestHost,
+  FilterAnnotation annotation(id, kTestTask, kTestHost,
                               base::Time::Now(), attributes);
 
   EXPECT_CALL(mock_client(),
@@ -87,7 +86,7 @@ TEST_F(FilterExtractorTest, ExtractAnnotationFromUrl_StoreFailed) {
   base::Uuid id = base::Uuid::GenerateRandomV4();
   std::vector<FilterAttribute> attributes = {
       {kTestAttributeKey, kTestAttributeValue}};
-  FilterAnnotation annotation(id, kTestTask, kTestDomain, kTestHost,
+  FilterAnnotation annotation(id, kTestTask, kTestHost,
                               base::Time::Now(), attributes);
 
   EXPECT_CALL(mock_client(),

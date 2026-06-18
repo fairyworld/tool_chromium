@@ -32,7 +32,6 @@ struct FilterAnnotation;
 //                           primary key).
 //   task_type               An identifier classifying the purpose of the
 //                           annotation.
-//   source_domain           The eTLD+1 domain of the source URL.
 //   source_host             The host of the source URL.
 //   creation_timestamp      The timestamp when the annotation was generated in
 //                           base::Time format.

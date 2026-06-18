@@ -53,7 +53,7 @@ TEST_F(FilterAnnotationTableTest, StoreAndRetrieveAnnotation) {
   std::vector<FilterAttribute> attributes;
   attributes.emplace_back("key1", "value1");
   attributes.emplace_back("key2", "value2");
-  FilterAnnotation annotation(id, "task1", "example.com", "sub.example.com",
+  FilterAnnotation annotation(id, "task1", "sub.example.com",
                               base::Time::Now(), attributes);
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation));
@@ -69,10 +69,10 @@ TEST_F(FilterAnnotationTableTest, StoreAndRetrieveAnnotation) {
 TEST_F(FilterAnnotationTableTest,
        GetAnnotationsForTasksSortedByCreationTimestamp_FiltersByTaskType) {
   base::Uuid id1 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation annotation1(id1, "task1", "example.com", "sub.example.com",
+  FilterAnnotation annotation1(id1, "task1", "sub.example.com",
                                base::Time::Now(), {});
   base::Uuid id2 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation annotation2(id2, "task2", "example.com", "sub.example.com",
+  FilterAnnotation annotation2(id2, "task2", "sub.example.com",
                                base::Time::Now(), {});
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation1));
@@ -89,13 +89,13 @@ TEST_F(FilterAnnotationTableTest,
 TEST_F(FilterAnnotationTableTest,
        GetAnnotationsForTasksSortedByCreationTimestamp_SortsByTimestamp) {
   base::Uuid id1 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation annotation1(id1, "task1", "example1.com", "sub.example1.com",
+  FilterAnnotation annotation1(id1, "task1", "sub.example1.com",
                                base::Time::FromTimeT(100), {});
   base::Uuid id2 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation annotation2(id2, "task1", "example2.com", "sub.example2.com",
+  FilterAnnotation annotation2(id2, "task1", "sub.example2.com",
                                base::Time::FromTimeT(200), {});
   base::Uuid id3 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation annotation3(id3, "task1", "example3.com", "sub.example3.com",
+  FilterAnnotation annotation3(id3, "task1", "sub.example3.com",
                                base::Time::FromTimeT(150), {});
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation1));
@@ -113,10 +113,10 @@ TEST_F(FilterAnnotationTableTest,
 TEST_F(FilterAnnotationTableTest,
        GetAnnotationsForTasksSortedByCreationTimestamp_FiltersByCreationTime) {
   base::Uuid id1 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation annotation1(id1, "task1", "example1.com", "sub.example1.com",
+  FilterAnnotation annotation1(id1, "task1", "sub.example1.com",
                                base::Time::FromTimeT(100), {});
   base::Uuid id2 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation annotation2(id2, "task1", "example2.com", "sub.example2.com",
+  FilterAnnotation annotation2(id2, "task1", "sub.example2.com",
                                base::Time::FromTimeT(200), {});
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation1));
@@ -135,13 +135,13 @@ TEST_F(FilterAnnotationTableTest,
   base::Uuid id1 = base::Uuid::GenerateRandomV4();
   std::vector<FilterAttribute> attributes1;
   attributes1.emplace_back("key1", "value1");
-  FilterAnnotation annotation1(id1, "task1", "example.com", "sub.example.com",
+  FilterAnnotation annotation1(id1, "task1", "sub.example.com",
                                base::Time::Now(), attributes1);
 
   base::Uuid id2 = base::Uuid::GenerateRandomV4();
   std::vector<FilterAttribute> attributes2;
   attributes2.emplace_back("key2", "value2");
-  FilterAnnotation annotation2(id2, "task1", "example.com", "sub.example.com",
+  FilterAnnotation annotation2(id2, "task1", "sub.example.com",
                                base::Time::Now() + base::Seconds(1),
                                attributes2);
 
@@ -159,13 +159,13 @@ TEST_F(FilterAnnotationTableTest,
 TEST_F(FilterAnnotationTableTest,
        StoreAnnotation_DoesNotOverwriteForDifferentTaskOrHost) {
   base::Uuid id1 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation annotation1(id1, "task1", "example.com", "sub1.example.com",
+  FilterAnnotation annotation1(id1, "task1", "sub1.example.com",
                                base::Time::Now(), {});
   base::Uuid id2 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation annotation2(id2, "task2", "example.com", "sub1.example.com",
+  FilterAnnotation annotation2(id2, "task2", "sub1.example.com",
                                base::Time::Now(), {});
   base::Uuid id3 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation annotation3(id3, "task1", "example.com", "sub2.example.com",
+  FilterAnnotation annotation3(id3, "task1", "sub2.example.com",
                                base::Time::Now(), {});
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation1));
@@ -184,13 +184,13 @@ TEST_F(FilterAnnotationTableTest,
 }
 TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForTask) {
   const base::Uuid id1 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation1(id1, "task1", "example1.com",
+  const FilterAnnotation annotation1(id1, "task1",
                                      "sub.example1.com", base::Time::Now(), {});
   const base::Uuid id2 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation2(id2, "task1", "example2.com",
+  const FilterAnnotation annotation2(id2, "task1",
                                      "sub.example2.com", base::Time::Now(), {});
   const base::Uuid id3 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation3(id3, "task2", "example3.com",
+  const FilterAnnotation annotation3(id3, "task2",
                                      "sub.example3.com", base::Time::Now(), {});
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation1));
@@ -213,7 +213,7 @@ TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForTask) {
 TEST_F(FilterAnnotationTableTest,
        GetAnnotationsForTaskSortedByCreationTimestamp_ExcludesDeleted) {
   const base::Uuid id = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation(id, "task1", "example.com",
+  const FilterAnnotation annotation(id, "task1",
                                     "sub.example.com", base::Time::Now(), {});
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation));
@@ -229,13 +229,13 @@ TEST_F(FilterAnnotationTableTest,
 TEST_F(FilterAnnotationTableTest,
        GetAnnotationsForTasksSortedByCreationTimestamp_MultipleTaskTypes) {
   base::Uuid id1 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation annotation1(id1, "task1", "example1.com", "sub.example1.com",
+  FilterAnnotation annotation1(id1, "task1", "sub.example1.com",
                                base::Time::FromTimeT(100), {});
   base::Uuid id2 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation annotation2(id2, "task2", "example2.com", "sub.example2.com",
+  FilterAnnotation annotation2(id2, "task2", "sub.example2.com",
                                base::Time::FromTimeT(200), {});
   base::Uuid id3 = base::Uuid::GenerateRandomV4();
-  FilterAnnotation annotation3(id3, "task3", "example3.com", "sub.example3.com",
+  FilterAnnotation annotation3(id3, "task3", "sub.example3.com",
                                base::Time::FromTimeT(150), {});
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation1));
@@ -252,13 +252,13 @@ TEST_F(FilterAnnotationTableTest,
 TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForHosts) {
   base::Time now = base::Time::Now();
   const base::Uuid id1 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation1(id1, "task1", "example1.com",
+  const FilterAnnotation annotation1(id1, "task1",
                                      "sub1.example1.com", now, {});
   const base::Uuid id2 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation2(id2, "task1", "example2.com",
+  const FilterAnnotation annotation2(id2, "task1",
                                      "sub2.example2.com", now, {});
   const base::Uuid id3 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation3(id3, "task2", "example1.com",
+  const FilterAnnotation annotation3(id3, "task2",
                                      "sub1.example1.com", now - base::Hours(2),
                                      {});
 
@@ -290,10 +290,10 @@ TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForHosts_BoundaryTimes) {
   base::Time end = now + base::Hours(1);
 
   const base::Uuid id1 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation1(id1, "task1", "example1.com",
+  const FilterAnnotation annotation1(id1, "task1",
                                      "sub1.example1.com", begin, {});
   const base::Uuid id2 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation2(id2, "task2", "example1.com",
+  const FilterAnnotation annotation2(id2, "task2",
                                      "sub1.example1.com", end, {});
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation1));
@@ -317,10 +317,10 @@ TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForHosts_BoundaryTimes) {
 TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForHosts_MultipleHosts) {
   base::Time now = base::Time::Now();
   const base::Uuid id1 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation1(id1, "task1", "a.com", "sub1.a.com", now,
+  const FilterAnnotation annotation1(id1, "task1", "sub1.a.com", now,
                                      {});
   const base::Uuid id2 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation2(id2, "task2", "b.com", "sub1.b.com", now,
+  const FilterAnnotation annotation2(id2, "task2", "sub1.b.com", now,
                                      {});
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation1));
@@ -337,13 +337,13 @@ TEST_F(FilterAnnotationTableTest, DeleteAnnotationsForHosts_DeletesAttributes) {
   const base::Uuid id1 = base::Uuid::GenerateRandomV4();
   std::vector<FilterAttribute> attributes1;
   attributes1.emplace_back("key1", "value1");
-  const FilterAnnotation annotation1(id1, "task1", "example1.com",
+  const FilterAnnotation annotation1(id1, "task1",
                                      "sub1.example1.com", now, attributes1);
 
   const base::Uuid id2 = base::Uuid::GenerateRandomV4();
   std::vector<FilterAttribute> attributes2;
   attributes2.emplace_back("key2", "value2");
-  const FilterAnnotation annotation2(id2, "task2", "example2.com",
+  const FilterAnnotation annotation2(id2, "task2",
                                      "sub2.example2.com", now, attributes2);
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation1));
@@ -373,10 +373,10 @@ TEST_F(FilterAnnotationTableTest,
        DeleteAnnotationsForHosts_EmptyHostsDeletesAll) {
   base::Time now = base::Time::Now();
   const base::Uuid id1 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation1(id1, "task1", "example1.com",
+  const FilterAnnotation annotation1(id1, "task1",
                                      "sub1.example1.com", now, {});
   const base::Uuid id2 = base::Uuid::GenerateRandomV4();
-  const FilterAnnotation annotation2(id2, "task2", "example2.com",
+  const FilterAnnotation annotation2(id2, "task2",
                                      "sub2.example2.com", now, {});
 
   ASSERT_TRUE(table()->StoreAnnotation(annotation1));
