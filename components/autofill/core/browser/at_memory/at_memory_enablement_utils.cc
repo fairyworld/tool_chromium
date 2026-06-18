@@ -49,13 +49,6 @@ namespace {
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus);
 }
 
-[[nodiscard]] bool IsChromeBrandedBuild() {
-#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  return true;
-#else   // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  return false;
-#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
-}
 // Returns true if AtMemory is supported for the user.
 //
 // Checks that AtMemory feature flags are enabled, At-Memory eligibility
@@ -78,7 +71,7 @@ namespace {
   // TODO(crbug.com/521270638) Check enterprise policy implementation.
   // TODO(crbug.com/517838959) Check subscription tier eligibility.
 
-  if (!IsChromeBrandedBuild()) {
+  if constexpr (!BUILDFLAG(GOOGLE_CHROME_BRANDING)) {
     return false;
   }
 
