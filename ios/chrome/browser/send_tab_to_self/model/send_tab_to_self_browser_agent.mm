@@ -138,6 +138,7 @@ void SendTabToSelfBrowserAgent::DisplayNewEntries(
       for (const send_tab_to_self::SendTabToSelfEntry* entry : new_entries) {
         OpenEntryInBackgroundTab(entry);
       }
+      DisplayInfoBar(web_state, new_entries.back());
     }
     return;
   }
@@ -308,6 +309,7 @@ void SendTabToSelfBrowserAgent::CheckAndOpenPendingEntriesIfBrowserVisible() {
   for (const send_tab_to_self::SendTabToSelfEntry* entry : pending_entries) {
     OpenEntryInBackgroundTab(entry);
   }
+  DisplayInfoBar(web_state, pending_entries.back());
 }
 
 void SendTabToSelfBrowserAgent::OpenEntryInBackgroundTab(

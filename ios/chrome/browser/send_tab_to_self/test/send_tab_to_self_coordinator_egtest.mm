@@ -724,6 +724,31 @@ ElementSelector* UsernameElement() {
   // Verify that a background tab was opened automatically (tab count increased
   // by 1).
   [ChromeEarlGrey waitForMainTabCount:initialTabCount + 1];
+
+  // Verify that the InfoBar message banner is displayed with correct title and
+  // subtitle.
+  NSString* title =
+      l10n_util::GetNSString(IDS_SEND_TAB_TO_SELF_INFOBAR_AUTO_OPEN_TITLE);
+  [ChromeEarlGrey
+      waitForSufficientlyVisibleElementWithMatcher:grey_accessibilityLabel(
+                                                       title)];
+
+  NSString* subtitle = l10n_util::GetNSStringF(
+      IDS_SEND_TAB_TO_SELF_INFOBAR_AUTO_OPEN_SUBTITLE, u"remote_device");
+  [ChromeEarlGrey
+      waitForSufficientlyVisibleElementWithMatcher:grey_accessibilityLabel(
+                                                       subtitle)];
+
+  // Tap "Open" on the banner and verify that the Tab Grid opens.
+  NSString* buttonText =
+      l10n_util::GetNSString(IDS_SEND_TAB_TO_SELF_INFOBAR_MESSAGE_URL);
+  [[EarlGrey
+      selectElementWithMatcher:grey_allOf(grey_accessibilityLabel(buttonText),
+                                          grey_sufficientlyVisible(), nil)]
+      performAction:grey_tap()];
+
+  [[EarlGrey selectElementWithMatcher:chrome_test_util::TabGridDoneButton()]
+      assertWithMatcher:grey_sufficientlyVisible()];
 }
 
 // Tests that when kSendTabToSelfAutoOpen is enabled and a shared tab is
@@ -761,6 +786,20 @@ ElementSelector* UsernameElement() {
   // Verify that the pending entry was now opened automatically in the
   // background.
   [ChromeEarlGrey waitForMainTabCount:initialTabCount + 1];
+
+  // Verify that the InfoBar message banner is displayed with correct title and
+  // subtitle.
+  NSString* title =
+      l10n_util::GetNSString(IDS_SEND_TAB_TO_SELF_INFOBAR_AUTO_OPEN_TITLE);
+  [ChromeEarlGrey
+      waitForSufficientlyVisibleElementWithMatcher:grey_accessibilityLabel(
+                                                       title)];
+
+  NSString* subtitle = l10n_util::GetNSStringF(
+      IDS_SEND_TAB_TO_SELF_INFOBAR_AUTO_OPEN_SUBTITLE, u"remote_device");
+  [ChromeEarlGrey
+      waitForSufficientlyVisibleElementWithMatcher:grey_accessibilityLabel(
+                                                       subtitle)];
 }
 
 @end
