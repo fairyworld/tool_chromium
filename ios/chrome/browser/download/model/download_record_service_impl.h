@@ -5,15 +5,14 @@
 #ifndef IOS_CHROME_BROWSER_DOWNLOAD_MODEL_DOWNLOAD_RECORD_SERVICE_IMPL_H_
 #define IOS_CHROME_BROWSER_DOWNLOAD_MODEL_DOWNLOAD_RECORD_SERVICE_IMPL_H_
 
-#import <map>
 #import <string>
 
-#import "base/memory/raw_ptr.h"
 #import "base/memory/weak_ptr.h"
 #import "base/observer_list.h"
 #import "base/scoped_multi_source_observation.h"
 #import "base/sequence_checker.h"
 #import "base/task/sequenced_task_runner.h"
+#import "base/threading/sequence_bound.h"
 #import "ios/chrome/browser/download/model/download_record.h"
 #import "ios/chrome/browser/download/model/download_record_observer.h"
 #import "ios/chrome/browser/download/model/download_record_service.h"
@@ -24,7 +23,7 @@ namespace base {
 class FilePath;
 }  // namespace base
 
-class DownloadRecordDatabase;
+class DownloadRecordStore;
 
 // Implementation class that manages download records with persistent storage.
 class DownloadRecordServiceImpl : public DownloadRecordService,
@@ -70,51 +69,16 @@ class DownloadRecordServiceImpl : public DownloadRecordService,
   void NotifyDownloadsRemoved(
       const std::vector<std::string_view>& download_ids);
 
-  // Determines whether a download record update should be persisted to the
-  // database by comparing critical fields between the new and cached records.
-  bool ShouldPersistUpdate(const DownloadRecord& new_record,
-                           const DownloadRecord& cached_record);
+  // Task runner for database operations.
+  scoped_refptr<base::SequencedTaskRunner> database_task_runner_;
 
-  // Initializes database operations, called on database_task_runner_.
-  void InitializeDatabase(const base::FilePath& profile_path);
-
-  // Legacy startup loader (flag-OFF path). Loads every persisted row into
-  // `record_cache_` and flips any kInProgress/kNotStarted row to kFailed.
-  // Only used when `IsDownloadListPaginationEnabled()` is false.
-  // TODO(crbug.com/524790428): Remove this legacy startup path (and the
-  // `record_cache_`-based readers) once the pagination flag has shipped to
-  // stable and is retired.
-  void LoadHistoricalRecords();
-  void CleanupInconsistentStates();
-
-  // Pagination-aware startup cleanup (flag-ON path). Issues a single
-  // UPDATE ... WHERE state IN (kInProgress, kNotStarted) against the DB
-  // via `DownloadRecordDatabase::MarkUnfinishedDownloadsAsFailed` (no
-  // full-table load).
-  void MarkUnfinishedDownloadsAsFailed();
-
-  // Database CRUD operations, called on database_task_runner_.
-  bool InsertRecord(const DownloadRecord& record);
-  std::optional<DownloadRecord> UpdateRecord(const DownloadRecord& record);
-  bool DeleteRecord(std::string_view id);
-  bool UpdateRecordsState(const std::vector<std::string>& download_ids,
-                          web::DownloadTask::State new_state);
-  std::optional<DownloadRecord> UpdateFilePathInRecord(
-      const std::string& download_id,
-      const base::FilePath& file_path);
-
-  // Cache query operations, called on database_task_runner_.
-  std::vector<DownloadRecord> GetAllFromCache();
-  std::optional<DownloadRecord> GetByIdFromCache(std::string_view id);
-
-  // Cache containing all download records (persistent and transient).
-  // Includes progress information and incognito downloads not stored in
-  // database. Accessed on database_task_runner_.
-  std::map<std::string, DownloadRecord> record_cache_;
-
-  // Database for persistent download records.
-  // Accessed on database_task_runner_.
-  std::unique_ptr<DownloadRecordDatabase> database_;
+  // Owns the SQLite-backed database and the in-memory record cache. The
+  // store is constructed on `database_task_runner_` and all CRUD operations
+  // run there via `AsyncCall`. `base::SequenceBound` also handles
+  // destruction on the bound sequence, so any in-flight DB-sequence task
+  // continues to observe a live store object even if `this` has already
+  // been destroyed on the main thread.
+  base::SequenceBound<DownloadRecordStore> store_;
 
   // ObserverList for download record changes.
   base::ObserverList<DownloadRecordObserver, /* check_empty= */ true>
@@ -123,9 +87,6 @@ class DownloadRecordServiceImpl : public DownloadRecordService,
   base::ScopedMultiSourceObservation<web::DownloadTask,
                                      web::DownloadTaskObserver>
       download_task_observations_{this};
-
-  // Task runner for database operations.
-  scoped_refptr<base::SequencedTaskRunner> database_task_runner_;
 
   // Snapshot of `IsDownloadListPaginationEnabled()` taken at construction
   // time. Held as a member so any in-process Finch flip during the lifetime
@@ -136,10 +97,6 @@ class DownloadRecordServiceImpl : public DownloadRecordService,
 
   // Main thread sequence checker for public API calls.
   SEQUENCE_CHECKER(main_sequence_checker_);
-
-  // Database thread sequence checker. Will be bound on first database thread
-  // access.
-  SEQUENCE_CHECKER(database_sequence_checker_);
 
   base::WeakPtrFactory<DownloadRecordServiceImpl> weak_ptr_factory_{this};
 };
