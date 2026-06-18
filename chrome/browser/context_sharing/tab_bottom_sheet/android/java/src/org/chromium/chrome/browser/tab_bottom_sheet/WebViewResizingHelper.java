@@ -26,6 +26,7 @@ import org.chromium.chrome.browser.context_sharing.R;
 import org.chromium.components.thinwebview.ThinWebView;
 import org.chromium.content_public.browser.WebContents;
 import org.chromium.ui.animation.AnimationHandler;
+import org.chromium.ui.base.ViewUtils;
 import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.util.CommonOnLayoutChangeListeners;
 
@@ -242,21 +243,26 @@ public class WebViewResizingHelper {
             }
         }
 
-        @Px int width = mResizingContainer.getWidth();
-        @Px int height = mResizingContainer.getHeight();
+        if (mWebContents == null || mWebContents.isDestroyed()) {
+            return;
+        }
 
-        if (mWebContents == null
-                || mWebContents.isDestroyed()
-                || (width == mWebContents.getWidth() && height == mWebContents.getHeight())
-                || width == 0
-                || height == 0) {
+        @Px int resizingContainerWidth = mResizingContainer.getWidth();
+        @Px int resizingContainerHeight = mResizingContainer.getHeight();
+        @Px int webContentsWidth = ViewUtils.dpToPx(mContext, mWebContents.getWidth());
+        @Px int webContentsHeight = ViewUtils.dpToPx(mContext, mWebContents.getHeight());
+
+        if (resizingContainerWidth == 0
+                || resizingContainerHeight == 0
+                || (resizingContainerWidth == webContentsWidth
+                        && resizingContainerHeight == webContentsHeight)) {
             return;
         }
 
         if (mThinWebView != null) {
-            mThinWebView.resizeWebContents(width, height);
+            mThinWebView.resizeWebContents(resizingContainerWidth, resizingContainerHeight);
         } else {
-            mWebContents.setSize(width, height);
+            mWebContents.setSize(resizingContainerWidth, resizingContainerHeight);
         }
     }
 }

@@ -37,6 +37,7 @@ import org.chromium.chrome.browser.context_sharing.R;
 import org.chromium.components.thinwebview.ThinWebView;
 import org.chromium.content_public.browser.WebContents;
 import org.chromium.ui.base.TestActivity;
+import org.chromium.ui.base.ViewUtils;
 import org.chromium.ui.base.WindowAndroid;
 
 /** Unit tests for {@link WebViewResizingHelper}. */
@@ -166,8 +167,9 @@ public class WebViewResizingHelperUnitTest {
         verify(mMockWebContents, never()).setSize(anyInt(), anyInt());
 
         // Case 3: width == mWebContents.getWidth() && height == mWebContents.getHeight()
-        when(mMockWebContents.getWidth()).thenReturn(100);
-        when(mMockWebContents.getHeight()).thenReturn(200);
+        // Use ViewUtils.dpToPx for conversion to match the logic in updateBounds
+        when(mMockWebContents.getWidth()).thenReturn(ViewUtils.pxToDp(mContext, 100));
+        when(mMockWebContents.getHeight()).thenReturn(ViewUtils.pxToDp(mContext, 200));
         container.layout(0, 0, 100, 200);
         verify(mMockThinWebView, never()).resizeWebContents(anyInt(), anyInt());
         verify(mMockWebContents, never()).setSize(anyInt(), anyInt());
