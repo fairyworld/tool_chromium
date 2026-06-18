@@ -6397,7 +6397,7 @@ void RenderFrameImpl::BeginNavigationInternal(
     // close enough to the start of the previous navigation, in which case we
     // can just ignore the new navigation and keep the previous navigation.
     bool start_diff_under_threshold =
-        nav_start_diff <= GetContentClient()->GetIgnoreDuplicateNavsThreshold();
+        nav_start_diff <= GetBlinkPreferences().duplicate_nav_threshold;
     base::UmaHistogramBoolean(
         "Navigation.RendererInitiated.DuplicateNavIsUnderThreshold2",
         start_diff_under_threshold);
@@ -6442,7 +6442,8 @@ void RenderFrameImpl::BeginNavigationInternal(
             input_diff);
       }
     }
-    if (start_diff_under_threshold &&
+    if (GetBlinkPreferences().ignore_duplicate_nav_enabled &&
+        start_diff_under_threshold &&
         GetContentClient()->ShouldIgnoreDuplicateNavs(
             common_params->url, /*is_renderer_initiated=*/true)) {
       if (!base::FeatureList::IsEnabled(

@@ -12,7 +12,6 @@
 
 #include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
-#include "base/time/time.h"
 #include "build/build_config.h"
 #include "content/common/content_export.h"
 #include "mojo/public/cpp/system/message_pipe.h"
@@ -240,8 +239,6 @@ class CONTENT_EXPORT ContentClient {
   // Returns false otherwise.
   virtual bool ShouldIgnoreDuplicateNavs(const GURL& url,
                                          bool is_renderer_initiated) const;
-
-  virtual base::TimeDelta GetIgnoreDuplicateNavsThreshold() const;
 
   // Returns whether the navigation's origin is included in the
   // kIgnoreDuplicateNavsOrigins parameter list for the
