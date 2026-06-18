@@ -118,6 +118,9 @@ class TestBrowserControlsHandler extends TestBrowserProxy implements
   navigate() {
     return new Promise<never>(() => {});
   }
+  navigateText() {
+    return new Promise<never>(() => {});
+  }
 }
 
 class TestToolbarBrowserProxy extends TestBrowserProxy implements BrowserProxy {

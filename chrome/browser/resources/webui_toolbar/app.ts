@@ -520,6 +520,7 @@ export class ToolbarAppElement extends AppElementBase {
   protected onDragOver_(e: DragEvent) {
     if (e.dataTransfer &&
         (e.dataTransfer.types.includes('text/uri-list') ||
+         e.dataTransfer.types.includes('text/plain') ||
          e.dataTransfer.types.includes('Files'))) {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'copy';
@@ -536,13 +537,19 @@ export class ToolbarAppElement extends AppElementBase {
       return;
     }
 
-    const url = e.dataTransfer.getData('text/uri-list');
-    if (url) {
-      this.browserProxy_.browserControlsHandler.navigate(
-          url.split('\n')[0]!);
+    if (e.dataTransfer.types.includes('text/uri-list')) {
+      const url = e.dataTransfer.getData('text/uri-list');
+      if (url) {
+        this.browserProxy_.browserControlsHandler.navigate(url.split('\n')[0]!);
+      }
     } else if (e.dataTransfer.types.includes('Files')) {
       this.browserProxy_.toolbarUIHandler.onToolbarDropFile(
           {x: e.clientX, y: e.clientY});
+    } else if (e.dataTransfer.types.includes('text/plain')) {
+      const text = e.dataTransfer.getData('text/plain');
+      if (text) {
+        this.browserProxy_.browserControlsHandler.navigateText(text);
+      }
     }
   }
 }
