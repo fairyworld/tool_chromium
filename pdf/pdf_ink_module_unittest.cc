@@ -5539,8 +5539,8 @@ TEST_P(PdfInkModuleTextHighlightTest, IgnoreVerySmallTextSelection) {
 
   // The test case should not crash. Instead, the very small text selection
   // simply gets ignored.
-  ExpectStrokeCounts(/*started=*/1, /*modified_finished=*/1,
-                     /*unmodified_finished=*/0);
+  ExpectStrokeCounts(/*started=*/1, /*modified_finished=*/0,
+                     /*unmodified_finished=*/1);
   EXPECT_TRUE(updated_ink_thumbnail_page_indices().empty());
   EXPECT_TRUE(CollectVisibleStrokes().empty());
 }

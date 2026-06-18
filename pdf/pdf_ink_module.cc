@@ -1393,7 +1393,7 @@ PdfInkModule::GetTextSelectionAsStrokes() {
   std::map<int, std::vector<ink::Stroke>> result;
   for (const auto& [page_index, selection_rects] :
        client_->GetSelectionRectMap()) {
-    auto& page_result = result[page_index];
+    std::vector<ink::Stroke> page_result;
     page_result.reserve(selection_rects.size());
     const gfx::Transform transform =
         client_->GetCanonicalToPdfTransform(page_index).GetCheckedInverse();
@@ -1403,6 +1403,9 @@ PdfInkModule::GetTextSelectionAsStrokes() {
       if (stroke.has_value()) {
         page_result.push_back(stroke.value());
       }
+    }
+    if (!page_result.empty()) {
+      result[page_index] = std::move(page_result);
     }
   }
   return result;
