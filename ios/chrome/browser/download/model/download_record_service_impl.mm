@@ -55,24 +55,38 @@ void DownloadRecordServiceImpl::RecordDownload(web::DownloadTask* task) {
 
   store_.AsyncCall(&DownloadRecordStore::InsertRecord)
       .WithArgs(record)
-      .Then(base::BindOnce(
-          [](base::WeakPtr<DownloadRecordServiceImpl> service,
-             web::DownloadTask* task, const DownloadRecord& record,
-             bool success) {
-            if (service && success) {
-              // Guard against double-registration: the same task may be
-              // retried (e.g. user taps "Try Again"), which would call
-              // RecordDownload again with the same DownloadTask pointer.
-              // AddObservation CHECKs that the source is not already observed,
-              // so skip it if we are already tracking this task.
-              if (!service->download_task_observations_.IsObservingSource(
-                      task)) {
-                service->download_task_observations_.AddObservation(task);
-                service->NotifyDownloadAdded(record);
-              }
-            }
-          },
-          weak_ptr_factory_.GetWeakPtr(), task, record));
+      .Then(base::BindOnce(&DownloadRecordServiceImpl::OnRecordInserted,
+                           weak_ptr_factory_.GetWeakPtr(), task->GetWeakPtr(),
+                           record));
+}
+
+void DownloadRecordServiceImpl::OnRecordInserted(
+    base::WeakPtr<web::DownloadTask> weak_task,
+    const DownloadRecord& record,
+    bool success) {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(main_sequence_checker_);
+
+  // `weak_task` is held as a WeakPtr because the DownloadTask may be destroyed
+  // during the asynchronous InsertRecord write (e.g. the download is
+  // cancelled, which posts CleanupCurrentDownload -> task_.reset()). The
+  // service is not yet observing the task at this point, so it receives no
+  // OnDownloadDestroyed callback. If the task is gone, the pointer is null and
+  // we skip safely instead of dereferencing freed memory.
+  web::DownloadTask* task = weak_task.get();
+  if (!success || !task) {
+    return;
+  }
+
+  // Guard against double-registration: the same task may be retried (e.g.
+  // user taps "Try Again"), which would call RecordDownload again with the
+  // same DownloadTask pointer. AddObservation CHECKs that the source is not
+  // already observed, so skip it if we are already tracking this task.
+  if (download_task_observations_.IsObservingSource(task)) {
+    return;
+  }
+
+  download_task_observations_.AddObservation(task);
+  NotifyDownloadAdded(record);
 }
 
 void DownloadRecordServiceImpl::GetAllDownloadsAsync(

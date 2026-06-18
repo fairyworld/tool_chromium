@@ -510,6 +510,48 @@ TEST_F(DownloadRecordServiceImplTest, RecordDownloadTwiceWithSameTask) {
   EXPECT_EQ(download_id, result[0].download_id);
 }
 
+// Regression test: the DownloadTask may be destroyed while the asynchronous
+// InsertRecord write is still in flight (e.g. the user cancels the download
+// before the DB write completes). The reply must not dereference the freed
+// task. Previously the reply captured a raw DownloadTask* and called
+// AddObservation() on freed memory, causing a use-after-free crash.
+TEST_F(DownloadRecordServiceImplTest, RecordDownloadTaskDestroyedBeforeReply) {
+  const std::string download_id = "cancelled_download";
+  std::unique_ptr<web::FakeDownloadTask> task =
+      CreateFakeDownloadTask(download_id);
+
+  StrictMock<MockDownloadRecordObserver> mock_observer;
+  service_->AddObserver(&mock_observer);
+
+  // OnDownloadAdded must NOT fire: the task is gone by the time the reply
+  // runs, so observation is skipped. StrictMock fails if it is called.
+  service_->RecordDownload(task.get());
+
+  // Destroy the task before the posted InsertRecord reply runs. The service
+  // is not yet observing the task, so it receives no OnDownloadDestroyed.
+  task.reset();
+
+  // Issue a follow-up query and wait for its callback. The database task
+  // runner is sequenced, so GetAllFromCache runs after InsertRecord and its
+  // reply runs after the RecordDownload reply on the main sequence. When this
+  // run loop quits, the RecordDownload reply has therefore already executed --
+  // and must not have crashed dereferencing the freed task. The record write
+  // itself still succeeds; only the post-write observation is skipped.
+  base::RunLoop run_loop;
+  std::vector<DownloadRecord> result;
+  service_->GetAllDownloadsAsync(
+      base::BindLambdaForTesting([&](std::vector<DownloadRecord> records) {
+        result = std::move(records);
+        run_loop.Quit();
+      }));
+  run_loop.Run();
+
+  service_->RemoveObserver(&mock_observer);
+
+  EXPECT_EQ(1u, result.size());
+  EXPECT_EQ(download_id, result[0].download_id);
+}
+
 // Sanity test for the pagination API: with one persisted record,
 // `GetDownloadsPageAsync` posts a non-empty vector to the calling
 // sequence asynchronously. Locks in the async contract; broader

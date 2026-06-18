@@ -69,6 +69,13 @@ class DownloadRecordServiceImpl : public DownloadRecordService,
   void NotifyDownloadsRemoved(
       const std::vector<std::string_view>& download_ids);
 
+  // Reply for the asynchronous InsertRecord write started by
+  // RecordDownload(), run on the main sequence. Observes `task` and
+  // notifies observers when the insert succeeded.
+  void OnRecordInserted(base::WeakPtr<web::DownloadTask> weak_task,
+                        const DownloadRecord& record,
+                        bool success);
+
   // Task runner for database operations.
   scoped_refptr<base::SequencedTaskRunner> database_task_runner_;
 
