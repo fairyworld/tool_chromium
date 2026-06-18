@@ -34,6 +34,7 @@ import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabObserver;
 import org.chromium.chrome.browser.tab.TabSelectionType;
+import org.chromium.chrome.browser.tab.state.PersistedTabDataConfiguration;
 import org.chromium.chrome.browser.tab.state.SendTabToSelfTabCardLabelData;
 import org.chromium.chrome.browser.tabmodel.TabModel;
 
@@ -63,6 +64,9 @@ public class SendTabToSelfTabLabellerUnitTest {
 
     @Before
     public void setUp() {
+        // Required to allow SendTabToSelfTabCardLabelData to be initialized.
+        PersistedTabDataConfiguration.setUseTestConfig(true);
+
         mContext = ApplicationProvider.getApplicationContext();
         mUserDataHost = new UserDataHost();
 

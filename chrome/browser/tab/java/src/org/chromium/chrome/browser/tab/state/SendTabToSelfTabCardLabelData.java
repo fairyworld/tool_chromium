@@ -8,71 +8,77 @@ import android.content.Context;
 
 import androidx.annotation.VisibleForTesting;
 
-import org.chromium.base.UserData;
+import com.google.protobuf.InvalidProtocolBufferException;
+
+import org.chromium.base.Callback;
+import org.chromium.base.Log;
+import org.chromium.base.UserDataHost;
+import org.chromium.base.supplier.ObservableSuppliers;
+import org.chromium.base.supplier.SettableMonotonicObservableSupplier;
+import org.chromium.base.task.PostTask;
+import org.chromium.base.task.TaskTraits;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.tab.EmptyTabObserver;
 import org.chromium.chrome.browser.tab.R;
 import org.chromium.chrome.browser.tab.Tab;
 import org.chromium.chrome.browser.tab.TabSelectionType;
+import org.chromium.chrome.browser.tab.proto.SendTabToSelfPersistedTabData.SendTabToSelfPersistedTabDataProto;
 
-import java.util.Objects;
+import java.nio.ByteBuffer;
+import java.util.concurrent.TimeUnit;
 
-/** UserData attached to a Tab to store the sender device name for Send Tab To Self. */
+/** PersistedTabData attached to a Tab to store the sender device name for Send Tab To Self. */
 @NullMarked
-public class SendTabToSelfTabCardLabelData extends EmptyTabObserver implements UserData {
-    private static final long EXPIRATION_MS = 5L * 24 * 60 * 60 * 1000; // 5 days
+public class SendTabToSelfTabCardLabelData extends PersistedTabData {
+    private static final long EXPIRATION_MS = TimeUnit.DAYS.toMillis(5); // 5 days
+    private static final String TAG = "SendTabToSelfTabCardLabelData";
+    private static final Class<SendTabToSelfTabCardLabelData> USER_DATA_KEY =
+            SendTabToSelfTabCardLabelData.class;
 
-    private final Tab mTab;
-    private final String mSenderDeviceName;
+    private String mSenderDeviceName;
     private long mAdditionTimestampMs;
 
-    /**
-     * Returns the valid SendTabToSelfTabCardLabelData for the tab, removing it if expired.
-     *
-     * @param tab The Tab from which to retrieve the label data.
-     * @return The valid SendTabToSelfTabCardLabelData object, or null if absent or expired.
-     */
-    public static @Nullable SendTabToSelfTabCardLabelData get(Tab tab) {
-        if (tab == null || tab.getUserDataHost() == null) return null;
-        SendTabToSelfTabCardLabelData data =
-                tab.getUserDataHost().getUserData(SendTabToSelfTabCardLabelData.class);
-        if (data == null) return null;
+    @SuppressWarnings("HidingField")
+    private final SettableMonotonicObservableSupplier<Boolean> mIsPersistenceEnabledSupplier =
+            ObservableSuppliers.createMonotonic();
 
-        if (data.isExpired()) {
-            removeAndDestroy(tab, data);
-            return null;
+    /**
+     * Observer that removes the SendTabToSelfTabCardLabelData from the UserDataHost when the tab is
+     * interacted with by the user.
+     */
+    private final EmptyTabObserver mObserver =
+            new EmptyTabObserver() {
+                @Override
+                public void onShown(Tab tab, @TabSelectionType int type) {
+                    if (tab != null && tab.getUserDataHost() != null) {
+                        SendTabToSelfTabCardLabelData data =
+                                tab.getUserDataHost()
+                                        .getUserData(SendTabToSelfTabCardLabelData.class);
+                        if (data != null) {
+                            data.removeAndDestroy();
+                        }
+                    }
+                }
+            };
+
+    /** Removes the data from the host and destroys the instance. */
+    private void removeAndDestroy() {
+        UserDataHost host = mTab.getUserDataHost();
+        // A race-condition is possible due to the asynchronous nature of PersistedTabData.from().
+        if (host != null && host.getUserData(SendTabToSelfTabCardLabelData.class) == this) {
+            host.removeUserData(SendTabToSelfTabCardLabelData.class);
+            delete();
+            destroy();
         }
-        return data;
     }
 
-    /**
-     * Removes the UserData from the host and destroys the instance.
-     *
-     * @param tab The Tab hosting the UserData.
-     * @param data The SendTabToSelfTabCardLabelData instance to remove and destroy.
-     */
-    private static void removeAndDestroy(Tab tab, SendTabToSelfTabCardLabelData data) {
-        tab.getUserDataHost().removeUserData(SendTabToSelfTabCardLabelData.class);
-        data.destroy();
-    }
-
-    /**
-     * Constructs a new SendTabToSelfTabCardLabelData object and attaches it as a TabObserver.
-     *
-     * @param tab The Tab to which this label data is attached.
-     * @param senderDeviceName The name of the device that sent the tab.
-     * @param additionTimestampMs The timestamp in milliseconds when the tab was added in the
-     *     background.
-     */
-    public SendTabToSelfTabCardLabelData(
-            Tab tab, String senderDeviceName, long additionTimestampMs) {
-        Objects.requireNonNull(tab);
-        mTab = tab;
-        mSenderDeviceName = senderDeviceName;
-        mAdditionTimestampMs = additionTimestampMs;
-        assert !isExpired();
-        mTab.addObserver(this);
+    private void updateIsPersistenceEnabledSupplier() {
+        mIsPersistenceEnabledSupplier.set(
+                !mTab.isIncognito()
+                        && !mTab.isDestroyed()
+                        // Avoid saving the negative cache instances.
+                        && !mSenderDeviceName.isEmpty());
     }
 
     /**
@@ -85,38 +91,82 @@ public class SendTabToSelfTabCardLabelData extends EmptyTabObserver implements U
     }
 
     /**
-     * Removes the label data, if present, upon user interaction with the tab.
+     * Asynchronously gets the SendTabToSelfTabCardLabelData associated with the given tab.
      *
-     * @param tab The Tab being shown.
-     * @param type The type of selection event that caused the tab to be shown.
+     * @param tab The Tab to get the tab data for.
+     * @param callback The Callback to be invoked when the SendTabToSelfTabCardLabelData is ready.
      */
-    @Override
-    public void onShown(Tab tab, @TabSelectionType int type) {
-        if (type == TabSelectionType.FROM_USER) {
-            if (tab != null && tab.getUserDataHost() != null) {
-                SendTabToSelfTabCardLabelData data =
-                        tab.getUserDataHost().getUserData(SendTabToSelfTabCardLabelData.class);
-                if (data != null) {
-                    removeAndDestroy(tab, data);
-                }
-            }
-        }
+    public static void from(Tab tab, Callback<@Nullable SendTabToSelfTabCardLabelData> callback) {
+        PersistedTabData.from(
+                tab,
+                () ->
+                        new SendTabToSelfTabCardLabelData(
+                                tab, /* senderDeviceName= */ "", /* additionTimestampMs= */ 0),
+                USER_DATA_KEY,
+                (data) -> {
+                    // TODO(crbug.com/488072250): This also clears the default created
+                    // `SendTabToSelfTabCardLabelData` instance which is supposed to be a negative
+                    // cache. Avoid removing it.
+                    if (data != null && data.isExpired()) {
+                        data.removeAndDestroy();
+                        callback.onResult(null);
+                        return;
+                    }
+                    callback.onResult(data);
+                });
     }
 
     /**
-     * Cleans up observer registration when the tab is destroyed.
+     * Returns the valid SendTabToSelfTabCardLabelData for the tab, removing it if expired. Note:
+     * This returns the in-memory instance if already loaded/attached.
      *
-     * @param tab The Tab being destroyed.
+     * @param tab The Tab from which to retrieve the label data.
+     * @return The valid SendTabToSelfTabCardLabelData object, or null if absent or expired.
      */
-    @Override
-    public void onDestroyed(Tab tab) {
-        destroy();
+    public static @Nullable SendTabToSelfTabCardLabelData get(Tab tab) {
+        if (tab == null || tab.getUserDataHost() == null) return null;
+        SendTabToSelfTabCardLabelData data =
+                tab.getUserDataHost().getUserData(SendTabToSelfTabCardLabelData.class);
+        if (data == null) return null;
+
+        if (data.isExpired()) {
+            data.removeAndDestroy();
+            return null;
+        }
+        return data;
+    }
+
+    /**
+     * Constructs a new SendTabToSelfTabCardLabelData object and attaches it as a TabObserver.
+     *
+     * @param tab The Tab to which this label data is attached.
+     * @param senderDeviceName The name of the device that sent the tab.
+     * @param additionTimestampMs The timestamp in milliseconds when the tab was added in the
+     *     background.
+     */
+    public SendTabToSelfTabCardLabelData(
+            Tab tab, String senderDeviceName, long additionTimestampMs) {
+        super(
+                tab,
+                PersistedTabDataConfiguration.get(
+                                SendTabToSelfTabCardLabelData.class, tab.isIncognito())
+                        .getStorage(),
+                PersistedTabDataConfiguration.get(
+                                SendTabToSelfTabCardLabelData.class, tab.isIncognito())
+                        .getId());
+        mSenderDeviceName = senderDeviceName;
+        mAdditionTimestampMs = additionTimestampMs;
+        mTab.addObserver(mObserver);
+
+        registerIsTabSaveEnabledSupplier(mIsPersistenceEnabledSupplier);
+        updateIsPersistenceEnabledSupplier();
     }
 
     /** Destroys the UserData object and removes the observer from the tab. */
     @Override
     public void destroy() {
-        mTab.removeObserver(this);
+        mTab.removeObserver(mObserver);
+        super.destroy();
     }
 
     /**
@@ -138,5 +188,45 @@ public class SendTabToSelfTabCardLabelData extends EmptyTabObserver implements U
     @VisibleForTesting
     public void setAdditionTimestampMsForTesting(long additionTimestampMs) {
         mAdditionTimestampMs = additionTimestampMs;
+    }
+
+    // PersistedTabData implementation.
+
+    @Override
+    Serializer<ByteBuffer> getSerializer() {
+        return () ->
+                SendTabToSelfPersistedTabDataProto.newBuilder()
+                        .setSenderDeviceName(mSenderDeviceName)
+                        .setAdditionTimestampMs(mAdditionTimestampMs)
+                        .build()
+                        .toByteString()
+                        .asReadOnlyByteBuffer();
+    }
+
+    @Override
+    boolean deserialize(@Nullable ByteBuffer bytes) {
+        if (bytes == null || !bytes.hasRemaining()) return false;
+
+        try {
+            SendTabToSelfPersistedTabDataProto proto =
+                    SendTabToSelfPersistedTabDataProto.parseFrom(bytes);
+            mSenderDeviceName = proto.getSenderDeviceName();
+            mAdditionTimestampMs = proto.getAdditionTimestampMs();
+            PostTask.postTask(
+                    TaskTraits.UI_DEFAULT,
+                    () -> {
+                        updateIsPersistenceEnabledSupplier();
+                    });
+        } catch (InvalidProtocolBufferException e) {
+            Log.i(TAG, "deserialize failed: \n" + e.toString());
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public String getUmaTag() {
+        return TAG;
     }
 }

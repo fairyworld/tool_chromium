@@ -40,6 +40,7 @@ import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.layouts.LayoutType;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.tab.Tab;
+import org.chromium.chrome.browser.tab.state.PersistedTabDataConfiguration;
 import org.chromium.chrome.browser.tab.state.SendTabToSelfTabCardLabelData;
 import org.chromium.components.messages.ManagedMessageDispatcher;
 import org.chromium.components.messages.MessageBannerProperties;
@@ -74,6 +75,9 @@ public class SendTabToSelfAndroidBridgeTest {
 
     @Before
     public void setUp() {
+        // Required to allow SendTabToSelfTabCardLabelData to be initialized.
+        PersistedTabDataConfiguration.setUseTestConfig(true);
+
         ContextUtils.initApplicationContextForTests(RuntimeEnvironment.getApplication());
         SendTabToSelfAndroidBridgeJni.setInstanceForTesting(mNativeMock);
         mWebContents = new MockWebContents();
