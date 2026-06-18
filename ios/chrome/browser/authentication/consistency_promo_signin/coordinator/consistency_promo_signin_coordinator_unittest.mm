@@ -59,6 +59,7 @@ class ConsistencyPromoSigninCoordinatorTest : public PlatformTest {
                            browser:browser_.get()
                       contextStyle:SigninContextStyle::kDefault
                        accessPoint:access_point_
+              confirmChangeProfile:nil
               prepareChangeProfile:nil
               continuationProvider:NotReachedContinuationProvider()];
     mediator_mock_ = OCMStrictClassMock([ConsistencyPromoSigninMediator class]);
@@ -231,6 +232,7 @@ TEST_F(ConsistencyPromoSigninCoordinatorTest, NoAccountWebSigninEnabled) {
                                contextStyle:SigninContextStyle::kDefault
                                 accessPoint:signin_metrics::AccessPoint::
                                                 kWebSignin
+                       confirmChangeProfile:nil
                        prepareChangeProfile:nil
                        continuationProvider:NotReachedContinuationProvider()];
 
@@ -248,6 +250,7 @@ TEST_F(ConsistencyPromoSigninCoordinatorTest, NoAccountWebSigninDisabled) {
                                contextStyle:SigninContextStyle::kDefault
                                 accessPoint:signin_metrics::AccessPoint::
                                                 kWebSignin
+                       confirmChangeProfile:nil
                        prepareChangeProfile:nil
                        continuationProvider:NotReachedContinuationProvider()];
 

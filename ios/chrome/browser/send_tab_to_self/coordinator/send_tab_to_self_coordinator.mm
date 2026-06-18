@@ -682,6 +682,7 @@ void OpenManageDevicesTab(CommandDispatcher* dispatcher) {
                                                       browser:self.browser
                                                  contextStyle:style
                                                   accessPoint:accessPoint
+                                         confirmChangeProfile:nil
                                          prepareChangeProfile:
                                              prepareChangeProfile
                                          continuationProvider:provider];

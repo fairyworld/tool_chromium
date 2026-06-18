@@ -946,6 +946,7 @@ void OnListFamilyMembersResponse(
                                                   accessPoint:signin_metrics::
                                                                   AccessPoint::
                                                                       kWebSignin
+                                         confirmChangeProfile:nil
                                          prepareChangeProfile:
                                              prepareChangeProfile
                                          continuationProvider:provider];

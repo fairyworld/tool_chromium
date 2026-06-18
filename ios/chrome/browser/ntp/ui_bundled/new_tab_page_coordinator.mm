@@ -1159,6 +1159,7 @@
                                                        SigninContextStyle::
                                                            kDefault
                                                     accessPoint:accessPoint
+                                           confirmChangeProfile:nil
                                            prepareChangeProfile:nil
                                            continuationProvider:
                                                DoNothingContinuationProvider()];
