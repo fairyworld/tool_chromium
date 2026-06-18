@@ -51,6 +51,7 @@ WebDialogBrowserTest.*
 BrowserFrameTest.*
 BrowserViewTest.*
 BrowserRootViewBrowserTest.*
+DefaultBrowserStepEligibilityCheckerTest.*
 
 # Filter out failing infobar tests from Chrome for Testing trybots
 
