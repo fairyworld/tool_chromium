@@ -3626,6 +3626,63 @@ public class ChromeContextMenuPopulatorTest {
                 findItemWithId(videoMenu, R.id.contextmenu_download_video_frame));
     }
 
+    @Test
+    @SmallTest
+    @UiThreadTest
+    public void testThinWebViewLinkItems() {
+        setAllMandatoryFlowsComplete();
+
+        when(mItemDelegate.supportsOpenInNewTab()).thenReturn(true);
+        when(mItemDelegate.supportsOpenInNewTabInGroup()).thenReturn(true);
+        when(mItemDelegate.supportsOpenInNewIncognitoTab()).thenReturn(true);
+        when(mItemDelegate.supportsOpenInNewWindow()).thenReturn(true);
+        when(mItemDelegate.supportsOpenInIncognitoWindow()).thenReturn(true);
+        when(mItemDelegate.supportsSaveLinkAs()).thenReturn(true);
+
+        ContextMenuParams linkParams = getHttpLinkParams();
+
+        // 1. Test when shouldOpenIncognitoAsWindow().
+        IncognitoUtils.setShouldOpenIncognitoAsWindowForTesting(false);
+        when(mItemDelegate.isIncognitoSupported()).thenReturn(true);
+        initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.THIN_WEB_VIEW, linkParams);
+        List<ModelList> linkMenuPhone = mPopulator.buildContextMenu();
+
+        assertNotNull(
+                "ThinWebView context menu must contain 'Open in new tab'",
+                findItemWithId(linkMenuPhone, R.id.contextmenu_open_in_new_tab));
+        assertNotNull(
+                "ThinWebView context menu must contain 'Open in new tab in group'",
+                findItemWithId(linkMenuPhone, R.id.contextmenu_open_in_new_tab_in_group));
+        assertNotNull(
+                "ThinWebView context menu must contain 'Open in incognito tab'",
+                findItemWithId(linkMenuPhone, R.id.contextmenu_open_in_incognito_tab));
+        assertNull(
+                "ThinWebView context menu must not contain 'Open in incognito window'",
+                findItemWithId(linkMenuPhone, R.id.contextmenu_open_in_incognito_window));
+        assertNotNull(
+                "ThinWebView context menu must contain 'Save link as'",
+                findItemWithId(linkMenuPhone, R.id.contextmenu_save_link_as));
+
+        // 2. Test when shouldOpenIncognitoAsWindow() is true.
+        IncognitoUtils.setShouldOpenIncognitoAsWindowForTesting(true);
+        initializePopulator(ChromeContextMenuPopulator.ContextMenuMode.THIN_WEB_VIEW, linkParams);
+        List<ModelList> linkMenuTablet = mPopulator.buildContextMenu();
+
+        if (org.chromium.chrome.browser.multiwindow.MultiWindowUtils
+                .isLinkNavigationToIncognitoWindowSupported()) {
+            assertNotNull(
+                    "ThinWebView context menu must contain 'Open in incognito window'",
+                    findItemWithId(linkMenuTablet, R.id.contextmenu_open_in_incognito_window));
+        } else {
+            assertNull(
+                    "ThinWebView context menu must not contain 'Open in incognito window'",
+                    findItemWithId(linkMenuTablet, R.id.contextmenu_open_in_incognito_window));
+        }
+        assertNull(
+                "ThinWebView context menu must not contain 'Open in incognito tab'",
+                findItemWithId(linkMenuTablet, R.id.contextmenu_open_in_incognito_tab));
+    }
+
     /**
      * Searches through all generated menu groups to find a menu item with a specific ID.
      *
