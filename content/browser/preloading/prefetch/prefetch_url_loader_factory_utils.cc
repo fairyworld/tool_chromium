@@ -11,6 +11,7 @@
 #include "content/public/browser/content_browser_client.h"
 #include "content/public/browser/render_frame_host.h"
 #include "net/base/isolation_info.h"
+#include "services/network/public/cpp/constants.h"
 #include "services/network/public/cpp/shared_url_loader_factory.h"
 
 namespace content {
@@ -20,12 +21,13 @@ static network::SharedURLLoaderFactory* g_url_loader_factory_for_testing =
     nullptr;
 }  // namespace
 
-network::mojom::URLLoaderFactoryParamsPtr
-CreatePrefetchURLLoaderFactoryParams() {
+network::mojom::URLLoaderFactoryParamsPtr CreatePrefetchURLLoaderFactoryParams(
+    const base::UnguessableToken& network_restrictions_id) {
   auto factory_params = network::mojom::URLLoaderFactoryParams::New();
   factory_params->process_id = network::OriginatingProcessId::browser();
   factory_params->is_trusted = true;
   factory_params->is_orb_enabled = false;
+  factory_params->network_restrictions_id = network_restrictions_id;
   return factory_params;
 }
 
@@ -58,6 +60,14 @@ scoped_refptr<network::SharedURLLoaderFactory> CreatePrefetchURLLoaderFactory(
     ukm_source_id = ukm::kInvalidSourceIdObj;
   }
 
+  base::UnguessableToken network_restrictions_id =
+      network::GetNoOpNetworkRestrictionsId();
+  if (referring_render_frame_host) {
+    auto* rfh_impl =
+        static_cast<RenderFrameHostImpl*>(referring_render_frame_host);
+    network_restrictions_id = rfh_impl->GetNetworkRestrictionsID();
+  }
+
   bool bypass_redirect_checks = false;
 
   url_loader_factory::TerminalParams terminal_params = [&]() {
@@ -79,7 +89,8 @@ scoped_refptr<network::SharedURLLoaderFactory> CreatePrefetchURLLoaderFactory(
 
     // Otherwise, send the request to the network.
     return url_loader_factory::TerminalParams::ForNetworkContext(
-        network_context, CreatePrefetchURLLoaderFactoryParams(),
+        network_context,
+        CreatePrefetchURLLoaderFactoryParams(network_restrictions_id),
         url_loader_factory::HeaderClientOption::kAllow);
   }();
 

@@ -6,6 +6,7 @@
 #define CONTENT_BROWSER_PRELOADING_PREFETCH_PREFETCH_URL_LOADER_FACTORY_UTILS_H_
 
 #include "base/memory/scoped_refptr.h"
+#include "base/unguessable_token.h"
 #include "content/common/content_export.h"
 #include "services/network/public/mojom/network_context.mojom.h"
 
@@ -22,8 +23,8 @@ class PrefetchRequest;
 
 // Creates the common factory params used for prefetching, including by
 // `CreatePrefetchURLLoaderFactory()` below.
-network::mojom::URLLoaderFactoryParamsPtr
-CreatePrefetchURLLoaderFactoryParams();
+network::mojom::URLLoaderFactoryParamsPtr CreatePrefetchURLLoaderFactoryParams(
+    const base::UnguessableToken& network_restrictions_id);
 
 // Creates a `URLLoaderFactory` (which is finally connected to
 // `network_context`) to be used for the prefetch. The configurations like

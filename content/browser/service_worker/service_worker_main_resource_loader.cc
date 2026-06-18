@@ -46,6 +46,7 @@
 #include "net/base/load_timing_info.h"
 #include "net/http/http_request_headers.h"
 #include "net/http/http_status_code.h"
+#include "services/network/public/cpp/constants.h"
 #include "services/network/public/cpp/cross_origin_embedder_policy.h"
 #include "services/network/public/cpp/document_isolation_policy.h"
 #include "services/network/public/cpp/features.h"
@@ -579,7 +580,8 @@ bool ServiceWorkerMainResourceLoader::StartRaceNetworkRequest(
       service_worker_client_->CreateNetworkURLLoaderFactory(
           ServiceWorkerClient::CreateNetworkURLLoaderFactoryType::
               kRaceNetworkRequest,
-          context->storage_partition(), resource_request_, std::nullopt),
+          context->storage_partition(), resource_request_,
+          network::GetNoOpNetworkRestrictionsId()),
       /*is_main_resource=*/true);
   CHECK(!race_network_request_url_loader_client_);
   race_network_request_url_loader_client_.emplace(
@@ -608,12 +610,14 @@ bool ServiceWorkerMainResourceLoader::StartRaceNetworkRequest(
   mojo::PendingRemote<network::mojom::URLLoaderClient> client_to_pass;
   race_network_request_url_loader_client_->Bind(&client_to_pass);
   CHECK(!race_network_request_url_loader_factory_);
-  // This is also for the race network request, so we pass std::nullopt.
+  // This is also for the race network request, so we pass
+  // network::GetNoOpNetworkRestrictionsId().
   race_network_request_url_loader_factory_ =
       service_worker_client_->CreateNetworkURLLoaderFactory(
           ServiceWorkerClient::CreateNetworkURLLoaderFactoryType::
               kRaceNetworkRequest,
-          context->storage_partition(), resource_request_, std::nullopt);
+          context->storage_partition(), resource_request_,
+          network::GetNoOpNetworkRestrictionsId());
 
   // Perform fetch
   CHECK_EQ(commit_responsibility(), FetchResponseFrom::kNoResponseYet);

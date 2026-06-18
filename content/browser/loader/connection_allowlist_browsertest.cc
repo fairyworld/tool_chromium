@@ -1569,12 +1569,11 @@ IN_PROC_BROWSER_TEST_F(ConnectionAllowlistTest,
       target_url.spec() + "\r\n\r\n");
   controllable_response.Done();
 
-  // For inegligible redirect, the prefetch status is set to
-  // `PrefetchStatus::kPrefetchFailedIneligibleRedirect` ignoring the specific
-  // `PreloadingEligibility` reason.
+  // The redirect is blocked by the network service, so the prefetch fails with
+  // a net error.
   EXPECT_TRUE(WaitForSpeculationRulesPrefetch(
-      redirect_url, PrefetchContainer::LoadState::kFailedDeterminedHead,
-      PrefetchStatus::kPrefetchFailedIneligibleRedirect));
+      redirect_url, PrefetchContainer::LoadState::kFailed,
+      PrefetchStatus::kPrefetchFailedNetError));
 }
 
 // Verifies that if a document is controlled by a Service Worker, and the
@@ -2929,8 +2928,8 @@ IN_PROC_BROWSER_TEST_F(ConnectionAllowlistTest,
   // because redirect is not allowed.
   if (IsPrerender2FallbackPrefetchSpecRulesEnabled()) {
     EXPECT_TRUE(WaitForSpeculationRulesPrefetch(
-        redirect_url, PrefetchContainer::LoadState::kFailedDeterminedHead,
-        PrefetchStatus::kPrefetchFailedIneligibleRedirect));
+        redirect_url, PrefetchContainer::LoadState::kFailed,
+        PrefetchStatus::kPrefetchFailedNetError));
   }
 
   // If feature `Prerender2FallbackPrefetchSpecRules` is enabled, the prefetch
