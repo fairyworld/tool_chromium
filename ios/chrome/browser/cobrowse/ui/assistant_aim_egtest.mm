@@ -251,6 +251,42 @@ id<GREYMatcher> CloseButton() {
   // Verify the assistant is visible again.
   [ChromeEarlGrey waitForUIElementToAppearWithMatcher:CloseButton()];
 }
+
+// Tests that tapping the new tab button in the toolbar opens a new tab, hides
+// the assistant, and navigating on the new tab shows the assistant again.
+- (void)testNewTabButtonHidesAssistant {
+  if ([ComposeboxAppInterface isServerSideStateEnabled]) {
+    EARL_GREY_TEST_SKIPPED(
+        @"Skipped when kComposeboxServerSideState is enabled.");
+  }
+  if ([ChromeEarlGrey isIPadIdiom]) {
+    EARL_GREY_TEST_SKIPPED(@"Secondary toolbar is not present on iPad.");
+  }
+
+  OpenCoBrowse(self.testServer);
+
+  // Wait for the assistant to appear.
+  [ChromeEarlGrey waitForUIElementToAppearWithMatcher:CloseButton()];
+
+  // Tap the new tab button.
+  [[EarlGrey selectElementWithMatcher:chrome_test_util::NewTabButton()]
+      performAction:grey_tap()];
+
+  // Verify the assistant is dismissed (hidden).
+  [[EarlGrey selectElementWithMatcher:CloseButton()]
+      assertWithMatcher:grey_nil()];
+
+  // Verify that a new tab was opened (we should be on NTP).
+  [ChromeEarlGrey waitForMainTabCount:2];
+
+  // Navigate to a URL on the new tab.
+  [ChromeEarlGrey loadURL:self.testServer->GetURL("/echo")];
+  [ChromeEarlGrey waitForPageToFinishLoading];
+
+  // Verify the assistant is visible again.
+  [ChromeEarlGrey waitForUIElementToAppearWithMatcher:CloseButton()];
+}
+
 // Tests that the assistant can transition between medium, large, and minimized
 // detents.
 - (void)testDetentTransitions {
