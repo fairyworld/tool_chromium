@@ -812,6 +812,10 @@ chromium-metrics-reviews@google.com.
   <int value="100380" label="AppRatingPromptShown"/>
   <int value="100381"
       label="AccessibilityReadAnythingLastOpenedPresentationState"/>
+  <int value="100382" label="ProfileContentSettingsExceptionsInlineCueMenu"/>
+  <int value="100383"
+      label="ProfileContentSettingsPartitionedExceptionsInlineCueMenu"/>
+  <int value="100384" label="ProfileDefaultContentSettingValuesInlineCueMenu"/>
 <!-- LINT.ThenChange(/chrome/browser/sync/prefs/chrome_syncable_prefs_database.cc:ChromeSyncablePref)-->
 
 <!-- LINT.IfChange(IosSyncablePref) -->

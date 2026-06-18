@@ -442,6 +442,9 @@ enum {
   kAccessibilityReadAnythingLastNonDisabledLineFocus = 100379,
   kAppRatingPromptShown = 100380,
   kAccessibilityReadAnythingLastOpenedPresentationState = 100381,
+  kProfileContentSettingsExceptionsInlineCueMenu = 100382,
+  kProfileContentSettingsPartitionedExceptionsInlineCueMenu = 100383,
+  kProfileDefaultContentSettingValuesInlineCueMenu = 100384,
   // See components/sync_preferences/README.md about adding new entries here.
   // vvvvv IMPORTANT! vvvvv
   // Note to the reviewer: IT IS YOUR RESPONSIBILITY to ensure that new syncable
@@ -1657,6 +1660,11 @@ constexpr auto kChromeSyncablePrefsAllowlist = base::MakeFixedFlatMap<
       syncer::PREFERENCES,
       sync_preferences::PrefSensitivity::kSensitiveRequiresHistory,
       sync_preferences::MergeBehavior::kMergeableDict}},
+    {"profile.content_settings.exceptions.inline_cue_menu",
+     {syncable_prefs_ids::kProfileContentSettingsExceptionsInlineCueMenu,
+      syncer::PREFERENCES,
+      sync_preferences::PrefSensitivity::kSensitiveRequiresHistory,
+      sync_preferences::MergeBehavior::kMergeableDict}},
     {"profile.content_settings.exceptions.javascript",
      {syncable_prefs_ids::kProfileContentSettingsExceptionsJavascript,
       syncer::PREFERENCES,
@@ -1715,6 +1723,12 @@ constexpr auto kChromeSyncablePrefsAllowlist = base::MakeFixedFlatMap<
       syncer::PREFERENCES,
       sync_preferences::PrefSensitivity::kSensitiveRequiresHistory,
       sync_preferences::MergeBehavior::kMergeableDict}},
+    {"profile.content_settings.partitioned_exceptions.inline_cue_menu",
+     {syncable_prefs_ids::
+          kProfileContentSettingsPartitionedExceptionsInlineCueMenu,
+      syncer::PREFERENCES,
+      sync_preferences::PrefSensitivity::kSensitiveRequiresHistory,
+      sync_preferences::MergeBehavior::kMergeableDict}},
     {"profile.content_settings.partitioned_exceptions.javascript",
      {syncable_prefs_ids::
           kProfileContentSettingsPartitionedExceptionsJavascript,
@@ -1769,6 +1783,10 @@ constexpr auto kChromeSyncablePrefsAllowlist = base::MakeFixedFlatMap<
       sync_preferences::MergeBehavior::kNone}},
     {"profile.default_content_setting_values.images",
      {syncable_prefs_ids::kProfileDefaultContentSettingValuesImages,
+      syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
+      sync_preferences::MergeBehavior::kNone}},
+    {"profile.default_content_setting_values.inline_cue_menu",
+     {syncable_prefs_ids::kProfileDefaultContentSettingValuesInlineCueMenu,
       syncer::PREFERENCES, sync_preferences::PrefSensitivity::kNone,
       sync_preferences::MergeBehavior::kNone}},
     {"profile.default_content_setting_values.javascript",
