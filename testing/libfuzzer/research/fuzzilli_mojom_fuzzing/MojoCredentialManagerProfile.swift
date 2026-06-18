@@ -101,10 +101,10 @@ private let mojoBuiltins: [String: ILType] = [
     MojoStrings.credentialInfo: .constructor(
         [
             .plain(.jsCredentialType),
-            .plain(.jsString16),
-            .plain(.jsString16),
+            .either(.jsString16, .undefined),
+            .either(.jsString16, .undefined),
             .plain(.jsUrl),
-            .plain(.jsString16),
+            .either(.jsString16, .undefined),
             .plain(.jsSchemeHostPort),
         ]
             => .jsCredentialInfo
