@@ -4483,6 +4483,17 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Gamepad.Win.GameInput.GameInputCreateResult" enum="Hresult"
+    expires_after="2026-11-18">
+  <owner>mattreynolds@chromium.org</owner>
+  <owner>gabrielbrito@microsoft.com</owner>
+  <summary>
+    The HRESULT returned by GameInputCreate in the Windows GameInput data
+    fetcher. Recorded once when the data fetcher is added to the gamepad
+    provider and attempts to create the GameInput instance.
+  </summary>
+</histogram>
+
 <histogram name="Gamepad.Win.GameInput.GamepadAddedResult"
     enum="GameInputGamepadAddedResult" expires_after="2026-11-18">
   <owner>mattreynolds@chromium.org</owner>
