@@ -36,6 +36,7 @@ chromium-metrics-reviews@google.com.
   <variant name="Camera" summary="Camera"/>
   <variant name="Clipboard" summary="Clipboard"/>
   <variant name="CurrentTab" summary="Current Tab button"/>
+  <variant name="Drive" summary="Drive file picker"/>
   <variant name="Files" summary="File picker"/>
   <variant name="Gallery" summary="Image picker"/>
   <variant name="RecentTab" summary="Recent Tab"/>

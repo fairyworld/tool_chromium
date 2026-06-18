@@ -2863,6 +2863,16 @@ Keep consistent with active providers. Doesn't need to include every provider in
   </summary>
 </histogram>
 
+<histogram name="Omnibox.MobileFusebox.NumDriveFilesAttached" units="count"
+    expires_after="2027-03-30">
+  <owner>erahmaoui@google.com</owner>
+  <owner>chrome-mobile-search@google.com</owner>
+  <summary>
+    The number of Drive files attached to the query when the user selects a
+    Drive file.
+  </summary>
+</histogram>
+
 <histogram name="Omnibox.MobileFusebox.TabPickerTabsAttached" units="count"
     expires_after="2026-11-11">
   <owner>ameurhosni@google.com</owner>
