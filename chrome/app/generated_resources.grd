@@ -19351,9 +19351,12 @@ Please help our engineers fix this problem. Tell us what happened right before y
         </message>
     </if>
 
-    <!-- PDF Ink Signatures elements. -->
+    <!-- PDF Editing elements. -->
     <message name="IDS_PDF_INK_SIGNATURES_IPH_BODY" desc="Content of in-product help to introduce the PDF Ink Signatures feature.">
     Add freehand drawings, signatures, and highlights with the new Draw tool
+    </message>
+    <message name="IDS_PDF_TEXT_ANNOTATIONS_IPH_BODY" desc="Content of in-product help to introduce the PDF Text Annotations feature.">
+    Add text with the new "Add text" tool
     </message>
 
     <!-- PDF Searchify elements. -->
