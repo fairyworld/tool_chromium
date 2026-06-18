@@ -770,7 +770,11 @@ void AtMemoryManager::OnSearchResultsReceived(
   std::vector<Suggestion> suggestions;
   switch (result.status) {
     case accessibility_annotator::MemorySearchStatus::kUnsupportedQuery:
-      suggestions.push_back(CreateUnsupportedQuerySuggestion(query));
+      if (owner_->client().IsGlicEnabled()) {
+        suggestions.push_back(CreateUnsupportedQuerySuggestion(query));
+      } else {
+        suggestions.push_back(CreateNoDataSuggestion());
+      }
       break;
     case accessibility_annotator::MemorySearchStatus::kFinalResponseSuccess:
       suggestions.push_back(CreateNoDataSuggestion());
