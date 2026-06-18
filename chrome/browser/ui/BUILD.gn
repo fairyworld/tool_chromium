@@ -4199,8 +4199,6 @@ static_library("ui") {
       "views/global_media_controls/media_toolbar_button_contextual_menu.h",
       "views/global_media_controls/media_toolbar_button_view.cc",
       "views/global_media_controls/media_toolbar_button_view.h",
-      "views/hover_button_controller.cc",
-      "views/hover_button_controller.h",
       "views/hung_renderer_view.cc",
       "views/hung_renderer_view.h",
       "views/idle_bubble.cc",
