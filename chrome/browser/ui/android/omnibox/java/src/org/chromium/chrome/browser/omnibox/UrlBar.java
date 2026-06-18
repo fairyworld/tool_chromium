@@ -59,6 +59,7 @@ import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.toolbar.ToolbarVariationUtils;
 import org.chromium.components.browser_ui.share.ShareHelper;
 import org.chromium.components.browser_ui.util.FirstDrawDetector;
+import org.chromium.components.omnibox.OmniboxCapabilities;
 import org.chromium.components.omnibox.OmniboxFeatures;
 import org.chromium.components.omnibox.TextSelection;
 import org.chromium.ui.KeyboardVisibilityDelegate;
@@ -75,7 +76,6 @@ import java.lang.annotation.RetentionPolicy;
 public class UrlBar extends AutocompleteEditText {
     private static final String TAG = "UrlBar";
     private static final String ACCESSIBILITY_WARNING_FORMAT = "%s. %s";
-    @VisibleForTesting static final float LINE_HEIGHT_FACTOR = 1.15f;
 
     private static final boolean DEBUG = false;
 
@@ -94,9 +94,10 @@ public class UrlBar extends AutocompleteEditText {
     // The text must be at least this long to be truncated. Safety measure to prevent accidentally
     // over truncating text for large tablets and external displays. Also, tests can continue to
     // check for text equality, instead of worrying about partial equality with truncated text.
-    static final int MIN_LENGTH_FOR_TRUNCATION = 100;
+    private static final int MIN_LENGTH_FOR_TRUNCATION = 100;
 
-    static final int MULTILINE_EDIT_MAX_LINES = 5;
+    @VisibleForTesting static final int MULTILINE_EDIT_MAX_LINES = 5;
+    @VisibleForTesting static final int DESKTOP_MULTILINE_EDIT_MAX_LINES = 8;
 
     /**
      * The text direction of the URL or query: LAYOUT_DIRECTION_LOCALE, LAYOUT_DIRECTION_LTR, or
@@ -294,7 +295,10 @@ public class UrlBar extends AutocompleteEditText {
                     // `multiline`, however the moment we do that - Android applies other
                     // incompatible defaults (and starts wrapping URLs).
                     setSingleLine(false);
-                    setMaxLines(MULTILINE_EDIT_MAX_LINES);
+                    setMaxLines(
+                            OmniboxCapabilities.isDesktopPlatform()
+                                    ? DESKTOP_MULTILINE_EDIT_MAX_LINES
+                                    : MULTILINE_EDIT_MAX_LINES);
                     setHorizontallyScrolling(true);
                 });
 
