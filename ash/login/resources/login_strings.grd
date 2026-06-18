@@ -316,6 +316,194 @@
       <message name="IDS_LOGIN_APP_DOWNLOADING_SCREEN_NEXT" desc="The label on the button that continues the setup flow.">
         Next
       </message>
+
+      <!-- Strings for ai intro screen -->
+      <message name="IDS_AI_INTRO_TITLE" desc="The title of the ai intro dialog">
+        Use Google AI to be more creative and productive
+      </message>
+      <message name="IDS_AI_INTRO_SUBTITLE" desc="The subtitle of the ai intro dialog">
+        <ph name="BEGIN_PARAGRAPH1">&lt;p&gt;</ph>Exclusive for <ph name="DEVICE_TYPE">$1<ex>Chromebook Plus</ex></ph>.<ph name="END_PARAGRAPH1">&lt;/p&gt;</ph>
+        <ph name="BEGIN_PARAGRAPH2">&lt;p&gt;</ph>Generative AI is experimental, in early development, and currently has limited availability.<ph name="END_PARAGRAPH2">&lt;/p&gt;</ph>
+      </message>
+      <message name="IDS_AI_INTRO_SLIDE_WRITE_TITLE" desc="The title of the write info slide">
+        Write faster and with more confidence
+      </message>
+      <message name="IDS_AI_INTRO_SLIDE_WRITE_TEXT" desc="The text of the write info slide">
+        Right-click in a text box to use Help me write
+      </message>
+      <message name="IDS_AI_INTRO_SLIDE_IMAGE_TITLE" desc="The title of the info slide for image generation feature">
+        Create images with AI
+      </message>
+      <message name="IDS_AI_INTRO_SLIDE_IMAGE_TEXT" desc="The text of the info slide for image generation feature">
+        Right-click to easily visualize your ideas
+      </message>
+      <message name="IDS_AI_INTRO_SLIDE_WALLPAPER_TITLE" desc="The title of the wallpaper info slide">
+        Create wallpapers with AI
+      </message>
+      <message name="IDS_AI_INTRO_SLIDE_WALLPAPER_TEXT" desc="The text of the wallpaper info slide">
+        Style unique wallpapers
+      </message>
+      <message name="IDS_AI_INTRO_SLIDE_BACKGROUND_TITLE" desc="The title of the background info slide">
+        Create backgrounds with AI
+      </message>
+      <message name="IDS_AI_INTRO_SLIDE_BACKGROUND_TEXT" desc="The text of the background info slide">
+        Personalize your camera backgrounds for video calls and more
+      </message>
+      <message name="IDS_AI_INTRO_SLIDE_READ_TITLE" desc="The title of the read info slide">
+        Summarize content, simplify complex language, or ask questions
+      </message>
+      <message name="IDS_AI_INTRO_SLIDE_READ_TEXT" desc="The text of the read info slide">
+        Right-click to use Help me read
+      </message>
+      <message name="IDS_AI_INTRO_SLIDE_LABEL" desc="Text of slide label for accessibility.">
+        Extra content <ph name="CURRENT_ELEMENT">$1<ex>1</ex></ph> out of <ph name="TOTAL_ELEMENTS">$2<ex>2</ex></ph>
+      </message>
+      <message name="IDS_AI_INTRO_SELECTED_BUTTON_LABEL" desc="Text of carousel selected button label for accessibility.">
+        Selected, extra content <ph name="CURRENT_ELEMENT">$1<ex>1</ex></ph> out of <ph name="TOTAL_ELEMENTS">$2<ex>2</ex></ph>
+      </message>
+      <message name="IDS_AI_INTRO_UNSELECTED_BUTTON_LABEL" desc="Text of carousel unselected button label for accessibility.">
+        Navigate to extra content <ph name="CURRENT_ELEMENT">$1<ex>1</ex></ph> out of <ph name="TOTAL_ELEMENTS">$2<ex>2</ex></ph>
+      </message>
+
+      <!-- Strings for gemini intro screen -->
+      <message name="IDS_GEMINI_INTRO_TITLE" desc="The title of the gemini intro dialog">
+        Your <ph name="DEVICE_TYPE">$1<ex>Chromebook Plus</ex></ph> comes with Gemini
+      </message>
+      <message name="IDS_GEMINI_INTRO_SUBTITLE" desc="The subtitle of the gemini intro dialog">
+        <ph name="BEGIN_PARAGRAPH1">&lt;p&gt;</ph>Chat with Gemini to start writing, planning, learning, and more with Google AI.<ph name="END_PARAGRAPH1">&lt;/p&gt;</ph>
+        <ph name="BEGIN_PARAGRAPH2">&lt;p&gt;</ph>After setup, start using Gemini by selecting the Gemini app on your shelf, at the bottom of your screen.<ph name="END_PARAGRAPH2">&lt;/p&gt;</ph>
+      </message>
+
+      <!-- Strings for marketing optin screen -->
+      <message name="IDS_LOGIN_MARKETING_OPT_IN_SCREEN_TITLE" desc="The title of the last dialog in the set of screens that are always displayed to the user on the first login to the ChromeOS device.">
+        You are all set!
+      </message>
+      <message name="IDS_LOGIN_MARKETING_OPT_IN_SCREEN_SUBTITLE" desc="The sub-title of the dialog that allows user to opt-in into several Google marketing options.">
+        Get <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> tips, offers, and updates, and share feedback.
+      </message>
+      <message name="IDS_LOGIN_MARKETING_OPT_IN_SCREEN_WITH_CLOUDGAMINGDEVICE_TITLE" desc="An alternate title for the last dialog the marketing opt-in for cloud gaming devices.">
+        Setup is complete! Get your device ready for gaming next
+      </message>
+      <message name="IDS_LOGIN_MARKETING_OPT_IN_SCREEN_WITH_CLOUDGAMINGDEVICE_SUBTITLE" desc="An alternate subtitle for the last dialog the marketing opt-in for cloud gaming devices.">
+        Your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> is built for gaming. The Explore app will open next where you can access hundreds of the latest games, see gaming offers, and discover gaming features that come with your device.
+      </message>
+      <message name="IDS_LOGIN_MARKETING_OPT_IN_SCREEN_UNSUBSCRIBE_SHORT" desc="Disclaimer about being able to unsubscribe">
+        Unsubscribe anytime.
+      </message>
+      <message name="IDS_LOGIN_MARKETING_OPT_IN_SCREEN_UNSUBSCRIBE_LONG" desc="Longer disclaimer explaining how to unsubscribe">
+        Unsubscribe anytime by clicking the link in the emails you receive.
+      </message>
+      <message name="IDS_LOGIN_MARKETING_OPT_IN_SCREEN_SUBTITLE_WITH_DEVICE_NAME" desc="The sub-title of the marketing opt in screen which will also include the name of the user's device.">
+        You are ready to start using your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph>.
+      </message>
+      <message name="IDS_LOGIN_MARKETING_OPT_IN_SCREEN_GET_CHROMEBOOK_UPDATES_SIGN_ME_UP" desc="A lablel next to the checkbox that controls user subscription to marketing updates and useful information about the user's Chrome device.">
+        Sign me up
+      </message>
+      <message name="IDS_LOGIN_MARKETING_OPT_IN_SCREEN_WITH_CLOUDGAMINGDEVICE_SIGN_ME_UP" desc="Alternate the lablel next to the checkbox that controls user subscription to marketing updates and useful information about the user's Chrome device for gaming device.">
+        Sign up for <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> emails
+      </message>
+      <message name="IDS_LOGIN_GET_STARTED" desc="A label on the button. Used on the welcome screen (the first one on OOBE) and on the marketing optin screen (the last one in OOBE).">
+        Get started
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_SETUP" desc="A label on the button. Used on multiple screens in OOBE to allow the user to initiate the Quick Start flow which allows them to set up their Chromebook using an existing Android phone.">
+        Quick setup with Android phone
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_SETUP_NETWORK_SCREEN_ENTRY_POINT" desc="A label of the first item of the list of available networks. Used on OOBE's network screen to allow the user to initiate the Quick Start flow which allows them to set up their Chromebook using an existing Android phone.">
+        Automatically transfer WiFi from your Android phone
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_SETUP_SIGNIN_SCREEN_ENTRY_POINT" desc="A label on the button. Used on OOBE's sign-in screen to allow the user to initiate the Quick Start flow which allows them to set up their Chromebook using an existing Android phone.">
+        Sign in with Android phone
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_SETUP_QR_TITLE" desc="A title used on OOBE's Quick Start screen for setting up a Chromebook using an Android device using a QR code.">
+        Scan the QR code with your Android phone
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_SETUP_PIN_TITLE" desc="A title used on OOBE's Quick Start screen for setting up a Chromebook using an Android device using a PIN code.">
+        Verify the code on your Android phone
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_SETUP_SUBTITLE" desc="A subtitle used on OOBE's Quick Start screen for setting up a Chromebook using an Android device.">
+        Easily set up your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> with your phone. You can add your Wi-Fi and Google Account without manually entering your passwords.
+        <ph name="BR">&lt;br&gt;</ph>
+        <ph name="BR">&lt;br&gt;</ph>
+        Visible as <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph>...
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_SETUP_SUBTITLE_ACCOUNT_ONLY" desc="A subtitle used on OOBE's Quick Start screen for setting up a Chromebook using an Android device. This variation only describes setting up a Google account.">
+        Easily set up your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> with your phone. You can add your Google Account without manually entering your password.
+        <ph name="BR">&lt;br&gt;</ph>
+        <ph name="BR">&lt;br&gt;</ph>
+        Visible as <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph>...
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_SETUP_CONTENT_FOOTER_TURN_ON_WIFI_AND_BLT" desc="A message telling the user to turn on their phone's Bluetooth and WiFi when setting up their Chromebook using an Android phone.">
+        Turn on your phone’s Bluetooth and Wi-Fi
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_SETUP_CONTENT_FOOTER_FOLLOW_INSTRUCTIONS_PIN" desc="A message telling the user to follow instructions on their phone when setting up when setting up their Chromebook using an Android phone.">
+        Follow instructions on your phone to verify the code
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_SETUP_CONTENT_FOOTER_FOLLOW_INSTRUCTIONS_QR" desc="A message telling the user to follow instructions on their phone when setting up when setting up their Chromebook using an Android phone.">
+        Follow instructions on your phone or use the camera app
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_WIFI_TRANSFER_TITLE" desc="A title used on OOBE's Quick Start screen when WiFi credentials are being transferred to the Chromebook from the Android device.">
+        Receiving Wi-Fi info...
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_WIFI_TRANSFER_SUBTITLE" desc="A subtitle used on OOBE's Quick Start screen when WiFi credentials are being transferred to the Chromebook from the Android device.">
+        Your Android phone has you covered. Your WiFi and password are being transferred over.
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_NETWORK_NEEDED_SUBTITLE" desc="A subtitle used on OOBE's Quick Start flow prompting the user to connect to a WiFi network in order to continue the Chromebook setup using the Android device.">
+        To continue setup with your Android device, connect your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph> to a network
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_WIFI_ERROR_TITLE" desc="A title used on the Network Screen when QuickStart fails during the WiFi transfer step.">
+        Can't transfer Wi-Fi
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_WIFI_ERROR_SUBTITLE" desc="A subtitle used on the Network Screen when QuickStart fails during the WiFi transfer step.">
+        Try again or connect to a network manually
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_RESUME_AFTER_REBOOT_TITLE" desc="A title used on OOBE's Quick Start flow when the device reboots after applying an update and tries to continue the setup by connecting to the Android device.">
+        Connecting to your Android phone...
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_RESUME_AFTER_REBOOT_SUBTITLE" desc="A subtitle used on OOBE's Quick Start flow when the device reboots after applying an update and tries to continue the setup by connecting to the Android device.">
+        Follow the instructions on your phone to continue setup. Make sure your phone is nearby and Bluetooth is turned on.
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_ACCOUNT_TRANSFER_STEP_TITLE" desc="A title used on OOBE's Quick Start flow when the user's credentails are being transferred from the Android device to ChromeOS.">
+        Signing in...
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_ACCOUNT_TRANSFER_STEP_SUBTITLE" desc="A subtitle used on OOBE's Quick Start flow when the user's credentails are being transferred from the Android device to ChromeOS.">
+        Transfering Google Account info from your Android phone
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_SETUP_COMPLETE_STEP_TITLE" desc="A title used on OOBE's Quick Start flow screen notifying the user that they have completed the setup using their Android phone.">
+        Android quick setup is done. Continue setup on your <ph name="DEVICE_TYPE">$1<ex>Chromebook</ex></ph>.
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_SETUP_COMPLETE_STEP_SUBTITLE_BOTH" desc="A subtitle used on OOBE's Quick Start flow screen notifying the user that they have completed the setup using their Android phone, including transferring Wi-Fi network credentials and signing in to their Google account.">
+        You connected to Wi-Fi and signed in to <ph name="USER_EMAIL">$1<ex>test@gmail.com</ex></ph> using your Android phone
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_SETUP_COMPLETE_STEP_SUBTITLE_SIGNED_IN" desc="A subtitle used on OOBE's Quick Start flow screen notifying the user that they have completed the setup using their Android phone, including signin in to their Google account.">
+        You signed in to <ph name="USER_EMAIL">$1<ex>test@gmail.com</ex></ph> using your Android phone
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_SETUP_FROM_SIGNIN_SCREEN_TITLE" desc="A title used on OOBE's Quick Start screen for signing-in into their Chromebook using an Android device prompting the user to scan a QR code.">
+        Sign in with your Android phone
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_SETUP_FROM_SIGNIN_SCREEN_SUBTITLE" desc="A subtitle used on OOBE's Quick Start screen for signing-in into their Chromebook using an Android device.">
+        Follow the instructions on your phone to scan the QR code. Make sure your phone's Bluetooth is on.
+        <ph name="BR">&lt;br&gt;</ph>
+        <ph name="BR">&lt;br&gt;</ph>
+        Visible to nearby devices as <ph name="QUICK_START_DEVICE_DISPLAY_NAME">$1<ex>Chromebook (123)</ex></ph>...
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_BLUETOOTH_DIALOG_TITLE" desc="A title used on Quick Start's enable bluetooth dialog which is shown before starting the quick start flow since bluetooth is needed for transferring the user's credentails from the Android device to ChromeOS.">
+        Turn on Bluetooth?
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_BLUETOOTH_DIALOG_CONTENT" desc="The content shown on Quick Start's enable blutooth dialog.">
+        To set up with your Android phone, your Chromebook's Bluetooth needs to be on
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_BLUETOOTH_DIALOG_CANCEL" desc="A lable on the button of the enable bluetooth dialog. It lets the user prevent the bluetooth from being enabled and hence does not continue the Quick Start flow.">
+        Cancel
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_BLUETOOTH_DIALOG_ENABLE" desc="A lable on the button of the enable bluetooth dialog. It lets the user allow turning on the bluetooth automatically to continue with the Quick Start flow.">
+        Turn on
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_CONFIRM_ACCOUNT_TITLE" desc="A title used on OOBE's Quick Start flow when the user must confirm (on the source device) which Google account they wish to set up on the ChromeOS device.">
+        Confirm your Google Account on your phone
+      </message>
+      <message name="IDS_LOGIN_QUICK_START_CONFIRM_ACCOUNT_SUBTITLE" desc="A subtitle used on OOBE's Quick Start flow when the user must confirm (on the source device) which Google account they wish to set up on the ChromeOS device.">
+        Follow the instructions on your phone
+      </message>
     </messages>
   </release>
 </grit>
