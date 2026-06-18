@@ -78,9 +78,7 @@ class FilterSuggestionGeneratorTest : public testing::Test {
 
   void SetUp() override {
     feature_list_.InitAndEnableFeatureWithParameters(
-        kMultistepFilter,
-        {{"CueTemplatesMap", "{\"SHOPPING\": {\"template\": \"Template\"}}"},
-         {"SameDomainSuggestionSuppressionDuration", "0s"}});
+        kMultistepFilter, {{"SameDomainSuggestionSuppressionDuration", "0s"}});
     store_ = std::make_unique<testing::NiceMock<MockFilterStore>>();
     generator_ = std::make_unique<FilterSuggestionGenerator>(
         mock_client_, *store_, /*log_router=*/nullptr);
@@ -138,7 +136,8 @@ TEST_F(FilterSuggestionGeneratorTest,
       {FilterSuggestionCandidateAttribute(kTestAttributeKey,
                                           kTestAttributeValue16),
        FilterSuggestionCandidateAttribute(kTestAttributeKey2,
-                                          kTestAttributeValue2_16)});
+                                          kTestAttributeValue2_16)},
+      u"Template", u"Template");
   std::vector<FilterAttributeUiLabel> attribute_ui_labels;
   attribute_ui_labels.emplace_back(expected_candidate.attributes[0],
                                    attributes[0]);
@@ -152,7 +151,8 @@ TEST_F(FilterSuggestionGeneratorTest,
       .triggering_navigation_id = kTestNavigationId,
       .triggering_host = kTestDomain,
       .task_type = kShoppingTask,
-      .suggestion_message = u"Template"});
+      .suggestion_message = u"Template",
+      .short_suggestion_message = u"Template"});
 
   EXPECT_CALL(mock_client(),
               GetFilterSuggestionCandidates(url, _, _, kTestNavigationId))
@@ -303,7 +303,8 @@ TEST_F(FilterSuggestionGeneratorTest,
        FilterSuggestionCandidateAttribute(kTestAttributeKey2,
                                           kTestAttributeValue2_16),
        FilterSuggestionCandidateAttribute(kTestAttributeKey3,
-                                          kTestAttributeValue3_16)});
+                                          kTestAttributeValue3_16)},
+      u"Template", u"Template");
   EXPECT_CALL(mock_client(), GetFilterSuggestionCandidates)
       .WillOnce([candidate](
                     const GURL&, base::span<const FilterAnnotation>,
@@ -352,7 +353,8 @@ TEST_F(FilterSuggestionGeneratorTest,
        FilterSuggestionCandidateAttribute(kTestAttributeKey2,
                                           kTestAttributeValue2_16),
        FilterSuggestionCandidateAttribute(kTestAttributeKey3,
-                                          kTestAttributeValue3_16)});
+                                          kTestAttributeValue3_16)},
+      u"Template", u"Template");
   EXPECT_CALL(mock_client(), GetFilterSuggestionCandidates)
       .WillOnce([candidate](
                     const GURL&, base::span<const FilterAnnotation>,
@@ -442,7 +444,8 @@ TEST_F(FilterSuggestionGeneratorTest,
        FilterSuggestionCandidateAttribute(kTestAttributeKey,
                                           kTestAttributeValue16),
        FilterSuggestionCandidateAttribute(kTestAttributeKey3,
-                                          kTestAttributeValue3_16)});
+                                          kTestAttributeValue3_16)},
+      u"Template", u"Template");
 
   EXPECT_CALL(mock_client(),
               GetFilterSuggestionCandidates(url, _, _, kTestNavigationId))
@@ -677,10 +680,10 @@ TEST_F(FilterSuggestionGeneratorTest,
   EXPECT_EQ(future.Get(), std::nullopt);
 }
 
-// Tests that std::nullopt is returned if cue message generation fails for the
-// matching task type.
+// Tests that std::nullopt is returned if candidate message is missing from the
+// server response.
 TEST_F(FilterSuggestionGeneratorTest,
-       GenerateSuggestion_SuppressesWhenMessageFails) {
+       GenerateSuggestion_SuppressesWhenMissingSuggestionMessage) {
   const GURL url(kTestUrl);
 
   std::vector<FilterAttribute> attributes = {
@@ -723,7 +726,57 @@ TEST_F(FilterSuggestionGeneratorTest,
   generator()->GenerateSuggestion(url, std::vector<std::string>{"NON_SHOPPING"},
                                   future.GetCallback(), kTestNavigationId);
 
-  // Should be suppressed (returns nullopt) because message generation failed!
+  // Should be suppressed (returns nullopt) because message is missing!
+  EXPECT_EQ(future.Get(), std::nullopt);
+}
+
+// Tests that std::nullopt is returned if candidate message is whitespace-only.
+TEST_F(FilterSuggestionGeneratorTest,
+       GenerateSuggestion_SuppressesWhenSuggestionMessageIsWhitespace) {
+  const GURL url(kTestUrl);
+
+  std::vector<FilterAttribute> attributes = {
+      {kTestAttributeKey, kTestAttributeValue},
+      {kTestAttributeKey2, kTestAttributeValue2}};
+  FilterAnnotation annotation =
+      CreateDummyAnnotation("NON_SHOPPING", kTestDomain, attributes);
+
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            std::vector<std::string>{"NON_SHOPPING"}, _, 10u, _))
+      .WillOnce(
+          [annotation](
+              std::vector<std::string> task_types,
+              base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
+              size_t max_count, base::Time min_creation_time) {
+            std::move(callback).Run(std::vector<FilterAnnotation>{annotation});
+          });
+
+  FilterSuggestionCandidate candidate(
+      annotation.id, GURL(kTestSuggestionUrl),
+      {FilterSuggestionCandidateAttribute(kTestAttributeKey,
+                                          kTestAttributeValue16),
+       FilterSuggestionCandidateAttribute(kTestAttributeKey2,
+                                          kTestAttributeValue2_16)},
+      u"   ", u"   ");
+
+  EXPECT_CALL(mock_client(),
+              GetFilterSuggestionCandidates(url, _, _, kTestNavigationId))
+      .WillOnce([candidate](
+                    const GURL& u,
+                    base::span<const FilterAnnotation> filter_annotations,
+                    base::OnceCallback<void(
+                        std::optional<std::vector<FilterSuggestionCandidate>>)>
+                        callback,
+                    int64_t navigation_id) {
+        std::move(callback).Run(
+            std::vector<FilterSuggestionCandidate>{candidate});
+      });
+
+  base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
+  generator()->GenerateSuggestion(url, std::vector<std::string>{"NON_SHOPPING"},
+                                  future.GetCallback(), kTestNavigationId);
+
+  // Should be suppressed (returns nullopt) because message is whitespace-only!
   EXPECT_EQ(future.Get(), std::nullopt);
 }
 
@@ -736,9 +789,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndEnableFeatureWithParameters(
-      kMultistepFilter,
-      {{"CueTemplatesMap", "{\"SHOPPING\": {\"template\": \"Template\"}}"},
-       {"SameDomainSuggestionSuppressionDuration", "5m"}});
+      kMultistepFilter, {{"SameDomainSuggestionSuppressionDuration", "5m"}});
 
   const std::vector<FilterAttribute> attributes = {
       {kTestAttributeKey, kTestAttributeValue},
@@ -772,7 +823,8 @@ TEST_F(FilterSuggestionGeneratorTest,
       {FilterSuggestionCandidateAttribute(kTestAttributeKey,
                                           kTestAttributeValue16),
        FilterSuggestionCandidateAttribute(kTestAttributeKey2,
-                                          kTestAttributeValue2_16)});
+                                          kTestAttributeValue2_16)},
+      u"Template", u"Template");
   EXPECT_CALL(mock_client(),
               GetFilterSuggestionCandidates(url, _, _, kTestNavigationId))
       .WillOnce([candidate](
@@ -802,9 +854,7 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndEnableFeatureWithParameters(
-      kMultistepFilter,
-      {{"CueTemplatesMap", "{\"SHOPPING\": {\"template\": \"Template\"}}"},
-       {"SameDomainSuggestionSuppressionDuration", "5m"}});
+      kMultistepFilter, {{"SameDomainSuggestionSuppressionDuration", "5m"}});
 
   const std::vector<FilterAttribute> attributes = {
       {kTestAttributeKey, kTestAttributeValue},
@@ -830,7 +880,8 @@ TEST_F(FilterSuggestionGeneratorTest,
       {FilterSuggestionCandidateAttribute(kTestAttributeKey,
                                           kTestAttributeValue16),
        FilterSuggestionCandidateAttribute(kTestAttributeKey2,
-                                          kTestAttributeValue2_16)});
+                                          kTestAttributeValue2_16)},
+      u"Template", u"Template");
   EXPECT_CALL(mock_client(),
               GetFilterSuggestionCandidates(url, _, _, kTestNavigationId))
       .WillOnce([candidate](
@@ -857,10 +908,8 @@ TEST_F(FilterSuggestionGeneratorTest,
 
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndEnableFeatureWithParameters(
-      kMultistepFilter,
-      {{"CueTemplatesMap", "{\"SHOPPING\": {\"template\": \"Template\"}}"},
-       {"SameDomainSuggestionSuppressionDuration", "0s"},
-       {"suggestion_max_candidates", "5"}});
+      kMultistepFilter, {{"SameDomainSuggestionSuppressionDuration", "0s"},
+                         {"suggestion_max_candidates", "5"}});
 
   EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
                             kSupportedTaskTypes, _, 5u, _))

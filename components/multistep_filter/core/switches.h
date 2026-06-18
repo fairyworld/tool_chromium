@@ -10,9 +10,6 @@ namespace multistep_filter::switches {
 // Overrides the base URL for the `SiteAutomationIndexServer` Server APIs.
 extern const char kMultistepFilterIndexServerApiBaseUrl[];
 
-// Path to a local JSON file containing cue templates. Used for testing.
-extern const char kMultistepFilterCueConfigPath[];
-
 }  // namespace multistep_filter::switches
 
 #endif  // COMPONENTS_MULTISTEP_FILTER_CORE_SWITCHES_H_

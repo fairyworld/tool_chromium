@@ -51,6 +51,7 @@ struct UrlFilterSuggestion {
     std::string triggering_host;
     std::string task_type;
     std::u16string suggestion_message;
+    std::u16string short_suggestion_message;
   };
 
   explicit UrlFilterSuggestion(Params params);
@@ -86,6 +87,8 @@ struct UrlFilterSuggestion {
   std::string task_type;
   // The localized message string to be shown to the user.
   std::u16string suggestion_message;
+  // The short cue string to display in the Omnibox.
+  std::u16string short_suggestion_message;
 };
 
 }  // namespace multistep_filter

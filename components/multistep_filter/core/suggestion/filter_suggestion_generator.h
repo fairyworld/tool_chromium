@@ -80,9 +80,6 @@ class FilterSuggestionGenerator {
       int64_t navigation_id,
       std::optional<std::vector<FilterSuggestionCandidate>> candidates);
 
-  // Loads the cue configuration from file or feature flag.
-  void LoadCueConfig();
-
   // The client used to fetch supported task types and URL filter suggestions.
   // This is a non-owning reference. The lifetime of the `AnnotationIndexClient`
   // object is managed by the `MultistepFilterService` instance that owns this
@@ -97,9 +94,6 @@ class FilterSuggestionGenerator {
 
   // Log router for the internals page.
   const raw_ptr<MultistepFilterLogRouter> log_router_;
-
-  // JSON config for cues, loaded from file or Finch.
-  base::DictValue cue_config_;
 
   // This should be kept at the end so that it is the first member to be
   // destroyed.

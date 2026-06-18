@@ -110,6 +110,10 @@ TEST(UrlFilterSuggestionTest, Equality) {
   suggestion2 = suggestion1;
   suggestion2.suggestion_message = u"other_msg";
   EXPECT_NE(suggestion1, suggestion2);
+
+  suggestion2 = suggestion1;
+  suggestion2.short_suggestion_message = u"other_short_msg";
+  EXPECT_NE(suggestion1, suggestion2);
 }
 
 TEST(UrlFilterSuggestionTest, ToString) {
@@ -185,18 +189,20 @@ TEST(UrlFilterSuggestionTest, ToStringWithSuggestionMessage) {
       .triggering_navigation_id = kTriggeringNavigationId,
       .triggering_host = "sub.example.com",
       .task_type = "task1",
-      .suggestion_message = u"Hello World"});
+      .suggestion_message = u"Hello World",
+      .short_suggestion_message = u"Hello"});
 
-  EXPECT_EQ(suggestion.ToString(),
-            "UrlFilterSuggestion(navigation_url=https://example.com/, "
-            "source_host=sub.domain, "
-            "extraction_timestamp=" +
-                base::NumberToString(
-                    timestamp.ToDeltaSinceWindowsEpoch().InMicroseconds()) +
-                ", attribute_ui_labels=[], triggering_navigation_id=" +
-                base::NumberToString(kTriggeringNavigationId) +
-                ", triggering_host=sub.example.com, task_type=task1, "
-                "suggestion_message=Hello World)");
+  EXPECT_EQ(
+      suggestion.ToString(),
+      "UrlFilterSuggestion(navigation_url=https://example.com/, "
+      "source_host=sub.domain, "
+      "extraction_timestamp=" +
+          base::NumberToString(
+              timestamp.ToDeltaSinceWindowsEpoch().InMicroseconds()) +
+          ", attribute_ui_labels=[], triggering_navigation_id=" +
+          base::NumberToString(kTriggeringNavigationId) +
+          ", triggering_host=sub.example.com, task_type=task1, "
+          "suggestion_message=Hello World, short_suggestion_message=Hello)");
 }
 
 }  // namespace

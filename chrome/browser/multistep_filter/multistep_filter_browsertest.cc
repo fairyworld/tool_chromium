@@ -87,9 +87,7 @@ class MultistepFilterBrowserTest
     scoped_feature_list_.InitAndEnableFeatureWithParameters(
         kMultistepFilter,
         {{kAllowedDomainsParam,
-          std::string(kTestAllowedDomain) + "," + kTestAllowedDomain2},
-         {kCueTemplatesMap.name,
-          "{\"test_task\": {\"template\": \"Template\"}}"}});
+          std::string(kTestAllowedDomain) + "," + kTestAllowedDomain2}});
   }
   ~MultistepFilterBrowserTest() override = default;
 

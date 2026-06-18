@@ -87,8 +87,18 @@ std::vector<FilterSuggestionCandidate> ToFilterSuggestionCandidates(
       continue;
     }
 
+    std::u16string short_text;
+    std::u16string detailed_text;
+    if (strategy.has_suggestion_message()) {
+      short_text =
+          base::UTF8ToUTF16(strategy.suggestion_message().short_text());
+      detailed_text =
+          base::UTF8ToUTF16(strategy.suggestion_message().detailed_text());
+    }
+
     candidates.emplace_back(std::move(annotation_id), std::move(navigation_url),
-                            std::move(attributes));
+                            std::move(attributes), std::move(short_text),
+                            std::move(detailed_text));
   }
 
   return candidates;
