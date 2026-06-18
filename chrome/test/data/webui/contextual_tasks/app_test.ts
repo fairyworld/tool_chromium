@@ -16,8 +16,6 @@ import { createContextualTasksAppElement, fixtureUrl } from './contextual_tasks_
 
 // <if expr="not is_android or enable_webui_contextual_tasks_composebox">
 import { isVisible } from 'chrome://webui-test/test_util.js';
-// </if>
-// <if expr="not is_android">
 import { simulateLoadCommit } from './contextual_tasks_test_utils.js';
 // </if>
 
@@ -425,7 +423,7 @@ suite('ContextualTasksAppTest', function() {
     await microtasksFinished();
     assertTrue(appElement['darkMode_']);
   });
-  // <if expr="not is_android">
+  // <if expr="not is_android or enable_webui_contextual_tasks_composebox">
   test('isAiPage reflected in dom', async () => {
     const {appElement, proxy} = await createContextualTasksAppElement(
         /*url=*/ fixtureUrl,
@@ -446,7 +444,7 @@ suite('ContextualTasksAppTest', function() {
 
     assertTrue(appElement.hasAttribute('is-ai-page_'));
   });
-  // </if> not is_android
+  // </if> not is_android or enable_webui_contextual_tasks_composebox
 
   // Disabled due to flakiness. See http://crbug.com/481936603.
   test.skip('copies source and aep params on new thread click', async () => {
@@ -670,7 +668,6 @@ suite('ContextualTasksAppTest', function() {
     assertEquals('', composebox.style.height);
   });
 
-  // <if expr="not is_android">
   test('zero state nullifies and ignores forcedComposeboxBounds', async () => {
     loadTimeData.overrideValues({contextManagementInComposeboxEnabled: false});
     const {appElement, proxy} =
@@ -760,7 +757,6 @@ suite('ContextualTasksAppTest', function() {
         newRect.bottom - appElement.$.composebox.offsetHeight,
         appElement.getForcedComposeboxBoundsForTesting()!.top);
   });
-  // </if> not is_android
 
   test('composebox hidden in nlm when no forced bounds', async () => {
     const {appElement} =
@@ -1032,7 +1028,7 @@ suite('ContextualTasksAppTest', function() {
             'isLoadError_ should be true if it was an error document');
       });
 
-  // <if expr="not is_android">
+  // <if expr="not is_android or enable_webui_contextual_tasks_composebox">
   test(
       'does not reset forced composebox bounds if navigation aborts',
       async () => {
@@ -1080,7 +1076,7 @@ suite('ContextualTasksAppTest', function() {
         // Bounds should still be present.
         assertDeepEquals(boundsBeforeNav, appElement.getForcedComposeboxBoundsForTesting()!);
       });
-  // </if> not is_android
+  // </if> not is_android or enable_webui_contextual_tasks_composebox
 
   test(
       'leaves isLoadError false if load abort does not contain error document',
