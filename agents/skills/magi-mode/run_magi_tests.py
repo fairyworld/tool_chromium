@@ -64,8 +64,8 @@ class AgentInvoker:
 
     def _invoke_generic_cli(self, prompt, expected_files):
         print("\n" + "=" * 60)
-        print(f"GENERIC_CLI MODE: Please invoke an agent with the following "
-              f"prompt:")
+        print("GENERIC_CLI MODE: Please invoke an agent with the following "
+              "prompt:")
         print("-" * 60)
         print(prompt)
         print("-" * 60)
@@ -78,6 +78,7 @@ class AgentInvoker:
         return all(os.path.exists(f) for f in expected_files)
 
     def _invoke_mock(self, prompt, expected_files, expected_outputs, cwd=None):
+        del prompt  # Unused.
         print("[MOCK] Simulating agent output...")
         content_patterns = expected_outputs.get('content_patterns', {})
 

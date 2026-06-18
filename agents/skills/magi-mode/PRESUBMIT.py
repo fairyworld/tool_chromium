@@ -63,7 +63,8 @@ def _ValidateSchema(output_api, f, content, active_schema):
     for key, value in content.items():
         if key in properties:
             expected_type = properties[key].get('type')
-            if expected_type == 'integer' and type(value) is not int:
+            if expected_type == 'integer' and (isinstance(value, bool)
+                                               or not isinstance(value, int)):
                 results.append(
                     _FileError(output_api, f,
                                f"key '{key}' should be integer."))
@@ -522,10 +523,9 @@ def CheckJsonFiles(input_api, output_api):
                                             f'{type(item).__name__}'))
                             # Token Merging Check: ensure joining won't create
                             # semantic errors.
-                            full_text = "".join(v)
-                            if any(v[j].endswith(tuple(".,!?;:")) == False and
-                                   v[j].endswith(" ") == False and j < len(v) -
-                                   1 for j in range(len(v))):
+                            if any(not v[j].endswith(tuple(".,!?;:")) and
+                                   not v[j].endswith(" ") and j < len(v) - 1
+                                   for j in range(len(v))):
                                 results.append(
                                     output_api.PresubmitPromptWarning(
                                         f'File {f.LocalPath()} persona key '
@@ -608,7 +608,8 @@ def CheckJsonFiles(input_api, output_api):
                             output_api.PresubmitError(
                                 f'File {f.LocalPath()} '
                                 'environment.output_directory must be '
-                                f'a string, got {type(output_directory).__name__}'
+                                f'a string, got '
+                                f'{type(output_directory).__name__}'
                             ))
 
                     temp_directory = environment.get('temp_directory')
@@ -622,7 +623,8 @@ def CheckJsonFiles(input_api, output_api):
                             output_api.PresubmitError(
                                 f'File {f.LocalPath()} '
                                 'environment.temp_directory must be '
-                                f'a string, got {type(temp_directory).__name__}'
+                                f'a string, got '
+                                f'{type(temp_directory).__name__}'
                             ))
 
         elif filename.startswith('constraints'):
@@ -692,7 +694,8 @@ def CheckTestJsonFiles(input_api, output_api):
             if not isinstance(case, dict):
                 results.append(
                     output_api.PresubmitError(
-                        f"File {f.LocalPath()} case at index {idx} must be an object."
+                        f"File {f.LocalPath()} case at index {idx} "
+                        "must be an object."
                     ))
                 continue
 
@@ -701,7 +704,8 @@ def CheckTestJsonFiles(input_api, output_api):
                 if key not in case:
                     results.append(
                         output_api.PresubmitError(
-                            f"File {f.LocalPath()} case '{case.get('name', idx)}' "
+                            f"File {f.LocalPath()} case "
+                            f"'{case.get('name', idx)}' "
                             f"is missing required key: {key}"))
 
             override_inputs = case.get("override_inputs", {})
@@ -722,9 +726,12 @@ def CheckTestJsonFiles(input_api, output_api):
                 if key not in allowed_overrides:
                     results.append(
                         output_api.PresubmitError(
-                            f"File {f.LocalPath()} case '{case.get('name', idx)}' "
-                            f"key 'override_inputs' contains invalid property: {key}. "
-                            f"Allowed properties are: {', '.join(allowed_overrides)}"
+                            f"File {f.LocalPath()} case "
+                            f"'{case.get('name', idx)}' "
+                            f"key 'override_inputs' contains invalid "
+                            f"property: {key}. "
+                            f"Allowed properties are: "
+                            f"{', '.join(allowed_overrides)}"
                         ))
 
     return results

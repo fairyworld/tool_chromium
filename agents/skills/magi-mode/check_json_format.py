@@ -40,7 +40,8 @@ def _ValidateMultilineStrings(data, file_path):
                     if not (item.endswith(' ')
                             or item.endswith(tuple('.,!?;:'))):
                         errors.append(
-                            f"Joining Rule violation in {file_path} at {path}[{i}]: "
+                            f"Joining Rule violation in {file_path} "
+                            f"at {path}[{i}]: "
                             "String lacks trailing space or punctuation.")
                 elif isinstance(item, (dict, list)):
                     _CheckValue(item, f"{path}[{i}]")
@@ -67,7 +68,8 @@ def CheckFormatting(file_path, fix=False):
 
   Returns:
     A tuple (formatting_ok, lint_errors).
-    formatting_ok is True if the file matches the expected format (or was fixed).
+    formatting_ok is True if the file matches the expected format (or
+    was fixed).
     lint_errors is a list of strings describing Joining Rule violations.
   """
     magi_dir = os.path.dirname(os.path.abspath(__file__))
@@ -92,7 +94,7 @@ def CheckFormatting(file_path, fix=False):
             data, indent=expected_indent, sort_keys=False,
             ensure_ascii=False) + '\n'
 
-        formatting_ok = (original_content == formatted_content)
+        formatting_ok = original_content == formatted_content
 
         if not formatting_ok and fix:
             with open(file_path, 'w', encoding='utf-8') as f:

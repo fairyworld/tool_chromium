@@ -1,3 +1,10 @@
+---
+name: magi-mode
+description: >-
+  Enforce engineering rigor and verification loop for
+  coding tasks using multi-agent debate
+---
+
 # MAGI Protocol (Modular Automated Guided Iteration)
 
 This skill implements the "Lean MAGI" protocol, a high-efficiency multi-agent

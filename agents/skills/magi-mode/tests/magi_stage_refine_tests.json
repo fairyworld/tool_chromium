@@ -21,7 +21,7 @@
                         }
                     },
                     {
-                        "persona": "domain/signaling.json",
+                        "persona": "remoting/signaling.json",
                         "verdict": "REJECT",
                         "checklist": {
                             "no_pii_leaks": false
@@ -347,7 +347,7 @@
                         }
                     },
                     {
-                        "persona": "domain/signaling.json",
+                        "persona": "remoting/signaling.json",
                         "verdict": "ACCEPT",
                         "checklist": {
                             "no_use_after_free": true

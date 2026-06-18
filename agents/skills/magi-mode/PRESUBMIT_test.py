@@ -2,6 +2,7 @@
 # Copyright 2026 The Chromium Authors
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
+"""Unit tests for MAGI presubmit checks."""
 
 import json
 import os
@@ -41,6 +42,7 @@ class MockInputApi:
         self.files_content = {}
 
     def AffectedFiles(self, file_filter=None, include_deletes=False):
+        del include_deletes  # Unused.
         return [
             f for f in self.affected_files if not file_filter or file_filter(f)
         ]
@@ -51,7 +53,7 @@ class MockInputApi:
     def PresubmitLocalPath(self):
         return os.path.normpath(
             os.path.join(os.path.abspath('fake_repo'),
-                         'remoting/tools/magi-mode'))
+                         'agents/skills/magi-mode'))
 
     def FilterSourceFile(self, affected_file, files_to_check=None):
         if not files_to_check:
@@ -76,25 +78,25 @@ class MagiPresubmitTest(unittest.TestCase):
         # Setup filesystem: SKILL.md -> LINKED.md, ORPHAN.md
         magi_dir = os.path.normpath(
             os.path.join(os.path.abspath('fake_repo'),
-                         'remoting/tools/magi-mode'))
+                         'agents/skills/magi-mode'))
         mock_walk.return_value = [(magi_dir, [],
                                    ['SKILL.md', 'LINKED.md', 'ORPHAN.md'])]
         mock_getsize.return_value = 100
         mock_exists.return_value = True
 
         self.mock_input.affected_files = [
-            MockAffectedFile('remoting/tools/magi-mode/SKILL.md')
+            MockAffectedFile('agents/skills/magi-mode/SKILL.md')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/SKILL.md':
+            'agents/skills/magi-mode/SKILL.md':
             ('[link](LINKED.md)\n'
              'TONE MANDATE (SIGNAL-TO-NOISE):\n'
              'Zero Preamble/Postamble\n'
              'Artifacts Only\n'
              'ADD_FAILURE("NOT IMPLEMENTED");\n'),
-            'remoting/tools/magi-mode/LINKED.md':
+            'agents/skills/magi-mode/LINKED.md':
             'content\n',
-            'remoting/tools/magi-mode/ORPHAN.md':
+            'agents/skills/magi-mode/ORPHAN.md':
             'content\n',
         }
 
@@ -113,15 +115,15 @@ class MagiPresubmitTest(unittest.TestCase):
         # 100 char line inside code block should be ignored
         long_line = '```\n' + 'A' * 100 + '\n```\n'
         self.mock_input.affected_files = [
-            MockAffectedFile('remoting/tools/magi-mode/SKILL.md')
+            MockAffectedFile('agents/skills/magi-mode/SKILL.md')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/SKILL.md': long_line
+            'agents/skills/magi-mode/SKILL.md': long_line
         }
 
         magi_dir = os.path.normpath(
             os.path.join(os.path.abspath('fake_repo'),
-                         'remoting/tools/magi-mode'))
+                         'agents/skills/magi-mode'))
         with patch('os.walk', return_value=[(magi_dir, [], ['SKILL.md'])]), \
                 patch('os.path.getsize', return_value=100):
             results = PRESUBMIT.CheckMarkdownFiles(self.mock_input,
@@ -135,15 +137,15 @@ class MagiPresubmitTest(unittest.TestCase):
         content = ('\n\n    Line 1 is long ' + 'A' * 70 +
                    '\n    Line 2 is also long ' + 'B' * 70 + '\n\nText')
         self.mock_input.affected_files = [
-            MockAffectedFile('remoting/tools/magi-mode/SKILL.md')
+            MockAffectedFile('agents/skills/magi-mode/SKILL.md')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/SKILL.md': content
+            'agents/skills/magi-mode/SKILL.md': content
         }
 
         magi_dir = os.path.normpath(
             os.path.join(os.path.abspath('fake_repo'),
-                         'remoting/tools/magi-mode'))
+                         'agents/skills/magi-mode'))
         with patch('os.walk', return_value=[(magi_dir, [], ['SKILL.md'])]), \
                 patch('os.path.getsize', return_value=100):
             results = PRESUBMIT.CheckMarkdownFiles(self.mock_input,
@@ -156,15 +158,15 @@ class MagiPresubmitTest(unittest.TestCase):
         # Missing Tone Mandate
         content_missing = 'Some text\n'
         self.mock_input.affected_files = [
-            MockAffectedFile('remoting/tools/magi-mode/SKILL.md')
+            MockAffectedFile('agents/skills/magi-mode/SKILL.md')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/SKILL.md': content_missing
+            'agents/skills/magi-mode/SKILL.md': content_missing
         }
 
         magi_dir = os.path.normpath(
             os.path.join(os.path.abspath('fake_repo'),
-                         'remoting/tools/magi-mode'))
+                         'agents/skills/magi-mode'))
         with patch('os.walk', return_value=[(magi_dir, [], ['SKILL.md'])]), \
                 patch('os.path.getsize', return_value=100):
             results = PRESUBMIT.CheckMarkdownFiles(self.mock_input,
@@ -178,7 +180,7 @@ class MagiPresubmitTest(unittest.TestCase):
         content_partial = ('TONE MANDATE (SIGNAL-TO-NOISE):\n'
                            'Zero Preamble/Postamble\n')
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/SKILL.md': content_partial
+            'agents/skills/magi-mode/SKILL.md': content_partial
         }
         with patch('os.walk', return_value=[(magi_dir, [], ['SKILL.md'])]), \
                 patch('os.path.getsize', return_value=100):
@@ -193,7 +195,7 @@ class MagiPresubmitTest(unittest.TestCase):
         content_no_tdd = ('TONE MANDATE (SIGNAL-TO-NOISE):\n'
                           'Zero Preamble/Postamble\nArtifacts Only\n')
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/SKILL.md': content_no_tdd
+            'agents/skills/magi-mode/SKILL.md': content_no_tdd
         }
         with patch('os.walk', return_value=[(magi_dir, [], ['SKILL.md'])]), \
                 patch('os.path.getsize', return_value=100):
@@ -208,7 +210,7 @@ class MagiPresubmitTest(unittest.TestCase):
                          'Zero Preamble/Postamble\nArtifacts Only\n'
                          'ADD_FAILURE("NOT IMPLEMENTED");\n')
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/SKILL.md': content_valid
+            'agents/skills/magi-mode/SKILL.md': content_valid
         }
         with patch('os.walk', return_value=[(magi_dir, [], ['SKILL.md'])]), \
                 patch('os.path.getsize', return_value=100):
@@ -226,10 +228,10 @@ class MagiPresubmitTest(unittest.TestCase):
         # Invalid persona name (with _expert suffix)
         self.mock_input.affected_files = [
             MockAffectedFile(
-                'remoting/tools/magi-mode/personas/core/security_expert.json')
+                'agents/skills/magi-mode/personas/core/security_expert.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/personas/core/security_expert.json':
+            'agents/skills/magi-mode/personas/core/security_expert.json':
             '{"checklist": {}}'
         }
         schema_json = '{"definitions": {"PersonaDef": {"required": []}}}'
@@ -245,10 +247,10 @@ class MagiPresubmitTest(unittest.TestCase):
         # Valid persona name
         self.mock_input.affected_files = [
             MockAffectedFile(
-                'remoting/tools/magi-mode/personas/core/security.json')
+                'agents/skills/magi-mode/personas/core/security.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/personas/core/security.json':
+            'agents/skills/magi-mode/personas/core/security.json':
             '{"checklist": {}}'
         }
         with patch('builtins.open',
@@ -269,14 +271,14 @@ class MagiPresubmitTest(unittest.TestCase):
             '"state_transport": "EPHEMERAL_WITH_LOGS", '
             '"next_stage": "CRITIQUE"}')
         self.mock_input.affected_files = [
-            MockAffectedFile('remoting/tools/magi-mode/state_block.magi.json'),
+            MockAffectedFile('agents/skills/magi-mode/state_block.magi.json'),
             MockAffectedFile(
-                'remoting/tools/magi-mode/personas/core/security.json')
+                'agents/skills/magi-mode/personas/core/security.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/state_block.magi.json':
+            'agents/skills/magi-mode/state_block.magi.json':
             valid_json,
-            'remoting/tools/magi-mode/personas/core/security.json':
+            'agents/skills/magi-mode/personas/core/security.json':
             ('{"checklist": {"checked_xyz": "Desc"}}')
         }
 
@@ -301,9 +303,6 @@ class MagiPresubmitTest(unittest.TestCase):
             '"VALIDATION", "DEPLOYMENT", "ESCALATION"]}, '
             '"state_transport": {"type": "string", "enum": '
             '["FILE_IO", "EPHEMERAL_WITH_LOGS"]}}}}}')
-        schema_path = os.path.normpath(
-            os.path.join(os.path.abspath('fake_repo'),
-                         'remoting/tools/magi-mode/magi_schema.json'))
 
         with patch('builtins.open',
                    unittest.mock.mock_open(read_data=schema_json)):
@@ -314,7 +313,7 @@ class MagiPresubmitTest(unittest.TestCase):
         # Missing required key
         invalid_json = '{"iteration": 1, "active_constraints": []}'
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/state_block.magi.json': invalid_json
+            'agents/skills/magi-mode/state_block.magi.json': invalid_json
         }
         with patch('builtins.open',
                    unittest.mock.mock_open(read_data=schema_json)):
@@ -331,8 +330,7 @@ class MagiPresubmitTest(unittest.TestCase):
             '"state_transport": "EPHEMERAL_WITH_LOGS", '
             '"next_stage": "INVALID_STAGE"}')
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/state_block.magi.json':
-            invalid_stage_json
+            'agents/skills/magi-mode/state_block.magi.json': invalid_stage_json
         }
         with patch('builtins.open',
                    unittest.mock.mock_open(read_data=schema_json)):
@@ -349,7 +347,7 @@ class MagiPresubmitTest(unittest.TestCase):
             '"state_transport": "EPHEMERAL_WITH_LOGS", '
             '"next_stage": "CRITIQUE"}')
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/state_block.magi.json': wrong_type_json
+            'agents/skills/magi-mode/state_block.magi.json': wrong_type_json
         }
         with patch('builtins.open',
                    unittest.mock.mock_open(read_data=schema_json)):
@@ -368,14 +366,14 @@ class MagiPresubmitTest(unittest.TestCase):
             '"state_transport": "EPHEMERAL_WITH_LOGS", '
             '"next_stage": "CRITIQUE"}')
         self.mock_input.affected_files = [
-            MockAffectedFile('remoting/tools/magi-mode/state_block.magi.json'),
+            MockAffectedFile('agents/skills/magi-mode/state_block.magi.json'),
             MockAffectedFile(
-                'remoting/tools/magi-mode/personas/core/security.json')
+                'agents/skills/magi-mode/personas/core/security.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/state_block.magi.json':
+            'agents/skills/magi-mode/state_block.magi.json':
             (invalid_checklist_json),
-            'remoting/tools/magi-mode/personas/core/security.json':
+            'agents/skills/magi-mode/personas/core/security.json':
             ('{"checklist": {"checked_xyz": "Desc"}}')
         }
         schema_json = (
@@ -414,13 +412,13 @@ class MagiPresubmitTest(unittest.TestCase):
             '"execution_path": "RIGOR_PATH", '
             '"complexity_level": "MEDIUM", '
             '"environment": {"repo_type": "CHROMIUM", "vcs": "JJ", '
-            '"harness": "JETSKI", "output_directory": "out/Default", "temp_directory": "remoting/tools/magi-mode/.temp"}}'
-        )
+            '"harness": "JETSKI", "output_directory": "out/Default", '
+            '"temp_directory": "agents/skills/magi-mode/.temp"}}')
         self.mock_input.affected_files = [
-            MockAffectedFile('remoting/tools/magi-mode/project.magi.json')
+            MockAffectedFile('agents/skills/magi-mode/project.magi.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/project.magi.json': valid_json
+            'agents/skills/magi-mode/project.magi.json': valid_json
         }
 
         # We need to mock the schema file
@@ -450,7 +448,7 @@ class MagiPresubmitTest(unittest.TestCase):
         # Missing required key
         invalid_json = '{"goal": "Test"}'
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/project.magi.json': invalid_json
+            'agents/skills/magi-mode/project.magi.json': invalid_json
         }
         with patch('builtins.open',
                    unittest.mock.mock_open(read_data=schema_json)):
@@ -462,14 +460,14 @@ class MagiPresubmitTest(unittest.TestCase):
         # Valid review feedback
         valid_json = (
             '{"checklist": {}, "verdict": "REJECT", "reasoning": ["Bad"], '
-            '"comments": [{"file": "foo.cc", "line": 10, "comment": "Fix this"}]}'
-        )
+            '"comments": [{"file": "foo.cc", "line": 10, '
+            '"comment": "Fix this"}]}')
         self.mock_input.affected_files = [
             MockAffectedFile(
-                'remoting/tools/magi-mode/review.security.magi.1.json')
+                'agents/skills/magi-mode/review.security.magi.1.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/review.security.magi.1.json': valid_json
+            'agents/skills/magi-mode/review.security.magi.1.json': valid_json
         }
 
         schema_json = (
@@ -491,7 +489,7 @@ class MagiPresubmitTest(unittest.TestCase):
             '{"checklist": {}, "unlisted_issues_found": [], '
             '"verdict": "MAYBE", "reasoning": []}')
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/review.security.magi.1.json':
+            'agents/skills/magi-mode/review.security.magi.1.json':
             invalid_verdict_json
         }
         with patch('builtins.open',
@@ -506,11 +504,10 @@ class MagiPresubmitTest(unittest.TestCase):
                       '"oscillation_detected": false, "conflict_report": [], '
                       '"next_stage": "SYNTHESIS"}')
         self.mock_input.affected_files = [
-            MockAffectedFile(
-                'remoting/tools/magi-mode/constraints.magi.2.json')
+            MockAffectedFile('agents/skills/magi-mode/constraints.magi.2.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/constraints.magi.2.json': valid_json
+            'agents/skills/magi-mode/constraints.magi.2.json': valid_json
         }
 
         schema_json = (
@@ -537,11 +534,10 @@ class MagiPresubmitTest(unittest.TestCase):
             '"oscillation_detected": false, "conflict_report": [], '
             '"next_stage": "CRITIQUE"}')
         self.mock_input.affected_files = [
-            MockAffectedFile(
-                'remoting/tools/magi-mode/constraints.magi.1.json')
+            MockAffectedFile('agents/skills/magi-mode/constraints.magi.1.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/constraints.magi.1.json':
+            'agents/skills/magi-mode/constraints.magi.1.json':
             invalid_constraints
         }
         schema_json = (
@@ -565,10 +561,10 @@ class MagiPresubmitTest(unittest.TestCase):
             '{"role": "Test Role", "mandate": "Test Mandate", '
             '"checklist": {"check_1": "Desc 1", "check_2": "Desc 2"}}')
         self.mock_input.affected_files = [
-            MockAffectedFile('remoting/tools/magi-mode/personas/test.json')
+            MockAffectedFile('agents/skills/magi-mode/personas/test.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/personas/test.json': valid_json
+            'agents/skills/magi-mode/personas/test.json': valid_json
         }
 
         schema_json = ('{"definitions": {"PersonaDef": {"required": ["role", '
@@ -586,7 +582,7 @@ class MagiPresubmitTest(unittest.TestCase):
         # Missing required key
         invalid_json = '{"role": "Test Role", "mandate": "Test Mandate"}'
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/personas/test.json': invalid_json
+            'agents/skills/magi-mode/personas/test.json': invalid_json
         }
 
         with patch('builtins.open',
@@ -601,11 +597,10 @@ class MagiPresubmitTest(unittest.TestCase):
 
         # Depth 5 (valid)
         self.mock_input.affected_files = [
-            MockAffectedFile(
-                'remoting/tools/magi-mode/personas/1/2/3/4/5.json')
+            MockAffectedFile('agents/skills/magi-mode/personas/1/2/3/4/5.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/personas/1/2/3/4/5.json': valid_json
+            'agents/skills/magi-mode/personas/1/2/3/4/5.json': valid_json
         }
         with patch('builtins.open',
                    unittest.mock.mock_open(read_data=schema_json)):
@@ -616,10 +611,10 @@ class MagiPresubmitTest(unittest.TestCase):
         # Depth 6 (invalid)
         self.mock_input.affected_files = [
             MockAffectedFile(
-                'remoting/tools/magi-mode/personas/1/2/3/4/5/6.json')
+                'agents/skills/magi-mode/personas/1/2/3/4/5/6.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/personas/1/2/3/4/5/6.json': valid_json
+            'agents/skills/magi-mode/personas/1/2/3/4/5/6.json': valid_json
         }
         with patch('builtins.open',
                    unittest.mock.mock_open(read_data=schema_json)):
@@ -636,10 +631,10 @@ class MagiPresubmitTest(unittest.TestCase):
             '"anti_goals": [], "edge_cases": [], '
             '"build_targets": "//remoting/host:host"}')
         self.mock_input.affected_files = [
-            MockAffectedFile('remoting/tools/magi-mode/project.magi.json')
+            MockAffectedFile('agents/skills/magi-mode/project.magi.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/project.magi.json': invalid_type_json
+            'agents/skills/magi-mode/project.magi.json': invalid_type_json
         }
         schema_json = ('{"definitions": {"ProjectSpec": {"required": [], '
                        '"properties": {"build_targets": {"type": "array", '
@@ -654,11 +649,11 @@ class MagiPresubmitTest(unittest.TestCase):
 
         # Invalid element in build_targets (integer instead of string)
         invalid_elem_json = (
-            '{"task_type": "IMPLEMENTATION", "goal": "Test", "target_files": [], '
-            '"anti_goals": [], "edge_cases": [], '
+            '{"task_type": "IMPLEMENTATION", "goal": "Test", '
+            '"target_files": [], "anti_goals": [], "edge_cases": [], '
             '"build_targets": [123]}')
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/project.magi.json': invalid_elem_json
+            'agents/skills/magi-mode/project.magi.json': invalid_elem_json
         }
         with patch('builtins.open',
                    unittest.mock.mock_open(read_data=schema_json)):
@@ -671,14 +666,14 @@ class MagiPresubmitTest(unittest.TestCase):
     def testJsonProjectSpecEnvironment(self):
         # Missing repo_type
         invalid_env_1 = (
-            '{"task_type": "IMPLEMENTATION", "goal": "Test", "target_files": [], '
-            '"anti_goals": [], "edge_cases": [], '
+            '{"task_type": "IMPLEMENTATION", "goal": "Test", '
+            '"target_files": [], "anti_goals": [], "edge_cases": [], '
             '"environment": {"vcs": "JJ", "harness": "JETSKI"}}')
         self.mock_input.affected_files = [
-            MockAffectedFile('remoting/tools/magi-mode/project.magi.json')
+            MockAffectedFile('agents/skills/magi-mode/project.magi.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/project.magi.json': invalid_env_1
+            'agents/skills/magi-mode/project.magi.json': invalid_env_1
         }
         schema_json = '{"definitions": {"ProjectSpec": {"required": []}}}'
 
@@ -692,12 +687,13 @@ class MagiPresubmitTest(unittest.TestCase):
 
         # Invalid repo_type
         invalid_env_2 = (
-            '{"task_type": "IMPLEMENTATION", "goal": "Test", "target_files": [], '
-            '"anti_goals": [], "edge_cases": [], '
-            '"environment": {"vcs": "JJ", "harness": "JETSKI", "repo_type": "INVALID"}}'
+            '{"task_type": "IMPLEMENTATION", "goal": "Test", '
+            '"target_files": [], "anti_goals": [], "edge_cases": [], '
+            '"environment": {"vcs": "JJ", "harness": "JETSKI", '
+            '"repo_type": "INVALID"}}'
         )
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/project.magi.json': invalid_env_2
+            'agents/skills/magi-mode/project.magi.json': invalid_env_2
         }
         with patch('builtins.open',
                    unittest.mock.mock_open(read_data=schema_json)):
@@ -709,12 +705,12 @@ class MagiPresubmitTest(unittest.TestCase):
 
         # Invalid output_directory type
         invalid_env_3 = (
-            '{"task_type": "IMPLEMENTATION", "goal": "Test", "target_files": [], '
-            '"anti_goals": [], "edge_cases": [], '
-            '"environment": {"vcs": "JJ", "harness": "JETSKI", "repo_type": "CHROMIUM", "output_directory": 123}}'
-        )
+            '{"task_type": "IMPLEMENTATION", "goal": "Test", '
+            '"target_files": [], "anti_goals": [], "edge_cases": [], '
+            '"environment": {"vcs": "JJ", "harness": "JETSKI", '
+            '"repo_type": "CHROMIUM", "output_directory": 123}}')
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/project.magi.json': invalid_env_3
+            'agents/skills/magi-mode/project.magi.json': invalid_env_3
         }
         with patch('builtins.open',
                    unittest.mock.mock_open(read_data=schema_json)):
@@ -726,12 +722,12 @@ class MagiPresubmitTest(unittest.TestCase):
 
         # Missing temp_directory
         invalid_env_4 = (
-            '{"task_type": "IMPLEMENTATION", "goal": "Test", "target_files": [], '
-            '"anti_goals": [], "edge_cases": [], '
-            '"environment": {"vcs": "JJ", "harness": "JETSKI", "repo_type": "CHROMIUM", "output_directory": "out/Default"}}'
-        )
+            '{"task_type": "IMPLEMENTATION", "goal": "Test", '
+            '"target_files": [], "anti_goals": [], "edge_cases": [], '
+            '"environment": {"vcs": "JJ", "harness": "JETSKI", '
+            '"repo_type": "CHROMIUM", "output_directory": "out/Default"}}')
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/project.magi.json': invalid_env_4
+            'agents/skills/magi-mode/project.magi.json': invalid_env_4
         }
         with patch('builtins.open',
                    unittest.mock.mock_open(read_data=schema_json)):
@@ -743,12 +739,13 @@ class MagiPresubmitTest(unittest.TestCase):
 
         # Invalid temp_directory type
         invalid_env_5 = (
-            '{"task_type": "IMPLEMENTATION", "goal": "Test", "target_files": [], '
-            '"anti_goals": [], "edge_cases": [], '
-            '"environment": {"vcs": "JJ", "harness": "JETSKI", "repo_type": "CHROMIUM", "output_directory": "out/Default", "temp_directory": 123}}'
-        )
+            '{"task_type": "IMPLEMENTATION", "goal": "Test", '
+            '"target_files": [], "anti_goals": [], "edge_cases": [], '
+            '"environment": {"vcs": "JJ", "harness": "JETSKI", '
+            '"repo_type": "CHROMIUM", "output_directory": "out/Default", '
+            '"temp_directory": 123}}')
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/project.magi.json': invalid_env_5
+            'agents/skills/magi-mode/project.magi.json': invalid_env_5
         }
         with patch('builtins.open',
                    unittest.mock.mock_open(read_data=schema_json)):
@@ -764,11 +761,10 @@ class MagiPresubmitTest(unittest.TestCase):
                       '{"name": "Case 1", "expected_outputs": {}}]}')
         self.mock_input.affected_files = [
             MockAffectedFile(
-                'remoting/tools/magi-mode/tests/magi_stage_generate_tests.json'
-            )
+                'agents/skills/magi-mode/tests/magi_stage_generate_tests.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/tests/magi_stage_generate_tests.json':
+            'agents/skills/magi-mode/tests/magi_stage_generate_tests.json':
             valid_json
         }
         results = PRESUBMIT.CheckTestJsonFiles(self.mock_input,
@@ -778,7 +774,7 @@ class MagiPresubmitTest(unittest.TestCase):
         # Missing required key in scenario
         invalid_json = '{"name": "Test", "cases": []}'
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/tests/magi_stage_generate_tests.json':
+            'agents/skills/magi-mode/tests/magi_stage_generate_tests.json':
             invalid_json
         }
         results = PRESUBMIT.CheckTestJsonFiles(self.mock_input,
@@ -791,7 +787,7 @@ class MagiPresubmitTest(unittest.TestCase):
             '"name": "Case 1", "expected_outputs": {}, '
             '"override_inputs": {"invalid_key": {}}}]}')
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/tests/magi_stage_generate_tests.json':
+            'agents/skills/magi-mode/tests/magi_stage_generate_tests.json':
             invalid_override_json
         }
         results = PRESUBMIT.CheckTestJsonFiles(self.mock_input,
@@ -800,7 +796,7 @@ class MagiPresubmitTest(unittest.TestCase):
 
     def testJsonTempDirectory(self):
         self.mock_input.affected_files = [
-            MockAffectedFile('remoting/tools/magi-mode/.temp/log.json')
+            MockAffectedFile('agents/skills/magi-mode/.temp/log.json')
         ]
         results = PRESUBMIT.CheckTempDirectory(self.mock_input,
                                                self.mock_output)
@@ -820,7 +816,8 @@ class MagiPresubmitTest(unittest.TestCase):
         self.assertIn('PersonaDef', schema['definitions'])
 
     def testTestDataConsistency(self):
-        # Ensure our testdata/project.magi.json is valid against the real schema.
+        # Ensure our testdata/project.magi.json is valid against the real
+        # schema.
         magi_dir = os.path.dirname(__file__)
         schema_path = os.path.join(magi_dir, 'magi_schema.json')
         project_path = os.path.join(magi_dir, 'tests', 'testdata',
@@ -834,14 +831,15 @@ class MagiPresubmitTest(unittest.TestCase):
         # Mock the InputApi to use the real files
         self.mock_input.affected_files = [
             MockAffectedFile(
-                'remoting/tools/magi-mode/tests/testdata/project.magi.json')
+                'agents/skills/magi-mode/tests/testdata/project.magi.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/tests/testdata/project.magi.json':
+            'agents/skills/magi-mode/tests/testdata/project.magi.json':
             json.dumps(project)
         }
 
-        # We need to mock 'builtins.open' because PRESUBMIT.py reads the schema from disk
+        # We need to mock 'builtins.open' because PRESUBMIT.py reads the
+        # schema from disk.
         with patch('builtins.open',
                    unittest.mock.mock_open(read_data=json.dumps(schema))):
             results = PRESUBMIT.CheckJsonFiles(self.mock_input,
@@ -855,10 +853,10 @@ class MagiPresubmitTest(unittest.TestCase):
         # Missing MANDATE: prefix
         invalid_mandate = '{"role": "R", "mandate": ["Bad"], "checklist": {}}'
         self.mock_input.affected_files = [
-            MockAffectedFile('remoting/tools/magi-mode/personas/test.json')
+            MockAffectedFile('agents/skills/magi-mode/personas/test.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/personas/test.json': invalid_mandate
+            'agents/skills/magi-mode/personas/test.json': invalid_mandate
         }
         schema_json = '{"definitions": {"PersonaDef": {"required": []}}}'
         with patch('builtins.open',
@@ -873,7 +871,7 @@ class MagiPresubmitTest(unittest.TestCase):
             '{"role": "R", "mandate": ["MANDATE: X", "Please do Y"], '
             '"checklist": {}}')
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/personas/test.json': filler_json
+            'agents/skills/magi-mode/personas/test.json': filler_json
         }
         with patch('builtins.open',
                    unittest.mock.mock_open(read_data=schema_json)):
@@ -890,10 +888,10 @@ class MagiPresubmitTest(unittest.TestCase):
             '"active_constraints": [], "resolved_constraints": [], '
             '"state_transport": "FILE_IO", "next_stage": "ESCALATION"}')
         self.mock_input.affected_files = [
-            MockAffectedFile('remoting/tools/magi-mode/state_block.magi.json')
+            MockAffectedFile('agents/skills/magi-mode/state_block.magi.json')
         ]
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/state_block.magi.json': invalid_json
+            'agents/skills/magi-mode/state_block.magi.json': invalid_json
         }
         schema_json = '{"definitions": {"StateBlock": {"required": []}}}'
         with patch('builtins.open',
@@ -910,7 +908,7 @@ class MagiPresubmitTest(unittest.TestCase):
             '"active_constraints": [], "resolved_constraints": [], '
             '"state_transport": "FILE_IO", "next_stage": "SYNTHESIS"}')
         self.mock_input.files_content = {
-            'remoting/tools/magi-mode/state_block.magi.json': wrong_stage_json
+            'agents/skills/magi-mode/state_block.magi.json': wrong_stage_json
         }
         with patch('builtins.open',
                    unittest.mock.mock_open(read_data=schema_json)):

@@ -46,6 +46,7 @@ class MockInputApi:
         self.re = re
 
     def AffectedFiles(self, file_filter=None, include_deletes=False):
+        del include_deletes  # Unused.
         if file_filter:
             return [f for f in self._files if file_filter(f)]
         return self._files
@@ -79,6 +80,7 @@ class MockOutputApi:
     class PresubmitError:
 
         def __init__(self, message, *args, **kwargs):
+            del args, kwargs
             self.message = message
 
         def __str__(self):
@@ -87,6 +89,7 @@ class MockOutputApi:
     class PresubmitPromptWarning:
 
         def __init__(self, message, *args, **kwargs):
+            del args, kwargs
             self.message = message
 
         def __str__(self):
@@ -95,6 +98,7 @@ class MockOutputApi:
     class PresubmitNotifyResult:
 
         def __init__(self, message, *args, **kwargs):
+            del args, kwargs
             self.message = message
 
         def __str__(self):
@@ -103,6 +107,7 @@ class MockOutputApi:
     class PresubmitPromptOrNotify:
 
         def __init__(self, message, *args, **kwargs):
+            del args, kwargs
             self.message = message
 
         def __str__(self):
@@ -128,7 +133,7 @@ def main():
     magi_dir = os.path.dirname(os.path.abspath(__file__))
     repo_root = find_repo_root(magi_dir)
 
-    for root, dirs, filenames in os.walk(magi_dir):
+    for root, _dirs, filenames in os.walk(magi_dir):
         if '.temp' in root.split(os.sep):
             continue
         for filename in filenames:

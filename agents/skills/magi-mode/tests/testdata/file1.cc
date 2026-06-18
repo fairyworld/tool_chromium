@@ -2,9 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// Mock file for testing.
 #include "base/logging.h"
 
+#define CONCAT_LOG(x) LOG(x)
+#define MAGI_LOG CONCAT_LOG(INFO)
+
 void MockFunction() {
-  LOG(INFO) << "Hello World";
+  MAGI_LOG << "Hello World";
 }
