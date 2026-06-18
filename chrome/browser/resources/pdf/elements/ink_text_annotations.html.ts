@@ -22,6 +22,7 @@ export function getHtml(this: InkTextAnnotationsElement) {
   `)}
 </div>
 <ink-text-box id="textBox"
+    .viewport="${this.viewport}"
     @state-changed="${this.onTextBoxStateChanged_}"
     @textbox-focused="${this.onTextboxFocused_}">
 </ink-text-box>

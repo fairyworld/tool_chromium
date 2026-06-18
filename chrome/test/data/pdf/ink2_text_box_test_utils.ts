@@ -8,19 +8,40 @@ import {keyDownOn, keyUpOn} from 'chrome://webui-test/keyboard_mock_interactions
 import {microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 import {TestPdfViewerPrivateProxy} from './test_pdf_viewer_private_proxy.js';
-import {assertDeepEquals, setUpInkTestContext} from './test_util.js';
+import {assertDeepEquals, MockDocumentDimensions, setUpInkTestContext} from './test_util.js';
 import type {MockPdfPluginElement} from './test_util.js';
 
-export async function setupTextBoxTest() {
+export async function setupTextBoxTest(
+    windowWidth: number = 500, windowHeight: number = 500,
+    pageWidth: number = 400, pageHeight: number = 500,
+    zeroScrollbars: boolean = false) {
+  document.body.innerHTML = '';
+  document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
+
   Ink2Manager.setInstance(null);
-  const {viewport, mockPlugin} = setUpInkTestContext();
+  const {viewport, mockPlugin, mockWindow} =
+      setUpInkTestContext(zeroScrollbars ? 0 : 5);
+
+  mockWindow.offsetWidth = windowWidth;
+  mockWindow.offsetHeight = windowHeight;
+  if (mockWindow.resizeCallback) {
+    mockWindow.resizeCallback();
+  }
+
+  const documentDimensions = new MockDocumentDimensions(0, 0);
+  documentDimensions.addPage(pageWidth, pageHeight);
+  viewport.setDocumentDimensions(documentDimensions);
+
   const privateProxy = new TestPdfViewerPrivateProxy();
   PdfViewerPrivateProxyImpl.setInstance(privateProxy);
   const manager = Ink2Manager.getInstance();
   await manager.initializeTextAnnotations();
   const textbox = document.createElement('ink-text-box');
+  textbox.viewport = viewport;
+  viewport.setViewportChangedCallback(() => textbox.viewportChanged());
   document.body.appendChild(textbox);
-  return {viewport, mockPlugin, privateProxy, manager, textbox};
+  return {viewport, mockPlugin, privateProxy, manager, textbox, mockWindow};
 }
 
 export function getTestAnnotation(

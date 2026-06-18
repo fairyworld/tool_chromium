@@ -12,12 +12,6 @@ import {pageToScreenCoordinates, screenToPageCoordinates} from './ink_text_annot
 import {UndoRedoStack} from './undo_redo_stack.js';
 import type {Viewport, ViewportRect} from './viewport.js';
 
-export interface ViewportParams {
-  clockwiseRotations: number;
-  pageDimensions: ViewportRect;
-  zoom: number;
-}
-
 export interface TextBoxInit {
   annotation: TextAnnotation;
   pageDimensions: ViewportRect;
@@ -62,16 +56,10 @@ export class Ink2Manager extends EventTarget {
   // user is editing. Null if the user is not editing an annotation or is
   // creating a new annotation using |attributes_|.
   private existingAnnotationAttributes_: TextAttributes|null = null;
-  private pageIndex_: number = -1;
   private pluginController_: PluginController = PluginController.getInstance();
   private textResolver_: PromiseResolver<void>|null = null;
   private textboxActiveResolver_: PromiseResolver<void>|null = null;
   private viewport_: Viewport|null = null;
-  private viewportParams_: ViewportParams = {
-    clockwiseRotations: 0,
-    pageDimensions: {x: 0, y: 0, width: 0, height: 0},
-    zoom: 1.0,
-  };
   private nextAnnotationId_: number = 0;
   // Keeps track of fonts that have been sent to the backend so that each font
   // is only serialized and loaded once.
@@ -205,7 +193,6 @@ export class Ink2Manager extends EventTarget {
           newBoxWidth, pageDimensions.x + pageDimensions.width - location.x);
     }
 
-    this.pageIndex_ = page;
     const viewportRotations = this.viewport_.getClockwiseRotations();
     const annotation: TextAnnotation = existing ? existing : {
       id: this.nextAnnotationId_,
@@ -242,39 +229,8 @@ export class Ink2Manager extends EventTarget {
 
     // Notify other listeners of any changes to the viewport and/or attributes,
     // since these may change with the annotation.
-    this.viewportChanged();
     this.fireAttributesChanged_();
     return true;
-  }
-
-  getViewportParams(): ViewportParams {
-    return this.viewportParams_;
-  }
-
-  viewportChanged() {
-    assert(this.viewport_, 'Must call setViewport() before viewportChanged()');
-    const zoom = this.viewport_.getZoom();
-    const page = this.pageIndex_ !== -1 ? this.pageIndex_ :
-                                          this.viewport_.getMostVisiblePage();
-    const pageDimensions = this.viewport_.getPageScreenRect(page);
-    const rotations = this.viewport_.getClockwiseRotations();
-    if (rotations === this.viewportParams_.clockwiseRotations &&
-        pageDimensions.x === this.viewportParams_.pageDimensions.x &&
-        pageDimensions.y === this.viewportParams_.pageDimensions.y &&
-        pageDimensions.width === this.viewportParams_.pageDimensions.width &&
-        pageDimensions.height === this.viewportParams_.pageDimensions.height &&
-        zoom === this.viewportParams_.zoom) {
-      // Early return to avoid firing unnecessary events.
-      return;
-    }
-
-    this.viewportParams_ = {
-      clockwiseRotations: rotations,
-      pageDimensions: pageDimensions,
-      zoom,
-    };
-    this.dispatchEvent(
-        new CustomEvent('viewport-changed', {detail: this.viewportParams_}));
   }
 
   isInitializationStarted(): boolean {

@@ -25,6 +25,8 @@ function createAnnotationsElement(): InkTextAnnotationsElement {
   document.body.innerHTML = '';
   const annotationsElement = document.createElement('ink-text-annotations');
   annotationsElement.viewport = viewport;
+  viewport.setViewportChangedCallback(
+      () => annotationsElement.viewportChanged());
   document.body.appendChild(annotationsElement);
   return annotationsElement;
 }
@@ -216,6 +218,51 @@ chrome.test.runTests([
     chrome.test.assertEq('syncScrollToRemote', syncScrollMessage.type);
     chrome.test.assertEq(0, syncScrollMessage.x);
     chrome.test.assertEq(505, syncScrollMessage.y);
+
+    chrome.test.succeed();
+  },
+
+  async function testViewportChangeReposition() {
+    const manager = setUpInk2Manager();
+    // For page coordinates of (50, 50), set screen coordinates (105, 53) due
+    // to 55, 3 offsets.
+    const annotation = {
+      ...getTestAnnotation(1),
+      text: 'Test',
+      textBoxRect: {height: 20, locationX: 105, locationY: 53, width: 100},
+    };
+    manager.commitTextAnnotation(annotation, true, []);
+
+    const annotationsElement = createAnnotationsElement();
+    await microtasksFinished();
+
+    let placeholders = getPlaceholders(annotationsElement);
+    chrome.test.assertEq(1, placeholders.length);
+    // Offset is 10px inline padding + 2px border --> left = 105 - 12 = 93
+    chrome.test.assertEq(
+        '93px', window.getComputedStyle(placeholders[0]!).left);
+
+    // Zoom to 2.0
+    // Page 0 dimensions at 2.0 zoom: pageX=10, pageY=6, width=780, height=980
+    // Screen coords should be:
+    // X = 50 * 2 + 10 = 110
+    // Y = 50 * 2 + 6 = 106
+    // W = 100 * 2 = 200
+    // H = 20 * 2 = 40
+    viewport.setZoom(2.0);
+    await microtasksFinished();
+
+    placeholders = getPlaceholders(annotationsElement);
+    const styleAt2 = window.getComputedStyle(placeholders[0]!);
+    // Left: 110 - 12 = 98px
+    // Y offset is 8px vertical padding + 2px border = 10
+    // Top: 106 - 10 = 96px
+    // Width: 200 + (24 = 2 * padding + 2 * border) = 224px
+    // Height: 40 + (20 = 2 * padding + 2 * border) = 60px
+    chrome.test.assertEq('98px', styleAt2.left);
+    chrome.test.assertEq('96px', styleAt2.top);
+    chrome.test.assertEq('224px', styleAt2.width);
+    chrome.test.assertEq('60px', styleAt2.height);
 
     chrome.test.succeed();
   },

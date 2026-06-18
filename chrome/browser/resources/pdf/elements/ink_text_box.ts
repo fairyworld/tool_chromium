@@ -11,10 +11,11 @@ import type {PropertyValues} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 import type {TextAnnotation, TextAttributes, TextBoxRect} from '../constants.js';
 import {TextTypeface} from '../constants.js';
 import {colorsEqual, Ink2Manager, MIN_TEXTBOX_SIZE_PX, stylesEqual} from '../ink2_manager.js';
-import type {TextBoxInit, ViewportParams} from '../ink2_manager.js';
+import type {TextBoxInit} from '../ink2_manager.js';
 import {convertRotatedCoordinates} from '../ink_text_annotation_utils.js';
 import {PdfViewerPrivateProxyImpl} from '../pdf_viewer_private_proxy.js';
 import {colorToHex, hasCtrlModifier} from '../pdf_viewer_utils.js';
+import type {Viewport} from '../viewport.js';
 
 import {getCss} from './ink_text_box.css.js';
 import {getHtml} from './ink_text_box.html.js';
@@ -79,6 +80,7 @@ export class InkTextBoxElement extends InkTextBoxElementBase {
       viewportRotations_: {type: Number},
       width_: {type: Number},
       zoom_: {type: Number},
+      viewport: {type: Object},
     };
   }
 
@@ -96,6 +98,7 @@ export class InkTextBoxElement extends InkTextBoxElementBase {
   private accessor viewportRotations_: number = 0;
   private accessor width_: number = MIN_TEXTBOX_SIZE_PX;
   private accessor zoom_: number = 1.0;
+  accessor viewport: Viewport|null = null;
 
   private attributes_?: TextAttributes;
   private currentArrowKey_: string|null = null;
@@ -127,11 +130,6 @@ export class InkTextBoxElement extends InkTextBoxElementBase {
     this.eventTracker_.add(
         Ink2Manager.getInstance(), 'deactivate-text-box',
         () => this.commitTextAnnotation());
-    this.onViewportChanged_(Ink2Manager.getInstance().getViewportParams());
-    this.eventTracker_.add(
-        Ink2Manager.getInstance(), 'viewport-changed',
-        (e: Event) =>
-            this.onViewportChanged_((e as CustomEvent<ViewportParams>).detail));
     this.eventTracker_.add(
         this, 'pointerdown', (e: PointerEvent) => this.onPointerDown_(e));
     this.eventTracker_.add(
@@ -365,6 +363,11 @@ export class InkTextBoxElement extends InkTextBoxElementBase {
       await this.commitTextAnnotation();
     }
 
+    if (this.viewport) {
+      this.zoom_ = this.viewport.getZoom();
+      this.viewportRotations_ = this.viewport.getClockwiseRotations();
+    }
+
     // Update is in screen coordinates.
     this.pageX_ = data.pageDimensions.x;
     this.pageY_ = data.pageDimensions.y;
@@ -395,41 +398,46 @@ export class InkTextBoxElement extends InkTextBoxElementBase {
     }, 0);
   }
 
-  private onViewportChanged_(update: ViewportParams) {
+  viewportChanged() {
+    if (!this.viewport || this.pageIndex_ === -1) {
+      return;
+    }
+    const zoom = this.viewport.getZoom();
+    const clockwiseRotations = this.viewport.getClockwiseRotations();
+    const pageDimensions = this.viewport.getPageScreenRect(this.pageIndex_);
+
     // Convert width, height, locationX, locationY to the new screen
     // coordinates.
 
     // Note that this.pageX_ and this.pageY_ are in the old screen
     // coordinates, i.e. they were using the old zoom value.
     const adjusted = {
-      locationX: (this.locationX_ - this.pageX_) * update.zoom / this.zoom_,
-      locationY: (this.locationY_ - this.pageY_) * update.zoom / this.zoom_,
-      width:
-          Math.max(this.width_ * update.zoom / this.zoom_, MIN_TEXTBOX_SIZE_PX),
-      height: Math.max(
-          this.height_ * update.zoom / this.zoom_, MIN_TEXTBOX_SIZE_PX),
+      locationX: (this.locationX_ - this.pageX_) * zoom / this.zoom_,
+      locationY: (this.locationY_ - this.pageY_) * zoom / this.zoom_,
+      width: Math.max(this.width_ * zoom / this.zoom_, MIN_TEXTBOX_SIZE_PX),
+      height: Math.max(this.height_ * zoom / this.zoom_, MIN_TEXTBOX_SIZE_PX),
     };
     const rotated = convertRotatedCoordinates(
-        adjusted, this.viewportRotations_, update.clockwiseRotations,
-        update.pageDimensions.width, update.pageDimensions.height);
+        adjusted, this.viewportRotations_, clockwiseRotations,
+        pageDimensions.width, pageDimensions.height);
     // Flip min height and width if we've switched orientation.
-    if (this.viewportRotations_ % 2 !== update.clockwiseRotations % 2) {
+    if (this.viewportRotations_ % 2 !== clockwiseRotations % 2) {
       const min = this.minHeight_;
       this.minHeight_ = this.minWidth_;
       this.minWidth_ = min;
     }
-    this.locationX_ = rotated.locationX + update.pageDimensions.x;
-    this.locationY_ = rotated.locationY + update.pageDimensions.y;
+    this.locationX_ = rotated.locationX + pageDimensions.x;
+    this.locationY_ = rotated.locationY + pageDimensions.y;
     this.width_ = rotated.width;
     this.height_ = rotated.height;
 
     // Update properties to the new values.
-    this.viewportRotations_ = update.clockwiseRotations;
-    this.zoom_ = update.zoom;
-    this.pageX_ = update.pageDimensions.x;
-    this.pageY_ = update.pageDimensions.y;
-    this.pageWidth_ = update.pageDimensions.width;
-    this.pageHeight_ = update.pageDimensions.height;
+    this.viewportRotations_ = clockwiseRotations;
+    this.zoom_ = zoom;
+    this.pageX_ = pageDimensions.x;
+    this.pageY_ = pageDimensions.y;
+    this.pageWidth_ = pageDimensions.width;
+    this.pageHeight_ = pageDimensions.height;
   }
 
   private onDocumentKeyDown_(e: KeyboardEvent) {

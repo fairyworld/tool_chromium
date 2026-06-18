@@ -898,7 +898,10 @@ export class PdfViewerElement extends PdfViewerBaseElement {
       this.style.setProperty(
           '--horizontal-scrollbar-width',
           hasScrollbars.horizontal ? scrollbarWidthStyle : '0px');
-      Ink2Manager.getInstance().viewportChanged();
+      const annotations = this.shadowRoot.querySelector('ink-text-annotations');
+      if (annotations) {
+        annotations.viewportChanged();
+      }
     }
     // </if>
   }

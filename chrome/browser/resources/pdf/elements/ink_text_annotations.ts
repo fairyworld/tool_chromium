@@ -62,6 +62,11 @@ export class InkTextAnnotationsElement extends CrLitElement {
     this.eventTracker_.removeAll();
   }
 
+  viewportChanged() {
+    this.updatePlaceholders_();
+    this.$.textBox.viewportChanged();
+  }
+
   protected getPlaceholderRotations_(annotation: TextAnnotation): number {
     if (!this.viewport) {
       return 0;

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import type {AnnotationBrush, TextAnnotation, TextAnnotationMessageData, TextAttributes, TextBoxInit, UndoRedoStateChangedDetail, Viewport, ViewportParams} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
+import type {AnnotationBrush, TextAnnotation, TextAnnotationMessageData, TextAttributes, TextBoxInit, UndoRedoStateChangedDetail, Viewport} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
 import {AnnotationBrushType, DEFAULT_TEXTBOX_WIDTH, Ink2Manager, MIN_TEXTBOX_SIZE_PX, PluginController, PluginControllerEventType, TextAlignment, TextAnnotationSource, TextTypeface} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
 import {assert} from 'chrome://resources/js/assert.js';
 import {eventToPromise} from 'chrome://webui-test/test_util.js';
@@ -842,20 +842,7 @@ chrome.test.runTests([
     manager.commitTextAnnotation(structuredClone(testAnnotation), true, []);
     mockPlugin.clearMessages();
 
-    const initialParams = manager.getViewportParams();
-    chrome.test.assertEq(1.0, initialParams.zoom);
-    // pageMarginY * zoom = 3 * 1
-    chrome.test.assertEq(3, initialParams.pageDimensions.y);
-    // (windowWidth - docWidth * zoom)/2 + pageMarginX * zoom =
-    // (500 - 400 * 1)/2 + 5 * 1
-    chrome.test.assertEq(55, initialParams.pageDimensions.x);
-    // 10px of width are taken up by PAGE_SHADOW.
-    chrome.test.assertEq(390, initialParams.pageDimensions.width);
-    // 20px of height are also taken up by PAGE_SHADOW.
-    chrome.test.assertEq(490, initialParams.pageDimensions.height);
-    chrome.test.assertEq(0, initialParams.clockwiseRotations);
-
-    // In this new layout, the existing 50x35 annotation at page coordinate
+    // In this layout, the existing 50x35 annotation at page coordinate
     // 5, 22 has its top left corner at 60, 25 in screen coordinates. Make
     // sure clicking there creates the box, and clicking just outside of this
     // does not.
@@ -869,20 +856,8 @@ chrome.test.runTests([
     await changeActiveAnnotation(manager, {x: 59, y: 24}, true);
     verifyEditTextAnnotationMessage(false);
 
-    // Zoom out should fire an event.
-    let whenViewportChanged = eventToPromise<CustomEvent<ViewportParams>>(
-        'viewport-changed', manager);
+    // Zoom out.
     viewport.setZoom(0.5);
-    let changedEvent = await whenViewportChanged;
-    chrome.test.assertEq(0.5, changedEvent.detail.zoom);
-    // pageMarginY * zoom = 3 * .5
-    chrome.test.assertEq(1.5, changedEvent.detail.pageDimensions.y);
-    // (windowWidth - docWidth * zoom)/2 + pageMarginX * zoom =
-    // (500 - 400 * .5)/2 + 5 * .5
-    chrome.test.assertEq(152.5, changedEvent.detail.pageDimensions.x);
-    chrome.test.assertEq(195, changedEvent.detail.pageDimensions.width);
-    chrome.test.assertEq(245, changedEvent.detail.pageDimensions.height);
-    chrome.test.assertEq(0, changedEvent.detail.clockwiseRotations);
 
     // In this new layout, the existing 50x35 annotation at page coordinate
     // 5, 22 has its top left corner at 155, 12.5 in screen coordinates.
@@ -894,19 +869,8 @@ chrome.test.runTests([
     await changeActiveAnnotation(manager, {x: 154, y: 12}, true);
     verifyEditTextAnnotationMessage(false);
 
-    // Zoom in should fire an event.
-    whenViewportChanged = eventToPromise<CustomEvent<ViewportParams>>(
-        'viewport-changed', manager);
+    // Zoom in.
     viewport.setZoom(2.0);
-    changedEvent = await whenViewportChanged;
-    chrome.test.assertEq(2, changedEvent.detail.zoom);
-    // pageMarginY * zoom = 3 * 2
-    chrome.test.assertEq(6, changedEvent.detail.pageDimensions.y);
-    // docWidth * zoom > windowWidth, so this is now pageMarginX * zoom = 5 * 2
-    chrome.test.assertEq(10, changedEvent.detail.pageDimensions.x);
-    chrome.test.assertEq(780, changedEvent.detail.pageDimensions.width);
-    chrome.test.assertEq(980, changedEvent.detail.pageDimensions.height);
-    chrome.test.assertEq(0, changedEvent.detail.clockwiseRotations);
 
     // In this new layout, the existing 50x35 annotation at page coordinate
     // 5, 22 has its top left corner at 25, 50 in screen coordinates.
@@ -919,18 +883,7 @@ chrome.test.runTests([
     verifyEditTextAnnotationMessage(false);
 
     // Translation.
-    whenViewportChanged = eventToPromise<CustomEvent<ViewportParams>>(
-        'viewport-changed', manager);
     viewport.goToPageAndXy(0, 20, 20);
-    changedEvent = await whenViewportChanged;
-    chrome.test.assertEq(2, changedEvent.detail.zoom);
-    // Shifts by -20 * zoom = -40 from previous position.
-    chrome.test.assertEq(-34, changedEvent.detail.pageDimensions.y);
-    // Shifts by -20 * zoom = -40 from previous position.
-    chrome.test.assertEq(-30, changedEvent.detail.pageDimensions.x);
-    chrome.test.assertEq(780, changedEvent.detail.pageDimensions.width);
-    chrome.test.assertEq(980, changedEvent.detail.pageDimensions.height);
-    chrome.test.assertEq(0, changedEvent.detail.clockwiseRotations);
 
     // In this new layout, the existing 50x35 annotation at page coordinate
     // 5, 22 has its top left corner at -15, 10 in screen coordinates.
@@ -945,18 +898,7 @@ chrome.test.runTests([
     verifyEditTextAnnotationMessage(false);
 
     // Rotation
-    whenViewportChanged = eventToPromise<CustomEvent<ViewportParams>>(
-        'viewport-changed', manager);
     rotateViewport(/* clockwiseRotations= */ 3);  // 90 degree CCW rotation.
-    changedEvent = await whenViewportChanged;
-    chrome.test.assertEq(2, changedEvent.detail.zoom);
-    chrome.test.assertEq(-34, changedEvent.detail.pageDimensions.y);
-    chrome.test.assertEq(-30, changedEvent.detail.pageDimensions.x);
-    // Width and height are switched.
-    chrome.test.assertEq(980, changedEvent.detail.pageDimensions.width);
-    chrome.test.assertEq(780, changedEvent.detail.pageDimensions.height);
-    // Rotations now non-zero.
-    chrome.test.assertEq(3, changedEvent.detail.clockwiseRotations);
 
     // In this new layout, the existing 50x35 annotation at page coordinate
     // 5, 22 has its top left corner at 14, 636 in screen coordinates. This

@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import {hexToColor, MIN_TEXTBOX_SIZE_PX, TEXT_COLORS, TextAlignment, TextStyle, TextTypeface} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
-import {microtasksFinished} from 'chrome://webui-test/test_util.js';
+import {eventToPromise, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 import {assertPositionAndSize, dragHandle, initializeBox, setupTextBoxTest} from './ink2_text_box_test_utils.js';
 import {getRequiredElement} from './test_util.js';
@@ -119,7 +119,7 @@ chrome.test.runTests([
   },
 
   async function testDragHandles() {
-    const {manager, textbox} = await setupTextBoxTest();
+    const {manager, textbox} = await setupTextBoxTest(1015, 500, 1000, 1000);
     // Initialize to a 100x200 box at 400, 300.
     initializeBox(manager, 100, 200, 400, 300);
     await microtasksFinished();
@@ -207,7 +207,7 @@ chrome.test.runTests([
   },
 
   async function testAutoResize() {
-    const {manager, textbox} = await setupTextBoxTest();
+    const {manager, textbox} = await setupTextBoxTest(1015, 500, 1000, 1000);
     initializeBox(manager, 24, 24, 416, 300);
     await microtasksFinished();
     // Textbox is initialized to the minimum clamped size.
@@ -255,7 +255,7 @@ chrome.test.runTests([
   },
 
   async function testResizeClampedToPageBoundaries() {
-    const {manager, textbox} = await setupTextBoxTest();
+    const {manager, textbox} = await setupTextBoxTest(1015, 500, 1000, 1000);
     // Initialize to a 100x100 box at 400, 300.
     initializeBox(manager, 100, 100, 400, 300);
     await microtasksFinished();
@@ -339,7 +339,7 @@ chrome.test.runTests([
   },
 
   async function testMove() {
-    const {manager, textbox} = await setupTextBoxTest();
+    const {manager, textbox} = await setupTextBoxTest(1015, 500, 1000, 1000);
     // Initialize to a 100x100 box at 400, 300.
     initializeBox(manager, 100, 100, 400, 300);
     await microtasksFinished();
@@ -359,7 +359,7 @@ chrome.test.runTests([
   },
 
   async function testMoveToPageBoundaries() {
-    const {manager, textbox} = await setupTextBoxTest();
+    const {manager, textbox} = await setupTextBoxTest(1015, 500, 1000, 1000);
     // Initialize to a 100x100 box at 400, 300.
     initializeBox(manager, 100, 100, 400, 300);
     await microtasksFinished();
@@ -388,6 +388,23 @@ chrome.test.runTests([
     // Drag the box past the bottom right corner and ensure it stops moving.
     await dragHandle(textbox, 1200, 200);
     assertPositionAndSize(textbox, '124px', '120px', '893px', '888px');
+
+    chrome.test.succeed();
+  },
+
+  async function testFocusEventDispatchesTextboxFocused() {
+    const {manager, textbox} = await setupTextBoxTest();
+    initializeBox(manager, 100, 100, 400, 300);
+    await microtasksFinished();
+
+    const whenFocused = eventToPromise<CustomEvent>('textbox-focused', textbox);
+    textbox.dispatchEvent(new FocusEvent('focus'));
+
+    const event = await whenFocused;
+    chrome.test.assertEq(400, event.detail.locationX);
+    chrome.test.assertEq(300, event.detail.locationY);
+    chrome.test.assertEq(100, event.detail.width);
+    chrome.test.assertEq(100, event.detail.height);
 
     chrome.test.succeed();
   },
