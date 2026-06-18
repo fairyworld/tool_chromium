@@ -641,12 +641,15 @@ class AutofillCreditCardBenefitsLabelTest
         card(), autofill_client(), CREDIT_CARD_NUMBER,
         /*virtual_card_option=*/false, &metadata_logging_context);
 
-    base::flat_map<int64_t, std::string>
-        expected_instrument_ids_to_available_benefit_sources = {
-            {card().instrument_id(), card().benefit_source()}};
+    base::flat_map<
+        int64_t,
+        autofill_metrics::CardMetadataLoggingContext::CardBenefitLoggingContext>
+        expected_instrument_ids_to_available_benefit_context = {
+            {card().instrument_id(),
+             {card().benefit_source(), GetTypeForCardBenefit(GetBenefit())}}};
     EXPECT_EQ(
-        metadata_logging_context.instrument_ids_to_available_benefit_sources,
-        expected_instrument_ids_to_available_benefit_sources);
+        metadata_logging_context.instrument_ids_to_available_benefit_context,
+        expected_instrument_ids_to_available_benefit_context);
   }
 
  private:
@@ -864,14 +867,17 @@ TEST_P(AutofillCreditCardBenefitsLabelTest,
 TEST_P(AutofillCreditCardBenefitsLabelTest,
        GetCreditCardSuggestionsForTouchToFill_BenefitsAdded_RealCard) {
   std::vector<CreditCard> cards = {card()};
-  base::flat_map<int64_t, std::string>
-      expected_instrument_ids_to_available_benefit_sources = {
-          {cards[0].instrument_id(), cards[0].benefit_source()}};
+  base::flat_map<
+      int64_t,
+      autofill_metrics::CardMetadataLoggingContext::CardBenefitLoggingContext>
+      expected_instrument_ids_to_available_benefit_context = {
+          {cards[0].instrument_id(),
+           {cards[0].benefit_source(), GetTypeForCardBenefit(GetBenefit())}}};
   EXPECT_CALL(credit_card_form_event_logger(),
               OnMetadataLoggingContextReceived(
                   Field(&autofill_metrics::CardMetadataLoggingContext::
-                            instrument_ids_to_available_benefit_sources,
-                        expected_instrument_ids_to_available_benefit_sources)))
+                            instrument_ids_to_available_benefit_context,
+                        expected_instrument_ids_to_available_benefit_context)))
       .Times(1);
 
   std::vector<Suggestion> suggestions = GetCreditCardSuggestionsForTouchToFill(
@@ -901,14 +907,17 @@ TEST_P(AutofillCreditCardBenefitsLabelTest,
        GetCreditCardSuggestionsForTouchToFill_BenefitsAdded_VirtualCard) {
   CreditCard virtual_card = CreditCard::CreateVirtualCard(card());
   std::vector<CreditCard> cards = {virtual_card};
-  base::flat_map<int64_t, std::string>
-      expected_instrument_ids_to_available_benefit_sources = {
-          {cards[0].instrument_id(), cards[0].benefit_source()}};
+  base::flat_map<
+      int64_t,
+      autofill_metrics::CardMetadataLoggingContext::CardBenefitLoggingContext>
+      expected_instrument_ids_to_available_benefit_context = {
+          {cards[0].instrument_id(),
+           {cards[0].benefit_source(), GetTypeForCardBenefit(GetBenefit())}}};
   EXPECT_CALL(credit_card_form_event_logger(),
               OnMetadataLoggingContextReceived(
                   Field(&autofill_metrics::CardMetadataLoggingContext::
-                            instrument_ids_to_available_benefit_sources,
-                        expected_instrument_ids_to_available_benefit_sources)))
+                            instrument_ids_to_available_benefit_context,
+                        expected_instrument_ids_to_available_benefit_context)))
       .Times(1);
 
   std::vector<Suggestion> suggestions = GetCreditCardSuggestionsForTouchToFill(
@@ -1019,15 +1028,19 @@ TEST_P(
     GetCreditCardSuggestionsForTouchToFill_OnMetadataLoggingContextReceivedCalled) {
   std::vector<CreditCard> cards = {card(),
                                    CreditCard::CreateVirtualCard(card())};
-  base::flat_map<int64_t, std::string>
-      expected_instrument_ids_to_available_benefit_sources = {
-          {cards[0].instrument_id(), cards[0].benefit_source()},
-          {cards[1].instrument_id(), cards[1].benefit_source()}};
+  base::flat_map<
+      int64_t,
+      autofill_metrics::CardMetadataLoggingContext::CardBenefitLoggingContext>
+      expected_instrument_ids_to_available_benefit_context = {
+          {cards[0].instrument_id(),
+           {cards[0].benefit_source(), GetTypeForCardBenefit(GetBenefit())}},
+          {cards[1].instrument_id(),
+           {cards[1].benefit_source(), GetTypeForCardBenefit(GetBenefit())}}};
   EXPECT_CALL(credit_card_form_event_logger(),
               OnMetadataLoggingContextReceived(
                   Field(&autofill_metrics::CardMetadataLoggingContext::
-                            instrument_ids_to_available_benefit_sources,
-                        expected_instrument_ids_to_available_benefit_sources)))
+                            instrument_ids_to_available_benefit_context,
+                        expected_instrument_ids_to_available_benefit_context)))
       .Times(1);
 
   GetCreditCardSuggestionsForTouchToFill(cards, autofill_manager(),

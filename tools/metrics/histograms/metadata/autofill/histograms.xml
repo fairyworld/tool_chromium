@@ -138,6 +138,12 @@ chromium-metrics-reviews@google.com.
   <variant name="Curinos" summary="Curinos"/>
 </variants>
 
+<variants name="Autofill.CreditCardBenefitType">
+  <variant name="Category" summary="Category benefits"/>
+  <variant name="FlatRate" summary="Flat rate benefits"/>
+  <variant name="Merchant" summary="Merchant benefits"/>
+</variants>
+
 <variants name="Autofill.CreditCardIssuerId">
   <variant name="Amex" summary="card issued by American Express"/>
   <variant name="Anz" summary="card issued by ANZ"/>
@@ -4386,6 +4392,24 @@ Called by update_autofill_enums.py. This is a manual comment.-->
     can be recorded once per page load.
   </summary>
   <token key="CardBenefitSource" variants="Autofill.CreditCardBenefitSource"/>
+</histogram>
+
+<histogram
+    name="Autofill.FormEvents.CreditCard.Benefits.{CardBenefitSource}.{CardBenefitType}"
+    enum="CardBenefitFormEvent" expires_after="2027-04-30">
+  <owner>ferny@google.com</owner>
+  <owner>payments-autofill-team@google.com</owner>
+  <summary>
+    Autofill form events for credit card forms that contain at least one
+    suggestion where a card benefit is available. This includes logging for when
+    card suggestions with benefits are shown, selected, filled, and submitted,
+    and logs at each of those times. Log emission pertains to credit cards where
+    the benefit source is {CardBenefitSource} and the benefit type is
+    {CardBenefitType}. Each CardBenefitFormEvent metric can be recorded once per
+    page load.
+  </summary>
+  <token key="CardBenefitSource" variants="Autofill.CreditCardBenefitSource"/>
+  <token key="CardBenefitType" variants="Autofill.CreditCardBenefitType"/>
 </histogram>
 
 <histogram name="Autofill.FormEvents.CreditCard.Bnpl" enum="BnplFormEvent"
