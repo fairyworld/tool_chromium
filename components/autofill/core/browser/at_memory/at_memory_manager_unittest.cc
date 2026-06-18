@@ -153,37 +153,12 @@ class AtMemoryManagerTest : public testing::Test,
     webdata_helper().WaitUntilIdle();
   }
 
-  void MockQueryResultsAndExpectCallback(
-      std::u16string_view query,
-      accessibility_annotator::MemorySearchStatus status,
-      std::vector<accessibility_annotator::MemorySearchResult> entries,
-      std::vector<Suggestion>& final_suggestions) {
-    EXPECT_CALL(mock_query_service(), Query(query, _))
-        .WillOnce([status, entries = std::move(entries)](
-                      std::u16string_view query,
-                      base::RepeatingCallback<void(
-                          accessibility_annotator::MemorySearchResults)>
-                          callback) mutable {
-          callback.Run(accessibility_annotator::MemorySearchResults(
-              status, std::move(entries)));
-        });
-    testing::InSequence s;
-    EXPECT_CALL(
-        update_callback_,
-        Run(testing::IsEmpty(), AutofillSuggestionTriggerSource::kAtMemory));
-    EXPECT_CALL(update_callback_,
-                Run(_, AutofillSuggestionTriggerSource::kAtMemory))
-        .WillOnce(SaveArg<0>(&final_suggestions));
-  }
-
   test::AutofillUnitTestEnvironment autofill_test_environment_;
   base::test::TaskEnvironment task_environment_;
   raw_ptr<accessibility_annotator::MockAtMemoryQueryService>
       mock_query_service_ptr_ = nullptr;
   AutofillWebDataServiceTestHelper webdata_helper_{
       std::make_unique<EntityTable>()};
-  base::MockCallback<AtMemoryManager::UpdateSuggestionsCallback>
-      update_callback_;
 };
 
 Matcher<Suggestion> EqualsAtMemorySuggestion(
@@ -202,15 +177,17 @@ Matcher<Suggestion> EqualsAtMemorySuggestion(
 // Tests that OnFilterChanged with a non-empty filter generates the search
 // affordance suggestion and does NOT trigger QueryService::Query.
 TEST_F(AtMemoryManagerTest, OnFilterChanged_GeneratesSearchAffordance) {
+  base::MockCallback<AtMemoryManager::UpdateSuggestionsCallback>
+      update_callback;
   manager().OnPopupShown(AutofillSuggestionTriggerSource::kAtMemory,
-                         /*is_context_secure=*/true, update_callback_.Get());
+                         /*is_context_secure=*/true, update_callback.Get());
 
   EXPECT_CALL(mock_query_service(), Query).Times(0);
 
   // Expect that OnFilterChanged triggers the callback with the single
   // affordance suggestion.
   std::vector<Suggestion> suggestions;
-  EXPECT_CALL(update_callback_,
+  EXPECT_CALL(update_callback,
               Run(_, AutofillSuggestionTriggerSource::kAtMemory))
       .WillOnce(SaveArg<0>(&suggestions));
 
@@ -230,12 +207,13 @@ TEST_F(AtMemoryManagerTest, OnFilterChanged_GeneratesSearchAffordance) {
 
 // Tests that OnFilterChanged with an empty filter clears all suggestions.
 TEST_F(AtMemoryManagerTest, OnFilterChanged_EmptyFilterClearsSuggestions) {
+  base::MockCallback<AtMemoryManager::UpdateSuggestionsCallback>
+      update_callback;
   manager().OnPopupShown(AutofillSuggestionTriggerSource::kAtMemory,
-                         /*is_context_secure=*/true, update_callback_.Get());
+                         /*is_context_secure=*/true, update_callback.Get());
 
-  EXPECT_CALL(
-      update_callback_,
-      Run(testing::IsEmpty(), AutofillSuggestionTriggerSource::kAtMemory));
+  EXPECT_CALL(update_callback, Run(testing::IsEmpty(),
+                                   AutofillSuggestionTriggerSource::kAtMemory));
 
   manager().OnFilterChanged(u"");
 }
@@ -245,8 +223,10 @@ TEST_F(AtMemoryManagerTest, OnFilterChanged_EmptyFilterClearsSuggestions) {
 // arrive.
 TEST_F(AtMemoryManagerTest,
        OnSearchSubmitted_TriggersQueryServiceAndClearsSuggestions) {
+  base::MockCallback<AtMemoryManager::UpdateSuggestionsCallback>
+      update_callback;
   manager().OnPopupShown(AutofillSuggestionTriggerSource::kAtMemory,
-                         /*is_context_secure=*/true, update_callback_.Get());
+                         /*is_context_secure=*/true, update_callback.Get());
 
   base::RepeatingCallback<void(accessibility_annotator::MemorySearchResults)>
       search_callback;
@@ -254,9 +234,8 @@ TEST_F(AtMemoryManagerTest,
       .WillOnce(SaveArg<1>(&search_callback));
 
   // Expect that executing the query immediately clears suggestions.
-  EXPECT_CALL(
-      update_callback_,
-      Run(testing::IsEmpty(), AutofillSuggestionTriggerSource::kAtMemory));
+  EXPECT_CALL(update_callback, Run(testing::IsEmpty(),
+                                   AutofillSuggestionTriggerSource::kAtMemory));
 
   manager().OnSearchSubmitted(u"query");
 
@@ -270,7 +249,7 @@ TEST_F(AtMemoryManagerTest,
 
   // Expect that when search results arrive, suggestions are updated.
   std::vector<Suggestion> final_suggestions;
-  EXPECT_CALL(update_callback_,
+  EXPECT_CALL(update_callback,
               Run(_, AutofillSuggestionTriggerSource::kAtMemory))
       .WillOnce(SaveArg<0>(&final_suggestions));
 
@@ -289,8 +268,10 @@ TEST_F(AtMemoryManagerTest, FillSensitiveAutofillAiData_AttributeSuccess) {
   EntityInstance passport = test::GetPassportEntityInstanceWithRandomGuid();
   AddOrUpdateEntityInstance(passport);
 
+  base::MockCallback<AtMemoryManager::UpdateSuggestionsCallback>
+      update_callback;
   manager().OnPopupShown(AutofillSuggestionTriggerSource::kAtMemory,
-                         /*is_context_secure=*/true, update_callback_.Get());
+                         /*is_context_secure=*/true, update_callback.Get());
 
   // Configure the mock access manager.
   auto mock_ai_access_manager =
@@ -350,8 +331,10 @@ TEST_F(AtMemoryManagerTest, FillSensitiveAutofillAiData_EntitySuccess) {
   EntityInstance passport = test::GetPassportEntityInstanceWithRandomGuid();
   AddOrUpdateEntityInstance(passport);
 
+  base::MockCallback<AtMemoryManager::UpdateSuggestionsCallback>
+      update_callback;
   manager().OnPopupShown(AutofillSuggestionTriggerSource::kAtMemory,
-                         /*is_context_secure=*/true, update_callback_.Get());
+                         /*is_context_secure=*/true, update_callback.Get());
 
   auto mock_ai_access_manager =
       std::make_unique<NiceMock<MockAutofillAiAccessManager>>(
@@ -417,8 +400,10 @@ TEST_F(AtMemoryManagerTest, FillSensitiveAutofillAiData_FetchFailed) {
   EntityInstance passport = test::GetPassportEntityInstanceWithRandomGuid();
   AddOrUpdateEntityInstance(passport);
 
+  base::MockCallback<AtMemoryManager::UpdateSuggestionsCallback>
+      update_callback;
   manager().OnPopupShown(AutofillSuggestionTriggerSource::kAtMemory,
-                         /*is_context_secure=*/true, update_callback_.Get());
+                         /*is_context_secure=*/true, update_callback.Get());
 
   auto mock_ai_access_manager =
       std::make_unique<NiceMock<MockAutofillAiAccessManager>>(
@@ -470,8 +455,10 @@ TEST_F(AtMemoryManagerTest, FillSensitiveAutofillAiData_FetchFailed) {
 // Tests that SPII entries and metadata are filtered out from the search
 // results when the context is insecure.
 TEST_F(AtMemoryManagerTest, FiltersSpiiInInsecureContext) {
+  base::MockCallback<AtMemoryManager::UpdateSuggestionsCallback>
+      update_callback;
   manager().OnPopupShown(AutofillSuggestionTriggerSource::kAtMemory,
-                         /*is_context_secure=*/false, update_callback_.Get());
+                         /*is_context_secure=*/false, update_callback.Get());
 
   base::RepeatingCallback<void(accessibility_annotator::MemorySearchResults)>
       search_callback;
@@ -479,7 +466,7 @@ TEST_F(AtMemoryManagerTest, FiltersSpiiInInsecureContext) {
       .WillOnce(SaveArg<1>(&search_callback));
 
   std::vector<Suggestion> resulting_suggestions;
-  EXPECT_CALL(update_callback_,
+  EXPECT_CALL(update_callback,
               Run(_, AutofillSuggestionTriggerSource::kAtMemory))
       .WillRepeatedly(SaveArg<0>(&resulting_suggestions));
 
@@ -522,8 +509,10 @@ TEST_F(AtMemoryManagerTest, FiltersSpiiInInsecureContext) {
 // Tests that SPII entries and metadata are retained in the search results
 // when the context is secure.
 TEST_F(AtMemoryManagerTest, KeepsSpiiInSecureContext) {
+  base::MockCallback<AtMemoryManager::UpdateSuggestionsCallback>
+      update_callback;
   manager().OnPopupShown(AutofillSuggestionTriggerSource::kAtMemory,
-                         /*is_context_secure=*/true, update_callback_.Get());
+                         /*is_context_secure=*/true, update_callback.Get());
 
   base::RepeatingCallback<void(accessibility_annotator::MemorySearchResults)>
       search_callback;
@@ -531,7 +520,7 @@ TEST_F(AtMemoryManagerTest, KeepsSpiiInSecureContext) {
       .WillOnce(SaveArg<1>(&search_callback));
 
   std::vector<Suggestion> resulting_suggestions;
-  EXPECT_CALL(update_callback_,
+  EXPECT_CALL(update_callback,
               Run(_, AutofillSuggestionTriggerSource::kAtMemory))
       .WillRepeatedly(SaveArg<0>(&resulting_suggestions));
 
@@ -580,8 +569,10 @@ TEST_F(AtMemoryManagerTest, KeepsSpiiInSecureContext) {
 // Tests that non-SPII data fills correctly and records the funnel metrics.
 TEST_F(AtMemoryManagerTest, FillNonSensitiveData_Success) {
   base::HistogramTester histogram_tester;
+  base::MockCallback<AtMemoryManager::UpdateSuggestionsCallback>
+      update_callback;
   manager().OnPopupShown(AutofillSuggestionTriggerSource::kAtMemory,
-                         /*is_context_secure=*/true, update_callback_.Get());
+                         /*is_context_secure=*/true, update_callback.Get());
 
   FormData form = test::CreateTestAddressFormData();
   std::vector<FieldType> field_types(form.fields().size(), UNKNOWN_TYPE);
@@ -725,11 +716,13 @@ TEST_F(AtMemoryManagerTest, PersonalContextEnabled_AppendsNoticeSuggestion) {
 
   autofill_client().set_should_show_personal_context_autofill_notice(true);
 
+  base::MockCallback<AtMemoryManager::UpdateSuggestionsCallback>
+      update_callback;
   manager().OnPopupShown(AutofillSuggestionTriggerSource::kAtMemory,
-                         /*is_context_secure=*/true, update_callback_.Get());
+                         /*is_context_secure=*/true, update_callback.Get());
 
   std::vector<Suggestion> suggestions;
-  EXPECT_CALL(update_callback_,
+  EXPECT_CALL(update_callback,
               Run(_, AutofillSuggestionTriggerSource::kAtMemory))
       .WillOnce(SaveArg<0>(&suggestions));
 
@@ -755,11 +748,13 @@ TEST_F(AtMemoryManagerTest,
 
   autofill_client().set_should_show_personal_context_autofill_notice(false);
 
+  base::MockCallback<AtMemoryManager::UpdateSuggestionsCallback>
+      update_callback;
   manager().OnPopupShown(AutofillSuggestionTriggerSource::kAtMemory,
-                         /*is_context_secure=*/true, update_callback_.Get());
+                         /*is_context_secure=*/true, update_callback.Get());
 
   std::vector<Suggestion> suggestions;
-  EXPECT_CALL(update_callback_,
+  EXPECT_CALL(update_callback,
               Run(_, AutofillSuggestionTriggerSource::kAtMemory))
       .WillOnce(SaveArg<0>(&suggestions));
 
@@ -776,58 +771,19 @@ TEST_F(AtMemoryManagerTest,
   feature_list.InitAndDisableFeature(
       personal_context::features::kPersonalContextFirstRunNoticePhase2);
 
+  base::MockCallback<AtMemoryManager::UpdateSuggestionsCallback>
+      update_callback;
   manager().OnPopupShown(AutofillSuggestionTriggerSource::kAtMemory,
-                         /*is_context_secure=*/true, update_callback_.Get());
+                         /*is_context_secure=*/true, update_callback.Get());
 
   std::vector<Suggestion> suggestions;
-  EXPECT_CALL(update_callback_,
+  EXPECT_CALL(update_callback,
               Run(_, AutofillSuggestionTriggerSource::kAtMemory))
       .WillOnce(SaveArg<0>(&suggestions));
 
   manager().OnFilterChanged(u"");
 
   EXPECT_TRUE(suggestions.empty());
-}
-
-// Tests that when Glic is enabled and search returns `kUnsupportedQuery`,
-// the unsupported query suggestion is returned.
-TEST_F(
-    AtMemoryManagerTest,
-    OnSearchSubmitted_UnsupportedQuery_GlicEnabled_UnsupportedQuerySuggestion) {
-  autofill_client().set_is_glic_enabled(true);
-  manager().OnPopupShown(AutofillSuggestionTriggerSource::kAtMemory,
-                         /*is_context_secure=*/true, update_callback_.Get());
-
-  std::vector<Suggestion> final_suggestions;
-  MockQueryResultsAndExpectCallback(
-      u"query", accessibility_annotator::MemorySearchStatus::kUnsupportedQuery,
-      /*entries=*/{}, final_suggestions);
-
-  manager().OnSearchSubmitted(u"query");
-
-  ASSERT_EQ(final_suggestions.size(), 1u);
-  EXPECT_EQ(final_suggestions[0].type, SuggestionType::kOpenGemini);
-}
-
-// Tests that when Glic is disabled and search returns `kUnsupportedQuery`,
-// it falls back to the no data suggestion.
-TEST_F(AtMemoryManagerTest,
-       OnSearchSubmitted_UnsupportedQuery_GlicDisabled_NoDataSuggestion) {
-  autofill_client().set_is_glic_enabled(false);
-  manager().OnPopupShown(AutofillSuggestionTriggerSource::kAtMemory,
-                         /*is_context_secure=*/true, update_callback_.Get());
-
-  std::vector<Suggestion> final_suggestions;
-  MockQueryResultsAndExpectCallback(
-      u"query", accessibility_annotator::MemorySearchStatus::kUnsupportedQuery,
-      /*entries=*/{}, final_suggestions);
-
-  manager().OnSearchSubmitted(u"query");
-
-  ASSERT_EQ(final_suggestions.size(), 1u);
-  EXPECT_EQ(final_suggestions[0].type, SuggestionType::kAtMemorySearchResult);
-  EXPECT_EQ(final_suggestions[0].main_text.value,
-            l10n_util::GetStringUTF16(IDS_AUTOFILL_AT_MEMORY_NO_DATA));
 }
 
 }  // namespace

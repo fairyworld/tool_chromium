@@ -429,9 +429,6 @@ class TestAutofillClientTemplate : public T {
     is_tab_in_actor_mode_ = is_in_actor_mode;
   }
 
-  bool IsGlicEnabled() const override { return is_glic_enabled_; }
-  void set_is_glic_enabled(bool enabled) { is_glic_enabled_ = enabled; }
-
   bool IsAutofillEnabled() const override {
     return IsAutofillProfileEnabled() ||
            AutofillClient::GetPaymentsAutofillClient()
@@ -835,8 +832,6 @@ class TestAutofillClientTemplate : public T {
 
   bool should_show_personal_context_autofill_notice_ = false;
   bool is_personal_context_notice_acknowledged_ = false;
-
-  bool is_glic_enabled_ = false;
 
   SuggestionHidingReason popup_hidden_reason_;
 

@@ -1561,9 +1561,4 @@ void ChromeAutofillClient::OpenGeminiInSidebar(const std::u16string& prompt) {
   glic_keyed_service->Invoke(std::move(options));
 }
 
-bool ChromeAutofillClient::IsGlicEnabled() const {
-  Profile* profile = GetProfile();
-  return profile && glic::GlicEnabling::IsEnabledForProfile(profile);
-}
-
 }  // namespace autofill

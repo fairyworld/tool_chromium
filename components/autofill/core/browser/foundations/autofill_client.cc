@@ -442,8 +442,4 @@ void AutofillClient::OpenGeminiInSidebar(const std::u16string& prompt) {
   NOTIMPLEMENTED();
 }
 
-bool AutofillClient::IsGlicEnabled() const {
-  return false;
-}
-
 }  // namespace autofill

@@ -596,9 +596,6 @@ class AutofillClient {
   // Opens Gemini in the sidebar with the given prompt pre-filled.
   virtual void OpenGeminiInSidebar(const std::u16string& prompt);
 
-  // Returns true if the Glic sidebar is enabled and can be opened.
-  virtual bool IsGlicEnabled() const;
-
   // Update the data list values shown by the Autofill suggestions, if visible.
   virtual void UpdateAutofillDataListValues(
       base::span<const SelectOption> datalist) = 0;
