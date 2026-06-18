@@ -20,7 +20,6 @@
 #include "printing/buildflags/buildflags.h"
 
 namespace ash {
-class ProbeServiceAsh;
 class TelemetryDiagnosticsRoutineServiceAsh;
 
 namespace auth {
@@ -78,15 +77,12 @@ class CrosapiAsh : public mojom::Crosapi {
       override;
 
 
-  ash::ProbeServiceAsh* probe_service_ash() { return probe_service_ash_.get(); }
-
  private:
   // Called when a connection is lost.
   void OnDisconnected();
 
   std::unique_ptr<ash::TelemetryDiagnosticsRoutineServiceAsh>
       telemetry_diagnostic_routine_service_ash_;
-  std::unique_ptr<ash::ProbeServiceAsh> probe_service_ash_;
 
   mojo::ReceiverSet<mojom::Crosapi, CrosapiId> receiver_set_;
   std::map<mojo::ReceiverId, base::OnceClosure> disconnect_handler_map_;

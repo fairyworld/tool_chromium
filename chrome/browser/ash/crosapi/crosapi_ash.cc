@@ -22,7 +22,6 @@
 #include "chromeos/ash/components/account_manager/account_manager_factory.h"
 #include "chromeos/ash/components/browser_context_helper/browser_context_helper.h"
 #include "chromeos/ash/components/telemetry_extension/routines/telemetry_diagnostic_routine_service_ash.h"
-#include "chromeos/ash/components/telemetry_extension/telemetry/probe_service_ash.h"
 #include "chromeos/components/cdm_factory_daemon/cdm_factory_daemon_proxy_ash.h"
 #include "chromeos/components/in_session_auth/in_process_instances.h"
 #include "chromeos/components/in_session_auth/in_session_auth.h"
@@ -68,8 +67,7 @@ Profile* GetAshProfile() {
 
 CrosapiAsh::CrosapiAsh()
     : telemetry_diagnostic_routine_service_ash_(
-          std::make_unique<ash::TelemetryDiagnosticsRoutineServiceAsh>()),
-      probe_service_ash_(std::make_unique<ash::ProbeServiceAsh>()) {
+          std::make_unique<ash::TelemetryDiagnosticsRoutineServiceAsh>()) {
   receiver_set_.set_disconnect_handler(base::BindRepeating(
       &CrosapiAsh::OnDisconnected, weak_factory_.GetWeakPtr()));
 }
