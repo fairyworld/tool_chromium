@@ -74,14 +74,18 @@ TEST_F(ActorToolFactoryTest, GetSupportedCapabilitiesWithDisabledTools) {
               testing::Contains(optimization_guide::proto::Action::kNavigate));
 }
 
-TEST_F(ActorToolFactoryTest, CreateToolUnsupported) {
+TEST_F(ActorToolFactoryTest, CreateTool_ToolsFeatureDisabled) {
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndDisableFeature(kActorTools);
+
   optimization_guide::proto::Action action;
+  action.mutable_click();
 
   base::expected<std::unique_ptr<ActorTool>, ToolExecutionResult> result =
       factory_->CreateTool(action);
 
   EXPECT_FALSE(result.has_value());
-  EXPECT_EQ(InternalToolErrorCode::kUnsupportedAction,
+  EXPECT_EQ(InternalToolErrorCode::kToolDisabledByFeature,
             result.error().internal_code().value());
 }
 

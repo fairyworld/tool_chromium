@@ -23,7 +23,8 @@ class ActorToolFactory {
   explicit ActorToolFactory(ProfileIOS* profile);
   virtual ~ActorToolFactory();
 
-  // Creates an ActorTool based on the provided action proto.
+  // Creates an ActorTool based on the provided action proto if it's not
+  // disabled by feature flag.
   //
   // This is virtual for testing.
   virtual base::expected<std::unique_ptr<ActorTool>, ToolExecutionResult>

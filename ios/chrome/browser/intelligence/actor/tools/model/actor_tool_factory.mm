@@ -24,6 +24,11 @@ ActorToolFactory::~ActorToolFactory() = default;
 
 base::expected<std::unique_ptr<ActorTool>, ToolExecutionResult>
 ActorToolFactory::CreateTool(const optimization_guide::proto::Action& action) {
+  if (IsToolDisabled(action.action_case())) {
+    return base::unexpected(
+        ToolExecutionResult(InternalToolErrorCode::kToolDisabledByFeature));
+  }
+
   // LINT.IfChange(CreateTool)
   switch (action.action_case()) {
     case optimization_guide::proto::Action::kNavigate:
