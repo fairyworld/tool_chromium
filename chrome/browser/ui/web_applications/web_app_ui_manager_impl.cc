@@ -23,6 +23,7 @@
 #include "base/metrics/user_metrics.h"
 #include "base/metrics/user_metrics_action.h"
 #include "base/one_shot_event.h"
+#include "base/strings/utf_string_conversions.h"
 #include "base/task/sequenced_task_runner.h"
 #include "base/types/pass_key.h"
 #include "build/build_config.h"
@@ -58,6 +59,7 @@
 #include "chrome/browser/user_education/user_education_service_factory.h"
 #include "chrome/browser/web_applications/link_capturing_features.h"
 #include "chrome/browser/web_applications/web_app_command_scheduler.h"
+#include "chrome/browser/web_applications/web_app_icon_generator.h"
 #include "chrome/browser/web_applications/web_app_icon_manager.h"
 #include "chrome/browser/web_applications/web_app_pref_guardrails.h"
 #include "chrome/browser/web_applications/web_app_provider.h"
@@ -819,6 +821,40 @@ void WebAppUiManagerImpl::OnIconsReadForUninstall(
     OnUninstallCancelled(std::move(complete_callback),
                          std::move(uninstall_scheduled_callback));
     return;
+  }
+
+  // If disk icon reading returned an empty map or missing base icon asset
+  // (`kIconSizeInDip` for the uninstall dialog view), fallback to generating
+  // monogram icons. This is needed to generate icons of larger sizes using the
+  // display scale factor on high-DPI screens.
+  //
+  // See `WebAppInfoImageSource::GetImageForScale()` for how this behavior
+  // works.
+  if (icon_metadata.icons_map.empty() ||
+      !icon_metadata.icons_map.contains(icon_size::k32)) {
+    WebAppProvider* provider = WebAppProvider::GetForWebApps(profile_);
+    CHECK(provider);
+    WebAppRegistrar& registrar = provider->registrar_unsafe();
+
+    // If the app was unregistered asynchronously during icon reading, we cannot
+    // construct fallback icons or display the dialog. Cancel uninstallation.
+    if (!registrar.GetInstallState(app_id)) {
+      OnUninstallCancelled(std::move(complete_callback),
+                           std::move(uninstall_scheduled_callback));
+      return;
+    }
+
+    std::string name_to_use_for_icon = registrar.GetAppShortName(app_id);
+    if (name_to_use_for_icon.empty()) {
+      name_to_use_for_icon = registrar.GetAppStartUrl(app_id).spec();
+    }
+
+    for (const auto& [size, bitmap] :
+         GenerateIcons(base::UTF8ToUTF16(name_to_use_for_icon))) {
+      if (!icon_metadata.icons_map.contains(size)) {
+        icon_metadata.icons_map[size] = bitmap;
+      }
+    }
   }
 
   ShowWebAppUninstallDialog(
