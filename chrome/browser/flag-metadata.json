@@ -1669,7 +1669,7 @@
   {
     "name": "chrome-item-picker-ui",
     "owners": [ "haileywang@google.com", "ssid@chromium.org" ],
-    "expiry_milestone": 150
+    "expiry_milestone": 160
   },
 
   {
