@@ -258,8 +258,8 @@ id<GREYMatcher> LanguageEntryDeleteButton() {
   [[EarlGrey selectElementWithMatcher:SearchBar()] performAction:grey_tap()];
 
   // Verify the scrim is visible when search bar is focused but not typed in.
-  [ChromeEarlGrey
-      waitForSufficientlyVisibleElementWithMatcher:SearchBarScrim()];
+  [[EarlGrey selectElementWithMatcher:SearchBarScrim()]
+      assertWithMatcher:grey_minimumVisiblePercent(0.5)];
 
   // Verify the cancel button is visible and unfocuses search bar when tapped.
   [ChromeEarlGreyUI clearAndDismissSearchBar];
