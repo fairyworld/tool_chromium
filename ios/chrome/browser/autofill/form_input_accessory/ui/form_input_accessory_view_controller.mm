@@ -410,18 +410,8 @@ UIImage* GetManualFillSymbol() {
   BOOL isTabletFormFactor =
       ui::GetDeviceFormFactor() == ui::DEVICE_FORM_FACTOR_TABLET;
 
-  UIImage* closeButtonSymbol = nil;
-  // When using liquid glass (on iOS 26+), the close button symbol uses the
-  // default checkmark symbol with the exception that a two-bubble experiment
-  // can supply a parameter to use the keyboard down symbol.
-  bool useKeyboardDownSymbol =
-      !IsLiquidGlassEffectEnabled() ||
-      (IsIOSKeyboardAccessoryTwoBubbleEnabled() &&
-       kIOSKeyboardAccessoryTwoBubbleKeyboardIconParam.Get());
-  if (useKeyboardDownSymbol) {
-    closeButtonSymbol =
-        DefaultSymbolWithPointSize(kKeyboardDownSymbol, kSymbolActionPointSize);
-  }
+  UIImage* closeButtonSymbol =
+      DefaultSymbolWithPointSize(kKeyboardDownSymbol, kSymbolActionPointSize);
 
   [formInputAccessoryView
             setUpWithLeadingView:self.leadingView
@@ -434,7 +424,6 @@ UIImage* GetManualFillSymbol() {
          addressManualFillSymbol:CustomSymbolWithPointSize(
                                      kLocationSymbol, kSymbolActionPointSize)
                closeButtonSymbol:closeButtonSymbol
-                splitViewEnabled:IsIOSKeyboardAccessoryTwoBubbleEnabled()
               isTabletFormFactor:isTabletFormFactor];
   [formInputAccessoryView setIsCompact:[self isCompact]];
 

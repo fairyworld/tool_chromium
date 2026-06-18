@@ -244,20 +244,6 @@ const FeatureEntry::FeatureVariation
          kEnableFuseboxKeyboardAccessoryOnlyFeaturesParam, nullptr},
         {"C) enable both", kEnableFuseboxKeyboardAccessoryBothParam, nullptr}};
 
-const FeatureEntry::FeatureParam
-    kIOSKeyboardAccessoryTwoBubbleWithKeyboardIcon[] = {
-        {kIOSKeyboardAccessoryTwoBubbleKeyboardIconParamName, "true"}};
-
-const FeatureEntry::FeatureParam
-    kIOSKeyboardAccessoryTwoBubbleWithCheckmarkIcon[] = {
-        {kIOSKeyboardAccessoryTwoBubbleKeyboardIconParamName, "false"}};
-
-const FeatureEntry::FeatureVariation
-    kIOSKeyboardAccessoryTwoBubbleVariations[] = {
-        {"With Keyboard Icon", kIOSKeyboardAccessoryTwoBubbleWithKeyboardIcon,
-         nullptr},
-        {"With Checkmark Icon", kIOSKeyboardAccessoryTwoBubbleWithCheckmarkIcon,
-         nullptr}};
 
 const FeatureEntry::FeatureParam kOmniboxUIMaxAutocompleteMatches3[] = {
     {OmniboxFieldTrial::kUIMaxAutocompleteMatchesParam, "3"}};
@@ -1575,13 +1561,6 @@ constexpr auto kFeatureEntries = std::to_array<flags_ui::FeatureEntry>({
      flag_descriptions::kIOSKeyboardAccessoryDefaultViewName,
      flag_descriptions::kIOSKeyboardAccessoryDefaultViewDescription,
      flags_ui::kOsIos, FEATURE_VALUE_TYPE(kIOSKeyboardAccessoryDefaultView)},
-    {"ios-keyboard-accessory-two-bubble",
-     flag_descriptions::kIOSKeyboardAccessoryTwoBubbleName,
-     flag_descriptions::kIOSKeyboardAccessoryTwoBubbleDescription,
-     flags_ui::kOsIos,
-     FEATURE_WITH_PARAMS_VALUE_TYPE(kIOSKeyboardAccessoryTwoBubble,
-                                    kIOSKeyboardAccessoryTwoBubbleVariations,
-                                    "IOSKeyboardAccessoryTwoBubble")},
     {"ios-magic-stack-segmentation-ranking",
      flag_descriptions::kSegmentationPlatformIosModuleRankerName,
      flag_descriptions::kSegmentationPlatformIosModuleRankerDescription,

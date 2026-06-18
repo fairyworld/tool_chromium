@@ -999,12 +999,6 @@ inline constexpr char kIOSKeyboardAccessoryDefaultViewDescription[] =
     "When enabled, a default Keyboard Accessory view with navigation buttons "
     "is provided for a <select> HTML element.";
 
-inline constexpr char kIOSKeyboardAccessoryTwoBubbleName[] =
-    "Enable the two-bubble design for the Keyboard Accessory view";
-inline constexpr char kIOSKeyboardAccessoryTwoBubbleDescription[] =
-    "When enabled, the two-bubble design is used for the Keyboard Accessory "
-    "view.";
-
 inline constexpr char kIOSLevelUpName[] = "Level Up";
 inline constexpr char kIOSLevelUpDescription[] =
     "Enables the 'Level Up' feature on iOS.";
