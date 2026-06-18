@@ -199,7 +199,8 @@ std::unique_ptr<VideoBitstream> VideoBitstream::Create(
 
 base::span<const uint8_t> VideoBitstream::Data() const {
   CHECK(memory_mapped_file_ && memory_mapped_file_->IsValid());
-  return memory_mapped_file_->bytes();
+  return UNSAFE_TODO(base::span<const uint8_t>(memory_mapped_file_->data(),
+                                               memory_mapped_file_->length()));
 }
 // static
 base::FilePath VideoBitstream::test_data_path_;

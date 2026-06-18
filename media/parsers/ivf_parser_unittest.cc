@@ -50,7 +50,7 @@ TEST(IvfParserTest, StreamFileParsing) {
       EXPECT_EQ(0u, uint64_t{frame_header.timestamp});
       EXPECT_EQ(
           static_cast<ptrdiff_t>(sizeof(file_header) + sizeof(frame_header)),
-          bytes.data() - stream.bytes().data());
+          bytes.data() - stream.data());
     }
   }
 

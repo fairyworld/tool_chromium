@@ -516,11 +516,12 @@ VideoCodecProfile H264Parser::ProfileIDCToVideoCodecProfile(int profile_idc) {
 }
 
 // static
-bool H264Parser::ParseNALUs(base::span<const uint8_t> stream,
+bool H264Parser::ParseNALUs(const uint8_t* stream,
+                            size_t stream_size,
                             std::vector<H264NALU>* nalus) {
   DCHECK(nalus);
   H264Parser parser;
-  parser.SetStream(stream);
+  parser.SetStream(UNSAFE_TODO(base::span(stream, stream_size)));
 
   while (true) {
     H264NALU nalu;

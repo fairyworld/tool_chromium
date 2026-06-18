@@ -52,7 +52,7 @@ std::vector<EsParserTestBase::Packet> EsParserTestBase::LoadPacketsFromFiles(
 
     Packet packet;
     packet.offset = stream_.size();
-    packet.size = stream.bytes().size();
+    packet.size = stream.length();
 
     base::Extend(stream_, stream.bytes());
     packets.push_back(packet);
