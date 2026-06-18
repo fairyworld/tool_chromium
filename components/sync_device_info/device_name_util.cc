@@ -60,16 +60,13 @@ std::string CapitalizeWords(const std::string& sentence) {
   return capitalized_sentence;
 }
 
-}  // namespace
+bool IsClientNameHighQuality(const DeviceInfo* device) {
+  const std::string model = device->model_name();
+  const std::string client_name = device->client_name();
 
-DisplayNameCandidates GetDisplayNameCandidates(const DeviceInfo* device) {
-  TRACE_EVENT0("sync", "syncer::GetDisplayNameCandidates");
-  DCHECK(device);
-  std::string model = device->model_name();
-  std::string client_name = device->client_name();
-
-  bool client_name_is_high_quality =
-      !client_name.empty() && client_name != model;
+  if (client_name.empty() || client_name == model) {
+    return false;
+  }
 
   // On iOS 16+, the default client name is "iPhone" or "iPad". It is not a
   // high-quality name, so we shouldn't treat it as a custom name.
@@ -77,9 +74,18 @@ DisplayNameCandidates GetDisplayNameCandidates(const DeviceInfo* device) {
   // https://developer.apple.com/documentation/uikit/uidevice/name#Discussion
   if (device->os_type() == DeviceInfo::OsType::kIOS) {
     if (client_name == "iPhone" || client_name == "iPad") {
-      client_name_is_high_quality = false;
+      return false;
     }
   }
+
+  return true;
+}
+
+}  // namespace
+
+DisplayNameCandidates GetDisplayNameCandidates(const DeviceInfo* device) {
+  TRACE_EVENT0("sync", "syncer::GetDisplayNameCandidates");
+  DCHECK(device);
 
   if (device->server_determined_model_name().has_value() &&
       !device->server_determined_model_name()->empty() &&
@@ -101,11 +107,14 @@ DisplayNameCandidates GetDisplayNameCandidates(const DeviceInfo* device) {
             .fallback_full_name = preferred_name};
   }
 
+  const std::string model = device->model_name();
+  const bool client_name_is_high_quality = IsClientNameHighQuality(device);
+
   // 1. Skip renaming for M78- devices where HardwareInfo is not available.
   // 2. Skip renaming if client_name is high quality.
   if (model.empty() || client_name_is_high_quality) {
-    return {.preferred_name_if_unique = client_name,
-            .fallback_full_name = client_name};
+    return {.preferred_name_if_unique = device->client_name(),
+            .fallback_full_name = device->client_name()};
   }
 
   std::string manufacturer = CapitalizeWords(device->manufacturer_name());
