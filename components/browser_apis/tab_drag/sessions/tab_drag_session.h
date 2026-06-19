@@ -5,13 +5,13 @@
 #ifndef COMPONENTS_BROWSER_APIS_TAB_DRAG_SESSIONS_TAB_DRAG_SESSION_H_
 #define COMPONENTS_BROWSER_APIS_TAB_DRAG_SESSIONS_TAB_DRAG_SESSION_H_
 
-#include <memory>
 #include <vector>
 
 #include "base/functional/callback.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/raw_ref.h"
 #include "base/types/expected.h"
+#include "components/browser_apis/tab_drag/adapters/tab_drag_window_adapter.h"
 #include "components/browser_apis/tab_strip/types/node_id.h"
 #include "mojo/public/mojom/base/error.mojom-forward.h"
 #include "ui/gfx/geometry/point.h"
@@ -19,12 +19,12 @@
 
 namespace tabs_api {
 
-class TabDragWindowAdapter;
 class TabDragSessionInjector;
+class TabDragWindowRegistry;
 struct TabDragInputEvent;
 
 struct TabDragSessionParams {
-  raw_ptr<TabDragWindowAdapter> source_window = nullptr;
+  TabDragWindowId source_window_id;
   std::vector<tabs_api::NodeId> source_tab_ids;
   gfx::Point start_point;
   base::OnceClosure end_callback;
@@ -45,7 +45,7 @@ class TabDragSession {
 
   // Updates the window hosting the drag session and transfers input capture
   // to it.
-  void UpdateDraggedWindow(TabDragWindowAdapter* new_window);
+  void UpdateDraggedWindow(TabDragWindowId new_window_id);
 
   const gfx::Point& start_point_in_screen() const {
     return start_point_in_screen_;
@@ -80,7 +80,8 @@ class TabDragSession {
   const gfx::Point start_point_in_screen_;
   gfx::Point last_mouse_screen_point_;
   gfx::Vector2d delta_;
-  raw_ptr<TabDragWindowAdapter> dragged_window_ = nullptr;
+  TabDragWindowId dragged_window_;
+  TabDragWindowRegistry* registry() const;
   DragMode drag_mode_ = DragMode::kAttachedToWindow;
 };
 
