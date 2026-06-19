@@ -1572,7 +1572,7 @@ public class TabListMediator implements TabListNotificationHandler {
                         swipeSafeTabActionListener,
                         mTabGridDialogHandler,
                         TabUiMetricsHelper.getComponentNameForMetrics(componentId),
-                        mLayoutType != TabListLayoutType.FLAT,
+                        mLayoutType,
                         onDragStateChangedListener);
     }
 
