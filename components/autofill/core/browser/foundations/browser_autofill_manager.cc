@@ -2664,10 +2664,6 @@ void BrowserAutofillManager::OnDidEndTextFieldEditingImpl() {
   // which ends editing.
 }
 
-const FormData& BrowserAutofillManager::last_query_form() const {
-  return external_delegate_->query_form();
-}
-
 bool BrowserAutofillManager::ShouldUploadForm(const FormStructure& form) {
   return client().IsAutofillEnabled() && !client().IsOffTheRecord() &&
          ShouldBeUploaded(form);

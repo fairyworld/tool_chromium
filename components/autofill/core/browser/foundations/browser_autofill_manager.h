@@ -316,9 +316,6 @@ class BrowserAutofillManager : public AutofillManager {
                                            const FormGlobalId& form_id,
                                            const FieldGlobalId& field_id);
 
-  // Returns the last form the autofill manager considered in this frame.
-  virtual const FormData& last_query_form() const;
-
   // Reports whether a document collects phone numbers, uses one time code, uses
   // WebOTP. There are cases that the reporting is not expected:
   //   1. some unit tests do not set necessary members,

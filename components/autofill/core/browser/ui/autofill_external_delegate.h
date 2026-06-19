@@ -131,8 +131,6 @@ class AutofillExternalDelegate : public AutofillSuggestionDelegate {
   // used to help record the metrics of when a new popup is shown.
   void DidEndTextFieldEditing();
 
-  const FormData& query_form() const { return query_form_; }
-
   void AttemptToDisplayAutofillSuggestionsForTest(
       std::vector<Suggestion> suggestions,
       AutofillSuggestionTriggerSource trigger_source,
@@ -261,8 +259,8 @@ class AutofillExternalDelegate : public AutofillSuggestionDelegate {
 
   const raw_ref<BrowserAutofillManager> manager_;
 
-  // The form last queried by Autofill.
-  FormData query_form_;
+  // The ID of the form last queried by Autofill.
+  FormGlobalId query_form_id_;
 
   // Information about the field last queried by Autofill.
   FieldGlobalId query_field_id_;
