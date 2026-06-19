@@ -1249,7 +1249,6 @@ if (is_android) {
       "//chrome/browser/glic/android:java",
       "//chrome/browser/glic/android:jni_headers_java",
       "//chrome/browser/tab_group_suggestion:toolbar_java",
-      "//chrome/browser/ui/android/extensions:buildflags_java",
       "//chrome/browser/ui/android/extensions:java",
       "//chrome/browser/ui/android/lens:java",
       "//chrome/browser/ui/android/overlay_panel:java",
@@ -1257,6 +1256,7 @@ if (is_android) {
       "//chrome/browser/ui/android/toolbar:optional_button_java",
       "//components/browser_ui/accessibility/android:page_zoom_utils_java",
       "//components/supervised_user/android:content_filters_observer_bridge_java",
+      "//extensions/buildflags:buildflags_java",
     ]
   }
 

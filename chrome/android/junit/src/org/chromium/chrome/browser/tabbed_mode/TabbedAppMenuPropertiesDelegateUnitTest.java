@@ -140,7 +140,6 @@ import org.chromium.chrome.browser.ui.appmenu.AppMenuItemWithSubmenuProperties;
 import org.chromium.chrome.browser.ui.appmenu.AppMenuRecentEntryItemProperties;
 import org.chromium.chrome.browser.ui.appmenu.AppMenuTabItemProperties;
 import org.chromium.chrome.browser.ui.default_browser_promo.DefaultBrowserPromoUtils;
-import org.chromium.chrome.browser.ui.extensions.ExtensionsBuildflags;
 import org.chromium.chrome.browser.ui.extensions.FakeExtensionUiBackendRule;
 import org.chromium.chrome.browser.ui.favicon.FaviconHelper;
 import org.chromium.chrome.browser.ui.favicon.FaviconHelperJni;
@@ -161,6 +160,7 @@ import org.chromium.components.commerce.core.CommerceFeatureUtilsJni;
 import org.chromium.components.commerce.core.ShoppingService;
 import org.chromium.components.content_settings.ContentSetting;
 import org.chromium.components.dom_distiller.core.DomDistillerUrlUtilsJni;
+import org.chromium.components.extensions.ExtensionsBuildflags;
 import org.chromium.components.favicon.LargeIconBridge;
 import org.chromium.components.favicon.LargeIconBridgeJni;
 import org.chromium.components.power_bookmarks.PowerBookmarkMeta;
@@ -735,7 +735,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                                 item(R.id.bookmark_folder_menu_id, item(0))),
                                         item(R.id.bookmark_folder_menu_id, item(0)))));
 
-        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(
                     item(
                             R.id.extensions_parent_menu_id,
@@ -795,7 +795,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.all_bookmarks_menu_id),
                                 item(R.id.recent_tabs_menu_id)));
 
-        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(item(R.id.extensions_menu_menu_id));
         }
 
@@ -868,7 +868,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                                 item(R.id.bookmark_folder_menu_id, item(0))),
                                         item(R.id.bookmark_folder_menu_id, item(0)))));
 
-        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(
                     item(
                             R.id.extensions_parent_menu_id,
@@ -942,7 +942,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.all_bookmarks_menu_id),
                                 item(R.id.recent_tabs_menu_id)));
 
-        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(item(R.id.extensions_menu_menu_id));
         }
 
@@ -1068,7 +1068,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         item(R.string.menu_mobile_bookmarks, item("Partner bookmarks", item(0))),
                         item(R.string.menu_other_bookmarks, item(0))));
 
-        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(
                     item(
                             R.id.extensions_parent_menu_id,
@@ -1290,7 +1290,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         expectedItems.add(item(R.id.recent_tabs_menu_id));
         expectedTitles.add(item(R.string.menu_recent_tabs));
 
-        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(item(R.id.extensions_menu_menu_id));
             expectedTitles.add(item(R.string.menu_extensions_menu));
         }
@@ -1447,7 +1447,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         item(R.string.menu_mobile_bookmarks, item("Partner bookmarks", item(0))),
                         item(R.string.menu_other_bookmarks, item(0))));
 
-        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(
                     item(
                             R.id.extensions_parent_menu_id,
@@ -1651,7 +1651,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         expectedItems.add(item(R.id.all_bookmarks_menu_id));
         expectedTitles.add(item(R.string.menu_bookmarks));
 
-        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(item(R.id.extensions_menu_menu_id));
             expectedTitles.add(item(R.string.menu_extensions_menu));
         }
@@ -1819,7 +1819,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         item(R.string.menu_mobile_bookmarks, item("Partner bookmarks", item(0))),
                         item(R.string.menu_other_bookmarks, item(0))));
 
-        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(
                     item(
                             R.id.extensions_parent_menu_id,
@@ -1995,7 +1995,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                                 item(R.id.bookmark_folder_menu_id, item(0))),
                                         item(R.id.bookmark_folder_menu_id, item(0)))));
 
-        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(
                     item(
                             R.id.extensions_parent_menu_id,
@@ -2102,7 +2102,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                                 item(R.id.bookmark_folder_menu_id, item(0))),
                                         item(R.id.bookmark_folder_menu_id, item(0)))));
 
-        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(
                     item(
                             R.id.extensions_parent_menu_id,
@@ -2435,7 +2435,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.all_bookmarks_menu_id),
                                 item(R.id.recent_tabs_menu_id)));
 
-        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(item(R.id.extensions_menu_menu_id));
         }
 
@@ -2554,7 +2554,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                                 item(R.id.bookmark_folder_menu_id, item(0))),
                                         item(R.id.bookmark_folder_menu_id, item(0)))));
 
-        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(
                     item(
                             R.id.extensions_parent_menu_id,
@@ -2694,7 +2694,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                                 item(R.id.bookmark_folder_menu_id, item(0))),
                                         item(R.id.bookmark_folder_menu_id, item(0)))));
 
-        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(
                     item(
                             R.id.extensions_parent_menu_id,
@@ -3737,7 +3737,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
     @Test
     @Config(qualifiers = "sw320dp")
     public void testPageMenuItems_ExtensionsSubmenu() {
-        if (!ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+        if (!ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             return;
         }
 
@@ -3778,7 +3778,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
     @Config(qualifiers = "sw320dp")
     @DisableFeatures({ChromeFeatureList.SUBMENUS_IN_APP_MENU})
     public void testPageMenuItems_ExtensionsItem_SubmenusDisabled() {
-        if (!ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
+        if (!ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             return;
         }
 
