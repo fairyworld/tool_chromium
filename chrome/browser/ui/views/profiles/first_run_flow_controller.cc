@@ -550,9 +550,11 @@ class FinishOrContinueStepController : public ProfileManagementStepController {
   FinishOrContinueStepController(
       ProfilePickerWebContentsHost* host,
       base::OnceCallback<bool()> eligibility_callback,
+      base::RepeatingCallback<bool()> query_effects_callback,
       base::OnceClosure step_completed_callback)
       : ProfileManagementStepController(host),
         eligibility_callback_(std::move(eligibility_callback)),
+        query_effects_callback_(std::move(query_effects_callback)),
         step_completed_callback_(std::move(step_completed_callback)) {}
 
   ~FinishOrContinueStepController() override = default;
@@ -579,10 +581,15 @@ class FinishOrContinueStepController : public ProfileManagementStepController {
     NOTREACHED();
   }
 
+  void ToggleMediaEffects(bool active) override {
+    UpdateAnimationsState(active);
+  }
+
  private:
   void OnLoadFinished() {
     CHECK(!step_shown_callback_->is_null());
     std::move(step_shown_callback_.value()).Run(/*success=*/true);
+    UpdateAnimationsState();
     // TODO(crbug.com/516392211): Remove once button actions are implemented.
     OnStepCompleted();
   }
@@ -592,7 +599,23 @@ class FinishOrContinueStepController : public ProfileManagementStepController {
     std::move(step_completed_callback_).Run();
   }
 
+  void UpdateAnimationsState() {
+    UpdateAnimationsState(query_effects_callback_.Run());
+  }
+
+  void UpdateAnimationsState(bool active) {
+    auto* intro_ui = host()
+                         ->GetPickerContents()
+                         ->GetWebUI()
+                         ->GetController()
+                         ->GetAs<IntroUI>();
+    if (intro_ui) {
+      intro_ui->ToggleAnimations(active);
+    }
+  }
+
   base::OnceCallback<bool()> eligibility_callback_;
+  const base::RepeatingCallback<bool()> query_effects_callback_;
   base::OnceClosure step_completed_callback_;
   StepSwitchFinishedCallback step_shown_callback_;
   base::WeakPtrFactory<FinishOrContinueStepController> weak_ptr_factory_{this};
@@ -726,9 +749,10 @@ std::unique_ptr<ProfileManagementStepController> CreateFeatureShowcaseStep(
 std::unique_ptr<ProfileManagementStepController> CreateFinishOrContinueStep(
     ProfilePickerWebContentsHost* host,
     base::OnceCallback<bool()> eligibility_callback,
+    base::RepeatingCallback<bool()> query_effects_callback,
     base::OnceClosure step_completed_callback) {
   return std::make_unique<FinishOrContinueStepController>(
-      host, std::move(eligibility_callback),
+      host, std::move(eligibility_callback), std::move(query_effects_callback),
       std::move(step_completed_callback));
 }
 
@@ -1061,6 +1085,10 @@ FirstRunFlowController::RegisterPostIdentitySteps(
                            // guaranteed to have the same lifetime as the
                            // flow controller
                            base::Unretained(feature_showcase_step_ptr)),
+            base::BindRepeating(&FirstRunFlowController::AreEffectsEnabled,
+                                // Unretained ok: the callback is passed to a
+                                // step that `this` will own and outlive.
+                                base::Unretained(this)),
             std::move(finish_or_continue_step_completed)));
     post_identity_steps.emplace(
         ProfileManagementFlowController::Step::kFinishOrContinue);
