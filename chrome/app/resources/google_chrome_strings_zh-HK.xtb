@@ -62,6 +62,17 @@
 <translation id="1587223624401073077">Google Chrome 正在使用您的相機。</translation>
 <translation id="1587325591171447154"><ph name="FILE_NAME" /> 不安全，因此 Chrome 已封鎖此檔案。</translation>
 <translation id="1597911401261118146">如要檢查密碼是否安全，且未受資料外洩或其他安全性問題影響，請<ph name="BEGIN_LINK" />登入 Chrome<ph name="END_LINK" />。</translation>
+<translation id="1619639070275605589">此操作將：
+          <ph name="LINE_BREAKS" />
+            • 重設起始網頁、新分頁、搜尋引擎和固定分頁
+            <ph name="LINE_BREAK" />
+            • 停用擴充程式
+            <ph name="LINE_BREAK" />
+            • 刪除 Cookie 和其他暫存網站資料
+            <ph name="LINE_BREAK" />
+            • 重設 Chrome 快速鍵
+            <ph name="LINE_BREAKS" />
+            書籤、記錄和已儲存的密碼並不會受到影響。</translation>
 <translation id="1619887657840448962">為鞏固 Chrome 的安全性，我們已將未列在 <ph name="IDS_EXTENSION_WEB_STORE_TITLE" /> 中的擴充功能停用，因為它們可能在您不知情的情況下加入瀏覽器。</translation>
 <translation id="1628000112320670027">取得 Chrome 相關說明</translation>
 <translation id="1640672724030957280">正在下載…</translation>
@@ -140,6 +151,7 @@
 <translation id="2472092250898121027">此擴充程式含有惡意軟件且不安全。請從 Chrome 中移除此擴充程式，令其無法再查看及變更您瀏覽的網站相關資料，包括您的個人資料。</translation>
 <translation id="2485422356828889247">解除安裝</translation>
 <translation id="2513154137948333830">必須重新啟動：<ph name="INSTALL_SUCCESS" /></translation>
+<translation id="2523492931736391680">Chrome 助你保障工作成果安全</translation>
 <translation id="2534365042754120737">為保護你的資料，請允許 Chrome 從你最近未瀏覽的網站移除權限。這不會停止通知。</translation>
 <translation id="2556847002339236023">您的機構會在 Chrome 閒置 <ph name="TIMEOUT_DURATION" />後將其關閉。瀏覽資料已刪除，當中可能包括記錄、自動填入資料和下載檔案。</translation>
 <translation id="2563121210305478421">要重新啟動 Chrome 嗎？</translation>
@@ -305,6 +317,7 @@
 <translation id="4149882025268051530">安裝程式無法解壓縮封存檔案，請再次下載 Google Chrome。</translation>
 <translation id="415112847282352845">如要在所有裝置上使用你的地址和其他資料，請登入 Chrome。登入後，此地址就會儲存至 Google 帳戶。</translation>
 <translation id="4153934450158521343">Chrome 即將關閉並刪除資料</translation>
+<translation id="4159985264221160808">為確保你在 Chrome 上的工作成果安全，你的機構將可查看或管理特定資料</translation>
 <translation id="4173512894976930765">網站可能會正常運作。關閉所有 Chrome 視窗後，系統會將你登出所有網站，但如果你已登入 Chrome，Google 帳戶就會維持登入狀態。</translation>
 <translation id="4175922240926474352">由於此網站未使用安全連線，且檔案可能已被篡改，因此 Chrome 已禁止下載</translation>
 <translation id="4191857738314598978">{0,plural, =1{請在 1 天內重新啟動 Chrome}other{請在 # 天內重新啟動 Chrome}}</translation>
@@ -695,6 +708,7 @@ Google Chrome 無法復原您的設定。</translation>
 <translation id="8064965390968184078">1. 點擊下方的 [<ph name="BUTTON_LABEL" />]
 2. 在 Windows 設定中點擊 [<ph name="BUTTON_2" />]
 3.在 Windows 通知中點擊 [<ph name="BUTTON_3" />] 以將 Chrome 固定至工作列，方便快速取用</translation>
+<translation id="8069447462453318634">選取 [固定至工具列]</translation>
 <translation id="8074398340364918139">如要搜尋特定 Chrome 功能或擴充程式，請在網址列中輸入捷徑，然後按下你選取的鍵盤按鍵</translation>
 <translation id="8077579734294125741">其他 Chrome 設定檔</translation>
 <translation id="8086881907087796310">由於你的電腦不符合最低硬件要求，因此安裝失敗。</translation>
@@ -780,6 +794,15 @@ Google Chrome 無法復原您的設定。</translation>
 <translation id="8922998289262614701">從 Chrome 移除此應用程式的資料</translation>
 <translation id="8925636929359899517">我們會使用有關資料改善服務，詳情請參閱《<ph name="BEGIN_LINK1" />私隱權政策<ph name="END_LINK1" />》和《<ph name="BEGIN_LINK2" />服務條款<ph name="END_LINK2" />》。</translation>
 <translation id="8936233353620149764">切換 Chrome 版 Gemini</translation>
+<translation id="8944232836376404813">此操作將：
+          <ph name="LINE_BREAKS" />
+            • 重設起始網頁、新分頁、搜尋引擎和固定分頁
+            <ph name="LINE_BREAK" />
+            • 停用擴充程式
+            <ph name="LINE_BREAK" />
+            • 刪除 Cookie 和其他暫存網站資料
+            <ph name="LINE_BREAKS" />
+            書籤、記錄和已儲存的密碼並不會受到影響。</translation>
 <translation id="8948460679427074738">此擴充程式尚未發佈私隱守則，例如擴充程式如何收集和使用資料。Chrome 建議你移除此擴充程式。</translation>
 <translation id="8958307504142971576">現可使用更多 Chrome 功能</translation>
 <translation id="8991530961471831170">開啟 Chrome 版 Gemini</translation>

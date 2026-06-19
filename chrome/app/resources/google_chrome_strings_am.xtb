@@ -62,6 +62,17 @@
 <translation id="1587223624401073077">Google Chrome ካሜራዎን እየተጠቀመ ነው።</translation>
 <translation id="1587325591171447154"><ph name="FILE_NAME" /> አደገኛ ነው፣ ስለዚህ Chrome አግዶታል።</translation>
 <translation id="1597911401261118146">የእርስዎ የይለፍ ቃላት ከውሂብ ጥሰቶች እና ሌሎች የደህንነት ችግሮች ነፃ መሆናቸውን ለማረጋገጥ <ph name="BEGIN_LINK" />በመለያ ወደ Chrome ይግቡ<ph name="END_LINK" />።</translation>
+<translation id="1619639070275605589">ይህ እርምጃ የሚከተሉትን ያደርጋል፦
+          <ph name="LINE_BREAKS" />
+            • የእርስዎን የመነሻ ገጽ፣ አዲስ የትር ገጽ፣ የፍለጋ ፕሮግራም እና ፒን የተደረጉ ትሮችን ዳግም ያስጀምራል
+            <ph name="LINE_BREAK" />
+            • ቅጥያዎችን ያሰናክላል
+            <ph name="LINE_BREAK" />
+            • ኩኪዎችን እና ሌሎች ጊዜያዊ የጣቢያ ውሂብን ይሰርዛል
+            <ph name="LINE_BREAK" />
+            • የChrome አቋራጮችን ዳግም ያስጀምራል
+            <ph name="LINE_BREAKS" />
+            ዕልባቶች፣ ታሪክ እና የተቀመጡ የይለፍ ቃላት አይነኩም።</translation>
 <translation id="1619887657840448962">Chromeን ይበልጥ ደህንነቱ የተጠበቀ እንዲሆን ለማድረግ፣ በ<ph name="IDS_EXTENSION_WEB_STORE_TITLE" /> ውስጥ ያልተዘረዘረውን የሚከተለውን ቅጥያ አሰናክለነዋል እና እርስዎ ሳያውቁት የታከለ ሊሆን ይችላል።</translation>
 <translation id="1628000112320670027">Chrome ላይ እገዛ ያግኙ</translation>
 <translation id="1640672724030957280">በማውረድ ላይ...</translation>
@@ -140,6 +151,7 @@
 <translation id="2472092250898121027">ይህ ቅጥያ ተንኮል አዘል ዌርን ይዟል እና ደህንነቱ የተጠበቀ አይደለም። የግል መረጃዎን ጨምሮ ከእንግዲህ እርስዎ በሚጎበኟቸው ጣቢያዎች ላይ ያለውን ውሂብዎን ማየት እና መለወጥ እንዳይችል ከChrome ያስወግዱት።</translation>
 <translation id="2485422356828889247">አራግፍ</translation>
 <translation id="2513154137948333830">ዳግም ማስነሳት ያስፈልጋል፦ <ph name="INSTALL_SUCCESS" /></translation>
+<translation id="2523492931736391680">ሥራዎ በChrome ላይ ደኅንነቱ የተጠበቀ ነው</translation>
 <translation id="2534365042754120737">ውሂብዎን ለመጠበቅ Chrome እርስዎ በቅርቡ ካልጎበኟቸው ጣቢያዎች ፈቃዶችን እንዲያስወግድ ይፍቀዱ። ማሳወቂያዎችን አያቆምም።</translation>
 <translation id="2556847002339236023">ድርጅትዎ Chrome ለ<ph name="TIMEOUT_DURATION" /> ያህል ሥራ ላይ ሳይውል ይዘጋዋል። የአሰሳ ውሂብ ተሰርዟል። ይህ ታሪክን፣ ራስ-ሙላን እና ውርዶችን ሊያካትት ይችላል።</translation>
 <translation id="2563121210305478421">Chrome ዳግም ይጀመር?</translation>
@@ -306,6 +318,7 @@
 <translation id="4149882025268051530">ጫኝው መዝገብ ለመበተን አልቻለም። እባክዎ Google Chromeን እንደገና ያውርዱ።</translation>
 <translation id="415112847282352845">የእርስዎን አድራሻዎች እና ሌሎችንም በሁሉም መሣሪያዎችዎ ላይ ለማግኘት ወደ Chrome በመለያ ይግቡ። በመለያ ከገቡ በኋላ ይህ አድራሻ Google መለያዎ ውስጥ ይቀመጣል።</translation>
 <translation id="4153934450158521343">Chrome በቅርቡ ይዘጋል እና ውሂብ ይሰርዛል</translation>
+<translation id="4159985264221160808">በChrome ላይ ሥራዎን ደኅንነት ለመጠበቅ ድርጅትዎ የተወሰነ መረጃን ማየት ወይም ማስተዳደር ይችላል</translation>
 <translation id="4173512894976930765">ጣቢያዎች እንደተጠበቀው መስራታቸው አይቀርም። ሁሉንም የChromium መስኮቶች ሲዘጉ ከአብዛኞቹ ጣቢያዎች ይወጣሉ፣ ከGoogle መለያዎ በስተቀር በChromium ውስጥ ገብተው ከሆነ።</translation>
 <translation id="4175922240926474352">ጣቢያው ደህንነቱ የተጠበቀ ግንኙነት እየተጠቀመ ስላልሆነ እና ፋይሉ ተነካክቶ ሊሆን ስለሚችል Chrome ይህን ውርድ አግዷል</translation>
 <translation id="4191857738314598978">{0,plural, =1{በአንድ ቀን ውስጥ Chromeን ዳግም አስጀምር}one{በ# ቀኖች ውስጥ Chromeን ዳግም አስጀምር}other{በ# ቀኖች ውስጥ Chromeን ዳግም አስጀምር}}</translation>
@@ -696,6 +709,7 @@ Google Chrome ቅንጅቶችዎን ማስመለስ አልቻለም።</translat
 <translation id="8064965390968184078">1. ከታች <ph name="BUTTON_LABEL" /> ላይ ጠቅ ያድርጉ
 2. በWindows ቅንብሮችዎ ውስጥ <ph name="BUTTON_2" /> ላይ ጠቅ ያድርጉ
 3. ለፈጣን መዳረሻ Chromeን በተግባር አሞሌዎ ላይ ለመሰካት በWindows ማሳወቂያ ውስጥ <ph name="BUTTON_3" /> ላይ ጠቅ ያድርጉ</translation>
+<translation id="8069447462453318634">«ወደ የመሣሪያ አሞሌ ሰካ» የሚለውን ይምረጡ</translation>
 <translation id="8074398340364918139">አንድን የተወሰነ የChrome ባህሪ ወይም ቅጥያ ለመፈለግ የእርስዎን የተመረጠ የቁልፍ ሰሌዳ ቁልፍ በማስከተል በአድራሻ አሞሌው ውስጥ አቋራጩን ይተይቡ</translation>
 <translation id="8077579734294125741">ሌሎች የChrome መገለጫዎች</translation>
 <translation id="8086881907087796310">ኮምፒውተርዎ አነስተኛውን የሃርድዌር መስፈርቶች ስላላሟላ መጫኑ አልተሳካም።</translation>
@@ -781,6 +795,15 @@ Google Chrome ቅንጅቶችዎን ማስመለስ አልቻለም።</translat
 <translation id="8922998289262614701">የዚህን መተግበሪያ ውሂብ ከChrome ላይ ያስወግዱ</translation>
 <translation id="8925636929359899517">ይህን አገልግሎት ለማሻሻል መረጃ እንጠቀማለን። <ph name="BEGIN_LINK1" />የግላዊነት መመሪያን<ph name="END_LINK1" /> እና <ph name="BEGIN_LINK2" />የአገልግሎት ውልን<ph name="END_LINK2" /> ይመልከቱ።</translation>
 <translation id="8936233353620149764">Gemini በChrome ውስጥ ቀያይር</translation>
+<translation id="8944232836376404813">ይህ እርምጃ የሚከተሉትን ያደርጋል፦
+          <ph name="LINE_BREAKS" />
+            • የእርስዎን የመነሻ ገጽ፣ አዲስ የትር ገጽ፣ የፍለጋ ፕሮግራም እና ፒን የተደረጉ ትሮችን ዳግም ያስጀምራል
+            <ph name="LINE_BREAK" />
+            • ቅጥያዎችን ያሰናክላል
+            <ph name="LINE_BREAK" />
+            • ኩኪዎችን እና ሌሎች ጊዜያዊ የጣቢያ ውሂብን ይሰርዛል
+            <ph name="LINE_BREAKS" />
+            ዕልባቶች፣ ታሪክ እና የተቀመጡ የይለፍ ቃላት አይነኩም።</translation>
 <translation id="8948460679427074738">ይህ ቅጥያ እንደ ውሂብን እንዴት እንደሚሰበስብ እና እንደሚጠቀም ያሉ የግላዊነት ተግባሮችን አላተመም። Chrome እንዲያስወግዱት ይመክራል።</translation>
 <translation id="8958307504142971576">አሁን Chrome ውስጥ የሚገኙ ተጨማሪ ባህሪያት አሉዎት</translation>
 <translation id="8991530961471831170">Gemini በChrome ውስጥ ክፈት</translation>

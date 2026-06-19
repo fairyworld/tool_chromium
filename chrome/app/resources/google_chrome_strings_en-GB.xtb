@@ -62,6 +62,17 @@ Some features may be unavailable and changes to preferences won't be saved.</tra
 <translation id="1587223624401073077">Google Chrome is using your camera.</translation>
 <translation id="1587325591171447154"><ph name="FILE_NAME" /> is dangerous, so Chrome has blocked it.</translation>
 <translation id="1597911401261118146">To check if your passwords are safe from data breaches and other security issues, <ph name="BEGIN_LINK" />sign in to Chrome<ph name="END_LINK" />.</translation>
+<translation id="1619639070275605589">This action will:
+          <ph name="LINE_BREAKS" />
+            • Reset your startup page, new tab page, search engine and pinned tabs
+            <ph name="LINE_BREAK" />
+            • Disable extensions
+            <ph name="LINE_BREAK" />
+            • Delete cookies and other temporary site data
+            <ph name="LINE_BREAK" />
+            • Reset Chrome shortcuts
+            <ph name="LINE_BREAKS" />
+            Bookmarks, history and saved passwords won't be affected.</translation>
 <translation id="1619887657840448962">To make Chrome safer, we disabled the following extension that isn't listed in the <ph name="IDS_EXTENSION_WEB_STORE_TITLE" /> and may have been added without your knowledge.</translation>
 <translation id="1628000112320670027">Get help with Chrome</translation>
 <translation id="1640672724030957280">Downloading ...</translation>
@@ -781,6 +792,15 @@ New bookmarks can't be saved in your account until you delete some. If you sign 
 <translation id="8922998289262614701">Remove this app's data from Chrome</translation>
 <translation id="8925636929359899517">We use info to improve this service. See <ph name="BEGIN_LINK1" />Privacy Policy<ph name="END_LINK1" /> and <ph name="BEGIN_LINK2" />Terms of Service<ph name="END_LINK2" />.</translation>
 <translation id="8936233353620149764">Toggle Gemini in Chrome</translation>
+<translation id="8944232836376404813">This action will:
+          <ph name="LINE_BREAKS" />
+            • Reset your startup page, new tab page, search engine and pinned tabs
+            <ph name="LINE_BREAK" />
+            • Disable extensions
+            <ph name="LINE_BREAK" />
+            • Delete cookies and other temporary site data
+            <ph name="LINE_BREAKS" />
+            Bookmarks, history and saved passwords won't be affected.</translation>
 <translation id="8948460679427074738">This extension hasn't published privacy practices, such as how it collects and uses data. Chrome recommends that you remove it.</translation>
 <translation id="8958307504142971576">You now have more features available in Chrome</translation>
 <translation id="8991530961471831170">Open Gemini in Chrome</translation>

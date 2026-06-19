@@ -541,6 +541,17 @@ Some features may be unavailable. Please specify a different profile directory o
 <translation id="6896758677409633944">Copy</translation>
 <translation id="6901631050894301805">Set Chromium as your default browser and pin it to your taskbar</translation>
 <translation id="6909503629704372277">&amp;Manage Chromium profiles</translation>
+<translation id="6919942714452658456">This action will:
+          <ph name="LINE_BREAKS" />
+            • Reset your startup page, new tab page, search engine and pinned tabs
+            <ph name="LINE_BREAK" />
+            • Disable extensions
+            <ph name="LINE_BREAK" />
+            • Delete cookies and other temporary site data
+            <ph name="LINE_BREAK" />
+            • Reset Chromium shortcuts
+            <ph name="LINE_BREAKS" />
+            Bookmarks, history and saved passwords won't be affected.</translation>
 <translation id="6934579572334859869">Ask image search about this image</translation>
 <translation id="6948031725951063910">You reached Chromium's limit of <ph name="BOOKMARK_LIMIT" /> bookmarks, so some of your bookmarks haven't been saved in your Google Account yet.
 
@@ -722,6 +733,15 @@ Google Chrome is unable to recover your settings.</translation>
 <translation id="8907580949721785412">Chromium is trying to show passwords. Type your Windows password to allow this.</translation>
 <translation id="8932992523185907506">Chromium is no longer your default browser. Make Chromium the default browser?</translation>
 <translation id="8941642502866065432">Can't update Chromium</translation>
+<translation id="8944232836376404813">This action will:
+          <ph name="LINE_BREAKS" />
+            • Reset your startup page, new tab page, search engine and pinned tabs
+            <ph name="LINE_BREAK" />
+            • Disable extensions
+            <ph name="LINE_BREAK" />
+            • Delete cookies and other temporary site data
+            <ph name="LINE_BREAKS" />
+            Bookmarks, history and saved passwords won't be affected.</translation>
 <translation id="897581876605952338">Chromium Enterprise logo</translation>
 <translation id="8981150672034878610">Cannot start Chromium because something went wrong when opening your profile. Try to restart Chromium.</translation>
 <translation id="8988036198400390003">Manage Chromium profiles</translation>
