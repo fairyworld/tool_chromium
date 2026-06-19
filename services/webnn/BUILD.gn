@@ -290,7 +290,7 @@ source_set("webnn_test_support") {
 
   if (is_win) {
     deps += [
-      "//services/webnn/host",
+      "//services/webnn/public/cpp:win",
       "//ui/gfx/mojom",
     ]
   }
