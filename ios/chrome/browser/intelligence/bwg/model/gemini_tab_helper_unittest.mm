@@ -323,9 +323,28 @@ TEST_F(GeminiTabHelperTest, TestGetServerId_Expired) {
   ASSERT_TRUE(tab_helper_->GetServerId().has_value());
 
   // Fast forward time to expire the session.
-  task_environment_.FastForwardBy(BWGSessionValidityDuration() +
+  task_environment_.FastForwardBy(GetGeminiSessionValidityDuration() +
                                   base::Seconds(1));
 
+  ASSERT_FALSE(tab_helper_->GetServerId().has_value());
+}
+
+TEST_F(GeminiTabHelperTest, TestGetServerId_Expired_CustomDuration) {
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitAndEnableFeatureWithParameters(
+      kGeminiConfigParams, {{kGeminiSessionValidityDuration, "5"}});
+
+  std::string server_id = "test_server_id";
+  tab_helper_->CreateOrUpdateGeminiSessionInStorage(server_id);
+  ASSERT_TRUE(tab_helper_->GetServerId().has_value());
+  ASSERT_EQ(GetGeminiSessionValidityDuration(), base::Minutes(5));
+
+  // Fast forward by 4 minutes -> should still be valid.
+  task_environment_.FastForwardBy(base::Minutes(4));
+  ASSERT_TRUE(tab_helper_->GetServerId().has_value());
+
+  // Fast forward by another 1 minute + 1 second -> should expire.
+  task_environment_.FastForwardBy(base::Minutes(1) + base::Seconds(1));
   ASSERT_FALSE(tab_helper_->GetServerId().has_value());
 }
 

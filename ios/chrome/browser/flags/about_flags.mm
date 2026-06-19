@@ -1012,12 +1012,8 @@ const FeatureEntry::FeatureVariation kBWGPromoConsentVariations[] = {
 const FeatureEntry::FeatureParam kPageActionMenuDirectEntryPoint[] = {
     {kPageActionMenuDirectEntryPointParam, "true"},
 };
-const FeatureEntry::FeatureParam kPageActionMenuBWGSessionValidityDuration[] = {
-    {kBWGSessionValidityDurationParam, "1"}};
 const FeatureEntry::FeatureVariation kPageActionMenuVariations[] = {
     {"Direct Entry Point", kPageActionMenuDirectEntryPoint, nullptr},
-    {"1 min session validity duration",
-     kPageActionMenuBWGSessionValidityDuration, nullptr},
 };
 
 const FeatureEntry::FeatureParam

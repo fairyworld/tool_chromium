@@ -65,10 +65,6 @@ bool IsAskGeminiChipIgnoreCriteriaEnabled();
 bool IsDirectBWGEntryPoint();
 extern const char kPageActionMenuDirectEntryPointParam[];
 
-// The BWG session validity duration in minutes.
-const base::TimeDelta BWGSessionValidityDuration();
-extern const char kBWGSessionValidityDurationParam[];
-
 // Feature flag to enable Explain Gemini in Edit Menu.
 BASE_DECLARE_FEATURE(kExplainGeminiEditMenu);
 
@@ -244,6 +240,10 @@ BASE_DECLARE_FEATURE(kGeminiConfigParams);
 // The threshold interval for displaying the response ready state in seconds.
 extern const char kGeminiResponseReadyInterval[];
 double GetGeminiResponseReadyInterval();
+
+// The Gemini session validity duration in minutes.
+base::TimeDelta GetGeminiSessionValidityDuration();
+extern const char kGeminiSessionValidityDuration[];
 
 // Feature flag for enabling early metrics collection for page stability.
 BASE_DECLARE_FEATURE(kPageStabilityMetrics);

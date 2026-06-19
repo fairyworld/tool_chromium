@@ -332,7 +332,7 @@ std::optional<std::string> GeminiTabHelper::GetServerId() {
   const std::string server_id =
       pref_service->GetString(prefs::kGeminiConversationId);
   if (base::Time::Now() - last_interaction_timestamp <
-      BWGSessionValidityDuration()) {
+      GetGeminiSessionValidityDuration()) {
     if (!server_id.empty()) {
       return server_id;
     }

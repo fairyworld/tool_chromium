@@ -142,18 +142,6 @@ bool IsDirectBWGEntryPoint() {
       kPageActionMenu, kPageActionMenuDirectEntryPointParam, false);
 }
 
-const char kBWGSessionValidityDurationParam[] = "BWGSessionValidityDuration";
-
-BASE_FEATURE_PARAM(int,
-                   kBWGSessionValidityDurationFeatureParam,
-                   &kPageActionMenu,
-                   kBWGSessionValidityDurationParam,
-                   30);
-
-const base::TimeDelta BWGSessionValidityDuration() {
-  return base::Minutes(kBWGSessionValidityDurationFeatureParam.Get());
-}
-
 const char kExplainGeminiEditMenuParams[] = "PositionForExplainGeminiEditMenu";
 
 BASE_FEATURE_PARAM(int,
@@ -454,6 +442,15 @@ double GetGeminiResponseReadyInterval() {
   return base::GetFieldTrialParamByFeatureAsDouble(
       kGeminiConfigParams, kGeminiResponseReadyInterval,
       kGeminiResponseReadyIntervalDefault);
+}
+
+const char kGeminiSessionValidityDuration[] = "GeminiSessionValidityDuration";
+constexpr int kGeminiSessionValidityDurationDefault = 30;
+
+base::TimeDelta GetGeminiSessionValidityDuration() {
+  return base::Minutes(base::GetFieldTrialParamByFeatureAsInt(
+      kGeminiConfigParams, kGeminiSessionValidityDuration,
+      kGeminiSessionValidityDurationDefault));
 }
 
 BASE_FEATURE(kPageStabilityMetrics, base::FEATURE_DISABLED_BY_DEFAULT);
