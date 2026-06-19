@@ -17,6 +17,7 @@
 #include "content/common/content_export.h"
 #include "content/public/browser/child_process_host.h"
 #include "content/public/browser/global_request_id.h"
+#include "content/public/browser/initiator_navigation_state.h"
 #include "content/public/browser/navigation_ui_data.h"
 #include "content/public/browser/reload_type.h"
 #include "content/public/browser/render_frame_host.h"
@@ -187,6 +188,16 @@ class NavigationController {
     // may not have an initiator, and in those cases this will be null. It will
     // also be null for non-about:blank/about:srcdoc navigations.
     std::optional<GURL> initiator_base_url;
+
+    // A record of the state of the navigation initiator when the navigation
+    // started. This should be non-null for all web contents initiated
+    // navigations.
+    scoped_refptr<InitiatorNavigationState> initiator_navigation_state;
+
+    // Whether initiator web security policies can be inherited when navigating
+    // to a local scheme. Except in specific cases (e.g. PDF viewer), this
+    // should be true.
+    bool should_ignore_initiator_policies_for_inheritance = false;
 
     // SiteInstance of the frame that initiated the navigation or null if we
     // don't know it.

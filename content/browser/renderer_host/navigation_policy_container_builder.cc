@@ -31,30 +31,6 @@ std::unique_ptr<PolicyContainerPolicies> GetParentPolicies(
   return parent->policy_container_host()->policies().ClonePtr();
 }
 
-// Returns a copy of the navigation initiator's policies, if any.
-//
-// Must only be called on the browser's UI thread.
-std::unique_ptr<PolicyContainerPolicies> GetInitiatorPolicies(
-    const blink::LocalFrameToken* frame_token,
-    int initiator_process_id,
-    StoragePartitionImpl* storage_partition) {
-  if (!frame_token) {
-    return nullptr;
-  }
-
-  PolicyContainerHost* initiator_policy_container_host =
-      RenderFrameHostImpl::GetPolicyContainerHost(
-          frame_token, initiator_process_id, storage_partition);
-
-  DCHECK(initiator_policy_container_host);
-  if (!initiator_policy_container_host) {
-    // Guard against wrong tokens being passed accidentally.
-    return nullptr;
-  }
-
-  return initiator_policy_container_host->policies().ClonePtr();
-}
-
 // Returns a copy of the given history |entry|'s policies, if any.
 std::unique_ptr<PolicyContainerPolicies> GetHistoryPolicies(
     const FrameNavigationEntry* entry) {
@@ -74,15 +50,10 @@ std::unique_ptr<PolicyContainerPolicies> GetHistoryPolicies(
 
 NavigationPolicyContainerBuilder::NavigationPolicyContainerBuilder(
     RenderFrameHostImpl* parent,
-    const blink::LocalFrameToken* initiator_frame_token,
-    int initiator_process_id,
-    StoragePartition* storage_partition,
+    std::unique_ptr<PolicyContainerPolicies> initiator_policies,
     const FrameNavigationEntry* history_entry)
     : parent_policies_(GetParentPolicies(parent)),
-      initiator_policies_(GetInitiatorPolicies(
-          initiator_frame_token,
-          initiator_process_id,
-          static_cast<StoragePartitionImpl*>(storage_partition))),
+      initiator_policies_(std::move(initiator_policies)),
       history_policies_(GetHistoryPolicies(history_entry)) {}
 
 NavigationPolicyContainerBuilder::~NavigationPolicyContainerBuilder() = default;

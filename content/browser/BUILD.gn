@@ -1900,6 +1900,8 @@ source_set("browser") {
     "renderer_host/http_error_navigation_throttle.h",
     "renderer_host/indexed_db_client_state_checker_factory.cc",
     "renderer_host/indexed_db_client_state_checker_factory.h",
+    "renderer_host/initiator_navigation_state_impl.cc",
+    "renderer_host/initiator_navigation_state_impl.h",
     "renderer_host/input/fling_scheduler.cc",
     "renderer_host/input/fling_scheduler.h",
     "renderer_host/input/input_injector_impl.cc",

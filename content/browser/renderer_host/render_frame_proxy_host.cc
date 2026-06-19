@@ -26,6 +26,7 @@
 #include "content/browser/renderer_host/cross_process_frame_connector.h"
 #include "content/browser/renderer_host/frame_tree.h"
 #include "content/browser/renderer_host/frame_tree_node.h"
+#include "content/browser/renderer_host/initiator_navigation_state_impl.h"
 #include "content/browser/renderer_host/ipc_utils.h"
 #include "content/browser/renderer_host/navigation_metrics_utils.h"
 #include "content/browser/renderer_host/navigator.h"
@@ -838,7 +839,13 @@ void RenderFrameProxyHost::OpenURL(blink::mojom::OpenURLParamsPtr params) {
 
   blink::LocalFrameToken* initiator_frame_token =
       base::OptionalToPtr(params->initiator_frame_token);
-
+  // TODO(crbug.com/510258191): Ensure that a well behaving renderer always has
+  // an associated |initiator_navigation_state|, and terminate renderer
+  // processes whose |initiator_navigation_state| we cannot find.
+  scoped_refptr<InitiatorNavigationState> initiator_navigation_state =
+      RenderFrameHostImpl::GetInitiatorNavigationStateFromFrameToken(
+          initiator_frame_token, GetProcess()->GetDeprecatedID(),
+          current_rfh->GetStoragePartition());
   // TODO(lfg, lukasza): Remove |extra_headers| parameter from
   // RequestTransferURL method once both RenderFrameProxyHost and
   // RenderFrameHostImpl call RequestOpenURL from their OnOpenURL handlers.
@@ -848,10 +855,7 @@ void RenderFrameProxyHost::OpenURL(blink::mojom::OpenURLParamsPtr params) {
   frame_tree_node_->navigator().NavigateFromFrameProxy(
       current_rfh, validated_url, initiator_frame_token,
       GetProcess()->GetDeprecatedID(), params->initiator_origin,
-      params->initiator_base_url,
-      RenderFrameHostImpl::GetSourceSiteInstanceFromFrameToken(
-          initiator_frame_token, GetProcess()->GetDeprecatedID(),
-          current_rfh->GetStoragePartition()),
+      params->initiator_base_url, initiator_navigation_state,
       params->referrer.To<content::Referrer>(), ui::PAGE_TRANSITION_LINK,
       params->should_replace_current_entry, download_policy,
       params->post_body ? "POST" : "GET", params->post_body,

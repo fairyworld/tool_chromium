@@ -5744,6 +5744,8 @@ FrameTree* WebContentsImpl::CreateNewWindow(
     load_params->initiator_origin = opener->GetLastCommittedOrigin();
     load_params->initiator_process_id = render_process_id;
     load_params->initiator_frame_token = opener->GetFrameToken();
+    load_params->initiator_navigation_state =
+        opener->CreateInitiatorStateFromCurrentFrame();
     // Avoiding setting |load_params->source_site_instance| when
     // |opener_suppressed| is true, because in that case we do not want to use
     // the old SiteInstance and/or BrowsingInstance.  See also the test here:

@@ -294,6 +294,7 @@ class GuestPageHolderImpl;
 class IdleManagerImpl;
 class NavigationEarlyHintsManager;
 class NavigationRequest;
+class InitiatorNavigationStateImpl;
 class PeerConnectionTrackerHost;
 class PendingNavigation;
 class PrefetchedSignedExchangeCache;
@@ -449,18 +450,9 @@ class CONTENT_EXPORT RenderFrameHostImpl
   static void SetCodeCacheHostReceiverHandlerForTesting(
       CodeCacheHostReceiverHandler handler);
 
-  // Get the PolicyContainerHost associated with `frame_token`.
-  static PolicyContainerHost* GetPolicyContainerHost(
-      const blink::LocalFrameToken* frame_token,
-      int initiator_process_id,
-      StoragePartitionImpl* storage_partition);
-
-  // Get the SiteInstance for the RenderFrameHost associated with `frame_token`,
-  // looking it up via NavigationStateKeepAlive in the case that the
-  // RenderFrameHost has already been deleted after initiating a scheduled
-  // navigation. The `storage_partition` parameter is used for looking up
-  // NavigationStateKeepAlives when needed.
-  static SiteInstanceImpl* GetSourceSiteInstanceFromFrameToken(
+  // Get the InitiatorNavigationStateImpl associated with `frame_token`.
+  static scoped_refptr<InitiatorNavigationState>
+  GetInitiatorNavigationStateFromFrameToken(
       const blink::LocalFrameToken* frame_token,
       int initiator_process_id,
       StoragePartitionImpl* storage_partition);
@@ -3338,6 +3330,11 @@ class CONTENT_EXPORT RenderFrameHostImpl
   // existence of the MockRenderProcessHost.
   void SetPrerenderStateChangedCallback(
       PrerenderStateChangedCallback prerender_state_callback);
+
+  // Records the current navigation state of this RFH. It should be passed to
+  // NavigationRequests initiated by this RFH.
+  scoped_refptr<InitiatorNavigationState>
+  CreateInitiatorStateFromCurrentFrame();
 
  protected:
   friend class RenderFrameHostFactory;

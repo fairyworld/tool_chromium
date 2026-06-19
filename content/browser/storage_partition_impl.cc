@@ -1221,9 +1221,12 @@ void StoragePartitionImpl::RegisterKeepAliveHandle(
     mojo::PendingReceiver<blink::mojom::NavigationStateKeepAliveHandle>
         receiver,
     std::unique_ptr<NavigationStateKeepAlive> handle) {
-  navigation_state_keep_alive_map_.erase(handle->frame_token());
+  auto frame_token = static_cast<InitiatorNavigationStateImpl*>(
+                         handle->initiator_navigation_state().get())
+                         ->frame_token();
+  navigation_state_keep_alive_map_.erase(frame_token);
   navigation_state_keep_alive_map_.insert(
-      std::make_pair(handle->frame_token(), handle.get()));
+      std::make_pair(frame_token, handle.get()));
 
   keep_alive_handles_receiver_set_.Add(std::move(handle), std::move(receiver));
 }

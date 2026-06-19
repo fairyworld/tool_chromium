@@ -977,32 +977,6 @@ bool IsMhtmlMimeType(const std::string& mime_type) {
   return mime_type == "multipart/related" || mime_type == "message/rfc822";
 }
 
-network::mojom::WebSandboxFlags GetSandboxFlagsInitiator(
-    const std::optional<blink::LocalFrameToken>& frame_token,
-    int initiator_process_id,
-    StoragePartitionImpl* storage_partition) {
-  if (!frame_token) {
-    return network::mojom::WebSandboxFlags::kNone;
-  }
-
-  // Even if the navigation was initiated from an unload handler and the
-  // RenderFrameHost is gone, its associated PolicyContainerHost should be
-  // available by design.
-  //
-  // Note: See https://crbug.com/1473165. The "design" is currently not 100%
-  // achieved. The PolicyContainer might be missing when the navigation is
-  // initiated from RenderViewContextMenu::ExecuteCommand(...).
-  const PolicyContainerHost* policy_container_host =
-      RenderFrameHostImpl::GetPolicyContainerHost(
-          base::OptionalToPtr(frame_token), initiator_process_id,
-          storage_partition);
-  if (!policy_container_host) {
-    return network::mojom::WebSandboxFlags::kNone;
-  }
-
-  return policy_container_host->policies().sandbox_flags;
-}
-
 bool IsSharedStorageWritableEligibleForNavigationRequest(
     FrameTreeNode* frame_tree_node,
     const GURL& url) {
@@ -1291,6 +1265,8 @@ std::unique_ptr<NavigationRequest> NavigationRequest::CreateBrowserInitiated(
       /*browser_initiated=*/true, was_opener_suppressed,
       std::nullopt /* initiator_frame_token */,
       ChildProcessHost::kInvalidUniqueID /* initiator_process_id */,
+      nullptr /* initiator_navigation_state */,
+      false /* should_ignore_initiator_policies_for_inheritance */,
       extra_headers, frame_entry, entry, is_form_submission,
       std::move(navigation_ui_data), impression,
       /*started_with_transient_activation=*/false,
@@ -1313,6 +1289,8 @@ std::unique_ptr<NavigationRequest> NavigationRequest::Create(
     bool was_opener_suppressed,
     const std::optional<blink::LocalFrameToken>& initiator_frame_token,
     int initiator_process_id,
+    scoped_refptr<InitiatorNavigationState> initiator_navigation_state,
+    bool should_ignore_initiator_policies_for_inheritance,
     const std::string& extra_headers,
     FrameNavigationEntry* frame_entry,
     NavigationEntryImpl* entry,
@@ -1387,8 +1365,9 @@ std::unique_ptr<NavigationRequest> NavigationRequest::Create(
       mojo::NullAssociatedRemote(),
       nullptr /* prefetched_signed_exchange_cache */,
       GetRenderFrameHostForBackForwardCacheRestore(frame_tree_node, entry),
-      initiator_process_id, was_opener_suppressed, embedder_isolation_mode,
-      is_embedder_initiated_fenced_frame_navigation,
+      initiator_process_id, initiator_navigation_state,
+      should_ignore_initiator_policies_for_inheritance, was_opener_suppressed,
+      embedder_isolation_mode, is_embedder_initiated_fenced_frame_navigation,
       mojo::NullReceiver() /* renderer_cancellation_listener */,
       mojo::NullReceiver() /* renderer_ignore_duplicate_navigation_listener */,
       mojo::NullReceiver() /* deferred_commit_resume_listener */,
@@ -1416,7 +1395,8 @@ std::unique_ptr<NavigationRequest> NavigationRequest::CreateRendererInitiated(
         mojom::NavigationRendererIgnoreDuplicateNavigationListener>
         renderer_ignore_duplicate_navigation_listener,
     mojo::PendingReceiver<blink::mojom::NavigationResumeDeferredCommitListener>
-        deferred_commit_resume_listener) {
+        deferred_commit_resume_listener,
+    scoped_refptr<InitiatorNavigationState> initiator_navigation_state) {
   TRACE_EVENT("navigation", "NavigationRequest::CreateRendererInitiated");
   // Only normal navigations to a different document or reloads are expected.
   // - Renderer-initiated same document navigations never start in the browser.
@@ -1541,7 +1521,8 @@ std::unique_ptr<NavigationRequest> NavigationRequest::CreateRendererInitiated(
       std::move(blob_url_loader_factory), std::move(navigation_client),
       std::move(prefetched_signed_exchange_cache),
       std::nullopt,  // rfh_restored_from_back_forward_cache
-      initiator_process_id,
+      initiator_process_id, initiator_navigation_state,
+      /*should_ignore_initiator_policies_for_inheritance=*/false,
       /*was_opener_suppressed=*/false, EmbedderIsolationInfo::Mode::kNone,
       /*is_embedder_initiated_fenced_frame_navigation=*/false,
       std::move(renderer_cancellation_listener),
@@ -1697,6 +1678,8 @@ NavigationRequest::CreateForSynchronousRendererCommit(
       nullptr /* prefetched_signed_exchange_cache */,
       std::nullopt /* rfh_restored_from_back_forward_cache */,
       ChildProcessHost::kInvalidUniqueID /* initiator_process_id */,
+      nullptr /* initiator_navigation_state */,
+      false /* should_ignore_initiator_policies_for_inheritance */,
       false /* was_opener_suppressed */, EmbedderIsolationInfo::Mode::kNone));
 
   std::optional<base::UnguessableToken> nonce = render_frame_host->ComputeNonce(
@@ -1758,6 +1741,8 @@ NavigationRequest::NavigationRequest(
     std::optional<base::SafeRef<RenderFrameHostImpl>>
         rfh_restored_from_back_forward_cache,
     int initiator_process_id,
+    scoped_refptr<InitiatorNavigationState> initiator_navigation_state,
+    bool should_ignore_initiator_policies_for_inheritance,
     bool was_opener_suppressed,
     EmbedderIsolationInfo::Mode embedder_isolation_mode,
     bool is_embedder_initiated_fenced_frame_navigation,
@@ -1813,11 +1798,6 @@ NavigationRequest::NavigationRequest(
           frame_tree_node->current_frame_host()->GetGlobalId()),
       initiator_frame_token_(begin_params_->initiator_frame_token),
       initiator_process_id_(initiator_process_id),
-      sandbox_flags_initiator_(GetSandboxFlagsInitiator(
-          initiator_frame_token_,
-          initiator_process_id,
-          static_cast<StoragePartitionImpl*>(
-              GetStoragePartitionWithCurrentSiteInfo()))),
       was_opener_suppressed_(was_opener_suppressed),
       is_credentialless_(
           IsDocumentToCommitAnonymous(frame_tree_node,
@@ -1841,7 +1821,8 @@ NavigationRequest::NavigationRequest(
       request_method_(common_params_->method),
       original_url_(common_params_->url),
       prerender_host_id_(
-          GetPrerenderHostRegistry().GetPrerenderHostIdForNavigation(this)) {
+          GetPrerenderHostRegistry().GetPrerenderHostIdForNavigation(this)),
+      initiator_navigation_state_(initiator_navigation_state) {
   TRACE_EVENT("navigation", "NavigationRequest::NavigationRequest",
               perfetto::Flow::FromPointer(this),
               perfetto::protos::pbzero::ChromeTrackEvent::kNavigation, this);
@@ -1876,6 +1857,8 @@ NavigationRequest::NavigationRequest(
         is_initial_nav_entry);
   CHECK(IsInOutermostMainFrame() ||
         common_params_->base_url_for_data_url.is_empty());
+  // TODO(crbug.com/510258191): Check that |initiator_navigation_state| is not
+  // null for renderer-initiated navigations.
 #if BUILDFLAG(IS_ANDROID)
   CHECK(IsInOutermostMainFrame() || commit_params_->data_url_as_string.empty());
 #endif
@@ -1967,11 +1950,23 @@ NavigationRequest::NavigationRequest(
   navigation_or_document_handle_ =
       NavigationOrDocumentHandle::CreateForNavigation(*this);
 
-  policy_container_builder_.emplace(
-      GetParentFrame(),
-      initiator_frame_token_.has_value() ? &*initiator_frame_token_ : nullptr,
-      initiator_process_id_, GetStoragePartitionWithCurrentSiteInfo(),
-      frame_entry);
+  // Pass the initiator policies to the PolicyContainerBuilder if this
+  // navigation has an initiator in the same storage partition.
+  // TODO(crbug.com/510258191): Move passing inherited policies to when the
+  // response started, which will allow to check whether the initiator and
+  // target StoragePartitions match and only inherit initiator policies in those
+  // cases. The StoragePartition at creation time might be incorrect.
+  std::unique_ptr<PolicyContainerPolicies> initiator_policies;
+  if (initiator_navigation_state_impl() &&
+      !should_ignore_initiator_policies_for_inheritance) {
+    initiator_policies = initiator_navigation_state_impl()
+                             ->policy_container_host()
+                             ->policies()
+                             .ClonePtr();
+  }
+
+  policy_container_builder_.emplace(GetParentFrame(),
+                                    std::move(initiator_policies), frame_entry);
 
   NavigationControllerImpl* controller = GetNavigationController();
 
@@ -2012,18 +2007,18 @@ NavigationRequest::NavigationRequest(
     // SiteInstanceGroups, because some other frame in a different SiteInstance
     // but same SiteInstanceGroup could've initiated this navigation.
     source_site_instance_ =
-        RenderFrameHostImpl::GetSourceSiteInstanceFromFrameToken(
-            base::OptionalToPtr(GetInitiatorFrameToken()),
-            GetInitiatorProcessId(),
-            frame_tree_node_->current_frame_host()->GetStoragePartition());
+        initiator_navigation_state_impl()
+            ? initiator_navigation_state_impl()->site_instance()
+            : nullptr;
 
-    // If the lookup above failed (e.g., when no initiator frame token was
-    // provided), fall back to the navigating frame's current SiteInstance. This
-    // ensures that this renderer-initiated navigation still has a valid source
-    // SiteInstance corresponding to the renderer process that initiated the
-    // navigation, which is needed for certain security checks based on
-    // `source_site_instance_`, such as the CanRequestURL() check in
-    // `OnRequestRedirected()`.
+    // TODO(crbug.com/510258191): This should not happen. Check that this is not
+    // the case once we have fixed storage of the initiator navigation state.
+    // If there is no initiator navigation state, fall back to the navigating
+    // frame's current SiteInstance. This ensures that this renderer-initiated
+    // navigation still has a valid source SiteInstance corresponding to the
+    // renderer process that initiated the navigation, which is needed for
+    // certain security checks based on `source_site_instance_`, such as the
+    // CanRequestURL() check in `OnRequestRedirected()`.
     if (!source_site_instance_) {
       source_site_instance_ =
           frame_tree_node_->current_frame_host()->GetSiteInstance();
@@ -6134,7 +6129,13 @@ void NavigationRequest::OnServiceWorkerAccessed(
 }
 
 network::mojom::WebSandboxFlags NavigationRequest::SandboxFlagsInitiator() {
-  return sandbox_flags_initiator_;
+  if (!initiator_navigation_state_) {
+    return network::mojom::WebSandboxFlags::kNone;
+  }
+  return initiator_navigation_state_impl()
+      ->policy_container_host()
+      ->policies()
+      .sandbox_flags;
 }
 
 network::mojom::WebSandboxFlags NavigationRequest::SandboxFlagsInherited() {
@@ -10428,6 +10429,11 @@ const std::optional<url::Origin>& NavigationRequest::GetInitiatorOrigin() {
   return common_params().initiator_origin;
 }
 
+scoped_refptr<InitiatorNavigationState>
+NavigationRequest::GetInitiatorNavigationState() {
+  return initiator_navigation_state_;
+}
+
 const std::optional<GURL>& NavigationRequest::GetInitiatorBaseUrl() {
   return common_params().initiator_base_url;
 }
@@ -11153,20 +11159,28 @@ void NavigationRequest::RecordAddressSpaceFeature() {
     return;
   }
 
-  // If there is an initiator document, then `initiator_frame_token_` should
-  // have a value, and thus there should be initiator policies.
-  const PolicyContainerPolicies* initiator_policies =
-      policy_container_builder_->InitiatorPolicies();
-  CHECK(initiator_policies);
-  if (!initiator_policies) {
-    base::debug::DumpWithoutCrashing();  // Just in case.
-    return;
-  }
+  // Get the initiator policies. Note that we are checking the policies from the
+  // initiator's InitiatorNavigationState and not the PolicyContainerBuilder, as
+  // the initiator policies may not be inherited by the PolicyContainerBuilder
+  // in case of StoragePartition mismatch. However, the address space of the
+  // initiator should always be taken into account, so we fall back to the
+  // record of the initiator policies stored in NavigationRequest.
+  // If we lack an |initiator_navigation_state_|, then get the policies from the
+  // initiator RenderFrameHost instead.
+  // TODO(crbug.com/510258191): Check that |initiator_navigation_state_| is not
+  // null. Currently, it is still possible to pass an |initiator_frame_token_|
+  // without an |initiator_navigation_state_|.
+  const PolicyContainerPolicies& initiator_policies =
+      initiator_navigation_state_impl()
+          ? initiator_navigation_state_impl()
+                ->policy_container_host()
+                ->policies()
+          : initiator_render_frame_host->policy_container_host()->policies();
 
   std::optional<blink::mojom::WebFeature> optional_feature =
       blink::AddressSpaceFeature(blink::FetchType::kNavigation,
-                                 initiator_policies->ip_address_space,
-                                 initiator_policies->is_web_secure_context,
+                                 initiator_policies.ip_address_space,
+                                 initiator_policies.is_web_secure_context,
                                  response_head_->response_address_space);
   if (!optional_feature.has_value()) {
     return;
