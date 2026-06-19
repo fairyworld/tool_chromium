@@ -8,7 +8,12 @@
 namespace multistep_filter::switches {
 
 // Overrides the base URL for the `SiteAutomationIndexServer` Server APIs.
-extern const char kMultistepFilterIndexServerApiBaseUrl[];
+inline constexpr char kMultistepFilterIndexServerApiBaseUrl[] =
+    "multistep-filter-index-server-api-base-url";
+
+// Allows HTTP URLs for extraction and suggestions during browser testing.
+inline constexpr char kMultistepFilterAllowHttpForTesting[] =
+    "multistep-filter-allow-http-for-testing";
 
 }  // namespace multistep_filter::switches
 

@@ -11,10 +11,7 @@ source_set("features") {
 }
 
 source_set("switches") {
-  sources = [
-    "switches.cc",
-    "switches.h",
-  ]
+  sources = [ "switches.h" ]
   deps = [ "//base" ]
 }
 

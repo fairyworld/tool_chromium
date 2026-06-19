@@ -5,6 +5,7 @@
 #include "components/multistep_filter/content/filter_navigation_observer.h"
 
 #include "base/check.h"
+#include "base/command_line.h"
 #include "base/functional/bind.h"
 #include "components/multistep_filter/content/filter_initiated_navigation_marker.h"
 #include "components/multistep_filter/core/logging/log_entry.h"
@@ -12,9 +13,11 @@
 #include "components/multistep_filter/core/multistep_filter_service.h"
 #include "components/multistep_filter/core/multistep_filter_ui_delegate.h"
 #include "components/multistep_filter/core/multistep_filter_util.h"
+#include "components/multistep_filter/core/switches.h"
 #include "content/public/browser/navigation_handle.h"
 #include "content/public/browser/web_contents.h"
 #include "url/gurl.h"
+#include "url/url_constants.h"
 
 namespace multistep_filter {
 
@@ -26,7 +29,8 @@ namespace {
 struct NavigationMetadata {
   GURL url;
   GURL prev_url;
-  bool is_valid_http_or_https_navigation;
+  bool is_cryptographic_scheme;
+  bool is_http_allowed_for_testing;
   bool is_error_page_navigation;
   bool has_user_gesture;
   bool was_filter_initiated_navigation;
@@ -35,7 +39,11 @@ struct NavigationMetadata {
   explicit NavigationMetadata(NavigationHandle* handle)
       : url(handle->GetURL()),
         prev_url(handle->GetPreviousPrimaryMainFrameURL()),
-        is_valid_http_or_https_navigation(url.SchemeIsHTTPOrHTTPS()),
+        is_cryptographic_scheme(url.SchemeIsCryptographic()),
+        is_http_allowed_for_testing(
+            url.SchemeIs(url::kHttpScheme) &&
+            base::CommandLine::ForCurrentProcess()->HasSwitch(
+                switches::kMultistepFilterAllowHttpForTesting)),
         is_error_page_navigation(handle->IsErrorPage()),
         has_user_gesture(handle->HasUserGesture()),
         was_filter_initiated_navigation(
@@ -167,9 +175,10 @@ void FilterNavigationObserver::DidFinishNavigation(
     return;
   }
 
-  if (!metadata.is_valid_http_or_https_navigation) {
+  if (!metadata.is_cryptographic_scheme &&
+      !metadata.is_http_allowed_for_testing) {
     LogUrlEligibilityCheck(log_router_, navigation_id, metadata.url.GetHost(),
-                           /*eligible=*/false, "non_http_or_https");
+                           /*eligible=*/false, "non_cryptographic");
     return;
   }
 

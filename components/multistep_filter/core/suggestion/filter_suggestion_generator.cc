@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "base/logging.h"
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
@@ -22,6 +23,7 @@
 #include "components/multistep_filter/core/logging/multistep_filter_logger.h"
 #include "components/multistep_filter/core/multistep_filter_util.h"
 #include "components/multistep_filter/core/storage/filter_store.h"
+#include "url/origin.h"
 
 namespace multistep_filter {
 
@@ -167,6 +169,15 @@ void FilterSuggestionGenerator::OnFilterSuggestionCandidatesFetched(
   // chosen by default. Implement the logic to select the best execution
   // candidate.
   FilterSuggestionCandidate& candidate = candidates->front();
+
+  const url::Origin triggering_origin = url::Origin::Create(url);
+
+  if (!url::Origin::Create(candidate.navigation_url)
+           .IsSameOriginWith(triggering_origin)) {
+    LogSuggestionSuppressed(log_router_, navigation_id, url.GetHost(),
+                            "cross_origin");
+    return;
+  }
 
   if (IsUrlSubsumedBy(candidate.navigation_url, url)) {
     LogSuggestionSuppressed(log_router_, navigation_id, url.GetHost(), "subsumed");

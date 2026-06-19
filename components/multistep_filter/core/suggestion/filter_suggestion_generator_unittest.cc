@@ -227,6 +227,57 @@ TEST_F(FilterSuggestionGeneratorTest,
   EXPECT_EQ(future.Get(), std::nullopt);
 }
 
+// Tests that suggestion generation is suppressed if the candidate URL is from a
+// different origin than the current triggering URL.
+TEST_F(FilterSuggestionGeneratorTest,
+       GenerateSuggestion_SuppressesCrossOriginSuggestions) {
+  const GURL url("https://example.com/search?category=shoes&size=large");
+
+  std::vector<FilterAttribute> attributes = {
+      {kTestAttributeKey, kTestAttributeValue},
+      {kTestAttributeKey2, kTestAttributeValue2}};
+  FilterAnnotation annotation =
+      CreateDummyAnnotation(kShoppingTask, kTestDomain, attributes);
+
+  EXPECT_CALL(*store(), GetAnnotationsForTasksSortedByCreationTimestamp(
+                            kSupportedTaskTypes, _, 10u, _))
+      .WillOnce(
+          [annotation](
+              std::vector<std::string> task_types,
+              base::OnceCallback<void(std::vector<FilterAnnotation>)> callback,
+              size_t max_count, base::Time min_creation_time) {
+            std::move(callback).Run(std::vector<FilterAnnotation>{annotation});
+          });
+
+  // Cross-origin URL should be suppressed.
+  FilterSuggestionCandidate candidate(
+      annotation.id,
+      GURL("https://differentorigin.com/search?category=shoes&size=large"),
+      {FilterSuggestionCandidateAttribute(kTestAttributeKey,
+                                          kTestAttributeValue16),
+       FilterSuggestionCandidateAttribute(kTestAttributeKey2,
+                                          kTestAttributeValue2_16)});
+
+  EXPECT_CALL(mock_client(),
+              GetFilterSuggestionCandidates(url, _, _, kTestNavigationId))
+      .WillOnce([candidate](
+                    const GURL& u,
+                    base::span<const FilterAnnotation> filter_annotations,
+                    base::OnceCallback<void(
+                        std::optional<std::vector<FilterSuggestionCandidate>>)>
+                        callback,
+                    int64_t navigation_id) {
+        std::move(callback).Run(
+            std::vector<FilterSuggestionCandidate>{candidate});
+      });
+
+  base::test::TestFuture<std::optional<UrlFilterSuggestion>> future;
+  generator()->GenerateSuggestion(url, kSupportedTaskTypes,
+                                  future.GetCallback(), kTestNavigationId);
+
+  EXPECT_EQ(future.Get(), std::nullopt);
+}
+
 // Tests that suggestion generation is suppressed if the candidate URL's query
 // parameters are a strict subset of the current URL's parameters.
 TEST_F(FilterSuggestionGeneratorTest,

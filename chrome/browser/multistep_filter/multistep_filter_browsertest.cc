@@ -107,6 +107,7 @@ class MultistepFilterBrowserTest
     command_line->AppendSwitchASCII(
         switches::kMultistepFilterIndexServerApiBaseUrl,
         embedded_test_server()->GetURL("/").spec());
+    command_line->AppendSwitch(switches::kMultistepFilterAllowHttpForTesting);
   }
 
   void SetUpInProcessBrowserTestFixture() override {
