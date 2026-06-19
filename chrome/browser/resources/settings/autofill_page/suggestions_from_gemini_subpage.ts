@@ -32,11 +32,6 @@ export class SettingsSuggestionsFromGeminiSubpageElement extends
     OpenWindowProxyImpl.getInstance().openUrl(
         loadTimeData.getString('personalContextConnectedAppsUrl'));
   }
-
-  private onManageSuggestionsClick_() {
-    // TODO(crbug.com/512204278): Add metrics.
-    // TODO(crbug.com/512202109): Add functionality.
-  }
 }
 
 declare global {
