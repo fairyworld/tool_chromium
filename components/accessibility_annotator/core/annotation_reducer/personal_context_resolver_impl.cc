@@ -234,8 +234,7 @@ std::vector<EntryMetadata> ExtractMetadata(
 }
 
 MemorySearchResult ConvertToMemorySearchResult(
-    const personal_context::proto::AtMemorySearchResult& proto_result,
-    double confidence_score) {
+    const personal_context::proto::AtMemorySearchResult& proto_result) {
   MemoryDataType memory_data_type = MemoryDataType::kUnknown;
   std::u16string type_name;
   std::u16string primary_value;
@@ -251,7 +250,7 @@ MemorySearchResult ConvertToMemorySearchResult(
   }
 
   MemorySearchResult pcontext_result(memory_data_type, type_name, primary_value,
-                                     confidence_score);
+                                     proto_result.relevance_score());
   pcontext_result.sources = ExtractSources(proto_result);
   pcontext_result.metadata_list = ExtractMetadata(proto_result);
   return pcontext_result;
@@ -349,12 +348,8 @@ void PersonalContextResolverImpl::OnPersonalContextRetrieved(
   for (int i = 0; i < response.results_size(); ++i) {
     const personal_context::proto::AtMemorySearchResult& proto_result =
         response.results(i);
-    // TODO(crbug.com/517771142): Use the confidence score returned by the
-    // `PrivacyContextService`.
-    double confidence_score = static_cast<double>(response.results_size() - i) /
-                              response.results_size();
     MemorySearchResult pcontext_result =
-        ConvertToMemorySearchResult(proto_result, confidence_score);
+        ConvertToMemorySearchResult(proto_result);
     if (!pcontext_result.value.empty()) {
       results.push_back(std::move(pcontext_result));
     }

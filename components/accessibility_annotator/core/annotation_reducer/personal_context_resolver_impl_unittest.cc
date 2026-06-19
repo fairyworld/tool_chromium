@@ -132,6 +132,7 @@ TEST_F(PersonalContextResolverImplTest,
           QUERY_CLASSIFICATION_AT_MEMORY);
   personal_context::proto::AtMemorySearchResult* result =
       response.add_results();
+  result->set_relevance_score(1.0);
 
   // Primary Attribute: Schemaful key
   personal_context::proto::Attribute* primary =
