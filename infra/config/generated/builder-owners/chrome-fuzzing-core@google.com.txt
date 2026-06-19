@@ -28,6 +28,7 @@ ci/linux-x86-libfuzzer-asan-rel-tests
 ci/mac-arm64-libfuzzer-asan-rel-tests
 ci/win-x64-libfuzzer-asan-rel-tests
 try/android-arm64-libfuzzer-hwasan
+try/android-desktop-x64-asan-rel
 try/android-desktop-x64-libfuzzer-asan
 try/chromeos-libfuzzer-asan-rel
 try/chromeos-x64-libfuzzer-asan-rel-tests

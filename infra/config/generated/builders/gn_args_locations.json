@@ -761,6 +761,7 @@
   },
   "tryserver.chromium.fuzz": {
     "android-arm64-libfuzzer-hwasan": "try/android-arm64-libfuzzer-hwasan/gn-args.json",
+    "android-desktop-x64-asan-rel": "try/android-desktop-x64-asan-rel/gn-args.json",
     "android-desktop-x64-libfuzzer-asan": "try/android-desktop-x64-libfuzzer-asan/gn-args.json",
     "chromeos-x64-libfuzzer-asan-rel-tests": "try/chromeos-x64-libfuzzer-asan-rel-tests/gn-args.json",
     "linux-asan-dbg": "try/linux-asan-dbg/gn-args.json",
