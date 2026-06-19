@@ -415,8 +415,9 @@ ItemType ItemTypeForEntitySectionHeader(SectionIdentifier section_identifier) {
     return;
   }
 
-  base::span<const autofill::EntityInstance> instances =
-      _entityDataManager->GetEntityInstances();
+  std::vector<autofill::EntityInstance> instances =
+      autofill::GetEntityInstancesForSettings(
+          _entityDataManager->GetEntityInstances());
 
   if (instances.empty()) {
     return;
@@ -638,15 +639,17 @@ ItemType ItemTypeForEntitySectionHeader(SectionIdentifier section_identifier) {
                                         .empty();
 }
 
-// Checks if there are any local entities.
+// Checks if there are any local entities available in settings.
 - (BOOL)hasLocalEntities {
   if (_settingsAreDismissed || !_entityDataManager) {
     return NO;
   }
   return std::ranges::any_of(
-      _entityDataManager->GetEntityInstances(), [](const auto& instance) {
-        return instance.record_type() !=
-               autofill::EntityInstance::RecordType::kServerWallet;
+      autofill::GetEntityInstancesForSettings(
+          _entityDataManager->GetEntityInstances()),
+      [](const auto& instance) {
+        return instance.record_type() ==
+               autofill::EntityInstance::RecordType::kLocal;
       });
 }
 

@@ -1685,6 +1685,7 @@ source_set("unit_tests") {
     "integrators/autofill_ai/autofill_ai_labels_unittest.cc",
     "integrators/autofill_ai/autofill_ai_manager_unittest.cc",
     "integrators/autofill_ai/autofill_ai_wallet_utils_unittest.cc",
+    "integrators/autofill_ai/management_utils_unittest.cc",
     "integrators/autofill_ai/metrics/autofill_ai_logger_unittest.cc",
     "integrators/one_time_tokens/metrics/otp_form_event_logger_unittest.cc",
     "integrators/one_time_tokens/otp_field_detector_unittest.cc",

@@ -145,8 +145,9 @@
     return;
   }
 
-  base::span<const autofill::EntityInstance> instances =
-      _entityDataManager->GetEntityInstances();
+  std::vector<autofill::EntityInstance> instances =
+      autofill::GetEntityInstancesForSettings(
+          _entityDataManager->GetEntityInstances());
 
   autofill::DenseSet<autofill::EntityTypeName> supportedTypes =
       [self supportedEntityTypes];

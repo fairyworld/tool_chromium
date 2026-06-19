@@ -144,7 +144,6 @@ class EntityDataManager : public KeyedService,
   // finished.
   //
   // See `EntityTable::GetEntityInstances()` for details on what "valid" means.
-  // TODO(crbug.com/516721244): Hide pContext entities in settings.
   base::span<const EntityInstance> GetEntityInstances() const LIFETIME_BOUND {
     return entities_;
   }
