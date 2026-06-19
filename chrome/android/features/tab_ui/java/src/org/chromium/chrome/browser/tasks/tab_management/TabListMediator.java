@@ -784,6 +784,13 @@ public class TabListMediator implements TabListNotificationHandler {
                     updateDescriptionString(tab, model);
                     updateActionButtonDescriptionString(tab, model);
                     updateThumbnailFetcher(model, tab.getId());
+
+                    // Only the NESTED layouts render child tabs in the same
+                    // model list as the group header. We must sync the color down to these
+                    // child models so decorations (like the group spine) can read it.
+                    if (mLayoutType == TabListLayoutType.NESTED) {
+                        updateColorForChildTabsInNestedLayout(tabGroupId, newColor);
+                    }
                 }
 
                 @Override
@@ -1037,8 +1044,13 @@ public class TabListMediator implements TabListNotificationHandler {
                         int destUiIndex = mModelList.indexFromTabId(destinationTab.getId());
                         if (destUiIndex == TabModel.INVALID_TAB_INDEX) return;
 
-                        ensureGroupHeaderExistsInNestedLayout(
-                                destinationTab, tabGroupId, destUiIndex);
+                        if (ensureGroupHeaderExistsInNestedLayout(
+                                destinationTab, tabGroupId, destUiIndex)) {
+                            // After adding the group header, the destination tab's model
+                            // shifts by one position.
+                            PropertyModel childModel = mModelList.get(destUiIndex + 1).model;
+                            setupGroupPropertiesForChildTab(destinationTab, childModel);
+                        }
                         return;
                     }
 
@@ -1937,6 +1949,31 @@ public class TabListMediator implements TabListNotificationHandler {
     }
 
     /**
+     * Updates the UI properties of child tabs in the NESTED layout when their group color changes.
+     *
+     * @param tabGroupId The ID of the tab group.
+     * @param newColor The new color of the tab group.
+     */
+    private void updateColorForChildTabsInNestedLayout(
+            Token tabGroupId, @TabGroupColorId int newColor) {
+        assert mLayoutType == TabListLayoutType.NESTED;
+        boolean foundGroup = false;
+        for (int i = 0; i < mModelList.size(); i++) {
+            PropertyModel childModel = mModelList.get(i).model;
+            if (childModel.get(CARD_TYPE) == TAB
+                    && tabGroupId.equals(childModel.get(TabProperties.TAB_GROUP_ID))) {
+                updateTabGroupColorViewProvider(
+                        EitherGroupId.createLocalId(new LocalTabGroupId(tabGroupId)),
+                        childModel,
+                        newColor);
+                foundGroup = true;
+            } else if (foundGroup) {
+                break;
+            }
+        }
+    }
+
+    /**
      * Updates the UI properties and positioning of a child tab in the NESTED layout when its group
      * membership changes.
      *
@@ -1945,6 +1982,7 @@ public class TabListMediator implements TabListNotificationHandler {
     private void syncChildTabInNestedLayout(Tab tab, @Nullable Token oldTabGroupId) {
         int srcIndex = mModelList.indexFromTabId(tab.getId());
 
+        Token newTabGroupId = tab.getTabGroupId();
         if (oldTabGroupId == null && srcIndex != TabModel.INVALID_TAB_INDEX) {
             oldTabGroupId = mModelList.get(srcIndex).model.get(TabProperties.TAB_GROUP_ID);
         }
@@ -1962,18 +2000,7 @@ public class TabListMediator implements TabListNotificationHandler {
             mModelList.removeAt(srcIndex);
         } else if (srcIndex != TabModel.INVALID_TAB_INDEX) {
             PropertyModel model = mModelList.get(srcIndex).model;
-            Token newTabGroupId = tab.getTabGroupId();
-
-            if (newTabGroupId == null) {
-                // Tab is moving out of an expanded group.
-                clearTabGroupProperties(model);
-            } else {
-                // Tab is moving into an expanded group.
-                TabModel tabModel = getCurrentTabModelChecked();
-                @TabGroupColorId int colorId = tabModel.getTabGroupColorWithFallback(newTabGroupId);
-                model.set(TabProperties.TAB_GROUP_ID, newTabGroupId);
-                updateTabGroupProperties(tab, model, colorId);
-            }
+            setupGroupPropertiesForChildTab(tab, model);
 
             bindTabActionStateProperties(mTabActionState, tab, model);
 
@@ -1987,7 +2014,6 @@ public class TabListMediator implements TabListNotificationHandler {
             }
         }
 
-        Token newTabGroupId = tab.getTabGroupId();
         if (newTabGroupId != null) {
             updateTabGroupTitle(newTabGroupId);
         }
@@ -2824,15 +2850,13 @@ public class TabListMediator implements TabListNotificationHandler {
 
     private void addTabInfoToModelForTab(Tab tab, int index, boolean isSelected) {
         assert index != TabModel.INVALID_TAB_INDEX;
-        boolean shouldShowAsNestedChild =
-                mLayoutType != TabListLayoutType.FLAT && isTabInTabGroup(tab);
 
         PropertyModel tabInfo =
                 addTabInfoToModel(tab, index, isSelected, CardProperties.ModelType.TAB);
 
-        // Page Tab Specific properties
-        tabInfo.set(
-                TabProperties.TAB_GROUP_ID, shouldShowAsNestedChild ? tab.getTabGroupId() : null);
+        if (mLayoutType != TabListLayoutType.FLAT) {
+            setupGroupPropertiesForChildTab(tab, tabInfo);
+        }
         tabInfo.set(
                 TabProperties.TITLE,
                 getLatestTitleForTabOrGroup(tab, tabInfo, /* useDefault= */ false));
@@ -4182,6 +4206,18 @@ public class TabListMediator implements TabListNotificationHandler {
         model.set(TabProperties.TAB_GROUP_HEADER_ID, null);
         model.set(TAB_GROUP_COLOR_VIEW_PROVIDER, null);
         if (provider != null) provider.destroy();
+    }
+
+    private void setupGroupPropertiesForChildTab(Tab tab, PropertyModel model) {
+        Token tabGroupId = tab.getTabGroupId();
+        if (tabGroupId != null) {
+            model.set(TabProperties.TAB_GROUP_ID, tabGroupId);
+            TabModel tabModel = getCurrentTabModelChecked();
+            @TabGroupColorId int colorId = tabModel.getTabGroupColorWithFallback(tabGroupId);
+            updateTabGroupProperties(tab, model, colorId);
+        } else {
+            clearTabGroupProperties(model);
+        }
     }
 
     private void updateTabGroupProperties(

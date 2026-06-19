@@ -717,6 +717,36 @@ public class TabListMediatorUnitTest {
     }
 
     @Test
+    public void updatesColor_OnTabGroupColorChange_Group_Nested() {
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
+        Tab newTab = prepareTab(TAB3_ID, TAB3_TITLE, TAB3_URL);
+        List<Tab> tabs = List.of(mTab1, newTab);
+        createTabGroup(tabs, TAB_GROUP_ID);
+
+        // Uncollapse and reset so children are added to the list.
+        when(mTabModel.getTabGroupCollapsed(TAB_GROUP_ID)).thenReturn(false);
+        mMediator.resetWithListOfTabs(List.of(mTab1), null, false);
+
+        mTabModel.setTabGroupColor(TAB_GROUP_ID, TabGroupColorId.BLUE);
+        mTabGroupObserverCaptor
+                .getValue()
+                .didChangeTabGroupColor(mTab1.getTabGroupId(), TabGroupColorId.BLUE);
+
+        // Header
+        var provider = mModelList.get(0).model.get(TabProperties.TAB_GROUP_COLOR_VIEW_PROVIDER);
+        assertNotNull(provider);
+        assertEquals(TabGroupColorId.BLUE, provider.getTabGroupColorIdForTesting());
+
+        // Children should also be updated.
+        assertEquals(
+                TabGroupColorId.BLUE,
+                (int) mModelList.get(1).model.get(TabProperties.TAB_GROUP_CARD_COLOR));
+        assertEquals(
+                TabGroupColorId.BLUE,
+                (int) mModelList.get(2).model.get(TabProperties.TAB_GROUP_CARD_COLOR));
+    }
+
+    @Test
     public void tabGroupColorViewProviderDestroyed_Reset() {
         Tab newTab = prepareTab(TAB3_ID, TAB3_TITLE, TAB3_URL);
         List<Tab> tabs = List.of(mTab1, newTab);
@@ -4521,6 +4551,7 @@ public class TabListMediatorUnitTest {
         PropertyModel childModel = mModelList.get(1).model;
         assertEquals(mTab1.getId(), childModel.get(TabProperties.TAB_ID));
         assertNotNull(childModel.get(TabProperties.TAB_GROUP_COLOR_VIEW_PROVIDER));
+        assertEquals(COLOR_2, (int) childModel.get(TabProperties.TAB_GROUP_CARD_COLOR));
     }
 
     @Test
@@ -4550,9 +4581,13 @@ public class TabListMediatorUnitTest {
 
         assertEquals(mTab1.getId(), mModelList.get(1).model.get(TabProperties.TAB_ID));
         assertNotNull(mModelList.get(1).model.get(TabProperties.TAB_GROUP_COLOR_VIEW_PROVIDER));
+        assertEquals(
+                COLOR_2, (int) mModelList.get(1).model.get(TabProperties.TAB_GROUP_CARD_COLOR));
 
         assertEquals(mTab2.getId(), mModelList.get(2).model.get(TabProperties.TAB_ID));
         assertNotNull(mModelList.get(2).model.get(TabProperties.TAB_GROUP_COLOR_VIEW_PROVIDER));
+        assertEquals(
+                COLOR_2, (int) mModelList.get(2).model.get(TabProperties.TAB_GROUP_CARD_COLOR));
     }
 
     @Test
@@ -7299,11 +7334,23 @@ public class TabListMediatorUnitTest {
 
         when(mTabModel.getTabsInGroup(TAB_GROUP_ID)).thenReturn(tabs);
         when(mTabModel.getTabGroupCollapsed(TAB_GROUP_ID)).thenReturn(isCollapsed);
+        when(mTabModel.getTabGroupColorWithFallback(TAB_GROUP_ID)).thenReturn(COLOR_2);
         when(mTabModel.getTabById(TAB1_ID)).thenReturn(mTab1);
         when(mTabModel.getTabById(TAB3_ID)).thenReturn(tab3);
         mockTabIndexes(mTab1, tab3);
 
         mMediator.resetWithListOfTabs(List.of(mTab1), null, false);
+
+        // Verify color initialization for nested children.
+        if (!isCollapsed) {
+            PropertyModel child1Model = mModelList.get(1).model;
+            assertEquals(mTab1.getId(), child1Model.get(TabProperties.TAB_ID));
+            assertEquals(COLOR_2, (int) child1Model.get(TabProperties.TAB_GROUP_CARD_COLOR));
+            PropertyModel child3Model = mModelList.get(2).model;
+            assertEquals(tab3.getId(), child3Model.get(TabProperties.TAB_ID));
+            assertEquals(COLOR_2, (int) child3Model.get(TabProperties.TAB_GROUP_CARD_COLOR));
+        }
+
         return tab3;
     }
 
