@@ -80,6 +80,7 @@ export class UserEducationInternalsElement extends
       featurePromoErrorMessage_: {type: String},
       narrow_: {type: Boolean},
       newBadges_: {type: Array},
+      nonIphPromos_: {type: Array},
 
       /**
        * Indicates if the information about session data is expanded or
@@ -115,6 +116,7 @@ export class UserEducationInternalsElement extends
   protected accessor tutorials_: FeaturePromoDemoPageInfo[] = [];
   protected accessor featurePromos_: FeaturePromoDemoPageInfo[] = [];
   protected accessor newBadges_: FeaturePromoDemoPageInfo[] = [];
+  protected accessor nonIphPromos_: FeaturePromoDemoPageInfo[] = [];
   protected accessor whatsNewModules_: WhatsNewModuleDemoPageInfo[] = [];
   protected accessor whatsNewEditions_: WhatsNewEditionDemoPageInfo[] = [];
   protected accessor ntpPromos_: FeaturePromoDemoPageInfo[] = [];
@@ -154,6 +156,10 @@ export class UserEducationInternalsElement extends
 
     this.handler_.getNewBadges().then(({newBadges}) => {
       this.newBadges_ = newBadges;
+    });
+
+    this.handler_.getNonIphPromos().then(({nonIphPromos}) => {
+      this.nonIphPromos_ = nonIphPromos;
     });
 
     this.handler_.getWhatsNewModules().then(({whatsNewModules}) => {
@@ -301,6 +307,23 @@ export class UserEducationInternalsElement extends
       } else {
         this.handler_.getNewBadges().then(({newBadges}) => {
           this.newBadges_ = newBadges;
+          this.requestUpdate();
+        });
+      }
+    });
+  }
+
+  protected onNonIphClearPromoData_(e: CustomEvent<string>) {
+    const id = e.detail;
+    this.featurePromoErrorMessage_ = '';
+
+    this.handler_.clearNonIphPromoData(id).then(({errorMessage}) => {
+      this.featurePromoErrorMessage_ = errorMessage;
+      if (errorMessage !== '') {
+        this.$.errorMessageToast.show();
+      } else {
+        this.handler_.getNonIphPromos().then(({nonIphPromos}) => {
+          this.nonIphPromos_ = nonIphPromos;
           this.requestUpdate();
         });
       }

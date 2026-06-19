@@ -40,12 +40,15 @@ export function getHtml(this: UserEducationInternalsElement) {
           "New" Badges
         </a>
         <a role="menuitem" index="3" class="cr-nav-menu-item">
-          NTP Promos
+          Non-IPH Promos
         </a>
         <a role="menuitem" index="4" class="cr-nav-menu-item">
-          What's New
+          NTP Promos
         </a>
         <a role="menuitem" index="5" class="cr-nav-menu-item">
+          What's New
+        </a>
+        <a role="menuitem" index="6" class="cr-nav-menu-item">
           Advanced
         </a>
       </cr-menu-selector>
@@ -113,6 +116,21 @@ export function getHtml(this: UserEducationInternalsElement) {
             </user-education-internals-card>`)}
           <p class="if-empty">
             No "New" Badges match the search filter.
+          </p>
+        </div>
+        <div id="nonIphPromos" class="promo-list">
+          <a name="nonIphPromos"></a>
+          <h2>Non-IPH Promos</h2>
+          ${this.nonIphPromos_.map(item => html`
+            <user-education-internals-card
+                id="${item.internalName}"
+                ?hidden="${!this.promoFilter_(item)}"
+                .promo="${item}"
+                @clear-promo-data="${this.onNonIphClearPromoData_}">
+            </user-education-internals-card>`)}
+          <p class="if-empty">
+            No non-IPH promos match the search filter or the Feature Engagement
+            tracker is not ready. Reload the page to try again.
           </p>
         </div>
         <div id="ntpPromos" class="promo-list">
