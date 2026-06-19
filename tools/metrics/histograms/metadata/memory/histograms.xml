@@ -1275,6 +1275,22 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Memory.Browser.PartitionAlloc.Malloc.AllocatedObjects"
+    units="MB" expires_after="2027-05-28">
+  <owner>colibie@google.com</owner>
+  <owner>src/android_webview/OWNERS</owner>
+  <improvement direction="LOWER_IS_BETTER"/>
+  <summary>
+    WARNING: Android WebView Only at the moment.
+
+    The total active memory (bytes currently occupied by live objects) managed
+    by PartitionAlloc-as-Malloc in the browser process.
+
+    Recorded at Poisson sampled time intervals with a mean of 5 minutes on
+    Android (WebView).
+  </summary>
+</histogram>
+
 <histogram name="Memory.Browser.PrivateMemoryFootprint" units="MB"
     expires_after="never">
 <!-- expires-never: guiding metric (internal: go/chrome-browser-guiding-metrics) -->
