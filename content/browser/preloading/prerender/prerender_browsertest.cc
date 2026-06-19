@@ -17526,11 +17526,11 @@ IN_PROC_BROWSER_TEST_F(PrerenderUntilScriptOriginTrialBrowserTest, Basic) {
   RunBasicFunctionalityCheck();
 }
 
-class PrerenderFormSubmissionOriginTrialBrowserTest
+class PrerenderFormSubmissionBrowserTest
     : public PrerenderBrowserTest,
       public testing::WithParamInterface<bool> {
  public:
-  PrerenderFormSubmissionOriginTrialBrowserTest() {
+  PrerenderFormSubmissionBrowserTest() {
     if (IsPrerenderUntilScriptEnabled()) {
       feature_list_.InitAndEnableFeature(
           blink::features::kPrerenderUntilScript);
@@ -17560,39 +17560,10 @@ class PrerenderFormSubmissionOriginTrialBrowserTest
                                  std::string target_hint,
                                  bool navigate_as_form_submission,
                                  bool should_activate) {
-    // The URL that was used to register the Origin Trial token.
-    static constexpr char kOriginUrl[] = "https://127.0.0.1:45356";
-
-    const GURL initiator_url(base::StrCat(
-        {kOriginUrl, "/form_submission_origin_trial_initiator.html"}));
+    const GURL initiator_url = GetUrl("/empty.html?initiator");
     // The suffix `?` is for form submission navigations, which has `?` mark
     // regardless of having any parameter or not.
-    const GURL prerender_url(base::StrCat({kOriginUrl, "/empty.html?"}));
-
-    // The EmbeddedTestServer must run on a specific port because the origin
-    // trial token hard-coded in form_submission_origin_trial_initiator.html is
-    // bound to a specific origin. While EmbeddedTestServer allows us to specify
-    // a port, doing so introduces test flakiness due to TCP port reuse
-    // restrictions. To avoid this, we use URLLoaderInterceptor to serve the
-    // file, making the actual port irrelevant.
-    URLLoaderInterceptor prerender_loader(base::BindLambdaForTesting(
-        [&](URLLoaderInterceptor::RequestParams* params) {
-          if (params->url_request.url != initiator_url &&
-              params->url_request.url != prerender_url) {
-            return false;
-          }
-
-          const std::string headers =
-              "HTTP/1.1 200 OK\n"
-              "Content-type: text/html\n";
-          URLLoaderInterceptor::WriteResponse(
-              base::StrCat({"content/test/data/prerender",
-                            params->url_request.url.path()}),
-              params->client.get(), &headers, std::optional<net::SSLInfo>(),
-              params->url_request.url);
-
-          return true;
-        }));
+    const GURL prerender_url = GetUrl("/empty.html?");
 
     // Navigate to an initial page which has a link to `prerender_url`.
     ASSERT_TRUE(NavigateToURL(shell(), initiator_url));
@@ -17706,39 +17677,10 @@ class PrerenderFormSubmissionOriginTrialBrowserTest
   // should be canceled regardless of `form_submission`, which denotes whether
   // the prerender speculation rules are generated for form submission or not.
   void RunPrerenderFormInPrerenderTest(bool form_submission) {
-    // The URL that was used to register the Origin Trial token.
-    static constexpr char kOriginUrl[] = "https://127.0.0.1:45356";
-
-    const GURL initiator_url(
-        base::StrCat({kOriginUrl, "/empty.html?initiator"}));
+    const GURL initiator_url = GetUrl("/empty.html?initiator");
     // The suffix `?` is for form submission navigations, which has `?` mark
     // regardless of having any parameter or not.
-    const GURL prerender_url(base::StrCat({kOriginUrl, "/empty.html?"}));
-
-    // The EmbeddedTestServer must run on a specific port because the origin
-    // trial token hard-coded in form_submission_origin_trial_initiator.html is
-    // bound to a specific origin. While EmbeddedTestServer allows us to specify
-    // a port, doing so introduces test flakiness due to TCP port reuse
-    // restrictions. To avoid this, we use URLLoaderInterceptor to serve the
-    // file, making the actual port irrelevant.
-    URLLoaderInterceptor prerender_loader(base::BindLambdaForTesting(
-        [&](URLLoaderInterceptor::RequestParams* params) {
-          if (params->url_request.url != initiator_url &&
-              params->url_request.url != prerender_url) {
-            return false;
-          }
-
-          const std::string headers =
-              "HTTP/1.1 200 OK\n"
-              "Content-type: text/html\n";
-          URLLoaderInterceptor::WriteResponse(
-              base::StrCat({"content/test/data/prerender",
-                            params->url_request.url.path()}),
-              params->client.get(), &headers, std::optional<net::SSLInfo>(),
-              params->url_request.url);
-
-          return true;
-        }));
+    const GURL prerender_url = GetUrl("/empty.html?");
 
     // Navigate to an initial page which has a link to `prerender_url`.
     ASSERT_TRUE(NavigateToURL(shell(), initiator_url));
@@ -17772,7 +17714,7 @@ class PrerenderFormSubmissionOriginTrialBrowserTest
   base::test::ScopedFeatureList feature_list_;
 };
 
-IN_PROC_BROWSER_TEST_P(PrerenderFormSubmissionOriginTrialBrowserTest,
+IN_PROC_BROWSER_TEST_P(PrerenderFormSubmissionBrowserTest,
                        FormSubmissionHint_ActivationSuccessful) {
   RunFormSubmissionHintTest(/*first_attempt_form_field=*/true,
                             /*second_attempt_form_field=*/std::nullopt,
@@ -17782,7 +17724,7 @@ IN_PROC_BROWSER_TEST_P(PrerenderFormSubmissionOriginTrialBrowserTest,
 }
 
 IN_PROC_BROWSER_TEST_P(
-    PrerenderFormSubmissionOriginTrialBrowserTest,
+    PrerenderFormSubmissionBrowserTest,
     FormSubmissionHint_FirstWin_TrueThenFalse_ActivationSuccesful) {
   RunFormSubmissionHintTest(/*first_attempt_form_field=*/true,
                             /*second_attempt_form_field=*/false,
@@ -17792,7 +17734,7 @@ IN_PROC_BROWSER_TEST_P(
 }
 
 IN_PROC_BROWSER_TEST_P(
-    PrerenderFormSubmissionOriginTrialBrowserTest,
+    PrerenderFormSubmissionBrowserTest,
     FormSubmissionHint_FirstWin_FalseThenTrue_ActivationSuccesful) {
   RunFormSubmissionHintTest(/*first_attempt_form_field=*/false,
                             /*second_attempt_form_field=*/true,
@@ -17804,7 +17746,7 @@ IN_PROC_BROWSER_TEST_P(
 // Verifies that the second prerender will be treated as duplicated and
 // the non-form submission navigation cannot activate form submission prerender.
 IN_PROC_BROWSER_TEST_P(
-    PrerenderFormSubmissionOriginTrialBrowserTest,
+    PrerenderFormSubmissionBrowserTest,
     FormSubmissionHint_FirstWin_TrueThenFalse_FailWithMismatch) {
   RunFormSubmissionHintTest(/*first_attempt_form_field=*/true,
                             /*second_attempt_form_field=*/false,
@@ -17816,7 +17758,7 @@ IN_PROC_BROWSER_TEST_P(
 // Verifies that the second prerender will be treated as duplicated and
 // the form submission navigation cannot activate non-form submission prerender.
 IN_PROC_BROWSER_TEST_P(
-    PrerenderFormSubmissionOriginTrialBrowserTest,
+    PrerenderFormSubmissionBrowserTest,
     FormSubmissionHint_FirstWin_FalseThenTrue_FailWithMismatch) {
   RunFormSubmissionHintTest(/*first_attempt_form_field=*/false,
                             /*second_attempt_form_field=*/true,
@@ -17825,7 +17767,7 @@ IN_PROC_BROWSER_TEST_P(
                             /*should_activate=*/false);
 }
 
-IN_PROC_BROWSER_TEST_P(PrerenderFormSubmissionOriginTrialBrowserTest,
+IN_PROC_BROWSER_TEST_P(PrerenderFormSubmissionBrowserTest,
                        FormSubmissionHintBlankTargetHint_ActivationSuccessful) {
   RunFormSubmissionHintTest(/*first_attempt_form_field=*/true,
                             /*second_attempt_form_field=*/std::nullopt,
@@ -17834,7 +17776,7 @@ IN_PROC_BROWSER_TEST_P(PrerenderFormSubmissionOriginTrialBrowserTest,
                             /*should_activate=*/true);
 }
 
-IN_PROC_BROWSER_TEST_P(PrerenderFormSubmissionOriginTrialBrowserTest,
+IN_PROC_BROWSER_TEST_P(PrerenderFormSubmissionBrowserTest,
                        FormSubmissionHintBlankTargetHint_FailWithMismatch) {
   RunFormSubmissionHintTest(/*first_attempt_form_field=*/true,
                             /*second_attempt_form_field=*/std::nullopt,
@@ -17846,7 +17788,7 @@ IN_PROC_BROWSER_TEST_P(PrerenderFormSubmissionOriginTrialBrowserTest,
 // The test will generate a form submission within the prerender by javascript.
 // PUS will not run the javascript when prerendering, so this has prerender
 // variation only.
-IN_PROC_BROWSER_TEST_F(PrerenderFormSubmissionOriginTrialBrowserTest,
+IN_PROC_BROWSER_TEST_F(PrerenderFormSubmissionBrowserTest,
                        PrerenderFormInPrerender_WithFormSubmission) {
   RunPrerenderFormInPrerenderTest(/*form_submission=*/true);
 }
@@ -17854,13 +17796,13 @@ IN_PROC_BROWSER_TEST_F(PrerenderFormSubmissionOriginTrialBrowserTest,
 // The test will generate a form submission within the prerender by javascript.
 // PUS will not run the javascript when prerendering, so this has prerender
 // variation only.
-IN_PROC_BROWSER_TEST_F(PrerenderFormSubmissionOriginTrialBrowserTest,
+IN_PROC_BROWSER_TEST_F(PrerenderFormSubmissionBrowserTest,
                        PrerenderFormInPrerender_WithoutFormSubmission) {
   RunPrerenderFormInPrerenderTest(/*form_submission=*/false);
 }
 
 INSTANTIATE_TEST_SUITE_P(All,
-                         PrerenderFormSubmissionOriginTrialBrowserTest,
+                         PrerenderFormSubmissionBrowserTest,
                          testing::Bool());
 
 // Tests that a PUS (prerender-until-script) session is upgraded to a full
