@@ -66,8 +66,7 @@ constexpr auto kOldDataResources = base::MakeFixedFlatMap<Suggestion::Icon,
     {Suggestion::Icon::kFlight, IDR_ANDROID_AUTOFILL_FLIGHT},
     // TODO(crbug.com/503303085): Correctly handle android icons.
     {Suggestion::Icon::kFlightSpark, IDR_ANDROID_AUTOFILL_FLIGHT},
-    {Suggestion::Icon::kOrder,
-     0},  // TODO(crbug.com/503303085): Correctly handle android icons.
+    {Suggestion::Icon::kOrder, IDR_ANDROID_AUTOFILL_ORDER},
     {Suggestion::Icon::kOrderSpark,
      0},  // TODO(crbug.com/503303085): Correctly handle android icons.
     {Suggestion::Icon::kPersonCheck, IDR_ANDROID_AUTOFILL_PERSON_CHECK},
@@ -119,8 +118,7 @@ constexpr auto kDataResources = base::MakeFixedFlatMap<Suggestion::Icon, int>({
     {Suggestion::Icon::kFlight, IDR_ANDROID_AUTOFILL_FLIGHT},
     // TODO(crbug.com/503303085): Correctly handle android icons.
     {Suggestion::Icon::kFlightSpark, IDR_ANDROID_AUTOFILL_FLIGHT},
-    {Suggestion::Icon::kOrder,
-     0},  // TODO(crbug.com/503303085): Correctly handle android icons.
+    {Suggestion::Icon::kOrder, IDR_ANDROID_AUTOFILL_ORDER},
     {Suggestion::Icon::kOrderSpark,
      0},  // TODO(crbug.com/503303085): Correctly handle android icons.
     {Suggestion::Icon::kPersonCheck, IDR_ANDROID_AUTOFILL_PERSON_CHECK},

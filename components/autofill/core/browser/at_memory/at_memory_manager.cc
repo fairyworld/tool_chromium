@@ -218,6 +218,7 @@ Suggestion::Icon GetIconForMemoryDataType(
     case accessibility_annotator::MemoryDataType::kOrderMerchantDomain:
     case accessibility_annotator::MemoryDataType::kOrderProductNames:
     case accessibility_annotator::MemoryDataType::kOrderGrandTotal:
+      return Suggestion::Icon::kOrder;
     case accessibility_annotator::MemoryDataType::kShipmentFull:
     case accessibility_annotator::MemoryDataType::kShipmentTrackingNumber:
     case accessibility_annotator::MemoryDataType::kShipmentAssociatedOrderId:
