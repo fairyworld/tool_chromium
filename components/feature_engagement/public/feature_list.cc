@@ -287,6 +287,7 @@ const base::Feature* const kAllFeatures[] = {
     &kIPHPasswordsSavePrimingPromoFeature,
     &kIPHPasswordsSaveRecoveryPromoFeature,
     &kIPHPasswordsWebAppProfileSwitchFeature,
+    &kIPHPdfGlicSummarizeFeature,
     &kIPHPdfInkSignaturesFeature,
     &kIPHPdfSearchifyFeature,
     &kIPHPerformanceInterventionDialogFeature,
