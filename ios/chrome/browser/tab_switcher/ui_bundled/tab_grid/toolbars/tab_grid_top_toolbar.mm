@@ -243,24 +243,6 @@ CGFloat HorizontalMargin() {
   [self.pageControl resetLastPageControlHighlight];
 }
 
-- (void)hide {
-  if (@available(iOS 26, *)) {
-    return;
-  }
-  self.backgroundColor = UIColor.blackColor;
-
-  self.pageControl.alpha = 0.0;
-}
-
-- (void)show {
-  if (@available(iOS 26, *)) {
-    return;
-  }
-  self.backgroundColor = UIColor.clearColor;
-
-  self.pageControl.alpha = 1.0;
-}
-
 - (void)setScrollViewScrolledToEdge:(BOOL)scrolledToEdge {
   if (scrolledToEdge == _scrolledToEdge) {
     return;

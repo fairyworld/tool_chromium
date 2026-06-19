@@ -58,7 +58,6 @@
 #import "ios/chrome/browser/tab_switcher/ui_bundled/tab_grid/toolbars/tab_grid_page_control.h"
 #import "ios/chrome/browser/tab_switcher/ui_bundled/tab_grid/toolbars/tab_grid_toolbar_background_view.h"
 #import "ios/chrome/browser/tab_switcher/ui_bundled/tab_grid/toolbars/tab_grid_top_toolbar.h"
-#import "ios/chrome/browser/tab_switcher/ui_bundled/tab_grid/transitions/legacy_grid_transition_layout.h"
 #import "ios/chrome/browser/tab_switcher/ui_bundled/tab_grid/transitions/tab_grid_transition_layout.h"
 #import "ios/chrome/common/ui/colors/semantic_color_names.h"
 #import "ios/chrome/common/ui/util/constraints_ui_util.h"
@@ -244,12 +243,6 @@ NSUInteger GetPageIndexFromPage(TabGridPage page) {
     [self setupPinnedTabsViewController];
   }
 
-  // Hide the toolbars and the floating button, so they can fade in the first
-  // time there's a transition into this view controller. Not hidden for the new
-  // tab grid transitions.
-  if (!IsNewTabGridTransitionsEnabled()) {
-    [self hideToolbars];
-  }
 
   [self scrollToPage:self.currentPage animated:NO];
 
@@ -474,19 +467,6 @@ NSUInteger GetPageIndexFromPage(TabGridPage page) {
   }
   [self.topToolbar.pageControl setSelectedPage:self.currentPage animated:NO];
   [self configureViewControllerForCurrentSizeClassesAndPage];
-
-  // The new tab grid transitions don't hide the toolbars, so no need to show.
-  if (!IsNewTabGridTransitionsEnabled()) {
-    // The toolbars should be hidden (alpha 0.0) before the tab appears, so that
-    // they can be animated in. They can't be set to 0.0 here, because if
-    // `animated` is YES, this method is being called inside the animation
-    // block.
-    if (animated && self.transitionCoordinator) {
-      [self animateToolbarsForAppearance];
-    } else {
-      [self showToolbars];
-    }
-  }
   [self broadcastIncognitoContentVisibility];
 
   [self.incognitoTabsViewController contentWillAppearAnimated:animated];
@@ -510,16 +490,6 @@ NSUInteger GetPageIndexFromPage(TabGridPage page) {
   [self.swipeToIncognitoIPH
       dismissWithReason:IPHDismissalReasonType::kTappedOutsideIPHAndAnchorView];
 
-  // The new tab grid transitions don't hide the toolbars.
-  if (!IsNewTabGridTransitionsEnabled()) {
-    // When the view disappears, the toolbar alpha should be set to 0; either as
-    // part of the animation, or directly with -hideToolbars.
-    if (animated && self.transitionCoordinator) {
-      [self animateToolbarsForDisappearance];
-    } else {
-      [self hideToolbars];
-    }
-  }
 
   self.viewVisible = NO;
   [self updateAccessibilityElements];
@@ -1047,100 +1017,6 @@ NSUInteger GetPageIndexFromPage(TabGridPage page) {
   }
 }
 
-// Shows the two toolbars and the floating button. Suitable for use in
-// animations.
-- (void)showToolbars {
-  CHECK(_childViewsAreSetUp);
-  [self.topToolbar show];
-  [self.bottomToolbar show];
-}
-
-// Hides the two toolbars. Suitable for use in animations.
-- (void)hideToolbars {
-  if (!_childViewsAreSetUp) {
-    return;
-  }
-  [self.topToolbar hide];
-  [self.bottomToolbar hide];
-}
-
-// Translates the toolbar views offscreen and then animates them back in using
-// the transition coordinator. Transitions are preferred here since they don't
-// interact with the layout system at all.
-- (void)animateToolbarsForAppearance {
-  CHECK(_childViewsAreSetUp);
-  DCHECK(self.transitionCoordinator);
-  // Unless reduce motion is enabled, hide the scroll view during the
-  // animation.
-  if (!UIAccessibilityIsReduceMotionEnabled()) {
-    self.scrollView.hidden = YES;
-  }
-  // Fade the toolbars in for the last 60% of the transition.
-  auto keyframe = ^{
-    [UIView addKeyframeWithRelativeStartTime:0.2
-                            relativeDuration:0.6
-                                  animations:^{
-                                    [self showToolbars];
-                                  }];
-  };
-  // Animation block that does the keyframe animation.
-  auto animation = ^(id<UIViewControllerTransitionCoordinatorContext> context) {
-    [UIView animateKeyframesWithDuration:context.transitionDuration
-                                   delay:0
-                                 options:UIViewAnimationOptionLayoutSubviews
-                              animations:keyframe
-                              completion:nil];
-  };
-
-  // Restore the scroll view and toolbar opacities (in case the animation didn't
-  // complete) as part of the completion.
-  auto cleanup = ^(id<UIViewControllerTransitionCoordinatorContext> context) {
-    self.scrollView.hidden = NO;
-    [self showToolbars];
-  };
-
-  // Animate the toolbar alphas alongside the current transition.
-  [self.transitionCoordinator animateAlongsideTransition:animation
-                                              completion:cleanup];
-}
-
-// Translates the toolbar views offscreen using the transition coordinator.
-- (void)animateToolbarsForDisappearance {
-  CHECK(_childViewsAreSetUp);
-  DCHECK(self.transitionCoordinator);
-  // Unless reduce motion is enabled, hide the scroll view during the
-  // animation.
-  if (!UIAccessibilityIsReduceMotionEnabled()) {
-    self.scrollView.hidden = YES;
-  }
-  // Fade the toolbars out in the first 66% of the transition.
-  auto keyframe = ^{
-    [UIView addKeyframeWithRelativeStartTime:0
-                            relativeDuration:0.40
-                                  animations:^{
-                                    [self hideToolbars];
-                                  }];
-  };
-
-  // Animation block that does the keyframe animation.
-  auto animation = ^(id<UIViewControllerTransitionCoordinatorContext> context) {
-    [UIView animateKeyframesWithDuration:context.transitionDuration
-                                   delay:0
-                                 options:UIViewAnimationOptionLayoutSubviews
-                              animations:keyframe
-                              completion:nil];
-  };
-
-  // Hide the scroll view (and thus the tab grids) until the transition
-  // completes. Restore the toolbar opacity when the transition completes.
-  auto cleanup = ^(id<UIViewControllerTransitionCoordinatorContext> context) {
-    self.scrollView.hidden = NO;
-  };
-
-  // Animate the toolbar alphas alongside the current transition.
-  [self.transitionCoordinator animateAlongsideTransition:animation
-                                              completion:cleanup];
-}
 
 // Tells the appropriate delegate to create a new item, and then tells the
 // presentation delegate to show the new item.

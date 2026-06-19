@@ -129,13 +129,6 @@ BASE_DECLARE_FEATURE(kRemoveExcessNTPs);
 // Feature flag / Kill Switch for TCRex.
 BASE_DECLARE_FEATURE(kTCRexKillSwitch);
 
-// When enabled uses new transitions in the TabGrid.
-BASE_DECLARE_FEATURE(kTabGridNewTransitions);
-
-
-// Whether the new tab grid tabs transitions should be enabled.
-bool IsNewTabGridTransitionsEnabled();
-
 // When enabled, an overflow menu will replace the edit menu on the GTS.
 BASE_DECLARE_FEATURE(kTabSwitcherOverflowMenu);
 
