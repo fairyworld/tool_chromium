@@ -532,3 +532,20 @@ IN_PROC_BROWSER_TEST_F(WebUIBrowserTest, DevToolsWindowDoesNotCrash) {
   chrome::ToggleDevToolsWindow(browser(), DevToolsToggleAction::Show(),
                                DevToolsOpenedByAction::kUnknown);
 }
+
+IN_PROC_BROWSER_TEST_F(WebUIBrowserTest,
+                       ActiveTabHasNonZeroSizeOnWindowCreation) {
+  // Create a new browser window with a tab.
+  Browser* new_browser = Browser::Create(Browser::CreateParams(
+      Browser::Type::TYPE_NORMAL, browser()->profile(), true));
+  chrome::AddTabAt(new_browser, GURL(), -1, true);
+  new_browser->GetWindow()->Show();
+
+  content::WebContents* active_contents =
+      new_browser->tab_strip_model()->GetActiveWebContents();
+  ASSERT_TRUE(active_contents);
+
+  // The active tab's size must be non-zero immediately after the browser window
+  // is created.
+  EXPECT_FALSE(active_contents->GetSize().IsZero());
+}
