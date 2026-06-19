@@ -77,7 +77,7 @@ import java.util.Collections;
 @RunWith(ChromeJUnit4ClassRunner.class)
 @Batch(Batch.PER_CLASS)
 @CommandLineFlags.Add({ChromeSwitches.DISABLE_FIRST_RUN_EXPERIENCE})
-public class TouchToFillIntegrationTest {
+public class TouchToFillPasswordManagerIntegrationTest {
     private static GURL sExampleUrl;
     private static final String MOBILE_URL = "https://m.example.xyz";
     private static Credential sAna;

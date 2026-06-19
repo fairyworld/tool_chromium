@@ -74,7 +74,7 @@ import java.util.List;
 @ParameterAnnotations.UseRunnerDelegate(ChromeJUnit4RunnerDelegate.class)
 @DoNotBatch(reason = "The tests can't be batched because they run for different set-ups.")
 @CommandLineFlags.Add({ChromeSwitches.DISABLE_FIRST_RUN_EXPERIENCE})
-public class TouchToFillRenderTest {
+public class TouchToFillPasswordManagerRenderTest {
     @ParameterAnnotations.ClassParameter
     private static final List<ParameterSet> sClassParams =
             Arrays.asList(
@@ -127,7 +127,7 @@ public class TouchToFillRenderTest {
     @Mock private Callback<Credential> mCredentialCallback;
 
     private PropertyModel mModel;
-    private TouchToFillView mTouchToFillView;
+    private TouchToFillPasswordManagerView mTouchToFillView;
     private BottomSheetController mBottomSheetController;
     PasswordManagerResourceProvider mResourceProvider;
     private WebPageStation mPage;
@@ -143,7 +143,7 @@ public class TouchToFillRenderTest {
                     .setBugComponent(Component.UI_BROWSER_AUTOFILL)
                     .build();
 
-    public TouchToFillRenderTest(boolean nightModeEnabled, boolean useRtlLayout) {
+    public TouchToFillPasswordManagerRenderTest(boolean nightModeEnabled, boolean useRtlLayout) {
         setRtlForTesting(useRtlLayout);
         ChromeNightModeTestUtils.setUpNightModeForChromeActivity(nightModeEnabled);
         mRenderTestRule.setNightModeEnabled(nightModeEnabled);
@@ -164,7 +164,7 @@ public class TouchToFillRenderTest {
                 () -> {
                     mModel = TouchToFillProperties.createDefaultModel(mDismissHandler);
                     mTouchToFillView =
-                            new TouchToFillView(
+                            new TouchToFillPasswordManagerView(
                                     mActivityTestRule.getActivity(), mBottomSheetController);
                     TouchToFillCoordinator.setUpModelChangeProcessors(mModel, mTouchToFillView);
                 });

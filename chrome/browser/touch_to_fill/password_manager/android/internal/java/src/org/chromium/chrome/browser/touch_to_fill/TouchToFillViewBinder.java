@@ -54,18 +54,18 @@ import org.chromium.ui.modelutil.SimpleRecyclerViewMcp;
 
 /**
  * Provides functions that map {@link TouchToFillProperties} changes in a {@link PropertyModel} to
- * the suitable method in {@link TouchToFillView}.
+ * the suitable method in {@link TouchToFillPasswordManagerView}.
  */
 class TouchToFillViewBinder {
     /**
      * Called whenever a property in the given model changes. It updates the given view accordingly.
      *
      * @param model The observed {@link PropertyModel}. Its data need to be reflected in the view.
-     * @param view The {@link TouchToFillView} to update.
+     * @param view The {@link TouchToFillPasswordManagerView} to update.
      * @param propertyKey The {@link PropertyKey} which changed.
      */
     static void bindTouchToFillView(
-            PropertyModel model, TouchToFillView view, PropertyKey propertyKey) {
+            PropertyModel model, TouchToFillPasswordManagerView view, PropertyKey propertyKey) {
         if (propertyKey == DISMISS_HANDLER) {
             view.setDismissHandler(model.get(DISMISS_HANDLER));
         } else if (propertyKey == VISIBLE) {
@@ -91,7 +91,8 @@ class TouchToFillViewBinder {
     }
 
     /**
-     * Factory used to create a new View inside the ListView inside the TouchToFillView.
+     * Factory used to create a new View inside the ListView inside the
+     * TouchToFillPasswordManagerView.
      *
      * @param parent The parent {@link ViewGroup} of the new item.
      * @param itemType The type of View to create.

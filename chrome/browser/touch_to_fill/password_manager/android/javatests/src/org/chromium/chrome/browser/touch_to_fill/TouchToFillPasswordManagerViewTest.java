@@ -98,7 +98,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RunWith(ChromeJUnit4ClassRunner.class)
 @Batch(Batch.PER_CLASS)
 @CommandLineFlags.Add({ChromeSwitches.DISABLE_FIRST_RUN_EXPERIENCE})
-public class TouchToFillViewTest {
+public class TouchToFillPasswordManagerViewTest {
     private static final Credential ANA =
             new Credential.Builder()
                     .setUsername("Ana")
@@ -163,7 +163,7 @@ public class TouchToFillViewTest {
     @Mock private FillableItemCollectionInfo mItemCollectionInfo;
 
     private PropertyModel mModel;
-    private TouchToFillView mTouchToFillView;
+    private TouchToFillPasswordManagerView mTouchToFillView;
     private BottomSheetController mBottomSheetController;
     private BottomSheetTestSupport mSheetTestSupport;
     private WebPageStation mPage;
@@ -184,7 +184,9 @@ public class TouchToFillViewTest {
         ThreadUtils.runOnUiThreadBlocking(
                 () -> {
                     mModel = TouchToFillProperties.createDefaultModel(mDismissHandler);
-                    mTouchToFillView = new TouchToFillView(getActivity(), mBottomSheetController);
+                    mTouchToFillView =
+                            new TouchToFillPasswordManagerView(
+                                    getActivity(), mBottomSheetController);
                     TouchToFillCoordinator.setUpModelChangeProcessors(mModel, mTouchToFillView);
                 });
     }

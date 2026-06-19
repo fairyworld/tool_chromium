@@ -27,7 +27,7 @@ import java.util.Set;
  * Android Views.
  */
 @NullMarked
-class TouchToFillView extends BottomSheetListViewBase {
+class TouchToFillPasswordManagerView extends BottomSheetListViewBase {
     private static class HorizontalDividerItemDecoration extends ItemDividerBase {
         HorizontalDividerItemDecoration(Context context) {
             super(context);
@@ -51,12 +51,13 @@ class TouchToFillView extends BottomSheetListViewBase {
     }
 
     /**
-     * Constructs a TouchToFillView which creates, modifies, and shows the bottom sheet.
+     * Constructs a TouchToFillPasswordManagerView which creates, modifies, and shows the bottom
+     * sheet.
      *
      * @param context A {@link Context} used to load resources and inflate the sheet.
      * @param bottomSheetController The {@link BottomSheetController} used to show/hide the sheet.
      */
-    TouchToFillView(Context context, BottomSheetController bottomSheetController) {
+    TouchToFillPasswordManagerView(Context context, BottomSheetController bottomSheetController) {
         super(
                 bottomSheetController,
                 (RelativeLayout)

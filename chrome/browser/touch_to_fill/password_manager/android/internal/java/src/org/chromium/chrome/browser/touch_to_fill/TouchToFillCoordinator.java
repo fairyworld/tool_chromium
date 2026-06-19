@@ -29,7 +29,7 @@ public class TouchToFillCoordinator implements TouchToFillComponent {
     private final TouchToFillMediator mMediator = new TouchToFillMediator();
     private final PropertyModel mModel =
             TouchToFillProperties.createDefaultModel(mMediator::onDismissed);
-    private TouchToFillView mView;
+    private TouchToFillPasswordManagerView mView;
 
     @Override
     public void initialize(
@@ -51,7 +51,7 @@ public class TouchToFillCoordinator implements TouchToFillComponent {
                 context.getResources()
                         .getDimensionPixelSize(R.dimen.touch_to_fill_favicon_size_modern),
                 bottomSheetFocusHelper);
-        mView = new TouchToFillView(context, sheetController);
+        mView = new TouchToFillPasswordManagerView(context, sheetController);
         setUpModelChangeProcessors(mModel, mView);
     }
 
@@ -82,10 +82,11 @@ public class TouchToFillCoordinator implements TouchToFillComponent {
      * Connects the given model with the given view using Model Change Processors.
      *
      * @param model A {@link PropertyModel} built with {@link TouchToFillProperties}.
-     * @param view A {@link TouchToFillView}.
+     * @param view A {@link TouchToFillPasswordManagerView}.
      */
     @VisibleForTesting
-    static void setUpModelChangeProcessors(PropertyModel model, TouchToFillView view) {
+    static void setUpModelChangeProcessors(
+            PropertyModel model, TouchToFillPasswordManagerView view) {
         PropertyModelChangeProcessor.create(
                 model, view, TouchToFillViewBinder::bindTouchToFillView);
     }
