@@ -3367,7 +3367,7 @@ useful for Chirp alerts (go/crca-alerts). -->
 
 <histogram
     name="SafeBrowsing.SiteFamiliarity.DeferNavigation.DefaultSearchEngine"
-    enum="BooleanOccurred" expires_after="2026-10-16">
+    enum="BooleanOccurred" expires_after="2026-12-16">
   <owner>tiffanysong@google.com</owner>
   <owner>jacastro@chromium.org</owner>
   <owner>chrome-counter-abuse-alerts@google.com</owner>
