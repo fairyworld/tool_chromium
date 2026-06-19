@@ -46,6 +46,7 @@
 #include "chrome/browser/ui/views/autofill/popup/popup_loading_view.h"
 #include "chrome/browser/ui/views/autofill/popup/popup_no_suggestions_view.h"
 #include "chrome/browser/ui/views/autofill/popup/popup_personal_context_notice_view.h"
+#include "chrome/browser/ui/views/autofill/popup/popup_row_content_view.h"
 #include "chrome/browser/ui/views/autofill/popup/popup_row_factory_utils.h"
 #include "chrome/browser/ui/views/autofill/popup/popup_row_view.h"
 #include "chrome/browser/ui/views/autofill/popup/popup_search_bar_view.h"
@@ -1370,9 +1371,11 @@ void PopupViewViews::CreateSuggestionViews() {
               base::BindRepeating(&DefaultA11yAnnouncer))));
     } else if (suggestions[current_line_number].type ==
                SuggestionType::kPersonalContextNotice) {
+      auto view = std::make_unique<PopupRowContentView>();
       rows_.push_back(footer_container_->AddChildView(
           std::make_unique<PopupPersonalContextNoticeView>(
-              controller(), current_line_number)));
+              /*a11y_selection_delegate=*/*this, /*selection_delegate=*/*this,
+              controller(), current_line_number, std::move(view))));
     } else {
       rows_.push_back(footer_container_->AddChildView(CreatePopupRowView(
           controller(), /*a11y_selection_delegate=*/*this,
