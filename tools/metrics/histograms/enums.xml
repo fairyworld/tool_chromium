@@ -2026,6 +2026,7 @@ Called by update_net_error_codes.py.-->
   <int value="-202" label="CERT_AUTHORITY_INVALID"/>
   <int value="-201" label="CERT_DATE_INVALID"/>
   <int value="-200" label="CERT_COMMON_NAME_INVALID"/>
+  <int value="-189" label="CONTROL_MSG_TOO_BIG"/>
   <int value="-188" label="PROXY_DELEGATE_CANCELED_CONNECT_RESPONSE"/>
   <int value="-187" label="PROXY_DELEGATE_CANCELED_CONNECT_REQUEST"/>
   <int value="-186" label="PROXY_UNABLE_TO_CONNECT_TO_DESTINATION"/>
@@ -21950,6 +21951,7 @@ Called by update_net_error_codes.py.-->
   <int value="186" label="PROXY_UNABLE_TO_CONNECT_TO_DESTINATION"/>
   <int value="187" label="PROXY_DELEGATE_CANCELED_CONNECT_REQUEST"/>
   <int value="188" label="PROXY_DELEGATE_CANCELED_CONNECT_RESPONSE"/>
+  <int value="189" label="CONTROL_MSG_TOO_BIG"/>
   <int value="200" label="CERT_COMMON_NAME_INVALID"/>
   <int value="201" label="CERT_DATE_INVALID"/>
   <int value="202" label="CERT_AUTHORITY_INVALID"/>
