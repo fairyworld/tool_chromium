@@ -706,10 +706,19 @@ chromium-metrics-reviews@google.com.
   <owner>mastiz@chromium.org</owner>
   <owner>treib@chromium.org</owner>
   <summary>
-    Breakdown of sync data types being configured at first time signin, restart,
-    or user-initiated reconfiguration. This is different from Sync.CustomTypes
-    in that this captures all active devices, not just those that are choosing a
-    custom sync configuration.
+    Breakdown of sync data types being configured. This is different from
+    Sync.CustomTypes in that this captures all active devices, not just those
+    that are choosing a custom sync configuration.
+
+    A sync configuration refers to the process of initializing or updating the
+    set of active, syncing data types. This is triggered under several
+    scenarios: most commonly, when a user signs in for the first time (setting
+    up a new client); upon browser restart or profile load while already signed
+    in (restarting sync for an existing client); when the user changes sync
+    toggles or settings (reconfiguration); when an identity/authentication error
+    is resolved; when key crypto-related events occur (such as decryption key
+    acquisition or entering a correct custom passphrase); and as a result of
+    other more advanced triggers such as error conditions.
 
     Note that not all platforms support all data types. As such, comparing
     across platforms should only look at the common data types.
@@ -928,6 +937,16 @@ chromium-metrics-reviews@google.com.
     Counts the number of entries for each data type. The count is based on
     metadata entries for the type. Recorded after sync configuration. This
     metric is used for monitoring general health of sync client-side code.
+
+    A sync configuration refers to the process of initializing or updating the
+    set of active, syncing data types. This is triggered under several
+    scenarios: most commonly, when a user signs in for the first time (setting
+    up a new client); upon browser restart or profile load while already signed
+    in (restarting sync for an existing client); when the user changes sync
+    toggles or settings (reconfiguration); when an identity/authentication error
+    is resolved; when key crypto-related events occur (such as decryption key
+    acquisition or entering a correct custom passphrase); and as a result of
+    other more advanced triggers such as error conditions.
   </summary>
   <token key="SyncDataType" variants="SyncDataType"/>
 </histogram>
@@ -980,6 +999,16 @@ chromium-metrics-reviews@google.com.
     Estimated memory usage by sync datatype in kilobytes. Recorded after sync
     configuration. This metric is used for monitoring general health of sync
     client-side code.
+
+    A sync configuration refers to the process of initializing or updating the
+    set of active, syncing data types. This is triggered under several
+    scenarios: most commonly, when a user signs in for the first time (setting
+    up a new client); upon browser restart or profile load while already signed
+    in (restarting sync for an existing client); when the user changes sync
+    toggles or settings (reconfiguration); when an identity/authentication error
+    is resolved; when key crypto-related events occur (such as decryption key
+    acquisition or entering a correct custom passphrase); and as a result of
+    other more advanced triggers such as error conditions.
   </summary>
   <token key="SyncDataType" variants="SyncDataType"/>
 </histogram>
