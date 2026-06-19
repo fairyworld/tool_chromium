@@ -586,7 +586,13 @@ BASE_FEATURE(kMagiChromeSignInExperimentsBatch1,
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
 #if BUILDFLAG(IS_ANDROID)
+// When enabled, IdentityManager is used as source of accounts instead of
+// AccountManagerFacade.
 BASE_FEATURE(kMakeIdentityManagerSourceOfAccounts,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+// When enabled, IdentityManager is used as source of accounts instead of
+// AccountManagerFacade. This flag is used for changes merged after M150.
+BASE_FEATURE(kMakeIdentityManagerSourceOfAccountsPart2,
              base::FEATURE_DISABLED_BY_DEFAULT);
 // When enabled a new library is used to fetch accounts via
 // AccountManagerAccountManagerDelegate

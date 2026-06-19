@@ -5889,6 +5889,13 @@ inline constexpr char kMakeIdentityManagerSourceOfAccountsDescription[] =
     "Make IdentityManager the source of accounts in Chrome on Android, as "
     "opposed to AccountManagerFacade, when this feature is disabled.";
 
+inline constexpr char kMakeIdentityManagerSourceOfAccountsPart2Name[] =
+    "Make IdentityManager source of accounts part 2";
+inline constexpr char kMakeIdentityManagerSourceOfAccountsPart2Description[] =
+    "Make IdentityManager the source of accounts in Chrome on Android, as "
+    "opposed to AccountManagerFacade. This flag is used for changes merged "
+    "after M150.";
+
 inline constexpr char kMediaCodecBlockModelName[] = "MediaCodec Block Model";
 inline constexpr char kMediaCodecBlockModelDescription[] =
     "Enables Block Model for MediaCodec on Android.";

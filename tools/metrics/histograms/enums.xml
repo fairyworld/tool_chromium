@@ -16603,6 +16603,8 @@ from previous Chrome versions.
   <int value="705946076"
       label="ContextMenuPerformanceInfoAndRemoteHintFetching:disabled"/>
   <int value="706280254" label="StoragePressureEvent:enabled"/>
+  <int value="707167242"
+      label="MakeIdentityManagerSourceOfAccountsPart2:disabled"/>
   <int value="707243920" label="OnDeviceModelPerformanceParams:enabled"/>
   <int value="707463326" label="DynamicSafeAreaInsets:enabled"/>
   <int value="707704853" label="SendTabToSelfPropagateFormFields:enabled"/>
@@ -19438,6 +19440,8 @@ from previous Chrome versions.
   <int value="1625988511" label="DurableClientHintsCache:enabled"/>
   <int value="1626258278"
       label="PrivacySandboxProactiveTopicsBlocking:enabled"/>
+  <int value="1626457215"
+      label="MakeIdentityManagerSourceOfAccountsPart2:enabled"/>
   <int value="1626698375" label="AndroidUseDisplayTopology:disabled"/>
   <int value="1626795933" label="CCTTextFragmentLookupApiEnabled:disabled"/>
   <int value="1626824478" label="ExperimentalAppBanners:disabled"/>

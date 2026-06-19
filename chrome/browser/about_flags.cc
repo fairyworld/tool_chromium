@@ -10907,6 +10907,12 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kMakeIdentityManagerSourceOfAccountsDescription,
      kOsAndroid,
      FEATURE_VALUE_TYPE(switches::kMakeIdentityManagerSourceOfAccounts)},
+
+    {"make-identity-manager-source-of-accounts-part2",
+     flag_descriptions::kMakeIdentityManagerSourceOfAccountsPart2Name,
+     flag_descriptions::kMakeIdentityManagerSourceOfAccountsPart2Description,
+     kOsAndroid,
+     FEATURE_VALUE_TYPE(switches::kMakeIdentityManagerSourceOfAccountsPart2)},
 #endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_ANDROID)
