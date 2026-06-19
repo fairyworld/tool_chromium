@@ -2481,6 +2481,14 @@ public class FuseboxMediatorUnitTest {
     }
 
     @Test
+    public void cameraButtonVisibility_desktopPlatform() {
+        OmniboxCapabilities.setIsDesktopPlatformForTesting(true);
+        recreateMediator();
+
+        assertFalse(mModel.get(FuseboxProperties.POPUP_ATTACH_CAMERA_VISIBLE));
+    }
+
+    @Test
     public void activationChip() {
         mModel.set(FuseboxProperties.FUSEBOX_LAYOUT_MODE, FuseboxLayoutMode.SUGGESTIONS_POPOVER);
 
