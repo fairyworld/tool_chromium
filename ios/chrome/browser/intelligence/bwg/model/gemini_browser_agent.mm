@@ -4,6 +4,8 @@
 
 #import "ios/chrome/browser/intelligence/bwg/model/gemini_browser_agent.h"
 
+#import <AVFoundation/AVFoundation.h>
+
 #import "base/barrier_closure.h"
 #import "base/functional/bind.h"
 #import "base/functional/callback.h"
@@ -153,6 +155,52 @@ NotificationCenterBlock ClosureToNotificationCenterBlock(
       base::IgnoreArgs<NSNotification*>(std::move(closure)));
 }
 
+// Helper function to show the Settings redirection alert when microphone access
+// is denied.
+// TODO(crbug.com/521132540): Migrate this to the GeminiContainerViewController
+// once the bottom sheet migration is complete.
+void ShowMicrophoneSettingsAlert(UIViewController* base_view_controller,
+                                 void (^completion)(BOOL granted)) {
+  UIAlertController* alert = [UIAlertController
+      alertControllerWithTitle:l10n_util::GetNSString(
+                                   IDS_IOS_GEMINI_LIVE_MICROPHONE_ALERT_TITLE)
+                       message:l10n_util::GetNSString(
+                                   IDS_IOS_GEMINI_LIVE_MICROPHONE_ALERT_DETAIL)
+                preferredStyle:UIAlertControllerStyleAlert];
+
+  [alert
+      addAction:
+          [UIAlertAction
+              actionWithTitle:
+                  l10n_util::GetNSString(
+                      IDS_IOS_GEMINI_LIVE_MICROPHONE_ALERT_GO_TO_SETTINGS)
+                        style:UIAlertActionStyleDefault
+                      handler:^(UIAlertAction* action) {
+                        NSURL* settingsURL = [NSURL
+                            URLWithString:UIApplicationOpenSettingsURLString];
+                        [[UIApplication sharedApplication] openURL:settingsURL
+                                                           options:@{}
+                                                 completionHandler:nil];
+                        if (completion) {
+                          completion(NO);
+                        }
+                      }]];
+
+  [alert addAction:[UIAlertAction
+                       actionWithTitle:
+                           l10n_util::GetNSString(
+                               IDS_IOS_GEMINI_LIVE_MICROPHONE_ALERT_NO_THANKS)
+                                 style:UIAlertActionStyleCancel
+                               handler:^(UIAlertAction* action) {
+                                 if (completion) {
+                                   completion(NO);
+                                 }
+                               }]];
+  [base_view_controller presentViewController:alert
+                                     animated:YES
+                                   completion:nil];
+}
+
 }  // namespace
 
 @interface GeminiSceneStateObserver
@@ -231,7 +279,8 @@ GeminiBrowserAgent::GeminiBrowserAgent(Browser* browser)
     bwg_session_handler_ = [[GeminiSessionHandler alloc]
         initWithWebStateList:browser_->GetWebStateList()
                      tracker:feature_engagement::TrackerFactory::GetForProfile(
-                                 browser_->GetProfile())];
+                                 browser_->GetProfile())
+                 prefService:browser_->GetProfile()->GetPrefs()];
     gemini_view_state_handler_ =
         [[GeminiViewStateChangeHandler alloc] initWithTarget:this];
     bwg_session_handler_.geminiViewStateDelegate = gemini_view_state_handler_;
@@ -433,6 +482,10 @@ bool GeminiBrowserAgent::IsInGeminiLiveMode() const {
                                       ios::provider::GeminiViewMode::kLive;
 }
 
+gemini::EntryPoint GeminiBrowserAgent::GetEntryPoint() const {
+  return entry_point_;
+}
+
 void GeminiBrowserAgent::UpdateGeminiAvailability() {
   bool available = IsGeminiAvailableForActiveWebState();
   if (available != last_known_gemini_availability_) {
@@ -595,6 +648,7 @@ void GeminiBrowserAgent::SetIsShowingLiveSessionDormantSnackbar(bool showing) {
 void GeminiBrowserAgent::StartGeminiFlow(UIViewController* base_view_controller,
                                          GeminiStartupState* startup_state) {
   gemini::EntryPoint entry_point = startup_state.entryPoint;
+  entry_point_ = entry_point;
   bool will_show_first_run = !HasCompletedFirstRun();
   RecordGeminiEntryPointClick(entry_point, will_show_first_run);
   RecordInvocationPageType();
@@ -651,6 +705,40 @@ GeminiBrowserAgent::CreateGeminiConfigurationForActiveWebState(
   ApplyUserPrefsToPageContext(initial_page_context);
   return CreateGeminiConfiguration(base_view_controller, startup_state,
                                    web_state, initial_page_context);
+}
+
+void GeminiBrowserAgent::ShowGeminiLiveMicrophoneAlert(
+    UIViewController* base_view_controller,
+    void (^completion)(BOOL granted)) {
+  AVAuthorizationStatus status =
+      [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeAudio];
+  switch (status) {
+    case AVAuthorizationStatusNotDetermined: {
+      [AVCaptureDevice requestAccessForMediaType:AVMediaTypeAudio
+                               completionHandler:^(BOOL granted) {
+                                 dispatch_async(dispatch_get_main_queue(), ^{
+                                   if (granted) {
+                                     if (completion) {
+                                       completion(YES);
+                                     }
+                                   } else {
+                                     ShowMicrophoneSettingsAlert(
+                                         base_view_controller, completion);
+                                   }
+                                 });
+                               }];
+      break;
+    }
+    case AVAuthorizationStatusAuthorized:
+      if (completion) {
+        completion(YES);
+      }
+      break;
+    case AVAuthorizationStatusDenied:
+    case AVAuthorizationStatusRestricted:
+      ShowMicrophoneSettingsAlert(base_view_controller, completion);
+      break;
+  }
 }
 
 bool GeminiBrowserAgent::HasCompletedFirstRun() {
@@ -1062,6 +1150,7 @@ void GeminiBrowserAgent::DismissFloaty() {
   is_hidden_by_keyboard_ = false;
   processing_status_ = ios::provider::GeminiClientMode::kUnknown;
   elapsed_minimized_floaty_time_ = base::TimeTicks();
+  entry_point_ = gemini::EntryPoint::Unknown;
   ios::provider::UpdateGeminiViewState(ios::provider::GeminiViewState::kHidden,
                                        /*animated=*/false);
   UpdateGeminiLiveIconVisibility();

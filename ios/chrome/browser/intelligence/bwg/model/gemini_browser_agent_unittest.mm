@@ -355,6 +355,7 @@ TEST_F(GeminiBrowserAgentTest, TestGeminiBrowserAgentStartGeminiFlow) {
   histogram_tester.ExpectUniqueSample(
       kGeminiInvocationPageTypeHistogram,
       IOSGeminiInvocationPageType::kExtractableWebPage, 1);
+  EXPECT_EQ(gemini_browser_agent_->GetEntryPoint(), gemini::EntryPoint::Promo);
 }
 
 // Tests that switching active web states handles observations correctly.

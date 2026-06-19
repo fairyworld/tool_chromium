@@ -128,6 +128,10 @@ class GeminiBrowserAgent : public BrowserUserData<GeminiBrowserAgent>,
       UIViewController* base_view_controller,
       GeminiStartupState* startup_state);
 
+  // Presents a Gemini Live microphone authorization alert or Settings prompt.
+  void ShowGeminiLiveMicrophoneAlert(UIViewController* base_view_controller,
+                                     void (^completion)(BOOL granted));
+
   // Dismisses the floaty and resets the Gemini flow.
   void DismissFloaty();
 
@@ -163,6 +167,9 @@ class GeminiBrowserAgent : public BrowserUserData<GeminiBrowserAgent>,
 
   // Dismisses Gemini from all other windows and executes the completion block.
   void DismissGeminiFromOtherWindows(base::OnceClosure completion);
+
+  // Returns the entry point that triggered the current Gemini flow.
+  gemini::EntryPoint GetEntryPoint() const;
 
  private:
   explicit GeminiBrowserAgent(Browser* browser);
@@ -444,6 +451,9 @@ class GeminiBrowserAgent : public BrowserUserData<GeminiBrowserAgent>,
   // Badge.
   bool has_triggered_gemini_live_iph_ = false;
   bool has_triggered_gemini_live_new_badge_ = false;
+
+  // The entry point that triggered the current Gemini flow.
+  gemini::EntryPoint entry_point_ = gemini::EntryPoint::Unknown;
 
   // Weak pointer factory.
   // Observers for GeminiBrowserAgent.

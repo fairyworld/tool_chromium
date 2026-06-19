@@ -59,10 +59,10 @@ class GeminiSessionHandlerTest : public PlatformTest {
 
     browser_ = std::make_unique<TestBrowser>(profile_.get());
     web_state_list_ = browser_->GetWebStateList();
-    session_handler_ =
-        [[GeminiSessionHandler alloc] initWithWebStateList:web_state_list_
-                                                   tracker:mock_tracker_];
-
+    session_handler_ = [[GeminiSessionHandler alloc]
+        initWithWebStateList:web_state_list_
+                     tracker:mock_tracker_
+                 prefService:profile_->GetPrefs()];
     optimization_guide_service_ =
         OptimizationGuideServiceFactory::GetForProfile(profile_.get());
 
@@ -267,7 +267,8 @@ TEST_F(GeminiSessionHandlerTest, TestDifferentInputTypes) {
   // Test Summarize input type.
   GeminiSessionHandler* handler1 =
       [[GeminiSessionHandler alloc] initWithWebStateList:web_state_list_
-                                                 tracker:mock_tracker_];
+                                                 tracker:mock_tracker_
+                                             prefService:profile_->GetPrefs()];
   [handler1 didSendQueryWithInputType:gemini::InputType::kSummarize
              isNanoBananaToolSelected:NO
                   imagesAttachedCount:0
@@ -280,7 +281,8 @@ TEST_F(GeminiSessionHandlerTest, TestDifferentInputTypes) {
   // Test CheckThisSite input type.
   GeminiSessionHandler* handler2 =
       [[GeminiSessionHandler alloc] initWithWebStateList:web_state_list_
-                                                 tracker:mock_tracker_];
+                                                 tracker:mock_tracker_
+                                             prefService:profile_->GetPrefs()];
   [handler2 didSendQueryWithInputType:gemini::InputType::kCheckThisSite
              isNanoBananaToolSelected:NO
                   imagesAttachedCount:0
@@ -293,7 +295,8 @@ TEST_F(GeminiSessionHandlerTest, TestDifferentInputTypes) {
   // Test FindRelatedSites input type.
   GeminiSessionHandler* handler3 =
       [[GeminiSessionHandler alloc] initWithWebStateList:web_state_list_
-                                                 tracker:mock_tracker_];
+                                                 tracker:mock_tracker_
+                                             prefService:profile_->GetPrefs()];
   [handler3 didSendQueryWithInputType:gemini::InputType::kFindRelatedSites
              isNanoBananaToolSelected:NO
                   imagesAttachedCount:0
@@ -306,7 +309,8 @@ TEST_F(GeminiSessionHandlerTest, TestDifferentInputTypes) {
   // Test AskAboutPage input type.
   GeminiSessionHandler* handler4 =
       [[GeminiSessionHandler alloc] initWithWebStateList:web_state_list_
-                                                 tracker:mock_tracker_];
+                                                 tracker:mock_tracker_
+                                             prefService:profile_->GetPrefs()];
   [handler4 didSendQueryWithInputType:gemini::InputType::kAskAboutPage
              isNanoBananaToolSelected:NO
                   imagesAttachedCount:0
@@ -319,7 +323,8 @@ TEST_F(GeminiSessionHandlerTest, TestDifferentInputTypes) {
   // Test CreateFaq input type.
   GeminiSessionHandler* handler5 =
       [[GeminiSessionHandler alloc] initWithWebStateList:web_state_list_
-                                                 tracker:mock_tracker_];
+                                                 tracker:mock_tracker_
+                                             prefService:profile_->GetPrefs()];
   [handler5 didSendQueryWithInputType:gemini::InputType::kCreateFaq
              isNanoBananaToolSelected:NO
                   imagesAttachedCount:0
@@ -332,7 +337,8 @@ TEST_F(GeminiSessionHandlerTest, TestDifferentInputTypes) {
   // Test Unknown input type.
   GeminiSessionHandler* handler6 =
       [[GeminiSessionHandler alloc] initWithWebStateList:web_state_list_
-                                                 tracker:mock_tracker_];
+                                                 tracker:mock_tracker_
+                                             prefService:profile_->GetPrefs()];
   [handler6 didSendQueryWithInputType:gemini::InputType::kUnknown
              isNanoBananaToolSelected:NO
                   imagesAttachedCount:0

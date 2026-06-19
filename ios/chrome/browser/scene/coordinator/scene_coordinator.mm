@@ -2402,17 +2402,15 @@ void OnListFamilyMembersResponse(
 - (void)startGeminiFirstRunWithCompletion:(void (^)(BOOL success))completion
                            fromEntryPoint:(gemini::EntryPoint)entryPoint {
   __weak SceneCoordinator* weakSelf = self;
+  void (^completionWrapper)(BOOL) =
+      [self geminiCompletionWrapperForCompletion:completion];
+
   ProceduralBlock startCoordinatorBlock = ^{
-    [weakSelf startGeminiFirstRunCoordinatorWithCompletion:completion
+    [weakSelf startGeminiFirstRunCoordinatorWithCompletion:completionWrapper
                                             fromEntryPoint:entryPoint];
   };
 
-  if (_geminiFirstRunCoordinator) {
-    [_geminiFirstRunCoordinator stopWithCompletion:startCoordinatorBlock];
-    _geminiFirstRunCoordinator = nil;
-  } else {
-    startCoordinatorBlock();
-  }
+  [self stopGeminiFirstRunCoordinatorAndStartBlock:startCoordinatorBlock];
 }
 
 - (void)startGeminiFirstRunCoordinatorWithCompletion:
@@ -2428,18 +2426,39 @@ void OnListFamilyMembersResponse(
   [_geminiFirstRunCoordinator start];
 }
 
-- (void)startGeminiLiveFREWithCompletion:(void (^)(BOOL success))completion {
-  // TODO(crbug.com/513889315): Implement this.
-  if (completion) {
-    completion(NO);
-  }
+- (void)startGeminiLiveFirstRunWithBaseViewController:
+            (UIViewController*)baseViewController
+                                           completion:(void (^)(BOOL success))
+                                                          completion {
+  __weak SceneCoordinator* weakSelf = self;
+  void (^completionWrapper)(BOOL) =
+      [self geminiCompletionWrapperForCompletion:completion];
+
+  ProceduralBlock startCoordinatorBlock = ^{
+    [weakSelf
+        startGeminiLiveFirstRunCoordinatorWithBaseViewController:
+            baseViewController
+                                                      completion:
+                                                          completionWrapper];
+  };
+
+  [self stopGeminiFirstRunCoordinatorAndStartBlock:startCoordinatorBlock];
 }
 
-- (void)showGeminiLiveMicrophoneAlertWithCompletion:
-    (void (^)(BOOL granted))completion {
-  // TODO(crbug.com/513889315): Implement this.
-  if (completion) {
-    completion(NO);
+- (void)showGeminiLiveMicrophoneAlertWithBaseViewController:
+            (UIViewController*)baseViewController
+                                                 completion:
+                                                     (void (^)(BOOL granted))
+                                                         completion {
+  GeminiBrowserAgent* geminiBrowserAgent =
+      GeminiBrowserAgent::FromBrowser(_regularBrowser.get());
+  if (geminiBrowserAgent) {
+    geminiBrowserAgent->ShowGeminiLiveMicrophoneAlert(baseViewController,
+                                                      completion);
+  } else {
+    if (completion) {
+      completion(NO);
+    }
   }
 }
 
@@ -2554,6 +2573,55 @@ void OnListFamilyMembersResponse(
   }
 
   geminiBrowserAgent->StartGeminiFlow(_viewController, startupState);
+}
+
+// Stops the existing first run coordinator (if any) and runs `startBlock`.
+- (void)stopGeminiFirstRunCoordinatorAndStartBlock:(ProceduralBlock)startBlock {
+  if (_geminiFirstRunCoordinator) {
+    GeminiFirstRunCoordinator* coordinatorToStop = _geminiFirstRunCoordinator;
+    _geminiFirstRunCoordinator = nil;
+    [coordinatorToStop stopWithCompletion:startBlock];
+  } else {
+    startBlock();
+  }
+}
+
+// Returns a completion block wrapper that resets `_geminiFirstRunCoordinator`
+// when executed.
+- (void (^)(BOOL))geminiCompletionWrapperForCompletion:
+    (void (^)(BOOL))completion {
+  __weak SceneCoordinator* weakSelf = self;
+  return ^(BOOL success) {
+    if (completion) {
+      completion(success);
+    }
+    SceneCoordinator* strongSelf = weakSelf;
+    if (strongSelf) {
+      strongSelf->_geminiFirstRunCoordinator = nil;
+    }
+  };
+}
+
+// Starts the Gemini Live First Run Experience (FRE) coordinator.
+- (void)
+    startGeminiLiveFirstRunCoordinatorWithBaseViewController:
+        (UIViewController*)baseViewController
+                                                  completion:
+                                                      (void (^)(BOOL success))
+                                                          completion {
+  gemini::EntryPoint entryPoint = gemini::EntryPoint::Unknown;
+  GeminiBrowserAgent* geminiBrowserAgent =
+      GeminiBrowserAgent::FromBrowser(_regularBrowser.get());
+  if (geminiBrowserAgent) {
+    entryPoint = geminiBrowserAgent->GetEntryPoint();
+  }
+  _geminiFirstRunCoordinator = [[GeminiFirstRunCoordinator alloc]
+      initWithBaseViewController:baseViewController
+                         browser:_regularBrowser.get()
+                  fromEntryPoint:entryPoint
+                    firstRunType:GeminiFirstRunType::kLive
+               completionHandler:completion];
+  [_geminiFirstRunCoordinator start];
 }
 
 @end
