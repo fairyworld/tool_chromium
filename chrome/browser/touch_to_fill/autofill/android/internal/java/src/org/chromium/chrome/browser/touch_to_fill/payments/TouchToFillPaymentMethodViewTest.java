@@ -702,6 +702,7 @@ public class TouchToFillPaymentMethodViewTest {
 
     @Test
     @MediumTest
+    @DisabledTest(message = "b/516254354 the test is flaky.")
     public void testSheetScrollabilityDependsOnState() {
         runOnUiThreadBlocking(
                 () -> {
