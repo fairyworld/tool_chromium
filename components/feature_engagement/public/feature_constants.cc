@@ -187,6 +187,9 @@ BASE_FEATURE(kIPHPdfInkSignaturesFeature,
 BASE_FEATURE(kIPHPdfSearchifyFeature,
              "IPH_PdfSearchifyFeature",
              base::FEATURE_ENABLED_BY_DEFAULT);
+BASE_FEATURE(kIPHPdfTextAnnotationsFeature,
+             "IPH_PdfTextAnnotations",
+             base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kIPHPerformanceInterventionDialogFeature,
              "IPH_PerformanceInterventionDialogFeature",
              base::FEATURE_ENABLED_BY_DEFAULT);

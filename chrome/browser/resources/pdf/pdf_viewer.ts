@@ -281,6 +281,7 @@ export class PdfViewerElement extends PdfViewerBaseElement {
 
       // <if expr="enable_pdf_ink2">
       pdfInk2Enabled_: {type: Boolean},
+      pdfTextAnnotationsEnabled_: {type: Boolean},
       // </if>
 
       // <if expr="enable_pdf_save_to_drive">
@@ -357,6 +358,7 @@ export class PdfViewerElement extends PdfViewerBaseElement {
   private pdfGetSaveDataInBlocks_: boolean = false;
   // <if expr="enable_pdf_ink2">
   protected accessor pdfInk2Enabled_: boolean = false;
+  protected accessor pdfTextAnnotationsEnabled_: boolean = false;
   // </if>
   // <if expr="enable_pdf_save_to_drive">
   protected accessor pdfSaveToDriveEnabled_: boolean = false;
@@ -913,6 +915,8 @@ export class PdfViewerElement extends PdfViewerBaseElement {
         loadTimeData.getBoolean('pdfGetSaveDataInBlocks');
     // <if expr="enable_pdf_ink2">
     this.pdfInk2Enabled_ = loadTimeData.getBoolean('pdfInk2Enabled');
+    this.pdfTextAnnotationsEnabled_ =
+        loadTimeData.getBoolean('pdfTextAnnotationsEnabled');
     // </if>
     // <if expr="enable_pdf_save_to_drive">
     this.pdfSaveToDriveEnabled_ = loadTimeData.getBoolean('pdfSaveToDrive');
@@ -952,6 +956,12 @@ export class PdfViewerElement extends PdfViewerBaseElement {
               'PdfHelpBubbleHandlerFactory::kPdfInkSignaturesDrawElementId',
               this.$.toolbar.shadowRoot.querySelector<HTMLElement>(
                   '#annotate')!);
+          if (this.pdfTextAnnotationsEnabled_) {
+            this.registerHelpBubble(
+                'PdfHelpBubbleHandlerFactory::kPdfInkSignaturesAddTextElementId',
+                this.$.toolbar.shadowRoot.querySelector<HTMLElement>(
+                    '#text-annotate')!);
+          }
         }
         // </if>
       });

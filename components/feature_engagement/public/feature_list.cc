@@ -290,6 +290,7 @@ const base::Feature* const kAllFeatures[] = {
     &kIPHPdfGlicSummarizeFeature,
     &kIPHPdfInkSignaturesFeature,
     &kIPHPdfSearchifyFeature,
+    &kIPHPdfTextAnnotationsFeature,
     &kIPHPerformanceInterventionDialogFeature,
     &kIPHPowerBookmarksSidePanelFeature,
     &kIPHPriceInsightsPageActionIconLabelFeature,

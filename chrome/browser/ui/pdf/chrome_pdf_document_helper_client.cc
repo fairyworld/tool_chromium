@@ -91,6 +91,8 @@ void ChromePDFDocumentHelperClient::OnDocumentLoadComplete(
   content::WebContents* web_contents = GetWebContentsToUse(render_frame_host);
   MaybeShowFeaturePromo(feature_engagement::kIPHPdfInkSignaturesFeature,
                         web_contents);
+  MaybeShowFeaturePromo(feature_engagement::kIPHPdfTextAnnotationsFeature,
+                        web_contents);
 
   auto* parent = render_frame_host->GetParent();
   bool is_pdf_viewer =

@@ -534,6 +534,8 @@ chromium-metrics-reviews@google.com.
       summary="educating users about the pdf download option in the app menu"/>
   <variant name="IPH_PdfSearchifyFeature"
       summary="educating users about PDF searchify feature"/>
+  <variant name="IPH_PdfTextAnnotations"
+      summary="educating users about PDF Text Annotations feature"/>
   <variant name="IPH_PerformanceInterventionDialog"
       summary="triggering the performance intervention dialog and toolbar
                button"/>

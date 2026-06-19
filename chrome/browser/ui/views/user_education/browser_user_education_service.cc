@@ -946,7 +946,17 @@ void MaybeRegisterChromeFeaturePromos(
           .SetInAnyContext(true)
           .SetMetadata(138, "thestig@chromium.org",
                        "Triggered when the PDF Viewer opens.")));
-#endif
+  // kIPHPdfTextAnnotationsFeature:
+  registry.RegisterFeature(std::move(
+      FeaturePromoSpecification::CreateForSnoozePromo(
+          feature_engagement::kIPHPdfTextAnnotationsFeature,
+          pdf::PdfHelpBubbleHandlerFactory::kPdfInkSignaturesAddTextElementId,
+          IDS_PDF_TEXT_ANNOTATIONS_IPH_BODY)
+          .SetBubbleArrow(HelpBubbleArrow::kTopRight)
+          .SetInAnyContext(true)
+          .SetMetadata(151, "thestig@chromium.org",
+                       "Triggered when the PDF Viewer opens.")));
+#endif  // BUILDFLAG(ENABLE_PDF_INK2)
 
   // kIPHPdfSearchifyFeature:
   registry.RegisterFeature(std::move(
