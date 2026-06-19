@@ -5,12 +5,14 @@
 static_library("network_header_injection") {
   public = [
     "http_header_injection_client.h",
+    "http_header_injection_proxying_url_loader_factory.h",
     "http_header_injection_service_factory.h",
     "http_header_injection_url_loader_header_client.h",
   ]
 
   sources = [
     "http_header_injection_client.cc",
+    "http_header_injection_proxying_url_loader_factory.cc",
     "http_header_injection_service_factory.cc",
     "http_header_injection_url_loader_header_client.cc",
   ]
@@ -35,6 +37,7 @@ source_set("unit_tests") {
 
   sources = [
     "http_header_injection_client_unittest.cc",
+    "http_header_injection_proxying_url_loader_factory_unittest.cc",
     "http_header_injection_url_loader_header_client_unittest.cc",
   ]
 
