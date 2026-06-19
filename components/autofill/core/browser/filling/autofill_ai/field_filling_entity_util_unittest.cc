@@ -205,6 +205,29 @@ TEST_F(FieldFillingEntityUtilTest, GetFillableEntityInstances_DependsOnPrefs) {
   EXPECT_THAT(GetFillableEntityInstances(client()), IsEmpty());
 }
 
+TEST_F(FieldFillingEntityUtilTest,
+       GetFillableEntityInstances_DependsOnEnterprisePolicy) {
+  base::test::ScopedFeatureList feature_list{
+      features::kAutofillEnableAutofillSettingsEnterprisePolicy};
+
+  EntityInstance passport = test::GetPassportEntityInstance();
+  EntityInstance vehicle = test::GetVehicleEntityInstance();
+  AddOrUpdateEntityInstance(passport);
+  AddOrUpdateEntityInstance(vehicle);
+
+  client().SetAutofillTypeBlockedByPolicy(
+      AutofillClient::AutofillPolicyDataCategory::kIdentityDocs, true);
+  EXPECT_THAT(GetFillableEntityInstances(client()),
+              UnorderedElementsAre(Pointee(vehicle)));
+
+  client().SetAutofillTypeBlockedByPolicy(
+      AutofillClient::AutofillPolicyDataCategory::kIdentityDocs, false);
+  client().SetAutofillTypeBlockedByPolicy(
+      AutofillClient::AutofillPolicyDataCategory::kTravel, true);
+  EXPECT_THAT(GetFillableEntityInstances(client()),
+              UnorderedElementsAre(Pointee(passport)));
+}
+
 // If there are no Autofill AI fields, none is blocked.
 TEST_F(FieldFillingEntityUtilTest, NoAutofillAiField) {
   AddOrUpdateEntityInstance(test::GetPassportEntityInstance());

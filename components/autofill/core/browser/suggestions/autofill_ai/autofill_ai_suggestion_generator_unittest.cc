@@ -1248,5 +1248,49 @@ TEST_F(AutofillAiSuggestionGeneratorSplitManageSuggestionTest,
                           HasType(SuggestionType::kManageAutofillAiTravel)));
 }
 
+class AutofillAiSuggestionGeneratorPolicyTest
+    : public AutofillAiSuggestionGeneratorTest {
+ public:
+  AutofillAiSuggestionGeneratorPolicyTest()
+      : AutofillAiSuggestionGeneratorTest(GetEnabledFeatures(),
+                                          /*disabled_features=*/{}) {}
+
+ private:
+  static std::vector<base::test::FeatureRef> GetEnabledFeatures() {
+    auto features = GetDefaultEnabledFeatures();
+    features.push_back(
+        features::kAutofillEnableAutofillSettingsEnterprisePolicy);
+    return features;
+  }
+};
+
+// Tests that identity document entities are blocked from suggestions when the
+// kIdentityDocs policy category is blocked.
+TEST_F(AutofillAiSuggestionGeneratorPolicyTest, BlockIdentityDocs) {
+  SetEntities({GetPassportEntityInstanceWithRandomGuid()});
+  SetForm({PASSPORT_NUMBER});
+
+  client().SetAutofillTypeBlockedByPolicy(
+      AutofillClient::AutofillPolicyDataCategory::kIdentityDocs, true);
+
+  std::vector<Suggestion> suggestions =
+      CreateAutofillAiFillingSuggestions(field(0));
+  EXPECT_TRUE(suggestions.empty());
+}
+
+// Tests that travel entities are blocked from suggestions when the kTravel
+// policy category is blocked.
+TEST_F(AutofillAiSuggestionGeneratorPolicyTest, BlockTravel) {
+  SetEntities({test::GetVehicleEntityInstanceWithRandomGuid()});
+  SetForm({VEHICLE_LICENSE_PLATE});
+
+  client().SetAutofillTypeBlockedByPolicy(
+      AutofillClient::AutofillPolicyDataCategory::kTravel, true);
+
+  std::vector<Suggestion> suggestions =
+      CreateAutofillAiFillingSuggestions(field(0));
+  EXPECT_TRUE(suggestions.empty());
+}
+
 }  // namespace
 }  // namespace autofill
