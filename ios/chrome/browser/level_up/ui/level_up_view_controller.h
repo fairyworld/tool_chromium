@@ -19,6 +19,10 @@
 // Called when the user taps the "See All" button on the tasks card.
 - (void)didTapSeeAllTasks:(LevelUpViewController*)controller;
 
+// Called when the user taps an individual task row in the checklist card.
+- (void)levelUpViewController:(LevelUpViewController*)controller
+                   didTapTask:(LevelUpTask*)task;
+
 // Called when the user toggles the progress updates menu item.
 - (void)didTapToggleProgressUpdates:(LevelUpViewController*)controller;
 

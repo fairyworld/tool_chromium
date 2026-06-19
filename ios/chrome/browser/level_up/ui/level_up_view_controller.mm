@@ -118,6 +118,11 @@ const CGFloat kTasksCellHeight = 350.0;
   // Collapsible section is not supported on main screen.
 }
 
+- (void)taskCollectionViewCell:(LevelUpTaskCollectionViewCell*)cell
+                    didTapTask:(LevelUpTask*)task {
+  [self.delegate levelUpViewController:self didTapTask:task];
+}
+
 #pragma mark - Private
 
 // Configures the welcome header cell.
