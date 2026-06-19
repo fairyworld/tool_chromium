@@ -15,31 +15,13 @@ import {NavigationPredictor} from 'chrome://resources/mojo/components/omnibox/br
 import type {AutocompleteMatch} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import {DriveDisclaimerStatus, RenderType, SideType} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import {assertEquals, assertFalse, assertNotEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
-import {assertStyle, MockInputState} from 'chrome://webui-test/cr_components/searchbox/searchbox_test_utils.js';
+import {assertStyle, createClipboardEvent, createUrlMatch, MockInputState} from 'chrome://webui-test/cr_components/searchbox/searchbox_test_utils.js';
 import {TestSearchboxBrowserProxy} from 'chrome://webui-test/cr_components/searchbox/test_searchbox_browser_proxy.js';
 import {TestMock} from 'chrome://webui-test/test_mock.js';
 import {eventToPromise, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 enum Attributes {
   SELECTED = 'selected',
-}
-
-function createClipboardEvent(name: string): ClipboardEvent {
-  return new ClipboardEvent(
-      name, {cancelable: true, clipboardData: new DataTransfer()});
-}
-
-function createUrlMatch(modifiers: Partial<AutocompleteMatch> = {}):
-    AutocompleteMatch {
-  return createAutocompleteMatch({
-    swapContentsAndDescription: true,
-    contents: 'helloworld.com',
-    contentsClass: [{offset: 0, style: 1}],
-    destinationUrl: 'https://helloworld.com/',
-    fillIntoEdit: 'https://helloworld.com',
-    type: 'url-what-you-typed',
-    ...modifiers,
-  });
 }
 
 function createCalculatorMatch(modifiers: Partial<AutocompleteMatch>):
