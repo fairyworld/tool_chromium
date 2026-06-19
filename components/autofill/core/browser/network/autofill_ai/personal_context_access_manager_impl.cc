@@ -37,15 +37,14 @@ namespace {
 // Configuration for exponential backoff on failed prefetch requests.
 // Subsequent prefetch requests are blocked until the backoff delay expires
 // (starts at 1s, doubles for each consecutive failure, capped at 1 hour).
-const net::BackoffEntry::Policy kBackoffPolicy = {
-    0,        // num_errors_to_ignore
-    1000,     // initial_delay_ms (1s)
-    2.0,      // multiply_factor
-    0.0,      // jitter_factor
-    3600000,  // maximum_backoff_ms (1h)
-    -1,       // entry_lifetime_ms
-    false     // always_use_initial_delay
-};
+constexpr net::BackoffEntry::Policy kBackoffPolicy = {
+    .num_errors_to_ignore = 0,
+    .initial_delay_ms = base::Seconds(1).InMilliseconds(),
+    .multiply_factor = 2.0,
+    .jitter_factor = 0.0,
+    .maximum_backoff_ms = base::Hours(1).InMilliseconds(),
+    .entry_lifetime_ms = -1,
+    .always_use_initial_delay = false};
 
 // Results of parsing the server response during prefetch requests. It bundles
 // the internal `EntityInstance` representation with its original
