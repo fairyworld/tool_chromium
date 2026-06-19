@@ -43,6 +43,7 @@
 #include "content/browser/renderer_host/page_impl.h"
 #include "content/browser/renderer_host/render_frame_host_impl.h"
 #include "content/browser/renderer_host/render_view_host_impl.h"
+#include "content/browser/site_instance_impl.h"
 #include "content/browser/web_contents/web_contents_impl.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/content_browser_client.h"
@@ -514,11 +515,31 @@ PrerenderHost::PrerenderHost(
   } else {
     frame_tree_delegate_ = std::make_unique<PrerenderFrameTreeDelegate>(
         web_contents.GetBrowserContext(), web_contents, *this);
+
     scoped_refptr<SiteInstanceImpl> site_instance =
         base::FeatureList::IsEnabled(kCreatePrerenderSiteInstanceWithURL)
             ? SiteInstanceImpl::CreateForURL(web_contents.GetBrowserContext(),
                                              attributes.prerendering_url)
             : SiteInstanceImpl::Create(web_contents.GetBrowserContext());
+
+    // TODO(https://crbug.com/524800804): Add the following restrictions:
+    // 1. Limit to prerender-until-script for now.
+    // 2. For moderate eagerness only
+    // 3. Disallow Target_hint = 'blank' to use the same process.
+    // 4. Disallow cross-site prerendering to reuse the process.
+    if (!attributes.IsBrowserInitiated() &&
+        attributes.initiator_frame_token.has_value() &&
+        base::FeatureList::IsEnabled(
+            features::kPrerender2ReuseInitiatorProcess)) {
+      RenderFrameHostImpl* initiator_rfh = RenderFrameHostImpl::FromFrameToken(
+          attributes.initiator_process_id,
+          attributes.initiator_frame_token.value());
+      if (initiator_rfh) {
+        site_instance->ReuseExistingProcessIfPossible(
+            initiator_rfh->GetProcess());
+      }
+    }
+
     GetFrameTree()->Init(site_instance.get(),
                          /*renderer_initiated_creation=*/false,
                          /*main_frame_name=*/"", /*opener_for_origin=*/nullptr,

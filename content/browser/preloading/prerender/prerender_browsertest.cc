@@ -82,6 +82,7 @@
 #include "content/public/browser/render_frame_host.h"
 #include "content/public/browser/render_process_host.h"
 #include "content/public/browser/site_isolation_policy.h"
+#include "content/public/common/child_process_id.h"
 #include "content/public/common/content_features.h"
 #include "content/public/common/content_switches.h"
 #include "content/public/common/isolated_world_ids.h"
@@ -19093,5 +19094,89 @@ IN_PROC_BROWSER_TEST_F(PrerenderUntilScriptUpgradeIframeBrowserTest,
   // prerendering rather than after activation.
   prerender_helper()->WaitForRequest(iframe_beacon_during_prerender_url, 1);
 }
+
+namespace {
+
+class ReuseInitiatorProcessTest : public PrerenderBrowserTest {
+ public:
+  ReuseInitiatorProcessTest() {
+    feature_list_.InitAndEnableFeature(
+        features::kPrerender2ReuseInitiatorProcess);
+  }
+
+ private:
+  base::test::ScopedFeatureList feature_list_;
+};
+
+// Tests that same-origin prerendering can reuse the initiator's renderer
+// process.
+IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessTest,
+                       SameOriginPrerenderReusesProcess) {
+  GURL url = GetUrl("/empty.html");
+  GURL prerender_url = GetUrl("/title1.html");
+
+  // 1. Navigate to the initiator page.
+  ASSERT_TRUE(NavigateToURL(shell(), url));
+  RenderFrameHost* initiator_rfh = current_frame_host();
+  ChildProcessId initiator_process_id = initiator_rfh->GetProcess()->GetID();
+
+  // 2. Start a same-origin prerender.
+  PrerenderHostId host_id = AddPrerender(prerender_url);
+  ASSERT_TRUE(host_id);
+
+  // 3. Verify the prerender process ID matches the initiator's process ID.
+  RenderFrameHost* prerender_rfh = GetPrerenderedMainFrameHost(host_id);
+  ChildProcessId prerender_process_id = prerender_rfh->GetProcess()->GetID();
+
+  EXPECT_EQ(initiator_process_id, prerender_process_id);
+
+  // 4. Verify that they are NOT in the same BrowsingInstance.
+  EXPECT_FALSE(initiator_rfh->GetSiteInstance()->IsRelatedSiteInstance(
+      prerender_rfh->GetSiteInstance()));
+
+  // 5. Activate the prerendered page and ensure it still works.
+  NavigatePrimaryPage(prerender_url);
+  EXPECT_EQ(web_contents()->GetLastCommittedURL(), prerender_url);
+  EXPECT_EQ(current_frame_host()->GetProcess()->GetID(), initiator_process_id);
+}
+
+IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessTest,
+                       PrerenderCancellationDoesNotAffectInitiator) {
+  GURL url = GetUrl("/empty.html");
+  GURL prerender_url = GetUrl("/title1.html");
+
+  // 1. Navigate to the initiator page.
+  ASSERT_TRUE(NavigateToURL(shell(), url));
+  RenderFrameHostImpl* initiator_rfh =
+      static_cast<RenderFrameHostImpl*>(current_frame_host());
+  ChildProcessId initiator_process_id = initiator_rfh->GetProcess()->GetID();
+
+  // 2. Start a same-origin prerender.
+  PrerenderHostId host_id = AddPrerender(prerender_url);
+  ASSERT_TRUE(host_id);
+
+  // 3. Verify the prerender process ID matches the initiator's process ID.
+  RenderFrameHost* prerender_rfh = GetPrerenderedMainFrameHost(host_id);
+  ChildProcessId prerender_process_id = prerender_rfh->GetProcess()->GetID();
+  EXPECT_EQ(initiator_process_id, prerender_process_id);
+
+  // 4. Cancel the prerender.
+  PrerenderHostRegistry& registry =
+      *static_cast<WebContentsImpl*>(web_contents())
+           ->GetPrerenderHostRegistry();
+  registry.CancelHost(host_id,
+                      PrerenderFinalStatus::kNavigationRequestBlockedByCsp);
+
+  // 5. Verify the prerender is gone but the initiator page is still live and in
+  // the same process.
+  EXPECT_FALSE(registry.FindNonReservedHostById(host_id));
+  EXPECT_TRUE(initiator_rfh->IsActive());
+  EXPECT_EQ(initiator_process_id, initiator_rfh->GetProcess()->GetID());
+
+  // 6. Ensure we can still execute script in the initiator page.
+  EXPECT_EQ(true, EvalJs(initiator_rfh, "true"));
+}
+
+}  // namespace
 
 }  // namespace content
