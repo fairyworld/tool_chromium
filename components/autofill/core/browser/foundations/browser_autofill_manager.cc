@@ -1749,7 +1749,7 @@ void BrowserAutofillManager::OnGenerateSuggestionsComplete(
   if (form_structure &&
       context.filling_product == FillingProduct::kCreditCard) {
     AutofillMetrics::LogIsQueriedCreditCardFormSecure(
-        !IsFormOrClientNonSecure(client(), *form_structure));
+        client().IsContextSecure());
   }
   if (trigger_source ==
           AutofillSuggestionTriggerSource::kFormControlElementClicked &&
@@ -2255,10 +2255,7 @@ void BrowserAutofillManager::DidShowSuggestions(
   auto [form_structure, autofill_field] =
       GetCachedFormAndField(form_id, field_id);
 
-  const bool is_context_secure =
-      form_structure ? !IsFormOrClientNonSecure(client(), *form_structure)
-                     : !IsFormOrClientNonSecure(client(), last_query_form());
-  GetAtMemoryManager().OnPopupShown(trigger_source, is_context_secure,
+  GetAtMemoryManager().OnPopupShown(trigger_source, client().IsContextSecure(),
                                     update_suggestions_callback);
 
   const DenseSet<SuggestionType> shown_suggestion_types(suggestions,

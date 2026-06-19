@@ -5238,14 +5238,13 @@ TEST_F(BrowserAutofillManagerTest,
       form.fields()[0].global_id(), {});
 }
 
-// Tests that even if the context is secure and the `FormStructure` is missing,
-// the underlying `FormData` is still evaluated for being safe enough for
-// filling SPIIs.
-TEST_F(BrowserAutofillManagerTest, DidShowSuggestions_FormNonSecureAction) {
-  // Ensure that the client context is secure.
+// Tests that if the context is insecure, the suggestions are filtered out
+// to not contain SPII.
+TEST_F(BrowserAutofillManagerTest, DidShowSuggestions_FormNonSecureContext) {
+  // Ensure that the client context is insecure.
   autofill_client().set_last_committed_primary_main_frame_url(
-      GURL("https://example.com"));
-  ASSERT_TRUE(autofill_client().IsContextSecure());
+      GURL("http://example.com"));
+  ASSERT_FALSE(autofill_client().IsContextSecure());
 
   auto mock_query_service = std::make_unique<
       testing::NiceMock<accessibility_annotator::MockAtMemoryQueryService>>();
@@ -5253,11 +5252,12 @@ TEST_F(BrowserAutofillManagerTest, DidShowSuggestions_FormNonSecureAction) {
       mock_query_service.get();
   autofill_client().set_at_memory_query_service(std::move(mock_query_service));
 
-  // Create a form that submits to an insecure HTTP action.
+  // Create a form on an insecure page. The action can be secure, but the
+  // context is what matters.
   FormData insecure_form;
   insecure_form.set_name(u"InsecureForm");
-  insecure_form.set_url(GURL("https://example.com/form.html"));
-  insecure_form.set_action(GURL("http://attacker.com/search"));
+  insecure_form.set_url(GURL("http://example.com/form.html"));
+  insecure_form.set_action(GURL("https://example.com/search"));
   test_api(insecure_form)
       .Append(CreateTestFormField("Search", "search", "",
                                   FormControlType::kInputText));
@@ -5291,9 +5291,8 @@ TEST_F(BrowserAutofillManagerTest, DidShowSuggestions_FormNonSecureAction) {
       accessibility_annotator::MemorySearchStatus::kFinalResponseSuccess,
       std::move(entries));
 
-  // Send search results. Since the context should be insecure (due to insecure
-  // fallback action), the SPII entry must be filtered out, leaving no
-  // suggestions.
+  // Send search results. Since the context is insecure, the SPII entry must be
+  // filtered out, leaving no suggestions.
   search_callback.Run(std::move(results));
   ASSERT_EQ(updated_suggestions.size(), 1u);
   EXPECT_EQ(updated_suggestions[0].main_text.value,

@@ -168,7 +168,7 @@ void OmniboxAutofillDelegate::OnFieldTypesDetermined(
   }
 
   // The client context and credit card form must be secure (not HTTP).
-  if (IsFormOrClientNonSecure(*client_, *form_structure)) {
+  if (!client_->IsContextSecure()) {
     LogOmniboxAutofillShowChipDecisionPart1(
         OmniboxAutofillShowChipDecisionPart1::kFormOrClientContextNotSecure);
     return;

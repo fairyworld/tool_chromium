@@ -566,8 +566,7 @@ void CreditCardSuggestionGenerator::GenerateSuggestions(
   // Don't provide credit card suggestions for non-secure pages, but do provide
   // them for secure pages with passive mixed content (see implementation of
   // IsContextSecure).
-  if (!suggestions.empty() &&
-      IsFormOrClientNonSecure(client, *form_structure)) {
+  if (!suggestions.empty() && !client.IsContextSecure()) {
     // Replace the suggestion content with a warning message explaining why
     // Autofill is disabled for a website. The string is different if the credit
     // card autofill HTTP warning experiment is enabled.

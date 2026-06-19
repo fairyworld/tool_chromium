@@ -1573,7 +1573,7 @@ bool ShouldShowScanCreditCard(const FormStructure& form,
     return false;
   }
 
-  if (IsFormOrClientNonSecure(client, form)) {
+  if (!client.IsContextSecure()) {
     return false;
   }
 
