@@ -90,23 +90,6 @@ void LogAnnotationExtractionStarted(MultistepFilterLogRouter* log_router,
                        LogEventType::kAnnotationExtractionStarted, host);
 }
 
-void LogExtractionEligibilityCheck(MultistepFilterLogRouter* log_router,
-                                   int64_t navigation_id,
-                                   std::string_view host,
-                                   bool eligible,
-                                   std::string_view reason = "") {
-  if (reason.empty()) {
-    MULTISTEP_FILTER_LOG(log_router, navigation_id,
-                         LogEventType::kUrlEligibilityCheck, host)
-        << LogDetail{"extraction_eligible", eligible};
-  } else {
-    MULTISTEP_FILTER_LOG(log_router, navigation_id,
-                         LogEventType::kUrlEligibilityCheck, host)
-        << LogDetail{"extraction_eligible", eligible}
-        << LogDetail{"reason", std::string(reason)};
-  }
-}
-
 void LogSuggestionSuppressed(MultistepFilterLogRouter* log_router,
                              int64_t navigation_id,
                              std::string_view host,
@@ -189,20 +172,18 @@ void FilterNavigationObserver::DidFinishNavigation(
     return;
   }
 
-  LogUrlEligibilityCheck(log_router_, navigation_id, metadata.url.GetHost(),
-                         /*eligible=*/true);
-
   // Ensure the interaction was intentional by the user (e.g., a search button
-  // click, omnibox navigation, or bookmark). This avoids extracting from
-  // automatic client-side redirects.
-  if (metadata.has_user_gesture) {
-    LogAnnotationExtractionStarted(log_router_, navigation_id, metadata.url.GetHost());
-    service_->ExtractAnnotation(navigation_id, metadata.url);
-  } else {
-    LogExtractionEligibilityCheck(log_router_, navigation_id, metadata.url.GetHost(),
-                                  /*eligible=*/false,
-                                  "no_user_gesture_for_extraction");
+  // click, omnibox navigation, or bookmark). This avoids extracting from or
+  // showing suggestions on automatic client-side redirects.
+  if (!metadata.has_user_gesture) {
+    LogUrlEligibilityCheck(log_router_, navigation_id, metadata.url.GetHost(),
+                           /*eligible=*/false, "no_user_gesture");
+    return;
   }
+
+  LogAnnotationExtractionStarted(log_router_, navigation_id,
+                                 metadata.url.GetHost());
+  service_->ExtractAnnotation(navigation_id, metadata.url);
 
   // Prevent showing suggestions for same-site navigations to avoid spamming
   // the user, and don't re-trigger if the navigation was already initiated by

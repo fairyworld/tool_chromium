@@ -318,15 +318,15 @@ TEST_F(FilterNavigationObserverTest, RendererInitiatedNavigation) {
 }
 
 // Tests that a renderer-initiated navigation without a user gesture does not
-// trigger extraction.
+// trigger extraction or suggestions.
 TEST_F(FilterNavigationObserverTest,
        RendererInitiatedNavigationWithoutUserGesture) {
   const GURL url("https://www.example.com");
   EXPECT_CALL(delegate(), ClearSuggestion());
   // Renderer-initiated navigation WITHOUT user gesture should NOT trigger
-  // extraction.
+  // extraction or suggestions.
   EXPECT_CALL(mock_service(), ExtractAnnotation).Times(0);
-  EXPECT_CALL(mock_service(), GenerateFilterSuggestions(_, url, _));
+  EXPECT_CALL(mock_service(), GenerateFilterSuggestions).Times(0);
 
   auto navigation =
       content::NavigationSimulator::CreateRendererInitiated(url, main_rfh());
@@ -335,15 +335,15 @@ TEST_F(FilterNavigationObserverTest,
 }
 
 // Tests that a browser-initiated navigation without a user gesture does not
-// trigger extraction.
+// trigger extraction or suggestions.
 TEST_F(FilterNavigationObserverTest,
        BrowserInitiatedNavigationWithoutUserGesture) {
   const GURL url("https://www.example.com");
   EXPECT_CALL(delegate(), ClearSuggestion());
   // Browser-initiated navigation WITHOUT user gesture should NOT trigger
-  // extraction.
+  // extraction or suggestions.
   EXPECT_CALL(mock_service(), ExtractAnnotation).Times(0);
-  EXPECT_CALL(mock_service(), GenerateFilterSuggestions(_, url, _));
+  EXPECT_CALL(mock_service(), GenerateFilterSuggestions).Times(0);
 
   auto navigation =
       content::NavigationSimulator::CreateBrowserInitiated(url, web_contents());
