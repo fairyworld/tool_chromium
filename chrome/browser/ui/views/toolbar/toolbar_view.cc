@@ -537,8 +537,8 @@ void ToolbarView::Init() {
   }
 
   if (!features::IsWebUIPerformanceInterventionButtonEnabled()) {
-    performance_intervention_button_ = AddChildView(
-        std::make_unique<PerformanceInterventionButton>(browser_view_));
+    performance_intervention_button_ =
+        AddChildView(std::make_unique<PerformanceInterventionButton>(browser_));
   }
 
   if (media_button) {
