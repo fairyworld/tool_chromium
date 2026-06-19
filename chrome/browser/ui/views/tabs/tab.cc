@@ -277,7 +277,11 @@ Tab::Tab(tabs::TabHandle handle, TabSlotController* controller)
   title_animation_.SetDuration(base::Milliseconds(100));
 
   // Enable keyboard focus.
+#if BUILDFLAG(IS_MAC)
+  SetFocusBehavior(FocusBehavior::ALWAYS);
+#else
   SetFocusBehavior(FocusBehavior::ACCESSIBLE_ONLY);
+#endif
   views::FocusRing::Install(this);
   views::HighlightPathGenerator::Install(
       this,
@@ -512,6 +516,13 @@ void Tab::Layout(PassKey) {
 }
 
 bool Tab::OnKeyPressed(const ui::KeyEvent& event) {
+#if BUILDFLAG(IS_MAC)
+  if (event.key_code() == ui::VKEY_RETURN && event.IsControlDown()) {
+    ShowContextMenu(GetKeyboardContextMenuLocation(),
+                    ui::mojom::MenuSourceType::kKeyboard);
+    return true;
+  }
+#endif
   if (event.key_code() == ui::VKEY_RETURN && !IsSelected()) {
     controller_->SelectTab(this, event);
     return true;
