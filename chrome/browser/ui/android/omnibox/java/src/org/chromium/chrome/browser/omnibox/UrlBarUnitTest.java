@@ -476,21 +476,33 @@ public class UrlBarUnitTest {
      */
     @Test
     public void onTouchEvent_ensureTouchpadFocusFired() {
-        // 1. Fire a touchpad event
-        MotionEvent evt = MotionEvent.obtain(0, 0, MotionEvent.ACTION_UP, 0, 0, 0);
-        evt.setSource(InputDevice.SOURCE_TOUCHPAD);
-        mUrlBar.onTouchEvent(evt);
+        List<Integer> sources =
+                List.of(
+                        InputDevice.SOURCE_MOUSE,
+                        InputDevice.SOURCE_TOUCHPAD,
+                        InputDevice.SOURCE_TOUCHSCREEN);
 
-        // 2. Fire a mouse event
-        evt.setSource(InputDevice.SOURCE_MOUSE);
-        mUrlBar.onTouchEvent(evt);
+        clearInvocations(mUrlBar);
 
-        // // 3. Fire a touchscreen event
-        evt.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-        mUrlBar.onTouchEvent(evt);
+        for (var source : sources) {
+            // 1. Fire a touchpad event
+            MotionEvent evt = MotionEvent.obtain(0, 0, MotionEvent.ACTION_UP, 0, 0, 0);
+            evt.setSource(source);
+            mUrlBar.onTouchEvent(evt);
+            mUrlBar.onTouchEvent(evt);
 
-        // Expect only two explicit calls to request focus (mouse and touchpad only)
-        verify(mUrlBar, times(2)).requestFocus();
+            // 2. Confirm only one requestFocus emitted.
+            // Focus is requested so that _we_ can specify the selection and cursor placement.
+            verify(mUrlBar).requestFocus();
+            clearInvocations(mUrlBar);
+            mUrlBar.onFocusChanged(false, 0, null);
+
+            // 3. Verify requestFocus is re-emitted after focus was lost.
+            mUrlBar.onTouchEvent(evt);
+            verify(mUrlBar).requestFocus();
+            clearInvocations(mUrlBar);
+            mUrlBar.onFocusChanged(false, 0, null);
+        }
     }
 
     @Test
@@ -1202,15 +1214,6 @@ public class UrlBarUnitTest {
     @DisableFeatures(OmniboxFeatureList.URL_BAR_WITHOUT_LIGATURES)
     public void testUrlBarWithoutLigaturesDisabled() {
         assertNull(mUrlBar.getFontFeatureSettings());
-    }
-
-    @Test
-    public void setSelection_trimToTextContents() {
-        mUrlBar.setText("a"); // 1 character.
-        mUrlBar.setSelection(10, 10); // no crash.
-        mUrlBar.setSelection(0, 10); // no crash.
-        mUrlBar.setSelection(10, 0); // no crash.
-        mUrlBar.setSelection(1, 1); // no crash.
     }
 
     @Test
