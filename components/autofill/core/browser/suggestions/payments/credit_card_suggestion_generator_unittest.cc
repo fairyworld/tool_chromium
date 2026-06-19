@@ -6528,5 +6528,36 @@ TEST_F(CreditCardSuggestionGeneratorTest, VirtualCard) {
   }
 }
 
+// Tests that credit card suggestions are not generated when payments is blocked
+// by the AutofillSettings policy.
+TEST_F(CreditCardSuggestionGeneratorTest, AutofillSettingsBlocked) {
+  base::test::ScopedFeatureList scoped_feature_list{
+      features::kAutofillEnableAutofillSettingsEnterprisePolicy};
+
+  payments_data().ClearCreditCards();
+  CreditCard visa_card(autofill::test::MakeGuid(1), test::kEmptyOrigin);
+  test::SetCreditCardInfo(&visa_card, "Elvis Presley", "4111111111113456", "04",
+                          "2099", "1");
+  payments_data().AddCreditCard(visa_card);
+
+  autofill_client().SetAutofillTypeBlockedByPolicy(
+      AutofillClient::AutofillPolicyDataCategory::kPayments, true);
+
+  FormBundle form_bundle =
+      GetFormWithTypes({.fields = {{.role = CREDIT_CARD_NUMBER}}});
+  form_bundle.trigger_field = form_bundle.form.fields()[0];
+  form_bundle.trigger_autofill_field = form_bundle.form_structure->field(0);
+
+  std::vector<Suggestion> suggestions = GetSuggestionsForCreditCards(
+      form_bundle.form, *form_bundle.form_structure, form_bundle.trigger_field,
+      *form_bundle.trigger_autofill_field, autofill_client(),
+      /*four_digit_combinations_in_dom=*/{},
+      /*amount_extraction_manager=*/nullptr, /*bnpl_manager=*/nullptr,
+      credit_card_form_event_logger(),
+      AutofillMetrics::PaymentsSigninState::kUnknown,
+      /*exclude_virtual_cards=*/false);
+  EXPECT_TRUE(suggestions.empty());
+}
+
 }  // namespace
 }  // namespace autofill

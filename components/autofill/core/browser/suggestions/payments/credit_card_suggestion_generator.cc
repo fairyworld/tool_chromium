@@ -418,6 +418,13 @@ void CreditCardSuggestionGenerator::GenerateSuggestions(
     const AutofillField* trigger_autofill_field,
     AutofillClient& client,
     base::FunctionRef<void(ReturnedSuggestions)> callback) {
+  if (client.IsAutofillTypeBlockedByPolicy(
+          client.GetLastCommittedPrimaryMainFrameURL(),
+          AutofillClient::AutofillPolicyDataCategory::kPayments)) {
+    callback({SuggestionDataSource::kCreditCard, {}});
+    return;
+  }
+
   if (!form_structure || !trigger_autofill_field ||
       trigger_autofill_field->Type().GetCreditCardType() == UNKNOWN_TYPE) {
     callback({SuggestionDataSource::kCreditCard, {}});
