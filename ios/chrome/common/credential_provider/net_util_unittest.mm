@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#import "ios/chrome/credential_provider_extension/ui/net_util.h"
+#import "ios/chrome/common/credential_provider/net_util.h"
 
 #import "net/base/registry_controlled_domains/registry_controlled_domain.h"
 #import "testing/gtest_mac.h"
 #import "testing/platform_test.h"
 
-namespace credential_provider_extension {
+namespace credential_provider {
 
 using NetUtilTest = PlatformTest;
 
@@ -81,4 +81,4 @@ TEST_F(NetUtilTest, SecureHostsMatch) {
   EXPECT_FALSE(SecureHostsMatch(@"login.example.co.uk", @"co.uk"));
 }
 
-}  // namespace credential_provider_extension
+}  // namespace credential_provider

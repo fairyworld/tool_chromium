@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#import "ios/chrome/credential_provider_extension/ui/net_util.h"
+#import "ios/chrome/common/credential_provider/net_util.h"
 
 #import "base/strings/sys_string_conversions.h"
 #import "net/base/registry_controlled_domains/registry_controlled_domain.h"
 
-namespace credential_provider_extension {
+namespace credential_provider {
 
 BOOL SecureHostsMatch(NSString* requestedHost, NSString* credentialHost) {
   if (requestedHost.length == 0 || credentialHost.length == 0) {
@@ -38,4 +38,4 @@ BOOL SecureHostsMatch(NSString* requestedHost, NSString* credentialHost) {
   return reqDomain == credDomain;
 }
 
-}  // namespace credential_provider_extension
+}  // namespace credential_provider
