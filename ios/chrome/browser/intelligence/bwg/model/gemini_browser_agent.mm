@@ -51,7 +51,7 @@
 #import "ios/chrome/browser/intelligence/bwg/utils/gemini_feature_availability.h"
 #import "ios/chrome/browser/intelligence/bwg/utils/gemini_prefs.h"
 #import "ios/chrome/browser/intelligence/features/features.h"
-#import "ios/chrome/browser/omnibox/model/omnibox_position/omnibox_position_browser_agent.h"
+#import "ios/chrome/browser/omnibox/model/omnibox_focus/omnibox_focus_browser_agent.h"
 #import "ios/chrome/browser/shared/coordinator/layout_guide/layout_guide_util.h"
 #import "ios/chrome/browser/shared/coordinator/scene/scene_state.h"
 #import "ios/chrome/browser/shared/coordinator/scene/scene_state_observer.h"
@@ -1310,8 +1310,8 @@ void GeminiBrowserAgent::FullscreenDidAnimate(FullscreenController* controller,
 }
 
 bool GeminiBrowserAgent::IsOmniboxFocused() const {
-  OmniboxPositionBrowserAgent* omnibox_agent =
-      OmniboxPositionBrowserAgent::FromBrowser(browser_);
+  OmniboxFocusBrowserAgent* omnibox_agent =
+      OmniboxFocusBrowserAgent::FromBrowser(browser_);
   return omnibox_agent && omnibox_agent->IsOmniboxFocused();
 }
 

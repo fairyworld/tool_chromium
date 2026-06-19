@@ -39,7 +39,7 @@ source_set("unit_tests") {
     "//base",
     "//base/test:test_support",
     "//ios/chrome/browser/fullscreen/model",
-    "//ios/chrome/browser/omnibox/model/omnibox_position",
+    "//ios/chrome/browser/omnibox/model/omnibox_focus",
     "//ios/chrome/browser/shared/coordinator/scene:scene_state_header",
     "//ios/chrome/browser/shared/coordinator/scene/state",
     "//ios/chrome/browser/shared/model/browser/test:test_support",

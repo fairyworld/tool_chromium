@@ -166,7 +166,7 @@
 #import "ios/chrome/browser/ntp/ui_bundled/new_tab_page_component_factory.h"
 #import "ios/chrome/browser/ntp/ui_bundled/new_tab_page_coordinator.h"
 #import "ios/chrome/browser/ntp/ui_bundled/new_tab_page_feature.h"
-#import "ios/chrome/browser/omnibox/model/omnibox_position/omnibox_position_browser_agent.h"
+#import "ios/chrome/browser/omnibox/model/omnibox_focus/omnibox_focus_browser_agent.h"
 #import "ios/chrome/browser/overlays/model/public/overlay_presenter.h"
 #import "ios/chrome/browser/overscroll_actions/model/overscroll_actions_tab_helper.h"
 #import "ios/chrome/browser/overscroll_actions/ui_bundled/overscroll_actions_controller.h"
@@ -1462,10 +1462,10 @@ const char kChromeAppStoreUrl[] =
   // used both in browser and lens overlay.
   _browserOmniboxStateProvider = [[BrowserOmniboxStateProvider alloc] init];
   _browserOmniboxStateProvider.locationBarStateProvider = _toolbarCoordinator;
-  OmniboxPositionBrowserAgent* omniboxPositionBrowserAgent =
-      OmniboxPositionBrowserAgent::FromBrowser(browser);
-  if (omniboxPositionBrowserAgent) {
-    omniboxPositionBrowserAgent->SetOmniboxStateProvider(
+  OmniboxFocusBrowserAgent* omniboxFocusBrowserAgent =
+      OmniboxFocusBrowserAgent::FromBrowser(browser);
+  if (omniboxFocusBrowserAgent) {
+    omniboxFocusBrowserAgent->SetOmniboxStateProvider(
         _browserOmniboxStateProvider);
   }
 
@@ -2302,8 +2302,7 @@ const char kChromeAppStoreUrl[] =
   }
   // Do not present the bottom sheet when the omnibox is being used to not
   // disrupt the user.
-  if (OmniboxPositionBrowserAgent::FromBrowser(self.browser)
-          ->IsOmniboxFocused()) {
+  if (OmniboxFocusBrowserAgent::FromBrowser(self.browser)->IsOmniboxFocused()) {
     return;
   }
   self.credentialSuggestionBottomSheetCoordinator =

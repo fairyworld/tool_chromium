@@ -37,7 +37,7 @@
 #import "ios/chrome/browser/main/model/browser_web_state_list_delegate.h"
 #import "ios/chrome/browser/ntp/model/new_tab_page_tab_helper.h"
 #import "ios/chrome/browser/ntp/ui_bundled/new_tab_page_coordinator.h"
-#import "ios/chrome/browser/omnibox/model/omnibox_position/omnibox_position_browser_agent.h"
+#import "ios/chrome/browser/omnibox/model/omnibox_focus/omnibox_focus_browser_agent.h"
 #import "ios/chrome/browser/save_to_photos/ui_bundled/save_to_photos_coordinator.h"
 #import "ios/chrome/browser/saved_tab_groups/model/tab_group_sync_service_factory.h"
 #import "ios/chrome/browser/search_engines/model/template_url_service_factory.h"
@@ -163,7 +163,7 @@ class BrowserCoordinatorTest : public PlatformTest {
     StartSurfaceRecentTabBrowserAgent::CreateForBrowser(browser_.get());
     WebStateDelegateBrowserAgent::CreateForBrowser(browser_.get());
     SyncErrorBrowserAgent::CreateForBrowser(browser_.get());
-    OmniboxPositionBrowserAgent::CreateForBrowser(browser_.get());
+    OmniboxFocusBrowserAgent::CreateForBrowser(browser_.get());
     BrowserViewVisibilityNotifierBrowserAgent::CreateForBrowser(browser_.get());
     DiscoverFeedVisibilityBrowserAgent::CreateForBrowser(browser_.get());
     ToolbarsSizeBrowserAgent::CreateForBrowser(browser_.get());

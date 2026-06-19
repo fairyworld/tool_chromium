@@ -10,7 +10,7 @@
 #import "ios/chrome/browser/fullscreen/ui_bundled/fullscreen_controller.h"
 #import "ios/chrome/browser/infobars/model/infobar_badge_tab_helper.h"
 #import "ios/chrome/browser/infobars/model/infobar_manager_impl.h"
-#import "ios/chrome/browser/omnibox/model/omnibox_position/omnibox_position_browser_agent.h"
+#import "ios/chrome/browser/omnibox/model/omnibox_focus/omnibox_focus_browser_agent.h"
 #import "ios/chrome/browser/reading_list/model/reading_list_model_factory.h"
 #import "ios/chrome/browser/saved_tab_groups/model/tab_group_sync_service_factory.h"
 #import "ios/chrome/browser/search_engines/model/template_url_service_factory.h"
@@ -177,7 +177,7 @@ class MainToolbarCoordinatorTest : public PlatformTest {
         startDispatchingToTarget:mock_browser_coordinator_commands
                      forProtocol:@protocol(BrowserCoordinatorCommands)];
 
-    OmniboxPositionBrowserAgent::CreateForBrowser(browser_.get());
+    OmniboxFocusBrowserAgent::CreateForBrowser(browser_.get());
     AutocompleteBrowserAgent::CreateForBrowser(browser_.get());
     // FullscreenController depends on ToolbarsSizeBrowserAgent, so the agent
     // must be created first. Please maintain this order.
@@ -219,9 +219,9 @@ class MainToolbarCoordinatorTest : public PlatformTest {
   base::test::ScopedFeatureList feature_list_;
 };
 
-// Test that the OmniboxPositionBrowserAgent can be observed to tell when the
+// Test that the LayoutState can be observed to tell when the
 // bottom omnibox position changes.
-TEST_F(MainToolbarCoordinatorTest, TestOmniboxPositionBrowserAgentObservation) {
+TEST_F(MainToolbarCoordinatorTest, TestLayoutStateToolbarPositionObservation) {
   // Bottom omnibox is not supported on all devices (e.g. iPad).
   if (!IsBottomOmniboxAvailable()) {
     return;
@@ -229,10 +229,10 @@ TEST_F(MainToolbarCoordinatorTest, TestOmniboxPositionBrowserAgentObservation) {
   VerifyOmniboxPositionObservation();
 }
 
-// Test that the OmniboxPositionBrowserAgent can be observed to tell when the
+// Test that the LayoutState can be observed to tell when the
 // bottom omnibox position changes when ChromeNextIa is enabled.
 TEST_F(MainToolbarCoordinatorTest,
-       TestOmniboxPositionBrowserAgentObservation_ChromeNextIa) {
+       TestLayoutStateToolbarPositionObservation_ChromeNextIa) {
   // Bottom omnibox is not supported on all devices (e.g. iPad).
   if (!IsBottomOmniboxAvailable()) {
     return;
