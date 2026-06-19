@@ -12,7 +12,7 @@
 
 #include "base/types/pass_key.h"
 #include "base/values.h"
-#include "chrome/browser/web_applications/isolated_web_apps/runtime_data/iwa_entitlements.h"
+#include "components/webapps/isolated_web_apps/public/iwa_entitlements.h"
 #include "components/webapps/isolated_web_apps/public/iwa_runtime_data_provider.h"
 
 class BrowserProcessImpl;

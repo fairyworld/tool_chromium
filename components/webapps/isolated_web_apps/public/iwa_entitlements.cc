@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/web_applications/isolated_web_apps/runtime_data/iwa_entitlements.h"
+#include "components/webapps/isolated_web_apps/public/iwa_entitlements.h"
 
 #include "base/containers/fixed_flat_map.h"
 #include "base/containers/map_util.h"

@@ -2,12 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/web_applications/isolated_web_apps/runtime_data/iwa_entitlements.h"
+#include "components/webapps/isolated_web_apps/public/iwa_entitlements.h"
 
 #include <string>
 
 #include "build/build_config.h"
-#include "chrome/browser/web_applications/isolated_web_apps/runtime_data/chrome_iwa_runtime_data_provider.h"
 #include "services/network/public/cpp/permissions_policy/permissions_policy_features_generated.h"
 #include "testing/gtest/include/gtest/gtest.h"
 

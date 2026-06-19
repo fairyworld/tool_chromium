@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_WEB_APPLICATIONS_ISOLATED_WEB_APPS_RUNTIME_DATA_IWA_ENTITLEMENTS_H_
-#define CHROME_BROWSER_WEB_APPLICATIONS_ISOLATED_WEB_APPS_RUNTIME_DATA_IWA_ENTITLEMENTS_H_
+#ifndef COMPONENTS_WEBAPPS_ISOLATED_WEB_APPS_PUBLIC_IWA_ENTITLEMENTS_H_
+#define COMPONENTS_WEBAPPS_ISOLATED_WEB_APPS_PUBLIC_IWA_ENTITLEMENTS_H_
 
 #include <optional>
 #include <string>
@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "base/values.h"
-#include "chrome/browser/web_applications/isolated_web_apps/key_distribution/proto/key_distribution.pb.h"
+#include "components/webapps/isolated_web_apps/key_distribution/proto/key_distribution.pb.h"
 
 namespace web_app {
 
@@ -47,4 +47,4 @@ std::optional<IwaEntitlement> GetEntitlementForFeature(
 
 }  // namespace web_app
 
-#endif  // CHROME_BROWSER_WEB_APPLICATIONS_ISOLATED_WEB_APPS_RUNTIME_DATA_IWA_ENTITLEMENTS_H_
+#endif  // COMPONENTS_WEBAPPS_ISOLATED_WEB_APPS_PUBLIC_IWA_ENTITLEMENTS_H_
