@@ -43,6 +43,8 @@ public class SendTabToSelfTabCardLabelData extends PersistedTabData {
     private final SettableMonotonicObservableSupplier<Boolean> mIsPersistenceEnabledSupplier =
             ObservableSuppliers.createMonotonic();
 
+    private boolean mObserverRegistered;
+
     /**
      * Observer that removes the SendTabToSelfTabCardLabelData from the UserDataHost when the tab is
      * interacted with by the user.
@@ -73,12 +75,26 @@ public class SendTabToSelfTabCardLabelData extends PersistedTabData {
         }
     }
 
+    /** Returns true if this is a negative cache instance (empty data), false otherwise. */
+    public boolean isNegativeCache() {
+        return mSenderDeviceName.isEmpty();
+    }
+
+    /** Safely registers the observer on the UI thread if the data is valid. */
+    private void registerTabObserverIfNotNegativeCache() {
+        org.chromium.base.ThreadUtils.assertOnUiThread();
+        if (!mObserverRegistered && !isNegativeCache()) {
+            mTab.addObserver(mObserver);
+            mObserverRegistered = true;
+        }
+    }
+
     private void updateIsPersistenceEnabledSupplier() {
         mIsPersistenceEnabledSupplier.set(
                 !mTab.isIncognito()
                         && !mTab.isDestroyed()
                         // Avoid saving the negative cache instances.
-                        && !mSenderDeviceName.isEmpty());
+                        && !isNegativeCache());
     }
 
     /**
@@ -87,6 +103,8 @@ public class SendTabToSelfTabCardLabelData extends PersistedTabData {
      * @return True if the data has exceeded the 5-day expiration window, false otherwise.
      */
     private boolean isExpired() {
+        // Avoid marking the negative cache as expired.
+        if (isNegativeCache()) return false;
         return System.currentTimeMillis() - mAdditionTimestampMs > EXPIRATION_MS;
     }
 
@@ -104,9 +122,6 @@ public class SendTabToSelfTabCardLabelData extends PersistedTabData {
                                 tab, /* senderDeviceName= */ "", /* additionTimestampMs= */ 0),
                 USER_DATA_KEY,
                 (data) -> {
-                    // TODO(crbug.com/488072250): This also clears the default created
-                    // `SendTabToSelfTabCardLabelData` instance which is supposed to be a negative
-                    // cache. Avoid removing it.
                     if (data != null && data.isExpired()) {
                         data.removeAndDestroy();
                         callback.onResult(null);
@@ -156,7 +171,8 @@ public class SendTabToSelfTabCardLabelData extends PersistedTabData {
                         .getId());
         mSenderDeviceName = senderDeviceName;
         mAdditionTimestampMs = additionTimestampMs;
-        mTab.addObserver(mObserver);
+
+        registerTabObserverIfNotNegativeCache();
 
         registerIsTabSaveEnabledSupplier(mIsPersistenceEnabledSupplier);
         updateIsPersistenceEnabledSupplier();
@@ -216,6 +232,7 @@ public class SendTabToSelfTabCardLabelData extends PersistedTabData {
                     TaskTraits.UI_DEFAULT,
                     () -> {
                         updateIsPersistenceEnabledSupplier();
+                        registerTabObserverIfNotNegativeCache();
                     });
         } catch (InvalidProtocolBufferException e) {
             Log.i(TAG, "deserialize failed: \n" + e.toString());

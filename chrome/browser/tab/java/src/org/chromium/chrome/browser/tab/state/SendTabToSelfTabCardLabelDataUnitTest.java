@@ -7,6 +7,7 @@ package org.chromium.chrome.browser.tab.state;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -139,5 +140,31 @@ public class SendTabToSelfTabCardLabelDataUnitTest {
 
         // Flushing tasks will execute both callbacks in sequence and should not crash.
         RobolectricUtil.runAllBackgroundAndUi();
+    }
+
+    @Test
+    public void testUserData_NegativeCache() {
+        when(mTab.getId()).thenReturn(1);
+        when(mTab.isInitialized()).thenReturn(true);
+
+        // from() should return the negative cache instance.
+        SendTabToSelfTabCardLabelData.from(
+                mTab,
+                (res) -> {
+                    assertNotNull(res);
+                    assertTrue(res.isNegativeCache());
+                });
+        RobolectricUtil.runAllBackgroundAndUi();
+
+        // Verify that a SendTabToSelfTabCardLabelData IS attached to the tab as negative cache.
+        SendTabToSelfTabCardLabelData attachedData =
+                mUserDataHost.getUserData(SendTabToSelfTabCardLabelData.class);
+        assertNotNull(attachedData);
+        assertTrue(attachedData.isNegativeCache());
+
+        // Verify that get() returns the negative cache instance.
+        SendTabToSelfTabCardLabelData retrieved = SendTabToSelfTabCardLabelData.get(mTab);
+        assertNotNull(retrieved);
+        assertTrue(retrieved.isNegativeCache());
     }
 }

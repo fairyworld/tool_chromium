@@ -76,8 +76,6 @@ public class SendTabToSelfTabLabeller implements TabModelObserver {
                 cardLabels.put(tab.getId(), buildLabel(data));
             } else {
                 // Asynchronously restore from LevelDB. If no data is found, push null to clear.
-                // TODO(crbug.com/488072250): This might clear labels applied by other features.
-                // Clear labels only for the tabs which were previously labelled by this labeller.
                 SendTabToSelfTabCardLabelData.from(
                         tab,
                         (loadedData) -> {
@@ -136,7 +134,7 @@ public class SendTabToSelfTabLabeller implements TabModelObserver {
      *     applies.
      */
     private @Nullable TabCardLabelData buildLabel(@Nullable SendTabToSelfTabCardLabelData data) {
-        if (data == null) {
+        if (data == null || data.isNegativeCache()) {
             // TODO(crbug.com/488072250): This might clear labels applied by other features.
             // Clear labels only for the tabs which were previously labelled by this labeller.
             return null;

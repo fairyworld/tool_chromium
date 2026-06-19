@@ -27,6 +27,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.robolectric.shadows.ShadowLooper;
 
 import org.chromium.base.UserDataHost;
 import org.chromium.base.supplier.ObservableSuppliers;
@@ -212,6 +213,24 @@ public class SendTabToSelfTabLabellerUnitTest {
         RobolectricUtil.runAllBackgroundAndUi();
 
         verifyTabCardLabelUpdated("From Example Phone", 1);
+    }
+
+    @Test
+    public void testShowAll_NegativeCache_Synchronous() {
+        // Create and set negative cache in memory.
+        SendTabToSelfTabCardLabelData sttsData =
+                new SendTabToSelfTabCardLabelData(
+                        mTab, /* senderDeviceName= */ "", /* additionTimestampMs= */ 0);
+        mUserDataHost.setUserData(SendTabToSelfTabCardLabelData.class, sttsData);
+
+        mLabeller.showAll(Collections.singletonList(mTab));
+
+        // Idle the main looper to execute the posted showAll task.
+        // Since it is synchronous, it should complete and update the UI immediately.
+        ShadowLooper.idleMainLooper();
+
+        // Verify the label was updated to null (cleared) synchronously.
+        verifyTabCardLabelUpdated(null, 1);
     }
 
     @Test
