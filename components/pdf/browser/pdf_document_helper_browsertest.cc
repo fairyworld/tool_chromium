@@ -294,6 +294,49 @@ IN_PROC_BROWSER_TEST_P(PDFDocumentHelperTest, DocumentLoadComplete) {
   EXPECT_TRUE(load_complete_future.WaitAndClear());
 }
 
+IN_PROC_BROWSER_TEST_P(PDFDocumentHelperTest,
+                       HasMeaningfulTextReturnsFalseBeforeLoad) {
+  base::test::TestFuture<bool> future;
+  pdf_document_helper()->HasMeaningfulText(future.GetCallback());
+  EXPECT_FALSE(future.Get());
+}
+
+IN_PROC_BROWSER_TEST_P(PDFDocumentHelperTest,
+                       HasMeaningfulTextReturnsFalseWhenNoText) {
+  NiceMock<FakePdfListener> listener;
+  mojo::Receiver<pdf::mojom::PdfListener> receiver(&listener);
+  pdf_document_helper()->SetListener(receiver.BindNewPipeAndPassRemote());
+
+  EXPECT_CALL(listener, HasMeaningfulText)
+      .WillOnce([](FakePdfListener::HasMeaningfulTextCallback callback) {
+        std::move(callback).Run(false);
+      });
+
+  pdf_document_helper()->OnDocumentLoadComplete();
+
+  base::test::TestFuture<bool> future;
+  pdf_document_helper()->HasMeaningfulText(future.GetCallback());
+  EXPECT_FALSE(future.Get());
+}
+
+IN_PROC_BROWSER_TEST_P(PDFDocumentHelperTest,
+                       HasMeaningfulTextReturnsTrueWhenNonEmptyText) {
+  NiceMock<FakePdfListener> listener;
+  mojo::Receiver<pdf::mojom::PdfListener> receiver(&listener);
+  pdf_document_helper()->SetListener(receiver.BindNewPipeAndPassRemote());
+
+  EXPECT_CALL(listener, HasMeaningfulText)
+      .WillOnce([](FakePdfListener::HasMeaningfulTextCallback callback) {
+        std::move(callback).Run(true);
+      });
+
+  pdf_document_helper()->OnDocumentLoadComplete();
+
+  base::test::TestFuture<bool> future;
+  pdf_document_helper()->HasMeaningfulText(future.GetCallback());
+  EXPECT_TRUE(future.Get());
+}
+
 // TODO(crbug.com/40268279): Stop testing both modes after OOPIF PDF viewer
 // launches.
 INSTANTIATE_FEATURE_OVERRIDE_TEST_SUITE(PDFDocumentHelperTest);

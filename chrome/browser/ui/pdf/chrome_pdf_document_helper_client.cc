@@ -105,6 +105,8 @@ void ChromePDFDocumentHelperClient::OnDocumentLoadComplete(
     auto* pdf_helper =
         pdf::PDFDocumentHelper::GetForCurrentDocument(render_frame_host);
     if (pdf_helper) {
+      // Get the text of the first page and send it to the main frame for
+      // language detection.
       pdf_helper->GetPageText(
           0, base::BindOnce(&ChromePDFDocumentHelperClient::OnPdfTextExtracted,
                             weak_factory_.GetWeakPtr(),
