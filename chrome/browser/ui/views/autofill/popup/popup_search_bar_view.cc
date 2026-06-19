@@ -36,7 +36,6 @@ namespace autofill {
 PopupSearchBarView::PopupSearchBarView(const std::u16string& placeholder,
                                        Delegate& delegate,
                                        bool show_indicator,
-                                       bool is_loading,
                                        bool show_search_icon_sparkle)
     : delegate_(delegate) {
   ChromeLayoutProvider* layout_provider = ChromeLayoutProvider::Get();
@@ -64,9 +63,8 @@ PopupSearchBarView::PopupSearchBarView(const std::u16string& placeholder,
 
   search_icon_ = AddChildView(std::make_unique<views::ImageView>(
       ui::ImageModel::FromVectorIcon(*icon, ui::kColorIcon, icon_size)));
-
   throbber_ = AddChildView(std::make_unique<views::Throbber>(icon_size));
-  SetLoading(is_loading);
+  SetLoading(false);
 
   input_ = AddChildView(
       views::Builder<views::Textfield>()
