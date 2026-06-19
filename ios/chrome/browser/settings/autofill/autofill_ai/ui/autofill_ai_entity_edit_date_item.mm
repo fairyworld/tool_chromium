@@ -5,7 +5,7 @@
 #import "ios/chrome/browser/settings/autofill/autofill_ai/ui/autofill_ai_entity_edit_date_item.h"
 
 #import "ios/chrome/browser/settings/autofill/autofill_ai/ui/autofill_ai_date_picker_input_view.h"
-#import "ui/base/device_form_factor.h"
+#import "ios/chrome/browser/settings/autofill/autofill_ai/utils/autofill_ai_date_util.h"
 
 namespace {
 
@@ -35,8 +35,7 @@ const CGFloat kDatePickerPopoverAnchorWidthRatio = 0.25;
 - (void)configureCell:(TableViewTextEditCell*)cell {
   [super configureCell:cell];
 
-  if (self.editingEnabled &&
-      (ui::GetDeviceFormFactor() != ui::DEVICE_FORM_FACTOR_TABLET)) {
+  if (self.editingEnabled && !ShouldUsePopoverForDatePicker()) {
     cell.textField.inputView = [self createCustomInputView];
   } else {
     cell.textField.inputView = nil;
