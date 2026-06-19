@@ -230,6 +230,7 @@ bool UnboundedSurfaceWindowAura::InitWindow(const gfx::Rect& bounds_in_dips) {
   window_ =
       std::make_unique<aura::Window>(this, aura::client::WINDOW_TYPE_MENU);
   window_->Init(ui::LayerType::LAYER_SOLID_COLOR);
+  window_->SetTransparent(true);
   // TODO(crbug.com/508672616): Note that we may need to change this to a non-
   // transparent background later, if security issues arise. For example, this
   // allows content to put up a fully transparent (invisible) overlay over site
