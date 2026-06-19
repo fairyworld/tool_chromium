@@ -237,9 +237,10 @@ suite('OverflowMenuTest', () => {
       // The menu should contain:
       // 1. Thread History (because we are on AI page and the flag is enabled)
       // 2. My Activity
-      // 3. Feedback button
+      // 3. Help button
+      // 4. Feedback button
       // No open in new tab (hidden by flag).
-      assertEquals(3, buttons.length);
+      assertEquals(4, buttons.length);
 
       const threadHistoryButton = buttons[0];
       assertTrue(!!threadHistoryButton);
@@ -259,9 +260,18 @@ suite('OverflowMenuTest', () => {
       await proxy.handler.whenCalled('showThreadHistory');
     });
 
+    test('handles help click', async () => {
+      const buttons = overflowMenu.shadowRoot.querySelectorAll('button');
+      const helpButton = buttons[2];
+      assertTrue(!!helpButton);
+
+      helpButton.click();
+      await proxy.handler.whenCalled('openOnboardingHelpUi');
+    });
+
     test('handles feedback click', async () => {
       const buttons = overflowMenu.shadowRoot.querySelectorAll('button');
-      const feedbackButton = buttons[2];
+      const feedbackButton = buttons[3];
       assertTrue(!!feedbackButton);
 
       feedbackButton.click();

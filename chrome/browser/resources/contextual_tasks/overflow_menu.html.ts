@@ -42,6 +42,12 @@ export function getHtml(this: OverflowMenuElement) {
 </if>
         $i18n{myActivity}
       </button>
+      ${this.contextualTasksEnableSpatialModelToolbarLayout_ ? html`
+        <button class="dropdown-item" id="helpButton" @click="${this.onHelpClick_}">
+          <cr-icon icon="cr:help-outline"></cr-icon>
+          $i18n{help}
+        </button>
+      ` : ''}
       ${this.isUserFeedbackAllowed ? html`
         <button class="dropdown-item" @click="${this.onFeedbackClick_}">
           <cr-icon icon="contextual_tasks:feedback"></cr-icon>

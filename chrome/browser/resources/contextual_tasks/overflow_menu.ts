@@ -169,9 +169,16 @@ export class OverflowMenuElement extends OverflowMenuElementBase {
     this.browserProxy_.handler.openMyActivityUi();
   }
 
-  protected onFeedbackClick_() {
+  protected onHelpClick_() {
     this.close();
     recordAction('ContextualTasks.WebUI.UserAction.OpenHelp');
+    this.browserProxy_.handler.openOnboardingHelpUi();
+  }
+
+
+  protected onFeedbackClick_() {
+    this.close();
+    recordAction('ContextualTasks.WebUI.UserAction.OpenFeedback');
     this.browserProxy_.handler.openFeedbackUi();
   }
 
