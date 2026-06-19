@@ -26,6 +26,9 @@
 #include "components/multistep_filter/core/logging/log_entry.h"
 #include "components/multistep_filter/core/logging/multistep_filter_logger.h"
 #include "components/multistep_filter/core/multistep_filter_service.h"
+#include "components/optimization_guide/core/model_execution/feature_keys.h"
+#include "components/optimization_guide/core/optimization_guide_prefs.h"
+#include "components/prefs/pref_service.h"
 #include "components/tabs/public/tab_interface.h"
 #include "components/vector_icons/vector_icons.h"
 #include "content/public/browser/navigation_handle.h"
@@ -86,11 +89,20 @@ void LogSuggestionUiDecision(
 
 void LogSuggestionUiShown(MultistepFilterLogRouter* log_router,
                           const UrlFilterSuggestion& suggestion,
-                          bool ui_shown) {
-  MULTISTEP_FILTER_LOG(log_router, suggestion.triggering_navigation_id,
-                       LogEventType::kSuggestionShown,
-                       suggestion.triggering_host)
-      << LogDetail{"ui_shown", ui_shown};
+                          bool ui_shown,
+                          std::string reason) {
+  if (reason.empty()) {
+    MULTISTEP_FILTER_LOG(log_router, suggestion.triggering_navigation_id,
+                         LogEventType::kSuggestionShown,
+                         suggestion.triggering_host)
+        << LogDetail{"ui_shown", ui_shown};
+  } else {
+    MULTISTEP_FILTER_LOG(log_router, suggestion.triggering_navigation_id,
+                         LogEventType::kSuggestionShown,
+                         suggestion.triggering_host)
+        << LogDetail{"ui_shown", ui_shown}
+        << LogDetail{"reason", std::move(reason)};
+  }
 }
 
 }  // namespace
@@ -111,6 +123,7 @@ FilterUiController::FilterUiController(tabs::TabInterface& tab)
     service_ = MultistepFilterServiceFactory::GetForProfile(profile);
     favicon_service_ = FaviconServiceFactory::GetForProfile(
         profile, ServiceAccessType::EXPLICIT_ACCESS);
+    pref_service_ = profile->GetPrefs();
   }
   if (tab.GetTabFeatures()) {
     page_action_controller_ = tab.GetTabFeatures()->page_action_controller();
@@ -135,8 +148,14 @@ void FilterUiController::OnSuggestionGenerated(
     return;
   }
   if (!tab().GetContents() || !service_ || !page_action_controller_ ||
-      !favicon_service_) {
-    LogSuggestionUiShown(log_router_, *suggestion, false);
+      !favicon_service_ || !pref_service_) {
+    LogSuggestionUiShown(log_router_, *suggestion, false,
+                         "missing_dependencies");
+    return;
+  }
+  if (!ShouldShowCue()) {
+    LogSuggestionUiShown(log_router_, *suggestion, false,
+                         "smart_suggestions_disabled");
     return;
   }
 
@@ -233,13 +252,24 @@ void FilterUiController::OpenSettings() {
   if (content::WebContents* web_contents = tab().GetContents()) {
     GURL settings_url(chrome::kChromeUISettingsURL);
     content::OpenURLParams params(
-        settings_url.Resolve(chrome::kExperimentalAISettingsSubPage),
-        content::Referrer(), WindowOpenDisposition::NEW_FOREGROUND_TAB,
+        settings_url.Resolve(chrome::kSuggestionsSubPage), content::Referrer(),
+        WindowOpenDisposition::NEW_FOREGROUND_TAB,
         ui::PAGE_TRANSITION_GENERATED,
         /*is_renderer_initiated=*/false);
     web_contents->OpenURL(params,
                           base::BindOnce([](content::NavigationHandle&) {}));
   }
+}
+
+bool FilterUiController::ShouldShowCue() const {
+  // TODO(b/522733094): Clean this up once proper eligibility integration is
+  // complete.
+  int opt_in_state = pref_service_->GetInteger(
+      optimization_guide::prefs::GetSettingEnabledPrefName(
+          optimization_guide::UserVisibleFeatureKey::kContextualCueing));
+  return opt_in_state !=
+         std::to_underlying(
+             optimization_guide::prefs::FeatureOptInState::kDisabled);
 }
 
 void FilterUiController::ShowCue(const UrlFilterSuggestion& suggestion) {
@@ -270,9 +300,14 @@ void FilterUiController::OnPageActionAnchoredMessageShown(
   }
   switch (suggestion_state_->view_state) {
     case SuggestionViewState::kInactive:
+      if (page_action_controller_) {
+        page_action_controller_->OverrideText(
+            kActionMultistepFilter,
+            l10n_util::GetStringUTF16(IDS_MULTISTEP_FILTER_CUE_ACTION_TEXT));
+      }
       suggestion_state_->view_state = SuggestionViewState::kShowingInitialCue;
       LogSuggestionUiShown(log_router_, suggestion_state_->suggestion,
-                           /*ui_shown=*/true);
+                           /*ui_shown=*/true, /*reason=*/"");
       if (service_) {
         // Delete similar suggestions from the service as this one is being
         // shown.
@@ -283,11 +318,16 @@ void FilterUiController::OnPageActionAnchoredMessageShown(
       }
       break;
     case SuggestionViewState::kCollapsedInOmnibox:
+      if (page_action_controller_) {
+        page_action_controller_->OverrideText(
+            kActionMultistepFilter,
+            l10n_util::GetStringUTF16(IDS_MULTISTEP_FILTER_CUE_ACTION_TEXT));
+      }
       suggestion_state_->view_state = SuggestionViewState::kReopenedFromOmnibox;
       break;
     case SuggestionViewState::kShowingInitialCue:
     case SuggestionViewState::kReopenedFromOmnibox:
-      break;
+      NOTREACHED();
   }
 }
 
@@ -304,10 +344,15 @@ void FilterUiController::OnPageActionAnchoredMessageHidden(
       LogSuggestionUiDecision(log_router_, *suggestion_state_,
                               SuggestionUserDecision::kIgnored);
       suggestion_state_->view_state = SuggestionViewState::kCollapsedInOmnibox;
+      if (page_action_controller_) {
+        page_action_controller_->OverrideText(
+            kActionMultistepFilter,
+            suggestion_state_->suggestion.short_suggestion_message);
+      }
       break;
     case SuggestionViewState::kInactive:
     case SuggestionViewState::kCollapsedInOmnibox:
-      break;
+      NOTREACHED();
   }
 }
 
@@ -324,12 +369,12 @@ void FilterUiController::OnFaviconAvailable(
                                                   message);
 
   auto menu_model = std::make_unique<ui::SimpleMenuModel>(this);
-  menu_model->AddItem(
-      internal::kDismissCommand,
-      l10n_util::GetStringUTF16(IDS_MULTISTEP_FILTER_CUE_DISMISS));
-  menu_model->AddItem(
-      internal::kSettingsCommand,
-      l10n_util::GetStringUTF16(IDS_MULTISTEP_FILTER_CUE_SETTINGS));
+  menu_model->AddItemWithStringIdAndIcon(
+      internal::kDismissCommand, IDS_MULTISTEP_FILTER_CUE_DISMISS,
+      ui::ImageModel::FromVectorIcon(vector_icons::kCloseIcon));
+  menu_model->AddItemWithStringIdAndIcon(
+      internal::kSettingsCommand, IDS_MULTISTEP_FILTER_CUE_SETTINGS,
+      ui::ImageModel::FromVectorIcon(vector_icons::kSettingsIcon));
   page_action_controller_->SetAnchoredMessageAction(
       kActionMultistepFilter,
       page_actions::AnchoredMessageActionIconType::kMenu,
@@ -343,6 +388,8 @@ void FilterUiController::OnFaviconAvailable(
        .text = suggestion.source_host});
 
   page_actions::AnchoredMessageExpandableContent content;
+  content.heading = l10n_util::GetStringUTF16(
+      IDS_MULTISTEP_FILTER_CUE_EXPANDABLE_CONTENT_HEADING);
   content.items = std::move(items);
 
   page_action_controller_->SetAnchoredMessageExpandableContent(

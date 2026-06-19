@@ -31,6 +31,8 @@ source_set("ui") {
       "//components/favicon/core",
       "//components/multistep_filter/content",
       "//components/multistep_filter/core/logging",
+      "//components/optimization_guide/core",
+      "//components/prefs",
       "//components/tabs:public",
       "//components/vector_icons",
       "//content/public/browser",

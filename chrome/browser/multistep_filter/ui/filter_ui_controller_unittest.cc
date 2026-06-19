@@ -5,6 +5,7 @@
 #include "chrome/browser/multistep_filter/ui/filter_ui_controller.h"
 
 #include <optional>
+#include <utility>
 
 #include "base/strings/utf_string_conversions.h"
 #include "base/test/scoped_feature_list.h"
@@ -20,6 +21,9 @@
 #include "components/multistep_filter/core/multistep_filter_service.h"
 #include "components/multistep_filter/core/multistep_filter_util.h"
 #include "components/multistep_filter/core/storage/filter_store.h"
+#include "components/optimization_guide/core/model_execution/feature_keys.h"
+#include "components/optimization_guide/core/optimization_guide_prefs.h"
+#include "components/prefs/pref_service.h"
 #include "components/tabs/public/mock_tab_interface.h"
 #include "components/unified_consent/url_keyed_data_collection_consent_helper.h"
 #include "content/public/browser/web_contents.h"
@@ -265,6 +269,46 @@ TEST_F(FilterUiControllerTest, OnSuggestionGeneratedWithNullFaviconService) {
 
   controller_->OnSuggestionGenerated(suggestion);
   EXPECT_FALSE(test_api(*controller_).suggestion_state().has_value());
+}
+
+TEST_F(FilterUiControllerTest, OnSuggestionGeneratedWithNullPrefService) {
+  test_api(*controller_).set_pref_service(nullptr);
+
+  UrlFilterSuggestion suggestion =
+      CreateDummySuggestion(GURL("https://example.com"), DefaultAttributes());
+  suggestion.suggestion_message = u"Test Message";
+
+  controller_->OnSuggestionGenerated(suggestion);
+  EXPECT_FALSE(test_api(*controller_).suggestion_state().has_value());
+}
+
+TEST_F(FilterUiControllerTest, OnSuggestionGeneratedWhenSettingDisabled) {
+  profile()->GetPrefs()->SetInteger(
+      optimization_guide::prefs::GetSettingEnabledPrefName(
+          optimization_guide::UserVisibleFeatureKey::kContextualCueing),
+      std::to_underlying(
+          optimization_guide::prefs::FeatureOptInState::kDisabled));
+
+  UrlFilterSuggestion suggestion =
+      CreateDummySuggestion(GURL("https://example.com"), DefaultAttributes());
+  suggestion.suggestion_message = u"Test Message";
+
+  controller_->OnSuggestionGenerated(suggestion);
+  EXPECT_FALSE(test_api(*controller_).suggestion_state().has_value());
+}
+
+TEST_F(FilterUiControllerTest, OnSuggestionGeneratedWhenSettingEnabled) {
+  profile()->GetPrefs()->SetInteger(
+      optimization_guide::prefs::GetSettingEnabledPrefName(
+          optimization_guide::UserVisibleFeatureKey::kContextualCueing),
+      std::to_underlying(optimization_guide::prefs::FeatureOptInState::kEnabled));
+
+  UrlFilterSuggestion suggestion =
+      CreateDummySuggestion(GURL("https://example.com"), DefaultAttributes());
+  suggestion.suggestion_message = u"Test Message";
+
+  controller_->OnSuggestionGenerated(suggestion);
+  EXPECT_TRUE(test_api(*controller_).suggestion_state().has_value());
 }
 
 // === Group 3: Clear & Dismissal ===

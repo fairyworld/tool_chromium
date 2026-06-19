@@ -41,6 +41,8 @@
 #include "components/multistep_filter/core/multistep_filter_service_test_api.h"
 #include "components/multistep_filter/core/storage/filter_store.h"
 #include "components/multistep_filter/core/switches.h"
+#include "components/optimization_guide/core/model_execution/feature_keys.h"
+#include "components/optimization_guide/core/optimization_guide_prefs.h"
 #include "components/prefs/pref_service.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
 #include "components/sync/service/sync_service.h"
@@ -361,16 +363,6 @@ IN_PROC_BROWSER_TEST_F(MultistepFilterBrowserTest,
 
 #endif
 
-class MultistepFilterDisabledBrowserTest : public InProcessBrowserTest {
- public:
-  MultistepFilterDisabledBrowserTest() {
-    scoped_feature_list_.InitAndDisableFeature(kMultistepFilter);
-  }
-
- protected:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
-
 IN_PROC_BROWSER_TEST_F(MultistepFilterBrowserTest,
                        ExecuteSettingsCommandOpensAiPage) {
   tabs::TabInterface* active_tab = browser()->tab_strip_model()->GetActiveTab();
@@ -383,9 +375,70 @@ IN_PROC_BROWSER_TEST_F(MultistepFilterBrowserTest,
   ASSERT_TRUE(base::test::RunUntil([&]() {
     return browser()->tab_strip_model()->GetActiveWebContents()->GetURL() ==
            GURL(base::StrCat({::chrome::kChromeUISettingsURL,
-                              ::chrome::kExperimentalAISettingsSubPage}));
+                              ::chrome::kSuggestionsSubPage}));
   }));
 }
+
+IN_PROC_BROWSER_TEST_F(MultistepFilterBrowserTest,
+                       CueNotShownWhenPrefDisabled) {
+  browser()->profile()->GetPrefs()->SetInteger(
+      optimization_guide::prefs::GetSettingEnabledPrefName(
+          optimization_guide::UserVisibleFeatureKey::kContextualCueing),
+      static_cast<int>(
+          optimization_guide::prefs::FeatureOptInState::kDisabled));
+
+  GURL extraction_url =
+      embedded_test_server()->GetURL(kTestAllowedDomain, kExtractionUrlPath);
+  GURL suggestion_trigger_url = embedded_test_server()->GetURL(
+      kTestAllowedDomain2, kSuggestionTriggerUrlPath);
+  GURL suggestion_url =
+      embedded_test_server()->GetURL(kTestAllowedDomain2, kSuggestionUrlPath);
+
+  // 1. Setup extraction
+  fake_server().SetSupportedTasksResponse(
+      CreateSupportedTasksResponse({kTestTaskType}));
+  fake_server().SetExtractResponse(CreateExtractTaskAttributesResponse(
+      kTestTaskType, {{kTestAttributeKey, kTestAttributeValue},
+                      {kTestAttributeKey2, kTestAttributeValue2}}));
+
+  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), extraction_url));
+
+  std::optional<base::Uuid> extraction_result = extraction_future_.Take();
+  ASSERT_TRUE(extraction_result.has_value());
+  base::Uuid annotation_id = std::move(extraction_result).value();
+  EXPECT_FALSE(suggestion_future_.Take().has_value());
+
+  // 2. Setup suggestion
+  GetTaskExecutionStrategiesResponse execution_strategies_response =
+      CreateTaskExecutionStrategiesResponse(
+          suggestion_url, {{kTestAttributeKey, kTestAttributeValue},
+                           {kTestAttributeKey2, kTestAttributeValue2}});
+  execution_strategies_response.mutable_execution_strategies(0)
+      ->set_candidate_id(annotation_id.AsLowercaseString());
+  fake_server().SetExecutionStrategiesResponse(execution_strategies_response);
+  fake_server().SetExtractResponse(ExtractTaskAttributesResponse());
+
+  // 3. Navigate to trigger suggestion
+  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), suggestion_trigger_url));
+  EXPECT_FALSE(extraction_future_.Take().has_value());
+  EXPECT_TRUE(suggestion_future_.Take().has_value());
+
+  // 4. Verify UI controller suppresses the cue
+  FilterUiController* ui_controller =
+      FilterUiController::From(browser()->tab_strip_model()->GetActiveTab());
+  ASSERT_TRUE(ui_controller);
+  EXPECT_FALSE(test_api(*ui_controller).suggestion_state().has_value());
+}
+
+class MultistepFilterDisabledBrowserTest : public InProcessBrowserTest {
+ public:
+  MultistepFilterDisabledBrowserTest() {
+    scoped_feature_list_.InitAndDisableFeature(kMultistepFilter);
+  }
+
+ protected:
+  base::test::ScopedFeatureList scoped_feature_list_;
+};
 
 // Tests that the `MultistepFilterService` is not created when the feature is
 // disabled.
