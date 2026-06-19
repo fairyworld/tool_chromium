@@ -248,7 +248,8 @@ void EntityDataManager::OnHistoryDeletions(
   }
 }
 
-void EntityDataManager::OnMaskedAmbientAutofillEntitiesPrefetched(
+void EntityDataManager::OnMaskedEntitiesPrefetched(
+    const PersonalContextAccessManager& manager,
     base::span<const EntityInstance> entities) {
   CHECK(std::ranges::all_of(entities, [](const EntityInstance& entity) {
     return entity.record_type() == EntityInstance::RecordType::kPersonalContext;
@@ -259,7 +260,8 @@ void EntityDataManager::OnMaskedAmbientAutofillEntitiesPrefetched(
   NotifyEntityInstancesChanged();
 }
 
-void EntityDataManager::OnMaskedAmbientAutofillEntityTypeEvicted(
+void EntityDataManager::OnMaskedEntityTypeEvicted(
+    const PersonalContextAccessManager& manager,
     EntityType type) {
   base::EraseIf(entities_, [&](const EntityInstance& entity) {
     return entity.record_type() ==

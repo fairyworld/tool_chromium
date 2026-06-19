@@ -214,15 +214,14 @@ class AutofillAiManagerTest
             autofill_client().GetIdentityManager(),
             autofill_client().GetSyncService(),
             webdata_helper_.autofill_webdata_service(),
-            /*history_service=*/nullptr, &personal_context_access_manager_,
+            /*history_service=*/nullptr, &pcontext_manager_,
             /*strike_database=*/nullptr,
             /*variation_country_code=*/GeoIpCountryCode("US")));
     autofill_client().SetUpPrefsAndIdentityForAutofillAi();
     autofill_client().set_sync_service(&sync_service_);
     autofill_client().GetSyncService()->GetUserSettings()->SetSelectedType(
         syncer::UserSelectableType::kPayments, true);
-    autofill_client().set_personal_context_access_manager(
-        &personal_context_access_manager_);
+    autofill_client().set_personal_context_access_manager(&pcontext_manager_);
     manager_ = std::make_unique<AutofillAiManager>(&autofill_client(),
                                                    &strike_database_);
   }
@@ -292,8 +291,8 @@ class AutofillAiManagerTest
   EntityDataManager& edm() { return *autofill_client().GetEntityDataManager(); }
   AutofillAiManager& manager() { return *manager_; }
   TestStrikeDatabase& strike_database() { return strike_database_; }
-  MockPersonalContextAccessManager& personal_context_access_manager() {
-    return personal_context_access_manager_;
+  MockPersonalContextAccessManager& pcontext_manager() {
+    return pcontext_manager_;
   }
 
  private:
@@ -303,7 +302,7 @@ class AutofillAiManagerTest
   AutofillWebDataServiceTestHelper webdata_helper_{
       std::make_unique<EntityTable>()};
   syncer::TestSyncService sync_service_;
-  NiceMock<MockPersonalContextAccessManager> personal_context_access_manager_;
+  NiceMock<MockPersonalContextAccessManager> pcontext_manager_;
   TestStrikeDatabase strike_database_;
   std::unique_ptr<AutofillAiManager> manager_;
 };
@@ -334,9 +333,8 @@ TEST_F(AutofillAiManagerTest, OnAfterLoadedServerPredictions_TriggersFetch) {
 
   std::vector<EntityType> expected_types = {
       EntityType(EntityTypeName::kPassport)};
-  EXPECT_CALL(personal_context_access_manager(),
-              PrefetchAmbientAutofillContext(
-                  testing::ElementsAreArray(expected_types)));
+  EXPECT_CALL(pcontext_manager(),
+              PrefetchContext(testing::ElementsAreArray(expected_types)));
 
   manager().OnAfterLoadedServerPredictions(autofill_manager());
 }
@@ -2290,8 +2288,7 @@ TEST_F(AutofillAiManagerTest,
 
 // Tests that the update callback is run with new suggestions when prefetch
 // completes successfully and the loading suggestion was shown.
-TEST_F(AutofillAiManagerTest,
-       OnPrefetchAmbientAutofillContextComplete_RunCallback) {
+TEST_F(AutofillAiManagerTest, OnPrefetchContextComplete_RunCallback) {
   test::FormDescription form_description = {
       .fields = {{.role = PASSPORT_NUMBER}}};
   FormData form = test::GetFormData(form_description);
@@ -2312,13 +2309,13 @@ TEST_F(AutofillAiManagerTest,
 
   EXPECT_CALL(callback, Run);
 
-  manager().OnPrefetchAmbientAutofillContextComplete(/*success=*/true);
+  manager().OnPrefetchContextComplete(pcontext_manager(),
+                                      /*success=*/true);
 }
 
 // Tests that the update callback is not run if the loading suggestion was not
 // shown.
-TEST_F(AutofillAiManagerTest,
-       OnPrefetchAmbientAutofillContextComplete_NoFetchingSuggestion) {
+TEST_F(AutofillAiManagerTest, OnPrefetchContextComplete_NoFetchingSuggestion) {
   test::FormDescription form_description = {
       .fields = {{.role = PASSPORT_NUMBER}}};
   FormData form = test::GetFormData(form_description);
@@ -2339,13 +2336,13 @@ TEST_F(AutofillAiManagerTest,
 
   EXPECT_CALL(callback, Run).Times(0);
 
-  manager().OnPrefetchAmbientAutofillContextComplete(/*success=*/true);
+  manager().OnPrefetchContextComplete(pcontext_manager(),
+                                      /*success=*/true);
 }
 
 // Tests that the update callback is not run if the form that triggered
 // suggestions is no longer found.
-TEST_F(AutofillAiManagerTest,
-       OnPrefetchAmbientAutofillContextComplete_FormNotFound) {
+TEST_F(AutofillAiManagerTest, OnPrefetchContextComplete_FormNotFound) {
   test::FormDescription form_description = {
       .fields = {{.role = PASSPORT_NUMBER}}};
   FormData form = test::GetFormData(form_description);
@@ -2368,7 +2365,8 @@ TEST_F(AutofillAiManagerTest,
 
   EXPECT_CALL(callback, Run).Times(0);
 
-  manager().OnPrefetchAmbientAutofillContextComplete(/*success=*/true);
+  manager().OnPrefetchContextComplete(pcontext_manager(),
+                                      /*success=*/true);
 }
 
 }  // namespace

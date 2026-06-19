@@ -121,8 +121,7 @@ class AutofillAiSuggestionGeneratorTest : public testing::Test {
             autofill_client_.GetPrefs(), autofill_client_.GetIdentityManager(),
             autofill_client_.GetSyncService(),
             webdata_helper_.autofill_webdata_service(),
-            /*history_service=*/nullptr,
-            /*pcontext_manager=*/nullptr,
+            /*history_service=*/nullptr, &pcontext_manager_,
             /*strike_database=*/nullptr,
             /*variation_country_code=*/GeoIpCountryCode("US")));
     autofill_client_.SetUpPrefsAndIdentityForAutofillAi();
@@ -160,7 +159,7 @@ class AutofillAiSuggestionGeneratorTest : public testing::Test {
           edm().AddOrUpdateEntityInstance(entity);
           break;
         case EntityInstance::RecordType::kPersonalContext:
-          edm().OnMaskedAmbientAutofillEntitiesPrefetched({entity});
+          edm().OnMaskedEntitiesPrefetched(pcontext_manager_, {entity});
           break;
       }
     }
@@ -229,6 +228,7 @@ class AutofillAiSuggestionGeneratorTest : public testing::Test {
   test::AutofillUnitTestEnvironment autofill_test_environment_;
   AutofillWebDataServiceTestHelper webdata_helper_{
       std::make_unique<EntityTable>()};
+  testing::NiceMock<MockPersonalContextAccessManager> pcontext_manager_;
   TestAutofillClient autofill_client_;
   std::vector<EntityInstance> entities_;
   std::optional<FormStructure> form_structure_;
@@ -1133,7 +1133,7 @@ TEST_F(AutofillAiSuggestionGeneratorTest, ShowFetchingSuggestionWhenPending) {
   SetEntities({});
 
   using RequestStatus = PersonalContextAccessManager::RequestStatus;
-  EXPECT_CALL(access_manager, GetPrefetchAmbientAutofillStatusByEntityType(
+  EXPECT_CALL(access_manager, GetPrefetchStatusByEntityType(
                                   EntityType(EntityTypeName::kPassport)))
       .WillRepeatedly(testing::Return(RequestStatus::kPending));
 
@@ -1149,7 +1149,7 @@ TEST_F(AutofillAiSuggestionGeneratorTest, NoFetchingSuggestionWhenNotPending) {
   SetEntities({});
 
   using RequestStatus = PersonalContextAccessManager::RequestStatus;
-  EXPECT_CALL(access_manager, GetPrefetchAmbientAutofillStatusByEntityType(
+  EXPECT_CALL(access_manager, GetPrefetchStatusByEntityType(
                                   EntityType(EntityTypeName::kPassport)))
       .WillRepeatedly(testing::Return(RequestStatus::kSuccess));
 
@@ -1165,10 +1165,10 @@ TEST_F(AutofillAiSuggestionGeneratorTest,
   SetEntities({});
 
   using RequestStatus = PersonalContextAccessManager::RequestStatus;
-  EXPECT_CALL(access_manager, GetPrefetchAmbientAutofillStatusByEntityType(
+  EXPECT_CALL(access_manager, GetPrefetchStatusByEntityType(
                                   EntityType(EntityTypeName::kNationalIdCard)))
       .WillRepeatedly(testing::Return(RequestStatus::kPending));
-  EXPECT_CALL(access_manager, GetPrefetchAmbientAutofillStatusByEntityType(
+  EXPECT_CALL(access_manager, GetPrefetchStatusByEntityType(
                                   EntityType(EntityTypeName::kPassport)))
       .WillRepeatedly(testing::Return(RequestStatus::kSuccess));
 
@@ -1188,11 +1188,11 @@ TEST_F(AutofillAiSuggestionGeneratorTest,
 
   using RequestStatus = PersonalContextAccessManager::RequestStatus;
   // National ID is fetching.
-  EXPECT_CALL(access_manager, GetPrefetchAmbientAutofillStatusByEntityType(
+  EXPECT_CALL(access_manager, GetPrefetchStatusByEntityType(
                                   EntityType(EntityTypeName::kNationalIdCard)))
       .WillRepeatedly(testing::Return(RequestStatus::kPending));
   // Passport is not fetching (success).
-  EXPECT_CALL(access_manager, GetPrefetchAmbientAutofillStatusByEntityType(
+  EXPECT_CALL(access_manager, GetPrefetchStatusByEntityType(
                                   EntityType(EntityTypeName::kPassport)))
       .WillRepeatedly(testing::Return(RequestStatus::kSuccess));
 

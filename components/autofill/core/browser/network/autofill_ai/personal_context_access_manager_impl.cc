@@ -95,7 +95,7 @@ bool IsPersonalContextEnabled(
   }
 }
 
-bool IsPrefetchAmbientAutofillContextEnabled(
+bool IsPrefetchContextEnabled(
     personal_context::PersonalContextEnablementService& enablement_service,
     PrefService* pref_service) {
   if (!base::FeatureList::IsEnabled(features::kAutofillAmbientAutofill)) {
@@ -135,10 +135,10 @@ PersonalContextAccessManagerImpl::PersonalContextAccessManagerImpl(
 
 PersonalContextAccessManagerImpl::~PersonalContextAccessManagerImpl() = default;
 
-void PersonalContextAccessManagerImpl::PrefetchAmbientAutofillContext(
+void PersonalContextAccessManagerImpl::PrefetchContext(
     base::span<const EntityType> requested_types) {
-  if (!IsPrefetchAmbientAutofillContextEnabled(
-          *personal_context_enablement_service_, pref_service_)) {
+  if (!IsPrefetchContextEnabled(*personal_context_enablement_service_,
+                                pref_service_)) {
     return;
   }
 
@@ -164,12 +164,12 @@ void PersonalContextAccessManagerImpl::PrefetchAmbientAutofillContext(
   personal_context_service_->FetchContext(
       personal_context::proto::CONTEXT_MEMORY_FEATURE_AMBIENT_AUTOFILL, request,
       /*options=*/{},
-      base::BindOnce(&PersonalContextAccessManagerImpl::
-                         OnPrefetchAmbientAutofillContextComplete,
-                     weak_factory_.GetWeakPtr(), std::move(types_to_request)));
+      base::BindOnce(
+          &PersonalContextAccessManagerImpl::OnPrefetchContextRequestComplete,
+          weak_factory_.GetWeakPtr(), std::move(types_to_request)));
 }
 
-void PersonalContextAccessManagerImpl::OnPrefetchAmbientAutofillContextComplete(
+void PersonalContextAccessManagerImpl::OnPrefetchContextRequestComplete(
     std::vector<EntityType> requested_types,
     personal_context::FetchContextResult result) {
   if (!result.response.has_value()) {
@@ -286,7 +286,7 @@ void PersonalContextAccessManagerImpl::RemoveObserver(
 }
 
 PersonalContextAccessManager::RequestStatus
-PersonalContextAccessManagerImpl::GetPrefetchAmbientAutofillStatusByEntityType(
+PersonalContextAccessManagerImpl::GetPrefetchStatusByEntityType(
     EntityType type) const {
   if (const RequestState* state = base::FindOrNull(prefetch_state_, type)) {
     return state->status;
@@ -304,9 +304,9 @@ void PersonalContextAccessManagerImpl::ResetStateForType(EntityType type) {
     return entity.type() == type;
   });
   prefetch_state_.erase(type);
-  observers_.Notify(&PersonalContextAccessManager::Observer::
-                        OnMaskedAmbientAutofillEntityTypeEvicted,
-                    type);
+  observers_.Notify(
+      &PersonalContextAccessManager::Observer::OnMaskedEntityTypeEvicted, *this,
+      type);
 }
 
 void PersonalContextAccessManagerImpl::ProcessPrefetchedEntities(
@@ -315,9 +315,9 @@ void PersonalContextAccessManagerImpl::ProcessPrefetchedEntities(
                         personal_context::proto::Entity> protos) {
   for (auto& [type, type_entities] : entities) {
     ResetStateForType(type);
-    observers_.Notify(&PersonalContextAccessManager::Observer::
-                          OnMaskedAmbientAutofillEntitiesPrefetched,
-                      type_entities);
+    observers_.Notify(
+        &PersonalContextAccessManager::Observer::OnMaskedEntitiesPrefetched,
+        *this, type_entities);
     SetTypeStatus(type, RequestStatus::kSuccess);
     base::SingleThreadTaskRunner::GetCurrentDefault()->PostDelayedTask(
         FROM_HERE,
@@ -450,9 +450,9 @@ void PersonalContextAccessManagerImpl::SetTypeStatus(EntityType type,
 
 void PersonalContextAccessManagerImpl::NotifyPrefetchStatusObservers(
     bool success) {
-  observers_.Notify(&PersonalContextAccessManager::Observer::
-                        OnPrefetchAmbientAutofillContextComplete,
-                    success);
+  observers_.Notify(
+      &PersonalContextAccessManager::Observer::OnPrefetchContextComplete, *this,
+      success);
 }
 
 }  // namespace autofill

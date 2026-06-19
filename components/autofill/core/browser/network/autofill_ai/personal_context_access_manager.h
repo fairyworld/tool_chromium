@@ -25,18 +25,23 @@ class PersonalContextAccessManager : public KeyedService {
   class Observer : public base::CheckedObserver {
    public:
     // Called when asynchronous prefetching of entities through
-    // `PrefetchAmbientAutofillContext()` finishes. In case it succeeds and
-    // fetched entities, the entities themselves are broadcast through
-    // `OnMaskedAmbientAutofillEntitiesPrefetched()`.
-    virtual void OnPrefetchAmbientAutofillContextComplete(bool success) {}
+    // `PrefetchContext()` finishes. In case it succeeds and fetched entities,
+    // the entities themselves are broadcast through
+    // `OnMaskedEntitiesPrefetched()`.
+    virtual void OnPrefetchContextComplete(
+        const PersonalContextAccessManager& manager,
+        bool success) {}
     // Called with the result of a prefetch call in case entities were fetched.
     // TODO(crbug.com/516721244): At the moment, this is called once per
     // prefetched entity type instead of just once.
-    virtual void OnMaskedAmbientAutofillEntitiesPrefetched(
+    virtual void OnMaskedEntitiesPrefetched(
+        const PersonalContextAccessManager& manager,
         base::span<const EntityInstance> entities) {}
     // Called whenever a prefetched entity reaches its TTL or expires for
     // another reason (eligibility to pContext changed, etc).
-    virtual void OnMaskedAmbientAutofillEntityTypeEvicted(EntityType type) {}
+    virtual void OnMaskedEntityTypeEvicted(
+        const PersonalContextAccessManager& manager,
+        EntityType type) {}
   };
 
   enum class RequestStatus {
@@ -58,13 +63,11 @@ class PersonalContextAccessManager : public KeyedService {
 
   ~PersonalContextAccessManager() override = default;
 
-  // TODO(crbug.com/503303085): Remove "AmbientAutofill" from the name.
-  // Fetches ambient autofill context from the personal context service.
-  virtual void PrefetchAmbientAutofillContext(
+  // Fetches personal context from the personal context service.
+  virtual void PrefetchContext(
       base::span<const EntityType> requested_types) = 0;
 
-  // TODO(crbug.com/503303085): Remove "AmbientAutofill" from the name.
-  virtual RequestStatus GetPrefetchAmbientAutofillStatusByEntityType(
+  virtual RequestStatus GetPrefetchStatusByEntityType(
       EntityType type) const = 0;
 
   // Retrieves the unmasked SPII `EntityInstance` with the given `id`. If it is

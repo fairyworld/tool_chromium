@@ -19,7 +19,7 @@ class MockPersonalContextAccessManager : public PersonalContextAccessManager {
   ~MockPersonalContextAccessManager() override;
 
   MOCK_METHOD(void,
-              PrefetchAmbientAutofillContext,
+              PrefetchContext,
               (base::span<const EntityType> requested_types),
               (override));
   MOCK_METHOD(void,
@@ -31,7 +31,7 @@ class MockPersonalContextAccessManager : public PersonalContextAccessManager {
   MOCK_METHOD(void, AddObserver, (Observer * observer), (override));
   MOCK_METHOD(void, RemoveObserver, (Observer * observer), (override));
   MOCK_METHOD(RequestStatus,
-              GetPrefetchAmbientAutofillStatusByEntityType,
+              GetPrefetchStatusByEntityType,
               (EntityType type),
               (const, override));
 };

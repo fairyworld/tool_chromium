@@ -163,9 +163,11 @@ class EntityDataManager : public KeyedService,
                           const history::DeletionInfo& deletion_info) override;
 
   // PersonalContextAccessManager::Observer:
-  void OnMaskedAmbientAutofillEntitiesPrefetched(
+  void OnMaskedEntitiesPrefetched(
+      const PersonalContextAccessManager& manager,
       base::span<const EntityInstance> entities) override;
-  void OnMaskedAmbientAutofillEntityTypeEvicted(EntityType type) override;
+  void OnMaskedEntityTypeEvicted(const PersonalContextAccessManager& manager,
+                                 EntityType type) override;
 
   // Records the date an entity was used and also increments the number of times
   // it was used.

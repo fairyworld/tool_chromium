@@ -352,11 +352,13 @@ void AutofillAiManager::OnAfterLoadedServerPredictions(
   if (PersonalContextAccessManager* access_manager =
           client_->GetPersonalContextAccessManager()) {
     base::flat_set<EntityType> requested_types(std::from_range, relevant_types);
-    access_manager->PrefetchAmbientAutofillContext(requested_types);
+    access_manager->PrefetchContext(requested_types);
   }
 }
 
-void AutofillAiManager::OnPrefetchAmbientAutofillContextComplete(bool success) {
+void AutofillAiManager::OnPrefetchContextComplete(
+    const PersonalContextAccessManager& manager,
+    bool success) {
   if (!std::ranges::contains(client_->GetAutofillSuggestions(),
                              SuggestionType::kFetchingAmbientData,
                              &Suggestion::type)) {

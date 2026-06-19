@@ -3164,9 +3164,8 @@ TEST_F(AutofillExternalDelegateWithAmbientAutofillTest,
   ASSERT_NE(
       full_passport.attribute(kPassportNumberType)->GetCompleteRawInfo(),
       masked_passport.attribute(kPassportNumberType)->GetCompleteRawInfo());
-  autofill_client()
-      .GetEntityDataManager()
-      ->OnMaskedAmbientAutofillEntitiesPrefetched({masked_passport});
+  autofill_client().GetEntityDataManager()->OnMaskedEntitiesPrefetched(
+      personal_context_manager(), {masked_passport});
 
   IssueOnQuery({.fields = {{.role = PASSPORT_NUMBER}}});
   Suggestion fill_suggestion(SuggestionType::kFillAutofillAi);
