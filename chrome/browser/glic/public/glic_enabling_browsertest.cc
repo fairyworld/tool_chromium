@@ -124,6 +124,7 @@ class GlicEnablingWithSeparateAccountCapabilityTest : public GlicEnablingTest {
             {switches::kGlicEligibilitySeparateAccountCapability, {}},
 #if BUILDFLAG(IS_CHROMEOS)
             {chromeos::features::kFeatureManagementGlic, {}},
+            {syncer::kReplaceSyncPromosWithSignInPromos, {}},
 #endif  // BUILDFLAG(IS_CHROMEOS)
         },
         {});
