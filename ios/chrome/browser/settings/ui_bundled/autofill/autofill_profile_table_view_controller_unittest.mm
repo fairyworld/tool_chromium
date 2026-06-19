@@ -326,7 +326,9 @@ TEST_F(AutofillProfileTableViewControllerTest,
            .record_type = autofill::EntityInstance::RecordType::kServerWallet});
 
   // Verify local instance is server wallet item.
-  ASSERT_TRUE(wallet_entity.IsServerInstance());
+  ASSERT_EQ(autofill::GetWalletPassType(wallet_entity.type(),
+                                        wallet_entity.record_type()),
+            autofill::EntityInstance::WalletPassType::kPublic);
 
   entity_data_manager->AddOrUpdateEntityInstance(wallet_entity);
 
@@ -341,7 +343,9 @@ TEST_F(AutofillProfileTableViewControllerTest,
   auto stored_instance =
       entity_data_manager->GetEntityInstance(wallet_entity.guid());
   ASSERT_TRUE(stored_instance.has_value());
-  ASSERT_TRUE(stored_instance->IsServerInstance());
+  ASSERT_EQ(autofill::GetWalletPassType(stored_instance->type(),
+                                        stored_instance->record_type()),
+            autofill::EntityInstance::WalletPassType::kPublic);
 
   CreateController();
   CheckController();

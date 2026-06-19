@@ -458,7 +458,8 @@ ItemType ItemTypeForEntitySectionHeader(SectionIdentifier section_identifier) {
   item.guid = instance.guid();
   item.entityTypeName = instance.type().name();
 
-  if (instance.IsServerInstance()) {
+  if (instance.record_type() ==
+      autofill::EntityInstance::RecordType::kServerWallet) {
     item.isServerWalletItem = YES;
     item.trailingText = l10n_util::GetNSString(IDS_IOS_AUTOFILL_WALLET_TEXT);
   }
