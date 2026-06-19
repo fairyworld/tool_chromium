@@ -6674,6 +6674,7 @@ Called by update_use_counter_feature_enum.py.-->
   <int value="5928" label="SVGPathElementGetPathDataNormalized"/>
   <int value="5929" label="DownloadFromAdScript"/>
   <int value="5930" label="CompositorKeyframeSnapshotMissing"/>
+  <int value="5931" label="TimelineTrigger"/>
 </enum>
 
 <!-- LINT.ThenChange(//third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom:WebFeature) -->
