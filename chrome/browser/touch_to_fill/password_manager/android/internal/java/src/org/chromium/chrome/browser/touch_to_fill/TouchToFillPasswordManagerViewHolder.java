@@ -13,17 +13,19 @@ import android.view.ViewGroup;
 import androidx.annotation.LayoutRes;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.chromium.build.annotations.NullMarked;
 import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.ui.modelutil.PropertyKey;
 import org.chromium.ui.modelutil.PropertyModel;
 import org.chromium.ui.modelutil.PropertyModelChangeProcessor;
 import org.chromium.ui.modelutil.PropertyModelChangeProcessor.ViewBinder;
 
-class TouchToFillViewHolder extends RecyclerView.ViewHolder {
+@NullMarked
+class TouchToFillPasswordManagerViewHolder extends RecyclerView.ViewHolder {
     private final ViewBinder<PropertyModel, View, PropertyKey> mViewBinder;
 
     @SuppressLint("ClickableViewAccessibility")
-    TouchToFillViewHolder(
+    TouchToFillPasswordManagerViewHolder(
             ViewGroup parent,
             @LayoutRes int layout,
             ViewBinder<PropertyModel, View, PropertyKey> viewBinder) {

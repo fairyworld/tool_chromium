@@ -8,9 +8,10 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.IntDef;
-import androidx.annotation.Nullable;
 
 import org.chromium.base.Callback;
+import org.chromium.build.annotations.NullMarked;
+import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.touch_to_fill.common.FillableItemCollectionInfo;
 import org.chromium.chrome.browser.touch_to_fill.data.Credential;
 import org.chromium.chrome.browser.touch_to_fill.data.WebauthnCredential;
@@ -23,7 +24,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /** Properties defined here reflect the visible state of the TouchToFill-components. */
-class TouchToFillProperties {
+@NullMarked
+class TouchToFillPasswordManagerProperties {
     static final PropertyModel.WritableBooleanPropertyKey VISIBLE =
             new PropertyModel.WritableBooleanPropertyKey("visible");
     static final PropertyModel.ReadableObjectPropertyKey<ListModel<MVCListAdapter.ListItem>>
@@ -204,5 +206,5 @@ class TouchToFillProperties {
         return item.type;
     }
 
-    private TouchToFillProperties() {}
+    private TouchToFillPasswordManagerProperties() {}
 }

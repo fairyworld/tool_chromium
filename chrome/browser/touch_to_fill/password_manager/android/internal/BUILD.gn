@@ -58,10 +58,10 @@ android_library("java") {
     "java/src/org/chromium/chrome/browser/touch_to_fill/TouchToFillBridge.java",
     "java/src/org/chromium/chrome/browser/touch_to_fill/TouchToFillCoordinator.java",
     "java/src/org/chromium/chrome/browser/touch_to_fill/TouchToFillMediator.java",
+    "java/src/org/chromium/chrome/browser/touch_to_fill/TouchToFillPasswordManagerProperties.java",
     "java/src/org/chromium/chrome/browser/touch_to_fill/TouchToFillPasswordManagerView.java",
-    "java/src/org/chromium/chrome/browser/touch_to_fill/TouchToFillProperties.java",
-    "java/src/org/chromium/chrome/browser/touch_to_fill/TouchToFillViewBinder.java",
-    "java/src/org/chromium/chrome/browser/touch_to_fill/TouchToFillViewHolder.java",
+    "java/src/org/chromium/chrome/browser/touch_to_fill/TouchToFillPasswordManagerViewBinder.java",
+    "java/src/org/chromium/chrome/browser/touch_to_fill/TouchToFillPasswordManagerViewHolder.java",
   ]
 
   resources_package = "org.chromium.chrome.browser.touch_to_fill"

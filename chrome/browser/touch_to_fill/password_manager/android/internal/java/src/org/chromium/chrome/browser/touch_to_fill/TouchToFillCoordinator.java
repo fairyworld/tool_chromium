@@ -28,7 +28,7 @@ import java.util.List;
 public class TouchToFillCoordinator implements TouchToFillComponent {
     private final TouchToFillMediator mMediator = new TouchToFillMediator();
     private final PropertyModel mModel =
-            TouchToFillProperties.createDefaultModel(mMediator::onDismissed);
+            TouchToFillPasswordManagerProperties.createDefaultModel(mMediator::onDismissed);
     private TouchToFillPasswordManagerView mView;
 
     @Override
@@ -81,13 +81,13 @@ public class TouchToFillCoordinator implements TouchToFillComponent {
     /**
      * Connects the given model with the given view using Model Change Processors.
      *
-     * @param model A {@link PropertyModel} built with {@link TouchToFillProperties}.
+     * @param model A {@link PropertyModel} built with {@link TouchToFillPasswordManagerProperties}.
      * @param view A {@link TouchToFillPasswordManagerView}.
      */
     @VisibleForTesting
     static void setUpModelChangeProcessors(
             PropertyModel model, TouchToFillPasswordManagerView view) {
         PropertyModelChangeProcessor.create(
-                model, view, TouchToFillViewBinder::bindTouchToFillView);
+                model, view, TouchToFillPasswordManagerViewBinder::bindTouchToFillView);
     }
 }

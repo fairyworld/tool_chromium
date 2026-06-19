@@ -4,17 +4,17 @@
 
 package org.chromium.chrome.browser.touch_to_fill;
 
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.CredentialProperties.CREDENTIAL;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.CredentialProperties.ON_CLICK_LISTENER;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.CredentialProperties.SHOW_SUBMIT_BUTTON;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.FooterProperties.MANAGE_BUTTON_TEXT;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.HeaderProperties.IMAGE_DRAWABLE_ID;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.HeaderProperties.SUBTITLE;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.HeaderProperties.TITLE;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.SHEET_ITEMS;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.VISIBLE;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.WebAuthnCredentialProperties.SHOW_WEBAUTHN_SUBMIT_BUTTON;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.WebAuthnCredentialProperties.WEBAUTHN_CREDENTIAL;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties.CREDENTIAL;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties.ON_CLICK_LISTENER;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties.SHOW_SUBMIT_BUTTON;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.FooterProperties.MANAGE_BUTTON_TEXT;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.HeaderProperties.IMAGE_DRAWABLE_ID;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.HeaderProperties.SUBTITLE;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.HeaderProperties.TITLE;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.SHEET_ITEMS;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.VISIBLE;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.WebAuthnCredentialProperties.SHOW_WEBAUTHN_SUBMIT_BUTTON;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.WebAuthnCredentialProperties.WEBAUTHN_CREDENTIAL;
 import static org.chromium.ui.base.LocalizationUtils.setRtlForTesting;
 
 import static java.util.Arrays.asList;
@@ -47,9 +47,9 @@ import org.chromium.chrome.browser.night_mode.ChromeNightModeTestUtils;
 import org.chromium.chrome.browser.password_manager.GetLoginMatchType;
 import org.chromium.chrome.browser.password_manager.PasswordManagerResourceProvider;
 import org.chromium.chrome.browser.password_manager.PasswordManagerResourceProviderFactory;
-import org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.CredentialProperties;
-import org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.FooterProperties;
-import org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.HeaderProperties;
+import org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties;
+import org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.FooterProperties;
+import org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.HeaderProperties;
 import org.chromium.chrome.browser.touch_to_fill.data.Credential;
 import org.chromium.chrome.browser.touch_to_fill.data.WebauthnCredential;
 import org.chromium.chrome.test.ChromeJUnit4RunnerDelegate;
@@ -162,7 +162,9 @@ public class TouchToFillPasswordManagerRenderTest {
         mResourceProvider = PasswordManagerResourceProviderFactory.create();
         ThreadUtils.runOnUiThreadBlocking(
                 () -> {
-                    mModel = TouchToFillProperties.createDefaultModel(mDismissHandler);
+                    mModel =
+                            TouchToFillPasswordManagerProperties.createDefaultModel(
+                                    mDismissHandler);
                     mTouchToFillView =
                             new TouchToFillPasswordManagerView(
                                     mActivityTestRule.getActivity(), mBottomSheetController);
@@ -380,27 +382,32 @@ public class TouchToFillPasswordManagerRenderTest {
 
     private MVCListAdapter.ListItem buildCredentialItem(Credential credential) {
         return buildSheetItem(
-                TouchToFillProperties.ItemType.CREDENTIAL, credential, mCredentialCallback, false);
+                TouchToFillPasswordManagerProperties.ItemType.CREDENTIAL,
+                credential,
+                mCredentialCallback,
+                false);
     }
 
     private MVCListAdapter.ListItem buildWebAuthnCredentialItem(WebauthnCredential credential) {
         return new MVCListAdapter.ListItem(
-                TouchToFillProperties.ItemType.WEBAUTHN_CREDENTIAL,
+                TouchToFillPasswordManagerProperties.ItemType.WEBAUTHN_CREDENTIAL,
                 new PropertyModel.Builder(
-                                TouchToFillProperties.WebAuthnCredentialProperties.ALL_KEYS)
+                                TouchToFillPasswordManagerProperties.WebAuthnCredentialProperties
+                                        .ALL_KEYS)
                         .with(WEBAUTHN_CREDENTIAL, credential)
                         .with(SHOW_WEBAUTHN_SUBMIT_BUTTON, false)
                         .build());
     }
 
     private static MVCListAdapter.ListItem buildSheetItem(
-            @TouchToFillProperties.ItemType int itemType,
+            @TouchToFillPasswordManagerProperties.ItemType int itemType,
             Credential credential,
             Callback<Credential> callback,
             boolean showSubmitButton) {
         return new MVCListAdapter.ListItem(
                 itemType,
-                new PropertyModel.Builder(TouchToFillProperties.CredentialProperties.ALL_KEYS)
+                new PropertyModel.Builder(
+                                TouchToFillPasswordManagerProperties.CredentialProperties.ALL_KEYS)
                         .with(CREDENTIAL, credential)
                         .with(ON_CLICK_LISTENER, callback)
                         .with(SHOW_SUBMIT_BUTTON, showSubmitButton)
@@ -411,7 +418,7 @@ public class TouchToFillPasswordManagerRenderTest {
         mModel.get(SHEET_ITEMS)
                 .add(
                         new MVCListAdapter.ListItem(
-                                TouchToFillProperties.ItemType.HEADER,
+                                TouchToFillPasswordManagerProperties.ItemType.HEADER,
                                 new PropertyModel.Builder(HeaderProperties.ALL_KEYS)
                                         .with(TITLE, title)
                                         .with(SUBTITLE, TEST_URL.getSpec())
@@ -425,7 +432,7 @@ public class TouchToFillPasswordManagerRenderTest {
         mModel.get(SHEET_ITEMS)
                 .add(
                         new MVCListAdapter.ListItem(
-                                TouchToFillProperties.ItemType.FILL_BUTTON,
+                                TouchToFillPasswordManagerProperties.ItemType.FILL_BUTTON,
                                 new PropertyModel.Builder(CredentialProperties.ALL_KEYS)
                                         .with(CREDENTIAL, ARON)
                                         .with(
@@ -439,7 +446,7 @@ public class TouchToFillPasswordManagerRenderTest {
         mModel.get(SHEET_ITEMS)
                 .add(
                         new MVCListAdapter.ListItem(
-                                TouchToFillProperties.ItemType.FOOTER,
+                                TouchToFillPasswordManagerProperties.ItemType.FOOTER,
                                 new PropertyModel.Builder(FooterProperties.ALL_KEYS)
                                         .with(
                                                 MANAGE_BUTTON_TEXT,

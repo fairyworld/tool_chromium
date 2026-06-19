@@ -4,26 +4,26 @@
 
 package org.chromium.chrome.browser.touch_to_fill;
 
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.CredentialProperties.CREDENTIAL;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.CredentialProperties.FAVICON_OR_FALLBACK;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.CredentialProperties.ITEM_COLLECTION_INFO;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.CredentialProperties.ON_CLICK_LISTENER;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.CredentialProperties.SHOW_SUBMIT_BUTTON;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.FooterProperties.MANAGE_BUTTON_TEXT;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.FooterProperties.ON_CLICK_HYBRID;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.FooterProperties.ON_CLICK_MANAGE;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.FooterProperties.SHOW_HYBRID;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.HeaderProperties.AVATAR;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.HeaderProperties.IMAGE_DRAWABLE_ID;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.HeaderProperties.SUBTITLE;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.HeaderProperties.TITLE;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.SHEET_ITEMS;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.VISIBLE;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.WebAuthnCredentialProperties.ON_WEBAUTHN_CLICK_LISTENER;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.WebAuthnCredentialProperties.SHOW_WEBAUTHN_SUBMIT_BUTTON;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.WebAuthnCredentialProperties.WEBAUTHN_CREDENTIAL;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.WebAuthnCredentialProperties.WEBAUTHN_FAVICON_OR_FALLBACK;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.WebAuthnCredentialProperties.WEBAUTHN_ITEM_COLLECTION_INFO;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties.CREDENTIAL;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties.FAVICON_OR_FALLBACK;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties.ITEM_COLLECTION_INFO;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties.ON_CLICK_LISTENER;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties.SHOW_SUBMIT_BUTTON;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.FooterProperties.MANAGE_BUTTON_TEXT;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.FooterProperties.ON_CLICK_HYBRID;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.FooterProperties.ON_CLICK_MANAGE;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.FooterProperties.SHOW_HYBRID;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.HeaderProperties.AVATAR;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.HeaderProperties.IMAGE_DRAWABLE_ID;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.HeaderProperties.SUBTITLE;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.HeaderProperties.TITLE;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.SHEET_ITEMS;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.VISIBLE;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.WebAuthnCredentialProperties.ON_WEBAUTHN_CLICK_LISTENER;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.WebAuthnCredentialProperties.SHOW_WEBAUTHN_SUBMIT_BUTTON;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.WebAuthnCredentialProperties.WEBAUTHN_CREDENTIAL;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.WebAuthnCredentialProperties.WEBAUTHN_FAVICON_OR_FALLBACK;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.WebAuthnCredentialProperties.WEBAUTHN_ITEM_COLLECTION_INFO;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -39,12 +39,12 @@ import org.chromium.base.metrics.RecordHistogram;
 import org.chromium.base.task.PostTask;
 import org.chromium.base.task.TaskTraits;
 import org.chromium.chrome.browser.password_manager.PasswordManagerResourceProviderFactory;
-import org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.CredentialProperties;
-import org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.FaviconOrFallback;
-import org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.FooterProperties;
-import org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.HeaderProperties;
-import org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.MorePasskeysProperties;
-import org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.WebAuthnCredentialProperties;
+import org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties;
+import org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.FaviconOrFallback;
+import org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.FooterProperties;
+import org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.HeaderProperties;
+import org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.MorePasskeysProperties;
+import org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.WebAuthnCredentialProperties;
 import org.chromium.chrome.browser.touch_to_fill.common.BottomSheetFocusHelper;
 import org.chromium.chrome.browser.touch_to_fill.common.FillableItemCollectionInfo;
 import org.chromium.chrome.browser.touch_to_fill.data.Credential;
@@ -132,7 +132,8 @@ class TouchToFillMediator {
                                 PasswordManagerResourceProviderFactory.create()
                                         .getPasswordManagerIcon())
                         .build();
-        sheetItems.add(new ListItem(TouchToFillProperties.ItemType.HEADER, headerModel));
+        sheetItems.add(
+                new ListItem(TouchToFillPasswordManagerProperties.ItemType.HEADER, headerModel));
 
         List<Credential> passwordsThatRequireNotification =
                 getSharedPasswordsThatRequireNotification(credentials);
@@ -166,9 +167,14 @@ class TouchToFillMediator {
                                 new FillableItemCollectionInfo(
                                         ++fillableItemPosition, fillableItemsTotal));
                 sheetItems.add(
-                        new ListItem(TouchToFillProperties.ItemType.WEBAUTHN_CREDENTIAL, model));
+                        new ListItem(
+                                TouchToFillPasswordManagerProperties.ItemType.WEBAUTHN_CREDENTIAL,
+                                model));
                 if (shouldCreateConfirmationButton(credentials, showMorePasskeys)) {
-                    sheetItems.add(new ListItem(TouchToFillProperties.ItemType.FILL_BUTTON, model));
+                    sheetItems.add(
+                            new ListItem(
+                                    TouchToFillPasswordManagerProperties.ItemType.FILL_BUTTON,
+                                    model));
                 }
                 requestWebAuthnIconOrFallbackImage(model, url);
             } else {
@@ -180,9 +186,14 @@ class TouchToFillMediator {
                                 triggerSubmission,
                                 new FillableItemCollectionInfo(
                                         ++fillableItemPosition, fillableItemsTotal));
-                sheetItems.add(new ListItem(TouchToFillProperties.ItemType.CREDENTIAL, model));
+                sheetItems.add(
+                        new ListItem(
+                                TouchToFillPasswordManagerProperties.ItemType.CREDENTIAL, model));
                 if (shouldCreateConfirmationButton(credentials, showMorePasskeys)) {
-                    sheetItems.add(new ListItem(TouchToFillProperties.ItemType.FILL_BUTTON, model));
+                    sheetItems.add(
+                            new ListItem(
+                                    TouchToFillPasswordManagerProperties.ItemType.FILL_BUTTON,
+                                    model));
                 }
                 if (!passwordCredential.isBackupCredential()) {
                     // Backup credentials display the history icon instead.
@@ -198,7 +209,7 @@ class TouchToFillMediator {
                             : mContext.getString(R.string.touch_to_fill_more_passkeys);
             sheetItems.add(
                     new ListItem(
-                            TouchToFillProperties.ItemType.MORE_PASSKEYS,
+                            TouchToFillPasswordManagerProperties.ItemType.MORE_PASSKEYS,
                             new PropertyModel.Builder(MorePasskeysProperties.ALL_KEYS)
                                     .with(
                                             MorePasskeysProperties.ON_CLICK,
@@ -209,7 +220,7 @@ class TouchToFillMediator {
 
         sheetItems.add(
                 new ListItem(
-                        TouchToFillProperties.ItemType.FOOTER,
+                        TouchToFillPasswordManagerProperties.ItemType.FOOTER,
                         new PropertyModel.Builder(FooterProperties.ALL_KEYS)
                                 .with(ON_CLICK_MANAGE, this::onManagePasswordSelected)
                                 .with(MANAGE_BUTTON_TEXT, getManageButtonText(credentials))

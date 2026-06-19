@@ -14,7 +14,7 @@ import androidx.annotation.StringRes;
 
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
-import org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.ItemType;
+import org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.ItemType;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetListViewBase;
 import org.chromium.components.browser_ui.bottomsheet.ItemDividerBase;
@@ -119,13 +119,13 @@ class TouchToFillPasswordManagerView extends BottomSheetListViewBase {
     @Override
     protected Set<Integer> listedItemTypes() {
         return Set.of(
-                TouchToFillProperties.ItemType.CREDENTIAL,
-                TouchToFillProperties.ItemType.WEBAUTHN_CREDENTIAL,
-                TouchToFillProperties.ItemType.MORE_PASSKEYS);
+                TouchToFillPasswordManagerProperties.ItemType.CREDENTIAL,
+                TouchToFillPasswordManagerProperties.ItemType.WEBAUTHN_CREDENTIAL,
+                TouchToFillPasswordManagerProperties.ItemType.MORE_PASSKEYS);
     }
 
     @Override
     protected Set<Integer> footerItemTypes() {
-        return Set.of(TouchToFillProperties.ItemType.FOOTER);
+        return Set.of(TouchToFillPasswordManagerProperties.ItemType.FOOTER);
     }
 }

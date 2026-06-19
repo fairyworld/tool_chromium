@@ -20,21 +20,21 @@ import static org.mockito.Mockito.verify;
 
 import static org.chromium.base.test.util.CriteriaHelper.pollUiThread;
 import static org.chromium.chrome.browser.autofill.AutofillTestHelper.createClickActionWithFlags;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.CredentialProperties.CREDENTIAL;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.CredentialProperties.ITEM_COLLECTION_INFO;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.CredentialProperties.ON_CLICK_LISTENER;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.CredentialProperties.SHOW_SUBMIT_BUTTON;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.FooterProperties.MANAGE_BUTTON_TEXT;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.FooterProperties.ON_CLICK_HYBRID;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.FooterProperties.ON_CLICK_MANAGE;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.FooterProperties.SHOW_HYBRID;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.HeaderProperties.IMAGE_DRAWABLE_ID;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.HeaderProperties.SUBTITLE;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.HeaderProperties.TITLE;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.SHEET_ITEMS;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.VISIBLE;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.WebAuthnCredentialProperties.WEBAUTHN_CREDENTIAL;
-import static org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.WebAuthnCredentialProperties.WEBAUTHN_ITEM_COLLECTION_INFO;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties.CREDENTIAL;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties.ITEM_COLLECTION_INFO;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties.ON_CLICK_LISTENER;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties.SHOW_SUBMIT_BUTTON;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.FooterProperties.MANAGE_BUTTON_TEXT;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.FooterProperties.ON_CLICK_HYBRID;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.FooterProperties.ON_CLICK_MANAGE;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.FooterProperties.SHOW_HYBRID;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.HeaderProperties.IMAGE_DRAWABLE_ID;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.HeaderProperties.SUBTITLE;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.HeaderProperties.TITLE;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.SHEET_ITEMS;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.VISIBLE;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.WebAuthnCredentialProperties.WEBAUTHN_CREDENTIAL;
+import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.WebAuthnCredentialProperties.WEBAUTHN_ITEM_COLLECTION_INFO;
 import static org.chromium.ui.test.util.ViewUtils.onViewWaiting;
 
 import static java.util.Arrays.asList;
@@ -71,8 +71,8 @@ import org.chromium.chrome.browser.app.ChromeActivity;
 import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.flags.ChromeSwitches;
 import org.chromium.chrome.browser.password_manager.GetLoginMatchType;
-import org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.FooterProperties;
-import org.chromium.chrome.browser.touch_to_fill.TouchToFillProperties.HeaderProperties;
+import org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.FooterProperties;
+import org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.HeaderProperties;
 import org.chromium.chrome.browser.touch_to_fill.common.FillableItemCollectionInfo;
 import org.chromium.chrome.browser.touch_to_fill.data.Credential;
 import org.chromium.chrome.browser.touch_to_fill.data.WebauthnCredential;
@@ -183,7 +183,9 @@ public class TouchToFillPasswordManagerViewTest {
         mSheetTestSupport = new BottomSheetTestSupport(mBottomSheetController);
         ThreadUtils.runOnUiThreadBlocking(
                 () -> {
-                    mModel = TouchToFillProperties.createDefaultModel(mDismissHandler);
+                    mModel =
+                            TouchToFillPasswordManagerProperties.createDefaultModel(
+                                    mDismissHandler);
                     mTouchToFillView =
                             new TouchToFillPasswordManagerView(
                                     getActivity(), mBottomSheetController);
@@ -238,7 +240,8 @@ public class TouchToFillPasswordManagerViewTest {
                             .addAll(
                                     asList(
                                             new MVCListAdapter.ListItem(
-                                                    TouchToFillProperties.ItemType.HEADER,
+                                                    TouchToFillPasswordManagerProperties.ItemType
+                                                            .HEADER,
                                                     new PropertyModel.Builder(
                                                                     HeaderProperties.ALL_KEYS)
                                                             .with(
@@ -280,7 +283,8 @@ public class TouchToFillPasswordManagerViewTest {
                             .addAll(
                                     asList(
                                             new MVCListAdapter.ListItem(
-                                                    TouchToFillProperties.ItemType.HEADER,
+                                                    TouchToFillPasswordManagerProperties.ItemType
+                                                            .HEADER,
                                                     new PropertyModel.Builder(
                                                                     HeaderProperties.ALL_KEYS)
                                                             .with(
@@ -324,7 +328,8 @@ public class TouchToFillPasswordManagerViewTest {
                             .addAll(
                                     asList(
                                             new MVCListAdapter.ListItem(
-                                                    TouchToFillProperties.ItemType.HEADER,
+                                                    TouchToFillPasswordManagerProperties.ItemType
+                                                            .HEADER,
                                                     new PropertyModel.Builder(
                                                                     HeaderProperties.ALL_KEYS)
                                                             .with(SUBTITLE, "www.example.org")
@@ -352,7 +357,8 @@ public class TouchToFillPasswordManagerViewTest {
                             .addAll(
                                     asList(
                                             new MVCListAdapter.ListItem(
-                                                    TouchToFillProperties.ItemType.HEADER,
+                                                    TouchToFillPasswordManagerProperties.ItemType
+                                                            .HEADER,
                                                     new PropertyModel.Builder(
                                                                     HeaderProperties.ALL_KEYS)
                                                             .with(
@@ -386,7 +392,8 @@ public class TouchToFillPasswordManagerViewTest {
                             .addAll(
                                     asList(
                                             new MVCListAdapter.ListItem(
-                                                    TouchToFillProperties.ItemType.HEADER,
+                                                    TouchToFillPasswordManagerProperties.ItemType
+                                                            .HEADER,
                                                     new PropertyModel.Builder(
                                                                     HeaderProperties.ALL_KEYS)
                                                             .with(
@@ -420,7 +427,8 @@ public class TouchToFillPasswordManagerViewTest {
                             .addAll(
                                     asList(
                                             new MVCListAdapter.ListItem(
-                                                    TouchToFillProperties.ItemType.HEADER,
+                                                    TouchToFillPasswordManagerProperties.ItemType
+                                                            .HEADER,
                                                     new PropertyModel.Builder(
                                                                     HeaderProperties.ALL_KEYS)
                                                             .with(
@@ -923,7 +931,8 @@ public class TouchToFillPasswordManagerViewTest {
                             .addAll(
                                     asList(
                                             new MVCListAdapter.ListItem(
-                                                    TouchToFillProperties.ItemType.HEADER,
+                                                    TouchToFillPasswordManagerProperties.ItemType
+                                                            .HEADER,
                                                     new PropertyModel.Builder(
                                                                     HeaderProperties.ALL_KEYS)
                                                             .with(
@@ -1101,8 +1110,9 @@ public class TouchToFillPasswordManagerViewTest {
     private MVCListAdapter.ListItem buildCredentialItem(
             Credential credential, FillableItemCollectionInfo collectionInfo) {
         return new MVCListAdapter.ListItem(
-                TouchToFillProperties.ItemType.CREDENTIAL,
-                new PropertyModel.Builder(TouchToFillProperties.CredentialProperties.ALL_KEYS)
+                TouchToFillPasswordManagerProperties.ItemType.CREDENTIAL,
+                new PropertyModel.Builder(
+                                TouchToFillPasswordManagerProperties.CredentialProperties.ALL_KEYS)
                         .with(CREDENTIAL, credential)
                         .with(ON_CLICK_LISTENER, mCredentialCallback)
                         .with(SHOW_SUBMIT_BUTTON, false)
@@ -1113,9 +1123,10 @@ public class TouchToFillPasswordManagerViewTest {
     private MVCListAdapter.ListItem buildWebAuthnCredentialItem(
             WebauthnCredential credential, FillableItemCollectionInfo collectionInfo) {
         return new MVCListAdapter.ListItem(
-                TouchToFillProperties.ItemType.WEBAUTHN_CREDENTIAL,
+                TouchToFillPasswordManagerProperties.ItemType.WEBAUTHN_CREDENTIAL,
                 new PropertyModel.Builder(
-                                TouchToFillProperties.WebAuthnCredentialProperties.ALL_KEYS)
+                                TouchToFillPasswordManagerProperties.WebAuthnCredentialProperties
+                                        .ALL_KEYS)
                         .with(WEBAUTHN_CREDENTIAL, credential)
                         .with(WEBAUTHN_ITEM_COLLECTION_INFO, collectionInfo)
                         .build());
@@ -1124,8 +1135,9 @@ public class TouchToFillPasswordManagerViewTest {
     private MVCListAdapter.ListItem buildConfirmationButton(
             Credential credential, boolean showSubmitButton) {
         return new MVCListAdapter.ListItem(
-                TouchToFillProperties.ItemType.FILL_BUTTON,
-                new PropertyModel.Builder(TouchToFillProperties.CredentialProperties.ALL_KEYS)
+                TouchToFillPasswordManagerProperties.ItemType.FILL_BUTTON,
+                new PropertyModel.Builder(
+                                TouchToFillPasswordManagerProperties.CredentialProperties.ALL_KEYS)
                         .with(CREDENTIAL, credential)
                         .with(ON_CLICK_LISTENER, mCredentialCallback)
                         .with(SHOW_SUBMIT_BUTTON, showSubmitButton)
@@ -1134,18 +1146,23 @@ public class TouchToFillPasswordManagerViewTest {
 
     private MVCListAdapter.ListItem buildMorePasskeysItem() {
         return new MVCListAdapter.ListItem(
-                TouchToFillProperties.ItemType.MORE_PASSKEYS,
-                new PropertyModel.Builder(TouchToFillProperties.MorePasskeysProperties.ALL_KEYS)
+                TouchToFillPasswordManagerProperties.ItemType.MORE_PASSKEYS,
+                new PropertyModel.Builder(
+                                TouchToFillPasswordManagerProperties.MorePasskeysProperties
+                                        .ALL_KEYS)
                         .with(
-                                TouchToFillProperties.MorePasskeysProperties.ON_CLICK,
+                                TouchToFillPasswordManagerProperties.MorePasskeysProperties
+                                        .ON_CLICK,
                                 () -> mMorePasskeysClicked.set(true))
-                        .with(TouchToFillProperties.MorePasskeysProperties.TITLE, "More Passkeys")
+                        .with(
+                                TouchToFillPasswordManagerProperties.MorePasskeysProperties.TITLE,
+                                "More Passkeys")
                         .build());
     }
 
     private MVCListAdapter.ListItem buildFooterItem(boolean showHybrid) {
         return new MVCListAdapter.ListItem(
-                TouchToFillProperties.ItemType.FOOTER,
+                TouchToFillPasswordManagerProperties.ItemType.FOOTER,
                 new PropertyModel.Builder(FooterProperties.ALL_KEYS)
                         .with(
                                 MANAGE_BUTTON_TEXT,
