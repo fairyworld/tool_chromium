@@ -212,6 +212,7 @@ class ChromeAutofillClient : public ContentAutofillClient {
   void HideSuggestions(SuggestionHidingReason reason,
                        std::optional<FillingProduct> product) final;
   void OpenGeminiInSidebar(const std::u16string& prompt) final;
+  bool IsGlicEnabled() const final;
   void TriggerUserPerceptionOfAutofillSurvey(
       FillingProduct filling_product,
       const std::map<std::string, std::string>& field_filling_stats_data) final;

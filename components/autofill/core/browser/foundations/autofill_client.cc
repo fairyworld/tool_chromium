@@ -447,6 +447,10 @@ void AutofillClient::OpenGeminiInSidebar(const std::u16string& prompt) {
   NOTIMPLEMENTED();
 }
 
+bool AutofillClient::IsGlicEnabled() const {
+  return false;
+}
+
 bool AutofillClient::IsAutofillTypeBlockedByPolicy(
     const GURL& url,
     AutofillPolicyDataCategory category) const {

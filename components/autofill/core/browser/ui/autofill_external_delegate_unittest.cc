@@ -1271,6 +1271,7 @@ TEST_P(AutofillExternalDelegateAutoSuggestInactivityTest,
 // Tests that when a remote query returns kUnsupportedQuery, the delegate shows
 // a specific suggestion offering to open Gemini.
 TEST_F(AutofillExternalDelegateTest, AtMemoryRemoteQuery_UnsupportedQuery) {
+  autofill_client().set_is_glic_enabled(true);
   StartAtMemorySession();
 
   SetupMockAtMemoryQueryService(
