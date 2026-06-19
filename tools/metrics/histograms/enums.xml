@@ -12942,6 +12942,7 @@ from previous Chrome versions.
       label="ContextualSuggestionsAblateOthersWhenPresent:enabled"/>
   <int value="-487324278" label="TpcdSupportSettings:enabled"/>
   <int value="-487294731" label="EnablePerfettoSystemTracing:disabled"/>
+  <int value="-487009324" label="HttpHeadersInjection:disabled"/>
   <int value="-486491020" label="ReadAnythingWithScreen2x:enabled"/>
   <int value="-484870143" label="GlicShareImage:disabled"/>
   <int value="-482494879"
@@ -15051,6 +15052,7 @@ from previous Chrome versions.
   <int value="207326879" label="NearbySharingReceiveWifiCredentials:enabled"/>
   <int value="207907053"
       label="OmniboxUIExperimentBlueSearchLoopAndSearchQuery:enabled"/>
+  <int value="208365605" label="HttpHeadersInjection:enabled"/>
   <int value="209072108" label="(Obsolete) LacrosExtensionPrinting:disabled"/>
   <int value="209792775" label="TabGroupsAndroid:enabled"/>
   <int value="209805234" label="MessagesForAndroidAutoDarkWebContents:enabled"/>

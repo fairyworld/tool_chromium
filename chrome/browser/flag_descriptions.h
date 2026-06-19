@@ -1426,6 +1426,10 @@ inline constexpr char kHttpCacheCustomBackendDescription[] =
     "overridden by the CacheEncryptionEnabled enterprise policy on supported "
     "platforms.";
 
+inline constexpr char kHttpHeadersInjectionName[] = "HTTP Headers Injection";
+inline constexpr char kHttpHeadersInjectionDescription[] =
+    "Enables injection of custom HTTP headers in network requests.";
+
 inline constexpr char kViewportSegmentsName[] = "Viewport Segments API";
 inline constexpr char kViewportSegmentsDescription[] =
     "Enable the viewport segment API, giving information about the logical "

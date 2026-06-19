@@ -3634,6 +3634,11 @@
     "expiry_milestone": 140
   },
   {
+    "name": "enable-http-headers-injection",
+    "owners": [ "antoli@google.com", "cbe-cep-eng@google.com" ],
+    "expiry_milestone": 153
+  },
+  {
     "name": "enable-iframe-for-pix",
     "owners": [ "longsheng@google.com", "siashah@google.com", "chrome-payments-team@google.com", "payments-autofill-team@google.com" ],
     "expiry_milestone": 155

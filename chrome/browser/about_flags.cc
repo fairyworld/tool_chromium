@@ -116,6 +116,7 @@
 #include "components/enterprise/connectors/core/features.h"
 #include "components/enterprise/data_controls/core/browser/features.h"
 #include "components/enterprise/isolated_mode/settings.h"
+#include "components/enterprise/network_header_injection/core/features.h"
 #include "components/enterprise/networking/features.h"
 #include "components/error_page/common/error_page_switches.h"
 #include "components/feature_engagement/public/feature_constants.h"
@@ -13131,6 +13132,11 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kAntivirusTelemetryForDownloadsDescription, kOsWin,
      FEATURE_VALUE_TYPE(safe_browsing::kAntivirusTelemetryForDownloads)},
 #endif  // BUILDFLAG(IS_WIN)
+
+    {"enable-http-headers-injection",
+     flag_descriptions::kHttpHeadersInjectionName,
+     flag_descriptions::kHttpHeadersInjectionDescription, kOsDesktop,
+     FEATURE_VALUE_TYPE(enterprise_custom_headers::kHttpHeadersInjection)},
 
     // Add new entries above this line.
     // NOTE: Adding a new flag requires adding a corresponding entry to enum
