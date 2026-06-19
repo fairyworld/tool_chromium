@@ -3000,8 +3000,8 @@ error::Error RasterDecoderImpl::DoRasterCHROMIUM(GLuint raster_shm_id,
       .is_privileged = is_privileged_,
       .shared_image_provider = paint_op_shared_image_provider_.get()};
 
-  alignas(cc::PaintOpBuffer::kPaintOpAlign) char
-      data[cc::kLargestPaintOpAlignedSize];
+  alignas(cc::PaintOpBuffer::kPaintOpAlign)
+      uint8_t data[cc::kLargestPaintOpAlignedSize];
 
   gl::ScopedProgressReporter report_progress(
       shared_context_state_->progress_reporter());
@@ -3047,8 +3047,8 @@ error::Error RasterDecoderImpl::DoRasterCHROMIUM(GLuint raster_shm_id,
 
   while (!paint_buffer.empty()) {
     size_t skip = 0;
-    cc::PaintOp* deserialized_op = cc::PaintOp::Deserialize(
-        paint_buffer, data, std::size(data), &skip, options);
+    cc::PaintOp* deserialized_op =
+        cc::PaintOp::Deserialize(paint_buffer, data, &skip, options);
     if (!deserialized_op) {
       LOCAL_SET_GL_ERROR(GL_INVALID_OPERATION, "glRasterCHROMIUM",
                          "RasterCHROMIUM: serialization failure");
