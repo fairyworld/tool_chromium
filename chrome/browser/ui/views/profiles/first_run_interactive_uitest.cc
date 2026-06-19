@@ -1257,7 +1257,8 @@ IN_PROC_BROWSER_TEST_P(FirstRunParameterizedInteractiveUiTest, GoToSettings) {
 }
 
 // TODO(crbug.com/366119368): Re-enable this test
-#if BUILDFLAG(IS_WIN)
+// TODO(crbug.com/525637007): Test is flaky on Linux TSan bots.
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
 #define MAYBE_PeekAndDeclineSignIn DISABLED_PeekAndDeclineSignIn
 #else
 #define MAYBE_PeekAndDeclineSignIn PeekAndDeclineSignIn
