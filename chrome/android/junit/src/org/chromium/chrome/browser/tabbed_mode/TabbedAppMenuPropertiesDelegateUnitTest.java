@@ -2763,102 +2763,14 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         ModelList modelList = mTabbedAppMenuPropertiesDelegate.getMenuItems();
 
-        // TODO(crbug.com/427240031): Stop asserting on menu items that are not subject of this
-        // test.
-        List<MenuItem> expectedItems =
-                new ArrayList<>(
-                        Arrays.asList(
-                                item(R.id.icon_row_menu_id),
-                                item(R.id.new_tab_menu_id),
-                                item(R.id.new_incognito_tab_menu_id),
-                                item(
-                                        R.id.tab_groups_parent_menu_id,
-                                        item(R.id.add_to_group_menu_id),
-                                        item(R.id.create_new_tab_group_menu_id)),
-                                item(R.id.divider_line_id),
-                                item(
-                                        R.id.history_parent_menu_id,
-                                        item(R.id.open_history_menu_id),
-                                        item(R.id.recent_tabs_menu_id)),
-                                item(R.id.quick_delete_menu_id),
-                                item(R.id.divider_line_id),
-                                item(R.id.downloads_menu_id),
-                                item(
-                                        R.id.bookmarks_parent_menu_id,
-                                        item(R.id.bookmark_this_page_menu_id),
-                                        item(R.id.divider_line_id),
-                                        item(R.id.all_bookmarks_menu_id),
-                                        item(
-                                                R.id.reading_list_parent_menu_id,
-                                                item(R.id.show_reading_list_menu_id),
-                                                item(R.id.add_to_reading_list_menu_id)),
-                                        item(R.id.divider_line_id),
-                                        item(R.id.toggle_bookmarks_bar_menu_id),
-                                        item(R.id.divider_line_id),
-                                        item(R.id.bookmarks_header_menu_id),
-                                        item(R.id.bookmark_menu_id),
-                                        item(R.id.bookmark_menu_id),
-                                        item(
-                                                R.id.bookmark_folder_menu_id,
-                                                item(R.id.bookmark_menu_id),
-                                                item(R.id.bookmark_menu_id)),
-                                        item(R.id.divider_line_id),
-                                        item(
-                                                R.id.bookmark_folder_menu_id,
-                                                item(R.id.bookmark_folder_menu_id, item(0))),
-                                        item(R.id.bookmark_folder_menu_id, item(0)))));
-
-        if (ExtensionsBuildflags.ENABLE_DESKTOP_ANDROID_EXTENSIONS) {
-            expectedItems.add(
-                    item(
-                            R.id.extensions_parent_menu_id,
-                            item(R.id.extensions_menu_menu_id),
-                            item(R.id.manage_extensions_menu_id),
-                            item(R.id.extensions_webstore_menu_id)));
-        }
-
-        expectedItems.add(
-                item(
-                        R.id.passwords_and_autofill_parent_menu_id,
-                        item(R.id.google_password_manager_menu_id),
-                        item(R.id.payment_methods_menu_id),
-                        item(R.id.addresses_and_more_menu_id)));
-
-        expectedItems.addAll(
+        // Last two items are of our interest.
+        assertTrue(modelList.size() >= 2);
+        modelList.removeRange(0, modelList.size() - 2);
+        assertMenuItemsAreEqual(
+                modelList,
                 Arrays.asList(
-                        item(R.id.divider_line_id),
-                        item(
-                                R.id.save_and_share_parent_menu_id,
-                                item(R.id.share_menu_id),
-                                item(R.id.copy_link_menu_id),
-                                item(R.id.send_to_devices_menu_id),
-                                item(R.id.qr_code_menu_id),
-                                item(R.id.divider_line_id),
-                                item(R.id.universal_install)),
-                        item(R.id.find_in_page_id),
-                        item(
-                                R.id.more_tools_menu_id,
-                                item(R.id.reader_mode_menu_id),
-                                item(R.id.divider_line_id),
-                                item(R.id.info_menu_id))));
-
-        if (!DeviceInfo.isDesktop()) {
-            expectedItems.add(item(R.id.request_desktop_site_id));
-        }
-
-        expectedItems.addAll(
-                Arrays.asList(
-                        item(R.id.auto_dark_web_contents_id),
-                        item(R.id.divider_line_id),
-                        item(R.id.preferences_id),
-                        item(
-                                R.id.help_parent_menu_id,
-                                item(R.id.about_chrome_menu_id),
-                                item(R.id.help_id),
-                                item(R.id.report_issue_menu_id)),
                         item(R.id.menu_item_content_filter_divider_line_id),
                         item(R.id.menu_item_content_filter_help_center_id)));
-        assertMenuItemsAreEqual(modelList, expectedItems);
     }
 
     @Test
