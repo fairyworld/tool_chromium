@@ -9,6 +9,19 @@
 
 namespace permissions {
 
+// This enum backs a UMA histogram, so it must be treated as append-only.
+enum class PermissionAction {
+  GRANTED = 0,
+  DENIED = 1,
+  DISMISSED = 2,
+  IGNORED = 3,
+  REVOKED = 4,
+  GRANTED_ONCE = 5,
+
+  // Always keep this at the end.
+  NUM,
+};
+
 enum class ActivityIndicatorState {
   kInUse = 0,
   kBlockedOnSiteLevel = 1,
