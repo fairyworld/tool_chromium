@@ -559,6 +559,7 @@ ci_builder(
     gn_extra_configs = [
         "android_desktop",
         "android_builder",
+        "android_fastbuild",
         "asan",
         "minimal_symbols",
         "v8_heap",
