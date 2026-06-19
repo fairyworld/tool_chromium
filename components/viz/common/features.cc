@@ -517,12 +517,11 @@ bool ShouldRemoveRedirectionBitmap() {
     return false;
   }
 
-  // Some users set ANGLE backend to D3D9 or OpenGL via chrome://flags and in
+  // Some users set ANGLE backend to OpenGL via chrome://flags and in
   // that case too we would also use an ANGLE EGLSurface.
   const std::string angle_backend =
       command_line->GetSwitchValueASCII(switches::kUseANGLE);
-  if (angle_backend == gl::kANGLEImplementationD3D9Name ||
-      angle_backend == gl::kANGLEImplementationOpenGLName) {
+  if (angle_backend == gl::kANGLEImplementationOpenGLName) {
     return false;
   }
 

@@ -6676,7 +6676,6 @@ inline constexpr char kUseAngleDescriptionWindows[] =
     "computers by default.";
 
 inline constexpr char kUseAngleD3D11[] = "D3D11";
-inline constexpr char kUseAngleD3D9[] = "D3D9";
 inline constexpr char kUseAngleD3D11Warp[] = "D3D11 WARP";
 
 inline constexpr char kUseWaitableSwapChainName[] = "Use waitable swap chains";
