@@ -114,6 +114,11 @@ DOMStorageContextWrapper::DOMStorageContextWrapper(
   MaybeBindLocalStorageControl();
 
   // Report on disk LocalStorage db size.
+  // TODO(crbug.com/377242771): Move this histogram to
+  // AsyncDomStorageDatabase::OnDatabaseOpened so it can use the correct
+  // database path (LevelDB vs SQLite) and emit with the appropriate
+  // DatabaseMetricsType suffix (.OnDisk vs .OnDiskExperimental) during the
+  // SQLite rollout experiment.
   if (partition_->GetStoragePartitionPath()) {
     // Path to the LocalStorage leveldb directory.
     base::FilePath db_path = storage::DomStorageDatabase::GetPath(

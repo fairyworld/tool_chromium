@@ -24,7 +24,6 @@
 #include "components/services/storage/dom_storage/async_dom_storage_database.h"
 #include "components/services/storage/dom_storage/db_status.h"
 #include "components/services/storage/dom_storage/dom_storage_database.h"
-#include "components/services/storage/dom_storage/dom_storage_histogram_helper.h"
 #include "components/services/storage/public/mojom/local_storage_control.mojom.h"
 #include "components/services/storage/public/mojom/storage_policy_update.mojom.h"
 #include "components/services/storage/public/mojom/storage_usage_info.mojom.h"
@@ -109,10 +108,6 @@ class LocalStorageImpl : public base::trace_event::MemoryDumpProvider,
 
   class StorageAreaHolder;
 
-  // Constructs an absolute path to the database using
-  // `storage_partition_directory_`.
-  base::FilePath GetDatabasePath() const;
-
   // Does dtor work. This is a distinct function mainly to retain git history.
   void ShutDown();
 
@@ -128,7 +123,9 @@ class LocalStorageImpl : public base::trace_event::MemoryDumpProvider,
   void OnDatabaseOpened(DbStatus status);
   void OnConnectionFinished();
   void DeleteAndRecreateDatabase(DomStorageRecoveryReason reason);
-  void OnDBDestroyed(bool recreate_in_memory, DbStatus status);
+  void OnDBDestroyed(bool recreate_in_memory,
+                     DatabaseMetricsType metrics_type,
+                     DbStatus status);
 
   StorageAreaHolder* GetOrCreateStorageArea(
       const blink::StorageKey& storage_key);

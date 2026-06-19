@@ -5,6 +5,7 @@
 #include "components/services/storage/dom_storage/local_storage_impl.h"
 
 #include <limits>
+#include <optional>
 #include <string_view>
 #include <tuple>
 
@@ -25,12 +26,14 @@
 #include "base/test/task_environment.h"
 #include "base/test/test_future.h"
 #include "base/threading/thread_restrictions.h"
+#include "base/trace_event/memory_allocator_dump_guid.h"
 #include "build/build_config.h"
 #include "components/services/storage/dom_storage/db_status.h"
 #include "components/services/storage/dom_storage/dom_storage_constants.h"
 #include "components/services/storage/dom_storage/dom_storage_database.h"
 #include "components/services/storage/dom_storage/dom_storage_histogram_helper.h"
 #include "components/services/storage/dom_storage/features.h"
+#include "components/services/storage/dom_storage/leveldb/local_storage_leveldb.h"
 #include "components/services/storage/dom_storage/storage_area_impl.h"
 #include "components/services/storage/dom_storage/test_support/dom_storage_database_testing.h"
 #include "components/services/storage/dom_storage/test_support/fake_dom_storage_database.h"
@@ -125,21 +128,10 @@ class TestStorageAreaObserver : public blink::mojom::StorageAreaObserver {
 
 // Base test fixture for `LocalStorageImpl` tests. Provides common setup
 // including database initialization, storage area binding, and helper methods
-// for reading/writing map entries and metadata. Subclasses can parameterize
-// tests to run on SQLite or LevelDB using `is_sqlite_enabled` when constructing
-// `LocalStorageImplTestBase`.
+// for reading/writing map entries and metadata.
 class LocalStorageImplTestBase : public testing::Test {
  public:
-  explicit LocalStorageImplTestBase(bool is_sqlite_enabled) {
-    // `kDomStorageSqlite` enables SQLite for all databases (on-disk and
-    // in-memory). Also explicitly control `kDomStorageSqliteInMemory` so that
-    // LevelDB tests don't accidentally use the SQLite in-memory backend.
-    feature_list_.InitWithFeatureStates(
-        {{kDomStorageSqlite, is_sqlite_enabled},
-         {kDomStorageSqliteInMemory, is_sqlite_enabled}});
-    task_environment_ = std::make_unique<base::test::TaskEnvironment>();
-    EXPECT_TRUE(temp_path_.CreateUniqueTempDir());
-  }
+  LocalStorageImplTestBase() { EXPECT_TRUE(temp_path_.CreateUniqueTempDir()); }
 
   LocalStorageImplTestBase(const LocalStorageImplTestBase&) = delete;
   LocalStorageImplTestBase& operator=(const LocalStorageImplTestBase&) = delete;
@@ -394,9 +386,16 @@ class LocalStorageImplTestBase : public testing::Test {
 
   void TearDown() override { ShutDownStorage(); }
 
-  // Enables or disables SQLite.
+ protected:
+  // Derived fixtures must initialize `feature_list_` and then call this from
+  // their constructor.
+  void InitializeTaskEnvironment() {
+    task_environment_ = std::make_unique<base::test::TaskEnvironment>();
+  }
+
   base::test::ScopedFeatureList feature_list_;
 
+ private:
   // TaskEnvironment initialization results in threads calling
   // `FeatureList::IsEnabled()`. On Android tests, this can race with
   // `FeatureList::InitWithFeatureState()` in the constructor. So, we hold the
@@ -412,8 +411,18 @@ class LocalStorageImplTest
     : public testing::WithParamInterface</*is_sqlite_enabled=*/bool>,
       public LocalStorageImplTestBase {
  public:
-  LocalStorageImplTest()
-      : LocalStorageImplTestBase(/*is_sqlite_enabled=*/GetParam()) {}
+  LocalStorageImplTest() {
+    if (GetParam()) {
+      feature_list_.InitWithFeatures(
+          /*enabled_features=*/{kDomStorageSqlite, kDomStorageSqliteInMemory},
+          /*disabled_features=*/{});
+    } else {
+      feature_list_.InitWithFeatures(
+          /*enabled_features=*/{},
+          /*disabled_features=*/{kDomStorageSqlite, kDomStorageSqliteInMemory});
+    }
+    InitializeTaskEnvironment();
+  }
   ~LocalStorageImplTest() override = default;
 
   bool IsSqliteEnabled() const { return GetParam(); }
@@ -1337,14 +1346,12 @@ TEST_P(LocalStorageImplTest, InvalidVersionOnDisk) {
 
   {
     // Re-open the database.
-    base::FilePath db_path =
-        DomStorageDatabase::GetPath(StorageType::kLocalStorage, storage_path());
     base::RunLoop open_db_run_loop;
     DbStatus status;
 
     std::unique_ptr<AsyncDomStorageDatabase> database =
         AsyncDomStorageDatabase::Open(
-            StorageType::kLocalStorage, db_path,
+            StorageType::kLocalStorage, storage_path(),
             /*memory_dump_id*/ std::nullopt,
             base::BindLambdaForTesting([&](DbStatus callback_status) {
               status = callback_status;
@@ -1651,12 +1658,187 @@ TEST_P(LocalStorageImplTest, DontRecreateOnRepeatedCommitFailure) {
                                kCommitErrorThreshold + 1, 1);
 }
 
+class LocalStorageImplOnDiskSQLiteRolloutTestBase
+    : public LocalStorageImplTestBase {
+ public:
+  // Shared helpers for the `LocalStorageImplOnDiskSQLiteRolloutTest` fixture.
+  base::FilePath LevelDbDir() const {
+    return DomStorageDatabase::GetLevelDbPath(StorageType::kLocalStorage,
+                                              storage_path());
+  }
+
+  base::FilePath SqliteDbPath() const {
+    return DomStorageDatabase::GetSqlitePath(StorageType::kLocalStorage,
+                                             storage_path());
+  }
+
+  base::FilePath ExpTagPath() const {
+    return LevelDbDir().AppendASCII("exp-v1");
+  }
+
+  bool LevelDbDirHasContents() const {
+    return base::PathExists(LevelDbDir()) &&
+           !base::IsDirectoryEmpty(LevelDbDir());
+  }
+
+  // Creates a real on-disk LevelDB database at `LevelDbDir()`. If `with_tag`
+  // is true, also writes the experimental tag file next to the database.
+  void CreateOnDiskLevelDb(bool with_tag) {
+    scoped_refptr<base::SequencedTaskRunner> runner =
+        base::ThreadPool::CreateSequencedTaskRunner({base::MayBlock()});
+    {
+      base::SequenceBound<LocalStorageLevelDB> db(
+          runner, DomStorageDatabaseFactory::CreatePassKeyForTesting(),
+          /*write_exp_tag=*/false);
+      base::test::TestFuture<DbStatus> open_future;
+      db.AsyncCall(&LocalStorageLevelDB::Open)
+          .WithArgs(LevelDbDir(), std::nullopt)
+          .Then(open_future.GetCallback());
+      ASSERT_TRUE(open_future.Take().ok());
+    }
+
+    // Drain `runner` so the DB's destruction completes and releases its LOCK
+    // before we touch the directory.
+    base::RunLoop flush;
+    runner->PostTask(FROM_HERE, flush.QuitClosure());
+    flush.Run();
+
+    if (with_tag) {
+      ASSERT_TRUE(base::WriteFile(ExpTagPath(), ""));
+    }
+  }
+};
+
+class LocalStorageImplOnDiskSQLiteRolloutTest
+    : public LocalStorageImplOnDiskSQLiteRolloutTestBase,
+      public testing::WithParamInterface<DomStorageSqliteRolloutStage> {
+ public:
+  LocalStorageImplOnDiskSQLiteRolloutTest() {
+    feature_list_.InitWithFeaturesAndParameters(
+        /*enabled_features=*/{{kDomStorageSqliteNewDatabases,
+                               {{"DomStorageSqliteNewDatabasesStage",
+                                 kDomStorageSqliteNewDatabasesStage.GetName(
+                                     stage())}}}},
+        /*disabled_features=*/{kDomStorageSqlite, kDomStorageSqliteInMemory});
+    InitializeTaskEnvironment();
+  }
+
+  DomStorageSqliteRolloutStage stage() const { return GetParam(); }
+
+  // Whether a newly-created on-disk database uses the SQLite backend.
+  bool UsesSqliteForNewDb() const {
+    return stage() == DomStorageSqliteRolloutStage::kUseSqliteForNewDatabases ||
+           stage() == DomStorageSqliteRolloutStage::kUseSqliteOnly;
+  }
+
+  // Whether new on-disk databases are attributed to the experiment (the
+  // "OnDiskExperimental" histogram) rather than "OnDisk".
+  bool IsExperimentalStage() const {
+    return stage() == DomStorageSqliteRolloutStage::kUseLevelDbAsControl ||
+           stage() == DomStorageSqliteRolloutStage::kUseSqliteForNewDatabases;
+  }
+};
+
+INSTANTIATE_TEST_SUITE_P(
+    /*no prefix*/,
+    LocalStorageImplOnDiskSQLiteRolloutTest,
+    testing::Values(DomStorageSqliteRolloutStage::kUseLevelDbOnly,
+                    DomStorageSqliteRolloutStage::kUseLevelDbAsControl,
+                    DomStorageSqliteRolloutStage::kUseSqliteForNewDatabases,
+                    DomStorageSqliteRolloutStage::kUseSqliteOnly),
+    [](const testing::TestParamInfo<DomStorageSqliteRolloutStage>& info) {
+      return kDomStorageSqliteNewDatabasesStage.GetName(info.param);
+    });
+
+TEST_P(LocalStorageImplOnDiskSQLiteRolloutTest,
+       NewDatabase_UsesConfiguredBackend) {
+  base::HistogramTester histograms;
+  auto key = StdStringToUint8Vector("key");
+  auto value = StdStringToUint8Vector("value");
+
+  DoTestPut(key, value);
+  ShutDownStorage();
+
+  if (UsesSqliteForNewDb()) {
+    EXPECT_TRUE(base::PathExists(SqliteDbPath()));
+    EXPECT_FALSE(LevelDbDirHasContents());
+  } else {
+    EXPECT_FALSE(base::PathExists(SqliteDbPath()));
+    EXPECT_TRUE(LevelDbDirHasContents());
+  }
+  // Only the control arm tags a newly-created LevelDB.
+  EXPECT_EQ(base::PathExists(ExpTagPath()),
+            stage() == DomStorageSqliteRolloutStage::kUseLevelDbAsControl);
+  histograms.ExpectUniqueSample(
+      IsExperimentalStage()
+          ? "Storage.LocalStorage.OpenDatabase.OnDiskExperimental"
+          : "Storage.LocalStorage.OpenDatabase.OnDisk",
+      /*sample=*/0, /*expected_bucket_count=*/1);
+}
+
+TEST_P(LocalStorageImplOnDiskSQLiteRolloutTest, PreExistingUntaggedLevelDb) {
+  ASSERT_NO_FATAL_FAILURE(CreateOnDiskLevelDb(/*with_tag=*/false));
+  base::HistogramTester histograms;
+  auto key = StdStringToUint8Vector("key");
+  auto value = StdStringToUint8Vector("value");
+
+  DoTestPut(key, value);
+  // The value round-trips through the active backend (SQLite for
+  // kUseSqliteOnly, the reused LevelDB otherwise), proving the write landed
+  // there rather than in an orphaned LevelDB.
+  EXPECT_EQ(value, DoTestGet(key));
+  ShutDownStorage();
+
+  // kUseSqliteOnly creates a SQLite database, orphaning the existing LevelDB;
+  // the other stages reuse the existing LevelDB. Either way the LevelDB
+  // directory stays on disk and the open is attributed to "OnDisk".
+  EXPECT_EQ(base::PathExists(SqliteDbPath()),
+            stage() == DomStorageSqliteRolloutStage::kUseSqliteOnly);
+  EXPECT_TRUE(LevelDbDirHasContents());
+  EXPECT_FALSE(base::PathExists(ExpTagPath()));
+  histograms.ExpectUniqueSample("Storage.LocalStorage.OpenDatabase.OnDisk",
+                                /*sample=*/0,
+                                /*expected_bucket_count=*/1);
+}
+
+TEST_P(LocalStorageImplOnDiskSQLiteRolloutTest, PreExistingTaggedLevelDb) {
+  ASSERT_NO_FATAL_FAILURE(CreateOnDiskLevelDb(/*with_tag=*/true));
+  base::HistogramTester histograms;
+  auto key = StdStringToUint8Vector("key");
+  auto value = StdStringToUint8Vector("value");
+
+  DoTestPut(key, value);
+  // The value round-trips through the active backend (SQLite for
+  // kUseSqliteOnly, the reused LevelDB otherwise), proving the write landed
+  // there rather than in an orphaned LevelDB.
+  EXPECT_EQ(value, DoTestGet(key));
+  ShutDownStorage();
+
+  // kUseSqliteOnly creates a SQLite database, orphaning the existing LevelDB;
+  // the other stages reuse it. The LevelDB directory and its tag stay on disk.
+  EXPECT_EQ(base::PathExists(SqliteDbPath()),
+            stage() == DomStorageSqliteRolloutStage::kUseSqliteOnly);
+  EXPECT_TRUE(LevelDbDirHasContents());
+  EXPECT_TRUE(base::PathExists(ExpTagPath()));
+  // Only the control arm attributes a previously-tagged LevelDB to the
+  // experiment; the other stages emit to "OnDisk".
+  histograms.ExpectUniqueSample(
+      stage() == DomStorageSqliteRolloutStage::kUseLevelDbAsControl
+          ? "Storage.LocalStorage.OpenDatabase.OnDiskExperimental"
+          : "Storage.LocalStorage.OpenDatabase.OnDisk",
+      /*sample=*/0, /*expected_bucket_count=*/1);
+}
+
 // Test fixture for tests that use fake database implementations. These tests
 // do not depend on the real SQLite/LevelDB backend and run only once.
 class LocalStorageImplFakeDbTest : public LocalStorageImplTestBase {
  public:
-  LocalStorageImplFakeDbTest()
-      : LocalStorageImplTestBase(/*is_sqlite_enabled=*/false) {}
+  LocalStorageImplFakeDbTest() {
+    feature_list_.InitWithFeatures(
+        /*enabled_features=*/{},
+        /*disabled_features=*/{kDomStorageSqlite, kDomStorageSqliteInMemory});
+    InitializeTaskEnvironment();
+  }
 };
 
 // After recovery, some commit errors occur but resolve via a successful commit.
@@ -1669,13 +1851,18 @@ TEST_F(LocalStorageImplFakeDbTest, TransientErrorsAfterRecovery) {
   // the second database to OK mid-flight to simulate transient errors.
   ScopedDomStorageDatabaseFactoryForTesting scoped_factory(
       base::BindLambdaForTesting(
-          [](StorageType, bool, scoped_refptr<base::SequencedTaskRunner> runner)
-              -> base::SequenceBound<DomStorageDatabase> {
-            auto fake = base::SequenceBound<FakeDomStorageDatabase>(
-                std::move(runner), DbStatus::OK());
-            fake.AsyncCall(&FakeDomStorageDatabase::SetUpdateMapsStatus)
-                .WithArgs(DbStatus::IOError("test"));
-            return fake;
+          [](StorageType, const base::FilePath& storage_partition_dir,
+             const std::optional<base::trace_event::MemoryAllocatorDumpGuid>&,
+             DomStorageDatabaseFactory::OpenResultCallback callback) {
+            auto fake =
+                std::make_unique<FakeDomStorageDatabase>(DbStatus::OK());
+            fake->SetUpdateMapsStatus(DbStatus::IOError("test"));
+            DomStorageDatabaseFactory::OpenResult result;
+            result.SetDatabase(GetTaskRunnerForDb(storage_partition_dir),
+                               std::move(fake));
+            result.metrics_type = DatabaseMetricsType::kOnDisk;
+            result.open_status = DbStatus::OK();
+            std::move(callback).Run(std::move(result));
           }));
 
   InitializeStorage(storage_path());
@@ -1897,7 +2084,7 @@ TEST_F(LocalStorageImplFakeDbTest, FallbackToInMemory_SecondDestroyFailed) {
   FakeDomStorageDatabaseFactory fake_factory(
       /*num_open_failures=*/2,
       base::BindLambdaForTesting(
-          [&destroy_count](const base::FilePath&,
+          [&destroy_count](const base::FilePath&, bool /*is_sqlite*/,
                            DomStorageDatabaseFactory::StatusCallback cb) {
             base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
                 FROM_HERE,
@@ -1929,7 +2116,7 @@ TEST_F(LocalStorageImplFakeDbTest, GaveUp_SecondDestroyFailed) {
   FakeDomStorageDatabaseFactory fake_factory(
       /*num_open_failures=*/3,
       base::BindLambdaForTesting(
-          [&destroy_count](const base::FilePath&,
+          [&destroy_count](const base::FilePath&, bool /*is_sqlite*/,
                            DomStorageDatabaseFactory::StatusCallback cb) {
             base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
                 FROM_HERE,
@@ -2009,7 +2196,18 @@ class LocalStorageImplStaleDeletionTest
     : public testing::WithParamInterface</*is_sqlite_enabled=*/bool>,
       public LocalStorageImplTestBase {
  public:
-  LocalStorageImplStaleDeletionTest() : LocalStorageImplTestBase(GetParam()) {}
+  LocalStorageImplStaleDeletionTest() {
+    if (GetParam()) {
+      feature_list_.InitWithFeatures(
+          /*enabled_features=*/{kDomStorageSqlite, kDomStorageSqliteInMemory},
+          /*disabled_features=*/{});
+    } else {
+      feature_list_.InitWithFeatures(
+          /*enabled_features=*/{},
+          /*disabled_features=*/{kDomStorageSqlite, kDomStorageSqliteInMemory});
+    }
+    InitializeTaskEnvironment();
+  }
   ~LocalStorageImplStaleDeletionTest() override = default;
 
   void UpdateAccessMetaData(const blink::StorageKey& storage_key,
