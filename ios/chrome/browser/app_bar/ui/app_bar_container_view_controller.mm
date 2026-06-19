@@ -51,6 +51,11 @@
   [self updateCutoutRadius:assistantContainerCutoutRadius];
 }
 
+- (void)layoutState:(LayoutState*)layoutState
+    didChangeToolbarPosition:(ToolbarPosition)toolbarPosition {
+  [self updateLayout];
+}
+
 @dynamic view;
 
 - (void)setAppBar:(AppBarViewController*)appBar {
@@ -179,8 +184,12 @@
 }
 
 - (void)updateCutoutRadius:(CGFloat)cutoutRadius {
-  CGFloat clampedRadius =
-      std::clamp(cutoutRadius, kAppBarCornerRadius, kAppBarCornerRadiusMax);
+  CGFloat clampedRadius = kAppBarCornerRadius;
+  if (self.layoutState.appBarPosition == AppBarPosition::kBottom &&
+      self.layoutState.toolbarPosition == ToolbarPosition::kTop) {
+    clampedRadius =
+        std::clamp(cutoutRadius, kAppBarCornerRadius, kAppBarCornerRadiusMax);
+  }
   [_appBar updateCornerRadius:clampedRadius];
 }
 

@@ -223,10 +223,6 @@ ContainerMorphingConstraints CalculateMorphingConstraints(
     }
   }
 
-  if (IsChromeNextIaEnabled()) {
-    bottom_corner_radius = std::max(kAppBarCornerRadius, bottom_corner_radius);
-  }
-
   return {actual_height,     side_margin,          bottom_margin,
           top_corner_radius, bottom_corner_radius, background_dimming_alpha};
 }

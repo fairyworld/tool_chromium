@@ -520,6 +520,17 @@ NSInteger GetMediumDetentHeight(NSInteger absoluteMax) {
   ContainerMorphingConstraints constraints = CalculateMorphingConstraints(
       height, minimizedHeight, mediumHeight, largeHeight);
 
+  if (IsChromeNextIaEnabled()) {
+    BOOL isAppBarAtBottom =
+        self.layoutState.appBarPosition == AppBarPosition::kBottom;
+    BOOL isToolbarAtTop =
+        self.layoutState.toolbarPosition == ToolbarPosition::kTop;
+    if (isAppBarAtBottom && isToolbarAtTop) {
+      constraints.bottom_corner_radius =
+          std::max(kAppBarCornerRadius, constraints.bottom_corner_radius);
+    }
+  }
+
   if (IsRegularXRegularSizeClass(self.traitCollection)) {
     // iPad floating sheet always has 4 rounded corners and a bottom margin.
     constraints.top_corner_radius = kMorphingBaseCornerRadius;
@@ -1025,6 +1036,11 @@ NSInteger GetMediumDetentHeight(NSInteger absoluteMax) {
 - (void)layoutState:(LayoutState*)layoutState
     didChangeContainedLayoutSupported:(BOOL)supported {
   [self updatePresentationContextForSupportedState:supported];
+}
+
+- (void)layoutState:(LayoutState*)layoutState
+    didChangeToolbarPosition:(ToolbarPosition)toolbarPosition {
+  [self updateContainerStylingForHeight:_heightConstraint.constant];
 }
 
 // Configures the constraints for the panel layout.
