@@ -58,7 +58,6 @@ std::pair<int, int> GetDeviceIds(const base::DictValue& object) {
 }
 
 std::u16string GetDeviceNameFromIds(int vendor_id, int product_id) {
-#if !BUILDFLAG(IS_ANDROID)
   device::UsbIdNames names =
       device::UsbIds::GetVendorAndProductName(vendor_id, product_id);
   if (names.product_name) {
@@ -77,7 +76,6 @@ std::u16string GetDeviceNameFromIds(int vendor_id, int product_id) {
         base::ASCIIToUTF16(base::StringPrintf("0x%04X", product_id)),
         base::UTF8ToUTF16(names.vendor_name));
   }
-#endif  // !BUILDFLAG(IS_ANDROID)
 
   if (product_id == kDeviceIdWildcard) {
     if (vendor_id == kDeviceIdWildcard)
