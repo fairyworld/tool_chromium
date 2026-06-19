@@ -92,7 +92,8 @@ If the automated test runner fails or hangs, an agent can manually execute the
 tests in parallel to save time:
 
 1. **Setup**: Create isolated directories for each test case under the
-   configured `temp_directory` (e.g. `agents/skills/magi-mode/.temp/`) and copy
+   configured `temp_directory` (e.g.
+   `~/.gemini/jetski/brain/<conversation_id>/.temp/`) and copy
    `testdata` into them.
 2. **Parallel Invocation**: Issue multiple `invoke_subagent` tool calls
    concurrently (one for each test case) to run them in parallel.

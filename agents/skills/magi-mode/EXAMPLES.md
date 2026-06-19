@@ -27,7 +27,7 @@ protocol.
     "use_reclient": true,
     "is_debug_build": true,
     "output_directory": "out/Default",
-    "temp_directory": "agents/skills/magi-mode/.temp"
+    "temp_directory": "/usr/local/google/home/<username>/.gemini/jetski/brain/<conversation_id>/.temp"
   }
 }
 ```

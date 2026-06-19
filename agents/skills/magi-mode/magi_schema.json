@@ -99,7 +99,7 @@
         },
         "temp_directory": {
           "type": "string",
-          "description": "The workspace-relative path to a directory where interim files are stored."
+          "description": "The absolute or relative path to a directory where interim files are stored."
         }
       },
       "required": [
