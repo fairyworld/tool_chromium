@@ -158,6 +158,8 @@ class ChromeAutofillClient : public ContentAutofillClient {
       override;
   personal_context::PersonalContextEnablementState
   GetPersonalContextEnablementState() const override;
+  personal_context::PersonalContextEnablementService*
+  GetPersonalContextEnablementService() const override;
   PasswordManagerDelegate* GetPasswordManagerDelegate(
       const FieldGlobalId& field_id) final;
   void GetAiPageContent(GetAiPageContentCallback callback) final;

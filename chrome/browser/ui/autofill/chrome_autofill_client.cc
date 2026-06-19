@@ -100,6 +100,7 @@
 #include "components/autofill/content/browser/content_autofill_driver_factory.h"
 #include "components/autofill/content/browser/content_identity_credential_delegate.h"
 #include "components/autofill/content/browser/integrators/email_verifier/email_verifier_delegate.h"
+#include "components/autofill/core/browser/at_memory/at_memory_enablement_utils.h"
 #include "components/autofill/core/browser/at_memory_promo_tracker.h"
 #include "components/autofill/core/browser/autofill_type.h"
 #include "components/autofill/core/browser/data_manager/autofill_ai/entity_data_manager.h"
@@ -352,6 +353,9 @@ void ChromeAutofillClient::AtMemoryPromoObserver::OnPaste() {
 }
 
 void ChromeAutofillClient::ShowAutofillAtMemoryPromo() {
+  if (!MayPerformAtMemoryAction(AtMemoryAction::kShowIph, *this)) {
+    return;
+  }
   auto* user_education_interface =
       BrowserUserEducationInterface::MaybeGetForWebContentsInTab(
           web_contents());
@@ -500,13 +504,18 @@ ChromeAutofillClient::GetAtMemoryQueryService() {
 
 personal_context::PersonalContextEnablementState
 ChromeAutofillClient::GetPersonalContextEnablementState() const {
-  Profile* profile =
-      Profile::FromBrowserContext(web_contents()->GetBrowserContext());
+  Profile* profile = GetProfile();
   personal_context::PersonalContextEnablementService* service =
       PersonalContextEnablementServiceFactory::GetForProfile(profile);
   return service ? service->GetEnablementState()
                  : personal_context::PersonalContextEnablementState::
                        kDisabledNotEligible;
+}
+
+personal_context::PersonalContextEnablementService*
+ChromeAutofillClient::GetPersonalContextEnablementService() const {
+  Profile* profile = GetProfile();
+  return PersonalContextEnablementServiceFactory::GetForProfile(profile);
 }
 
 PasswordManagerDelegate* ChromeAutofillClient::GetPasswordManagerDelegate(

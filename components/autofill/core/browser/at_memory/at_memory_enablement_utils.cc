@@ -85,6 +85,7 @@ namespace {
   switch (action) {
     case AtMemoryAction::kTriggerSearchUI:
     case AtMemoryAction::kAllowCustomizeAtMemoryShortcut:
+    case AtMemoryAction::kShowIph:
       return IsPersonalContextToggleOn(pref_service);
     case AtMemoryAction::kShowAtMemoryInSettings:
       return true;
@@ -93,6 +94,13 @@ namespace {
 }
 
 }  // namespace
+
+bool MayPerformAtMemoryAction(AtMemoryAction action,
+                              const AutofillClient& client) {
+  return MayPerformAtMemoryAction(
+      action, client.GetPersonalContextEnablementService(), client.GetPrefs(),
+      client.GetGoogleGroupsManager());
+}
 
 bool MayPerformAtMemoryAction(
     AtMemoryAction action,

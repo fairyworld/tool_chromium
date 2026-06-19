@@ -5,6 +5,8 @@
 #ifndef COMPONENTS_AUTOFILL_CORE_BROWSER_AT_MEMORY_AT_MEMORY_ENABLEMENT_UTILS_H_
 #define COMPONENTS_AUTOFILL_CORE_BROWSER_AT_MEMORY_AT_MEMORY_ENABLEMENT_UTILS_H_
 
+#include "components/autofill/core/browser/foundations/autofill_client.h"
+
 class GoogleGroupsManager;
 class PrefService;
 
@@ -30,6 +32,8 @@ enum class AtMemoryAction {
   // This unlocks the ability to reconfigure the shortcut in Enhanced
   // Autofill section of the Settings.
   kAllowCustomizeAtMemoryShortcut,
+  // Show the In-Product Help (IPH) Promo Bubble for AtMemory.
+  kShowIph,
 };
 
 // Returns whether all permission-related requirements are met for `action`.
@@ -37,6 +41,9 @@ enum class AtMemoryAction {
 // Checks that AtMemory feature flags are enabled, AtMemory eligibility
 // criteria are met and PersonalContext settings toggle is on if required by
 // the action.
+[[nodiscard]] bool MayPerformAtMemoryAction(AtMemoryAction action,
+                                            const AutofillClient& client);
+
 [[nodiscard]] bool MayPerformAtMemoryAction(
     AtMemoryAction action,
     personal_context::PersonalContextEnablementService*

@@ -143,6 +143,11 @@ AutofillClient::GetPersonalContextEnablementState() const {
   return personal_context::PersonalContextEnablementState::kDisabledNotEligible;
 }
 
+personal_context::PersonalContextEnablementService*
+AutofillClient::GetPersonalContextEnablementService() const {
+  return nullptr;
+}
+
 PasswordManagerDelegate* AutofillClient::GetPasswordManagerDelegate(
     const FieldGlobalId& field_id) {
   return nullptr;

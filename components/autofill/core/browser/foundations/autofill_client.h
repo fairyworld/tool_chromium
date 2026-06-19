@@ -105,6 +105,7 @@ class AtMemoryQueryService;
 
 namespace personal_context {
 enum class PersonalContextEnablementState;
+class PersonalContextEnablementService;
 }
 
 namespace subscription_eligibility {
@@ -489,8 +490,14 @@ class AutofillClient {
   GetAtMemoryQueryService();
 
   // Returns the enablement state of the Accessibility Annotator.
+  // TODO(crbug.com/524193567) Delete this method once all the invocations are
+  // replaced by the calls to the central enablement util.
   virtual personal_context::PersonalContextEnablementState
   GetPersonalContextEnablementState() const;
+
+  // Returns the Personal Context Enablement Service. May return nullptr.
+  virtual personal_context::PersonalContextEnablementService*
+  GetPersonalContextEnablementService() const;
 
   // Returns the `PasswordManagerDelegate` responsible to provide
   // password suggestions for the given `field_id`.
