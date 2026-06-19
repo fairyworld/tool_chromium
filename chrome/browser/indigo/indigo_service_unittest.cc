@@ -45,6 +45,7 @@ class IndigoServiceTest : public testing::Test {
 
   void TearDown() override {
     component_updater::ResetIndigoInstallDirForTesting();
+    glic::GlicEnabling::SetBypassEnablementChecksForTesting(false);
   }
 
   void CreateService() {
