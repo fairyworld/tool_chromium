@@ -297,16 +297,15 @@ std::u16string GetMessageForBiometricAuthenticationBeforeFillingSetting(
 
 void MaybeShowProfileSwitchIPH(Profile* profile) {
 #if !BUILDFLAG(IS_CHROMEOS)
+  if (extensions::profile_util::GetNumberOfProfiles() < 2) {
+    return;
+  }
+
   BrowserWindowInterface* launched_app =
       web_app::AppBrowserController::FindForWebApp(*profile,
                                                    ash::kPasswordManagerAppId);
-
-  // Try to show promo only if there is profile menu button and there are
-  // multiple profiles.
-  if (launched_app && web_app::AppBrowserController::IsWebApp(launched_app) &&
-      web_app::AppBrowserController::From(launched_app)
-          ->HasProfileMenuButton() &&
-      extensions::profile_util::GetNumberOfProfiles() > 1) {
+  if (launched_app && web_app::AppBrowserController::From(launched_app)
+                          ->HasProfileMenuButton()) {
     launched_app->GetBrowserForMigrationOnly()
         ->window()
         ->MaybeShowProfileSwitchIPH();
