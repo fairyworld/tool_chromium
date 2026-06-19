@@ -15,10 +15,7 @@ import org.junit.runner.RunWith;
 import org.chromium.base.test.util.CommandLineFlags;
 import org.chromium.base.test.util.DisableIf;
 import org.chromium.base.test.util.DisabledTest;
-import org.chromium.base.test.util.Features.DisableFeatures;
-import org.chromium.base.test.util.Features.EnableFeatures;
 import org.chromium.blink.mojom.DisplayMode;
-import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.flags.ChromeSwitches;
 import org.chromium.chrome.test.ChromeJUnit4ClassRunner;
 import org.chromium.ui.base.DeviceFormFactor;
@@ -73,37 +70,13 @@ public class WebappDisplayCutoutTest {
     }
 
     /**
-     * Test that a safe area is applied when we have viewport-fit=cover and a standalone display
-     * mode with the short-edges cutout feature enabled.
+     * Test that a safe area is not applied when we have viewport-fit=cover and a standalone display
+     * mode.
      */
     @Test
     @LargeTest
     @WebappDisplayCutoutTestRule.TestConfiguration(displayMode = DisplayMode.STANDALONE)
-    @EnableFeatures(ChromeFeatureList.WEB_APP_SHORT_EDGES_CUTOUT_MODE)
-    // Desktop freeform mode runs the webapp in a windowed (non-fullscreen) container, so no
-    // display cutout is involved and SHORT_EDGES never applies. The fullscreen test above still
-    // exercises the cutout path on desktop.
-    @DisableIf.Device(DeviceFormFactor.DESKTOP_FREEFORM)
     public void testViewportFitWebapp_Standalone() throws TimeoutException {
-        mTestRule.setViewportFit(DisplayCutoutTestRule.VIEWPORT_FIT_COVER);
-
-        mTestRule.waitForLayoutInDisplayCutoutMode(
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES);
-        mTestRule.waitForSafeAreaTopInset();
-    }
-
-    /**
-     * Test that the pre-flag behavior is preserved for a standalone display mode when the
-     * short-edges cutout feature is disabled: no safe area and DEFAULT cutout mode.
-     */
-    @Test
-    @LargeTest
-    @WebappDisplayCutoutTestRule.TestConfiguration(displayMode = DisplayMode.STANDALONE)
-    @DisableFeatures(ChromeFeatureList.WEB_APP_SHORT_EDGES_CUTOUT_MODE)
-    // Same reason as the enabled variant above: desktop freeform runs the webapp windowed, so
-    // the cutout path is not exercised in standalone mode there.
-    @DisableIf.Device(DeviceFormFactor.DESKTOP_FREEFORM)
-    public void testViewportFitWebapp_Standalone_FeatureDisabled() throws TimeoutException {
         mTestRule.setViewportFit(DisplayCutoutTestRule.VIEWPORT_FIT_COVER);
 
         mTestRule.waitForSafeArea(DisplayCutoutTestRule.TEST_SAFE_AREA_WITHOUT_CUTOUT);
