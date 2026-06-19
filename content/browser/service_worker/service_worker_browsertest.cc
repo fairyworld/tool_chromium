@@ -56,6 +56,7 @@
 #include "content/browser/service_worker/service_worker_controllee_request_handler.h"
 #include "content/browser/service_worker/service_worker_fetch_dispatcher.h"
 #include "content/browser/service_worker/service_worker_loader_helpers.h"
+#include "content/browser/service_worker/service_worker_metrics.h"
 #include "content/browser/service_worker/service_worker_registration.h"
 #include "content/browser/service_worker/service_worker_test_utils.h"
 #include "content/browser/service_worker/service_worker_version.h"
@@ -6343,6 +6344,9 @@ IN_PROC_BROWSER_TEST_P(ServiceWorkerAutoPreloadBrowserTest, PassThrough) {
 
   histogram_tester.ExpectUniqueSample("ServiceWorker.AutoPreload.Dispatched",
                                       true, 1);
+  histogram_tester.ExpectUniqueSample(
+      "ServiceWorker.AutoPreload.DispatchResult",
+      ServiceWorkerAutoPreloadDispatchResult::kDispatched, 1);
 }
 
 IN_PROC_BROWSER_TEST_P(ServiceWorkerAutoPreloadBrowserTest,

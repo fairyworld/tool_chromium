@@ -131,6 +131,12 @@ void MaybeSetFetchHandlerBypassOptionForsyntheticResponse(
   }
 }
 
+void RecordAutoPreloadDispatchResult(
+    ServiceWorkerAutoPreloadDispatchResult result) {
+  base::UmaHistogramEnumeration("ServiceWorker.AutoPreload.DispatchResult",
+                                result);
+}
+
 }  // namespace
 
 // This class waits for completion of a stream response from the service worker.
@@ -475,16 +481,22 @@ bool ServiceWorkerMainResourceLoader::MaybeStartAutoPreload(
     scoped_refptr<ServiceWorkerContextWrapper> context,
     scoped_refptr<ServiceWorkerVersion> version) {
   if (!base::FeatureList::IsEnabled(features::kServiceWorkerAutoPreload)) {
+    RecordAutoPreloadDispatchResult(
+        ServiceWorkerAutoPreloadDispatchResult::kFeatureDisabled);
     return false;
   }
 
   if (!GetContentClient()->browser()->IsServiceWorkerAutoPreloadAllowed(
           context->browser_context())) {
+    RecordAutoPreloadDispatchResult(
+        ServiceWorkerAutoPreloadDispatchResult::kNotAllowedByBrowser);
     return false;
   }
 
   // AutoPreload is triggered only in a main frame.
   if (!resource_request_.is_outermost_main_frame) {
+    RecordAutoPreloadDispatchResult(
+        ServiceWorkerAutoPreloadDispatchResult::kNotOutermostMainFrame);
     return false;
   }
 
@@ -493,6 +505,8 @@ bool ServiceWorkerMainResourceLoader::MaybeStartAutoPreload(
   if (base::FeatureList::IsEnabled(
           features::kOptimizeWebRequestProxyForServiceWorkerAutoPreload) &&
       context->storage_partition()->is_guest()) {
+    RecordAutoPreloadDispatchResult(
+        ServiceWorkerAutoPreloadDispatchResult::kGuestStoragePartition);
     return false;
   }
 
@@ -502,6 +516,8 @@ bool ServiceWorkerMainResourceLoader::MaybeStartAutoPreload(
   // `OnErrorOccurred()`, while that is not actually an error.
   if (GetContentClient()->browser()->HasWebRequestAPIProxy(
           context->browser_context())) {
+    RecordAutoPreloadDispatchResult(
+        ServiceWorkerAutoPreloadDispatchResult::kWebRequestAPIProxy);
     return false;
   }
 
@@ -519,6 +535,11 @@ bool ServiceWorkerMainResourceLoader::MaybeStartAutoPreload(
     // handler result is fallback. The fallback case is handled after
     // receiving the fetch handler result.
     SetCommitResponsibility(FetchResponseFrom::kServiceWorker);
+    RecordAutoPreloadDispatchResult(
+        ServiceWorkerAutoPreloadDispatchResult::kDispatched);
+  } else {
+    RecordAutoPreloadDispatchResult(
+        ServiceWorkerAutoPreloadDispatchResult::kStartFailed);
   }
 
   return result;

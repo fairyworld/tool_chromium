@@ -25334,6 +25334,20 @@ Called by update_net_error_codes.py.-->
   <int value="2" label="Success with suggestions"/>
 </enum>
 
+<!-- LINT.IfChange(ServiceWorkerAutoPreloadDispatchResult) -->
+
+<enum name="ServiceWorkerAutoPreloadDispatchResult">
+  <int value="0" label="Dispatched"/>
+  <int value="1" label="FeatureDisabled"/>
+  <int value="2" label="NotAllowedByBrowser"/>
+  <int value="3" label="NotOutermostMainFrame"/>
+  <int value="4" label="GuestStoragePartition"/>
+  <int value="5" label="WebRequestAPIProxy"/>
+  <int value="6" label="StartFailed"/>
+</enum>
+
+<!-- LINT.ThenChange(/content/browser/service_worker/service_worker_metrics.h:ServiceWorkerAutoPreloadDispatchResult) -->
+
 <enum name="ServiceWorkerEventStatus">
   <int value="0" label="Completed"/>
   <int value="1" label="Rejected"/>
