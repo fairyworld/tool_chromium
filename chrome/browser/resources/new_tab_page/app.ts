@@ -478,8 +478,6 @@ export class AppElement extends AppElementBase {
       GlifAnimationState.INELIGIBLE;
   protected accessor undoToastCallback_: (() => void)|null = null;
   protected accessor undoToastMessage_: string|null = null;
-  protected showContextMenuDescription_: boolean =
-      loadTimeData.getBoolean('composeboxShowContextMenuDescription');
   protected accessor enableThreadsRail_: boolean =
       loadTimeData.getBoolean('enableThreadsRail');
   protected accessor useNtpComposeboxFork_: boolean =

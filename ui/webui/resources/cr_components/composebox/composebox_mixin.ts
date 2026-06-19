@@ -194,7 +194,7 @@ export const ComposeboxEmbedderMixin =
         accessor smartTabSharingActive: boolean = false;
         accessor smartTabSharingVisible: boolean = false;
         contextMenuDescriptionEnabled: boolean =
-            loadTimeData.getBoolean('composeboxShowContextMenuDescription');
+            getLoadTimeBoolean('composeboxShowContextMenuDescription', false);
         accessor showContextMenuDescription: boolean =
             this.contextMenuDescriptionEnabled;
         accessor shouldShowGhostFiles: boolean = false;
