@@ -981,6 +981,7 @@ source_set("extensions") {
       "//chrome/browser/ui/window_sizer",
       "//chrome/browser/ui/zoom",
       "//chrome/browser/webauthn",
+      "//components/password_manager/core/browser/form_parsing",
       "//components/services/app_service",
 
       # Only for allow_circular_includes_from
