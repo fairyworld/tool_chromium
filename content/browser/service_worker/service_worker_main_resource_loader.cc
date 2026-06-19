@@ -505,27 +505,7 @@ bool ServiceWorkerMainResourceLoader::MaybeStartAutoPreload(
     return false;
   }
 
-  // Hosts to disable AutoPreload feature. This mechanism is needed to address
-  // the case when the AutoPreload behavior is problematic for some websites and
-  // those should be opted out from the feature.
-  const static base::NoDestructor<base::flat_set<std::string>> blocked_hosts(
-      base::SplitString(
-          base::GetFieldTrialParamValueByFeature(
-              features::kServiceWorkerAutoPreload, "blocked_hosts"),
-          ",", base::TRIM_WHITESPACE, base::SPLIT_WANT_NONEMPTY));
-  if (blocked_hosts->contains(resource_request_.url.GetHost())) {
-    return false;
-  }
-
-  // If |enable_only_when_service_worker_not_running| is true, preload requests
-  // are dispatched only when the ServiceWorker is not running. When it's
-  // running, preload requests for both main resource and subresources are not
-  // dispatched.
-  if (base::GetFieldTrialParamByFeatureAsBool(
-          features::kServiceWorkerAutoPreload,
-          "enable_only_when_service_worker_not_running",
-          /*default_value=*/true) &&
-      version->running_status() == blink::EmbeddedWorkerStatus::kRunning) {
+  if (version->running_status() == blink::EmbeddedWorkerStatus::kRunning) {
     return false;
   }
 
@@ -567,7 +547,6 @@ bool ServiceWorkerMainResourceLoader::StartRaceNetworkRequest(
   if (!service_worker_client_) {
     return false;
   }
-
   // Create URLLoader related assets to handle the request triggered by
   // RaceNetworkRequset.
   mojo::PendingRemote<network::mojom::URLLoaderClient> forwarding_client;
