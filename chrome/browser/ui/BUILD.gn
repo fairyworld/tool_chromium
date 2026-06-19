@@ -1078,10 +1078,6 @@ static_library("ui") {
       # data_sharing_utils.h) that can't be split out yet.
       "//chrome/browser/ui/webui/data_sharing:impl",
 
-      # discards includes headers from //chrome/browser/ui (e.g.
-      # favicon_source.h) that can't be split out yet.
-      "//chrome/browser/ui/webui/discards",
-
       # downloads includes headers from //chrome/browser/ui (e.g.
       # browser_window.h, chrome_pages.h) that can't be split out yet.
       "//chrome/browser/ui/webui/downloads",
@@ -1106,10 +1102,6 @@ static_library("ui") {
 
   if (is_desktop_android) {
     allow_circular_includes_from += [
-      # discards includes headers from //chrome/browser/ui (e.g.
-      # favicon_source.h) that can't be split out yet.
-      "//chrome/browser/ui/webui/discards",
-
       # management includes headers from //chrome/browser/ui (e.g. managed_ui.h)
       # that can't be split out yet.
       "//chrome/browser/ui/webui/management",
@@ -1201,7 +1193,7 @@ static_library("ui") {
     "//chrome/browser/net:impl",
     "//chrome/browser/performance_manager:impl",
 
-    # TODO(crbug.com/360599255): Remove this circular dependency.
+    # TODO(crbug.com/360599255): popunder_preventer.cc includes browser.h
     "//chrome/browser/ui/blocked_content:impl",
 
     "//chrome/browser/picture_in_picture:impl",
@@ -1287,12 +1279,6 @@ static_library("ui") {
       "//chrome/browser/ui/webui/webui_gallery",
       "//chrome/browser/ui/zoom:browser_window_zoom_observer",
     ]
-
-    # TODO(crbug.com/353332589): Remove this circular include when
-    # webui_gallery_ui.cc can depend on a modular target that includes
-    # favicon_source.h instead of depending on //chrome/browser/ui:ui.
-    allow_circular_includes_from +=
-        [ "//chrome/browser/ui/webui/webui_gallery" ]
   }
 
   if (!is_android || enable_webui_ntp) {
@@ -2083,7 +2069,7 @@ static_library("ui") {
       # chrome_pages.h, etc. from //chrome/browser/ui:ui.
       "//chrome/browser/ui/webui/browser_command",
 
-      # inspect_ui.cc includes browser.h, singleton_tabs.h, theme_source.h.
+      # inspect_ui.cc includes browser.h, singleton_tabs.h.
       "//chrome/browser/ui/webui/inspect",
 
       # cast_feedback_ui.cc includes metrics_handler.h from
@@ -2205,7 +2191,7 @@ static_library("ui") {
       # TODO(crbug.com/438226511): Remove this circular dependency when the
       # following headers get componentized:
       # - c/b/ui/browser.h, browser_window.h, browser_window_state.h,
-      #   browser_commands.h, chrome_pages.h, intent_picker_tab_helper.h,
+      #   browser_commands.h, chrome_pages.h,
       #   browser_tabstrip.h, intent_picker_tab_helper.h.
       "//chrome/browser/ui/web_applications:impl",
 
@@ -2220,10 +2206,6 @@ static_library("ui") {
       # hid's :impl includes //chrome/browser/ui/dialogs/browser_dialogs.h, and
       # //chrome/browser/ui/chrome_pages.h from //chrome/browser/ui.
       "//chrome/browser/hid:impl",
-
-      # new_tab_page_third_party includes favicon_source.h, theme_source.h, and
-      # most_visited_handler.h from //chrome/browser/ui.
-      "//chrome/browser/ui/webui/new_tab_page_third_party:impl",
 
       # ntp and ntp_resource_cache include browser_window.h and
       # layout_constants.h from //chrome/browser/ui.
@@ -2329,7 +2311,7 @@ static_library("ui") {
 
       # new_tab_page and new_tab_page:impl files include headers from
       # //chrome/browser/ui:ui that haven't been extracted yet (e.g.
-      # action_chips_handler.h, favicon_source.h, theme_source.h).
+      # action_chips_handler.h).
       "//chrome/browser/ui/webui/new_tab_page",
       "//chrome/browser/ui/webui/new_tab_page:impl",
     ]
@@ -5080,7 +5062,6 @@ static_library("ui") {
       # c/b/ui/views/frame/browser_view.h
       # c/b/ui/views/omnibox/omnibox_view_views.h
       # c/b/ui/webui/new_tab_page/new_tab_page_ui.h
-      # c/b/ui/webui/new_tab_page_third_party/new_tab_page_third_party_ui.h
       # c/b/ui/webui/ntp/new_tab_ui.h
       "//chrome/browser/ui/views/page_action:impl",
 
