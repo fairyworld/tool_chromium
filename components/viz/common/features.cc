@@ -255,6 +255,7 @@ const base::FeatureParam<int>
 // If enabled, DisplayScheduler will attempt to select a future deadline if the
 // preferred deadline is not achievable.
 BASE_FEATURE(kSelectFutureFrameDeadline, base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kAllowMultipleSwapsPerVsync, base::FEATURE_DISABLED_BY_DEFAULT);
 
 #if BUILDFLAG(IS_ANDROID)
 // If enabled, DisplayScheduler will use a custom FrameDeadlineDecider to
