@@ -9,7 +9,7 @@ import type {InkTextAnnotationsElement} from './ink_text_annotations.js';
 export function getHtml(this: InkTextAnnotationsElement) {
   // clang-format off
   return html`<!--_html_template_start_-->
-<div id="container" role="list" aria-label="Text Annotations">
+<div id="container" role="list" aria-label="$i18n{ink2TextAnnotationsAxLabel}">
   ${this.annotations_.map((annotation, index) => html`
     <div class="placeholder"
         data-index="${index}"

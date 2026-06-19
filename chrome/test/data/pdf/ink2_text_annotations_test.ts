@@ -5,6 +5,7 @@
 import type {InkTextAnnotationsElement, TextAnnotationMessageData, Viewport} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
 import {DEFAULT_TEXTBOX_WIDTH, Ink2Manager, PdfViewerPrivateProxyImpl, TextBoxState, TextStyle} from 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai/pdf_viewer_wrapper.js';
 import {assert} from 'chrome://resources/js/assert.js';
+import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {eventToPromise, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 import {assertPositionAndSize, dragHandle, verifyFinishTextAnnotationMessage} from './ink2_text_box_test_utils.js';
@@ -107,7 +108,8 @@ chrome.test.runTests([
     assert(container);
     chrome.test.assertEq('list', container.getAttribute('role'));
     chrome.test.assertEq(
-        'Text Annotations', container.getAttribute('aria-label'));
+        loadTimeData.getString('ink2TextAnnotationsAxLabel'),
+        container.getAttribute('aria-label'));
 
     // Verify A11y attributes on placeholders
     chrome.test.assertEq('listitem', placeholders[0]!.getAttribute('role'));
