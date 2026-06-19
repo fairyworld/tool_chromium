@@ -1199,7 +1199,6 @@ public class TabListMediatorUnitTest {
     @Test
     public void sendsMoveTabSignalCorrectlyWithGroup() {
         TabGridItemTouchHelperCallback itemTouchHelperCallback = getItemTouchHelperCallback();
-        itemTouchHelperCallback.setLayoutTypeForTesting(TabListLayoutType.GROUPED);
 
         itemTouchHelperCallback.onMove(mRecyclerView, mViewHolder1, mViewHolder2);
 
@@ -1218,7 +1217,6 @@ public class TabListMediatorUnitTest {
     @Test
     public void sendsMergeTabSignalCorrectly() {
         TabGridItemTouchHelperCallback itemTouchHelperCallback = getItemTouchHelperCallback();
-        itemTouchHelperCallback.setLayoutTypeForTesting(TabListLayoutType.GROUPED);
         itemTouchHelperCallback.setHoveredTabIndexForTesting(POSITION1);
         itemTouchHelperCallback.setSelectedTabIndexForTesting(POSITION2);
         itemTouchHelperCallback.getMovementFlags(mRecyclerView, mFakeViewHolder1);
@@ -1255,7 +1253,6 @@ public class TabListMediatorUnitTest {
 
         // Merge 2 to 1.
         TabGridItemTouchHelperCallback itemTouchHelperCallback = getItemTouchHelperCallback();
-        itemTouchHelperCallback.setLayoutTypeForTesting(TabListLayoutType.GROUPED);
         itemTouchHelperCallback.setHoveredTabIndexForTesting(POSITION1);
         itemTouchHelperCallback.setSelectedTabIndexForTesting(POSITION2);
         itemTouchHelperCallback.getMovementFlags(mRecyclerView, mFakeViewHolder1);
@@ -1324,8 +1321,8 @@ public class TabListMediatorUnitTest {
 
     @Test
     public void sendsUngroupSignalCorrectly() {
+        setUpTabListMediator(TabListMediatorType.TAB_GRID_DIALOG, TabListMode.GRID);
         TabGridItemTouchHelperCallback itemTouchHelperCallback = getItemTouchHelperCallback();
-        itemTouchHelperCallback.setLayoutTypeForTesting(TabListLayoutType.FLAT);
         itemTouchHelperCallback.setUnGroupTabIndexForTesting(POSITION1);
         itemTouchHelperCallback.getMovementFlags(mRecyclerView, mFakeViewHolder1);
 

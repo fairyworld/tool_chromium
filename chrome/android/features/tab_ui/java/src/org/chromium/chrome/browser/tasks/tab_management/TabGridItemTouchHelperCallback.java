@@ -72,10 +72,10 @@ public class TabGridItemTouchHelperCallback extends TabListItemTouchHelperCallba
     private final @Nullable TabGridDialogHandler mTabGridDialogHandler;
     private final int mLongPressDpThresholdSquared;
     private final TabGroupCreationDialogManager mTabGroupCreationDialogManager;
+    private final @TabListLayoutType int mLayoutType;
     private float mSwipeToDismissThreshold;
     private float mMergeThreshold;
     private float mUngroupThreshold;
-    private @TabListLayoutType int mLayoutType;
     private boolean mIsSwipingToDismiss;
     private int mDragFlags;
     private int mHoveredTabIndex = TabModel.INVALID_TAB_INDEX;
@@ -706,12 +706,6 @@ public class TabGridItemTouchHelperCallback extends TabListItemTouchHelperCallba
         }
 
         return true;
-    }
-
-    void setLayoutTypeForTesting(@TabListLayoutType int layoutType) {
-        var oldValue = mLayoutType;
-        mLayoutType = layoutType;
-        ResettersForTesting.register(() -> mLayoutType = oldValue);
     }
 
     void setHoveredTabIndexForTesting(int index) {
