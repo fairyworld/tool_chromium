@@ -5,7 +5,15 @@
 // <if expr="is_ios">
 import 'chrome://resources/js/ios/web_ui.js';
 // </if>
-
+// clang-format off
+// <if expr="not is_ios">
+import 'chrome://resources/cr_elements/cr_toast/cr_toast.js';
+import 'chrome://resources/cr_elements/cr_tooltip/cr_tooltip.js';
+import 'chrome://resources/cr_elements/cr_icon_button/cr_icon_button.js';
+import 'chrome://resources/cr_elements/icons.html.js';
+import './icons.html.js';
+// </if>
+// clang-format on
 import 'chrome://resources/cr_elements/cr_button/cr_button.js';
 import 'chrome://resources/cr_elements/cr_tabs/cr_tabs.js';
 import '/strings.m.js';
@@ -19,12 +27,24 @@ import {PromiseResolver} from 'chrome://resources/js/promise_resolver.js';
 import {getDeepActiveElement} from 'chrome://resources/js/util.js';
 import {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 import type {PropertyValues} from 'chrome://resources/lit/v3_0/lit.rollup.js';
+// clang-format off
+// <if expr="not is_ios">
+import type {CrToastElement} from 'chrome://resources/cr_elements/cr_toast/cr_toast.js';
+// </if>
+// clang-format on
+
 
 import {getCss} from './app.css.js';
 import {getHtml} from './app.html.js';
 import type {ExperimentElement as FlagsExperimentElement} from './experiment.js';
 import type {ExperimentalFeaturesData, Feature} from './flags_browser_proxy.js';
 import {FlagsBrowserProxyImpl} from './flags_browser_proxy.js';
+// clang-format off
+// <if expr="not is_ios">
+import {ImportExportFileProxyImpl} from './import_export_file_proxy.js';
+// </if>
+// clang-format on
+
 
 
 /**
@@ -138,8 +158,15 @@ export class FlagsAppElement extends CrLitElement {
         type: Boolean,
       },
 
+      importError: {
+        type: String,
+      },
+
       tabNames_: {type: Array},
       selectedTabIndex_: {type: Number},
+      // <if expr="not is_ios">
+      isImportExportEnabled_: {type: Boolean},
+      // </if>
     };
   }
 
@@ -159,6 +186,9 @@ export class FlagsAppElement extends CrLitElement {
     needsRestart: false,
     showBetaChannelPromotion: false,
     showDevChannelPromotion: false,
+    // <if expr="not is_ios">
+    importExportEnabled: false,
+    // </if>
     // <if expr="is_chromeos">
     showOwnerWarning: false,
     // </if>
@@ -168,6 +198,7 @@ export class FlagsAppElement extends CrLitElement {
   protected accessor nonDefaultFeatures: Feature[] = [];
   protected accessor searching: boolean = false;
   protected accessor needsRestart: boolean = false;
+  protected accessor importError: string = '';
 
   private announceStatusDelayMs: number = 100;
   private featuresResolver: PromiseResolver<void> = new PromiseResolver();
@@ -510,6 +541,75 @@ export class FlagsAppElement extends CrLitElement {
     this.clearSearch();
   }
 
+  // <if expr="not is_ios">
+  protected async onExportClick_() {
+    const data = await FlagsBrowserProxyImpl.getInstance().exportFlags();
+    const content = JSON.stringify(data, null, 2);
+    const blob = new Blob([content], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'flags.json';
+    ImportExportFileProxyImpl.getInstance().downloadFile(a);
+
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 0);
+  }
+
+  protected async onImportFileChange_(e: Event) {
+    const input = e.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+    const file = input.files[0]!;
+    input.value = '';
+
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+
+      if (!data || typeof data !== 'object' || Array.isArray(data)) {
+        throw new Error();
+      }
+
+      const allowedKeys = ['enabled_flags', 'customized_flags'];
+      const keys = Object.keys(data);
+      if (keys.length === 0 || keys.some(k => !allowedKeys.includes(k))) {
+        throw new Error();
+      }
+
+      if ('enabled_flags' in data && !Array.isArray(data.enabled_flags)) {
+        throw new Error();
+      }
+
+      if ('customized_flags' in data &&
+          (typeof data.customized_flags !== 'object' ||
+           data.customized_flags === null ||
+           Array.isArray(data.customized_flags))) {
+        throw new Error();
+      }
+
+      this.importError = '';
+      FlagsBrowserProxyImpl.getInstance().resetAllFlags();
+      await FlagsBrowserProxyImpl.getInstance().importFlags(data);
+      this.needsRestart = true;
+      this.announceStatus('Flags imported successfully.');
+      await this.requestExperimentalFeaturesData();
+      await this.updateComplete;
+    } catch {
+      this.rejectImport_('Invalid file format.');
+    }
+  }
+
+  private rejectImport_(msg: string) {
+    this.importError = msg;
+    this.announceStatus(msg);
+    console.error(msg);
+    this.getRequiredElement<CrToastElement>('#errorToast').show();
+  }
+  // </if>
+
   protected onSearchInput_() {
     assert(this.flagSearch);
     this.flagSearch.debounceSearch();
@@ -573,6 +673,11 @@ export class FlagsAppElement extends CrLitElement {
     return this.data.showBetaChannelPromotion ||
         this.data.showDevChannelPromotion;
   }
+
+  // <if expr="not is_ios">
+  protected accessor isImportExportEnabled_: boolean =
+      loadTimeData.getBoolean('importExportEnabled');
+  // </if>
 
   protected onTabsSelectedChanged_(e: CustomEvent<{value: number}>) {
     this.selectedTabIndex_ = e.detail.value;
