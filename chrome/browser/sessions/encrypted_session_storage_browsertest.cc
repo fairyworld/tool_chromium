@@ -74,6 +74,7 @@
 #include "net/dns/mock_host_resolver.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "ui/base/ozone_buildflags.h"
 
 namespace sessions {
 
@@ -751,7 +752,13 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreAcrossStagesTest, PRE_Restore) {
   AssertCommandStorageBackendFilesExist(SessionType::kSessionRestore);
 }
 
-IN_PROC_BROWSER_TEST_F(SessionRestoreAcrossStagesTest, Restore) {
+// TODO(crbug.com/525638651): Re-enable this test on Linux Wayland.
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(SUPPORTS_OZONE_WAYLAND)
+#define MAYBE_Restore DISABLED_Restore
+#else
+#define MAYBE_Restore Restore
+#endif
+IN_PROC_BROWSER_TEST_F(SessionRestoreAcrossStagesTest, MAYBE_Restore) {
   AssertSessionState();
 }
 
