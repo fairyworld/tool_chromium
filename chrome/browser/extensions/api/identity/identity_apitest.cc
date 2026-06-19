@@ -458,6 +458,7 @@ class FakeGetAuthTokenFunction : public IdentityGetAuthTokenFunction {
   }
 #endif
 
+#if !BUILDFLAG(IS_CHROMEOS)
   // Fix auth error on secondary account or add a new account.
   void FixOrAddSecondaryAccount() {
     signin::IdentityManager* identity_manager =
@@ -520,6 +521,7 @@ class FakeGetAuthTokenFunction : public IdentityGetAuthTokenFunction {
       SigninFailed();
     }
   }
+#endif
 
   void ShowRemoteConsentDialog(
       const RemoteConsentResolutionData& resolution_data) override {
