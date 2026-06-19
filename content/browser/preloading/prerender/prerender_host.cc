@@ -523,20 +523,38 @@ PrerenderHost::PrerenderHost(
             : SiteInstanceImpl::Create(web_contents.GetBrowserContext());
 
     // TODO(https://crbug.com/524800804): Add the following restrictions:
-    // 1. Limit to prerender-until-script for now.
-    // 2. For moderate eagerness only
-    // 3. Disallow Target_hint = 'blank' to use the same process.
-    // 4. Disallow cross-site prerendering to reuse the process.
+    // 1. For moderate eagerness only
+    // 2. Disallow Target_hint = 'blank' to use the same process.
+    // 3. Disallow cross-site prerendering to reuse the process.
     if (!attributes.IsBrowserInitiated() &&
         attributes.initiator_frame_token.has_value() &&
         base::FeatureList::IsEnabled(
             features::kPrerender2ReuseInitiatorProcess)) {
-      RenderFrameHostImpl* initiator_rfh = RenderFrameHostImpl::FromFrameToken(
-          attributes.initiator_process_id,
-          attributes.initiator_frame_token.value());
-      if (initiator_rfh) {
-        site_instance->ReuseExistingProcessIfPossible(
-            initiator_rfh->GetProcess());
+      std::string allowed_action =
+          features::kPrerender2ReuseInitiatorProcessActionType.Get();
+
+      bool action_matches = false;
+      if (allowed_action == "all") {
+        action_matches = true;
+      } else if (allowed_action == "prerender" &&
+                 attributes.prerender_action_type ==
+                     blink::mojom::SpeculationAction::kPrerender) {
+        action_matches = true;
+      } else if (allowed_action == "prerender-until-script" &&
+                 attributes.prerender_action_type ==
+                     blink::mojom::SpeculationAction::kPrerenderUntilScript) {
+        action_matches = true;
+      }
+
+      if (action_matches) {
+        RenderFrameHostImpl* initiator_rfh =
+            RenderFrameHostImpl::FromFrameToken(
+                attributes.initiator_process_id,
+                attributes.initiator_frame_token.value());
+        if (initiator_rfh) {
+          site_instance->ReuseExistingProcessIfPossible(
+              initiator_rfh->GetProcess());
+        }
       }
     }
 

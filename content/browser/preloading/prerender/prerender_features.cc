@@ -90,6 +90,10 @@ BASE_FEATURE(kPrerenderUntilScriptUpgrade, base::FEATURE_DISABLED_BY_DEFAULT);
 
 BASE_FEATURE(kPrerender2ReuseInitiatorProcess,
              base::FEATURE_DISABLED_BY_DEFAULT);
+const base::FeatureParam<std::string>
+    kPrerender2ReuseInitiatorProcessActionType{
+        &kPrerender2ReuseInitiatorProcess, "prerender_action_type",
+        "prerender-until-script"};
 
 bool UsePrefetchPrerenderIntegration() {
   return base::FeatureList::IsEnabled(

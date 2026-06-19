@@ -19042,20 +19042,94 @@ namespace {
 class ReuseInitiatorProcessTest : public PrerenderBrowserTest {
  public:
   ReuseInitiatorProcessTest() {
-    feature_list_.InitAndEnableFeature(
-        features::kPrerender2ReuseInitiatorProcess);
+    feature_list_.InitWithFeaturesAndParameters(
+        {{features::kPrerender2ReuseInitiatorProcess,
+          {{"prerender_action_type", "prerender-until-script"}}},
+         {blink::features::kPrerenderUntilScript, {}},
+         {features::kPrerenderUntilScriptUpgrade, {}}},
+        {});
   }
 
  private:
   base::test::ScopedFeatureList feature_list_;
 };
 
-// Tests that same-origin prerendering can reuse the initiator's renderer
-// process.
+// Tests that a same-origin prerender-until-script reuses the initiator's
+// process when the feature is enabled and configured for this action type.
 IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessTest,
-                       SameOriginPrerenderReusesProcess) {
+                       SameOriginPrerenderUntilScriptReusesProcess) {
   GURL url = GetUrl("/empty.html");
   GURL prerender_url = GetUrl("/title1.html");
+
+  // 1. Navigate to the initiator page.
+  ASSERT_TRUE(NavigateToURL(shell(), url));
+  RenderFrameHost* initiator_rfh = current_frame_host();
+  ChildProcessId initiator_process_id = initiator_rfh->GetProcess()->GetID();
+
+  // 2. Start a same-origin prerender-until-script.
+  test::PrerenderHostCreationWaiter waiter;
+  prerender_helper()->AddPrerenderUntilScriptAsync(
+      prerender_url, blink::mojom::SpeculationEagerness::kImmediate);
+  PrerenderHostId host_id = waiter.Wait();
+  ASSERT_TRUE(host_id);
+
+  // 3. Verify the prerender process ID matches the initiator's process ID.
+  RenderFrameHost* prerender_rfh = GetPrerenderedMainFrameHost(host_id);
+  ChildProcessId prerender_process_id = prerender_rfh->GetProcess()->GetID();
+  EXPECT_EQ(initiator_process_id, prerender_process_id);
+
+  // 4. Verify that they are NOT in the same BrowsingInstance.
+  EXPECT_FALSE(initiator_rfh->GetSiteInstance()->IsRelatedSiteInstance(
+      prerender_rfh->GetSiteInstance()));
+
+  // 5. Activate the prerendered page and ensure it still works.
+  NavigatePrimaryPage(prerender_url);
+  EXPECT_EQ(web_contents()->GetLastCommittedURL(), prerender_url);
+  EXPECT_EQ(current_frame_host()->GetProcess()->GetID(), initiator_process_id);
+}
+
+// Tests that a regular prerender DOES NOT reuse the process if the feature
+// is limited to prerender-until-script.
+IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessTest,
+                       RegularPrerenderDoesNotReuseProcess) {
+  GURL url = GetUrl("/empty.html");
+  GURL prerender_url = GetUrl("/title1.html");
+
+  // 1. Navigate to the initiator page.
+  ASSERT_TRUE(NavigateToURL(shell(), url));
+  RenderFrameHost* initiator_rfh = current_frame_host();
+  ChildProcessId initiator_process_id = initiator_rfh->GetProcess()->GetID();
+
+  // 2. Start a regular same-origin prerender.
+  PrerenderHostId host_id = AddPrerender(prerender_url);
+  ASSERT_TRUE(host_id);
+
+  // 3. Verify the prerender process ID DOES NOT match the initiator's process
+  // ID, because the action type (prerender) does not match the allowed
+  // action (prerender-until-script).
+  RenderFrameHost* prerender_rfh = GetPrerenderedMainFrameHost(host_id);
+  ChildProcessId prerender_process_id = prerender_rfh->GetProcess()->GetID();
+  EXPECT_NE(initiator_process_id, prerender_process_id);
+}
+
+class ReuseInitiatorProcessAllActionsTest : public PrerenderBrowserTest {
+ public:
+  ReuseInitiatorProcessAllActionsTest() {
+    feature_list_.InitAndEnableFeatureWithParameters(
+        features::kPrerender2ReuseInitiatorProcess,
+        {{"prerender_action_type", "all"}});
+  }
+
+ private:
+  base::test::ScopedFeatureList feature_list_;
+};
+
+// Tests that a regular prerender CAN reuse the process if configured to allow
+// all actions.
+IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessAllActionsTest,
+                       RegularPrerenderCanReuseProcess) {
+  GURL url = ssl_server().GetURL("a.test", "/empty.html");
+  GURL prerender_url = ssl_server().GetURL("a.test", "/title1.html");
 
   // 1. Navigate to the initiator page.
   ASSERT_TRUE(NavigateToURL(shell(), url));
@@ -19069,17 +19143,7 @@ IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessTest,
   // 3. Verify the prerender process ID matches the initiator's process ID.
   RenderFrameHost* prerender_rfh = GetPrerenderedMainFrameHost(host_id);
   ChildProcessId prerender_process_id = prerender_rfh->GetProcess()->GetID();
-
   EXPECT_EQ(initiator_process_id, prerender_process_id);
-
-  // 4. Verify that they are NOT in the same BrowsingInstance.
-  EXPECT_FALSE(initiator_rfh->GetSiteInstance()->IsRelatedSiteInstance(
-      prerender_rfh->GetSiteInstance()));
-
-  // 5. Activate the prerendered page and ensure it still works.
-  NavigatePrimaryPage(prerender_url);
-  EXPECT_EQ(web_contents()->GetLastCommittedURL(), prerender_url);
-  EXPECT_EQ(current_frame_host()->GetProcess()->GetID(), initiator_process_id);
 }
 
 IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessTest,
@@ -19093,8 +19157,11 @@ IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessTest,
       static_cast<RenderFrameHostImpl*>(current_frame_host());
   ChildProcessId initiator_process_id = initiator_rfh->GetProcess()->GetID();
 
-  // 2. Start a same-origin prerender.
-  PrerenderHostId host_id = AddPrerender(prerender_url);
+  // 2. Start a same-origin prerender-until-script.
+  test::PrerenderHostCreationWaiter waiter;
+  prerender_helper()->AddPrerenderUntilScriptAsync(
+      prerender_url, blink::mojom::SpeculationEagerness::kImmediate);
+  PrerenderHostId host_id = waiter.Wait();
   ASSERT_TRUE(host_id);
 
   // 3. Verify the prerender process ID matches the initiator's process ID.
