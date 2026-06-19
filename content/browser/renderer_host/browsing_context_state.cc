@@ -130,8 +130,9 @@ RenderFrameProxyHost* BrowsingContextState::CreateRenderFrameProxyHost(
   if (features::GetBrowsingContextMode() ==
       features::BrowsingContextStateImplementationType::
           kLegacyOneToOneWithFrameTreeNode) {
-    DCHECK_EQ(this,
-              frame_tree_node->current_frame_host()->browsing_context_state());
+    CHECK_EQ(this,
+             frame_tree_node->current_frame_host()->browsing_context_state(),
+             base::NotFatalUntil::M152);
   }
 
   if (features::GetBrowsingContextMode() ==
@@ -242,16 +243,17 @@ void BrowsingContextState::SetFrameName(const std::string& name,
                                         const std::string& unique_name) {
   if (name == replication_state_->name) {
     // |unique_name| shouldn't change unless |name| changes.
-    DCHECK_EQ(unique_name, replication_state_->unique_name);
+    CHECK_EQ(unique_name, replication_state_->unique_name,
+             base::NotFatalUntil::M152);
     return;
   }
 
   if (parent_) {
     // Non-main frames should have a non-empty unique name.
-    DCHECK(!unique_name.empty());
+    CHECK(!unique_name.empty(), base::NotFatalUntil::M152);
   } else {
     // Unique name of main frames should always stay empty.
-    DCHECK(unique_name.empty());
+    CHECK(unique_name.empty(), base::NotFatalUntil::M152);
   }
 
   // Note the unique name should only be able to change before the first real
@@ -316,8 +318,9 @@ void BrowsingContextState::SetInsecureRequestPolicy(
 
 void BrowsingContextState::SetInsecureNavigationsSet(
     const std::vector<uint32_t>& insecure_navigations_set) {
-  DCHECK(std::is_sorted(insecure_navigations_set.begin(),
-                        insecure_navigations_set.end()));
+  CHECK(std::is_sorted(insecure_navigations_set.begin(),
+                       insecure_navigations_set.end()),
+        base::NotFatalUntil::M152);
   if (insecure_navigations_set == replication_state_->insecure_navigations_set)
     return;
   {

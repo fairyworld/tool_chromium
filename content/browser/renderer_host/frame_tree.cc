@@ -401,11 +401,12 @@ FrameTreeNode* FrameTree::AddFrame(
   // is invalid. Also its RenderFrameHostImpl is exempt from having
   // `RenderFrameCreated()` called on it (see later in this method, as well as
   // `WebContentsObserverConsistencyChecker::RenderFrameHostChanged()`).
-  DCHECK_NE(frame_remote.is_valid(), is_dummy_frame_for_inner_tree);
-  DCHECK_NE(browser_interface_broker_receiver.is_valid(),
-            is_dummy_frame_for_inner_tree);
-  DCHECK_NE(associated_interface_provider_receiver.is_valid(),
-            is_dummy_frame_for_inner_tree);
+  CHECK_NE(frame_remote.is_valid(), is_dummy_frame_for_inner_tree,
+           base::NotFatalUntil::M152);
+  CHECK_NE(browser_interface_broker_receiver.is_valid(),
+           is_dummy_frame_for_inner_tree, base::NotFatalUntil::M152);
+  CHECK_NE(associated_interface_provider_receiver.is_valid(),
+           is_dummy_frame_for_inner_tree, base::NotFatalUntil::M152);
 
   // A child frame always starts with an initial empty document, which means
   // it is in the same SiteInstance as the parent frame. Ensure that the process
@@ -690,7 +691,8 @@ scoped_refptr<RenderViewHostImpl> FrameTree::CreateRenderViewHost(
     CreateRenderViewHostCase create_case,
     std::optional<viz::FrameSinkId> frame_sink_id) {
   if (main_browsing_context_state) {
-    DCHECK(main_browsing_context_state->is_main_frame());
+    CHECK(main_browsing_context_state->is_main_frame(),
+          base::NotFatalUntil::M152);
   }
   RenderViewHostImpl* rvh =
       static_cast<RenderViewHostImpl*>(RenderViewHostFactory::Create(
@@ -978,7 +980,8 @@ void FrameTree::Init(SiteInstanceImpl* main_frame_site_instance,
   // Note that the origin of the new frame might depend on sandbox flags.
   // Checking sandbox flags of the new frame should be safe at this point,
   // because the flags should be already inherited when creating the root node.
-  DCHECK(!renderer_initiated_creation || opener_for_origin);
+  CHECK(!renderer_initiated_creation || opener_for_origin,
+        base::NotFatalUntil::M152);
   root_.current_frame_host()->SetOriginDependentStateOfNewFrame(
       renderer_initiated_creation ? opener_for_origin : nullptr);
 
@@ -1033,8 +1036,8 @@ void FrameTree::Shutdown() {
     // need to be moved along during activation replace this line with a DCHECK
     // that there are no pending delete instances.
     root_manager->ClearRFHsPendingShutdown();
-    DCHECK(!root_.navigation_request());
-    DCHECK(!root_manager->speculative_frame_host());
+    CHECK(!root_.navigation_request(), base::NotFatalUntil::M152);
+    CHECK(!root_manager->speculative_frame_host(), base::NotFatalUntil::M152);
     manager_delegate_->OnFrameTreeNodeDestroyed(&root_);
     return;
   }
