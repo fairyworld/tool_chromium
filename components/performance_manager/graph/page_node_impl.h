@@ -123,7 +123,9 @@ class PageNodeImpl
   // function can be called from any thread.
   const perfetto::NamedTrack& tracing_track() const { return tracing_track_; }
 
+  // Initializes the page type. The current type must be kUnknown.
   void SetType(PageType type);
+
   void SetIsFocused(bool is_focused);
   void SetIsVisible(bool is_visible);
   void SetIsAudible(bool is_audible);
