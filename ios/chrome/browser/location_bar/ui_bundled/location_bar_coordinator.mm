@@ -67,7 +67,6 @@
 #import "ios/chrome/browser/omnibox/coordinator/omnibox_coordinator.h"
 #import "ios/chrome/browser/omnibox/coordinator/popup/omnibox_popup_coordinator.h"
 #import "ios/chrome/browser/omnibox/model/chrome_omnibox_client_ios.h"
-#import "ios/chrome/browser/omnibox/model/omnibox_position/omnibox_position_browser_agent.h"
 #import "ios/chrome/browser/omnibox/model/placeholder_service/placeholder_service.h"
 #import "ios/chrome/browser/omnibox/model/placeholder_service/placeholder_service_factory.h"
 #import "ios/chrome/browser/omnibox/public/omnibox_presentation_context.h"
@@ -79,6 +78,8 @@
 #import "ios/chrome/browser/reader_mode/model/reader_mode_web_state_utils.h"
 #import "ios/chrome/browser/search_engines/model/template_url_service_factory.h"
 #import "ios/chrome/browser/shared/coordinator/layout_guide/layout_guide_util.h"
+#import "ios/chrome/browser/shared/coordinator/scene/scene_state.h"
+#import "ios/chrome/browser/shared/coordinator/scene/state/layout_state.h"
 #import "ios/chrome/browser/shared/model/browser/browser.h"
 #import "ios/chrome/browser/shared/model/prefs/pref_names.h"
 #import "ios/chrome/browser/shared/model/profile/profile_ios.h"
@@ -442,10 +443,7 @@ struct AIHubBadgeActiveWindowsData : public base::SupportsUserData::Data {
   self.steadyViewMediator.tracker = _tracker;
 
   if (IsFullscreenRefactoringEnabled()) {
-    if (!IsChromeNextIaEnabled()) {
-      self.mediator.omniboxPositionBrowserAgent =
-          OmniboxPositionBrowserAgent::FromBrowser(self.browser);
-    }
+    self.mediator.layoutState = self.browser->GetSceneState().layoutState;
     _fullscreenBrowserAgentObserver =
         std::make_unique<FullscreenBrowserAgentObserverBridge>(
             self.mediator, FullscreenBrowserAgent::FromBrowser(self.browser));

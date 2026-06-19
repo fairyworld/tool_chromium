@@ -1470,8 +1470,8 @@ const char kChromeAppStoreUrl[] =
   }
 
   _toolbarAccessoryPresenter = [[ToolbarAccessoryPresenter alloc]
-              initWithIsIncognito:profile->IsOffTheRecord()
-      omniboxPositionBrowserAgent:omniboxPositionBrowserAgent];
+      initWithIsIncognito:profile->IsOffTheRecord()
+              layoutState:browser->GetSceneState().layoutState];
   _toolbarAccessoryPresenter.topToolbarLayoutGuide =
       [_layoutGuideCenter makeLayoutGuideNamed:kPrimaryToolbarGuide];
   _toolbarAccessoryPresenter.bottomToolbarLayoutGuide =

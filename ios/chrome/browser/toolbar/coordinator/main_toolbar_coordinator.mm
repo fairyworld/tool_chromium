@@ -23,7 +23,6 @@
 #import "ios/chrome/browser/location_bar/ui_bundled/location_bar_coordinator.h"
 #import "ios/chrome/browser/menu/ui_bundled/browser_action_factory.h"
 #import "ios/chrome/browser/ntp/model/new_tab_page_util.h"
-#import "ios/chrome/browser/omnibox/model/omnibox_position/omnibox_position_browser_agent.h"
 #import "ios/chrome/browser/omnibox/ui/omnibox_drs_view_controller.h"
 #import "ios/chrome/browser/orchestrator/ui_bundled/omnibox_focus_orchestrator.h"
 #import "ios/chrome/browser/overlays/model/public/overlay_presentation_context.h"
@@ -220,8 +219,6 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
                    forProtocol:@protocol(ReaderModeChipCommands)];
   BOOL isToolbarAtBottom = [self isToolbarPositionBottom];
 
-  OmniboxPositionBrowserAgent::FromBrowser(self.browser)
-      ->SetIsCurrentLayoutBottomOmnibox(isToolbarAtBottom);
   [layoutState addObserver:self];
 
   if (IsChromeNextIaEnabled()) {
@@ -1358,8 +1355,6 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
   _omniboxPosition =
       isToolbarAtBottom ? ToolbarType::kSecondary : ToolbarType::kPrimary;
 
-  OmniboxPositionBrowserAgent::FromBrowser(self.browser)
-      ->SetIsCurrentLayoutBottomOmnibox(isToolbarAtBottom);
 
   if (!IsChromeNextIaEnabled()) {
     [self updateOrchestratorAnimatee];

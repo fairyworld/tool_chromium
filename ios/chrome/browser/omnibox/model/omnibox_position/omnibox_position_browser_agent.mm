@@ -28,49 +28,8 @@ const char kOmniboxSteadyStatePositionAtStartup[] =
 const char kOmniboxSteadyStatePositionAtStartupSelected[] =
     "IOS.Omnibox.SteadyStatePositionAtStartup.Selected";
 
-}  // namespace
-
-OmniboxPositionBrowserAgent::OmniboxPositionBrowserAgent(Browser* browser)
-    : BrowserUserData(browser) {
-  LogOmniboxPosition();
-}
-
-OmniboxPositionBrowserAgent::~OmniboxPositionBrowserAgent() = default;
-
-BOOL OmniboxPositionBrowserAgent::IsOmniboxFocused() const {
-  return [omnibox_state_provider_ isOmniboxFocused];
-}
-
-bool OmniboxPositionBrowserAgent::IsCurrentLayoutBottomOmnibox() {
-  return is_current_layout_bottom_omnibox_;
-}
-
-void OmniboxPositionBrowserAgent::SetIsCurrentLayoutBottomOmnibox(
-    bool is_current_layout_bottom_omnibox) {
-  if (is_current_layout_bottom_omnibox_ == is_current_layout_bottom_omnibox) {
-    return;
-  }
-  is_current_layout_bottom_omnibox_ = is_current_layout_bottom_omnibox;
-  for (OmniboxPositionBrowserAgentObserver& observer : observers_) {
-    observer.OmniboxPositionBrowserAgentHasNewBottomLayout(
-        this, is_current_layout_bottom_omnibox_);
-  }
-  for (OmniboxPositionBrowserAgentObserver& observer : observers_) {
-    observer.DidUpdatePosition(this, is_current_layout_bottom_omnibox_);
-  }
-}
-
-void OmniboxPositionBrowserAgent::AddObserver(
-    OmniboxPositionBrowserAgentObserver* observer) {
-  observers_.AddObserver(observer);
-}
-
-void OmniboxPositionBrowserAgent::RemoveObserver(
-    OmniboxPositionBrowserAgentObserver* observer) {
-  observers_.RemoveObserver(observer);
-}
-
-void OmniboxPositionBrowserAgent::LogOmniboxPosition() {
+// Logs the omnibox position at startup.
+void LogOmniboxPosition() {
   if (!IsBottomOmniboxAvailable()) {
     return;
   }
@@ -90,4 +49,17 @@ void OmniboxPositionBrowserAgent::LogOmniboxPosition() {
           kOmniboxSteadyStatePositionAtStartupSelected, position_type);
     }
   });
+}
+
+}  // namespace
+
+OmniboxPositionBrowserAgent::OmniboxPositionBrowserAgent(Browser* browser)
+    : BrowserUserData(browser) {
+  LogOmniboxPosition();
+}
+
+OmniboxPositionBrowserAgent::~OmniboxPositionBrowserAgent() = default;
+
+BOOL OmniboxPositionBrowserAgent::IsOmniboxFocused() const {
+  return [omnibox_state_provider_ isOmniboxFocused];
 }
