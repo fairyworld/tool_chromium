@@ -203,6 +203,8 @@ extensions/browser
 extensions/common
 extensions/common/api
 extensions/common/manifest_handlers
+fuchsia_web/runners/cast
+fuchsia_web/runners/cast/testdata
 google_apis/gaia
 gpu/config
 infra
