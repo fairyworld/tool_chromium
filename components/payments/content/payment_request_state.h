@@ -264,9 +264,8 @@ class PaymentRequestState : public PaymentAppFactory::Delegate,
 
   bool is_retry_called() const { return is_retry_called_; }
 
-  bool user_interaction_in_web_payment_app() const {
-    return user_interaction_in_web_payment_app_;
-  }
+  bool user_interaction_in_web_payment_app() const;
+
   void set_user_interaction_in_web_payment_app(bool user_interaction);
 
   const std::string& GetApplicationLocale();
