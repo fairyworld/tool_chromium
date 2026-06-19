@@ -157,7 +157,8 @@ public class TouchToFillControllerTest {
 
     private final TestImageFetcher mImageFetcher = spy(new TestImageFetcher());
     private final Context mContext = ContextUtils.getApplicationContext();
-    private final TouchToFillMediator mMediator = new TouchToFillMediator();
+    private final TouchToFillPasswordManagerMediator mMediator =
+            new TouchToFillPasswordManagerMediator();
     private final PropertyModel mModel =
             TouchToFillPasswordManagerProperties.createDefaultModel(mMediator::onDismissed);
 
@@ -618,7 +619,7 @@ public class TouchToFillControllerTest {
         assertThat(mModel.get(VISIBLE), is(false));
         assertThat(
                 RecordHistogram.getHistogramTotalCountForTesting(
-                        TouchToFillMediator.UMA_TOUCH_TO_FILL_CREDENTIAL_INDEX),
+                        TouchToFillPasswordManagerMediator.UMA_TOUCH_TO_FILL_CREDENTIAL_INDEX),
                 is(0));
     }
 
@@ -639,7 +640,7 @@ public class TouchToFillControllerTest {
         assertThat(mModel.get(VISIBLE), is(false));
         assertThat(
                 RecordHistogram.getHistogramValueCountForTesting(
-                        TouchToFillMediator.UMA_TOUCH_TO_FILL_CREDENTIAL_INDEX, 1),
+                        TouchToFillPasswordManagerMediator.UMA_TOUCH_TO_FILL_CREDENTIAL_INDEX, 1),
                 is(1));
     }
 
@@ -657,7 +658,7 @@ public class TouchToFillControllerTest {
         assertThat(mModel.get(VISIBLE), is(false));
         assertThat(
                 RecordHistogram.getHistogramValueCountForTesting(
-                        TouchToFillMediator.UMA_TOUCH_TO_FILL_DISMISSAL_REASON,
+                        TouchToFillPasswordManagerMediator.UMA_TOUCH_TO_FILL_DISMISSAL_REASON,
                         BottomSheetController.StateChangeReason.BACK_PRESS),
                 is(1));
     }

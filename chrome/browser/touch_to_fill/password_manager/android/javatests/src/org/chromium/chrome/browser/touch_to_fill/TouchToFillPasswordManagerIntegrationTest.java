@@ -130,7 +130,7 @@ public class TouchToFillPasswordManagerIntegrationTest {
         mPage = mActivityTestRule.startOnBlankPage();
         runOnUiThreadBlocking(
                 () -> {
-                    mTouchToFill = new TouchToFillCoordinator();
+                    mTouchToFill = new TouchToFillPasswordManagerCoordinator();
                     mBottomSheetController =
                             BottomSheetControllerProvider.from(
                                     mActivityTestRule.getActivity().getWindowAndroid());

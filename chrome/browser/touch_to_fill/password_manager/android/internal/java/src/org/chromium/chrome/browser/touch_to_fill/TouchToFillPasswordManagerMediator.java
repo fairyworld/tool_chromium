@@ -4,6 +4,7 @@
 
 package org.chromium.chrome.browser.touch_to_fill;
 
+import static org.chromium.build.NullUtil.assumeNonNull;
 import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties.CREDENTIAL;
 import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties.FAVICON_OR_FALLBACK;
 import static org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties.ITEM_COLLECTION_INFO;
@@ -29,7 +30,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.Px;
 import androidx.appcompat.content.res.AppCompatResources;
 
@@ -38,6 +38,9 @@ import org.chromium.base.ThreadUtils;
 import org.chromium.base.metrics.RecordHistogram;
 import org.chromium.base.task.PostTask;
 import org.chromium.base.task.TaskTraits;
+import org.chromium.build.annotations.MonotonicNonNull;
+import org.chromium.build.annotations.NullMarked;
+import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.password_manager.PasswordManagerResourceProviderFactory;
 import org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.CredentialProperties;
 import org.chromium.chrome.browser.touch_to_fill.TouchToFillPasswordManagerProperties.FaviconOrFallback;
@@ -74,20 +77,21 @@ import java.util.Set;
  * Contains the logic for the TouchToFill component. It sets the state of the model and reacts to
  * events like clicks.
  */
-class TouchToFillMediator {
+@NullMarked
+class TouchToFillPasswordManagerMediator {
     static final String UMA_TOUCH_TO_FILL_DISMISSAL_REASON =
             "PasswordManager.TouchToFill.DismissalReason";
     static final String UMA_TOUCH_TO_FILL_CREDENTIAL_INDEX =
             "PasswordManager.TouchToFill.CredentialIndex";
 
-    private Context mContext;
-    private TouchToFillComponent.Delegate mDelegate;
-    private PropertyModel mModel;
-    private LargeIconBridge mLargeIconBridge;
+    private @MonotonicNonNull Context mContext;
+    private @MonotonicNonNull TouchToFillComponent.Delegate mDelegate;
+    private @MonotonicNonNull PropertyModel mModel;
+    private @MonotonicNonNull LargeIconBridge mLargeIconBridge;
     private @Px int mDesiredIconSize;
-    private List<CredentialBase> mCredentials;
-    private BottomSheetFocusHelper mBottomSheetFocusHelper;
-    private ImageFetcher mImageFetcher;
+    private @MonotonicNonNull List<CredentialBase> mCredentials;
+    private @MonotonicNonNull BottomSheetFocusHelper mBottomSheetFocusHelper;
+    private @MonotonicNonNull ImageFetcher mImageFetcher;
 
     void initialize(
             Context context,
@@ -115,8 +119,13 @@ class TouchToFillMediator {
             boolean triggerSubmission,
             boolean showHybridPasskeyOption) {
         assert credentials != null;
+        assert mModel != null;
+        assert mContext != null;
+        assert mLargeIconBridge != null;
+        assert mBottomSheetFocusHelper != null;
 
         ListModel<ListItem> sheetItems = mModel.get(SHEET_ITEMS);
+        assumeNonNull(sheetItems);
         sheetItems.clear();
 
         final PropertyModel headerModel =
@@ -233,6 +242,7 @@ class TouchToFillMediator {
     }
 
     private String getTitle(List<CredentialBase> credentials) {
+        assert mContext != null;
         int sharedPasswordsRequireNotificationCount =
                 getSharedPasswordsThatRequireNotification(credentials).size();
         if (sharedPasswordsRequireNotificationCount > 0) {
@@ -255,6 +265,7 @@ class TouchToFillMediator {
             boolean isOriginSecure,
             boolean triggerSubmission,
             List<CredentialBase> credentials) {
+        assert mContext != null;
         String formattedUrl =
                 UrlFormatter.formatUrlForSecurityDisplay(url, SchemeDisplay.OMIT_HTTP_AND_HTTPS);
         List<Credential> sharedCredentials = getSharedPasswordsThatRequireNotification(credentials);
@@ -305,6 +316,7 @@ class TouchToFillMediator {
     }
 
     private String getManageButtonText(List<CredentialBase> credentials) {
+        assert mContext != null;
         if (webAuthnCredentialCount(credentials) == 0) {
             return mContext.getString(R.string.manage_passwords);
         }
@@ -317,7 +329,9 @@ class TouchToFillMediator {
     }
 
     private void requestIconOrFallbackImage(PropertyModel credentialModel, GURL url) {
+        assert mLargeIconBridge != null;
         Credential credential = credentialModel.get(CREDENTIAL);
+        assumeNonNull(credential);
         final String iconOrigin = getIconOrigin(credential.getOriginUrl(), url);
 
         final LargeIconCallback setIcon =
@@ -345,6 +359,7 @@ class TouchToFillMediator {
     }
 
     private void requestWebAuthnIconOrFallbackImage(PropertyModel credentialModel, GURL url) {
+        assert mLargeIconBridge != null;
         // WebAuthn credentials have already been filtered to match the current site's URL.
         final String iconOrigin = url.getSpec();
 
@@ -379,6 +394,7 @@ class TouchToFillMediator {
     }
 
     private void reportCredentialSelection(int index) {
+        assert mCredentials != null;
         if (mCredentials.size() > 1) {
             // We only record this histogram in case multiple credentials were shown to the user.
             // Otherwise the single credential case where position should always be 0 will dominate
@@ -388,24 +404,34 @@ class TouchToFillMediator {
     }
 
     private void onSelectedCredential(Credential credential) {
+        assert mModel != null;
+        assert mCredentials != null;
+        assert mDelegate != null;
         mModel.set(VISIBLE, false);
         reportCredentialSelection(mCredentials.indexOf(credential));
         mDelegate.onCredentialSelected(credential);
     }
 
     private void onSelectedWebAuthnCredential(WebauthnCredential credential) {
+        assert mModel != null;
+        assert mCredentials != null;
+        assert mDelegate != null;
         mModel.set(VISIBLE, false);
         reportCredentialSelection(mCredentials.indexOf(credential));
         mDelegate.onWebAuthnCredentialSelected(credential);
     }
 
     private void onSelectedMorePasskeys() {
+        assert mModel != null;
+        assert mDelegate != null;
         mModel.set(VISIBLE, false);
         // TODO(crbug.com/40070194): add metrics
         mDelegate.onShowMorePasskeysSelected();
     }
 
     public void onDismissed(@StateChangeReason int reason) {
+        assert mModel != null;
+        assert mDelegate != null;
         if (!mModel.get(VISIBLE)) return; // Dismiss only if not dismissed yet.
         mModel.set(VISIBLE, false);
         RecordHistogram.recordEnumeratedHistogram(
@@ -416,12 +442,17 @@ class TouchToFillMediator {
     }
 
     private void onManagePasswordSelected() {
+        assert mModel != null;
+        assert mCredentials != null;
+        assert mDelegate != null;
         mModel.set(VISIBLE, false);
         boolean passkeysShown = (webAuthnCredentialCount(mCredentials) > 0);
         mDelegate.onManagePasswordsSelected(passkeysShown);
     }
 
     private void onHybridSignInSelected() {
+        assert mModel != null;
+        assert mDelegate != null;
         mModel.set(VISIBLE, false);
         mDelegate.onHybridSignInSelected();
     }
@@ -482,19 +513,20 @@ class TouchToFillMediator {
         private final Set<GURL> mUrls;
         private int mRemainingImagesCount;
         private final List<Bitmap> mAvatarImages = Collections.synchronizedList(new ArrayList<>());
-        private Callback<Drawable> mDoneCallback;
+        private @MonotonicNonNull Callback<@Nullable Drawable> mDoneCallback;
 
         GenerateAvatarTask(Set<GURL> avatarUrls) {
             mUrls = avatarUrls;
             mRemainingImagesCount = avatarUrls.size();
         }
 
-        void fetchInBackground(Callback<Drawable> doneCallback) {
+        void fetchInBackground(Callback<@Nullable Drawable> doneCallback) {
             mDoneCallback = doneCallback;
             PostTask.postTask(TaskTraits.USER_VISIBLE, this::fetchAllUrls);
         }
 
         private void fetchAllUrls() {
+            assert mImageFetcher != null;
             for (GURL url : mUrls) {
                 mImageFetcher.fetchImage(
                         ImageFetcher.Params.create(
@@ -514,11 +546,14 @@ class TouchToFillMediator {
 
         private void onAllImagesFetched() {
             ThreadUtils.assertOnUiThread();
+            assert mContext != null;
+            Callback<@Nullable Drawable> doneCallback = mDoneCallback;
+            assumeNonNull(doneCallback);
             if (mAvatarImages.isEmpty()) {
-                mDoneCallback.onResult(null);
+                doneCallback.onResult(null);
                 return;
             }
-            mDoneCallback.onResult(
+            doneCallback.onResult(
                     AvatarGenerator.makeRoundAvatar(
                             mContext.getResources(),
                             mAvatarImages,

@@ -75,10 +75,10 @@ The controller of this model implements the TouchToFillComponent interface as
 defined in `public/` and contains all logic that affects the component's visual
 appearance. The controller consists of two parts:
 
-  * **TouchToFillCoordinator** which implements the public interface and creates all
+  * **TouchToFillPasswordManagerCoordinator** which implements the public interface and creates all
     parts of the component (model, mediator, view, etc.) and links them using
     MCPs.
-  * **TouchToFillMediator** which handles request to the component API and changes
+  * **TouchToFillPasswordManagerMediator** which handles request to the component API and changes
     the model accordingly. Interactions with the view are typically handled here
     and either affect the model or notify callers of the component API.
 

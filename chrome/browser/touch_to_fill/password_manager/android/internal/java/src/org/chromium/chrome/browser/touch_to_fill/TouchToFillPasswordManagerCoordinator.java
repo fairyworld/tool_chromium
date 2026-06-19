@@ -8,6 +8,8 @@ import android.content.Context;
 
 import androidx.annotation.VisibleForTesting;
 
+import org.chromium.build.annotations.MonotonicNonNull;
+import org.chromium.build.annotations.NullMarked;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.touch_to_fill.common.BottomSheetFocusHelper;
 import org.chromium.chrome.browser.touch_to_fill.data.CredentialBase;
@@ -25,11 +27,13 @@ import java.util.List;
  * Creates the TouchToFill component. TouchToFill uses a bottom sheet to let the user select a set
  * of credentials and fills it into the focused form.
  */
-public class TouchToFillCoordinator implements TouchToFillComponent {
-    private final TouchToFillMediator mMediator = new TouchToFillMediator();
+@NullMarked
+public class TouchToFillPasswordManagerCoordinator implements TouchToFillComponent {
+    private final TouchToFillPasswordManagerMediator mMediator =
+            new TouchToFillPasswordManagerMediator();
     private final PropertyModel mModel =
             TouchToFillPasswordManagerProperties.createDefaultModel(mMediator::onDismissed);
-    private TouchToFillPasswordManagerView mView;
+    private @MonotonicNonNull TouchToFillPasswordManagerView mView;
 
     @Override
     public void initialize(
@@ -74,8 +78,9 @@ public class TouchToFillCoordinator implements TouchToFillComponent {
 
     @Override
     public void cleanUp() {
-        if (mView == null) return;
-        mView.destroy();
+        TouchToFillPasswordManagerView view = mView;
+        if (view == null) return;
+        view.destroy();
     }
 
     /**
