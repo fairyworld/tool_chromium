@@ -249,6 +249,26 @@ public class VerticalTabListCoordinatorUnitTest {
 
     @Test
     @SmallTest
+    public void testConstructor_AddsSpineDecoration() {
+        createCoordinator();
+        ViewGroup view = (ViewGroup) mCoordinator.getView();
+        TabListRecyclerView recyclerView = view.findViewById(R.id.tab_list_recycler_view);
+        assertNotNull(recyclerView);
+
+        boolean hasSpineDecoration = false;
+        for (int i = 0; i < recyclerView.getItemDecorationCount(); i++) {
+            if (recyclerView.getItemDecorationAt(i) instanceof VerticalTabGroupSpineDecoration) {
+                hasSpineDecoration = true;
+                break;
+            }
+        }
+        assertTrue(
+                "VerticalTabGroupSpineDecoration should be added to RecyclerView.",
+                hasSpineDecoration);
+    }
+
+    @Test
+    @SmallTest
     public void testDestroy() {
         doNothing().when(mTabModelSelector).addObserver(mSelectorObserverCaptor.capture());
         createCoordinator();

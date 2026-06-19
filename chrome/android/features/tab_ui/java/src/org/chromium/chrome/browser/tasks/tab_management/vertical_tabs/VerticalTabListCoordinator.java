@@ -86,6 +86,7 @@ public class VerticalTabListCoordinator {
     private final Point mLastTouchPoint = new Point();
     private final MonotonicObservableSupplier<ShareDelegate> mShareDelegateSupplier;
     private final View mSpacerView;
+    private final VerticalTabGroupSpineDecoration mSpineDecoration;
     private final @Nullable DesktopWindowStateManager mDesktopWindowStateManager;
     private final @Nullable AppHeaderObserver mAppHeaderObserver;
     private @Nullable TabStripContextMenuCoordinator mTabStripContextMenuCoordinator;
@@ -211,6 +212,10 @@ public class VerticalTabListCoordinator {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
         recyclerView.setupCustomItemAnimator();
+        mSpineDecoration =
+                new VerticalTabGroupSpineDecoration(
+                        activity, recyclerView::postInvalidate, mModelList, tabModelSelector);
+        recyclerView.addItemDecoration(mSpineDecoration);
         recyclerView.setVisibility(View.VISIBLE);
 
         // Create the gesture detector to catch long-presses on VT empty space.
@@ -435,6 +440,8 @@ public class VerticalTabListCoordinator {
             mTabContextMenuCoordinator.dismiss();
             mTabContextMenuCoordinator = null;
         }
+
+        mSpineDecoration.destroy();
     }
 
     /**
