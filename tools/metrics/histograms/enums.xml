@@ -15361,6 +15361,7 @@ from previous Chrome versions.
   <int value="302293391" label="MostVisitedTilesNewScoring:disabled"/>
   <int value="302473173" label="AndroidTabGroupStableIds:disabled"/>
   <int value="302509562" label="LinkedServicesSetting:disabled"/>
+  <int value="302584256" label="GlicActorAutofillPreClick:disabled"/>
   <int value="302725573" label="NewInstanceFromDraggedLink:enabled"/>
   <int value="302754902" label="MicMuteNotifications:disabled"/>
   <int value="303058039" label="AccountConsistency:disabled"/>
@@ -18843,6 +18844,7 @@ from previous Chrome versions.
   <int value="1432263468" label="SpeculationRulesPrefetchProxy:disabled"/>
   <int value="1433119211" label="ShowSuggestionsOnAutofocus:enabled"/>
   <int value="1433200410" label="ElementCaptureOfOtherTabs:enabled"/>
+  <int value="1433357848" label="GlicActorAutofillPreClick:enabled"/>
   <int value="1433706192" label="FileSystemObserver:disabled"/>
   <int value="1434502662" label="NtpDummyModules:enabled"/>
   <int value="1434515920" label="ReaderModeInCCT:enabled"/>
