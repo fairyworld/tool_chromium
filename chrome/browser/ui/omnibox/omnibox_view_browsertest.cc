@@ -64,6 +64,7 @@
 #include "components/omnibox/browser/omnibox_popup_selection.h"
 #include "components/omnibox/browser/test_location_bar_model.h"
 #include "components/omnibox/common/omnibox_features.h"
+#include "components/page_load_metrics/browser/navigation_handle_user_data.h"
 #include "components/policy/core/browser/browser_policy_connector.h"
 #include "components/policy/core/common/mock_configuration_policy_provider.h"
 #include "components/policy/policy_constants.h"
@@ -1377,6 +1378,87 @@ IN_PROC_BROWSER_TEST_F(OmniboxViewTest, DoesNotUpdateAutocompleteOnBlur) {
   ASSERT_FALSE(GetOmniboxController()->IsPopupOpen());
   EXPECT_EQ(old_autocomplete_text,
             GetOmniboxController()->autocomplete_controller()->input_.text());
+}
+
+namespace {
+
+class TestOmniboxNavigationObserver : public content::WebContentsObserver {
+ public:
+  explicit TestOmniboxNavigationObserver(content::WebContents* web_contents)
+      : content::WebContentsObserver(web_contents) {}
+
+  void DidFinishNavigation(
+      content::NavigationHandle* navigation_handle) override {
+    if (navigation_handle->HasCommitted()) {
+      auto* user_data =
+          page_load_metrics::NavigationHandleUserData::GetForNavigationHandle(
+              *navigation_handle);
+      if (user_data) {
+        navigation_type_ = user_data->navigation_type();
+      }
+    }
+  }
+
+  std::optional<page_load_metrics::NavigationHandleUserData::InitiatorLocation>
+      navigation_type_;
+};
+
+}  // namespace
+
+IN_PROC_BROWSER_TEST_F(OmniboxViewTest,
+                       Navigate_OmniboxDirectUrlInput_AttachesUserData) {
+  OmniboxView* omnibox_view = nullptr;
+  ASSERT_NO_FATAL_FAILURE(GetOmniboxView(&omnibox_view));
+
+  omnibox_view->SetUserText(u"http://www.example.com/");
+  ASSERT_NO_FATAL_FAILURE(WaitForAutocompleteControllerDone());
+
+  auto* match = GetOmniboxController()
+                    ->autocomplete_controller()
+                    ->result()
+                    .default_match();
+  ASSERT_NE(match, nullptr);
+
+  TestOmniboxNavigationObserver omnibox_observer(
+      browser()->tab_strip_model()->GetActiveWebContents());
+  content::TestNavigationObserver observer(
+      browser()->tab_strip_model()->GetActiveWebContents(), 1);
+
+  ASSERT_NO_FATAL_FAILURE(SendKey(ui::VKEY_RETURN, 0));
+  observer.Wait();
+
+  ASSERT_TRUE(omnibox_observer.navigation_type_.has_value());
+  EXPECT_EQ(omnibox_observer.navigation_type_.value(),
+            page_load_metrics::NavigationHandleUserData::InitiatorLocation::
+                kOmniboxDirectUrlInput);
+}
+
+IN_PROC_BROWSER_TEST_F(OmniboxViewTest,
+                       Navigate_OmniboxDefaultSearchEngine_AttachesUserData) {
+  OmniboxView* omnibox_view = nullptr;
+  ASSERT_NO_FATAL_FAILURE(GetOmniboxView(&omnibox_view));
+
+  omnibox_view->SetUserText(u"search query");
+  ASSERT_NO_FATAL_FAILURE(WaitForAutocompleteControllerDone());
+
+  auto* match = GetOmniboxController()
+                    ->autocomplete_controller()
+                    ->result()
+                    .default_match();
+  ASSERT_NE(match, nullptr);
+
+  TestOmniboxNavigationObserver omnibox_observer(
+      browser()->tab_strip_model()->GetActiveWebContents());
+  content::TestNavigationObserver observer(
+      browser()->tab_strip_model()->GetActiveWebContents(), 1);
+
+  ASSERT_NO_FATAL_FAILURE(SendKey(ui::VKEY_RETURN, 0));
+  observer.Wait();
+
+  ASSERT_TRUE(omnibox_observer.navigation_type_.has_value());
+  EXPECT_EQ(omnibox_observer.navigation_type_.value(),
+            page_load_metrics::NavigationHandleUserData::InitiatorLocation::
+                kOmniboxDefaultSearchEngine);
 }
 
 IN_PROC_BROWSER_TEST_F(OmniboxViewTest, Paste) {
