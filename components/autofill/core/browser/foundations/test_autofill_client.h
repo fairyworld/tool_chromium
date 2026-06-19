@@ -14,6 +14,7 @@
 
 #include "base/command_line.h"
 #include "base/compiler_specific.h"
+#include "base/containers/flat_set.h"
 #include "base/feature_list.h"
 #include "base/functional/callback.h"
 #include "base/functional/callback_forward.h"
@@ -439,6 +440,22 @@ class TestAutofillClientTemplate : public T {
     return autofill_profile_enabled_;
   }
 
+  bool IsAutofillTypeBlockedByPolicy(
+      const GURL& url,
+      AutofillClient::AutofillPolicyDataCategory category) const override {
+    return blocked_policy_categories_.contains(category);
+  }
+
+  void SetAutofillTypeBlockedByPolicy(
+      AutofillClient::AutofillPolicyDataCategory category,
+      bool blocked) {
+    if (blocked) {
+      blocked_policy_categories_.insert(category);
+    } else {
+      blocked_policy_categories_.erase(category);
+    }
+  }
+
   bool IsWalletPublicPassStorageEnabled() const override {
     return wallet_public_pass_storage_enabled_;
   }
@@ -858,6 +875,9 @@ class TestAutofillClientTemplate : public T {
 
   std::optional<AutofillClient::SuggestionUiSessionId>
       suggestion_ui_session_id_;
+
+  base::flat_set<AutofillClient::AutofillPolicyDataCategory>
+      blocked_policy_categories_;
 
   base::WeakPtr<AutofillSuggestionDelegate> active_suggestion_delegate_;
 

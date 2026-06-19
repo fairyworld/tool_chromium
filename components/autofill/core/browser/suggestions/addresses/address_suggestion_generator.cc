@@ -999,6 +999,13 @@ void AddressSuggestionGenerator::GenerateSuggestions(
     const AutofillField* trigger_autofill_field,
     AutofillClient& client,
     base::FunctionRef<void(ReturnedSuggestions)> callback) {
+  if (client.IsAutofillTypeBlockedByPolicy(
+          client.GetLastCommittedPrimaryMainFrameURL(),
+          AutofillClient::AutofillPolicyDataCategory::kContactInfo)) {
+    callback({SuggestionDataSource::kAddress, {}});
+    return;
+  }
+
   FieldTypeSet field_types = [&]() -> FieldTypeSet {
     if (!form_structure || !trigger_autofill_field) {
       return {};

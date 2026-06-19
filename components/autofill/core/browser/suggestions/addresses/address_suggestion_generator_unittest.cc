@@ -1810,5 +1810,29 @@ TEST_F(AddressSuggestionGeneratorTest, AlreadyAutofilledNoLabels) {
           EqualsManageAddressesSuggestion()));
 }
 
+// Tests that address suggestions are not generated when contact info is blocked
+// by the AutofillSettings policy.
+TEST_F(AddressSuggestionGeneratorTest, AutofillSettingsBlocked) {
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitAndEnableFeature(
+      features::kAutofillEnableAutofillSettingsEnterprisePolicy);
+
+  AutofillProfile p1 = test::GetFullProfile();
+  address_data().AddProfile(p1);
+
+  autofill_client()->SetAutofillTypeBlockedByPolicy(
+      AutofillClient::AutofillPolicyDataCategory::kContactInfo, true);
+
+  FormFieldData triggering_field;
+  std::vector<Suggestion> suggestions =
+      GetSuggestionsForProfiles(triggering_field, NAME_FIRST);
+  EXPECT_TRUE(suggestions.empty());
+
+  // Verify that turning off the policy restores suggestions.
+  autofill_client()->SetAutofillTypeBlockedByPolicy(
+      AutofillClient::AutofillPolicyDataCategory::kContactInfo, false);
+  EXPECT_FALSE(GetSuggestionsForProfiles(triggering_field, NAME_FIRST).empty());
+}
+
 }  // namespace
 }  // namespace autofill
