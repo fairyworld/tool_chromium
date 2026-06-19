@@ -2238,6 +2238,20 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                             assumeNonNull(mToolbarManager).getTabStripTransitionCoordinator();
                     assumeNonNull(transitionCoordinator).suppressTabStrip(active);
                 });
+
+        var transitionCoordinator =
+                assumeNonNull(mToolbarManager).getTabStripTransitionCoordinator();
+        if (transitionCoordinator != null) {
+            transitionCoordinator.addObserver(
+                    success -> {
+                        if (VerticalTabUtils.isVerticalTabsEnabled(mActivity)) {
+                            if (mVerticalTabsSideUiCoordinator != null) {
+                                mVerticalTabsSideUiCoordinator.setVisible(true);
+                            }
+                        }
+                    });
+        }
+
         if (useVerticalLayoutOnLaunch) {
             assumeNonNull(mVerticalTabsSideUiCoordinator).setVisible(true);
         }
@@ -2265,7 +2279,13 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
         ChromeSharedPreferences.getInstance()
                 .writeBoolean(ChromePreferenceKeys.VERTICAL_TABS_ENABLED, shouldShowVerticalTabs);
 
-        assumeNonNull(mVerticalTabsSideUiCoordinator).setVisible(shouldShowVerticalTabs);
+        var transitionCoordinator =
+                assumeNonNull(mToolbarManager).getTabStripTransitionCoordinator();
+        if (shouldShowVerticalTabs) {
+            assumeNonNull(transitionCoordinator).suppressTabStrip(true);
+        } else {
+            assumeNonNull(mVerticalTabsSideUiCoordinator).setVisible(false);
+        }
     }
 
     private void destroySideUi() {

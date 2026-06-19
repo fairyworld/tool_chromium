@@ -12,8 +12,10 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.View.OnLayoutChangeListener;
 
+import org.chromium.base.Callback;
 import org.chromium.base.CallbackController;
 import org.chromium.base.Log;
+import org.chromium.base.ObserverList;
 import org.chromium.base.ResettersForTesting;
 import org.chromium.base.supplier.OneshotSupplier;
 import org.chromium.build.annotations.NullMarked;
@@ -50,6 +52,12 @@ public class TabStripTransitionCoordinator implements ComponentCallbacks, AppHea
     // configuration changed.
     private static final int TRANSITION_DELAY_MS = 200;
 
+    /** Observer for tab strip transition completion. */
+    public interface TabStripTransitionObserver {
+        /** Called when tab strip transition finishes. */
+        void onTabStripTransitionFinished(boolean success);
+    }
+
     /**
      * Interface that exposes methods to handle tab strip height transitions that can impact strip
      * visibility.
@@ -69,6 +77,13 @@ public class TabStripTransitionCoordinator implements ComponentCallbacks, AppHea
                 int topPadding,
                 boolean applyScrimOverlay,
                 Runnable transitionStartedCallback) {}
+
+        /**
+         * Set the callback invoked when the transition animation is finished.
+         *
+         * @param callback Callback object.
+         */
+        default void setTransitionFinishedCallback(Callback<Boolean> callback) {}
     }
 
     /** Delegate to enforce tab strip updates when strip transition is requested. */
@@ -143,6 +158,8 @@ public class TabStripTransitionCoordinator implements ComponentCallbacks, AppHea
     private final FadeTransitionHandler mFadeTransitionHandler;
 
     private final OneshotSupplier<TabStripTransitionDelegate> mTabStripTransitionDelegateSupplier;
+    private final ObserverList<TabStripTransitionObserver> mTransitionObservers =
+            new ObserverList<>();
 
     /**
      * Create the coordinator to manage transitions to show / hide the tab strip.
@@ -182,6 +199,12 @@ public class TabStripTransitionCoordinator implements ComponentCallbacks, AppHea
                         suppressTabStripAtStart);
         mFadeTransitionHandler =
                 new FadeTransitionHandler(tabStripTransitionDelegateSupplier, mCallbackController);
+        tabStripTransitionHandler.setTransitionFinishedCallback(
+                success -> {
+                    for (TabStripTransitionObserver observer : mTransitionObservers) {
+                        observer.onTabStripTransitionFinished(success);
+                    }
+                });
 
         mTabStripReservedTopPadding =
                 controlContainerView()
@@ -286,6 +309,16 @@ public class TabStripTransitionCoordinator implements ComponentCallbacks, AppHea
     public void suppressTabStrip(boolean suppress) {
         mHeightTransitionHandler.suppressTabStrip(suppress);
         mFadeTransitionHandler.suppressTabStrip(suppress);
+    }
+
+    /** Add observer for tab strip transition finished events. */
+    public void addObserver(TabStripTransitionObserver observer) {
+        mTransitionObservers.addObserver(observer);
+    }
+
+    /** Remove observer for tab strip transition finished events. */
+    public void removeObserver(TabStripTransitionObserver observer) {
+        mTransitionObservers.removeObserver(observer);
     }
 
     /** Request the token to defer the tab strip height transition to a later time. */
