@@ -12,6 +12,8 @@ import android.view.accessibility.AccessibilityManager;
 
 import androidx.test.filters.SmallTest;
 
+import com.google.common.collect.ImmutableSet;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,6 +30,7 @@ import org.robolectric.shadow.api.Shadow;
 import org.robolectric.shadows.ShadowAccessibilityManager;
 
 import org.chromium.base.test.BaseRobolectricTestRunner;
+import org.chromium.base.test.RobolectricUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -416,6 +419,29 @@ public class AccessibilityStateTest {
 
         Assert.assertTrue(AccessibilityState.isAnyAccessibilityServiceEnabled());
         Assert.assertTrue(AccessibilityState.isTouchExplorationEnabled());
+    }
+
+    @Test
+    @SmallTest
+    public void testRelevantEventTypesUpdatedWhenServiceRegistered() {
+        AccessibilityState.registerObservers();
+
+        // Check initial state.
+        Assert.assertTrue(AccessibilityState.relevantEventTypesForCurrentServices().isEmpty());
+
+        // Register new accessibility service.
+        int newServiceEventMask =
+                AccessibilityEvent.TYPE_VIEW_CLICKED | AccessibilityEvent.TYPE_VIEW_FOCUSED;
+        AccessibilityServiceInfo newService =
+                new BuilderForTests().setEventTypes(newServiceEventMask).build();
+        startTestWithService(
+                newService, "com.example.google/app.accessibility.AccessibilityService");
+        RobolectricUtil.runAllBackgroundAndUi();
+
+        Set<Integer> expectedEventTypes =
+                ImmutableSet.of(AccessibilityEvent.TYPE_VIEW_CLICKED, AccessibilityEvent.TYPE_VIEW_FOCUSED);
+        Assert.assertEquals(
+                expectedEventTypes, AccessibilityState.relevantEventTypesForCurrentServices());
     }
 
     private void startTestWithService(AccessibilityServiceInfo newService) {
