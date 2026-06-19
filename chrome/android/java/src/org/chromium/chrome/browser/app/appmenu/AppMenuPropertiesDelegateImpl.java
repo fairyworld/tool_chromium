@@ -85,6 +85,8 @@ import org.chromium.components.browser_ui.accessibility.PageZoomManager;
 import org.chromium.components.browser_ui.accessibility.PageZoomMenuItemCoordinator;
 import org.chromium.components.browser_ui.accessibility.PageZoomProperties;
 import org.chromium.components.browser_ui.accessibility.PageZoomUtils;
+import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
+import org.chromium.components.browser_ui.bottomsheet.BottomSheetControllerProvider;
 import org.chromium.components.commerce.core.CommerceFeatureUtils;
 import org.chromium.components.commerce.core.CommerceSubscription;
 import org.chromium.components.commerce.core.IdentifierType;
@@ -98,6 +100,7 @@ import org.chromium.components.webapk.lib.client.WebApkValidator;
 import org.chromium.components.webapps.AppBannerManager;
 import org.chromium.components.webapps.WebappsUtils;
 import org.chromium.ui.base.DeviceFormFactor;
+import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.modelutil.LayoutViewBuilder;
 import org.chromium.ui.modelutil.MVCListAdapter;
 import org.chromium.ui.modelutil.MVCListAdapter.ListItem;
@@ -1502,8 +1505,19 @@ public abstract class AppMenuPropertiesDelegateImpl implements AppMenuProperties
 
     @Contract("null -> false")
     protected boolean shouldShowPageZoomItem(@Nullable Tab currentTab) {
-        return currentTab != null
-                && shouldShowWebContentsDependentMenuItem(currentTab)
+        if (currentTab == null) return false;
+
+        // If the bottom sheet is currently expanded, remove the menu option.
+        WindowAndroid windowAndroid = currentTab.getWindowAndroid();
+        if (windowAndroid != null) {
+            BottomSheetController bottomSheetController =
+                    BottomSheetControllerProvider.from(windowAndroid);
+            if (bottomSheetController != null && bottomSheetController.isSheetOpen()) {
+                return false;
+            }
+        }
+
+        return shouldShowWebContentsDependentMenuItem(currentTab)
                 && PageZoomUtils.shouldShowZoomMenuItem();
     }
 
