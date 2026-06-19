@@ -54,6 +54,7 @@ class CONTENT_EXPORT RequestService
   // blink::mojom::FederatedRequestService:
   void RegisterIdP(const GURL& idp, RegisterIdPCallback callback) override;
   void UnregisterIdP(const GURL& idp, UnregisterIdPCallback callback) override;
+  void PreventSilentAccess(PreventSilentAccessCallback callback) override;
 
   Request* GetActiveRequestForTesting() { return active_request_.get(); }
 
@@ -95,6 +96,8 @@ class CONTENT_EXPORT RequestService
 
   mojo::ReceiverSet<blink::mojom::FederatedRequestService> receivers_;
 
+  void SetRequiresUserMediation(bool requires_user_mediation,
+                                base::OnceClosure callback);
   void OnIdpRegistrationConfigFetched(
       RegisterIdPCallback callback,
       const GURL& idp,

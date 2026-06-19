@@ -280,4 +280,21 @@ TEST_F(RequestRegistryTest, RequestServiceUnregisterIdP) {
   loop.Run();
 }
 
+// Test PreventSilentAccess via FederatedRequestService.
+TEST_F(RequestRegistryTest, RequestServicePreventSilentAccess) {
+  EXPECT_CALL(*mock_permission_delegate_, HasSharingPermission(_))
+      .WillOnce(Return(false));
+  EXPECT_CALL(*mock_auto_reauthn_permission_delegate_,
+              SetRequiresUserMediation(_, true))
+      .WillOnce(Return());
+  EXPECT_CALL(*mock_permission_delegate_, OnSetRequiresUserMediation(_, _))
+      .WillOnce(::testing::WithArg<1>(
+          [](base::OnceClosure callback) { std::move(callback).Run(); }));
+
+  base::RunLoop loop;
+  request_service_remote_->PreventSilentAccess(
+      base::BindLambdaForTesting([&loop]() { loop.Quit(); }));
+  loop.Run();
+}
+
 }  // namespace content::webid

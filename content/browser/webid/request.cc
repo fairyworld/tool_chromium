@@ -2683,14 +2683,8 @@ bool Request::RequiresUserMediation() {
 
 void Request::SetRequiresUserMediation(bool requires_user_mediation,
                                        base::OnceClosure callback) {
-  auto_reauthn_permission_delegate_->SetRequiresUserMediation(
-      origin(), requires_user_mediation);
-  if (permission_delegate_) {
-    permission_delegate_->OnSetRequiresUserMediation(origin(),
-                                                     std::move(callback));
-  } else {
-    std::move(callback).Run();
-  }
+  request_service_->SetRequiresUserMediation(requires_user_mediation,
+                                             std::move(callback));
 }
 
 void Request::LoginToIdP(bool can_append_hints,
@@ -2737,19 +2731,7 @@ void Request::MaybeShowActiveModeModalDialog(const GURL& idp_config_url,
 }
 
 void Request::PreventSilentAccess(PreventSilentAccessCallback callback) {
-  SetRequiresUserMediation(true, std::move(callback));
-  if (permission_delegate_->HasSharingPermission(GetEmbeddingOrigin())) {
-    // Ensure the lifecycle state as GetPageUkmSourceId doesn't support the
-    // prerendering page. As FederatedAuthRequest runs behind the
-    // BrowserInterfaceBinders, the service doesn't receive any request while
-    // prerendering, and the CHECK should always meet the condition.
-    CHECK(!render_frame_host().IsInLifecycleState(
-        RenderFrameHost::LifecycleState::kPrerendering));
-    RecordPreventSilentAccess(
-        ComputeRequesterFrameType(render_frame_host(), origin(),
-                                  GetEmbeddingOrigin()),
-        render_frame_host().GetPageUkmSourceId());
-  }
+  request_service_->PreventSilentAccess(std::move(callback));
 }
 
 void Request::Disconnect(

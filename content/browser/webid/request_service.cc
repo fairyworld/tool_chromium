@@ -170,5 +170,36 @@ void RequestService::UnregisterIdP(const GURL& idp,
   std::move(callback).Run(true);
 }
 
+void RequestService::PreventSilentAccess(PreventSilentAccessCallback callback) {
+  SetRequiresUserMediation(true, std::move(callback));
+
+  if (permission_delegate_->HasSharingPermission(
+          render_frame_host().GetMainFrame()->GetLastCommittedOrigin())) {
+    // Ensure the lifecycle state as GetPageUkmSourceId doesn't support the
+    // prerendering page. As FederatedAuthRequest runs behind the
+    // BrowserInterfaceBinders, the service doesn't receive any request while
+    // prerendering, and the CHECK should always meet the condition.
+    CHECK(!render_frame_host().IsInLifecycleState(
+        RenderFrameHost::LifecycleState::kPrerendering));
+    RecordPreventSilentAccess(
+        ComputeRequesterFrameType(
+            render_frame_host(), render_frame_host().GetLastCommittedOrigin(),
+            render_frame_host().GetMainFrame()->GetLastCommittedOrigin()),
+        render_frame_host().GetPageUkmSourceId());
+  }
+}
+
+void RequestService::SetRequiresUserMediation(bool requires_user_mediation,
+                                              base::OnceClosure callback) {
+  auto_reauthn_permission_delegate_->SetRequiresUserMediation(
+      render_frame_host().GetLastCommittedOrigin(), requires_user_mediation);
+  if (permission_delegate_) {
+    permission_delegate_->OnSetRequiresUserMediation(
+        render_frame_host().GetLastCommittedOrigin(), std::move(callback));
+  } else {
+    std::move(callback).Run();
+  }
+}
+
 }  // namespace webid
 }  // namespace content
