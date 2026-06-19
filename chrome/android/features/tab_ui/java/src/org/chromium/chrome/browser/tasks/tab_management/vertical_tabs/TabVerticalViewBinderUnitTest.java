@@ -26,7 +26,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.test.filters.SmallTest;
@@ -43,6 +42,8 @@ import org.robolectric.shadows.ShadowLooper;
 import org.chromium.base.Callback;
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.base.test.util.Features.DisableFeatures;
+import org.chromium.chrome.browser.actor.ui.ActorUiTabController.UiTabState;
+import org.chromium.chrome.browser.actor.ui.TabIndicatorStatus;
 import org.chromium.chrome.browser.tab.MediaState;
 import org.chromium.chrome.browser.tab_ui.TabListFaviconProvider.TabFavicon;
 import org.chromium.chrome.browser.tab_ui.TabListFaviconProvider.TabFaviconFetcher;
@@ -65,11 +66,12 @@ import java.util.concurrent.TimeUnit;
 public class TabVerticalViewBinderUnitTest {
     @Rule public MockitoRule mMockitoRule = MockitoJUnit.rule();
 
-    private LinearLayout mItemView;
+    private ViewGroup mItemView;
     private TextView mTitleView;
     private ImageView mFaviconView;
     private ImageView mCloseButton;
     private ImageView mMediaIndicatorView;
+    private View mIndicatorView;
     private PropertyModel mModel;
 
     @Before
@@ -77,13 +79,14 @@ public class TabVerticalViewBinderUnitTest {
         Activity activity = Robolectric.buildActivity(Activity.class).setup().get();
         activity.setTheme(R.style.Theme_BrowserUI_DayNight);
         mItemView =
-                (LinearLayout)
+                (ViewGroup)
                         LayoutInflater.from(activity)
                                 .inflate(R.layout.vertical_tab_item, null, false);
         mTitleView = mItemView.findViewById(R.id.tab_title);
         mFaviconView = mItemView.findViewById(R.id.tab_favicon);
         mCloseButton = mItemView.findViewById(R.id.action_button);
         mMediaIndicatorView = mItemView.findViewById(R.id.media_indicator_icon);
+        mIndicatorView = mItemView.findViewById(R.id.ai_indicator);
 
         mModel =
                 new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
@@ -98,6 +101,28 @@ public class TabVerticalViewBinderUnitTest {
         TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.TITLE);
 
         assertEquals("Google", mTitleView.getText());
+    }
+
+    @Test
+    @SmallTest
+    public void testBindActorIndicator() {
+        mModel.set(
+                TabProperties.ACTOR_UI_STATE,
+                new UiTabState(0, null, null, TabIndicatorStatus.DYNAMIC, false));
+        TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.ACTOR_UI_STATE);
+        assertEquals(View.VISIBLE, mIndicatorView.getVisibility());
+
+        mModel.set(
+                TabProperties.ACTOR_UI_STATE,
+                new UiTabState(0, null, null, TabIndicatorStatus.STATIC, false));
+        TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.ACTOR_UI_STATE);
+        assertEquals(View.VISIBLE, mIndicatorView.getVisibility());
+
+        mModel.set(
+                TabProperties.ACTOR_UI_STATE,
+                new UiTabState(0, null, null, TabIndicatorStatus.NONE, false));
+        TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.ACTOR_UI_STATE);
+        assertEquals(View.GONE, mIndicatorView.getVisibility());
     }
 
     @Test

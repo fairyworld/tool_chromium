@@ -33,6 +33,8 @@ import org.chromium.base.test.util.Batch;
 import org.chromium.base.test.util.CommandLineFlags;
 import org.chromium.base.test.util.CriteriaHelper;
 import org.chromium.base.test.util.Feature;
+import org.chromium.chrome.browser.actor.ui.ActorUiTabController.UiTabState;
+import org.chromium.chrome.browser.actor.ui.TabIndicatorStatus;
 import org.chromium.chrome.browser.flags.ChromeSwitches;
 import org.chromium.chrome.browser.tab.MediaState;
 import org.chromium.chrome.browser.tab_ui.TabListFaviconProvider.TabFavicon;
@@ -55,8 +57,9 @@ import java.io.IOException;
 import java.util.List;
 
 // TODO(crbug.com/524393627): Add tests for Incognito.
-// TODO(crbug.com/521987032): Add tests for nested children with visual spine.
+// TODO(crbug.com/521987032): Add tests for nested children with visual spine and actor indicator.
 // TODO(crbug.com/519325873): Add RenderTest for pinned tab hover state.
+// TODO(crbug.com/509226293): Add tests for RTL layout.
 
 /** Render tests for Vertical Tabs UI (TabVerticalViewBinder). */
 @RunWith(ParameterizedRunner.class)
@@ -76,7 +79,7 @@ public class TabVerticalViewBinderRenderTest {
     public ChromeRenderTestRule mRenderTestRule =
             ChromeRenderTestRule.Builder.withPublicCorpus()
                     .setBugComponent(UI_BROWSER_MOBILE_TAB_SWITCHER_GRID)
-                    .setRevision(1)
+                    .setRevision(2)
                     .build();
 
     private Activity mActivity;
@@ -114,10 +117,11 @@ public class TabVerticalViewBinderRenderTest {
         ViewGroup view =
                 (ViewGroup) LayoutInflater.from(mActivity).inflate(layoutResId, mRenderView, false);
         mRenderView.addView(view);
+        int width = ViewGroup.LayoutParams.WRAP_CONTENT;
+
         parent.addView(
                 mRenderView,
-                new FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                new FrameLayout.LayoutParams(width, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         return view;
     }
@@ -219,6 +223,66 @@ public class TabVerticalViewBinderRenderTest {
         CriteriaHelper.pollUiThread(() -> view[0].getHeight() > 0);
 
         mRenderTestRule.render(mRenderView, "standard_tab_loading");
+    }
+
+    @Test
+    @MediumTest
+    @Feature({"RenderTest"})
+    public void testStandardTab_ActorIndicator() throws IOException {
+        ViewGroup[] view = new ViewGroup[1];
+        ThreadUtils.runOnUiThreadBlocking(
+                () -> {
+                    view[0] = inflateAndAttachView(R.layout.vertical_tab_item);
+                    PropertyModel model =
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
+                                    .with(TabProperties.IS_INCOGNITO, false)
+                                    .build();
+                    PropertyModelChangeProcessor.create(
+                            model, view[0], TabVerticalViewBinder::bindTab);
+                    model.set(TabProperties.TITLE, "AI Tab");
+                    model.set(TabProperties.IS_SELECTED, false);
+                    UiTabState uiTabState =
+                            new UiTabState(0, null, null, TabIndicatorStatus.DYNAMIC, false);
+                    model.set(TabProperties.ACTOR_UI_STATE, uiTabState);
+                    model.set(TabProperties.FAVICON_FETCHER, createFaviconFetcher());
+                    model.set(
+                            TabProperties.TAB_ACTION_BUTTON_DATA,
+                            new TabActionButtonData(
+                                    TabActionButtonType.CLOSE, /* tabActionListener= */ null));
+                });
+        CriteriaHelper.pollUiThread(() -> view[0].getHeight() > 0);
+
+        mRenderTestRule.render(mRenderView, "standard_tab_actor_indicator");
+    }
+
+    @Test
+    @MediumTest
+    @Feature({"RenderTest"})
+    public void testStandardTab_Active_ActorIndicator() throws IOException {
+        ViewGroup[] view = new ViewGroup[1];
+        ThreadUtils.runOnUiThreadBlocking(
+                () -> {
+                    view[0] = inflateAndAttachView(R.layout.vertical_tab_item);
+                    PropertyModel model =
+                            new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
+                                    .with(TabProperties.IS_INCOGNITO, false)
+                                    .build();
+                    PropertyModelChangeProcessor.create(
+                            model, view[0], TabVerticalViewBinder::bindTab);
+                    model.set(TabProperties.TITLE, "Active AI Tab");
+                    model.set(TabProperties.IS_SELECTED, true);
+                    UiTabState uiTabState =
+                            new UiTabState(0, null, null, TabIndicatorStatus.DYNAMIC, false);
+                    model.set(TabProperties.ACTOR_UI_STATE, uiTabState);
+                    model.set(TabProperties.FAVICON_FETCHER, createFaviconFetcher());
+                    model.set(
+                            TabProperties.TAB_ACTION_BUTTON_DATA,
+                            new TabActionButtonData(
+                                    TabActionButtonType.CLOSE, /* tabActionListener= */ null));
+                });
+        CriteriaHelper.pollUiThread(() -> view[0].getHeight() > 0);
+
+        mRenderTestRule.render(mRenderView, "standard_tab_active_actor_indicator");
     }
 
     @Test

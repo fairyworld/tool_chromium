@@ -74,6 +74,8 @@ class TabVerticalViewBinder {
             TabListViewBinderUtils.updateContentDescription(model, view);
         } else if (TabProperties.MEDIA_INDICATOR == propertyKey) {
             updateMediaIndicator(model, view);
+        } else if (TabProperties.ACTOR_UI_STATE == propertyKey) {
+            updateActorIndicator(model, view);
         }
     }
 
@@ -199,6 +201,14 @@ class TabVerticalViewBinder {
         } else {
             mediaIndicator.setVisibility(View.GONE);
         }
+    }
+
+    private static void updateActorIndicator(PropertyModel model, ViewGroup view) {
+        @Nullable View indicatorView = view.findViewById(R.id.ai_indicator);
+        if (indicatorView == null) return;
+
+        boolean shouldBeVisible = TabListViewBinderUtils.setupActorIndicator(model, view);
+        indicatorView.setVisibility(shouldBeVisible ? View.VISIBLE : View.GONE);
     }
 
     // Row-Specific Layout Color Binder Helpers
