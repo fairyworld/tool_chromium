@@ -71,7 +71,8 @@ FrameTreeNode* GetInnerTreeMainFrameNode(FrameTreeNode* node) {
       node->current_frame_host()->inner_tree_main_frame_tree_node_id());
 
   if (inner_main_frame_tree_node) {
-    DCHECK_NE(&node->frame_tree(), &inner_main_frame_tree_node->frame_tree());
+    CHECK_NE(&node->frame_tree(), &inner_main_frame_tree_node->frame_tree(),
+             base::NotFatalUntil::M152);
   }
 
   return inner_main_frame_tree_node;
@@ -153,17 +154,19 @@ FrameTree::NodeIterator::NodeIterator(
       queue_(std::from_range, starting_nodes) {
   // If `include_delegate_nodes_for_inner_frame_trees_` is true then
   // `should_descend_into_inner_trees_` must be true.
-  DCHECK(!include_delegate_nodes_for_inner_frame_trees_ ||
-         should_descend_into_inner_trees_);
+  CHECK(!include_delegate_nodes_for_inner_frame_trees_ ||
+            should_descend_into_inner_trees_,
+        base::NotFatalUntil::M152);
   AdvanceNode();
 }
 
 FrameTree::NodeIterator FrameTree::NodeRange::begin() {
   // We shouldn't be attempting a frame tree traversal while the tree is
   // being constructed or destructed.
-  DCHECK(std::ranges::all_of(starting_nodes_, [](FrameTreeNode* ftn) {
-    return ftn->current_frame_host();
-  }));
+  CHECK(std::ranges::all_of(
+            starting_nodes_,
+            [](FrameTreeNode* ftn) { return ftn->current_frame_host(); }),
+        base::NotFatalUntil::M152);
 
   return NodeIterator(starting_nodes_, root_of_subtree_to_skip_,
                       should_descend_into_inner_trees_,
@@ -224,9 +227,7 @@ FrameTree::FrameTree(
 
 FrameTree::~FrameTree() {
   is_being_destroyed_ = true;
-#if DCHECK_IS_ON()
-  DCHECK(was_shut_down_);
-#endif
+  CHECK(was_shut_down_, base::NotFatalUntil::M152);
 }
 
 void FrameTree::ForEachRenderViewHost(
@@ -1020,10 +1021,8 @@ void FrameTree::StopLoading() {
 
 void FrameTree::Shutdown() {
   is_being_destroyed_ = true;
-#if DCHECK_IS_ON()
-  DCHECK(!was_shut_down_);
+  CHECK(!was_shut_down_, base::NotFatalUntil::M152);
   was_shut_down_ = true;
-#endif
 
   RenderFrameHostManager* root_manager = root_.render_manager();
 
