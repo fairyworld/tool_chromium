@@ -2125,6 +2125,19 @@ int HttpNetworkTransaction::HandleIOError(int error) {
               true);
           return ERR_TOO_MANY_RETRIES;
         }
+
+        base::UmaHistogramSparse(
+            "Net.NetworkTransaction.RetryOnConnectionErrors", -error);
+        base::UmaHistogramSparse(
+            base::StrCat(
+                {"Net.NetworkTransaction.RetryOnConnectionErrors.",
+                 NegotiatedProtocolToHistogramSuffix(negotiated_protocol_)}),
+            -error);
+
+        if (retry_attempts_on_connection_errors_ == 0) {
+          initial_connection_error_ = error;
+        }
+
         retry_attempts_on_connection_errors_++;
         net_log_.AddEventWithNetErrorCode(
             NetLogEventType::HTTP_TRANSACTION_RESTART_AFTER_ERROR, error);
@@ -2171,6 +2184,15 @@ int HttpNetworkTransaction::HandleIOError(int error) {
                               NegotiatedProtocolToHistogramSuffix(
                                   negotiated_protocol_)}),
                 true);
+            base::UmaHistogramSparse(
+                "Net.NetworkTransaction.InitialErrorOnAsyncRetry",
+                -initial_connection_error_);
+            base::UmaHistogramSparse(
+                base::StrCat(
+                    {"Net.NetworkTransaction.InitialErrorOnAsyncRetry.",
+                     NegotiatedProtocolToHistogramSuffix(
+                         negotiated_protocol_)}),
+                -initial_connection_error_);
           }
           // Use WeakPtr to prevent a potential dangling pointer crash. See
           // http://crbug.com/506964502 for more details.

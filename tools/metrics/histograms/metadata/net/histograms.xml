@@ -4690,6 +4690,19 @@ chromium-metrics-reviews@google.com.
   </token>
 </histogram>
 
+<histogram name="Net.NetworkTransaction.InitialErrorOnAsyncRetry{Protocol}"
+    enum="NetErrorCodes" expires_after="2027-06-19">
+  <owner>hayato@chromium.org</owner>
+  <owner>src/net/OWNERS</owner>
+  <summary>
+    Recorded when the mitigation for priority starvation (switching to async
+    retry after a threshold of connection errors) is triggered. Records the
+    initial network error code that started the connection error retry loop.
+    This is for {Protocol}.
+  </summary>
+  <token key="Protocol" variants="NetworkTransactionProtocol"/>
+</histogram>
+
 <histogram
     name="Net.NetworkTransaction.InitializeStreamBlocked{HostType}.{Protocol}"
     enum="Boolean" expires_after="2026-09-20">
@@ -4760,6 +4773,18 @@ chromium-metrics-reviews@google.com.
     of a single HttpNetworkTransaction. Recorded when the transaction is
     destroyed, if there was at least one retry attempt. The maximum value is
     kMaxRetryAttemptsOnConnectionErrors (50). This is for {Protocol}.
+  </summary>
+  <token key="Protocol" variants="NetworkTransactionProtocol"/>
+</histogram>
+
+<histogram name="Net.NetworkTransaction.RetryOnConnectionErrors{Protocol}"
+    enum="NetErrorCodes" expires_after="2027-06-19">
+  <owner>hayato@chromium.org</owner>
+  <owner>src/net/OWNERS</owner>
+  <summary>
+    Recorded when a retry attempt is made for a connection error during an HTTP
+    network transaction. Records the specific network error code that triggered
+    the retry. This is for {Protocol}.
   </summary>
   <token key="Protocol" variants="NetworkTransactionProtocol"/>
 </histogram>
