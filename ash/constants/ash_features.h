@@ -1062,6 +1062,7 @@ COMPONENT_EXPORT(ASH_CONSTANTS) bool IsDemoModeSignInFileCleanupEnabled();
 COMPONENT_EXPORT(ASH_CONSTANTS)
 bool IsDemoModeSecondaryGoogleAccountSigninAllowedFalse();
 COMPONENT_EXPORT(ASH_CONSTANTS) bool IsDeskTemplateSyncEnabled();
+COMPONENT_EXPORT(ASH_CONSTANTS) bool IsDeviceMoveConfigSaveEnabled();
 COMPONENT_EXPORT(ASH_CONSTANTS) bool IsDisplayPerformanceModeEnabled();
 COMPONENT_EXPORT(ASH_CONSTANTS) bool IsPeripheralCustomizationEnabled();
 COMPONENT_EXPORT(ASH_CONSTANTS) bool IsPeripheralsLoggingEnabled();
