@@ -261,9 +261,14 @@ class AutofillExternalDelegate : public AutofillSuggestionDelegate {
 
   const raw_ref<BrowserAutofillManager> manager_;
 
-  // The current form and field selected by Autofill.
+  // The form last queried by Autofill.
   FormData query_form_;
-  FormFieldData query_field_;
+
+  // Information about the field last queried by Autofill.
+  FieldGlobalId query_field_id_;
+  std::u16string query_field_name_;
+  std::vector<SelectOption> query_field_datalist_options_;
+
   // The method how suggestions were triggered on the current form.
   AutofillSuggestionTriggerSource trigger_source_ =
       AutofillSuggestionTriggerSource::kUnspecified;
