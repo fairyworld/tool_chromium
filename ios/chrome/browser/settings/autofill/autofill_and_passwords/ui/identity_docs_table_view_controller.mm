@@ -55,10 +55,15 @@ enum ItemType {
   UIBarButtonItem* _addButtonInToolbar;
   BOOL _hasLocalEntities;
   BOOL _identityDocsEnabled;
+  BOOL _identityDocsToggleEnabled;
 }
 
 - (instancetype)init {
-  return [super initWithStyle:ChromeTableViewStyle()];
+  self = [super initWithStyle:ChromeTableViewStyle()];
+  if (self) {
+    _identityDocsToggleEnabled = YES;
+  }
+  return self;
 }
 
 - (void)viewDidLoad {
@@ -87,6 +92,7 @@ enum ItemType {
   toggleItem.text =
       l10n_util::GetNSString(IDS_AUTOFILL_IDENTITY_DOCS_OPT_IN_TOGGLE_LABEL);
   toggleItem.on = _identityDocsEnabled;
+  toggleItem.enabled = _identityDocsToggleEnabled;
   toggleItem.target = self;
   toggleItem.selector = @selector(identityDocsToggleChanged:);
   [model addItem:toggleItem toSectionWithIdentifier:SectionIdentifierToggle];
@@ -159,11 +165,12 @@ enum ItemType {
   }
 }
 
-- (void)setIdentityDocsToggleState:(BOOL)enabled {
-  if (_identityDocsEnabled == enabled) {
+- (void)setIdentityDocsToggleState:(BOOL)on enabled:(BOOL)enabled {
+  if (_identityDocsEnabled == on && _identityDocsToggleEnabled == enabled) {
     return;
   }
-  _identityDocsEnabled = enabled;
+  _identityDocsEnabled = on;
+  _identityDocsToggleEnabled = enabled;
   if (self.isViewLoaded) {
     TableViewModel* model = self.tableViewModel;
     NSIndexPath* switchPath =
@@ -173,7 +180,8 @@ enum ItemType {
       TableViewSwitchItem* switchItem =
           base::apple::ObjCCastStrict<TableViewSwitchItem>(
               [model itemAtIndexPath:switchPath]);
-      switchItem.on = enabled;
+      switchItem.enabled = enabled;
+      switchItem.on = on;
       [self reconfigureCellsForItems:@[ switchItem ]];
     }
     [self updateAddButtonInToolbar];
@@ -262,13 +270,14 @@ enum ItemType {
   }
   _addButtonInToolbar.action = nil;
   _addButtonInToolbar.target = nil;
-  _addButtonInToolbar.menu =
-      [AutofillAIAddEntitiesMenuBuilder buildMenuWithTypes:_writableEntityTypes
-                                            profileEnabled:NO
-                                           entitiesEnabled:_identityDocsEnabled
-                                                  delegate:self];
-  _addButtonInToolbar.enabled =
-      _identityDocsEnabled && !_writableEntityTypes.empty();
+  _addButtonInToolbar.menu = [AutofillAIAddEntitiesMenuBuilder
+      buildMenuWithTypes:_writableEntityTypes
+          profileEnabled:NO
+         entitiesEnabled:_identityDocsEnabled && _identityDocsToggleEnabled
+                delegate:self];
+  _addButtonInToolbar.enabled = _identityDocsEnabled &&
+                                _identityDocsToggleEnabled &&
+                                !_writableEntityTypes.empty();
 }
 
 #pragma mark - AutofillAIAddEntitiesMenuDelegate

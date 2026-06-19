@@ -54,10 +54,15 @@ enum ItemType {
   UIBarButtonItem* _addButtonInToolbar;
   BOOL _hasLocalEntities;
   BOOL _travelInfoEnabled;
+  BOOL _travelInfoToggleEnabled;
 }
 
 - (instancetype)init {
-  return [super initWithStyle:ChromeTableViewStyle()];
+  self = [super initWithStyle:ChromeTableViewStyle()];
+  if (self) {
+    _travelInfoToggleEnabled = YES;
+  }
+  return self;
 }
 
 - (void)viewDidLoad {
@@ -86,6 +91,7 @@ enum ItemType {
   toggleItem.text =
       l10n_util::GetNSString(IDS_AUTOFILL_TRAVEL_OPT_IN_TOGGLE_LABEL);
   toggleItem.on = _travelInfoEnabled;
+  toggleItem.enabled = _travelInfoToggleEnabled;
   toggleItem.target = self;
   toggleItem.selector = @selector(travelInfoToggleChanged:);
   [model addItem:toggleItem toSectionWithIdentifier:SectionIdentifierToggle];
@@ -177,11 +183,12 @@ enum ItemType {
   }
 }
 
-- (void)setTravelInfoToggleState:(BOOL)enabled {
-  if (_travelInfoEnabled == enabled) {
+- (void)setTravelInfoToggleState:(BOOL)on enabled:(BOOL)enabled {
+  if (_travelInfoEnabled == on && _travelInfoToggleEnabled == enabled) {
     return;
   }
-  _travelInfoEnabled = enabled;
+  _travelInfoEnabled = on;
+  _travelInfoToggleEnabled = enabled;
   if (self.isViewLoaded) {
     TableViewModel* model = self.tableViewModel;
     NSIndexPath* switchPath =
@@ -191,7 +198,8 @@ enum ItemType {
       TableViewSwitchItem* switchItem =
           base::apple::ObjCCastStrict<TableViewSwitchItem>(
               [model itemAtIndexPath:switchPath]);
-      switchItem.on = enabled;
+      switchItem.enabled = enabled;
+      switchItem.on = on;
       [self reconfigureCellsForItems:@[ switchItem ]];
     }
     [self updateAddButtonInToolbar];
@@ -280,13 +288,14 @@ enum ItemType {
   }
   _addButtonInToolbar.action = nil;
   _addButtonInToolbar.target = nil;
-  _addButtonInToolbar.menu =
-      [AutofillAIAddEntitiesMenuBuilder buildMenuWithTypes:_writableEntityTypes
-                                             profileEnabled:NO
-                                            entitiesEnabled:_travelInfoEnabled
-                                                   delegate:self];
-  _addButtonInToolbar.enabled =
-      _travelInfoEnabled && !_writableEntityTypes.empty();
+  _addButtonInToolbar.menu = [AutofillAIAddEntitiesMenuBuilder
+      buildMenuWithTypes:_writableEntityTypes
+          profileEnabled:NO
+         entitiesEnabled:_travelInfoEnabled && _travelInfoToggleEnabled
+                delegate:self];
+  _addButtonInToolbar.enabled = _travelInfoEnabled &&
+                                _travelInfoToggleEnabled &&
+                                !_writableEntityTypes.empty();
 }
 
 #pragma mark - AutofillAIAddEntitiesMenuDelegate

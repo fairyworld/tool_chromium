@@ -144,7 +144,8 @@ TEST_F(TravelInfoMediatorTest, SupportedEntityTypes) {
 
 @interface FakeTravelInfoConsumer : NSObject <TravelInfoConsumer>
 - (const std::vector<autofill::EntityType>&)writableEntityTypes;
-@property(nonatomic, assign) BOOL travelInfoToggleState;
+@property(nonatomic, assign) BOOL travelInfoToggleStateOn;
+@property(nonatomic, assign) BOOL travelInfoToggleEnabled;
 @end
 
 @implementation FakeTravelInfoConsumer {
@@ -168,8 +169,9 @@ TEST_F(TravelInfoMediatorTest, SupportedEntityTypes) {
   return _writableEntityTypes;
 }
 
-- (void)setTravelInfoToggleState:(BOOL)enabled {
-  _travelInfoToggleState = enabled;
+- (void)setTravelInfoToggleState:(BOOL)on enabled:(BOOL)enabled {
+  _travelInfoToggleStateOn = on;
+  _travelInfoToggleEnabled = enabled;
 }
 @end
 
@@ -252,13 +254,33 @@ TEST_F(TravelInfoMediatorTest, PrefChangeUpdatesConsumer) {
       autofill::prefs::kAutofillAiTravelEntitiesEnabled, false);
   mediator_.consumer = consumer_;
 
-  OCMExpect([consumer_ setTravelInfoToggleState:YES]);
+  OCMExpect([consumer_ setTravelInfoToggleState:YES enabled:YES]);
   profile_->GetPrefs()->SetBoolean(
       autofill::prefs::kAutofillAiTravelEntitiesEnabled, true);
   [consumer_ verify];
 
-  OCMExpect([consumer_ setTravelInfoToggleState:NO]);
+  OCMExpect([consumer_ setTravelInfoToggleState:NO enabled:YES]);
   profile_->GetPrefs()->SetBoolean(
       autofill::prefs::kAutofillAiTravelEntitiesEnabled, false);
+  [consumer_ verify];
+}
+
+// Tests that a preference change for address autofill updates the consumer
+// toggle enabled state.
+TEST_F(TravelInfoMediatorTest, AutofillProfilePrefChangeUpdatesConsumer) {
+  profile_->GetPrefs()->SetBoolean(autofill::prefs::kAutofillProfileEnabled,
+                                   true);
+  profile_->GetPrefs()->SetBoolean(
+      autofill::prefs::kAutofillAiTravelEntitiesEnabled, true);
+  mediator_.consumer = consumer_;
+
+  OCMExpect([consumer_ setTravelInfoToggleState:NO enabled:NO]);
+  profile_->GetPrefs()->SetBoolean(autofill::prefs::kAutofillProfileEnabled,
+                                   false);
+  [consumer_ verify];
+
+  OCMExpect([consumer_ setTravelInfoToggleState:YES enabled:YES]);
+  profile_->GetPrefs()->SetBoolean(autofill::prefs::kAutofillProfileEnabled,
+                                   true);
   [consumer_ verify];
 }

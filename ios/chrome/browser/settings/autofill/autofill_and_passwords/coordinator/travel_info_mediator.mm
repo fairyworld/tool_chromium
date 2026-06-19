@@ -31,11 +31,12 @@ static constexpr autofill::DenseSet<autofill::EntityTypeName> kTravelInfo = {
 // Mediator implementation for Travel Info.
 @implementation TravelInfoMediator {
   PrefBackedBoolean* _travelInfoEnabled;
+  PrefBackedBoolean* _autofillProfileEnabled;
 }
 
 - (instancetype)initWithEntityDataManager:
                     (autofill::EntityDataManager*)entityDataManager
-                               prefService:(PrefService*)prefService {
+                              prefService:(PrefService*)prefService {
   self = [super initWithEntityDataManager:entityDataManager
                               prefService:prefService];
   if (self) {
@@ -45,6 +46,10 @@ static constexpr autofill::DenseSet<autofill::EntityTypeName> kTravelInfo = {
                      prefName:autofill::prefs::
                                   kAutofillAiTravelEntitiesEnabled];
       _travelInfoEnabled.observer = self;
+      _autofillProfileEnabled = [[PrefBackedBoolean alloc]
+          initWithPrefService:prefService
+                     prefName:autofill::prefs::kAutofillProfileEnabled];
+      _autofillProfileEnabled.observer = self;
     }
   }
   return self;
@@ -59,9 +64,7 @@ static constexpr autofill::DenseSet<autofill::EntityTypeName> kTravelInfo = {
     // Trigger initial push.
     [self pushEntitiesToConsumer];
 
-    if (_travelInfoEnabled) {
-      [_consumer setTravelInfoToggleState:_travelInfoEnabled.value];
-    }
+    [self updateConsumerToggleState];
   }
 }
 
@@ -70,15 +73,32 @@ static constexpr autofill::DenseSet<autofill::EntityTypeName> kTravelInfo = {
   _travelInfoEnabled.observer = nil;
   [_travelInfoEnabled stop];
   _travelInfoEnabled = nil;
+  _autofillProfileEnabled.observer = nil;
+  [_autofillProfileEnabled stop];
+  _autofillProfileEnabled = nil;
   _consumer = nil;
 }
 
 #pragma mark - BooleanObserver
 
 - (void)booleanDidChange:(id<ObservableBoolean>)observableBoolean {
-  if (observableBoolean == _travelInfoEnabled) {
-    [self.consumer setTravelInfoToggleState:_travelInfoEnabled.value];
+  if (observableBoolean == _travelInfoEnabled ||
+      observableBoolean == _autofillProfileEnabled) {
+    [self updateConsumerToggleState];
   }
+}
+
+#pragma mark - Private
+
+- (void)updateConsumerToggleState {
+  if (!self.consumer) {
+    return;
+  }
+  BOOL profileEnabled =
+      _autofillProfileEnabled ? _autofillProfileEnabled.value : YES;
+  BOOL travelInfoEnabled = _travelInfoEnabled ? _travelInfoEnabled.value : YES;
+  [self.consumer setTravelInfoToggleState:travelInfoEnabled && profileEnabled
+                                  enabled:profileEnabled];
 }
 
 #pragma mark - TravelInfoMutator

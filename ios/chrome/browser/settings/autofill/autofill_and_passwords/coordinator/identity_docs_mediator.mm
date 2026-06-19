@@ -30,6 +30,7 @@ static constexpr autofill::DenseSet<autofill::EntityTypeName> kIdentityDocs = {
 // Mediator implementation for Identity Docs.
 @implementation IdentityDocsMediator {
   PrefBackedBoolean* _identityDocsEnabled;
+  PrefBackedBoolean* _autofillProfileEnabled;
 }
 
 - (instancetype)initWithEntityDataManager:
@@ -44,6 +45,10 @@ static constexpr autofill::DenseSet<autofill::EntityTypeName> kIdentityDocs = {
                      prefName:autofill::prefs::
                                   kAutofillAiIdentityEntitiesEnabled];
       _identityDocsEnabled.observer = self;
+      _autofillProfileEnabled = [[PrefBackedBoolean alloc]
+          initWithPrefService:prefService
+                     prefName:autofill::prefs::kAutofillProfileEnabled];
+      _autofillProfileEnabled.observer = self;
     }
   }
   return self;
@@ -58,9 +63,7 @@ static constexpr autofill::DenseSet<autofill::EntityTypeName> kIdentityDocs = {
     // Trigger initial push.
     [self pushEntitiesToConsumer];
 
-    if (_identityDocsEnabled) {
-      [_consumer setIdentityDocsToggleState:_identityDocsEnabled.value];
-    }
+    [self updateConsumerToggleState];
   }
 }
 
@@ -69,15 +72,34 @@ static constexpr autofill::DenseSet<autofill::EntityTypeName> kIdentityDocs = {
   _identityDocsEnabled.observer = nil;
   [_identityDocsEnabled stop];
   _identityDocsEnabled = nil;
+  _autofillProfileEnabled.observer = nil;
+  [_autofillProfileEnabled stop];
+  _autofillProfileEnabled = nil;
   _consumer = nil;
 }
 
 #pragma mark - BooleanObserver
 
 - (void)booleanDidChange:(id<ObservableBoolean>)observableBoolean {
-  if (observableBoolean == _identityDocsEnabled) {
-    [self.consumer setIdentityDocsToggleState:_identityDocsEnabled.value];
+  if (observableBoolean == _identityDocsEnabled ||
+      observableBoolean == _autofillProfileEnabled) {
+    [self updateConsumerToggleState];
   }
+}
+
+#pragma mark - Private
+
+- (void)updateConsumerToggleState {
+  if (!self.consumer) {
+    return;
+  }
+  BOOL profileEnabled =
+      _autofillProfileEnabled ? _autofillProfileEnabled.value : YES;
+  BOOL identityDocsEnabled =
+      _identityDocsEnabled ? _identityDocsEnabled.value : YES;
+  [self.consumer
+      setIdentityDocsToggleState:identityDocsEnabled && profileEnabled
+                         enabled:profileEnabled];
 }
 
 #pragma mark - IdentityDocsMutator

@@ -31,8 +31,9 @@ class EntityType;
 - (void)setWritableEntityTypes:
     (const std::vector<autofill::EntityType>&)writableEntityTypes;
 
-// Sets the toggle state for "save and fill travel info".
-- (void)setTravelInfoToggleState:(BOOL)enabled;
+// Sets the toggle state for "save and fill travel info" and its enabled
+// state.
+- (void)setTravelInfoToggleState:(BOOL)on enabled:(BOOL)enabled;
 
 @end
 

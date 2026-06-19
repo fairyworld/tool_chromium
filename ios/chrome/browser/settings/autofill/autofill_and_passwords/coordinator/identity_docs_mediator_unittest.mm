@@ -175,13 +175,33 @@ TEST_F(IdentityDocsMediatorTest, PrefChangeUpdatesConsumer) {
       autofill::prefs::kAutofillAiIdentityEntitiesEnabled, false);
   mediator_.consumer = consumer_;
 
-  OCMExpect([consumer_ setIdentityDocsToggleState:YES]);
+  OCMExpect([consumer_ setIdentityDocsToggleState:YES enabled:YES]);
   profile_->GetPrefs()->SetBoolean(
       autofill::prefs::kAutofillAiIdentityEntitiesEnabled, true);
   [consumer_ verify];
 
-  OCMExpect([consumer_ setIdentityDocsToggleState:NO]);
+  OCMExpect([consumer_ setIdentityDocsToggleState:NO enabled:YES]);
   profile_->GetPrefs()->SetBoolean(
       autofill::prefs::kAutofillAiIdentityEntitiesEnabled, false);
+  [consumer_ verify];
+}
+
+// Tests that a preference change for address autofill updates the consumer
+// toggle enabled state.
+TEST_F(IdentityDocsMediatorTest, AutofillProfilePrefChangeUpdatesConsumer) {
+  profile_->GetPrefs()->SetBoolean(autofill::prefs::kAutofillProfileEnabled,
+                                   true);
+  profile_->GetPrefs()->SetBoolean(
+      autofill::prefs::kAutofillAiIdentityEntitiesEnabled, true);
+  mediator_.consumer = consumer_;
+
+  OCMExpect([consumer_ setIdentityDocsToggleState:NO enabled:NO]);
+  profile_->GetPrefs()->SetBoolean(autofill::prefs::kAutofillProfileEnabled,
+                                   false);
+  [consumer_ verify];
+
+  OCMExpect([consumer_ setIdentityDocsToggleState:YES enabled:YES]);
+  profile_->GetPrefs()->SetBoolean(autofill::prefs::kAutofillProfileEnabled,
+                                   true);
   [consumer_ verify];
 }
