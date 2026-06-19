@@ -12,9 +12,11 @@
 #include <utility>
 #include <vector>
 
+#include "ash/constants/ash_features.h"
 #include "ash/constants/ash_pref_names.h"
 #include "base/check.h"
 #include "base/check_op.h"
+#include "base/feature_list.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback.h"
 #include "base/logging.h"
@@ -25,6 +27,8 @@
 #include "chromeos/ash/components/policy/weekly_time/weekly_time_interval.h"
 #include "chromeos/dbus/power/power_manager_client.h"
 #include "components/prefs/pref_service.h"
+#include "components/session_manager/core/session_manager.h"
+#include "components/user_manager/user_manager.h"
 #include "third_party/cros_system_api/dbus/power_manager/dbus-constants.h"
 
 namespace ash {
@@ -32,6 +36,33 @@ namespace ash {
 using ::policy::WeeklyTimeInterval;
 
 namespace {
+
+bool IsPolicyApplicable() {
+  if (!user_manager::UserManager::IsInitialized()) {
+    return false;
+  }
+  auto* user_manager = user_manager::UserManager::Get();
+  if (user_manager->IsLoggedInAsAnyKioskApp()) {
+    return true;
+  }
+
+  if (!base::FeatureList::IsEnabled(
+          ash::features::kDeviceWeeklyScheduledSuspendMgs)) {
+    return false;
+  }
+
+  if (user_manager->IsLoggedInAsManagedGuestSession()) {
+    return true;
+  }
+
+  if (session_manager::SessionManager::Get() &&
+      session_manager::SessionManager::Get()->session_state() ==
+          session_manager::SessionState::LOGIN_PRIMARY) {
+    return true;
+  }
+
+  return false;
+}
 
 // Extracts a vector of WeeklyTimeInterval objects from the policy config.
 // Returns a vector containing nullptr for invalid dictionary entries.
@@ -107,6 +138,20 @@ DeviceWeeklyScheduledSuspendController::DeviceWeeklyScheduledSuspendController(
       base::BindRepeating(&DeviceWeeklyScheduledSuspendController::
                               OnDeviceWeeklyScheduledSuspendUpdate,
                           weak_factory_.GetWeakPtr()));
+}
+
+void DeviceWeeklyScheduledSuspendController::InitUserManagerObservation(
+    user_manager::UserManager* user_manager) {
+  user_manager_observation_.Observe(user_manager);
+  OnDeviceWeeklyScheduledSuspendUpdate();
+}
+
+void DeviceWeeklyScheduledSuspendController::InitSessionObservation() {
+  if (session_manager::SessionManager::Get()) {
+    session_manager_observation_.Observe(
+        session_manager::SessionManager::Get());
+    OnDeviceWeeklyScheduledSuspendUpdate();
+  }
 
   if (chromeos::PowerManagerClient::Get()) {
     // If the power manager service is already available then as soon as an
@@ -154,6 +199,15 @@ void DeviceWeeklyScheduledSuspendController::DarkSuspendImminent() {
       power_manager::USER_ACTIVITY_OTHER);
 }
 
+void DeviceWeeklyScheduledSuspendController::OnSessionStateChanged() {
+  OnDeviceWeeklyScheduledSuspendUpdate();
+}
+
+void DeviceWeeklyScheduledSuspendController::ActiveUserChanged(
+    user_manager::User* active_user) {
+  OnDeviceWeeklyScheduledSuspendUpdate();
+}
+
 const WeeklyIntervalTimers&
 DeviceWeeklyScheduledSuspendController::GetWeeklyIntervalTimersForTesting()
     const {
@@ -175,13 +229,19 @@ void DeviceWeeklyScheduledSuspendController::
     OnDeviceWeeklyScheduledSuspendUpdate() {
   // Early return in case the policy is set before power manager is available.
   if (!power_manager_available_) {
+    VLOG(1) << "Power manager not available";
     return;
   }
+
+  device_suspension_timers_.clear();
+
+  if (!IsPolicyApplicable()) {
+    return;
+  }
+
   const base::ListValue& policy_config =
       pref_change_registrar_.prefs()->GetList(
           ash::prefs::kDeviceWeeklyScheduledSuspend);
-
-  device_suspension_timers_.clear();
 
   if (!AllWeeklyTimeIntervalsAreValid(policy_config)) {
     return;

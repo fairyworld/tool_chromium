@@ -21,7 +21,9 @@
 #include "chrome/browser/ash/app_mode/kiosk_system_session.h"
 #include "chrome/browser/ash/app_mode/test/kiosk_mixin.h"
 #include "chrome/browser/ash/app_mode/test/kiosk_test_utils.h"
+#include "chrome/browser/ash/policy/core/browser_policy_connector_ash.h"
 #include "chrome/browser/browser_process.h"
+#include "chrome/browser/browser_process_platform_part.h"
 #include "chrome/test/base/mixin_based_in_process_browser_test.h"
 #include "chrome/test/base/testing_browser_process.h"
 #include "chromeos/ash/components/policy/weekly_time/weekly_time.h"
@@ -68,9 +70,9 @@ class ScopedMockTimeScheduledSuspendTestHelper {
  public:
   ScopedMockTimeScheduledSuspendTestHelper() {
     DeviceWeeklyScheduledSuspendController* controller =
-        KioskController::Get()
-            .GetKioskSystemSession()
-            ->device_weekly_scheduled_suspend_controller_for_testing();
+        g_browser_process->platform_part()
+            ->browser_policy_connector_ash()
+            ->GetDeviceWeeklyScheduledSuspendControllerForTesting();
 
     controller->SetWeeklyIntervalTimerFactoryForTesting(
         std::make_unique<WeeklyIntervalTimer::Factory>(
@@ -80,9 +82,9 @@ class ScopedMockTimeScheduledSuspendTestHelper {
 
   ~ScopedMockTimeScheduledSuspendTestHelper() {
     DeviceWeeklyScheduledSuspendController* controller =
-        KioskController::Get()
-            .GetKioskSystemSession()
-            ->device_weekly_scheduled_suspend_controller_for_testing();
+        g_browser_process->platform_part()
+            ->browser_policy_connector_ash()
+            ->GetDeviceWeeklyScheduledSuspendControllerForTesting();
 
     controller->SetWeeklyIntervalTimerFactoryForTesting(nullptr);
     controller->SetClockForTesting(nullptr);
@@ -136,6 +138,15 @@ class FakePowerManagerMixin : public InProcessBrowserTestMixin {
 
 }  // namespace
 
+using DeviceWeeklyScheduledSuspendControllerStartupTest = InProcessBrowserTest;
+
+IN_PROC_BROWSER_TEST_F(DeviceWeeklyScheduledSuspendControllerStartupTest,
+                       SuspendControllerExistsOnStartup) {
+  EXPECT_TRUE(g_browser_process->platform_part()
+                  ->browser_policy_connector_ash()
+                  ->GetDeviceWeeklyScheduledSuspendControllerForTesting());
+}
+
 class DeviceWeeklyScheduledSuspendControllerTest
     : public MixinBasedInProcessBrowserTest,
       public testing::WithParamInterface<KioskMixin::Config> {
@@ -162,13 +173,6 @@ class DeviceWeeklyScheduledSuspendControllerTest
                     /*cached_configuration=*/GetParam()};
   base::test::ScopedFeatureList scoped_feature_list_;
 };
-
-IN_PROC_BROWSER_TEST_P(DeviceWeeklyScheduledSuspendControllerTest,
-                       SuspendControllerExistOnKioskStartUp) {
-  ASSERT_TRUE(KioskController::Get()
-                  .GetKioskSystemSession()
-                  ->device_weekly_scheduled_suspend_controller_for_testing());
-}
 
 IN_PROC_BROWSER_TEST_P(DeviceWeeklyScheduledSuspendControllerTest,
                        SuspendAndWakeTest) {

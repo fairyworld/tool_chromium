@@ -2014,6 +2014,10 @@ BASE_FEATURE(kDeviceActiveClientChurnObservationNewDeviceMetadata,
 // over a powerwash that happens as part of a device move to a new domain
 BASE_FEATURE(kDeviceMoveConfigSave, base::FEATURE_DISABLED_BY_DEFAULT);
 
+// Enables the DeviceWeeklyScheduledSuspend policy for Managed Guest Sessions.
+BASE_FEATURE(kDeviceWeeklyScheduledSuspendMgs,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
 // Enables peripheral customization to be split per device.
 BASE_FEATURE(kPeripheralCustomization, base::FEATURE_ENABLED_BY_DEFAULT);
 
