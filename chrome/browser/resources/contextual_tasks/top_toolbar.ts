@@ -88,6 +88,7 @@ export class TopToolbarElement extends TopToolbarElementBase {
         reflect: true,
       },
       onboardingTooltipShowing: {type: Boolean},
+      contextualTasksEnableSpatialModelToolbarLayout_: {type: Boolean},
     };
   }
 
@@ -107,6 +108,8 @@ export class TopToolbarElement extends TopToolbarElementBase {
       loadTimeData.getBoolean('enablePinButton');
   private hideOverflowMenuOnAiPageEnabled_: boolean =
       loadTimeData.getBoolean('hideMenuOnAiPageEnabled');
+  protected accessor contextualTasksEnableSpatialModelToolbarLayout_: boolean =
+      loadTimeData.getBoolean('contextualTasksEnableSpatialModelToolbarLayout');
   accessor hideOverflowMenuButton_: boolean =
       this.hideOverflowMenuOnAiPageEnabled_ && this.isAiPage;
   protected accessor isPinned: boolean =

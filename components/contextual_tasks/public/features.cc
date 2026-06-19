@@ -150,6 +150,9 @@ BASE_FEATURE(kContextualTasksAiUrlAllowedParamsFilter,
 
 BASE_FEATURE(kContextualTasksUploadChunking, base::FEATURE_DISABLED_BY_DEFAULT);
 
+BASE_FEATURE(kContextualTasksEnableSpatialModelToolbarLayout,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
 bool GetIsContextualTasksPdfCitationsEnabled() {
   return base::FeatureList::IsEnabled(kContextualTasksPdfCitations);
 }
@@ -164,6 +167,11 @@ bool GetIsContextualTasksWindowTrackingEnabled() {
 
 bool GetIsContextualTasksUploadChunkingEnabled() {
   return base::FeatureList::IsEnabled(kContextualTasksUploadChunking);
+}
+
+bool GetContextualTasksSpatialModelToolbarLayoutEnabled() {
+  return base::FeatureList::IsEnabled(
+      kContextualTasksEnableSpatialModelToolbarLayout);
 }
 
 const base::FeatureParam<bool> kContextualTasksLockAndUnlockInputCapability(
@@ -739,6 +747,11 @@ const char kContextualTasksHideMenuOnAiPageName[] =
 const char kContextualTasksHideMenuOnAiPageDescription[] =
     "Hides the 3-dot (overflow) menu when viewing an AI page in the side "
     "panel. The menu is still shown for lens flows.";
+
+const char kContextualTasksEnableSpatialModelToolbarLayoutName[] =
+    "Contextual Tasks Enable Spatial Model Toolbar Layout";
+const char kContextualTasksEnableSpatialModelToolbarLayoutDescription[] =
+    "Enables the spatial model toolbar layout for contextual tasks.";
 
 }  // namespace flag_descriptions
 

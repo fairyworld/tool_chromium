@@ -123,6 +123,8 @@ BASE_DECLARE_FEATURE(kContextualTasksAiUrlAllowedParamsFilter);
 // Enables upload chunking for Contextual Tasks.
 BASE_DECLARE_FEATURE(kContextualTasksUploadChunking);
 
+BASE_DECLARE_FEATURE(kContextualTasksEnableSpatialModelToolbarLayout);
+
 bool GetIsContextualTasksPdfCitationsEnabled();
 
 bool GetIsContextualTasksLazyFetchClusterInfoEnabled();
@@ -130,6 +132,8 @@ bool GetIsContextualTasksLazyFetchClusterInfoEnabled();
 bool GetIsContextualTasksWindowTrackingEnabled();
 
 bool GetIsContextualTasksUploadChunkingEnabled();
+
+bool GetContextualTasksSpatialModelToolbarLayoutEnabled();
 
 // Enum denoting which entry point can show when enabled.
 enum class EntryPointOption {
@@ -417,6 +421,8 @@ extern const char kEnableContextualTasksPinButtonInToolbarName[];
 extern const char kEnableContextualTasksPinButtonInToolbarDescription[];
 extern const char kContextualTasksHideMenuOnAiPageName[];
 extern const char kContextualTasksHideMenuOnAiPageDescription[];
+extern const char kContextualTasksEnableSpatialModelToolbarLayoutName[];
+extern const char kContextualTasksEnableSpatialModelToolbarLayoutDescription[];
 
 }  // namespace flag_descriptions
 

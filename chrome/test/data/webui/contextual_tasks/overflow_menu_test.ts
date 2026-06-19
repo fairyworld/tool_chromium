@@ -31,6 +31,7 @@ suite('OverflowMenuTest', () => {
       enablePinButton: false,
       isAiPage: false,
       isUserFeedbackAllowed: true,
+      contextualTasksEnableSpatialModelToolbarLayout: false,
     });
 
     overflowMenu = document.createElement('contextual-tasks-overflow-menu');
@@ -102,12 +103,12 @@ suite('OverflowMenuTest', () => {
       await proxy.handler.whenCalled('openMyActivityUi');
     });
 
-    test('handles help click', async () => {
+    test('handles feedback click', async () => {
       const buttons = overflowMenu.shadowRoot.querySelectorAll('button');
-      const helpButton = buttons[2];
-      assertTrue(!!helpButton);
+      const feedbackButton = buttons[2];
+      assertTrue(!!feedbackButton);
 
-      helpButton.click();
+      feedbackButton.click();
       await proxy.handler.whenCalled('openFeedbackUi');
     });
   });
@@ -121,6 +122,7 @@ suite('OverflowMenuTest', () => {
         enablePinButton: false,
         isAiPage: false,
         isUserFeedbackAllowed: false,
+        contextualTasksEnableSpatialModelToolbarLayout: false,
       });
       overflowMenu = document.createElement('contextual-tasks-overflow-menu');
       document.body.appendChild(overflowMenu);
@@ -135,7 +137,7 @@ suite('OverflowMenuTest', () => {
       assertFalse(!!feedbackIcon);
     });
 
-    test('hides help button on small form factor', async () => {
+    test('hides feedback button on small form factor', async () => {
       overflowMenu.isSmallDeviceFormFactor = true;
       await microtasksFinished();
 
@@ -161,6 +163,7 @@ suite('OverflowMenuTest', () => {
         isUserFeedbackAllowed: true,
         pinTooltip: 'Pin',
         unpinTooltip: 'Unpin',
+        contextualTasksEnableSpatialModelToolbarLayout: false,
       });
       overflowMenu = document.createElement('contextual-tasks-overflow-menu');
       document.body.appendChild(overflowMenu);
@@ -210,6 +213,59 @@ suite('OverflowMenuTest', () => {
               'ContextualTasks.WebUI.UserAction.UnpinSidePanel', true));
       assertEquals(
           0, metrics.count('ContextualTasks.WebUI.UserAction.PinSidePanel'));
+    });
+  });
+
+  suite('ContextualTasksEnableSpatialModelToolbarLayout', () => {
+    setup(async () => {
+      document.body.innerHTML = window.trustedTypes!.emptyHTML;
+      loadTimeData.resetForTesting({
+        isSmallDeviceFormFactor: false,
+        isSidePanelPinned: false,
+        enablePinButton: false,
+        isAiPage: true,
+        isUserFeedbackAllowed: true,
+        contextualTasksEnableSpatialModelToolbarLayout: true,
+      });
+      overflowMenu = document.createElement('contextual-tasks-overflow-menu');
+      document.body.appendChild(overflowMenu);
+      await microtasksFinished();
+    });
+
+    test('shows correct items in the menu', () => {
+      const buttons = overflowMenu.shadowRoot.querySelectorAll('button');
+      // The menu should contain:
+      // 1. Thread History (because we are on AI page and the flag is enabled)
+      // 2. My Activity
+      // 3. Feedback button
+      // No open in new tab (hidden by flag).
+      assertEquals(3, buttons.length);
+
+      const threadHistoryButton = buttons[0];
+      assertTrue(!!threadHistoryButton);
+      const historyIcon = threadHistoryButton.querySelector('cr-icon');
+      assertTrue(!!historyIcon);
+      assertEquals(
+          'contextual_tasks:notes_spark',
+          historyIcon.getAttribute('icon'));
+    });
+
+    test('handles thread history click', async () => {
+      const buttons = overflowMenu.shadowRoot.querySelectorAll('button');
+      const threadHistoryButton = buttons[0];
+      assertTrue(!!threadHistoryButton);
+
+      threadHistoryButton.click();
+      await proxy.handler.whenCalled('showThreadHistory');
+    });
+
+    test('handles feedback click', async () => {
+      const buttons = overflowMenu.shadowRoot.querySelectorAll('button');
+      const feedbackButton = buttons[2];
+      assertTrue(!!feedbackButton);
+
+      feedbackButton.click();
+      await proxy.handler.whenCalled('openFeedbackUi');
     });
   });
 });

@@ -39,7 +39,8 @@ export function getHtml(this: TopToolbarElement) {
         iron-icon="contextual_tasks:notes_spark"
         class="no-overlap" title="$i18n{threadHistoryTooltip}"
         aria-label="$i18n{threadHistoryTooltip}"
-        ?hidden="${!this.isAiPage}">
+        ?hidden="${!this.isAiPage ||
+            this.contextualTasksEnableSpatialModelToolbarLayout_}">
     </cr-icon-button>
 
     ${!this.contextManagementInComposeboxEnabled_ ? html`

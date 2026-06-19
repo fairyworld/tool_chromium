@@ -11828,6 +11828,15 @@ const FeatureEntry kFeatureEntries[] = {
      FEATURE_VALUE_TYPE(
          contextual_tasks::kEnableContextualTasksPinButtonInToolbar)},
 
+    {"contextual-tasks-enable-spatial-model-toolbar-layout",
+     contextual_tasks::flag_descriptions::
+         kContextualTasksEnableSpatialModelToolbarLayoutName,
+     contextual_tasks::flag_descriptions::
+         kContextualTasksEnableSpatialModelToolbarLayoutDescription,
+     kOsDesktop | kOsAndroid,
+     FEATURE_VALUE_TYPE(
+         contextual_tasks::kContextualTasksEnableSpatialModelToolbarLayout)},
+
     {"contextual-tasks-hide-menu-on-ai-page",
      contextual_tasks::flag_descriptions::kContextualTasksHideMenuOnAiPageName,
      contextual_tasks::flag_descriptions::
