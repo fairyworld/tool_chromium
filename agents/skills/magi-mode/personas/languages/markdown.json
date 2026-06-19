@@ -11,6 +11,10 @@
     ],
     "line_length_limit": [
       "Ensure lines do not exceed 80 characters unless exempt."
+    ],
+    "heading_hierarchy": [
+      "Ensure heading levels are structured logically without skipping levels.",
+      "Under a top-level # header, next-level headings must start at ## (not ###)."
     ]
   }
 }

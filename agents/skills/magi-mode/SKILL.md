@@ -115,280 +115,26 @@ are deterministic.*
 - **Training:** `VALIDATION` (if manually invoked)
 - **Validation:** `DEPLOYMENT`
 
-## Workflow
+## Workflow Stages
 
-### Stage 1: Specify & Investigate
+The MAGI protocol runs through four distinct stages. To reduce LLM context
+size, detailed step-by-step rules for each stage are maintained in separate
+references:
 
-#### Step 1: Define Goal (Scoping)
-
-1. **The Investigation:** When a bug or feature is requested, the Orchestrator
-   MUST NOT read the raw logs or attempt to hold the requirements in its own
-   context window. Instead, invoke a "Scoping" sub-agent.
-2. **Session Resumption:** Before starting investigation, Scoping MUST check if
-   the directory configured in `temp_directory` contains a half-finished session
-   (e.g., existing state files). If it does, the agent MUST ask the user whether
-   they want to resume the previous session or start a new task.
-
-#### Step 2: Investigate Codebase (Scoping)
-
-1. Scoping investigates the codebase (`grep_search`, `read_file`) to understand
-   context, dependencies, and existing patterns.
-2. **Environment Discovery:** Before writing the file, Scoping MUST discover the
-   environment:
-   - **VCS:** Check for a `.jj/` directory or run `jj status`. If successful,
-     set `vcs` to `"JJ"`. Otherwise, default to `"GIT"`.
-   - **Harness:** Check if Jetski tools (e.g., `code_search`, `view_file`) are
-     available. If yes, set `harness` to `"JETSKI"`. Otherwise, set to
-     `"GENERIC_CLI"`.
-   - **Temp Directory:** Configure the path where all transient MAGI files
-     will be stored:
-     - If Harness is `"JETSKI"`, check the environment variable
-       `$ANTIGRAVITY_CONVERSATION_ID` and set `temp_directory` to the
-       JetSki conversation brain folder:
-       `~/.gemini/jetski/brain/<conversation_id>/.temp/` (must be resolved
-       to its absolute path).
-     - If Harness is `"GENERIC_CLI"`, default to
-       `agents/skills/magi-mode/.temp/`.
-
-#### Step 3: Define Scope (Scoping)
-
-1. Scoping writes a strict specification to `project.magi.json` conforming to
-   `magi_schema.json`.
-2. **Path & Complexity Determination:** Scoping MUST determine the
-   `execution_path` and `complexity_level`:
-   - `complexity_level`: `LOW` (minor bug fixes, small nits), `MEDIUM` (standard
-     feature work), or `HIGH` (architectural changes, security-sensitive code).
-   - `execution_path`: `FAST_PATH` if complexity is `LOW` and ambiguity is
-     `LOW`. Otherwise, default to `RIGOR_PATH`.
-3. **Task Type Determination:** Scoping MUST determine the `task_type` based on
-   the request:
-   - `IMPLEMENTATION`: Default. For creating new features or fixing bugs. Sets
-     `next_stage` to `SCAFFOLDING`.
-   - `REVIEW`: For reviewing existing changes or a CL. Sets `next_stage` to
-     `PREPARATION`.
-   - `AUDIT`: For analyzing existing code for modernization or flaws. Sets
-     `next_stage` to `PREPARATION`.
-4. **Context Resolution (The Stop-and-Verify Gate):** Scoping MUST verify that
-   all external context (e.g., Buganizer links, documentation URLs) has been
-   successfully retrieved and parsed. If any link returned a login prompt,
-   redirect, or error, Scoping MUST halt, report the failure to the human, and
-   request the raw text of the missing context. It MUST NOT proceed with a
-   hallucinated or "fallback" scope.
-5. **Approach Confirmation (The Dynamic Gate):** Scoping MUST assess the
-   ambiguity of the request.
-   - **Low Ambiguity:** If the human provided prescriptive instructions (e.g.,
-     "Add feature X to file Y"), Scoping sets `ambiguity_level: "LOW"`.
-   - **High Ambiguity:** If the request is exploratory, implies multiple viable
-     paths, or is underspecified, Scoping sets `ambiguity_level: "HIGH"`. **The
-     Gate:** If `ambiguity_level == "HIGH"` OR `context_resolved == false`, the
-     Orchestrator MUST pause for human intervention. If
-     `ambiguity_level == "LOW"` AND `context_resolved == true`, the Orchestrator
-     MAY auto-proceed to the next stage.
-   - **Confirmation Details:** During the gate, Scoping MUST present the
-     discovered `goal`, `target_files`, and **Build Parameters** (Debug/Release,
-     reclient status, and `output_directory`) to the user for verification.
-6. **JSON Contract (`project.magi.json`):** See [EXAMPLES.md](./EXAMPLES.md) for
-   a full example. *Tooling Selection:* The combination of `repo_type`, `vcs`,
-   and `harness` in the `environment` block determines the exact build, test,
-   and upload commands used by the agents.
-
-### Stage 2: Generate
-
-*Note: Steps 1, 2, 4, 6, and 7 are ONLY executed if `task_type` is
-`IMPLEMENTATION`.* *Step 3 (Select Modules) is executed for all task types to
-initialize the State Block. Step 5 (Synthesize) is executed during the initial
-generation for `IMPLEMENTATION` tasks, but its synthesis logic is also invoked
-during Stage 3 (Refine) iteration for all task types if code changes are
-generated.*
-
-#### Step 1: Scaffold (Implementation)
-
-1. **Roughing In:** Invoke an Implementation sub-agent. The Implementation MUST
-   read `project.magi.json` to understand the goal. Their mandate is to create
-   necessary files, define class interfaces, set up Mojo pipes, and GN/DEPS
-   rules. Leave implementation details empty or stubbed (e.g.,
-   `NOTIMPLEMENTED()`). The Implementation MUST signal
-   `next_stage: SCAFFOLDING`.
-
-#### Step 2: TDD Boundary (The Test Expert)
-
-1. **Test-Driven Development:** After the Implementation completes the scaffold,
-   invoke a Test Expert sub-agent to establish the testing boundaries. Their
-   mandate is to add test files (`*_unittest.cc`), define the required test
-   fixtures, and stub out the critical test cases based on the Implementation's
-   scaffold. To ensure failure in Chromium's GTest framework (confirming TDD
-   behavior), the Test Expert MUST insert `ADD_FAILURE() << "NOT IMPLEMENTED"`
-   into the stubbed test cases. The Test Expert SHOULD signal
-   `next_stage: PREPARATION`.
-2. **Scaffold Verification:** Before proceeding to Step 3, the Orchestrator MUST
-   attempt to build the scaffolded targets. If `build_targets` are defined in
-   `project.magi.json`, the Orchestrator MUST verify that the scaffold compiles
-   and that all newly added tests fail (confirming TDD behavior).
-3. **Snapshot:** The Orchestrator records this state (e.g., as a local commit)
-   as the "Base Scaffold" so all parallel Implementation Modules share the exact
-   same multi-file API and test boundaries.
-
-#### Step 3: Select Modules (The Orchestrator)
-
-1. **Needs Assessment:** The Orchestrator reads `project.magi.json` and the
-   [ROUTING.md](./ROUTING.md) catalog to select the appropriate Scanners
-   (Auditors) based on the execution path:
-   - **FAST_PATH:** Select a single auditor (typically the Auditor).
-   - **RIGOR_PATH:** Select the "Big Three" (Security, Performance, Auditor)
-     plus any relevant domain modules.
-2. **State Initialization:** The Orchestrator writes the initial State Block to
-   `state_block.magi.json`. The `checklist` field is initialized with the
-   **Union Set** of all checklist keys from every selected ruleset, set to
-   `false`.
-3. **State Transport Selection:** The Orchestrator selects `state_transport`
-   based on the risk score (Scanner Count * Target Files):
-   - **FILE_IO:** Use if risk score > 15.
-   - **EPHEMERAL_WITH_LOGS:** Default for standard tasks.
-4. **JSON Contract (`state_block.magi.json`):** See [EXAMPLES.md](./EXAMPLES.md)
-   for a full example.
-
-#### Step 4: Implement (Implementation Modules)
-
-1. **Parallel Implementation:** Invoke the selected sub-agents in parallel
-   (`wait_for_previous: false`). Instruct each to implement the stubbed
-   internals from the Base Scaffold.
-2. **Mandates for Modules:**
-   - **Production Code Focus:** Modules SHOULD focus primarily on implementing
-     the production code logic.
-   - **Production Hardening:** Modules MUST adhere to the **Production Hardening
-     Checklist** (defined at the end of this document) during implementation.
-   - **Domain Edge Cases:** If a module identifies specific edge cases or
-     scenarios that need verification, they MUST add a stubbed test case in the
-     test file (with both `ADD_FAILURE() << "NOT IMPLEMENTED"` and a descriptive
-     TODO comment) rather than fully implementing the test.
-   - **Test Hooks & Accessors:** Modules MUST provide any necessary public
-     accessors, test-only hooks, or `friend` declarations in the production code
-     that the Test Expert will need to verify internal state.
-   - **Signature Integrity Lock:** Modules MUST NOT change scaffolded signatures
-     (function names, parameters, or return types). If a module identifies a
-     necessary API change, it MUST signal `next_stage: ESCALATION` and produce a
-     detailed `conflict_report` for human review.
-3. **File I/O:** Each sub-agent MUST read `project.magi.json` to ground their
-   implementation in the actual requirements. They MUST securely save their
-   draft to disk using the versioned naming convention
-   `[filename].[persona].magi.[iteration]` (e.g., `host.cc.security.magi.1`).
-   Sub-agents SHOULD signal `next_stage: SYNTHESIS` upon completion.
-
-#### Step 5: Synthesize (Synthesis)
-
-1. **Conflict Resolution:** Synthesis MUST use a surgical 3-way merge strategy
-   (Base Scaffold + Draft A + Draft B) rather than full-file overwrites to
-   resolve conflicts between modules.
-2. **Hardening Audit:** Synthesis MUST perform a final audit against the
-   **Production Hardening Checklist** during synthesis to ensure merged code
-   maintains architectural integrity.
-3. **Synthesis Build (Empirical Gate):** If `build_targets` are defined in
-   `project.magi.json`, Synthesis MUST run the local build/test suite on "Draft
-   A".
-   - **Failure:** If the code fails to compile, Synthesis MUST loop back to
-     internal refinement and fix the syntax/link errors. It MUST NOT signal
-     `next_stage: TEST_FILLING` or `CRITIQUE` until the build is green.
-   - **Success:** Once the build is verified, Synthesis MUST attach the build
-     logs to the synthesis report before signaling `next_stage: TEST_FILLING` or
-     `CRITIQUE`.
-
-#### Step 6: Implement Tests (The Test Expert)
-
-1. Fill out the actual implementation of tests.
-
-#### Step 7: Verification Build (The Test Expert)
-
-1. Run tests to verify they PASS. If they fail due to implementation bugs, loop
-   back to Step 5 or 4.
-
-### Stage 3: Refine
-
-#### Step 1: Review (The Scanners)
-
-1. **Audit Mandate:** Invoke the selected Scanners (Auditors) to review the
-   synthesized code against their specialized boolean checklists.
-2. **Prompt Template:**
-   > MANDATE: Perform technical audit of synthesized code. INPUT: [filename]
-   > SPEC: project.magi.json RULESET: [persona_file_path] OUTPUT: JSON object
-   > conforming to magi_schema.json#definitions/ReviewFeedback TARGET:
-   > review.[persona].magi.[iteration].json TONE: Zero Preamble. Artifacts only.
-
-#### Step 2: Consolidate (The Orchestrator / Consolidation)
-
-1. **Path A: FAST_PATH:** The Orchestrator reads the single review and updates
-   `state_block.magi.json` directly. If any checklist items are `false`, it
-   generates `constraints.magi.[iteration].json` and loops back to synthesis.
-2. **Path B: RIGOR_PATH:** The Orchestrator invokes the **Consolidation**
-   sub-agent to consolidate multiple scanner reports. Consolidation performs a
-   **Logical AND** across all checklists (restricted to scanners that evaluate
-   each specific key) and generates a prioritized list of Actionable Constraints
-   in `constraints.magi.[iteration].json`.
-3. **Conflict Detection (Oscillation):** Consolidation MUST proactively detect
-   mutually exclusive requirements.
-   - **Oscillation:** If a checklist key toggles state (`True -> False -> True`)
-     across iterations, or if the `active_constraints` list is identical across
-     two iterations, Consolidation MUST signal `next_stage: ESCALATION`.
-   - **Conflict Report:** In the event of an oscillation, Consolidation MUST
-     produce a structured `conflict_report` in the State Block, identifying the
-     specific modules and constraints that are in conflict.
-4. **Common Convergence:**
-   - **Convergence & Iteration:** Synthesis reads `state_block.magi.json` and
-     `constraints.magi.[iteration].json` to generate the next iteration.
-   - **Success Handoff:** Once consensus is reached (all checklist items in the
-     State Block are `true`), the Orchestrator proceeds directly to Stage 4:
-     Release.
-   - **Escalation Gate:** If `oscillation_detected == true`, the Orchestrator
-     MUST halt and present the `conflict_report` to the human for a strategic
-     decision.
-
-#### Step 3: Train (Training - Manual Workflow)
-
-1. **Continuous Improvement (Manual):** Once consensus is reached, the automated
-   verification loop terminates and proceeds to Stage 4: Release. The developer
-   can manually invoke the "Training" sub-agent after a session is complete to
-   evaluate the final State Block and Consolidation constraints to identify
-   systemic gaps in the Scanners' knowledge. If a Scanner made a recurring
-   mistake or lacked domain context, Training proposes an upgrade to the
-   relevant `personas/*.json` ruleset by adding a new Boolean constraint to its
-   checklist.
-2. **Module Segmentation (Hierarchical Specialization):** Training MUST NOT let
-   a ruleset's checklist exceed 10 items. If adding a new constraint exceeds
-   this limit, Training MUST "segment" the module using a nested directory
-   structure representing `[category]/[domain]/[specialty].json` (e.g., split
-   `core/security.json` into `core/security/memory.json` and
-   `core/security/network.json`). Do not use flat files with underscores. The
-   directory depth MUST NOT exceed 5 levels (counting from `/personas`). Migrate
-   the relevant checks and update `ROUTING.md`. If manually invoked prior to
-   release, Training MUST signal `next_stage: VALIDATION` upon completion.
-
-### Stage 4: Release
-
-#### Step 1: Validate (Release)
-
-1. Run `git cl presubmit` and full test suite.
-2. **Failure Loop:** If validation fails and requires code change, loop back to
-   **Stage 3: Step 1 (Review)**! (Trivial fixes like formatting/lint can be
-   handled by Release directly if they pass presubmit).
-
-#### Step 2: Deploy (Release)
-
-1. **Handoff:** Once Validation passes, the Orchestrator pauses its own actions
-   and delegates strictly to the **Release** sub-agent. The Orchestrator passes
-   only two pieces of information: the name of the feature/bug, and the list of
-   MAGI files updated by Training (if Training was run manually).
-2. **Exclusive Mandate:** Release's exclusive mandate is:
-   - **Workspace Hygiene:** Read the discovered VCS from
-     `project.magi.json#environment/vcs`. Run `jj st` (for JJ) or `git status`
-     (for Git). Detect and revert accidental submodule bumps. Remove any
-     lingering temporary files generated by the protocol (e.g., `*.magi`,
-     `*.magi.*`) and delete the configured `temp_directory`.
-   - **Formatting:** Enforce `git cl format` or project-specific formatters.
-   - **The Feature CL:** Upload the main feature CL containing only the product
-     source changes (using the VCS-specific track defined in the VCS Isolation
-     Rule).
-   - **The MAGI CL:** Create a separate change/bookmark (for JJ) or branch (for
-     Git). Stage and upload the `ROUTING.md` and `personas/**/*.json` files
-     updated by Training as a secondary CL.
+1. **Stage 1: Specify & Investigate**: Scoping, environment grounding, and
+   project specifications.
+   - Reference: [stage1_specify.md](./references/stage1_specify.md)
+2. **Stage 2: Generate**: Scaffold generation, test bounds (TDD), parallel
+   implementations, and synthesis.
+   - Reference: [stage2_generate.md](./references/stage2_generate.md)
+   - *TDD Mandate:* To enforce Test-Driven Development, stubbed tests MUST
+     fail by default using `ADD_FAILURE() << "NOT IMPLEMENTED"`.
+3. **Stage 3: Refine**: Multi-agent audits (checklist review), constraint
+   consolidation, conflict resolution, and training.
+   - Reference: [stage3_refine.md](./references/stage3_refine.md)
+4. **Stage 4: Release**: Final validation, workspace cleanup, formatting,
+   and CL deployment.
+   - Reference: [stage4_release.md](./references/stage4_release.md)
 
 ### Specialized Modes
 
@@ -399,92 +145,25 @@ generated.*
   MAY present the final synthesized code and consolidated checklist to the human
   for a final "PASS/FAIL" before deployment.
 
-### Production Hardening Checklist
+## Workspace Management & Isolation
 
-Synthesis MUST ensure:
-
-1. **Lifetime Safety:** Use `base::RefCountedDeleteOnSequence` for timers.
-2. **Zero-Copy:** Prefer `std::move` and `base::RefCountedString`.
-3. **DoS Mitigation:** Enforce strict length limits (e.g., 64KB).
-4. **Atomic State:** Ensure callback checks (e.g., `if (callback_)`) are
-   atomically sound or strictly sequence-enforced to prevent double-runs.
-
-**VCS Isolation Rule:** Any modifications to MAGI files (e.g., adding/updating
-personas by Training) MUST be excluded from the feature/bugfix CL. The staging
-and submission workflow branches dynamically based on
-`project.magi.json#environment/vcs`:
-
-- **For JJ (Jujutsu):** Work in parallel sibling changes (both rooted at
-  `main@origin`) from the start: one for the feature/bugfix and one for the MAGI
-  upgrades. If they accidentally get mixed, Release MUST use `jj split` or
-  `jj squash -i` to cleanly separate the changes before pushing.
-- **For GIT:** Use standard git branching. Stage *only* product source files for
-  the feature CL. Stage *only* MAGI updates for the secondary CL.
-
-#### Workspace Management
-
-- **Interim File Isolation**: Place all interim files (drafts, reviews, logs)
-  in `temp_directory` to minimize permission prompts and maintain workspace
+- **Interim File Isolation**: Place all interim files (drafts, reviews, logs) in
+  `temp_directory` to minimize permission prompts and maintain workspace
   hygiene.
 - **Cleanup**: Release (or the agent in charge of cleanup) MUST delete the
   configured temporary directory at the end of the run.
+- **VCS & Staging Workflows**: Sibling modifications to MAGI rulesets (Training)
+  MUST be branched and uploaded as separate changes to Gerrit. For details,
+  consult [vcs_isolation.md](./references/vcs_isolation.md).
 
-### Infrastructure & Tooling Guidance
+## Reference Guides & Drivers
 
-To ensure agents operate safely within the specific environment, specialized
-tooling personas are available in `personas/infra/`:
-
-- **`infra/jj_git.json`**: Expert in `jj` on Git workflow. Agents performing
-  file operations or commit management in a `JJ` environment SHOULD consult this
-  persona to avoid losing Gerrit `Change-Id`s or mishandling detached HEAD
-  states.
-- **`infra/chromium_build.json`**: Expert in Chromium build tools. Agents
-  performing builds or adding new files SHOULD consult this persona to ensure
-  correct target discovery and usage of `autoninja`.
-
-## Harness-Specific Drivers (Orchestration Patterns)
-
-The Orchestrator MUST adjust its behavior and instruction set based on the
-`project.magi.json#environment/orchestration_pattern` to optimize for the
-specific CLI harness.
-
-### 1. CENTRALIZED (Simulated MAS / JETSKI)
-
-Optimized for single-threaded harnesses without native background routing.
-
-- **The State Driver:** The Orchestrator MUST act as the primary state machine.
-  It MUST manually parse `next_stage` signals from sub-agent JSON outputs and
-  explicitly invoke the subsequent tools.
-- **Aggressive Batching (The 1-Turn Rule):** To minimize human-in-the-loop wait
-  times, the Orchestrator MUST attempt to pack all independent operations for a
-  stage into a single turn. This includes reading all necessary personas, source
-  files, and state files in parallel (`wait_for_previous: false`).
-- **Proactive State Recovery:** The Orchestrator MUST start every turn by
-  reading `state_block.magi.json` to ground its context, making the protocol
-  resilient to turn interruptions or context loss.
-- **Direct Prompt Injection:** The Orchestrator SHOULD read the
-  `personas/**/*.json` files and inject their `mandate` and `checklist` directly
-  into the sub-agent invocation prompts to save turns. *Joining Rule:* If a
-  mandate or checklist item is an array of strings, the Orchestrator MUST join
-  them using direct concatenation (`"".join(array)`). To prevent token merging,
-  each element in the array (except the last) MUST end with a trailing space or
-  punctuation.
-
-### 2. DECENTRALIZED (True MAS / GENERIC_CLI)
-
-Optimized for autonomous harnesses with native multi-agent routing (e.g., Gemini
-CLI).
-
-- **Autonomous Delegation:** The Orchestrator MUST delegate task execution to
-  the harness's native sub-agent tools. It SHOULD NOT manually drive every minor
-  transition.
-- **Signaling over Coordination:** Agents SHOULD use `next_stage` signals to
-  trigger successor agents directly through the harness.
-- **Lean Monitoring:** The Orchestrator's context SHOULD remain lean. It
-  monitors high-level "Checkpoints" (e.g., `project.magi.json` and
-  `state_block.magi.json` updates) rather than every interim tool call.
-- **Parallel Synthesis:** Leverage the harness's ability to run multiple
-  specialized agents in parallel without centralized serialization.
+- **Production Hardening & Tooling**: For coding standards, reclient build
+  guidance, and C++ lifecycle rules, consult
+  [tooling_guidance.md](./references/tooling_guidance.md).
+- **Harness & Orchestration Patterns**: To understand Centralized (Jetski) vs.
+  Decentralized (MAS CLI) coordination, consult
+  [orchestration_patterns.md](./references/orchestration_patterns.md).
 
 ## When to Invoke
 
@@ -495,5 +174,13 @@ CLI).
 ## Testing Protocol
 
 To validate MAGI execution and prevent regressions, consult
-[SKILL_TEST_PLAN.md](./SKILL_TEST_PLAN.md) and [SKILL_TEST.md](./SKILL_TEST.md) for
-strategy and unit tests.
+[SKILL_TEST_PLAN.md](./SKILL_TEST_PLAN.md) and [SKILL_TEST.md](./SKILL_TEST.md)
+for strategy and unit tests.
+
+## Skill Resource Map
+
+To satisfy reachability requirements for the multi-agent system, all primary
+catalogs, test files, and examples are linked below:
+
+- **Routing and Specialization**: [ROUTING.md](./ROUTING.md)
+- **JSON Configuration Contract**: [EXAMPLES.md](./EXAMPLES.md)
