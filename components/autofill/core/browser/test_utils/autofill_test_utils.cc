@@ -1071,8 +1071,7 @@ void GenerateTestAutofillPopup(
   std::vector<Suggestion> suggestions;
   suggestions.emplace_back(u"Test suggestion",
                            SuggestionType::kAutocompleteEntry);
-  autofill_external_delegate->OnSuggestionsReturned(field.global_id(),
-                                                    suggestions);
+  autofill_external_delegate->OnSuggestionsReturned(field, suggestions);
 }
 
 std::string ObfuscatedCardDigitsAsUTF8(const std::string& str,

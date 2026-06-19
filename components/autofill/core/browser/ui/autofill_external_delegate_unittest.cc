@@ -548,9 +548,9 @@ class AutofillExternalDelegateTest : public testing::Test,
     return queried_form().fields().front();
   }
 
-  void OnSuggestionsReturned(FieldGlobalId field_id,
+  void OnSuggestionsReturned(const FormFieldData& field,
                              const std::vector<Suggestion>& input_suggestions) {
-    external_delegate().OnSuggestionsReturned(field_id, input_suggestions);
+    external_delegate().OnSuggestionsReturned(field, input_suggestions);
   }
 
   FormData CreateTestFormWithBounds(
@@ -595,17 +595,16 @@ TEST_F(AutofillExternalDelegateTest, GetMainFillingProduct) {
 
   // Show address suggestion in the popup.
   OnSuggestionsReturned(
-      queried_field().global_id(),
-      {CreateAutofillSuggestion(SuggestionType::kAddressEntry,
-                                u"address suggestion"),
-       CreateAutofillSuggestion(SuggestionType::kManageAddress,
-                                u"manage addresses")});
+      queried_field(), {CreateAutofillSuggestion(SuggestionType::kAddressEntry,
+                                                 u"address suggestion"),
+                        CreateAutofillSuggestion(SuggestionType::kManageAddress,
+                                                 u"manage addresses")});
   EXPECT_EQ(external_delegate().GetMainFillingProduct(),
             FillingProduct::kAddress);
 
   // Show credit card suggestion in the popup.
   OnSuggestionsReturned(
-      queried_field().global_id(),
+      queried_field(),
       {CreateAutofillSuggestion(SuggestionType::kCreditCardEntry,
                                 u"credit card suggestion"),
        CreateAutofillSuggestion(SuggestionType::kManageCreditCard,
@@ -614,7 +613,7 @@ TEST_F(AutofillExternalDelegateTest, GetMainFillingProduct) {
             FillingProduct::kCreditCard);
 
   // Show BNPL suggestion in the popup.
-  OnSuggestionsReturned(queried_field().global_id(),
+  OnSuggestionsReturned(queried_field(),
                         {CreateAutofillSuggestion(SuggestionType::kBnplEntry,
                                                   u"BNPL suggestion")});
   EXPECT_EQ(external_delegate().GetMainFillingProduct(),
@@ -622,7 +621,7 @@ TEST_F(AutofillExternalDelegateTest, GetMainFillingProduct) {
 
   // Show merchant promo code suggestion in the popup.
   OnSuggestionsReturned(
-      queried_field().global_id(),
+      queried_field(),
       {CreateAutofillSuggestion(SuggestionType::kMerchantPromoCodeEntry,
                                 u"promo code")});
   EXPECT_EQ(external_delegate().GetMainFillingProduct(),
@@ -630,56 +629,54 @@ TEST_F(AutofillExternalDelegateTest, GetMainFillingProduct) {
 
   // Show IBAN suggestion in the popup.
   OnSuggestionsReturned(
-      queried_field().global_id(),
+      queried_field(),
       {CreateAutofillSuggestion(SuggestionType::kIbanEntry, u"fill IBAN")});
   EXPECT_EQ(external_delegate().GetMainFillingProduct(), FillingProduct::kIban);
 
   // Show password suggestion in the popup.
   OnSuggestionsReturned(
-      queried_field().global_id(),
+      queried_field(),
       {CreateAutofillSuggestion(SuggestionType::kPasswordEntry, u"password")});
   EXPECT_EQ(external_delegate().GetMainFillingProduct(),
             FillingProduct::kPassword);
 
   // Show compose suggestion in the popup.
   OnSuggestionsReturned(
-      queried_field().global_id(),
+      queried_field(),
       {CreateAutofillSuggestion(SuggestionType::kComposeResumeNudge,
                                 u"generated text")});
   EXPECT_EQ(external_delegate().GetMainFillingProduct(),
             FillingProduct::kCompose);
 
   // Show only autocomplete suggestion in the popup.
-  OnSuggestionsReturned(
-      queried_field().global_id(),
-      {CreateAutofillSuggestion(SuggestionType::kAutocompleteEntry,
-                                u"autocomplete")});
+  OnSuggestionsReturned(queried_field(), {CreateAutofillSuggestion(
+                                             SuggestionType::kAutocompleteEntry,
+                                             u"autocomplete")});
   EXPECT_EQ(external_delegate().GetMainFillingProduct(),
             FillingProduct::kAutocomplete);
 
   // Show only datalist suggestion in the popup.
   OnSuggestionsReturned(
-      queried_field().global_id(),
+      queried_field(),
       {CreateAutofillSuggestion(SuggestionType::kDatalistEntry, u"datalist")});
   EXPECT_EQ(external_delegate().GetMainFillingProduct(),
             FillingProduct::kDataList);
 
   // Show auxiliary helper suggestion in the popup.
   OnSuggestionsReturned(
-      queried_field().global_id(),
+      queried_field(),
       {CreateAutofillSuggestion(SuggestionType::kUndoOrClear, u"undo")});
   EXPECT_EQ(external_delegate().GetMainFillingProduct(), FillingProduct::kNone);
 
   // Show auxiliary helper suggestion in the popup.
-  OnSuggestionsReturned(
-      queried_field().global_id(),
-      {CreateAutofillSuggestion(SuggestionType::kMixedFormMessage,
-                                u"no autofill available")});
+  OnSuggestionsReturned(queried_field(), {CreateAutofillSuggestion(
+                                             SuggestionType::kMixedFormMessage,
+                                             u"no autofill available")});
   EXPECT_EQ(external_delegate().GetMainFillingProduct(), FillingProduct::kNone);
 
   // Show save and fill suggestion in the popup.
   OnSuggestionsReturned(
-      queried_field().global_id(),
+      queried_field(),
       {CreateAutofillSuggestion(SuggestionType::kSaveAndFillCreditCardEntry,
                                 u"save and fill suggestion")});
   EXPECT_EQ(external_delegate().GetMainFillingProduct(),
@@ -705,7 +702,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryDoesNotHideOnEmptySuggestions) {
   EXPECT_CALL(autofill_client(), HideSuggestions).Times(0);
 
   // Return empty suggestions.
-  OnSuggestionsReturned(queried_field().global_id(), {});
+  OnSuggestionsReturned(queried_field(), {});
 }
 
 // Tests that accepting the AtMemory search affordance suggestion does not
@@ -746,7 +743,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryUsesCaretAnchorWithValidCaret) {
                   _));
 
   OnSuggestionsReturned(
-      queried_field().global_id(),
+      queried_field(),
       {CreateAutofillSuggestion(SuggestionType::kAddressEntry, u"suggestion")});
 }
 
@@ -775,7 +772,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryUsesBottomSheetAnchor) {
                   _));
 
   OnSuggestionsReturned(
-      queried_field().global_id(),
+      queried_field(),
       {CreateAutofillSuggestion(SuggestionType::kAddressEntry, u"suggestion")});
 }
 
@@ -805,7 +802,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryContextMenuUsesCaretAnchor) {
                   _));
 
   OnSuggestionsReturned(
-      queried_field().global_id(),
+      queried_field(),
       {CreateAutofillSuggestion(SuggestionType::kAddressEntry, u"suggestion")});
 }
 
@@ -1433,7 +1430,7 @@ TEST_F(AutofillExternalDelegateTest, TestExternalDelegateVirtualCalls) {
       Suggestion(SuggestionType::kAddressEntry)};
   autofill_item[0].payload =
       Suggestion::AutofillProfilePayload(Suggestion::Guid(profile.guid()));
-  OnSuggestionsReturned(queried_field().global_id(), autofill_item);
+  OnSuggestionsReturned(queried_field(), autofill_item);
 
   EXPECT_CALL(
       autofill_manager(),
@@ -1469,7 +1466,7 @@ TEST_F(AutofillExternalDelegateTest, ExternalDelegateDataList) {
       ShowAutofillSuggestions(PopupOpenArgsAre(kExpectedSuggestions), _));
   std::vector<Suggestion> autofill_item;
   autofill_item.emplace_back(/*main_text=*/u"", SuggestionType::kAddressEntry);
-  OnSuggestionsReturned(queried_field().global_id(), autofill_item);
+  OnSuggestionsReturned(queried_field(), autofill_item);
 
   // Try calling OnSuggestionsReturned with no Autofill values and ensure
   // the datalist items are still shown.
@@ -1478,7 +1475,7 @@ TEST_F(AutofillExternalDelegateTest, ExternalDelegateDataList) {
                                           SuggestionType::kDatalistEntry)),
                                       _));
   autofill_item.clear();
-  OnSuggestionsReturned(queried_field().global_id(), autofill_item);
+  OnSuggestionsReturned(queried_field(), autofill_item);
 }
 
 // Test that datalist values can get updated while a popup is showing.
@@ -1505,7 +1502,7 @@ TEST_F(AutofillExternalDelegateTest, UpdateDataListWhileShowingPopup) {
       ShowAutofillSuggestions(PopupOpenArgsAre(kExpectedSuggestions), _));
   std::vector<Suggestion> autofill_item;
   autofill_item.emplace_back(SuggestionType::kAddressEntry);
-  OnSuggestionsReturned(queried_field().global_id(), autofill_item);
+  OnSuggestionsReturned(queried_field(), autofill_item);
 
   // This would normally get called from ShowAutofillSuggestions, but it is
   // mocked so we need to call OnSuggestionsShown ourselves.
@@ -1547,7 +1544,7 @@ TEST_F(AutofillExternalDelegateTest, DuplicateAutofillDatalistValues) {
   autofill_item[0].main_text =
       Suggestion::Text(u"Rick", Suggestion::Text::IsPrimary(true));
   autofill_item[0].labels = {{Suggestion::Text(u"Deckard")}};
-  OnSuggestionsReturned(queried_field().global_id(), autofill_item);
+  OnSuggestionsReturned(queried_field(), autofill_item);
 }
 
 // Test that we de-dupe autocomplete values against datalist values, keeping the
@@ -1583,7 +1580,7 @@ TEST_F(AutofillExternalDelegateTest, DuplicateAutocompleteDatalistValues) {
   autocomplete_items.emplace_back(SuggestionType::kAutocompleteEntry);
   autocomplete_items[1].main_text =
       Suggestion::Text(u"Cain", Suggestion::Text::IsPrimary(true));
-  OnSuggestionsReturned(queried_field().global_id(), autocomplete_items);
+  OnSuggestionsReturned(queried_field(), autocomplete_items);
 }
 
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
@@ -1744,7 +1741,7 @@ TEST_F(AutofillExternalDelegateTest, ShowTabbedPopup_PreferPrevArrowSide) {
                         true),
                   _));
 
-  OnSuggestionsReturned(queried_field().global_id(),
+  OnSuggestionsReturned(queried_field(),
                         {Suggestion(SuggestionType::kCreditCardEntry)});
 }
 
@@ -1783,7 +1780,7 @@ TEST_F(AutofillExternalDelegateTest, ShowTabbedPopup_NotCreditCard) {
                               false)),
                   _));
 
-  OnSuggestionsReturned(queried_field().global_id(),
+  OnSuggestionsReturned(queried_field(),
                         {Suggestion(SuggestionType::kAddressEntry)});
 }
 
@@ -1823,7 +1820,7 @@ TEST_F(AutofillExternalDelegateTest, ShowTabbedPopup_EligibleFieldType) {
                       &AutofillClient::PopupOpenArgs::show_tabbed_popup, true)),
           _));
 
-  OnSuggestionsReturned(queried_field().global_id(),
+  OnSuggestionsReturned(queried_field(),
                         {Suggestion(SuggestionType::kCreditCardEntry)});
 }
 
@@ -1864,7 +1861,7 @@ TEST_F(AutofillExternalDelegateTest, ShowTabbedPopup_IneligibleFieldType_Cvc) {
                               false)),
                   _));
 
-  OnSuggestionsReturned(queried_field().global_id(),
+  OnSuggestionsReturned(queried_field(),
                         {Suggestion(SuggestionType::kCreditCardEntry)});
 }
 
@@ -1897,7 +1894,7 @@ TEST_F(AutofillExternalDelegateTest, ShowTabbedPopup_PrefUpdated) {
 
   ASSERT_FALSE(paydm.IsAutofillHasSeenBnplPrefEnabled());
 
-  OnSuggestionsReturned(queried_field().global_id(),
+  OnSuggestionsReturned(queried_field(),
                         {Suggestion(SuggestionType::kCreditCardEntry)});
 
   EXPECT_TRUE(paydm.IsAutofillHasSeenBnplPrefEnabled());
@@ -1938,7 +1935,7 @@ TEST_F(AutofillExternalDelegateTest, ShowTabbedPopup_FeatureDisabled) {
                               false)),
                   _));
 
-  OnSuggestionsReturned(queried_field().global_id(),
+  OnSuggestionsReturned(queried_field(),
                         {Suggestion(SuggestionType::kCreditCardEntry)});
 }
 
@@ -2021,7 +2018,7 @@ TEST_F(AutofillExternalDelegateTest, AutofillWarnings) {
   std::vector<Suggestion> autofill_item;
   autofill_item.emplace_back(
       SuggestionType::kInsecureContextPaymentDisabledMessage);
-  OnSuggestionsReturned(queried_field().global_id(), autofill_item);
+  OnSuggestionsReturned(queried_field(), autofill_item);
 
   EXPECT_THAT(open_args.suggestions,
               SuggestionVectorIdsAre(
@@ -2046,7 +2043,7 @@ TEST_F(AutofillExternalDelegateTest, AutofillWarningsNotShown_WithSuggestions) {
   suggestions.emplace_back(SuggestionType::kAutocompleteEntry);
   suggestions[1].main_text =
       Suggestion::Text(u"Rick", Suggestion::Text::IsPrimary(true));
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
 }
 
 // Test that the Autofill delegate doesn't try and fill a form with a
@@ -2087,7 +2084,7 @@ TEST_F(AutofillExternalDelegateTest, ExternalDelegateFillsIbanEntry) {
   suggestions[0].labels = {
       {Suggestion::Text(iban.GetIdentifierStringForAutofillDisplay())}};
   suggestions[0].payload = Suggestion::Guid(iban.guid());
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
 
   EXPECT_CALL(autofill_driver(), RendererShouldClearPreviewedForm());
   EXPECT_CALL(
@@ -2141,7 +2138,7 @@ TEST_F(AutofillExternalDelegateTest,
                            SuggestionType::kMerchantPromoCodeEntry);
   suggestions[0].main_text.value = promo_code_value;
   suggestions[0].labels = {{Suggestion::Text(u"12.34% off your purchase!")}};
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
 
   EXPECT_CALL(autofill_driver(), RendererShouldClearPreviewedForm());
   EXPECT_CALL(
@@ -2181,7 +2178,7 @@ TEST_F(AutofillExternalDelegateTest, ExternalDelegatePreviewsLoyaltyCardEntry) {
   suggestions.emplace_back(/*main_text=*/loyalty_card_value,
                            SuggestionType::kLoyaltyCardEntry);
   suggestions[0].main_text.value = loyalty_card_value;
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
 
   EXPECT_CALL(autofill_driver(), RendererShouldClearPreviewedForm());
   EXPECT_CALL(
@@ -2210,7 +2207,7 @@ TEST_F(AutofillExternalDelegateTest, ExternalDelegateFillsLoyaltyCardEntry) {
                            SuggestionType::kLoyaltyCardEntry);
   suggestions[0].main_text.value = full_loyalty_card_value;
   suggestions[0].payload = Suggestion::Guid(loyalty_card.id().value());
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
 
   EXPECT_CALL(autofill_driver(), RendererShouldClearPreviewedForm());
   EXPECT_CALL(
@@ -2340,7 +2337,7 @@ TEST_F(AutofillExternalDelegateTest, AutofillSuggestionAvailability_Autofill) {
 
   std::vector<Suggestion> suggestions = {
       Suggestion(u"Suggestion main_text", SuggestionType::kAddressEntry)};
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
 
   EXPECT_CALL(autofill_driver(),
               RendererShouldSetSuggestionAvailability(
@@ -2358,7 +2355,7 @@ TEST_F(AutofillExternalDelegateTest,
 
   std::vector<Suggestion> suggestions = {
       Suggestion(u"Autofill with AI", SuggestionType::kFillAutofillAi)};
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
 
   EXPECT_CALL(autofill_driver(),
               RendererShouldSetSuggestionAvailability(
@@ -2376,7 +2373,7 @@ TEST_F(AutofillExternalDelegateTest,
 
   std::vector<Suggestion> suggestions = {
       Suggestion(u"Suggestion main_text", SuggestionType::kAutocompleteEntry)};
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
 
   EXPECT_CALL(
       autofill_driver(),
@@ -2415,7 +2412,7 @@ TEST_F(AutofillExternalDelegateTest,
   IssueOnQuery();
   std::vector<Suggestion> suggestions = {CreateAutofillSuggestion(
       SuggestionType::kDevtoolsTestAddresses, u"Devtools")};
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
   external_delegate().OnSuggestionsShown(suggestions);
   histogram_tester.ExpectUniqueSample(
       "Autofill.TestAddressesEvent",
@@ -2623,7 +2620,7 @@ TEST_F(AutofillExternalDelegateTest, AutofillAiReauthFlow_ReauthAccepted) {
   fill_suggestion.payload = Suggestion::AutofillAiPayload(passport.guid());
   std::vector<Suggestion> all_suggestions = {
       fill_suggestion, Suggestion(SuggestionType::kFillAutofillAi)};
-  OnSuggestionsReturned(queried_field().global_id(), all_suggestions);
+  OnSuggestionsReturned(queried_field(), all_suggestions);
   ON_CALL(autofill_client(), GetAutofillSuggestions)
       .WillByDefault(Return(all_suggestions));
 
@@ -2966,7 +2963,7 @@ TEST_F(AutofillExternalDelegateWithWalletPrivatePassesTest,
   fill_suggestion.payload = Suggestion::AutofillAiPayload(
       masked_passport.guid(), /*requires_server_fetch=*/true);
   std::vector<Suggestion> suggestions = {fill_suggestion};
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
   ON_CALL(autofill_client(), GetAutofillSuggestions)
       .WillByDefault(Return(suggestions));
 
@@ -3008,7 +3005,7 @@ TEST_F(AutofillExternalDelegateWithWalletPrivatePassesTest,
   fill_suggestion.payload =
       Suggestion::AutofillAiPayload(masked_passport.guid());
   std::vector<Suggestion> suggestions = {fill_suggestion};
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
   ON_CALL(autofill_client(), GetAutofillSuggestions)
       .WillByDefault(Return(suggestions));
 
@@ -3050,7 +3047,7 @@ TEST_F(AutofillExternalDelegateWithWalletPrivatePassesTest,
   fill_suggestion.payload = Suggestion::AutofillAiPayload(
       masked_passport.guid(), /*requires_server_fetch=*/true);
   std::vector<Suggestion> suggestions = {fill_suggestion};
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
   ON_CALL(autofill_client(), GetAutofillSuggestions)
       .WillByDefault(Return(suggestions));
 
@@ -3088,7 +3085,7 @@ TEST_F(AutofillExternalDelegateWithWalletPrivatePassesTest,
   fill_suggestion.payload = Suggestion::AutofillAiPayload(
       masked_passport.guid(), /*requires_server_fetch=*/true);
   std::vector<Suggestion> suggestions = {fill_suggestion};
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
   ON_CALL(autofill_client(), GetAutofillSuggestions)
       .WillByDefault(Return(suggestions));
 
@@ -3173,7 +3170,7 @@ TEST_F(AutofillExternalDelegateWithAmbientAutofillTest,
   fill_suggestion.payload = Suggestion::AutofillAiPayload(
       masked_passport.guid(), /*requires_server_fetch=*/true);
   std::vector<Suggestion> suggestions = {fill_suggestion};
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
   ON_CALL(autofill_client(), GetAutofillSuggestions)
       .WillByDefault(Return(suggestions));
 
@@ -3244,7 +3241,7 @@ TEST_F(AutofillExternalDelegateTest,
       .WillByDefault(Return(true));
 
   // This should call ShowAutofillSuggestions.
-  OnSuggestionsReturned(queried_field().global_id(),
+  OnSuggestionsReturned(queried_field(),
                         {Suggestion(SuggestionType::kComposeProactiveNudge)});
 }
 
@@ -3284,7 +3281,7 @@ TEST_F(
       .WillByDefault(Return(false));
 
   // This should call ShowAutofillSuggestions.
-  OnSuggestionsReturned(queried_field().global_id(),
+  OnSuggestionsReturned(queried_field(),
                         {Suggestion(SuggestionType::kComposeProactiveNudge)});
 }
 
@@ -3323,7 +3320,7 @@ TEST_F(
       .WillByDefault(Return(true));
 
   // This should call ShowAutofillSuggestions.
-  OnSuggestionsReturned(queried_field().global_id(),
+  OnSuggestionsReturned(queried_field(),
                         {Suggestion(SuggestionType::kComposeProactiveNudge)});
 }
 
@@ -3352,7 +3349,7 @@ TEST_F(
       .WillByDefault(Return(true));
 
   // This should call ShowAutofillSuggestions.
-  OnSuggestionsReturned(queried_field().global_id(),
+  OnSuggestionsReturned(queried_field(),
                         {Suggestion(SuggestionType::kAutocompleteEntry)});
 }
 
@@ -3372,7 +3369,7 @@ TEST_F(AutofillExternalDelegateTest, ExternalDelegateOpensComposeAndFills) {
                                       _));
   std::vector<Suggestion> suggestions = {
       Suggestion(SuggestionType::kComposeResumeNudge)};
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
 
   // Simulate accepting a Compose suggestion.
   EXPECT_CALL(
@@ -3517,7 +3514,7 @@ TEST_F(AutofillExternalDelegateTest, ScanCreditCardMetrics_SuggestionShown) {
   IssueOnQuery();
   std::vector<Suggestion> suggestions = {
       Suggestion(SuggestionType::kScanCreditCard)};
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
   external_delegate().OnSuggestionsShown(suggestions);
 
   histogram.ExpectUniqueSample("Autofill.ScanCreditCardPrompt",
@@ -3529,7 +3526,7 @@ TEST_F(AutofillExternalDelegateTest, ScanCreditCardMetrics_SuggestionAccepted) {
   IssueOnQuery();
   std::vector<Suggestion> suggestions = {
       Suggestion(SuggestionType::kScanCreditCard)};
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
   external_delegate().OnSuggestionsShown(suggestions);
 
   external_delegate().DidAcceptSuggestion(
@@ -3551,7 +3548,7 @@ TEST_F(AutofillExternalDelegateTest,
   IssueOnQuery();
   std::vector<Suggestion> suggestions = {
       Suggestion(SuggestionType::kScanCreditCard)};
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
   external_delegate().OnSuggestionsShown(suggestions);
 
   external_delegate().DidAcceptSuggestion(
@@ -3570,7 +3567,7 @@ TEST_F(AutofillExternalDelegateTest,
 TEST_F(AutofillExternalDelegateTest, ScanCreditCardMetrics_SuggestionNotShown) {
   base::HistogramTester histogram;
   IssueOnQuery();
-  OnSuggestionsReturned(queried_field().global_id(), {});
+  OnSuggestionsReturned(queried_field(), {});
   external_delegate().OnSuggestionsShown({});
   histogram.ExpectTotalCount("Autofill.ScanCreditCardPrompt", 0);
 }
@@ -3580,7 +3577,7 @@ TEST_F(AutofillExternalDelegateTest, AutocompleteShown_MetricsEmitted) {
   IssueOnQuery();
   std::vector<Suggestion> suggestions = {CreateAutofillSuggestion(
       SuggestionType::kAutocompleteEntry, u"autocomplete")};
-  OnSuggestionsReturned(queried_field().global_id(), suggestions);
+  OnSuggestionsReturned(queried_field(), suggestions);
   external_delegate().OnSuggestionsShown(suggestions);
   histogram.ExpectBucketCount("Autocomplete.Events3",
                               AutofillMetrics::AUTOCOMPLETE_SUGGESTIONS_SHOWN,
@@ -3588,6 +3585,7 @@ TEST_F(AutofillExternalDelegateTest, AutocompleteShown_MetricsEmitted) {
 }
 
 TEST_F(AutofillExternalDelegateTest, ScanCreditCard_FillForm) {
+  IssueOnQuery();
   CreditCard card = test::GetCreditCard();
   EXPECT_CALL(payments_autofill_client(), ScanCreditCard)
       .WillOnce(
@@ -3618,7 +3616,7 @@ TEST_F(AutofillExternalDelegateTest, IgnoreAutocompleteOffForAutofill) {
   EXPECT_CALL(autofill_client(), ShowAutofillSuggestions);
   EXPECT_CALL(autofill_client(), HideSuggestions(_, _)).Times(0);
 
-  OnSuggestionsReturned(field.global_id(), autofill_items);
+  OnSuggestionsReturned(field, autofill_items);
 }
 
 TEST_F(AutofillExternalDelegateTest,
@@ -3924,10 +3922,10 @@ TEST_F(AutofillExternalDelegateTest, UpdateSuggestions) {
                                   AutofillSuggestionsIgnoreFocusLoss(false)));
   }
 
-  OnSuggestionsReturned(queried_field().global_id(), suggestions1);
+  OnSuggestionsReturned(queried_field(), suggestions1);
   external_delegate().AttemptToDisplayAutofillSuggestionsForTest(
       suggestions2, AutofillSuggestionTriggerSource::kUnspecified,
-      /*is_update=*/true);
+      std::nullopt);
 }
 
 // TODO(crbug.com/41483208): Add test case where 'Show cards from your Google
@@ -3938,11 +3936,14 @@ TEST_F(AutofillExternalDelegateTest, UpdateSuggestions) {
 // Tests that outdated returned suggestions are discarded.
 TEST_F(AutofillExternalDelegateTest, ShouldDiscardOutdatedSuggestions) {
   FieldGlobalId old_field_id = test::MakeFieldGlobalId();
+  FormFieldData old_field;
+  old_field.set_host_frame(old_field_id.frame_token);
+  old_field.set_renderer_id(old_field_id.renderer_id);
   FieldGlobalId new_field_id = test::MakeFieldGlobalId();
   autofill_client().set_last_queried_field(new_field_id);
   IssueOnQuery();
   EXPECT_CALL(autofill_client(), ShowAutofillSuggestions).Times(0);
-  OnSuggestionsReturned(old_field_id, std::vector<Suggestion>());
+  OnSuggestionsReturned(old_field, std::vector<Suggestion>());
 }
 #endif
 
@@ -4136,7 +4137,7 @@ TEST_F(AutofillExternalDelegateTest,
                               Eq(std::nullopt)));
 
   // Return empty suggestions.
-  OnSuggestionsReturned(queried_field().global_id(), {});
+  OnSuggestionsReturned(queried_field(), {});
 }
 
 TEST_F(AutofillExternalDelegateTest,
@@ -4151,7 +4152,7 @@ TEST_F(AutofillExternalDelegateTest,
   EXPECT_CALL(autofill_client(), HideSuggestions).Times(0);
 
   // Return empty suggestions.
-  OnSuggestionsReturned(queried_field().global_id(), {});
+  OnSuggestionsReturned(queried_field(), {});
 }
 
 }  // namespace

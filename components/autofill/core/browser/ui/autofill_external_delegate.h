@@ -115,7 +115,7 @@ class AutofillExternalDelegate : public AutofillSuggestionDelegate {
   // Records query results and correctly formats them before sending them off
   // to be displayed. Called when an Autofill query result is available.
   virtual void OnSuggestionsReturned(
-      FieldGlobalId field_id,
+      const FormFieldData& trigger_field,
       const std::vector<Suggestion>& input_suggestions);
 
   // Returns true if there is a screen reader installed on the machine.
@@ -136,9 +136,9 @@ class AutofillExternalDelegate : public AutofillSuggestionDelegate {
   void AttemptToDisplayAutofillSuggestionsForTest(
       std::vector<Suggestion> suggestions,
       AutofillSuggestionTriggerSource trigger_source,
-      bool is_update) {
+      base::optional_ref<const FormFieldData> trigger_field) {
     AttemptToDisplayAutofillSuggestions(
-        std::move(suggestions), trigger_source, is_update,
+        std::move(suggestions), trigger_source, trigger_field,
         AutofillSuggestionsIgnoreFocusLoss(false));
   }
   base::WeakPtr<AutofillExternalDelegate> GetWeakPtrForTest() {
@@ -158,15 +158,17 @@ class AutofillExternalDelegate : public AutofillSuggestionDelegate {
   base::optional_ref<const EntityInstance> GetEntityInstance(
       const Suggestion& suggestion) const;
 
-  // Tries to display `suggestions` in the suggestions UI. If `is_update` is
-  // true, then `AutofillClient::UpdateAutofillSuggestions` is called, which
-  // means that suggestions will only be shown if there is currently suggestion
-  // UI with the same main filling product showing and that no new
-  // `SuggestionsUiSessionId` will be assigned.
+  // Tries to display `suggestions` in the suggestions UI.
+  // If `trigger_field` is `std::nullopt`, the delegate attempts to update the
+  // the existing suggestion UI instead of showing new UI. This means:
+  // - The last non-null provided trigger field is used.
+  // - The existing `UiSessionId` continues to be used.
+  // - If no suggestions are currently showing or the new suggestions have a
+  //   different `FillingProduct`, no UI is shown.
   void AttemptToDisplayAutofillSuggestions(
       std::vector<Suggestion> suggestions,
       AutofillSuggestionTriggerSource trigger_source,
-      bool is_update,
+      base::optional_ref<const FormFieldData> trigger_field,
       AutofillSuggestionsIgnoreFocusLoss ignore_focus_loss);
 
   // Returns a callback that, when run, attempts to update the currently shown
@@ -246,7 +248,8 @@ class AutofillExternalDelegate : public AutofillSuggestionDelegate {
   // any required separators. Will also go through `suggestions` and remove
   // duplicate autocomplete (not Autofill) suggestions, keeping their datalist
   // version.
-  void InsertDataListValues(std::vector<Suggestion>& suggestions) const;
+  void InsertDataListValues(base::span<const SelectOption> datalist_options,
+                            std::vector<Suggestion>& suggestions) const;
 
   // Returns the text (i.e. |Suggestion| value) for Chrome autofill options.
   std::u16string GetSettingsSuggestionValue() const;

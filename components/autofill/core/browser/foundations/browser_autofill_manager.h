@@ -197,13 +197,13 @@ class BrowserAutofillManager : public AutofillManager {
 
   // Defers the suggestion selection to the password manager.
   void DelegateSelectToPasswordManager(const Suggestion& suggestion,
-                                       const FormFieldData& trigger_field);
+                                       const FieldGlobalId& trigger_field_id);
 
   // Defers the suggestion selection to the password manager.
   void DelegateAcceptToPasswordManager(
       const Suggestion& suggestion,
       const AutofillSuggestionDelegate::SuggestionMetadata& metadata,
-      const FormFieldData& trigger_field);
+      const FieldGlobalId& trigger_field_id);
 
   void DidShowSuggestions(base::span<const Suggestion> suggestions,
                           const FormGlobalId& form_id,
@@ -571,7 +571,7 @@ class BrowserAutofillManager : public AutofillManager {
   // user and whether the suggestion is shown.
   void OnGenerateSuggestionsComplete(
       const FormGlobalId& form_id,
-      const FieldGlobalId& field_id,
+      const FormFieldData& trigger_field,
       AutofillSuggestionTriggerSource trigger_source,
       const SuggestionsContext& context,
       base::TimeTicks suggestion_generation_start_time,

@@ -1261,7 +1261,7 @@ void BrowserAutofillManager::OnAskForValuesToFillImpl(
     GetAtMemoryManager().MaybeAppendPersonalContextNotice(suggestions);
 
     // Show suggestions with a search bar to start the flow.
-    external_delegate_->OnSuggestionsReturned(field_id, suggestions);
+    external_delegate_->OnSuggestionsReturned(field, suggestions);
     return;
   }
 
@@ -1382,7 +1382,7 @@ void BrowserAutofillManager::OnIndividualSuggestionsGenerated(
         if (TryToShowTouchToFillSuggestions(form, field, autofill_field,
                                             suggestions, trigger_source)) {
           OnGenerateSuggestionsComplete(
-              form.global_id(), field.global_id(), trigger_source, context,
+              form.global_id(), field, trigger_source, context,
               suggestion_generation_start_time,
               /*show_suggestions=*/false, suggestions);
           return;
@@ -1395,9 +1395,8 @@ void BrowserAutofillManager::OnIndividualSuggestionsGenerated(
           MergePasskeysAndExistingSuggestions(
               suggestions, std::move(passkey_suggestions.mapped()[0]));
         }
-        OnGenerateSuggestionsComplete(form.global_id(), field.global_id(),
-                                      trigger_source, context,
-                                      suggestion_generation_start_time,
+        OnGenerateSuggestionsComplete(form.global_id(), field, trigger_source,
+                                      context, suggestion_generation_start_time,
                                       /*show_suggestions=*/true, suggestions);
       };
 
@@ -1693,9 +1692,8 @@ void BrowserAutofillManager::GenerateFooter(
                                         std::move(passkey_suggestion.value()));
   }
 
-  OnGenerateSuggestionsComplete(form.global_id(), field.global_id(),
-                                trigger_source, context,
-                                suggestion_generation_start_time,
+  OnGenerateSuggestionsComplete(form.global_id(), field, trigger_source,
+                                context, suggestion_generation_start_time,
                                 show_suggestions, std::move(suggestions));
 }
 
@@ -1729,7 +1727,7 @@ void BrowserAutofillManager::OnGeneratedSingleFieldFillSuggestions(
 
 void BrowserAutofillManager::OnGenerateSuggestionsComplete(
     const FormGlobalId& form_id,
-    const FieldGlobalId& field_id,
+    const FormFieldData& trigger_field,
     AutofillSuggestionTriggerSource trigger_source,
     const SuggestionsContext& context,
     base::TimeTicks suggestion_generation_start_time,
@@ -1747,7 +1745,7 @@ void BrowserAutofillManager::OnGenerateSuggestionsComplete(
   // When focusing on a field, log whether there is a suggestion for the user
   // and whether the suggestion is shown.
   auto [form_structure, autofill_field] =
-      GetCachedFormAndField(form_id, field_id);
+      GetCachedFormAndField(form_id, trigger_field.global_id());
   if (form_structure &&
       context.filling_product == FillingProduct::kCreditCard) {
     AutofillMetrics::LogIsQueriedCreditCardFormSecure(
@@ -1810,7 +1808,7 @@ void BrowserAutofillManager::OnGenerateSuggestionsComplete(
 
   if (show_suggestions) {
     // Send Autofill suggestions (could be an empty list).
-    external_delegate_->OnSuggestionsReturned(field_id, suggestions);
+    external_delegate_->OnSuggestionsReturned(trigger_field, suggestions);
   }
 }
 
@@ -1955,9 +1953,9 @@ void BrowserAutofillManager::UndoAutofill(
 
 void BrowserAutofillManager::DelegateSelectToPasswordManager(
     const Suggestion& suggestion,
-    const FormFieldData& trigger_field) {
+    const FieldGlobalId& trigger_field_id) {
   if (PasswordManagerDelegate* password_delegate =
-          client().GetPasswordManagerDelegate(trigger_field.global_id())) {
+          client().GetPasswordManagerDelegate(trigger_field_id)) {
     password_delegate->SelectSuggestion(suggestion);
   }
 }
@@ -1965,9 +1963,9 @@ void BrowserAutofillManager::DelegateSelectToPasswordManager(
 void BrowserAutofillManager::DelegateAcceptToPasswordManager(
     const Suggestion& suggestion,
     const AutofillSuggestionDelegate::SuggestionMetadata& metadata,
-    const FormFieldData& trigger_field) {
+    const FieldGlobalId& trigger_field_id) {
   if (PasswordManagerDelegate* password_delegate =
-          client().GetPasswordManagerDelegate(trigger_field.global_id())) {
+          client().GetPasswordManagerDelegate(trigger_field_id)) {
     password_delegate->AcceptSuggestion(suggestion, metadata);
   }
 }
