@@ -12862,6 +12862,11 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kUserMediaElementDescription,
      kOsMac | kOsWin | kOsLinux | kOsAndroid,
      FEATURE_VALUE_TYPE(blink::features::kUserMediaElement)},
+    {"user-media-element-legacy",
+     flag_descriptions::kUserMediaElementLegacyName,
+     flag_descriptions::kUserMediaElementLegacyDescription,
+     kOsMac | kOsWin | kOsLinux | kOsAndroid,
+     FEATURE_VALUE_TYPE(blink::features::kUserMediaElementLegacy)},
 
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
     BUILDFLAG(IS_CHROMEOS)

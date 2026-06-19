@@ -14618,6 +14618,7 @@ from previous Chrome versions.
   <int value="63198390"
       label="AutofillAiBasedAmountExtractionIgnoreSeenTermsForTesting:enabled"/>
   <int value="63693157" label="cast-streaming-force-disable-hardware-h264"/>
+  <int value="63761054" label="UserMediaElementLegacy:enabled"/>
   <int value="63801483" label="ShimlessRMAHideGoogleSKU:disabled"/>
   <int value="63915832"
       label="ContextualTasksEnableSpatialModelToolbarLayout:disabled"/>
@@ -18101,6 +18102,7 @@ from previous Chrome versions.
   <int value="1199648187" label="BypassAppBannerEngagementChecks:enabled"/>
   <int value="1199746915" label="ApiPrintingMarginsAndScale:enabled"/>
   <int value="1200407724" label="WebUITabStripContextMenuAfterTap:disabled"/>
+  <int value="1200793007" label="UserMediaElementLegacy:disabled"/>
   <int value="1200946197" label="ConfirmationChip:disabled"/>
   <int value="1201008500"
       label="EnableAmbientAuthenticationInIncognito:enabled"/>

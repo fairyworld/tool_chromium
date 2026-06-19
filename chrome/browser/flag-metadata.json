@@ -9587,6 +9587,11 @@
     "expiry_milestone": 160
   },
   {
+    "name": "user-media-element-legacy",
+    "owners": [ "ravjit@chromium.org", "tungnh@chromium.org" ],
+    "expiry_milestone": 157
+  },
+  {
     "name": "user-media-screen-capturing",
     "owners": [ "hscham@chromium.org", "mbujak@google.com" ],
     "expiry_milestone": 160
