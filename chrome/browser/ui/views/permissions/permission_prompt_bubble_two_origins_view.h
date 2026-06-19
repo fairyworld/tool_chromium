@@ -7,6 +7,7 @@
 
 #include "base/memory/raw_ptr.h"
 #include "base/task/cancelable_task_tracker.h"
+#include "base/timer/timer.h"
 #include "chrome/browser/ui/views/permissions/permission_prompt_bubble_base_view.h"
 #include "components/favicon_base/favicon_types.h"
 #include "ui/views/controls/styled_label.h"

@@ -15,6 +15,7 @@
 #include "chrome/browser/ui/views/chrome_widget_sublevel.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/permissions/features.h"
+#include "components/permissions/permission_uma_util.h"
 #include "components/strings/grit/components_strings.h"
 #include "ui/base/interaction/element_identifier.h"
 #include "ui/base/l10n/l10n_util.h"
