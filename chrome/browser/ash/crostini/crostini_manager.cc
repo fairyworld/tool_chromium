@@ -45,7 +45,6 @@
 #include "chrome/browser/ash/crostini/crostini_features.h"
 #include "chrome/browser/ash/crostini/crostini_manager_factory.h"
 #include "chrome/browser/ash/crostini/crostini_metrics_service.h"
-#include "chrome/browser/ash/crostini/crostini_mount_provider.h"
 #include "chrome/browser/ash/crostini/crostini_port_forwarder.h"
 #include "chrome/browser/ash/crostini/crostini_port_forwarder_factory.h"
 #include "chrome/browser/ash/crostini/crostini_pref_names.h"
@@ -3975,15 +3974,6 @@ void CrostiniManager::UnregisterContainer(
     terminal_provider_ids_.erase(it);
   }
 
-  auto* mount_registry =
-      guest_os::GuestOsServiceFactory::GetForProfile(profile_)
-          ->MountProviderRegistry();
-  it = mount_provider_ids_.find(container_id);
-  if (it != mount_provider_ids_.end()) {
-    mount_registry->Unregister(it->second);
-    mount_provider_ids_.erase(it);
-  }
-
   guest_os::GuestOsSharePathFactory::GetForProfile(profile_)->UnregisterGuest(
       container_id);
 }
@@ -3996,14 +3986,6 @@ void CrostiniManager::UnregisterAllContainers() {
     terminal_registry->Unregister(pair.second);
   }
   terminal_provider_ids_.clear();
-
-  auto* mount_registry =
-      guest_os::GuestOsServiceFactory::GetForProfile(profile_)
-          ->MountProviderRegistry();
-  for (const auto& pair : mount_provider_ids_) {
-    mount_registry->Unregister(pair.second);
-  }
-  mount_provider_ids_.clear();
 
   auto* share_service =
       guest_os::GuestOsSharePathFactory::GetForProfile(profile_);

@@ -32,7 +32,6 @@
 #include "chrome/browser/ash/guest_os/guest_os_launcher.h"
 #include "chrome/browser/ash/guest_os/guest_os_remover.h"
 #include "chrome/browser/ash/guest_os/guest_os_session_tracker.h"
-#include "chrome/browser/ash/guest_os/public/guest_os_mount_provider_registry.h"
 #include "chrome/browser/ash/guest_os/public/guest_os_terminal_provider_registry.h"
 #include "chrome/browser/ash/guest_os/vm_shutdown_observer.h"
 #include "chrome/browser/ash/guest_os/vm_starting_observer.h"
@@ -874,9 +873,6 @@ class CrostiniManager : public KeyedService,
   base::ScopedObservation<ash::NetworkStateHandler,
                           ash::NetworkStateHandlerObserver>
       network_state_handler_observer_{this};
-
-  base::flat_map<guest_os::GuestId, guest_os::GuestOsMountProviderRegistry::Id>
-      mount_provider_ids_;
 
   base::CallbackListSubscription primary_counter_mount_subscription_;
 
