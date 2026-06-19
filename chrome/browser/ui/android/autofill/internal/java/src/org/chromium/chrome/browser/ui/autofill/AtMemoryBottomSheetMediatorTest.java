@@ -78,7 +78,7 @@ public class AtMemoryBottomSheetMediatorTest {
         PropertyModel itemModel1 = mModelList.get(0).model;
         itemModel1.get(AtMemoryBottomSheetSuggestionProperties.ON_SUGGESTION_CLICKED).run();
 
-        verify(mDelegate).onSuggestionClicked(suggestions.get(0));
+        verify(mDelegate).onSuggestionClicked(/* position= */ 0);
 
         PropertyModel itemModel2 = mModelList.get(1).model;
         itemModel2.get(AtMemoryBottomSheetSuggestionProperties.ON_FLYOUT_CLICKED).run();

@@ -730,6 +730,7 @@ class AutofillClient {
   virtual void ShowAtMemoryBottomSheet(
       base::span<const Suggestion> suggestions,
       base::WeakPtr<AutofillSuggestionDelegate> delegate);
+  virtual void HideAtMemoryBottomSheet() {}
 
   // The AutofillSnackbarController is used to show a snackbar notification
   // on Android.

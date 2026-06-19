@@ -61,13 +61,15 @@ class AtMemoryBottomSheetMediator {
     private void setSuggestions(List<AutofillSuggestion> suggestions) {
         mModelList.clear();
 
-        for (AutofillSuggestion suggestion : suggestions) {
+        for (int i = 0; i < suggestions.size(); i++) {
+            AutofillSuggestion suggestion = suggestions.get(i);
+            int position = i;
             PropertyModel itemModel =
                     new PropertyModel.Builder(ALL_PROPERTIES)
                             .with(ICON, suggestion.getIconId())
                             .with(TITLE, suggestion.getLabel())
                             .with(DETAILS, suggestion.getSublabel())
-                            .with(ON_SUGGESTION_CLICKED, () -> onSuggestionClicked(suggestion))
+                            .with(ON_SUGGESTION_CLICKED, () -> onSuggestionClicked(position))
                             .with(ON_FLYOUT_CLICKED, () -> onFlyoutClicked(suggestion))
                             .build();
             ListItem listItem =
@@ -76,8 +78,8 @@ class AtMemoryBottomSheetMediator {
         }
     }
 
-    private void onSuggestionClicked(AutofillSuggestion suggestion) {
-        mDelegate.onSuggestionClicked(suggestion);
+    private void onSuggestionClicked(int position) {
+        mDelegate.onSuggestionClicked(position);
     }
 
     private void onFlyoutClicked(AutofillSuggestion suggestion) {

@@ -250,6 +250,7 @@ class ChromeAutofillClient : public ContentAutofillClient {
   void ShowAtMemoryBottomSheet(
       base::span<const Suggestion> suggestions,
       base::WeakPtr<AutofillSuggestionDelegate> delegate) final;
+  void HideAtMemoryBottomSheet() final;
 
   // Returns the AtMemoryBottomSheetBridge for the current tab.
   AtMemoryBottomSheetBridge* GetOrCreateAtMemoryBottomSheetBridge();

@@ -1106,8 +1106,15 @@ void ChromeAutofillClient::ShowAtMemoryBottomSheet(
   if (AtMemoryBottomSheetBridge* bridge =
           GetOrCreateAtMemoryBottomSheetBridge()) {
     bridge->RequestShowContent(
-        std::make_unique<AtMemoryBottomSheetDelegateAndroid>(this, delegate),
+        std::make_unique<AtMemoryBottomSheetDelegateAndroid>(
+            this, delegate, base::ToVector(suggestions)),
         suggestions);
+  }
+}
+
+void ChromeAutofillClient::HideAtMemoryBottomSheet() {
+  if (at_memory_bottom_sheet_bridge_) {
+    at_memory_bottom_sheet_bridge_->Hide();
   }
 }
 
