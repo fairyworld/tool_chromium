@@ -474,6 +474,8 @@ static_library("common") {
     "host_window.h",
     "host_window_proxy.cc",
     "host_window_proxy.h",
+    "input_pipeline.cc",
+    "input_pipeline.h",
     "it2me_desktop_environment.cc",
     "it2me_desktop_environment.h",
     "legacy_interaction_strategy.cc",
