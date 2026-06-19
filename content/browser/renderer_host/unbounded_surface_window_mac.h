@@ -50,6 +50,7 @@ class UnboundedSurfaceWindowMac : public UnboundedSurfaceWindow,
 
   // UnboundedSurfaceWindow overrides:
   bool is_valid() const override;
+  gfx::NativeWindow GetNativeWindow() const override;
   void SetBounds(const gfx::Rect& bounds_in_screen) override;
   viz::FrameSinkId GetFrameSinkId() const override;
   viz::LocalSurfaceId GetLocalSurfaceId() const override;

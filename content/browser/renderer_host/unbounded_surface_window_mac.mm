@@ -115,6 +115,10 @@ bool UnboundedSurfaceWindowMac::is_valid() const {
   return window_ != nil;
 }
 
+gfx::NativeWindow UnboundedSurfaceWindowMac::GetNativeWindow() const {
+  return gfx::NativeWindow(window_);
+}
+
 UnboundedSurfaceWindowMac::~UnboundedSurfaceWindowMac() {
   if (recyclable_compositor_) {
     GetHostFrameSinkManager()->UnregisterFrameSinkHierarchy(

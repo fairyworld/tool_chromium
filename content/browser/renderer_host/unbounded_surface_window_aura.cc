@@ -106,6 +106,10 @@ bool UnboundedSurfaceWindowAura::is_valid() const {
   return window_ != nullptr;
 }
 
+gfx::NativeWindow UnboundedSurfaceWindowAura::GetNativeWindow() const {
+  return window_.get();
+}
+
 viz::FrameSinkId UnboundedSurfaceWindowAura::GetFrameSinkId() const {
   return frame_sink_id_;
 }
