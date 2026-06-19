@@ -9,5 +9,4 @@ rootWebArea
 ++++menuListPopup ignored invisible
 ++++++group ignored invisible
 ++++++++genericContainer ignored invisible
-++++++++genericContainer ignored invisible
 ++++++++++menuListOption ignored invisible
