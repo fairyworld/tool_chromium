@@ -375,7 +375,6 @@ public class UploadImagePreviewCoordinator implements InsetObserver.WindowInsets
         NtpBackgroundDataUploadImage uploadImageData =
                 new NtpBackgroundDataUploadImage(
                         PlatformType.ANDROID_LOCAL,
-                        NtpCustomizationUtils.createBackgroundImageFile().getAbsolutePath(),
                         info,
                         bitmap,
                         /* primaryColor= */ null,
