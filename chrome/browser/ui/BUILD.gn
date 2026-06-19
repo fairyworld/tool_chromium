@@ -1134,9 +1134,10 @@ static_library("ui") {
     "//chrome/browser/enterprise",
     "//chrome/browser/enterprise:impl",
 
-    # media:impl includes headers from //chrome/browser/ui that can't be
-    # split out yet (e.g. tab_sharing/tab_sharing_ui.h, browser.h,
-    # tabs/tab_strip_model.h, recently_audible_helper.h).
+    # TODO(crbug.com/353332589): Remove this circular dependency whent the
+    # following headers get modularized:
+    # - c/b/ui/browser.h
+    # - c/b/ui/views/media_rounter/media_remoting_dialog_view.h
     "//chrome/browser/media:impl",
 
     # optimization_guide:impl includes headers from //chrome/browser/ui
@@ -1160,10 +1161,6 @@ static_library("ui") {
     # yet.
     "//chrome/browser/glic:impl",
 
-    # glic/common includes headers from //chrome/browser/ui (e.g. browser.h,
-    # browser_navigator.h, tabs/tab_strip_model.h) that can't be split out
-    # yet.
-    "//chrome/browser/glic/common",
     "//chrome/browser/safe_browsing",
     "//chrome/browser/profiling_host",
 
@@ -1179,7 +1176,6 @@ static_library("ui") {
 
     # notifications:impl includes chrome/browser/ui/browser.h,
     # chrome/browser/ui/chrome_pages.h,
-    # chrome/browser/ui/navigator/browser_navigator.h
     "//chrome/browser/notifications:impl",
     "//chrome/browser/password_manager:impl",
     "//chrome/browser/permissions",
@@ -1206,8 +1202,6 @@ static_library("ui") {
     "//chrome/browser/performance_manager:impl",
 
     # TODO(crbug.com/360599255): Remove this circular dependency.
-    # - chrome_popup_navigation_delegate.cc includes //c/b/ui/browser_navigator.h.
-    # - popunder_preventer.cc includes //c/b/ui/tabs/tab_strip_model.h.
     "//chrome/browser/ui/blocked_content:impl",
 
     "//chrome/browser/picture_in_picture:impl",
@@ -1244,7 +1238,7 @@ static_library("ui") {
     "//chrome/browser/ui/passwords:impl",
 
     # ssl:impl includes headers from //chrome/browser/ui that can't be
-    # split out yet (e.g. browser.h, browser_navigator.h, tab_strip_model.h).
+    # split out yet (e.g. browser.h).
     "//chrome/browser/ssl:impl",
 
     # TODO(crbug.com/353332589): Remove this circular dependency when
@@ -1255,8 +1249,7 @@ static_library("ui") {
     # be split out yet.
     "//chrome/browser/policy:impl",
 
-    # vr_tab_helper.cc includes //c/b/ui/browser.h,
-    # browser_window_interface.h, and tab_strip_model.h.
+    # vr_tab_helper.cc includes //c/b/ui/browser.h.
     "//chrome/browser/vr:impl",
 
     # TODO(crbug.com/353332589): Remove this circular dependency when the
@@ -2201,8 +2194,7 @@ static_library("ui") {
       "//chrome/browser/ui/translate:impl",
 
       # TODO(crbug.com/430078439): Remove this circular dependency when .cc
-      # files stop including browser.h, browser_window.h and
-      # browser_navigator.h.
+      # files stop including browser.h, browser_window.h.
       "//chrome/browser/ui/user_education:impl",
 
       # TODO(crbug.com/432421124): Remove when the following headers aren't
@@ -2213,7 +2205,7 @@ static_library("ui") {
       # TODO(crbug.com/438226511): Remove this circular dependency when the
       # following headers get componentized:
       # - c/b/ui/browser.h, browser_window.h, browser_window_state.h,
-      #   browser_commands.h, chrome_pages.h, browser_navigator.h, intent_picker_tab_helper.h,
+      #   browser_commands.h, chrome_pages.h, intent_picker_tab_helper.h,
       #   browser_tabstrip.h, intent_picker_tab_helper.h.
       "//chrome/browser/ui/web_applications:impl",
 
@@ -2254,8 +2246,7 @@ static_library("ui") {
 
     if (is_mac) {
       # TODO(358538886): find_bar/find_bar_platform_helper_mac.mm includes
-      # //c/b/ui/browser.h and //c/b/ui/tabs/tab_strip_model.h which causes a
-      # circular dependency with //c/b/ui.
+      # //c/b/ui/browser.h which causes a circular dependency with //c/b/ui.
       allow_circular_includes_from += [ "//chrome/browser/ui/find_bar:impl" ]
     }
 
@@ -5101,7 +5092,7 @@ static_library("ui") {
 
       # TODO(crbug.com/434882143): Remove this circular dependency when the
       # following headers get componentized:
-      # c/b/ui/browser.h, browser_navigator.h, browser_window.h
+      # c/b/ui/browser.h, browser_window.h
       # c/b/ui/views/frame/browser_view.h
       "//chrome/browser/ui/views/send_tab_to_self:impl",
 
