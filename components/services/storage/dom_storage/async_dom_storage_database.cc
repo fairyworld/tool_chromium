@@ -263,6 +263,7 @@ void AsyncDomStorageDatabase::OnDatabaseOpened(
   if (is_database_opened_) {
     CHECK(database_);
   }
+
   std::move(callback).Run(std::move(result.open_status));
 }
 

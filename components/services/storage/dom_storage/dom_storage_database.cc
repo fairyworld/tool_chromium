@@ -4,11 +4,14 @@
 
 #include "components/services/storage/dom_storage/dom_storage_database.h"
 
+#include "base/byte_size.h"
 #include "base/feature_list.h"
+#include "base/files/file_util.h"
 #include "base/functional/bind.h"
 #include "base/memory/ptr_util.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/no_destructor.h"
+#include "base/numerics/safe_conversions.h"
 #include "base/strings/strcat.h"
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/string_util.h"
@@ -34,11 +37,42 @@ namespace storage {
 
 namespace {
 
-// Records the standard `Storage.{LocalStorage,SessionStorage}.OpenDatabase`
-// status and `.Duration.OpenDatabase2` duration histograms with the
-// `metrics_type` suffix.
+// Records the on-disk size of the LocalStorage database at `db_path` to the
+// `LocalStorage.DatabaseOnDiskSizeKB` histogram (`.OnDiskExperimental` suffix
+// for `kOnDiskExperimental`, unsuffixed for `kOnDisk`). LevelDB stores its data
+// in a directory, while SQLite stores a single file plus a `-wal` file that
+// may be absent depending on checkpoint state.
+void RecordLocalStorageOnDiskSizeKB(const base::FilePath& db_path,
+                                    bool is_sqlite,
+                                    DatabaseMetricsType metrics_type) {
+  int64_t size_bytes = 0;
+  if (is_sqlite) {
+    size_bytes += base::GetFileSize(db_path).value_or(0);
+    size_bytes += base::GetFileSize(sql::Database::WriteAheadLogPath(db_path))
+                      .value_or(0);
+  } else {
+    size_bytes = base::ComputeDirectorySize(db_path);
+  }
+  base::UmaHistogramMemoryKB(
+      base::StrCat({"LocalStorage.DatabaseOnDiskSizeKB",
+                    metrics_type == DatabaseMetricsType::kOnDiskExperimental
+                        ? ".OnDiskExperimental"
+                        : ""}),
+      base::ByteSize(base::checked_cast<uint64_t>(size_bytes)));
+}
+
+// Records all open-time telemetry for a database open attempt:
+//   * `Storage.{LocalStorage,SessionStorage}.OpenDatabase` status.
+//   * `Storage.{LocalStorage,SessionStorage}.Duration.OpenDatabase2` duration.
+//   * `LocalStorage.DatabaseOnDiskSizeKB` size for LocalStorage on-disk only.
+//
+// The size histogram needs a blocking filesystem read. It is posted to a
+// `base::ThreadPool` sequence to avoid blocking DOMStorage database
+// operations.
 void RecordOpenDatabaseHistograms(StorageType storage_type,
                                   DatabaseMetricsType metrics_type,
+                                  const base::FilePath& database_path,
+                                  bool is_sqlite,
                                   base::TimeTicks start_time,
                                   const DbStatus& status) {
   const std::string_view prefix = storage_type == StorageType::kLocalStorage
@@ -48,6 +82,14 @@ void RecordOpenDatabaseHistograms(StorageType storage_type,
                                         GetHistogramSuffix(metrics_type)}),
                           base::TimeTicks::Now() - start_time);
   status.Log(base::StrCat({prefix, ".OpenDatabase"}), metrics_type);
+
+  // TODO(crbug.com/377242771): Also record on-disk size for SessionStorage.
+  if (storage_type == StorageType::kLocalStorage && !database_path.empty()) {
+    base::ThreadPool::PostTask(
+        FROM_HERE, {base::MayBlock()},
+        base::BindOnce(&RecordLocalStorageOnDiskSizeKB, database_path,
+                       is_sqlite, metrics_type));
+  }
 }
 
 }  // namespace
@@ -169,20 +211,6 @@ DomStorageDatabase::MapBatchUpdate::MapBatchUpdate(MapBatchUpdate&&) = default;
 DomStorageDatabase::MapBatchUpdate&
 DomStorageDatabase::MapBatchUpdate::operator=(MapBatchUpdate&&) = default;
 
-base::FilePath DomStorageDatabase::GetPath(
-    StorageType storage_type,
-    const base::FilePath& storage_partition_dir) {
-  CHECK(!storage_partition_dir.empty());
-  CHECK(storage_partition_dir.IsAbsolute());
-
-  const DomStorageSqliteRolloutStage stage =
-      GetSqliteRolloutStage(/*in_memory=*/false);
-  if (ShouldUseSqlite(stage, /*leveldb_exists=*/true)) {
-    return GetSqlitePath(storage_type, storage_partition_dir);
-  }
-  return GetLevelDbPath(storage_type, storage_partition_dir);
-}
-
 DomStorageDatabaseFactory::OpenResult::OpenResult() = default;
 DomStorageDatabaseFactory::OpenResult::~OpenResult() = default;
 DomStorageDatabaseFactory::OpenResult::OpenResult(OpenResult&&) = default;
@@ -297,8 +325,8 @@ void DomStorageDatabaseFactory::InitializeDatabase(
 
   const base::TimeTicks start_time = base::TimeTicks::Now();
   DbStatus open_status = db->Open(database_path, memory_dump_id);
-  RecordOpenDatabaseHistograms(storage_type, metrics_type, start_time,
-                               open_status);
+  RecordOpenDatabaseHistograms(storage_type, metrics_type, database_path,
+                               is_sqlite, start_time, open_status);
 
   // We are now on the backend's blocking sequence, so bind the database to it.
   OpenResult result;

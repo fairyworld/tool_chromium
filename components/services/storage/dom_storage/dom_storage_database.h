@@ -264,11 +264,6 @@ class DomStorageDatabase {
     std::optional<Usage> map_usage;
   };
 
-  // Constructs an absolute path to the `storage_type` database under
-  // `storage_partition_dir`.
-  static base::FilePath GetPath(StorageType storage_type,
-                                const base::FilePath& storage_partition_dir);
-
   // Returns the LevelDB database path for `storage_type` under
   // `storage_partition_dir`. The path is a directory:
   //

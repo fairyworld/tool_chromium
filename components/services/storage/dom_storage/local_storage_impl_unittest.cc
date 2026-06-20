@@ -14,10 +14,12 @@
 #include "base/files/scoped_temp_dir.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback_helpers.h"
+#include "base/rand_util.h"
 #include "base/run_loop.h"
 #include "base/strings/stringprintf.h"
 #include "base/task/sequenced_task_runner.h"
 #include "base/task/thread_pool.h"
+#include "base/task/thread_pool/thread_pool_instance.h"
 #include "base/test/bind.h"
 #include "base/test/gmock_expected_support.h"
 #include "base/test/metrics/histogram_tester.h"
@@ -426,6 +428,13 @@ class LocalStorageImplTest
   ~LocalStorageImplTest() override = default;
 
   bool IsSqliteEnabled() const { return GetParam(); }
+
+  base::FilePath GetDatabasePath() {
+    return IsSqliteEnabled() ? DomStorageDatabase::GetSqlitePath(
+                                   StorageType::kLocalStorage, storage_path())
+                             : DomStorageDatabase::GetLevelDbPath(
+                                   StorageType::kLocalStorage, storage_path());
+  }
 };
 
 INSTANTIATE_TEST_SUITE_P(
@@ -1275,8 +1284,7 @@ TEST_P(LocalStorageImplTest, InMemory) {
   // Should not have created any files.
   ShutDownStorage();
 
-  base::FilePath database_path =
-      DomStorageDatabase::GetPath(StorageType::kLocalStorage, storage_path());
+  base::FilePath database_path = GetDatabasePath();
   EXPECT_FALSE(base::PathExists(database_path));
 
   // Re-opening should get fresh data.
@@ -1302,15 +1310,16 @@ TEST_P(LocalStorageImplTest, InMemoryInvalidPath) {
   ShutDownStorage();
 
   // Should not have created any files.
-  base::FilePath database_path =
-      DomStorageDatabase::GetPath(StorageType::kLocalStorage, storage_path());
+  base::FilePath database_path = GetDatabasePath();
   EXPECT_FALSE(base::PathExists(database_path));
 }
 
 TEST_P(LocalStorageImplTest, OnDisk) {
   base::HistogramTester histograms;
   auto key = StdStringToUint8Vector("key");
-  auto value = StdStringToUint8Vector("value");
+  // Use a large, incompressible value so the populated database size exceeds
+  // 1 KB.
+  std::vector<uint8_t> value = base::RandBytesAsVector(4096);
 
   DoTestPut(key, value);
   std::vector<uint8_t> result;
@@ -1320,8 +1329,7 @@ TEST_P(LocalStorageImplTest, OnDisk) {
   ShutDownStorage();
 
   // Writing map entries must create the database on disk.
-  base::FilePath database_path =
-      DomStorageDatabase::GetPath(StorageType::kLocalStorage, storage_path());
+  base::FilePath database_path = GetDatabasePath();
   EXPECT_TRUE(base::PathExists(database_path));
 
   // Should be able to re-open.
@@ -1331,6 +1339,13 @@ TEST_P(LocalStorageImplTest, OnDisk) {
   // Sample value of 0 denotes DbStatus::Type::kOk.
   histograms.ExpectUniqueSample("Storage.LocalStorage.OpenDatabase.OnDisk",
                                 /*sample=*/0, 2);
+  // DB size telemetry fires once per Open.
+  base::ThreadPoolInstance::Get()->FlushForTesting();
+  histograms.ExpectTotalCount("LocalStorage.DatabaseOnDiskSizeKB", 2);
+  // The recorded size must be non-zero. This guards the SQLite path, whose
+  // single database file would otherwise measure zero if treated as a
+  // directory.
+  EXPECT_GT(histograms.GetTotalSum("LocalStorage.DatabaseOnDiskSizeKB"), 0);
 }
 
 TEST_P(LocalStorageImplTest, InvalidVersionOnDisk) {
@@ -1390,8 +1405,7 @@ TEST_P(LocalStorageImplTest, CorruptionOnDisk) {
 
   ShutDownStorage();
 
-  base::FilePath db_path =
-      DomStorageDatabase::GetPath(StorageType::kLocalStorage, storage_path());
+  base::FilePath db_path = GetDatabasePath();
   if (IsSqliteEnabled()) {
     // Replace the SQLite database file with plain text.
     ASSERT_TRUE(base::WriteFile(db_path, "Corrupt database"));
@@ -1774,6 +1788,14 @@ TEST_P(LocalStorageImplOnDiskSQLiteRolloutTest,
           ? "Storage.LocalStorage.OpenDatabase.OnDiskExperimental"
           : "Storage.LocalStorage.OpenDatabase.OnDisk",
       /*sample=*/0, /*expected_bucket_count=*/1);
+  // DB size telemetry fires once per Open, with the `.OnDiskExperimental`
+  // suffix on experimental rollout stages and unsuffixed otherwise.
+  base::ThreadPoolInstance::Get()->FlushForTesting();
+  histograms.ExpectTotalCount(
+      IsExperimentalStage()
+          ? "LocalStorage.DatabaseOnDiskSizeKB.OnDiskExperimental"
+          : "LocalStorage.DatabaseOnDiskSizeKB",
+      1);
 }
 
 TEST_P(LocalStorageImplOnDiskSQLiteRolloutTest, PreExistingUntaggedLevelDb) {

@@ -54,10 +54,6 @@ void FakeDomStorageDatabaseFactory::Open(
                      std::make_unique<FakeDomStorageDatabase>(open_status));
   result.metrics_type = is_in_memory ? DatabaseMetricsType::kInMemory
                                      : DatabaseMetricsType::kOnDisk;
-  if (!is_in_memory) {
-    result.database_path = DomStorageDatabase::GetPath(
-        StorageType::kLocalStorage, storage_partition_dir);
-  }
   result.open_status = open_status;
   std::move(callback).Run(std::move(result));
 }

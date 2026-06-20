@@ -244,6 +244,13 @@ class SessionStorageImplTest
   ~SessionStorageImplTest() override = default;
 
   bool IsSqliteEnabled() const { return GetParam(); }
+
+  base::FilePath GetDatabasePath() {
+    return IsSqliteEnabled() ? DomStorageDatabase::GetSqlitePath(
+                                   StorageType::kSessionStorage, temp_path())
+                             : DomStorageDatabase::GetLevelDbPath(
+                                   StorageType::kSessionStorage, temp_path());
+  }
 };
 
 INSTANTIATE_TEST_SUITE_P(
@@ -916,8 +923,7 @@ TEST_P(SessionStorageImplTest, CorruptionOnDisk) {
 
   ShutDownSessionStorage();
 
-  base::FilePath db_path =
-      DomStorageDatabase::GetPath(StorageType::kSessionStorage, temp_path());
+  base::FilePath db_path = GetDatabasePath();
   if (IsSqliteEnabled()) {
     // Replace the SQLite database file with plain text.
     ASSERT_TRUE(base::WriteFile(db_path, "Corrupt database"));
