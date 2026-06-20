@@ -518,3 +518,80 @@ TEST_F(MostRelevantTabResumptionPageHandlerTest, RemoveOldDismissedTabs) {
   RemoveOldDismissedTabs();
   ASSERT_EQ(0u, dismissed_urls_dict.size());
 }
+
+TEST_F(MostRelevantTabResumptionPageHandlerTest,
+       GetURLVisits_URLTitleFormatting) {
+  visited_url_ranking::MockVisitedURLRankingService*
+      mock_visited_url_ranking_service =
+          static_cast<visited_url_ranking::MockVisitedURLRankingService*>(
+              VisitedURLRankingServiceFactory::GetForProfile(profile()));
+
+  EXPECT_CALL(*mock_visited_url_ranking_service, FetchURLVisitAggregates(_, _))
+      .Times(1)
+      .WillOnce(
+          [](const FetchOptions& options,
+             VisitedURLRankingService::GetURLVisitAggregatesCallback callback) {
+            std::vector<URLVisitAggregate> url_visit_aggregates = {};
+
+            // 1. Visit with an empty title.
+            URLVisitAggregate visit1("visit_id_1");
+            GURL url1("https://www.example.com/path?q=1");
+            visit1.fetcher_data_map.emplace(
+                Fetcher::kHistory,
+                URLVisitAggregate::HistoryData(
+                    visited_url_ranking::GenerateSampleAnnotatedVisit(
+                        1, u"", url1, false)));
+            visit1.decorations.emplace_back(
+                visited_url_ranking::DecorationType::kVisitedXAgo,
+                u"You visited X ago");
+            url_visit_aggregates.push_back(std::move(visit1));
+
+            // 2. Visit with a non-empty title.
+            URLVisitAggregate visit2("visit_id_2");
+            GURL url2("https://www.google.com/");
+            visit2.fetcher_data_map.emplace(
+                Fetcher::kHistory,
+                URLVisitAggregate::HistoryData(
+                    visited_url_ranking::GenerateSampleAnnotatedVisit(
+                        2, u"Google Search Page", url2, false)));
+            visit2.decorations.emplace_back(
+                visited_url_ranking::DecorationType::kVisitedXAgo,
+                u"You visited X ago");
+            url_visit_aggregates.push_back(std::move(visit2));
+
+            URLVisitsMetadata url_visits_metadata;
+            std::move(callback).Run(ResultStatus::kSuccess,
+                                    std::move(url_visits_metadata),
+                                    std::move(url_visit_aggregates));
+          });
+
+  EXPECT_CALL(*mock_visited_url_ranking_service,
+              RankURLVisitAggregates(_, _, _))
+      .Times(1)
+      .WillOnce([](const visited_url_ranking::Config& config,
+                   std::vector<URLVisitAggregate> visits,
+                   VisitedURLRankingService::RankURLVisitAggregatesCallback
+                       callback) {
+        std::move(callback).Run(ResultStatus::kSuccess, std::move(visits));
+      });
+
+  EXPECT_CALL(*mock_visited_url_ranking_service,
+              DecorateURLVisitAggregates(_, _, _, _))
+      .Times(1)
+      .WillOnce([](const visited_url_ranking::Config& config,
+                   visited_url_ranking::URLVisitsMetadata url_visit_metadata,
+                   std::vector<URLVisitAggregate> visits,
+                   VisitedURLRankingService::DecorateURLVisitAggregatesCallback
+                       callback) {
+        std::move(callback).Run(ResultStatus::kSuccess, std::move(visits));
+      });
+
+  auto url_visits_mojom = RunGetURLVisits();
+  ASSERT_EQ(2u, url_visits_mojom.size());
+
+  // First visit had an empty title, so it should fallback to the GURL spec.
+  EXPECT_EQ("https://www.example.com/path?q=1", url_visits_mojom[0]->title);
+
+  // Second visit had a non-empty title, so it should use it.
+  EXPECT_EQ("Google Search Page", url_visits_mojom[1]->title);
+}
