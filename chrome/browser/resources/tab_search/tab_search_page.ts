@@ -94,6 +94,8 @@ export class TabSearchPageElement extends TabSearchSearchFieldBase {
       listItemSize_: {type: Number},
       searchQueryMaxLength_: {type: Number},
 
+      activeDescendantEnabled_: {type: Boolean},
+
       /**
        * Options for search. Controls how heavily weighted fields are relative
        * to each other in the scoring via field weights.
@@ -109,6 +111,7 @@ export class TabSearchPageElement extends TabSearchSearchFieldBase {
   protected accessor listMaxHeight_: number|undefined;
   protected accessor listItemSize_: number|undefined;
   protected accessor searchQueryMaxLength_: number = SEARCH_QUERY_MAX_LENGTH;
+  protected accessor activeDescendantEnabled_: boolean = false;
   protected accessor filteredItems_:
       Array<TitleItem|TabData|TabGroupData|SplitViewData> = [];
   private accessor searchOptions_: SearchOptions = {
@@ -166,6 +169,7 @@ export class TabSearchPageElement extends TabSearchSearchFieldBase {
     this.documentVisibilityChangedListener_ = () => {
       if (document.visibilityState === 'visible') {
         this.windowShownTimestamp_ = Date.now();
+        this.activeDescendantEnabled_ = false;
         this.updateTabs_();
       } else {
         this.onDocumentHidden_();
@@ -250,6 +254,7 @@ export class TabSearchPageElement extends TabSearchSearchFieldBase {
    * responsive.
    */
   override onSearchTermInput() {
+    this.activeDescendantEnabled_ = false;
     this.hasSearchText = this.getSearchInput().value !== '';
     this.searchText_ = this.getSearchInput().value;
     // Reset the selected item whenever a search query is provided.
@@ -426,7 +431,7 @@ export class TabSearchPageElement extends TabSearchSearchFieldBase {
     this.updateFilteredTabs_();
   }
 
-  private itemIndexToTabIndex_(itemIndex: number) {
+  protected itemIndexToTabIndex_(itemIndex: number) {
     // Note: the array being searched has length at most 3.
     const numPreviousHeaders =
         this.filteredOpenHeaderIndices_.findLastIndex(idx => idx < itemIndex) +
@@ -460,7 +465,7 @@ export class TabSearchPageElement extends TabSearchSearchFieldBase {
    * @return The number of selectable list items, excludes non
    *     selectable items such as section title items.
    */
-  private selectableItemCount_(): number {
+  protected selectableItemCount_(): number {
     return this.filteredItems_.reduce((acc, item) => {
       return acc + (item instanceof TitleItem ? 0 : 1);
     }, 0);
@@ -668,6 +673,14 @@ export class TabSearchPageElement extends TabSearchSearchFieldBase {
     this.updateFilteredTabs_();
   }
 
+  protected getAriaActivedescendant_() {
+    if (this.activeDescendantEnabled_) {
+      return this.activeSelectionId_;
+    }
+
+    return undefined;
+  }
+
   protected onItemFocus_(e: Event) {
     // Ensure that when a TabSearchItem receives focus, it becomes the selected
     // item in the list.
@@ -744,11 +757,17 @@ export class TabSearchPageElement extends TabSearchSearchFieldBase {
       return;
     }
 
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      this.activeDescendantEnabled_ = false;
+    }
+
     // <if expr="is_macosx">
     const lowerKey = e.key.toLowerCase();
 
     if (e.ctrlKey && (lowerKey === 'n' || lowerKey === 'p')) {
       const mappedKey = lowerKey === 'n' ? 'ArrowDown' : 'ArrowUp';
+
+      this.activeDescendantEnabled_ = true;
       this.$.tabsList.navigate(mappedKey);
 
       e.stopPropagation();
@@ -758,6 +777,7 @@ export class TabSearchPageElement extends TabSearchSearchFieldBase {
     // </if>
 
     if (selectorNavigationKeys.includes(e.key)) {
+      this.activeDescendantEnabled_ = true;
       this.$.tabsList.navigate(e.key);
 
       e.stopPropagation();

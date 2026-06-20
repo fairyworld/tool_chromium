@@ -1150,4 +1150,66 @@ suite('TabSearchAppTest', () => {
     const [closedTabIds] = await testProxy.whenCalled('closeTabs');
     assertDeepEquals([10, 20], closedTabIds);
   });
+
+  test('aria-activedescendant updates', async () => {
+    await setupTest(createProfileData());
+    const searchInput = tabSearchPage.$.searchInput;
+
+    // Initially, aria-activedescendant is not set.
+    assertFalse(searchInput.hasAttribute('aria-activedescendant'));
+
+    // Type in search input, it should still not be set.
+    setSearchText('Apple');
+    await microtasksFinished();
+    assertFalse(searchInput.hasAttribute('aria-activedescendant'));
+
+    // Press ArrowDown. This should activate keyboard navigation and set
+    // aria-activedescendant.
+    const searchField = tabSearchPage.$.searchField;
+    keyDownOn(searchField, 0, [], 'ArrowDown');
+    await microtasksFinished();
+
+    assertTrue(searchInput.hasAttribute('aria-activedescendant'));
+    const activeId1 = searchInput.getAttribute('aria-activedescendant');
+    assertTrue(!!activeId1);
+
+    const rows = queryRows();
+    const activeIndex = tabSearchPage.getSelectedTabIndex();
+    const activeElementId = rows[activeIndex]!.id;
+    assertEquals(activeElementId, activeId1);
+
+    // Press ArrowDown again. This should move selection and update
+    // aria-activedescendant.
+    keyDownOn(searchField, 0, [], 'ArrowDown');
+    await microtasksFinished();
+
+    const activeId2 = searchInput.getAttribute('aria-activedescendant');
+    const activeIndex2 = tabSearchPage.getSelectedTabIndex();
+    const activeElementId2 = rows[activeIndex2]!.id;
+    assertEquals(activeElementId2, activeId2, 'hello');
+    assertNotEquals(activeId1, activeId2);
+
+    // Type again. This should remove aria-activedescendant.
+    setSearchText('A');
+    await microtasksFinished();
+    assertFalse(searchInput.hasAttribute('aria-activedescendant'));
+
+    // Reactivate keyboard navigation.
+    keyDownOn(searchField, 0, [], 'ArrowDown');
+    await microtasksFinished();
+    assertTrue(searchInput.hasAttribute('aria-activedescendant'));
+  });
+
+  test('aria-posinset and aria-setsize', async () => {
+    await setupTest(createProfileData());
+
+    await tabSearchPage.$.tabsList.ensureAllDomItemsAvailable();
+    const rows = queryRows();
+
+    assertEquals(6, rows.length);
+    rows.forEach((row, index) => {
+      assertEquals((index + 1).toString(), row.ariaPosInSet);
+      assertEquals('6', row.ariaSetSize);
+    });
+  });
 });
