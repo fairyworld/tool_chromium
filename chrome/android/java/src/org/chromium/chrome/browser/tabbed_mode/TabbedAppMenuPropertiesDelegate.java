@@ -1455,7 +1455,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                 mTabModelSelector.isTabStateInitialized())
                         .build();
 
-        return createStandardListItem(model, /* showIcon= */ false);
+        return new ListItem(AppMenuHandler.AppMenuItemType.RECENT_ENTRY, model);
     }
 
     private ListItem buildClosedWindowTabMenuItem(RecentlyClosedTab tab, int windowInstanceId) {
@@ -1536,7 +1536,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                 AppMenuItemProperties.ENABLED,
                                 mTabModelSelector.isTabStateInitialized())
                         .build();
-        return createStandardListItem(model, /* showIcon= */ false);
+        return new ListItem(AppMenuHandler.AppMenuItemType.RECENT_ENTRY, model);
     }
 
     private ListItem buildRecentTabMenuItem(RecentlyClosedTab tab) {

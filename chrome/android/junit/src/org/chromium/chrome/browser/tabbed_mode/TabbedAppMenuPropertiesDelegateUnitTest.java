@@ -4544,6 +4544,10 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         item(R.string.menu_mobile_bookmarks, item("Partner bookmarks", item(0))),
                         item(R.string.menu_other_bookmarks, item(0)));
         assertMenuTitlesAreEqual(subItems, expectedTitles);
+
+        // Confirm we are using the correct item type.
+        ListItem bookmarkItem = subItems.get(8);
+        assertEquals(AppMenuHandler.AppMenuItemType.BOOKMARK, bookmarkItem.type);
     }
 
     @Test
@@ -4697,6 +4701,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         ListItem tabItem1 = tabsSubmenuItems.get(0);
         assertEquals(AppMenuHandler.AppMenuItemType.TAB, tabItem1.type);
+        assertEquals(AppMenuHandler.AppMenuItemType.MENU_ITEM_WITH_SUBMENU, groupItem.type);
         assertEquals(101, tabItem1.model.get(AppMenuTabItemProperties.TAB_ID));
         Bundle bundle1 = mTabbedAppMenuPropertiesDelegate.getBundleForMenuItem(tabItem1.model);
         assertNotNull("Bundle 1 should not be null", bundle1);
@@ -5015,6 +5020,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         ListItem restoreItem = windowSubmenu.get(0);
         assertEquals(
                 closedWindow, restoreItem.model.get(AppMenuRecentEntryItemProperties.RECENT_ENTRY));
+        assertEquals(AppMenuHandler.AppMenuItemType.RECENT_ENTRY, restoreItem.type);
     }
 
     @Test
