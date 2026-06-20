@@ -1384,13 +1384,20 @@ void GpuDataManagerImplPrivate::UpdateGpuPreferences(
         !std::ranges::contains(fallback_modes_, gpu::GpuMode::HARDWARE_VULKAN));
   }
 
+  bool has_software_mode = false;
   for (gpu::GpuMode mode : base::Reversed(fallback_modes_)) {
     gpu::GrContextType type = gpu::GpuModeToGrContextType(mode);
-    // kNone corresponds to a software mode; in-process fallback from a hardware
-    // context type to a software context type is not supported.
+    // kNone might be duplicated between SOFTWARE_GL and DISPLAY_COMPOSITOR gpu
+    // modes, both of which can return kNone.
     if (type != gpu::GrContextType::kNone) {
       gpu_preferences->fallback_gr_context_types.push_back(type);
+    } else {
+      has_software_mode = true;
     }
+  }
+  if (has_software_mode) {
+    gpu_preferences->fallback_gr_context_types.push_back(
+        gpu::GrContextType::kNone);
   }
 }
 
