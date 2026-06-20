@@ -428,6 +428,7 @@ public class ToolbarManager
 
     private boolean mInitializedWithNative;
     private @Nullable Runnable mMenuStateObserver;
+    private final OneshotSupplier<AppMenuCoordinator> mAppMenuCoordinatorSupplier;
     private @MonotonicNonNull UpdateMenuItemHelper mUpdateMenuItemHelper;
 
     private boolean mShouldUpdateToolbarPrimaryColor = true;
@@ -836,6 +837,7 @@ public class ToolbarManager
         mOmniboxFocusStateSupplier = omniboxFocusStateSupplier;
         mPromoShownOneshotSupplier = promoShownOneshotSupplier;
         mAppMenuDelegate = appMenuDelegate;
+        mAppMenuCoordinatorSupplier = appMenuCoordinatorSupplier;
         mModalDialogManagerSupplier = modalDialogManagerSupplier;
         mStatusBarColorController = statusBarColorController;
         mUrlFocusChangedCallback = urlFocusChangedCallback;
@@ -2454,7 +2456,8 @@ public class ToolbarManager
                         mHomepageEnabledSupplier,
                         mProfileSupplier,
                         mOmniboxFocusStateSupplier,
-                        mModalDialogManagerSupplier);
+                        mModalDialogManagerSupplier,
+                        mAppMenuCoordinatorSupplier);
         bottomBarContainerOneshotSupplier.set(bottomBarContainerCoordinator);
 
         if (mBottomBarHostManager != null) {
