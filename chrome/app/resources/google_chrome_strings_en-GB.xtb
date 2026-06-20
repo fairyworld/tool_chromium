@@ -151,6 +151,7 @@ Some features may be unavailable and changes to preferences won't be saved.</tra
 <translation id="2472092250898121027">This extension contains malware and is unsafe. Remove it from Chrome so that it can no longer see and change your data on sites that you visit, including your personal info.</translation>
 <translation id="2485422356828889247">Uninstall</translation>
 <translation id="2513154137948333830">Reboot required: <ph name="INSTALL_SUCCESS" /></translation>
+<translation id="2523492931736391680">Your work secured on Chrome</translation>
 <translation id="2534365042754120737">To protect your data, let Chrome remove permissions from sites you haven't visited recently. Doesn't stop notifications.</translation>
 <translation id="2556847002339236023">Your organisation closes Chrome when it isn't used for <ph name="TIMEOUT_DURATION" />. Browsing data was deleted. This could include history, autofill and downloads.</translation>
 <translation id="2563121210305478421">Relaunch Chrome?</translation>
@@ -255,6 +256,7 @@ If this page isn't working as expected, try allowing optimisation.</translation>
 <translation id="345171907106878721">Add yourself to Chrome</translation>
 <translation id="3453763134178591239">Chrome OS terms</translation>
 <translation id="3503306920980160878">Chrome needs access to your location to share your location with this site</translation>
+<translation id="3512495006767217696">Built into Chrome to help you create, save and autofill strong passwords. Add the shortcut for easy access</translation>
 <translation id="3539955434060988644">Open link in Chrome Inco&amp;gnito window</translation>
 <translation id="3576528680708590453">Your system administrator has configured Google Chrome to open an alternative browser to access <ph name="TARGET_URL_HOSTNAME" />.</translation>
 <translation id="3582972582564653026">Sync and personalise Chrome across your devices</translation>
@@ -317,6 +319,7 @@ If this page isn't working as expected, try allowing optimisation.</translation>
 <translation id="4149882025268051530">The installer failed to uncompress archive. Please download Google Chrome again.</translation>
 <translation id="415112847282352845">To get your addresses and more on all your devices, sign in to Chrome. This address will be saved in your Google Account after you sign in.</translation>
 <translation id="4153934450158521343">Chrome will soon close and delete data</translation>
+<translation id="4159985264221160808">To secure your work on Chrome, your organisation will be able to view or manage certain information</translation>
 <translation id="4173512894976930765">Sites will probably work as expected. You'll be signed out of most sites when you close all Chrome windows, except your Google Account if you're signed in to Chrome.</translation>
 <translation id="4175922240926474352">Chrome blocked this download because the site isn't using a secure connection and the file may have been tampered with</translation>
 <translation id="4191857738314598978">{0,plural, =1{Relaunch Chrome within a day}other{Relaunch Chrome within # days}}</translation>
@@ -348,6 +351,7 @@ If this page isn't working as expected, try allowing optimisation.</translation>
 <translation id="4493028449971051158">Startup error: Please run the installer as administrator.</translation>
 <translation id="4501471624619070934">Installation failed because access is restricted in this country.</translation>
 <translation id="4571503333518166079">Go to Chrome notification settings</translation>
+<translation id="4580939929828762295">Stay safe with Google Password Manager</translation>
 <translation id="4592634244097223647">Ask Google about this image</translation>
 <translation id="459622048091363950">Once Chrome has access, websites will be able to ask you for access.</translation>
 <translation id="4598116752460667024">Search for any process from the list.</translation>
@@ -536,6 +540,7 @@ Google Chrome is unable to recover your settings.</translation>
 <translation id="6438015621983209660">Extend Enhanced Safe Browsing with Chrome on your phone</translation>
 <translation id="6442774133615368941">Shop, translate and identify what you see with your camera on the Chrome iOS app</translation>
 <translation id="6448835208126432197">To select part of the screen in Gemini in Chrome, use keyboard shortcut.</translation>
+<translation id="6473659734176498825">A simplified image showing the Google Password Manager entry point in Chrome</translation>
 <translation id="6473905796280459355">Go to the About Chrome page</translation>
 <translation id="6481963882741794338">Link Chrome and other Google services for personalisation and other purposes</translation>
 <translation id="648319183876919572">Enhanced Safe Browsing does more to protect you against dangerous websites and downloads</translation>
@@ -707,6 +712,7 @@ Google Chrome is unable to recover your settings.</translation>
 <translation id="8064965390968184078">1. Click <ph name="BUTTON_LABEL" /> below
 2. Click <ph name="BUTTON_2" /> in your Windows settings
 3. Click <ph name="BUTTON_3" /> in the Windows notification to pin Chrome to your taskbar for quick access</translation>
+<translation id="8069447462453318634">Select 'Pin to toolbar'</translation>
 <translation id="8074398340364918139">To search a specific Chrome feature or extension, type its shortcut in the address bar, followed by your selected keyboard key</translation>
 <translation id="8077579734294125741">Other Chrome profiles</translation>
 <translation id="8086881907087796310">Installation failed because your computer does not meet the minimum hardware requirements.</translation>

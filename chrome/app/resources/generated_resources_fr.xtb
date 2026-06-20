@@ -3375,7 +3375,6 @@ Vous pouvez gérer les paramètres de ce compte en installant l'application Fami
 <translation id="351152300840026870">Police à largeur fixe</translation>
 <translation id="3511528412952710609">Court</translation>
 <translation id="3512465804715993309">Mise en surbrillance adaptative</translation>
-<translation id="3512495006767217696">Intégré à Chrome pour vous aider à créer, enregistrer et saisir automatiquement des mots de passe sécurisés. Ajoutez le raccourci pour y accéder facilement.</translation>
 <translation id="3513019849832307207">Rejoindre et ouvrir</translation>
 <translation id="3513563267917474897">Curseur de teinte de <ph name="MIN_VALUE" /> à <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Vous allez bénéficier de la protection standard. Pour une protection renforcée contre les téléchargements, les extensions et les sites Web dangereux, activez la navigation sécurisée avec protection renforcée dans les paramètres de Chrome.</translation>
@@ -4838,7 +4837,6 @@ Souhaitez-vous lancer <ph name="CONTROL_PANEL_APPLET_NAME" /> ?</translation>
 <translation id="4580127151758731432">Plus vous bougez la tête, plus le curseur se déplace loin</translation>
 <translation id="4580389561674319558">Visible par tous les contacts</translation>
 <translation id="4580596421317071374">Les mots de passe sont enregistrés dans le <ph name="GOOGLE_PASSWORD_MANAGER" /> sur cet appareil.</translation>
-<translation id="4580939929828762295">Protégez-vous avec Gestionnaire mots de passe Google</translation>
 <translation id="4582297591746054421">Les sites lisent généralement le contenu du presse-papiers pour proposer certaines fonctionnalités, comme conserver la mise en forme du texte copié</translation>
 <translation id="4584094413232466841">Supprimer ces informations de la saisie automatique Chrome ?</translation>
 <translation id="4584770411839426377">Fenêtre</translation>
@@ -7294,7 +7292,6 @@ Assurez-vous de ne pas dévoiler d'informations sensibles.</translation>
 <translation id="6470823736074966819">Ignorer les notifications</translation>
 <translation id="6472893788822429178">Afficher le bouton Accueil</translation>
 <translation id="6473315466413288899">Sélectionnez une option</translation>
-<translation id="6473659734176498825">Image simplifiée montrant le point d'entrée du Gestionnaire de mots de passe de Google dans Chrome</translation>
 <translation id="6474498546677193336">Impossible d'annuler le partage, car une application utilise ce dossier. Le partage sera annulé au prochain arrêt de Linux.</translation>
 <translation id="6474884162850599008">Déconnecter le compte Google Drive</translation>
 <translation id="6476482583633999078">Vitesse d'élocution</translation>

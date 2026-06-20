@@ -3380,7 +3380,6 @@ Cihazda Family Link tətbiqini quraşdırmaqla bu hesabın ayarlarını idarə e
 <translation id="351152300840026870">Fiksə edilmiş eni olan şrift</translation>
 <translation id="3511528412952710609">Qısa</translation>
 <translation id="3512465804715993309">Adaptiv vurğulama</translation>
-<translation id="3512495006767217696">Güclü parollar yaratmağa, yadda saxlamağa və avtomatik doldurmağa kömək etmək üçün Chrome-a daxil edilib. Asan giriş üçün qısayol əlavə edin</translation>
 <translation id="3513019849832307207">Qoşulun və açın</translation>
 <translation id="3513563267917474897"><ph name="MIN_VALUE" />-<ph name="MAX_VALUE" /> aralığında rəng slayderi</translation>
 <translation id="3514647716686280777">Standart qoruma əldə edirsiniz. Təhlükəli vebsaytlara, endirmələrə və artırmalara qarşı daha çox qoruma əldə etmək üçün Chrome ayarlarında Qabaqcıl Güvənli Baxışı aktiv edin.</translation>
@@ -4841,7 +4840,6 @@ Cihazda Family Link tətbiqini quraşdırmaqla bu hesabın ayarlarını idarə e
 <translation id="4580127151758731432">Daha sürətli baş hərəkətləri kursoru daha da uzaqlaşdıracaq</translation>
 <translation id="4580389561674319558">Bütün kontaktlara görünür</translation>
 <translation id="4580596421317071374">Parollar bu cihazda <ph name="GOOGLE_PASSWORD_MANAGER" /> bölməsində saxlanılır.</translation>
-<translation id="4580939929828762295">Google Parol Meneceri ilə güvəndə olun</translation>
 <translation id="4582297591746054421">Saytlar adətən kopyaladığınız mətnin formatını saxlamaq kimi xüsusiyyətlər üçün mübadilə buferinizi oxuyur</translation>
 <translation id="4584094413232466841">Bu məlumat Chrome avto-doldurmadan silinsin?</translation>
 <translation id="4584770411839426377">Pəncərə</translation>
@@ -7298,7 +7296,6 @@ Bu əməliyyata birdən çox keçirici təyin edə bilərsiniz.</translation>
 <translation id="6470823736074966819">Bildirişləri susdurun</translation>
 <translation id="6472893788822429178">Əsas səhifə düyməsini göstərin</translation>
 <translation id="6473315466413288899">Bir seçim edin</translation>
-<translation id="6473659734176498825">Chrome-da Google Parol Menecerinə giriş nöqtəsini göstərən sadələşdirilmiş şəkil</translation>
 <translation id="6474498546677193336">Tətbiq bu qovluqdan istifadə etdiyi üçün paylaşımı silmək mümkün olmadı. Linux növbəti dəfə bağlandıqda qovluğun paylaşımı silinəcək.</translation>
 <translation id="6474884162850599008">Google Disk hesabı bağlantısını kəsin</translation>
 <translation id="6476482583633999078">Nitq sürəti</translation>

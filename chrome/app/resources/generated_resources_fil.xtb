@@ -3390,7 +3390,6 @@ Puwede mong pamahalaan ang mga setting ng account na ito sa pamamagitan ng pag-i
 <translation id="351152300840026870">Fixed-width font</translation>
 <translation id="3511528412952710609">Maikli</translation>
 <translation id="3512465804715993309">Adaptive na pag-highlight</translation>
-<translation id="3512495006767217696">Built in sa Chrome para tulungan kang gumawa, mag-save, at mag-autofill ng malalakas na password. Idagdag ang shortcut para sa madaling pag-access</translation>
 <translation id="3513019849832307207">Sumali at buksan</translation>
 <translation id="3513563267917474897">Slider ng hue mula <ph name="MIN_VALUE" /> hanggang <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Ang standard na proteksyon sa seguridad ang nakukuha mo. Para makakuha ng higit pang proteksyon laban sa mga mapanganib na website, download, at extension, i-on ang Pinahusay na Ligtas na Pag-browse sa mga setting ng Chrome.</translation>
@@ -4853,7 +4852,6 @@ Puwede mong pamahalaan ang mga setting ng account na ito sa pamamagitan ng pag-i
 <translation id="4580127151758731432">Magagalaw nang mas malayo ang cursor kapag mas malalaki ang paggalaw ng ulo</translation>
 <translation id="4580389561674319558">Nakikita ng lahat ng contact</translation>
 <translation id="4580596421317071374">Sine-save ang mga password sa <ph name="GOOGLE_PASSWORD_MANAGER" /> sa device na ito.</translation>
-<translation id="4580939929828762295">Manatiling ligtas sa Google Password Manager</translation>
 <translation id="4582297591746054421">Karaniwang binabasa ng mga site ang iyong clipboard para sa mga feature gaya ng pagpapanatili ng pag-format ng text na kinopya mo</translation>
 <translation id="4584094413232466841">Alisin ang impormasyong ito sa autofill sa Chrome?</translation>
 <translation id="4584770411839426377">Window</translation>
@@ -7310,7 +7308,6 @@ Puwede kang magtalaga ng maraming switch sa pagkilos na ito.</translation>
 <translation id="6470823736074966819">I-mute ang Mga Notification</translation>
 <translation id="6472893788822429178">Ipakita ang button na Home</translation>
 <translation id="6473315466413288899">Pumili ng opsyon</translation>
-<translation id="6473659734176498825">Isang pinasimpleng larawan na nagpapakita ng entry point ng Google Password Manager sa Chrome</translation>
 <translation id="6474498546677193336">Hindi ma-unshare dahil ginagamit ng isang application ang folder na ito. Ia-unshare ang folder kapag na-shut down ang Linux.</translation>
 <translation id="6474884162850599008">Alisin sa pagkakakonekta ang Google Drive account</translation>
 <translation id="6476482583633999078">Bilis ng pagsasalita</translation>

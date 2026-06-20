@@ -3390,7 +3390,6 @@ Jei nenorite, dabar atsijunkite, kad šios paskyros pakeitimai būtų matomi ši
 <translation id="351152300840026870">Fiksuoto pločio šriftas</translation>
 <translation id="3511528412952710609">Trumpa</translation>
 <translation id="3512465804715993309">Prisitaikantis paryškinimas</translation>
-<translation id="3512495006767217696">Integruota į „Chrome“, kad galėtumėte kurti, išsaugoti ir automatiškai užpildyti sudėtingus slaptažodžius. Pridėkite šaukinį, kad galėtumėte lengvai pasiekti.</translation>
 <translation id="3513019849832307207">Prisijungti ir atidaryti</translation>
 <translation id="3513563267917474897">Atspalvio šliaužiklis nuo <ph name="MIN_VALUE" /> iki <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Naudojate įprastos apsaugos funkciją. Kad užtikrintumėte geresnę apsaugą nuo pavojingų svetainių, atsisiuntimų ir plėtinių, „Chrome“ nustatymuose įjunkite „Sustiprinto saugaus naršymo“ funkciją.</translation>
@@ -4853,7 +4852,6 @@ Ar norite paleisti „<ph name="CONTROL_PANEL_APPLET_NAME" />“?</translation>
 <translation id="4580127151758731432">Kuo didesnė galvos judesio amplitudė, tuo toliau perkeliamas žymeklis</translation>
 <translation id="4580389561674319558">Matoma visiems kontaktams</translation>
 <translation id="4580596421317071374">Slaptažodžiai išsaugomi skiltyje „<ph name="GOOGLE_PASSWORD_MANAGER" />“ šiame įrenginyje</translation>
-<translation id="4580939929828762295">Išlikite saugūs su „Google“ slaptažodžių tvarkykle</translation>
 <translation id="4582297591746054421">Paprastai svetainėse nuskaitoma jūsų iškarpinė ieškant tam tikrų funkcijų, pvz., norint išlaikyti nukopijuoto teksto formatavimą</translation>
 <translation id="4584094413232466841">Pašalinti šią informaciją iš „Chrome“ automatinio pildymo?</translation>
 <translation id="4584770411839426377">Langas</translation>
@@ -7311,7 +7309,6 @@ Jei norite nutolinti, naudokite „Ctrl“ + „Alt“ + šviesumo mažinimo kla
 <translation id="6470823736074966819">Nutildyti pranešimus</translation>
 <translation id="6472893788822429178">Rodyti mygtuką „Pagrindinis“</translation>
 <translation id="6473315466413288899">Pasirinkite parinktį</translation>
-<translation id="6473659734176498825">Supaprastintas vaizdas, kuriame rodomas „Google“ slaptažodžių tvarkyklės pradžios taškas naršyklėje „Chrome“</translation>
 <translation id="6474498546677193336">Nepavyko panaikinti bendrinimo, nes programa naudoja šį aplanką. Aplankas bus nebebendrinamas, kai kitą kartą išjungsite „Linux“.</translation>
 <translation id="6474884162850599008">Atjungti „Google“ disko paskyrą</translation>
 <translation id="6476482583633999078">Kalbos sparta</translation>

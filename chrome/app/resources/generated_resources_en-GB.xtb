@@ -3390,7 +3390,6 @@ You can manage this account’s settings by installing the Family Link app on yo
 <translation id="351152300840026870">Fixed-width font</translation>
 <translation id="3511528412952710609">Short</translation>
 <translation id="3512465804715993309">Adaptive highlighting</translation>
-<translation id="3512495006767217696">Built into Chrome to help you create, save and autofill strong passwords. Add the shortcut for easy access</translation>
 <translation id="3513019849832307207">Join and open</translation>
 <translation id="3513563267917474897">Hue slider from <ph name="MIN_VALUE" /> to <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">You're getting standard security protection. To get more protection against dangerous websites, downloads and extensions, turn on Enhanced Safe Browsing in Chrome settings.</translation>
@@ -4236,6 +4235,7 @@ You can manage this account’s settings by installing the Family Link app on yo
 <translation id="4103644672850109428">Screen reader, magnification</translation>
 <translation id="4104163789986725820">E&amp;xport...</translation>
 <translation id="4107048419833779140">Identify and eject storage devices</translation>
+<translation id="4107207375883769436">Your organisation may need to see and manage browsing data in your work profile, such as your browsing history and passwords</translation>
 <translation id="4107522742068568249">Go to safety check</translation>
 <translation id="4107793386654579933">Select a shortcut for <ph name="ACTION_NAME" /> action</translation>
 <translation id="4109135793348361820">Move window to <ph name="USER_NAME" /> (<ph name="USER_EMAIL" />)</translation>
@@ -4852,7 +4852,6 @@ You can manage this account’s settings by installing the Family Link app on yo
 <translation id="4580127151758731432">Bigger head movements will move the cursor further</translation>
 <translation id="4580389561674319558">Visible to all contacts</translation>
 <translation id="4580596421317071374">Passwords are saved to <ph name="GOOGLE_PASSWORD_MANAGER" /> on this device.</translation>
-<translation id="4580939929828762295">Stay safe with Google Password Manager</translation>
 <translation id="4582297591746054421">Sites usually read your clipboard for features like keeping the formatting of text that you copied</translation>
 <translation id="4584094413232466841">Remove this info from Chrome autofill?</translation>
 <translation id="4584770411839426377">Window</translation>
@@ -6053,6 +6052,7 @@ You can assign multiple switches to this action.</translation>
 <translation id="5493792505296048976">screen on</translation>
 <translation id="5494016731375030300">Recently closed tabs</translation>
 <translation id="5494362494988149300">Open When &amp;Finished</translation>
+<translation id="5494879038325093596">Verify that it's you to get it on all devices with your Google Account</translation>
 <translation id="5494920125229734069">Select all</translation>
 <translation id="5495466433285976480">This will remove all local users, files, data and other settings after your next restart. All users will need to sign in again.</translation>
 <translation id="5495597166260341369">Keep display on</translation>
@@ -7308,7 +7308,6 @@ You can assign multiple switches to this action.</translation>
 <translation id="6470823736074966819">Mute notifications</translation>
 <translation id="6472893788822429178">Show Home button</translation>
 <translation id="6473315466413288899">Select an option</translation>
-<translation id="6473659734176498825">A simplified image showing the Google Password Manager entry point in Chrome</translation>
 <translation id="6474498546677193336">Couldn't unshare because an application is using this folder. The folder will be unshared when Linux is next shut down.</translation>
 <translation id="6474884162850599008">Disconnect Google Drive account</translation>
 <translation id="6476482583633999078">Speech speed</translation>
@@ -10758,6 +10757,7 @@ This can include information about installed software, files, your browser, the 
 <translation id="9012585441087414258">Protects against sites, downloads and extensions that are known to be dangerous. If a page does something suspicious, URLs and bits of page content are sent to Google Safe Browsing.</translation>
 <translation id="9014206344398081366">ChromeVox tutorial</translation>
 <translation id="9014674417732091912">Moved to row <ph name="ROW_NUMBER" /></translation>
+<translation id="9015111999662965458">To make sure that this device can be used safely, your organisation may need to see information about its operating system, browser, settings and what software is installed on the device</translation>
 <translation id="9015849286924418538">Organise tabs into labelled, colour-coded groups for easy access</translation>
 <translation id="9016827136585652292">Privacy screen toggle</translation>
 <translation id="90181708067259747">Expiry date: <ph name="CARD" /></translation>

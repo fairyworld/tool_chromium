@@ -3387,7 +3387,6 @@ Postavkama ovog računa možete upravljati instaliranjem aplikacije Family Link 
 <translation id="351152300840026870">Font fiksne širine</translation>
 <translation id="3511528412952710609">Kratko</translation>
 <translation id="3512465804715993309">Prilagodljivo isticanje</translation>
-<translation id="3512495006767217696">Ugrađen je u Chromeu da vam pomogne da kreirate, pohranjujete i automatski popunjavate jake lozinke. Dodajte prečicu za lak pristup</translation>
 <translation id="3513019849832307207">Pridružite se i otvorite</translation>
 <translation id="3513563267917474897">Klizač nijanse od <ph name="MIN_VALUE" /> do <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Dobijate standardnu sigurnosnu zaštitu. Da dobijete bolju zaštitu od opasnih web lokacija, preuzimanja i ekstenzija, uključite Poboljšano sigurno pregledanje u postavkama Chromea.</translation>
@@ -4850,7 +4849,6 @@ Postavkama ovog računa možete upravljati instaliranjem aplikacije Family Link 
 <translation id="4580127151758731432">Veći pokreti glavom će pomjeriti kursor dalje</translation>
 <translation id="4580389561674319558">Vidljivo je svim kontaktima</translation>
 <translation id="4580596421317071374">Lozinke se pohranjuju u aplikaciji <ph name="GOOGLE_PASSWORD_MANAGER" /> na ovom uređaju.</translation>
-<translation id="4580939929828762295">Ostanite sigurni uz Google upravitelj lozinki</translation>
 <translation id="4582297591746054421">Web lokacije obično čitaju vašu međumemoriju radi funkcija kao što je održavanje formatiranja teksta koji ste kopirali</translation>
 <translation id="4584094413232466841">Ukloniti ove informacije iz automatskog popunjavanja u Chromeu?</translation>
 <translation id="4584770411839426377">Prozor</translation>
@@ -7307,7 +7305,6 @@ Ovoj radnji možete dodijeliti više prekidača.</translation>
 <translation id="6470823736074966819">Isključi zvuk obavještenja</translation>
 <translation id="6472893788822429178">Prikaz dugmeta za početni ekran</translation>
 <translation id="6473315466413288899">Odaberite opciju</translation>
-<translation id="6473659734176498825">Pojednostavljena slika koja prikazuje ulaznu tačku Google upravitelja lozinki u Chromeu</translation>
 <translation id="6474498546677193336">Prekidanje dijeljenja nije uspjelo jer neka aplikacija koristi ovaj folder. Dijeljenje foldera će se prekinuti nakon sljedećeg isključivanja Linuxa.</translation>
 <translation id="6474884162850599008">Prekini vezu s računom za Google Disk</translation>
 <translation id="6476482583633999078">Brzina govora</translation>

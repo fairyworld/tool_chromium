@@ -3375,7 +3375,6 @@ Sunucunun mesajı: <ph name="SERVER_MSG" /></translation>
 <translation id="351152300840026870">Sabit genişlikte yazı tipi</translation>
 <translation id="3511528412952710609">Kısa</translation>
 <translation id="3512465804715993309">Uyarlanabilir vurgulama</translation>
-<translation id="3512495006767217696">Güçlü şifreler oluşturmanıza, kaydetmenize ve otomatik doldurmanıza yardımcı olmak için Chrome'a entegre edilmiştir. Kolay erişim için kısayol ekleyin.</translation>
 <translation id="3513019849832307207">Katıl ve aç</translation>
 <translation id="3513563267917474897"><ph name="MIN_VALUE" />-<ph name="MAX_VALUE" /> arasında ton kaydırma çubuğu</translation>
 <translation id="3514647716686280777">Standart güvenlik korumasına sahipsiniz. Tehlikeli web siteleri, indirmeler ve uzantılara karşı daha fazla koruma elde etmek için Chrome ayarlarında Gelişmiş Güvenli Tarama'yı etkinleştirin.</translation>
@@ -4838,7 +4837,6 @@ Sunucunun mesajı: <ph name="SERVER_MSG" /></translation>
 <translation id="4580127151758731432">Başınızı daha fazla hareket ettirmeniz, imleci daha uzağa taşır</translation>
 <translation id="4580389561674319558">Tüm kişiler görebilir</translation>
 <translation id="4580596421317071374">Şifreler bu cihazda <ph name="GOOGLE_PASSWORD_MANAGER" /> uygulamasına kaydedilir.</translation>
-<translation id="4580939929828762295">Google Şifre Yöneticisi ile güvende kalın</translation>
 <translation id="4582297591746054421">Kopyaladığınız metnin biçimini koruma gibi özelliklerin kullanılması için siteler genellikle panonuzu okur</translation>
 <translation id="4584094413232466841">Bu bilgiler, Chrome otomatik doldurma özelliğinden kaldırılsın mı?</translation>
 <translation id="4584770411839426377">Pencere</translation>
@@ -7295,7 +7293,6 @@ Hassas bilgileri vermediğinizden emin olun.</translation>
 <translation id="6470823736074966819">Bildirimleri yoksay</translation>
 <translation id="6472893788822429178">Ana Sayfa düğmesini göster</translation>
 <translation id="6473315466413288899">Bir seçenek belirleyin</translation>
-<translation id="6473659734176498825">Chrome'da Google Şifre Yöneticisi giriş noktasını gösteren basitleştirilmiş bir resim</translation>
 <translation id="6474498546677193336">Bir uygulama bu klasörü kullandığından paylaşım kaldırılamadı. Linux kapatıldığında klasörün paylaşımı kaldırılacak.</translation>
 <translation id="6474884162850599008">Google Drive hesabının bağlantısını kes</translation>
 <translation id="6476482583633999078">Konuşma hızı</translation>

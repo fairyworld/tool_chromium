@@ -3386,7 +3386,6 @@
 <translation id="351152300840026870">固定寬度字型</translation>
 <translation id="3511528412952710609">短</translation>
 <translation id="3512465804715993309">自動調節突顯內容</translation>
-<translation id="3512495006767217696">Chrome 內置此功能，可協助你建立、儲存及自動填入安全度高的密碼。建議新增捷徑，方便隨時使用</translation>
 <translation id="3513019849832307207">加入並開啟</translation>
 <translation id="3513563267917474897">色調滑桿由 <ph name="MIN_VALUE" /> 至 <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">您正受標準安全保護功能保護。如要進一步防範危險網站、下載檔案及擴充程式，請在 Chrome 設定中啟用「強化安全瀏覽」功能。</translation>
@@ -4849,7 +4848,6 @@
 <translation id="4580127151758731432">頭部移動幅度越大，游標移動距離越遠</translation>
 <translation id="4580389561674319558">所有聯絡人都可看見</translation>
 <translation id="4580596421317071374">密碼會儲存至此裝置的「<ph name="GOOGLE_PASSWORD_MANAGER" />」中。</translation>
-<translation id="4580939929828762295">「Google 密碼管理工具」為你的安全護航</translation>
 <translation id="4582297591746054421">網站通常會讀取剪貼簿，以提供保留複製文字格式等功能</translation>
 <translation id="4584094413232466841">要從 Chrome 自動填入功能中移除這項資料嗎？</translation>
 <translation id="4584770411839426377">視窗</translation>
@@ -7301,7 +7299,6 @@
 <translation id="6470823736074966819">忽略通知</translation>
 <translation id="6472893788822429178">顯示 [主頁] 按鈕</translation>
 <translation id="6473315466413288899">選取一個選項</translation>
-<translation id="6473659734176498825">簡化版圖片顯示 Chrome 嘅「Google 密碼管理工具」入口點</translation>
 <translation id="6474498546677193336">某個應用程式正在使用此資料夾，因此無法取消分享。系統會在下次關閉 Linux 時取消分享此資料夾。</translation>
 <translation id="6474884162850599008">中斷 Google Drive 帳戶連線</translation>
 <translation id="6476482583633999078">語音速度</translation>

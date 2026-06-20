@@ -3389,7 +3389,6 @@
 <translation id="351152300840026870">قلم با عرض ثابت</translation>
 <translation id="3511528412952710609">کوتاه</translation>
 <translation id="3512465804715993309">رنگی کردن تطبیقی</translation>
-<translation id="3512495006767217696">‏این ویژگی در Chrome تعبیه شده است تا به شما در ساختن، ذخیره، و تکمیل کردن خودکار گذرواژه‌های قوی کمک کند. برای دسترسی آسان، میان‌بر را اضافه کنید</translation>
 <translation id="3513019849832307207">پیوستن و باز کردن</translation>
 <translation id="3513563267917474897">لغزنده رنگ‌مایه از <ph name="MIN_VALUE" /> تا <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">‏از محافظت امنیتی استاندارد برخوردار هستید. برای محافظت بیشتر دربرابر وب‌سایت‌ها، بارگیری‌ها، و افزونه‌های خطرناک، «مرور ایمن پیشرفته» را در تنظیمات Chrome روشن کنید.</translation>
@@ -4852,7 +4851,6 @@
 <translation id="4580127151758731432">حرکت‌های بزرگ‌تر سر باعث می‌شود مکان‌نما بیشتر حرکت کند</translation>
 <translation id="4580389561674319558">نمایان برای همه مخاطبین</translation>
 <translation id="4580596421317071374">گذرواژه‌ها در <ph name="GOOGLE_PASSWORD_MANAGER" /> در این دستگاه ذخیره می‌شود.</translation>
-<translation id="4580939929828762295">‏با «مدیر گذرواژه Google» ایمن بمانید</translation>
 <translation id="4582297591746054421">سایت‌ها معمولاً بریده‌دان را برای ارائه ویژگی‌هایی مانند حفظ قالب نوشتاری که کپی می‌کنید می‌خوانند</translation>
 <translation id="4584094413232466841">‏این اطلاعات از تکمیل خودکار Chrome برداشته شود؟</translation>
 <translation id="4584770411839426377">پنجره</translation>
@@ -6458,7 +6456,7 @@
 <translation id="5826993284769733527">نیمه شفاف</translation>
 <translation id="5827266244928330802">Safari</translation>
 <translation id="5827591412833386477">نمایش سایت‌های هم‌گروه</translation>
-<translation id="5827835011646404677">‏مهارت‌ها در «حساب Google» شما ذخیره شده‌اند</translation>
+<translation id="5827835011646404677">‏«مهارت‌ها» در «حساب Google» شما ذخیره می‌شوند</translation>
 <translation id="5828181959764767444">غروب</translation>
 <translation id="5828545842856466741">افزودن نمایه…</translation>
 <translation id="5828633471261496623">در حال چاپ...</translation>
@@ -7309,7 +7307,6 @@
 <translation id="6470823736074966819">صامت کردن اعلان‌ها</translation>
 <translation id="6472893788822429178">نمایش دکمه صفحه اصلی</translation>
 <translation id="6473315466413288899">انتخاب یک گزینه</translation>
-<translation id="6473659734176498825">‏تصویری ساده‌شده که نقطه ورودی «مدیر گذرواژه Google» را در Chrome نشان می‌دهد</translation>
 <translation id="6474498546677193336">‏لغو هم‌رسانی امکان‌پذیر نیست زیرا برنامه‌ای از این پوشه استفاده می‌کند. دفعه بعد که Linux را خاموش کنید، پوشه لغو هم‌رسانی می‌شود.</translation>
 <translation id="6474884162850599008">‏قطع ارتباط حساب Google Drive</translation>
 <translation id="6476482583633999078">سرعت گفتار</translation>
@@ -10933,7 +10930,7 @@
 <translation id="9130015405878219958">حالت نامعتبر وارد شده است.</translation>
 <translation id="9130135798965366513">برای ادامه دادن، <ph name="IDENTITY_PROVIDER_ETLD_PLUS_ONE" /> <ph name="FIELDS_STRING" /> شما را با این سایت هم‌رسانی خواهد کرد. <ph name="BEGIN_LINK1" />خط‌مشی رازداری<ph name="END_LINK1" /> و <ph name="BEGIN_LINK2" />شرایط خدمات<ph name="END_LINK2" /> این سایت را بررسی کنید.</translation>
 <translation id="9130364135697530260">محتوای جاسازی‌شده در این سایت می‌تواند از اطلاعات ذخیره‌شده درباره شما استفاده کند</translation>
-<translation id="9130857050314385402">‏وقتی از مهارتی استفاده می‌کنید، عنوان زبانه‌ها و نشانی‌های وب به Google ارسال می‌شود</translation>
+<translation id="9130857050314385402">‏وقتی که از مهارتی استفاده می‌کنید، عنوان زبانه‌ها و نشانی‌های وب به Google ارسال می‌شود</translation>
 <translation id="9131209053278896908">سایت‌های مسدودشده اینجا نشان داده می‌شود</translation>
 <translation id="9131487537093447019">ارسال پیام‌ها به دستگاه‌های بلوتوث و دریافت پیام‌ها از آنها</translation>
 <translation id="9133568201369135151">جمع‌آوری داده‌های عیب‌یابی تکمیل شد. برخی‌از اطلاعات شخصی‌تان به این داده‌ها اضافه شده است.</translation>

@@ -3375,7 +3375,6 @@ Servernachricht: <ph name="SERVER_MSG" /></translation>
 <translation id="351152300840026870">Schriftart mit fester Breite</translation>
 <translation id="3511528412952710609">Kurz</translation>
 <translation id="3512465804715993309">Adaptives Hervorheben</translation>
-<translation id="3512495006767217696">Der Passwortmanager ist direkt in Chrome eingebunden und kann für dich starke Passwörter erstellen, speichern und automatisch eintragen. Füge die Verknüpfung hinzu, um einfacher darauf zuzugreifen.</translation>
 <translation id="3513019849832307207">Beitreten und öffnen</translation>
 <translation id="3513563267917474897">Schieberegler für den Farbton von <ph name="MIN_VALUE" /> bis <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Du wirst durch die standardmäßigen Sicherheitsfunktionen geschützt. Wenn du das erweiterte Safe Browsing in den Chrome-Einstellungen aktivierst, profitierst du von noch umfangreicherem Schutz gegen schädliche Websites, Downloads und Erweiterungen.</translation>
@@ -4838,7 +4837,6 @@ Möchtest du <ph name="CONTROL_PANEL_APPLET_NAME" /> starten?</translation>
 <translation id="4580127151758731432">Größere Kopfbewegungen bewegen den Cursor weiter</translation>
 <translation id="4580389561674319558">Für alle Kontakte sichtbar</translation>
 <translation id="4580596421317071374">Passwörter werden auf diesem Gerät im <ph name="GOOGLE_PASSWORD_MANAGER" /> gespeichert.</translation>
-<translation id="4580939929828762295">Gut geschützt mit dem Google Passwortmanager</translation>
 <translation id="4582297591746054421">Websites lesen normalerweise die Zwischenablage für Funktionen aus, um beispielsweise die Formatierung von kopierten Texten beizubehalten</translation>
 <translation id="4584094413232466841">Diese Informationen aus Chrome Autofill entfernen?</translation>
 <translation id="4584770411839426377">Fenster</translation>
@@ -7290,7 +7288,6 @@ Du kannst dieser Aktion mehrere Schalter zuweisen.</translation>
 <translation id="6470823736074966819">Benachrichtigungen stummschalten</translation>
 <translation id="6472893788822429178">Button „Startseite“ anzeigen</translation>
 <translation id="6473315466413288899">Option auswählen</translation>
-<translation id="6473659734176498825">Ein vereinfachtes Bild des Einstiegspunkts für den Google Passwortmanager in Chrome</translation>
 <translation id="6474498546677193336">Die Aufhebung der Freigabe ist nicht möglich, weil eine Anwendung diesen Ordner verwendet. Die Freigabe des Ordners wird aufgehoben, wenn Linux das nächste Mal heruntergefahren wird.</translation>
 <translation id="6474884162850599008">Verbindung zu Google Drive-Konto aufheben</translation>
 <translation id="6476482583633999078">Sprechgeschwindigkeit</translation>

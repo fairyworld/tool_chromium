@@ -252,6 +252,7 @@ Jos tämä sivu ei toimi odotetulla tavalla, kokeile sallia optimointi.</transla
 <translation id="345171907106878721">Lisää itsesi Chromeen</translation>
 <translation id="3453763134178591239">Chrome-käyttöjärjestelmän käyttöehdot</translation>
 <translation id="3503306920980160878">Chrome tarvitsee oikeuden käyttää sijaintiasi, jotta se voidaan jakaa tämän sivuston kanssa.</translation>
+<translation id="3512495006767217696">Sisäänrakennettu Chromeen, jotta voit luoda, tallentaa ja täyttää vahvoja salasanoja automaattisesti. Lisää pikakuvake, niin pääset siihen helposti</translation>
 <translation id="3539955434060988644">Avaa linkki Chromen inco&amp;gnito-ikkunassa</translation>
 <translation id="3576528680708590453">Järjestelmänvalvojasi on määrittänyt Chromen käynnistämään vaihtoehtoisen selaimen, kun <ph name="TARGET_URL_HOSTNAME" /> avataan.</translation>
 <translation id="3582972582564653026">Voit synkronoida Chromen ja tehdä siitä yksilöllisemmän kaikilla laitteilla.</translation>
@@ -346,6 +347,7 @@ Jos tämä sivu ei toimi odotetulla tavalla, kokeile sallia optimointi.</transla
 <translation id="4493028449971051158">Käynnistysvirhe: Suorita asennusohjelma järjestelmänvalvojana.</translation>
 <translation id="4501471624619070934">Asentaminen epäonnistui, koska pääsyä on rajoitettu tässä maassa.</translation>
 <translation id="4571503333518166079">Siirry Chromen ilmoitusasetuksiin</translation>
+<translation id="4580939929828762295">Pysy turvassa Google Salasanojen avulla</translation>
 <translation id="4592634244097223647">Kysy Googlelta tästä kuvasta</translation>
 <translation id="459622048091363950">Kun Chromella on käyttöoikeus, sivustot voivat pyytää sitä sinulta.</translation>
 <translation id="4598116752460667024">Hae mitä tahansa prosessia listalta.</translation>
@@ -530,6 +532,7 @@ Jos tämä sivu ei toimi odotetulla tavalla, kokeile sallia optimointi.</transla
 <translation id="6438015621983209660">Laajenna Parannettua selaussuojaa Chromen avulla puhelimella</translation>
 <translation id="6442774133615368941">Tee ostoksia, käännä ja tunnista näkemiäsi asioita kameran avulla Chromen iOS-sovelluksen avulla</translation>
 <translation id="6448835208126432197">Voit valita osan näytöstä Gemini in Chromessa pikanäppäimellä.</translation>
+<translation id="6473659734176498825">Yksinkertaistettu kuva, jossa näkyy Google Salasanojen aloituskohta Chromessa</translation>
 <translation id="6473905796280459355">Siirry Tietoja Chromesta ‐sivulle</translation>
 <translation id="6481963882741794338">Linkitä Chrome ja muita Googlen palveluja esimerkiksi personointia varten</translation>
 <translation id="648319183876919572">Parannettu selaussuoja suojaa sinua entistä paremmin vaarallisilta sivustoilta ja latauksilta</translation>

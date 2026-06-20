@@ -250,6 +250,7 @@
 <translation id="345171907106878721">Chrome に自分を追加</translation>
 <translation id="3453763134178591239">ChromeOS 利用規約</translation>
 <translation id="3503306920980160878">このサイトで現在地を共有するには、Chrome で位置情報の使用を許可する必要があります</translation>
+<translation id="3512495006767217696">Chrome に組み込まれており、安全なパスワードを作成、保存、自動入力できます。ショートカットを追加すると、簡単にアクセスできます。</translation>
 <translation id="3539955434060988644">Chrome のシークレット ウインドウでリンクを開く(&amp;G)</translation>
 <translation id="3576528680708590453">システム管理者が、<ph name="TARGET_URL_HOSTNAME" /> へのアクセスに代替ブラウザを開くよう Google Chrome を設定しています。</translation>
 <translation id="3582972582564653026">同期してカスタマイズした Chrome をどのデバイスでも使用できます</translation>
@@ -343,6 +344,7 @@
 <translation id="4493028449971051158">起動エラー: 管理者としてインストーラを実行してください。</translation>
 <translation id="4501471624619070934">お住まいの国ではアクセスが制限されているため、インストールに失敗しました。</translation>
 <translation id="4571503333518166079">Chrome の通知設定に移動</translation>
+<translation id="4580939929828762295">Google パスワード マネージャーで安全を確保</translation>
 <translation id="4592634244097223647">Google でこの画像について質問する</translation>
 <translation id="459622048091363950">Chrome にアクセスを許可すると、ウェブサイトからアクセスをリクエストできるようになります。</translation>
 <translation id="4598116752460667024">リストからプロセスを検索します。</translation>
@@ -527,6 +529,7 @@
 <translation id="6438015621983209660">スマートフォンの Chrome でセーフ ブラウジング保護強化機能を有効にする</translation>
 <translation id="6442774133615368941">Chrome iOS アプリで、カメラに映ったものを購入、翻訳、特定できます</translation>
 <translation id="6448835208126432197">Gemini in Chrome で画面の一部を選択するときに、キーボード ショートカットを使用します。</translation>
+<translation id="6473659734176498825">Chrome の Google パスワード マネージャーのエントリ ポイントを示す簡略化された画像</translation>
 <translation id="6473905796280459355">Chrome についてのページに移動</translation>
 <translation id="6481963882741794338">パーソナライズなどの目的で、Chrome と他の Google サービスをリンクします</translation>
 <translation id="648319183876919572">セーフ ブラウジング保護強化機能では、危険なウェブサイトやダウンロードから高いセキュリティ強度で保護されます</translation>

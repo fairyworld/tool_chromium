@@ -3379,7 +3379,6 @@ l‘<ph name="BEGIN_LINK" />
 <translation id="351152300840026870">Police à largeur fixe</translation>
 <translation id="3511528412952710609">Court</translation>
 <translation id="3512465804715993309">Mise en évidence adaptative</translation>
-<translation id="3512495006767217696">Intégré à Chrome pour vous aider à créer, à enregistrer et à remplir automatiquement des mots de passe forts. Ajoutez le raccourci pour un accès facile</translation>
 <translation id="3513019849832307207">Se joindre et ouvrir</translation>
 <translation id="3513563267917474897">Curseur de teinte de <ph name="MIN_VALUE" /> à <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Vous bénéficiez d'une protection de sécurité standard. Pour obtenir une meilleure protection contre les sites Web, les extensions et les téléchargements dangereux, activez la navigation sécurisée améliorée dans les paramètres de Chrome.</translation>
@@ -4842,7 +4841,6 @@ Vous pouvez gérer les paramètres à partir du menu de la carte ou voir plus d'
 <translation id="4580127151758731432">Des mouvements de tête plus amples déplaceront le curseur plus loin</translation>
 <translation id="4580389561674319558">Visible pour tous les contacts</translation>
 <translation id="4580596421317071374">Les mots de passe sont enregistrés dans le <ph name="GOOGLE_PASSWORD_MANAGER" /> sur cet appareil.</translation>
-<translation id="4580939929828762295">Protégez-vous avec le gestionnaire de mdp Google</translation>
 <translation id="4582297591746054421">Les sites lisent généralement le contenu de votre presse-papiers pour proposer certaines fonctionnalités, comme la conservation du formatage du texte copié</translation>
 <translation id="4584094413232466841">Retirer ces informations du remplissage automatique de Chrome?</translation>
 <translation id="4584770411839426377">Fenêtre</translation>
@@ -7297,7 +7295,6 @@ Vous pouvez attribuer plusieurs commutateurs à cette action.</translation>
 <translation id="6470823736074966819">Ignorer les notifications</translation>
 <translation id="6472893788822429178">Afficher le bouton Accueil</translation>
 <translation id="6473315466413288899">Choisir une option</translation>
-<translation id="6473659734176498825">Une image simplifiée montrant le point d'entrée du gestionnaire de mots de passe Google dans Chrome</translation>
 <translation id="6474498546677193336">Impossible d'annuler le partage parce qu'une application utilise ce dossier. Le partage sera annulé au prochain arrêt de Linux.</translation>
 <translation id="6474884162850599008">Se déconnecter du compte Google Disque</translation>
 <translation id="6476482583633999078">Débit de parole</translation>

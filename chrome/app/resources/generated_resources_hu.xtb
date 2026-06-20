@@ -3388,7 +3388,6 @@ Ha kezelni szeretné a fiók beállításait, telepítse eszközére a Family Li
 <translation id="351152300840026870">Állandó szélességű betűtípus</translation>
 <translation id="3511528412952710609">Rövid</translation>
 <translation id="3512465804715993309">Adaptív kiemelés</translation>
-<translation id="3512495006767217696">A Chrome beépített funkciója, amely segít erős jelszavak létrehozásában, mentésében és automatikus kitöltésében. Adja hozzá a parancsikont a könnyű hozzáférés érdekében.</translation>
 <translation id="3513019849832307207">Csatlakozás és megnyitás</translation>
 <translation id="3513563267917474897">Színárnyalat csúszkája <ph name="MIN_VALUE" /> és <ph name="MAX_VALUE" /> között</translation>
 <translation id="3514647716686280777">Normál biztonsági védelemben részesül. Ha hatékonyabb védelmet szeretne kapni a veszélyes webhelyekkel, letöltésekkel és bővítményekkel szemben, kapcsolja be a Biztonságos Böngészés fokozott védelemmel funkciót a Chrome beállításainál.</translation>
@@ -4850,7 +4849,6 @@ Elindítja a következőt: <ph name="CONTROL_PANEL_APPLET_NAME" />?</translation
 <translation id="4580127151758731432">A nagyobb fejmozgások messzebbre mozdítják a kurzort</translation>
 <translation id="4580389561674319558">Minden ismerős számára látható</translation>
 <translation id="4580596421317071374">A rendszer az eszközön, a <ph name="GOOGLE_PASSWORD_MANAGER" /> alkalmazásba menti a jelszavakat.</translation>
-<translation id="4580939929828762295">A Google Jelszókezelővel biztonságban lesz</translation>
 <translation id="4582297591746054421">A webhelyek általában bizonyos funkciók biztosítása (például a másolt szöveg formázásának megőrzése) érdekében olvassák le a vágólapon lévő szöveget</translation>
 <translation id="4584094413232466841">Eltávolítja ezeket az adatokat a Chrome automatikus kitöltés funkciójából?</translation>
 <translation id="4584770411839426377">Ablak</translation>
@@ -7308,7 +7306,6 @@ Győződjön meg arról, hogy nem ad ki bizalmas adatokat.</translation>
 <translation id="6470823736074966819">Értesítések elnémítása</translation>
 <translation id="6472893788822429178">A Kezdőlap gomb megjelenítése</translation>
 <translation id="6473315466413288899">Válasszon egy lehetőséget</translation>
-<translation id="6473659734176498825">Egyszerűsített kép, amely a Google Jelszókezelő belépési pontját mutatja a Chrome-ban</translation>
 <translation id="6474498546677193336">Nem sikerült a megosztás visszavonása, mivel valamelyik alkalmazás használja ezt a mappát. A mappa megosztásának visszavonása a Linux következő leállításakor történik majd meg.</translation>
 <translation id="6474884162850599008">Google Drive-fiók leválasztása</translation>
 <translation id="6476482583633999078">Beszédsebesség</translation>

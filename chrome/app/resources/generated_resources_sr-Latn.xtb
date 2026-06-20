@@ -3376,7 +3376,6 @@ Možete da upravljate podešavanjima ovog naloga ako instalirate aplikaciju Fami
 <translation id="351152300840026870">Font fiksne širine</translation>
 <translation id="3511528412952710609">Kratko</translation>
 <translation id="3512465804715993309">Prilagodljivo isticanje</translation>
-<translation id="3512495006767217696">Ugrađen je u Chrome da bi vam pomogao da pravite, čuvate i automatski popunjavate jake lozinke. Dodajte prečicu radi lakšeg pristupa</translation>
 <translation id="3513019849832307207">Pridruži me i otvori</translation>
 <translation id="3513563267917474897">Klizač za nijansu boje od <ph name="MIN_VALUE" /> do <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Dobijate standardnu zaštitu. Da biste dobili dodatnu zaštitu od opasnih veb-sajtova, preuzimanja i dodataka, uključite poboljšano bezbedno pregledanje u podešavanjima Chrome-a.</translation>
@@ -4839,7 +4838,6 @@ Možete da upravljate podešavanjima ovog naloga ako instalirate aplikaciju Fami
 <translation id="4580127151758731432">Veći pokreti glave će pomeriti kursor dalje</translation>
 <translation id="4580389561674319558">Vidljivo svim kontaktima</translation>
 <translation id="4580596421317071374">Lozinke se čuvaju na ovom uređaju u:<ph name="GOOGLE_PASSWORD_MANAGER" />.</translation>
-<translation id="4580939929828762295">Ostanite bezbedni uz Google menadžer lozinki</translation>
 <translation id="4582297591746054421">Sajtovi obično čitaju privremenu memoriju za potrebe funkcija poput zadržavanja formatiranja teksta koji ste kopirali</translation>
 <translation id="4584094413232466841">Želite da uklonite ove informacije iz Chrome automatskog popunjavanja?</translation>
 <translation id="4584770411839426377">Prozor</translation>
@@ -7295,7 +7293,6 @@ Vodite računa da ne otkrijete nikakve osetljive informacije.</translation>
 <translation id="6470823736074966819">Isključite zvuk obaveštenja</translation>
 <translation id="6472893788822429178">Prikaži dugme Početak</translation>
 <translation id="6473315466413288899">Izaberite opciju</translation>
-<translation id="6473659734176498825">Pojednostavljena slika koja prikazuje ulaznu tačku Google menadžera lozinki u Chrome-u</translation>
 <translation id="6474498546677193336">Opozivanje deljenja nije uspelo jer jedna aplikacija koristi ovaj folder. Deljenje foldera će biti opozvano kada se Linux sledeći put zatvori.</translation>
 <translation id="6474884162850599008">Prekini vezu sa nalogom Google diska</translation>
 <translation id="6476482583633999078">Brzina govora</translation>

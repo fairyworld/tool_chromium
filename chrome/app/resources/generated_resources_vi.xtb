@@ -3390,7 +3390,6 @@ Bạn có thể quản lý các tùy chọn cài đặt của tài khoản này 
 <translation id="351152300840026870">Phông chữ có chiều rộng cố định</translation>
 <translation id="3511528412952710609">Độ trễ ngắn</translation>
 <translation id="3512465804715993309">Đánh dấu thích ứng</translation>
-<translation id="3512495006767217696">Tích hợp sẵn trong Chrome để giúp bạn tạo, lưu và tự động điền mật khẩu mạnh. Thêm lối tắt để dễ dàng truy cập</translation>
 <translation id="3513019849832307207">Tham gia và mở</translation>
 <translation id="3513563267917474897">Thanh trượt điều chỉnh màu sắc từ <ph name="MIN_VALUE" /> đến <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Bạn đang sử dụng biện pháp bảo mật tiêu chuẩn. Để tăng cường khả năng bảo vệ trước các trang web, nội dung tải xuống và tiện ích nguy hiểm, hãy bật tính năng Duyệt web an toàn có tăng cường bảo vệ trong phần cài đặt của Chrome.</translation>
@@ -4236,6 +4235,7 @@ Bạn có thể quản lý các tùy chọn cài đặt của tài khoản này 
 <translation id="4103644672850109428">Trình đọc màn hình, phóng to</translation>
 <translation id="4104163789986725820">X&amp;uất...</translation>
 <translation id="4107048419833779140">Nhận dạng và ngắt kết nối thiết bị lưu trữ</translation>
+<translation id="4107207375883769436">Tổ chức bạn có thể cần xem và quản lý dữ liệu duyệt web, chẳng hạn như nhật ký duyệt web và mật khẩu, trong hồ sơ công việc của bạn</translation>
 <translation id="4107522742068568249">Chuyển đến tính năng Kiểm tra an toàn</translation>
 <translation id="4107793386654579933">Chọn một phím tắt cho thao tác <ph name="ACTION_NAME" /></translation>
 <translation id="4109135793348361820">Di chuyển cửa sổ đến <ph name="USER_NAME" /> (<ph name="USER_EMAIL" />)</translation>
@@ -4852,7 +4852,6 @@ Bạn có thể quản lý các tùy chọn cài đặt của tài khoản này 
 <translation id="4580127151758731432">Phạm vi di chuyển đầu càng rộng, con trỏ di chuyển càng xa</translation>
 <translation id="4580389561674319558">Hiển thị với tất cả người liên hệ</translation>
 <translation id="4580596421317071374">Mật khẩu được lưu vào <ph name="GOOGLE_PASSWORD_MANAGER" /> trên thiết bị này.</translation>
-<translation id="4580939929828762295">Bảo vệ bạn an toàn bằng Trình quản lý mật khẩu của Google</translation>
 <translation id="4582297591746054421">Các trang web thường đọc bảng nhớ tạm để áp dụng những tính năng như giữ nguyên định dạng của văn bản đã sao chép</translation>
 <translation id="4584094413232466841">Xoá thông tin này khỏi dữ liệu tự động điền của Chrome?</translation>
 <translation id="4584770411839426377">Cửa sổ</translation>
@@ -6053,6 +6052,7 @@ Bạn có thể gán nhiều công tắc cho thao tác này.</translation>
 <translation id="5493792505296048976">màn hình bật</translation>
 <translation id="5494016731375030300">Thẻ đóng gần đây</translation>
 <translation id="5494362494988149300">Mở Khi &amp;Hoàn tất</translation>
+<translation id="5494879038325093596">Xác minh danh tính của bạn để sử dụng mật khẩu này trên mọi thiết bị mà bạn đã đăng nhập bằng Tài khoản Google của mình</translation>
 <translation id="5494920125229734069">Chọn tất cả</translation>
 <translation id="5495466433285976480">Quá trình này sẽ xóa tất cả dữ liệu, tệp, người dùng trên máy và các cài đặt khác sau khi bạn khởi động lại vào lần kế tiếp. Tất cả người dùng sẽ cần đăng nhập lại.</translation>
 <translation id="5495597166260341369">Luôn bật màn hình</translation>
@@ -7308,7 +7308,6 @@ Bạn có thể gán nhiều công tắc cho thao tác này.</translation>
 <translation id="6470823736074966819">Ẩn thông báo</translation>
 <translation id="6472893788822429178">Hiển thị nút Trang chủ</translation>
 <translation id="6473315466413288899">Chọn một hành động:</translation>
-<translation id="6473659734176498825">Hình ảnh đơn giản hoá cho thấy điểm truy cập vào Trình quản lý mật khẩu của Google trong Chrome</translation>
 <translation id="6474498546677193336">Không thể ngừng chia sẻ vì một ứng dụng đang dùng thư mục này. Hệ thống sẽ ngừng chia sẻ thư mục này khi bạn tắt Linux vào lần tới.</translation>
 <translation id="6474884162850599008">Ngắt kết nối tài khoản Google Drive</translation>
 <translation id="6476482583633999078">Tốc độ lời nói</translation>
@@ -10760,6 +10759,7 @@ Thông tin này có thể bao gồm thông tin về phần mềm đã cài đặ
 <translation id="9012585441087414258">Bảo vệ bạn khỏi các trang web, nội dung tải xuống và tiện ích được xác định là nguy hiểm. Nếu một trang có hoạt động đáng ngờ, thì URL và một phần nội dung của trang sẽ được gửi tới dịch vụ Duyệt web An toàn của Google.</translation>
 <translation id="9014206344398081366">Hướng dẫn về ChromeVox</translation>
 <translation id="9014674417732091912">Đã chuyển đến hàng <ph name="ROW_NUMBER" /></translation>
+<translation id="9015111999662965458">Để đảm bảo bạn có thể dùng thiết bị này một cách an toàn, tổ chức bạn có thể cần xem thông tin về hệ điều hành, trình duyệt, chế độ cài đặt và phần mềm được cài đặt trên thiết bị</translation>
 <translation id="9015849286924418538">Sắp xếp thẻ thành các nhóm được gắn nhãn và đánh dấu bằng màu để dễ dàng truy cập</translation>
 <translation id="9016827136585652292">bật/tắt màn hình bảo vệ quyền riêng tư</translation>
 <translation id="90181708067259747">Ngày hết hạn: <ph name="CARD" /></translation>

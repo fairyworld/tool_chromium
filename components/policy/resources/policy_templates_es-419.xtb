@@ -7950,7 +7950,7 @@ A partir de <ph name="PRODUCT_NAME" /> 147, esta política dejará de estar disp
 <translation id="5962271004971310788">Extensiones que el usuario debe permitir que se ejecuten en Incógnito a fin de navegar en modo Incógnito</translation>
 <translation id="5963752574792883406">puerto 990 (puede desbloquearse hasta el 01/02/2022)</translation>
 <translation id="596523880465577341">Esta política dejó de estar disponible y ya no se admite. En su lugar, usa la política "<ph name="EXTENSION_INSTALL_ALLOWLIST_POLICY_NAME" />".</translation>
-<translation id="5965344524743236327">El ID o número del proyecto <ph name="GOOGLE_CLOUD_PRODUCT_NAME" /> correspondiente a la instancia de <ph name="GEMINI_ENTERPRISE_PRODUCT_NAME" /> que se habilitará. Obtén más información sobre los IDs de proyecto en https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects.</translation>
+<translation id="5965344524743236327">El ID o número del proyecto de <ph name="GOOGLE_CLOUD_PRODUCT_NAME" /> correspondiente a la instancia de <ph name="GEMINI_ENTERPRISE_PRODUCT_NAME" /> que se habilitará. Obtén más información sobre los IDs de proyecto en https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects.</translation>
 <translation id="5966615072639944554">Extensiones que tienen permitido utilizar la API de atestación remota</translation>
 <translation id="596732417280023843">El nombre del perfil del certificado.</translation>
 <translation id="5972538402066550344">Permitir los controles de informes detallados</translation>

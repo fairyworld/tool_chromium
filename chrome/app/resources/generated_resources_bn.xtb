@@ -3390,7 +3390,6 @@
 <translation id="351152300840026870">নির্দিষ্ট-চওড়া হরফ</translation>
 <translation id="3511528412952710609">স্বল্পস্থায়ী</translation>
 <translation id="3512465804715993309">অ্যাডাপ্টিভ হাইলাইটিং</translation>
-<translation id="3512495006767217696">আপনাকে শক্তিশালী পাসওয়ার্ড তৈরি, সেভ ও অটোফিল করতে সাহায্য করার জন্য Chrome-এ ইন-বিল্ট রয়েছে। সহজে অ্যাক্সেস করার জন্য শর্টকাট যোগ করুন</translation>
 <translation id="3513019849832307207">যোগ দিন ও খুলুন</translation>
 <translation id="3513563267917474897"><ph name="MIN_VALUE" /> থেকে <ph name="MAX_VALUE" /> পর্যন্ত রঙের শেডের জন্য স্লাইডার</translation>
 <translation id="3514647716686280777">আপনি স্ট্যান্ডার্ড নিরাপত্তা সুরক্ষা পাচ্ছেন। ঝুঁকিপূর্ণ ওয়েবসাইট, ডাউনলোড এবং এক্সটেনশনের বিরুদ্ধে আরও সুরক্ষা পেতে, Chrome সেটিংসে উন্নত নিরাপদ ব্রাউজিং চালু করুন।</translation>
@@ -4853,7 +4852,6 @@
 <translation id="4580127151758731432">বেশি মাথা নড়াচড়া করলে, কার্সর আরও সরে যাবে</translation>
 <translation id="4580389561674319558">পরিচিতির তালিকায় থাকা সকলেই দেখতে পাবেন</translation>
 <translation id="4580596421317071374">এই ডিভাইসে পাসওয়ার্ড <ph name="GOOGLE_PASSWORD_MANAGER" />-এ সেভ করা হয়।</translation>
-<translation id="4580939929828762295">Google Password Manager দিয়ে সুরক্ষিত থাকুন</translation>
 <translation id="4582297591746054421">আপনার কপি করা টেক্সটের ফর্ম্যাটিং বজায় রাখার মতো ফিচারের জন্য সাইট সাধারণত ক্লিপবোর্ড পড়ে নেয়</translation>
 <translation id="4584094413232466841">Chrome অটোফিল থেকে এই তথ্য সরাতে চান?</translation>
 <translation id="4584770411839426377">উইন্ডো</translation>
@@ -7311,7 +7309,6 @@
 <translation id="6470823736074966819">বিজ্ঞপ্তি মিউট করুন</translation>
 <translation id="6472893788822429178">হোম বোতাম দেখান</translation>
 <translation id="6473315466413288899">কোনও একটি বিকল্প বেছে নিন</translation>
-<translation id="6473659734176498825">Chrome-এ Google Password Manager-এর এন্ট্রি পয়েন্ট দেখানোর জন্য সরলীকৃত ছবি</translation>
 <translation id="6474498546677193336">ফোল্ডারটির শেয়ারিং বন্ধ করা যাচ্ছে না, কারণ এখন একটি অ্যাপ্লিকেশন এটিকে ব্যবহার করছে। পরবর্তী সময়ে Linux-কে যখন বন্ধ করা হবে, তখনই ফোল্ডারটির শেয়ারিং বন্ধ করা যাবে।</translation>
 <translation id="6474884162850599008">Google ড্রাইভ অ্যাকাউন্ট ডিসকানেক্ট করুন</translation>
 <translation id="6476482583633999078">স্পিচ স্পিড</translation>

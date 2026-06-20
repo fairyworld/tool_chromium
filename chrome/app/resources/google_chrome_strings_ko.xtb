@@ -256,6 +256,7 @@
 <translation id="345171907106878721">Chrome에 본인 추가</translation>
 <translation id="3453763134178591239">ChromeOS 약관</translation>
 <translation id="3503306920980160878">이 사이트와 위치를 공유하려면 Chrome에 내 위치 액세스 권한이 있어야 합니다</translation>
+<translation id="3512495006767217696">Google 비밀번호 관리자는 안전한 비밀번호를 만들고, 저장하고, 자동 완성할 수 있도록 Chrome에 내장되어 있습니다. 바로가기를 추가하여 간편하게 액세스하세요.</translation>
 <translation id="3539955434060988644">Chrome 시크릿 창에서 링크 열기(&amp;G)</translation>
 <translation id="3576528680708590453">시스템 관리자가 <ph name="TARGET_URL_HOSTNAME" /> 액세스를 위해 다른 브라우저를 실행하도록 Chrome을 구성했습니다.</translation>
 <translation id="3582972582564653026">모든 기기에서 Chrome을 동기화하고 맞춤설정하세요.</translation>
@@ -349,6 +350,7 @@
 <translation id="4493028449971051158">시작 오류: 관리자로 설치 프로그램을 실행하세요.</translation>
 <translation id="4501471624619070934">이 국가에서는 액세스가 제한되므로 설치할 수 없습니다.</translation>
 <translation id="4571503333518166079">Chrome 알림 설정으로 이동</translation>
+<translation id="4580939929828762295">Google 비밀번호 관리자로 보안을 유지하세요</translation>
 <translation id="4592634244097223647">Google에 이 이미지에 관해 질문하기</translation>
 <translation id="459622048091363950">Chrome에 액세스 권한을 부여하면 웹사이트에서 액세스 권한을 요청할 수 있게 됩니다.</translation>
 <translation id="4598116752460667024">목록에서 프로세스를 검색합니다.</translation>
@@ -537,6 +539,7 @@ Chrome에서 설정을 복구할 수 없습니다.</translation>
 <translation id="6438015621983209660">휴대전화에서 Chrome으로 향상된 세이프 브라우징을 확장하세요</translation>
 <translation id="6442774133615368941">iOS용 Chrome 앱에서 카메라를 사용해 눈앞의 물건을 쇼핑하고, 번역하고, 알아보세요.</translation>
 <translation id="6448835208126432197">Chrome의 Gemini에서 화면의 일부를 선택하려면 키보드 단축키를 사용하세요.</translation>
+<translation id="6473659734176498825">Chrome의 Google 비밀번호 관리자 진입점을 보여주는 간소화된 이미지</translation>
 <translation id="6473905796280459355">Chrome 정보 페이지로 이동</translation>
 <translation id="6481963882741794338">맞춤설정 등의 목적으로 Chrome과 다른 Google 서비스를 연결합니다</translation>
 <translation id="648319183876919572">향상된 세이프 브라우징은 위험한 웹사이트와 다운로드로부터 사용자를 보호합니다.</translation>

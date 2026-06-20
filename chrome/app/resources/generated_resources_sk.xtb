@@ -3377,7 +3377,6 @@ Ak chcete spravovať nastavenia tohto účtu, nainštalujte si do zariadenia apl
 <translation id="351152300840026870">Písmo s pevnou šírkou</translation>
 <translation id="3511528412952710609">Krátke</translation>
 <translation id="3512465804715993309">Adaptívne zvýrazňovanie</translation>
-<translation id="3512495006767217696">Je integrovaný v Chrome, aby vám pomáhal vytvárať, ukladať a automaticky dopĺňať silné heslá. Pridajte si odkaz na jednoduchý prístup.</translation>
 <translation id="3513019849832307207">Pripojiť sa a otvoriť</translation>
 <translation id="3513563267917474897">Posúvač odtieňa od <ph name="MIN_VALUE" /> do <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Máte štandardnú ochranu zabezpečenia. Ak chcete získať účinnejšiu ochranu pred nebezpečnými webmi, sťahovanými súbormi a rozšíreniami, zapnite v nastaveniach Chromu Zlepšené bezpečné prehliadanie.</translation>
@@ -4840,7 +4839,6 @@ Ak chcete spravovať nastavenia tohto účtu, nainštalujte si do zariadenia apl
 <translation id="4580127151758731432">Väčšími pohybmi hlavou posuniete kurzor ďalej</translation>
 <translation id="4580389561674319558">Viditeľné pre všetky kontakty</translation>
 <translation id="4580596421317071374">Heslá sa ukladajú do služby <ph name="GOOGLE_PASSWORD_MANAGER" /> v tomto zariadení.</translation>
-<translation id="4580939929828762295">Buďte v bezpečí so Správcom hesiel Google</translation>
 <translation id="4582297591746054421">Weby zvyčajne čítajú vašu schránku, aby mohli poskytovať funkcie, ako je ponechanie formátu kopírovaného textu</translation>
 <translation id="4584094413232466841">Chcete odstrániť tieto informácie z automatického dopĺňania v Chrome?</translation>
 <translation id="4584770411839426377">Okno</translation>
@@ -7295,7 +7293,6 @@ Tejto akcii môžete prideliť viacero prepínačov.</translation>
 <translation id="6470823736074966819">Vypnúť zvuk upozornení</translation>
 <translation id="6472893788822429178">Zobraziť tlačidlo Domovskej stránky</translation>
 <translation id="6473315466413288899">Vyberte možnosť</translation>
-<translation id="6473659734176498825">Zjednodušený obrázok zobrazujúci vstupný bod Správcu hesiel Google v Chrome</translation>
 <translation id="6474498546677193336">Zdieľanie sa nepodarilo zrušiť, pretože tento priečinok používa nejaká aplikácia. Jeho zdieľanie bude zrušené po ďalšom vypnutí systému Linux.</translation>
 <translation id="6474884162850599008">Odpojiť účet služby Disk Google</translation>
 <translation id="6476482583633999078">Rýchlosť reči</translation>

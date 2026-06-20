@@ -3375,7 +3375,6 @@ Zpráva serveru: <ph name="SERVER_MSG" /></translation>
 <translation id="351152300840026870">Písmo s pevnou šířkou</translation>
 <translation id="3511528412952710609">Krátká</translation>
 <translation id="3512465804715993309">Adaptivní zvýrazňování</translation>
-<translation id="3512495006767217696">Integrovaný v Chromu pomáhá vytvářet, ukládat a automaticky vyplňovat silná hesla. Přidejte si zkratku pro snadný přístup.</translation>
 <translation id="3513019849832307207">Přidat se a otevřít</translation>
 <translation id="3513563267917474897">Posuvník odstínu do <ph name="MIN_VALUE" /> do <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Používáte standardní bezpečnostní ochranu. Pokud chcete být lépe chráněni před nebezpečnými weby, soubory ke stažení a rozšířeními, zapněte v nastavení Chromu Vylepšené Bezpečné prohlížení.</translation>
@@ -4837,7 +4836,6 @@ Zpráva serveru: <ph name="SERVER_MSG" /></translation>
 <translation id="4580127151758731432">Větší pohyby hlavou posunou kurzor dále</translation>
 <translation id="4580389561674319558">Viditelné pro všechny kontakty</translation>
 <translation id="4580596421317071374">Hesla se ukládají do <ph name="GOOGLE_PASSWORD_MANAGER" /> v tomto zařízení</translation>
-<translation id="4580939929828762295">Buďte v bezpečí se Správcem hesel Google</translation>
 <translation id="4582297591746054421">Weby obvykle načítají obsah schránky kvůli funkcím, jako je zachování formátu zkopírovaného textu</translation>
 <translation id="4584094413232466841">Odebrat tyto informace z automatického vyplňování v Chromu?</translation>
 <translation id="4584770411839426377">Okno</translation>
@@ -7289,7 +7287,6 @@ K této akci lze přiřadit několik přepínačů.</translation>
 <translation id="6470823736074966819">Vypnout oznámení</translation>
 <translation id="6472893788822429178">Zobrazit tlačítko Domovská stránka</translation>
 <translation id="6473315466413288899">Vyberte jednu z možností</translation>
-<translation id="6473659734176498825">Zjednodušený obrázek zobrazující vstupní bod Správce hesel Google v Chromu</translation>
 <translation id="6474498546677193336">Sdílení se nepodařilo zrušit, protože tuto složku používá nějaká aplikace. Sdílení složky bude zrušeno při příštím vypnutí systému Linux.</translation>
 <translation id="6474884162850599008">Odpojit účet Disku Google</translation>
 <translation id="6476482583633999078">Rychlost řeči</translation>

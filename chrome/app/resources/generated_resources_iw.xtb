@@ -1878,7 +1878,7 @@
 <translation id="2406153734066939945">למחוק את הפרופיל הזה ואת הנתונים שלו?</translation>
 <translation id="2406942743794219791">צריך לאשר את מנוע החיפוש שיוגדר כברירת מחדל</translation>
 <translation id="2407671304279211586">‏בחירת ספק DNS</translation>
-<translation id="2408018932941436077">שמירת הכרטיס מתבצעת</translation>
+<translation id="2408018932941436077">הכרטיס תכף יישמר</translation>
 <translation id="2408601796549249241">‏הגיליון התחתון של Gemini נפתח בגובה מלא</translation>
 <translation id="2408762424059547338">‏השבתת האופטימיזציה של JavaScript מספקת הגנה טובה יותר מפני מתקפות</translation>
 <translation id="2408955596600435184">יש להזין את קוד האימות</translation>
@@ -3389,7 +3389,6 @@
 <translation id="351152300840026870">גופן ברוחב קבוע</translation>
 <translation id="3511528412952710609">קצרה</translation>
 <translation id="3512465804715993309">הדגשה דינמית</translation>
-<translation id="3512495006767217696">‏מנהל הסיסמאות מובנה ב-Chrome ומאפשר לך ליצור ולשמור סיסמאות חזקות ולמלא אותן אוטומטית. כדי להגיע אליו בקלות, אפשר להוסיף את קיצור הדרך</translation>
 <translation id="3513019849832307207">הצטרפות ופתיחה</translation>
 <translation id="3513563267917474897">פס הזזה של גוון הצבע מ-<ph name="MIN_VALUE" /> עד <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">‏בחשבון פועלת אבטחה ברמה רגילה. כדי לקבל הגנה נוספת מפני אתרים, הורדות ותוספים מסוכנים, יש להפעיל את הגרסה המשופרת של הגלישה הבטוחה בהגדרות של Chrome.</translation>
@@ -4853,7 +4852,6 @@
 <translation id="4580127151758731432">תנועות ראש גדולות יותר יזיזו את הסמן רחוק יותר</translation>
 <translation id="4580389561674319558">במצב גלוי לכל אנשי הקשר</translation>
 <translation id="4580596421317071374">הסיסמאות נשמרות ב<ph name="GOOGLE_PASSWORD_MANAGER" /> במכשיר הזה.</translation>
-<translation id="4580939929828762295">‏מנהל הסיסמאות של Google עוזר לשמור על הבטיחות שלך</translation>
 <translation id="4582297591746054421">אתרים קוראים בדרך כלל את הלוח כדי לתמוך בתכונות כמו שמירה על עיצוב הטקסט שהועתק אליו</translation>
 <translation id="4584094413232466841">‏להסיר את הפרטים האלה מהמילוי האוטומטי של Chrome?</translation>
 <translation id="4584770411839426377">חלון</translation>
@@ -7310,7 +7308,6 @@
 <translation id="6470823736074966819">השתקת ההתראות</translation>
 <translation id="6472893788822429178">הצגת כפתור 'דף הבית'</translation>
 <translation id="6473315466413288899">יש לבחור אפשרות</translation>
-<translation id="6473659734176498825">‏תמונה פשוטה שמראה את נקודת הכניסה למנהל הסיסמאות של Google ב-Chrome</translation>
 <translation id="6474498546677193336">‏לא ניתן לבטל את השיתוף כי אפליקציה משתמשת בתיקייה הזו. השיתוף של התיקייה הזו יבוטל בכיבוי הבא של Linux.</translation>
 <translation id="6474884162850599008">‏ניתוק חשבון Google Drive</translation>
 <translation id="6476482583633999078">מהירות הדיבור</translation>

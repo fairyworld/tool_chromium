@@ -3376,7 +3376,6 @@ Mesaj de la server: <ph name="SERVER_MSG" /></translation>
 <translation id="351152300840026870">Font cu lățime fixă</translation>
 <translation id="3511528412952710609">Scurtă</translation>
 <translation id="3512465804715993309">Evidențiere adaptivă</translation>
-<translation id="3512495006767217696">Încorporat în Chrome pentru a te ajuta să creezi, să salvezi și să completezi automat parole puternice. Adaugă comanda rapidă pentru acces ușor</translation>
 <translation id="3513019849832307207">Alătură-te și deschide</translation>
 <translation id="3513563267917474897">Glisor de nuanță de la <ph name="MIN_VALUE" /> la <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Beneficiezi de protecție de securitate standard. Pentru a beneficia de mai multă protecție împotriva site-urilor, descărcărilor și extensiilor periculoase, activează Navigarea sigură îmbunătățită în setările Chrome.</translation>
@@ -4839,7 +4838,6 @@ Mesaj de la server: <ph name="SERVER_MSG" /></translation>
 <translation id="4580127151758731432">Mișcările mai ample ale capului vor deplasa mai mult cursorul</translation>
 <translation id="4580389561674319558">Vizibil pentru toată agenda</translation>
 <translation id="4580596421317071374">Parolele se salvează în <ph name="GOOGLE_PASSWORD_MANAGER" /> pe acest dispozitiv.</translation>
-<translation id="4580939929828762295">Rămâi în siguranță cu Managerul de parole Google</translation>
 <translation id="4582297591746054421">Site-urile citesc de obicei clipboardul pentru a face acțiuni precum păstrarea formatării textului pe care l-ai copiat</translation>
 <translation id="4584094413232466841">Elimini aceste informații din completarea automată din Chrome?</translation>
 <translation id="4584770411839426377">Fereastră</translation>
@@ -7294,7 +7292,6 @@ Poți atribui mai multe comutatoare acestei acțiuni.</translation>
 <translation id="6470823736074966819">Dezactivează sunetul notificărilor</translation>
 <translation id="6472893788822429178">Afișează butonul Pagina principală</translation>
 <translation id="6473315466413288899">Selectează o opțiune</translation>
-<translation id="6473659734176498825">Imagine simplificată care arată punctul de intrare al Managerului de parole Google în Chrome</translation>
 <translation id="6474498546677193336">Distribuirea nu s-a putut anula, deoarece o aplicație folosește acest dosar. Distribuirea dosarului va fi anulată la următoarea închidere a sistemului de operare Linux.</translation>
 <translation id="6474884162850599008">Deconectează contul Google Drive</translation>
 <translation id="6476482583633999078">Viteza vorbirii</translation>

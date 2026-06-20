@@ -3391,7 +3391,6 @@
 <translation id="351152300840026870">고정폭 글꼴</translation>
 <translation id="3511528412952710609">짧게</translation>
 <translation id="3512465804715993309">적응형 강조 표시</translation>
-<translation id="3512495006767217696">Google 비밀번호 관리자는 안전한 비밀번호를 만들고, 저장하고, 자동 완성할 수 있도록 Chrome에 내장되어 있습니다. 바로가기를 추가하여 간편하게 액세스하세요.</translation>
 <translation id="3513019849832307207">참여하고 열기</translation>
 <translation id="3513563267917474897"><ph name="MIN_VALUE" />에서 <ph name="MAX_VALUE" />까지의 색조 슬라이더</translation>
 <translation id="3514647716686280777">표준 보호 조치를 사용하고 있습니다. 위험한 웹사이트, 다운로드 항목, 확장 프로그램에 대응하여 보안을 강화하려면 Chrome 설정에서 향상된 세이프 브라우징을 사용 설정하세요.</translation>
@@ -4852,7 +4851,6 @@
 <translation id="4580127151758731432">머리 움직임이 더 커지면 커서가 더 멀리 이동합니다</translation>
 <translation id="4580389561674319558">연락처에 있는 모든 사용자에게 공개</translation>
 <translation id="4580596421317071374">비밀번호는 이 기기의 <ph name="GOOGLE_PASSWORD_MANAGER" />에 저장됩니다.</translation>
-<translation id="4580939929828762295">Google 비밀번호 관리자로 보안을 유지하세요</translation>
 <translation id="4582297591746054421">사이트에서는 일반적으로 복사한 텍스트 형식 유지와 같은 기능을 사용하기 위해 클립보드를 읽어 옵니다.</translation>
 <translation id="4584094413232466841">Chrome 자동 완성에서 이 정보를 삭제하시겠습니까?</translation>
 <translation id="4584770411839426377">창</translation>
@@ -7309,7 +7307,6 @@
 <translation id="6470823736074966819">알림 숨기기</translation>
 <translation id="6472893788822429178">홈 버튼 표시</translation>
 <translation id="6473315466413288899">옵션 선택</translation>
-<translation id="6473659734176498825">Chrome의 Google 비밀번호 관리자 진입점을 보여주는 간소화된 이미지</translation>
 <translation id="6474498546677193336">다른 애플리케이션에서 폴더를 사용 중이므로 공유를 취소할 수 없습니다. 다음번에 Linux가 종료되면 폴더 공유가 취소됩니다.</translation>
 <translation id="6474884162850599008">Google Drive 계정 연결 해제</translation>
 <translation id="6476482583633999078">음성 속도</translation>

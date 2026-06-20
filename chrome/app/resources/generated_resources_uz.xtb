@@ -3380,7 +3380,6 @@ Oʻz qurilmangizda Family Link ilovasini oʻrnatib, bu hisob sozlamalarini boshq
 <translation id="351152300840026870">Monokenglikdagi shrift</translation>
 <translation id="3511528412952710609">Qisqa</translation>
 <translation id="3512465804715993309">Adaptiv ajratib belgilash</translation>
-<translation id="3512495006767217696">Kuchli parollarni yaratish, saqlash va avtomatik kiritishda yordam berish uchun Chromeda oldindan oʻrnatilgan. Tezkor ruxsat olish uchun yorliq qoʻshing</translation>
 <translation id="3513019849832307207">Qoʻshilish va ochish</translation>
 <translation id="3513563267917474897">Tuslar slayderi: <ph name="MIN_VALUE" /> — <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Siz standart xavfsizlik himoyasiga ega boʻlasiz. Zararli saytlar, yuklamalar va kengaytmalardan himoyalanish uchun Chrome sozlamalarida Saytlarni kuchaytirilgan rejimda xavfsiz kezish funksiyasini yoqing.</translation>
@@ -4843,7 +4842,6 @@ Oʻz qurilmangizda Family Link ilovasini oʻrnatib, bu hisob sozlamalarini boshq
 <translation id="4580127151758731432">Boshning keskin harakatlari kursorni uzoqroq suradi</translation>
 <translation id="4580389561674319558">Barcha kontaktlarga koʻrinadi</translation>
 <translation id="4580596421317071374">Bu qurilmadagi parollar <ph name="GOOGLE_PASSWORD_MANAGER" />ga saqlanadi.</translation>
-<translation id="4580939929828762295">Google Parollar menejeri bilan maʼlumotlaringizni himoyalang</translation>
 <translation id="4582297591746054421">Saytlar odatda nusxalanayotgan matn formatini saqlab qolish uchun klipbord axborotini oʻqiydi</translation>
 <translation id="4584094413232466841">Bu axborot Chrome avtomatik kiritish vositasidan olib tashlansinmi?</translation>
 <translation id="4584770411839426377">Oyna</translation>
@@ -7299,7 +7297,6 @@ Ochiq eksponenta (<ph name="PUBLIC_EXPONENT_NUM_BITS" /> bit):
 <translation id="6470823736074966819">Bildirishnomalarni tovushsiz qilish</translation>
 <translation id="6472893788822429178">Bosh sahifa tugmasini ko‘rsatish</translation>
 <translation id="6473315466413288899">Birini tanlang</translation>
-<translation id="6473659734176498825">Chromeda Google Parollar menejeriga kirish qismi aks ettirilgan sodda tasvir</translation>
 <translation id="6474498546677193336">Bu jild bandligi sababli umumiy ruxsat bekor qilinmadi. Jildga umumiy ruxsat Linux qayta ishga tushganda bekor qilinadi.</translation>
 <translation id="6474884162850599008">Google Drive hisobini uzib qo‘yish</translation>
 <translation id="6476482583633999078">Nutq tezligi</translation>

@@ -3371,7 +3371,6 @@
 <translation id="351152300840026870">固定幅フォント</translation>
 <translation id="3511528412952710609">短い</translation>
 <translation id="3512465804715993309">アダプティブ ハイライト表示</translation>
-<translation id="3512495006767217696">Chrome に組み込まれており、安全なパスワードを作成、保存、自動入力できます。ショートカットを追加すると、簡単にアクセスできます。</translation>
 <translation id="3513019849832307207">参加して開く</translation>
 <translation id="3513563267917474897">色相スライダー <ph name="MIN_VALUE" />～<ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">標準のセキュリティ機能で保護します。危険なウェブサイト、ダウンロード、拡張機能からの保護を強化するには、Chrome の設定でセーフ ブラウジング保護強化機能をオンにしてください。</translation>
@@ -4832,7 +4831,6 @@
 <translation id="4580127151758731432">頭を大きく動かすとカーソルの移動幅が大きくなります</translation>
 <translation id="4580389561674319558">すべての連絡先に公開</translation>
 <translation id="4580596421317071374">パスワードは、このデバイスの <ph name="GOOGLE_PASSWORD_MANAGER" /> に保存されています。</translation>
-<translation id="4580939929828762295">Google パスワード マネージャーで安全を確保</translation>
 <translation id="4582297591746054421">多くのサイトは、コピーしたテキストの書式を保持するなどのためにクリップボードを読み取ります。</translation>
 <translation id="4584094413232466841">Chrome の自動入力からこの情報を削除しますか？</translation>
 <translation id="4584770411839426377">ウィンドウ</translation>
@@ -7284,7 +7282,6 @@
 <translation id="6470823736074966819">通知をミュートする</translation>
 <translation id="6472893788822429178">ホーム ボタンを表示する</translation>
 <translation id="6473315466413288899">オプションを選択</translation>
-<translation id="6473659734176498825">Chrome の Google パスワード マネージャーのエントリ ポイントを示す簡略化された画像</translation>
 <translation id="6474498546677193336">このフォルダを使用しているアプリケーションがあるため、共有を停止できませんでした。次回 Linux をシャットダウンするときに、フォルダの共有を停止します。</translation>
 <translation id="6474884162850599008">Google ドライブ アカウントを切断する</translation>
 <translation id="6476482583633999078">読み上げ速度</translation>

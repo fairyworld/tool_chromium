@@ -3391,7 +3391,6 @@ Du kan administrere indstillingerne for denne konto ved at installere Family Lin
 <translation id="351152300840026870">Skrifttype med fast bredde</translation>
 <translation id="3511528412952710609">Kort</translation>
 <translation id="3512465804715993309">Adaptiv fremhævelse</translation>
-<translation id="3512495006767217696">Indbygget i Chrome for at hjælpe dig med at oprette, gemme og automatisk udfylde stærke adgangskoder. Tilføj genvejen for at få nem adgang</translation>
 <translation id="3513019849832307207">Deltag og åbn</translation>
 <translation id="3513563267917474897">Skyder til farvetone fra <ph name="MIN_VALUE" /> til <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Du får standardsikkerhedsbeskyttelse. Hvis du vil have mere beskyttelse mod farlige websites, downloads og udvidelser, skal du aktivere "Udvidet beskyttet browsing" i indstillingerne for Chrome.</translation>
@@ -4854,7 +4853,6 @@ Vil du starte <ph name="CONTROL_PANEL_APPLET_NAME" />?</translation>
 <translation id="4580127151758731432">Større hovedbevægelser flytter markøren længere</translation>
 <translation id="4580389561674319558">Synlig for alle kontakter</translation>
 <translation id="4580596421317071374">Adgangskoder gemmes i <ph name="GOOGLE_PASSWORD_MANAGER" /> på denne enhed.</translation>
-<translation id="4580939929828762295">Beskyt dine oplysninger med Google Adgangskodeadministrator</translation>
 <translation id="4582297591746054421">Websites læser normalt din udklipsholder for at kunne bevare formatet af den tekst, du kopierede</translation>
 <translation id="4584094413232466841">Vil du fjerne disse oplysninger fra autofyld i Chrome?</translation>
 <translation id="4584770411839426377">Vindue</translation>
@@ -7311,7 +7309,6 @@ Flere kontakter kan tildeles denne handling.</translation>
 <translation id="6470823736074966819">Ignorer notifikationer</translation>
 <translation id="6472893788822429178">Vis knappen Startside</translation>
 <translation id="6473315466413288899">Vælg en af mulighederne</translation>
-<translation id="6473659734176498825">Et forenklet billede, der viser indgangspunktet til Google Adgangskodeadministrator i Chrome</translation>
 <translation id="6474498546677193336">Delingen kunne ikke ophæves, fordi mappen stadig anvendes af en app. Delingen af mappen ophæves, næste gang Linux lukkes.</translation>
 <translation id="6474884162850599008">Fjern tilknytningen af din Google Drev-konto</translation>
 <translation id="6476482583633999078">Talehastighed</translation>

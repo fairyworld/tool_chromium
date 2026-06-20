@@ -3378,7 +3378,6 @@ Puedes gestionar la configuración de esta cuenta instalando la aplicación Fami
 <translation id="351152300840026870">Fuente de ancho fijo</translation>
 <translation id="3511528412952710609">Breve</translation>
 <translation id="3512465804715993309">Resaltado adaptativo</translation>
-<translation id="3512495006767217696">Integrado en Chrome para ayudarte a crear, guardar y autocompletar contraseñas seguras. Añade el acceso directo para acceder fácilmente.</translation>
 <translation id="3513019849832307207">Unirme y abrir</translation>
 <translation id="3513563267917474897">Control deslizante del tono de <ph name="MIN_VALUE" /> a <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Estás usando la protección de seguridad estándar. Para aumentar la protección contra las descargas, las extensiones y los sitios web peligrosos, activa Navegación segura mejorada en la configuración de Chrome.</translation>
@@ -4840,7 +4839,6 @@ Puedes gestionar la configuración de esta cuenta instalando la aplicación Fami
 <translation id="4580127151758731432">Si haces movimientos más amplios con la cabeza, el cursor se moverá más lejos</translation>
 <translation id="4580389561674319558">Visible para todos los contactos</translation>
 <translation id="4580596421317071374">Las contraseñas se guardan en el <ph name="GOOGLE_PASSWORD_MANAGER" /> de este dispositivo.</translation>
-<translation id="4580939929828762295">Protégete con el Gestor de contraseñas de Google</translation>
 <translation id="4582297591746054421">Los sitios suelen leer el contenido del portapapeles para utilizarlo en funciones como conservar el formato del texto que se ha copiado.</translation>
 <translation id="4584094413232466841">¿Quitar esta información de Autocompletar de Chrome?</translation>
 <translation id="4584770411839426377">Ventana</translation>
@@ -7295,7 +7293,6 @@ Exponente público (<ph name="PUBLIC_EXPONENT_NUM_BITS" /> bits):
 <translation id="6470823736074966819">Silenciar notificaciones</translation>
 <translation id="6472893788822429178">Mostrar el botón Página principal</translation>
 <translation id="6473315466413288899">Selecciona una opción</translation>
-<translation id="6473659734176498825">Imagen simplificada que muestra el punto de entrada del Gestor de contraseñas de Google en Chrome</translation>
 <translation id="6474498546677193336">No se ha podido dejar de compartir esta carpeta porque una aplicación está usándola. Se dejará de compartir la próxima vez que se apague Linux.</translation>
 <translation id="6474884162850599008">Desconectar cuenta de Google Drive</translation>
 <translation id="6476482583633999078">Velocidad de la voz</translation>

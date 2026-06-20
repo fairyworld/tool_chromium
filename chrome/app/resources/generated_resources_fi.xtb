@@ -3389,7 +3389,6 @@ Voit ylläpitää tilin asetuksia asentamalla laitteellesi Family Link ‑sovell
 <translation id="351152300840026870">Kiinteäleveyksinen fontti</translation>
 <translation id="3511528412952710609">Lyhyt</translation>
 <translation id="3512465804715993309">Mukautuva korostus</translation>
-<translation id="3512495006767217696">Sisäänrakennettu Chromeen, jotta voit luoda, tallentaa ja täyttää vahvoja salasanoja automaattisesti. Lisää pikakuvake, niin pääset siihen helposti</translation>
 <translation id="3513019849832307207">Liity ja avaa</translation>
 <translation id="3513563267917474897">Värisävyliukusäädin <ph name="MIN_VALUE" />–<ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Sinulla on perustason suojaus. Voit parantaa suojausta vaarallisia verkkosivustoja, latauksia ja laajennuksia vastaan laittamalla Parannettu selaussuoja päälle Chromen asetuksista.</translation>
@@ -4849,7 +4848,6 @@ Voit ylläpitää tilin asetuksia asentamalla laitteellesi Family Link ‑sovell
 <translation id="4580127151758731432">Suuremmat pään liikkeet liikuttavat kohdistinta kauemmas</translation>
 <translation id="4580389561674319558">Näkyy kaikille yhteystiedoille</translation>
 <translation id="4580596421317071374"><ph name="GOOGLE_PASSWORD_MANAGER" /> toimii salasanojen tallennuspaikkana tällä laitteella.</translation>
-<translation id="4580939929828762295">Pysy turvassa Google Salasanojen avulla</translation>
 <translation id="4582297591746054421">Sivustot lukevat yleensä leikepöydän sisältöä säilyttääkseen kopioimasi tekstin muotoilun ja muita vastaavia ominaisuuksia varten</translation>
 <translation id="4584094413232466841">Poistetaanko nämä tiedot Chromen automaattisesta täytöstä?</translation>
 <translation id="4584770411839426377">Ikkuna</translation>
@@ -7306,7 +7304,6 @@ Julkinen eksponentti (<ph name="PUBLIC_EXPONENT_NUM_BITS" /> bittiä):
 <translation id="6470823736074966819">Mykistä ilmoitukset</translation>
 <translation id="6472893788822429178">Näytä Etusivu-painike</translation>
 <translation id="6473315466413288899">Valitse vaihtoehto</translation>
-<translation id="6473659734176498825">Yksinkertaistettu kuva, jossa näkyy Google Salasanojen aloituskohta Chromessa</translation>
 <translation id="6474498546677193336">Jakamista ei voitu peruuttaa, koska sovellus käyttää tätä kansiota. Kansion jakaminen perutaan seuraavan kerran, kun Linux sammutetaan.</translation>
 <translation id="6474884162850599008">Katkaise yhteys Google Drive -tiliin.</translation>
 <translation id="6476482583633999078">Puheen nopeus</translation>

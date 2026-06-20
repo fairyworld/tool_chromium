@@ -3381,7 +3381,6 @@ Selle konto seadete haldamiseks installige oma seadmesse Family Link.  Saatsime 
 <translation id="351152300840026870">Fikseeritud laiusega font</translation>
 <translation id="3511528412952710609">Lühike</translation>
 <translation id="3512465804715993309">Kohanduv esiletõst</translation>
-<translation id="3512495006767217696">Chrome'i sisse ehitatud, et aidata teil luua, salvestada ja automaatselt täita tugevaid paroole. Lisage otsetee, et hõlpsasti juurde pääseda</translation>
 <translation id="3513019849832307207">Liitu ja ava</translation>
 <translation id="3513563267917474897">Värvitooni liugur alates <ph name="MIN_VALUE" /> kuni <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Teil on standardne turvakaitse. Parema kaitse saamiseks ohtlike veebisaitide, allalaadimiste ja laienduste vastu lülitage Chrome'i seadetes sisse funktsioon Täiustatud ohutu sirvimine.</translation>
@@ -4844,7 +4843,6 @@ kasutades juhtpaneeli funktsiooni <ph name="CONTROL_PANEL_APPLET_NAME" />.
 <translation id="4580127151758731432">Suuremad pealiigutused liigutavad kursorit kaugemale</translation>
 <translation id="4580389561674319558">Nähtav kõikidele kontaktidele</translation>
 <translation id="4580596421317071374">Paroolid salvestatakse selles seadmes rakendusse <ph name="GOOGLE_PASSWORD_MANAGER" />.</translation>
-<translation id="4580939929828762295">Olge Google'i paroolihalduriga kaitstud</translation>
 <translation id="4582297591746054421">Saidid loevad teie lõikelaual olevat sisu näiteks teie kopeeritud teksti vormingu säilitamiseks</translation>
 <translation id="4584094413232466841">Kas eemaldada see teave Chrome’i automaattäitefunktsioonist?</translation>
 <translation id="4584770411839426377">Aken</translation>
@@ -7301,7 +7299,6 @@ Saate sellele toimingule määrata mitu lülitit.</translation>
 <translation id="6470823736074966819">Summuta märguanded</translation>
 <translation id="6472893788822429178">Kuva nupp Avaleht</translation>
 <translation id="6473315466413288899">Tehke valik</translation>
-<translation id="6473659734176498825">Lihtsustatud pilt, mis näitab Google'i paroolihalduri sisenemispunkti Chrome'is</translation>
 <translation id="6474498546677193336">Jagamist ei saanud lõpetada, kuna rakendus kasutab seda kausta. Kausta jagamine lõpetatakse Linuxi väljalülitamisel.</translation>
 <translation id="6474884162850599008">Google Drive'i konto ühenduse katkestamine</translation>
 <translation id="6476482583633999078">Kõne kiirus</translation>

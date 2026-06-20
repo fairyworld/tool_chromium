@@ -3375,7 +3375,6 @@ Servera ziņojums: <ph name="SERVER_MSG" /></translation>
 <translation id="351152300840026870">Noteikta platuma fonts</translation>
 <translation id="3511528412952710609">Īsa</translation>
 <translation id="3512465804715993309">Adaptīva atzīmēšana</translation>
-<translation id="3512495006767217696">Iebūvēts pārlūkā Chrome, lai palīdzētu jums izveidot, saglabāt un automātiski aizpildīt drošas paroles. Pievienojiet saīsni, lai varētu ērti piekļūt.</translation>
 <translation id="3513019849832307207">Pievienoties un atvērt</translation>
 <translation id="3513563267917474897">Nokrāsas slīdnis diapazonā no <ph name="MIN_VALUE" /> līdz <ph name="MAX_VALUE" /></translation>
 <translation id="3514647716686280777">Jūs saņemat standarta aizsardzību. Lai uzlabotu aizsardzību pret bīstamām tīmekļa vietnēm, lejupielādēm un paplašinājumiem, Chrome iestatījumos ieslēdziet funkciju “Droša pārlūkošana ar papildu aizsardzību”.</translation>
@@ -4838,7 +4837,6 @@ Vai vēlaties palaist rīku <ph name="CONTROL_PANEL_APPLET_NAME" />?</translatio
 <translation id="4580127151758731432">Lielākas galvas kustības pārvietos kursoru tālāk.</translation>
 <translation id="4580389561674319558">Redzama visām kontaktpersonām</translation>
 <translation id="4580596421317071374">Paroles tiek saglabātas šajā ierīcē, izmantojot pakalpojumu <ph name="GOOGLE_PASSWORD_MANAGER" />.</translation>
-<translation id="4580939929828762295">Esiet drošībā, izmantojot Google paroļu pārvaldnieku</translation>
 <translation id="4582297591746054421">Parasti vietnes lasa starpliktuvi, lai nodrošinātu noteiktas funkcijas, piemēram, nokopētā teksta formatējuma saglabāšanu.</translation>
 <translation id="4584094413232466841">Vai noņemt šo informāciju no Chrome automātiskās aizpildes?</translation>
 <translation id="4584770411839426377">Logs</translation>
@@ -7291,7 +7289,6 @@ Lai tālinātu, nospiediet Ctrl + Alt + spilgtuma samazināšanas taustiņu.
 <translation id="6470823736074966819">Izslēgt paziņojumus</translation>
 <translation id="6472893788822429178">Rādīt pogu Sākums</translation>
 <translation id="6473315466413288899">Atlasiet kādu no tālāk norādītajām iespējām.</translation>
-<translation id="6473659734176498825">Vienkāršots attēls, kurā redzams Google paroļu pārvaldnieka ieejas punkts pārlūkā Chrome</translation>
 <translation id="6474498546677193336">Nevarēja atsaukt kopīgošanu, jo šo mapi izmanto lietojumprogramma. Mapes kopīgošana tiks atsaukta, kad nākamreiz tiks beidzēta operētājsistēma Linux.</translation>
 <translation id="6474884162850599008">Atspējot Google diska kontu</translation>
 <translation id="6476482583633999078">Runas ātrums</translation>
