@@ -649,6 +649,8 @@ class AppMenuHandlerImpl
                 AppMenuItemType.BUTTON_ROW, AppMenuItemViewBinder::getIconRowItemPixelHeight);
         customSizingProviders.append(
                 AppMenuItemType.SUBMENU_HEADER, AppMenuItemViewBinder::getSubmenuHeaderPixelHeight);
+        customSizingProviders.append(
+                AppMenuItemType.HEADER, AppMenuItemViewBinder::getHeaderPixelHeight);
 
         mDelegate.registerCustomViewBinders(adapter, customSizingProviders);
     }

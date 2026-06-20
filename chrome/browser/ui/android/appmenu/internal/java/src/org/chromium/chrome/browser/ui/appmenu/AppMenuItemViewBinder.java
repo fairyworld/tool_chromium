@@ -280,6 +280,10 @@ class AppMenuItemViewBinder {
         }
     }
 
+    public static @Px int getHeaderPixelHeight(Context context, PropertyModel model) {
+        return context.getResources().getDimensionPixelSize(R.dimen.menu_header_height);
+    }
+
     public static void bindItemWithSubmenu(PropertyModel model, View view, PropertyKey key) {
         bindStandardItem(model, view, key);
 

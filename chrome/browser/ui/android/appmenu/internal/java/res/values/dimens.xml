@@ -30,6 +30,6 @@ found in the LICENSE file.
     <dimen name="bottom_bar_app_menu_lateral_margin">12dp</dimen>
 
     <!-- Menu header dimensions. -->
-    <dimen name="menu_header_padding_top">8dp</dimen>
+    <dimen name="menu_header_height">26dp</dimen>
     <dimen name="menu_header_padding_bottom">2dp</dimen>
 </resources>
