@@ -258,9 +258,8 @@ public class SwipeRefreshHandler extends TabWebContentsUserData
     public void didStopRefreshing() {
         if (mSwipeRefreshLayout == null || !mSwipeRefreshLayout.isRefreshing()) return;
         cancelStopRefreshingRunnable();
-        // Use a handler rather than PostTask because we need to be able to cancel it.
-        ThreadUtils.getUiThreadHandler()
-                .postDelayed(getStopRefreshingRunnable(), STOP_REFRESH_ANIMATION_DELAY_MS);
+        mSwipeRefreshLayout.postDelayed(
+                getStopRefreshingRunnable(), STOP_REFRESH_ANIMATION_DELAY_MS);
     }
 
     @Override
