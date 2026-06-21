@@ -12,6 +12,7 @@
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
 #include "chrome/browser/ui/views/chrome_widget_sublevel.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
+#include "chrome/browser/ui/views/frame/contents_web_view.h"
 #include "chrome/browser/ui/views/permissions/permission_prompt_observer.h"
 #include "chrome/browser/ui/views/sub_apps_permission_explanation.h"
 #include "components/permissions/features.h"
@@ -34,6 +35,7 @@
 #include "ui/views/controls/button/md_text_button.h"
 #include "ui/views/controls/label.h"
 #include "ui/views/controls/throbber.h"
+#include "ui/views/interaction/element_tracker_views.h"
 #include "ui/views/layout/box_layout.h"
 #include "ui/views/view_class_properties.h"
 #include "ui/views/widget/widget.h"
@@ -88,18 +90,12 @@ int GetPermissionIconSize() {
   return 20;
 }
 
-float GetScreenScaleFactor(BrowserWindowInterface* browser) {
-  BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser);
-  return browser_view ? display::Screen::Get()
-                            ->GetPreferredScaleFactorForWindow(
-                                browser_view->GetNativeWindow())
-                            .value_or(1.0f)
-                      : 1.0f;
-}
-
-views::View* GetContentsWebView(BrowserWindowInterface* browser) {
-  BrowserView* browser_view = BrowserView::GetBrowserViewForBrowser(browser);
-  return browser_view ? browser_view->contents_web_view() : nullptr;
+views::View* GetContentsWebView(gfx::NativeWindow native_window) {
+  auto* tracker = views::ElementTrackerViews::GetInstance();
+  auto* widget = views::Widget::GetWidgetForNativeWindow(native_window);
+  return tracker->GetFirstMatchingView(
+      ContentsWebView::kContentsWebViewElementId,
+      tracker->GetContextForWidget(widget));
 }
 
 }  // namespace
@@ -127,11 +123,14 @@ EmbeddedPermissionPromptBaseView::EmbeddedPermissionPromptBaseView(
   }
 
   // Scale the element position according to the device scale factor.
-  element_rect_ = gfx::ScaleToEnclosedRect(
-      element_rect_, 1.f / GetScreenScaleFactor(GetBrowser()));
+  const float scale_factor =
+      display::Screen::Get()
+          ->GetPreferredScaleFactorForWindow(GetNativeWindow())
+          .value_or(1.0f);
+  element_rect_ = gfx::ScaleToEnclosedRect(element_rect_, 1.f / scale_factor);
 
   // Convert the position into screen coordinates.
-  auto* content_view = GetContentsWebView(GetBrowser());
+  auto* content_view = GetContentsWebView(GetNativeWindow());
   views::View::ConvertRectToScreen(content_view, &element_rect_);
 }
 
@@ -158,7 +157,7 @@ bool EmbeddedPermissionPromptBaseView::ShowLoadingIcon() const {
 }
 
 void EmbeddedPermissionPromptBaseView::CreateWidget() {
-  DCHECK(GetBrowser()->GetWindow());
+  DCHECK(GetNativeWindow());
   views::Widget* widget = views::BubbleDialogDelegateView::CreateBubble(this);
 
   widget->SetZOrderSublevel(ChromeWidgetSublevel::kSublevelSecurity);

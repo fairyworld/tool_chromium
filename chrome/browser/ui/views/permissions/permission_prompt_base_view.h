@@ -13,6 +13,7 @@
 #include "chrome/browser/ui/url_identity.h"
 #include "components/permissions/permission_prompt.h"
 #include "content/public/browser/web_contents_observer.h"
+#include "ui/gfx/native_ui_types.h"
 #include "ui/views/bubble/bubble_dialog_delegate_view.h"
 
 namespace content {
@@ -94,6 +95,9 @@ class PermissionPromptBaseView : public views::BubbleDialogDelegateView,
 
   BrowserWindowInterface* GetBrowser();
   const BrowserWindowInterface* GetBrowser() const;
+
+  // Gets the permission prompt's top-level NativeWindow.
+  gfx::NativeWindow GetNativeWindow();
 
   bool record_browser_always_active_value() const {
     return record_browser_always_active_value_;

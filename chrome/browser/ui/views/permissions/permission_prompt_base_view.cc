@@ -292,6 +292,17 @@ BrowserWindowInterface* PermissionPromptBaseView::GetBrowser() {
   return const_cast<BrowserWindowInterface*>(std::as_const(*this).GetBrowser());
 }
 
+gfx::NativeWindow PermissionPromptBaseView::GetNativeWindow() {
+  BrowserWindowInterface* browser = GetBrowser();
+  if (browser && browser->GetWindow()) {
+    return browser->GetWindow()->GetNativeWindow();
+  }
+  if (web_contents()) {
+    return web_contents()->GetTopLevelNativeWindow();
+  }
+  return gfx::NativeWindow();
+}
+
 std::vector<std::pair<size_t, size_t>>
 PermissionPromptBaseView::GetTitleBoldedRanges() {
   return title_bolded_ranges_;
