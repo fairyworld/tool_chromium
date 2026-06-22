@@ -401,7 +401,6 @@ TaskManagerView::TableConfigs TaskManagerView::GetTableConfigs() {
   return TableConfigs{
       .table_has_border = false,
       .table_refresh = true,
-      .scroll_view_rounded = true,
       .dialog_button_disabled = true,
       .sort_on_cpu_by_default = true,
   };
@@ -677,14 +676,12 @@ void TaskManagerView::Init() {
   auto* tab_table_parent = AddChildView(
       CreateProcessView(std::move(tab_table), table_config_.table_has_border));
 
-  if (table_config_.scroll_view_rounded) {
-    tab_table_parent->SetPaintToLayer(ui::LAYER_TEXTURED);
+  tab_table_parent->SetPaintToLayer(ui::LAYER_TEXTURED);
 
-    ui::Layer* scroll_view_layer = tab_table_parent->layer();
-    scroll_view_layer->SetRoundedCornerRadius(
-        gfx::RoundedCornersF(corner_radius));
-    scroll_view_layer->SetIsFastRoundedCorner(true);
-  }
+  ui::Layer* scroll_view_layer = tab_table_parent->layer();
+  scroll_view_layer->SetRoundedCornerRadius(
+      gfx::RoundedCornersF(corner_radius));
+  scroll_view_layer->SetIsFastRoundedCorner(true);
 
   table_model_->RetrieveSavedColumnsSettingsAndUpdateTable(
       table_config_.sort_on_cpu_by_default);
