@@ -4,11 +4,20 @@
 
 source_set("ui") {
   sources = [
+    "autofill_bnpl_tos_consumer.h",
+    "autofill_bnpl_tos_view_controller.h",
+    "autofill_bnpl_tos_view_controller.mm",
     "ios_bnpl_ui_delegate.h",
     "ios_bnpl_ui_delegate.mm",
   ]
   deps = [
     "//base",
     "//components/autofill/core/browser",
+    "//components/strings:components_strings",
+    "//ios/chrome/common/ui/button_stack",
+    "//ios/chrome/common/ui/colors",
+    "//ios/chrome/common/ui/confirmation_alert",
+    "//ios/chrome/common/ui/util",
+    "//ui/base",
   ]
 }
