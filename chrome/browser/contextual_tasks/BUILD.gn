@@ -410,6 +410,7 @@ source_set("ui_impl") {
       "//chrome/browser/pdf",
       "//chrome/browser/resources/contextual_tasks:resources",
       "//chrome/browser/tab_list",
+      "//chrome/browser/ui:browser_actions",
       "//chrome/browser/ui/lens",
       "//chrome/browser/ui/omnibox",
       "//chrome/browser/ui/tabs:tab_strip",
@@ -641,6 +642,7 @@ source_set("unit_tests") {
 
   if (!is_android) {
     deps += [
+      "//chrome/browser/ui:browser_actions",
       "//chrome/browser/ui/actions",
       "//chrome/browser/ui/actions:actions_headers",
       "//chrome/browser/ui/contextual_search",

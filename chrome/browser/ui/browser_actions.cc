@@ -23,6 +23,7 @@
 #include "chrome/browser/contextual_cueing/features.h"
 #include "chrome/browser/contextual_tasks/contextual_tasks_side_panel_coordinator.h"
 #include "chrome/browser/contextual_tasks/contextual_tasks_utils.h"
+#include "chrome/browser/contextual_tasks/entry_point_eligibility_manager.h"
 #include "chrome/browser/devtools/devtools_window.h"
 #include "chrome/browser/glic/browser_ui/glic_vector_icon_manager.h"
 #include "chrome/browser/glic/host/glic.mojom.h"
@@ -502,6 +503,9 @@ void BrowserActions::InitializeSidePanelActions() {
                 static_cast<
                     std::underlying_type_t<actions::ActionPinnableState>>(
                     actions::ActionPinnableState::kPinnable))
+            .SetVisible(
+                contextual_tasks::EntryPointEligibilityManager::IsEligible(
+                    profile))
             .Build());
   }
 

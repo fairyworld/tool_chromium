@@ -3796,6 +3796,7 @@ class WebUIPinnedToolbarActionsBrowserTest
              collaboration::features::kCollaborationComments,
              // Facilitate testing kActionsSidePanelShowContextualTasks
              contextual_tasks::kContextualTasks,
+             contextual_tasks::kContextualTasksForceEntryPointEligibility,
              // Facilitate testing kActionSendSharedTabGroupFeedback
              data_sharing::features::kDataSharingFeature},
             {}) {}
