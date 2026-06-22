@@ -239,6 +239,7 @@
 #include "printing/buildflags/buildflags.h"
 #include "services/metrics/public/cpp/ukm_builders.h"
 #include "services/metrics/public/cpp/ukm_recorder.h"
+#include "services/network/public/cpp/constants.h"
 #include "services/service_manager/public/cpp/interface_provider.h"
 #include "third_party/blink/public/common/associated_interfaces/associated_interface_provider.h"
 #include "third_party/blink/public/common/context_menu_data/context_menu_data.h"
@@ -1170,9 +1171,9 @@ void RenderViewContextMenu::IssuePreconnectionToUrl(
   auto network_anonymization_key =
       net::NetworkAnonymizationKey::CreateCrossSite(
           std::move(anonymization_key_schemeful_site));
-  loading_predictor->PreconnectURLIfAllowed(GURL(preconnect_url),
-                                            /*allow_credentials=*/true,
-                                            network_anonymization_key);
+  loading_predictor->PreconnectURLIfAllowed(
+      GURL(preconnect_url), /*allow_credentials=*/true,
+      network_anonymization_key, network::GetNoOpNetworkRestrictionsId());
 }
 
 ui::IsNewFeatureAtValue RenderViewContextMenu::GetIsNewFeatureAtValue(
