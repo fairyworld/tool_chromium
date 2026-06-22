@@ -301,13 +301,32 @@ class AssistantAIMUIStateProvider
   }
 }
 
+// Closes the assistant.
+- (void)closeAssistant {
+  if (!self.browser) {
+    return;
+  }
+  id<SceneCommands> sceneHandler =
+      HandlerForProtocol(self.browser->GetCommandDispatcher(), SceneCommands);
+  [sceneHandler closeAssistant];
+}
+
+// Reveals the assistant.
+- (void)revealAssistant {
+  if (!self.browser) {
+    return;
+  }
+  id<SceneCommands> sceneHandler =
+      HandlerForProtocol(self.browser->GetCommandDispatcher(), SceneCommands);
+  [sceneHandler revealAssistant];
+}
+
 // Shows the undo snackbar with a confirmation message.
 //
 // While the snackbar is shown the assistant is hidden. If the user presses
 // "undo" the assistant is revealed, otherwise it is permanently closed.
 - (void)showUndoSnackbar {
-  __weak id<SceneCommands> sceneHandler =
-      HandlerForProtocol(self.browser->GetCommandDispatcher(), SceneCommands);
+  __weak __typeof(self) weakSelf = self;
   __block BOOL didUndo = NO;
   SnackbarMessage* message = [[SnackbarMessage alloc]
       initWithTitle:l10n_util::GetNSString(IDS_IOS_AIM_CLOSE_SNACKBAR_TITLE)];
@@ -315,13 +334,20 @@ class AssistantAIMUIStateProvider
   message.action = [[SnackbarMessageAction alloc] init];
   message.action.title =
       l10n_util::GetNSString(IDS_IOS_AIM_SNACKBAR_UNDO_BUTTON);
+  // Use the helpers for revealing and closing instead of capturing the scene
+  // handler explicitly.
+  // During browser shutdown, the coordinator's stop sequence immediately
+  // triggers all active snackbar completion handlers. Because the scene handler
+  // is already deregistered from SceneCommands by this point, calling it
+  // directly causes an unrecognized selector exception and a subsequent crash.
+  // See crbug.com/525452659 for more details.
   message.action.handler = ^{
     didUndo = YES;
-    [sceneHandler revealAssistant];
+    [weakSelf revealAssistant];
   };
   message.completionHandler = ^(BOOL success) {
     if (!didUndo) {
-      [sceneHandler closeAssistant];
+      [weakSelf closeAssistant];
     }
   };
 
