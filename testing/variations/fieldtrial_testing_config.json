@@ -19783,29 +19783,6 @@
             ]
         }
     ],
-    "Prerender2FallbackPrefetchSpecRules": [
-        {
-            "platforms": [
-                "android",
-                "chromeos",
-                "linux",
-                "mac",
-                "windows"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled_NoTimeout_Burst",
-                    "params": {
-                        "kPrerender2FallbackPrefetchSchedulerPolicy": "Burst",
-                        "kPrerender2FallbackPrefetchUseBlockUntilHeadTimetout": "false"
-                    },
-                    "enable_features": [
-                        "Prerender2FallbackPrefetchSpecRules"
-                    ]
-                }
-            ]
-        }
-    ],
     "Prerender2WarmUpCompositorForBookmarkBar": [
         {
             "platforms": [

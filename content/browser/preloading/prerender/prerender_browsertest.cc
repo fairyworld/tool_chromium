@@ -1111,7 +1111,7 @@ class PrerenderBrowserTestFallbackEnabledDisabled
                       {
                           features::kPrerender2FallbackPrefetchSchedulerPolicy
                               .name,
-                          "Burst",
+                          "NotUse",
                       },
                   },
               },
@@ -2659,7 +2659,7 @@ class PrerenderTargetAgnosticBrowserTest
                       {
                           features::kPrerender2FallbackPrefetchSchedulerPolicy
                               .name,
-                          "Burst",
+                          "NotUse",
                       },
                   },
               },
@@ -7817,7 +7817,7 @@ class SSLPrerenderBrowserTest
                       {
                           features::kPrerender2FallbackPrefetchSchedulerPolicy
                               .name,
-                          "Burst",
+                          "NotUse",
                       },
                   },
               },
@@ -8798,7 +8798,7 @@ class PrerenderLowMemoryBrowserTest
                       {
                           features::kPrerender2FallbackPrefetchSchedulerPolicy
                               .name,
-                          "Burst",
+                          "NotUse",
                       },
                   },
               },
@@ -14898,7 +14898,7 @@ class PrerenderSpeculationRulesHoldbackBrowserTest
                       {
                           features::kPrerender2FallbackPrefetchSchedulerPolicy
                               .name,
-                          "Burst",
+                          "NotUse",
                       },
                   },
               },

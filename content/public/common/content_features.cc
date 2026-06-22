@@ -785,6 +785,13 @@ BASE_FEATURE(kPrefetchRequestStatusListenerAsync,
 BASE_FEATURE(kPreloadingRespectUserAgentOverride,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
+// Triggers prefetch ahead of prerender for Speculation Rules.
+// See https://crbug.com/342089123 for more details.
+//
+// Enabled except for Android WebView.
+BASE_FEATURE(kPrerender2FallbackPrefetchSpecRules,
+             base::FEATURE_ENABLED_BY_DEFAULT);
+
 // If enabled, the feature allows the prerender host to be reused for the
 // future same-site page prerender if marked as reusable.
 BASE_FEATURE(kPrerender2ReuseHost, base::FEATURE_DISABLED_BY_DEFAULT);

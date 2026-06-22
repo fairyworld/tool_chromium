@@ -332,4 +332,8 @@ void AwFieldTrials::RegisterFeatureOverrides(base::FeatureList* feature_list) {
   // experiment on WebView.
   aw_feature_overrides.DisableFeature(
       ::features::kPrefetchRequestStatusListenerAsync);
+
+  // Disable prefetch ahead of prerender on WebView.
+  aw_feature_overrides.DisableFeature(
+      ::features::kPrerender2FallbackPrefetchSpecRules);
 }
