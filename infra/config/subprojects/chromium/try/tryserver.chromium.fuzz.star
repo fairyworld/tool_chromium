@@ -201,14 +201,15 @@ try_.builder(
 
 # Libfuzzer test bots.
 
-# All test bots should run on the CQ for any changes to fuzztest.
-# See crbug.com/466122130.
+# All test bots should run on the CQ for any changes to fuzztest or libfuzzer.
+# See crbug.com/466122130 and crbug.com/493762894.
 def _test_builder(**kwargs):
     _mirror_builder(
         cq_settings = try_.cq_settings(
             location_filters = [
                 "testing/libfuzzer/.+",
                 "third_party/fuzztest/.+",
+                "third_party/libFuzzer/.+",
             ],
         ),
         **kwargs
