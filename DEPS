@@ -2022,7 +2022,7 @@ deps = {
     Var('chromium_git') + '/external/github.com/mozilla/readability.git' + '@' + 'd7949dc47dd9ed9ee1d3b34ffdcf3bce28cde435',
 
   'src/third_party/content_analysis_sdk/src':
-    Var('chromium_git') + '/external/github.com/chromium/content_analysis_sdk.git' + '@' + '9a408736204513e0e95dd2ab3c08de0d95963efc',
+    Var('chromium_git') + '/external/github.com/chromium/content_analysis_sdk.git' + '@' + '3d82f7523b557d0d5c75e1acf28c3deb8081ead1',
 
   'src/third_party/dav1d/libdav1d':
     Var('chromium_git') + '/external/github.com/videolan/dav1d.git' + '@' + '14c73c7db38eebfd3202146b76a1ad4df90dd3a2',
