@@ -1467,14 +1467,6 @@ bool TabStripModel::IsTabInForeground(int index) const {
   return active_index() == index;
 }
 
-bool TabStripModel::IsTabClosable(int index) const {
-  return PolicyAllowsTabClosing(GetWebContentsAt(index));
-}
-
-bool TabStripModel::IsTabClosable(const content::WebContents* contents) const {
-  return IsTabClosable(GetIndexOfWebContents(contents));
-}
-
 std::optional<tab_groups::TabGroupId> TabStripModel::GetTabGroupForTab(
     int index) const {
   return ContainsIndex(index) ? GetTabAtIndex(index)->GetGroup() : std::nullopt;
@@ -2385,10 +2377,6 @@ TabStripModel::TabIterator TabStripModel::end() const {
 }
 
 const tabs::TabCollection* TabStripModel::Root() const {
-  return contents_data_.get();
-}
-
-const tabs::TabCollection* TabStripModel::GetRootForTesting() const {
   return contents_data_.get();
 }
 
@@ -3630,11 +3618,12 @@ void TabStripModel::CloseTabs(base::span<content::WebContents* const> items,
                               uint32_t close_types) {
   std::vector<content::WebContents*> filtered_items;
   for (content::WebContents* contents : items) {
-    if (IsTabClosable(contents)) {
+    tabs::TabInterface* tab = GetTabForWebContents(contents);
+    if (IsTabClosable(tab)) {
       filtered_items.push_back(contents);
     } else {
       for (auto& observer : observers_) {
-        observer.OnTabCloseCancelled(GetTabForWebContents(contents));
+        observer.OnTabCloseCancelled(tab);
       }
     }
   }
@@ -5270,16 +5259,16 @@ void TabStripModel::OnActiveTabChanged(
   }
 }
 
-bool TabStripModel::PolicyAllowsTabClosing(
-    content::WebContents* contents) const {
-  if (!contents) {
+bool TabStripModel::IsTabClosable(const tabs::TabInterface* tab) const {
+  if (!tab) {
     return true;
   }
 
   web_app::WebAppProvider* provider =
-      web_app::WebAppProvider::GetForWebContents(contents);
+      web_app::WebAppProvider::GetForWebContents(tab->GetContents());
   // Can be null if there is no tab helper or app id.
-  const webapps::AppId* app_id = web_app::WebAppTabHelper::GetAppId(contents);
+  const webapps::AppId* app_id =
+      web_app::WebAppTabHelper::GetAppId(tab->GetContents());
   if (!app_id) {
     return true;
   }

@@ -505,12 +505,9 @@ class TabStripModel {
   // Returns true if the tab at |index| is in the foreground.
   bool IsTabInForeground(int index) const;
 
-  // Returns true if the tab at |index| is allowed to be closed.
-  bool IsTabClosable(int index) const;
-
-  // Returns true if the tab corresponding to |contents| is allowed to be
+  // Returns true if the tab corresponding to |tab| is allowed to be
   // closed.
-  bool IsTabClosable(const content::WebContents* contents) const;
+  bool IsTabClosable(const tabs::TabInterface* tab) const;
 
   split_tabs::SplitTabData* GetSplitData(split_tabs::SplitTabId split_id) const;
 
@@ -730,8 +727,6 @@ class TabStripModel {
 
   // Gets the root of the tab strip model. Used to traverse the tab topology.
   const tabs::TabCollection* Root() const;
-
-  const tabs::TabCollection* GetRootForTesting() const;
 
   // Finds the group id for a tab collection. Note that this API can be error
   // prone. Make sure to read and understand the potential problems with
@@ -1378,9 +1373,6 @@ class TabStripModel {
 
   // Takes the |selection| change and decides whether to forget the openers.
   void OnActiveTabChanged(const TabStripSelectionChange& selection);
-
-  // Checks if policy allows a tab to be closed.
-  bool PolicyAllowsTabClosing(content::WebContents* contents) const;
 
   // Determine where to shift selection after a tab or collection is closed.
   std::optional<int> DetermineNewSelectedIndex(
