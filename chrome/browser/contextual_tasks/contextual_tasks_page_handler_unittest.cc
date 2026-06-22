@@ -134,7 +134,7 @@ class ContextualTasksPageHandlerTest : public ChromeRenderViewHostTestHarness {
         {kContextualTasksContextLibrary,
          kEnableContextualTasksPinButtonInToolbar,
          feature_engagement::kIPHSidePanelContextualTasksPinnableFeature},
-        {});
+        {kContextualTasksHideMenuOnAiPage});
     InitializeActionIdStringMapping();
 #else
     feature_list_.InitWithFeatures(
@@ -678,6 +678,31 @@ TEST_F(ContextualTasksPageHandlerTest, MaybeTriggerPinningPromo_Success) {
   // The pinning promo is expected to be tried.
   EXPECT_CALL(mock_user_education, MaybeShowFeaturePromo(testing::Matcher<user_education::FeaturePromoParams>(testing::_)))
       .WillOnce(testing::Return(true));
+
+  page_handler_->MaybeTriggerPinningPromo();
+}
+
+TEST_F(ContextualTasksPageHandlerTest, MaybeTriggerPinningPromo_HideMenuOnAiPageEnabled) {
+  base::test::ScopedFeatureList test_features;
+  test_features.InitAndEnableFeature(kContextualTasksHideMenuOnAiPage);
+
+  NiceMock<MockBrowserWindowInterface> mock_browser_window;
+  ui::UnownedUserDataHost window_user_data_host;
+  ON_CALL(mock_browser_window, GetUnownedUserDataHost())
+      .WillByDefault(ReturnRef(window_user_data_host));
+  ON_CALL(mock_browser_window, GetProfile())
+      .WillByDefault(Return(profile()));
+
+  // Instantiating MockBrowserUserEducationInterface automatically attaches it
+  // to the mock_browser_window (via the UnownedUserDataHost).
+  MockBrowserUserEducationInterface mock_user_education(&mock_browser_window);
+
+  EXPECT_CALL(*mock_panel_controller_, IsPanelOpenForContextualTask())
+      .WillOnce(testing::Return(true));
+
+  // The pinning promo is not expected to be tried.
+  EXPECT_CALL(mock_user_education, MaybeShowFeaturePromo(testing::Matcher<user_education::FeaturePromoParams>(testing::_)))
+      .Times(0);
 
   page_handler_->MaybeTriggerPinningPromo();
 }
