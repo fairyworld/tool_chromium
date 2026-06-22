@@ -575,7 +575,7 @@ IN_PROC_BROWSER_TEST_F(
                                   Not(IsEmpty()))),
                     Contains(Pair(HatsDialog::kHatsPsdNewExtensionName,
                                   "Search Override Extension")))))
-            .WillOnce(testing::Return(true));
+            .WillOnce(testing::Return(HatsService::LaunchError::kNone));
       }),
       PressButton(kNewSettingButtonId), PressButton(kSaveButtonId),
       WaitForHide(kSaveButtonId));
@@ -603,7 +603,7 @@ IN_PROC_BROWSER_TEST_F(
                             Contains(Pair(
                                 HatsDialog::kHatsPsdUserChoice,
                                 HatsDialog::kHatsUserChoicePreviousProvider)))))
-            .WillOnce(testing::Return(true));
+            .WillOnce(testing::Return(HatsService::LaunchError::kNone));
       }),
       PressButton(kPreviousSettingButtonId), PressButton(kSaveButtonId),
       WaitForHide(kSaveButtonId));
@@ -742,7 +742,7 @@ IN_PROC_BROWSER_TEST_F(SettingsOverriddenLegacyDialogHatsInteractiveUiTest,
                             // covered in other HaTS tests.
                             Contains(Pair(HatsDialog::kHatsPsdNewExtensionName,
                                           "Search Override Extension")))))
-            .WillOnce(testing::Return(true));
+            .WillOnce(testing::Return(HatsService::LaunchError::kNone));
       }),
       // Press "Keep it" button.
       PressButton(kKeepItButtonId), WaitForHide(kKeepItButtonId));
