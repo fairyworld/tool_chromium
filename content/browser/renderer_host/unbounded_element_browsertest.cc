@@ -38,6 +38,9 @@ class UnboundedElementBrowserTest : public ContentBrowserTest {
 #if BUILDFLAG(IS_ANDROID)
     // TODO(crbug.com/508672616): Not yet implemented on Android.
     GTEST_SKIP();
+#elif BUILDFLAG(IS_LINUX)
+    // TODO(crbug.com/525899641): Flaky/failing on Linux Aura/Wayland.
+    GTEST_SKIP();
 #else
     feature_list_.InitWithFeatures(
         {blink::features::kUnboundedElement,
