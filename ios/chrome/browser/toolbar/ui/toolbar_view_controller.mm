@@ -436,6 +436,10 @@ const base::TimeDelta kProgressBarEndAnimationDuration =
 - (void)setAssistantButtonVisible:(BOOL)visible enabled:(BOOL)enabled {
   _assistantButton.forceHidden = !visible;
   _assistantButton.enabled = enabled;
+  if (self.isViewLoaded) {
+    [self updateButtons:@[ _assistantButton ]
+        forFullscreenProgress:_fullscreenProgress];
+  }
 }
 
 - (void)setCanGoBack:(BOOL)canGoBack {
