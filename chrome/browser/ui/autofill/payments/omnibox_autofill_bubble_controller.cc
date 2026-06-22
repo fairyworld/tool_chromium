@@ -4,6 +4,11 @@
 
 #include "chrome/browser/ui/autofill/payments/omnibox_autofill_bubble_controller.h"
 
+#include "chrome/browser/ui/autofill/autofill_bubble_handler.h"
+#include "chrome/browser/ui/browser_window.h"
+#include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
+#include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
+#include "components/autofill/core/browser/ui/payments/payments_ui_closed_reasons.h"
 #include "components/tabs/public/tab_interface.h"
 #include "content/public/browser/web_contents.h"
 #include "ui/base/unowned_user_data/scoped_unowned_user_data.h"
@@ -52,7 +57,31 @@ OmniboxAutofillBubbleController::GetBubbleControllerBaseWeakPtr() {
 }
 
 void OmniboxAutofillBubbleController::DoShowBubble() {
-  // TODO(crbug.com/490214497): Display payment method suggestion list.
+  BrowserWindowInterface* browser =
+      GlobalBrowserCollection::GetInstance()->FindBrowserWithTab(
+          web_contents());
+  if (!browser) {
+    return;
+  }
+  BrowserWindow* browser_window = BrowserWindow::FromBrowser(browser);
+  if (!browser_window) {
+    return;
+  }
+  if (AutofillBubbleBase* bubble_view =
+          browser_window->GetAutofillBubbleHandler()->ShowOmniboxAutofillBubble(
+              web_contents(), this)) {
+    SetBubbleView(*bubble_view);
+  }
+}
+
+void OmniboxAutofillBubbleController::OnBubbleClosed(
+    PaymentsUiClosedReason reason) {
+  ResetBubbleViewAndInformBubbleManager();
+}
+
+base::WeakPtr<OmniboxAutofillBubbleController>
+OmniboxAutofillBubbleController::GetWeakPtr() {
+  return weak_ptr_factory_.GetWeakPtr();
 }
 
 }  // namespace autofill

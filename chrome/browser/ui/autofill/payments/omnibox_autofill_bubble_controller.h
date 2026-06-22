@@ -22,6 +22,9 @@ class TabInterface;
 
 namespace autofill {
 
+class AutofillBubbleBase;
+enum class PaymentsUiClosedReason;
+
 // Controller class that exposes functionality to omnibox autofill bubbles.
 // Owned by TabFeatures.
 class OmniboxAutofillBubbleController : public AutofillBubbleControllerBase {
@@ -54,6 +57,12 @@ class OmniboxAutofillBubbleController : public AutofillBubbleControllerBase {
           void(const Suggestion&,
                const AutofillSuggestionDelegate::SuggestionMetadata&)>
           did_accept_suggestion);
+
+  AutofillBubbleBase* GetBubbleView() const { return bubble_view(); }
+
+  void OnBubbleClosed(PaymentsUiClosedReason reason);
+
+  base::WeakPtr<OmniboxAutofillBubbleController> GetWeakPtr();
 
  protected:
   void DoShowBubble() override;
