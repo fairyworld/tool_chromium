@@ -4321,6 +4321,26 @@ TEST_F(BrowserAutofillManagerTest, DontSaveCvcInAutocompleteHistory) {
   EXPECT_FALSE(form_seen_by_ahm.fields()[1].should_autocomplete());
   EXPECT_TRUE(form_seen_by_ahm.fields()[2].should_autocomplete());
 }
+
+// Test that inputs detected to be standalone CVC inputs are forced to
+// !should_autocomplete for SingleFieldFillRouter::OnWillSubmitForm.
+TEST_F(BrowserAutofillManagerTest, DontSaveStandaloneCvcInAutocompleteHistory) {
+  FormData form_seen_by_ahm;
+  EXPECT_CALL(single_field_fill_router(),
+              OnWillSubmitForm(_, _, /*is_autocomplete_enabled=*/true))
+      .WillOnce(SaveArg<0>(&form_seen_by_ahm));
+
+  FormData form = test::GetFormData(
+      {.fields = {{.role = CREDIT_CARD_STANDALONE_VERIFICATION_CODE,
+                   .value = u"123"}}});
+  autofill_manager().AddSeenForm(form,
+                                 {CREDIT_CARD_STANDALONE_VERIFICATION_CODE});
+  FormSubmitted(form);
+
+  ASSERT_EQ(1u, form_seen_by_ahm.fields().size());
+  EXPECT_FALSE(form_seen_by_ahm.fields()[0].should_autocomplete());
+}
+
 // Test that autofilled loyalty card fields are forced to !should_autocomplete.
 TEST_F(BrowserAutofillManagerTest,
        DontSaveAutofilledLoyaltyCardsInAutocompleteHistory) {

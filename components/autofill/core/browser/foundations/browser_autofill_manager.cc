@@ -643,8 +643,9 @@ void MaybeImportFromSubmittedForm(AutofillClient& client,
       form_structure,
       [&](const std::unique_ptr<AutofillField>& autofill_field) {
         FormFieldData field = *autofill_field;
-        if (autofill_field->Type().GetCreditCardType() ==
-            CREDIT_CARD_VERIFICATION_CODE) {
+        FieldType cc_type = autofill_field->Type().GetCreditCardType();
+        if (cc_type == CREDIT_CARD_VERIFICATION_CODE ||
+            cc_type == CREDIT_CARD_STANDALONE_VERIFICATION_CODE) {
           // However, if Autofill has recognized a field as CVC, that shouldn't
           // be saved.
           field.set_should_autocomplete(false);

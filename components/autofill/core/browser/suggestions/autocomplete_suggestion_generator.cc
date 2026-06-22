@@ -99,15 +99,15 @@ void AutocompleteSuggestionGenerator::GenerateSuggestions(
   }
 
   // Do not offer autocomplete suggestions for credit card number, cvc, and
-  // expiration date related fields. Standalone cvc fields (used to
-  // re-authenticate the use of a credit card the website has on file) will be
-  // handled separately because those have the field type
-  // CREDIT_CARD_STANDALONE_VERIFICATION_CODE.
+  // expiration date related fields, including standalone CVC fields (used to
+  // re-authenticate the use of a credit card the website has on file).
   if (FieldType type = trigger_autofill_field
                            ? trigger_autofill_field->Type().GetCreditCardType()
                            : UNKNOWN_TYPE;
       data_util::IsCreditCardExpirationType(type) ||
-      type == CREDIT_CARD_VERIFICATION_CODE || type == CREDIT_CARD_NUMBER) {
+      type == CREDIT_CARD_VERIFICATION_CODE ||
+      type == CREDIT_CARD_STANDALONE_VERIFICATION_CODE ||
+      type == CREDIT_CARD_NUMBER) {
     std::move(callback).Run({SuggestionDataSource::kAutocomplete, {}});
     return;
   }
