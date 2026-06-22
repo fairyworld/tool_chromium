@@ -6676,6 +6676,9 @@ Called by update_use_counter_feature_enum.py.-->
   <int value="5929" label="DownloadFromAdScript"/>
   <int value="5930" label="CompositorKeyframeSnapshotMissing"/>
   <int value="5931" label="TimelineTrigger"/>
+  <int value="5932" label="ContainerTimingAttribute"/>
+  <int value="5933" label="ContainerTimingAttributeHasRootName"/>
+  <int value="5934" label="ContainerTimingIgnoreAttribute"/>
 </enum>
 
 <!-- LINT.ThenChange(//third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom:WebFeature) -->
