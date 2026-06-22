@@ -558,8 +558,7 @@ GLES2Implementation::CopySharedImageDirectlyToGLTexture(
 
     // Trigger resource allocation for dst texture to back SkSurface.
     BindAndTexImage2D(this, dst_target, dst_texture, dst_internal_format,
-                      dst_format, dst_type,
-                      /*level=*/0, src_rect.size());
+                      dst_format, dst_type, dst_level, src_rect.size());
 
     destination_access = source_shared_image->BeginGLAccessForCopySharedImage(
         this, source_sync_token, /*readonly=*/true);
