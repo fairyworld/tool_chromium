@@ -7591,11 +7591,6 @@ inline constexpr char kLauncherContinueSectionWithRecentsDescription[] =
     "Adds Google Drive file suggestions based on users' recent activity to "
     "\"Continue where you left off\" section in Launcher.";
 
-inline constexpr char kLauncherItemSuggestName[] = "Launcher ItemSuggest";
-inline constexpr char kLauncherItemSuggestDescription[] =
-    "Allows configuration of experiment parameters for ItemSuggest in the "
-    "launcher.";
-
 inline constexpr char kLimitShelfItemsToActiveDeskName[] =
     "Limit Shelf items to active desk";
 inline constexpr char kLimitShelfItemsToActiveDeskDescription[] =

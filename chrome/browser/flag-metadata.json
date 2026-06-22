@@ -6156,11 +6156,6 @@
     "expiry_milestone": 130
   },
   {
-    "name": "launcher-item-suggest",
-    "owners": ["wrong@chromium.org", "amandadeacon@chromium.org", "tby@chromium.org"],
-    "expiry_milestone": 115
-  },
-  {
     "name": "launcher-local-image-search",
     "owners": ["chenjih@google.com", "nbowe@chromium.org"],
     "expiry_milestone": 150
