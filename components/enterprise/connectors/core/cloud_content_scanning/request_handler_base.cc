@@ -68,7 +68,7 @@ std::string RequestHandlerBase::access_point_string() const {
     case DeepScanAccessPoint::DOWNLOAD:
       return kFileDownloadDataTransferEventTrigger;
     case DeepScanAccessPoint::PRINT:
-      break;
+      return kPagePrintDataTransferEventTrigger;
   }
   NOTREACHED();
 }
