@@ -46,16 +46,8 @@ bool ContainsCommand(const ui::MenuModel* menu,
 }  // namespace
 
 class SystemMenuModelBuilderGlicTest : public InProcessBrowserTest {
- protected:
-  void SetUp() override {
-    scoped_feature_list_.InitWithFeatures(
-        {tabs::kHorizontalTabStripComboButton}, {});
-    InProcessBrowserTest::SetUp();
-  }
-
  private:
   glic::GlicTestEnvironment glic_test_env_;
-  base::test::ScopedFeatureList scoped_feature_list_;
 };
 
 // Check if the toggle tab search pinning option exists and has the right label
@@ -114,16 +106,7 @@ IN_PROC_BROWSER_TEST_F(SystemMenuModelBuilderGlicTest,
   EXPECT_FALSE(profile_prefs->GetBoolean(prefs::kTabSearchPinnedToTabstrip));
 }
 
-class SystemMenuModelBuilderSimplificationTest : public InProcessBrowserTest {
- protected:
-  void SetUp() override {
-    scoped_feature_list_.InitAndEnableFeature(features::kMenuSimplification);
-    InProcessBrowserTest::SetUp();
-  }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
-};
+class SystemMenuModelBuilderSimplificationTest : public InProcessBrowserTest {};
 
 #if BUILDFLAG(IS_WIN)
 IN_PROC_BROWSER_TEST_F(SystemMenuModelBuilderSimplificationTest,

@@ -20,7 +20,6 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/frame/window_frame_util.h"
 #include "chrome/browser/ui/layout_constants.h"
-#include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/tabs/tab_menu_model.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
 #include "chrome/browser/ui/tabs/tab_strip_prefs.h"
@@ -34,7 +33,6 @@
 #include "chrome/browser/ui/views/tabs/new_tab_button.h"
 #include "chrome/browser/ui/views/tabs/shared/tab_strip_combo_button.h"
 #include "chrome/browser/ui/views/tabs/shared/tab_strip_flat_edge_button.h"
-#include "chrome/browser/ui/views/tabs/tab_search_button.h"
 #include "chrome/browser/ui/views/tabs/tab_strip.h"
 #include "chrome/browser/ui/views/tabs/tab_strip_action_container.h"
 #include "chrome/browser/ui/views/tabs/tab_strip_control_button.h"
@@ -182,8 +180,7 @@ HorizontalTabStripRegionView::HorizontalTabStripRegionView(
   BrowserWindowInterface* const browser = browser_view->browser();
 
   if (browser &&
-      (browser->GetType() == BrowserWindowInterface::Type::TYPE_NORMAL) &&
-      base::FeatureList::IsEnabled(tabs::kHorizontalTabStripComboButton)) {
+      (browser->GetType() == BrowserWindowInterface::Type::TYPE_NORMAL)) {
     combo_button_ = AddChildView(std::make_unique<TabStripComboButton>(
         browser, TabStripComboButton::Context::kHorizontalTabStrip));
     combo_button_->SetProperty(views::kCrossAxisAlignmentKey,
@@ -210,8 +207,7 @@ HorizontalTabStripRegionView::HorizontalTabStripRegionView(
                                  views::LayoutAlignment::kCenter);
   }
 
-  // Add and configure the TabSearchButton and TabStripComboButton.
-  std::unique_ptr<TabSearchButton> tab_search_button;
+  // Add and configure the TabStripComboButton.
   std::unique_ptr<TabStripActionContainer> tab_strip_action_container;
   if (browser &&
       (browser->GetType() == BrowserWindowInterface::Type::TYPE_NORMAL)) {
@@ -225,24 +221,7 @@ HorizontalTabStripRegionView::HorizontalTabStripRegionView(
           browser, browser->GetFeatures().glic_nudge_controller());
       tab_strip_action_container->SetProperty(views::kCrossAxisAlignmentKey,
                                               views::LayoutAlignment::kStart);
-    } else if (!base::FeatureList::IsEnabled(
-                   tabs::kHorizontalTabStripComboButton)) {
-      tab_search_button =
-          std::make_unique<TabSearchButton>(browser, Edge::kNone, Edge::kNone);
-      tab_search_button->SetProperty(views::kCrossAxisAlignmentKey,
-                                     views::LayoutAlignment::kCenter);
     }
-  }
-
-  if (tab_search_button) {
-    tab_search_button->SetPaintToLayer();
-    tab_search_button->layer()->SetFillsBoundsOpaquely(false);
-
-    tab_search_button_ = AddChildView(std::move(tab_search_button));
-
-    // Inset between the tabsearch and tabstrip should be reduced to account for
-    // extra spacing.
-    tab_search_button_->SetProperty(views::kViewIgnoredByLayoutKey, true);
   }
 
   tab_strip_ = AddChildView(CreateTabStrip(this, browser_view));
@@ -311,9 +290,6 @@ HorizontalTabStripRegionView::~HorizontalTabStripRegionView() {
   if (unfocus_button_) {
     RemoveChildViewT(std::exchange(unfocus_button_, nullptr));
   }
-  if (tab_search_button_) {
-    RemoveChildViewT(std::exchange(tab_search_button_, nullptr));
-  }
 }
 
 bool HorizontalTabStripRegionView::IsPositionInWindowCaption(
@@ -323,10 +299,6 @@ bool HorizontalTabStripRegionView::IsPositionInWindowCaption(
   }
 
   if (combo_button_ && IsHitInView(combo_button_, point)) {
-    return false;
-  }
-
-  if (tab_search_button_ && IsHitInView(tab_search_button_, point)) {
     return false;
   }
 
@@ -376,10 +348,6 @@ views::View::Views HorizontalTabStripRegionView::GetChildrenInZOrder() {
     children.emplace_back(unfocus_button_.get());
   }
 
-  if (tab_search_button_) {
-    children.emplace_back(tab_search_button_.get());
-  }
-
   if (tab_strip_action_container_) {
     children.emplace_back(tab_strip_action_container_.get());
   }
@@ -403,11 +371,6 @@ void HorizontalTabStripRegionView::Layout(PassKey) {
   LayoutSuperclass<views::AccessiblePaneView>(this);
 
   int leading_offset = 0;
-  if (tab_search_button_) {
-    AdjustViewBoundsRect(tab_search_button_, leading_offset);
-    leading_offset += tab_search_button_->GetPreferredSize().width() +
-                      GetLayoutConstant(LayoutConstant::kTabStripPadding);
-  }
 
   if (unfocus_button_ && unfocus_button_->GetVisible()) {
     AdjustViewBoundsRect(unfocus_button_, leading_offset);
@@ -511,7 +474,7 @@ views::Button* HorizontalTabStripRegionView::GetTabSearchButton() {
   if (combo_button_) {
     return combo_button_->end_button();
   }
-  return tab_search_button_;
+  return nullptr;
 }
 
 views::LabelButton* HorizontalTabStripRegionView::GetGlicButton() {
@@ -642,9 +605,6 @@ bool HorizontalTabStripRegionView::HasLeadingButtons() const {
   if (unfocus_button_ && unfocus_button_->GetVisible()) {
     return true;
   }
-  if (tab_search_button_ && tab_search_button_->GetVisible()) {
-    return true;
-  }
   return false;
 }
 
@@ -683,9 +643,6 @@ void HorizontalTabStripRegionView::UpdateButtonBorders() {
   if (unfocus_button_) {
     UpdateBorderInsetsIfNeeded(unfocus_button_, border_insets);
   }
-  if (tab_search_button_) {
-    UpdateBorderInsetsIfNeeded(tab_search_button_, border_insets);
-  }
 }
 
 void HorizontalTabStripRegionView::UpdateTabStripMargin() {
@@ -721,14 +678,6 @@ void HorizontalTabStripRegionView::UpdateTabStripMargin() {
   // tabstrip, so give it the same treatment.
   std::optional<int> tab_strip_left_margin;
   int current_leading_width = 0;
-
-  if (tab_search_button_) {
-    // The `tab_search_button_` is being laid out manually.
-    CHECK(tab_search_button_->GetProperty(views::kViewIgnoredByLayoutKey));
-    current_leading_width +=
-        tab_search_button_->GetPreferredSize().width() +
-        GetLayoutConstant(LayoutConstant::kTabStripPadding);
-  }
 
   if (unfocus_button_ && unfocus_button_->GetVisible()) {
     unfocus_button_->SetPaintToLayer();
