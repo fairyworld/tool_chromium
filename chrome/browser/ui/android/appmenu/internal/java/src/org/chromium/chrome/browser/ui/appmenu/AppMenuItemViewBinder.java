@@ -55,7 +55,7 @@ class AppMenuItemViewBinder {
         R.id.button_wrapper_five
     };
 
-    public static void bindStandardItem(PropertyModel model, View view, PropertyKey key) {
+    /* package */ static void bindStandardItem(PropertyModel model, View view, PropertyKey key) {
         if (key == AppMenuItemProperties.MENU_ITEM_ID) {
             int id = model.get(AppMenuItemProperties.MENU_ITEM_ID);
             view.setId(id);
@@ -105,7 +105,7 @@ class AppMenuItemViewBinder {
         }
     }
 
-    public static void bindHeaderItem(PropertyModel model, View view, PropertyKey key) {
+    /* package */ static void bindHeaderItem(PropertyModel model, View view, PropertyKey key) {
         if (key == AppMenuItemProperties.MENU_ITEM_ID) {
             int id = model.get(AppMenuItemProperties.MENU_ITEM_ID);
             view.setId(id);
@@ -116,7 +116,7 @@ class AppMenuItemViewBinder {
         }
     }
 
-    public static void bindTitleButtonItem(PropertyModel model, View view, PropertyKey key) {
+    /* package */ static void bindTitleButtonItem(PropertyModel model, View view, PropertyKey key) {
         bindStandardItem(model, view, key);
 
         if (key == AppMenuItemProperties.ADDITIONAL_ICONS) {
@@ -189,7 +189,7 @@ class AppMenuItemViewBinder {
         }
     }
 
-    public static void bindIconRowItem(PropertyModel model, View view, PropertyKey key) {
+    /* package */ static void bindIconRowItem(PropertyModel model, View view, PropertyKey key) {
         if (key == AppMenuItemProperties.ADDITIONAL_ICONS) {
             // Obtain from the current theme a typed array containing all the attributes.
             TypedArray typedArray =
@@ -253,7 +253,7 @@ class AppMenuItemViewBinder {
         }
     }
 
-    public static @Px int getIconRowItemPixelHeight(Context context, PropertyModel model) {
+    /* package */ static @Px int getIconRowItemPixelHeight(Context context, PropertyModel model) {
         TypedArray a =
                 context.obtainStyledAttributes(
                         new int[] {R.attr.minInteractTargetSize, R.attr.appMenuIconRowPadding});
@@ -272,7 +272,7 @@ class AppMenuItemViewBinder {
         return height;
     }
 
-    public static @Px int getSubmenuHeaderPixelHeight(Context context, PropertyModel model) {
+    /* package */ static @Px int getSubmenuHeaderPixelHeight(Context context, PropertyModel model) {
         if (model.get(AppMenuSubmenuHeaderItemProperties.SHOULD_SHOW_ICON_ROW)) {
             return getIconRowItemPixelHeight(context, model);
         } else {
@@ -280,11 +280,11 @@ class AppMenuItemViewBinder {
         }
     }
 
-    public static @Px int getHeaderPixelHeight(Context context, PropertyModel model) {
+    /* package */ static @Px int getHeaderPixelHeight(Context context, PropertyModel model) {
         return context.getResources().getDimensionPixelSize(R.dimen.menu_header_height);
     }
 
-    public static void bindItemWithSubmenu(PropertyModel model, View view, PropertyKey key) {
+    /* package */ static void bindItemWithSubmenu(PropertyModel model, View view, PropertyKey key) {
         bindStandardItem(model, view, key);
 
         if (key == AppMenuItemWithSubmenuProperties.IS_EXPANDED) {
@@ -295,7 +295,7 @@ class AppMenuItemViewBinder {
         }
     }
 
-    public static void bindSubmenuHeader(PropertyModel model, View view, PropertyKey key) {
+    /* package */ static void bindSubmenuHeader(PropertyModel model, View view, PropertyKey key) {
         bindStandardItem(model, view, key);
 
         if (key == AppMenuItemWithSubmenuProperties.CLICK_LISTENER) {
@@ -308,7 +308,7 @@ class AppMenuItemViewBinder {
         }
     }
 
-    public static void setContentDescription(View view, final PropertyModel model) {
+    /* package */ static void setContentDescription(View view, final PropertyModel model) {
         CharSequence titleCondensed = model.get(AppMenuItemProperties.TITLE_CONDENSED);
         if (TextUtils.isEmpty(titleCondensed)) {
             view.setContentDescription(null);
