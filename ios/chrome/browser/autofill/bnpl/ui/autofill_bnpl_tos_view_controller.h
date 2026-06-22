@@ -10,16 +10,8 @@
 
 @class AutofillBnplTosViewController;
 
-// Delegate protocol to handle user actions in the Terms of Service view.
+// Delegate protocol to handle navigation actions in the Terms of Service view.
 @protocol AutofillBnplTosViewControllerDelegate <NSObject>
-
-// Called when the user clicks the primary "Continue" button.
-- (void)didTapContinueInTosViewController:
-    (AutofillBnplTosViewController*)viewController;
-
-// Called when the user clicks the secondary "Cancel" button.
-- (void)didTapCancelInTosViewController:
-    (AutofillBnplTosViewController*)viewController;
 
 // Called when the user clicks a hyperlink inside the legal text.
 - (void)tosViewController:(AutofillBnplTosViewController*)viewController
@@ -27,12 +19,26 @@
 
 @end
 
+// Mutator protocol to handle user mutation actions directly on the mediator.
+@protocol AutofillBnplTosMutator <NSObject>
+
+// Called when the user clicks the primary "Continue" button.
+- (void)didTapContinue;
+
+// Called when the user clicks the secondary "Cancel" button.
+- (void)didTapCancel;
+
+@end
+
 // View Controller rendering the BNPL Terms of Service bottom sheet.
 @interface AutofillBnplTosViewController
     : ConfirmationAlertViewController <AutofillBnplTosConsumer>
 
-// The delegate for action events.
+// The delegate for navigation events.
 @property(nonatomic, weak) id<AutofillBnplTosViewControllerDelegate> delegate;
+
+// The mutator for user actions.
+@property(nonatomic, weak) id<AutofillBnplTosMutator> mutator;
 
 @end
 

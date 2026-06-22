@@ -12,6 +12,7 @@
 #import "components/autofill/core/browser/payments/test_legal_message_line.h"
 #import "components/strings/grit/components_strings.h"
 #import "ios/chrome/browser/autofill/bnpl/ui/autofill_bnpl_tos_consumer.h"
+#import "ios/chrome/browser/autofill/bnpl/ui/autofill_bnpl_tos_coordinator.h"
 #import "ios/chrome/browser/shared/ui/symbols/symbols.h"
 #import "testing/gtest/include/gtest/gtest.h"
 #import "testing/gtest_mac.h"
@@ -24,8 +25,6 @@ class AutofillBnplTosMediatorTest : public PlatformTest {
  protected:
   AutofillBnplTosMediatorTest() {
     mock_consumer_ = OCMProtocolMock(@protocol(AutofillBnplTosConsumer));
-    mock_delegate_ =
-        OCMProtocolMock(@protocol(AutofillBnplTosMediatorDelegate));
   }
 
   autofill::payments::BnplTosModel CreateTestModel(bool linked) {
@@ -51,19 +50,18 @@ class AutofillBnplTosMediatorTest : public PlatformTest {
   }
 
   id mock_consumer_;
-  id mock_delegate_;
 };
 
 // Tests that the mediator correctly populates the consumer for an unlinked
 // issuer.
 TEST_F(AutofillBnplTosMediatorTest, PopulateConsumerUnlinked) {
-  base::OnceClosure accept_closure = base::DoNothing();
-  base::OnceClosure cancel_closure = base::DoNothing();
+  auto callbacks = std::make_unique<BnplCallbacks>();
+  callbacks->accept_callback = base::DoNothing();
+  callbacks->cancel_callback = base::DoNothing();
 
   AutofillBnplTosMediator* mediator = [[AutofillBnplTosMediator alloc]
-       initWithModel:CreateTestModel(/*linked=*/false)
-      acceptCallback:std::move(accept_closure)
-      cancelCallback:std::move(cancel_closure)];
+      initWithModel:CreateTestModel(/*linked=*/false)
+          callbacks:std::move(callbacks)];
 
   NSString* expectedTitle = l10n_util::GetNSStringF(
       IDS_AUTOFILL_BNPL_TOS_UNLINKED_TITLE,
@@ -117,13 +115,13 @@ TEST_F(AutofillBnplTosMediatorTest, PopulateConsumerUnlinked) {
 
 // Tests that the mediator correctly populates the consumer for a linked issuer.
 TEST_F(AutofillBnplTosMediatorTest, PopulateConsumerLinked) {
-  base::OnceClosure accept_closure = base::DoNothing();
-  base::OnceClosure cancel_closure = base::DoNothing();
+  auto callbacks = std::make_unique<BnplCallbacks>();
+  callbacks->accept_callback = base::DoNothing();
+  callbacks->cancel_callback = base::DoNothing();
 
   AutofillBnplTosMediator* mediator = [[AutofillBnplTosMediator alloc]
-       initWithModel:CreateTestModel(/*linked=*/true)
-      acceptCallback:std::move(accept_closure)
-      cancelCallback:std::move(cancel_closure)];
+      initWithModel:CreateTestModel(/*linked=*/true)
+          callbacks:std::move(callbacks)];
 
   NSString* expectedTitle = l10n_util::GetNSStringF(
       IDS_AUTOFILL_BNPL_TOS_LINKED_TITLE,
@@ -139,46 +137,36 @@ TEST_F(AutofillBnplTosMediatorTest, PopulateConsumerLinked) {
   [mock_consumer_ verify];
 }
 
-// Tests that accepting the ToS triggers the C++ callback and mediator delegate.
+// Tests that accepting the ToS triggers the C++ callback.
 TEST_F(AutofillBnplTosMediatorTest, AcceptCallbackTriggered) {
   __block bool accept_callback_run = false;
-  base::OnceClosure accept_closure =
+  auto callbacks = std::make_unique<BnplCallbacks>();
+  callbacks->accept_callback =
       base::BindOnce([](bool* run) { *run = true; }, &accept_callback_run);
-  base::OnceClosure cancel_closure = base::DoNothing();
+  callbacks->cancel_callback = base::DoNothing();
 
   AutofillBnplTosMediator* mediator = [[AutofillBnplTosMediator alloc]
-       initWithModel:CreateTestModel(/*linked=*/false)
-      acceptCallback:std::move(accept_closure)
-      cancelCallback:std::move(cancel_closure)];
-
-  OCMExpect([mock_delegate_ tosMediatorDidAccept:mediator]);
-
-  mediator.delegate = mock_delegate_;
+      initWithModel:CreateTestModel(/*linked=*/false)
+          callbacks:std::move(callbacks)];
 
   [mediator didTapContinue];
 
   EXPECT_TRUE(accept_callback_run);
-  [mock_delegate_ verify];
 }
 
-// Tests that canceling the ToS triggers the C++ callback and mediator delegate.
+// Tests that canceling the ToS triggers the C++ callback.
 TEST_F(AutofillBnplTosMediatorTest, CancelCallbackTriggered) {
   __block bool cancel_callback_run = false;
-  base::OnceClosure accept_closure = base::DoNothing();
-  base::OnceClosure cancel_closure =
+  auto callbacks = std::make_unique<BnplCallbacks>();
+  callbacks->accept_callback = base::DoNothing();
+  callbacks->cancel_callback =
       base::BindOnce([](bool* run) { *run = true; }, &cancel_callback_run);
 
   AutofillBnplTosMediator* mediator = [[AutofillBnplTosMediator alloc]
-       initWithModel:CreateTestModel(/*linked=*/false)
-      acceptCallback:std::move(accept_closure)
-      cancelCallback:std::move(cancel_closure)];
-
-  OCMExpect([mock_delegate_ tosMediatorDidCancel:mediator]);
-
-  mediator.delegate = mock_delegate_;
+      initWithModel:CreateTestModel(/*linked=*/false)
+          callbacks:std::move(callbacks)];
 
   [mediator didTapCancel];
 
   EXPECT_TRUE(cancel_callback_run);
-  [mock_delegate_ verify];
 }

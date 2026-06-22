@@ -111,11 +111,11 @@ constexpr CGFloat kBulletIconSize = 20.0;
 #pragma mark - ConfirmationAlertActionHandler
 
 - (void)confirmationAlertPrimaryAction {
-  [self.delegate didTapContinueInTosViewController:self];
+  [self.mutator didTapContinue];
 }
 
 - (void)confirmationAlertSecondaryAction {
-  [self.delegate didTapCancelInTosViewController:self];
+  [self.mutator didTapCancel];
 }
 
 #pragma mark - UITextViewDelegate

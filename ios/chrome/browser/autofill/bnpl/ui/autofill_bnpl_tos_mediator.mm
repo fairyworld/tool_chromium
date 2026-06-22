@@ -8,6 +8,7 @@
 #import "components/autofill/core/browser/data_model/payments/bnpl_issuer.h"
 #import "components/strings/grit/components_strings.h"
 #import "ios/chrome/browser/autofill/bnpl/ui/autofill_bnpl_tos_consumer.h"
+#import "ios/chrome/browser/autofill/bnpl/ui/autofill_bnpl_tos_coordinator.h"
 #import "ios/chrome/browser/shared/ui/symbols/symbols.h"
 #import "ios/chrome/browser/shared/ui/util/uikit_ui_util.h"
 #import "ios/chrome/common/ui/colors/semantic_color_names.h"
@@ -26,18 +27,15 @@ NSString* const kWalletUrlString = @"https://wallet.google.com/";
 
 @implementation AutofillBnplTosMediator {
   autofill::payments::BnplTosModel _model;
-  base::OnceClosure _acceptCallback;
-  base::OnceClosure _cancelCallback;
+  std::unique_ptr<BnplCallbacks> _callbacks;
 }
 
 - (instancetype)initWithModel:(autofill::payments::BnplTosModel)model
-               acceptCallback:(base::OnceClosure)acceptCallback
-               cancelCallback:(base::OnceClosure)cancelCallback {
+                    callbacks:(std::unique_ptr<BnplCallbacks>)callbacks {
   self = [super init];
   if (self) {
     _model = std::move(model);
-    _acceptCallback = std::move(acceptCallback);
-    _cancelCallback = std::move(cancelCallback);
+    _callbacks = std::move(callbacks);
   }
   return self;
 }
@@ -50,17 +48,15 @@ NSString* const kWalletUrlString = @"https://wallet.google.com/";
 }
 
 - (void)didTapContinue {
-  if (_acceptCallback) {
-    std::move(_acceptCallback).Run();
+  if (_callbacks && _callbacks->accept_callback) {
+    std::move(_callbacks->accept_callback).Run();
   }
-  [self.delegate tosMediatorDidAccept:self];
 }
 
 - (void)didTapCancel {
-  if (_cancelCallback) {
-    std::move(_cancelCallback).Run();
+  if (_callbacks && _callbacks->cancel_callback) {
+    std::move(_callbacks->cancel_callback).Run();
   }
-  [self.delegate tosMediatorDidCancel:self];
 }
 
 #pragma mark - Private Helper Methods
