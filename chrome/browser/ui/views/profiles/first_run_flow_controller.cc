@@ -408,12 +408,15 @@ class DefaultBrowserStepController : public ProfileManagementStepController {
 
 class FeatureShowcaseStepController : public ProfileManagementStepController {
  public:
-  FeatureShowcaseStepController(ProfilePickerWebContentsHost* host,
-                                Profile* profile,
-                                base::OnceClosure step_completed_callback)
+  FeatureShowcaseStepController(
+      ProfilePickerWebContentsHost* host,
+      Profile* profile,
+      base::OnceClosure step_completed_callback,
+      base::OnceCallback<void(bool)> eligibility_callback)
       : ProfileManagementStepController(host),
         profile_(profile),
-        step_completed_callback_(std::move(step_completed_callback)) {
+        step_completed_callback_(std::move(step_completed_callback)),
+        eligibility_callback_(std::move(eligibility_callback)) {
     CHECK(step_completed_callback_);
     std::vector<std::unique_ptr<FeatureShowcaseStepEligibilityChecker>>
         checkers;
@@ -426,8 +429,6 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
     tracker_ = std::make_unique<FeatureShowcaseEligibilityTracker>(
         std::move(checkers));
   }
-
-  bool is_eligible() const { return is_eligible_; }
 
   ~FeatureShowcaseStepController() override = default;
 
@@ -457,9 +458,11 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
 
  private:
   void OnEligibilityDetermined(const std::vector<std::string>& eligible_steps) {
-    is_eligible_ = !eligible_steps.empty();
+    const bool is_eligible = !eligible_steps.empty();
+    CHECK(eligibility_callback_);
+    std::move(eligibility_callback_).Run(is_eligible);
 
-    if (!is_eligible_) {
+    if (!is_eligible) {
       std::move(step_shown_callback_.value()).Run(/*success=*/false);
       std::move(step_completed_callback_).Run();
       return;
@@ -537,8 +540,8 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
   }
 
   raw_ptr<Profile> profile_;
-  bool is_eligible_ = false;
   base::OnceClosure step_completed_callback_;
+  base::OnceCallback<void(bool)> eligibility_callback_;
   StepSwitchFinishedCallback step_shown_callback_;
   std::unique_ptr<FeatureShowcaseEligibilityTracker> tracker_;
 
@@ -741,9 +744,11 @@ std::unique_ptr<ProfileManagementStepController> CreateDefaultBrowserStep(
 std::unique_ptr<ProfileManagementStepController> CreateFeatureShowcaseStep(
     ProfilePickerWebContentsHost* host,
     Profile* profile,
-    base::OnceClosure step_completed_callback) {
+    base::OnceClosure step_completed_callback,
+    base::OnceCallback<void(bool)> eligibility_callback) {
   return std::make_unique<FeatureShowcaseStepController>(
-      host, profile, std::move(step_completed_callback));
+      host, profile, std::move(step_completed_callback),
+      std::move(eligibility_callback));
 }
 
 std::unique_ptr<ProfileManagementStepController> CreateFinishOrContinueStep(
@@ -948,8 +953,18 @@ void FirstRunFlowController::RunFinishFlowCallback() {
 }
 
 std::string FirstRunFlowController::GetHatsSurveyTrigger() const {
+  const bool is_in_search_engine_choice_region =
+      IsProfileInSearchEngineChoiceRegion(profile_);
+
+  if (switches::IsFirstRunDesktopRevampEnabled(
+          is_in_search_engine_choice_region)) {
+    return is_feature_showcase_eligible_
+               ? kHatsSurveyTriggerFirstRunDesktopRevampCompleted
+               : kHatsSurveyTriggerFirstRunDesktopRevampNoFeatureShowcaseCompleted;
+  }
+
   if (switches::IsFirstRunDesktopRefreshEnabled(
-          IsProfileInSearchEngineChoiceRegion(profile_))) {
+          is_in_search_engine_choice_region)) {
     return kHatsSurveyTriggerIdentityRefreshedFirstRunCompleted;
   }
 
@@ -1066,9 +1081,10 @@ FirstRunFlowController::RegisterPostIdentitySteps(
                        base::Unretained(this));
     auto feature_showcase_step =
         std::make_unique<FeatureShowcaseStepController>(
-            host(), profile_, std::move(feature_showcase_step_completed));
-    FeatureShowcaseStepController* feature_showcase_step_ptr =
-        feature_showcase_step.get();
+            host(), profile_, std::move(feature_showcase_step_completed),
+            base::BindOnce(
+                &FirstRunFlowController::SetFeatureShowcaseEligibility,
+                base::Unretained(this)));
     RegisterStep(Step::kFeatureShowcase, std::move(feature_showcase_step));
     post_identity_steps.emplace(
         ProfileManagementFlowController::Step::kFeatureShowcase);
@@ -1080,11 +1096,11 @@ FirstRunFlowController::RegisterPostIdentitySteps(
         Step::kFinishOrContinue,
         CreateFinishOrContinueStep(
             host(),
-            base::BindOnce(&FeatureShowcaseStepController::is_eligible,
-                           // Unretained ok: sibling step controllers are
-                           // guaranteed to have the same lifetime as the
-                           // flow controller
-                           base::Unretained(feature_showcase_step_ptr)),
+            base::BindOnce(
+                &FirstRunFlowController::is_feature_showcase_eligible,
+                // Unretained ok: the callback is passed to a
+                // step that `this` will own and outlive.
+                base::Unretained(this)),
             base::BindRepeating(&FirstRunFlowController::AreEffectsEnabled,
                                 // Unretained ok: the callback is passed to a
                                 // step that `this` will own and outlive.

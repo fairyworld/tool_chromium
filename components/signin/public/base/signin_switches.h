@@ -478,6 +478,28 @@ COMPONENT_EXPORT(SIGNIN_SWITCHES)
 bool IsFirstRunDesktopRevampEnabled(bool is_in_search_engine_choice_region);
 #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+// A HaTS survey flag for the survey to gather user feedback after the changes
+// introduced with `kFirstRunDesktopRevamp` for users who are not eligible for
+// the Feature Showcase.
+//
+// NOTE: Only signed-in (excluding enterprise) users are eligible for this
+// survey.
+COMPONENT_EXPORT(SIGNIN_SWITCHES)
+BASE_DECLARE_FEATURE(kFirstRunDesktopRevampNoFeatureShowcaseSurvey);
+#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+// A HaTS survey flag for the survey to gather user feedback after the changes
+// introduced with `kFirstRunDesktopRevamp` for users who are eligible for the
+// Feature Showcase.
+//
+// NOTE: Only signed-in (excluding enterprise) users are eligible for this
+// survey.
+COMPONENT_EXPORT(SIGNIN_SWITCHES)
+BASE_DECLARE_FEATURE(kFirstRunDesktopRevampSurvey);
+#endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+
 #if BUILDFLAG(IS_ANDROID)
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kForceHistoryOptInScreen);
