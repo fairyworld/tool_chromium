@@ -807,7 +807,7 @@ void ContextualCueingController::ShowCue(
   page_action_observer_->RegisterAsPageActionObserver(*page_action_controller);
 
   contextual_cueing_service_->OnCueShown(
-      active_tab->GetContents()->GetLastCommittedURL());
+      active_tab->GetContents()->GetLastCommittedURL(), cue_type);
 #endif
 
   base::UmaHistogramSparse("ContextualCueing.ShownCueCUJ",
