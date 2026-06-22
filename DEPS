@@ -3747,7 +3747,7 @@ deps = {
 
   'src/chrome/common/request_header_integrity/internal': {
       'url': Var('chrome_git') + '/chrome/browser/request_header_integrity/internal.git' + '@' +
-        '821046a4ba7739c68d2f9098f851163d61e0bced',
+        '48df08f2b79694e9bf0651bef88c0e491641d5f1',
       'condition': 'checkout_src_internal',
   },
 
