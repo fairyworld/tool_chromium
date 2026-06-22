@@ -23,6 +23,7 @@
 #import "components/feature_engagement/public/tracker.h"
 #import "components/saved_tab_groups/public/tab_group_sync_service.h"
 #import "components/search_engines/template_url_service.h"
+#import "components/send_tab_to_self/metrics_util.h"
 #import "components/strings/grit/components_strings.h"
 #import "components/supervised_user/core/browser/supervised_user_utils.h"
 #import "ios/chrome/app/profile/first_run_profile_agent.h"
@@ -859,7 +860,6 @@ bool FindNavigatorShouldBePresentedInBrowser(Browser* browser) {
                                    completion:completionHandler];
 }
 
-
 // Called when the transition from Browser to Tab Grid is complete and whether
 // it `shouldDisplayBringAndroidTabsPrompt`.
 - (void)transitionToGridCompleteForAndroidTabsPrompt:
@@ -879,7 +879,6 @@ bool FindNavigatorShouldBePresentedInBrowser(Browser* browser) {
   SceneState* sceneState = self.regularBrowser->GetSceneState();
   sceneState.window.overrideUserInterfaceStyle = UIUserInterfaceStyleDark;
 }
-
 
 // YES if there are tabs present on `page`. Should be called for regular or
 // incognito.
@@ -1525,7 +1524,8 @@ bool FindNavigatorShouldBePresentedInBrowser(Browser* browser) {
                          browser:self.regularBrowser
                  signinPresenter:self
                              url:url
-                           title:title];
+                           title:title
+                      entryPoint:send_tab_to_self::ShareEntryPoint::kTabMenu];
   self.sendTabToSelfCoordinator.delegate = self;
 
   // Postpone the start of the coordinator to allow the context menu dismissal
@@ -1908,6 +1908,5 @@ bool FindNavigatorShouldBePresentedInBrowser(Browser* browser) {
   }
   return self.browserLayoutViewController.view;
 }
-
 
 @end

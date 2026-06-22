@@ -41,6 +41,7 @@
 #import "components/safe_browsing/core/common/features.h"
 #import "components/segmentation_platform/embedder/home_modules/tips_manager/signal_constants.h"
 #import "components/send_tab_to_self/features.h"
+#import "components/send_tab_to_self/metrics_util.h"
 #import "components/signin/public/base/signin_metrics.h"
 #import "components/supervised_user/core/browser/supervised_user_utils.h"
 #import "components/supervised_user/core/common/features.h"
@@ -2766,7 +2767,9 @@ const char kChromeAppStoreUrl[] =
   [self.addCreditCardCoordinator start];
 }
 
-- (void)showSendTabToSelfUI:(const GURL&)url title:(NSString*)title {
+- (void)showSendTabToSelfUI:(const GURL&)url
+                      title:(NSString*)title
+                 entryPoint:(send_tab_to_self::ShareEntryPoint)entryPoint {
   // According to crbug.com/472243358 a second coordinator can be opened while
   // the first one is not stopped. In doubt, let’s stop the first one.
   [_sendTabToSelfCoordinator stop];
@@ -2775,7 +2778,8 @@ const char kChromeAppStoreUrl[] =
                          browser:self.browser
                  signinPresenter:self
                              url:url
-                           title:title];
+                           title:title
+                      entryPoint:entryPoint];
   _sendTabToSelfCoordinator.delegate = self;
 
   // If there is another transition going on (e.g. dismissal of the context

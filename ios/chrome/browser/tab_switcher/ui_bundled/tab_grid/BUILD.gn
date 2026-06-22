@@ -28,6 +28,7 @@ source_set("tab_grid") {
     "//components/prefs/ios",
     "//components/saved_tab_groups/public",
     "//components/search_engines",
+    "//components/send_tab_to_self",
     "//components/signin/public/identity_manager",
     "//components/strings",
     "//components/supervised_user/core/browser",

@@ -261,6 +261,7 @@ source_set("unit_tests") {
     "//components/feature_engagement/test:test_support",
     "//components/omnibox/browser:test_support",
     "//components/search_engines",
+    "//components/send_tab_to_self",
     "//components/send_tab_to_self:features",
     "//components/strings",
     "//components/variations",

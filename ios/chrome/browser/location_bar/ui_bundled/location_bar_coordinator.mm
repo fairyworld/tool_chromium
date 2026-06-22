@@ -19,6 +19,7 @@
 #import "components/profile_metrics/browser_profile_type.h"
 #import "components/search_engines/util.h"
 #import "components/send_tab_to_self/features.h"
+#import "components/send_tab_to_self/metrics_util.h"
 #import "components/send_tab_to_self/send_tab_to_self_sync_service.h"
 #import "components/strings/grit/components_strings.h"
 #import "ios/chrome/browser/aim/model/ios_chrome_aim_eligibility_service_factory.h"
@@ -766,7 +767,11 @@ struct AIHubBadgeActiveWindowsData : public base::SupportsUserData::Data {
 
   ExecuteWhenTransitionsComplete(
       ^{
-        [browserCoordinatorHandler showSendTabToSelfUI:url title:title];
+        [browserCoordinatorHandler
+            showSendTabToSelfUI:url
+                          title:title
+                     entryPoint:send_tab_to_self::ShareEntryPoint::
+                                    kOmniboxMenu];
       },
       self.viewController);
 }

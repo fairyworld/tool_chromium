@@ -282,6 +282,7 @@ void OpenManageDevicesTab(CommandDispatcher* dispatcher) {
                                         SendTabToSelfModalDelegate,
                                         UIViewControllerTransitioningDelegate> {
   std::unique_ptr<TargetDeviceListWaiter> _targetDeviceListWaiter;
+  send_tab_to_self::ShareEntryPoint _entryPoint;
 }
 
 @property(nonatomic, weak, readonly) id<SigninPresenter> signinPresenter;
@@ -323,7 +324,8 @@ void OpenManageDevicesTab(CommandDispatcher* dispatcher) {
                          browser:(Browser*)browser
                  signinPresenter:(id<SigninPresenter>)signinPresenter
                              url:(const GURL&)url
-                           title:(NSString*)title {
+                           title:(NSString*)title
+                      entryPoint:(send_tab_to_self::ShareEntryPoint)entryPoint {
   self = [super initWithBaseViewController:baseViewController browser:browser];
   if (!self) {
     return nil;
@@ -332,6 +334,7 @@ void OpenManageDevicesTab(CommandDispatcher* dispatcher) {
   _signinPresenter = signinPresenter;
   _url = url;
   _title = title;
+  _entryPoint = entryPoint;
   _browserCoordinatorHandler = HandlerForProtocol(
       browser->GetCommandDispatcher(), BrowserCoordinatorCommands);
   return self;
@@ -344,6 +347,7 @@ void OpenManageDevicesTab(CommandDispatcher* dispatcher) {
 #pragma mark - ChromeCoordinator Methods
 
 - (void)start {
+  send_tab_to_self::RecordEntryPointInvoked(_entryPoint);
   AuthenticationService* authService =
       AuthenticationServiceFactory::GetForProfile(self.profile);
   if (!authService->SigninEnabled()) {
@@ -520,7 +524,8 @@ void OpenManageDevicesTab(CommandDispatcher* dispatcher) {
                   base::SysNSStringToUTF8(cacheGUID), pageContext,
                   send_tab_to_self::NavigationHistory(),
                   base::BindOnce(&SendTabToDeviceComplete, snackbarHandler,
-                                 base::SysNSStringToUTF8(deviceName)));
+                                 base::SysNSStringToUTF8(deviceName)),
+                  _entryPoint);
 
   if (!base::FeatureList::IsEnabled(
           send_tab_to_self::kSendTabToSelfPostSendToast)) {
@@ -576,7 +581,8 @@ void OpenManageDevicesTab(CommandDispatcher* dispatcher) {
   }
 
   size_t deviceCount = 0;
-  if (*displayReason == send_tab_to_self::EntryPointDisplayReason::kOfferFeature) {
+  if (*displayReason ==
+      send_tab_to_self::EntryPointDisplayReason::kOfferFeature) {
     send_tab_to_self::SendTabToSelfSyncService* syncService =
         SendTabToSelfSyncServiceFactory::GetForProfile(self.profile);
     if (syncService && syncService->GetSendTabToSelfModel()) {
@@ -668,7 +674,7 @@ void OpenManageDevicesTab(CommandDispatcher* dispatcher) {
     [weakSelf onSigninCompleteWithCoordinator:coordinator succeeded:succeeded];
   };
   ChangeProfileContinuationProvider provider = base::BindRepeating(
-      &CreateChangeProfileSendTabToOtherDevice, _url, self.title);
+      &CreateChangeProfileSendTabToOtherDevice, _url, self.title, _entryPoint);
   void (^prepareChangeProfile)() = ^() {
     [weakSelf prepareForChangeProfile];
   };
