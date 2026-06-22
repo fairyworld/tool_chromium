@@ -700,8 +700,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.new_incognito_tab_menu_id),
                                 item(
                                         R.id.tab_groups_parent_menu_id,
-                                        item(R.id.add_to_group_menu_id),
-                                        item(R.id.create_new_tab_group_menu_id)),
+                                        item(R.id.create_new_tab_group_menu_id),
+                                        item(R.id.add_to_group_menu_id)),
                                 item(R.id.divider_line_id),
                                 item(
                                         R.id.history_parent_menu_id,
@@ -833,8 +833,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.new_incognito_tab_menu_id),
                                 item(
                                         R.id.tab_groups_parent_menu_id,
-                                        item(R.id.add_to_group_menu_id),
-                                        item(R.id.create_new_tab_group_menu_id)),
+                                        item(R.id.create_new_tab_group_menu_id),
+                                        item(R.id.add_to_group_menu_id)),
                                 item(R.id.divider_line_id),
                                 item(
                                         R.id.history_parent_menu_id,
@@ -988,13 +988,13 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         expectedItems.add(
                 item(
                         R.id.tab_groups_parent_menu_id,
-                        item(R.id.add_to_group_menu_id),
-                        item(R.id.create_new_tab_group_menu_id)));
+                        item(R.id.create_new_tab_group_menu_id),
+                        item(R.id.add_to_group_menu_id)));
         expectedTitles.add(
                 item(
                         R.string.menu_tab_groups,
-                        item(R.string.menu_add_tab_to_new_group),
-                        item(R.string.menu_create_new_tab_group)));
+                        item(R.string.menu_create_new_tab_group),
+                        item(R.string.menu_add_tab_to_new_group)));
 
         expectedItems.add(item(R.id.divider_line_id));
         expectedTitles.add(item(0));
@@ -1384,13 +1384,13 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         expectedItems.add(
                 item(
                         R.id.tab_groups_parent_menu_id,
-                        item(R.id.add_to_group_menu_id),
-                        item(R.id.create_new_tab_group_menu_id)));
+                        item(R.id.create_new_tab_group_menu_id),
+                        item(R.id.add_to_group_menu_id)));
         expectedTitles.add(
                 item(
                         R.string.menu_tab_groups,
-                        item(R.string.menu_add_tab_to_new_group),
-                        item(R.string.menu_create_new_tab_group)));
+                        item(R.string.menu_create_new_tab_group),
+                        item(R.string.menu_add_tab_to_new_group)));
 
         expectedItems.add(item(R.id.divider_line_id));
         expectedTitles.add(item(0));
@@ -1739,13 +1739,13 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         expectedItems.add(
                 item(
                         R.id.tab_groups_parent_menu_id,
-                        item(R.id.add_to_group_menu_id),
-                        item(R.id.create_new_tab_group_menu_id)));
+                        item(R.id.create_new_tab_group_menu_id),
+                        item(R.id.add_to_group_menu_id)));
         expectedTitles.add(
                 item(
                         R.string.menu_tab_groups,
-                        item(R.string.menu_add_tab_to_new_group),
-                        item(R.string.menu_create_new_tab_group)));
+                        item(R.string.menu_create_new_tab_group),
+                        item(R.string.menu_add_tab_to_new_group)));
 
         expectedItems.add(item(R.id.divider_line_id));
         expectedTitles.add(item(0));
@@ -1960,8 +1960,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.new_incognito_tab_menu_id),
                                 item(
                                         R.id.tab_groups_parent_menu_id,
-                                        item(R.id.add_to_group_menu_id),
-                                        item(R.id.create_new_tab_group_menu_id)),
+                                        item(R.id.create_new_tab_group_menu_id),
+                                        item(R.id.add_to_group_menu_id)),
                                 item(R.id.divider_line_id),
                                 item(
                                         R.id.history_parent_menu_id,
@@ -2067,8 +2067,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.new_incognito_tab_menu_id),
                                 item(
                                         R.id.tab_groups_parent_menu_id,
-                                        item(R.id.add_to_group_menu_id),
-                                        item(R.id.create_new_tab_group_menu_id)),
+                                        item(R.id.create_new_tab_group_menu_id),
+                                        item(R.id.add_to_group_menu_id)),
                                 item(R.id.divider_line_id),
                                 item(
                                         R.id.history_parent_menu_id,
@@ -2519,8 +2519,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.new_incognito_tab_menu_id),
                                 item(
                                         R.id.tab_groups_parent_menu_id,
-                                        item(R.id.add_to_group_menu_id),
-                                        item(R.id.create_new_tab_group_menu_id)),
+                                        item(R.id.create_new_tab_group_menu_id),
+                                        item(R.id.add_to_group_menu_id)),
                                 item(R.id.divider_line_id),
                                 item(
                                         R.id.history_parent_menu_id,
@@ -2659,8 +2659,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 item(R.id.new_incognito_tab_menu_id),
                                 item(
                                         R.id.tab_groups_parent_menu_id,
-                                        item(R.id.add_to_group_menu_id),
-                                        item(R.id.create_new_tab_group_menu_id)),
+                                        item(R.id.create_new_tab_group_menu_id),
+                                        item(R.id.add_to_group_menu_id)),
                                 item(R.id.divider_line_id),
                                 item(
                                         R.id.history_parent_menu_id,
@@ -4676,8 +4676,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         List<MenuItem> expectedItems =
                 Arrays.asList(
-                        item(R.id.add_to_group_menu_id),
                         item(R.id.create_new_tab_group_menu_id),
+                        item(R.id.add_to_group_menu_id),
                         item(R.id.divider_line_id),
                         item(R.id.tab_groups_header_menu_id),
                         item(
@@ -4688,8 +4688,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
 
         List<MenuItem> expectedTitles =
                 Arrays.asList(
-                        item(R.string.menu_add_tab_to_group),
                         item(R.string.menu_create_new_tab_group),
+                        item(R.string.menu_add_tab_to_group),
                         item(0),
                         item(R.string.menu_tab_groups),
                         item("Group 1", item("Tab 1"), item("Tab 2")));
@@ -5020,7 +5020,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
         ListItem restoreItem = windowSubmenu.get(0);
         assertEquals(
                 closedWindow, restoreItem.model.get(AppMenuRecentEntryItemProperties.RECENT_ENTRY));
-        assertEquals(AppMenuHandler.AppMenuItemType.RECENT_ENTRY, restoreItem.type);
+        assertEquals(AppMenuHandler.AppMenuItemType.RECENT_ENTRY_NO_ICON, restoreItem.type);
     }
 
     @Test

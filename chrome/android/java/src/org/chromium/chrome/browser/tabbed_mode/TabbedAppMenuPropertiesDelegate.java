@@ -965,11 +965,12 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
 
     private List<ListItem> getTabGroupsSubmenuItems(@Nullable Tab currentTab, boolean showIcons) {
         List<ListItem> submenuItems = new ArrayList<>();
-        if (shouldShowAddToGroup()) {
-            submenuItems.add(buildAddToGroupItem(currentTab, showIcons));
-        }
         if (currentTab != null) {
-            submenuItems.add(buildCreateNewTabGroupItem(showIcons));
+            submenuItems.add(buildCreateNewTabGroupItem(/* showIcon= */ false));
+        }
+
+        if (shouldShowAddToGroup()) {
+            submenuItems.add(buildAddToGroupItem(currentTab, /* showIcon= */ false));
         }
 
         TabModel tabModel = mTabModelSelector.getCurrentModel();
@@ -1455,7 +1456,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                 mTabModelSelector.isTabStateInitialized())
                         .build();
 
-        return new ListItem(AppMenuHandler.AppMenuItemType.RECENT_ENTRY, model);
+        return new ListItem(AppMenuHandler.AppMenuItemType.RECENT_ENTRY_NO_ICON, model);
     }
 
     private ListItem buildClosedWindowTabMenuItem(RecentlyClosedTab tab, int windowInstanceId) {
@@ -1536,7 +1537,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                 AppMenuItemProperties.ENABLED,
                                 mTabModelSelector.isTabStateInitialized())
                         .build();
-        return new ListItem(AppMenuHandler.AppMenuItemType.RECENT_ENTRY, model);
+        return new ListItem(AppMenuHandler.AppMenuItemType.RECENT_ENTRY_NO_ICON, model);
     }
 
     private ListItem buildRecentTabMenuItem(RecentlyClosedTab tab) {

@@ -629,6 +629,10 @@ class AppMenuHandlerImpl
                 new LayoutViewBuilder<>(standardItemResId),
                 AppMenuItemViewBinder::bindStandardItem);
         adapter.registerType(
+                AppMenuItemType.RECENT_ENTRY_NO_ICON,
+                new LayoutViewBuilder<>(R.layout.menu_item_no_icon),
+                AppMenuItemViewBinder::bindStandardItem);
+        adapter.registerType(
                 AppMenuItemType.EMPTY,
                 new LayoutViewBuilder<>(R.layout.menu_item_empty),
                 AppMenuItemViewBinder::bindStandardItem);
