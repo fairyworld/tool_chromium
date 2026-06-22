@@ -199,7 +199,6 @@
 #include "chrome/browser/ui/views/sharing/sharing_dialog_view.h"
 #include "chrome/browser/ui/views/sharing_hub/screenshot/screenshot_captured_bubble.h"
 #include "chrome/browser/ui/views/sharing_hub/sharing_hub_bubble_view_impl.h"
-#include "chrome/browser/ui/views/sharing_hub/sharing_hub_icon_view.h"
 #include "chrome/browser/ui/views/side_panel/side_panel.h"
 #include "chrome/browser/ui/views/side_panel/side_panel_coordinator.h"
 #include "chrome/browser/ui/views/status_bubble_views.h"
@@ -2764,8 +2763,6 @@ void BrowserView::OnFocusBookmarksToolbar() {
   }
 }
 
-
-
 void BrowserView::FocusAppMenu() {
   // Chrome doesn't have a traditional menu bar, but it has a menu button in the
   // main toolbar that plays the same role.  If the user presses a key that
@@ -2781,8 +2778,6 @@ void BrowserView::FocusAppMenu() {
     toolbar_->SetPaneFocusAndFocusAppMenu();
   }
 }
-
-
 
 void BrowserView::TryNotifyWindowBoundsChanged(const gfx::Rect& widget_bounds) {
   if (interactive_resize_in_progress_ || last_widget_bounds_ == widget_bounds) {
@@ -3069,7 +3064,6 @@ ShowTranslateBubbleResult BrowserView::ShowTranslateBubble(
 
   return ShowTranslateBubbleResult::kSuccess;
 }
-
 
 DownloadBubbleUIController* BrowserView::GetDownloadBubbleUIController() {
 #if !BUILDFLAG(IS_CHROMEOS)
@@ -4439,8 +4433,8 @@ void BrowserView::GetAccessiblePanes(std::vector<views::View*>* panes) {
         toolbar_->location_bar_view()
             ->permission_dashboard_view()
             ->GetVisible()) {
-      panes->push_back(toolbar_->location_bar_view()
-                           ->permission_dashboard_view());
+      panes->push_back(
+          toolbar_->location_bar_view()->permission_dashboard_view());
     }
   } else if (toolbar_ && toolbar_->location_bar() &&
              toolbar_->location_bar()->GetChipController() &&

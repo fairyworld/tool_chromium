@@ -295,7 +295,6 @@ BASE_DECLARE_FEATURE_PARAM(bool, kPageActionsMigrationIntentPicker);
 BASE_DECLARE_FEATURE_PARAM(bool, kPageActionsMigrationZoom);
 BASE_DECLARE_FEATURE_PARAM(bool, kPageActionsMigrationCookieControls);
 BASE_DECLARE_FEATURE_PARAM(bool, kPageActionsMigrationAutofillMandatoryReauth);
-BASE_DECLARE_FEATURE_PARAM(bool, kPageActionsMigrationSharingHub);
 BASE_DECLARE_FEATURE_PARAM(bool, kPageActionsMigrationAiMode);
 BASE_DECLARE_FEATURE_PARAM(bool, kPageActionsMigrationVirtualCard);
 BASE_DECLARE_FEATURE_PARAM(bool, kPageActionsMigrationFilledCardInformation);

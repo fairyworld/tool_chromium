@@ -350,12 +350,6 @@ BASE_FEATURE_PARAM(bool,
                    false);
 
 BASE_FEATURE_PARAM(bool,
-                   kPageActionsMigrationSharingHub,
-                   &kPageActionsMigration,
-                   "sharing_hub",
-                   false);
-
-BASE_FEATURE_PARAM(bool,
                    kPageActionsMigrationAiMode,
                    &kPageActionsMigration,
                    "ai_mode",
