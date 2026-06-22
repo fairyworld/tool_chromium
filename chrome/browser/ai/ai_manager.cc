@@ -657,6 +657,19 @@ void CheckAndLogEligibility(
   }
 }
 
+template <typename OptionsPtr>
+uint32_t GetInputContextLimit(const OptionsPtr& options) {
+  if constexpr (std::is_same_v<OptionsPtr,
+                               blink::mojom::AISummarizerCreateOptionsPtr>) {
+    return AISummarizer::GetInputContextLimit(options);
+  }
+  if constexpr (std::is_same_v<OptionsPtr,
+                               blink::mojom::AIProofreaderCreateOptionsPtr>) {
+    return AIProofreader::GetInputContextLimit(options);
+  }
+  return blink::mojom::kWritingAssistanceMaxInputTokenSize;
+}
+
 }  // namespace
 
 // Feature flag for enabling foundational models in the AI API, requires the
@@ -1710,12 +1723,12 @@ void AIManager::OnGotExecutionInputSizeInTokens(
         blink::mojom::AIManagerCreateClientError::kUnableToCalculateTokenSize);
     return;
   }
-  uint32_t quota = blink::mojom::kWritingAssistanceMaxInputTokenSize;
-  if (result.value() > quota) {
+  uint32_t context_window_size = GetInputContextLimit(options);
+  if (result.value() > context_window_size) {
     on_device_ai::SendClientRemoteError(
         client_remote,
         blink::mojom::AIManagerCreateClientError::kInitialInputTooLarge,
-        blink::mojom::QuotaErrorInfo::New(result.value(), quota));
+        blink::mojom::QuotaErrorInfo::New(result.value(), context_window_size));
     return;
   }
   mojo::PendingRemote<ContextBoundObjectReceiverInterface> pending_remote;
