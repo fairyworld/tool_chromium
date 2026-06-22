@@ -6586,6 +6586,10 @@ class TestSSLConfigService : public SSLConfigService {
 
   SSLContextConfig GetSSLContextConfig() override { return config_; }
 
+  EchMode GetEchMode(std::string_view hostname) const override {
+    return EchMode::kOpportunistic;
+  }
+
   // Returns true if |hostname| is in domains_for_pooling_. This is a simpler
   // implementation than the production implementation in SSLConfigServiceMojo.
   bool CanShareConnectionWithClientCerts(
