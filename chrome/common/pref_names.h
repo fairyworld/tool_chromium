@@ -736,11 +736,6 @@ inline constexpr char kExtensionCommands[] = "extensions.commands";
 inline constexpr char kPluginsAlwaysOpenPdfExternally[] =
     "plugins.always_open_pdf_externally";
 
-// Int64 containing the internal value of the time at which the default browser
-// infobar was last dismissed by the user.
-inline constexpr char kDefaultBrowserInfobarLastDeclined[] =
-    "browser.default_browser_infobar_last_declined";
-
 // base::Time containing time at which the default browser infobar was last
 // dismissed by the user.
 inline constexpr char kDefaultBrowserInfobarLastDeclinedTime[] =

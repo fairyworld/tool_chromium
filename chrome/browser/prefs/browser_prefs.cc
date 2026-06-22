@@ -996,6 +996,10 @@ inline constexpr char kTabSearchPinnedToTabstripMigrationComplete[] =
 inline constexpr char kTabSearchPinnedToTabstripMigrationComplete2[] =
     "tab_search.pinned_to_tabstrip_migration_complete_2";
 
+// Deprecated 06/2026.
+inline constexpr char kDefaultBrowserInfobarLastDeclined[] =
+    "browser.default_browser_infobar_last_declined";
+
 // Register local state used only for migration (clearing or moving to a new
 // key).
 void RegisterLocalStatePrefsForMigration(PrefRegistrySimple* registry) {
@@ -1341,6 +1345,9 @@ void RegisterProfilePrefsForMigration(
                                 true);
   registry->RegisterBooleanPref(kTabSearchPinnedToTabstripMigrationComplete2,
                                 true);
+
+  // Deprecated 06/2026.
+  registry->RegisterInt64Pref(kDefaultBrowserInfobarLastDeclined, 0);
 }
 
 }  // namespace
@@ -2394,12 +2401,6 @@ void MigrateObsoleteProfilePrefs(PrefService* profile_prefs,
   // Check MigrateDeprecatedAutofillPrefs() to see if this is safe to remove.
   autofill::prefs::MigrateDeprecatedAutofillPrefs(profile_prefs);
 
-  // TODO(326079444): After experiment is over, update the deprecated date and
-  // allow this to be cleaned up.
-#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
-  MigrateDefaultBrowserLastDeclinedPref(profile_prefs);
-#endif
-
   // Added 06/2025.
   profile_prefs->ClearPref(kStorageGarbageCollect);
   profile_prefs->ClearPref(kGaiaCookiePeriodicReportTimeDeprecated);
@@ -2617,6 +2618,11 @@ void MigrateObsoleteProfilePrefs(PrefService* profile_prefs,
   profile_prefs->ClearPref(kTabSearchMigrationComplete);
   profile_prefs->ClearPref(kTabSearchPinnedToTabstripMigrationComplete);
   profile_prefs->ClearPref(kTabSearchPinnedToTabstripMigrationComplete2);
+
+  // Added 06/2026
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+  profile_prefs->ClearPref(kDefaultBrowserInfobarLastDeclined);
+#endif
 
   // Please don't delete the following line. It is used by PRESUBMIT.py.
   // END_MIGRATE_OBSOLETE_PROFILE_PREFS
