@@ -11,6 +11,7 @@
 #include "base/test/run_until.h"
 #include "base/test/task_environment.h"
 #include "components/browser_apis/tab_drag/sessions/drop_target.h"
+#include "components/browser_apis/tab_drag/sessions/drop_target_registry.h"
 #include "components/browser_apis/tab_drag/sessions/tab_drag_window_registry.h"
 #include "components/browser_apis/tab_drag/testing/toy_drop_target.h"
 #include "components/browser_apis/tab_drag/testing/toy_tab_drag_window_adapter.h"

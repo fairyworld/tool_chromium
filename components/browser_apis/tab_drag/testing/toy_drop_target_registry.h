@@ -10,7 +10,7 @@
 #include "base/memory/raw_ptr.h"
 #include "components/browser_apis/tab_drag/adapters/tab_drag_window_adapter.h"
 #include "components/browser_apis/tab_drag/sessions/drop_target_id.h"
-#include "components/browser_apis/tab_drag/sessions/tab_drag_session_injector.h"
+#include "components/browser_apis/tab_drag/sessions/drop_target_registry.h"
 
 namespace gfx {
 class Point;
