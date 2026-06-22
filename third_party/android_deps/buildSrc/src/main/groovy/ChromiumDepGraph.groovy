@@ -92,6 +92,9 @@ class ChromiumDepGraph {
                     cpePrefix: 'cpe:/a:google:guava',
                     licenseUrl: 'https://www.apache.org/licenses/LICENSE-2.0.txt',
                     licenseName: 'Apache 2.0'),
+            com_google_jimfs_jimfs: new PropertyOverride(
+                    licenseUrl: 'https://raw.githubusercontent.com/google/jimfs/refs/heads/master/LICENSE',
+                    licenseName: 'Apache 2.0'),
             com_google_mlkit_common: new PropertyOverride(
                     licenseUrl: 'https://www.apache.org/licenses/LICENSE-2.0.txt',
                     licenseName: 'Apache 2.0'),
