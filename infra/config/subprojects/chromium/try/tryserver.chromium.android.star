@@ -682,8 +682,7 @@ try_.builder(
     experiments = {
         # crbug/940930
         "chromium.enable_cleandead": 50,
-        # TODO(https://crbug.com/521401232): Increase to 100
-        "luci.buildbucket.run_in_turboci": 50,
+        "luci.buildbucket.run_in_turboci": 100,
     },
     main_list_view = "try",
 )
@@ -1117,7 +1116,7 @@ try_.orchestrator_builder(
         # crbug/940930
         "chromium.enable_cleandead": 100,
         # TODO(https://crbug.com/521401232): Increase to 100
-        "luci.buildbucket.run_in_turboci": 1,
+        "luci.buildbucket.run_in_turboci": 50,
     },
     main_list_view = "try",
     # TODO(crbug.com/20485794): Experimentally disabled. Enable after getting
