@@ -1542,7 +1542,8 @@ bool OmniboxViewViews::OnMousePressed(const ui::MouseEvent& event) {
   if (location_bar_view_ && location_bar_view_->GetOmniboxPopupView() &&
       base::FeatureList::IsEnabled(
           omnibox::kWebUIOmniboxFullPopupDoubleClick)) {
-    location_bar_view_->GetOmniboxPopupView()->PushTextToWebUI(is_double_click);
+    location_bar_view_->GetOmniboxPopupView()->SyncNativeStateToWebUI(
+        is_double_click);
   }
 
   return handled;
