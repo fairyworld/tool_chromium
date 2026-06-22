@@ -3480,7 +3480,7 @@
   {
     "name": "enable-extension-ai-data-collection",
     "owners": [ "ryansturm@chromium.org" ],
-    "expiry_milestone": 150
+    "expiry_milestone": 170
   },
   {
     "name": "enable-extension-install-policy-fetching",
