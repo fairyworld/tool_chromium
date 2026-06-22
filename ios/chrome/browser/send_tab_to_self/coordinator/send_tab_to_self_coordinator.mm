@@ -591,7 +591,8 @@ void OpenManageDevicesTab(CommandDispatcher* dispatcher) {
                         .size();
     }
   }
-  send_tab_to_self::RecordTargetDeviceCount(*displayReason, deviceCount);
+  send_tab_to_self::RecordTargetDeviceCount(_entryPoint, *displayReason,
+                                            deviceCount);
 
   switch (*displayReason) {
     case send_tab_to_self::EntryPointDisplayReason::kInformNoTargetDevice:

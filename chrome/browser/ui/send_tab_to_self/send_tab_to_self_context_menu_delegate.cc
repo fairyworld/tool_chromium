@@ -203,7 +203,8 @@ void SendTabToSelfContextMenuDelegate::OnMenuWillShow(
 
   size_t device_count =
       service->GetSendTabToSelfModel()->GetTargetDeviceInfoSortedList().size();
-  RecordTargetDeviceCount(EntryPointDisplayReason::kOfferFeature, device_count);
+  RecordTargetDeviceCount(entry_point_, EntryPointDisplayReason::kOfferFeature,
+                          device_count);
 }
 
 }  // namespace send_tab_to_self

@@ -537,15 +537,28 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="Sharing.SendTabToSelf.TargetDeviceCount"
+<histogram name="Sharing.SendTabToSelf.TargetDeviceCount{ShareEntryPoint}"
     enum="SendTabToSelfDeviceCount" expires_after="2027-06-17">
   <owner>mtatarski@google.com</owner>
   <owner>src/components/sync/OWNERS</owner>
   <summary>
-    The number of target devices when the Send Tab to Self UI is invoked.
-    Recorded when the UI is shown (or signed-out promo or no target devices
-    promo is shown).
+    The number of target devices when the Send Tab to Self UI is invoked from
+    {ShareEntryPoint}. Recorded when the UI is shown (or signed-out promo or no
+    target devices promo is shown).
   </summary>
+  <token key="ShareEntryPoint">
+    <variant name="" summary="any entry point"/>
+    <variant name=".ContentMenu" summary="the context menu on a WebContents"/>
+    <variant name=".Gesture" summary="a physical gesture"/>
+    <variant name=".LinkMenu" summary="the context menu on a link"/>
+    <variant name=".OmniboxMenu" summary="the context menu on the Omnibox"/>
+    <variant name=".ShareMenu" summary="the Share menu in the 3-dot menu"/>
+    <variant name=".ShareSheet" summary="the OS-level Share Sheet"/>
+    <variant name=".TabMenu"
+        summary="the context menu on a tab (in the tab strip or tab switcher)"/>
+    <variant name=".ToolbarIcon"
+        summary="the icon in the toolbar next to the Omnibox"/>
+  </token>
 </histogram>
 
 <histogram name="Sharing.SendTabToSelf.TimeSentToOpened" units="ms"

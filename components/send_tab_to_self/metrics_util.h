@@ -200,7 +200,8 @@ enum class SendTabToSelfDeviceCount {
 };
 // LINT.ThenChange(/tools/metrics/histograms/enums.xml:SendTabToSelfDeviceCount)
 
-void RecordTargetDeviceCount(EntryPointDisplayReason display_reason,
+void RecordTargetDeviceCount(ShareEntryPoint entry_point,
+                             EntryPointDisplayReason display_reason,
                              size_t device_count);
 
 }  // namespace send_tab_to_self

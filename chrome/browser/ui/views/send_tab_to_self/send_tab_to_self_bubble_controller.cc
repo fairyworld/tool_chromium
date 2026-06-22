@@ -154,7 +154,10 @@ void SendTabToSelfBubbleController::ShowBubbleWithAnchor(
   if (reason == EntryPointDisplayReason::kOfferFeature) {
     device_count = GetValidDevices().size();
   }
-  RecordTargetDeviceCount(reason, device_count);
+  // Note: `entry_point_` should always be populated here, since it's set in
+  // ShowBubble() which must've been called earlier.
+  RecordTargetDeviceCount(entry_point_.value_or(ShareEntryPoint::kShareSheet),
+                          reason, device_count);
 
   std::unique_ptr<SendTabToSelfBubbleView> bubble_view;
   switch (reason) {
