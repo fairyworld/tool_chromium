@@ -148,6 +148,7 @@ source_set("unit_tests") {
     "google_drive_app_util_unittest.mm",
     "installation_notifier_unittest.mm",
     "pass_kit_tab_helper_unittest.mm",
+    "safari_download_tab_helper_unittest.mm",
     "vcard_tab_helper_unittest.mm",
   ]
   deps = [
