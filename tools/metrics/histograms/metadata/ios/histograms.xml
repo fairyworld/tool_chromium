@@ -7904,8 +7904,8 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="IOS.ThemeSync.InitialSyncState"
-    enum="IOSThemeSyncInitialState" expires_after="2026-05-20">
-  <owner>bwwilliams@google.com</owner>
+    enum="IOSThemeSyncInitialState" expires_after="2027-06-18">
+  <owner>hiramahmood@google.com</owner>
   <owner>adamta@google.com</owner>
   <summary>
     Records the state of the Sync server during the initial Theme Sync flow.
@@ -7923,8 +7923,8 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="IOS.ThemeSync.StopAction" enum="IOSThemeSyncStopAction"
-    expires_after="2026-05-20">
-  <owner>bwwilliams@google.com</owner>
+    expires_after="2027-06-18">
+  <owner>hiramahmood@google.com</owner>
   <owner>adamta@google.com</owner>
   <summary>
     Records that the local pre-sync theme was successfully restored when sync
