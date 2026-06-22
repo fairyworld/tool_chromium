@@ -19,6 +19,8 @@
 #include "components/personal_context/core/personal_context_types.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/testing_pref_service.h"
+#include "components/subscription_eligibility/subscription_eligibility_prefs.h"
+#include "components/subscription_eligibility/subscription_eligibility_service.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -38,7 +40,11 @@ using ::testing::Return;
 class AtMemoryEnablementUtilsTest : public testing::Test {
  protected:
   AtMemoryEnablementUtilsTest() {
+    feature_list_.InitAndEnableFeatureWithParameters(
+        features::kAutofillAtMemory, {{"at_memory_eligible_tiers", ""}});
     personal_context::prefs::RegisterProfilePrefs(
+        autofill_client().GetPrefs()->registry());
+    subscription_eligibility::prefs::RegisterProfilePrefs(
         autofill_client().GetPrefs()->registry());
     // Enable the toggle by default in tests since it represents the default
     // active state.
@@ -56,7 +62,7 @@ class AtMemoryEnablementUtilsTest : public testing::Test {
   TestAutofillClient& autofill_client() { return autofill_client_; }
 
   base::test::TaskEnvironment task_environment_;
-  base::test::ScopedFeatureList feature_list_{features::kAutofillAtMemory};
+  base::test::ScopedFeatureList feature_list_;
   testing::NiceMock<personal_context::MockPersonalContextEnablementService>
       personal_context_service_;
 
@@ -87,15 +93,35 @@ TEST_F(AtMemoryEnablementUtilsTest, MayPerformAtMemoryAction_AtMemoryDisabled) {
 // `personal_context_service` is null.
 TEST_F(AtMemoryEnablementUtilsTest,
        MayPerformAtMemoryAction_NullPersonalContextService) {
+  EXPECT_FALSE(MayPerformAtMemoryAction(
+      AtMemoryAction::kTriggerSearchUI, nullptr,
+      autofill_client().GetSubscriptionEligibilityService(),
+      autofill_client().GetPrefs(), nullptr));
+  EXPECT_FALSE(MayPerformAtMemoryAction(
+      AtMemoryAction::kShowAtMemoryInSettings, nullptr,
+      autofill_client().GetSubscriptionEligibilityService(),
+      autofill_client().GetPrefs(), nullptr));
+  EXPECT_FALSE(MayPerformAtMemoryAction(
+      AtMemoryAction::kAllowCustomizeAtMemoryShortcut, nullptr,
+      autofill_client().GetSubscriptionEligibilityService(),
+      autofill_client().GetPrefs(), nullptr));
+}
+
+// Tests that `MayPerformAtMemoryAction` returns false when
+// `subscription_eligibility_service` is null.
+TEST_F(AtMemoryEnablementUtilsTest,
+       MayPerformAtMemoryAction_NullSubscriptionTierEligibilityService) {
+  EXPECT_CALL(personal_context_service_, GetEnablementState)
+      .WillRepeatedly(
+          Return(personal_context::PersonalContextEnablementState::kEnabled));
+
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndEnableFeatureWithParameters(
+      features::kAutofillAtMemory, {{"at_memory_eligible_tiers", "1"}});
+
   EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
-                                        nullptr, autofill_client().GetPrefs(),
-                                        nullptr));
-  EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kShowAtMemoryInSettings,
-                                        nullptr, autofill_client().GetPrefs(),
-                                        nullptr));
-  EXPECT_FALSE(
-      MayPerformAtMemoryAction(AtMemoryAction::kAllowCustomizeAtMemoryShortcut,
-                               nullptr, autofill_client().GetPrefs(), nullptr));
+                                        &personal_context_service_, nullptr,
+                                        autofill_client().GetPrefs(), nullptr));
 }
 
 // Tests `MayPerformAtMemoryAction` when `pref_service` is null.
@@ -104,15 +130,17 @@ TEST_F(AtMemoryEnablementUtilsTest, MayPerformAtMemoryAction_NullPrefService) {
       .WillRepeatedly(
           Return(personal_context::PersonalContextEnablementState::kEnabled));
 
-  EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
-                                        &personal_context_service_, nullptr,
-                                        nullptr));
-  EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kShowAtMemoryInSettings,
-                                       &personal_context_service_, nullptr,
-                                       nullptr));
-  EXPECT_FALSE(
-      MayPerformAtMemoryAction(AtMemoryAction::kAllowCustomizeAtMemoryShortcut,
-                               &personal_context_service_, nullptr, nullptr));
+  // IsPersonalContextToggleOn returns false if pref_service is null.
+  EXPECT_FALSE(MayPerformAtMemoryAction(
+      AtMemoryAction::kTriggerSearchUI, &personal_context_service_,
+      autofill_client().GetSubscriptionEligibilityService(), nullptr, nullptr));
+  EXPECT_TRUE(MayPerformAtMemoryAction(
+      AtMemoryAction::kShowAtMemoryInSettings, &personal_context_service_,
+      autofill_client().GetSubscriptionEligibilityService(), nullptr, nullptr));
+  EXPECT_FALSE(MayPerformAtMemoryAction(
+      AtMemoryAction::kAllowCustomizeAtMemoryShortcut,
+      &personal_context_service_,
+      autofill_client().GetSubscriptionEligibilityService(), nullptr, nullptr));
 }
 
 // Tests `MayPerformAtMemoryAction` under various Personal Context states.
@@ -219,6 +247,81 @@ TEST_F(AtMemoryEnablementUtilsTest,
       .WillRepeatedly(Return(personal_context::PersonalContextEnablementState::
                                  kDisabledNotEligible));
 
+  EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                       autofill_client()));
+}
+
+// Tests that a user is eligible for AtMemory if their subscription tier is in
+// the list of eligible tiers configured by the feature parameters.
+TEST_F(AtMemoryEnablementUtilsTest,
+       MayPerformAtMemoryAction_SubscriptionTierEligibility) {
+  EXPECT_CALL(personal_context_service_, GetEnablementState)
+      .WillRepeatedly(
+          Return(personal_context::PersonalContextEnablementState::kEnabled));
+
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndEnableFeatureWithParameters(
+      features::kAutofillAtMemory, {{"at_memory_eligible_tiers", "1,2"}});
+
+  autofill_client().GetPrefs()->SetInteger(
+      subscription_eligibility::prefs::kAiSubscriptionTier, 1);
+  EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                       autofill_client()));
+
+  autofill_client().GetPrefs()->SetInteger(
+      subscription_eligibility::prefs::kAiSubscriptionTier, 2);
+  EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                       autofill_client()));
+
+  autofill_client().GetPrefs()->SetInteger(
+      subscription_eligibility::prefs::kAiSubscriptionTier, 3);
+  EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                        autofill_client()));
+}
+
+// Tests that if `at_memory_eligible_tiers` is empty, then the user is eligible
+// regardless of their tier, and even if SubscriptionEligibilityService is null.
+TEST_F(AtMemoryEnablementUtilsTest,
+       MayPerformAtMemoryAction_SubscriptionTierEligibility_EmptyList) {
+  EXPECT_CALL(personal_context_service_, GetEnablementState)
+      .WillRepeatedly(
+          Return(personal_context::PersonalContextEnablementState::kEnabled));
+
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndEnableFeatureWithParameters(
+      features::kAutofillAtMemory, {{"at_memory_eligible_tiers", ""}});
+
+  // The user is eligible even if SubscriptionEligibilityService is null.
+  EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                       &personal_context_service_, nullptr,
+                                       autofill_client().GetPrefs(), nullptr));
+
+  // The user is eligible for any tier value.
+  autofill_client().GetPrefs()->SetInteger(
+      subscription_eligibility::prefs::kAiSubscriptionTier, 999);
+  EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                       autofill_client()));
+}
+
+// Tests that if `at_memory_eligible_tiers` is not defined, then the user is
+// eligible.
+TEST_F(AtMemoryEnablementUtilsTest,
+       MayPerformAtMemoryAction_SubscriptionTierEligibility_NotDefined) {
+  EXPECT_CALL(personal_context_service_, GetEnablementState)
+      .WillRepeatedly(
+          Return(personal_context::PersonalContextEnablementState::kEnabled));
+
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndEnableFeature(features::kAutofillAtMemory);
+
+  // The user is eligible even if SubscriptionEligibilityService is null.
+  EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                       &personal_context_service_, nullptr,
+                                       autofill_client().GetPrefs(), nullptr));
+
+  // The user is eligible for any tier value.
+  autofill_client().GetPrefs()->SetInteger(
+      subscription_eligibility::prefs::kAiSubscriptionTier, 999);
   EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
                                        autofill_client()));
 }

@@ -419,6 +419,15 @@ BASE_FEATURE(kAutofillAndroidKeyboardAccessoryDynamicPositioning,
 // Feature flag for kAutofillAtMemory.
 BASE_FEATURE(kAutofillAtMemory, base::FEATURE_DISABLED_BY_DEFAULT);
 
+// The subscription tiers for which AtMemory is eligible. Comma-separated list
+// of subscription tier integers. If empty/not defined, no tier restrictions
+// are applied.
+BASE_FEATURE_PARAM(std::string,
+                   kAutofillAtMemoryEligibleTiers,
+                   &kAutofillAtMemory,
+                   "at_memory_eligible_tiers",
+                   "");
+
 // Controls whether the Autosuggest nudging logic is used. If enabled, user are
 // encouraged to use the AtMemory feature.
 BASE_FEATURE(kAutofillAtMemoryInactivityNudge,

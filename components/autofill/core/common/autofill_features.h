@@ -145,6 +145,8 @@ BASE_DECLARE_FEATURE(kAutofillAndroidKeyboardAccessoryDynamicPositioning);
 COMPONENT_EXPORT(AUTOFILL)
 BASE_DECLARE_FEATURE(kAutofillAtMemory);
 COMPONENT_EXPORT(AUTOFILL)
+BASE_DECLARE_FEATURE_PARAM(std::string, kAutofillAtMemoryEligibleTiers);
+COMPONENT_EXPORT(AUTOFILL)
 BASE_DECLARE_FEATURE(kAutofillAtMemoryInactivityNudge);
 COMPONENT_EXPORT(AUTOFILL)
 BASE_DECLARE_FEATURE(kAutofillBetterLocalHeuristicPlaceholderSupport);
