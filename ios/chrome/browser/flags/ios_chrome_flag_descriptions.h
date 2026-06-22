@@ -290,6 +290,13 @@ inline constexpr char kAutofillPruneSuggestionsName[] =
 inline constexpr char kAutofillPruneSuggestionsDescription[] =
     "Further limits the number of suggestions in the Autofill dropdown.";
 
+inline constexpr char kAutofillRejectFormSubmissionsWithoutUserGestureName[] =
+    "Reject autofill form submissions without a user gesture";
+inline constexpr char
+    kAutofillRejectFormSubmissionsWithoutUserGestureDescription[] =
+        "When enabled, form submission events will be ignored if they lack a "
+        "user gesture.";
+
 inline constexpr char kAutofillSupportDateInputName[] =
     "Autofill support for date input";
 inline constexpr char kAutofillSupportDateInputDescription[] =

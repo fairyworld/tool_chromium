@@ -1772,6 +1772,12 @@ constexpr auto kFeatureEntries = std::to_array<flags_ui::FeatureEntry>({
      FEATURE_WITH_PARAMS_VALUE_TYPE(kBackgroundRefreshRegressionTest,
                                     kBackgroundRefreshRegressionTestVariations,
                                     "BackgroundRefreshRegressionTest")},
+    {"autofill-reject-form-submissions-without-user-gesture",
+     flag_descriptions::kAutofillRejectFormSubmissionsWithoutUserGestureName,
+     flag_descriptions::
+         kAutofillRejectFormSubmissionsWithoutUserGestureDescription,
+     flags_ui::kOsIos,
+     FEATURE_VALUE_TYPE(kAutofillRejectFormSubmissionsWithoutUserGesture)},
     {"autofill-support-date-input",
      flag_descriptions::kAutofillSupportDateInputName,
      flag_descriptions::kAutofillSupportDateInputDescription, flags_ui::kOsIos,

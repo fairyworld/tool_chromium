@@ -1104,6 +1104,11 @@
     "expiry_milestone": 150
   },
   {
+    "name": "autofill-reject-form-submissions-without-user-gesture",
+    "owners": [ "sugoi@chromium.org", "vincb@google.com", "bling-transactions@google.com" ],
+    "expiry_milestone": 170
+  },
+  {
     "name": "autofill-support-date-input",
     "owners": [ "tmartino@chromium.org", "bling-transactions@google.com" ],
     "expiry_milestone": 160
