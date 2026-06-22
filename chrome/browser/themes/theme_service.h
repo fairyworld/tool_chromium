@@ -63,11 +63,15 @@ class ThemeService : public KeyedService,
  public:
   // This is stored as an integer in the profile prefs, so entries should not be
   // renumbered and numeric values should never be reused.
+  //
+  // LINT.IfChange(BrowserColorScheme)
   enum class BrowserColorScheme {
     kSystem = 0,
     kLight = 1,
     kDark = 2,
+    kMaxValue = kDark,
   };
+  // LINT.ThenChange(//tools/metrics/histograms/metadata/chrome/enums.xml:BrowserColorScheme)
 
   // This class keeps track of the number of existing |ThemeReinstaller|
   // objects. When that number reaches 0 then unused themes will be deleted.
