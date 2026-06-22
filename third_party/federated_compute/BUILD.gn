@@ -75,9 +75,7 @@ proto_library("confidential_compute_proto") {
     "//third_party/protobuf:timestamp_proto",
   ]
 
-  import_dirs = [
-    "//third_party/oak/chromium",
-  ]
+  import_dirs = [ "//third_party/oak/chromium" ]
 
   proto_in_dir = "src"
 
@@ -198,6 +196,7 @@ source_set("fl_runner") {
     "src/fcp/client/flags.h",
     "src/fcp/client/log_manager.h",
     "src/fcp/client/secagg_event_publisher.h",
+    "src/fcp/client/simple_task_environment.h",
     "src/fcp/client/stats.h",
   ]
 
@@ -256,7 +255,6 @@ source_set("fl_runner") {
     "src/fcp/client/runner_common.h",
     "src/fcp/client/secagg_runner.h",
     "src/fcp/client/simple_task_environment.cc",
-    "src/fcp/client/simple_task_environment.h",
     "src/fcp/client/tensorflow/tensorflow_runner.h",
     "src/fcp/client/tensorflow/tensorflow_runner_factory.cc",
     "src/fcp/client/tensorflow/tensorflow_runner_factory.h",
