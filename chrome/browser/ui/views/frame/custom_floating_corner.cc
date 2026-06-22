@@ -13,7 +13,6 @@
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "third_party/skia/include/core/SkPathBuilder.h"
 #include "ui/base/metadata/metadata_impl_macros.h"
-#include "ui/base/ui_base_features.h"
 #include "ui/color/color_id.h"
 #include "ui/compositor/layer.h"
 #include "ui/gfx/color_utils.h"
@@ -51,14 +50,31 @@ CustomFloatingCorner::CustomFloatingCorner(
     BrowserView& browser_view,
     CornerOrientation orientation,
     views::ShapeContextTokens corner_radius_token,
-    ColorChoice color,
-    std::optional<ui::ColorId> stroke_color,
+    ColorChoiceWithAlpha background,
+    std::optional<ColorWithAlpha> stroke_color,
     bool is_vertical_window_edge)
     : CustomCorners(browser_view),
       orientation_(orientation),
       corner_radius_token_(corner_radius_token),
-      color_(color),
-      stroke_color_(stroke_color),
+      background_(background),
+      stroke_(stroke_color),
+      is_vertical_window_edge_(is_vertical_window_edge) {
+  SetPaintToLayer();
+  layer()->SetFillsBoundsOpaquely(false);
+}
+
+CustomFloatingCorner::CustomFloatingCorner(
+    BrowserView& browser_view,
+    CornerOrientation orientation,
+    views::ShapeContextTokens corner_radius_token,
+    ColorChoice background,
+    std::optional<ui::ColorId> stroke,
+    bool is_vertical_window_edge)
+    : CustomCorners(browser_view),
+      orientation_(orientation),
+      corner_radius_token_(corner_radius_token),
+      background_(background),
+      stroke_(stroke),
       is_vertical_window_edge_(is_vertical_window_edge) {
   SetPaintToLayer();
   layer()->SetFillsBoundsOpaquely(false);
@@ -66,12 +82,12 @@ CustomFloatingCorner::CustomFloatingCorner(
 
 CustomFloatingCorner::~CustomFloatingCorner() = default;
 
-void CustomFloatingCorner::SetColor(ColorChoice color) {
-  if (color_ == color) {
+void CustomFloatingCorner::SetBackground(ColorChoiceWithAlpha color) {
+  if (background_ == color) {
     return;
   }
 
-  color_ = color;
+  background_ = color;
   SchedulePaint();
 }
 
@@ -94,18 +110,19 @@ void CustomFloatingCorner::SetCornerRadius(
   PreferredSizeChanged();
 }
 
-void CustomFloatingCorner::SetStroke(std::optional<ui::ColorId> stroke_color,
+void CustomFloatingCorner::SetStroke(std::optional<ColorWithAlpha> stroke_color,
                                      bool is_vertical_window_edge) {
-  if (stroke_color_ == stroke_color &&
+  if (stroke_ == stroke_color &&
       is_vertical_window_edge_ == is_vertical_window_edge) {
     return;
   }
 
-  const bool size_changed =
-      stroke_color.has_value() != stroke_color_.has_value() ||
-      is_vertical_window_edge != is_vertical_window_edge_;
+  // The size changes if the stroke changes because the stroke width is added to
+  // the preferred size.
+  const bool size_changed = stroke_color.has_value() != stroke_.has_value() ||
+                            is_vertical_window_edge != is_vertical_window_edge_;
 
-  stroke_color_ = stroke_color;
+  stroke_ = stroke_color;
   is_vertical_window_edge_ = is_vertical_window_edge;
   if (size_changed) {
     PreferredSizeChanged();
@@ -114,13 +131,24 @@ void CustomFloatingCorner::SetStroke(std::optional<ui::ColorId> stroke_color,
   }
 }
 
+void CustomFloatingCorner::SetAlpha(float alpha) {
+  if (stroke_) {
+    auto new_stroke = *stroke_;
+    new_stroke.opacity = alpha;
+    SetStroke(new_stroke, is_vertical_window_edge_);
+  }
+  auto background = background_;
+  background.opacity = alpha;
+  SetBackground(background);
+}
+
 SkPath CustomFloatingCorner::GetBackgroundPath(
     const gfx::Rect& in_bounds) const {
   // This assumes that the view has gotten its preferred size, however, it will
   // scale gracefully if it is not that size. The view should be the preferred
   // corner radius in each dimension, plus the stroke thickness if there is a
   // stroke.
-  const bool has_stroke = stroke_color_.has_value();
+  const bool has_stroke = stroke_.has_value();
   const bool extend_vertical = has_stroke && !is_vertical_window_edge_;
   const SkVector corner_radius(
       has_stroke ? width() - kStrokeSize : width(),
@@ -210,11 +238,10 @@ gfx::Size CustomFloatingCorner::CalculatePreferredSize(
   const float corner_radius =
       GetLayoutProvider()->GetCornerRadiusMetric(corner_radius_token_);
   const float horizontal_size =
-      corner_radius + (stroke_color_ ? views::Separator::kThickness : 0);
+      corner_radius + (stroke_ ? views::Separator::kThickness : 0);
   const float vertical_size =
-      corner_radius + (stroke_color_ && !is_vertical_window_edge_
-                           ? views::Separator::kThickness
-                           : 0);
+      corner_radius +
+      (stroke_ && !is_vertical_window_edge_ ? views::Separator::kThickness : 0);
   return gfx::Size(horizontal_size, vertical_size);
 }
 
@@ -227,7 +254,7 @@ void CustomFloatingCorner::OnPaint(gfx::Canvas* canvas) {
   // scale gracefully if it is not that size. The view should be the preferred
   // corner radius in each dimension, plus the stroke thickness if there is a
   // stroke.
-  const bool has_stroke = stroke_color_.has_value();
+  const bool has_stroke = stroke_ && stroke_->is_visible();
   const bool extend_vertical = has_stroke && !is_vertical_window_edge_;
   const SkVector corner_radius(
       has_stroke ? width() - kStrokeSize : width(),
@@ -243,25 +270,16 @@ void CustomFloatingCorner::OnPaint(gfx::Canvas* canvas) {
   PaintPath(canvas,
             SkPath::Rect(SkRect::MakeXYWH(rect.x(), rect.y(), rect.width(),
                                           rect.height())),
-            ColorChoiceWithAlpha(color_), false);
+            ColorChoiceWithAlpha(background_), false);
 
   // Maybe draw the stroke.
   if (has_stroke) {
     cc::PaintFlags flags;
     flags.setStrokeWidth(kStrokeSize * 2);
-    SkColor stroke_color = GetColorProvider()->GetColor(*stroke_color_);
-    if (features::IsGlassFrameEnabled() &&
-        std::holds_alternative<FrameTheme>(color_)) {
-      const SkAlpha frame_alpha =
-          color_utils::IsDark(
-              GetView().GetColorProvider()->GetColor(ui::kColorFrameActive))
-              ? kBrowserFrameAlphaDark
-              : kBrowserFrameAlphaLight;
-      stroke_color = SkColorSetA(
-          stroke_color, std::clamp(static_cast<int>(SkColorGetA(stroke_color) *
-                                                    (frame_alpha / 255.0f)),
-                                   0, 255));
-    }
+    SkColor stroke_color = GetColorProvider()->GetColor(stroke_->color);
+    stroke_color = SkColorSetA(
+        stroke_color,
+        base::ClampRound(SkColorGetA(stroke_color) * stroke_->opacity));
     flags.setColor(stroke_color);
     flags.setStyle(cc::PaintFlags::kStroke_Style);
     flags.setAntiAlias(true);
@@ -311,7 +329,7 @@ const views::View& CustomFloatingCorner::GetView() const {
 }
 
 void CustomFloatingCorner::OnBrowserPaintAsActiveChanged() {
-  if (std::holds_alternative<FrameTheme>(color_)) {
+  if (std::holds_alternative<FrameTheme>(background_.color)) {
     SchedulePaint();
   }
 }
