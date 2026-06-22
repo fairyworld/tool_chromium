@@ -12,14 +12,10 @@
 #include "base/files/file_path.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/task/sequenced_task_runner.h"
-#include "base/types/expected.h"
 #include "base/types/pass_key.h"
 #include "components/sqlite_vfs/sqlite_sandboxed_vfs.h"
-#include "net/base/io_buffer.h"
 #include "net/base/net_export.h"
-#include "net/disk_cache/sql/cache_entry_key.h"
 #include "net/disk_cache/sql/sql_backend_aliases.h"
-#include "net/disk_cache/sql/sql_persistent_store.h"
 #include "sql/database.h"
 
 namespace disk_cache {
@@ -52,20 +48,7 @@ class NET_EXPORT_PRIVATE SqlSharedCacheIsolatedDatabase {
     kFailedToInitMetaTable = 9,
     kFailedToSetNikInMetaTable = 10,
     kFailedToCommitTransaction = 11,
-    kDatabaseNotOpen = 12,
-    kFailedToExecuteStatement = 13,
-    kEntryNotFound = 14,
-    kFailedToGetBlob = 15,
-    kFailedToWriteBlob = 16,
-    kFailedToSetReady = 17,
-    kBodyTooLarge = 18,
-    kInvalidWriteRange = 19,
-    kInvalidReadRange = 20,
-    kFailedToReadBlob = 21,
   };
-
-  using ReadResult = SqlPersistentStore::ReadResult;
-  using ReadResultOrError = base::expected<ReadResult, Error>;
 
   SqlSharedCacheIsolatedDatabase(
       std::string nik_string,
@@ -75,36 +58,6 @@ class NET_EXPORT_PRIVATE SqlSharedCacheIsolatedDatabase {
   ~SqlSharedCacheIsolatedDatabase();
 
   base::expected<void, Error> Init();
-
-  // Inserts a new resource with the serialized headers and total body size.
-  // `total_body_size` is restricted by the maximum value of int32_t.
-  // The entry is immediately marked as `ready` if `total_body_size` is 0, or if
-  // `body` is provided and its size matches `total_body_size`.
-  // Otherwise, the entry is not ready and subsequent calls to `WriteBody` are
-  // required to append the body data. Finally, a call to `WriteBody` with
-  // `set_ready = true` makes it `ready` and accessible via `Read`.
-  base::expected<SqlSharedCacheRowId, Error> Insert(
-      const CacheEntryKey& entry_key,
-      scoped_refptr<net::IOBuffer> headers,
-      uint32_t total_body_size,
-      scoped_refptr<net::IOBuffer> body);
-
-  // Appends data from `buffer` (at the given `offset`) to the entry's
-  // body. If `set_ready` is true, the entry is marked as `ready` and will
-  // become accessible to `Read`.
-  base::expected<void, Error> WriteBody(const CacheEntryKey& entry_key,
-                                        SqlSharedCacheRowId shared_cache_row_id,
-                                        int offset,
-                                        scoped_refptr<net::IOBuffer> buffer,
-                                        bool set_ready);
-
-  // Reads data from the entry's body into `buffer` starting at
-  // `offset`. The entry must be in the `ready` state, otherwise this operation
-  // will fail.
-  ReadResultOrError Read(const CacheEntryKey& entry_key,
-                         SqlSharedCacheRowId shared_cache_row_id,
-                         int offset,
-                         scoped_refptr<net::IOBuffer> buffer);
 
   void SetSimulateDbFailureForTesting(bool fail);
 
@@ -130,14 +83,6 @@ class NET_EXPORT_PRIVATE SqlSharedCacheIsolatedDatabase {
     sqlite_vfs::SqliteSandboxedVfsDelegate::UnregisterRunner unregister_runner_;
     sql::Database db_;
   };
-
-  base::expected<void, Error> WriteBodyInternal(
-      const CacheEntryKey& entry_key,
-      SqlSharedCacheRowId shared_cache_row_id,
-      int offset,
-      scoped_refptr<net::IOBuffer> buffer,
-      bool set_ready,
-      bool in_transaction);
 
   std::string nik_string_;
   std::unique_ptr<DatabaseAssets> db_assets_;

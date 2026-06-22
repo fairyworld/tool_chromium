@@ -3682,7 +3682,6 @@ target(_test_target_type, "net_unittests") {
       sources += [
         "disk_cache/sql/sql_persistent_store_queries_unittest.cc",
         "disk_cache/sql/sql_shared_cache_index_database_queries_unittest.cc",
-        "disk_cache/sql/sql_shared_cache_isolated_database_queries_unittest.cc",
       ]
       data_deps += [ "//third_party/sqlite:sqlite_dev_shell" ]
     }
