@@ -1411,6 +1411,7 @@ Sebagai contoh, sesetengah laman web mungkin memberi respons kepada permintaan i
 <translation id="6846298663435243399">Memuatkan…</translation>
 <translation id="6850409657436465440">Muat turun anda masih berlangsung</translation>
 <translation id="6850830437481525139"><ph name="TAB_COUNT" /> tab telah ditutup</translation>
+<translation id="6852437757508328589">{NUM_RESULTS,plural, =1{1 hasil carian ditemukan}other{# hasil carian ditemukan}}</translation>
 <translation id="685340923442249391">{FILE_COUNT,plural, =1{Fail audio, 1 fail audio dalam senarai}other{Fail audio, # fail audio dalam senarai}}</translation>
 <translation id="685850645784703949">Discover oleh Google - dimatikan</translation>
 <translation id="6864459304226931083">Muat turun imej</translation>
