@@ -76,16 +76,6 @@ std::u16string GetBlockTextInternal(
   return l10n_util::GetStringUTF16(IDS_PERMISSION_NEVER_ALLOW);
 }
 
-int CountValidRequests(
-    const std::vector<base::WeakPtr<permissions::PermissionRequest>>&
-        requests) {
-  return std::ranges::count_if(
-      requests.begin(), requests.end(),
-      [](base::WeakPtr<permissions::PermissionRequest> request_ptr) {
-        return request_ptr.get() != nullptr;
-      });
-}
-
 }  // namespace
 
 PermissionPromptBaseView::PermissionPromptBaseView(
@@ -235,13 +225,11 @@ std::u16string PermissionPromptBaseView::GetAllowAlwaysText(
 }
 
 std::u16string PermissionPromptBaseView::GetAllowAlwaysText(
-    const std::vector<base::WeakPtr<permissions::PermissionRequest>>&
+    const std::vector<base::SafeRef<permissions::PermissionRequest>>&
         visible_requests) {
-  size_t num_valid_visible_requests = CountValidRequests(visible_requests);
-  CHECK_EQ(visible_requests.size(), num_valid_visible_requests);
-  CHECK_GT(num_valid_visible_requests, 0u);
-  return GetAllowAlwaysTextInternal(num_valid_visible_requests,
-                                    visible_requests[0].get());
+  CHECK_GT(visible_requests.size(), 0u);
+  return GetAllowAlwaysTextInternal(visible_requests.size(),
+                                    &*visible_requests[0]);
 }
 
 std::u16string PermissionPromptBaseView::GetBlockText(
@@ -253,13 +241,10 @@ std::u16string PermissionPromptBaseView::GetBlockText(
 }
 
 std::u16string PermissionPromptBaseView::GetBlockText(
-    const std::vector<base::WeakPtr<permissions::PermissionRequest>>&
+    const std::vector<base::SafeRef<permissions::PermissionRequest>>&
         visible_requests) {
-  size_t num_valid_visible_requests = CountValidRequests(visible_requests);
-  CHECK_EQ(visible_requests.size(), num_valid_visible_requests);
-  CHECK_GT(num_valid_visible_requests, 0u);
-  return GetBlockTextInternal(num_valid_visible_requests,
-                              visible_requests[0].get());
+  CHECK_GT(visible_requests.size(), 0u);
+  return GetBlockTextInternal(visible_requests.size(), &*visible_requests[0]);
 }
 
 void PermissionPromptBaseView::StartTrackingPictureInPictureOcclusion() {

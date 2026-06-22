@@ -63,7 +63,7 @@ namespace {
 
 std::u16string GetAccessibleWindowTitleInternal(
     const std::u16string display_name,
-    std::vector<base::WeakPtr<permissions::PermissionRequest>>
+    std::vector<base::SafeRef<permissions::PermissionRequest>>
         visible_requests) {
   // Generate one of:
   //   $origin wants to: $permission
@@ -106,12 +106,12 @@ bool ShouldShowRequest(permissions::PermissionPrompt::Delegate& delegate,
   return true;
 }
 
-std::vector<base::WeakPtr<permissions::PermissionRequest>> GetVisibleRequests(
+std::vector<base::SafeRef<permissions::PermissionRequest>> GetVisibleRequests(
     permissions::PermissionPrompt::Delegate& delegate) {
-  std::vector<base::WeakPtr<permissions::PermissionRequest>> visible_requests;
+  std::vector<base::SafeRef<permissions::PermissionRequest>> visible_requests;
   for (const auto& request : delegate.Requests()) {
     if (ShouldShowRequest(delegate, request->request_type())) {
-      visible_requests.push_back(request->GetWeakPtr());
+      visible_requests.push_back(request->GetSafeRef());
     }
   }
   return visible_requests;
@@ -144,7 +144,7 @@ PermissionPromptBubbleOneOriginView::PermissionPromptBubbleOneOriginView(
     : PermissionPromptBubbleBaseView(web_contents, delegate, prompt_style) {
   std::vector<std::string> requested_audio_capture_device_ids;
   std::vector<std::string> requested_video_capture_device_ids;
-  std::vector<base::WeakPtr<permissions::PermissionRequest>> visible_requests =
+  std::vector<base::SafeRef<permissions::PermissionRequest>> visible_requests =
       GetVisibleRequests(*delegate.get());
 
   SetAccessibleTitle(GetAccessibleWindowTitleInternal(
@@ -204,7 +204,7 @@ void PermissionPromptBubbleOneOriginView::RunButtonCallback(int button_id) {
 }
 
 void PermissionPromptBubbleOneOriginView::AddRequestLine(
-    const base::WeakPtr<permissions::PermissionRequest>& request,
+    const base::SafeRef<permissions::PermissionRequest>& request,
     std::size_t index) {
   ChromeLayoutProvider* provider = ChromeLayoutProvider::Get();
 
