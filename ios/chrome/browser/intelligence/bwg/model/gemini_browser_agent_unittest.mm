@@ -21,6 +21,7 @@
 #import "components/signin/public/identity_manager/primary_account_change_event.h"
 #import "ios/chrome/browser/favicon/model/favicon_service_factory.h"
 #import "ios/chrome/browser/feature_engagement/model/tracker_factory.h"
+#import "ios/chrome/browser/fullscreen/ui_bundled/fullscreen_controller.h"
 #import "ios/chrome/browser/intelligence/bwg/metrics/gemini_metrics.h"
 #import "ios/chrome/browser/intelligence/bwg/model/gemini_configuration.h"
 #import "ios/chrome/browser/intelligence/bwg/model/gemini_page_context.h"
@@ -856,4 +857,33 @@ TEST_F(GeminiBrowserAgentTest, TestOnGeminiLiveUserDidBargeIn) {
   // Status should be set to kTranscribing.
   EXPECT_EQ(GetProcessingStatus(),
             ios::provider::GeminiClientMode::kTranscribing);
+}
+
+// Tests that preparing the floaty to be shown temporarily disables fullscreen
+// mode, and verify that it is re-enabled once the Gemini UI did appear or when
+// the state collapses.
+TEST_F(GeminiBrowserAgentTest, TestPrepareFloatyToBeShownDisablesFullscreen) {
+  FullscreenController* controller =
+      FullscreenController::FromBrowser(browser_.get());
+  ASSERT_NE(controller, nullptr);
+  EXPECT_TRUE(controller->IsEnabled());
+
+  // Fullscreen should be disabled once the floaty is invoked.
+  InvokeFloaty([[GeminiConfiguration alloc] init]);
+  EXPECT_FALSE(controller->IsEnabled());
+
+  // Fullscreen should be re-enabled once the UI appears.
+  gemini_browser_agent_->OnGeminiUIDidAppear();
+  EXPECT_TRUE(controller->IsEnabled());
+
+  // Fullscreen should be disabled once the state transitions to expanded.
+  gemini_browser_agent_->OnViewStateChanged(
+      ios::provider::GeminiViewState::kExpanded);
+  EXPECT_FALSE(controller->IsEnabled());
+
+  // Fullscreen should be re-enabled once the state transitions back to
+  // collapsed.
+  gemini_browser_agent_->OnViewStateChanged(
+      ios::provider::GeminiViewState::kCollapsed);
+  EXPECT_TRUE(controller->IsEnabled());
 }

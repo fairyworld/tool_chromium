@@ -616,7 +616,6 @@ void GeminiBrowserAgent::ShowSignInRequiredSnackbar(
 
 void GeminiBrowserAgent::ShowLiveSessionDormantSnackbar() {
   PrepareFloatyToBeShown();
-  fullscreen_disabler_timer_.Stop();
 
   id<SnackbarCommands> snackbar_handler =
       HandlerForProtocol(browser_->GetCommandDispatcher(), SnackbarCommands);
@@ -1044,7 +1043,6 @@ void GeminiBrowserAgent::SetLastShownViewState(
   }
 
   if (view_state == ios::provider::GeminiViewState::kExpanded) {
-    PrepareFloatyToBeShown();
     RecordFloatyCollapsedToExpanded();
     RecordFloatyMinimizedTime(elapsed_minimized_floaty_time_);
     elapsed_minimized_floaty_time_ = base::TimeTicks();
@@ -1262,10 +1260,18 @@ void GeminiBrowserAgent::ShowFloatyIfInvoked(
     PrepareFloatyToBeShown();
   }
 
+  // Animate the floaty back into view and release the fullscreen disabler
+  // once the animation completes.
+  base::WeakPtr<GeminiBrowserAgent> weak_self = weak_factory_.GetWeakPtr();
   [UIView animateWithDuration:kFloatyAnimationDuration
                    animations:base::CallbackToBlock(base::BindRepeating(
                                   &GeminiBrowserAgent::ForceShowFloatyIfInvoked,
-                                  weak_factory_.GetWeakPtr()))];
+                                  weak_self))
+                   completion:^(BOOL finished) {
+                     if (weak_self) {
+                       weak_self->ResetFullscreenDisabler();
+                     }
+                   }];
 }
 
 #pragma mark - TabsDependencyInstaller
@@ -1305,6 +1311,7 @@ void GeminiBrowserAgent::OnActiveWebStateChanged(web::WebState* old_active,
 
   UpdateLiveModeUI();
   UpdateGeminiAvailability();
+  ResetFullscreenDisabler();
 }
 
 void GeminiBrowserAgent::OnScrollEvent() {
@@ -1637,13 +1644,24 @@ void GeminiBrowserAgent::PrepareFloatyToBeShown() {
   if (!IsFullscreenInitialized() || !web_state) {
     return;
   }
+
+  CRWWebViewScrollViewProxy* scroll_view_proxy =
+      web_state->GetWebViewProxy().scrollViewProxy;
+  CGPoint current_offset = scroll_view_proxy.contentOffset;
+  [scroll_view_proxy setContentOffset:current_offset animated:NO];
+
   if (IsFullscreenRefactoringEnabled()) {
     [HandlerForProtocol(browser_->GetCommandDispatcher(), FullscreenCommands)
         exitFullscreenWithTrigger:FullscreenModeTransitionTrigger::
                                       kUserInitiatedFinishedByCode
                          animated:YES];
+    fullscreen_disabler_ =
+        std::make_unique<ScopedFullscreenDisabler>(HandlerForProtocol(
+            browser_->GetCommandDispatcher(), FullscreenCommands));
   } else {
     fullscreen_controller_->ExitFullscreen();
+    fullscreen_disabler_ =
+        std::make_unique<ScopedFullscreenDisabler>(fullscreen_controller_);
   }
 }
 
@@ -1658,7 +1676,6 @@ void GeminiBrowserAgent::ResetFullscreenDisabler() {
     return;
   }
 
-  fullscreen_disabler_timer_.Stop();
   fullscreen_disabler_.reset();
 }
 
@@ -1720,11 +1737,16 @@ void GeminiBrowserAgent::OnViewStateChanged(
   UpdateLiveModeUI();
 
   if (view_state == ios::provider::GeminiViewState::kExpanded) {
+    if (last_shown_view_state_ != ios::provider::GeminiViewState::kExpanded) {
+      PrepareFloatyToBeShown();
+    }
     if (is_floaty_temporarily_hidden_) {
       ForceShowFloatyIfInvoked();
       is_hidden_by_keyboard_ = false;
     }
     RequestPageContextGeneration();
+  } else if (view_state == ios::provider::GeminiViewState::kCollapsed) {
+    ResetFullscreenDisabler();
   } else if (view_state == ios::provider::GeminiViewState::kHidden) {
     // TODO(crbug.com/517583120): Remove when the temporary actuation prototype
     // is cleaned up.
@@ -1736,6 +1758,10 @@ void GeminiBrowserAgent::OnViewStateChanged(
       }
     }
   }
+}
+
+void GeminiBrowserAgent::OnGeminiUIDidAppear() {
+  ResetFullscreenDisabler();
 }
 
 GeminiTabHelper* GeminiBrowserAgent::GetActiveTabHelper(

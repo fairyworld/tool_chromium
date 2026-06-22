@@ -194,6 +194,7 @@ IOSGeminiSessionCancellationReason HistogramEnumFromGeminiCancelType(
   _totalPromptsInSession = 0;
 
   [self dismissOtherActiveSessionsUsingClientID:clientID];
+  [self.geminiViewStateDelegate geminiUIDidAppear];
 }
 
 - (void)UIDidDisappearWithClientID:(NSString*)clientID

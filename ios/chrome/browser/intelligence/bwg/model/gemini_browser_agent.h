@@ -155,6 +155,7 @@ class GeminiBrowserAgent : public BrowserUserData<GeminiBrowserAgent>,
       ios::provider::GeminiViewState view_state) override;
   void OnLiveButtonTapped() override;
   void OnGeminiLiveUserDidBargeIn() override;
+  void OnGeminiUIDidAppear() override;
 
   // Called when the scene activation level changes.
   void OnSceneActivationLevelChanged(SceneActivationLevel level);
@@ -424,12 +425,6 @@ class GeminiBrowserAgent : public BrowserUserData<GeminiBrowserAgent>,
   base::ScopedObservation<FullscreenBrowserAgent,
                           FullscreenBrowserAgentObserver>
       fullscreen_observation_{this};
-
-  // Timer to reset the fullscreen disabler. Re-enabling fullscreen should be
-  // handled in floaty interaction logic such as the floaty being collapsed or
-  // dismissed. For any reason, if an exit point doesn't re-enable fullscreen,
-  // this timer will reset the fullscreen disabler after a short delay.
-  base::OneShotTimer fullscreen_disabler_timer_;
 
   // Whether the floaty is hidden by the keyboard.
   bool is_hidden_by_keyboard_ = false;
