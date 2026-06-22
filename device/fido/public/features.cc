@@ -239,4 +239,9 @@ COMPONENT_EXPORT(FIDO_PUBLIC)
 BASE_FEATURE(kWebAuthnStripUnusedEnclaveParameters,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
+// Disabled by default.
+COMPONENT_EXPORT(FIDO_PUBLIC)
+BASE_FEATURE(kWebAuthnGpmPasskeyEmbeddedRecoveryUrl,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
 }  // namespace device

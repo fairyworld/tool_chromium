@@ -198,6 +198,10 @@ BASE_DECLARE_FEATURE(kWebAuthnGpmPinResetUsesAccountIndex);
 COMPONENT_EXPORT(FIDO_PUBLIC)
 BASE_DECLARE_FEATURE(kWebAuthnStripUnusedEnclaveParameters);
 
+// Enables the new embedded recovery URL for GPM keychain recovery.
+COMPONENT_EXPORT(FIDO_PUBLIC)
+BASE_DECLARE_FEATURE(kWebAuthnGpmPasskeyEmbeddedRecoveryUrl);
+
 }  // namespace device
 
 #endif  // DEVICE_FIDO_PUBLIC_FEATURES_H_
