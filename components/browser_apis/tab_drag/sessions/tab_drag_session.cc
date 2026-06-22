@@ -113,13 +113,30 @@ void TabDragSession::HandleMovedEvent(const gfx::Point& screen_point) {
 }
 
 void TabDragSession::HandleAttachedMove(const gfx::Point& screen_point) {
-  TabDragWindowAdapter* window = registry()->Get(dragged_window_);
-  CHECK(window);
-  gfx::Rect bounds = window->GetBoundsInScreen();
-  constexpr int kTearThreshold = 15;
-  bounds.Inset(-kTearThreshold);
+  DropTargetRegistry& drop_target_registry = injector_->GetDropTargetRegistry();
+  DropTargetId target_id =
+      drop_target_registry.FindTargetForWindow(dragged_window_);
 
-  if (!bounds.Contains(screen_point)) {
+  // Enforce that the source window MUST have a registered drop target to drag
+  // tabs.
+  CHECK(target_id) << "Source window must have a registered drop target";
+
+  DropTarget* target = drop_target_registry.GetDropTarget(target_id);
+  CHECK(target) << "Active drop target must exist";
+
+  std::optional<gfx::Rect> bounds_opt = target->cached_bounds();
+
+  // Enforce that the drop target MUST have cached bounds.
+  // Due to Mojo message ordering, these are guaranteed to be present if the
+  // client registered and pushed bounds before calling StartDrag.
+  CHECK(bounds_opt) << "Active drop target must have cached bounds";
+
+  constexpr int kTearThreshold = 15;
+
+  gfx::Point local_point = target->ConvertScreenPointToLocal(screen_point);
+  gfx::Rect bounds = *bounds_opt;
+  bounds.Inset(-kTearThreshold);
+  if (!bounds.Contains(local_point)) {
     drag_mode_ = DragMode::kDetachedWindow;
   } else {
     injector_->GetSessionListener().OnDragMoved(screen_point);

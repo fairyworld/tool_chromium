@@ -11,6 +11,8 @@
 #include "components/browser_apis/tab_drag/sessions/tab_drag_session_manager.h"
 #include "components/browser_apis/tab_drag/sessions/tab_drag_window_registry.h"
 #include "ui/base/base_window.h"
+#include "ui/views/controls/native/native_view_host.h"
+#include "ui/views/view_utils.h"
 #include "ui/views/widget/widget.h"
 
 TabDragWindowAdapterImpl::TabDragWindowAdapterImpl(
@@ -37,11 +39,41 @@ gfx::Rect TabDragWindowAdapterImpl::GetBoundsInScreen() const {
   return browser_window_->GetWindow()->GetBounds();
 }
 
+namespace {
+
+// Helper to recursively find the NativeViewHost for a given NativeView.
+// Returning nullptr means it is not found.
+views::View* FindNativeViewHost(views::View* root,
+                                gfx::NativeView native_view) {
+  if (auto* host = views::AsViewClass<views::NativeViewHost>(root)) {
+    if (host->native_view() == native_view) {
+      return host;
+    }
+  }
+  for (views::View* child : root->children()) {
+    if (auto* found = FindNativeViewHost(child, native_view)) {
+      return found;
+    }
+  }
+  return nullptr;
+}
+
+}  // namespace
+
 gfx::Point TabDragWindowAdapterImpl::ConvertScreenPointToLocal(
+    gfx::NativeView target_view,
     const gfx::Point& screen_point) const {
-  // TODO(crbug.com/501070453): Implement this once a client is registered
-  NOTIMPLEMENTED();
-  return screen_point;
+  gfx::Point local_point = screen_point;
+  views::Widget* widget = views::Widget::GetWidgetForNativeWindow(
+      browser_window_->GetWindow()->GetNativeWindow());
+  CHECK(widget);
+  CHECK(widget->GetRootView());
+
+  views::View* host = FindNativeViewHost(widget->GetRootView(), target_view);
+  CHECK(host) << "Target view not found in window hierarchy";
+
+  views::View::ConvertPointFromScreen(host, &local_point);
+  return local_point;
 }
 
 void TabDragWindowAdapterImpl::SetCapture() {

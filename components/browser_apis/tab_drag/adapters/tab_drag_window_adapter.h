@@ -8,6 +8,7 @@
 #include "base/types/id_type.h"
 #include "ui/gfx/geometry/point.h"
 #include "ui/gfx/geometry/rect.h"
+#include "ui/gfx/native_ui_types.h"
 
 namespace tabs_api {
 
@@ -23,8 +24,10 @@ class TabDragWindowAdapter {
   // Returns the window bounds in screen coordinates.
   virtual gfx::Rect GetBoundsInScreen() const = 0;
 
-  // Converts a point in screen coordinates to local window coordinates.
+  // Converts a point in screen coordinates to local coordinates relative to the
+  // given `target_view`.
   virtual gfx::Point ConvertScreenPointToLocal(
+      gfx::NativeView target_view,
       const gfx::Point& screen_point) const = 0;
 
   // Acquires input capture for this window.

@@ -21,6 +21,7 @@
 #include "testing/gtest/include/gtest/gtest.h"
 #include "ui/gfx/geometry/point.h"
 #include "ui/gfx/geometry/rect.h"
+#include "ui/gfx/native_ui_types.h"
 
 namespace tabs_api {
 
@@ -46,7 +47,7 @@ TEST_F(TabDragEventRouterTest, RouteMoveEvents) {
   mojo::AssociatedRemote<mojom::DropTargetRegistration> registration;
 
   registry_.RegisterDropTarget(
-      &window, remote.Unbind(),
+      &window, gfx::NativeView(), remote.Unbind(),
       registration.BindNewEndpointAndPassDedicatedReceiver());
 
   std::vector<NodeId> tabs = {NodeId(NodeId::Type::kContent, "tab1")};
@@ -84,7 +85,7 @@ TEST_F(TabDragEventRouterTest, MultiWindowRouting) {
   mojo::AssociatedReceiver<mojom::DropTarget> bound_receiver_a(
       &target_a, remote_a.BindNewEndpointAndPassDedicatedReceiver());
   mojo::AssociatedRemote<mojom::DropTargetRegistration> reg_a;
-  registry_.RegisterDropTarget(&window_a, remote_a.Unbind(),
+  registry_.RegisterDropTarget(&window_a, gfx::NativeView(), remote_a.Unbind(),
                                reg_a.BindNewEndpointAndPassDedicatedReceiver());
 
   ToyTabDragWindowAdapter window_b(gfx::Rect(200, 0, 100, 100),
@@ -95,7 +96,7 @@ TEST_F(TabDragEventRouterTest, MultiWindowRouting) {
       &target_b, remote_b.BindNewEndpointAndPassDedicatedReceiver());
   mojo::AssociatedRemote<mojom::DropTargetRegistration> reg_b;
   DropTargetId id_b = registry_.RegisterDropTarget(
-      &window_b, remote_b.Unbind(),
+      &window_b, gfx::NativeView(), remote_b.Unbind(),
       reg_b.BindNewEndpointAndPassDedicatedReceiver());
 
   router_.OnSessionStarted({}, window_a.GetWindowId(), gfx::Point(50, 50));
@@ -131,7 +132,7 @@ TEST_F(TabDragEventRouterTest, DropEvent) {
   mojo::AssociatedReceiver<mojom::DropTarget> bound_receiver(
       &target, remote.BindNewEndpointAndPassDedicatedReceiver());
   mojo::AssociatedRemote<mojom::DropTargetRegistration> reg;
-  registry_.RegisterDropTarget(&window, remote.Unbind(),
+  registry_.RegisterDropTarget(&window, gfx::NativeView(), remote.Unbind(),
                                reg.BindNewEndpointAndPassDedicatedReceiver());
 
   std::vector<NodeId> tabs = {NodeId(NodeId::Type::kContent, "tab1")};
@@ -154,7 +155,7 @@ TEST_F(TabDragEventRouterTest, CancelEvent) {
   mojo::AssociatedReceiver<mojom::DropTarget> bound_receiver(
       &target, remote.BindNewEndpointAndPassDedicatedReceiver());
   mojo::AssociatedRemote<mojom::DropTargetRegistration> reg;
-  registry_.RegisterDropTarget(&window, remote.Unbind(),
+  registry_.RegisterDropTarget(&window, gfx::NativeView(), remote.Unbind(),
                                reg.BindNewEndpointAndPassDedicatedReceiver());
 
   router_.OnSessionStarted({}, window.GetWindowId(), gfx::Point(50, 50));

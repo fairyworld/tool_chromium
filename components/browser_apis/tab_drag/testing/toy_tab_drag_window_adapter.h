@@ -26,6 +26,7 @@ class ToyTabDragWindowAdapter : public TabDragWindowAdapter {
   TabDragWindowId GetWindowId() const override { return id_; }
   gfx::Rect GetBoundsInScreen() const override;
   gfx::Point ConvertScreenPointToLocal(
+      gfx::NativeView target_view,
       const gfx::Point& screen_point) const override;
   void SetCapture() override;
   void ReleaseCapture() override;

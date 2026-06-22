@@ -116,6 +116,7 @@ TEST_F(TabDragSessionTest, CoordinateTracking) {
   ToyTabDragSessionInputAdapter toy_adapter;
   ToyTabDragSessionListener listener;
   ToyDropTargetRegistry dummy_registry;
+  dummy_registry.set_source_window(&dummy_window_);
   ToyTabDragSessionInjector injector(toy_adapter, listener, dummy_registry,
                                      &registry_);
   base::MockOnceClosure end_callback;
@@ -240,6 +241,124 @@ TEST_F(TabDragSessionTest, CaptureLostExternally) {
   toy_window.ReleaseCapture();
   EXPECT_CALL(end_callback, Run()).Times(1);
   toy_adapter.SendToyEvent(TabDragInputEvent::Type::kCaptureChanged);
+}
+
+TEST_F(TabDragSessionTest, DropTargetBoundsTearOff) {
+  ToyTabDragSessionInputAdapter toy_adapter;
+  ToyTabDragSessionListener listener;
+  ToyDropTargetRegistry registry;
+  registry.set_source_window(&dummy_window_);
+  ToyTabDragSessionInjector injector(toy_adapter, listener, registry,
+                                     &registry_);
+  base::MockOnceClosure end_callback;
+
+  // Set cached bounds on the source drop target.
+  // Window bounds are (0, 0, 100, 100). We set drop target bounds to (10, 10,
+  // 80, 20). With kTearThreshold = 15, the tear-off bounds will be (-5, -5,
+  // 110, 50).
+  registry.UpdateTargetBounds(registry.source_id(), gfx::Rect(10, 10, 80, 20));
+
+  std::vector<tabs_api::NodeId> tab_ids = {
+      NodeId(NodeId::Type::kContent, "tab1")};
+  TabDragSessionParams params{.source_window_id = dummy_window_.GetWindowId(),
+                              .source_tab_ids = tab_ids,
+                              .start_point = gfx::Point(),
+                              .end_callback = end_callback.Get()};
+  TabDragSession session(std::move(params), &injector);
+
+  EXPECT_TRUE(session.Start().has_value());
+
+  // Move mouse to (50, 30). This is inside the active bounds (-5, -5, 110, 50).
+  // It should remain attached.
+  gfx::Point inside_point(50, 30);
+  toy_adapter.SendToyEvent(TabDragInputEvent::Type::kMoved, inside_point);
+  ASSERT_EQ(listener.events().size(), 2u);  // Started, DragMoved
+  EXPECT_EQ(listener.events()[1].type,
+            ToyTabDragSessionListener::Event::Type::kMoved);
+
+  // Move mouse to (50, 60). This is outside the active bounds (-5, -5, 110, 50)
+  // but inside the window. It should trigger tear-off (transition to detached).
+  gfx::Point tear_point(50, 60);
+  toy_adapter.SendToyEvent(TabDragInputEvent::Type::kMoved, tear_point);
+
+  // Event count remains 2 (no Moved event for detached transition).
+  ASSERT_EQ(listener.events().size(), 2u);
+
+  // Move to a target window (simulate merge) to verify we are indeed detached.
+  ToyTabDragWindowAdapter target_window(gfx::Rect(200, 200, 100, 100),
+                                        &registry_);
+  registry.set_target_window(&target_window);
+  gfx::Point target_point(250, 250);
+  toy_adapter.SendToyEvent(TabDragInputEvent::Type::kMoved, target_point);
+
+  // If we were detached, this move should transition us back to attached and
+  // fire OnTargetChanged.
+  ASSERT_EQ(listener.events().size(), 3u);
+  EXPECT_EQ(listener.events()[2].type,
+            ToyTabDragSessionListener::Event::Type::kTargetChanged);
+  EXPECT_EQ(listener.events()[2].target, registry.target_id());
+
+  EXPECT_CALL(end_callback, Run()).Times(1);
+  toy_adapter.SendToyEvent(TabDragInputEvent::Type::kDropped, target_point);
+}
+
+TEST_F(TabDragSessionTest, DropTargetBoundsAttach) {
+  ToyTabDragSessionInputAdapter toy_adapter;
+  ToyTabDragSessionListener listener;
+  ToyDropTargetRegistry registry;
+  registry.set_source_window(&dummy_window_);
+  ToyTabDragSessionInjector injector(toy_adapter, listener, registry,
+                                     &registry_);
+  base::MockOnceClosure end_callback;
+  ToyTabDragWindowAdapter target_window(gfx::Rect(200, 200, 100, 100),
+                                        &registry_);
+  registry.set_target_window(&target_window);
+
+  // Set cached bounds on the target drop target.
+  // Target window is (200, 200, 100, 100).
+  // We set drop target bounds to (10, 10, 80, 20) relative to the target
+  // window. So in screen coordinates, the target drop target is at (210, 210,
+  // 80, 20).
+  registry.UpdateTargetBounds(registry.target_id(), gfx::Rect(10, 10, 80, 20));
+
+  std::vector<tabs_api::NodeId> tab_ids = {
+      NodeId(NodeId::Type::kContent, "tab1")};
+  TabDragSessionParams params{.source_window_id = dummy_window_.GetWindowId(),
+                              .source_tab_ids = tab_ids,
+                              .start_point = gfx::Point(),
+                              .end_callback = end_callback.Get()};
+  TabDragSession session(std::move(params), &injector);
+
+  EXPECT_TRUE(session.Start().has_value());
+
+  // Move outside source window to trigger tear-off.
+  gfx::Point tear_point(150, 150);
+  toy_adapter.SendToyEvent(TabDragInputEvent::Type::kMoved, tear_point);
+
+  // Now in detached mode.
+  // Move mouse to (250, 290). This is inside the target window (200, 200, 100,
+  // 100) but outside the target drop target bounds (210, 210, 80, 20) -> local
+  // (50, 90). It should NOT attach.
+  gfx::Point outside_target_drop_bounds(250, 290);
+  toy_adapter.SendToyEvent(TabDragInputEvent::Type::kMoved,
+                           outside_target_drop_bounds);
+  ASSERT_EQ(listener.events().size(), 1u);
+
+  // Move mouse to (250, 220). This is inside the target drop target bounds
+  // (210, 210, 80, 20) -> local (50, 20). It should attach and trigger
+  // OnTargetChanged.
+  gfx::Point inside_target_drop_bounds(250, 220);
+  toy_adapter.SendToyEvent(TabDragInputEvent::Type::kMoved,
+                           inside_target_drop_bounds);
+
+  ASSERT_EQ(listener.events().size(), 2u);
+  EXPECT_EQ(listener.events()[1].type,
+            ToyTabDragSessionListener::Event::Type::kTargetChanged);
+  EXPECT_EQ(listener.events()[1].target, registry.target_id());
+
+  EXPECT_CALL(end_callback, Run()).Times(1);
+  toy_adapter.SendToyEvent(TabDragInputEvent::Type::kDropped,
+                           inside_target_drop_bounds);
 }
 
 }  // namespace tabs_api

@@ -13,6 +13,8 @@
 #include "components/browser_apis/tab_drag/tab_drag_api.mojom-forward.h"
 #include "mojo/public/cpp/bindings/pending_associated_receiver.h"
 #include "mojo/public/cpp/bindings/pending_associated_remote.h"
+#include "ui/gfx/geometry/rect.h"
+#include "ui/gfx/native_ui_types.h"
 
 namespace tabs_api {
 
@@ -29,6 +31,7 @@ class DropTargetRegistry {
   // of the registration. Returns a unique DropTargetId for this registration.
   virtual DropTargetId RegisterDropTarget(
       TabDragWindowAdapter* window,
+      gfx::NativeView native_view,
       mojo::PendingAssociatedRemote<mojom::DropTarget> target,
       mojo::PendingAssociatedReceiver<mojom::DropTargetRegistration>
           registration) = 0;
@@ -48,6 +51,11 @@ class DropTargetRegistry {
   // Returns the C++ DropTarget object for the given ID, or nullptr if not
   // found.
   virtual DropTarget* GetDropTarget(DropTargetId target_id) const = 0;
+
+  virtual std::optional<gfx::Rect> GetCachedBounds(
+      DropTargetId target_id) const = 0;
+  virtual void UpdateTargetBounds(DropTargetId target_id,
+                                  const gfx::Rect& bounds) = 0;
 };
 
 class TabDragSessionInjector {

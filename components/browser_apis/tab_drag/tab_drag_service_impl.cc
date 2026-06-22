@@ -34,8 +34,9 @@ TabDragServiceImpl::~TabDragServiceImpl() {
 }
 
 void TabDragServiceImpl::Accept(
-    mojo::PendingReceiver<mojom::TabDragService> receiver) {
-  receivers_.Add(&bridge_, std::move(receiver));
+    mojo::PendingReceiver<mojom::TabDragService> receiver,
+    gfx::NativeView context_view) {
+  receivers_.Add(&bridge_, std::move(receiver), context_view);
 }
 
 mojom::TabDragService::StartDragResult TabDragServiceImpl::StartDrag(
@@ -50,8 +51,10 @@ TabDragServiceImpl::RegisterDropTarget(
     mojo::PendingAssociatedRemote<mojom::DropTarget> target,
     mojo::PendingAssociatedReceiver<mojom::DropTargetRegistration>
         registration) {
+  gfx::NativeView native_view = receivers_.current_context();
   session_manager_->GetDropTargetRegistry().RegisterDropTarget(
-      window_adapter_.get(), std::move(target), std::move(registration));
+      window_adapter_.get(), native_view, std::move(target),
+      std::move(registration));
   return std::monostate();
 }
 

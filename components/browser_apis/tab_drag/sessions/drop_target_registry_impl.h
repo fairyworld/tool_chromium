@@ -30,6 +30,7 @@ class DropTargetRegistryImpl : public DropTargetRegistry {
   // DropTargetRegistry:
   DropTargetId RegisterDropTarget(
       TabDragWindowAdapter* window,
+      gfx::NativeView native_view,
       mojo::PendingAssociatedRemote<mojom::DropTarget> target,
       mojo::PendingAssociatedReceiver<mojom::DropTargetRegistration>
           registration) override;
@@ -40,6 +41,11 @@ class DropTargetRegistryImpl : public DropTargetRegistry {
   DropTargetId FindTargetForWindow(TabDragWindowId window_id) const override;
 
   DropTarget* GetDropTarget(DropTargetId target_id) const override;
+
+  std::optional<gfx::Rect> GetCachedBounds(
+      DropTargetId target_id) const override;
+  void UpdateTargetBounds(DropTargetId target_id,
+                          const gfx::Rect& bounds) override;
 
   base::WeakPtr<DropTargetRegistryImpl> AsWeakPtr() {
     return weak_factory_.GetWeakPtr();
