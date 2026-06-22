@@ -74,6 +74,7 @@
 #include "net/dns/mock_host_resolver.h"
 #include "net/test/embedded_test_server/embedded_test_server.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "ui/base/ozone_buildflags.h"
 
 namespace sessions {
 
@@ -679,11 +680,8 @@ class SessionRestoreAcrossStagesTest
     auto [expected_bounds1, expected_bounds2] =
         ReadWindowBoundsFromFile(bounds_file);
 
-    // Assert Window 1 bounds.
-    // Downcast via GetBrowserForMigrationOnly() is required to inspect
-    // requested bounds prior to Window Manager modification.
-    EXPECT_EQ(expected_bounds1,
-              w1->GetBrowserForMigrationOnly()->override_bounds());
+    // Assert Window 1 bounds
+    EXPECT_EQ(expected_bounds1, w1->GetWindow()->GetBounds());
 
     // Window 1 Tab 1 shows GetUrl(1) and is active
     TabStripModel* w1_model = w1->GetTabStripModel();
@@ -698,9 +696,8 @@ class SessionRestoreAcrossStagesTest
     EXPECT_EQ(GetUrl(2), controller.GetEntryAtIndex(0)->GetURL());
     EXPECT_EQ(GetUrl(3), controller.GetEntryAtIndex(1)->GetURL());
 
-    // Assert Window 2 bounds.
-    EXPECT_EQ(expected_bounds2,
-              w2->GetBrowserForMigrationOnly()->override_bounds());
+    // Assert Window 2 bounds
+    EXPECT_EQ(expected_bounds2, w2->GetWindow()->GetBounds());
 
     TabStripModel* w2_model = w2->GetTabStripModel();
     // Tab 1 should be pinned and shows GetUrl(1)
@@ -755,7 +752,13 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreAcrossStagesTest, PRE_Restore) {
   AssertCommandStorageBackendFilesExist(SessionType::kSessionRestore);
 }
 
-IN_PROC_BROWSER_TEST_F(SessionRestoreAcrossStagesTest, Restore) {
+// TODO(crbug.com/525638651): Re-enable this test on Linux Wayland.
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(SUPPORTS_OZONE_WAYLAND)
+#define MAYBE_Restore DISABLED_Restore
+#else
+#define MAYBE_Restore Restore
+#endif
+IN_PROC_BROWSER_TEST_F(SessionRestoreAcrossStagesTest, MAYBE_Restore) {
   AssertSessionState();
 }
 
