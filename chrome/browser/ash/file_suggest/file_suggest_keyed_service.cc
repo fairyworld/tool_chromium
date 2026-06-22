@@ -49,12 +49,6 @@ FileSuggestKeyedService::FileSuggestKeyedService(
 
 FileSuggestKeyedService::~FileSuggestKeyedService() = default;
 
-void FileSuggestKeyedService::MaybeUpdateItemSuggestCache(
-    base::PassKey<app_list::ZeroStateDriveProvider>) {
-  drive_file_suggestion_provider_->MaybeUpdateItemSuggestCache(
-      base::PassKey<FileSuggestKeyedService>());
-}
-
 void FileSuggestKeyedService::GetSuggestFileData(
     FileSuggestionType type,
     GetSuggestFileDataCallback callback) {
