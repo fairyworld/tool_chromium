@@ -1215,9 +1215,6 @@ TEST_F(AddressSuggestionGeneratorTest, TestAddressSuggestion_HomeAndWork) {
 // Tests that AccountNameEmail has IPH feature.
 TEST_F(AddressSuggestionGeneratorTest,
        TestAddressSuggestion_AccountNameEmailIph) {
-  base::test::ScopedFeatureList features(
-      features::kAutofillEnableSupportForNameAndEmail);
-
   AutofillProfile profile_account_name_email = test::GetFullProfile();
   profile_account_name_email.SetRawInfo(EMAIL_ADDRESS, u"hoa@gmail.com");
 

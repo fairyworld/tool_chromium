@@ -395,8 +395,6 @@ void SlowlyTypeText(NSString* text) {
   }
 
   if ([self isRunningTest:@selector(testAccountNameEmailIPH)]) {
-    config.features_enabled.push_back(
-        autofill::features::kAutofillEnableSupportForNameAndEmail);
     config.iph_feature_enabled =
         feature_engagement::kIPHAutofillAccountNameEmailSuggestionFeature.name;
   }

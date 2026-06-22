@@ -620,27 +620,6 @@ BASE_FEATURE(kAutofillEnableSkippingUnrecognizedAttribute,
 BASE_FEATURE(kAutofillEnableStreetAddressMergeModes,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-// When enabled, chrome will support name and email address profile.
-// TODO(crbug.com/356845298): Clean up when launched.
-BASE_FEATURE(kAutofillEnableSupportForNameAndEmail,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
-// The number of times after which, a never accepted `kAccountNameEmail`
-// suggestion will result in the `kAccountNameEmail` profile being deleted.
-BASE_FEATURE_PARAM(int,
-                   kAutofillNameAndEmailProfileNotSelectedThreshold,
-                   &kAutofillEnableSupportForNameAndEmail,
-                   "rejection_threshold",
-                   10);
-
-// The pattern used to remove nicknames from the account full name before
-// creating the kAccountNameEmail profile.
-BASE_FEATURE_PARAM(std::string,
-                   kAutofillNameAndEmailProfileNicknameRegex,
-                   &kAutofillEnableSupportForNameAndEmail,
-                   "nickname_regex",
-                   R"(\s+\([^)]*\)|\s+\"[^\"]*\")");
-
 // Enables extended zip code validation.
 // TODO(crbug.com/434140055): Clean up when launched.
 BASE_FEATURE(kAutofillExtendZipCodeValidation,

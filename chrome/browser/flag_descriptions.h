@@ -1121,12 +1121,6 @@ inline constexpr char kAutofillEnableSeparatePixPreferenceItemDescription[] =
     "menu "
     "item.";
 
-inline constexpr char kAutofillEnableSupportForNameAndEmailName[] =
-    "Support for name and email addresses in Autofill";
-inline constexpr char kAutofillEnableSupportForNameAndEmailDescription[] =
-    "When enabled, a name and email profile with data comming from the account "
-    "will be created for autofilling.";
-
 inline constexpr char kAutofillEnableTouchToFillReshowForBnplName[] =
     "Enable the Touch To Fill bottom sheet to be reshown on Android for BNPL.";
 inline constexpr char kAutofillEnableTouchToFillReshowForBnplDescription[] =

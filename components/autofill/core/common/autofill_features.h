@@ -229,14 +229,6 @@ BASE_DECLARE_FEATURE(kAutofillEnableSkippingUnrecognizedAttribute);
 COMPONENT_EXPORT(AUTOFILL)
 BASE_DECLARE_FEATURE(kAutofillEnableStreetAddressMergeModes);
 COMPONENT_EXPORT(AUTOFILL)
-BASE_DECLARE_FEATURE(kAutofillEnableSupportForNameAndEmail);
-COMPONENT_EXPORT(AUTOFILL)
-BASE_DECLARE_FEATURE_PARAM(int,
-                           kAutofillNameAndEmailProfileNotSelectedThreshold);
-COMPONENT_EXPORT(AUTOFILL)
-BASE_DECLARE_FEATURE_PARAM(std::string,
-                           kAutofillNameAndEmailProfileNicknameRegex);
-COMPONENT_EXPORT(AUTOFILL)
 BASE_DECLARE_FEATURE(kAutofillExtendZipCodeValidation);
 COMPONENT_EXPORT(AUTOFILL)
 BASE_DECLARE_FEATURE(kAutofillExtractOnlyNonAdFrames);

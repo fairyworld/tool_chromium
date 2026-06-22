@@ -606,17 +606,14 @@ AutofillSettingsPage SuggestionToAutofillSettingsPage(
     return;
   }
 
-  if (base::FeatureList::IsEnabled(
-          autofill::features::kAutofillEnableSupportForNameAndEmail)) {
-    sceneHandler =
-        HandlerForProtocol(self.browser->GetCommandDispatcher(), SceneCommands);
-    if (address.record_type() ==
-        autofill::AutofillProfile::RecordType::kAccountNameEmail) {
-      OpenNewTabCommand* command = [OpenNewTabCommand
-          commandWithURLFromChrome:GURL(kGoogleAccountNameEmailAddressEditURL)];
-      [sceneHandler openURLInNewTab:command];
-      return;
-    }
+  sceneHandler =
+      HandlerForProtocol(self.browser->GetCommandDispatcher(), SceneCommands);
+  if (address.record_type() ==
+      autofill::AutofillProfile::RecordType::kAccountNameEmail) {
+    OpenNewTabCommand* command = [OpenNewTabCommand
+        commandWithURLFromChrome:GURL(kGoogleAccountNameEmailAddressEditURL)];
+    [sceneHandler openURLInNewTab:command];
+    return;
   }
 
   CommandDispatcher* dispatcher = self.browser->GetCommandDispatcher();
