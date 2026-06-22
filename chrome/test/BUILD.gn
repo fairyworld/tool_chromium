@@ -3477,7 +3477,6 @@ if (!is_android) {
       "../browser/secure_origin_allowlist_browsertest.cc",
       "../browser/signin/e2e_tests/live_sign_in_test.cc",
       "../browser/signin/remove_local_account_browsertest.cc",
-      "../browser/spellchecker/spellcheck_service_browsertest.cc",
       "../browser/ssl/certificate_transparency_browsertest.cc",
       "../browser/ssl/connection_help_tab_helper_browsertest.cc",
       "../browser/ssl/https_upgrades_browsertest.cc",
@@ -4063,7 +4062,6 @@ if (!is_android) {
         "../browser/printing/pdf_to_emf_converter_browsertest.cc",
         "../browser/process_singleton_browsertest.cc",
         "../browser/profiles/profile_shortcut_manager_browsertest_win.cc",
-        "../browser/spellchecker/spell_check_host_chrome_impl_win_browsertest.cc",
         "../browser/ui/color/win/native_chrome_color_mixer_win_browsertest.cc",
         "../browser/ui/views/sync/inline_login_ui_browsertest.cc",
         "../browser/ui/views/uninstall_view_browsertest.cc",
@@ -4103,7 +4101,6 @@ if (!is_android) {
         "../browser/net/chrome_mojo_proxy_resolver_mac_browsertest.cc",
         "../browser/renderer_host/chrome_render_widget_host_view_mac_history_swiper_browsertest.mm",
         "../browser/shell_integration_mac_browsertest.mm",
-        "../browser/spellchecker/spell_check_host_chrome_impl_mac_browsertest.cc",
         "../browser/ui/cocoa/accelerators_cocoa_browsertest.mm",
         "../browser/ui/cocoa/applescript/bookmark_applescript_test_utils.h",
         "../browser/ui/cocoa/applescript/bookmark_applescript_test_utils.mm",
@@ -4126,11 +4123,6 @@ if (!is_android) {
         "../browser/ui/views/web_apps/web_app_integration_browsertest_mac.cc",
         "../common/mac/app_mode_chrome_locator_browsertest.mm",
         "../common/profiler/thread_profiler_browsertest.cc",
-      ]
-      sources -= [
-        # TODO(groby): This test depends on hunspell and we cannot run it on
-        # Mac, which does not use hunspell by default.
-        "../browser/spellchecker/spellcheck_service_browsertest.cc",
       ]
 
       data_deps += [
@@ -5414,7 +5406,10 @@ if (!is_android) {
     if (enable_spellcheck) {
       sources +=
           [ "../browser/site_isolation/spellcheck_per_process_browsertest.cc" ]
-      deps += [ "//chrome/browser/spellchecker" ]
+      deps += [
+        "//chrome/browser/spellchecker",
+        "//chrome/browser/spellchecker:browser_tests",
+      ]
     }
 
     sources +=
@@ -8503,25 +8498,13 @@ test("unit_tests") {
   }
 
   if (enable_spellcheck) {
-    deps += [ "//chrome/browser/spellchecker" ]
+    deps += [
+      "//chrome/browser/spellchecker",
+      "//chrome/browser/spellchecker:unit_tests",
+    ]
 
-    sources +=
-        [ "../browser/spellchecker/spellcheck_custom_dictionary_unittest.cc" ]
-
-    if (is_chromeos || is_linux || is_win) {
-      sources += [ "../browser/spellchecker/spellcheck_language_policy_handlers_unittest.cc" ]
-    }
-
-    if (is_mac) {
+    if (!is_mac) {
       sources += [
-        "../browser/spellchecker/spell_check_host_chrome_impl_mac_unittest.cc",
-      ]
-    } else {
-      sources += [
-        # This tests the function GetSpellCheckLanguages which is not used on
-        # Mac.
-        "../browser/spellchecker/spellcheck_service_unittest.cc",
-
         # This tests Chrome's spellchecker which Mac doesn't use.
         "../tools/convert_dict/aff_reader_unittest.cc",
         "../tools/convert_dict/convert_dict_unittest.cc",
@@ -8537,20 +8520,6 @@ test("unit_tests") {
       "data/convert_dict/prefix-suffix.aff",
       "data/convert_dict/rep.aff",
     ]
-
-    if (use_renderer_spellchecker) {
-      sources +=
-          [ "../browser/spellchecker/spell_check_host_chrome_impl_unittest.cc" ]
-    }
-
-    if (enable_spelling_service) {
-      sources +=
-          [ "../browser/spellchecker/spelling_service_client_unittest.cc" ]
-    }
-
-    if (use_browser_spellchecker && enable_spelling_service) {
-      sources += [ "../browser/spellchecker/spelling_request_unittest.cc" ]
-    }
   }
 
   # Unit tests that run on Win/Mac/Linux and Android desktop. Note that most
@@ -11046,7 +11015,6 @@ if (!is_android && !is_chromeos_device) {
         "../browser/app_controller_mac_interactive_uitest.mm",
         "../browser/global_keyboard_shortcuts_interactive_uitest_mac.mm",
         "../browser/notifications/mac/notification_interactive_uitest_mac.mm",
-        "../browser/spellchecker/spellcheck_mac_view_interactive_uitest.mm",
         "../browser/ui/cocoa/apps/quit_with_apps_controller_mac_interactive_uitest.mm",
         "../browser/ui/cocoa/confirm_quit_panel_controller_interactive_uitest.mm",
         "../browser/ui/cocoa/status_bubble_mac_interactive_uitest.mm",
@@ -11065,6 +11033,7 @@ if (!is_android && !is_chromeos_device) {
       deps += [
         "//chrome/browser/apps/app_shim",
         "//chrome/browser/lifetime:termination_notification",
+        "//chrome/browser/spellchecker:interactive_ui_tests",
         "//chrome/browser/web_applications/extensions",
         "//components/remote_cocoa/app_shim",
         "//components/spellcheck:buildflags",
