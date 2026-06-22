@@ -143,9 +143,8 @@ void CustomCornersBackground::SetCutoutFrom(
     const std::vector<const views::View*>& views) {
   cutout_paths_.clear();
   for (const auto* view : views) {
-    gfx::Rect bounds = view->GetLocalBounds();
-    views::View::ConvertRectToScreen(&*view, &bounds);
-    bounds = views::View::ConvertRectFromScreen(&*view_, bounds);
+    const gfx::Rect bounds =
+        views::View::ConvertRectFromScreen(&*view_, view->GetBoundsInScreen());
     SkPath cutout_path;
     if (auto* const corner = views::AsViewClass<CustomFloatingCorner>(view)) {
       cutout_path = corner->GetBackgroundPath(bounds);
