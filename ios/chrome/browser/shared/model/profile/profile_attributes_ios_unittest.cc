@@ -4,19 +4,21 @@
 
 #include "ios/chrome/browser/shared/model/profile/profile_attributes_ios.h"
 
+#include <string_view>
+
 #include "base/time/time.h"
 #include "testing/platform_test.h"
 
 namespace {
 
 // Constants used by tests.
-constexpr char kProfileName[] = "Profile";
+constexpr std::string_view kProfileName = "Profile";
 constexpr GaiaId::Literal kGaiaId1("Gaia1");
 constexpr GaiaId::Literal kGaiaId2("Gaia2");
-constexpr char kUserName[] = "email@example.com";
+constexpr std::string_view kUserName = "email@example.com";
 
-constexpr char kFakeNotificationClient1[] = "CLIENT_1";
-constexpr char kFakeNotificationClient2[] = "CLIENT_2";
+constexpr std::string_view kFakeNotificationClient1 = "CLIENT_1";
+constexpr std::string_view kFakeNotificationClient2 = "CLIENT_2";
 
 }  // namespace
 
