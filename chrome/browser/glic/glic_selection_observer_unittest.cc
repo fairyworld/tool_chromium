@@ -331,6 +331,7 @@ TEST_F(GlicSelectionObserverTest, MultipleSelectionUpdatesDuringDrag) {
   observer->OnInputEvent(*rwh, mouse_down,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   // First selection update during drag.
   observer->OnTextSelectionChanged(nullptr, u"First");
@@ -348,6 +349,7 @@ TEST_F(GlicSelectionObserverTest, MultipleSelectionUpdatesDuringDrag) {
   observer->OnInputEvent(*rwh, mouse_up,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   // Verify that only the last selection is processed instantly.
   EXPECT_EQ(1, observer->update_count());
@@ -372,6 +374,7 @@ TEST_F(GlicSelectionObserverTest, KeyboardSelectionIgnored) {
   observer->OnInputEvent(*rwh, key_event,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   // Send a text selection event representing a collapsed selection.
   observer->OnTextSelectionChanged(nullptr, u"");
@@ -392,6 +395,7 @@ TEST_F(GlicSelectionObserverTest, KeyboardSelectionIgnored) {
   observer->OnInputEvent(*rwh, mouse_event,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   observer->OnTextSelectionChanged(nullptr, u"Mouse Selection");
   // Should be ignored during selection drag.
@@ -405,6 +409,7 @@ TEST_F(GlicSelectionObserverTest, KeyboardSelectionIgnored) {
   observer->OnInputEvent(*rwh, mouse_up,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   // Should be processed instantly on MouseUp.
   EXPECT_EQ(1, observer->update_count());
@@ -429,6 +434,7 @@ TEST_F(GlicSelectionObserverTest, InlineKeyboardSelectionByShiftAndArrowKeys) {
   observer->OnInputEvent(*rwh, key_event,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   // Send a text selection event representing the expanding selection.
   observer->OnTextSelectionChanged(nullptr, u"Keyboard Selection");
@@ -443,6 +449,7 @@ TEST_F(GlicSelectionObserverTest, InlineKeyboardSelectionByShiftAndArrowKeys) {
   observer->OnInputEvent(*rwh, key_up,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   // The final selection should be processed instantly on KeyUp.
   EXPECT_EQ(1, observer->update_count());
@@ -472,6 +479,7 @@ TEST_F(GlicSelectionObserverTest, SelectAllCommandDebouncedProperly) {
   observer->OnInputEvent(*rwh, key_event,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   // Send a text selection event representing the entire selected page.
   observer->OnTextSelectionChanged(nullptr, u"Entire Page Selected Text");
@@ -486,6 +494,7 @@ TEST_F(GlicSelectionObserverTest, SelectAllCommandDebouncedProperly) {
   observer->OnInputEvent(*rwh, key_up,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   // The selected page text should be processed instantly on KeyUp.
   EXPECT_EQ(1, observer->update_count());
@@ -506,40 +515,24 @@ TEST_F(GlicSelectionObserverTest, InputEventsDismissUI) {
 
   // Keyboard events should dismiss UI with keep_nudge = false.
   // The nudge should be dismissed.
-  // DismissUI posts a task to update the nudge label. To verify the
-  // expectations we must wait for this posted task to run. The posted task
-  // calls GetBrowserWindowInterface() on the TabInterface. By hooking into this
-  // mock call, we can quit the RunLoop, ensuring the test waits exactly until
-  // the async task executes before proceeding to VerifyAndClearExpectations.
-  base::RunLoop run_loop_keyboard;
   EXPECT_CALL(mock_tab, GetBrowserWindowInterface())
-      .WillOnce(testing::InvokeWithoutArgs(
-          [&run_loop_keyboard]() -> BrowserWindowInterface* {
-            run_loop_keyboard.Quit();
-            return nullptr;
-          }));
+      .WillRepeatedly(testing::Return(nullptr));
   blink::WebKeyboardEvent key_event(
       blink::WebInputEvent::Type::kKeyDown, blink::WebInputEvent::kNoModifiers,
       blink::WebInputEvent::GetStaticTimeStampForTests());
   observer->OnInputEvent(*rwh, key_event,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
   EXPECT_TRUE(observer->dismiss_ui_called());
   EXPECT_FALSE(observer->dismiss_ui_kept_nudge());
-  run_loop_keyboard.Run();
   testing::Mock::VerifyAndClearExpectations(&mock_tab);
   observer->Reset();
 
   // Mouse clicks should dismiss UI with keep_nudge = false.
   // The nudge should be dismissed.
-  // We use the same RunLoop trick as above to wait for the posted task to run.
-  base::RunLoop run_loop_mouse;
   EXPECT_CALL(mock_tab, GetBrowserWindowInterface())
-      .WillOnce(testing::InvokeWithoutArgs(
-          [&run_loop_mouse]() -> BrowserWindowInterface* {
-            run_loop_mouse.Quit();
-            return nullptr;
-          }));
+      .WillRepeatedly(testing::Return(nullptr));
   blink::WebMouseEvent mouse_event(
       blink::WebInputEvent::Type::kMouseDown,
       blink::WebInputEvent::kNoModifiers,
@@ -548,9 +541,9 @@ TEST_F(GlicSelectionObserverTest, InputEventsDismissUI) {
   observer->OnInputEvent(*rwh, mouse_event,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
   EXPECT_TRUE(observer->dismiss_ui_called());
   EXPECT_FALSE(observer->dismiss_ui_kept_nudge());
-  run_loop_mouse.Run();
   testing::Mock::VerifyAndClearExpectations(&mock_tab);
   observer->Reset();
 
@@ -564,6 +557,7 @@ TEST_F(GlicSelectionObserverTest, InputEventsDismissUI) {
   observer->OnInputEvent(*rwh, scroll_event,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
   EXPECT_TRUE(observer->dismiss_ui_called());
   EXPECT_TRUE(observer->dismiss_ui_kept_nudge());
   testing::Mock::VerifyAndClearExpectations(&mock_tab);
@@ -639,6 +633,7 @@ TEST_F(GlicSelectionObserverTest, SelectionShowOnlyAfterMouseUp) {
   observer->OnInputEvent(*rwh, mouse_down_event,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   // Selection changes during drag.
   observer->OnTextSelectionChanged(nullptr, u"Drag Selection");
@@ -655,6 +650,7 @@ TEST_F(GlicSelectionObserverTest, SelectionShowOnlyAfterMouseUp) {
   observer->OnInputEvent(*rwh, mouse_up_event,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   // Verify the update has been processed immediately.
   EXPECT_EQ(1, observer->update_count());
@@ -679,6 +675,7 @@ TEST_F(GlicSelectionObserverTest, SelectionShowOnTripleClick) {
   observer->OnInputEvent(*rwh, mouse_down1,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   blink::WebMouseEvent mouse_up1(
       blink::WebInputEvent::Type::kMouseUp, blink::WebInputEvent::kNoModifiers,
@@ -688,6 +685,7 @@ TEST_F(GlicSelectionObserverTest, SelectionShowOnTripleClick) {
   observer->OnInputEvent(*rwh, mouse_up1,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   // Simulate a double click.
   blink::WebMouseEvent mouse_down2(
@@ -699,6 +697,7 @@ TEST_F(GlicSelectionObserverTest, SelectionShowOnTripleClick) {
   observer->OnInputEvent(*rwh, mouse_down2,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   observer->OnTextSelectionChanged(nullptr, u"Word");
 
@@ -710,6 +709,7 @@ TEST_F(GlicSelectionObserverTest, SelectionShowOnTripleClick) {
   observer->OnInputEvent(*rwh, mouse_up2,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   // Verify widget shown for Word.
   EXPECT_EQ(1, observer->update_count());
@@ -727,6 +727,7 @@ TEST_F(GlicSelectionObserverTest, SelectionShowOnTripleClick) {
   observer->OnInputEvent(*rwh, mouse_down3,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   observer->OnTextSelectionChanged(nullptr, u"Entire Paragraph");
 
@@ -738,6 +739,7 @@ TEST_F(GlicSelectionObserverTest, SelectionShowOnTripleClick) {
   observer->OnInputEvent(*rwh, mouse_up3,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   // Verify widget shown for Entire Paragraph.
   EXPECT_EQ(1, observer->update_count());
@@ -765,6 +767,7 @@ TEST_F(GlicSelectionObserverTest, SelectionShowOnShiftClick) {
   observer->OnInputEvent(*rwh, shift_down,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   // Expect UI to be dismissed.
   EXPECT_TRUE(observer->dismiss_ui_called());
@@ -779,6 +782,7 @@ TEST_F(GlicSelectionObserverTest, SelectionShowOnShiftClick) {
   observer->OnInputEvent(*rwh, mouse_down,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   // Selection extended.
   observer->OnTextSelectionChanged(nullptr, u"Initial Text Extended");
@@ -791,6 +795,7 @@ TEST_F(GlicSelectionObserverTest, SelectionShowOnShiftClick) {
   observer->OnInputEvent(*rwh, mouse_up,
                          content::RenderWidgetHost::InputEventObserver::
                              InputEventSource::kUnknown);
+  task_environment()->RunUntilIdle();
 
   // Verify widget shown for extended text.
   EXPECT_EQ(1, observer->update_count());
