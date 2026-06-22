@@ -32,6 +32,7 @@ class IdentityRegistry;
 class IdpRegistrationHandler;
 class IdpNetworkRequestManager;
 class UserInfoRequest;
+class DisconnectRequest;
 
 // RequestService is a document-scoped manager class that coordinates
 // Federated Credential Management (FedCM) requests for a given RenderFrameHost.
@@ -61,6 +62,8 @@ class CONTENT_EXPORT RequestService
   void RegisterIdP(const GURL& idp, RegisterIdPCallback callback) override;
   void UnregisterIdP(const GURL& idp, UnregisterIdPCallback callback) override;
   void PreventSilentAccess(PreventSilentAccessCallback callback) override;
+  void Disconnect(blink::mojom::IdentityCredentialDisconnectOptionsPtr options,
+                  DisconnectCallback callback) override;
 
   Request* GetActiveRequestForTesting() { return active_request_.get(); }
 
@@ -92,6 +95,8 @@ class CONTENT_EXPORT RequestService
  private:
   friend class DocumentUserData<RequestService>;
   friend class Request;
+  friend class RequestTest;
+  friend class RequestRegistryTest;
 
   std::unique_ptr<Request> active_request_;
 
@@ -113,6 +118,9 @@ class CONTENT_EXPORT RequestService
       RequestUserInfoCallback callback,
       blink::mojom::RequestUserInfoStatus status,
       std::optional<std::vector<blink::mojom::IdentityUserInfoPtr>> user_info);
+  void CompleteDisconnectRequest(DisconnectCallback callback,
+                                 blink::mojom::DisconnectStatus status);
+  std::unique_ptr<Metrics> CreateFedCmMetrics();
 
   std::unique_ptr<IdpNetworkRequestManager> registration_network_manager_;
   std::unique_ptr<IdpRegistrationHandler> fedcm_idp_registration_handler_;
@@ -126,6 +134,7 @@ class CONTENT_EXPORT RequestService
       auto_reauthn_permission_delegate_ = nullptr;
   raw_ptr<FederatedIdentityPermissionContextDelegate> permission_delegate_ =
       nullptr;
+  std::unique_ptr<DisconnectRequest> disconnect_request_;
 
   base::WeakPtrFactory<RequestService> weak_ptr_factory_{this};
 };

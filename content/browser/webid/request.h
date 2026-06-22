@@ -50,7 +50,6 @@ class RenderFrameHost;
 
 namespace webid {
 
-class DisconnectRequest;
 class RequestService;
 
 using blink::mojom::IdentityProviderGetParametersPtr;
@@ -483,9 +482,6 @@ class CONTENT_EXPORT Request
                   const GURL& idp_config_url,
                   GURL login_url);
 
-  void CompleteDisconnectRequest(DisconnectCallback callback,
-                                 blink::mojom::DisconnectStatus status);
-
   void RecordErrorMetrics(
       blink::mojom::IdentityProviderRequestOptionsPtr idp,
       IdpNetworkRequestManager::FedCmTokenResponseType token_response_type,
@@ -589,9 +585,6 @@ class CONTENT_EXPORT Request
   std::unique_ptr<AccountsFetcher> fedcm_accounts_fetcher_;
 
   std::unique_ptr<FederatedSdJwtHandler> federated_sdjwt_handler_;
-
-  // Pending disconnect request.
-  std::unique_ptr<DisconnectRequest> disconnect_request_;
 
   // TODO(crbug.com/40238075): Refactor these member variables introduced
   // through the multi IDP prototype implementation to make them less confusing.

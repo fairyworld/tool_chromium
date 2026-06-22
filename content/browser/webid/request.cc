@@ -29,7 +29,6 @@
 #include "content/browser/devtools/devtools_instrumentation.h"
 #include "content/browser/renderer_host/render_frame_host_impl.h"
 #include "content/browser/web_contents/web_contents_impl.h"
-#include "content/browser/webid/disconnect_request.h"
 #include "content/browser/webid/fake_identity_request_dialog_controller.h"
 #include "content/browser/webid/flags.h"
 #include "content/browser/webid/identity_registry.h"
@@ -185,11 +184,6 @@ Request::~Request() {
                              TokenStatus::kUnhandledRequest,
                              /*should_delay_callback=*/false);
   }
-  // Calls |DisconnectRequest|'s destructor to complete the
-  // revocation request. This is needed because otherwise some resources like
-  // `fedcm_metrics_` may no longer be usable when the destructor get invoked
-  // naturally.
-  disconnect_request_.reset();
 }
 
 void Request::BindReceiver(
@@ -809,20 +803,6 @@ void Request::OnAccountsResultsReceived(
     OnFetchDataForIdpSucceeded(std::move(*result.accounts),
                                std::move(result.idp_info));
   }
-}
-
-void Request::CompleteDisconnectRequest(DisconnectCallback callback,
-                                        blink::mojom::DisconnectStatus status) {
-  // `disconnect_request_` may be null here if the completion is invoked from
-  // the Request destructor, which destroys
-  // `disconnect_request_`. The DisconnectRequest destructor would
-  // trigger the callback.
-  if (!disconnect_request_ &&
-      status == blink::mojom::DisconnectStatus::kSuccess) {
-    NOTREACHED() << "The successful disconnect request is nowhere to be found";
-  }
-  std::move(callback).Run(status);
-  disconnect_request_.reset();
 }
 
 bool Request::CanShowContinueOnPopup() const {
@@ -2694,47 +2674,7 @@ void Request::PreventSilentAccess(PreventSilentAccessCallback callback) {
 void Request::Disconnect(
     blink::mojom::IdentityCredentialDisconnectOptionsPtr options,
     DisconnectCallback callback) {
-  // Enforce identity-credentials-get Permissions Policy browser-side.
-  // The renderer checks this, but a compromised renderer can bypass it.
-  if (!render_frame_host().IsFeatureEnabled(
-          network::mojom::PermissionsPolicyFeature::kIdentityCredentialsGet)) {
-    ReportBadMessage("identity-credentials-get permissions policy not enabled");
-    return;
-  }
-
-  std::unique_ptr<Metrics> disconnect_metrics = CreateFedCmMetrics();
-  if (disconnect_request_) {
-    // Since we do not send any fetches in this case, consider the request to be
-    // instant, e.g. duration is 0.
-    render_frame_host().AddMessageToConsole(
-        blink::mojom::ConsoleMessageLevel::kError,
-        GetDisconnectConsoleErrorMessage(DisconnectStatus::kTooManyRequests));
-    disconnect_metrics->RecordDisconnectMetrics(
-        DisconnectStatus::kTooManyRequests, std::nullopt,
-        ComputeRequesterFrameType(render_frame_host(), origin(),
-                                  GetEmbeddingOrigin()),
-        options->config->config_url);
-    std::move(callback).Run(
-        blink::mojom::DisconnectStatus::kErrorTooManyRequests);
-    return;
-  }
-
-  bool intercept = false;
-  bool should_complete_request_immediately = false;
-  devtools_instrumentation::WillSendFedCmRequest(
-      render_frame_host(), &intercept, &should_complete_request_immediately);
-
-  auto network_manager = CreateNetworkManager();
-
-  disconnect_request_ = DisconnectRequest::Create(
-      std::move(network_manager), permission_delegate_, &render_frame_host(),
-      std::move(disconnect_metrics), std::move(options));
-  DisconnectRequest* disconnect_request_ptr = disconnect_request_.get();
-
-  disconnect_request_ptr->SetCallbackAndStart(
-      base::BindOnce(&Request::CompleteDisconnectRequest,
-                     weak_ptr_factory_.GetWeakPtr(), std::move(callback)),
-      api_permission_delegate_);
+  request_service_->Disconnect(std::move(options), std::move(callback));
 }
 
 void Request::RecordErrorMetrics(

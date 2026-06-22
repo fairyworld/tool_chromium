@@ -6,7 +6,9 @@
 
 #include "base/command_line.h"
 #include "base/functional/bind.h"
+#include "content/browser/devtools/devtools_instrumentation.h"
 #include "content/browser/renderer_host/render_frame_host_impl.h"
+#include "content/browser/webid/disconnect_request.h"
 #include "content/browser/webid/fake_identity_request_dialog_controller.h"
 #include "content/browser/webid/flags.h"
 #include "content/browser/webid/idp_registration_handler.h"
@@ -54,6 +56,7 @@ RequestService::~RequestService() {
   // clear).
   weak_ptr_factory_.InvalidateWeakPtrs();
   user_info_requests_.clear();
+  disconnect_request_.reset();
   if (num_requests_ > 0) {
     Metrics::RecordNumRequestsPerDocument(
         render_frame_host().GetPageUkmSourceId(), num_requests_);
@@ -274,6 +277,73 @@ void RequestService::CompleteUserInfoRequest(
     std::move(callback).Run(
         blink::mojom::RequestUserInfoResult::NewStatus(status));
   }
+}
+
+void RequestService::Disconnect(
+    blink::mojom::IdentityCredentialDisconnectOptionsPtr options,
+    DisconnectCallback callback) {
+  // Enforce identity-credentials-get Permissions Policy browser-side.
+  // The renderer checks this, but a compromised renderer can bypass it.
+  if (!render_frame_host().IsFeatureEnabled(
+          network::mojom::PermissionsPolicyFeature::kIdentityCredentialsGet)) {
+    mojo::ReportBadMessage(
+        "identity-credentials-get permissions policy not enabled");
+    std::move(callback).Run(blink::mojom::DisconnectStatus::kError);
+    return;
+  }
+
+  std::unique_ptr<Metrics> disconnect_metrics = CreateFedCmMetrics();
+  if (disconnect_request_) {
+    // Since we do not send any fetches in this case, consider the request to be
+    // instant, e.g. duration is 0.
+    render_frame_host().AddMessageToConsole(
+        blink::mojom::ConsoleMessageLevel::kError,
+        GetDisconnectConsoleErrorMessage(DisconnectStatus::kTooManyRequests));
+    disconnect_metrics->RecordDisconnectMetrics(
+        DisconnectStatus::kTooManyRequests, std::nullopt,
+        ComputeRequesterFrameType(
+            render_frame_host(), render_frame_host().GetLastCommittedOrigin(),
+            render_frame_host().GetMainFrame()->GetLastCommittedOrigin()),
+        options->config->config_url);
+    std::move(callback).Run(
+        blink::mojom::DisconnectStatus::kErrorTooManyRequests);
+    return;
+  }
+
+  bool intercept = false;
+  bool should_complete_request_immediately = false;
+  devtools_instrumentation::WillSendFedCmRequest(
+      render_frame_host(), &intercept, &should_complete_request_immediately);
+
+  auto network_manager = CreateNetworkManager();
+
+  disconnect_request_ = DisconnectRequest::Create(
+      std::move(network_manager), permission_delegate_, &render_frame_host(),
+      std::move(disconnect_metrics), std::move(options));
+  DisconnectRequest* disconnect_request_ptr = disconnect_request_.get();
+
+  disconnect_request_ptr->SetCallbackAndStart(
+      base::BindOnce(&RequestService::CompleteDisconnectRequest,
+                     weak_ptr_factory_.GetWeakPtr(), std::move(callback)),
+      api_permission_delegate_);
+}
+
+void RequestService::CompleteDisconnectRequest(
+    DisconnectCallback callback,
+    blink::mojom::DisconnectStatus status) {
+  CHECK(disconnect_request_);
+  std::move(callback).Run(status);
+  disconnect_request_.reset();
+}
+
+std::unique_ptr<Metrics> RequestService::CreateFedCmMetrics() {
+  // Ensure the lifecycle state as GetPageUkmSourceId doesn't support the
+  // prerendering page. As FederatedRequestService runs behind the
+  // BrowserInterfaceBinders, the service doesn't receive any request while
+  // prerendering, and the CHECK should always meet the condition.
+  CHECK(!render_frame_host().IsInLifecycleState(
+      RenderFrameHost::LifecycleState::kPrerendering));
+  return std::make_unique<Metrics>(render_frame_host().GetPageUkmSourceId());
 }
 
 }  // namespace webid
