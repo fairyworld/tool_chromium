@@ -504,15 +504,10 @@ gpu::SyncToken GLES2Implementation::CopySharedImageToGLTextureViaTextureCopy(
       source_shared_image->alpha_type() == kPremul_SkAlphaType;
 
   const bool do_flip_y = source_shared_image->surface_origin() != dst_origin;
-  // Must reallocate the destination texture and copy only a sub-portion.
-
   // There should always be enough data in the source texture to
   // cover this copy.
   GPU_CLIENT_DCHECK(src_rect.width() <= source_shared_image->size().width());
   GPU_CLIENT_DCHECK(src_rect.height() <= source_shared_image->size().height());
-
-  BindAndTexImage2D(this, dst_target, dst_texture, dst_internal_format,
-                    dst_format, dst_type, dst_level, src_rect.size());
   // TODO(crbug.com/378688985): `src_rect` is always in top-left
   // coordinate space, but CopySubTextureCHROMIUM requires it to be in texture
   // space, so this is incorrect if `source_shared_image` origin is bottom
@@ -541,6 +536,8 @@ GLES2Implementation::CopySharedImageDirectlyToGLTexture(
     GrSurfaceOrigin dst_origin) {
   std::unique_ptr<gpu::RasterScopedAccess> destination_access;
   if (CanCopySharedImageToGLTextureViaTextureCopy(source_shared_image)) {
+    BindAndTexImage2D(this, dst_target, dst_texture, dst_internal_format,
+                      dst_format, dst_type, dst_level, src_rect.size());
     CopySharedImageToGLTextureViaTextureCopy(
         src_rect, source_shared_image, source_sync_token, dst_target,
         dst_texture, dst_internal_format, dst_format, dst_type, dst_level,
