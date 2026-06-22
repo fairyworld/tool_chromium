@@ -2309,8 +2309,7 @@ TEST_F(AutofillAiManagerTest, OnPrefetchContextComplete_RunCallback) {
 
   EXPECT_CALL(callback, Run);
 
-  manager().OnPrefetchContextComplete(pcontext_manager(),
-                                      /*success=*/true);
+  manager().OnPrefetchContextComplete(pcontext_manager(), {});
 }
 
 // Tests that the update callback is not run if the loading suggestion was not
@@ -2336,8 +2335,7 @@ TEST_F(AutofillAiManagerTest, OnPrefetchContextComplete_NoFetchingSuggestion) {
 
   EXPECT_CALL(callback, Run).Times(0);
 
-  manager().OnPrefetchContextComplete(pcontext_manager(),
-                                      /*success=*/true);
+  manager().OnPrefetchContextComplete(pcontext_manager(), {});
 }
 
 // Tests that the update callback is not run if the form that triggered
@@ -2365,8 +2363,7 @@ TEST_F(AutofillAiManagerTest, OnPrefetchContextComplete_FormNotFound) {
 
   EXPECT_CALL(callback, Run).Times(0);
 
-  manager().OnPrefetchContextComplete(pcontext_manager(),
-                                      /*success=*/true);
+  manager().OnPrefetchContextComplete(pcontext_manager(), {});
 }
 
 }  // namespace

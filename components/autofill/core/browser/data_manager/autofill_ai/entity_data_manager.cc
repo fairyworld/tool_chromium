@@ -248,9 +248,12 @@ void EntityDataManager::OnHistoryDeletions(
   }
 }
 
-void EntityDataManager::OnMaskedEntitiesPrefetched(
+void EntityDataManager::OnPrefetchContextComplete(
     const PersonalContextAccessManager& manager,
     base::span<const EntityInstance> entities) {
+  if (entities.empty()) {
+    return;
+  }
   CHECK(std::ranges::all_of(entities, [](const EntityInstance& entity) {
     return entity.record_type() == EntityInstance::RecordType::kPersonalContext;
   }));

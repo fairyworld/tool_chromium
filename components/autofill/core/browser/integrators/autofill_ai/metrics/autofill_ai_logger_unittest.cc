@@ -149,7 +149,7 @@ class BaseAutofillAiTest : public testing::Test {
         webdata_helper_.WaitUntilIdle();
         break;
       case EntityInstance::RecordType::kPersonalContext:
-        edm.OnMaskedEntitiesPrefetched(pcontext_manager_, {entity});
+        edm.OnPrefetchContextComplete(pcontext_manager_, {entity});
         break;
     }
   }

@@ -163,7 +163,7 @@ class EntityDataManager : public KeyedService,
                           const history::DeletionInfo& deletion_info) override;
 
   // PersonalContextAccessManager::Observer:
-  void OnMaskedEntitiesPrefetched(
+  void OnPrefetchContextComplete(
       const PersonalContextAccessManager& manager,
       base::span<const EntityInstance> entities) override;
   void OnMaskedEntityTypeEvicted(const PersonalContextAccessManager& manager,

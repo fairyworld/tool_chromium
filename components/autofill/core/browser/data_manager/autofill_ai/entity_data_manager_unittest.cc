@@ -478,7 +478,7 @@ TEST_F(
 
 // Tests that whenever pContext entities are prefetched, they are stored in the
 // data manager.
-TEST_F(EntityDataManagerTest_InitiallyEmpty, OnMaskedEntitiesPrefetched) {
+TEST_F(EntityDataManagerTest_InitiallyEmpty, OnPrefetchContextComplete) {
   // Wait for the database to load to prevent additional observer events.
   helper().WaitUntilIdle();
   MockEntityDataManagerObserver observer;
@@ -492,8 +492,8 @@ TEST_F(EntityDataManagerTest_InitiallyEmpty, OnMaskedEntitiesPrefetched) {
       {.record_type = EntityInstance::RecordType::kPersonalContext});
 
   EXPECT_CALL(observer, OnEntityInstancesChanged);
-  entity_data_manager().OnMaskedEntitiesPrefetched(pcontext_manager(),
-                                                   {order, shipment});
+  entity_data_manager().OnPrefetchContextComplete(pcontext_manager(),
+                                                  {order, shipment});
   EXPECT_THAT(GetEntityInstances(), UnorderedElementsAre(order, shipment));
 }
 
@@ -516,8 +516,8 @@ TEST_F(EntityDataManagerTest_InitiallyEmpty, OnMaskedEntityTypeEvicted) {
   // Expect OnEntityInstancesChanged() to be called once after prefetching and
   // once after eviction.
   EXPECT_CALL(observer, OnEntityInstancesChanged).Times(2);
-  entity_data_manager().OnMaskedEntitiesPrefetched(pcontext_manager(),
-                                                   {order, shipment});
+  entity_data_manager().OnPrefetchContextComplete(pcontext_manager(),
+                                                  {order, shipment});
   ASSERT_THAT(GetEntityInstances(), UnorderedElementsAre(order, shipment));
 
   // Evict orders.

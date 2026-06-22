@@ -358,7 +358,7 @@ void AutofillAiManager::OnAfterLoadedServerPredictions(
 
 void AutofillAiManager::OnPrefetchContextComplete(
     const PersonalContextAccessManager& manager,
-    bool success) {
+    base::span<const EntityInstance> entities) {
   if (!std::ranges::contains(client_->GetAutofillSuggestions(),
                              SuggestionType::kFetchingAmbientData,
                              &Suggestion::type)) {

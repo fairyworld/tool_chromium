@@ -25,16 +25,10 @@ class PersonalContextAccessManager : public KeyedService {
   class Observer : public base::CheckedObserver {
    public:
     // Called when asynchronous prefetching of entities through
-    // `PrefetchContext()` finishes. In case it succeeds and fetched entities,
-    // the entities themselves are broadcast through
-    // `OnMaskedEntitiesPrefetched()`.
+    // `PrefetchContext()` finishes. If prefetching succeeded, `entities`
+    // contains the result. In case it failed or the response was empty,
+    // `entities` is empty.
     virtual void OnPrefetchContextComplete(
-        const PersonalContextAccessManager& manager,
-        bool success) {}
-    // Called with the result of a prefetch call in case entities were fetched.
-    // TODO(crbug.com/516721244): At the moment, this is called once per
-    // prefetched entity type instead of just once.
-    virtual void OnMaskedEntitiesPrefetched(
         const PersonalContextAccessManager& manager,
         base::span<const EntityInstance> entities) {}
     // Called whenever a prefetched entity reaches its TTL or expires for

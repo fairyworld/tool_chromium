@@ -159,7 +159,7 @@ class AutofillAiSuggestionGeneratorTest : public testing::Test {
           edm().AddOrUpdateEntityInstance(entity);
           break;
         case EntityInstance::RecordType::kPersonalContext:
-          edm().OnMaskedEntitiesPrefetched(pcontext_manager_, {entity});
+          edm().OnPrefetchContextComplete(pcontext_manager_, {entity});
           break;
       }
     }
