@@ -2984,7 +2984,7 @@ TEST_P(PaymentsDataManagerShouldBlockBenefitsTest, NonSupportedAppLocale) {
 TEST_P(PaymentsDataManagerShouldBlockBenefitsTest,
        BlockedUrlForFlateRateBenefit) {
   if (app_locale() != "en-US" && app_locale() != "en-GB") {
-    GTEST_SKIP() << "This test should not run for not supported app locale.";
+    GTEST_SKIP() << "This test should not run for unsupported app locales.";
   }
 
   const url::Origin origin =
@@ -3036,7 +3036,7 @@ TEST_P(PaymentsDataManagerShouldBlockBenefitsTest,
 TEST_P(PaymentsDataManagerShouldBlockBenefitsTest,
        BlockedUrlForFlateRateBenefit_BlocklistDisabled) {
   if (app_locale() != "en-US" && app_locale() != "en-GB") {
-    GTEST_SKIP() << "This test should not run for not supported app locale.";
+    GTEST_SKIP() << "This test should not run for unsupported app locales.";
   }
 
   base::test::ScopedFeatureList scoped_feature_list;
@@ -3068,6 +3068,127 @@ TEST_P(PaymentsDataManagerShouldBlockBenefitsTest,
   EXPECT_EQ(std::get<CreditCardFlatRateBenefit>(benefit.value())
                 .benefit_description(),
             flat_rate_benefit.benefit_description());
+}
+
+// Tests that parent category travel benefit is returned when optimization guide
+// suggests a travel subcategory (e.g. flights) but no direct subcategory
+// benefit is available. Also verifies that direct subcategory benefits take
+// precedence if both are available.
+TEST_P(PaymentsDataManagerShouldBlockBenefitsTest,
+       ApplicableBenefitDescriptionForTravelSubcategoryFallback) {
+  if (app_locale() != "en-US" && app_locale() != "en-GB") {
+    GTEST_SKIP() << "This test should not run for unsupported app locales.";
+  }
+
+  base::test::ScopedFeatureList scoped_feature_list(
+      features::kAutofillEnableTravelCategoryAndMerchantBenefitsFromCurinos);
+
+  const url::Origin origin =
+      url::Origin::Create(GURL("https://example-travel.com/"));
+  ON_CALL(*static_cast<MockAutofillOptimizationGuideDecider*>(
+              autofill_client()->GetAutofillOptimizationGuideDecider()),
+          AttemptToGetEligibleCreditCardBenefitCategory)
+      .WillByDefault(testing::Return(
+          CreditCardCategoryBenefit::BenefitCategory::kFlights));
+
+  // Create a card and a generic travel category benefit.
+  CreditCard card = test::GetMaskedServerCard();
+  test_api(payments_data_manager()).AddServerCreditCard(card);
+
+  CreditCardCategoryBenefit travel_benefit =
+      test::GetActiveCreditCardCategoryBenefit();
+  test_api(travel_benefit)
+      .SetLinkedCardInstrumentId(
+          CreditCardBenefitBase::LinkedCardInstrumentId(card.instrument_id()));
+  test_api(travel_benefit)
+      .SetBenefitCategory(CreditCardCategoryBenefit::BenefitCategory::kTravel);
+  std::u16string travel_description = u"5% back on Travel";
+  test_api(travel_benefit).SetBenefitDescription(travel_description);
+
+  payments_data_manager().AddCreditCardBenefitForTest(travel_benefit);
+
+  // Fallback path: returns broad travel benefit description when flight benefit
+  // is missing.
+  std::optional<CreditCardBenefit> benefit =
+      payments_data_manager().GetApplicableBenefitForCardAndOrigin(
+          card, origin,
+          autofill_client()->GetAutofillOptimizationGuideDecider());
+  ASSERT_TRUE(benefit.has_value());
+  EXPECT_EQ(std::get<CreditCardCategoryBenefit>(benefit.value())
+                .benefit_description(),
+            travel_description);
+
+  // Now add a specific flight benefit to the same card.
+  CreditCardCategoryBenefit flight_benefit =
+      test::GetActiveCreditCardCategoryBenefit();
+  test_api(flight_benefit)
+      .SetLinkedCardInstrumentId(
+          CreditCardBenefitBase::LinkedCardInstrumentId(card.instrument_id()));
+  test_api(flight_benefit)
+      .SetBenefitCategory(CreditCardCategoryBenefit::BenefitCategory::kFlights);
+  std::u16string flight_description = u"10% back on Flights";
+  test_api(flight_benefit).SetBenefitDescription(flight_description);
+  // Ensure unique benefit id to avoid overwriting or map collisions.
+  test_api(flight_benefit)
+      .SetBenefitId(CreditCardBenefitBase::BenefitId("flight_benefit_id"));
+
+  payments_data_manager().AddCreditCardBenefitForTest(flight_benefit);
+
+  // Direct path precedence: returns specific flight benefit description.
+  benefit = payments_data_manager().GetApplicableBenefitForCardAndOrigin(
+      card, origin, autofill_client()->GetAutofillOptimizationGuideDecider());
+  ASSERT_TRUE(benefit.has_value());
+  EXPECT_EQ(std::get<CreditCardCategoryBenefit>(benefit.value())
+                .benefit_description(),
+            flight_description);
+}
+
+// Tests that no category benefit is returned when optimization guide
+// suggests a travel subcategory (e.g. flights) but no direct subcategory
+// benefit is available when the Curinos category and merchant benefit flag is
+// disabled.
+TEST_P(
+    PaymentsDataManagerShouldBlockBenefitsTest,
+    ApplicableBenefitDescriptionForTravelSubcategoryFallback_CurinosCategoryBenefitDisabled) {
+  if (app_locale() != "en-US" && app_locale() != "en-GB") {
+    GTEST_SKIP() << "This test should not run for unsupported app locales.";
+  }
+
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitAndDisableFeature(
+      features::kAutofillEnableTravelCategoryAndMerchantBenefitsFromCurinos);
+
+  const url::Origin origin =
+      url::Origin::Create(GURL("https://example-travel.com/"));
+  ON_CALL(*static_cast<MockAutofillOptimizationGuideDecider*>(
+              autofill_client()->GetAutofillOptimizationGuideDecider()),
+          AttemptToGetEligibleCreditCardBenefitCategory)
+      .WillByDefault(testing::Return(
+          CreditCardCategoryBenefit::BenefitCategory::kFlights));
+
+  // Create a card and a generic travel category benefit.
+  CreditCard card = test::GetMaskedServerCard();
+  test_api(payments_data_manager()).AddServerCreditCard(card);
+
+  CreditCardCategoryBenefit travel_benefit =
+      test::GetActiveCreditCardCategoryBenefit();
+  test_api(travel_benefit)
+      .SetLinkedCardInstrumentId(
+          CreditCardBenefitBase::LinkedCardInstrumentId(card.instrument_id()));
+  test_api(travel_benefit)
+      .SetBenefitCategory(CreditCardCategoryBenefit::BenefitCategory::kTravel);
+  std::u16string travel_description = u"5% back on Travel";
+  test_api(travel_benefit).SetBenefitDescription(travel_description);
+
+  payments_data_manager().AddCreditCardBenefitForTest(travel_benefit);
+
+  // Fallback path: returns std::nullopt when flight benefit is missing and
+  // Curinos travel benefits are disabled.
+  std::optional<CreditCardBenefit> benefit =
+      payments_data_manager().GetApplicableBenefitForCardAndOrigin(
+          card, origin,
+          autofill_client()->GetAutofillOptimizationGuideDecider());
+  EXPECT_FALSE(benefit.has_value());
 }
 
 INSTANTIATE_TEST_SUITE_P(
