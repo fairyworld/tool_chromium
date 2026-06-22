@@ -152,7 +152,6 @@ try_.builder(
     ssd = None,
     free_space = None,
     cq_settings = try_.cq_settings(
-        experiment_percentage = 100,
         location_filters = [
             cq.location_filter(path_regexp = "content/test/gpu/.+"),
             cq.location_filter(path_regexp = "gpu/.+"),
