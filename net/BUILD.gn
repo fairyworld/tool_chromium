@@ -467,7 +467,6 @@ component("net") {
     "device_bound_sessions/session_event.h",
     "device_bound_sessions/session_inclusion_rules_display.cc",
     "device_bound_sessions/session_inclusion_rules_display.h",
-    "device_bound_sessions/session_key.cc",
     "device_bound_sessions/session_key.h",
     "device_bound_sessions/session_params.h",
     "device_bound_sessions/session_usage.cc",
