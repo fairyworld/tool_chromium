@@ -16,15 +16,14 @@ import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.ui.autofill.internal.R;
 
-/** View for an individual suggestion in the AtMemory bottom sheet. */
+/** View for the interactive search tile in the AtMemory bottom sheet. */
 @NullMarked
-public class AtMemoryBottomSheetSuggestionView extends LinearLayout {
+public class AtMemoryBottomSheetSearchTileView extends LinearLayout {
     private ImageView mIconView;
     private TextView mTitleView;
     private TextView mDetailsView;
-    private View mArrowView;
 
-    public AtMemoryBottomSheetSuggestionView(Context context, AttributeSet attrs) {
+    public AtMemoryBottomSheetSearchTileView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -34,7 +33,6 @@ public class AtMemoryBottomSheetSuggestionView extends LinearLayout {
         mIconView = findViewById(R.id.icon_view);
         mTitleView = findViewById(R.id.title_text);
         mDetailsView = findViewById(R.id.details_text);
-        mArrowView = findViewById(R.id.arrow_view);
     }
 
     public void setIcon(int resId) {
@@ -50,11 +48,7 @@ public class AtMemoryBottomSheetSuggestionView extends LinearLayout {
         mDetailsView.setVisibility(TextUtils.isEmpty(text) ? View.GONE : View.VISIBLE);
     }
 
-    public void setSuggestionClickListener(Runnable callback) {
+    public void setClickListener(Runnable callback) {
         setOnClickListener(v -> callback.run());
-    }
-
-    public void setFlyoutClickListener(Runnable callback) {
-        mArrowView.setOnClickListener(v -> callback.run());
     }
 }

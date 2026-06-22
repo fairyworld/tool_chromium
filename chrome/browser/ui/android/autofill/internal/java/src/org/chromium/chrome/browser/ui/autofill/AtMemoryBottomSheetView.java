@@ -58,8 +58,24 @@ public class AtMemoryBottomSheetView {
         mSearchBarView.setOnQuerySubmittedCallback(callback);
     }
 
+    public void setOnQueryTextChangedCallback(Callback<String> callback) {
+        mSearchBarView.setOnQueryTextChangedCallback(callback);
+    }
+
     public void setIsLoading(boolean isLoading) {
         mSearchBarView.setIsLoading(isLoading);
+    }
+
+    public void setShowSuggestionsBackground(boolean showBackground) {
+        if (showBackground) {
+            mRecyclerView.setBackgroundResource(R.drawable.at_memory_suggestions_bg);
+        } else {
+            mRecyclerView.setBackground(null);
+        }
+    }
+
+    public void hideKeyboardAndClearFocus() {
+        mSearchBarView.hideKeyboardAndClearFocus();
     }
 
     /** Draws a divider line below each item in the list except for the last item. */
