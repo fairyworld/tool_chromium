@@ -1322,6 +1322,7 @@ source_set("core") {
   if (is_win || is_mac || is_linux || is_chromeos) {
     deps += [
       "//chrome/browser/captive_portal",
+      "//chrome/browser/enterprise/network_header_injection",
       "//chrome/browser/headless:headless_extra_parts",
       "//chrome/browser/hid",
       "//chrome/browser/indigo/onboarding",
@@ -2602,7 +2603,6 @@ source_set("browser") {
     "//components/enterprise/device_trust",
     "//components/enterprise/encryption/cache",
     "//components/enterprise/isolated_mode",
-    "//components/enterprise/network_header_injection/core",
     "//components/enterprise/networking",
     "//components/enterprise/obfuscation/core:enterprise_obfuscation",
     "//components/error_page/common",
