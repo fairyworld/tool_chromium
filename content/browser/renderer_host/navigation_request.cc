@@ -7796,8 +7796,8 @@ bool NavigationRequest::IsAllowedByConnectionAllowlist(bool is_redirect) {
   // confirming the feature is active for this initiator. Note:
   // redirect_behavior defaults to kBlock if not explicitly set in the
   // Connection-Allowlist header.
-  if (is_redirect && !IsRedirectAllowedByConnectionAllowlist(*policies)) {
-    return false;
+  if (is_redirect) {
+    return IsRedirectAllowedByConnectionAllowlist(*policies);
   }
 
   // For same-document navigation, the connection allowlist is not checked. For
