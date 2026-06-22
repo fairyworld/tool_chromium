@@ -1134,6 +1134,10 @@ inline constexpr char kIndicateIdentityErrorInOverflowMenuDescription[] =
     "When enabled, the Overflow Menu indicates the identity error with an "
     "error badge on the Settings destination";
 
+inline constexpr char kInfobarBannerRevampName[] = "Infobar Banner Revamp";
+inline constexpr char kInfobarBannerRevampDescription[] =
+    "Enables the revamped UI design for Infobar Banner.";
+
 inline constexpr char
     kInvalidateSearchEngineChoiceOnDeviceRestoreDetectionName[] =
         "Invalidate search engine choice after device restore";

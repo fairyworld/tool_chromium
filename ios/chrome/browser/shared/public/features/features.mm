@@ -1272,3 +1272,9 @@ BASE_FEATURE(kAiAvatarRingIos, base::FEATURE_DISABLED_BY_DEFAULT);
 bool IsAiAvatarRingIosEnabled() {
   return base::FeatureList::IsEnabled(kAiAvatarRingIos);
 }
+
+BASE_FEATURE(kInfobarBannerRevamp, base::FEATURE_DISABLED_BY_DEFAULT);
+
+bool IsInfobarBannerRevampEnabled() {
+  return base::FeatureList::IsEnabled(kInfobarBannerRevamp);
+}

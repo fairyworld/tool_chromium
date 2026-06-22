@@ -1051,4 +1051,11 @@ BASE_DECLARE_FEATURE(kAiAvatarRingIos);
 // Returns true if the AiAvatarRing feature is enabled.
 bool IsAiAvatarRingIosEnabled();
 
+// Feature flag to enable the Infobar Banner Revamp (UI Refactor of the
+// Infobar/Banner Component).
+BASE_DECLARE_FEATURE(kInfobarBannerRevamp);
+
+// Returns true if the InfobarBannerRevamp feature is enabled.
+bool IsInfobarBannerRevampEnabled();
+
 #endif  // IOS_CHROME_BROWSER_SHARED_PUBLIC_FEATURES_FEATURES_H_

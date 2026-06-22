@@ -5799,6 +5799,11 @@
     "expiry_milestone": 142
   },
   {
+    "name": "infobar-banner-revamp",
+    "owners": [ "kanouche@google.com", "bling-alchemy-eng@google.com" ],
+    "expiry_milestone": 172
+  },
+  {
     "name": "infobar-inline-links",
     "owners": [ "behery@chromium.org", "top-chrome-desktop-ui@google.com"],
     "expiry_milestone": 160
