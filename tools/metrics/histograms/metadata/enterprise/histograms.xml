@@ -78,6 +78,7 @@ chromium-metrics-reviews@google.com.
 </variants>
 
 <variants name="ContentAnalysisRequestType">
+  <variant name="ClipboardCopy" summary="Content analysis of copied data."/>
   <variant name="File"
       summary="Content analysis of uploaded or downloaded files."/>
   <variant name="Print" summary="Content analysis of printed pages."/>

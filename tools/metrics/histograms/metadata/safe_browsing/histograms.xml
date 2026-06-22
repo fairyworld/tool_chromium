@@ -31,6 +31,7 @@ chromium-metrics-reviews@google.com.
 
 <variants name="EnterpriseConnector">
   <variant name="Actor"/>
+  <variant name="Copy"/>
   <variant name="Download"/>
   <variant name="DragAndDrop"/>
   <variant name="FileTransfer"/>
