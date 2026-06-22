@@ -1672,6 +1672,11 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
 
     @VisibleForTesting
     boolean maybeShowGlicPromo() {
+        if (CommandLine.getInstance().hasSwitch(ChromeSwitches.DISABLE_FIRST_RUN_EXPERIENCE)
+                || CommandLine.getInstance().hasSwitch(ChromeSwitches.DISABLE_STARTUP_PROMOS)) {
+            return false;
+        }
+
         Profile profile = mProfileSupplier.get();
         if (profile == null
                 || mActivity == null
