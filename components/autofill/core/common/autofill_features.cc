@@ -930,11 +930,6 @@ BASE_FEATURE(kAutofillStructuredFieldsDisableAddressLines,
 BASE_FEATURE(kAutofillSupportCombinedZipAndCityFR,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
-// Enables using a custom address model for Japan, overriding the legacy one.
-// TODO(crbug.com/359768803): Remove in M151.
-BASE_FEATURE(kAutofillSupportPhoneticNameForJP,
-             base::FEATURE_ENABLED_BY_DEFAULT);
-
 // Enables splitting two-part zip codes into two fields while filling and
 // importing split zip codes from two adjacent fields.
 // TODO(crbug.com/369503318): Clean up when launched.

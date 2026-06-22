@@ -212,9 +212,7 @@ bool ShouldTransliterateMainTextToKatakana(
     const FormFieldData& trigger_field,
     const FieldType& trigger_field_type) {
   return IsAlternativeNameType(trigger_field_type) &&
-         data_util::HasKatakanaCharacter(trigger_field.label()) &&
-         base::FeatureList::IsEnabled(
-             features::kAutofillSupportPhoneticNameForJP);
+         data_util::HasKatakanaCharacter(trigger_field.label());
 }
 
 // In addition to just getting the values out of the profile, this function
