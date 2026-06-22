@@ -534,10 +534,11 @@ GLES2Implementation::CopySharedImageDirectlyToGLTexture(
     int32_t dst_level,
     SkAlphaType dst_alpha_type,
     GrSurfaceOrigin dst_origin) {
+  BindAndTexImage2D(this, dst_target, dst_texture, dst_internal_format,
+                    dst_format, dst_type, dst_level, src_rect.size());
+
   std::unique_ptr<gpu::RasterScopedAccess> destination_access;
   if (CanCopySharedImageToGLTextureViaTextureCopy(source_shared_image)) {
-    BindAndTexImage2D(this, dst_target, dst_texture, dst_internal_format,
-                      dst_format, dst_type, dst_level, src_rect.size());
     CopySharedImageToGLTextureViaTextureCopy(
         src_rect, source_shared_image, source_sync_token, dst_target,
         dst_texture, dst_internal_format, dst_format, dst_type, dst_level,
@@ -555,10 +556,6 @@ GLES2Implementation::CopySharedImageDirectlyToGLTexture(
     // TODO(crbug.com/40064510): Eliminate this reliance to enable one-copy
     // upload to work for Graphite *without* depending on being able to create a
     // Ganesh/GL context.
-
-    // Trigger resource allocation for dst texture to back SkSurface.
-    BindAndTexImage2D(this, dst_target, dst_texture, dst_internal_format,
-                      dst_format, dst_type, dst_level, src_rect.size());
 
     destination_access = source_shared_image->BeginGLAccessForCopySharedImage(
         this, source_sync_token, /*readonly=*/true);
