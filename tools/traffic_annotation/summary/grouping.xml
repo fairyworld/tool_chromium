@@ -60,7 +60,6 @@ after discussions on the right group.
       <annotation id="kiosk_app_icon"/>
       <annotation id="management_ui_customer_logo"/>
       <annotation id="nearby_connections_wifi_lan"/>
-      <annotation id="network_traversal_ice_config_fetcher"/>
       <annotation id="quick_answers_spellchecker"/>
       <annotation id="remote_apps_image_downloader"/>
       <annotation id="remote_command_screenshot"/>
