@@ -1697,8 +1697,10 @@ NetworkHandler::BuildProtocolReport(const net::ReportingReport& report) {
         .SetInitiatorUrl(report.url.spec())
         .SetDestination(report.group)
         .SetType(report.type)
-        .SetTimestamp(
-            (report.queued - base::TimeTicks::UnixEpoch()).InSecondsF())
+        .SetTimestamp((base::Time::Now() -
+                       (base::TimeTicks::Now() - report.queued) -
+                       base::Time::UnixEpoch())
+                          .InSecondsF())
         .SetDepth(report.depth)
         .SetCompletedAttempts(report.attempts)
         .SetBody(std::make_unique<base::DictValue>(report.body.Clone()))
