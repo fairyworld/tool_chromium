@@ -88,6 +88,7 @@ android_resources("java_resources") {
     "java/res/drawable/pdf_edit_button_background.xml",
     "java/res/drawable/toolbar_no_divider.xml",
     "java/res/layout/pdf_page.xml",
+    "java/res/layout/pdf_properties_dialog.xml",
     "java/res/layout/pdf_toolbar.xml",
   ]
   deps = []

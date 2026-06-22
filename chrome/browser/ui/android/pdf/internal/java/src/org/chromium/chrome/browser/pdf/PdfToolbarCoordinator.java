@@ -177,15 +177,17 @@ public class PdfToolbarCoordinator implements View.OnClickListener, View.OnKeyLi
         modelList.add(twoPageItem.build());
 
         // Document properties item
-        modelList.add(
-                new ListItemBuilder()
-                        .withTitleRes(R.string.pdf_document_properties)
-                        .withClickListener(
-                                v -> {
-                                    // TODO (crbug.com/479585910): Display document properties.
-                                    dismissMenu();
-                                })
-                        .build());
+        if (mModel.get(PdfToolbarProperties.TOTAL_PAGE_COUNT) > 0) {
+            modelList.add(
+                    new ListItemBuilder()
+                            .withTitleRes(R.string.pdf_document_properties)
+                            .withClickListener(
+                                    v -> {
+                                        mDelegate.showDocumentProperties();
+                                        dismissMenu();
+                                    })
+                            .build());
+        }
 
         ListMenu.Delegate delegate =
                 (model, view) -> {

@@ -57,4 +57,7 @@ public interface PdfToolbarActionsDelegate {
 
     /** Rotates the PDF document. */
     void rotate();
+
+    /** Shows the document properties dialog. */
+    void showDocumentProperties();
 }
