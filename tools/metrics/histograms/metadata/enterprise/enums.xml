@@ -2494,6 +2494,7 @@ chromium-metrics-reviews@google.com.
   <int value="1458" label="RestrictYouTubeCookiesDeletion"/>
   <int value="1459" label="AutofillSettings"/>
   <int value="1460" label="IsolateOriginsShortlist"/>
+  <int value="1461" label="DeviceWeeklyScheduledResuspendDelayMs"/>
 </enum>
 
 <enum name="EnterprisePoliciesSources">

@@ -21,6 +21,8 @@ static_library("auto_sleep") {
     "//chromeos/dbus/power",
     "//components/prefs",
     "//components/session_manager/core",
+    "//ui/base",
+    "//ui/events",
   ]
   deps = [
     "//ash",
@@ -29,6 +31,8 @@ static_library("auto_sleep") {
     "//components/policy:generated",
     "//components/policy:policy_code_generate",
     "//components/policy/core/browser",
+    "//components/session_manager/core",
+    "//components/user_manager",
   ]
 }
 

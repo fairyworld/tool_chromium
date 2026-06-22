@@ -2799,6 +2799,10 @@ inline constexpr char kAppListPreferredOrder[] = "app_list.preferred_order";
 // up the device.
 inline constexpr char kDeviceWeeklyScheduledSuspend[] =
     "device_weekly_scheduled_suspend";
+// The delay in milliseconds before the device re-suspends during a scheduled
+// suspend interval if woken up manually.
+inline constexpr char kDeviceWeeklyScheduledResuspendDelayMs[] =
+    "device_weekly_scheduled_resuspend_delay_ms";
 
 // Boolean pref recording whether cookie and data would be used only for
 // essential purposes.

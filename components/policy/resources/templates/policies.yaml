@@ -1459,6 +1459,7 @@ policies:
   1458: RestrictYouTubeCookiesDeletion
   1459: AutofillSettings
   1460: IsolateOriginsShortlist
+  1461: DeviceWeeklyScheduledResuspendDelayMs
 
 atomic_groups:
   1: Homepage
