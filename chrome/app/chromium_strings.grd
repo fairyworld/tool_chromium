@@ -3308,11 +3308,23 @@ Chromium is unable to recover your settings.
         <message name="IDS_IOS_DESKTOP_AI_PROMO_BUBBLE_TITLE_QR" desc="The title for the iOS desktop AI promo bubble with a QR code.">
           Use Google's best AI tools with the Chromium app on your phone
         </message>
+        <message name="IDS_IOS_DESKTOP_AI_PROMO_BUBBLE_DESCRIPTION_REMINDER" desc="The description for the iOS desktop AI promo bubble with a reminder.">
+          Take your favorite Google AI tools on the go with Chromium on iOS.
+        </message>
+        <message name="IDS_IOS_DESKTOP_AI_PROMO_BUBBLE_TITLE_REMINDER" desc="The title for the iOS desktop AI promo bubble with a reminder.">
+          Get the power of AI when you use the Chromium app on your <ph name="DEVICE_TYPE">$1<ex>iPhone</ex></ph>
+        </message>
         <message name="IDS_IOS_DESKTOP_BEST_OF_GOOGLE_PROMO_BUBBLE_DESCRIPTION_QR" desc="The description for the iOS desktop Best of Google promo bubble with a QR code.">
           Scan the QR code with your phone to download Chromium and sign in to your Google Account.
         </message>
         <message name="IDS_IOS_DESKTOP_BEST_OF_GOOGLE_PROMO_BUBBLE_TITLE_QR" desc="The title for the iOS desktop Best of Google promo bubble with a QR code.">
           Get the best of Google with the Chromium app on your phone
+        </message>
+        <message name="IDS_IOS_DESKTOP_BEST_OF_GOOGLE_PROMO_BUBBLE_DESCRIPTION_REMINDER" desc="The description for the iOS desktop Best of Google promo bubble with a reminder.">
+          Seamlessly work with your favorite apps like Google Drive and YouTube on the go with Chromium.
+        </message>
+        <message name="IDS_IOS_DESKTOP_BEST_OF_GOOGLE_PROMO_BUBBLE_TITLE_REMINDER" desc="The title for the iOS desktop Best of Google promo bubble with a reminder.">
+          Get the best of Google with the Chromium app on your <ph name="DEVICE_TYPE">$1<ex>iPhone</ex></ph>
         </message>
         <message name="IDS_IOS_DESKTOP_SAFETY_PROMO_BUBBLE_DESCRIPTION_QR" desc="The description for the iOS desktop Safety promo bubble with a QR code.">
           Scan the QR code with your phone to download Chromium and sign in to your Google Account.
@@ -3320,17 +3332,35 @@ Chromium is unable to recover your settings.
         <message name="IDS_IOS_DESKTOP_SAFETY_PROMO_BUBBLE_TITLE_QR" desc="The title for the iOS desktop Safety promo bubble with a QR code.">
           Get Google's best safety features on the go, with the Chromium app on your phone
         </message>
+        <message name="IDS_IOS_DESKTOP_SAFETY_PROMO_BUBBLE_DESCRIPTION_REMINDER" desc="The description for the iOS desktop Safety promo bubble with a reminder.">
+          Get Google’s best safety features on the go with Chromium.
+        </message>
+        <message name="IDS_IOS_DESKTOP_SAFETY_PROMO_BUBBLE_TITLE_REMINDER" desc="The title for the iOS desktop Safety promo bubble with a reminder.">
+          Take the safety of Google on the go with the Chromium app on your <ph name="DEVICE_TYPE">$1<ex>iPhone</ex></ph>
+        </message>
         <message name="IDS_IOS_DESKTOP_SHOPPING_PROMO_BUBBLE_DESCRIPTION_QR" desc="The description for the iOS desktop Shopping promo bubble with a QR code.">
           Scan the QR code with your phone to download Chromium and sign in to your Google Account.
         </message>
         <message name="IDS_IOS_DESKTOP_SHOPPING_PROMO_BUBBLE_TITLE_QR" desc="The title for the iOS desktop Shopping promo bubble with a QR code.">
           Get price drop alerts on items you're interested in with the Chromium app on your phone
         </message>
+        <message name="IDS_IOS_DESKTOP_SHOPPING_PROMO_BUBBLE_DESCRIPTION_REMINDER" desc="The description for the iOS desktop Shopping promo bubble with a reminder.">
+          Discover products with your camera, track price drops and more on the go with Chromium on iOS.
+        </message>
+        <message name="IDS_IOS_DESKTOP_SHOPPING_PROMO_BUBBLE_TITLE_REMINDER" desc="The title for the iOS desktop Shopping promo bubble with a reminder.">
+          Get more out of online shopping when you use the Chromium app on your <ph name="DEVICE_TYPE">$1<ex>iPhone</ex></ph>
+        </message>
         <message name="IDS_IOS_DESKTOP_YOUR_CHROME_PROMO_BUBBLE_DESCRIPTION_QR" desc="The description for the iOS desktop Your Chrome promo bubble with a QR code.">
           Scan the QR code with your phone to download Chromium and sign in to your Google Account.
         </message>
         <message name="IDS_IOS_DESKTOP_YOUR_CHROME_PROMO_BUBBLE_TITLE_QR" desc="The title for the iOS desktop Your Chrome promo bubble with a QR code.">
           Take your passwords, tabs and more on the go with the Chromium app on your phone
+        </message>
+        <message name="IDS_IOS_DESKTOP_YOUR_CHROME_PROMO_BUBBLE_DESCRIPTION_REMINDER" desc="The description for the iOS desktop Your Chrome promo bubble with a reminder.">
+          Pick up right where you left off with Chromium on iOS.
+        </message>
+        <message name="IDS_IOS_DESKTOP_YOUR_CHROME_PROMO_BUBBLE_TITLE_REMINDER" desc="The title for the iOS desktop Your Chrome promo bubble with a reminder.">
+          Take your passwords, tabs and more on the go with the Chromium app on your <ph name="DEVICE_TYPE">$1<ex>iPhone</ex></ph>
         </message>
       </if>
 
