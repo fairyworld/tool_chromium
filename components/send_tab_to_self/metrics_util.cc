@@ -8,6 +8,7 @@
 
 #include "base/metrics/histogram_functions.h"
 #include "base/strings/strcat.h"
+#include "components/send_tab_to_self/send_tab_to_self_model.h"
 
 namespace send_tab_to_self {
 
@@ -233,6 +234,10 @@ void RecordEntryPointInvoked(ShareEntryPoint entry_point) {
 void RecordEntryPointSent(ShareEntryPoint entry_point) {
   base::UmaHistogramEnumeration("Sharing.SendTabToSelf.SentEntryPoint",
                                 entry_point);
+}
+
+void RecordSendResult(SendTabToSelfResult result) {
+  base::UmaHistogramEnumeration("Sharing.SendTabToSelf.SendResult", result);
 }
 
 }  // namespace send_tab_to_self

@@ -516,6 +516,16 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Sharing.SendTabToSelf.SendResult" enum="SendTabToSelfResult"
+    expires_after="2027-06-22">
+  <owner>mtatarski@google.com</owner>
+  <owner>src/components/sync/OWNERS</owner>
+  <summary>
+    Records the result of attempting to send a tab to another device. Recorded
+    when the send attempt completes.
+  </summary>
+</histogram>
+
 <histogram name="Sharing.SendTabToSelf.SentEntryPoint"
     enum="SendTabToSelfShareEntryPoint" expires_after="2027-06-01">
   <owner>treib@chromium.org</owner>

@@ -133,6 +133,23 @@ chromium-metrics-reviews@google.com.
 
 <!-- LINT.ThenChange(/components/send_tab_to_self/metrics_util.h:FormFieldMatchOutcome) -->
 
+<!-- LINT.IfChange(SendTabToSelfResult) -->
+
+<enum name="SendTabToSelfResult">
+  <int value="0" label="Success"/>
+  <int value="1" label="Success (Throttled)"/>
+  <int value="2" label="Failure: Not Tracking Metadata"/>
+  <int value="3" label="Failure: Invalid URL"/>
+  <int value="5" label="Failure: Commit Attempt Failed"/>
+  <int value="6" label="Failure: Commit Attempt Error"/>
+  <int value="7" label="Failure: Sync Disabled"/>
+  <int value="8" label="Failure: Entry Removed"/>
+  <int value="9" label="Failure: Commit Timeout"/>
+  <int value="10" label="Failure: No Internet Connection"/>
+</enum>
+
+<!-- LINT.ThenChange(/components/send_tab_to_self/send_tab_to_self_model.h:SendTabToSelfResult) -->
+
 <!-- LINT.IfChange(SendTabToSelfScrollPositionGenerationOutcome) -->
 
 <enum name="SendTabToSelfScrollPositionGenerationOutcome">

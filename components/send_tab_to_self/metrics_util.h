@@ -15,6 +15,8 @@
 
 namespace send_tab_to_self {
 
+enum class SendTabToSelfResult;
+
 // GENERATED_JAVA_ENUM_PACKAGE: (
 //   org.chromium.chrome.browser.share.send_tab_to_self)
 // LINT.IfChange(SendTabToSelfShareEntryPoint)
@@ -45,6 +47,9 @@ void RecordEntryPointInvoked(ShareEntryPoint entry_point);
 // Records the entry point from which the Send Tab to Self feature successfully
 // sent a tab.
 void RecordEntryPointSent(ShareEntryPoint entry_point);
+
+// Records the result of attempting to send a tab.
+void RecordSendResult(SendTabToSelfResult result);
 
 // Records when a received STTS notification is shown.
 void RecordNotificationShown();

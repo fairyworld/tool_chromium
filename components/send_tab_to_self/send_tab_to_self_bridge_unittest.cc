@@ -729,6 +729,7 @@ TEST_F(SendTabToSelfBridgeTest, AddExpiredEntry) {
 
 TEST_F(SendTabToSelfBridgeTest, AddInvalidEntries) {
   InitializeBridge();
+  base::HistogramTester histogram_tester;
   EXPECT_CALL(*mock_observer(), OnEntriesAddedRemotely(_)).Times(0);
 
   // Add Entry should fail on invalid URLs.
@@ -782,6 +783,10 @@ TEST_F(SendTabToSelfBridgeTest, AddInvalidEntries) {
                                 PageContext(), NavigationHistory(),
                                 mock_callback_fail_scheme_2.Get(),
                                 ShareEntryPoint::kShareSheet));
+
+  histogram_tester.ExpectUniqueSample("Sharing.SendTabToSelf.SendResult",
+                                      SendTabToSelfResult::kFailureInvalidUrl,
+                                      5);
 }
 
 TEST_F(SendTabToSelfBridgeTest, IsEntityDataValid) {
@@ -812,6 +817,7 @@ TEST_F(SendTabToSelfBridgeTest, IsEntityDataValid) {
 // local change processor marks the entity as successfully synced.
 TEST_F(SendTabToSelfBridgeTest, NotifyPendingCommitsOnIncrementalSync) {
   InitializeBridge();
+  base::HistogramTester histogram_tester;
   base::test::TestFuture<SendTabToSelfResult> future;
   const SendTabToSelfEntry* entry = bridge()->SendEntry(
       GURL("https://www.example.com/"), "title", kLocalDeviceCacheGuid,
@@ -832,12 +838,16 @@ TEST_F(SendTabToSelfBridgeTest, NotifyPendingCommitsOnIncrementalSync) {
   bridge()->ApplyIncrementalSyncChanges(bridge()->CreateMetadataChangeList(),
                                         syncer::EntityChangeList());
   EXPECT_EQ(future.Get(), SendTabToSelfResult::kSuccess);
+
+  histogram_tester.ExpectUniqueSample("Sharing.SendTabToSelf.SendResult",
+                                      SendTabToSelfResult::kSuccess, 1);
 }
 
 // Tests that the pending commit callback is fired with a commit error
 // when the sync engine reports a specific error for the entity.
 TEST_F(SendTabToSelfBridgeTest, NotifyPendingCommitsOnCommitError) {
   InitializeBridge();
+  base::HistogramTester histogram_tester;
   base::test::TestFuture<SendTabToSelfResult> future;
   const SendTabToSelfEntry* entry = bridge()->SendEntry(
       GURL("https://www.example.com/"), "title", kLocalDeviceCacheGuid,
@@ -851,6 +861,10 @@ TEST_F(SendTabToSelfBridgeTest, NotifyPendingCommitsOnCommitError) {
 
   bridge()->OnCommitAttemptErrors({error_data});
   EXPECT_EQ(future.Get(), SendTabToSelfResult::kFailureCommitAttemptError);
+
+  histogram_tester.ExpectUniqueSample(
+      "Sharing.SendTabToSelf.SendResult",
+      SendTabToSelfResult::kFailureCommitAttemptError, 1);
 }
 
 // Tests that the pending commit callback is fired with a commit attempt failed
@@ -858,6 +872,7 @@ TEST_F(SendTabToSelfBridgeTest, NotifyPendingCommitsOnCommitError) {
 // error).
 TEST_F(SendTabToSelfBridgeTest, NotifyPendingCommitsOnCommitAttemptFailed) {
   InitializeBridge();
+  base::HistogramTester histogram_tester;
   base::test::TestFuture<SendTabToSelfResult> future;
   const SendTabToSelfEntry* entry = bridge()->SendEntry(
       GURL("https://www.example.com/"), "title", kLocalDeviceCacheGuid,
@@ -867,11 +882,16 @@ TEST_F(SendTabToSelfBridgeTest, NotifyPendingCommitsOnCommitAttemptFailed) {
 
   bridge()->OnCommitAttemptFailed(syncer::SyncCommitError::kServerError);
   EXPECT_EQ(future.Get(), SendTabToSelfResult::kFailureCommitAttemptFailed);
+
+  histogram_tester.ExpectUniqueSample(
+      "Sharing.SendTabToSelf.SendResult",
+      SendTabToSelfResult::kFailureCommitAttemptFailed, 1);
 }
 
 TEST_F(SendTabToSelfBridgeTest,
        NotifyPendingCommitsOnCommitAttemptFailedWithNetworkError) {
   InitializeBridge();
+  base::HistogramTester histogram_tester;
   base::test::TestFuture<SendTabToSelfResult> future;
   const SendTabToSelfEntry* entry = bridge()->SendEntry(
       GURL("https://www.example.com/"), "title", kLocalDeviceCacheGuid,
@@ -881,12 +901,17 @@ TEST_F(SendTabToSelfBridgeTest,
 
   bridge()->OnCommitAttemptFailed(syncer::SyncCommitError::kNetworkError);
   EXPECT_EQ(future.Get(), SendTabToSelfResult::kFailureNoInternetConnection);
+
+  histogram_tester.ExpectUniqueSample(
+      "Sharing.SendTabToSelf.SendResult",
+      SendTabToSelfResult::kFailureNoInternetConnection, 1);
 }
 
 // Tests that the pending commit callback is fired with a sync disabled error
 // when sync is disabled while there are still pending commits.
 TEST_F(SendTabToSelfBridgeTest, NotifyPendingCommitsOnDisableSync) {
   InitializeBridge();
+  base::HistogramTester histogram_tester;
   base::test::TestFuture<SendTabToSelfResult> future;
   const SendTabToSelfEntry* entry = bridge()->SendEntry(
       GURL("https://www.example.com/"), "title", kLocalDeviceCacheGuid,
@@ -896,6 +921,10 @@ TEST_F(SendTabToSelfBridgeTest, NotifyPendingCommitsOnDisableSync) {
 
   bridge()->ApplyDisableSyncChanges(bridge()->CreateMetadataChangeList());
   EXPECT_EQ(future.Get(), SendTabToSelfResult::kFailureSyncDisabled);
+
+  histogram_tester.ExpectUniqueSample("Sharing.SendTabToSelf.SendResult",
+                                      SendTabToSelfResult::kFailureSyncDisabled,
+                                      1);
 }
 
 // Tests that the pending commit callback is fired with an entry removed error
@@ -903,6 +932,7 @@ TEST_F(SendTabToSelfBridgeTest, NotifyPendingCommitsOnDisableSync) {
 // still pending.
 TEST_F(SendTabToSelfBridgeTest, NotifyPendingCommitsOnHistoryDeletion) {
   InitializeBridge();
+  base::HistogramTester histogram_tester;
   base::test::TestFuture<SendTabToSelfResult> future;
   const SendTabToSelfEntry* entry = bridge()->SendEntry(
       GURL("https://www.example.com/"), "title", kLocalDeviceCacheGuid,
@@ -916,6 +946,10 @@ TEST_F(SendTabToSelfBridgeTest, NotifyPendingCommitsOnHistoryDeletion) {
   bridge()->OnHistoryDeletions(
       nullptr, history::DeletionInfo::ForUrls(urls_to_remove, {}));
   EXPECT_EQ(future.Get(), SendTabToSelfResult::kFailureEntryRemoved);
+
+  histogram_tester.ExpectUniqueSample("Sharing.SendTabToSelf.SendResult",
+                                      SendTabToSelfResult::kFailureEntryRemoved,
+                                      1);
 }
 
 // Tests that the pending commit callback is fired with an entry removed error
@@ -1996,6 +2030,7 @@ TEST_F(SendTabToSelfBridgeTest,
 // entry is throttled due to deduplication.
 TEST_F(SendTabToSelfBridgeTest, InvokesCallbackWithSuccessForThrottledEntry) {
   InitializeBridge();
+  base::HistogramTester histogram_tester;
 
   const GURL kUrl("https://www.example.com");
   const std::string kTitle("dummy title");
@@ -2015,6 +2050,10 @@ TEST_F(SendTabToSelfBridgeTest, InvokesCallbackWithSuccessForThrottledEntry) {
   bridge()->SendEntry(kUrl, kTitle, kLocalDeviceCacheGuid, PageContext(),
                       NavigationHistory(), mock_callback.Get(),
                       ShareEntryPoint::kShareSheet);
+
+  histogram_tester.ExpectUniqueSample("Sharing.SendTabToSelf.SendResult",
+                                      SendTabToSelfResult::kSuccessThrottled,
+                                      1);
 }
 
 TEST_F(SendTabToSelfBridgeTest, DeleteAllEntriesPersists) {
