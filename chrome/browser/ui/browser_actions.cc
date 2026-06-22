@@ -1935,4 +1935,17 @@ void BrowserActions::InitializeNavigationActions() {
               bwi))
           .SetActionId(kActionBack)
           .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                WindowOpenDisposition disposition =
+                    context.GetProperty(chrome::kDispositionKey);
+                chrome::Reload(bwi, disposition);
+              },
+              bwi))
+          .SetActionId(kActionReload)
+          .Build());
 }
