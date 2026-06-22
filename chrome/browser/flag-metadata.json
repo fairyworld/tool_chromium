@@ -5822,6 +5822,11 @@
     "expiry_milestone": 153
   },
   {
+    "name": "input-cursor-anchor-info-migration",
+    "owners": [ "hdchuong@google.com" ],
+    "expiry_milestone": 160
+  },
+  {
     "name": "input-on-viz",
     "owners": [ "woa-performance-team@google.com", "amanvr@google.com", "jonross@chromium.org", "kartarsingh@google.com", "nuskos@chromium.org" ],
     "expiry_milestone": 150

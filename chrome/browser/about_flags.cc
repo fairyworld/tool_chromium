@@ -13149,6 +13149,13 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kHttpHeadersInjectionDescription, kOsDesktop,
      FEATURE_VALUE_TYPE(enterprise_custom_headers::kHttpHeadersInjection)},
 
+#if BUILDFLAG(IS_ANDROID)
+    {"input-cursor-anchor-info-migration",
+     flag_descriptions::kInputCursorAnchorInfoMigrationName,
+     flag_descriptions::kInputCursorAnchorInfoMigrationDescription, kOsAndroid,
+     FEATURE_VALUE_TYPE(blink::features::kInputCursorAnchorInfoMigration)},
+#endif  // BUILDFLAG(IS_ANDROID)
+
     // Add new entries above this line.
     // NOTE: Adding a new flag requires adding a corresponding entry to enum
     // "LoginCustomFlags" in tools/metrics/histograms/enums.xml. See "Flag
