@@ -14,6 +14,7 @@
 #include "base/memory/weak_ptr.h"
 #include "chrome/browser/dictation/session_state.h"
 #include "chrome/browser/dictation/session_ui_delegate.h"
+#include "chrome/browser/dictation/stream_provider_delegate.h"
 
 namespace dictation {
 
@@ -25,7 +26,8 @@ class Target;
 // The session_controller is a coordinating class between the StreamProvider and
 // the UI. It manages Profile-level state and transitions and synchronizes the
 // dictation system.
-class SessionController : public SessionUiDelegate {
+class SessionController : public SessionUiDelegate,
+                          public StreamProviderDelegate {
  public:
 
   explicit SessionController(SessionControllerDelegate& delegate);
@@ -36,7 +38,19 @@ class SessionController : public SessionUiDelegate {
   // Called by the service when it's ready for the session to start.
   void Initialize();
 
+  // SessionUiDelegate:
   void UiRequestEndSession() override;
+
+  // StreamProviderDelegate:
+  void DidUpdateStreamProviderState(
+      StreamProvider& stream_provider,
+      StreamProvider::StreamState old_state) override;
+
+  using SessionStateChangedCallback =
+      base::RepeatingCallback<void(SessionState)>;
+  // Registers a callback to be notified of session state changes.
+  base::CallbackListSubscription AddSessionStateChangedCallback(
+      SessionStateChangedCallback callback);
 
   // Starts a new dictation stream by creating and attaching a new stream
   // provider. An existing stream must have been detached before calling this
@@ -66,6 +80,9 @@ class SessionController : public SessionUiDelegate {
   std::unique_ptr<StreamProvider> attached_stream_provider_;
 
   std::unique_ptr<SessionUi> ui_;
+
+  base::RepeatingCallbackList<void(SessionState)>
+      session_state_changed_callback_list_;
 
   base::WeakPtrFactory<SessionController> weak_ptr_factory_{this};
 };

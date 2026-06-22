@@ -50,6 +50,7 @@ class MockStreamProvider : public StreamProvider {
               (const std::string& data, bool is_final),
               (override));
   MOCK_METHOD(void, OnStreamStateChanged, (StreamState state), (override));
+  MOCK_METHOD(StreamState, GetState, (), (const, override));
 };
 
 class MockSessionUi : public SessionUi {

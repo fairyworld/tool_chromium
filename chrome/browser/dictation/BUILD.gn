@@ -14,6 +14,7 @@ source_set("dictation") {
     "session_ui.h",
     "session_ui_delegate.h",
     "stream_provider.h",
+    "stream_provider_delegate.h",
     "target.h",
   ]
   public_deps = [

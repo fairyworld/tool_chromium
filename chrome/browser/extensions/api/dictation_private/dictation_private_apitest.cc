@@ -92,6 +92,12 @@ class ExtensionApiTestStreamProvider : public dictation::StreamProvider {
     state_changes_.push_back(state);
   }
 
+  dictation::StreamProvider::StreamState GetState() const override {
+    return state_changes_.empty()
+               ? dictation::StreamProvider::StreamState::kInitializing
+               : state_changes_.back();
+  }
+
   struct TranscriptionUpdate {
     std::string data;
     bool is_final;

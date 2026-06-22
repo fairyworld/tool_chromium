@@ -4,7 +4,13 @@
 
 #include "chrome/browser/dictation/session_controller.h"
 
+#include <vector>
+
+#include "base/functional/bind.h"
+#include "base/run_loop.h"
+#include "base/test/bind.h"
 #include "base/test/scoped_feature_list.h"
+#include "base/test/task_environment.h"
 #include "chrome/browser/dictation/features.h"
 #include "chrome/browser/dictation/test_util.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -26,6 +32,7 @@ class DictationSessionControllerTest : public testing::Test {
   ~DictationSessionControllerTest() override = default;
 
  protected:
+  base::test::SingleThreadTaskEnvironment task_environment_;
   base::test::ScopedFeatureList scoped_feature_list_;
   testing::NiceMock<MockSessionControllerDelegate> mock_delegate_;
   std::unique_ptr<SessionController> controller_;
@@ -79,6 +86,98 @@ TEST_F(DictationSessionControllerTest, EndStream) {
 
   EXPECT_CALL(*stream_provider_ptr, Stop());
   controller_->EndDictationStream();
+}
+
+// Test that registering a callback receives state updates when the controller
+// transitions states.
+TEST_F(DictationSessionControllerTest, StateChangedCallback) {
+  std::vector<SessionState> states;
+  base::CallbackListSubscription subscription =
+      controller_->AddSessionStateChangedCallback(base::BindLambdaForTesting(
+          [&](SessionState state) { states.push_back(state); }));
+
+  controller_->StartDictationStream(std::make_unique<MockTarget>());
+  controller_->EndDictationStream();
+
+  EXPECT_THAT(states, testing::ElementsAre(SessionState::kStreamInitializing,
+                                           SessionState::kInactive));
+}
+
+// Test that propagating state changes from the stream provider updates the
+// controller's state accordingly.
+TEST_F(DictationSessionControllerTest, StreamProviderStatePropagates) {
+  auto mock_stream_provider =
+      std::make_unique<testing::NiceMock<MockStreamProvider>>();
+  MockStreamProvider* stream_provider_ptr = mock_stream_provider.get();
+
+  EXPECT_CALL(mock_delegate_, CreateStreamProvider(_))
+      .WillOnce(Return(std::move(mock_stream_provider)));
+  controller_->StartDictationStream(std::make_unique<MockTarget>());
+  EXPECT_EQ(controller_->state(), SessionState::kStreamInitializing);
+
+  // Transition to transcribing.
+  EXPECT_CALL(*stream_provider_ptr, GetState())
+      .WillRepeatedly(Return(StreamProvider::StreamState::kTranscribing));
+  controller_->DidUpdateStreamProviderState(
+      *stream_provider_ptr, StreamProvider::StreamState::kInitializing);
+  EXPECT_EQ(controller_->state(), SessionState::kTranscribing);
+
+  // Transition to complete.
+  EXPECT_CALL(*stream_provider_ptr, GetState())
+      .WillRepeatedly(Return(StreamProvider::StreamState::kComplete));
+
+  // Transitions to inactive are asynchronous.
+  base::RunLoop run_loop;
+  base::CallbackListSubscription subscription =
+      controller_->AddSessionStateChangedCallback(
+          base::BindLambdaForTesting([&](SessionState state) {
+            if (state == SessionState::kInactive) {
+              run_loop.Quit();
+            }
+          }));
+  controller_->DidUpdateStreamProviderState(
+      *stream_provider_ptr, StreamProvider::StreamState::kTranscribing);
+  run_loop.Run();
+
+  EXPECT_EQ(controller_->state(), SessionState::kInactive);
+}
+
+// Test that propagating state changes for a failure
+TEST_F(DictationSessionControllerTest, StreamProviderStatePropagatesFailure) {
+  auto mock_stream_provider =
+      std::make_unique<testing::NiceMock<MockStreamProvider>>();
+  MockStreamProvider* stream_provider_ptr = mock_stream_provider.get();
+
+  EXPECT_CALL(mock_delegate_, CreateStreamProvider(_))
+      .WillOnce(Return(std::move(mock_stream_provider)));
+  controller_->StartDictationStream(std::make_unique<MockTarget>());
+  EXPECT_EQ(controller_->state(), SessionState::kStreamInitializing);
+
+  // Transition to transcribing.
+  EXPECT_CALL(*stream_provider_ptr, GetState())
+      .WillRepeatedly(Return(StreamProvider::StreamState::kTranscribing));
+  controller_->DidUpdateStreamProviderState(
+      *stream_provider_ptr, StreamProvider::StreamState::kInitializing);
+  EXPECT_EQ(controller_->state(), SessionState::kTranscribing);
+
+  // Transition to failure.
+  EXPECT_CALL(*stream_provider_ptr, GetState())
+      .WillRepeatedly(Return(StreamProvider::StreamState::kFailed));
+
+  // Transitions to inactive are asynchronous.
+  base::RunLoop run_loop;
+  base::CallbackListSubscription subscription =
+      controller_->AddSessionStateChangedCallback(
+          base::BindLambdaForTesting([&](SessionState state) {
+            if (state == SessionState::kInactive) {
+              run_loop.Quit();
+            }
+          }));
+  controller_->DidUpdateStreamProviderState(
+      *stream_provider_ptr, StreamProvider::StreamState::kTranscribing);
+  run_loop.Run();
+
+  EXPECT_EQ(controller_->state(), SessionState::kInactive);
 }
 
 }  // namespace

@@ -45,6 +45,8 @@ void SessionController::StartDictationStream(std::unique_ptr<Target> target) {
 void SessionController::EndDictationStream() {
   CHECK_NE(state_, SessionState::kInactive);
   attached_stream_provider_->Stop();
+  // TODO(b/525943882): The stream needs to live on until the transcript is
+  // complete.
   attached_stream_provider_.reset();
   MoveToState(SessionState::kInactive);
 }
@@ -64,6 +66,42 @@ void SessionController::UiRequestEndSession() {
                      weak_ptr_factory_.GetWeakPtr()));
 }
 
+void SessionController::DidUpdateStreamProviderState(
+    StreamProvider& stream_provider,
+    StreamProvider::StreamState old_state) {
+  CHECK_EQ(&stream_provider, attached_stream_provider_.get());
+
+  switch (stream_provider.GetState()) {
+    case StreamProvider::StreamState::kInitializing:
+      MoveToState(SessionState::kStreamInitializing);
+      break;
+    case StreamProvider::StreamState::kTranscribing:
+      MoveToState(SessionState::kTranscribing);
+      break;
+    case StreamProvider::StreamState::kComplete:
+    case StreamProvider::StreamState::kFailed:
+      // Post since we're resetting the stream but it's also the caller so
+      // still on the stack.
+      base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
+          FROM_HERE, base::BindOnce(
+                         [](base::WeakPtr<SessionController> this_ptr) {
+                           if (!this_ptr) {
+                             return;
+                           }
+                           this_ptr->attached_stream_provider_.reset();
+                           this_ptr->MoveToState(SessionState::kInactive);
+                         },
+                         weak_ptr_factory_.GetWeakPtr()));
+      break;
+  }
+}
+
+base::CallbackListSubscription
+SessionController::AddSessionStateChangedCallback(
+    SessionStateChangedCallback callback) {
+  return session_state_changed_callback_list_.Add(std::move(callback));
+}
+
 void SessionController::MoveToState(SessionState new_state) {
   using enum SessionState;
 #if DCHECK_IS_ON()
@@ -79,6 +117,7 @@ void SessionController::MoveToState(SessionState new_state) {
   }
 #endif  // DCHECK_IS_ON()
   state_ = new_state;
+  session_state_changed_callback_list_.Notify(new_state);
 }
 
 }  // namespace dictation

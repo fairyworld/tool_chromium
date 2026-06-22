@@ -42,7 +42,7 @@ void DictationKeyedService::Shutdown() {
 
 std::unique_ptr<StreamProvider> DictationKeyedService::CreateStreamProvider(
     SessionController& controller) const {
-  return std::make_unique<ListenerStreamProvider>(profile_);
+  return std::make_unique<ListenerStreamProvider>(profile_, controller);
 }
 
 std::unique_ptr<SessionUi> DictationKeyedService::CreateUi(

@@ -137,7 +137,7 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
     if (!seen_partial) {
       if (provider->GetLatestTranscriptionForTesting() == "Hello") {
         EXPECT_FALSE(provider->IsTranscriptionFinalForTesting());
-        EXPECT_EQ(provider->GetStateForTesting(),
+        EXPECT_EQ(provider->GetState(),
                   StreamProvider::StreamState::kTranscribing);
         seen_partial = true;
       }
@@ -147,8 +147,7 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
       EXPECT_TRUE(seen_partial);
       wait_for_updates_loop.Quit();
     }
-    if (provider->GetStateForTesting() ==
-        StreamProvider::StreamState::kComplete) {
+    if (provider->GetState() == StreamProvider::StreamState::kComplete) {
       stream_complete_loop.Quit();
     }
   }));
