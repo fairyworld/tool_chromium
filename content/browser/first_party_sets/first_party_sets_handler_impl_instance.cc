@@ -470,11 +470,11 @@ void FirstPartySetsHandlerImplInstance::ComputeFirstPartySetMetadata(
     base::OnceCallback<void(net::FirstPartySetMetadata)> callback) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   if (!global_sets_.has_value()) {
-    EnqueuePendingTask(base::BindOnce(
-        &FirstPartySetsHandlerImplInstance::
-            ComputeFirstPartySetMetadataInternal,
-        base::Unretained(this), site, top_frame_site.CopyAsOptional(),
-        config.Clone(), base::ElapsedTimer(), std::move(callback)));
+    EnqueuePendingTask(base::BindOnce(&FirstPartySetsHandlerImplInstance::
+                                          ComputeFirstPartySetMetadataInternal,
+                                      base::Unretained(this), site,
+                                      top_frame_site.CopyAsOptional(),
+                                      config.Clone(), std::move(callback)));
     return;
   }
 
@@ -486,14 +486,9 @@ void FirstPartySetsHandlerImplInstance::ComputeFirstPartySetMetadataInternal(
     const net::SchemefulSite& site,
     base::optional_ref<const net::SchemefulSite> top_frame_site,
     const net::FirstPartySetsContextConfig& config,
-    const base::ElapsedTimer& timer,
     base::OnceCallback<void(net::FirstPartySetMetadata)> callback) const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   CHECK(global_sets_.has_value());
-
-  base::UmaHistogramTimes(
-      "Cookie.FirstPartySets.EnqueueingDelay.ComputeMetadata3",
-      timer.Elapsed());
 
   std::move(callback).Run(
       global_sets_->ComputeMetadata(site, top_frame_site, config));

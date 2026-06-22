@@ -149,7 +149,6 @@ class CONTENT_EXPORT FirstPartySetsHandlerImplInstance
       const net::SchemefulSite& site,
       base::optional_ref<const net::SchemefulSite> top_frame_site,
       const net::FirstPartySetsContextConfig& config,
-      const base::ElapsedTimer& timer,
       base::OnceCallback<void(net::FirstPartySetMetadata)> callback) const;
 
   // Parses the policy and computes the config that represents the changes

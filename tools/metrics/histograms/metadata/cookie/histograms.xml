@@ -323,7 +323,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Cookie.FirstPartySets.EnqueueingDelay.{QueryType}" units="ms"
-    expires_after="2026-08-04">
+    expires_after="2027-08-04">
   <owner>cfredric@chromium.org</owner>
   <owner>kaustubhag@chromium.org</owner>
   <summary>
@@ -335,7 +335,6 @@ chromium-metrics-reviews@google.com.
     low-resolution clocks.
   </summary>
   <token key="QueryType">
-    <variant name="ComputeMetadata3"/>
     <variant name="ContextConfig2"/>
   </token>
 </histogram>
