@@ -64,8 +64,10 @@ ElementSelector* UsernameElement() {
       send_tab_to_self::kSendTabToSelfExtraEntryPoints);
   config.features_enabled.push_back(
       send_tab_to_self::kSendTabToSelfEnhancedBottomsheet);
-  if ([self
-          isRunningTest:@selector(testSendTabToSelfAndVerifySuccessSnackbar)]) {
+  if ([self isRunningTest:@selector(
+                    testSendTabToSelfAndVerifySuccessSnackbar)] ||
+      [self isRunningTest:@selector(
+                    testSendTabToSelfAndVerifyErrorSnackbar)]) {
     config.features_enabled.push_back(
         send_tab_to_self::kSendTabToSelfPostSendToast);
   }
@@ -243,27 +245,32 @@ ElementSelector* UsernameElement() {
       l10n_util::GetNSString(IDS_IOS_SEND_TAB_TO_SELF_TARGET_DEVICE_ACTION);
   [ChromeEarlGrey tapButtonInActivitySheetWithID:sendTabToSelf];
 
-  // Tap the device in the device picker.
+  // Verify the device is shown in the device picker.
   [ChromeEarlGrey
       waitForSufficientlyVisibleElementWithMatcher:grey_accessibilityLabel(
                                                        kTargetDeviceName)];
-  [[EarlGrey
-      selectElementWithMatcher:grey_accessibilityLabel(kTargetDeviceName)]
-      performAction:grey_tap()];
 
   // Tap "Send".
   [[EarlGrey selectElementWithMatcher:grey_accessibilityID(
                                           @"kSendTabToSelfModalSendButton")]
       performAction:grey_tap()];
 
-  // Wait for and verify the snackbar message.
-  NSString* snackbarMessage =
-      l10n_util::GetNSStringF(IDS_IOS_SEND_TAB_TO_SELF_SNACKBAR_MESSAGE,
+  // Wait for and verify the success checkmark state on the button.
+  NSString* successMessage =
+      l10n_util::GetNSStringF(IDS_SEND_TAB_TO_SELF_POST_SEND_SUCCESS_TOAST,
                               base::SysNSStringToUTF16(kTargetDeviceName));
-  id<GREYMatcher> snackbarMatcher = grey_allOf(
-      chrome_test_util::SnackbarViewMatcher(),
-      grey_descendant(grey_accessibilityLabel(snackbarMessage)), nil);
-  [ChromeEarlGrey waitForSufficientlyVisibleElementWithMatcher:snackbarMatcher];
+  [ChromeEarlGrey
+      waitForSufficientlyVisibleElementWithMatcher:
+          grey_allOf(grey_accessibilityID(@"kSendTabToSelfModalSendButton"),
+                     grey_accessibilityLabel(successMessage), nil)];
+
+  // Verify that the bottom sheet is dismissed.
+  [ChromeEarlGrey waitForUIElementToDisappearWithMatcher:
+                      grey_accessibilityID(@"kSendTabToSelfModalSendButton")];
+
+  // Verify that no snackbar is shown.
+  [[EarlGrey selectElementWithMatcher:chrome_test_util::SnackbarViewMatcher()]
+      assertWithMatcher:grey_nil()];
 
   // Verify that the text fragment was successfully captured and attached to the
   // STTS entry in the model.
@@ -295,26 +302,75 @@ ElementSelector* UsernameElement() {
       l10n_util::GetNSString(IDS_IOS_SEND_TAB_TO_SELF_TARGET_DEVICE_ACTION);
   [ChromeEarlGrey tapButtonInActivitySheetWithID:sendTabToSelf];
 
-  // Tap the device in the device picker.
+  // Verify the device is shown in the device picker.
   [ChromeEarlGrey
       waitForSufficientlyVisibleElementWithMatcher:grey_accessibilityLabel(
                                                        kTargetDeviceName)];
-  [[EarlGrey
-      selectElementWithMatcher:grey_accessibilityLabel(kTargetDeviceName)]
-      performAction:grey_tap()];
 
   // Tap "Send".
   [[EarlGrey selectElementWithMatcher:grey_accessibilityID(
                                           @"kSendTabToSelfModalSendButton")]
       performAction:grey_tap()];
 
-  // Wait for and verify the success snackbar message.
+  // Wait for and verify the success checkmark state on the button.
   NSString* successMessage =
       l10n_util::GetNSStringF(IDS_SEND_TAB_TO_SELF_POST_SEND_SUCCESS_TOAST,
                               base::SysNSStringToUTF16(kTargetDeviceName));
-  id<GREYMatcher> snackbarMatcher =
-      grey_allOf(chrome_test_util::SnackbarViewMatcher(),
-                 grey_descendant(grey_accessibilityLabel(successMessage)), nil);
+  [ChromeEarlGrey
+      waitForSufficientlyVisibleElementWithMatcher:
+          grey_allOf(grey_accessibilityID(@"kSendTabToSelfModalSendButton"),
+                     grey_accessibilityLabel(successMessage), nil)];
+
+  // Verify that the bottom sheet is dismissed.
+  [ChromeEarlGrey waitForUIElementToDisappearWithMatcher:
+                      grey_accessibilityID(@"kSendTabToSelfModalSendButton")];
+
+  // Verify that no snackbar is shown.
+  [[EarlGrey selectElementWithMatcher:chrome_test_util::SnackbarViewMatcher()]
+      assertWithMatcher:grey_nil()];
+}
+
+- (void)testSendTabToSelfAndVerifyErrorSnackbar {
+  [ChromeEarlGrey addFakeSyncServerDeviceInfo:kTargetDeviceName
+                         lastUpdatedTimestamp:base::Time::Now()];
+  [SigninEarlGrey signinWithFakeIdentity:[FakeSystemIdentity fakeIdentity1]];
+  [ChromeEarlGrey
+      loadURL:self.testServer->GetURL(
+                  "/send_tab_to_self/send_tab_to_self_active_page.html")];
+  [ChromeEarlGrey waitForWebStateContainingElement:TargetElement()];
+
+  [ChromeEarlGreyUI shareCurrentPage];
+  NSString* sendTabToSelf =
+      l10n_util::GetNSString(IDS_IOS_SEND_TAB_TO_SELF_TARGET_DEVICE_ACTION);
+  [ChromeEarlGrey tapButtonInActivitySheetWithID:sendTabToSelf];
+
+  // Verify the device is shown in the device picker.
+  [ChromeEarlGrey
+      waitForSufficientlyVisibleElementWithMatcher:grey_accessibilityLabel(
+                                                       kTargetDeviceName)];
+
+  // Simulate network disconnection for the fake sync server.
+  [ChromeEarlGrey disconnectFakeSyncServerNetwork];
+  [self addTeardownBlock:^{
+    [ChromeEarlGrey connectFakeSyncServerNetwork];
+  }];
+
+  // Tap "Send".
+  [[EarlGrey selectElementWithMatcher:grey_accessibilityID(
+                                          @"kSendTabToSelfModalSendButton")]
+      performAction:grey_tap()];
+
+  // Verify that the bottom sheet is dismissed after the failure.
+  [ChromeEarlGrey waitForUIElementToDisappearWithMatcher:
+                      grey_accessibilityID(@"kSendTabToSelfModalSendButton")];
+
+  // Wait for and verify the error snackbar message ("Something went wrong.
+  // Check your internet connection and try again.").
+  NSString* errorSnackbarMessage =
+      l10n_util::GetNSString(IDS_SEND_TAB_TO_SELF_POST_SEND_NO_INTERNET_TOAST);
+  id<GREYMatcher> snackbarMatcher = grey_allOf(
+      chrome_test_util::SnackbarViewMatcher(),
+      grey_descendant(grey_accessibilityLabel(errorSnackbarMessage)), nil);
   [ChromeEarlGrey waitForSufficientlyVisibleElementWithMatcher:snackbarMatcher];
 }
 
