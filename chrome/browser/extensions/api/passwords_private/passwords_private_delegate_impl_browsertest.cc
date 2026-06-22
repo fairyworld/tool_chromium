@@ -32,8 +32,8 @@
 #include "base/values.h"
 #include "chrome/browser/affiliations/affiliation_service_factory.h"
 #include "chrome/browser/extensions/api/passwords_private/passwords_private_delegate.h"
-#include "chrome/browser/extensions/api/passwords_private/passwords_private_event_router.h"
 #include "chrome/browser/extensions/api/passwords_private/passwords_private_event_router_factory.h"
+#include "chrome/browser/extensions/api/passwords_private/passwords_private_event_router_impl.h"
 #include "chrome/browser/password_manager/factories/account_password_store_factory.h"
 #include "chrome/browser/password_manager/factories/bulk_leak_check_service_factory.h"
 #include "chrome/browser/password_manager/factories/password_sender_service_factory.h"
@@ -215,7 +215,7 @@ class FakePasswordImportController : public PasswordImportControllerInterface {
 
 std::unique_ptr<KeyedService> BuildPasswordsPrivateEventRouter(
     content::BrowserContext* context) {
-  return std::make_unique<PasswordsPrivateEventRouter>(context);
+  return std::make_unique<PasswordsPrivateEventRouterImpl>(context);
 }
 
 PasswordForm CreateSampleForm(

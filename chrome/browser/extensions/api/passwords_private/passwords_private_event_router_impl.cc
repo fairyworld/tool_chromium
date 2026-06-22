@@ -1,8 +1,8 @@
-// Copyright 2015 The Chromium Authors
+// Copyright 2026 The Chromium Authors
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/extensions/api/passwords_private/passwords_private_event_router.h"
+#include "chrome/browser/extensions/api/passwords_private/passwords_private_event_router_impl.h"
 
 #include <utility>
 #include <vector>
@@ -21,22 +21,20 @@
 
 namespace extensions {
 
-PasswordsPrivateEventRouter::PasswordsPrivateEventRouter(
+PasswordsPrivateEventRouterImpl::PasswordsPrivateEventRouterImpl(
     content::BrowserContext* context)
-    : context_(context), event_router_(nullptr) {
-  event_router_ = EventRouter::Get(context_);
-}
+    : context_(context), event_router_(EventRouter::Get(context_)) {}
 
-PasswordsPrivateEventRouter::~PasswordsPrivateEventRouter() = default;
+PasswordsPrivateEventRouterImpl::~PasswordsPrivateEventRouterImpl() = default;
 
-void PasswordsPrivateEventRouter::OnSavedPasswordsListChanged(
+void PasswordsPrivateEventRouterImpl::OnSavedPasswordsListChanged(
     const std::vector<api::passwords_private::PasswordUiEntry>& entries) {
   cached_saved_password_parameters_ =
       api::passwords_private::OnSavedPasswordsListChanged::Create(entries);
   SendSavedPasswordListToListeners();
 }
 
-void PasswordsPrivateEventRouter::SendSavedPasswordListToListeners() {
+void PasswordsPrivateEventRouterImpl::SendSavedPasswordListToListeners() {
   if (!cached_saved_password_parameters_.has_value()) {
     // If there is nothing to send, return early.
     return;
@@ -49,7 +47,7 @@ void PasswordsPrivateEventRouter::SendSavedPasswordListToListeners() {
   event_router_->BroadcastEvent(std::move(extension_event));
 }
 
-void PasswordsPrivateEventRouter::OnPasswordExceptionsListChanged(
+void PasswordsPrivateEventRouterImpl::OnPasswordExceptionsListChanged(
     const std::vector<api::passwords_private::ExceptionEntry>& exceptions) {
   cached_password_exception_parameters_ =
       api::passwords_private::OnPasswordExceptionsListChanged::Create(
@@ -57,7 +55,7 @@ void PasswordsPrivateEventRouter::OnPasswordExceptionsListChanged(
   SendPasswordExceptionListToListeners();
 }
 
-void PasswordsPrivateEventRouter::SendPasswordExceptionListToListeners() {
+void PasswordsPrivateEventRouterImpl::SendPasswordExceptionListToListeners() {
   if (!cached_password_exception_parameters_.has_value()) {
     // If there is nothing to send, return early.
     return;
@@ -70,7 +68,7 @@ void PasswordsPrivateEventRouter::SendPasswordExceptionListToListeners() {
   event_router_->BroadcastEvent(std::move(extension_event));
 }
 
-void PasswordsPrivateEventRouter::OnPasswordsExportProgress(
+void PasswordsPrivateEventRouterImpl::OnPasswordsExportProgress(
     api::passwords_private::ExportProgressStatus status,
     const std::string& file_path,
     const std::string& folder_name) {
@@ -89,7 +87,7 @@ void PasswordsPrivateEventRouter::OnPasswordsExportProgress(
   event_router_->BroadcastEvent(std::move(extension_event));
 }
 
-void PasswordsPrivateEventRouter::OnAccountStorageActiveStateChanged(
+void PasswordsPrivateEventRouterImpl::OnAccountStorageActiveStateChanged(
     bool active) {
   auto extension_event = std::make_unique<Event>(
       events::PASSWORDS_PRIVATE_ON_ACCOUNT_STORAGE_ENABLED_STATE_CHANGED,
@@ -99,7 +97,7 @@ void PasswordsPrivateEventRouter::OnAccountStorageActiveStateChanged(
   event_router_->BroadcastEvent(std::move(extension_event));
 }
 
-void PasswordsPrivateEventRouter::
+void PasswordsPrivateEventRouterImpl::
     OnShouldShowAccountStorageSettingToggleChanged(bool enabled) {
   auto extension_event = std::make_unique<Event>(
       events::
@@ -111,7 +109,7 @@ void PasswordsPrivateEventRouter::
   event_router_->BroadcastEvent(std::move(extension_event));
 }
 
-void PasswordsPrivateEventRouter::OnInsecureCredentialsChanged(
+void PasswordsPrivateEventRouterImpl::OnInsecureCredentialsChanged(
     std::vector<api::passwords_private::PasswordUiEntry> insecure_credentials) {
   auto extension_event = std::make_unique<Event>(
       events::PASSWORDS_PRIVATE_ON_INSECURE_CREDENTIALS_CHANGED,
@@ -121,7 +119,7 @@ void PasswordsPrivateEventRouter::OnInsecureCredentialsChanged(
   event_router_->BroadcastEvent(std::move(extension_event));
 }
 
-void PasswordsPrivateEventRouter::OnPasswordCheckStatusChanged(
+void PasswordsPrivateEventRouterImpl::OnPasswordCheckStatusChanged(
     const api::passwords_private::PasswordCheckStatus& status) {
   auto extension_event = std::make_unique<Event>(
       events::PASSWORDS_PRIVATE_ON_PASSWORD_CHECK_STATUS_CHANGED,
@@ -130,14 +128,14 @@ void PasswordsPrivateEventRouter::OnPasswordCheckStatusChanged(
   event_router_->BroadcastEvent(std::move(extension_event));
 }
 
-void PasswordsPrivateEventRouter::OnPasswordManagerAuthTimeout() {
+void PasswordsPrivateEventRouterImpl::OnPasswordManagerAuthTimeout() {
   event_router_->BroadcastEvent(std::make_unique<Event>(
       events::PASSWORDS_PRIVATE_ON_PASSWORD_MANAGER_AUTH_TIMEOUT,
       api::passwords_private::OnPasswordManagerAuthTimeout::kEventName,
       api::passwords_private::OnPasswordManagerAuthTimeout::Create()));
 }
 
-void PasswordsPrivateEventRouter::OnPasswordManagerActionableErrorChanged(
+void PasswordsPrivateEventRouterImpl::OnPasswordManagerActionableErrorChanged(
     api::passwords_private::PasswordManagerActionableError error) {
   auto extension_event = std::make_unique<Event>(
       events::PASSWORDS_PRIVATE_ON_PASSWORD_MANAGER_ACTIONABLE_ERROR_CHANGED,

@@ -27,6 +27,7 @@
 #include "base/time/time.h"
 #include "chrome/browser/extensions/api/passwords_private/passwords_private_event_router.h"
 #include "chrome/browser/extensions/api/passwords_private/passwords_private_event_router_factory.h"
+#include "chrome/browser/extensions/api/passwords_private/passwords_private_event_router_impl.h"
 #include "chrome/browser/password_manager/factories/account_password_store_factory.h"
 #include "chrome/browser/password_manager/factories/bulk_leak_check_service_factory.h"
 #include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
@@ -245,7 +246,7 @@ std::unique_ptr<TestingProfile> CreateTestingProfile() {
       PasswordsPrivateEventRouterFactory::GetInstance(),
       base::BindRepeating([](content::BrowserContext* context)
                               -> std::unique_ptr<KeyedService> {
-        return std::make_unique<PasswordsPrivateEventRouter>(context);
+        return std::make_unique<PasswordsPrivateEventRouterImpl>(context);
       }));
   builder.AddTestingFactory(
       BulkLeakCheckServiceFactory::GetInstance(),
