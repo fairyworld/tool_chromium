@@ -4406,6 +4406,12 @@ To continue from your computer, switch to <ph name="OTHER_EMAIL">$2<ex>john.doe@
       <message name="IDS_IOS_LEVEL_UP_SEE_ALL" desc="Link button to open all available level-up tasks. [iOS only]">
         See All
       </message>
+      <message name="IDS_IOS_LEVEL_UP_SIGNED_OUT_SNACKBAR" desc="Snackbar message displayed when a user attempts to use Level Up without being signed in. [iOS only]">
+        You have to be signed in to use Level Up
+      </message>
+      <message name="IDS_IOS_LEVEL_UP_SIGNED_OUT_SNACKBAR_ACTION" desc="Action button title on the snackbar message displayed when a user attempts to use Level Up without being signed in, allowing them to sign in. [iOS only]">
+        Sign in
+      </message>
       <message name="IDS_IOS_LEVEL_UP_STAT_PASSWORDS_VERIFIED" desc="Title for the passwords verified statistic card. [iOS only]">
         {count, plural,
           =1 {1 password instantly verified}
@@ -9021,14 +9027,14 @@ Handoff must also be enabled in the General section of Settings, and your device
       <message name="IDS_SEARCH_ENGINE_CHOICE_DEFAULT_HINT" desc="Announcement for screen reader users. This string is announced when the user interacts with the 'Set as Default' button at the bottom of the 'Choose Your Search Engine' choice screen. The text provides a hint that the user needs to choose a search engine from the list on this screen before they can press this button.">
         Choose a search engine from the list.
       </message>
-      <message name="IDS_SEND_TAB_TO_SELF_INFOBAR_MESSAGE" desc="The message text for the infobar when a user receives a shared tab from another device.">
-        Tab received.
+      <message name="IDS_SEND_TAB_TO_SELF_INFOBAR_AUTO_OPEN_SUBTITLE" desc="The subtitle text for the infobar when a user receives shared links from another device that open automatically, indicating the sending device.">
+        From <ph name="DEVICE_NAME">$1<ex>My iPhone</ex></ph>
       </message>
       <message name="IDS_SEND_TAB_TO_SELF_INFOBAR_AUTO_OPEN_TITLE" desc="The title text for the infobar when a user receives shared links from another device that open automatically.">
         Links received
       </message>
-      <message name="IDS_SEND_TAB_TO_SELF_INFOBAR_AUTO_OPEN_SUBTITLE" desc="The subtitle text for the infobar when a user receives shared links from another device that open automatically, indicating the sending device.">
-        From <ph name="DEVICE_NAME">$1<ex>My iPhone</ex></ph>
+      <message name="IDS_SEND_TAB_TO_SELF_INFOBAR_MESSAGE" desc="The message text for the infobar when a user receives a shared tab from another device.">
+        Tab received.
       </message>
       <message name="IDS_SEND_TAB_TO_SELF_INFOBAR_MESSAGE_URL" desc="Clickable text displayed as part of a URL in the inforbar displayed when a user receives a shared tab from another device.">
         Open

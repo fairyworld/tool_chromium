@@ -47068,6 +47068,15 @@ should be able to be added at any place in this file.
   </description>
 </action>
 
+<action name="Signin_Signin_FromLevelUp">
+  <owner>pabouchard@google.com</owner>
+  <owner>bling-mony-pod@google.com</owner>
+  <description>
+    Recorded on sign in start from access point
+    signin_metrics::AccessPoint::kLevelUp. iOS only.
+  </description>
+</action>
+
 <action name="Signin_Signin_FromMachineLogon">
   <owner>rogerta@chromium.org</owner>
   <owner>tienmai@chromium.org</owner>

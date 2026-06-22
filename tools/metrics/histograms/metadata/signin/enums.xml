@@ -1094,6 +1094,7 @@ chromium-metrics-reviews@google.com.
   <int value="104" label="Gemini Toolbar button (iOS only)"/>
   <int value="105" label="Indigo"/>
   <int value="106" label="Overflow Menu (iOS only)"/>
+  <int value="107" label="Level Up (iOS only)"/>
 </enum>
 
 <enum name="SigninAccountReconcilorState">
