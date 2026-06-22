@@ -35,8 +35,8 @@ impl ResponseBuilder {
             qualified_signer: Vec::new(),
             extra_data: Vec::new(),
             algorithms: tpm::SignatureAlgorithms {
-                sig_alg: tpm::TPM_ALG_RSASSA,
-                hash_alg: tpm::TPM_ALG_SHA256,
+                sig_alg: tpm::ffi::TpmAlg::TPM_ALG_RSASSA.repr,
+                hash_alg: tpm::ffi::TpmAlg::TPM_ALG_SHA256.repr,
             },
             sig: Vec::new(),
         }
@@ -107,7 +107,7 @@ impl ResponseBuilder {
         let mut signature_size: u16 = 2 // sigAlg
             + 2 // hashAlg
             + u16::try_from(self.sig.len()).unwrap();
-        if self.algorithms.sig_alg == tpm::TPM_ALG_RSASSA {
+        if self.algorithms.sig_alg == tpm::ffi::TpmAlg::TPM_ALG_RSASSA.repr {
             signature_size += 2; // sig size field
         }
 
@@ -141,7 +141,7 @@ impl ResponseBuilder {
             // Signature
             writer.write_u16(self.algorithms.sig_alg);
             writer.write_u16(self.algorithms.hash_alg);
-            if self.algorithms.sig_alg == tpm::TPM_ALG_RSASSA {
+            if self.algorithms.sig_alg == tpm::ffi::TpmAlg::TPM_ALG_RSASSA.repr {
                 writer.write_tpm2b(&self.sig);
             } else {
                 writer.write_bytes(&self.sig);
@@ -186,7 +186,7 @@ fn test_build_certify_command_null_scheme() {
     expect_eq!(reader.read_bytes(QUALIFYING_DATA.len()).unwrap(), QUALIFYING_DATA);
 
     // Scheme
-    expect_eq!(reader.read_u16().unwrap(), tpm::TPM_ALG_NULL);
+    expect_eq!(reader.read_u16().unwrap(), tpm::ffi::TpmAlg::TPM_ALG_NULL.repr);
 }
 
 #[gtest(TpmParserTest, EmptyBuffer)]
@@ -234,13 +234,13 @@ fn test_wrong_attest_type() {
     expect_true!(matches!(result.result, tpm::ffi::ParseResult::WrongType));
 }
 
-#[gtest(TpmParserTest, NonceMismatch)]
-fn test_nonce_mismatch() {
-    let nonce_mismatch = ResponseBuilder::new().with_extra_data(QUALIFYING_DATA).build();
+#[gtest(TpmParserTest, ChallengeMismatch)]
+fn test_challenge_mismatch() {
+    let challenge_mismatch = ResponseBuilder::new().with_extra_data(QUALIFYING_DATA).build();
 
     let challenge: &[u8] = WRONG_CHALLENGE;
-    let result = tpm::parse_certify_response(&nonce_mismatch, challenge);
-    expect_true!(matches!(result.result, tpm::ffi::ParseResult::NonceMismatch));
+    let result = tpm::parse_certify_response(&challenge_mismatch, challenge);
+    expect_true!(matches!(result.result, tpm::ffi::ParseResult::ChallengeMismatch));
 }
 
 #[gtest(TpmParserTest, HappyPath)]
@@ -278,15 +278,15 @@ fn test_happy_path() {
 #[gtest(TpmParserTest, ParseRsaSignature)]
 fn test_parse_rsa_signature() {
     let mut writer = tpm::Writer::new();
-    writer.write_u16(tpm::TPM_ALG_RSASSA);
-    writer.write_u16(tpm::TPM_ALG_SHA256);
+    writer.write_u16(tpm::ffi::TpmAlg::TPM_ALG_RSASSA.repr);
+    writer.write_u16(tpm::ffi::TpmAlg::TPM_ALG_SHA256.repr);
     writer.write_tpm2b(b"rsa signature bytes");
     let signature = writer.into_inner();
 
     let parsed = tpm::parse_tpm_signature(&signature);
-    expect_true!(matches!(parsed.status, tpm::ffi::VerificationResult::Ok));
-    expect_eq!(parsed.sig_alg, tpm::TPM_ALG_RSASSA);
-    expect_eq!(parsed.hash_alg, tpm::TPM_ALG_SHA256);
+    expect_true!(matches!(parsed.status, tpm::ffi::SignatureParseResult::Ok));
+    expect_eq!(parsed.sig_alg, tpm::ffi::TpmAlg::TPM_ALG_RSASSA);
+    expect_eq!(parsed.hash_alg, tpm::ffi::TpmAlg::TPM_ALG_SHA256);
     expect_eq!(parsed.rsa_sig, b"rsa signature bytes");
     expect_true!(parsed.ecdsa_r.is_empty());
     expect_true!(parsed.ecdsa_s.is_empty());
@@ -295,16 +295,16 @@ fn test_parse_rsa_signature() {
 #[gtest(TpmParserTest, ParseEcdsaSignature)]
 fn test_parse_ecdsa_signature() {
     let mut writer = tpm::Writer::new();
-    writer.write_u16(tpm::TPM_ALG_ECDSA);
-    writer.write_u16(tpm::TPM_ALG_SHA256);
+    writer.write_u16(tpm::ffi::TpmAlg::TPM_ALG_ECDSA.repr);
+    writer.write_u16(tpm::ffi::TpmAlg::TPM_ALG_SHA256.repr);
     writer.write_tpm2b(b"r coordinate");
     writer.write_tpm2b(b"s coordinate");
     let signature = writer.into_inner();
 
     let parsed = tpm::parse_tpm_signature(&signature);
-    expect_true!(matches!(parsed.status, tpm::ffi::VerificationResult::Ok));
-    expect_eq!(parsed.sig_alg, tpm::TPM_ALG_ECDSA);
-    expect_eq!(parsed.hash_alg, tpm::TPM_ALG_SHA256);
+    expect_true!(matches!(parsed.status, tpm::ffi::SignatureParseResult::Ok));
+    expect_eq!(parsed.sig_alg, tpm::ffi::TpmAlg::TPM_ALG_ECDSA);
+    expect_eq!(parsed.hash_alg, tpm::ffi::TpmAlg::TPM_ALG_SHA256);
     expect_true!(parsed.rsa_sig.is_empty());
     expect_eq!(parsed.ecdsa_r, b"r coordinate");
     expect_eq!(parsed.ecdsa_s, b"s coordinate");
@@ -314,36 +314,36 @@ fn test_parse_ecdsa_signature() {
 fn test_parse_invalid_signature_algorithm() {
     let mut writer = tpm::Writer::new();
     writer.write_u16(0x1234); // Invalid signature algorithm
-    writer.write_u16(tpm::TPM_ALG_SHA256);
+    writer.write_u16(tpm::ffi::TpmAlg::TPM_ALG_SHA256.repr);
     writer.write_bytes(b"dummy");
     let signature = writer.into_inner();
 
     let parsed = tpm::parse_tpm_signature(&signature);
     expect_true!(matches!(
         parsed.status,
-        tpm::ffi::VerificationResult::UnsupportedSignatureAlgorithm
+        tpm::ffi::SignatureParseResult::UnsupportedSignatureAlgorithm
     ));
 }
 
 #[gtest(TpmParserTest, ParseBufferTooSmall)]
 fn test_parse_buffer_too_small() {
     let mut writer = tpm::Writer::new();
-    writer.write_u16(tpm::TPM_ALG_RSASSA);
+    writer.write_u16(tpm::ffi::TpmAlg::TPM_ALG_RSASSA.repr);
     let signature = writer.into_inner();
 
     let parsed = tpm::parse_tpm_signature(&signature);
-    expect_true!(matches!(parsed.status, tpm::ffi::VerificationResult::BufferTooSmall));
+    expect_true!(matches!(parsed.status, tpm::ffi::SignatureParseResult::BufferTooSmall));
 }
 
 #[gtest(TpmParserTest, ParseTrailingBytes)]
 fn test_parse_trailing_bytes() {
     let mut writer = tpm::Writer::new();
-    writer.write_u16(tpm::TPM_ALG_RSASSA);
-    writer.write_u16(tpm::TPM_ALG_SHA256);
+    writer.write_u16(tpm::ffi::TpmAlg::TPM_ALG_RSASSA.repr);
+    writer.write_u16(tpm::ffi::TpmAlg::TPM_ALG_SHA256.repr);
     writer.write_tpm2b(b"rsa signature bytes");
     writer.write_bytes(b"extra garbage");
     let signature = writer.into_inner();
 
     let parsed = tpm::parse_tpm_signature(&signature);
-    expect_true!(matches!(parsed.status, tpm::ffi::VerificationResult::TrailingBytes));
+    expect_true!(matches!(parsed.status, tpm::ffi::SignatureParseResult::TrailingBytes));
 }

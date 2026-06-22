@@ -100,6 +100,8 @@ component("crypto") {
     "signature_verifier.h",
     "subtle_passkey.cc",
     "subtle_passkey.h",
+    "tpm_parser.cc",
+    "tpm_parser.h",
     "unexportable_key.cc",
     "unexportable_key.h",
     "unexportable_key_metrics.cc",
@@ -251,6 +253,7 @@ test("crypto_unittests") {
     "sha2_unittest.cc",
     "sign_unittest.cc",
     "signature_verifier_unittest.cc",
+    "tpm_parser_unittest.cc",
     "unexportable_key_metrics_unittest.cc",
     "unexportable_key_unittest.cc",
   ]

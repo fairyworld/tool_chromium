@@ -9,6 +9,7 @@
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 #include "base/base64.h"
@@ -36,7 +37,7 @@
 #include "crypto/keypair.h"
 #include "crypto/random.h"
 #include "crypto/sign.h"
-#include "crypto/tpm.rs.h"
+#include "crypto/tpm_parser.h"
 #include "crypto/unexportable_key.h"
 #include "crypto/unexportable_key_metrics.h"
 #include "third_party/boringssl/src/include/openssl/bn.h"
@@ -51,11 +52,6 @@
 namespace crypto {
 
 namespace {
-
-constexpr uint16_t kTpmAlgRsaSsa = 0x0014;
-constexpr uint16_t kTpmAlgEcdsa = 0x0018;
-constexpr uint16_t kTpmAlgSha1 = 0x0004;
-constexpr uint16_t kTpmAlgSha256 = 0x000B;
 
 const char kMetricVirtualCreateKeyError[] = "Crypto.TpmError.VirtualCreateKey";
 const char kMetricVirtualFinalizeKeyError[] =
@@ -527,88 +523,19 @@ ScopedNCryptKey LoadWrappedKey(base::span<const uint8_t> wrapped,
   return key;
 }
 
-std::optional<sign::SignatureKind> GetSignatureKind(uint16_t sig_alg,
-                                                    uint16_t hash_alg) {
-  switch (sig_alg) {
-    case kTpmAlgRsaSsa:
-      switch (hash_alg) {
-        case kTpmAlgSha256:
-          return sign::SignatureKind::RSA_PKCS1_SHA256;
-        case kTpmAlgSha1:
-          return sign::SignatureKind::RSA_PKCS1_SHA1;
-      }
-      break;
-    case kTpmAlgEcdsa:
-      switch (hash_alg) {
-        case kTpmAlgSha256:
-          return sign::SignatureKind::ECDSA_SHA256;
-        case kTpmAlgSha1:
-          return sign::SignatureKind::ECDSA_SHA1;
-      }
-      break;
-  }
-  return std::nullopt;
-}
-
-crypto::tpm::VerificationResult VerifyTpmSignature(
+tpm::SignatureErrorOr<void> VerifyAndLogTpmSignature(
     base::span<const uint8_t> spki,
-    base::span<const uint8_t> payload,
-    const crypto::tpm::RawSignatureComponents& parsed_sig) {
-  std::optional<keypair::PublicKey> public_key =
-      keypair::PublicKey::FromSubjectPublicKeyInfo(spki);
-  if (!public_key.has_value()) {
-    return crypto::tpm::VerificationResult::InvalidPublicKey;
-  }
+    base::span<const uint8_t> statement,
+    base::span<const uint8_t> signature_blob) {
+  ASSIGN_OR_RETURN(tpm::SignatureAlgorithms algs,
+                   tpm::GetSignatureAlgorithms(signature_blob));
+  base::UmaHistogramSparse(
+      "Crypto.TPMOperation.Win.TpmCertifyVerify.SignatureAlgorithm",
+      algs.sig_alg);
+  base::UmaHistogramSparse(
+      "Crypto.TPMOperation.Win.TpmCertifyVerify.HashAlgorithm", algs.hash_alg);
 
-  if (parsed_sig.sig_alg != kTpmAlgRsaSsa &&
-      parsed_sig.sig_alg != kTpmAlgEcdsa) {
-    return crypto::tpm::VerificationResult::UnsupportedSignatureAlgorithm;
-  }
-
-  std::optional<sign::SignatureKind> kind =
-      GetSignatureKind(parsed_sig.sig_alg, parsed_sig.hash_alg);
-  if (!kind.has_value()) {
-    return crypto::tpm::VerificationResult::UnsupportedHashAlgorithm;
-  }
-
-  switch (parsed_sig.sig_alg) {
-    case kTpmAlgRsaSsa:
-      return sign::Verify(*kind, *public_key, payload, parsed_sig.rsa_sig)
-                 ? crypto::tpm::VerificationResult::Ok
-                 : crypto::tpm::VerificationResult::InvalidSignature;
-    case kTpmAlgEcdsa: {
-      std::optional<std::vector<uint8_t>> der_sig =
-          ConvertEcdsaRawComponentsToDer(parsed_sig.ecdsa_r,
-                                         parsed_sig.ecdsa_s);
-      return der_sig.has_value() &&
-                     sign::Verify(*kind, *public_key, payload, *der_sig)
-                 ? crypto::tpm::VerificationResult::Ok
-                 : crypto::tpm::VerificationResult::InvalidSignature;
-    }
-    default:
-      NOTREACHED();
-  }
-}
-
-void VerifyAndLogTpmSignature(base::span<const uint8_t> spki,
-                              base::span<const uint8_t> statement,
-                              base::span<const uint8_t> signature) {
-  crypto::tpm::RawSignatureComponents parsed_sig =
-      crypto::tpm::parse_tpm_signature(base::SpanToRustSlice(signature));
-  crypto::tpm::VerificationResult result = parsed_sig.status;
-  if (result == crypto::tpm::VerificationResult::Ok) {
-    base::UmaHistogramSparse(
-        "Crypto.TPMOperation.Win.TpmCertifyVerify.SignatureAlgorithm",
-        parsed_sig.sig_alg);
-    base::UmaHistogramSparse(
-        "Crypto.TPMOperation.Win.TpmCertifyVerify.HashAlgorithm",
-        parsed_sig.hash_alg);
-
-    result = VerifyTpmSignature(spki, statement, parsed_sig);
-  }
-
-  base::UmaHistogramEnumeration(
-      "Crypto.TPMOperation.Win.TpmCertifyVerify.Result", result);
+  return tpm::VerifySignature(spki, statement, signature_blob);
 }
 
 // ECDSASigningKey wraps a P-256 ECDSA key stored in the given provider.
@@ -761,8 +688,8 @@ class AttestationKeyWin : public WinKeyImpl<UnexportableAttestationKey> {
         log_extract_property_error);
 
     // 3. Construct Command
-    rust::Vec<uint8_t> cmd = crypto::tpm::build_certify_command(
-        object_handle, sign_handle, base::SpanToRustSlice(challenge));
+    std::vector<uint8_t> cmd =
+        tpm::BuildCertifyCommand(object_handle, sign_handle, challenge);
 
     // 4. Submit Command
     // A 4096-byte buffer handles the maximum theoretical TPM response
@@ -789,33 +716,33 @@ class AttestationKeyWin : public WinKeyImpl<UnexportableAttestationKey> {
       return std::nullopt;
     }
 
-    // 5. Parse via Rust and verify in C++. C++ supports a wider range of
-    // signature algorithms.
-    crypto::tpm::CertifyResponse parsed = crypto::tpm::parse_certify_response(
-        base::SpanToRustSlice(base::span(resp).first(resp_len)),
-        base::SpanToRustSlice(challenge));
+    // 5. Parse in Rust by going through the C++ shim.
+    const tpm::CertifyResponseErrorOr<tpm::CertifyResponse> parsed_or_error =
+        tpm::ParseCertifyResponse(base::span(resp).first(resp_len), challenge);
 
+    auto parse_error = parsed_or_error.error_or(
+        tpm::CertifyResponseError(tpm::kNoCertifyResponseErrorForMetrics));
+    base::UmaHistogramEnumeration(
+        "Crypto.TPMOperation.Win.TpmCertifyParse.Result", parse_error.type);
     base::UmaHistogramSparse(
         "Crypto.TPMOperation.Win.TpmCertifyResponse.TpmResponseCode",
-        parsed.tpm_response_code);
+        parse_error.tpm_error_code.value_or(0));
 
+    ASSIGN_OR_RETURN(tpm::CertifyResponse parsed, std::move(parsed_or_error),
+                     [](const auto&) { return std::nullopt; });
+
+    // 6. Verify in C++. C++ supports a wider range of signature algorithms than
+    // Rust.
     base::UmaHistogramEnumeration(
-        "Crypto.TPMOperation.Win.TpmCertifyParse.Result", parsed.result);
-
-    if (parsed.result != crypto::tpm::ParseResult::Ok) {
-      return std::nullopt;
-    }
-
-    // We log local signature verification failures for telemetry, but do not
-    // early-return (e.g. return std::nullopt). The browser simply forwards
-    // the payload; strict cryptographic enforcement happens on the server.
-    VerifyAndLogTpmSignature(GetSubjectPublicKeyInfo(), parsed.statement,
-                             parsed.signature);
+        "Crypto.TPMOperation.Win.TpmCertifyVerify.Result",
+        VerifyAndLogTpmSignature(GetSubjectPublicKeyInfo(), parsed.statement,
+                                 parsed.signature)
+            .error_or(tpm::kNoSignatureErrorForMetrics));
 
     return AttestationStatement{
         .format = AttestationStatement::kTpm,
-        .statement = base::ToVector(parsed.statement),
-        .signature = base::ToVector(parsed.signature),
+        .statement = std::move(parsed.statement),
+        .signature = std::move(parsed.signature),
     };
   }
 };
