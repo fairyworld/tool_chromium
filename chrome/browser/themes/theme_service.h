@@ -319,6 +319,7 @@ class ThemeService : public KeyedService,
   friend class BrowserThemeProvider;
   friend class BrowserWidget;
   friend class InitialWebUIManager;
+  friend class ProfilePickerWidget;
   friend class ThemeColorsSourceManager;
   friend class theme_service_internal::ThemeServiceTest;
 
