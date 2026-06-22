@@ -10,6 +10,7 @@
 #import "ios/chrome/browser/authentication/test/signin_earl_grey.h"
 #import "ios/chrome/browser/authentication/test/signin_earl_grey_ui_test_util.h"
 #import "ios/chrome/browser/authentication/ui_bundled/signin/signin_constants.h"
+#import "ios/chrome/browser/infobars/ui_bundled/banners/infobar_banner_constants.h"
 #import "ios/chrome/browser/shared/model/url/chrome_url_constants.h"
 #import "ios/chrome/browser/shared/public/features/features.h"
 #import "ios/chrome/browser/signin/model/fake_system_identity.h"
@@ -785,15 +786,15 @@ ElementSelector* UsernameElement() {
   // subtitle.
   NSString* title =
       l10n_util::GetNSString(IDS_SEND_TAB_TO_SELF_INFOBAR_AUTO_OPEN_TITLE);
-  [ChromeEarlGrey
-      waitForSufficientlyVisibleElementWithMatcher:grey_accessibilityLabel(
-                                                       title)];
-
   NSString* subtitle = l10n_util::GetNSStringF(
       IDS_SEND_TAB_TO_SELF_INFOBAR_AUTO_OPEN_SUBTITLE, u"remote_device");
+  NSString* combinedLabel =
+      [NSString stringWithFormat:@"%@,%@", title, subtitle];
+  id<GREYMatcher> labelsStackMatcher =
+      grey_allOf(grey_accessibilityID(kInfobarBannerLabelsStackViewIdentifier),
+                 grey_accessibilityLabel(combinedLabel), nil);
   [ChromeEarlGrey
-      waitForSufficientlyVisibleElementWithMatcher:grey_accessibilityLabel(
-                                                       subtitle)];
+      waitForSufficientlyVisibleElementWithMatcher:labelsStackMatcher];
 
   // Tap "Open" on the banner and verify that the Tab Grid opens.
   NSString* buttonText =
@@ -847,15 +848,63 @@ ElementSelector* UsernameElement() {
   // subtitle.
   NSString* title =
       l10n_util::GetNSString(IDS_SEND_TAB_TO_SELF_INFOBAR_AUTO_OPEN_TITLE);
-  [ChromeEarlGrey
-      waitForSufficientlyVisibleElementWithMatcher:grey_accessibilityLabel(
-                                                       title)];
-
   NSString* subtitle = l10n_util::GetNSStringF(
       IDS_SEND_TAB_TO_SELF_INFOBAR_AUTO_OPEN_SUBTITLE, u"remote_device");
+  NSString* combinedLabel =
+      [NSString stringWithFormat:@"%@,%@", title, subtitle];
+  id<GREYMatcher> labelsStackMatcher =
+      grey_allOf(grey_accessibilityID(kInfobarBannerLabelsStackViewIdentifier),
+                 grey_accessibilityLabel(combinedLabel), nil);
   [ChromeEarlGrey
-      waitForSufficientlyVisibleElementWithMatcher:grey_accessibilityLabel(
-                                                       subtitle)];
+      waitForSufficientlyVisibleElementWithMatcher:labelsStackMatcher];
+}
+
+// Tests that when a shared tab is auto-opened, its tab card in the Tab Grid
+// displays the "From remote_device" activity label, and that the label
+// disappears once the tab is viewed.
+- (void)testTabCardLabelDisplayedInTabGrid {
+  [SigninEarlGrey signinWithFakeIdentity:[FakeSystemIdentity fakeIdentity1]];
+  [ChromeEarlGrey addFakeSyncServerDeviceInfo:kTargetDeviceName
+                         lastUpdatedTimestamp:base::Time::Now()];
+
+  // Load a starting page so there is an active, visible WebState.
+  [ChromeEarlGrey loadURL:GURL("about:blank")];
+
+  NSUInteger initialTabCount = [ChromeEarlGrey mainTabCount];
+
+  // Receive a shared tab.
+  [ChromeEarlGrey addFakeSyncServerSendTabToSelfEntryWithURL:kExampleURL
+                                                       title:@"AutoOpen Page"
+                                                  deviceName:@"remote_device"
+                                            targetDeviceGUID:@""];
+  [ChromeEarlGrey triggerSyncCycleForType:syncer::SEND_TAB_TO_SELF];
+
+  // Wait for the background tab to open.
+  [ChromeEarlGrey waitForMainTabCount:initialTabCount + 1];
+
+  // Enter the Tab Grid.
+  [ChromeEarlGreyUI openTabGrid];
+
+  // Verify that the activity label "From remote_device" is visible.
+  NSString* labelText = l10n_util::GetNSStringF(
+      IDS_SEND_TAB_TO_SELF_INFOBAR_AUTO_OPEN_SUBTITLE, u"remote_device");
+  [[EarlGrey
+      selectElementWithMatcher:grey_allOf(grey_accessibilityLabel(labelText),
+                                          grey_sufficientlyVisible(), nil)]
+      assertWithMatcher:grey_notNil()];
+
+  // Tap the newly opened tab (index 1) to view it.
+  [[EarlGrey selectElementWithMatcher:chrome_test_util::TabGridCellAtIndex(1)]
+      performAction:grey_tap()];
+
+  // Enter the Tab Grid again.
+  [ChromeEarlGreyUI openTabGrid];
+
+  // Verify that the label is now gone.
+  [[EarlGrey
+      selectElementWithMatcher:grey_allOf(grey_accessibilityLabel(labelText),
+                                          grey_sufficientlyVisible(), nil)]
+      assertWithMatcher:grey_nil()];
 }
 
 @end
