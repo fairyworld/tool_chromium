@@ -443,10 +443,6 @@ class Browser : public TabStripModelObserver,
     return should_trigger_session_restore_;
   }
 
-  // Remove these functions and migrate to using
-  // AppBrowserController::IsWebApp()` and `AppBrowserController::From()`.
-  const web_app::AppBrowserController* app_controller() const;
-  web_app::AppBrowserController* app_controller();
   BrowserWindowFeatures* browser_window_features() const {
     return features_.get();
   }

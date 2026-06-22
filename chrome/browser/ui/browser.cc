@@ -926,14 +926,6 @@ BrowserWindowInterface::Type Browser::GetType() const {
   return type_;
 }
 
-web_app::AppBrowserController* Browser::app_controller() {
-  return web_app::AppBrowserController::From(this);
-}
-
-const web_app::AppBrowserController* Browser::app_controller() const {
-  return web_app::AppBrowserController::From(this);
-}
-
 std::vector<tabs::TabInterface*> Browser::GetAllTabInterfaces() {
   std::vector<tabs::TabInterface*> results;
   results.reserve(tab_strip_model_->count());
