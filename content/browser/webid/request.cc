@@ -185,12 +185,6 @@ Request::~Request() {
                              TokenStatus::kUnhandledRequest,
                              /*should_delay_callback=*/false);
   }
-  // Calls |UserInfoRequest|'s destructor to complete the user
-  // info request. This is needed because otherwise some resources like
-  // `fedcm_metrics_` may no longer be usable when the destructor get invoked
-  // naturally.
-  user_info_requests_.clear();
-
   // Calls |DisconnectRequest|'s destructor to complete the
   // revocation request. This is needed because otherwise some resources like
   // `fedcm_metrics_` may no longer be usable when the destructor get invoked
@@ -581,32 +575,20 @@ void Request::RequestToken(
 
 void Request::RequestUserInfo(blink::mojom::IdentityProviderConfigPtr provider,
                               RequestUserInfoCallback callback) {
-  // Enforce identity-credentials-get Permissions Policy browser-side.
-  // The renderer checks this, but a compromised renderer can bypass it.
-  if (!render_frame_host().IsFeatureEnabled(
-          network::mojom::PermissionsPolicyFeature::kIdentityCredentialsGet)) {
-    ReportBadMessage("identity-credentials-get permissions policy not enabled");
-    return;
-  }
-
-  if (!render_frame_host().GetPage().IsPrimary()) {
-    ReportBadMessage("FedCM should not be allowed in nested frame trees.");
-    return;
-  }
-  // FedCmMetrics class is currently not used for UserInfo API. If we log UKM
-  // metrics later on, we should call CreateFedCmMetrics() here.
-
-  auto network_manager = IdpNetworkRequestManager::Create(
-      static_cast<RenderFrameHostImpl*>(&render_frame_host()));
-  auto user_info_request = UserInfoRequest::Create(
-      std::move(network_manager), permission_delegate_,
-      api_permission_delegate_, &render_frame_host(), std::move(provider));
-  UserInfoRequest* user_info_request_ptr = user_info_request.get();
-  user_info_requests_.insert(std::move(user_info_request));
-
-  user_info_request_ptr->SetCallbackAndStart(base::BindOnce(
-      &Request::CompleteUserInfoRequest, weak_ptr_factory_.GetWeakPtr(),
-      user_info_request_ptr, std::move(callback)));
+  request_service_->RequestUserInfo(
+      std::move(provider),
+      base::BindOnce(
+          [](RequestUserInfoCallback callback,
+             blink::mojom::RequestUserInfoResultPtr result) {
+            if (result->is_status()) {
+              std::move(callback).Run(result->get_status(), std::nullopt);
+            } else {
+              std::move(callback).Run(
+                  blink::mojom::RequestUserInfoStatus::kSuccess,
+                  std::move(result->get_user_info()));
+            }
+          },
+          std::move(callback)));
 }
 
 void Request::CancelTokenRequest() {
@@ -2272,31 +2254,6 @@ void Request::AddConsoleErrorMessage(FederatedAuthRequestResult result) {
 
 url::Origin Request::GetEmbeddingOrigin() const {
   return render_frame_host().GetMainFrame()->GetLastCommittedOrigin();
-}
-
-void Request::CompleteUserInfoRequest(
-    UserInfoRequest* request,
-    RequestUserInfoCallback callback,
-    blink::mojom::RequestUserInfoStatus status,
-    std::optional<std::vector<blink::mojom::IdentityUserInfoPtr>> user_info) {
-  auto it =
-      std::find_if(user_info_requests_.begin(), user_info_requests_.end(),
-                   [request](const std::unique_ptr<UserInfoRequest>& ptr) {
-                     return ptr.get() == request;
-                   });
-  // The request may not be found if the completion is invoked from
-  // Request destructor. The destructor clears
-  // `user_info_requests_`, which destroys the FederatedAuthUserInfoRequests it
-  // contains. The FederatedAuthUserInfoRequest destructor invokes this
-  // callback.
-  if (it == user_info_requests_.end() &&
-      status == blink::mojom::RequestUserInfoStatus::kSuccess) {
-    NOTREACHED() << "The successful user info request is nowhere to be found";
-  }
-  std::move(callback).Run(status, std::move(user_info));
-  if (it != user_info_requests_.end()) {
-    user_info_requests_.erase(it);
-  }
 }
 
 std::unique_ptr<IdpNetworkRequestManager> Request::CreateNetworkManager() {

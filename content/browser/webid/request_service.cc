@@ -5,6 +5,7 @@
 #include "content/browser/webid/request_service.h"
 
 #include "base/command_line.h"
+#include "base/functional/bind.h"
 #include "content/browser/renderer_host/render_frame_host_impl.h"
 #include "content/browser/webid/fake_identity_request_dialog_controller.h"
 #include "content/browser/webid/flags.h"
@@ -12,6 +13,7 @@
 #include "content/browser/webid/metrics.h"
 #include "content/browser/webid/request.h"
 #include "content/browser/webid/request_page_data.h"
+#include "content/browser/webid/user_info_request.h"
 #include "content/browser/webid/webid_utils.h"
 #include "content/public/browser/browser_context.h"
 #include "content/public/browser/content_browser_client.h"
@@ -21,6 +23,7 @@
 #include "content/public/browser/webid/federated_identity_permission_context_delegate.h"
 #include "content/public/common/content_client.h"
 #include "content/public/common/content_switches.h"
+#include "mojo/public/cpp/bindings/message.h"
 
 namespace content {
 
@@ -45,6 +48,12 @@ RequestService::RequestService(RenderFrameHost* rfh)
 }
 
 RequestService::~RequestService() {
+  // Invalidate weak pointers before clearing `user_info_requests_` to prevent
+  // the destroying UserInfoRequests from calling back re-entrantly into
+  // CompleteUserInfoRequest (which would cause container corruption during
+  // clear).
+  weak_ptr_factory_.InvalidateWeakPtrs();
+  user_info_requests_.clear();
   if (num_requests_ > 0) {
     Metrics::RecordNumRequestsPerDocument(
         render_frame_host().GetPageUkmSourceId(), num_requests_);
@@ -198,6 +207,72 @@ void RequestService::SetRequiresUserMediation(bool requires_user_mediation,
         render_frame_host().GetLastCommittedOrigin(), std::move(callback));
   } else {
     std::move(callback).Run();
+  }
+}
+
+void RequestService::RequestUserInfo(
+    blink::mojom::IdentityProviderConfigPtr provider,
+    RequestUserInfoCallback callback) {
+  // Enforce identity-credentials-get Permissions Policy browser-side.
+  if (!render_frame_host().IsFeatureEnabled(
+          network::mojom::PermissionsPolicyFeature::kIdentityCredentialsGet)) {
+    mojo::ReportBadMessage(
+        "identity-credentials-get permissions policy not enabled");
+    std::move(callback).Run(blink::mojom::RequestUserInfoResult::NewStatus(
+        blink::mojom::RequestUserInfoStatus::kError));
+    return;
+  }
+
+  if (!render_frame_host().GetPage().IsPrimary()) {
+    mojo::ReportBadMessage(
+        "FedCM should not be allowed in nested frame trees.");
+    std::move(callback).Run(blink::mojom::RequestUserInfoResult::NewStatus(
+        blink::mojom::RequestUserInfoStatus::kError));
+    return;
+  }
+  // FedCmMetrics class is currently not used for UserInfo API. If we log UKM
+  // metrics later on, we should call CreateFedCmMetrics() here.
+
+  auto user_info_request = UserInfoRequest::Create(
+      CreateNetworkManager(), permission_delegate_, api_permission_delegate_,
+      &render_frame_host(), std::move(provider));
+  UserInfoRequest* user_info_request_ptr = user_info_request.get();
+  user_info_requests_.insert(std::move(user_info_request));
+
+  user_info_request_ptr->SetCallbackAndStart(base::BindOnce(
+      &RequestService::CompleteUserInfoRequest, weak_ptr_factory_.GetWeakPtr(),
+      user_info_request_ptr, std::move(callback)));
+}
+
+void RequestService::CompleteUserInfoRequest(
+    UserInfoRequest* request,
+    RequestUserInfoCallback callback,
+    blink::mojom::RequestUserInfoStatus status,
+    std::optional<std::vector<blink::mojom::IdentityUserInfoPtr>> user_info) {
+  auto it = user_info_requests_.find(request);
+  // The request may not be found if the completion is invoked from the
+  // RequestService destructor. The destructor clears `user_info_requests_`,
+  // which destroys the UserInfoRequests it contains. The
+  // UserInfoRequest destructor invokes this callback.
+  if (it == user_info_requests_.end() &&
+      status == blink::mojom::RequestUserInfoStatus::kSuccess) {
+    NOTREACHED() << "The successful user info request is nowhere to be found";
+  }
+  // Extract the request from the set first to prevent UAF if the callback
+  // synchronously destroys `this` (RequestService).
+  std::unique_ptr<UserInfoRequest> holder;
+  if (it != user_info_requests_.end()) {
+    holder = std::move(const_cast<std::unique_ptr<UserInfoRequest>&>(*it));
+    user_info_requests_.erase(it);
+  }
+
+  if (status == blink::mojom::RequestUserInfoStatus::kSuccess) {
+    DCHECK(user_info.has_value());
+    std::move(callback).Run(blink::mojom::RequestUserInfoResult::NewUserInfo(
+        std::move(user_info.value())));
+  } else {
+    std::move(callback).Run(
+        blink::mojom::RequestUserInfoResult::NewStatus(status));
   }
 }
 

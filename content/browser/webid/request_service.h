@@ -7,7 +7,10 @@
 
 #include <memory>
 
+#include "base/containers/flat_set.h"
+#include "base/containers/unique_ptr_adapters.h"
 #include "base/memory/raw_ptr.h"
+#include "base/memory/weak_ptr.h"
 #include "content/browser/webid/config_fetcher.h"
 #include "content/common/content_export.h"
 #include "content/public/browser/document_user_data.h"
@@ -28,6 +31,7 @@ class Request;
 class IdentityRegistry;
 class IdpRegistrationHandler;
 class IdpNetworkRequestManager;
+class UserInfoRequest;
 
 // RequestService is a document-scoped manager class that coordinates
 // Federated Credential Management (FedCM) requests for a given RenderFrameHost.
@@ -52,6 +56,8 @@ class CONTENT_EXPORT RequestService
       mojo::PendingReceiver<blink::mojom::FederatedRequestService> receiver);
 
   // blink::mojom::FederatedRequestService:
+  void RequestUserInfo(blink::mojom::IdentityProviderConfigPtr provider,
+                       RequestUserInfoCallback callback) override;
   void RegisterIdP(const GURL& idp, RegisterIdPCallback callback) override;
   void UnregisterIdP(const GURL& idp, UnregisterIdPCallback callback) override;
   void PreventSilentAccess(PreventSilentAccessCallback callback) override;
@@ -102,10 +108,17 @@ class CONTENT_EXPORT RequestService
       RegisterIdPCallback callback,
       const GURL& idp,
       std::vector<ConfigFetcher::FetchResult> fetch_results);
+  void CompleteUserInfoRequest(
+      UserInfoRequest* request,
+      RequestUserInfoCallback callback,
+      blink::mojom::RequestUserInfoStatus status,
+      std::optional<std::vector<blink::mojom::IdentityUserInfoPtr>> user_info);
 
   std::unique_ptr<IdpNetworkRequestManager> registration_network_manager_;
   std::unique_ptr<IdpRegistrationHandler> fedcm_idp_registration_handler_;
   std::unique_ptr<IdpNetworkRequestManager> mock_network_manager_;
+  base::flat_set<std::unique_ptr<UserInfoRequest>, base::UniquePtrComparator>
+      user_info_requests_;
 
   raw_ptr<FederatedIdentityApiPermissionContextDelegate>
       api_permission_delegate_ = nullptr;

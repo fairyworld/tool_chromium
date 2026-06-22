@@ -51,7 +51,6 @@ class RenderFrameHost;
 namespace webid {
 
 class DisconnectRequest;
-class UserInfoRequest;
 class RequestService;
 
 using blink::mojom::IdentityProviderGetParametersPtr;
@@ -415,12 +414,6 @@ class CONTENT_EXPORT Request
   void MarkUserAsSignedIn(const GURL& idp_config_url,
                           const std::string& account_id);
 
-  void CompleteUserInfoRequest(
-      UserInfoRequest* request,
-      RequestUserInfoCallback callback,
-      blink::mojom::RequestUserInfoStatus status,
-      std::optional<std::vector<blink::mojom::IdentityUserInfoPtr>> user_info);
-
   // Validates the input from the renderer and signals to terminate the request
   // if needed.
   bool ShouldTerminateRequest(
@@ -596,9 +589,6 @@ class CONTENT_EXPORT Request
   std::unique_ptr<AccountsFetcher> fedcm_accounts_fetcher_;
 
   std::unique_ptr<FederatedSdJwtHandler> federated_sdjwt_handler_;
-
-  // Set of pending user info requests.
-  base::flat_set<std::unique_ptr<UserInfoRequest>> user_info_requests_;
 
   // Pending disconnect request.
   std::unique_ptr<DisconnectRequest> disconnect_request_;
