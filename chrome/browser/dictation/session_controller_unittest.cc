@@ -32,19 +32,18 @@ class DictationSessionControllerTest : public testing::Test {
 };
 
 TEST_F(DictationSessionControllerTest, StartsInactive) {
-  EXPECT_EQ(controller_->state(), SessionController::State::kInactive);
+  EXPECT_EQ(controller_->state(), SessionState::kInactive);
 }
 
 // Test that starting and stopping a stream moves the controller into the
 // appropriate state.
 TEST_F(DictationSessionControllerTest, StreamAffectsState) {
   controller_->StartDictationStream(std::make_unique<MockTarget>());
-  EXPECT_EQ(controller_->state(),
-            SessionController::State::kStreamInitializing);
+  EXPECT_EQ(controller_->state(), SessionState::kStreamInitializing);
   EXPECT_NE(controller_->attached_stream_provider(), nullptr);
 
   controller_->EndDictationStream();
-  EXPECT_EQ(controller_->state(), SessionController::State::kInactive);
+  EXPECT_EQ(controller_->state(), SessionState::kInactive);
   EXPECT_EQ(controller_->attached_stream_provider(), nullptr);
 }
 

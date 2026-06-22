@@ -21,8 +21,8 @@ SessionController::SessionController(SessionControllerDelegate& delegate)
     : delegate_(delegate) {}
 
 SessionController::~SessionController() {
-  CHECK(state_ != State::kInactive || !attached_stream_provider_);
-  if (state_ != State::kInactive) {
+  CHECK(state_ != SessionState::kInactive || !attached_stream_provider_);
+  if (state_ != SessionState::kInactive) {
     EndDictationStream();
   }
 }
@@ -32,24 +32,24 @@ void SessionController::Initialize() {
 }
 
 void SessionController::StartDictationStream(std::unique_ptr<Target> target) {
-  CHECK_EQ(state_, State::kInactive);
+  CHECK_EQ(state_, SessionState::kInactive);
 
   std::unique_ptr<StreamProvider> stream_provider =
       delegate_->CreateStreamProvider(*this);
   stream_provider->BindToTargetAndConnect(std::move(target));
   attached_stream_provider_ = std::move(stream_provider);
 
-  MoveToState(State::kStreamInitializing);
+  MoveToState(SessionState::kStreamInitializing);
 }
 
 void SessionController::EndDictationStream() {
-  CHECK_NE(state_, State::kInactive);
+  CHECK_NE(state_, SessionState::kInactive);
   attached_stream_provider_->Stop();
   attached_stream_provider_.reset();
-  MoveToState(State::kInactive);
+  MoveToState(SessionState::kInactive);
 }
 
-void SessionController::RequestEndSession() {
+void SessionController::UiRequestEndSession() {
   // EndSession will destroy `this` which owns other objects that call into here
   // so PostTask to avoid destroying objects in the callstack.
   base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
@@ -64,11 +64,11 @@ void SessionController::RequestEndSession() {
                      weak_ptr_factory_.GetWeakPtr()));
 }
 
-void SessionController::MoveToState(State new_state) {
-  using enum State;
+void SessionController::MoveToState(SessionState new_state) {
+  using enum SessionState;
 #if DCHECK_IS_ON()
-  static const base::NoDestructor<base::StateTransitions<State>>
-      allowed_transitions(base::StateTransitions<State>(
+  static const base::NoDestructor<base::StateTransitions<SessionState>>
+      allowed_transitions(base::StateTransitions<SessionState>(
           {{kInactive, {kStreamInitializing}},
            {kStreamInitializing, {kInactive, kTranscribing}},
            {kTranscribing, {kInactive, kFinalizing}},
@@ -79,24 +79,6 @@ void SessionController::MoveToState(State new_state) {
   }
 #endif  // DCHECK_IS_ON()
   state_ = new_state;
-}
-
-const char* ToString(SessionController::State state) {
-  using enum SessionController::State;
-  switch (state) {
-    case kInactive:
-      return "kInactive";
-    case kStreamInitializing:
-      return "kStreamInitializing";
-    case kTranscribing:
-      return "kTranscribing";
-    case kFinalizing:
-      return "kFinalizing";
-  }
-}
-
-std::ostream& operator<<(std::ostream& out, SessionController::State state) {
-  return out << ToString(state);
 }
 
 }  // namespace dictation

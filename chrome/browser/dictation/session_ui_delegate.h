@@ -13,7 +13,7 @@ class SessionUiDelegate {
   virtual ~SessionUiDelegate() = default;
 
   // Called when the session end has been requested via the UI.
-  virtual void RequestEndSession() = 0;
+  virtual void UiRequestEndSession() = 0;
 };
 
 }  // namespace dictation

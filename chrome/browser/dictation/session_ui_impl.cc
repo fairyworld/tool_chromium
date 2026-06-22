@@ -40,7 +40,7 @@ SessionUiImpl::SessionUiImpl(BrowserWindowInterface& window,
 SessionUiImpl::~SessionUiImpl() = default;
 
 void SessionUiImpl::OnDictationBubbleCloseClicked() {
-  controller_->RequestEndSession();
+  controller_->UiRequestEndSession();
 }
 
 }  // namespace dictation

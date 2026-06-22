@@ -10,6 +10,7 @@ source_set("dictation") {
     "features.h",
     "session_controller.h",
     "session_controller_delegate.h",
+    "session_state.h",
     "session_ui.h",
     "session_ui_delegate.h",
     "stream_provider.h",
@@ -30,6 +31,7 @@ source_set("impl") {
     "listener_stream_provider.cc",
     "listener_stream_provider.h",
     "session_controller.cc",
+    "session_state.cc",
     "session_ui_impl.cc",
     "session_ui_impl.h",
   ]

@@ -12,6 +12,7 @@
 #include "base/functional/bind.h"
 #include "base/memory/raw_ref.h"
 #include "base/memory/weak_ptr.h"
+#include "chrome/browser/dictation/session_state.h"
 #include "chrome/browser/dictation/session_ui_delegate.h"
 
 namespace dictation {
@@ -26,22 +27,6 @@ class Target;
 // dictation system.
 class SessionController : public SessionUiDelegate {
  public:
-  enum class State {
-    // Dictation is currently not active, there is no stream provider attached.
-    kInactive,
-
-    // A stream provider has just been attached but it is still starting up and
-    // not yet active.
-    kStreamInitializing,
-
-    // A stream provider is attached and actively transcribing and sending
-    // data.
-    kTranscribing,
-
-    // A stream provider is attached and has finished transcribing but is still
-    // finalizing the transcription and more data may be provided.
-    kFinalizing,
-  };
 
   explicit SessionController(SessionControllerDelegate& delegate);
   ~SessionController() override;
@@ -51,8 +36,7 @@ class SessionController : public SessionUiDelegate {
   // Called by the service when it's ready for the session to start.
   void Initialize();
 
-  // SessionUiDelegate
-  void RequestEndSession() override;
+  void UiRequestEndSession() override;
 
   // Starts a new dictation stream by creating and attaching a new stream
   // provider. An existing stream must have been detached before calling this
@@ -62,7 +46,8 @@ class SessionController : public SessionUiDelegate {
   // Ends the current dictation stream and detaches the stream provider.
   void EndDictationStream();
 
-  State state() const { return state_; }
+  SessionState state() const { return state_; }
+
   StreamProvider* attached_stream_provider() const {
     return attached_stream_provider_.get();
   }
@@ -70,11 +55,11 @@ class SessionController : public SessionUiDelegate {
   SessionUi* ui_for_testing() { return ui_.get(); }
 
  private:
-  void MoveToState(State new_state);
+  void MoveToState(SessionState new_state);
 
   const base::raw_ref<SessionControllerDelegate> delegate_;
 
-  State state_ = State::kInactive;
+  SessionState state_ = SessionState::kInactive;
 
   // The currently attached stream provider. The state of this provider is used
   // to drive the current state of dictation in the UI.
@@ -84,9 +69,6 @@ class SessionController : public SessionUiDelegate {
 
   base::WeakPtrFactory<SessionController> weak_ptr_factory_{this};
 };
-
-const char* ToString(SessionController::State state);
-std::ostream& operator<<(std::ostream& out, SessionController::State state);
 
 }  // namespace dictation
 
