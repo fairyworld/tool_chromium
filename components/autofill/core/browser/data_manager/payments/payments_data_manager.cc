@@ -1084,12 +1084,40 @@ void PaymentsDataManager::NotifyObservers() {
 bool PaymentsDataManager::IsCardEligibleForBenefits(
     const CreditCard& card) const {
 #if !BUILDFLAG(IS_IOS)
-  return card.benefit_source() == kAmexCardBenefitSource ||
-         card.benefit_source() == kBmoCardBenefitSource ||
-         (card.benefit_source() == kCurinosCardBenefitSource &&
-          GetFlatRateBenefitByInstrumentId(
-              CreditCardBenefitBase::LinkedCardInstrumentId(
-                  card.instrument_id())));
+  const std::string& benefit_source = card.benefit_source();
+  // Benefits sourced from American Express of Bank of Montreal are always
+  // eligible.
+  if (benefit_source == kAmexCardBenefitSource ||
+      benefit_source == kBmoCardBenefitSource) {
+    return true;
+  }
+
+  if (benefit_source == kCurinosCardBenefitSource) {
+    CreditCardBenefitBase::LinkedCardInstrumentId instrument_id(
+        card.instrument_id());
+    // Flat rate benefits sourced from Curinos are always eligible.
+    if (GetFlatRateBenefitByInstrumentId(instrument_id)) {
+      return true;
+    }
+    // Travel category, subcategory, and merchant benefits sourced from Curinos
+    // are currently restricted by an experiment.
+    if (GetCreditCardBenefitByInstrumentId<CreditCardCategoryBenefit>(
+            instrument_id,
+            [](const CreditCardCategoryBenefit& benefit) {
+              return benefit.benefit_category() ==
+                         CreditCardCategoryBenefit::BenefitCategory::kTravel ||
+                     CreditCardCategoryBenefit::IsTravelSubcategory(
+                         benefit.benefit_category());
+            }) ||
+        GetCreditCardBenefitByInstrumentId<CreditCardMerchantBenefit>(
+            instrument_id,
+            [](const CreditCardMerchantBenefit&) { return true; })) {
+      return base::FeatureList::IsEnabled(
+          features::
+              kAutofillEnableTravelCategoryAndMerchantBenefitsFromCurinos);
+    }
+  }
+  return false;
 #else
   return false;
 #endif  // !BUILDFLAG(IS_IOS)
