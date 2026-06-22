@@ -266,6 +266,8 @@ chromium-metrics-reviews@google.com.
   <variant name=".Malloc.Fragmentation.After24H"
       summary="Fragmentation of PartitionAlloc for processes older than 1
                day."/>
+  <variant name=".Malloc.IntendedLeakSize"
+      summary="Intended leaked size for LeakedSanitizedObjects."/>
   <variant name=".Malloc.MaxAllocatedSize"
       summary="Highwatermark for allocated memory for malloc(). Recorded only
                when PartitionAlloc is used as malloc()."/>
