@@ -1214,12 +1214,20 @@ class LocationBarMediator
             mCurrentInput.setRequestType(mLocationBarDataProvider.getDefaultRequestType());
         }
 
+        // See if there's any existing user selection that we can pick and work with.
+        var selection =
+                new TextSelection(
+                        mUrlCoordinator.getSelectionStart(), mUrlCoordinator.getSelectionEnd());
+
         session.activate(
                 mContext,
                 mLocationBarDataProvider.getWebContents(),
                 mProfileSupplier,
                 () -> {
                     if (mAutocompleteCoordinator == null || mCurrentInput == null) return;
+
+                    if (!selection.isCollapsed()) mCurrentInput.setSelection(selection);
+
                     if (mScrimHandler != null) {
                         mScrimHandler.updateScrimVisualState();
                         mScrimHandler.setVisibility(
