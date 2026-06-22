@@ -380,6 +380,10 @@ IOSGeminiSessionCancellationReason HistogramEnumFromGeminiCancelType(
   RecordGeminiRegenerateButtonTapped(optionType);
 }
 
+- (void)didRequestToDetachTabWithID:(NSString*)tabID {
+  // TODO(crbug.com/525782842): Implement tab detachment logic.
+}
+
 - (void)geminiLiveUserDidBargeIn {
   [self.geminiViewStateDelegate geminiLiveUserDidBargeIn];
 }
