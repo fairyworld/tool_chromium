@@ -12,7 +12,8 @@
 
 class SendTabToSelfTabCardLabelDataTest : public PlatformTest {
  protected:
-  base::test::TaskEnvironment task_environment_;
+  base::test::TaskEnvironment task_environment_{
+      base::test::TaskEnvironment::TimeSource::MOCK_TIME};
 };
 
 // Tests that the label data is successfully attached and is cleared
@@ -52,4 +53,25 @@ TEST_F(SendTabToSelfTabCardLabelDataTest, WebStateDestroyedClearsLabel) {
   // Destroy the WebState. This will trigger WebStateDestroyed, removing the
   // observer and safely destructing the label data.
   web_state.reset();
+}
+
+// Tests that the label data automatically expires after 5 days.
+TEST_F(SendTabToSelfTabCardLabelDataTest, ExpiryClearsLabel) {
+  web::FakeWebState web_state;
+
+  // Attach the label.
+  SendTabToSelfTabCardLabelData::CreateForWebState(&web_state, "remote_device");
+
+  SendTabToSelfTabCardLabelData* label_data =
+      SendTabToSelfTabCardLabelData::FromWebState(&web_state);
+  ASSERT_NE(nullptr, label_data);
+
+  // Fast forward 4 days (less than 5 days). The label should still be valid.
+  task_environment_.FastForwardBy(base::Days(4));
+  EXPECT_NE(nullptr, SendTabToSelfTabCardLabelData::FromWebState(&web_state));
+
+  // Fast forward another 2 days (total 6 days). The label should now be
+  // expired and cleared.
+  task_environment_.FastForwardBy(base::Days(2));
+  EXPECT_EQ(nullptr, SendTabToSelfTabCardLabelData::FromWebState(&web_state));
 }
