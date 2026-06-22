@@ -8506,11 +8506,6 @@
     "expiry_milestone": 150
   },
   {
-    "name": "search-in-settings",
-    "owners": [ "adelm@google.com", "jinsukkimn@chromium.org", "clank-app-team@google.com" ],
-    "expiry_milestone": 155
-  },
-  {
     "name": "search-settings-update",
     "owners": [ "amelies@google.com", "chrome-signin-desktop-team@google.com" ],
     "expiry_milestone": 158

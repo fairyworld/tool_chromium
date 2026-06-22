@@ -3936,10 +3936,6 @@ inline constexpr char kSuspiciousSiteWarningsName[] =
 inline constexpr char kSuspiciousSiteWarningsDescription[] =
     "Enables warnings on sites that Safe Browsing deem to be suspicious.";
 
-inline constexpr char kSearchInSettingsName[] = "Search in Settings";
-inline constexpr char kSearchInSettingsDescription[] =
-    "Enable search in settings";
-
 inline constexpr char kSearchEngineExplicitChoiceDialogName[] =
     "Use explicit-choice dialog confirming new search engine overrides";
 inline constexpr char kSearchEngineExplicitChoiceDialogDescription[] =
