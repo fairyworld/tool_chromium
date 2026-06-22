@@ -1945,8 +1945,8 @@ chromium-metrics-reviews@google.com.
 
 <histogram name="IOS.ExternalAction" enum="IOSExternalAction"
     expires_after="2027-06-30">
-  <owner>nicolasmacbeth@google.com</owner>
-  <owner>bling-pandamonium@google.com</owner>
+  <owner>joemerramos@google.com</owner>
+  <owner>bling-mony-pod@google.com</owner>
   <summary>
     Records the action passed to Chrome for iOS using an external action URL.
   </summary>
