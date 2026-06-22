@@ -241,6 +241,9 @@ class AssistantAIMUIStateProvider
 - (void)assistantAIMViewControllerDidTapClose:
     (AssistantAIMViewController*)viewController {
   [_mediator endSession];
+  // Initially the assistant is only hidden, the actual closing happens after
+  // the snackbar dismisses and the undo window elapses.
+  _isHiding = YES;
   [self dismissAssistantContainerAnimated:YES];
   [self showUndoSnackbar];
 }

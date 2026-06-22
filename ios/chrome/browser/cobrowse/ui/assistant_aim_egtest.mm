@@ -13,6 +13,7 @@
 #import "ios/chrome/browser/composebox/shared/ui/composebox_ui_constants.h"
 #import "ios/chrome/browser/scene/ui/scene_ui_constants.h"
 #import "ios/chrome/browser/shared/public/features/features.h"
+#import "ios/chrome/browser/shared/public/snackbar/snackbar_constants.h"
 #import "ios/chrome/browser/tab_switcher/ui_bundled/tab_grid/tab_grid_constants.h"
 #import "ios/chrome/grit/ios_strings.h"
 #import "ios/chrome/test/earl_grey/chrome_earl_grey.h"
@@ -199,6 +200,21 @@ id<GREYMatcher> CloseButton() {
                  grey_descendant(grey_accessibilityLabel(snackbarTitle)), nil);
   // Verify the undo snackbar is shown.
   [ChromeEarlGrey waitForUIElementToAppearWithMatcher:snackbarMatcher];
+
+  // Press undo.
+  [[EarlGrey
+      selectElementWithMatcher:grey_allOf(
+                                   grey_accessibilityID(
+                                       kSnackbarButtonAccessibilityId),
+                                   grey_accessibilityLabel(
+                                       l10n_util::GetNSString(
+                                           IDS_IOS_AIM_SNACKBAR_UNDO_BUTTON)),
+                                   nil)] performAction:grey_tap()];
+
+  // Verify it's back.
+  id<GREYMatcher> composeboxMatcher =
+      grey_accessibilityID(kComposeboxAccessibilityIdentifier);
+  [ChromeEarlGrey waitForUIElementToAppearWithMatcher:composeboxMatcher];
 }
 
 // Tests that the assistant can be dismissed and reopened multiple times.
@@ -695,6 +711,13 @@ id<GREYMatcher> CloseButton() {
   [[EarlGrey selectElementWithMatcher:CloseButton()] performAction:grey_tap()];
   [[EarlGrey selectElementWithMatcher:CloseButton()]
       assertWithMatcher:grey_nil()];
+
+  // Wait for the snackbar to appear.
+  id<GREYMatcher> snackbarMatcher = chrome_test_util::SnackbarViewMatcher();
+  [ChromeEarlGrey testUIElementAppearanceWithMatcher:snackbarMatcher];
+  // Tap the snackbar to make it disappear.
+  [[EarlGrey selectElementWithMatcher:snackbarMatcher]
+      performAction:grey_tap()];
 
   // 4. Reopen Co-browse.
   OpenCoBrowse(self.testServer);
