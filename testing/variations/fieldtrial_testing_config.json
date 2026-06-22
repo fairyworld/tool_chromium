@@ -9270,6 +9270,21 @@
             ]
         }
     ],
+    "DiscoverWidescreenFeedClank": [
+        {
+            "platforms": [
+                "android"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled_50_prestable_20260612",
+                    "enable_features": [
+                        "WideScreenFeedForFoldables"
+                    ]
+                }
+            ]
+        }
+    ],
     "DiskCacheBackendExperiment": [
         {
             "platforms": [
