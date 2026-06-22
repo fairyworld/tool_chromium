@@ -4,6 +4,7 @@
 
 package org.chromium.chrome.browser.tasks.tab_management.vertical_tabs;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -11,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,6 +26,8 @@ import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
+import org.chromium.chrome.browser.actor.ui.ActorUiTabController.UiTabState;
+import org.chromium.chrome.browser.actor.ui.TabIndicatorStatus;
 import org.chromium.chrome.browser.tab.MediaState;
 import org.chromium.chrome.browser.tab.TabUtils;
 import org.chromium.chrome.browser.tasks.tab_management.TabActionButtonData;
@@ -33,6 +37,7 @@ import org.chromium.chrome.browser.tasks.tab_management.TabUiThemeUtil;
 import org.chromium.chrome.tab_ui.R;
 import org.chromium.components.browser_ui.styles.SemanticColorUtils;
 import org.chromium.components.tab_groups.TabGroupColorPickerUtils;
+import org.chromium.ui.base.ViewUtils;
 import org.chromium.ui.modelutil.PropertyKey;
 import org.chromium.ui.modelutil.PropertyModel;
 
@@ -41,6 +46,8 @@ import org.chromium.ui.modelutil.PropertyModel;
 class TabVerticalViewBinder {
     private static final float ROTATION_COLLAPSED = 0f;
     private static final float ROTATION_EXPANDED = 180f;
+    private static final float ACTUATION_SPINNER_ROTATION_DEGREES = 360f;
+    private static final long ACTUATION_SPINNER_DURATION_MS = 2000L;
     @VisibleForTesting static final long CHEVRON_ANIMATION_DURATION_MS = 200L;
 
     // Public Entry-Point Binders
@@ -204,11 +211,54 @@ class TabVerticalViewBinder {
     }
 
     private static void updateActorIndicator(PropertyModel model, ViewGroup view) {
-        @Nullable View indicatorView = view.findViewById(R.id.ai_indicator);
-        if (indicatorView == null) return;
+        @Nullable View aiIndicatorLine = view.findViewById(R.id.ai_indicator);
+        @Nullable ImageView actuationSpark = view.findViewById(R.id.actuation_spark);
+        @Nullable ImageView actuationSpinner = view.findViewById(R.id.actuation_spinner);
+
+        if (aiIndicatorLine == null || actuationSpark == null || actuationSpinner == null) return;
 
         boolean shouldBeVisible = TabListViewBinderUtils.setupActorIndicator(model, view);
-        indicatorView.setVisibility(shouldBeVisible ? View.VISIBLE : View.GONE);
+        aiIndicatorLine.setVisibility(shouldBeVisible ? View.VISIBLE : View.GONE);
+
+        @Nullable UiTabState state = model.get(TabProperties.ACTOR_UI_STATE);
+
+        boolean isDynamic =
+                shouldBeVisible
+                        && state != null
+                        && state.tabIndicator == TabIndicatorStatus.DYNAMIC;
+
+        ObjectAnimator animator = (ObjectAnimator) actuationSpinner.getTag(R.id.actuation_spinner);
+
+        if (isDynamic) {
+            actuationSpark.setVisibility(View.VISIBLE);
+            actuationSpinner.setVisibility(View.VISIBLE);
+
+            if (animator == null) {
+                animator =
+                        ObjectAnimator.ofFloat(
+                                actuationSpinner,
+                                View.ROTATION,
+                                0f,
+                                ACTUATION_SPINNER_ROTATION_DEGREES);
+                animator.setDuration(ACTUATION_SPINNER_DURATION_MS);
+                animator.setRepeatCount(ObjectAnimator.INFINITE);
+                animator.setInterpolator(new LinearInterpolator());
+                actuationSpinner.setTag(R.id.actuation_spinner, animator);
+
+                // Cancel the animator when the view is recycled to prevent infinite background
+                // execution and memory leaks.
+                ViewUtils.cancelAnimatorOnDetach(actuationSpinner, R.id.actuation_spinner);
+            }
+            if (!animator.isRunning()) {
+                animator.start();
+            }
+        } else {
+            if (animator != null && animator.isRunning()) {
+                animator.cancel();
+            }
+            actuationSpark.setVisibility(View.GONE);
+            actuationSpinner.setVisibility(View.GONE);
+        }
     }
 
     // Row-Specific Layout Color Binder Helpers

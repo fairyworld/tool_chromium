@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -72,6 +73,8 @@ public class TabVerticalViewBinderUnitTest {
     private ImageView mCloseButton;
     private ImageView mMediaIndicatorView;
     private View mIndicatorView;
+    private ImageView mActuationSparkView;
+    private ImageView mActuationSpinnerView;
     private PropertyModel mModel;
 
     @Before
@@ -87,6 +90,8 @@ public class TabVerticalViewBinderUnitTest {
         mCloseButton = mItemView.findViewById(R.id.action_button);
         mMediaIndicatorView = mItemView.findViewById(R.id.media_indicator_icon);
         mIndicatorView = mItemView.findViewById(R.id.ai_indicator);
+        mActuationSparkView = mItemView.findViewById(R.id.actuation_spark);
+        mActuationSpinnerView = mItemView.findViewById(R.id.actuation_spinner);
 
         mModel =
                 new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
@@ -111,18 +116,29 @@ public class TabVerticalViewBinderUnitTest {
                 new UiTabState(0, null, null, TabIndicatorStatus.DYNAMIC, false));
         TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.ACTOR_UI_STATE);
         assertEquals(View.VISIBLE, mIndicatorView.getVisibility());
+        assertEquals(View.VISIBLE, mActuationSparkView.getVisibility());
+        assertEquals(View.VISIBLE, mActuationSpinnerView.getVisibility());
+        ObjectAnimator animator =
+                (ObjectAnimator) mActuationSpinnerView.getTag(R.id.actuation_spinner);
+        assertNotNull(animator);
+        assertTrue(animator.isRunning());
 
         mModel.set(
                 TabProperties.ACTOR_UI_STATE,
                 new UiTabState(0, null, null, TabIndicatorStatus.STATIC, false));
         TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.ACTOR_UI_STATE);
         assertEquals(View.VISIBLE, mIndicatorView.getVisibility());
+        assertEquals(View.GONE, mActuationSparkView.getVisibility());
+        assertEquals(View.GONE, mActuationSpinnerView.getVisibility());
+        assertFalse(animator.isRunning());
 
         mModel.set(
                 TabProperties.ACTOR_UI_STATE,
                 new UiTabState(0, null, null, TabIndicatorStatus.NONE, false));
         TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.ACTOR_UI_STATE);
         assertEquals(View.GONE, mIndicatorView.getVisibility());
+        assertEquals(View.GONE, mActuationSparkView.getVisibility());
+        assertEquals(View.GONE, mActuationSpinnerView.getVisibility());
     }
 
     @Test
