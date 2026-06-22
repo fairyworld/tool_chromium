@@ -9,7 +9,9 @@
 
 #include "base/check_deref.h"
 #include "base/test/scoped_feature_list.h"
+#include "base/test/task_environment.h"
 #include "build/branding_buildflags.h"
+#include "components/autofill/core/browser/foundations/test_autofill_client.h"
 #include "components/autofill/core/common/autofill_debug_features.h"
 #include "components/autofill/core/common/autofill_features.h"
 #include "components/personal_context/core/mock_personal_context_enablement_service.h"
@@ -36,22 +38,30 @@ using ::testing::Return;
 class AtMemoryEnablementUtilsTest : public testing::Test {
  protected:
   AtMemoryEnablementUtilsTest() {
-    personal_context::prefs::RegisterProfilePrefs(pref_service_.registry());
+    personal_context::prefs::RegisterProfilePrefs(
+        autofill_client().GetPrefs()->registry());
     // Enable the toggle by default in tests since it represents the default
     // active state.
-    pref_service_.SetUserPref(
+    autofill_client().GetPrefs()->SetUserPref(
         personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
         base::Value(true));
     // Set PersonalContextService to return not eligible by default.
     ON_CALL(personal_context_service_, GetEnablementState)
         .WillByDefault(Return(personal_context::PersonalContextEnablementState::
                                   kDisabledNotEligible));
+    autofill_client().set_personal_context_enablement_service(
+        &personal_context_service_);
   }
 
+  TestAutofillClient& autofill_client() { return autofill_client_; }
+
+  base::test::TaskEnvironment task_environment_;
   base::test::ScopedFeatureList feature_list_{features::kAutofillAtMemory};
   testing::NiceMock<personal_context::MockPersonalContextEnablementService>
       personal_context_service_;
-  TestingPrefServiceSimple pref_service_;
+
+ private:
+  TestAutofillClient autofill_client_;
 };
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
@@ -66,14 +76,11 @@ TEST_F(AtMemoryEnablementUtilsTest, MayPerformAtMemoryAction_AtMemoryDisabled) {
           Return(personal_context::PersonalContextEnablementState::kEnabled));
 
   EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
-                                        &personal_context_service_,
-                                        &pref_service_, nullptr));
+                                        autofill_client()));
   EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kShowAtMemoryInSettings,
-                                        &personal_context_service_,
-                                        &pref_service_, nullptr));
+                                        autofill_client()));
   EXPECT_FALSE(MayPerformAtMemoryAction(
-      AtMemoryAction::kAllowCustomizeAtMemoryShortcut,
-      &personal_context_service_, &pref_service_, nullptr));
+      AtMemoryAction::kAllowCustomizeAtMemoryShortcut, autofill_client()));
 }
 
 // Tests that `MayPerformAtMemoryAction` returns false when
@@ -81,12 +88,14 @@ TEST_F(AtMemoryEnablementUtilsTest, MayPerformAtMemoryAction_AtMemoryDisabled) {
 TEST_F(AtMemoryEnablementUtilsTest,
        MayPerformAtMemoryAction_NullPersonalContextService) {
   EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
-                                        nullptr, &pref_service_, nullptr));
+                                        nullptr, autofill_client().GetPrefs(),
+                                        nullptr));
   EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kShowAtMemoryInSettings,
-                                        nullptr, &pref_service_, nullptr));
+                                        nullptr, autofill_client().GetPrefs(),
+                                        nullptr));
   EXPECT_FALSE(
       MayPerformAtMemoryAction(AtMemoryAction::kAllowCustomizeAtMemoryShortcut,
-                               nullptr, &pref_service_, nullptr));
+                               nullptr, autofill_client().GetPrefs(), nullptr));
 }
 
 // Tests `MayPerformAtMemoryAction` when `pref_service` is null.
@@ -108,7 +117,7 @@ TEST_F(AtMemoryEnablementUtilsTest, MayPerformAtMemoryAction_NullPrefService) {
 
 // Tests `MayPerformAtMemoryAction` under various Personal Context states.
 TEST_F(AtMemoryEnablementUtilsTest, MayPerformAtMemoryAction_States) {
-  pref_service_.SetUserPref(
+  autofill_client().GetPrefs()->SetUserPref(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
       base::Value(true));
 
@@ -117,49 +126,44 @@ TEST_F(AtMemoryEnablementUtilsTest, MayPerformAtMemoryAction_States) {
       .WillOnce(
           Return(personal_context::PersonalContextEnablementState::kEnabled));
   EXPECT_TRUE(MayPerformAtMemoryAction(
-      AtMemoryAction::kAllowCustomizeAtMemoryShortcut,
-      &personal_context_service_, &pref_service_, nullptr));
+      AtMemoryAction::kAllowCustomizeAtMemoryShortcut, autofill_client()));
 
   // State: kEnabledShouldShowNotice
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillOnce(Return(personal_context::PersonalContextEnablementState::
                            kEnabledShouldShowNotice));
-  pref_service_.SetUserPref(
+  autofill_client().GetPrefs()->SetUserPref(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
       base::Value(true));
   EXPECT_TRUE(MayPerformAtMemoryAction(
-      AtMemoryAction::kAllowCustomizeAtMemoryShortcut,
-      &personal_context_service_, &pref_service_, nullptr));
+      AtMemoryAction::kAllowCustomizeAtMemoryShortcut, autofill_client()));
 
   // State: kDisabledViaPersonalIntelligenceInAutofillToggle
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillOnce(Return(personal_context::PersonalContextEnablementState::
                            kDisabledViaPersonalIntelligenceInAutofillToggle));
-  pref_service_.SetUserPref(
+  autofill_client().GetPrefs()->SetUserPref(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
       base::Value(false));
   EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kShowAtMemoryInSettings,
-                                       &personal_context_service_,
-                                       &pref_service_, nullptr));
+                                       autofill_client()));
 
   // State: kDisabledNeedsOptIn
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillOnce(Return(personal_context::PersonalContextEnablementState::
                            kDisabledNeedsOptIn));
-  pref_service_.SetUserPref(
+  autofill_client().GetPrefs()->SetUserPref(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
       base::Value(false));
   EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kShowAtMemoryInSettings,
-                                       &personal_context_service_,
-                                       &pref_service_, nullptr));
+                                       autofill_client()));
 
   // State: kDisabledNotEligible
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillOnce(Return(personal_context::PersonalContextEnablementState::
                            kDisabledNotEligible));
   EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
-                                        &personal_context_service_,
-                                        &pref_service_, nullptr));
+                                        autofill_client()));
 }
 
 // Tests `MayPerformAtMemoryAction` when the toggle pref is off.
@@ -167,30 +171,26 @@ TEST_F(AtMemoryEnablementUtilsTest, MayPerformAtMemoryAction_ToggleOff) {
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillRepeatedly(
           Return(personal_context::PersonalContextEnablementState::kEnabled));
-  pref_service_.SetUserPref(
+  autofill_client().GetPrefs()->SetUserPref(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
       base::Value(false));
 
   EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
-                                        &personal_context_service_,
-                                        &pref_service_, nullptr));
+                                        autofill_client()));
   EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kShowAtMemoryInSettings,
-                                       &personal_context_service_,
-                                       &pref_service_, nullptr));
+                                       autofill_client()));
   EXPECT_FALSE(MayPerformAtMemoryAction(
-      AtMemoryAction::kAllowCustomizeAtMemoryShortcut,
-      &personal_context_service_, &pref_service_, nullptr));
+      AtMemoryAction::kAllowCustomizeAtMemoryShortcut, autofill_client()));
 }
 
-// Tests that `MayPerformAtMemoryAction returns false when
+// Tests that `MayPerformAtMemoryAction` returns false when
 // `personal_context_service` returns `kDisabledNotEligible`.
 TEST_F(AtMemoryEnablementUtilsTest, MayPerformAtMemoryAction_NotSupported) {
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillRepeatedly(Return(personal_context::PersonalContextEnablementState::
                                  kDisabledNotEligible));
   EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
-                                        &personal_context_service_,
-                                        &pref_service_, nullptr));
+                                        autofill_client()));
 }
 
 // Tests that `MayPerformAtMemoryAction` returns true when the client supports
@@ -200,12 +200,11 @@ TEST_F(AtMemoryEnablementUtilsTest,
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillRepeatedly(
           Return(personal_context::PersonalContextEnablementState::kEnabled));
-  pref_service_.SetUserPref(
+  autofill_client().GetPrefs()->SetUserPref(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
       base::Value(true));
   EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
-                                       &personal_context_service_,
-                                       &pref_service_, nullptr));
+                                       autofill_client()));
 }
 
 // Tests that when `kAtMemorySkipEligibilityChecks` is enabled,
@@ -221,27 +220,25 @@ TEST_F(AtMemoryEnablementUtilsTest,
                                  kDisabledNotEligible));
 
   EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
-                                       &personal_context_service_,
-                                       &pref_service_, nullptr));
+                                       autofill_client()));
 }
 
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 // Tests for non-branded Chromium builds.
 #if !BUILDFLAG(GOOGLE_CHROME_BRANDING)
-// Tests that MayPerformAtMemoryAction returns false for non-branded Chromium
+// Tests that `MayPerformAtMemoryAction` returns false for non-branded Chromium
 // build even when all conditions are met.
 TEST_F(AtMemoryEnablementUtilsTest,
        MayPerformAtMemoryAction_SupportedAndToggleOn) {
   EXPECT_CALL(personal_context_service_, GetEnablementState)
       .WillRepeatedly(
           Return(personal_context::PersonalContextEnablementState::kEnabled));
-  pref_service_.SetUserPref(
+  autofill_client().GetPrefs()->SetUserPref(
       personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
       base::Value(true));
   EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
-                                        &personal_context_service_,
-                                        &pref_service_, nullptr));
+                                        autofill_client()));
 }
 #endif  // !BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
@@ -252,9 +249,12 @@ class AtMemoryEnablementUtilsWithGroupsTest
   AtMemoryEnablementUtilsWithGroupsTest() {
     local_state_.registry()->RegisterDictionaryPref(
         variations::prefs::kVariationsGoogleGroups);
-    pref_service_.registry()->RegisterListPref(GetDogfoodGroupsPrefName());
+    autofill_client().GetPrefs()->registry()->RegisterListPref(
+        GetDogfoodGroupsPrefName());
 
-    groups_manager_.emplace(local_state_, "DefaultKey", pref_service_);
+    autofill_client().set_google_groups_manager(
+        std::make_unique<GoogleGroupsManager>(local_state_, "DefaultKey",
+                                              *autofill_client().GetPrefs()));
   }
 
   static constexpr std::string GetDogfoodGroupsPrefName() {
@@ -272,17 +272,12 @@ class AtMemoryEnablementUtilsWithGroupsTest
       group_dict.Set(variations::kDogfoodGroupsSyncPrefGaiaIdKey, group);
       pref_groups_list.Append(std::move(group_dict));
     }
-    pref_service_.SetUserPref(GetDogfoodGroupsPrefName(),
-                              base::Value(std::move(pref_groups_list)));
-  }
-
-  const GoogleGroupsManager& groups_manager() const {
-    return CHECK_DEREF(groups_manager_);
+    autofill_client().GetPrefs()->SetUserPref(
+        GetDogfoodGroupsPrefName(), base::Value(std::move(pref_groups_list)));
   }
 
  private:
   TestingPrefServiceSimple local_state_;
-  std::optional<GoogleGroupsManager> groups_manager_;
 };
 
 // Tests that the action is not allowed if a Google Group is required but the
@@ -301,8 +296,7 @@ TEST_F(AtMemoryEnablementUtilsWithGroupsTest,
           Return(personal_context::PersonalContextEnablementState::kEnabled));
 
   EXPECT_FALSE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
-                                        &personal_context_service_,
-                                        &pref_service_, &groups_manager()));
+                                        autofill_client()));
 }
 
 // Tests that the action is allowed if a Google Group is required and the user
@@ -321,8 +315,7 @@ TEST_F(AtMemoryEnablementUtilsWithGroupsTest,
           Return(personal_context::PersonalContextEnablementState::kEnabled));
 
   EXPECT_TRUE(MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
-                                       &personal_context_service_,
-                                       &pref_service_, &groups_manager()));
+                                       autofill_client()));
 }
 #endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING) && !BUILDFLAG(IS_FUCHSIA)
 
