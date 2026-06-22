@@ -76,8 +76,6 @@ class SendTabToSelfModel {
   // if it failed to be queued. Callers do not need to check IsReady() before
   // calling this method; if the model is not ready, the callback will be
   // invoked with kFailureNotTrackingMetadata.
-  // TODO(crbug.com/503283050): Make `entry_point` required once all call sites
-  // have been updated.
   virtual const SendTabToSelfEntry* SendEntry(
       const GURL& url,
       const std::string& title,
@@ -85,7 +83,7 @@ class SendTabToSelfModel {
       const PageContext& context,
       NavigationHistory navigation_history,
       base::OnceCallback<void(SendTabToSelfResult)> commit_confirmation,
-      std::optional<ShareEntryPoint> entry_point = std::nullopt) = 0;
+      ShareEntryPoint entry_point) = 0;
 
   // Dismiss entry with key `guid`. Allows clients to modify the state
   // of the model as driven by user behaviors.

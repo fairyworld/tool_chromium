@@ -422,12 +422,10 @@ const SendTabToSelfEntry* SendTabToSelfBridge::SendEntry(
     const PageContext& context,
     NavigationHistory navigation_history,
     base::OnceCallback<void(SendTabToSelfResult)> commit_confirmation,
-    std::optional<ShareEntryPoint> entry_point) {
+    ShareEntryPoint entry_point) {
   CHECK(commit_confirmation);
 
-  if (entry_point) {
-    RecordEntryPointSent(*entry_point);
-  }
+  RecordEntryPointSent(entry_point);
 
   if (!change_processor()->IsTrackingMetadata()) {
     std::move(commit_confirmation)

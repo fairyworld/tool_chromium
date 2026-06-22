@@ -108,7 +108,7 @@ class SendTabToSelfBridge : public syncer::DataTypeSyncBridge,
       const PageContext& context,
       NavigationHistory navigation_history,
       base::OnceCallback<void(SendTabToSelfResult)> commit_confirmation,
-      std::optional<ShareEntryPoint> entry_point) override;
+      ShareEntryPoint entry_point) override;
   void DismissEntry(std::string_view guid) override;
   void MarkEntryOpened(std::string_view guid) override;
   bool IsReady() override;
