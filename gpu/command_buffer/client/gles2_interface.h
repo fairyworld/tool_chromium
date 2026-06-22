@@ -74,8 +74,9 @@ class GLES2Interface : public InterfaceBase {
       SkAlphaType dst_alpha_type,
       GrSurfaceOrigin dst_origin);
 
-  // Copies the contents of |source_shared_image| to |texture| of the current
-  // context.
+  // Copies the contents of |source_shared_image| to |dst_texture| of the
+  // current context. Assumes that |dst_texture| has already been allocated (via
+  // BindTexture and TexImage2D) to the size of |src_rect|.
   virtual std::unique_ptr<RasterScopedAccess>
   CopySharedImageDirectlyToGLTexture(const gfx::Rect& src_rect,
                                      ClientSharedImage* source_shared_image,

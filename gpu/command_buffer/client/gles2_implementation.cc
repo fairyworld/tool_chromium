@@ -138,18 +138,6 @@ bool ValidFormatForDirectUploading(GLenum format, uint32_t type) {
 }
 #endif
 
-void BindAndTexImage2D(gpu::gles2::GLES2Interface* gl,
-                       unsigned int target,
-                       unsigned int texture,
-                       unsigned int internal_format,
-                       unsigned int format,
-                       unsigned int type,
-                       int level,
-                       const gfx::Size& size) {
-  gl->BindTexture(target, texture);
-  gl->TexImage2D(target, level, internal_format, size.width(), size.height(), 0,
-                 format, type, nullptr);
-}
 
 void CopyRectToBuffer(base::span<const uint8_t> pixels,
                       uint32_t height,
@@ -534,9 +522,6 @@ GLES2Implementation::CopySharedImageDirectlyToGLTexture(
     int32_t dst_level,
     SkAlphaType dst_alpha_type,
     GrSurfaceOrigin dst_origin) {
-  BindAndTexImage2D(this, dst_target, dst_texture, dst_internal_format,
-                    dst_format, dst_type, dst_level, src_rect.size());
-
   std::unique_ptr<gpu::RasterScopedAccess> destination_access;
   if (CanCopySharedImageToGLTextureViaTextureCopy(source_shared_image)) {
     CopySharedImageToGLTextureViaTextureCopy(
