@@ -1378,6 +1378,14 @@ void ManagePasswordsUIController::PrimaryPageChanged(content::Page& page) {
 
 void ManagePasswordsUIController::OnVisibilityChanged(
     content::Visibility visibility) {
+  // The page action icon (and its pinned toolbar button) is shared at the
+  // window level. When this tab becomes visible, we must push our tab-specific
+  // state to the shared icon/action item to ensure it correctly reflects our
+  // state (e.g. clearing any highlights from a previously active tab).
+  if (visibility == content::Visibility::VISIBLE) {
+    UpdateBubbleAndIconVisibility();
+  }
+
   if (base::FeatureList::IsEnabled(
           autofill::features::kAutofillShowBubblesBasedOnPriorities)) {
     // BubbleManager will handle the effects of tab changes.
