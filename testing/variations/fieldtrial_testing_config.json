@@ -9494,26 +9494,6 @@
             ]
         }
     ],
-    "DrainSpdySessionSynchronouslyOnRemoteEndpointDisconnect": [
-        {
-            "platforms": [
-                "android",
-                "android_webview",
-                "chromeos",
-                "linux",
-                "mac",
-                "windows"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "DrainSpdySessionSynchronouslyOnRemoteEndpointDisconnect"
-                    ]
-                }
-            ]
-        }
-    ],
     "DseIntegrity": [
         {
             "platforms": [
@@ -16639,6 +16619,28 @@
             ]
         }
     ],
+    "NetTaskScheduler": [
+        {
+            "platforms": [
+                "android",
+                "android_webview",
+                "chromeos",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled_V2_And_SpdyDrainFix",
+                    "enable_features": [
+                        "DrainSpdySessionSynchronouslyOnRemoteEndpointDisconnect",
+                        "NetTaskScheduler",
+                        "NetworkServicePerPriorityTaskQueues"
+                    ]
+                }
+            ]
+        }
+    ],
     "NetTaskSchedulerHostResolver": [
         {
             "platforms": [
@@ -16740,26 +16742,6 @@
                     },
                     "enable_features": [
                         "NetworkQualityEstimator"
-                    ]
-                }
-            ]
-        }
-    ],
-    "NetworkServicePerPriorityTaskQueues": [
-        {
-            "platforms": [
-                "android",
-                "android_webview",
-                "chromeos",
-                "linux",
-                "mac",
-                "windows"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "NetworkServicePerPriorityTaskQueues"
                     ]
                 }
             ]
