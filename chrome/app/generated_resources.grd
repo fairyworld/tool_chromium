@@ -9900,7 +9900,7 @@ Keep your key file in a safe place. You will need it to create new versions of y
         Languages
       </message>
       <message name="IDS_READING_MODE_LANGUAGE_MENU_CLOSE" desc="Label for a button to close a dialog with options for managing language preferences for Read Aloud.">
-        Close
+        Close language menu
       </message>
       <if expr="is_macosx">
         <message name="IDS_READING_MODE_CLOSE" desc="Tooltip and screen reader label for a button to close reading mode.">
