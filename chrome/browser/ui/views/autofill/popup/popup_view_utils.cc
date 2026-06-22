@@ -554,17 +554,25 @@ BubbleBorder::Arrow GetOptimalPopupPlacement(
 
 bool IsExpandableSuggestionType(SuggestionType type) {
   switch (type) {
-    case SuggestionType::kAddressEntry:
-    case SuggestionType::kAddressFieldByFieldFilling:
+    // This opens the non-affiliated loyalty cards submenu.
     case SuggestionType::kAllLoyaltyCardsEntry:
+    // This opens a submenu with footer-like suggestions around the compose
+    // nudge (e.g., Go to settings).
     case SuggestionType::kComposeProactiveNudge:
-    case SuggestionType::kCreditCardEntry:
+    // This opens the submenu where one of many test addresses can be selected.
     case SuggestionType::kDevtoolsTestAddresses:
-    case SuggestionType::kFillAutofillAi:
-    case SuggestionType::kLoyaltyCardEntry:
+    // This opens a submenu, only during password manual fallback, so that the
+    // user can decide whether to fill the username or password into the field.
     case SuggestionType::kPasswordEntry:
+    // This opens the submenu where different suggestions related to the same
+    // query response are present.
     case SuggestionType::kAtMemorySearchResult:
       return true;
+    case SuggestionType::kAddressEntry:
+    case SuggestionType::kAddressFieldByFieldFilling:
+    case SuggestionType::kCreditCardEntry:
+    case SuggestionType::kLoyaltyCardEntry:
+    case SuggestionType::kFillAutofillAi:
     case SuggestionType::kAccountStoragePasswordEntry:
     case SuggestionType::kAddressEntryOnTyping:
     case SuggestionType::kAllSavedPasswordsEntry:
