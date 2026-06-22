@@ -124,8 +124,7 @@ void FirstPartySetsHandlerImplInstance::GetContextConfigForPolicy(
     return;
   }
   if (global_sets_.has_value()) {
-    std::move(callback).Run(
-        GetContextConfigForPolicyInternal(*policy, std::nullopt));
+    std::move(callback).Run(GetContextConfigForPolicyInternal(*policy));
     return;
   }
   // Add to the deque of callbacks that will be processed once the list
@@ -135,7 +134,7 @@ void FirstPartySetsHandlerImplInstance::GetContextConfigForPolicy(
           &FirstPartySetsHandlerImplInstance::GetContextConfigForPolicyInternal,
           // base::Unretained(this) is safe here because this is a static
           // singleton.
-          base::Unretained(this), policy->Clone(), base::ElapsedTimer())
+          base::Unretained(this), policy->Clone())
           .Then(std::move(callback)));
 }
 
@@ -496,16 +495,9 @@ void FirstPartySetsHandlerImplInstance::ComputeFirstPartySetMetadataInternal(
 
 net::FirstPartySetsContextConfig
 FirstPartySetsHandlerImplInstance::GetContextConfigForPolicyInternal(
-    const base::DictValue& policy,
-    base::optional_ref<const base::ElapsedTimer> timer) const {
+    const base::DictValue& policy) const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   CHECK(global_sets_.has_value());
-
-  if (timer.has_value()) {
-    base::UmaHistogramTimes(
-        "Cookie.FirstPartySets.EnqueueingDelay.ContextConfig2",
-        timer->Elapsed());
-  }
 
   if (!enabled_) {
     return net::FirstPartySetsContextConfig();
