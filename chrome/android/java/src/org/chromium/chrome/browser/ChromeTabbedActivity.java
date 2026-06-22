@@ -1469,10 +1469,17 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
         try (TraceEvent e =
                 TraceEvent.scoped(
                         "ChromeTabbedActivity.maybeCreateIncognitoTabSnapshotController")) {
-            IncognitoTabbedSnapshotController.createIncognitoTabSnapshotController(
-                    this, mLayoutManager, mTabModelSelector, getLifecycleDispatcher());
+            if (!ChromeFeatureList.sEnableAndroidEnterpriseScreenshotProtection.isEnabled()) {
+                IncognitoTabbedSnapshotController.createIncognitoTabSnapshotController(
+                        this, mLayoutManager, mTabModelSelector, getLifecycleDispatcher());
 
-            mUiWithNativeInitialized = true;
+                mUiWithNativeInitialized = true;
+            } else {
+                mScreenshotProtectionControllerSupplier.addSyncObserverAndCallIfNonNull(
+                        (ignored) -> {
+                            mUiWithNativeInitialized = true;
+                        });
+            }
 
             // The dataset has already been created, we need to initialize our state.
             mTabModelSelector.notifyChanged();
