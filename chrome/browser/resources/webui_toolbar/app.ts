@@ -249,6 +249,7 @@ export class ToolbarAppElement extends AppElementBase {
       tooltip: '',
       accessibilityName: '',
       accessibilityDescription: '',
+      enabled: true,
     },
     layoutConstantsVersion: 0,
     touchUi: false,

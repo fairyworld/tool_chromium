@@ -93,6 +93,7 @@
 #include "chrome/browser/ui/views/tabs/tab_strip_controller.h"
 #include "chrome/browser/ui/views/toolbar/app_menu.h"
 #include "chrome/browser/ui/views/toolbar/app_menu_control.h"
+#include "chrome/browser/ui/views/toolbar/avatar_toolbar_button_interface.h"
 #include "chrome/browser/ui/views/toolbar/back_forward_button.h"
 #include "chrome/browser/ui/views/toolbar/browser_app_menu_button.h"
 #include "chrome/browser/ui/views/toolbar/chrome_labs/chrome_labs_coordinator.h"
@@ -581,21 +582,8 @@ void ToolbarView::Init() {
   if (!features::IsWebUIAvatarButtonEnabled()) {
     avatar_ =
         AddChildView(std::make_unique<AvatarToolbarButton>(browser_view_));
-    bool show_avatar_toolbar_button = true;
-#if BUILDFLAG(IS_CHROMEOS)
-    // ChromeOS only badges Incognito, Guest, and captive portal signin icons in
-    // the browser window.
-    show_avatar_toolbar_button =
-        browser_->profile()->IsIncognitoProfile() ||
-        browser_->profile()->IsGuestSession() ||
-        (browser_->profile()->IsOffTheRecord() &&
-         browser_->profile()->GetOTRProfileID().IsCaptivePortal());
-#else
-    // DevTools profiles are OffTheRecord, so hide it there.
-    show_avatar_toolbar_button = browser_->profile()->IsIncognitoProfile() ||
-                                 browser_->profile()->IsGuestSession() ||
-                                 browser_->profile()->IsRegularProfile();
-#endif
+    bool show_avatar_toolbar_button =
+        AvatarToolbarButtonInterface::CanShowForProfile(browser_->profile());
     avatar_->SetVisible(show_avatar_toolbar_button);
   }
 
