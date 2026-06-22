@@ -29,7 +29,6 @@ class Target;
 class SessionController : public SessionUiDelegate,
                           public StreamProviderDelegate {
  public:
-
   explicit SessionController(SessionControllerDelegate& delegate);
   ~SessionController() override;
   SessionController(const SessionController&) = delete;
@@ -40,6 +39,8 @@ class SessionController : public SessionUiDelegate,
 
   // SessionUiDelegate:
   void UiRequestEndSession() override;
+  void UiRequestEndActiveStream() override;
+  SessionState GetState() const override;
 
   // StreamProviderDelegate:
   void DidUpdateStreamProviderState(
@@ -59,8 +60,6 @@ class SessionController : public SessionUiDelegate,
 
   // Ends the current dictation stream and detaches the stream provider.
   void EndDictationStream();
-
-  SessionState state() const { return state_; }
 
   StreamProvider* attached_stream_provider() const {
     return attached_stream_provider_.get();

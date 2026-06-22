@@ -8,6 +8,7 @@
 
 #include "base/functional/bind.h"
 #include "base/memory/ptr_util.h"
+#include "base/notimplemented.h"
 #include "chrome/browser/dictation/session_ui_delegate.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
@@ -30,6 +31,8 @@ SessionUiImpl::SessionUiImpl(BrowserWindowInterface& window,
   bubble_ui_ = std::make_unique<DictationBubbleUi>(
       anchor_view,
       base::BindRepeating(&SessionUiImpl::OnDictationBubbleCloseClicked,
+                          base::Unretained(this)),
+      base::BindRepeating(&SessionUiImpl::OnToggleActiveStreamClicked,
                           base::Unretained(this)));
 
   // TODO(b/510778034): Determine what we need to make this accessibility
@@ -41,6 +44,18 @@ SessionUiImpl::~SessionUiImpl() = default;
 
 void SessionUiImpl::OnDictationBubbleCloseClicked() {
   controller_->UiRequestEndSession();
+}
+
+void SessionUiImpl::OnToggleActiveStreamClicked() {
+  switch (controller_->GetState()) {
+    case SessionState::kStreamInitializing:
+    case SessionState::kTranscribing:
+      controller_->UiRequestEndActiveStream();
+      break;
+    case SessionState::kInactive:
+    case SessionState::kFinalizing:
+      NOTIMPLEMENTED();
+  }
 }
 
 }  // namespace dictation

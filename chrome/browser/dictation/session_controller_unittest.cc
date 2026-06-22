@@ -39,18 +39,18 @@ class DictationSessionControllerTest : public testing::Test {
 };
 
 TEST_F(DictationSessionControllerTest, StartsInactive) {
-  EXPECT_EQ(controller_->state(), SessionState::kInactive);
+  EXPECT_EQ(controller_->GetState(), SessionState::kInactive);
 }
 
 // Test that starting and stopping a stream moves the controller into the
 // appropriate state.
 TEST_F(DictationSessionControllerTest, StreamAffectsState) {
   controller_->StartDictationStream(std::make_unique<MockTarget>());
-  EXPECT_EQ(controller_->state(), SessionState::kStreamInitializing);
+  EXPECT_EQ(controller_->GetState(), SessionState::kStreamInitializing);
   EXPECT_NE(controller_->attached_stream_provider(), nullptr);
 
   controller_->EndDictationStream();
-  EXPECT_EQ(controller_->state(), SessionState::kInactive);
+  EXPECT_EQ(controller_->GetState(), SessionState::kInactive);
   EXPECT_EQ(controller_->attached_stream_provider(), nullptr);
 }
 
@@ -88,6 +88,24 @@ TEST_F(DictationSessionControllerTest, EndStream) {
   controller_->EndDictationStream();
 }
 
+// Test that calling EndDictationStream while the controller is in the
+// kStreamInitializing state correctly transitions the controller to kInactive.
+TEST_F(DictationSessionControllerTest, EndStreamDuringInitialization) {
+  auto mock_stream_provider =
+      std::make_unique<testing::NiceMock<MockStreamProvider>>();
+  MockStreamProvider* stream_provider_ptr = mock_stream_provider.get();
+
+  EXPECT_CALL(mock_delegate_, CreateStreamProvider(_))
+      .WillOnce(Return(std::move(mock_stream_provider)));
+  controller_->StartDictationStream(std::make_unique<MockTarget>());
+  ASSERT_EQ(controller_->GetState(), SessionState::kStreamInitializing);
+
+  EXPECT_CALL(*stream_provider_ptr, Stop());
+  controller_->EndDictationStream();
+  EXPECT_EQ(controller_->GetState(), SessionState::kInactive);
+  EXPECT_EQ(controller_->attached_stream_provider(), nullptr);
+}
+
 // Test that registering a callback receives state updates when the controller
 // transitions states.
 TEST_F(DictationSessionControllerTest, StateChangedCallback) {
@@ -113,14 +131,14 @@ TEST_F(DictationSessionControllerTest, StreamProviderStatePropagates) {
   EXPECT_CALL(mock_delegate_, CreateStreamProvider(_))
       .WillOnce(Return(std::move(mock_stream_provider)));
   controller_->StartDictationStream(std::make_unique<MockTarget>());
-  EXPECT_EQ(controller_->state(), SessionState::kStreamInitializing);
+  EXPECT_EQ(controller_->GetState(), SessionState::kStreamInitializing);
 
   // Transition to transcribing.
   EXPECT_CALL(*stream_provider_ptr, GetState())
       .WillRepeatedly(Return(StreamProvider::StreamState::kTranscribing));
   controller_->DidUpdateStreamProviderState(
       *stream_provider_ptr, StreamProvider::StreamState::kInitializing);
-  EXPECT_EQ(controller_->state(), SessionState::kTranscribing);
+  EXPECT_EQ(controller_->GetState(), SessionState::kTranscribing);
 
   // Transition to complete.
   EXPECT_CALL(*stream_provider_ptr, GetState())
@@ -139,7 +157,7 @@ TEST_F(DictationSessionControllerTest, StreamProviderStatePropagates) {
       *stream_provider_ptr, StreamProvider::StreamState::kTranscribing);
   run_loop.Run();
 
-  EXPECT_EQ(controller_->state(), SessionState::kInactive);
+  EXPECT_EQ(controller_->GetState(), SessionState::kInactive);
 }
 
 // Test that propagating state changes for a failure
@@ -151,14 +169,14 @@ TEST_F(DictationSessionControllerTest, StreamProviderStatePropagatesFailure) {
   EXPECT_CALL(mock_delegate_, CreateStreamProvider(_))
       .WillOnce(Return(std::move(mock_stream_provider)));
   controller_->StartDictationStream(std::make_unique<MockTarget>());
-  EXPECT_EQ(controller_->state(), SessionState::kStreamInitializing);
+  EXPECT_EQ(controller_->GetState(), SessionState::kStreamInitializing);
 
   // Transition to transcribing.
   EXPECT_CALL(*stream_provider_ptr, GetState())
       .WillRepeatedly(Return(StreamProvider::StreamState::kTranscribing));
   controller_->DidUpdateStreamProviderState(
       *stream_provider_ptr, StreamProvider::StreamState::kInitializing);
-  EXPECT_EQ(controller_->state(), SessionState::kTranscribing);
+  EXPECT_EQ(controller_->GetState(), SessionState::kTranscribing);
 
   // Transition to failure.
   EXPECT_CALL(*stream_provider_ptr, GetState())
@@ -177,7 +195,7 @@ TEST_F(DictationSessionControllerTest, StreamProviderStatePropagatesFailure) {
       *stream_provider_ptr, StreamProvider::StreamState::kTranscribing);
   run_loop.Run();
 
-  EXPECT_EQ(controller_->state(), SessionState::kInactive);
+  EXPECT_EQ(controller_->GetState(), SessionState::kInactive);
 }
 
 }  // namespace

@@ -66,6 +66,14 @@ void SessionController::UiRequestEndSession() {
                      weak_ptr_factory_.GetWeakPtr()));
 }
 
+void SessionController::UiRequestEndActiveStream() {
+  EndDictationStream();
+}
+
+SessionState SessionController::GetState() const {
+  return state_;
+}
+
 void SessionController::DidUpdateStreamProviderState(
     StreamProvider& stream_provider,
     StreamProvider::StreamState old_state) {
