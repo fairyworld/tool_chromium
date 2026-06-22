@@ -79,8 +79,7 @@ bool ShouldAllowSavingPasswordsWithInFlowRecovery(
     password_manager::ActionableError error) {
   return error == password_manager::ActionableError::kTrustedVaultKeyNeeded &&
          base::FeatureList::IsEnabled(
-             password_manager::features::
-                 kInFlowTrustedVaultKeyRetrievalAndroid);
+             password_manager::features::kPasswordSaveInContextErrorResolution);
 }
 #endif
 
@@ -196,8 +195,7 @@ bool IsSavingBlockedByTrustedVaultError(
   }
   return has_trusted_vault_error && !has_other_blocking_errors &&
          base::FeatureList::IsEnabled(
-             password_manager::features::
-                 kPasswordSaveInContextErrorResolutionOnDesktop);
+             password_manager::features::kPasswordSaveInContextErrorResolution);
 #endif
 }
 

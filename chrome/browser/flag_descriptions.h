@@ -3849,12 +3849,11 @@ inline constexpr char kPasswordManagerShowSuggestionsOnAutofocusDescription[] =
     "click on the already focused field if the field was autofocused on "
     "the page load.";
 
-inline constexpr char kPasswordSaveInContextErrorResolutionOnDesktopName[] =
+inline constexpr char kPasswordSaveInContextErrorResolutionName[] =
     "In-flow resolution of errors during password saving";
-inline constexpr char
-    kPasswordSaveInContextErrorResolutionOnDesktopDescription[] =
-        "Starts the password manager error resolution flow after offering to "
-        "save a password.";
+inline constexpr char kPasswordSaveInContextErrorResolutionDescription[] =
+    "Starts the password manager error resolution flow after offering to "
+    "save a password.";
 
 inline constexpr char kPasswordUploadUiUpdateName[] =
     "Password Upload UI Update";
@@ -6376,11 +6375,6 @@ inline constexpr char kEnableShouldShowPromotionName[] =
     "Enable Chrome Web Store Promotion Banner";
 inline constexpr char kEnableShouldShowPromotionDescription[] =
     "Enables showing the promotion banner on chromewebstore page.";
-
-inline constexpr char kInFlowTrustedVaultKeyRetrievalAndroidName[] =
-    "In-flow Trusted Vault key retrieval";
-inline constexpr char kInFlowTrustedVaultKeyRetrievalAndroidDescription[] =
-    "Starts the key retrieval flow after offering to save a password.";
 
 inline constexpr char kInfiniteTabsFreezingName[] = "Infinite Tabs Freezing";
 inline constexpr char kInfiniteTabsFreezingDescription[] =

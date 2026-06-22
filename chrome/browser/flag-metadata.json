@@ -5766,16 +5766,6 @@
    "expiry_milestone": 160
   },
   {
-    "name": "in-flow-trusted-vault-key-retrieval-android",
-    "owners": [ "izuzic@google.com", "anki-team@google.com" ],
-    "expiry_milestone": 149
-  },
-  {
-    "name": "in-flow-trusted-vault-key-retrieval-ios",
-    "owners": [ "thomasth@google.com", "anki-team@google.com" ],
-    "expiry_milestone": 149
-  },
-  {
     "name": "in-product-help-demo-mode-choice",
     "owners": [ "dtrainor@chromium.org", "nyquist@chromium.org" ],
     // This flag is used by teams as they develop in-product help integrations,
@@ -7650,9 +7640,9 @@
       "expiry_milestone": 152
   },
   {
-    "name": "password-save-in-context-error-resolution-on-desktop",
-    "owners": [  "ylahodiuk@google.com", "anki-team@google.com" ],
-    "expiry_milestone": 151
+    "name": "password-save-in-context-error-resolution",
+    "owners": [ "izuzic@google.com", "rgod@google.com", "ylahodiuk@google.com", "anki-team@google.com" ],
+    "expiry_milestone": 155
   },
   {
     "name": "password-upload-ui-update",

@@ -1628,8 +1628,7 @@ void ManagePasswordsUIController::OnErrorStateChanged(
     password_manager::PasswordStoreInterface* /*store*/,
     password_manager::ActionableError new_state) {
   if (base::FeatureList::IsEnabled(
-          password_manager::features::
-              kPasswordSaveInContextErrorResolutionOnDesktop)) {
+          password_manager::features::kPasswordSaveInContextErrorResolution)) {
     if (save_password_after_trusted_vault_error_resolution_ &&
         new_state == password_manager::ActionableError::kNoError) {
       SavePasswordAfterTrustedVaultErrorResolution();

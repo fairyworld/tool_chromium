@@ -815,8 +815,7 @@ class PasswordManagerUtilTrustedVaultErrorPreventsFromSavingTest
  protected:
   PasswordManagerUtilTrustedVaultErrorPreventsFromSavingTest() {
     feature_list_.InitAndEnableFeature(
-        password_manager::features::
-            kPasswordSaveInContextErrorResolutionOnDesktop);
+        password_manager::features::kPasswordSaveInContextErrorResolution);
   }
   ~PasswordManagerUtilTrustedVaultErrorPreventsFromSavingTest() override =
       default;

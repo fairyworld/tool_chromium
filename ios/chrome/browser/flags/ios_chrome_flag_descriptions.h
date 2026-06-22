@@ -1113,11 +1113,6 @@ inline constexpr char kIdentityConfirmationSnackbarName[] =
 inline constexpr char kIdentityConfirmationSnackbarDescription[] =
     "When enabled, the identity confirmation snackbar will show on startup.";
 
-inline constexpr char kInFlowTrustedVaultKeyRetrievalIosName[] =
-    "In-flow Trusted Vault key retrieval";
-inline constexpr char kInFlowTrustedVaultKeyRetrievalIosDescription[] =
-    "Starts the key retrieval flow after offering to save a password.";
-
 inline constexpr char kInProductHelpDemoModeName[] =
     "In-Product Help Demo Mode";
 inline constexpr char kInProductHelpDemoModeDescription[] =
@@ -1599,6 +1594,12 @@ inline constexpr char kPasswordReuseDetectionName[] =
 inline constexpr char kPasswordReuseDetectionDescription[] =
     "Displays warning when user types or pastes a saved password into a "
     "phishing website.";
+
+inline constexpr char kPasswordSaveInContextErrorResolutionName[] =
+    "In-flow resolution of errors during password saving";
+inline constexpr char kPasswordSaveInContextErrorResolutionDescription[] =
+    "Starts the password manager error resolution flow after offering to save "
+    "a password.";
 
 inline constexpr char kPasswordSharingName[] = "Enables password sharing";
 inline constexpr char kPasswordSharingDescription[] =

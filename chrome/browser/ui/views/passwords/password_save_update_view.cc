@@ -507,8 +507,7 @@ bool PasswordSaveUpdateView::IsSaveBubbleDropdownExperimentEnabled() const {
 
 bool PasswordSaveUpdateView::IsTrustedVaultErrorResolutionEnabled() const {
   return base::FeatureList::IsEnabled(
-      password_manager::features::
-          kPasswordSaveInContextErrorResolutionOnDesktop);
+      password_manager::features::kPasswordSaveInContextErrorResolution);
 }
 
 PasswordBubbleControllerBase* PasswordSaveUpdateView::GetController() {
