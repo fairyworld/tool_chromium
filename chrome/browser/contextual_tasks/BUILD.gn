@@ -168,7 +168,10 @@ source_set("impl") {
       "//ui/android",
     ]
   } else {
-    deps += [ "//components/policy/core/browser" ]
+    deps += [
+      "//chrome/browser/ui:browser_actions",
+      "//components/policy/core/browser",
+    ]
   }
 }
 

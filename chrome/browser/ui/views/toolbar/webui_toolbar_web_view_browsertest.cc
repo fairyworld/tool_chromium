@@ -3801,9 +3801,14 @@ class WebUIPinnedToolbarActionsBrowserTest
 
   void SetUpOnMainThread() override {
     WebUIToolbarWebViewBrowserTest::SetUpOnMainThread();
-    // Make everything pinnable by default to facilitate testing.
+    // Make everything pinnable and visible by default to facilitate testing.
     for (const auto& mapping : kActionMappings) {
       SetPinnableProperty(mapping.first, true);
+      if (actions::ActionItem* action_item =
+              actions::ActionManager::Get().FindAction(
+                  mapping.first, browser()->GetActions()->root_action_item())) {
+        action_item->SetVisible(true);
+      }
     }
     model_ = PinnedToolbarActionsModel::Get(browser()->profile());
     WebUIToolbarWebView* webui_toolbar_view = GetWebUIToolbarWebView(browser());
