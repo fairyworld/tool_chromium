@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -233,9 +234,19 @@ class AppMenuItemViewBinder {
                                         : R.color.default_icon_color_tint_list;
                         button.setIconTint(button.getContext().getColorStateList(resId));
                     } else {
-                        button.setCheckable(true);
-                        button.setChecked(isChecked);
+                        button.setCheckable(false);
+                        button.setSelected(isChecked);
+                        button.setAccessibilityDelegate(
+                                new View.AccessibilityDelegate() {
+                                    @Override
+                                    public void onInitializeAccessibilityNodeInfo(
+                                            View host, AccessibilityNodeInfo info) {
+                                        super.onInitializeAccessibilityNodeInfo(host, info);
+                                        info.setSelected(false);
+                                    }
+                                });
                     }
+
                     setupMenuButton(button, iconList.get(i).model, appMenuClickHandler);
                 } else {
                     buttonWrapper.setVisibility(View.GONE);
