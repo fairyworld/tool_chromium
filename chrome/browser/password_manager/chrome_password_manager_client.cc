@@ -191,6 +191,7 @@
 #endif  // BUILDFLAG(ENTERPRISE_CONTENT_ANALYSIS) || BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
+#include "chrome/browser/signin/dice_tab_helper.h"
 #include "chrome/browser/signin/dice_web_signin_interceptor_factory.h"
 #endif
 
@@ -1378,6 +1379,15 @@ bool ChromePasswordManagerClient::IsNewTabPage() const {
   return origin ==
              chrome::ChromeUINewTabPageURLAsGURL().DeprecatedGetOriginAsURL() ||
          origin == chrome::ChromeUINewTabURLAsGURL().DeprecatedGetOriginAsURL();
+}
+
+bool ChromePasswordManagerClient::IsChromeSigninPage() const {
+#if BUILDFLAG(ENABLE_DICE_SUPPORT)
+  DiceTabHelper* tab_helper = DiceTabHelper::FromWebContents(web_contents());
+  return tab_helper && tab_helper->IsChromeSigninPage();
+#else
+  return false;
+#endif
 }
 
 password_manager::WebAuthnCredentialsDelegate*
