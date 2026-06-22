@@ -91,7 +91,6 @@ chromium/try/linux-asan-dbg
 chromium/try/linux-asan-media-rel
 chromium/try/linux-asan-media-v8-arm-rel
 chromium/try/linux-asan-rel
-chromium/try/linux-asan-v8-arm-dbg
 chromium/try/linux-asan-v8-arm-rel
 chromium/try/linux-bfcache-rel
 chromium/try/linux-blink-asan-rel

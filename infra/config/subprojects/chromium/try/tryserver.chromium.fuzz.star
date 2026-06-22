@@ -63,11 +63,6 @@ _builder(
 )
 
 _builder(
-    name = "linux-asan-v8-arm-dbg",
-    mirror_of = "ci/ASan Debug (32-bit x86 with V8-ARM)",
-)
-
-_builder(
     name = "linux-asan-v8-arm-rel",
     mirror_of = "ci/ASan Release (32-bit x86 with V8-ARM)",
 )
