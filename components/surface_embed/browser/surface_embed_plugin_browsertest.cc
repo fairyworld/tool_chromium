@@ -774,6 +774,33 @@ IN_PROC_BROWSER_TEST_F(SurfaceEmbedBrowserTest, CrashEarly) {
   EXPECT_TRUE(CheckHasPixelInColor(SkColors::kGray.toSkColor()));
 }
 
+IN_PROC_BROWSER_TEST_F(SurfaceEmbedBrowserTest, CrashThenReload) {
+  auto child_contents = SetupHarnessAndChildWithContent(kRedBoxUrl);
+  AttachChildToEmbed(child_contents.get());
+
+  EXPECT_TRUE(CheckHasPixelInColor(SK_ColorRED));
+
+  // Simulate a crash.
+  content::ScopedAllowRendererCrashes testing_crashes_here(
+      child_contents->GetPrimaryMainFrame());
+  child_contents->GetPrimaryMainFrame()->GetProcess()->Shutdown(
+      content::RESULT_CODE_KILLED);
+  EXPECT_TRUE(
+      base::test::RunUntil([&]() { return child_contents->IsCrashed(); }));
+  // The crashed frame gets drawn with a gray background, with an image
+  // in the middle (which doesn't seem configured for tests). The gray in
+  // question is a bit different than SK_ColorGRAY.
+  EXPECT_TRUE(CheckHasPixelInColor(SkColors::kGray.toSkColor()));
+  EXPECT_FALSE(HasPixelInColor(SK_ColorRED));
+
+  // Reload the child contents.
+  child_contents->GetController().Reload(content::ReloadType::NORMAL, false);
+  EXPECT_TRUE(content::WaitForLoadStop(child_contents.get()));
+
+  EXPECT_FALSE(child_contents->IsCrashed());
+  EXPECT_TRUE(CheckHasPixelInColor(SK_ColorRED));
+}
+
 IN_PROC_BROWSER_TEST_F(SurfaceEmbedBrowserTest, VisualPropertiesSync) {
   auto child_contents = SetupHarnessAndChild();
   AttachChildToEmbed(child_contents.get());
