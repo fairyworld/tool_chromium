@@ -6,7 +6,6 @@
 
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/task_environment.h"
-#include "build/build_config.h"
 #include "chrome/browser/extensions/api/passwords_private/passwords_private_delegate_factory.h"
 #include "chrome/browser/password_manager/password_manager_test_util.h"
 #include "chrome/browser/sync/sync_service_factory.h"
@@ -142,13 +141,7 @@ TEST_F(PromoCardMovePasswordsTest, PromoShownWithSavedLocalPasswords) {
   EXPECT_TRUE(promo->ShouldShowPromo());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_PromoShownIn7DaysAfterDismiss \
-  DISABLED_PromoShownIn7DaysAfterDismiss
-#else
-#define MAYBE_PromoShownIn7DaysAfterDismiss PromoShownIn7DaysAfterDismiss
-#endif
-TEST_F(PromoCardMovePasswordsTest, MAYBE_PromoShownIn7DaysAfterDismiss) {
+TEST_F(PromoCardMovePasswordsTest, PromoShownIn7DaysAfterDismiss) {
   base::HistogramTester histogram_tester;
   EnableAccountStorage();
   SavePassword();

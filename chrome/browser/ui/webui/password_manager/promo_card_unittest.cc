@@ -11,7 +11,6 @@
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/task_environment.h"
 #include "base/time/time.h"
-#include "build/build_config.h"
 #include "chrome/browser/affiliations/affiliation_service_factory.h"
 #include "chrome/browser/extensions/api/passwords_private/passwords_private_delegate.h"
 #include "chrome/browser/extensions/api/passwords_private/passwords_private_delegate_factory.h"
@@ -281,12 +280,7 @@ TEST_F(PromoCardCheckupTest, PromoShownWithSavedPasswords) {
   EXPECT_TRUE(promo->ShouldShowPromo());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_PromoShownFirstThreeTimes DISABLED_PromoShownFirstThreeTimes
-#else
-#define MAYBE_PromoShownFirstThreeTimes PromoShownFirstThreeTimes
-#endif
-TEST_F(PromoCardCheckupTest, MAYBE_PromoShownFirstThreeTimes) {
+TEST_F(PromoCardCheckupTest, PromoShownFirstThreeTimes) {
   SavePassword();
 
   ASSERT_THAT(pref_service()->GetList(prefs::kPasswordManagerPromoCardsList),
@@ -308,13 +302,7 @@ TEST_F(PromoCardCheckupTest, MAYBE_PromoShownFirstThreeTimes) {
   EXPECT_TRUE(promo->ShouldShowPromo());
 }
 
-#if BUILDFLAG(IS_CHROMEOS)
-#define MAYBE_PromoShownIn7DaysAfterDismiss \
-  DISABLED_PromoShownIn7DaysAfterDismiss
-#else
-#define MAYBE_PromoShownIn7DaysAfterDismiss PromoShownIn7DaysAfterDismiss
-#endif
-TEST_F(PromoCardCheckupTest, MAYBE_PromoShownIn7DaysAfterDismiss) {
+TEST_F(PromoCardCheckupTest, PromoShownIn7DaysAfterDismiss) {
   base::HistogramTester histogram_tester;
 
   SavePassword();
