@@ -51,20 +51,20 @@ class NET_EXPORT_PRIVATE CacheEntryKey {
   Hash hash() const;
 
   // Requires the `kRendererAccessibleHttpCache` feature to be enabled.
-  const std::string& resource_url() const;
+  std::string_view resource_url() const;
   // Requires the `kRendererAccessibleHttpCache` feature to be enabled.
   SqlSharedCacheUrlHash resource_url_hash() const;
 
  private:
   struct Data {
+    explicit Data(std::string key_str);
+
     const std::string key;
     const Hash hash;
-    const std::string resource_url;
+    // Points to a substring within `key`. Must be declared after `key`.
+    const std::string_view resource_url;
     const SqlSharedCacheUrlHash resource_url_hash;
   };
-
-  static scoped_refptr<const base::RefCountedData<Data>> MakeData(
-      std::string key);
 
   scoped_refptr<const base::RefCountedData<Data>> data_;
 };
