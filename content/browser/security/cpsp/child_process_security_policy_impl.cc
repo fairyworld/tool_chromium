@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "content/browser/child_process_security_policy_impl.h"
+#include "content/browser/security/cpsp/child_process_security_policy_impl.h"
 
 #include <algorithm>
 #include <optional>
@@ -28,10 +28,10 @@
 #include "base/strings/stringprintf.h"
 #include "build/build_config.h"
 #include "content/browser/bad_message.h"
-#include "content/browser/child_process_security_policy_impl.rs.h"
 #include "content/browser/isolated_origin_util.h"
 #include "content/browser/process_lock.h"
 #include "content/browser/renderer_host/render_process_host_impl.h"
+#include "content/browser/security/cpsp/child_process_security_policy_impl.rs.h"
 #include "content/browser/site_info.h"
 #include "content/browser/site_instance_impl.h"
 #include "content/browser/url_info.h"
