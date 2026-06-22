@@ -35,13 +35,17 @@
 #include "chrome/browser/extensions/api/passwords_private/passwords_private_event_router.h"
 #include "chrome/browser/extensions/api/passwords_private/passwords_private_event_router_factory.h"
 #include "chrome/browser/password_manager/factories/account_password_store_factory.h"
+#include "chrome/browser/password_manager/factories/bulk_leak_check_service_factory.h"
 #include "chrome/browser/password_manager/factories/password_sender_service_factory.h"
 #include "chrome/browser/password_manager/factories/profile_password_store_factory.h"
+#include "chrome/browser/password_manager/password_change_service_factory.h"
 #include "chrome/browser/password_manager/password_manager_test_util.h"
+#include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/sync/sync_service_factory.h"
 #include "chrome/browser/ui/autofill/chrome_autofill_client.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_tabstrip.h"
+#include "chrome/browser/ui/hats/trust_safety_sentiment_service_factory.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "chrome/browser/ui/passwords/settings/password_import_controller_interface.h"
@@ -85,6 +89,7 @@
 #include "components/sync/test/test_sync_service.h"
 #include "components/webauthn/core/browser/test_passkey_model.h"
 #include "content/public/browser/browser_context.h"
+#include "content/public/browser/storage_partition.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/test/browser_task_environment.h"
 #include "content/public/test/browser_test.h"
@@ -286,7 +291,26 @@ class PasswordsPrivateDelegateImplTest : public InProcessBrowserTest {
   base::HistogramTester& histogram_tester() { return histogram_tester_; }
 
   scoped_refptr<PasswordsPrivateDelegateImpl> CreateDelegate() {
-    return new PasswordsPrivateDelegateImpl(GetProfile());
+    Profile* profile = GetProfile();
+    return base::MakeRefCounted<PasswordsPrivateDelegateImpl>(
+        profile->GetPrefs(), IdentityManagerFactory::GetForProfile(profile),
+        profile->GetDefaultStoragePartition()
+            ->GetURLLoaderFactoryForBrowserProcess(),
+        PasswordSenderServiceFactory::GetForProfile(profile),
+        SyncServiceFactory::GetForProfile(profile),
+        TrustSafetySentimentServiceFactory::GetForProfile(profile),
+        PasswordChangeServiceFactory::GetForProfile(profile),
+        AffiliationServiceFactory::GetForProfile(profile),
+        ProfilePasswordStoreFactory::GetForProfile(
+            profile, ServiceAccessType::EXPLICIT_ACCESS),
+        AccountPasswordStoreFactory::GetForProfile(
+            profile, ServiceAccessType::EXPLICIT_ACCESS),
+        PasskeyModelFactory::GetInstance()->GetForProfile(profile),
+        BulkLeakCheckServiceFactory::GetForProfile(profile),
+        PasswordsPrivateEventRouterFactory::GetForProfile(profile),
+        web_app::WebAppProvider::GetForWebApps(profile),
+        EnclaveManagerFactory::GetForProfile(profile), base::NullCallback(),
+        base::DoNothing());
   }
 
   // Queries and returns the list of saved credentials, blocking until finished.
@@ -1831,10 +1855,6 @@ class PasswordsPrivateDelegateImplMockTaskEnvironmentTest
   PasswordsPrivateDelegateImplMockTaskEnvironmentTest() = default;
 
   base::HistogramTester& histogram_tester() { return histogram_tester_; }
-
-  scoped_refptr<PasswordsPrivateDelegateImpl> CreateDelegate() {
-    return new PasswordsPrivateDelegateImpl(GetProfile());
-  }
 
  private:
   base::HistogramTester histogram_tester_;

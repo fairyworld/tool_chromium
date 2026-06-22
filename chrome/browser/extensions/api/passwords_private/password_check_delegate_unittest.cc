@@ -287,7 +287,9 @@ class PasswordCheckDelegateTest : public ::testing::Test {
     prefs_.registry()->RegisterDoublePref(kLastTimePasswordCheckCompleted, 0.0);
     presenter_.Init();
     delegate_ = std::make_unique<PasswordCheckDelegate>(
-        profile_.get(), &presenter_, &credential_id_generator_,
+        profile_->GetPrefs(),
+        BulkLeakCheckServiceFactory::GetForProfile(profile_.get()), &presenter_,
+        &credential_id_generator_,
         PasswordsPrivateEventRouterFactory::GetForProfile(profile_.get()));
   }
 
@@ -324,13 +326,17 @@ class PasswordCheckDelegateTest : public ::testing::Test {
   PasswordCheckDelegate& delegate() { return *delegate_; }
 
   PasswordCheckDelegate CreateDelegate(SavedPasswordsPresenter* presenter) {
-    return PasswordCheckDelegate(profile_.get(), presenter,
-                                 &credential_id_generator_);
+    return PasswordCheckDelegate(
+        profile_->GetPrefs(),
+        BulkLeakCheckServiceFactory::GetForProfile(profile_.get()), presenter,
+        &credential_id_generator_);
   }
 
   void ResetWithoutEventRouter() {
     delegate_ = std::make_unique<PasswordCheckDelegate>(
-        profile_.get(), &presenter_, &credential_id_generator_, nullptr);
+        profile_->GetPrefs(),
+        BulkLeakCheckServiceFactory::GetForProfile(profile_.get()), &presenter_,
+        &credential_id_generator_, nullptr);
   }
 
  private:
