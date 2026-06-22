@@ -6,6 +6,7 @@
 
 #include <string_view>
 
+#include "base/json/values_util.h"
 #include "base/time/time.h"
 #include "testing/platform_test.h"
 
@@ -19,6 +20,12 @@ constexpr std::string_view kUserName = "email@example.com";
 
 constexpr std::string_view kFakeNotificationClient1 = "CLIENT_1";
 constexpr std::string_view kFakeNotificationClient2 = "CLIENT_2";
+
+constexpr std::string_view kSession1 = "Session1";
+constexpr std::string_view kSession2 = "Session2";
+
+constexpr std::string_view kTimePref = "Time";
+constexpr std::string_view kBoolPref = "Bool";
 
 }  // namespace
 
@@ -131,4 +138,64 @@ TEST_F(ProfileAttributesIOSTest, GetNotificationPermissions) {
   EXPECT_EQ(attributes.GetNotificationPermissions()->FindBool(
                 kFakeNotificationClient2),
             false);
+}
+
+// Tests setting and reading the session scoped preferences.
+TEST_F(ProfileAttributesIOSTest, SessionScopedPreferences) {
+  ProfileAttributesIOS attributes =
+      ProfileAttributesIOS::WithAttrs(kProfileName, base::DictValue());
+
+  const base::Time never;
+  EXPECT_EQ(attributes.HasSessionScopedPrefs(kSession1), false);
+  EXPECT_EQ(attributes.HasSessionScopedPrefs(kSession2), false);
+  EXPECT_EQ(attributes.GetSessionScopedTimePref(kSession1, kTimePref), never);
+  EXPECT_EQ(attributes.GetSessionScopedTimePref(kSession2, kTimePref), never);
+  EXPECT_EQ(attributes.GetSessionScopedBoolPref(kSession1, kBoolPref), false);
+  EXPECT_EQ(attributes.GetSessionScopedBoolPref(kSession2, kBoolPref), false);
+
+  const base::Time now = base::Time::Now();
+  attributes.SetSessionScopedTimePref(kSession1, kTimePref, now);
+  EXPECT_EQ(attributes.HasSessionScopedPrefs(kSession1), true);
+  EXPECT_EQ(attributes.HasSessionScopedPrefs(kSession2), false);
+  EXPECT_EQ(attributes.GetSessionScopedTimePref(kSession1, kTimePref), now);
+  EXPECT_EQ(attributes.GetSessionScopedTimePref(kSession2, kTimePref), never);
+  EXPECT_EQ(attributes.GetSessionScopedBoolPref(kSession1, kBoolPref), false);
+  EXPECT_EQ(attributes.GetSessionScopedBoolPref(kSession2, kBoolPref), false);
+
+  attributes.SetSessionScopedBoolPref(kSession2, kBoolPref, true);
+  EXPECT_EQ(attributes.HasSessionScopedPrefs(kSession1), true);
+  EXPECT_EQ(attributes.HasSessionScopedPrefs(kSession2), true);
+  EXPECT_EQ(attributes.GetSessionScopedTimePref(kSession1, kTimePref), now);
+  EXPECT_EQ(attributes.GetSessionScopedTimePref(kSession2, kTimePref), never);
+  EXPECT_EQ(attributes.GetSessionScopedBoolPref(kSession1, kBoolPref), false);
+  EXPECT_EQ(attributes.GetSessionScopedBoolPref(kSession2, kBoolPref), true);
+}
+
+// Tests clearing the session scoped preferences.
+TEST_F(ProfileAttributesIOSTest, ClearSessionScopedPreferences) {
+  ProfileAttributesIOS attributes =
+      ProfileAttributesIOS::WithAttrs(kProfileName, base::DictValue());
+
+  const base::Time now = base::Time::Now();
+  attributes.SetSessionScopedTimePref(kSession1, kTimePref, now);
+  attributes.SetSessionScopedTimePref(kSession2, kTimePref, now);
+  attributes.SetSessionScopedBoolPref(kSession1, kBoolPref, true);
+  attributes.SetSessionScopedBoolPref(kSession2, kBoolPref, true);
+
+  EXPECT_EQ(attributes.HasSessionScopedPrefs(kSession1), true);
+  EXPECT_EQ(attributes.HasSessionScopedPrefs(kSession2), true);
+  EXPECT_EQ(attributes.GetSessionScopedTimePref(kSession1, kTimePref), now);
+  EXPECT_EQ(attributes.GetSessionScopedTimePref(kSession2, kTimePref), now);
+  EXPECT_EQ(attributes.GetSessionScopedBoolPref(kSession1, kBoolPref), true);
+  EXPECT_EQ(attributes.GetSessionScopedBoolPref(kSession2, kBoolPref), true);
+
+  attributes.ClearSessionScopedPrefs(kSession2);
+
+  const base::Time never;
+  EXPECT_EQ(attributes.HasSessionScopedPrefs(kSession1), true);
+  EXPECT_EQ(attributes.HasSessionScopedPrefs(kSession2), false);
+  EXPECT_EQ(attributes.GetSessionScopedTimePref(kSession1, kTimePref), now);
+  EXPECT_EQ(attributes.GetSessionScopedTimePref(kSession2, kTimePref), never);
+  EXPECT_EQ(attributes.GetSessionScopedBoolPref(kSession1, kBoolPref), true);
+  EXPECT_EQ(attributes.GetSessionScopedBoolPref(kSession2, kBoolPref), false);
 }

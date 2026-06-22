@@ -24,12 +24,19 @@ constexpr std::string_view kNewProfile = "new_profile";
 constexpr std::string_view kIsFullyInitializedKey = "fully_initialized";
 constexpr std::string_view kIsDeletedProfile = "deleted_profile";
 constexpr std::string_view kDiscardedSessions = "discarded_sessions";
+constexpr std::string_view kSessionScopedPrefs = "session_scoped_prefs";
 constexpr std::string_view kNotificationPermissions =
     "notification_permissions";
 
 // Helper class to convert a V into a base::Value using partial specialisation.
 template <typename T>
 struct From {};
+
+// Partial specialisation of `From<>` for `std::nullopt_t`.
+template <>
+struct From<std::nullopt_t> {
+  static base::Value operator()(std::nullopt_t value) { return base::Value(); }
+};
 
 // Partial specialisation of `From<>` for `bool`.
 template <>
@@ -325,6 +332,24 @@ const Dict* ProfileAttributesIOS::GetNotificationPermissions() const {
   return Get<Dict>(storage_, {kNotificationPermissions});
 }
 
+bool ProfileAttributesIOS::HasSessionScopedPrefs(
+    std::string_view session_id) const {
+  return Get<Dict>(storage_, {kSessionScopedPrefs, session_id}) != nullptr;
+}
+
+bool ProfileAttributesIOS::GetSessionScopedBoolPref(
+    std::string_view session_id,
+    std::string_view pref_name) const {
+  return Get<bool>(storage_, {kSessionScopedPrefs, session_id, pref_name});
+}
+
+base::Time ProfileAttributesIOS::GetSessionScopedTimePref(
+    std::string_view session_id,
+    std::string_view pref_name) const {
+  using Time = base::Time;
+  return Get<Time>(storage_, {kSessionScopedPrefs, session_id, pref_name});
+}
+
 void ProfileAttributesIOS::ClearIsNewProfile() {
   Set(storage_, {kNewProfile}, false);
 }
@@ -357,6 +382,23 @@ void ProfileAttributesIOS::SetDiscardedSessions(const SessionIds& session_ids) {
 
 void ProfileAttributesIOS::SetNotificationPermissions(Dict permissions) {
   Set(storage_, {kNotificationPermissions}, std::move(permissions));
+}
+
+void ProfileAttributesIOS::ClearSessionScopedPrefs(
+    std::string_view session_id) {
+  Set(storage_, {kSessionScopedPrefs, session_id}, std::nullopt);
+}
+
+void ProfileAttributesIOS::SetSessionScopedBoolPref(std::string_view session_id,
+                                                    std::string_view pref_name,
+                                                    bool value) {
+  Set(storage_, {kSessionScopedPrefs, session_id, pref_name}, value);
+}
+
+void ProfileAttributesIOS::SetSessionScopedTimePref(std::string_view session_id,
+                                                    std::string_view pref_name,
+                                                    base::Time value) {
+  Set(storage_, {kSessionScopedPrefs, session_id, pref_name}, value);
 }
 
 base::DictValue ProfileAttributesIOS::GetStorage() && {
