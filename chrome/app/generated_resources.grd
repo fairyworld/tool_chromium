@@ -10744,6 +10744,19 @@ Keep your key file in a safe place. You will need it to create new versions of y
         </message>
       </if>
 
+      <!--Desktop to iOS Wave 2 Promo Notification Titles-->
+      <if expr="not is_android">
+        <message name="IDS_IOS_DESKTOP_AI_PROMO_NOTIFICATION_TITLE" desc="The notification title for the iOS desktop AI promo.">
+          Reminder: AI-powered browsing in your pocket
+        </message>
+        <message name="IDS_IOS_DESKTOP_SHOPPING_PROMO_NOTIFICATION_TITLE" desc="The notification title for the iOS desktop Shopping promo.">
+          Reminder: The best of online shopping in your pocket
+        </message>
+        <message name="IDS_IOS_DESKTOP_YOUR_CHROME_PROMO_NOTIFICATION_TITLE" desc="The notification title for the iOS desktop Your Chrome promo.">
+          Reminder: Seamless browsing in your pocket
+        </message>
+      </if>
+
       <!--Accessible name/action strings-->
       <message name="IDS_ACCESSIBLE_INCOGNITO_WINDOW_TITLE_FORMAT" desc="The format for the accessible title of an Incognito window">
         <ph name="WINDOW_TITLE">$1</ph> (Incognito)
