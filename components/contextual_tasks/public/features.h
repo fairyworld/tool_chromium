@@ -121,6 +121,14 @@ BASE_DECLARE_FEATURE(kContextualTasksUploadChunking);
 
 BASE_DECLARE_FEATURE(kContextualTasksEnableSpatialModelToolbarLayout);
 
+enum class OverflowMenuItems {
+  kAllItems,
+  kAllWithoutNewThread,
+};
+
+extern const base::FeatureParam<OverflowMenuItems>
+    kContextualTasksSpatialModelToolbarLayoutOverflowItems;
+
 bool GetIsContextualTasksPdfCitationsEnabled();
 
 bool GetIsContextualTasksLazyFetchClusterInfoEnabled();
@@ -130,6 +138,8 @@ bool GetIsContextualTasksWindowTrackingEnabled();
 bool GetIsContextualTasksUploadChunkingEnabled();
 
 bool GetContextualTasksSpatialModelToolbarLayoutEnabled();
+
+bool GetContextualTasksSpatialModelToolbarLayoutNewThreadInOverflow();
 
 // Enum denoting which entry point can show when enabled.
 enum class EntryPointOption {

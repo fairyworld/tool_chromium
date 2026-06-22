@@ -32,6 +32,7 @@ suite('OverflowMenuTest', () => {
       isAiPage: false,
       isUserFeedbackAllowed: true,
       contextualTasksEnableSpatialModelToolbarLayout: false,
+      contextualTasksEnableSpatialModelToolbarLayoutNewThreadInOverflow: false,
     });
 
     overflowMenu = document.createElement('contextual-tasks-overflow-menu');
@@ -123,6 +124,7 @@ suite('OverflowMenuTest', () => {
         isAiPage: false,
         isUserFeedbackAllowed: false,
         contextualTasksEnableSpatialModelToolbarLayout: false,
+        contextualTasksEnableSpatialModelToolbarLayoutNewThreadInOverflow: false,
       });
       overflowMenu = document.createElement('contextual-tasks-overflow-menu');
       document.body.appendChild(overflowMenu);
@@ -164,6 +166,7 @@ suite('OverflowMenuTest', () => {
         pinTooltip: 'Pin',
         unpinTooltip: 'Unpin',
         contextualTasksEnableSpatialModelToolbarLayout: false,
+        contextualTasksEnableSpatialModelToolbarLayoutNewThreadInOverflow: false,
       });
       overflowMenu = document.createElement('contextual-tasks-overflow-menu');
       document.body.appendChild(overflowMenu);
@@ -226,6 +229,7 @@ suite('OverflowMenuTest', () => {
         isAiPage: true,
         isUserFeedbackAllowed: true,
         contextualTasksEnableSpatialModelToolbarLayout: true,
+        contextualTasksEnableSpatialModelToolbarLayoutNewThreadInOverflow: false,
       });
       overflowMenu = document.createElement('contextual-tasks-overflow-menu');
       document.body.appendChild(overflowMenu);
@@ -276,6 +280,60 @@ suite('OverflowMenuTest', () => {
 
       feedbackButton.click();
       await proxy.handler.whenCalled('openFeedbackUi');
+    });
+
+    suite('WithNewThreadInOverflow', () => {
+      setup(async () => {
+        document.body.innerHTML = window.trustedTypes!.emptyHTML;
+        loadTimeData.resetForTesting({
+          isSmallDeviceFormFactor: false,
+          isSidePanelPinned: false,
+          enablePinButton: false,
+          isAiPage: true,
+          isUserFeedbackAllowed: true,
+          contextualTasksEnableSpatialModelToolbarLayout: true,
+          contextualTasksEnableSpatialModelToolbarLayoutNewThreadInOverflow:
+              true,
+        });
+        overflowMenu = document.createElement('contextual-tasks-overflow-menu');
+        overflowMenu.isAimEligible = true;
+        document.body.appendChild(overflowMenu);
+        await microtasksFinished();
+      });
+
+      test(
+          'shows new thread inside the menu and fires click event',
+          async () => {
+            const buttons = overflowMenu.shadowRoot.querySelectorAll('button');
+            // The menu should contain:
+            // 1. New Thread
+            // 2. Thread History
+            // 3. My Activity
+            // 4. Help button
+            // 5. Feedback button
+            assertEquals(5, buttons.length);
+
+            const newThreadButton = buttons[0];
+            assertTrue(!!newThreadButton);
+            assertEquals('newThreadButton', newThreadButton.id);
+
+            const newThreadIcon = newThreadButton.querySelector('cr-icon');
+            assertTrue(!!newThreadIcon);
+            assertEquals(
+                'contextual_tasks:edit_square',
+                newThreadIcon.getAttribute('icon'));
+
+            let clickEventFired = false;
+            overflowMenu.addEventListener('new-thread-click', () => {
+              clickEventFired = true;
+            });
+
+            newThreadButton.click();
+            await microtasksFinished();
+
+            assertTrue(
+                clickEventFired, 'new-thread-click event should be emitted');
+          });
     });
   });
 });

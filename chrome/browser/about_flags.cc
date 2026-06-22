@@ -505,6 +505,22 @@ const FeatureEntry::Choice kIwaKeyDistributionComponentExpCohortChoices[] = {
      component_updater::kIwaKeyDistributionComponentExpCohort, "staging"}};
 #endif
 
+const FeatureEntry::FeatureParam
+    kContextualTasksEnableSpatialModelToolbarLayout_NewThreadInOverflow[] = {
+        {"overflow-items", "all-items"}};
+const FeatureEntry::FeatureParam
+    kContextualTasksEnableSpatialModelToolbarLayout_NewThreadNotInOverflow[] = {
+        {"overflow-items", "all-without-new-thread"}};
+
+const FeatureEntry::FeatureVariation
+    kContextualTasksEnableSpatialModelToolbarLayoutVariations[] = {
+        {"with new thread button in overflow menu",
+         kContextualTasksEnableSpatialModelToolbarLayout_NewThreadInOverflow,
+         nullptr},
+        {"with new thread button NOT in overflow menu",
+         kContextualTasksEnableSpatialModelToolbarLayout_NewThreadNotInOverflow,
+         nullptr}};
+
 const FeatureEntry::Choice kOverlayStrategiesChoices[] = {
     {flag_descriptions::kOverlayStrategiesDefault, "", ""},
     {flag_descriptions::kOverlayStrategiesNone,
@@ -11828,8 +11844,10 @@ const FeatureEntry kFeatureEntries[] = {
      contextual_tasks::flag_descriptions::
          kContextualTasksEnableSpatialModelToolbarLayoutDescription,
      kOsDesktop | kOsAndroid,
-     FEATURE_VALUE_TYPE(
-         contextual_tasks::kContextualTasksEnableSpatialModelToolbarLayout)},
+     FEATURE_WITH_PARAMS_VALUE_TYPE(
+         contextual_tasks::kContextualTasksEnableSpatialModelToolbarLayout,
+         kContextualTasksEnableSpatialModelToolbarLayoutVariations,
+         "ContextualTasksEnableSpatialModelToolbarLayout")},
 
     {"contextual-tasks-hide-menu-on-ai-page",
      contextual_tasks::flag_descriptions::kContextualTasksHideMenuOnAiPageName,

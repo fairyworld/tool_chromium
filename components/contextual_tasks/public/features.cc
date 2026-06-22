@@ -171,6 +171,24 @@ bool GetContextualTasksSpatialModelToolbarLayoutEnabled() {
       kContextualTasksEnableSpatialModelToolbarLayout);
 }
 
+const base::FeatureParam<OverflowMenuItems>::Option
+    kContextualTasksSpatialModelToolbarLayoutOverflowItemsOptions[] = {
+        {OverflowMenuItems::kAllItems, "all-items"},
+        {OverflowMenuItems::kAllWithoutNewThread, "all-without-new-thread"},
+};
+
+const base::FeatureParam<OverflowMenuItems>
+    kContextualTasksSpatialModelToolbarLayoutOverflowItems(
+        &kContextualTasksEnableSpatialModelToolbarLayout,
+        "overflow-items",
+        OverflowMenuItems::kAllWithoutNewThread,
+        &kContextualTasksSpatialModelToolbarLayoutOverflowItemsOptions);
+
+bool GetContextualTasksSpatialModelToolbarLayoutNewThreadInOverflow() {
+  return kContextualTasksSpatialModelToolbarLayoutOverflowItems.Get() ==
+         OverflowMenuItems::kAllItems;
+}
+
 const base::FeatureParam<bool> kContextualTasksLockAndUnlockInputCapability(
     &kContextualTasks,
     "ContextualTasksLockAndUnlockInputCapability",

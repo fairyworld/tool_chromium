@@ -89,6 +89,8 @@ export class TopToolbarElement extends TopToolbarElementBase {
       },
       onboardingTooltipShowing: {type: Boolean},
       contextualTasksEnableSpatialModelToolbarLayout_: {type: Boolean},
+      contextualTasksEnableSpatialModelToolbarLayoutNewThreadInOverflow_:
+          {type: Boolean},
     };
   }
 
@@ -110,6 +112,9 @@ export class TopToolbarElement extends TopToolbarElementBase {
       loadTimeData.getBoolean('hideMenuOnAiPageEnabled');
   protected accessor contextualTasksEnableSpatialModelToolbarLayout_: boolean =
       loadTimeData.getBoolean('contextualTasksEnableSpatialModelToolbarLayout');
+  protected accessor contextualTasksEnableSpatialModelToolbarLayoutNewThreadInOverflow_:
+      boolean = loadTimeData.getBoolean(
+          'contextualTasksEnableSpatialModelToolbarLayoutNewThreadInOverflow');
   accessor hideOverflowMenuButton_: boolean =
       this.hideOverflowMenuOnAiPageEnabled_ && this.isAiPage;
   protected accessor isPinned: boolean =

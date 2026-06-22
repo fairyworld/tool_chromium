@@ -612,6 +612,10 @@ ContextualTasksUI::ContextualTasksUI(content::WebUI* web_ui)
   source->AddBoolean("contextualTasksEnableSpatialModelToolbarLayout",
       contextual_tasks::GetContextualTasksSpatialModelToolbarLayoutEnabled());
   source->AddBoolean(
+      "contextualTasksEnableSpatialModelToolbarLayoutNewThreadInOverflow",
+      contextual_tasks::
+          GetContextualTasksSpatialModelToolbarLayoutNewThreadInOverflow());
+  source->AddBoolean(
       "contextManagementInComposeboxEnabled",
       base::FeatureList::IsEnabled(omnibox::kContextManagementInComposebox));
   source->AddBoolean(

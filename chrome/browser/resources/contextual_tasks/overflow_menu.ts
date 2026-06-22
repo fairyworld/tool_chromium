@@ -57,6 +57,9 @@ export class OverflowMenuElement extends OverflowMenuElementBase {
       isAiPage: {type: Boolean},
       isUserFeedbackAllowed: {type: Boolean},
       contextualTasksEnableSpatialModelToolbarLayout_: {type: Boolean},
+      contextualTasksEnableSpatialModelToolbarLayoutNewThreadInOverflow_:
+          {type: Boolean},
+      isAimEligible: {type: Boolean},
     };
   }
 
@@ -73,6 +76,10 @@ export class OverflowMenuElement extends OverflowMenuElementBase {
       loadTimeData.getBoolean('isUserFeedbackAllowed');
   accessor contextualTasksEnableSpatialModelToolbarLayout_: boolean =
       loadTimeData.getBoolean('contextualTasksEnableSpatialModelToolbarLayout');
+  accessor contextualTasksEnableSpatialModelToolbarLayoutNewThreadInOverflow_:
+      boolean = loadTimeData.getBoolean(
+          'contextualTasksEnableSpatialModelToolbarLayoutNewThreadInOverflow');
+  accessor isAimEligible: boolean = false;
   private browserProxy_: BrowserProxy = BrowserProxyImpl.getInstance();
   private listenerIds_: number[] = [];
 // <if expr="not is_android">
@@ -180,6 +187,17 @@ export class OverflowMenuElement extends OverflowMenuElementBase {
     this.close();
     recordAction('ContextualTasks.WebUI.UserAction.OpenFeedback');
     this.browserProxy_.handler.openFeedbackUi();
+  }
+
+  protected onNewThreadClick_() {
+    this.close();
+    this.dispatchEvent(new CustomEvent('new-thread-click'));
+  }
+
+  protected shouldShowNewThreadInMenu_(): boolean {
+    return this.isAimEligible &&
+        this.contextualTasksEnableSpatialModelToolbarLayout_ &&
+        this.contextualTasksEnableSpatialModelToolbarLayoutNewThreadInOverflow_;
   }
 
   protected shouldShowThreadHistoryInMenu_(): boolean {

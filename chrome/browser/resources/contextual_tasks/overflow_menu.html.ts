@@ -10,6 +10,12 @@ import type {OverflowMenuElement} from './overflow_menu.js';
 export function getHtml(this: OverflowMenuElement) {
   return html`<!--_html_template_start_-->
     <cr-action-menu id="menu">
+      ${this.shouldShowNewThreadInMenu_() ? html`
+        <button class="dropdown-item" id="newThreadButton" @click="${this.onNewThreadClick_}">
+          <cr-icon icon="contextual_tasks:edit_square"></cr-icon>
+          $i18n{newThreadTooltip}
+        </button>
+      ` : ''}
       ${this.shouldShowThreadHistoryInMenu_() ? html`
         <button class="dropdown-item" @click="${this.onThreadHistoryClick_}">
           <cr-icon icon="contextual_tasks:notes_spark"></cr-icon>

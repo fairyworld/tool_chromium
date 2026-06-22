@@ -32,7 +32,9 @@ export function getHtml(this: TopToolbarElement) {
         iron-icon="contextual_tasks:edit_square"
         class="no-overlap" title="$i18n{newThreadTooltip}"
         aria-label="$i18n{newThreadTooltip}"
-        ?hidden="${!this.isAimEligible}">
+        ?hidden="${!this.isAimEligible ||
+            (this.contextualTasksEnableSpatialModelToolbarLayout_ &&
+             this.contextualTasksEnableSpatialModelToolbarLayoutNewThreadInOverflow_)}">
     </cr-icon-button>
     <cr-icon-button id="threadHistoryButton"
         @click="${this.onThreadHistoryClick_}"
@@ -86,7 +88,9 @@ export function getHtml(this: TopToolbarElement) {
         .isPinned="${this.isPinned}"
         .isPinButtonEnabled="${this.isPinButtonEnabled}"
         .isAiPage="${this.isAiPage}"
-        @pin-click="${this.onPinClick_}">
+        .isAimEligible="${this.isAimEligible}"
+        @pin-click="${this.onPinClick_}"
+        @new-thread-click="${this.onNewThreadClick_}">
     </contextual-tasks-overflow-menu>`}">
   </cr-lazy-render-lit>
   ${this.showReopenTabs_ ? html`
