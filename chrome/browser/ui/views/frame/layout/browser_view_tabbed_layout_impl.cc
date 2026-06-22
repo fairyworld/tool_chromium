@@ -1195,8 +1195,35 @@ BrowserViewTabbedLayoutImpl::CalculateProposedLayout(
     views().vertical_tab_strip_region_view->SetIsExitingExpandOnHoverForLayout(
         vertical_tab_strip_animation.current_motion &&
         vertical_tab_strip_animation.expand_on_hover > 0.0 &&
-        vertical_tab_strip_animation.top_offset > 0 &&
-        will_wrap_at_destination);
+        vertical_tab_strip_animation.top_offset > 0);
+
+    float transition_button_opacity = 1.0f;
+    if (toolbar_height > 0) {
+      if (!will_wrap_at_destination &&
+          (vertical_tab_strip_animation.current_motion ==
+               TabStripAnimations::kExpand ||
+           vertical_tab_strip_animation.current_motion ==
+               TabStripAnimations::kCollapse)) {
+        constexpr float kOpacityTransitionStart = 0.2f;
+        constexpr float kOpacityTransitionEnd = 0.8f;
+        if (vertical_tab_strip_animation.tab_strip_width <
+            kOpacityTransitionStart) {
+          transition_button_opacity =
+              1.0f - (vertical_tab_strip_animation.tab_strip_width /
+                      kOpacityTransitionStart);
+        } else if (vertical_tab_strip_animation.tab_strip_width >
+                   kOpacityTransitionEnd) {
+          transition_button_opacity =
+              (vertical_tab_strip_animation.tab_strip_width -
+               kOpacityTransitionEnd) /
+              (1.0f - kOpacityTransitionEnd);
+        } else {
+          transition_button_opacity = 0.0f;
+        }
+      }
+    }
+    views().vertical_tab_strip_region_view->SetTransitionButtonOpacity(
+        transition_button_opacity);
   }
 
   return layout;
