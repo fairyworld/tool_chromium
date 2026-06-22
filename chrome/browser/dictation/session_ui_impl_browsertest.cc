@@ -9,12 +9,14 @@
 #include "chrome/browser/dictation/features.h"
 #include "chrome/browser/dictation/session_ui.h"
 #include "chrome/browser/dictation/target.h"
+#include "chrome/browser/dictation/test_util.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/views/dictation/dictation_bubble_ui.h"
 #include "chrome/test/base/chrome_test_utils.h"
 #include "chrome/test/interaction/interactive_browser_test.h"
 #include "content/public/test/browser_test.h"
+#include "extensions/common/switches.h"
 
 namespace dictation {
 
@@ -24,6 +26,19 @@ class DictationSessionUiImplBrowserTest : public InteractiveBrowserTest {
     scoped_feature_list_.InitAndEnableFeature(kDictation);
   }
   ~DictationSessionUiImplBrowserTest() override = default;
+
+  void SetUpCommandLine(base::CommandLine* command_line) override {
+    InteractiveBrowserTest::SetUpCommandLine(command_line);
+    command_line->AppendSwitchASCII(
+        extensions::switches::kAllowlistedExtensionID,
+        kDictationTestExtensionId);
+  }
+
+  void SetUpOnMainThread() override {
+    InteractiveBrowserTest::SetUpOnMainThread();
+    LoadTestExtension(profile());
+    SetMockTranscript(profile(), "test transcript");
+  }
 
   Profile* profile() { return chrome_test_utils::GetProfile(this); }
 

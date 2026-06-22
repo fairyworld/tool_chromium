@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include "base/memory/raw_ptr.h"
 #include "chrome/browser/dictation/session_controller_delegate.h"
@@ -15,7 +16,24 @@
 #include "chrome/browser/dictation/target.h"
 #include "testing/gmock/include/gmock/gmock.h"
 
+class Profile;
+namespace extensions {
+class Extension;
+}
+
 namespace dictation {
+
+inline constexpr std::string_view kDictationTestExtensionId =
+    "dfihfgggpgemecjdjahibncmmjlfjggp";
+
+// Loads an extension that provides an implementation of the connector
+// extension. The test extension has hooks that tests can use to control the
+// behavior of the extension.
+const extensions::Extension* LoadTestExtension(Profile* profile);
+
+// Sets a canned string that the test extension will replay when the test
+// starts a stream.
+void SetMockTranscript(Profile* profile, const std::string& transcript);
 
 class MockStreamProvider : public StreamProvider {
  public:

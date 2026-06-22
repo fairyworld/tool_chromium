@@ -63,6 +63,13 @@ source_set("test_support") {
     "//testing/gmock",
     "//testing/gtest",
   ]
+
+  deps = [
+    "//chrome/browser/extensions:test_support",
+    "//chrome/common:constants",
+    "//content/test:test_support",
+    "//extensions/browser:test_support",
+  ]
 }
 
 source_set("unit_tests") {
