@@ -149,6 +149,11 @@ const base::Feature* GetFeatureByName(const std::string& feature_name,
       }
     }
   }
+  for (const base::Feature* feature : feature_engagement::GetAllFeatures()) {
+    if (feature_name == feature->name) {
+      return feature;
+    }
+  }
   return nullptr;
 }
 
