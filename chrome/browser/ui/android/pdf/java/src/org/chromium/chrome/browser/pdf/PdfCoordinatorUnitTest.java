@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.net.Uri;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.FragmentActivity;
@@ -476,6 +477,25 @@ public class PdfCoordinatorUnitTest {
         createPdfCoordinator();
         mPdfCoordinator.print();
         verify(mNativePageHost).print();
+    }
+
+    @Test
+    @EnableFeatures(ChromeFeatureList.INLINE_PDF_V2)
+    public void testFragmentOnEnterExitEditMode() {
+        createPdfCoordinator();
+
+        View editButton = mPdfCoordinator.getView().findViewById(R.id.edit_button);
+        assertNotNull("Edit button should exist", editButton);
+        assertFalse("Edit button should not be selected initially", editButton.isSelected());
+
+        // Simulate fragment entering edit mode
+        mPdfCoordinator.mChromePdfViewerFragment.onEnterEditMode();
+        assertTrue("Edit button should be selected after onEnterEditMode", editButton.isSelected());
+
+        // Simulate fragment exiting edit mode
+        mPdfCoordinator.mChromePdfViewerFragment.onExitEditMode();
+        assertFalse(
+                "Edit button should not be selected after onExitEditMode", editButton.isSelected());
     }
 
     @Implements(PdfView.class)

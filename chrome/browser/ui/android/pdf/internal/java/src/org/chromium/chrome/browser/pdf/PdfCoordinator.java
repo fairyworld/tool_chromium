@@ -324,6 +324,28 @@ public class PdfCoordinator
                 mViewTag = savedInstanceState.getString(KEY_VIEW_TAG, null);
                 if (getView() != null) getView().setTag(mViewTag);
             }
+            // Remove the toolbox view (default edit icon) from the PDF viewer fragment in favor of
+            // the PDF toolbar.
+            View toolBoxView = view.findViewById(R.id.toolBoxView);
+            if (toolBoxView != null) {
+                ((ViewGroup) view).removeView(toolBoxView);
+            }
+        }
+
+        @Override
+        public void onEnterEditMode() {
+            super.onEnterEditMode();
+            if (mDelegate != null) {
+                mDelegate.onEditModeChanged(true);
+            }
+        }
+
+        @Override
+        public void onExitEditMode() {
+            super.onExitEditMode();
+            if (mDelegate != null) {
+                mDelegate.onEditModeChanged(false);
+            }
         }
 
         @Override
@@ -744,6 +766,16 @@ public class PdfCoordinator
     }
 
     /**
+     * Sets the edit mode of the PDF toolbar.
+     *
+     * @param editMode Whether to enable edit mode.
+     */
+    @Override
+    public void setEditMode(boolean editMode) {
+        mChromePdfViewerFragment.setEditModeEnabled(editMode);
+    }
+
+    /**
      * Toggles between "fit to page height" and "fit to page width" modes.
      *
      * @param fitToPageHeight Whether to fit to page height or fit to page width.
@@ -827,6 +859,13 @@ public class PdfCoordinator
     }
 
     @Override
+    public void onEditModeChanged(boolean editMode) {
+        if (mToolbarCoordinator != null) {
+            mToolbarCoordinator.setEditModeActive(editMode);
+        }
+    }
+
+    @Override
     public void onViewportChanged(int pageIndex, float zoomLevel) {
         assert mToolbarCoordinator != null;
         // AndroidX PDF Viewport is not initialized to 100% zoom on the initial pass. For PDF V2, we
@@ -850,5 +889,4 @@ public class PdfCoordinator
         }
         mToolbarCoordinator.onViewportChanged(pageIndex, zoomLevel);
     }
-
 }

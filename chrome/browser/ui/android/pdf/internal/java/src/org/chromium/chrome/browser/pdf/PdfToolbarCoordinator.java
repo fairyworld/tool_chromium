@@ -103,6 +103,8 @@ public class PdfToolbarCoordinator implements View.OnClickListener, View.OnKeyLi
             showMenu(view);
         } else if (actionId == R.id.print_button) {
             mDelegate.print();
+        } else if (actionId == R.id.edit_button) {
+            mDelegate.setEditMode(!mModel.get(PdfToolbarProperties.EDIT_MODE_ACTIVE));
         }
     }
 
@@ -320,6 +322,11 @@ public class PdfToolbarCoordinator implements View.OnClickListener, View.OnKeyLi
                 PdfToolbarProperties.FIT_TO_PAGE_BUTTON_VISIBLE, widthDp > THRESHOLD_FIT_DP);
         mModel.set(PdfToolbarProperties.ZOOM_CONTROLS_VISIBLE, widthDp > THRESHOLD_ZOOM_DP);
         mModel.set(PdfToolbarProperties.PAGE_NAV_AND_EDIT_VISIBLE, widthDp > THRESHOLD_NAV_EDIT_DP);
+    }
+
+    /** Sets whether edit mode is active in the model. */
+    public void setEditModeActive(boolean active) {
+        mModel.set(PdfToolbarProperties.EDIT_MODE_ACTIVE, active);
     }
 
     /** Destroys the coordinator and releases references held by the change processor. */
