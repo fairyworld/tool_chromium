@@ -79,8 +79,10 @@ class ScopedEmbeddingsModelInfoStatusLogger {
 }  // namespace
 
 PassageEmbeddingsServiceController::PassageEmbeddingsServiceController(
+    PassageEmbeddingsServiceLauncher& launcher,
     bool execute_for_gemma)
-    : embedder_(std::make_unique<SchedulingEmbedder>(
+    : launcher_(launcher),
+      embedder_(std::make_unique<SchedulingEmbedder>(
           /*embedder_metadata_provider=*/this,
           /*get_embeddings_callback=*/
           base::BindRepeating(
@@ -151,16 +153,17 @@ bool PassageEmbeddingsServiceController::MaybeUpdateModelInfo(
 }
 
 void PassageEmbeddingsServiceController::LoadModelsToService(
+    base::WeakPtr<PassageEmbeddingsServiceController> embedder_remote_weak_ptr,
     mojo::PendingReceiver<mojom::PassageEmbedder> receiver,
     base::ElapsedTimer service_launch_timer,
     mojom::PassageEmbeddingsLoadModelsParamsPtr params) {
-  if (!service_remote_) {
+  if (!embedder_remote_weak_ptr || !service_remote_) {
     // Close the model files in a background thread.
     base::ThreadPool::PostTaskAndReply(
         FROM_HERE, {base::MayBlock()},
         base::DoNothingWithBoundArgs(std::move(params)),
         base::BindOnce(&PassageEmbeddingsServiceController::OnLoadModelsResult,
-                       weak_ptr_factory_.GetWeakPtr(),
+                       embedder_remote_weak_ptr_factory_.GetWeakPtr(),
                        std::move(service_launch_timer), /*success=*/false));
     return;
   }
@@ -169,7 +172,7 @@ void PassageEmbeddingsServiceController::LoadModelsToService(
       std::move(params), MakeEmbedderParams(execute_for_gemma_),
       std::move(receiver),
       base::BindOnce(&PassageEmbeddingsServiceController::OnLoadModelsResult,
-                     weak_ptr_factory_.GetWeakPtr(),
+                     embedder_remote_weak_ptr_factory_.GetWeakPtr(),
                      std::move(service_launch_timer)));
 }
 
@@ -177,7 +180,6 @@ void PassageEmbeddingsServiceController::OnLoadModelsResult(
     base::ElapsedTimer service_launch_timer,
     bool success) {
   if (!success) {
-    ResetEmbedderRemote();
     return;
   }
 
@@ -244,8 +246,9 @@ void PassageEmbeddingsServiceController::GetEmbeddings(
         base::BindOnce(&MakeModelParams, embeddings_model_path_, sp_model_path_,
                        model_metadata_->input_window_size()),
         base::BindOnce(&PassageEmbeddingsServiceController::LoadModelsToService,
-                       weak_ptr_factory_.GetWeakPtr(), std::move(receiver),
-                       std::move(service_launch_timer)));
+                       weak_ptr_factory_.GetWeakPtr(),
+                       embedder_remote_weak_ptr_factory_.GetWeakPtr(),
+                       std::move(receiver), std::move(service_launch_timer)));
   }
 
   pending_requests_.push_back(next_request_id_);
@@ -284,6 +287,7 @@ bool PassageEmbeddingsServiceController::EmbedderRunning() {
 
 void PassageEmbeddingsServiceController::ResetEmbedderRemote() {
   embedder_remote_.reset();
+  embedder_remote_weak_ptr_factory_.InvalidateWeakPtrs();
 }
 
 void PassageEmbeddingsServiceController::OnGotEmbeddings(
@@ -346,4 +350,24 @@ void PassageEmbeddingsServiceController::OnDisconnected(
                           ComputeEmbeddingsStatus::kExecutionFailure);
 }
 
+void PassageEmbeddingsServiceController::MaybeLaunchService() {
+  if (service_remote_.is_bound() || !launcher_->AllowedToLaunch()) {
+    return;
+  }
+  auto receiver = service_remote_.BindNewPipeAndPassReceiver();
+  service_remote_.set_disconnect_handler(
+      base::BindOnce(&PassageEmbeddingsServiceController::ResetServiceRemote,
+                     base::Unretained(this), /*is_idle=*/false));
+  service_remote_.set_idle_handler(
+      kEmbeddingsServiceTimeout.Get(),
+      base::BindRepeating(
+          &PassageEmbeddingsServiceController::ResetServiceRemote,
+          base::Unretained(this), /*is_idle=*/true));
+  launcher_->LaunchService(std::move(receiver));
+}
+
+void PassageEmbeddingsServiceController::ResetServiceRemote(bool is_idle) {
+  service_remote_.reset();
+  launcher_->OnServiceDisconnected(is_idle);
+}
 }  // namespace passage_embeddings
