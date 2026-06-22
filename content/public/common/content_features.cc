@@ -233,9 +233,18 @@ BASE_FEATURE(kBypassRedirectChecksPerRequest, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kCacheControlNoStoreEnterBackForwardCache,
              base::FEATURE_ENABLED_BY_DEFAULT);
 
-// Enables the experimental Rust implementation of
-// ChildProcessSecurityPolicy. See https://crbug.com/482216433.
+// Enables the experimental Rust implementation of ChildProcessSecurityPolicy.
+// This includes managing global state but not per-process SecurityState (which
+// is handled by the ChildProcessSecurityPolicyRustSecurityState feature). See
+// https://crbug.com/482216433.
 BASE_FEATURE(kChildProcessSecurityPolicyRust,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
+// Controls whether the Rust implementation of ChildProcessSecurityPolicy
+// manages per-process SecurityState. Only takes effect if
+// ChildProcessSecurityPolicyRust is also enabled (for the global state). See
+// https://crbug.com/522872468
+BASE_FEATURE(kChildProcessSecurityPolicyRustSecurityState,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Clear the window.name property for the top-level cross-site navigations that

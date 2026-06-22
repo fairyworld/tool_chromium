@@ -72,6 +72,19 @@ enum class RustPolicy {
 
 CONTENT_EXPORT extern const base::FeatureParam<RustPolicy> kRustPolicyParam;
 
+// Which feature flag a given Rust migration function depends on. Using an enum
+// rather than base::Feature directly allows us to limit to just the valid
+// feature flags for this Rust migration.
+enum class CpspRustFeature {
+  // Identifies cases that depend on the main ChildProcessSecurityPolicy Rust
+  // feature for global state: features::kChildProcessSecurityPolicyRust.
+  kMain,
+  // Identifies cases that depend on the per-process ChildProcessSecurityPolicy
+  // Rust feature for SecurityState:
+  // features::kChildProcessSecurityPolicyRustSecurityState.
+  kSecurityState,
+};
+
 // Note: This class's implementation is migrating to Rust in
 // https://crbug.com/482216433. Existing functions will be replaced with
 // wrappers that can forward to a Rust implementation or a C++ implementation

@@ -98,33 +98,29 @@ namespace {
 // Helpers to determine whether the experimental Rust ChildProcessSecurityPolicy
 // implementation is enabled, and whether both Rust and the legacy C++
 // implementations should run in parallel.
-RustPolicy GetRustPolicy() {
+// `feature` specifies whether to determine the policy for the main CPSP in Rust
+// feature or a sub-feature (e.g., `CpspRustFeature::kSecurityState`).
+RustPolicy GetRustPolicy(CpspRustFeature feature = CpspRustFeature::kMain) {
+  // Sub-features (like the SecurityState feature) also depend on the main CPSP
+  // in Rust feature also being enabled.
   if (!base::FeatureList::IsEnabled(
           features::kChildProcessSecurityPolicyRust)) {
     return RustPolicy::kCppOnly;
   }
+  if (feature == CpspRustFeature::kSecurityState &&
+      !base::FeatureList::IsEnabled(
+          features::kChildProcessSecurityPolicyRustSecurityState)) {
+    return RustPolicy::kCppOnly;
+  }
   return kRustPolicyParam.Get();
 }
-bool IsRustEnabled() {
-  return GetRustPolicy() == RustPolicy::kRustAndCpp ||
-         GetRustPolicy() == RustPolicy::kRustOnly;
-}
-bool IsCppEnabled() {
-  return GetRustPolicy() == RustPolicy::kCppOnly ||
-         GetRustPolicy() == RustPolicy::kRustAndCpp;
+
+bool IsRustEnabled(RustPolicy policy) {
+  return policy == RustPolicy::kRustAndCpp || policy == RustPolicy::kRustOnly;
 }
 
-// Helper function that ensures that the values calculated by Rust and C++ code
-// match. This is used as a return value for functions that are implemented in
-// both languages.
-template <typename T>
-T CheckAndReturnRustAndCppResults(const T& rust_result, const T& cpp_result) {
-  if (GetRustPolicy() == RustPolicy::kRustAndCpp) {
-    CHECK_EQ(rust_result, cpp_result)
-        << "Rust: " << rust_result << " vs C++: " << cpp_result;
-  }
-  // Rust return values get priority.
-  return IsRustEnabled() ? rust_result : cpp_result;
+bool IsCppEnabled(RustPolicy policy) {
+  return policy == RustPolicy::kCppOnly || policy == RustPolicy::kRustAndCpp;
 }
 
 // Similar to the above, but includes a workaround since CHECK_EQ does not
@@ -132,43 +128,83 @@ T CheckAndReturnRustAndCppResults(const T& rust_result, const T& cpp_result) {
 template <typename T>
 std::optional<T> CheckAndReturnOptionalRustAndCppResults(
     const std::optional<T>& rust_result,
-    const std::optional<T>& cpp_result) {
-  if (GetRustPolicy() == RustPolicy::kRustAndCpp) {
+    const std::optional<T>& cpp_result,
+    RustPolicy policy) {
+  if (policy == RustPolicy::kRustAndCpp) {
     // Use CHECK rather than CHECK_EQ to support std::optional types.
     CHECK(rust_result == cpp_result)
         << "rust_result: " << rust_result.value_or("(none)")
         << " cpp_result: " << cpp_result.value_or("(none)");
   }
   // Rust return values get priority.
-  return IsRustEnabled() ? rust_result : cpp_result;
+  return IsRustEnabled(policy) ? rust_result : cpp_result;
 }
 
 // Macro for gating whether a void function should use its Rust or C++
-// implementation (or both), based on current feature flags.
-#define RUST_CPP_VOID_FUNCTION(rust_function_call, cpp_function_call) \
-  if (IsRustEnabled()) {                                              \
-    rust_function_call;                                               \
-  }                                                                   \
-  if (IsCppEnabled()) {                                               \
-    cpp_function_call;                                                \
-  }
+// implementation (or both), based on current feature flags. This is wrapped in
+// a do/while(0) loop to ensure it behaves as a single statement for blocks that
+// omit braces.
+//
+// An optional `CpspRustFeature` enum value may be passed as a third argument to
+// specify how much of the Rust CPSP feature needs to be enabled to invoke
+// `rust_function_call` (e.g., whether the call site requires the main Rust
+// feature or also the `kSecurityState` sub-feature). If omitted, it defaults to
+// checking the main Rust feature (`CpspRustFeature::kMain`).
+#define RUST_CPP_VOID_FUNCTION(rust_function_call, cpp_function_call, ...) \
+  do {                                                                     \
+    const RustPolicy rust_cpp_policy = GetRustPolicy(__VA_ARGS__);         \
+    if (IsRustEnabled(rust_cpp_policy)) {                                  \
+      rust_function_call;                                                  \
+    }                                                                      \
+    if (IsCppEnabled(rust_cpp_policy)) {                                   \
+      cpp_function_call;                                                   \
+    }                                                                      \
+  } while (0)
 
 // Macro for gating whether a function with a return value should use its Rust
 // or C++ implementation (or both), based on current feature flags. If both Rust
 // and C++ are enabled, then the return values of both implementations are
-// compared, causing a CHECK failure if they differ.
-// `ReturnType` specifies what type to use for the return value.
-#define RUST_CPP_RETURN_FUNCTION(rust_function_call, cpp_function_call, \
-                                 ReturnType)                            \
-  ReturnType rust_result{};                                             \
-  if (IsRustEnabled()) {                                                \
-    rust_result = rust_function_call;                                   \
-    if (GetRustPolicy() == RustPolicy::kRustOnly) {                     \
-      return rust_result;                                               \
-    }                                                                   \
-  }                                                                     \
-  ReturnType cpp_result = cpp_function_call;                            \
-  return CheckAndReturnRustAndCppResults(rust_result, cpp_result);
+// compared, causing a CHECK failure if they differ. This is wrapped in a
+// do/while(0) loop to ensure it behaves as a single statement for blocks that
+// omit braces.
+//
+// An optional `CpspRustFeature` enum value may be passed as a third argument to
+// specify how much of the Rust CPSP feature needs to be enabled to invoke
+// `rust_function_call` (e.g., whether the call site requires the main Rust
+// feature or also the `kSecurityState` sub-feature). If omitted, it defaults to
+// checking the main Rust feature (`CpspRustFeature::kMain`).
+#define RUST_CPP_RETURN_FUNCTION(rust_function_call, cpp_function_call, ...) \
+  do {                                                                       \
+    const RustPolicy rust_cpp_policy = GetRustPolicy(__VA_ARGS__);           \
+    if (rust_cpp_policy == RustPolicy::kRustOnly) {                          \
+      return rust_function_call;                                             \
+    }                                                                        \
+    if (rust_cpp_policy == RustPolicy::kCppOnly) {                           \
+      return cpp_function_call;                                              \
+    }                                                                        \
+    /* Both are enabled (kRustAndCpp): compare and return. */                \
+    decltype(auto) rust_result = rust_function_call;                         \
+    decltype(auto) cpp_result = cpp_function_call;                           \
+    CHECK_EQ(rust_result, cpp_result)                                        \
+        << "Rust: " << rust_result << " vs C++: " << cpp_result;             \
+    return rust_result;                                                      \
+  } while (0)
+
+// Helper macro specifically for gating functions that depend on the Rust
+// SecurityState sub-feature
+// (features::kChildProcessSecurityPolicyRustSecurityState).
+#define RUST_CPP_SECURITY_STATE_VOID_FUNCTION(rust_function_call, \
+                                              cpp_function_call)  \
+  RUST_CPP_VOID_FUNCTION(rust_function_call, cpp_function_call,   \
+                         CpspRustFeature::kSecurityState)
+
+// Helper macro specifically for gating return functions that depend on the Rust
+// SecurityState sub-feature
+// (features::kChildProcessSecurityPolicyRustSecurityState).
+#define RUST_CPP_SECURITY_STATE_RETURN_FUNCTION(rust_function_call, \
+                                                cpp_function_call)  \
+  RUST_CPP_RETURN_FUNCTION(rust_function_call, cpp_function_call,   \
+                           CpspRustFeature::kSecurityState)
 
 // Used internally only. These bit positions have no relationship to any
 // underlying OS and can be changed to accommodate finer-grained permissions.
@@ -1259,7 +1295,7 @@ bool ChildProcessSecurityPolicyImpl::IsWebSafeScheme(
     const std::string& scheme) {
   RUST_CPP_RETURN_FUNCTION(
       rust::child_process_security_policy::is_web_safe_scheme(scheme),
-      IsWebSafeScheme_Cpp(scheme), bool);
+      IsWebSafeScheme_Cpp(scheme));
 }
 
 bool ChildProcessSecurityPolicyImpl::IsWebSafeScheme_Cpp(
@@ -1290,7 +1326,7 @@ void ChildProcessSecurityPolicyImpl::RegisterPseudoScheme_Cpp(
 bool ChildProcessSecurityPolicyImpl::IsPseudoScheme(const std::string& scheme) {
   RUST_CPP_RETURN_FUNCTION(
       rust::child_process_security_policy::is_pseudo_scheme(scheme),
-      IsPseudoScheme_Cpp(scheme), bool);
+      IsPseudoScheme_Cpp(scheme));
 }
 
 bool ChildProcessSecurityPolicyImpl::IsPseudoScheme_Cpp(
@@ -1726,7 +1762,7 @@ bool ChildProcessSecurityPolicyImpl::CanCommitSchemeInAnyProcess(
   RUST_CPP_RETURN_FUNCTION(
       rust::child_process_security_policy::can_commit_scheme_in_any_process(
           scheme),
-      CanCommitSchemeInAnyProcess_Cpp(scheme), bool);
+      CanCommitSchemeInAnyProcess_Cpp(scheme));
 }
 
 bool ChildProcessSecurityPolicyImpl::CanCommitSchemeInAnyProcess_Cpp(
@@ -2001,7 +2037,7 @@ bool ChildProcessSecurityPolicyImpl::FindPermissionPolicyForFileSystemType(
   RUST_CPP_RETURN_FUNCTION(
       rust::child_process_security_policy::
           find_permissions_for_file_system_type(type, policy),
-      FindPermissionPolicyForFileSystemType_Cpp(type, policy), bool);
+      FindPermissionPolicyForFileSystemType_Cpp(type, policy));
 }
 
 bool ChildProcessSecurityPolicyImpl::FindPermissionPolicyForFileSystemType_Cpp(
@@ -3275,8 +3311,7 @@ bool ChildProcessSecurityPolicyImpl::
               // Make a copy of the origin for Rust to own.
               std::make_unique<url::Origin>(origin)),
       HasOriginEverRequestedOriginAgentClusterValue_Cpp(browser_context,
-                                                        origin),
-      bool);
+                                                        origin));
 }
 
 bool ChildProcessSecurityPolicyImpl::
@@ -3548,7 +3583,7 @@ bool ChildProcessSecurityPolicyImpl::RecordOriginAgentClusterRequestIfNew(
               browser_context->UniqueId(),
               // Make a copy of the origin for Rust to own.
               std::make_unique<url::Origin>(origin)),
-      RecordOriginAgentClusterRequestIfNew_Cpp(browser_context, origin), bool);
+      RecordOriginAgentClusterRequestIfNew_Cpp(browser_context, origin));
 }
 
 bool ChildProcessSecurityPolicyImpl::RecordOriginAgentClusterRequestIfNew_Cpp(
@@ -3639,9 +3674,10 @@ ChildProcessSecurityPolicyImpl::LookupAreV8OptimizationsDisabled(
   // support passing Option/std::optional across the FFI boundary (see
   // https://github.com/dtolnay/cxx/issues/87). We must use a custom out
   // parameter FFI bridge and call CheckAndReturnOptionalRustAndCppResults.
+  const RustPolicy policy = GetRustPolicy();
   std::optional<bool> rust_result = std::nullopt;
 
-  if (IsRustEnabled()) {
+  if (IsRustEnabled(policy)) {
     bool result = false;
     if (rust::child_process_security_policy::
             lookup_are_v8_optimizations_disabled(
@@ -3653,12 +3689,13 @@ ChildProcessSecurityPolicyImpl::LookupAreV8OptimizationsDisabled(
   }
 
   std::optional<bool> cpp_result = std::nullopt;
-  if (IsCppEnabled()) {
+  if (IsCppEnabled(policy)) {
     cpp_result = LookupAreV8OptimizationsDisabled_Cpp(browsing_instance_id,
                                                       process_lock_origin);
   }
 
-  return CheckAndReturnOptionalRustAndCppResults(rust_result, cpp_result);
+  return CheckAndReturnOptionalRustAndCppResults(rust_result, cpp_result,
+                                                 policy);
 }
 
 std::optional<bool>

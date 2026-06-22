@@ -6,6 +6,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <tuple>
 
 #include "base/files/file_path.h"
 #include "base/functional/callback_helpers.h"
@@ -99,9 +100,19 @@ void LockProcessIfNeeded(ChildProcessId process_id,
 
 }  // namespace
 
+// Test parameter used to validate ChildProcessSecurityPolicy behavior across
+// all meaningful permutations of the Rust integration feature flags:
+// 1. `RustPolicy` controls whether the main CPSP logic runs in `kCppOnly`,
+//    `kRustOnly`, or `kRustAndCpp` mode via
+//    `features::kChildProcessSecurityPolicyRust`.
+// 2. `CpspRustFeature` controls how much of the Rust CPSP feature is enabled
+//    (e.g., only the main logic, or also the per-child `SecurityState`
+//    management).
+using CpspTestParam = std::tuple<RustPolicy, CpspRustFeature>;
+
 class ChildProcessSecurityPolicyTest
     : public testing::Test,
-      public ::testing::WithParamInterface<RustPolicy> {
+      public ::testing::WithParamInterface<CpspTestParam> {
  public:
   ChildProcessSecurityPolicyTest()
       : task_environment_(BrowserTaskEnvironment::REAL_IO_THREAD),
@@ -109,16 +120,29 @@ class ChildProcessSecurityPolicyTest
     std::vector<base::test::FeatureRefAndParams> enabled_features;
     std::vector<base::test::FeatureRef> disabled_features;
 
+    const RustPolicy rust_policy = std::get<0>(GetParam());
+    const CpspRustFeature rust_feature = std::get<1>(GetParam());
+
     // Apply test params to run in three modes: kCppOnly, kRustOnly, and
     // kRustAndCpp. kCppOnly should turn off kChildProcessSecurityPolicyRust,
     // while the other two modes should enable it with a proper FeatureParam to
     // set the mode.
-    if (GetParam() == RustPolicy::kCppOnly) {
+    if (rust_policy == RustPolicy::kCppOnly) {
       disabled_features.push_back(features::kChildProcessSecurityPolicyRust);
     } else {
       enabled_features.push_back(
           {features::kChildProcessSecurityPolicyRust,
-           {{kRustPolicyParam.name, kRustPolicyParam.GetName(GetParam())}}});
+           {{kRustPolicyParam.name, kRustPolicyParam.GetName(rust_policy)}}});
+    }
+
+    // Additionally enable the SecurityState migration if that CpspRustFeature
+    // is enabled.
+    if (rust_feature == CpspRustFeature::kSecurityState) {
+      enabled_features.push_back(
+          {features::kChildProcessSecurityPolicyRustSecurityState, {}});
+    } else {
+      disabled_features.push_back(
+          features::kChildProcessSecurityPolicyRustSecurityState);
     }
 
     feature_list_.InitWithFeaturesAndParameters(enabled_features,
@@ -127,14 +151,25 @@ class ChildProcessSecurityPolicyTest
 
   static std::string DescribeParams(
       const testing::TestParamInfo<ParamType>& info) {
-    switch (info.param) {
+    const RustPolicy rust_policy = std::get<0>(info.param);
+    const CpspRustFeature rust_feature = std::get<1>(info.param);
+
+    std::string result;
+    switch (rust_policy) {
       case RustPolicy::kCppOnly:
-        return "CppOnly";
+        result = "CppOnly";
+        break;
       case RustPolicy::kRustOnly:
-        return "RustOnly";
+        result = "RustOnly";
+        break;
       case RustPolicy::kRustAndCpp:
-        return "RustAndCpp";
+        result = "RustAndCpp";
+        break;
     }
+    result += (rust_feature == CpspRustFeature::kSecurityState
+                   ? "_SecurityStateEnabled"
+                   : "_SecurityStateDisabled");
+    return result;
   }
 
   void SetUp() override {
@@ -3480,19 +3515,25 @@ TEST_P(ChildProcessSecurityPolicyTest, AddV8OptimizationState_AlreadyCached) {
             p->LookupAreV8OptimizationsDisabled(browsing_instance_id, origin));
 }
 
+// This intentionally excludes {kCppOnly, kSecurityState} since that behaves
+// the same as {kCppOnly, kMain} and is redundant to test separately.
+const CpspTestParam kCpspTestParams[] = {
+    {RustPolicy::kCppOnly, CpspRustFeature::kMain},
+    {RustPolicy::kRustOnly, CpspRustFeature::kMain},
+    {RustPolicy::kRustOnly, CpspRustFeature::kSecurityState},
+    {RustPolicy::kRustAndCpp, CpspRustFeature::kMain},
+    {RustPolicy::kRustAndCpp, CpspRustFeature::kSecurityState},
+};
+
 INSTANTIATE_TEST_SUITE_P(,
                          ChildProcessSecurityPolicyTest,
-                         ::testing::Values(RustPolicy::kCppOnly,
-                                           RustPolicy::kRustOnly,
-                                           RustPolicy::kRustAndCpp),
+                         ::testing::ValuesIn(kCpspTestParams),
                          &ChildProcessSecurityPolicyTest::DescribeParams);
 
 INSTANTIATE_TEST_SUITE_P(
     ,
     ChildProcessSecurityPolicyTest_NoOriginKeyedProcessesByDefault,
-    ::testing::Values(RustPolicy::kCppOnly,
-                      RustPolicy::kRustOnly,
-                      RustPolicy::kRustAndCpp),
+    ::testing::ValuesIn(kCpspTestParams),
     &ChildProcessSecurityPolicyTest::DescribeParams);
 
 }  // namespace content
