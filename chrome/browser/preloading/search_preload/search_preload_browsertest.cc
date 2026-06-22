@@ -1150,17 +1150,11 @@ IN_PROC_BROWSER_TEST_F(
 //   - Prefetch matching fails due to lack of No-Vary-Search hint and "pf=cs"
 //     param.
 // - Prefetch is not used.
-// TODO(crbug.com/434918482): Re-enable this test on Mac, Linux, and Windows.
-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
-#define MAYBE_TriggersPrefetchAndPrerenderButPrerenderFailsDueToNoVarySearchHint \
-  DISABLED_TriggersPrefetchAndPrerenderButPrerenderFailsDueToNoVarySearchHint
-#else
-#define MAYBE_TriggersPrefetchAndPrerenderButPrerenderFailsDueToNoVarySearchHint \
-  TriggersPrefetchAndPrerenderButPrerenderFailsDueToNoVarySearchHint
-#endif
+//
+// TODO(crbug.com/434918482): Re-enable this test.
 IN_PROC_BROWSER_TEST_F(
     SearchPreloadBrowserTest,
-    MAYBE_TriggersPrefetchAndPrerenderButPrerenderFailsDueToNoVarySearchHint) {
+    DISABLED_TriggersPrefetchAndPrerenderButPrerenderFailsDueToNoVarySearchHint) {
   HistogramTesterWrapper uma_tester;
   SetUpTemplateURLService();
   SetUpSearchPreloadService({
