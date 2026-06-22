@@ -191,7 +191,8 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
             BiConsumer<AnchorInfo, Boolean> reorderFunction,
             SnackbarManager snackbarManager,
             @Nullable ActivityResultTracker activityResultTracker,
-            @Nullable ModalDialogManager modalDialogManager) {
+            @Nullable ModalDialogManager modalDialogManager,
+            @TabClosingSource int tabClosingSource) {
         super(
                 R.layout.tab_switcher_action_menu_layout,
                 R.layout.tab_switcher_action_menu_layout,
@@ -206,7 +207,8 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
                         activity,
                         snackbarManager,
                         activityResultTracker,
-                        modalDialogManager),
+                        modalDialogManager,
+                        tabClosingSource),
                 tabModelSupplier,
                 multiInstanceManager,
                 tabGroupSyncService,
@@ -239,6 +241,7 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
      * @param snackbarManager The {@link SnackbarManager} used to show snackbar UI.
      * @param activityResultTracker The {@link ActivityResultTracker} to track activity results.
      * @param modalDialogManager The {@link ModalDialogManager} to show modal dialogs.
+     * @param tabClosingSource The {@link TabClosingSource} indicating where the tab is closed from.
      */
     public static TabContextMenuCoordinator createContextMenuCoordinator(
             Supplier<TabModel> tabModelSupplier,
@@ -252,7 +255,8 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
             BiConsumer<AnchorInfo, Boolean> reorderFunction,
             SnackbarManager snackbarManager,
             @Nullable ActivityResultTracker activityResultTracker,
-            @Nullable ModalDialogManager modalDialogManager) {
+            @Nullable ModalDialogManager modalDialogManager,
+            @TabClosingSource int tabClosingSource) {
         Profile profile = assumeNonNull(tabModelSupplier.get().getProfile());
 
         @Nullable TabGroupSyncService tabGroupSyncService =
@@ -275,7 +279,8 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
                 reorderFunction,
                 snackbarManager,
                 activityResultTracker,
-                modalDialogManager);
+                modalDialogManager,
+                tabClosingSource);
     }
 
     @VisibleForTesting
@@ -290,7 +295,8 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
             Activity activity,
             SnackbarManager snackbarManager,
             @Nullable ActivityResultTracker activityResultTracker,
-            @Nullable ModalDialogManager modalDialogManager) {
+            @Nullable ModalDialogManager modalDialogManager,
+            @TabClosingSource int tabClosingSource) {
         return (menuId, anchorInfo, collaborationId, listViewTouchTracker) -> {
             List<Integer> tabIds = anchorInfo.getAllTabIds();
             assert !tabIds.isEmpty() : "Empty tab id list provided";
@@ -324,14 +330,14 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
             } else if (menuId == R.id.unmute_site_menu_id) {
                 unmuteSiteItemCallback(tabModel, tabs);
             } else if (menuId == R.id.close_tab) {
-                closeTabItemCallback(tabModel, tabs, listViewTouchTracker);
+                closeTabItemCallback(tabModel, tabs, listViewTouchTracker, tabClosingSource);
             } else if (menuId == R.id.close_all_tabs_menu_id
                     || menuId == R.id.close_all_incognito_tabs_menu_id) {
-                closeAllTabsItemCallback(tabModel);
+                closeAllTabsItemCallback(tabModel, tabClosingSource);
             } else if (menuId == R.id.close_other_tabs_menu_id) {
-                closeOtherTabsItemCallback(tabModel, tabIds);
+                closeOtherTabsItemCallback(tabModel, tabIds, tabClosingSource);
             } else if (menuId == R.id.close_tabs_to_the_right_menu_id) {
-                closeTabsToTheRightItemCallback(tabModel, tabIds);
+                closeTabsToTheRightItemCallback(tabModel, tabIds, tabClosingSource);
             } else if (menuId == R.id.new_tab_to_the_right_menu_id) {
                 newTabToTheRightItemCallback(tabModel, anchorInfo);
             } else if (menuId == R.id.add_tab_to_reading_list_menu_id) {
@@ -420,28 +426,31 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
     private static void closeTabItemCallback(
             TabModel tabModel,
             List<Tab> tabs,
-            @Nullable ListViewTouchTracker listViewTouchTracker) {
+            @Nullable ListViewTouchTracker listViewTouchTracker,
+            @TabClosingSource int tabClosingSource) {
         boolean allowUndo = TabClosureParamsUtils.shouldAllowUndo(listViewTouchTracker);
         tabModel.getTabRemover()
                 .closeTabs(
                         TabClosureParams.closeTabs(tabs)
                                 .allowUndo(allowUndo)
-                                .tabClosingSource(TabClosingSource.TABLET_TAB_STRIP)
+                                .tabClosingSource(tabClosingSource)
                                 .build(),
                         /* allowDialog= */ true);
     }
 
-    private static void closeAllTabsItemCallback(TabModel tabModel) {
+    private static void closeAllTabsItemCallback(
+            TabModel tabModel, @TabClosingSource int tabClosingSource) {
         tabModel.getTabRemover()
                 .closeTabs(
                         TabClosureParams.closeAllTabs()
                                 .hideTabGroups(true)
-                                .tabClosingSource(TabClosingSource.TABLET_TAB_STRIP)
+                                .tabClosingSource(tabClosingSource)
                                 .build(),
                         /* allowDialog= */ true);
     }
 
-    private static void closeOtherTabsItemCallback(TabModel tabModel, List<Integer> tabIds) {
+    private static void closeOtherTabsItemCallback(
+            TabModel tabModel, List<Integer> tabIds, @TabClosingSource int tabClosingSource) {
         List<Tab> otherTabs = new ArrayList<>();
         for (Tab tab : tabModel) {
             if (!tabIds.contains(tab.getId())) {
@@ -452,12 +461,13 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
                 .closeTabs(
                         TabClosureParams.closeTabs(otherTabs)
                                 .hideTabGroups(true)
-                                .tabClosingSource(TabClosingSource.TABLET_TAB_STRIP)
+                                .tabClosingSource(tabClosingSource)
                                 .build(),
                         /* allowDialog= */ true);
     }
 
-    private static void closeTabsToTheRightItemCallback(TabModel tabModel, List<Integer> tabIds) {
+    private static void closeTabsToTheRightItemCallback(
+            TabModel tabModel, List<Integer> tabIds, @TabClosingSource int tabClosingSource) {
         List<Tab> otherTabs = new ArrayList<>();
         boolean foundPivot = false;
         for (Tab tab : tabModel) {
@@ -474,7 +484,7 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
                 .closeTabs(
                         TabClosureParams.closeTabs(otherTabs)
                                 .hideTabGroups(true)
-                                .tabClosingSource(TabClosingSource.TABLET_TAB_STRIP)
+                                .tabClosingSource(tabClosingSource)
                                 .build(),
                         /* allowDialog= */ true);
     }

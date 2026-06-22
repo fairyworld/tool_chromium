@@ -37,6 +37,7 @@ import org.chromium.chrome.browser.tab.TabFavicon;
 import org.chromium.chrome.browser.tab.TabSelectionType;
 import org.chromium.chrome.browser.tab_ui.TabListFaviconProvider;
 import org.chromium.chrome.browser.tab_ui.TabListMode;
+import org.chromium.chrome.browser.tabmodel.TabClosingSource;
 import org.chromium.chrome.browser.tabmodel.TabCreatorUtil;
 import org.chromium.chrome.browser.tabmodel.TabGroupUtils.TabGroupCreationCallback;
 import org.chromium.chrome.browser.tabmodel.TabModel;
@@ -572,7 +573,8 @@ public class VerticalTabListCoordinator {
                             mDataSharingTabManager,
                             /* reorderFunction= */ (info, toLeft) -> {
                                 // TODO(crbug.com/521982129): Implement tab reordering for a11y.
-                            });
+                            },
+                            TabClosingSource.VERTICAL_TAB_STRIP);
         }
         mTabGroupContextMenuCoordinator.showMenu(rectProvider, tabGroupId);
     }
@@ -605,7 +607,8 @@ public class VerticalTabListCoordinator {
                             },
                             mSnackbarManager,
                             /* activityResultTracker= */ null,
-                            /* modalDialogManager= */ mWindowAndroid.getModalDialogManager());
+                            /* modalDialogManager= */ mWindowAndroid.getModalDialogManager(),
+                            TabClosingSource.VERTICAL_TAB_STRIP);
         }
         mTabContextMenuCoordinator.showMenu(rectProvider, anchorInfo);
     }
