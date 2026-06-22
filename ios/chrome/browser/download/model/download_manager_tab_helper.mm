@@ -384,7 +384,13 @@ DownloadFileService* DownloadManagerTabHelper::GetDownloadFileService() {
 }
 
 void DownloadManagerTabHelper::MaybeMoveDownloadToDownloadsDirectory(
+    base::WeakPtr<web::DownloadTask> task,
     bool shouldProceed) {
+  // Ignore the result if it does not correspond to the current download.
+  if (!task || task.get() != task_.get()) {
+    return;
+  }
+
   if (!shouldProceed) {
     CleanupCurrentDownload();
     return;
@@ -445,7 +451,7 @@ void DownloadManagerTabHelper::ProcessCompleteDownloadTask() {
           enterprise_connectors::TriggerType::kSavePrompt,
           base::BindOnce(
               &DownloadManagerTabHelper::MaybeMoveDownloadToDownloadsDirectory,
-              weak_ptr_factory_.GetWeakPtr())));
+              weak_ptr_factory_.GetWeakPtr(), task_->GetWeakPtr())));
 
   // Send the download file for enterprise DLP download content scanning.
   files_request_handler_ = std::make_unique<
