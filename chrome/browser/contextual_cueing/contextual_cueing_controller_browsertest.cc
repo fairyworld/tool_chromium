@@ -1124,7 +1124,7 @@ IN_PROC_BROWSER_TEST_F(ContextualCueingControllerBrowserTest,
   browser()->tab_strip_model()->AddToNewSplit(
       {1}, split_tabs::SplitTabVisualData(),
       split_tabs::SplitTabCreatedSource::kToolbarButton);
-  ASSERT_TRUE(browser()->tab_strip_model()->IsActiveTabSplit());
+  ASSERT_TRUE(browser()->tab_strip_model()->GetActiveTab()->IsSplit());
 
   SimulateFilterPassed();
 
@@ -1760,7 +1760,7 @@ IN_PROC_BROWSER_TEST_F(ContextualCueingControllerShowInSplitViewBrowserTest,
   browser()->tab_strip_model()->AddToNewSplit(
       {1}, split_tabs::SplitTabVisualData(),
       split_tabs::SplitTabCreatedSource::kToolbarButton);
-  ASSERT_TRUE(browser()->tab_strip_model()->IsActiveTabSplit());
+  ASSERT_TRUE(browser()->tab_strip_model()->GetActiveTab()->IsSplit());
 
   SimulateFilterPassed();
 

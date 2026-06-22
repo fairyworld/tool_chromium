@@ -1160,7 +1160,7 @@ void TabStrip::NewTabButtonPressed(const ui::Event& event) {
   GetBrowser()->profile()->SetUserData(
       NewTabGroupingUserData::kNewTabGroupingUserDataKey,
       std::make_unique<NewTabGroupingUserData>(
-          GetBrowser()->tab_strip_model()->GetActiveTabGroupId()));
+          GetBrowser()->tab_strip_model()->GetActiveTab()->GetGroup()));
   if (event.IsMouseEvent()) {
     // Prevent the hover card from popping back in immediately. This forces a
     // normal fade-in.

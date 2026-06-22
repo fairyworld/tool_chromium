@@ -470,7 +470,7 @@ IN_PROC_BROWSER_TEST_F(
       }),
       WaitForShow(kTabGroupHeaderElementId), Do([this]() {
         std::optional<tab_groups::TabGroupId> group =
-            browser()->tab_strip_model()->GetActiveTabGroupId();
+            browser()->tab_strip_model()->GetActiveTab()->GetGroup();
         EXPECT_TRUE(group.has_value());
 
         // Focus on the group, which should override the tab strip color.
@@ -500,7 +500,7 @@ IN_PROC_BROWSER_TEST_F(
       Do([this]() { browser()->tab_strip_model()->AddToNewGroup({0, 1}); }),
       WaitForShow(kTabGroupHeaderElementId), Do([this]() {
         std::optional<tab_groups::TabGroupId> group =
-            browser()->tab_strip_model()->GetActiveTabGroupId();
+            browser()->tab_strip_model()->GetActiveTab()->GetGroup();
         EXPECT_TRUE(group.has_value());
 
         // Focus on the group, which should show the unfocus button.

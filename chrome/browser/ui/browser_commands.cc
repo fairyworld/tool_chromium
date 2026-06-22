@@ -1216,18 +1216,20 @@ content::WebContents& NewTab(BrowserWindowInterface* browser,
   UMA_HISTOGRAM_ENUMERATION("Tab.NewTab", context,
                             NewTabTypes::kNewTabEnumCount);
 
+  const tabs::TabInterface* active_tab =
+      browser->GetTabStripModel()->GetActiveTab();
+  const std::optional<tab_groups::TabGroupId> active_tab_group_id =
+      active_tab ? active_tab->GetGroup() : std::nullopt;
+
   browser->GetProfile()->SetUserData(
       NewTabGroupingUserData::kNewTabGroupingUserDataKey,
-      std::make_unique<NewTabGroupingUserData>(
-          browser->GetTabStripModel()->GetActiveTabGroupId()));
+      std::make_unique<NewTabGroupingUserData>(active_tab_group_id));
 
   if (browser->GetBrowserForMigrationOnly()->SupportsWindowFeature(
           Browser::WindowFeature::kFeatureTabStrip)) {
     std::optional<tab_groups::TabGroupId> group_id;
-
     if (features::IsNewTabAddsToActiveGroupEnabled()) {
-      const int index = browser->GetTabStripModel()->active_index();
-      group_id = browser->GetTabStripModel()->GetTabGroupForTab(index);
+      group_id = active_tab_group_id;
     }
 
     return *AddAndReturnTabAt(browser, GURL(), -1, true, group_id);
@@ -1287,19 +1289,21 @@ void NewTabFromClipboardURL(BrowserWindowInterface* browser) {
 void CloseTab(BrowserWindowInterface* browser) {
   base::RecordAction(UserMetricsAction("CloseTab_Accelerator"));
 
+  tabs::TabInterface* active_tab = browser->GetTabStripModel()->GetActiveTab();
+  if (!active_tab) {
+    return;
+  }
+
   // If the selection model consists of only the indices of a single split tab,
   // decide if just the active tab in the split is closed instead of all tabs in
   // the split.
   const bool only_active_split_tab_selected =
-      browser->GetTabStripModel()->IsActiveTabSplit() &&
+      active_tab->IsSplit() &&
       browser->GetTabStripModel()->selection_model().size() == 2;
+
   if (only_active_split_tab_selected) {
     RecordTabCloseCount(1);
-
-    content::WebContents* active_web_contents =
-        browser->GetTabStripModel()->GetActiveWebContents();
-    active_web_contents->Close();
-
+    active_tab->GetContents()->Close();
     return;
   }
 
@@ -1309,9 +1313,8 @@ void CloseTab(BrowserWindowInterface* browser) {
     return;
   }
 
-  tabs::TabInterface* tab = browser->GetTabStripModel()->GetActiveTab();
   const bool single_pinned_tab_selected =
-      tab->IsPinned() &&
+      active_tab->IsPinned() &&
       browser->GetTabStripModel()->selection_model().size() == 1;
   if (single_pinned_tab_selected &&
       toast_controller->GetCurrentToastId() != ToastId::kClosePinnedTab) {

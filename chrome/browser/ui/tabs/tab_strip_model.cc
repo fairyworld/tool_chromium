@@ -1472,12 +1472,6 @@ std::optional<tab_groups::TabGroupId> TabStripModel::GetTabGroupForTab(
   return ContainsIndex(index) ? GetTabAtIndex(index)->GetGroup() : std::nullopt;
 }
 
-std::optional<tab_groups::TabGroupId> TabStripModel::GetActiveTabGroupId()
-    const {
-  const tabs::TabInterface* active_tab = selection_model_.active_tab();
-  return active_tab ? active_tab->GetGroup() : std::nullopt;
-}
-
 std::optional<tab_groups::TabGroupId> TabStripModel::GetSurroundingTabGroup(
     int index) const {
   if (!ContainsIndex(index - 1) || !ContainsIndex(index)) {
@@ -1544,7 +1538,8 @@ void TabStripModel::SelectTabAt(int index) {
 
   tabs::TabStripModelSelectionState new_model = selection_model_;
 
-  if (std::optional<split_tabs::SplitTabId> split_id = GetSplitForTab(index);
+  if (std::optional<split_tabs::SplitTabId> split_id =
+          tab_to_select->GetSplit();
       split_id.has_value()) {
     std::vector<tabs::TabInterface*> tabs =
         GetSplitData(split_id.value())->ListTabs();
@@ -1578,7 +1573,7 @@ void TabStripModel::DeselectTabAt(int index) {
 
   tabs::TabStripModelSelectionState new_model = selection_model_;
 
-  if (std::optional<split_tabs::SplitTabId> split_id = GetSplitForTab(index);
+  if (std::optional<split_tabs::SplitTabId> split_id = tab->GetSplit();
       split_id.has_value()) {
     for (auto [t, _] : GetTabsAndIndicesInSplit(split_id.value())) {
       new_model.RemoveTabFromSelection(t);
@@ -1866,11 +1861,6 @@ std::set<split_tabs::SplitTabId> TabStripModel::ListSplits() const {
 
 bool TabStripModel::ContainsSplit(split_tabs::SplitTabId split_id) const {
   return contents_data_->GetSplitTabCollection(split_id);
-}
-
-bool TabStripModel::IsActiveTabSplit() const {
-  const tabs::TabInterface* active_tab = GetActiveTab();
-  return active_tab && active_tab->IsSplit();
 }
 
 void TabStripModel::UpdateSplitLayout(

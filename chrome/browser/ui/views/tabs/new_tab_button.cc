@@ -191,6 +191,9 @@ void NewTabButtonMenuModel ::AddNewSplitTabItem() {
   TabStripModel* tab_strip_model = browser_->GetTabStripModel();
   CHECK(tab_strip_model);
 
+  const tabs::TabInterface* const active_tab = tab_strip_model->GetActiveTab();
+  bool is_active_tab_split = active_tab && active_tab->IsSplit();
+
   SetEnabledAt(GetIndexOfCommandId(IDC_NEW_SPLIT_TAB).value(),
-               !tab_strip_model->IsActiveTabSplit());
+               !is_active_tab_split);
 }

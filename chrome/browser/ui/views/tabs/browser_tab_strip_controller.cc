@@ -164,9 +164,9 @@ void BrowserTabStripController::InitFromModel(TabStrip* tabstrip) {
 
   // Add all pinned / unpinned tabs regardless of group / split affiliation.
   std::vector<TabStrip::AddTabData> tabs_to_add;
-  for (int i = 0; i < model_->count(); ++i) {
-    tabs::TabInterface* const tab_interface = model_->GetTabAtIndex(i);
-    tabs_to_add.push_back({.index = i,
+  int i = 0;
+  for (const tabs::TabInterface* tab_interface : *model_) {
+    tabs_to_add.push_back({.index = i++,
                            .handle = tab_interface->GetHandle(),
                            .is_pinned = tab_interface->IsPinned()});
   }
