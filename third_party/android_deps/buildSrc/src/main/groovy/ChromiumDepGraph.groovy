@@ -128,6 +128,9 @@ class ChromiumDepGraph {
                     cpePrefix: 'cpe:/a:google:protobuf-javalite',
                     licenseUrl: 'https://raw.githubusercontent.com/protocolbuffers/protobuf/master/LICENSE',
                     licenseName: 'BSD'),
+            io_github_java_diff_utils_java_diff_utils: new PropertyOverride(
+                    licenseUrl: 'https://raw.githubusercontent.com/java-diff-utils/java-diff-utils/refs/heads/master/LICENSE',
+                    licenseName: 'Apache 2.0'),
             io_grpc_grpc_api: new PropertyOverride(
                     cpePrefix: 'cpe:/a:grpc:grpc',
                     licenseUrl: 'https://raw.githubusercontent.com/grpc/grpc-java/refs/heads/master/LICENSE',
