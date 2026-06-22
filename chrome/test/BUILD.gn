@@ -7179,6 +7179,7 @@ test("unit_tests") {
       "../browser/ui/webui/feature_showcase/password_manager_handler_unittest.cc",
     ]
     deps += [
+      "//chrome/browser/ui/signin:unit_tests",
       "//chrome/browser/ui/webui/feature_showcase",
       "//chrome/browser/ui/webui/intro",
       "//components/lens:enterprise_policy",

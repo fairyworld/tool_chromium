@@ -259,3 +259,26 @@ if (!is_android) {
     }
   }
 }
+
+if (enable_dice_support) {
+  source_set("unit_tests") {
+    testonly = true
+
+    sources = [ "promos/signin_promo_tab_helper_unittest.cc" ]
+
+    deps = [
+      ":signin",
+      "//base",
+      "//base/test:test_support",
+      "//chrome/browser",
+      "//chrome/browser/ui",
+      "//chrome/test:test_support",
+      "//components/signin/public/base",
+      "//components/signin/public/identity_manager",
+      "//components/signin/public/identity_manager:test_support",
+      "//content/test:test_support",
+      "//google_apis",
+      "//testing/gtest",
+    ]
+  }
+}
