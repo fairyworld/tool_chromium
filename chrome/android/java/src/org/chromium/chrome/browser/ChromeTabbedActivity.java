@@ -1015,7 +1015,8 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
         }
 
         return closingSource == TabClosingSource.TABLET_TAB_STRIP
-                || closingSource == TabClosingSource.KEYBOARD_SHORTCUT;
+                || closingSource == TabClosingSource.KEYBOARD_SHORTCUT
+                || closingSource == TabClosingSource.VERTICAL_TAB_STRIP;
     }
 
     private void onNewTabButtonClick(View view) {

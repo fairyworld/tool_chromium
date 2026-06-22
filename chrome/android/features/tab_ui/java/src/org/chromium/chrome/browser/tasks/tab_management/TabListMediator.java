@@ -1433,6 +1433,12 @@ public class TabListMediator implements TabListNotificationHandler {
                         Tab closingTab = tabModel.getTabById(tabId);
                         if (closingTab == null) return;
 
+                        @TabClosingSource
+                        int tabClosingSource =
+                                mComponentId == TabComponentId.VERTICAL_TABS
+                                        ? TabClosingSource.VERTICAL_TAB_STRIP
+                                        : TabClosingSource.UNKNOWN;
+
                         setUseShrinkCloseAnimation(tabId, /* useShrinkCloseAnimation= */ true);
                         if (mLayoutType == TabListLayoutType.GROUPED
                                 && tabModel.isTabInTabGroup(closingTab)) {
@@ -1443,7 +1449,7 @@ public class TabListMediator implements TabListNotificationHandler {
                             TabUiUtils.closeTabGroup(
                                     tabModel,
                                     tabId,
-                                    /* tabClosingSource= */ TabClosingSource.UNKNOWN,
+                                    tabClosingSource,
                                     /* allowUndo= */ true,
                                     /* hideTabGroups= */ true,
                                     getOnMaybeTabClosedCallback(tabId));
@@ -1458,6 +1464,7 @@ public class TabListMediator implements TabListNotificationHandler {
                                 TabClosureParams.closeTab(closingTab)
                                         .recommendedNextTab(nextTab)
                                         .allowUndo(allowUndo)
+                                        .tabClosingSource(tabClosingSource)
                                         .build();
 
                         @Nullable TabModelActionListener listener =
@@ -3891,12 +3898,18 @@ public class TabListMediator implements TabListNotificationHandler {
 
             boolean allowUndo = TabClosureParamsUtils.shouldAllowUndo(listViewTouchTracker);
 
+            @TabClosingSource
+            int tabClosingSource =
+                    mComponentId == TabComponentId.VERTICAL_TABS
+                            ? TabClosingSource.VERTICAL_TAB_STRIP
+                            : TabClosingSource.UNKNOWN;
+
             setUseShrinkCloseAnimation(tabId, /* useShrinkCloseAnimation= */ true);
             onGroupClosedFrom(tabId);
             TabUiUtils.closeTabGroup(
                     tabModel,
                     tabId,
-                    TabClosingSource.UNKNOWN,
+                    tabClosingSource,
                     allowUndo,
                     hideTabGroups,
                     getOnMaybeTabClosedCallback(tabId));

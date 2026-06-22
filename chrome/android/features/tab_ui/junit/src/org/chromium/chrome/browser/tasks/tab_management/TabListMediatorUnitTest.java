@@ -152,6 +152,7 @@ import org.chromium.chrome.browser.tab_ui.TabListFaviconProvider.TabFavicon;
 import org.chromium.chrome.browser.tab_ui.TabListFaviconProvider.TabFaviconMetadata;
 import org.chromium.chrome.browser.tab_ui.TabListMode;
 import org.chromium.chrome.browser.tab_ui.ThumbnailProvider;
+import org.chromium.chrome.browser.tabmodel.TabClosingSource;
 import org.chromium.chrome.browser.tabmodel.TabClosureParams;
 import org.chromium.chrome.browser.tabmodel.TabGroupObserver;
 import org.chromium.chrome.browser.tabmodel.TabGroupObserver.DidRemoveTabGroupReason;
@@ -1194,6 +1195,32 @@ public class TabListMediatorUnitTest {
                         argThat(params -> params.tabs.get(0) == mTab2),
                         /* allowDialog= */ eq(true),
                         any());
+    }
+
+    @Test
+    public void sendsCloseSignalCorrectly_VerticalTabs() {
+        setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
+        initAndAssertAllProperties();
+        mModelList
+                .get(1)
+                .model
+                .get(TabProperties.TAB_ACTION_BUTTON_DATA)
+                .tabActionListener
+                .run(
+                        mItemView2,
+                        mModelList.get(1).model.get(TabProperties.TAB_ID),
+                        /* triggeringMotion= */ null);
+
+        TabClosureParams params =
+                TabClosureParams.closeTab(mTab2)
+                        .allowUndo(true)
+                        .tabClosingSource(TabClosingSource.VERTICAL_TAB_STRIP)
+                        .build();
+        verify(mTabRemover)
+                .closeTabs(
+                        eq(params),
+                        /* allowDialog= */ eq(true),
+                        mTabModelActionListenerCaptor.capture());
     }
 
     @Test
