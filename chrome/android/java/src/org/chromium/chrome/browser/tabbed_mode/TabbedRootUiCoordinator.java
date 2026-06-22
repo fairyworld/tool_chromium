@@ -2209,7 +2209,8 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                                     assumeNonNull(mMultiInstanceManager),
                                     assumeNonNull(mSnackbarManagerSupplier.get()),
                                     getDesktopWindowStateManager(),
-                                    mShareDelegateSupplier),
+                                    mShareDelegateSupplier,
+                                    mDataSharingTabManager),
                             mIsVerticalTabsActiveSupplier);
             mSideUiCoordinator.registerSideUiContainer(mVerticalTabsSideUiCoordinator);
         }

@@ -172,7 +172,7 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
         sSendTabToSelfCreator = creator;
     }
 
-    private final @Nullable TabGroupCreationCallback mTabGroupCreationCallback;
+    private final TabGroupCreationCallback mTabGroupCreationCallback;
     private final WindowAndroid mWindowAndroid;
     private final Activity mActivity;
     private final int mCircleSize;
@@ -180,7 +180,7 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
     private TabContextMenuCoordinator(
             Supplier<TabModel> tabModelSupplier,
             @Nullable TabGroupListBottomSheetCoordinator tabGroupListBottomSheetCoordinator,
-            @Nullable TabGroupCreationCallback tabGroupCreationCallback,
+            TabGroupCreationCallback tabGroupCreationCallback,
             MultiInstanceManager multiInstanceManager,
             MonotonicObservableSupplier<ShareDelegate> shareDelegateSupplier,
             WindowAndroid windowAndroid,
@@ -243,7 +243,7 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
     public static TabContextMenuCoordinator createContextMenuCoordinator(
             Supplier<TabModel> tabModelSupplier,
             @Nullable TabGroupListBottomSheetCoordinator tabGroupListBottomSheetCoordinator,
-            @Nullable TabGroupCreationCallback tabGroupCreationCallback,
+            TabGroupCreationCallback tabGroupCreationCallback,
             MultiInstanceManager multiInstanceManager,
             MonotonicObservableSupplier<ShareDelegate> shareDelegateSupplier,
             WindowAndroid windowAndroid,
@@ -282,7 +282,7 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
     static OnItemClickedCallback<AnchorInfo> getMenuItemClickedCallback(
             Supplier<TabModel> tabModelSupplier,
             @Nullable TabGroupListBottomSheetCoordinator tabGroupListBottomSheetCoordinator,
-            @Nullable TabGroupCreationCallback tabGroupCreationCallback,
+            TabGroupCreationCallback tabGroupCreationCallback,
             MultiInstanceManager multiInstanceManager,
             MonotonicObservableSupplier<ShareDelegate> shareDelegateSupplier,
             @Nullable Supplier<TabBookmarker> tabBookmarkerSupplier,
@@ -306,9 +306,7 @@ public class TabContextMenuCoordinator extends TabStripReorderingHelper<AnchorIn
                     addToTabGroupItemCallback(tabGroupListBottomSheetCoordinator, tabs);
                 }
             } else if (menuId == R.id.add_to_new_tab_group) {
-                if (tabGroupCreationCallback != null) {
-                    addToNewTabGroupItemCallback(tabModel, tabs, tabGroupCreationCallback);
-                }
+                addToNewTabGroupItemCallback(tabModel, tabs, tabGroupCreationCallback);
             } else if (menuId == R.id.remove_from_tab_group) {
                 removeFromTabGroupItemCallback(tabModel, tabs);
             } else if (menuId == R.id.move_to_other_window_menu_id) {
