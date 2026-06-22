@@ -19555,6 +19555,29 @@
             ]
         }
     ],
+    "PrefetchCancelUnrelatedPrefetch": [
+        {
+            "platforms": [
+                "android",
+                "android_webview",
+                "chromeos",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled_Cancel_NotServable",
+                    "params": {
+                        "prefetch_cancel_unrelated_prefetch_cancel_policy": "NotServable"
+                    },
+                    "enable_features": [
+                        "PrefetchCancelUnrelatedPrefetch"
+                    ]
+                }
+            ]
+        }
+    ],
     "PrefetchManagerUseNetworkContextPrefetch": [
         {
             "platforms": [
