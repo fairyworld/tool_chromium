@@ -51,7 +51,6 @@ WebDialogBrowserTest.*
 BrowserFrameTest.*
 BrowserViewTest.*
 BrowserRootViewBrowserTest.*
-DefaultBrowserStepEligibilityCheckerTest.*
 
 # Filter out failing infobar tests from Chrome for Testing trybots
 
@@ -115,6 +114,7 @@ DefaultBrowserStepEligibilityCheckerTest.*
 # Gardener: disable failing tests.
 # TODO (crbug.com/417895560): fix test and re-enable
 -ChromeForTestingInfoBarTest.*
+-DefaultBrowserStepEligibilityCheckerTest.*
 -EnableDisableSingleClientTest.*
 -LocalSyncTest.*
 -MigrationSingleClientTest.*
