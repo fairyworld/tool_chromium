@@ -608,6 +608,7 @@ if (!is_android) {
       "//chrome/browser/autofill",
       "//chrome/browser/autofill:test_support",
       "//chrome/browser/password_manager",
+      "//chrome/browser/password_manager:test_support",
       "//chrome/browser/password_manager/factories",
       "//chrome/browser/plus_addresses",
       "//chrome/browser/signin",

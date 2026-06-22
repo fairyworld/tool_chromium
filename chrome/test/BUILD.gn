@@ -191,6 +191,7 @@ static_library("test_support") {
     "//chrome/browser/lifetime",
     "//chrome/browser/omnibox",
     "//chrome/browser/password_manager",
+    "//chrome/browser/password_manager:test_support",
     "//chrome/browser/password_manager/factories",
     "//chrome/browser/profiles:misc",
     "//chrome/browser/profiles:profile_manager",
@@ -238,10 +239,6 @@ static_library("test_support") {
     "../browser/notifications/notification_display_service_tester.h",
     "../browser/notifications/stub_notification_platform_bridge.cc",
     "../browser/notifications/stub_notification_platform_bridge.h",
-    "../browser/password_manager/password_change_delegate_mock.cc",
-    "../browser/password_manager/password_change_delegate_mock.h",
-    "../browser/password_manager/password_manager_test_util.cc",
-    "../browser/password_manager/password_manager_test_util.h",
     "../browser/performance_manager/test_support/page_discarding_utils.cc",
     "../browser/performance_manager/test_support/page_discarding_utils.h",
     "../browser/permissions/crowd_deny_fake_safe_browsing_database_manager.cc",
@@ -1086,8 +1083,6 @@ static_library("test_support") {
 
   if (toolkit_views) {
     sources += [
-      "../browser/password_manager/password_manager_uitest_util.cc",
-      "../browser/password_manager/password_manager_uitest_util.h",
       "../browser/ui/chooser_bubble_testapi.h",
       "../browser/ui/views/chooser_bubble_testapi_views.cc",
       "../browser/ui/views/desktop_capture/desktop_media_picker_views_test_api.cc",
@@ -1710,8 +1705,6 @@ if (is_android) {
       "../browser/offline_pages/background_loader_offliner_browsertest.cc",
       "../browser/page_load_metrics/observers/ad_metrics/ad_density_intervention_android_browsertest.cc",
       "../browser/password_manager/android/password_manager_android_browsertest.cc",
-      "../browser/password_manager/passwords_navigation_observer.cc",
-      "../browser/password_manager/passwords_navigation_observer.h",
       "../browser/policy/test/v8_optimizer_policy_browsertest.cc",
       "../browser/profiles/profile_browsertest_android.cc",
       "../browser/renderer_host/javascript_optimizer_feature_browsertest.cc",
@@ -1779,6 +1772,7 @@ if (is_android) {
       "//chrome/browser/page_content_annotations:android_browser_tests",
       "//chrome/browser/page_content_annotations:extraction_service",
       "//chrome/browser/password_manager",
+      "//chrome/browser/password_manager:test_support",
       "//chrome/browser/password_manager/android:test_support",
       "//chrome/browser/password_manager/factories",
       "//chrome/browser/payments:browser_tests",
@@ -2474,7 +2468,10 @@ if (!is_android) {
       "//chrome/browser/page_content_annotations",
       "//chrome/browser/page_content_annotations:browser_tests",
       "//chrome/browser/password_manager",
+      "//chrome/browser/password_manager:browser_tests",
       "//chrome/browser/password_manager:impl",
+      "//chrome/browser/password_manager:test_support",
+      "//chrome/browser/password_manager:test_support_ui",
       "//chrome/browser/password_manager/password_change",
       "//chrome/browser/payments",
       "//chrome/browser/payments:browser_tests",
@@ -3422,10 +3419,6 @@ if (!is_android) {
       "../browser/page_load_metrics/observers/use_counter_page_load_metrics_observer_browsertest.cc",
       "../browser/page_load_metrics/observers/webui_page_load_metrics_observer_browsertest.cc",
       "../browser/page_load_metrics/page_load_metrics_browsertest.cc",
-      "../browser/password_manager/credential_manager_browsertest.cc",
-      "../browser/password_manager/password_change_browsertest.cc",
-      "../browser/password_manager/password_change_from_checkup_browsertest.cc",
-      "../browser/password_manager/password_manager_browsertest.cc",
       "../browser/performance_manager/background_tab_loading_policy_browsertest.cc",
       "../browser/performance_manager/decorators/helpers/page_live_state_decorator_helper_browsertest.cc",
       "../browser/performance_manager/frame_node_impl_browsertest.cc",
@@ -5935,10 +5928,6 @@ test("unit_tests") {
     "../browser/page_load_metrics/observers/scheme_page_load_metrics_observer_unittest.cc",
     "../browser/page_load_metrics/observers/signed_exchange_page_load_metrics_observer_unittest.cc",
     "../browser/page_load_metrics/observers/translate_page_load_metrics_observer_unittest.cc",
-    "../browser/password_manager/account_password_store_factory_unittest.cc",
-    "../browser/password_manager/chrome_password_change_service_unittest.cc",
-    "../browser/password_manager/chrome_password_manager_client_unittest.cc",
-    "../browser/password_manager/chrome_webauthn_credentials_delegate_unittest.cc",
     "../browser/performance_manager/decorators/helpers/page_live_state_decorator_helper_unittest.cc",
     "../browser/performance_manager/metrics/metrics_provider_common_unittest.cc",
     "../browser/performance_manager/policies/best_effort_task_inhibiting_policy_unittest.cc",
@@ -6338,6 +6327,8 @@ test("unit_tests") {
     "//chrome/browser/page_load_metrics",
     "//chrome/browser/password_manager",
     "//chrome/browser/password_manager:impl",
+    "//chrome/browser/password_manager:test_support",
+    "//chrome/browser/password_manager:unit_tests",
     "//chrome/browser/password_manager/actor_login/internal:unit_tests",
     "//chrome/browser/password_manager/factories",
     "//chrome/browser/payments:unittests",
@@ -7161,7 +7152,6 @@ test("unit_tests") {
 
   if (enable_dice_support) {
     sources += [
-      "../browser/password_manager/multi_profile_credentials_filter_unittest.cc",
       "../browser/signin/dice_response_handler_factory_unittest.cc",
       "../browser/signin/dice_response_handler_unittest.cc",
       "../browser/signin/dice_signed_in_profile_creator_unittest.cc",
@@ -7521,8 +7511,6 @@ test("unit_tests") {
       "../browser/media/webrtc/webrtc_text_log_handler_unittest.cc",
       "../browser/notifications/muted_notification_handler_unittest.cc",
       "../browser/notifications/screen_capture_notification_blocker_unittest.cc",
-      "../browser/password_manager/generated_password_leak_detection_pref_unittest.cc",
-      "../browser/password_manager/password_change_delegate_impl_unittest.cc",
       "../browser/performance_manager/execution_context_priority/side_panel_loading_voter_unittest.cc",
       "../browser/policy/policy_path_parser_unittest.cc",
       "../browser/policy/webhid_device_policy_handler_unittest.cc",
@@ -9741,10 +9729,6 @@ if (!is_android) {
     sources = [
       "../browser/interstitials/security_interstitial_idn_test.cc",
       "../browser/interstitials/security_interstitial_idn_test.h",
-      "../browser/password_manager/password_manager_test_base.cc",
-      "../browser/password_manager/password_manager_test_base.h",
-      "../browser/password_manager/passwords_navigation_observer.cc",
-      "../browser/password_manager/passwords_navigation_observer.h",
       "../browser/ssl/cert_verifier_browser_test.cc",
       "../browser/ssl/cert_verifier_browser_test.h",
       "../browser/ssl/cert_verifier_platform_browser_test.cc",
@@ -10071,11 +10055,6 @@ if (!is_android) {
         "//chromeos/ash/services/device_sync:test_support",
       ]
     } else {
-      sources += [
-        "../browser/password_manager/password_manager_signin_intercept_test_helper.cc",
-        "../browser/password_manager/password_manager_signin_intercept_test_helper.h",
-      ]
-
       public_deps += [ "//chrome/browser/ui/webui/app_home" ]
       public_deps += [ "//chrome/browser/first_run:test_support" ]
     }
@@ -10199,11 +10178,6 @@ if (!is_android && !is_chromeos_device) {
       "../browser/new_tab_page/new_tab_page_realbox_interactive_uitest.cc",
       "../browser/new_tab_page/ntp_promo/ntp_promo_interactive_uitest.cc",
       "../browser/notifications/platform_notification_service_interactive_uitest.cc",
-      "../browser/password_manager/password_generation_interactive_uitest.cc",
-      "../browser/password_manager/password_manager_interactive_test_base.cc",
-      "../browser/password_manager/password_manager_interactive_test_base.h",
-      "../browser/password_manager/password_manager_interactive_uitest.cc",
-      "../browser/password_manager/password_user_education_interactive_uitest.cc",
       "../browser/permissions/one_time_permissions_tracker_helper_interactive_uitest.cc",
       "../browser/select_popup_interactive_uitest.cc",
       "../browser/sessions/session_restore_interactive_uitest.cc",
@@ -10355,6 +10329,7 @@ if (!is_android && !is_chromeos_device) {
       "//chrome/browser/optimization_guide:test_support",
       "//chrome/browser/page_content_annotations",
       "//chrome/browser/password_manager",
+      "//chrome/browser/password_manager:interactive_ui_tests",
       "//chrome/browser/password_manager/factories",
       "//chrome/browser/permissions",
       "//chrome/browser/permissions:interactive_ui_tests",
@@ -10686,9 +10661,7 @@ if (!is_android && !is_chromeos_device) {
       deps += [ "//chrome/browser/ui/startup/default_browser_prompt:interactive_ui_tests" ]
     }
 
-    if (!is_chromeos) {
-      sources += [ "../browser/password_manager/web_app_profile_switcher_interactive_uitest.cc" ]
-    } else {
+    if (is_chromeos) {
       deps += [ "//chrome/browser/smart_card" ]
     }
 
@@ -11489,11 +11462,6 @@ if (!is_android) {
     use_xvfb = use_xvfb_in_this_config
 
     sources = [
-      "../browser/password_manager/password_manager_captured_sites_interactive_uitest.cc",
-      "../browser/password_manager/password_manager_test_base.cc",
-      "../browser/password_manager/password_manager_test_base.h",
-      "../browser/password_manager/passwords_navigation_observer.cc",
-      "../browser/password_manager/passwords_navigation_observer.h",
       "../browser/ui/views/translate/translate_bubble_test_utils_views.cc",
       "base/interactive_ui_tests_main.cc",
     ]
@@ -11532,6 +11500,7 @@ if (!is_android) {
       "//chrome/browser/autofill:test_support_ui",
       "//chrome/browser/devtools",
       "//chrome/browser/password_manager",
+      "//chrome/browser/password_manager:captured_sites_interactive_tests",
       "//chrome/browser/password_manager/factories",
       "//chrome/browser/ssl",
       "//chrome/browser/sync",

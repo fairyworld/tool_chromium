@@ -266,6 +266,8 @@ source_set("sync_integration_tests_impl") {
       "//chrome/browser/browsing_data:constants",
       "//chrome/browser/consent_auditor",
       "//chrome/browser/metrics/desktop_session_duration",
+      "//chrome/browser/password_manager:test_support",
+      "//chrome/browser/password_manager:test_support_ui",
       "//chrome/browser/send_tab_to_self",
       "//chrome/browser/send_tab_to_self:impl",
       "//chrome/browser/sharing",
