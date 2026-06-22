@@ -410,6 +410,7 @@ public class TabCollectionTabModelImpl extends TabModelJniBridge {
         if (mNativeTabCollectionTabModelImplPtr != 0) {
             TabCollectionTabModelImplJni.get().destroy(mNativeTabCollectionTabModelImplPtr);
             mNativeTabCollectionTabModelImplPtr = 0;
+            invalidateCache();
         }
 
         for (Tab tab : tabs) {
@@ -430,7 +431,6 @@ public class TabCollectionTabModelImpl extends TabModelJniBridge {
         }
 
         mTabIdToTabs.clear();
-        invalidateCache();
         mTabCountSupplier.set(0);
         mTabModelObservers.clear();
         mTabGroupObservers.clear();
