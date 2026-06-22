@@ -1122,7 +1122,10 @@ void PopupViewViews::InitViews() {
     search_bar_ = AddChildView(std::make_unique<PopupSearchBarView>(
         search_bar_config_->placeholder, *this,
         /*show_indicator=*/is_at_memory,
-        /*show_search_icon_sparkle=*/is_at_memory));
+        /*show_search_icon_sparkle=*/is_at_memory,
+        /*debounce_delay=*/
+        is_at_memory ? base::TimeDelta()
+                     : PopupSearchBarView::kInputChangeCallbackDelay));
     search_bar_->SetProperty(views::kMarginsKey,
                              gfx::Insets::VH(GetContentsVerticalPadding(), 0));
     search_bar_->SetLoading(controller_ && controller_->IsSearching());
