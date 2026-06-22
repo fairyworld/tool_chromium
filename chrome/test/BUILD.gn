@@ -3659,8 +3659,6 @@ if (!is_android) {
       "../browser/ui/webui/webui_url_hashes_browsertest.cc",
       "../browser/unload_browsertest.cc",
       "../browser/web_applications/isolated_web_apps/browser_navigator_iwa_browsertest.cc",
-      "../browser/webauthn/chrome_webauthn_browsertest.cc",
-      "../browser/webauthn/passkey_unlock_manager_browsertest.cc",
       "../common/chrome_paths_browsertest.cc",
       "../common/time_format_browsertest.cc",
       "../renderer/accessibility/ax_tree_distiller_browsertest.cc",
@@ -3818,10 +3816,7 @@ if (!is_android) {
     }
 
     if (is_win || is_mac || is_linux || is_chromeos) {
-      sources += [
-        "../browser/ui/views/device_signals_consent/consent_dialog_browsertest.cc",
-        "../browser/webauthn/chrome_webauthn_iwa_remote_desktop_override_browsertest.cc",
-      ]
+      sources += [ "../browser/ui/views/device_signals_consent/consent_dialog_browsertest.cc" ]
     }
 
     if (is_win || is_mac || is_linux) {
@@ -3910,6 +3905,7 @@ if (!is_android) {
       "//chrome/browser/usb",
       "//chrome/browser/web_applications:app_service_browser_tests",
       "//chrome/browser/webauthn",
+      "//chrome/browser/webauthn:browser_tests",
       "//chrome/browser/webauthn:unexportable_key_utils",
       "//chrome/browser/webdata_services",
       "//chrome/common:mojo_bindings",
@@ -5487,14 +5483,6 @@ if (!is_android) {
     sources += metric_integration_sources
 
     if (!is_chromeos) {
-      sources += [
-        "../browser/webauthn/change_pin_controller_impl_browsertest.cc",
-        "../browser/webauthn/enclave_authenticator_browsertest.cc",
-      ]
-      deps += [ "//chrome/browser/webauthn:test_support" ]
-    }
-
-    if (!is_chromeos) {
       deps += [
         "//chrome/browser/ui/webui/whats_new:browser_tests",
         "//chrome/browser/ui/webui/whats_new:mojo_bindings",
@@ -6043,8 +6031,6 @@ test("unit_tests") {
     "../browser/ui/url_identity_unittest.cc",
     "../browser/ui/webui/fileicon_source_unittest.cc",
     "../browser/ui/webui/log_web_ui_url_unittest.cc",
-    "../browser/webauthn/chrome_web_authentication_delegate_base_unittest.cc",
-    "../browser/webauthn/password_credential_fetcher_unittest.cc",
     "../common/chrome_content_client_unittest.cc",
     "../common/chrome_paths_unittest.cc",
     "../common/crash_keys_unittest.cc",
@@ -6503,6 +6489,7 @@ test("unit_tests") {
     "//chrome/browser/web_share_target:unit_tests",
     "//chrome/browser/webauthn",
     "//chrome/browser/webauthn:chrome_web_authentication_delegate",
+    "//chrome/browser/webauthn:unit_tests",
     "//chrome/browser/webdata_services",
     "//chrome/browser/webid",
     "//chrome/browser/webid:unit_tests",
@@ -7648,15 +7635,6 @@ test("unit_tests") {
       "../browser/ui/webui/util/webui_util_desktop_unittest.cc",
       "../browser/ui/webui/webui_allowlist_provider_unittest.cc",
       "../browser/ui/webui/webui_embedding_context_unittest.cc",
-      "../browser/webauthn/authenticator_request_dialog_model_unittest.cc",
-      "../browser/webauthn/authenticator_request_scheduler_unittest.cc",
-      "../browser/webauthn/chrome_authenticator_request_delegate_unittest.cc",
-      "../browser/webauthn/chrome_web_authentication_delegate_unittest.cc",
-      "../browser/webauthn/credential_sorter_desktop_unittest.cc",
-      "../browser/webauthn/enclave_manager_unittest.cc",
-      "../browser/webauthn/passkey_unlock_manager_unittest.cc",
-      "../browser/webauthn/password_credential_ui_controller_unittest.cc",
-      "../browser/webauthn/ui_readiness_barrier_unittest.cc",
       "../renderer/accessibility/phrase_segmentation/dependency_parser_model_unittest.cc",
       "../renderer/accessibility/phrase_segmentation/dependency_tree_unittest.cc",
       "../renderer/accessibility/phrase_segmentation/phrase_segmenter_unittest.cc",
@@ -7849,15 +7827,7 @@ test("unit_tests") {
       sources += [ "../browser/ui/webui/password_manager/promo_cards/move_passwords_promo_unittest.cc" ]
     }
 
-    if (is_mac) {
-      sources +=
-          [ "../browser/webauthn/local_credential_management_mac_unittest.mm" ]
-    }
-
     if (is_win) {
-      sources +=
-          [ "../browser/webauthn/local_credential_management_win_unittest.cc" ]
-
       deps += [
         "//chrome/browser/startup",
         "//chrome/browser/startup:unit_tests",
@@ -8269,7 +8239,6 @@ test("unit_tests") {
       "../browser/ui/views/mahi/mahi_menu_controller_unittest.cc",
       "../browser/ui/views/mahi/mahi_menu_view_unittest.cc",
       "../browser/ui/webui/certificate_provisioning_ui_handler_unittest.cc",
-      "../browser/webauthn/unexportable_key_utils_chromeos_unittest.cc",
       "../common/chrome_constants_ash_unittest.cc",
       "../renderer/ash_merge_session_loader_throttle_unittest.cc",
       "../renderer/chromeos_delayed_callback_group_unittest.cc",
@@ -10280,8 +10249,6 @@ if (!is_android && !is_chromeos_device) {
       "../browser/ui/webui/side_panel/customize_chrome/customize_chrome_interactive_uitest.cc",
       "../browser/ui/webui/side_panel/customize_chrome/wallpaper_search/wallpaper_search_interactive_uitest.cc",
       "../browser/ui/webui/skills/skills_page_interactive_uitest.cc",
-      "../browser/webauthn/chrome_webauthn_autofill_interactive_uitest.cc",
-      "../browser/webauthn/webauthn_focus_interactive_uitest.cc",
       "//ui/base/clipboard/clipboard_unittest.cc",
       "base/interactive_ui_tests_main.cc",
     ]
@@ -10495,6 +10462,7 @@ if (!is_android && !is_chromeos_device) {
       "//chrome/browser/web_applications:web_applications_test_support",
       "//chrome/browser/webapps:interactive_ui_tests",
       "//chrome/browser/webauthn",
+      "//chrome/browser/webauthn:interactive_ui_tests",
       "//chrome/browser/webauthn:test_support",
       "//chrome/common:version_header",
       "//chrome/common/notifications",
@@ -10865,7 +10833,6 @@ if (!is_android && !is_chromeos_device) {
         "../browser/ui/views/user_education/impl/browser_feature_promo_preconditions_interactive_uitest.cc",
         "../browser/ui/views/user_education/product_messaging_controller_interactive_uitest.cc",
         "../browser/ui/views/user_education/tutorial_interactive_uitest.cc",
-        "../browser/webauthn/webauthn_immediate_get_interactive_uitest.cc",
         "interaction/element_tracker_views_interactive_uitest.cc",
         "interaction/interaction_sequence_interactive_uitest.cc",
         "interaction/interaction_test_util_browser_interactive_uitest.cc",
@@ -11174,7 +11141,6 @@ if (!is_android && !is_chromeos_device) {
         "../browser/ui/views/frame/browser_native_widget_mac_interactive_uitest.mm",
         "../browser/ui/views/frame/immersive_mode_controller_mac_interactive_uitest.mm",
         "../browser/ui/views/tabs/tab_modal_focus_interactive_uitest_mac.mm",
-        "../browser/webauthn/chrome_webauthn_autofill_mac_interactive_uitest.mm",
         "//ui/display/mac/test/virtual_display_util_mac_interactive_uitest.mm",
       ]
 
