@@ -143,6 +143,8 @@ std::string_view SuggestionTypeToStringView(SuggestionType type) {
       return "kFetchingAmbientData";
     case SuggestionType::kAtMemoryGenericError:
       return "kAtMemoryGenericError";
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
+      return "kMaximizeCreditCardBenefitsEntry";
   }
   NOTREACHED();
 }

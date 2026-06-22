@@ -114,6 +114,7 @@ SuggestionSection GetSuggestionSection(SuggestionType type) {
     case SuggestionType::kAtMemoryNoConnection:
     case SuggestionType::kAtMemoryGenericError:
     case SuggestionType::kAtMemorySearchAffordance:
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
       return SuggestionSection::kBody;
 
     case SuggestionType::kWebauthnSignInWithAnotherDevice:

@@ -309,6 +309,7 @@ bool IsPasswordSuggestion(FormSuggestion* suggestion) {
     case SuggestionType::kAtMemorySearchAffordance:
     case SuggestionType::kPersonalContextNotice:
     case SuggestionType::kFetchingAmbientData:
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
       return false;
   }
   NOTREACHED();

@@ -328,6 +328,7 @@ FillDataType GetEventTypeFromSingleFieldSuggestionType(SuggestionType type) {
     case SuggestionType::kAtMemorySearchAffordance:
     case SuggestionType::kPersonalContextNotice:
     case SuggestionType::kFetchingAmbientData:
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
       NOTREACHED();
   }
   NOTREACHED();
@@ -775,6 +776,7 @@ bool IsManagementFooterOption(const Suggestion& suggestion) {
     case SuggestionType::kAtMemoryGenericError:
     case SuggestionType::kAtMemorySearchAffordance:
     case SuggestionType::kPersonalContextNotice:
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
       return false;
   }
 }

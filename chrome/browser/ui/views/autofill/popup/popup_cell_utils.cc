@@ -326,6 +326,7 @@ bool IsPaymentMethodSuggestion(const Suggestion& suggestion) {
     case SuggestionType::kIbanEntry:
     case SuggestionType::kBnplEntry:
     case SuggestionType::kSaveAndFillCreditCardEntry:
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
       return true;
     case SuggestionType::kAllLoyaltyCardsEntry:
     case SuggestionType::kAllSavedPasswordsEntry:

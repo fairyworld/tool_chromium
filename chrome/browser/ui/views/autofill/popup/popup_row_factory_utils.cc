@@ -810,7 +810,56 @@ std::unique_ptr<PopupRowView> CreatePopupRowView(
       // BNPL suggestion.
       [[fallthrough]];
     }
-    default:
+    case SuggestionType::kAddressEntry:
+    case SuggestionType::kAddressEntryOnTyping:
+    case SuggestionType::kAddressFieldByFieldFilling:
+    case SuggestionType::kAllLoyaltyCardsEntry:
+    case SuggestionType::kAllSavedPasswordsEntry:
+    case SuggestionType::kAtMemoryGenericError:
+    case SuggestionType::kAtMemoryInactivityNudge:
+    case SuggestionType::kAtMemoryNoConnection:
+    case SuggestionType::kAtMemorySearchAffordance:
+    case SuggestionType::kAtMemorySearchResult:
+    case SuggestionType::kAutocompleteAtMemoryButton:
+    case SuggestionType::kAutocompleteEntry:
+    case SuggestionType::kBnplFootnote:
+    case SuggestionType::kComposeDisable:
+    case SuggestionType::kComposeGoToSettings:
+    case SuggestionType::kComposeNeverShowOnThisSiteAgain:
+    case SuggestionType::kCreditCardEntry:
+    case SuggestionType::kDatalistEntry:
+    case SuggestionType::kDevtoolsTestAddressByCountry:
+    case SuggestionType::kDevtoolsTestAddressEntry:
+    case SuggestionType::kDevtoolsTestAddresses:
+    case SuggestionType::kFetchingAmbientData:
+    case SuggestionType::kFillAutofillAi:
+    case SuggestionType::kFillPassword:
+    case SuggestionType::kFreeformFooter:
+    case SuggestionType::kGeneratePasswordEntry:
+    case SuggestionType::kIdentityCredential:
+    case SuggestionType::kLoadingThrobber:
+    case SuggestionType::kLoyaltyCardEntry:
+    case SuggestionType::kManageAddress:
+    case SuggestionType::kManageAutofillAi:
+    case SuggestionType::kManageAutofillAiIdentityDocs:
+    case SuggestionType::kManageAutofillAiTravel:
+    case SuggestionType::kManageCreditCard:
+    case SuggestionType::kManageIban:
+    case SuggestionType::kManageLoyaltyCard:
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
+    case SuggestionType::kMerchantPromoCodeEntry:
+    case SuggestionType::kOneTimePasswordEntry:
+    case SuggestionType::kOpenGemini:
+    case SuggestionType::kPasswordFieldByFieldFilling:
+    case SuggestionType::kPendingStateSignin:
+    case SuggestionType::kPersonalContextNotice:
+    case SuggestionType::kScanCreditCard:
+    case SuggestionType::kSeePromoCodeDetails:
+    case SuggestionType::kTitle:
+    case SuggestionType::kUndoOrClear:
+    case SuggestionType::kViewPasswordDetails:
+    case SuggestionType::kWebauthnCredential:
+    case SuggestionType::kWebauthnSignInWithAnotherDevice:
       return std::make_unique<PopupRowView>(
           a11y_selection_delegate, selection_delegate, controller, line_number,
           CreatePopupRowContentView(suggestion, show_new_badge,

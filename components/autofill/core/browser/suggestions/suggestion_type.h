@@ -213,8 +213,12 @@ enum class SuggestionType {
   // generic error.
   kAtMemoryGenericError = 88,
 
-  // Next ID: 89
-  kMaxValue = kAtMemoryGenericError
+  // Maximize Credit Card Benefits suggestion that, when clicked, prompts Gemini
+  // to recommend credit cards for autofill
+  kMaximizeCreditCardBenefitsEntry = 89,
+
+  // Next ID: 90
+  kMaxValue = kMaximizeCreditCardBenefitsEntry
 };
 // LINT.ThenChange(/tools/metrics/histograms/metadata/autofill/enums.xml:SuggestionType)
 

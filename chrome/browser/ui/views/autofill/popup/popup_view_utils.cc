@@ -627,6 +627,7 @@ bool IsExpandableSuggestionType(SuggestionType type) {
     case SuggestionType::kAtMemorySearchAffordance:
     case SuggestionType::kPersonalContextNotice:
     case SuggestionType::kFetchingAmbientData:
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
       return false;
   }
 }
@@ -698,6 +699,7 @@ bool IsSuggestionTypeAutoselected(SuggestionType type) {
     case SuggestionType::kPasswordEntry:
     case SuggestionType::kPersonalContextNotice:
     case SuggestionType::kFetchingAmbientData:
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
       return false;
   }
 }

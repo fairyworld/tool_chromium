@@ -210,6 +210,7 @@ bool HasAutofillSuggestionsForA11y(SuggestionType type) {
     case SuggestionType::kAtMemoryGenericError:
     case SuggestionType::kAtMemorySearchAffordance:
     case SuggestionType::kPersonalContextNotice:
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
       return false;
   }
 }
@@ -307,6 +308,7 @@ bool AutofillExternalDelegate::IsAutofillAndFirstLayerSuggestionId(
     case SuggestionType::kAtMemoryGenericError:
     case SuggestionType::kAtMemorySearchAffordance:
     case SuggestionType::kPersonalContextNotice:
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
       return false;
   }
 }
@@ -706,6 +708,7 @@ void AutofillExternalDelegate::DidSelectSuggestion(
     // is needed. This needs to be changed once Desktop suggestions and UI
     // are implemented.
     case SuggestionType::kOneTimePasswordEntry:
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
       break;
     case SuggestionType::kTitle:
     case SuggestionType::kSeparator:
@@ -756,6 +759,7 @@ void AutofillExternalDelegate::DidAcceptSuggestion(
     case SuggestionType::kSeePromoCodeDetails:
     case SuggestionType::kScanCreditCard:
     case SuggestionType::kBnplEntry:
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
       DidAcceptPaymentsSuggestion(suggestion, metadata);
       break;
     case SuggestionType::kManageAddress:
@@ -1100,6 +1104,7 @@ bool AutofillExternalDelegate::RemoveSuggestion(const Suggestion& suggestion) {
     case SuggestionType::kAtMemoryNoConnection:
     case SuggestionType::kAtMemoryGenericError:
     case SuggestionType::kAtMemorySearchAffordance:
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
       return false;
   }
 }
@@ -1493,6 +1498,9 @@ void AutofillExternalDelegate::DidAcceptPaymentsSuggestion(
       }
       break;
     }
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
+      // TODO(haochenf) Handle MaximizeCreditCardBenefitsEntry selection.
+      [[fallthrough]];
     default:
       NOTREACHED();  // Should be handled elsewhere
   }

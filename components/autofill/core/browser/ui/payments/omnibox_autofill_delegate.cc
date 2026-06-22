@@ -79,6 +79,7 @@ bool IsValidOmniboxAutofillSuggestion(SuggestionType type) {
     case SuggestionType::kManageCreditCard:
     case SuggestionType::kManageIban:
     case SuggestionType::kManageLoyaltyCard:
+    case SuggestionType::kMaximizeCreditCardBenefitsEntry:
     case SuggestionType::kMerchantPromoCodeEntry:
     case SuggestionType::kMixedFormMessage:
     case SuggestionType::kOneTimePasswordEntry:
