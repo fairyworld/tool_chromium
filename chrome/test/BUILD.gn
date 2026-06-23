@@ -2437,6 +2437,7 @@ if (!is_android) {
       "//chrome/browser/language_detection:browser_tests",
       "//chrome/browser/launch_time_navigation_signal:browser_tests",
       "//chrome/browser/lifetime",
+      "//chrome/browser/lifetime:browser_tests",
       "//chrome/browser/lifetime:termination_notification",
       "//chrome/browser/loader:browser_tests",
       "//chrome/browser/local_network_access:browser_tests",
@@ -3330,10 +3331,6 @@ if (!is_android) {
       "../browser/indigo/indigo_browsertest.cc",
       "../browser/indigo/indigo_image_replacement_manager_browsertest.cc",
       "../browser/l10n_util_browsertest.cc",
-      "../browser/lifetime/browser_close_manager_browsertest.cc",
-      "../browser/lifetime/browser_shutdown_browsertest.cc",
-      "../browser/lifetime/smart_restart_manager_browsertest.cc",
-      "../browser/lifetime/smart_restart_metrics_observer_browsertest.cc",
       "../browser/locale_tests_browsertest.cc",
       "../browser/media/audio_ducker_browsertest.cc",
       "../browser/media/autoplay_metrics_browsertest.cc",
@@ -4206,7 +4203,6 @@ if (!is_android) {
         # chromeos does not support machine level user cloud policies
         "../browser/enterprise/reporting/report_scheduler_browsertest.cc",
         "../browser/external_protocol/external_protocol_policy_browsertest.cc",
-        "../browser/lifetime/application_lifetime_browsertest.cc",
         "../browser/ui/views/enable_link_capturing_infobar_browsertest.cc",
       ]
       deps += [
@@ -4632,7 +4628,6 @@ if (!is_android) {
         "../browser/chromeos/enterprise/cloud_storage/one_drive_pref_observer_browsertest.cc",
         "../browser/enterprise/connectors/device_trust/signals/decorators/ash/ash_signals_decorator_browsertest.cc",
         "../browser/file_system_access/cloud_identifier/cloud_identifier_util_ash_browsertest.cc",
-        "../browser/lifetime/application_lifetime_chromeos_browsertest.cc",
 
         # TODO(crbug.com/510716187): Enable for other platforms once macOS
         # native window ID translation is implemented.
@@ -6788,6 +6783,7 @@ test("unit_tests") {
       "//chrome/browser/background:unit_tests",
       "//chrome/browser/dictation:unit_tests",
       "//chrome/browser/feedback/report_unsafe_site:unit_tests",
+      "//chrome/browser/lifetime:unit_tests",
       "//chrome/browser/new_tab_page/chrome_colors:generate_chrome_colors_info",
       "//chrome/browser/new_tab_page/chrome_colors:generate_colors_info",
       "//chrome/browser/record_replay:unit_tests",
@@ -7404,7 +7400,6 @@ test("unit_tests") {
       "../browser/hid/chrome_hid_delegate_unittest.cc",
       "../browser/hid/hid_chooser_context_unittest.cc",
       "../browser/hid/hid_policy_allowed_devices_unittest.cc",
-      "../browser/lifetime/smart_restart_metrics_observer_unittest.cc",
       "../browser/media/webrtc/current_tab_desktop_media_list_unittest.cc",
       "../browser/media/webrtc/desktop_capture_access_handler_unittest.cc",
       "../browser/media/webrtc/desktop_media_picker_controller_unittest.cc",
@@ -8070,7 +8065,6 @@ test("unit_tests") {
       "../browser/extensions/api/document_scan/document_scan_type_converters_unittest.cc",
       "../browser/extensions/api/terminal/startup_status_unittest.cc",
       "../browser/hid/hid_pinned_notification_unittest.cc",
-      "../browser/lifetime/application_lifetime_chromeos_unittest.cc",
       "../browser/media/platform_verification_chromeos_unittest.cc",
       "../browser/media/webrtc/chrome_screen_enumerator_ash_unittest.cc",
       "../browser/media/webrtc/desktop_media_list_ash_unittest.cc",
@@ -8594,7 +8588,6 @@ test("unit_tests") {
 
   if (!is_android && !is_chromeos) {
     sources += [
-      "../browser/lifetime/switch_utils_unittest.cc",
       "../browser/profiles/profile_list_desktop_unittest.cc",
       "../browser/profiles/profile_statistics_aggregator_unittest.cc",
       "../browser/signin/chrome_signin_and_sync_status_metrics_provider_unittest.cc",
@@ -8603,8 +8596,6 @@ test("unit_tests") {
 
   if (!is_android) {
     sources += [
-      "../browser/lifetime/restartability_monitor_unittest.cc",
-      "../browser/lifetime/smart_restart_policy_unittest.cc",
       "../browser/policy/cloud/cloud_policy_invalidator_unittest.cc",
       "../browser/policy/cloud/extension_install_policy_invalidator_unittest.cc",
       "../browser/policy/cloud/extension_install_policy_service_unittest.cc",
