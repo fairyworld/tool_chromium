@@ -168,6 +168,11 @@
 #include "chrome/browser/ui/views/download/bubble/download_toolbar_ui_controller.h"
 #endif
 
+#if BUILDFLAG(IS_LINUX)
+#include "chrome/common/pref_names.h"
+#include "components/prefs/pref_service.h"
+#endif
+
 namespace {
 
 actions::ActionItem::ActionItemBuilder ChromeMenuAction(
@@ -2003,6 +2008,48 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               : vector_icons::kLocationOnChromeRefreshOldIcon)
           .SetEnabled(!profile->IsGuestSession())
           .Build());
+
+#if BUILDFLAG(IS_CHROMEOS)
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ToggleMultitaskMenu(bwi);
+              },
+              bwi))
+          .SetActionId(kToggleMultitaskMenu)
+          .Build());
+#endif  // BUILDFLAG(IS_CHROMEOS)
+
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                bwi->GetWindow()->Restore();
+              },
+              bwi))
+          .SetActionId(kRestoreWindow)
+          .Build());
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+
+#if BUILDFLAG(IS_LINUX)
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](Profile* profile, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                PrefService* prefs = profile->GetPrefs();
+                prefs->SetBoolean(
+                    prefs::kUseCustomChromeFrame,
+                    !prefs->GetBoolean(prefs::kUseCustomChromeFrame));
+              },
+              profile))
+          .SetActionId(kUseSystemTitleBar)
+          .Build());
+#endif  // BUILDFLAG(IS_LINUX)
 }
 
 void BrowserActions::AddListeners() {
