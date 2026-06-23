@@ -25,7 +25,6 @@ import re
 import subprocess
 import os
 import sys
-import json
 import shutil
 
 REPOSITORY_ROOT = os.path.abspath(
