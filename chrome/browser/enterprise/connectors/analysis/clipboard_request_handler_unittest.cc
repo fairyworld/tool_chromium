@@ -33,7 +33,6 @@ constexpr char kSourceUrl[] = "https://baz.com/";
 constexpr char kSourceEmail[] = "test-user@gmail.com";
 constexpr char kTabTitle[] = "tab_title";
 constexpr char kMessage[] = "message";
-constexpr char kMethod[] = "CONTENT_TRANSFER_METHOD_FILE_PASTE";
 constexpr char16_t kJustification[] = u"justification";
 constexpr size_t kMaxSize = 1000;
 
@@ -164,8 +163,8 @@ TEST_F(ClipboardRequestHandlerTest, Text) {
   auto handler = ClipboardRequestHandler::Create(
       &info, &binary_upload_service_, profile_.get(), GURL(kUrl),
       ClipboardRequestHandler::Type::kText, DeepScanAccessPoint::PASTE,
-      GetSource(), kSourceEmail, kMethod, CreateTestData(kMaxSize),
-      base::BindOnce([](RequestHandlerResult result) {
+      GetSource(), kSourceEmail, kContentTransferMethodFilePaste,
+      CreateTestData(kMaxSize), base::BindOnce([](RequestHandlerResult result) {
         EXPECT_EQ(result.final_result, FinalContentAnalysisResult::FAILURE);
         EXPECT_EQ(result.complies, false);
         EXPECT_EQ(result.custom_rule_message.message_segments_size(), 1);
@@ -257,8 +256,8 @@ TEST_F(ClipboardRequestHandlerTest, CopyText) {
   auto handler = ClipboardRequestHandler::Create(
       &info, &binary_upload_service_, profile_.get(), GURL(kUrl),
       ClipboardRequestHandler::Type::kText, DeepScanAccessPoint::COPY,
-      GetSource(), kSourceEmail, "", CreateTestData(kMaxSize),
-      base::BindOnce([](RequestHandlerResult result) {
+      GetSource(), kSourceEmail, kContentTransferMethodClipboardCopy,
+      CreateTestData(kMaxSize), base::BindOnce([](RequestHandlerResult result) {
         EXPECT_EQ(result.final_result, FinalContentAnalysisResult::FAILURE);
         EXPECT_EQ(result.complies, false);
         EXPECT_EQ(result.custom_rule_message.message_segments_size(), 1);
@@ -284,9 +283,8 @@ TEST_F(ClipboardRequestHandlerTest, CopyText) {
   expected_event.set_event_result(
       chrome::cros::reporting::proto::EventResult::EVENT_RESULT_BLOCKED);
   expected_event.set_clicked_through(false);
-  // TODO(eliashomsi): Set this to CONTENT_TRANSFER_METHOD_CLIPBOARD_COPY once added to the synced proto.
   expected_event.set_content_transfer_method(
-      chrome::cros::reporting::proto::CONTENT_TRANSFER_METHOD_UNKNOWN);
+      chrome::cros::reporting::proto::CONTENT_TRANSFER_METHOD_CLIPBOARD_COPY);
   expected_event.set_source_web_app_signed_in_account(kSourceEmail);
   expected_event.set_trigger(
       chrome::cros::reporting::proto::DataTransferEventTrigger::CLIPBOARD_COPY);
@@ -332,9 +330,8 @@ TEST_F(ClipboardRequestHandlerTest, CopyText) {
       chrome::cros::reporting::proto::TriggeredRuleInfo::BLOCK);
   triggered_bypass_rule.set_rule_name("clipboard_rule_name");
   *expected_bypass_event.add_triggered_rule_info() = triggered_bypass_rule;
-  // TODO(eliashomsi): Set this to CONTENT_TRANSFER_METHOD_CLIPBOARD_COPY once added to the synced proto.
   expected_bypass_event.set_content_transfer_method(
-      chrome::cros::reporting::proto::CONTENT_TRANSFER_METHOD_UNKNOWN);
+      chrome::cros::reporting::proto::CONTENT_TRANSFER_METHOD_CLIPBOARD_COPY);
 
   expected_bypass_event.set_profile_identifier(
       profile_->GetPath().AsUTF8Unsafe());
@@ -351,8 +348,8 @@ TEST_F(ClipboardRequestHandlerTest, Image) {
   auto handler = ClipboardRequestHandler::Create(
       &info, &binary_upload_service_, profile_.get(), GURL(kUrl),
       ClipboardRequestHandler::Type::kImage, DeepScanAccessPoint::DRAG_AND_DROP,
-      GetSource(), kSourceEmail, kMethod, CreateTestData(kMaxSize),
-      base::BindOnce([](RequestHandlerResult result) {
+      GetSource(), kSourceEmail, kContentTransferMethodFilePaste,
+      CreateTestData(kMaxSize), base::BindOnce([](RequestHandlerResult result) {
         EXPECT_EQ(result.final_result, FinalContentAnalysisResult::FAILURE);
         EXPECT_EQ(result.complies, false);
         EXPECT_EQ(result.custom_rule_message.message_segments_size(), 1);
@@ -447,8 +444,8 @@ TEST_F(ClipboardRequestHandlerTest, CancelledByUser) {
   auto handler = ClipboardRequestHandler::Create(
       &info, &binary_upload_service_, profile_.get(), GURL(kUrl),
       ClipboardRequestHandler::Type::kText, DeepScanAccessPoint::PASTE,
-      GetSource(), kSourceEmail, kMethod, CreateTestData(kMaxSize),
-      base::BindOnce([](RequestHandlerResult result) {
+      GetSource(), kSourceEmail, kContentTransferMethodFilePaste,
+      CreateTestData(kMaxSize), base::BindOnce([](RequestHandlerResult result) {
         EXPECT_EQ(result.final_result, FinalContentAnalysisResult::CANCELLED);
         EXPECT_EQ(result.complies, false);
       }));
