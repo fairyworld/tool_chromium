@@ -2320,6 +2320,47 @@ TEST_F(HostResolverCacheTest, TransientAnonymizationKeyNotSerialized) {
   EXPECT_TRUE(value.GetList().empty());
 }
 
+TEST_F(HostResolverCacheTest,
+       SerializationPreservesTargetNetworkOnlyForLogging) {
+  HostResolverCache cache(kMaxResults, clock_, tick_clock_);
+  const std::string kName = "foo.test";
+  const std::vector<IPEndPoint> kEndpoints = {
+      IPEndPoint(IPAddress::FromIPLiteral("::1").value(), /*port=*/0)};
+  const base::Time kExpiration = clock_.Now() + base::Hours(2);
+
+  auto result = std::make_unique<HostResolverInternalDataResult>(
+      kName, DnsQueryType::AAAA, tick_clock_.NowTicks() + base::Hours(2),
+      kExpiration, HostResolverInternalResult::Source::kDns, kEndpoints,
+      /*strings=*/std::vector<std::string>{},
+      /*hosts=*/std::vector<HostPortPair>{});
+
+  const NetworkAnonymizationKey anonymization_key;
+  const handles::NetworkHandle kNetwork = 100;
+
+  cache.Set(std::move(result), anonymization_key, kNetwork,
+            HostResolverSource::DNS,
+            /*secure=*/false);
+
+  // Serialize for logging
+  base::Value value = cache.SerializeForLogging();
+  // The serialized list should contain the network-specific entry
+  ASSERT_TRUE(value.is_dict());
+  const base::ListValue* entries = value.GetDict().FindList("entries");
+  ASSERT_TRUE(entries);
+  EXPECT_EQ(entries->size(), 1u);
+  const base::Value& serialized_entry = (*entries)[0];
+  ASSERT_TRUE(serialized_entry.is_dict());
+  const std::string* target_network_str =
+      serialized_entry.GetDict().FindString("target_network");
+  ASSERT_TRUE(target_network_str);
+  EXPECT_EQ(base::NumberToString(kNetwork), *target_network_str);
+
+  // Serialize for persistence
+  value = cache.Serialize();
+  // The serialized list should not contain the network-specific entry
+  EXPECT_EQ(value.GetList().size(), 0u);
+}
+
 TEST_F(HostResolverCacheTest, DeserializePrefersExistingResults) {
   HostResolverCache cache(kMaxResults, clock_, tick_clock_);
   const std::string kName = "foo.test";

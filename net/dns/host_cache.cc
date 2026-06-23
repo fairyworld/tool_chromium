@@ -75,6 +75,7 @@ const char kTextRecordsKey[] = "text_records";
 const char kHostnameResultsKey[] = "hostname_results";
 const char kHostPortsKey[] = "host_ports";
 const char kCanonicalNamesKey[] = "canonical_names";
+const char kTargetNetworkKey[] = "target_network";
 
 base::Value IpEndpointToValue(const IPEndPoint& endpoint) {
   base::DictValue dictionary;
@@ -980,6 +981,10 @@ void HostCache::GetList(base::ListValue& entry_list,
               &network_anonymization_key_value)) {
         continue;
       }
+      // Don't save entries associated with a specific network.
+      if (key.target_network != handles::kInvalidNetworkHandle) {
+        continue;
+      }
     } else {
       // ToValue() fails for transient NAKs, since they should never be
       // serialized to disk in a restorable format, so use ToDebugString() when
@@ -1007,6 +1012,11 @@ void HostCache::GetList(base::ListValue& entry_list,
     entry_dict.Set(kNetworkAnonymizationKey,
                    std::move(network_anonymization_key_value));
     entry_dict.Set(kSecureKey, key.secure);
+
+    if (serialization_type == SerializationType::kDebug) {
+      entry_dict.Set(kTargetNetworkKey,
+                     base::NumberToString(key.target_network));
+    }
 
     entry_list.Append(std::move(entry_dict));
   }

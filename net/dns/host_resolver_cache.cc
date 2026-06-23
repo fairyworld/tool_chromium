@@ -14,6 +14,7 @@
 
 #include "base/check_op.h"
 #include "base/numerics/safe_conversions.h"
+#include "base/strings/string_number_conversions.h"
 #include "base/time/clock.h"
 #include "base/time/time.h"
 #include "net/base/network_anonymization_key.h"
@@ -36,6 +37,7 @@ constexpr std::string_view kResultKey = "result";
 constexpr std::string_view kStalenessGenerationKey = "staleness_generation";
 constexpr std::string_view kMaxEntriesKey = "max_entries";
 constexpr std::string_view kEntriesKey = "entries";
+constexpr std::string_view kTargetNetworkKey = "target_network";
 
 }  // namespace
 
@@ -176,13 +178,9 @@ void HostResolverCache::MakeAllResultsStale() {
 }
 
 base::Value HostResolverCache::Serialize() const {
-  // Do not serialize any entries without a persistable anonymization key
-  // because it is required to store and restore entries with the correct
-  // annonymization key. A non-persistable anonymization key is typically used
-  // for short-lived contexts, and associated entries are not expected to be
-  // useful after persistence to disk anyway.
-  return SerializeEntries(/*serialize_staleness_generation=*/false,
-                          /*require_persistable_anonymization_key=*/true);
+  // When serializing for persistence, we are not interested in entries that
+  // cannot be used once they will be restored.
+  return SerializeEntries(/*serialize_non_persistable_parameters=*/false);
 }
 
 bool HostResolverCache::RestoreFromValue(const base::Value& value) {
@@ -249,11 +247,10 @@ base::Value HostResolverCache::SerializeForLogging() const {
   dict.Set(kMaxEntriesKey, base::checked_cast<int>(max_entries_));
   dict.Set(kStalenessGenerationKey, staleness_generation_);
 
-  // Include entries with non-persistable anonymization keys, so the log can
-  // contain all entries. Restoring from this serialization is not supported.
+  // Include all entries for debugging purposes, even those. Restoring from this
+  // serialization is not supported.
   dict.Set(kEntriesKey,
-           SerializeEntries(/*serialize_staleness_generation=*/true,
-                            /*require_persistable_anonymization_key=*/false));
+           SerializeEntries(/*serialize_non_persistable_parameters=*/true));
 
   return base::Value(std::move(dict));
 }
@@ -425,20 +422,19 @@ void HostResolverCache::EvictEntries() {
 }
 
 base::Value HostResolverCache::SerializeEntries(
-    bool serialize_staleness_generation,
-    bool require_persistable_anonymization_key) const {
+    bool serialize_non_persistable_parameters) const {
   base::ListValue list;
 
   for (const auto& [key, entry] : entries_) {
     base::DictValue dict;
 
-    if (serialize_staleness_generation) {
+    if (serialize_non_persistable_parameters) {
       dict.Set(kStalenessGenerationKey, entry.staleness_generation);
     }
 
     base::Value anonymization_key_value;
     if (!key.network_anonymization_key.ToValue(&anonymization_key_value)) {
-      if (require_persistable_anonymization_key) {
+      if (!serialize_non_persistable_parameters) {
         continue;
       } else {
         // If the caller doesn't care about anonymization keys that can be
@@ -450,10 +446,21 @@ base::Value HostResolverCache::SerializeEntries(
       }
     }
 
+    if (!serialize_non_persistable_parameters) {
+      // Don't save entries associated with a specific network.
+      if (key.target_network != handles::kInvalidNetworkHandle) {
+        continue;
+      }
+    }
+
     dict.Set(kNakKey, std::move(anonymization_key_value));
     dict.Set(kSourceKey, ToValue(entry.source));
     dict.Set(kSecureKey, entry.secure);
     dict.Set(kResultKey, entry.result->ToValue());
+
+    if (serialize_non_persistable_parameters) {
+      dict.Set(kTargetNetworkKey, base::NumberToString(key.target_network));
+    }
 
     list.Append(std::move(dict));
   }

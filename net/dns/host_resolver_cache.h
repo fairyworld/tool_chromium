@@ -241,14 +241,15 @@ class NET_EXPORT HostResolverCache final {
 
   void EvictEntries();
 
-  // If `require_persistable_anonymization_key` is true, will not serialize
-  // any entries that do not have an anonymization key that supports
-  // serialization and restoration. If false, will serialize all entries, but
-  // the result may contain anonymization keys that are malformed for
-  // restoration.
-  base::Value SerializeEntries(
-      bool serialize_staleness_generation,
-      bool require_persistable_anonymization_key) const;
+  // If `serialize_non_persistable_parameters` is false this will:
+  // - Only serialize entries that have persistable parameters (e.g.,
+  //     non-transient network anonymization keys, default target networks).
+  // - Don't include the staleness generation value.
+  // This is useful to make sure that serialized data can later be restored and
+  // utilized.
+  // If `serialize_non_persistable_parameters` is true, all entries will be
+  // included. This is useful for debugging.
+  base::Value SerializeEntries(bool serialize_non_persistable_parameters) const;
 
   EntryMap entries_;
   size_t max_entries_;

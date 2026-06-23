@@ -306,6 +306,41 @@ TEST(HostCacheTest, TargetNetwork) {
   EXPECT_LT(key_network_100, key_network_200);  // 100 < 200
 }
 
+TEST(HostCacheTest, SerializationPreservesTargetNetworkOnlyForDebug) {
+  HostCache cache(kMaxCacheEntries);
+  base::TimeTicks now;
+  const base::TimeDelta kTTL = base::Seconds(10);
+  const handles::NetworkHandle kNetwork = 100;
+  HostCache::Key cache_key("host2.test", DnsQueryType::UNSPECIFIED, 0,
+                           HostResolverSource::ANY, NetworkAnonymizationKey(),
+                           kNetwork);
+  HostCache::Entry entry =
+      HostCache::Entry(OK, /*ip_endpoints=*/{}, /*aliases=*/{},
+                       HostCache::Entry::SOURCE_UNKNOWN);
+  cache.Set(cache_key, entry, now, kTTL);
+  EXPECT_EQ(1U, cache.size());
+
+  // Serialize the cache for debugging (kDebug)
+  base::ListValue serialized_debug_cache;
+  cache.GetList(serialized_debug_cache, false /* include_staleness */,
+                HostCache::SerializationType::kDebug);
+  // The serialized list should contain the network-specific entry
+  EXPECT_EQ(1U, serialized_debug_cache.size());
+  const base::Value& serialized_entry = serialized_debug_cache[0];
+  ASSERT_TRUE(serialized_entry.is_dict());
+  const std::string* target_network_str =
+      serialized_entry.GetDict().FindString("target_network");
+  ASSERT_TRUE(target_network_str);
+  EXPECT_EQ(base::NumberToString(kNetwork), *target_network_str);
+
+  // Serialize the cache for restoration (kRestorable)
+  base::ListValue serialized_restorable_cache;
+  cache.GetList(serialized_restorable_cache, false /* include_staleness */,
+                HostCache::SerializationType::kRestorable);
+  // The serialized list should not contain the network-specific entry
+  EXPECT_EQ(0U, serialized_restorable_cache.size());
+}
+
 // Make sure NetworkAnonymizationKey is respected.
 TEST(HostCacheTest, NetworkAnonymizationKey) {
   const url::SchemeHostPort kHost(url::kHttpsScheme, "hostname.test", 443);
