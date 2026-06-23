@@ -190,7 +190,8 @@ DisplayNameCandidates GetDisplayNameCandidates(const DeviceInfo* device) {
 
   // Internal names of Apple devices are formatted as MacbookPro2,3 or
   // iPhone2,1 or Ipad4,1.
-  if (manufacturer == "Apple Inc.") {
+  if (device->os_type() == DeviceInfo::OsType::kMac ||
+      device->os_type() == DeviceInfo::OsType::kIOS) {
     std::string model_prefix =
         model.substr(0, model.find_first_of("0123456789,"));
     return {.preferred_name_if_unique = model_prefix,
