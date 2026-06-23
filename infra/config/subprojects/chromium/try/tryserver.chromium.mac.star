@@ -369,7 +369,7 @@ try_.builder(
     main_list_view = "try",
 )
 
-try_.orchestrator_builder(
+try_.builder(
     name = "mac15-arm64-rel",
     branch_selector = branches.selector.MAC_BRANCHES,
     description_html = "Compiles and runs MacOS 15 tests on ARM machines",
@@ -387,19 +387,10 @@ try_.orchestrator_builder(
             "mac",
         ],
     ),
-    compilator = "mac15-arm64-rel-compilator",
-    contact_team_email = "bling-engprod@google.com",
-    main_list_view = "try",
-)
-
-try_.compilator_builder(
-    name = "mac15-arm64-rel-compilator",
-    branch_selector = branches.selector.MAC_BRANCHES,
-    description_html = "compilator for mac15-arm64-rel",
+    builderless = True,
+    cores = None,
     cpu = cpu.ARM64,
     contact_team_email = "bling-engprod@google.com",
-    # TODO (crbug.com/1245171): Revert when root issue is fixed
-    grace_period = 4 * time.minute,
     main_list_view = "try",
 )
 
