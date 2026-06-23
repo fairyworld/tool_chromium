@@ -1284,6 +1284,7 @@ chromium-metrics-reviews@google.com.
   <int value="7" label="Cookie setting change"/>
   <int value="8" label="Forced reconcile"/>
   <int value="9" label="Primary account changed"/>
+  <int value="10" label="Device bound sessions fetched"/>
 </enum>
 
 <!-- LINT.ThenChange(//components/signin/core/browser/account_reconcilor.h:Trigger) -->
