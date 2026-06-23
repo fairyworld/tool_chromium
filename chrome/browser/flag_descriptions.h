@@ -2562,6 +2562,14 @@ inline constexpr char kCastStreamingAv1Description[] =
     "Offers the AV1 video codec when negotiating Cast Streaming, and uses AV1 "
     "if selected for the session.";
 
+inline constexpr char kCastStreamingHardwareAv1Name[] =
+    "Toggle hardware accelerated AV1 video encoding for Cast Streaming";
+inline constexpr char kCastStreamingHardwareAv1Description[] =
+    "The default is to allow hardware AV1 encoding when recommended for the "
+    "platform. If enabled, hardware AV1 encoding will always be allowed when "
+    "supported by the platform. If disabled, hardware AV1 encoding will "
+    "never be used.";
+
 inline constexpr char kCastStreamingHardwareH264Name[] =
     "Toggle hardware accelerated H.264 video encoding for Cast Streaming";
 inline constexpr char kCastStreamingHardwareH264Description[] =

@@ -5547,6 +5547,13 @@ const FeatureEntry kFeatureEntries[] = {
          kCastStreamingExponentialVideoBitrateAlgorithmVariations,
          "CastStreamingExponentialVideoBitrateAlgorithm")},
 
+    {"cast-streaming-hardware-av1",
+     flag_descriptions::kCastStreamingHardwareAv1Name,
+     flag_descriptions::kCastStreamingHardwareAv1Description, kOsDesktop,
+     ENABLE_DISABLE_VALUE_TYPE(
+         switches::kCastStreamingForceEnableHardwareAv1,
+         switches::kCastStreamingForceDisableHardwareAv1)},
+
     {"cast-streaming-hardware-h264",
      flag_descriptions::kCastStreamingHardwareH264Name,
      flag_descriptions::kCastStreamingHardwareH264Description, kOsDesktop,
@@ -5557,7 +5564,9 @@ const FeatureEntry kFeatureEntries[] = {
     {"cast-streaming-hardware-hevc",
      flag_descriptions::kCastStreamingHardwareHevcName,
      flag_descriptions::kCastStreamingHardwareHevcDescription, kOsDesktop,
-     FEATURE_VALUE_TYPE(media::kCastStreamingHardwareHevc)},
+     ENABLE_DISABLE_VALUE_TYPE(
+         switches::kCastStreamingForceEnableHardwareHevc,
+         switches::kCastStreamingForceDisableHardwareHevc)},
 
     {"cast-streaming-hardware-vp8",
      flag_descriptions::kCastStreamingHardwareVp8Name,
