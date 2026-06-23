@@ -327,6 +327,7 @@ class ThemeService : public KeyedService,
   friend class BrowserThemeProvider;
   friend class BrowserWidget;
   friend class ProfilePickerWidget;
+  friend class InitialWebUIProfileService;
   friend class ThemeColorsSourceManager;
   friend class theme_service_internal::ThemeServiceTest;
   friend class waap::PrewarmHelper;

@@ -30,8 +30,16 @@ static_library("waap") {
 }
 
 source_set("manager") {
-  public = [ "initial_web_ui_manager.h" ]
-  sources = [ "initial_web_ui_manager.cc" ]
+  public = [
+    "initial_web_ui_manager.h",
+    "initial_webui_profile_service.h",
+    "initial_webui_profile_service_factory.h",
+  ]
+  sources = [
+    "initial_web_ui_manager.cc",
+    "initial_webui_profile_service.cc",
+    "initial_webui_profile_service_factory.cc",
+  ]
   deps = [
     ":waap_utils",
     ":window_metrics_manager",

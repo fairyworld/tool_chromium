@@ -1303,6 +1303,8 @@ extern const base::FeatureParam<bool> kWebUIReloadButtonPrewarmWebUI;
 COMPONENT_EXPORT(CHROME_FEATURES)
 extern const base::FeatureParam<bool> kWebUIReloadButtonPrewarmWebUIPreNavigate;
 COMPONENT_EXPORT(CHROME_FEATURES)
+extern const base::FeatureParam<bool> kWebUIReloadButtonProfilePrewarming;
+COMPONENT_EXPORT(CHROME_FEATURES)
 extern const base::FeatureParam<bool> kWebUIReloadButtonKeepVisibleUntilPaint;
 COMPONENT_EXPORT(CHROME_FEATURES)
 BASE_DECLARE_FEATURE(kWebUIHomeButton);

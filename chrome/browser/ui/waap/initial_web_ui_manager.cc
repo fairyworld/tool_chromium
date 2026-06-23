@@ -8,13 +8,14 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/toolbar/webui_toolbar_web_view.h"
+#include "chrome/browser/ui/waap/initial_webui_profile_service.h"
+#include "chrome/browser/ui/waap/initial_webui_profile_service_factory.h"
 #include "chrome/browser/ui/waap/initial_webui_window_metrics_manager.h"
 #include "chrome/browser/ui/waap/waap_utils.h"
 #include "chrome/browser/ui/webui/webui_embedding_context.h"
 #include "chrome/common/chrome_features.h"
 #include "content/public/browser/web_contents.h"
 #include "ui/base/unowned_user_data/scoped_unowned_user_data.h"
-
 
 DEFINE_USER_DATA(InitialWebUIManager);
 
@@ -30,6 +31,24 @@ InitialWebUIManager::InitialWebUIManager(BrowserWindowInterface* browser)
       base::FeatureList::IsEnabled(
           features::kWebUIToolbarProcessOverheadExperiment)) {
     Profile* profile = browser->GetProfile();
+
+    if (features::kWebUIReloadButtonProfilePrewarming.Get()) {
+      // If `WebUIReloadButtonProfilePrewarming` is enabled, the WebContents is
+      // created and pre-navigated in the profile service, so we just take it
+      // from there.
+      if (auto* profile_service =
+              InitialWebUIProfileServiceFactory::GetForProfile(profile)) {
+        toolbar_web_contents_ = profile_service->TakeToolbarContents();
+      }
+    }
+
+    if (toolbar_web_contents_) {
+      // The WebContents is already pre-created, bind the BrowserWindowInterface
+      // now.
+      webui::SetBrowserWindowInterface(toolbar_web_contents_.get(), browser);
+      return;
+    }
+
     const bool pre_navigate =
         features::kWebUIReloadButtonPrewarmWebUIPreNavigate.Get() ||
         base::FeatureList::IsEnabled(

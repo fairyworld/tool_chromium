@@ -1844,9 +1844,15 @@ const base::FeatureParam<bool> kWebUIReloadButtonDeferBrowserViewShow{
 // initialization.
 const base::FeatureParam<bool> kWebUIReloadButtonPrewarmWebUI{
     &kWebUIReloadButton, "WebUIReloadButtonPrewarmWebUI", false};
-// When this is enabled, the pre-warmed WebUI will also navigate immediately.
+// When this is enabled, the pre-warmed WebUI will also navigate immediately. It
+// only takes effect when `WebUIReloadButtonPrewarmWebUI` is enabled.
 const base::FeatureParam<bool> kWebUIReloadButtonPrewarmWebUIPreNavigate{
     &kWebUIReloadButton, "WebUIReloadButtonPrewarmWebUIPreNavigate", false};
+// When this is enabled, the WebUI toolbar will be pre-warmed at profile ready
+// time instead of browser initialization time. It only takes effect when
+// `WebUIReloadButtonPrewarmWebUI` is enabled.
+const base::FeatureParam<bool> kWebUIReloadButtonProfilePrewarming{
+    &kWebUIReloadButton, "WebUIReloadButtonProfilePrewarming", false};
 // When this is enabled, the reload button will be marked as visible until its
 // first non-empty paint.
 const base::FeatureParam<bool> kWebUIReloadButtonKeepVisibleUntilPaint{
