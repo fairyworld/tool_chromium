@@ -7612,9 +7612,14 @@
     "expiry_milestone": 150
   },
   {
+    "name": "partition-alloc-scheduler-loop-quarantine",
+    "owners": [ "mikt@google.com", "chrome-memory-safety@google.com" ],
+    "expiry_milestone": 156
+  },
+  {
     "name": "partition-alloc-with-advanced-checks",
     "owners": [ "mikt@google.com", "chrome-memory-safety@google.com" ],
-    "expiry_milestone": 150
+    "expiry_milestone": 156
   },
   {
     "name": "partition-visited-link-database-with-self-links",

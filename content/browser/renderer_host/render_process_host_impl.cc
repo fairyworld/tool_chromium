@@ -3905,6 +3905,7 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
       switches::kMSEVideoBufferSizeLimitMb,
       switches::kNoZygote,
       switches::kOverrideLanguageDetection,
+      switches::kPartitionAllocSchedulerLoopQuarantine,
       switches::kPerfettoDisableInterning,
       switches::kProfilingAtStart,
       switches::kProfilingFile,

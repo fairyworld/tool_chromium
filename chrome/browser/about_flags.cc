@@ -3522,6 +3522,12 @@ const FeatureEntry::FeatureParam
     kPartitionAllocWithAdvancedChecksEnabledProcesses_NonRenderer[] = {
         {"enabled-processes", "non-renderer"}};
 const FeatureEntry::FeatureParam
+    kPartitionAllocWithAdvancedChecksEnabledProcesses_GPUOnly[] = {
+        {"enabled-processes", "gpu-only"}};
+const FeatureEntry::FeatureParam
+    kPartitionAllocWithAdvancedChecksEnabledProcesses_BrowserAndGPU[] = {
+        {"enabled-processes", "browser-and-gpu"}};
+const FeatureEntry::FeatureParam
     kPartitionAllocWithAdvancedChecksEnabledProcesses_AllProcesses[] = {
         {"enabled-processes", "all-processes"}};
 const FeatureEntry::FeatureVariation
@@ -3534,6 +3540,11 @@ const FeatureEntry::FeatureVariation
          nullptr},
         {"on non renderer processes",
          kPartitionAllocWithAdvancedChecksEnabledProcesses_NonRenderer,
+         nullptr},
+        {"on gpu process only",
+         kPartitionAllocWithAdvancedChecksEnabledProcesses_GPUOnly, nullptr},
+        {"on browser and gpu processes",
+         kPartitionAllocWithAdvancedChecksEnabledProcesses_BrowserAndGPU,
          nullptr},
         {"on all processes",
          kPartitionAllocWithAdvancedChecksEnabledProcesses_AllProcesses,
@@ -10449,6 +10460,11 @@ const FeatureEntry kFeatureEntries[] = {
                                     "ContextualCueingV2Options")},
 
 #if PA_BUILDFLAG(USE_PARTITION_ALLOC_AS_MALLOC)
+    {"partition-alloc-scheduler-loop-quarantine",
+     flag_descriptions::kPartitionAllocSchedulerLoopQuarantineName,
+     flag_descriptions::kPartitionAllocSchedulerLoopQuarantineDescription,
+     kOsAll,
+     STRING_VALUE_TYPE(switches::kPartitionAllocSchedulerLoopQuarantine, "")},
     {"partition-alloc-with-advanced-checks",
      flag_descriptions::kPartitionAllocWithAdvancedChecksName,
      flag_descriptions::kPartitionAllocWithAdvancedChecksDescription, kOsAll,
