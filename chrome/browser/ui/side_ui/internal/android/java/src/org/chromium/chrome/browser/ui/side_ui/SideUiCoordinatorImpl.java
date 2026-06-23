@@ -322,28 +322,17 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
 
         // 4. Collect containers whose width needs updating for resize event and transition effect.
         SideUiSpecs currentSideUiSpecs = getCurrentSideUiSpecsInternal();
-        Map<@AnchorSide Integer, Integer> updatedSides = new ArrayMap<>(); // side -> width
-        for (SideUiContainer container : mSideUiContainers) {
-            @AnchorSide int side = container.getAnchorSide();
-            int currentWidth = currentSideUiSpecs.getWidth(side);
-            int newWidth = newSideUiSpecs.getWidth(side);
-            if (currentWidth != newWidth) {
-                updatedSides.put(side, newWidth);
-            }
-        }
+        SideUiSpecs sideUiSpecsDiff = newSideUiSpecs.diffAgainst(currentSideUiSpecs);
 
         // 5. Notify SideUiObservers of the new SideUiShowability.
         mShowabilityNotifier.notify(mSideUiObservers, newSideUiShowability);
 
         // 6. Commit the new SideUiSpecs.
-        if (!updatedSides.isEmpty()) {
+        if (!sideUiSpecsDiff.isEmpty()) {
             // If animating, gather all Transitions into a TransitionSet.
-            SideUiSpecs deltaSideUiSpecs = new SideUiSpecs(updatedSides);
             @Nullable TransitionSet transitionSet =
-                    suppressAnimations
-                            ? null
-                            : collectTransitions(newSideUiSpecs, deltaSideUiSpecs);
-            commitNewSideUiSpecs(newSideUiSpecs, deltaSideUiSpecs, transitionSet);
+                    suppressAnimations ? null : collectTransitions(newSideUiSpecs, sideUiSpecsDiff);
+            commitNewSideUiSpecs(newSideUiSpecs, sideUiSpecsDiff, transitionSet);
         }
     }
 
@@ -433,12 +422,12 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
      * returns a TransitionSet that plays all the Transitions together.
      *
      * @param newSideUiSpecs The new complete {@link SideUiSpecs}.
-     * @param deltaSideUiSpecs The {@link SideUiSpecs} containing the width of {@link AnchorSide}s
+     * @param sideUiSpecsDiff The {@link SideUiSpecs} containing the width of {@link AnchorSide}s
      *     that need updating only.
      */
     // TODO(crbug.com/510059861): Add tests for transition animations.
     private TransitionSet collectTransitions(
-            SideUiSpecs newSideUiSpecs, SideUiSpecs deltaSideUiSpecs) {
+            SideUiSpecs newSideUiSpecs, SideUiSpecs sideUiSpecsDiff) {
         // Rather than use a standard Android or Material interpolator, we instead match the desktop
         // impl's curve found at chrome/browser/ui/views/animations/side_panel_animations.cc.
         TimeInterpolator interpolator = PathInterpolatorCompat.create(0.45f, 0f, 0.12f, 1f);
@@ -448,7 +437,7 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
                         .setOrdering(TransitionSet.ORDERING_TOGETHER)
                         .setInterpolator(interpolator);
 
-        for (Map.Entry<@AnchorSide Integer, Integer> entry : deltaSideUiSpecs.entrySet()) {
+        for (Map.Entry<@AnchorSide Integer, Integer> entry : sideUiSpecsDiff.entrySet()) {
             int side = entry.getKey();
             int width = entry.getValue();
             // Add transitions for the side UI containers.
@@ -475,26 +464,26 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
      * of the given {@code transitionSet}.
      *
      * @param newSideUiSpecs The new, complete {@link SideUiSpecs}.
-     * @param deltaSideUiSpecs The {@link SideUiSpecs} containing the width of {@link AnchorSide}s
+     * @param sideUiSpecsDiff The {@link SideUiSpecs} containing the width of {@link AnchorSide}s
      *     that need updating only.
      * @param transitionSet The {@link TransitionSet} directing the animation for the update. If
      *     null, then no animation is happening for the update.
      */
     private void commitNewSideUiSpecs(
             SideUiSpecs newSideUiSpecs,
-            SideUiSpecs deltaSideUiSpecs,
+            SideUiSpecs sideUiSpecsDiff,
             @Nullable TransitionSet transitionSet) {
         // Update the side containers, with Transitions if available.
         if (transitionSet != null) {
-            commitNewSpecsForAnimatedResize(newSideUiSpecs, deltaSideUiSpecs, transitionSet);
+            commitNewSpecsForAnimatedResize(newSideUiSpecs, sideUiSpecsDiff, transitionSet);
         } else {
-            commitNewSpecsForStaticResize(newSideUiSpecs, deltaSideUiSpecs);
+            commitNewSpecsForStaticResize(newSideUiSpecs, sideUiSpecsDiff);
         }
     }
 
     private void commitNewSpecsForAnimatedResize(
-            SideUiSpecs newSideUiSpecs, SideUiSpecs deltaSideUiSpecs, TransitionSet transitionSet) {
-        for (Map.Entry<@AnchorSide Integer, Integer> entry : deltaSideUiSpecs.entrySet()) {
+            SideUiSpecs newSideUiSpecs, SideUiSpecs sideUiSpecsDiff, TransitionSet transitionSet) {
+        for (Map.Entry<@AnchorSide Integer, Integer> entry : sideUiSpecsDiff.entrySet()) {
             @AnchorSide int anchorSide = entry.getKey();
             int sideUiWidth = entry.getValue();
             SideUiContainer sideUiContainer = assumeNonNull(getSideUiContainerBySide(anchorSide));
@@ -511,7 +500,7 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
                         public void onTransitionEnd(Transition transition) {
                             // Detach and close the container after the transition is complete.
                             for (Map.Entry<@AnchorSide Integer, Integer> entry :
-                                    deltaSideUiSpecs.entrySet()) {
+                                    sideUiSpecsDiff.entrySet()) {
                                 @AnchorSide int anchorSide = entry.getKey();
                                 int sideUiWidth = entry.getValue();
                                 SideUiContainer sideUiContainer =
@@ -536,7 +525,7 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
         ViewUtils.triggerSynchronousMeasureAndLayout(mAnchorContainerParent);
         TransitionManager.beginDelayedTransition(getRootView(), transitionSet);
 
-        for (Map.Entry<@AnchorSide Integer, Integer> entry : deltaSideUiSpecs.entrySet()) {
+        for (Map.Entry<@AnchorSide Integer, Integer> entry : sideUiSpecsDiff.entrySet()) {
             @AnchorSide int anchorSide = entry.getKey();
             int sideUiWidth = entry.getValue();
             ViewGroup anchorContainer = assumeNonNull(mAnchorContainers.get(anchorSide));
@@ -549,13 +538,13 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
     }
 
     private void commitNewSpecsForStaticResize(
-            SideUiSpecs newSideUiSpecs, SideUiSpecs deltaSideUiSpecs) {
+            SideUiSpecs newSideUiSpecs, SideUiSpecs sideUiSpecsDiff) {
         // Reset the side UI containers to clear any leftover state from previous Transitions.
         for (var container : mAnchorContainers.values()) {
             SideUiContainerTransition.resetContainer(container);
         }
 
-        for (Map.Entry<@AnchorSide Integer, Integer> entry : deltaSideUiSpecs.entrySet()) {
+        for (Map.Entry<@AnchorSide Integer, Integer> entry : sideUiSpecsDiff.entrySet()) {
             @AnchorSide int anchorSide = entry.getKey();
             int sideUiWidth = entry.getValue();
             SideUiContainer sideUiContainer = getSideUiContainerBySide(anchorSide);

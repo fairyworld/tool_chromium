@@ -166,6 +166,46 @@ public interface SideUiCoordinator extends SideUiStateProvider {
             return mSideUiWidths.entrySet();
         }
 
+        /**
+         * Calculates the difference between this {@link SideUiSpecs} and the given {@link
+         * SideUiSpecs}.
+         *
+         * <p>For each {@link AnchorSide}, if the widths are different, the returned {@link
+         * SideUiSpecs} retains the width of this {@link SideUiSpecs}. Otherwise, the width is set
+         * to 0.
+         *
+         * <p>The returned {@link SideUiSpecs} is useful for only updating the parts in the UI that
+         * are changed.
+         *
+         * @param sideUiSpecs The {@link SideUiSpecs} to compare against.
+         * @return A {@link SideUiSpecs} representing the diff.
+         */
+        public SideUiSpecs diffAgainst(SideUiSpecs sideUiSpecs) {
+            Map<@AnchorSide Integer, Integer> diffWidths = new ArrayMap<>();
+
+            for (@AnchorSide int side = 0; side < AnchorSide.NUM_ENTRIES; side++) {
+                Integer thisWidth = mSideUiWidths.get(side);
+                Integer otherWidth = sideUiSpecs.mSideUiWidths.get(side);
+
+                if (thisWidth == null && otherWidth == null) {
+                    continue;
+                }
+
+                if (thisWidth == null) {
+                    diffWidths.put(side, 0);
+                } else if (!thisWidth.equals(otherWidth)) {
+                    diffWidths.put(side, thisWidth);
+                }
+            }
+
+            return new SideUiSpecs(diffWidths);
+        }
+
+        /** Returns true if the width for any {@link AnchorSide} doesn't exist. */
+        public boolean isEmpty() {
+            return mSideUiWidths.isEmpty();
+        }
+
         @Override
         public boolean equals(@Nullable Object obj) {
             if (!(obj instanceof SideUiSpecs that)) return false;
