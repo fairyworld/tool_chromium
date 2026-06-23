@@ -15,7 +15,6 @@ import org.chromium.base.supplier.NullableObservableSupplier;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.feature_engagement.TrackerFactory;
-import org.chromium.chrome.browser.glic.GlicEnabling;
 import org.chromium.chrome.browser.glic.GlicKeyedService;
 import org.chromium.chrome.browser.glic.GlicKeyedServiceFactory;
 import org.chromium.chrome.browser.profiles.Profile;
@@ -257,7 +256,8 @@ public class BottomBarMediator
 
         // Calculate and set visibility.
         long startTime = SystemClock.uptimeMillis();
-        boolean shouldBeVisible = GlicEnabling.isEnabledForProfile(originalProfile);
+        boolean shouldBeVisible =
+                BottomBarActionEligibility.getEligibleExtraAction(originalProfile) == ActionId.GLIC;
         long decisionDuration = SystemClock.uptimeMillis() - startTime;
 
         BottomBarMetrics.recordGlicVisibilityDecisionTime(decisionDuration);

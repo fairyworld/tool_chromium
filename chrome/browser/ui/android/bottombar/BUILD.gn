@@ -55,6 +55,7 @@ android_library("java") {
   sources = [
     "java/src/org/chromium/chrome/browser/ui/bottombar/AppMenuActionButtonBinder.java",
     "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBar.java",
+    "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarActionEligibility.java",
     "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarAppMenu.java",
     "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarButtonContainer.java",
     "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarButtonManager.java",
@@ -110,6 +111,7 @@ android_library("java") {
 robolectric_library("junit") {
   sources = [
     "java/src/org/chromium/chrome/browser/ui/bottombar/AppMenuActionButtonBinderUnitTest.java",
+    "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarActionEligibilityUnitTest.java",
     "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarButtonContainerUnitTest.java",
     "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarButtonManagerUnitTest.java",
     "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarConfigUtilsUnitTest.java",
