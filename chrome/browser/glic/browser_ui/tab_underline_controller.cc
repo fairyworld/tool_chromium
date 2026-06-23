@@ -177,6 +177,10 @@ void TabUnderlineController::OnContextTabsChanged(
           : UpdateUnderlineReason::kContextualTask_TabNotInContext);
 }
 
+void TabUnderlineController::OnActiveTaskContextProviderDestroyed() {
+  contextual_task_observation_.Reset();
+}
+
 void TabUnderlineController::PanelStateChanged(
     const glic::mojom::PanelState& panel_state) {
   UpdateUnderlineView(
