@@ -597,12 +597,15 @@ std::string GetJournalLogsAsJson(actor::AggregatedJournal* journal) {
 
   actor::ActorTaskId task_id = actorService->CreateTask(
       "AI Prototyping Test Task", /*allow_incognito_web_states=*/false);
+  actorService->AddControlledWebState(task_id,
+                                      _webStateList->GetActiveWebState());
 
   actorService->PerformActions(
       task_id, actions, "Executing AI Prototyping actions",
       base::BindOnce(^(actor::PerformActionsResult result) {
         [weakSelf onActionsPerformed:std::move(result.action_results)
-                         withActions:actions];
+                         withActions:actions
+                              taskId:task_id];
       }));
 }
 
@@ -610,10 +613,16 @@ std::string GetJournalLogsAsJson(actor::AggregatedJournal* journal) {
 - (void)onActionsPerformed:(std::vector<actor::ActionResult>)results
                withActions:
                    (const std::vector<optimization_guide::proto::Action>&)
-                       actions {
+                       actions
+                    taskId:(actor::ActorTaskId)taskId {
   actor::ActorService* actorService =
       actor::ActorServiceFactory::GetForProfile(ProfileIOS::FromBrowserState(
           _webStateList->GetActiveWebState()->GetBrowserState()));
+
+  if (actorService) {
+    actorService->StopTask(taskId,
+                           actor::ActorTaskStoppedReason::kTaskComplete);
+  }
 
   NSString* result_text = @"";
   std::string summary_str = "Action Results:\n";
