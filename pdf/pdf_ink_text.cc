@@ -232,7 +232,7 @@ InkTextInfo::InkTextInfo(InkTextInfo&&) noexcept = default;
 InkTextInfo& InkTextInfo::operator=(InkTextInfo&&) noexcept = default;
 InkTextInfo::~InkTextInfo() = default;
 
-std::vector<InkTextInfo> InkTextInfo::SplitTypefaceRuns(
+std::vector<InkTextInfo> InkTextInfo::BlinkTextInfoToPDFTextInfo(
     const std::vector<pdf::mojom::InkTextRunPtr>& text_runs,
     float effective_zoom) {
   std::vector<InkTextInfo> results;
