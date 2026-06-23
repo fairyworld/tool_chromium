@@ -26,6 +26,50 @@ namespace readaloud {
 
 namespace {
 
+class MockDelegate : public ReadAloudService::Delegate {
+ public:
+  MockDelegate() = default;
+  ~MockDelegate() override = default;
+
+  MOCK_METHOD(void,
+              OnMetadataAvailable,
+              (std::string_view title, std::string_view publisher),
+              (override));
+  MOCK_METHOD(void,
+              OnPlaybackProgressUpdated,
+              (base::TimeDelta elapsed, base::TimeDelta duration),
+              (override));
+  MOCK_METHOD(void,
+              OnPlaybackStateChanged,
+              (ReadAloudService::PlaybackState playback_state),
+              (override));
+  MOCK_METHOD(void,
+              OnVoicesAvailable,
+              (const std::vector<ReadAloudService::Voice>& voices,
+               std::string_view selected_voice_id),
+              (override));
+  MOCK_METHOD(void,
+              OnWordHighlightUpdated,
+              (int absolute_start_index, int absolute_end_index),
+              (override));
+  MOCK_METHOD(void, OnHighlightingSupported, (bool supported), (override));
+  MOCK_METHOD(void, OnFallbackEngaged, (), (override));
+  MOCK_METHOD(void,
+              OnPlaybackError,
+              (std::string_view error_message),
+              (override));
+  MOCK_METHOD(void,
+              OnVoicePreviewPlaybackStateChanged,
+              (std::string_view voice_id,
+               ReadAloudService::PlaybackState playback_state),
+              (override));
+  MOCK_METHOD(void,
+              OnReadabilityResult,
+              (const GURL& url, bool is_readable),
+              (override));
+  MOCK_METHOD(void, OnNativeDestroyed, (), (override));
+};
+
 class MockDomDistillerService
     : public dom_distiller::DomDistillerContextKeyedService {
  public:
@@ -140,6 +184,24 @@ TEST_F(ReadAloudServiceTest, ShutdownClearsHandle) {
 
   service()->Shutdown();
   EXPECT_EQ(nullptr, service()->GetViewerHandleForTesting());
+}
+
+TEST_F(ReadAloudServiceTest, SetDelegateAndShutdownLifecycle) {
+  auto delegate = std::make_unique<testing::StrictMock<MockDelegate>>();
+  MockDelegate* delegate_ptr = delegate.get();
+
+  // Initially, there is no delegate.
+  EXPECT_EQ(nullptr, service()->delegate());
+
+  // Registering the delegate should succeed and be accessible.
+  service()->SetDelegate(std::move(delegate));
+  EXPECT_EQ(delegate_ptr, service()->delegate());
+
+  // Shutdown should trigger OnNativeDestroyed() exactly once and clear the
+  // delegate.
+  EXPECT_CALL(*delegate_ptr, OnNativeDestroyed()).Times(1);
+  service()->Shutdown();
+  EXPECT_EQ(nullptr, service()->delegate());
 }
 
 }  // namespace readaloud

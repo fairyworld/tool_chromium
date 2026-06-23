@@ -16,7 +16,31 @@ ReadAloudService::ReadAloudService(Profile* profile) : profile_(profile) {}
 
 ReadAloudService::~ReadAloudService() = default;
 
+void ReadAloudService::SetDelegate(std::unique_ptr<Delegate> delegate) {
+  delegate_ = std::move(delegate);
+}
+
+void ReadAloudService::Play() {}
+void ReadAloudService::Pause() {}
+void ReadAloudService::Stop() {}
+void ReadAloudService::SeekToWordIndex(int word_index) {}
+void ReadAloudService::Seek(base::TimeDelta absolute_time) {}
+void ReadAloudService::SeekRelative(base::TimeDelta offset) {}
+void ReadAloudService::SetPlaybackRate(float rate) {}
+void ReadAloudService::SetVoice(std::string_view voice_id) {}
+void ReadAloudService::PreviewVoice(std::string_view voice_id) {}
+void ReadAloudService::StopVoicePreview() {}
+void ReadAloudService::SetPlaybackMode(PlaybackMode mode) {}
+void ReadAloudService::SetHighlightingEnabled(bool enabled) {}
+void ReadAloudService::SendFeedback(FeedbackType feedback_type) {}
+void ReadAloudService::CheckReadability(const GURL& url) {}
+
 void ReadAloudService::Shutdown() {
+  weak_factory_.InvalidateWeakPtrs();
+  if (delegate_) {
+    delegate_->OnNativeDestroyed();
+    delegate_.reset();
+  }
   viewer_handle_.reset();
 }
 
