@@ -499,7 +499,6 @@ try/chromeos-amd64-generic-asan-rel
 try/chromeos-amd64-generic-cfi-thin-lto-rel
 try/chromeos-amd64-generic-dbg
 try/chromeos-amd64-generic-rel
-try/chromeos-amd64-generic-rel-gtest
 try/chromeos-arm-generic-dbg
 try/chromeos-arm-generic-rel
 try/chromeos-arm64-generic-rel
