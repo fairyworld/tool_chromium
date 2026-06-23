@@ -689,12 +689,6 @@ bool GlicGlobalEnabling::IsEnabledByGlobalCriteria() {
   return is_enabled && IsOsVersionSupported() && IsSystemRequirementMet();
 }
 
-bool GlicEnabling::IsOsVersionSupported() {
-  return g_browser_process->GetFeatures()
-      ->glic_global_enabling()
-      .IsOsVersionSupported();
-}
-
 // static
 bool GlicEnabling::IsEnabledByGlobalCriteria() {
   return g_browser_process->GetFeatures()

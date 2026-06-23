@@ -11,7 +11,6 @@
 #include "base/containers/adapters.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback_helpers.h"
-#include "base/memory/raw_ptr.h"
 #include "base/strings/string_util.h"
 #include "base/test/bind.h"
 #include "base/test/gmock_expected_support.h"
@@ -19,7 +18,6 @@
 #include "base/types/expected.h"
 #include "base/types/expected_macros.h"
 #include "build/build_config.h"
-#include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/tab_list/tab_list_interface.h"
 #include "chrome/browser/ui/browser_commands.h"
@@ -30,13 +28,12 @@
 #include "content/public/browser/page_navigator.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/test_navigation_observer.h"
-#include "ui/base/base_window.h"
 #include "ui/base/page_transition_types.h"
 #include "ui/base/window_open_disposition.h"
+#include "ui/gfx/geometry/point_conversions.h"
 
 #if BUILDFLAG(IS_ANDROID)
 #include "base/android/device_info.h"
-#include "build/android_buildflags.h"
 #include "chrome/browser/flags/android/chrome_feature_list.h"
 #include "chrome/browser/ui/android/tab_model/tab_model.h"
 #include "chrome/browser/ui/android/tab_model/tab_model_list.h"
@@ -170,47 +167,22 @@ class GlicTabEventCollector {
 
 class GlicTabObserverBrowserTest : public PlatformBrowserTest {
  public:
-  GlicTabObserverBrowserTest() = default;
-
   ~GlicTabObserverBrowserTest() override = default;
 
   void SetUpDefaultCommandLine(base::CommandLine* command_line) override {
     PlatformBrowserTest::SetUpDefaultCommandLine(command_line);
-#if BUILDFLAG(IS_DESKTOP_ANDROID)
-    command_line->AppendSwitch(switches::kForceDesktopAndroid);
-#endif
 #if BUILDFLAG(IS_ANDROID)
-    command_line->AppendSwitch("disable-fre");
+    command_line->AppendSwitch(switches::kForceDesktopAndroid);
 #endif
   }
 
  protected:
   void SetUpOnMainThread() override {
-    if (!glic::GlicEnabling::IsOsVersionSupported()) {
-      GTEST_SKIP() << "OS version not supported by Glic";
-    }
     PlatformBrowserTest::SetUpOnMainThread();
     ASSERT_TRUE(GetProfile());
   }
 
-  BrowserWindowInterface* CreateNewWindowWithTab() {
-    BrowserWindowCreateParams create_params(BrowserWindowInterface::TYPE_NORMAL,
-                                            *GetProfile(), false);
-    base::test::TestFuture<BrowserWindowInterface*> future;
-    CreateBrowserWindow(std::move(create_params), future.GetCallback());
-    BrowserWindowInterface* window = future.Get();
-    CHECK(window);
-    TabListInterface* tab_list = TabListInterface::From(window);
-    CHECK(tab_list);
-    tabs::TabInterface* active_tab = tab_list->GetActiveTab();
-    if (!active_tab) {
-      active_tab = CreateTab(tab_list);
-    }
-    CHECK(active_tab);
-    return window;
-  }
-
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
+#if !BUILDFLAG(IS_ANDROID)
   TabListInterface* CreateIncognitoTabList() {
     Profile* incognito_profile =
         GetProfile()->GetPrimaryOTRProfile(/*create_if_needed=*/true);
@@ -276,9 +248,18 @@ class GlicTabObserverBrowserTest : public PlatformBrowserTest {
     navigation_observer.Wait();
     return creation;
   }
+
+ private:
+  base::test::ScopedFeatureList feature_list_;
 };
 
 IN_PROC_BROWSER_TEST_F(GlicTabObserverBrowserTest, ObservesTabCreation) {
+#if BUILDFLAG(IS_ANDROID)
+  // TODO(b/477918431): Flaky on non-desktop Android.
+  if (!base::android::device_info::is_desktop()) {
+    GTEST_SKIP() << "Skipping on non-desktop Android";
+  }
+#endif
   GlicTabEventCollector collector(GetProfile());
 
   // Initial tab verification
@@ -303,6 +284,8 @@ IN_PROC_BROWSER_TEST_F(GlicTabObserverBrowserTest, ObservesTabCreation) {
   EXPECT_EQ(creation.new_tab.get(), third_tab);
 }
 
+// TODO: See if we can create a multi-window test on android.
+#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(GlicTabObserverBrowserTest,
                        ObservesTabCreationInNewWindow) {
   GlicTabEventCollector collector(GetProfile());
@@ -322,10 +305,6 @@ IN_PROC_BROWSER_TEST_F(GlicTabObserverBrowserTest,
   EXPECT_NE(creation.new_tab, nullptr);
 }
 
-// Mobile Android does not support programmatically creating separate browser
-// window tasks with an OTR profile; attempting to do so triggers a profile
-// assertion crash in ChromeAndroidTaskImpl.java at startup.
-#if !BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_DESKTOP_ANDROID)
 IN_PROC_BROWSER_TEST_F(GlicTabObserverBrowserTest,
                        DoesNotObserveTabCreationInDifferentProfile) {
   TabListInterface* incognito_tab_list = CreateIncognitoTabList();
@@ -393,15 +372,16 @@ IN_PROC_BROWSER_TEST_F(GlicTabObserverBrowserTest, ObservesTabMove) {
   collector.WaitForMutation();
 }
 
+#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(GlicTabObserverBrowserTest, ObservesTabStripMerge) {
-  BrowserWindowInterface* window2 = CreateNewWindowWithTab();
-  TabListInterface* tab_list2 = TabListInterface::From(window2);
-  tabs::TabInterface* tab_to_move = tab_list2->GetActiveTab();
-
+  Browser* browser2 = CreateBrowser(GetProfile());
   GlicTabEventCollector collector(GetProfile());
 
-  tab_list2->MoveTabToWindow(tab_to_move->GetHandle(),
-                             GetBrowserWindowInterface()->GetSessionID(), 0);
+  std::unique_ptr<content::WebContents> contents =
+      browser2->tab_strip_model()->DetachWebContentsAtForInsertion(0);
+
+  browser()->tab_strip_model()->InsertWebContentsAt(0, std::move(contents),
+                                                    AddTabTypes::ADD_ACTIVE);
 
   // We expect both insertion and likely some mutations from the detach/insert.
   ASSERT_OK(collector.WaitForCreation());
@@ -422,21 +402,29 @@ IN_PROC_BROWSER_TEST_F(GlicTabObserverBrowserTest, ObservesTabStripMerge) {
 
   EXPECT_TRUE(found_removal);
   EXPECT_TRUE(found_insertion);
-
-  window2->GetWindow()->Close();
 }
+#endif
 
+#if !BUILDFLAG(IS_ANDROID)
 IN_PROC_BROWSER_TEST_F(GlicTabObserverBrowserTest,
                        TabMoveDoesNotClassifyAsNewCreation) {
-  BrowserWindowInterface* window2 = CreateNewWindowWithTab();
-  TabListInterface* tab_list2 = TabListInterface::From(window2);
-  tabs::TabInterface* tab_to_move = tab_list2->GetActiveTab();
-  NavigateTab(tab_to_move, GURL("about:blank"));
-
+  Browser* browser2 = CreateBrowser(GetProfile());
   GlicTabEventCollector collector(GetProfile());
 
-  tab_list2->MoveTabToWindow(tab_to_move->GetHandle(),
-                             GetBrowserWindowInterface()->GetSessionID(), 0);
+  // 1. Navigate browser2's tab so it has a visible, typed navigation entry.
+  tabs::TabInterface* tab_to_move =
+      TabListInterface::From(browser2)->GetActiveTab();
+  ASSERT_TRUE(tab_to_move);
+  NavigateTab(tab_to_move, GURL("about:blank"));
+  collector.WaitForMutation();
+  collector.ClearEvents();
+
+  // 2. Detach and insert into the first browser window. This is a move.
+  std::unique_ptr<tabs::TabModel> tab_model =
+      browser2->tab_strip_model()->DetachTabAtForInsertion(0);
+
+  browser()->tab_strip_model()->InsertDetachedTabAt(0, std::move(tab_model),
+                                                    AddTabTypes::ADD_ACTIVE);
 
   // 3. Wait for the tab creation event.
   ASSERT_OK_AND_ASSIGN(auto creation, collector.WaitForCreation());
@@ -453,9 +441,8 @@ IN_PROC_BROWSER_TEST_F(GlicTabObserverBrowserTest,
     }
   }
   EXPECT_EQ(creation_event_count, 1);
-
-  window2->GetWindow()->Close();
 }
+#endif
 
 IN_PROC_BROWSER_TEST_F(GlicTabObserverBrowserTest, ObservesTabNavigation) {
   GlicTabEventCollector collector(GetProfile());
@@ -533,10 +520,11 @@ IN_PROC_BROWSER_TEST_F(GlicTabObserverBrowserTest, LinkClickNewWindowTracking) {
                                           first_tab, params, collector));
   ASSERT_TRUE(creation.new_tab);
 
+// GetBrowserWindowInterface() always returns nullptr on non-desktop Android.
+// And android browser tests don't allow multiple windows, so this test will
+// open the tab a new tab in the same window.
 #if !BUILDFLAG(IS_ANDROID)
-  // Android forces the NEW_WINDOW disposition to open in the same window,
-  // returning the same BrowserWindowInterface pointer. Only assert they are
-  // different on other platforms.
+  // Verify that it opened in a new window
   EXPECT_NE(creation.new_tab->GetBrowserWindowInterface(),
             first_tab->GetBrowserWindowInterface());
 #endif
