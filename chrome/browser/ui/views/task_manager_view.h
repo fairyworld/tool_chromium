@@ -127,7 +127,6 @@ class TaskManagerView : public TableViewDelegate,
     bool table_has_border;
     bool table_refresh;
     bool dialog_button_disabled;
-    bool sort_on_cpu_by_default;
   };
 
   friend class TaskManagerViewTest;

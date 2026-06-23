@@ -402,7 +402,6 @@ TaskManagerView::TableConfigs TaskManagerView::GetTableConfigs() {
       .table_has_border = false,
       .table_refresh = true,
       .dialog_button_disabled = true,
-      .sort_on_cpu_by_default = true,
   };
 }
 
@@ -683,8 +682,7 @@ void TaskManagerView::Init() {
       gfx::RoundedCornersF(corner_radius));
   scroll_view_layer->SetIsFastRoundedCorner(true);
 
-  table_model_->RetrieveSavedColumnsSettingsAndUpdateTable(
-      table_config_.sort_on_cpu_by_default);
+  table_model_->RetrieveSavedColumnsSettingsAndUpdateTable(true);
 
   RestoreSavedCategory();
 
