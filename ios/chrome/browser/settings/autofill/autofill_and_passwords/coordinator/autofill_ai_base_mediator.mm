@@ -221,8 +221,13 @@
     item.trailingText = l10n_util::GetNSString(IDS_IOS_AUTOFILL_WALLET_TEXT);
   }
 
+  const bool isPersonalContext =
+      instance.record_type() ==
+      autofill::EntityInstance::RecordType::kPersonalContext;
+
   item.icon = autofill::DefaultIconForAutofillAiEntityType(
-      instance.type().name(), [[self class] entityIconPointSize], nil);
+      instance.type().name(), isPersonalContext,
+      [[self class] entityIconPointSize], nil);
   return item;
 }
 
