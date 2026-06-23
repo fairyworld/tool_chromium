@@ -4,6 +4,8 @@
 
 #include "components/sync_device_info/device_name_util.h"
 
+#include <optional>
+
 #include "base/check.h"
 #include "base/containers/flat_map.h"
 #include "base/containers/flat_set.h"
@@ -23,10 +25,25 @@ namespace syncer {
 
 namespace {
 
+constexpr char kWindowsDesktopPrefix[] = "DESKTOP-";
+constexpr char kWindowsLaptopPrefix[] = "LAPTOP-";
+
 // Returns the localized string resource ID of the device type based on its
-// form factor.
-int GetSharingDeviceTypeStringId(DeviceInfo::FormFactor form_factor) {
-  switch (form_factor) {
+// form factor, or Windows generic device type if applicable.
+int GetSharingDeviceTypeStringId(const DeviceInfo& device) {
+  if (device.os_type() == DeviceInfo::OsType::kWindows &&
+      base::FeatureList::IsEnabled(kSyncSimplifyDeviceNaming)) {
+    if (base::StartsWith(device.client_name(), kWindowsDesktopPrefix,
+                         base::CompareCase::SENSITIVE)) {
+      return IDS_SHARING_DEVICE_TYPE_DESKTOP;
+    }
+    if (base::StartsWith(device.client_name(), kWindowsLaptopPrefix,
+                         base::CompareCase::SENSITIVE)) {
+      return IDS_SHARING_DEVICE_TYPE_LAPTOP;
+    }
+  }
+
+  switch (device.form_factor()) {
     case DeviceInfo::FormFactor::kDesktop:
       return IDS_SHARING_DEVICE_TYPE_COMPUTER;
     case DeviceInfo::FormFactor::kPhone:
@@ -77,6 +94,16 @@ bool IsClientNameHighQuality(const DeviceInfo* device) {
   // https://developer.apple.com/documentation/uikit/uidevice/name#Discussion
   if (device->os_type() == DeviceInfo::OsType::kIOS) {
     if (client_name == "iPhone" || client_name == "iPad") {
+      return false;
+    }
+  }
+
+  if (device->os_type() == DeviceInfo::OsType::kWindows &&
+      base::FeatureList::IsEnabled(kSyncSimplifyDeviceNaming)) {
+    if (base::StartsWith(client_name, kWindowsDesktopPrefix,
+                         base::CompareCase::SENSITIVE) ||
+        base::StartsWith(client_name, kWindowsLaptopPrefix,
+                         base::CompareCase::SENSITIVE)) {
       return false;
     }
   }
@@ -141,10 +168,9 @@ DisplayNameCandidates GetDisplayNameCandidates(const DeviceInfo* device) {
   // TODO(crbug.com/522788942): This string concatenation is an i18n
   // anti-pattern. It should be refactored to use a translatable string template
   // with placeholders.
-  std::string preferred_name_if_unique =
-      base::StrCat({manufacturer, " ",
-                    l10n_util::GetStringUTF8(
-                        GetSharingDeviceTypeStringId(device->form_factor()))});
+  std::string preferred_name_if_unique = base::StrCat(
+      {manufacturer, " ",
+       l10n_util::GetStringUTF8(GetSharingDeviceTypeStringId(*device))});
   std::string fallback_full_name =
       base::StrCat({preferred_name_if_unique, " ", model});
   return {.preferred_name_if_unique = preferred_name_if_unique,
