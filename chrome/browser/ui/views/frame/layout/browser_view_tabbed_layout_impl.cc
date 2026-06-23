@@ -1369,8 +1369,6 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
   // container in transparency mode.
   std::vector<const views::View*> top_container_cutout_views;
   std::vector<const views::View*> main_background_cutout_views;
-  std::vector<const views::View*> tab_strip_cutout_views;
-  float glass_alpha = 1.0f;
 
   // Set vertical tabstrip corners.
   if (layout_data_->tab_strip_type == TabStripType::kVertical) {
@@ -1385,13 +1383,13 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
     CHECK(vertical_tabs_background)
         << "Expected vertical tab strip to have a CustomCornersBackground.";
 
-    if (features::IsGlassFrameEnabled()) {
-      if (!is_fullscreen(layout_data_->window_state)) {
-        if (animation.tab_strip_width != 0.0) {
-          glass_alpha = 1.0f - animation.tab_strip_width;
-        } else {
-          glass_alpha = delegate().IsVerticalTabStripCollapsed() ? 1.0f : 0.0f;
-        }
+    float glass_alpha = 1.0f;
+    if (features::IsGlassFrameEnabled() &&
+        !is_fullscreen(layout_data_->window_state)) {
+      if (animation.tab_strip_width != 0.0) {
+        glass_alpha = 1.0f - animation.tab_strip_width;
+      } else {
+        glass_alpha = delegate().IsVerticalTabStripCollapsed() ? 1.0f : 0.0f;
       }
       vertical_tabs_background->SetPrimaryColor(
           CustomCorners::ColorChoiceWithAlpha(CustomCorners::FrameTheme(),
@@ -1473,17 +1471,14 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
     }
 
     CustomCornersBackground::Outline vertical_tabs_outline;
-    vertical_tabs_outline.color = {
-        .color = kColorVerticalTabStripShadow,
-        // Vertical tabs outline fades partially during expand-on-hover to be
-        // replaced with shadow. Note that the glass alpha will affect the
-        // entire paint operation, so no need to re-multiply it in here.
-        .opacity =
-            static_cast<float>(1.0f - kVerticalTabStripOutlineFadeOnHover *
-                                          vertical_tabs_bottom_corner_amount) *
-            glass_alpha,
-    };
-    // Vertical tab strip always draws trailing edge.
+    vertical_tabs_outline.color = kColorVerticalTabStripShadow;
+    // Vertical tabs outline fades partially during expand-on-hover to be
+    // replaced with shadow. Note that the glass alpha will affect the entire
+    // paint operation, so no need to re-multiply it in here.
+    vertical_tabs_outline.opacity =
+        1.0 - kVerticalTabStripOutlineFadeOnHover *
+                  vertical_tabs_bottom_corner_amount * glass_alpha;
+    // Vertical tabs outline always draws trailing edge.
     vertical_tabs_outline.trailing = true;
     // Top edge is drawn when the tabstrip is not flush with the edge of the
     // screen, or with a visual element that provides a natural border.
@@ -1497,54 +1492,33 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
     vertical_tabs_background->SetOutline(vertical_tabs_outline);
 
     // Cut the vertical tab strip out of the top container.
-    if (glass_alpha < 1.0f) {
+    top_container_cutout_views.push_back(
+        views().vertical_tab_strip_region_view);
+    if (animation.top_corner > 0) {
       top_container_cutout_views.push_back(
-          views().vertical_tab_strip_region_view);
-      if (animation.top_corner > 0) {
-        top_container_cutout_views.push_back(
-            views().vertical_tab_strip_top_corner);
-        tab_strip_cutout_views.push_back(views().vertical_tab_strip_top_corner);
-      }
-      main_background_cutout_views = top_container_cutout_views;
-      if (animation.bottom_corner > 0) {
-        main_background_cutout_views.push_back(
-            views().vertical_tab_strip_bottom_corner);
-        tab_strip_cutout_views.push_back(
-            views().vertical_tab_strip_bottom_corner);
-      }
+          views().vertical_tab_strip_top_corner);
     }
-
-    // Do corner cutouts and transparency.
-    if (features::IsGlassFrameEnabled()) {
-      views().vertical_tab_strip_top_corner->SetAlpha(glass_alpha);
-      // Set bottom corner alpha when proper cutout is available from the
-      // contents and side panel.
-      // views().vertical_tab_strip_bottom_corner->SetAlpha(glass_alpha);
-      vertical_tabs_background->SetCutoutFrom(tab_strip_cutout_views);
+    main_background_cutout_views = top_container_cutout_views;
+    if (animation.bottom_corner > 0) {
+      main_background_cutout_views.push_back(
+          views().vertical_tab_strip_bottom_corner);
     }
   }
 
-  auto* const toolbar_background =
-      views().toolbar->background()->AsA<CustomCornersBackground>();
-  auto* const top_container_background =
-      views().top_container->background()->AsA<CustomCornersBackground>();
-  CHECK(toolbar_background)
-      << "Expected toolbar to have a CustomCornersBackground.";
-  CHECK(top_container_background)
-      << "Expected top container to have a CustomCornersBackground.";
-
-  // Set up top container cutouts.
-  if (features::IsGlassFrameEnabled()) {
-    if (!is_fullscreen(layout_data_->window_state)) {
-      top_container_background->SetCutoutFrom(top_container_cutout_views);
-      toolbar_background->SetCutoutFrom(top_container_cutout_views);
-    } else {
-      top_container_background->SetCutoutFrom({});
-      toolbar_background->SetCutoutFrom({});
-    }
+  if (!is_fullscreen(layout_data_->window_state) &&
+      features::IsGlassFrameEnabled()) {
+    // Do the top container cutouts.
+    views()
+        .top_container->background()
+        ->AsA<CustomCornersBackground>()
+        ->SetCutoutFrom(top_container_cutout_views);
   }
 
   // Set toolbar corners.
+  auto* const toolbar_background =
+      views().toolbar->background()->AsA<CustomCornersBackground>();
+  CHECK(toolbar_background)
+      << "Expected toolbar to have a CustomCornersBackground.";
   CustomCornersBackground::Corners toolbar_corners;
   switch (layout_data_->tab_strip_type) {
     case TabStripType::kHorizontal: {

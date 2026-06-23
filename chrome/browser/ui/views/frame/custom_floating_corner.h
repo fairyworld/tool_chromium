@@ -40,19 +40,13 @@ class CustomFloatingCorner : public views::View, public CustomCorners {
   CustomFloatingCorner(BrowserView& browser_view,
                        CornerOrientation orientation,
                        views::ShapeContextTokens corner_radius_token,
-                       ColorChoice background,
-                       std::optional<ui::ColorId> stroke = std::nullopt,
-                       bool is_vertical_window_edge = false);
-  CustomFloatingCorner(BrowserView& browser_view,
-                       CornerOrientation orientation,
-                       views::ShapeContextTokens corner_radius_token,
-                       ColorChoiceWithAlpha background,
-                       std::optional<ColorWithAlpha> stroke = std::nullopt,
+                       ColorChoice color,
+                       std::optional<ui::ColorId> stroke_color = std::nullopt,
                        bool is_vertical_window_edge = false);
   ~CustomFloatingCorner() override;
 
-  // Sets the background color to paint the corner.
-  void SetBackground(ColorChoiceWithAlpha color);
+  // Sets the color to paint the corner.
+  void SetColor(ColorChoice color);
 
   // Sets the corner orientation.
   void SetOrientation(CornerOrientation orientation);
@@ -62,11 +56,8 @@ class CustomFloatingCorner : public views::View, public CustomCorners {
 
   // Sets a stroke, or no stroke (std::nullopt). If `is_vertical_window_edge` is
   // true, the stroke ends outside the vertical bounds of the corner.
-  void SetStroke(std::optional<ColorWithAlpha> stroke_color,
+  void SetStroke(std::optional<ui::ColorId> stroke_color,
                  bool is_vertical_window_edge);
-
-  // Convenience method to update alpha for both stroke and background.
-  void SetAlpha(float alpha);
 
   // Returns the background path of the corner.
   SkPath GetBackgroundPath(const gfx::Rect& in_bounds) const;
@@ -87,8 +78,8 @@ class CustomFloatingCorner : public views::View, public CustomCorners {
 
   CornerOrientation orientation_;
   views::ShapeContextTokens corner_radius_token_;
-  ColorChoiceWithAlpha background_;
-  std::optional<ColorWithAlpha> stroke_;
+  ColorChoice color_;
+  std::optional<ui::ColorId> stroke_color_;
   bool is_vertical_window_edge_ = false;
 };
 

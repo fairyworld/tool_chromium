@@ -57,22 +57,6 @@ class CustomCorners : public views::ViewObserver {
     inline bool is_visible() const { return opacity > 0.0; }
   };
 
-  // A color ID plus an alpha value.
-  struct ColorWithAlpha {
-    // The color ID.
-    ui::ColorId color;
-
-    // The opacity. Special handling may be applied if this value is 0 (fully
-    // transparent) or 1 (full opaque).
-    float opacity = 1.0f;
-
-    friend bool operator==(const ColorWithAlpha& left,
-                           const ColorWithAlpha& right) = default;
-
-    inline bool is_opaque() const { return opacity == 1.0; }
-    inline bool is_visible() const { return opacity > 0.0; }
-  };
-
   CustomCorners(const CustomCorners&) = delete;
   void operator=(const CustomCorners&) = delete;
   ~CustomCorners() override;
