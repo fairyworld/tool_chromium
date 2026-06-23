@@ -756,7 +756,7 @@ HatsService::LaunchError HatsServiceDesktop::ShowSurvey(
     survey_configs_by_triggers_[trigger].trigger_id =
         std::string(supplied_trigger_id.value());
   }
-  browser->window()->ShowHatsDialog(
+  BrowserWindow::FromBrowser(browser)->ShowHatsDialog(
       survey_configs_by_triggers_[trigger].trigger_id,
       survey_configs_by_triggers_[trigger].hats_histogram_name,
       survey_configs_by_triggers_[trigger].hats_survey_ukm_id,

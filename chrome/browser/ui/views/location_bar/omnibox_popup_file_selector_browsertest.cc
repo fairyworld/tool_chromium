@@ -178,8 +178,9 @@ IN_PROC_BROWSER_TEST_F(OmniboxPopupFileSelectorBrowserTest,
 IN_PROC_BROWSER_TEST_F(OmniboxPopupFileSelectorBrowserTest,
                        UploadLimitExceededTriggersMaxImagesError) {
   // Arrange.
-  auto* omnibox_controller =
-      browser()->window()->GetLocationBar()->GetOmniboxController();
+  auto* omnibox_controller = BrowserWindow::FromBrowser(browser())
+                                 ->GetLocationBar()
+                                 ->GetOmniboxController();
   MockOmniboxEditModel mock_edit_model(omnibox_controller);
 
   OmniboxPopupFileSelector file_selector(
@@ -221,8 +222,9 @@ IN_PROC_BROWSER_TEST_F(OmniboxPopupFileSelectorBrowserTest,
 IN_PROC_BROWSER_TEST_F(OmniboxPopupFileSelectorBrowserTest,
                        UploadLimitExceededTriggersMaxPdfsError) {
   // Arrange.
-  auto* omnibox_controller =
-      browser()->window()->GetLocationBar()->GetOmniboxController();
+  auto* omnibox_controller = BrowserWindow::FromBrowser(browser())
+                                 ->GetLocationBar()
+                                 ->GetOmniboxController();
   MockOmniboxEditModel mock_edit_model(omnibox_controller);
 
   OmniboxPopupFileSelector file_selector(
@@ -264,8 +266,9 @@ IN_PROC_BROWSER_TEST_F(OmniboxPopupFileSelectorBrowserTest,
 IN_PROC_BROWSER_TEST_F(OmniboxPopupFileSelectorBrowserTest,
                        UploadLimitExceededTriggersMaxFilesError) {
   // Arrange.
-  auto* omnibox_controller =
-      browser()->window()->GetLocationBar()->GetOmniboxController();
+  auto* omnibox_controller = BrowserWindow::FromBrowser(browser())
+                                 ->GetLocationBar()
+                                 ->GetOmniboxController();
   MockOmniboxEditModel mock_edit_model(omnibox_controller);
 
   OmniboxPopupFileSelector file_selector(
