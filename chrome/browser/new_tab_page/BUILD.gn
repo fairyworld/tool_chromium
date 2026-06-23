@@ -255,3 +255,42 @@ if (!is_android) {
     ]
   }
 }
+
+if (!is_android) {
+  source_set("interactive_ui_tests") {
+    testonly = true
+
+    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
+
+    # These tests pre-date strict sign-comparison warnings; relax to the warning
+    # posture they had while compiled in //chrome/test.
+    configs -= [ "//build/config/compiler:chromium_code" ]
+    configs += [ "//build/config/compiler:no_chromium_code" ]
+    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+    sources = [
+      "modules/new_tab_page_modules_interactive_uitest.cc",
+      "new_tab_page_interactive_uitest.cc",
+      "new_tab_page_realbox_interactive_uitest.cc",
+      "ntp_promo/ntp_promo_interactive_uitest.cc",
+    ]
+
+    deps = [
+      ":test_support",
+      "//base",
+      "//chrome/browser/autocomplete:aim_eligibility_service",
+      "//chrome/browser/contextual_search",
+      "//chrome/browser/ui",
+      "//chrome/browser/ui/side_panel",
+      "//chrome/browser/ui/side_panel:side_panel_views_dependent",
+      "//chrome/browser/ui/webui/searchbox:searchbox_test_utils",
+      "//chrome/browser/user_education",
+      "//chrome/test:test_support",
+      "//chrome/test:test_support_ui",
+      "//components/contextual_search:test_support",
+      "//content/test:test_support",
+      "//testing/gtest",
+      "//ui/base:test_support",
+    ]
+  }
+}
