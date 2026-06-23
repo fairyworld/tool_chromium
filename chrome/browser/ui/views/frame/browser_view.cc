@@ -3388,8 +3388,7 @@ void BrowserView::OnSplitTabChanged(const SplitTabChange& change) {
           browser_->tab_strip_model()->GetActiveTab();
 
       if (active_tab->GetSplit() == change.split_id) {
-        UpdateContentsInSplitView(change.GetContentsChange()->prev_tabs(),
-                                  change.GetContentsChange()->new_tabs());
+        multi_contents_view_->SwapContentsInSplitView();
       }
       break;
     }
@@ -4262,50 +4261,6 @@ void BrowserView::UpdateActiveTabInSplitView() {
   // focus change e.g. using tab shortcuts and in these cases update focus.
   if (GetWidget()->IsActive() &&
       multi_contents_view_->GetInactiveContentsView()->HasFocus()) {
-    multi_contents_view_->GetActiveContentsView()->RequestFocus();
-  }
-}
-
-void BrowserView::UpdateContentsInSplitView(
-    const std::vector<std::pair<tabs::TabInterface*, int>>& prev_tabs,
-    const std::vector<std::pair<tabs::TabInterface*, int>>& new_tabs) {
-  CHECK(multi_contents_view_->IsInSplitView());
-
-  std::optional<split_tabs::SplitTabId> split_id =
-      browser_->GetActiveTabInterface()->GetSplit();
-  CHECK(split_id.has_value());
-
-  split_tabs::SplitTabData* split_data =
-      browser_->tab_strip_model()->GetSplitData(split_id.value());
-  const int first_split_tab_index =
-      browser_->tab_strip_model()->GetIndexOfTab(split_data->ListTabs()[0]);
-
-  const bool active_view_has_focus =
-      multi_contents_view_->GetActiveContentsView()->HasFocus();
-
-  // Clear web contents for prev_tabs in preparation to reset for new_tabs.
-  multi_contents_view_->GetInactiveContentsView()->SetWebContents(nullptr);
-  multi_contents_view_->GetActiveContentsView()->SetWebContents(nullptr);
-
-  // Clear focus to avoid reentrency when setting the web contents within
-  // MultiContentsView. See crbug.com/458189541 and crbug.com/447369458
-  if (!GetWidget()->IsActive()) {
-    GetFocusManager()->ClearFocus();
-  }
-
-  // Set web contents in multi_contents_view_ to match new_tabs and update the
-  // active multi_contents_view_ index.
-  for (std::pair<tabs::TabInterface*, int> split_tab_with_index : new_tabs) {
-    CHECK(split_id == split_tab_with_index.first->GetSplit());
-    int relative_index = split_tab_with_index.second - first_split_tab_index;
-    multi_contents_view_->SetWebContentsAtIndex(
-        split_tab_with_index.first->GetContents(), relative_index);
-    if (split_tab_with_index.first->IsActivated()) {
-      multi_contents_view_->SetActiveIndex(relative_index);
-    }
-  }
-  // Focus the active contents view if it previously had focus prior to swap.
-  if (active_view_has_focus) {
     multi_contents_view_->GetActiveContentsView()->RequestFocus();
   }
 }
