@@ -873,6 +873,8 @@ source_set("browser") {
     "declarative_performance_observer/declarative_performance_observer.h",
     "declarative_performance_observer/declarative_performance_observer_coordinator.cc",
     "declarative_performance_observer/declarative_performance_observer_coordinator.h",
+    "declarative_performance_observer/declarative_performance_observer_store.cc",
+    "declarative_performance_observer/declarative_performance_observer_store.h",
     "device/device_service.cc",
     "device_posture/device_posture_platform_provider.cc",
     "device_posture/device_posture_platform_provider.h",
