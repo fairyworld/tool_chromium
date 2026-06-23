@@ -4508,7 +4508,14 @@ public class StripLayoutHelper
         StripLayoutTab stripTab = findTabById(tabId);
         if (stripTab != null) {
             stripTab.setIsUnderlined(isUnderlined);
-            mUpdateHost.requestUpdate();
+        }
+    }
+
+    /** Reset the underline animation cycle for a tab. */
+    void resetTabUnderlineAnimationCycle(int tabId) {
+        StripLayoutTab stripTab = findTabById(tabId);
+        if (stripTab != null) {
+            stripTab.resetUnderlineAnimationCycle();
         }
     }
 
