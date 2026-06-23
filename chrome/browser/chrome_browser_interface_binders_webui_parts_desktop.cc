@@ -17,7 +17,6 @@
 #include "chrome/browser/history_embeddings/history_embeddings_utils.h"
 #include "chrome/browser/new_tab_page/modules/file_suggestion/microsoft_files.mojom.h"
 #include "chrome/browser/new_tab_page/modules/v2/authentication/microsoft_auth.mojom.h"
-#include "chrome/browser/new_tab_page/modules/v2/calendar/google_calendar.mojom.h"
 #include "chrome/browser/new_tab_page/modules/v2/calendar/outlook_calendar.mojom.h"
 #include "chrome/browser/new_tab_page/modules/v2/tab_groups/tab_groups.mojom.h"
 #include "chrome/browser/new_tab_page/new_tab_page_util.h"
@@ -417,11 +416,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
   if (base::FeatureList::IsEnabled(ntp_features::kNtpTabGroupsModule)) {
     RegisterWebUIControllerInterfaceBinder<ntp::tab_groups::mojom::PageHandler,
                                            NewTabPageUI>(map);
-  }
-
-  if (base::FeatureList::IsEnabled(ntp_features::kNtpCalendarModule)) {
-    RegisterWebUIControllerInterfaceBinder<
-        ntp::calendar::mojom::GoogleCalendarPageHandler, NewTabPageUI>(map);
   }
 
   if (IsOutlookCalendarModuleEnabledForProfile(Profile::FromBrowserContext(
