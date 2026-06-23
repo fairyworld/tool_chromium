@@ -178,18 +178,6 @@ public final class AuthenticatorImpl implements Authenticator, AuthenticationCon
         mIsPaymentRequest = options.isPaymentCredentialCreation;
         mRequestCallback = requestCallback;
         mRequestCallback.setCompletionCallback(this::cleanupRequest);
-
-        if (isChrome(mWebContents)
-                && WebauthnBrowserBridge.shouldDisallowCredentialRequest(mRenderFrameHost)) {
-            mRequestCallback.onComplete(
-                    WebauthnRequestResponse.forFailedMakeCredential(
-                            AuthenticatorStatus.NOT_ALLOWED_ERROR,
-                            new RequestMetrics.Builder()
-                                    .setMakeCredentialOutcome(
-                                            MakeCredentialOutcome.BLOCKED_BY_EMBEDDER)
-                                    .build()));
-            return;
-        }
         if (!GmsCoreUtils.isWebauthnSupported()
                 || (!isChrome(mWebContents) && !GmsCoreUtils.isResultReceiverSupported())) {
             mRequestCallback.onComplete(
@@ -276,17 +264,6 @@ public final class AuthenticatorImpl implements Authenticator, AuthenticationCon
         mIsPaymentRequest = mPayment != null;
         mIsConditionalRequest = options.mediation == Mediation.CONDITIONAL;
         mIsImmediateRequest = options.mediation == Mediation.IMMEDIATE;
-
-        if (isChrome(mWebContents)
-                && WebauthnBrowserBridge.shouldDisallowCredentialRequest(mRenderFrameHost)) {
-            mRequestCallback.onComplete(
-                    WebauthnRequestResponse.forFailedGetCredential(
-                            AuthenticatorStatus.NOT_ALLOWED_ERROR,
-                            new RequestMetrics.Builder()
-                                    .setGetAssertionOutcome(GetAssertionOutcome.BLOCKED_BY_EMBEDDER)
-                                    .build()));
-            return;
-        }
 
         boolean isPasswordOnlyFlux =
                 options.publicKey == null

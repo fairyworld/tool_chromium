@@ -54,8 +54,6 @@ import org.chromium.components.webauthn.Fido2CredentialRequest;
 import org.chromium.components.webauthn.GpmBrowserOptionsHelper;
 import org.chromium.components.webauthn.InternalAuthenticator;
 import org.chromium.components.webauthn.InternalAuthenticatorJni;
-import org.chromium.components.webauthn.WebauthnBrowserBridge;
-import org.chromium.components.webauthn.WebauthnBrowserBridgeJni;
 import org.chromium.components.webauthn.WebauthnMode;
 import org.chromium.components.webauthn.WebauthnModeProvider;
 import org.chromium.components.webauthn.cred_man.CredManSupportProvider;
@@ -92,7 +90,6 @@ public class AuthenticatorImplTest {
             ChromeTransitTestRules.fastAutoResetCtaActivityRule();
 
     @Mock UkmRecorder.Natives mUkmRecorderJniMock;
-    @Mock WebauthnBrowserBridge.Natives mWebauthnBrowserBridgeNativesMock;
 
     private Context mContext;
     private WebauthnTestUtils.MockIntentSender mIntentSender;
@@ -131,7 +128,6 @@ public class AuthenticatorImplTest {
         mTestAuthenticatorImplJni = new WebauthnTestUtils.TestAuthenticatorImplJni(mCallback);
         InternalAuthenticatorJni.setInstanceForTesting(mTestAuthenticatorImplJni);
         UkmRecorderJni.setInstanceForTesting(mUkmRecorderJniMock);
-        WebauthnBrowserBridgeJni.setInstanceForTesting(mWebauthnBrowserBridgeNativesMock);
 
         mCreationOptions = Fido2ApiTestHelper.createDefaultMakeCredentialOptions();
         mRequestOptions = new GetCredentialOptions();

@@ -230,17 +230,6 @@ public class WebauthnBrowserBridge {
         return passwordCredential;
     }
 
-    /**
-     * Returns true if the credential request should be disallowed by the embedder. This is used to
-     * block requests when an actor is active on the tab.
-     */
-    public static boolean shouldDisallowCredentialRequest(RenderFrameHost frameHost) {
-        if (WebauthnBrowserBridgeJni.get() == null) {
-            return false;
-        }
-        return WebauthnBrowserBridgeJni.get().shouldDisallowCredentialRequest(frameHost);
-    }
-
     @CalledByNative
     private static @Nullable String getWebauthnCredentialDetailsUserName(
             WebauthnCredentialDetails cred) {
@@ -292,7 +281,7 @@ public class WebauthnBrowserBridge {
     }
 
     @NativeMethods
-    public interface Natives {
+    interface Natives {
         // Native methods are implemented in webauthn_browser_bridge.cc.
         long createNativeWebauthnBrowserBridge(WebauthnBrowserBridge self);
 
@@ -328,7 +317,5 @@ public class WebauthnBrowserBridge {
                 long nativeWebauthnBrowserBridge, @Nullable RenderFrameHost frameHost);
 
         void destroy(long nativeWebauthnBrowserBridge);
-
-        boolean shouldDisallowCredentialRequest(@Nullable RenderFrameHost frameHost);
     }
 }
