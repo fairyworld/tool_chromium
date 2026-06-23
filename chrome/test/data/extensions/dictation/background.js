@@ -91,6 +91,9 @@ chrome.dictationPrivate.onStartStream.addListener(async (details) => {
     return;
   }
 
+  console.info(
+      '[onStartStream] Selected text received from Chrome:',
+      details.editableContent);
   startStream(details.streamId);
 });
 

@@ -35,6 +35,7 @@ source_set("impl") {
     "session_state.cc",
     "session_ui_impl.cc",
     "session_ui_impl.h",
+    "target.cc",
   ]
 
   deps = [

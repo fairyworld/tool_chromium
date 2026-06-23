@@ -125,7 +125,34 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
 
   menu.ExecuteCommand(IDC_CONTENT_CONTEXT_DICTATION, 0);
 
-  EXPECT_NE(dictation_service().session_controller(), nullptr);
+  ASSERT_NE(dictation_service().session_controller(), nullptr);
+  StreamProvider* provider =
+      dictation_service().session_controller()->attached_stream_provider();
+  ASSERT_NE(provider, nullptr);
+  ASSERT_NE(provider->GetTarget(), nullptr);
+  EXPECT_EQ(provider->GetTarget()->GetSelectedText(), "");
+}
+
+IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
+                       ExecuteContextMenuCommandWithSelectedText) {
+  content::ContextMenuParams params;
+  params.is_editable = true;
+  params.selection_text = u"selected text";
+  TestRenderViewContextMenu menu(*web_contents()->GetPrimaryMainFrame(),
+                                 params);
+  menu.Init();
+
+  ASSERT_TRUE(menu.IsItemPresent(IDC_CONTENT_CONTEXT_DICTATION));
+  ASSERT_TRUE(menu.IsItemEnabled(IDC_CONTENT_CONTEXT_DICTATION));
+
+  menu.ExecuteCommand(IDC_CONTENT_CONTEXT_DICTATION, 0);
+
+  ASSERT_NE(dictation_service().session_controller(), nullptr);
+  StreamProvider* provider =
+      dictation_service().session_controller()->attached_stream_provider();
+  ASSERT_NE(provider, nullptr);
+  ASSERT_NE(provider->GetTarget(), nullptr);
+  EXPECT_EQ(provider->GetTarget()->GetSelectedText(), "selected text");
 }
 
 // TODO(crbug.com/502587072): Add tests which have the test extension simulate

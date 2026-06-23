@@ -26,6 +26,7 @@ ListenerStreamProvider::~ListenerStreamProvider() {
 
 void ListenerStreamProvider::BindToTargetAndConnect(
     std::unique_ptr<Target> target) {
+  CHECK(target);
   target_ = std::move(target);
   DictationMultiplexer& multiplexer = GetMultiplexer();
   stream_id_ = multiplexer.GenerateStreamId();
@@ -35,8 +36,7 @@ void ListenerStreamProvider::BindToTargetAndConnect(
   details.stream_id = stream_id_.value();
   // TODO(crbug.com/502587072): Populate page context.
   details.page_context = "";
-  // TODO(crbug.com/524620051): Populate editable content.
-  details.editable_content = "";
+  details.editable_content = target_->GetSelectedText();
 
   base::ListValue event_args =
       extensions::api::dictation_private::OnStartStream::Create(details);
@@ -115,6 +115,10 @@ bool ListenerStreamProvider::IsTranscriptionFinalForTesting() const {
 
 ListenerStreamProvider::StreamState ListenerStreamProvider::GetState() const {
   return state_;
+}
+
+const Target* ListenerStreamProvider::GetTarget() const {
+  return target_.get();
 }
 
 DictationMultiplexer& ListenerStreamProvider::GetMultiplexer() const {

@@ -5,6 +5,7 @@
 #include "chrome/browser/dictation/dictation_keyed_service.h"
 
 #include "base/feature_list.h"
+#include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/dictation/dictation_keyed_service_factory.h"
 #include "chrome/browser/dictation/features.h"
 #include "chrome/browser/dictation/listener_stream_provider.h"
@@ -89,7 +90,9 @@ bool DictationKeyedService::ShouldShowContextMenuItem() const {
   return !session_;
 }
 
-void DictationKeyedService::ContextMenuHandler(BrowserWindowInterface& window) {
+void DictationKeyedService::ContextMenuHandler(
+    BrowserWindowInterface& window,
+    const std::u16string& selected_text) {
   if (IsDisabledByPolicy()) {
     // TODO(crbug.com/525506786): Disable the menu item on policy change so
     // this is not reachable.
@@ -98,7 +101,8 @@ void DictationKeyedService::ContextMenuHandler(BrowserWindowInterface& window) {
 
   // TODO(crbug.com/508729855) Populate target with information about the
   // targeted field from context menu params.
-  StartSession(window, std::make_unique<Target>());
+  StartSession(window,
+               std::make_unique<Target>(base::UTF16ToUTF8(selected_text)));
 }
 
 bool DictationKeyedService::IsDisabledByPolicy() const {
