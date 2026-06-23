@@ -204,7 +204,7 @@ void PermissionPromptBubbleBaseView::Show() {
 }
 
 void PermissionPromptBubbleBaseView::CreateWidget() {
-  CHECK(GetBrowser()->GetWindow());
+  CHECK(GetNativeWindow());
 
   UpdateAnchorPosition();
 
@@ -221,9 +221,13 @@ void PermissionPromptBubbleBaseView::CreateWidget() {
 }
 
 void PermissionPromptBubbleBaseView::ShowWidget() {
-  // If a browser window (or popup) other than the bubble parent has focus,
+  // If a host window (or popup) other than the bubble parent has focus,
   // don't take focus.
-  if (GetBrowser() && GetBrowser()->GetWindow()->IsActive()) {
+  views::Widget* host_widget =
+      GetNativeWindow()
+          ? views::Widget::GetWidgetForNativeWindow(GetNativeWindow())
+          : nullptr;
+  if (host_widget && host_widget->ShouldPaintAsActive()) {
     GetWidget()->Show();
   } else {
     GetWidget()->ShowInactive();

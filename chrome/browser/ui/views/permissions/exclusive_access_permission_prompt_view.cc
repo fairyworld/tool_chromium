@@ -131,7 +131,7 @@ void ExclusiveAccessPermissionPromptView::Show() {
 }
 
 void ExclusiveAccessPermissionPromptView::CreateWidget() {
-  DCHECK(GetBrowser()->GetWindow());
+  DCHECK(GetNativeWindow());
   views::Widget* widget = views::BubbleDialogDelegateView::CreateBubble(this);
 
   widget->SetZOrderSublevel(ChromeWidgetSublevel::kSublevelSecurity);
@@ -172,9 +172,8 @@ void ExclusiveAccessPermissionPromptView::ShowWidget() {
 
 void ExclusiveAccessPermissionPromptView::UpdateAnchor(views::Widget* widget) {
   SetAnchorView(widget->GetContentsView());
-  if (GetBrowser() && GetBrowser()->GetWindow()) {
-    set_parent_window(platform_util::GetViewForWindow(
-        GetBrowser()->GetWindow()->GetNativeWindow()));
+  if (GetNativeWindow()) {
+    set_parent_window(platform_util::GetViewForWindow(GetNativeWindow()));
   }
   SetArrow(views::BubbleBorder::Arrow::FLOAT);
 }
