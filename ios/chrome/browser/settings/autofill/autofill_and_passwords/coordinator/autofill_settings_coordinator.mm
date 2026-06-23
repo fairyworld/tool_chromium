@@ -12,8 +12,19 @@
 #import "ios/chrome/browser/settings/autofill/autofill_and_passwords/ui/autofill_settings_table_view_controller.h"
 #import "ios/chrome/browser/shared/model/browser/browser.h"
 #import "ios/chrome/browser/shared/model/profile/profile_ios.h"
+#import "ios/chrome/browser/shared/public/commands/command_dispatcher.h"
+#import "ios/chrome/browser/shared/public/commands/open_new_tab_command.h"
+#import "ios/chrome/browser/shared/public/commands/scene_commands.h"
 #import "ios/chrome/browser/shared/ui/table_view/table_view_utils.h"
 #import "ios/chrome/browser/signin/model/identity_manager_factory.h"
+
+namespace {
+
+// The URL for managing passes data in Google Wallet.
+const char kWalletManagePassesDataURL[] =
+    "https://wallet.google.com/wallet/settings/managepassesdata";
+
+}  // namespace
 
 @interface AutofillSettingsCoordinator () <
     AutofillSettingsTableViewControllerDelegate,
@@ -48,12 +59,16 @@
   id<ReauthenticationProtocol> reauthModule =
       ReauthenticationServiceFactory::GetForProfile(originalProfile)
           ->GetReauthModule();
+  BOOL shouldShowWalletPromo = autofill::CanPerformAutofillAiAction(
+      originalProfile, autofill::AutofillAiAction::kWalletDataSharingPromotion);
 
   _mediator = [[AutofillSettingsMediator alloc]
          initWithPrefService:originalProfile->GetPrefs()
              identityManager:IdentityManagerFactory::GetForProfile(
                                  originalProfile)
-      reauthenticationModule:reauthModule];
+      reauthenticationModule:reauthModule
+       shouldShowWalletPromo:shouldShowWalletPromo];
+
   _mediator.consumer = _viewController;
   _mediator.delegate = self;
   _viewController.mutator = _mediator;
@@ -84,6 +99,16 @@
     (AutofillSettingsTableViewController*)controller {
   CHECK_EQ(_viewController, controller);
   [self.delegate autofillSettingsCoordinatorDidRemove:self];
+}
+
+- (void)autofillSettingsTableViewControllerDidTapWalletPromoCard:
+    (AutofillSettingsTableViewController*)controller {
+  id<SceneCommands> sceneHandler =
+      HandlerForProtocol(self.browser->GetCommandDispatcher(), SceneCommands);
+  [sceneHandler
+      closePresentedViewsAndOpenURL:
+          [OpenNewTabCommand
+              commandWithURLFromChrome:GURL(kWalletManagePassesDataURL)]];
 }
 
 @end

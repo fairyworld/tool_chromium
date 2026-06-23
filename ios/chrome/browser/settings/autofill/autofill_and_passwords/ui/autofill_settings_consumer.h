@@ -25,6 +25,9 @@
 // Sets whether the user verification setting is visible.
 - (void)setUserVerificationSettingVisible:(BOOL)visible;
 
+// Sets whether the Google Wallet promotion should be shown.
+- (void)setShouldShowWalletPromo:(BOOL)shouldShowWalletPromo;
+
 @end
 
 #endif  // IOS_CHROME_BROWSER_SETTINGS_AUTOFILL_AUTOFILL_AND_PASSWORDS_UI_AUTOFILL_SETTINGS_CONSUMER_H_

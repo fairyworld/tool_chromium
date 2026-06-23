@@ -11,7 +11,10 @@
 #import "ios/chrome/browser/settings/ui_bundled/autofill/autofill_settings_constants.h"
 #import "ios/chrome/browser/shared/ui/list_model/list_model.h"
 #import "ios/chrome/browser/shared/ui/table_view/cells/table_view_detail_icon_item.h"
+#import "ios/chrome/browser/shared/ui/table_view/cells/table_view_detail_text_item.h"
 #import "ios/chrome/browser/shared/ui/table_view/cells/table_view_switch_item.h"
+#import "ios/chrome/browser/shared/ui/table_view/cells/table_view_text_item.h"
+#import "ios/chrome/common/ui/colors/semantic_color_names.h"
 #import "ios/chrome/grit/ios_strings.h"
 #import "ui/base/l10n/l10n_util.h"
 
@@ -23,6 +26,7 @@ enum SectionIdentifier {
   SectionIdentifierWhenOn,
   SectionIdentifierThingsToConsider,
   SectionIdentifierVerificationSwitch,
+  SectionIdentifierWalletPromo,
 };
 
 enum ItemType {
@@ -32,6 +36,8 @@ enum ItemType {
   ItemTypeFooter,
   ItemTypeHeader,
   ItemTypeLabel,
+  ItemTypeWalletPromoInfo,
+  ItemTypeWalletPromoButton,
 };
 
 }  // namespace
@@ -43,6 +49,7 @@ enum ItemType {
   BOOL _userVerificationEnabled;
   BOOL _userVerificationSwitchEnabled;
   BOOL _userVerificationSettingVisible;
+  BOOL _shouldShowWalletPromo;
 }
 
 - (void)didMoveToParentViewController:(UIViewController*)parent {
@@ -103,6 +110,36 @@ enum ItemType {
                          ItemTypeVerificationFooter)
         forSectionWithIdentifier:SectionIdentifierVerificationSwitch];
   }
+
+  if (_shouldShowWalletPromo) {
+    [model addSectionWithIdentifier:SectionIdentifierWalletPromo];
+    [model addItem:[self walletPromoInfoItem]
+        toSectionWithIdentifier:SectionIdentifierWalletPromo];
+    [model addItem:[self walletPromoButtonItem]
+        toSectionWithIdentifier:SectionIdentifierWalletPromo];
+  }
+}
+
+// Returns the Google Wallet promo info item.
+- (TableViewItem*)walletPromoInfoItem {
+  TableViewDetailTextItem* item =
+      [[TableViewDetailTextItem alloc] initWithType:ItemTypeWalletPromoInfo];
+  item.text = l10n_util::GetNSString(IDS_IOS_AUTOFILL_WALLET_PROMO_TITLE);
+  item.detailText =
+      l10n_util::GetNSString(IDS_IOS_AUTOFILL_WALLET_PROMO_DETAIL_TEXT);
+  item.allowMultilineDetailText = YES;
+  return item;
+}
+
+// Returns the Google Wallet promo button item.
+- (TableViewItem*)walletPromoButtonItem {
+  TableViewTextItem* item =
+      [[TableViewTextItem alloc] initWithType:ItemTypeWalletPromoButton];
+  item.text = l10n_util::GetNSString(IDS_IOS_AUTOFILL_WALLET_PROMO_LINK_TEXT);
+  item.textColor = [UIColor colorNamed:kBlueColor];
+  item.accessibilityTraits |= UIAccessibilityTraitButton;
+  item.titleNumberOfLines = 0;
+  return item;
 }
 
 #pragma mark - AutofillSettingsConsumer
@@ -158,6 +195,16 @@ enum ItemType {
   }
 }
 
+- (void)setShouldShowWalletPromo:(BOOL)shouldShowWalletPromo {
+  if (_shouldShowWalletPromo == shouldShowWalletPromo) {
+    return;
+  }
+  _shouldShowWalletPromo = shouldShowWalletPromo;
+  if (self.isViewLoaded) {
+    [self reloadData];
+  }
+}
+
 #pragma mark - Switch Callbacks
 
 - (void)enhancedAutofillSwitchChanged:(UISwitch*)switchView {
@@ -201,6 +248,23 @@ enum ItemType {
           [self.tableViewModel itemAtIndexPath:switchPath]);
   switchItem.enabled = _userVerificationSwitchEnabled;
   [self reconfigureCellsForItems:@[ switchItem ]];
+}
+
+#pragma mark - UITableViewDelegate
+
+- (void)tableView:(UITableView*)tableView
+    didSelectRowAtIndexPath:(NSIndexPath*)indexPath {
+  [super tableView:tableView didSelectRowAtIndexPath:indexPath];
+  if (_settingsAreDismissed) {
+    return;
+  }
+
+  NSInteger itemType = [self.tableViewModel itemTypeForIndexPath:indexPath];
+  if (itemType == ItemTypeWalletPromoButton) {
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+    [self.delegate
+        autofillSettingsTableViewControllerDidTapWalletPromoCard:self];
+  }
 }
 
 #pragma mark - SettingsControllerProtocol

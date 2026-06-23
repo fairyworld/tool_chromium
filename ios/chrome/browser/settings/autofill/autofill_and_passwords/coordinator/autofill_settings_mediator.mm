@@ -19,16 +19,19 @@
   raw_ptr<PrefService> _prefs;
   raw_ptr<signin::IdentityManager> _identityManager;
   id<ReauthenticationProtocol> _reauthenticationModule;
+  BOOL _shouldShowWalletPromo;
 }
 
 - (instancetype)initWithPrefService:(PrefService*)prefs
                     identityManager:(signin::IdentityManager*)identityManager
-             reauthenticationModule:(id<ReauthenticationProtocol>)reauthModule {
+             reauthenticationModule:(id<ReauthenticationProtocol>)reauthModule
+              shouldShowWalletPromo:(BOOL)shouldShowWalletPromo {
   self = [super init];
   if (self) {
     _prefs = prefs;
     _identityManager = identityManager;
     _reauthenticationModule = reauthModule;
+    _shouldShowWalletPromo = shouldShowWalletPromo;
   }
   return self;
 }
@@ -53,6 +56,7 @@
         setUserVerificationEnabled:
             autofill::prefs::IsAutofillAiReauthBeforeFillingEnabled(_prefs)];
     [_consumer setUserVerificationSwitchEnabled:canAttemptReauth];
+    [_consumer setShouldShowWalletPromo:_shouldShowWalletPromo];
   }
 }
 
