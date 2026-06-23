@@ -864,10 +864,10 @@ void ReadAnythingAppController::DistillNewTree() {
   // distillation / failures being logged.
   distillationsCompleted_ = 0;
   timer_.Stop();
-  timer_.Start(
-      FROM_HERE, base::Milliseconds(kDistillationLoggingDelayMs),
-      base::BindOnce(&ReadAnythingAppController::RecordDistillationSuccess,
-                     base::Unretained(this)));
+  timer_.Start(FROM_HERE, base::Milliseconds(kDistillationLoggingDelayMs),
+               base::BindOnce(
+                   &ReadAnythingAppController::RecordScreen2xDistillationStatus,
+                   base::Unretained(this)));
 
   if (features::IsImmersiveReadAnythingEnabled()) {
     SetDistillationState(read_anything::mojom::ReadAnythingDistillationState::
@@ -883,7 +883,7 @@ void ReadAnythingAppController::DistillNewTree() {
   }
 }
 
-void ReadAnythingAppController::RecordDistillationSuccess() {
+void ReadAnythingAppController::RecordScreen2xDistillationStatus() {
   read_anything::mojom::DistillationStatus distillationStatus;
   if (model_.screen2x_distiller_running()) {
     distillationStatus =
@@ -898,11 +898,16 @@ void ReadAnythingAppController::RecordDistillationSuccess() {
 
   page_handler_->OnDistillationStatus(distillationStatus,
                                       model_.words_distilled());
+  RecordDistillationStatus(distillationStatus);
+  distillationsCompleted_ = 0;
+}
+
+void ReadAnythingAppController::RecordDistillationStatus(
+    read_anything::mojom::DistillationStatus status) {
   ukm::builders::Accessibility_ReadAnything_Distillation(
       model_.GetUkmSourceId())
-      .SetDistillationStatus(static_cast<int>(distillationStatus))
+      .SetDistillationStatus(static_cast<int>(status))
       .Record(ukm_recorder_.get());
-  distillationsCompleted_ = 0;
 }
 
 void ReadAnythingAppController::RecordNumSelections() {
@@ -3084,6 +3089,9 @@ void ReadAnythingAppController::UpdateContent(const std::string& title,
   if (didProcessAnchors) {
     ExecuteJavaScript("chrome.readingMode.onAnchorsReadyForReadability();");
   }
+
+  // Log a successful readability distillation
+  RecordDistillationStatus(read_anything::mojom::DistillationStatus::kSuccess);
 }
 
 void ReadAnythingAppController::OnReadabilityDistillationStateChanged(
