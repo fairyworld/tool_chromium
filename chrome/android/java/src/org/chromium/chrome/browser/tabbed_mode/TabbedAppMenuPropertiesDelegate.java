@@ -1276,6 +1276,19 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                         .build());
     }
 
+    private static ListItem buildEmptySubmenuItem() {
+        return new ListItem(
+                AppMenuHandler.AppMenuItemType.EMPTY,
+                new PropertyModel.Builder(AppMenuItemProperties.ALL_KEYS)
+                        .with(AppMenuItemProperties.MENU_ITEM_ID, R.id.empty_item_menu_id)
+                        // Keep enabled for keyboard navigation; disabled visual styling is handled
+                        // by the layout. Keyboard navigation becomes problematic when a submenu
+                        // contains only one item and that item is disabled. Currently the "empty"
+                        // item is the only case when that can happen.
+                        .with(AppMenuItemProperties.ENABLED, true)
+                        .build());
+    }
+
     private List<ListItem> getRecentEntryMenuItemList() {
         List<ListItem> items = new ArrayList<>();
         RecentlyClosedEntriesManager manager = mRecentlyClosedEntriesManagerSupplier.get();
@@ -1325,12 +1338,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                         }
                     }
                     if (submenuItems.isEmpty()) {
-                        submenuItems.add(
-                                new ListItem(
-                                        AppMenuHandler.AppMenuItemType.EMPTY,
-                                        new PropertyModel.Builder(AppMenuItemProperties.ALL_KEYS)
-                                                .with(AppMenuItemProperties.ENABLED, false)
-                                                .build()));
+                        submenuItems.add(buildEmptySubmenuItem());
                     }
                     return submenuItems;
                 };
@@ -1696,12 +1704,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                         items.addAll(getBookmarkItemList(childIds, bookmarkModel));
                     }
                     if (items.size() == 0) {
-                        items.add(
-                                new ListItem(
-                                        AppMenuHandler.AppMenuItemType.EMPTY,
-                                        new PropertyModel.Builder(AppMenuItemProperties.ALL_KEYS)
-                                                .with(AppMenuItemProperties.ENABLED, false)
-                                                .build()));
+                        items.add(buildEmptySubmenuItem());
                     }
                     return items;
                 };
@@ -1800,15 +1803,7 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
                                                 bookmarkModel.getChildIds(item.getId()),
                                                 bookmarkModel);
                                 if (items.size() == 0) {
-                                    items.add(
-                                            new ListItem(
-                                                    AppMenuHandler.AppMenuItemType.EMPTY,
-                                                    new PropertyModel.Builder(
-                                                                    AppMenuItemProperties.ALL_KEYS)
-                                                            .with(
-                                                                    AppMenuItemProperties.ENABLED,
-                                                                    false)
-                                                            .build()));
+                                    items.add(buildEmptySubmenuItem());
                                 }
                                 return items;
                             }));

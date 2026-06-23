@@ -732,8 +732,12 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                         item(R.id.divider_line_id),
                                         item(
                                                 R.id.bookmark_folder_menu_id,
-                                                item(R.id.bookmark_folder_menu_id, item(0))),
-                                        item(R.id.bookmark_folder_menu_id, item(0)))));
+                                                item(
+                                                        R.id.bookmark_folder_menu_id,
+                                                        item(R.id.empty_item_menu_id))),
+                                        item(
+                                                R.id.bookmark_folder_menu_id,
+                                                item(R.id.empty_item_menu_id)))));
 
         if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(
@@ -865,8 +869,12 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                         item(R.id.divider_line_id),
                                         item(
                                                 R.id.bookmark_folder_menu_id,
-                                                item(R.id.bookmark_folder_menu_id, item(0))),
-                                        item(R.id.bookmark_folder_menu_id, item(0)))));
+                                                item(
+                                                        R.id.bookmark_folder_menu_id,
+                                                        item(R.id.empty_item_menu_id))),
+                                        item(
+                                                R.id.bookmark_folder_menu_id,
+                                                item(R.id.empty_item_menu_id)))));
 
         if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(
@@ -1042,8 +1050,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         item(R.id.divider_line_id),
                         item(
                                 R.id.bookmark_folder_menu_id,
-                                item(R.id.bookmark_folder_menu_id, item(0))),
-                        item(R.id.bookmark_folder_menu_id, item(0))));
+                                item(R.id.bookmark_folder_menu_id, item(R.id.empty_item_menu_id))),
+                        item(R.id.bookmark_folder_menu_id, item(R.id.empty_item_menu_id))));
         expectedTitles.add(
                 item(
                         R.string.menu_bookmarks,
@@ -1421,8 +1429,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         item(R.id.divider_line_id),
                         item(
                                 R.id.bookmark_folder_menu_id,
-                                item(R.id.bookmark_folder_menu_id, item(0))),
-                        item(R.id.bookmark_folder_menu_id, item(0))));
+                                item(R.id.bookmark_folder_menu_id, item(R.id.empty_item_menu_id))),
+                        item(R.id.bookmark_folder_menu_id, item(R.id.empty_item_menu_id))));
         expectedTitles.add(
                 item(
                         R.string.menu_bookmarks,
@@ -1793,8 +1801,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         item(R.id.divider_line_id),
                         item(
                                 R.id.bookmark_folder_menu_id,
-                                item(R.id.bookmark_folder_menu_id, item(0))),
-                        item(R.id.bookmark_folder_menu_id, item(0))));
+                                item(R.id.bookmark_folder_menu_id, item(R.id.empty_item_menu_id))),
+                        item(R.id.bookmark_folder_menu_id, item(R.id.empty_item_menu_id))));
         expectedTitles.add(
                 item(
                         R.string.menu_bookmarks,
@@ -1992,8 +2000,12 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                         item(R.id.divider_line_id),
                                         item(
                                                 R.id.bookmark_folder_menu_id,
-                                                item(R.id.bookmark_folder_menu_id, item(0))),
-                                        item(R.id.bookmark_folder_menu_id, item(0)))));
+                                                item(
+                                                        R.id.bookmark_folder_menu_id,
+                                                        item(R.id.empty_item_menu_id))),
+                                        item(
+                                                R.id.bookmark_folder_menu_id,
+                                                item(R.id.empty_item_menu_id)))));
 
         if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(
@@ -2099,8 +2111,12 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                         item(R.id.divider_line_id),
                                         item(
                                                 R.id.bookmark_folder_menu_id,
-                                                item(R.id.bookmark_folder_menu_id, item(0))),
-                                        item(R.id.bookmark_folder_menu_id, item(0)))));
+                                                item(
+                                                        R.id.bookmark_folder_menu_id,
+                                                        item(R.id.empty_item_menu_id))),
+                                        item(
+                                                R.id.bookmark_folder_menu_id,
+                                                item(R.id.empty_item_menu_id)))));
 
         if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(
@@ -2551,8 +2567,12 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                         item(R.id.divider_line_id),
                                         item(
                                                 R.id.bookmark_folder_menu_id,
-                                                item(R.id.bookmark_folder_menu_id, item(0))),
-                                        item(R.id.bookmark_folder_menu_id, item(0)))));
+                                                item(
+                                                        R.id.bookmark_folder_menu_id,
+                                                        item(R.id.empty_item_menu_id))),
+                                        item(
+                                                R.id.bookmark_folder_menu_id,
+                                                item(R.id.empty_item_menu_id)))));
 
         if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(
@@ -2691,8 +2711,12 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                         item(R.id.divider_line_id),
                                         item(
                                                 R.id.bookmark_folder_menu_id,
-                                                item(R.id.bookmark_folder_menu_id, item(0))),
-                                        item(R.id.bookmark_folder_menu_id, item(0)))));
+                                                item(
+                                                        R.id.bookmark_folder_menu_id,
+                                                        item(R.id.empty_item_menu_id))),
+                                        item(
+                                                R.id.bookmark_folder_menu_id,
+                                                item(R.id.empty_item_menu_id)))));
 
         if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
             expectedItems.add(
@@ -4461,8 +4485,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         item(R.id.divider_line_id),
                         item(
                                 R.id.bookmark_folder_menu_id,
-                                item(R.id.bookmark_folder_menu_id, item(0))),
-                        item(R.id.bookmark_folder_menu_id, item(0)));
+                                item(R.id.bookmark_folder_menu_id, item(R.id.empty_item_menu_id))),
+                        item(R.id.bookmark_folder_menu_id, item(R.id.empty_item_menu_id)));
 
         assertMenuItemsAreEqual(subItems, expectedSubItems);
     }
@@ -4512,8 +4536,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                         item(R.id.divider_line_id),
                         item(
                                 R.id.bookmark_folder_menu_id,
-                                item(R.id.bookmark_folder_menu_id, item(0))),
-                        item(R.id.bookmark_folder_menu_id, item(0)));
+                                item(R.id.bookmark_folder_menu_id, item(R.id.empty_item_menu_id))),
+                        item(R.id.bookmark_folder_menu_id, item(R.id.empty_item_menu_id)));
 
         assertMenuItemsAreEqual(subItems, expectedSubItems);
 
@@ -4584,12 +4608,12 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
                                 R.id.bookmark_folder_menu_id,
                                 item(R.id.bookmark_menu_id),
                                 item(R.id.bookmark_menu_id)),
-                        item(R.id.bookmark_folder_menu_id, item(0)),
+                        item(R.id.bookmark_folder_menu_id, item(R.id.empty_item_menu_id)),
                         item(R.id.divider_line_id),
                         item(
                                 R.id.bookmark_folder_menu_id,
-                                item(R.id.bookmark_folder_menu_id, item(0))),
-                        item(R.id.bookmark_folder_menu_id, item(0)));
+                                item(R.id.bookmark_folder_menu_id, item(R.id.empty_item_menu_id))),
+                        item(R.id.bookmark_folder_menu_id, item(R.id.empty_item_menu_id)));
 
         assertMenuItemsAreEqual(subItems, expectedSubItems);
     }
