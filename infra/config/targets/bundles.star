@@ -3873,7 +3873,7 @@ targets.bundle(
                     "--use-fxc",
                 ],
                 swarming = targets.swarming(
-                    shards = 8,
+                    shards = 16,
                 ),
             ),
             "gpu_integration_test_common_args",
@@ -3903,7 +3903,7 @@ targets.bundle(
         "webgpu_cts_tests": [
             targets.mixin(
                 swarming = targets.swarming(
-                    shards = 8,
+                    shards = 16,
                 ),
             ),
             "gpu_integration_test_common_args",
