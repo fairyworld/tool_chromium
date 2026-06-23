@@ -50,6 +50,7 @@ import org.robolectric.shadows.ShadowLooper;
 import org.chromium.base.Token;
 import org.chromium.base.supplier.ObservableSuppliers;
 import org.chromium.base.supplier.SettableMonotonicObservableSupplier;
+import org.chromium.base.supplier.SettableNonNullObservableSupplier;
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.base.test.util.Features;
 import org.chromium.chrome.browser.collaboration.CollaborationServiceFactory;
@@ -148,6 +149,8 @@ public class VerticalTabListCoordinatorUnitTest {
             ObservableSuppliers.createMonotonic(mShareDelegate);
     private final SettableMonotonicObservableSupplier<TabModel> mCurrentTabModelSupplier =
             ObservableSuppliers.createMonotonic();
+    private final SettableNonNullObservableSupplier<Boolean> mIsVerticalTabsActiveSupplier =
+            ObservableSuppliers.createNonNull(false);
     private final List<TabGroupObserver> mTabGroupObservers = new ArrayList<>();
     private VerticalTabListCoordinator mCoordinator;
 
@@ -209,7 +212,8 @@ public class VerticalTabListCoordinatorUnitTest {
                         mSnackbarManager,
                         mDesktopWindowStateManager,
                         mShareDelegateSupplier,
-                        mDataSharingTabManager);
+                        mDataSharingTabManager,
+                        mIsVerticalTabsActiveSupplier);
     }
 
     private Tab prepareMockTab(int id) {

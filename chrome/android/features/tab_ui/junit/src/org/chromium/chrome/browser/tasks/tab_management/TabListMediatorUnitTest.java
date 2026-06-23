@@ -5412,6 +5412,7 @@ public class TabListMediatorUnitTest {
         List<Tab> tabs = List.of(mTab1, tab3);
         createTabGroup(tabs, TAB_GROUP_ID);
 
+        mMediator.resetWithListOfTabs(null, null, false);
         mMediator.resetWithListOfTabs(List.of(mTab1, mTab2), null, true);
 
         doReturn(true).when(mTabModel).tabGroupExists(TAB_GROUP_ID);
