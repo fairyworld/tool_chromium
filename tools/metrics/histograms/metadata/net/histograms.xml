@@ -247,7 +247,11 @@ chromium-metrics-reviews@google.com.
 
 <variants name="TpmOperation">
   <variant name="MessageSigning" summary="message signing"/>
+  <variant name="NewAttestationKeyCreation"
+      summary="new attestation key creation"/>
   <variant name="NewKeyCreation" summary="new key creation"/>
+  <variant name="WrappedAttestationKeyCreation"
+      summary="wrapped attestation key creation"/>
   <variant name="WrappedKeyCreation" summary="wrapped key creation"/>
 </variants>
 
@@ -583,6 +587,8 @@ chromium-metrics-reviews@google.com.
   <token key="Operation" variants="TpmOperation">
     <variant name="KeyCertification" summary="key certification"/>
     <variant name="SelectAlgorithm" summary="select algorithm"/>
+    <variant name="WrappedAttestationKeyExport"
+        summary="wrapped attestation key export"/>
     <variant name="WrappedKeyExport" summary="wrapped key export"/>
   </token>
   <token key="SignatureAlgorithm">
