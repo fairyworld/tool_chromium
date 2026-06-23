@@ -23,6 +23,7 @@
 #include "chrome/browser/web_applications/locks/app_lock.h"
 #include "chrome/browser/web_applications/model/app_installed_by.h"
 #include "chrome/browser/web_applications/model/dialog_image_info.h"
+#include "chrome/browser/web_applications/model/web_install_manifest_fetch_error.h"
 #include "chrome/browser/web_applications/web_app_command_manager.h"
 #include "chrome/browser/web_applications/web_app_command_scheduler.h"
 #include "chrome/browser/web_applications/web_app_helpers.h"
@@ -36,6 +37,7 @@
 #include "chrome/browser/web_applications/web_app_utils.h"
 #include "chrome/browser/web_applications/web_contents/web_app_data_retriever.h"
 #include "chrome/browser/web_applications/web_contents/web_contents_manager.h"
+#include "chrome/browser/web_applications/web_install_manifest_fetcher.h"
 #include "components/permissions/permission_request.h"
 #include "components/ukm/app_source_url_recorder.h"
 #include "components/webapps/browser/banners/app_banner_manager.h"
@@ -54,6 +56,7 @@
 #include "content/public/browser/permission_request_description.h"
 #include "content/public/browser/permission_result.h"
 #include "content/public/browser/web_contents.h"
+#include "net/base/url_util.h"
 #include "services/metrics/public/cpp/ukm_builders.h"
 #include "services/metrics/public/cpp/ukm_recorder.h"
 #include "services/metrics/public/cpp/ukm_source_id.h"
@@ -66,6 +69,7 @@
 #include "third_party/blink/public/mojom/web_install/web_install.mojom.h"
 #include "url/gurl.h"
 #include "url/origin.h"
+#include "url/url_constants.h"
 
 namespace web_app {
 
@@ -316,8 +320,70 @@ void WebInstallServiceImpl::InstallFromElement(
 void WebInstallServiceImpl::InstallFromManifest(
     blink::mojom::ManifestInstallOptionsPtr options,
     InstallFromManifestCallback callback) {
+  InstallFromManifestInternal(std::move(options), std::move(callback));
+}
+
+void WebInstallServiceImpl::InstallFromManifestInternal(
+    blink::mojom::ManifestInstallOptionsPtr options,
+    InstallFromManifestCallback callback) {
+  if (IsInstallInProgress()) {
+    std::move(callback).Run(blink::mojom::WebInstallServiceResult::kAbortError);
+    return;
+  }
+  base::ScopedClosureRunner install_guard = ReserveInstallInProgress();
+
+  // Wrap the callback so the install guard is released on every exit path.
+  // TODO(crbug.com/525409692): Include manifest URL telemetry. This should
+  // eventually mirror `callback_with_metrics`.
+  auto callback_with_guard = base::BindOnce(
+      [](InstallFromManifestCallback callback,
+         base::ScopedClosureRunner install_guard,
+         blink::mojom::WebInstallServiceResult result) {
+        std::move(callback).Run(result);
+      },
+      std::move(callback), std::move(install_guard));
+
+  const GURL install_target = options->manifest_url;
+
+  // Exclude file://, chrome://, data:, blob:, etc.
+  bool can_fetch_manifest = install_target.SchemeIs(url::kHttpsScheme) ||
+                            (install_target.SchemeIs(url::kHttpScheme) &&
+                             net::IsLocalhost(install_target));
+  if (!can_fetch_manifest) {
+    std::move(callback_with_guard)
+        .Run(blink::mojom::WebInstallServiceResult::kDataError);
+    return;
+  }
+
+  // Fetch the manifest even in Incognito/off-the-record profiles so that
+  // DataErrors (invalid JSON, missing id) can be returned accurately. This
+  // prevents sites from using DataError differences to detect Incognito mode.
+  auto* profile =
+      Profile::FromBrowserContext(render_frame_host().GetBrowserContext());
+
+  manifest_fetcher_ = std::make_unique<WebInstallManifestFetcher>(
+      install_target, profile->GetURLLoaderFactory());
+
+  manifest_fetcher_->Fetch(base::BindOnce(
+      &WebInstallServiceImpl::OnManifestFetched, weak_ptr_factory_.GetWeakPtr(),
+      std::move(callback_with_guard)));
+}
+
+void WebInstallServiceImpl::OnManifestFetched(
+    InstallFromManifestCallbackWithGuard callback_with_guard,
+    base::expected<std::string, WebInstallManifestFetchError> result) {
+  manifest_fetcher_.reset();
+
+  if (!result.has_value()) {
+    std::move(callback_with_guard)
+        .Run(blink::mojom::WebInstallServiceResult::kDataError);
+    return;
+  }
+
+  // TODO(liahiscock): Parse the manifest and continue the install flow.
   NOTIMPLEMENTED();
-  std::move(callback).Run(blink::mojom::WebInstallServiceResult::kAbortError);
+  std::move(callback_with_guard)
+      .Run(blink::mojom::WebInstallServiceResult::kAbortError);
 }
 
 void WebInstallServiceImpl::InstallInternal(
