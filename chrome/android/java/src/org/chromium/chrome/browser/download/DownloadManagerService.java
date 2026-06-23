@@ -49,6 +49,7 @@ import org.chromium.chrome.browser.preferences.Pref;
 import org.chromium.chrome.browser.profiles.OtrProfileId;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.profiles.ProfileKey;
+import org.chromium.chrome.browser.profiles.ProfileKeyUtil;
 import org.chromium.chrome.browser.profiles.ProfileManager;
 import org.chromium.components.download.DownloadCollectionBridge;
 import org.chromium.components.download.DownloadState;
@@ -108,7 +109,7 @@ public class DownloadManagerService implements DownloadServiceDelegate, ProfileM
     /** Generic interface for notifying external UI components about downloads and their states. */
     public interface DownloadObserver extends DownloadSharedPreferenceHelper.Observer {
         /** Called in response to {@link DownloadManagerService#getAllDownloads(OtrProfileId)}. */
-        void onAllDownloadsRetrieved(List<DownloadItem> list, ProfileKey profileKey);
+        void onAllDownloadsRetrieved(final List<DownloadItem> list, ProfileKey profileKey);
 
         /** Called when a download is created. */
         void onDownloadItemCreated(DownloadItem item);
@@ -262,6 +263,10 @@ public class DownloadManagerService implements DownloadServiceDelegate, ProfileM
     public void onActivityLaunched(DownloadMessageUiController.Delegate delegate) {
         if (mMessageUiController == null) {
             mMessageUiController = DownloadMessageUiControllerFactory.create(delegate);
+
+            DownloadManagerService.getDownloadManagerService()
+                    .checkForExternallyRemovedDownloads(
+                            ProfileKeyUtil.getLastUsedRegularProfileKey());
         }
     }
 
@@ -1173,6 +1178,16 @@ public class DownloadManagerService implements DownloadServiceDelegate, ProfileM
                         IncognitoUtils.getProfileKeyFromOtrProfileId(otrProfileId));
     }
 
+    /**
+     * Checks if the files associated with any downloads have been removed by an external action.
+     *
+     * @param profileKey The {@link ProfileKey} to check the downloads for the the given profile.
+     */
+    public void checkForExternallyRemovedDownloads(ProfileKey profileKey) {
+        DownloadManagerServiceJni.get()
+                .checkForExternallyRemovedDownloads(getNativeDownloadManagerService(), profileKey);
+    }
+
     // Deprecated after new download backend.
     @CalledByNative
     private List<DownloadItem> createDownloadItemList() {
@@ -1580,6 +1595,9 @@ public class DownloadManagerService implements DownloadServiceDelegate, ProfileM
                 ProfileKey profileKey);
 
         void getAllDownloads(long nativeDownloadManagerService, ProfileKey profileKey);
+
+        void checkForExternallyRemovedDownloads(
+                long nativeDownloadManagerService, ProfileKey profileKey);
 
         void updateLastAccessTime(
                 long nativeDownloadManagerService,
