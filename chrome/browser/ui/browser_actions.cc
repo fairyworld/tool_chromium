@@ -2367,6 +2367,61 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               bwi))
           .SetActionId(kActionShowAsTab)
           .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::MoveTabNext(bwi);
+              },
+              bwi))
+          .SetActionId(kActionMoveTabNext)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::MoveTabPrevious(bwi);
+              },
+              bwi))
+          .SetActionId(kActionMoveTabPrevious)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::MoveActiveTabToNewWindow(bwi);
+              },
+              bwi))
+          .SetActionId(kActionMoveTabToNewWindow)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::BookmarkAllTabs(bwi);
+              },
+              bwi))
+          .SetActionId(kActionBookmarkAllTabs)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::PinTab(bwi);
+              },
+              bwi))
+          .SetActionId(kActionWindowPinTab)
+          .Build());
 }
 
 void BrowserActions::AddListeners() {
