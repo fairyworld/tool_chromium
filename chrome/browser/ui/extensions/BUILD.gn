@@ -16,6 +16,14 @@ source_set("extension_popup_types") {
   public_deps = [ "//base" ]
 }
 
+source_set("extensions_menu_handler") {
+  sources = [ "extensions_menu_handler.h" ]
+  deps = [
+    "//extensions/browser",
+    "//extensions/common",
+  ]
+}
+
 source_set("extensions") {
   sources = [
     "controlled_home_dialog_controller.h",

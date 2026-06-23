@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_UI_VIEWS_EXTENSIONS_EXTENSIONS_MENU_HANDLER_H_
-#define CHROME_BROWSER_UI_VIEWS_EXTENSIONS_EXTENSIONS_MENU_HANDLER_H_
+#ifndef CHROME_BROWSER_UI_EXTENSIONS_EXTENSIONS_MENU_HANDLER_H_
+#define CHROME_BROWSER_UI_EXTENSIONS_EXTENSIONS_MENU_HANDLER_H_
 
 #include "extensions/browser/permissions_manager.h"
 #include "extensions/common/extension_id.h"
@@ -64,4 +64,4 @@ class ExtensionsMenuHandler {
       bool is_on) = 0;
 };
 
-#endif  // CHROME_BROWSER_UI_VIEWS_EXTENSIONS_EXTENSIONS_MENU_HANDLER_H_
+#endif  // CHROME_BROWSER_UI_EXTENSIONS_EXTENSIONS_MENU_HANDLER_H_
