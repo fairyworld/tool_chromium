@@ -1120,6 +1120,10 @@ if (is_android) {
         "//components/test/android/browsertests_apk/AndroidManifest.xml.jinja2"
     output =
         "${target_gen_dir}/components_browsertests_manifest/AndroidManifest.xml"
+    variables = [
+      "javaless_renderers=$enable_javaless_renderers",
+      "library_name=components_browsertests__library",
+    ]
   }
 
   android_resources("components_browsertests_resources") {
@@ -1324,6 +1328,9 @@ if (use_blink) {
         ":components_browsertests_assets",
         ":components_browsertests_java",
       ]
+      if (enable_javaless_renderers) {
+        deps += [ "//content/app:javaless_renderer" ]
+      }
     }
 
     if (is_linux || is_chromeos) {

@@ -1432,6 +1432,10 @@ if (is_android) {
     input =
         "//content/shell/android/browsertests_apk/AndroidManifest.xml.jinja2"
     output = content_browsertests_manifest
+    variables = [
+      "javaless_renderers=$enable_javaless_renderers",
+      "library_name=content_browsertests__library",
+    ]
   }
 
   android_library("content_browsertests_java") {
@@ -2310,6 +2314,9 @@ test("content_browsertests") {
       "//ui/events:motionevent_jni_headers",
       "//ui/touch_selection",
     ]
+    if (enable_javaless_renderers) {
+      deps += [ "//content/app:javaless_renderer" ]
+    }
     android_manifest =
         "${target_gen_dir}/content_browsertests_manifest/AndroidManifest.xml"
     android_manifest_dep = ":content_browsertests_manifest"
