@@ -123,6 +123,7 @@ export class OmniboxPopupSearchboxElement extends
   // True during an active IME (Input Method Editor) text composition session.
   // Used to suppress intermediate selection updates until composition finishes.
   private isComposing_: boolean = false;
+  private fullUrl_: string = '';
 
   constructor() {
     super();
@@ -280,10 +281,20 @@ export class OmniboxPopupSearchboxElement extends
 
   override onInputFocusChanged(e: CustomEvent<{value: string}>) {
     // Don't populate results if the user edited the input.
-    if (this.userInputInProgress_) {
+    if (this.userInputInProgress_ || this.isChromeScheme_()) {
       return;
     }
     super.onInputFocusChanged(e);
+  }
+
+  private isChromeScheme_(): boolean {
+    try {
+      const url = new URL(this.fullUrl_);
+      return url.protocol === 'chrome:' || url.protocol === 'chrome-untrusted:';
+    } catch (e) {
+      // Invalid URL string
+      return false;
+    }
   }
 
   /**
@@ -308,6 +319,7 @@ export class OmniboxPopupSearchboxElement extends
     this.$.input.setInputText(state.text);
     this.userInputInProgress_ = state.userInputInProgress;
     this.currentSequenceNum_ = state.sequenceNumber;
+    this.fullUrl_ = state.fullUrl;
     if (state.selection.start <= state.selection.end) {
       if (state.isDoubleClick) {
         this.$.input.setInputText(state.fullUrl);
