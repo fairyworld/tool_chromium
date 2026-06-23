@@ -45,6 +45,7 @@ source_set("coordinator") {
     "//ios/chrome/browser/authentication/ui_bundled/change_profile",
     "//ios/chrome/browser/authentication/ui_bundled/signin",
     "//ios/chrome/browser/autofill/model",
+    "//ios/chrome/browser/device_reauth/model",
     "//ios/chrome/browser/settings/autofill/autofill_ai/coordinator",
     "//ios/chrome/browser/settings/autofill/autofill_ai/ui",
     "//ios/chrome/browser/settings/autofill/autofill_and_passwords/ui:autofill_and_passwords",
@@ -66,6 +67,7 @@ source_set("coordinator") {
     "//ios/chrome/browser/signin/model:authentication_service",
     "//ios/chrome/browser/signin/model:authentication_service_factory",
     "//ios/chrome/browser/sync/model",
+    "//ios/chrome/common/ui/reauthentication",
     "//ios/chrome/common/ui/table_view:cells_constants",
   ]
 }

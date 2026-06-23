@@ -22,10 +22,13 @@ enum SectionIdentifier {
   SectionIdentifierSwitches,
   SectionIdentifierWhenOn,
   SectionIdentifierThingsToConsider,
+  SectionIdentifierVerificationSwitch,
 };
 
 enum ItemType {
   ItemTypeEnhancedAutofillSwitch = kItemTypeEnumZero,
+  ItemTypeVerificationSwitch,
+  ItemTypeVerificationFooter,
   ItemTypeFooter,
   ItemTypeHeader,
   ItemTypeLabel,
@@ -37,6 +40,9 @@ enum ItemType {
   BOOL _settingsAreDismissed;
   BOOL _enhancedAutofillEnabled;
   BOOL _autofillAIAllowedByPolicy;
+  BOOL _userVerificationEnabled;
+  BOOL _userVerificationSwitchEnabled;
+  BOOL _userVerificationSettingVisible;
 }
 
 - (void)didMoveToParentViewController:(UIViewController*)parent {
@@ -85,6 +91,18 @@ enum ItemType {
                        ItemTypeLabel)
         toSectionWithIdentifier:SectionIdentifierThingsToConsider];
   }
+
+  if (_userVerificationSettingVisible) {
+    [model addSectionWithIdentifier:SectionIdentifierVerificationSwitch];
+    [model addItem:AutofillVerificationSwitchItem(
+                       ItemTypeVerificationSwitch,
+                       _userVerificationSwitchEnabled, _userVerificationEnabled,
+                       self, @selector(verificationSwitchChanged:))
+        toSectionWithIdentifier:SectionIdentifierVerificationSwitch];
+    [model setFooter:AutofillVerificationSwitchFooter(
+                         ItemTypeVerificationFooter)
+        forSectionWithIdentifier:SectionIdentifierVerificationSwitch];
+  }
 }
 
 #pragma mark - AutofillSettingsConsumer
@@ -95,7 +113,9 @@ enum ItemType {
   }
   _enhancedAutofillEnabled = enabled;
   if (self.isViewLoaded) {
-    [self setSwitchItemOn:enabled itemType:ItemTypeEnhancedAutofillSwitch];
+    [self setSwitchItemOn:enabled
+                 itemType:ItemTypeEnhancedAutofillSwitch
+        sectionIdentifier:SectionIdentifierSwitches];
   }
 }
 
@@ -109,29 +129,77 @@ enum ItemType {
   }
 }
 
+- (void)setUserVerificationEnabled:(BOOL)enabled {
+  _userVerificationEnabled = enabled;
+  if (self.isViewLoaded) {
+    [self setSwitchItemOn:enabled
+                 itemType:ItemTypeVerificationSwitch
+        sectionIdentifier:SectionIdentifierVerificationSwitch];
+  }
+}
+
+- (void)setUserVerificationSwitchEnabled:(BOOL)enabled {
+  if (_userVerificationSwitchEnabled == enabled) {
+    return;
+  }
+  _userVerificationSwitchEnabled = enabled;
+  if (self.isViewLoaded) {
+    [self updateVerificationSwitchEnabledState];
+  }
+}
+
+- (void)setUserVerificationSettingVisible:(BOOL)visible {
+  if (_userVerificationSettingVisible == visible) {
+    return;
+  }
+  _userVerificationSettingVisible = visible;
+  if (self.isViewLoaded) {
+    [self reloadData];
+  }
+}
+
 #pragma mark - Switch Callbacks
 
 - (void)enhancedAutofillSwitchChanged:(UISwitch*)switchView {
-  BOOL enabled = switchView.on;
-  _enhancedAutofillEnabled = enabled;
-  [self setSwitchItemOn:enabled itemType:ItemTypeEnhancedAutofillSwitch];
-  [self.mutator setEnhancedAutofillEnabled:enabled];
+  [self.mutator setEnhancedAutofillEnabled:switchView.on];
+}
+
+- (void)verificationSwitchChanged:(UISwitch*)switchView {
+  [self.mutator setUserVerificationEnabled:switchView.on];
 }
 
 #pragma mark - Switch Helpers
 
-- (void)setSwitchItemOn:(BOOL)on itemType:(ItemType)switchItemType {
+- (void)setSwitchItemOn:(BOOL)on
+               itemType:(ItemType)switchItemType
+      sectionIdentifier:(SectionIdentifier)sectionIdentifier {
   if (![self.tableViewModel hasItemForItemType:switchItemType
-                             sectionIdentifier:SectionIdentifierSwitches]) {
+                             sectionIdentifier:sectionIdentifier]) {
     return;
   }
   NSIndexPath* switchPath =
       [self.tableViewModel indexPathForItemType:switchItemType
-                              sectionIdentifier:SectionIdentifierSwitches];
+                              sectionIdentifier:sectionIdentifier];
   TableViewSwitchItem* switchItem =
       base::apple::ObjCCastStrict<TableViewSwitchItem>(
           [self.tableViewModel itemAtIndexPath:switchPath]);
   switchItem.on = on;
+  [self reconfigureCellsForItems:@[ switchItem ]];
+}
+
+- (void)updateVerificationSwitchEnabledState {
+  if (![self.tableViewModel
+          hasItemForItemType:ItemTypeVerificationSwitch
+           sectionIdentifier:SectionIdentifierVerificationSwitch]) {
+    return;
+  }
+  NSIndexPath* switchPath = [self.tableViewModel
+      indexPathForItemType:ItemTypeVerificationSwitch
+         sectionIdentifier:SectionIdentifierVerificationSwitch];
+  TableViewSwitchItem* switchItem =
+      base::apple::ObjCCastStrict<TableViewSwitchItem>(
+          [self.tableViewModel itemAtIndexPath:switchPath]);
+  switchItem.enabled = _userVerificationSwitchEnabled;
   [self reconfigureCellsForItems:@[ switchItem ]];
 }
 

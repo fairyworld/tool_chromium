@@ -6,6 +6,8 @@
 
 #import "base/check_op.h"
 #import "ios/chrome/browser/autofill/model/autofill_ai_util.h"
+#import "ios/chrome/browser/device_reauth/model/reauthentication_service.h"
+#import "ios/chrome/browser/device_reauth/model/reauthentication_service_factory.h"
 #import "ios/chrome/browser/settings/autofill/autofill_and_passwords/coordinator/autofill_settings_mediator.h"
 #import "ios/chrome/browser/settings/autofill/autofill_and_passwords/ui/autofill_settings_table_view_controller.h"
 #import "ios/chrome/browser/shared/model/browser/browser.h"
@@ -43,10 +45,15 @@
 
   ProfileIOS* originalProfile =
       self.browser->GetProfile()->GetOriginalProfile();
+  id<ReauthenticationProtocol> reauthModule =
+      ReauthenticationServiceFactory::GetForProfile(originalProfile)
+          ->GetReauthModule();
+
   _mediator = [[AutofillSettingsMediator alloc]
-      initWithPrefService:originalProfile->GetPrefs()
-          identityManager:IdentityManagerFactory::GetForProfile(
-                              originalProfile)];
+         initWithPrefService:originalProfile->GetPrefs()
+             identityManager:IdentityManagerFactory::GetForProfile(
+                                 originalProfile)
+      reauthenticationModule:reauthModule];
   _mediator.consumer = _viewController;
   _mediator.delegate = self;
   _viewController.mutator = _mediator;
