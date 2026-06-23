@@ -2028,4 +2028,30 @@ void BrowserActions::InitializeNavigationActions() {
               bwi))
           .SetActionId(kActionReload)
           .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                WindowOpenDisposition disposition =
+                    context.GetProperty(chrome::kDispositionKey);
+                chrome::Home(bwi, disposition);
+              },
+              bwi))
+          .SetActionId(kActionHome)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                WindowOpenDisposition disposition =
+                    context.GetProperty(chrome::kDispositionKey);
+                chrome::GoForward(bwi, disposition);
+              },
+              bwi))
+          .SetActionId(kActionForward)
+          .Build());
 }
