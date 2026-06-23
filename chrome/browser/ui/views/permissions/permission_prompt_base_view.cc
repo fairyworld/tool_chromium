@@ -18,6 +18,7 @@
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/views/bubble_anchor_util_views.h"
+#include "chrome/browser/ui/views/picture_in_picture/document_pip_host.h"
 #include "chrome/browser/ui/views/title_origin_label.h"
 #include "chrome/browser/ui/webui/webui_embedding_context.h"
 #include "chrome/browser/web_applications/web_app_helpers.h"
@@ -87,10 +88,6 @@ PermissionPromptBaseView::PermissionPromptBaseView(
                                /*autosize=*/true),
       WebContentsObserver(web_contents),
       url_identity_(GetUrlIdentity(web_contents, *delegate)),
-      is_for_picture_in_picture_window_(
-          GetBrowser() &&
-          GetBrowser()->GetType() ==
-              BrowserWindowInterface::Type::TYPE_PICTURE_IN_PICTURE),
       record_browser_always_active_value_(GetBrowser() &&
                                           GetBrowser()->IsActive()) {
   // To prevent permissions being accepted accidentally, and as a security
@@ -250,7 +247,7 @@ std::u16string PermissionPromptBaseView::GetBlockText(
 void PermissionPromptBaseView::StartTrackingPictureInPictureOcclusion() {
   // If we're for a picture-in-picture window, then we are in an always-on-top
   // widget that should be tracked by the PictureInPictureOcclusionTracker.
-  if (is_for_picture_in_picture_window_) {
+  if (IsForPictureInPictureWindow()) {
     PictureInPictureOcclusionTracker* tracker =
         PictureInPictureWindowManager::GetInstance()->GetOcclusionTracker();
     if (tracker) {
@@ -300,6 +297,14 @@ void PermissionPromptBaseView::SetTitleBoldedRanges(
 void PermissionPromptBaseView::DidBecomeInactive(
     BrowserWindowInterface* browser_window_interface) {
   record_browser_always_active_value_ = false;
+}
+
+bool PermissionPromptBaseView::IsForPictureInPictureWindow() const {
+  if (const BrowserWindowInterface* browser = GetBrowser()) {
+    return browser->GetType() ==
+           BrowserWindowInterface::Type::TYPE_PICTURE_IN_PICTURE;
+  }
+  return !!DocumentPipHost::FromChildWebContents(web_contents());
 }
 
 BEGIN_METADATA(PermissionPromptBaseView)

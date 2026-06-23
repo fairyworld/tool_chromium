@@ -113,17 +113,17 @@ class PermissionPromptBaseView : public views::BubbleDialogDelegateView,
  private:
   void DidBecomeInactive(BrowserWindowInterface* browser_window_interface);
 
+  // True if this permission prompt is for a picture-in-picture window. This
+  // means it will be in an always-on-top window, and needs to be tracked by the
+  // PictureInPictureOcclusionTracker.
+  bool IsForPictureInPictureWindow() const;
+
   base::CallbackListSubscription browser_subscription_;
 
   const UrlIdentity url_identity_;
 
   ScopedPictureInPictureOcclusionObservation occlusion_observation_{this};
   bool occluded_by_picture_in_picture_ = false;
-
-  // True if this permission prompt is for a picture-in-picture window. This
-  // means it will be in an always-on-top window, and needs to be tracked by the
-  // PictureInPictureOcclusionTracker.
-  const bool is_for_picture_in_picture_window_;
 
   // Boolean value to track if the browser was always active while the prompt
   // was displayed.
