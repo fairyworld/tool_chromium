@@ -570,7 +570,7 @@ const gfx::VectorIcon& AutocompleteMatch::GetVectorIcon(
   if (is_bookmark && type != Type::HISTORY_EMBEDDINGS_ANSWER &&
       type != Type::STARTER_PACK) {
     return features::IsRoundedIconsEnabled()
-               ? omnibox::kStarIcon
+               ? omnibox::kStarCustomIcon
                : omnibox::kBookmarkChromeRefreshOldIcon;
   }
 
@@ -725,7 +725,7 @@ const gfx::VectorIcon& AutocompleteMatch::GetVectorIcon(
         switch (turl->GetBuiltinEngineType()) {
           case KEYWORD_MODE_STARTER_PACK_BOOKMARKS:
             return features::IsRoundedIconsEnabled()
-                       ? omnibox::kStarFilledIcon
+                       ? omnibox::kStarFilledCustomIcon
                        : omnibox::kStarActiveChromeRefreshOldIcon;
           case KEYWORD_MODE_STARTER_PACK_HISTORY:
             return features::IsRoundedIconsEnabled()

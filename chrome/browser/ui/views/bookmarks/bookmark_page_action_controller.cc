@@ -146,10 +146,10 @@ void BookmarkPageActionController::SetStarred(bool starred) {
       kActionBookmarkThisTab,
       ui::ImageModel::FromVectorIcon(
           starred ? features::IsRoundedIconsEnabled()
-                        ? omnibox::kStarFilledIcon
+                        ? omnibox::kStarFilledCustomIcon
                         : omnibox::kStarActiveChromeRefreshOldIcon
           : features::IsRoundedIconsEnabled()
-              ? omnibox::kStarIcon
+              ? omnibox::kStarCustomIcon
               : omnibox::kStarChromeRefreshOldIcon),
       starred ? page_actions::PageActionColorSource::kCascadingAccent
               : page_actions::PageActionColorSource::kForeground,
