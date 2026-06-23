@@ -8,7 +8,7 @@ import 'chrome://resources/cr_components/composebox/composebox_favicon_group.js'
 
 import type {ComposeboxFaviconGroupElement} from 'chrome://resources/cr_components/composebox/composebox_favicon_group.js';
 import type {ContextualActionMenuElement} from 'chrome://resources/cr_components/composebox/contextual_action_menu.js';
-import {DEFAULT_FLYOUT_WIDTH_PX, MIN_MENU_HEIGHT_PX, SHARE_TABS_FLYOUT_GAP_PX, SHARE_TABS_FLYOUT_MAX_HEIGHT_PX, VIEWPORT_BUFFER_PX} from 'chrome://resources/cr_components/composebox/contextual_action_menu.js';
+import {DEFAULT_FLYOUT_WIDTH_PX, MIN_MENU_HEIGHT_PX, SHARE_TABS_FLYOUT_GAP_PX, SHARE_TABS_FLYOUT_MAX_HEIGHT_PX, VIEWPORT_BUFFER_PX, DEFAULT_MAX_MENU_HEIGHT_PX} from 'chrome://resources/cr_components/composebox/contextual_action_menu.js';
 import {AnchorAlignment} from 'chrome://resources/cr_elements/cr_action_menu/cr_action_menu.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {PluralStringProxyImpl} from 'chrome://resources/js/plural_string_proxy.js';
@@ -17,7 +17,7 @@ import type {InputState} from 'chrome://resources/mojo/components/omnibox/compos
 import {InputType, ModelMode, ToolMode} from 'chrome://resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {TestPluralStringProxy} from 'chrome://webui-test/test_plural_string_proxy.js';
-import {$$, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
+import {$$, eventToPromise, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 import {MockInputState} from './composebox_test_utils.js';
 
@@ -842,7 +842,8 @@ suite('ContextualActionMenu', () => {
     const dialog = actionMenu.$.menu.getDialog();
     assertTrue(actionMenu.$.menu.open);
 
-    const expectedMaxHeight = Math.min(540, window.innerHeight - 16);
+    const expectedMaxHeight =
+        Math.min(DEFAULT_MAX_MENU_HEIGHT_PX, window.innerHeight - VIEWPORT_BUFFER_PX);
     assertEquals(expectedMaxHeight, dialog.offsetHeight);
 
     const style = window.getComputedStyle(dialog);
@@ -2214,6 +2215,40 @@ suite('ContextualActionMenu', () => {
       assertEquals(AnchorAlignment.AFTER_END, showAtCalls[1].anchorAlignmentY);
     });
 
+    test('Renders underneath the button when in zero state', async () => {
+      // Mock window innerHeight
+      Object.defineProperty(window, 'innerHeight', {
+        value: 800,
+        configurable: true,
+      });
+
+      // Suggestions are empty (zero state).
+      actionMenu.tabSuggestions = [];
+
+      // Mock anchor position (rect.bottom = 200px, spaceBelow = 800 - 200 = 600px >= 160px)
+      anchor.getBoundingClientRect = () => {
+        return {
+          bottom: 200,
+          top: 150,
+          left: 100,
+          right: 200,
+          width: 100,
+          height: 50,
+          x: 100,
+          y: 150,
+        } as DOMRect;
+      };
+
+      actionMenu.showAt(anchor);
+      await microtasksFinished();
+
+      const dialog = actionMenu.$.menu.getDialog();
+      const dialogTop = dialog.getBoundingClientRect().top;
+      // The top of the dialog should be >= the bottom of the button (200px)
+      // to ensure it renders underneath the button.
+      assertTrue(dialogTop >= 200);
+    });
+
     test('Anchors above the button if space below < 160px', async () => {
       // Mock window innerHeight
       Object.defineProperty(window, 'innerHeight', {
@@ -2386,6 +2421,114 @@ suite('ContextualActionMenu', () => {
               AnchorAlignment.AFTER_START, showAtCalls[1].anchorAlignmentX);
           assertEquals(
               AnchorAlignment.AFTER_END, showAtCalls[1].anchorAlignmentY);
+        });
+
+    test('Does not overlap the button when anchoring from above',
+          async () => {
+      // Mock window innerHeight
+      Object.defineProperty(window, 'innerHeight', {
+        value: 450,
+        configurable: true,
+      });
+
+      actionMenu.inputState = new MockInputState({
+        allowedInputTypes: [InputType.kBrowserTab],
+      });
+
+      // Provide 10 tab suggestions so the natural height is larger than 354px.
+      actionMenu.tabSuggestions = Array(10).fill({
+        tabId: 1,
+        title: 'Tab Item',
+        url: {url: 'about:blank'},
+        lastActiveTime: {internalValue: 0n},
+        showInCurrentTabChip: false,
+        showInPreviousTabChip: false,
+        lastActive: {internalValue: 0n},
+      });
+
+      // Mock anchor position (rect.bottom = 410px, spaceBelow = 450
+      // - 410 = 40px < 160px) spaceAbove = rect.top = 370px.
+      // maxHeight = 370 - 16 (buffer) = 354px.
+      anchor.getBoundingClientRect = () => {
+        return {
+          bottom: 410,
+          top: 370,
+          left: 100,
+          right: 200,
+          width: 100,
+          height: 40,
+          x: 100,
+          y: 370,
+        } as DOMRect;
+      };
+
+      await microtasksFinished();
+      actionMenu.showAt(anchor);
+      await microtasksFinished();
+
+      const dialog = actionMenu.$.menu.getDialog();
+      // The bottom of the dialog should be <= (higher than) the top of the
+      // button (370px) to prevent overlap.
+      const dialogBottom = dialog.getBoundingClientRect().bottom;
+      assertTrue(dialogBottom <= 370);
+    });
+
+    test(
+        'Does not overlap the button when suggestions load asynchronously after'
+            + ' and grows the menu.',
+        async () => {
+          // Mock window innerHeight
+          Object.defineProperty(window, 'innerHeight', {
+            value: 450,
+            configurable: true,
+          });
+
+          actionMenu.inputState = new MockInputState({
+            allowedInputTypes: [InputType.kBrowserTab],
+          });
+
+          // Suggestions are initially empty.
+          actionMenu.tabSuggestions = [];
+
+          // Mock anchor position (rect.bottom = 410px, spaceBelow = 450
+          // - 410 = 40px < 160px) spaceAbove = rect.top = 370px.
+          // maxHeight = 370 - 16 (buffer) = 354px.
+          anchor.getBoundingClientRect = () => {
+            return {
+              bottom: 410,
+              top: 370,
+              left: 100,
+              right: 200,
+              width: 100,
+              height: 40,
+              x: 100,
+              y: 370,
+            } as DOMRect;
+          };
+
+          await microtasksFinished();
+          actionMenu.showAt(anchor);
+          await microtasksFinished();
+
+          // Suggestions now load asynchronously.
+          const repositionedPromise =
+              eventToPromise('cr-action-menu-repositioned', actionMenu.$.menu);
+          actionMenu.tabSuggestions = Array(10).fill({
+            tabId: 1,
+            title: 'Tab Item',
+            url: {url: 'about:blank'},
+            lastActiveTime: {internalValue: 0n},
+            showInCurrentTabChip: false,
+            showInPreviousTabChip: false,
+            lastActive: {internalValue: 0n},
+          });
+          await Promise.all([microtasksFinished(), repositionedPromise]);
+
+          const dialog = actionMenu.$.menu.getDialog();
+          // The bottom of the dialog should be <= (higher than) the top of the
+          // button (370px) to prevent overlap.
+          const dialogBottom = dialog.getBoundingClientRect().bottom;
+          assertTrue(dialogBottom <= 370);
         });
   });
 

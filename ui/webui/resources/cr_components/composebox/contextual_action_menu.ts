@@ -41,6 +41,9 @@ const ANCHOR_RIGHT_THRESHOLD_PX = 362;
 export const VIEWPORT_BUFFER_PX = 16;
 export const MIN_MENU_HEIGHT_PX = 100;
 export const SHARE_TABS_FLYOUT_MAX_HEIGHT_PX = 344;
+// From the CSS file (default max-height and min-height):
+export const DEFAULT_MAX_MENU_HEIGHT_PX = 540;
+export const DEFAULT_MIN_MENU_HEIGHT_PX = 144;
 
 // Gap between tab shared menu and context menu in px.
 const MENU_GAP = 0;
@@ -277,14 +280,26 @@ export class ContextualActionMenuElement extends
         MENU_WIDTH_PX;
   }
 
+// Determines where menu can be placed automatically by renderer
+// based on the menu's set max/min heights.
   private constrainMenuHeight_(maxHeight: number) {
-    const menuHeight = this.$.menu.getDialog().offsetHeight;
-    if (menuHeight > maxHeight) {
-      const constrainedHeight = Math.max(MIN_MENU_HEIGHT_PX, maxHeight);
+    // Height limit is either the constant, or window size (minus buffer).
+    const defaultMaxHeight =
+        Math.min(DEFAULT_MAX_MENU_HEIGHT_PX, window.innerHeight - VIEWPORT_BUFFER_PX);
+    // Cap menu height based on the limit. Make sure it is above minimum.
+    const constrainedHeight =
+        Math.max(MIN_MENU_HEIGHT_PX, Math.min(defaultMaxHeight, maxHeight));
+    // Always set the max height, even if the current height is smaller
+    // than the max height in case later asynchronous suggestion loading
+    // creates larger height, which will cause the menu to overlap with the plus button.
+    this.$.menu.style.setProperty(
+        '--contextual-menu-max-height', `${constrainedHeight}px`);
+    // Only if constrainedHeight < CSS default, override the CSS default to allow shrinkage.
+    if (constrainedHeight < DEFAULT_MIN_MENU_HEIGHT_PX) {
       this.$.menu.style.setProperty(
-          '--contextual-menu-max-height', `${constrainedHeight}px`);
+          '--contextual-menu-min-height', `${constrainedHeight}px`);
     } else {
-      this.$.menu.style.removeProperty('--contextual-menu-max-height');
+      this.$.menu.style.removeProperty('--contextual-menu-min-height');
     }
   }
 
@@ -967,6 +982,7 @@ export class ContextualActionMenuElement extends
     window.removeEventListener('blur', this.onWindowBlur_);
     this.resetShareTabsFlyout_();
     this.$.menu.style.removeProperty('--contextual-menu-max-height');
+    this.$.menu.style.removeProperty('--contextual-menu-min-height');
     this.fire('close');
   }
 
