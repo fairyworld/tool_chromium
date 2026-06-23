@@ -686,7 +686,6 @@ void PermissionContextBase::PermissionDecided(
       decision.overall_decision == PermissionDecision::kNone) {
     content::RenderFrameHost* rfh = content::RenderFrameHost::FromID(
         request_data.id.global_render_frame_host_id());
-    DCHECK(rfh);
     MaybeUpdateCachedHasDevicePermission(
         content::WebContents::FromRenderFrameHost(rfh));
   }
