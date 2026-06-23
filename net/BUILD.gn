@@ -3314,6 +3314,7 @@ target(_test_target_type, "net_unittests") {
     sources += [
       "extras/sqlite/sqlite_persistent_cookie_store_unittest.cc",
       "extras/sqlite/sqlite_persistent_shared_dictionary_store_unittest.cc",
+      "extras/sqlite/sqlite_persistent_store_backend_base_unittest.cc",
       "log/trace_net_log_observer_unittest.cc",
     ]
 
