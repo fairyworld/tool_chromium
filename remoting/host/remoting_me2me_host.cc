@@ -1688,6 +1688,10 @@ bool HostProcess::OnPairingPolicyUpdate(const base::DictValue& policies) {
   return true;
 }
 
+// TODO(crbug.com/517007701): This callback and the associated host restart
+// logic will be completely removed once the SecurityKeyExtension lifecycle
+// is moved into ClientSession in the upcoming parallel transport refactoring
+// CL, which will enable 100% dynamic policy enforcement without restarts.
 bool HostProcess::OnGnubbyAuthPolicyUpdate(const base::DictValue& policies) {
   DCHECK(context_->network_task_runner()->BelongsToCurrentThread());
 
