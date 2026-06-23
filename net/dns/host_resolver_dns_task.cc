@@ -844,8 +844,8 @@ void HostResolverDnsTask::HandleTransactionResults(
     for (const std::unique_ptr<HostResolverInternalResult>& result :
          transaction_results) {
       resolve_context_->host_resolver_cache()->Set(
-          result->Clone(), anonymization_key_, HostResolverSource::DNS,
-          secure());
+          result->Clone(), anonymization_key_, target_network_,
+          HostResolverSource::DNS, secure());
     }
   }
 

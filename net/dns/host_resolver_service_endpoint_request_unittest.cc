@@ -363,10 +363,10 @@ class HostResolverServiceEndpointRequestTest
   void PopulateCacheForUrl(std::string_view host,
                            std::vector<IPEndPoint> endpoints,
                            bool secure = false) {
-    HostCache::Key key =
-        HostCache::Key(url::SchemeHostPort(GURL(host)),
-                       DnsQueryType::UNSPECIFIED, /*host_resolver_flags=*/0,
-                       HostResolverSource::ANY, NetworkAnonymizationKey());
+    HostCache::Key key = HostCache::Key(
+        url::SchemeHostPort(GURL(host)), DnsQueryType::UNSPECIFIED,
+        /*host_resolver_flags=*/0, HostResolverSource::ANY,
+        NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
     key.secure = secure;
     PopulateCache(key, std::move(endpoints));
   }

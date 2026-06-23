@@ -23,6 +23,7 @@
 #include "base/values.h"
 #include "net/base/net_export.h"
 #include "net/base/network_anonymization_key.h"
+#include "net/base/network_handle.h"
 #include "net/dns/public/dns_query_type.h"
 #include "net/dns/public/host_resolver_source.h"
 
@@ -79,6 +80,7 @@ class NET_EXPORT HostResolverCache final {
   const HostResolverInternalResult* Lookup(
       std::string_view domain_name,
       const NetworkAnonymizationKey& network_anonymization_key,
+      handles::NetworkHandle target_network,
       DnsQueryType query_type = DnsQueryType::UNSPECIFIED,
       HostResolverSource source = HostResolverSource::ANY,
       std::optional<bool> secure = std::nullopt) const;
@@ -99,6 +101,7 @@ class NET_EXPORT HostResolverCache final {
   std::optional<StaleLookupResult> LookupStale(
       std::string_view domain_name,
       const NetworkAnonymizationKey& network_anonymization_key,
+      handles::NetworkHandle target_network,
       DnsQueryType query_type = DnsQueryType::UNSPECIFIED,
       HostResolverSource source = HostResolverSource::ANY,
       std::optional<bool> secure = std::nullopt) const;
@@ -109,6 +112,7 @@ class NET_EXPORT HostResolverCache final {
   // `DnsQueryType::UNSPECIFIED`.
   void Set(std::unique_ptr<HostResolverInternalResult> result,
            const NetworkAnonymizationKey& network_anonymization_key,
+           handles::NetworkHandle target_network,
            HostResolverSource source,
            bool secure);
 
@@ -151,6 +155,7 @@ class NET_EXPORT HostResolverCache final {
 
     std::string domain_name;
     NetworkAnonymizationKey network_anonymization_key;
+    handles::NetworkHandle target_network = handles::kInvalidNetworkHandle;
   };
 
   struct KeyRef {
@@ -158,6 +163,7 @@ class NET_EXPORT HostResolverCache final {
 
     std::string_view domain_name;
     const raw_ref<const NetworkAnonymizationKey> network_anonymization_key;
+    handles::NetworkHandle target_network = handles::kInvalidNetworkHandle;
   };
 
   // Allow comparing Key to KeyRef to allow refs for entry lookup.
@@ -167,18 +173,24 @@ class NET_EXPORT HostResolverCache final {
     ~KeyComparator() = default;
 
     bool operator()(const Key& lhs, const Key& rhs) const {
-      return std::tie(lhs.domain_name, lhs.network_anonymization_key) <
-             std::tie(rhs.domain_name, rhs.network_anonymization_key);
+      return std::tie(lhs.domain_name, lhs.network_anonymization_key,
+                      lhs.target_network) <
+             std::tie(rhs.domain_name, rhs.network_anonymization_key,
+                      rhs.target_network);
     }
 
     bool operator()(const Key& lhs, const KeyRef& rhs) const {
-      return std::tie(lhs.domain_name, lhs.network_anonymization_key) <
-             std::tie(rhs.domain_name, *rhs.network_anonymization_key);
+      return std::tie(lhs.domain_name, lhs.network_anonymization_key,
+                      lhs.target_network) <
+             std::tie(rhs.domain_name, *rhs.network_anonymization_key,
+                      rhs.target_network);
     }
 
     bool operator()(const KeyRef& lhs, const Key& rhs) const {
-      return std::tie(lhs.domain_name, *lhs.network_anonymization_key) <
-             std::tie(rhs.domain_name, rhs.network_anonymization_key);
+      return std::tie(lhs.domain_name, *lhs.network_anonymization_key,
+                      lhs.target_network) <
+             std::tie(rhs.domain_name, rhs.network_anonymization_key,
+                      rhs.target_network);
     }
   };
 
@@ -214,12 +226,14 @@ class NET_EXPORT HostResolverCache final {
   std::vector<EntryMap::const_iterator> LookupInternal(
       std::string_view domain_name,
       const NetworkAnonymizationKey& network_anonymization_key,
+      handles::NetworkHandle target_network,
       DnsQueryType query_type,
       HostResolverSource source,
       std::optional<bool> secure) const;
 
   void Set(std::unique_ptr<HostResolverInternalResult> result,
            const NetworkAnonymizationKey& network_anonymization_key,
+           handles::NetworkHandle target_network,
            HostResolverSource source,
            bool secure,
            bool replace_existing,

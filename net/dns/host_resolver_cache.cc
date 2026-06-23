@@ -17,6 +17,7 @@
 #include "base/time/clock.h"
 #include "base/time/time.h"
 #include "net/base/network_anonymization_key.h"
+#include "net/base/network_handle.h"
 #include "net/dns/host_resolver_internal_result.h"
 #include "net/dns/public/dns_query_type.h"
 #include "net/dns/public/host_resolver_source.h"
@@ -64,11 +65,13 @@ HostResolverCache& HostResolverCache::operator=(HostResolverCache&&) = default;
 const HostResolverInternalResult* HostResolverCache::Lookup(
     std::string_view domain_name,
     const NetworkAnonymizationKey& network_anonymization_key,
+    handles::NetworkHandle network,
     DnsQueryType query_type,
     HostResolverSource source,
     std::optional<bool> secure) const {
-  std::vector<EntryMap::const_iterator> candidates = LookupInternal(
-      domain_name, network_anonymization_key, query_type, source, secure);
+  std::vector<EntryMap::const_iterator> candidates =
+      LookupInternal(domain_name, network_anonymization_key, network,
+                     query_type, source, secure);
 
   // Get the most secure, last-matching (which is first in the vector returned
   // by LookupInternal()) non-expired result.
@@ -98,11 +101,13 @@ std::optional<HostResolverCache::StaleLookupResult>
 HostResolverCache::LookupStale(
     std::string_view domain_name,
     const NetworkAnonymizationKey& network_anonymization_key,
+    handles::NetworkHandle network,
     DnsQueryType query_type,
     HostResolverSource source,
     std::optional<bool> secure) const {
-  std::vector<EntryMap::const_iterator> candidates = LookupInternal(
-      domain_name, network_anonymization_key, query_type, source, secure);
+  std::vector<EntryMap::const_iterator> candidates =
+      LookupInternal(domain_name, network_anonymization_key, network,
+                     query_type, source, secure);
 
   // Get the least expired, most secure result.
   base::TimeTicks now_ticks = tick_clock_->NowTicks();
@@ -158,9 +163,11 @@ HostResolverCache::LookupStale(
 void HostResolverCache::Set(
     std::unique_ptr<HostResolverInternalResult> result,
     const NetworkAnonymizationKey& network_anonymization_key,
+    handles::NetworkHandle target_network,
     HostResolverSource source,
     bool secure) {
-  Set(std::move(result), network_anonymization_key, source, secure,
+  Set(std::move(result), network_anonymization_key, target_network, source,
+      secure,
       /*replace_existing=*/true, staleness_generation_);
 }
 
@@ -227,7 +234,8 @@ bool HostResolverCache::RestoreFromValue(const base::Value& value) {
     }
 
     // `staleness_generation_ - 1` to make entry stale-by-generation.
-    Set(std::move(result), anonymization_key, source.value(), secure.value(),
+    Set(std::move(result), anonymization_key, handles::kInvalidNetworkHandle,
+        source.value(), secure.value(),
         /*replace_existing=*/false, staleness_generation_ - 1);
   }
 
@@ -289,6 +297,7 @@ std::vector<HostResolverCache::EntryMap::const_iterator>
 HostResolverCache::LookupInternal(
     std::string_view domain_name,
     const NetworkAnonymizationKey& network_anonymization_key,
+    handles::NetworkHandle network,
     DnsQueryType query_type,
     HostResolverSource source,
     std::optional<bool> secure) const {
@@ -315,7 +324,7 @@ HostResolverCache::LookupInternal(
   }
 
   auto range = entries_.equal_range(
-      KeyRef{lookup_name, raw_ref(network_anonymization_key)});
+      KeyRef{lookup_name, raw_ref(network_anonymization_key), network});
   if (range.first == entries_.cend() || range.second == entries_.cbegin() ||
       range.first == range.second) {
     return matches;
@@ -344,6 +353,7 @@ HostResolverCache::LookupInternal(
 void HostResolverCache::Set(
     std::unique_ptr<HostResolverInternalResult> result,
     const NetworkAnonymizationKey& network_anonymization_key,
+    handles::NetworkHandle target_network,
     HostResolverSource source,
     bool secure,
     bool replace_existing,
@@ -354,7 +364,7 @@ void HostResolverCache::Set(
 
   std::vector<EntryMap::const_iterator> matches =
       LookupInternal(result->domain_name(), network_anonymization_key,
-                     result->query_type(), source, secure);
+                     target_network, result->query_type(), source, secure);
 
   if (!matches.empty() && !replace_existing) {
     // Matches already present that are not to be replaced.
@@ -367,7 +377,7 @@ void HostResolverCache::Set(
 
   std::string domain_name = result->domain_name();
   entries_.emplace(
-      Key(std::move(domain_name), network_anonymization_key),
+      Key(std::move(domain_name), network_anonymization_key, target_network),
       Entry(std::move(result), source, secure, staleness_generation));
 
   if (entries_.size() > max_entries_) {

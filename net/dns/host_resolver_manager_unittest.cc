@@ -587,21 +587,23 @@ TEST_F(HostResolverManagerTest, AsynchronousLookup) {
   EXPECT_EQ("just.testing", proc_->GetCaptureList()[0].hostname);
 
   const std::pair<const HostCache::Key, HostCache::Entry>* cache_result =
-      GetCacheHit(HostCache::Key("just.testing", DnsQueryType::UNSPECIFIED,
-                                 0 /* host_resolver_flags */,
-                                 HostResolverSource::ANY,
-                                 NetworkAnonymizationKey()));
+      GetCacheHit(HostCache::Key(
+          "just.testing", DnsQueryType::UNSPECIFIED,
+          0 /* host_resolver_flags */, HostResolverSource::ANY,
+          NetworkAnonymizationKey(), handles::kInvalidNetworkHandle));
   EXPECT_TRUE(cache_result);
 
   EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  "just.testing", NetworkAnonymizationKey(), DnsQueryType::A,
+                  "just.testing", NetworkAnonymizationKey(),
+                  handles::kInvalidNetworkHandle, DnsQueryType::A,
                   HostResolverSource::SYSTEM, /*secure=*/false),
               Pointee(ExpectHostResolverInternalDataResult(
                   "just.testing", DnsQueryType::A,
                   HostResolverInternalResult::Source::kUnknown, _, _,
                   ElementsAre(CreateExpected("192.168.1.42", 0)))));
   EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  "just.testing", NetworkAnonymizationKey(), DnsQueryType::AAAA,
+                  "just.testing", NetworkAnonymizationKey(),
+                  handles::kInvalidNetworkHandle, DnsQueryType::AAAA,
                   HostResolverSource::SYSTEM, /*secure=*/false),
               Pointee(ExpectHostResolverInternalErrorResult(
                   "just.testing", DnsQueryType::AAAA,
@@ -634,7 +636,8 @@ TEST_F(HostResolverManagerTest, AsynchronousLookupWithScheme) {
       GetCacheHit(
           HostCache::Key(url::SchemeHostPort(url::kHttpScheme, "host.test", 80),
                          DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-                         HostResolverSource::ANY, NetworkAnonymizationKey()));
+                         HostResolverSource::ANY, NetworkAnonymizationKey(),
+                         handles::kInvalidNetworkHandle));
   EXPECT_TRUE(cache_result);
 }
 
@@ -654,20 +657,22 @@ TEST_F(HostResolverManagerTest, AsynchronousIpv6Lookup) {
               ElementsAre(ExpectEndpointResult(
                   ElementsAre(CreateExpected("2001:db8:1::", 80)))));
 
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  "foo.test", NetworkAnonymizationKey(), DnsQueryType::A,
-                  HostResolverSource::SYSTEM, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalErrorResult(
-                  "foo.test", DnsQueryType::A,
-                  HostResolverInternalResult::Source::kUnknown, _, _,
-                  ERR_NAME_NOT_RESOLVED)));
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  "foo.test", NetworkAnonymizationKey(), DnsQueryType::AAAA,
-                  HostResolverSource::SYSTEM, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalDataResult(
-                  "foo.test", DnsQueryType::AAAA,
-                  HostResolverInternalResult::Source::kUnknown, _, _,
-                  ElementsAre(CreateExpected("2001:db8:1::", 0)))));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          "foo.test", NetworkAnonymizationKey(), handles::kInvalidNetworkHandle,
+          DnsQueryType::A, HostResolverSource::SYSTEM, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalErrorResult(
+          "foo.test", DnsQueryType::A,
+          HostResolverInternalResult::Source::kUnknown, _, _,
+          ERR_NAME_NOT_RESOLVED)));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          "foo.test", NetworkAnonymizationKey(), handles::kInvalidNetworkHandle,
+          DnsQueryType::AAAA, HostResolverSource::SYSTEM, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalDataResult(
+          "foo.test", DnsQueryType::AAAA,
+          HostResolverInternalResult::Source::kUnknown, _, _,
+          ElementsAre(CreateExpected("2001:db8:1::", 0)))));
 }
 
 TEST_F(HostResolverManagerTest, AsynchronousAllFamilyLookup) {
@@ -687,20 +692,22 @@ TEST_F(HostResolverManagerTest, AsynchronousAllFamilyLookup) {
                   UnorderedElementsAre(CreateExpected("2001:db8:2::", 80),
                                        CreateExpected("192.168.1.43", 80)))));
 
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  "foo.test", NetworkAnonymizationKey(), DnsQueryType::A,
-                  HostResolverSource::SYSTEM, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalDataResult(
-                  "foo.test", DnsQueryType::A,
-                  HostResolverInternalResult::Source::kUnknown, _, _,
-                  ElementsAre(CreateExpected("192.168.1.43", 0)))));
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  "foo.test", NetworkAnonymizationKey(), DnsQueryType::AAAA,
-                  HostResolverSource::SYSTEM, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalDataResult(
-                  "foo.test", DnsQueryType::AAAA,
-                  HostResolverInternalResult::Source::kUnknown, _, _,
-                  ElementsAre(CreateExpected("2001:db8:2::", 0)))));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          "foo.test", NetworkAnonymizationKey(), handles::kInvalidNetworkHandle,
+          DnsQueryType::A, HostResolverSource::SYSTEM, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalDataResult(
+          "foo.test", DnsQueryType::A,
+          HostResolverInternalResult::Source::kUnknown, _, _,
+          ElementsAre(CreateExpected("192.168.1.43", 0)))));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          "foo.test", NetworkAnonymizationKey(), handles::kInvalidNetworkHandle,
+          DnsQueryType::AAAA, HostResolverSource::SYSTEM, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalDataResult(
+          "foo.test", DnsQueryType::AAAA,
+          HostResolverInternalResult::Source::kUnknown, _, _,
+          ElementsAre(CreateExpected("2001:db8:2::", 0)))));
 }
 
 TEST_F(HostResolverManagerTest, JobsClearedOnCompletion) {
@@ -936,15 +943,16 @@ TEST_F(HostResolverManagerTest, FailedAsynchronousLookup) {
 
   // Also test that the error is not cached.
   const std::pair<const HostCache::Key, HostCache::Entry>* cache_result =
-      GetCacheHit(HostCache::Key("just.testing", DnsQueryType::UNSPECIFIED,
-                                 0 /* host_resolver_flags */,
-                                 HostResolverSource::ANY,
-                                 NetworkAnonymizationKey()));
+      GetCacheHit(HostCache::Key(
+          "just.testing", DnsQueryType::UNSPECIFIED,
+          0 /* host_resolver_flags */, HostResolverSource::ANY,
+          NetworkAnonymizationKey(), handles::kInvalidNetworkHandle));
   EXPECT_FALSE(cache_result);
 
   // Expect system resolve failures never cached.
   EXPECT_FALSE(resolve_context_->host_resolver_cache()->Lookup(
-      "just.testing", NetworkAnonymizationKey()));
+      "just.testing", NetworkAnonymizationKey(),
+      handles::kInvalidNetworkHandle));
 }
 
 TEST_F(HostResolverManagerTest, AbortedAsynchronousLookup) {
@@ -2753,7 +2761,8 @@ TEST_F(HostResolverManagerTest, NameCollisionIcann) {
   const std::pair<const HostCache::Key, HostCache::Entry>* cache_result =
       GetCacheHit(HostCache::Key(
           "single", DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-          HostResolverSource::ANY, NetworkAnonymizationKey()));
+          HostResolverSource::ANY, NetworkAnonymizationKey(),
+          handles::kInvalidNetworkHandle));
   EXPECT_FALSE(cache_result);
 
   ResolveHostResponseHelper multiple_response(resolver_->CreateRequest(
@@ -2877,27 +2886,31 @@ TEST_F(HostResolverManagerTest, IncludeCanonicalName) {
 
   EXPECT_THAT(
       resolve_context_->host_resolver_cache()->Lookup(
-          "just.testing", NetworkAnonymizationKey(), DnsQueryType::A,
+          "just.testing", NetworkAnonymizationKey(),
+          handles::kInvalidNetworkHandle, DnsQueryType::A,
           HostResolverSource::SYSTEM, /*secure=*/false),
       Pointee(ExpectHostResolverInternalAliasResult(
           "just.testing", DnsQueryType::A,
           HostResolverInternalResult::Source::kUnknown, _, _, "canon.name")));
   EXPECT_THAT(
       resolve_context_->host_resolver_cache()->Lookup(
-          "just.testing", NetworkAnonymizationKey(), DnsQueryType::AAAA,
+          "just.testing", NetworkAnonymizationKey(),
+          handles::kInvalidNetworkHandle, DnsQueryType::AAAA,
           HostResolverSource::SYSTEM, /*secure=*/false),
       Pointee(ExpectHostResolverInternalAliasResult(
           "just.testing", DnsQueryType::AAAA,
           HostResolverInternalResult::Source::kUnknown, _, _, "canon.name")));
   EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  "canon.name", NetworkAnonymizationKey(), DnsQueryType::A,
+                  "canon.name", NetworkAnonymizationKey(),
+                  handles::kInvalidNetworkHandle, DnsQueryType::A,
                   HostResolverSource::SYSTEM, /*secure=*/false),
               Pointee(ExpectHostResolverInternalDataResult(
                   "canon.name", DnsQueryType::A,
                   HostResolverInternalResult::Source::kUnknown, _, _,
                   ElementsAre(CreateExpected("192.168.1.42", 0)))));
   EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  "canon.name", NetworkAnonymizationKey(), DnsQueryType::AAAA,
+                  "canon.name", NetworkAnonymizationKey(),
+                  handles::kInvalidNetworkHandle, DnsQueryType::AAAA,
                   HostResolverSource::SYSTEM, /*secure=*/false),
               Pointee(ExpectHostResolverInternalErrorResult(
                   "canon.name", DnsQueryType::AAAA,
@@ -4118,31 +4131,32 @@ TEST_F(HostResolverManagerTest, NetworkAnonymizationKeyWriteToHostCache) {
     // should be an entry in the HostCache with kNetworkAnonymizationKey1.
     // Otherwise, there should be an entry with the empty NAK.
     if (split_cache_by_network_anonymization_key) {
-      EXPECT_TRUE(GetCacheHit(
-          HostCache::Key("just.testing", DnsQueryType::UNSPECIFIED,
-                         0 /* host_resolver_flags */, HostResolverSource::ANY,
-                         kNetworkAnonymizationKey1)));
+      EXPECT_TRUE(GetCacheHit(HostCache::Key(
+          "just.testing", DnsQueryType::UNSPECIFIED,
+          0 /* host_resolver_flags */, HostResolverSource::ANY,
+          kNetworkAnonymizationKey1, handles::kInvalidNetworkHandle)));
 
-      EXPECT_FALSE(GetCacheHit(
-          HostCache::Key("just.testing", DnsQueryType::UNSPECIFIED,
-                         0 /* host_resolver_flags */, HostResolverSource::ANY,
-                         NetworkAnonymizationKey())));
+      EXPECT_FALSE(GetCacheHit(HostCache::Key(
+          "just.testing", DnsQueryType::UNSPECIFIED,
+          0 /* host_resolver_flags */, HostResolverSource::ANY,
+          NetworkAnonymizationKey(), handles::kInvalidNetworkHandle)));
     } else {
-      EXPECT_FALSE(GetCacheHit(
-          HostCache::Key("just.testing", DnsQueryType::UNSPECIFIED,
-                         0 /* host_resolver_flags */, HostResolverSource::ANY,
-                         kNetworkAnonymizationKey1)));
+      EXPECT_FALSE(GetCacheHit(HostCache::Key(
+          "just.testing", DnsQueryType::UNSPECIFIED,
+          0 /* host_resolver_flags */, HostResolverSource::ANY,
+          kNetworkAnonymizationKey1, handles::kInvalidNetworkHandle)));
 
-      EXPECT_TRUE(GetCacheHit(
-          HostCache::Key("just.testing", DnsQueryType::UNSPECIFIED,
-                         0 /* host_resolver_flags */, HostResolverSource::ANY,
-                         NetworkAnonymizationKey())));
+      EXPECT_TRUE(GetCacheHit(HostCache::Key(
+          "just.testing", DnsQueryType::UNSPECIFIED,
+          0 /* host_resolver_flags */, HostResolverSource::ANY,
+          NetworkAnonymizationKey(), handles::kInvalidNetworkHandle)));
     }
 
     // There should be no entry using kNetworkAnonymizationKey2 in either case.
     EXPECT_FALSE(GetCacheHit(HostCache::Key(
         "just.testing", DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-        HostResolverSource::ANY, kNetworkAnonymizationKey2)));
+        HostResolverSource::ANY, kNetworkAnonymizationKey2,
+        handles::kInvalidNetworkHandle)));
 
     // A request using kNetworkAnonymizationKey2 should only be served out of
     // the cache of the cache if |split_cache_by_network_anonymization_key| is
@@ -4166,10 +4180,10 @@ TEST_F(HostResolverManagerTest, NetworkAnonymizationKeyWriteToHostCache) {
               testing::ElementsAre(CreateExpected(kSecondDnsResult, 80)))));
       EXPECT_FALSE(response2.request()->GetStaleInfo());
       EXPECT_EQ(2u, proc_->GetCaptureList().size());
-      EXPECT_TRUE(GetCacheHit(
-          HostCache::Key("just.testing", DnsQueryType::UNSPECIFIED,
-                         0 /* host_resolver_flags */, HostResolverSource::ANY,
-                         kNetworkAnonymizationKey2)));
+      EXPECT_TRUE(GetCacheHit(HostCache::Key(
+          "just.testing", DnsQueryType::UNSPECIFIED,
+          0 /* host_resolver_flags */, HostResolverSource::ANY,
+          kNetworkAnonymizationKey2, handles::kInvalidNetworkHandle)));
     } else {
       EXPECT_THAT(response2.request()->GetAddressResults(),
                   testing::ElementsAre(CreateExpected(kFirstDnsResult, 80)));
@@ -4179,10 +4193,10 @@ TEST_F(HostResolverManagerTest, NetworkAnonymizationKeyWriteToHostCache) {
               testing::ElementsAre(CreateExpected(kFirstDnsResult, 80)))));
       EXPECT_TRUE(response2.request()->GetStaleInfo());
       EXPECT_EQ(1u, proc_->GetCaptureList().size());
-      EXPECT_FALSE(GetCacheHit(
-          HostCache::Key("just.testing", DnsQueryType::UNSPECIFIED,
-                         0 /* host_resolver_flags */, HostResolverSource::ANY,
-                         kNetworkAnonymizationKey2)));
+      EXPECT_FALSE(GetCacheHit(HostCache::Key(
+          "just.testing", DnsQueryType::UNSPECIFIED,
+          0 /* host_resolver_flags */, HostResolverSource::ANY,
+          kNetworkAnonymizationKey2, handles::kInvalidNetworkHandle)));
     }
 
     resolve_context_->host_cache()->clear();
@@ -4214,9 +4228,9 @@ TEST_F(HostResolverManagerTest, NetworkAnonymizationKeyReadFromHostCache) {
   // HostResolverManager obeys network state partitioning, so this is fine to do
   // regardless of the feature value.
   for (const auto& cache_entry : kCacheEntries) {
-    HostCache::Key key("just.testing", DnsQueryType::UNSPECIFIED, 0,
-                       HostResolverSource::ANY,
-                       cache_entry.network_anonymization_key);
+    HostCache::Key key(
+        "just.testing", DnsQueryType::UNSPECIFIED, 0, HostResolverSource::ANY,
+        cache_entry.network_anonymization_key, handles::kInvalidNetworkHandle);
     IPAddress address;
     ASSERT_TRUE(address.AssignFromIPLiteral(cache_entry.cached_ip_address));
     HostCache::Entry entry = HostCache::Entry(
@@ -6120,8 +6134,8 @@ TEST_F(HostResolverManagerDnsTest, Ipv6UnreachableOnlyDisablesAAAAQuery) {
   ResolveHostResponseHelper response(resolver_->CreateRequest(
       url::SchemeHostPort(url::kHttpsScheme, kName, 443),
       NetworkAnonymizationKey(), handles::kInvalidNetworkHandle,
-      NetLogWithSource(), /*optional_parameters=*/std::nullopt,
-      resolve_context_.get()));
+      NetLogWithSource(),
+      /*optional_parameters=*/std::nullopt, resolve_context_.get()));
   EXPECT_THAT(response.result_error(), IsOk());
   EXPECT_THAT(response.request()->GetAddressResults(),
               testing::UnorderedElementsAre(CreateExpected("127.0.0.1", 443)));
@@ -6269,8 +6283,9 @@ TEST_F(HostResolverManagerDnsTest, DeleteWithActiveTransactions) {
     responses.emplace_back(
         std::make_unique<ResolveHostResponseHelper>(resolver_->CreateRequest(
             HostPortPair(hostname, 80), NetworkAnonymizationKey(),
-            handles::kInvalidNetworkHandle, NetLogWithSource(), std::nullopt,
-            resolve_context_.get())));
+            handles::kInvalidNetworkHandle,
+
+            NetLogWithSource(), std::nullopt, resolve_context_.get())));
   }
   EXPECT_EQ(10u, num_running_dispatcher_jobs());
 
@@ -6449,23 +6464,27 @@ TEST_F(HostResolverManagerDnsTest, AAAACompletesFirst) {
   responses.emplace_back(
       std::make_unique<ResolveHostResponseHelper>(resolver_->CreateRequest(
           HostPortPair("4slow_ok", 80), NetworkAnonymizationKey(),
-          handles::kInvalidNetworkHandle, NetLogWithSource(), std::nullopt,
-          resolve_context_.get())));
+          handles::kInvalidNetworkHandle,
+
+          NetLogWithSource(), std::nullopt, resolve_context_.get())));
   responses.emplace_back(
       std::make_unique<ResolveHostResponseHelper>(resolver_->CreateRequest(
           HostPortPair("4slow_4ok", 80), NetworkAnonymizationKey(),
-          handles::kInvalidNetworkHandle, NetLogWithSource(), std::nullopt,
-          resolve_context_.get())));
+          handles::kInvalidNetworkHandle,
+
+          NetLogWithSource(), std::nullopt, resolve_context_.get())));
   responses.emplace_back(
       std::make_unique<ResolveHostResponseHelper>(resolver_->CreateRequest(
           HostPortPair("4slow_4timeout", 80), NetworkAnonymizationKey(),
-          handles::kInvalidNetworkHandle, NetLogWithSource(), std::nullopt,
-          resolve_context_.get())));
+          handles::kInvalidNetworkHandle,
+
+          NetLogWithSource(), std::nullopt, resolve_context_.get())));
   responses.emplace_back(
       std::make_unique<ResolveHostResponseHelper>(resolver_->CreateRequest(
           HostPortPair("4slow_6timeout", 80), NetworkAnonymizationKey(),
-          handles::kInvalidNetworkHandle, NetLogWithSource(), std::nullopt,
-          resolve_context_.get())));
+          handles::kInvalidNetworkHandle,
+
+          NetLogWithSource(), std::nullopt, resolve_context_.get())));
 
   base::RunLoop().RunUntilIdle();
   EXPECT_FALSE(responses[0]->complete());
@@ -6541,10 +6560,10 @@ TEST_F(HostResolverManagerDnsTest, AAAACompletesFirst_AutomaticMode) {
   EXPECT_THAT(response.request()->GetEndpointResults(),
               testing::ElementsAre(ExpectEndpointResult(
                   testing::ElementsAre(CreateExpected("127.0.0.1", 80)))));
-  HostCache::Key insecure_key =
-      HostCache::Key("secure_slow_nx_insecure_4slow_ok",
-                     DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-                     HostResolverSource::ANY, NetworkAnonymizationKey());
+  HostCache::Key insecure_key = HostCache::Key(
+      "secure_slow_nx_insecure_4slow_ok", DnsQueryType::UNSPECIFIED,
+      0 /* host_resolver_flags */, HostResolverSource::ANY,
+      NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   const std::pair<const HostCache::Key, HostCache::Entry>* cache_result =
       GetCacheHit(insecure_key);
   EXPECT_TRUE(!!cache_result);
@@ -6577,9 +6596,10 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Automatic) {
       response_secure.request()->GetEndpointResults(),
       testing::ElementsAre(ExpectEndpointResult(testing::UnorderedElementsAre(
           CreateExpected("::1", 80), CreateExpected("127.0.0.1", 80)))));
-  HostCache::Key secure_key = HostCache::Key(
-      "automatic", DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-      HostResolverSource::ANY, NetworkAnonymizationKey());
+  HostCache::Key secure_key =
+      HostCache::Key("automatic", DnsQueryType::UNSPECIFIED,
+                     0 /* host_resolver_flags */, HostResolverSource::ANY,
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   secure_key.secure = true;
   cache_result = GetCacheHit(secure_key);
   EXPECT_TRUE(!!cache_result);
@@ -6606,7 +6626,7 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Automatic) {
   HostCache::Key insecure_key =
       HostCache::Key("insecure_automatic", DnsQueryType::UNSPECIFIED,
                      0 /* host_resolver_flags */, HostResolverSource::ANY,
-                     NetworkAnonymizationKey());
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   cache_result = GetCacheHit(insecure_key);
   EXPECT_TRUE(!!cache_result);
 
@@ -6636,7 +6656,7 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Automatic_SecureCache) {
   HostCache::Key cached_secure_key =
       HostCache::Key("automatic_cached", DnsQueryType::UNSPECIFIED,
                      0 /* host_resolver_flags */, HostResolverSource::ANY,
-                     NetworkAnonymizationKey());
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   cached_secure_key.secure = true;
   IPEndPoint kExpectedSecureIP = CreateExpected("192.168.1.102", 80);
   PopulateCache(cached_secure_key, kExpectedSecureIP);
@@ -6671,7 +6691,7 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Automatic_InsecureCache) {
   HostCache::Key cached_insecure_key =
       HostCache::Key("insecure_automatic_cached", DnsQueryType::UNSPECIFIED,
                      0 /* host_resolver_flags */, HostResolverSource::ANY,
-                     NetworkAnonymizationKey());
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   IPEndPoint kExpectedInsecureIP = CreateExpected("192.168.1.103", 80);
   PopulateCache(cached_insecure_key, kExpectedInsecureIP);
 
@@ -6708,14 +6728,14 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Automatic_Downgrade) {
   HostCache::Key cached_secure_key =
       HostCache::Key("automatic_cached", DnsQueryType::UNSPECIFIED,
                      0 /* host_resolver_flags */, HostResolverSource::ANY,
-                     NetworkAnonymizationKey());
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   cached_secure_key.secure = true;
   IPEndPoint kExpectedSecureIP = CreateExpected("192.168.1.102", 80);
   PopulateCache(cached_secure_key, kExpectedSecureIP);
   HostCache::Key cached_insecure_key =
       HostCache::Key("insecure_automatic_cached", DnsQueryType::UNSPECIFIED,
                      0 /* host_resolver_flags */, HostResolverSource::ANY,
-                     NetworkAnonymizationKey());
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   IPEndPoint kExpectedInsecureIP = CreateExpected("192.168.1.103", 80);
   PopulateCache(cached_insecure_key, kExpectedInsecureIP);
 
@@ -6758,9 +6778,10 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Automatic_Downgrade) {
       response.request()->GetEndpointResults(),
       testing::ElementsAre(ExpectEndpointResult(testing::UnorderedElementsAre(
           CreateExpected("::1", 80), CreateExpected("127.0.0.1", 80)))));
-  HostCache::Key key = HostCache::Key(
-      "automatic", DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-      HostResolverSource::ANY, NetworkAnonymizationKey());
+  HostCache::Key key =
+      HostCache::Key("automatic", DnsQueryType::UNSPECIFIED,
+                     0 /* host_resolver_flags */, HostResolverSource::ANY,
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   cache_result = GetCacheHit(key);
   EXPECT_TRUE(!!cache_result);
 }
@@ -6789,17 +6810,19 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Automatic_Unavailable) {
       response_automatic.request()->GetEndpointResults(),
       testing::ElementsAre(ExpectEndpointResult(testing::UnorderedElementsAre(
           CreateExpected("::1", 80), CreateExpected("127.0.0.1", 80)))));
-  HostCache::Key secure_key = HostCache::Key(
-      "automatic", DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-      HostResolverSource::ANY, NetworkAnonymizationKey());
+  HostCache::Key secure_key =
+      HostCache::Key("automatic", DnsQueryType::UNSPECIFIED,
+                     0 /* host_resolver_flags */, HostResolverSource::ANY,
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   secure_key.secure = true;
   const std::pair<const HostCache::Key, HostCache::Entry>* cache_result =
       GetCacheHit(secure_key);
   EXPECT_FALSE(!!cache_result);
 
-  HostCache::Key insecure_key = HostCache::Key(
-      "automatic", DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-      HostResolverSource::ANY, NetworkAnonymizationKey());
+  HostCache::Key insecure_key =
+      HostCache::Key("automatic", DnsQueryType::UNSPECIFIED,
+                     0 /* host_resolver_flags */, HostResolverSource::ANY,
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   cache_result = GetCacheHit(insecure_key);
   EXPECT_TRUE(!!cache_result);
 }
@@ -6821,17 +6844,19 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Automatic_Unavailable_Fail) {
   EXPECT_FALSE(
       response_secure.request()->GetResolveErrorInfo().is_secure_network_error);
 
-  HostCache::Key secure_key = HostCache::Key(
-      "secure", DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-      HostResolverSource::ANY, NetworkAnonymizationKey());
+  HostCache::Key secure_key =
+      HostCache::Key("secure", DnsQueryType::UNSPECIFIED,
+                     0 /* host_resolver_flags */, HostResolverSource::ANY,
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   secure_key.secure = true;
   const std::pair<const HostCache::Key, HostCache::Entry>* cache_result =
       GetCacheHit(secure_key);
   EXPECT_FALSE(!!cache_result);
 
-  HostCache::Key insecure_key = HostCache::Key(
-      "secure", DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-      HostResolverSource::ANY, NetworkAnonymizationKey());
+  HostCache::Key insecure_key =
+      HostCache::Key("secure", DnsQueryType::UNSPECIFIED,
+                     0 /* host_resolver_flags */, HostResolverSource::ANY,
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   cache_result = GetCacheHit(insecure_key);
   EXPECT_FALSE(!!cache_result);
 }
@@ -6894,9 +6919,10 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Automatic_Stale) {
   resolver_->SetDnsConfigOverrides(overrides);
 
   // Populate cache with insecure entry.
-  HostCache::Key cached_stale_key = HostCache::Key(
-      "automatic_stale", DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-      HostResolverSource::ANY, NetworkAnonymizationKey());
+  HostCache::Key cached_stale_key =
+      HostCache::Key("automatic_stale", DnsQueryType::UNSPECIFIED,
+                     0 /* host_resolver_flags */, HostResolverSource::ANY,
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   IPEndPoint kExpectedStaleIP = CreateExpected("192.168.1.102", 80);
   PopulateCache(cached_stale_key, kExpectedStaleIP);
   MakeCacheStale();
@@ -6948,9 +6974,10 @@ TEST_F(HostResolverManagerDnsTest,
       response_secure.request()->GetEndpointResults(),
       testing::ElementsAre(ExpectEndpointResult(testing::UnorderedElementsAre(
           CreateExpected("::1", 80), CreateExpected("127.0.0.1", 80)))));
-  HostCache::Key secure_key = HostCache::Key(
-      "automatic", DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-      HostResolverSource::ANY, NetworkAnonymizationKey());
+  HostCache::Key secure_key =
+      HostCache::Key("automatic", DnsQueryType::UNSPECIFIED,
+                     0 /* host_resolver_flags */, HostResolverSource::ANY,
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   secure_key.secure = true;
   cache_result = GetCacheHit(secure_key);
   EXPECT_TRUE(!!cache_result);
@@ -6971,14 +6998,14 @@ TEST_F(HostResolverManagerDnsTest,
   HostCache::Key insecure_key =
       HostCache::Key("insecure_automatic", DnsQueryType::UNSPECIFIED,
                      0 /* host_resolver_flags */, HostResolverSource::ANY,
-                     NetworkAnonymizationKey());
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   cache_result = GetCacheHit(insecure_key);
   EXPECT_TRUE(!!cache_result);
 
   HostCache::Key cached_insecure_key =
       HostCache::Key("insecure_automatic_cached", DnsQueryType::UNSPECIFIED,
                      0 /* host_resolver_flags */, HostResolverSource::ANY,
-                     NetworkAnonymizationKey());
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   IPEndPoint kExpectedInsecureIP = CreateExpected("192.168.1.101", 80);
   PopulateCache(cached_insecure_key, kExpectedInsecureIP);
 
@@ -7020,9 +7047,10 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Automatic_DotActive) {
       response_secure.request()->GetEndpointResults(),
       testing::ElementsAre(ExpectEndpointResult(testing::UnorderedElementsAre(
           CreateExpected("::1", 80), CreateExpected("127.0.0.1", 80)))));
-  HostCache::Key secure_key = HostCache::Key(
-      "automatic", DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-      HostResolverSource::ANY, NetworkAnonymizationKey());
+  HostCache::Key secure_key =
+      HostCache::Key("automatic", DnsQueryType::UNSPECIFIED,
+                     0 /* host_resolver_flags */, HostResolverSource::ANY,
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   secure_key.secure = true;
   cache_result = GetCacheHit(secure_key);
   EXPECT_TRUE(!!cache_result);
@@ -7046,14 +7074,14 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Automatic_DotActive) {
   HostCache::Key insecure_key =
       HostCache::Key("insecure_automatic", DnsQueryType::UNSPECIFIED,
                      0 /* host_resolver_flags */, HostResolverSource::ANY,
-                     NetworkAnonymizationKey());
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   cache_result = GetCacheHit(insecure_key);
   EXPECT_TRUE(!!cache_result);
 
   HostCache::Key cached_insecure_key =
       HostCache::Key("insecure_automatic_cached", DnsQueryType::UNSPECIFIED,
                      0 /* host_resolver_flags */, HostResolverSource::ANY,
-                     NetworkAnonymizationKey());
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   IPEndPoint kExpectedInsecureIP = CreateExpected("192.168.1.101", 80);
   PopulateCache(cached_insecure_key, kExpectedInsecureIP);
 
@@ -7090,9 +7118,10 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Secure) {
   ASSERT_THAT(response_secure.result_error(), IsOk());
   EXPECT_FALSE(
       response_secure.request()->GetResolveErrorInfo().is_secure_network_error);
-  HostCache::Key secure_key = HostCache::Key(
-      "secure", DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-      HostResolverSource::ANY, NetworkAnonymizationKey());
+  HostCache::Key secure_key =
+      HostCache::Key("secure", DnsQueryType::UNSPECIFIED,
+                     0 /* host_resolver_flags */, HostResolverSource::ANY,
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   secure_key.secure = true;
   cache_result = GetCacheHit(secure_key);
   EXPECT_TRUE(!!cache_result);
@@ -7105,9 +7134,10 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Secure) {
   EXPECT_TRUE(response_insecure.request()
                   ->GetResolveErrorInfo()
                   .is_secure_network_error);
-  HostCache::Key insecure_key = HostCache::Key(
-      "ok", DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-      HostResolverSource::ANY, NetworkAnonymizationKey());
+  HostCache::Key insecure_key =
+      HostCache::Key("ok", DnsQueryType::UNSPECIFIED,
+                     0 /* host_resolver_flags */, HostResolverSource::ANY,
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   cache_result = GetCacheHit(insecure_key);
   EXPECT_FALSE(!!cache_result);
 
@@ -7155,8 +7185,8 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Secure_ResolutionDetails) {
   ResolveHostResponseHelper response(resolver_->CreateRequest(
       url::SchemeHostPort(url::kHttpsScheme, kName, 443),
       NetworkAnonymizationKey(), handles::kInvalidNetworkHandle,
-      NetLogWithSource(), /*optional_parameters=*/std::nullopt,
-      resolve_context_.get()));
+      NetLogWithSource(),
+      /*optional_parameters=*/std::nullopt, resolve_context_.get()));
   EXPECT_THAT(response.result_error(), IsOk());
 
   const std::optional<ResolutionDetails>& details =
@@ -7187,9 +7217,10 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Secure_InsecureAsyncDisabled) {
       handles::kInvalidNetworkHandle, NetLogWithSource(), std::nullopt,
       resolve_context_.get()));
   ASSERT_THAT(response_secure.result_error(), IsOk());
-  HostCache::Key secure_key = HostCache::Key(
-      "secure", DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-      HostResolverSource::ANY, NetworkAnonymizationKey());
+  HostCache::Key secure_key =
+      HostCache::Key("secure", DnsQueryType::UNSPECIFIED,
+                     0 /* host_resolver_flags */, HostResolverSource::ANY,
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   secure_key.secure = true;
   cache_result = GetCacheHit(secure_key);
   EXPECT_TRUE(!!cache_result);
@@ -7205,9 +7236,10 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Secure_Local_CacheMiss) {
   source_none_parameters.source = HostResolverSource::LOCAL_ONLY;
 
   // Populate cache with an insecure entry.
-  HostCache::Key cached_insecure_key = HostCache::Key(
-      "automatic", DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-      HostResolverSource::ANY, NetworkAnonymizationKey());
+  HostCache::Key cached_insecure_key =
+      HostCache::Key("automatic", DnsQueryType::UNSPECIFIED,
+                     0 /* host_resolver_flags */, HostResolverSource::ANY,
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   IPEndPoint kExpectedInsecureIP = CreateExpected("192.168.1.102", 80);
   PopulateCache(cached_insecure_key, kExpectedInsecureIP);
 
@@ -7236,9 +7268,10 @@ TEST_F(HostResolverManagerDnsTest, SecureDnsMode_Secure_Local_CacheHit) {
   source_none_parameters.source = HostResolverSource::LOCAL_ONLY;
 
   // Populate cache with a secure entry.
-  HostCache::Key cached_secure_key = HostCache::Key(
-      "secure", DnsQueryType::UNSPECIFIED, 0 /* host_resolver_flags */,
-      HostResolverSource::ANY, NetworkAnonymizationKey());
+  HostCache::Key cached_secure_key =
+      HostCache::Key("secure", DnsQueryType::UNSPECIFIED,
+                     0 /* host_resolver_flags */, HostResolverSource::ANY,
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   cached_secure_key.secure = true;
   IPEndPoint kExpectedSecureIP = CreateExpected("192.168.1.103", 80);
   PopulateCache(cached_secure_key, kExpectedSecureIP);
@@ -7292,8 +7325,8 @@ TEST_F(HostResolverManagerDnsTest,
   ResolveHostResponseHelper response(resolver_->CreateRequest(
       url::SchemeHostPort(url::kHttpsScheme, kName, 443),
       NetworkAnonymizationKey(), handles::kInvalidNetworkHandle,
-      NetLogWithSource(), /*optional_parameters=*/std::nullopt,
-      resolve_context_.get()));
+      NetLogWithSource(),
+      /*optional_parameters=*/std::nullopt, resolve_context_.get()));
   EXPECT_THAT(response.result_error(), IsError(ERR_NAME_NOT_RESOLVED));
   response.ExpectNoResults();
 
@@ -7565,14 +7598,16 @@ TEST_F(HostResolverManagerDnsTest, InvalidDnsConfigWithPendingRequests) {
   responses.emplace_back(
       std::make_unique<ResolveHostResponseHelper>(resolver_->CreateRequest(
           HostPortPair("slow_nx1", 80), NetworkAnonymizationKey(),
-          handles::kInvalidNetworkHandle, NetLogWithSource(), std::nullopt,
-          resolve_context_.get())));
+          handles::kInvalidNetworkHandle,
+
+          NetLogWithSource(), std::nullopt, resolve_context_.get())));
   // Next job gets one slot, and waits on another.
   responses.emplace_back(
       std::make_unique<ResolveHostResponseHelper>(resolver_->CreateRequest(
           HostPortPair("slow_nx2", 80), NetworkAnonymizationKey(),
-          handles::kInvalidNetworkHandle, NetLogWithSource(), std::nullopt,
-          resolve_context_.get())));
+          handles::kInvalidNetworkHandle,
+
+          NetLogWithSource(), std::nullopt, resolve_context_.get())));
   responses.emplace_back(
       std::make_unique<ResolveHostResponseHelper>(resolver_->CreateRequest(
           HostPortPair("ok", 80), NetworkAnonymizationKey(),
@@ -7643,8 +7678,9 @@ TEST_F(HostResolverManagerDnsTest,
       failure_responses.emplace_back(
           std::make_unique<ResolveHostResponseHelper>(resolver_->CreateRequest(
               HostPortPair(host, 80), NetworkAnonymizationKey(),
-              handles::kInvalidNetworkHandle, NetLogWithSource(), parameters,
-              resolve_context_.get())));
+              handles::kInvalidNetworkHandle,
+
+              NetLogWithSource(), parameters, resolve_context_.get())));
       EXPECT_FALSE(failure_responses[i]->complete());
     }
 
@@ -7691,8 +7727,10 @@ TEST_F(HostResolverManagerDnsTest,
     // Secure DnsTasks should not be affected.
     ResolveHostResponseHelper response_secure(resolver_->CreateRequest(
         HostPortPair("automatic", 80), NetworkAnonymizationKey(),
-        handles::kInvalidNetworkHandle, NetLogWithSource(),
-        /* optional_parameters=*/std::nullopt, resolve_context_.get()));
+        handles::kInvalidNetworkHandle,
+
+        NetLogWithSource(), /* optional_parameters=*/std::nullopt,
+        resolve_context_.get()));
     EXPECT_FALSE(response_secure.complete());
 
     proc_->SignalMultiple(maximum_insecure_dns_task_failures() + 4);
@@ -7762,15 +7800,17 @@ TEST_F(HostResolverManagerDnsTest,
   responses.emplace_back(
       std::make_unique<ResolveHostResponseHelper>(resolver_->CreateRequest(
           HostPortPair("slow_ok1", 80), NetworkAnonymizationKey(),
-          handles::kInvalidNetworkHandle, NetLogWithSource(), std::nullopt,
-          resolve_context_.get())));
+          handles::kInvalidNetworkHandle,
+
+          NetLogWithSource(), std::nullopt, resolve_context_.get())));
   EXPECT_FALSE(responses[0]->complete());
   // Next job gets one slot, and waits on another.
   responses.emplace_back(
       std::make_unique<ResolveHostResponseHelper>(resolver_->CreateRequest(
           HostPortPair("slow_ok2", 80), NetworkAnonymizationKey(),
-          handles::kInvalidNetworkHandle, NetLogWithSource(), std::nullopt,
-          resolve_context_.get())));
+          handles::kInvalidNetworkHandle,
+
+          NetLogWithSource(), std::nullopt, resolve_context_.get())));
   EXPECT_FALSE(responses[1]->complete());
   // Next one is queued.
   responses.emplace_back(
@@ -7995,16 +8035,16 @@ TEST_F(HostResolverManagerDnsTest, NotFoundTtl) {
   no_data_response.ExpectNoResults();
   EXPECT_THAT(
       resolve_context_->host_resolver_cache()->Lookup(
-          "empty", kNetworkAnonymizationKey, DnsQueryType::A,
-          HostResolverSource::DNS, /*secure=*/false),
+          "empty", kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::A, HostResolverSource::DNS, /*secure=*/false),
       Pointee(ExpectHostResolverInternalErrorResult(
           "empty", DnsQueryType::A, HostResolverInternalResult::Source::kDns,
           Optional(base::TimeTicks::Now() + base::Days(1)),
           Optional(base::Time::Now() + base::Days(1)), ERR_NAME_NOT_RESOLVED)));
   EXPECT_THAT(
       resolve_context_->host_resolver_cache()->Lookup(
-          "empty", kNetworkAnonymizationKey, DnsQueryType::AAAA,
-          HostResolverSource::DNS, /*secure=*/false),
+          "empty", kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::AAAA, HostResolverSource::DNS, /*secure=*/false),
       Pointee(ExpectHostResolverInternalErrorResult(
           "empty", DnsQueryType::AAAA, HostResolverInternalResult::Source::kDns,
           Optional(base::TimeTicks::Now() + base::Days(1)),
@@ -8020,16 +8060,16 @@ TEST_F(HostResolverManagerDnsTest, NotFoundTtl) {
   no_domain_response.ExpectNoResults();
   EXPECT_THAT(
       resolve_context_->host_resolver_cache()->Lookup(
-          "nodomain", kNetworkAnonymizationKey, DnsQueryType::A,
-          HostResolverSource::DNS, /*secure=*/false),
+          "nodomain", kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::A, HostResolverSource::DNS, /*secure=*/false),
       Pointee(ExpectHostResolverInternalErrorResult(
           "nodomain", DnsQueryType::A, HostResolverInternalResult::Source::kDns,
           Optional(base::TimeTicks::Now() + base::Days(1)),
           Optional(base::Time::Now() + base::Days(1)), ERR_NAME_NOT_RESOLVED)));
   EXPECT_THAT(
       resolve_context_->host_resolver_cache()->Lookup(
-          "nodomain", kNetworkAnonymizationKey, DnsQueryType::AAAA,
-          HostResolverSource::DNS, /*secure=*/false),
+          "nodomain", kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::AAAA, HostResolverSource::DNS, /*secure=*/false),
       Pointee(ExpectHostResolverInternalErrorResult(
           "nodomain", DnsQueryType::AAAA,
           HostResolverInternalResult::Source::kDns,
@@ -8053,7 +8093,8 @@ TEST_F(HostResolverManagerDnsTest, NotFoundTtlWithHostCache) {
   EXPECT_THAT(no_data_response.result_error(), IsError(ERR_NAME_NOT_RESOLVED));
   no_data_response.ExpectNoResults();
   HostCache::Key key("empty", DnsQueryType::UNSPECIFIED, 0,
-                     HostResolverSource::ANY, NetworkAnonymizationKey());
+                     HostResolverSource::ANY, NetworkAnonymizationKey(),
+                     handles::kInvalidNetworkHandle);
   HostCache::EntryStaleness staleness;
   const std::pair<const HostCache::Key, HostCache::Entry>* cache_result =
       resolve_context_->host_cache()->Lookup(key, base::TimeTicks::Now(),
@@ -8071,7 +8112,8 @@ TEST_F(HostResolverManagerDnsTest, NotFoundTtlWithHostCache) {
               IsError(ERR_NAME_NOT_RESOLVED));
   no_domain_response.ExpectNoResults();
   HostCache::Key nxkey("nodomain", DnsQueryType::UNSPECIFIED, 0,
-                       HostResolverSource::ANY, NetworkAnonymizationKey());
+                       HostResolverSource::ANY, NetworkAnonymizationKey(),
+                       handles::kInvalidNetworkHandle);
   cache_result = resolve_context_->host_cache()->Lookup(
       nxkey, base::TimeTicks::Now(), false /* ignore_secure */);
   EXPECT_TRUE(!!cache_result);
@@ -8151,11 +8193,11 @@ TEST_F(HostResolverManagerDnsTest, CachedError_AutomaticMode) {
   HostCache::Key insecure_key =
       HostCache::Key("automatic_nodomain", DnsQueryType::UNSPECIFIED,
                      0 /* host_resolver_flags */, HostResolverSource::ANY,
-                     NetworkAnonymizationKey());
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   HostCache::Key secure_key =
       HostCache::Key("automatic_nodomain", DnsQueryType::UNSPECIFIED,
                      0 /* host_resolver_flags */, HostResolverSource::ANY,
-                     NetworkAnonymizationKey());
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   secure_key.secure = true;
 
   // Expect cache initially empty.
@@ -8193,11 +8235,11 @@ TEST_F(HostResolverManagerDnsTest, CachedError_SecureMode) {
   HostCache::Key insecure_key =
       HostCache::Key("automatic_nodomain", DnsQueryType::UNSPECIFIED,
                      0 /* host_resolver_flags */, HostResolverSource::ANY,
-                     NetworkAnonymizationKey());
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   HostCache::Key secure_key =
       HostCache::Key("automatic_nodomain", DnsQueryType::UNSPECIFIED,
                      0 /* host_resolver_flags */, HostResolverSource::ANY,
-                     NetworkAnonymizationKey());
+                     NetworkAnonymizationKey(), handles::kInvalidNetworkHandle);
   secure_key.secure = true;
 
   // Expect cache initially empty.
@@ -13580,7 +13622,8 @@ TEST_F(HostResolverManagerDnsTest, ResultsSortedAsUnreachable) {
 
   ASSERT_FALSE(!!GetCacheHit(HostCache::Key(
       "host.test", DnsQueryType::UNSPECIFIED, /*host_resolver_flags=*/0,
-      HostResolverSource::ANY, NetworkAnonymizationKey())));
+      HostResolverSource::ANY, NetworkAnonymizationKey(),
+      handles::kInvalidNetworkHandle)));
 
   ResolveHostResponseHelper response(resolver_->CreateRequest(
       HostPortPair("host.test", 80), NetworkAnonymizationKey(),
@@ -13592,7 +13635,8 @@ TEST_F(HostResolverManagerDnsTest, ResultsSortedAsUnreachable) {
   // Expect error is cached (because pre-sort results had a TTL).
   EXPECT_TRUE(!!GetCacheHit(HostCache::Key(
       "host.test", DnsQueryType::UNSPECIFIED, /*host_resolver_flags=*/0,
-      HostResolverSource::ANY, NetworkAnonymizationKey())));
+      HostResolverSource::ANY, NetworkAnonymizationKey(),
+      handles::kInvalidNetworkHandle)));
 }
 
 // Test for when AddressSorter removes all results.
@@ -13628,7 +13672,8 @@ TEST_F(HostResolverManagerDnsTest, ResultsSortedAsUnreachableWithHostCache) {
 
   ASSERT_FALSE(!!GetCacheHit(HostCache::Key(
       "host.test", DnsQueryType::UNSPECIFIED, /*host_resolver_flags=*/0,
-      HostResolverSource::ANY, NetworkAnonymizationKey())));
+      HostResolverSource::ANY, NetworkAnonymizationKey(),
+      handles::kInvalidNetworkHandle)));
 
   ResolveHostResponseHelper response(resolver_->CreateRequest(
       HostPortPair("host.test", 80), NetworkAnonymizationKey(),
@@ -13640,7 +13685,8 @@ TEST_F(HostResolverManagerDnsTest, ResultsSortedAsUnreachableWithHostCache) {
   // Expect error is cached (because pre-sort results had a TTL).
   EXPECT_TRUE(!!GetCacheHit(HostCache::Key(
       "host.test", DnsQueryType::UNSPECIFIED, /*host_resolver_flags=*/0,
-      HostResolverSource::ANY, NetworkAnonymizationKey())));
+      HostResolverSource::ANY, NetworkAnonymizationKey(),
+      handles::kInvalidNetworkHandle)));
 }
 
 TEST_F(HostResolverManagerDnsTest, SortFailure) {
@@ -13694,16 +13740,18 @@ TEST_F(HostResolverManagerDnsTest, SortFailure) {
 
   // Expect error is cached with same TTL as results that failed to sort.
   EXPECT_FALSE(resolve_context_->host_resolver_cache()->Lookup(
-      kHost, kNetworkAnonymizationKey, DnsQueryType::A, HostResolverSource::DNS,
+      kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+      DnsQueryType::A, HostResolverSource::DNS,
       /*secure=*/false));
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  kHost, kNetworkAnonymizationKey, DnsQueryType::AAAA,
-                  HostResolverSource::DNS, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalErrorResult(
-                  std::string(kHost), DnsQueryType::AAAA,
-                  HostResolverInternalResult::Source::kUnknown,
-                  Optional(base::TimeTicks::Now() + kMinTtl),
-                  Optional(base::Time::Now() + kMinTtl), ERR_DNS_SORT_ERROR)));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::AAAA, HostResolverSource::DNS, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalErrorResult(
+          std::string(kHost), DnsQueryType::AAAA,
+          HostResolverInternalResult::Source::kUnknown,
+          Optional(base::TimeTicks::Now() + kMinTtl),
+          Optional(base::Time::Now() + kMinTtl), ERR_DNS_SORT_ERROR)));
 }
 
 // Test for if a transaction sort fails after another transaction has already
@@ -13760,35 +13808,39 @@ TEST_F(HostResolverManagerDnsTest, PartialSortFailure) {
   EXPECT_FALSE(response.complete());
 
   // Expect the successful A result to be cached immediately on receipt.
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  kHost, kNetworkAnonymizationKey, DnsQueryType::A,
-                  HostResolverSource::DNS, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalDataResult(
-                  std::string(kHost), DnsQueryType::A,
-                  HostResolverInternalResult::Source::kDns, _, _,
-                  ElementsAre(IPEndPoint(IPAddress::IPv4Localhost(), 0)))));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::A, HostResolverSource::DNS, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalDataResult(
+          std::string(kHost), DnsQueryType::A,
+          HostResolverInternalResult::Source::kDns, _, _,
+          ElementsAre(IPEndPoint(IPAddress::IPv4Localhost(), 0)))));
   EXPECT_FALSE(resolve_context_->host_resolver_cache()->Lookup(
-      kHost, kNetworkAnonymizationKey, DnsQueryType::AAAA));
+      kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+      DnsQueryType::AAAA));
 
   mock_dns_client_->CompleteDelayedTransactions();
   EXPECT_THAT(response.result_error(), IsError(ERR_DNS_SORT_ERROR));
 
   // Expect error is cached with same TTL as results that failed to sort.
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  kHost, kNetworkAnonymizationKey, DnsQueryType::A,
-                  HostResolverSource::DNS, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalDataResult(
-                  std::string(kHost), DnsQueryType::A,
-                  HostResolverInternalResult::Source::kDns, _, _,
-                  ElementsAre(IPEndPoint(IPAddress::IPv4Localhost(), 0)))));
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  kHost, kNetworkAnonymizationKey, DnsQueryType::AAAA,
-                  HostResolverSource::DNS, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalErrorResult(
-                  std::string(kHost), DnsQueryType::AAAA,
-                  HostResolverInternalResult::Source::kUnknown,
-                  Optional(base::TimeTicks::Now() + kMinTtl),
-                  Optional(base::Time::Now() + kMinTtl), ERR_DNS_SORT_ERROR)));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::A, HostResolverSource::DNS, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalDataResult(
+          std::string(kHost), DnsQueryType::A,
+          HostResolverInternalResult::Source::kDns, _, _,
+          ElementsAre(IPEndPoint(IPAddress::IPv4Localhost(), 0)))));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::AAAA, HostResolverSource::DNS, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalErrorResult(
+          std::string(kHost), DnsQueryType::AAAA,
+          HostResolverInternalResult::Source::kUnknown,
+          Optional(base::TimeTicks::Now() + kMinTtl),
+          Optional(base::Time::Now() + kMinTtl), ERR_DNS_SORT_ERROR)));
 }
 
 TEST_F(HostResolverManagerDnsTest, SortFailureWithHostCache) {
@@ -13822,7 +13874,8 @@ TEST_F(HostResolverManagerDnsTest, SortFailureWithHostCache) {
 
   ASSERT_FALSE(!!GetCacheHit(HostCache::Key(
       "host.test", DnsQueryType::UNSPECIFIED, /*host_resolver_flags=*/0,
-      HostResolverSource::ANY, NetworkAnonymizationKey())));
+      HostResolverSource::ANY, NetworkAnonymizationKey(),
+      handles::kInvalidNetworkHandle)));
 
   ResolveHostResponseHelper response(resolver_->CreateRequest(
       HostPortPair("host.test", 80), NetworkAnonymizationKey(),
@@ -13834,7 +13887,8 @@ TEST_F(HostResolverManagerDnsTest, SortFailureWithHostCache) {
   // Expect error is cached (because pre-sort results had a TTL).
   EXPECT_TRUE(!!GetCacheHit(HostCache::Key(
       "host.test", DnsQueryType::UNSPECIFIED, /*host_resolver_flags=*/0,
-      HostResolverSource::ANY, NetworkAnonymizationKey())));
+      HostResolverSource::ANY, NetworkAnonymizationKey(),
+      handles::kInvalidNetworkHandle)));
 }
 
 TEST_F(HostResolverManagerDnsTest, HostResolverCacheContainsTransactions) {
@@ -13860,15 +13914,15 @@ TEST_F(HostResolverManagerDnsTest, HostResolverCacheContainsTransactions) {
   // Expect separate transactions to be separately cached.
   EXPECT_THAT(
       resolve_context_->host_resolver_cache()->Lookup(
-          "ok", kNetworkAnonymizationKey, DnsQueryType::A,
-          HostResolverSource::DNS, /*secure=*/false),
+          "ok", kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::A, HostResolverSource::DNS, /*secure=*/false),
       Pointee(ExpectHostResolverInternalDataResult(
           "ok", DnsQueryType::A, HostResolverInternalResult::Source::kDns, _, _,
           ElementsAre(IPEndPoint(IPAddress::IPv4Localhost(), 0)))));
   EXPECT_THAT(
       resolve_context_->host_resolver_cache()->Lookup(
-          "ok", kNetworkAnonymizationKey, DnsQueryType::AAAA,
-          HostResolverSource::DNS, /*secure=*/false),
+          "ok", kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::AAAA, HostResolverSource::DNS, /*secure=*/false),
       Pointee(ExpectHostResolverInternalDataResult(
           "ok", DnsQueryType::AAAA, HostResolverInternalResult::Source::kDns, _,
           _, ElementsAre(IPEndPoint(IPAddress::IPv6Localhost(), 0)))));
@@ -13912,20 +13966,22 @@ TEST_F(HostResolverManagerDnsTest, HostResolverCacheContainsAliasChains) {
   // aliases cached under the original query type.
   EXPECT_THAT(
       resolve_context_->host_resolver_cache()->Lookup(
-          kHost, kNetworkAnonymizationKey, DnsQueryType::A,
-          HostResolverSource::DNS, /*secure=*/false),
+          kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::A, HostResolverSource::DNS, /*secure=*/false),
       Pointee(ExpectHostResolverInternalAliasResult(
           std::string(kHost), DnsQueryType::A,
           HostResolverInternalResult::Source::kDns, _, _, "alias1.test")));
   EXPECT_THAT(
       resolve_context_->host_resolver_cache()->Lookup(
-          "alias1.test", kNetworkAnonymizationKey, DnsQueryType::A,
+          "alias1.test", kNetworkAnonymizationKey,
+          handles::kInvalidNetworkHandle, DnsQueryType::A,
           HostResolverSource::DNS, /*secure=*/false),
       Pointee(ExpectHostResolverInternalAliasResult(
           "alias1.test", DnsQueryType::A,
           HostResolverInternalResult::Source::kDns, _, _, "alias2.test")));
   EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  "alias2.test", kNetworkAnonymizationKey, DnsQueryType::A,
+                  "alias2.test", kNetworkAnonymizationKey,
+                  handles::kInvalidNetworkHandle, DnsQueryType::A,
                   HostResolverSource::DNS, /*secure=*/false),
               Pointee(ExpectHostResolverInternalDataResult(
                   "alias2.test", DnsQueryType::A,
@@ -13979,20 +14035,22 @@ TEST_F(HostResolverManagerDnsTest,
   // the aliases cached under the original query type.
   EXPECT_THAT(
       resolve_context_->host_resolver_cache()->Lookup(
-          kHost, kNetworkAnonymizationKey, DnsQueryType::A,
-          HostResolverSource::DNS, /*secure=*/false),
+          kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::A, HostResolverSource::DNS, /*secure=*/false),
       Pointee(ExpectHostResolverInternalAliasResult(
           std::string(kHost), DnsQueryType::A,
           HostResolverInternalResult::Source::kDns, _, _, "alias1.test")));
   EXPECT_THAT(
       resolve_context_->host_resolver_cache()->Lookup(
-          "alias1.test", kNetworkAnonymizationKey, DnsQueryType::A,
+          "alias1.test", kNetworkAnonymizationKey,
+          handles::kInvalidNetworkHandle, DnsQueryType::A,
           HostResolverSource::DNS, /*secure=*/false),
       Pointee(ExpectHostResolverInternalAliasResult(
           "alias1.test", DnsQueryType::A,
           HostResolverInternalResult::Source::kDns, _, _, "alias2.test")));
   EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  "alias2.test", kNetworkAnonymizationKey, DnsQueryType::A,
+                  "alias2.test", kNetworkAnonymizationKey,
+                  handles::kInvalidNetworkHandle, DnsQueryType::A,
                   HostResolverSource::DNS, /*secure=*/false),
               Pointee(ExpectHostResolverInternalErrorResult(
                   "alias2.test", DnsQueryType::A,
@@ -14043,21 +14101,22 @@ TEST_F(HostResolverManagerDnsTest,
   // to contain the NODATA TTL.
   EXPECT_THAT(
       resolve_context_->host_resolver_cache()->Lookup(
-          kHost, kNetworkAnonymizationKey, DnsQueryType::A,
-          HostResolverSource::DNS, /*secure=*/false),
+          kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::A, HostResolverSource::DNS, /*secure=*/false),
       Pointee(ExpectHostResolverInternalAliasResult(
           std::string(kHost), DnsQueryType::A,
           HostResolverInternalResult::Source::kDns, _, _, "alias1.test")));
   EXPECT_THAT(
       resolve_context_->host_resolver_cache()->Lookup(
-          "alias1.test", kNetworkAnonymizationKey, DnsQueryType::A,
+          "alias1.test", kNetworkAnonymizationKey,
+          handles::kInvalidNetworkHandle, DnsQueryType::A,
           HostResolverSource::DNS, /*secure=*/false),
       Pointee(ExpectHostResolverInternalAliasResult(
           "alias1.test", DnsQueryType::A,
           HostResolverInternalResult::Source::kDns, _, _, "alias2.test")));
   EXPECT_FALSE(resolve_context_->host_resolver_cache()->Lookup(
-      "alias2.test", kNetworkAnonymizationKey, DnsQueryType::A,
-      HostResolverSource::DNS, /*secure=*/false));
+      "alias2.test", kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+      DnsQueryType::A, HostResolverSource::DNS, /*secure=*/false));
 }
 
 TEST_F(HostResolverManagerDnsTest, NetworkErrorsNotSavedInHostCache) {
@@ -14099,7 +14158,8 @@ TEST_F(HostResolverManagerDnsTest, NetworkErrorsNotSavedInHostCache) {
   // Expect result not cached because network errors have no TTL.
   EXPECT_FALSE(GetCacheHit(HostCache::Key(
       std::string(kHost), DnsQueryType::UNSPECIFIED, /*host_resolver_flags=*/0,
-      HostResolverSource::ANY, kNetworkAnonymizationKey)));
+      HostResolverSource::ANY, kNetworkAnonymizationKey,
+      handles::kInvalidNetworkHandle)));
   EXPECT_EQ(resolve_context_->host_cache()->size(), 0u);
 }
 
@@ -14147,7 +14207,8 @@ TEST_F(HostResolverManagerDnsTest, PartialNetworkErrorsNotSavedInHostCache) {
   // to the HostCache.
   EXPECT_FALSE(GetCacheHit(HostCache::Key(
       std::string(kHost), DnsQueryType::UNSPECIFIED, /*host_resolver_flags=*/0,
-      HostResolverSource::ANY, kNetworkAnonymizationKey)));
+      HostResolverSource::ANY, kNetworkAnonymizationKey,
+      handles::kInvalidNetworkHandle)));
   EXPECT_EQ(resolve_context_->host_cache()->size(), 0u);
 }
 
@@ -14190,7 +14251,7 @@ TEST_F(HostResolverManagerDnsTest, NetworkErrorsNotSavedInHostResolverCache) {
 
   // Expect result not cached because network errors have no TTL.
   EXPECT_FALSE(resolve_context_->host_resolver_cache()->Lookup(
-      kHost, kNetworkAnonymizationKey));
+      kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle));
 }
 
 // Test for if a DNS transaction fails with network error after another
@@ -14234,28 +14295,32 @@ TEST_F(HostResolverManagerDnsTest,
 
   // Expect AAAA result to be cached immediately on receipt.
   EXPECT_FALSE(resolve_context_->host_resolver_cache()->Lookup(
-      kHost, kNetworkAnonymizationKey, DnsQueryType::A));
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  kHost, kNetworkAnonymizationKey, DnsQueryType::AAAA,
-                  HostResolverSource::DNS, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalDataResult(
-                  std::string(kHost), DnsQueryType::AAAA,
-                  HostResolverInternalResult::Source::kDns, _, _,
-                  ElementsAre(IPEndPoint(IPAddress::IPv6Localhost(), 0)))));
+      kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+      DnsQueryType::A));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::AAAA, HostResolverSource::DNS, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalDataResult(
+          std::string(kHost), DnsQueryType::AAAA,
+          HostResolverInternalResult::Source::kDns, _, _,
+          ElementsAre(IPEndPoint(IPAddress::IPv6Localhost(), 0)))));
 
   mock_dns_client_->CompleteDelayedTransactions();
   ASSERT_THAT(response.result_error(), IsError(ERR_CONNECTION_REFUSED));
 
   // Expect same cache contents, as network errors are not cacheable.
   EXPECT_FALSE(resolve_context_->host_resolver_cache()->Lookup(
-      kHost, kNetworkAnonymizationKey, DnsQueryType::A));
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  kHost, kNetworkAnonymizationKey, DnsQueryType::AAAA,
-                  HostResolverSource::DNS, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalDataResult(
-                  std::string(kHost), DnsQueryType::AAAA,
-                  HostResolverInternalResult::Source::kDns, _, _,
-                  ElementsAre(IPEndPoint(IPAddress::IPv6Localhost(), 0)))));
+      kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+      DnsQueryType::A));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::AAAA, HostResolverSource::DNS, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalDataResult(
+          std::string(kHost), DnsQueryType::AAAA,
+          HostResolverInternalResult::Source::kDns, _, _,
+          ElementsAre(IPEndPoint(IPAddress::IPv6Localhost(), 0)))));
 }
 
 TEST_F(HostResolverManagerDnsTest, MalformedResponsesNotSavedInHostCache) {
@@ -14294,7 +14359,8 @@ TEST_F(HostResolverManagerDnsTest, MalformedResponsesNotSavedInHostCache) {
   // Expect result not cached because malformed responses have no TTL.
   EXPECT_FALSE(GetCacheHit(HostCache::Key(
       std::string(kHost), DnsQueryType::UNSPECIFIED, /*host_resolver_flags=*/0,
-      HostResolverSource::ANY, kNetworkAnonymizationKey)));
+      HostResolverSource::ANY, kNetworkAnonymizationKey,
+      handles::kInvalidNetworkHandle)));
   EXPECT_EQ(resolve_context_->host_cache()->size(), 0u);
 }
 
@@ -14342,7 +14408,8 @@ TEST_F(HostResolverManagerDnsTest,
   // cached to the HostCache.
   EXPECT_FALSE(GetCacheHit(HostCache::Key(
       std::string(kHost), DnsQueryType::UNSPECIFIED, /*host_resolver_flags=*/0,
-      HostResolverSource::ANY, kNetworkAnonymizationKey)));
+      HostResolverSource::ANY, kNetworkAnonymizationKey,
+      handles::kInvalidNetworkHandle)));
   EXPECT_EQ(resolve_context_->host_cache()->size(), 0u);
 }
 
@@ -14383,7 +14450,7 @@ TEST_F(HostResolverManagerDnsTest,
 
   // Expect result not cached because malformed responses have no TTL.
   EXPECT_FALSE(resolve_context_->host_resolver_cache()->Lookup(
-      kHost, kNetworkAnonymizationKey));
+      kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle));
 }
 
 // Test for if a DNS transaction fails with malformed response after another
@@ -14426,28 +14493,32 @@ TEST_F(HostResolverManagerDnsTest,
 
   // Expect the successful AAAA result to be cached immediately on receipt.
   EXPECT_FALSE(resolve_context_->host_resolver_cache()->Lookup(
-      kHost, kNetworkAnonymizationKey, DnsQueryType::A));
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  kHost, kNetworkAnonymizationKey, DnsQueryType::AAAA,
-                  HostResolverSource::DNS, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalDataResult(
-                  std::string(kHost), DnsQueryType::AAAA,
-                  HostResolverInternalResult::Source::kDns, _, _,
-                  ElementsAre(IPEndPoint(IPAddress::IPv6Localhost(), 0)))));
+      kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+      DnsQueryType::A));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::AAAA, HostResolverSource::DNS, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalDataResult(
+          std::string(kHost), DnsQueryType::AAAA,
+          HostResolverInternalResult::Source::kDns, _, _,
+          ElementsAre(IPEndPoint(IPAddress::IPv6Localhost(), 0)))));
 
   mock_dns_client_->CompleteDelayedTransactions();
   ASSERT_THAT(response.result_error(), IsError(ERR_DNS_MALFORMED_RESPONSE));
 
   // Expect same cache contents, as malformed responses are not cacheable.
   EXPECT_FALSE(resolve_context_->host_resolver_cache()->Lookup(
-      kHost, kNetworkAnonymizationKey, DnsQueryType::A));
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  kHost, kNetworkAnonymizationKey, DnsQueryType::AAAA,
-                  HostResolverSource::DNS, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalDataResult(
-                  std::string(kHost), DnsQueryType::AAAA,
-                  HostResolverInternalResult::Source::kDns, _, _,
-                  ElementsAre(IPEndPoint(IPAddress::IPv6Localhost(), 0)))));
+      kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+      DnsQueryType::A));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::AAAA, HostResolverSource::DNS, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalDataResult(
+          std::string(kHost), DnsQueryType::AAAA,
+          HostResolverInternalResult::Source::kDns, _, _,
+          ElementsAre(IPEndPoint(IPAddress::IPv6Localhost(), 0)))));
 }
 
 TEST_F(HostResolverManagerDnsTest, HttpToHttpsUpgradeSavedInHostCache) {
@@ -14501,7 +14572,8 @@ TEST_F(HostResolverManagerDnsTest, HttpToHttpsUpgradeSavedInHostCache) {
       GetCacheHit(
           HostCache::Key(url::SchemeHostPort(url::kHttpScheme, kHost, 80),
                          DnsQueryType::UNSPECIFIED, /*host_resolver_flags=*/0,
-                         HostResolverSource::ANY, kNetworkAnonymizationKey));
+                         HostResolverSource::ANY, kNetworkAnonymizationKey,
+                         handles::kInvalidNetworkHandle));
   ASSERT_TRUE(cache_result);
   ASSERT_TRUE(cache_result->second.has_ttl());
   EXPECT_EQ(cache_result->second.ttl(), base::Days(20));
@@ -14553,51 +14625,56 @@ TEST_F(HostResolverManagerDnsTest,
   EXPECT_FALSE(response.complete());
 
   // Expect successful address responses to be cached immediately on receipt.
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  kHost, kNetworkAnonymizationKey, DnsQueryType::A,
-                  HostResolverSource::DNS, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalDataResult(
-                  std::string(kHost), DnsQueryType::A,
-                  HostResolverInternalResult::Source::kDns, _, _,
-                  ElementsAre(IPEndPoint(IPAddress::IPv4Localhost(), 0)))));
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  kHost, kNetworkAnonymizationKey, DnsQueryType::AAAA,
-                  HostResolverSource::DNS, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalDataResult(
-                  std::string(kHost), DnsQueryType::AAAA,
-                  HostResolverInternalResult::Source::kDns, _, _,
-                  ElementsAre(IPEndPoint(IPAddress::IPv6Localhost(), 0)))));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::A, HostResolverSource::DNS, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalDataResult(
+          std::string(kHost), DnsQueryType::A,
+          HostResolverInternalResult::Source::kDns, _, _,
+          ElementsAre(IPEndPoint(IPAddress::IPv4Localhost(), 0)))));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::AAAA, HostResolverSource::DNS, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalDataResult(
+          std::string(kHost), DnsQueryType::AAAA,
+          HostResolverInternalResult::Source::kDns, _, _,
+          ElementsAre(IPEndPoint(IPAddress::IPv6Localhost(), 0)))));
   EXPECT_FALSE(resolve_context_->host_resolver_cache()->Lookup(
-      kHost, kNetworkAnonymizationKey, DnsQueryType::HTTPS,
-      HostResolverSource::DNS, /*secure=*/false));
+      kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+      DnsQueryType::HTTPS, HostResolverSource::DNS, /*secure=*/false));
 
   mock_dns_client_->CompleteDelayedTransactions();
   ASSERT_THAT(response.result_error(), IsError(ERR_DNS_NAME_HTTPS_ONLY));
 
   // All responses cached, including the full metadata result because it is
   // still a usable result when requested for https://.
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  kHost, kNetworkAnonymizationKey, DnsQueryType::A,
-                  HostResolverSource::DNS, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalDataResult(
-                  std::string(kHost), DnsQueryType::A,
-                  HostResolverInternalResult::Source::kDns, _, _,
-                  ElementsAre(IPEndPoint(IPAddress::IPv4Localhost(), 0)))));
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  kHost, kNetworkAnonymizationKey, DnsQueryType::AAAA,
-                  HostResolverSource::DNS, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalDataResult(
-                  std::string(kHost), DnsQueryType::AAAA,
-                  HostResolverInternalResult::Source::kDns, _, _,
-                  ElementsAre(IPEndPoint(IPAddress::IPv6Localhost(), 0)))));
-  EXPECT_THAT(resolve_context_->host_resolver_cache()->Lookup(
-                  kHost, kNetworkAnonymizationKey, DnsQueryType::HTTPS,
-                  HostResolverSource::DNS, /*secure=*/false),
-              Pointee(ExpectHostResolverInternalMetadataResult(
-                  std::string(kHost), DnsQueryType::HTTPS,
-                  HostResolverInternalResult::Source::kDns,
-                  Optional(base::TimeTicks::Now() + base::Days(20)),
-                  Optional(base::Time::Now() + base::Days(20)))));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::A, HostResolverSource::DNS, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalDataResult(
+          std::string(kHost), DnsQueryType::A,
+          HostResolverInternalResult::Source::kDns, _, _,
+          ElementsAre(IPEndPoint(IPAddress::IPv4Localhost(), 0)))));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::AAAA, HostResolverSource::DNS, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalDataResult(
+          std::string(kHost), DnsQueryType::AAAA,
+          HostResolverInternalResult::Source::kDns, _, _,
+          ElementsAre(IPEndPoint(IPAddress::IPv6Localhost(), 0)))));
+  EXPECT_THAT(
+      resolve_context_->host_resolver_cache()->Lookup(
+          kHost, kNetworkAnonymizationKey, handles::kInvalidNetworkHandle,
+          DnsQueryType::HTTPS, HostResolverSource::DNS, /*secure=*/false),
+      Pointee(ExpectHostResolverInternalMetadataResult(
+          std::string(kHost), DnsQueryType::HTTPS,
+          HostResolverInternalResult::Source::kDns,
+          Optional(base::TimeTicks::Now() + base::Days(20)),
+          Optional(base::Time::Now() + base::Days(20)))));
 }
 
 class HostResolverManagerBootstrapTest : public HostResolverManagerDnsTest {
@@ -14661,7 +14738,8 @@ class HostResolverManagerBootstrapTest : public HostResolverManagerDnsTest {
 
   HostCache::Key MakeCacheKey(bool secure) {
     HostCache::Key cache_key(kEndpoint, DnsQueryType::UNSPECIFIED, 0,
-                             HostResolverSource::ANY, kAnonymizationKey);
+                             HostResolverSource::ANY, kAnonymizationKey,
+                             handles::kInvalidNetworkHandle);
     cache_key.secure = secure;
     return cache_key;
   }
@@ -15021,7 +15099,8 @@ void HostResolverManagerTest::IPv4AddressLiteralInIPv6OnlyNetworkTest(
   const std::pair<const HostCache::Key, HostCache::Entry>* cache_result =
       GetCacheHit(HostCache::Key(
           "ipv4only.arpa", DnsQueryType::AAAA, 0 /* host_resolver_flags */,
-          HostResolverSource::ANY, NetworkAnonymizationKey()));
+          HostResolverSource::ANY, NetworkAnonymizationKey(),
+          handles::kInvalidNetworkHandle));
   EXPECT_TRUE(cache_result);
 }
 
@@ -15067,7 +15146,8 @@ void HostResolverManagerTest::IPv4AddressLiteralInIPv6OnlyNetworkPort443Test(
   const std::pair<const HostCache::Key, HostCache::Entry>* cache_result =
       GetCacheHit(HostCache::Key(
           "ipv4only.arpa", DnsQueryType::AAAA, 0 /* host_resolver_flags */,
-          HostResolverSource::ANY, NetworkAnonymizationKey()));
+          HostResolverSource::ANY, NetworkAnonymizationKey(),
+          handles::kInvalidNetworkHandle));
   EXPECT_TRUE(cache_result);
 }
 
@@ -15361,6 +15441,56 @@ TEST_F(HostResolverManagerTest, CalculateResolvePath) {
                   test_case.task_type, test_case.secure_dns_failed,
                   test_case.classic_dns_failed, test_case.platform_dns_failed));
   }
+}
+
+TEST_F(HostResolverManagerTest,
+       RequestsForDifferentNetworksAreCachedSeparately) {
+  proc_->AddRuleForAllFamilies("just.testing", "192.168.1.42");
+  proc_->SignalMultiple(3u);  // We expect exactly 3 network resolves
+
+  const handles::NetworkHandle kNetwork1 = 100;
+  const handles::NetworkHandle kNetwork2 = 200;
+
+  // 1. Resolve on kNetwork1. Should be a cache miss and call proc.
+  ResolveHostResponseHelper response1(resolver_->CreateRequest(
+      HostPortPair("just.testing", 80), NetworkAnonymizationKey(), kNetwork1,
+      NetLogWithSource(), std::nullopt, resolve_context_.get()));
+  EXPECT_THAT(response1.result_error(), IsOk());
+  EXPECT_EQ(1u, proc_->GetCaptureList().size());
+
+  // 2. Resolve on kNetwork1 again. Should be a cache hit.
+  ResolveHostResponseHelper response2(resolver_->CreateRequest(
+      HostPortPair("just.testing", 80), NetworkAnonymizationKey(), kNetwork1,
+      NetLogWithSource(), std::nullopt, resolve_context_.get()));
+  EXPECT_THAT(response2.result_error(), IsOk());
+  // Capture list size should STILL be 1 (no new proc call)
+  EXPECT_EQ(1u, proc_->GetCaptureList().size());
+
+  // 3. Resolve on kNetwork2. Should be a cache miss and call proc.
+  ResolveHostResponseHelper response3(resolver_->CreateRequest(
+      HostPortPair("just.testing", 80), NetworkAnonymizationKey(), kNetwork2,
+      NetLogWithSource(), std::nullopt, resolve_context_.get()));
+  EXPECT_THAT(response3.result_error(), IsOk());
+  // Capture list size should now be 2
+  EXPECT_EQ(2u, proc_->GetCaptureList().size());
+
+  // 4. Resolve on kNetwork2 again. Should be a cache hit.
+  ResolveHostResponseHelper response4(resolver_->CreateRequest(
+      HostPortPair("just.testing", 80), NetworkAnonymizationKey(), kNetwork2,
+      NetLogWithSource(), std::nullopt, resolve_context_.get()));
+  EXPECT_THAT(response4.result_error(), IsOk());
+  // Capture list size should STILL be 2
+  EXPECT_EQ(2u, proc_->GetCaptureList().size());
+
+  // 5. Resolve with kInvalidNetworkHandle. Should be a cache miss and call
+  // proc.
+  ResolveHostResponseHelper response5(resolver_->CreateRequest(
+      HostPortPair("just.testing", 80), NetworkAnonymizationKey(),
+      handles::kInvalidNetworkHandle, NetLogWithSource(), std::nullopt,
+      resolve_context_.get()));
+  EXPECT_THAT(response5.result_error(), IsOk());
+  // Capture list size should now be 3
+  EXPECT_EQ(3u, proc_->GetCaptureList().size());
 }
 
 }  // namespace net
