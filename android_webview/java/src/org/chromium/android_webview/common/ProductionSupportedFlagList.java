@@ -1391,6 +1391,9 @@ public final class ProductionSupportedFlagList {
         Flag.baseFeature(
                 AwFeatures.WEBVIEW_DOWNLOAD_FAVICONS,
                 "Determines whether a Favicon will be downloaded upon navigation."),
+        Flag.baseFeature(
+                "PrefetchCancelUnrelatedPrefetch",
+                "Cancels unrelated prefetch when a navigation is started."),
         // Add new commandline switches and features above. The final entry should have a
         // trailing comma for cleaner diffs.
     };
