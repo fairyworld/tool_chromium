@@ -2156,6 +2156,7 @@ chromium-metrics-reviews@google.com.
   <int value="3" label="DuplicateCallBeforePromiseResolution"/>
   <int value="4" label="DuplicateCallAfterPromiseResolution"/>
   <int value="5" label="ElementAndMediaDevicesNotInSameExecutionContext"/>
+  <int value="6" label="FencedFrameNotAllowed"/>
 </enum>
 
 <enum name="ProduceTargetPromiseResult">
