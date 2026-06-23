@@ -22,7 +22,7 @@ using SigninCompletionBlock = void (^)(id<SystemIdentity>, NSError*);
 // re-authentication, the screen to enter the credential will have the email
 // field pre-entered.
 //
-// The activity will fail is there already an authentication activity in
+// The activity will fail if there is already an authentication activity in
 // progress.
 //
 // The activity will be displayed in `viewController`, if `userEmail` is set
