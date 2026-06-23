@@ -379,7 +379,6 @@
 #include "chrome/browser/metrics/critical_user_journeys/critical_user_journey_service_factory.h"
 #include "chrome/browser/metrics/desktop_session_duration/desktop_profile_session_durations_service_factory.h"
 #include "chrome/browser/new_tab_page/chrome_colors/chrome_colors_factory.h"
-#include "chrome/browser/new_tab_page/modules/file_suggestion/drive_service_factory.h"
 #include "chrome/browser/password_manager/factories/bulk_leak_check_service_factory.h"
 #include "chrome/browser/password_manager/factories/password_counter_factory.h"
 #include "chrome/browser/payments/payment_request_display_manager_factory.h"
@@ -597,6 +596,7 @@
 #endif
 
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
+#include "chrome/browser/new_tab_page/modules/file_suggestion/drive_service_factory.h"
 #include "chrome/browser/new_tab_page/one_google_bar/one_google_bar_service_factory.h"
 #endif
 
@@ -954,7 +954,6 @@ void ChromeBrowserMainExtraPartsProfiles::
 #endif
   DownloadCoreServiceFactory::GetInstance();
 #if !BUILDFLAG(IS_ANDROID)
-  DriveServiceFactory::GetInstance();
   EnclaveManagerFactory::GetInstance();
 #endif
   enterprise::ProfileIdServiceFactory::GetInstance();
@@ -1171,6 +1170,7 @@ void ChromeBrowserMainExtraPartsProfiles::
   private_insights::PrivateInsightsServiceFactory::GetInstance();
   ProfileMetricsServiceFactory::GetInstance();
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
+  DriveServiceFactory::GetInstance();
   MicrosoftAuthServiceFactory::GetInstance();
 #endif
 #if !BUILDFLAG(IS_ANDROID)

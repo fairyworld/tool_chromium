@@ -101,12 +101,7 @@ BASE_FEATURE(kNtpDummyModules, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // If enabled, Google Drive module will be shown.
 // This is a kill switch. Keep indefinitely.
-BASE_FEATURE(kNtpDriveModule,
-#if BUILDFLAG(IS_ANDROID)
-             base::FEATURE_DISABLED_BY_DEFAULT);
-#else
-             base::FEATURE_ENABLED_BY_DEFAULT);
-#endif
+BASE_FEATURE(kNtpDriveModule, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // If enabled, the NTP Drive module does not require sync.
 BASE_FEATURE(kNtpDriveModuleHistorySyncRequirement,

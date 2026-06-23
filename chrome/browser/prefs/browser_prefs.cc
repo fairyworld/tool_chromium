@@ -225,6 +225,7 @@
 #include "ui/webui/buildflags.h"
 
 #if BUILDFLAG(ENABLE_WEBUI_NTP)
+#include "chrome/browser/new_tab_page/modules/file_suggestion/drive_service.h"
 #include "chrome/browser/new_tab_page/modules/v2/most_relevant_tab_resumption/most_relevant_tab_resumption_page_handler.h"
 #include "chrome/browser/ui/webui/new_tab_page/new_tab_page_handler.h"
 #include "chrome/browser/ui/webui/new_tab_page/new_tab_page_ui.h"
@@ -299,7 +300,6 @@
 #include "chrome/browser/media/router/discovery/access_code/access_code_cast_feature.h"
 #include "chrome/browser/media/router/media_router_feature.h"
 #include "chrome/browser/nearby_sharing/common/nearby_share_prefs.h"
-#include "chrome/browser/new_tab_page/modules/file_suggestion/drive_service.h"
 #include "chrome/browser/new_tab_page/modules/file_suggestion/microsoft_files_page_handler.h"
 #include "chrome/browser/new_tab_page/modules/v2/authentication/microsoft_auth_page_handler.h"
 #include "chrome/browser/new_tab_page/modules/v2/calendar/google_calendar_page_handler.h"
@@ -1878,6 +1878,7 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   NewTabPageHandler::RegisterProfilePrefs(registry);
   NewTabPageUI::RegisterProfilePrefs(registry);
   MostRelevantTabResumptionPageHandler::RegisterProfilePrefs(registry);
+  DriveService::RegisterProfilePrefs(registry);
 #endif  // BUILDFLAG(ENABLE_WEBUI_NTP)
 
 #if BUILDFLAG(IS_ANDROID)
@@ -1907,7 +1908,6 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   captions::LiveTranslateController::RegisterProfilePrefs(registry);
   ChromeAuthenticatorRequestDelegate::RegisterProfilePrefs(registry);
   commerce::CommerceUiTabHelper::RegisterProfilePrefs(registry);
-  DriveService::RegisterProfilePrefs(registry);
   first_run::RegisterProfilePrefs(registry);
   gcm::RegisterProfilePrefs(registry);
   GoogleCalendarPageHandler::RegisterProfilePrefs(registry);

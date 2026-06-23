@@ -15,7 +15,6 @@
 #include "chrome/browser/glic/selection/selection_overlay_untrusted_ui.h"
 #include "chrome/browser/history_clusters/history_clusters_service_factory.h"
 #include "chrome/browser/history_embeddings/history_embeddings_utils.h"
-#include "chrome/browser/new_tab_page/modules/file_suggestion/drive_suggestion.mojom.h"
 #include "chrome/browser/new_tab_page/modules/file_suggestion/microsoft_files.mojom.h"
 #include "chrome/browser/new_tab_page/modules/v2/authentication/microsoft_auth.mojom.h"
 #include "chrome/browser/new_tab_page/modules/v2/calendar/google_calendar.mojom.h"
@@ -414,11 +413,6 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
   RegisterWebUIControllerInterfaceBinder<foo::mojom::FooHandler, NewTabPageUI>(
       map);
 #endif  // !defined(OFFICIAL_BUILD)
-
-  if (IsDriveModuleEnabled()) {
-    RegisterWebUIControllerInterfaceBinder<
-        file_suggestion::mojom::DriveSuggestionHandler, NewTabPageUI>(map);
-  }
 
   if (base::FeatureList::IsEnabled(ntp_features::kNtpTabGroupsModule)) {
     RegisterWebUIControllerInterfaceBinder<ntp::tab_groups::mojom::PageHandler,
