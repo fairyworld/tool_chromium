@@ -2688,6 +2688,50 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               bwi))
           .SetActionId(kActionFocusNextPane)
           .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::FocusPreviousPane(bwi);
+              },
+              bwi))
+          .SetActionId(kActionFocusPreviousPane)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::FocusBookmarksToolbar(bwi);
+              },
+              bwi))
+          .SetActionId(kActionFocusBookmarks)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::FocusInactivePopupForAccessibility(bwi);
+              },
+              bwi))
+          .SetActionId(kActionFocusInactivePopupForAccessibility)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::FocusWebContentsPane(bwi);
+              },
+              bwi))
+          .SetActionId(kActionFocusWebContentsPane)
+          .Build());
 }
 
 void BrowserActions::AddListeners() {
