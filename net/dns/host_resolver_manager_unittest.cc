@@ -360,9 +360,12 @@ class TestHostResolverManager : public HostResolverManager {
   const bool is_async_;
 
   int StartGloballyReachableCheck(const IPAddress& dest,
+                                  handles::NetworkHandle target_network,
                                   const NetLogWithSource& net_log,
                                   ClientSocketFactory* client_socket_factory,
                                   CompletionOnceCallback callback) override {
+    // This is used only for testing in scenarios that do not involve multiple
+    // networks. With that in mind, it's safe to ignore `target_network`.
     int rv = OK;
     if (dest.IsIPv6()) {
       rv = ipv6_reachable_ ? OK : ERR_FAILED;
@@ -517,15 +520,30 @@ void HostResolverManagerTest::set_allow_fallback_to_systemtask(
 }
 
 int HostResolverManagerTest::StartIPv6ReachabilityCheck(
+    handles::NetworkHandle target_network,
     const NetLogWithSource& net_log,
     raw_ptr<ClientSocketFactory> client_socket_factory,
     CompletionOnceCallback callback) {
-  return resolver_->StartIPv6ReachabilityCheck(net_log, client_socket_factory,
-                                               std::move(callback));
+  return resolver_->StartIPv6ReachabilityCheck(
+      target_network, net_log, client_socket_factory, std::move(callback));
 }
 
 bool HostResolverManagerTest::GetLastIpv6ProbeResult() {
   return resolver_->last_ipv6_probe_result_;
+}
+
+void HostResolverManagerTest::SetLastIPv6ProbeResult(bool result) {
+  resolver_->last_ipv6_probe_result_ = result;
+}
+
+void HostResolverManagerTest::InitializeJobKeyAndIPAddress(
+    const NetworkAnonymizationKey& network_anonymization_key,
+    const HostResolver::ResolveHostParameters& parameters,
+    const NetLogWithSource& net_log,
+    HostResolverManager::JobKey& out_job_key,
+    IPAddress& out_ip_address) {
+  resolver_->InitializeJobKeyAndIPAddress(network_anonymization_key, parameters,
+                                          net_log, out_job_key, out_ip_address);
 }
 
 void HostResolverManagerTest::PopulateCache(const HostCache::Key& key,
@@ -2825,12 +2843,14 @@ TEST_F(HostResolverManagerTest, StartIPv6ReachabilityCheck) {
   socket_factory.AddSocketDataProvider(&sync_connect);
   socket_factory.AddSocketDataProvider(&async_connect);
 
-  int attempt1 = StartIPv6ReachabilityCheck(net_log, &socket_factory,
+  int attempt1 = StartIPv6ReachabilityCheck(handles::kInvalidNetworkHandle,
+                                            net_log, &socket_factory,
                                             base::DoNothingAs<void(int)>());
   EXPECT_EQ(attempt1, OK);
   int result1 = GetLastIpv6ProbeResult();
 
-  int attempt2 = StartIPv6ReachabilityCheck(net_log, &socket_factory,
+  int attempt2 = StartIPv6ReachabilityCheck(handles::kInvalidNetworkHandle,
+                                            net_log, &socket_factory,
                                             base::DoNothingAs<void(int)>());
   EXPECT_EQ(attempt2, OK);
   int result2 = GetLastIpv6ProbeResult();
@@ -2840,7 +2860,8 @@ TEST_F(HostResolverManagerTest, StartIPv6ReachabilityCheck) {
   resolver_->ResetIPv6ProbeTimeForTesting();
   TestCompletionCallback callback;
   int attempt3 =
-      StartIPv6ReachabilityCheck(net_log, &socket_factory, callback.callback());
+      StartIPv6ReachabilityCheck(handles::kInvalidNetworkHandle, net_log,
+                                 &socket_factory, callback.callback());
   EXPECT_EQ(attempt3, ERR_IO_PENDING);
   EXPECT_THAT(callback.WaitForResult(), IsOk());
   int result3 = GetLastIpv6ProbeResult();
@@ -2854,7 +2875,155 @@ TEST_F(HostResolverManagerTest, StartIPv6ReachabilityCheck) {
   // was.
   EXPECT_FALSE(GetBooleanValueFromParams(probe_event_list[0], "cached"));
   EXPECT_TRUE(GetBooleanValueFromParams(probe_event_list[1], "cached"));
-  EXPECT_FALSE(GetBooleanValueFromParams(probe_event_list[0], "cached"));
+  EXPECT_FALSE(GetBooleanValueFromParams(probe_event_list[2], "cached"));
+}
+
+TEST_F(HostResolverManagerTest,
+       StartIPv6ReachabilityCheck_TargetNetworkDoesNotClobberCache) {
+  DestroyResolver();
+  resolver_ = std::make_unique<HostResolverManager>(
+      DefaultOptions(), nullptr /* system_dns_config_notifier */,
+      nullptr /* net_log */);
+
+  RecordingNetLogObserver net_log_observer;
+  NetLogWithSource net_log =
+      NetLogWithSource::Make(net::NetLog::Get(), NetLogSourceType::NONE);
+  MockClientSocketFactory socket_factory;
+
+  // 1st socket: succeeds (for default network)
+  SequencedSocketData sync_connect_ok(MockConnect(SYNCHRONOUS, OK), {}, {});
+  socket_factory.AddSocketDataProvider(&sync_connect_ok);
+
+  handles::NetworkHandle target_network = 123;
+
+  // 1. Call for default network. Should perform check and populate cache with
+  // TRUE.
+  int attempt1 = StartIPv6ReachabilityCheck(handles::kInvalidNetworkHandle,
+                                            net_log, &socket_factory,
+                                            base::DoNothingAs<void(int)>());
+  EXPECT_EQ(attempt1, OK);
+  EXPECT_TRUE(GetLastIpv6ProbeResult());
+
+  // 2. Call for target network. Should return OK immediately without using a
+  // socket.
+  int attempt2 = StartIPv6ReachabilityCheck(
+      target_network, net_log, &socket_factory, base::DoNothingAs<void(int)>());
+  EXPECT_EQ(attempt2, OK);
+  EXPECT_TRUE(GetLastIpv6ProbeResult());
+
+  // 3. Call for default network again. Should still be CACHED and return TRUE.
+  // If target network clobbered the cache, this would return FALSE (or we would
+  // see it in GetLastIpv6ProbeResult).
+  int attempt3 = StartIPv6ReachabilityCheck(handles::kInvalidNetworkHandle,
+                                            net_log, &socket_factory,
+                                            base::DoNothingAs<void(int)>());
+  EXPECT_EQ(attempt3, OK);
+  EXPECT_TRUE(GetLastIpv6ProbeResult());
+
+  // Filter reachability check events.
+  auto probe_events = net_log_observer.GetEntriesWithType(
+      NetLogEventType::HOST_RESOLVER_MANAGER_IPV6_REACHABILITY_CHECK);
+  ASSERT_EQ(2U, probe_events.size());
+
+  // 1st: default, not cached
+  EXPECT_FALSE(GetBooleanValueFromParams(probe_events[0], "cached"));
+  // 2nd: default, cached
+  EXPECT_TRUE(GetBooleanValueFromParams(probe_events[1], "cached"));
+}
+
+TEST_F(HostResolverManagerTest,
+       StartIPv6ReachabilityCheck_TargetNetworkSucceedsIfDefaultFails) {
+  DestroyResolver();
+  resolver_ = std::make_unique<HostResolverManager>(
+      DefaultOptions(), nullptr /* system_dns_config_notifier */,
+      nullptr /* net_log */);
+
+  RecordingNetLogObserver net_log_observer;
+  NetLogWithSource net_log =
+      NetLogWithSource::Make(net::NetLog::Get(), NetLogSourceType::NONE);
+  MockClientSocketFactory socket_factory;
+
+  // 1st socket: FAILS (for default network)
+  SequencedSocketData sync_connect_fail(MockConnect(SYNCHRONOUS, ERR_FAILED),
+                                        {}, {});
+  socket_factory.AddSocketDataProvider(&sync_connect_fail);
+
+  handles::NetworkHandle target_network = 123;
+
+  // 1. Call for default network. Should perform check and populate cache with
+  // FALSE.
+  int attempt1 = StartIPv6ReachabilityCheck(handles::kInvalidNetworkHandle,
+                                            net_log, &socket_factory,
+                                            base::DoNothingAs<void(int)>());
+  EXPECT_EQ(attempt1, OK);
+  EXPECT_FALSE(GetLastIpv6ProbeResult());
+
+  // 2. Call for target network. Should return OK immediately even though
+  // default failed.
+  int attempt2 = StartIPv6ReachabilityCheck(
+      target_network, net_log, &socket_factory, base::DoNothingAs<void(int)>());
+  EXPECT_EQ(attempt2, OK);
+  EXPECT_FALSE(GetLastIpv6ProbeResult());
+
+  // 3. Call for default network again. Should still be CACHED and return FALSE.
+  int attempt3 = StartIPv6ReachabilityCheck(handles::kInvalidNetworkHandle,
+                                            net_log, &socket_factory,
+                                            base::DoNothingAs<void(int)>());
+  EXPECT_EQ(attempt3, OK);
+  EXPECT_FALSE(GetLastIpv6ProbeResult());
+
+  // Filter reachability check events.
+  auto probe_events = net_log_observer.GetEntriesWithType(
+      NetLogEventType::HOST_RESOLVER_MANAGER_IPV6_REACHABILITY_CHECK);
+  ASSERT_EQ(2U, probe_events.size());
+
+  // 1st: default, not cached
+  EXPECT_FALSE(GetBooleanValueFromParams(probe_events[0], "cached"));
+  // 2nd: default, cached
+  EXPECT_TRUE(GetBooleanValueFromParams(probe_events[1], "cached"));
+}
+
+TEST_F(HostResolverManagerDnsTest,
+       InitializeJobKeyAndIPAddress_TargetNetworkKeepsAAAA) {
+  // Set up DnsConfig with use_local_ipv6 = false.
+  DnsConfig config;
+  config.nameservers.push_back(CreateExpected("127.0.0.1", 53));
+  config.use_local_ipv6 = false;
+  ChangeDnsConfig(config);
+
+  // 1. Set default network IPv6 to NOT reachable.
+  SetLastIPv6ProbeResult(false);
+
+  // 2. Create a JobKey targeting a network.
+  handles::NetworkHandle target_network = 123;
+  HostResolver::Host host(HostPortPair("example.com", 80));
+  HostResolverManager::JobKey job_key(host, target_network,
+                                      resolve_context_.get());
+
+  // 3. Call InitializeJobKeyAndIPAddress via helper.
+  IPAddress ip_address;
+  HostResolver::ResolveHostParameters parameters;
+  parameters.dns_query_type =
+      DnsQueryType::UNSPECIFIED;  // This triggers the A/AAAA logic
+
+  InitializeJobKeyAndIPAddress(NetworkAnonymizationKey(), parameters,
+                               NetLogWithSource(), job_key, ip_address);
+
+  // 4. Verify that DnsQueryType::AAAA is STILL in query_types.
+  EXPECT_TRUE(job_key.query_types.Has(DnsQueryType::AAAA));
+  EXPECT_FALSE(job_key.flags & HOST_RESOLVER_DEFAULT_FAMILY_SET_DUE_TO_NO_IPV6);
+
+  // 5. Compare with a JobKey targeting the default network
+  // (kInvalidNetworkHandle).
+  HostResolverManager::JobKey default_job_key(
+      host, handles::kInvalidNetworkHandle, resolve_context_.get());
+  InitializeJobKeyAndIPAddress(NetworkAnonymizationKey(), parameters,
+                               NetLogWithSource(), default_job_key, ip_address);
+
+  // Verify that DnsQueryType::AAAA is REMOVED for default network.
+  EXPECT_FALSE(default_job_key.query_types.Has(DnsQueryType::AAAA));
+  EXPECT_TRUE(default_job_key.flags &
+              HOST_RESOLVER_DEFAULT_FAMILY_SET_DUE_TO_NO_IPV6);
 }
 
 TEST_F(HostResolverManagerTest, IncludeCanonicalName) {
@@ -8747,8 +8916,11 @@ class AlwaysFailSocketFactory : public MockClientSocketFactory {
  public:
   std::unique_ptr<DatagramClientSocket> CreateDatagramClientSocket(
       DatagramSocket::BindType bind_type,
+      handles::NetworkHandle target_network,
       NetLog* net_log,
       const NetLogSource& source) override {
+    // This is used only for testing in scenarios that do not involve multiple
+    // networks. With that in mind, it's safe to ignore `target_network`.
     return std::make_unique<MockUDPClientSocket>();
   }
 };
@@ -13346,23 +13518,26 @@ class MockAddressSorter : public AddressSorter {
               Sort,
               (const std::vector<IPEndPoint>& endpoints,
                const NetworkAnonymizationKey& anonymization_key,
+               handles::NetworkHandle target_network,
                CallbackType callback),
               (const, override));
 
   void ExpectCall(const std::vector<IPEndPoint>& expected,
                   std::vector<IPEndPoint> sorted) {
-    EXPECT_CALL(*this, Sort(expected, _, _))
+    EXPECT_CALL(*this, Sort(expected, _, _, _))
         .WillOnce([sorted](const std::vector<IPEndPoint>& endpoints,
                            const NetworkAnonymizationKey& anonymization_key,
+                           handles::NetworkHandle target_network,
                            AddressSorter::CallbackType callback) {
           std::move(callback).Run(true, std::move(sorted));
         });
   }
 
   void ExpectCallAndFailSort(const std::vector<IPEndPoint>& expected) {
-    EXPECT_CALL(*this, Sort(expected, _, _))
+    EXPECT_CALL(*this, Sort(expected, _, _, _))
         .WillOnce([](const std::vector<IPEndPoint>& endpoints,
                      const NetworkAnonymizationKey& anonymization_key,
+                     handles::NetworkHandle target_network,
                      AddressSorter::CallbackType callback) {
           std::move(callback).Run(false, {});
         });

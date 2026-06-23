@@ -260,8 +260,11 @@ class TestConnectionMigrationSocketFactory : public MockClientSocketFactory {
 
   std::unique_ptr<DatagramClientSocket> CreateDatagramClientSocket(
       DatagramSocket::BindType bind_type,
+      handles::NetworkHandle target_network,
       NetLog* net_log,
       const NetLogSource& source) override {
+    // This is used only for testing in scenarios that do not involve multiple
+    // networks. With that in mind, it's safe to ignore `target_network`.
     SocketDataProvider* data_provider = mock_data().GetNext();
     auto socket = std::make_unique<MockUDPClientSocket>(data_provider, net_log);
     socket->set_source_host(IPAddress(192, 0, 2, next_source_host_num_++));
@@ -287,8 +290,11 @@ class TestPortMigrationSocketFactory : public MockClientSocketFactory {
 
   std::unique_ptr<DatagramClientSocket> CreateDatagramClientSocket(
       DatagramSocket::BindType bind_type,
+      handles::NetworkHandle target_network,
       NetLog* net_log,
       const NetLogSource& source) override {
+    // This is used only for testing in scenarios that do not involve multiple
+    // networks. With that in mind, it's safe to ignore `target_network`.
     SocketDataProvider* data_provider = mock_data().GetNext();
     auto socket = std::make_unique<MockUDPClientSocket>(data_provider, net_log);
     socket->set_source_port(next_source_port_num_++);
@@ -6616,8 +6622,8 @@ TEST_P(QuicSessionPoolTest,
   EXPECT_EQ(OK, stream->SendRequest(request_headers, &response,
                                     callback_.callback()));
 
-  std::unique_ptr<DatagramClientSocket> socket(
-      pool_->CreateSocket(net_log_.net_log(), net_log_.source()));
+  std::unique_ptr<DatagramClientSocket> socket(pool_->CreateSocket(
+      handles::kInvalidNetworkHandle, net_log_.net_log(), net_log_.source()));
   DatagramClientSocket* socket_ptr = socket.get();
   pool_->ConnectAndConfigureSocket(
       base::BindLambdaForTesting([&session, &socket](int rv) {

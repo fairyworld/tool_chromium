@@ -2039,10 +2039,13 @@ class FailingSocketFactory : public MockClientSocketFactory {
 
   std::unique_ptr<TransportClientSocket> CreateTransportClientSocket(
       const AddressList& addresses,
+      handles::NetworkHandle target_network,
       std::unique_ptr<SocketPerformanceWatcher> socket_performance_watcher,
       NetworkQualityEstimator* network_quality_estimator,
       NetLog* net_log,
       const NetLogSource& source) override {
+    // This is used only for testing in scenarios that do not involve multiple
+    // networks. With that in mind, it's safe to ignore `target_network`.
     SocketDataProvider* data_provider = mock_data().GetNext();
     auto socket = std::make_unique<FailingGetPeerAddressSocket>(
         addresses, net_log, data_provider);

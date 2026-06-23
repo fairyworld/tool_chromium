@@ -3442,8 +3442,13 @@ void QuicChromiumClientSession::MaybeStartProbing(
 void QuicChromiumClientSession::CreateContextForMultiPortPath(
     std::unique_ptr<quic::MultiPortPathContextObserver> context_observer) {
   // Create and configure socket on default network
+  // TODO(crbug.com/518753285): Once we no longer bindToNetwork via
+  // `ConnectAndConfigureSocket`, bind the socket via this `CreateSocket` call,
+  // by passing in `default_network_` instead of
+  // `handles::kInvalidNetworkHandle`.
   std::unique_ptr<DatagramClientSocket> probing_socket =
-      session_pool_->CreateSocket(net_log_.net_log(), net_log_.source());
+      session_pool_->CreateSocket(handles::kInvalidNetworkHandle,
+                                  net_log_.net_log(), net_log_.source());
   if (base::FeatureList::IsEnabled(net::features::kAsyncMultiPortPath)) {
     DatagramClientSocket* probing_socket_ptr = probing_socket.get();
     CompletionOnceCallback configure_callback = base::BindOnce(
@@ -3534,9 +3539,13 @@ void QuicChromiumClientSession::StartProbing(
     return;
   }
 
-  // Create and configure socket on |network|.
+  // Create and configure socket on `network`.
+  // TODO(crbug.com/518753285): Once we no longer bindToNetwork via
+  // `FinishStartProbing`, bind the socket via this `CreateSocket` call, by
+  // passing in `network` instead of `handles::kInvalidNetworkHandle`.
   std::unique_ptr<DatagramClientSocket> probing_socket =
-      session_pool_->CreateSocket(net_log_.net_log(), net_log_.source());
+      session_pool_->CreateSocket(handles::kInvalidNetworkHandle,
+                                  net_log_.net_log(), net_log_.source());
   DatagramClientSocket* probing_socket_ptr = probing_socket.get();
   CompletionOnceCallback configure_callback =
       base::BindOnce(&QuicChromiumClientSession::FinishStartProbing,
@@ -4150,9 +4159,12 @@ void QuicChromiumClientSession::Migrate(handles::NetworkHandle network,
     }
   }
 
-  // Create and configure socket on |network|.
-  std::unique_ptr<DatagramClientSocket> socket(
-      session_pool_->CreateSocket(net_log_.net_log(), net_log_.source()));
+  // Create and configure socket on `network`.
+  // TODO(crbug.com/518753285): Once we no longer bindToNetwork via
+  // `ConnectAndConfigureSocket`, bind the socket via this `CreateSocket` call,
+  // by passing in `network` instead of `handles::kInvalidNetworkHandle`.
+  std::unique_ptr<DatagramClientSocket> socket(session_pool_->CreateSocket(
+      handles::kInvalidNetworkHandle, net_log_.net_log(), net_log_.source()));
   DatagramClientSocket* socket_ptr = socket.get();
   DVLOG(1) << "Force blocking the packet writer";
   static_cast<QuicChromiumPacketWriter*>(connection()->writer())

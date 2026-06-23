@@ -65,6 +65,7 @@
 #include "content/public/test/test_renderer_host.h"
 #include "content/public/test/test_utils.h"
 #include "net/base/address_list.h"
+#include "net/base/network_handle.h"
 #include "net/socket/tcp_client_socket.h"
 #include "third_party/zlib/google/compression_utils.h"
 #include "ui/events/keycodes/dom/dom_key.h"
@@ -741,7 +742,10 @@ bool WebPageReplayServerWrapper::Start(
         net::IPEndPoint(net::IPAddress(127, 0, 0, 1), host_http_port_));
     ++connect_attempts;
     client_socket = std::make_unique<net::TCPClientSocket>(
-        addr, nullptr, nullptr, nullptr, net::NetLogSource());
+        addr, nullptr, nullptr, nullptr, net::NetLogSource(),
+        // No need to use a target network here. This is an external tool not
+        // used in production.
+        net::handles::kInvalidNetworkHandle);
     int connect_result = client_socket->Connect(on_connect_complete);
     // On ERR_IO_PENDING, `on_connect_complete` will be invoked
     // asynchronously, so need to let the message loop spin until that
