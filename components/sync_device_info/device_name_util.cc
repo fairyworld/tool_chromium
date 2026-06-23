@@ -140,9 +140,8 @@ DisplayNameCandidates GetDisplayNameCandidates(const DeviceInfo* device) {
   const std::string model = device->model_name();
   const bool client_name_is_high_quality = IsClientNameHighQuality(device);
 
-  // 1. Skip renaming for M78- devices where HardwareInfo is not available.
-  // 2. Skip renaming if client_name is high quality.
-  if (model.empty() || client_name_is_high_quality) {
+  // Skip renaming if client_name is high quality.
+  if (client_name_is_high_quality) {
     return {.preferred_name_if_unique = device->client_name(),
             .fallback_full_name = device->client_name()};
   }
