@@ -81,6 +81,7 @@
 #include "components/autofill/core/browser/test_utils/entity_data_test_utils.h"
 #include "components/autofill/core/browser/test_utils/valuables_data_test_utils.h"
 #include "components/autofill/core/browser/ui/tabbed_pane_enums.h"
+#include "components/autofill/core/browser/webdata/autocomplete/autocomplete_entry.h"
 #include "components/autofill/core/browser/webdata/autofill_ai/entity_table.h"
 #include "components/autofill/core/browser/webdata/autofill_webdata_service_test_helper.h"
 #include "components/autofill/core/common/aliases.h"
@@ -3823,11 +3824,17 @@ TEST_F(AutofillExternalDelegateTest, RemoveSuggestion_Autocomplete) {
       std::make_unique<MockSingleFieldFillRouter>(
           autofill_client().GetAutocompleteHistoryManager(), nullptr, nullptr);
   EXPECT_CALL(*mock_single_field_fill_router,
-              OnRemoveCurrentSingleFieldSuggestion);
+              OnRemoveCurrentSingleFieldSuggestion(
+                  std::u16string(u"name"), std::u16string(u"value"),
+                  SuggestionType::kAutocompleteEntry));
   autofill_client().set_single_field_fill_router(
       std::move(mock_single_field_fill_router));
-  EXPECT_TRUE(external_delegate().RemoveSuggestion(
-      Suggestion(u"autocomplete", SuggestionType::kAutocompleteEntry)));
+
+  AutocompleteEntry entry(AutocompleteKey("name", "value"), base::Time::Now(),
+                          base::Time::Now());
+  Suggestion autocomplete_suggestion(SuggestionType::kAutocompleteEntry);
+  autocomplete_suggestion.payload = std::move(entry);
+  EXPECT_TRUE(external_delegate().RemoveSuggestion(autocomplete_suggestion));
 }
 
 TEST_F(AutofillExternalDelegateTest, RemoveSuggestion_Address) {
