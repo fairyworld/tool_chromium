@@ -4315,15 +4315,6 @@ if (!is_android) {
     }
 
     if (enable_extensions) {
-      # These files have not moved to chrome/browser/extensions/BUILD.gn due to
-      # dependency issues. They should likely be moved closer to the actual test
-      # files instead.
-      sources += [
-        "//chrome/browser/ui/extensions/extension_install_blocked_dialog_browsertest.cc",
-        "//chrome/browser/ui/extensions/extension_multiple_uninstall_dialog_browsertest.cc",
-        "//chrome/browser/ui/extensions/extension_uninstall_dialog_impl_browsertest.cc",
-        "//chrome/browser/ui/extensions/reload_page_dialog_controller_browsertest.cc",
-      ]
       deps += [
         "//chrome/browser/apps/platform_apps:browser_test_support",
         "//chrome/browser/apps/platform_apps:browser_tests",
@@ -4335,8 +4326,6 @@ if (!is_android) {
       ]
       if (is_chromeos) {
         deps += [ "//chrome/browser/apps:browser_tests" ]
-      } else {
-        sources += [ "//chrome/browser/ui/extensions/upload_extension_to_account_dialog_browsertest.cc" ]
       }
     }
 
@@ -4385,8 +4374,6 @@ if (!is_android) {
         "../browser/ui/views/extensions/device_chooser_extension_browsertest.cc",
         "../browser/ui/views/extensions/extension_install_dialog_view_browsertest.cc",
         "../browser/ui/views/extensions/extension_post_install_dialog_view_utils_browsertest.cc",
-        "../browser/ui/views/extensions/extensions_dialogs_browsertest.cc",
-        "../browser/ui/views/extensions/extensions_dialogs_browsertest.h",
         "../browser/ui/views/extensions/extensions_request_access_hover_card_coordinator_browsertest.cc",
         "../browser/ui/views/extensions/generic_mime_handler_chip_browsertest.cc",
         "../browser/ui/views/extensions/security_dialog_tracker_browsertest.cc",
