@@ -129,6 +129,16 @@ class EncryptedSessionStorageBrowserTestBase : public InProcessBrowserTest {
     InProcessBrowserTest::SetUp();
   }
 
+  void VerifyWindowBounds(gfx::Rect expected, gfx::Rect actual) {
+#if BUILDFLAG(IS_LINUX) && BUILDFLAG(SUPPORTS_OZONE_WAYLAND)
+    // On Linux Wayland, client applications cannot set top-level window
+    // positions. So we can only verify the window size.
+    EXPECT_EQ(expected.size(), actual.size());
+#else
+    EXPECT_EQ(expected, actual);
+#endif
+  }
+
   void AssertCommandStorageBackendFilesExist(SessionType session_type,
                                              Profile* profile = nullptr) {
     if (!profile) {
@@ -681,7 +691,7 @@ class SessionRestoreAcrossStagesTest
         ReadWindowBoundsFromFile(bounds_file);
 
     // Assert Window 1 bounds
-    EXPECT_EQ(expected_bounds1, w1->GetWindow()->GetBounds());
+    VerifyWindowBounds(expected_bounds1, w1->GetWindow()->GetBounds());
 
     // Window 1 Tab 1 shows GetUrl(1) and is active
     TabStripModel* w1_model = w1->GetTabStripModel();
@@ -697,7 +707,7 @@ class SessionRestoreAcrossStagesTest
     EXPECT_EQ(GetUrl(3), controller.GetEntryAtIndex(1)->GetURL());
 
     // Assert Window 2 bounds
-    EXPECT_EQ(expected_bounds2, w2->GetWindow()->GetBounds());
+    VerifyWindowBounds(expected_bounds2, w2->GetWindow()->GetBounds());
 
     TabStripModel* w2_model = w2->GetTabStripModel();
     // Tab 1 should be pinned and shows GetUrl(1)
@@ -752,13 +762,7 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreAcrossStagesTest, PRE_Restore) {
   AssertCommandStorageBackendFilesExist(SessionType::kSessionRestore);
 }
 
-// TODO(crbug.com/525638651): Re-enable this test on Linux Wayland.
-#if BUILDFLAG(IS_LINUX) && BUILDFLAG(SUPPORTS_OZONE_WAYLAND)
-#define MAYBE_Restore DISABLED_Restore
-#else
-#define MAYBE_Restore Restore
-#endif
-IN_PROC_BROWSER_TEST_F(SessionRestoreAcrossStagesTest, MAYBE_Restore) {
+IN_PROC_BROWSER_TEST_F(SessionRestoreAcrossStagesTest, Restore) {
   AssertSessionState();
 }
 
