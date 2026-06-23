@@ -40,6 +40,7 @@ import org.chromium.base.supplier.SettableNullableObservableSupplier;
 import org.chromium.base.test.util.Batch;
 import org.chromium.base.test.util.Criteria;
 import org.chromium.base.test.util.CriteriaHelper;
+import org.chromium.base.test.util.DisableLeakChecks;
 import org.chromium.base.test.util.DisabledTest;
 import org.chromium.base.test.util.Features.EnableFeatures;
 import org.chromium.base.test.util.Restriction;
@@ -79,6 +80,7 @@ import org.chromium.ui.modelutil.PropertyModel;
 @RunWith(ChromeJUnit4ClassRunner.class)
 @Batch(Batch.PER_CLASS)
 @EnableFeatures(ChromeFeatureList.TAB_BOTTOM_SHEET)
+@DisableLeakChecks("crbug.com/512491038")
 public class TabBottomSheetManagerTest {
     @Rule
     public FreshCtaTransitTestRule mActivityTestRule =
