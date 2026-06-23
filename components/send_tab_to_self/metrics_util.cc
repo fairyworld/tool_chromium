@@ -180,6 +180,11 @@ void RecordAutoOpenOutcome(AutoOpenOutcome outcome) {
                                 outcome);
 }
 
+void RecordActivatedEntryPoint(ShareActivatedEntryPoint entry_point) {
+  base::UmaHistogramEnumeration("Sharing.SendTabToSelf.ActivatedEntryPoint",
+                                entry_point);
+}
+
 void RecordFormFieldMatchOutcome(FormFieldMatchOutcome outcome, int count) {
   for (int i = 0; i < count; ++i) {
     base::UmaHistogramEnumeration(
