@@ -40,7 +40,7 @@ export enum SubmitButtonIconType {
   UPWARD = 'upward',
 }
 
-const PERMISSION_PROMPT_CSS_CLASS = 'embedded-permission-prompt-showing';
+const PERMISSION_PROMPT_CSS_CLASS = 'permission-prompt-showing';
 
 type Constructor<T> = new (...args: any[]) => T;
 
@@ -556,7 +556,7 @@ export const ComposeboxEmbedderMixin =
             // Only for when the permission prompt is showing, fire a resize
             // event if the permission prompt has a height and width.
             if (e.detail.height > 0 && e.detail.width > 0) {
-              this.fire('embedded-voice-permission-prompt-changed', e.detail);
+              this.fire('voice-permission-prompt-changed', e.detail);
             }
             // Not listening if no permission granted. Needed to turn off
             // animation.
@@ -565,7 +565,7 @@ export const ComposeboxEmbedderMixin =
             // Listening is set as `true` if permission is granted.
             this.isListening =
                 this.inVoiceSearchMode && !this.hasVoiceSearchError;
-            this.fire('embedded-voice-permission-prompt-changed', e.detail);
+            this.fire('voice-permission-prompt-changed', e.detail);
           }
 
           const audioAnimation =

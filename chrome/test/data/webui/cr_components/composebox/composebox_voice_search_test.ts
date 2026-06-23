@@ -867,7 +867,7 @@ suite('ComposeboxVoiceSearch', () => {
         // Track custom resize events fired on composeboxElement.
         let resizeEventFired = false;
         composeboxElement.addEventListener(
-            'embedded-voice-permission-prompt-changed', () => {
+            'voice-permission-prompt-changed', () => {
               resizeEventFired = true;
             });
 
@@ -938,8 +938,8 @@ suite('ComposeboxVoiceSearch', () => {
 
 
         // Verify: classes were added to elements.
-        assertTrue(voiceSearchElement.classList.contains(
-            'embedded-permission-prompt-showing'));
+        assertTrue(
+            voiceSearchElement.classList.contains('permission-prompt-showing'));
 
         // Verify: voice search remains open because permission prompt is open.
         assertTrue(
@@ -952,8 +952,8 @@ suite('ComposeboxVoiceSearch', () => {
         await microtasksFinished();
 
         assertFalse(voiceSearchElement.isPermissionPromptOpen);
-        assertFalse(voiceSearchElement.classList.contains(
-            'embedded-permission-prompt-showing'));
+        assertFalse(
+            voiceSearchElement.classList.contains('permission-prompt-showing'));
 
         // Simulate blur event again.
         window.dispatchEvent(new Event('blur'));

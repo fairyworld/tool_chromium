@@ -243,8 +243,7 @@ suite('ComposeboxTest', () => {
         await composebox.updateComplete;
 
         // Verify the class was added and opacity turned to 0.
-        assertTrue(
-            glow.classList.contains('embedded-permission-prompt-showing'));
+        assertTrue(glow.classList.contains('permission-prompt-showing'));
         assertEquals('0', window.getComputedStyle(audioWave).opacity);
       });
 
@@ -305,8 +304,7 @@ suite('ComposeboxTest', () => {
         await composebox.updateComplete;
 
         // Verify the class was added and opacity turned to 0.
-        assertTrue(
-            glow.classList.contains('embedded-permission-prompt-showing'));
+        assertTrue(glow.classList.contains('permission-prompt-showing'));
         assertEquals('0', window.getComputedStyle(recordingWave).opacity);
       });
 
@@ -360,9 +358,7 @@ suite('ComposeboxTest', () => {
         await voiceSearch.updateComplete;
 
         // Verify the class was added and opacity turned to 0.
-        assertTrue(
-            voiceSearch.classList.contains(
-                'embedded-permission-prompt-showing'));
+        assertTrue(voiceSearch.classList.contains('permission-prompt-showing'));
         assertEquals('0', window.getComputedStyle(bottomActions).opacity);
       });
 
