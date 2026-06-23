@@ -1055,8 +1055,8 @@ void SetApplicationLocaleOnIOThread(const std::string& locale) {
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
 
-// Returns true if there is is an extension matching `url` in
-// `render_process_id` with `permission`.
+// Returns true if there is an extension matching `url` in `render_process_id`
+// with `permission`.
 //
 // GetExtensionOrAppByURL requires a full URL in order to match with a hosted
 // app, even though normal extensions just use the host.
