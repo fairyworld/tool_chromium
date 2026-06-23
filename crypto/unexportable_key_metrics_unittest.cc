@@ -9,16 +9,17 @@
 #include <functional>
 #include <memory>
 #include <optional>
-#include <set>
 #include <utility>
 #include <vector>
 
 #include "base/containers/span.h"
 #include "base/containers/to_vector.h"
+#include "base/containers/transparent_hash.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "crypto/signature_verifier.h"
 #include "crypto/unexportable_key.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
 
 namespace crypto {
 
@@ -55,8 +56,7 @@ class MockTrackingUnexportableKeyProvider
   }
   std::unique_ptr<UnexportableSigningKey> FromWrappedSigningKeySlowly(
       base::span<const uint8_t> wrapped_key) override {
-    CHECK(keys_.contains(
-        std::vector<uint8_t>(wrapped_key.begin(), wrapped_key.end())))
+    CHECK(keys_.contains(wrapped_key))
         << "Attempted to delete non existing key";
     return key_provider_->FromWrappedSigningKeySlowly(wrapped_key);
   }
@@ -80,7 +80,7 @@ class MockTrackingUnexportableKeyProvider
   // StatefulUnexportableKeyProvider:
   std::optional<std::vector<std::unique_ptr<UnexportableSigningKey>>>
   GetAllKeysSlowly() override {
-    return base::ToVector(keys_, [&](const std::vector<uint8_t>& key) {
+    return base::ToVector(keys_, [&](base::span<const uint8_t> key) {
       return FromWrappedSigningKeySlowly(key);
     });
   }
@@ -91,9 +91,8 @@ class MockTrackingUnexportableKeyProvider
             key_provider_->AsStatefulUnexportableKeyProvider()) {
       stateful_key_provider->DeleteWrappedKeysSlowly(wrapped_keys);
     }
-    return std::ranges::count_if(wrapped_keys, [&](auto key) {
-      return keys_.erase(base::ToVector(key)) != 0;
-    });
+    return std::ranges::count_if(
+        wrapped_keys, [&](auto key) { return keys_.erase(key) != 0; });
   }
 
   std::optional<size_t> DeleteKeysSlowly(
@@ -117,7 +116,10 @@ class MockTrackingUnexportableKeyProvider
 
  private:
   std::unique_ptr<UnexportableKeyProvider> key_provider_;
-  std::set<std::vector<uint8_t>> keys_;
+  absl::flat_hash_set<std::vector<uint8_t>,
+                      base::TransparentHashAs<base::span<const uint8_t>>,
+                      base::TransparentEqualAs<base::span<const uint8_t>>>
+      keys_;
 };
 
 std::unique_ptr<UnexportableKeyProvider> GetUnexportableKeyProviderMock() {
