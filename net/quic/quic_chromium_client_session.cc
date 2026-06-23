@@ -1051,11 +1051,22 @@ QuicChromiumClientSession::QuicChromiumClientSession(
       session_alias_key_(std::move(session_alias_key)),
       session_key_(session_alias_key_.session_key()),
       require_confirmation_(require_confirmation),
-      migrate_session_early_v2_(migrate_session_early_v2),
+      migrate_session_early_v2_(migrate_session_early_v2 &&
+                                // If the session targets a network, we should
+                                // not migrate to another.
+                                session_key_.target_network() ==
+                                    handles::kInvalidNetworkHandle),
       migrate_session_on_network_change_v2_(
-          migrate_sessions_on_network_change_v2),
+          migrate_sessions_on_network_change_v2 &&
+          // If the session targets a network, we should not migrate to another.
+          session_key_.target_network() == handles::kInvalidNetworkHandle),
       migrate_idle_session_(migrate_idle_session),
-      allow_port_migration_(allow_port_migration),
+      allow_port_migration_(
+          allow_port_migration &&
+          // If the session targets a network, we could migrate to a different
+          // port onto the same network. Having said that, this is non-trivial
+          // to implement. For the time being don't migrate.
+          session_key_.target_network() == handles::kInvalidNetworkHandle),
       idle_migration_period_(idle_migration_period),
       max_time_on_non_default_network_(max_time_on_non_default_network),
       max_migrations_to_non_default_network_on_write_error_(
