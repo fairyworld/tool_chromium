@@ -33,6 +33,7 @@
 #import "ios/chrome/browser/shared/model/application_context/application_context.h"
 #import "ios/chrome/browser/shared/model/browser/browser.h"
 #import "ios/chrome/browser/shared/model/profile/profile_ios.h"
+#import "ios/chrome/browser/shared/model/url/url_util.h"
 #import "ios/chrome/browser/shared/model/web_state_list/web_state_list.h"
 #import "ios/chrome/browser/shared/public/commands/activity_service_commands.h"
 #import "ios/chrome/browser/shared/public/commands/browser_coordinator_commands.h"
@@ -538,7 +539,7 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
 
 - (CGFloat)collapsedPrimaryToolbarHeight {
   if (IsChromeNextIaEnabled()) {
-    if (self.primaryToolbarViewController.view.hidden) {
+    if ([self isToolbarHidden:_topToolbarViewController.view]) {
       // TODO(crbug.com/40279063): Find out why primary toolbar height cannot be
       // zero. This is a temporary fix for the pdf bug.
       return IsFullscreenRefactoringEnabled() ? 0.0 : 1.0;
@@ -568,7 +569,7 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
 
 - (CGFloat)expandedPrimaryToolbarHeight {
   if (IsChromeNextIaEnabled()) {
-    if (self.primaryToolbarViewController.view.hidden) {
+    if ([self isToolbarHidden:_topToolbarViewController.view]) {
       // TODO(crbug.com/40279063): Find out why primary toolbar height cannot be
       // zero. This is a temporary fix for the pdf bug.
       return IsFullscreenRefactoringEnabled() ? 0.0 : 1.0;
@@ -615,7 +616,7 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
 
 - (CGFloat)collapsedSecondaryToolbarHeight {
   if (IsChromeNextIaEnabled()) {
-    if (self.secondaryToolbarViewController.view.hidden) {
+    if ([self isToolbarHidden:_bottomToolbarViewController.view]) {
       return 0.0;
     }
     if ([self isToolbarPositionBottom]) {
@@ -632,7 +633,7 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
 
 - (CGFloat)expandedSecondaryToolbarHeight {
   if (IsChromeNextIaEnabled()) {
-    if (self.secondaryToolbarViewController.view.hidden) {
+    if ([self isToolbarHidden:_bottomToolbarViewController.view]) {
       return 0.0;
     }
     if ([self isToolbarPositionBottom]) {
@@ -1114,6 +1115,13 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
       updateForFullscreenProgress:agent->bottom_progress()];
 }
 
+#pragma mark - LayoutStateObserver
+
+- (void)layoutState:(LayoutState*)layoutState
+    didChangeToolbarPosition:(ToolbarPosition)toolbarPosition {
+  [self updateLayoutForToolbarPosition:toolbarPosition];
+}
+
 #pragma mark - Private
 
 /// Whether the omnibox is currently in edit state.
@@ -1342,19 +1350,11 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
   self.browser->GetSceneState().layoutState.toolbarPosition = position;
 }
 
-#pragma mark - LayoutStateObserver
-
-- (void)layoutState:(LayoutState*)layoutState
-    didChangeToolbarPosition:(ToolbarPosition)toolbarPosition {
-  [self updateLayoutForToolbarPosition:toolbarPosition];
-}
-
 // Updates the visual layout and child coordinators to match the given position.
 - (void)updateLayoutForToolbarPosition:(ToolbarPosition)toolbarPosition {
   BOOL isToolbarAtBottom = toolbarPosition == ToolbarPosition::kBottom;
   _omniboxPosition =
       isToolbarAtBottom ? ToolbarType::kSecondary : ToolbarType::kPrimary;
-
 
   if (!IsChromeNextIaEnabled()) {
     [self updateOrchestratorAnimatee];
@@ -1378,6 +1378,42 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
   }
 
   [self.toolbarHeightDelegate toolbarsHeightChanged];
+}
+
+// Helper for public methods returning the toolbar height. Returns whether the
+// toolbar is hidden. This check requires the active WebState to be the NTP to
+// ensure that during NTP-to-webpage transitions, the full toolbar height is
+// returned immediately when the navigation starts. Otherwise, checking only
+// `toolbarView.isHidden` would return a height of 0.0 to the caller during the
+// loading phase, causing the webpage to layout with incorrect content insets.
+- (BOOL)isToolbarHidden:(UIView*)toolbarView {
+  CHECK(IsChromeNextIaEnabled());
+  if (!toolbarView.isHidden) {
+    return NO;
+  }
+
+  web::WebState* webState =
+      self.browser->GetWebStateList()->GetActiveWebState();
+  if (!webState) {
+    // No web state to have a toolbar for.
+    return YES;
+  }
+
+  // If the active page is the NTP, the toolbar is legitimately hidden.
+  if (IsVisibleURLNewTabPage(webState)) {
+    return YES;
+  }
+
+  // If the toolbar is hidden, but in the middle of transitioning from the NTP
+  // to a non-NTP page, treat it as NOT hidden so the full height is returned
+  // immediately.
+  BOOL transitioningFromNTP =
+      webState->IsLoading() && IsUrlNtp(webState->GetLastCommittedURL());
+  if (transitioningFromNTP) {
+    return NO;
+  }
+
+  return YES;
 }
 
 @end
