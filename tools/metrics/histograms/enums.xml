@@ -5890,6 +5890,10 @@ shown properly on the user-facing crash UI.
   <int value="45" label="kStartDragging">
     A request was received to start dragging from within an inactive page.
   </int>
+  <int value="46" label="kWindowPlacement">
+    A window.moveTo() / moveBy() / resizeTo() / resizeBy() / SetWindowRect() IPC
+    arrived for a frame in BFCache or pending deletion.
+  </int>
 </enum>
 
 <enum name="IncidentType">

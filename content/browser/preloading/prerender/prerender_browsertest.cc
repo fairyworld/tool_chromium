@@ -6943,6 +6943,35 @@ IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest, CancelOnPreferredSizeChanged) {
       DisallowActivationReasonId::kContentsPreferredSizeChanged, 1);
 }
 
+// Tests that a window-placement IPC (MoveWindowTo) targeting a prerendered main
+// frame cancels prerendering rather than killing the renderer. The renderer
+// normally drops these in LocalDOMWindow (IsPrerendering/IsOutermostMainFrame
+// guards), so we invoke the LocalMainFrameHost receiver directly to emulate a
+// compromised renderer reaching ValidateOutermostMainFrameWindowChange.
+IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest, CancelOnMoveWindowTo) {
+  const GURL initial_url = GetUrl("/empty.html");
+  const GURL prerendering_url = GetUrl("/title1.html");
+  ASSERT_TRUE(NavigateToURL(shell(), initial_url));
+
+  PrerenderHostId host_id = AddPrerender(prerendering_url);
+  test::PrerenderHostObserver host_observer(*web_contents_impl(), host_id);
+
+  // Drive the browser-side MoveWindowTo handler on the prerendered main frame.
+  // This reaches IsInactiveAndDisallowActivation(kWindowPlacement), which
+  // cancels prerendering for a frame in the kPrerendering lifecycle state.
+  GetPrerenderedMainFrameHost(host_id)->MoveWindowTo(gfx::Point(10, 20),
+                                                     base::DoNothing());
+
+  host_observer.WaitForDestroyed();
+  EXPECT_FALSE(HasHostForUrl(prerendering_url));
+  ExpectFinalStatusForSpeculationRule(
+      PrerenderFinalStatus::kInactivePageRestriction);
+  histogram_tester().ExpectUniqueSample(
+      "Prerender.CanceledForInactivePageRestriction.DisallowActivationReason."
+      "SpeculationRule",
+      DisallowActivationReasonId::kWindowPlacement, 1);
+}
+
 // Tests that prerendering cannot request the browser to create a popup widget.
 IN_PROC_BROWSER_TEST_F(PrerenderBrowserTest, NoPopupWidget) {
   const GURL initial_url = GetUrl("/empty.html");
