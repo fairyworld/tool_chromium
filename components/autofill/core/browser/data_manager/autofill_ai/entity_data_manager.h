@@ -212,6 +212,11 @@ class EntityDataManager : public KeyedService,
   // level) because the device's re-auth state can change.
   void EnforceEntityReauthRequirements();
 
+  // Removes any cached `kPersonalContext` entities from `entities_` that
+  // represent the same entity as any non-pContext entity in the cache, based
+  // on their merge constraints.
+  void DedupePersonalContextEntities();
+
   // Becomes true after the response of the initial LoadEntitiesFromDatabase()
   // and remains true from then on.
   bool database_loaded_ = false;
