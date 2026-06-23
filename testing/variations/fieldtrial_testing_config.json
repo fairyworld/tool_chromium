@@ -9431,6 +9431,38 @@
             ]
         }
     ],
+    "DomStorageSqliteNewDatabases": [
+        {
+            "platforms": [
+                "android",
+                "android_webview",
+                "chromeos",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "UseSqliteForNewDatabases",
+                    "params": {
+                        "DomStorageSqliteNewDatabasesStage": "UseSqliteForNewDatabases"
+                    },
+                    "enable_features": [
+                        "DomStorageSqliteNewDatabases"
+                    ]
+                },
+                {
+                    "name": "UseLevelDbAsControl",
+                    "params": {
+                        "DomStorageSqliteNewDatabasesStage": "UseLevelDbAsControl"
+                    },
+                    "enable_features": [
+                        "DomStorageSqliteNewDatabases"
+                    ]
+                }
+            ]
+        }
+    ],
     "DownloadWarningSurvey": [
         {
             "platforms": [
