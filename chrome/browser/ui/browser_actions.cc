@@ -2422,6 +2422,50 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               bwi))
           .SetActionId(kActionWindowPinTab)
           .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::GroupTab(bwi);
+              },
+              bwi))
+          .SetActionId(kActionWindowGroupTab)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::CloseTabsToRight(bwi);
+              },
+              bwi))
+          .SetActionId(kActionWindowCloseTabsToRight)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::CloseOtherTabs(bwi);
+              },
+              bwi))
+          .SetActionId(kActionWindowCloseOtherTabs)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::NewTabToRight(bwi);
+              },
+              bwi))
+          .SetActionId(kActionNewTabToRight)
+          .Build());
 }
 
 void BrowserActions::AddListeners() {
