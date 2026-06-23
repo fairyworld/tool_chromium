@@ -115,6 +115,7 @@ import java.util.concurrent.TimeUnit;
     ChromeFeatureList.GLIC,
     ChromeFeatureList.DATA_SHARING,
     ChromeFeatureList.DATA_SHARING_JOIN_ONLY,
+    ChromeFeatureList.ANDROID_CONTEXT_MENU_NEW_ACTIONS,
     TabGroupsFeatureMap.UPDATE_TAB_GROUP_COLORS
 })
 public class VerticalTabListCoordinatorUnitTest {
