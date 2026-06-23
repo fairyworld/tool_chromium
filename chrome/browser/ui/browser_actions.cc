@@ -2050,6 +2050,17 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           .SetActionId(kUseSystemTitleBar)
           .Build());
 #endif  // BUILDFLAG(IS_LINUX)
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::CloseTabSearch(bwi);
+              },
+              bwi))
+          .SetActionId(kActionTabSearchClose)
+          .Build());
 }
 
 void BrowserActions::AddListeners() {
