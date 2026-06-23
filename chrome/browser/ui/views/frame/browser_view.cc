@@ -5618,6 +5618,11 @@ int BrowserView::GetCommandIDForAppCommandID(int app_command_id) const {
 
 void BrowserView::UpdateAcceleratorMetrics(const ui::Accelerator& accelerator,
                                            int command_id) {
+  if (!accelerator.IsRepeat()) {
+    base::UmaHistogramSparse("Browser.Shortcuts.TriggeredCommandId",
+                             command_id);
+  }
+
   const ui::KeyboardCode key_code = accelerator.key_code();
   if (command_id == IDC_HELP_PAGE_VIA_KEYBOARD && key_code == ui::VKEY_F1) {
     base::RecordAction(UserMetricsAction("ShowHelpTabViaF1"));
