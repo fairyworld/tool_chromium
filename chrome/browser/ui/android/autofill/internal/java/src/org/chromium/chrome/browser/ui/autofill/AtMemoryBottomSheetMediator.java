@@ -6,6 +6,7 @@ package org.chromium.chrome.browser.ui.autofill;
 
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetCoordinator.ITEM_TYPE_SEARCH_TILE;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetCoordinator.ITEM_TYPE_SUGGESTION;
+import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.FLYOUT_SUGGESTIONS;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.IS_LOADING;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.ON_QUERY_SUBMITTED_CALLBACK;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.ON_QUERY_TEXT_CHANGED_CALLBACK;
@@ -100,7 +101,10 @@ class AtMemoryBottomSheetMediator {
     }
 
     private void onFlyoutClicked(AutofillSuggestion suggestion) {
-        mDelegate.onFlyoutClicked(suggestion);
+        // TODO(crbug.com/505255929): Once AutofillSuggestion supports child/sub-suggestions,
+        // set the title, source, and suggestions directly. For now, pass placeholder values for
+        // testing.
+        mModel.set(FLYOUT_SUGGESTIONS, List.of(suggestion));
     }
 
     void onQuerySubmitted(String query) {

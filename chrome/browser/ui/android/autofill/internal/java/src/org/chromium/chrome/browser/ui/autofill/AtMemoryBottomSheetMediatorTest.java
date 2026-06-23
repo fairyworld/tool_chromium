@@ -94,11 +94,31 @@ public class AtMemoryBottomSheetMediatorTest {
         itemModel1.get(ON_SUGGESTION_CLICKED).run();
 
         verify(mDelegate).onSuggestionClicked(/* position= */ 0);
+    }
+
+    @Test
+    public void testOnFlyoutClicked() {
+        List<AutofillSuggestion> suggestions =
+                List.of(
+                        new AutofillSuggestion.Builder()
+                                .setIconId(R.drawable.flight)
+                                .setLabel("KLM204")
+                                .setSubLabel("Flight ⋅ 15 May ⋅ SEA - MUC")
+                                .build(),
+                        new AutofillSuggestion.Builder()
+                                .setIconId(R.drawable.travel_trip)
+                                .setLabel("Hotel Booking")
+                                .setSubLabel("Hilton ⋅ 16 May")
+                                .build());
+
+        mMediator.show(suggestions);
 
         PropertyModel itemModel2 = mModelList.get(1).model;
         itemModel2.get(ON_FLYOUT_CLICKED).run();
 
-        verify(mDelegate).onFlyoutClicked(suggestions.get(1));
+        assertEquals(
+                List.of(suggestions.get(1)),
+                mModel.get(AtMemoryBottomSheetProperties.FLYOUT_SUGGESTIONS));
     }
 
     @Test

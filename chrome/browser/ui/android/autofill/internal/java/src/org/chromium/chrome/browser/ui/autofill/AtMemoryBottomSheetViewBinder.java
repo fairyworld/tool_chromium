@@ -4,6 +4,7 @@
 
 package org.chromium.chrome.browser.ui.autofill;
 
+import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.FLYOUT_SUGGESTIONS;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.IS_LOADING;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.ON_QUERY_SUBMITTED_CALLBACK;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.ON_QUERY_TEXT_CHANGED_CALLBACK;
@@ -31,6 +32,8 @@ class AtMemoryBottomSheetViewBinder {
             view.setIsLoading(model.get(IS_LOADING));
         } else if (propertyKey == SHOW_SUGGESTIONS_BACKGROUND) {
             view.setShowSuggestionsBackground(model.get(SHOW_SUGGESTIONS_BACKGROUND));
+        } else if (propertyKey == FLYOUT_SUGGESTIONS) {
+            view.setFlyoutSuggestions(model.get(FLYOUT_SUGGESTIONS));
         }
     }
 }

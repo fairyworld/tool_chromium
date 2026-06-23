@@ -18,6 +18,7 @@ import android.app.Activity;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.ViewGroup;
+import android.widget.ViewFlipper;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.filters.LargeTest;
@@ -46,6 +47,7 @@ import org.chromium.base.test.util.DoNotBatch;
 import org.chromium.base.test.util.Feature;
 import org.chromium.chrome.browser.flags.ChromeSwitches;
 import org.chromium.chrome.browser.ui.autofill.internal.R;
+import org.chromium.components.autofill.AutofillSuggestion;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetControllerFactory;
 import org.chromium.components.browser_ui.widget.scrim.ScrimManager;
@@ -88,7 +90,7 @@ public class AtMemoryBottomSheetViewRenderTest {
     @Rule
     public final RenderTestRule mRenderTestRule =
             RenderTestRule.Builder.withPublicCorpus()
-                    .setRevision(2)
+                    .setRevision(3)
                     .setBugComponent(Component.UI_BROWSER_AUTOFILL)
                     .build();
 
@@ -145,7 +147,7 @@ public class AtMemoryBottomSheetViewRenderTest {
 
     @Test
     @Feature({"RenderTest"})
-    public void testAtMemoryBottomSheetView() throws Exception {
+    public void testAtMemoryBottomSheetMainScreen() throws Exception {
         ContextThemeWrapper themeWrapper =
                 new ContextThemeWrapper(mActivity, R.style.Theme_BrowserUI_DayNight);
 
@@ -204,7 +206,7 @@ public class AtMemoryBottomSheetViewRenderTest {
                     }
                 });
         mRenderTestRule.render(
-                mActivity.findViewById(android.R.id.content), "at_memory_bottom_sheet_view");
+                mActivity.findViewById(android.R.id.content), "at_memory_main_screen");
     }
 
     @Test
@@ -273,5 +275,39 @@ public class AtMemoryBottomSheetViewRenderTest {
                 .with(TILE_DETAILS, details)
                 .with(TILE_ICON, iconResId)
                 .build();
+    }
+
+    @Test
+    @Feature({"RenderTest"})
+    public void testAtMemoryBottomSheetFlyoutScreen() throws Exception {
+        ContextThemeWrapper themeWrapper =
+                new ContextThemeWrapper(mActivity, R.style.Theme_BrowserUI_DayNight);
+
+        runOnUiThreadBlocking(
+                () -> {
+                    mView = new AtMemoryBottomSheetView(themeWrapper);
+                    AtMemoryBottomSheetContent content =
+                            new AtMemoryBottomSheetContent(
+                                    mView.getContentView(), mBottomSheetController);
+
+                    ((ViewFlipper) mView.getContentView()).setDisplayedChild(1);
+                    mView.setFlyoutSuggestions(
+                            List.of(
+                                    createAutofillSuggestion("Elisa Beckett", ""),
+                                    createAutofillSuggestion("123530", "Passport number"),
+                                    createAutofillSuggestion("07-05-2032", "Issue date"),
+                                    createAutofillSuggestion("07-05-2032", "Expiration date"),
+                                    createAutofillSuggestion("USA", "")));
+
+                    mBottomSheetController.requestShowContent(content, false);
+                });
+
+        ViewUtils.waitForStableView(mView.getContentView());
+        mRenderTestRule.render(
+                mActivity.findViewById(android.R.id.content), "at_memory_flyout_screen");
+    }
+
+    private AutofillSuggestion createAutofillSuggestion(String label, String subLabel) {
+        return new AutofillSuggestion.Builder().setLabel(label).setSubLabel(subLabel).build();
     }
 }
