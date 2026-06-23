@@ -8536,18 +8536,15 @@ test("unit_tests") {
 
     if (is_chromeos) {
       sources += [
-        "../browser/chromeos/extensions/wm/wm_desks_private_events_unittest.cc",
         "../browser/policy/restricted_mgs_policy_provider_ash_unittest.cc",
         "../common/apps/platform_apps/media_galleries_permission_unittest.cc",
-        "../common/chromeos/extensions/chromeos_system_extension_info_unittest.cc",
-        "../common/chromeos/extensions/manifest_tests/extension_manifests_chromeos_system_extension_unittest.cc",
       ]
 
       deps += [
-        "//chrome/browser/chromeos/extensions/wm",
+        "//chrome/browser/chromeos/extensions/wm:unit_tests",
         "//chrome/browser/ui/webui/certificate_manager",
         "//chrome/common/apps/platform_apps",
-        "//chrome/common/chromeos/extensions",
+        "//chrome/common/chromeos/extensions:unit_tests",
       ]
     } else {
       deps += [
