@@ -62,8 +62,7 @@ bool IsPersonalContextEnabled(
 }
 
 bool IsPrefetchContextEnabled(
-    personal_context::PersonalContextEnablementService& enablement_service,
-    PrefService* pref_service) {
+    personal_context::PersonalContextEnablementService& enablement_service) {
   if (!base::FeatureList::IsEnabled(features::kAutofillAmbientAutofill)) {
     return false;
   }
@@ -103,8 +102,7 @@ PersonalContextAccessManagerImpl::~PersonalContextAccessManagerImpl() = default;
 
 void PersonalContextAccessManagerImpl::PrefetchContext(
     base::span<const EntityType> requested_types) {
-  if (!IsPrefetchContextEnabled(*personal_context_enablement_service_,
-                                pref_service_)) {
+  if (!IsPrefetchContextEnabled(*personal_context_enablement_service_)) {
     return;
   }
 
