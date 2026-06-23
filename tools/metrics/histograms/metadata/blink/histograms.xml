@@ -2977,6 +2977,48 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Blink.Fonts.MatchFamilyStyle.Duration" units="microseconds"
+    expires_after="2027-06-15">
+  <owner>suzukikeita@chromium.org</owner>
+  <owner>chrome-loading@google.com</owner>
+  <summary>
+    Records the duration of SkFontMgr::matchFamilyStyle calls on the main
+    thread. Recorded when a typeface is looked up by family name during font
+    creation.
+
+    This measures the latency of querying the operating system's font manager.
+    For &quot;cold&quot; lookups (first time a font is loaded), this includes
+    disk I/O to read and parse font files, and potential sandbox/IPC overhead on
+    platforms that use a font service (such as Windows, macOS, or Linux). For
+    &quot;warm&quot; lookups, this measures the fast Skia-side in-memory
+    cache-resolution latency.
+
+    Note that this metric is only recorded on clients with high-resolution
+    clocks.
+  </summary>
+</histogram>
+
+<histogram name="Blink.Fonts.MatchFamilyStyleCharacter.Duration"
+    units="microseconds" expires_after="2027-06-15">
+  <owner>suzukikeita@chromium.org</owner>
+  <owner>chrome-loading@google.com</owner>
+  <summary>
+    Records the duration of SkFontMgr::matchFamilyStyleCharacter calls on the
+    main thread. Recorded when a fallback typeface is looked up for a specific
+    character or locale.
+
+    This measures the latency of system font fallback resolution. For
+    &quot;cold&quot; lookups, this includes the expensive OS-level scanning of
+    multiple system font character maps (cmaps) to find a supporting font, disk
+    I/O, and potential sandbox/IPC overhead on platforms that use a font service
+    (such as Windows, macOS, or Linux). For &quot;warm&quot; lookups, it
+    measures the fast Skia-side in-memory cache-resolution latency.
+
+    Note that this metric is only recorded on clients with high-resolution
+    clocks.
+  </summary>
+</histogram>
+
 <histogram name="Blink.Fonts.VariableFontsRatio"
     enum="WebFontInstantiationResult" expires_after="2026-10-26">
   <owner>drott@chromium.org</owner>
