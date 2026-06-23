@@ -162,7 +162,7 @@ export class RegionSelectionElement extends RegionSelectionElementBase {
   // Whether multi-region selection is enabled.
   declare private multiRegionSelectionEnabled: boolean;
   // Whether line selection is enabled.
-  declare private lineSelectionEnabled: boolean;
+  declare lineSelectionEnabled: boolean;
 
   // The colors used for the gradient stroke of the region selection.
   declare private regionStrokeColor1: string;
@@ -225,6 +225,30 @@ export class RegionSelectionElement extends RegionSelectionElementBase {
           document, 'post-selection-updated', (e: CustomEvent) => {
             this.displayKeyboardSelection =
                 e.detail.height === 0 && e.detail.width === 0;
+          });
+    }
+    if (loadTimeData.getBoolean('lineSelection')) {
+      this.eventTracker_.add(
+          document, 'keydown', (e: KeyboardEvent) => {
+            let activeElement = document.activeElement;
+            while (activeElement) {
+              const tagName = activeElement.tagName;
+              if (tagName === 'INPUT' ||
+                  tagName === 'TEXTAREA' ||
+                  tagName === 'IFRAME' ||
+                  (activeElement as HTMLElement).isContentEditable) {
+                return;
+              }
+              if (activeElement.shadowRoot &&
+                  activeElement.shadowRoot.activeElement) {
+                activeElement = activeElement.shadowRoot.activeElement;
+              } else {
+                break;
+              }
+            }
+            if (e.key === 'z' || e.key === 'Z') {
+              this.lineSelectionEnabled = !this.lineSelectionEnabled;
+            }
           });
     }
   }
