@@ -131,7 +131,7 @@ public class NavigateTest {
     private String typeInOmniboxAndNavigate(final String url, final String expectedTitle)
             throws Exception {
         mOmnibox.requestFocus();
-        mOmnibox.typeText(url, false);
+        mOmnibox.setText(url);
         mOmnibox.checkSuggestionsShown();
 
         // Loads the url.

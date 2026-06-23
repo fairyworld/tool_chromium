@@ -107,6 +107,9 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
 
     /** Signals that the Omnibox input session has ended. */
     void endInput() {
+        if (!isInInputSession()) return;
+        var data = UrlBarData.forUrl(mCurrentInput.getPageUrl());
+        setUrlBarData(data, ScrollType.SCROLL_TO_TLD, TextSelection.SELECT_END);
         mCurrentInput = null;
     }
 
