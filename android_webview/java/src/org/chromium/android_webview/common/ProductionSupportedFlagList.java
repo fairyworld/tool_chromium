@@ -1254,9 +1254,6 @@ public final class ProductionSupportedFlagList {
                         + " at 60Hz on 120Hz devices."),
         Flag.baseFeature("IsolatesPriorityUseProcessPriority"),
         Flag.baseFeature(
-                "UseLockFreeX509Verification",
-                "Enables lock-free certificate verification codepath."),
-        Flag.baseFeature(
                 AwFeatures.WEBVIEW_WEB_PERFORMANCE_METRICS_REPORTING,
                 "Enables Web Performance Metrics to be reported using"
                         + " AwWebPerformanceMetricsObserver"),
