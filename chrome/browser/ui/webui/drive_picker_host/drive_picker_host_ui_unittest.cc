@@ -219,7 +219,7 @@ TEST_F(DrivePickerHostUITest, TriggerDrivePickerHostReportsTokenFetchFailure) {
   controller.SetBridge(mock_bridge.BindAndGetRemote());
 
   identity_test_env()->WaitForAccessTokenRequestIfNecessaryAndRespondWithError(
-      GoogleServiceAuthError(GoogleServiceAuthError::SERVICE_UNAVAILABLE));
+      GoogleServiceAuthError::FromServiceUnavailable(""));
 
   base::RunLoop().RunUntilIdle();
 }
