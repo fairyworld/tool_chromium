@@ -11,6 +11,7 @@
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
+#include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/webui/theme_colors_source_manager.h"
 #include "chrome/browser/ui/webui/theme_colors_source_manager_factory.h"
 #include "chrome/browser/ui/webui/webui_embedding_context.h"
@@ -182,7 +183,10 @@ class WebUIToolbarUIBrowserTest : public InProcessBrowserTest,
     feature_list_.InitWithFeatures(
         {features::kInitialWebUI, features::kWebUIReloadButton,
          features::kWebUIInProcessResourceLoadingV2,
-         features::kWebUIPinnedToolbarActions},
+         features::kWebUIPinnedToolbarActions,
+         // WebUIPinnedToolbarActions does not support toolbar tab search
+         // button. Requires tab strip tab search button.
+         tabs::kHorizontalTabStripComboButton},
         {});
   }
   ~WebUIToolbarUIBrowserTest() override = default;

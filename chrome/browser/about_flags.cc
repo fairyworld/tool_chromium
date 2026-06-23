@@ -575,6 +575,14 @@ const FeatureEntry::FeatureVariation kDXGIWaitableSwapChainVariations[] = {
 #endif
 
 #if !BUILDFLAG(IS_ANDROID)
+const FeatureEntry::FeatureParam kHorizontalTabStripComboButtonShowStartOnly[] =
+    {{"show_start_only", "true"}};
+
+const FeatureEntry::FeatureVariation
+    kHorizontalTabStripComboButtonVariations[] = {
+        {"show start button only", kHorizontalTabStripComboButtonShowStartOnly,
+         nullptr}};
+
 const FeatureEntry::FeatureParam kVerticalTabsExpandOnHover_NoClickDelay[] = {
     {"expand_on_hover_delay", "350ms"},
     {"expand_on_hover_click_delay", "0ms"},
@@ -12533,6 +12541,15 @@ const FeatureEntry kFeatureEntries[] = {
      FEATURE_WITH_PARAMS_VALUE_TYPE(blink::features::kUnthrottleAsyncTouchMoves,
                                     kUnthrottleAsyncTouchMovesVariations,
                                     "UnthrottleAsyncTouchMoves")},
+
+#if !BUILDFLAG(IS_ANDROID)
+    {"horizontal-tab-strip-combo-button",
+     flag_descriptions::kHorizontalTabStripComboButtonName,
+     flag_descriptions::kHorizontalTabStripComboButtonDescription, kOsDesktop,
+     FEATURE_WITH_PARAMS_VALUE_TYPE(tabs::kHorizontalTabStripComboButton,
+                                    kHorizontalTabStripComboButtonVariations,
+                                    "HorizontalTabStripComboButton")},
+#endif  // BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_ANDROID)
     {"ntp-mvc-refactor", flag_descriptions::kNtpMvcRefactorName,

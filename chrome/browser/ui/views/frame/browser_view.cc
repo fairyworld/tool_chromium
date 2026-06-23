@@ -112,6 +112,7 @@
 #include "chrome/browser/ui/side_panel/side_panel_registry.h"
 #include "chrome/browser/ui/side_panel/side_panel_ui.h"
 #include "chrome/browser/ui/tabs/alert/tab_alert_controller.h"
+#include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/tabs/projects/projects_panel_state_controller.h"
 #include "chrome/browser/ui/tabs/public/tab_dialog_manager.h"
 #include "chrome/browser/ui/tabs/saved_tab_groups/collaboration_messaging_tab_data.h"
@@ -210,6 +211,7 @@
 #include "chrome/browser/ui/views/tabs/shared/tab_strip_flat_edge_button.h"
 #include "chrome/browser/ui/views/tabs/tab.h"
 #include "chrome/browser/ui/views/tabs/tab/tab_accessibility.h"
+#include "chrome/browser/ui/views/tabs/tab_search_button.h"
 #include "chrome/browser/ui/views/tabs/tab_strip.h"
 #include "chrome/browser/ui/views/tabs/vertical/vertical_tab_strip_top_container.h"
 #include "chrome/browser/ui/views/theme_copying_widget.h"
@@ -4200,11 +4202,17 @@ void BrowserView::UpdateTabSearchBubbleHost() {
     tab_search_bubble_host_ = std::make_unique<TabSearchBubbleHost>(
         combo_button->end_button(), browser_.get());
     combo_button->SetTabSearchBubbleHost(tab_search_bubble_host_.get());
-  } else {
+  } else if (base::FeatureList::IsEnabled(
+                 tabs::kHorizontalTabStripComboButton)) {
     auto* combo_button = horizontal_tab_strip_region_view_->GetComboButton();
     tab_search_bubble_host_ = std::make_unique<TabSearchBubbleHost>(
         combo_button->end_button(), browser_.get());
     combo_button->SetTabSearchBubbleHost(tab_search_bubble_host_.get());
+  } else {
+    tab_search_bubble_host_ = std::make_unique<TabSearchBubbleHost>(
+        BrowserElementsViews::From(browser_.get())
+            ->GetViewAs<TabSearchButton>(kTabSearchButtonElementId),
+        browser_.get());
   }
 }
 

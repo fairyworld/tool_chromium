@@ -53,6 +53,7 @@
 #include "chrome/browser/ui/side_panel/side_panel_entry.h"
 #include "chrome/browser/ui/side_panel/side_panel_enums.h"
 #include "chrome/browser/ui/side_panel/side_panel_ui.h"
+#include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/tabs/split_tab_metrics.h"
 #include "chrome/browser/ui/test/test_browser_dialog.h"
 #include "chrome/browser/ui/toolbar/pinned_toolbar/pinned_toolbar_actions_ids.h"
@@ -457,7 +458,8 @@ class WebUIToolbarWebViewPixelBrowserTest : public InProcessBrowserTest {
         {features::kInitialWebUI, features::kWebUIReloadButton,
          features::kWebUISplitTabsButton, features::kWebUIBackForwardButton,
          features::kWebUIHomeButton, features::kWebUIPinnedToolbarActions,
-         features::kWebUILocationBar, features::kWebUIExtensionsContainer,
+         tabs::kHorizontalTabStripComboButton, features::kWebUILocationBar,
+         features::kWebUIExtensionsContainer,
          features::kSkipIPCChannelPausingForNonGuests,
          features::kWebUIInProcessResourceLoadingV2,
          features::kInitialWebUISyncNavStartToCommit,
@@ -3789,7 +3791,7 @@ class WebUIPinnedToolbarActionsBrowserTest
              features::kInitialWebUISyncNavStartToCommit,
              // `WebUIPinnedToolbarActionsBrowserTest.LensOverlayResultsIcon`
              // depends on `kRoundedIcons`.
-             features::kRoundedIcons,
+             features::kRoundedIcons, tabs::kHorizontalTabStripComboButton,
              // Facilitate testing kActionSidePanelShowComments
              collaboration::features::kCollaborationComments,
              // Facilitate testing kActionsSidePanelShowContextualTasks

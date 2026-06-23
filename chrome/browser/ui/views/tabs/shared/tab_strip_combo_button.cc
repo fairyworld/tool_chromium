@@ -16,6 +16,7 @@
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
 #include "chrome/browser/ui/layout_constants.h"
+#include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/tabs/saved_tab_groups/saved_tab_group_utils.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/views/bookmarks/saved_tab_groups/saved_tab_group_everything_menu.h"
@@ -72,7 +73,8 @@ TabStripComboButton::TabStripComboButton(BrowserWindowInterface* browser,
           LayoutConstant::kVerticalTabStripFlatEdgeButtonPadding)));
 
   std::unique_ptr<TabStripFlatEdgeButton> start_button;
-  if (context_ == Context::kVerticalTabStrip) {
+  if (context_ == Context::kVerticalTabStrip ||
+      tabs::kHorizontalTabStripComboButtonShowStartOnly.Get()) {
     if (projects_panel::IsProjectsPanelVisibleForProfile(
             browser->GetProfile())) {
       start_button = CreateFlatEdgeButtonFor(
@@ -309,6 +311,10 @@ void TabStripComboButton::ShowContextMenuForViewImpl(
       element_id = kEverythingMenuUnpinMenuItem;
     }
   } else if (source == end_button_) {
+    if (context_ == Context::kHorizontalTabStrip &&
+        tabs::kHorizontalTabStripComboButtonShowStartOnly.Get()) {
+      return;
+    }
     command_id = IDC_TAB_SEARCH_TOGGLE_PIN;
     pref_name = prefs::kTabSearchPinnedToTabstrip;
     string_id = prefs->GetBoolean(pref_name)
@@ -355,8 +361,10 @@ void TabStripComboButton::ShowContextMenuForViewImpl(
 
 void TabStripComboButton::ExecuteCommand(int command_id, int event_flags) {
   if (command_id == IDC_TAB_SEARCH_TOGGLE_PIN) {
-    show_tab_search_ephemerally_ = false;
-    hide_tab_search_timer_.Stop();
+    if (!tabs::kHorizontalTabStripComboButtonShowStartOnly.Get()) {
+      show_tab_search_ephemerally_ = false;
+      hide_tab_search_timer_.Stop();
+    }
     chrome::ExecuteCommand(browser_, command_id);
     return;
   }
@@ -457,7 +465,8 @@ void TabStripComboButton::MaybeHideTabSearchButton() {
 
 bool TabStripComboButton::IsTabSearchPinned() {
   PrefService* prefs = browser_->GetProfile()->GetPrefs();
-  return prefs->GetBoolean(prefs::kTabSearchPinnedToTabstrip);
+  return prefs->GetBoolean(prefs::kTabSearchPinnedToTabstrip) &&
+         !tabs::kHorizontalTabStripComboButtonShowStartOnly.Get();
 }
 
 actions::ActionItem* TabStripComboButton::GetStartButtonActionItem() {

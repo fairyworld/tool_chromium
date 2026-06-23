@@ -10,6 +10,7 @@
 #include "chrome/browser/ui/sad_tab.h"
 #include "chrome/browser/ui/sad_tab_controller.h"
 #include "chrome/browser/ui/sad_tab_helper.h"
+#include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/views/frame/browser_frame_view.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/sad_tab_view.h"
@@ -157,10 +158,15 @@ IN_PROC_BROWSER_TEST_F(SadTabViewInteractiveUITest,
   ASSERT_FALSE(IsFocusedViewInsideBrowserToolbar());
   ASSERT_FALSE(IsFocusedViewInsideTabStrip());
 
-  // Pressing the Tab key should cycle focus back to the tab strip.
+  // Pressing the Tab key should cycle focus back to the toolbar or the tab
+  // strip if the tab search button is enabled.
   PressTab();
   ASSERT_FALSE(IsFocusedViewInsideSadTab());
-  ASSERT_TRUE(IsFocusedViewInsideTabStrip());
+  if (base::FeatureList::IsEnabled(tabs::kHorizontalTabStripComboButton)) {
+    ASSERT_TRUE(IsFocusedViewInsideTabStrip());
+  } else {
+    ASSERT_TRUE(IsFocusedViewInsideBrowserToolbar());
+  }
 
   // Keep pressing the Tab key and make sure we make it back to the sad tab.
   while (!IsFocusedViewInsideSadTab()) {

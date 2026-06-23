@@ -10,6 +10,7 @@
 #include "chrome/browser/ui/browser_actions.h"
 #include "chrome/browser/ui/browser_command_controller.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
+#include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/toolbar/pinned_toolbar/pinned_toolbar_actions_model.h"
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/view_ids.h"
@@ -140,7 +141,7 @@ class WebUIPinnedToolbarActionsInteractiveTest : public InteractiveBrowserTest {
          features::kSkipIPCChannelPausingForNonGuests,
          features::kWebUIInProcessResourceLoadingV2,
          features::kInitialWebUISyncNavStartToCommit,
-         features::kWebUIReloadButton},
+         tabs::kHorizontalTabStripComboButton, features::kWebUIReloadButton},
         {});
   }
 

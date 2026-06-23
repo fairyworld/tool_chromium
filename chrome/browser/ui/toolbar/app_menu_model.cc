@@ -1072,10 +1072,12 @@ void ToolsMenuModel::Build(Browser* browser) {
   is_tablet_mode = display::Screen::Get()->InTabletMode();
 #endif  // BUILDFLAG(IS_CHROMEOS)
   if (!is_tablet_mode) {
-    AddItemWithStringIdAndVectorIcon(this, IDC_TAB_SEARCH, IDS_TAB_SEARCH_MENU,
-                                     features::IsRoundedIconsEnabled()
-                                         ? kManageSearchIcon
-                                         : kTabSearchTabStripOldIcon);
+    if (base::FeatureList::IsEnabled(tabs::kHorizontalTabStripComboButton)) {
+      AddItemWithStringIdAndVectorIcon(
+          this, IDC_TAB_SEARCH, IDS_TAB_SEARCH_MENU,
+          features::IsRoundedIconsEnabled() ? kManageSearchIcon
+                                            : kTabSearchTabStripOldIcon);
+    }
   }
 
   AddItemWithStringIdAndVectorIcon(
