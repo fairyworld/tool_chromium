@@ -113,54 +113,6 @@ std::vector<uint8_t> CreateBufferAsIndicesType(
   }
 }
 
-struct BuildConv2dAttributes {
-  std::vector<uint32_t> padding;
-  std::vector<uint32_t> strides;
-  std::vector<uint32_t> dilations;
-  uint32_t groups;
-};
-
-struct BuildGemmAttributes {
-  std::optional<OperandId> c_operand_id;
-  float alpha;
-  float beta;
-  bool a_transpose;
-  bool b_transpose;
-};
-
-struct BuildLstmAttributes {
-  std::optional<OperandId> bias_operand_id;
-  std::optional<OperandId> recurrent_bias_operand_id;
-  std::optional<OperandId> peephole_weight_operand_id;
-  std::optional<OperandId> initial_hidden_state_operand_id;
-  std::optional<OperandId> initial_cell_state_operand_id;
-  bool return_sequence;
-  mojom::RecurrentNetworkDirection direction;
-  mojom::LstmWeightLayout layout;
-  std::vector<mojom::RecurrentNetworkActivation> activations;
-};
-
-struct BuildLstmCellAttributes {
-  std::optional<OperandId> bias_operand_id;
-  std::optional<OperandId> recurrent_bias_operand_id;
-  std::optional<OperandId> peephole_weight_operand_id;
-  mojom::LstmWeightLayout layout;
-  std::vector<mojom::RecurrentNetworkActivation> activations;
-};
-
-struct BuildPool2dAttributes {
-  std::vector<uint32_t> window_dimensions;
-  std::vector<uint32_t> padding;
-  std::vector<uint32_t> strides;
-  std::vector<uint32_t> dilations;
-};
-
-struct BuildResample2dAttributes {
-  mojom::Resample2d::InterpolationMode mode;
-  std::optional<std::vector<float>> scales;
-  std::vector<uint32_t> axes;
-};
-
 // Represents which activation function to fuse for conv2d.
 enum class ActivationKind : uint8_t {
   kNone = 0,
