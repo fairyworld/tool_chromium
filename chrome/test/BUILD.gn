@@ -2537,6 +2537,8 @@ if (!is_android) {
       "//chrome/browser/screen_ai:screen_ai_install_state",
       "//chrome/browser/screen_ai:screen_ai_service_router_factory",
       "//chrome/browser/search",
+      "//chrome/browser/search:browser_tests",
+      "//chrome/browser/search:test_support",
       "//chrome/browser/search_engines",
       "//chrome/browser/segmentation_platform:test_utils",
       "//chrome/browser/send_tab_to_self:browser_tests",
@@ -3460,13 +3462,6 @@ if (!is_android) {
       "../browser/repost_form_warning_browsertest.cc",
       "../browser/safe_browsing/download_protection/download_protection_service_browsertest.cc",
       "../browser/safe_xml_parser_browsertest.cc",
-      "../browser/search/background/wallpaper_search/wallpaper_search_browsertest.cc",
-      "../browser/search/instant_browsertest_base.cc",
-      "../browser/search/instant_browsertest_base.h",
-      "../browser/search/instant_service_browsertest.cc",
-      "../browser/search/ntp_custom_background_enabled_policy_handler_browsertest.cc",
-      "../browser/search/search_browsertest.cc",
-      "../browser/search/search_engine_base_url_tracker_browsertest.cc",
       "../browser/search_engines/template_url_scraper_browsertest.cc",
       "../browser/search_engines/template_url_service_browsertest.cc",
       "../browser/secure_origin_allowlist_browsertest.cc",
@@ -6802,6 +6797,7 @@ test("unit_tests") {
       "//chrome/browser/new_tab_page/chrome_colors:generate_chrome_colors_info",
       "//chrome/browser/new_tab_page/chrome_colors:generate_colors_info",
       "//chrome/browser/record_replay:unit_tests",
+      "//chrome/browser/search:unit_tests",
       "//chrome/browser/ui:browser_actions",
       "//chrome/browser/ui/fullscreen",
       "//chrome/browser/ui/side_panel:test_support",
@@ -7442,9 +7438,6 @@ test("unit_tests") {
       "../browser/profiles/profile_destroyer_unittest.cc",
       "../browser/safe_browsing/generated_safe_browsing_pref_unittest.cc",
       "../browser/safe_browsing/generated_security_settings_bundle_pref_unittest.cc",
-      "../browser/search/background/ntp_custom_background_service_unittest.cc",
-      "../browser/search/background/wallpaper_search/wallpaper_search_background_manager_unittest.cc",
-      "../browser/search/most_visited_iframe_source_unittest.cc",
       "../browser/signin/signin_promo_unittest.cc",
       "../browser/ui/accelerator_table_unittest.cc",
       "../browser/ui/browser_command_controller_unittest.cc",
@@ -7782,11 +7775,6 @@ test("unit_tests") {
     sources += [
       # The importer code is not used on Android.
       "../common/importer/firefox_importer_utils_unittest.cc",
-    ]
-
-    sources += [
-      # NTP is in native code on Android.
-      "../browser/search/ntp_features_unittest.cc",
     ]
 
     if (!is_mac) {
