@@ -2466,6 +2466,72 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               bwi))
           .SetActionId(kActionNewTabToRight)
           .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::AddNewTabToGroup(bwi);
+              },
+              bwi))
+          .SetActionId(kActionAddNewTabToGroup)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::CreateNewTabGroup(bwi);
+              },
+              bwi))
+          .SetActionId(kActionCreateNewTabGroup)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::FocusNextTabGroup(bwi);
+              },
+              bwi))
+          .SetActionId(kActionFocusNextTabGroup)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::FocusPreviousTabGroup(bwi);
+              },
+              bwi))
+          .SetActionId(kActionFocusPrevTabGroup)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::CloseTabGroup(bwi);
+              },
+              bwi))
+          .SetActionId(kActionCloseTabGroup)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::GroupAllUngroupedTabs(bwi);
+              },
+              bwi))
+          .SetActionId(kActionGroupUngroupedTabs)
+          .Build());
 }
 
 void BrowserActions::AddListeners() {
