@@ -1122,6 +1122,7 @@ void GlicInstanceImpl::OnBoundTabActivated(tabs::TabInterface* tab) {
   if (embedder && embedder->IsShowingOrBackgrounded()) {
     // Ensure that the side panel in this tab becomes the active embedder.
     SidePanelShowOptions side_panel_options{*tab};
+    side_panel_options.suppress_opening_animation = true;
     side_panel_options.prefer_peek = true;
     Show(ShowOptions{side_panel_options});
   }
