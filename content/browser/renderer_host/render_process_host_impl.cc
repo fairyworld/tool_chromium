@@ -200,6 +200,7 @@
 #include "services/resource_coordinator/public/mojom/memory_instrumentation/memory_instrumentation.mojom.h"
 #include "services/service_manager/public/cpp/interface_provider.h"
 #include "services/tracing/public/cpp/trace_startup.h"
+#include "services/webnn/webnn_switches.h"
 #include "skia/ext/switches.h"
 #include "storage/browser/quota/quota_manager.h"
 #include "third_party/blink/public/common/associated_interfaces/associated_interface_registry.h"
@@ -4011,6 +4012,10 @@ void RenderProcessHostImpl::PropagateBrowserCommandLineToRenderer(
 #endif
   };
   renderer_cmd->CopySwitchesFrom(browser_cmd, kSwitchNames);
+
+  // Propagate WebNN switches needed by backends that run in the renderer.
+  renderer_cmd->CopySwitchesFrom(
+      browser_cmd, switches::GetWebNNSwitchesForRendererProcess());
 
   // |switches::kGaiaConfig| can be set via browser command-line arguments,
   // usually by developers working on signin code. The switch, however, cannot
