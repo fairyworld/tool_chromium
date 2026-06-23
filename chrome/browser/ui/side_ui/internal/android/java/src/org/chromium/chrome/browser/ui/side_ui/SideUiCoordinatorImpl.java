@@ -61,6 +61,8 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
     /** List of registered {@link SideUiContainer} objects. */
     private final List<SideUiContainer> mSideUiContainers = new ArrayList<>();
 
+    private final SideUiShowabilityNotifier mShowabilityNotifier = new SideUiShowabilityNotifier();
+
     /**
      * Constructor for a {@link SideUiCoordinatorImpl}.
      *
@@ -186,19 +188,9 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
     public boolean canShowSideUi(@SideUiId int sideUiId) {
         @Px int windowWidth = getWindowWidth();
         @Px int minWebContentsWidth = ViewUtils.dpToPx(mParentActivity, MIN_WEB_CONTENTS_WIDTH_DP);
-        @Px int availableWidth = windowWidth - minWebContentsWidth;
+        var sideUiShowability = determineSideUiShowability(windowWidth, minWebContentsWidth);
 
-        for (var container : mSideUiContainers) {
-            if (container.getSideUiId() == sideUiId) {
-                return container.determineShowableWidth(availableWidth, windowWidth) > 0;
-            }
-            if (container.hasContentToShow()) {
-                @Px
-                int showableWidth = container.determineShowableWidth(availableWidth, windowWidth);
-                availableWidth = Math.max(availableWidth - showableWidth, 0);
-            }
-        }
-        return false;
+        return sideUiShowability.mShowableSideUiIds.contains(sideUiId);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -250,9 +242,8 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
         }
         SideUiShowability sideUiShowability =
                 new SideUiShowability(showableSideUiIds, unshowableSideUiIds);
-        for (var sideUiObserver : mSideUiObservers) {
-            sideUiObserver.onShowableSideUisUpdated(sideUiShowability);
-        }
+
+        mShowabilityNotifier.notify(mSideUiObservers, sideUiShowability);
 
         // 3.1. Check if we need to close side UI.
         if (currentSideUiWidth != 0 && !canShowSideUi) {
@@ -310,13 +301,15 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
                 suppressAnimations
                         || ChromeFeatureList.sEnableAndroidSidePanelDisableAnimations.getValue();
 
-        // 3. Determine the new SideUiSpecs.
+        // 3. Determine the new SideUiShowability and the new SideUiSpecs.
         @Px int windowWidth = getWindowWidth();
         @Px int minWebContentsWidth = ViewUtils.dpToPx(mParentActivity, MIN_WEB_CONTENTS_WIDTH_DP);
-        SideUiSpecs currentSideUiSpecs = getCurrentSideUiSpecsInternal();
+        SideUiShowability newSideUiShowability =
+                determineSideUiShowability(windowWidth, minWebContentsWidth);
         SideUiSpecs newSideUiSpecs = determineSideUiSpecs(windowWidth, minWebContentsWidth);
 
         // 4. Collect containers whose width needs updating for resize event and transition effect.
+        SideUiSpecs currentSideUiSpecs = getCurrentSideUiSpecsInternal();
         Map<@AnchorSide Integer, Integer> updatedSides = new ArrayMap<>(); // side -> width
         for (SideUiContainer container : mSideUiContainers) {
             @AnchorSide int side = container.getAnchorSide();
@@ -327,6 +320,10 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
             }
         }
 
+        // 5. Notify SideUiObservers of the new SideUiShowability.
+        mShowabilityNotifier.notify(mSideUiObservers, newSideUiShowability);
+
+        // 6. Commit the new SideUiSpecs.
         if (!updatedSides.isEmpty()) {
             // If animating, gather all Transitions into a TransitionSet.
             SideUiSpecs deltaSideUiSpecs = new SideUiSpecs(updatedSides);
@@ -363,6 +360,37 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
             if (container.getAnchorSide() == side) return container;
         }
         return null;
+    }
+
+    /**
+     * Determines {@link SideUiShowability}.
+     *
+     * @param windowWidth The current window width (in px).
+     * @param minWebContentsWidth The minimum width reserved for {@code WebContents} (in px).
+     * @return The new {@link SideUiShowability}.
+     */
+    private SideUiShowability determineSideUiShowability(
+            @Px int windowWidth, @Px int minWebContentsWidth) {
+        int availableWidth = windowWidth - minWebContentsWidth;
+        List<@SideUiId Integer> showableSideUiIds = new ArrayList<>();
+        List<@SideUiId Integer> unShowableSideUiIds = new ArrayList<>();
+
+        for (var container : mSideUiContainers) {
+            int showableWidth = container.determineShowableWidth(availableWidth, windowWidth);
+            if (showableWidth > 0) {
+                showableSideUiIds.add(container.getSideUiId());
+            } else {
+                unShowableSideUiIds.add(container.getSideUiId());
+            }
+
+            // If a SideUiContainer is showable and has content to show, it will be shown.
+            // Therefore, we should subtract the showable width from the available width.
+            if (showableWidth > 0 && container.hasContentToShow()) {
+                availableWidth = Math.max(availableWidth - showableWidth, 0);
+            }
+        }
+
+        return new SideUiShowability(showableSideUiIds, unShowableSideUiIds);
     }
 
     /**

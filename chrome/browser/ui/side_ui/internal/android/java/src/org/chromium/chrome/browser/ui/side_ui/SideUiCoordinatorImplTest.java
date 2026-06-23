@@ -257,9 +257,13 @@ public class SideUiCoordinatorImplTest {
         leftUiContainer.mMaxWidthDp = leftUiContainer.mMinWidthDp;
         mCoordinator.registerSideUiContainer(leftUiContainer);
 
-        // Arrange: Show only the right SideUiContainer.
+        // Arrange: Add an observer.
+        mCoordinator.addObserver(mSideUiObserver);
+
+        // Act: Show only the right SideUiContainer.
         rightUiContainer.mHasContentToShow = true;
         leftUiContainer.mHasContentToShow = false;
+        clearInvocations(mSideUiObserver);
         mCoordinator.requestUpdateContainer(
                 new SideUiContainerProperties(
                         rightUiContainer.getSideUiId(), rightUiContainer.getAnchorSide()),
@@ -275,9 +279,26 @@ public class SideUiCoordinatorImplTest {
         assertEquals(expectedSideUiSpecs, currentSideUiSpecs);
         assertEquals(expectedRightSideUiWidth, rightUiContainerView.getLayoutParams().width);
 
+        // Assert: The observer is notified with both containers being showable.
+        //
+        // The right SideUiContainer is currently visible, so it's definitely showable.
+        // The left SideUiContainer isn't visible, but it has higher priority. If it needs to be
+        // shown, it will force the right SideUiContainer to be hidden. So the left SideUiContainer
+        // is also showable.
+        ArgumentCaptor<SideUiShowability> showabilityCaptor =
+                ArgumentCaptor.forClass(SideUiShowability.class);
+        verify(mSideUiObserver).onShowableSideUisUpdated(showabilityCaptor.capture());
+        assertEquals(
+                List.of(
+                        SideUiId.SIDE_UI_FOR_TESTING_HIGH_PRIORITY,
+                        SideUiId.SIDE_UI_FOR_TESTING_LOW_PRIORITY),
+                showabilityCaptor.getValue().mShowableSideUiIds);
+        assertTrue(showabilityCaptor.getValue().mUnshowableSideUiIds.isEmpty());
+
         // Act: Attempt to show both SideUiContainers.
         rightUiContainer.mHasContentToShow = true;
         leftUiContainer.mHasContentToShow = true;
+        clearInvocations(mSideUiObserver);
         mCoordinator.requestUpdateContainer(
                 new SideUiContainerProperties(
                         leftUiContainer.getSideUiId(), leftUiContainer.getAnchorSide()),
@@ -292,6 +313,16 @@ public class SideUiCoordinatorImplTest {
         assertEquals(expectedSideUiSpecs, currentSideUiSpecs);
         assertEquals(expectedLeftSideUiWidth, leftUiContainerView.getLayoutParams().width);
         assertEquals(0, rightUiContainerView.getLayoutParams().width);
+
+        // Assert: The observer is notified that the right (low-priority) container is no longer
+        // showable.
+        verify(mSideUiObserver).onShowableSideUisUpdated(showabilityCaptor.capture());
+        assertEquals(
+                List.of(SideUiId.SIDE_UI_FOR_TESTING_HIGH_PRIORITY),
+                showabilityCaptor.getValue().mShowableSideUiIds);
+        assertEquals(
+                List.of(SideUiId.SIDE_UI_FOR_TESTING_LOW_PRIORITY),
+                showabilityCaptor.getValue().mUnshowableSideUiIds);
     }
 
     @Test
@@ -522,13 +553,9 @@ public class SideUiCoordinatorImplTest {
         mCoordinator.onConfigurationChanged(new Configuration());
         RobolectricUtil.runAllBackgroundAndUi();
 
-        // Verify that observer is notified of the showable state, but specs change is NOT notified
-        // (since specs are unchanged).
-        ArgumentCaptor<SideUiShowability> showabilityCaptor =
-                ArgumentCaptor.forClass(SideUiShowability.class);
-        verify(mSideUiObserver).onShowableSideUisUpdated(showabilityCaptor.capture());
-        assertEquals(List.of(SideUiId.SIDE_PANEL), showabilityCaptor.getValue().mShowableSideUiIds);
-        assertTrue(showabilityCaptor.getValue().mUnshowableSideUiIds.isEmpty());
+        // Verify that the observer is NOT notified of the showable state or the specs since neither
+        // was changed.
+        verify(mSideUiObserver, never()).onShowableSideUisUpdated(any());
         verify(mSideUiObserver, never()).onSideUiSpecsChanged(any());
 
         // Verify the container view's width is unchanged.

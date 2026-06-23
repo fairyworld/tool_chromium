@@ -17,6 +17,7 @@ import java.lang.annotation.Target;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -91,6 +92,25 @@ public interface SideUiCoordinator extends SideUiStateProvider {
                 List<@SideUiId Integer> unshowableSideUiIds) {
             mShowableSideUiIds = List.copyOf(showableSideUiIds);
             mUnshowableSideUiIds = List.copyOf(unshowableSideUiIds);
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (this == obj) {
+                return true;
+            }
+
+            if (!(obj instanceof SideUiShowability other)) {
+                return false;
+            }
+
+            return mShowableSideUiIds.equals(other.mShowableSideUiIds)
+                    && mUnshowableSideUiIds.equals(other.mUnshowableSideUiIds);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(mShowableSideUiIds, mUnshowableSideUiIds);
         }
     }
 
