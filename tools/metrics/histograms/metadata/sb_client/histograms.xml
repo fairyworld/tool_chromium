@@ -865,8 +865,8 @@ useful for Chirp alerts (go/crca-alerts). -->
 </histogram>
 
 <histogram name="SBClientPhishing.ImageEmbeddingModelVersionMatch"
-    enum="BooleanMatched" expires_after="2026-07-27">
-  <owner>andysjlim@chromium.org</owner>
+    enum="BooleanMatched" expires_after="2027-07-27">
+  <owner>nwokedi@chromium.org</owner>
   <owner>chrome-counter-abuse-alerts@google.com</owner>
   <summary>
     Logs whether the image embedding model version is matched or not so that the
