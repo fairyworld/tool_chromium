@@ -162,12 +162,10 @@ Request::Request(
     FederatedIdentityApiPermissionContextDelegate* api_permission_delegate,
     FederatedIdentityAutoReauthnPermissionContextDelegate*
         auto_reauthn_permission_delegate,
-    FederatedIdentityPermissionContextDelegate* permission_delegate,
-    IdentityRegistry* identity_registry)
+    FederatedIdentityPermissionContextDelegate* permission_delegate)
     : api_permission_delegate_(api_permission_delegate),
       auto_reauthn_permission_delegate_(auto_reauthn_permission_delegate),
       permission_delegate_(permission_delegate),
-      identity_registry_(identity_registry),
       render_frame_host_(rfh),
       request_service_(request_service),
       perfetto_track_(CreatePerfettoTrackForFedCM(this)) {
@@ -603,24 +601,8 @@ void Request::CancelTokenRequest() {
 void Request::ResolveTokenRequest(const std::optional<std::string>& account_id,
                                   blink::mojom::ResolveTokenParamsPtr params,
                                   ResolveTokenRequestCallback callback) {
-  if (params->is_redirect_to()) {
-    const blink::mojom::RedirectParamsPtr& redirect_to =
-        params->get_redirect_to();
-    if (redirect_to->is_post() &&
-        redirect_to->get_post()->request_body.empty()) {
-      ReportBadMessage("POST redirects must have a body");
-      return;
-    }
-  }
-
-  if (!identity_registry_ && !SetupIdentityRegistryFromPopup()) {
-    std::move(callback).Run(false);
-    return;
-  }
-
-  bool accepted = identity_registry_->NotifyResolve(origin(), account_id,
-                                                    std::move(params));
-  std::move(callback).Run(accepted);
+  request_service_->ResolveTokenRequest(account_id, std::move(params),
+                                        std::move(callback));
 }
 
 void Request::SetIdpSigninStatus(
@@ -1408,13 +1390,7 @@ void Request::ShowSingleIdpFailureDialog() {
 }
 
 void Request::CloseModalDialogView() {
-#if BUILDFLAG(IS_ANDROID)
-  SetupIdentityRegistryFromPopup();
-#endif
-  // Invoke OnClose on the opener.
-  if (identity_registry_) {
-    identity_registry_->NotifyClose(origin());
-  }
+  request_service_->CloseModalDialogView();
 }
 
 void Request::OnAccountSelected(const GURL& idp_config_url,
@@ -2242,25 +2218,7 @@ std::unique_ptr<IdpNetworkRequestManager> Request::CreateNetworkManager() {
 
 std::unique_ptr<IdentityRequestDialogController>
 Request::CreateDialogController() {
-  if (mock_dialog_controller_) {
-    return std::move(mock_dialog_controller_);
-  }
-
-  WebContents* web_contents =
-      WebContents::FromRenderFrameHost(&render_frame_host());
-  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
-          switches::kUseFakeUIForFedCM)) {
-    std::string selected_account =
-        base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(
-            switches::kUseFakeUIForFedCM);
-    return std::make_unique<FakeIdentityRequestDialogController>(
-        selected_account.empty() ? std::nullopt
-                                 : std::optional<std::string>(selected_account),
-        web_contents);
-  }
-
-  return GetContentClient()->browser()->CreateIdentityRequestDialogController(
-      web_contents);
+  return request_service_->CreateDialogController();
 }
 
 void Request::SetNetworkManagerForTests(
@@ -2270,7 +2228,7 @@ void Request::SetNetworkManagerForTests(
 
 void Request::SetDialogControllerForTests(
     std::unique_ptr<IdentityRequestDialogController> controller) {
-  mock_dialog_controller_ = std::move(controller);
+  request_service_->SetDialogControllerForTests(std::move(controller));
 }
 
 void Request::OnClose() {
@@ -2382,44 +2340,6 @@ void Request::OnOriginMismatch(Method method,
       method_string, actual.Serialize().c_str(), expected.Serialize().c_str());
   render_frame_host().AddMessageToConsole(
       blink::mojom::ConsoleMessageLevel::kError, error_messsage);
-}
-
-bool Request::SetupIdentityRegistryFromPopup() {
-#if BUILDFLAG(IS_ANDROID)
-  if (identity_registry_) {
-    return true;
-  }
-
-  if (!request_dialog_controller_) {
-    request_dialog_controller_ = CreateDialogController();
-    CHECK(request_dialog_controller_);
-  }
-
-  // Because ShowModalDialog does not return the web contents on Android, we
-  // need to set up the IdentityRegistry now.
-  WebContents* rp_web_contents = request_dialog_controller_->GetRpWebContents();
-  // This can be null if resolve was called in a regular tab (as opposed to
-  // a CCT opened from ShowModalDialog).
-  if (!rp_web_contents) {
-    return false;
-  }
-  Request* rp_auth_request = GetPageData(rp_web_contents->GetPrimaryPage())
-                                 ->PendingWebIdentityRequest();
-  if (!rp_auth_request) {
-    return false;
-  }
-
-  WebContents* web_contents =
-      WebContents::FromRenderFrameHost(&render_frame_host());
-  IdentityRegistry::CreateForWebContents(
-      web_contents, rp_auth_request->weak_ptr_factory_.GetWeakPtr(),
-      rp_auth_request->config_url_);
-  identity_registry_ = IdentityRegistry::FromWebContents(web_contents);
-
-  return true;
-#else
-  return false;
-#endif
 }
 
 FederatedApiPermissionStatus Request::GetApiPermissionStatus() {

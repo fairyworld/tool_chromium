@@ -37,6 +37,8 @@ using blink::mojom::RegisterIdpStatus;
 
 RequestService::RequestService(RenderFrameHost* rfh)
     : DocumentUserData<RequestService>(rfh),
+      identity_registry_(IdentityRegistry::FromWebContents(
+          WebContents::FromRenderFrameHost(rfh))),
       api_permission_delegate_(
           rfh->GetBrowserContext()->GetFederatedIdentityApiPermissionContext()),
       auto_reauthn_permission_delegate_(
@@ -83,9 +85,10 @@ Request& RequestService::CreateRequestForTesting(
   api_permission_delegate_ = api_permission_delegate;
   auto_reauthn_permission_delegate_ = auto_reauthn_permission_delegate;
   permission_delegate_ = permission_delegate;
+  identity_registry_ = identity_registry;
   active_request_ = std::make_unique<Request>(
       &render_frame_host(), *this, api_permission_delegate,
-      auto_reauthn_permission_delegate, permission_delegate, identity_registry);
+      auto_reauthn_permission_delegate, permission_delegate);
   active_request_->BindReceiver(std::move(receiver));
   return *active_request_;
 }
@@ -98,9 +101,7 @@ Request* RequestService::GetOrCreateActiveRequest() {
         &rfh, *this,
         browser_context->GetFederatedIdentityApiPermissionContext(),
         browser_context->GetFederatedIdentityAutoReauthnPermissionContext(),
-        browser_context->GetFederatedIdentityPermissionContext(),
-        IdentityRegistry::FromWebContents(
-            WebContents::FromRenderFrameHost(&rfh)));
+        browser_context->GetFederatedIdentityPermissionContext());
   }
   return active_request_.get();
 }
@@ -182,6 +183,16 @@ void RequestService::UnregisterIdP(const GURL& idp,
   std::move(callback).Run(true);
 }
 
+void RequestService::CloseModalDialogView() {
+#if BUILDFLAG(IS_ANDROID)
+  SetupIdentityRegistryFromPopup();
+#endif
+  // Invoke OnClose on the opener.
+  if (identity_registry_) {
+    identity_registry_->NotifyClose(
+        render_frame_host().GetLastCommittedOrigin());
+  }
+}
 void RequestService::PreventSilentAccess(PreventSilentAccessCallback callback) {
   SetRequiresUserMediation(true, std::move(callback));
 
@@ -213,12 +224,46 @@ void RequestService::SetRequiresUserMediation(bool requires_user_mediation,
   }
 }
 
+bool RequestService::SetupIdentityRegistryFromPopup() {
+#if BUILDFLAG(IS_ANDROID)
+  if (identity_registry_) {
+    return true;
+  }
+  std::unique_ptr<IdentityRequestDialogController> controller =
+      CreateDialogController();
+  CHECK(controller);
+  // Because ShowModalDialog does not return the web contents on Android, we
+  // need to set up the IdentityRegistry now.
+  WebContents* rp_web_contents = controller->GetRpWebContents();
+  // This can be null if resolve was called in a regular tab (as opposed to
+  // a CCT opened from ShowModalDialog).
+  if (!rp_web_contents) {
+    return false;
+  }
+  Request* rp_auth_request = GetPageData(rp_web_contents->GetPrimaryPage())
+                                 ->PendingWebIdentityRequest();
+  if (!rp_auth_request) {
+    return false;
+  }
+  WebContents* web_contents =
+      WebContents::FromRenderFrameHost(&render_frame_host());
+  IdentityRegistry::CreateForWebContents(
+      web_contents, rp_auth_request->weak_ptr_factory_.GetWeakPtr(),
+      rp_auth_request->config_url_);
+  identity_registry_ = IdentityRegistry::FromWebContents(web_contents);
+  return true;
+#else
+  return false;
+#endif
+}
+
 void RequestService::RequestUserInfo(
     blink::mojom::IdentityProviderConfigPtr provider,
     RequestUserInfoCallback callback) {
   // Enforce identity-credentials-get Permissions Policy browser-side.
   if (!render_frame_host().IsFeatureEnabled(
           network::mojom::PermissionsPolicyFeature::kIdentityCredentialsGet)) {
+    // TODO(crbug.com/519217823): Use receivers_.ReportBadMessage().
     mojo::ReportBadMessage(
         "identity-credentials-get permissions policy not enabled");
     std::move(callback).Run(blink::mojom::RequestUserInfoResult::NewStatus(
@@ -227,6 +272,7 @@ void RequestService::RequestUserInfo(
   }
 
   if (!render_frame_host().GetPage().IsPrimary()) {
+    // TODO(crbug.com/519217823): Use receivers_.ReportBadMessage().
     mojo::ReportBadMessage(
         "FedCM should not be allowed in nested frame trees.");
     std::move(callback).Run(blink::mojom::RequestUserInfoResult::NewStatus(
@@ -286,6 +332,7 @@ void RequestService::Disconnect(
   // The renderer checks this, but a compromised renderer can bypass it.
   if (!render_frame_host().IsFeatureEnabled(
           network::mojom::PermissionsPolicyFeature::kIdentityCredentialsGet)) {
+    // TODO(crbug.com/519217823): Use receivers_.ReportBadMessage().
     mojo::ReportBadMessage(
         "identity-credentials-get permissions policy not enabled");
     std::move(callback).Run(blink::mojom::DisconnectStatus::kError);
@@ -344,6 +391,70 @@ std::unique_ptr<Metrics> RequestService::CreateFedCmMetrics() {
   CHECK(!render_frame_host().IsInLifecycleState(
       RenderFrameHost::LifecycleState::kPrerendering));
   return std::make_unique<Metrics>(render_frame_host().GetPageUkmSourceId());
+}
+
+void RequestService::ResolveTokenRequest(
+    const std::optional<std::string>& account_id,
+    blink::mojom::ResolveTokenParamsPtr params,
+    ResolveTokenRequestCallback callback) {
+  if (params->is_redirect_to()) {
+    const blink::mojom::RedirectParamsPtr& redirect_to =
+        params->get_redirect_to();
+    const GURL& redirect_url = redirect_to->is_get()
+                                   ? redirect_to->get_get()->url
+                                   : redirect_to->get_post()->url;
+    if (!redirect_url.is_valid()) {
+      // TODO(crbug.com/519217823): Use receivers_.ReportBadMessage().
+      mojo::ReportBadMessage("Invalid redirect URL");
+      std::move(callback).Run(false);
+      return;
+    }
+    if (redirect_to->is_post() &&
+        redirect_to->get_post()->request_body.empty()) {
+      // TODO(crbug.com/519217823): Use receivers_.ReportBadMessage().
+      mojo::ReportBadMessage("POST redirects must have a body");
+      std::move(callback).Run(false);
+      return;
+    }
+  }
+
+  if (!identity_registry_ && !SetupIdentityRegistryFromPopup()) {
+    std::move(callback).Run(false);
+    return;
+  }
+
+  bool accepted = identity_registry_->NotifyResolve(
+      render_frame_host().GetLastCommittedOrigin(), account_id,
+      std::move(params));
+  std::move(callback).Run(accepted);
+}
+
+std::unique_ptr<IdentityRequestDialogController>
+RequestService::CreateDialogController() {
+  if (mock_dialog_controller_) {
+    return std::move(mock_dialog_controller_);
+  }
+
+  WebContents* web_contents =
+      WebContents::FromRenderFrameHost(&render_frame_host());
+  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
+          switches::kUseFakeUIForFedCM)) {
+    std::string selected_account =
+        base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(
+            switches::kUseFakeUIForFedCM);
+    return std::make_unique<FakeIdentityRequestDialogController>(
+        selected_account.empty() ? std::nullopt
+                                 : std::optional<std::string>(selected_account),
+        web_contents);
+  }
+
+  return GetContentClient()->browser()->CreateIdentityRequestDialogController(
+      web_contents);
+}
+
+void RequestService::SetDialogControllerForTests(
+    std::unique_ptr<IdentityRequestDialogController> controller) {
+  mock_dialog_controller_ = std::move(controller);
 }
 
 }  // namespace webid

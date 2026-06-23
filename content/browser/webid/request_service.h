@@ -24,6 +24,7 @@ class RenderFrameHost;
 class FederatedIdentityApiPermissionContextDelegate;
 class FederatedIdentityAutoReauthnPermissionContextDelegate;
 class FederatedIdentityPermissionContextDelegate;
+class IdentityRequestDialogController;
 
 namespace webid {
 
@@ -64,6 +65,9 @@ class CONTENT_EXPORT RequestService
   void PreventSilentAccess(PreventSilentAccessCallback callback) override;
   void Disconnect(blink::mojom::IdentityCredentialDisconnectOptionsPtr options,
                   DisconnectCallback callback) override;
+  void ResolveTokenRequest(const std::optional<std::string>& account_id,
+                           blink::mojom::ResolveTokenParamsPtr params,
+                           ResolveTokenRequestCallback callback) override;
 
   Request* GetActiveRequestForTesting() { return active_request_.get(); }
 
@@ -74,6 +78,10 @@ class CONTENT_EXPORT RequestService
   void SetNetworkManagerForTests(
       std::unique_ptr<IdpNetworkRequestManager> manager);
   std::unique_ptr<IdpNetworkRequestManager> CreateNetworkManager();
+  void CloseModalDialogView();
+  std::unique_ptr<IdentityRequestDialogController> CreateDialogController();
+  void SetDialogControllerForTests(
+      std::unique_ptr<IdentityRequestDialogController> controller);
 
   // Returns the active Request if one exists, or instantiates a new one if not.
   Request* GetOrCreateActiveRequest();
@@ -98,15 +106,7 @@ class CONTENT_EXPORT RequestService
   friend class RequestTest;
   friend class RequestRegistryTest;
 
-  std::unique_ptr<Request> active_request_;
-
-  // Number of navigator.credentials.get() requests made for metrics purposes.
-  // Requests made when there is a pending FedCM request or for the purpose of
-  // Wallets or multi-IDP are not counted.
-  int num_requests_{0};
-
-  mojo::ReceiverSet<blink::mojom::FederatedRequestService> receivers_;
-
+  bool SetupIdentityRegistryFromPopup();
   void SetRequiresUserMediation(bool requires_user_mediation,
                                 base::OnceClosure callback);
   void OnIdpRegistrationConfigFetched(
@@ -122,6 +122,17 @@ class CONTENT_EXPORT RequestService
                                  blink::mojom::DisconnectStatus status);
   std::unique_ptr<Metrics> CreateFedCmMetrics();
 
+  std::unique_ptr<Request> active_request_;
+
+  // Number of navigator.credentials.get() requests made for metrics purposes.
+  // Requests made when there is a pending FedCM request or for the purpose of
+  // Wallets or multi-IDP are not counted.
+  int num_requests_{0};
+
+  raw_ptr<IdentityRegistry> identity_registry_ = nullptr;
+
+  mojo::ReceiverSet<blink::mojom::FederatedRequestService> receivers_;
+
   std::unique_ptr<IdpNetworkRequestManager> registration_network_manager_;
   std::unique_ptr<IdpRegistrationHandler> fedcm_idp_registration_handler_;
   std::unique_ptr<IdpNetworkRequestManager> mock_network_manager_;
@@ -135,6 +146,7 @@ class CONTENT_EXPORT RequestService
   raw_ptr<FederatedIdentityPermissionContextDelegate> permission_delegate_ =
       nullptr;
   std::unique_ptr<DisconnectRequest> disconnect_request_;
+  std::unique_ptr<IdentityRequestDialogController> mock_dialog_controller_;
 
   base::WeakPtrFactory<RequestService> weak_ptr_factory_{this};
 };

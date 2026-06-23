@@ -9107,4 +9107,53 @@ TEST_F(RequestTest, DisconnectViaFederatedRequestService) {
   run_loop.Run();
 }
 
+TEST_F(RequestTest, ResolveViaFederatedRequestService) {
+  mojo::Remote<blink::mojom::FederatedRequestService> federated_request_service;
+  RequestService* service =
+      RequestService::GetOrCreateForCurrentDocument(main_test_rfh());
+  service->BindFederatedRequestService(
+      federated_request_service.BindNewPipeAndPassReceiver());
+
+  EXPECT_CALL(*test_identity_registry_, NotifyResolve)
+      .WillOnce(::testing::Return(true));
+
+  auto params = blink::mojom::ResolveTokenParams::NewToken(
+      base::Value("an-access-token"));
+
+  base::RunLoop run_loop;
+  federated_request_service->ResolveTokenRequest(
+      "account", std::move(params),
+      base::BindLambdaForTesting([&](bool success) {
+        EXPECT_TRUE(success);
+        run_loop.Quit();
+      }));
+  run_loop.Run();
+}
+
+TEST_F(RequestTest, ResolveViaFederatedRequestServiceEmptyPostRedirectBody) {
+  mojo::Remote<blink::mojom::FederatedRequestService> federated_request_service;
+  RequestService* service =
+      RequestService::GetOrCreateForCurrentDocument(main_test_rfh());
+  service->BindFederatedRequestService(
+      federated_request_service.BindNewPipeAndPassReceiver());
+
+  // Construct a redirect param with a POST method but an EMPTY request body.
+  auto post_params = blink::mojom::RedirectPostParams::New();
+  post_params->url = GURL("https://example.com/redirect");
+  post_params->request_body = "";  // Empty body (violates validation rule)
+
+  auto params = blink::mojom::ResolveTokenParams::NewRedirectTo(
+      blink::mojom::RedirectParams::NewPost(std::move(post_params)));
+
+  // Observe bad Mojo messages.
+  mojo::test::BadMessageObserver bad_message_observer;
+  federated_request_service->ResolveTokenRequest("account", std::move(params),
+                                                 base::DoNothing());
+
+  // Verify that the browser-side implementation correctly detected the
+  // violation and reported a bad message.
+  EXPECT_EQ("POST redirects must have a body",
+            bad_message_observer.WaitForBadMessage());
+}
+
 }  // namespace content::webid

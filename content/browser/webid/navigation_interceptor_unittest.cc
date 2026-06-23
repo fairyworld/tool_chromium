@@ -61,9 +61,8 @@ class MockFederatedAuthRequest : public Request {
                 ->GetFederatedIdentityApiPermissionContext(),
             rfh->GetBrowserContext()
                 ->GetFederatedIdentityAutoReauthnPermissionContext(),
-            rfh->GetBrowserContext()->GetFederatedIdentityPermissionContext(),
-            IdentityRegistry::FromWebContents(
-                WebContents::FromRenderFrameHost(rfh))) {}
+            rfh->GetBrowserContext()->GetFederatedIdentityPermissionContext()) {
+  }
 
   MOCK_METHOD(
       void,
