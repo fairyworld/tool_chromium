@@ -2354,6 +2354,12 @@ class FirstRunRevampInteractiveUiTest : public FirstRunInteractiveUiBaseTest {
             {{syncer::kReplaceSyncPromosWithSignInPromos, {}}}) {}
 
  protected:
+  GURL GetFeatureShowcaseUrl() const {
+    return net::AppendQueryParameter(
+        GURL(chrome::kChromeUIFeatureShowcaseURL), "steps",
+        base::JoinString(GetForcedFeatureShowcaseSteps(), ","));
+  }
+
   // FirstRunInteractiveUiBaseTest:
   std::vector<std::string> GetForcedFeatureShowcaseSteps() const override {
     return {"default-browser"};
@@ -2629,6 +2635,16 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
       InstrumentNonTabWebView(kWebContentsId, web_view()),
       // Do not sign in to proceed to the feature showcase immediately.
       CompleteIntroStep(/*sign_in=*/false),
+      WaitForWebContentsNavigation(kWebContentsId, GetFeatureShowcaseUrl()));
+
+  histogram_tester().ExpectUniqueSample(
+      "ProfilePicker.FREFlow.FeatureShowcase.StepShown",
+      FeatureShowcaseStep::kDefaultBrowser, 1);
+  histogram_tester().ExpectTotalCount(
+      "ProfilePicker.FREFlow.FeatureShowcase.StartBrowsing", 0);
+
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
       WaitForShow(kProfilePickerToolbarStartBrowsingButtonElementId),
       PressButton(kProfilePickerToolbarStartBrowsingButtonElementId));
 
@@ -2638,4 +2654,11 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
   ExpectStepHistograms(Step::kIntro, /*shown=*/true);
   ExpectStepHistograms(Step::kFeatureShowcase, /*shown=*/true);
   ExpectStepHistograms(Step::kFinishFlow, /*shown=*/true, /*with_exit=*/true);
+
+  histogram_tester().ExpectUniqueSample(
+      "ProfilePicker.FREFlow.FeatureShowcase.StepShown",
+      FeatureShowcaseStep::kDefaultBrowser, 1);
+  histogram_tester().ExpectUniqueSample(
+      "ProfilePicker.FREFlow.FeatureShowcase.StartBrowsing",
+      FeatureShowcaseStep::kDefaultBrowser, 1);
 }

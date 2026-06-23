@@ -54,6 +54,9 @@ class FeatureShowcaseUI
   // when the user is done.
   void SetFinishCallback(base::OnceClosure finish_callback);
 
+  void SetNextStepShownCallback(
+      base::RepeatingClosure next_step_shown_callback);
+
   void SetCanPinToTaskbar(bool can_pin);
 
   void BindInterface(
@@ -100,9 +103,11 @@ class FeatureShowcaseUI
           handler) override;
 
   void OnShowcaseFinished();
+  void OnNextStepShown();
 
   bool can_pin_ = false;
   base::OnceClosure finish_callback_;
+  base::RepeatingClosure next_step_shown_callback_;
   std::unique_ptr<FeatureShowcaseHandler> page_handler_;
   std::unique_ptr<DefaultBrowserHandler> default_browser_page_handler_;
   std::unique_ptr<GoogleLensHandler> google_lens_handler_;

@@ -50,6 +50,37 @@ suite('FeatureShowcaseAppTest', function() {
 
     await testHandler.whenCalled('finishFeatureShowcase');
   });
+
+  test('nextStepShown called on init', async function() {
+    await testHandler.whenCalled('nextStepShown');
+  });
+
+  test('nextStepShown called on transition', async function() {
+    // Setup app with 2 steps.
+    document.body.innerHTML = window.trustedTypes!.emptyHTML;
+    window.history.replaceState({}, '', '?steps=example,password-manager');
+
+    testHandler = TestMock.fromClass(FeatureShowcasePageHandlerRemote);
+    FeatureShowcaseBrowserProxyImpl.setInstance({handler: testHandler});
+
+    appElement = document.createElement('feature-showcase-app');
+    document.body.appendChild(appElement);
+
+    await testHandler.whenCalled('nextStepShown');
+
+    testHandler.resetResolver('nextStepShown');
+
+    const exampleStep =
+        appElement.shadowRoot.querySelector('feature-showcase-example-step');
+    assertTrue(!!exampleStep);
+
+    const button =
+        exampleStep.shadowRoot.querySelector<HTMLElement>('#confirm-button');
+    assertTrue(!!button);
+    button.click();
+
+    await testHandler.whenCalled('nextStepShown');
+  });
 });
 
 suite('FeatureShowcaseStepperTest', function() {

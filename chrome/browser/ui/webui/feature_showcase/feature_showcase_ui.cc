@@ -132,6 +132,11 @@ void FeatureShowcaseUI::SetFinishCallback(base::OnceClosure finish_callback) {
   finish_callback_ = std::move(finish_callback);
 }
 
+void FeatureShowcaseUI::SetNextStepShownCallback(
+    base::RepeatingClosure next_step_shown_callback) {
+  next_step_shown_callback_ = std::move(next_step_shown_callback);
+}
+
 void FeatureShowcaseUI::SetCanPinToTaskbar(bool can_pin) {
   can_pin_ = can_pin;
   if (default_browser_page_handler_) {
@@ -184,8 +189,11 @@ void FeatureShowcaseUI::CreatePageHandler(
     mojo::PendingReceiver<feature_showcase::mojom::FeatureShowcasePageHandler>
         handler) {
   page_handler_ = std::make_unique<FeatureShowcaseHandler>(
-      std::move(handler), base::BindOnce(&FeatureShowcaseUI::OnShowcaseFinished,
-                                         base::Unretained(this)));
+      std::move(handler),
+      base::BindOnce(&FeatureShowcaseUI::OnShowcaseFinished,
+                     base::Unretained(this)),
+      base::BindRepeating(&FeatureShowcaseUI::OnNextStepShown,
+                          base::Unretained(this)));
 }
 
 void FeatureShowcaseUI::CreatePageHandler(
@@ -213,5 +221,11 @@ void FeatureShowcaseUI::CreatePasswordManagerPageHandler(
 void FeatureShowcaseUI::OnShowcaseFinished() {
   if (finish_callback_) {
     std::move(finish_callback_).Run();
+  }
+}
+
+void FeatureShowcaseUI::OnNextStepShown() {
+  if (next_step_shown_callback_) {
+    next_step_shown_callback_.Run();
   }
 }

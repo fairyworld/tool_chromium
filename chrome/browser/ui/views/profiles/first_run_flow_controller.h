@@ -24,7 +24,20 @@
 
 struct CoreAccountInfo;
 enum class IntroChoice;
+class FeatureShowcaseStepController;
 class Profile;
+
+// Exposed for testing purposes only.
+// These values are persisted to UMA logs. Entries should not be renumbered and
+// numeric values should never be reused.
+// LINT.IfChange(FeatureShowcaseStep)
+enum class FeatureShowcaseStep {
+  kDefaultBrowser = 0,
+  kGoogleLens = 1,
+  kPasswordManager = 2,
+  kMaxValue = kPasswordManager,
+};
+// LINT.ThenChange(//tools/metrics/histograms/metadata/profile/enums.xml:FeatureShowcaseStep)
 
 // Creates a step to represent the intro. Exposed for testing.
 std::unique_ptr<ProfileManagementStepController> CreateIntroStep(
@@ -41,8 +54,7 @@ std::unique_ptr<ProfileManagementStepController> CreateDefaultBrowserStep(
 std::unique_ptr<ProfileManagementStepController> CreateFeatureShowcaseStep(
     ProfilePickerWebContentsHost* host,
     Profile* profile,
-    base::OnceClosure step_completed_callback,
-    base::OnceCallback<void(bool)> eligibility_callback);
+    base::OnceClosure step_completed_callback);
 
 std::unique_ptr<ProfileManagementStepController> CreateFinishOrContinueStep(
     ProfilePickerWebContentsHost* host,
@@ -97,6 +109,8 @@ class FirstRunFlowController : public ProfileManagementFlowControllerImpl {
       PostHostClearedCallback post_host_cleared_callback) override;
 
  private:
+  bool is_feature_showcase_eligible() const;
+
   void HandleIntroSigninChoice(IntroChoice choice);
 
   void PlaySignInCelebrationSound();
@@ -105,14 +119,6 @@ class FirstRunFlowController : public ProfileManagementFlowControllerImpl {
 
   // Run the `finish_flow_callback_` if it's not empty.
   void RunFinishFlowCallback();
-
-  bool is_feature_showcase_eligible() const {
-    return is_feature_showcase_eligible_;
-  }
-
-  void SetFeatureShowcaseEligibility(bool is_eligible) {
-    is_feature_showcase_eligible_ = is_eligible;
-  }
 
   std::string GetHatsSurveyTrigger() const;
 
@@ -130,7 +136,8 @@ class FirstRunFlowController : public ProfileManagementFlowControllerImpl {
 
   std::unique_ptr<audio::SoundsManager> sounds_manager_;
 
-  bool is_feature_showcase_eligible_ = false;
+  base::WeakPtr<FeatureShowcaseStepController>
+      feature_showcase_step_controller_;
 
   base::WeakPtrFactory<FirstRunFlowController> weak_ptr_factory_{this};
 };

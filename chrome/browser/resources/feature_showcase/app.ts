@@ -89,7 +89,9 @@ export class FeatureShowcaseAppElement extends CrLitElement {
         this.steps.length > 0, 'Feature showcase requires at least one step.');
 
     const step = this.steps[this.activeStepIndex]!;
-    this.$.viewManager.switchView(step);
+    this.$.viewManager.switchView(step).then(() => {
+      this.notifyStepShown_();
+    });
   }
 
   protected getAnimationUrl_(position: 'right'|'bottom'): string {
@@ -111,12 +113,17 @@ export class FeatureShowcaseAppElement extends CrLitElement {
       const step = this.steps[this.activeStepIndex]!;
       this.$.viewManager.switchView(step).then(() => {
         this.areButtonsDisabled_ = false;
+        this.notifyStepShown_();
       });
       return;
     }
 
     FeatureShowcaseBrowserProxyImpl.getInstance()
         .handler.finishFeatureShowcase();
+  }
+
+  private notifyStepShown_() {
+    FeatureShowcaseBrowserProxyImpl.getInstance().handler.nextStepShown();
   }
 
   private tryPlayingTransitionAnimations() {

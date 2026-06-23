@@ -109,8 +109,7 @@ class FirstRunFeatureShowcasePixelTest
                 -> std::unique_ptr<ProfileManagementStepController> {
               return CreateFeatureShowcaseStep(
                   host, profile,
-                  /*step_completed_callback=*/base::DoNothing(),
-                  /*eligibility_callback=*/base::DoNothing());
+                  /*step_completed_callback=*/base::DoNothing());
             },
             browser()->profile()));
 
