@@ -41,42 +41,51 @@
 #endif
 
 WebUIAllUrlsBrowserTest::WebUIAllUrlsBrowserTest() {
-  std::vector<base::test::FeatureRef> enabled_features;
-  enabled_features.push_back(ntp_features::kCustomizeChromeWallpaperSearch);
-  enabled_features.push_back(
+  std::vector<base::test::FeatureRefAndParams> enabled_features;
+  auto enable_feature = [&](const base::Feature& feature,
+                            std::map<std::string, std::string> params = {}) {
+    enabled_features.push_back({feature, std::move(params)});
+  };
+
+  enable_feature(ntp_features::kCustomizeChromeWallpaperSearch);
+  enable_feature(
       optimization_guide::features::kOptimizationGuideModelExecution);
-  enabled_features.push_back(collaboration::features::kCollaborationComments);
-  enabled_features.push_back(omnibox::kComposeboxDriveContextMenuOption);
+  enable_feature(collaboration::features::kCollaborationComments);
+  enable_feature(omnibox::kComposeboxDriveContextMenuOption);
 
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
     BUILDFLAG(IS_CHROMEOS)
-  enabled_features.push_back(features::kAiOverlayDialog);
+  enable_feature(features::kAiOverlayDialog);
 #endif
 
 #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
-  enabled_features.push_back(whats_new::kForceEnabled);
+  enable_feature(whats_new::kForceEnabled);
 #endif
 
 #if BUILDFLAG(IS_CHROMEOS)
-  enabled_features.push_back(ash::features::kDriveFsMirroring);
-  enabled_features.push_back(ash::features::kShimlessRMAOsUpdate);
-  enabled_features.push_back(chromeos::features::kUploadOfficeToCloud);
+  enable_feature(ash::features::kDriveFsMirroring);
+  enable_feature(ash::features::kShimlessRMAOsUpdate);
+  enable_feature(chromeos::features::kUploadOfficeToCloud);
 #endif
 
-  enabled_features.push_back(features::kTabsFromOtherDevicesSidePanel);
-  enabled_features.push_back(contextual_cueing::kContextualCueingV2);
+  enable_feature(features::kTabsFromOtherDevicesSidePanel);
+  enable_feature(contextual_cueing::kContextualCueingV2);
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
-  enabled_features.push_back(switches::kFirstRunDesktopRefresh);
-  enabled_features.push_back(switches::kFirstRunDesktopChoiceScreenRefresh);
-  enabled_features.push_back(switches::kFirstRunDesktopRevamp);
-  enabled_features.push_back(switches::kMagiChromeSignInBanner);
+  enable_feature(switches::kFirstRunDesktopRefresh);
+  enable_feature(switches::kFirstRunDesktopChoiceScreenRefresh);
+  enable_feature(switches::kFirstRunDesktopRevamp);
 #endif
 
   const std::vector<base::test::FeatureRef> disabled_features = {
       privacy_sandbox::kPrivacySandboxAdPrivacyUxDeprecation};
 
-  feature_list_.InitWithFeatures(enabled_features, disabled_features);
+#if BUILDFLAG(ENABLE_DICE_SUPPORT)
+  enable_feature(switches::kMagiChromePasskeySignIn, {{"flow_type", "banner"}});
+#endif
+
+  feature_list_.InitWithFeaturesAndParameters(enabled_features,
+                                              disabled_features);
 }
 
 WebUIAllUrlsBrowserTest::~WebUIAllUrlsBrowserTest() = default;

@@ -33,6 +33,7 @@
 #include "components/password_manager/core/browser/webauthn_credentials_delegate.h"
 #include "components/password_manager/core/common/password_manager_constants.h"
 #include "components/signin/public/base/consent_level.h"
+#include "components/signin/public/base/signin_switches.h"
 #include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/sync/base/features.h"
 #include "components/sync/service/sync_service.h"
@@ -478,15 +479,18 @@ std::vector<Suggestion> PasswordSuggestionGenerator::GetSuggestionsForDomain(
                      autofill::FieldType::PASSWORD));
   }
 
-  bool has_qr =
+  bool has_qr = false;
+#if BUILDFLAG(ENABLE_DICE_SUPPORT)
+  has_qr =
       password_client_->IsChromeSigninPage() &&
-      base::FeatureList::IsEnabled(features::kMagiChromeQrCodeAutofill) &&
+      switches::IsMagiChromePasskeyAutofillEnabled() &&
       password_client_->GetWebAuthnCredentialsDelegateForDriver(
           password_manager_driver_) &&
       password_client_
           ->GetWebAuthnCredentialsDelegateForDriver(password_manager_driver_)
           ->GetCableQrString()
           .has_value();
+#endif
 
   // Don't return early if there is a QR code suggestion. It still needs to be
   // appended later in the footer section.
@@ -682,8 +686,9 @@ PasswordSuggestionGenerator::GetWebauthnSignInWithAnotherDeviceSuggestion(
   if (!delegate) {
     return std::nullopt;
   }
+#if BUILDFLAG(ENABLE_DICE_SUPPORT)
   if (password_client_->IsChromeSigninPage() &&
-      base::FeatureList::IsEnabled(features::kMagiChromeQrCodeAutofill)) {
+      switches::IsMagiChromePasskeyAutofillEnabled()) {
     std::optional<std::string> qr_string = delegate->GetCableQrString();
     if (qr_string.has_value()) {
       autofill::Suggestion suggestion(
@@ -698,6 +703,7 @@ PasswordSuggestionGenerator::GetWebauthnSignInWithAnotherDeviceSuggestion(
       return suggestion;
     }
   }
+#endif
   if (!delegate->GetPasskeys().has_value() ||
       !delegate->IsSecurityKeyOrHybridFlowAvailable()) {
     return std::nullopt;

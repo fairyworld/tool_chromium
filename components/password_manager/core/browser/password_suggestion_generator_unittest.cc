@@ -33,6 +33,7 @@
 #include "components/password_manager/core/browser/undo_password_change_controller.h"
 #include "components/password_manager/core/common/password_manager_constants.h"
 #include "components/signin/public/base/consent_level.h"
+#include "components/signin/public/base/signin_switches.h"
 #include "components/signin/public/identity_manager/identity_test_environment.h"
 #include "components/signin/public/identity_manager/identity_test_utils.h"
 #include "components/strings/grit/components_strings.h"
@@ -1860,10 +1861,12 @@ TEST_F(PasswordSuggestionGeneratorTest,
                   Suggestion::Icon::kDevice));
 }
 
+#if BUILDFLAG(ENABLE_DICE_SUPPORT)
 TEST_F(PasswordSuggestionGeneratorTest,
        GetWebauthnSignInWithAnotherDeviceSuggestion_QrEnabled) {
   base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(features::kMagiChromeQrCodeAutofill);
+  feature_list.InitAndEnableFeatureWithParameters(
+      switches::kMagiChromePasskeySignIn, {{"flow_type", "autofill"}});
 
   const std::string kTestQrString = "test_qr_string";
   ON_CALL(credentials_delegate(), GetCableQrString)
@@ -1886,7 +1889,8 @@ TEST_F(PasswordSuggestionGeneratorTest,
 TEST_F(PasswordSuggestionGeneratorTest,
        GetWebauthnSignInWithAnotherDeviceSuggestion_QrEnabled_NotChromeSigninPage) {
   base::test::ScopedFeatureList feature_list;
-  feature_list.InitAndEnableFeature(features::kMagiChromeQrCodeAutofill);
+  feature_list.InitAndEnableFeatureWithParameters(
+      switches::kMagiChromePasskeySignIn, {{"flow_type", "autofill"}});
 
   const std::string kTestQrString = "test_qr_string";
   ON_CALL(credentials_delegate(), GetCableQrString)
@@ -1913,6 +1917,7 @@ TEST_F(PasswordSuggestionGeneratorTest,
 #endif  // BUILDFLAG(IS_IOS)
           Suggestion::Icon::kDevice));
 }
+#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
 TEST_F(PasswordSuggestionGeneratorTest,
        GetWebauthnSignInWithAnotherDeviceSuggestionWithListedPasskeys) {

@@ -132,9 +132,6 @@ extern const base::FeatureParam<int>
 BASE_DECLARE_FEATURE(kIOSProactivePasswordGenerationBottomSheet);
 #endif  // BUILDFLAG(IS_IOS)
 
-// Enables rendering a passkey hybrid QR code directly inside the autofill
-// dropdown during conditional UI.
-BASE_DECLARE_FEATURE(kMagiChromeQrCodeAutofill);
 
 // Marks all submitted credentials as leaked, useful for testing of a password
 // leak dialog.

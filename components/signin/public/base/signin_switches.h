@@ -555,10 +555,23 @@ BASE_DECLARE_FEATURE(kIgnoreInvalidGrantError);
 #endif
 
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
-// Controls the MagiChrome sign-in banner.
+// Controls the MagiChrome passkey sign-in experiment, enabling either the
+// Autofill-based promo flow or the native Views-based banner flow.
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
-BASE_DECLARE_FEATURE(kMagiChromeSignInBanner);
+BASE_DECLARE_FEATURE(kMagiChromePasskeySignIn);
+// Controls which flow is active: "autofill" or "banner".
+COMPONENT_EXPORT(SIGNIN_SWITCHES)
+extern const base::FeatureParam<std::string> kMagiChromePasskeySignInFlowType;
+// Returns true if the MagiChrome passkey sign-in Autofill flow is active.
+COMPONENT_EXPORT(SIGNIN_SWITCHES)
+bool IsMagiChromePasskeyAutofillEnabled();
+// Returns true if the MagiChrome passkey sign-in native Views banner flow is
+// active.
+COMPONENT_EXPORT(SIGNIN_SWITCHES)
+bool IsMagiChromePasskeyBannerEnabled();
+#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
 
+#if BUILDFLAG(ENABLE_DICE_SUPPORT)
 // Controls experiments for MagiChrome (e.g. Gaia sign-in URL parameters).
 COMPONENT_EXPORT(SIGNIN_SWITCHES)
 BASE_DECLARE_FEATURE(kMagiChromeSignInExperimentsBatch1);
