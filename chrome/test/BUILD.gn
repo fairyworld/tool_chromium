@@ -2400,6 +2400,7 @@ if (!is_android) {
       "//chrome/browser/favicon",
       "//chrome/browser/favicon:browser_tests",
       "//chrome/browser/feedback",
+      "//chrome/browser/feedback:browser_tests",
       "//chrome/browser/feedback:feedback_impl",
       "//chrome/browser/file_system_access",
       "//chrome/browser/file_system_access:browser_tests",
@@ -3312,8 +3313,6 @@ if (!is_android) {
       "../browser/error_reporting/webui_js_error_reporting_browsertest.cc",
       "../browser/extensions/api/bookmark_manager_private/bookmark_manager_private_api_browsertest.cc",
       "../browser/fast_shutdown_browsertest.cc",
-      "../browser/feedback/report_unsafe_site_dialog_browsertest.cc",
-      "../browser/feedback/system_logs/log_sources/chrome_internal_log_source_browsertest.cc",
       "../browser/guest_view/mime_handler_view/chrome_mime_handler_view_browsertest.cc",
       "../browser/hid/hid_browsertest.cc",
       "../browser/icon_loader_browsertest.cc",
@@ -4679,7 +4678,6 @@ if (!is_android) {
         "../browser/browser_process_platform_part_ash_browsertest.cc",
         "../browser/chromeos/enterprise/cloud_storage/one_drive_pref_observer_browsertest.cc",
         "../browser/enterprise/connectors/device_trust/signals/decorators/ash/ash_signals_decorator_browsertest.cc",
-        "../browser/feedback/show_feedback_page_browsertest.cc",
         "../browser/file_system_access/cloud_identifier/cloud_identifier_util_ash_browsertest.cc",
         "../browser/lifetime/application_lifetime_chromeos_browsertest.cc",
 
@@ -7833,14 +7831,6 @@ test("unit_tests") {
     ]
 
     sources += [
-      # Android uses different way of showing feedback page
-      "../browser/feedback/system_logs/log_sources/crash_ids_source_unittest.cc",
-      "../browser/feedback/system_logs/log_sources/family_info_log_source_unittest.cc",
-      "../browser/feedback/system_logs/log_sources/performance_log_source_unittest.cc",
-      "../browser/feedback/system_logs/log_sources/related_website_sets_source_unittest.cc",
-    ]
-
-    sources += [
       # NTP is in native code on Android.
       "../browser/search/ntp_features_unittest.cc",
     ]
@@ -10073,7 +10063,6 @@ if (!is_android && !is_chromeos_device) {
       "../browser/controlled_frame/controlled_frame_interactive_uitest.cc",
       "../browser/devtools/devtools_connection_dialog_browsertest.cc",
       "../browser/devtools/devtools_interactive_uitest.cc",
-      "../browser/feedback/report_unsafe_site_dialog_views_interactive_uitest.cc",
       "../browser/focus_ring_interactive_uitest.cc",
       "../browser/media/webrtc/conditional_focus_interactive_uitest.cc",
       "../browser/media/webrtc/display_media_access_handler_interactive_uitest.cc",
@@ -10223,6 +10212,7 @@ if (!is_android && !is_chromeos_device) {
       "//chrome/browser/devtools:test_support",
       "//chrome/browser/download:test_support",
       "//chrome/browser/feedback:feedback_impl",
+      "//chrome/browser/feedback:interactive_ui_tests",
       "//chrome/browser/file_system_access",
       "//chrome/browser/gcm",
       "//chrome/browser/glic/browser_ui",
