@@ -819,8 +819,11 @@ bool GeminiTabHelper::CanExtractPageContextForGemini() {
 }
 
 bool GeminiTabHelper::IsInGeminiLiveMode() const {
-  return IsGeminiLiveEnabled() && ios::provider::GetCurrentMode() ==
-                                      ios::provider::GeminiViewMode::kLive;
+  ProfileIOS* profile =
+      ProfileIOS::FromBrowserState(web_state_->GetBrowserState());
+  return gemini::IsFeatureAvailable(gemini::Feature::kLive, profile) &&
+         ios::provider::GetCurrentMode() ==
+             ios::provider::GeminiViewMode::kLive;
 }
 
 bool GeminiTabHelper::IsNextIaOrLiveMode() const {

@@ -766,6 +766,9 @@ TEST_F(GeminiBrowserAgentTest, TestOnLiveButtonTappedTriggersEvent) {
 // are successfully triggered when starting the flow and dismissed when the
 // floaty is dismissed.
 TEST_F(GeminiBrowserAgentTest, TestGeminiLiveIPHAndNewBadgeFET) {
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitWithFeatures({kGeminiLive}, {});
+
   // Setup mock tracker expectations for triggering
   EXPECT_CALL(*mock_tracker_,
               ShouldTriggerHelpUI(testing::Ref(

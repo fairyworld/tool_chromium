@@ -478,8 +478,10 @@ bool GeminiBrowserAgent::IsGeminiAvailableForActiveWebState() const {
 }
 
 bool GeminiBrowserAgent::IsInGeminiLiveMode() const {
-  return IsGeminiLiveEnabled() && ios::provider::GetCurrentMode() ==
-                                      ios::provider::GeminiViewMode::kLive;
+  return gemini::IsFeatureAvailable(gemini::Feature::kLive,
+                                    browser_->GetProfile()) &&
+         ios::provider::GetCurrentMode() ==
+             ios::provider::GeminiViewMode::kLive;
 }
 
 gemini::EntryPoint GeminiBrowserAgent::GetEntryPoint() const {
@@ -527,6 +529,8 @@ void GeminiBrowserAgent::ConfigureGemini() {
   config.gateway = bwg_gateway_;
   config.imageRemixEnabled = gemini::IsFeatureAvailable(
       gemini::Feature::kImageRemix, browser_->GetProfile());
+  config.geminiLiveEnabled = gemini::IsFeatureAvailable(gemini::Feature::kLive,
+                                                        browser_->GetProfile());
 
   ios::provider::ConfigureWithStartupConfiguration(config);
 }
@@ -542,13 +546,27 @@ void GeminiBrowserAgent::OnIdentityManagerShutdown(
   }
 }
 
+// Called when account capabilities are updated in the background. This ensures
+// we re-configure Gemini once the user's capabilities (like age eligibility)
+// finish syncing from the server after sign-in.
+void GeminiBrowserAgent::OnExtendedAccountInfoUpdated(
+    const AccountInfo& account_info) {
+  if (identity_manager_->GetPrimaryAccountInfo(signin::ConsentLevel::kSignin)
+          .account_id == account_info.account_id) {
+    ConfigureGemini();
+    UpdateGeminiAvailability();
+    UpdateGeminiLiveIconVisibility();
+  }
+}
+
 void GeminiBrowserAgent::OnKeyboardStateChanged(bool is_visible) {
   if (is_visible == is_keyboard_visible_) {
     return;
   }
 
   is_keyboard_visible_ = is_visible;
-  if (IsGeminiLiveEnabled()) {
+  if (gemini::IsFeatureAvailable(gemini::Feature::kLive,
+                                 browser_->GetProfile())) {
     ios::provider::SetLiveCaptionsNumberOfLines(is_visible ? 1 : -1);
   }
 
@@ -1613,7 +1631,10 @@ GeminiConfiguration* GeminiBrowserAgent::CreateGeminiConfiguration(
 
   feature_engagement::Tracker* tracker =
       feature_engagement::TrackerFactory::GetForProfile(browser_->GetProfile());
-  if (tracker) {
+  // Only trigger and show the IPH/new badge if Gemini Live is available for the
+  // current user.
+  if (tracker && gemini::IsFeatureAvailable(gemini::Feature::kLive,
+                                            browser_->GetProfile())) {
     config.shouldShowGeminiLiveIPH = tracker->ShouldTriggerHelpUI(
         feature_engagement::kIPHiOSGeminiLiveIPHFeature);
     config.shouldShowGeminiLiveNewBadge = tracker->ShouldTriggerHelpUI(
@@ -1707,8 +1728,7 @@ void GeminiBrowserAgent::SetSessionCommandHandlers() {
 }
 
 void GeminiBrowserAgent::OnPageContentPrefChanged() {
-  if (IsGeminiLiveEnabled() &&
-      ios::provider::GetCurrentMode() == ios::provider::GeminiViewMode::kLive &&
+  if (IsInGeminiLiveMode() &&
       processing_status_ == ios::provider::GeminiClientMode::kTranscribing) {
     return;
   }

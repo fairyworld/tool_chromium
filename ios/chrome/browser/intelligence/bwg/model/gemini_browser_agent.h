@@ -113,6 +113,7 @@ class GeminiBrowserAgent : public BrowserUserData<GeminiBrowserAgent>,
       const signin::PrimaryAccountChangeEvent& event) override;
   void OnIdentityManagerShutdown(
       signin::IdentityManager* identity_manager) override;
+  void OnExtendedAccountInfoUpdated(const AccountInfo& account_info) override;
 
   // GeminiTabHelperObserver:
   void OnPageContextUpdated(web::WebState* web_state) override;
