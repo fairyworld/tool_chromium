@@ -2532,6 +2532,72 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               bwi))
           .SetActionId(kActionGroupUngroupedTabs)
           .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::CreateNewTabGroup(bwi);
+              },
+              bwi))
+          .SetActionId(kActionCreateNewTabGroupTopLevel)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::AddNewTabToRecentGroup(bwi);
+              },
+              bwi))
+          .SetActionId(kActionAddNewTabRecentGroup)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::PinKeyboardFocusedTab(bwi);
+              },
+              bwi))
+          .SetActionId(kActionPinTargetTab)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::GroupKeyboardFocusedTab(bwi);
+              },
+              bwi))
+          .SetActionId(kActionGroupTargetTab)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::DuplicateKeyboardFocusedTab(bwi);
+              },
+              bwi))
+          .SetActionId(kActionDuplicateTargetTab)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ToggleRequestTabletSite(bwi);
+              },
+              bwi))
+          .SetActionId(kActionToggleRequestTabletSite)
+          .Build());
 }
 
 void BrowserActions::AddListeners() {
