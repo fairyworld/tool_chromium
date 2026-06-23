@@ -37,7 +37,10 @@
 #include "chrome/browser/ui/omnibox/omnibox_popup_state_manager.h"
 #include "chrome/browser/ui/tab_ui_helper.h"
 #include "chrome/browser/ui/tabs/tab_strip_model.h"
+#include "chrome/browser/ui/views/location_bar/location_bar_view.h"
 #include "chrome/browser/ui/views/location_bar/omnibox_popup_file_selector.h"
+#include "chrome/browser/ui/views/omnibox/omnibox_popup_aim_presenter.h"
+#include "chrome/browser/ui/views/omnibox/omnibox_popup_webui_base_content.h"
 #include "chrome/browser/ui/webui/cr_components/composebox/composebox_handler.h"
 #include "chrome/browser/ui/webui/new_tab_page/composebox/variations/composebox_fieldtrial.h"
 #include "chrome/browser/ui/webui/omnibox_popup/omnibox_popup_aim_handler.h"
@@ -80,6 +83,9 @@
 
 namespace {
 constexpr int kMinOmniboxContextMenuRecentTabsCommandId = 33000;
+// Default limit for the maximum number of files if the input state is
+// uninitialized.
+constexpr int kDefaultMaxNumFiles = 10;
 
 }  // namespace
 
@@ -564,7 +570,11 @@ void OmniboxContextMenuController::AddModelPickerItems() {
 }
 
 std::vector<OmniboxContextMenuController::TabInfo>
-OmniboxContextMenuController::GetRecentTabs() {
+OmniboxContextMenuController::GetRecentTabs() const {
+  if (cached_recent_tabs_) {
+    return *cached_recent_tabs_;
+  }
+
   std::vector<OmniboxContextMenuController::TabInfo> tabs;
 
   std::vector<contextual_search::FileInfo> uploaded_file_infos;
@@ -635,6 +645,7 @@ OmniboxContextMenuController::GetRecentTabs() {
                       return a.last_active > b.last_active;
                     });
   tabs.resize(max_tab_suggestions);
+  cached_recent_tabs_ = tabs;
   return tabs;
 }
 
@@ -1130,9 +1141,48 @@ OmniboxPopupUI* OmniboxContextMenuController::GetOmniboxPopupUI(
     return nullptr;
   }
   if (auto* webui = web_contents->GetWebUI()) {
-    return webui->GetController()->GetAs<OmniboxPopupUI>();
+    if (auto* controller = webui->GetController()) {
+      if (auto* omnibox_popup_ui = controller->GetAs<OmniboxPopupUI>()) {
+        return omnibox_popup_ui;
+      }
+    }
   }
-  return nullptr;
+
+  // Fallback: If web_contents does not have WebUI (e.g. it is the active tab),
+  // try to find it through the active browser window's LocationBarView.
+  auto* browser_window_interface =
+      webui::GetBrowserWindowInterface(web_contents);
+  if (!browser_window_interface) {
+    return nullptr;
+  }
+
+  LocationBar* location_bar =
+      browser_window_interface->GetFeatures().location_bar();
+  if (!location_bar) {
+    return nullptr;
+  }
+
+  auto* location_bar_view = static_cast<LocationBarView*>(location_bar);
+  if (!location_bar_view) {
+    return nullptr;
+  }
+
+  auto* presenter = location_bar_view->GetOmniboxPopupAimPresenter();
+  if (!presenter) {
+    return nullptr;
+  }
+
+  auto* webui_content = presenter->GetWebUIContent();
+  if (!webui_content) {
+    return nullptr;
+  }
+
+  auto* wrapper = webui_content->contents_wrapper();
+  if (!wrapper) {
+    return nullptr;
+  }
+
+  return wrapper->GetWebUIController();
 }
 
 raw_ptr<OmniboxPopupUI> OmniboxContextMenuController::GetOmniboxPopupUI()
@@ -1386,9 +1436,36 @@ bool OmniboxContextMenuController::IsCommandIdEnabled(int command_id) const {
     if (IsTabCommandId(command_id)) {
       auto it =
           input_type_info_.find(omnibox::InputType::INPUT_TYPE_BROWSER_TAB);
-      bool tab_context_enabled =
-          it != input_type_info_.end() && it->second.enabled;
+      if (it == input_type_info_.end()) {
+        return false;
+      }
+
+      bool is_checked = false;
+      std::vector<OmniboxContextMenuController::TabInfo> tabs = GetRecentTabs();
+      int tab_index_in_menu =
+          command_id - kMinOmniboxContextMenuRecentTabsCommandId;
+      if (static_cast<size_t>(tab_index_in_menu) < tabs.size()) {
+        is_checked = tabs[tab_index_in_menu].is_checked;
+      }
+
+      bool tab_context_enabled = is_checked || it->second.enabled;
       if (tab_context_enabled) {
+        if (!is_checked) {
+          int max_num_files = input_state_.allowed_models.empty()
+                                  ? kDefaultMaxNumFiles
+                                  : input_state_.max_total_inputs;
+          std::vector<contextual_search::FileInfo> file_infos;
+          if (auto omnibox_popup_ui = GetOmniboxPopupUI()) {
+            if (auto* session_handle =
+                    omnibox_popup_ui->GetOrCreateContextualSessionHandle()) {
+              file_infos = session_handle->GetUploadedContextFileInfos();
+            }
+          }
+          if (static_cast<int>(file_infos.size()) >= max_num_files) {
+            return false;
+          }
+        }
+
         base::UmaHistogramEnumeration(sliced_prefix,
                                       CommandIdToEnum(command_id));
       }
@@ -1448,8 +1525,9 @@ bool OmniboxContextMenuController::IsCommandIdEnabled(int command_id) const {
   // If `allowed_models` is empty, the `input_state` is uninitialized and we
   // fallback to a default limit of 10. Otherwise, we use the limit provided by
   // the `input_state` even if it is 0.
-  const int max_num_files =
-      input_state.allowed_models.empty() ? 10 : input_state.max_total_inputs;
+  const int max_num_files = input_state.allowed_models.empty()
+                                ? kDefaultMaxNumFiles
+                                : input_state.max_total_inputs;
 
   std::vector<contextual_search::FileInfo> file_infos;
   if (auto* session_handle =
@@ -1497,12 +1575,24 @@ bool OmniboxContextMenuController::IsCommandIdEnabledHelper(
         }
         return create_images_enabled;
       }
-      default:
-        if (file_upload_count < max_num_files) {
+      default: {
+        bool is_checked = false;
+        if (IsTabCommandId(command_id)) {
+          std::vector<OmniboxContextMenuController::TabInfo> tabs =
+              GetRecentTabs();
+          int tab_index_in_menu =
+              command_id - kMinOmniboxContextMenuRecentTabsCommandId;
+          if (static_cast<size_t>(tab_index_in_menu) < tabs.size()) {
+            is_checked = tabs[tab_index_in_menu].is_checked;
+          }
+        }
+        bool is_enabled = is_checked || file_upload_count < max_num_files;
+        if (is_enabled) {
           base::UmaHistogramEnumeration(sliced_prefix,
                                         CommandIdToEnum(command_id));
         }
-        return file_upload_count < max_num_files;
+        return is_enabled;
+      }
     }
   }
 

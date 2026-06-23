@@ -671,7 +671,9 @@ void InputStateModel::UpdateDisabledInputTypes() {
         !std::ranges::contains(active_tool_rule->allowed_input_types(),
                                input_type);
 
-    if (input_limit_reached || incompatible_with_model ||
+    const bool should_disable_due_to_limit = input_limit_reached;
+
+    if (should_disable_due_to_limit || incompatible_with_model ||
         incompatible_with_tool ||
         std::ranges::contains(permanently_disabled_input_types_, input_type)) {
       state_.disabled_input_types.push_back(input_type);

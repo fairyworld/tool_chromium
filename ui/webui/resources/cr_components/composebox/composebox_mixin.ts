@@ -2367,6 +2367,12 @@ export const ComposeboxEmbedderMixin =
           return filesArray;
         }
 
+        getNonTabFileNum(): number {
+          return Array.from(this.files.values())
+              .filter(file => file.inputType !== InputType.kBrowserTab)
+              .length;
+        }
+
         getSharedTabs(): TabInfo[] {
           return Array.from(this.files.values())
               .filter(file => !!file.url)
@@ -2571,6 +2577,7 @@ export interface ComposeboxEmbedderMixinInterface extends
       onBeforeUpdateFiles?: (attachment: ComposeboxFile) => void):
       Promise<ComposeboxFile|null>;
   getFilteredCarouselFiles(): ComposeboxFile[];
+  getNonTabFileNum(): number;
   getSharedTabs(): TabInfo[];
   shouldShowSuggestionActivityLink(): boolean;
   onLinkClicked(e: CustomEvent<{event: Event}>): void;

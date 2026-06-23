@@ -1151,6 +1151,7 @@ suite('ContextualActionMenu', () => {
   test('Share tabs flyout cycling skips disabled tabs', async () => {
     loadTimeData.overrideValues({
       contextManagementInComposeboxEnabled: true,
+      composeboxFileMaxCount: 2,
     });
 
     actionMenu.remove();
@@ -1193,8 +1194,8 @@ suite('ContextualActionMenu', () => {
     } as any;
 
     actionMenu.tabSuggestions = [tab1, tab2, tab3, tab4];
-    // Disabled tabs:
-    actionMenu.aimThreadRestoredTabs = [tab1, tab3];
+    // Select 2 tabs to reach the limit of 2, so that unselected tabs (2 & 4) are disabled.
+    actionMenu.disabledTabIds = new Map([[1, 'uuid1'], [3, 'uuid3']]);
     actionMenu.inputState = new MockInputState({
                               allowedInputTypes: [InputType.kBrowserTab],
                             }) as any;
@@ -1221,35 +1222,35 @@ suite('ContextualActionMenu', () => {
     const buttons = Array.from(
         flyout.querySelectorAll<HTMLButtonElement>('button.dropdown-item'));
     assertEquals(4, buttons.length);
-    assertTrue(buttons[0]!.disabled);   // tab1
-    assertFalse(buttons[1]!.disabled);  // tab2
-    assertTrue(buttons[2]!.disabled);   // tab3
-    assertFalse(buttons[3]!.disabled);  // tab4
+    assertFalse(buttons[0]!.disabled);  // tab1 (selected) -> enabled
+    assertTrue(buttons[1]!.disabled);   // tab2 (unselected) -> disabled due to limit
+    assertFalse(buttons[2]!.disabled);  // tab3 (selected) -> enabled
+    assertTrue(buttons[3]!.disabled);   // tab4 (unselected) -> disabled due to limit
 
-    const secondItem = buttons[1]!;
-    const fourthItem = buttons[3]!;
+    const firstItem = buttons[0]!;
+    const thirdItem = buttons[2]!;
 
-    // Focus the first enabled item (tab2).
-    secondItem.focus();
-    assertEquals(secondItem, actionMenu.shadowRoot.activeElement);
+    // Focus the first enabled item (tab1).
+    firstItem.focus();
+    assertEquals(firstItem, actionMenu.shadowRoot.activeElement);
 
-    // Press ArrowDown to navigate to the next enabled item (tab4), skipping
-    // tab3.
-    triggerKeyDown(secondItem, 'ArrowDown');
+    // Press ArrowDown to navigate to the next enabled item (tab3), skipping
+    // tab2.
+    triggerKeyDown(firstItem, 'ArrowDown');
     await actionMenu.updateComplete;
-    assertEquals(fourthItem, actionMenu.shadowRoot.activeElement);
+    assertEquals(thirdItem, actionMenu.shadowRoot.activeElement);
 
-    // Press ArrowDown to navigate/cycle back to the first enabled item (tab2),
-    // skipping tab1.
-    triggerKeyDown(fourthItem, 'ArrowDown');
+    // Press ArrowDown to navigate/cycle back to the first enabled item (tab1),
+    // skipping tab4.
+    triggerKeyDown(thirdItem, 'ArrowDown');
     await actionMenu.updateComplete;
-    assertEquals(secondItem, actionMenu.shadowRoot.activeElement);
+    assertEquals(firstItem, actionMenu.shadowRoot.activeElement);
 
-    // Press ArrowUp to navigate/cycle back to the last enabled item (tab4),
-    // skipping tab1.
-    triggerKeyDown(secondItem, 'ArrowUp');
+    // Press ArrowUp to navigate/cycle back to the last enabled item (tab3),
+    // skipping tab4.
+    triggerKeyDown(firstItem, 'ArrowUp');
     await actionMenu.updateComplete;
-    assertEquals(fourthItem, actionMenu.shadowRoot.activeElement);
+    assertEquals(thirdItem, actionMenu.shadowRoot.activeElement);
   });
 
   test('focuses Share Tabs when opening the + menu via keydown', async () => {

@@ -102,6 +102,7 @@ export class ContextualActionMenuElement extends
   static override get properties() {
     return {
       fileNum: {type: Number},
+      nonTabFileNum: {type: Number},
       disabledTabIds: {type: Object},
       aimThreadRestoredTabs: {type: Array},
       tabSuggestions: {type: Array},
@@ -132,6 +133,7 @@ export class ContextualActionMenuElement extends
 
   accessor recentTabId: number|null = null;
   accessor fileNum: number = 0;
+  accessor nonTabFileNum: number = 0;
   accessor disabledTabIds: Map<number, UnguessableToken> = new Map();
   accessor aimThreadRestoredTabs: TabInfo[] = [];
   accessor tabSuggestions: TabInfo[] = [];
@@ -472,13 +474,10 @@ export class ContextualActionMenuElement extends
   }
 
   protected isTabSelected_(tabOrId: TabInfo|number): boolean {
-    if (typeof tabOrId === 'number') {
-      return this.disabledTabIds.has(tabOrId);
-    }
-    const tab = tabOrId;
-    const isAimThreadRestored =
-        (this.aimThreadRestoredTabs || []).includes(tab);
-    return this.disabledTabIds.has(tab.tabId) || isAimThreadRestored;
+    const tabId = typeof tabOrId === 'number' ? tabOrId : tabOrId.tabId;
+    const isAimThreadRestored = (this.aimThreadRestoredTabs || []).some(
+        restoredTab => restoredTab.tabId === tabId);
+    return this.disabledTabIds.has(tabId) || isAimThreadRestored;
   }
 
   protected getToolLabel_(tool: ToolMode): string {
@@ -582,16 +581,29 @@ export class ContextualActionMenuElement extends
 
   // Checks if a tab item in the context menu should be disabled.
   protected isTabDisabled_(tab: TabInfo): boolean {
-    const noNewContextAllowed =
-        this.isInputTypeDisabled_(InputType.kBrowserTab);
-    const isTabInContext = this.isTabSelected_(tab.tabId);
-    if ((this.aimThreadRestoredTabs || []).includes(tab)) {
+    const isTabCurrentlySelected = this.isTabSelected_(tab.tabId);
+
+    // Selected tabs (both newly selected and restored) must remain enabled for deselection.
+    if (isTabCurrentlySelected) {
+      return false;
+    }
+
+    if (this.isInputTypeDisabled_(InputType.kBrowserTab)) {
       return true;
     }
+
     if (this.enableMultiTabSelection_) {
-      return noNewContextAllowed && !isTabInContext;
+      let maxTotal = this.maxFileCount_;
+      if (this.inputState && this.inputState.maxTotalInputs > 0) {
+        maxTotal = this.inputState.maxTotalInputs;
+      }
+      const totalSelected = this.nonTabFileNum + this.disabledTabIds.size +
+          (this.aimThreadRestoredTabs || []).length;
+      const limitReached = totalSelected >= maxTotal;
+      // Disable unselected tabs only when the total selected count reaches the limit.
+      return limitReached;
     }
-    return noNewContextAllowed || isTabInContext;
+    return false; // Default: Do not disable tabs if not in the multi-select limit scenario.
   }
 
   protected getSelectedTabs_(): TabInfo[] {

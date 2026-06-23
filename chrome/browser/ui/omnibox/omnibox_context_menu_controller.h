@@ -192,7 +192,7 @@ class OmniboxContextMenuController : public ui::SimpleMenuModel::Delegate {
   // Adds a title with a localized string to the menu.
   void AddTitleWithStringId(int localization_id);
   // Gets the most recent tabs.
-  std::vector<OmniboxContextMenuController::TabInfo> GetRecentTabs();
+  std::vector<OmniboxContextMenuController::TabInfo> GetRecentTabs() const;
   // Adds the tabs favicon to the menu.
   void AddTabFavicon(int command_id,
                      const GURL& url,
@@ -259,6 +259,9 @@ class OmniboxContextMenuController : public ui::SimpleMenuModel::Delegate {
 
   std::map<omnibox::ModelMode, MenuItemInfo> model_info_;
   std::map<int, omnibox::ModelMode> model_for_command_id_;
+
+  mutable std::optional<std::vector<OmniboxContextMenuController::TabInfo>>
+      cached_recent_tabs_;
 
   base::WeakPtrFactory<OmniboxContextMenuController> weak_ptr_factory_{this};
 };

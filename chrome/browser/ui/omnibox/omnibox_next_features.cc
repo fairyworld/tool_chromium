@@ -314,7 +314,7 @@ const base::FeatureParam<std::string>
 const base::FeatureParam<bool> kContextMenuEnableMultiTabSelection(
     &internal::kWebUIOmniboxAimPopup,
     "Omnibox_ContextMenuEnableMultiTabSelection",
-    false);
+    true);
 const base::FeatureParam<int> kContextMenuMaxTabSuggestions(
     &internal::kWebUIOmniboxAimPopup,
     "Omnibox_ContextMenuMaxTabSuggestions",
