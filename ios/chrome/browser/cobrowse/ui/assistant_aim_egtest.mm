@@ -729,6 +729,10 @@ id<GREYMatcher> CloseButton() {
 
 // Tests that Co-browse Assistant is hidden when toolbars are hidden.
 - (void)testCobrowseHidesWhenToolbarsHide {
+  // TODO(crbug.com/526935460): Fix this test for ChromeNext.
+  if ([ChromeEarlGrey isChromeNextEnabled]) {
+    EARL_GREY_TEST_SKIPPED(@"Skipped when chromeNext is enabled.");
+  }
   if ([ComposeboxAppInterface isServerSideStateEnabled]) {
     EARL_GREY_TEST_SKIPPED(
         @"Skipped when kComposeboxServerSideState is enabled.");
