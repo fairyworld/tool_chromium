@@ -38,6 +38,7 @@
 #include "chrome/browser/ui/accelerator_table.h"
 #include "chrome/browser/ui/omnibox/ai_mode_button_service_factory.h"
 #include "chrome/browser/ui/web_applications/web_app_launch_utils.h"
+#include "chrome/common/webui_url_constants.h"
 #include "components/omnibox/browser/ai_mode_button_config.h"
 #include "components/omnibox/browser/ai_mode_button_service.h"
 #if BUILDFLAG(IS_MAC)
@@ -2597,6 +2598,40 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               },
               bwi))
           .SetActionId(kActionToggleRequestTabletSite)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::MoveCurrentTabToReadLater(bwi);
+              },
+              bwi))
+          .SetActionId(kActionReadingListMenuAddTab)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowSettingsSubPage(bwi, chrome::kPeopleSubPage);
+              },
+              bwi))
+          .SetActionId(kActionRecentTabsLoginForDeviceTabs)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowHistorySubPage(bwi,
+                                           chrome::kChromeUIHistorySyncedTabs);
+              },
+              bwi))
+          .SetActionId(kActionRecentTabsSeeDeviceTabs)
           .Build());
 }
 
