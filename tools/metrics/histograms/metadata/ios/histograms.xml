@@ -3117,7 +3117,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="IOS.GoogleOne.Outcome.{EntryPoint}" enum="GoogleOneOutcome"
-    expires_after="2026-05-24">
+    expires_after="2027-06-23">
   <owner>olivierrobin@chromium.org</owner>
   <owner>qpubert@chromium.org</owner>
   <summary>
