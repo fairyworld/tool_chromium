@@ -300,9 +300,9 @@ TEST_F(ActorOneTimeTokenFillingServiceImplTest, FillOtp_FieldNotInCache) {
   EXPECT_FALSE(future.Get());
 }
 
-// Tests that `FillOtp` fails gracefully when the form does not contain any
-// valid OTP fields, resulting in empty fill data.
-TEST_F(ActorOneTimeTokenFillingServiceImplTest, FillOtp_EmptyFillData) {
+// Tests that `FillOtp` succeeds by falling back to filling the trigger field
+// even when the form does not contain any classified OTP fields.
+TEST_F(ActorOneTimeTokenFillingServiceImplTest, FillOtp_NoOtpFieldsInForm) {
   FormData form = SeeForm({.fields = {{.server_type = NAME_FIRST}}});
   FieldGlobalId field_id = form.fields()[0].global_id();
 
@@ -310,7 +310,7 @@ TEST_F(ActorOneTimeTokenFillingServiceImplTest, FillOtp_EmptyFillData) {
   service().FillOtp(tab().GetHandle(), {field_id}, "123456",
                     future.GetCallback());
 
-  EXPECT_FALSE(future.Get());
+  EXPECT_TRUE(future.Get());
 }
 
 }  // namespace

@@ -1026,10 +1026,16 @@ void AddressSuggestionGenerator::GenerateSuggestions(
       if (const DenseSet<FieldFillingSkipReason>* field_skip_reasons =
               base::FindOrNull(skip_reasons,
                                form_structure->field(i)->global_id());
-          !field_skip_reasons || field_skip_reasons->empty()) {
-        field_types.insert(form_structure->field(i)->Type().GetAddressType());
+          field_skip_reasons && !field_skip_reasons->empty()) {
+        continue;
+      }
+      if (FieldType address_type =
+              form_structure->field(i)->Type().GetAddressType();
+          address_type != UNKNOWN_TYPE) {
+        field_types.insert(address_type);
       }
     }
+
     return field_types;
   }();
 
