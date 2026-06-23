@@ -23,6 +23,7 @@
 #include "content/public/test/browser_test.h"
 #include "extensions/common/switches.h"
 #include "ui/base/interaction/element_tracker.h"
+#include "ui/views/controls/button/label_button.h"
 
 namespace dictation {
 
@@ -124,11 +125,45 @@ class DictationSessionUiImplBrowserTest : public InteractiveBrowserTest {
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
-IN_PROC_BROWSER_TEST_F(DictationSessionUiImplBrowserTest, StartSessionShowsUI) {
+IN_PROC_BROWSER_TEST_F(DictationSessionUiImplBrowserTest,
+                       SessionStateUpdatesToggleButton) {
   // clang-format off
   RunTestSequence(
     StartSession(),
-    WaitForShow(DictationBubbleUi::kViewElementIdForTesting)
+    WaitForShow(DictationBubbleUi::kViewElementIdForTesting),
+
+    // kStreamInitializing.
+    CheckResult(GetSessionState(), SessionState::kStreamInitializing),
+    CheckViewProperty(DictationBubbleUi::kToggleButtonElementIdForTesting,
+                      &views::LabelButton::GetText, u"Done"),
+    CheckViewProperty(DictationBubbleUi::kToggleButtonElementIdForTesting,
+                      &views::View::GetEnabled, true),
+
+    // kTranscribing.
+    ExtensionAPISetStreamState(ExtensionStreamState::kTranscribing),
+    CheckResult(GetSessionState(), SessionState::kTranscribing),
+    CheckViewProperty(DictationBubbleUi::kToggleButtonElementIdForTesting,
+                      &views::LabelButton::GetText, u"Done"),
+    CheckViewProperty(DictationBubbleUi::kToggleButtonElementIdForTesting,
+                      &views::View::GetEnabled, true),
+
+    // kFinalizing.
+    Do([this]{
+      dictation_service().session_controller()->EndDictationStream();
+    }),
+    CheckResult(GetSessionState(), SessionState::kFinalizing),
+    CheckViewProperty(DictationBubbleUi::kToggleButtonElementIdForTesting,
+                      &views::LabelButton::GetText, u"Done"),
+    CheckViewProperty(DictationBubbleUi::kToggleButtonElementIdForTesting,
+                      &views::View::GetEnabled, false),
+
+    // kInactive
+    ExtensionAPISetStreamState(ExtensionStreamState::kComplete),
+    CheckResult(GetSessionState(), SessionState::kInactive),
+    CheckViewProperty(DictationBubbleUi::kToggleButtonElementIdForTesting,
+                      &views::LabelButton::GetText, u"Start"),
+    CheckViewProperty(DictationBubbleUi::kToggleButtonElementIdForTesting,
+                      &views::View::GetEnabled, true)
   );
   // clang-format on
 }
@@ -153,7 +188,7 @@ IN_PROC_BROWSER_TEST_F(DictationSessionUiImplBrowserTest,
     ExtensionAPISetStreamState(ExtensionStreamState::kTranscribing),
     CheckResult(GetSessionState(), SessionState::kTranscribing),
 
-    PressButton(DictationBubbleUi::kDoneButtonElementIdForTesting),
+    PressButton(DictationBubbleUi::kToggleButtonElementIdForTesting),
 
     // TODO(b/525943882): Currently the controller immediately disposes of the
     // stream but it should really be going into a finalization state. Update
