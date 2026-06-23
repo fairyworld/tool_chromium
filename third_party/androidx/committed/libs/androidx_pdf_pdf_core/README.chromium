@@ -1,6 +1,6 @@
-Name: androidx.pdf:pdf-viewer
-Short Name: pdf-viewer
-URL: https://androidx.dev/snapshots/builds/15689363/artifacts/repository/androidx/pdf/pdf-viewer/1.0.0-SNAPSHOT/pdf-viewer-1.0.0-20260621.031145-1.aar
+Name: androidx.pdf:pdf-core
+Short Name: pdf-core
+URL: https://androidx.dev/snapshots/builds/15689363/artifacts/repository/androidx/pdf/pdf-core/1.0.0-SNAPSHOT/pdf-core-1.0.0-20260621.031145-1.aar
 Version: 1.0.0-SNAPSHOT
 Update Mechanism: Autoroll
 License: Apache-2.0
@@ -11,7 +11,7 @@ Shipped: yes
 License Android Compatible: yes
 
 Description:
-add pdf viewing to their apps.
+Provides the core abstractions and foundational logic for AndroidX PDF.
 
 See also: https://developer.android.com/jetpack/androidx/releases/pdf#1.0.0-SNAPSHOT
 

@@ -91,6 +91,7 @@ dependencies {
     compileLatest 'androidx.navigation:navigation-runtime:+'
     compileLatest 'androidx.paging:paging-compose:+'
     compileLatest 'androidx.paging:paging-runtime:+'
+    compileLatest 'androidx.pdf:pdf-core:+'
     compileLatest 'androidx.pdf:pdf-document-service:+'
     compileLatest 'androidx.pdf:pdf-ink:+'
     compileLatest 'androidx.pdf:pdf-viewer:+'
