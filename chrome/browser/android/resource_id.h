@@ -29,7 +29,7 @@
 LINK_RESOURCE_ID(0, 0)
 
 // InfoBar resources.
-LINK_RESOURCE_ID(IDR_INFOBAR_AUTOFILL_CC, R.drawable.infobar_autofill_cc)
+LINK_RESOURCE_ID(IDR_INFOBAR_AUTOFILL_CC, R.drawable.ic_autofill_cc)
 
 // Android only infobars.
 DECLARE_RESOURCE_ID(IDR_ANDROID_INFOBAR_LITE_MODE, R.drawable.preview_pin_round)
