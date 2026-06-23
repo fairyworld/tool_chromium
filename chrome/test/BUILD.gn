@@ -3686,8 +3686,6 @@ if (!is_android) {
 
     msan_options = sanitizer_options
     libfuzzer_options = [
-      "rss_limit_mb=8192",
-
       # We can't allow libfuzzer to fork because these fuzzers may have
       # pre-existing threads. See crbug.com/325928325
       "fork=0",
@@ -3713,8 +3711,6 @@ if (!is_android) {
       # For testing. Those fuzzers are extremely slow on ClusterFuzz, and
       # using this option doesn't help.
       "fork_server=0",
-
-      "rss_limit_mb=8192",
 
       # This value is the one used by CF for Centipede fuzzers.
       # Default computed timeout per batch is ridiculously low (1127, which

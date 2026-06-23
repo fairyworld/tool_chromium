@@ -1338,9 +1338,6 @@ if (enable_extensions) {
       "//third_party/abseil-cpp:absl",
       "//url",
     ]
-
-    # The fuzzed code needs more RAM that the default limit.
-    libfuzzer_options = [ "rss_limit_mb=4096" ]
   }
 }
 
