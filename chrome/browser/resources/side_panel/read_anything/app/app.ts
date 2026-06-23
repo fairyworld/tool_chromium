@@ -32,6 +32,7 @@ import {VoiceLanguageController} from '../read_aloud/voice_language_controller.j
 import type {VoiceLanguageListener} from '../read_aloud/voice_language_controller.js';
 import {VoiceNotificationManager} from '../read_aloud/voice_notification_manager.js';
 import {getWordCount, isDistilledByReadability, minOverflowLengthToScroll} from '../shared/common.js';
+import {isPlayPauseShortcut} from '../shared/keyboard_util.js';
 import {ReadAnythingLogger, TimeFrom} from '../shared/read_anything_logger.js';
 
 import {getCss} from './app.css.js';
@@ -798,12 +799,13 @@ export class AppElement extends AppElementBase implements SpeechListener,
   }
 
   protected onKeyDown_(e: KeyboardEvent) {
-    if (e.key === 'k') {
+    if (isPlayPauseShortcut(e)) {
       e.stopPropagation();
       e.preventDefault();
       this.speechController_.onPlayPauseKeyPress(this.$.container);
-    } else if (this.lineFocusController_.onKeyDown(
-                   e, this.$.container, this.$.appFlexParent.offsetHeight)) {
+    } else if (
+        this.lineFocusController_.onKeyDown(
+            e, this.$.container, this.$.appFlexParent.offsetHeight)) {
       e.stopPropagation();
       e.preventDefault();
     }

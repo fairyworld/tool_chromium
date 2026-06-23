@@ -190,13 +190,44 @@ suite('AppContent', () => {
     chrome.readingMode.isLineFocusEnabled = true;
     assertFalse(lineFocusController.isEnabled());
 
+    // 'l' toggle
     keyDownOn(app, 0, undefined, 'l');
     await microtasksFinished();
     assertTrue(lineFocusController.isEnabled());
 
-    keyDownOn(app, 0, undefined, 'l');
+    // 'L' toggle
+    keyDownOn(app, 0, undefined, 'L');
     await microtasksFinished();
     assertFalse(lineFocusController.isEnabled());
+
+    // Modifier check: Ctrl+l should not toggle
+    keyDownOn(app, 0, ['ctrl'], 'l');
+    await microtasksFinished();
+    assertFalse(lineFocusController.isEnabled());
+  });
+
+  test('read aloud shortcut toggles playback', async () => {
+    let playPauseCalled = false;
+    speechController.onPlayPauseKeyPress = () => {
+      playPauseCalled = true;
+    };
+
+    // 'k' press
+    keyDownOn(app, 0, undefined, 'k');
+    await microtasksFinished();
+    assertTrue(playPauseCalled);
+
+    // 'K' press
+    playPauseCalled = false;
+    keyDownOn(app, 0, undefined, 'K');
+    await microtasksFinished();
+    assertTrue(playPauseCalled);
+
+    // Modifier check: Alt+k should not toggle
+    playPauseCalled = false;
+    keyDownOn(app, 0, ['alt'], 'k');
+    await microtasksFinished();
+    assertFalse(playPauseCalled);
   });
 
   test('line focus shortcut updates padding', async () => {
