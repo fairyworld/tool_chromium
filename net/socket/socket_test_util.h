@@ -457,6 +457,17 @@ class SocketDataProvider {
   void set_silently_closed() { silently_closed_ = true; }
   bool silently_closed() const { return silently_closed_; }
 
+  // Makes GetPeerAddress() fail with ERR_SOCKET_NOT_CONNECTED for any socket
+  // using `this`. Useful for simulating "zombie" sockets that are technically
+  // still pooled/connected but fail when queried for their address (e.g.
+  // simulating a socket that is in a semi-broken state).
+  void set_force_get_peer_address_failure(bool force) {
+    force_get_peer_address_failure_ = force;
+  }
+  bool force_get_peer_address_failure() const {
+    return force_get_peer_address_failure_;
+  }
+
  private:
   // Called to inform subclasses of initialization.
   virtual void Reset() = 0;
@@ -470,6 +481,8 @@ class SocketDataProvider {
   bool no_delay_ = true;
 
   bool silently_closed_ = false;
+
+  bool force_get_peer_address_failure_ = false;
 
   KeepAliveState keep_alive_state_ = KeepAliveState::kDefault;
   int keep_alive_delay_ = 0;

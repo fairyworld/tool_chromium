@@ -1272,8 +1272,13 @@ bool MockTCPClientSocket::IsConnectedAndIdle() const {
 }
 
 int MockTCPClientSocket::GetPeerAddress(IPEndPoint* address) const {
-  if (addresses_.empty())
+  if (data_ && data_->force_get_peer_address_failure()) {
+    return ERR_SOCKET_NOT_CONNECTED;
+  }
+
+  if (addresses_.empty()) {
     return MockClientSocket::GetPeerAddress(address);
+  }
 
   if (data_->connect_data().first_attempt_fails) {
     DCHECK_GE(addresses_.size(), 2U);
@@ -1764,6 +1769,10 @@ void MockUDPClientSocket::Close() {
 }
 
 int MockUDPClientSocket::GetPeerAddress(IPEndPoint* address) const {
+  if (data_ && data_->force_get_peer_address_failure()) {
+    return ERR_SOCKET_NOT_CONNECTED;
+  }
+
   if (!data_)
     return ERR_UNEXPECTED;
 
