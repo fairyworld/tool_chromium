@@ -32,6 +32,8 @@
 #import "ios/chrome/browser/shared/coordinator/scene/state/layout_state.h"
 #import "ios/chrome/browser/shared/model/application_context/application_context.h"
 #import "ios/chrome/browser/shared/model/browser/browser.h"
+#import "ios/chrome/browser/shared/model/browser/browser_provider.h"
+#import "ios/chrome/browser/shared/model/browser/browser_provider_interface.h"
 #import "ios/chrome/browser/shared/model/profile/profile_ios.h"
 #import "ios/chrome/browser/shared/model/url/url_util.h"
 #import "ios/chrome/browser/shared/model/web_state_list/web_state_list.h"
@@ -124,6 +126,8 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
 @implementation MainToolbarCoordinator {
   // The mediator for this coordinator.
   MainToolbarMediator* _mainToolbarMediator;
+  // The layout state for the scene.
+  __weak LayoutState* _layoutState;
   /// Type of toolbar containing the omnibox. Unlike
   /// `_steadyStateOmniboxPosition`, this tracks the omnibox position at all
   /// time.
@@ -189,7 +193,7 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
   _omniboxPosition = ToolbarType::kPrimary;
 
   Browser* browser = self.browser;
-  LayoutState* layoutState = browser->GetSceneState().layoutState;
+  _layoutState = browser->GetSceneState().layoutState;
   [browser->GetCommandDispatcher()
       startDispatchingToTarget:self
                    forProtocol:@protocol(FakeboxFocuser)];
@@ -214,13 +218,13 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
 
   _mainToolbarMediator = [[MainToolbarMediator alloc]
       initWithPrefService:GetApplicationContext()->GetLocalState()
-              layoutState:layoutState];
+              layoutState:_layoutState];
   [browser->GetCommandDispatcher()
       startDispatchingToTarget:self
                    forProtocol:@protocol(ReaderModeChipCommands)];
   BOOL isToolbarAtBottom = [self isToolbarPositionBottom];
 
-  [layoutState addObserver:self];
+  [_layoutState addObserver:self];
 
   if (IsChromeNextIaEnabled()) {
     _topLocationBarCoordinator =
@@ -288,7 +292,7 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
           startDispatchingToTarget:self
                        forProtocol:@protocol(PageActionMenuEntryPointCommands)];
     }
-    [self updateLayoutForToolbarPosition:layoutState.toolbarPosition];
+    [self updateLayoutForToolbarPosition:_layoutState.toolbarPosition];
     self.started = YES;
     return;
   }
@@ -324,7 +328,7 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
   // Force the initial layout setup to ensure the view hierarchy is constructed
   // and the location bar view is loaded before setting up the command
   // dispatchers.
-  [self updateLayoutForToolbarPosition:layoutState.toolbarPosition];
+  [self updateLayoutForToolbarPosition:_layoutState.toolbarPosition];
 
   if (IsPageActionMenuEnabled()) {
     [self.locationBarCoordinator setPageActionMenuEntryPointDispatcher];
@@ -382,7 +386,7 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
   [_mainToolbarMediator disconnect];
   _mainToolbarMediator = nil;
 
-  [self.browser->GetSceneState().layoutState removeObserver:self];
+  [_layoutState removeObserver:self];
   [self.browser->GetCommandDispatcher() stopDispatchingToTarget:self];
   self.started = NO;
 }
@@ -1063,6 +1067,15 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
   if (IsChromeNextIaEnabled()) {
     return;
   }
+
+  // Only the visible coordinator (normal vs. incognito) is allowed to update
+  // the shared LayoutState.
+  if (self.browser !=
+      self.browser->GetSceneState()
+          .browserProviderInterface.currentBrowserProvider.browser) {
+    return;
+  }
+
   ToolbarPosition position = (toolbarType == ToolbarType::kSecondary)
                                  ? ToolbarPosition::kBottom
                                  : ToolbarPosition::kTop;
@@ -1078,8 +1091,7 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
 
 - (CGFloat)keyboardAttachedBottomOmniboxHeight {
   if (IsChromeNextIaEnabled()) {
-    if (self.browser->GetSceneState().layoutState.appBarPosition ==
-        AppBarPosition::kBottom) {
+    if (_layoutState.appBarPosition == AppBarPosition::kBottom) {
       return kKeyboardAttachedOmniboxBottomPadding;
     } else {
       return kKeyboardAttachedOmniboxBottomPaddingLandscape;
@@ -1234,7 +1246,7 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
                                          topPosition:topPosition];
   toolbarViewController.layoutGuideCenter =
       LayoutGuideCenterForBrowser(browser);
-  toolbarViewController.layoutState = browser->GetSceneState().layoutState;
+  toolbarViewController.layoutState = _layoutState;
   toolbarViewController.buttonFactory =
       [[ToolbarButtonFactory alloc] initWithIncognito:incognito];
   toolbarViewController.mutator = mediator;
@@ -1325,10 +1337,10 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
   return toolbarMediator;
 }
 
-// Returns the current position of the toolbar.
+// Returns whether the toolbar position is currently at the bottom of the
+// screen.
 - (BOOL)isToolbarPositionBottom {
-  return IsBottomOmniboxAvailable() &&
-         [_mainToolbarMediator isOmniboxInBottomPosition];
+  return _layoutState.toolbarPosition == ToolbarPosition::kBottom;
 }
 
 // Returns whether `point` in window coordinates is inside the frame of
@@ -1347,7 +1359,7 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
 // Updates the LayoutState's toolbarPosition property.
 - (void)updateLayoutStateToolbarPosition:(ToolbarPosition)position {
   CHECK(!IsChromeNextIaEnabled());
-  self.browser->GetSceneState().layoutState.toolbarPosition = position;
+  _layoutState.toolbarPosition = position;
 }
 
 // Updates the visual layout and child coordinators to match the given position.

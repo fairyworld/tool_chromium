@@ -10,6 +10,7 @@
 #import "ios/chrome/browser/shared/coordinator/scene/state/layout_state.h"
 #import "ios/chrome/browser/shared/model/prefs/pref_backed_boolean.h"
 #import "ios/chrome/browser/shared/model/utils/observable_boolean.h"
+#import "ios/chrome/browser/shared/public/features/features.h"
 #import "ios/chrome/browser/shared/ui/util/uikit_ui_util.h"
 
 namespace {
@@ -77,10 +78,12 @@ void LogOmniboxPosition(PrefService* local_state) {
     // Log the initial startup metrics.
     LogOmniboxPosition(prefService);
 
-    // Set the initial toolbar position.
-    _layoutState.toolbarPosition = [self isOmniboxInBottomPosition]
-                                       ? ToolbarPosition::kBottom
-                                       : ToolbarPosition::kTop;
+    if (IsChromeNextIaEnabled()) {
+      // Set the initial toolbar position.
+      _layoutState.toolbarPosition = [self isBottomOmniboxPrefEnabled]
+                                         ? ToolbarPosition::kBottom
+                                         : ToolbarPosition::kTop;
+    }
   }
   return self;
 }
@@ -90,18 +93,23 @@ void LogOmniboxPosition(PrefService* local_state) {
   _bottomOmniboxPref = nil;
 }
 
-- (BOOL)isOmniboxInBottomPosition {
-  return IsBottomOmniboxAvailable() && _bottomOmniboxPref.value;
-}
-
 #pragma mark - BooleanObserver
 
 - (void)booleanDidChange:(id<ObservableBoolean>)observableBoolean {
   if (observableBoolean == _bottomOmniboxPref) {
-    _layoutState.toolbarPosition = [self isOmniboxInBottomPosition]
-                                       ? ToolbarPosition::kBottom
-                                       : ToolbarPosition::kTop;
+    if (IsChromeNextIaEnabled()) {
+      _layoutState.toolbarPosition = [self isBottomOmniboxPrefEnabled]
+                                         ? ToolbarPosition::kBottom
+                                         : ToolbarPosition::kTop;
+    }
   }
+}
+
+#pragma mark - Private
+
+// Returns whether the bottom omnibox preference is enabled.
+- (BOOL)isBottomOmniboxPrefEnabled {
+  return IsBottomOmniboxAvailable() && _bottomOmniboxPref.value;
 }
 
 @end
