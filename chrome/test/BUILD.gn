@@ -4681,7 +4681,6 @@ if (!is_android) {
         "../browser/media/webrtc/multi_capture/multi_capture_usage_indicator_service_browsertest.cc",
         "../browser/media_galleries/media_galleries_dialog_controller_mock.cc",
         "../browser/media_galleries/media_galleries_dialog_controller_mock.h",
-        "../browser/metrics/chrome_metrics_services_manager_client_browsertest.cc",
         "../browser/metrics/chromeos_family_link_user_metrics_provider_browsertest.cc",
         "../browser/metrics/chromeos_metrics_provider_browsertest.cc",
         "../browser/metrics/class_management_enabled_metrics_provider_browsertest.cc",
