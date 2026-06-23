@@ -34,6 +34,7 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "ui/base/metadata/metadata_impl_macros.h"
 #include "ui/base/mojom/dialog_button.mojom.h"
+#include "ui/views/widget/widget.h"
 #include "ui/views/window/dialog_client_view.h"
 
 namespace {
@@ -87,18 +88,23 @@ PermissionPromptBaseView::PermissionPromptBaseView(
                                views::BubbleBorder::DIALOG_SHADOW,
                                /*autosize=*/true),
       WebContentsObserver(web_contents),
-      url_identity_(GetUrlIdentity(web_contents, *delegate)),
-      record_browser_always_active_value_(GetBrowser() &&
-                                          GetBrowser()->IsActive()) {
+      url_identity_(GetUrlIdentity(web_contents, *delegate)) {
+  auto* host_widget =
+      views::Widget::GetWidgetForNativeWindow(GetNativeWindow());
+  record_host_always_active_value_ =
+      host_widget && host_widget->ShouldPaintAsActive();
+
   // To prevent permissions being accepted accidentally, and as a security
   // measure against crbug.com/40084558, permission prompts should not be
   // accepted as the default action.
   SetDefaultButton(static_cast<int>(ui::mojom::DialogButton::kNone));
-  // `browser` can be null in tests.
-  if (BrowserWindowInterface* browser_window_interface = GetBrowser()) {
-    browser_subscription_ = browser_window_interface->RegisterDidBecomeActive(
-        base::BindRepeating(&PermissionPromptBaseView::DidBecomeInactive,
-                            base::Unretained(this)));
+
+  // The host widget can be null in tests
+  if (host_widget) {
+    host_paint_as_active_subscription_ =
+        host_widget->RegisterPaintAsActiveChangedCallback(base::BindRepeating(
+            &PermissionPromptBaseView::HostPaintAsActiveChanged,
+            base::Unretained(this)));
   }
   request_type_ =
       permissions::PermissionUtil::GetUmaValueForRequests(delegate->Requests());
@@ -109,7 +115,7 @@ PermissionPromptBaseView::~PermissionPromptBaseView() {
   if (request_type_ != permissions::RequestTypeForUma::UNKNOWN) {
     permissions::PermissionUmaUtil::RecordBrowserAlwaysActiveWhilePrompting(
         request_type_, /*embedded_permission_element_initiated*/ false,
-        record_browser_always_active_value_);
+        record_host_always_active_value_);
   }
 }
 
@@ -123,7 +129,7 @@ void PermissionPromptBaseView::AddedToWidget() {
 
   permissions::PermissionUmaUtil::RecordPromptShownInActiveBrowser(
       request_type_, /*embedded_permission_element_initiated*/ false,
-      record_browser_always_active_value_);
+      record_host_always_active_value_);
   StartTrackingPictureInPictureOcclusion();
 }
 
@@ -294,9 +300,12 @@ void PermissionPromptBaseView::SetTitleBoldedRanges(
   title_bolded_ranges_ = bolded_ranges;
 }
 
-void PermissionPromptBaseView::DidBecomeInactive(
-    BrowserWindowInterface* browser_window_interface) {
-  record_browser_always_active_value_ = false;
+void PermissionPromptBaseView::HostPaintAsActiveChanged() {
+  auto* host_widget =
+      views::Widget::GetWidgetForNativeWindow(GetNativeWindow());
+  if (!host_widget || !host_widget->ShouldPaintAsActive()) {
+    record_host_always_active_value_ = false;
+  }
 }
 
 bool PermissionPromptBaseView::IsForPictureInPictureWindow() const {

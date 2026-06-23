@@ -264,7 +264,7 @@ void PermissionPromptBubbleBaseView::ClosingPermission() {
 
   if (delegate_) {
     permissions::PermissionUmaUtil::RecordActionBrowserAlwaysActive(
-        request_type(), "Dismissed", record_browser_always_active_value());
+        request_type(), "Dismissed", record_host_always_active_value());
     delegate_->Dismiss(/*prompt_options=*/std::monostate());
   }
 }
@@ -273,7 +273,7 @@ void PermissionPromptBubbleBaseView::RunButtonCallback(int button_id) {
   PermissionDialogButton button = GetPermissionDialogButton(button_id);
   permissions::PermissionUmaUtil::RecordActionBrowserAlwaysActive(
       request_type(), GetPermissionActionString(button),
-      record_browser_always_active_value());
+      record_host_always_active_value());
   BrowserView* browser_view =
       BrowserView::GetBrowserViewForBrowser(GetBrowser());
 #if BUILDFLAG(IS_CHROMEOS)
