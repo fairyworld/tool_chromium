@@ -276,6 +276,9 @@ HEADLESS_PROTOCOL_TEST(VirtualTimeDisposeWhileRunning,
                        "emulation/virtual-time-dispose-while-running.js")
 HEADLESS_PROTOCOL_TEST(VirtualTimePausesDocumentLoading,
                        "emulation/virtual-time-pauses-document-loading.js")
+HEADLESS_PROTOCOL_TEST(
+    VirtualTimeCommitWhileResumingLoaders,
+    "emulation/virtual-time-commit-while-resuming-loaders.js")
 
 HEADLESS_PROTOCOL_TEST(PageBeforeUnload, "page/page-before-unload.js")
 
