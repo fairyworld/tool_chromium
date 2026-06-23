@@ -67,6 +67,7 @@
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
+#include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/browser/ui/commerce/commerce_ui_tab_helper.h"
 #include "chrome/browser/ui/customize_chrome/side_panel_controller.h"
 #include "chrome/browser/ui/intent_picker_tab_helper.h"
@@ -1945,6 +1946,52 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               },
               bwi))
           .SetActionId(kActionSaveIbanForPage)
+          .Build());
+
+  root_action_item_->AddChild(
+      ChromeMenuAction(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowPasswordManager(bwi);
+              },
+              bwi),
+          kActionShowPasswordManager, IDS_VIEW_PASSWORDS, IDS_VIEW_PASSWORDS,
+          features::IsRoundedIconsEnabled()
+              ? vector_icons::kPasswordManagerIcon
+              : vector_icons::kPasswordManagerOldIcon)
+          .SetEnabled(!profile->IsGuestSession())
+          .Build());
+
+  root_action_item_->AddChild(
+      ChromeMenuAction(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowPaymentMethods(bwi);
+              },
+              bwi),
+          kActionShowPaymentMethods, IDS_PAYMENT_METHOD_SUBMENU_OPTION,
+          IDS_PAYMENT_METHOD_SUBMENU_OPTION,
+          features::IsRoundedIconsEnabled() ? kCreditCardIcon
+                                            : kCreditCardChromeRefreshOldIcon)
+          .SetEnabled(!profile->IsGuestSession())
+          .Build());
+
+  root_action_item_->AddChild(
+      ChromeMenuAction(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowAddresses(bwi);
+              },
+              bwi),
+          kActionShowAddresses, IDS_ADDRESSES_AND_MORE_SUBMENU_OPTION,
+          IDS_ADDRESSES_AND_MORE_SUBMENU_OPTION,
+          features::IsRoundedIconsEnabled()
+              ? vector_icons::kLocationOnIcon
+              : vector_icons::kLocationOnChromeRefreshOldIcon)
+          .SetEnabled(!profile->IsGuestSession())
           .Build());
 }
 

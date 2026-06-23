@@ -45,12 +45,17 @@ should be able to be added at any place in this file.
   <variant name=".kActionQrCodeGenerator" summary="QR code generator action"/>
   <variant name=".kActionRouteMedia" summary="Media router action"/>
   <variant name=".kActionSendTabToSelf" summary="Send tab to self action"/>
+  <variant name=".kActionShowAddresses" summary="Show addresses action"/>
   <variant name=".kActionShowAddressesBubbleOrPage"
       summary="Show addresses action"/>
   <variant name=".kActionShowChromeLabs" summary="Show Chrome Labs action"/>
   <variant name=".kActionShowDownloads" summary="Show downloads action"/>
+  <variant name=".kActionShowPasswordManager"
+      summary="Show passwords bubble or page action"/>
   <variant name=".kActionShowPasswordsBubbleOrPage"
       summary="Show passwords bubble or page action"/>
+  <variant name=".kActionShowPaymentMethods"
+      summary="Show payments bubble or page action"/>
   <variant name=".kActionShowPaymentsBubbleOrPage"
       summary="Show payments bubble or page action"/>
   <variant name=".kActionShowTranslate" summary="Show translate action"/>
