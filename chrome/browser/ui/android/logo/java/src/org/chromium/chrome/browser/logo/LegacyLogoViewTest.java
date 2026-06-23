@@ -12,6 +12,8 @@ import android.animation.ObjectAnimator;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -52,6 +54,8 @@ public class LegacyLogoViewTest {
     private static final String LOGO_URL = "https://www.google.com";
     private static final String ANIMATED_LOGO_URL =
             "https://www.gstatic.com/chrome/ntp/doodle_test/ddljson_android4.json";
+    private static final String DARK_ANIMATED_LOGO_URL =
+            "https://www.gstatic.com/chrome/ntp/doodle_test/ddljson_android4_dark.json";
     private static final String ALT_TEXT = "Hello World!";
 
     private LegacyLogoView mView;
@@ -281,5 +285,69 @@ public class LegacyLogoViewTest {
         MarginLayoutParams params = (MarginLayoutParams) mView.getLayoutParams();
         mView.setLogoHeight(200);
         Assert.assertEquals(200, params.height);
+    }
+
+    @Test
+    public void testLogoView_DarkMode_WithDarkAsset() {
+        Bitmap darkBitmap = Bitmap.createBitmap(2, 2, Config.ARGB_8888);
+        Logo logo =
+                new Logo(
+                        mBitmap, darkBitmap, null, null, ANIMATED_LOGO_URL, DARK_ANIMATED_LOGO_URL);
+
+        // Test Light Mode
+        mView.setNightMode(false);
+        mView.updateLogo(logo);
+        mView.endAnimationsForTesting();
+        Assert.assertEquals(
+                "Should render light logo in light mode",
+                mBitmap,
+                getLogoDrawableBitmapForTesting());
+        Assert.assertEquals(
+                "Should use light animated logo in light mode",
+                ANIMATED_LOGO_URL,
+                mView.getAnimatedLogoUrlForTesting());
+        Assert.assertTrue("Logo should be clickable", mView.isClickable());
+
+        // Test Dark Mode
+        mView.setNightMode(true);
+        mView.updateLogo(logo);
+        mView.endAnimationsForTesting();
+        Assert.assertEquals(
+                "Should render dark logo in dark mode",
+                darkBitmap,
+                getLogoDrawableBitmapForTesting());
+        Assert.assertEquals(
+                "Should use dark animated logo in dark mode",
+                DARK_ANIMATED_LOGO_URL,
+                mView.getAnimatedLogoUrlForTesting());
+        Assert.assertTrue("Logo should be clickable", mView.isClickable());
+    }
+
+    @Test
+    public void testLogoView_DarkMode_WithoutDarkAsset() {
+        Logo logo = new Logo(mBitmap, null, null, null, ANIMATED_LOGO_URL, null);
+
+        // Test Dark Mode Fallback
+        mView.setNightMode(true);
+        mView.updateLogo(logo);
+        mView.endAnimationsForTesting();
+        Assert.assertEquals(
+                "Should fall back to light logo in dark mode if no dark asset exists",
+                mBitmap,
+                getLogoDrawableBitmapForTesting());
+        Assert.assertEquals(
+                "Should fall back to light animated logo in dark mode if no dark animated logo"
+                        + " exists",
+                ANIMATED_LOGO_URL,
+                mView.getAnimatedLogoUrlForTesting());
+        Assert.assertTrue("Logo should be clickable", mView.isClickable());
+    }
+
+    private Bitmap getLogoDrawableBitmapForTesting() {
+        Drawable drawable = mView.getLogoDrawableForTesting();
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable) drawable).getBitmap();
+        }
+        return null;
     }
 }

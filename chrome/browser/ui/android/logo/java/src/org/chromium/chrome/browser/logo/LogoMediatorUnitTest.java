@@ -47,6 +47,7 @@ import org.chromium.components.search_engines.TemplateUrl;
 import org.chromium.components.search_engines.TemplateUrlService;
 import org.chromium.content_public.browser.LoadUrlParams;
 import org.chromium.ui.modelutil.PropertyModel;
+import org.chromium.ui.util.ColorUtils;
 
 /** Unit tests for the {@link LogoMediator}. */
 @RunWith(BaseRobolectricTestRunner.class)
@@ -225,6 +226,31 @@ public class LogoMediatorUnitTest {
     }
 
     @Test
+    public void testLoadAnimatedLogoFromCache_DarkMode() {
+        ColorUtils.setInNightModeForTesting(true);
+        try {
+            LogoMediator logoMediator = createMediator();
+            logoMediator.setHasLogoLoadedForCurrentSearchEngineForTesting(false);
+            Logo cachedLogo =
+                    new Logo(
+                            null,
+                            null,
+                            TEST_CLICK_URL,
+                            null,
+                            TEST_ANIMATED_LOGO_URL,
+                            "http://dark-animated-logo.com");
+            when(mDoodleCache.getCachedDoodle(any())).thenReturn(cachedLogo);
+
+            logoMediator.updateVisibility(/* animationEnabled= */ true);
+
+            assertEquals(
+                    "http://dark-animated-logo.com", logoMediator.getAnimatedLogoUrlForTesting());
+        } finally {
+            ColorUtils.setInNightModeForTesting(null);
+        }
+    }
+
+    @Test
     public void testLoadLogoWhenLogoHasLoaded() {
         LogoMediator logoMediator = createMediator();
         logoMediator.setHasLogoLoadedForCurrentSearchEngineForTesting(true);
@@ -385,6 +411,7 @@ public class LogoMediatorUnitTest {
     private LogoMediator createMediatorWithoutNative(@Nullable Drawable defaultGoogleLogoDrawable) {
         LogoMediator logoMediator =
                 new LogoMediator(
+                        mContext,
                         mLogoClickedCallback,
                         mLogoModel,
                         mOnLogoAvailableCallback,

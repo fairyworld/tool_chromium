@@ -99,6 +99,7 @@ public class LegacyLogoViewBinderUnitTest {
                         mLogoModel, mLogoView, new LegacyLogoViewBinder());
         mLogoMediator =
                 new LogoMediator(
+                        mActivity,
                         /* logoClickedCallback= */ null,
                         mLogoModel,
                         /* onLogoAvailableCallback= */ null,

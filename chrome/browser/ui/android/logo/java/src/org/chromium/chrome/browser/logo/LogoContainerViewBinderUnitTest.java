@@ -105,6 +105,7 @@ public class LogoContainerViewBinderUnitTest {
                         mLogoModel, mLogoContainerView, new LogoContainerViewBinder());
         mLogoMediator =
                 new LogoMediator(
+                        mActivity,
                         /* logoClickedCallback= */ null,
                         mLogoModel,
                         /* onLogoAvailableCallback= */ null,
