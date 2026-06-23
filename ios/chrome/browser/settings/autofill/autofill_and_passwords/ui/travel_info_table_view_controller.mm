@@ -8,6 +8,7 @@
 
 #import "base/apple/foundation_util.h"
 #import "base/check.h"
+#import "base/metrics/user_metrics.h"
 #import "components/autofill/core/browser/data_model/autofill_ai/entity_type.h"
 #import "components/strings/grit/components_strings.h"
 #import "ios/chrome/browser/settings/autofill/autofill_ai/ui/autofill_ai_add_entities_menu_builder.h"
@@ -98,8 +99,8 @@ enum ItemType {
 
   TableViewLinkHeaderFooterItem* footer =
       [[TableViewLinkHeaderFooterItem alloc] initWithType:ItemTypeFooter];
-  footer.text = l10n_util::GetNSString(
-      IDS_AUTOFILL_TRAVEL_OPT_IN_TOGGLE_SUB_LABEL);
+  footer.text =
+      l10n_util::GetNSString(IDS_AUTOFILL_TRAVEL_OPT_IN_TOGGLE_SUB_LABEL);
   [model setFooter:footer forSectionWithIdentifier:SectionIdentifierToggle];
 
   if (_flightReservations.count > 0) {
@@ -514,11 +515,11 @@ enum ItemType {
 #pragma mark - SettingsControllerProtocol
 
 - (void)reportDismissalUserAction {
-  // TODO(crbug.com/500341282): Add missing metric.
+  base::RecordAction(base::UserMetricsAction("MobileTravelInfoSettingsClose"));
 }
 
 - (void)reportBackUserAction {
-  // TODO(crbug.com/500341282): Add missing metric.
+  base::RecordAction(base::UserMetricsAction("MobileTravelInfoSettingsBack"));
 }
 
 - (void)settingsWillBeDismissed {

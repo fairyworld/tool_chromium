@@ -26628,6 +26628,40 @@ should be able to be added at any place in this file.
   <description>Reported when the user taps the New Feature Badge</description>
 </action>
 
+<action name="MobileAutofillAndPasswordsSettingsBack">
+  <owner>jsobiech@google.com</owner>
+  <owner>chrome-autofill-team@google.com</owner>
+  <description>
+    Reported when user goes back from Autofill and Passwords Settings UI to root
+    Settings screen. iOS only.
+  </description>
+</action>
+
+<action name="MobileAutofillAndPasswordsSettingsClose">
+  <owner>jsobiech@google.com</owner>
+  <owner>chrome-autofill-team@google.com</owner>
+  <description>
+    Reported when Autofill and Passwords Settings UI was dismissed. iOS only.
+  </description>
+</action>
+
+<action name="MobileAutofillSettingsBack">
+  <owner>jsobiech@google.com</owner>
+  <owner>chrome-autofill-team@google.com</owner>
+  <description>
+    Reported when user goes back from Autofill Settings UI to Autofill and
+    Passwords Settings screen. iOS only.
+  </description>
+</action>
+
+<action name="MobileAutofillSettingsClose">
+  <owner>jsobiech@google.com</owner>
+  <owner>chrome-autofill-team@google.com</owner>
+  <description>
+    Reported when Autofill Settings UI was dismissed. iOS only.
+  </description>
+</action>
+
 <action name="MobileBandwidthSettingsBack">
   <owner>gambard@chromium.org</owner>
   <owner>sczs@chromium.org</owner>
@@ -28294,6 +28328,23 @@ should be able to be added at any place in this file.
   <owner>gambard@chromium.org</owner>
   <description>
     User confirmed provided credentials in HTTP Authentication dialog. iOS only.
+  </description>
+</action>
+
+<action name="MobileIdentityDocsSettingsBack">
+  <owner>jsobiech@google.com</owner>
+  <owner>chrome-autofill-team@google.com</owner>
+  <description>
+    Reported when user goes back from Identity Docs Settings UI to Autofill and
+    Passwords Settings screen. iOS only.
+  </description>
+</action>
+
+<action name="MobileIdentityDocsSettingsClose">
+  <owner>jsobiech@google.com</owner>
+  <owner>chrome-autofill-team@google.com</owner>
+  <description>
+    Reported when Identity Docs Settings UI was dismissed. iOS only.
   </description>
 </action>
 
@@ -33682,6 +33733,23 @@ should be able to be added at any place in this file.
   <owner>sdefresne@chromium.org</owner>
   <description>
     Reported when Translate Settings UI was dismissed. iOS only.
+  </description>
+</action>
+
+<action name="MobileTravelInfoSettingsBack">
+  <owner>jsobiech@google.com</owner>
+  <owner>chrome-autofill-team@google.com</owner>
+  <description>
+    Reported when user goes back from Travel Info Settings UI to Autofill and
+    Passwords Settings screen. iOS only.
+  </description>
+</action>
+
+<action name="MobileTravelInfoSettingsClose">
+  <owner>jsobiech@google.com</owner>
+  <owner>chrome-autofill-team@google.com</owner>
+  <description>
+    Reported when Travel Info Settings UI was dismissed. iOS only.
   </description>
 </action>
 
