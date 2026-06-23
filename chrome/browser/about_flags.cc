@@ -9672,11 +9672,6 @@ const FeatureEntry kFeatureEntries[] = {
      FEATURE_VALUE_TYPE(
          autofill::features::kAutofillEnablePrefetchingRiskDataForRetrieval)},
 
-    {"rcaps-dynamic-profile-country",
-     flag_descriptions::kRcapsDynamicProfileCountryName,
-     flag_descriptions::kRcapsDynamicProfileCountryDescription, kOsAll,
-     FEATURE_VALUE_TYPE(switches::kDynamicProfileCountry)},
-
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
     {"enable-generic-oidc-auth-profile-management",
      flag_descriptions::kEnableGenericOidcAuthProfileManagementName,

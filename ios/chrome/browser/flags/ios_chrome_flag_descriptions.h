@@ -1668,12 +1668,6 @@ inline constexpr char kProvisionalNotificationAlertDescription[] =
     "Shows an alert to the user when app notification settings are changed but "
     "only provisonal notifications are enabled";
 
-inline constexpr char kRcapsDynamicProfileCountryName[] =
-    "Dynamic Profile Country";
-inline constexpr char kRcapsDynamicProfileCountryDescription[] =
-    "When enabled, Chrome updates the country associated with "
-    "the profile on open";
-
 inline constexpr char kReaderModeContentSettingsForLinksName[] =
     "Enables Content Settings options for Reading Mode";
 inline constexpr char kReaderModeContentSettingsForLinksDescription[] =

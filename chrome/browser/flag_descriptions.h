@@ -4092,12 +4092,6 @@ inline constexpr char kRendererSideContentDecodingDescription[] =
     "network service sends compressed HTTP response bodies to the renderer "
     "process.";
 
-inline constexpr char kRcapsDynamicProfileCountryName[] =
-    "Dynamic Profile Country";
-inline constexpr char kRcapsDynamicProfileCountryDescription[] =
-    "When enabled, Chrome updates the country associated with "
-    "the profile on open";
-
 inline constexpr char kRustyBmpName[] = "Rust-based BMP image handling";
 inline constexpr char kRustyBmpDescription[] =
     "When enabled, uses Rust `image` crate to decode BMP images.";
