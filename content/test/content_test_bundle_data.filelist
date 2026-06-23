@@ -512,6 +512,12 @@ data/accessibility/aria/aria-actions-reference-target.html
 data/accessibility/aria/aria-actions-target-id-change-expected-blink.txt
 data/accessibility/aria/aria-actions-target-id-change-expected-mac.txt
 data/accessibility/aria/aria-actions-target-id-change.html
+data/accessibility/aria/aria-actions-visibility-hidden-expected-auralinux.txt
+data/accessibility/aria/aria-actions-visibility-hidden-expected-blink.txt
+data/accessibility/aria/aria-actions-visibility-hidden-expected-mac.txt
+data/accessibility/aria/aria-actions-visibility-hidden-expected-uia-win.txt
+data/accessibility/aria/aria-actions-visibility-hidden-expected-win.txt
+data/accessibility/aria/aria-actions-visibility-hidden.html
 data/accessibility/aria/aria-actions.html
 data/accessibility/aria/aria-activedescendant-expected-auralinux.txt
 data/accessibility/aria/aria-activedescendant-expected-blink.txt
