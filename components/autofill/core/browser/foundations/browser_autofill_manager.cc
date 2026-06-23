@@ -329,6 +329,7 @@ FillDataType GetEventTypeFromSingleFieldSuggestionType(SuggestionType type) {
     case SuggestionType::kPersonalContextNotice:
     case SuggestionType::kFetchingAmbientData:
     case SuggestionType::kMaximizeCreditCardBenefitsEntry:
+    case SuggestionType::kAutofillAiOtherOrders:
       NOTREACHED();
   }
   NOTREACHED();
@@ -770,6 +771,7 @@ bool IsManagementFooterOption(const Suggestion& suggestion) {
     case SuggestionType::kPendingStateSignin:
     case SuggestionType::kLoadingThrobber:
     case SuggestionType::kFetchingAmbientData:
+    case SuggestionType::kAutofillAiOtherOrders:
     case SuggestionType::kBnplFootnote:
     case SuggestionType::kAutocompleteAtMemoryButton:
     case SuggestionType::kAtMemoryNoConnection:

@@ -1153,6 +1153,7 @@ bool IsCreditCardFooterSuggestion(
     case SuggestionType::kOneTimePasswordEntry:
     case SuggestionType::kLoadingThrobber:
     case SuggestionType::kFetchingAmbientData:
+    case SuggestionType::kAutofillAiOtherOrders:
     case SuggestionType::kAutocompleteAtMemoryButton:
     case SuggestionType::kPersonalContextNotice:
       return false;

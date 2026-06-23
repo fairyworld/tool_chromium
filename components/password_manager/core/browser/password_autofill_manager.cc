@@ -144,6 +144,7 @@ bool IsSuggestionHandledInPasswordManager(SuggestionType type) {
     case SuggestionType::kPendingStateSignin:
     case SuggestionType::kLoadingThrobber:
     case SuggestionType::kFetchingAmbientData:
+    case SuggestionType::kAutofillAiOtherOrders:
     case SuggestionType::kBnplFootnote:
     case SuggestionType::kAutocompleteAtMemoryButton:
     case SuggestionType::kMaximizeCreditCardBenefitsEntry:

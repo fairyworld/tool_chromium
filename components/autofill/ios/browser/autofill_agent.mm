@@ -699,6 +699,7 @@ bool HasGuid(const Suggestion::Payload& payload) {
       case SuggestionType::kAtMemoryNoConnection:
       case SuggestionType::kAtMemoryGenericError:
       case SuggestionType::kPersonalContextNotice:
+      case SuggestionType::kAutofillAiOtherOrders:
       case SuggestionType::kFetchingAmbientData:
       case SuggestionType::kMaximizeCreditCardBenefitsEntry:
         break;

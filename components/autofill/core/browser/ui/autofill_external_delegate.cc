@@ -249,6 +249,7 @@ bool HasAutofillSuggestionsForA11y(SuggestionType type) {
     case SuggestionType::kPendingStateSignin:
     case SuggestionType::kLoadingThrobber:
     case SuggestionType::kFetchingAmbientData:
+    case SuggestionType::kAutofillAiOtherOrders:
     case SuggestionType::kAtMemorySearchResult:
     case SuggestionType::kBnplFootnote:
     case SuggestionType::kAtMemoryInactivityNudge:
@@ -347,6 +348,7 @@ bool AutofillExternalDelegate::IsAutofillAndFirstLayerSuggestionId(
     case SuggestionType::kPendingStateSignin:
     case SuggestionType::kLoadingThrobber:
     case SuggestionType::kFetchingAmbientData:
+    case SuggestionType::kAutofillAiOtherOrders:
     case SuggestionType::kAtMemorySearchResult:
     case SuggestionType::kAtMemoryInactivityNudge:
     case SuggestionType::kBnplFootnote:
@@ -754,6 +756,7 @@ void AutofillExternalDelegate::DidSelectSuggestion(
     case SuggestionType::kScanCreditCard:
     case SuggestionType::kSeePromoCodeDetails:
     case SuggestionType::kBnplEntry:
+    case SuggestionType::kAutofillAiOtherOrders:
     // So far OTP suggestions are only available on Android, so no preview
     // is needed. This needs to be changed once Desktop suggestions and UI
     // are implemented.
@@ -1032,6 +1035,7 @@ void AutofillExternalDelegate::DidAcceptSuggestion(
     case SuggestionType::kPendingStateSignin:
     case SuggestionType::kLoadingThrobber:
     case SuggestionType::kFetchingAmbientData:
+    case SuggestionType::kAutofillAiOtherOrders:
     case SuggestionType::kBnplFootnote:
     case SuggestionType::kAtMemoryNoConnection:
     case SuggestionType::kAtMemoryGenericError:
@@ -1153,6 +1157,7 @@ bool AutofillExternalDelegate::RemoveSuggestion(const Suggestion& suggestion) {
     case SuggestionType::kOneTimePasswordEntry:
     case SuggestionType::kLoadingThrobber:
     case SuggestionType::kFetchingAmbientData:
+    case SuggestionType::kAutofillAiOtherOrders:
     case SuggestionType::kAtMemorySearchResult:
     case SuggestionType::kAtMemoryInactivityNudge:
     case SuggestionType::kBnplFootnote:

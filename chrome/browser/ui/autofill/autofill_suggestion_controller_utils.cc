@@ -105,6 +105,7 @@ SuggestionSection GetSuggestionSection(SuggestionType type) {
     case SuggestionType::kWebauthnPasskeyQrCode:
     case SuggestionType::kAtMemorySearchResult:
     case SuggestionType::kFillAutofillAi:
+    case SuggestionType::kAutofillAiOtherOrders:
     case SuggestionType::kBnplEntry:
     case SuggestionType::kOneTimePasswordEntry:
     case SuggestionType::kLoadingThrobber:

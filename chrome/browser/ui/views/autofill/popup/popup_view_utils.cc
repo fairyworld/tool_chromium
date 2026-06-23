@@ -567,6 +567,9 @@ bool IsExpandableSuggestionType(SuggestionType type) {
     // This opens the submenu where different suggestions related to the same
     // query response are present.
     case SuggestionType::kAtMemorySearchResult:
+    // This opens the submenu with all other Autofill AI orders suggestions
+    // that are not displayed in the first level.
+    case SuggestionType::kAutofillAiOtherOrders:
       return true;
     case SuggestionType::kAddressEntry:
     case SuggestionType::kAddressFieldByFieldFilling:
@@ -700,6 +703,7 @@ bool IsSuggestionTypeAutoselected(SuggestionType type) {
     case SuggestionType::kPersonalContextNotice:
     case SuggestionType::kFetchingAmbientData:
     case SuggestionType::kMaximizeCreditCardBenefitsEntry:
+    case SuggestionType::kAutofillAiOtherOrders:
       return false;
   }
 }

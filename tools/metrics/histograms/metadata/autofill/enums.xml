@@ -5750,6 +5750,7 @@ Called by update_autofill_enums.py.-->
   <int value="87" label="Fetching Ambient Data"/>
   <int value="88" label="AtMemory generic error"/>
   <int value="89" label="Maximize credit card benefits entry"/>
+  <int value="90" label="Autofill AI other orders"/>
 </enum>
 
 <!-- LINT.ThenChange(/components/autofill/core/browser/suggestions/suggestion_type.h:SuggestionType) -->
