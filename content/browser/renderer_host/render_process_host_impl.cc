@@ -4616,7 +4616,7 @@ void RenderProcessHostImpl::Cleanup() {
   // Use `DeleteSoon` to delete `this` RenderProcessHost *after* the tasks
   // that are *already* queued on the UI thread have been given a chance to run
   // (this may include IPC handling tasks that depend on the existence of
-  // RenderProcessHost and/or ChildProcessSecurityPolicyImpl::SecurityState).
+  // RenderProcessHost and/or ChildProcessSecurityPolicyImpl::ProcessState).
 #ifndef NDEBUG
   is_self_deleted_ = true;
 #endif

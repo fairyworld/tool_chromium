@@ -106,7 +106,7 @@ void LockProcessIfNeeded(ChildProcessId process_id,
 //    `kRustOnly`, or `kRustAndCpp` mode via
 //    `features::kChildProcessSecurityPolicyRust`.
 // 2. `CpspRustFeature` controls how much of the Rust CPSP feature is enabled
-//    (e.g., only the main logic, or also the per-child `SecurityState`
+//    (e.g., only the main logic, or also the per-child `ProcessState`
 //    management).
 using CpspTestParam = std::tuple<RustPolicy, CpspRustFeature>;
 
@@ -135,14 +135,14 @@ class ChildProcessSecurityPolicyTest
            {{kRustPolicyParam.name, kRustPolicyParam.GetName(rust_policy)}}});
     }
 
-    // Additionally enable the SecurityState migration if that CpspRustFeature
+    // Additionally enable the ProcessState migration if that CpspRustFeature
     // is enabled.
-    if (rust_feature == CpspRustFeature::kSecurityState) {
+    if (rust_feature == CpspRustFeature::kProcessState) {
       enabled_features.push_back(
-          {features::kChildProcessSecurityPolicyRustSecurityState, {}});
+          {features::kChildProcessSecurityPolicyRustProcessState, {}});
     } else {
       disabled_features.push_back(
-          features::kChildProcessSecurityPolicyRustSecurityState);
+          features::kChildProcessSecurityPolicyRustProcessState);
     }
 
     feature_list_.InitWithFeaturesAndParameters(enabled_features,
@@ -166,9 +166,9 @@ class ChildProcessSecurityPolicyTest
         result = "RustAndCpp";
         break;
     }
-    result += (rust_feature == CpspRustFeature::kSecurityState
-                   ? "_SecurityStateEnabled"
-                   : "_SecurityStateDisabled");
+    result += (rust_feature == CpspRustFeature::kProcessState
+                   ? "_ProcessStateEnabled"
+                   : "_ProcessStateDisabled");
     return result;
   }
 
@@ -204,10 +204,10 @@ class ChildProcessSecurityPolicyTest
     auto* policy = ChildProcessSecurityPolicyImpl::GetInstance();
     policy->ResetRegisteredSchemesForTesting();
 
-    // Also make sure the per-process SecurityStates don't leak across tests.
+    // Also make sure the per-process ProcessStates don't leak across tests.
     {
       base::AutoLock lock(policy->lock_);
-      EXPECT_EQ(0u, policy->security_states_.GetSizeForTesting())
+      EXPECT_EQ(0u, policy->process_states_.GetSizeForTesting())
           << "ChildProcessSecurityPolicy should not be tracking any processes "
           << "at test startup.  Some other test probably forgot to call "
           << "Remove() at the end.";
@@ -220,7 +220,7 @@ class ChildProcessSecurityPolicyTest
     auto* policy = ChildProcessSecurityPolicyImpl::GetInstance();
     {
       base::AutoLock lock(policy->lock_);
-      EXPECT_EQ(0u, policy->security_states_.GetSizeForTesting())
+      EXPECT_EQ(0u, policy->process_states_.GetSizeForTesting())
           << "ChildProcessSecurityPolicy should not be tracking any processes "
           << "at test shutdown.  Did you forget to call Remove() at the end of "
           << "a test?";
@@ -1465,7 +1465,7 @@ TEST_P(ChildProcessSecurityPolicyTest, CanAccessDataForOrigin_URL) {
   EXPECT_FALSE(
       handle.CanAccessDataForOrigin(url::Origin::Create(bar_http_url)));
 
-  // Invalidate handle so it does not preserve security state beyond Remove().
+  // Invalidate handle so it does not preserve process state beyond Remove().
   handle = ChildProcessSecurityPolicyImpl::Handle();
 
   p->Remove(kRendererProcess);
@@ -1525,7 +1525,7 @@ TEST_P(ChildProcessSecurityPolicyTest, CanAccessDataForOrigin_Origin) {
   // TODO(crbug.com/40148776): Committed origin enforcements should stop
   // allowing a non-opaque committed origin to match an opaque origin, even if
   // the latter's precursor matches. See TODO in
-  // SecurityState::MatchesCommittedOrigin().
+  // ProcessState::MatchesCommittedOrigin().
   auto opaque_with_foo_precursor = foo_origin.DeriveNewOpaqueOrigin();
   foo_origins.push_back(opaque_with_foo_precursor);
   all_origins.push_back(opaque_with_foo_precursor);
@@ -1655,7 +1655,7 @@ TEST_P(ChildProcessSecurityPolicyTest, MatchesCommittedOrigin) {
 
   auto foo_origin = url::Origin::Create(GURL("http://foo.com"));
 
-  // Helper wrapper for checking SecurityState::MatchesCommittedOrigin().
+  // Helper wrapper for checking ProcessState::MatchesCommittedOrigin().
   auto matches_committed_origin = [&](const std::string& url,
                                       bool url_is_for_precursor_origin) {
     return p->MatchesCommittedOriginForTesting(kRendererProcess, GURL(url),
@@ -1685,7 +1685,7 @@ TEST_P(ChildProcessSecurityPolicyTest, MatchesCommittedOrigin) {
 
   // If the URL is for a precursor, ideally it should not match a non-opaque
   // committed origin, but this has not been implemented yet - see TODO in
-  // SecurityState::MatchesCommittedOrigin().
+  // ProcessState::MatchesCommittedOrigin().
   //
   // TODO(crbug.com/40148776): Flip this expectation to false after fixing the
   // dedicated workers case.
@@ -1717,7 +1717,7 @@ TEST_P(ChildProcessSecurityPolicyTest, MatchesCommittedOrigin) {
   EXPECT_TRUE(matches_committed_origin("file:///", false));
   // TODO(alexmos): This behavior of allowing file URL origins to match
   // regardless of their hosts might change in the future. See note in
-  // SecurityState::MatchesCommittedOrigin().
+  // ProcessState::MatchesCommittedOrigin().
   EXPECT_TRUE(matches_committed_origin("file://localhost/", false));
 
   p->Remove(kRendererProcess);
@@ -1902,7 +1902,7 @@ TEST_P(ChildProcessSecurityPolicyTest, OriginGranting) {
   EXPECT_TRUE(p->CanCommitURL(kRendererID, url_foo2));
   EXPECT_FALSE(p->CanCommitURL(kRendererID, url_bar));
 
-  // Create a handle that extends the lifetime of the SecurityState beyond the
+  // Create a handle that extends the lifetime of the ProcessState beyond the
   // RenderProcessHost's lifetime.
   auto handle = p->CreateHandle(kRendererProcess);
   p->Remove(kRendererProcess);
@@ -3434,7 +3434,7 @@ TEST_P(ChildProcessSecurityPolicyTest, GetProcessLockAfterProcessRemoval) {
   EXPECT_TRUE(p->GetProcessLock(kRendererProcess).IsLockedToSite());
   EXPECT_FALSE(p->GetProcessLock(kRendererProcess).AllowsAnySite());
 
-  // Create a handle that extends the lifetime of the SecurityState beyond the
+  // Create a handle that extends the lifetime of the ProcessState beyond the
   // RenderProcessHost's lifetime.
   auto handle = p->CreateHandle(kRendererProcess);
   p->Remove(kRendererProcess);
@@ -3515,14 +3515,14 @@ TEST_P(ChildProcessSecurityPolicyTest, AddV8OptimizationState_AlreadyCached) {
             p->LookupAreV8OptimizationsDisabled(browsing_instance_id, origin));
 }
 
-// This intentionally excludes {kCppOnly, kSecurityState} since that behaves
+// This intentionally excludes {kCppOnly, kProcessState} since that behaves
 // the same as {kCppOnly, kMain} and is redundant to test separately.
 const CpspTestParam kCpspTestParams[] = {
     {RustPolicy::kCppOnly, CpspRustFeature::kMain},
     {RustPolicy::kRustOnly, CpspRustFeature::kMain},
-    {RustPolicy::kRustOnly, CpspRustFeature::kSecurityState},
+    {RustPolicy::kRustOnly, CpspRustFeature::kProcessState},
     {RustPolicy::kRustAndCpp, CpspRustFeature::kMain},
-    {RustPolicy::kRustAndCpp, CpspRustFeature::kSecurityState},
+    {RustPolicy::kRustAndCpp, CpspRustFeature::kProcessState},
 };
 
 INSTANTIATE_TEST_SUITE_P(,

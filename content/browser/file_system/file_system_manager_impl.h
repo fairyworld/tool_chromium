@@ -56,7 +56,7 @@ class CONTENT_EXPORT FileSystemManagerImpl
   // the UI thread. Used by render frames (via the RenderFrameHost) and workers
   // (via RenderProcessHost).
   // `security_policy_handle` indicates which renderer process this is for and
-  // ensures that the corresponding SecurityState is not deleted while this
+  // ensures that the corresponding ProcessState is not deleted while this
   // instance may still query it.
   FileSystemManagerImpl(
       ChildProcessSecurityPolicyImpl::Handle security_policy_handle,
@@ -304,7 +304,7 @@ class CONTENT_EXPORT FileSystemManagerImpl
   std::unique_ptr<storage::FileSystemOperationRunner> operation_runner_;
 
   // Storing a ChildProcessSecurityPolicy::Handle for this instances's renderer
-  // process ensures that the corresponding SecurityState cannot be deleted
+  // process ensures that the corresponding ProcessState cannot be deleted
   // while it is still needed.
   ChildProcessSecurityPolicyImpl::Handle security_policy_handle_;
 

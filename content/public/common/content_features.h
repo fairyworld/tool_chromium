@@ -103,7 +103,7 @@ inline constexpr const char kChildProcessSecurityPolicyRustPolicyRustOnly[] =
 inline constexpr const char kChildProcessSecurityPolicyRustPolicyRustAndCpp[] =
     "rust-and-cpp";
 CONTENT_EXPORT BASE_DECLARE_FEATURE(
-    kChildProcessSecurityPolicyRustSecurityState);
+    kChildProcessSecurityPolicyRustProcessState);
 CONTENT_EXPORT BASE_DECLARE_FEATURE(
     kClearCrossSiteCrossBrowsingContextGroupWindowName);
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kCompositeBGColorAnimation);

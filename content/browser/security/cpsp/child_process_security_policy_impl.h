@@ -80,9 +80,9 @@ enum class CpspRustFeature {
   // feature for global state: features::kChildProcessSecurityPolicyRust.
   kMain,
   // Identifies cases that depend on the per-process ChildProcessSecurityPolicy
-  // Rust feature for SecurityState:
-  // features::kChildProcessSecurityPolicyRustSecurityState.
-  kSecurityState,
+  // Rust feature for ProcessState:
+  // features::kChildProcessSecurityPolicyRustProcessState.
+  kProcessState,
 };
 
 // Note: This class's implementation is migrating to Rust in
@@ -101,7 +101,7 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
  public:
   // Handle used to access the security state for a specific process.
   //
-  // Objects that require the security state to be preserved beyond the
+  // Objects that require the process state to be preserved beyond the
   // lifetime of the RenderProcessHostImpl should hold an instance of this
   // object and use it to answer security policy questions. (e.g. Mojo services
   // created by RPHI that can receive calls after RPHI destruction). This
@@ -545,9 +545,9 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
                              const storage::FileSystemURL& src_url,
                              const storage::FileSystemURL& dest_url);
 
-  // Notifies security state of |child_id| about the IsolationContext it will
+  // Notifies process state of |child_id| about the IsolationContext it will
   // host.  The main side effect is proper setting of the lowest
-  // BrowsingInstanceId associated with the security state.
+  // BrowsingInstanceId associated with the process state.
   void IncludeIsolationContext(int child_id,
                                const IsolationContext& isolation_context);
 
@@ -638,15 +638,14 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
 
   // Creates a Handle object for a specific child process ID.
   //
-  // This handle can be used to extend the lifetime of policy state beyond
-  // the Remove() call for |child_id|. This should be used by objects that can
+  // This handle can be used to extend the lifetime of policy state beyond the
+  // Remove() call for |child_id|. This should be used by objects that can
   // outlive the RenderProcessHostImpl object associated with |child_id| and
-  // need to be able to make policy decisions after RPHI destruction. (e.g.
-  // Mojo services created by RPHI)
+  // need to be able to make policy decisions after RPHI destruction. (e.g. Mojo
+  // services created by RPHI)
   //
-  // Returns a valid Handle for any |child_id| that is present in
-  // |security_state_|. Otherwise it returns a Handle that returns false for
-  // all policy checks.
+  // Returns a valid Handle if |child_id| is present in |process_states_|.
+  // Otherwise it returns a Handle that returns false for all policy checks.
   Handle CreateHandle(ChildProcessId child_id);
 
   // TODO(crbug.com/379869738) Remove this method when usages are ported.
@@ -751,47 +750,47 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
   FRIEND_TEST_ALL_PREFIXES(ChildProcessSecurityPolicyTest,
                            MatchesCommittedOrigin);
 
-  class SecurityState;
+  class ProcessState;
 
   typedef std::set<std::string> SchemeSet;
   typedef std::map<storage::FileSystemType, int> FileSystemPermissionPolicyMap;
 
-  // Data structure that tracks SecurityState for each RenderProcessHost based
-  // on ChildProcessId. A registered SecurityState is guaranteed to exist both
+  // Data structure that tracks ProcessState for each RenderProcessHost based
+  // on ChildProcessId. A registered ProcessState is guaranteed to exist both
   // while the RenderProcessHost exists and until all of the
   // ChildProcessSecurityPolicy::Handles for the process have gone away, as
   // tracked by reference counting within this class.
   //
-  // The SecurityState can only be modified while the RenderProcessHost exists,
+  // The ProcessState can only be modified while the RenderProcessHost exists,
   // so that no new permissions can be granted after it is deleted. Queries for
   // the state can continue to be safely serviced until the Handles are gone.
   //
-  // All SecurityState query functions should use `GetSecurityStateForQuery` to
-  // look up SecurityState. This approach looks for the state in both maps and
-  // returns a const SecurityState that won't allow mutation.
+  // All ProcessState query functions should use `GetProcessStateForQuery` to
+  // look up ProcessState. This approach looks for the state in both maps and
+  // returns a const ProcessState that won't allow mutation.
   //
-  // All SecurityState mutator functions must use `GetSecurityStateForMutation`
-  // to look up SecurityState, which is enforced by the compiler because
-  // `GetSecurityStateForQuery` is the only other accessor to the internal maps
-  // and returns a const SecurityState.
+  // All ProcessState mutator functions must use `GetProcessStateForMutation`
+  // to look up ProcessState, which is enforced by the compiler because
+  // `GetProcessStateForQuery` is the only other accessor to the internal maps
+  // and returns a const ProcessState.
   //
   // This can be accessed from any thread, because the only instance of this
   // class is guarded by ChildProcessSecurityPolicyImpl::lock_.
-  class CONTENT_EXPORT SecurityStateMaps {
+  class CONTENT_EXPORT ProcessStateMaps {
    public:
-    SecurityStateMaps();
-    ~SecurityStateMaps();
+    ProcessStateMaps();
+    ~ProcessStateMaps();
 
-    // Registers a new SecurityState for `child_id`. Crashes if this ID has
+    // Registers a new ProcessState for `child_id`. Crashes if this ID has
     // already been registered.
     void CreateStateForProcess(ChildProcessId child_id,
                                BrowserContext* browser_context);
 
-    // Gets the SecurityState object associated with `child_id`, for callers
+    // Gets the ProcessState object associated with `child_id`, for callers
     // that want to query but not modify the state. See
-    // `GetSecurityStateForMutation` for callers that want to modify the state.
+    // `GetProcessStateForMutation` for callers that want to modify the state.
     //
-    // This function consults both the live `security_state_` map and the
+    // This function consults both the live `process_state_` map and the
     // `pending_remove_state_` map, to ensure queries can access state both
     // while the RenderProcessHost exists and for a short time afterwards, as
     // long as any ChildProcessSecurityPolicy::Handles exist. This allows
@@ -800,19 +799,19 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
     //
     // Note: Returned object is only valid for the duration the caller holds
     // `lock_`.
-    const SecurityState* GetSecurityStateForQuery(ChildProcessId child_id);
+    const ProcessState* GetProcessStateForQuery(ChildProcessId child_id);
 
-    // Gets the SecurityState object associated with `child_id`, for callers
+    // Gets the ProcessState object associated with `child_id`, for callers
     // that want to modify the state. Callers that only want to query the state
-    // must not use this, and should use `GetSecurityStateForQuery` instead.
+    // must not use this, and should use `GetProcessStateForQuery` instead.
     //
-    // This function only consults the live `security_state_` map and not the
-    // `pending_remove_state_` map, to ensure that SecurityState can only be
+    // This function only consults the live `process_state_` map and not the
+    // `pending_remove_state_` map, to ensure that ProcessState can only be
     // modified while the RenderProcessHost still exists.
     //
     // Note: Returned object is only valid for the duration the caller holds
     // `lock_`.
-    SecurityState* GetSecurityStateForMutation(ChildProcessId child_id);
+    ProcessState* GetProcessStateForMutation(ChildProcessId child_id);
 
     // Updates reference counts for `child_id` both when the process is
     // registered and when a Handle is created. If `duplicating_handle` is
@@ -822,7 +821,7 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
 
     // Updates reference counts for `child_id` when the RenderProcessHost or any
     // of its Handles are destroyed. When all have been destroyed, this cleans
-    // up the SecurityState from the `pending_remove_state_` map.
+    // up the ProcessState from the `pending_remove_state_` map.
     void RemoveProcessReference(ChildProcessId child_id);
 
     // Helper function for CPSPI::RemoveAllStateForBrowsingInstance.
@@ -833,49 +832,49 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
     void ClearBrowserContextIfMatches(const BrowserContext& browser_context);
 
     // When the RenderProcessHost with `child_id` is deleted, this function
-    // transitions the SecurityState to `pending_remove_state_`, which continues
+    // transitions the ProcessState to `pending_remove_state_`, which continues
     // to be used for queries until all Handles have been deleted. No changes
-    // should be made to the SecurityState after this transition.
+    // should be made to the ProcessState after this transition.
     void PrepareToRemoveState(ChildProcessId child_id);
 
     // When the RenderProcessHost and all Handles for `child_id` have been
-    // deleted, this function removes its SecurityState from SecurityStateMaps
+    // deleted, this function removes its ProcessState from ProcessStateMaps
     // entirely. This assumes PrepareToRemoveState has been called already.
     //
     // Note: This runs on the IO thread, to allow time for any pending IO thread
     // tasks to run after the last references for the process have gone away.
     void CompletePendingStateRemoval(ChildProcessId child_id);
 
-    // Returns how many SecurityStates are registered in `security_state_`
+    // Returns how many ProcessStates are registered in `process_state_`
     // (omitting those in `pending_remove_state_`).
     size_t GetSizeForTesting();
 
    private:
-    typedef std::map<ChildProcessId, std::unique_ptr<SecurityState>>
-        SecurityStateMap;
+    using ProcessStateMap =
+        std::map<ChildProcessId, std::unique_ptr<ProcessState>>;
 
-    // This map holds a SecurityState for each child process, while its
+    // This map holds a ProcessState for each child process, while its
     // RenderProcessHost exists. The key for the map is the ID of the
-    // RenderProcessHost. The SecurityState objects are owned by this class and
+    // RenderProcessHost. The ProcessState objects are owned by this class and
     // are protected by ChildProcessSecurityPolicy's |lock_|. References to
     // them must not escape ChildProcessSecurityPolicy.
-    SecurityStateMap security_state_;
+    ProcessStateMap process_state_;
 
-    // This map holds the SecurityState for a child process after its
+    // This map holds the ProcessState for a child process after its
     // RenderProcessHost is deleted, when Remove() is called on the UI thread.
     // An entry stays in this map until all corresponding
     // ChildProcessSecurityPolicy::Handles are deleted, and then until a task
     // has run on the IO thread. This is necessary to provide consistent
     // security decisions and avoid races between the UI & IO threads during
     // child process shutdown. This separate map is used to preserve
-    // SecurityState info AND prevent mutation of that state after Remove() is
+    // ProcessState info AND prevent mutation of that state after Remove() is
     // called.
-    SecurityStateMap pending_remove_state_;
+    ProcessStateMap pending_remove_state_;
 
     // Contains a mapping between child process ID and the number of outstanding
-    // references that want to keep the SecurityState for each process alive.
+    // references that want to keep the ProcessState for each process alive.
     // ChildProcessSecurityPolicy and the Handles that it creates increment and
-    // decrement the counts in this map. A SecurityState object for a process is
+    // decrement the counts in this map. A ProcessState object for a process is
     // only destroyed when its count goes to zero.
     std::map<ChildProcessId, int> process_reference_counts_;
   };
@@ -1077,14 +1076,14 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
       const BrowsingInstanceId& browsing_instance_id);
 
   // Creates the value to place in the "killed_process_origin_lock" crash key
-  // based on the contents of |security_state|.
+  // based on the contents of |process_state|.
   static std::string GetKilledProcessOriginLock(
-      const SecurityState* security_state);
+      const ProcessState* process_state);
 
   // Creates the value to place in the "committed_origins" crash key
-  // based on the contents of |security_state|.
+  // based on the contents of |process_state|.
   static std::string GetCommittedOriginsForCrashKey(
-      const SecurityState* security_state);
+      const ProcessState* process_state);
 
   // Helper for CanAccessMaybeOpaqueOrigin, to perform two security checks:
   //  - Jail check: a process locked to a particular site shouldn't access data
@@ -1093,7 +1092,7 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
   //    belonging to sites that require a dedicated process.
   //
   // These checks are performed by comparing the actual ProcessLock of the
-  // process represented by `child_id` and `security_state` to an expected
+  // process represented by `child_id` and `process_state` to an expected
   // ProcessLock computed from `url`, which takes into account factors such as
   // whether `url` should be site-isolated or origin-isolated (or not isolated,
   // e.g. on Android). Determining site-vs-origin isolation is non-trivial: the
@@ -1108,7 +1107,7 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
   //
   // This function must be called while already holding `lock_`.
   bool PerformJailAndCitadelChecks(ChildProcessId child_id,
-                                   const SecurityState& security_state,
+                                   const ProcessState& process_state,
                                    const GURL& url,
                                    bool url_is_precursor_of_opaque_origin,
                                    AccessType access_type,
@@ -1172,11 +1171,11 @@ class CONTENT_EXPORT ChildProcessSecurityPolicyImpl
   // protected by |schemes_lock_|.
   SchemeSet pseudo_schemes_ GUARDED_BY(schemes_lock_);
 
-  // Tracks all per-process SecurityStates, both while the RenderProcessHost
+  // Tracks all per-process ProcessStates, both while the RenderProcessHost
   // exists and can be modified, and after it has been deleted until all of the
   // corresponding ChildProcessSecurityPolicy::Handles are gone (when the state
   // can be queried but should not be modified).
-  SecurityStateMaps security_states_ GUARDED_BY(lock_);
+  ProcessStateMaps process_states_ GUARDED_BY(lock_);
 
   FileSystemPermissionPolicyMap file_system_policy_map_ GUARDED_BY(lock_);
 

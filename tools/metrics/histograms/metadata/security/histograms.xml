@@ -1075,7 +1075,7 @@ chromium-metrics-reviews@google.com.
   <summary>
     The maximum number of BrowsingInstances seen in a RenderProcessHost over its
     lifetime. Recorded once when
-    ChildProcessImpl::SecurityState::~SecurityState() is invoked.
+    ChildProcessSecurityPolicyImpl::ProcessState::~ProcessState() is invoked.
   </summary>
 </histogram>
 
