@@ -1942,6 +1942,11 @@ std::string ReadAnythingAppController::GetUrl(ui::AXNodeID ax_node_id) const {
 }
 
 std::string ReadAnythingAppController::GetDocumentUrl() const {
+  // During rapid navigations, the active tree ID can temporarily point to a
+  // tree not yet loaded in the model. Check if the tree exists first.
+  if (!model_.ContainsTree(model_.active_tree_id())) {
+    return "";
+  }
   ui::AXSerializableTree* tree = model_.GetActiveTree();
   if (!tree) {
     return "";
@@ -1955,6 +1960,11 @@ std::string ReadAnythingAppController::GetDocumentUrl() const {
 
 std::string ReadAnythingAppController::GetHtmlId(
     ui::AXNodeID ax_node_id) const {
+  // During rapid navigations, the active tree ID can temporarily point to a
+  // tree not yet loaded in the model. Check if the tree exists first.
+  if (!model_.ContainsTree(model_.active_tree_id())) {
+    return "";
+  }
   ui::AXNode* ax_node = model_.GetAXNode(ax_node_id);
   if (!ax_node) {
     return "";
@@ -3102,6 +3112,14 @@ void ReadAnythingAppController::OnReadabilityDistillationStateChanged(
   // model, which then circles back to the ReadAnythingUntrustedPageHandler to
   // update the distillation state in the ReadAnythingController.
   SetDistillationState(new_state);
+}
+
+void ReadAnythingAppController::OnMainFrameSameDocumentNavigation(
+    const GURL& url) {
+  std::string script =
+      base::StrCat({"chrome.readingMode.onMainFrameSameDocumentNavigation(",
+                    base::GetQuotedJSONString(url.spec()), ");"});
+  ExecuteJavaScript(script);
 }
 
 void ReadAnythingAppController::ApplyAccessibilityUpdatesForReadability(

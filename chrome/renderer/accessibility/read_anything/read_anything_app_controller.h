@@ -187,6 +187,7 @@ class ReadAnythingAppController
                      const std::string& content) override;
   void OnReadabilityDistillationStateChanged(
       read_anything::mojom::ReadAnythingDistillationState new_state) override;
+  void OnMainFrameSameDocumentNavigation(const GURL& url) override;
 
 #if BUILDFLAG(IS_CHROMEOS)
   void OnDeviceLocked() override;

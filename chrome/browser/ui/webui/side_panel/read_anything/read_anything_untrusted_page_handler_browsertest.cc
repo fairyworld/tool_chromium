@@ -148,6 +148,10 @@ class MockPage : public read_anything::mojom::UntrustedPage {
               OnReadabilityDistillationStateChanged,
               (read_anything::mojom::ReadAnythingDistillationState state),
               (override));
+  MOCK_METHOD(void,
+              OnMainFrameSameDocumentNavigation,
+              (const GURL& url),
+              (override));
 
   mojo::Receiver<read_anything::mojom::UntrustedPage> receiver_{this};
 };

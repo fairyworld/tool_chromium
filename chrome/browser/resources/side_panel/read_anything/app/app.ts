@@ -335,6 +335,11 @@ export class AppElement extends AppElementBase implements SpeechListener,
     chrome.readingMode.onRenderedTextMappingReady = () => {
       this.contentController_.onRenderedTextMappingReady();
     };
+
+    chrome.readingMode.onMainFrameSameDocumentNavigation = (url: string) => {
+      assert(this.shadowRoot);
+      this.contentController_.scrollToAnchor(url, this.shadowRoot);
+    };
   }
 
   override disconnectedCallback() {

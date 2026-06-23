@@ -1788,6 +1788,20 @@ TEST_F(ReadAnythingAppControllerTest, GetHtmlId) {
   EXPECT_EQ("", controller().GetHtmlId(4));
 }
 
+TEST_F(ReadAnythingAppControllerTest, GetDocumentUrl_ContainsTreeSafetyCheck) {
+  ui::AXTreeID unknown_tree_id = ui::AXTreeID::CreateNewAXTreeID();
+  controller().OnActiveAXTreeIDChanged(unknown_tree_id, ukm::kInvalidSourceId,
+                                       /*is_pdf=*/false);
+  EXPECT_EQ("", controller().GetDocumentUrl());
+}
+
+TEST_F(ReadAnythingAppControllerTest, GetHtmlId_ContainsTreeSafetyCheck) {
+  ui::AXTreeID unknown_tree_id = ui::AXTreeID::CreateNewAXTreeID();
+  controller().OnActiveAXTreeIDChanged(unknown_tree_id, ukm::kInvalidSourceId,
+                                       /*is_pdf=*/false);
+  EXPECT_EQ("", controller().GetHtmlId(2));
+}
+
 TEST_F(ReadAnythingAppControllerTest, ShouldBold) {
   ui::AXNodeData overline_node;
   overline_node.id = 2;
