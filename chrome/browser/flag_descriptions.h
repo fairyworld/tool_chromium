@@ -315,12 +315,6 @@ inline constexpr char kBrowsingHistorySimilarVisitsGroupingDescription[] =
     "Enables improvements to grouping of similar browsing history on the "
     "history page.";
 
-inline constexpr char kGlicButtonAutoSummarizeName[] =
-    "Glic Button Auto Summarize";
-inline constexpr char kGlicButtonAutoSummarizeDescription[] =
-    "Automatically triggers a summary when the Glic button is clicked on a "
-    "certain page (ex. PDF).";
-
 inline constexpr char kBundledSecuritySettingsName[] =
     "Bundled Security Settings";
 inline constexpr char kBundledSecuritySettingsDescription[] =

@@ -110,7 +110,6 @@ source_set("impl") {
       "//chrome/common:buildflags",
       "//chrome/common:chrome_features",
       "//components/omnibox/browser:vector_icons",
-      "//components/pdf/common:constants",
       "//components/prefs",
       "//content/public/browser",
       "//ui/strings:ui_strings__strings_grit",

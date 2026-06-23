@@ -131,8 +131,6 @@ const base::FeatureParam<GlicToolbarButtonLocation>
         GlicToolbarButtonLocation::kLeftOfProfileChip,
         &kGlicButtonLocationOptions};
 
-BASE_FEATURE(kGlicButtonAutoSummarize, base::FEATURE_DISABLED_BY_DEFAULT);
-
 BASE_FEATURE(kGlicGetTabFaviconById, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kGlicSkipCookieSyncOnOpen, base::FEATURE_DISABLED_BY_DEFAULT);
