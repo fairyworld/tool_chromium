@@ -789,6 +789,11 @@ void GlicActorClientSession::ResumeActorTask(
             // TODO(b/380495633): Finalize and implement image annotations.
             glic::mojom::ImageOriginAnnotations::New());
 
+        if (page_context.screenshot_info.has_value()) {
+          glic_tab_context->screenshot_info =
+              mojo_base::ProtoWrapper(*page_context.screenshot_info);
+        }
+
         glic_tab_context->annotated_page_data = mojom::AnnotatedPageData::New();
         glic_tab_context->annotated_page_data->annotated_page_content =
             mojo_base::ProtoWrapper(
