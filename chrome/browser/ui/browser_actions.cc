@@ -2633,6 +2633,61 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               bwi))
           .SetActionId(kActionRecentTabsSeeDeviceTabs)
           .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::FocusToolbar(bwi);
+              },
+              bwi))
+          .SetActionId(kActionFocusToolbar)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::FocusLocationBar(bwi);
+              },
+              bwi))
+          .SetActionId(kActionFocusLocation)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::FocusSearch(bwi);
+              },
+              bwi))
+          .SetActionId(kActionFocusSearch)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::FocusAppMenu(bwi);
+              },
+              bwi))
+          .SetActionId(kActionFocusMenuBar)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::FocusNextPane(bwi);
+              },
+              bwi))
+          .SetActionId(kActionFocusNextPane)
+          .Build());
 }
 
 void BrowserActions::AddListeners() {
