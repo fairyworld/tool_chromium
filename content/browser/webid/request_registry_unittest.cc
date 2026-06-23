@@ -116,16 +116,21 @@ class RequestRegistryTest : public RenderViewHostImplTestHarness {
 
     mock_auto_reauthn_permission_delegate_ =
         std::make_unique<NiceMock<MockAutoReauthnPermissionDelegate>>();
-    mock_identity_registry_ = std::make_unique<NiceMock<MockIdentityRegistry>>(
-        web_contents(), /*delegate=*/nullptr, GURL(kIdpUrl));
+    auto mock_identity_registry =
+        std::make_unique<NiceMock<MockIdentityRegistry>>(
+            web_contents(), /*delegate=*/nullptr, GURL(kIdpUrl));
+    mock_identity_registry_ = mock_identity_registry->GetWeakPtr();
+    web_contents()->SetUserData(IdentityRegistry::UserDataKey(),
+                                std::move(mock_identity_registry));
 
-    request_ = &RequestService::GetOrCreateForCurrentDocument(main_test_rfh())
-                    ->CreateRequestForTesting(
-                        request_remote_.BindNewPipeAndPassReceiver(),
-                        test_api_permission_delegate_.get(),
-                        mock_auto_reauthn_permission_delegate_.get(),
-                        mock_permission_delegate_.get(),
-                        mock_identity_registry_.get());
+    request_ =
+        RequestService::GetOrCreateForCurrentDocument(main_test_rfh())
+            ->CreateRequestForTesting(
+                request_remote_.BindNewPipeAndPassReceiver(),
+                test_api_permission_delegate_.get(),
+                mock_auto_reauthn_permission_delegate_.get(),
+                mock_permission_delegate_.get(), mock_identity_registry_.get())
+            .GetWeakPtr();
     auto mock_dialog_controller =
         std::make_unique<NiceMock<MockIdentityRequestDialogController>>();
     request_->SetDialogControllerForTests(std::move(mock_dialog_controller));
@@ -139,7 +144,13 @@ class RequestRegistryTest : public RenderViewHostImplTestHarness {
   }
 
   void TearDown() override {
+    RequestService* service =
+        RequestService::GetOrCreateForCurrentDocument(main_test_rfh());
+    if (service && service->GetActiveRequestForTesting()) {
+      service->GetActiveRequestForTesting()->ResetAndDeleteThisForTesting();
+    }
     request_ = nullptr;
+    mock_identity_registry_ = nullptr;
     request_service_remote_.reset();
     RenderViewHostImplTestHarness::TearDown();
   }
@@ -149,13 +160,13 @@ class RequestRegistryTest : public RenderViewHostImplTestHarness {
 
   mojo::Remote<blink::mojom::FederatedAuthRequest> request_remote_;
   mojo::Remote<blink::mojom::FederatedRequestService> request_service_remote_;
-  raw_ptr<Request> request_;
+  base::WeakPtr<Request> request_;
 
   std::unique_ptr<TestApiPermissionDelegate> test_api_permission_delegate_;
   std::unique_ptr<StrictMock<MockPermissionDelegate>> mock_permission_delegate_;
   std::unique_ptr<NiceMock<MockAutoReauthnPermissionDelegate>>
       mock_auto_reauthn_permission_delegate_;
-  std::unique_ptr<NiceMock<MockIdentityRegistry>> mock_identity_registry_;
+  base::WeakPtr<MockIdentityRegistry> mock_identity_registry_ = nullptr;
 };
 
 // Test Registering an IdP successfully.

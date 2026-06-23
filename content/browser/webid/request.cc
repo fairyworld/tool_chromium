@@ -2193,6 +2193,10 @@ void Request::SetDialogControllerForTests(
   request_service_->SetDialogControllerForTests(std::move(controller));
 }
 
+base::WeakPtr<Request> Request::GetWeakPtr() {
+  return weak_ptr_factory_.GetWeakPtr();
+}
+
 void Request::OnClose() {
   CHECK(request_dialog_controller_);
   request_dialog_controller_->CloseModalDialog();

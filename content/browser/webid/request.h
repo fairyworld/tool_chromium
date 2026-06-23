@@ -151,6 +151,8 @@ class CONTENT_EXPORT Request
   void SetDialogControllerForTests(
       std::unique_ptr<IdentityRequestDialogController> controller);
 
+  base::WeakPtr<Request> GetWeakPtr();
+
   // content::FederatedIdentityModalDialogViewDelegate:
   void OnClose() override;
   bool OnResolve(GURL idp_config_url,
