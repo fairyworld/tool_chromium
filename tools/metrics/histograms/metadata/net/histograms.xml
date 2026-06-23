@@ -8655,6 +8655,17 @@ chromium-metrics-reviews@google.com.
   <summary>Socket connected status in SpdySession::CreateStream.</summary>
 </histogram>
 
+<histogram name="Net.SpdySession.GetRemoteEndpointResult" enum="NetErrorCodes"
+    expires_after="2027-06-20">
+  <owner>hayato@chromium.org</owner>
+  <owner>src/net/OWNERS</owner>
+  <summary>
+    Records the net error code returned by GetPeerAddress inside
+    SpdySession::GetRemoteEndpoint. This is recorded every time
+    GetRemoteEndpoint is called.
+  </summary>
+</histogram>
+
 <histogram name="Net.SpdySession.GoAwayReceived" enum="Http2WireErrorCodes"
     expires_after="2026-09-02">
   <owner>bashi@chromium.org</owner>
