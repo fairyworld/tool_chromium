@@ -1673,6 +1673,10 @@ class CONTENT_EXPORT WebContentsImpl
   friend class TestWCDelegateForDialogsAndFullscreen;
 
   FRIEND_TEST_ALL_PREFIXES(WebContentsImplTest, CaptureHoldsWakeLock);
+  FRIEND_TEST_ALL_PREFIXES(WebContentsImplTest,
+                           OnColorProviderChangedNoOpDuringDestruction);
+  FRIEND_TEST_ALL_PREFIXES(WebContentsImplTest,
+                           OnNativeThemeUpdatedNoOpDuringDestruction);
   FRIEND_TEST_ALL_PREFIXES(WebContentsImplTest, NoJSMessageOnInterstitials);
   FRIEND_TEST_ALL_PREFIXES(WebContentsImplTest, UpdateTitle);
   FRIEND_TEST_ALL_PREFIXES(WebContentsImplTest, FindOpenerRVHWhenPending);

@@ -3495,6 +3495,7 @@ test("content_unittests") {
     "//ui/gl:gl_headers",
     "//ui/gl:test_support",
     "//ui/latency:test_support",
+    "//ui/native_theme",
     "//ui/shell_dialogs",
     "//ui/webui:test_support",
     "//url",

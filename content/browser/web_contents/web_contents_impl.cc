@@ -12278,6 +12278,13 @@ void WebContentsImpl::SetVisibilityForChildViews(bool visible) {
 }
 
 void WebContentsImpl::HandleColorRelatedStateChanges() {
+  // This can be reached re-entrantly during ~WebContentsImpl, after the
+  // primary main frame has begun being destroyed. Bail out before
+  // dereferencing it via GetPrimaryMainFrame() below.
+  if (IsBeingDestroyed()) {
+    return;
+  }
+
   if (const auto* const theme = ui::NativeTheme::GetInstanceForWeb();
       prefers_reduced_transparency_ != theme->prefers_reduced_transparency() ||
       inverted_colors_ != theme->inverted_colors() ||
@@ -12339,6 +12346,12 @@ void WebContentsImpl::OnCaptionStyleUpdated() {
 }
 
 void WebContentsImpl::OnColorProviderChanged() {
+  // OnColorProviderChanged() might have been triggered as the result of the
+  // observed source being destroyed during teardown, in this case, no-op.
+  if (IsBeingDestroyed()) {
+    return;
+  }
+
   // OnColorProviderChanged() might have been triggered as the result of the
   // observed source being reset. If this is the case fallback to the default
   // source.
