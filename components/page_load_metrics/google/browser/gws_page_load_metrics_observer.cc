@@ -15,6 +15,7 @@
 #include "base/feature_list.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/no_destructor.h"
+#include "base/notreached.h"
 #include "base/strings/strcat.h"
 #include "base/strings/string_util.h"
 #include "base/time/time.h"
@@ -446,6 +447,37 @@ std::optional<base::TimeDelta> CalculateActualNavigationOffset(
   }
   return std::nullopt;
 }
+
+std::string_view GetScriptSuffix(page_load_metrics::mojom::ScriptType type) {
+  switch (type) {
+    case page_load_metrics::mojom::ScriptType::kLatin:
+      return "Latn";
+    case page_load_metrics::mojom::ScriptType::kHan:
+      return "Hani";
+    case page_load_metrics::mojom::ScriptType::kHangul:
+      return "Hang";
+    case page_load_metrics::mojom::ScriptType::kHiragana:
+      return "Hira";
+    case page_load_metrics::mojom::ScriptType::kKatakana:
+      return "Kana";
+    case page_load_metrics::mojom::ScriptType::kArabic:
+      return "Arab";
+    case page_load_metrics::mojom::ScriptType::kBengali:
+      return "Beng";
+    case page_load_metrics::mojom::ScriptType::kDevanagari:
+      return "Deva";
+    case page_load_metrics::mojom::ScriptType::kCyrillic:
+      return "Cyrl";
+    case page_load_metrics::mojom::ScriptType::kCommon:
+      return "Zyyy";
+    case page_load_metrics::mojom::ScriptType::kEmoji:
+      return "Emoji";
+    case page_load_metrics::mojom::ScriptType::kOther:
+      return "Other";
+  }
+  NOTREACHED();
+}
+
 void RecordFontMetrics(
     const page_load_metrics::mojom::FontLoadingMetricsPtr& font_loading_metrics,
     std::string_view suffix) {
@@ -466,6 +498,17 @@ void RecordFontMetrics(
       base::StrCat(
           {"PageLoad.Clients.GoogleSearch.FontLoading.FallbackCount.", suffix}),
       font_loading_metrics->fallback_count);
+
+  for (const auto& script_metric :
+       font_loading_metrics->script_fallback_metrics) {
+    std::string_view script_suffix =
+        GetScriptSuffix(script_metric->script_type);
+    base::UmaHistogramCounts100(
+        base::StrCat(
+            {"PageLoad.Clients.GoogleSearch.FontLoading.FallbackCount.",
+             script_suffix, ".", suffix}),
+        script_metric->fallback_count);
+  }
 }
 
 }  // namespace
