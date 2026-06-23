@@ -1995,7 +1995,7 @@ RenderFrameHostManager::GetFrameHostForNavigation(
   // A subframe should always be in the same BrowsingInstance as the parent
   // (see also https://crbug.com/1107269).
   //
-  // TODO(https://crbug.com/497761255): CHECK-exclusion: Convert to CHECK once
+  // TODO(https://crbug.com/526542490): CHECK-exclusion: Convert to CHECK once
   // we are sure this isn't hit.
   RenderFrameHostImpl* parent = frame_tree_node_->parent();
   DCHECK(!parent ||
@@ -2537,7 +2537,7 @@ RenderFrameHostManager::UnsetSpeculativeRenderFrameHost(
                   kSpeculativeMainFrameForNavigationCancelled);
   } else {
     // TODO(dcheng): Upgrade this to a CHECK()?
-    // TODO(https://crbug.com/503784536): CHECK-exclusion: Convert to CHECK once
+    // TODO(https://crbug.com/526543099): CHECK-exclusion: Convert to CHECK once
     // we are sure this isn't hit.
     DCHECK_EQ(speculative_render_frame_host_->lifecycle_state(),
               LifecycleStateImpl::kPendingCommit);
@@ -3439,7 +3439,7 @@ RenderFrameHostManager::GetSiteInstanceForNavigation(
   }
 
   if (process_to_reuse) {
-    // TODO(https://crbug.com/497761255): CHECK-exclusion: Convert to CHECK once
+    // TODO(https://crbug.com/526542622): CHECK-exclusion: Convert to CHECK once
     // we are sure this isn't hit.
     DCHECK(frame_tree_node_->IsMainFrame());
     new_instance->ReuseExistingProcessIfPossible(process_to_reuse);
@@ -4679,7 +4679,7 @@ RenderFrameHostManager::CreateSpeculativeRenderFrame(
         ->Hide();
   }
 
-  // TODO(https://crbug.com/503784536): CHECK-exclusion: Convert to CHECK once
+  // TODO(https://crbug.com/526543245): CHECK-exclusion: Convert to CHECK once
   // we are sure this isn't hit.
   DCHECK(render_view_host->IsRenderViewLive());
   // RenderViewHost for |instance| might exist prior to calling
@@ -4755,7 +4755,7 @@ void RenderFrameHostManager::CreateRenderFrameProxy(
       SCOPED_CRASH_KEY_STRING64("Bug1400009", "parent_lifecycle",
                                 RenderFrameHostImpl::LifecycleStateImplToString(
                                     parent_rfh->lifecycle_state()));
-      // TODO(https://crbug.com/497761255): CHECK-exclusion: Convert to CHECK
+      // TODO(https://crbug.com/526542464): CHECK-exclusion: Convert to CHECK
       // once we are sure this isn't hit.
       DCHECK(render_view_host);
     }
@@ -5916,7 +5916,7 @@ void RenderFrameHostManager::CreateOpenerProxies(
 
     auto opener_frame_token =
         node->render_manager()->GetOpenerFrameToken(group);
-    // TODO(https://crbug.com/497761255): CHECK-exclusion: Convert to CHECK once
+    // TODO(https://crbug.com/526543318): CHECK-exclusion: Convert to CHECK once
     // we are sure this isn't hit.
     DCHECK(opener_frame_token);
     proxy->GetAssociatedRemoteFrame()->UpdateOpener(opener_frame_token);

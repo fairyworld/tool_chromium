@@ -1707,7 +1707,7 @@ RenderProcessHostImpl::RenderProcessHostImpl(
           perfetto::NamedTrack::FromPointer("RenderProcessHostImpl",
                                             this,
                                             GetChildProcessTracingTrack(id_))) {
-  // TODO(https://crbug.com/497761255): CHECK-exclusion: Convert to CHECK once
+  // TODO(https://crbug.com/526543416): CHECK-exclusion: Convert to CHECK once
   // we are sure this isn't hit.
   DCHECK(!browser_context->ShutdownStarted());
   TRACE_EVENT("shutdown", "RenderProcessHostImpl",
@@ -2261,7 +2261,7 @@ void RenderProcessHostImpl::InitializeSharedMemoryRegionsOnceChannelIsUp() {
         base::AtomicSharedMemory<base::TimeTicks>::Create(
             priority_.is_background() ? base::TimeTicks()
                                       : base::TimeTicks::Now());
-    // TODO(https://crbug.com/497761255): CHECK-exclusion: Convert to CHECK once
+    // TODO(https://crbug.com/526542975): CHECK-exclusion: Convert to CHECK once
     // we are sure this isn't hit.
     DCHECK(last_foreground_time_region_.has_value());
   }

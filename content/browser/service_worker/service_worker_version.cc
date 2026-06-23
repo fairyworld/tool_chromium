@@ -1107,7 +1107,7 @@ void ServiceWorkerVersion::MoveControlleeToBackForwardCacheMap(
 
 void ServiceWorkerVersion::RestoreControlleeFromBackForwardCacheMap(
     const std::string& client_uuid) {
-  // TODO(https://crbug.com/497761255): CHECK-exclusion: Convert to CHECK once
+  // TODO(https://crbug.com/526538771): CHECK-exclusion: Convert to CHECK once
   // we are sure this isn't hit.
   DCHECK(IsBackForwardCacheEnabled());
   DCHECK(!controllee_map_.contains(client_uuid));
@@ -1116,7 +1116,7 @@ void ServiceWorkerVersion::RestoreControlleeFromBackForwardCacheMap(
     // evicted due to activation, postMessage or claim. In this case, we reload
     // the page without using BackForwardCache, so we can assume that
     // ContainerHost will be deleted soon.
-    // TODO(https://crbug.com/497761255): CHECK-exclusion: Convert to CHECK once
+    // TODO(https://crbug.com/526541415): CHECK-exclusion: Convert to CHECK once
     // we are sure this isn't hit.
     DCHECK(controllees_to_be_evicted_.contains(client_uuid));
     // TODO(crbug.com/40657227): Remove DumpWithoutCrashing once we confirm the

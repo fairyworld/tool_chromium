@@ -2085,7 +2085,7 @@ NavigationRequest::NavigationRequest(
     // TODO(acolwell): Move this below so it can be enforced on all paths.
     // This requires auditing same-document and other navigations that don't
     // have |from_begin_navigation_| or |entry| set.
-    // TODO(https://crbug.com/497761255): CHECK-exclusion: Convert to CHECK once
+    // TODO(https://crbug.com/526542421): CHECK-exclusion: Convert to CHECK once
     // we are sure this isn't hit.
     DCHECK(!RequiresInitiatorBasedSourceSiteInstance() ||
            source_site_instance_);
@@ -8760,10 +8760,10 @@ void NavigationRequest::Resume(NavigationThrottle* resuming_throttle) {
 void NavigationRequest::CancelDeferredNavigation(
     NavigationThrottle* cancelling_throttle,
     NavigationThrottle::ThrottleCheckResult result) {
-  // TODO(https://crbug.com/503784536): CHECK-exclusion: Convert to CHECK once
+  // TODO(https://crbug.com/526542189): CHECK-exclusion: Convert to CHECK once
   // we are sure this isn't hit.
   DCHECK(cancelling_throttle);
-  // TODO(https://crbug.com/503784536): CHECK-exclusion: Convert to CHECK once
+  // TODO(https://crbug.com/526541751): CHECK-exclusion: Convert to CHECK once
   // we are sure this isn't hit.
   DCHECK(throttle_registry_->GetDeferringThrottles().contains(
       cancelling_throttle));
@@ -9727,7 +9727,7 @@ NavigationRequest::GetOriginForURLLoaderFactoryAfterResponse() {
       !IsForMhtmlSubframe()) {
     int process_id = GetRenderFrameHost()->GetProcess()->GetDeprecatedID();
     auto* policy = ChildProcessSecurityPolicyImpl::GetInstance();
-    // TODO(https://crbug.com/497761255): CHECK-exclusion: Convert to CHECK once
+    // TODO(https://crbug.com/526541544): CHECK-exclusion: Convert to CHECK once
     // we are sure this isn't hit.
     DCHECK(policy->CanAccessOrigin(
         process_id, origin,
@@ -9958,7 +9958,7 @@ NavigationRequest::MakeDidCommitProvisionalLoadParamsForActivation() {
   // it won't be triggered.
   DCHECK_EQ(params->url, common_params().url);
   params->should_update_history = true;
-  // TODO(https://crbug.com/497761255): CHECK-exclusion: Convert to CHECK once
+  // TODO(https://crbug.com/526542699): CHECK-exclusion: Convert to CHECK once
   // we are sure this isn't hit.
   DCHECK_EQ(params->method, common_params().method);
   params->item_sequence_number = frame_entry_item_sequence_number();
@@ -10287,7 +10287,7 @@ NavigationRequest::GetAssociatedRFHType() const {
   // we only update the value for non-pending commit navigations (i.e. the
   // NavigationRequest owned by the FrameTreeNode). See the comments in
   // `RenderFrameHostManager::CommitPendingIfNecessary()` for more details.
-  // TODO(https://crbug.com/503784536): CHECK-exclusion: Convert to CHECK once
+  // TODO(https://crbug.com/526542284): CHECK-exclusion: Convert to CHECK once
   // we are sure this isn't hit.
   DCHECK(state_ < READY_TO_COMMIT || state_ == WILL_FAIL_REQUEST)
       << "Use GetRenderFrameHost() instead when the final RenderFrameHost "
@@ -10361,7 +10361,7 @@ const GURL& NavigationRequest::GetPreviousPrimaryMainFrameURL() {
 }
 
 const GURL& NavigationRequest::GetPreviousMainFrameURL() const {
-  // TODO(https://crbug.com/497761255): CHECK-exclusion: Convert to CHECK once
+  // TODO(https://crbug.com/526542680): CHECK-exclusion: Convert to CHECK once
   // we are sure this isn't hit.
   DCHECK(state_ == DID_COMMIT || state_ == DID_COMMIT_ERROR_PAGE);
   return previous_main_frame_url_;
@@ -12094,7 +12094,7 @@ void NavigationRequest::CheckSoftNavigationHeuristicsInvariants() {
   // that the task ID is only passed along if the initiator RFH is the same as
   // the navigated RFH.
   //
-  // TODO(https://crbug.com/497761255): CHECK-exclusion: Convert to CHECK once
+  // TODO(https://crbug.com/526542223): CHECK-exclusion: Convert to CHECK once
   // we are sure this isn't hit.
   DCHECK(IsSameDocument());
   DCHECK(IsInMainFrame());
