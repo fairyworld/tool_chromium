@@ -25,11 +25,25 @@ inline constexpr char kSharedCacheIsolatedCreateResourcesTable[] =
 inline constexpr char kSharedCacheIsolatedCreateResourcesTableIndex[] =
     "CREATE INDEX index_resources_hash ON resources(hash)";
 
+inline constexpr char kSharedCacheIsolatedInsertResource[] =
+    "INSERT INTO resources (hash, url, headers, body, is_ready) "
+    "VALUES (?, ?, ?, ?, ?)";
+
+inline constexpr char kSharedCacheIsolatedSetResourceReady[] =
+    "UPDATE resources SET is_ready = 1 WHERE rowid = ?";
+
+inline constexpr char kSharedCacheIsolatedSelectUrlAndReadyByRowId[] =
+    "SELECT url, is_ready FROM resources WHERE rowid = ?";
+
 }  // namespace internal
 
 enum class SharedCacheIsolatedDatabaseQuery {
-  kCreateResourcesTable,
-  kCreateResourcesTableIndex,
+  kCreateResourcesTable = 0,
+  kCreateResourcesTableIndex = 1,
+  kInsertResource = 2,
+  kSetResourceReady = 3,
+  kSelectUrlAndReadyByRowId = 4,
+  kMaxValue = kSelectUrlAndReadyByRowId,
 };
 
 inline constexpr base::cstring_view GetSharedCacheIsolatedDatabaseQuery(
@@ -39,6 +53,12 @@ inline constexpr base::cstring_view GetSharedCacheIsolatedDatabaseQuery(
       return internal::kSharedCacheIsolatedCreateResourcesTable;
     case SharedCacheIsolatedDatabaseQuery::kCreateResourcesTableIndex:
       return internal::kSharedCacheIsolatedCreateResourcesTableIndex;
+    case SharedCacheIsolatedDatabaseQuery::kInsertResource:
+      return internal::kSharedCacheIsolatedInsertResource;
+    case SharedCacheIsolatedDatabaseQuery::kSetResourceReady:
+      return internal::kSharedCacheIsolatedSetResourceReady;
+    case SharedCacheIsolatedDatabaseQuery::kSelectUrlAndReadyByRowId:
+      return internal::kSharedCacheIsolatedSelectUrlAndReadyByRowId;
   }
 }
 
