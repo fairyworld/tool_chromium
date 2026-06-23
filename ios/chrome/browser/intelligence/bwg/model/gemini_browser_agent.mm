@@ -1597,7 +1597,8 @@ GeminiConfiguration* GeminiBrowserAgent::CreateGeminiConfiguration(
   config.imageAttachment = startup_state.imageAttachment;
 
   config.clientID = base::SysUTF8ToNSString(gemini_tab_helper->GetClientId());
-  std::optional<std::string> maybe_server_id = gemini_tab_helper->GetServerId();
+  std::optional<std::string> maybe_server_id =
+      gemini::GetConversationId(browser_->GetProfile()->GetPrefs());
   config.serverID =
       maybe_server_id ? base::SysUTF8ToNSString(*maybe_server_id) : nil;
   config.shouldAnimatePresentation = YES;

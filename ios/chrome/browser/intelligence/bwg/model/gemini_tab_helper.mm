@@ -289,7 +289,9 @@ void GeminiTabHelper::UpdatePresentedSource(gemini::FloatyUpdateSource source,
 
 void GeminiTabHelper::DeactivateGeminiSession() {
   CancelPageContextGeneration();
-  GeminiTabHelper::DeleteGeminiSessionInStorage();
+  PrefService* pref_service =
+      ProfileIOS::FromBrowserState(web_state_->GetBrowserState())->GetPrefs();
+  gemini::DeleteGeminiSessionInStorage(pref_service);
 }
 
 bool GeminiTabHelper::IsLastInteractionUrlDifferent() {
@@ -312,33 +314,8 @@ bool GeminiTabHelper::ShouldShowSuggestionChips() {
   return !google_util::IsGoogleSearchUrl(web_state_->GetVisibleURL());
 }
 
-void GeminiTabHelper::CreateOrUpdateGeminiSessionInStorage(
-    std::string server_id) {
-  CreateOrUpdateSessionInPrefs(GetClientId(), server_id);
-}
-
-void GeminiTabHelper::DeleteGeminiSessionInStorage() {
-  CleanupSessionFromPrefs();
-}
-
 std::string GeminiTabHelper::GetClientId() {
   return base::NumberToString(web_state_->GetUniqueIdentifier().identifier());
-}
-
-std::optional<std::string> GeminiTabHelper::GetServerId() {
-  PrefService* pref_service =
-      ProfileIOS::FromBrowserState(web_state_->GetBrowserState())->GetPrefs();
-  base::Time last_interaction_timestamp =
-      pref_service->GetTime(prefs::kLastGeminiInteractionTimestamp);
-  const std::string server_id =
-      pref_service->GetString(prefs::kGeminiConversationId);
-  if (base::Time::Now() - last_interaction_timestamp <
-      GetGeminiSessionValidityDuration()) {
-    if (!server_id.empty()) {
-      return server_id;
-    }
-  }
-  return std::nullopt;
 }
 
 void GeminiTabHelper::SetGeminiHandler(id<GeminiCommands> handler) {
@@ -662,27 +639,6 @@ void GeminiTabHelper::NotifyPageContextUpdated(web::WebState* web_state) {
   for (auto& observer : observers_) {
     observer.OnPageContextUpdated(web_state);
   }
-}
-
-void GeminiTabHelper::CreateOrUpdateSessionInPrefs(std::string client_id,
-                                                   std::string server_id) {
-  if (client_id.empty() || server_id.empty()) {
-    return;
-  }
-
-  PrefService* pref_service =
-      ProfileIOS::FromBrowserState(web_state_->GetBrowserState())->GetPrefs();
-  pref_service->SetTime(prefs::kLastGeminiInteractionTimestamp,
-                        base::Time::Now());
-  pref_service->SetString(prefs::kLastGeminiInteractionURL,
-                          web_state_->GetVisibleURL().spec());
-  pref_service->SetString(prefs::kGeminiConversationId, server_id);
-}
-
-void GeminiTabHelper::CleanupSessionFromPrefs() {
-  PrefService* pref_service =
-      ProfileIOS::FromBrowserState(web_state_->GetBrowserState())->GetPrefs();
-  pref_service->ClearPref(prefs::kGeminiConversationId);
 }
 
 void GeminiTabHelper::OnCanApplyContextualCueingDecision(

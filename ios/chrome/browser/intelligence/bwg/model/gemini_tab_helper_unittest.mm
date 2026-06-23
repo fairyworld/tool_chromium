@@ -30,6 +30,7 @@
 #import "ios/chrome/browser/intelligence/bwg/metrics/gemini_metrics.h"
 #import "ios/chrome/browser/intelligence/bwg/model/gemini_page_context.h"
 #import "ios/chrome/browser/intelligence/bwg/model/gemini_service_factory.h"
+#import "ios/chrome/browser/intelligence/bwg/utils/gemini_prefs.h"
 #import "ios/chrome/browser/intelligence/features/features.h"
 #import "ios/chrome/browser/intelligence/proto_wrappers/page_context_wrapper.h"
 #import "ios/chrome/browser/intelligence/zero_state_suggestions/zero_state_suggestions_service.h"
@@ -218,6 +219,11 @@ class GeminiTabHelperTest : public PlatformTest {
       tab_helper_->OnGeminiEligibilityOnDemandDecision(url, decisions);
     }
   }
+
+  void CreateOrUpdateSessionInStorage(const std::string& server_id) {
+    gemini::CreateOrUpdateConversationIdPrefs(
+        server_id, web_state_->GetVisibleURL().spec(), profile_->GetPrefs());
+  }
 };
 
 TEST_F(GeminiTabHelperTest, TestContextualChipCommandSent) {
@@ -262,7 +268,7 @@ TEST_F(GeminiTabHelperTest, TestIsLastInteractionUrlDifferent_SameURL) {
       /*enabled_features=*/{kPageActionMenu}, /*disabled_features=*/{});
   GURL url("https://www.chromium.org");
   web_state_->SetCurrentURL(url);
-  tab_helper_->CreateOrUpdateGeminiSessionInStorage("server_id");
+  CreateOrUpdateSessionInStorage("server_id");
   ASSERT_FALSE(tab_helper_->IsLastInteractionUrlDifferent());
 }
 
@@ -271,7 +277,7 @@ TEST_F(GeminiTabHelperTest, TestIsLastInteractionUrlDifferent_DifferentURL) {
       /*enabled_features=*/{kPageActionMenu}, /*disabled_features=*/{});
   GURL url1("https://www.chromium.org");
   web_state_->SetCurrentURL(url1);
-  tab_helper_->CreateOrUpdateGeminiSessionInStorage("server_id");
+  CreateOrUpdateSessionInStorage("server_id");
 
   GURL url2("https://www.google.com");
   web_state_->SetCurrentURL(url2);
@@ -285,7 +291,7 @@ TEST_F(GeminiTabHelperTest,
       /*disabled_features=*/{});
   GURL url("https://www.chromium.org");
   web_state_->SetCurrentURL(url);
-  tab_helper_->CreateOrUpdateGeminiSessionInStorage("server_id");
+  CreateOrUpdateSessionInStorage("server_id");
   ASSERT_FALSE(tab_helper_->IsLastInteractionUrlDifferent());
 }
 
@@ -296,7 +302,7 @@ TEST_F(GeminiTabHelperTest,
       /*disabled_features=*/{});
   GURL url1("https://www.chromium.org");
   web_state_->SetCurrentURL(url1);
-  tab_helper_->CreateOrUpdateGeminiSessionInStorage("server_id");
+  CreateOrUpdateSessionInStorage("server_id");
 
   GURL url2("https://www.google.com");
   web_state_->SetCurrentURL(url2);
@@ -312,59 +318,7 @@ TEST_F(GeminiTabHelperTest, TestShouldShowSuggestionChips) {
   ASSERT_TRUE(tab_helper_->ShouldShowSuggestionChips());
 }
 
-TEST_F(GeminiTabHelperTest, TestCreateOrUpdateGeminiSessionInStorage) {
-  std::string server_id = "test_server_id";
-  tab_helper_->CreateOrUpdateGeminiSessionInStorage(server_id);
-  std::optional<std::string> retrieved_server_id = tab_helper_->GetServerId();
-  ASSERT_TRUE(retrieved_server_id.has_value());
-  ASSERT_EQ(server_id, retrieved_server_id.value());
-}
 
-TEST_F(GeminiTabHelperTest, TestDeleteGeminiSessionInStorage) {
-  tab_helper_->CreateOrUpdateGeminiSessionInStorage("test_server_id");
-  ASSERT_TRUE(tab_helper_->GetServerId().has_value());
-  tab_helper_->DeleteGeminiSessionInStorage();
-  ASSERT_FALSE(tab_helper_->GetServerId().has_value());
-}
-
-TEST_F(GeminiTabHelperTest, TestGetServerId) {
-  ASSERT_FALSE(tab_helper_->GetServerId().has_value());
-  std::string server_id = "test_server_id";
-  tab_helper_->CreateOrUpdateGeminiSessionInStorage(server_id);
-  ASSERT_TRUE(tab_helper_->GetServerId().has_value());
-  ASSERT_EQ(server_id, tab_helper_->GetServerId().value());
-}
-
-TEST_F(GeminiTabHelperTest, TestGetServerId_Expired) {
-  std::string server_id = "test_server_id";
-  tab_helper_->CreateOrUpdateGeminiSessionInStorage(server_id);
-  ASSERT_TRUE(tab_helper_->GetServerId().has_value());
-
-  // Fast forward time to expire the session.
-  task_environment_.FastForwardBy(GetGeminiSessionValidityDuration() +
-                                  base::Seconds(1));
-
-  ASSERT_FALSE(tab_helper_->GetServerId().has_value());
-}
-
-TEST_F(GeminiTabHelperTest, TestGetServerId_Expired_CustomDuration) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeatureWithParameters(
-      kGeminiConfigParams, {{kGeminiSessionValidityDuration, "5"}});
-
-  std::string server_id = "test_server_id";
-  tab_helper_->CreateOrUpdateGeminiSessionInStorage(server_id);
-  ASSERT_TRUE(tab_helper_->GetServerId().has_value());
-  ASSERT_EQ(GetGeminiSessionValidityDuration(), base::Minutes(5));
-
-  // Fast forward by 4 minutes -> should still be valid.
-  task_environment_.FastForwardBy(base::Minutes(4));
-  ASSERT_TRUE(tab_helper_->GetServerId().has_value());
-
-  // Fast forward by another 1 minute + 1 second -> should expire.
-  task_environment_.FastForwardBy(base::Minutes(1) + base::Seconds(1));
-  ASSERT_FALSE(tab_helper_->GetServerId().has_value());
-}
 
 TEST_F(GeminiTabHelperTest, TestDidStartNavigation_ShowsImageRemixTooltip) {
   feature_engagement::test::ScopedIphFeatureList iph_feature_list;
@@ -642,8 +596,8 @@ TEST_F(GeminiTabHelperTest,
        WebStateDestroyed_DoesNotCleanUpSession_GeminiCrossTabEnabled) {
   feature_list_.InitWithFeatures({kPageActionMenu}, {});
   std::string server_id = "test_server_id";
-  tab_helper_->CreateOrUpdateGeminiSessionInStorage(server_id);
-  ASSERT_EQ(tab_helper_->GetServerId().value(), server_id);
+  CreateOrUpdateSessionInStorage(server_id);
+  ASSERT_EQ(gemini::GetConversationId(profile_->GetPrefs()).value(), server_id);
 
   // Destroy the webstate.
   web_state_.reset();
@@ -654,7 +608,7 @@ TEST_F(GeminiTabHelperTest,
   GeminiTabHelper::CreateForWebState(web_state_.get());
   tab_helper_ = GeminiTabHelper::FromWebState(web_state_.get());
 
-  ASSERT_EQ(tab_helper_->GetServerId().value(), server_id);
+  ASSERT_EQ(gemini::GetConversationId(profile_->GetPrefs()).value(), server_id);
 }
 
 @interface FakePageContextWrapper : PageContextWrapper

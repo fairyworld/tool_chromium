@@ -89,13 +89,6 @@ class GeminiTabHelper : public web::WebStateObserver,
   // and visible URL.
   bool ShouldShowSuggestionChips();
 
-  // Creates, or updates, a new Gemini session in storage with the current
-  // timestamp, server ID and URL for the associated WebState.
-  void CreateOrUpdateGeminiSessionInStorage(std::string server_id);
-
-  // Removes the associated WebState's session from storage.
-  void DeleteGeminiSessionInStorage();
-
   // Whether Gemini is available for the current web state.
   bool IsGeminiAvailableForWebState();
 
@@ -105,10 +98,8 @@ class GeminiTabHelper : public web::WebStateObserver,
   // Whether Gemini Chat mode is available for the current web state.
   bool IsGeminiChatAvailableForWebState();
 
-  // Gets the client and server IDs for the Gemini session for the associated
-  // WebState. server ID is optional because it may not be found or is expired.
+  // Gets the client ID for the Gemini session for the associated WebState.
   std::string GetClientId();
-  std::optional<std::string> GetServerId();
 
   // Set the Gemini commands handler, used to show/hide the Gemini UI.
   void SetGeminiHandler(id<GeminiCommands> handler);
@@ -233,11 +224,6 @@ class GeminiTabHelper : public web::WebStateObserver,
       const GURL& main_frame_url,
       optimization_guide::OptimizationGuideDecision decision,
       const optimization_guide::OptimizationMetadata& metadata);
-
-  // Creates a new Gemini session in the prefs, or updates an existing one, with
-  // the current timestamp.
-  void CreateOrUpdateSessionInPrefs(std::string client_id,
-                                    std::string server_id);
 
   // Removes the Gemini session from the prefs.
   void CleanupSessionFromPrefs();
