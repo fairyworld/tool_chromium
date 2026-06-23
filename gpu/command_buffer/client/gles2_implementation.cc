@@ -508,7 +508,7 @@ gpu::SyncToken GLES2Implementation::CopySharedImageToGLTextureViaTextureCopy(
       std::move(scoped_si_access));
 }
 
-std::unique_ptr<gpu::RasterScopedAccess>
+CopySharedImageSyncCallback
 GLES2Implementation::CopySharedImageDirectlyToGLTexture(
     const gfx::Rect& src_rect,
     ClientSharedImage* source_shared_image,
@@ -522,7 +522,7 @@ GLES2Implementation::CopySharedImageDirectlyToGLTexture(
     int32_t dst_level,
     SkAlphaType dst_alpha_type,
     GrSurfaceOrigin dst_origin) {
-  std::unique_ptr<gpu::RasterScopedAccess> destination_access;
+  CopySharedImageSyncCallback sync_callback;
   if (CanCopySharedImageToGLTextureViaTextureCopy(source_shared_image)) {
     CopySharedImageToGLTextureViaTextureCopy(
         src_rect, source_shared_image, source_sync_token, dst_target,
@@ -542,16 +542,22 @@ GLES2Implementation::CopySharedImageDirectlyToGLTexture(
     // upload to work for Graphite *without* depending on being able to create a
     // Ganesh/GL context.
 
-    destination_access = source_shared_image->BeginGLAccessForCopySharedImage(
-        this, source_sync_token, /*readonly=*/true);
+    std::unique_ptr<gpu::RasterScopedAccess> destination_access =
+        source_shared_image->BeginGLAccessForCopySharedImage(
+            this, source_sync_token, /*readonly=*/true);
 
     const bool is_dst_origin_top_left = dst_origin == kTopLeft_GrSurfaceOrigin;
     CopySharedImageToTextureINTERNAL(
         dst_texture, dst_target, dst_internal_format, dst_type, src_rect.x(),
         src_rect.y(), src_rect.width(), src_rect.height(),
         is_dst_origin_top_left, source_shared_image->mailbox().name);
+    sync_callback = base::BindOnce(
+        [](std::unique_ptr<gpu::RasterScopedAccess> ri_access) {
+          return gpu::RasterScopedAccess::EndAccess(std::move(ri_access));
+        },
+        std::move(destination_access));
   }
-  return destination_access;
+  return sync_callback;
 }
 
 void GLES2Implementation::SendErrorMessage(std::string message, int32_t id) {

@@ -212,7 +212,7 @@ void SynchronizeVideoFrameRead(
     scoped_refptr<VideoFrame> video_frame,
     gpu::raster::RasterInterface* ri,
     gpu::ContextSupport* context_support,
-    std::unique_ptr<gpu::RasterScopedAccess> ri_access = nullptr) {
+    std::unique_ptr<gpu::RasterScopedAccess> ri_access) {
   WaitAndReplaceSyncTokenClient client(ri, std::move(ri_access));
   video_frame->UpdateReleaseSyncToken(&client);
   if (!video_frame->metadata().read_lock_fences_enabled) {
@@ -1266,8 +1266,8 @@ void PaintCanvasVideoRenderer::SynchronizeVideoFrameRead(
     scoped_refptr<VideoFrame> video_frame,
     gpu::gles2::GLES2Interface* gl,
     gpu::ContextSupport* context_support,
-    std::unique_ptr<gpu::RasterScopedAccess> ri_access) {
-  WaitAndReplaceSyncTokenClient client(gl, std::move(ri_access));
+    base::OnceCallback<gpu::SyncToken()> sync_callback) {
+  WaitAndReplaceSyncTokenClient client(gl, std::move(sync_callback));
   video_frame->UpdateReleaseSyncToken(&client);
   if (!video_frame->metadata().read_lock_fences_enabled) {
     return;

@@ -48,7 +48,7 @@ GLES2TraceImplementation::CopySharedImageToGLTextureViaTextureCopy(
       dst_origin);
 }
 
-std::unique_ptr<gpu::RasterScopedAccess>
+CopySharedImageSyncCallback
 GLES2TraceImplementation::CopySharedImageDirectlyToGLTexture(
     const gfx::Rect& src_rect,
     ClientSharedImage* source_shared_image,
@@ -94,4 +94,3 @@ void GLES2TraceImplementation::ShallowFlushCHROMIUM() {
 
 }  // namespace gles2
 }  // namespace gpu
-
