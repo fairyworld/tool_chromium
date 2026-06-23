@@ -15084,7 +15084,7 @@ should be able to be added at any place in this file.
   <owner>chromeos-launcher@google.com</owner>
   <description>
     User performed an action in the tasks glanceables. This aggregates all user
-    actions that the user can perform intaskss glanceable.
+    actions that the user can perform in the tasks glanceable.
   </description>
 </action>
 
@@ -15092,7 +15092,7 @@ should be able to be added at any place in this file.
   <owner>perrier@google.com</owner>
   <owner>harringtond@chromium.org</owner>
   <description>
-    Logged anytime the Glic CookieSyncronizer timeout is reached.
+    Logged any time the Glic CookieSynchronizer timeout is reached.
   </description>
 </action>
 
@@ -15100,7 +15100,7 @@ should be able to be added at any place in this file.
   <owner>iwells@google.com</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
-    Logged anytime glic is disabled, regardless of source. Note: Glic can only
+    Logged any time Glic is disabled, regardless of source. Note: Glic can only
     be disabled by account and policy changes that are not user initiated.
   </description>
 </action>
@@ -15211,8 +15211,8 @@ should be able to be added at any place in this file.
   <owner>andreaxg@google.com</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
-    Logged if the user uses the focus hotkey while glic is open. Triggered by
-    hotkey presses captured in Chrome as well as in the glic window.
+    Logged if the user uses the focus hotkey while Glic is open. Triggered by
+    hotkey presses captured in Chrome as well as in the Glic window.
   </description>
 </action>
 
@@ -15279,7 +15279,7 @@ should be able to be added at any place in this file.
   <owner>birnie@google.com</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
-    User closed the FRE by toggling the glic feature invocation source.
+    User closed the FRE by toggling the Glic feature invocation source.
   </description>
 </action>
 
@@ -15424,7 +15424,7 @@ should be able to be added at any place in this file.
   <owner>iwells@google.com</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
-    Logged if the glic FRE is shown. Logged as soon as the widget is visible.
+    Logged if the Glic FRE is shown. Logged as soon as the widget is visible.
     This occurs before the UI is fully loaded.
   </description>
 </action>
@@ -15699,7 +15699,7 @@ should be able to be added at any place in this file.
   <owner>perrier@google.com</owner>
   <description>
     Logged when SwitchConversation is called from Floaty on a Glic instance to
-    switch to a different conversation (eg. loading a chat from 'recent'
+    switch to a different conversation (e.g. loading a chat from 'recent'
     conversations in the three-dots menu).
   </description>
 </action>
@@ -15709,7 +15709,7 @@ should be able to be added at any place in this file.
   <owner>perrier@google.com</owner>
   <description>
     Logged when SwitchConversation is called from Side Panel on a Glic instance
-    to switch to a different conversation (eg. loading a chat from 'recent'
+    to switch to a different conversation (e.g. loading a chat from 'recent'
     conversations in the three-dots menu).
   </description>
 </action>
@@ -15736,7 +15736,7 @@ should be able to be added at any place in this file.
   <owner>kenok@google.com</owner>
   <owner>chrstne@google.com</owner>
   <description>
-    Logged if the user activates a task controlled tab from a glic instance.
+    Logged if the user activates a task-controlled tab from a Glic instance.
   </description>
 </action>
 
@@ -15749,7 +15749,7 @@ should be able to be added at any place in this file.
 <action name="Glic.Instance.UnBind">
   <owner>birnie@google.com</owner>
   <owner>perrier@google.com</owner>
-  <description>Logged when a Glic instance is un bound from a tab.</description>
+  <description>Logged when a Glic instance is unbound from a tab.</description>
 </action>
 
 <action name="Glic.Instance.UninterruptActorTask">
@@ -15893,7 +15893,7 @@ should be able to be added at any place in this file.
   <owner>charlesmeng@chromium.org</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
-    Logged anytime glic is pinned to the tabstrip, regardless of source.
+    Logged any time Glic is pinned to the tabstrip, regardless of source.
   </description>
 </action>
 
@@ -15901,7 +15901,7 @@ should be able to be added at any place in this file.
   <owner>wry@chromium.org</owner>
   <owner>perrier@chromium.org</owner>
   <description>
-    Logged anytime a pinned tab is navigated to a new origin.
+    Logged any time a pinned tab is navigated to a new origin.
   </description>
 </action>
 
@@ -15909,7 +15909,7 @@ should be able to be added at any place in this file.
   <owner>wry@chromium.org</owner>
   <owner>perrier@chromium.org</owner>
   <description>
-    Logged anytime a pinned tab is navigated to a new origin and the tab is
+    Logged any time a pinned tab is navigated to a new origin and the tab is
     unpinned as a result.
   </description>
 </action>
@@ -16048,14 +16048,14 @@ should be able to be added at any place in this file.
   <owner>charlesmeng@chromium.org</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
-    Logged anytime glic is unpinned from the tabstrip, regardless of source.
+    Logged any time Glic is unpinned from the tabstrip, regardless of source.
   </description>
 </action>
 
 <action name="Glic.Widget.ResetPositionOnOpen">
   <owner>perrier@chromium.org</owner>
   <description>
-    Logged eachtime the position of the glic widget is reset when reopening
+    Logged each time the position of the Glic widget is reset when reopening
     before a minimum delay is reached.
   </description>
 </action>
@@ -16190,7 +16190,7 @@ should be able to be added at any place in this file.
   <owner>pauladedeji@google.com</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
-    Logged anytime glic shortcut (aka hotkey) is disabled from
+    Logged any time the Glic shortcut (aka hotkey) is disabled from
     chrome://settings.
   </description>
 </action>
@@ -16199,7 +16199,8 @@ should be able to be added at any place in this file.
   <owner>pauladedeji@google.com</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
-    Logged anytime glic shortcut (aka hotkey) is edited from chrome://settings.
+    Logged any time the Glic shortcut (aka hotkey) is edited from
+    chrome://settings.
   </description>
 </action>
 
@@ -16207,7 +16208,8 @@ should be able to be added at any place in this file.
   <owner>pauladedeji@google.com</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
-    Logged anytime glic shortcut (aka hotkey) is enabled from chrome://settings.
+    Logged any time the Glic shortcut (aka hotkey) is enabled from
+    chrome://settings.
   </description>
 </action>
 
@@ -16215,8 +16217,8 @@ should be able to be added at any place in this file.
   <owner>ananyaseelam@google.com</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
-    Logged anytime glic OS launcher entrypoint (aka hotkey) is toggled off from
-    chrome://settings.
+    Logged any time the Glic OS launcher entrypoint (aka hotkey) is toggled off
+    from chrome://settings.
   </description>
 </action>
 
@@ -16224,8 +16226,8 @@ should be able to be added at any place in this file.
   <owner>ananyaseelam@google.com</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
-    Logged anytime glic OS launcher entrypoint (aka hotkey) is toggled on from
-    chrome://settings.
+    Logged any time the Glic OS launcher entrypoint (aka hotkey) is toggled on
+    from chrome://settings.
   </description>
 </action>
 
@@ -16379,7 +16381,7 @@ should be able to be added at any place in this file.
   <owner>pauladedeji@google.com</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
-    Logged when glic web client requests the main settings page (no section
+    Logged when the Glic web client requests the main settings page (no section
     specified).
   </description>
 </action>
@@ -16388,8 +16390,8 @@ should be able to be added at any place in this file.
   <owner>pauladedeji@google.com</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
-    Logged when glic web client requests os entrypoint toggle section of the
-    settings page.
+    Logged when the Glic web client requests the OS entrypoint toggle section of
+    the settings page.
   </description>
 </action>
 
@@ -16397,7 +16399,8 @@ should be able to be added at any place in this file.
   <owner>pauladedeji@google.com</owner>
   <owner>erikchen@chromium.org</owner>
   <description>
-    Logged when glic web client requests os hotkey section of the settings page.
+    Logged when the Glic web client requests the OS hotkey section of the
+    settings page.
   </description>
 </action>
 
@@ -16412,7 +16415,7 @@ should be able to be added at any place in this file.
   <owner>carlosk@chromium.org</owner>
   <owner>harringtond@chromium.org</owner>
   <owner>erikchen@chromium.org</owner>
-  <description>Tracks when glic webui crashes.</description>
+  <description>Tracks when the Glic WebUI crashes.</description>
 </action>
 
 <action name="GlicTabContextPermissionDisabled">
