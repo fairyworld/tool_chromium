@@ -2061,6 +2061,41 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               bwi))
           .SetActionId(kActionTabSearchClose)
           .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ExecuteUIDebugCommand(IDC_DEBUG_TOGGLE_TABLET_MODE,
+                                              bwi);
+              },
+              bwi))
+          .SetActionId(kActionDebugToggleTabletMode)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ExecuteUIDebugCommand(IDC_DEBUG_PRINT_VIEW_TREE, bwi);
+              },
+              bwi))
+          .SetActionId(kActionDebugPrintViewTree)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ExecuteUIDebugCommand(IDC_DEBUG_PRINT_VIEW_TREE_DETAILS,
+                                              bwi);
+              },
+              bwi))
+          .SetActionId(kActionDebugPrintViewTreeDetails)
+          .Build());
 }
 
 void BrowserActions::AddListeners() {
