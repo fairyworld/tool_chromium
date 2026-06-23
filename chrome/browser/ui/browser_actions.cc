@@ -2195,6 +2195,55 @@ void BrowserActions::InitializeNavigationActions() {
           base::BindRepeating(
               [](BrowserWindowInterface* bwi, actions::ActionItem* item,
                  actions::ActionInvocationContext context) {
+                chrome::Stop(bwi);
+              },
+              bwi))
+          .SetActionId(kActionStop)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                WindowOpenDisposition disposition =
+                    context.GetProperty(chrome::kDispositionKey);
+                chrome::ClearCache(bwi);
+                chrome::ReloadBypassingCache(bwi, disposition);
+              },
+              bwi))
+          .SetActionId(kActionReloadClearingCache)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                WindowOpenDisposition disposition =
+                    context.GetProperty(chrome::kDispositionKey);
+                chrome::ReloadBypassingCache(bwi, disposition);
+              },
+              bwi))
+          .SetActionId(kActionReloadBypassingCache)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::OpenCurrentURL(bwi);
+              },
+              bwi))
+          .SetActionId(kActionOpenCurrentUrl)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
                 WindowOpenDisposition disposition =
                     context.GetProperty(chrome::kDispositionKey);
                 chrome::Home(bwi, disposition);
