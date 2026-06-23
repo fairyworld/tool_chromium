@@ -15,6 +15,8 @@ build_webui("build") {
     "animations/showcase_transition_right.json",
     "animations/showcase_transition_right_dark.json",
     "feature_showcase.html",
+    "images/lens_overlay_illustration_light.png",
+    "images/lens_overlay_illustration_dark.png",
     "images/password_manager_illustration_light.png",
     "images/password_manager_illustration_dark.png",
   ]

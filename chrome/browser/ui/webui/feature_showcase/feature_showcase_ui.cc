@@ -66,9 +66,9 @@ void AddGoogleLensStepResources(content::WebUIDataSource* source) {
   });
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
-  source->AddResourcePath("images/google_lens_illustration_light.png",
+  source->AddResourcePath("images/lens_overlay_illustration_light.png",
                           IDR_FEATURE_SHOWCASE_GOOGLE_LENS_ILLUSTRATION_LIGHT);
-  source->AddResourcePath("images/google_lens_illustration_dark.png",
+  source->AddResourcePath("images/lens_overlay_illustration_dark.png",
                           IDR_FEATURE_SHOWCASE_GOOGLE_LENS_ILLUSTRATION_DARK);
 #endif
 }
