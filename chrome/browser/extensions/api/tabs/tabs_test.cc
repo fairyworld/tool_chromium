@@ -1240,8 +1240,9 @@ IN_PROC_BROWSER_TEST_F(ExtensionWindowCreateTest, MAYBE_AcceptState) {
   // DesktopWindowTreeHostX11::IsMinimized() relies on an asynchronous update
   // from the window server
   views::test::PropertyWaiter minimize_waiter(
-      base::BindRepeating(&BrowserWindow::IsMinimized,
-                          base::Unretained(new_browser->window())),
+      base::BindRepeating(
+          &BrowserWindow::IsMinimized,
+          base::Unretained(BrowserWindow::FromBrowser(new_browser))),
       true, TestTimeouts::action_timeout());
   EXPECT_TRUE(minimize_waiter.Wait());
 #elif BUILDFLAG(SUPPORTS_OZONE_WAYLAND)
