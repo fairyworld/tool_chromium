@@ -761,7 +761,7 @@ bool FindNavigatorShouldBePresentedInBrowser(Browser* browser) {
 
   auto params = std::make_unique<TabGridTransitionHandlerInitParams>(
       direction, self.browserLayoutViewController, _viewController,
-      parentViewController, appContentView);
+      parentViewController, appContentView, self);
 
   if (animationEnabled) {
     // Use reduced animation on TabGroup panel to avoid weird animation where
@@ -1914,6 +1914,18 @@ bool FindNavigatorShouldBePresentedInBrowser(Browser* browser) {
   self.pageActionMenuCoordinator.pageActionMenuHandler = HandlerForProtocol(
       self.regularBrowser->GetCommandDispatcher(), PageActionMenuCommands);
   [self.pageActionMenuCoordinator start];
+}
+
+- (void)activateGridContainerConstraints {
+  [_viewController.incognitoGridContainerViewController activateConstraints];
+  [_viewController.incognitoGridContainerViewController activateConstraints];
+  [_viewController.tabGroupsGridContainerViewController activateConstraints];
+}
+
+- (void)deactivateGridContainerConstraints {
+  [_viewController.incognitoGridContainerViewController deactivateConstraints];
+  [_viewController.incognitoGridContainerViewController deactivateConstraints];
+  [_viewController.tabGroupsGridContainerViewController deactivateConstraints];
 }
 
 #pragma mark - TabGroupPositioner
