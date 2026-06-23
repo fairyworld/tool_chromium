@@ -46,6 +46,7 @@
 #include "components/sync/service/sync_service.h"
 #include "components/sync/service/sync_user_settings.h"
 #include "google_apis/gaia/gaia_id.h"
+#include "url/gurl.h"
 
 #if !BUILDFLAG(IS_FUCHSIA)
 #include "components/variations/service/google_groups_manager.h"  // nogncheck
@@ -878,6 +879,28 @@ bool SetAutofillAiOptInStatus(
          (signed_in_hash &&
           syncer::GetAccountKeyedPrefValue(prefs, prefs::kAutofillAiOptInStatus,
                                            *signed_in_hash));
+}
+
+bool IsAutofillAiEntityTypeBlockedByPolicy(const AutofillClient& client,
+                                           const GURL& url,
+                                           EntityType entity_type) {
+  switch (entity_type.name()) {
+    case EntityTypeName::kNationalIdCard:
+    case EntityTypeName::kPassport:
+    case EntityTypeName::kDriversLicense:
+      return client.IsAutofillTypeBlockedByPolicy(
+          url, AutofillClient::AutofillPolicyDataCategory::kIdentityDocs);
+    case EntityTypeName::kVehicle:
+    case EntityTypeName::kFlightReservation:
+    case EntityTypeName::kRedressNumber:
+    case EntityTypeName::kKnownTravelerNumber:
+      return client.IsAutofillTypeBlockedByPolicy(
+          url, AutofillClient::AutofillPolicyDataCategory::kTravel);
+    case EntityTypeName::kOrder:
+    case EntityTypeName::kShipment:
+      return false;
+  }
+  return false;
 }
 
 [[nodiscard]] bool IsAutofillAiDisabledByEnterprisePolicy(

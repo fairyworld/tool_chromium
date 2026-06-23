@@ -156,6 +156,27 @@ class AutofillAiPermissionUtilsTest : public ::testing::Test {
   TestAutofillClient client_;
 };
 
+// Tests that IsAutofillAiEntityTypeBlockedByPolicy correctly maps entity
+// schemas to enterprise policy categories.
+TEST_F(AutofillAiPermissionUtilsTest, IsAutofillAiEntityTypeBlockedByPolicy) {
+  const GURL kUrl("https://example.com");
+
+  EXPECT_FALSE(IsAutofillAiEntityTypeBlockedByPolicy(
+      client(), kUrl, EntityType(EntityTypeName::kPassport)));
+
+  client().SetAutofillTypeBlockedByPolicy(
+      AutofillClient::AutofillPolicyDataCategory::kIdentityDocs, true);
+  EXPECT_TRUE(IsAutofillAiEntityTypeBlockedByPolicy(
+      client(), kUrl, EntityType(EntityTypeName::kPassport)));
+  EXPECT_FALSE(IsAutofillAiEntityTypeBlockedByPolicy(
+      client(), kUrl, EntityType(EntityTypeName::kVehicle)));
+
+  client().SetAutofillTypeBlockedByPolicy(
+      AutofillClient::AutofillPolicyDataCategory::kTravel, true);
+  EXPECT_TRUE(IsAutofillAiEntityTypeBlockedByPolicy(
+      client(), kUrl, EntityType(EntityTypeName::kVehicle)));
+}
+
 class AutofillAiMayPerformActionTest
     : public AutofillAiPermissionUtilsTest,
       public ::testing::WithParamInterface<AutofillAiAction> {
