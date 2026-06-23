@@ -21,6 +21,10 @@ TEST(AiModeButtonConfigTest, GoogleConfigIsValid) {
 
   // Fill in all required fields.
   config.text = u"Bing AI";
+  config.placeholder_text = u"Bing placeholder";
+  config.tooltip = u"Bing tooltip";
+  config.a11y_label = u"Bing a11y";
+  config.context_menu_label = u"Bing menu";
   config.navigation_url = "https://bing.com/search?q={searchTerms}";
   config.navigation_url_empty = "https://bing.com/chat";
   config.favicon_url = "https://bing.com/favicon.ico";
@@ -30,6 +34,26 @@ TEST(AiModeButtonConfigTest, GoogleConfigIsValid) {
   {
     AiModeButtonConfig config_copy = config;
     config_copy.text.clear();
+    EXPECT_FALSE(config_copy.IsValid());
+  }
+  {
+    AiModeButtonConfig config_copy = config;
+    config_copy.placeholder_text.clear();
+    EXPECT_FALSE(config_copy.IsValid());
+  }
+  {
+    AiModeButtonConfig config_copy = config;
+    config_copy.tooltip.clear();
+    EXPECT_FALSE(config_copy.IsValid());
+  }
+  {
+    AiModeButtonConfig config_copy = config;
+    config_copy.a11y_label.clear();
+    EXPECT_FALSE(config_copy.IsValid());
+  }
+  {
+    AiModeButtonConfig config_copy = config;
+    config_copy.context_menu_label.clear();
     EXPECT_FALSE(config_copy.IsValid());
   }
   {
@@ -45,6 +69,33 @@ TEST(AiModeButtonConfigTest, GoogleConfigIsValid) {
   {
     AiModeButtonConfig config_copy = config;
     config_copy.favicon_url.clear();
+    EXPECT_FALSE(config_copy.IsValid());
+  }
+
+  // Test string fields too long.
+  {
+    AiModeButtonConfig config_copy = config;
+    config_copy.text = std::u16string(17, 'a');
+    EXPECT_FALSE(config_copy.IsValid());
+  }
+  {
+    AiModeButtonConfig config_copy = config;
+    config_copy.placeholder_text = std::u16string(65, 'a');
+    EXPECT_FALSE(config_copy.IsValid());
+  }
+  {
+    AiModeButtonConfig config_copy = config;
+    config_copy.tooltip = std::u16string(65, 'a');
+    EXPECT_FALSE(config_copy.IsValid());
+  }
+  {
+    AiModeButtonConfig config_copy = config;
+    config_copy.a11y_label = std::u16string(65, 'a');
+    EXPECT_FALSE(config_copy.IsValid());
+  }
+  {
+    AiModeButtonConfig config_copy = config;
+    config_copy.context_menu_label = std::u16string(65, 'a');
     EXPECT_FALSE(config_copy.IsValid());
   }
 

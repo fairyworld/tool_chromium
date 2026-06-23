@@ -16,7 +16,15 @@ bool AiModeButtonConfig::IsValid() const {
     return true;
   }
 
-  if (text.empty()) {
+  constexpr size_t kMaxTextLength = 16;
+  constexpr size_t kMaxOtherStringsLength = 64;
+  if (text.empty() || text.length() > kMaxTextLength ||
+      placeholder_text.empty() ||
+      placeholder_text.length() > kMaxOtherStringsLength || tooltip.empty() ||
+      tooltip.length() > kMaxOtherStringsLength || a11y_label.empty() ||
+      a11y_label.length() > kMaxOtherStringsLength ||
+      context_menu_label.empty() ||
+      context_menu_label.length() > kMaxOtherStringsLength) {
     return false;
   }
 
