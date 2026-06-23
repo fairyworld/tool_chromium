@@ -235,6 +235,7 @@ std::string GenerateContentSettingsExceptionsSubPage(ContentSettingsType type) {
           {ContentSettingsType::WEB_PRINTING, "webPrinting"},
           {ContentSettingsType::AUTO_PICTURE_IN_PICTURE,
            "autoPictureInPicture"},
+          {ContentSettingsType::INLINE_CUE_MENU, "inlineCueMenu"},
       });
 
   const std::string_view* override =

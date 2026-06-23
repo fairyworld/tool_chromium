@@ -24,6 +24,7 @@
 #include "chrome/browser/compose/compose_enabling.h"
 #include "chrome/browser/contextual_cueing/features.h"
 #include "chrome/browser/contextual_tasks/contextual_tasks_context_service.h"
+#include "chrome/browser/glic/public/features.h"
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/glic/public/glic_keyed_service.h"
 #include "chrome/browser/history_embeddings/history_embeddings_utils.h"
@@ -581,6 +582,11 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
       "enableAutofillAiWalletPrivatePasses",
       base::FeatureList::IsEnabled(
           autofill::features::kAutofillAiWalletPrivatePasses));
+
+  html_source->AddBoolean(
+      "enableInlineCueMenuContentSetting",
+      base::FeatureList::IsEnabled(features::kGlicSelectionPrompt) &&
+          features::kGlicSelectionEnableSiteSettings.Get());
 
   // AI
   bool show_glic_section = false;

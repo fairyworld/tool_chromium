@@ -898,22 +898,18 @@ TEST_F(GlicSelectionObserverTest, ContentSettingsBlockSelectionWidget) {
   HostContentSettingsMap* settings_map =
       HostContentSettingsMapFactory::GetForProfile(profile);
 
-  // Default setting is ALLOW, so ShouldShowSelectionWidget() should be true.
   EXPECT_TRUE(ShouldShowSelectionWidget());
 
-  // Block the site.
   settings_map->SetContentSettingDefaultScope(
       web_contents()->GetLastCommittedURL(), GURL(),
       ContentSettingsType::INLINE_CUE_MENU, CONTENT_SETTING_BLOCK);
   EXPECT_FALSE(ShouldShowSelectionWidget());
 
-  // Reset to ALLOW.
   settings_map->SetContentSettingDefaultScope(
       web_contents()->GetLastCommittedURL(), GURL(),
       ContentSettingsType::INLINE_CUE_MENU, CONTENT_SETTING_ALLOW);
   EXPECT_TRUE(ShouldShowSelectionWidget());
 
-  // Call OnHideForThisSite() which should write BLOCK.
   CallOnHideForThisSite();
   EXPECT_FALSE(ShouldShowSelectionWidget());
   EXPECT_EQ(CONTENT_SETTING_BLOCK, settings_map->GetContentSetting(
@@ -924,6 +920,11 @@ TEST_F(GlicSelectionObserverTest, ContentSettingsBlockSelectionWidget) {
   // Navigate to another site and verify it is NOT blocked.
   NavigateAndCommit(GURL("https://google.com"));
   EXPECT_TRUE(ShouldShowSelectionWidget());
+
+  // Re-navigating to the original site proves that the block persists in
+  // HostContentSettingsMap after the temporary page hide state is cleared.
+  NavigateAndCommit(GURL("https://example.com"));
+  EXPECT_FALSE(ShouldShowSelectionWidget());
 }
 
 TEST_F(GlicSelectionObserverTest, ContentSettingsDisabledBlockSelectionWidget) {
@@ -942,23 +943,54 @@ TEST_F(GlicSelectionObserverTest, ContentSettingsDisabledBlockSelectionWidget) {
   HostContentSettingsMap* settings_map =
       HostContentSettingsMapFactory::GetForProfile(profile);
 
-  // Set the site setting to BLOCK directly in the map.
   settings_map->SetContentSettingDefaultScope(
       web_contents()->GetLastCommittedURL(), GURL(),
       ContentSettingsType::INLINE_CUE_MENU, CONTENT_SETTING_BLOCK);
 
-  // Since feature is disabled, ShouldShowSelectionWidget() should STILL return
-  // true despite the BLOCK setting.
+  // When the site settings feature is disabled, ShouldShowSelectionWidget()
+  // ignores HostContentSettingsMap rules.
   EXPECT_TRUE(ShouldShowSelectionWidget());
 
-  // Reset setting to ALLOW.
   settings_map->SetContentSettingDefaultScope(
       web_contents()->GetLastCommittedURL(), GURL(),
       ContentSettingsType::INLINE_CUE_MENU, CONTENT_SETTING_ALLOW);
 
-  // Call OnHideForThisSite(). It should set is_hidden_on_current_page_ to true
-  // (so ShouldShowSelectionWidget() becomes false), but it should NOT write
-  // BLOCK to the map.
+  CallOnHideForThisSite();
+  EXPECT_FALSE(ShouldShowSelectionWidget());
+  EXPECT_EQ(CONTENT_SETTING_ALLOW, settings_map->GetContentSetting(
+                                       web_contents()->GetLastCommittedURL(),
+                                       web_contents()->GetLastCommittedURL(),
+                                       ContentSettingsType::INLINE_CUE_MENU));
+
+  // Navigate to another site and verify the temporary hide state is reset.
+  NavigateAndCommit(GURL("https://google.com"));
+  EXPECT_TRUE(ShouldShowSelectionWidget());
+
+  // Re-navigating proves that OnHideForThisSite() did not persist the block to
+  // HostContentSettingsMap when the feature is disabled.
+  NavigateAndCommit(GURL("https://example.com"));
+  EXPECT_TRUE(ShouldShowSelectionWidget());
+}
+
+TEST_F(GlicSelectionObserverTest, ContentSettingsInvalidUrl) {
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndEnableFeatureWithParameters(
+      features::kGlicSelectionPrompt,
+      {{features::kGlicSelectionEnableSiteSettings.name, "true"}});
+
+  auto* observer = GetObserver();
+  ASSERT_TRUE(observer);
+
+  NavigateAndCommit(GURL("about:blank"));
+  EXPECT_TRUE(ShouldShowSelectionWidget());
+
+  Profile* profile =
+      Profile::FromBrowserContext(web_contents()->GetBrowserContext());
+  HostContentSettingsMap* settings_map =
+      HostContentSettingsMapFactory::GetForProfile(profile);
+
+  // OnHideForThisSite() must not attempt to write invalid URL patterns to
+  // HostContentSettingsMap, as doing so triggers a fatal DCHECK failure.
   CallOnHideForThisSite();
   EXPECT_FALSE(ShouldShowSelectionWidget());
   EXPECT_EQ(CONTENT_SETTING_ALLOW, settings_map->GetContentSetting(

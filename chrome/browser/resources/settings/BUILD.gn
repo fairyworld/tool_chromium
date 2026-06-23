@@ -225,6 +225,7 @@ build_webui("build") {
     "site_settings/hid_devices_page.ts",
     "site_settings/idle_detection_page.ts",
     "site_settings/images_page.ts",
+    "site_settings/inline_cue_menu_page.ts",
     "site_settings/insecure_content_page.ts",
     "site_settings/javascript_page.ts",
     "site_settings/keyboard_lock_page.ts",

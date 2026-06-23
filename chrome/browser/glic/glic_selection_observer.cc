@@ -37,6 +37,7 @@
 #include "chrome/browser/ui/toasts/api/toast_id.h"
 #include "chrome/browser/ui/toasts/toast_controller.h"
 #include "chrome/browser/ui/toasts/toast_features.h"
+#include "chrome/common/webui_url_constants.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/content_settings_pattern.h"
@@ -793,14 +794,17 @@ void GlicSelectionObserver::OnHideForThisSite() {
 }
 
 void GlicSelectionObserver::OnSettings() {
+  if (!features::kGlicSelectionEnableSiteSettings.Get()) {
+    return;
+  }
   auto* tab_interface =
       tabs::TabInterface::MaybeGetFromContents(web_contents());
   if (tab_interface) {
     BrowserWindowInterface* browser_window_interface =
         tab_interface->GetBrowserWindowInterface();
     if (browser_window_interface) {
-      chrome::ShowSettingsSubPage(browser_window_interface,
-                                  "content?search=site+settings");
+      chrome::ShowContentSettingsExceptions(
+          browser_window_interface, ContentSettingsType::INLINE_CUE_MENU);
     }
   }
 }
