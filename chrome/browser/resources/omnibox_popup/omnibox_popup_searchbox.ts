@@ -146,12 +146,6 @@ export class OmniboxPopupSearchboxElement extends
       this.popupCallbackRouter_.setInputState.addListener(
           this.onSetInputState_.bind(this)),
     ];
-
-    this.eventTracker_.add(this, 'escape-searchbox', () => {
-      if (!this.dropdownIsVisible) {
-        this.popupPageHandler_.closeUI();
-      }
-    });
     this.eventTracker_.add(
         document, 'selectionchange', this.onSelectionChanged_.bind(this));
     // TODO(b/522957982): Establish closer IME parity with the native Views
@@ -354,6 +348,23 @@ export class OmniboxPopupSearchboxElement extends
   protected onLensSearchClick_() {
     this.dropdownIsVisible = false;
     this.dispatchEvent(new Event('open-lens-search'));
+  }
+
+  override async handleKeyNavigation(e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      if (!this.dropdownIsVisible) {
+        if (this.getInputElement().inputElement.value) {
+          this.getInputElement().setInput({text: '', inline: ''});
+        } else {
+          this.popupPageHandler_.closeUI();
+        }
+      } else {
+        this.clearAutocompleteMatches();
+        e.preventDefault();
+      }
+      return;
+    }
+    await super.handleKeyNavigation(e);
   }
 }
 

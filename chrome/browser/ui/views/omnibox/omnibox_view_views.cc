@@ -2034,11 +2034,13 @@ bool OmniboxViewViews::ShouldShowPlaceholderText() const {
           omnibox::kOmniboxAimDeferShowUntilVisualStateReady)) {
     // Suppress the hint text while the AIM popup is displayed or in deferred
     // transition.
-    bool is_aim_popup = controller()->popup_state_manager()->popup_state() ==
-                        OmniboxPopupState::kAim;
+    OmniboxPopupState state =
+        controller()->popup_state_manager()->popup_state();
+    bool is_webui_popup =
+        state == OmniboxPopupState::kAim || state == OmniboxPopupState::kFull;
     bool is_transitioning =
         location_bar_view_ && location_bar_view_->in_popup_state_transition();
-    if (is_aim_popup || is_transitioning) {
+    if (is_webui_popup || is_transitioning) {
       return false;
     }
   }

@@ -1982,13 +1982,6 @@ void LocationBarView::OnPopupStateChanged(OmniboxPopupState old_state,
   RefreshBackground();
   UpdateWithoutTabRestore();
 
-  if (base::FeatureList::IsEnabled(
-          omnibox::kOmniboxAimDeferShowUntilVisualStateReady)) {
-    // Ensure the omnibox view repaints to reflect potential placeholder text
-    // visibility changes.
-    omnibox_view_->SchedulePaint();
-  }
-
   // Update the focus ring visibility.
   if (views::FocusRing::Get(this)) {
     views::FocusRing::Get(this)->Refresh();
@@ -2046,6 +2039,14 @@ void LocationBarView::ValidatePopupState(OmniboxPopupState state) {
 
 void LocationBarView::ClearInPopupStateTransition() {
   in_popup_state_transition_ = false;
+  // Since there is a 100ms delay, the omnibox_view never gets repainted.
+  // Ensure the omnibox view repaints to reflect potential placeholder text
+  // visibility changes.
+  if (omnibox_view_ &&
+      base::FeatureList::IsEnabled(
+          omnibox::kOmniboxAimDeferShowUntilVisualStateReady)) {
+    omnibox_view_->SchedulePaint();
+  }
 }
 
 void LocationBarView::AnimationProgressed(const gfx::Animation* animation) {
