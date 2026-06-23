@@ -2202,6 +2202,61 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               bwi))
           .SetActionId(kActionWindowMuteSite)
           .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::CloseTab(bwi);
+              },
+              bwi))
+          .SetActionId(kActionCloseTab)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::SelectNextTab(bwi);
+              },
+              bwi))
+          .SetActionId(kActionSelectNextTab)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::SelectPreviousTab(bwi);
+              },
+              bwi))
+          .SetActionId(kActionSelectPreviousTab)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::SelectNumberedTab(bwi, 0);
+              },
+              bwi))
+          .SetActionId(kActionSelectTab0)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::SelectNumberedTab(bwi, 1);
+              },
+              bwi))
+          .SetActionId(kActionSelectTab1)
+          .Build());
 }
 
 void BrowserActions::AddListeners() {
