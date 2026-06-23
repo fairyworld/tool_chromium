@@ -12,6 +12,7 @@
 #include "base/metrics/histogram_functions.h"
 #include "chrome/browser/autocomplete/aim_eligibility_service_factory.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
+#include "chrome/browser/ui/omnibox/ai_mode_button_service_factory.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/contextual_search/contextual_search_metrics_recorder.h"
 #include "components/contextual_search/contextual_search_service.h"
@@ -214,8 +215,14 @@ omnibox::NTPComposeboxConfig GetNTPComposeboxConfig() {
 bool ShouldShowAimContextMenuOption(Profile* profile) {
   const auto* aim_eligibility_service =
       AimEligibilityServiceFactory::GetForProfile(profile);
+  const auto* ai_mode_button_service =
+      AiModeButtonServiceFactory::GetForProfile(profile);
+  const auto* template_url_service =
+      TemplateURLServiceFactory::GetForProfile(profile);
   const bool is_aim_entrypoint_enabled =
-      OmniboxFieldTrial::IsAimOmniboxEntrypointEnabled(aim_eligibility_service);
+      OmniboxFieldTrial::IsAimOmniboxEntrypointEnabled(aim_eligibility_service,
+                                                       ai_mode_button_service,
+                                                       template_url_service);
 
   if (is_aim_entrypoint_enabled) {
     return true;

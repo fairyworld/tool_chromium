@@ -38,6 +38,7 @@
 #include "chrome/browser/external_protocol/external_protocol_handler.h"
 #include "chrome/browser/history_clusters/history_clusters_tab_helper.h"
 #include "chrome/browser/profiles/profile.h"
+#include "chrome/browser/search_engines/template_url_service_factory.h"
 #include "chrome/browser/send_tab_to_self/send_tab_to_self_util.h"
 #include "chrome/browser/themes/theme_service.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
@@ -2733,8 +2734,15 @@ bool OmniboxViewViews::ShouldInstallAimPlaceholderText() const {
   const auto* aim_eligibility_service =
       AimEligibilityServiceFactory::GetForProfile(
           location_bar_view_->GetProfile());
+  const auto* ai_mode_button_service =
+      AiModeButtonServiceFactory::GetForProfile(
+          location_bar_view_->GetProfile());
+  const auto* template_url_service = TemplateURLServiceFactory::GetForProfile(
+      location_bar_view_->GetProfile());
   const bool is_aim_entrypoint_enabled =
-      OmniboxFieldTrial::IsAimOmniboxEntrypointEnabled(aim_eligibility_service);
+      OmniboxFieldTrial::IsAimOmniboxEntrypointEnabled(aim_eligibility_service,
+                                                       ai_mode_button_service,
+                                                       template_url_service);
 
   return is_aim_entrypoint_enabled &&
          controller()->edit_model()->is_caret_visible() && GetAiModeConfig();
