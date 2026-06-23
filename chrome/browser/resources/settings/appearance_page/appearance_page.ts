@@ -249,13 +249,6 @@ export class SettingsAppearancePageElement extends
         },
       },
 
-      showTabSearchEnabled_: {
-        type: Boolean,
-        value() {
-          return loadTimeData.getBoolean('showTabSearchEnabled');
-        },
-      },
-
       showProjectsPanelEnabled_: {
         type: Boolean,
         value() {
@@ -353,7 +346,6 @@ export class SettingsAppearancePageElement extends
   declare private ntpSimplificationBookmarksBarEnabled_: boolean;
   declare private bookmarksBarOptions_: DropdownMenuOptionList;
   declare private showVerticalTabsExpandOnHoverEnabled_: boolean;
-  declare private showTabSearchEnabled_: boolean;
   declare private showProjectsPanelEnabled_: boolean;
   declare private showEverythingMenuEnabled_: boolean;
   declare private showManagedThemeDialog_: boolean;

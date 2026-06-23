@@ -736,7 +736,6 @@ suite('TabStripComboButtonSettings', () => {
 
   setup(async () => {
     loadTimeData.overrideValues({
-      showTabSearchEnabled: true,
       showProjectsPanelEnabled: true,
     });
 
@@ -809,7 +808,6 @@ suite('TabStripComboButtonSettings', () => {
 
   test('Everything menu toggle updates correct pref', async function() {
     loadTimeData.overrideValues({
-      showTabSearchEnabled: true,
       showProjectsPanelEnabled: false,
       showEverythingMenuEnabled: true,
     });
@@ -833,7 +831,6 @@ suite('TabStripComboButtonSettings', () => {
 
   test('Everything menu toggle records metrics', async function() {
     loadTimeData.overrideValues({
-      showTabSearchEnabled: true,
       showProjectsPanelEnabled: false,
       showEverythingMenuEnabled: true,
     });
@@ -857,15 +854,12 @@ suite('TabStripComboButtonSettings', () => {
 
   test('Toggles hidden when disabled', async function() {
     loadTimeData.overrideValues({
-      showTabSearchEnabled: false,
       showProjectsPanelEnabled: false,
       showEverythingMenuEnabled: false,
     });
     createAppearancePage();
     await microtasksFinished();
 
-    assertFalse(
-        !!appearancePage.shadowRoot!.querySelector('#showTabSearchButton'));
     assertFalse(
         !!appearancePage.shadowRoot!.querySelector('#showProjectsPanelButton'));
     assertFalse(!!appearancePage.shadowRoot!.querySelector(
