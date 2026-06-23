@@ -879,11 +879,12 @@ void ReadAnythingAppController::DistillNewTree() {
   // success or failures. Logging this via a timer reduces duplicate
   // distillation / failures being logged.
   distillations_completed_ = 0;
-  timer_.Stop();
-  timer_.Start(FROM_HERE, base::Milliseconds(kDistillationLoggingDelayMs),
-               base::BindOnce(
-                   &ReadAnythingAppController::RecordScreen2xDistillationStatus,
-                   base::Unretained(this)));
+  distillation_status_logging_delay_timer_.Stop();
+  distillation_status_logging_delay_timer_.Start(
+      FROM_HERE, base::Milliseconds(kDistillationLoggingDelayMs),
+      base::BindOnce(
+          &ReadAnythingAppController::RecordScreen2xDistillationStatus,
+          base::Unretained(this)));
 
   if (features::IsImmersiveReadAnythingEnabled()) {
     SetDistillationState(read_anything::mojom::ReadAnythingDistillationState::

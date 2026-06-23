@@ -622,7 +622,9 @@ class ReadAnythingAppController
   // drawing instead.
   std::unique_ptr<base::RetainingOneShotTimer> pdf_draw_debouncer_;
 
-  base::OneShotTimer timer_;
+  // Since Screen2x distillation takes some time to occur, distillation success
+  // and failure occurs after kDistillationLoggingDelayMs.
+  base::OneShotTimer distillation_status_logging_delay_timer_;
 
   // The number of times distillation completes successfully after a page
   // change. Used for logging.
