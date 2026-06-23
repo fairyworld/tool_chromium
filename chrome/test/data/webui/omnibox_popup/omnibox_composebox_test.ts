@@ -32,6 +32,17 @@ interface TestOmniboxComposeboxElement extends OmniboxComposeboxElement {
   composeboxSource: string;
 }
 
+declare global {
+  interface SpeechRecognition extends EventTarget {
+    interimResults: boolean;
+    lang: string;
+    continuous: boolean;
+    abort(): void;
+    start(): void;
+    stop(): void;
+  }
+}
+
 suite('OmniboxComposeboxTest', () => {
   let omniboxComposebox: OmniboxComposeboxElement;
   let mockPageHandler: TestMock<PageHandlerRemote>&PageHandlerRemote;
@@ -978,6 +989,14 @@ suite('OmniboxComposeboxTest', () => {
       async () => {
         const windowProxy = TestMock.fromClass(WindowProxy);
         windowProxy.setResultFor('hasWebkitSpeechRecognition', true);
+        windowProxy.setResultMapperFor('createSpeechRecognition', () => {
+          const mock = new EventTarget();
+          const speechMock = mock as unknown as SpeechRecognition;
+          speechMock.abort = () => {};
+          speechMock.start = () => {};
+          speechMock.stop = () => {};
+          return speechMock;
+        });
         windowProxy.setResultMapperFor(
             'matchMedia', (query: string) => window.matchMedia(query));
         WindowProxy.setInstance(windowProxy);
@@ -1004,6 +1023,14 @@ suite('OmniboxComposeboxTest', () => {
       async () => {
         const windowProxy = TestMock.fromClass(WindowProxy);
         windowProxy.setResultFor('hasWebkitSpeechRecognition', true);
+        windowProxy.setResultMapperFor('createSpeechRecognition', () => {
+          const mock = new EventTarget();
+          const speechMock = mock as unknown as SpeechRecognition;
+          speechMock.abort = () => {};
+          speechMock.start = () => {};
+          speechMock.stop = () => {};
+          return speechMock;
+        });
         windowProxy.setResultMapperFor(
             'matchMedia', (query: string) => window.matchMedia(query));
         WindowProxy.setInstance(windowProxy);
@@ -1027,6 +1054,14 @@ suite('OmniboxComposeboxTest', () => {
       async () => {
         const windowProxy = TestMock.fromClass(WindowProxy);
         windowProxy.setResultFor('hasWebkitSpeechRecognition', true);
+        windowProxy.setResultMapperFor('createSpeechRecognition', () => {
+          const mock = new EventTarget();
+          const speechMock = mock as unknown as SpeechRecognition;
+          speechMock.abort = () => {};
+          speechMock.start = () => {};
+          speechMock.stop = () => {};
+          return speechMock;
+        });
         windowProxy.setResultMapperFor(
             'matchMedia', (query: string) => window.matchMedia(query));
         WindowProxy.setInstance(windowProxy);
@@ -1079,6 +1114,14 @@ suite('OmniboxComposeboxTest', () => {
       async () => {
         const windowProxy = TestMock.fromClass(WindowProxy);
         windowProxy.setResultFor('hasWebkitSpeechRecognition', true);
+        windowProxy.setResultMapperFor('createSpeechRecognition', () => {
+          const mock = new EventTarget();
+          const speechMock = mock as unknown as SpeechRecognition;
+          speechMock.abort = () => {};
+          speechMock.start = () => {};
+          speechMock.stop = () => {};
+          return speechMock;
+        });
         windowProxy.setResultMapperFor(
             'matchMedia', (query: string) => window.matchMedia(query));
         WindowProxy.setInstance(windowProxy);
@@ -1143,6 +1186,14 @@ suite('OmniboxComposeboxTest', () => {
       async () => {
         const windowProxy = TestMock.fromClass(WindowProxy);
         windowProxy.setResultFor('hasWebkitSpeechRecognition', true);
+        windowProxy.setResultMapperFor('createSpeechRecognition', () => {
+          const mock = new EventTarget();
+          const speechMock = mock as unknown as SpeechRecognition;
+          speechMock.abort = () => {};
+          speechMock.start = () => {};
+          speechMock.stop = () => {};
+          return speechMock;
+        });
         windowProxy.setResultMapperFor(
             'matchMedia', (query: string) => window.matchMedia(query));
         WindowProxy.setInstance(windowProxy);

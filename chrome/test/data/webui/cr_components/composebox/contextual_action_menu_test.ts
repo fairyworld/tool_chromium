@@ -1078,6 +1078,7 @@ suite('ContextualActionMenu', () => {
 
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
+    actionMenu['contextManagementInComposeboxEnabled_'] = true;
     const tab1: TabInfo = {
       tabId: 1,
       title: 'Tab 1',
@@ -1156,6 +1157,7 @@ suite('ContextualActionMenu', () => {
 
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
+    actionMenu['contextManagementInComposeboxEnabled_'] = true;
     const tab1: TabInfo = {
       tabId: 1,
       title: 'Tab 1',

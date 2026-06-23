@@ -132,12 +132,7 @@ function toError(webkitError: string): VoiceSearchError {
   }
 }
 
-// TODO(crbug.com/40449919): Remove when bug is fixed.
-declare global {
-  interface Window {
-    webkitSpeechRecognition: typeof SpeechRecognition;
-  }
-}
+
 
 export interface ComposeboxVoiceSearchElement {
   $: {
@@ -255,7 +250,8 @@ export class ComposeboxVoiceSearchElement extends
 
   constructor() {
     super();
-    this.voiceRecognition_ = new window.webkitSpeechRecognition();
+    this.voiceRecognition_ =
+        WindowProxy.getInstance().createSpeechRecognition();
     this.voiceRecognition_.interimResults = true;
     this.voiceRecognition_.lang = window.navigator.language;
     this.voiceRecognition_.onresult = this.onResult_.bind(this);

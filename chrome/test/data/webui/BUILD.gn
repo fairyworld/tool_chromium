@@ -519,7 +519,9 @@ webui_ts_library("build_ts") {
   in_files = [
     "chai_assert.ts",
     "fake_chrome_event.ts",
+    "fake_media_query_list.ts",
     "keyboard_mock_interactions.ts",
+    "metrics_test_support.ts",
     "mocha_adapter_simple.ts",
     "mock_controller.ts",
     "mock_timer.ts",
@@ -527,16 +529,14 @@ webui_ts_library("build_ts") {
     "test_browser_proxy.ts",
     "test_mock.ts",
     "test_mock_test.ts",
+    "test_open_window_proxy.ts",
     "test_plural_string_proxy.ts",
     "test_util.ts",
-    "test_open_window_proxy.ts",
     "trusted_html.ts",
-    "metrics_test_support.ts",
   ]
 
   if (!is_android) {
     in_files += [
-      "fake_media_query_list.ts",
       "fake_settings_private.ts",
       "mocked_metrics_reporter.ts",
       "mouse_mock_interactions.ts",
