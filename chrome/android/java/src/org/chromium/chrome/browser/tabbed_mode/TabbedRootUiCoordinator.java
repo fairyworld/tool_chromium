@@ -218,6 +218,7 @@ import org.chromium.chrome.browser.toolbar.ToolbarManager;
 import org.chromium.chrome.browser.toolbar.adaptive.AdaptiveToolbarBehavior;
 import org.chromium.chrome.browser.toolbar.adaptive.AdaptiveToolbarButtonVariant;
 import org.chromium.chrome.browser.toolbar.adaptive.AdaptiveToolbarPrefs;
+import org.chromium.chrome.browser.toolbar.top.ToolbarControlContainer;
 import org.chromium.chrome.browser.ui.RootUiCoordinator;
 import org.chromium.chrome.browser.ui.actions.ActionRegistry;
 import org.chromium.chrome.browser.ui.actions.ActionUtils;
@@ -983,8 +984,8 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
     @Override
     @EnsuresNonNull("mToolbarManager")
     protected void initializeToolbar() {
+        ToolbarControlContainer controlContainer = mActivity.findViewById(R.id.control_container);
         if (OpenInAppUtils.isOpenInAppAvailable()) {
-            View controlContainer = mActivity.findViewById(R.id.control_container);
             assert controlContainer != null;
 
             ViewGroup omniboxChipContainer =
@@ -995,6 +996,9 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
 
         assert mFindToolbarManager != null;
         super.initializeToolbar();
+        if (controlContainer != null) {
+            controlContainer.setIsVerticalTabsActiveSupplier(mIsVerticalTabsActiveSupplier);
+        }
 
         if (AndroidSidePanelEnabledFn.isEnabled()) {
             mToolbarManager.setSideUiStateProviderSupplier(mSideUiStateProviderSupplier);
