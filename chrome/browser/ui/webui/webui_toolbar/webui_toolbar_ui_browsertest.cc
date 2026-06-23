@@ -105,9 +105,6 @@ class BrowserControlsDelegate
   ~BrowserControlsDelegate() override = default;
 
   void PermitLaunchUrl() override {}
-  base::TimeTicks GetNavigationStartTicks() const override {
-    return base::TimeTicks::Now();
-  }
 };
 
 class MockToolbarUIDelegate

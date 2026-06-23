@@ -5,26 +5,17 @@
 #ifndef CHROME_BROWSER_UI_WEBUI_WEBUI_TOOLBAR_BROWSER_CONTROLS_SERVICE_H_
 #define CHROME_BROWSER_UI_WEBUI_WEBUI_TOOLBAR_BROWSER_CONTROLS_SERVICE_H_
 
-#include <memory>
 #include <string>
-#include <vector>
 
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
-#include "base/time/time.h"
-#include "base/types/expected.h"
 #include "chrome/browser/ui/webui/webui_toolbar/adapters/browser_controls_adapter.h"
 #include "components/browser_apis/browser_controls/browser_controls_api.mojom.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
 #include "mojo/public/cpp/bindings/receiver.h"
 #include "ui/events/event_constants.h"
-#include "url/gurl.h"
 
 class MetricsReporter;
-
-namespace content {
-class RenderFrameHost;
-}
 
 namespace browser_controls_api {
 
@@ -35,19 +26,13 @@ class BrowserControlsService
    public:
     virtual ~BrowserControlsServiceDelegate() = default;
     virtual void PermitLaunchUrl() = 0;
-    // Queries the absolute navigation start time of the toolbar document.
-    // This serves as the shared, document-scoped temporal baseline to
-    // reconstruct absolute TimeTicks from renderer-reported relative offsets
-    // for any toolbar button telemetry.
-    virtual base::TimeTicks GetNavigationStartTicks() const = 0;
   };
 
   BrowserControlsService(
       mojo::PendingReceiver<mojom::BrowserControlsService> service,
       std::unique_ptr<BrowserControlsAdapter> browser_adapter,
       MetricsReporter* metrics_reporter,
-      BrowserControlsServiceDelegate* delegate,
-      content::RenderFrameHost* toolbar_rfh);
+      BrowserControlsServiceDelegate* delegate);
 
   BrowserControlsService(const BrowserControlsService&) = delete;
   BrowserControlsService& operator=(const BrowserControlsService&) = delete;
@@ -59,8 +44,7 @@ class BrowserControlsService
   // browser_controls_api::mojom::BrowserControlsService:
   ReloadFromClickResult ReloadFromClick(
       bool bypass_cache,
-      const std::vector<mojom::EventDispositionFlag>& click_flags,
-      mojom::ReloadInteractionMetadataPtr metadata = nullptr) override;
+      const std::vector<mojom::EventDispositionFlag>& click_flags) override;
   StopLoadResult StopLoad() override;
   BackResult Back(
       const std::vector<mojom::EventDispositionFlag>& flags) override;
@@ -79,20 +63,6 @@ class BrowserControlsService
           flags);
 
  private:
-  // Reconstructs the absolute interaction time from the Mojo metadata and
-  // validates it against several criteria.
-  // Returns the reconstructed TimeTicks, or a Mojo error if validation fails.
-  base::expected<base::TimeTicks, mojo_base::mojom::ErrorPtr>
-  ReconstructAndValidateInteractionTime(
-      const mojom::ReloadInteractionMetadata& metadata,
-      base::TimeTicks evaluation_time);
-
-  // Maps the Mojo input type to the internal metrics input type and logs the
-  // interaction-to-reload latency metric if the mapping is valid.
-  void MaybeRecordInteractionToReloadMetric(
-      base::TimeTicks interaction_ticks,
-      mojom::ReloadInputType input_type) const;
-
   // Callback for `MetricsReporter::Measure()`. Records the resulting
   // base::TimeDelta to the given UMA histogram and clears the start mark.
   void OnMeasureResultAndClearMark(const std::string& histogram_name,
@@ -106,9 +76,6 @@ class BrowserControlsService
   // Not owned.
   raw_ptr<MetricsReporter> metrics_reporter_;
   raw_ptr<BrowserControlsServiceDelegate> delegate_;
-  const raw_ptr<content::RenderFrameHost> toolbar_rfh_;
-
-  base::TimeTicks last_processed_interaction_ticks_;
 
   // Must be the last member.
   base::WeakPtrFactory<BrowserControlsService> weak_ptr_factory_{this};

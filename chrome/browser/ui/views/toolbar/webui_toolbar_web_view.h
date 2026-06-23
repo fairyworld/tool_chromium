@@ -204,7 +204,6 @@ class WebUIToolbarWebView
 
   // BrowserControlsService::BrowserControlsServiceDelegate:
   void PermitLaunchUrl() override;
-  base::TimeTicks GetNavigationStartTicks() const override;
 
   // views::View:
   void AddedToWidget() override;
@@ -352,9 +351,7 @@ class WebUIToolbarWebView
   // Resolves the initial deadline from features and applies it if enabled.
   void ApplyInitialSurfaceSyncDeadline();
 
-  // Returns the active WebUI toolbar controller (const-safe).
-  // Robust against teardown as it uses the observed WebContents.
-  WebUIToolbarUI* GetWebUIToolbarUI() const;
+  WebUIToolbarUI* GetWebUIToolbarUI();
 
   void OnTouchUiChanged();
   void PostPushNavigationState();

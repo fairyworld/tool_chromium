@@ -965,19 +965,12 @@ views::WebView* WebUIToolbarWebView::GetWebViewForTesting() {
   return web_view_;
 }
 
-WebUIToolbarUI* WebUIToolbarWebView::GetWebUIToolbarUI() const {
-  // web_contents() is const-safe and automatically returns nullptr
-  // when the observed WebContents begins destruction.
-  return GetWebUIToolbarUIFromWebContents(web_contents());
+WebUIToolbarUI* WebUIToolbarWebView::GetWebUIToolbarUI() {
+  return GetWebUIToolbarUIFromWebContents(web_view_->web_contents());
 }
 
 void WebUIToolbarWebView::PermitLaunchUrl() {
   ExternalProtocolHandler::PermitLaunchUrl();
-}
-
-base::TimeTicks WebUIToolbarWebView::GetNavigationStartTicks() const {
-  auto* ui = GetWebUIToolbarUI();
-  return ui ? ui->navigation_start_ticks() : base::TimeTicks();
 }
 
 void WebUIToolbarWebView::OnHomeButtonDropUrl(const GURL& url) {
