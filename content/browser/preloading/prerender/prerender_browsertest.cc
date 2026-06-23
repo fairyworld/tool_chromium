@@ -19231,6 +19231,35 @@ IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessAllActionsTest,
   EXPECT_EQ(true, EvalJs(initiator_rfh, "true"));
 }
 
+// Tests that a prerender with target_hint='_blank' DOES NOT reuse the
+// initiator's process even if configured to allow all actions/eagerness.
+IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessAllActionsTest,
+                       BlankTargetHintDoesNotReuseProcess) {
+  GURL url = ssl_server().GetURL("a.test", "/empty.html");
+  GURL prerender_url = ssl_server().GetURL("a.test", "/title1.html");
+
+  // 1. Navigate to the initiator page.
+  ASSERT_TRUE(NavigateToURL(shell(), url));
+  RenderFrameHost* initiator_rfh = current_frame_host();
+  ChildProcessId initiator_process_id = initiator_rfh->GetProcess()->GetID();
+
+  // 2. Start a same-origin prerender with target_hint="_blank".
+  PrerenderHostId host_id = prerender_helper()->AddPrerender(
+      prerender_url, /*eagerness=*/std::nullopt, /*target_hint=*/"_blank");
+  ASSERT_TRUE(host_id);
+
+  // 3. Verify the prerender process ID DOES NOT match the initiator's process
+  // ID.
+  WebContents* prerender_web_contents =
+      test::PrerenderTestHelper::GetPrerenderWebContents(host_id);
+  ASSERT_TRUE(prerender_web_contents);
+  RenderFrameHost* prerender_rfh =
+      test::PrerenderTestHelper::GetPrerenderedMainFrameHost(
+          *prerender_web_contents, host_id);
+  ChildProcessId prerender_process_id = prerender_rfh->GetProcess()->GetID();
+  EXPECT_NE(initiator_process_id, prerender_process_id);
+}
+
 }  // namespace
 
 }  // namespace content

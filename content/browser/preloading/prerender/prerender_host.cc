@@ -1397,9 +1397,14 @@ bool PrerenderHost::ShouldAllowProcessReuse() const {
           features::kPrerender2ReuseInitiatorProcess)) {
     return false;
   }
+
   // TODO(https://crbug.com/524800804): Add the following restrictions:
-  // 1. Disallow Target_hint = 'blank' to use the same process.
-  // 2. Disallow cross-site prerendering to reuse the process.
+  // 1. Disallow cross-origin prerendering to reuse the process.
+
+  if (attributes_.GetTargetHint() ==
+      blink::mojom::SpeculationTargetHint::kBlank) {
+    return false;
+  }
   std::string allowed_action =
       features::kPrerender2ReuseInitiatorProcessActionType.Get();
 
