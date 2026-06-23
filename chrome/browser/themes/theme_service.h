@@ -50,6 +50,10 @@ namespace user_prefs {
 class PrefRegistrySyncable;
 }  // namespace user_prefs
 
+namespace waap {
+class PrewarmHelper;
+}  // namespace waap
+
 // A theme consists of a set of colors and images, including the NTP background
 // image. See CustomThemeSupplier for details. There are multiple sources for
 // themes, including extensions, NTP, the system theme, and policy.
@@ -322,10 +326,10 @@ class ThemeService : public KeyedService,
   };
   friend class BrowserThemeProvider;
   friend class BrowserWidget;
-  friend class InitialWebUIManager;
   friend class ProfilePickerWidget;
   friend class ThemeColorsSourceManager;
   friend class theme_service_internal::ThemeServiceTest;
+  friend class waap::PrewarmHelper;
 
   // Returns a ColorProviderKey configured with Profile-scoped state. The
   // `profile` param is necessary as the service itself may be keyed to the

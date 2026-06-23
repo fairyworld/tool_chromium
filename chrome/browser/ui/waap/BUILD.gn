@@ -33,6 +33,7 @@ source_set("manager") {
   public = [ "initial_web_ui_manager.h" ]
   sources = [ "initial_web_ui_manager.cc" ]
   deps = [
+    ":waap_utils",
     ":window_metrics_manager",
     "//base",
     "//chrome/browser/profiles:profile",
@@ -42,6 +43,7 @@ source_set("manager") {
     "//chrome/browser/ui/webui:webui_util",
     "//chrome/common:chrome_features",
     "//chrome/common:constants",
+    "//content/public/browser",
     "//ui/base/unowned_user_data",
     "//ui/views",
   ]
@@ -69,10 +71,16 @@ source_set("waap_utils") {
   ]
   deps = [
     "//base",
+    "//chrome/browser/page_load_metrics",
     "//chrome/browser/profiles:profile",
+    "//chrome/browser/themes",
     "//chrome/common",
     "//chrome/common:chrome_features",
+    "//components/ukm/content",
+    "//content/public/browser",
     "//content/public/common",
+    "//ui/color",
+    "//ui/native_theme",
     "//url",
   ]
 }
