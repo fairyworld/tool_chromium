@@ -65,6 +65,9 @@ class TabSimpleMenuModel : public ui::SimpleMenuModel {
   explicit TabSimpleMenuModel(OmniboxContextMenuController* controller);
 
   const gfx::FontList* GetLabelFontListAt(size_t index) const override;
+  std::optional<ui::ColorId> GetForegroundColorId(size_t index) override;
+  std::optional<ui::ColorId> GetSelectedBackgroundColorId(
+      size_t index) override;
 
  private:
   raw_ptr<OmniboxContextMenuController> controller_;
@@ -206,6 +209,8 @@ class OmniboxContextMenuController : public ui::SimpleMenuModel::Delegate {
   void UpdateSearchboxContextToolMode(omnibox::ToolMode tool_mode);
 
   bool IsContentSharingEnabled() const;
+
+  bool IsTabContextEnabled() const;
 
   omnibox::ContextType CommandIdToEnum(int command_id) const;
 

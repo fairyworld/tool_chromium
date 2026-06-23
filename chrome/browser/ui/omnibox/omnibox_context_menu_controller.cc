@@ -103,6 +103,28 @@ const gfx::FontList* TabSimpleMenuModel::GetLabelFontListAt(
       ui::ResourceBundle::BaseFont);
 }
 
+std::optional<ui::ColorId> TabSimpleMenuModel::GetForegroundColorId(
+    size_t index) {
+  int command_id = GetCommandIdAt(index);
+  if (command_id == IDC_OMNIBOX_CONTEXT_SHARED_TABS_SUBMENU) {
+    if (!controller_->IsTabContextEnabled()) {
+      return ui::kColorMenuItemForegroundDisabled;
+    }
+  }
+  return ui::SimpleMenuModel::GetForegroundColorId(index);
+}
+
+std::optional<ui::ColorId> TabSimpleMenuModel::GetSelectedBackgroundColorId(
+    size_t index) {
+  int command_id = GetCommandIdAt(index);
+  if (command_id == IDC_OMNIBOX_CONTEXT_SHARED_TABS_SUBMENU) {
+    if (!controller_->IsTabContextEnabled()) {
+      return ui::kColorMenuItemBackgroundSelected;
+    }
+  }
+  return ui::SimpleMenuModel::GetSelectedBackgroundColorId(index);
+}
+
 namespace {
 
 bool IsStaticOmniboxCommandId(int command_id) {
@@ -413,7 +435,10 @@ void OmniboxContextMenuController::AddRecentTabItems() {
     menu_model_->AddSubMenuWithIcon(
         IDC_OMNIBOX_CONTEXT_SHARED_TABS_SUBMENU, label,
         shared_tabs_menu_model_.get(),
-        ui::ImageModel::FromVectorIcon(kTabOldIcon, ui::kColorMenuIcon,
+        ui::ImageModel::FromVectorIcon(kTabOldIcon,
+                                       IsTabContextEnabled()
+                                           ? ui::kColorMenuIcon
+                                           : ui::kColorMenuIconDisabled,
                                        ui::SimpleMenuModel::kDefaultIconSize));
   }
 
@@ -571,10 +596,6 @@ void OmniboxContextMenuController::AddModelPickerItems() {
 
 std::vector<OmniboxContextMenuController::TabInfo>
 OmniboxContextMenuController::GetRecentTabs() const {
-  if (cached_recent_tabs_) {
-    return *cached_recent_tabs_;
-  }
-
   std::vector<OmniboxContextMenuController::TabInfo> tabs;
 
   std::vector<contextual_search::FileInfo> uploaded_file_infos;
@@ -589,7 +610,13 @@ OmniboxContextMenuController::GetRecentTabs() const {
   // Iterate through the tab strip model.
   auto* browser_window_interface =
       webui::GetBrowserWindowInterface(web_contents_.get());
+  if (!browser_window_interface) {
+    return tabs;
+  }
   auto* tab_strip_model = browser_window_interface->GetTabStripModel();
+  if (!tab_strip_model) {
+    return tabs;
+  }
   for (tabs::TabInterface* tab : *tab_strip_model) {
     content::WebContents* web_contents = tab->GetContents();
     const auto& last_committed_url = web_contents->GetLastCommittedURL();
@@ -647,6 +674,25 @@ OmniboxContextMenuController::GetRecentTabs() const {
   tabs.resize(max_tab_suggestions);
   cached_recent_tabs_ = tabs;
   return tabs;
+}
+
+bool OmniboxContextMenuController::IsTabContextEnabled() const {
+  if (base::FeatureList::IsEnabled(omnibox::kAimUsePecApi)) {
+    auto it = input_type_info_.find(omnibox::InputType::INPUT_TYPE_BROWSER_TAB);
+    return it != input_type_info_.end() && it->second.enabled;
+  }
+
+  auto omnibox_controller = GetOmniboxController();
+  if (!omnibox_controller) {
+    return false;
+  }
+  auto omnibox_popup_ui = GetOmniboxPopupUI();
+  if (!omnibox_popup_ui || !omnibox_popup_ui->composebox_handler() ||
+      !omnibox_popup_ui->composebox_handler()->input_state_model()) {
+    return false;
+  }
+
+  return true;
 }
 
 void OmniboxContextMenuController::AddTabFavicon(int command_id,
@@ -1434,23 +1480,19 @@ bool OmniboxContextMenuController::IsCommandIdEnabled(int command_id) const {
 
     // Command ID corresponds to tabs section/submenu item.
     if (IsTabCommandId(command_id)) {
-      auto it =
-          input_type_info_.find(omnibox::InputType::INPUT_TYPE_BROWSER_TAB);
-      if (it == input_type_info_.end()) {
-        return false;
-      }
-
-      bool is_checked = false;
       std::vector<OmniboxContextMenuController::TabInfo> tabs = GetRecentTabs();
       int tab_index_in_menu =
           command_id - kMinOmniboxContextMenuRecentTabsCommandId;
       if (static_cast<size_t>(tab_index_in_menu) < tabs.size()) {
-        is_checked = tabs[tab_index_in_menu].is_checked;
+        const auto& tab_info = tabs[tab_index_in_menu];
+        if (tab_info.is_checked) {
+          base::UmaHistogramEnumeration(sliced_prefix,
+                                        CommandIdToEnum(command_id));
+          return true;
+        }
       }
-
-      bool tab_context_enabled = is_checked || it->second.enabled;
+      bool tab_context_enabled = IsTabContextEnabled();
       if (tab_context_enabled) {
-        if (!is_checked) {
           int max_num_files = input_state_.allowed_models.empty()
                                   ? kDefaultMaxNumFiles
                                   : input_state_.max_total_inputs;
@@ -1464,7 +1506,6 @@ bool OmniboxContextMenuController::IsCommandIdEnabled(int command_id) const {
           if (static_cast<int>(file_infos.size()) >= max_num_files) {
             return false;
           }
-        }
 
         base::UmaHistogramEnumeration(sliced_prefix,
                                       CommandIdToEnum(command_id));
@@ -1549,6 +1590,26 @@ bool OmniboxContextMenuController::IsCommandIdEnabledHelper(
                                  ? kClassicContextTypeHistogramPrefix
                                  : kAimContextTypeHistogramPrefix;
   const std::string sliced_prefix = base::StrCat({prefix, ".Shown"});
+
+  if (IsTabCommandId(command_id)) {
+    std::vector<OmniboxContextMenuController::TabInfo> tabs = GetRecentTabs();
+    int tab_index_in_menu =
+        command_id - kMinOmniboxContextMenuRecentTabsCommandId;
+    if (static_cast<size_t>(tab_index_in_menu) < tabs.size()) {
+      const auto& tab_info = tabs[tab_index_in_menu];
+      if (tab_info.is_checked) {
+        base::UmaHistogramEnumeration(sliced_prefix,
+                                      CommandIdToEnum(command_id));
+        return true;
+      }
+    }
+    auto file_upload_count = static_cast<int>(file_infos.size());
+    if (file_upload_count < max_num_files) {
+      base::UmaHistogramEnumeration(sliced_prefix, CommandIdToEnum(command_id));
+    }
+    return file_upload_count < max_num_files;
+  }
+
   if (aim_tool_mode == omnibox::ToolMode::TOOL_MODE_IMAGE_GEN) {
     const bool command_enabled =
         command_id == IDC_OMNIBOX_CONTEXT_ADD_IMAGE && file_infos.empty();
