@@ -158,6 +158,7 @@
 #include "chrome/browser/safe_browsing/url_checker_delegate_impl.h"
 #include "chrome/browser/search/search.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
+#include "chrome/browser/sensor/chrome_sensor_delegate.h"
 #include "chrome/browser/serial/chrome_serial_delegate.h"
 #include "chrome/browser/sharing/sms/sms_remote_fetcher.h"
 #include "chrome/browser/signin/chrome_signin_proxying_url_loader_factory.h"
@@ -7150,6 +7151,13 @@ ChromeContentBrowserClient::GetDirectSocketsDelegate() {
     direct_sockets_delegate_ = std::make_unique<ChromeDirectSocketsDelegate>();
   }
   return direct_sockets_delegate_.get();
+}
+
+content::SensorDelegate* ChromeContentBrowserClient::GetSensorDelegate() {
+  if (!sensor_delegate_) {
+    sensor_delegate_ = std::make_unique<ChromeSensorDelegate>();
+  }
+  return sensor_delegate_.get();
 }
 
 std::unique_ptr<content::AuthenticatorRequestClientDelegate>

@@ -1329,6 +1329,7 @@ source_set("core") {
       "//chrome/browser/media/router/discovery/access_code:access_code_sink_service",
       "//chrome/browser/printing",
       "//chrome/browser/record_replay:impl",
+      "//chrome/browser/sensor",
       "//chrome/browser/sharing_hub",
       "//chrome/browser/themes",
       "//chrome/browser/ui/apps",

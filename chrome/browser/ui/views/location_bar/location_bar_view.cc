@@ -1613,17 +1613,35 @@ bool LocationBarView::RefreshContentSettingViews() {
   }
 
   bool visibility_changed = false;
+  bool dashboard_updated = false;
+
   for (ContentSettingImageView* v : content_setting_views_) {
     const bool was_visible = v->GetVisible();
-    // The Left-Hand Side indicators currently supports only
-    // `ImageType::kMediaStream`.
-    if (v->GetType() == ContentSettingImageModel::ImageType::kMediaStream &&
-        // WebApps do not support the Left-Hand Side indicators.
-        !web_app::AppBrowserController::IsWebApp(browser_) &&
-        base::FeatureList::IsEnabled(
-            content_settings::features::kLeftHandSideActivityIndicators)) {
-      visibility_changed |= permission_dashboard_controller()->Update(
-          v->content_setting_image_model());
+
+    bool is_lhs_indicator = false;
+    if (!web_app::AppBrowserController::IsWebApp(browser_)) {
+      if (v->GetType() == ContentSettingImageModel::ImageType::kMediaStream) {
+        is_lhs_indicator = base::FeatureList::IsEnabled(
+            content_settings::features::kLeftHandSideActivityIndicators);
+      } else if (v->GetType() ==
+                 ContentSettingImageModel::ImageType::kSensors) {
+        is_lhs_indicator = base::FeatureList::IsEnabled(
+            content_settings::features::kLeftHandSideSensorActivityIndicators);
+      }
+    }
+
+    if (is_lhs_indicator) {
+      // Prioritize Media Stream (kMediaStream) over Sensors (kSensors) by
+      // selecting the first visible model. `kMediaStream` is always evaluated
+      // first because of the ordering in
+      // `ContentSettingImageModel::GenerateContentSettingImageModels()`.
+      if (!dashboard_updated) {
+        visibility_changed |= permission_dashboard_controller()->Update(
+            v->content_setting_image_model());
+        if (v->content_setting_image_model()->is_visible()) {
+          dashboard_updated = true;
+        }
+      }
     } else {
       v->Update();
       if (was_visible != v->GetVisible()) {
@@ -1631,6 +1649,7 @@ bool LocationBarView::RefreshContentSettingViews() {
       }
     }
   }
+
   return visibility_changed;
 }
 

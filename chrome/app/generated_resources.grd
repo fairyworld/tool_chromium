@@ -16179,6 +16179,12 @@ Please help our engineers fix this problem. Tell us what happened right before y
       <message name="IDS_MICROPHONE_CAMERA_NOT_ALLOWED" desc="Title for the media activity indicator when a page is not allowed to use the camera and microphone.">
         Camera &amp; microphone not allowed
       </message>
+      <message name="IDS_SENSORS_IN_USE" desc="Title for the sensors activity indicator when a page is using motion sensors.">
+        Sensors in use
+      </message>
+      <message name="IDS_SENSORS_BLOCKED" desc="Title for the sensors activity indicator when a page is not allowed to use motion sensors.">
+        Sensors blocked
+      </message>
       <message name="IDS_MICROPHONE_IN_USE" desc="Title for the media activity indicator when a page is using the microphone.">
         Microphone in use
       </message>
