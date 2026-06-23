@@ -1025,11 +1025,6 @@ ci.thin_tester(
         mixins = [
             "gpu_pixel_10_stable",
             "has_native_resultdb_integration",
-            # TODO(crbug.com/443001330): Remove the limited_capacity_bot mixin
-            # once additional devices are deployed. 49 devices is likely not enough
-            # to run both standard GPU and WebGPU tests on CI + have enough
-            # capacity for trybots without this.
-            "limited_capacity_bot",
         ],
         per_test_modifications = {
             "dawn_end2end_skip_validation_tests": targets.remove(
