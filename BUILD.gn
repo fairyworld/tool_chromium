@@ -1284,7 +1284,7 @@ if (use_blink && !is_cronet_build) {
       "//third_party/blink/web_tests/external/wpt/config.tmpl.json",
       "//third_party/blink/web_tests/resources/",
       "//third_party/blink/web_tests/TestLists/",
-      "//third_party/pywebsocket3/src/mod_pywebsocket/",
+      "//third_party/pywebsocket3/src/pywebsocket3/",
       "//third_party/test_fonts/test_fonts/",
       "//third_party/wpt_tools/",
     ]
