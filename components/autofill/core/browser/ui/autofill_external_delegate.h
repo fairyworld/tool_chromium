@@ -47,7 +47,6 @@ namespace autofill {
 class AddressDataManager;
 class AutofillDriver;
 class BrowserAutofillManager;
-class CreditCard;
 class FormStructure;
 
 // Retrieves a copy of the profile that the `payload` refers to.
@@ -185,20 +184,6 @@ class AutofillExternalDelegate : public AutofillSuggestionDelegate {
   // Private handler for DidAcceptSuggestions for payments related suggestions.
   void DidAcceptPaymentsSuggestion(const Suggestion& suggestion,
                                    const SuggestionMetadata& metadata);
-
-  // Fills the queried form with the provided credit card using the specified
-  // trigger source. Used as a callback for asynchronous card fetches.
-  void OnCreditCardFetched(AutofillTriggerSource trigger_source,
-                           const CreditCard& card);
-
-  // Fills the queried form with the provided `EntityInstance` in `result`,
-  // unless a `FailureReason` is present.
-  void OnEntityInstanceFetched(
-      AutofillTriggerSource trigger_source,
-      const FieldTypeSet& ai_field_types,
-      base::expected<EntityInstance, AutofillAiAccessManager::FailureReason>
-          result,
-      bool reauth_attempted);
 
   // Returns the last Autofill triggering field. Derived from the `form` and
   // `field` parameters of `OnQuery(). Returns nullptr if called before
