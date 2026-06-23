@@ -1058,4 +1058,10 @@ BASE_DECLARE_FEATURE(kInfobarBannerRevamp);
 // Returns true if the InfobarBannerRevamp feature is enabled.
 bool IsInfobarBannerRevampEnabled();
 
+// Feature flag to enable shortcut paste bypass detection for PhishGuard.
+BASE_DECLARE_FEATURE(kIOSPhishGuardPasteShortcutDetection);
+
+// Returns true if kIOSPhishGuardPasteShortcutDetection is enabled.
+bool IsIOSPhishGuardPasteShortcutDetectionEnabled();
+
 #endif  // IOS_CHROME_BROWSER_SHARED_PUBLIC_FEATURES_FEATURES_H_

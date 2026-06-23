@@ -1278,3 +1278,10 @@ BASE_FEATURE(kInfobarBannerRevamp, base::FEATURE_DISABLED_BY_DEFAULT);
 bool IsInfobarBannerRevampEnabled() {
   return base::FeatureList::IsEnabled(kInfobarBannerRevamp);
 }
+
+BASE_FEATURE(kIOSPhishGuardPasteShortcutDetection,
+             base::FEATURE_ENABLED_BY_DEFAULT);
+
+bool IsIOSPhishGuardPasteShortcutDetectionEnabled() {
+  return base::FeatureList::IsEnabled(kIOSPhishGuardPasteShortcutDetection);
+}
