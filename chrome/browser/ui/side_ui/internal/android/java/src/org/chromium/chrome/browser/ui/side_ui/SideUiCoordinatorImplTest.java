@@ -158,13 +158,13 @@ public class SideUiCoordinatorImplTest {
         mCoordinator.registerSideUiContainer(sideUiContainer);
         assertEquals(
                 "Unexpected registered SideUiContainer.",
-                mCoordinator.getSideUiContainerForTesting(sideUiContainer.getSideUiId()),
+                mCoordinator.getSideUiContainerById(sideUiContainer.getSideUiId()),
                 sideUiContainer);
 
         mCoordinator.unregisterSideUiContainer(sideUiContainer);
         assertNull(
                 "Registered SideUiContainer expected to be null.",
-                mCoordinator.getSideUiContainerForTesting(sideUiContainer.getSideUiId()));
+                mCoordinator.getSideUiContainerById(sideUiContainer.getSideUiId()));
     }
 
     @Test

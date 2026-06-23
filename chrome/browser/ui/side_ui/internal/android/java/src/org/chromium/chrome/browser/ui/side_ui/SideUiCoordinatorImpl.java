@@ -21,6 +21,7 @@ import android.view.ViewParent;
 import android.view.ViewStub;
 
 import androidx.annotation.Px;
+import androidx.annotation.VisibleForTesting;
 import androidx.core.view.animation.PathInterpolatorCompat;
 import androidx.window.layout.WindowMetricsCalculator;
 
@@ -171,17 +172,13 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
 
     @Override
     public boolean isSideUiShowing(@SideUiId int sideUiId) {
-        for (var sideUiContainer : mSideUiContainers) {
-            if (sideUiContainer.getSideUiId() != sideUiId) continue;
-
-            ViewGroup anchorContainer = mAnchorContainers.get(sideUiContainer.getAnchorSide());
-            if (anchorContainer == null) return false;
-
-            int width =
-                    anchorContainer.getVisibility() == View.GONE ? 0 : anchorContainer.getWidth();
-            return width > 0;
+        var sideUiContainer = getSideUiContainerById(sideUiId);
+        if (sideUiContainer == null) {
+            return false;
         }
-        return false;
+
+        var currentSideUiSpecs = getCurrentSideUiSpecsInternal();
+        return currentSideUiSpecs.getWidth(sideUiContainer.getAnchorSide()) > 0;
     }
 
     @Override
@@ -272,6 +269,21 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
         }
     }
 
+    @VisibleForTesting
+    @Nullable SideUiContainer getSideUiContainerById(@SideUiId int id) {
+        for (SideUiContainer container : mSideUiContainers) {
+            if (container.getSideUiId() == id) return container;
+        }
+        return null;
+    }
+
+    private @Nullable SideUiContainer getSideUiContainerBySide(@AnchorSide int side) {
+        for (SideUiContainer container : mSideUiContainers) {
+            if (container.getAnchorSide() == side) return container;
+        }
+        return null;
+    }
+
     private boolean hasConflictingAnchorSides(SideUiContainer sideUiContainer) {
         List<@AnchorSide Integer> allocatedAnchorSide = new ArrayList<>();
         @SideUiId int id = sideUiContainer.getSideUiId();
@@ -353,13 +365,6 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
         }
 
         return new SideUiSpecs(anchorContainerWidths);
-    }
-
-    private @Nullable SideUiContainer getSideUiContainerBySide(@AnchorSide int side) {
-        for (SideUiContainer container : mSideUiContainers) {
-            if (container.getAnchorSide() == side) return container;
-        }
-        return null;
     }
 
     /**
@@ -665,14 +670,5 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
                 .computeCurrentWindowMetrics(mParentActivity)
                 .getBounds()
                 .width();
-    }
-
-    // Test Support
-
-    @Nullable SideUiContainer getSideUiContainerForTesting(@SideUiId int id) {
-        for (SideUiContainer container : mSideUiContainers) {
-            if (container.getSideUiId() == id) return container;
-        }
-        return null;
     }
 }
