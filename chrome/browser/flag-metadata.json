@@ -6793,6 +6793,11 @@
     "expiry_milestone": 160
   },
   {
+    "name": "new-tab-page-redesign",
+    "owners": [ "thegreenfrog@google.com", "bling-pandamonium@google.com" ],
+    "expiry_milestone": 160
+  },
+  {
     "name": "no-accounts-web-signin",
     "owners": [
       "mlbipin@google.com",

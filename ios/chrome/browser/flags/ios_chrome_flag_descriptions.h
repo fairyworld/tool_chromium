@@ -1385,6 +1385,10 @@ inline constexpr char kNewTabPageFieldTrialDescription[] =
     "Enables new tab page features that are available on first run for new "
     "Chrome iOS users.";
 
+inline constexpr char kNewTabPageRedesignName[] = "New Tab Page Redesign";
+inline constexpr char kNewTabPageRedesignDescription[] =
+    "Enables the redesigned New Tab Page on iOS (iPhone only).";
+
 inline constexpr char kNoAccountWebSigninName[] =
     "Enable no account web sigin bottom sheet";
 inline constexpr char kNoAccountWebSigninDescription[] =

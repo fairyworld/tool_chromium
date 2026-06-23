@@ -242,6 +242,8 @@ source_set("ntp_internal") {
     "new_tab_page_mutator.h",
     "new_tab_page_quick_actions_view_controller.h",
     "new_tab_page_quick_actions_view_controller.mm",
+    "new_tab_page_redesign_view_controller.h",
+    "new_tab_page_redesign_view_controller.mm",
     "new_tab_page_shortcuts_handler.h",
     "new_tab_page_view_controller.h",
     "new_tab_page_view_controller.mm",
