@@ -993,4 +993,29 @@ IN_PROC_BROWSER_TEST_F(SurfaceEmbedBrowserTest, FocusByClick) {
             web_contents()->GetFocusedFrame());
 }
 
+IN_PROC_BROWSER_TEST_F(SurfaceEmbedBrowserTest,
+                       HtmlPopupOnSurfaceEmbeddedPage) {
+  auto child_contents =
+      SetupHarnessAndChildWithContent("/surface_embed/inner_page.html");
+  AttachChildToEmbed(child_contents.get());
+
+  // Replace child page contents with a select element.
+  EXPECT_TRUE(content::ExecJs(child_contents.get(), R"(
+    document.body.innerHTML = "<select><option>option1</option></select>";
+  )"));
+
+  // Ensure visibility and activation of the child WebContents.
+  child_contents->WasShown();
+  child_contents->GetPrimaryMainFrame()->GetRenderWidgetHost()->SetActive(true);
+
+  content::ShowPopupWidgetWaiter waiter(child_contents.get(),
+                                        child_contents->GetPrimaryMainFrame());
+  EXPECT_TRUE(content::ExecJs(child_contents.get(),
+                              "document.querySelector('select').showPicker()"));
+  // Android sometimes times out when waiting for the popup.
+#if !BUILDFLAG(IS_ANDROID)
+  waiter.Wait();
+#endif
+}
+
 }  // namespace surface_embed
