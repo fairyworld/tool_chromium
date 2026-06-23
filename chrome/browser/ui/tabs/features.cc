@@ -93,8 +93,6 @@ BASE_FEATURE_PARAM(base::TimeDelta,
                    "expand_on_hover_velocity_heuristic_edge_delay",
                    base::Milliseconds(200));
 
-BASE_FEATURE(kTabSelectionByPointer, base::FEATURE_ENABLED_BY_DEFAULT);
-
 BASE_FEATURE(kTabStripUnification, base::FEATURE_DISABLED_BY_DEFAULT);
 
 // Enables Back-to-Opener behavior, allowing users to press the back button in a

@@ -90,8 +90,6 @@ BASE_DECLARE_FEATURE_PARAM(
     base::TimeDelta,
     kVerticalTabsExpandOnHoverVelocityHeuristicEdgeDelay);
 
-BASE_DECLARE_FEATURE(kTabSelectionByPointer);
-
 BASE_DECLARE_FEATURE(kBackToOpener);
 
 BASE_DECLARE_FEATURE(kTabStripUnification);
