@@ -678,6 +678,30 @@ public class LocationBarMediatorTest {
     }
 
     @Test
+    public void testSuspendInput_clearsExactMatchUrlSupplier() {
+        mMediator.onFinishNativeInitialization();
+        mProfileSupplier.set(mProfile);
+
+        AutocompleteInput input = new AutocompleteInput();
+        input.setUserText("text");
+        input.setRequestType(AutocompleteRequestType.SEARCH);
+        mMediator.beginInput(input);
+
+        AutocompleteMatch defaultMatch =
+                AutocompleteMatchBuilder.searchWithType(OmniboxSuggestionType.URL_WHAT_YOU_TYPED)
+                        .setDisplayText("text")
+                        .setIsSearch(false)
+                        .setAllowedToBeDefaultMatch(true)
+                        .setUrl(JUnitTestGURLs.RED_1)
+                        .build();
+        mMediator.onSuggestionsChanged(defaultMatch, true);
+        assertNotNull(mMediator.getExactMatchUrlSupplier().get());
+
+        mMediator.suspendInput();
+        assertNull(mMediator.getExactMatchUrlSupplier().get());
+    }
+
+    @Test
     public void testOnUrlTextChanged_updatesShouldAutocomplete() {
         mMediator.onFinishNativeInitialization();
         mProfileSupplier.set(mProfile);

@@ -2513,6 +2513,7 @@ class LocationBarMediator
         }
         mHintTextUpdater.endInput();
         setAttachmentModelList(null);
+        mExactMatchUrlSupplier.set(null);
     }
 
     /**
