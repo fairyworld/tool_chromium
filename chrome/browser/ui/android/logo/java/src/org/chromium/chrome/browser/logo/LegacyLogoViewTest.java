@@ -56,12 +56,14 @@ public class LegacyLogoViewTest {
 
     private LegacyLogoView mView;
     private Bitmap mBitmap;
+    private Bitmap mDarkBitmap;
     private PropertyModelChangeProcessor mPropertyModelChangeProcessor;
     private PropertyModel mModel;
 
     @Before
     public void setup() {
         mBitmap = Bitmap.createBitmap(1, 1, Config.ALPHA_8);
+        mDarkBitmap = Bitmap.createBitmap(1, 1, Config.ARGB_8888);
         TemplateUrlServiceFactory.setInstanceForTesting(mTemplateUrlService);
 
         mActivityScenarioRule
@@ -97,7 +99,14 @@ public class LegacyLogoViewTest {
 
     @Test
     public void testLogoView_WithUrl() {
-        Logo logo = new Logo(mBitmap, LOGO_URL, null, null);
+        Logo logo =
+                new Logo(
+                        /* image= */ mBitmap,
+                        /* darkImage= */ mDarkBitmap,
+                        /* onClickUrl= */ LOGO_URL,
+                        /* altText= */ null,
+                        /* animatedLogoUrl= */ null,
+                        /* darkAnimatedLogoUrl= */ null);
         mView.updateLogo(logo);
         mView.endAnimationsForTesting();
 
@@ -110,7 +119,14 @@ public class LegacyLogoViewTest {
 
     @Test
     public void testLogoView_WithAnimatedUrl() {
-        Logo logo = new Logo(mBitmap, null, null, ANIMATED_LOGO_URL);
+        Logo logo =
+                new Logo(
+                        /* image= */ mBitmap,
+                        /* darkImage= */ mDarkBitmap,
+                        /* onClickUrl= */ null,
+                        /* altText= */ null,
+                        /* animatedLogoUrl= */ ANIMATED_LOGO_URL,
+                        /* darkAnimatedLogoUrl= */ null);
         mView.updateLogo(logo);
         mView.endAnimationsForTesting();
 
@@ -124,7 +140,14 @@ public class LegacyLogoViewTest {
     @Test
     public void testLogoView_WithUrl_Clicked() {
         mView.setClickHandler(mLogoClickHandler);
-        Logo logo = new Logo(mBitmap, LOGO_URL, null, null);
+        Logo logo =
+                new Logo(
+                        /* image= */ mBitmap,
+                        /* darkImage= */ mDarkBitmap,
+                        /* onClickUrl= */ LOGO_URL,
+                        /* altText= */ null,
+                        /* animatedLogoUrl= */ null,
+                        /* darkAnimatedLogoUrl= */ null);
         mView.updateLogo(logo);
         mView.endAnimationsForTesting();
         mView.performClick();
@@ -133,7 +156,14 @@ public class LegacyLogoViewTest {
 
     @Test
     public void testLogoView_WithAltText() {
-        Logo logo = new Logo(mBitmap, null, ALT_TEXT, null);
+        Logo logo =
+                new Logo(
+                        /* image= */ mBitmap,
+                        /* darkImage= */ mDarkBitmap,
+                        /* onClickUrl= */ null,
+                        /* altText= */ ALT_TEXT,
+                        /* animatedLogoUrl= */ null,
+                        /* darkAnimatedLogoUrl= */ null);
         mView.updateLogo(logo);
         mView.endAnimationsForTesting();
 
@@ -146,7 +176,14 @@ public class LegacyLogoViewTest {
 
     @Test
     public void testShowLoadingView() {
-        Logo logo = new Logo(Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8), null, null, null);
+        Logo logo =
+                new Logo(
+                        /* image= */ Bitmap.createBitmap(1, 1, Config.ALPHA_8),
+                        /* darkImage= */ mDarkBitmap,
+                        /* onClickUrl= */ null,
+                        /* altText= */ null,
+                        /* animatedLogoUrl= */ null,
+                        /* darkAnimatedLogoUrl= */ null);
         mModel.set(LogoProperties.LOGO, logo);
         mView.endAnimationsForTesting();
         Assert.assertNotNull(mView.getLogoDrawableForTesting());
@@ -181,7 +218,14 @@ public class LegacyLogoViewTest {
         Assert.assertEquals(logoTopMargin, logoLayoutParams.topMargin);
 
         // Test doodle animation.
-        Logo logo = new Logo(mBitmap, null, ALT_TEXT, null);
+        Logo logo =
+                new Logo(
+                        /* image= */ mBitmap,
+                        /* darkImage= */ mDarkBitmap,
+                        /* onClickUrl= */ null,
+                        /* altText= */ ALT_TEXT,
+                        /* animatedLogoUrl= */ null,
+                        /* darkAnimatedLogoUrl= */ null);
         mModel.set(LogoProperties.LOGO, logo);
         ObjectAnimator fadeAnimation = mView.getFadeAnimationForTesting();
         Assert.assertNotNull(fadeAnimation);

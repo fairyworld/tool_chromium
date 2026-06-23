@@ -197,7 +197,14 @@ public class LogoMediatorUnitTest {
     public void testLoadAnimatedLogoFromCache() {
         LogoMediator logoMediator = createMediator();
         logoMediator.setHasLogoLoadedForCurrentSearchEngineForTesting(false);
-        Logo cachedLogo = new Logo(null, TEST_CLICK_URL, null, TEST_ANIMATED_LOGO_URL);
+        Logo cachedLogo =
+                new Logo(
+                        /* image= */ null,
+                        /* darkImage= */ null,
+                        /* onClickUrl= */ TEST_CLICK_URL,
+                        /* altText= */ null,
+                        /* animatedLogoUrl= */ TEST_ANIMATED_LOGO_URL,
+                        /* darkAnimatedLogoUrl= */ null);
         when(mDoodleCache.getCachedDoodle(any())).thenReturn(cachedLogo);
 
         var histogramWatcher =

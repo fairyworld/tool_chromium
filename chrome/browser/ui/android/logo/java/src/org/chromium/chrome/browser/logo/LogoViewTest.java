@@ -55,10 +55,12 @@ public class LogoViewTest {
 
     private LogoView mView;
     private Bitmap mBitmap;
+    private Bitmap mDarkBitmap;
 
     @Before
     public void setup() {
         mBitmap = Bitmap.createBitmap(1, 1, Config.ALPHA_8);
+        mDarkBitmap = Bitmap.createBitmap(1, 1, Config.ARGB_8888);
         TemplateUrlServiceFactory.setInstanceForTesting(mTemplateUrlService);
 
         mActivityScenarioRule
@@ -96,7 +98,14 @@ public class LogoViewTest {
 
     @Test
     public void testLogoView_WithUrl() {
-        Logo logo = new Logo(mBitmap, LOGO_URL, null, null);
+        Logo logo =
+                new Logo(
+                        /* image= */ mBitmap,
+                        /* darkImage= */ mDarkBitmap,
+                        /* onClickUrl= */ LOGO_URL,
+                        /* altText= */ null,
+                        /* animatedLogoUrl= */ null,
+                        /* darkAnimatedLogoUrl= */ null);
         mView.updateLogo(logo);
         mView.endAnimationsForTesting();
 
@@ -109,7 +118,14 @@ public class LogoViewTest {
 
     @Test
     public void testLogoView_WithAnimatedUrl() {
-        Logo logo = new Logo(mBitmap, null, null, ANIMATED_LOGO_URL);
+        Logo logo =
+                new Logo(
+                        /* image= */ mBitmap,
+                        /* darkImage= */ mDarkBitmap,
+                        /* onClickUrl= */ null,
+                        /* altText= */ null,
+                        /* animatedLogoUrl= */ ANIMATED_LOGO_URL,
+                        /* darkAnimatedLogoUrl= */ null);
         mView.updateLogo(logo);
         mView.endAnimationsForTesting();
 
@@ -123,7 +139,14 @@ public class LogoViewTest {
     @Test
     public void testLogoView_WithUrl_Clicked() {
         mView.setClickHandler(mLogoClickHandler);
-        Logo logo = new Logo(mBitmap, LOGO_URL, null, null);
+        Logo logo =
+                new Logo(
+                        /* image= */ mBitmap,
+                        /* darkImage= */ mDarkBitmap,
+                        /* onClickUrl= */ LOGO_URL,
+                        /* altText= */ null,
+                        /* animatedLogoUrl= */ null,
+                        /* darkAnimatedLogoUrl= */ null);
         mView.updateLogo(logo);
         mView.endAnimationsForTesting();
         mView.performClick();
@@ -132,7 +155,14 @@ public class LogoViewTest {
 
     @Test
     public void testLogoView_WithAltText() {
-        Logo logo = new Logo(mBitmap, null, ALT_TEXT, null);
+        Logo logo =
+                new Logo(
+                        /* image= */ mBitmap,
+                        /* darkImage= */ mDarkBitmap,
+                        /* onClickUrl= */ null,
+                        /* altText= */ ALT_TEXT,
+                        /* animatedLogoUrl= */ null,
+                        /* darkAnimatedLogoUrl= */ null);
         mView.updateLogo(logo);
         mView.endAnimationsForTesting();
 
@@ -168,7 +198,14 @@ public class LogoViewTest {
         Assert.assertEquals(logoTopMargin, logoLayoutParams.topMargin);
 
         // Test doodle animation.
-        Logo logo = new Logo(mBitmap, null, ALT_TEXT, null);
+        Logo logo =
+                new Logo(
+                        /* image= */ mBitmap,
+                        /* darkImage= */ mDarkBitmap,
+                        /* onClickUrl= */ null,
+                        /* altText= */ ALT_TEXT,
+                        /* animatedLogoUrl= */ null,
+                        /* darkAnimatedLogoUrl= */ null);
         mView.updateLogo(logo);
 
         // With TransitionManager, layout params are updated immediately.
@@ -220,7 +257,14 @@ public class LogoViewTest {
         Assert.assertEquals(ImageView.ScaleType.CENTER_INSIDE, mView.getScaleType());
 
         // Doodle
-        Logo logo = new Logo(mBitmap, null, ALT_TEXT, null);
+        Logo logo =
+                new Logo(
+                        /* image= */ mBitmap,
+                        /* darkImage= */ mDarkBitmap,
+                        /* onClickUrl= */ null,
+                        /* altText= */ ALT_TEXT,
+                        /* animatedLogoUrl= */ null,
+                        /* darkAnimatedLogoUrl= */ null);
         mView.updateLogo(logo);
         mView.endAnimationsForTesting();
         Assert.assertEquals(ImageView.ScaleType.FIT_CENTER, mView.getScaleType());

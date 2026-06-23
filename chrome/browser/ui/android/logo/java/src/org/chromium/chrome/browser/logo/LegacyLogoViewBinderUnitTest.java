@@ -140,10 +140,12 @@ public class LegacyLogoViewBinderUnitTest {
     public void testEndFadeAnimation() {
         Logo logo =
                 new Logo(
-                        Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8),
-                        null,
-                        null,
-                        "https://www.gstatic.com/chrome/ntp/doodle_test/ddljson_android4.json");
+                        /* image= */ Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8),
+                        /* darkImage= */ Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888),
+                        /* onClickUrl= */ null,
+                        /* altText= */ null,
+                        /* animatedLogoUrl= */ "https://www.gstatic.com/chrome/ntp/doodle_test/ddljson_android4.json",
+                        /* darkAnimatedLogoUrl= */ null);
         assertNull(mLogoView.getFadeAnimationForTesting());
         mLogoModel.set(LogoProperties.LOGO, logo);
         assertNotNull(mLogoView.getFadeAnimationForTesting());
@@ -151,10 +153,12 @@ public class LegacyLogoViewBinderUnitTest {
         assertNull(mLogoView.getFadeAnimationForTesting());
         Logo newLogo =
                 new Logo(
-                        Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888),
-                        "https://www.google.com",
-                        null,
-                        null);
+                        /* image= */ Bitmap.createBitmap(2, 2, Bitmap.Config.ARGB_8888),
+                        /* darkImage= */ Bitmap.createBitmap(2, 2, Bitmap.Config.ALPHA_8),
+                        /* onClickUrl= */ "https://www.google.com",
+                        /* altText= */ null,
+                        /* animatedLogoUrl= */ null,
+                        /* darkAnimatedLogoUrl= */ null);
         mLogoModel.set(LogoProperties.LOGO, newLogo);
         assertNotNull(mLogoView.getFadeAnimationForTesting());
         mLogoModel.set(LogoProperties.SET_END_FADE_ANIMATION, true);
@@ -166,10 +170,12 @@ public class LegacyLogoViewBinderUnitTest {
     public void testUpdateLogo() {
         Logo logo =
                 new Logo(
-                        Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8),
-                        null,
-                        null,
-                        "https://www.gstatic.com/chrome/ntp/doodle_test/ddljson_android4.json");
+                        /* image= */ Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8),
+                        /* darkImage= */ Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888),
+                        /* onClickUrl= */ null,
+                        /* altText= */ null,
+                        /* animatedLogoUrl= */ "https://www.gstatic.com/chrome/ntp/doodle_test/ddljson_android4.json",
+                        /* darkAnimatedLogoUrl= */ null);
         assertNull(mLogoView.getFadeAnimationForTesting());
         assertNotEquals(logo.image, mLogoView.getNewLogoDrawableBitmapForTesting());
         mLogoModel.set(LogoProperties.LOGO, logo);

@@ -354,7 +354,13 @@ public class ShowNtpAtStartupTest {
                             (LogoContainerView)
                                     ntp.getView().findViewById(R.id.logo_container_view);
                     Logo logo =
-                            new Logo(Bitmap.createBitmap(1, 1, Config.ALPHA_8), null, null, null);
+                            new Logo(
+                                    /* image= */ Bitmap.createBitmap(1, 1, Config.ALPHA_8),
+                                    /* darkImage= */ Bitmap.createBitmap(1, 1, Config.ARGB_8888),
+                                    /* onClickUrl= */ null,
+                                    /* altText= */ null,
+                                    /* animatedLogoUrl= */ null,
+                                    /* darkAnimatedLogoUrl= */ null);
                     logoView.updateLogo(logo);
                     logoView.endAnimationsForTesting();
 
@@ -388,7 +394,13 @@ public class ShowNtpAtStartupTest {
                     LegacyLogoView logoView =
                             (LegacyLogoView) ntp.getView().findViewById(R.id.search_provider_logo);
                     Logo logo =
-                            new Logo(Bitmap.createBitmap(1, 1, Config.ALPHA_8), null, null, null);
+                            new Logo(
+                                    /* image= */ Bitmap.createBitmap(1, 1, Config.ALPHA_8),
+                                    /* darkImage= */ Bitmap.createBitmap(1, 1, Config.ARGB_8888),
+                                    /* onClickUrl= */ null,
+                                    /* altText= */ null,
+                                    /* animatedLogoUrl= */ null,
+                                    /* darkAnimatedLogoUrl= */ null);
                     logoView.updateLogo(logo);
                     logoView.endAnimationsForTesting();
 
