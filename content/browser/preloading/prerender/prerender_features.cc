@@ -79,6 +79,9 @@ const base::FeatureParam<std::string>
         &kPrerender2ReuseInitiatorProcess, "prerender_action_type",
         "prerender-until-script"};
 
+const base::FeatureParam<std::string> kPrerender2ReuseInitiatorProcessEagerness{
+    &kPrerender2ReuseInitiatorProcess, "eagerness", "moderate"};
+
 bool UsePrefetchPrerenderIntegration() {
   return base::FeatureList::IsEnabled(
              features::kPrerender2FallbackPrefetchSpecRules) ||

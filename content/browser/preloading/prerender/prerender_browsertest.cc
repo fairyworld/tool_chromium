@@ -19054,10 +19054,21 @@ class ReuseInitiatorProcessTest : public PrerenderBrowserTest {
   base::test::ScopedFeatureList feature_list_;
 };
 
-// Tests that a same-origin prerender-until-script reuses the initiator's
-// process when the feature is enabled and configured for this action type.
-IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessTest,
-                       SameOriginPrerenderUntilScriptReusesProcess) {
+// Tests that a same-origin prerender-until-script with moderate eagerness
+// reuses the initiator's process when the feature is enabled with default
+// eagerness (moderate).
+// TODO(crbug.com/40269669): Add the implementation of pointer interaction
+// on Android to the function below.
+#if BUILDFLAG(IS_ANDROID)
+#define MAYBE_ModerateEagernessPrerenderUntilScriptReusesProcess \
+  DISABLED_ModerateEagernessPrerenderUntilScriptReusesProcess
+#else
+#define MAYBE_ModerateEagernessPrerenderUntilScriptReusesProcess \
+  ModerateEagernessPrerenderUntilScriptReusesProcess
+#endif
+IN_PROC_BROWSER_TEST_F(
+    ReuseInitiatorProcessTest,
+    MAYBE_ModerateEagernessPrerenderUntilScriptReusesProcess) {
   GURL url = GetUrl("/empty.html");
   GURL prerender_url = GetUrl("/title1.html");
 
@@ -19066,11 +19077,15 @@ IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessTest,
   RenderFrameHost* initiator_rfh = current_frame_host();
   ChildProcessId initiator_process_id = initiator_rfh->GetProcess()->GetID();
 
-  // 2. Start a same-origin prerender-until-script.
-  test::PrerenderHostCreationWaiter waiter;
+  // 2. Start a same-origin prerender-until-script with moderate eagerness.
+  InsertAnchor(prerender_url);
+  test::PrerenderHostRegistryObserver observer(*web_contents_impl());
   prerender_helper()->AddPrerenderUntilScriptAsync(
-      prerender_url, blink::mojom::SpeculationEagerness::kImmediate);
-  PrerenderHostId host_id = waiter.Wait();
+      prerender_url, blink::mojom::SpeculationEagerness::kModerate);
+  PointerHoverToAnchor(prerender_url);
+  observer.WaitForTrigger(prerender_url);
+
+  PrerenderHostId host_id = prerender_helper()->GetHostForUrl(prerender_url);
   ASSERT_TRUE(host_id);
 
   // 3. Verify the prerender process ID matches the initiator's process ID.
@@ -19086,6 +19101,33 @@ IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessTest,
   NavigatePrimaryPage(prerender_url);
   EXPECT_EQ(web_contents()->GetLastCommittedURL(), prerender_url);
   EXPECT_EQ(current_frame_host()->GetProcess()->GetID(), initiator_process_id);
+}
+
+// Tests that a same-origin prerender-until-script with immediate eagerness
+// DOES NOT reuse the process when the feature is limited to moderate.
+IN_PROC_BROWSER_TEST_F(
+    ReuseInitiatorProcessTest,
+    ImmediateEagernessPrerenderUntilScriptDoesNotReuseProcess) {
+  GURL url = GetUrl("/empty.html");
+  GURL prerender_url = GetUrl("/title1.html");
+
+  // 1. Navigate to the initiator page.
+  ASSERT_TRUE(NavigateToURL(shell(), url));
+  RenderFrameHost* initiator_rfh = current_frame_host();
+  ChildProcessId initiator_process_id = initiator_rfh->GetProcess()->GetID();
+
+  // 2. Start a same-origin prerender-until-script with immediate eagerness.
+  test::PrerenderHostCreationWaiter waiter;
+  prerender_helper()->AddPrerenderUntilScriptAsync(
+      prerender_url, blink::mojom::SpeculationEagerness::kImmediate);
+  PrerenderHostId host_id = waiter.Wait();
+  ASSERT_TRUE(host_id);
+
+  // 3. Verify the prerender process ID DOES NOT match the initiator's process
+  // ID.
+  RenderFrameHost* prerender_rfh = GetPrerenderedMainFrameHost(host_id);
+  ChildProcessId prerender_process_id = prerender_rfh->GetProcess()->GetID();
+  EXPECT_NE(initiator_process_id, prerender_process_id);
 }
 
 // Tests that a regular prerender DOES NOT reuse the process if the feature
@@ -19115,9 +19157,12 @@ IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessTest,
 class ReuseInitiatorProcessAllActionsTest : public PrerenderBrowserTest {
  public:
   ReuseInitiatorProcessAllActionsTest() {
-    feature_list_.InitAndEnableFeatureWithParameters(
-        features::kPrerender2ReuseInitiatorProcess,
-        {{"prerender_action_type", "all"}});
+    feature_list_.InitWithFeaturesAndParameters(
+        {{features::kPrerender2ReuseInitiatorProcess,
+          {{"prerender_action_type", "all"}, {"eagerness", "all"}}},
+         {blink::features::kPrerenderUntilScript, {}},
+         {features::kPrerenderUntilScriptUpgrade, {}}},
+        {});
   }
 
  private:
@@ -19146,7 +19191,7 @@ IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessAllActionsTest,
   EXPECT_EQ(initiator_process_id, prerender_process_id);
 }
 
-IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessTest,
+IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessAllActionsTest,
                        PrerenderCancellationDoesNotAffectInitiator) {
   GURL url = GetUrl("/empty.html");
   GURL prerender_url = GetUrl("/title1.html");

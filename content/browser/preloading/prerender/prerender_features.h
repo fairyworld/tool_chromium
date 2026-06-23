@@ -73,6 +73,8 @@ CONTENT_EXPORT BASE_DECLARE_FEATURE(kPrerenderUntilScriptUpgrade);
 CONTENT_EXPORT BASE_DECLARE_FEATURE(kPrerender2ReuseInitiatorProcess);
 CONTENT_EXPORT extern const base::FeatureParam<std::string>
     kPrerender2ReuseInitiatorProcessActionType;
+CONTENT_EXPORT extern const base::FeatureParam<std::string>
+    kPrerender2ReuseInitiatorProcessEagerness;
 
 CONTENT_EXPORT bool UsePrefetchPrerenderIntegration();
 }  // namespace features
