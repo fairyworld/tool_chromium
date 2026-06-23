@@ -811,7 +811,6 @@ third_party/sentencepiece/src/src
 third_party/shell-encryption
 third_party/shell-encryption/src
 third_party/simdutf
-third_party/sinonjs/src
 third_party/six/src
 third_party/six/src/documentation
 third_party/sqlite
