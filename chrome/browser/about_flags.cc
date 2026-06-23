@@ -1348,6 +1348,21 @@ const FeatureEntry::FeatureVariation
         {"(Cobrowsing only)", kVoiceSearchCoherenceComposeboxCobrowsingParams,
          nullptr}};
 
+const FeatureEntry::FeatureParam
+    kContextManagementKeepMenuOpenOnTabSelectForRealboxParams[] = {
+        {"ContextManagementInComposebox", "true"},
+        {"KeepMenuOpenOnTabSelectForRealboxComposebox", "true"}};
+
+// Normal 'Enabled' option is just the flag enabled with param 'realbox closes
+// menu on tab select' enabled by default. 'Disabled' option disables the flag, and thus
+// the context menu and 'realbox closes menu on tab select'.
+const FeatureEntry::FeatureVariation
+    kContextManagementInComposeboxVariations[] = {
+        {"Context Management in composebox (realbox closes menu on tab select)", {}},
+        {"Context management in composebox (realbox keeps menu open on tab "
+         "select)",
+         kContextManagementKeepMenuOpenOnTabSelectForRealboxParams, nullptr}};
+
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || \
     BUILDFLAG(IS_WIN)
 
@@ -6981,7 +6996,9 @@ const FeatureEntry kFeatureEntries[] = {
     {"context-management-in-composebox",
      flag_descriptions::kContextManagementInComposeboxName,
      flag_descriptions::kContextManagementInComposeboxDescription, kOsDesktop,
-     FEATURE_VALUE_TYPE(omnibox::kContextManagementInComposebox)},
+     FEATURE_WITH_PARAMS_VALUE_TYPE(omnibox::kContextManagementInComposebox,
+                                    kContextManagementInComposeboxVariations,
+                                    "ContextManagementInComposeboxVariations")},
 
     {"context-management-in-omnibox",
      flag_descriptions::kContextManagementInOmniboxName,
