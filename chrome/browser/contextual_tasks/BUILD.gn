@@ -76,6 +76,7 @@ source_set("impl") {
   visibility = [
     ":*",
     "//chrome/browser",
+    "//chrome/browser/ui/lens:browser_tests",
   ]
 
   sources = [

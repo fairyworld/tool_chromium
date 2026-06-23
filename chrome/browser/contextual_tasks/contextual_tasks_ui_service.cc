@@ -1351,10 +1351,31 @@ bool ContextualTasksUiService::HandleNavigationImpl(
     return true;
   }
 
+  // Whether the navigation is from forward navigation and originally from
+  // a link click. `page_transition` can contain both the original navigation
+  // information (from link click or typed, etc) and the modified one(from
+  // forward/back).
+  ui::PageTransition page_transition = url_params.transition;
+  bool is_forward_link_navigation =
+      (page_transition & ui::PAGE_TRANSITION_FORWARD_BACK) && source_contents &&
+      (source_contents->GetController().GetPendingEntryIndex() >
+       source_contents->GetController().GetLastCommittedEntryIndex()) &&
+      (ui::PageTransitionCoreTypeIs(page_transition,
+                                    ui::PAGE_TRANSITION_LINK) ||
+       ui::PageTransitionCoreTypeIs(page_transition,
+                                    ui::PAGE_TRANSITION_RELOAD));
+
+  bool is_nav_within_existing_session =
+      lens::features::IsLensSidePanelUnificationEnabled() &&
+      (is_from_embedded_page || is_forward_link_navigation) &&
+      source_contents &&
+      IsContextualTasksUrl(source_contents->GetLastCommittedURL());
+
   // Make sure the user is eligible to use the feature before attempting to
   // intercept.
-  if (!eligibility_manager_ ||
-      !eligibility_manager_->IsEligibleWithoutIdentity()) {
+  if (!is_nav_within_existing_session &&
+      (!eligibility_manager_ ||
+       !eligibility_manager_->IsEligibleWithoutIdentity())) {
     OMNIBOX_LOG("nav_trace")
         << "ContextualTasks navigation trace: HandleNavigationImpl "
            "returning early, not eligible";
@@ -1491,7 +1512,8 @@ bool ContextualTasksUiService::HandleNavigationImpl(
   }
 
   // If the user is not signed in to Chrome, do not intercept.
-  if (!IsSignedInToBrowserWithValidCredentials()) {
+  if (!is_nav_within_existing_session &&
+      !IsSignedInToBrowserWithValidCredentials()) {
     OMNIBOX_LOG("nav_trace")
         << "ContextualTasks navigation trace: HandleNavigationImpl "
            "returning false, not signed into browser";
@@ -1500,7 +1522,8 @@ bool ContextualTasksUiService::HandleNavigationImpl(
 
   // If the user is not signed in to the account that is using the URL, do not
   // intercept.
-  if (is_nav_to_ai && !IsUrlForPrimaryAccount(url_params.url)) {
+  if (!is_nav_within_existing_session && is_nav_to_ai &&
+      !IsUrlForPrimaryAccount(url_params.url)) {
     OMNIBOX_LOG("nav_trace")
         << "ContextualTasks navigation trace: HandleNavigationImpl "
            "returning false, not signed into account for AI URL";
@@ -1514,20 +1537,6 @@ bool ContextualTasksUiService::HandleNavigationImpl(
   BrowserWindowInterface* browser =
       tab ? tab->GetBrowserWindowInterface()
           : webui::GetBrowserWindowInterface(source_contents);
-
-  // Whether the navigation is from forward navigation and originally from
-  // a link click. `page_transition` can contain both the original navigation
-  // information (from link click or typed, etc) and the modified one(from
-  // forward/back).
-  ui::PageTransition page_transition = url_params.transition;
-  bool is_forward_link_navigation =
-      (page_transition & ui::PAGE_TRANSITION_FORWARD_BACK) &&
-      (source_contents->GetController().GetPendingEntryIndex() >
-       source_contents->GetController().GetLastCommittedEntryIndex()) &&
-      (ui::PageTransitionCoreTypeIs(page_transition,
-                                    ui::PAGE_TRANSITION_LINK) ||
-       ui::PageTransitionCoreTypeIs(page_transition,
-                                    ui::PAGE_TRANSITION_RELOAD));
 
   // Retrieve the stored open url params from the pending tracker. If found, use
   // those params for this navigation. This is required as the second call to
