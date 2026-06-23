@@ -629,11 +629,6 @@ public class ImeAdapterImpl
     }
 
     @Override
-    public InputMethodManagerWrapper getInputMethodManagerWrapper() {
-        return mInputMethodManagerWrapper;
-    }
-
-    @Override
     public void setAllowFullscreenIme(boolean allow) {
         mAllowFullscreenIme = allow;
     }
