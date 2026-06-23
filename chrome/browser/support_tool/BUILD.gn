@@ -96,11 +96,6 @@ if (!is_android) {
 
     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
-    # These tests pre-date strict sign-comparison warnings; relax to the warning
-    # posture they had while compiled in //chrome/test.
-    configs -= [ "//build/config/compiler:chromium_code" ]
-    configs += [ "//build/config/compiler:no_chromium_code" ]
-
     sources = [
       "support_tool_handler_unittest.cc",
       "system_log_source_data_collector_adaptor_unittest.cc",
@@ -128,10 +123,6 @@ if (!is_android) {
 
     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
-    # These tests pre-date strict sign-comparison warnings; relax to the warning
-    # posture they had while compiled in //chrome/test.
-    configs -= [ "//build/config/compiler:chromium_code" ]
-    configs += [ "//build/config/compiler:no_chromium_code" ]
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
     sources = [

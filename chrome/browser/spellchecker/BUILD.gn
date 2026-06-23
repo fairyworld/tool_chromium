@@ -109,11 +109,6 @@ source_set("unit_tests") {
 
   configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
-  # These tests pre-date strict sign-comparison warnings; relax to the warning
-  # posture they had while compiled in //chrome/test.
-  configs -= [ "//build/config/compiler:chromium_code" ]
-  configs += [ "//build/config/compiler:no_chromium_code" ]
-
   sources = [ "spellcheck_custom_dictionary_unittest.cc" ]
 
   deps = [
@@ -161,10 +156,6 @@ if (!is_android) {
 
     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
-    # These tests pre-date strict sign-comparison warnings; relax to the warning
-    # posture they had while compiled in //chrome/test.
-    configs -= [ "//build/config/compiler:chromium_code" ]
-    configs += [ "//build/config/compiler:no_chromium_code" ]
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
     sources = []
@@ -201,10 +192,6 @@ if (is_mac) {
 
     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
-    # These tests pre-date strict sign-comparison warnings; relax to the warning
-    # posture they had while compiled in //chrome/test.
-    configs -= [ "//build/config/compiler:chromium_code" ]
-    configs += [ "//build/config/compiler:no_chromium_code" ]
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
     sources = [ "spellcheck_mac_view_interactive_uitest.mm" ]
