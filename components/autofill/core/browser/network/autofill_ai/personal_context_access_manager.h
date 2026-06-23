@@ -9,10 +9,8 @@
 #include <string>
 
 #include "base/observer_list_types.h"
-#include "base/types/expected.h"
 #include "components/autofill/core/browser/data_model/autofill_ai/entity_instance.h"
 #include "components/keyed_service/core/keyed_service.h"
-#include "components/personal_context/core/context_memory_error.h"
 
 namespace autofill {
 
@@ -76,6 +74,9 @@ class PersonalContextAccessManager : public KeyedService {
   // Returns true if all entities of the given `type_name` have been prefetched
   // and the validity of the result has not expired.
   virtual bool IsTypePrefetched(EntityType type) const = 0;
+
+  // Returns true if the server has data available for the given `type`.
+  virtual bool ServerHasDataAvailable(EntityType type) const = 0;
 };
 
 }  // namespace autofill

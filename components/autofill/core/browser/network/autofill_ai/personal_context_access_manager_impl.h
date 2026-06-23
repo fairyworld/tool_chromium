@@ -74,6 +74,7 @@ class PersonalContextAccessManagerImpl
   void GetUnmaskedSpiiEntity(const EntityInstance::EntityId& id,
                              GetUnmaskedSpiiEntityCallback callback) override;
   bool IsTypePrefetched(EntityType type) const override;
+  bool ServerHasDataAvailable(EntityType type) const override;
   void AddObserver(PersonalContextAccessManager::Observer* observer) override;
   void RemoveObserver(
       PersonalContextAccessManager::Observer* observer) override;

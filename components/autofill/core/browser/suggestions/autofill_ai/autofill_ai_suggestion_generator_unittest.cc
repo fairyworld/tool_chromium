@@ -52,6 +52,7 @@ using ::testing::IsEmpty;
 using ::testing::Matcher;
 using ::testing::Not;
 using ::testing::ResultOf;
+using ::testing::Return;
 
 constexpr char kAppLocaleUS[] = "en-US";
 
@@ -1133,12 +1134,35 @@ TEST_F(AutofillAiSuggestionGeneratorTest, ShowFetchingSuggestionWhenPending) {
   SetEntities({});
 
   using RequestStatus = PersonalContextAccessManager::RequestStatus;
+  EXPECT_CALL(access_manager,
+              ServerHasDataAvailable(EntityType(EntityTypeName::kPassport)))
+      .WillRepeatedly(Return(true));
   EXPECT_CALL(access_manager, GetPrefetchStatusByEntityType(
                                   EntityType(EntityTypeName::kPassport)))
-      .WillRepeatedly(testing::Return(RequestStatus::kPending));
+      .WillRepeatedly(Return(RequestStatus::kPending));
 
   EXPECT_THAT(CreateAutofillAiFillingSuggestions(field(0)),
               SuggestionsAre(HasType(SuggestionType::kFetchingAmbientData)));
+}
+
+TEST_F(AutofillAiSuggestionGeneratorTest,
+       NoFetchingSuggestionWhenNoDataExists) {
+  testing::NiceMock<MockPersonalContextAccessManager> access_manager;
+  client().set_personal_context_access_manager(&access_manager);
+
+  SetForm({PASSPORT_NUMBER});
+  SetEntities({});
+
+  using RequestStatus = PersonalContextAccessManager::RequestStatus;
+  EXPECT_CALL(access_manager,
+              ServerHasDataAvailable(EntityType(EntityTypeName::kPassport)))
+      .WillRepeatedly(Return(false));
+  // We mock pending to ensure the test fails if the existence check is missing.
+  EXPECT_CALL(access_manager, GetPrefetchStatusByEntityType(
+                                  EntityType(EntityTypeName::kPassport)))
+      .WillRepeatedly(Return(RequestStatus::kPending));
+
+  EXPECT_THAT(CreateAutofillAiFillingSuggestions(field(0)), IsEmpty());
 }
 
 TEST_F(AutofillAiSuggestionGeneratorTest, NoFetchingSuggestionWhenNotPending) {
@@ -1149,28 +1173,12 @@ TEST_F(AutofillAiSuggestionGeneratorTest, NoFetchingSuggestionWhenNotPending) {
   SetEntities({});
 
   using RequestStatus = PersonalContextAccessManager::RequestStatus;
+  EXPECT_CALL(access_manager,
+              ServerHasDataAvailable(EntityType(EntityTypeName::kPassport)))
+      .WillRepeatedly(Return(true));
   EXPECT_CALL(access_manager, GetPrefetchStatusByEntityType(
                                   EntityType(EntityTypeName::kPassport)))
-      .WillRepeatedly(testing::Return(RequestStatus::kSuccess));
-
-  EXPECT_THAT(CreateAutofillAiFillingSuggestions(field(0)), IsEmpty());
-}
-
-TEST_F(AutofillAiSuggestionGeneratorTest,
-       NoFetchingSuggestionWhenNoMatchingField) {
-  testing::NiceMock<MockPersonalContextAccessManager> access_manager;
-  client().set_personal_context_access_manager(&access_manager);
-
-  SetForm({PASSPORT_NUMBER});
-  SetEntities({});
-
-  using RequestStatus = PersonalContextAccessManager::RequestStatus;
-  EXPECT_CALL(access_manager, GetPrefetchStatusByEntityType(
-                                  EntityType(EntityTypeName::kNationalIdCard)))
-      .WillRepeatedly(testing::Return(RequestStatus::kPending));
-  EXPECT_CALL(access_manager, GetPrefetchStatusByEntityType(
-                                  EntityType(EntityTypeName::kPassport)))
-      .WillRepeatedly(testing::Return(RequestStatus::kSuccess));
+      .WillRepeatedly(Return(RequestStatus::kSuccess));
 
   EXPECT_THAT(CreateAutofillAiFillingSuggestions(field(0)), IsEmpty());
 }
@@ -1187,14 +1195,20 @@ TEST_F(AutofillAiSuggestionGeneratorTest,
   SetEntities({test::GetPassportEntityInstance()});
 
   using RequestStatus = PersonalContextAccessManager::RequestStatus;
-  // National ID is fetching.
-  EXPECT_CALL(access_manager, GetPrefetchStatusByEntityType(
-                                  EntityType(EntityTypeName::kNationalIdCard)))
-      .WillRepeatedly(testing::Return(RequestStatus::kPending));
-  // Passport is not fetching (success).
+  EXPECT_CALL(access_manager,
+              ServerHasDataAvailable(EntityType(EntityTypeName::kPassport)))
+      .WillRepeatedly(Return(true));
   EXPECT_CALL(access_manager, GetPrefetchStatusByEntityType(
                                   EntityType(EntityTypeName::kPassport)))
-      .WillRepeatedly(testing::Return(RequestStatus::kSuccess));
+      .WillRepeatedly(Return(RequestStatus::kSuccess));
+
+  // National ID is fetching, but the focused field (Passport) is not pending.
+  EXPECT_CALL(access_manager, ServerHasDataAvailable(
+                                  EntityType(EntityTypeName::kNationalIdCard)))
+      .WillRepeatedly(Return(true));
+  EXPECT_CALL(access_manager, GetPrefetchStatusByEntityType(
+                                  EntityType(EntityTypeName::kNationalIdCard)))
+      .WillRepeatedly(Return(RequestStatus::kPending));
 
   // User clicks Passport field.
   std::vector<Suggestion> suggestions =

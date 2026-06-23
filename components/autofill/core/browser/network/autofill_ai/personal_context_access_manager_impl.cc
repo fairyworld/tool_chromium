@@ -266,6 +266,12 @@ PersonalContextAccessManagerImpl::GetPrefetchStatusByEntityType(
   return RequestStatus::kNotStarted;
 }
 
+bool PersonalContextAccessManagerImpl::ServerHasDataAvailable(
+    EntityType type) const {
+  // TODO(crbug.com/503303085): Implement this properly.
+  return false;
+}
+
 void PersonalContextAccessManagerImpl::ResetStateForType(EntityType type) {
   // Clear existing proto entities of this type.
   absl::erase_if(prefetched_proto_cache_, [type](const auto& entry) {

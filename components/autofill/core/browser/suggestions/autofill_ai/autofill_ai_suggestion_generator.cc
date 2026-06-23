@@ -601,9 +601,9 @@ bool IsFetchingFillableEntity(const AutofillField& field,
   using RequestStatus = PersonalContextAccessManager::RequestStatus;
   for (EntityType entity_type : DenseSet<EntityType>::all()) {
     if (field.Type().GetAutofillAiType(entity_type) != UNKNOWN_TYPE) {
-      if (access_manager->GetPrefetchStatusByEntityType(entity_type) ==
-          RequestStatus::kPending) {
-        // TODO(crbug.com/503303085): Check if entity data actually exists.
+      if (access_manager->ServerHasDataAvailable(entity_type) &&
+          access_manager->GetPrefetchStatusByEntityType(entity_type) ==
+              RequestStatus::kPending) {
         return true;
       }
     }
