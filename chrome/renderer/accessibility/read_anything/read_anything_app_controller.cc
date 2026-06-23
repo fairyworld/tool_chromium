@@ -878,7 +878,7 @@ void ReadAnythingAppController::DistillNewTree() {
   // After the active tree has changed, start a timer for logging distillation
   // success or failures. Logging this via a timer reduces duplicate
   // distillation / failures being logged.
-  distillationsCompleted_ = 0;
+  distillations_completed_ = 0;
   timer_.Stop();
   timer_.Start(FROM_HERE, base::Milliseconds(kDistillationLoggingDelayMs),
                base::BindOnce(
@@ -900,22 +900,22 @@ void ReadAnythingAppController::DistillNewTree() {
 }
 
 void ReadAnythingAppController::RecordScreen2xDistillationStatus() {
-  read_anything::mojom::DistillationStatus distillationStatus;
+  read_anything::mojom::DistillationStatus distillation_status;
   if (model_.screen2x_distiller_running()) {
-    distillationStatus =
-        distillationsCompleted_ > 0
+    distillation_status =
+        distillations_completed_ > 0
             ? read_anything::mojom::DistillationStatus::kRestarted
             : read_anything::mojom::DistillationStatus::kStillRunning;
   } else if (!model_.content_node_ids().empty()) {
-    distillationStatus = read_anything::mojom::DistillationStatus::kSuccess;
+    distillation_status = read_anything::mojom::DistillationStatus::kSuccess;
   } else {
-    distillationStatus = read_anything::mojom::DistillationStatus::kFailure;
+    distillation_status = read_anything::mojom::DistillationStatus::kFailure;
   }
 
-  page_handler_->OnDistillationStatus(distillationStatus,
+  page_handler_->OnDistillationStatus(distillation_status,
                                       model_.words_distilled());
-  RecordDistillationStatus(distillationStatus);
-  distillationsCompleted_ = 0;
+  RecordDistillationStatus(distillation_status);
+  distillations_completed_ = 0;
 }
 
 void ReadAnythingAppController::RecordDistillationStatus(
@@ -1071,7 +1071,7 @@ void ReadAnythingAppController::OnAXTreeDistilled(
     // displayed nodes. Thus, we have to calculate the display nodes first.
     model_.ComputeDisplayNodeIdsForDistilledTree();
 
-    distillationsCompleted_++;
+    distillations_completed_++;
   }
 
   // If there's no distillable content on the active tree or if the page is a

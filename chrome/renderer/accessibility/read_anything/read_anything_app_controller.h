@@ -626,7 +626,7 @@ class ReadAnythingAppController
 
   // The number of times distillation completes successfully after a page
   // change. Used for logging.
-  int distillationsCompleted_;
+  int distillations_completed_;
 
   // The distilled title result of DOM distiller distillation.
   std::string dom_distiller_title_;
