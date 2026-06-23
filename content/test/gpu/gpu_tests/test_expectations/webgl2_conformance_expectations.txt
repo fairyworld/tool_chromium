@@ -879,6 +879,7 @@ crbug.com/446941342 [ android android-pixel-10 ] conformance2/textures/misc/tex-
 crbug.com/446941342 [ android android-pixel-10 ] conformance2/textures/misc/texel-fetch-undefined.html [ Failure ]
 crbug.com/446941342 [ android android-pixel-10 ] conformance2/textures/video/tex-2d-rg8-rg-unsigned_byte.html [ RetryOnFailure ]
 crbug.com/446941342 [ android android-pixel-10 ] deqp/functional/gles3/shaderstruct.html [ Failure ]
+crbug.com/527094637 [ android android-pixel-10 ] deqp/functional/gles3/uniformbuffers/random.html [ Failure ]
 
 # New failures from OS upgrade.
 crbug.com/513192891 [ android android-pixel-10 ] conformance/rendering/out-of-bounds-array-buffers.html [ Failure ]
