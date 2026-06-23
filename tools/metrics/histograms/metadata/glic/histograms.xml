@@ -2208,7 +2208,7 @@ chromium-metrics-reviews@google.com.
 
 <histogram
     name="Glic.ProfileEnablement.AnchoredDespiteEligibilityFailureReason.{Suffix}"
-    enum="GlicFeatureDisabledReason" expires_after="2026-09-27">
+    enum="GlicFeatureDisabledReason" expires_after="2026-12-20">
   <owner>birnie@google.com</owner>
   <owner>chrome-glic@google.com</owner>
   <summary>

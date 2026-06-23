@@ -2892,7 +2892,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Sync.TriggerRefreshSource" enum="TriggerRefreshSource"
-    expires_after="2026-09-22">
+    expires_after="2026-12-20">
   <owner>mtatarski@google.com</owner>
   <owner>chrome-sync-dev@chromium.org</owner>
   <summary>

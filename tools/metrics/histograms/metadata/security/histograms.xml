@@ -592,7 +592,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Security.iOS.KeychainMigration.Result"
-    enum="IOSKeychainMigrationResult" expires_after="2026-10-20">
+    enum="IOSKeychainMigrationResult" expires_after="2026-12-20">
   <owner>marq@chromium.org</owner>
   <owner>bling-flags@google.com</owner>
   <summary>
@@ -605,7 +605,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Security.iOS.KeychainMigration.UserStatus"
-    enum="IOSKeychainMigrationUserStatus" expires_after="2026-10-20">
+    enum="IOSKeychainMigrationUserStatus" expires_after="2026-12-20">
   <owner>marq@chromium.org</owner>
   <owner>bling-flags@google.com</owner>
   <summary>

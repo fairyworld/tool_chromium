@@ -2964,7 +2964,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="ComponentUpdater.UpdateCompleteTime" units="ms"
-    expires_after="2026-10-18">
+    expires_after="2026-12-20">
   <owner>sorin@chromium.org</owner>
   <owner>src/components/component_updater/OWNERS</owner>
   <summary>
@@ -3786,7 +3786,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Feedback.NotAllowed.RequestSource" enum="FeedbackSource"
-    expires_after="2026-10-18">
+    expires_after="2026-12-20">
   <owner>jlebel@chromium.org</owner>
   <owner>chrome-regionalcapabilities@google.com</owner>
   <summary>
@@ -8166,7 +8166,7 @@ regressions. -->
 </histogram>
 
 <histogram name="WebUsb.DetachKernelDriverOutcome"
-    enum="DetachKernelDriverOutcome" expires_after="2026-10-18">
+    enum="DetachKernelDriverOutcome" expires_after="2026-12-20">
   <owner>ovn@google.com</owner>
   <owner>lt-web-apps-team@google.com</owner>
   <summary>

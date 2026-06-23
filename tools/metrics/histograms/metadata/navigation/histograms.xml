@@ -1307,7 +1307,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Navigation.GestureTransition.ScreenshotCacheSize" units="MB"
-    expires_after="2026-10-18">
+    expires_after="2026-12-20">
   <owner>acondor@google.com</owner>
   <owner>liuwilliam@google.com</owner>
   <owner>baranerf@google.com</owner>
@@ -2138,7 +2138,7 @@ chromium-metrics-reviews@google.com.
 
 <histogram
     name="Navigation.ProcessSwap.V8Optimizer.WouldSwapRendererInitiatedAboutBlankNavigation"
-    enum="BooleanOccurred" expires_after="2026-10-18">
+    enum="BooleanOccurred" expires_after="2026-12-20">
   <owner>tiffanysong@google.com</owner>
   <owner>jacastro@chromium.org</owner>
   <owner>chrome-counter-abuse-alerts@google.com</owner>
@@ -3635,7 +3635,7 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Navigation{Initiator}.DuplicateNavCookieStatus"
-    enum="DuplicateNavsCookieStatus" expires_after="2026-10-18">
+    enum="DuplicateNavsCookieStatus" expires_after="2026-12-20">
   <owner>annasato@google.com</owner>
   <owner>rakina@google.com</owner>
   <owner>chrome-navigation@google.com</owner>
