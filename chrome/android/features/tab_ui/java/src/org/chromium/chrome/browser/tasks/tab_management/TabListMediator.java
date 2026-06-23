@@ -1008,6 +1008,11 @@ public class TabListMediator implements TabListNotificationHandler {
                     }
                     if (!isValidMovePosition(curPosition)) return;
 
+                    // TODO(crbug.com/526117174): We can use
+                    // getInsertionIndexOfTab(currentGroupSelectedTab)
+                    // to determine the new position, instead of manual offset math and looking up
+                    // adjacent tabs.
+
                     // Find the tab which was in the destination index before this move. Use
                     // that tab to figure out the new position.
                     int destinationTabIndex =
@@ -1030,7 +1035,7 @@ public class TabListMediator implements TabListNotificationHandler {
                         newPosition =
                                 mModelList.indexFromTabId(destinationGroupSelectedTab.getId());
                     }
-                    if (!isValidMovePosition(newPosition)) return;
+                    if (!isValidMovePosition(newPosition) || newPosition == curPosition) return;
 
                     mModelList.move(curPosition, newPosition);
                 }
@@ -1333,10 +1338,8 @@ public class TabListMediator implements TabListNotificationHandler {
                         assert mShowingTabs;
 
                         // Standalone tab moves triggered from external sources need to be
-                        // explicitly synced to the ModelList, especially for NESTED layouts like
-                        // Vertical Tabs, which do not frequently rebuild the mModelList from
-                        // scratch.
-                        if (mLayoutType != TabListLayoutType.NESTED) return;
+                        // explicitly synced to the ModelList for GROUPED and NESTED layouts.
+                        if (mLayoutType == TabListLayoutType.FLAT) return;
 
                         // Intra-group move or merging into group.
                         if (tab.getTabGroupId() != null) {
@@ -1356,7 +1359,7 @@ public class TabListMediator implements TabListNotificationHandler {
                         }
 
                         // Standalone tab movement.
-                        int targetUiIndex = getInsertionIndexOfTabForNestedLayout(tab);
+                        int targetUiIndex = getInsertionIndexOfTab(tab);
                         if (targetUiIndex == TabModel.INVALID_TAB_INDEX
                                 || targetUiIndex == currentUiIndex) {
                             return;
@@ -2030,31 +2033,28 @@ public class TabListMediator implements TabListNotificationHandler {
     }
 
     /**
-     * Updates the UI positioning of a tab or tab group in the NESTED layout when it is moved across
-     * the tab list. Standalone tabs are treated as a block of 1.
+     * Updates the UI positioning of a tab group in the NESTED layout when it is moved across the
+     * tab list.
      *
-     * @param movedTab The tab that was moved. If part of a group, this is the representative tab.
+     * @param movedTab The tab group that was moved. If part of a group, this is the representative
+     *     tab.
      * @param tabModelNewIndex The new backend index of the moved tab.
      */
     private void moveTabGroupForNestedLayout(Tab movedTab, int tabModelNewIndex) {
         Token tabGroupId = movedTab.getTabGroupId();
+        assert tabGroupId != null;
 
-        int sourceUiIndex =
-                tabGroupId == null
-                        ? mModelList.indexFromTabId(movedTab.getId())
-                        : mModelList.indexFromTabGroupId(tabGroupId);
+        int sourceUiIndex = mModelList.indexFromTabGroupId(tabGroupId);
         if (sourceUiIndex == TabModel.INVALID_TAB_INDEX) return;
 
         List<Tab> relatedTabs = getRelatedTabsForId(movedTab.getId());
         if (relatedTabs == null || relatedTabs.isEmpty()) return;
 
         int itemsToMove = 1;
-        if (tabGroupId != null) {
-            PropertyModel headerModel = mModelList.get(sourceUiIndex).model;
-            boolean isCollapsed = headerModel.get(TabProperties.IS_COLLAPSED);
-            if (!isCollapsed) {
-                itemsToMove += relatedTabs.size();
-            }
+        PropertyModel headerModel = mModelList.get(sourceUiIndex).model;
+        boolean isCollapsed = headerModel.get(TabProperties.IS_COLLAPSED);
+        if (!isCollapsed) {
+            itemsToMove += relatedTabs.size();
         }
 
         int destinationUiIndex =
