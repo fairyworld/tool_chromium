@@ -484,6 +484,12 @@ ContextualTasksServiceImpl::GetContextualTaskForTab(SessionID tab_id) const {
       return task_it->second;
     }
   }
+  if (IsStickyConversationEnabled() && last_active_task_id_.has_value()) {
+    auto task_it = tasks_.find(*last_active_task_id_);
+    if (task_it != tasks_.end()) {
+      return task_it->second;
+    }
+  }
   return std::nullopt;
 }
 
@@ -496,6 +502,10 @@ std::vector<SessionID> ContextualTasksServiceImpl::GetTabsAssociatedWithTask(
     }
   }
   return associated_tabs;
+}
+
+void ContextualTasksServiceImpl::SetLastActiveTask(const base::Uuid& task_id) {
+  last_active_task_id_ = task_id;
 }
 
 void ContextualTasksServiceImpl::GetContextForTask(
@@ -798,6 +808,10 @@ void ContextualTasksServiceImpl::RemoveTaskInternal(const base::Uuid& task_id,
   const auto& task = task_it->second;
   for (const auto& tab_id : task.GetTabIds()) {
     tab_to_task_.erase(tab_id);
+  }
+
+  if (last_active_task_id_ == task_id) {
+    last_active_task_id_ = std::nullopt;
   }
 
   tasks_.erase(task_it);

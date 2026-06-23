@@ -872,6 +872,11 @@ void ContextualTasksSidePanelCoordinator::UpdateContextualTaskUI() {
   if (auto* web_ui_interface = GetWebUiInterface(web_contents)) {
     web_ui_interface->OnActiveTabContextStatusChanged();
   }
+
+  std::optional<ContextualTask> task = GetCurrentTask();
+  if (task) {
+    contextual_tasks_service_->SetLastActiveTask(task->GetTaskId());
+  }
 }
 
 void ContextualTasksSidePanelCoordinator::MaybeDetachWebContents(

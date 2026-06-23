@@ -119,6 +119,9 @@ BASE_DECLARE_FEATURE(kContextualTasksWindowTracking);
 // Enables upload chunking for Contextual Tasks.
 BASE_DECLARE_FEATURE(kContextualTasksUploadChunking);
 
+// Enables sticky conversation UI that follows the user around.
+BASE_DECLARE_FEATURE(kContextualTasksEnableStickyConversation);
+
 BASE_DECLARE_FEATURE(kContextualTasksEnableSpatialModelToolbarLayout);
 
 enum class OverflowMenuItems {
@@ -140,6 +143,15 @@ bool GetIsContextualTasksUploadChunkingEnabled();
 bool GetContextualTasksSpatialModelToolbarLayoutEnabled();
 
 bool GetContextualTasksSpatialModelToolbarLayoutNewThreadInOverflow();
+
+bool IsStickyConversationEnabled();
+
+// Test utility for overriding conditions for sticky conversation.
+class ScopedStickyConversationEnabledForTesting {
+ public:
+  explicit ScopedStickyConversationEnabledForTesting(bool enabled);
+  ~ScopedStickyConversationEnabledForTesting();
+};
 
 // Enum denoting which entry point can show when enabled.
 enum class EntryPointOption {
