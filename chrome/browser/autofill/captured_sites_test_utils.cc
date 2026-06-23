@@ -853,7 +853,14 @@ bool WebPageReplayServerWrapper::RunWebPageReplayCmd(
   options.current_directory = web_page_replay_binary_dir;
   base::FilePath wpr_executable_binary =
       base::FilePath(FILE_PATH_LITERAL("run_wpr.py"));
-  base::CommandLine full_command(
+  base::CommandLine full_command(base::FilePath(FILE_PATH_LITERAL(
+#if BUILDFLAG(IS_WIN)
+      "vpython3.bat"
+#else
+      "vpython3"
+#endif
+      )));
+  full_command.AppendArgPath(
       web_page_replay_binary_dir.Append(wpr_executable_binary));
   full_command.AppendArg(cmd_name());
 
