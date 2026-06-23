@@ -178,7 +178,6 @@ proto_library("client_proto") {
     "chromium",
     "//third_party/federated_compute/third_party/googleapis/src",
     "//third_party/oak/chromium",
-    "//third_party/protobuf/src",
   ]
 
   proto_in_dir = "src"
