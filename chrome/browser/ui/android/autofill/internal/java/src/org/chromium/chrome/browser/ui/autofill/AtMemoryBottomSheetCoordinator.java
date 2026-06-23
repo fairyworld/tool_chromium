@@ -14,7 +14,6 @@ import org.chromium.components.browser_ui.bottomsheet.BottomSheetObserver;
 import org.chromium.components.browser_ui.bottomsheet.EmptyBottomSheetObserver;
 import org.chromium.ui.modelutil.LayoutViewBuilder;
 import org.chromium.ui.modelutil.MVCListAdapter.ModelList;
-import org.chromium.ui.modelutil.PropertyModel;
 import org.chromium.ui.modelutil.PropertyModelChangeProcessor;
 import org.chromium.ui.modelutil.SimpleRecyclerViewAdapter;
 
@@ -55,17 +54,12 @@ public class AtMemoryBottomSheetCoordinator {
             Context context, BottomSheetController sheetController, Delegate delegate) {
         mBottomSheetController = sheetController;
 
-        PropertyModel model =
-                new PropertyModel.Builder(AtMemoryBottomSheetProperties.ALL_KEYS)
-                        .with(AtMemoryBottomSheetProperties.VISIBLE, false)
-                        .build();
-
         AtMemoryBottomSheetView view = new AtMemoryBottomSheetView(context);
 
         ModelList modelList = new ModelList();
         mMediator =
                 new AtMemoryBottomSheetMediator(
-                        context, delegate, model, modelList, view::hideKeyboardAndClearFocus);
+                        context, delegate, modelList, view::hideKeyboardAndClearFocus);
 
         SimpleRecyclerViewAdapter adapter = new SimpleRecyclerViewAdapter(modelList);
         adapter.registerType(
@@ -80,7 +74,8 @@ public class AtMemoryBottomSheetCoordinator {
 
         mContent = new AtMemoryBottomSheetContent(view.getContentView(), mBottomSheetController);
 
-        PropertyModelChangeProcessor.create(model, view, AtMemoryBottomSheetViewBinder::bind);
+        PropertyModelChangeProcessor.create(
+                mMediator.getModel(), view, AtMemoryBottomSheetViewBinder::bind);
     }
 
     public void show(List<AutofillSuggestion> suggestions) {

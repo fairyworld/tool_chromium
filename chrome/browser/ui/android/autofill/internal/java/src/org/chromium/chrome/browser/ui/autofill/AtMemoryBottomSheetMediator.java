@@ -45,17 +45,23 @@ class AtMemoryBottomSheetMediator {
     AtMemoryBottomSheetMediator(
             Context context,
             AtMemoryBottomSheetCoordinator.Delegate delegate,
-            PropertyModel model,
             ModelList modelList,
             Runnable hideKeyboardCallback) {
         mContext = context;
-        mModel = model;
         mModelList = modelList;
         mDelegate = delegate;
         mHideKeyboardCallback = hideKeyboardCallback;
 
-        mModel.set(ON_QUERY_SUBMITTED_CALLBACK, this::onQuerySubmitted);
-        mModel.set(ON_QUERY_TEXT_CHANGED_CALLBACK, this::onQueryTextChanged);
+        mModel =
+                new PropertyModel.Builder(AtMemoryBottomSheetProperties.ALL_KEYS)
+                        .with(VISIBLE, false)
+                        .with(ON_QUERY_SUBMITTED_CALLBACK, this::onQuerySubmitted)
+                        .with(ON_QUERY_TEXT_CHANGED_CALLBACK, this::onQueryTextChanged)
+                        .build();
+    }
+
+    PropertyModel getModel() {
+        return mModel;
     }
 
     void show(List<AutofillSuggestion> suggestions) {

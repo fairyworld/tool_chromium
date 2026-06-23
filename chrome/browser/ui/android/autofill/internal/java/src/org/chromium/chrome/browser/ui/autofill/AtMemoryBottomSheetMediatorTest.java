@@ -53,18 +53,14 @@ public class AtMemoryBottomSheetMediatorTest {
 
     @Before
     public void setUp() {
-        mModel =
-                new PropertyModel.Builder(AtMemoryBottomSheetProperties.ALL_KEYS)
-                        .with(VISIBLE, false)
-                        .build();
         mModelList = new ModelList();
         mMediator =
                 new AtMemoryBottomSheetMediator(
                         ApplicationProvider.getApplicationContext(),
                         mDelegate,
-                        mModel,
                         mModelList,
                         mHideKeyboardCallback);
+        mModel = mMediator.getModel();
     }
 
     @Test
