@@ -10,10 +10,12 @@
 #include <string_view>
 
 #include "base/memory/raw_ptr.h"
+#include "chrome/browser/dictation/dictation_multiplexer.h"
 #include "chrome/browser/dictation/session_controller_delegate.h"
 #include "chrome/browser/dictation/session_ui.h"
 #include "chrome/browser/dictation/stream_provider.h"
 #include "chrome/browser/dictation/target.h"
+#include "chrome/common/extensions/api/dictation_private.h"
 #include "testing/gmock/include/gmock/gmock.h"
 
 class Profile;
@@ -23,6 +25,8 @@ class Extension;
 
 namespace dictation {
 
+class ListenerStreamProvider;
+
 inline constexpr std::string_view kDictationTestExtensionId =
     "dfihfgggpgemecjdjahibncmmjlfjggp";
 
@@ -31,9 +35,39 @@ inline constexpr std::string_view kDictationTestExtensionId =
 // behavior of the extension.
 const extensions::Extension* LoadTestExtension(Profile* profile);
 
+// Same as above but puts the test extension into "manual" mode which prevents
+// it from starting the speech API or responding to any events. Tests using this
+// will manually simulate API calls from the extension using the send methods
+// below.
+const extensions::Extension* LoadTestExtensionInManualMode(Profile* profile);
+
 // Sets a canned string that the test extension will replay when the test
 // starts a stream.
 void SetMockTranscript(Profile* profile, const std::string& transcript);
+
+// Simulates the connector extension sending a transcript update. Returns
+// immediately, use WaitForTranscriptUpdate below to await the change in the
+// browser process.
+void ExtensionSendTranscriptUpdate(
+    Profile* profile,
+    DictationMultiplexer::StreamId stream_id,
+    extensions::api::dictation_private::TranscriptionType type,
+    std::string_view data);
+
+// Simulates the connector extension sending a stream state update. Returns
+// immediately, use WaitForStreamState to await the change in the browser
+// process.
+void ExtensionSendStreamStateUpdate(
+    Profile* profile,
+    DictationMultiplexer::StreamId stream_id,
+    extensions::api::dictation_private::StreamState state);
+
+// Waits for the given stream provider to enter the specified state.
+void WaitForStreamState(ListenerStreamProvider* provider,
+                        StreamProvider::StreamState state);
+
+// Waits for the given stream provider to receive any transcript update.
+void WaitForTranscriptUpdate(ListenerStreamProvider* provider);
 
 class MockStreamProvider : public StreamProvider {
  public:

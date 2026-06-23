@@ -6,6 +6,10 @@
 
 #include "base/functional/bind.h"
 #include "base/path_service.h"
+#include "base/run_loop.h"
+#include "base/test/bind.h"
+#include "chrome/browser/dictation/dictation_multiplexer.h"
+#include "chrome/browser/dictation/listener_stream_provider.h"
 #include "chrome/browser/extensions/chrome_test_extension_loader.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/chrome_paths.h"
@@ -31,6 +35,24 @@ const extensions::Extension* LoadTestExtension(Profile* profile) {
   return ext;
 }
 
+const extensions::Extension* LoadTestExtensionInManualMode(Profile* profile) {
+  const extensions::Extension* ext = LoadTestExtension(profile);
+
+  std::string script = R"JS(
+    (async function() {
+      await chrome.storage.local.set({manualTest: true});
+      chrome.test.sendScriptResult('ready');
+    })();
+  )JS";
+
+  base::Value result =
+      extensions::browsertest_util::ExecuteScriptInBackgroundPage(
+          profile, std::string(kDictationTestExtensionId), script);
+  EXPECT_EQ("ready", result);
+
+  return ext;
+}
+
 void SetMockTranscript(Profile* profile, const std::string& transcript) {
   std::string script = content::JsReplace(R"JS(
     (async function() {
@@ -44,6 +66,74 @@ void SetMockTranscript(Profile* profile, const std::string& transcript) {
       extensions::browsertest_util::ExecuteScriptInBackgroundPage(
           profile, std::string(kDictationTestExtensionId), script);
   EXPECT_EQ("ready", result);
+}
+
+void ExtensionSendTranscriptUpdate(
+    Profile* profile,
+    DictationMultiplexer::StreamId stream_id,
+    extensions::api::dictation_private::TranscriptionType type,
+    std::string_view data) {
+  std::string script = content::JsReplace(
+      R"JS(
+    chrome.dictationPrivate.updateTranscription({
+      streamId: $1,
+      type: $2,
+      data: $3
+    });
+  )JS",
+      stream_id.value(), extensions::api::dictation_private::ToString(type),
+      data);
+
+  extensions::browsertest_util::ExecuteScriptInBackgroundPageNoWait(
+      profile, std::string(kDictationTestExtensionId), script);
+}
+
+void ExtensionSendStreamStateUpdate(
+    Profile* profile,
+    DictationMultiplexer::StreamId stream_id,
+    extensions::api::dictation_private::StreamState state) {
+  std::string script = content::JsReplace(
+      R"JS(
+    chrome.dictationPrivate.setStreamState({
+        streamId: $1,
+        state: $2
+    });
+      )JS",
+      stream_id.value(), extensions::api::dictation_private::ToString(state));
+
+  extensions::browsertest_util::ExecuteScriptInBackgroundPageNoWait(
+      profile, std::string(kDictationTestExtensionId), script);
+}
+
+void WaitForStreamState(ListenerStreamProvider* provider,
+                        StreamProvider::StreamState state) {
+  if (provider->GetState() == state) {
+    return;
+  }
+
+  base::RunLoop run_loop;
+  provider->SetOnUpdateForTesting(base::BindLambdaForTesting([&]() {
+    if (provider->GetState() == state) {
+      run_loop.Quit();
+    }
+  }));
+  run_loop.Run();
+  // Reset the callback.
+  provider->SetOnUpdateForTesting(base::RepeatingClosure());
+}
+
+void WaitForTranscriptUpdate(ListenerStreamProvider* provider) {
+  std::string initial_transcript = provider->GetLatestTranscriptionForTesting();
+
+  base::RunLoop run_loop;
+  provider->SetOnUpdateForTesting(base::BindLambdaForTesting([&]() {
+    if (provider->GetLatestTranscriptionForTesting() != initial_transcript) {
+      run_loop.Quit();
+    }
+  }));
+  run_loop.Run();
+  // Clear the callback so it doesn't hold references or trigger later.
+  provider->SetOnUpdateForTesting(base::RepeatingClosure());
 }
 
 using ::testing::_;

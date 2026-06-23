@@ -61,11 +61,13 @@ source_set("test_support") {
   public_deps = [
     ":dictation",
     "//base",
+    "//chrome/common/extensions/api",
     "//testing/gmock",
     "//testing/gtest",
   ]
 
   deps = [
+    ":impl",
     "//chrome/browser/extensions:test_support",
     "//chrome/common:constants",
     "//content/test:test_support",

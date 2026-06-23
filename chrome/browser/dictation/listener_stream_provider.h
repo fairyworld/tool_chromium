@@ -44,6 +44,9 @@ class ListenerStreamProvider : public StreamProvider {
   void SetOnUpdateForTesting(base::RepeatingClosure callback);
   const std::string& GetLatestTranscriptionForTesting() const;
   bool IsTranscriptionFinalForTesting() const;
+  DictationMultiplexer::StreamId stream_id_for_testing() const {
+    return stream_id_;
+  }
 
  private:
   DictationMultiplexer& GetMultiplexer() const;

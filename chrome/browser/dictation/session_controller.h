@@ -15,6 +15,7 @@
 #include "chrome/browser/dictation/session_state.h"
 #include "chrome/browser/dictation/session_ui_delegate.h"
 #include "chrome/browser/dictation/stream_provider_delegate.h"
+#include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
 
 namespace dictation {
 
@@ -69,6 +70,7 @@ class SessionController : public SessionUiDelegate,
 
  private:
   void MoveToState(SessionState new_state);
+  void PurgeToDeleteStreamProviders();
 
   const base::raw_ref<SessionControllerDelegate> delegate_;
 
@@ -77,6 +79,14 @@ class SessionController : public SessionUiDelegate,
   // The currently attached stream provider. The state of this provider is used
   // to drive the current state of dictation in the UI.
   std::unique_ptr<StreamProvider> attached_stream_provider_;
+
+  // Stream providers that are finalizing.
+  absl::flat_hash_set<std::unique_ptr<StreamProvider>>
+      finalizing_stream_providers_;
+
+  // Stream providers that are queued to be deleted asynchronously.
+  absl::flat_hash_set<std::unique_ptr<StreamProvider>>
+      to_delete_stream_providers_;
 
   std::unique_ptr<SessionUi> ui_;
 
