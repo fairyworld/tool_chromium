@@ -1289,8 +1289,8 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryRemoteQuery_UnsupportedQuery) {
                     IDS_AUTOFILL_AT_MEMORY_UNSUPPORTED_QUERY_TITLE)),
                 HasLabel(l10n_util::GetStringUTF16(
                     IDS_AUTOFILL_AT_MEMORY_UNSUPPORTED_QUERY_DESCRIPTION)),
-                testing::Field(&Suggestion::type,
-                               SuggestionType::kOpenGemini))));
+                testing::Field(&Suggestion::type, SuggestionType::kOpenGemini),
+                testing::Field(&Suggestion::icon, Suggestion::Icon::kSpark))));
       });
 
   external_delegate().OnSearchSubmitted(u"shoe size");
@@ -1319,9 +1319,9 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryRemoteQuery_NoData) {
                     l10n_util::GetStringUTF16(IDS_AUTOFILL_AT_MEMORY_NO_DATA)),
                 testing::Field(&Suggestion::type,
                                SuggestionType::kAtMemorySearchResult),
+                testing::Field(&Suggestion::icon, Suggestion::Icon::kSadTab),
                 testing::Field(&Suggestion::acceptability,
-                               Suggestion::Acceptability::
-                                   kUnacceptableWithDeactivatedStyle))));
+                               Suggestion::Acceptability::kUnacceptable))));
       });
 
   external_delegate().OnSearchSubmitted(u"shoe size");
@@ -1348,8 +1348,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryRemoteQuery_NoConnection) {
                 Field(&Suggestion::type, SuggestionType::kAtMemoryNoConnection),
                 Field(&Suggestion::icon, Suggestion::Icon::kSadTab),
                 Field(&Suggestion::acceptability,
-                      Suggestion::Acceptability::
-                          kUnacceptableWithDeactivatedStyle))));
+                      Suggestion::Acceptability::kUnacceptable))));
       });
 
   external_delegate().OnSearchSubmitted(u"shoe size");
@@ -1387,8 +1386,7 @@ TEST_P(AutofillExternalDelegateAtMemoryGenericErrorTest,
                 Field(&Suggestion::type, SuggestionType::kAtMemoryGenericError),
                 Field(&Suggestion::icon, Suggestion::Icon::kSadTab),
                 Field(&Suggestion::acceptability,
-                      Suggestion::Acceptability::
-                          kUnacceptableWithDeactivatedStyle))));
+                      Suggestion::Acceptability::kUnacceptable))));
       });
 
   external_delegate().OnSearchSubmitted(u"shoe size");
