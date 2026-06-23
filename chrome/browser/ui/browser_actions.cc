@@ -1640,6 +1640,16 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           base::BindRepeating(
               [](BrowserWindowInterface* bwi, actions::ActionItem* item,
                  actions::ActionInvocationContext context) {
+                chrome::NewWindow(bwi);
+              },
+              bwi))
+          .SetActionId(kActionNewWindow)
+          .Build());
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
                 bwi->GetBrowserForMigrationOnly()->GetBrowserView().Cut();
               },
               bwi))
