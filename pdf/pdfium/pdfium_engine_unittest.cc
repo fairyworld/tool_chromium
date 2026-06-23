@@ -4112,6 +4112,12 @@ TEST_P(PDFiumEngineInkDrawTextTest, DrawTextSaveAndLoad) {
   std::vector<uint8_t> saved_pdf_data = engine->GetSaveData();
   ASSERT_FALSE(saved_pdf_data.empty());
 
+  // The size should be small due to font subsetting.
+  // TODO(crbug.com/476127152): Actually turn on font subsetting to make the
+  // saved PDF smaller.
+  constexpr size_t kMaxFileSizeWithSubsettedFont = 15 * 1024;
+  EXPECT_GE(saved_pdf_data.size(), kMaxFileSizeWithSubsettedFont);
+
   // Load the saved PDF data into a new engine.
   NiceMock<TestClient> saved_client(/*use_skia_renderer=*/GetParam());
   std::unique_ptr<PDFiumEngine> saved_engine =
