@@ -37,10 +37,12 @@
 #include "chrome/browser/sharing_hub/sharing_hub_features.h"
 #include "chrome/browser/ui/accelerator_table.h"
 #include "chrome/browser/ui/omnibox/ai_mode_button_service_factory.h"
+#include "chrome/browser/ui/web_applications/web_app_launch_utils.h"
 #include "components/omnibox/browser/ai_mode_button_config.h"
 #include "components/omnibox/browser/ai_mode_button_service.h"
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/global_keyboard_shortcuts_mac.h"
+#include "chrome/browser/ui/browser_commands_mac.h"
 #endif
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/indigo/resources/grit/indigo_strings.h"
@@ -2023,19 +2025,6 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           .Build());
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
-  root_action_item_->AddChild(
-      actions::ActionItem::Builder(
-          base::BindRepeating(
-              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
-                 actions::ActionInvocationContext context) {
-                bwi->GetWindow()->Restore();
-              },
-              bwi))
-          .SetActionId(kRestoreWindow)
-          .Build());
-#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
-
 #if BUILDFLAG(IS_LINUX)
   root_action_item_->AddChild(
       actions::ActionItem::Builder(
@@ -2137,6 +2126,17 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           base::BindRepeating(
               [](BrowserWindowInterface* bwi, actions::ActionItem* item,
                  actions::ActionInvocationContext context) {
+                bwi->GetWindow()->Restore();
+              },
+              bwi))
+          .SetActionId(kRestoreWindow)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
                 bwi->GetWindow()->Minimize();
               },
               bwi))
@@ -2154,6 +2154,54 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
           .SetActionId(kActionMaximizeWindow)
           .Build());
 #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::PromptToNameWindow(bwi);
+              },
+              bwi))
+          .SetActionId(kActionNameWindow)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                web_app::ReparentWebAppForActiveTab(
+                    bwi->GetBrowserForMigrationOnly());
+              },
+              bwi))
+          .SetActionId(kActionOpenInPwaWindow)
+          .Build());
+
+#if BUILDFLAG(IS_MAC)
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ToggleAlwaysShowToolbarInFullscreen(
+                    bwi->GetBrowserForMigrationOnly());
+              },
+              bwi))
+          .SetActionId(kActionToggleFullscreenToolbar)
+          .Build());
+#endif  // BUILDFLAG(IS_MAC)
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::MuteSite(bwi);
+              },
+              bwi))
+          .SetActionId(kActionWindowMuteSite)
+          .Build());
 }
 
 void BrowserActions::AddListeners() {
