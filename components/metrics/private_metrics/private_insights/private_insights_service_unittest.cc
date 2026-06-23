@@ -6,7 +6,13 @@
 
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/run_until.h"
+#include "base/test/scoped_feature_list.h"
 #include "base/test/task_environment.h"
+#include "components/metrics/metrics_pref_names.h"
+#include "components/metrics/metrics_reporting_choice_service.h"
+#include "components/metrics/private_metrics/private_insights/private_insights_features.h"
+#include "components/prefs/pref_registry_simple.h"
+#include "components/prefs/testing_pref_service.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace private_insights {
@@ -20,7 +26,8 @@ class PrivateInsightsServiceTest : public testing::Test {
 TEST_F(PrivateInsightsServiceTest,
        TriggerUploadSkipsPostingTaskWhenAlreadyRunning) {
   base::HistogramTester histogram_tester;
-  PrivateInsightsService service;
+  TestingPrefServiceSimple local_state;
+  PrivateInsightsService service(&local_state);
 
   // First call: should post the task.
   service.TriggerUpload();
@@ -48,6 +55,84 @@ TEST_F(PrivateInsightsServiceTest,
       kTriggerUploadOutcomeHistogram,
       PrivateInsightsService::TriggerUploadOutcome::kTaskPosted, 2);
   histogram_tester.ExpectTotalCount(kTriggerUploadOutcomeHistogram, 3);
+}
+
+TEST_F(PrivateInsightsServiceTest, MetricsChoiceCoupling) {
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitAndEnableFeature(kPrivateInsightsFeature);
+
+  TestingPrefServiceSimple local_state;
+  metrics::MetricsReportingChoiceService::RegisterPrefs(local_state.registry());
+  local_state.registry()->RegisterBooleanPref(
+      metrics::prefs::kMetricsReportingEnabled, false);
+
+  PrivateInsightsMetricsServiceAccessor::
+      SetForceIsMetricsReportingEnabledPrefLookupForTesting(true);
+
+  // When Init() is NOT called, UMA choice changes should be ignored.
+  PrivateInsightsService uninit_service(&local_state);
+  EXPECT_FALSE(uninit_service.upload_timer_.IsRunning());
+  local_state.SetBoolean(metrics::prefs::kMetricsReportingEnabled, true);
+  EXPECT_FALSE(uninit_service.upload_timer_.IsRunning());
+
+  local_state.SetBoolean(metrics::prefs::kMetricsReportingEnabled, false);
+
+  // When Init() IS called, UMA choice changes should start/stop the service.
+  PrivateInsightsService service(&local_state);
+  service.Init();
+  EXPECT_FALSE(service.upload_timer_.IsRunning());
+
+  // Enable UMA metrics reporting.
+  local_state.SetBoolean(metrics::prefs::kMetricsReportingEnabled, true);
+  EXPECT_TRUE(service.upload_timer_.IsRunning());
+
+  // Disable UMA metrics reporting.
+  local_state.SetBoolean(metrics::prefs::kMetricsReportingEnabled, false);
+  EXPECT_FALSE(service.upload_timer_.IsRunning());
+
+  PrivateInsightsMetricsServiceAccessor::
+      SetForceIsMetricsReportingEnabledPrefLookupForTesting(false);
+}
+
+TEST_F(PrivateInsightsServiceTest, MetricsChoiceRespectedOnStartup) {
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitAndEnableFeature(kPrivateInsightsFeature);
+
+  PrivateInsightsMetricsServiceAccessor::
+      SetForceIsMetricsReportingEnabledPrefLookupForTesting(true);
+
+  // Verify choice is respected when disabled on startup.
+  {
+    TestingPrefServiceSimple local_state;
+    metrics::MetricsReportingChoiceService::RegisterPrefs(
+        local_state.registry());
+    local_state.registry()->RegisterBooleanPref(
+        metrics::prefs::kMetricsReportingEnabled, false);
+
+    PrivateInsightsService service(&local_state);
+    EXPECT_FALSE(service.upload_timer_.IsRunning());
+
+    service.Init();
+    EXPECT_FALSE(service.upload_timer_.IsRunning());
+  }
+
+  // Verify choice is respected when enabled on startup.
+  {
+    TestingPrefServiceSimple local_state;
+    metrics::MetricsReportingChoiceService::RegisterPrefs(
+        local_state.registry());
+    local_state.registry()->RegisterBooleanPref(
+        metrics::prefs::kMetricsReportingEnabled, true);
+
+    PrivateInsightsService service(&local_state);
+    EXPECT_FALSE(service.upload_timer_.IsRunning());
+
+    service.Init();
+    EXPECT_TRUE(service.upload_timer_.IsRunning());
+  }
+
+  PrivateInsightsMetricsServiceAccessor::
+      SetForceIsMetricsReportingEnabledPrefLookupForTesting(false);
 }
 
 }  // namespace private_insights

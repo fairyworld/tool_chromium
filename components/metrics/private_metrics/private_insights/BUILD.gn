@@ -14,13 +14,17 @@ component("private_insights") {
     "private_insights_service.cc",
   ]
   defines = [ "IS_PRIVATE_INSIGHTS_IMPL" ]
+  public_deps = [
+    "//components/keyed_service/core",
+    "//components/metrics",
+    "//components/prefs",
+  ]
   deps = [
     ":fcp_event_publisher",
     ":fcp_files",
     ":fcp_log_manager",
     ":fcp_simple_task_environment",
     "//base",
-    "//components/keyed_service/core",
     "//third_party/federated_compute:fl_runner",
   ]
 }
@@ -72,6 +76,8 @@ source_set("unit_tests") {
     ":private_insights",
     "//base",
     "//base/test:test_support",
+    "//components/metrics",
+    "//components/prefs:test_support",
     "//testing/gtest",
   ]
 }

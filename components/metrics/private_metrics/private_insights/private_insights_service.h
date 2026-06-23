@@ -8,14 +8,30 @@
 #include "base/component_export.h"
 #include "base/files/file_path.h"
 #include "base/gtest_prod_util.h"
+#include "base/memory/raw_ptr.h"
 #include "base/memory/scoped_refptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/sequence_checker.h"
 #include "base/time/time.h"
 #include "base/timer/timer.h"
 #include "components/keyed_service/core/keyed_service.h"
+#include "components/metrics/metrics_service_accessor.h"
+#include "components/prefs/pref_change_registrar.h"
+
+class PrefService;
 
 namespace private_insights {
+
+class PrivateInsightsService;
+
+class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsMetricsServiceAccessor
+    : public metrics::MetricsServiceAccessor {
+ public:
+  static void SetForceIsMetricsReportingEnabledPrefLookupForTesting(bool value);
+
+ private:
+  friend class PrivateInsightsService;
+};
 
 inline constexpr char kTriggerUploadOutcomeHistogram[] =
     "PrivateMetrics.PrivateInsights.TriggerUploadOutcome";
@@ -35,12 +51,13 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
   };
   // LINT.ThenChange(//tools/metrics/histograms/metadata/private_metrics/enums.xml:PrivateInsightsTriggerUploadOutcome)
 
-  PrivateInsightsService();
+  explicit PrivateInsightsService(PrefService* local_state);
   ~PrivateInsightsService() override;
 
   PrivateInsightsService(const PrivateInsightsService&) = delete;
   PrivateInsightsService& operator=(const PrivateInsightsService&) = delete;
 
+  void Init();
   void Start();
   void Stop();
 
@@ -48,12 +65,17 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
   void Shutdown() override;
 
  private:
+  void OnMetricsChoiceChanged();
+
   void TriggerUpload();
 
   // Runs on a background thread pool sequence (allows blocking).
   static bool UploadBlocking(base::TimeTicks trigger_time);
 
   void OnUploadComplete(bool result);
+
+  raw_ptr<PrefService> local_state_ = nullptr;
+  PrefChangeRegistrar pref_registrar_;
 
   bool is_upload_running_ = false;
   base::RepeatingTimer upload_timer_;
@@ -63,6 +85,9 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
 
   FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest,
                            TriggerUploadSkipsPostingTaskWhenAlreadyRunning);
+  FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest, MetricsChoiceCoupling);
+  FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest,
+                           MetricsChoiceRespectedOnStartup);
 };
 
 }  // namespace private_insights

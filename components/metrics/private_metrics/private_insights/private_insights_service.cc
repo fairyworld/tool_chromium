@@ -6,22 +6,47 @@
 
 #include <string>
 
+#include "base/check.h"
 #include "base/functional/bind.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/sequence_checker.h"
 #include "base/task/task_traits.h"
 #include "base/task/thread_pool.h"
 #include "base/time/time.h"
+#include "components/metrics/metrics_pref_names.h"
 #include "components/metrics/private_metrics/private_insights/private_insights_features.h"
+#include "components/prefs/pref_service.h"
 
 namespace private_insights {
 
-PrivateInsightsService::PrivateInsightsService() {
+PrivateInsightsService::PrivateInsightsService(PrefService* local_state)
+    : local_state_(local_state) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+  CHECK(local_state_);
 }
 
 PrivateInsightsService::~PrivateInsightsService() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+}
+
+void PrivateInsightsService::Init() {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+  pref_registrar_.Init(local_state_);
+  pref_registrar_.Add(
+      metrics::prefs::kMetricsReportingEnabled,
+      base::BindRepeating(&PrivateInsightsService::OnMetricsChoiceChanged,
+                          weak_ptr_factory_.GetWeakPtr()));
+  OnMetricsChoiceChanged();
+}
+
+void PrivateInsightsService::OnMetricsChoiceChanged() {
+  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+  if (PrivateInsightsMetricsServiceAccessor::IsMetricsReportingEnabled(
+          local_state_)) {
+    Start();
+  } else {
+    Stop();
+  }
 }
 
 void PrivateInsightsService::Start() {
@@ -88,6 +113,12 @@ void PrivateInsightsService::OnUploadComplete(bool _result) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   is_upload_running_ = false;
   // TODO(b/518646350): Handle the result of the upload.
+}
+
+// static
+void PrivateInsightsMetricsServiceAccessor::
+    SetForceIsMetricsReportingEnabledPrefLookupForTesting(bool value) {
+  SetForceIsMetricsReportingEnabledPrefLookup(value);
 }
 
 }  // namespace private_insights
