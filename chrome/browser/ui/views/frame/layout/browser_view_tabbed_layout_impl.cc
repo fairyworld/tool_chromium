@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <optional>
 #include <utility>
 
 #include "base/i18n/rtl.h"
@@ -1370,8 +1371,12 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
   std::vector<const views::View*> top_container_cutout_views;
   std::vector<const views::View*> main_background_cutout_views;
 
+  int side_panel_start = layout_data_->revised_params.visual_client_area.x();
+
   // Set vertical tabstrip corners.
   if (layout_data_->tab_strip_type == TabStripType::kVertical) {
+    side_panel_start = views().vertical_tab_strip_region_view->bounds().right();
+
     // Vertical tabstrip goes all the way to the top of the window if it is not
     // collapsed or there are no caption buttons on the leading edge.
     const VerticalTabStripAnimation& animation =
@@ -1559,6 +1564,34 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
       break;
   }
   toolbar_background->SetCorners(toolbar_corners);
+
+  // Clip the side panel so it doesn't run off the edge of the browser or into
+  // the vertical tab strip.
+  if (IsParentedToAndVisible(views().side_panel, views().browser_view)) {
+    const int left_overlap =
+        std::max(0, side_panel_start - views().side_panel->x());
+    const int right_overlap = std::max(
+        0, views().side_panel->bounds().right() -
+               layout_data_->revised_params.visual_client_area.right());
+    if (left_overlap > 0 || right_overlap > 0) {
+      gfx::Rect side_panel_visible_bounds =
+          views().side_panel->GetLocalBounds();
+      side_panel_visible_bounds.Inset(
+          gfx::Insets::TLBR(0, left_overlap, 0, right_overlap));
+      if (side_panel_visible_bounds.IsEmpty()) {
+        // Can't let this be empty or the clipping won't work, so if it's zero
+        // width add a pixel that won't matter.
+        if (left_overlap) {
+          side_panel_visible_bounds.Outset(gfx::Outsets::TLBR(0, 0, 0, 1));
+        } else {
+          side_panel_visible_bounds.Outset(gfx::Outsets::TLBR(0, 1, 0, 0));
+        }
+      }
+      views().side_panel->SetClipToVisibleArea(side_panel_visible_bounds);
+    } else {
+      views().side_panel->SetClipToVisibleArea(std::nullopt);
+    }
+  }
 
   if (views().main_background_region &&
       views().main_background_region->GetVisible()) {
