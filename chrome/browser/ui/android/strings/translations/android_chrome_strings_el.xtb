@@ -1411,6 +1411,7 @@
 <translation id="6846298663435243399">Φόρτωση…</translation>
 <translation id="6850409657436465440">Η λήψη σας βρίσκεται ακόμα σε εξέλιξη</translation>
 <translation id="6850830437481525139">Έκλεισαν <ph name="TAB_COUNT" /> καρτέλες</translation>
+<translation id="6852437757508328589">{NUM_RESULTS,plural, =1{Βρέθηκε 1 αποτέλεσμα}other{Βρέθηκαν # αποτελέσματα}}</translation>
 <translation id="685340923442249391">{FILE_COUNT,plural, =1{Αρχεία ήχου, 1 αρχείο ήχου στη λίστα}other{Αρχεία ήχου, # αρχεία ήχου στη λίστα}}</translation>
 <translation id="685850645784703949">Discover από την Google - ανενεργό</translation>
 <translation id="6864459304226931083">Λήψη εικόνας</translation>

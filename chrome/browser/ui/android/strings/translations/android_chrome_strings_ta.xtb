@@ -1411,6 +1411,7 @@
 <translation id="6846298663435243399">ஏற்றுகிறது...</translation>
 <translation id="6850409657436465440">பதிவிறக்கம் செயலில் உள்ளது</translation>
 <translation id="6850830437481525139"><ph name="TAB_COUNT" /> தாவல்கள் மூடப்பட்டன</translation>
+<translation id="6852437757508328589">{NUM_RESULTS,plural, =1{1 முடிவு உள்ளது}other{# முடிவுகள் உள்ளன}}</translation>
 <translation id="685340923442249391">{FILE_COUNT,plural, =1{ஆடியோ ஃபைல்கள், பட்டியலில் 1 ஆடியோ ஃபைல் உள்ளது}other{ஆடியோ ஃபைல்கள், பட்டியலில் # ஆடியோ ஃபைல்கள் உள்ளன}}</translation>
 <translation id="685850645784703949">Discover by Google - முடக்கப்பட்டுள்ளது</translation>
 <translation id="6864459304226931083">படத்தைப் பதிவிறக்கு</translation>

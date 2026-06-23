@@ -583,6 +583,7 @@
 <translation id="1902576642799138955">រយៈពេលមានសុពលភាព</translation>
 <translation id="1908217026282415406">ការផ្លាស់ទី និងការប្រើប្រាស់កាមេរ៉ា</translation>
 <translation id="1908690643053136980">អ្នកគ្រប់គ្រងរបស់អ្នកមិនអនុញ្ញាតឱ្យប្រើ<ph name="PERMISSION" />សម្រាប់គេហទំព័រនេះទេ</translation>
+<translation id="1912750443952232242">រក្សាទុកកាតសម្គាល់ខ្លួននៅក្នុង Google Wallet</translation>
 <translation id="1913037223029790376">ប្រើ CVC សម្រាប់​កាតនិម្មិតនេះ</translation>
 <translation id="191374271204266022">ចម្លងជា JSON</translation>
 <translation id="1914326953223720820">សេវាកម្ម​ពន្លាឯកសារ</translation>
@@ -1496,6 +1497,7 @@
 <translation id="3325568918769906282">តាមលំដាប់ចុះ</translation>
 <translation id="3325662270238538525">ការចូលប្រើ និងការកែសម្រួលឯកសារថ្មីៗ ដែលរួមមានឈ្មោះឯកសារ ស្នាមម្រាមដៃឌីជីថលនៃខ្លឹមសារឯកសារ ប្រភពទាញយក និងទិន្នន័យមេតា</translation>
 <translation id="3329013043687509092">កម្រិតពណ៌</translation>
+<translation id="3330483197654063678">នៅពេល​បើក Chrome នឹង​ចែករំលែក​ផ្ទាំង​ដែលបើក​នៅក្នុង​វិនដូនេះ ដើម្បីជួយ​អ្នកឱ្យ​ទទួលបាន​ការឆ្លើយតប​កាន់តែ​ពាក់ព័ន្ធ។</translation>
 <translation id="3333762389743153920">មិនមានសិទ្ធិសម្រាប់​កាតនិម្មិតទេ</translation>
 <translation id="3338095232262050444">សុវត្ថិភាព</translation>
 <translation id="333839153442689579">ការហ្វឹកហាត់​ឆ្លាស់ក្បាច់​កម្រិតខ្លាំង</translation>
@@ -2850,6 +2852,7 @@
 <translation id="5458150163479425638">{CONTACT,plural, =0{<ph name="CONTACT_PREVIEW" />}=1{<ph name="CONTACT_PREVIEW" /> និង <ph name="NUMBER_OF_ADDITIONAL_CONTACTS" /> ទៀត}other{<ph name="CONTACT_PREVIEW" /> និង <ph name="NUMBER_OF_ADDITIONAL_CONTACTS" /> ទៀត}}</translation>
 <translation id="5463625433003343978">កំពុង​ស្វែងរក​ឧបករណ៍...</translation>
 <translation id="5464236009658034488">សម្ភារផ្គត់ផ្គង់​ការិយាល័យ</translation>
+<translation id="5465128270485645058">ទទួលបាន​ការឆ្លើយតប​កាន់តែមាន​លក្ខណៈ​ផ្ទាល់ខ្លួន​ដោយ​ចែករំលែក​ផ្ទាំង​ដែលបើក​ដោយ​ស្វ័យប្រវត្តិ​នៅក្នុង​វិនដូនេះ ប្រសិនបើ​ផ្ទាំង​ទាំងនោះ​ពាក់ព័ន្ធនឹង​កម្រងសារ​នេះ។</translation>
 <translation id="5465724643247062031">កញ្ចក់ (ស្រអាប់)</translation>
 <translation id="5466018172325111652">មិន​បាន​ទទួល​លេខកូដ​របស់​អ្នក​ឬ? <ph name="BEGIN_LINK" />យកលេខកូដថ្មី<ph name="END_LINK" /></translation>
 <translation id="5466818462212249084">កម្មវិធី​ទូទាត់ប្រាក់</translation>
@@ -3132,6 +3135,7 @@
 <translation id="5911020115933784199">ព្រឹត្តិការណ៍ និង​បញ្ជី</translation>
 <translation id="5911110632211230665">បានទប់ស្កាត់ការបើក</translation>
 <translation id="5912796581727968237">បើក Google Wallet</translation>
+<translation id="5914185423510719251">រក្សាទុក KTN នៅក្នុង Google Wallet</translation>
 <translation id="5914465277418006379"><ph name="MEMBER_FIRST_NAME" /> បានបញ្ចូល​ផ្ទាំងនេះ</translation>
 <translation id="5915189366813702112">ការរៀបចំ​កន្លែងធ្វើការ​ដែលមាន​ភាពបត់បែន</translation>
 <translation id="59174027418879706">បានបើកដំណើរការ</translation>
@@ -3912,6 +3916,7 @@
 <translation id="7110116949943042888">ការងារ​បណ្ដោះ​អាសន្ន និង​តាមរដូវកាល</translation>
 <translation id="7110368079836707726">មហាវិទ្យាល័យ និងសកលវិទ្យាល័យ</translation>
 <translation id="7111507312244504964">ការពិនិត្យ និង​វាយ​តម្លៃ​អចលនទ្រព្យ</translation>
+<translation id="7117290130383718594">ចំណារ​ជាអក្សរ</translation>
 <translation id="7118618213916969306">ស្វែងរក URL ឃ្លីបបត, <ph name="SHORT_URL" /></translation>
 <translation id="7118852830504022370">អ្នកមើលឃើញ​សារប្រុងប្រយ័ត្ននេះ ដោយសារ​គេហទំព័រនេះ​មិនស្គាល់ HTTPS ទេ។ <ph name="BEGIN_LEARN_MORE_LINK" />ស្វែងយល់បន្ថែមអំពីសារប្រុងប្រយ័ត្ននេះ<ph name="END_LEARN_MORE_LINK" /></translation>
 <translation id="7119063404975271297">ដ្រាម៉ាតាមទូរទស្សន៍</translation>
