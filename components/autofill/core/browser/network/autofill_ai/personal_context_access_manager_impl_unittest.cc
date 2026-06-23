@@ -369,6 +369,40 @@ TEST_F(PersonalContextAccessManagerImplTest, PrefetchedEntities_TTL) {
       EntityType(EntityTypeName::kDriversLicense)));
 }
 
+// Tests that a follow-up prefetch request for an already prefetched type
+// does nothing, and the original eviction timer correctly clears the cache
+// when it expires.
+TEST_F(PersonalContextAccessManagerImplTest,
+       PrefetchContext_FollowUpRequestNoOp) {
+  // 1. Prefetch Passport at T = 0.
+  personal_context::proto::ContextMemoryAmbientAutofillResponse
+      passport_response;
+  passport_response.add_entities()->mutable_passport()->set_number("P123");
+  PrefetchContextSync({EntityType(EntityTypeName::kPassport)},
+                      passport_response);
+  EXPECT_TRUE(
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
+
+  // Fast forward 20 minutes (Passport still valid).
+  FastForwardBy(base::Minutes(20));
+  EXPECT_TRUE(
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
+
+  // 2. Trigger a follow-up prefetch request for Passport at T = 20.
+  // Since the cache is still valid, no network request should be made.
+  EXPECT_CALL(mock_personal_context_service(), FetchContext).Times(0);
+  access_manager().PrefetchContext({EntityType(EntityTypeName::kPassport)});
+
+  // Fast forward another 15 minutes (Total T = 35, past the original 30-min
+  // TTL). The original eviction task should have fired at T = 30 and cleared
+  // the cache.
+  EXPECT_CALL(mock_observer(), OnMaskedEntityTypeEvicted(
+                                   _, EntityType(EntityTypeName::kPassport)));
+  FastForwardBy(base::Minutes(15));
+  EXPECT_FALSE(
+      access_manager().IsTypePrefetched(EntityType(EntityTypeName::kPassport)));
+}
+
 // Tests that unmasked SPII entities are cached with a 1-minute TTL.
 TEST_F(PersonalContextAccessManagerImplTest, CacheUnmaskedSpiiEntity_TTL) {
   EntityInstance passport = test::GetPassportEntityInstance(
