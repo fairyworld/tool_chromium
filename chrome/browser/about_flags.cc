@@ -4629,16 +4629,27 @@ const FeatureEntry::Choice kSendTabToSelfGestureChoices[] = {
 #endif  // BUILDFLAG(IS_ANDROID)
 
 // The choices for Rust-based ChildProcessSecurityPolicy feature.
-const FeatureEntry::FeatureParam kChildProcessSecurityPolicyRustRustOnly[] = {
-    {features::kChildProcessSecurityPolicyRustPolicyName,
-     features::kChildProcessSecurityPolicyRustPolicyRustOnly}};
-const FeatureEntry::FeatureParam kChildProcessSecurityPolicyRustRustAndCpp[] = {
-    {features::kChildProcessSecurityPolicyRustPolicyName,
-     features::kChildProcessSecurityPolicyRustPolicyRustAndCpp}};
-const FeatureEntry::FeatureVariation
-    kChildProcessSecurityPolicyRustVariations[] = {
-        {"Rust only", kChildProcessSecurityPolicyRustRustOnly, nullptr},
-        {"Rust and C++", kChildProcessSecurityPolicyRustRustAndCpp, nullptr},
+const FeatureEntry::Choice kChildProcessSecurityPolicyRustChoices[] = {
+    {flags_ui::kGenericExperimentChoiceDefault, "", ""},
+    {flag_descriptions::kChildProcessSecurityPolicyRustChoiceRustOnly,
+     switches::kEnableFeatures,
+     "ChildProcessSecurityPolicyRust:policy/rust-only"},
+    {flag_descriptions::kChildProcessSecurityPolicyRustChoiceRustAndCpp,
+     switches::kEnableFeatures,
+     "ChildProcessSecurityPolicyRust:policy/rust-and-cpp"},
+    {flag_descriptions::
+         kChildProcessSecurityPolicyRustChoiceRustOnlyWithProcessState,
+     switches::kEnableFeatures,
+     "ChildProcessSecurityPolicyRust:policy/rust-only,"
+     "ChildProcessSecurityPolicyRustProcessState"},
+    {flag_descriptions::
+         kChildProcessSecurityPolicyRustChoiceRustAndCppWithProcessState,
+     switches::kEnableFeatures,
+     "ChildProcessSecurityPolicyRust:policy/rust-and-cpp,"
+     "ChildProcessSecurityPolicyRustProcessState"},
+    {flags_ui::kGenericExperimentChoiceDisabled, switches::kDisableFeatures,
+     "ChildProcessSecurityPolicyRust,"
+     "ChildProcessSecurityPolicyRustProcessState"},
 };
 
 const FeatureEntry::FeatureParam kWebAuthnAmbientSignin_AnchoredMessage[] = {
@@ -12957,9 +12968,7 @@ const FeatureEntry kFeatureEntries[] = {
     {"child-process-security-policy-rust",
      flag_descriptions::kChildProcessSecurityPolicyRustName,
      flag_descriptions::kChildProcessSecurityPolicyRustDescription, kOsAll,
-     FEATURE_WITH_PARAMS_VALUE_TYPE(features::kChildProcessSecurityPolicyRust,
-                                    kChildProcessSecurityPolicyRustVariations,
-                                    "ChildProcessSecurityPolicyRust")},
+     MULTI_VALUE_TYPE(kChildProcessSecurityPolicyRustChoices)},
 
 #if BUILDFLAG(IS_ANDROID)
     {"home-button-removal", flag_descriptions::kHomeButtonRemovalName,

@@ -350,7 +350,19 @@ inline constexpr char kChildProcessSecurityPolicyRustDescription[] =
     "implementation or Rust and C++ implementations side-by-side for "
     "validation. The default mode when enabled is Rust-only. Portions of "
     "ChildProcessSecurityPolicy that haven't been implemented in Rust yet will "
-    "fall back to their C++ implementations.";
+    "fall back to their C++ implementations. This can also be configured to "
+    "control whether the Rust implementation manages per-process security "
+    "state.";
+inline constexpr char kChildProcessSecurityPolicyRustChoiceRustOnly[] =
+    "Rust only";
+inline constexpr char kChildProcessSecurityPolicyRustChoiceRustAndCpp[] =
+    "Rust and C++";
+inline constexpr char
+    kChildProcessSecurityPolicyRustChoiceRustOnlyWithProcessState[] =
+        "Rust only (with ProcessState)";
+inline constexpr char
+    kChildProcessSecurityPolicyRustChoiceRustAndCppWithProcessState[] =
+        "Rust and C++ (with ProcessState)";
 
 inline constexpr char kClickToCallName[] = "Click-To-Call";
 inline constexpr char kClickToCallDescription[] =
