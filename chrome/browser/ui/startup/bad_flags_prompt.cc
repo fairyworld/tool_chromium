@@ -15,7 +15,6 @@
 #include "base/files/file_path.h"
 #include "base/strings/utf_string_conversions.h"
 #include "base/trace_event/memory_dump_manager.h"
-#include "base/version_info/version_info_values.h"
 #include "build/build_config.h"
 #include "cc/base/switches.h"
 #include "chrome/browser/infobars/simple_alert_infobar_creator.h"
@@ -268,7 +267,7 @@ void ShowBadFlagsPrompt(content::WebContents* web_contents) {
   }
 #endif
 
-#if BUILDFLAG(IS_ANDROID) && defined(IS_OFFICIAL_BUILD)
+#if BUILDFLAG(IS_ANDROID)
   JNIEnv* env = base::android::AttachCurrentThread();
   base::CommandLine* commandLine = base::CommandLine::ForCurrentProcess();
   bool isTestIntent = commandLine->HasSwitch("enable-test-intents");
