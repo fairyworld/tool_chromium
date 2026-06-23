@@ -21,18 +21,6 @@ struct AiModeButtonConfig {
   // Text show when hovering over button.
   std::u16string tooltip;
 
-  // TODO(crbug.com/510389207): Wire in `navigation_url` &
-  //   `navigation_url_empty`.
-
-  // Icon shown in button.
-  std::string favicon_url;
-
-  // URL navigated when button clicked with omnibox text present.
-  std::string navigation_url;
-
-  // URL navigated when button clicked without omnibox text present.
-  std::string navigation_url_empty;
-
   // Text announced when button is focused.
   std::u16string a11y_label;
 
@@ -42,6 +30,15 @@ struct AiModeButtonConfig {
   // Omnibox placeholder text conditionally shown when the omnibox is focused
   // and empty.
   std::u16string placeholder_text;
+
+  // Icon shown in button.
+  std::string favicon_url;
+
+  // URL navigated when button clicked with omnibox text present.
+  std::string navigation_url;
+
+  // URL navigated when button clicked without omnibox text present.
+  std::string navigation_url_empty;
 
   // Returns true if the config is valid.
   bool IsValid() const;

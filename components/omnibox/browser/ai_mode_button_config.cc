@@ -28,8 +28,8 @@ bool AiModeButtonConfig::IsValid() const {
     return false;
   }
 
-  if (!GURL(navigation_url).is_valid() ||
-      !GURL(navigation_url_empty).is_valid() || !GURL(favicon_url).is_valid()) {
+  if (!GURL(favicon_url).is_valid() || !GURL(navigation_url).is_valid() ||
+      !GURL(navigation_url_empty).is_valid()) {
     return false;
   }
 

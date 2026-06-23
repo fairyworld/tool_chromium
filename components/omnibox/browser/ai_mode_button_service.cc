@@ -70,12 +70,12 @@ AiModeButtonService::ComputeCurrentConfig() const {
         google_strings_.entrypoint_label,
         l10n_util::GetStringUTF16(
             IDS_STARTER_PACK_AI_MODE_ACTION_SUGGESTION_CONTENTS),
-        "",
-        "",
-        "",
         l10n_util::GetStringUTF16(IDS_ACC_AI_MODE_BUTTON_FOCUSED),
         google_strings_.context_menu_label,
-        l10n_util::GetStringUTF16(IDS_ACC_AI_MODE_PLACEHOLDER_TEXT)};
+        l10n_util::GetStringUTF16(IDS_ACC_AI_MODE_PLACEHOLDER_TEXT),
+        "",
+        "",
+        ""};
   }
 
   // TODO(crbug.com/517976551): Return valid config for certain non-Google DSEs.
