@@ -5015,6 +5015,9 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
       <message name="IDS_ACCESSIBILITY_TOOLBAR_BTN_HOME" desc="Content description for the home button.">
         Open the home page
       </message>
+      <message name="IDS_ACCESSIBILITY_BOTTOM_BAR_AI_MODE_BUTTON" desc="Content description for the AI search button in the bottom bar.">
+        Ask AI Mode
+      </message>
       <message name="IDS_ACCESSIBILITY_BTN_REFRESH" desc="Content description for the refresh page button.">
         Reload this page
       </message>
