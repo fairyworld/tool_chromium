@@ -797,6 +797,8 @@ bool IsFullscreenNextIAEnabled() {
   [_bookmarksCoordinator dismissBookmarkModalControllerAnimated:NO];
   if (dismissOmnibox) {
     [_browserCoordinatorHandler hideComposebox];
+  } else {
+    [_browserCoordinatorHandler dismissMultimodalActionsMenu];
   }
   [self.helpHandler hideAllHelpBubbles];
   [_voiceSearchController dismissMicPermissionHelp];
