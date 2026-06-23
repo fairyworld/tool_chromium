@@ -28,6 +28,7 @@ public class AtMemoryBottomSheetCoordinator {
 
     public static final int ITEM_TYPE_SUGGESTION = 1;
     public static final int ITEM_TYPE_SEARCH_TILE = 2;
+    public static final int ITEM_TYPE_ZERO_STATE = 3;
 
     private final BottomSheetObserver mBottomSheetObserver =
             new EmptyBottomSheetObserver() {
@@ -70,6 +71,12 @@ public class AtMemoryBottomSheetCoordinator {
                 ITEM_TYPE_SEARCH_TILE,
                 new LayoutViewBuilder<>(R.layout.at_memory_bottom_sheet_search_item),
                 AtMemoryBottomSheetSearchTileViewBinder::bind);
+        adapter.registerType(
+                ITEM_TYPE_ZERO_STATE,
+                new LayoutViewBuilder<>(R.layout.at_memory_bottom_sheet_zero_state_item),
+                // Zero-state illustration and text are static in the layout, so no view binding is
+                // needed.
+                (m, v, k) -> {});
         view.setRecyclerViewAdapter(adapter);
 
         mContent = new AtMemoryBottomSheetContent(view.getContentView(), mBottomSheetController);

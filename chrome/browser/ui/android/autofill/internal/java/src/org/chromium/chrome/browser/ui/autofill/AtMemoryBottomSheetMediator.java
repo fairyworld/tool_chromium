@@ -6,6 +6,7 @@ package org.chromium.chrome.browser.ui.autofill;
 
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetCoordinator.ITEM_TYPE_SEARCH_TILE;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetCoordinator.ITEM_TYPE_SUGGESTION;
+import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetCoordinator.ITEM_TYPE_ZERO_STATE;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.FLYOUT_SUGGESTIONS;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.IS_LOADING;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.ON_QUERY_SUBMITTED_CALLBACK;
@@ -86,6 +87,10 @@ class AtMemoryBottomSheetMediator {
 
     private void setSuggestions(List<AutofillSuggestion> suggestions) {
         mModelList.clear();
+        if (suggestions.isEmpty()) {
+            showZeroState();
+            return;
+        }
 
         for (int i = 0; i < suggestions.size(); i++) {
             AutofillSuggestion suggestion = suggestions.get(i);
@@ -128,6 +133,7 @@ class AtMemoryBottomSheetMediator {
         }
         mModelList.clear();
         if (query.isEmpty()) {
+            showZeroState();
             return;
         }
         PropertyModel itemModel =
@@ -154,5 +160,10 @@ class AtMemoryBottomSheetMediator {
 
         mHideKeyboardCallback.run();
         onQuerySubmitted(query);
+    }
+
+    private void showZeroState() {
+        // The zero-state illustration and text are static in the layout, so an empty model is used.
+        mModelList.add(new ListItem(ITEM_TYPE_ZERO_STATE, new PropertyModel()));
     }
 }

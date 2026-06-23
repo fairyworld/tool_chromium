@@ -9,6 +9,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 
+import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetCoordinator.ITEM_TYPE_ZERO_STATE;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.IS_LOADING;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.SHOW_SUGGESTIONS_BACKGROUND;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.VISIBLE;
@@ -172,11 +173,20 @@ public class AtMemoryBottomSheetMediatorTest {
     }
 
     @Test
-    public void testOnQueryTextChanged_emptyQueryClearsList() {
+    public void testOnQueryTextChanged_emptyQueryShowsZeroState() {
         mMediator.onQueryTextChanged("f");
         assertEquals(1, mModelList.size());
 
         mMediator.onQueryTextChanged("");
-        assertTrue(mModelList.isEmpty());
+        assertEquals(1, mModelList.size());
+        assertEquals(ITEM_TYPE_ZERO_STATE, mModelList.get(0).type);
+    }
+
+    @Test
+    public void testShow_emptySuggestionsShowsZeroState() {
+        mMediator.show(List.of());
+
+        assertEquals(1, mModelList.size());
+        assertEquals(ITEM_TYPE_ZERO_STATE, mModelList.get(0).type);
     }
 }
