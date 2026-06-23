@@ -676,6 +676,31 @@ IN_PROC_BROWSER_TEST_F(GlicInvokeBrowserTest, InvokeWithContextNoSourceFrame) {
             GlicInvokeError::kAdditionalContextNoSourceFrame);
   EXPECT_FALSE(GetInstanceForTab(tab));
 }
+class GlicInvokeBrowserTestWithoutActor : public GlicInvokeBrowserTest {
+ public:
+  GlicInvokeBrowserTestWithoutActor() {
+    scoped_feature_list_.InitAndDisableFeature(::features::kGlicActor);
+  }
+
+ private:
+  base::test::ScopedFeatureList scoped_feature_list_;
+};
+
+IN_PROC_BROWSER_TEST_F(GlicInvokeBrowserTestWithoutActor,
+                       InvokeWithInvalidConfiguration) {
+  base::test::TestFuture<GlicInvokeError> error_future;
+  GlicInvokeOptions options(mojom::InvocationSource::kOsButton);
+  options.target.surface = DefaultSurface{
+      GetTabListInterface()->GetActiveTab()->GetBrowserWindowInterface()};
+  // Invoking with an actuating feature mode when ActorKeyedService is not
+  // enabled will result in kInvalidConfiguration.
+  options.feature_mode = mojom::FeatureMode::kActuation;
+  options.on_error = error_future.GetCallback();
+
+  coordinator().Invoke(std::move(options));
+
+  EXPECT_EQ(error_future.Get(), GlicInvokeError::kInvalidConfiguration);
+}
 
 IN_PROC_BROWSER_TEST_F(GlicInvokeBrowserTest, InvokeWithInvalidContextData) {
   tabs::TabInterface* tab = CreateAndActivateTab(GURL("about:blank"));
