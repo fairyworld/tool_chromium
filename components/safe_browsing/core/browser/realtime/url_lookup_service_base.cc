@@ -521,9 +521,7 @@ void RealTimeUrlLookupServiceBase::SendRequestInternal(
   RecordCount1MWithAndWithoutSuffix("SafeBrowsing.RT.Request.Size",
                                     GetMetricSuffix(), req_data.size());
   base::TimeTicks start_time = base::TimeTicks::Now();
-  if (!first_request_start_time_) {
-    first_request_start_time_ = start_time;
-  }
+
   loader->AttachStringForUpload(req_data, "application/octet-stream");
   loader->SetTimeoutDuration(base::Seconds(kURLLookupTimeoutDurationInSeconds));
   loader->DownloadToStringOfUnboundedSizeUntilCrashAndDie(
@@ -547,7 +545,6 @@ void RealTimeUrlLookupServiceBase::OnURLLoaderComplete(
     std::optional<int> webui_token,
     std::optional<std::string> response_body) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  CHECK(first_request_start_time_);
 
   auto it = pending_requests_.find(url);
   CHECK(it != pending_requests_.end()) << "Request not found";
@@ -570,13 +567,6 @@ void RealTimeUrlLookupServiceBase::OnURLLoaderComplete(
   RecordHttpResponseOrErrorCode(
       ("SafeBrowsing.RT.Network.Result" + report_type_suffix).c_str(),
       net_error, response_code);
-
-  bool was_first_request = *first_request_start_time_ == request_start_time;
-  bool request_had_cookie = url_loader->ResponseInfo() &&
-                            url_loader->ResponseInfo()->was_cookie_in_request;
-  bool sent_with_token = access_token_string && !access_token_string->empty();
-  MaybeLogProtegoPingCookieHistograms(request_had_cookie, was_first_request,
-                                      sent_with_token);
 
   if (response_code == net::HTTP_UNAUTHORIZED &&
       access_token_string.has_value()) {
