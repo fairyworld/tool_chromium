@@ -68,6 +68,11 @@ class CONTENT_EXPORT RequestService
   void ResolveTokenRequest(const std::optional<std::string>& account_id,
                            blink::mojom::ResolveTokenParamsPtr params,
                            ResolveTokenRequestCallback callback) override;
+  void SetIdpSigninStatus(
+      const url::Origin& idp_origin,
+      blink::mojom::IdpSigninStatus status,
+      const std::optional<::blink::common::webid::LoginStatusOptions>& options,
+      SetIdpSigninStatusCallback callback) override;
 
   Request* GetActiveRequestForTesting() { return active_request_.get(); }
 
@@ -136,6 +141,7 @@ class CONTENT_EXPORT RequestService
   std::unique_ptr<IdpNetworkRequestManager> registration_network_manager_;
   std::unique_ptr<IdpRegistrationHandler> fedcm_idp_registration_handler_;
   std::unique_ptr<IdpNetworkRequestManager> mock_network_manager_;
+  std::unique_ptr<IdpNetworkRequestManager> signin_status_network_manager_;
   base::flat_set<std::unique_ptr<UserInfoRequest>, base::UniquePtrComparator>
       user_info_requests_;
 

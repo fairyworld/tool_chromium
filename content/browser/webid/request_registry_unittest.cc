@@ -31,6 +31,7 @@
 #include "services/network/public/mojom/permissions_policy/permissions_policy_feature.mojom.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "third_party/blink/public/common/webid/login_status_options.h"
 #include "third_party/blink/public/mojom/webid/federated_auth_request.mojom.h"
 #include "ui/base/page_transition_types.h"
 #include "url/gurl.h"
@@ -291,6 +292,20 @@ TEST_F(RequestRegistryTest, RequestServiceUnregisterIdP) {
   loop.Run();
 }
 
+// Test SetIdpSigninStatus via FederatedRequestService.
+TEST_F(RequestRegistryTest, RequestServiceSetIdpSigninStatus) {
+  url::Origin origin = url::Origin::Create(GURL(kIdpUrl));
+
+  EXPECT_CALL(*mock_permission_delegate_, SetIdpSigninStatus(origin, true, _))
+      .WillOnce(Return());
+
+  base::RunLoop loop;
+  request_service_remote_->SetIdpSigninStatus(
+      origin, blink::mojom::IdpSigninStatus::kSignedIn, std::nullopt,
+      base::BindLambdaForTesting([&loop]() { loop.Quit(); }));
+  loop.Run();
+}
+
 // Test PreventSilentAccess via FederatedRequestService.
 TEST_F(RequestRegistryTest, RequestServicePreventSilentAccess) {
   EXPECT_CALL(*mock_permission_delegate_, HasSharingPermission(_))
@@ -410,6 +425,58 @@ TEST_F(RequestRegistryTest,
 
   EXPECT_EQ("identity-credentials-get permissions policy not enabled",
             bad_message_observer.WaitForBadMessage());
+}
+
+// Test that SetIdpSigninStatus with an invalid picture URL triggers a Bad
+// Message report.
+TEST_F(RequestRegistryTest, SetIdpSigninStatusInvalidPictureUrl) {
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitAndEnableFeature(features::kFedCmLightweightMode);
+
+  url::Origin origin = url::Origin::Create(GURL(kIdpUrl));
+
+  // Create LoginStatusOptions with an invalid picture URL
+  blink::common::webid::LoginStatusOptions options;
+  blink::common::webid::LoginStatusAccount account;
+  account.id = "id";
+  account.email = "email";
+  account.name = "name";
+  account.picture = GURL("invalid_url");  // Invalid!
+  options.accounts.push_back(account);
+
+  mojo::test::BadMessageObserver bad_message_observer;
+  request_service_remote_->SetIdpSigninStatus(
+      origin, blink::mojom::IdpSigninStatus::kSignedIn, std::move(options),
+      base::DoNothing());
+
+  EXPECT_THAT(bad_message_observer.WaitForBadMessage(),
+              testing::HasSubstr("VALIDATION_ERROR_DESERIALIZATION_FAILED"));
+}
+
+// Test that SetIdpSigninStatus with an insecure picture URL triggers a Bad
+// Message report.
+TEST_F(RequestRegistryTest, SetIdpSigninStatusInsecurePictureUrl) {
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitAndEnableFeature(features::kFedCmLightweightMode);
+
+  url::Origin origin = url::Origin::Create(GURL(kIdpUrl));
+
+  // Create LoginStatusOptions with an insecure picture URL (plain http)
+  blink::common::webid::LoginStatusOptions options;
+  blink::common::webid::LoginStatusAccount account;
+  account.id = "id";
+  account.email = "email";
+  account.name = "name";
+  account.picture = GURL("http://insecure.example/picture.png");  // Insecure!
+  options.accounts.push_back(account);
+
+  mojo::test::BadMessageObserver bad_message_observer;
+  request_service_remote_->SetIdpSigninStatus(
+      origin, blink::mojom::IdpSigninStatus::kSignedIn, std::move(options),
+      base::DoNothing());
+
+  EXPECT_THAT(bad_message_observer.WaitForBadMessage(),
+              testing::HasSubstr("VALIDATION_ERROR_DESERIALIZATION_FAILED"));
 }
 
 }  // namespace content::webid

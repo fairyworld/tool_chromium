@@ -610,46 +610,8 @@ void Request::SetIdpSigninStatus(
     blink::mojom::IdpSigninStatus status,
     const std::optional<blink::common::webid::LoginStatusOptions>& options,
     SetIdpSigninStatusCallback callback) {
-  auto scoped_closure = base::ScopedClosureRunner(std::move(callback));
-
-  if (render_frame_host().IsNestedWithinFencedFrame()) {
-    RecordSetLoginStatusIgnoredReason(
-        SetLoginStatusIgnoredReason::kInFencedFrame);
-    return;
-  }
-  // We only allow setting the IDP signin status when the subresource is loaded
-  // from the same site as the document, and the document is same site with
-  // all ancestors. This is to protect from an RP embedding a tracker resource
-  // that would set this signin status for the tracker, enabling the FedCM
-  // request.
-  if (!IsSameSiteWithAncestors(idp_origin, &render_frame_host())) {
-    RecordSetLoginStatusIgnoredReason(
-        SetLoginStatusIgnoredReason::kCrossOrigin);
-    return;
-  }
-
-  if (!IsLightweightModeEnabled()) {
-    permission_delegate_->SetIdpSigninStatus(
-        idp_origin, status == blink::mojom::IdpSigninStatus::kSignedIn,
-        std::nullopt);
-  } else {
-    if (options.has_value()) {
-      std::vector<GURL> picture_urls;
-      for (const blink::common::webid::LoginStatusAccount& account :
-           options->accounts) {
-        if (account.picture.has_value() && account.picture->is_valid()) {
-          picture_urls.emplace_back(account.picture.value());
-        }
-      }
-      if (!network_manager_) {
-        network_manager_ = CreateNetworkManager();
-      }
-      network_manager_->CacheAccountPictures(idp_origin, picture_urls);
-    }
-    permission_delegate_->SetIdpSigninStatus(
-        idp_origin, status == blink::mojom::IdpSigninStatus::kSignedIn,
-        options);
-  }
+  request_service_->SetIdpSigninStatus(idp_origin, status, options,
+                                       std::move(callback));
 }
 
 void Request::RegisterIdP(const GURL& idp, RegisterIdPCallback callback) {

@@ -26,6 +26,7 @@
 #include "content/public/common/content_client.h"
 #include "content/public/common/content_switches.h"
 #include "mojo/public/cpp/bindings/message.h"
+#include "services/network/public/cpp/is_potentially_trustworthy.h"
 
 namespace content {
 
@@ -455,6 +456,58 @@ RequestService::CreateDialogController() {
 void RequestService::SetDialogControllerForTests(
     std::unique_ptr<IdentityRequestDialogController> controller) {
   mock_dialog_controller_ = std::move(controller);
+}
+
+void RequestService::SetIdpSigninStatus(
+    const url::Origin& idp_origin,
+    blink::mojom::IdpSigninStatus status,
+    const std::optional<blink::common::webid::LoginStatusOptions>& options,
+    SetIdpSigninStatusCallback callback) {
+  auto scoped_closure = base::ScopedClosureRunner(std::move(callback));
+
+  if (render_frame_host().IsNestedWithinFencedFrame()) {
+    RecordSetLoginStatusIgnoredReason(
+        SetLoginStatusIgnoredReason::kInFencedFrame);
+    return;
+  }
+  // We only allow setting the IDP signin status when the subresource is loaded
+  // from the same site as the document, and the document is same site with
+  // all ancestors. This is to protect from an RP embedding a tracker resource
+  // that would set this signin status for the tracker, enabling the FedCM
+  // request.
+  if (!IsSameSiteWithAncestors(idp_origin, &render_frame_host())) {
+    RecordSetLoginStatusIgnoredReason(
+        SetLoginStatusIgnoredReason::kCrossOrigin);
+    return;
+  }
+
+  if (!IsLightweightModeEnabled()) {
+    permission_delegate_->SetIdpSigninStatus(
+        idp_origin, status == blink::mojom::IdpSigninStatus::kSignedIn,
+        /*options=*/std::nullopt);
+  } else {
+    if (options.has_value()) {
+      std::vector<GURL> picture_urls;
+      for (const blink::common::webid::LoginStatusAccount& account :
+           options->accounts) {
+        if (account.picture.has_value()) {
+          // Guaranteed by Mojo deserialization traits (StructTraits::Read in
+          // federated_auth_request_mojom_traits.cc).
+          DCHECK(account.picture->is_valid());
+          DCHECK(network::IsUrlPotentiallyTrustworthy(account.picture.value()));
+          picture_urls.emplace_back(account.picture.value());
+        }
+      }
+      if (!signin_status_network_manager_) {
+        signin_status_network_manager_ = CreateNetworkManager();
+      }
+      signin_status_network_manager_->CacheAccountPictures(idp_origin,
+                                                           picture_urls);
+    }
+    permission_delegate_->SetIdpSigninStatus(
+        idp_origin, status == blink::mojom::IdpSigninStatus::kSignedIn,
+        options);
+  }
 }
 
 }  // namespace webid
