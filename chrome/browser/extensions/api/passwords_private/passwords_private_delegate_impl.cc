@@ -35,8 +35,8 @@
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
 #include "chrome/browser/ui/user_education/browser_user_education_interface.h"
 #include "chrome/browser/ui/web_applications/web_app_dialog_utils.h"
+#include "chrome/browser/web_applications/web_app_install_manager.h"
 #include "chrome/browser/web_applications/web_app_install_params.h"
-#include "chrome/browser/web_applications/web_app_provider.h"
 #include "chrome/browser/webauthn/change_pin_controller.h"
 #include "chrome/browser/webauthn/enclave_manager.h"
 #include "chrome/common/channel_info.h"
@@ -319,7 +319,7 @@ PasswordsPrivateDelegateImpl::PasswordsPrivateDelegateImpl(
     webauthn::PasskeyModel* passkey_model,
     password_manager::BulkLeakCheckServiceInterface* bulk_leak_check_service,
     PasswordsPrivateEventRouter* event_router,
-    web_app::WebAppProvider* web_app_provider,
+    web_app::WebAppInstallManager* web_app_install_manager,
     EnclaveManagerInterface* enclave_manager,
     const DeviceAuthenticatorFactory& device_authenticator_factory,
     const base::RepeatingClosure& maybe_show_profile_switch_iph_cb)
@@ -371,7 +371,7 @@ PasswordsPrivateDelegateImpl::PasswordsPrivateDelegateImpl(
   }
 
 #if !BUILDFLAG(IS_CHROMEOS)
-  install_manager_observation_.Observe(&web_app_provider->install_manager());
+  install_manager_observation_.Observe(web_app_install_manager);
 #endif
 }
 

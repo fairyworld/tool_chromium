@@ -79,7 +79,6 @@ class SyncService;
 
 namespace web_app {
 class WebAppInstallManager;
-class WebAppProvider;
 }  // namespace web_app
 
 namespace webauthn {
@@ -120,7 +119,7 @@ class PasswordsPrivateDelegateImpl
       webauthn::PasskeyModel* passkey_model,
       password_manager::BulkLeakCheckServiceInterface* bulk_leak_check_service,
       PasswordsPrivateEventRouter* event_router,
-      web_app::WebAppProvider* web_app_provider,
+      web_app::WebAppInstallManager* web_app_install_manager,
       EnclaveManagerInterface* enclave_manager,
       const DeviceAuthenticatorFactory& device_authenticator_factory,
       const base::RepeatingClosure& maybe_show_profile_switch_iph_cb);

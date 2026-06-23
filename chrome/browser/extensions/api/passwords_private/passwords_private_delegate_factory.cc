@@ -121,7 +121,7 @@ PasswordsPrivateDelegateProxy::GetOrCreateDelegate() {
           PasskeyModelFactory::GetInstance()->GetForProfile(profile),
           BulkLeakCheckServiceFactory::GetForProfile(profile),
           PasswordsPrivateEventRouterFactory::GetForProfile(profile),
-          web_app::WebAppProvider::GetForWebApps(profile),
+          &web_app::WebAppProvider::GetForWebApps(profile)->install_manager(),
           EnclaveManagerFactory::GetForProfile(profile),
           base::BindRepeating(&GetDeviceAuthenticator, profile),
           base::BindRepeating(&MaybeShowProfileSwitchIPH, profile));
