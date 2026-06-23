@@ -1638,6 +1638,43 @@ suite('ContextualActionMenu', () => {
     assertTrue(suffix!.hasAttribute('disabled'));
   });
 
+  test('Share tabs trigger disabled when tab upload disabled', async () => {
+    loadTimeData.overrideValues({
+      contextManagementInComposeboxEnabled: true,
+    });
+    actionMenu.remove();
+    actionMenu = document.createElement('cr-composebox-contextual-action-menu');
+    const tabInfo: TabInfo = {
+      tabId: 1,
+      title: 'Recent Tab',
+      url: 'about:blank',
+      showInCurrentTabChip: false,
+      showInPreviousTabChip: false,
+      lastActive: {internalValue: 0n},
+    };
+    actionMenu.tabSuggestions = [tabInfo];
+    actionMenu.inputState = new MockInputState({
+      allowedInputTypes: [InputType.kBrowserTab],
+      disabledInputTypes: [InputType.kBrowserTab],
+    });
+    document.body.appendChild(actionMenu);
+    await microtasksFinished();
+
+    actionMenu.showAt(actionMenu);
+    await microtasksFinished();
+
+    const trigger = $$(actionMenu, '#shareTabsTrigger') as HTMLButtonElement;
+    assertTrue(!!trigger);
+    assertTrue(trigger.disabled);
+
+    // Hovering should open the flyout.
+    trigger.dispatchEvent(new PointerEvent('pointerenter'));
+    await microtasksFinished();
+
+    const flyout = $$(actionMenu, '.share-tabs-flyout') as HTMLElement;
+    assertFalse(flyout.hidden);
+  });
+
   test('Menu closes after tab selection in Realbox', async () => {
     loadTimeData.overrideValues({
       contextManagementInComposeboxEnabled: true,

@@ -579,6 +579,11 @@ export class ContextualActionMenuElement extends
     return limitReached;
   }
 
+  protected isShareTabsTriggerDisabled_(): boolean {
+    return (this.inputState?.disabledInputTypes || [])
+        .includes(InputType.kBrowserTab);
+  }
+
   // Checks if a tab item in the context menu should be disabled.
   protected isTabDisabled_(tab: TabInfo): boolean {
     const isTabCurrentlySelected = this.isTabSelected_(tab.tabId);
