@@ -100,3 +100,76 @@ if (is_android) {
     ]
   }
 }
+
+source_set("unit_tests") {
+  testonly = true
+
+  configs += [ "//build/config/compiler:no_exit_time_destructors" ]
+
+  # These tests pre-date strict sign-comparison warnings; relax to the warning
+  # posture they had while compiled in //chrome/test.
+  configs -= [ "//build/config/compiler:chromium_code" ]
+  configs += [ "//build/config/compiler:no_chromium_code" ]
+
+  sources = [ "subresource_filter_history_observer_unittest.cc" ]
+
+  deps = [
+    ":subresource_filter",
+    "//base",
+    "//chrome/browser/history",
+    "//chrome/test:test_support",
+    "//components/history/core/browser",
+    "//components/history/core/test",
+    "//components/subresource_filter/content/browser",
+    "//content/test:test_support",
+    "//testing/gtest",
+  ]
+}
+
+if (!is_android) {
+  source_set("browser_tests") {
+    testonly = true
+
+    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
+
+    # These tests pre-date strict sign-comparison warnings; relax to the warning
+    # posture they had while compiled in //chrome/test.
+    configs -= [ "//build/config/compiler:chromium_code" ]
+    configs += [ "//build/config/compiler:no_chromium_code" ]
+    defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+    sources = [
+      "ad_navigation_entry_browsertest.cc",
+      "ad_tagging_browsertest.cc",
+      "ads_intervention_manager_browsertest.cc",
+      "ruleset_browsertest.cc",
+      "subresource_filter_browsertest.cc",
+      "subresource_filter_devtools_browsertest.cc",
+      "subresource_filter_disabled_reason_uma_browsertest.cc",
+      "subresource_filter_dns_alias_browsertest.cc",
+      "subresource_filter_fenced_frame_browsertest.cc",
+      "subresource_filter_intercepting_browsertest.cc",
+      "subresource_filter_popup_browsertest.cc",
+      "subresource_filter_prerender_browsertest.cc",
+      "subresource_filter_settings_browsertest.cc",
+      "subresource_filter_special_subframe_navigations_browsertest.cc",
+      "subresource_filter_web_socket_browsertest.cc",
+      "subresource_filter_worker_browsertest.cc",
+    ]
+
+    deps = [
+      ":subresource_filter",
+      "//base",
+      "//chrome/browser/preloading",
+      "//chrome/browser/ui",
+      "//chrome/test:test_support",
+      "//chrome/test:test_support_ui",
+      "//components/embedder_support",
+      "//components/page_load_metrics/browser:test_support",
+      "//components/page_load_metrics/browser/observers/ad_metrics",
+      "//components/subresource_filter/content/browser",
+      "//content/test:test_support",
+      "//testing/gtest",
+    ]
+  }
+}
