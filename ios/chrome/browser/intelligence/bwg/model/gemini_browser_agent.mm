@@ -667,10 +667,10 @@ void GeminiBrowserAgent::StartGeminiFlow(UIViewController* base_view_controller,
   // skipped.
   bool skip_consent = BWGPromoConsentVariationsParam() ==
                       BWGPromoConsentVariations::kSkipConsent;
+  startup_state.isFirstSession = will_show_first_run && !skip_consent;
 
-  if (!will_show_first_run || skip_consent) {
-    PresentFloaty(base_view_controller, startup_state,
-                  /*was_first_run_shown=*/false);
+  if (!startup_state.isFirstSession) {
+    PresentFloaty(base_view_controller, startup_state);
     return;
   }
 
@@ -679,7 +679,7 @@ void GeminiBrowserAgent::StartGeminiFlow(UIViewController* base_view_controller,
 
   auto present_floaty_closure = base::BindRepeating(
       &GeminiBrowserAgent::PresentFloaty, weak_factory_.GetWeakPtr(),
-      base_view_controller, startup_state, /*first_run_shown=*/true);
+      base_view_controller, startup_state);
 
   [gemini_handler
       startGeminiFirstRunWithCompletion:BlockRunningClosureIfSuccess(
@@ -924,8 +924,7 @@ void GeminiBrowserAgent::UpdateForTraitCollection(
 }
 
 void GeminiBrowserAgent::PresentFloaty(UIViewController* base_view_controller,
-                                       GeminiStartupState* startup_state,
-                                       bool first_run_shown) {
+                                       GeminiStartupState* startup_state) {
   base::TimeTicks start_time = base::TimeTicks::Now();
 
   web::WebState* web_state = browser_->GetWebStateList()->GetActiveWebState();
@@ -980,7 +979,7 @@ void GeminiBrowserAgent::PresentFloaty(UIViewController* base_view_controller,
         &GeminiBrowserAgent::InvokeFloaty, weak_factory_.GetWeakPtr(), config));
   }
 
-  base::UmaHistogramLongTimes(first_run_shown
+  base::UmaHistogramLongTimes(startup_state.isFirstSession
                                   ? kStartupTimeWithFirstRunHistogram
                                   : kStartupTimeNoFirstRunHistogram,
                               base::TimeTicks::Now() - start_time);
@@ -1594,6 +1593,7 @@ GeminiConfiguration* GeminiBrowserAgent::CreateGeminiConfiguration(
   config.singleSignOnService =
       GetApplicationContext()->GetSingleSignOnService();
   config.gateway = bwg_gateway_;
+  config.gateway.sessionHandler.isFirstSession = startup_state.isFirstSession;
   config.imageAttachment = startup_state.imageAttachment;
 
   config.clientID = base::SysUTF8ToNSString(gemini_tab_helper->GetClientId());

@@ -51,6 +51,9 @@ typedef NS_ENUM(NSInteger, GeminiCancelType) {
 // SessionDelegate.
 @protocol GeminiSessionDelegate
 
+// Whether the current session is the first session.
+@property(nonatomic, assign) BOOL isFirstSession;
+
 // Called when a new session is created.
 - (void)newSessionCreatedWithClientID:(NSString*)clientID
                              serverID:(NSString*)serverID;

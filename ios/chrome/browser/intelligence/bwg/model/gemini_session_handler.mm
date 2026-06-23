@@ -201,20 +201,6 @@ IOSGeminiSessionCancellationReason HistogramEnumFromGeminiCancelType(
                           serverID:(NSString*)serverID {
   [_geminiHandler dismissGeminiFlowWithCompletion:nil];
 
-  web::WebState* webState = [self webStateWithClientID:clientID];
-  if (!webState) {
-    return;
-  }
-  // Get the GeminiTabHelper from the WebState.
-  GeminiTabHelper* geminiTabHelper = GeminiTabHelper::FromWebState(webState);
-  // WebState should always be valid as long as the tab is open.
-  if (!geminiTabHelper) {
-    // Early exit if no valid tab helper is found.
-    return;
-  }
-  bool isFirstSession = geminiTabHelper->GetIsFirstRun();
-  geminiTabHelper->SetIsFirstRun(false);
-
   // Record session duration.
   if (!_sessionStartTime.is_null()) {
     base::TimeDelta session_duration =
@@ -228,7 +214,7 @@ IOSGeminiSessionCancellationReason HistogramEnumFromGeminiCancelType(
       session_type = IOSGeminiSessionType::kAbandoned;
     }
 
-    RecordGeminiSessionLengthByType(session_duration, isFirstSession,
+    RecordGeminiSessionLengthByType(session_duration, _isFirstSession,
                                     session_type);
     RecordGeminiSessionTime(session_duration);
     _sessionStartTime = base::TimeTicks();

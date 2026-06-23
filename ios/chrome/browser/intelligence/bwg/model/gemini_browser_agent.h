@@ -191,8 +191,7 @@ class GeminiBrowserAgent : public BrowserUserData<GeminiBrowserAgent>,
 
   // Starts the Gemini session (prepares context and shows overlay).
   void PresentFloaty(UIViewController* base_view_controller,
-                     GeminiStartupState* startup_state,
-                     bool first_run_shown);
+                     GeminiStartupState* startup_state);
 
   // Creates the configuration for the Gemini overlay.
   GeminiConfiguration* CreateGeminiConfiguration(

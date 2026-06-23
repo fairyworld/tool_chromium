@@ -194,14 +194,6 @@ void GeminiTabHelper::ExecuteZeroStateSuggestions(
       std::move(callback));
 }
 
-void GeminiTabHelper::SetIsFirstRun(bool is_first_run) {
-  is_first_run_ = is_first_run;
-}
-
-bool GeminiTabHelper::GetIsFirstRun() {
-  return is_first_run_;
-}
-
 bool GeminiTabHelper::ShouldPreventContextualPanelEntryPoint() {
   return prevent_contextual_panel_entry_point_;
 }
