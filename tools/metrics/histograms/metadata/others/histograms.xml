@@ -5014,16 +5014,6 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
-<histogram name="Mojo.Channel.WriteReceiveMessageProcessType"
-    enum="ShortProcessType" expires_after="2026-11-15">
-  <owner>amanvr@chromium.org</owner>
-  <owner>woa-performance@google.com</owner>
-  <summary>
-    Records the number of received Mojo IPCs, split per process. Emitted each
-    time a mojo IPC is received.
-  </summary>
-</histogram>
-
 <histogram name="Mojo.Channel.WriteSendMessageProcessType"
     enum="ShortProcessType" expires_after="2026-11-15">
   <owner>amanvr@chromium.org</owner>
