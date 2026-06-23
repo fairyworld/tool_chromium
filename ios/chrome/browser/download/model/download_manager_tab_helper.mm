@@ -340,6 +340,9 @@ void DownloadManagerTabHelper::MoveComplete(bool move_completed,
                                             const base::FilePath& source_path,
                                             const base::FilePath& final_path) {
   DCHECK(move_completed);
+  if (move_completed) {
+    task_final_file_path_ = final_path;
+  }
   MaybeSetDownloadPathForAutoDeletion();
   [delegate_ downloadManagerTabHelperDidChangeState:this];
 }
