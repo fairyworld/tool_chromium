@@ -7523,6 +7523,12 @@ interface PopStateEvent : Event
     getter hasUAVisualTransition
     getter state
     method constructor
+interface PreconnectData
+    attribute @@toStringTag
+    getter crossorigin
+    getter earlyhint
+    getter origin
+    method constructor
 interface PreferenceManager
     attribute @@toStringTag
     getter colorScheme
@@ -9631,6 +9637,7 @@ interface SpeculationData
     attribute @@toStringTag
     getter navigationDestinationURL
     getter navigations
+    getter preconnects
     getter preloads
     method constructor
 interface SpeculationNavigationData
