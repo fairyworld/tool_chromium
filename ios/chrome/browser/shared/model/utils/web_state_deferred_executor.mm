@@ -5,6 +5,7 @@
 #import "ios/chrome/browser/shared/model/utils/web_state_deferred_executor.h"
 
 #import "base/memory/weak_ptr.h"
+#import "ios/web/public/navigation/navigation_manager.h"
 
 @implementation WebStateDeferredExecutor {
   // Observer for the web state loading.
@@ -33,12 +34,16 @@
     executeOnceLoaded:(WebStateLoadedCompletionBlock)completion {
   _loadedCallbacks[webState->GetUniqueIdentifier()] = completion;
   BOOL realized = webState->IsRealized();
-  BOOL loading = webState->IsLoading();
 
   if (!realized) {
     [self observeWebState:webState];
     [self forceRealizeWebState:webState];
-    return;
+  }
+
+  // Ensure the web state is actually loading/loaded by triggering restoration
+  // load.
+  if (webState->GetNavigationManager()) {
+    webState->GetNavigationManager()->LoadIfNecessary();
   }
 
   [self.delegate webStateDeferredExecutor:self willLoadWebState:webState];
@@ -55,7 +60,7 @@
     return completion(success);
   };
 
-  if (loading) {
+  if (webState->IsLoading()) {
     [self observeWebState:webState];
     return;
   }
