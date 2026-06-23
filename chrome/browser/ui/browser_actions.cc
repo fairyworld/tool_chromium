@@ -30,6 +30,7 @@
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/glic/public/glic_keyed_service.h"
 #include "chrome/browser/indigo/indigo_page_action_controller.h"
+#include "chrome/browser/lifetime/application_lifetime.h"
 #include "chrome/browser/prefs/incognito_mode_prefs.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/search_engines/template_url_service_factory.h"
@@ -2096,6 +2097,63 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               bwi))
           .SetActionId(kActionDebugPrintViewTreeDetails)
           .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::CloseWindow(bwi);
+              },
+              bwi))
+          .SetActionId(kActionCloseWindow)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ToggleFullscreenMode(bwi);
+              },
+              bwi))
+          .SetActionId(kActionFullscreen)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::AttemptUserExit();
+              },
+              bwi))
+          .SetActionId(kActionExit)
+          .Build());
+
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                bwi->GetWindow()->Minimize();
+              },
+              bwi))
+          .SetActionId(kActionMinimizeWindow)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                bwi->GetWindow()->Maximize();
+              },
+              bwi))
+          .SetActionId(kActionMaximizeWindow)
+          .Build());
+#endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
 }
 
 void BrowserActions::AddListeners() {
