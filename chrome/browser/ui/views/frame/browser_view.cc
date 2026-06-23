@@ -3833,14 +3833,6 @@ views::View* BrowserView::GetInitiallyFocusedView() {
 }
 
 bool BrowserView::ShouldShowWindowTitle() const {
-#if BUILDFLAG(IS_CHROMEOS)
-  // For Chrome OS only, trusted windows (apps and settings) do not show a
-  // title, crbug.com/40175496. Child windows (i.e. popups) do show a title.
-  if (browser_->is_trusted_source() || AppUsesWindowControlsOverlay()) {
-    return false;
-  }
-#endif
-
   return browser_->SupportsWindowFeature(
       Browser::WindowFeature::kFeatureTitleBar);
 }

@@ -224,6 +224,13 @@ void BrowserFrameViewChromeOS::Init() {
   display_observer_.emplace(this);
   frame_header_ = CreateFrameHeader();
 
+  // BrowserFrameViewChromeOS should not paint titles for Web Apps given that
+  // client view (BrowserView) paints/manages the window title for Web Apps.
+  // (See `BrowserView::web_app_window_title_`)
+  if (GetBrowserView()->GetIsWebAppType()) {
+    frame_header_->SetPaintTitleBar(false);
+  }
+
   if (AppIsPwaWithUnframedDisplayMode()) {
     UpdateUnframedModeEnabled();
   }
@@ -253,17 +260,12 @@ BrowserLayoutParams BrowserFrameViewChromeOS::GetBrowserLayoutParams() const {
     params.trailing_exclusion.content =
         gfx::SizeF(width() - caption_bounds.x(), height);
   }
+  MaybeAddAppIconToLayoutParams(params);
   return params;
 }
 
 bool BrowserFrameViewChromeOS::ShouldShowWebAppFrameToolbar() const {
   if (!GetShowCaptionButtons()) {
-    return false;
-  }
-
-  if (GetBrowserView()->browser()->is_type_app_popup() &&
-      !GetBrowserView()->AppUsesWindowControlsOverlay() &&
-      !GetBrowserView()->AppUsesUnframedMode()) {
     return false;
   }
 
@@ -1037,6 +1039,25 @@ void BrowserFrameViewChromeOS::UpdateWindowRoundedCorners() {
   }
 
   GetWidget()->client_view()->UpdateWindowRoundedCorners(window_radii);
+}
+
+void BrowserFrameViewChromeOS::MaybeAddAppIconToLayoutParams(
+    BrowserLayoutParams& params) const {
+  if (GetBrowserView()->ShouldShowWindowIcon() && window_icon_) {
+    const auto icon_bounds = window_icon_->bounds();
+    const float icon_right = icon_bounds.right();
+    const float icon_bottom = icon_bounds.bottom();
+
+    // The icon may extend the size of the exclusion area.
+    params.leading_exclusion.content.set_width(
+        std::max(params.leading_exclusion.content.width(), icon_right));
+    params.leading_exclusion.content.set_height(
+        std::max(params.leading_exclusion.content.height(), icon_bottom));
+
+    // Default space between window icon and title text for ChromeOS.
+    // (See `kTitleIconOffsetX` in chromeos/ui/frame/frame_header.cc).
+    params.leading_exclusion.horizontal_padding = 5.f;
+  }
 }
 
 void BrowserFrameViewChromeOS::LayoutProfileIndicator() {

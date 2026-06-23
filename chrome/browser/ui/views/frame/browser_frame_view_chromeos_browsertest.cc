@@ -759,12 +759,12 @@ IN_PROC_BROWSER_TEST_P(WebAppFrameViewChromeOSTest,
   ASSERT_TRUE(WaitForFocus(true, web_app_menu_button_));
 }
 
-// Tests the app icon and title are not shown.
-IN_PROC_BROWSER_TEST_P(WebAppFrameViewChromeOSTest, IconShownAndTitleNotShown) {
+// Tests the app icon is not shown but the title is shown.
+IN_PROC_BROWSER_TEST_P(WebAppFrameViewChromeOSTest, IconNotShownButTitleShown) {
   SetUpWebApp();
   auto* browser_view = BrowserView::GetBrowserViewForBrowser(app_browser_);
   EXPECT_FALSE(browser_view->ShouldShowWindowIcon());
-  EXPECT_FALSE(browser_view->ShouldShowWindowTitle());
+  EXPECT_TRUE(browser_view->ShouldShowWindowTitle());
 }
 
 // Tests that the custom tab bar is focusable from the keyboard.
@@ -837,7 +837,7 @@ IN_PROC_BROWSER_TEST_P(WebAppFrameViewChromeOSTest,
   EXPECT_FALSE(GetPaintingAsActive());
 }
 
-IN_PROC_BROWSER_TEST_P(WebAppFrameViewChromeOSTest, PopupHasNoToolbar) {
+IN_PROC_BROWSER_TEST_P(WebAppFrameViewChromeOSTest, PopupHasToolbar) {
   SetUpWebApp();
 
   Browser* popup_browser;
@@ -855,8 +855,8 @@ IN_PROC_BROWSER_TEST_P(WebAppFrameViewChromeOSTest, PopupHasNoToolbar) {
 
   BrowserView* browser_view =
       BrowserView::GetBrowserViewForBrowser(popup_browser);
-  EXPECT_FALSE(browser_view->web_app_frame_toolbar_for_testing() &&
-               browser_view->web_app_frame_toolbar_for_testing()->GetVisible());
+  EXPECT_TRUE(browser_view->web_app_frame_toolbar_for_testing() &&
+              browser_view->web_app_frame_toolbar_for_testing()->GetVisible());
 }
 
 IN_PROC_BROWSER_TEST_P(BrowserFrameViewChromeOSTest,
