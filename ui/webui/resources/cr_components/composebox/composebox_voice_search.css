@@ -40,7 +40,7 @@
  * Must have static positioning otherwise so the error and placeholder
  * voice search text change the height of voice_search and thus composebox.
  */
-:host(:not([is-permission-prompt-open_])) #container:not(.has-error) {
+:host(:not([is-permission-prompt-open])) #container:not(.has-error) {
   inset: 0;
   position: absolute;
 }
