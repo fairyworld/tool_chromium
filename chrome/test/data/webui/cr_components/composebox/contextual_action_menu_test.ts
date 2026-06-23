@@ -21,6 +21,19 @@ import {$$, eventToPromise, isVisible, microtasksFinished} from 'chrome://webui-
 
 import {MockInputState} from './composebox_test_utils.js';
 
+function createTabSuggestion(overrides: Partial<TabInfo> = {}): TabInfo {
+  return Object.assign(
+      {
+        tabId: 0,
+        title: '',
+        url: 'about:blank',
+        showInCurrentTabChip: false,
+        showInPreviousTabChip: false,
+        lastActive: {internalValue: 0n},
+      },
+      overrides);
+}
+
 function triggerKeyDown(
     element: HTMLElement, key: string, shiftKey: boolean = false) {
   element.dispatchEvent(new KeyboardEvent('keydown', {
@@ -32,6 +45,24 @@ function triggerKeyDown(
     cancelable: true,
   }));
 }
+
+interface InternalContextualActionMenu {
+  onWindowBlur_: () => void;
+  getSelectedTabs_: () => TabInfo[];
+  resetShareTabsFlyout_: () => void;
+  updateFlyoutPosition_: () => void;
+  scheduleCloseTimer_: () => void;
+  metricsSource_: string;
+  closeMenuOnSelect: boolean;
+  addTabContext_: (tabInfo: TabInfo) => void;
+  deleteTabContext_: (uuid: string) => void;
+}
+
+function asInternal(element: ContextualActionMenuElement):
+    InternalContextualActionMenu {
+  return element as unknown as InternalContextualActionMenu;
+}
+
 suite('ContextualActionMenu', () => {
   let actionMenu: ContextualActionMenuElement;
 
@@ -764,19 +795,14 @@ suite('ContextualActionMenu', () => {
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
     actionMenu.tabSuggestions = [
-      {
+      createTabSuggestion({
         tabId: 1,
         title: 'Tab 1',
-        url: {url: 'about:blank'},
-        lastActiveTime: {internalValue: 0n},
-        showInCurrentTabChip: false,
-        showInPreviousTabChip: false,
-        lastActive: {internalValue: 0n},
-      } as any,
+      }),
     ];
     actionMenu.inputState = new MockInputState({
-                              allowedInputTypes: [InputType.kBrowserTab],
-                            }) as any;
+      allowedInputTypes: [InputType.kBrowserTab],
+    });
     document.body.appendChild(actionMenu);
     await microtasksFinished();
 
@@ -796,11 +822,6 @@ suite('ContextualActionMenu', () => {
     actionMenu.tabSuggestions = Array(50).fill({
       tabId: 1,
       title: 'Tab',
-      url: {url: 'about:blank'},
-      lastActiveTime: {internalValue: 0n},
-      showInCurrentTabChip: false,
-      showInPreviousTabChip: false,
-      lastActive: {internalValue: 0n},
     });
     await microtasksFinished();
 
@@ -819,15 +840,10 @@ suite('ContextualActionMenu', () => {
       'Constrain height if space below plus menu button is < menu height',
       async () => {
     // Arrange: Provide 20 tab suggestions to ensure height exceeds 540px.
-    actionMenu.tabSuggestions = Array(20).fill({
+    actionMenu.tabSuggestions = Array(20).fill(createTabSuggestion({
       tabId: 1,
       title: 'Tab Item',
-      url: {url: 'about:blank'},
-      lastActiveTime: {internalValue: 0n},
-      showInCurrentTabChip: false,
-      showInPreviousTabChip: false,
-      lastActive: {internalValue: 0n},
-    });
+    }));
     actionMenu.inputState = new MockInputState({
       allowedInputTypes: [InputType.kBrowserTab],
       toolsSectionConfig: {header: ''},
@@ -861,19 +877,14 @@ suite('ContextualActionMenu', () => {
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
     actionMenu.tabSuggestions = [
-      {
+      createTabSuggestion({
         tabId: 1,
         title: 'Tab 1',
-        url: {url: 'about:blank'},
-        lastActiveTime: {internalValue: 0n},
-        showInCurrentTabChip: false,
-        showInPreviousTabChip: false,
-        lastActive: {internalValue: 0n},
-      } as any,
+      }),
     ];
     actionMenu.inputState = new MockInputState({
-                              allowedInputTypes: [InputType.kBrowserTab],
-                            }) as any;
+      allowedInputTypes: [InputType.kBrowserTab],
+    });
     document.body.appendChild(actionMenu);
     await microtasksFinished();
 
@@ -889,9 +900,7 @@ suite('ContextualActionMenu', () => {
     // Verify that the flyout is hidden initially.
     assertTrue(flyout.hidden);
 
-    // Simulate an ArrowRight keydown event on the trigger to expand the flyout.
-    trigger.dispatchEvent(
-        new KeyboardEvent('keydown', {key: 'ArrowRight', bubbles: true}));
+    triggerKeyDown(trigger, 'ArrowRight');
     await actionMenu.updateComplete;
     await new Promise(resolve => requestAnimationFrame(resolve));
     await microtasksFinished();
@@ -902,15 +911,12 @@ suite('ContextualActionMenu', () => {
     // Assert that the keyboard focus has successfully moved to the first button
     // inside the flyout.
     const firstTabItem =
-        flyout.querySelector<HTMLElement>('button.dropdown-item');
+        flyout.querySelector<HTMLElement>('button.dropdown-item')!;
 
     assertTrue(!!firstTabItem);
     assertEquals(firstTabItem, actionMenu.shadowRoot.activeElement);
 
-    // Simulate an ArrowLeft keydown event on the inner item to collapse the
-    // flyout.
-    firstTabItem.dispatchEvent(
-        new KeyboardEvent('keydown', {key: 'ArrowLeft', bubbles: true}));
+    triggerKeyDown(firstTabItem, 'ArrowLeft');
     await actionMenu.updateComplete;
     await new Promise(resolve => requestAnimationFrame(resolve));
     await microtasksFinished();
@@ -931,30 +937,20 @@ suite('ContextualActionMenu', () => {
         actionMenu.remove();
         actionMenu =
             document.createElement('cr-composebox-contextual-action-menu');
-        const tab1: TabInfo = {
+        const tab1 = createTabSuggestion({
           tabId: 1,
           title: 'Tab 1',
-          url: {url: 'about:blank'},
-          lastActiveTime: {internalValue: 0n},
-          showInCurrentTabChip: false,
-          showInPreviousTabChip: false,
-          lastActive: {internalValue: 0n},
-        } as any;
-        const tab2: TabInfo = {
+        });
+        const tab2 = createTabSuggestion({
           tabId: 2,
           title: 'Tab 2',
-          url: {url: 'about:blank'},
-          lastActiveTime: {internalValue: 0n},
-          showInCurrentTabChip: false,
-          showInPreviousTabChip: false,
-          lastActive: {internalValue: 0n},
-        } as any;
+        });
 
         actionMenu.tabSuggestions = [tab1, tab2];
         actionMenu.aimThreadRestoredTabs = [tab1];
         actionMenu.inputState = new MockInputState({
-                                  allowedInputTypes: [InputType.kBrowserTab],
-                                }) as any;
+          allowedInputTypes: [InputType.kBrowserTab],
+        });
         document.body.appendChild(actionMenu);
         await microtasksFinished();
 
@@ -968,10 +964,7 @@ suite('ContextualActionMenu', () => {
         assertTrue(!!trigger);
         assertTrue(!!flyout);
 
-        // Simulate an ArrowRight keydown event on the trigger to expand the
-        // flyout.
-        trigger.dispatchEvent(
-            new KeyboardEvent('keydown', {key: 'ArrowRight', bubbles: true}));
+        triggerKeyDown(trigger, 'ArrowRight');
         await actionMenu.updateComplete;
         await new Promise(resolve => requestAnimationFrame(resolve));
         await microtasksFinished();
@@ -1001,15 +994,10 @@ suite('ContextualActionMenu', () => {
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
     actionMenu.tabSuggestions = [
-      {
+      createTabSuggestion({
         tabId: 1,
         title: 'Tab 1',
-        url: {url: 'about:blank'},
-        lastActiveTime: {internalValue: 0n},
-        showInCurrentTabChip: false,
-        showInPreviousTabChip: false,
-        lastActive: {internalValue: 0n},
-      } as any,
+      }),
     ];
     actionMenu.inputState = new MockInputState({
       allowedInputTypes: [InputType.kBrowserTab],
@@ -1039,19 +1027,16 @@ suite('ContextualActionMenu', () => {
   test(
       'Tabs counter visibility with restored tabs and no suggestions',
       async () => {
-        loadTimeData.overrideValues(
-            {contextManagementInComposeboxEnabled: true});
+        loadTimeData.overrideValues({
+          contextManagementInComposeboxEnabled: true,
+        });
         actionMenu.remove();
         actionMenu =
             document.createElement('cr-composebox-contextual-action-menu');
-        const restoredTab: TabInfo = {
+        const restoredTab = createTabSuggestion({
           tabId: 1,
           title: 'Restored Tab',
-          url: 'about:blank',
-          showInCurrentTabChip: false,
-          showInPreviousTabChip: false,
-          lastActive: {internalValue: 0n},
-        };
+        });
         actionMenu.aimThreadRestoredTabs = [restoredTab];
         actionMenu.tabSuggestions = [restoredTab];
         actionMenu.inputState = new MockInputState({
@@ -1079,30 +1064,19 @@ suite('ContextualActionMenu', () => {
 
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
-    actionMenu['contextManagementInComposeboxEnabled_'] = true;
-    const tab1: TabInfo = {
+    const tab1 = createTabSuggestion({
       tabId: 1,
       title: 'Tab 1',
-      url: {url: 'about:blank'},
-      lastActiveTime: {internalValue: 0n},
-      showInCurrentTabChip: false,
-      showInPreviousTabChip: false,
-      lastActive: {internalValue: 0n},
-    } as any;
-    const tab2: TabInfo = {
+    });
+    const tab2 = createTabSuggestion({
       tabId: 2,
       title: 'Tab 2',
-      url: {url: 'about:blank'},
-      lastActiveTime: {internalValue: 0n},
-      showInCurrentTabChip: false,
-      showInPreviousTabChip: false,
-      lastActive: {internalValue: 0n},
-    } as any;
+    });
 
     actionMenu.tabSuggestions = [tab1, tab2];
     actionMenu.inputState = new MockInputState({
-                              allowedInputTypes: [InputType.kBrowserTab],
-                            }) as any;
+      allowedInputTypes: [InputType.kBrowserTab],
+    });
     document.body.appendChild(actionMenu);
     await microtasksFinished();
 
@@ -1158,50 +1132,29 @@ suite('ContextualActionMenu', () => {
 
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
-    actionMenu['contextManagementInComposeboxEnabled_'] = true;
-    const tab1: TabInfo = {
+    const tab1 = createTabSuggestion({
       tabId: 1,
       title: 'Tab 1',
-      url: {url: 'about:blank'},
-      lastActiveTime: {internalValue: 0n},
-      showInCurrentTabChip: false,
-      showInPreviousTabChip: false,
-      lastActive: {internalValue: 0n},
-    } as any;
-    const tab2: TabInfo = {
+    });
+    const tab2 = createTabSuggestion({
       tabId: 2,
       title: 'Tab 2',
-      url: {url: 'about:blank'},
-      lastActiveTime: {internalValue: 0n},
-      showInCurrentTabChip: false,
-      showInPreviousTabChip: false,
-      lastActive: {internalValue: 0n},
-    } as any;
-    const tab3: TabInfo = {
+    });
+    const tab3 = createTabSuggestion({
       tabId: 3,
       title: 'Tab 3',
-      url: {url: 'about:blank'},
-      lastActiveTime: {internalValue: 0n},
-      showInCurrentTabChip: false,
-      showInPreviousTabChip: false,
-      lastActive: {internalValue: 0n},
-    } as any;
-    const tab4: TabInfo = {
+    });
+    const tab4 = createTabSuggestion({
       tabId: 4,
       title: 'Tab 4',
-      url: {url: 'about:blank'},
-      lastActiveTime: {internalValue: 0n},
-      showInCurrentTabChip: false,
-      showInPreviousTabChip: false,
-      lastActive: {internalValue: 0n},
-    } as any;
+    });
 
     actionMenu.tabSuggestions = [tab1, tab2, tab3, tab4];
     // Select 2 tabs to reach the limit of 2, so that unselected tabs (2 & 4) are disabled.
     actionMenu.disabledTabIds = new Map([[1, 'uuid1'], [3, 'uuid3']]);
     actionMenu.inputState = new MockInputState({
-                              allowedInputTypes: [InputType.kBrowserTab],
-                            }) as any;
+      allowedInputTypes: [InputType.kBrowserTab],
+    });
     document.body.appendChild(actionMenu);
     await microtasksFinished();
 
@@ -1266,10 +1219,9 @@ suite('ContextualActionMenu', () => {
 
     // Initially, there is no tab data.
     actionMenu.tabSuggestions = [];
-    actionMenu.inputState =
-        new MockInputState({
-          allowedInputTypes: [InputType.kBrowserTab, InputType.kLensImage],
-        }) as any;
+    actionMenu.inputState = new MockInputState({
+      allowedInputTypes: [InputType.kBrowserTab, InputType.kLensImage],
+    });
     document.body.appendChild(actionMenu);
     await microtasksFinished();
 
@@ -1286,15 +1238,10 @@ suite('ContextualActionMenu', () => {
 
     // Simulate the asynchronous return of tab data from the backend.
     actionMenu.tabSuggestions = [
-      {
+      createTabSuggestion({
         tabId: 1,
         title: 'Tab 1',
-        url: {url: 'about:blank'},
-        lastActiveTime: {internalValue: 0n},
-        showInCurrentTabChip: false,
-        showInPreviousTabChip: false,
-        lastActive: {internalValue: 0n},
-      } as any,
+      }),
     ];
 
     await actionMenu.updateComplete;
@@ -1321,17 +1268,16 @@ suite('ContextualActionMenu', () => {
 
         actionMenu.smartTabSharingActive = true;
         actionMenu.tabSuggestions = [];
-        actionMenu.inputState =
-            new MockInputState({
-              allowedInputTypes: [InputType.kBrowserTab, InputType.kLensImage],
-            }) as any;
+        actionMenu.inputState = new MockInputState({
+          allowedInputTypes: [InputType.kBrowserTab, InputType.kLensImage],
+        });
         document.body.appendChild(actionMenu);
         await microtasksFinished();
 
         actionMenu.showAt(actionMenu);
         await actionMenu.updateComplete;
 
-        (actionMenu as any).onWindowBlur_ = () => {};
+        asInternal(actionMenu).onWindowBlur_ = () => {};
 
         const trigger = $$(actionMenu, '#smartTabSharingItem') as HTMLElement;
         const imageUpload = $$(actionMenu, '#imageUpload') as HTMLElement;
@@ -1341,14 +1287,7 @@ suite('ContextualActionMenu', () => {
         trigger.focus();
         assertEquals(trigger, actionMenu.shadowRoot.activeElement);
 
-        trigger.dispatchEvent(new KeyboardEvent('keydown', {
-          key: 'ArrowDown',
-          code: 'ArrowDown',
-          keyCode: 40,
-          bubbles: true,
-          composed: true,
-          cancelable: true,
-        } as any));
+        triggerKeyDown(trigger, 'ArrowDown');
 
         await microtasksFinished();
 
@@ -1363,19 +1302,14 @@ suite('ContextualActionMenu', () => {
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
     actionMenu.tabSuggestions = [
-      {
+      createTabSuggestion({
         tabId: 1,
         title: 'Tab 1',
-        url: {url: 'about:blank'},
-        lastActiveTime: {internalValue: 0n},
-        showInCurrentTabChip: false,
-        showInPreviousTabChip: false,
-        lastActive: {internalValue: 0n},
-      } as any,
+      }),
     ];
     actionMenu.inputState = new MockInputState({
       allowedInputTypes: [InputType.kBrowserTab],
-    }) as any;
+    });
     document.body.appendChild(actionMenu);
     await microtasksFinished();
 
@@ -1445,17 +1379,15 @@ suite('ContextualActionMenu', () => {
   });
 
   test('Favicon group rendered in action menu', async () => {
-    loadTimeData.overrideValues({ contextManagementInComposeboxEnabled: true });
+    loadTimeData.overrideValues({
+      contextManagementInComposeboxEnabled: true,
+    });
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
-    const tabInfo: TabInfo = {
+    const tabInfo = createTabSuggestion({
       tabId: 1,
       title: 'Tab 1',
-      url: 'about:blank',
-      showInCurrentTabChip: false,
-      showInPreviousTabChip: false,
-      lastActive: {internalValue: 0n},
-    };
+    });
     actionMenu.tabSuggestions = [tabInfo];
     actionMenu.inputState = new MockInputState({
       allowedInputTypes: [InputType.kBrowserTab],
@@ -1484,15 +1416,10 @@ suite('ContextualActionMenu', () => {
         actionMenu.fileNum = 1;  // Set fileNum to 1 (limit reached)
 
         // Provide tab suggestion.
-        const tabInfo = {
+        const tabInfo = createTabSuggestion({
           tabId: 1,
           title: 'Google',
-          url: 'about:blank',
-          lastActiveTime: {internalValue: 0n},
-          showInCurrentTabChip: false,
-          showInPreviousTabChip: false,
-          lastActive: {internalValue: 0n},
-        };
+        });
         actionMenu.tabSuggestions = [tabInfo];
 
         // inputState allows everything and disables nothing.
@@ -1534,15 +1461,10 @@ suite('ContextualActionMenu', () => {
     actionMenu.uploadButtonDisabled = true;
 
     // Provide tab suggestion.
-    const tabInfo = {
+    const tabInfo = createTabSuggestion({
       tabId: 1,
       title: 'Google',
-      url: 'about:blank',
-      lastActiveTime: {internalValue: 0n},
-      showInCurrentTabChip: false,
-      showInPreviousTabChip: false,
-      lastActive: {internalValue: 0n},
-    };
+    });
     actionMenu.tabSuggestions = [tabInfo];
 
     // inputState allows everything and disables nothing.
@@ -1612,14 +1534,10 @@ suite('ContextualActionMenu', () => {
     });
     actionMenu.remove();
     actionMenu = document.createElement('cr-composebox-contextual-action-menu');
-    const tabInfo: TabInfo = {
+    const tabInfo = createTabSuggestion({
       tabId: 1,
       title: 'Recent Tab',
-      url: 'about:blank',
-      showInCurrentTabChip: false,
-      showInPreviousTabChip: false,
-      lastActive: {internalValue: 0n},
-    };
+    });
     actionMenu.tabSuggestions = [tabInfo];
     actionMenu.recentTabId = tabInfo.tabId;
     actionMenu.inputState = new MockInputState({
@@ -1689,14 +1607,10 @@ suite('ContextualActionMenu', () => {
       metricsSource_: 'NewTabPage',
     });
 
-    const tabInfo: TabInfo = {
+    const tabInfo = createTabSuggestion({
       tabId: 1,
       title: 'Tab 1',
-      url: 'about:blank',
-      showInCurrentTabChip: false,
-      showInPreviousTabChip: false,
-      lastActive: {internalValue: 0n},
-    };
+    });
     actionMenu.tabSuggestions = [tabInfo];
     actionMenu.inputState = new MockInputState({
       allowedInputTypes: [InputType.kBrowserTab],
@@ -1731,14 +1645,10 @@ suite('ContextualActionMenu', () => {
           metricsSource_: 'contextual-tasks',
         });
 
-        const tabInfo: TabInfo = {
+        const tabInfo = createTabSuggestion({
           tabId: 1,
           title: 'Tab 1',
-          url: 'about:blank',
-          showInCurrentTabChip: false,
-          showInPreviousTabChip: false,
-          lastActive: {internalValue: 0n},
-        };
+        });
         actionMenu.tabSuggestions = [tabInfo];
         actionMenu.inputState = new MockInputState({
           allowedInputTypes: [InputType.kBrowserTab],
@@ -1760,67 +1670,67 @@ suite('ContextualActionMenu', () => {
       });
 
   test(
-    'Menu closes when a selected tab is clicked (deselected) in NTP/Omnibox mode',
-    async () => {
-      const tabInfo: TabInfo = {
-        tabId: 1,
-        title: 'Tab 1',
-        url: 'about:blank',
-        showInCurrentTabChip: false,
-        showInPreviousTabChip: false,
-        lastActive: { internalValue: 0n },
-      };
-      loadTimeData.overrideValues({
-        contextManagementInComposeboxEnabled: true,
-        composeboxContextMenuEnableMultiTabSelection: true,
+      'Menu closes when a selected tab is clicked' +
+          ' (deselected) in NTP/Omnibox mode',
+      async () => {
+        const tabInfo = createTabSuggestion({
+          tabId: 1,
+          title: 'Tab 1',
+        });
+        loadTimeData.overrideValues({
+          contextManagementInComposeboxEnabled: true,
+          composeboxContextMenuEnableMultiTabSelection: true,
+        });
+        actionMenu.remove();
+        actionMenu =
+            document.createElement('cr-composebox-contextual-action-menu');
+        Object.assign(actionMenu, {
+          metricsSource_: 'NewTabPage',
+          disabledTabIds: new Map([[1, 'some-token']]),
+          contextManagementInComposeboxEnabled: true,
+        });
+
+        actionMenu.tabSuggestions = [tabInfo];
+        actionMenu.inputState = new MockInputState({
+          allowedInputTypes: [InputType.kBrowserTab],
+        });
+        document.body.appendChild(actionMenu);
+        await microtasksFinished();
+
+        actionMenu.showAt(actionMenu);
+        Object.assign(actionMenu, {shareTabsFlyoutOpen_: true});
+        await microtasksFinished();
+        assertTrue(actionMenu.$.menu.open);
+
+        const tabButton = actionMenu.$.menu.querySelector<HTMLButtonElement>(
+            '.share-tabs-flyout button.dropdown-item')!;
+        tabButton.click();
+        await microtasksFinished();
+
+        assertFalse(actionMenu.$.menu.open);
       });
-      actionMenu.remove();
-      actionMenu = document.createElement('cr-composebox-contextual-action-menu');
-      Object.assign(actionMenu, {
-        metricsSource_: 'NewTabPage',
-        disabledTabIds: new Map([[1, 'some-token']]),
-      });
 
-      actionMenu.tabSuggestions = [tabInfo];
-      actionMenu.inputState = new MockInputState({
-        allowedInputTypes: [InputType.kBrowserTab],
-      });
-      document.body.appendChild(actionMenu);
-      await microtasksFinished();
-
-      actionMenu.showAt(actionMenu);
-      Object.assign(actionMenu, { shareTabsFlyoutOpen_: true });
-      await microtasksFinished();
-      assertTrue(actionMenu.$.menu.open);
-
-      const tabButton = actionMenu.$.menu.querySelector<HTMLButtonElement>(
-        '.share-tabs-flyout button.dropdown-item')!;
-      tabButton.click();
-      await microtasksFinished();
-
-      assertFalse(actionMenu.$.menu.open);
-    });
   test(
       'Recent tab suffix follows the correct tab after reordering',
       async () => {
-        const tab1: TabInfo = {
+        const tab1 = createTabSuggestion({
           tabId: 1,
           title: 'Tab 1',
           url: 'about:blank/1',
-          showInCurrentTabChip: false,
-          showInPreviousTabChip: false,
-          lastActive: {internalValue: 0n},
-        };
-        const tab2: TabInfo = {
+        });
+        const tab2 = createTabSuggestion({
           tabId: 2,
           title: 'Tab 2',
           url: 'about:blank/2',
-          showInCurrentTabChip: false,
-          showInPreviousTabChip: false,
-          lastActive: {internalValue: 0n},
-        };
+        });
 
-        actionMenu['contextManagementInComposeboxEnabled_'] = true;
+        loadTimeData.overrideValues({
+          contextManagementInComposeboxEnabled: true,
+          composeboxContextMenuEnableMultiTabSelection: true,
+        });
+        actionMenu.remove();
+        actionMenu =
+            document.createElement('cr-composebox-contextual-action-menu');
 
         actionMenu.inputState = new MockInputState({
           allowedInputTypes: [InputType.kBrowserTab],
@@ -1831,6 +1741,7 @@ suite('ContextualActionMenu', () => {
         // Backend initially provides Tab 1 as the first (most recent) item.
         actionMenu.tabSuggestions = [tab1, tab2];
         actionMenu.recentTabId = tab1.tabId;
+        document.body.appendChild(actionMenu);
 
         actionMenu.showAt(actionMenu);
         await microtasksFinished();
@@ -1889,14 +1800,10 @@ suite('ContextualActionMenu', () => {
         actionMenu =
             document.createElement('cr-composebox-contextual-action-menu');
 
-        const tabInfo = {
+        const tabInfo = createTabSuggestion({
           tabId: 1,
           title: 'Google Docs',
-          url: 'about:blank',
-          showInCurrentTabChip: false,
-          showInPreviousTabChip: false,
-          lastActive: {internalValue: 0n},
-        };
+        });
         actionMenu.tabSuggestions = [tabInfo];
         actionMenu.recentTabId = tabInfo.tabId;
         actionMenu.inputState = new MockInputState({
@@ -1940,14 +1847,10 @@ suite('ContextualActionMenu', () => {
           document.createElement('cr-composebox-contextual-action-menu');
       actionMenu.smartTabSharingVisible = true;
       actionMenu.tabSuggestions = [
-        {
+        createTabSuggestion({
           tabId: 1,
           title: 'Tab 1',
-          url: 'about:blank',
-          showInCurrentTabChip: false,
-          showInPreviousTabChip: false,
-          lastActive: {internalValue: 0n},
-        },
+        }),
       ];
       actionMenu.inputState = new MockInputState({
         allowedInputTypes: [InputType.kBrowserTab],
@@ -2079,16 +1982,12 @@ suite('ContextualActionMenu', () => {
           actionMenu.disabledTabIds = new Map();
           actionMenu.aimThreadRestoredTabs = [];
           actionMenu.tabSuggestions = [
-            {
+            createTabSuggestion({
               tabId: 1,
               title: 'Tab 1',
-              url: 'about:blank',
-              showInCurrentTabChip: false,
-              showInPreviousTabChip: false,
-              lastActive: {internalValue: 0n},
-            },
+            }),
           ];
-          const selectedTabs = (actionMenu as any).getSelectedTabs_();
+          const selectedTabs = asInternal(actionMenu).getSelectedTabs_();
           assertEquals(0, selectedTabs.length);
         });
 
@@ -2096,30 +1995,18 @@ suite('ContextualActionMenu', () => {
         'returns matched tabs in reverse order of' +
             ' addition to disabled and concatenated with restored',
         () => {
-          const tab1: TabInfo = {
+          const tab1 = createTabSuggestion({
             tabId: 1,
             title: 'Tab 1',
-            url: 'about:blank',
-            showInCurrentTabChip: false,
-            showInPreviousTabChip: false,
-            lastActive: {internalValue: 0n},
-          };
-          const tab2: TabInfo = {
+          });
+          const tab2 = createTabSuggestion({
             tabId: 2,
             title: 'Tab 2',
-            url: 'about:blank',
-            showInCurrentTabChip: false,
-            showInPreviousTabChip: false,
-            lastActive: {internalValue: 0n},
-          };
-          const tab3: TabInfo = {
+          });
+          const tab3 = createTabSuggestion({
             tabId: 3,
             title: 'Tab 3',
-            url: 'about:blank',
-            showInCurrentTabChip: false,
-            showInPreviousTabChip: false,
-            lastActive: {internalValue: 0n},
-          };
+          });
 
           actionMenu.tabSuggestions = [tab1, tab2, tab3];
 
@@ -2129,7 +2016,7 @@ suite('ContextualActionMenu', () => {
           disabledTabIds.set(3, 'token3');
           actionMenu.disabledTabIds = disabledTabIds;
 
-          const selectedTabs = (actionMenu as any).getSelectedTabs_();
+          const selectedTabs = asInternal(actionMenu).getSelectedTabs_();
           assertEquals(3, selectedTabs.length);
           // Given the displayed tabs are reversed (least to most recent),
           // tab3 should be first, then tab2, and restored tabs are concatenated
@@ -2140,14 +2027,10 @@ suite('ContextualActionMenu', () => {
         });
 
     test('filters out tab IDs not found in tabSuggestions', () => {
-      const tab1: TabInfo = {
+      const tab1 = createTabSuggestion({
         tabId: 1,
         title: 'Tab 1',
-        url: 'about:blank',
-        showInCurrentTabChip: false,
-        showInPreviousTabChip: false,
-        lastActive: {internalValue: 0n},
-      };
+      });
       actionMenu.tabSuggestions = [tab1];
 
       actionMenu.aimThreadRestoredTabs = [];
@@ -2156,7 +2039,7 @@ suite('ContextualActionMenu', () => {
       disabledTabIds.set(5, 'token5');
       actionMenu.disabledTabIds = disabledTabIds;
 
-      const selectedTabs = (actionMenu as any).getSelectedTabs_();
+      const selectedTabs = asInternal(actionMenu).getSelectedTabs_();
       // Tab 5 is filtered out because it is not found in tabSuggestions.
       assertEquals(1, selectedTabs.length);
       assertEquals(tab1, selectedTabs[0]);
@@ -2370,7 +2253,7 @@ suite('ContextualActionMenu', () => {
     test(
         'Does not anchor to the right if obstructed by voice/lens buttons',
         async () => {
-          const mockSearchbox = document.createElement('ntp-searchbox') as any;
+          const mockSearchbox = document.createElement('ntp-searchbox');
           const shadowRoot = mockSearchbox.attachShadow({mode: 'open'});
 
           const mockVoiceButton = document.createElement('button');
@@ -2592,7 +2475,7 @@ suite('ContextualActionMenu', () => {
       assertTrue(actionMenu.shareTabsFlyoutOpen);
 
       // resetShareTabsFlyout makes it false
-      actionMenu['resetShareTabsFlyout_']();
+      asInternal(actionMenu).resetShareTabsFlyout_();
       assertFalse(actionMenu.shareTabsFlyoutOpen);
     });
 
@@ -2600,7 +2483,7 @@ suite('ContextualActionMenu', () => {
         'showAt calls updateFlyoutPosition if open, same with updated()',
         async () => {
           let updateFlyoutPositionCalled = false;
-          actionMenu['updateFlyoutPosition_'] = () => {
+          asInternal(actionMenu).updateFlyoutPosition_ = () => {
             updateFlyoutPositionCalled = true;
           };
 
@@ -2634,7 +2517,7 @@ suite('ContextualActionMenu', () => {
           tabButton.click();
 
           let scheduleCloseTimerCalled = false;
-          actionMenu['scheduleCloseTimer_'] = () => {
+          asInternal(actionMenu).scheduleCloseTimer_ = () => {
             scheduleCloseTimerCalled = true;
           };
 
@@ -2646,14 +2529,15 @@ suite('ContextualActionMenu', () => {
     test(
         'deleteTabContext, addTabContext close menu if ntp flag is off', () => {
           // Set to NTP source and flag off
-          actionMenu['metricsSource_'] = 'NewTabPage';
-          actionMenu['closeMenuOnSelect'] = true;  // this means ntp flag is off
+          asInternal(actionMenu).metricsSource_ = 'NewTabPage';
+          asInternal(actionMenu).closeMenuOnSelect =
+              true;  // this means ntp flag is off
 
           actionMenu.showAt(actionMenu);
           assertTrue(actionMenu.$.menu.open);
 
           // test addTabContext
-          actionMenu['addTabContext_']({
+          asInternal(actionMenu).addTabContext_({
             tabId: 1,
             title: 'Test',
             url: 'about:blank',
@@ -2664,7 +2548,7 @@ suite('ContextualActionMenu', () => {
           assertTrue(actionMenu.$.menu.open);
 
           // test deleteTabContext
-          actionMenu['deleteTabContext_']('0');
+          asInternal(actionMenu).deleteTabContext_('0');
           assertFalse(actionMenu.$.menu.open);
         });
   });
@@ -2841,15 +2725,11 @@ suite('ContextualActionMenu', () => {
 
     test('Share tabs flyout scrollbar styles', async () => {
       // Arrange: Ensure tab suggestions exist so the flyout can be triggered.
-      const tabInfo = {
+      const tabInfo = createTabSuggestion({
         tabId: 101,
         title: 'Scrollbar Test Tab 1',
-        url: {url: 'https://example.com/1'},
-        lastActiveTime: {internalValue: 0n},
-        showInCurrentTabChip: false,
-        showInPreviousTabChip: false,
-        lastActive: {internalValue: 0n},
-      } as any;
+        url: 'about:blank/1',
+      });
       actionMenu.tabSuggestions = Array(15).fill(tabInfo);
       actionMenu.inputState = new MockInputState({
         allowedInputTypes: [InputType.kBrowserTab],
