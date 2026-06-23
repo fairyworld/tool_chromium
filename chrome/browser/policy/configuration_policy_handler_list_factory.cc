@@ -472,6 +472,11 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kGeminiSettings,
     prefs::kGeminiSettings,
     base::Value::Type::INTEGER },
+#if !BUILDFLAG(IS_ANDROID)
+  { key::kVoiceTypingSettings,
+    prefs::kVoiceTypingSettings,
+    base::Value::Type::INTEGER },
+#endif
   { key::kAllowDeletingBrowserHistory,
     prefs::kAllowDeletingBrowserHistory,
     base::Value::Type::BOOLEAN },
@@ -3644,6 +3649,10 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       key::kGeminiSettings, prefs::kGeminiSettings,
       GenAiDefaultSettingsPolicyHandler::PolicyValueToPrefMap(
           {{0, 0}, {1, 0}, {2, 1}}));
+#if !BUILDFLAG(IS_ANDROID)
+  gen_ai_default_policies.emplace_back(key::kVoiceTypingSettings,
+                                       prefs::kVoiceTypingSettings);
+#endif
   // Default value for SearchContentSharingSettings is 0 if
   // GenAiDefaultSettings value is 0 or 1, or 1 if the latter is 2.
   gen_ai_default_policies.emplace_back(

@@ -1775,6 +1775,7 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   RegisterBrowserUserPrefs(registry);
   registry->RegisterBooleanPref(prefs::kRestrictYouTubeCookiesDeletion, false);
   RegisterGeminiSettingsPrefs(registry);
+  registry->RegisterIntegerPref(prefs::kVoiceTypingSettings, 0);
   RegisterPrefersDefaultScrollbarStylesPrefs(registry);
   RegisterSafetyHubProfilePrefs(registry);
 #if BUILDFLAG(IS_CHROMEOS)

@@ -1463,6 +1463,7 @@ policies:
   1462: DefaultAutomaticDownloadsSetting
   1463: AutomaticDownloadsAllowedForUrls
   1464: AutomaticDownloadsBlockedForUrls
+  1465: VoiceTypingSettings
 
 atomic_groups:
   1: Homepage

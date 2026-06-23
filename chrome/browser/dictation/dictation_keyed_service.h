@@ -77,6 +77,8 @@ class DictationKeyedService : public KeyedService,
   DictationMultiplexer& multiplexer() { return multiplexer_; }
 
  private:
+  bool IsDisabledByPolicy() const;
+
   raw_ptr<Profile> profile_;
 
   DictationMultiplexer multiplexer_;

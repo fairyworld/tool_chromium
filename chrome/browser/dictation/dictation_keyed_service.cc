@@ -13,8 +13,14 @@
 #include "chrome/browser/dictation/target.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
+#include "chrome/common/pref_names.h"
+#include "components/prefs/pref_service.h"
 
 namespace dictation {
+
+namespace {
+constexpr int kVoiceTypingSettingsDisabled = 2;
+}  // namespace
 
 // static
 DictationKeyedService* DictationKeyedService::Get(
@@ -32,6 +38,9 @@ DictationKeyedService::SessionState::~SessionState() = default;
 DictationKeyedService::DictationKeyedService(Profile* profile)
     : profile_(profile) {
   CHECK(base::FeatureList::IsEnabled(kDictation));
+  // TODO(crbug.com/525506786): Observe prefs::kVoiceTypingSettings to end
+  // active sessions and disable the context menu item in real-time when the
+  // policy is disabled.
 }
 
 DictationKeyedService::~DictationKeyedService() = default;
@@ -57,6 +66,7 @@ std::unique_ptr<SessionUi> DictationKeyedService::CreateUi(
 
 void DictationKeyedService::StartSession(BrowserWindowInterface& window,
                                          std::unique_ptr<Target> target) {
+  CHECK(!IsDisabledByPolicy());
   CHECK(!session_);
 
   session_.emplace(*this, window.GetWeakPtr());
@@ -73,13 +83,28 @@ void DictationKeyedService::EndSession() {
 }
 
 bool DictationKeyedService::ShouldShowContextMenuItem() const {
+  if (IsDisabledByPolicy()) {
+    return false;
+  }
   return !session_;
 }
 
 void DictationKeyedService::ContextMenuHandler(BrowserWindowInterface& window) {
+  if (IsDisabledByPolicy()) {
+    // TODO(crbug.com/525506786): Disable the menu item on policy change so
+    // this is not reachable.
+    return;
+  }
+
   // TODO(crbug.com/508729855) Populate target with information about the
   // targeted field from context menu params.
   StartSession(window, std::make_unique<Target>());
+}
+
+bool DictationKeyedService::IsDisabledByPolicy() const {
+  CHECK(profile_);
+  return profile_->GetPrefs()->GetInteger(prefs::kVoiceTypingSettings) ==
+         kVoiceTypingSettingsDisabled;
 }
 
 }  // namespace dictation
