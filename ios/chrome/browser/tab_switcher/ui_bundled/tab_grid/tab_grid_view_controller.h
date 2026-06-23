@@ -42,6 +42,7 @@ enum class IPHDismissalReasonType;
 @protocol TabGridConsumer;
 @protocol TabGridMutator;
 @protocol TabGridToolbarsCommandsWrangler;
+@class TabGridViewController;
 @class TabGridTopToolbar;
 @class TabGroupsPanelViewController;
 
@@ -90,6 +91,10 @@ enum class TabGridPageConfiguration {
 
 // Closes the current active tab.
 - (void)closeCurrentTab;
+
+// Notifies the delegate that the current page has changed.
+- (void)tabGridViewController:(TabGridViewController*)tabGridViewController
+         didChangeCurrentPage:(TabGridPage)currentPage;
 
 @end
 

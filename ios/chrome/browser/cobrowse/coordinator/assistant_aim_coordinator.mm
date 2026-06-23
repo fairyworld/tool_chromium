@@ -26,6 +26,7 @@
 #import "ios/chrome/browser/composebox/public/composebox_focus_params.h"
 #import "ios/chrome/browser/composebox/public/composebox_theme.h"
 #import "ios/chrome/browser/composebox/public/features.h"
+#import "ios/chrome/browser/metrics/model/activity_reporter.h"
 #import "ios/chrome/browser/shared/coordinator/scene/scene_state.h"
 #import "ios/chrome/browser/shared/coordinator/scene/state/tab_grid_state.h"
 #import "ios/chrome/browser/shared/model/browser/browser.h"
@@ -84,12 +85,18 @@ class AssistantAIMUIStateProvider
 
   // Handler for container related interactions.
   __weak id<AssistantContainerCommands> _containerHandler;
+  ActivityReporter* _activityReporter;
 }
 
 - (instancetype)initWithBaseViewController:(UIViewController*)viewController
                                    browser:(Browser*)browser {
   CHECK(IsAimCobrowseEligible(browser->GetProfile()));
-  return [super initWithBaseViewController:viewController browser:browser];
+  self = [super initWithBaseViewController:viewController browser:browser];
+  if (self) {
+    _activityReporter =
+        [[ActivityReporter alloc] initWithDomain:ActivityReportDomainCobrowse];
+  }
+  return self;
 }
 
 - (void)start {
@@ -101,6 +108,7 @@ class AssistantAIMUIStateProvider
   if (self.browser->GetProfile()->IsOffTheRecord()) {
     return;
   }
+  [_activityReporter reportActive];
 
   [self.browser->GetSceneState().tabGridState addObserver:self];
 
@@ -198,6 +206,7 @@ class AssistantAIMUIStateProvider
     _viewController = nil;
     [self dismissAssistantContainerAnimated:NO];
   }
+  [_activityReporter reportInactive];
 }
 
 - (void)setVisible:(BOOL)visible {
@@ -209,6 +218,9 @@ class AssistantAIMUIStateProvider
       // Restore `_currentDetent` in case `showAssistantContainerWithContent:`
       // triggered intermediate layout passes that incorrectly reset it.
       _currentDetent = targetDetent;
+
+      [_activityReporter reportActive];
+
       [_containerHandler
           animateAssistantContainerToDetent:_currentDetent
                                    duration:kSheetDetentAnimationDuration
@@ -217,6 +229,7 @@ class AssistantAIMUIStateProvider
   } else {
     _isHiding = YES;
     [self dismissAssistantContainerAnimated:YES];
+    [_activityReporter reportInactive];
   }
 }
 

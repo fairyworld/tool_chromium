@@ -63,6 +63,7 @@
 #import "ios/chrome/browser/home_customization/coordinator/home_customization_delegate.h"
 #import "ios/chrome/browser/home_customization/utils/home_customization_constants.h"
 #import "ios/chrome/browser/lens/ui_bundled/lens_entrypoint.h"
+#import "ios/chrome/browser/metrics/model/activity_reporter.h"
 #import "ios/chrome/browser/ntp/model/new_tab_page_tab_helper.h"
 #import "ios/chrome/browser/ntp/model/new_tab_page_util.h"
 #import "ios/chrome/browser/ntp/search_engine_logo/mediator/search_engine_logo_mediator.h"
@@ -301,6 +302,7 @@
   SearchEngineLogoMediator* _searchEngineLogoMediator;
   // The Safari data import used by the content suggestions.
   SafariDataImportExportCoordinator* _safariDataImportExportCoordinator;
+  ActivityReporterWithIncognito* _activityReporter;
 }
 
 @synthesize baseViewController = _baseViewController;
@@ -316,6 +318,8 @@
     _componentFactory = componentFactory;
     _containerViewController = [[UIViewController alloc] init];
     _canfocusAccessibilityOmniboxWhenViewAppears = YES;
+    _activityReporter = [[ActivityReporterWithIncognito alloc]
+        initWithDomain:ActivityReportDomainNtp];
   }
   return self;
 }
@@ -401,6 +405,8 @@
   if (!self.started) {
     return;
   }
+
+  [_activityReporter reportInactive];
 
   _webState = nullptr;
 
@@ -1705,6 +1711,12 @@
   self.visible = visible;
   self.NTPViewController.NTPVisible = visible;
   self.NTPMediator.NTPVisible = visible;
+
+  if (visible) {
+    [_activityReporter reportActiveWithIncognito:self.isOffTheRecord];
+  } else {
+    [_activityReporter reportInactive];
+  }
 
   if (!self.isOffTheRecord) {
     if (visible) {
