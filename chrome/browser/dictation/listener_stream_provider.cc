@@ -121,6 +121,10 @@ const Target* ListenerStreamProvider::GetTarget() const {
   return target_.get();
 }
 
+base::WeakPtr<ListenerStreamProvider> ListenerStreamProvider::GetWeakPtr() {
+  return weak_ptr_factory_.GetWeakPtr();
+}
+
 DictationMultiplexer& ListenerStreamProvider::GetMultiplexer() const {
   DictationKeyedService* service = DictationKeyedService::Get(browser_context_);
   CHECK(service);

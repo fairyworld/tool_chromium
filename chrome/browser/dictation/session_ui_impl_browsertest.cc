@@ -4,9 +4,11 @@
 
 #include "chrome/browser/dictation/session_ui_impl.h"
 
+#include "base/memory/weak_ptr.h"
 #include "base/test/scoped_feature_list.h"
 #include "chrome/browser/dictation/dictation_keyed_service.h"
 #include "chrome/browser/dictation/features.h"
+#include "chrome/browser/dictation/listener_stream_provider.h"
 #include "chrome/browser/dictation/session_state.h"
 #include "chrome/browser/dictation/session_ui.h"
 #include "chrome/browser/dictation/target.h"
@@ -15,6 +17,7 @@
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/views/dictation/dictation_bubble_ui.h"
+#include "chrome/common/extensions/api/dictation_private.h"
 #include "chrome/test/base/chrome_test_utils.h"
 #include "chrome/test/interaction/interactive_browser_test.h"
 #include "content/public/test/browser_test.h"
@@ -23,7 +26,9 @@
 
 namespace dictation {
 
-DEFINE_LOCAL_CUSTOM_ELEMENT_EVENT_TYPE(kStreamStartedEvent);
+using ExtensionStreamState = extensions::api::dictation_private::StreamState;
+using ExtensionTranscriptionType =
+    extensions::api::dictation_private::TranscriptionType;
 
 class DictationSessionUiImplBrowserTest : public InteractiveBrowserTest {
  public:
@@ -41,8 +46,7 @@ class DictationSessionUiImplBrowserTest : public InteractiveBrowserTest {
 
   void SetUpOnMainThread() override {
     InteractiveBrowserTest::SetUpOnMainThread();
-    LoadTestExtension(profile());
-    SetMockTranscript(profile(), "test transcript");
+    LoadTestExtensionInManualMode(profile());
   }
 
   void TearDownOnMainThread() override {
@@ -72,16 +76,33 @@ class DictationSessionUiImplBrowserTest : public InteractiveBrowserTest {
         dictation_service().StartSession(
             *browser(),
             std::make_unique<Target>());
-        session_state_changed_callback_ =
+        last_started_provider_ = static_cast<ListenerStreamProvider*>(
             dictation_service()
                 .session_controller()
-                ->AddSessionStateChangedCallback(base::BindRepeating(
-                    &DictationSessionUiImplBrowserTest::OnSessionStateChanged,
-                    base::Unretained(this)));
+                ->attached_stream_provider())->GetWeakPtr();
+        ASSERT_NE(last_started_provider_, nullptr);
       }),
       Check([this]{ return session_ui() != nullptr; })
     );
     // clang-format on
+  }
+
+  auto ExtensionAPISetStreamState(ExtensionStreamState state) {
+    return Steps(Do([this, state] {
+      ASSERT_NE(last_started_provider_, nullptr);
+      ExtensionSendStreamStateUpdate(
+          profile(), last_started_provider_->stream_id_for_testing(), state);
+    }));
+  }
+
+  auto ExtensionAPIUpdateTranscription(ExtensionTranscriptionType type,
+                                       std::string_view text) {
+    return Steps(Do([this, type, text_str = std::string(text)] {
+      ASSERT_NE(last_started_provider_, nullptr);
+      ExtensionSendTranscriptUpdate(
+          profile(), last_started_provider_->stream_id_for_testing(), type,
+          text_str);
+    }));
   }
 
   auto GetSessionState() {
@@ -99,14 +120,7 @@ class DictationSessionUiImplBrowserTest : public InteractiveBrowserTest {
   }
 
  private:
-  void OnSessionStateChanged(SessionState new_state) {
-    if (new_state == SessionState::kTranscribing) {
-      BrowserElements::From(browser())->NotifyEvent(kBrowserViewElementId,
-                                                    kStreamStartedEvent);
-    }
-  }
-
-  base::CallbackListSubscription session_state_changed_callback_;
+  base::WeakPtr<ListenerStreamProvider> last_started_provider_ = nullptr;
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
@@ -136,7 +150,7 @@ IN_PROC_BROWSER_TEST_F(DictationSessionUiImplBrowserTest,
   // clang-format off
   RunTestSequence(
     StartSession(),
-    WaitForEvent(kBrowserViewElementId, kStreamStartedEvent),
+    ExtensionAPISetStreamState(ExtensionStreamState::kTranscribing),
     CheckResult(GetSessionState(), SessionState::kTranscribing),
 
     PressButton(DictationBubbleUi::kDoneButtonElementIdForTesting),

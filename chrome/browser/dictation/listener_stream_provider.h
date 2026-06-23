@@ -11,6 +11,7 @@
 #include "base/functional/callback.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/raw_ref.h"
+#include "base/memory/weak_ptr.h"
 #include "chrome/browser/dictation/dictation_multiplexer.h"
 #include "chrome/browser/dictation/stream_provider.h"
 
@@ -48,6 +49,7 @@ class ListenerStreamProvider : public StreamProvider {
   DictationMultiplexer::StreamId stream_id_for_testing() const {
     return stream_id_;
   }
+  base::WeakPtr<ListenerStreamProvider> GetWeakPtr();
 
  private:
   DictationMultiplexer& GetMultiplexer() const;
@@ -63,6 +65,8 @@ class ListenerStreamProvider : public StreamProvider {
   StreamState state_ = StreamState::kInitializing;
 
   base::RepeatingClosure update_callback_for_testing_;
+
+  base::WeakPtrFactory<ListenerStreamProvider> weak_ptr_factory_{this};
 };
 
 }  // namespace dictation

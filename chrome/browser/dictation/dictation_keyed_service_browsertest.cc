@@ -4,7 +4,9 @@
 
 #include "chrome/browser/dictation/dictation_keyed_service.h"
 
+#include "base/memory/weak_ptr.h"
 #include "base/test/bind.h"
+#include "base/test/run_until.h"
 #include "base/test/scoped_feature_list.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/dictation/dictation_keyed_service_factory.h"
@@ -63,7 +65,6 @@ class DictationKeyedServiceBrowserTest : public PlatformBrowserTest {
                                  std::string_view text) {
     ExtensionSendTranscriptUpdate(profile(), provider->stream_id_for_testing(),
                                   type, text);
-    WaitForTranscriptUpdate(provider);
   }
 
  private:
@@ -160,38 +161,41 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
 
 IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
                        StartSessionAndReceiveTranscription) {
-  LoadTestExtension(profile());
-  SetMockTranscript(profile(), "Hello world");
+  LoadTestExtensionInManualMode(profile());
 
   dictation_service().StartSession(*GetBrowserWindowInterface(),
                                    std::make_unique<Target>());
 
+  SessionController* controller = dictation_service().session_controller();
+  ASSERT_NE(controller, nullptr);
+
   ListenerStreamProvider* provider = static_cast<ListenerStreamProvider*>(
-      dictation_service().session_controller()->attached_stream_provider());
-  base::RunLoop wait_for_updates_loop;
-  bool seen_partial = false;
-  provider->SetOnUpdateForTesting(base::BindLambdaForTesting([&]() {
-    if (!seen_partial) {
-      if (provider->GetLatestTranscriptionForTesting() == "Hello") {
-        EXPECT_FALSE(provider->IsTranscriptionFinalForTesting());
-        EXPECT_EQ(provider->GetState(),
-                  StreamProvider::StreamState::kTranscribing);
-        seen_partial = true;
-      }
-    }
-    if (provider->GetLatestTranscriptionForTesting() == "Hello world" &&
-        provider->IsTranscriptionFinalForTesting()) {
-      EXPECT_TRUE(seen_partial);
-      wait_for_updates_loop.Quit();
-    }
-  }));
-  wait_for_updates_loop.Run();
+      controller->attached_stream_provider());
+  ASSERT_NE(provider, nullptr);
 
+  ExtensionSendStreamStateUpdate(profile(), provider->stream_id_for_testing(),
+                                 ExtensionStreamState::kTranscribing);
+  EXPECT_EQ(provider->GetState(), StreamProvider::StreamState::kTranscribing);
+
+  // Send partial transcript.
+  ExtensionSendTranscriptUpdate(profile(), provider->stream_id_for_testing(),
+                                ExtensionTranscriptionType::kPartial, "Hello");
+  EXPECT_EQ(provider->GetLatestTranscriptionForTesting(), "Hello");
+  EXPECT_FALSE(provider->IsTranscriptionFinalForTesting());
+
+  // Send final transcript.
+  ExtensionSendTranscriptUpdate(profile(), provider->stream_id_for_testing(),
+                                ExtensionTranscriptionType::kFinal,
+                                "Hello world");
+  EXPECT_EQ(provider->GetLatestTranscriptionForTesting(), "Hello world");
+  EXPECT_TRUE(provider->IsTranscriptionFinalForTesting());
+
+  // Stop the provider from the browser side and confirm the state change from
+  // the extension API.
   provider->Stop();
-
-  WaitForStreamState(provider, StreamProvider::StreamState::kComplete);
-
-  dictation_service().EndSession();
+  ExtensionSendStreamStateUpdate(profile(), provider->stream_id_for_testing(),
+                                 ExtensionStreamState::kComplete);
+  EXPECT_EQ(controller->GetState(), SessionState::kInactive);
 }
 
 IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
@@ -210,7 +214,6 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
 
   ExtensionSendStreamStateUpdate(profile(), provider->stream_id_for_testing(),
                                  ExtensionStreamState::kTranscribing);
-  WaitForStreamState(provider, StreamProvider::StreamState::kTranscribing);
   ASSERT_EQ(controller->GetState(), SessionState::kTranscribing);
 
   // Send a transcription update ("Hello") as a partial update and wait for it
@@ -255,7 +258,6 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
   // Wait for the first stream to transition to transcribing.
   ExtensionSendStreamStateUpdate(profile(), provider1->stream_id_for_testing(),
                                  ExtensionStreamState::kTranscribing);
-  WaitForStreamState(provider1, StreamProvider::StreamState::kTranscribing);
   ASSERT_EQ(controller->GetState(), SessionState::kTranscribing);
 
   SimulateSpeechRecognition(provider1, ExtensionTranscriptionType::kPartial,
@@ -279,13 +281,71 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
       controller->attached_stream_provider());
   ExtensionSendStreamStateUpdate(profile(), provider2->stream_id_for_testing(),
                                  ExtensionStreamState::kTranscribing);
-  WaitForStreamState(provider2, StreamProvider::StreamState::kTranscribing);
   ASSERT_EQ(controller->GetState(), SessionState::kTranscribing);
 
   // Recognition from the new provider arrives.
   SimulateSpeechRecognition(provider2, ExtensionTranscriptionType::kPartial,
                             "World");
   EXPECT_EQ(provider2->GetLatestTranscriptionForTesting(), "World");
+}
+
+IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
+                       ProviderDestroyedAfterComplete) {
+  LoadTestExtensionInManualMode(profile());
+
+  dictation_service().StartSession(*GetBrowserWindowInterface(),
+                                   std::make_unique<Target>());
+
+  SessionController* controller = dictation_service().session_controller();
+  ASSERT_NE(controller, nullptr);
+
+  ListenerStreamProvider* provider = static_cast<ListenerStreamProvider*>(
+      controller->attached_stream_provider());
+  ASSERT_NE(provider, nullptr);
+
+  base::WeakPtr<ListenerStreamProvider> provider_weak = provider->GetWeakPtr();
+  ASSERT_NE(provider_weak, nullptr);
+
+  // Transition to transcribing.
+  ExtensionSendStreamStateUpdate(profile(), provider->stream_id_for_testing(),
+                                 ExtensionStreamState::kTranscribing);
+  EXPECT_EQ(provider->GetState(), StreamProvider::StreamState::kTranscribing);
+
+  // Stop the provider and confirm the state change from the extension. This
+  // should trigger a deletion task.
+  provider->Stop();
+  ExtensionSendStreamStateUpdate(profile(), provider->stream_id_for_testing(),
+                                 ExtensionStreamState::kComplete);
+  EXPECT_TRUE(base::test::RunUntil([&]() { return provider_weak == nullptr; }));
+}
+
+IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
+                       ProviderDestroyedAfterFailed) {
+  LoadTestExtensionInManualMode(profile());
+
+  dictation_service().StartSession(*GetBrowserWindowInterface(),
+                                   std::make_unique<Target>());
+
+  SessionController* controller = dictation_service().session_controller();
+  ASSERT_NE(controller, nullptr);
+
+  ListenerStreamProvider* provider = static_cast<ListenerStreamProvider*>(
+      controller->attached_stream_provider());
+  ASSERT_NE(provider, nullptr);
+
+  base::WeakPtr<ListenerStreamProvider> provider_weak = provider->GetWeakPtr();
+  ASSERT_NE(provider_weak, nullptr);
+
+  // Transition to transcribing.
+  ExtensionSendStreamStateUpdate(profile(), provider->stream_id_for_testing(),
+                                 ExtensionStreamState::kTranscribing);
+  EXPECT_EQ(provider->GetState(), StreamProvider::StreamState::kTranscribing);
+
+  // Simulate a stream failure from the extension. This should trigger a
+  // deletion task.
+  ExtensionSendStreamStateUpdate(profile(), provider->stream_id_for_testing(),
+                                 ExtensionStreamState::kFailed);
+  EXPECT_TRUE(base::test::RunUntil([&]() { return provider_weak == nullptr; }));
 }
 
 }  // namespace
