@@ -104,7 +104,7 @@ class DurationTest(unittest.TestCase):
 
   def test_assign_datetime_to_duration(self):
     message = well_known_types_test_pb2.WKTMessage()
-    with self.assertRaises((TypeError)):
+    with self.assertRaises((TypeError, AttributeError)):
       message.optional_duration = datetime.datetime.now()
 
 

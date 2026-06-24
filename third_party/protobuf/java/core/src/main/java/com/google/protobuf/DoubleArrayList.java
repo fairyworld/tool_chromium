@@ -156,13 +156,11 @@ final class DoubleArrayList extends AbstractProtobufList<Double>
   }
 
   @Override
-  @CanIgnoreReturnValue
   public Double set(int index, Double element) {
     return setDouble(index, element);
   }
 
   @Override
-  @CanIgnoreReturnValue
   public double setDouble(int index, double element) {
     ensureIsMutable();
     ensureIndexInRange(index);
@@ -172,7 +170,6 @@ final class DoubleArrayList extends AbstractProtobufList<Double>
   }
 
   @Override
-  @CanIgnoreReturnValue
   public boolean add(Double element) {
     addDouble(element);
     return true;
@@ -226,7 +223,6 @@ final class DoubleArrayList extends AbstractProtobufList<Double>
   }
 
   @Override
-  @CanIgnoreReturnValue
   public boolean addAll(Collection<? extends Double> collection) {
     ensureIsMutable();
 
@@ -260,7 +256,6 @@ final class DoubleArrayList extends AbstractProtobufList<Double>
   }
 
   @Override
-  @CanIgnoreReturnValue
   public Double remove(int index) {
     ensureIsMutable();
     ensureIndexInRange(index);

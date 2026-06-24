@@ -16,6 +16,10 @@ class DescriptorsTest extends TestBase
 {
 
     // Redefine these here for compatibility with c extension
+    const GPBLABEL_OPTIONAL = 1;
+    const GPBLABEL_REQUIRED = 2;
+    const GPBLABEL_REPEATED = 3;
+
     const GPBTYPE_DOUBLE   =  1;
     const GPBTYPE_FLOAT    =  2;
     const GPBTYPE_INT64    =  3;
@@ -142,7 +146,6 @@ class DescriptorsTest extends TestBase
         $this->assertFalse($fieldDesc->isRepeated());
         $this->assertSame(self::GPBTYPE_INT32, $fieldDesc->getType());
         $this->assertFalse($fieldDesc->isMap());
-        $this->assertFalse($fieldDesc->hasPresence());
 
         // Optional enum field
         $fieldDesc = $fieldDescMap[16];
@@ -153,7 +156,6 @@ class DescriptorsTest extends TestBase
         $this->assertSame(self::GPBTYPE_ENUM, $fieldDesc->getType());
         $this->assertInstanceOf('\Google\Protobuf\EnumDescriptor', $fieldDesc->getEnumType());
         $this->assertFalse($fieldDesc->isMap());
-        $this->assertFalse($fieldDesc->hasPresence());
 
         // Optional message field
         $fieldDesc = $fieldDescMap[17];
@@ -164,7 +166,6 @@ class DescriptorsTest extends TestBase
         $this->assertSame(self::GPBTYPE_MESSAGE, $fieldDesc->getType());
         $this->assertInstanceOf('\Google\Protobuf\Descriptor', $fieldDesc->getMessageType());
         $this->assertFalse($fieldDesc->isMap());
-        $this->assertTrue($fieldDesc->hasPresence());
 
         // Repeated int field
         $fieldDesc = $fieldDescMap[31];
@@ -173,7 +174,6 @@ class DescriptorsTest extends TestBase
         $this->assertTrue($fieldDesc->isRepeated());
         $this->assertSame(self::GPBTYPE_INT32, $fieldDesc->getType());
         $this->assertFalse($fieldDesc->isMap());
-        $this->assertFalse($fieldDesc->hasPresence());
 
         // Repeated message field
         $fieldDesc = $fieldDescMap[47];
@@ -184,7 +184,6 @@ class DescriptorsTest extends TestBase
         $this->assertInstanceOf('\Google\Protobuf\Descriptor', $fieldDesc->getMessageType());
         $this->assertFalse($fieldDesc->isMap());
         $this->assertNull($fieldDesc->getContainingOneof());
-        $this->assertFalse($fieldDesc->hasPresence());
 
         // Oneof int field
         // Tested further in testOneofDescriptor()
@@ -196,7 +195,6 @@ class DescriptorsTest extends TestBase
         $this->assertSame(self::GPBTYPE_INT32, $fieldDesc->getType());
         $this->assertFalse($fieldDesc->isMap());
         $this->assertSame($fieldDesc->getContainingOneof(), $fieldDesc->getRealContainingOneof());
-        $this->assertTrue($fieldDesc->hasPresence());
 
         $oneofDesc = $fieldDesc->getContainingOneof();
         $this->assertSame('my_oneof', $oneofDesc->getName());
@@ -212,7 +210,6 @@ class DescriptorsTest extends TestBase
         $this->assertFalse($fieldDesc->isMap());
         $this->assertNull($fieldDesc->getRealContainingOneof());
         $this->assertNotNull($fieldDesc->getContainingOneof());
-        $this->assertTrue($fieldDesc->hasPresence());
 
         // Map int-enum field
         $fieldDesc = $fieldDescMap[71];
@@ -225,7 +222,6 @@ class DescriptorsTest extends TestBase
         $this->assertSame('descriptors.TestDescriptorsMessage.MapInt32EnumEntry', $mapDesc->getFullName());
         $this->assertSame(self::GPBTYPE_INT32, $mapDesc->getField(0)->getType());
         $this->assertSame(self::GPBTYPE_ENUM, $mapDesc->getField(1)->getType());
-        $this->assertFalse($fieldDesc->hasPresence());
     }
 
     public function testFieldDescriptorEnumException()

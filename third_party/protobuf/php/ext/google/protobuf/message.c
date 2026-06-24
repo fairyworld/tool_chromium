@@ -65,8 +65,7 @@ static zend_object* Message_create(zend_class_entry* class_type) {
   Message_SuppressDefaultProperties(class_type);
   zend_object_std_init(&intern->std, class_type);
   intern->std.handlers = &message_object_handlers;
-  intern->desc = NULL;
-  ZVAL_NULL(&intern->arena);
+  Arena_Init(&intern->arena);
   return &intern->std;
 }
 
@@ -90,15 +89,6 @@ static void Message_dtor(zend_object* obj) {
  * Helper function to look up a field given a member name (as a string).
  */
 static const upb_FieldDef* get_field(Message* msg, zend_string* member) {
-  if (!msg || !msg->desc || !msg->desc->msgdef) {
-    zend_throw_exception_ex(NULL, 0,
-                            "Couldn't find descriptor. "
-                            "The message constructor was likely bypassed, "
-                            "resulting in an uninitialized descriptor.");
-
-    return NULL;
-  }
-
   const upb_MessageDef* m = msg->desc->msgdef;
   const upb_FieldDef* f = upb_MessageDef_FindFieldByNameWithSize(
       m, ZSTR_VAL(member), ZSTR_LEN(member));
@@ -540,7 +530,6 @@ bool Message_InitFromPhp(upb_Message* msg, const upb_MessageDef* m, zval* init,
 static void Message_Initialize(Message* intern, const Descriptor* desc) {
   intern->desc = desc;
   const upb_MiniTable* t = upb_MessageDef_MiniTable(desc->msgdef);
-  Arena_Init(&intern->arena);
   intern->msg = upb_Message_New(t, Arena_Get(&intern->arena));
   ObjCache_Add(intern->msg, &intern->std);
 }
@@ -555,6 +544,7 @@ PHP_METHOD(Message, __construct) {
   Message* intern = (Message*)Z_OBJ_P(getThis());
   const Descriptor* desc;
   zend_class_entry* ce = Z_OBJCE_P(getThis());
+  upb_Arena* arena = Arena_Get(&intern->arena);
   zval* init_arr = NULL;
 
   // This descriptor should always be available, as the generated __construct
@@ -583,8 +573,7 @@ PHP_METHOD(Message, __construct) {
   }
 
   if (init_arr) {
-    Message_InitFromPhp(intern->msg, desc->msgdef, init_arr,
-                        Arena_Get(&intern->arena));
+    Message_InitFromPhp(intern->msg, desc->msgdef, init_arr, arena);
   }
 }
 
@@ -783,9 +772,6 @@ PHP_METHOD(Message, serializeToJsonString) {
     }
     if (Z_LVAL_P(flags) & PRESERVE_PROTO_FIELD_NAMES) {
       options |= upb_JsonEncode_UseProtoNames;
-    }
-    if (Z_LVAL_P(flags) & EMIT_DEFAULTS) {
-      options |= upb_JsonEncode_EmitDefaults;
     }
   }
 

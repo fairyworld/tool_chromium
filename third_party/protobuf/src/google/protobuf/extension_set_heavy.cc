@@ -14,10 +14,8 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <cstring>
 #include <initializer_list>
 #include <string>
-#include <utility>
 #include <variant>
 #include <vector>
 
@@ -35,7 +33,6 @@
 #include "google/protobuf/extension_set_inl.h"  // IWYU pragma: keep
 #include "google/protobuf/generated_message_reflection.h"
 #include "google/protobuf/generated_message_tctable_impl.h"
-#include "google/protobuf/internal_visibility.h"
 #include "google/protobuf/io/coded_stream.h"
 #include "google/protobuf/message.h"
 #include "google/protobuf/message_lite.h"
@@ -66,13 +63,7 @@ void ExtensionSet::AppendToList(
           //   AppendToList() is called.
 
           if (ext.descriptor == nullptr) {
-            const FieldDescriptor* field =
-                pool->FindExtensionByNumber(extendee, number);
-            // TODO This should be limited to and only reachable by
-            // lite extensions on full messages.
-            if (field != nullptr) {
-              output->push_back(field);
-            }
+            output->push_back(pool->FindExtensionByNumber(extendee, number));
           } else {
             output->push_back(ext.descriptor);
           }
@@ -102,10 +93,9 @@ inline WireFormatLite::FieldType field_type(FieldType type) {
                  FieldDescriptor::LABEL_##LABEL);                           \
   ABSL_DCHECK_EQ(cpp_type((EXTENSION).type), FieldDescriptor::CPPTYPE_##CPPTYPE)
 
-const MessageLite& ExtensionSet::GetMessage(Arena* arena, int number,
+const MessageLite& ExtensionSet::GetMessage(int number,
                                             const Descriptor* message_type,
                                             MessageFactory* factory) const {
-  DebugAssertArenaMatches(arena);
   const Extension* extension = FindOrNull(number);
   if (extension == nullptr || extension->is_cleared) {
     // Not present.  Return the default value.
@@ -114,19 +104,17 @@ const MessageLite& ExtensionSet::GetMessage(Arena* arena, int number,
     ABSL_DCHECK_TYPE(*extension, OPTIONAL, MESSAGE);
     if (extension->is_lazy) {
       return extension->ptr.lazymessage_value->GetMessage(
-          *factory->GetPrototype(message_type), arena);
+          *factory->GetPrototype(message_type), arena_);
     } else {
       return *extension->ptr.message_value;
     }
   }
 }
 
-MessageLite* ExtensionSet::MutableMessage(Arena* arena,
-                                          const FieldDescriptor* descriptor,
+MessageLite* ExtensionSet::MutableMessage(const FieldDescriptor* descriptor,
                                           MessageFactory* factory) {
-  DebugAssertArenaMatches(arena);
   Extension* extension;
-  if (MaybeNewExtension(arena, descriptor->number(), descriptor, &extension)) {
+  if (MaybeNewExtension(descriptor->number(), descriptor, &extension)) {
     extension->type = descriptor->type();
     ABSL_DCHECK_EQ(cpp_type(extension->type), FieldDescriptor::CPPTYPE_MESSAGE);
     extension->is_repeated = false;
@@ -135,7 +123,7 @@ MessageLite* ExtensionSet::MutableMessage(Arena* arena,
     const MessageLite* prototype =
         factory->GetPrototype(descriptor->message_type());
     extension->is_lazy = false;
-    extension->ptr.message_value = prototype->New(arena);
+    extension->ptr.message_value = prototype->New(arena_);
     extension->is_cleared = false;
     return extension->ptr.message_value;
   } else {
@@ -143,17 +131,15 @@ MessageLite* ExtensionSet::MutableMessage(Arena* arena,
     extension->is_cleared = false;
     if (extension->is_lazy) {
       return extension->ptr.lazymessage_value->MutableMessage(
-          *factory->GetPrototype(descriptor->message_type()), arena);
+          *factory->GetPrototype(descriptor->message_type()), arena_);
     } else {
       return extension->ptr.message_value;
     }
   }
 }
 
-MessageLite* ExtensionSet::ReleaseMessage(Arena* arena,
-                                          const FieldDescriptor* descriptor,
+MessageLite* ExtensionSet::ReleaseMessage(const FieldDescriptor* descriptor,
                                           MessageFactory* factory) {
-  DebugAssertArenaMatches(arena);
   Extension* extension = FindOrNull(descriptor->number());
   if (extension == nullptr) {
     // Not present.  Return nullptr.
@@ -163,12 +149,12 @@ MessageLite* ExtensionSet::ReleaseMessage(Arena* arena,
     MessageLite* ret = nullptr;
     if (extension->is_lazy) {
       ret = extension->ptr.lazymessage_value->ReleaseMessage(
-          *factory->GetPrototype(descriptor->message_type()), arena);
-      if (arena == nullptr) {
+          *factory->GetPrototype(descriptor->message_type()), arena_);
+      if (arena_ == nullptr) {
         delete extension->ptr.lazymessage_value;
       }
     } else {
-      if (arena != nullptr) {
+      if (arena_ != nullptr) {
         ret = extension->ptr.message_value->New();
         ret->CheckTypeAndMergeFrom(*extension->ptr.message_value);
       } else {
@@ -181,8 +167,7 @@ MessageLite* ExtensionSet::ReleaseMessage(Arena* arena,
 }
 
 MessageLite* ExtensionSet::UnsafeArenaReleaseMessage(
-    Arena* arena, const FieldDescriptor* descriptor, MessageFactory* factory) {
-  DebugAssertArenaMatches(arena);
+    const FieldDescriptor* descriptor, MessageFactory* factory) {
   Extension* extension = FindOrNull(descriptor->number());
   if (extension == nullptr) {
     // Not present.  Return nullptr.
@@ -192,8 +177,8 @@ MessageLite* ExtensionSet::UnsafeArenaReleaseMessage(
     MessageLite* ret = nullptr;
     if (extension->is_lazy) {
       ret = extension->ptr.lazymessage_value->UnsafeArenaReleaseMessage(
-          *factory->GetPrototype(descriptor->message_type()), arena);
-      if (arena == nullptr) {
+          *factory->GetPrototype(descriptor->message_type()), arena_);
+      if (arena_ == nullptr) {
         delete extension->ptr.lazymessage_value;
       }
     } else {
@@ -205,58 +190,55 @@ MessageLite* ExtensionSet::UnsafeArenaReleaseMessage(
 }
 
 ExtensionSet::Extension* ExtensionSet::MaybeNewRepeatedExtension(
-    Arena* arena, const FieldDescriptor* descriptor) {
+    const FieldDescriptor* descriptor) {
   Extension* extension;
-  if (MaybeNewExtension(arena, descriptor->number(), descriptor, &extension)) {
+  if (MaybeNewExtension(descriptor->number(), descriptor, &extension)) {
     extension->type = descriptor->type();
     ABSL_DCHECK_EQ(cpp_type(extension->type), FieldDescriptor::CPPTYPE_MESSAGE);
     extension->is_repeated = true;
     extension->is_pointer = true;
     extension->ptr.repeated_message_value =
-        Arena::Create<RepeatedPtrField<MessageLite>>(arena);
+        Arena::Create<RepeatedPtrField<MessageLite> >(arena_);
   } else {
     ABSL_DCHECK_TYPE(*extension, REPEATED, MESSAGE);
   }
   return extension;
 }
 
-MessageLite* ExtensionSet::AddMessage(Arena* arena,
-                                      const FieldDescriptor* descriptor,
+MessageLite* ExtensionSet::AddMessage(const FieldDescriptor* descriptor,
                                       MessageFactory* factory) {
-  Extension* extension = MaybeNewRepeatedExtension(arena, descriptor);
+  Extension* extension = MaybeNewRepeatedExtension(descriptor);
 
   // RepeatedPtrField<Message> does not know how to Add() since it cannot
   // allocate an abstract object, so we have to be tricky.
-  auto* repeated = reinterpret_cast<internal::RepeatedPtrFieldBase*>(
-      extension->ptr.repeated_message_value);
   MessageLite* result =
-      repeated->AddFromCleared<GenericTypeHandler<MessageLite>>();
+      reinterpret_cast<internal::RepeatedPtrFieldBase*>(
+          extension->ptr.repeated_message_value)
+          ->AddFromCleared<GenericTypeHandler<MessageLite> >();
   if (result == nullptr) {
-    const MessageLite* prototype = nullptr;
+    const MessageLite* prototype;
     if (extension->ptr.repeated_message_value->empty()) {
       prototype = factory->GetPrototype(descriptor->message_type());
       ABSL_CHECK(prototype != nullptr);
     } else {
       prototype = &extension->ptr.repeated_message_value->Get(0);
     }
-    result = repeated->AddFromPrototype<GenericTypeHandler<MessageLite>>(
-        arena, prototype);
+    result = prototype->New(arena_);
+    extension->ptr.repeated_message_value->AddAllocated(result);
   }
   return result;
 }
 
-void ExtensionSet::AddAllocatedMessage(Arena* arena,
-                                       const FieldDescriptor* descriptor,
+void ExtensionSet::AddAllocatedMessage(const FieldDescriptor* descriptor,
                                        MessageLite* new_entry) {
-  Extension* extension = MaybeNewRepeatedExtension(arena, descriptor);
+  Extension* extension = MaybeNewRepeatedExtension(descriptor);
 
-  extension->ptr.repeated_message_value->AddAllocatedWithArena(arena,
-                                                               new_entry);
+  extension->ptr.repeated_message_value->AddAllocated(new_entry);
 }
 
 void ExtensionSet::UnsafeArenaAddAllocatedMessage(
-    Arena* arena, const FieldDescriptor* descriptor, MessageLite* new_entry) {
-  Extension* extension = MaybeNewRepeatedExtension(arena, descriptor);
+    const FieldDescriptor* descriptor, MessageLite* new_entry) {
+  Extension* extension = MaybeNewRepeatedExtension(descriptor);
 
   extension->ptr.repeated_message_value->UnsafeArenaAddAllocated(new_entry);
 }
@@ -319,37 +301,6 @@ bool ExtensionSet::FindExtension(int wire_type, uint32_t field,
 }
 
 
-bool ExtensionSet::MoveExtension(Arena* arena, int dst_number,
-                                 ExtensionSet& src, int src_number) {
-  // Find the source extension & return if it doesn't exist.
-  Extension* src_ext = src.FindOrNull(src_number);
-  if (src_ext == nullptr) {
-    ClearExtension(dst_number);
-    return true;
-  }
-
-  if (src_ext->descriptor != nullptr) {
-    return false;
-  }
-
-  // Get or create the destination extension.
-  auto [dst_ext, is_new] = Insert(arena, dst_number);
-  if (!is_new) {
-    // If an extension already exists at dst_number, free it if not using an
-    // arena.
-    if (arena == nullptr) {
-      dst_ext->Free();
-    }
-  }
-
-  // Move the extension from the source to the destination.
-  *dst_ext = std::move(*src_ext);
-
-  // Erase the extension from the source.
-  src.Erase(src_number);
-  return true;
-}
-
 const char* ExtensionSet::ParseField(uint64_t tag, const char* ptr,
                                      const Message* extendee,
                                      internal::InternalMetadata* metadata,
@@ -396,7 +347,7 @@ size_t ExtensionSet::SpaceUsedExcludingSelfLong() const {
 
 inline size_t ExtensionSet::RepeatedMessage_SpaceUsedExcludingSelfLong(
     RepeatedPtrFieldBase* field) {
-  return field->SpaceUsedExcludingSelfLong<GenericTypeHandler<Message>>();
+  return field->SpaceUsedExcludingSelfLong<GenericTypeHandler<Message> >();
 }
 
 size_t ExtensionSet::Extension::SpaceUsedExcludingSelfLong() const {
@@ -474,6 +425,7 @@ bool ExtensionSet::ShouldRegisterAtThisTime(
   return has_all == is_preregistration;
 }
 #endif  // PROTOBUF_DESCRIPTOR_WEAK_MESSAGES_ALLOWED
+
 
 }  // namespace internal
 }  // namespace protobuf

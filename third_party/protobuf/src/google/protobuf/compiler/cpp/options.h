@@ -20,9 +20,6 @@ namespace protobuf {
 namespace compiler {
 class AccessInfoMap;
 class SplitMap;
-namespace cpp {
-class MessageSCCAnalyzer;
-}  // namespace cpp
 
 namespace cpp {
 
@@ -48,7 +45,6 @@ struct FieldListenerOptions {
 struct Options {
   const AccessInfoMap* access_info_map = nullptr;
   const SplitMap* split_map = nullptr;
-  cpp::MessageSCCAnalyzer* scc_analyzer = nullptr;
   std::string dllexport_decl;
   std::string runtime_include_base;
   std::string annotation_pragma_name;

@@ -155,13 +155,11 @@ final class LongArrayList extends AbstractProtobufList<Long>
   }
 
   @Override
-  @CanIgnoreReturnValue
   public Long set(int index, Long element) {
     return setLong(index, element);
   }
 
   @Override
-  @CanIgnoreReturnValue
   public long setLong(int index, long element) {
     ensureIsMutable();
     ensureIndexInRange(index);
@@ -171,7 +169,6 @@ final class LongArrayList extends AbstractProtobufList<Long>
   }
 
   @Override
-  @CanIgnoreReturnValue
   public boolean add(Long element) {
     addLong(element);
     return true;
@@ -225,7 +222,6 @@ final class LongArrayList extends AbstractProtobufList<Long>
   }
 
   @Override
-  @CanIgnoreReturnValue
   public boolean addAll(Collection<? extends Long> collection) {
     ensureIsMutable();
 
@@ -259,7 +255,6 @@ final class LongArrayList extends AbstractProtobufList<Long>
   }
 
   @Override
-  @CanIgnoreReturnValue
   public Long remove(int index) {
     ensureIsMutable();
     ensureIndexInRange(index);

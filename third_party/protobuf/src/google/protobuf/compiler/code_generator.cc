@@ -106,10 +106,7 @@ void GeneratorContext::GetCompilerVersion(Version* version) const {
 bool CanSkipEditionCheck(absl::string_view filename) {
   return absl::StartsWith(filename, "google/protobuf/") ||
          absl::StartsWith(filename, "upb/") ||
-         absl::StartsWith(filename, "com/google/protobuf/") ||
-         absl::StartsWith(filename, "conformance/test_protos/") ||
-         // TODO: Remove this once internal proto rule is resolved.
-         absl::StartsWith(filename, "test_messages_edition_unstable");
+         absl::StartsWith(filename, "com/google/protobuf/");
 }
 
 }  // namespace compiler

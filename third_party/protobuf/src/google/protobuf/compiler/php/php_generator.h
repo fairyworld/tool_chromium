@@ -35,12 +35,13 @@ class PROTOC_EXPORT Generator : public CodeGenerator {
                    std::string* error) const override;
 
   uint64_t GetSupportedFeatures() const override {
-    return Feature::FEATURE_PROTO3_OPTIONAL |
-           Feature::FEATURE_SUPPORTS_EDITIONS;
+    return Feature::FEATURE_PROTO3_OPTIONAL;
   }
 
   Edition GetMinimumEdition() const override { return Edition::EDITION_PROTO2; }
-  Edition GetMaximumEdition() const override { return Edition::EDITION_2024; }
+  Edition GetMaximumEdition() const override {
+    return Edition::EDITION_2024;
+  }
   std::vector<const FieldDescriptor*> GetFeatureExtensions() const override {
     return {};
   }

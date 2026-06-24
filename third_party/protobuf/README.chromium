@@ -3,9 +3,9 @@ Short Name: protobuf
 URL: https://github.com/google/protobuf
 License: BSD-3-Clause
 License File: LICENSE
-Version: 34.1
-CPEPrefix: cpe:/a:google:protobuf:34.1
-Revision: 4b0c3aacf0657fbf38253b38918d3358dd4319ec
+Version: 33.0
+CPEPrefix: cpe:/a:google:protobuf:33.0
+Revision: a79f2d2e9fadd75e94f3fe40a0399bf0a5d90551
 Update Mechanism: Manual
 Security Critical: yes
 Shipped: yes
@@ -217,6 +217,10 @@ Description of the patches:
 
   Replaces usage of absl internal string routines with std::string::resize().
 
+- 0049-deprecated-declarations-pragma.patch
+
+  Modify a compiler diagnostic pragma to work on Windows.
+
 - 0051-export-template-define.patch
 
   Adds some missing export defines to fix Windows component build.
@@ -244,9 +248,27 @@ Description of the patches:
   accessor in the pre-generated descriptor.pb.h file. This fixes a build
   warning without the noise of regenerating the entire file.
 
+- 0056-fix-use-of-deprecated-has_optional_keyword.patch
+
+  Updates the implementation of the deprecated
+  FieldDescriptor::has_optional_keyword() to use the recommended has_presence()
+  method, fixing a deprecation error.
+
+- 0057-rm-extraneous-utf8-import.patch
+
+  Removes an extraneous utf8 import in parse_context.h. This has already been
+  upstreamed.
+
 - 0058-fix-messagelite-clear-declaration.patch
 
    Fix a compile error in how a function parameter is declared.
+
+- 0059-rm-repeatedptrfield-deprecated-declaration.patch
+
+   Remove deprecated declaration on repeatedptrfield constructor. This
+   constructor is removed in the next roll post-v33, but this patch is added
+   to allow for rolling proto first without touching the 100s of places to
+   patch in Chromium.
 
 - 0060-export-any.patch
 
@@ -301,14 +323,3 @@ Description of the patches:
   This util was meant to be compiled with protobuf full. However, it depends on
   zlib, so instead of making Chromium's protobuf depend on zlib, the utility is
   compiled as a separate target, and not exported.
-
-- 0066-absl-unsigned-comparisons.patch
-
-  This is a trivial fix to a type-checking error that's already done upstream.
-
-- 0067-ignore-nodiscard.patch
-
-  v34 introduces `[[nodiscard]]` on methods that are called throughought
-  Chromium and its dependencies. This patch ignores `[[nodiscard]]` by tying
-  the relevant flag to `PROTOBUF_FUTURE_BREAKING_CHANGES`, which should buy
-  us some time.

@@ -530,21 +530,20 @@ void AppListSyncableService::InitFromLocalStorage() {
             item_dict->FindString(kBackgroundColorKey)) {
       // Retrieve the background color.
       sync_pb::AppListSpecifics::ColorGroup background_color;
-      if (sync_pb::AppListSpecifics::ColorGroup_Parse(
-              background_color_internal_string
-                  ? *background_color_internal_string
-                  : std::string(),
-              &background_color)) {
-        // Retrieve the hue.
-        DCHECK(item_dict->Find(kHueKey));
-        int hue =
-            item_dict->FindInt(kHueKey).value_or(ash::IconColor::kHueInvalid);
+      sync_pb::AppListSpecifics::ColorGroup_Parse(
+          background_color_internal_string ? *background_color_internal_string
+                                           : std::string(),
+          &background_color);
 
-        sync_item->item_color = ash::IconColor(background_color, hue);
+      // Retrieve the hue.
+      DCHECK(item_dict->Find(kHueKey));
+      int hue =
+          item_dict->FindInt(kHueKey).value_or(ash::IconColor::kHueInvalid);
 
-        // Assume that the color saved in pref is valid.
-        DCHECK(sync_item->item_color.IsValid());
-      }
+      sync_item->item_color = ash::IconColor(background_color, hue);
+
+      // Assume that the color saved in pref is valid.
+      DCHECK(sync_item->item_color.IsValid());
     }
 
     ProcessNewSyncItem(sync_item);

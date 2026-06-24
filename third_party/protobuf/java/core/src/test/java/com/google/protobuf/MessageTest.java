@@ -409,8 +409,9 @@ public class MessageTest {
     // Conversion happens during serialization.
     ByteString expectedBytes = ByteString.copyFromUtf8(expectedString);
     assertWithMessage(
-            "Expected serializedMessage (%s) to contain \"%s\" (%s).",
-            encodeHex(serializedMessage), expectedString, encodeHex(expectedBytes))
+            String.format(
+                "Expected serializedMessage (%s) to contain \"%s\" (%s).",
+                encodeHex(serializedMessage), expectedString, encodeHex(expectedBytes)))
         .that(contains(serializedMessage, expectedBytes))
         .isTrue();
   }

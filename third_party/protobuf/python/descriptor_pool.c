@@ -12,7 +12,6 @@
 #include "python/descriptor.h"
 #include "python/message.h"
 #include "python/protobuf.h"
-#include "python/python_api.h"
 #include "upb/base/upcast.h"
 #include "upb/message/compare.h"
 #include "upb/reflection/def.h"
@@ -76,11 +75,7 @@ static int PyUpb_DescriptorPool_Clear(PyUpb_DescriptorPool* self) {
 
 PyObject* PyUpb_DescriptorPool_Get(const upb_DefPool* symtab) {
   PyObject* pool = PyUpb_ObjCache_Get(symtab);
-  assert(pool
-#if PY_VERSION_HEX >= 0x030D0000  // >= 3.13
-         || Py_IsFinalizing()
-#endif
-  );
+  assert(pool);
   return pool;
 }
 
@@ -330,7 +325,7 @@ static PyObject* PyUpb_DescriptorPool_AddSerializedFile(
         PyExc_ValueError,
         "Cannot call AddSerializedFile on a DescriptorPool that uses a "
         "DescriptorDatabase. Add your file to the underlying database.");
-    return NULL;
+    return false;
   }
   return PyUpb_DescriptorPool_DoAddSerializedFile(_self, serialized_pb);
 }
@@ -343,7 +338,7 @@ static PyObject* PyUpb_DescriptorPool_Add(PyObject* _self,
         PyExc_ValueError,
         "Cannot call Add on a DescriptorPool that uses a DescriptorDatabase. "
         "Add your file to the underlying database.");
-    return NULL;
+    return false;
   }
   return PyUpb_DescriptorPool_DoAdd(_self, file_desc);
 }

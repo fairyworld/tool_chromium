@@ -183,6 +183,8 @@ class PROTOC_EXPORT FileGenerator {
   const FileDescriptor* file_;
   Options options_;
 
+  MessageSCCAnalyzer scc_analyzer_;
+
   // This member is unused and should be deleted once all old-style variable
   // maps are gone.
   // TODO

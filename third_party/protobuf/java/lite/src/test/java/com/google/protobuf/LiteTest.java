@@ -53,7 +53,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Before;
 import org.junit.Test;
@@ -2976,8 +2975,9 @@ public class LiteTest {
     // Conversion happens during serialization.
     ByteString expectedBytes = ByteString.copyFromUtf8(expectedString);
     assertWithMessage(
-            "Expected serializedMessage (%s) to contain \"%s\" (%s).",
-            encodeHex(serializedMessage), expectedString, encodeHex(expectedBytes))
+            String.format(
+                "Expected serializedMessage (%s) to contain \"%s\" (%s).",
+                encodeHex(serializedMessage), expectedString, encodeHex(expectedBytes)))
         .that(contains(serializedMessage, expectedBytes))
         .isTrue();
   }

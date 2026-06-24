@@ -134,11 +134,10 @@ std::string WalletMaskedCreditCardSpecificsAsDebugString(
     output << "[benefit_id: " << benefit.benefit_id()
            << ", benefit_description: " << benefit.benefit_description();
     if (benefit.has_start_time_unix_epoch_milliseconds()) {
-      output << ", start_time: "
-             << benefit.start_time_unix_epoch_milliseconds();
+      output << ", start_time: ", benefit.start_time_unix_epoch_milliseconds();
     }
     if (benefit.has_end_time_unix_epoch_milliseconds()) {
-      output << ", end_time: " << benefit.end_time_unix_epoch_milliseconds();
+      output << ", end_time: ", benefit.end_time_unix_epoch_milliseconds();
     }
     if (benefit.has_flat_rate_benefit()) {
       output << ", benefit_type: flat_rate_benefit";

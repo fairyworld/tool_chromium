@@ -4,7 +4,6 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include "absl/log/absl_check.h"
 #include "absl/strings/string_view.h"
 #include "binary_wireformat.h"
 #include "test_runner.h"
@@ -25,11 +24,11 @@ using ::testing::Return;
 
 MATCHER_P(RequestEquals, expected_textproto, "") {
   ::conformance::ConformanceRequest request, expected;
-  ABSL_CHECK(request.ParseFromString(arg));
-  ABSL_CHECK(TextFormat::ParseFromString(expected_textproto, &expected));
+  request.ParseFromString(arg);
+  TextFormat::ParseFromString(expected_textproto, &expected);
   if (!util::MessageDifferencer::Equals(request, expected)) {
     std::string request_string;
-    ABSL_CHECK(TextFormat::PrintToString(request, &request_string));
+    TextFormat::PrintToString(request, &request_string);
     *result_listener << "with equivalent text format:\n" << request_string;
     return false;
   }
@@ -38,7 +37,7 @@ MATCHER_P(RequestEquals, expected_textproto, "") {
 
 auto RespondWith(absl::string_view textproto) {
   ::conformance::ConformanceResponse response;
-  ABSL_CHECK(TextFormat::ParseFromString(textproto, &response));
+  TextFormat::ParseFromString(textproto, &response);
   return Return(response.SerializeAsString());
 }
 

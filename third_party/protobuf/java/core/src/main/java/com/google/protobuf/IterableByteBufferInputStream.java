@@ -62,6 +62,7 @@ final class IterableByteBufferInputStream extends InputStream {
 
     if (!getNextByteBuffer()) {
       currentByteBuffer = EMPTY_BYTE_BUFFER;
+      currentIndex = 0;
       currentByteBufferPos = 0;
       currentAddress = 0;
     }

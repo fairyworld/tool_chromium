@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 #include "conformance/test_protos/test_messages_edition2023.pb.h"
-#include "conformance/test_protos/test_messages_edition_unstable.pb.h"
 #include "editions/golden/test_messages_proto2_editions.pb.h"
 #include "editions/golden/test_messages_proto3_editions.pb.h"
 #include "google/protobuf/test_messages_proto2.pb.h"
@@ -13,7 +12,6 @@ namespace protobuf {
 namespace conformance {
 namespace {
 
-using protobuf_test_messages::edition_unstable::TestAllTypesEditionUnstable;
 using protobuf_test_messages::editions::TestAllTypesEdition2023;
 using protobuf_test_messages::proto2::TestAllTypesProto2;
 using protobuf_test_messages::proto3::TestAllTypesProto3;
@@ -27,8 +25,6 @@ TEST(NamingTest, GetEditionIdentifier) {
   EXPECT_EQ(GetEditionIdentifier(*TestAllTypesProto3::descriptor()), "Proto3");
   EXPECT_EQ(GetEditionIdentifier(*TestAllTypesEdition2023::descriptor()),
             "Editions");
-  EXPECT_EQ(GetEditionIdentifier(*TestAllTypesEditionUnstable::descriptor()),
-            "EditionUnstable");
   EXPECT_EQ(GetEditionIdentifier(*TestAllTypesProto2Editions::descriptor()),
             "Editions_Proto2");
   EXPECT_EQ(GetEditionIdentifier(*TestAllTypesProto3Editions::descriptor()),

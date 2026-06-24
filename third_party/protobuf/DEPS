@@ -1,5 +1,4 @@
 skip_child_includes = [
-  'bazel',
   'benchmarks',
   'conformance',
   'editions',

@@ -51,17 +51,24 @@ std::vector<const FieldDescriptor*> GetOrderedFields(
 
 ParseFunctionGenerator::ParseFunctionGenerator(
     const Descriptor* descriptor, int max_has_bit_index,
-    absl::Span<const int> has_bit_indices, const Options& options,
+    absl::Span<const int> has_bit_indices,
+    absl::Span<const int> inlined_string_indices, const Options& options,
+    MessageSCCAnalyzer* scc_analyzer,
     const absl::flat_hash_map<absl::string_view, std::string>& vars,
     int index_in_file_messages)
     : descriptor_(descriptor),
+      scc_analyzer_(scc_analyzer),
       options_(options),
       variables_(vars),
+      // Copy the absl::Span into a vector owned by the class.
+      inlined_string_indices_(inlined_string_indices.begin(),
+                              inlined_string_indices.end()),
       ordered_fields_(GetOrderedFields(descriptor_)),
       num_hasbits_(max_has_bit_index),
       index_in_file_messages_(index_in_file_messages) {
-  auto fields = BuildFieldOptions(descriptor_, ordered_fields_, options_,
-                                  has_bit_indices);
+  auto fields =
+      BuildFieldOptions(descriptor_, ordered_fields_, options_, scc_analyzer_,
+                        has_bit_indices, inlined_string_indices_);
   tc_table_info_ = std::make_unique<TailCallTableInfo>(
       BuildTcTableInfoFromDescriptor(descriptor_, options_, fields));
   SetCommonMessageDataVariables(descriptor_, &variables_);
@@ -73,7 +80,9 @@ std::vector<internal::TailCallTableInfo::FieldOptions>
 ParseFunctionGenerator::BuildFieldOptions(
     const Descriptor* descriptor,
     absl::Span<const FieldDescriptor* const> ordered_fields,
-    const Options& options, absl::Span<const int> has_bit_indices) {
+    const Options& options, MessageSCCAnalyzer* scc_analyzer,
+    absl::Span<const int> has_bit_indices,
+    absl::Span<const int> inlined_string_indices) {
   std::vector<TailCallTableInfo::FieldOptions> fields;
   fields.reserve(ordered_fields.size());
   for (size_t i = 0; i < ordered_fields.size(); ++i) {
@@ -86,11 +95,13 @@ ParseFunctionGenerator::BuildFieldOptions(
                                        : internal::kNoHasbit,
         GetPresenceProbability(field, options)
             .value_or(kUnknownPresenceProbability),
-        GetLazyStyle(field, options),
+        GetLazyStyle(field, options, scc_analyzer),
         IsStringInlined(field, options),
-        IsImplicitWeakField(field, options),
+        IsImplicitWeakField(field, options, scc_analyzer),
         /* use_direct_tcparser_table */ true,
         ShouldSplit(field, options),
+        index < inlined_string_indices.size() ? inlined_string_indices[index]
+                                              : -1,
         IsMicroString(field, options),
     });
   }
@@ -283,11 +294,7 @@ void ParseFunctionGenerator::GenerateTailCallTable(io::Printer* p) {
               p->Emit(
                   "PROTOBUF_FIELD_OFFSET($classname$, _impl_._has_bits_),\n");
             } else {
-              // Just put something safe here. _cached_size_ is fine.
-              p->Emit(R"cc(
-                PROTOBUF_FIELD_OFFSET($classname$,
-                                      _impl_._cached_size_),  // no hasbits
-              )cc");
+              p->Emit("0,  // no _has_bits_\n");
             }
           }},
          {"extension_offset",
@@ -382,6 +389,11 @@ void ParseFunctionGenerator::GenerateTailCallTable(io::Printer* p) {
         case TailCallTableInfo::kNothing:
           p->Emit("{},\n");
           break;
+        case TailCallTableInfo::kInlinedStringDonatedOffset:
+          p->Emit(
+              "{_fl::Offset{offsetof($classname$, "
+              "_impl_._inlined_string_donated_)}},\n");
+          break;
         case TailCallTableInfo::kSplitOffset:
           p->Emit("{_fl::Offset{offsetof($classname$, _impl_._split_)}},\n");
           break;
@@ -409,7 +421,7 @@ void ParseFunctionGenerator::GenerateTailCallTable(io::Printer* p) {
                   "{$name$::InternalVerify},\n");
           break;
         case TailCallTableInfo::kSelfVerifyFunc:
-          if (ShouldVerify(descriptor_, options_)) {
+          if (ShouldVerify(descriptor_, options_, scc_analyzer_)) {
             p->Emit("{&InternalVerify},\n");
           } else {
             p->Emit("{},\n");

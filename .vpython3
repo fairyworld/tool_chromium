@@ -43,7 +43,7 @@ verify_pep425_tag: [
 #   //tools/perf/crossbench
 wheel: <
   name: "infra/python/wheels/protobuf-py3"
-  version: "version:7.34.1"
+  version: "version:6.33.0"
 >
 
 # TODO(https://crbug.com/898348): Add in necessary wheels as Python3 versions
@@ -228,11 +228,11 @@ wheel: <
 >
 wheel: <
   name: "infra/python/wheels/googleapis-common-protos-py2_py3"
-  version: "version:1.75.0"
+  version: "version:1.69.2"
 >
 wheel: <
   name: "infra/python/wheels/google-api-core-py3"
-  version: "version:2.30.3"
+  version: "version:2.24.2"
 >
 wheel: <
   name: "infra/python/wheels/google-auth-httplib2-py2_py3"
@@ -275,7 +275,7 @@ wheel: <
 
 wheel: <
   name: "infra/python/wheels/proto-plus-py3"
-  version: "version:1.28.0"
+  version: "version:1.26.1"
 >
 
 wheel: <
@@ -661,7 +661,7 @@ wheel: <
 >
 wheel: <
   name: "infra/python/wheels/google-cloud-bigquery-storage-py3"
-  version: "version:2.38.0"
+  version: "version:2.29.1"
 >
 wheel: <
   name: "infra/python/wheels/google-crc32c/${vpython_platform}"

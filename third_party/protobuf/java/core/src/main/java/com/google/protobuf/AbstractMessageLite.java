@@ -35,8 +35,7 @@ public abstract class AbstractMessageLite<
         MessageType extends AbstractMessageLite<MessageType, BuilderType>,
         BuilderType extends AbstractMessageLite.Builder<MessageType, BuilderType>>
     implements MessageLite {
-  protected
-  int memoizedHashCode = 0;
+  protected int memoizedHashCode = 0;
 
   @Override
   public ByteString toByteString() {
@@ -92,7 +91,6 @@ public abstract class AbstractMessageLite<
     throw new UnsupportedOperationException();
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
   int getSerializedSize(
           Schema schema) {
     int memoizedSerializedSize = getMemoizedSerializedSize();

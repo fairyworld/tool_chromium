@@ -39,7 +39,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -120,8 +119,7 @@ public final class Descriptors {
               + javaEditionDefaults.getMinimumEdition()
               + "!");
     }
-    if (edition.getNumber() > javaEditionDefaults.getMaximumEdition().getNumber()
-        && edition != Edition.EDITION_UNSTABLE) {
+    if (edition.getNumber() > javaEditionDefaults.getMaximumEdition().getNumber()) {
       throw new IllegalArgumentException(
           "Edition "
               + edition
@@ -694,54 +692,28 @@ public final class Descriptors {
       }
     }
 
-    /** Create a placeholder FileDescriptor */
-    private FileDescriptor(
-        String packageName,
-        Descriptor[] messages,
-        EnumDescriptor[] enums,
-        FileDescriptorProto proto)
-        throws DescriptorValidationException {
+    /** Create a placeholder FileDescriptor for a message Descriptor. */
+    FileDescriptor(String packageName, Descriptor message) throws DescriptorValidationException {
       this.tables = new FileDescriptorTables(new FileDescriptor[0], true);
-      this.proto = proto;
+      this.proto =
+          FileDescriptorProto.newBuilder()
+              .setName(message.getFullName() + ".placeholder.proto")
+              .setPackage(packageName)
+              .addMessageType(message.toProto())
+              .build();
       this.dependencies = new FileDescriptor[0];
       this.publicDependencies = new FileDescriptor[0];
       this.featuresResolved = false;
 
-      messageTypes = messages;
-      enumTypes = enums;
+      messageTypes = new Descriptor[] {message};
+      enumTypes = EMPTY_ENUM_DESCRIPTORS;
       services = EMPTY_SERVICE_DESCRIPTORS;
       extensions = EMPTY_FIELD_DESCRIPTORS;
 
       placeholder = true;
 
       tables.addPackage(packageName, this);
-    }
-
-    /** Create a placeholder FileDescriptor for a message Descriptor. */
-    FileDescriptor(String packageName, Descriptor message) throws DescriptorValidationException {
-      this(
-          packageName,
-          new Descriptor[] {message},
-          EMPTY_ENUM_DESCRIPTORS,
-          FileDescriptorProto.newBuilder()
-              .setName(message.getFullName() + ".placeholder.proto")
-              .setPackage(packageName)
-              .addMessageType(message.toProto())
-              .build());
-    }
-
-    /** Create a placeholder FileDescriptor for an EnumDescriptor. */
-    private FileDescriptor(String packageName, EnumDescriptor enm)
-        throws DescriptorValidationException {
-      this(
-          packageName,
-          EMPTY_DESCRIPTORS,
-          new EnumDescriptor[] {enm},
-          FileDescriptorProto.newBuilder()
-              .setName(enm.getFullName() + ".placeholder.proto")
-              .setPackage(packageName)
-              .addEnumType(enm.toProto())
-              .build());
+      tables.addSymbol(message);
     }
 
     public void resolveAllFeaturesImmutable() {
@@ -1177,13 +1149,7 @@ public final class Descriptors {
           DescriptorProto.newBuilder()
               .setName(name)
               .addExtensionRange(
-                  DescriptorProto.ExtensionRange.newBuilder()
-                      .setStart(1)
-                      // 2^31 - 1, which is the largest possible extension for messages that set
-                      // message_set_wire_format = true.  Since this is a placeholder and we don't
-                      // have a schema, this is safest setting.
-                      .setEnd(2147483647)
-                      .build())
+                  DescriptorProto.ExtensionRange.newBuilder().setStart(1).setEnd(536870912).build())
               .build();
       this.fullName = fullname;
 
@@ -1198,8 +1164,8 @@ public final class Descriptors {
       // Create a placeholder FileDescriptor to hold this message.
       this.parent = new FileDescriptor(packageName, this);
 
-      extensionRangeLowerBounds = new int[] {this.proto.getExtensionRange(0).getStart()};
-      extensionRangeUpperBounds = new int[] {this.proto.getExtensionRange(0).getEnd()};
+      extensionRangeLowerBounds = new int[] {1};
+      extensionRangeUpperBounds = new int[] {536870912};
 
       placeholder = true;
     }
@@ -1677,7 +1643,7 @@ public final class Descriptors {
         return false;
       }
 
-      if (!getMessageType().getName().toLowerCase(Locale.ROOT).equals(getName())) {
+      if (!getMessageType().getName().toLowerCase().equals(getName())) {
         // Group fields always are always the lowercase type name.
         return false;
       }
@@ -1768,8 +1734,7 @@ public final class Descriptors {
       // This is especially important for descriptor.proto since getting the JavaFeaturesProto
       // extension itself involves calling legacyEnumFieldTreatedAsClosed() which would otherwise
       // infinite loop.
-      if (getFile().getDependencies().isEmpty()
-          && getFile().proto.getOptionDependencyCount() == 0) {
+      if (getFile().getDependencies().isEmpty()) {
         return getType() == Type.ENUM && getEnumType().isClosed();
       }
 
@@ -2146,10 +2111,7 @@ public final class Descriptors {
             getFile()
                 .tables
                 .lookupSymbol(
-                    proto.getExtendee(),
-                    this,
-                    FileDescriptorTables.SearchFilter.TYPES_ONLY,
-                    /* expectingEnum= */ false);
+                    proto.getExtendee(), this, FileDescriptorTables.SearchFilter.TYPES_ONLY);
         if (!(extendee instanceof Descriptor)) {
           throw new DescriptorValidationException(
               this, '\"' + proto.getExtendee() + "\" is not a message type.");
@@ -2168,16 +2130,11 @@ public final class Descriptors {
       }
 
       if (proto.hasTypeName()) {
-        boolean expectingEnum =
-            proto.getType() == FieldDescriptorProto.Type.TYPE_ENUM || proto.hasDefaultValue();
         final GenericDescriptor typeDescriptor =
             getFile()
                 .tables
                 .lookupSymbol(
-                    proto.getTypeName(),
-                    this,
-                    FileDescriptorTables.SearchFilter.TYPES_ONLY,
-                    expectingEnum);
+                    proto.getTypeName(), this, FileDescriptorTables.SearchFilter.TYPES_ONLY);
 
         if (!proto.hasType()) {
           // Choose field type based on symbol.
@@ -2290,12 +2247,10 @@ public final class Descriptors {
               }
               break;
             case ENUM:
-              if (!getEnumType().isPlaceholder()) {
-                defaultValue = getEnumType().findValueByName(proto.getDefaultValue());
-                if (defaultValue == null) {
-                  throw new DescriptorValidationException(
-                      this, "Unknown enum default value: \"" + proto.getDefaultValue() + '\"');
-                }
+              defaultValue = getEnumType().findValueByName(proto.getDefaultValue());
+              if (defaultValue == null) {
+                throw new DescriptorValidationException(
+                    this, "Unknown enum default value: \"" + proto.getDefaultValue() + '\"');
               }
               break;
             case MESSAGE:
@@ -2396,7 +2351,7 @@ public final class Descriptors {
     }
 
     public boolean isPlaceholder() {
-      return placeholder;
+      return false;
     }
 
     /**
@@ -2578,39 +2533,6 @@ public final class Descriptors {
     private final int distinctNumbers;
     private Map<Integer, WeakReference<EnumValueDescriptor>> unknownValues = null;
     private ReferenceQueue<EnumValueDescriptor> cleanupQueue = null;
-    private final boolean placeholder;
-
-    // Used to create a placeholder when the type cannot be found.
-    private EnumDescriptor(final String fullName) throws DescriptorValidationException {
-      String name = fullName;
-      String packageName = "";
-      int pos = fullName.lastIndexOf('.');
-      if (pos != -1) {
-        name = fullName.substring(pos + 1);
-        packageName = fullName.substring(0, pos);
-      }
-      this.index = 0;
-      this.proto =
-          EnumDescriptorProto.newBuilder()
-              .setName(name)
-              .addValue(
-                  EnumValueDescriptorProto.newBuilder()
-                      .setName("PLACEHOLDER_VALUE")
-                      .setNumber(0)
-                      .build())
-              .build();
-      this.fullName = fullName;
-
-      this.values = new EnumValueDescriptor[1];
-      this.values[0] = new EnumValueDescriptor(this, 0);
-      this.valuesSortedByNumber = this.values.clone();
-      this.distinctNumbers = 1;
-
-      // Create a placeholder FileDescriptor to hold this message.
-      this.parent = new FileDescriptor(packageName, this);
-
-      placeholder = true;
-    }
 
     private EnumDescriptor(
         final EnumDescriptorProto proto,
@@ -2625,7 +2547,6 @@ public final class Descriptors {
       }
       this.index = index;
       this.proto = proto;
-      this.placeholder = false;
       fullName = computeFullName(file, parent, proto.getName());
 
       if (proto.getValueCount() == 0) {
@@ -3079,10 +3000,7 @@ public final class Descriptors {
           getFile()
               .tables
               .lookupSymbol(
-                  proto.getInputType(),
-                  this,
-                  FileDescriptorTables.SearchFilter.TYPES_ONLY,
-                  /* expectingEnum= */ false);
+                  proto.getInputType(), this, FileDescriptorTables.SearchFilter.TYPES_ONLY);
       if (!(input instanceof Descriptor)) {
         throw new DescriptorValidationException(
             this, '\"' + proto.getInputType() + "\" is not a message type.");
@@ -3093,10 +3011,7 @@ public final class Descriptors {
           getFile()
               .tables
               .lookupSymbol(
-                  proto.getOutputType(),
-                  this,
-                  FileDescriptorTables.SearchFilter.TYPES_ONLY,
-                  /* expectingEnum= */ false);
+                  proto.getOutputType(), this, FileDescriptorTables.SearchFilter.TYPES_ONLY);
       if (!(output instanceof Descriptor)) {
         throw new DescriptorValidationException(
             this, '\"' + proto.getOutputType() + "\" is not a message type.");
@@ -3393,8 +3308,7 @@ public final class Descriptors {
     GenericDescriptor lookupSymbol(
         final String name,
         final GenericDescriptor relativeTo,
-        final FileDescriptorTables.SearchFilter filter,
-        final boolean expectingEnum)
+        final FileDescriptorTables.SearchFilter filter)
         throws DescriptorValidationException {
 
       GenericDescriptor result;
@@ -3453,15 +3367,9 @@ public final class Descriptors {
                 scopeToTry.setLength(dotpos + 1);
                 scopeToTry.append(name);
                 result = findSymbol(scopeToTry.toString(), filter);
-                fullname = scopeToTry.toString();
-                break;
               }
-              if (filter != FileDescriptorTables.SearchFilter.TYPES_ONLY || isType(result)) {
-                fullname = scopeToTry.toString();
-                break;
-              }
-              // We found the symbol, but it's not a type and we're looking for types only.
-              // Keep looking.
+              fullname = scopeToTry.toString();
+              break;
             }
 
             // Not found.  Remove the name so we can try again.
@@ -3473,17 +3381,16 @@ public final class Descriptors {
       if (result == null) {
         if (allowUnknownDependencies && filter == SearchFilter.TYPES_ONLY) {
           logger.warning(
-              "The descriptor for type \""
+              "The descriptor for message type \""
                   + name
                   + "\" cannot be found and a placeholder is created for it");
-          // If we have good reason to believe that the type is an enum, create an EnumDescriptor
-          // placeholder here. Otherwise, create a Descriptor placeholder.  If we're wrong, a
-          // DescriptorValidationException will be thrown later.
-          if (expectingEnum) {
-            result = new EnumDescriptor(fullname);
-          } else {
-            result = new Descriptor(fullname);
-          }
+          // We create a dummy message descriptor here regardless of the
+          // expected type. If the type should be message, this dummy
+          // descriptor will work well and if the type should be enum, a
+          // DescriptorValidationException will be thrown later. In either
+          // case, the code works as expected: we allow unknown message types
+          // but not unknown enum types.
+          result = new Descriptor(fullname);
           // Add the placeholder file as a dependency so we can find the
           // placeholder symbol when resolving other references.
           this.dependencies.add(result.getFile());
@@ -3723,8 +3630,7 @@ public final class Descriptors {
     }
 
     private OneofDescriptor(
-        final OneofDescriptorProto proto, final Descriptor parent, final int index)
-        throws DescriptorValidationException {
+        final OneofDescriptorProto proto, final Descriptor parent, final int index) {
       this.proto = proto;
       fullName = computeFullName(null, parent, proto.getName());
       this.index = index;

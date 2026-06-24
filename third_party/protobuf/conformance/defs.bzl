@@ -35,15 +35,13 @@ def conformance_test(
 
     sh_test(
         name = name,
-        srcs = [
-            Label("//conformance:bazel_conformance_test_runner.sh"),
-        ],
+        srcs = ["//conformance:bazel_conformance_test_runner.sh"],
         data = [testee] + failure_lists + [
-            Label("//conformance:conformance_test_runner"),
+            "//conformance:conformance_test_runner",
         ],
         args = args,
         deps = [
-            Label("@bazel_tools//tools/bash/runfiles"),
+            "@bazel_tools//tools/bash/runfiles",
         ],
         tags = ["conformance"],
         **kwargs

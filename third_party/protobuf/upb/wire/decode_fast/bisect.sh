@@ -13,15 +13,13 @@
 #
 #   $ third_party/upb/upb/wire/decode_fast/bisect.sh third_party/upb/upb/test:test_generated_code
 
-if [[ $# -lt 1 ]]; then
+if [[ $# -ne 1 ]]; then
   echo "Usage: bisect.sh [blaze test flags] <test_target(s)>"
   exit 1
 fi
 
-set -ex
-
-/google/data/ro/teams/tetralight/bin/bisect -low 0 -high 256 \
+/google/data/ro/teams/tetralight/bin/bisect -low 0 -high 128 \
   "blaze test --//third_party/upb:fasttable_enabled=True \
   --per_file_copt=//third_party/upb/upb/wire/decode_fast:select@-DUPB_DECODEFAST_DISABLE_FUNCTIONS_ABOVE=\$X \
   --host_per_file_copt=//third_party/upb/upb/wire/decode_fast:select@-DUPB_DECODEFAST_DISABLE_FUNCTIONS_ABOVE=\$X \
-  $*"
+  $@"

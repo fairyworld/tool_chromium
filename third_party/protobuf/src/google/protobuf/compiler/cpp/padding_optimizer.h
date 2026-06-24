@@ -35,8 +35,9 @@ class PaddingOptimizer final : public MessageLayoutHelper {
  private:
   bool HasProfiledData() const override { return false; }
 
-  FieldHotness GetFieldHotness(const FieldDescriptor* field,
-                               const Options& options) const override {
+  FieldHotness GetFieldHotness(
+      const FieldDescriptor* field, const Options& options,
+      MessageSCCAnalyzer* scc_analyzer) const override {
     // Assume all fields are hot.
     return FieldHotness::kHot;
   }

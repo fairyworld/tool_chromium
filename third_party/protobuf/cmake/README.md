@@ -89,11 +89,11 @@ downloading and building a copy from GitHub. To prevent this and make it an
 error condition, you can optionally set:
 `-Dprotobuf_LOCAL_DEPENDENCIES_ONLY=ON`.
 
-### Enabling Tests
+### Disabling Tests
 
-To enable building the unit tests, set the following flag:
+To disable building the unit tests completely, set the following flag:
 
-*   `-Dprotobuf_BUILD_TESTS=ON`
+*   `-Dprotobuf_BUILD_TESTS=OFF`
 
 ### ZLib Support
 

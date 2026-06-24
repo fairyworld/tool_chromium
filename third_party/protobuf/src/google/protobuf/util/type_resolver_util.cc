@@ -63,57 +63,49 @@ void ConvertOptionField(const Reflection* reflection, const Message& options,
   Any* value = out->mutable_value();
   switch (field->cpp_type()) {
     case FieldDescriptor::CPPTYPE_MESSAGE:
-      // TODO: Remove this suppression.
-      (void)value->PackFrom(
+      value->PackFrom(
           field->is_repeated()
               ? reflection->GetRepeatedMessage(options, field, index)
               : reflection->GetMessage(options, field));
       return;
     case FieldDescriptor::CPPTYPE_DOUBLE:
-      // TODO: Remove this suppression.
-      (void)value->PackFrom(WrapValue<DoubleValue>(
+      value->PackFrom(WrapValue<DoubleValue>(
           field->is_repeated()
               ? reflection->GetRepeatedDouble(options, field, index)
               : reflection->GetDouble(options, field)));
       return;
     case FieldDescriptor::CPPTYPE_FLOAT:
-      // TODO: Remove this suppression.
-      (void)value->PackFrom(WrapValue<FloatValue>(
+      value->PackFrom(WrapValue<FloatValue>(
           field->is_repeated()
               ? reflection->GetRepeatedFloat(options, field, index)
               : reflection->GetFloat(options, field)));
       return;
     case FieldDescriptor::CPPTYPE_INT64:
-      // TODO: Remove this suppression.
-      (void)value->PackFrom(WrapValue<Int64Value>(
+      value->PackFrom(WrapValue<Int64Value>(
           field->is_repeated()
               ? reflection->GetRepeatedInt64(options, field, index)
               : reflection->GetInt64(options, field)));
       return;
     case FieldDescriptor::CPPTYPE_UINT64:
-      // TODO: Remove this suppression.
-      (void)value->PackFrom(WrapValue<UInt64Value>(
+      value->PackFrom(WrapValue<UInt64Value>(
           field->is_repeated()
               ? reflection->GetRepeatedUInt64(options, field, index)
               : reflection->GetUInt64(options, field)));
       return;
     case FieldDescriptor::CPPTYPE_INT32:
-      // TODO: Remove this suppression.
-      (void)value->PackFrom(WrapValue<Int32Value>(
+      value->PackFrom(WrapValue<Int32Value>(
           field->is_repeated()
               ? reflection->GetRepeatedInt32(options, field, index)
               : reflection->GetInt32(options, field)));
       return;
     case FieldDescriptor::CPPTYPE_UINT32:
-      // TODO: Remove this suppression.
-      (void)value->PackFrom(WrapValue<UInt32Value>(
+      value->PackFrom(WrapValue<UInt32Value>(
           field->is_repeated()
               ? reflection->GetRepeatedUInt32(options, field, index)
               : reflection->GetUInt32(options, field)));
       return;
     case FieldDescriptor::CPPTYPE_BOOL:
-      // TODO: Remove this suppression.
-      (void)value->PackFrom(WrapValue<BoolValue>(
+      value->PackFrom(WrapValue<BoolValue>(
           field->is_repeated()
               ? reflection->GetRepeatedBool(options, field, index)
               : reflection->GetBool(options, field)));
@@ -124,11 +116,9 @@ void ConvertOptionField(const Reflection* reflection, const Message& options,
               ? reflection->GetRepeatedString(options, field, index)
               : reflection->GetString(options, field);
       if (field->type() == FieldDescriptor::TYPE_STRING) {
-        // TODO: Remove this suppression.
-        (void)value->PackFrom(WrapValue<StringValue>(val));
+        value->PackFrom(WrapValue<StringValue>(val));
       } else {
-        // TODO: Remove this suppression.
-        (void)value->PackFrom(WrapValue<BytesValue>(val));
+        value->PackFrom(WrapValue<BytesValue>(val));
       }
       return;
     }
@@ -137,8 +127,7 @@ void ConvertOptionField(const Reflection* reflection, const Message& options,
           field->is_repeated()
               ? reflection->GetRepeatedEnum(options, field, index)
               : reflection->GetEnum(options, field);
-      // TODO: Remove this suppression.
-      (void)value->PackFrom(WrapValue<Int32Value>(val->number()));
+      value->PackFrom(WrapValue<Int32Value>(val->number()));
       return;
     }
   }

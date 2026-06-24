@@ -154,15 +154,18 @@ public class CodedOutputStreamTest {
     private final CodedOutputStream stream;
     private final ByteBuffer buffer;
 
-    NioDirectCoder(int size) {
-      this(size, 0);
+    NioDirectCoder(int size, boolean unsafe) {
+      this(size, 0, unsafe);
     }
 
-    NioDirectCoder(int size, int initialPosition) {
+    NioDirectCoder(int size, int initialPosition, boolean unsafe) {
       this.initialPosition = initialPosition;
       buffer = ByteBuffer.allocateDirect(size);
       buffer.position(initialPosition);
-      stream = CodedOutputStream.newInstance(buffer);
+      stream =
+          unsafe
+              ? CodedOutputStream.newUnsafeInstance(buffer)
+              : CodedOutputStream.newSafeInstance(buffer);
     }
 
     @Override
@@ -179,6 +182,29 @@ public class CodedOutputStreamTest {
       byte[] bytes = new byte[dup.remaining()];
       dup.get(bytes);
       return bytes;
+    }
+  }
+
+  private static final class ByteOutputWrappingArrayCoder implements Coder {
+    private final CodedOutputStream stream;
+    private final byte[] bytes;
+
+    ByteOutputWrappingArrayCoder(int size) {
+      bytes = new byte[size];
+      // Any ByteOutput subclass would do. All CodedInputStreams implement ByteOutput, so it
+      // seemed most convenient to this this with a CodedInputStream.newInstance(byte[]).
+      ByteOutput byteOutput = CodedOutputStream.newInstance(bytes);
+      stream = CodedOutputStream.newInstance(byteOutput, size);
+    }
+
+    @Override
+    public CodedOutputStream stream() {
+      return stream;
+    }
+
+    @Override
+    public byte[] toByteArray() {
+      return Arrays.copyOf(bytes, stream.getTotalBytesWritten());
     }
   }
 
@@ -202,17 +228,30 @@ public class CodedOutputStreamTest {
         return new NioHeapCoder(size + offset, /* initialPosition= */ offset);
       }
     },
-    NIO_DIRECT() {
+    NIO_DIRECT_SAFE() {
       @Override
       Coder newCoder(int size) {
-        return new NioDirectCoder(size);
+        return new NioDirectCoder(size, /* unsafe= */ false);
       }
     },
-    NIO_DIRECT_WITH_INITIAL_OFFSET() {
+    NIO_DIRECT_SAFE_WITH_INITIAL_OFFSET() {
       @Override
       Coder newCoder(int size) {
         int offset = 2;
-        return new NioDirectCoder(size + offset, offset);
+        return new NioDirectCoder(size + offset, offset, /* unsafe= */ false);
+      }
+    },
+    NIO_DIRECT_UNSAFE() {
+      @Override
+      Coder newCoder(int size) {
+        return new NioDirectCoder(size, /* unsafe= */ true);
+      }
+    },
+    NIO_DIRECT_UNSAFE_WITH_INITIAL_OFFSET() {
+      @Override
+      Coder newCoder(int size) {
+        int offset = 2;
+        return new NioDirectCoder(size + offset, offset, /* unsafe= */ true);
       }
     },
     STREAM() {
@@ -227,6 +266,12 @@ public class CodedOutputStreamTest {
         // Block Size 0 gets rounded up to minimum block size, see AbstractBufferedEncoder.
         return new OutputStreamCoder(size, /* blockSize= */ 0);
       }
+    },
+    BYTE_OUTPUT_WRAPPING_ARRAY() {
+      @Override
+      Coder newCoder(int size) {
+        return new ByteOutputWrappingArrayCoder(size);
+      }
     };
 
     abstract Coder newCoder(int size);
@@ -237,6 +282,7 @@ public class CodedOutputStreamTest {
       switch (this) {
         case STREAM:
         case STREAM_MINIMUM_BUFFER_SIZE:
+        case BYTE_OUTPUT_WRAPPING_ARRAY:
           return false;
         default:
           return true;
@@ -828,6 +874,8 @@ public class CodedOutputStreamTest {
   @Test
   public void testSerializeInvalidUtf8FollowedByOutOfSpace() throws Exception {
     final int notEnoughBytes = 4;
+    // This test fails for BYTE_OUTPUT_WRAPPING_ARRAY
+    assume().that(outputType).isNotEqualTo(OutputType.BYTE_OUTPUT_WRAPPING_ARRAY);
 
     Coder coder = outputType.newCoder(notEnoughBytes);
 

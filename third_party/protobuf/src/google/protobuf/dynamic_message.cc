@@ -62,7 +62,6 @@
 #include "google/protobuf/generated_message_reflection.h"
 #include "google/protobuf/generated_message_util.h"
 #include "google/protobuf/has_bits.h"
-#include "google/protobuf/internal_metadata_locator.h"
 #include "google/protobuf/map.h"
 #include "google/protobuf/map_field.h"
 #include "google/protobuf/message_lite.h"
@@ -95,13 +94,7 @@ class DynamicMapField final : public MapFieldBase {
   // allow the caller to use the appropriate lookup function. During prototype
   // building we need to use a different one.
   DynamicMapField(const Message* default_entry,
-                  const Message* mapped_default_entry_if_message,
-#ifdef PROTOBUF_INTERNAL_REMOVE_ARENA_PTRS_MAP_FIELD
-                  InternalMetadataOffset offset
-#else
-                  Arena* arena
-#endif
-  );
+                  const Message* mapped_default_entry_if_message, Arena* arena);
   DynamicMapField(const DynamicMapField&) = delete;
   DynamicMapField& operator=(const DynamicMapField&) = delete;
   ~DynamicMapField();
@@ -154,21 +147,10 @@ static auto DefaultEntryToTypeInfo(
 
 DynamicMapField::DynamicMapField(const Message* default_entry,
                                  const Message* mapped_default_entry_if_message,
-#ifdef PROTOBUF_INTERNAL_REMOVE_ARENA_PTRS_MAP_FIELD
-                                 InternalMetadataOffset offset
-#else
-                                 Arena* arena
-#endif
-                                 )
+                                 Arena* arena)
     : MapFieldBase(default_entry),
-      map_(
-#ifdef PROTOBUF_INTERNAL_REMOVE_ARENA_PTRS_MAP_FIELD
-          offset.TranslateForMember<offsetof(DynamicMapField, map_)>(),
-#else
-          arena,
-#endif
-          DefaultEntryToTypeInfo(default_entry,
-                                 mapped_default_entry_if_message)) {
+      map_(arena, DefaultEntryToTypeInfo(default_entry,
+                                         mapped_default_entry_if_message)) {
   // This invariant is required by `GetMapRaw` to easily access the map
   // member without paying for dynamic dispatch.
   static_assert(MapFieldBaseForParse::MapOffset() ==
@@ -177,7 +159,7 @@ DynamicMapField::DynamicMapField(const Message* default_entry,
 
 DynamicMapField::~DynamicMapField() {
   ABSL_DCHECK_EQ(map_.arena(), nullptr);
-  map_.ClearTable(/*arena=*/nullptr, /*reset=*/false);
+  map_.ClearTable(false);
 }
 
 }  // namespace internal
@@ -367,7 +349,6 @@ class DynamicMessage final : public Message {
   // implementation.
   template <typename T>
   uint32_t FieldOffset(int i) const;
-  internal::InternalMetadataOffset FieldInternalMetadataOffset(int i) const;
   template <typename T = void>
   T* MutableRaw(int i);
   template <typename T = void>
@@ -400,6 +381,7 @@ struct DynamicMessageFactory::TypeInfo {
       internal::ClassData{
           nullptr,  // default_instance
           nullptr,  // tc_table
+          nullptr,  // on_demand_register_arena_dtor
           &DynamicMessage::IsInitializedImpl,
           &DynamicMessage::MergeImpl,
           internal::MessageCreator(),  // to be filled later
@@ -472,12 +454,6 @@ inline uint32_t DynamicMessage::FieldOffset(int i) const {
   }
   return type_info_->offsets[i] & mask;
 }
-inline internal::InternalMetadataOffset
-DynamicMessage::FieldInternalMetadataOffset(int i) const {
-  size_t field_offset = FieldOffset<void>(i);
-  return internal::InternalMetadataOffset::BuildFromDynamicOffset<
-      DynamicMessage>(field_offset);
-}
 template <typename T>
 inline T* DynamicMessage::MutableRaw(int i) {
   return reinterpret_cast<T*>(OffsetToPointer(FieldOffset<T>(i)));
@@ -520,11 +496,7 @@ void DynamicMessage::SharedCtor(bool lock_factory) {
   }
 
   if (type_info_->extensions_offset != -1) {
-#ifdef PROTOBUF_INTERNAL_REMOVE_ARENA_PTRS_EXTENSION_SET
-    new (MutableExtensionsRaw()) ExtensionSet();
-#else
     new (MutableExtensionsRaw()) ExtensionSet(arena);
-#endif
   }
   for (int i = 0; i < descriptor->field_count(); i++) {
     const FieldDescriptor* field = descriptor->field(i);
@@ -533,16 +505,6 @@ void DynamicMessage::SharedCtor(bool lock_factory) {
       continue;
     }
     switch (field->cpp_type()) {
-#ifdef PROTOBUF_INTERNAL_REMOVE_ARENA_PTRS_REPEATED_FIELD
-#define HANDLE_TYPE(CPPTYPE, TYPE)                                         \
-  case FieldDescriptor::CPPTYPE_##CPPTYPE:                                 \
-    if (!field->is_repeated()) {                                           \
-      new (field_ptr) TYPE(field->default_value_##TYPE());                 \
-    } else {                                                               \
-      new (field_ptr) RepeatedField<TYPE>(FieldInternalMetadataOffset(i)); \
-    }                                                                      \
-    break;
-#else
 #define HANDLE_TYPE(CPPTYPE, TYPE)                         \
   case FieldDescriptor::CPPTYPE_##CPPTYPE:                 \
     if (!field->is_repeated()) {                           \
@@ -551,7 +513,6 @@ void DynamicMessage::SharedCtor(bool lock_factory) {
       new (field_ptr) RepeatedField<TYPE>(arena);          \
     }                                                      \
     break;
-#endif
 
       HANDLE_TYPE(INT32, int32_t);
       HANDLE_TYPE(INT64, int64_t);
@@ -566,11 +527,7 @@ void DynamicMessage::SharedCtor(bool lock_factory) {
         if (!field->is_repeated()) {
           new (field_ptr) int{field->default_value_enum()->number()};
         } else {
-#ifdef PROTOBUF_INTERNAL_REMOVE_ARENA_PTRS_REPEATED_FIELD
-          new (field_ptr) RepeatedField<int>(FieldInternalMetadataOffset(i));
-#else
           new (field_ptr) RepeatedField<int>(arena);
-#endif
         }
         break;
 
@@ -590,12 +547,7 @@ void DynamicMessage::SharedCtor(bool lock_factory) {
                 arena->OwnDestructor(static_cast<absl::Cord*>(field_ptr));
               }
             } else {
-#ifdef PROTOBUF_INTERNAL_REMOVE_ARENA_PTRS_REPEATED_FIELD
-              new (field_ptr)
-                  RepeatedField<absl::Cord>(FieldInternalMetadataOffset(i));
-#else
               new (field_ptr) RepeatedField<absl::Cord>(arena);
-#endif
               if (arena != nullptr) {
                 // Needs to destroy Cord elements.
                 arena->OwnDestructor(
@@ -623,12 +575,7 @@ void DynamicMessage::SharedCtor(bool lock_factory) {
               ArenaStringPtr* asp = new (field_ptr) ArenaStringPtr();
               asp->InitDefault();
             } else {
-#ifdef PROTOBUF_INTERNAL_REMOVE_ARENA_PTRS_REPEATED_PTR_FIELD
-              new (field_ptr)
-                  RepeatedPtrField<std::string>(FieldInternalMetadataOffset(i));
-#else  // !PROTOBUF_INTERNAL_REMOVE_ARENA_PTRS_REPEATED_PTR_FIELD
               new (field_ptr) RepeatedPtrField<std::string>(arena);
-#endif
             }
             break;
         }
@@ -654,19 +601,9 @@ void DynamicMessage::SharedCtor(bool lock_factory) {
                           ? type_info_->factory->GetPrototype(sub)
                           : type_info_->factory->GetPrototypeNoLock(sub)
                     : nullptr,
-#ifdef PROTOBUF_INTERNAL_REMOVE_ARENA_PTRS_MAP_FIELD
-                FieldInternalMetadataOffset(i)
-#else
-                arena
-#endif
-            );
+                arena);
           } else {
-#ifdef PROTOBUF_INTERNAL_REMOVE_ARENA_PTRS_REPEATED_PTR_FIELD
-            new (field_ptr)
-                RepeatedPtrField<Message>(FieldInternalMetadataOffset(i));
-#else  // !PROTOBUF_INTERNAL_REMOVE_ARENA_PTRS_REPEATED_PTR_FIELD
             new (field_ptr) RepeatedPtrField<Message>(arena);
-#endif
           }
         }
         break;
@@ -1035,7 +972,7 @@ const Message* DynamicMessageFactory::GetPrototypeNoLock(
   // Construct the reflection object.
 
   // Allocate the prototype fields.
-  void* base = internal::Allocate(size);
+  void* base = operator new(size);
   memset(base, 0, size);
 
   // We have already locked the factory so we should not lock in the constructor
@@ -1051,6 +988,8 @@ const Message* DynamicMessageFactory::GetPrototypeNoLock(
       type_info->oneof_case_offset,
       static_cast<int>(type_info->class_data.allocation_size()),
       type_info->weak_field_map_offset,
+      nullptr,  // inlined_string_indices_
+      0,        // inlined_string_donated_offset_
       -1,       // split_offset_
       -1,       // sizeof_split_
   };
