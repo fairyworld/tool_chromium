@@ -772,6 +772,8 @@ export class ComposeboxElement extends ComposeboxEmbedderMixin
   }
 
   override submitCleanup() {
+    // TODO: crbug.com/486707842 - Move to the Contextual Tasks embedder
+    this.cacheSubmittedTabs();
     if (this.isCollapsible) {
       this.clearAllInputs(/* querySubmitted= */ true,
                           /* shouldBlockAutoSuggestedTabs= */ false);

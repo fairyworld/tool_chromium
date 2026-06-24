@@ -51,6 +51,7 @@
 #include "components/contextual_tasks/public/query_contextualizer.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/lens/lens_url_utils.h"
+#include "components/omnibox/common/composebox_features.h"
 #include "components/prefs/pref_service.h"
 #include "components/tab_groups/tab_group_visual_data.h"
 #include "components/variations/scoped_variations_ids_provider.h"
@@ -1211,6 +1212,86 @@ TEST_F(ContextualTasksPageHandlerTest,
 
 TEST_F(ContextualTasksPageHandlerTest, OnContextMenuOpened) {
   page_handler_->OnContextMenuOpened();
+}
+
+TEST_F(ContextualTasksPageHandlerTest,
+       OnWebviewMessage_UpdateThreadContextLibrary_HistoryLoad) {
+  base::test::ScopedFeatureList local_features;
+  local_features.InitAndEnableFeature(omnibox::kContextManagementInComposebox);
+
+  base::Uuid task_id = base::Uuid::GenerateRandomV4();
+
+  // Directly set the history load state to true to simulate switching to a
+  // history thread.
+  contextual_tasks_ui_->set_is_history_thread_loading(true);
+  contextual_tasks_ui_->SetTaskId(task_id);
+
+  lens::AimToClientMessage message;
+  auto* update = message.mutable_update_thread_context_library();
+  auto* context = update->add_contexts();
+  context->set_context_id(123);
+  context->mutable_webpage()->set_url(kExampleUrl);
+
+  size_t size = message.ByteSizeLong();
+  std::vector<uint8_t> serialized(size);
+  message.SerializeToArray(serialized.data(), size);
+
+  EXPECT_CALL(*contextual_tasks_ui_, GetOrCreateContextualSessionHandle())
+      .WillOnce(Return(nullptr));
+  EXPECT_CALL(*mock_contextual_tasks_service_,
+              SetUrlResourcesFromServer(task_id, _))
+      .Times(1);
+
+  // Since is_history_thread_loading() is true, we expect GetContextForTask to
+  // be called.
+  EXPECT_CALL(*mock_contextual_tasks_service_,
+              GetContextForTask(task_id, _, _, _))
+      .Times(1);
+
+  page_handler_->OnWebviewMessage(serialized);
+
+  // Verify that the flag is reset to false after handling.
+  EXPECT_FALSE(contextual_tasks_ui_->is_history_thread_loading());
+}
+
+TEST_F(ContextualTasksPageHandlerTest,
+       OnWebviewMessage_UpdateThreadContextLibrary_ActiveTurn) {
+  base::test::ScopedFeatureList local_features;
+  local_features.InitAndEnableFeature(omnibox::kContextManagementInComposebox);
+
+  base::Uuid task_id = base::Uuid::GenerateRandomV4();
+
+  // Set the task ID and explicitly set is_history_thread_loading to false to
+  // simulate an active turn.
+  contextual_tasks_ui_->SetTaskId(task_id);
+  contextual_tasks_ui_->set_is_history_thread_loading(false);
+
+  lens::AimToClientMessage message;
+  auto* update = message.mutable_update_thread_context_library();
+  auto* context = update->add_contexts();
+  context->set_context_id(123);
+  context->mutable_webpage()->set_url(kExampleUrl);
+
+  size_t size = message.ByteSizeLong();
+  std::vector<uint8_t> serialized(size);
+  message.SerializeToArray(serialized.data(), size);
+
+  EXPECT_CALL(*contextual_tasks_ui_, GetOrCreateContextualSessionHandle())
+      .WillOnce(Return(nullptr));
+  EXPECT_CALL(*mock_contextual_tasks_service_,
+              SetUrlResourcesFromServer(task_id, _))
+      .Times(1);
+
+  // Since is_history_thread_loading() is false, GetContextForTask should NOT be
+  // called.
+  EXPECT_CALL(*mock_contextual_tasks_service_,
+              GetContextForTask(task_id, _, _, _))
+      .Times(0);
+
+  page_handler_->OnWebviewMessage(serialized);
+
+  // Verify that the flag remains false.
+  EXPECT_FALSE(contextual_tasks_ui_->is_history_thread_loading());
 }
 
 }  // namespace contextual_tasks

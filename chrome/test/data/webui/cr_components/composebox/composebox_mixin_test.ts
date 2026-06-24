@@ -207,6 +207,47 @@ suite('ComposeboxMixinTest', () => {
     assertFalse(element.files.has(tokenTab));
   });
 
+  test(
+      'cacheSubmittedTabs appends submitted tabs in chronological order',
+      () => {
+        const token1 = 'token1' as unknown as UnguessableToken;
+        const tab1 =
+            new ComposeboxFile(token1, 'Tab 1', 'tab', InputType.kBrowserTab, {
+              isDeletable: true,
+              tabId: 1,
+              url: 'about:blank?1',
+            });
+        const token2 = 'token2' as unknown as UnguessableToken;
+        const tab2 =
+            new ComposeboxFile(token2, 'Tab 2', 'tab', InputType.kBrowserTab, {
+              isDeletable: true,
+              tabId: 2,
+              url: 'about:blank?2',
+            });
+
+        element.files = new Map([[token1, tab1], [token2, tab2]]);
+        element.addedTabsIds = new Map([[1, token1], [2, token2]]);
+        element.aimThreadRestoredTabs = [
+          {
+            tabId: 3,
+            title: 'Tab 3',
+            url: 'about:blank?3',
+            showInCurrentTabChip: false,
+            showInPreviousTabChip: false,
+            lastActive: {internalValue: 0n},
+          },
+        ];
+
+        element.cacheSubmittedTabs();
+
+        assertEquals(3, element.aimThreadRestoredTabs.length);
+        // Newly submitted tabs (tab1, tab2) should be appended chronologically:
+        // [tab3, tab1, tab2]
+        assertEquals(3, element.aimThreadRestoredTabs[0]!.tabId);
+        assertEquals(1, element.aimThreadRestoredTabs[1]!.tabId);
+        assertEquals(2, element.aimThreadRestoredTabs[2]!.tabId);
+      });
+
   test('queryAutocomplete passes cursor position', async () => {
     element.input = 'hello';
     await microtasksFinished();

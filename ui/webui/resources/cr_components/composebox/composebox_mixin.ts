@@ -228,6 +228,7 @@ export const ComposeboxEmbedderMixin =
         queryZpsOnLoad: boolean =
             getLoadTimeBoolean('queryZpsOnLoad', /*defaultValue=*/ true);
         contextMenuOpened: boolean = false;
+        hasCachedSubmittedTabsThisTurn: boolean = false;
         keepMenuOpenOnTabSelectForRealbox: boolean =
             getLoadTimeBoolean('keepMenuOpenOnTabSelectForRealbox', false);
         eventTracker: EventTracker = new EventTracker();
@@ -1759,11 +1760,28 @@ export const ComposeboxEmbedderMixin =
           }
         }
 
+        cacheSubmittedTabs() {
+          if (this.hasCachedSubmittedTabsThisTurn) {
+            return;
+          }
+          if (this.addedTabsIds && this.addedTabsIds.size > 0) {
+            const submittedTabs = this.getSharedTabs();
+            if (submittedTabs.length > 0) {
+              this.aimThreadRestoredTabs = [
+                ...this.aimThreadRestoredTabs,
+                ...submittedTabs,
+              ];
+              this.hasCachedSubmittedTabsThisTurn = true;
+            }
+          }
+        }
+
         submitCleanup() {
           this.submitting = true;
           this.clearAutocompleteMatches();
           this.resetSmartComposeStats();
           this.animationState = GlowAnimationState.SUBMITTING;
+          this.cacheSubmittedTabs();
           if (this.addedTabsIds && this.addedTabsIds.size > 0) {
             const activeTabsArray = Array.from(this.addedTabsIds.keys());
 
@@ -1785,6 +1803,7 @@ export const ComposeboxEmbedderMixin =
                 /* shouldBlockAutoSuggestedTabs= */ false);
           }
           this.fire('composebox-submit');
+          this.hasCachedSubmittedTabsThisTurn = false;
         }
 
         hasImageFiles(): boolean {
@@ -2569,6 +2588,7 @@ export interface ComposeboxEmbedderMixinInterface extends
   closeMenu(): void;
   closeComposebox(): void;
   submitQuery(e?: KeyboardEvent|MouseEvent): void;
+  cacheSubmittedTabs(): void;
   submitCleanup(): void;
   getInputElement(): ComposeboxInputElement;
   getDropdownElement(): ComposeboxDropdownElement;

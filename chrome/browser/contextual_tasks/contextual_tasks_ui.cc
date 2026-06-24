@@ -809,17 +809,29 @@ const std::optional<base::Uuid>& ContextualTasksUI::GetTaskId() {
 
 void ContextualTasksUI::SetTaskId(std::optional<base::Uuid> id) {
   // Only clear restored tabs if the task has changed or no id exists.
-  if (base::FeatureList::IsEnabled(omnibox::kContextManagementInComposebox) &&
-      ((id.has_value() && task_id_.has_value() &&
-        id.value() != task_id_.value()) ||
-       !id.has_value())) {
-    OnRestoredTabsFetched({});
+  if (base::FeatureList::IsEnabled(omnibox::kContextManagementInComposebox)) {
+    if ((id.has_value() && task_id_.has_value() &&
+         id.value() != task_id_.value()) ||
+        !id.has_value()) {
+      OnRestoredTabsFetched({});
+    }
+    if (id != task_id_) {
+      is_history_thread_loading_ = id.has_value();
+    }
   }
   task_id_ = id;
   // Initialize input state once task id is available.
   if (composebox_handler_) {
     composebox_handler_->InitializeInputStateModel();
   }
+}
+
+bool ContextualTasksUI::is_history_thread_loading() const {
+  return is_history_thread_loading_;
+}
+
+void ContextualTasksUI::set_is_history_thread_loading(bool loading) {
+  is_history_thread_loading_ = loading;
 }
 
 const std::optional<std::string>& ContextualTasksUI::GetThreadId() {

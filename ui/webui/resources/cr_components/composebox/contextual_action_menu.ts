@@ -663,8 +663,9 @@ export class ContextualActionMenuElement extends
     const activeRestoredTabs = allSelectedIds.map(id => suggestionsMap.get(id))
                                    .filter((tab): tab is TabInfo => !!tab)
                                    .reverse();
+    const reversedRestored = [...(this.aimThreadRestoredTabs || [])].reverse();
 
-    return activeRestoredTabs.concat(this.aimThreadRestoredTabs || []);
+    return activeRestoredTabs.concat(reversedRestored);
   }
 
   protected isRecentTab_(tabId: number): boolean {
