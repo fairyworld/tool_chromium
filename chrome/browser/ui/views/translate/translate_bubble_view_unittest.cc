@@ -221,6 +221,19 @@ views::BoxLayoutView* GetListView(views::View* search_view) {
   return nullptr;
 }
 
+views::TabbedPane* GetTabbedPane(views::View* view) {
+  if (views::IsViewClass<views::TabbedPane>(view)) {
+    return static_cast<views::TabbedPane*>(view);
+  }
+  for (views::View* child : view->children()) {
+    views::TabbedPane* tabbed_pane = GetTabbedPane(child);
+    if (tabbed_pane) {
+      return tabbed_pane;
+    }
+  }
+  return nullptr;
+}
+
 }  // namespace
 
 class TranslateBubbleViewTest : public ChromeViewsTestBase {
@@ -871,3 +884,14 @@ TEST_F(TranslateBubbleViewTest, SearchNoResultsMessage) {
             static_cast<views::Label*>(child)->GetText());
 }
 
+TEST_F(TranslateBubbleViewTest, InitialFocus) {
+  base::test::ScopedFeatureList features(translate::kTranslateLanguageSearchUI);
+  CreateAndShowBubble();
+
+  // The initially focused view should be the selected tab (index 0).
+  views::View* initially_focused = bubble_->GetInitiallyFocusedView();
+  ASSERT_TRUE(initially_focused);
+  views::TabbedPane* tabbed_pane = GetTabbedPane(bubble_);
+  ASSERT_TRUE(tabbed_pane);
+  EXPECT_EQ(tabbed_pane->GetTabAt(0), initially_focused);
+}
