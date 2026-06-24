@@ -152,6 +152,7 @@ const FeatureEntry::Choice kSendTabToSelfEnhancedHandoffChoices[] = {
      "SyncSimplifyDeviceNaming,"
      "SyncUseServerDeterminedDeviceName,"
      "SendTabToSelfEnhancedBottomsheet,"
+     "SendTabToSelfIOSShareSheetDeviceList,"
      "SyncSessionsUsePreferredDisplayName"},
     {flags_ui::kGenericExperimentChoiceDisabled, switches::kDisableFeatures,
      "SendTabToSelfAutoOpen,"
@@ -163,6 +164,7 @@ const FeatureEntry::Choice kSendTabToSelfEnhancedHandoffChoices[] = {
      "SyncSimplifyDeviceNaming,"
      "SyncUseServerDeterminedDeviceName,"
      "SendTabToSelfEnhancedBottomsheet,"
+     "SendTabToSelfIOSShareSheetDeviceList,"
      "SyncSessionsUsePreferredDisplayName"},
 };
 
