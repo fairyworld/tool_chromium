@@ -46,6 +46,7 @@
 #include "chrome/browser/global_keyboard_shortcuts_mac.h"
 #include "chrome/browser/ui/browser_commands_mac.h"
 #endif
+#include "chrome/browser/browser_process.h"
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/indigo/resources/grit/indigo_strings.h"
 #include "chrome/browser/multistep_filter/ui/filter_ui_controller.h"
@@ -75,6 +76,7 @@
 #include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/browser/ui/commerce/commerce_ui_tab_helper.h"
 #include "chrome/browser/ui/customize_chrome/side_panel_controller.h"
+#include "chrome/browser/ui/exclusive_access/exclusive_access_manager.h"
 #include "chrome/browser/ui/intent_picker_tab_helper.h"
 #include "chrome/browser/ui/lens/lens_overlay_controller.h"
 #include "chrome/browser/ui/lens/lens_overlay_entry_point_controller.h"
@@ -84,6 +86,7 @@
 #include "chrome/browser/ui/page_action/page_action_triggers.h"
 #include "chrome/browser/ui/passwords/manage_passwords_ui_controller.h"
 #include "chrome/browser/ui/passwords/passwords_model_delegate.h"
+#include "chrome/browser/ui/passwords/ui_utils.h"
 #include "chrome/browser/ui/performance_controls/memory_saver_bubble_controller.h"
 #include "chrome/browser/ui/qrcode_generator/qrcode_generator_bubble_controller.h"
 #include "chrome/browser/ui/read_anything/read_anything_entry_point_controller.h"
@@ -135,9 +138,11 @@
 #include "chrome/browser/ui/webid/account_selection_view.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_section.h"
 #include "chrome/common/chrome_features.h"
+#include "chrome/common/pref_names.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/autofill/core/common/autofill_payments_features.h"
+#include "components/bookmarks/common/bookmark_pref_names.h"
 #include "components/collaboration/public/messaging/activity_log.h"
 #include "components/commerce/core/metrics/discounts_metric_collector.h"
 #include "components/content_settings/core/common/features.h"
@@ -149,7 +154,9 @@
 #include "components/multistep_filter/core/features.h"
 #include "components/omnibox/browser/omnibox_field_trial.h"
 #include "components/omnibox/browser/vector_icons.h"
+#include "components/password_manager/core/browser/manage_passwords_referrer.h"
 #include "components/policy/core/common/policy_pref_names.h"
+#include "components/prefs/pref_service.h"
 #include "components/record_replay/core/common/record_replay_features.h"
 #include "components/saved_tab_groups/public/features.h"
 #include "components/search_engines/template_url.h"
@@ -2754,6 +2761,100 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               },
               bwi))
           .SetActionId(kActionZoomMinus)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                ExclusiveAccessManager* manager =
+                    ExclusiveAccessManager::From(bwi);
+                if (manager) {
+                  manager->ExitExclusiveAccess();
+                }
+              },
+              bwi))
+          .SetActionId(kActionContentContextExitFullscreen)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                NavigateToManagePasswordsPage(
+                    bwi, password_manager::ManagePasswordsReferrer::
+                             kPasswordContextMenu);
+              },
+              bwi))
+          .SetActionId(kActionContentContextShowAllSavedPasswords)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ToggleBookmarkBarWhenVisible(bwi->GetProfile());
+              },
+              bwi))
+          .SetActionId(kActionBookmarkBarAlwaysShow)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                PrefService* prefs = bwi->GetProfile()->GetPrefs();
+                prefs->SetBoolean(
+                    bookmarks::prefs::kShowAppsShortcutInBookmarkBar,
+                    !prefs->GetBoolean(
+                        bookmarks::prefs::kShowAppsShortcutInBookmarkBar));
+              },
+              bwi))
+          .SetActionId(kActionBookmarkBarShowAppsShortcut)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                PrefService* prefs = bwi->GetProfile()->GetPrefs();
+                prefs->SetBoolean(
+                    bookmarks::prefs::kShowManagedBookmarksInBookmarkBar,
+                    !prefs->GetBoolean(
+                        bookmarks::prefs::kShowManagedBookmarksInBookmarkBar));
+              },
+              bwi))
+          .SetActionId(kActionBookmarkBarShowManagedBookmarks)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowBookmarkManager(bwi);
+              },
+              bwi))
+          .SetActionId(kActionBookmarkManager)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                PrefService* service = g_browser_process->local_state();
+                if (service) {
+                  service->SetBoolean(prefs::kBackgroundModeEnabled, false);
+                }
+              },
+              bwi))
+          .SetActionId(kActionStatusTrayKeepChromeRunningInBackground)
           .Build());
 }
 
