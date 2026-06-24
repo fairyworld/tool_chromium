@@ -5317,17 +5317,7 @@ if (!is_android) {
       }
     }
     if (enable_paint_preview) {
-      sources += [
-        "../browser/paint_preview/paint_preview_browsertest.cc",
-        "../browser/paint_preview/paint_preview_compositor_browsertest.cc",
-      ]
-      deps += [
-        "//components/paint_preview/browser",
-        "//components/paint_preview/browser:test_support",
-        "//components/paint_preview/common",
-        "//components/paint_preview/common:test_utils",
-        "//components/services/paint_preview_compositor/public/mojom",
-      ]
+      deps += [ "//chrome/browser/paint_preview:browser_tests" ]
     }
 
     if (is_chromeos) {
