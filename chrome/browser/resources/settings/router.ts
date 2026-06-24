@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import {assert, assertNotReached} from 'chrome://resources/js/assert.js';
+import type {CrLitElement} from 'chrome://resources/lit/v3_0/lit.rollup.js';
 import type {PolymerElement} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 import {dedupingMixin} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 
@@ -513,6 +514,36 @@ export const RouteObserverMixin = dedupingMixin(
       }
       return RouteObserverMixin;
     });
+
+export const RouteObserverMixinLit =
+    <T extends Constructor<CrLitElement>>(superClass: T): T&
+    Constructor<RouteObserverMixinInterface> => {
+      class RouteObserverMixinLit extends superClass implements
+          RouteObserverMixinInterface {
+        override connectedCallback() {
+          super.connectedCallback();
+
+          assert(routerInstance);
+          routerInstance.addObserver(this);
+
+          // Emulating Polymer data bindings, the observer is called when the
+          // element starts observing the route.
+          this.currentRouteChanged(routerInstance.currentRoute, undefined);
+        }
+
+        override disconnectedCallback() {
+          super.disconnectedCallback();
+
+          assert(routerInstance);
+          routerInstance.removeObserver(this);
+        }
+
+        currentRouteChanged(_newRoute: Route, _oldRoute?: Route) {
+          assertNotReached();
+        }
+      }
+      return RouteObserverMixinLit;
+    };
 
 export interface RouteObserverMixinInterface {
   currentRouteChanged(newRoute: Route, oldRoute?: Route): void;
