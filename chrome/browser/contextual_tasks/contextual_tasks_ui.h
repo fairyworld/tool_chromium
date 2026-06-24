@@ -205,6 +205,7 @@ class ContextualTasksUI
   contextual_search::ContextualSearchSessionHandle*
   GetOrCreateContextualSessionHandle() override;
   GURL GetWebUiUrl() override;
+  bool IsContextualTasksEligibleOnInit() const override;
   bool IsInitComplete() override;
   void OnInitComplete() override;
   void AddObserver(contextual_tasks::ContextualTasksUIInterface::Observer*

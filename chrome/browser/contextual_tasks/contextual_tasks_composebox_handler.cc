@@ -535,6 +535,13 @@ void ContextualTasksComposeboxHandler::InitializeInputStateModel() {
     }
   }
 }
+
+bool ContextualTasksComposeboxHandler::IsContextualSearchTabSharingEligible()
+    const {
+  return web_ui_interface_ &&
+         web_ui_interface_->IsContextualTasksEligibleOnInit();
+}
+
 void ContextualTasksComposeboxHandler::SetAimThreadRestoredTabs(
     std::vector<searchbox::mojom::TabInfoPtr> tabs) {
   if (SearchboxHandler::page_) {
@@ -774,6 +781,12 @@ void ContextualTasksComposeboxHandler::AddTabContext(
     int32_t tab_id,
     bool delay_upload,
     AddTabContextCallback callback) {
+  if (!IsContextualSearchTabSharingEligible()) {
+    std::move(callback).Run(base::unexpected(
+        contextual_search::ContextUploadErrorType::kBrowserProcessingError));
+    return;
+  }
+
   if (!contextual_search::ContextualSearchService::IsContextSharingEnabled(
           profile_->GetPrefs())) {
     std::move(callback).Run(base::unexpected(

@@ -148,6 +148,10 @@ class ContextualTasksUIInterface : public TaskInfoDelegate {
   // Returns the WebContents of the embedded page, if it exists.
   virtual content::WebContents* GetInnerWebContents() const = 0;
 
+  // Returns whether the user was eligible for contextual tasks at
+  // initialization.
+  virtual bool IsContextualTasksEligibleOnInit() const = 0;
+
   // Returns whether the web ui is initialized.
   virtual bool IsInitComplete() = 0;
   // A notification that the web ui is initialized.

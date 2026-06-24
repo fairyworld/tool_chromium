@@ -505,6 +505,15 @@ ContextualTasksUI::ContextualTasksUI(content::WebUI* web_ui)
   source->AddBoolean("lensSendRawFileMediaTypesEnabled",
                      lens::features::IsLensSendRawFileMediaTypesEnabled());
 
+  // Determine and cache contextual tasks eligibility on initialization. This
+  // prevents the expand button from dynamically appearing or changing state
+  // mid-session, avoiding a jarring user experience.
+  is_contextual_tasks_eligible_on_init_ =
+      contextual_tasks::EntryPointEligibilityManager::IsEligible(
+          Profile::FromWebUI(web_ui));
+  source->AddBoolean("isCobrowseEligible",
+                     is_contextual_tasks_eligible_on_init_);
+
   source->AddString("nlmUrlParam",
                     contextual_tasks::GetContextualTasksNlmUrlParam());
   source->AddBoolean("enableCustomNlmUi",
@@ -671,13 +680,6 @@ ContextualTasksUI::ContextualTasksUI(content::WebUI* web_ui)
       "contextualTasksSignInDomains",
       base::JoinString(contextual_tasks::GetContextualTasksSignInDomains(),
                        ","));
-
-  // Determine and cache contextual tasks eligibility on initialization. This
-  // prevents the expand button from dynamically appearing or changing state
-  // mid-session, avoiding a jarring user experience.
-  is_contextual_tasks_eligible_on_init_ =
-      ui_service_ && ui_service_->GetEligibilityManager() &&
-      ui_service_->GetEligibilityManager()->IsEligible();
 
   // Expand button experiment state.
   source->AddBoolean(
@@ -1088,6 +1090,10 @@ GURL ContextualTasksUI::GetWebUiUrl() {
   return web_ui()->GetWebContents()->GetLastCommittedURL();
 }
 
+bool ContextualTasksUI::IsContextualTasksEligibleOnInit() const {
+  return is_contextual_tasks_eligible_on_init_;
+}
+
 // Empty implementation, does not need to be cleared in contextual tasks. Only
 // needs to be cleared when transferring ownership to a new web contents / UI
 // controller which never happens for contextual tasks.
@@ -1327,6 +1333,10 @@ bool ContextualTasksUI::CanUpdateSuggestedTabContext(
   }
 
   if (!composebox_handler_) {
+    return false;
+  }
+
+  if (!is_contextual_tasks_eligible_on_init_) {
     return false;
   }
 

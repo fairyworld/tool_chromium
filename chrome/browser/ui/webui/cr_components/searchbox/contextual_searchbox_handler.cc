@@ -203,6 +203,11 @@ int ContextualSearchboxHandler::GetContextMenuMaxTabSuggestions() {
 }
 
 void ContextualSearchboxHandler::GetRecentTabs(GetRecentTabsCallback callback) {
+  if (!IsContextualSearchTabSharingEligible()) {
+    std::move(callback).Run({});
+    return;
+  }
+
   auto* browser_window_interface =
       webui::GetBrowserWindowInterface(web_contents_);
   if (!browser_window_interface) {
@@ -309,6 +314,11 @@ void ContextualSearchboxHandler::GetRecentTabs(GetRecentTabsCallback callback) {
 
 void ContextualSearchboxHandler::GetTabPreview(int32_t tab_id,
                                                GetTabPreviewCallback callback) {
+  if (!IsContextualSearchTabSharingEligible()) {
+    std::move(callback).Run(std::nullopt);
+    return;
+  }
+
   const tabs::TabHandle handle = tabs::TabHandle(tab_id);
   tabs::TabInterface* const tab = handle.Get();
   if (!tab) {
@@ -543,6 +553,9 @@ std::string ContextualSearchboxHandler::GetPreviousQuery() {
 }
 
 bool ContextualSearchboxHandler::IsSmartTabSharingActive() const {
+  if (!IsContextualSearchTabSharingEligible()) {
+    return false;
+  }
   if (smart_tab_sharing_active_for_thread_.has_value()) {
     return *smart_tab_sharing_active_for_thread_;
   }
@@ -828,6 +841,12 @@ void ContextualSearchboxHandler::ContinueAddTabContext(
 void ContextualSearchboxHandler::AddTabContext(int32_t tab_id,
                                                bool delay_upload,
                                                AddTabContextCallback callback) {
+  if (!IsContextualSearchTabSharingEligible()) {
+    std::move(callback).Run(base::unexpected(
+        contextual_search::ContextUploadErrorType::kBrowserProcessingError));
+    return;
+  }
+
   if (!contextual_search::ContextualSearchService::IsContextSharingEnabled(
           profile_->GetPrefs())) {
     std::move(callback).Run(base::unexpected(
@@ -1137,6 +1156,11 @@ void ContextualSearchboxHandler::InitializeInputStateModel() {
     input_state_model_->SetPrefService(profile_->GetPrefs());
   }
 
+  if (!IsContextualSearchTabSharingEligible()) {
+    input_state_model_->SetPermanentlyDisabledInputTypes(
+        {omnibox::InputType::INPUT_TYPE_BROWSER_TAB});
+  }
+
   input_state_subscription_ = input_state_model_->subscribe(
       base::BindRepeating(&ContextualSearchboxHandler::OnInputStateChanged,
                           weak_ptr_factory_.GetWeakPtr()));
@@ -1155,6 +1179,13 @@ void ContextualSearchboxHandler::InitializeInputStateModel() {
     }
   }
 #endif
+}
+
+bool ContextualSearchboxHandler::IsContextualSearchTabSharingEligible() const {
+  // The default implementation returns true. Inheritors (such as the side
+  // panel composebox) can override this to enforce custom or dynamic
+  // eligibility.
+  return true;
 }
 
 void ContextualSearchboxHandler::RecordTabAddedMetric(
@@ -1529,6 +1560,9 @@ void ContextualSearchboxHandler::SubmitQuery(const std::string& query_text,
 void ContextualSearchboxHandler::MaybeTriggerSmartTabSharingPromo(
     const std::string& query,
     content::WebContents* web_contents_for_window) {
+  if (!IsContextualSearchTabSharingEligible()) {
+    return;
+  }
   if (!contextual_tasks_context_service_) {
     return;
   }
@@ -1876,7 +1910,7 @@ void ContextualSearchboxHandler::OpenUrl(
   contextual_session_handle->ClearSubmittedContextTokens();
 }
 
-std::optional<base::Uuid> ContextualSearchboxHandler::GetTaskId() {
+std::optional<base::Uuid> ContextualSearchboxHandler::GetTaskId() const {
   if (!web_contents_) {
     return std::nullopt;
   }

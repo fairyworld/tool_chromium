@@ -181,6 +181,7 @@ class MockContextualTasksUI : public ContextualTasksUI {
               (override));
   MOCK_METHOD(std::vector<int32_t>, GetRestoredTabIds, (), (override));
   MOCK_METHOD(bool, IsActiveTabContextSuggestionShowing, (), (const, override));
+  MOCK_METHOD(bool, IsContextualTasksEligibleOnInit, (), (const, override));
   MOCK_METHOD(contextual_tasks::ContextualTasksAutoSuggestionManager*,
               GetAutoSuggestionManager,
               (),
@@ -398,6 +399,8 @@ class ContextualTasksComposeboxHandlerTest
         .WillByDefault([this]() {
           return auto_suggestion_manager_.GetCurrentSuggestion() != nullptr;
         });
+    ON_CALL(*mock_ui_, IsContextualTasksEligibleOnInit())
+        .WillByDefault(testing::Return(true));
 
     // Create mock controller directly.
     mock_contextual_tasks_service_owner_ = std::make_unique<

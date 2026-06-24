@@ -632,6 +632,39 @@ suite('ContextualActionMenu', () => {
     assertEquals('true', tabButton.getAttribute('aria-checked'));
   });
 
+  test(
+      'Browser tab suggestions disabled when input type disabled', async () => {
+        // Arrange: Provide tab suggestions, allow browser tabs but also
+        // disable them.
+        const tabInfo = {
+          tabId: 1,
+          title: 'Google',
+          url: 'about:blank',
+          lastActiveTime: {internalValue: 0n},
+          showInCurrentTabChip: false,
+          showInPreviousTabChip: false,
+          lastActive: {internalValue: 0n},
+        };
+        actionMenu.tabSuggestions = [tabInfo];
+        actionMenu.inputState = new MockInputState({
+          allowedInputTypes: [InputType.kBrowserTab],
+          disabledInputTypes: [InputType.kBrowserTab],
+          toolsSectionConfig: {header: ''},
+          modelSectionConfig: {header: ''},
+        });
+
+        actionMenu.showAt(actionMenu);
+        await microtasksFinished();
+
+        // Assert: Tab suggestions should be shown (because allowed).
+        const items = actionMenu.$.menu.querySelectorAll('.dropdown-item');
+        assertEquals(1, items.length);
+
+        const tabButton = items[0] as HTMLButtonElement;
+        // And it should be disabled.
+        assertTrue(tabButton.disabled);
+      });
+
   test('Uses configured menu labels', async () => {
     const toolsHeader = 'Tools Header';
     const deepSearchLabel = 'Custom Deep Search Label';
