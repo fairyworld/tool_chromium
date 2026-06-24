@@ -1804,11 +1804,11 @@ inline constexpr char kEnableProcessIsolationUiName[] =
 inline constexpr char kEnableProcessIsolationUiDescription[] =
     "Shows the Enable Process Isolation toggle in chrome://settings/system.";
 
-inline constexpr char kEnableProxyAuthenticationServiceName[] =
-    "Enable Proxy Authentication Service";
-inline constexpr char kEnableProxyAuthenticationServiceDescription[] =
-    "Enables the proxy authentication service for authenticating with forward "
-    "proxies.";
+inline constexpr char kEnableDynamicRouteFetchingName[] =
+    "Enable Dynamic Route Fetching";
+inline constexpr char kEnableDynamicRouteFetchingDescription[] =
+    "Enables fetching proxy configurations and routing rules dynamically from "
+    "Provisioning Domains.";
 
 inline constexpr char kEnableStaticQrCodeForPixName[] =
     "Enable Static Qr Code For Pix";

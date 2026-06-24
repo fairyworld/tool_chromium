@@ -117,7 +117,6 @@
 #include "components/enterprise/data_controls/core/browser/features.h"
 #include "components/enterprise/isolated_mode/settings.h"
 #include "components/enterprise/network_header_injection/core/features.h"
-#include "components/enterprise/networking/features.h"
 #include "components/error_page/common/error_page_switches.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/feature_engagement/public/feature_list.h"
@@ -377,6 +376,10 @@
 
 #if BUILDFLAG(ENABLE_BOUND_SESSION_CREDENTIALS)
 #include "components/unexportable_keys/features.h"  // nogncheck
+#endif
+
+#if BUILDFLAG(ENTERPRISE_PROXY)
+#include "components/enterprise/net/core/features.h"
 #endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS_CORE)
@@ -12911,11 +12914,12 @@ const FeatureEntry kFeatureEntries[] = {
          autofill::features::
              kAutofillEnableTravelCategoryAndMerchantBenefitsFromCurinos)},
 
-    {"enable-proxy-authentication-service",
-     flag_descriptions::kEnableProxyAuthenticationServiceName,
-     flag_descriptions::kEnableProxyAuthenticationServiceDescription,
-     kOsAndroid,
-     FEATURE_VALUE_TYPE(enterprise::kEnableProxyAuthenticationService)},
+#if BUILDFLAG(ENTERPRISE_PROXY)
+    {"enable-dynamic-route-fetching",
+     flag_descriptions::kEnableDynamicRouteFetchingName,
+     flag_descriptions::kEnableDynamicRouteFetchingDescription, kOsAndroid,
+     FEATURE_VALUE_TYPE(enterprise_net::kEnableDynamicRouteFetching)},
+#endif
 
     {"payment-request-reject-too-small-windows",
      flag_descriptions::kPaymentRequestRejectTooSmallWindowsName,

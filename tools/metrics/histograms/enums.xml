@@ -13378,6 +13378,7 @@ from previous Chrome versions.
   <int value="-344076279" label="NtpAnimatedDoodles:enabled"/>
   <int value="-343971624" label="BorealisPermitted:disabled"/>
   <int value="-343769596" label="ServiceWorkerScriptStreaming:disabled"/>
+  <int value="-343609197" label="EnableDynamicRouteFetching:disabled"/>
   <int value="-343314036" label="WebBluetooth:enabled"/>
   <int value="-342421456" label="EnableOverviewRoundedCorners:disabled"/>
   <int value="-342243498" label="EnableWebHidInWebView:enabled"/>
@@ -17693,6 +17694,7 @@ from previous Chrome versions.
   <int value="1059007599" label="enable-gpu-appcontainer"/>
   <int value="1059595064" label="GlicPanelResetOnStart:enabled"/>
   <int value="1059698271" label="EnableZeroStateSuggestions:disabled"/>
+  <int value="1060059366" label="EnableDynamicRouteFetching:enabled"/>
   <int value="1060127537" label="TabSwitcherFullNewTabButton:disabled"/>
   <int value="1060319397" label="enable-data-reduction-proxy-carrier-test"/>
   <int value="1061121730" label="AccessibilityHandleOccludingViews:disabled"/>

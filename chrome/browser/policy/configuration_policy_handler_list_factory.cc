@@ -93,6 +93,7 @@
 #include "components/enterprise/data_controls/core/browser/prefs.h"
 #include "components/enterprise/device_trust/prefs.h"
 #include "components/enterprise/isolated_mode/prefs.h"
+#include "components/enterprise/net/core/prefs.h"
 #include "components/feed/core/shared_prefs/pref_names.h"
 #include "components/history/core/common/pref_names.h"
 #include "components/history_clusters/core/history_clusters_prefs.h"
@@ -2693,6 +2694,15 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
           enterprise_connectors::kOnFileDownloadedScopePref, chrome_schema));
 
   handlers->AddHandler(std::make_unique<DeveloperToolsPolicyHandler>());
+
+#if BUILDFLAG(ENTERPRISE_PROXY)
+  handlers->AddHandler(
+      std::make_unique<
+          enterprise_connectors::EnterpriseConnectorsPolicyHandler>(
+          key::kProxyProvisioningDomains,
+          enterprise_net::kProxyProvisioningDomains, chrome_schema));
+#endif
+
   handlers->AddHandler(std::make_unique<IsolateOriginsPolicyHandler>());
 
 #if !BUILDFLAG(IS_ANDROID)

@@ -128,6 +128,7 @@
 #include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/connectors/core/connectors_prefs.h"
 #include "components/enterprise/isolated_mode/prefs.h"
+#include "components/enterprise/net/core/prefs.h"
 #include "components/enterprise/network_header_injection/core/network_header_injection_prefs.h"
 #include "components/feature_engagement/public/pref_names.h"
 #include "components/history_clusters/core/history_clusters_prefs.h"
@@ -1714,6 +1715,9 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
   enterprise::RegisterIdentifiersProfilePrefs(registry);
   enterprise_connectors::RegisterProfilePrefs(registry);
   enterprise_isolated_mode::RegisterProfilePrefs(registry);
+#if BUILDFLAG(ENTERPRISE_PROXY)
+  enterprise_net::RegisterProfilePrefs(registry);
+#endif
   enterprise_promotion::RegisterProfilePrefs(registry);
   enterprise_reporting::RegisterProfilePrefs(registry);
   dom_distiller::DistilledPagePrefs::RegisterProfilePrefs(registry);
