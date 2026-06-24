@@ -13,7 +13,6 @@
 #include "chrome/browser/picture_in_picture/picture_in_picture_window_manager.h"
 #include "chrome/browser/platform_util.h"
 #include "chrome/browser/profiles/profile.h"
-#include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -134,10 +133,9 @@ void PermissionPromptBaseView::AddedToWidget() {
 }
 
 void PermissionPromptBaseView::AnchorToPageInfoOrChip() {
-  Browser* browser =
-      GetBrowser() ? GetBrowser()->GetBrowserForMigrationOnly() : nullptr;
   bubble_anchor_util::AnchorConfiguration configuration =
-      bubble_anchor_util::GetPermissionPromptBubbleAnchorConfiguration(browser);
+      bubble_anchor_util::GetPermissionPromptBubbleAnchorConfiguration(
+          web_contents());
   SetAnchor(configuration.anchor);
   // In fullscreen, `anchor` may be nullptr because the toolbar is hidden,
   // therefore anchor to the browser window instead.
@@ -146,9 +144,8 @@ void PermissionPromptBaseView::AnchorToPageInfoOrChip() {
   } else if (ui::TrackedElement* element =
                  configuration.anchor.GetIfElement()) {
     set_parent_window(element->GetNativeView());
-  } else if (GetBrowser() && GetBrowser()->GetWindow()) {
-    set_parent_window(platform_util::GetViewForWindow(
-        GetBrowser()->GetWindow()->GetNativeWindow()));
+  } else if (GetNativeWindow()) {
+    set_parent_window(platform_util::GetViewForWindow(GetNativeWindow()));
   }
   if (configuration.highlighted_element) {
     SetHighlightedElement(*configuration.highlighted_element);

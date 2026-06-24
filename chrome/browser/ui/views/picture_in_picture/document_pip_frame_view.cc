@@ -12,6 +12,7 @@
 #include "base/metrics/histogram_functions.h"
 #include "chrome/browser/picture_in_picture/picture_in_picture_occlusion_tracker.h"
 #include "chrome/browser/picture_in_picture/picture_in_picture_window_manager.h"
+#include "chrome/browser/ui/browser_element_identifiers.h"
 #include "chrome/browser/ui/color/chrome_color_id.h"
 #include "chrome/browser/ui/content_settings/content_setting_image_model.h"
 #include "chrome/browser/ui/views/location_bar/content_setting_image_view.h"
@@ -168,6 +169,8 @@ DocumentPipFrameView::DocumentPipFrameView(DocumentPipHost* host)
       // Safety: The widget owns the frame view and this button, so the
       // callback cannot outlive the widget.
       base::Unretained(this)));
+  origin_chip->SetProperty(views::kElementIdentifierKey,
+                           kLocationIconElementId);
   origin_chip->SetTooltipText(
       l10n_util::GetStringUTF16(IDS_TOOLTIP_LOCATION_ICON));
   origin_chip->GetViewAccessibility().SetName(
