@@ -1641,6 +1641,31 @@ void ApplyNetworkRequestOverrides(
 
 }  // namespace
 
+void ApplyExtraHeadersForWebSocket(const GlobalRenderFrameHostId& frame_id,
+                                   net::HttpRequestHeaders* headers) {
+  auto* frame = RenderFrameHostImpl::FromID(frame_id);
+  if (!frame) {
+    return;
+  }
+
+  FrameTreeNode* ftn = frame->frame_tree_node();
+  if (!ftn) {
+    return;
+  }
+
+  DevToolsAgentHostImpl* agent_host =
+      GetDevToolsAgentHostForNetworkOverrides(ftn);
+  if (!agent_host) {
+    return;
+  }
+
+  bool disable_cache = false;
+  bool skip_service_worker = false;
+  ApplyNetworkRequestOverrides(agent_host, headers, &disable_cache, nullptr,
+                               &skip_service_worker, nullptr, nullptr, nullptr,
+                               nullptr);
+}
+
 void ApplyAuctionNetworkRequestOverrides(
     FrameTreeNode* frame_tree_node,
     network::ResourceRequest* request,

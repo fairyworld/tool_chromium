@@ -142,6 +142,12 @@ DevtoolsOverriddenOutputParams ApplyEmulationOverrides(
     DevToolsAgentHostImpl* agent_host,
     net::HttpRequestHeaders* headers);
 
+// Applies extra headers set via Network.setExtraHTTPHeaders to a WebSocket
+// handshake request. This is needed because WebSocket connections bypass the
+// normal URLLoader path where ApplyNetworkRequestOverrides is called.
+void ApplyExtraHeadersForWebSocket(const GlobalRenderFrameHostId& frame_id,
+                                   net::HttpRequestHeaders* headers);
+
 // Returns true if devtools want |*override_out| to be used.
 // (A true return and |*override_out| being nullopt means no user agent client
 //  hints should be sent; a false return means devtools doesn't want to affect
