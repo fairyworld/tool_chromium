@@ -150,6 +150,13 @@ public class VerticalTabListItemTouchHelperCallback extends TabListItemTouchHelp
         return !mIsMouseInputSource;
     }
 
+    @Override
+    public boolean isDragSweepingEnabled() {
+        // Enable drag sweeping for Vertical Tabs to ensure fast mouse drags
+        // don't skip over swap targets.
+        return true;
+    }
+
     /**
      * Called when the selected state of a tab changes, such as when dragging starts or stops.
      * Updates the visual state and tab model selection.
