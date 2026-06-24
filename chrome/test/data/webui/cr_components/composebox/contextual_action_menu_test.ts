@@ -2196,6 +2196,10 @@ suite('ContextualActionMenu', () => {
     test(
         'Anchors to the right if space above and below are both < 362px',
         async () => {
+          Object.defineProperty(actionMenu.$.menu.getDialog(), 'scrollHeight', {
+            value: 380,
+            configurable: true,
+          });
           Object.defineProperty(window, 'innerHeight', {
             value: 500,
             configurable: true,
@@ -2231,6 +2235,10 @@ suite('ContextualActionMenu', () => {
     test(
         'Anchors to the right of the icon even when favicon coins are present',
         async () => {
+          Object.defineProperty(actionMenu.$.menu.getDialog(), 'scrollHeight', {
+            value: 380,
+            configurable: true,
+          });
           Object.defineProperty(window, 'innerHeight', {
             value: 500,
             configurable: true,
@@ -2286,6 +2294,10 @@ suite('ContextualActionMenu', () => {
     test(
         'Does not anchor to the right if obstructed by voice/lens buttons',
         async () => {
+          Object.defineProperty(actionMenu.$.menu.getDialog(), 'scrollHeight', {
+            value: 380,
+            configurable: true,
+          });
           const mockSearchbox = document.createElement('ntp-searchbox');
           const shadowRoot = mockSearchbox.attachShadow({mode: 'open'});
 
@@ -2316,14 +2328,14 @@ suite('ContextualActionMenu', () => {
 
           anchor.getBoundingClientRect = () => {
             return {
-              bottom: 300,
-              top: 250,
+              bottom: 240,
+              top: 190,
               left: 100,
               right: 200,
               width: 100,
               height: 50,
               x: 100,
-              y: 250,
+              y: 190,
             } as DOMRect;
           };
 
@@ -2352,6 +2364,11 @@ suite('ContextualActionMenu', () => {
       });
 
       // Provide 10 tab suggestions so the natural height is larger than 354px.
+      const origWidth = window.innerWidth;
+      Object.defineProperty(window, 'innerWidth', {
+        value: 300,
+        configurable: true,
+      });
       actionMenu.tabSuggestions = Array(10).fill({
         tabId: 1,
         title: 'Tab Item',
@@ -2387,6 +2404,10 @@ suite('ContextualActionMenu', () => {
       // button (370px) to prevent overlap.
       const dialogBottom = dialog.getBoundingClientRect().bottom;
       assertTrue(dialogBottom <= 370);
+      Object.defineProperty(window, 'innerWidth', {
+        value: origWidth,
+        configurable: true,
+      });
     });
 
     test(
@@ -2445,6 +2466,49 @@ suite('ContextualActionMenu', () => {
           // button (370px) to prevent overlap.
           const dialogBottom = dialog.getBoundingClientRect().bottom;
           assertTrue(dialogBottom <= 370);
+        });
+
+    test(
+        'Shows full menu for below, above, and right positions when space allows',
+        async () => {
+          Object.defineProperty(actionMenu.$.menu.getDialog(), 'scrollHeight', {
+            value: 120,
+            configurable: true,
+          });
+
+          // 1. Below position (spaceBelow = 800 - 500 = 300 >= 136)
+          Object.defineProperty(window, 'innerHeight', {value: 800, configurable: true});
+          anchor.getBoundingClientRect = () => ({
+            bottom: 500, top: 450, left: 100, right: 200, width: 100, height: 50, x: 100, y: 450,
+          } as DOMRect);
+
+          actionMenu.showAt(anchor);
+          await microtasksFinished();
+          assertEquals(AnchorAlignment.AFTER_END, showAtCalls[showAtCalls.length - 1].anchorAlignmentY);
+          assertEquals('284px', actionMenu.$.menu.style.getPropertyValue('--contextual-menu-max-height'));
+
+          // 2. Above position (spaceAbove = 200 >= 136, spaceBelow = 300 - 250 = 50 < 136)
+          Object.defineProperty(window, 'innerHeight', {value: 300, configurable: true});
+          anchor.getBoundingClientRect = () => ({
+            bottom: 250, top: 200, left: 100, right: 200, width: 100, height: 50, x: 100, y: 200,
+          } as DOMRect);
+
+          actionMenu.showAt(anchor);
+          await microtasksFinished();
+          assertEquals(AnchorAlignment.BEFORE_START, showAtCalls[showAtCalls.length - 1].anchorAlignmentY);
+          assertEquals('184px', actionMenu.$.menu.style.getPropertyValue('--contextual-menu-max-height'));
+
+          // 3. Right position (spaceAbove = 100 < 136, spaceBelow = 100 < 136, right vertical = 250 - 32 >= 120)
+          Object.defineProperty(window, 'innerHeight', {value: 250, configurable: true});
+          anchor.getBoundingClientRect = () => ({
+            bottom: 150, top: 100, left: 100, right: 200, width: 100, height: 50, x: 100, y: 100,
+          } as DOMRect);
+
+          actionMenu.showAt(anchor);
+          await microtasksFinished();
+          assertEquals(AnchorAlignment.AFTER_END, showAtCalls[showAtCalls.length - 1].anchorAlignmentX);
+          assertEquals(AnchorAlignment.AFTER_START, showAtCalls[showAtCalls.length - 1].anchorAlignmentY);
+          assertEquals('', actionMenu.$.menu.style.getPropertyValue('--contextual-menu-max-height'));
         });
   });
 
