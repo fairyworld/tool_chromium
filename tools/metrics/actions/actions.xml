@@ -16078,6 +16078,44 @@ should be able to be added at any place in this file.
   </description>
 </action>
 
+<action name="Glic.ZoomIn">
+  <owner>cuianthony@chromium.org</owner>
+  <description>
+    Logged when the user zooms in on the Glic webview using keyboard shortcuts.
+  </description>
+</action>
+
+<action name="Glic.ZoomInAtMax">
+  <owner>cuianthony@chromium.org</owner>
+  <description>
+    Logged when the user attempts to zoom in on the Glic webview using keyboard
+    shortcuts, but is already at the maximum zoom level.
+  </description>
+</action>
+
+<action name="Glic.ZoomOut">
+  <owner>cuianthony@chromium.org</owner>
+  <description>
+    Logged when the user zooms out on the Glic webview using keyboard shortcuts.
+  </description>
+</action>
+
+<action name="Glic.ZoomOutAtMin">
+  <owner>cuianthony@chromium.org</owner>
+  <description>
+    Logged when the user attempts to zoom out on the Glic webview using keyboard
+    shortcuts, but is already at the minimum zoom level.
+  </description>
+</action>
+
+<action name="Glic.ZoomReset">
+  <owner>cuianthony@chromium.org</owner>
+  <description>
+    Logged when the user resets the zoom level on the Glic webview using
+    keyboard shortcuts.
+  </description>
+</action>
+
 <action name="GlicClosedCaptioningDisabled">
   <owner>birnie@google.com</owner>
   <description>
