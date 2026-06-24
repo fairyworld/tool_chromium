@@ -58,10 +58,9 @@ import org.chromium.chrome.browser.tabmodel.TabModelUtils;
 import org.chromium.chrome.test.ChromeJUnit4ClassRunner;
 import org.chromium.chrome.test.transit.AutoResetCtaTransitTestRule;
 import org.chromium.chrome.test.transit.ChromeTransitTestRules;
+import org.chromium.chrome.test.transit.page.RecentTabsPageStation;
 import org.chromium.chrome.test.util.ChromeApplicationTestUtils;
 import org.chromium.chrome.test.util.ChromeTabUtils;
-import org.chromium.chrome.test.util.RecentTabsPageTestUtils;
-import org.chromium.components.embedder_support.util.UrlConstants;
 import org.chromium.content_public.browser.LoadUrlParams;
 import org.chromium.content_public.browser.WebContents;
 import org.chromium.ui.base.WindowAndroid;
@@ -235,10 +234,14 @@ public class TabTest {
             "crbug.com/358190587, causes BlankCTATabInitialStateRule state reset to fail flakily.")
     public void testNativePageTabAttachment() {
         Tab tab =
-                mActivityTestRule.loadUrlInNewTab(
-                        UrlConstants.RECENT_TABS_URL, /* incognito= */ false);
+                mActivityTestRule
+                        .startOnBlankPage()
+                        .openFakeLink(
+                                RecentTabsPageStation.RECENT_TABS_URL,
+                                RecentTabsPageStation.newBuilder())
+                        .getTab();
         mExtraTabs.add(tab);
-        RecentTabsPageTestUtils.waitForRecentTabsPageLoaded(tab);
+
         assertNotNull(tab.getWebContents());
         assertFalse(tab.isDetachedFromActivity());
 
