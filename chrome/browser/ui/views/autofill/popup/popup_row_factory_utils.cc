@@ -90,6 +90,7 @@ constexpr auto kPopupItemTypesUsingLeadingIcons = DenseSet<SuggestionType>(
      SuggestionType::kAllSavedPasswordsEntry, SuggestionType::kManageAddress,
      SuggestionType::kManageCreditCard, SuggestionType::kManageAutofillAi,
      SuggestionType::kManageAutofillAiIdentityDocs,
+     SuggestionType::kManageAutofillAiShopping,
      SuggestionType::kManageAutofillAiTravel, SuggestionType::kManageIban,
      SuggestionType::kManageLoyaltyCard, SuggestionType::kUndoOrClear,
      SuggestionType::kViewPasswordDetails, SuggestionType::kPendingStateSignin,
@@ -840,6 +841,7 @@ std::unique_ptr<PopupRowView> CreatePopupRowView(
     case SuggestionType::kManageAddress:
     case SuggestionType::kManageAutofillAi:
     case SuggestionType::kManageAutofillAiIdentityDocs:
+    case SuggestionType::kManageAutofillAiShopping:
     case SuggestionType::kManageAutofillAiTravel:
     case SuggestionType::kManageCreditCard:
     case SuggestionType::kManageIban:
