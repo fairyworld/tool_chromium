@@ -436,7 +436,6 @@
 #include "chrome/browser/ash/release_notes/release_notes_storage.h"
 #include "chrome/browser/ash/scanning/chrome_scanning_app_delegate.h"
 #include "chrome/browser/ash/settings/hardware_data_usage_controller.h"
-#include "chrome/browser/ash/settings/metrics_reporting_level_controller.h"
 #include "chrome/browser/ash/settings/stats_reporting_controller.h"
 #include "chrome/browser/ash/system/automatic_reboot_manager.h"
 #include "chrome/browser/ash/system/input_device_settings.h"
@@ -1007,6 +1006,8 @@ inline constexpr char kOobeGuestMetricsReportingLevel[] =
     "oobe.guest_metrics_reporting_level";
 inline constexpr char kMetricsUserReportingLevel[] =
     "metrics.user_reporting_level";
+inline constexpr char kPendingMetricsReportingLevel[] =
+    "pending.cros.metrics.metricsReportingLevel";
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
 // Register local state used only for migration (clearing or moving to a new
@@ -1116,6 +1117,7 @@ void RegisterLocalStatePrefsForMigration(PrefRegistrySimple* registry) {
 #if BUILDFLAG(IS_CHROMEOS)
   // Deprecated 06/2026.
   registry->RegisterIntegerPref(kOobeGuestMetricsReportingLevel, 0);
+  registry->RegisterIntegerPref(kPendingMetricsReportingLevel, 0);
 #endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
@@ -1563,7 +1565,6 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
   ash::ServicesCustomizationDocument::RegisterPrefs(registry);
   ash::StartupUtils::RegisterPrefs(registry);
   ash::StatsReportingController::RegisterLocalStatePrefs(registry);
-  ash::MetricsReportingLevelController::RegisterLocalStatePrefs(registry);
   ash::system::AutomaticRebootManager::RegisterPrefs(registry);
   ash::TimeZoneResolver::RegisterPrefs(registry);
   ash::UserImageManagerImpl::RegisterPrefs(registry);
@@ -2387,6 +2388,7 @@ void MigrateObsoleteLocalStatePrefs(PrefService* local_state) {
 #if BUILDFLAG(IS_CHROMEOS)
   // Added 06/2026.
   local_state->ClearPref(kOobeGuestMetricsReportingLevel);
+  local_state->ClearPref(kPendingMetricsReportingLevel);
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Please don't delete the following line. It is used by PRESUBMIT.py.
