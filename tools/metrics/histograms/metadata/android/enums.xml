@@ -769,10 +769,14 @@ chromium-metrics-reviews@google.com.
   <int value="181" label="WebSettingsCompat.setPrefetchTtlSeconds"/>
   <int value="182" label="BackForwardCacheSettings.getKeepForwardEntries"/>
   <int value="183" label="BackForwardCacheSettings.setKeepForwardEntries"/>
-  <int value="184" label="WebSettingsCompat.setIgnoreDuplicateNavEnabled"/>
-  <int value="185" label="WebSettingsCompat.getIgnoreDuplicateNavEnabled"/>
-  <int value="186" label="WebSettingsCompat.setIgnoreDuplicateNavThreshold"/>
-  <int value="187" label="WebSettingsCompat.getIgnoreDuplicateNavThreshold"/>
+  <int value="184"
+      label="(Obsolete) WebSettingsCompat.setIgnoreDuplicateNavEnabled"/>
+  <int value="185"
+      label="(Obsolete) WebSettingsCompat.getIgnoreDuplicateNavEnabled"/>
+  <int value="186"
+      label="(Obsolete) WebSettingsCompat.setIgnoreDuplicateNavThreshold"/>
+  <int value="187"
+      label="(Obsolete) WebSettingsCompat.getIgnoreDuplicateNavThreshold"/>
   <int value="188" label="WebSettingsCompat.getMaxPrerenders"/>
   <int value="189" label="WebSettingsCompat.getMaxPrefetches"/>
   <int value="190" label="WebSettingsCompat.getPrefetchTtlSeconds"/>
