@@ -71,7 +71,15 @@ export function getHtml(this: UserEducationInternalsElement) {
           in ways it was not designed to. Use at your own risk.
         </p>
       </div>
-      <cr-page-selector .selected="${this.selectedTabIndex_}" show-all="true"
+      <div id="uninitialized" ?hidden="${this.initialized_}">
+        <h2>Waiting for Data...</h2>
+        <p>
+          Data is not yet loaded or the Feature Engagement system is not yet
+          initialized. This page will populate when data is available.
+        </p>
+      </div>
+      <cr-page-selector ?hidden="${!this.initialized_}"
+                        .selected="${this.selectedTabIndex_}" show-all="true"
                         id="selector">
         <div id="iph" class="promo-list">
           <a name="iph"></a>
@@ -129,8 +137,7 @@ export function getHtml(this: UserEducationInternalsElement) {
                 @clear-promo-data="${this.onNonIphClearPromoData_}">
             </user-education-internals-card>`)}
           <p class="if-empty">
-            No non-IPH promos match the search filter or the Feature Engagement
-            tracker is not ready. Reload the page to try again.
+            No non-IPH promos match the search filter.
           </p>
         </div>
         <div id="ntpPromos" class="promo-list">
