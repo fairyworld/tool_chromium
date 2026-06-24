@@ -48,6 +48,17 @@ ElementSelector* UsernameElement() {
   return [ElementSelector selectorWithElementID:"username"];
 }
 
+// Waits up to 30 seconds for the web state to contain the specified element.
+void WaitForWebStateContainingElement(ElementSelector* selector) {
+  ConditionBlock condition = ^BOOL {
+    return [ChromeEarlGrey webStateContainsElement:selector];
+  };
+  BOOL success = base::test::ios::WaitUntilConditionOrTimeout(base::Seconds(10),
+                                                              condition);
+  GREYAssertTrue(success, @"Failed waiting for web state containing element %@",
+                 selector.selectorDescription);
+}
+
 }  // namespace
 
 @interface SendTabToSelfCoordinatorTestCase : ChromeTestCase
@@ -87,7 +98,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGrey
       loadURL:self.testServer->GetURL(
                   "/send_tab_to_self/send_tab_to_self_active_page.html")];
-  [ChromeEarlGrey waitForWebStateContainingElement:TargetElement()];
+  WaitForWebStateContainingElement(TargetElement());
 
   [ChromeEarlGreyUI shareCurrentPage];
 
@@ -106,7 +117,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGrey
       loadURL:self.testServer->GetURL(
                   "/send_tab_to_self/send_tab_to_self_active_page.html")];
-  [ChromeEarlGrey waitForWebStateContainingElement:TargetElement()];
+  WaitForWebStateContainingElement(TargetElement());
 
   [ChromeEarlGreyUI shareCurrentPage];
 
@@ -140,7 +151,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGrey
       loadURL:self.testServer->GetURL(
                   "/send_tab_to_self/send_tab_to_self_active_page.html")];
-  [ChromeEarlGrey waitForWebStateContainingElement:TargetElement()];
+  WaitForWebStateContainingElement(TargetElement());
 
   [ChromeEarlGreyUI shareCurrentPage];
   NSString* sendTabToSelf =
@@ -171,7 +182,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGrey
       loadURL:self.testServer->GetURL(
                   "/send_tab_to_self/send_tab_to_self_active_page.html")];
-  [ChromeEarlGrey waitForWebStateContainingElement:TargetElement()];
+  WaitForWebStateContainingElement(TargetElement());
 
   [ChromeEarlGreyUI shareCurrentPage];
   NSString* sendTabToSelf =
@@ -211,7 +222,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGrey
       loadURL:self.testServer->GetURL(
                   "/send_tab_to_self/send_tab_to_self_active_page.html")];
-  [ChromeEarlGrey waitForWebStateContainingElement:TargetElement()];
+  WaitForWebStateContainingElement(TargetElement());
 
   [ChromeEarlGreyUI shareCurrentPage];
   NSString* sendTabToSelf =
@@ -239,7 +250,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGrey
       loadURL:self.testServer->GetURL(
                   "/send_tab_to_self/send_tab_to_self_active_page.html")];
-  [ChromeEarlGrey waitForWebStateContainingElement:TargetElement()];
+  WaitForWebStateContainingElement(TargetElement());
 
   [ChromeEarlGreyUI shareCurrentPage];
   NSString* sendTabToSelf =
@@ -296,7 +307,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGrey
       loadURL:self.testServer->GetURL(
                   "/send_tab_to_self/send_tab_to_self_active_page.html")];
-  [ChromeEarlGrey waitForWebStateContainingElement:TargetElement()];
+  WaitForWebStateContainingElement(TargetElement());
 
   [ChromeEarlGreyUI shareCurrentPage];
   NSString* sendTabToSelf =
@@ -338,7 +349,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGrey
       loadURL:self.testServer->GetURL(
                   "/send_tab_to_self/send_tab_to_self_active_page.html")];
-  [ChromeEarlGrey waitForWebStateContainingElement:TargetElement()];
+  WaitForWebStateContainingElement(TargetElement());
 
   [ChromeEarlGreyUI shareCurrentPage];
   NSString* sendTabToSelf =
@@ -412,7 +423,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGrey waitForPageToFinishLoading];
 
   // Wait for the new tab to load and the fragment to be applied.
-  [ChromeEarlGrey waitForWebStateContainingElement:TargetElement()];
+  WaitForWebStateContainingElement(TargetElement());
 
   // Verify that the page has scrolled down to the fragment.
   NSString* checkScrollJS = @"window.scrollY > 0;";
@@ -466,7 +477,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGrey waitForPageToFinishLoading];
 
   // Wait for the new tab to load.
-  [ChromeEarlGrey waitForWebStateContainingElement:TargetElement()];
+  WaitForWebStateContainingElement(TargetElement());
 
   // Verify that the page has NOT scrolled down. Wait for a short duration to
   // ensure any pending async scrolls do not occur.
@@ -523,7 +534,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGrey waitForPageToFinishLoading];
 
   // Wait for the new tab to load.
-  [ChromeEarlGrey waitForWebStateContainingElement:TargetElement()];
+  WaitForWebStateContainingElement(TargetElement());
 
   // Verify that the page has NOT scrolled down. Wait for a short duration to
   // ensure any pending async scrolls do not occur.
@@ -572,7 +583,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGrey
       waitForWebStateVisibleURL:GURL(base::SysNSStringToUTF8(urlString))];
   [ChromeEarlGrey waitForPageToFinishLoading];
-  [ChromeEarlGrey waitForWebStateContainingElement:UsernameElement()];
+  WaitForWebStateContainingElement(UsernameElement());
 
   // Verify that the input field was populated with the expected value.
   NSString* checkFilledJS = @"(function() {"
@@ -588,7 +599,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGrey
       waitForWebStateVisibleURL:GURL(base::SysNSStringToUTF8(urlString))];
   [ChromeEarlGrey waitForPageToFinishLoading];
-  [ChromeEarlGrey waitForWebStateContainingElement:UsernameElement()];
+  WaitForWebStateContainingElement(UsernameElement());
 
   // Verify that the input field remains empty for normal navigations.
   NSString* checkEmptyJS = @"(function() {"
@@ -608,7 +619,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGrey
       loadURL:self.testServer->GetURL(
                   "/send_tab_to_self/send_tab_to_self_active_page.html")];
-  [ChromeEarlGrey waitForWebStateContainingElement:TargetElement()];
+  WaitForWebStateContainingElement(TargetElement());
 
   // Open tab switcher.
   [ChromeEarlGrey showTabSwitcher];
@@ -650,7 +661,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGrey
       loadURL:self.testServer->GetURL(
                   "/send_tab_to_self/send_tab_to_self_active_page.html")];
-  [ChromeEarlGrey waitForWebStateContainingElement:TargetElement()];
+  WaitForWebStateContainingElement(TargetElement());
 
   // Open tab switcher.
   [ChromeEarlGrey showTabSwitcher];
@@ -709,7 +720,7 @@ ElementSelector* UsernameElement() {
   [ChromeEarlGrey
       loadURL:self.testServer->GetURL(
                   "/send_tab_to_self/send_tab_to_self_active_page.html")];
-  [ChromeEarlGrey waitForWebStateContainingElement:TargetElement()];
+  WaitForWebStateContainingElement(TargetElement());
 
   // Long press the DefocusedLocationView.
   [[EarlGrey selectElementWithMatcher:chrome_test_util::DefocusedLocationView()]
