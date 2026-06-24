@@ -15,6 +15,7 @@
 #include "chrome/browser/actor/ui/task_list_bubble/actor_task_list_bubble_controller.h"
 #include "chrome/browser/autocomplete/aim_eligibility_service_factory.h"
 #include "chrome/browser/bookmarks/bookmark_model_factory.h"
+#include "chrome/browser/bookmarks/managed_bookmark_service_factory.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/collaboration/collaboration_service_factory.h"
 #include "chrome/browser/commerce/shopping_service_factory.h"
@@ -268,8 +269,9 @@ void BrowserWindowFeatures::Init(BrowserWindowInterface* browser) {
           *browser, &web_app::MaybeCreateAppBrowserController, browser);
 
   if (auto* model = BookmarkModelFactory::GetForBrowserContext(profile)) {
+    auto* managed = ManagedBookmarkServiceFactory::GetForProfile(profile);
     bookmarks_service_feature_ =
-        std::make_unique<BookmarksServiceFeature>(model);
+        std::make_unique<BookmarksServiceFeature>(model, managed);
   }
 
   bookmarks_side_panel_coordinator_ =
