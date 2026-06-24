@@ -215,7 +215,7 @@ class COMPONENT_EXPORT(MIRRORING_SERVICE) OpenscreenSessionHost final
   void ProcessFeedback(const media::VideoCaptureFeedback& feedback);
 
   // Called by media::cast::VideoSender to help determine the video bitrate.
-  int GetVideoNetworkBandwidth() const;
+  uint32_t GetVideoNetworkBandwidth() const;
 
   // Called periodically to update the `bandwidth_estimate_`.
   void UpdateBandwidthEstimate();
@@ -399,7 +399,7 @@ class COMPONENT_EXPORT(MIRRORING_SERVICE) OpenscreenSessionHost final
   // The portion of the bandwidth estimate that is currently available for use.
   // Note that the actual bandwidth will be effectively capped at the sum of the
   // current video and audio bitrates.
-  int usable_bandwidth_ = kDefaultBitrate;
+  uint32_t usable_bandwidth_ = kDefaultBitrate;
 
   // Indicate whether we're in the middle of switching tab sources.
   bool switching_tab_source_ = false;

@@ -108,7 +108,7 @@ base::TimeDelta AudioSender::GetTargetPlayoutDelay() const {
   return frame_sender_->GetTargetPlayoutDelay();
 }
 
-int AudioSender::GetEncoderBitrate() const {
+uint32_t AudioSender::GetEncoderBitrate() const {
   return audio_encoder_->GetBitrate();
 }
 

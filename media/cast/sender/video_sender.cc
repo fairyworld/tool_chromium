@@ -248,14 +248,15 @@ void VideoSender::InsertRawVideoFrame(
     return;
   }
 
-  const int suggested_bitrate = bitrate_suggester_->GetSuggestedBitrate();
+  const uint32_t suggested_bitrate = bitrate_suggester_->GetSuggestedBitrate();
 
   // To avoid thrashing the encoder, which can cause dropped frames, only update
   // the encoder if the suggested bitrate has changed by a significant amount.
   // We use 5% as the threshold for this "bitrate hysteresis".
   constexpr double kBitrateThreshold = 0.05;
   const bool should_update_bitrate =
-      last_bitrate_ == 0 || std::abs(suggested_bitrate - last_bitrate_) >
+      last_bitrate_ == 0 || std::abs(static_cast<int64_t>(suggested_bitrate) -
+                                     static_cast<int64_t>(last_bitrate_)) >
                                 (last_bitrate_ * kBitrateThreshold);
 
   if (should_update_bitrate) {
@@ -309,7 +310,7 @@ base::TimeDelta VideoSender::GetTargetPlayoutDelay() const {
   return frame_sender_->GetTargetPlayoutDelay();
 }
 
-int VideoSender::GetEncoderBitrate() const {
+uint32_t VideoSender::GetEncoderBitrate() const {
   return last_bitrate_;
 }
 

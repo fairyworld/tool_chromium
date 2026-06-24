@@ -95,7 +95,7 @@ class MockVideoSender : public media::cast::VideoSender {
               InsertRawVideoFrame,
               (scoped_refptr<media::VideoFrame>, base::TimeTicks),
               (override));
-  MOCK_METHOD(int, GetEncoderBitrate, (), (const, override));
+  MOCK_METHOD(uint32_t, GetEncoderBitrate, (), (const, override));
   MOCK_METHOD(double, GetEncoderUtilization, (), (const, override));
   MOCK_METHOD(double, GetLossiness, (), (const, override));
   MOCK_METHOD(int, GetFramesInserted, (), (const, override));

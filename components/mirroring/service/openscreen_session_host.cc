@@ -822,9 +822,11 @@ void OpenscreenSessionHost::SetConstraints(
           gfx::Size(video.maximum.width, video.maximum.height));
     }
     video_config->min_bitrate =
-        std::max(video_config->min_bitrate, video.bit_rate_limits.minimum);
+        std::max(video_config->min_bitrate,
+                 base::checked_cast<uint32_t>(video.bit_rate_limits.minimum));
     video_config->max_bitrate =
-        std::min(video_config->max_bitrate, video.bit_rate_limits.maximum);
+        std::min(video_config->max_bitrate,
+                 base::checked_cast<uint32_t>(video.bit_rate_limits.maximum));
     video_config->start_bitrate =
         std::clamp(video_config->start_bitrate, video_config->min_bitrate,
                    video_config->max_bitrate);
@@ -848,9 +850,11 @@ void OpenscreenSessionHost::SetConstraints(
 
   if (audio_config) {
     audio_config->min_bitrate =
-        std::max(audio_config->min_bitrate, audio.bit_rate_limits.minimum);
+        std::max(audio_config->min_bitrate,
+                 base::checked_cast<uint32_t>(audio.bit_rate_limits.minimum));
     audio_config->max_bitrate =
-        std::min(audio_config->max_bitrate, audio.bit_rate_limits.maximum);
+        std::min(audio_config->max_bitrate,
+                 base::checked_cast<uint32_t>(audio.bit_rate_limits.maximum));
     audio_config->start_bitrate =
         std::clamp(audio_config->start_bitrate, audio_config->min_bitrate,
                    audio_config->max_bitrate);
@@ -977,10 +981,14 @@ void OpenscreenSessionHost::ProcessFeedback(
   }
 }
 
-int OpenscreenSessionHost::GetVideoNetworkBandwidth() const {
+uint32_t OpenscreenSessionHost::GetVideoNetworkBandwidth() const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  return audio_sender_ ? usable_bandwidth_ - audio_sender_->GetEncoderBitrate()
-                       : usable_bandwidth_;
+  if (audio_sender_) {
+    const uint32_t audio_bitrate = audio_sender_->GetEncoderBitrate();
+    return usable_bandwidth_ > audio_bitrate ? usable_bandwidth_ - audio_bitrate
+                                             : 0;
+  }
+  return usable_bandwidth_;
 }
 
 void OpenscreenSessionHost::UpdateBandwidthEstimate() {
@@ -997,13 +1005,13 @@ void OpenscreenSessionHost::UpdateBandwidthEstimate() {
   // Don't ever try to use *all* of the network bandwidth! However, don't go
   // below the absolute minimum requirement either.
   constexpr double kGoodNetworkCitizenFactor = 0.8;
-  const int usable_bandwidth = std::max<int>(
+  const uint32_t usable_bandwidth = std::max<uint32_t>(
       kGoodNetworkCitizenFactor * bandwidth_estimate, kMinRequiredBitrate);
 
   if (usable_bandwidth > usable_bandwidth_) {
     constexpr double kConservativeIncrease = 1.1;
-    usable_bandwidth_ = std::min<int>(usable_bandwidth_ * kConservativeIncrease,
-                                      usable_bandwidth);
+    usable_bandwidth_ = std::min<uint32_t>(
+        usable_bandwidth_ * kConservativeIncrease, usable_bandwidth);
   } else {
     usable_bandwidth_ = usable_bandwidth;
   }

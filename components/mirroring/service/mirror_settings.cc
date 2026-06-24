@@ -40,12 +40,12 @@ constexpr int kAudioChannels = 2;
 constexpr int kAudioFramerate = 100;
 
 // Minimum video bitrate (300 kbps).
-constexpr int kMinVideoBitrate = 300000;
+constexpr uint32_t kMinVideoBitrate = 300000;
 
 // Start video bitrate (5 Mbps).
-constexpr int kStartVideoBitrate = 5000000;
+constexpr uint32_t kStartVideoBitrate = 5000000;
 
-int GetMaxVideoBitrate() {
+uint32_t GetMaxVideoBitrate() {
   if (!base::FeatureList::IsEnabled(media::kCastStreamingMaxVideoBitrate)) {
     return 5000000;  // Fallback to legacy 5 Mbps
   }
@@ -66,7 +66,7 @@ constexpr gfx::Size kMinResolution{180, 180};
 
 // Default maximum bitrate for audio (128 kbps).
 // Bumped from legacy ~102 kbps formula to provide better quality.
-constexpr int kDefaultAudioMaxBitrate = 128000;
+constexpr uint32_t kDefaultAudioMaxBitrate = 128000;
 
 int GetMaxFrameRate() {
   return base::FeatureList::IsEnabled(features::kCastStreaming60fps)
