@@ -8130,6 +8130,7 @@ from previous Chrome versions.
   <int value="-2036268747" label="OmniboxExpandedLayout:disabled"/>
   <int value="-2036149591" label="FaviconsFromWebManifest:disabled"/>
   <int value="-2036127998" label="LocalWebApprovals:disabled"/>
+  <int value="-2036112914" label="ContextualTasksRearchitecture:enabled"/>
   <int value="-2035845836" label="ArcExtendServiceAnrTimeout:enabled"/>
   <int value="-2035126988" label="enabled-new-style-notification"/>
   <int value="-2034315473" label="OnDeviceModelPerformanceParams:disabled"/>
@@ -11554,6 +11555,7 @@ from previous Chrome versions.
   <int value="-947643308" label="EnableTouchscreensInDiagnosticsApp:disabled"/>
   <int value="-946366838" label="MetricsSettingsAndroid:enabled"/>
   <int value="-945806012" label="DownloadsUi:enabled"/>
+  <int value="-944396240" label="ContextualTasksRearchitecture:disabled"/>
   <int value="-943778276"
       label="WebAppSyncGeneratedIconRetroactiveFix:disabled"/>
   <int value="-943304570" label="PaintHolding:enabled"/>

@@ -119,6 +119,10 @@ BASE_DECLARE_FEATURE(kContextualTasksWindowTracking);
 // Enables upload chunking for Contextual Tasks.
 BASE_DECLARE_FEATURE(kContextualTasksUploadChunking);
 
+// Enables composebox embedded in AIM main frame, new auth, and
+// new side panel and ghost loader for contextual tasks.
+BASE_DECLARE_FEATURE(kContextualTasksRearchitecture);
+
 // Enables sticky conversation UI that follows the user around.
 BASE_DECLARE_FEATURE(kContextualTasksEnableStickyConversation);
 
@@ -438,6 +442,8 @@ extern const char kContextualTasksHideMenuOnAiPageName[];
 extern const char kContextualTasksHideMenuOnAiPageDescription[];
 extern const char kContextualTasksEnableSpatialModelToolbarLayoutName[];
 extern const char kContextualTasksEnableSpatialModelToolbarLayoutDescription[];
+extern const char kContextualTasksRearchitectureName[];
+extern const char kContextualTasksRearchitectureDescription[];
 
 }  // namespace flag_descriptions
 

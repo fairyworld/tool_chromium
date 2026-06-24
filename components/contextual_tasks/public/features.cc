@@ -157,6 +157,8 @@ BASE_FEATURE(kContextualTasksUploadChunking, base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kContextualTasksEnableSpatialModelToolbarLayout,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
+BASE_FEATURE(kContextualTasksRearchitecture, base::FEATURE_DISABLED_BY_DEFAULT);
+
 BASE_FEATURE(kContextualTasksEnableStickyConversation,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
@@ -787,6 +789,12 @@ const char kContextualTasksEnableSpatialModelToolbarLayoutName[] =
     "Contextual Tasks Enable Spatial Model Toolbar Layout";
 const char kContextualTasksEnableSpatialModelToolbarLayoutDescription[] =
     "Enables the spatial model toolbar layout for contextual tasks.";
+
+const char kContextualTasksRearchitectureName[] =
+    "Contextual Tasks Rearchitecture";
+const char kContextualTasksRearchitectureDescription[] =
+    "Enables composebox embedded in AIM main frame, new auth,"
+    " and new side panel and ghost loader for contextual tasks.";
 
 }  // namespace flag_descriptions
 
