@@ -143,7 +143,9 @@ IN_PROC_BROWSER_TEST_F(SwitchAccessTest, MAYBE_ConsumesKeyEvents) {
 //
 // A separate bug (crbug.com/431933537) is filed to specifically track the
 // blink::CSSParserImpl::ParseStyleSheet issue.
-#if defined(MEMORY_SANITIZER)
+//
+// TODO(crbug.com/516557726): Also flaky on ASan/LSan and debug builds.
+#if defined(MEMORY_SANITIZER) || defined(ADDRESS_SANITIZER) || !defined(NDEBUG)
 #define MAYBE_NavigateGroupings DISABLED_NavigateGroupings
 #else
 #define MAYBE_NavigateGroupings NavigateGroupings
