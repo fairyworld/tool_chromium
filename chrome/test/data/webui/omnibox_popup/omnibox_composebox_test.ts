@@ -2112,6 +2112,14 @@ suite('OmniboxComposeboxTest', () => {
     setup(async () => {
       const windowProxy = TestMock.fromClass(WindowProxy);
       windowProxy.setResultFor('hasWebkitSpeechRecognition', true);
+      windowProxy.setResultMapperFor('createSpeechRecognition', () => {
+        const mock = new EventTarget();
+        const speechMock = mock as unknown as SpeechRecognition;
+        speechMock.abort = () => {};
+        speechMock.start = () => {};
+        speechMock.stop = () => {};
+        return speechMock;
+      });
       windowProxy.setResultMapperFor(
           'matchMedia', (query: string) => window.matchMedia(query));
       WindowProxy.setInstance(windowProxy);
