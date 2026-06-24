@@ -5,14 +5,18 @@
 #include <optional>
 
 #include "base/test/scoped_feature_list.h"
+#include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/dictation/dictation_keyed_service.h"
 #include "chrome/browser/dictation/features.h"
+#include "chrome/browser/dictation/target.h"
 #include "chrome/browser/policy/policy_test_utils.h"
 #include "chrome/browser/profiles/profile.h"
+#include "chrome/browser/renderer_context_menu/render_view_context_menu_test_util.h"
 #include "chrome/test/base/chrome_test_utils.h"
 #include "components/policy/core/common/policy_map.h"
 #include "components/policy/policy_constants.h"
 #include "content/public/test/browser_test.h"
+#include "content/public/test/browser_test_utils.h"
 
 namespace dictation {
 
@@ -133,6 +137,44 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServicePolicyTest,
     ASSERT_NE(service, nullptr);
     EXPECT_FALSE(service->ShouldShowContextMenuItem());
   }
+}
+
+IN_PROC_BROWSER_TEST_F(DictationKeyedServicePolicyTest,
+                       PolicyChangeEndsActiveSession) {
+  DictationKeyedService* service = DictationKeyedService::Get(profile());
+  ASSERT_NE(service, nullptr);
+
+  service->StartSession(*GetBrowserWindowInterface(),
+                        std::make_unique<Target>());
+  ASSERT_NE(service->session_controller(), nullptr);
+
+  // Set policy to disabled (value = 2) in real-time.
+  SetPolicyCombination(kPolicyValueDisabled, std::nullopt);
+
+  EXPECT_EQ(service->session_controller(), nullptr);
+}
+
+IN_PROC_BROWSER_TEST_F(DictationKeyedServicePolicyTest,
+                       ContextMenuDisabledByPolicy) {
+  DictationKeyedService* service = DictationKeyedService::Get(profile());
+  ASSERT_NE(service, nullptr);
+
+  // 1. With policy enabled, the menu item should be present and enabled.
+  SetPolicyCombination(kPolicyValueEnabledWithLogging, std::nullopt);
+  content::ContextMenuParams params;
+  params.is_editable = true;
+  auto menu = std::make_unique<TestRenderViewContextMenu>(
+      *chrome_test_utils::GetActiveWebContents(this)->GetPrimaryMainFrame(),
+      params);
+  menu->Init();
+  ASSERT_TRUE(menu->IsItemPresent(IDC_CONTENT_CONTEXT_DICTATION));
+  EXPECT_TRUE(menu->IsItemEnabled(IDC_CONTENT_CONTEXT_DICTATION));
+
+  // 2. If we disable the policy, executing the command should be a safe no-op
+  // and not start a session.
+  SetPolicyCombination(kPolicyValueDisabled, std::nullopt);
+  menu->ExecuteCommand(IDC_CONTENT_CONTEXT_DICTATION, 0);
+  EXPECT_EQ(service->session_controller(), nullptr);
 }
 
 }  // namespace

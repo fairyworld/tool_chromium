@@ -5,6 +5,7 @@
 #include "chrome/browser/dictation/dictation_keyed_service.h"
 
 #include "base/feature_list.h"
+#include "base/functional/bind.h"
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/dictation/dictation_keyed_service_factory.h"
 #include "chrome/browser/dictation/features.h"
@@ -39,9 +40,11 @@ DictationKeyedService::SessionState::~SessionState() = default;
 DictationKeyedService::DictationKeyedService(Profile* profile)
     : profile_(profile) {
   CHECK(base::FeatureList::IsEnabled(kDictation));
-  // TODO(crbug.com/525506786): Observe prefs::kVoiceTypingSettings to end
-  // active sessions and disable the context menu item in real-time when the
-  // policy is disabled.
+  pref_change_registrar_.Init(profile_->GetPrefs());
+  pref_change_registrar_.Add(
+      prefs::kVoiceTypingSettings,
+      base::BindRepeating(&DictationKeyedService::OnPrefChanged,
+                          base::Unretained(this)));
 }
 
 DictationKeyedService::~DictationKeyedService() = default;
@@ -93,9 +96,8 @@ bool DictationKeyedService::ShouldShowContextMenuItem() const {
 void DictationKeyedService::ContextMenuHandler(
     BrowserWindowInterface& window,
     const std::u16string& selected_text) {
+  // Policy could have changed to disabled while the context menu was open.
   if (IsDisabledByPolicy()) {
-    // TODO(crbug.com/525506786): Disable the menu item on policy change so
-    // this is not reachable.
     return;
   }
 
@@ -109,6 +111,12 @@ bool DictationKeyedService::IsDisabledByPolicy() const {
   CHECK(profile_);
   return profile_->GetPrefs()->GetInteger(prefs::kVoiceTypingSettings) ==
          kVoiceTypingSettingsDisabled;
+}
+
+void DictationKeyedService::OnPrefChanged() {
+  if (IsDisabledByPolicy()) {
+    EndSession();
+  }
 }
 
 }  // namespace dictation

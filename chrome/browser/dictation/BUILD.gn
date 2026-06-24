@@ -21,6 +21,7 @@ source_set("dictation") {
     "//base",
     "//chrome/browser/profiles:profile",
   ]
+  deps = [ "//components/prefs" ]
 }
 
 source_set("impl") {

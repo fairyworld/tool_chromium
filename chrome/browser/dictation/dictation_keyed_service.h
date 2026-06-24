@@ -14,6 +14,7 @@
 #include "chrome/browser/dictation/session_controller.h"
 #include "chrome/browser/dictation/session_controller_delegate.h"
 #include "components/keyed_service/core/keyed_service.h"
+#include "components/prefs/pref_change_registrar.h"
 
 class BrowserWindowInterface;
 class Profile;
@@ -79,9 +80,14 @@ class DictationKeyedService : public KeyedService,
   DictationMultiplexer& multiplexer() { return multiplexer_; }
 
  private:
+  void OnPrefChanged();
+
+  // Returns true if the service is disabled by enterprise policy.
   bool IsDisabledByPolicy() const;
 
   raw_ptr<Profile> profile_;
+
+  PrefChangeRegistrar pref_change_registrar_;
 
   DictationMultiplexer multiplexer_;
 
