@@ -142,6 +142,22 @@ export class UserEducationInternalsElement extends
   override firstUpdated() {
     ColorChangeUpdater.forDocument().start();
 
+    this.checkInitializedAndReadAllData_();
+  }
+
+  private checkInitializedAndReadAllData_() {
+    this.handler_.isFeatureEngagementInitialized().then(({isInitialized}) => {
+      if (isInitialized) {
+        this.readAllData_();
+      } else {
+        setTimeout(() => {
+          this.checkInitializedAndReadAllData_();
+        }, 1000);
+      }
+    });
+  }
+
+  private readAllData_() {
     this.handler_.getTutorials().then(({tutorialInfos}) => {
       this.tutorials_ = tutorialInfos;
     });
