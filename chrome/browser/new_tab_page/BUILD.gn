@@ -262,6 +262,8 @@ if (!is_android) {
   source_set("interactive_ui_tests") {
     testonly = true
 
+    # Some of these interactive uitests have file-scope statics of
+    # non-trivial-destructor types, which -Wexit-time-destructors rejects.
     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]

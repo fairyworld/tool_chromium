@@ -94,6 +94,9 @@ if (!is_android) {
   source_set("unit_tests") {
     testonly = true
 
+    # system_log_source_data_collector_adaptor_unittest.cc has file-scope
+    # statics of non-trivial-destructor types, which -Wexit-time-destructors
+    # rejects.
     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
     sources = [
@@ -121,6 +124,8 @@ if (!is_android) {
   source_set("browser_tests") {
     testonly = true
 
+    # The *_data_collector_browsertest.cc files have file-scope statics of
+    # non-trivial-destructor types, which -Wexit-time-destructors rejects.
     configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]

@@ -303,8 +303,6 @@ source_set("test_support") {
 source_set("unit_tests") {
   testonly = true
 
-  configs += [ "//build/config/compiler:no_exit_time_destructors" ]
-
   sources = [
     "chrome_component_updater_configurator_unittest.cc",
     "crl_set_component_installer_unittest.cc",
@@ -363,8 +361,6 @@ source_set("unit_tests") {
 if (!is_android) {
   source_set("browser_tests") {
     testonly = true
-
-    configs += [ "//build/config/compiler:no_exit_time_destructors" ]
 
     defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
 
