@@ -139,12 +139,6 @@ using omnibox::mojom::NavigationPredictor;
 
 namespace {
 
-const char kOmniboxAimEntrypointShown[] = "Omnibox.AimEntrypoint.Shown";
-const char kOmniboxAimEntrypointActivatedUserTextPresent[] =
-    "Omnibox.AimEntrypoint.Activated.UserTextPresent";
-const char kOmniboxAimEntrypointActivatedViaKeyboard[] =
-    "Omnibox.AimEntrypoint.Activated.ViaKeyboard";
-
 // The possible histogram values emitted when escape is pressed.
 // These values are persisted to logs. Entries should not be renumbered and
 // numeric values should never be reused.
@@ -160,6 +154,21 @@ enum class OmniboxEscapeAction {
   kBlur = 5,
   kMaxValue = kBlur,
 };
+
+void RecordAimEntrypointMetric(const std::string& name,
+                               bool value,
+                               const std::string& page_context,
+                               const std::string& third_party) {
+  base::UmaHistogramBoolean(name, value);
+  base::UmaHistogramBoolean(
+      base::StrCat({name, ".ByPageContext.", page_context}), value);
+  if (!third_party.empty()) {
+    base::UmaHistogramBoolean(base::StrCat({name, third_party}), value);
+    base::UmaHistogramBoolean(
+        base::StrCat({name, ".ByPageContext.", page_context, third_party}),
+        value);
+  }
+}
 
 const char kOmniboxFocusResultedInNavigation[] =
     "Omnibox.FocusResultedInNavigation";
@@ -3223,16 +3232,23 @@ void OmniboxEditModel::RecordAiModeMetrics(const std::u16string& query,
   const std::string page_context =
       ::metrics::OmniboxEventProto::PageClassification_Name(
           GetPageClassification());
+  std::string third_party;
+  if (auto* service = controller_->client()->GetAiModeButtonService()) {
+    // `config` may be null if the button wasn't shown.
+    if (auto* config = service->GetCurrentConfig()) {
+      third_party = (config->id == SearchEngineType::SEARCH_ENGINE_GOOGLE)
+                        ? ".google"
+                        : ".3p";
+    }
+  }
 
   // Record whether or not the AIM page action was shown during the session.
   const bool shown_in_session =
       triggered_feature_service->GetFeatureTriggeredInSession(
           metrics::OmniboxEventProto_Feature::
               OmniboxEventProto_Feature_AIM_PAGE_ACTION_OMNIBOX_ENTRYPOINT);
-  base::UmaHistogramBoolean(kOmniboxAimEntrypointShown, shown_in_session);
-  base::UmaHistogramBoolean(base::StrCat({kOmniboxAimEntrypointShown,
-                                          ".ByPageContext.", page_context}),
-                            shown_in_session);
+  RecordAimEntrypointMetric("Omnibox.AimEntrypoint.Shown", shown_in_session,
+                            page_context, third_party);
 
   if (activation == AimActivation::kNotActivated) {
     return;
@@ -3240,24 +3256,19 @@ void OmniboxEditModel::RecordAiModeMetrics(const std::u16string& query,
 
   // Record whether or not the AIM page action was activated with non-empty
   // query text.
-  base::UmaHistogramBoolean(kOmniboxAimEntrypointActivatedUserTextPresent,
-                            !query.empty());
-  base::UmaHistogramBoolean(
-      base::StrCat({kOmniboxAimEntrypointActivatedUserTextPresent,
-                    ".ByPageContext.", page_context}),
-      !query.empty());
+  RecordAimEntrypointMetric("Omnibox.AimEntrypoint.Activated.UserTextPresent",
+                            !query.empty(), page_context, third_party);
 
   // Record the entry method used to activate the AIM page action.
   const bool via_keyboard = activation == AimActivation::kKeyboard;
-  base::UmaHistogramBoolean(kOmniboxAimEntrypointActivatedViaKeyboard,
-                            via_keyboard);
-  base::UmaHistogramBoolean(
-      base::StrCat({kOmniboxAimEntrypointActivatedViaKeyboard,
-                    ".ByPageContext.", page_context}),
-      via_keyboard);
+  RecordAimEntrypointMetric("Omnibox.AimEntrypoint.Activated.ViaKeyboard",
+                            via_keyboard, page_context, third_party);
 
   // Record button click metrics if activated via click or keyboard (not context
   // menu).
+  // Note, the page classification mapping is different than for the histograms
+  // above. And despite its name being '...Click...', its logged for keyboard
+  // activation too.
   if (activation == AimActivation::kClickOrGesture ||
       activation == AimActivation::kKeyboard) {
     OmniboxEventProto::PageClassification classification =

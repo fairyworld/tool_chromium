@@ -1907,6 +1907,90 @@ TEST_F(OmniboxEditModelPopupTest, AimPopupEnabledPopupOpened) {
       "Omnibox.AimEntrypoint.Activated.UserTextPresent", false, 1);
 }
 
+TEST_F(OmniboxEditModelPopupTest, RecordAiModeMetrics_ThirdParty) {
+  auto* service = client()->GetAiModeButtonService();
+  EXPECT_CALL(*client(), IsAimPopupEnabled()).WillRepeatedly(Return(true));
+  EXPECT_CALL(*client(), OpenUrl(_, _)).WillRepeatedly(Return());
+
+  // Test google config.
+  {
+    constexpr ai_mode_button_config::AiModeButtonConfig kGoogleConfig = {
+        .id = SearchEngineType::SEARCH_ENGINE_GOOGLE};
+    service->current_config_ = &kGoogleConfig;
+
+    base::HistogramTester histogram_tester;
+    model()->RecordAiModeMetrics(u"",
+                                 OmniboxEditModel::AimActivation::kKeyboard);
+
+    // Verify base metrics are recorded.
+    histogram_tester.ExpectBucketCount(
+        "Omnibox.AimEntrypoint.Activated.ViaKeyboard", true, 1);
+    histogram_tester.ExpectBucketCount(
+        "Omnibox.AimEntrypoint.Activated.UserTextPresent", false, 1);
+    histogram_tester.ExpectBucketCount("Omnibox.AimEntrypoint.Shown", false, 1);
+    histogram_tester.ExpectBucketCount(
+        "Omnibox.AimEntrypoint.Shown.ByPageContext.OTHER", false, 1);
+
+    // Verify Google sliced metrics are recorded.
+    histogram_tester.ExpectBucketCount(
+        "Omnibox.AimEntrypoint.Activated.ViaKeyboard.google", true, 1);
+    histogram_tester.ExpectBucketCount(
+        "Omnibox.AimEntrypoint.Activated.UserTextPresent.google", false, 1);
+    histogram_tester.ExpectBucketCount("Omnibox.AimEntrypoint.Shown.google",
+                                       false, 1);
+    histogram_tester.ExpectBucketCount(
+        "Omnibox.AimEntrypoint.Shown.ByPageContext.OTHER.google", false, 1);
+
+    // Verify 3P sliced metrics are NOT recorded.
+    histogram_tester.ExpectTotalCount(
+        "Omnibox.AimEntrypoint.Activated.ViaKeyboard.3p", 0);
+    histogram_tester.ExpectTotalCount(
+        "Omnibox.AimEntrypoint.Activated.UserTextPresent.3p", 0);
+    histogram_tester.ExpectTotalCount("Omnibox.AimEntrypoint.Shown.3p", 0);
+    histogram_tester.ExpectTotalCount(
+        "Omnibox.AimEntrypoint.Shown.ByPageContext.OTHER.3p", 0);
+  }
+
+  // Test 3P config.
+  {
+    static constexpr ai_mode_button_config::AiModeButtonConfig
+        kThirdPartyConfig = {.id = SearchEngineType::SEARCH_ENGINE_YAHOO};
+    service->current_config_ = &kThirdPartyConfig;
+
+    base::HistogramTester histogram_tester;
+    model()->RecordAiModeMetrics(u"",
+                                 OmniboxEditModel::AimActivation::kKeyboard);
+
+    // Verify base metrics are recorded.
+    histogram_tester.ExpectBucketCount(
+        "Omnibox.AimEntrypoint.Activated.ViaKeyboard", true, 1);
+    histogram_tester.ExpectBucketCount(
+        "Omnibox.AimEntrypoint.Activated.UserTextPresent", false, 1);
+    histogram_tester.ExpectBucketCount("Omnibox.AimEntrypoint.Shown", false, 1);
+    histogram_tester.ExpectBucketCount(
+        "Omnibox.AimEntrypoint.Shown.ByPageContext.OTHER", false, 1);
+
+    // Verify Google sliced metrics are recorded.
+    histogram_tester.ExpectBucketCount(
+        "Omnibox.AimEntrypoint.Activated.ViaKeyboard.3p", true, 1);
+    histogram_tester.ExpectBucketCount(
+        "Omnibox.AimEntrypoint.Activated.UserTextPresent.3p", false, 1);
+    histogram_tester.ExpectBucketCount("Omnibox.AimEntrypoint.Shown.3p", false,
+                                       1);
+    histogram_tester.ExpectBucketCount(
+        "Omnibox.AimEntrypoint.Shown.ByPageContext.OTHER.3p", false, 1);
+
+    // Verify 3P sliced metrics are NOT recorded.
+    histogram_tester.ExpectTotalCount(
+        "Omnibox.AimEntrypoint.Activated.ViaKeyboard.google", 0);
+    histogram_tester.ExpectTotalCount(
+        "Omnibox.AimEntrypoint.Activated.UserTextPresent.google", 0);
+    histogram_tester.ExpectTotalCount("Omnibox.AimEntrypoint.Shown.google", 0);
+    histogram_tester.ExpectTotalCount(
+        "Omnibox.AimEntrypoint.Shown.ByPageContext.OTHER.google", 0);
+  }
+}
+
 TEST_F(OmniboxEditModelPopupTest, AimPopupEnabled_ForcedNavigationDisabled) {
   base::test::ScopedFeatureList feature_list;
   feature_list.InitAndDisableFeature(omnibox::kAiModeEntryPointAlwaysNavigates);

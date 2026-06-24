@@ -59,6 +59,13 @@ chromium-metrics-reviews@google.com.
 
 <!-- LINT.ThenChange(//components/omnibox/browser/aim_eligibility_service.h:RequestSource) -->
 
+<variants name="AimEntrypointParty">
+  <variant name=""
+      summary="Unsliced; recorded for google and 3rd party AIM entrypoint."/>
+  <variant name=".3p" summary="Recorded for 3rd party AIM entrypoint."/>
+  <variant name=".google" summary="Recorded for google entrypoint."/>
+</variants>
+
 <variants name="ClipboardSuggestionType">
   <variant name="" summary="Aggregated across all clipboard suggestion types"/>
   <variant name=".IMAGE" summary="IMAGE from clipboard."/>
@@ -815,24 +822,8 @@ Keep consistent with active providers. Doesn't need to include every provider in
   <token key="Feature" variants="AimEligibilityBooleanFeature"/>
 </histogram>
 
-<histogram name="Omnibox.AimEntrypoint.Activated.UserTextPresent"
-    enum="Boolean" expires_after="2026-11-12">
-  <owner>khalidpeer@chromium.org</owner>
-  <owner>jdonnelly@chromium.org</owner>
-  <owner>chrome-desktop-search@google.com</owner>
-  <summary>
-    Recorded when the user activates the AIM entrypoint (page action) in the
-    Omnibox. More specifically, this metric records whether the user had text in
-    the Omnibox at the time they activated the AIM entrypoint.
-
-    Activation can be achieved via keyboard events (e.g. hitting [ENTER] or
-    [SPACE] while the page action is focused) or via mouse/gesture events (e.g.
-    clicking or tapping on the page action).
-  </summary>
-</histogram>
-
 <histogram
-    name="Omnibox.AimEntrypoint.Activated.UserTextPresent.ByPageContext.{OmniboxPageContext}"
+    name="Omnibox.AimEntrypoint.Activated.UserTextPresent.ByPageContext.{OmniboxPageContext}{AimEntrypointParty}"
     enum="Boolean" expires_after="2026-11-12">
   <owner>khalidpeer@chromium.org</owner>
   <owner>jdonnelly@chromium.org</owner>
@@ -843,33 +834,42 @@ Keep consistent with active providers. Doesn't need to include every provider in
     the Omnibox at the time they activated the AIM entrypoint.
 
     Activation can be achieved via keyboard events (e.g. hitting [ENTER] or
-    [SPACE] while the page action is focused) or via mouse/gesture events (e.g.
-    clicking or tapping on the page action).
+    [SPACE] while the page action is focused), via mouse/gesture events (e.g.
+    clicking or tapping on the page action), or by adding context (e.g. an open
+    tab).
 
     Sliced by {OmniboxPageContext} which represents the page classification at
     the time of AIM page action activation.
+
+    {AimEntrypointParty}
   </summary>
   <token key="OmniboxPageContext" variants="OmniboxPageContext"/>
+  <token key="AimEntrypointParty" variants="AimEntrypointParty"/>
 </histogram>
 
-<histogram name="Omnibox.AimEntrypoint.Activated.ViaKeyboard" enum="Boolean"
-    expires_after="2026-11-12">
+<histogram
+    name="Omnibox.AimEntrypoint.Activated.UserTextPresent{AimEntrypointParty}"
+    enum="Boolean" expires_after="2026-11-12">
   <owner>khalidpeer@chromium.org</owner>
   <owner>jdonnelly@chromium.org</owner>
   <owner>chrome-desktop-search@google.com</owner>
   <summary>
     Recorded when the user activates the AIM entrypoint (page action) in the
-    Omnibox.
+    Omnibox. More specifically, this metric records whether the user had text in
+    the Omnibox at the time they activated the AIM entrypoint.
 
-    This metric records `true` when the user activates the entrypoint via
-    keyboard (e.g. hitting [ENTER] or [SPACE]) and records `false` when the user
-    activates the entrypoint via mouse/gesture events (e.g. clicking or tapping
-    on the page action).
+    Activation can be achieved via keyboard events (e.g. hitting [ENTER] or
+    [SPACE] while the page action is focused), via mouse/gesture events (e.g.
+    clicking or tapping on the page action), or by adding context (e.g. an open
+    tab).
+
+    {AimEntrypointParty}
   </summary>
+  <token key="AimEntrypointParty" variants="AimEntrypointParty"/>
 </histogram>
 
 <histogram
-    name="Omnibox.AimEntrypoint.Activated.ViaKeyboard.ByPageContext.{OmniboxPageContext}"
+    name="Omnibox.AimEntrypoint.Activated.ViaKeyboard.ByPageContext.{OmniboxPageContext}{AimEntrypointParty}"
     enum="Boolean" expires_after="2026-11-12">
   <owner>khalidpeer@chromium.org</owner>
   <owner>jdonnelly@chromium.org</owner>
@@ -881,41 +881,80 @@ Keep consistent with active providers. Doesn't need to include every provider in
     This metric records `true` when the user activates the entrypoint via
     keyboard (e.g. hitting [ENTER] or [SPACE]) and records `false` when the user
     activates the entrypoint via mouse/gesture events (e.g. clicking or tapping
-    on the page action).
+    on the page action) or by adding context (e.g. an open tab).
 
     Sliced by {OmniboxPageContext} which represents the page classification at
     the time of AIM page action activation.
+
+    {AimEntrypointParty}
   </summary>
   <token key="OmniboxPageContext" variants="OmniboxPageContext"/>
+  <token key="AimEntrypointParty" variants="AimEntrypointParty"/>
 </histogram>
 
-<histogram name="Omnibox.AimEntrypoint.Shown" enum="Boolean"
-    expires_after="2026-11-15">
+<histogram
+    name="Omnibox.AimEntrypoint.Activated.ViaKeyboard{AimEntrypointParty}"
+    enum="Boolean" expires_after="2026-11-12">
   <owner>khalidpeer@chromium.org</owner>
   <owner>jdonnelly@chromium.org</owner>
   <owner>chrome-desktop-search@google.com</owner>
   <summary>
-    Recorded when the AIM entrypoint (page action) is shown in the Omnibox. This
-    is recorded once per Omnibox navigation. The entrypoint will only be shown
-    if the user is eligible for AIM functionality.
+    Recorded when the user activates the AIM entrypoint (page action) in the
+    Omnibox.
+
+    This metric records `true` when the user activates the entrypoint via
+    keyboard (e.g. hitting [ENTER] or [SPACE]) and records `false` when the user
+    activates the entrypoint via mouse/gesture events (e.g. clicking or tapping
+    on the page action) or by adding context (e.g. an open tab).
+
+    {AimEntrypointParty}
   </summary>
+  <token key="AimEntrypointParty" variants="AimEntrypointParty"/>
 </histogram>
 
 <histogram
-    name="Omnibox.AimEntrypoint.Shown.ByPageContext.{OmniboxPageContext}"
+    name="Omnibox.AimEntrypoint.Shown.ByPageContext.{OmniboxPageContext}{AimEntrypointParty}"
     enum="Boolean" expires_after="2026-08-09">
   <owner>khalidpeer@chromium.org</owner>
   <owner>jdonnelly@chromium.org</owner>
   <owner>chrome-desktop-search@google.com</owner>
   <summary>
-    Recorded when the AIM entrypoint (page action) is shown in the Omnibox. This
-    is recorded once per Omnibox navigation. The entrypoint will only be shown
-    if the user is eligible for AIM functionality.
+    Recorded whether the AIM entrypoint (page action) was shown at least once
+    during an Omnibox session. This is recorded once per Omnibox navigation or
+    AIM entrypoint activation. The entrypoint will only be shown if the user is
+    eligible for AIM functionality.
+
+    Showing the AIM entrypoint on focus only won't log true for navigations; it
+    must be shown as the user is typing in order to log true. Showing the AIM
+    entrypoint on focus only and activating the entrypoint will log true.
 
     Sliced by {OmniboxPageContext} which represents the page classification when
     the AIM page action was shown to the user.
+
+    {AimEntrypointParty}
   </summary>
   <token key="OmniboxPageContext" variants="OmniboxPageContext"/>
+  <token key="AimEntrypointParty" variants="AimEntrypointParty"/>
+</histogram>
+
+<histogram name="Omnibox.AimEntrypoint.Shown{AimEntrypointParty}"
+    enum="Boolean" expires_after="2026-11-15">
+  <owner>khalidpeer@chromium.org</owner>
+  <owner>jdonnelly@chromium.org</owner>
+  <owner>chrome-desktop-search@google.com</owner>
+  <summary>
+    Recorded whether the AIM entrypoint (page action) was shown at least once
+    during an Omnibox session. This is recorded once per Omnibox navigation or
+    AIM entrypoint activation. The entrypoint will only be shown if the user is
+    eligible for AIM functionality.
+
+    Showing the AIM entrypoint on focus only won't log true for navigations; it
+    must be shown as the user is typing in order to log true. Showing the AIM
+    entrypoint on focus only and activating the entrypoint will log true.
+
+    {AimEntrypointParty}
+  </summary>
+  <token key="AimEntrypointParty" variants="AimEntrypointParty"/>
 </histogram>
 
 <histogram name="Omnibox.AiModePageAction.IconSource"
