@@ -185,6 +185,7 @@
 #include "components/split_tabs/split_tab_visual_data.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/tabs/public/tab_interface.h"
+#include "chrome/browser/feedback/show_feedback_page.h"
 #include "components/translate/core/browser/translate_manager.h"
 #include "components/user_prefs/user_prefs.h"
 #include "components/vector_icons/vector_icons.h"
@@ -3426,6 +3427,192 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               },
               bwi))
           .SetActionId(kActionLiveCaption)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::FocusLocationBar(bwi);
+              },
+              bwi))
+          .SetActionId(kActionSearch)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowSettingsSubPage(bwi, chrome::kManageProfileSubPage);
+              },
+              bwi))
+          .SetActionId(kActionCustomizeChrome)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ToggleBookmarkBar(bwi);
+              },
+              bwi))
+          .SetActionId(kActionShowBookmarkBar)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowBookmarkManager(bwi);
+              },
+              bwi))
+          .SetActionId(kActionShowBookmarkManager)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowAboutChrome(bwi);
+              },
+              bwi))
+          .SetActionId(kActionAbout)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::OpenInChrome(bwi);
+              },
+              bwi))
+          .SetActionId(kActionOpenInChrome)
+          .Build());
+
+#if !BUILDFLAG(IS_CHROMEOS)
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                Browser* browser = bwi->GetBrowserForMigrationOnly();
+                auto* controller = web_app::AppBrowserController::From(browser);
+                if (controller) {
+                  chrome::ShowWebAppSettings(
+                      bwi, controller->app_id(),
+                      web_app::AppSettingsPageEntryPoint::kBrowserCommand);
+                }
+              },
+              bwi))
+          .SetActionId(kActionWebAppSettings)
+          .Build());
+#endif
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::SaveAutofillAddress(bwi);
+              },
+              bwi))
+          .SetActionId(kActionSaveAutofillAddress)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::SharingHub(bwi);
+              },
+              bwi))
+          .SetActionId(kActionSharingHub)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ScreenshotCapture(bwi);
+              },
+              bwi))
+          .SetActionId(kActionSharingHubScreenshot)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowFeedbackPage(
+                    bwi, feedback::kFeedbackSourceBrowserCommand, std::string(),
+                    std::string(), std::string(), std::string());
+              },
+              bwi))
+          .SetActionId(kActionFeedback)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowHistory(bwi);
+              },
+              bwi))
+          .SetActionId(kActionShowHistory)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowHelp(bwi, chrome::HelpSource::kKeyboard);
+              },
+              bwi))
+          .SetActionId(kActionHelpPageViaKeyboard)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowHelp(bwi, chrome::HelpSource::kMenu);
+              },
+              bwi))
+          .SetActionId(kActionHelpPageViaMenu)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowAppMenu(bwi);
+              },
+              bwi))
+          .SetActionId(kActionShowAppMenu)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowExtensions(bwi);
+              },
+              bwi))
+          .SetActionId(kActionManageExtensions)
           .Build());
 }
 
