@@ -182,8 +182,6 @@ OmniboxPopupUI::OmniboxPopupUI(content::WebUI* web_ui)
                          omnibox::internal::kWebUIOmniboxSimplification));
   source->AddBoolean("hideClassicContextButton",
                      omnibox::kHideClassicContextButton.Get());
-  source->AddBoolean("composeboxForkEnabled",
-                     omnibox::kUseComposeboxFork.Get());
   source->AddBoolean(
       "contextManagementInComposeboxEnabled",
       base::FeatureList::IsEnabled(omnibox::kContextManagementInComposebox) &&
