@@ -20,12 +20,16 @@ import static org.chromium.chrome.browser.keyboard_accessory.bar_component.Keybo
 import static org.chromium.chrome.browser.keyboard_accessory.bar_component.KeyboardAccessoryProperties.STYLE;
 import static org.chromium.chrome.browser.keyboard_accessory.bar_component.KeyboardAccessoryProperties.VISIBLE;
 
+import android.content.Context;
+
 import androidx.annotation.StringRes;
 
 import org.chromium.base.ObserverList;
 import org.chromium.base.TraceEvent;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
+import org.chromium.chrome.browser.autofill.autofill_ai.EntityDataManager;
+import org.chromium.chrome.browser.autofill.autofill_ai.EntityDataManagerFactory;
 import org.chromium.chrome.browser.flags.ChromeFeatureList;
 import org.chromium.chrome.browser.keyboard_accessory.AccessoryAction;
 import org.chromium.chrome.browser.keyboard_accessory.KeyboardAccessoryVisualStateProvider;
@@ -45,12 +49,21 @@ import org.chromium.chrome.browser.keyboard_accessory.data.Provider;
 import org.chromium.chrome.browser.keyboard_accessory.sheet_component.AccessorySheetCoordinator;
 import org.chromium.chrome.browser.keyboard_accessory.utils.ManualFillingMetricsRecorder;
 import org.chromium.chrome.browser.profiles.Profile;
+import org.chromium.components.autofill.AutofillAiPayload;
 import org.chromium.components.autofill.AutofillDelegate;
 import org.chromium.components.autofill.AutofillSuggestion;
 import org.chromium.components.autofill.FillingProduct;
 import org.chromium.components.autofill.FillingProductBridge;
 import org.chromium.components.autofill.SuggestionType;
+import org.chromium.components.autofill.autofill_ai.EntityInstance;
+import org.chromium.components.autofill.autofill_ai.RecordType;
+import org.chromium.components.browser_ui.widget.ActionConfirmationDialog;
+import org.chromium.components.browser_ui.widget.ActionConfirmationDialog.ConfirmationDialogParams;
+import org.chromium.components.browser_ui.widget.ActionConfirmationDialog.DialogDismissType;
+import org.chromium.components.browser_ui.widget.ActionConfirmationDialog.DismissHandler;
+import org.chromium.components.browser_ui.widget.StrictButtonPressController.ButtonClickResult;
 import org.chromium.components.feature_engagement.FeatureConstants;
+import org.chromium.ui.modaldialog.ModalDialogManager;
 import org.chromium.ui.modelutil.ListModel;
 import org.chromium.ui.modelutil.PropertyKey;
 import org.chromium.ui.modelutil.PropertyModel;
@@ -73,6 +86,7 @@ class KeyboardAccessoryMediator
         implements PropertyObservable.PropertyObserver<PropertyKey>,
                 Provider.Observer<Action[]>,
                 KeyboardAccessoryButtonGroupCoordinator.AccessoryTabObserver {
+    private final Context mContext;
     private final PropertyModel mModel;
     private final BarVisibilityDelegate mBarVisibilityDelegate;
     private final AccessorySheetCoordinator.SheetVisibilityDelegate mSheetVisibilityDelegate;
@@ -80,13 +94,16 @@ class KeyboardAccessoryMediator
     private final Supplier<Integer> mBackgroundColorSupplier;
     private final Supplier<Boolean> mIsLargeFormFactorSupplier;
     private final Profile mProfile;
+    private final @Nullable ActionConfirmationDialog mDialog;
     private @Nullable Boolean mHasFilteredTouchEvent;
     private final ObserverList<KeyboardAccessoryVisualStateProvider.Observer> mVisualObservers =
             new ObserverList<>();
 
     KeyboardAccessoryMediator(
+            Context context,
             PropertyModel model,
             Profile profile,
+            ModalDialogManager modalDialogManager,
             BarVisibilityDelegate barVisibilityDelegate,
             AccessorySheetCoordinator.SheetVisibilityDelegate sheetVisibilityDelegate,
             TabSwitchingDelegate tabSwitcher,
@@ -94,6 +111,7 @@ class KeyboardAccessoryMediator
             Supplier<Integer> backgroundColorSupplier,
             Supplier<Boolean> isLargeFormFactorSupplier,
             Runnable dismissRunnable) {
+        mContext = context;
         mModel = model;
         mProfile = profile;
         mBarVisibilityDelegate = barVisibilityDelegate;
@@ -101,6 +119,10 @@ class KeyboardAccessoryMediator
         mTabSwitcher = tabSwitcher;
         mBackgroundColorSupplier = backgroundColorSupplier;
         mIsLargeFormFactorSupplier = isLargeFormFactorSupplier;
+        mDialog =
+                modalDialogManager != null
+                        ? new ActionConfirmationDialog(context, modalDialogManager)
+                        : null;
 
         // Add mediator as observer so it can use model changes as signal for accessory visibility.
         mModel.set(OBFUSCATED_CHILD_AT_CALLBACK, this::onSuggestionObfuscatedAt);
@@ -340,7 +362,61 @@ class KeyboardAccessoryMediator
                     }
                     delegate.suggestionSelected(pos, suggestion.showLoadingOnAcceptance());
                 },
-                result -> delegate.deleteSuggestion(pos));
+                result -> {
+                    if (maybeShowDialogOnLongPress(suggestion)) {
+                        return;
+                    }
+                    delegate.deleteSuggestion(pos);
+                });
+    }
+
+    private boolean maybeShowDialogOnLongPress(AutofillSuggestion suggestion) {
+        AutofillAiPayload payload = suggestion.getAutofillAiPayload();
+        if (payload == null || mDialog == null) {
+            return false;
+        }
+        EntityDataManager entityDataManager = EntityDataManagerFactory.getForProfile(mProfile);
+        if (entityDataManager == null) {
+            return false;
+        }
+        EntityInstance entityInstance = entityDataManager.getEntityInstance(payload.getGuid());
+        if (entityInstance == null
+                || entityInstance.getRecordType() != RecordType.PERSONAL_CONTEXT) {
+            return false;
+        }
+        String secondaryLabel = suggestion.getSecondaryLabel();
+        if (secondaryLabel == null) {
+            return false;
+        }
+        mDialog.show(
+                new ConfirmationDialogParams.Builder(mContext)
+                        .withTitle(secondaryLabel)
+                        .withDescription(
+                                mContext.getString(
+                                        R.string
+                                                .autofill_ai_suggestion_long_press_dialog_description))
+                        .withPositiveButton(
+                                mContext.getString(
+                                        R.string
+                                                .autofill_ai_suggestion_long_press_dialog_positive_button))
+                        .withNegativeButton(
+                                mContext.getString(
+                                        R.string
+                                                .autofill_ai_suggestion_long_press_dialog_negative_button))
+                        .build(),
+                this::handleDialogAction);
+        return true;
+    }
+
+    private @DialogDismissType int handleDialogAction(
+            DismissHandler dismissHandler,
+            @ButtonClickResult int buttonClickResult,
+            boolean stopShowing) {
+        // TODO: crbug.com/503303085 - Log metrics to asses usage.
+        if (buttonClickResult == ButtonClickResult.POSITIVE) {
+            // TODO: crbug.com/503303085 - Open the corresponding settings page.
+        }
+        return DialogDismissType.DISMISS_IMMEDIATELY;
     }
 
     private void updateListState(
