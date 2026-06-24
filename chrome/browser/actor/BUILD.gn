@@ -346,6 +346,7 @@ source_set("unit_tests") {
     "tools/attempt_form_filling_tool_request_unittest.cc",
     "tools/attempt_login_tool_request_unittest.cc",
     "tools/attempt_otp_filling_tool_request_unittest.cc",
+    "tools/click_tool_request_unittest.cc",
   ]
   deps = [
     ":actor",
