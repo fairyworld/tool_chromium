@@ -60,6 +60,7 @@ class MockActorLoginService : public actor_login::ActorLoginService {
       bool should_store_permission,
       base::WeakPtr<actor_login::ActorLoginQualityLoggerInterface> mqls_logger,
       base::TimeTicks attempt_login_tool_start_time,
+      actor_login::FrameFillingStartedCallback frame_filling_started_cb,
       actor_login::LoginStatusResultOrErrorReply callback,
       base::WeakPtr<actor_login::ActionSequenceDelegate>
           action_sequence_delegate) override;
