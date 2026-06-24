@@ -45,6 +45,15 @@ chromium-metrics-reviews@google.com.
   <variant name="OpenFailure"/>
 </variants>
 
+<variants name="DomStorageSqliteRolloutStage">
+  <variant name=""
+      summary="on-disk database not participating in the SQLite rollout
+               experiment"/>
+  <variant name=".OnDiskExperimental"
+      summary="experimental (belongs to the treatment or control group of the
+               SQLite rollout experiment)"/>
+</variants>
+
 <variants name="DomStorageType">
   <variant name="LocalStorage" summary="local storage"/>
   <variant name="SessionStorage" summary="session storage"/>
@@ -1044,14 +1053,6 @@ chromium-metrics-reviews@google.com.
     Profile. Recorded once per LocalStorage backend per attempt to open the
     on-disk database in the Storage process, regardless of open outcome.
   </summary>
-  <token key="DomStorageSqliteRolloutStage">
-    <variant name=""
-        summary="on-disk database not participating in the SQLite rollout
-                 experiment"/>
-    <variant name=".OnDiskExperimental"
-        summary="experimental (belongs to the treatment or control group of
-                 the SQLite rollout experiment)"/>
-  </token>
 </histogram>
 
 <histogram name="LocalStorage.DaysSinceLastModified" units="days"
@@ -1831,6 +1832,19 @@ chromium-metrics-reviews@google.com.
     partition initialization. True means the database was destroyed and
     recreated because no session restore was needed. Emitted once per storage
     partition during initialization.
+  </summary>
+</histogram>
+
+<histogram
+    name="Storage.SessionStorage.DatabaseOnDiskSizeKB{DomStorageSqliteRolloutStage}"
+    units="KB" expires_after="2026-11-22">
+  <owner>fergal@chromium.org</owner>
+  <owner>rahsin@microsoft.com</owner>
+  <owner>chrome-owp-storage@google.com</owner>
+  <summary>
+    Records the on disk size of the SessionStorage database for a given browser
+    Profile. Recorded once per SessionStorage backend per attempt to open the
+    on-disk database in the Storage process, regardless of open outcome.
   </summary>
 </histogram>
 
