@@ -11,6 +11,7 @@
 #include "base/notreached.h"
 #include "base/strings/strcat.h"
 #include "base/strings/utf_string_conversions.h"
+#include "chrome/browser/contextual_cueing/prefs.h"
 #include "chrome/browser/favicon/favicon_service_factory.h"
 #include "chrome/browser/multistep_filter/core/multistep_filter_log_router_factory.h"
 #include "chrome/browser/multistep_filter/core/multistep_filter_service_factory.h"
@@ -26,6 +27,7 @@
 #include "components/multistep_filter/core/logging/log_entry.h"
 #include "components/multistep_filter/core/logging/multistep_filter_logger.h"
 #include "components/multistep_filter/core/multistep_filter_service.h"
+#include "components/optimization_guide/core/feature_registry/feature_registration.h"
 #include "components/optimization_guide/core/model_execution/feature_keys.h"
 #include "components/optimization_guide/core/optimization_guide_prefs.h"
 #include "components/prefs/pref_service.h"
@@ -267,9 +269,21 @@ bool FilterUiController::ShouldShowCue() const {
   int opt_in_state = pref_service_->GetInteger(
       optimization_guide::prefs::GetSettingEnabledPrefName(
           optimization_guide::UserVisibleFeatureKey::kContextualCueing));
-  return opt_in_state !=
-         std::to_underlying(
-             optimization_guide::prefs::FeatureOptInState::kDisabled);
+  if (opt_in_state ==
+      std::to_underlying(
+          optimization_guide::prefs::FeatureOptInState::kDisabled)) {
+    return false;
+  }
+
+  // Check enterprise policy.
+  if (pref_service_->GetInteger(
+          optimization_guide::prefs::kChromeSuggestionsSettings) ==
+      std::to_underlying(
+          contextual_cueing::ChromeSuggestionsSettingsValue::kDisabled)) {
+    return false;
+  }
+
+  return true;
 }
 
 void FilterUiController::ShowCue(const UrlFilterSuggestion& suggestion) {
