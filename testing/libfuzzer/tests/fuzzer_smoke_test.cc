@@ -58,5 +58,21 @@ TEST(FuzzerSmokeTest, MAYBE_FuzzerSolvesProtoStringComparison) {
       << target->output();
 }
 
+// TODO(https://crbug.com/526667982): Fix when Mac Arm64 builds are fixed.
+// TODO(https://crbug.com/526656114): Fix when MSAN builds are fixed.
+#if defined(MEMORY_SANITIZER) || (BUILDFLAG(IS_MAC) && defined(ARCH_CPU_ARM64))
+#define MAYBE_LpmEmptyFuzzerDoesNotCrashOnStartup \
+  DISABLED_LpmEmptyFuzzerDoesNotCrashOnStartup
+#else
+#define MAYBE_LpmEmptyFuzzerDoesNotCrashOnStartup \
+  LpmEmptyFuzzerDoesNotCrashOnStartup
+#endif
+TEST(FuzzerSmokeTest, MAYBE_LpmEmptyFuzzerDoesNotCrashOnStartup) {
+  auto target = FuzzTarget::Make("lpm_empty_fuzzer");
+  ASSERT_TRUE(target);
+
+  EXPECT_TRUE(target->Fuzz({.timeout_secs = 2})) << target->output();
+}
+
 }  // namespace
 }  // namespace fuzzing
