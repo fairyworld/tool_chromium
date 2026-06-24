@@ -362,6 +362,8 @@
   E(kActionContentContextGeneratePassword, \
     IDC_CONTENT_CONTEXT_GENERATEPASSWORD) \
   E(kActionContentContextExitFullscreen, IDC_CONTENT_CONTEXT_EXIT_FULLSCREEN) \
+  E(kActionContentContextSaveToMemoryBanks, \
+    IDC_CONTENT_CONTEXT_SAVE_TO_MEMORY_BANKS) \
   E(kActionContentContextShowAllSavedPasswords, \
     IDC_CONTENT_CONTEXT_SHOWALLSAVEDPASSWORDS) \
   E(kActionContentContextUsePasskeyFromAnotherDeviceTopLevel, \
