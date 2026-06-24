@@ -329,6 +329,10 @@ public class VerticalTabListCoordinator {
 
         ItemTouchHelper2 itemTouchHelper =
                 new ItemTouchHelper2(touchHelperCallback, /* externalLongPressHandler= */ null);
+
+        recyclerView.addOnItemTouchListener(
+                touchHelperCallback.createMouseDragDetector(itemTouchHelper));
+
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
         recyclerView.addOnItemTouchListener(
