@@ -330,7 +330,7 @@ BASE_FEATURE_PARAM(bool,
                    "intent_picker",
 // TODOD(crbug.com/480035938): Enable on ChromeOS.
 #if BUILDFLAG(IS_CHROMEOS)
-                   false
+                   true
 #else
                    true
 #endif
@@ -340,37 +340,37 @@ BASE_FEATURE_PARAM(bool,
                    kPageActionsMigrationZoom,
                    &kPageActionsMigration,
                    "zoom",
-                   false);
+                   true);
 
 BASE_FEATURE_PARAM(bool,
                    kPageActionsMigrationCookieControls,
                    &kPageActionsMigration,
                    "cookie_controls",
-                   false);
+                   true);
 
 BASE_FEATURE_PARAM(bool,
                    kPageActionsMigrationAutofillMandatoryReauth,
                    &kPageActionsMigration,
                    "mandatory_reauth",
-                   false);
+                   true);
 
 BASE_FEATURE_PARAM(bool,
                    kPageActionsMigrationAiMode,
                    &kPageActionsMigration,
                    "ai_mode",
-                   false);
+                   true);
 
 BASE_FEATURE_PARAM(bool,
                    kPageActionsMigrationVirtualCard,
                    &kPageActionsMigration,
                    "virtual_card",
-                   false);
+                   true);
 
 BASE_FEATURE_PARAM(bool,
                    kPageActionsMigrationFilledCardInformation,
                    &kPageActionsMigration,
                    "filled_card_information",
-                   false);
+                   true);
 
 BASE_FEATURE_PARAM(bool,
                    kPageActionsMigrationReadingMode,
@@ -382,17 +382,17 @@ BASE_FEATURE_PARAM(bool,
                    kPageActionsMigrationSavePayments,
                    &kPageActionsMigration,
                    "save_payments",
-                   false);
+                   true);
 BASE_FEATURE_PARAM(bool,
                    kPageActionsMigrationLensOverlayHomework,
                    &kPageActionsMigration,
                    "lens_overlay_homework",
-                   false);
+                   true);
 BASE_FEATURE_PARAM(bool,
                    kPageActionsMigrationBookmarkStar,
                    &kPageActionsMigration,
                    "bookmark_star",
-                   false);
+                   true);
 
 BASE_FEATURE(kPageActionsPrioritySelector, base::FEATURE_DISABLED_BY_DEFAULT);
 
