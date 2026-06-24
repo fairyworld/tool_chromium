@@ -26,6 +26,7 @@
 #include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/views/chrome_layout_provider.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
+#include "chrome/browser/ui/views/frame/immersive_mode_controller.h"
 #include "chrome/browser/ui/views/tab_search_bubble_host.h"
 #include "chrome/browser/ui/views/tabs/browser_tab_strip_controller.h"
 #include "chrome/browser/ui/views/tabs/dragging/tab_drag_controller.h"
@@ -168,7 +169,7 @@ std::unique_ptr<TabStrip> CreateTabStrip(
 
 HorizontalTabStripRegionView::HorizontalTabStripRegionView(
     BrowserView* browser_view)
-    : profile_(browser_view->GetProfile()),
+    : browser_view_(browser_view),
       action_view_controller_(std::make_unique<views::ActionViewController>()) {
   views::SetCascadingColorProviderColor(
       this, views::kCascadingBackgroundColor,
@@ -216,7 +217,7 @@ HorizontalTabStripRegionView::HorizontalTabStripRegionView(
     // We instantiate the action container if the profile is eligible (even if
     // the button is not currently shown, e.g. when signed out) so that it can
     // dynamically update its visibility when the profile state changes.
-    if (glic::GlicEnabling::IsProfileEligible(profile_)) {
+    if (glic::GlicEnabling::IsProfileEligible(profile())) {
       tab_strip_action_container = std::make_unique<TabStripActionContainer>(
           browser, browser->GetFeatures().glic_nudge_controller());
       tab_strip_action_container->SetProperty(views::kCrossAxisAlignmentKey,
@@ -483,6 +484,10 @@ views::LabelButton* HorizontalTabStripRegionView::GetGlicButton() {
              : nullptr;
 }
 
+Profile* HorizontalTabStripRegionView::profile() {
+  return browser_view_->GetProfile();
+}
+
 void HorizontalTabStripRegionView::InitializeTabStrip() {
   if (tab_strip_set_) {
     return;
@@ -688,7 +693,10 @@ void HorizontalTabStripRegionView::UpdateTabStripMargin() {
         GetLayoutConstant(LayoutConstant::kTabStripPadding);
   }
 
-  if (combo_button_) {
+  if (combo_button_ && ((combo_button_->start_button() &&
+                         combo_button_->start_button()->GetVisible()) ||
+                        (combo_button_->end_button() &&
+                         combo_button_->end_button()->GetVisible()))) {
     combo_button_->SetPaintToLayer();
     combo_button_->layer()->SetFillsBoundsOpaquely(false);
     combo_button_->SetProperty(views::kViewIgnoredByLayoutKey, true);
@@ -698,10 +706,25 @@ void HorizontalTabStripRegionView::UpdateTabStripMargin() {
   }
 
   if (current_leading_width > 0) {
-    tab_strip_left_margin =
-        current_leading_width +
-        GetLayoutConstant(LayoutConstant::kTabStripPadding) -
-        TabStyle::Get()->GetBottomCornerRadius();
+    tab_strip_left_margin = current_leading_width +
+                            GetLayoutConstant(LayoutConstant::kTabStripPadding);
+  }
+
+  bool subtract_radius = current_leading_width > 0;
+#if BUILDFLAG(IS_MAC)
+  const ImmersiveModeController* const immersive_mode_controller =
+      browser_view_->browser()
+          ? ImmersiveModeController::From(browser_view_->browser())
+          : nullptr;
+  const bool is_immersive_mode_enabled =
+      immersive_mode_controller && immersive_mode_controller->IsEnabled();
+  if (is_immersive_mode_enabled) {
+    subtract_radius = false;
+  }
+#endif
+
+  if (subtract_radius) {
+    tab_strip_left_margin.value() -= TabStyle::Get()->GetBottomCornerRadius();
   }
 
   UpdateButtonBorders();
