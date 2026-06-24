@@ -3261,6 +3261,17 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Media.CodedSizeGuessing" enum="CodedSizeGuessStatus"
+    expires_after="2026-12-23">
+  <owner>vasilyt@chromium.org</owner>
+  <owner>media-dev-uma@chromium.org</owner>
+  <summary>
+    Records if the guessed coded size and/or
+    MediaFormat.KEY_WIDTH/MediaFormat.KEY_HEIGHT were correct. Recorded once per
+    resolution change (including the first frame).
+  </summary>
+</histogram>
+
 <histogram name="Media.ContentAudioDecoder.CreateReaderSuccess"
     enum="BooleanSuccess" expires_after="2026-12-05">
   <owner>jophba@chromium.org</owner>
