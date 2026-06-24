@@ -40,6 +40,12 @@
         autofill::prefs::kAutofillCreditCardEnabled, &_prefChangeRegistrar);
     _prefObserverBridge->ObserveChangesForPreference(
         autofill::prefs::kAutofillProfileEnabled, &_prefChangeRegistrar);
+    _prefObserverBridge->ObserveChangesForPreference(
+        autofill::prefs::kAutofillAiIdentityEntitiesEnabled,
+        &_prefChangeRegistrar);
+    _prefObserverBridge->ObserveChangesForPreference(
+        autofill::prefs::kAutofillAiTravelEntitiesEnabled,
+        &_prefChangeRegistrar);
   }
   return self;
 }
@@ -63,10 +69,12 @@
                    _userPrefService->GetBoolean(
                        autofill::prefs::kAutofillProfileEnabled)];
 
-    // TODO(crbug.com/491417038): Introduce logic to enable/disable values based
-    // on pref value.
-    [_consumer setIdentityDocsEnabled:YES];
-    [_consumer setTravelInfoEnabled:YES];
+    [_consumer setIdentityDocsEnabled:
+                   _userPrefService->GetBoolean(
+                       autofill::prefs::kAutofillAiIdentityEntitiesEnabled)];
+    [_consumer setTravelInfoEnabled:
+                   _userPrefService->GetBoolean(
+                       autofill::prefs::kAutofillAiTravelEntitiesEnabled)];
 
     [_consumer setShouldShowAutofillAIFeatures:_entityDataManager != nullptr];
   }
@@ -85,18 +93,24 @@
     [_consumer setPasswordsEnabled:
                    _userPrefService->GetBoolean(
                        password_manager::prefs::kCredentialsEnableService)];
-  }
-
-  if (preferenceName == autofill::prefs::kAutofillProfileEnabled) {
+  } else if (preferenceName == autofill::prefs::kAutofillProfileEnabled) {
     [_consumer setAutofillProfileEnabled:
                    _userPrefService->GetBoolean(
                        autofill::prefs::kAutofillProfileEnabled)];
-  }
-
-  if (preferenceName == autofill::prefs::kAutofillCreditCardEnabled) {
+  } else if (preferenceName == autofill::prefs::kAutofillCreditCardEnabled) {
     [_consumer setAutofillCreditCardEnabled:
                    _userPrefService->GetBoolean(
                        autofill::prefs::kAutofillCreditCardEnabled)];
+  } else if (preferenceName ==
+             autofill::prefs::kAutofillAiIdentityEntitiesEnabled) {
+    [_consumer setIdentityDocsEnabled:
+                   _userPrefService->GetBoolean(
+                       autofill::prefs::kAutofillAiIdentityEntitiesEnabled)];
+  } else if (preferenceName ==
+             autofill::prefs::kAutofillAiTravelEntitiesEnabled) {
+    [_consumer setTravelInfoEnabled:
+                   _userPrefService->GetBoolean(
+                       autofill::prefs::kAutofillAiTravelEntitiesEnabled)];
   }
 }
 

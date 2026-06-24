@@ -47,12 +47,16 @@ TEST_F(AutofillAndPasswordsMediatorTest, SetsInitialConsumerValues) {
                             YES);
   pref_service_->SetBoolean(autofill::prefs::kAutofillCreditCardEnabled, NO);
   pref_service_->SetBoolean(autofill::prefs::kAutofillProfileEnabled, YES);
+  pref_service_->SetBoolean(
+      autofill::prefs::kAutofillAiIdentityEntitiesEnabled, YES);
+  pref_service_->SetBoolean(autofill::prefs::kAutofillAiTravelEntitiesEnabled,
+                            NO);
 
   OCMExpect([consumer_ setPasswordsEnabled:YES]);
   OCMExpect([consumer_ setAutofillCreditCardEnabled:NO]);
   OCMExpect([consumer_ setAutofillProfileEnabled:YES]);
   OCMExpect([consumer_ setIdentityDocsEnabled:YES]);
-  OCMExpect([consumer_ setTravelInfoEnabled:YES]);
+  OCMExpect([consumer_ setTravelInfoEnabled:NO]);
   OCMExpect([consumer_ setShouldShowAutofillAIFeatures:NO]);
 
   mediator_.consumer = consumer_;
@@ -75,6 +79,16 @@ TEST_F(AutofillAndPasswordsMediatorTest, UpdatesConsumerOnPreferenceChange) {
 
   OCMExpect([consumer_ setAutofillProfileEnabled:YES]);
   pref_service_->SetBoolean(autofill::prefs::kAutofillProfileEnabled, YES);
+  EXPECT_OCMOCK_VERIFY(consumer_);
+
+  OCMExpect([consumer_ setIdentityDocsEnabled:YES]);
+  pref_service_->SetBoolean(
+      autofill::prefs::kAutofillAiIdentityEntitiesEnabled, YES);
+  EXPECT_OCMOCK_VERIFY(consumer_);
+
+  OCMExpect([consumer_ setTravelInfoEnabled:YES]);
+  pref_service_->SetBoolean(autofill::prefs::kAutofillAiTravelEntitiesEnabled,
+                            YES);
   EXPECT_OCMOCK_VERIFY(consumer_);
 }
 
