@@ -2378,6 +2378,7 @@ if (!is_android) {
       "//chrome/browser/content_settings:content_settings_util",
       "//chrome/browser/contextual_cueing:browser_tests",
       "//chrome/browser/custom_handlers",
+      "//chrome/browser/custom_handlers:browser_tests",
       "//chrome/browser/data_saver",
       "//chrome/browser/data_sharing:browser_tests",
       "//chrome/browser/desktop_to_mobile_promos:utils",
@@ -3296,7 +3297,6 @@ if (!is_android) {
       "../browser/chrome_web_platform_security_metrics_browsertest.cc",
       "../browser/chrome_worker_browsertest.cc",
       "../browser/crash_recovery_browsertest.cc",
-      "../browser/custom_handlers/protocol_handler_registry_browsertest.cc",
       "../browser/data_saver/data_saver_browsertest.cc",
       "../browser/data_saver/data_saver_webapis_browsertest.cc",
       "../browser/devtools/device/adb/adb_client_socket_browsertest.cc",
@@ -4506,10 +4506,7 @@ if (!is_android) {
         deps += [ "//chrome/browser/ui/webui/app_home" ]
       }
       if (!is_android) {
-        sources += [
-          "../browser/custom_handlers/chrome_protocol_handler_navigation_throttle_browsertest.cc",
-          "../browser/platform_util_browsertest.cc",
-        ]
+        sources += [ "../browser/platform_util_browsertest.cc" ]
       }
       if (is_chromeos) {
         sources += [
@@ -5784,7 +5781,6 @@ test("unit_tests") {
     "../browser/chrome_content_browser_client_parts_unittest.cc",
     "../browser/chrome_content_browser_client_unittest.cc",
     "../browser/command_updater_impl_unittest.cc",
-    "../browser/custom_handlers/chrome_protocol_handler_registry_unittest.cc",
     "../browser/enterprise/connectors/interstitials/enterprise_page_unittest.cc",
     "../browser/enterprise/encryption/cache_encryption_provider_impl_unittest.cc",
     "../browser/enterprise/identifiers/profile_id_service_factory_unittest.cc",
@@ -6165,6 +6161,7 @@ test("unit_tests") {
     "//chrome/browser/contextual_tasks:unit_tests",
     "//chrome/browser/crash_upload_list:unit_tests",
     "//chrome/browser/custom_handlers",
+    "//chrome/browser/custom_handlers:unit_tests",
     "//chrome/browser/data_saver",
     "//chrome/browser/data_sharing",
     "//chrome/browser/data_sharing:unit_tests",
