@@ -10572,6 +10572,11 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kGlicExperimentalTriggeringName,
      flag_descriptions::kGlicExperimentalTriggeringDescription, kOsDesktop,
      FEATURE_VALUE_TYPE(features::kGlicExperimentalTriggering)},
+    {"glic-experimental-triggering-screenshot",
+     flag_descriptions::kGlicExperimentalTriggeringScreenshotName,
+     flag_descriptions::kGlicExperimentalTriggeringScreenshotDescription,
+     kOsDesktop,
+     FEATURE_VALUE_TYPE(features::kGlicExperimentalTriggeringScreenshot)},
     {"glic-experimental-triggering-suppress-done-notification",
      flag_descriptions::kGlicExperimentalTriggeringSuppressDoneNotificationName,
      flag_descriptions::
