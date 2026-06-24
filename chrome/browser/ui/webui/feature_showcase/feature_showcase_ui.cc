@@ -12,6 +12,9 @@
 #include "build/branding_buildflags.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/regional_capabilities/regional_capabilities_service_factory.h"
+#include "chrome/browser/search/background/ntp_custom_background_service_factory.h"
+#include "chrome/browser/ui/webui/cr_components/customize_color_scheme_mode/customize_color_scheme_mode_handler.h"
+#include "chrome/browser/ui/webui/cr_components/theme_color_picker/theme_color_picker_handler.h"
 #include "chrome/browser/ui/webui/feature_showcase/default_browser_handler.h"
 #include "chrome/browser/ui/webui/feature_showcase/feature_showcase_handler.h"
 #include "chrome/browser/ui/webui/feature_showcase/google_lens_handler.h"
@@ -26,6 +29,7 @@
 #include "chrome/grit/theme_resources.h"
 #include "components/regional_capabilities/regional_capabilities_service.h"
 #include "components/signin/public/base/signin_switches.h"
+#include "components/strings/grit/components_strings.h"
 #include "content/public/browser/web_ui.h"
 #include "content/public/browser/web_ui_data_source.h"
 #include "services/network/public/mojom/content_security_policy.mojom.h"
@@ -87,6 +91,31 @@ void AddPasswordManagerStepResources(content::WebUIDataSource* source) {
   });
 }
 
+void AddThemesAndCustomizationStepResources(content::WebUIDataSource* source) {
+  source->AddLocalizedStrings({
+      {"themesTitle", IDS_FEATURE_SHOWCASE_THEMES_TITLE},
+      {"themesSubtitle", IDS_FEATURE_SHOWCASE_THEMES_SUBTITLE},
+      {"themesApplyTheme", IDS_FEATURE_SHOWCASE_THEMES_APPLY_THEME},
+      {"themesNoThanks", IDS_FEATURE_SHOWCASE_THEMES_NO_THANKS},
+      // cr-theme-color-picker strings:
+      {"close", IDS_CLOSE},
+      {"colorPickerLabel", IDS_NTP_CUSTOMIZE_COLOR_PICKER_LABEL},
+      {"colorsContainerLabel", IDS_NTP_THEMES_CONTAINER_LABEL},
+      {"defaultColorName", IDS_NTP_CUSTOMIZE_DEFAULT_LABEL},
+      {"hueSliderTitle", IDS_NTP_CUSTOMIZE_COLOR_HUE_SLIDER_TITLE},
+      {"hueSliderAriaLabel", IDS_NTP_CUSTOMIZE_COLOR_HUE_SLIDER_ARIA_LABEL},
+      {"greyDefaultColorName", IDS_NTP_CUSTOMIZE_GREY_DEFAULT_LABEL},
+      {"managedColorsBody", IDS_NTP_THEME_MANAGED_DIALOG_BODY},
+      {"managedColorsTitle", IDS_NTP_THEME_MANAGED_DIALOG_TITLE},
+      // customize-color-scheme-mode strings:
+      {"colorSchemeModeLabel",
+       IDS_NTP_CUSTOMIZE_CHROME_COLOR_SCHEME_MODE_GROUP_LABEL},
+      {"lightMode", IDS_NTP_CUSTOMIZE_CHROME_COLOR_SCHEME_MODE_LIGHT_LABEL},
+      {"darkMode", IDS_NTP_CUSTOMIZE_CHROME_COLOR_SCHEME_MODE_DARK_LABEL},
+      {"systemMode", IDS_NTP_CUSTOMIZE_CHROME_COLOR_SCHEME_MODE_SYSTEM_LABEL},
+  });
+}
+
 }  // namespace
 
 FeatureShowcaseUIConfig::FeatureShowcaseUIConfig()
@@ -124,6 +153,7 @@ FeatureShowcaseUI::FeatureShowcaseUI(content::WebUI* web_ui)
   AddDefaultBrowserStepResources(source);
   AddGoogleLensStepResources(source);
   AddPasswordManagerStepResources(source);
+  AddThemesAndCustomizationStepResources(source);
 }
 
 FeatureShowcaseUI::~FeatureShowcaseUI() = default;
@@ -185,6 +215,22 @@ void FeatureShowcaseUI::BindInterface(
   password_manager_factory_receiver_.Bind(std::move(receiver));
 }
 
+void FeatureShowcaseUI::BindInterface(
+    mojo::PendingReceiver<
+        theme_color_picker::mojom::ThemeColorPickerHandlerFactory> receiver) {
+  theme_color_picker_handler_factory_receiver_.reset();
+  theme_color_picker_handler_factory_receiver_.Bind(std::move(receiver));
+}
+
+void FeatureShowcaseUI::BindInterface(
+    mojo::PendingReceiver<customize_color_scheme_mode::mojom::
+                              CustomizeColorSchemeModeHandlerFactory>
+        receiver) {
+  customize_color_scheme_mode_handler_factory_receiver_.reset();
+  customize_color_scheme_mode_handler_factory_receiver_.Bind(
+      std::move(receiver));
+}
+
 void FeatureShowcaseUI::CreatePageHandler(
     mojo::PendingReceiver<feature_showcase::mojom::FeatureShowcasePageHandler>
         handler) {
@@ -216,6 +262,30 @@ void FeatureShowcaseUI::CreatePasswordManagerPageHandler(
         handler) {
   password_manager_handler_ = std::make_unique<PasswordManagerHandler>(
       std::move(handler), Profile::FromWebUI(web_ui()));
+}
+
+void FeatureShowcaseUI::CreateThemeColorPickerHandler(
+    mojo::PendingRemote<theme_color_picker::mojom::ThemeColorPickerClient>
+        client,
+    mojo::PendingReceiver<theme_color_picker::mojom::ThemeColorPickerHandler>
+        handler) {
+  theme_color_picker_handler_ = std::make_unique<ThemeColorPickerHandler>(
+      std::move(handler), std::move(client),
+      NtpCustomBackgroundServiceFactory::GetForProfile(
+          Profile::FromWebUI(web_ui())),
+      web_ui()->GetWebContents());
+}
+
+void FeatureShowcaseUI::CreateCustomizeColorSchemeModeHandler(
+    mojo::PendingRemote<
+        customize_color_scheme_mode::mojom::CustomizeColorSchemeModeClient>
+        client,
+    mojo::PendingReceiver<
+        customize_color_scheme_mode::mojom::CustomizeColorSchemeModeHandler>
+        handler) {
+  customize_color_scheme_mode_handler_ =
+      std::make_unique<CustomizeColorSchemeModeHandler>(
+          std::move(client), std::move(handler), Profile::FromWebUI(web_ui()));
 }
 
 void FeatureShowcaseUI::OnShowcaseFinished() {

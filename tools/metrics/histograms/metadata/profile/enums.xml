@@ -33,6 +33,7 @@ chromium-metrics-reviews@google.com.
   <int value="0" label="DefaultBrowser"/>
   <int value="1" label="GoogleLens"/>
   <int value="2" label="PasswordManager"/>
+  <int value="3" label="ThemesAndCustomization"/>
 </enum>
 
 <!-- LINT.ThenChange(//chrome/browser/ui/views/profiles/first_run_flow_controller.h:FeatureShowcaseStep) -->

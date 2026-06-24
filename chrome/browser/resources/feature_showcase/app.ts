@@ -5,13 +5,16 @@
 import '//resources/cr_elements/cr_button/cr_button.js';
 import '//resources/cr_elements/cr_lottie/cr_lottie.js';
 import '//resources/cr_elements/cr_view_manager/cr_view_manager.js';
-import './feature_showcase_stepper.js';
-import './default_browser/default_browser_step.js';
-import './example/example_step.js';
+import '/strings.m.js';
 import './feature_showcase_step.js';
+import './feature_showcase_stepper.js';
+import './example/example_step.js';
+import './default_browser/default_browser_step.js';
 import './google_lens/google_lens_step.js';
+import './themes_and_customization/themes_and_customization_step.js';
 import './password_manager/password_manager_step.js';
 
+import {ColorChangeUpdater} from '//resources/cr_components/color_change_listener/colors_css_updater.js';
 import type {CrLottieElement} from '//resources/cr_elements/cr_lottie/cr_lottie.js';
 import type {CrViewManagerElement} from '//resources/cr_elements/cr_view_manager/cr_view_manager.js';
 import {assert} from '//resources/js/assert.js';
@@ -83,6 +86,7 @@ export class FeatureShowcaseAppElement extends CrLitElement {
   }
 
   override firstUpdated() {
+    ColorChangeUpdater.forDocument().start();
     // TODO(crbug.com/500274411): Clarify if assert here is ok or it's better
     // to have more graceful handling.
     assert(

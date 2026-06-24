@@ -386,7 +386,12 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
   RegisterWebUIControllerInterfaceBinder<
       customize_color_scheme_mode::mojom::
           CustomizeColorSchemeModeHandlerFactory,
-      CustomizeChromeUI>(map);
+      CustomizeChromeUI
+#if BUILDFLAG(ENABLE_DICE_SUPPORT)
+      ,
+      FeatureShowcaseUI
+#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
+      >(map);
 
   RegisterWebUIControllerInterfaceBinder<
       theme_color_picker::mojom::ThemeColorPickerHandlerFactory,
@@ -395,6 +400,10 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
       ,
       ProfileCustomizationUI
 #endif  // !BUILDFLAG(IS_CHROMEOS)
+#if BUILDFLAG(ENABLE_DICE_SUPPORT)
+      ,
+      FeatureShowcaseUI
+#endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
       >(map);
 
   RegisterWebUIControllerInterfaceBinder<

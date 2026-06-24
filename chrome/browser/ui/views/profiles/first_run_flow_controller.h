@@ -35,7 +35,8 @@ enum class FeatureShowcaseStep {
   kDefaultBrowser = 0,
   kGoogleLens = 1,
   kPasswordManager = 2,
-  kMaxValue = kPasswordManager,
+  kThemesAndCustomization = 3,
+  kMaxValue = kThemesAndCustomization,
 };
 // LINT.ThenChange(//tools/metrics/histograms/metadata/profile/enums.xml:FeatureShowcaseStep)
 

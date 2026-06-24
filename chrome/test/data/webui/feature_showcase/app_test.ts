@@ -5,6 +5,7 @@
 import 'chrome://feature-showcase/app.js';
 import 'chrome://feature-showcase/feature_showcase_stepper.js';
 import 'chrome://feature-showcase/password_manager/password_manager_step.js';
+import 'chrome://feature-showcase/themes_and_customization/themes_and_customization_step.js';
 
 import type {FeatureShowcaseAppElement} from 'chrome://feature-showcase/app.js';
 import {DefaultBrowserPageHandlerRemote} from 'chrome://feature-showcase/default_browser.mojom-webui.js';
@@ -16,6 +17,7 @@ import type {FeatureShowcaseStepperElement} from 'chrome://feature-showcase/feat
 import {PasswordManagerPageHandlerRemote} from 'chrome://feature-showcase/password_manager.mojom-webui.js';
 import {PasswordManagerBrowserProxyImpl} from 'chrome://feature-showcase/password_manager/password_manager_browser_proxy.js';
 import type {FeatureShowcasePasswordManagerStepElement} from 'chrome://feature-showcase/password_manager/password_manager_step.js';
+import type {FeatureShowcaseThemesAndCustomizationStepElement} from 'chrome://feature-showcase/themes_and_customization/themes_and_customization_step.js';
 import {assertEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {TestMock} from 'chrome://webui-test/test_mock.js';
 import {microtasksFinished} from 'chrome://webui-test/test_util.js';
@@ -228,5 +230,31 @@ suite('FeatureShowcasePasswordManagerStepTest', function() {
 
     await stepCompletedEvent;
     assertEquals(0, testHandler.getCallCount('pinPasswordManager'));
+  });
+});
+
+suite('FeatureShowcaseThemesAndCustomizationStepTest', function() {
+  let stepElement: FeatureShowcaseThemesAndCustomizationStepElement;
+    setup(function() {
+      document.body.innerHTML = window.trustedTypes!.emptyHTML;
+      stepElement = document.createElement(
+        'feature-showcase-themes-and-customization-step');
+    document.body.appendChild(stepElement);
+  });
+
+  test('confirm button clicked', async function() {
+    await microtasksFinished();
+
+    const button =
+        stepElement.shadowRoot.querySelector<HTMLElement>('#confirm-button');
+    assertTrue(!!button);
+
+    const stepCompletedEvent = new Promise((resolve) => {
+      stepElement.addEventListener('step-completed', resolve);
+    });
+
+    button.click();
+
+    await stepCompletedEvent;
   });
 });

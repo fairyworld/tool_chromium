@@ -1257,6 +1257,17 @@
       Yes, I'm in
     </message>
 
+    <!-- Feature Showcase - Themes and Customization -->
+    <message name="IDS_FEATURE_SHOWCASE_THEMES_SUBTITLE" desc="This is the subtitle for the customization screen, listing examples like 'themes' and 'dark mode'. (CHAR LIMIT = 60)">
+      Customize your browser with options like themes and dark mode.
+    </message>
+    <message name="IDS_FEATURE_SHOWCASE_THEMES_APPLY_THEME" desc="Label for the button to apply a theme to the browser. It is a verb-based action that initiates the visual change. Ensure 'Apply' is translated as a functional command. (CHAR LIMIT = 20)">
+      Apply theme
+    </message>
+    <message name="IDS_FEATURE_SHOWCASE_THEMES_NO_THANKS" desc="Label for a button that dismisses the option to personalize the browser. (CHAR LIMIT = 20)">
+      No thanks
+    </message>
+
     <!-- Signout Confirmation Dialog Desktop -->
     <message name="IDS_SIGNOUT_CONFIRMATION_EXTENSIONS_SECTION_TITLE" desc="Title of the Extensions section in the Signout Confirmation dialog which allows users to remove extensions linked to their account when signing out.">
       {ACCOUNT_EXTENSIONS_COUNT, plural,

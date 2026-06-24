@@ -41,10 +41,11 @@
 #include "chrome/browser/ui/views/profiles/feature_showcase/feature_showcase_step_eligibility_checker.h"
 #include "chrome/browser/ui/views/profiles/feature_showcase/google_lens_step_eligibility_checker.h"
 #include "chrome/browser/ui/views/profiles/feature_showcase/password_manager_feature_showcase_eligibility_checker.h"
-#include "chrome/browser/ui/views/profiles/profile_management_flow_controller.h"
+#include "chrome/browser/ui/views/profiles/feature_showcase/themes_and_customization_step_eligibility_checker.h"
 #include "chrome/browser/ui/views/profiles/profile_management_flow_controller_impl.h"
 #include "chrome/browser/ui/views/profiles/profile_management_step_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_management_types.h"
+#include "chrome/browser/ui/views/profiles/profile_picker_flow_controller.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_post_sign_in_adapter.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_toolbar.h"
 #include "chrome/browser/ui/views/profiles/profile_picker_web_contents_host.h"
@@ -152,6 +153,8 @@ FeatureShowcaseStep GetFeatureShowcaseStep(std::string_view step_id) {
            FeatureShowcaseStep::kGoogleLens},
           {kFeatureShowcasePasswordManagerStepIdentifier,
            FeatureShowcaseStep::kPasswordManager},
+          {kFeatureShowcaseThemesAndCustomizationStepIdentifier,
+           FeatureShowcaseStep::kThemesAndCustomization},
       });
   if (const auto it = kStepMap->find(step_id); it != kStepMap->end()) {
     return it->second;
@@ -617,6 +620,8 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
     checkers.push_back(std::make_unique<GoogleLensStepEligibilityChecker>());
     checkers.push_back(
         std::make_unique<PasswordManagerFeatureShowcaseEligibilityChecker>());
+    checkers.push_back(
+        std::make_unique<ThemesAndCustomizationStepEligibilityChecker>());
     tracker_ = std::make_unique<FeatureShowcaseEligibilityTracker>(
         std::move(checkers));
   }
