@@ -28,7 +28,9 @@ ChannelMixer::ChannelMixer(
 void ChannelMixer::Initialize(const ChannelLayoutConfig& input_config,
                               const ChannelLayoutConfig& output_config) {
   // Create the transformation matrix
-  ChannelMixingMatrix matrix_builder(input_config, output_config);
+  ChannelMixingMatrix matrix_builder(
+      input_config.channel_layout(), input_config.channels(),
+      output_config.channel_layout(), output_config.channels());
   remapping_ = matrix_builder.CreateTransformationMatrix(&matrix_);
 }
 
