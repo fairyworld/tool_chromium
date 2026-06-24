@@ -14,6 +14,7 @@
 #include "base/memory/scoped_refptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/time/time.h"
+#include "components/content_settings/core/common/content_settings.h"
 #include "components/keyed_service/core/keyed_service.h"
 #include "components/permissions/resolvers/permission_prompt_options.h"
 #include "mojo/public/cpp/bindings/pending_receiver.h"
@@ -30,6 +31,21 @@
 
 class HostContentSettingsMap;
 class TemplateURLService;
+
+// LINT.IfChange(OmniboxInlineLocationSuggestionShown)
+enum class OmniboxInlineLocationSuggestionShown {
+  // The suggestion could not be shown because there was no eligible suggestion
+  // found from which to create a duplicate inline location suggestion.
+  kNoEligibleSuggestionFound = 0,
+  // There was a parent suggestion found, but no inline location suggestion was
+  // shown.
+  kOnlyParentSuggestionShown = 1,
+  // An inline location suggestion was shown.
+  kLocationSuggestionShown = 2,
+  // Max value.
+  kMaxValue = kLocationSuggestionShown,
+};
+// LINT.ThenChange(//tools/metrics/histograms/metadata/omnibox/enums.xml:OmniboxInlineLocationSuggestionShown)
 
 // A KeyedService that handles the generation of the X-Geo header for valid DSE
 // navigations after checking that permissions allow for it.
@@ -76,6 +92,11 @@ class GeolocationHeaderService : public KeyedService {
   std::optional<std::string> GetLocationHeader(const GURL& url,
                                                bool for_automatic_sending);
 
+  // Records metrics about when the inline location suggestion is shown.
+  void RecordInlineLocationSuggestionShown(
+      OmniboxInlineLocationSuggestionShown shown_state,
+      size_t match_index) const;
+
   void SetLocationAgeForTesting(base::TimeDelta age) {
     location_age_for_testing_ = age;
   }
@@ -101,6 +122,9 @@ class GeolocationHeaderService : public KeyedService {
                                           bool use_cache_only = false);
 
   void OnLocationUpdate(device::mojom::GeopositionResultPtr result);
+
+  PermissionSetting GetPermissionSetting(const GURL& url) const;
+  std::optional<PermissionSetting> GetDSEPermissionSetting() const;
 
   scoped_refptr<HostContentSettingsMap> settings_map_;
   raw_ptr<TemplateURLService> template_url_service_;

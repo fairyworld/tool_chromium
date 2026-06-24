@@ -325,6 +325,17 @@ chromium-metrics-reviews@google.com.
   <int value="5" label="Blurred"/>
 </enum>
 
+<!-- LINT.IfChange(OmniboxInlineLocationSuggestionShown) -->
+
+<enum name="OmniboxInlineLocationSuggestionShown">
+  <int value="0" label="No eligible suggestion found"/>
+  <int value="1"
+      label="Only parent suggestion shown (no inline location suggestion)"/>
+  <int value="2" label="Inline location suggestion shown"/>
+</enum>
+
+<!-- LINT.ThenChange(//components/omnibox/browser/geolocation_header_service.h:OmniboxInlineLocationSuggestionShown) -->
+
 <enum name="OmniboxInputType">
   <int value="0" label="empty"/>
   <int value="1" label="unknown"/>

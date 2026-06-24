@@ -2091,6 +2091,40 @@ Keep consistent with active providers. Doesn't need to include every provider in
   </summary>
 </histogram>
 
+<histogram name="Omnibox.InlineLocationSuggestion.Ask.ShownState"
+    enum="OmniboxInlineLocationSuggestionShown" expires_after="2026-11-12">
+  <owner>andypaicu@chromium.org</owner>
+  <owner>chrome-permissions@google.com</owner>
+  <summary>
+    Recorded when an autocomplete pass completes, for Default Search Engines
+    where the geolocation permission is set to ASK. Tracks whether an inline
+    location suggestion was shown, or whether there was or not a eligible parent
+    suggestion.
+  </summary>
+</histogram>
+
+<histogram name="Omnibox.InlineLocationSuggestion.Deny.ShownState"
+    enum="OmniboxInlineLocationSuggestionShown" expires_after="2026-11-12">
+  <owner>andypaicu@chromium.org</owner>
+  <owner>chrome-permissions@google.com</owner>
+  <summary>
+    Recorded when an autocomplete pass completes, for Default Search Engines
+    where the geolocation permission is set to DENY. Tracks whether an inline
+    location suggestion was shown, or whether there was or not a eligible parent
+    suggestion.
+  </summary>
+</histogram>
+
+<histogram name="Omnibox.InlineLocationSuggestion.Index" units="position"
+    expires_after="2026-11-12">
+  <owner>andypaicu@chromium.org</owner>
+  <owner>chrome-permissions@google.com</owner>
+  <summary>
+    Recorded when a duplicate inline location suggestion is shown. Tracks the
+    0-based position index of the suggestion in the matches list.
+  </summary>
+</histogram>
+
 <histogram name="Omnibox.InputToAcceptNonAction" units="microseconds"
     expires_after="2026-11-12">
   <owner>kouhei@google.com</owner>
