@@ -558,6 +558,48 @@ public class TabBottomSheetManagerTest {
 
     @Test
     @SmallTest
+    public void testTryToCloseBottomSheet_WhenSuppressedByAnotherBottomSheet() {
+        NativeInterfaceDelegate mockDelegate = mock(NativeInterfaceDelegate.class);
+        showBottomSheetAndBlockUntilReady(mockDelegate);
+
+        // Create and show another bottom sheet content of higher priority.
+        BottomSheetContent otherContent = mock(BottomSheetContent.class);
+        when(otherContent.getPriority()).thenReturn(BottomSheetContent.ContentPriority.HIGH);
+        when(otherContent.allowInSheetContentSnackbars()).thenReturn(true);
+        var alwaysFalse =
+                ThreadUtils.runOnUiThreadBlocking(() -> ObservableSuppliers.alwaysFalse());
+        when(otherContent.getBackPressStateChangedSupplier()).thenReturn(alwaysFalse);
+        View otherView = ThreadUtils.runOnUiThreadBlocking(() -> new View(mActivity));
+        when(otherContent.getContentView()).thenReturn(otherView);
+
+        // Request showing the other content. This will suppress the Tab Bottom Sheet.
+        ThreadUtils.runOnUiThreadBlocking(
+                () -> {
+                    mBottomSheetController.requestShowContent(otherContent, /* animate= */ false);
+                });
+
+        // Verify the Tab Bottom Sheet is suppressed and no longer showing.
+        CriteriaHelper.pollUiThread(() -> !mManager.isSheetShowing());
+        verify(mockDelegate).onBottomSheetSuppressed();
+
+        // While suppressed, close the Tab Bottom Sheet via the manager.
+        ThreadUtils.runOnUiThreadBlocking(
+                () -> {
+                    mManager.tryToCloseBottomSheet(/* animate= */ false);
+                });
+
+        // Verify that native got onBottomSheetClosed.
+        verify(mockDelegate).onBottomSheetClosed();
+
+        // Close the other bottom sheet.
+        ThreadUtils.runOnUiThreadBlocking(
+                () -> {
+                    mBottomSheetController.hideContent(otherContent, /* animate= */ false);
+                });
+    }
+
+    @Test
+    @SmallTest
     public void testTryToShowBottomSheet_WhenAlreadyShowing() {
         NativeInterfaceDelegate mockDelegate1 = mock(NativeInterfaceDelegate.class);
         NativeInterfaceDelegate mockDelegate2 = mock(NativeInterfaceDelegate.class);
