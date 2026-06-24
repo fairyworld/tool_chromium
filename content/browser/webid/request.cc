@@ -2084,7 +2084,7 @@ void Request::CompleteRequestInternal(
   if (token_error) {
     error = blink::mojom::TokenError::New();
     error->code = token_error->code;
-    error->url = token_error->url.spec();
+    error->url = token_error->url;
   }
   RequestTokenStatus status =
       FederatedAuthRequestResultToRequestTokenStatus(result);
