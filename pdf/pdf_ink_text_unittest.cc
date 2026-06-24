@@ -165,14 +165,14 @@ TEST(PdfInkTextBlinkTextInfoToPDFTextInfoTest, HorizontalOffset) {
       InkTextInfoEq(FontId(0),
                     /*glyphs=*/std::vector<uint32_t>{1, 2, 3},
                     /*glyph_positions=*/std::vector<float>{0.0f, 1.5f, 1.6f},
-                    /*location=*/gfx::RectF(10.0f, 20.0f, 3.0f, 2.0f),
+                    /*location=*/gfx::RectF(10.0f, 20.0f, 3.5f, 2.0f),
                     /*is_horizontal=*/true));
 
   EXPECT_THAT(ink_info[1],
               InkTextInfoEq(FontId(0),
                             /*glyphs=*/std::vector<uint32_t>{101, 102},
                             /*glyph_positions=*/std::vector<float>{0.0f, 0.3f},
-                            /*location=*/gfx::RectF(13.5f, 20.0f, 2.0f, 2.0f),
+                            /*location=*/gfx::RectF(13.5f, 20.0f, 1.5f, 2.0f),
                             /*is_horizontal=*/true));
 
   EXPECT_THAT(
@@ -180,7 +180,7 @@ TEST(PdfInkTextBlinkTextInfoToPDFTextInfoTest, HorizontalOffset) {
       InkTextInfoEq(FontId(0),
                     /*glyphs=*/std::vector<uint32_t>{1, 2, 3},
                     /*glyph_positions=*/std::vector<float>{0.0f, 1.9f, 2.7f},
-                    /*location=*/gfx::RectF(9.6f, 20.0f, 4.0f, 2.0f),
+                    /*location=*/gfx::RectF(9.6f, 20.0f, 4.4f, 2.0f),
                     /*is_horizontal=*/true));
 }
 
@@ -220,14 +220,14 @@ TEST(PdfInkTextBlinkTextInfoToPDFTextInfoTest, 2DOffset) {
               InkTextInfoEq(FontId(0),
                             /*glyphs=*/std::vector<uint32_t>{2, 3},
                             /*glyph_positions=*/std::vector<float>{0.0f, 0.5f},
-                            /*location=*/gfx::RectF(11.4f, 20.0f, 1.6f, 2.0f),
+                            /*location=*/gfx::RectF(11.4f, 20.0f, 2.1f, 2.0f),
                             /*is_horizontal=*/true));
 
   EXPECT_THAT(ink_info[2],
               InkTextInfoEq(FontId(0),
                             /*glyphs=*/std::vector<uint32_t>{101, 102},
                             /*glyph_positions=*/std::vector<float>{0.0f, 0.3f},
-                            /*location=*/gfx::RectF(13.5f, 20.0f, 2.0f, 2.0f),
+                            /*location=*/gfx::RectF(13.5f, 20.0f, 1.5f, 2.0f),
                             /*is_horizontal=*/true));
 
   EXPECT_THAT(ink_info[3],
@@ -241,7 +241,7 @@ TEST(PdfInkTextBlinkTextInfoToPDFTextInfoTest, 2DOffset) {
               InkTextInfoEq(FontId(0),
                             /*glyphs=*/std::vector<uint32_t>{3},
                             /*glyph_positions=*/std::vector<float>{0.0f},
-                            /*location=*/gfx::RectF(12.3f, 20.5f, 1.3f, 2.0f),
+                            /*location=*/gfx::RectF(12.3f, 20.5f, 1.7f, 2.0f),
                             /*is_horizontal=*/true));
 }
 
@@ -285,7 +285,7 @@ TEST(PdfInkTextBlinkTextInfoToPDFTextInfoTest, SplitText) {
       InkTextInfoWithTextEq(FontId(0),
                             /*glyphs=*/std::vector<uint32_t>{2, 3},
                             /*glyph_positions=*/std::vector<float>{0.0f, 0.5f},
-                            /*location=*/gfx::RectF(11.4f, 20.0f, 1.6f, 2.0f),
+                            /*location=*/gfx::RectF(11.4f, 20.0f, 2.1f, 2.0f),
                             /*is_horizontal=*/true, u"2"));
 
   EXPECT_THAT(
@@ -293,7 +293,7 @@ TEST(PdfInkTextBlinkTextInfoToPDFTextInfoTest, SplitText) {
       InkTextInfoWithTextEq(FontId(0),
                             /*glyphs=*/std::vector<uint32_t>{101, 102},
                             /*glyph_positions=*/std::vector<float>{0.0f, 0.3f},
-                            /*location=*/gfx::RectF(13.5f, 20.0f, 2.0f, 2.0f),
+                            /*location=*/gfx::RectF(13.5f, 20.0f, 1.5f, 2.0f),
                             /*is_horizontal=*/true, u"345"));
 
   EXPECT_THAT(
@@ -309,7 +309,7 @@ TEST(PdfInkTextBlinkTextInfoToPDFTextInfoTest, SplitText) {
       InkTextInfoWithTextEq(FontId(0),
                             /*glyphs=*/std::vector<uint32_t>{3},
                             /*glyph_positions=*/std::vector<float>{0.0f},
-                            /*location=*/gfx::RectF(12.3f, 20.5f, 1.3f, 2.0f),
+                            /*location=*/gfx::RectF(12.3f, 20.5f, 1.7f, 2.0f),
                             /*is_horizontal=*/true, u"8"));
 }
 
