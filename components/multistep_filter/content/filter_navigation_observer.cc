@@ -128,8 +128,10 @@ void FilterNavigationObserver::DidFinishNavigation(
     return;
   }
 
-  // We only care about committed navigations in the primary main frame.
+  // We only care about committed navigations in the outermost primary main
+  // frame.
   if (!navigation_handle->IsInPrimaryMainFrame() ||
+      !navigation_handle->IsInOutermostMainFrame() ||
       !navigation_handle->HasCommitted()) {
     return;
   }
