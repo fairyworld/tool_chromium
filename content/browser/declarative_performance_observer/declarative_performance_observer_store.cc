@@ -4,6 +4,7 @@
 
 #include "content/browser/declarative_performance_observer/declarative_performance_observer_store.h"
 
+#include "base/files/file_util.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback_helpers.h"
 #include "base/json/json_reader.h"
@@ -31,6 +32,9 @@ constexpr char kReportsTableName[] = "declarative_performance_observer_reports";
 constexpr char kReportsIndexName[] = "idx_reports_origin";
 
 constexpr char kHistogramPrefix[] = "Storage.DeclarativePerformanceObserver.";
+
+constexpr base::FilePath::CharType kDatabaseFilename[] =
+    FILE_PATH_LITERAL("declarative_performance_observer.db");
 
 // These values are persisted to logs. Entries should not be renumbered and
 // numeric values should never be reused.
@@ -230,6 +234,65 @@ class DeclarativePerformanceObserverStore::Backend
     transaction.Commit();
   }
 
+  void ClearDataWithFilterOnDbSequence(OriginMatcherFunction filter) {
+    DCHECK_CALLED_ON_VALID_SEQUENCE(db_sequence_checker_);
+    if (!InitOnDbSequence()) {
+      return;
+    }
+
+    std::vector<url::Origin> origins;
+
+    // 1. Query all distinct origins from both tables:
+    {
+      sql::Statement statement(
+          db_->GetUniqueStatement("SELECT DISTINCT origin FROM "
+                                  "declarative_performance_observer_policies"));
+      while (statement.Step()) {
+        origins.push_back(url::Origin::Create(GURL(statement.ColumnString(0))));
+      }
+    }
+
+    {
+      sql::Statement statement(
+          db_->GetUniqueStatement("SELECT DISTINCT origin FROM "
+                                  "declarative_performance_observer_reports"));
+      while (statement.Step()) {
+        origins.push_back(url::Origin::Create(GURL(statement.ColumnString(0))));
+      }
+    }
+
+    // Deduplicate origins:
+    std::sort(origins.begin(), origins.end());
+    origins.erase(std::unique(origins.begin(), origins.end()), origins.end());
+
+    // 2. Perform transaction-backed filtered deletion:
+    sql::Transaction transaction(db_.get());
+    if (!transaction.Begin()) {
+      return;
+    }
+
+    sql::Statement delete_policies(db_->GetUniqueStatement(
+        "DELETE FROM declarative_performance_observer_policies WHERE origin "
+        "= ?"));
+    sql::Statement delete_reports(db_->GetUniqueStatement(
+        "DELETE FROM declarative_performance_observer_reports WHERE origin "
+        "= ?"));
+
+    for (const auto& origin : origins) {
+      if (filter.Run(origin)) {
+        delete_policies.Reset(true);
+        delete_policies.BindString(0, origin.Serialize());
+        delete_policies.Run();
+
+        delete_reports.Reset(true);
+        delete_reports.BindString(0, origin.Serialize());
+        delete_reports.Run();
+      }
+    }
+
+    transaction.Commit();
+  }
+
   void ClearAllDataOnDbSequence() {
     DCHECK_CALLED_ON_VALID_SEQUENCE(db_sequence_checker_);
     if (db_ && db_->is_open()) {
@@ -297,6 +360,9 @@ class DeclarativePerformanceObserverStore::Backend
         return false;
       }
     } else {
+      if (!base::CreateDirectory(db_path_.DirName())) {
+        return false;
+      }
       if (!db_->Open(db_path_)) {
         return false;
       }
@@ -394,7 +460,8 @@ class DeclarativePerformanceObserverStore::Backend
 };
 
 DeclarativePerformanceObserverStore::DeclarativePerformanceObserverStore(
-    const base::FilePath& db_path,
+    bool is_in_memory,
+    const base::FilePath& profile_path,
     scoped_refptr<base::SequencedTaskRunner> db_task_runner,
     base::OnceClosure on_loaded_callback)
     : db_task_runner_(
@@ -403,7 +470,10 @@ DeclarativePerformanceObserverStore::DeclarativePerformanceObserverStore(
               : base::ThreadPool::CreateSequencedTaskRunner(
                     {base::MayBlock(), base::TaskPriority::BEST_EFFORT,
                      base::TaskShutdownBehavior::BLOCK_SHUTDOWN})),
-      backend_(base::MakeRefCounted<Backend>(db_task_runner_, db_path)) {
+      backend_(base::MakeRefCounted<Backend>(
+          db_task_runner_,
+          is_in_memory ? base::FilePath()
+                       : profile_path.Append(kDatabaseFilename))) {
   db_task_runner_->PostTask(
       FROM_HERE,
       base::BindOnce(&Backend::LoadPoliciesOnDbSequence, backend_,
@@ -421,6 +491,17 @@ void DeclarativePerformanceObserverStore::OnPoliciesLoadedOnUISequence(
     base::OnceClosure on_loaded_callback,
     std::vector<url::Origin> loaded) {
   if (!clear_all_pending_) {
+    // 1. Filter out loaded origins using pending filters that ran during load:
+    std::erase_if(loaded, [this](const url::Origin& origin) {
+      for (const auto& filter : pending_filters_) {
+        if (filter.Run(origin)) {
+          return true;
+        }
+      }
+      return false;
+    });
+
+    // 2. Discard loaded origins that were modified during load:
     std::erase_if(loaded, [this](const url::Origin& origin) {
       return modified_during_load_.contains(origin);
     });
@@ -428,6 +509,7 @@ void DeclarativePerformanceObserverStore::OnPoliciesLoadedOnUISequence(
   }
   loaded_ = true;
   modified_during_load_.clear();
+  pending_filters_.clear();
   clear_all_pending_ = false;
   std::move(on_loaded_callback).Run();
 }
@@ -493,6 +575,32 @@ void DeclarativePerformanceObserverStore::ClearDataForOrigin(
       FROM_HERE,
       base::BindOnce(&Backend::ClearDataForOriginOnDbSequence, backend_,
                      origin),
+      std::move(callback));
+}
+
+void DeclarativePerformanceObserverStore::ClearDataWithFilter(
+    OriginMatcherFunction filter,
+    base::OnceClosure callback) {
+  if (!loaded_) {
+    pending_filters_.push_back(filter);
+  }
+
+  // 1. Filter and remove from in-memory policy cache immediately:
+  base::EraseIf(cached_policies_, [&](const url::Origin& origin) {
+    if (filter.Run(origin)) {
+      if (!loaded_) {
+        modified_during_load_.erase(origin);
+      }
+      return true;
+    }
+    return false;
+  });
+
+  // 2. Post to DB sequence to perform the actual database deletions:
+  db_task_runner_->PostTaskAndReply(
+      FROM_HERE,
+      base::BindOnce(&Backend::ClearDataWithFilterOnDbSequence, backend_,
+                     std::move(filter)),
       std::move(callback));
 }
 

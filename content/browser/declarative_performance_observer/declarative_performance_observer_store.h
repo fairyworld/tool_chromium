@@ -25,6 +25,8 @@ class SequencedTaskRunner;
 
 namespace content {
 
+using OriginMatcherFunction = base::RepeatingCallback<bool(const url::Origin&)>;
+
 // Manages the physical SQLite storage backend for Declarative Performance
 // Observers.
 //
@@ -32,9 +34,11 @@ namespace content {
 // dedicated background task runner (`db_task_runner_`).
 class CONTENT_EXPORT DeclarativePerformanceObserverStore {
  public:
-  // If `db_path` is empty, opens an in-memory database (for incognito mode).
-  explicit DeclarativePerformanceObserverStore(
-      const base::FilePath& db_path,
+  // If `is_in_memory` is true, opens an in-memory database (for incognito
+  // mode).
+  DeclarativePerformanceObserverStore(
+      bool is_in_memory,
+      const base::FilePath& profile_path,
       scoped_refptr<base::SequencedTaskRunner> db_task_runner = nullptr,
       base::OnceClosure on_loaded_callback = base::DoNothing());
   ~DeclarativePerformanceObserverStore();
@@ -72,6 +76,10 @@ class CONTENT_EXPORT DeclarativePerformanceObserverStore {
   void ClearDataForOrigin(const url::Origin& origin,
                           base::OnceClosure callback = base::DoNothing());
 
+  // Wipes stored policies and reports for any origin matching `filter`.
+  void ClearDataWithFilter(OriginMatcherFunction filter,
+                           base::OnceClosure callback = base::DoNothing());
+
   // Catastrophically razes the entire database and closes the connection
   // to surrender Operating System file locks.
   void ClearAllData(base::OnceClosure callback = base::DoNothing());
@@ -107,6 +115,7 @@ class CONTENT_EXPORT DeclarativePerformanceObserverStore {
   // initial database load completed. This prevents database load results
   // from overwriting newer updates.
   base::flat_set<url::Origin> modified_during_load_;
+  std::vector<OriginMatcherFunction> pending_filters_;
   bool clear_all_pending_ = false;
 
   base::WeakPtrFactory<DeclarativePerformanceObserverStore> weak_factory_{this};

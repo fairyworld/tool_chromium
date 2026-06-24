@@ -26,7 +26,7 @@ class DeclarativePerformanceObserverStoreTest : public testing::Test {
   std::unique_ptr<DeclarativePerformanceObserverStore> CreateStore() {
     base::RunLoop run_loop;
     auto store = std::make_unique<DeclarativePerformanceObserverStore>(
-        temp_dir_.GetPath().AppendASCII("TestStore"), nullptr,
+        /*is_in_memory=*/false, temp_dir_.GetPath(), nullptr,
         run_loop.QuitClosure());
     run_loop.Run();
     return store;
@@ -35,7 +35,8 @@ class DeclarativePerformanceObserverStoreTest : public testing::Test {
   std::unique_ptr<DeclarativePerformanceObserverStore> CreateStoreInMemory() {
     base::RunLoop run_loop;
     auto store = std::make_unique<DeclarativePerformanceObserverStore>(
-        base::FilePath(), nullptr, run_loop.QuitClosure());
+        /*is_in_memory=*/true, base::FilePath(), nullptr,
+        run_loop.QuitClosure());
     run_loop.Run();
     return store;
   }
@@ -77,13 +78,13 @@ TEST_F(DeclarativePerformanceObserverStoreTest, IncognitoModeInMemoryOnly) {
 
 TEST_F(DeclarativePerformanceObserverStoreTest, PersistsAcrossRestarts) {
   const url::Origin kOrigin = url::Origin::Create(GURL("https://example.com/"));
-  base::FilePath db_path = temp_dir_.GetPath().AppendASCII("TestStore");
+  base::FilePath profile_path = temp_dir_.GetPath().AppendASCII("TestProfile");
 
   // 1. Create store and set policy.
   {
     base::RunLoop run_loop;
     auto store = std::make_unique<DeclarativePerformanceObserverStore>(
-        db_path, nullptr, run_loop.QuitClosure());
+        /*is_in_memory=*/false, profile_path, nullptr, run_loop.QuitClosure());
     run_loop.Run();
 
     base::RunLoop run_loop2;
@@ -101,7 +102,7 @@ TEST_F(DeclarativePerformanceObserverStoreTest, PersistsAcrossRestarts) {
   {
     base::RunLoop run_loop;
     auto store = std::make_unique<DeclarativePerformanceObserverStore>(
-        db_path, nullptr, run_loop.QuitClosure());
+        /*is_in_memory=*/false, profile_path, nullptr, run_loop.QuitClosure());
     run_loop.Run();
 
     EXPECT_TRUE(store->HasEarlyFailurePolicy(kOrigin));
@@ -110,13 +111,13 @@ TEST_F(DeclarativePerformanceObserverStoreTest, PersistsAcrossRestarts) {
 
 TEST_F(DeclarativePerformanceObserverStoreTest, RaceConditionDuringLoad) {
   const url::Origin kOrigin = url::Origin::Create(GURL("https://example.com/"));
-  base::FilePath db_path = temp_dir_.GetPath().AppendASCII("TestStore2");
+  base::FilePath profile_path = temp_dir_.GetPath().AppendASCII("TestProfile2");
 
   // Pre-populate DB with the policy.
   {
     base::RunLoop run_loop;
     auto store = std::make_unique<DeclarativePerformanceObserverStore>(
-        db_path, nullptr, run_loop.QuitClosure());
+        /*is_in_memory=*/false, profile_path, nullptr, run_loop.QuitClosure());
     run_loop.Run();
 
     base::RunLoop run_loop2;
@@ -130,7 +131,7 @@ TEST_F(DeclarativePerformanceObserverStoreTest, RaceConditionDuringLoad) {
 
   // Start new store but DON'T wait for loading to complete yet.
   auto store = std::make_unique<DeclarativePerformanceObserverStore>(
-      db_path, nullptr, base::DoNothing());
+      /*is_in_memory=*/false, profile_path, nullptr, base::DoNothing());
 
   // Instantly disable the policy before loading completes.
   base::RunLoop run_loop_set;
@@ -436,13 +437,13 @@ TEST_F(DeclarativePerformanceObserverStoreTest,
 
 TEST_F(DeclarativePerformanceObserverStoreTest, ClearDataForOriginDuringLoad) {
   const url::Origin kOrigin = url::Origin::Create(GURL("https://example.com/"));
-  base::FilePath db_path = temp_dir_.GetPath().AppendASCII("TestStore3");
+  base::FilePath profile_path = temp_dir_.GetPath().AppendASCII("TestProfile3");
 
   // 1. Populate database with a policy.
   {
     base::RunLoop run_loop;
     auto store = std::make_unique<DeclarativePerformanceObserverStore>(
-        db_path, nullptr, run_loop.QuitClosure());
+        /*is_in_memory=*/false, profile_path, nullptr, run_loop.QuitClosure());
     run_loop.Run();
 
     base::RunLoop run_loop2;
@@ -456,7 +457,7 @@ TEST_F(DeclarativePerformanceObserverStoreTest, ClearDataForOriginDuringLoad) {
 
   // 2. Start a new store but call ClearDataForOrigin before loading finishes.
   auto store = std::make_unique<DeclarativePerformanceObserverStore>(
-      db_path, nullptr, base::DoNothing());
+      /*is_in_memory=*/false, profile_path, nullptr, base::DoNothing());
 
   base::RunLoop run_loop_clear;
   store->ClearDataForOrigin(kOrigin, run_loop_clear.QuitClosure());
@@ -468,13 +469,13 @@ TEST_F(DeclarativePerformanceObserverStoreTest, ClearDataForOriginDuringLoad) {
 
 TEST_F(DeclarativePerformanceObserverStoreTest, ClearAllDataDuringLoad) {
   const url::Origin kOrigin = url::Origin::Create(GURL("https://example.com/"));
-  base::FilePath db_path = temp_dir_.GetPath().AppendASCII("TestStore4");
+  base::FilePath profile_path = temp_dir_.GetPath().AppendASCII("TestProfile4");
 
   // 1. Populate database.
   {
     base::RunLoop run_loop;
     auto store = std::make_unique<DeclarativePerformanceObserverStore>(
-        db_path, nullptr, run_loop.QuitClosure());
+        /*is_in_memory=*/false, profile_path, nullptr, run_loop.QuitClosure());
     run_loop.Run();
 
     base::RunLoop run_loop2;
@@ -488,7 +489,7 @@ TEST_F(DeclarativePerformanceObserverStoreTest, ClearAllDataDuringLoad) {
 
   // 2. Start new store and call ClearAllData before load finishes.
   auto store = std::make_unique<DeclarativePerformanceObserverStore>(
-      db_path, nullptr, base::DoNothing());
+      /*is_in_memory=*/false, profile_path, nullptr, base::DoNothing());
 
   base::RunLoop run_loop_clear;
   store->ClearAllData(run_loop_clear.QuitClosure());
@@ -496,6 +497,52 @@ TEST_F(DeclarativePerformanceObserverStoreTest, ClearAllDataDuringLoad) {
 
   // All policies should be cleared.
   EXPECT_FALSE(store->HasEarlyFailurePolicy(kOrigin));
+}
+
+TEST_F(DeclarativePerformanceObserverStoreTest, ClearDataWithFilterDuringLoad) {
+  const url::Origin kOrigin = url::Origin::Create(GURL("https://example.com/"));
+  const url::Origin kOtherOrigin =
+      url::Origin::Create(GURL("https://other.com/"));
+  base::FilePath profile_path = temp_dir_.GetPath().AppendASCII("TestProfile5");
+
+  // 1. Populate database with both policies.
+  {
+    base::RunLoop run_loop;
+    auto store = std::make_unique<DeclarativePerformanceObserverStore>(
+        /*is_in_memory=*/false, profile_path, nullptr, run_loop.QuitClosure());
+    run_loop.Run();
+
+    base::RunLoop run_loop2;
+    store->SetEarlyFailurePolicy(kOrigin, true, run_loop2.QuitClosure());
+    run_loop2.Run();
+
+    base::RunLoop run_loop3;
+    store->SetEarlyFailurePolicy(kOtherOrigin, true, run_loop3.QuitClosure());
+    run_loop3.Run();
+
+    base::RunLoop run_loop4;
+    store->Close(run_loop4.QuitClosure());
+    run_loop4.Run();
+  }
+
+  // 2. Start a new store but call ClearDataWithFilter before loading finishes.
+  auto store = std::make_unique<DeclarativePerformanceObserverStore>(
+      /*is_in_memory=*/false, profile_path, nullptr, base::DoNothing());
+
+  auto filter = base::BindRepeating(
+      [](const url::Origin& target, const url::Origin& origin) {
+        return origin == target;
+      },
+      kOrigin);
+
+  base::RunLoop run_loop_clear;
+  store->ClearDataWithFilter(std::move(filter), run_loop_clear.QuitClosure());
+  run_loop_clear.Run();
+
+  // kOrigin should be cleared, but kOtherOrigin should remain present and NOT
+  // be affected by the load completion.
+  EXPECT_FALSE(store->HasEarlyFailurePolicy(kOrigin));
+  EXPECT_TRUE(store->HasEarlyFailurePolicy(kOtherOrigin));
 }
 
 }  // namespace content
