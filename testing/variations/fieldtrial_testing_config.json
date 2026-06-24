@@ -23944,6 +23944,24 @@
             ]
         }
     ],
+    "TabSearchCjkWordBoundary": [
+        {
+            "platforms": [
+                "chromeos",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "enable_features": [
+                        "TabSearchCjkWordBoundary"
+                    ]
+                }
+            ]
+        }
+    ],
     "TabStorageSqlitePrototype": [
         {
             "platforms": [
