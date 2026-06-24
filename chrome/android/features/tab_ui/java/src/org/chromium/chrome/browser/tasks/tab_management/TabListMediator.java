@@ -2898,7 +2898,9 @@ public class TabListMediator implements TabListNotificationHandler {
         @TabGroupColorId int colorId = tabModel.getTabGroupColorWithFallback(tabGroupId);
         int currentTabId = TabModelUtils.getCurrentTabId(tabModel);
 
-        boolean isCollapsed = tabModel.getTabGroupCollapsed(tabGroupId);
+        boolean isCollapsed =
+                mLayoutType != TabListLayoutType.NESTED
+                        || tabModel.getTabGroupCollapsed(tabGroupId);
         // If the group is collapsed, the group representation card displays the selection.
         // If expanded, the group card is a header and should remain unhighlighted (child rows show
         // selection).
@@ -3036,7 +3038,21 @@ public class TabListMediator implements TabListNotificationHandler {
                                     .getTabGroupColorPickerItemColorAccessibilityString(colorId);
                     String colorDesc = res.getString(colorDescRes);
                     String description;
-                    if (TabUiUtils.isDataSharingFunctionalityEnabled() && hasCollaboration(tab)) {
+                    if (!model.get(TabProperties.IS_COLLAPSED)) {
+                        description =
+                                TextUtils.isEmpty(title)
+                                        ? res.getQuantityString(
+                                                R.plurals.accessibility_dialog_back_button,
+                                                numOfRelatedTabs,
+                                                numOfRelatedTabs)
+                                        : res.getQuantityString(
+                                                R.plurals
+                                                        .accessibility_dialog_back_button_with_group_name,
+                                                numOfRelatedTabs,
+                                                title,
+                                                numOfRelatedTabs);
+                    } else if (TabUiUtils.isDataSharingFunctionalityEnabled()
+                            && hasCollaboration(tab)) {
                         TabCardLabelData tabCardLabelData =
                                 model.get(TabProperties.TAB_CARD_LABEL_DATA);
                         CharSequence tabCardLabelDesc = "";

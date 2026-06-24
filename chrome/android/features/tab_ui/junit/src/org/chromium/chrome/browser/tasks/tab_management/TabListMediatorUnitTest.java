@@ -1430,6 +1430,7 @@ public class TabListMediatorUnitTest {
         setUpTabListMediator(TabListMediatorType.VERTICAL_TABS, TabListMode.VERTICAL);
 
         createTabGroup(List.of(mTab1, mTab2), TAB_GROUP_ID);
+        when(mTabModel.getTabGroupCollapsed(TAB_GROUP_ID)).thenReturn(false);
         mockRepresentativeTabs(mTab1, mTab2);
         doReturn(POSITION1).when(mTabModel).representativeIndexOf(mTab2);
         doReturn(POSITION1).when(mTabModel).representativeIndexOf(mTab1);
@@ -2569,6 +2570,7 @@ public class TabListMediatorUnitTest {
         when(tab4.getTabGroupId()).thenReturn(TAB_GROUP_ID);
         List<Tab> newTabs = List.of(mTab1, tab3, tab4);
         createTabGroup(newTabs, TAB_GROUP_ID);
+        when(mTabModel.getTabGroupCollapsed(TAB_GROUP_ID)).thenReturn(false);
         when(mTabModel.getTabsInGroup(TAB_GROUP_ID)).thenReturn(newTabs);
 
         mTabGroupObserverCaptor.getValue().didMergeTabToGroup(tab4, /* isDestinationTab= */ false);
@@ -3441,6 +3443,7 @@ public class TabListMediatorUnitTest {
         // Create a single tab group that became a single tab.
         List<Tab> tabs = List.of(mTab1);
         createTabGroup(tabs, TAB_GROUP_ID);
+        when(mTabModel.getTabGroupCollapsed(TAB_GROUP_ID)).thenReturn(false);
         mMediator.resetWithListOfTabs(tabs, null, false);
         mockRepresentativeTabs(mTab1);
         when(mTabModel.getTabsInGroup(TAB_GROUP_ID)).thenReturn(List.of(mTab1));
@@ -4894,6 +4897,43 @@ public class TabListMediatorUnitTest {
         assertThat(
                 mModelList
                         .get(POSITION2)
+                        .model
+                        .get(TabProperties.CONTENT_DESCRIPTION_TEXT_RESOLVER)
+                        .resolve(mContext),
+                equalTo(nonEmptyTitleTargetString));
+    }
+
+    @Test
+    public void testTabGroupExpandedDescriptionString() {
+        setUpNestedLayoutWithTwoTabGroup(/* isCollapsed= */ false);
+
+        // Unnamed group targets collapse dialog plurals.
+        String emptyTitleTargetString =
+                mResources.getQuantityString(R.plurals.accessibility_dialog_back_button, 2, 2);
+
+        assertThat(
+                mModelList
+                        .get(0)
+                        .model
+                        .get(TabProperties.CONTENT_DESCRIPTION_TEXT_RESOLVER)
+                        .resolve(mContext),
+                equalTo(emptyTitleTargetString));
+
+        // Named group targets collapse dialog plurals with group name.
+        String nonEmptyTitleTargetString =
+                mResources.getQuantityString(
+                        R.plurals.accessibility_dialog_back_button_with_group_name,
+                        2,
+                        CUSTOMIZED_DIALOG_TITLE1,
+                        2);
+
+        mTabModel.setTabGroupTitle(TAB_GROUP_ID, CUSTOMIZED_DIALOG_TITLE1);
+        mTabGroupObserverCaptor
+                .getValue()
+                .didChangeTabGroupTitle(mTab1.getTabGroupId(), CUSTOMIZED_DIALOG_TITLE1);
+        assertThat(
+                mModelList
+                        .get(0)
                         .model
                         .get(TabProperties.CONTENT_DESCRIPTION_TEXT_RESOLVER)
                         .resolve(mContext),
@@ -7331,6 +7371,7 @@ public class TabListMediatorUnitTest {
         when(mTabModel.getTabCountForGroup(tabGroupId)).thenReturn(tabs.size());
         when(mTabModel.tabGroupExists(tabGroupId)).thenReturn(true);
         when(mTabModel.getTabsInGroup(tabGroupId)).thenReturn(tabs);
+        when(mTabModel.getTabGroupCollapsed(tabGroupId)).thenReturn(true);
         int firstTabId = tabs.get(0).getId();
         when(mTabModel.getGroupLastShownTabId(tabGroupId)).thenReturn(firstTabId);
         for (Tab tab : tabs) {
@@ -7349,6 +7390,11 @@ public class TabListMediatorUnitTest {
                 model.set(TabProperties.TAB_GROUP_ID, null);
             }
             model.set(TabProperties.TAB_GROUP_HEADER_ID, tabGroupId);
+            @TabListLayoutType int layoutType = mTabListConfigDelegate.getLayoutType();
+            boolean isCollapsed =
+                    layoutType != TabListLayoutType.NESTED
+                            || mTabModel.getTabGroupCollapsed(tabGroupId);
+            model.set(TabProperties.IS_COLLAPSED, isCollapsed);
         }
     }
 
