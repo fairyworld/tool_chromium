@@ -57,6 +57,7 @@
 #include "content/browser/browsing_topics/header_util.h"
 #include "content/browser/client_hints/client_hints.h"
 #include "content/browser/connection_allowlist_utils.h"
+#include "content/browser/declarative_performance_observer/declarative_performance_observer.h"
 #include "content/browser/devtools/devtools_instrumentation.h"
 #include "content/browser/devtools/network_service_devtools_observer.h"
 #include "content/browser/download/download_manager_impl.h"
@@ -2389,6 +2390,12 @@ NavigationRequest::~NavigationRequest() {
           features::kAbortNavigationsFromTabClosures) &&
       state_ < DID_COMMIT && net_error_ == net::OK) {
     net_error_ = net::ERR_ABORTED;
+  }
+
+  if (!early_navigation_failure_recorded_ && !response() &&
+      IsInPrimaryMainFrame() && net_error_ == net::ERR_ABORTED) {
+    DeclarativePerformanceObserver::RecordEarlyNavigationFailure(
+        this, GetStoragePartitionWithCurrentSiteInfo(), net::ERR_ABORTED);
   }
 
   // IMPORTANT NOTE: DO NOT return early from the destructor before this line.
@@ -5576,6 +5583,12 @@ void NavigationRequest::OnRequestFailedInternal(
   CHECK(!(status.error_code == net::ERR_ABORTED &&
           error_page_content.has_value()));
   ScopedCrashKeys crash_keys(*this);
+
+  if (!response() && IsInPrimaryMainFrame() && status.error_code != net::OK) {
+    DeclarativePerformanceObserver::RecordEarlyNavigationFailure(
+        this, GetStoragePartitionWithCurrentSiteInfo(), status.error_code);
+    early_navigation_failure_recorded_ = true;
+  }
 
   if (reserved_prerender_host_info_.has_value()) {
     // Prerender activation must not fail but some reports imply it can actually
