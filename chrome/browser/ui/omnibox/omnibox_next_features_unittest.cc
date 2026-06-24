@@ -227,10 +227,10 @@ TEST_F(OmniboxNextFeaturesTest, ComposeboxConfigEnabled_Valid_ClearMimeTypes) {
   // config.
   fieldtrial_config.mutable_composebox()
       ->mutable_image_upload()
-      ->mime_types_allowed();
+      ->clear_mime_types_allowed();
   fieldtrial_config.mutable_composebox()
       ->mutable_attachment_upload()
-      ->mime_types_allowed();
+      ->clear_mime_types_allowed();
 
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndEnableFeatureWithParameters(

@@ -111,6 +111,10 @@ gl_context_egl.cc).
 * no-consume.patch - MediaPipe still uses shared_ptr::unique() but only in code
 that Chrome does not exercise. This needs to actually be fixed properly upstream.
 
+* nodiscard-unpackto.patch - Protobuf has marked `UnpackTo` (among other things)
+  as `[[nodiscard]]`. This patch ignores the annotation; MediaPipe should
+  probably do something more robust.
+
 Other patches
 =============
 * update-any-usage.patch - Renames usage of the proto google.protobuf.Any to

@@ -365,7 +365,7 @@ TEST_F(ExamplePreprocessorTest, ExampleFloatIterator) {
 TEST_F(ExamplePreprocessorTest, ExampleFloatIteratorError) {
   RankerExample example;
   example.mutable_features()->insert({"foo", Feature::default_instance()});
-  (*example.mutable_features())["bar"]
+  (void)(*example.mutable_features())["bar"]
       .mutable_string_list()
       ->mutable_string_value();
   int num_of_fields = 0;

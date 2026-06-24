@@ -219,8 +219,9 @@ std::optional<sync_pb::EntitySpecifics> ParseEntitySpecifics(
       auto* color = tab_group_dict->FindString(kColorKey);
       if (color) {
         sync_pb::SharedTabGroup::Color group_color;
-        SharedTabGroup_Color_Parse(*color, &group_color);
-        shared_tab_group->set_color(group_color);
+        if (SharedTabGroup_Color_Parse(*color, &group_color)) {
+          shared_tab_group->set_color(group_color);
+        }
       }
     } else {
       return std::nullopt;

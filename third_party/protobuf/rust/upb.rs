@@ -408,12 +408,16 @@ where
         // No-op: the memory will be dropped by the arena.
     }
 
-    fn repeated_len(repeated: View<Repeated<Self>>) -> usize {
+    fn repeated_len(_private: Private, repeated: View<Repeated<Self>>) -> usize {
         // SAFETY: `repeated.as_raw()` is a valid `upb_Array*`.
         unsafe { upb_Array_Size(repeated.as_raw(Private)) }
     }
 
-    fn repeated_push(mut repeated: Mut<Repeated<Self>>, val: impl IntoProxied<Self>) {
+    fn repeated_push(
+        _private: Private,
+        mut repeated: Mut<Repeated<Self>>,
+        val: impl IntoProxied<Self>,
+    ) {
         // SAFETY:
         // - `repeated.as_raw()` is a valid `upb_Array*`.
         // - `msg_ptr` is a valid `upb_Message*`.
@@ -429,13 +433,14 @@ where
         };
     }
 
-    fn repeated_clear(mut repeated: Mut<Repeated<Self>>) {
+    fn repeated_clear(_private: Private, mut repeated: Mut<Repeated<Self>>) {
         // SAFETY:
         // - `repeated.as_raw()` is a valid `upb_Array*`.
         unsafe { upb_Array_Resize(repeated.as_raw(Private), 0, repeated.raw_arena(Private)) };
     }
 
     unsafe fn repeated_get_unchecked<'a>(
+        _private: Private,
         repeated: View<'a, Repeated<Self>>,
         index: usize,
     ) -> View<'a, Self> {
@@ -450,6 +455,7 @@ where
     }
 
     unsafe fn repeated_get_mut_unchecked<'a>(
+        _private: Private,
         mut repeated: Mut<'a, Repeated<Self>>,
         index: usize,
     ) -> Mut<'a, Self>
@@ -468,6 +474,7 @@ where
     }
 
     unsafe fn repeated_set_unchecked(
+        _private: Private,
         mut repeated: Mut<Repeated<Self>>,
         index: usize,
         val: impl IntoProxied<Self>,
@@ -484,7 +491,11 @@ where
         }
     }
 
-    fn repeated_copy_from(src: View<Repeated<Self>>, mut dest: Mut<Repeated<Self>>) {
+    fn repeated_copy_from(
+        _private: Private,
+        src: View<Repeated<Self>>,
+        mut dest: Mut<Repeated<Self>>,
+    ) {
         // SAFETY:
         // - `src.as_raw()` and `dest.as_raw()` are both valid arrays of `Self`.
         // - `dest.as_raw()` is mutable.
@@ -494,7 +505,7 @@ where
         }
     }
 
-    fn repeated_reserve(mut repeated: Mut<Repeated<Self>>, additional: usize) {
+    fn repeated_reserve(_private: Private, mut repeated: Mut<Repeated<Self>>, additional: usize) {
         // SAFETY:
         // - `repeated.as_raw()` is a valid `upb_Array*`.
         unsafe {
@@ -986,17 +997,18 @@ where
         // No-op: the memory will be dropped by the arena.
     }
 
-    fn map_clear(mut map: MapMut<Key, Self>) {
+    fn map_clear(_private: Private, mut map: MapMut<Key, Self>) {
         unsafe {
             upb_Map_Clear(map.as_raw(Private));
         }
     }
 
-    fn map_len(map: MapView<Key, Self>) -> usize {
+    fn map_len(_private: Private, map: MapView<Key, Self>) -> usize {
         unsafe { upb_Map_Size(map.as_raw(Private)) }
     }
 
     fn map_insert(
+        _private: Private,
         mut map: MapMut<Key, Self>,
         key: View<'_, Key>,
         value: impl IntoProxied<Self>,
@@ -1019,7 +1031,11 @@ where
         }
     }
 
-    fn map_get<'a>(map: MapView<'a, Key, Self>, key: View<'_, Key>) -> Option<View<'a, Self>> {
+    fn map_get<'a>(
+        _private: Private,
+        map: MapView<'a, Key, Self>,
+        key: View<'_, Key>,
+    ) -> Option<View<'a, Self>> {
         let mut val = MaybeUninit::uninit();
         let found = unsafe {
             upb_Map_Get(map.as_raw(Private), Key::to_message_value(key), val.as_mut_ptr())
@@ -1030,7 +1046,11 @@ where
         Some(unsafe { Self::from_message_value(val.assume_init()) })
     }
 
-    fn map_get_mut<'a>(mut map: MapMut<'a, Key, Self>, key: View<'_, Key>) -> Option<Mut<'a, Self>>
+    fn map_get_mut<'a>(
+        _private: Private,
+        mut map: MapMut<'a, Key, Self>,
+        key: View<'_, Key>,
+    ) -> Option<Mut<'a, Self>>
     where
         Self: Message,
     {
@@ -1040,15 +1060,16 @@ where
         NonNull::new(val).map(|msg| unsafe { Self::from_message_mut(msg, map.arena(Private)) })
     }
 
-    fn map_remove(mut map: MapMut<Key, Self>, key: View<'_, Key>) -> bool {
+    fn map_remove(_private: Private, mut map: MapMut<Key, Self>, key: View<'_, Key>) -> bool {
         unsafe { upb_Map_Delete(map.as_raw(Private), Key::to_message_value(key), ptr::null_mut()) }
     }
-    fn map_iter(map: MapView<Key, Self>) -> MapIter<Key, Self> {
+    fn map_iter(_private: Private, map: MapView<Key, Self>) -> MapIter<Key, Self> {
         // SAFETY: MapView<'_,..>> guarantees its RawMap outlives '_.
         unsafe { MapIter::from_raw(Private, RawMapIter::new(map.as_raw(Private))) }
     }
 
     fn map_iter_next<'a>(
+        _private: Private,
         iter: &mut MapIter<'a, Key, Self>,
     ) -> Option<(View<'a, Key>, View<'a, Self>)> {
         // SAFETY: MapIter<'a, ..> guarantees its RawMapIter outlives 'a.
@@ -1110,6 +1131,50 @@ where
     }
 }
 
+/// Message equality definition which may have both false-negatives and false-positives in the face
+/// of unknown fields.
+///
+/// This behavior is deliberately held back from being exposed as an `Eq` trait for messages. The
+/// reason is that it is impossible to properly compare unknown fields for message equality, since
+/// without the schema you cannot know how to interpret the wire format properly for comparison.
+///
+/// False negative cases (where message_eq will return false on unknown fields where it
+/// would return true if the fields were known) are common and will occur in production: for
+/// example, as map and repeated fields look exactly the same, map field order is unstable, the
+/// comparison cannot know to treat it as unordered and will return false when it was the same
+/// map but in a different order.
+///
+/// False positives cases (where message_eq will return true on unknown fields where it would have
+/// return false if the fields were known) are possible but uncommon in practice. One example
+/// of this direction can occur if two fields are defined in the same oneof and both are present on
+/// the wire but in opposite order, without the schema these messages appear equal but with the
+/// schema they are not-equal.
+///
+/// This lossy behavior in the face of unknown fields is especially problematic in the face of
+/// extensions and other treeshaking behaviors where a given field being known or not to binary is a
+/// spooky-action-at-a-distance behavior, which may lead to surprising changes in outcome in
+/// equality tests based on changes made arbitrarily distant from the code performing the equality
+/// check.
+///
+/// Broadly this is recommended for use in tests (where unknown field behaviors are rarely a
+/// concern), and in limited/targeted cases where the lossy behavior in the face of unknown fields
+/// behavior is unlikely to be a problem.
+pub fn message_eq<T>(a: &T, b: &T) -> bool
+where
+    T: AsView + Debug,
+    <T as AsView>::Proxied: AssociatedMiniTable,
+    for<'a> View<'a, <T as AsView>::Proxied>: UpbGetMessagePtr,
+{
+    unsafe {
+        upb_Message_IsEqual(
+            a.as_view().get_ptr(Private).raw(),
+            b.as_view().get_ptr(Private).raw(),
+            <T as AsView>::Proxied::mini_table(),
+            0,
+        )
+    }
+}
+
 impl<T> MatcherEq for T
 where
     Self: AsView + Debug,
@@ -1117,14 +1182,7 @@ where
     for<'a> View<'a, <Self as AsView>::Proxied>: UpbGetMessagePtr,
 {
     fn matches(&self, o: &Self) -> bool {
-        unsafe {
-            upb_Message_IsEqual(
-                self.as_view().get_ptr(Private).raw(),
-                o.as_view().get_ptr(Private).raw(),
-                <Self as AsView>::Proxied::mini_table(),
-                0,
-            )
-        }
+        message_eq(self, o)
     }
 }
 
@@ -1237,8 +1295,8 @@ where
     }
 }
 
-// # Safety
-// - The field at `index` must be a message field of type `T`.
+/// # Safety
+/// - The field at `index` must be a message field of type `T`.
 pub unsafe fn message_set_sub_message<
     'msg,
     P: Message + AssociatedMiniTable,
@@ -1261,5 +1319,103 @@ pub unsafe fn message_set_sub_message<
         // - The caller guarantees that `index` refers to a valid message field of type `T`.
         // - The child's arena has been fused into the parent's arena above.
         parent.ptr.set_base_field_message_at_index(index, child_ptr);
+    }
+}
+
+/// # Safety
+/// - The field at `index` must be a string field.
+pub unsafe fn message_set_string_field<'msg, P: Message + AssociatedMiniTable>(
+    parent: MessageMutInner<'msg, P>,
+    index: u32,
+    val: impl IntoProxied<ProtoString>,
+) {
+    let s = val.into_proxied(Private);
+    let (view, arena) = s.into_inner(Private).into_raw_parts();
+    parent.arena().fuse(&arena);
+    unsafe {
+        // SAFETY:
+        // - `parent.ptr` is valid as it comes from a `MessageMutInner`.
+        // - The caller guarantees that `index` refers to a valid string field.
+        // - The string's arena has been fused into the parent's arena above.
+        parent.ptr.set_base_field_string_at_index(index, view);
+    }
+}
+
+/// # Safety
+/// - The field at `index` must be a bytes field.
+pub unsafe fn message_set_bytes_field<'msg, P: Message + AssociatedMiniTable>(
+    parent: MessageMutInner<'msg, P>,
+    index: u32,
+    val: impl IntoProxied<ProtoBytes>,
+) {
+    let s = val.into_proxied(Private);
+    let (view, arena) = s.into_inner(Private).into_raw_parts();
+    parent.arena().fuse(&arena);
+    unsafe {
+        // SAFETY:
+        // - `parent.ptr` is valid as it comes from a `MessageMutInner`.
+        // - The caller guarantees that `index` refers to a valid bytes field.
+        // - The string's arena has been fused into the parent's arena above.
+        parent.ptr.set_base_field_string_at_index(index, view);
+    }
+}
+
+/// # Safety
+/// - The field at `index` must be a repeated field of `T`.
+pub unsafe fn message_set_repeated_field<
+    'msg,
+    P: Message + AssociatedMiniTable,
+    T: ProxiedInRepeated,
+>(
+    parent: MessageMutInner<'msg, P>,
+    index: u32,
+    val: impl IntoProxied<Repeated<T>>,
+) {
+    let child = val.into_proxied(Private);
+    let inner = child.inner(Private);
+    parent.arena().fuse(inner.arena());
+    unsafe {
+        // SAFETY:
+        // - `parent.ptr` is valid as it comes from a `MessageMutInner`.
+        // - The caller guarantees that `index` refers to a valid repeated field.
+        // - The repeated field's arena has been fused into the parent's arena above.
+        parent.ptr.set_array_at_index(index, inner.raw());
+    }
+}
+
+/// # Safety
+/// - The field at `index` must be a map field with key type `K` and value type `V`.
+pub unsafe fn message_set_map_field<
+    'msg,
+    P: Message + AssociatedMiniTable,
+    K: Proxied,
+    V: ProxiedInMapValue<K>,
+>(
+    parent: MessageMutInner<'msg, P>,
+    index: u32,
+    val: impl IntoProxied<Map<K, V>>,
+) {
+    let mut child = val.into_proxied(Private);
+    let child_as_mut = child.as_mut();
+    let mut inner = child_as_mut.inner(Private);
+
+    parent.arena().fuse(inner.arena());
+    unsafe {
+        // SAFETY:
+        // - `parent.ptr` is valid as it comes from a `MessageMutInner`.
+        // - The caller guarantees that `index` refers to a valid map field.
+        // - The map's arena has been fused into the parent's arena above.
+        parent.ptr.set_map_at_index(index, inner.as_raw());
+    }
+}
+
+pub mod __unstable {
+    // Stores a serialized FileDescriptorProto, along with references to its dependencies.
+    pub struct DescriptorInfo {
+        // The serialized FileDescriptorProto.
+        pub descriptor: &'static [u8],
+        // A reference to the DescriptorInfo associated with each .proto file that the current one
+        // imports.
+        pub deps: &'static [&'static DescriptorInfo],
     }
 }

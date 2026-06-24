@@ -18,6 +18,12 @@ config("compat_no_flock") {
   }
 }
 
+# TODO(524759039): Remove this by upstreaming changes that support protobuf's
+# [[nodiscard]] annotations.
+config("compat_no_nodiscard") {
+  cflags = [ "-Wno-unused-result" ]
+}
+
 source_set("base") {
   public = [
     "src/fcp/base/base_name.h",
@@ -284,6 +290,10 @@ source_set("fl_runner") {
     # enforces a single app instance per data directory, so concurrent FCP
     # processes writing to the same directory do not exist.
     ":compat_no_flock",
+
+    # TODO(524759039): We need this to roll protobuf to v34+. Ideally we'll
+    # remove it by patching upstream.
+    ":compat_no_nodiscard",
   ]
 
   public_deps = [
