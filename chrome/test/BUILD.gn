@@ -4127,7 +4127,6 @@ if (!is_android) {
       sources += [
         "../browser/chrome_multiprofile_startup_browsertest.cc",
         "../browser/enterprise/reporting/cloud_profile_reporting_browsertest.cc",
-        "../browser/external_protocol/external_protocol_handler_browsertest.cc",
         "../browser/policy/cloud/extension_install_policy_service_browsertest.cc",
         "../browser/profiles/avatar_menu_browsertest.cc",
         "../browser/profiles/delete_profile_helper_browsertest.cc",
@@ -4201,11 +4200,11 @@ if (!is_android) {
       sources += [
         # chromeos does not support machine level user cloud policies
         "../browser/enterprise/reporting/report_scheduler_browsertest.cc",
-        "../browser/external_protocol/external_protocol_policy_browsertest.cc",
         "../browser/ui/views/enable_link_capturing_infobar_browsertest.cc",
       ]
       deps += [
         "//chrome/browser/apps/link_capturing",
+        "//chrome/browser/external_protocol:browser_tests",
         "//chrome/browser/shortcuts:browser_tests",
       ]
     }
@@ -5794,7 +5793,6 @@ test("unit_tests") {
     "../browser/enterprise/reporting/report_scheduler_unittest.cc",
     "../browser/enterprise/signin/interstitials/managed_profile_required_page_unittest.cc",
     "../browser/enterprise/util/managed_browser_utils_unittest.cc",
-    "../browser/external_protocol/external_protocol_handler_unittest.cc",
     "../browser/file_select_helper_unittest.cc",
     "../browser/font_family_cache_unittest.cc",
     "../browser/font_pref_change_notifier_unittest.cc",
@@ -6180,6 +6178,7 @@ test("unit_tests") {
     "//chrome/browser/engagement",
     "//chrome/browser/engagement:unit_tests",
     "//chrome/browser/external_protocol",
+    "//chrome/browser/external_protocol:unit_tests",
     "//chrome/browser/favicon",
     "//chrome/browser/favicon:unit_tests",
     "//chrome/browser/feedback",
