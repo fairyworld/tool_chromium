@@ -4,6 +4,7 @@
 
 import 'chrome://resources/cr_components/composebox/composebox.js';
 
+import {ComposeboxFile} from 'chrome://resources/cr_components/composebox/common.js';
 import type {ComposeboxElement} from 'chrome://resources/cr_components/composebox/composebox.js';
 import {PageCallbackRouter, PageHandlerRemote} from 'chrome://resources/cr_components/composebox/composebox.mojom-webui.js';
 import type {ComposeboxInputElement} from 'chrome://resources/cr_components/composebox/composebox_input.js';
@@ -12,9 +13,11 @@ import type {ContextualEntrypointAndMenuElement} from 'chrome://resources/cr_com
 import {WindowProxy} from 'chrome://resources/cr_components/composebox/window_proxy.js';
 import {createAutocompleteResultForTesting, createSearchMatchForTesting} from 'chrome://resources/cr_components/searchbox/searchbox_browser_proxy.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
+import type {TabInfo} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import {PageCallbackRouter as SearchboxPageCallbackRouter, PageHandlerRemote as SearchboxPageHandlerRemote} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import type {PageRemote as SearchboxPageRemote} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
-import {assertEquals, assertFalse, assertNotEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
+import {InputType} from 'chrome://resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
+import {assertEquals, assertNotEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import type {TestMock} from 'chrome://webui-test/test_mock.js';
 import {microtasksFinished} from 'chrome://webui-test/test_util.js';
 import {getTrustedHtml} from 'chrome://webui-test/trusted_html.js';
@@ -407,6 +410,70 @@ suite('ComposeboxTest', () => {
 
     assertEquals(1, handler.getCallCount('getSmartTabSharingActive'));
     assertTrue(newComposebox.smartTabSharingActive);
+  });
+
+  test('UpdateAutoSuggestedTabContext_NullDoesNotDelete', () => {
+    loadTimeData.overrideValues({webUIOmniboxAskGAboutThisPageEnabled: true});
+    const token = {high: 0n, low: 1n} as any;
+    const mockFile =
+        new ComposeboxFile(token, 'Auto Tab', 'tab', InputType.kBrowserTab, {
+          isDeletable: true,
+          tabId: 1,
+          url: 'http://example.com',
+        });
+    composebox.setAutomaticActiveTabForTesting(mockFile);
+
+    let deleteFileCalled = false;
+    const originalDeleteFile = composebox.deleteFile;
+    composebox.deleteFile = (_uuid) => {
+      deleteFileCalled = true;
+      return null;
+    };
+
+    // Call with null, should NOT delete.
+    composebox.updateAutoSuggestedTabContextForTesting(null);
+    assertFalse(deleteFileCalled);
+
+    // Call with different URL, SHOULD delete.
+    const differentTab: TabInfo = {
+      tabId: 2,
+      title: 'Different Tab',
+      url: 'http://different.com',
+      showInCurrentTabChip: false,
+      showInPreviousTabChip: false,
+      lastActive: {internalValue: BigInt(1)} as any,
+    };
+    composebox.updateAutoSuggestedTabContextForTesting(differentTab);
+    assertTrue(deleteFileCalled);
+
+    // Restore
+    composebox.deleteFile = originalDeleteFile;
+  });
+
+  test('UpdateAutoSuggestedTabContext_NullDeletesIfFeatureDisabled', () => {
+    loadTimeData.overrideValues({webUIOmniboxAskGAboutThisPageEnabled: false});
+    const token = {high: 0n, low: 1n} as any;
+    const mockFile =
+        new ComposeboxFile(token, 'Auto Tab', 'tab', InputType.kBrowserTab, {
+          isDeletable: true,
+          tabId: 1,
+          url: 'http://example.com',
+        });
+    composebox.setAutomaticActiveTabForTesting(mockFile);
+
+    let deleteFileCalled = false;
+    const originalDeleteFile = composebox.deleteFile;
+    composebox.deleteFile = (_uuid) => {
+      deleteFileCalled = true;
+      return null;
+    };
+
+    // Call with null, should delete because feature is disabled.
+    composebox.updateAutoSuggestedTabContextForTesting(null);
+    assertTrue(deleteFileCalled);
+
+    // Restore
+    composebox.deleteFile = originalDeleteFile;
   });
 
 });

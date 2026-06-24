@@ -96,6 +96,7 @@
 
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/lens/lens_media_link_handler.h"
+#include "chrome/browser/ui/omnibox/omnibox_next_features.h"  // nogncheck
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #endif
 
@@ -241,6 +242,18 @@ EntrypointSource ConvertContextualSearchSourceToEntrypointSource(
       return EntrypointSource::kFromWeb;
   }
 }
+
+#if !BUILDFLAG(IS_ANDROID)
+bool ShouldReloadZeroState(const GURL& url, ContextualTasksUiService* service) {
+  return base::FeatureList::IsEnabled(
+             omnibox::kWebUIOmniboxAskGAboutThisPage) &&
+         ContextualTasksUI::IsZeroState(url, service);
+}
+#else
+bool ShouldReloadZeroState(const GURL& url, ContextualTasksUiService* service) {
+  return false;
+}
+#endif
 
 }  // namespace
 
@@ -2525,6 +2538,22 @@ void ContextualTasksUiService::StartTaskUiInSidePanel(
   // navigation directly to the embedded page.
   if (ContextualTasksUIInterface* web_ui_interface =
           GetWebUiInterface(panel_contents)) {
+    if (ShouldReloadZeroState(url, this)) {
+      // Cleanly start over: Create a new task and reload the parent WebUI.
+      ContextualTask task = contextual_tasks_service_->CreateTaskFromUrl(url);
+      task_id_to_creation_url_[task.GetTaskId()] = url;
+      AssociateWebContentsToTask(tab_interface->GetContents(),
+                                 task.GetTaskId());
+
+      content::NavigationController::LoadURLParams load_params(
+          GetContextualTaskUrlForTask(task.GetTaskId()));
+      panel_contents->GetController().LoadURLWithParams(load_params);
+
+      InitializeTaskInSidePanel(panel_contents, task.GetTaskId(),
+                                std::move(session_handle));
+      return;
+    }
+
     content::OpenURLParams url_params(
         url, content::Referrer(), WindowOpenDisposition::CURRENT_TAB,
         ui::PAGE_TRANSITION_LINK, /*is_renderer_initiated=*/false);

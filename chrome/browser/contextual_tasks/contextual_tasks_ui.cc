@@ -107,6 +107,7 @@
 #if !BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/lens/lens_search_controller.h"
+#include "chrome/browser/ui/omnibox/omnibox_next_features.h"  // nogncheck
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/user_education/browser_help_bubble.h"
 #include "components/omnibox/browser/searchbox.mojom-forward.h"
@@ -518,6 +519,13 @@ ContextualTasksUI::ContextualTasksUI(content::WebUI* web_ui)
                     contextual_tasks::GetContextualTasksNlmUrlParam());
   source->AddBoolean("enableCustomNlmUi",
                      contextual_tasks::IsCustomNlmUiEnabled());
+#if !BUILDFLAG(IS_ANDROID)
+  source->AddBoolean(
+      "webUIOmniboxAskGAboutThisPageEnabled",
+      base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxAskGAboutThisPage));
+#else
+  source->AddBoolean("webUIOmniboxAskGAboutThisPageEnabled", false);
+#endif
 
   source->AddInteger(
       "composeboxFileMaxSize",
