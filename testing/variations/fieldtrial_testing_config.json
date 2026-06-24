@@ -27384,6 +27384,21 @@
             ]
         }
     ],
+    "WinIsolatedProcess": [
+        {
+            "platforms": [
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "enable_features": [
+                        "IsolatedProcess"
+                    ]
+                }
+            ]
+        }
+    ],
     "WinSboxCsrssLockdown": [
         {
             "platforms": [
