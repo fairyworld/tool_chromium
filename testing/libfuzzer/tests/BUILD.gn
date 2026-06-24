@@ -55,11 +55,6 @@ test("fuzzing_unittests") {
       "//testing/libfuzzer/fuzzers:string_compare_proto_fuzzer",
     ]
 
-    # TODO(crbug.com/526667982): Fix when Mac Arm64 builds are fixed.
-    if (!(is_mac && current_cpu == "arm64")) {
-      data_deps += [ "//testing/libfuzzer/fuzzers:lpm_empty_fuzzer" ]
-    }
-
     data += [
       "data/check",
       "data/uaf",
