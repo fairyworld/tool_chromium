@@ -40,6 +40,12 @@ public final class TestSideUiContainer implements SideUiContainer {
     /** Minimum width for this {@link SideUiContainer}. */
     public int mMinWidthDp;
 
+    /** Number of times {@link #onWillAutoClose} is called. */
+    public int mNumOnWillAutoCloseReceived;
+
+    /** Number of times {@link #onWillAutoRestore} is called. */
+    public int mNumOnWillAutoRestoreReceived;
+
     private final SideUiCoordinator mSideUiCoordinator;
     private final View mSideUiContainerView;
     private final @SideUiId int mSideUiId;
@@ -109,6 +115,16 @@ public final class TestSideUiContainer implements SideUiContainer {
 
     @Override
     public void onContainerResized(@Px int containerWidth) {}
+
+    @Override
+    public void onWillAutoClose() {
+        mNumOnWillAutoCloseReceived++;
+    }
+
+    @Override
+    public void onWillAutoRestore() {
+        mNumOnWillAutoRestoreReceived++;
+    }
 
     @Override
     public void onWindowResized(boolean canShowSideUi) {

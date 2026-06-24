@@ -137,7 +137,7 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
     @Override
     public void requestUpdateContainer(
             SideUiContainerProperties properties, boolean suppressAnimations) {
-        updateContainerWidths(suppressAnimations);
+        updateUi(properties.mSideUiId, suppressAnimations);
     }
 
     @Override
@@ -298,11 +298,20 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
     }
 
     /**
-     * Update registered {@link SideUiContainer} widths.
+     * Updates all {@link SideUiContainer}s and {@link SideUiObserver}s.
      *
+     * <p>Each {@link SideUiContainer} or {@link SideUiObserver} will also be notified of relevant
+     * events before/during/after the new {@link SideUiSpecs} is applied to the UI. Please see their
+     * documentation for details.
+     *
+     * <p>TODO(crbug.com/478338737): Make {@code requestingSideUiId} nullable since a UI update
+     * isn't always requested by a {@link SideUiContainer}. For example, when the window size is
+     * changed, the UI update won't have a {@code requestingSideUiId}.
+     *
+     * @param requestingSideUiId The {@link SideUiContainer} that requested the update.
      * @param suppressAnimations Whether the animation should be suppressed.
      */
-    private void updateContainerWidths(boolean suppressAnimations) {
+    private void updateUi(@SideUiId int requestingSideUiId, boolean suppressAnimations) {
         // 1. End any existing transitions still in progress. This needs to be done before checking
         // the current specs, since specs aren't fully updated until after all transitions have
         // finished.
@@ -324,10 +333,27 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
         SideUiSpecs currentSideUiSpecs = getCurrentSideUiSpecsInternal();
         SideUiSpecs sideUiSpecsDiff = newSideUiSpecs.diffAgainst(currentSideUiSpecs);
 
-        // 5. Notify SideUiObservers of the new SideUiShowability.
+        // 5. Handle auto-close/auto-restore.
+        for (var container : mSideUiContainers) {
+            if (container.getSideUiId() == requestingSideUiId) {
+                // No need to auto-close/auto-restore the requesting SideUi.
+                continue;
+            }
+
+            @AnchorSide int anchorSide = container.getAnchorSide();
+            @Px int currentWidth = currentSideUiSpecs.getWidth(anchorSide);
+            @Px int newWidth = newSideUiSpecs.getWidth(anchorSide);
+            if (currentWidth != 0 && newWidth == 0) {
+                container.onWillAutoClose();
+            } else if (currentWidth == 0 && newWidth != 0) {
+                container.onWillAutoRestore();
+            }
+        }
+
+        // 6. Notify SideUiObservers of the new SideUiShowability.
         mShowabilityNotifier.notify(mSideUiObservers, newSideUiShowability);
 
-        // 6. Commit the new SideUiSpecs.
+        // 7. Commit the new SideUiSpecs.
         if (!sideUiSpecsDiff.isEmpty()) {
             // If animating, gather all Transitions into a TransitionSet.
             @Nullable TransitionSet transitionSet =

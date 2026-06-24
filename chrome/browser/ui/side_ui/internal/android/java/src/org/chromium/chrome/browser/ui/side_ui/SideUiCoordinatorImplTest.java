@@ -226,7 +226,7 @@ public class SideUiCoordinatorImplTest {
     }
 
     @Test
-    public void testRequestUpdateContainer_hideLowerPriorityContainer() {
+    public void testRequestUpdateContainer_twoSideUiContainers() {
         int windowWidthDp = ViewUtils.pxToDp(mTestActivity, WINDOW_SIZE_PX.getWidth());
 
         // Arrange: Register the right SideUiContainer.
@@ -241,6 +241,9 @@ public class SideUiCoordinatorImplTest {
                         AnchorSide.RIGHT);
         rightUiContainer.mMinWidthDp = windowWidthDp - SideUiCoordinator.MIN_WEB_CONTENTS_WIDTH_DP;
         rightUiContainer.mMaxWidthDp = rightUiContainer.mMinWidthDp;
+        @Px
+        int expectedRightSideUiWidth =
+                ViewUtils.dpToPx(mTestActivity, rightUiContainer.mMaxWidthDp);
         mCoordinator.registerSideUiContainer(rightUiContainer);
 
         // Arrange: Register the left SideUiContainer.
@@ -255,6 +258,8 @@ public class SideUiCoordinatorImplTest {
                         AnchorSide.LEFT);
         leftUiContainer.mMinWidthDp = windowWidthDp - SideUiCoordinator.MIN_WEB_CONTENTS_WIDTH_DP;
         leftUiContainer.mMaxWidthDp = leftUiContainer.mMinWidthDp;
+        @Px
+        int expectedLeftSideUiWidth = ViewUtils.dpToPx(mTestActivity, leftUiContainer.mMaxWidthDp);
         mCoordinator.registerSideUiContainer(leftUiContainer);
 
         // Arrange: Add an observer.
@@ -271,13 +276,16 @@ public class SideUiCoordinatorImplTest {
         RobolectricUtil.runAllBackgroundAndUi();
 
         // Assert: The right SideUiContainer is shown.
-        @Px
-        int expectedRightSideUiWidth =
-                ViewUtils.dpToPx(mTestActivity, rightUiContainer.mMaxWidthDp);
         SideUiSpecs expectedSideUiSpecs = new SideUiSpecs(0, expectedRightSideUiWidth);
         SideUiSpecs currentSideUiSpecs = mCoordinator.getCurrentSideUiSpecs();
         assertEquals(expectedSideUiSpecs, currentSideUiSpecs);
         assertEquals(expectedRightSideUiWidth, rightUiContainerView.getLayoutParams().width);
+
+        // Assert: Neither container will receive auto-close/auto-restore notifications.
+        assertEquals(0, rightUiContainer.mNumOnWillAutoCloseReceived);
+        assertEquals(0, rightUiContainer.mNumOnWillAutoRestoreReceived);
+        assertEquals(0, leftUiContainer.mNumOnWillAutoCloseReceived);
+        assertEquals(0, leftUiContainer.mNumOnWillAutoRestoreReceived);
 
         // Assert: The observer is notified with both containers being showable.
         //
@@ -306,13 +314,17 @@ public class SideUiCoordinatorImplTest {
         RobolectricUtil.runAllBackgroundAndUi();
 
         // Assert: The left SideUiContainer is shown, but the right container is hidden.
-        @Px
-        int expectedLeftSideUiWidth = ViewUtils.dpToPx(mTestActivity, leftUiContainer.mMaxWidthDp);
         expectedSideUiSpecs = new SideUiSpecs(expectedLeftSideUiWidth, 0);
         currentSideUiSpecs = mCoordinator.getCurrentSideUiSpecs();
         assertEquals(expectedSideUiSpecs, currentSideUiSpecs);
         assertEquals(expectedLeftSideUiWidth, leftUiContainerView.getLayoutParams().width);
         assertEquals(0, rightUiContainerView.getLayoutParams().width);
+
+        // Assert: The right SideUiContainer should receive the auto-close notification.
+        assertEquals(1, rightUiContainer.mNumOnWillAutoCloseReceived);
+        assertEquals(0, rightUiContainer.mNumOnWillAutoRestoreReceived);
+        assertEquals(0, leftUiContainer.mNumOnWillAutoCloseReceived);
+        assertEquals(0, leftUiContainer.mNumOnWillAutoRestoreReceived);
 
         // Assert: The observer is notified that the right (low-priority) container is no longer
         // showable.
@@ -323,6 +335,37 @@ public class SideUiCoordinatorImplTest {
         assertEquals(
                 List.of(SideUiId.SIDE_UI_FOR_TESTING_LOW_PRIORITY),
                 showabilityCaptor.getValue().mUnshowableSideUiIds);
+
+        // Act: Close the left container.
+        leftUiContainer.mHasContentToShow = false;
+        clearInvocations(mSideUiObserver);
+        mCoordinator.requestUpdateContainer(
+                new SideUiContainerProperties(
+                        leftUiContainer.getSideUiId(), leftUiContainer.getAnchorSide()),
+                /* suppressAnimations= */ true);
+        RobolectricUtil.runAllBackgroundAndUi();
+
+        // Assert: The left SideUiContainer is hidden, and the right container is auto-restored.
+        expectedSideUiSpecs = new SideUiSpecs(0, expectedRightSideUiWidth);
+        currentSideUiSpecs = mCoordinator.getCurrentSideUiSpecs();
+        assertEquals(expectedSideUiSpecs, currentSideUiSpecs);
+        assertEquals(0, leftUiContainerView.getLayoutParams().width);
+        assertEquals(expectedRightSideUiWidth, rightUiContainerView.getLayoutParams().width);
+
+        // Assert: The right SideUiContainer should receive the auto-restore notification.
+        assertEquals(1, rightUiContainer.mNumOnWillAutoCloseReceived);
+        assertEquals(1, rightUiContainer.mNumOnWillAutoRestoreReceived);
+        assertEquals(0, leftUiContainer.mNumOnWillAutoCloseReceived);
+        assertEquals(0, leftUiContainer.mNumOnWillAutoRestoreReceived);
+
+        // Assert: The observer is notified that both containers are showable.
+        verify(mSideUiObserver).onShowableSideUisUpdated(showabilityCaptor.capture());
+        assertEquals(
+                List.of(
+                        SideUiId.SIDE_UI_FOR_TESTING_HIGH_PRIORITY,
+                        SideUiId.SIDE_UI_FOR_TESTING_LOW_PRIORITY),
+                showabilityCaptor.getValue().mShowableSideUiIds);
+        assertTrue(showabilityCaptor.getValue().mUnshowableSideUiIds.isEmpty());
     }
 
     @Test
