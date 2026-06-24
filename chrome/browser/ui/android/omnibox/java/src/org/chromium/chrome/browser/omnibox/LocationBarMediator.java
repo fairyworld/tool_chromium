@@ -2586,6 +2586,11 @@ class LocationBarMediator
     // UrlBarDelegate implementation.
 
     @Override
+    public UrlBarData getUrlBarDataForCurrentInput() {
+        return getUrlBarDataForCurrentInput(mCurrentInput);
+    }
+
+    @Override
     public @Nullable View getViewForUrlBackFocus() {
         assert mLocationBarDataProvider != null;
         Tab tab = mLocationBarDataProvider.getTab();
