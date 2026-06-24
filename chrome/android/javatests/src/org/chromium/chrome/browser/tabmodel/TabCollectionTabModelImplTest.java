@@ -4536,5 +4536,11 @@ public class TabCollectionTabModelImplTest {
         ThreadUtils.runOnUiThreadBlocking(() -> mCollectionModel.removeTab(tab2));
         verifyCacheInSync();
         assertTabsInOrderAre(List.of(tab0, tab1));
+
+        ThreadUtils.runOnUiThreadBlocking(
+                () -> {
+                    tab2.destroy();
+                    tab3.destroy();
+                });
     }
 }
