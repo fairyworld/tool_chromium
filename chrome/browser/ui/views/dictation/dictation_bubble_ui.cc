@@ -89,10 +89,18 @@ void DictationToastView::Init() {
   // TODO(b/510738735): Finalize placeholder strings.
   // TODO(b/512495405): Wrap the visual aspects of the view into a model so this
   // setup is common across elements..
+  views::ImageView* mic_icon =
+      AddChildView(std::make_unique<views::ImageView>());
+  mic_icon->SetImage(ui::ImageModel::FromVectorIcon(
+      vector_icons::kMicIcon, ui::kColorSysOnSurface,
+      lp->GetDistanceMetric(DISTANCE_TOAST_BUBBLE_ICON_SIZE)));
+
+  // TODO(b/527101202): Replace this placeholder label with the actual waveform
+  // icon once it is implemented.
   views::Label* label_view = AddChildView(
       std::make_unique<views::Label>(u"<placehold>", CONTEXT_TOAST_BODY_TEXT));
   label_view_ = label_view;
-  label_view->SetEnabledColor(ui::kColorToastForeground);
+  label_view->SetEnabledColor(ui::kColorSysOnSurface);
   label_view->SetMultiLine(false);
   label_view->SetHorizontalAlignment(gfx::ALIGN_LEFT);
   label_view->SetAllowCharacterBreak(false);
@@ -107,15 +115,13 @@ void DictationToastView::Init() {
   label_view->SetProperty(
       views::kFlexBehaviorKey,
       views::FlexSpecification(views::LayoutOrientation::kHorizontal,
-                               views::MinimumFlexSizeRule::kScaleToZero));
+                               views::MinimumFlexSizeRule::kPreferred,
+                               views::MaximumFlexSizeRule::kPreferred));
 
   views::MdTextButton* toggle_button =
       AddChildView(std::make_unique<views::MdTextButton>(
           toggle_active_stream_callback_, l10n_util::GetStringUTF16(IDS_DONE)));
   toggle_button_ = toggle_button;
-  toggle_button->SetEnabledTextColors(ui::kColorToastButton);
-  toggle_button->SetBgColorIdOverride(ui::kColorToastBackgroundProminent);
-  toggle_button->SetStrokeColorIdOverride(ui::kColorToastButton);
   toggle_button->SetPreferredSize(gfx::Size(
       toggle_button->GetPreferredSize().width(),
       lp->GetDistanceMetric(DISTANCE_TOAST_BUBBLE_HEIGHT_ACTION_BUTTON)));
@@ -138,8 +144,8 @@ void DictationToastView::Init() {
               ? vector_icons::kCloseIcon
               : vector_icons::kCloseChromeRefreshOldIcon,
           lp->GetDistanceMetric(DISTANCE_TOAST_BUBBLE_ICON_SIZE),
-          ui::kColorToastForeground, ui::kColorIconDisabled,
-          ui::kColorToastForeground));
+          ui::kColorSysOnSurface, ui::kColorIconDisabled,
+          ui::kColorSysOnSurface));
   const gfx::Insets insets =
       lp->GetInsetsMetric(views::InsetsMetric::INSETS_VECTOR_IMAGE_BUTTON);
   close_button->SetBorder(views::CreateEmptyBorder(insets));
@@ -204,7 +210,7 @@ DictationBubbleUi::DictationBubbleUi(
     base::RepeatingClosure close_callback,
     base::RepeatingClosure toggle_active_stream_callback)
     : BubbleDialogDelegate(anchor_view, views::BubbleBorder::NONE) {
-  SetBackgroundColor(ui::kColorToastBackgroundProminent);
+  SetBackgroundColor(ui::kColorBubbleBackground);
   SetShowCloseButton(false);
   DialogDelegate::SetButtons(static_cast<int>(ui::mojom::DialogButton::kNone));
   set_corner_radius(ChromeLayoutProvider::Get()->GetDistanceMetric(
@@ -234,6 +240,9 @@ void DictationBubbleUi::SetState(State state) {
   if (GetContentsView()) {
     views::AsViewClass<DictationToastView>(GetContentsView())
         ->UpdateForState(state);
+  }
+  if (GetWidget()) {
+    SizeToContents();
   }
 }
 
@@ -268,7 +277,7 @@ void DictationBubbleUi::Init() {
 
 gfx::Rect DictationBubbleUi::GetBubbleBounds() {
   views::View* anchor_view = GetAnchorView();
-  if (!anchor_view) {
+  if (!anchor_view || !GetWidget()) {
     return gfx::Rect();
   }
 
@@ -284,7 +293,10 @@ gfx::Rect DictationBubbleUi::GetBubbleBounds() {
                std::max(anchor_bounds.width() - 2 * minimum_margin, 0));
   const int x = anchor_bounds.x() + ((anchor_bounds.width() - width) / 2);
 
-  const int y = anchor_bounds.bottom() - (preferred_size.height() / 2);
+  // Overlap the bottom of the toolbar/omnibox by only a few pixels (e.g. 10
+  // dip).
+  constexpr int kOverlapAmount = 10;
+  const int y = anchor_bounds.bottom() - kOverlapAmount;
   return gfx::Rect(x, y, width, preferred_size.height());
 }
 
