@@ -899,6 +899,10 @@ lens::ImageEncodingOptions GetDefaultImageEncodingOptions() {
   }
   _omniboxFocused = focused;
   [self requestUIRefresh];
+
+  if (_omniboxFocused && _entrypoint == ComposeboxEntrypoint::kCobrowse) {
+    [self attachCurrentTabContent];
+  }
 }
 
 - (void)removeDeselectedIDs:(std::set<web::WebStateID>)deselectedIDs {

@@ -835,4 +835,47 @@ id<GREYMatcher> CloseButton() {
                                                      OmniboxText(""), nil)];
 }
 
+// Tests that focusing the Cobrowse input plate automatically attaches the
+// active tab.
+- (void)testCobrowseAutoAttachesActiveTabWhenTyping {
+  if ([ComposeboxAppInterface isServerSideStateEnabled]) {
+    EARL_GREY_TEST_SKIPPED(
+        @"Skipped when kComposeboxServerSideState is enabled.");
+  }
+
+  // 1. Open Co-browse. This loads /echo and opens the Assistant.
+  OpenCoBrowse(self.testServer);
+
+  // Wait for the assistant to appear.
+  [ChromeEarlGrey waitForUIElementToAppearWithMatcher:CloseButton()];
+  WaitForDetent(AssistantContainerDetent::kMedium);
+
+  // 2. Focus the input plate inside the Cobrowse assistant.
+  // We match the omnibox inside the Assistant container.
+  id<GREYMatcher> cobrowseOmnibox = grey_allOf(
+      chrome_test_util::Omnibox(),
+      grey_ancestor(
+          grey_accessibilityID(kAssistantContainerDetentMediumIdentifier)),
+      nil);
+
+  [[EarlGrey selectElementWithMatcher:cobrowseOmnibox]
+      performAction:grey_tap()];
+  WaitForDetent(AssistantContainerDetent::kLarge);
+
+  // 3. Verify that an attachment appears in the Cobrowse carousel.
+  id<GREYMatcher> cobrowseCarousel = grey_allOf(
+      grey_accessibilityID(kComposeboxCarouselAccessibilityIdentifier),
+      grey_ancestor(
+          grey_accessibilityID(kAssistantContainerDetentLargeIdentifier)),
+      nil);
+
+  [ChromeEarlGrey waitForUIElementToAppearWithMatcher:cobrowseCarousel];
+
+  id<GREYMatcher> attachedItem = grey_allOf(
+      grey_accessibilityID(kComposeboxCarouselItemAccessibilityIdentifier),
+      grey_ancestor(cobrowseCarousel), nil);
+
+  [ChromeEarlGrey waitForUIElementToAppearWithMatcher:attachedItem];
+}
+
 @end
