@@ -828,7 +828,7 @@ bool SessionServiceBase::ShouldTrackBrowser(
   // change SessionRestoreImpl::CreateRestoredBrowser().
   if ((browser->GetType() == BrowserWindowInterface::TYPE_APP ||
        browser->GetType() == BrowserWindowInterface::TYPE_APP_POPUP) &&
-      !browser->GetBrowserForMigrationOnly()->is_trusted_source()) {
+      !WindowFeatureController::From(browser)->IsTrustedSource()) {
     return false;
   }
 

@@ -268,8 +268,10 @@ void CreateAndShowNewWindowWithContents(
   DCHECK(original_browser->GetType() != BrowserWindowInterface::TYPE_APP_POPUP);
   if (original_browser->GetType() == BrowserWindowInterface::TYPE_APP) {
     const Browser* browser = original_browser->GetBrowserForMigrationOnly();
+    const bool is_trusted_source =
+        WindowFeatureController::From(original_browser)->IsTrustedSource();
     new_browser = Browser::Create(Browser::CreateParams::CreateForApp(
-        browser->app_name(), browser->is_trusted_source(), gfx::Rect(),
+        browser->app_name(), is_trusted_source, gfx::Rect(),
         original_browser->GetProfile(), true));
   } else {
     new_browser = Browser::Create(Browser::CreateParams(

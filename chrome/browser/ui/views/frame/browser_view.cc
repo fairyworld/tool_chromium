@@ -580,7 +580,8 @@ bool ShouldShowWindowIcon(const Browser* browser,
   // For Chrome OS only, trusted windows (apps and settings) do not show a
   // window icon, crbug.com/40175496. Child windows (i.e. popups) do show an
   // icon.
-  if (browser->is_trusted_source() || app_uses_window_controls_overlay) {
+  if (WindowFeatureController::From(browser)->IsTrustedSource() ||
+      app_uses_window_controls_overlay) {
     return false;
   }
 #else

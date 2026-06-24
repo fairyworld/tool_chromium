@@ -442,7 +442,7 @@ GURL GetHistoryUrl(std::string_view sub_page) {
 bool IsTrustedPopupWindowWithScheme(const BrowserWindowInterface* browser,
                                     const std::string& scheme) {
   if (browser->GetType() == BrowserWindowInterface::Type::TYPE_NORMAL ||
-      !browser->GetBrowserForMigrationOnly()->is_trusted_source()) {
+      !WindowFeatureController::From(browser)->IsTrustedSource()) {
     return false;
   }
   if (scheme.empty()) {  // Any trusted popup window
