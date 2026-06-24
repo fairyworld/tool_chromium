@@ -24,6 +24,7 @@
 #include "base/memory/scoped_refptr.h"
 #include "base/numerics/byte_conversions.h"
 #include "base/numerics/safe_conversions.h"
+#include "base/task/bind_post_task.h"
 #include "base/time/tick_clock.h"
 #include "base/time/time.h"
 #include "base/trace_event/trace_event.h"
@@ -798,6 +799,12 @@ void AudioEncoder::InsertAudio(std::unique_ptr<AudioBus> audio_bus,
       CastEnvironment::ThreadId::kAudio, FROM_HERE,
       base::BindOnce(&AudioEncoder::ImplBase::EncodeAudio, impl_,
                      std::move(audio_bus), recorded_time));
+}
+
+AudioEncoder::EncodeCallback AudioEncoder::GetAsynchronousEncodeCallback() {
+  return base::BindPostTask(
+      cast_environment_->GetTaskRunner(CastEnvironment::ThreadId::kAudio),
+      base::BindRepeating(&AudioEncoder::ImplBase::EncodeAudio, impl_));
 }
 
 }  // namespace cast

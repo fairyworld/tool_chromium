@@ -30,6 +30,7 @@
 #include "media/cast/cast_config.h"
 #include "media/cast/common/openscreen_conversion_helpers.h"
 #include "media/cast/encoding/encoding_support.h"
+#include "media/cast/sender/audio_sender.h"
 #include "media/cast/test/openscreen_test_helpers.h"
 #include "media/cast/test/utility/default_config.h"
 #include "media/media_buildflags.h"
@@ -951,9 +952,9 @@ TEST_F(OpenscreenSessionHostTest, ChangeTargetPlayoutDelay) {
   // Currently new delays are ignored due to the playout delay being bounded by
   // the minimum and maximum both being set to the default value.
   session_host().SetTargetPlayoutDelay(base::Milliseconds(300));
-  EXPECT_EQ(session_host().audio_stream_->GetTargetPlayoutDelay(),
+  EXPECT_EQ(session_host().audio_sender_->GetTargetPlayoutDelay(),
             kDefaultPlayoutDelay);
-  EXPECT_EQ(session_host().audio_stream_->GetTargetPlayoutDelay(),
+  EXPECT_EQ(session_host().audio_sender_->GetTargetPlayoutDelay(),
             kDefaultPlayoutDelay);
 
   StopSession();

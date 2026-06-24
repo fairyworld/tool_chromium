@@ -49,6 +49,9 @@ class OneShotTimer;
 
 namespace media {
 class AudioInputDevice;
+namespace cast {
+class AudioSender;
+}  // namespace cast
 }  // namespace media
 
 namespace viz {
@@ -323,7 +326,7 @@ class COMPONENT_EXPORT(MIRRORING_SERVICE) OpenscreenSessionHost final
   bool offering_fallback_codecs_ = false;
 
   // Created after OFFER/ANSWER exchange succeeds.
-  std::unique_ptr<AudioRtpStream> audio_stream_;
+  std::unique_ptr<media::cast::AudioSender> audio_sender_;
   std::unique_ptr<VideoRtpStream> video_stream_;
 
   // Connects to the video capture host and launches the video capture device.
@@ -416,7 +419,6 @@ class COMPONENT_EXPORT(MIRRORING_SERVICE) OpenscreenSessionHost final
   SEQUENCE_CHECKER(sequence_checker_);
 
   // Used in callbacks executed on task runners, such as by RtpStream.
-  // TODO(crbug.com/40238714): determine if weak pointers can be removed.
   base::WeakPtrFactory<OpenscreenSessionHost> weak_factory_{this};
 };
 

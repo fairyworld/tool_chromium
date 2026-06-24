@@ -351,14 +351,11 @@ void OpenscreenSessionHost::OnNegotiated(
 
   SetConstraints(capture_recommendations, audio_config, video_config);
   if (senders.audio_sender) {
-    auto audio_sender = std::make_unique<media::cast::AudioSender>(
+    audio_sender_ = std::make_unique<media::cast::AudioSender>(
         cast_environment_, *audio_config,
         base::BindOnce(&OpenscreenSessionHost::OnAudioEncoderStatus,
-                       // Safe because we own `audio_stream`.
                        weak_factory_.GetWeakPtr(), *audio_config),
         std::move(senders.audio_sender));
-    audio_stream_ = std::make_unique<AudioRtpStream>(
-        std::move(audio_sender), weak_factory_.GetWeakPtr());
     CHECK(!audio_capturing_callback_);
     StartCapturingAudio();
   }
@@ -590,8 +587,6 @@ void OpenscreenSessionHost::CreateVideoEncodeAccelerator(
     // This is a highly unusual statement due to the fact that
     // `MojoVideoEncodeAccelerator` must be destroyed using `Destroy()` and has
     // a private destructor.
-    // TODO(crbug.com/40238884): should be castable to parent type with
-    // destructor.
     mojo_vea = base::WrapUnique<media::VideoEncodeAccelerator>(
         new media::MojoVideoEncodeAccelerator(std::move(vea)));
   }
@@ -763,7 +758,7 @@ void OpenscreenSessionHost::StopStreaming() {
 
   StopCapturingAudio();
   PauseCapturingVideo();
-  audio_stream_.reset();
+  audio_sender_.reset();
   video_stream_.reset();
   gpu_factories_factory_.reset();
   remoting_stream_data_.reset();
@@ -951,9 +946,9 @@ void OpenscreenSessionHost::SetTargetPlayoutDelay(
     base::TimeDelta playout_delay) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   bool playout_delay_was_updated = false;
-  if (audio_stream_ &&
-      audio_stream_->GetTargetPlayoutDelay() != playout_delay) {
-    audio_stream_->SetTargetPlayoutDelay(playout_delay);
+  if (audio_sender_ &&
+      audio_sender_->GetTargetPlayoutDelay() != playout_delay) {
+    audio_sender_->SetTargetPlayoutDelay(playout_delay);
     playout_delay_was_updated = true;
   }
 
@@ -980,7 +975,7 @@ void OpenscreenSessionHost::ProcessFeedback(
 
 int OpenscreenSessionHost::GetVideoNetworkBandwidth() const {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  return audio_stream_ ? usable_bandwidth_ - audio_stream_->GetEncoderBitrate()
+  return audio_sender_ ? usable_bandwidth_ - audio_sender_->GetEncoderBitrate()
                        : usable_bandwidth_;
 }
 
@@ -1145,12 +1140,15 @@ void OpenscreenSessionHost::StartCapturingAudio() {
   CHECK(!audio_capturing_callback_);
   CHECK(!audio_input_device_);
 
-  // TODO(crbug.com/40103719): Eliminate the thread hops. The audio data is
-  // thread-hopped from the audio thread, and later thread-hopped again to
-  // the encoding thread.
+  auto encode_callback = audio_sender_->GetAsynchronousEncodeCallback();
+  if (encode_callback.is_null()) {
+    ReportAndLogError(SessionError::ENCODING_ERROR,
+                      "Audio encoder could not be initialized.");
+    return;
+  }
+
   audio_capturing_callback_ = std::make_unique<AudioCapturingCallback>(
-      base::BindPostTaskToCurrentDefault(base::BindRepeating(
-          &AudioRtpStream::InsertAudio, audio_stream_->AsWeakPtr())),
+      std::move(encode_callback),
       base::BindPostTaskToCurrentDefault(base::BindOnce(
           &OpenscreenSessionHost::ReportAndLogError, weak_factory_.GetWeakPtr(),
           SessionError::AUDIO_CAPTURE_ERROR)),
@@ -1240,8 +1238,11 @@ base::DictValue OpenscreenSessionHost::GetMirroringStats() const {
     stats.EnsureDict("video")->Merge(video_stream_->GetStats());
   }
 
-  if (audio_stream_) {
-    stats.EnsureDict("audio")->Merge(audio_stream_->GetStats());
+  if (audio_sender_) {
+    base::DictValue audio_stats;
+    audio_stats.Set("FRAMES_INSERTED", audio_sender_->GetFramesInserted());
+    audio_stats.Set("FRAMES_DROPPED", audio_sender_->GetFramesDropped());
+    stats.EnsureDict("audio")->Merge(std::move(audio_stats));
   }
 
   return stats;
