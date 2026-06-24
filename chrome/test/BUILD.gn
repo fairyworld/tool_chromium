@@ -10405,39 +10405,15 @@ if (!is_android && !is_chromeos_device) {
     ]
 
     if (enable_extensions) {
-      sources += [
-        "../browser/extensions/api/extension_action/browser_action_interactive_test.cc",
-        "../browser/extensions/api/extension_action/extension_action_api_interactive_uitest.cc",
-        "../browser/extensions/api/extension_action/page_action_interactive_test.cc",
-        "../browser/extensions/api/notifications/notifications_apitest.cc",
-        "../browser/extensions/api/omnibox/omnibox_api_interactive_test.cc",
-        "../browser/extensions/api/permissions/permissions_api_interactive_uitest.cc",
-        "../browser/extensions/api/runtime/runtime_interactive_apitest.cc",
-        "../browser/extensions/api/tabs/tabs_interactive_test.cc",
-        "../browser/extensions/api/tabs/window_open_interactive_apitest.cc",
-        "../browser/extensions/app_window_uitest.cc",
-        "../browser/extensions/extension_apitest.cc",
-        "../browser/extensions/extension_browsertest.cc",
-        "../browser/extensions/extension_commands_global_registry_apitest.cc",
-        "../browser/extensions/extension_crash_recovery_browsertest.cc",
-        "../browser/extensions/extension_fullscreen_apitest.cc",
-        "../browser/extensions/extension_keybinding_apitest.cc",
-        "../browser/extensions/omnibox_focus_interactive_test.cc",
-        "../browser/guest_view/mime_handler_view/chrome_mime_handler_view_interactive_uitest.cc",
-      ]
+      # TODO(crbug.com/521960574): Move this into a build file closer to the
+      # source.
+      sources += [ "../browser/guest_view/mime_handler_view/chrome_mime_handler_view_interactive_uitest.cc" ]
 
       deps += [
-        "//chrome/browser/apps/platform_apps:browser_test_support",
-        "//chrome/browser/apps/platform_apps:interactive_ui_tests",
         "//chrome/browser/controlled_frame:test_support",
+        "//chrome/browser/extensions:interactive_ui_tests",
         "//chrome/browser/omnibox",
-        "//chrome/browser/tab_list",
-        "//chrome/browser/ui/browser_window:create_browser_window",
         "//chrome/browser/ui/exclusive_access:test_support",
-        "//chrome/browser/ui/omnibox",
-        "//chrome/browser/ui/webui/extensions_zero_state_promo:interactive_ui_tests",
-        "//components/feed:feature_list",
-        "//extensions/browser:crx_installer",
         "//extensions/browser/api:extensions_api_client",
       ]
 
@@ -10448,8 +10424,6 @@ if (!is_android && !is_chromeos_device) {
         data_deps +=
             [ "//chrome/browser/resources/chromeos/accessibility:build" ]
         data += [ "$root_out_dir/resources/chromeos/" ]
-      } else {
-        deps += [ "//chrome/browser/ui/download" ]
       }
 
       if (is_mac || is_win) {
@@ -10940,6 +10914,7 @@ if (!is_android && !is_chromeos_device) {
 
       deps += [
         "//chrome/browser/apps/app_shim",
+        "//chrome/browser/apps/platform_apps:browser_test_support",
         "//chrome/browser/lifetime:termination_notification",
         "//chrome/browser/spellchecker:interactive_ui_tests",
         "//chrome/browser/web_applications/extensions",
