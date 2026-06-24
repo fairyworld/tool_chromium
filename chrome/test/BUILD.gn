@@ -3323,7 +3323,6 @@ if (!is_android) {
       "../browser/enterprise/watermark/watermark_browsertest.cc",
       "../browser/extensions/api/bookmark_manager_private/bookmark_manager_private_api_browsertest.cc",
       "../browser/fast_shutdown_browsertest.cc",
-      "../browser/guest_view/mime_handler_view/chrome_mime_handler_view_browsertest.cc",
       "../browser/icon_loader_browsertest.cc",
       "../browser/iframe_browsertest.cc",
       "../browser/image_fetcher/image_fetcher_impl_browsertest.cc",
@@ -4301,6 +4300,7 @@ if (!is_android) {
         "//chrome/browser/apps/platform_apps:browser_test_support",
         "//chrome/browser/apps/platform_apps:browser_tests",
         "//chrome/browser/extensions:browser_tests",
+        "//chrome/browser/guest_view:browser_tests",
         "//chrome/browser/web_applications/extensions",
         "//chrome/browser/web_applications/isolated_web_apps/window_management",
         "//extensions/browser:webstore_installer",
@@ -10387,13 +10387,10 @@ if (!is_android && !is_chromeos_device) {
     ]
 
     if (enable_extensions) {
-      # TODO(crbug.com/521960574): Move this into a build file closer to the
-      # source.
-      sources += [ "../browser/guest_view/mime_handler_view/chrome_mime_handler_view_interactive_uitest.cc" ]
-
       deps += [
         "//chrome/browser/controlled_frame:test_support",
         "//chrome/browser/extensions:interactive_ui_tests",
+        "//chrome/browser/guest_view:interactive_ui_tests",
         "//chrome/browser/omnibox",
         "//chrome/browser/ui/exclusive_access:test_support",
         "//extensions/browser/api:extensions_api_client",
