@@ -193,6 +193,7 @@ class IwaKeyDistributionInfoProvider : public ChromeIwaRuntimeDataProvider {
   void DispatchComponentUpdateError(IwaComponentUpdateError error);
 
   void SignalOnDataReady(bool is_preloaded);
+  void OnTimeout();
 
   KeyDistributionComponentSource GetComponentDataSource() const;
 

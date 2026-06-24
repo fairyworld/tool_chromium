@@ -91,6 +91,11 @@ base::TaskPriority GetLoadTaskPriority() {
   return base::TaskPriority::BEST_EFFORT;
 #endif
 }
+void SignalIfNeeded(base::OneShotEvent& event) {
+  if (!event.is_signaled()) {
+    event.Signal();
+  }
+}
 }  // namespace
 
 // static
@@ -507,6 +512,12 @@ void IwaKeyDistributionInfoProvider::
     return;
   }
   maybe_queue_component_update_posted_ = true;
+  if (maybe_downloaded_data_ready_.is_signaled()) {
+    // This will only be logged once per Chrome session.
+    base::UmaHistogramEnumeration(
+        kIwaComponentBestEffortWaitOutcome,
+        IwaComponentBestEffortWaitOutcome::kNoWaitComponentAlreadyReady);
+  }
   any_data_ready_.Post(
       FROM_HERE,
       base::BindOnce(&IwaKeyDistributionInfoProvider::MaybeQueueComponentUpdate,
@@ -524,20 +535,51 @@ void IwaKeyDistributionInfoProvider::MaybeQueueComponentUpdate() {
     //  Schedule a fallback signaller.
     base::SequencedTaskRunner::GetCurrentDefault()->PostDelayedTask(
         FROM_HERE,
-        base::BindOnce(&IwaKeyDistributionInfoProvider::SignalOnDataReady,
-                       base::Unretained(this),
-                       /*is_preloaded=*/false),
+        base::BindOnce(&IwaKeyDistributionInfoProvider::OnTimeout,
+                       base::Unretained(this)),
         kDownloadedComponentDataWaitTime);
   }
 }
 
 void IwaKeyDistributionInfoProvider::SignalOnDataReady(bool is_preloaded) {
-  if (!any_data_ready_.is_signaled()) {
-    any_data_ready_.Signal();
+  if (is_preloaded) {
+    SignalIfNeeded(any_data_ready_);
+    return;
   }
-  if (!is_preloaded && !maybe_downloaded_data_ready_.is_signaled()) {
-    maybe_downloaded_data_ready_.Signal();
+
+  // We only record the outcome of a wait cycle if a wait was actually
+  // initiated (tracked by `maybe_queue_component_update_posted_` being true)
+  // and we are resolving the wait for the first time (when the event is not
+  // yet signaled).
+  if (maybe_queue_component_update_posted_ &&
+      !maybe_downloaded_data_ready_.is_signaled()) {
+    // If `any_data_ready_` has already been signaled, the preloaded
+    // component loaded first, meaning this download must be a brand new
+    // one fetched from the network. Otherwise, the local cached component
+    // won the startup race before preload finished loading.
+    base::UmaHistogramEnumeration(
+        kIwaComponentBestEffortWaitOutcome,
+        any_data_ready_.is_signaled()
+            ? IwaComponentBestEffortWaitOutcome::
+                  kWaitCompletedDownloadedNewComponent
+            : IwaComponentBestEffortWaitOutcome::
+                  kWaitCompletedLoadedCachedComponent);
   }
+
+  SignalIfNeeded(any_data_ready_);
+  SignalIfNeeded(maybe_downloaded_data_ready_);
+}
+
+void IwaKeyDistributionInfoProvider::OnTimeout() {
+  if (maybe_queue_component_update_posted_ &&
+      !maybe_downloaded_data_ready_.is_signaled()) {
+    base::UmaHistogramEnumeration(
+        kIwaComponentBestEffortWaitOutcome,
+        IwaComponentBestEffortWaitOutcome::kWaitTimeoutFellBackToPreload);
+  }
+
+  SignalIfNeeded(any_data_ready_);
+  SignalIfNeeded(maybe_downloaded_data_ready_);
 }
 
 KeyDistributionComponentSource
