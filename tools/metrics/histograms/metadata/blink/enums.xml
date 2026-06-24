@@ -6681,6 +6681,9 @@ Called by update_use_counter_feature_enum.py.-->
   <int value="5933" label="ContainerTimingAttributeHasRootName"/>
   <int value="5934" label="ContainerTimingIgnoreAttribute"/>
   <int value="5935" label="SVGPathElementSetPathData"/>
+  <int value="5936" label="SubAppsAdd"/>
+  <int value="5937" label="SubAppsRemove"/>
+  <int value="5938" label="SubAppsList"/>
 </enum>
 
 <!-- LINT.ThenChange(//third_party/blink/public/mojom/use_counter/metrics/web_feature.mojom:WebFeature) -->
