@@ -73,7 +73,8 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
   };
   // LINT.ThenChange(//tools/metrics/histograms/metadata/private_metrics/enums.xml:PrivateInsightsTriggerUploadOutcome)
 
-  explicit PrivateInsightsService(PrefService* local_state);
+  PrivateInsightsService(PrefService* local_state,
+                         const base::FilePath& profile_dir);
   ~PrivateInsightsService() override;
 
   PrivateInsightsService(const PrivateInsightsService&) = delete;
@@ -98,7 +99,8 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
   void TriggerUpload();
 
   // Runs on a background thread pool sequence (allows blocking).
-  static bool UploadBlocking(base::TimeTicks trigger_time);
+  static bool UploadBlocking(const base::FilePath& profile_dir,
+                             base::TimeTicks trigger_time);
 
   static bool RunFederatedComputation(const FederatedComputationParams& params);
 
@@ -107,6 +109,7 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
   void OnUploadComplete(bool result);
 
   raw_ptr<PrefService> local_state_ = nullptr;
+  base::FilePath profile_dir_;
   PrefChangeRegistrar pref_registrar_;
 
   bool is_upload_running_ = false;

@@ -7,6 +7,7 @@
 #include <string>
 
 #include "base/check.h"
+#include "base/files/file_path.h"
 #include "base/functional/bind.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/sequence_checker.h"
@@ -34,8 +35,10 @@ inline constexpr char kContextualCuesPopulationName[] =
 
 }  // namespace
 
-PrivateInsightsService::PrivateInsightsService(PrefService* local_state)
-    : local_state_(local_state) {
+PrivateInsightsService::PrivateInsightsService(
+    PrefService* local_state,
+    const base::FilePath& profile_dir)
+    : local_state_(local_state), profile_dir_(profile_dir) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   CHECK(local_state_);
 }
@@ -101,7 +104,7 @@ void PrivateInsightsService::TriggerUpload() {
       FROM_HERE,
       {base::MayBlock(), base::TaskPriority::BEST_EFFORT,
        base::TaskShutdownBehavior::SKIP_ON_SHUTDOWN},
-      base::BindOnce(&PrivateInsightsService::UploadBlocking,
+      base::BindOnce(&PrivateInsightsService::UploadBlocking, profile_dir_,
                      base::TimeTicks::Now()),
       base::BindOnce(&PrivateInsightsService::OnUploadComplete,
                      weak_ptr_factory_.GetWeakPtr()));
@@ -111,12 +114,19 @@ void PrivateInsightsService::TriggerUpload() {
 }
 
 // static
-bool PrivateInsightsService::UploadBlocking(base::TimeTicks trigger_time) {
+bool PrivateInsightsService::UploadBlocking(const base::FilePath& profile_dir,
+                                            base::TimeTicks trigger_time) {
   base::UmaHistogramTimes(kUploadPendingTimeHistogram,
                           base::TimeTicks::Now() - trigger_time);
   base::TimeTicks upload_start_time = base::TimeTicks::Now();
 
-  FcpSimpleTaskEnvironment fcp_task_env("", "", {});
+  base::FilePath private_insights_dir =
+      profile_dir.AppendASCII("PrivateInsights");
+  base::FilePath base_dir = private_insights_dir.AppendASCII("base_dir");
+  base::FilePath cache_dir = private_insights_dir.AppendASCII("cache_dir");
+
+  FcpSimpleTaskEnvironment fcp_task_env(base_dir.AsUTF8Unsafe(),
+                                        cache_dir.AsUTF8Unsafe(), {});
   FcpEventPublisher fcp_event_publisher;
   FcpFiles fcp_files;
   FcpLogManager fcp_log_manager;

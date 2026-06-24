@@ -6,6 +6,7 @@
 
 #include <atomic>
 
+#include "base/files/scoped_temp_dir.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/run_until.h"
 #include "base/test/scoped_feature_list.h"
@@ -22,6 +23,7 @@ namespace private_insights {
 class PrivateInsightsServiceTest : public testing::Test {
  protected:
   void SetUp() override {
+    ASSERT_TRUE(tmp_profile_dir_.CreateUniqueTempDir());
     mock_run_federated_computation_call_count_ = 0;
     PrivateInsightsService::SetRunFederatedComputationForTesting(
         &MockRunFederatedComputation);
@@ -41,13 +43,14 @@ class PrivateInsightsServiceTest : public testing::Test {
 
   base::test::TaskEnvironment task_environment_{
       base::test::TaskEnvironment::TimeSource::MOCK_TIME};
+  base::ScopedTempDir tmp_profile_dir_;
 };
 
 TEST_F(PrivateInsightsServiceTest,
        TriggerUploadSkipsPostingTaskWhenAlreadyRunning) {
   base::HistogramTester histogram_tester;
   TestingPrefServiceSimple local_state;
-  PrivateInsightsService service(&local_state);
+  PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath());
 
   // First call: should post the task.
   service.TriggerUpload();
@@ -95,7 +98,8 @@ TEST_F(PrivateInsightsServiceTest, MetricsChoiceCoupling) {
       SetForceIsMetricsReportingEnabledPrefLookupForTesting(true);
 
   // When Init() is NOT called, UMA choice changes should be ignored.
-  PrivateInsightsService uninit_service(&local_state);
+  PrivateInsightsService uninit_service(&local_state,
+                                        tmp_profile_dir_.GetPath());
   EXPECT_FALSE(uninit_service.upload_timer_.IsRunning());
   local_state.SetBoolean(metrics::prefs::kMetricsReportingEnabled, true);
   EXPECT_FALSE(uninit_service.upload_timer_.IsRunning());
@@ -103,7 +107,7 @@ TEST_F(PrivateInsightsServiceTest, MetricsChoiceCoupling) {
   local_state.SetBoolean(metrics::prefs::kMetricsReportingEnabled, false);
 
   // When Init() IS called, UMA choice changes should start/stop the service.
-  PrivateInsightsService service(&local_state);
+  PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath());
   service.Init();
   EXPECT_FALSE(service.upload_timer_.IsRunning());
 
@@ -134,7 +138,7 @@ TEST_F(PrivateInsightsServiceTest, MetricsChoiceRespectedOnStartup) {
     local_state.registry()->RegisterBooleanPref(
         metrics::prefs::kMetricsReportingEnabled, false);
 
-    PrivateInsightsService service(&local_state);
+    PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath());
     EXPECT_FALSE(service.upload_timer_.IsRunning());
 
     service.Init();
@@ -149,7 +153,7 @@ TEST_F(PrivateInsightsServiceTest, MetricsChoiceRespectedOnStartup) {
     local_state.registry()->RegisterBooleanPref(
         metrics::prefs::kMetricsReportingEnabled, true);
 
-    PrivateInsightsService service(&local_state);
+    PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath());
     EXPECT_FALSE(service.upload_timer_.IsRunning());
 
     service.Init();

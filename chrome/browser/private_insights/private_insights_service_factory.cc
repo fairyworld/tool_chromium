@@ -58,7 +58,7 @@ PrivateInsightsServiceFactory::BuildServiceInstanceForBrowserContext(
     return nullptr;
   }
   auto service = std::make_unique<PrivateInsightsService>(
-      g_browser_process->local_state());
+      g_browser_process->local_state(), context->GetPath());
   service->Init();
   return service;
 #endif
