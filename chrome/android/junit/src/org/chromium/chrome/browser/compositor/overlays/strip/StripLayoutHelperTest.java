@@ -4778,6 +4778,21 @@ public class StripLayoutHelperTest {
 
                             @Override
                             public void fadeCompositorButtons(boolean fade) {}
+
+                            @Override
+                            public boolean isGlicButtonVisible() {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean isGlicUiVisible() {
+                                return false;
+                            }
+
+                            @Override
+                            public CompositorButton getGlicButton() {
+                                return null;
+                            }
                         },
                         mManagerHost,
                         mUpdateHost,
