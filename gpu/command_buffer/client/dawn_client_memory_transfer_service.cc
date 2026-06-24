@@ -16,86 +16,6 @@
 namespace gpu {
 namespace webgpu {
 
-class DawnClientMemoryTransferService::ReadHandleImpl
-    : public dawn::wire::client::MemoryTransferService::ReadHandle {
- public:
-  ReadHandleImpl(base::span<uint8_t> buffer,
-                 MemoryTransferHandle handle,
-                 DawnClientMemoryTransferService* service)
-      : buffer_(buffer), handle_(handle), service_(service) {}
-
-  ~ReadHandleImpl() override {
-    // The shared memory can't be freed until the server consumes it. Add the
-    // the pointer to a list of blocks to process on the next Flush.
-    service_->MarkHandleFree(buffer_.data());
-  }
-
-  // Get the serialization size of SerializeCreate.
-  size_t SerializeCreateSize() override { return sizeof(MemoryTransferHandle); }
-
-  // Serialize the handle into |serialize_pointer| so it can be received by the
-  // service.
-  void SerializeCreate(void* serialize_pointer) override {
-    *reinterpret_cast<MemoryTransferHandle*>(serialize_pointer) = handle_;
-  }
-
-  const void* GetData() override { return buffer_.data(); }
-
-  bool DeserializeDataUpdate(std::span<const uint8_t> deserialize_data,
-                             size_t offset) override {
-    // No data is deserialized because we're using shared memory.
-    DCHECK(deserialize_data.empty());
-    return true;
-  }
-
- private:
-  base::raw_span<uint8_t> buffer_;  // Client-side shared memory.
-  MemoryTransferHandle handle_;
-  raw_ptr<DawnClientMemoryTransferService> service_;
-};
-
-class DawnClientMemoryTransferService::WriteHandleImpl
-    : public dawn::wire::client::MemoryTransferService::WriteHandle {
- public:
-  WriteHandleImpl(base::span<uint8_t> buffer,
-                  MemoryTransferHandle handle,
-                  DawnClientMemoryTransferService* service)
-      : buffer_(buffer), handle_(handle), service_(service) {}
-
-  ~WriteHandleImpl() override {
-    // The shared memory can't be freed until the server consumes it. Add
-    // the pointer to a list of blocks to process on the next Flush.
-    service_->MarkHandleFree(buffer_.data());
-  }
-
-  // Get the serialization size of SerializeCreate.
-  size_t SerializeCreateSize() override { return sizeof(MemoryTransferHandle); }
-
-  // Serialize the handle into |serialize_pointer| so it can be received by the
-  // service.
-  void SerializeCreate(void* serialize_pointer) override {
-    *reinterpret_cast<MemoryTransferHandle*>(serialize_pointer) = handle_;
-  }
-
-  void* GetData() override { return buffer_.data(); }
-
-  size_t SizeOfSerializeDataUpdate(size_t offset, size_t size) override {
-    // No data is serialized because we're using shared memory.
-    return 0;
-  }
-
-  void SerializeDataUpdate(std::span<char> serialize_data,
-                           size_t offset) override {
-    // No data is serialized because we're using shared memory.
-    DCHECK(serialize_data.empty());
-  }
-
- private:
-  base::raw_span<uint8_t> buffer_;
-  MemoryTransferHandle handle_;
-  raw_ptr<DawnClientMemoryTransferService> service_;
-};
-
 class DawnClientMemoryTransferService::MemoryHandleImpl
     : public dawn::wire::client::MemoryTransferService::MemoryHandle {
  public:
@@ -160,41 +80,18 @@ DawnClientMemoryTransferService::DawnClientMemoryTransferService(
 
 DawnClientMemoryTransferService::~DawnClientMemoryTransferService() = default;
 
-dawn::wire::client::MemoryTransferService::ReadHandle*
-DawnClientMemoryTransferService::CreateReadHandle(size_t size) {
-  MemoryTransferHandle handle = {};
-  base::span<uint8_t> buffer = AllocateTransferBuffer(size, &handle);
-  if (buffer.empty()) {
-    return nullptr;
-  }
-  return new ReadHandleImpl(buffer, handle, this);
-}
-
-dawn::wire::client::MemoryTransferService::WriteHandle*
-DawnClientMemoryTransferService::CreateWriteHandle(size_t size) {
-  MemoryTransferHandle handle = {};
-  base::span<uint8_t> buffer = AllocateTransferBuffer(size, &handle);
-  if (buffer.empty()) {
-    return nullptr;
-  }
-  // Zero-initialize the data.
-  std::ranges::fill(buffer, 0u);
-  return new WriteHandleImpl(buffer, handle, this);
-}
-
 std::unique_ptr<dawn::wire::client::MemoryTransferService::MemoryHandle>
 DawnClientMemoryTransferService::CreateMemoryHandle(size_t size) {
   MemoryTransferHandle handle = {};
-  base::span<uint8_t> buffer = AllocateTransferBuffer(size, &handle);
+  base::span<std::byte> buffer = AllocateTransferBuffer(size, &handle);
   if (buffer.empty()) {
     return nullptr;
   }
 
-  return std::make_unique<MemoryHandleImpl>(
-      base::subtle::reinterpret_span<std::byte>(buffer), handle, this);
+  return std::make_unique<MemoryHandleImpl>(buffer, handle, this);
 }
 
-base::span<uint8_t> DawnClientMemoryTransferService::AllocateTransferBuffer(
+base::span<std::byte> DawnClientMemoryTransferService::AllocateTransferBuffer(
     size_t size,
     MemoryTransferHandle* handle) {
   if (size > std::numeric_limits<uint32_t>::max() || disconnected_) {
@@ -208,9 +105,9 @@ base::span<uint8_t> DawnClientMemoryTransferService::AllocateTransferBuffer(
   size_t alloc_size = size == 0 ? 1 : size;
 
   DCHECK(mapped_memory_);
-  return mapped_memory_->Alloc(
-      alloc_size, &handle->shm_id, &handle->shm_offset,
-      TransferBufferAllocationOption::kReturnNullOnOOM);
+  return base::subtle::reinterpret_span<std::byte>(
+      mapped_memory_->Alloc(alloc_size, &handle->shm_id, &handle->shm_offset,
+                            TransferBufferAllocationOption::kReturnNullOnOOM));
 }
 
 void DawnClientMemoryTransferService::MarkHandleFree(void* ptr) {

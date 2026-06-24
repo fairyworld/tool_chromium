@@ -27,14 +27,6 @@ class DawnClientMemoryTransferService
   DawnClientMemoryTransferService(MappedMemoryManager* mapped_memory);
   ~DawnClientMemoryTransferService() override;
 
-  // Create a handle for reading shared memory data.
-  // This may fail and return nullptr.
-  ReadHandle* CreateReadHandle(size_t size) override;
-
-  // Create a handle for writing shared memory data.
-  // This may fail and return nullptr.
-  WriteHandle* CreateWriteHandle(size_t size) override;
-
   // Create a handle for using shared memory data.
   // This may fail and return nullptr.
   std::unique_ptr<MemoryHandle> CreateMemoryHandle(size_t size) override;
@@ -52,8 +44,8 @@ class DawnClientMemoryTransferService
 
   // Allocate a shared memory transfer buffer and populate `handle` with its
   // metadata (shm_id, shm_offset, size).
-  base::span<uint8_t> AllocateTransferBuffer(size_t size,
-                                             MemoryTransferHandle* handle);
+  base::span<std::byte> AllocateTransferBuffer(size_t size,
+                                               MemoryTransferHandle* handle);
 
   // Mark a shared memory allocation as free. This should not be called more
   // than once per block.
