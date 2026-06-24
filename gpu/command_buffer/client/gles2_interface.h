@@ -63,7 +63,10 @@ class GLES2Interface : public InterfaceBase {
   // Copies the contents of |source_shared_image| to |dst_texture| of the
   // current context. Assumes that |dst_texture| has already been allocated (via
   // BindTexture and TexImage2D) to the size of |src_rect|.
-  virtual gpu::SyncToken CopySharedImageToGLTextureViaTextureCopy(
+  // Returns a callback that the client is expected to invoke when they have
+  // finished the access. Invoking the callback ends access and returns a
+  // SyncToken.
+  virtual CopySharedImageSyncCallback CopySharedImageToGLTextureViaTextureCopy(
       const gfx::Rect& src_rect,
       ClientSharedImage* source_shared_image,
       const gpu::SyncToken& source_sync_token,
@@ -79,6 +82,9 @@ class GLES2Interface : public InterfaceBase {
   // Copies the contents of |source_shared_image| to |dst_texture| of the
   // current context. Assumes that |dst_texture| has already been allocated (via
   // BindTexture and TexImage2D) to the size of |src_rect|.
+  // Returns a callback that the client is expected to invoke when they have
+  // finished the access. Invoking the callback ends access and returns a
+  // SyncToken.
   virtual CopySharedImageSyncCallback CopySharedImageDirectlyToGLTexture(
       const gfx::Rect& src_rect,
       ClientSharedImage* source_shared_image,

@@ -29,7 +29,7 @@ bool GLES2TraceImplementation::CanCopySharedImageDirectlyToGLTexture(
       dst_level, dst_alpha_type);
 }
 
-gpu::SyncToken
+CopySharedImageSyncCallback
 GLES2TraceImplementation::CopySharedImageToGLTextureViaTextureCopy(
     const gfx::Rect& src_rect,
     ClientSharedImage* source_shared_image,

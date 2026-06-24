@@ -468,7 +468,8 @@ bool GLES2Implementation::CanCopySharedImageDirectlyToGLTexture(
              dst_internal_format, dst_type, dst_level, dst_alpha_type);
 }
 
-gpu::SyncToken GLES2Implementation::CopySharedImageToGLTextureViaTextureCopy(
+CopySharedImageSyncCallback
+GLES2Implementation::CopySharedImageToGLTextureViaTextureCopy(
     const gfx::Rect& src_rect,
     ClientSharedImage* source_shared_image,
     const gpu::SyncToken& source_sync_token,
@@ -504,8 +505,13 @@ gpu::SyncToken GLES2Implementation::CopySharedImageToGLTextureViaTextureCopy(
       scoped_si_access->texture_id(), 0, dst_target, dst_texture, dst_level, 0,
       0, src_rect.x(), src_rect.y(), src_rect.width(), src_rect.height(),
       do_flip_y, do_premultiply_alpha, do_unpremultiply_alpha);
-  return gpu::SharedImageTexture::ScopedAccess::EndAccess(
-      std::move(scoped_si_access));
+  return base::BindOnce(
+      [](std::unique_ptr<SharedImageTexture::ScopedAccess> si_access,
+         std::unique_ptr<SharedImageTexture> si_texture) {
+        return gpu::SharedImageTexture::ScopedAccess::EndAccess(
+            std::move(si_access));
+      },
+      std::move(scoped_si_access), std::move(si_texture));
 }
 
 CopySharedImageSyncCallback
@@ -524,7 +530,7 @@ GLES2Implementation::CopySharedImageDirectlyToGLTexture(
     GrSurfaceOrigin dst_origin) {
   CopySharedImageSyncCallback sync_callback;
   if (CanCopySharedImageToGLTextureViaTextureCopy(source_shared_image)) {
-    CopySharedImageToGLTextureViaTextureCopy(
+    sync_callback = CopySharedImageToGLTextureViaTextureCopy(
         src_rect, source_shared_image, source_sync_token, dst_target,
         dst_texture, dst_internal_format, dst_format, dst_type, dst_level,
         dst_alpha_type, dst_origin);
