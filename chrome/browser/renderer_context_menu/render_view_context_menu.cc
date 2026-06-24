@@ -5317,6 +5317,10 @@ void RenderViewContextMenu::ExecProtocolHandlerSettings(int event_flags) {
 }
 
 void RenderViewContextMenu::MaybeAppendOpenGlicItem() {
+  if (!content_type_->SupportsGroup(ContextMenuContentType::ITEM_GROUP_GLIC)) {
+    return;
+  }
+
   // Append an item for opening Glic
   if (!IsNormalBrowser()) {
     return;
