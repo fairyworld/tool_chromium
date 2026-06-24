@@ -124,6 +124,14 @@ public class AuxiliarySearchDonationServiceBridgeUnitTest {
         assertTrue(
                 request.getSchemas().stream()
                         .anyMatch(s -> s.getSchemaType().equals(WebPage.SCHEMA_NAME)));
+        assertTrue(
+                request.getSchemas().stream()
+                        .anyMatch(
+                                s ->
+                                        s.getSchemaType()
+                                                .equals(
+                                                        AuxiliarySearchDonationServiceBridge
+                                                                .BUILTIN_ACCOUNT_SCHEMA_NAME)));
         AppSearchSchema extendedWebPageSchema =
                 request.getSchemas().stream()
                         .filter(
@@ -136,6 +144,28 @@ public class AuxiliarySearchDonationServiceBridgeUnitTest {
                         .orElse(null);
         assertNotNull(extendedWebPageSchema);
         assertEquals(List.of(WebPage.SCHEMA_NAME), extendedWebPageSchema.getParentTypes());
+
+        AppSearchSchema.PropertyConfig accountProperty =
+                extendedWebPageSchema.getProperties().stream()
+                        .filter(
+                                p ->
+                                        p.getName()
+                                                .equals(
+                                                        AuxiliarySearchDonationServiceBridge
+                                                                .ACCOUNT_PROPERTY_NAME))
+                        .findFirst()
+                        .orElse(null);
+        assertNotNull(accountProperty);
+        assertEquals(
+                AppSearchSchema.PropertyConfig.CARDINALITY_OPTIONAL,
+                accountProperty.getCardinality());
+        assertTrue(accountProperty instanceof AppSearchSchema.DocumentPropertyConfig);
+        assertEquals(
+                AuxiliarySearchDonationServiceBridge.BUILTIN_ACCOUNT_SCHEMA_NAME,
+                ((AppSearchSchema.DocumentPropertyConfig) accountProperty).getSchemaType());
+        assertTrue(
+                ((AppSearchSchema.DocumentPropertyConfig) accountProperty)
+                        .shouldIndexNestedProperties());
 
         assertEquals(
                 TEST_INTELLIGENCE_PACKAGES,
