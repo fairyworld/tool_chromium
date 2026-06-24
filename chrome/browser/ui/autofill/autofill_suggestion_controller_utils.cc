@@ -68,7 +68,6 @@ SuggestionSection GetSuggestionSection(SuggestionType type) {
     case SuggestionType::kPendingStateSignin:
     case SuggestionType::kBnplFootnote:
     case SuggestionType::kAutocompleteAtMemoryButton:
-    case SuggestionType::kPersonalContextNotice:
       return SuggestionSection::kFooter;
 
     // Body items.
@@ -117,6 +116,7 @@ SuggestionSection GetSuggestionSection(SuggestionType type) {
     case SuggestionType::kAtMemoryGenericError:
     case SuggestionType::kAtMemorySearchAffordance:
     case SuggestionType::kMaximizeCreditCardBenefitsEntry:
+    case SuggestionType::kPersonalContextNotice:
       return SuggestionSection::kBody;
 
     case SuggestionType::kWebauthnSignInWithAnotherDevice:
