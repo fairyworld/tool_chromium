@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "base/functional/callback_helpers.h"
+#include "base/test/metrics/histogram_tester.h"
 #include "base/test/scoped_feature_list.h"
 #include "chrome/browser/dom_distiller/dom_distiller_service_factory.h"
 #include "chrome/browser/readaloud/read_aloud_service_factory.h"
@@ -130,6 +131,7 @@ TEST_F(ReadAloudServiceTest, DistillNullWebContents) {
 
 TEST_F(ReadAloudServiceTest, DistillPageAndArticleReady) {
   NavigateAndCommit(GURL("https://www.example.com/article"));
+  base::HistogramTester histograms;
 
   EXPECT_CALL(*mock_distiller_service(),
               CreateDefaultDistillerPageWithHandle(testing::_))
@@ -152,11 +154,48 @@ TEST_F(ReadAloudServiceTest, DistillPageAndArticleReady) {
   EXPECT_NE(nullptr, service()->GetViewerHandleForTesting());
   ASSERT_NE(nullptr, delegate_ptr);
 
-  // Simulate DomDistiller finishing distillation and triggering OnArticleReady.
+  // Simulate DomDistiller finishing distillation with success (contains pages).
+  dom_distiller::DistilledArticleProto proto;
+  proto.add_pages();
+  delegate_ptr->OnArticleReady(&proto);
+
+  EXPECT_EQ(nullptr, service()->GetViewerHandleForTesting());
+  histograms.ExpectTotalCount("ReadAloud.Distillation.Duration", 1);
+  histograms.ExpectUniqueSample("ReadAloud.Distillation.Success", true, 1);
+}
+
+TEST_F(ReadAloudServiceTest, DistillPageAndArticleFailure) {
+  NavigateAndCommit(GURL("https://www.example.com/article"));
+  base::HistogramTester histograms;
+
+  EXPECT_CALL(*mock_distiller_service(),
+              CreateDefaultDistillerPageWithHandle(testing::_))
+      .WillOnce(testing::Return(testing::ByMove(
+          std::make_unique<dom_distiller::test::MockDistillerPage>())));
+
+  dom_distiller::ViewRequestDelegate* delegate_ptr = nullptr;
+  EXPECT_CALL(*mock_distiller_service(),
+              ViewUrlIgnoreCache(service(), testing::_,
+                                 GURL("https://www.example.com/article")))
+      .WillOnce([&](dom_distiller::ViewRequestDelegate* delegate,
+                    std::unique_ptr<dom_distiller::DistillerPage> page,
+                    const GURL& url) {
+        delegate_ptr = delegate;
+        return std::make_unique<dom_distiller::ViewerHandle>(base::DoNothing());
+      });
+
+  service()->DistillPage(web_contents());
+
+  EXPECT_NE(nullptr, service()->GetViewerHandleForTesting());
+  ASSERT_NE(nullptr, delegate_ptr);
+
+  // Simulate DomDistiller finishing distillation with failure (no pages).
   dom_distiller::DistilledArticleProto proto;
   delegate_ptr->OnArticleReady(&proto);
 
   EXPECT_EQ(nullptr, service()->GetViewerHandleForTesting());
+  histograms.ExpectTotalCount("ReadAloud.Distillation.Duration", 1);
+  histograms.ExpectUniqueSample("ReadAloud.Distillation.Success", false, 1);
 }
 
 TEST_F(ReadAloudServiceTest, OnArticleUpdated) {

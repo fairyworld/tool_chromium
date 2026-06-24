@@ -191,6 +191,7 @@ class ReadAloudService : public KeyedService,
   raw_ptr<Profile> profile_;
   std::unique_ptr<dom_distiller::ViewerHandle> viewer_handle_;
   std::unique_ptr<Delegate> delegate_;
+  base::TimeTicks distillation_start_time_;
 
   base::WeakPtrFactory<ReadAloudService> weak_factory_{this};
 };
