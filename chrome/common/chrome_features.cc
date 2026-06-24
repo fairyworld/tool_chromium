@@ -800,6 +800,11 @@ const base::FeatureParam<int> kGlicWarmingDelayMs{
 const base::FeatureParam<int> kGlicWarmingJitterMs{
     &kGlicWarming, "glic-warming-jitter-ms", 10 * 1000};
 
+// Blocks prewarming if the device has less than this amount of physical memory.
+// If 0, memory is not checked.
+const base::FeatureParam<size_t> kGlicWarmingMinRequiredRamMb{
+    &kGlicWarming, "glic-warming-min-required-ram-mb", 0};
+
 BASE_FEATURE(kGlicTieredRollout, base::FEATURE_ENABLED_BY_DEFAULT);
 
 BASE_FEATURE(kGlicRollout, base::FEATURE_ENABLED_BY_DEFAULT);
