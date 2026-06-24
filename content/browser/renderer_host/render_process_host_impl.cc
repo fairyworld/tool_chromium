@@ -3399,14 +3399,12 @@ void RenderProcessHostImpl::OnImmersiveXrSessionStarted() {
   // TODO(https://crbug.com/397907158): Evaluate upgrading to CHECK.
   DUMP_WILL_BE_CHECK(!has_immersive_xr_session_);
   has_immersive_xr_session_ = true;
-  UpdateProcessPriority();
 }
 
 void RenderProcessHostImpl::OnImmersiveXrSessionStopped() {
   // TODO(https://crbug.com/397907158): Evaluate upgrading to CHECK.
   DUMP_WILL_BE_CHECK(has_immersive_xr_session_);
   has_immersive_xr_session_ = false;
-  UpdateProcessPriority();
 }
 
 bool RenderProcessHostImpl::HasImmersiveXrSessionForTesting() const {
