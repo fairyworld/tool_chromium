@@ -644,7 +644,8 @@ bool IsAimOmniboxEntrypointEnabled(
   // eligibility. Instead, it requires the 3p flag and local checks excluding
   // DSE.
   return base::FeatureList::IsEnabled(omnibox::kAim3pEntrypoint) &&
-         aim_eligibility_service->IsAimAllowedByFeatureAndPolicy();
+         aim_eligibility_service->IsAimAllowedByFeatureAndPolicy() &&
+         aim_eligibility_service->IsAimAllowedByThirdPartyPolicy();
 }
 
 bool IsAimStarterPackEnabled(
