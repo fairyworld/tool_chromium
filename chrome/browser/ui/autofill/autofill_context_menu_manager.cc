@@ -21,6 +21,7 @@
 #include "chrome/browser/metrics/variations/google_groups_manager_factory.h"
 #include "chrome/browser/password_manager/chrome_password_manager_client.h"
 #include "chrome/browser/password_manager/factories/password_counter_factory.h"
+#include "chrome/browser/personal_context/personal_context_enablement_service_factory.h"
 #include "chrome/browser/plus_addresses/plus_address_service_factory.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
@@ -336,12 +337,6 @@ void AutofillContextMenuManager::MaybeAddAutofillAtMemoryItem() {
     return;
   }
 
-  if (!IsAtMemoryFeatureEnabled(
-          GoogleGroupsManagerFactory::GetForBrowserContext(
-              rfh->GetBrowserContext()))) {
-    return;
-  }
-
   if (!ShouldShowAutofillContextMenu(params_)) {
     return;
   }
@@ -352,10 +347,8 @@ void AutofillContextMenuManager::MaybeAddAutofillAtMemoryItem() {
     return;
   }
 
-  if (autofill_driver->GetAutofillManager()
-          .client()
-          .GetPersonalContextEnablementState() ==
-      personal_context::PersonalContextEnablementState::kDisabledNotEligible) {
+  if (!MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                autofill_driver->GetAutofillClient())) {
     return;
   }
 

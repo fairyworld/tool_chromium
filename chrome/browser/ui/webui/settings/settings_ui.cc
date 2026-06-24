@@ -28,6 +28,7 @@
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/glic/public/glic_keyed_service.h"
 #include "chrome/browser/history_embeddings/history_embeddings_utils.h"
+#include "chrome/browser/metrics/variations/google_groups_manager_factory.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service.h"
 #include "chrome/browser/optimization_guide/optimization_guide_keyed_service_factory.h"
 #include "chrome/browser/password_manager/chrome_password_change_service.h"
@@ -692,7 +693,12 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
       PersonalContextEnablementServiceFactory::GetForProfile(profile);
   html_source->AddBoolean(
       "showSuggestionsFromGeminiSettings",
-      autofill::ShouldShowPersonalContextAutofillSetting(enablement_service));
+      autofill::ShouldShowPersonalContextAutofillSetting(
+          enablement_service,
+          subscription_eligibility::SubscriptionEligibilityServiceFactory::
+              GetForProfile(profile),
+          profile->GetPrefs(),
+          GoogleGroupsManagerFactory::GetForBrowserContext(profile)));
   html_source->AddBoolean(
       "showPersonalContextSettingsLink",
       enablement_service &&

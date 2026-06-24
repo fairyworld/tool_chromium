@@ -137,6 +137,7 @@ base::flat_set<int32_t> GetAutofillAtMemoryEligibleTiers() {
     case AtMemoryAction::kTriggerSearchUI:
     case AtMemoryAction::kAllowCustomizeAtMemoryShortcut:
     case AtMemoryAction::kShowIph:
+    case AtMemoryAction::kShowAutocompleteAtMemoryButton:
       return IsPersonalContextToggleOn(pref_service);
     case AtMemoryAction::kShowAtMemoryInSettings:
       return true;

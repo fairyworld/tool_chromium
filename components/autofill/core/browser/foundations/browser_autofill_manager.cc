@@ -1247,13 +1247,8 @@ void BrowserAutofillManager::OnAskForValuesToFillImpl(
     return;
   }
 
-  // TODO(crbug.com/519061643): Rely on central atMemory eligibility logic
-  // instead.
   if (IsAtMemoryTriggerSource(trigger_source) &&
-      (client().GetPersonalContextEnablementState() ==
-           personal_context::PersonalContextEnablementState::
-               kDisabledNotEligible ||
-       !IsAtMemoryFeatureEnabled(client().GetGoogleGroupsManager()))) {
+      !MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI, client())) {
     return;
   }
 
@@ -3486,7 +3481,8 @@ void BrowserAutofillManager::InitializeSuggestionGenerators(
     suggestion_generators_.push_back(
         std::make_unique<AutocompleteSuggestionGenerator>(
             client().GetAutocompleteHistoryManager()->GetProfileDatabase(),
-            IsAtMemoryFeatureEnabled(client().GetGoogleGroupsManager())));
+            MayPerformAtMemoryAction(AtMemoryAction::kTriggerSearchUI,
+                                     client())));
   }
   if (relevant_filling_products.contains(FillingProduct::kLoyaltyCard) &&
       client().GetValuablesDataManager()) {

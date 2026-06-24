@@ -16,6 +16,7 @@
 #include "base/test/metrics/user_action_tester.h"
 #include "base/test/run_until.h"
 #include "base/test/scoped_feature_list.h"
+#include "build/branding_buildflags.h"
 #include "chrome/app/chrome_command_ids.h"
 #include "chrome/browser/password_manager/chrome_password_manager_client.h"
 #include "chrome/browser/password_manager/chrome_webauthn_credentials_delegate_factory.h"
@@ -50,6 +51,8 @@
 #include "components/password_manager/core/browser/password_store/password_form_converters.h"
 #include "components/password_manager/core/browser/password_store/password_store_interface.h"
 #include "components/password_manager/core/common/password_manager_pref_names.h"
+#include "components/personal_context/core/mock_personal_context_enablement_service.h"
+#include "components/personal_context/core/personal_context_prefs.h"
 #include "components/plus_addresses/core/browser/grit/plus_addresses_strings.h"
 #include "components/plus_addresses/core/browser/plus_address_service.h"
 #include "components/plus_addresses/core/browser/plus_address_test_utils.h"
@@ -78,9 +81,11 @@ namespace {
 
 using ::testing::ElementsAre;
 using ::testing::IsEmpty;
+using ::testing::NiceMock;
 using ::testing::Not;
 using ::testing::Pointee;
 using ::testing::Property;
+using ::testing::Return;
 
 // Checks if the context menu model contains no password manager related
 // entries. `arg` must be of type `ui::SimpleMenuModel*`.
@@ -1076,12 +1081,31 @@ INSTANTIATE_TEST_SUITE_P(
       return info.param.test_name;
     });
 
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 class AtMemoryContextMenuManagerTest
     : public BaseAutofillContextMenuManagerTest {
  public:
   AtMemoryContextMenuManagerTest() {
     scoped_feature_list_.InitAndEnableFeature(features::kAutofillAtMemory);
   }
+
+  void SetUpOnMainThread() override {
+    BaseAutofillContextMenuManagerTest::SetUpOnMainThread();
+    personal_context::prefs::RegisterProfilePrefs(
+        autofill_client()->GetPrefs()->registry());
+    autofill_client()->GetPrefs()->SetBoolean(
+        personal_context::prefs::kPersonalContextInAutofillSettingsToggleStatus,
+        true);
+    ON_CALL(mock_personal_context_service_, GetEnablementState())
+        .WillByDefault(
+            Return(personal_context::PersonalContextEnablementState::kEnabled));
+    autofill_client()->set_personal_context_enablement_service(
+        &mock_personal_context_service_);
+  }
+
+ protected:
+  NiceMock<personal_context::MockPersonalContextEnablementService>
+      mock_personal_context_service_;
 
  private:
   base::test::ScopedFeatureList scoped_feature_list_;
@@ -1115,8 +1139,9 @@ IN_PROC_BROWSER_TEST_F(AtMemoryContextMenuManagerTest, AddAtMemoryFallback) {
 // AtMemory fallback is dropped.
 IN_PROC_BROWSER_TEST_F(AtMemoryContextMenuManagerTest,
                        AtMemoryFallbackDroppedWhenProfileNotEligible) {
-  autofill_client()->set_personal_context_enablement_state(
-      personal_context::PersonalContextEnablementState::kDisabledNotEligible);
+  EXPECT_CALL(mock_personal_context_service_, GetEnablementState())
+      .WillRepeatedly(Return(personal_context::PersonalContextEnablementState::
+                                 kDisabledNotEligible));
 
   autofill_context_menu_manager()->AppendItems();
   ASSERT_FALSE(ContainsAtMemoryFallback(*menu_model()));
@@ -1201,6 +1226,7 @@ IN_PROC_BROWSER_TEST_F(AtMemoryContextMenuManagerTest,
   autofill_context_menu_manager()->ExecuteCommand(
       IDC_CONTENT_CONTEXT_AUTOFILL_FALLBACK_AT_MEMORY);
 }
+#endif  // BUILDFLAG(GOOGLE_CHROME_BRANDING)
 
 }  // namespace
 }  // namespace autofill
