@@ -1606,6 +1606,10 @@ public abstract class ChromeFeatureList {
             newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "ntp_scroll_off_enabled", true);
     public static final BooleanCachedFeatureParam sAndroidBottomBarShowBottomBarOnGts =
             newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "show_bottom_bar_on_gts", false);
+    public static final BooleanCachedFeatureParam sAndroidBottomBarBypassGlicGeofencing =
+            newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "bypass_glic_geofencing", false);
+    public static final BooleanCachedFeatureParam sAndroidBottomBarBypassAimGeofencing =
+            newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "bypass_aim_geofencing", false);
 
     public static final IntCachedFeatureParam sBackgroundThreadPoolFieldTrialConfig =
             newIntCachedFeatureParam(BACKGROUND_THREAD_POOL_FIELD_TRIAL, "config", 4);
@@ -1952,6 +1956,8 @@ public abstract class ChromeFeatureList {
                     sAndroidAppIntegrationMultiDataSourceSkipSchemaCheck,
                     sAndroidAppRatingPromptBypassChecks,
                     sAndroidBottomBarAlwaysUseFilledGlicIcon,
+                    sAndroidBottomBarBypassAimGeofencing,
+                    sAndroidBottomBarBypassGlicGeofencing,
                     sAndroidBottomBarDisableOnNtp,
                     sAndroidBottomBarKeepAppMenuInToolbar,
                     sAndroidBottomBarKeepHomeButtonInToolbar,
