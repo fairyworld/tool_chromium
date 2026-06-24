@@ -1010,8 +1010,6 @@ BASE_FEATURE(kGlicActorAutofillPreClick, base::FEATURE_DISABLED_BY_DEFAULT);
 // This feature is also gated by |kGlicActorAutofill|.
 BASE_FEATURE(kGlicActorAutofillSectionLabel, base::FEATURE_DISABLED_BY_DEFAULT);
 
-BASE_FEATURE(kGlicDisableUnderlineAnimations,
-             base::FEATURE_DISABLED_BY_DEFAULT);
 BASE_FEATURE(kGlicGuestUrlPresets, base::FEATURE_DISABLED_BY_DEFAULT);
 const base::FeatureParam<int> kGlicGuestUrlPresetType{
     &kGlicGuestUrlPresets, "glic-guest-url-preset-type", 0};
