@@ -1826,14 +1826,10 @@ void ChromeContentBrowserClient::RenderProcessWillLaunch(
 
   WebRtcLoggingController::AttachToRenderProcessHost(host);
 
-  // The audio manager outlives the host, so it's safe to hand a raw pointer to
-  // it to the AudioDebugRecordingsHandler, which is owned by the host.
-  AudioDebugRecordingsHandler* audio_debug_recordings_handler =
-      new AudioDebugRecordingsHandler(profile);
   host->SetUserData(
       AudioDebugRecordingsHandler::kAudioDebugRecordingsHandlerKey,
       std::make_unique<base::UserDataAdapter<AudioDebugRecordingsHandler>>(
-          audio_debug_recordings_handler));
+          base::MakeRefCounted<AudioDebugRecordingsHandler>(profile)));
 
 #if BUILDFLAG(IS_ANDROID)
   // Register CrashMemoryMetricsCollector to report oom related metrics.
