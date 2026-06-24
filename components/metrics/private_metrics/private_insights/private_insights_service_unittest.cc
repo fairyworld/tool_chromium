@@ -4,6 +4,8 @@
 
 #include "components/metrics/private_metrics/private_insights/private_insights_service.h"
 
+#include <atomic>
+
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/run_until.h"
 #include "base/test/scoped_feature_list.h"
@@ -19,6 +21,24 @@ namespace private_insights {
 
 class PrivateInsightsServiceTest : public testing::Test {
  protected:
+  void SetUp() override {
+    mock_run_federated_computation_call_count_ = 0;
+    PrivateInsightsService::SetRunFederatedComputationForTesting(
+        &MockRunFederatedComputation);
+  }
+
+  void TearDown() override {
+    PrivateInsightsService::SetRunFederatedComputationForTesting(nullptr);
+  }
+
+  static bool MockRunFederatedComputation(
+      const PrivateInsightsService::FederatedComputationParams& params) {
+    mock_run_federated_computation_call_count_++;
+    return true;
+  }
+
+  static inline std::atomic<int> mock_run_federated_computation_call_count_ = 0;
+
   base::test::TaskEnvironment task_environment_{
       base::test::TaskEnvironment::TimeSource::MOCK_TIME};
 };
@@ -45,6 +65,7 @@ TEST_F(PrivateInsightsServiceTest,
   // Wait for task execution to complete.
   ASSERT_TRUE(
       base::test::RunUntil([&]() { return !service.is_upload_running_; }));
+  EXPECT_EQ(mock_run_federated_computation_call_count_, 1);
 
   histogram_tester.ExpectTotalCount(kUploadPendingTimeHistogram, 1);
   histogram_tester.ExpectTotalCount(kUploadTimeHistogram, 1);
@@ -55,6 +76,10 @@ TEST_F(PrivateInsightsServiceTest,
       kTriggerUploadOutcomeHistogram,
       PrivateInsightsService::TriggerUploadOutcome::kTaskPosted, 2);
   histogram_tester.ExpectTotalCount(kTriggerUploadOutcomeHistogram, 3);
+
+  ASSERT_TRUE(
+      base::test::RunUntil([&]() { return !service.is_upload_running_; }));
+  EXPECT_EQ(mock_run_federated_computation_call_count_, 2);
 }
 
 TEST_F(PrivateInsightsServiceTest, MetricsChoiceCoupling) {

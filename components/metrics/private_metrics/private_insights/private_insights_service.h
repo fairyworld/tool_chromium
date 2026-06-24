@@ -5,6 +5,8 @@
 #ifndef COMPONENTS_METRICS_PRIVATE_METRICS_PRIVATE_INSIGHTS_PRIVATE_INSIGHTS_SERVICE_H_
 #define COMPONENTS_METRICS_PRIVATE_METRICS_PRIVATE_INSIGHTS_PRIVATE_INSIGHTS_SERVICE_H_
 
+#include <string>
+
 #include "base/component_export.h"
 #include "base/files/file_path.h"
 #include "base/gtest_prod_util.h"
@@ -21,6 +23,12 @@
 class PrefService;
 
 namespace private_insights {
+
+class FcpEventPublisher;
+class FcpFiles;
+class FcpFlags;
+class FcpLogManager;
+class FcpSimpleTaskEnvironment;
 
 class PrivateInsightsService;
 
@@ -43,6 +51,20 @@ inline constexpr char kUploadTimeHistogram[] =
 class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
     : public KeyedService {
  public:
+  struct FederatedComputationParams {
+    raw_ptr<FcpSimpleTaskEnvironment> task_env;
+    raw_ptr<FcpEventPublisher> event_publisher;
+    raw_ptr<FcpFiles> files;
+    raw_ptr<FcpLogManager> log_manager;
+    raw_ptr<FcpFlags> flags;
+    std::string api_key;
+    std::string session_name;
+    std::string population_name;
+  };
+
+  using RunFederatedComputationFunc =
+      bool (*)(const FederatedComputationParams& params);
+
   // LINT.IfChange(PrivateInsightsTriggerUploadOutcome)
   enum class TriggerUploadOutcome {
     kSkippedAlreadyRunning = 0,
@@ -64,6 +86,12 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
   // KeyedService:
   void Shutdown() override;
 
+  static void SetRunFederatedComputationForTesting(
+      RunFederatedComputationFunc func) {
+    run_federated_computation_func =
+        func ? func : &PrivateInsightsService::RunFederatedComputation;
+  }
+
  private:
   void OnMetricsChoiceChanged();
 
@@ -71,6 +99,10 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
 
   // Runs on a background thread pool sequence (allows blocking).
   static bool UploadBlocking(base::TimeTicks trigger_time);
+
+  static bool RunFederatedComputation(const FederatedComputationParams& params);
+
+  static RunFederatedComputationFunc run_federated_computation_func;
 
   void OnUploadComplete(bool result);
 

@@ -25,6 +25,7 @@ component("private_insights") {
     ":fcp_log_manager",
     ":fcp_simple_task_environment",
     "//base",
+    "//google_apis",
     "//third_party/federated_compute:fl_runner",
   ]
 }
