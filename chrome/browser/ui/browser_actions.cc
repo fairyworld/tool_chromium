@@ -41,6 +41,7 @@
 #include "chrome/common/webui_url_constants.h"
 #include "components/omnibox/browser/ai_mode_button_config.h"
 #include "components/omnibox/browser/ai_mode_button_service.h"
+#include "content/public/common/page_zoom.h"
 #if BUILDFLAG(IS_MAC)
 #include "chrome/browser/global_keyboard_shortcuts_mac.h"
 #include "chrome/browser/ui/browser_commands_mac.h"
@@ -2731,6 +2732,28 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               },
               bwi))
           .SetActionId(kActionFocusWebContentsPane)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::Zoom(bwi, content::PAGE_ZOOM_IN);
+              },
+              bwi))
+          .SetActionId(kActionZoomPlus)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::Zoom(bwi, content::PAGE_ZOOM_OUT);
+              },
+              bwi))
+          .SetActionId(kActionZoomMinus)
           .Build());
 }
 
