@@ -231,6 +231,7 @@ ${this.voiceSearchCoherenceAnySearchboxExperimentEnabled_ &&
             .receivedSpeech="${this.voiceSearchReceivedSpeech_}">
         </search-animated-glow>
       ` : ''}
+      <!-- Pass metricSource synchronously to avoid microtask race in unit tests. -->
       <cr-composebox-voice-search id="voiceSearch"
           in-voice-search-mode
           @voice-search-cancel="${this.onVoiceSearchCancel_}"
@@ -247,7 +248,8 @@ ${this.voiceSearchCoherenceAnySearchboxExperimentEnabled_ &&
           .idleTimeout="${this.voiceIdleTimeoutMs_}"
           .liveTranscriptEnabled="${
             this.voiceSearchCoherenceSearchboxWithLiveTranscriptionEnabled_}"
-          .submitStopButtonsEnabled="${true}">
+          .submitStopButtonsEnabled="${true}"
+          .metricSource="${'NTP_REALBOX'}">
       </cr-composebox-voice-search>
     </div>
   </dialog>
