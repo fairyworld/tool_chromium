@@ -66,11 +66,11 @@ void HttpAuthManagerImpl::SetObserverAndDeliverCredentials(
     authenticator_->Cancel();
   }
   observer_ = observer;
+  observed_origin_ = url::Origin::Create(observed_form.url);
 
-  if (!client_->IsFillingEnabled(observed_form.url)) {
+  if (!client_->IsFillingEnabled(observed_origin_)) {
     return;
   }
-  observed_origin_ = url::Origin::Create(observed_form.url);
   // Initialize the form manager.
   form_manager_ = std::make_unique<PasswordFormManager>(
       client_, PasswordFormDigest(observed_form), nullptr /* form_fetcher */,
@@ -92,7 +92,7 @@ void HttpAuthManagerImpl::Autofill(const PasswordForm& preferred_match,
     return;
   }
 
-  if (!client_->IsFillingEnabled(form_manager_->GetURL())) {
+  if (!client_->IsFillingEnabled(observed_origin_, form_manager_->GetURL())) {
     return;
   }
 

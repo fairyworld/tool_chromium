@@ -145,7 +145,7 @@ void ActorLoginCredentialFiller::AttemptLogin(
 
   // The check is added separately in order to differentiate between having
   // no signin form on the page and filling being disallowed.
-  if (!client_->IsFillingEnabled(origin_.GetURL())) {
+  if (!client_->IsFillingEnabled(origin_)) {
     LogStatus(logger.get(), Logger::STRING_ACTOR_LOGIN_FILLING_NOT_ALLOWED);
     BuildAttemptLoginOutcome(AttemptLoginOutcomeMqls::kFillingNotAllowed);
     std::move(callback_).Run(

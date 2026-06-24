@@ -138,7 +138,11 @@ BASE_FEATURE(kMarkAllCredentialsAsLeaked, base::FEATURE_DISABLED_BY_DEFAULT);
 
 #if BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kOtpPhishGuard, base::FEATURE_ENABLED_BY_DEFAULT);
+#endif  // BUILDFLAG(IS_ANDROID)
 
+BASE_FEATURE(kPasswordBlockOpaqueOrigins, base::FEATURE_ENABLED_BY_DEFAULT);
+
+#if BUILDFLAG(IS_ANDROID)
 BASE_FEATURE(kPassDeletionOriginToAndroidBackend,
              base::FEATURE_DISABLED_BY_DEFAULT);
 

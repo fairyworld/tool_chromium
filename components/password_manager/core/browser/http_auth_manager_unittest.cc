@@ -40,6 +40,7 @@
 #include "components/prefs/testing_pref_service.h"
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "url/origin.h"
 
 using base::TestMockTimeTaskRunner;
 using testing::_;
@@ -61,7 +62,10 @@ class MockPasswordManagerClient : public StubPasswordManagerClient {
               IsSavingAndFillingEnabled,
               (const GURL&),
               (const, override));
-  MOCK_METHOD(bool, IsFillingEnabled, (const GURL&), (const, override));
+  MOCK_METHOD(bool,
+              IsFillingEnabled,
+              (const url::Origin&, base::optional_ref<const GURL>),
+              (const, override));
   MOCK_METHOD(const GURL&, GetLastCommittedURL, (), (const, override));
   MOCK_METHOD(void,
               AutofillHttpAuth,

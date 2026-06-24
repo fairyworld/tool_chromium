@@ -350,7 +350,8 @@ class BaseAutofillContextMenuManagerTest : public InProcessBrowserTest {
     password_manager->OnPasswordFormsParsed(password_manager_driver(), {form});
     // First parsing is done for filling case. Password forms are only parsed
     // when filling is enabled.
-    if (password_manager_client()->IsFillingEnabled(GURL(form.url()))) {
+    if (password_manager_client()->IsFillingEnabled(
+            url::Origin::Create(form.url()))) {
       // Wait until `form` gets parsed.
       EXPECT_TRUE(base::test::RunUntil([&]() {
         return password_manager->GetPasswordFormCache()->GetPasswordForm(

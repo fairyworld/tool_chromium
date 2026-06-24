@@ -277,10 +277,18 @@ bool ChromePasswordManagerClient::IsSavingAndFillingEnabled(
   return settings_service &&
          settings_service->IsSettingEnabled(
              PasswordManagerSetting::kOfferToSavePasswords) &&
-         !IsOffTheRecord() && IsFillingEnabled(url);
+         !IsOffTheRecord() && IsFillingEnabled(url::Origin::Create(url));
 }
 
-bool ChromePasswordManagerClient::IsFillingEnabled(const GURL& url) const {
+bool ChromePasswordManagerClient::IsFillingEnabled(
+    const url::Origin& origin,
+    base::optional_ref<const GURL> url) const {
+  if (origin.opaque() &&
+      base::FeatureList::IsEnabled(
+          password_manager::features::kPasswordBlockOpaqueOrigins)) {
+    return false;
+  }
+
   const Profile* profile =
       Profile::FromBrowserContext(web_contents()->GetBrowserContext());
   // Guest profiles don't have PasswordStore at all, so filling should be
@@ -300,7 +308,13 @@ bool ChromePasswordManagerClient::IsFillingEnabled(const GURL& url) const {
     password_manager::BrowserSavePasswordProgressLogger logger(log_manager);
     logger.LogBoolean(Logger::STRING_SSL_ERRORS_PRESENT, ssl_errors);
   }
-  return !ssl_errors && IsPasswordManagementEnabledForCurrentPage(url);
+
+  if (url && !base::FeatureList::IsEnabled(
+                 password_manager::features::kPasswordBlockOpaqueOrigins)) {
+    return !ssl_errors && IsPasswordManagementEnabledForCurrentPage(*url);
+  }
+  return !ssl_errors &&
+         IsPasswordManagementEnabledForCurrentPage(origin.GetURL());
 }
 
 bool ChromePasswordManagerClient::IsFieldFilledWithOtp(

@@ -140,7 +140,13 @@ BASE_DECLARE_FEATURE(kMarkAllCredentialsAsLeaked);
 #if BUILDFLAG(IS_ANDROID)
 // Enables OTP phishing checks.
 BASE_DECLARE_FEATURE(kOtpPhishGuard);
+#endif  // BUILDFLAG(IS_ANDROID)
 
+// PasswordManagerClient::IsFillingEnabled returns `false` for opaque origins.
+// Intended as a kill-switch.
+BASE_DECLARE_FEATURE(kPasswordBlockOpaqueOrigins);
+
+#if BUILDFLAG(IS_ANDROID)
 // When enabled, DeletionOrigin is sent to Android Backend for password
 // deletions.
 BASE_DECLARE_FEATURE(kPassDeletionOriginToAndroidBackend);

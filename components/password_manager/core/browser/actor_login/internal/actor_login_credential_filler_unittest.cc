@@ -32,6 +32,7 @@
 #include "components/password_manager/core/browser/mock_password_manager.h"
 #include "components/password_manager/core/browser/password_form.h"
 #include "components/password_manager/core/browser/password_form_manager.h"
+#include "components/password_manager/core/browser/password_manager_client.h"
 #include "components/password_manager/core/browser/password_save_manager_impl.h"
 #include "components/password_manager/core/browser/stub_password_manager_client.h"
 #include "components/password_manager/core/browser/stub_password_manager_driver.h"
@@ -149,7 +150,10 @@ class MockPasswordManagerClient
               GetPasswordManager,
               (),
               (const, override));
-  MOCK_METHOD(bool, IsFillingEnabled, (const GURL&), (const, override));
+  MOCK_METHOD(bool,
+              IsFillingEnabled,
+              (const url::Origin&, base::optional_ref<const GURL>),
+              (const, override));
   MOCK_METHOD(bool,
               IsReauthBeforeFillingRequired,
               (DeviceAuthenticator*),
@@ -217,7 +221,7 @@ class ActorLoginCredentialFillerTest : public ::testing::TestWithParam<bool> {
 
     ON_CALL(mock_password_manager_, GetClient())
         .WillByDefault(Return(&mock_client_));
-    ON_CALL(mock_client_, IsFillingEnabled).WillByDefault(Return(true));
+    ON_CALL(mock_client_, IsFillingEnabled(_, _)).WillByDefault(Return(true));
     ON_CALL(mock_client_, IsReauthBeforeFillingRequired)
         .WillByDefault(Return(false));
     ON_CALL(mock_client_, GetAffiliationService)
@@ -2155,7 +2159,7 @@ TEST_P(ActorLoginCredentialFillerTest, FillingIsDisabled) {
   const Credential credential =
       CreateTestCredential(u"username", origin.GetURL(), origin);
 
-  EXPECT_CALL(mock_client_, IsFillingEnabled(origin.GetURL()))
+  EXPECT_CALL(mock_client_, IsFillingEnabled(origin, _))
       .WillOnce(Return(false));
 
   base::MockCallback<LoginStatusResultOrErrorReply> mock_callback;

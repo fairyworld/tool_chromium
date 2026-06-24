@@ -60,6 +60,7 @@
 #include "ui/base/ui_base_features.h"
 #include "ui/color/color_id.h"
 #include "ui/menus/simple_menu_model.h"
+#include "url/origin.h"
 
 #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
 #include "components/plus_addresses/core/browser/resources/vector_icons.h"
@@ -449,8 +450,8 @@ bool AutofillContextMenuManager::ShouldAddPlusAddressManualFallbackItem(
 }
 
 bool AutofillContextMenuManager::ShouldAddPasswordsManualFallbackItem(
-    ContentPasswordManagerDriver& password_manager_driver) {
-  if (!password_manager_driver.CanShowAutofillUi()) {
+    ContentPasswordManagerDriver& driver) {
+  if (!driver.CanShowAutofillUi()) {
     return false;
   }
   // Password suggestions should not be triggered on text areas.
@@ -460,13 +461,12 @@ bool AutofillContextMenuManager::ShouldAddPasswordsManualFallbackItem(
 
   if (base::FeatureList::IsEnabled(
           password_manager::features::kPasswordManualFallbackSecurityChecks) &&
-      (!password_manager_driver.HasValidURL(/*may_kill_renderer*/ false) ||
-       !password_manager_driver.IsRenderFrameHostSupported())) {
+      (!driver.HasValidURL(/*may_kill_renderer*/ false) ||
+       !driver.IsRenderFrameHostSupported())) {
     return false;
   }
-  return password_manager_driver.GetPasswordManager()
-      ->GetClient()
-      ->IsFillingEnabled(password_manager_driver.GetLastCommittedURL());
+  return driver.GetPasswordManager()->GetClient()->IsFillingEnabled(
+      driver.GetLastCommittedOrigin(), driver.GetLastCommittedURL());
 }
 
 void AutofillContextMenuManager::AddPasswordsManualFallbackItems(
