@@ -6922,6 +6922,24 @@ should be able to be added at any place in this file.
   </description>
 </action>
 
+<action name="AutofillAddressesAdded">
+  <owner>josefraska@google.com</owner>
+  <owner>chrome-autofill-team@google.com</owner>
+  <description>
+    Recorded when the user adds an address via the Contact info settings page on
+    Android.
+  </description>
+</action>
+
+<action name="AutofillAddressesEdited">
+  <owner>josefraska@google.com</owner>
+  <owner>chrome-autofill-team@google.com</owner>
+  <description>
+    Recorded when the user edits an address via the Contact info settings page
+    on Android.
+  </description>
+</action>
+
 <action name="AutofillAddressesViewed">
   <owner>battre@chromium.org</owner>
   <owner>osaul@google.com</owner>
