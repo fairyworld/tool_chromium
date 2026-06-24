@@ -4415,6 +4415,9 @@ To continue from your computer, switch to <ph name="OTHER_EMAIL">$2<ex>john.doe@
       <message name="IDS_IOS_LEVEL_UP_SIGNED_OUT_SNACKBAR_ACTION" desc="Action button title on the snackbar message displayed when a user attempts to use Level Up without being signed in, allowing them to sign in. [iOS only]">
         Sign in
       </message>
+      <message name="IDS_IOS_LEVEL_UP_SNACKBAR_ACTION" desc="The snackbar action link button to go to the Level Up feature screen. [iOS only]">
+        Go to Level Up
+      </message>
       <message name="IDS_IOS_LEVEL_UP_STAT_PASSWORDS_VERIFIED" desc="Title for the passwords verified statistic card. [iOS only]">
         {count, plural,
           =1 {1 password instantly verified}
@@ -4451,6 +4454,42 @@ To continue from your computer, switch to <ph name="OTHER_EMAIL">$2<ex>john.doe@
         {count, plural,
           =1 {Complete 1 more task to level up}
           other {Complete {count} more tasks to level up}}
+      </message>
+      <message name="IDS_IOS_LEVEL_UP_TASK_COMPLETED_AI_SEARCH" desc="Completion snackbar message for the AI Search task. [iOS only]">
+        Search with AI Mode completed!
+      </message>
+      <message name="IDS_IOS_LEVEL_UP_TASK_COMPLETED_AUTOFILL" desc="Completion snackbar message for the Autofill task. [iOS only]">
+        Passwords and Autofill completed!
+      </message>
+      <message name="IDS_IOS_LEVEL_UP_TASK_COMPLETED_CAMERA_SEARCH" desc="Completion snackbar message for the Camera Search task. [iOS only]">
+        Search with camera completed!
+      </message>
+      <message name="IDS_IOS_LEVEL_UP_TASK_COMPLETED_GEMINI" desc="Completion snackbar message for the Gemini task. [iOS only]">
+        Use Gemini in Chrome completed!
+      </message>
+      <message name="IDS_IOS_LEVEL_UP_TASK_COMPLETED_INCOGNITO" desc="Completion snackbar message for the Incognito task. [iOS only]">
+        Go Incognito completed!
+      </message>
+      <message name="IDS_IOS_LEVEL_UP_TASK_COMPLETED_LENS_SEARCH" desc="Completion snackbar message for the Lens Search task. [iOS only]">
+        Google Lens completed!
+      </message>
+      <message name="IDS_IOS_LEVEL_UP_TASK_COMPLETED_PASSWORD_CHECKUP" desc="Completion snackbar message for the Password Checkup task. [iOS only]">
+        Password checkup completed!
+      </message>
+      <message name="IDS_IOS_LEVEL_UP_TASK_COMPLETED_PAYMENT_METHODS" desc="Completion snackbar message for the Payment Methods task. [iOS only]">
+        Manage payment methods completed!
+      </message>
+      <message name="IDS_IOS_LEVEL_UP_TASK_COMPLETED_PIN_TABS" desc="Completion snackbar message for the Pin Tabs task. [iOS only]">
+        Pin tabs completed!
+      </message>
+      <message name="IDS_IOS_LEVEL_UP_TASK_COMPLETED_QUICK_DELETE" desc="Completion snackbar message for the Quick Delete task. [iOS only]">
+        Quick delete completed!
+      </message>
+      <message name="IDS_IOS_LEVEL_UP_TASK_COMPLETED_SAFE_BROWSING" desc="Completion snackbar message for the Safe Browsing task. [iOS only]">
+        Enhanced Safe Browsing completed!
+      </message>
+      <message name="IDS_IOS_LEVEL_UP_TASK_COMPLETED_TAB_GROUPS" desc="Completion snackbar message for the Tab Groups task. [iOS only]">
+        Tab Groups completed!
       </message>
       <message name="IDS_IOS_LEVEL_UP_TURN_OFF_PROGRESS_UPDATES" desc="The context menu item to turn off Level Up progress updates. [iOS only]">
         Turn off progress updates
