@@ -397,12 +397,11 @@ static_library("test_support") {
     sources += [
       "../browser/ui/webui/extensions/extension_settings_test_base.cc",
       "../browser/ui/webui/extensions/extension_settings_test_base.h",
-      "../common/extensions/manifest_tests/chrome_manifest_test.cc",
-      "../common/extensions/manifest_tests/chrome_manifest_test.h",
     ]
 
     public_deps += [
       "//chrome/browser/extensions:test_support",
+      "//chrome/common/extensions:test_support",
       "//components/custom_handlers:test_support",
       "//extensions:test_support",
     ]

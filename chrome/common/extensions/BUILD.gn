@@ -118,6 +118,25 @@ source_set("extensions") {
   }
 }
 
+source_set("test_support") {
+  testonly = true
+
+  sources = [
+    "manifest_tests/chrome_manifest_test.cc",
+    "manifest_tests/chrome_manifest_test.h",
+  ]
+
+  deps = [
+    "//base",
+    "//chrome/common:constants",
+    "//components/version_info",
+    "//extensions:test_support",
+    "//extensions/buildflags",
+    "//extensions/common",
+    "//testing/gtest",
+  ]
+}
+
 source_set("unit_tests") {
   testonly = true
 
@@ -195,6 +214,7 @@ source_set("unit_tests") {
   deps = [
     ":extension_features_unittest",
     ":extensions",
+    ":test_support",
     "//base",
     "//chrome/test:test_support",
     "//extensions:test_support",
