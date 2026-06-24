@@ -1001,6 +1001,14 @@ inline constexpr char kTabSearchPinnedToTabstripMigrationComplete2[] =
 inline constexpr char kDefaultBrowserInfobarLastDeclined[] =
     "browser.default_browser_infobar_last_declined";
 
+#if BUILDFLAG(IS_CHROMEOS)
+// Deprecated 06/2026.
+inline constexpr char kOobeGuestMetricsReportingLevel[] =
+    "oobe.guest_metrics_reporting_level";
+inline constexpr char kMetricsUserReportingLevel[] =
+    "metrics.user_reporting_level";
+#endif  // BUILDFLAG(IS_CHROMEOS)
+
 // Register local state used only for migration (clearing or moving to a new
 // key).
 void RegisterLocalStatePrefsForMigration(PrefRegistrySimple* registry) {
@@ -1104,6 +1112,11 @@ void RegisterLocalStatePrefsForMigration(PrefRegistrySimple* registry) {
 
   // Deprecated 05/2026.
   registry->RegisterStringPref(kHttpCacheFinchExperimentGroups, "");
+
+#if BUILDFLAG(IS_CHROMEOS)
+  // Deprecated 06/2026.
+  registry->RegisterIntegerPref(kOobeGuestMetricsReportingLevel, 0);
+#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 // Register prefs used only for migration (clearing or moving to a new key).
@@ -1349,6 +1362,11 @@ void RegisterProfilePrefsForMigration(
 
   // Deprecated 06/2026.
   registry->RegisterInt64Pref(kDefaultBrowserInfobarLastDeclined, 0);
+
+#if BUILDFLAG(IS_CHROMEOS)
+  // Deprecated 06/2026.
+  registry->RegisterIntegerPref(kMetricsUserReportingLevel, 0);
+#endif  // BUILDFLAG(IS_CHROMEOS)
 }
 
 }  // namespace
@@ -2366,6 +2384,11 @@ void MigrateObsoleteLocalStatePrefs(PrefService* local_state) {
   // Added 05/2026
   local_state->ClearPref(kHttpCacheFinchExperimentGroups);
 
+#if BUILDFLAG(IS_CHROMEOS)
+  // Added 06/2026.
+  local_state->ClearPref(kOobeGuestMetricsReportingLevel);
+#endif  // BUILDFLAG(IS_CHROMEOS)
+
   // Please don't delete the following line. It is used by PRESUBMIT.py.
   // END_MIGRATE_OBSOLETE_LOCAL_STATE_PREFS
 
@@ -2628,6 +2651,11 @@ void MigrateObsoleteProfilePrefs(PrefService* profile_prefs,
 #if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
   profile_prefs->ClearPref(kDefaultBrowserInfobarLastDeclined);
 #endif
+
+#if BUILDFLAG(IS_CHROMEOS)
+  // Added 06/2026.
+  profile_prefs->ClearPref(kMetricsUserReportingLevel);
+#endif  // BUILDFLAG(IS_CHROMEOS)
 
   // Please don't delete the following line. It is used by PRESUBMIT.py.
   // END_MIGRATE_OBSOLETE_PROFILE_PREFS
