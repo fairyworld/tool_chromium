@@ -256,13 +256,14 @@ void Request::RequestToken(
     RequestTokenCallback callback) {
   // This call is coming from Mojo, so we have no navigation handle.
   RequestToken(std::move(idp_get_params_ptrs), requirement,
-               /*navigation_handle=*/nullptr, std::move(callback));
+               /*navigation_handle=*/nullptr, GURL(), std::move(callback));
 }
 
 void Request::RequestToken(
     std::vector<IdentityProviderGetParametersPtr> idp_get_params_ptrs,
     MediationRequirement requirement,
     NavigationHandle* navigation_handle,
+    const GURL& intercepted_url,
     RequestTokenCallback callback) {
   if (ShouldTerminateRequest(idp_get_params_ptrs, requirement,
                              navigation_handle)) {
@@ -328,7 +329,7 @@ void Request::RequestToken(
        DidNavigationHandleHaveActivation(navigation_handle)) ||
       render_frame_host().HasTransientUserActivation();
   if (navigation_handle) {
-    intercepted_url_ = navigation_handle->GetURL();
+    intercepted_url_ = intercepted_url;
   }
 
   // Store the previous `idp_order_` value from this class. Note that this is {}

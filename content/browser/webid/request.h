@@ -116,6 +116,7 @@ class CONTENT_EXPORT Request
           idp_get_params_ptrs,
       MediationRequirement requirement,
       NavigationHandle* navigation_handle,
+      const GURL& intercepted_url,
       RequestTokenCallback);
 
   // blink::mojom::FederatedAuthRequest:
