@@ -228,4 +228,274 @@ TEST_F(DeclarativePerformanceObserverStoreTest, DatabaseSchemaConfigured) {
   EXPECT_TRUE(index_ok);
 }
 
+TEST_F(DeclarativePerformanceObserverStoreTest, Enforces640KBFIFOQuota) {
+  const url::Origin kOrigin = url::Origin::Create(GURL("https://example.com/"));
+  auto store = CreateStoreInMemory();
+
+  base::RunLoop run_loop_limit;
+  store->SetQuotaLimitForTesting(4096, run_loop_limit.QuitClosure());
+  run_loop_limit.Run();
+
+  base::RunLoop run_loop1;
+  store->SetEarlyFailurePolicy(kOrigin, true, run_loop1.QuitClosure());
+  run_loop1.Run();
+
+  base::DictValue sample;
+  sample.Set("entryType", "navigation");
+  sample.Set("name", kOrigin.GetURL().spec());
+  sample.Set("padding", std::string(200, 'x'));
+
+  for (int i = 0; i < 20; ++i) {
+    base::DictValue report = sample.Clone();
+    report.Set("index", i);
+    store->StoreEarlyFailureReport(kOrigin, std::move(report));
+  }
+
+  base::ListValue reports;
+  base::RunLoop run_loop3;
+  store->TakeEarlyFailureReports(
+      kOrigin, base::BindOnce(
+                   [](base::ListValue* out, base::OnceClosure quit,
+                      base::ListValue res) {
+                     *out = std::move(res);
+                     std::move(quit).Run();
+                   },
+                   &reports, run_loop3.QuitClosure()));
+  run_loop3.Run();
+
+  EXPECT_GE(reports.size(), 13u);
+  EXPECT_LE(reports.size(), 15u);
+
+  // Verify FIFO eviction order: older entries (lower index) should be deleted
+  // first. The remaining entries should have consecutive indexes ending at 19.
+  int expected_start_index = 20 - reports.size();
+  for (size_t i = 0; i < reports.size(); ++i) {
+    const base::DictValue* dict = reports[i].GetIfDict();
+    ASSERT_TRUE(dict);
+    std::optional<int> idx = dict->FindInt("index");
+    ASSERT_TRUE(idx);
+    EXPECT_EQ(*idx, static_cast<int>(expected_start_index + i));
+  }
+}
+
+TEST_F(DeclarativePerformanceObserverStoreTest, ClearData) {
+  const url::Origin kOrigin = url::Origin::Create(GURL("https://example.com/"));
+  auto store = CreateStore();
+
+  base::RunLoop run_loop1;
+  store->SetEarlyFailurePolicy(kOrigin, true, run_loop1.QuitClosure());
+  run_loop1.Run();
+
+  base::DictValue sample;
+  sample.Set("entryType", "navigation");
+
+  base::RunLoop run_loop2;
+  store->StoreEarlyFailureReport(kOrigin, sample.Clone(),
+                                 run_loop2.QuitClosure());
+  run_loop2.Run();
+
+  base::RunLoop run_loop3;
+  store->ClearAllData(run_loop3.QuitClosure());
+  run_loop3.Run();
+
+  EXPECT_FALSE(store->HasEarlyFailurePolicy(kOrigin));
+
+  base::ListValue reports;
+  base::RunLoop run_loop4;
+  store->TakeEarlyFailureReports(
+      kOrigin, base::BindOnce(
+                   [](base::ListValue* out, base::OnceClosure quit,
+                      base::ListValue res) {
+                     *out = std::move(res);
+                     std::move(quit).Run();
+                   },
+                   &reports, run_loop4.QuitClosure()));
+  run_loop4.Run();
+  EXPECT_TRUE(reports.empty());
+}
+
+TEST_F(DeclarativePerformanceObserverStoreTest, ClearSelectiveData) {
+  const url::Origin kOrigin = url::Origin::Create(GURL("https://example.com/"));
+  const url::Origin kOtherOrigin =
+      url::Origin::Create(GURL("https://other.com/"));
+  auto store = CreateStore();
+
+  {
+    base::RunLoop run_loop1;
+    store->SetEarlyFailurePolicy(kOrigin, true, run_loop1.QuitClosure());
+    run_loop1.Run();
+  }
+
+  {
+    base::RunLoop run_loop2;
+    store->SetEarlyFailurePolicy(kOtherOrigin, true, run_loop2.QuitClosure());
+    run_loop2.Run();
+  }
+
+  base::DictValue sample;
+  sample.Set("entryType", "navigation");
+
+  {
+    base::RunLoop run_loop_store1;
+    store->StoreEarlyFailureReport(kOrigin, sample.Clone(),
+                                   run_loop_store1.QuitClosure());
+    run_loop_store1.Run();
+  }
+
+  {
+    base::RunLoop run_loop_store2;
+    store->StoreEarlyFailureReport(kOtherOrigin, sample.Clone(),
+                                   run_loop_store2.QuitClosure());
+    run_loop_store2.Run();
+  }
+
+  EXPECT_TRUE(store->HasEarlyFailurePolicy(kOrigin));
+  EXPECT_TRUE(store->HasEarlyFailurePolicy(kOtherOrigin));
+
+  {
+    base::RunLoop run_loop3;
+    store->ClearDataForOrigin(kOrigin, run_loop3.QuitClosure());
+    run_loop3.Run();
+  }
+
+  EXPECT_FALSE(store->HasEarlyFailurePolicy(kOrigin));
+  EXPECT_TRUE(store->HasEarlyFailurePolicy(kOtherOrigin));
+
+  // kOrigin's reports should be deleted:
+  {
+    base::ListValue reports;
+    base::RunLoop run_loop_take1;
+    store->TakeEarlyFailureReports(
+        kOrigin, base::BindOnce(
+                     [](base::ListValue* out, base::OnceClosure quit,
+                        base::ListValue res) {
+                       *out = std::move(res);
+                       std::move(quit).Run();
+                     },
+                     &reports, run_loop_take1.QuitClosure()));
+    run_loop_take1.Run();
+    EXPECT_TRUE(reports.empty());
+  }
+
+  // kOtherOrigin's reports should still be present:
+  {
+    base::ListValue reports;
+    base::RunLoop run_loop_take2;
+    store->TakeEarlyFailureReports(
+        kOtherOrigin, base::BindOnce(
+                          [](base::ListValue* out, base::OnceClosure quit,
+                             base::ListValue res) {
+                            *out = std::move(res);
+                            std::move(quit).Run();
+                          },
+                          &reports, run_loop_take2.QuitClosure()));
+    run_loop_take2.Run();
+    EXPECT_EQ(reports.size(), 1u);
+  }
+}
+
+TEST_F(DeclarativePerformanceObserverStoreTest,
+       RejectsReportExceedingQuotaLimit) {
+  const url::Origin kOrigin = url::Origin::Create(GURL("https://example.com/"));
+  auto store = CreateStoreInMemory();
+  base::HistogramTester histogram_tester;
+
+  // Set quota to 100 bytes for testing.
+  base::RunLoop run_loop_quota;
+  store->SetQuotaLimitForTesting(100, run_loop_quota.QuitClosure());
+  run_loop_quota.Run();
+
+  // Create an oversized report (150 bytes).
+  base::DictValue oversized_report;
+  oversized_report.Set("data", std::string(150, 'a'));
+
+  base::RunLoop run_loop_store;
+  store->StoreEarlyFailureReport(kOrigin, oversized_report.Clone(),
+                                 run_loop_store.QuitClosure());
+  run_loop_store.Run();
+
+  // Verify that the size violation UMA is recorded (kReportTooLarge = 4).
+  histogram_tester.ExpectUniqueSample(
+      "Storage.DeclarativePerformanceObserver.StoreReportResult",
+      /*sample=*/4, /*expected_bucket_count=*/1);
+
+  // The oversized report should be rejected.
+  base::ListValue reports;
+  base::RunLoop run_loop_take;
+  store->TakeEarlyFailureReports(
+      kOrigin, base::BindOnce(
+                   [](base::ListValue* out, base::OnceClosure quit,
+                      base::ListValue res) {
+                     *out = std::move(res);
+                     std::move(quit).Run();
+                   },
+                   &reports, run_loop_take.QuitClosure()));
+  run_loop_take.Run();
+  EXPECT_TRUE(reports.empty());
+}
+
+TEST_F(DeclarativePerformanceObserverStoreTest, ClearDataForOriginDuringLoad) {
+  const url::Origin kOrigin = url::Origin::Create(GURL("https://example.com/"));
+  base::FilePath db_path = temp_dir_.GetPath().AppendASCII("TestStore3");
+
+  // 1. Populate database with a policy.
+  {
+    base::RunLoop run_loop;
+    auto store = std::make_unique<DeclarativePerformanceObserverStore>(
+        db_path, nullptr, run_loop.QuitClosure());
+    run_loop.Run();
+
+    base::RunLoop run_loop2;
+    store->SetEarlyFailurePolicy(kOrigin, true, run_loop2.QuitClosure());
+    run_loop2.Run();
+
+    base::RunLoop run_loop3;
+    store->Close(run_loop3.QuitClosure());
+    run_loop3.Run();
+  }
+
+  // 2. Start a new store but call ClearDataForOrigin before loading finishes.
+  auto store = std::make_unique<DeclarativePerformanceObserverStore>(
+      db_path, nullptr, base::DoNothing());
+
+  base::RunLoop run_loop_clear;
+  store->ClearDataForOrigin(kOrigin, run_loop_clear.QuitClosure());
+  run_loop_clear.Run();
+
+  // The policy should be cleared and NOT resurrected when the load completes.
+  EXPECT_FALSE(store->HasEarlyFailurePolicy(kOrigin));
+}
+
+TEST_F(DeclarativePerformanceObserverStoreTest, ClearAllDataDuringLoad) {
+  const url::Origin kOrigin = url::Origin::Create(GURL("https://example.com/"));
+  base::FilePath db_path = temp_dir_.GetPath().AppendASCII("TestStore4");
+
+  // 1. Populate database.
+  {
+    base::RunLoop run_loop;
+    auto store = std::make_unique<DeclarativePerformanceObserverStore>(
+        db_path, nullptr, run_loop.QuitClosure());
+    run_loop.Run();
+
+    base::RunLoop run_loop2;
+    store->SetEarlyFailurePolicy(kOrigin, true, run_loop2.QuitClosure());
+    run_loop2.Run();
+
+    base::RunLoop run_loop3;
+    store->Close(run_loop3.QuitClosure());
+    run_loop3.Run();
+  }
+
+  // 2. Start new store and call ClearAllData before load finishes.
+  auto store = std::make_unique<DeclarativePerformanceObserverStore>(
+      db_path, nullptr, base::DoNothing());
+
+  base::RunLoop run_loop_clear;
+  store->ClearAllData(run_loop_clear.QuitClosure());
+  run_loop_clear.Run();
+
+  // All policies should be cleared.
+  EXPECT_FALSE(store->HasEarlyFailurePolicy(kOrigin));
+}
+
 }  // namespace content

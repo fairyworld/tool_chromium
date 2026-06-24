@@ -5,6 +5,8 @@
 #ifndef CONTENT_BROWSER_DECLARATIVE_PERFORMANCE_OBSERVER_DECLARATIVE_PERFORMANCE_OBSERVER_STORE_H_
 #define CONTENT_BROWSER_DECLARATIVE_PERFORMANCE_OBSERVER_DECLARATIVE_PERFORMANCE_OBSERVER_STORE_H_
 
+#include <memory>
+#include <optional>
 #include <vector>
 
 #include "base/containers/flat_set.h"
@@ -65,6 +67,19 @@ class CONTENT_EXPORT DeclarativePerformanceObserverStore {
       const url::Origin& origin,
       base::OnceCallback<void(base::ListValue)> callback);
 
+  // Wipes all stored policies and reports for a specific origin.
+  // The database connection remains open.
+  void ClearDataForOrigin(const url::Origin& origin,
+                          base::OnceClosure callback = base::DoNothing());
+
+  // Catastrophically razes the entire database and closes the connection
+  // to surrender Operating System file locks.
+  void ClearAllData(base::OnceClosure callback = base::DoNothing());
+
+  // Sets the physical storage quota limit for testing purposes.
+  void SetQuotaLimitForTesting(size_t quota_limit_bytes,
+                               base::OnceClosure callback = base::DoNothing());
+
   // Closes the persistent SQLite database connection engine and flushes any
   // pending I/O transactions on the background sequence.
   void Close(base::OnceClosure callback = base::DoNothing());
@@ -92,6 +107,7 @@ class CONTENT_EXPORT DeclarativePerformanceObserverStore {
   // initial database load completed. This prevents database load results
   // from overwriting newer updates.
   base::flat_set<url::Origin> modified_during_load_;
+  bool clear_all_pending_ = false;
 
   base::WeakPtrFactory<DeclarativePerformanceObserverStore> weak_factory_{this};
 };

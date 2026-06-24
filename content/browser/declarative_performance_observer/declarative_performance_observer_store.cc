@@ -40,9 +40,15 @@ enum class StoreReportResult {
   kFailedDbInit = 1,
   kFailedJsonWrite = 2,
   kFailedSqlRun = 3,
-  kMaxValue = kFailedSqlRun,
+  kReportTooLarge = 4,
+  kMaxValue = kReportTooLarge,
 };
 // LINT.ThenChange(//tools/metrics/histograms/enums.xml)
+
+void RecordStoreReportResult(StoreReportResult result) {
+  base::UmaHistogramEnumeration(
+      base::StrCat({kHistogramPrefix, "StoreReportResult"}), result);
+}
 
 }  // namespace
 
@@ -112,20 +118,23 @@ class DeclarativePerformanceObserverStore::Backend
                                            base::DictValue report) {
     DCHECK_CALLED_ON_VALID_SEQUENCE(db_sequence_checker_);
     if (!InitOnDbSequence()) {
-      base::UmaHistogramEnumeration(
-          base::StrCat({kHistogramPrefix, "StoreReportResult"}),
-          StoreReportResult::kFailedDbInit);
+      RecordStoreReportResult(StoreReportResult::kFailedDbInit);
       return;
     }
 
     std::string payload;
     bool write_success = base::JSONWriter::Write(report, &payload);
     if (!write_success) {
-      base::UmaHistogramEnumeration(
-          base::StrCat({kHistogramPrefix, "StoreReportResult"}),
-          StoreReportResult::kFailedJsonWrite);
+      RecordStoreReportResult(StoreReportResult::kFailedJsonWrite);
       return;
     }
+
+    if (payload.size() > quota_limit_bytes_) {
+      RecordStoreReportResult(StoreReportResult::kReportTooLarge);
+      return;
+    }
+
+    EnforceDiskQuotaOnDbSequence(payload.size());
 
     sql::Statement statement(db_->GetUniqueStatement(
         "INSERT INTO declarative_performance_observer_reports "
@@ -136,15 +145,11 @@ class DeclarativePerformanceObserverStore::Backend
         2, base::Time::Now().ToDeltaSinceWindowsEpoch().InMicroseconds());
 
     if (!statement.Run()) {
-      base::UmaHistogramEnumeration(
-          base::StrCat({kHistogramPrefix, "StoreReportResult"}),
-          StoreReportResult::kFailedSqlRun);
+      RecordStoreReportResult(StoreReportResult::kFailedSqlRun);
       return;
     }
 
-    base::UmaHistogramEnumeration(
-        base::StrCat({kHistogramPrefix, "StoreReportResult"}),
-        StoreReportResult::kSuccess);
+    RecordStoreReportResult(StoreReportResult::kSuccess);
   }
 
   void TakeEarlyFailureReportsOnDbSequence(
@@ -191,6 +196,49 @@ class DeclarativePerformanceObserverStore::Backend
       ui_task_runner->PostTask(
           FROM_HERE, base::BindOnce(std::move(callback), base::ListValue()));
     }
+  }
+
+  void SetQuotaLimitForTestingOnDbSequence(  // IN-TEST
+      size_t quota_limit_bytes) {
+    DCHECK_CALLED_ON_VALID_SEQUENCE(db_sequence_checker_);
+    quota_limit_bytes_ = quota_limit_bytes;
+  }
+
+  void ClearDataForOriginOnDbSequence(const url::Origin& origin) {
+    DCHECK_CALLED_ON_VALID_SEQUENCE(db_sequence_checker_);
+    if (!InitOnDbSequence()) {
+      return;
+    }
+
+    sql::Transaction transaction(db_.get());
+    if (!transaction.Begin()) {
+      return;
+    }
+
+    sql::Statement delete_policies(db_->GetUniqueStatement(
+        "DELETE FROM declarative_performance_observer_policies WHERE origin "
+        "= ?"));
+    delete_policies.BindString(0, origin.Serialize());
+    delete_policies.Run();
+
+    sql::Statement delete_reports(db_->GetUniqueStatement(
+        "DELETE FROM declarative_performance_observer_reports WHERE origin "
+        "= ?"));
+    delete_reports.BindString(0, origin.Serialize());
+    delete_reports.Run();
+
+    transaction.Commit();
+  }
+
+  void ClearAllDataOnDbSequence() {
+    DCHECK_CALLED_ON_VALID_SEQUENCE(db_sequence_checker_);
+    if (db_ && db_->is_open()) {
+      if (!db_path_.empty()) {
+        std::ignore = db_->RazeAndPoison();
+      }
+      db_->Close();
+    }
+    db_.reset();
   }
 
   void CloseOnDbSequence() {
@@ -289,8 +337,59 @@ class DeclarativePerformanceObserverStore::Backend
     return true;
   }
 
+  // Enforces the storage quota limit. If the total size of stored reports plus
+  // `new_entry_bytes` exceeds the quota, older reports are deleted (FIFO)
+  // in a single batch until the size fits within the limit.
+  void EnforceDiskQuotaOnDbSequence(size_t new_entry_bytes) {
+    sql::Statement count(
+        db_->GetUniqueStatement("SELECT COALESCE(SUM(length(payload)), 0) FROM "
+                                "declarative_performance_observer_reports"));
+    size_t estimated_bytes = 0;
+    if (count.Step()) {
+      estimated_bytes = static_cast<size_t>(count.ColumnInt64(0));
+    }
+
+    if (estimated_bytes + new_entry_bytes <= quota_limit_bytes_) {
+      return;
+    }
+
+    size_t target_evict_bytes =
+        (estimated_bytes + new_entry_bytes) - quota_limit_bytes_;
+
+    // Since Chromium's SQLite omits window functions (SQLITE_OMIT_WINDOWFUNC),
+    // we cannot use SUM(...) OVER (...). Instead, we perform a simple O(N) scan
+    // of IDs and payload lengths, and accumulate the running total in C++
+    // to find the eviction boundary.
+    sql::Statement select_reports(db_->GetUniqueStatement(
+        "SELECT id, length(payload) FROM "
+        "declarative_performance_observer_reports ORDER BY id ASC"));
+
+    int64_t max_evicted_id = -1;
+    size_t running_total = 0;
+    while (select_reports.Step()) {
+      int64_t id = select_reports.ColumnInt64(0);
+      size_t size = static_cast<size_t>(select_reports.ColumnInt(1));
+      running_total += size;
+      if (running_total >= target_evict_bytes) {
+        max_evicted_id = id;
+        break;
+      }
+    }
+
+    if (max_evicted_id >= 0) {
+      sql::Statement delete_batch(db_->GetUniqueStatement(
+          "DELETE FROM declarative_performance_observer_reports WHERE id <= "
+          "?"));
+      delete_batch.BindInt64(0, max_evicted_id);
+      delete_batch.Run();
+    }
+  }
+
   base::FilePath db_path_;
   std::unique_ptr<sql::Database> db_;
+  // The physical storage quota limit for this store (per storage partition).
+  // Default is 640KB, aligning with the fetchLater per-document quota.
+  size_t quota_limit_bytes_ = 640 * 1024;
   SEQUENCE_CHECKER(db_sequence_checker_);
 };
 
@@ -321,12 +420,15 @@ DeclarativePerformanceObserverStore::~DeclarativePerformanceObserverStore() =
 void DeclarativePerformanceObserverStore::OnPoliciesLoadedOnUISequence(
     base::OnceClosure on_loaded_callback,
     std::vector<url::Origin> loaded) {
-  std::erase_if(loaded, [this](const url::Origin& origin) {
-    return modified_during_load_.contains(origin);
-  });
-  cached_policies_.insert(loaded.begin(), loaded.end());
+  if (!clear_all_pending_) {
+    std::erase_if(loaded, [this](const url::Origin& origin) {
+      return modified_during_load_.contains(origin);
+    });
+    cached_policies_.insert(loaded.begin(), loaded.end());
+  }
   loaded_ = true;
   modified_during_load_.clear();
+  clear_all_pending_ = false;
   std::move(on_loaded_callback).Run();
 }
 
@@ -378,6 +480,41 @@ void DeclarativePerformanceObserverStore::TakeEarlyFailureReports(
       base::BindOnce(&Backend::TakeEarlyFailureReportsOnDbSequence, backend_,
                      origin, base::SequencedTaskRunner::GetCurrentDefault(),
                      std::move(callback)));
+}
+
+void DeclarativePerformanceObserverStore::ClearDataForOrigin(
+    const url::Origin& origin,
+    base::OnceClosure callback) {
+  if (!loaded_) {
+    modified_during_load_.insert(origin);
+  }
+  cached_policies_.erase(origin);
+  db_task_runner_->PostTaskAndReply(
+      FROM_HERE,
+      base::BindOnce(&Backend::ClearDataForOriginOnDbSequence, backend_,
+                     origin),
+      std::move(callback));
+}
+
+void DeclarativePerformanceObserverStore::ClearAllData(
+    base::OnceClosure callback) {
+  if (!loaded_) {
+    clear_all_pending_ = true;
+  }
+  cached_policies_.clear();
+  db_task_runner_->PostTaskAndReply(
+      FROM_HERE, base::BindOnce(&Backend::ClearAllDataOnDbSequence, backend_),
+      std::move(callback));
+}
+
+void DeclarativePerformanceObserverStore::SetQuotaLimitForTesting(  // IN-TEST
+    size_t quota_limit_bytes,
+    base::OnceClosure callback) {
+  db_task_runner_->PostTaskAndReply(
+      FROM_HERE,
+      base::BindOnce(&Backend::SetQuotaLimitForTestingOnDbSequence, backend_,
+                     quota_limit_bytes),  // IN-TEST
+      std::move(callback));
 }
 
 void DeclarativePerformanceObserverStore::Close(base::OnceClosure callback) {
