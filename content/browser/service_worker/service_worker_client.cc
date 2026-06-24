@@ -714,9 +714,8 @@ void ServiceWorkerClient::SetControllerRegistration(
   if (controller_registration) {
     CHECK(IsEligibleForServiceWorkerController());
     CHECK(controller_registration->active_version());
-    // TODO(https://crbug.com/526540644): CHECK-exclusion: Convert to CHECK once
-    // we are sure this isn't hit.
-    DCHECK(IsMatchingRegistration(controller_registration.get()));
+
+    CHECK(IsMatchingRegistration(controller_registration.get()));
   }
 
   controller_registration_ = controller_registration;
