@@ -2268,6 +2268,10 @@ source_set("unit_tests") {
     # IS_ANDROID.
     deps += [ "//chrome/browser/ui/android/extensions:public" ]
   }
+
+  if (is_chromeos) {
+    deps += [ "//ash/constants" ]
+  }
 }
 
 # By default these tests run on Win, Mac, Linux, Chrome OS and desktop Android.
@@ -2584,6 +2588,7 @@ source_set("browser_tests") {
 
   if (is_chromeos) {
     deps += [
+      "//ash/constants",
       "//chrome/browser/ash/boca/on_task",
       "//chrome/browser/ash/net",
       "//chrome/browser/ash/test:test_support",

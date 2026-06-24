@@ -6,8 +6,8 @@
 
 #include "base/strings/string_util.h"
 #include "base/test/bind.h"
-#include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/contextual_cueing/features.h"
+#include "chrome/browser/ui/ui_features.h"
 #include "chrome/browser/ui/webui/webui_urls_for_test.h"
 #include "chrome/common/webui_url_constants.h"
 #include "chrome/test/base/in_process_browser_test.h"
@@ -26,13 +26,14 @@
 #include "content/public/test/browser_test_utils.h"
 #include "printing/buildflags/buildflags.h"
 #include "third_party/abseil-cpp/absl/strings/ascii.h"
+
 #if BUILDFLAG(IS_CHROMEOS)
+#include "ash/constants/ash_extension_constants.h"
 #include "ash/constants/ash_features.h"
 #include "ash/constants/ash_login_pref_names.h"
 #include "ash/constants/ash_switches.h"
 #include "chrome/browser/ash/file_system_provider/fake_extension_provider.h"
 #include "chrome/browser/ash/file_system_provider/service.h"
-#include "chrome/common/extensions/extension_constants.h"
 #include "chromeos/constants/chromeos_features.h"
 #include "components/prefs/pref_service.h"
 #else
