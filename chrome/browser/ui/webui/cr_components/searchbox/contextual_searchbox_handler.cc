@@ -1681,7 +1681,6 @@ void ContextualSearchboxHandler::ComputeAndOpenQueryUrl(
     std::map<std::string, std::string> additional_params,
     bool is_voice_search) {
   auto* contextual_session_handle = GetContextualSessionHandle();
-  std::vector<const contextual_search::FileInfo*> file_info_list;
   if (contextual_session_handle) {
     // Upload the cached tab context if it exists.
     UploadSnapshotTabContextIfPresent();
@@ -1706,8 +1705,6 @@ void ContextualSearchboxHandler::ComputeAndOpenQueryUrl(
     search_url_request_info->aim_entry_point = aim_entry_point;
     search_url_request_info->is_voice_search = is_voice_search;
 
-    file_info_list =
-        contextual_session_handle->GetController()->GetFileInfoList();
     // Do not keep tabs in composebox's 'future context to use' since this searchbox handler
     // will be destroyed when this query is submitted and AIM/cobrowsing opens via
     // `CreateSearchUrl`. Tabs are passed to cobrowse composebox through web contents instead.
