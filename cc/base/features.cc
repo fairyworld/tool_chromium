@@ -60,6 +60,9 @@ const base::FeatureParam<int> kReclaimDelayInSeconds{&kSmallerInterestArea,
 
 BASE_FEATURE(kTileOOMFreezeMitigation, base::FEATURE_ENABLED_BY_DEFAULT);
 
+BASE_FEATURE(kStopDeferringCommitsInCompositeForTest,
+             base::FEATURE_ENABLED_BY_DEFAULT);
+
 BASE_FEATURE(kClearCanvasResourcesInBackground,
              base::FEATURE_DISABLED_BY_DEFAULT);
 

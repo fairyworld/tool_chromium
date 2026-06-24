@@ -46,6 +46,11 @@ CC_BASE_EXPORT extern const base::FeatureParam<int> kReclaimDelayInSeconds;
 // that it doesn't wait for resource releases that will never come.
 CC_BASE_EXPORT BASE_DECLARE_FEATURE(kTileOOMFreezeMitigation);
 
+// When enabled, CompositeForTest unconditionally stops deferring commits before
+// running the main frame. Disable in tests that need to observe paint holding
+// state through BeginFrame.
+CC_BASE_EXPORT BASE_DECLARE_FEATURE(kStopDeferringCommitsInCompositeForTest);
+
 // When a LayerTreeHostImpl is not visible, clear its transferable resources
 // that haven't been imported into viz.
 CC_BASE_EXPORT BASE_DECLARE_FEATURE(kClearCanvasResourcesInBackground);
