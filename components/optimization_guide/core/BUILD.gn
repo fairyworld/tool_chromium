@@ -713,6 +713,12 @@ group("test_support") {
     ":model_execution_test_support",
     "//components/optimization_guide/core/inference:test_support",
   ]
+  if (build_with_model_execution) {
+    public_deps += [
+      ":manifest_broker_dev_support",
+      ":manifest_broker_test_support",
+    ]
+  }
 }
 
 if (is_ios) {

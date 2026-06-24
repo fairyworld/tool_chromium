@@ -2886,6 +2886,7 @@ if (!is_android) {
       "//components/optimization_guide/content/renderer",
       "//components/optimization_guide/core",
       "//components/optimization_guide/core:bloomfilter",
+      "//components/optimization_guide/core:manifest_broker_test_support",
       "//components/optimization_guide/core:prediction",
       "//components/optimization_guide/core:test_support",
       "//components/optimization_guide/proto:optimization_guide_proto",

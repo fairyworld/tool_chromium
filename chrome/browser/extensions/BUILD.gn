@@ -3036,6 +3036,7 @@ source_set("browser_tests") {
       "//components/media_router/browser:test_support",
       "//components/media_router/common:test_support",
       "//components/onc",
+      "//components/optimization_guide/core:test_support",
       "//components/optimization_guide/optimization_guide_internals/webui",
       "//components/page_load_metrics/browser:test_support",
       "//components/password_manager/content/browser",
