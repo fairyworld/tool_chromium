@@ -4,12 +4,13 @@
 
 import 'chrome://resources/cr_components/composebox/composebox.js';
 
-import {ComposeboxFile} from 'chrome://resources/cr_components/composebox/common.js';
+import {ComposeboxFile, TabUploadOrigin} from 'chrome://resources/cr_components/composebox/common.js';
 import type {ComposeboxElement} from 'chrome://resources/cr_components/composebox/composebox.js';
 import {PageCallbackRouter, PageHandlerRemote} from 'chrome://resources/cr_components/composebox/composebox.mojom-webui.js';
 import type {ComposeboxInputElement} from 'chrome://resources/cr_components/composebox/composebox_input.js';
 import {ComposeboxProxyImpl} from 'chrome://resources/cr_components/composebox/composebox_proxy.js';
 import type {ContextualEntrypointAndMenuElement} from 'chrome://resources/cr_components/composebox/contextual_entrypoint_and_menu.js';
+import type {ContextualEntrypointButtonElement} from 'chrome://resources/cr_components/composebox/contextual_entrypoint_button.js';
 import {WindowProxy} from 'chrome://resources/cr_components/composebox/window_proxy.js';
 import {createAutocompleteResultForTesting, createSearchMatchForTesting} from 'chrome://resources/cr_components/searchbox/searchbox_browser_proxy.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
@@ -17,12 +18,18 @@ import type {TabInfo} from 'chrome://resources/mojo/components/omnibox/browser/s
 import {PageCallbackRouter as SearchboxPageCallbackRouter, PageHandlerRemote as SearchboxPageHandlerRemote} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import type {PageRemote as SearchboxPageRemote} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import {InputType} from 'chrome://resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
-import {assertEquals, assertNotEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
+import {assertEquals, assertFalse, assertNotEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import type {TestMock} from 'chrome://webui-test/test_mock.js';
 import {microtasksFinished} from 'chrome://webui-test/test_util.js';
 import {getTrustedHtml} from 'chrome://webui-test/trusted_html.js';
 
 import {installMock} from './composebox_test_utils.js';
+
+interface TestComposeboxElement extends ComposeboxElement {
+  keepMenuOpenForMultiSelection: () => void;
+  keepMenuOpenOnTabSelectForRealbox: boolean;
+  composeboxSource: string;
+}
 
 suite('ComposeboxTest', () => {
   let composebox: ComposeboxElement;
@@ -475,7 +482,90 @@ suite('ComposeboxTest', () => {
     // Restore
     composebox.deleteFile = originalDeleteFile;
   });
+});
 
+suite('Composebox tab flyout', () => {
+  let composebox: ComposeboxElement;
+
+  setup(async () => {
+    loadTimeData.overrideValues({
+      'contextManagementInComposeboxEnabled': true,
+    });
+
+    document.body.innerHTML = window.trustedTypes!.emptyHTML;
+    composebox = document.createElement('cr-composebox');
+    document.body.appendChild(composebox);
+    await composebox.updateComplete;
+  });
+
+  test(
+      'keepMenuOpenForMultiSelection is gated' +
+          ' by keepMenuOpenOnTabSelectForRealbox',
+      () => {
+        let openMenuCalled = false;
+        composebox.getContextEntrypointElement = () => {
+          return {
+            openMenuForMultiSelection: () => {
+              openMenuCalled = true;
+            },
+          } as unknown as ContextualEntrypointButtonElement;
+        };
+
+        const testElement = composebox as TestComposeboxElement;
+
+        // Omnibox source: always returns early
+        testElement.composeboxSource = 'Omnibox';
+        testElement.keepMenuOpenForMultiSelection();
+        assertFalse(openMenuCalled);
+
+        // NewTabPage source, flag off: returns early
+        testElement.composeboxSource = 'NewTabPage';
+        testElement.keepMenuOpenOnTabSelectForRealbox = false;
+        testElement.keepMenuOpenForMultiSelection();
+        assertFalse(openMenuCalled);
+
+        // NewTabPage source, flag on: calls openMenuForMultiSelection
+        testElement.composeboxSource = 'NewTabPage';
+        testElement.keepMenuOpenOnTabSelectForRealbox = true;
+        testElement.keepMenuOpenForMultiSelection();
+        assertTrue(openMenuCalled);
+      });
+
+  test(
+      'keepMenuOpenForMultiSelection called on add/delete tab context',
+      async () => {
+        let keepMenuOpenCalled = false;
+        const testElement = composebox as TestComposeboxElement;
+        testElement.keepMenuOpenForMultiSelection = () => {
+          keepMenuOpenCalled = true;
+        };
+
+        await composebox.onAddTabContext(new CustomEvent('add-tab-context', {
+          detail: {
+            id: 1,
+            title: 'Test',
+            url: 'about:blank',  // Mojo converts obj to str.
+            delayUpload: false,
+            origin: TabUploadOrigin.CONTEXT_MENU,
+          },
+        }));
+        assertTrue(keepMenuOpenCalled);
+
+        keepMenuOpenCalled = false;
+        await composebox.onDeleteTabContext(
+            new CustomEvent('delete-tab-context', {
+              detail: {
+                uuid: '0',
+              },
+            }));
+        assertTrue(keepMenuOpenCalled);
+      });
+
+  test('onContextMenuClosed sets shareTabsFlyoutOpen to false', async () => {
+    composebox.shareTabsFlyoutOpen = true;
+    await composebox.onContextMenuClosed();
+    assertFalse(composebox.shareTabsFlyoutOpen);
+  });
 });
 
 suite('composeboxSharedMountAutoRepositionDefault', () => {
