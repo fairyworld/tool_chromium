@@ -1467,6 +1467,11 @@ std::unique_ptr<NavigationRequest> NavigationRequest::CreateRendererInitiated(
           /*should_have_sticky_user_activation=*/false,
           /*old_page_info=*/nullptr, /*http_response_code=*/-1,
           blink::mojom::NavigationApiHistoryEntryArrays::New(),
+          /*early_hints_preloaded_resources=*/
+          std::vector<network::mojom::LinkHeaderPtr>(),
+          /*early_hints_preconnects=*/
+          std::vector<network::mojom::LinkHeaderPtr>(),
+          /*navigation_preconnects=*/
           std::vector<network::mojom::LinkHeaderPtr>(),
           // This timestamp will be populated when the commit IPC is sent.
           /*commit_sent=*/base::TimeTicks(), /*srcdoc_value=*/std::string(),
@@ -1636,6 +1641,11 @@ NavigationRequest::CreateForSynchronousRendererCommit(
           /*should_have_sticky_user_activation=*/false,
           /*old_page_info=*/nullptr, http_response_code,
           blink::mojom::NavigationApiHistoryEntryArrays::New(),
+          /*early_hints_preloaded_resources=*/
+          std::vector<network::mojom::LinkHeaderPtr>(),
+          /*early_hints_preconnects=*/
+          std::vector<network::mojom::LinkHeaderPtr>(),
+          /*navigation_preconnects=*/
           std::vector<network::mojom::LinkHeaderPtr>(),
           // This timestamp will be populated when the commit IPC is sent.
           /*commit_sent=*/base::TimeTicks(), /*srcdoc_value=*/std::string(),
@@ -7187,6 +7197,20 @@ void NavigationRequest::CommitNavigation() {
   if (early_hints_manager_) {
     commit_params_->early_hints_preloaded_resources =
         early_hints_manager_->TakePreloadedResources();
+    commit_params_->early_hints_preconnects =
+        early_hints_manager_->TakePreconnectedResources();
+  }
+
+  if (response_head_ && response_head_->parsed_headers) {
+    // Collect `Link: rel=preconnect` headers from the final navigation response
+    // (not 103 Early Hints) for the SpeculationMeasurement API. The renderer
+    // issues these preconnects; here we only forward them so they can be
+    // recorded at commit.
+    for (const auto& link : response_head_->parsed_headers->link_headers) {
+      if (link->rel == network::mojom::LinkRelAttribute::kPreconnect) {
+        commit_params_->navigation_preconnects.push_back(link.Clone());
+      }
+    }
   }
 
   if (response_head_) {

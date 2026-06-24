@@ -472,6 +472,11 @@ NavigationEarlyHintsManager::TakePreloadedResources() {
   return std::move(preloaded_infos_);
 }
 
+std::vector<network::mojom::LinkHeaderPtr>
+NavigationEarlyHintsManager::TakePreconnectedResources() {
+  return std::move(preconnect_infos_);
+}
+
 bool NavigationEarlyHintsManager::HasInflightPreloads() const {
   return inflight_preloads_.size() > 0;
 }
@@ -529,6 +534,8 @@ void NavigationEarlyHintsManager::MaybePreconnect(
           kEarlyHintsPreloadTrafficAnnotation),
       /*keepalive_config=*/std::nullopt, mojo::NullRemote());
   preconnect_entries_.insert(std::move(entry));
+  // Record preconnect for the SpeculationMeasurement API.
+  preconnect_infos_.push_back(link.Clone());
 }
 
 void NavigationEarlyHintsManager::MaybePreloadHintedResource(
