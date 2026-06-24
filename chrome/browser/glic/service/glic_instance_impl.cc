@@ -1124,6 +1124,7 @@ void GlicInstanceImpl::OnBoundTabActivated(tabs::TabInterface* tab) {
     SidePanelShowOptions side_panel_options{*tab};
     side_panel_options.suppress_opening_animation = true;
     side_panel_options.prefer_peek = true;
+    side_panel_options.open_trigger = SidePanelOpenTrigger::kTabChanged;
     Show(ShowOptions{side_panel_options});
   }
 }
@@ -1338,8 +1339,11 @@ void GlicInstanceImpl::MaybeActivateForegroundEmbedder() {
         auto* coordinator = GlicSidePanelCoordinator::GetForTab(*tab);
         if (coordinator &&
             coordinator->state() == GlicSidePanelCoordinator::State::kShown) {
-          // Note that this will only happen for full show, not peek.
-          Show(ShowOptions::ForSidePanel(**tab));
+          // Note that this will only happen for a fully showing panel, not
+          // peek.
+          SidePanelShowOptions side_panel_options{**tab};
+          side_panel_options.open_trigger = SidePanelOpenTrigger::kTabChanged;
+          Show(ShowOptions{side_panel_options});
           return;
         }
       }

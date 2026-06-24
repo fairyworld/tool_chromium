@@ -141,6 +141,10 @@ IN_PROC_BROWSER_TEST_F(GlicSidePanelCoordinatorAndroidBrowserTest,
   ASSERT_OK(OpenGlicForActiveTab());
   EXPECT_EQ(coordinator()->state(), GlicSidePanelCoordinator::State::kShown);
 
+  SidePanelEntry* entry = coordinator()->GetEntryForTesting();
+  ASSERT_TRUE(entry);
+  EXPECT_EQ(entry->last_open_trigger(), SidePanelOpenTrigger::kGlicOpened);
+
   tabs::TabInterface* first_tab = GetTabListInterface()->GetActiveTab();
   GlicSidePanelCoordinatorDesktopAndroid* first_coordinator = coordinator();
 
@@ -166,6 +170,8 @@ IN_PROC_BROWSER_TEST_F(GlicSidePanelCoordinatorAndroidBrowserTest,
   EXPECT_EQ(first_state_future.Take(), GlicSidePanelCoordinator::State::kShown);
   EXPECT_EQ(first_coordinator->state(),
             GlicSidePanelCoordinator::State::kShown);
+
+  EXPECT_EQ(entry->last_open_trigger(), SidePanelOpenTrigger::kTabChanged);
 }
 
 }  // namespace glic

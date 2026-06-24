@@ -452,6 +452,7 @@ void SidePanelCoordinatorAndroid::PopulateSidePanel(
     std::optional<SidePanelOpenTrigger> open_trigger,
     SidePanelEntry* entry,
     std::optional<SidePanelNativeView> content_view) {
+  entry->set_last_open_trigger(open_trigger);
   SPLOG("PopulateSidePanel - unique_key: "
         << unique_key << ", suppress_animations: " << suppress_animations);
   std::unique_ptr<SidePanelNativeViewAndroid> native_view =

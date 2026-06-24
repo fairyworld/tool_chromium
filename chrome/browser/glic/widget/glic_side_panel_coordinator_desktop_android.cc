@@ -127,11 +127,7 @@ void GlicSidePanelCoordinatorDesktopAndroid::Show(const ShowOptions& options) {
     }
     return;
   }
-  // TODO(crbug.com/526819090): Make this trigger logic more robust.
-  SidePanelOpenTrigger trigger = (state_ == State::kBackgrounded)
-                                     ? SidePanelOpenTrigger::kTabChanged
-                                     : SidePanelOpenTrigger::kGlicOpened;
-  window_side_panel_ui->Show(entry_->key(), trigger,
+  window_side_panel_ui->Show(entry_->key(), options.open_trigger,
                              options.suppress_animations);
 }
 
