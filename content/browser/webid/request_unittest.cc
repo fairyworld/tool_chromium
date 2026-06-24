@@ -1281,7 +1281,10 @@ class RequestTest : public RenderViewHostImplTestHarness {
     if (service && service->GetActiveRequestForTesting()) {
       service->GetActiveRequestForTesting()->ResetAndDeleteThisForTesting();
     }
-    request_ = nullptr;
+    // The destruction is asynchronous. Wait until the Request object is
+    // physically destroyed, which will automatically invalidate the weak
+    // pointer and ensure fallback metrics are recorded in its destructor.
+    ASSERT_TRUE(base::test::RunUntil([&]() { return !request_; }));
   }
   void SetNetworkRequestManager(
       std::unique_ptr<TestIdpNetworkRequestManager> manager) {

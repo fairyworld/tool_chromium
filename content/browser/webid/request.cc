@@ -205,11 +205,9 @@ void Request::ResetAndDeleteThisForTesting() {
   // and is what our tests expect.
   auth_request_receivers_.Clear();
   receivers_.Clear();
-  // TODO(crbug.com/519217823): Refactor this to avoid "delete this" pattern by
-  // having tests request destruction via RequestService directly.
-  // WARNING: Calling OnRequestDestroyed(this) will destroy 'this' immediately
-  // because the request is owned by request_service_. Do not add any code
-  // after this call!
+  // TODO(crbug.com/519217823): Refactor the test harness to avoid having the
+  // Request object request its own destruction, by transitioning tests to
+  // trigger destruction via RequestService directly.
   request_service_->OnRequestDestroyed(this);
 }
 

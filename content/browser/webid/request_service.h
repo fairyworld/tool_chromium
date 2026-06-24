@@ -6,6 +6,7 @@
 #define CONTENT_BROWSER_WEBID_REQUEST_SERVICE_H_
 
 #include <memory>
+#include <vector>
 
 #include "base/containers/flat_set.h"
 #include "base/containers/unique_ptr_adapters.h"
@@ -125,9 +126,11 @@ class CONTENT_EXPORT RequestService
       std::optional<std::vector<blink::mojom::IdentityUserInfoPtr>> user_info);
   void CompleteDisconnectRequest(DisconnectCallback callback,
                                  blink::mojom::DisconnectStatus status);
+  void CleanUpCompletedRequest(Request* request);
   std::unique_ptr<Metrics> CreateFedCmMetrics();
 
   std::unique_ptr<Request> active_request_;
+  std::vector<std::unique_ptr<Request>> completed_requests_;
 
   // Number of navigator.credentials.get() requests made for metrics purposes.
   // Requests made when there is a pending FedCM request or for the purpose of

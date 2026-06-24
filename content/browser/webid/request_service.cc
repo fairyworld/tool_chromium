@@ -109,8 +109,22 @@ Request* RequestService::GetOrCreateActiveRequest() {
 
 void RequestService::OnRequestDestroyed(Request* request) {
   if (active_request_.get() == request) {
-    active_request_.reset();
+    // Release ownership synchronously to prevent race conditions with
+    // subsequent requests, but keep it in completed_requests_ to ensure it does
+    // not outlive RequestService.
+    completed_requests_.push_back(std::move(active_request_));
+
+    // Destroy the request asynchronously to allow the C++ call stack to unwind
+    // safely.
+    base::SequencedTaskRunner::GetCurrentDefault()->PostTask(
+        FROM_HERE, base::BindOnce(&RequestService::CleanUpCompletedRequest,
+                                  weak_ptr_factory_.GetWeakPtr(), request));
   }
+}
+
+void RequestService::CleanUpCompletedRequest(Request* request) {
+  std::erase_if(completed_requests_,
+                [&](const auto& r) { return r.get() == request; });
 }
 
 void RequestService::SetNetworkManagerForTests(
