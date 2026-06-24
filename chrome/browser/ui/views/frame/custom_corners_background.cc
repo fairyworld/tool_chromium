@@ -152,24 +152,79 @@ SkPath CustomCornersBackground::GetBackgroundPath(const gfx::Rect& in_bounds,
       SkRRect::MakeRectRadii(gfx::RectToSkRect(in_bounds), radii->data()));
 }
 
-void CustomCornersBackground::SetCutoutFrom(
-    const std::vector<const views::View*>& views) {
+std::vector<SkPath> CustomCornersBackground::GetCornerPaths(
+    const gfx::Rect& in_bounds) const {
+  std::vector<SkPath> result;
+  const Corners corners = GetMirroredCorners();
+
+  // Bump out the corners by 1 DIP to avoid cracking/subpixel issues.
+  // (This is why the insets are applied below.)
+  if (corners.upper_leading.type != CornerType::kSquare) {
+    const int radius = corners.upper_leading.radius.value_or(default_radius());
+    gfx::Rect bounds(in_bounds.x(), in_bounds.y(), radius, radius);
+    const gfx::Insets insets = gfx::Insets::TLBR(1, 1, 0, 0);
+    bounds.Inset(-insets);
+    result.push_back(
+        GetCornerPath(VisualCornerOrientation::kTopLeft, bounds, insets));
+  }
+  if (corners.upper_trailing.type != CornerType::kSquare) {
+    const int radius = corners.upper_trailing.radius.value_or(default_radius());
+    gfx::Rect bounds(in_bounds.right() - radius, in_bounds.y(), radius, radius);
+    const gfx::Insets insets = gfx::Insets::TLBR(1, 0, 0, 1);
+    bounds.Inset(-insets);
+    result.push_back(
+        GetCornerPath(VisualCornerOrientation::kTopRight, bounds, insets));
+  }
+  if (corners.lower_trailing.type != CornerType::kSquare) {
+    const int radius = corners.lower_trailing.radius.value_or(default_radius());
+    gfx::Rect bounds(in_bounds.right() - radius, in_bounds.bottom() - radius,
+                     radius, radius);
+    const gfx::Insets insets = gfx::Insets::TLBR(0, 0, 1, 1);
+    bounds.Inset(-insets);
+    result.push_back(
+        GetCornerPath(VisualCornerOrientation::kBottomRight, bounds, insets));
+  }
+  if (corners.lower_leading.type != CornerType::kSquare) {
+    const int radius = corners.lower_leading.radius.value_or(default_radius());
+    gfx::Rect bounds(in_bounds.x(), in_bounds.bottom() - radius, radius,
+                     radius);
+    const gfx::Insets insets = gfx::Insets::TLBR(0, 1, 1, 0);
+    bounds.Inset(-insets);
+    result.push_back(
+        GetCornerPath(VisualCornerOrientation::kBottomLeft, bounds, insets));
+  }
+  return result;
+}
+
+void CustomCornersBackground::SetCutoutFrom(const Cutouts& cutouts) {
   cutout_paths_.clear();
-  for (const auto* view : views) {
-    const gfx::Rect bounds =
-        views::View::ConvertRectFromScreen(&*view_, view->GetBoundsInScreen());
-    SkPath cutout_path;
-    if (auto* const corner = views::AsViewClass<CustomFloatingCorner>(view)) {
-      cutout_path = corner->GetBackgroundPath(bounds);
-    } else if (view->background() &&
-               view->background()->IsA<CustomCornersBackground>()) {
-      cutout_path =
-          view->background()->AsA<CustomCornersBackground>()->GetBackgroundPath(
-              bounds, nullptr);
+  for (const auto& cutout : cutouts) {
+    if (const views::View* const* view_ptr =
+            std::get_if<const views::View*>(&cutout)) {
+      const views::View* const view = *view_ptr;
+      const gfx::Rect bounds = views::View::ConvertRectFromScreen(
+          &*view_, view->GetBoundsInScreen());
+      SkPath cutout_path;
+      if (auto* const corner = views::AsViewClass<CustomFloatingCorner>(view)) {
+        cutout_path = corner->GetBackgroundPath(bounds);
+      } else if (view->background() &&
+                 view->background()->IsA<CustomCornersBackground>()) {
+        cutout_path = view->background()
+                          ->AsA<CustomCornersBackground>()
+                          ->GetBackgroundPath(bounds, nullptr);
+      } else {
+        cutout_path = SkPath::Rect(gfx::RectToSkRect(bounds));
+      }
+      cutout_paths_.push_back(cutout_path);
     } else {
-      cutout_path = SkPath::Rect(gfx::RectToSkRect(bounds));
+      const auto* const background =
+          std::get<InverseOf>(cutout).background.get();
+      const gfx::Rect bounds = views::View::ConvertRectFromScreen(
+          &*view_, background->view_->GetBoundsInScreen());
+      for (SkPath& path : background->GetCornerPaths(bounds)) {
+        cutout_paths_.push_back(path);
+      }
     }
-    cutout_paths_.push_back(cutout_path);
   }
 }
 

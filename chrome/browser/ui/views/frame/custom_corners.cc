@@ -5,8 +5,10 @@
 #include "chrome/browser/ui/views/frame/custom_corners.h"
 
 #include "base/check_op.h"
+#include "base/i18n/rtl.h"
 #include "chrome/browser/ui/views/frame/browser_view.h"
 #include "chrome/browser/ui/views/frame/themed_background.h"
+#include "third_party/skia/include/core/SkPathBuilder.h"
 #include "ui/gfx/scoped_canvas.h"
 
 CustomCorners::CustomCorners(BrowserView& browser_view)
@@ -99,4 +101,97 @@ void CustomCorners::PaintPath(gfx::Canvas* canvas,
     paint_color(color_choice);
     paint_color(*fade_background_);
   }
+}
+
+// static
+CustomCorners::VisualCornerOrientation CustomCorners::GetVisualOrientation(
+    CornerOrientation orientation) {
+  const bool mirror = base::i18n::IsRTL();
+  switch (orientation) {
+    case CornerOrientation::kTopLeading:
+      return mirror ? VisualCornerOrientation::kTopRight
+                    : VisualCornerOrientation::kTopLeft;
+    case CornerOrientation::kTopTrailing:
+      return mirror ? VisualCornerOrientation::kTopLeft
+                    : VisualCornerOrientation::kTopRight;
+    case CornerOrientation::kBottomLeading:
+      return mirror ? VisualCornerOrientation::kBottomRight
+                    : VisualCornerOrientation::kBottomLeft;
+    case CornerOrientation::kBottomTrailing:
+      return mirror ? VisualCornerOrientation::kBottomLeft
+                    : VisualCornerOrientation::kBottomRight;
+  }
+}
+
+// static
+SkPath CustomCorners::GetCornerPath(VisualCornerOrientation orientation,
+                                    const gfx::Rect& inbounds,
+                                    const gfx::Insets& insets) {
+  const gfx::Rect border_rect = inbounds;
+  gfx::Rect curve_rect = inbounds;
+  curve_rect.Inset(insets);
+  const SkVector corner_radius(curve_rect.width(), curve_rect.height());
+
+  // Set up a clip path.
+  SkPathBuilder clip_path;
+  switch (orientation) {
+    case VisualCornerOrientation::kTopLeft:
+      clip_path.moveTo(border_rect.x(), border_rect.y());
+      clip_path.lineTo(curve_rect.right(), border_rect.y());
+      if (insets.top()) {
+        clip_path.lineTo(curve_rect.right(), curve_rect.y());
+      }
+      clip_path.arcTo(corner_radius, 0, SkPathBuilder::kSmall_ArcSize,
+                      SkPathDirection::kCCW,
+                      SkPoint(curve_rect.x(), curve_rect.bottom()));
+      if (insets.left()) {
+        clip_path.lineTo(border_rect.x(), curve_rect.bottom());
+      }
+      clip_path.lineTo(border_rect.x(), border_rect.y());
+      break;
+    case VisualCornerOrientation::kTopRight:
+      clip_path.moveTo(curve_rect.x(), border_rect.y());
+      clip_path.lineTo(border_rect.right(), border_rect.y());
+      clip_path.lineTo(border_rect.right(), curve_rect.bottom());
+      if (insets.right()) {
+        clip_path.lineTo(curve_rect.right(), curve_rect.bottom());
+      }
+      clip_path.arcTo(corner_radius, 0, SkPathBuilder::kSmall_ArcSize,
+                      SkPathDirection::kCCW,
+                      SkPoint(curve_rect.x(), curve_rect.y()));
+      if (insets.top()) {
+        clip_path.lineTo(curve_rect.x(), border_rect.y());
+      }
+      break;
+    case VisualCornerOrientation::kBottomLeft:
+      clip_path.moveTo(border_rect.x(), curve_rect.y());
+      if (insets.left()) {
+        clip_path.lineTo(curve_rect.x(), curve_rect.y());
+      }
+      clip_path.arcTo(corner_radius, 0, SkPathBuilder::kSmall_ArcSize,
+                      SkPathDirection::kCCW,
+                      SkPoint(curve_rect.right(), curve_rect.bottom()));
+      if (insets.bottom()) {
+        clip_path.lineTo(curve_rect.right(), border_rect.bottom());
+      }
+      clip_path.lineTo(border_rect.x(), border_rect.bottom());
+      clip_path.lineTo(border_rect.x(), curve_rect.y());
+      break;
+    case VisualCornerOrientation::kBottomRight:
+      clip_path.moveTo(border_rect.right(), curve_rect.y());
+      clip_path.lineTo(border_rect.right(), border_rect.bottom());
+      clip_path.lineTo(curve_rect.x(), border_rect.bottom());
+      if (insets.bottom()) {
+        clip_path.lineTo(curve_rect.x(), curve_rect.bottom());
+      }
+      clip_path.arcTo(corner_radius, 0, SkPathBuilder::kSmall_ArcSize,
+                      SkPathDirection::kCCW,
+                      SkPoint(curve_rect.right(), curve_rect.y()));
+      if (insets.right()) {
+        clip_path.lineTo(border_rect.right(), curve_rect.y());
+      }
+      break;
+  }
+
+  return clip_path.detach();
 }

@@ -27,16 +27,6 @@ class CustomFloatingCorner : public views::View, public CustomCorners {
   METADATA_HEADER(CustomFloatingCorner, views::View)
 
  public:
-  // Specifies which corner something refers to.
-  // Currently only top corners are fully supported; bottom corners do not
-  // support strokes (as they are not yet needed).
-  enum class CornerOrientation {
-    kTopLeading,
-    kTopTrailing,
-    kBottomLeading,
-    kBottomTrailing,
-  };
-
   CustomFloatingCorner(BrowserView& browser_view,
                        CornerOrientation orientation,
                        views::ShapeContextTokens corner_radius_token,

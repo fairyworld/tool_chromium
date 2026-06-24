@@ -114,10 +114,25 @@ class CustomCornersBackground : public views::Background, public CustomCorners {
 
   bool visible_for_testing() const { return visible_; }
 
-  // Cuts the backgrounds from `views` out of `this`. Works for views with a
+  // Takes the inverse of a view with a CustomCornersBackground - i.e. it cuts
+  // out the corners, not the background area.
+  struct InverseOf {
+    InverseOf() = default;
+    explicit InverseOf(const CustomCornersBackground& background_)
+        : background(&background_) {}
+    InverseOf(const InverseOf& other) = default;
+    InverseOf& operator=(const InverseOf& other) = default;
+    ~InverseOf() = default;
+
+    raw_ptr<const CustomCornersBackground> background = nullptr;
+  };
+  using Cutout = std::variant<InverseOf, const views::View*>;
+  using Cutouts = std::vector<Cutout>;
+
+  // Cuts `cutouts` out of `this`. Works for views with a
   // `CustomCornersBackground` as well as for `CustomFloatingCorner`. Empty
   // clears the cutout.
-  void SetCutoutFrom(const std::vector<const views::View*>& views);
+  void SetCutoutFrom(const Cutouts& cutouts);
 
   // views::Background:
   void Paint(gfx::Canvas* canvas, views::View* view) const override;
@@ -138,6 +153,9 @@ class CustomCornersBackground : public views::Background, public CustomCorners {
   // Returns a path containing the entire painted background region.
   SkPath GetBackgroundPath(const gfx::Rect& in_bounds,
                            CornerRadii* corners = nullptr) const;
+
+  // Returns a set of paths containining each corner cutout.
+  std::vector<SkPath> GetCornerPaths(const gfx::Rect& in_bounds) const;
 
   // Possibly mirrors corners for RtL.
   Corners GetMirroredCorners() const;

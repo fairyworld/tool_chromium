@@ -24,26 +24,6 @@ namespace {
 
 constexpr int kStrokeSize = views::Separator::kThickness;
 
-// Returns the orientation in which to visually draw the corner; will mirror
-// `orientation` for RtL.
-CustomFloatingCorner::CornerOrientation GetVisualOrientation(
-    CustomFloatingCorner::CornerOrientation orientation) {
-  if (!base::i18n::IsRTL()) {
-    return orientation;
-  }
-
-  switch (orientation) {
-    case CustomFloatingCorner::CornerOrientation::kTopLeading:
-      return CustomFloatingCorner::CornerOrientation::kTopTrailing;
-    case CustomFloatingCorner::CornerOrientation::kTopTrailing:
-      return CustomFloatingCorner::CornerOrientation::kTopLeading;
-    case CustomFloatingCorner::CornerOrientation::kBottomLeading:
-      return CustomFloatingCorner::CornerOrientation::kBottomTrailing;
-    case CustomFloatingCorner::CornerOrientation::kBottomTrailing:
-      return CustomFloatingCorner::CornerOrientation::kBottomLeading;
-  }
-}
-
 }  // namespace
 
 CustomFloatingCorner::CustomFloatingCorner(
@@ -150,83 +130,29 @@ SkPath CustomFloatingCorner::GetBackgroundPath(
   // stroke.
   const bool has_stroke = stroke_.has_value();
   const bool extend_vertical = has_stroke && !is_vertical_window_edge_;
-  const SkVector corner_radius(
-      has_stroke ? width() - kStrokeSize : width(),
-      extend_vertical ? height() - kStrokeSize : height());
+  const int horizontal = has_stroke ? kStrokeSize : 0;
+  const int vertical = extend_vertical ? kStrokeSize : 0;
+  gfx::Insets stroke_insets;
 
   // Because we're painting, we have to account for RTL.
-  const CornerOrientation visual_orientation =
-      GetVisualOrientation(orientation_);
+  const auto visual_orientation = GetVisualOrientation(orientation_);
 
-  // Set up a clip path.
-  SkPathBuilder clip_path;
   switch (visual_orientation) {
-    case CornerOrientation::kTopLeading:
-      clip_path.moveTo(in_bounds.x(), in_bounds.y());
-      clip_path.lineTo(in_bounds.right(), in_bounds.y());
-      if (extend_vertical) {
-        clip_path.lineTo(in_bounds.right(), in_bounds.y() + kStrokeSize);
-      }
-      clip_path.arcTo(corner_radius, 0, SkPathBuilder::kSmall_ArcSize,
-                      SkPathDirection::kCCW,
-                      SkPoint(in_bounds.x() + (has_stroke ? kStrokeSize : 0),
-                              in_bounds.bottom()));
-      if (has_stroke) {
-        clip_path.lineTo(in_bounds.x(), in_bounds.bottom());
-      }
-      clip_path.lineTo(in_bounds.x(), in_bounds.y());
+    case VisualCornerOrientation::kTopLeft:
+      stroke_insets = gfx::Insets::TLBR(vertical, horizontal, 0, 0);
       break;
-    case CornerOrientation::kTopTrailing:
-      clip_path.moveTo(in_bounds.x(), in_bounds.y());
-      clip_path.lineTo(in_bounds.right(), in_bounds.y());
-      clip_path.lineTo(in_bounds.right(), in_bounds.bottom());
-      if (has_stroke) {
-        clip_path.lineTo(in_bounds.right() - kStrokeSize, in_bounds.bottom());
-      }
-      clip_path.arcTo(
-          corner_radius, 0, SkPathBuilder::kSmall_ArcSize,
-          SkPathDirection::kCCW,
-          SkPoint(in_bounds.x(),
-                  in_bounds.y() + (extend_vertical ? kStrokeSize : 0)));
-      if (extend_vertical) {
-        clip_path.lineTo(in_bounds.x(), in_bounds.y());
-      }
+    case VisualCornerOrientation::kTopRight:
+      stroke_insets = gfx::Insets::TLBR(vertical, 0, 0, horizontal);
       break;
-    case CornerOrientation::kBottomLeading:
-      clip_path.moveTo(in_bounds.x(), in_bounds.y());
-      if (has_stroke) {
-        clip_path.lineTo(in_bounds.x() + kStrokeSize, in_bounds.y());
-      }
-      clip_path.arcTo(corner_radius, 0, SkPathBuilder::kSmall_ArcSize,
-                      SkPathDirection::kCCW,
-                      SkPoint(in_bounds.right(),
-                              extend_vertical ? in_bounds.bottom() - kStrokeSize
-                                              : in_bounds.bottom()));
-      if (extend_vertical) {
-        clip_path.lineTo(in_bounds.right(), in_bounds.bottom());
-      }
-      clip_path.lineTo(in_bounds.x(), in_bounds.bottom());
-      clip_path.lineTo(in_bounds.x(), in_bounds.y());
+    case VisualCornerOrientation::kBottomRight:
+      stroke_insets = gfx::Insets::TLBR(0, 0, vertical, horizontal);
       break;
-    case CornerOrientation::kBottomTrailing:
-      clip_path.moveTo(in_bounds.right(), in_bounds.y());
-      clip_path.lineTo(in_bounds.right(), in_bounds.bottom());
-      clip_path.lineTo(in_bounds.x(), in_bounds.bottom());
-      if (extend_vertical) {
-        clip_path.lineTo(in_bounds.x(), in_bounds.bottom() - kStrokeSize);
-      }
-      clip_path.arcTo(corner_radius, 0, SkPathBuilder::kSmall_ArcSize,
-                      SkPathDirection::kCCW,
-                      SkPoint(has_stroke ? in_bounds.right() - kStrokeSize
-                                         : in_bounds.right(),
-                              in_bounds.y()));
-      if (has_stroke) {
-        clip_path.lineTo(in_bounds.right(), in_bounds.y());
-      }
+    case VisualCornerOrientation::kBottomLeft:
+      stroke_insets = gfx::Insets::TLBR(0, horizontal, vertical, 0);
       break;
   }
 
-  return clip_path.detach();
+  return GetCornerPath(visual_orientation, in_bounds, stroke_insets);
 }
 
 gfx::Size CustomFloatingCorner::CalculatePreferredSize(
@@ -261,8 +187,7 @@ void CustomFloatingCorner::OnPaint(gfx::Canvas* canvas) {
       extend_vertical ? height() - kStrokeSize : height());
 
   // Because we're painting, we have to account for RTL.
-  const CornerOrientation visual_orientation =
-      GetVisualOrientation(orientation_);
+  const auto visual_orientation = GetVisualOrientation(orientation_);
 
   canvas->ClipPath(GetBackgroundPath(rect), /*do_anti_alias=*/true);
 
@@ -286,19 +211,19 @@ void CustomFloatingCorner::OnPaint(gfx::Canvas* canvas) {
 
     SkPathBuilder stroke_path;
     switch (visual_orientation) {
-      case CornerOrientation::kTopLeading:
+      case VisualCornerOrientation::kTopLeft:
         stroke_path.moveTo(rect.width(), extend_vertical ? kStrokeSize : 0);
         stroke_path.arcTo(corner_radius, 0, SkPathBuilder::kSmall_ArcSize,
                           SkPathDirection::kCCW,
                           SkPoint(kStrokeSize, rect.height()));
         break;
-      case CornerOrientation::kTopTrailing:
+      case VisualCornerOrientation::kTopRight:
         stroke_path.moveTo(rect.width() - kStrokeSize, rect.height());
         stroke_path.arcTo(corner_radius, 0, SkPathBuilder::kSmall_ArcSize,
                           SkPathDirection::kCCW,
                           SkPoint(0, extend_vertical ? kStrokeSize : 0));
         break;
-      case CornerOrientation::kBottomLeading:
+      case VisualCornerOrientation::kBottomLeft:
         stroke_path.moveTo(kStrokeSize, 0);
         stroke_path.arcTo(
             corner_radius, 0, SkPathBuilder::kSmall_ArcSize,
@@ -306,7 +231,7 @@ void CustomFloatingCorner::OnPaint(gfx::Canvas* canvas) {
             SkPoint(rect.width(), extend_vertical ? rect.height() - kStrokeSize
                                                   : rect.height()));
         break;
-      case CornerOrientation::kBottomTrailing:
+      case VisualCornerOrientation::kBottomRight:
         stroke_path.moveTo(rect.width() - kStrokeSize, 0);
         stroke_path.arcTo(
             corner_radius, 0, SkPathBuilder::kSmall_ArcSize,

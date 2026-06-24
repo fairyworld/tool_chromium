@@ -21,6 +21,14 @@ class BrowserView;
 // Shared base class for custom corners in the UI.
 class CustomCorners : public views::ViewObserver {
  public:
+  // Specifies which corner something refers to.
+  enum class CornerOrientation {
+    kTopLeading,
+    kTopTrailing,
+    kBottomLeading,
+    kBottomTrailing,
+  };
+
   // Designates that the current frame color (either active or inactive) should
   // be used. If a theme is present, then that takes precedence. If you want to
   // force e.g. active color, use `kColorFrameActive` instead.
@@ -100,6 +108,32 @@ class CustomCorners : public views::ViewObserver {
                  const SkPath& path,
                  ColorChoiceWithAlpha color_choice,
                  bool anti_alias) const;
+
+  // This represents which corner something is visually, which is different from
+  // CornerOrientation because the latter is expressed as leading/trailing,
+  // which can change between LtR/RtL.
+  //
+  // Use GetVisualOrientation to convert from CornerOrientation to
+  // VisualCornerOrientation.
+  enum class VisualCornerOrientation {
+    kTopLeft,
+    kTopRight,
+    kBottomRight,
+    kBottomLeft
+  };
+
+  // Possibly mirrors a corner for RtL.
+  static VisualCornerOrientation GetVisualOrientation(
+      CornerOrientation orientation);
+
+  // Gets the outline path for a corner.
+  //
+  // The entire shape will be drawn `in_bounds`, with the actual curve of the
+  // corner drawn in `in_bounds` - `insets`. (Flat edges will be extended out to
+  // the edge of `in_bounds`).
+  static SkPath GetCornerPath(VisualCornerOrientation corner,
+                              const gfx::Rect& in_bounds,
+                              const gfx::Insets& insets);
 
  private:
   // views::ViewObserver:
