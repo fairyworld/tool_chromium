@@ -69,8 +69,8 @@ class TabDragSession {
   void OnInputEvent(const TabDragInputEvent& event);
 
   void HandleMovedEvent(const gfx::Point& screen_point);
-  void HandleAttachedMove(const gfx::Point& screen_point);
-  void HandleDetachedMove(const gfx::Point& screen_point);
+  void HandleMoveWhileAttached(const gfx::Point& screen_point);
+  void HandleMoveWhileDetached(const gfx::Point& screen_point);
 
   std::vector<tabs_api::NodeId> dragged_tabs_;
   const raw_ref<TabDragSessionInjector> injector_;
@@ -83,6 +83,7 @@ class TabDragSession {
   TabDragWindowId dragged_window_;
   TabDragWindowRegistry* registry() const;
   DragMode drag_mode_ = DragMode::kAttachedToWindow;
+  gfx::Vector2d start_window_offset_;
 };
 
 }  // namespace tabs_api
