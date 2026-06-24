@@ -46,11 +46,17 @@
 #include "chrome/browser/global_keyboard_shortcuts_mac.h"
 #include "chrome/browser/ui/browser_commands_mac.h"
 #endif
+#include "base/strings/escape.h"
 #include "chrome/browser/browser_process.h"
+#include "chrome/browser/devtools/devtools_policy_dialog.h"
+#include "chrome/browser/devtools/devtools_window.h"
+#include "chrome/browser/devtools/features.h"
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/indigo/resources/grit/indigo_strings.h"
 #include "chrome/browser/multistep_filter/ui/filter_ui_controller.h"
+#include "chrome/browser/platform_util.h"
 #include "chrome/browser/tab_list/tab_list_interface.h"
+#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ui/actions/actions_util.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/actions/chrome_action_properties.h"
@@ -76,10 +82,12 @@
 #include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/browser/ui/commerce/commerce_ui_tab_helper.h"
 #include "chrome/browser/ui/customize_chrome/side_panel_controller.h"
+#include "chrome/browser/ui/dialogs/browser_dialogs.h"
 #include "chrome/browser/ui/exclusive_access/exclusive_access_manager.h"
 #include "chrome/browser/ui/intent_picker_tab_helper.h"
 #include "chrome/browser/ui/lens/lens_overlay_controller.h"
 #include "chrome/browser/ui/lens/lens_overlay_entry_point_controller.h"
+#include "chrome/browser/ui/lens/lens_search_controller.h"
 #include "chrome/browser/ui/lens/lens_string_utils.h"
 #include "chrome/browser/ui/omnibox/ai_mode_page_action_controller.h"
 #include "chrome/browser/ui/page_action/page_action_controller.h"
@@ -137,6 +145,7 @@
 #include "chrome/browser/ui/webauthn/ambient/ambient_signin_controller.h"
 #include "chrome/browser/ui/webid/account_selection_view.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_section.h"
+#include "chrome/browser/web_applications/web_app_install_params.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/pref_names.h"
 #include "chrome/grit/branded_strings.h"
@@ -149,6 +158,7 @@
 #include "components/contextual_tasks/public/features.h"
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/lens/lens_features.h"
+#include "components/lens/lens_overlay_invocation_source.h"
 #include "components/media_router/browser/media_router_dialog_controller.h"
 #include "components/media_router/browser/media_router_metrics.h"
 #include "components/multistep_filter/core/features.h"
@@ -164,12 +174,10 @@
 #include "components/split_tabs/split_tab_visual_data.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/tabs/public/tab_interface.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
-#include "chrome/browser/ui/lens/lens_search_controller.h"
-#include "components/lens/lens_overlay_invocation_source.h"
 #include "components/translate/core/browser/translate_manager.h"
 #include "components/user_prefs/user_prefs.h"
 #include "components/vector_icons/vector_icons.h"
+#include "printing/buildflags/buildflags.h"
 #include "ui/accessibility/accessibility_features.h"
 #include "ui/actions/actions.h"
 #include "ui/base/l10n/l10n_util.h"
@@ -2945,6 +2953,216 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               },
               bwi))
           .SetActionId(kActionContentContextLensRegionSearch)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                tabs::TabInterface* const active_tab =
+                    bwi->GetActiveTabInterface();
+                if (!active_tab) {
+                  return;
+                }
+                content::WebContents* const web_contents =
+                    active_tab->GetContents();
+                if (!web_contents) {
+                  return;
+                }
+                if (base::FeatureList::IsEnabled(
+                        features::kDevToolsShowPolicyDialog) &&
+                    !DevToolsWindow::AllowDevToolsFor(bwi->GetProfile(),
+                                                      web_contents)) {
+                  DevToolsPolicyDialog::Show(web_contents);
+                } else {
+                  web_contents->GetPrimaryMainFrame()->ViewSource();
+                }
+              },
+              bwi))
+          .SetActionId(kActionViewSource)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::SavePage(bwi);
+              },
+              bwi))
+          .SetActionId(kActionSavePage)
+          .Build());
+
+#if BUILDFLAG(ENABLE_PRINTING)
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::BasicPrint(bwi);
+              },
+              bwi))
+          .SetActionId(kActionBasicPrint)
+          .Build());
+#endif  // BUILDFLAG(ENABLE_PRINTING)
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                tabs::TabInterface* const active_tab =
+                    bwi->GetActiveTabInterface();
+                if (active_tab && active_tab->GetContents()) {
+                  active_tab->GetContents()->Focus();
+                }
+              },
+              bwi))
+          .SetActionId(kActionFocusThisTab)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::MuteSiteForKeyboardFocusedTab(bwi);
+              },
+              bwi))
+          .SetActionId(kActionMuteTargetSite)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::FindNext(bwi);
+              },
+              bwi))
+          .SetActionId(kActionFindNext)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::FindPrevious(bwi);
+              },
+              bwi))
+          .SetActionId(kActionFindPrevious)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                if (chrome::CanCloseFind(bwi)) {
+                  chrome::CloseFind(bwi);
+                } else {
+                  chrome::Stop(bwi);
+                }
+              },
+              bwi))
+          .SetActionId(kActionCloseFindOrStop)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
+                chrome::CreateDesktopShortcutForActiveWebContents(
+                    bwi->GetBrowserForMigrationOnly());
+#else
+                web_app::CreateWebAppFromCurrentWebContents(
+                    bwi->GetBrowserForMigrationOnly(),
+                    web_app::WebAppInstallFlow::kCreateShortcut);
+#endif
+              },
+              bwi))
+          .SetActionId(kActionCreateShortcut)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ToggleDevToolsWindow(
+                    bwi, DevToolsToggleAction::ShowConsolePanel(),
+                    DevToolsOpenedByAction::kConsoleShortcut);
+              },
+              bwi))
+          .SetActionId(kActionDevToolsConsole)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ToggleDevToolsWindow(
+                    bwi, DevToolsToggleAction::Toggle(),
+                    DevToolsOpenedByAction::kToggleShortcut);
+              },
+              bwi))
+          .SetActionId(kActionDevToolsToggle)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ToggleShowSearchTools(bwi);
+              },
+              bwi))
+          .SetActionId(kActionShowSearchTools)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ToggleCaretBrowsing(bwi);
+              },
+              bwi))
+          .SetActionId(kActionCaretBrowsingToggle)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                tabs::TabInterface* const active_tab =
+                    bwi->GetActiveTabInterface();
+                if (!active_tab) {
+                  return;
+                }
+                content::WebContents* const web_contents =
+                    active_tab->GetContents();
+                if (!web_contents) {
+                  return;
+                }
+                auto* bubble_controller =
+                    qrcode_generator::QRCodeGeneratorBubbleController::Get(
+                        web_contents);
+                if (bubble_controller) {
+                  base::RecordAction(base::UserMetricsAction(
+                      "SharingQRCode.DialogLaunched.ContextMenuPage"));
+                  bubble_controller->ShowBubble(
+                      web_contents->GetLastCommittedURL());
+                }
+              },
+              bwi))
+          .SetActionId(kActionContentContextGenerateQrCode)
           .Build());
 }
 
