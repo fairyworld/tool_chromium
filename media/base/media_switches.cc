@@ -1770,6 +1770,8 @@ BASE_FEATURE(kMP4TimedMetadataTrack, base::FEATURE_ENABLED_BY_DEFAULT);
 BASE_FEATURE(kWebRtcAudioNeuralResidualEchoEstimation,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
+BASE_FEATURE(kWebRtcVoiceIsolationDenoiser, base::FEATURE_DISABLED_BY_DEFAULT);
+
 bool IsAudioProcessMlModelUsageEnabled() {
   if (!media::IsChromeWideEchoCancellationEnabled()) {
     // The feature relies on Chrome-wide echo cancellation being enabled,
@@ -1777,7 +1779,9 @@ bool IsAudioProcessMlModelUsageEnabled() {
     // model.
     return false;
   }
-  return base::FeatureList::IsEnabled(kWebRtcAudioNeuralResidualEchoEstimation);
+  return base::FeatureList::IsEnabled(
+             kWebRtcAudioNeuralResidualEchoEstimation) ||
+         base::FeatureList::IsEnabled(kWebRtcVoiceIsolationDenoiser);
 }
 
 #if BUILDFLAG(IS_MAC)

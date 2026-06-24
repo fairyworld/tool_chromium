@@ -580,6 +580,10 @@ MEDIA_EXPORT bool IsChromeWideEchoCancellationEnabled();
 // WebRTC echo cancellation.
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kWebRtcAudioNeuralResidualEchoEstimation);
 
+// When enabled, input audio processing in the audio process may use an ML-based
+// voice isolation denoiser.
+MEDIA_EXPORT BASE_DECLARE_FEATURE(kWebRtcVoiceIsolationDenoiser);
+
 // Flag to enable or disable parsing of MP4 timed metadata tracks.
 MEDIA_EXPORT BASE_DECLARE_FEATURE(kMP4TimedMetadataTrack);
 
