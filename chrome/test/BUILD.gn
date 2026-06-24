@@ -5961,9 +5961,6 @@ test("unit_tests") {
       "../browser/performance_manager/metrics/metrics_provider_desktop_unittest.cc",
       "../browser/performance_manager/policies/transient_keep_alive_policy_unittest.cc",
       "../browser/policy/messaging_layer/util/reporting_server_connector_unittest.cc",
-      "../browser/site_protection/site_familiarity_process_selection_deferring_condition_unittest.cc",
-      "../browser/site_protection/site_familiarity_utils_unittest.cc",
-      "../browser/site_protection/site_protection_metrics_observer_unittest.cc",
       "../browser/ssl/generated_https_first_mode_pref_unittest.cc",
     ]
   } else {
@@ -6781,6 +6778,7 @@ test("unit_tests") {
       "//chrome/browser/new_tab_page/chrome_colors:generate_colors_info",
       "//chrome/browser/record_replay:unit_tests",
       "//chrome/browser/search:unit_tests",
+      "//chrome/browser/site_protection:unit_tests",
       "//chrome/browser/ui:browser_actions",
       "//chrome/browser/ui/fullscreen",
       "//chrome/browser/ui/side_panel:test_support",
