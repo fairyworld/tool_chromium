@@ -13,17 +13,17 @@ import type {ComposeboxToolChipElement} from 'chrome://resources/cr_components/c
 import {createAutocompleteMatch, createAutocompleteResultForTesting} from 'chrome://resources/cr_components/searchbox/searchbox_browser_proxy.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {PageCallbackRouter as SearchboxPageCallbackRouter, PageHandlerRemote as SearchboxPageHandlerRemote, SuggestInventory} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
-import type {PageRemote as SearchboxPageRemote} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
+import type {AutocompleteResult, PageRemote as SearchboxPageRemote} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {MockInputState} from 'chrome://webui-test/cr_components/searchbox/searchbox_test_utils.js';
 import {MockTimer} from 'chrome://webui-test/mock_timer.js';
 import {TestMock} from 'chrome://webui-test/test_mock.js';
-import {$$, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
+import {$$, eventToPromise, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
 
-import {TestContextualTasksBrowserProxy} from './test_contextual_tasks_browser_proxy.js';
-import {setupAutocompleteResults} from './test_searchbox_utils.js';
 import {createCtComposeboxApp, fixtureUrl, getSubmitButton, simulateUserInput} from './contextual_tasks_test_utils.js';
 import type {CtComposeboxAppParts} from './contextual_tasks_test_utils.js';
+import {TestContextualTasksBrowserProxy} from './test_contextual_tasks_browser_proxy.js';
+import {setupAutocompleteResults} from './test_searchbox_utils.js';
 
 declare global {
   interface Window {
@@ -247,45 +247,6 @@ suite('ContextualTasksComposeboxTest', () => {
         height1 !== height2, `Height should change: ${height1} vs ${height2}`);
   });
 
-  test('SelectingMatchPopulatesComposebox', async () => {
-    mockTimer.install();
-    const composebox = contextualTasksApp.$.composebox.$.composebox;
-    const inputElement = composebox.getInputElement().$.input;
-
-
-    const testQuery = 'test';
-    simulateUserInput(inputElement, testQuery);
-
-    const matches = [
-      createAutocompleteMatch({fillIntoEdit: 'match 1'}),
-      createAutocompleteMatch({fillIntoEdit: 'match 2'}),
-    ];
-    searchboxCallbackRouterRemote.autocompleteResultChanged(
-        createAutocompleteResultForTesting(
-            {input: testQuery, matches: matches}));
-    await searchboxCallbackRouterRemote.$.flushForTesting();
-    mockTimer.tick(0);
-
-    const matchesEl = composebox.getDropdownElement();
-    assertTrue(matchesEl.result !== null, 'Matches should be populated');
-    assertEquals(2, matchesEl.result.matches.length, 'Should have 2 matches');
-
-
-    inputElement.dispatchEvent(new KeyboardEvent(
-        'keydown', {key: 'ArrowDown', bubbles: true, composed: true}));
-
-    // Wait for Lit updates to propagate
-    mockTimer.tick(100);
-    await composebox.getDropdownElement().updateComplete;
-    await composebox.updateComplete;
-    assertEquals(
-        0, composebox.getDropdownElement().selectedMatchIndex,
-        'Index should be 0');
-    assertEquals(
-        'match 1', inputElement.value, 'Input value should be match 1');
-    assertEquals(0, composebox.selectedMatchIndex, 'Parent index should be 0');
-  });
-
   // TODO(crbug.com/523350742): Enable Tooltip tests on Android.
   // <if expr="not is_android">
   test('TooltipVisibilityUpdatesOnResize', () => {
@@ -447,73 +408,6 @@ suite('ContextualTasksComposeboxTest', () => {
     await setActiveTool(ToolMode.kUnspecified);
 
     assertFalse(isVisible(getChip()), 'Tool chip still visible');
-  });
-
-  test('EnterKeyAfterSubmitDoesNotAddNewLine', async () => {
-    mockTimer.install();
-    const TEST_QUERY = 'test query';
-
-    const inputElement = composebox.getInputElement().$.input;
-    assertTrue(
-        isVisible(inputElement), 'Composebox input element should be visible');
-
-    // 1. Setup: Input text.
-    simulateUserInput(inputElement, TEST_QUERY);
-
-    // Advance timer to trigger the debounced autocomplete query.
-    mockTimer.tick(300);
-
-    // Wait for the component to actually request autocomplete
-    // before we mock the response, otherwise the response is ignored.
-    await mockSearchboxPageHandler.whenCalled(
-        'queryAutocompleteWithSuggestInventory');
-
-    // 2. Mock Autocomplete Results.
-    await setupAutocompleteResults(searchboxCallbackRouterRemote, TEST_QUERY,
-        mockTimer);
-
-    // Wait for the matches to be populated in the dropdown.
-    while (!composebox.getDropdownElement().result) {
-      mockTimer.tick(10);
-      await Promise.resolve();
-    }
-
-    const submitButton = getSubmitButton(composebox);
-    assertTrue(submitButton !== null);
-    assertFalse(submitButton.disabled, 'Submit should be enabled');
-
-    // 3. Action: Simulate Enter press to submit
-    mockSearchboxPageHandler.reset();
-    pressEnter(inputElement);
-
-    await mockSearchboxPageHandler.whenCalled('openAutocompleteMatch');
-    assertEquals(
-        1, mockSearchboxPageHandler.getCallCount('openAutocompleteMatch'));
-
-    // Tick timer to allow Lit's update lifecycle to process the submit.
-    mockTimer.tick(0);
-
-    // 4. Wait for the UI to clear the input after submission.
-    await composebox.updateComplete;
-    assertEquals(
-        '', inputElement.value, 'Input should be cleared after submit');
-    assertEquals(
-        null, composebox.getDropdownElement().result,
-        'Matches should be cleared after submit');
-
-    // 5. Action: Press Enter again on empty input.
-    mockSearchboxPageHandler.reset();
-    pressEnter(inputElement);
-
-    // Tick timer again for Lit updates.
-    mockTimer.tick(0);
-    await composebox.updateComplete;
-
-    // 6. Assert: No newline added, submit not called again.
-    assertFalse(inputElement.value.includes('\n'));
-    assertEquals(0, mockSearchboxPageHandler.getCallCount('submitQuery'));
-    assertEquals(
-        0, mockSearchboxPageHandler.getCallCount('openAutocompleteMatch'));
   });
 
   test('composebox is hidden until isZeroState is not undefined', async () => {
@@ -1685,5 +1579,305 @@ suite('ContextualTasksComposeboxTest', () => {
               queryAutocompleteClearMatchesArg,
               'should pass clearMatches = true');
         });
+      });
+});
+
+// =============================================================================
+// Fork DUAL-PATH DROPDOWN / RESULT-CHANGED / SUGGESTION-ACTIVITY SUITE
+// The fork forwards autocomplete results to the wrapper via `result-changed`
+// and signals the suggestion-activity link via `show-suggestion-activity-link`,
+// matching the legacy <cr-composebox>, so these tests run on both paths.
+// =============================================================================
+[true, false].forEach(useFork => {
+  suite(
+      `ContextualTasksComposeboxForkDropdownTest ` +
+          `(useContextualTasksComposeboxFork = ${useFork})`,
+      () => {
+        let mockComposeboxPageHandler: TestMock<ComposeboxPageHandlerRemote>&
+            ComposeboxPageHandlerRemote;
+        let mockSearchboxPageHandler: TestMock<SearchboxPageHandlerRemote>&
+            SearchboxPageHandlerRemote;
+        let searchboxCallbackRouterRemote: SearchboxPageRemote;
+        let mockTimer: MockTimer;
+        let parts: CtComposeboxAppParts;
+
+        setup(async () => {
+          if (!window.chrome) {
+            Object.assign(window, {chrome: {}});
+          }
+          if (!window.chrome.histograms) {
+            Object.assign(window.chrome, {
+              histograms: {
+                recordEnumerationValue: () => {},
+                recordUserAction: () => {},
+                recordBoolean: () => {},
+              },
+            });
+          }
+          document.body.innerHTML = window.trustedTypes!.emptyHTML;
+
+          mockTimer = new MockTimer();
+
+          loadTimeData.overrideValues({
+            contextualMenuUsePecApi: false,
+            composeboxSmartTabSharingVisible: false,
+            enableComposeboxJumpFix: false,
+            composeboxShowTypedSuggest: true,
+            composeboxShowZps: true,
+            enableBasicModeZOrder: true,
+            composeboxShowContextMenu: true,
+            composeboxHintTextLensOverlay: 'Test Lens Hint',
+            forcedEmbeddedPageHost: '',
+            tabFaviconChipsToCoinsEnabled: false,
+          });
+
+          const testProxy = new TestContextualTasksBrowserProxy(fixtureUrl);
+          BrowserProxyImpl.setInstance(testProxy);
+
+          mockComposeboxPageHandler =
+              TestMock.fromClass(ComposeboxPageHandlerRemote);
+          mockComposeboxPageHandler.setResultFor(
+              'getSmartTabSharingActive', Promise.resolve({active: false}));
+          mockComposeboxPageHandler.setResultFor(
+              'canShowNextboxAnimation', Promise.resolve({canShow: true}));
+          mockSearchboxPageHandler =
+              TestMock.fromClass(SearchboxPageHandlerRemote);
+          mockSearchboxPageHandler.setResultFor(
+              'getRecentTabs', Promise.resolve({tabs: []}));
+          mockSearchboxPageHandler.setResultFor(
+              'getPageClassification',
+              Promise.resolve({metricSource: 'CO_BROWSING_COMPOSEBOX'}));
+          mockSearchboxPageHandler.setResultFor(
+              'addTabContext',
+              Promise.resolve({high: BigInt(1), low: BigInt(2)}));
+          mockSearchboxPageHandler.setResultFor(
+              'getInputState', Promise.resolve({state: new MockInputState()}));
+          const searchboxCallbackRouter = new SearchboxPageCallbackRouter();
+          searchboxCallbackRouterRemote =
+              searchboxCallbackRouter.$.bindNewPipeAndPassRemote();
+          ComposeboxProxyImpl.setInstance(new ComposeboxProxyImpl(
+              mockComposeboxPageHandler, new ComposeboxPageCallbackRouter(),
+              mockSearchboxPageHandler, searchboxCallbackRouter));
+
+          parts = await createCtComposeboxApp(useFork);
+          searchboxCallbackRouterRemote.onInputStateChanged(
+              new MockInputState());
+          await microtasksFinished();
+        });
+
+        teardown(() => {
+          mockTimer.uninstall();
+        });
+
+        test('fires result-changed for an accepted autocomplete result',
+            async () => {
+              mockTimer.install();
+              const {innerComposebox} = parts;
+              const inputElement = innerComposebox.getInputElement().$.input;
+              const testQuery = 'test';
+
+              simulateUserInput(inputElement, testQuery);
+              mockTimer.tick(300);
+              await mockSearchboxPageHandler.whenCalled(
+                  'queryAutocompleteWithSuggestInventory');
+
+              const whenResultChanged =
+                  eventToPromise<CustomEvent<AutocompleteResult>>(
+                      'result-changed', innerComposebox);
+              searchboxCallbackRouterRemote.autocompleteResultChanged(
+                  createAutocompleteResultForTesting({
+                    input: testQuery,
+                    matches: [createAutocompleteMatch({fillIntoEdit: 'm1'})],
+                  }));
+              await searchboxCallbackRouterRemote.$.flushForTesting();
+              mockTimer.tick(0);
+
+              const event = await whenResultChanged;
+              assertEquals(testQuery, event.detail.input);
+              assertEquals(1, event.detail.matches.length);
+            });
+
+        test('does not fire result-changed for a stale autocomplete result',
+            async () => {
+              mockTimer.install();
+              const {innerComposebox} = parts;
+              const inputElement = innerComposebox.getInputElement().$.input;
+
+              simulateUserInput(inputElement, 'test');
+              mockTimer.tick(300);
+              await mockSearchboxPageHandler.whenCalled(
+                  'queryAutocompleteWithSuggestInventory');
+
+              let fired = false;
+              innerComposebox.addEventListener(
+                  'result-changed', () => fired = true);
+
+              // The response input does not match the last queried input.
+              searchboxCallbackRouterRemote.autocompleteResultChanged(
+                  createAutocompleteResultForTesting({
+                    input: 'stale',
+                    matches: [createAutocompleteMatch()],
+                  }));
+              await searchboxCallbackRouterRemote.$.flushForTesting();
+              mockTimer.tick(0);
+              await innerComposebox.updateComplete;
+
+              assertFalse(
+                  fired, 'result-changed should not fire for a stale result');
+            });
+
+        test(
+            'fires show-suggestion-activity-link for a noncanned AIM suggestion',
+            async () => {
+              const {innerComposebox} = parts;
+              let lastDetail: boolean|null = null;
+              innerComposebox.addEventListener(
+                  'show-suggestion-activity-link',
+                  e => lastDetail = (e as CustomEvent<boolean>).detail);
+
+              // Zero-prefix-suggest results (empty input) keep the dropdown
+              // shown; one match is a noncanned AIM suggestion.
+              searchboxCallbackRouterRemote.autocompleteResultChanged(
+                  createAutocompleteResultForTesting({
+                    input: '',
+                    matches: [
+                      createAutocompleteMatch({isNoncannedAimSuggestion: true}),
+                      createAutocompleteMatch(),
+                    ],
+                  }));
+              await searchboxCallbackRouterRemote.$.flushForTesting();
+              await innerComposebox.updateComplete;
+
+              assertTrue(
+                  !!lastDetail,
+                  'show-suggestion-activity-link should fire true');
+            });
+
+        test('clears the suggestion-activity link for ordinary results',
+            async () => {
+              const {wrapper, innerComposebox} = parts;
+              let lastDetail: boolean|null = null;
+              innerComposebox.addEventListener(
+                  'show-suggestion-activity-link',
+                  e => lastDetail = (e as CustomEvent<boolean>).detail);
+
+              // A noncanned AIM suggestion first surfaces the link.
+              searchboxCallbackRouterRemote.autocompleteResultChanged(
+                  createAutocompleteResultForTesting({
+                    input: '',
+                    matches: [
+                      createAutocompleteMatch({isNoncannedAimSuggestion: true}),
+                      createAutocompleteMatch(),
+                    ],
+                  }));
+              await searchboxCallbackRouterRemote.$.flushForTesting();
+              await innerComposebox.updateComplete;
+              assertTrue(!!lastDetail);
+
+              // Ordinary results clear it; the wrapper keeps no residual link.
+              searchboxCallbackRouterRemote.autocompleteResultChanged(
+                  createAutocompleteResultForTesting({
+                    input: '',
+                    matches: [
+                      createAutocompleteMatch(),
+                      createAutocompleteMatch(),
+                    ],
+                  }));
+              await searchboxCallbackRouterRemote.$.flushForTesting();
+              await innerComposebox.updateComplete;
+              await wrapper.updateComplete;
+
+              assertFalse(
+                  !!lastDetail,
+                  'show-suggestion-activity-link should fire false');
+              assertEquals(
+                  null,
+                  wrapper.shadowRoot.querySelector('#suggestionActivity'),
+                  'wrapper should not keep a residual activity link');
+            });
+
+        test('selecting a match populates the composebox', async () => {
+          mockTimer.install();
+          const {innerComposebox} = parts;
+          const inputElement = innerComposebox.getInputElement().$.input;
+          const testQuery = 'test';
+
+          simulateUserInput(inputElement, testQuery);
+          searchboxCallbackRouterRemote.autocompleteResultChanged(
+              createAutocompleteResultForTesting({
+                input: testQuery,
+                matches: [
+                  createAutocompleteMatch({fillIntoEdit: 'match 1'}),
+                  createAutocompleteMatch({fillIntoEdit: 'match 2'}),
+                ],
+              }));
+          await searchboxCallbackRouterRemote.$.flushForTesting();
+          mockTimer.tick(0);
+
+          const matchesEl = innerComposebox.getDropdownElement();
+          assertTrue(matchesEl.result !== null, 'Matches should be populated');
+          assertEquals(2, matchesEl.result.matches.length);
+
+          inputElement.dispatchEvent(new KeyboardEvent(
+              'keydown', {key: 'ArrowDown', bubbles: true, composed: true}));
+          mockTimer.tick(100);
+          await innerComposebox.getDropdownElement().updateComplete;
+          await innerComposebox.updateComplete;
+
+          assertEquals(
+              0, innerComposebox.getDropdownElement().selectedMatchIndex);
+          assertEquals('match 1', inputElement.value);
+          assertEquals(0, innerComposebox.selectedMatchIndex);
+        });
+
+        test('clears dropdown matches after submitting a selected match',
+            async () => {
+              mockTimer.install();
+              const TEST_QUERY = 'test query';
+              const {app, innerComposebox} = parts;
+              const inputElement = innerComposebox.getInputElement().$.input;
+              assertTrue(isVisible(inputElement));
+
+              simulateUserInput(inputElement, TEST_QUERY);
+              mockTimer.tick(300);
+              await mockSearchboxPageHandler.whenCalled(
+                  'queryAutocompleteWithSuggestInventory');
+
+              await setupAutocompleteResults(
+                  searchboxCallbackRouterRemote, TEST_QUERY, mockTimer);
+              while (!innerComposebox.getDropdownElement().result) {
+                mockTimer.tick(10);
+                await Promise.resolve();
+              }
+
+              const submitButton = getSubmitButton(innerComposebox);
+              assertTrue(submitButton !== null);
+              assertFalse(submitButton.disabled);
+
+              mockSearchboxPageHandler.reset();
+              pressEnter(inputElement);
+              await mockSearchboxPageHandler.whenCalled('openAutocompleteMatch');
+              mockTimer.tick(0);
+              await innerComposebox.updateComplete;
+              await app.updateComplete;
+
+              assertEquals('', inputElement.value);
+              assertEquals(
+                  null, innerComposebox.getDropdownElement().result,
+                  'Matches should be cleared after submit');
+
+              // Pressing Enter again on the now-empty input is a no-op.
+              mockSearchboxPageHandler.reset();
+              pressEnter(inputElement);
+              mockTimer.tick(0);
+              await innerComposebox.updateComplete;
+              assertFalse(inputElement.value.includes('\n'));
+              assertEquals(
+                  0, mockSearchboxPageHandler.getCallCount('submitQuery'));
+              assertEquals(
+                  0,
+                  mockSearchboxPageHandler.getCallCount(
+                      'openAutocompleteMatch'));
+            });
       });
 });
