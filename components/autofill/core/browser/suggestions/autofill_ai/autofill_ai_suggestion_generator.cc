@@ -64,6 +64,15 @@
 namespace autofill {
 namespace {
 
+// Represents all the different UI sections for autofill ai data in Chrome
+// Settings.
+enum class AutofillAiUiSection {
+  kTravel,
+  kIdentityDocs,
+  kShopping,
+  kMaxValue = kShopping,
+};
+
 // Holds an assignment of AutofillFields to AttributeTypes.
 //
 // Note that an AutofillField may have multiple AttributeTypes of distinct
@@ -153,6 +162,16 @@ Suggestion CreateManageTravelSuggestion() {
   return suggestion;
 }
 
+// Returns a suggestion to manage AutofillAi shopping data.
+Suggestion CreateManageShoppingSuggestion() {
+  Suggestion suggestion(
+      l10n_util::GetStringUTF16(
+          IDS_AUTOFILL_AI_MANAGE_SHOPPING_SUGGESTION_MAIN_TEXT),
+      SuggestionType::kManageAutofillAiShopping);
+  suggestion.icon = Suggestion::Icon::kSettings;
+  return suggestion;
+}
+
 // Returns a suggestion to "Undo" Autofill.
 Suggestion CreateUndoSuggestion() {
   Suggestion suggestion(l10n_util::GetStringUTF16(IDS_AUTOFILL_UNDO_MENU_ITEM),
@@ -165,8 +184,7 @@ Suggestion CreateUndoSuggestion() {
 
 std::vector<Suggestion> GetFooterSuggestions(
     const FormFieldData& trigger_field,
-    bool suggestions_contain_travel_entity,
-    bool suggestions_contain_identity_docs_entity) {
+    const DenseSet<AutofillAiUiSection>& ui_sections) {
   std::vector<Suggestion> suggestions;
   suggestions.reserve(3);
 
@@ -178,18 +196,22 @@ std::vector<Suggestion> GetFooterSuggestions(
   if (base::FeatureList::IsEnabled(
           features::kSuggestionManageButtonSplitForEnhancedAutofill) &&
       base::FeatureList::IsEnabled(features::kYourSavedInfoSettingsPage)) {
-    CHECK(suggestions_contain_travel_entity ||
-          suggestions_contain_identity_docs_entity);
+    CHECK(!ui_sections.empty());
 
-    if (suggestions_contain_travel_entity &&
-        suggestions_contain_identity_docs_entity) {
+    if (ui_sections.size() > 1) {
       suggestions.emplace_back(CreateManageAutofillAiSuggestion());
-    } else if (suggestions_contain_travel_entity) {
-      suggestions.emplace_back(CreateManageTravelSuggestion());
-    } else if (suggestions_contain_identity_docs_entity) {
-      suggestions.emplace_back(CreateManageIdentityDocsSuggestion());
     } else {
-      NOTREACHED();
+      switch (*ui_sections.begin()) {
+        case AutofillAiUiSection::kTravel:
+          suggestions.emplace_back(CreateManageTravelSuggestion());
+          break;
+        case AutofillAiUiSection::kIdentityDocs:
+          suggestions.emplace_back(CreateManageIdentityDocsSuggestion());
+          break;
+        case AutofillAiUiSection::kShopping:
+          suggestions.emplace_back(CreateManageShoppingSuggestion());
+          break;
+      }
     }
   } else {
     suggestions.emplace_back(CreateManageAutofillAiSuggestion());
@@ -408,36 +430,20 @@ Suggestion::Icon GetSuggestionIcon(
   NOTREACHED();
 }
 
-bool IsTravelType(EntityType trigger_entity_type) {
+AutofillAiUiSection GetAutofillAiUiSection(EntityType trigger_entity_type) {
   switch (trigger_entity_type.name()) {
     case EntityTypeName::kFlightReservation:
     case EntityTypeName::kKnownTravelerNumber:
     case EntityTypeName::kRedressNumber:
     case EntityTypeName::kVehicle:
-      return true;
-    case EntityTypeName::kDriversLicense:
-    case EntityTypeName::kNationalIdCard:
-    case EntityTypeName::kOrder:
-    case EntityTypeName::kPassport:
-    case EntityTypeName::kShipment:
-      return false;
-  }
-  NOTREACHED();
-}
-
-bool IsIdentityDocsType(EntityType trigger_entity_type) {
-  switch (trigger_entity_type.name()) {
+      return AutofillAiUiSection::kTravel;
     case EntityTypeName::kDriversLicense:
     case EntityTypeName::kNationalIdCard:
     case EntityTypeName::kPassport:
-      return true;
-    case EntityTypeName::kFlightReservation:
-    case EntityTypeName::kKnownTravelerNumber:
+      return AutofillAiUiSection::kIdentityDocs;
     case EntityTypeName::kOrder:
-    case EntityTypeName::kRedressNumber:
-    case EntityTypeName::kVehicle:
     case EntityTypeName::kShipment:
-      return false;
+      return AutofillAiUiSection::kShopping;
   }
   NOTREACHED();
 }
@@ -633,8 +639,7 @@ std::vector<Suggestion> CreateAutofillAiFillingSuggestions(
   }
 
   std::vector<Suggestion> suggestions;
-  bool contains_travel_entity = false;
-  bool contains_identity_docs_entity = false;
+  DenseSet<AutofillAiUiSection> ui_sections;
   bool contains_personal_context_entity = false;
 
   if (!entities_to_suggest.empty()) {
@@ -671,8 +676,7 @@ std::vector<Suggestion> CreateAutofillAiFillingSuggestions(
       suggestions.push_back(GetSuggestionForEntity(
           form, entity, fields_with_types, *trigger_field_with_type,
           std::move(label), client.GetAppLocale()));
-      contains_travel_entity |= IsTravelType(entity.type());
-      contains_identity_docs_entity |= IsIdentityDocsType(entity.type());
+      ui_sections.insert(GetAutofillAiUiSection(entity.type()));
       contains_personal_context_entity |=
           entity.record_type() == EntityInstance::RecordType::kPersonalContext;
     }
@@ -689,9 +693,7 @@ std::vector<Suggestion> CreateAutofillAiFillingSuggestions(
     base::Extend(suggestions, CreateFetchingAmbientSuggestions());
   }
 
-  base::Extend(suggestions,
-               GetFooterSuggestions(trigger_field, contains_travel_entity,
-                                    contains_identity_docs_entity));
+  base::Extend(suggestions, GetFooterSuggestions(trigger_field, ui_sections));
   return suggestions;
 }
 

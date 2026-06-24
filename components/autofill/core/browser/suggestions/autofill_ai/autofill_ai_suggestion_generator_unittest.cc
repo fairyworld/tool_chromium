@@ -1233,6 +1233,8 @@ class AutofillAiSuggestionGeneratorSplitManageSuggestionTest
     features.push_back(
         features::kSuggestionManageButtonSplitForEnhancedAutofill);
     features.push_back(features::kYourSavedInfoSettingsPage);
+    features.push_back(features::kAutofillAiOrder);
+    features.push_back(features::kAutofillAiShipment);
     return features;
   }
 };
@@ -1260,6 +1262,33 @@ TEST_F(AutofillAiSuggestionGeneratorSplitManageSuggestionTest,
               ElementsAre(HasType(SuggestionType::kFillAutofillAi),
                           HasType(SuggestionType::kSeparator),
                           HasType(SuggestionType::kManageAutofillAiTravel)));
+}
+
+TEST_F(AutofillAiSuggestionGeneratorSplitManageSuggestionTest,
+       SuggestionsFooterContainsManageAutofillAiShoppingSuggestion) {
+  SetEntities({test::GetOrderEntityInstanceWithRandomGuid()});
+  SetForm({ORDER_ID});
+  std::vector<Suggestion> suggestions =
+      CreateAutofillAiFillingSuggestions(field(0));
+  EXPECT_THAT(suggestions,
+              ElementsAre(HasType(SuggestionType::kFillAutofillAi),
+                          HasType(SuggestionType::kSeparator),
+                          HasType(SuggestionType::kManageAutofillAiShopping)));
+}
+
+TEST_F(
+    AutofillAiSuggestionGeneratorSplitManageSuggestionTest,
+    SuggestionsFooterContainsManageAutofillAiSuggestionWhenMultipleSectionsPresent) {
+  SetEntities({GetPassportEntityInstanceWithRandomGuid(),
+               test::GetVehicleEntityInstanceWithRandomGuid()});
+  SetForm({PASSPORT_NUMBER, NAME_FULL, VEHICLE_LICENSE_PLATE});
+  std::vector<Suggestion> suggestions =
+      CreateAutofillAiFillingSuggestions(field(1));
+  EXPECT_THAT(suggestions,
+              ElementsAre(HasType(SuggestionType::kFillAutofillAi),
+                          HasType(SuggestionType::kFillAutofillAi),
+                          HasType(SuggestionType::kSeparator),
+                          HasType(SuggestionType::kManageAutofillAi)));
 }
 
 class AutofillAiSuggestionGeneratorPolicyTest
