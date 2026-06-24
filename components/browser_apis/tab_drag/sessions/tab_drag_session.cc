@@ -88,6 +88,9 @@ void TabDragSession::OnInputEvent(const TabDragInputEvent& event) {
       EndSession();
       break;
     case TabDragInputEvent::Type::kCaptureChanged: {
+      if (drag_mode_ == DragMode::kDetaching) {
+        break;
+      }
       TabDragWindowAdapter* window = registry()->Get(dragged_window_);
       if (window && window->HasCapture()) {
         break;
@@ -110,6 +113,9 @@ void TabDragSession::HandleMovedEvent(const gfx::Point& screen_point) {
   switch (drag_mode_) {
     case DragMode::kAttachedToWindow:
       HandleMoveWhileAttached(screen_point);
+      break;
+    case DragMode::kDetaching:
+      // Transient state during detach; should not receive move events.
       break;
     case DragMode::kDetachedWindow:
       HandleMoveWhileDetached(screen_point);
@@ -142,18 +148,20 @@ void TabDragSession::HandleMoveWhileAttached(const gfx::Point& screen_point) {
   gfx::Rect bounds = *bounds_opt;
   bounds.Inset(-kTearThreshold);
   if (!bounds.Contains(local_point)) {
-    drag_mode_ = DragMode::kDetachedWindow;
+    drag_mode_ = DragMode::kDetaching;
     TabDragWindowAdapter* source_window = registry()->Get(dragged_window_);
     CHECK(source_window);
     auto detach_result = source_window->DetachToNewWindow(
         dragged_tabs_, screen_point, start_window_offset_);
     if (!detach_result.has_value()) {
+      drag_mode_ = DragMode::kAttachedToWindow;
       injector_->GetSessionListener().OnSessionCancelled();
       EndSession();
       return;
     }
     TabDragWindowId new_window_id = detach_result.value();
     UpdateDraggedWindow(new_window_id);
+    drag_mode_ = DragMode::kDetachedWindow;
     injector_->GetSessionListener().OnDragDetached(screen_point);
 
     TabDragWindowAdapter* new_window = registry()->Get(new_window_id);

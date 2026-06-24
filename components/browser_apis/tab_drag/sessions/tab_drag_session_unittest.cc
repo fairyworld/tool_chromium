@@ -326,4 +326,38 @@ TEST_F(TabDragSessionTest, DropTargetBoundsTearOffCancel) {
             ToyTabDragSessionListener::Event::Type::kCancelled);
 }
 
+TEST_F(TabDragSessionTest, CaptureLostDuringDetachIgnored) {
+  ToyTabDragSessionInputAdapter toy_adapter;
+  ToyTabDragSessionListener listener;
+  ToyDropTargetRegistry registry;
+  TabDragWindowRegistry window_registry;
+  ToyTabDragSessionInjector injector(toy_adapter, listener, registry,
+                                     &window_registry);
+  base::MockOnceClosure end_callback;
+  ToyTabDragWindowAdapter toy_window(gfx::Rect(0, 0, 100, 100),
+                                     &window_registry);
+
+  TabDragSessionParams params{
+      .source_window_id = toy_window.GetWindowId(),
+      .source_tab_ids = {NodeId(NodeId::Type::kContent, "tab1")},
+      .start_point = gfx::Point(),
+      .end_callback = end_callback.Get()};
+  TabDragSession session(std::move(params), &injector);
+  EXPECT_TRUE(session.Start().has_value());
+  EXPECT_TRUE(toy_window.HasCapture());
+
+  // Force the session into the kDetaching state.
+  session.set_drag_mode_for_testing(TabDragSession::DragMode::kDetaching);
+
+  // Simulate capture loss. It should be IGNORED.
+  // We expect end_callback to NOT be called (Times(0)).
+  EXPECT_CALL(end_callback, Run()).Times(0);
+  toy_adapter.SendToyEvent(TabDragInputEvent::Type::kCaptureChanged);
+
+  // Verify the session is still alive by successfully dropping it.
+  // This should trigger the end_callback.
+  EXPECT_CALL(end_callback, Run()).Times(1);
+  toy_adapter.SendToyEvent(TabDragInputEvent::Type::kDropped);
+}
+
 }  // namespace tabs_api

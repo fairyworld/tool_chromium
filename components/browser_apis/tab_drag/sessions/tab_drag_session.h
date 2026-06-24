@@ -59,12 +59,14 @@ class TabDragSession {
   }
   TabDragSessionInjector* injector() const { return &*injector_; }
 
- private:
   enum class DragMode {
     kAttachedToWindow,
+    kDetaching,
     kDetachedWindow,
   };
+  void set_drag_mode_for_testing(DragMode mode) { drag_mode_ = mode; }
 
+ private:
   void EndSession();
   void OnInputEvent(const TabDragInputEvent& event);
 
