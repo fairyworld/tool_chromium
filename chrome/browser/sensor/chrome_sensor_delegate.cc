@@ -26,15 +26,20 @@ void ChromeSensorDelegate::OnSensorStarted(
   CHECK(render_frame_host);
   auto* settings = content_settings::PageSpecificContentSettings::GetForFrame(
       render_frame_host);
-  settings->OnContentAllowed(ContentSettingsType::SENSORS);
-  settings->OnSensorStarted();
+  if (settings) {
+    settings->OnContentAllowed(ContentSettingsType::SENSORS);
+    settings->OnSensorStarted();
+  }
 }
 
 void ChromeSensorDelegate::OnSensorStopped(
     content::RenderFrameHost* render_frame_host) {
   CHECK(render_frame_host);
-  content_settings::PageSpecificContentSettings::GetForFrame(render_frame_host)
-      ->OnSensorStopped();
+  auto* settings = content_settings::PageSpecificContentSettings::GetForFrame(
+      render_frame_host);
+  if (settings) {
+    settings->OnSensorStopped();
+  }
 }
 
 void ChromeSensorDelegate::OnSensorBlocked(
