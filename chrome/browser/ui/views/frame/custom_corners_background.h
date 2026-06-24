@@ -59,18 +59,17 @@ class CustomCornersBackground : public views::Background, public CustomCorners {
 
   // Specifies whether outline strokes should be drawn.
   struct Outline {
-    ui::ColorId color = ui::kColorSeparator;
-    double opacity = 1.0;
+    ColorWithAlpha color;
     bool top = false;
     bool leading = false;
     bool bottom = false;
     bool trailing = false;
 
     bool has_strokes() const {
-      return opacity > 0.0 && (top || leading || bottom || trailing);
+      return color.is_visible() && (top || leading || bottom || trailing);
     }
 
-    bool operator==(const Outline&) const = default;
+    friend bool operator==(const Outline& left, const Outline& right) = default;
   };
 
   // Struct to store corner radii.
