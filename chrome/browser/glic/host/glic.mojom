@@ -1726,7 +1726,7 @@ enum InvocationSource {
   [MinVersion=25] kPromotionPage = 34,
 };
 
-// LINT.ThenChange(//tools/metrics/histograms/metadata/glic/enums.xml:GlicInvocationSource, //chrome/browser/glic/service/metrics/metrics_types.h:ResponseSegmentation)
+// LINT.ThenChange(//tools/metrics/histograms/metadata/glic/enums.xml:GlicInvocationSource, //tools/metrics/histograms/metadata/glic/histograms.xml:GlicInvocationSource, //chrome/browser/glic/service/metrics/metrics_types.h:ResponseSegmentation)
 
 // @generate glic_api
 // Target for actuation.

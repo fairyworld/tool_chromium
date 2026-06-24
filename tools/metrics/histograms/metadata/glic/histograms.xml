@@ -148,35 +148,47 @@ chromium-metrics-reviews@google.com.
   <variant name="SidePanel" summary="a side panel embedder"/>
 </variants>
 
+<!-- LINT.IfChange(GlicInvocationSource) -->
+
 <variants name="GlicInvocationSource">
   <variant name="ActorTaskIcon"/>
   <variant name="AfterSignIn"/>
   <variant name="AnchoredContextualCue"/>
+  <variant name="Autofill"/>
   <variant name="AutoOpenedByContextualCue"/>
   <variant name="AutoOpenedForPdf"/>
   <variant name="CaptureRegionHotkey"/>
+  <variant name="ExperimentalTriggering"/>
   <variant name="Fre"/>
   <variant name="HandoffButton"/>
+  <variant name="IndigoPageAction"/>
   <variant name="Iph"/>
   <variant name="NavigationCapture"/>
   <variant name="Nudge"/>
   <variant name="OsButton"/>
   <variant name="OsButtonMenu"/>
   <variant name="OsHotkey"/>
+  <variant name="PasswordChange"/>
   <variant name="PdfSummarizeButton"/>
   <variant name="ProfilePicker"/>
+  <variant name="PromotionPage"/>
   <variant name="SharedImage"/>
   <variant name="SharedTab"/>
   <variant name="Skills"/>
   <variant name="TextSelectionNudge"/>
   <variant name="TextSelectionWidget"/>
   <variant name="ThreeDotsMenu"/>
+  <variant name="ToolbarButton"/>
   <variant name="TopChromeButton"/>
+  <variant name="UniversalCart"/>
   <variant name="Unsupported"/>
   <variant name="WebContentsContextMenu"/>
+  <variant name="WebDragDrop"/>
   <variant name="WhatsNew"/>
   <variant name="ZeroStateAutoSummarize"/>
 </variants>
+
+<!-- LINT.ThenChange(//chrome/browser/glic/host/glic.mojom:InvocationSource) -->
 
 <variants name="MemoryTriggerEvent">
   <variant name="CriticalPressure"
