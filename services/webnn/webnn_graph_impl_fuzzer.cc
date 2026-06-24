@@ -142,6 +142,19 @@ enum class QuantizationKind : uint32_t {
   kPerBlock = 2,
 };
 
+struct BatchNormalizationParams {
+  OperandDataType data_type;
+  uint32_t rank;
+  std::array<uint32_t, 8> input_dims;
+  uint32_t axis;
+  float epsilon;
+  OptionalOperandKind scale_kind;
+  OptionalOperandKind bias_kind;
+  bool is_input_constant;
+  bool is_mean_constant;
+  bool is_variance_constant;
+};
+
 struct ConcatParams {
   OperandDataType data_type;
   uint32_t rank;
@@ -246,6 +259,30 @@ struct GemmParams {
   bool is_a_constant;
   bool is_b_constant;
   bool is_c_constant;
+};
+
+struct InstanceNormalizationParams {
+  OperandDataType data_type;
+  uint32_t batch;
+  uint32_t channels;
+  uint32_t input_height;
+  uint32_t input_width;
+  float epsilon;
+  OptionalOperandKind scale_kind;
+  OptionalOperandKind bias_kind;
+  bool is_input_constant;
+};
+
+struct LayerNormalizationParams {
+  OperandDataType data_type;
+  uint32_t rank;
+  std::array<uint32_t, 8> input_dims;
+  uint32_t num_axes;
+  std::array<uint32_t, 8> axes;
+  float epsilon;
+  OptionalOperandKind scale_kind;
+  OptionalOperandKind bias_kind;
+  bool is_input_constant;
 };
 
 struct LstmParams {
@@ -725,6 +762,23 @@ auto AnyOperandDataTypeFor(SupportedDataTypes supported) {
   return fuzztest::ElementOf<OperandDataType>(std::move(types));
 }
 
+auto AnyBatchNormalizationParams() {
+  const auto& limits = GetContextPropertiesForTesting().data_type_limits;
+  return fuzztest::StructOf<BatchNormalizationParams>(
+      AnyOperandDataTypeFor(limits.batch_normalization_input.data_types),
+      AnyTensorRank(),                     // rank
+      fuzztest::ArrayOf<8>(AnyDimSize()),  // input_dims
+      fuzztest::InRange<uint32_t>(0, 7),   // axis
+      fuzztest::OneOf(fuzztest::Just(1e-5f),
+                      fuzztest::Positive<float>()),  // epsilon
+      AnyOptionalOperandKind(),                      // scale_kind
+      AnyOptionalOperandKind(),                      // bias_kind
+      fuzztest::Arbitrary<bool>(),                   // is_input_constant
+      fuzztest::Arbitrary<bool>(),                   // is_mean_constant
+      fuzztest::Arbitrary<bool>()                    // is_variance_constant
+  );
+}
+
 auto AnyConcatParams() {
   const auto& limits = GetContextPropertiesForTesting().data_type_limits;
   return fuzztest::StructOf<ConcatParams>(
@@ -880,6 +934,39 @@ auto AnyGemmParams() {
       fuzztest::Arbitrary<bool>(),                              // is_a_constant
       fuzztest::Arbitrary<bool>(),                              // is_b_constant
       fuzztest::Arbitrary<bool>()                               // is_c_constant
+  );
+}
+
+auto AnyInstanceNormalizationParams() {
+  const auto& limits = GetContextPropertiesForTesting().data_type_limits;
+  return fuzztest::StructOf<InstanceNormalizationParams>(
+      AnyOperandDataTypeFor(limits.instance_normalization_input.data_types),
+      AnyDimSize(),  // batch
+      AnyDimSize(),  // channels
+      AnyDimSize(),  // input_height
+      AnyDimSize(),  // input_width
+      fuzztest::OneOf(fuzztest::Just(1e-5f),
+                      fuzztest::Positive<float>()),  // epsilon
+      AnyOptionalOperandKind(),                      // scale_kind
+      AnyOptionalOperandKind(),                      // bias_kind
+      fuzztest::Arbitrary<bool>()                    // is_input_constant
+  );
+}
+
+auto AnyLayerNormalizationParams() {
+  const auto& limits = GetContextPropertiesForTesting().data_type_limits;
+  return fuzztest::StructOf<LayerNormalizationParams>(
+      AnyOperandDataTypeFor(limits.layer_normalization_input.data_types),
+      AnyTensorRankIncludeZero(),          // rank
+      fuzztest::ArrayOf<8>(AnyDimSize()),  // input_dims
+      fuzztest::InRange<uint32_t>(0, 8),   // num_axes
+      fuzztest::ArrayOf<8>(                // axes
+          fuzztest::InRange<uint32_t>(0, 7)),
+      fuzztest::OneOf(fuzztest::Just(1e-5f),
+                      fuzztest::Positive<float>()),  // epsilon
+      AnyOptionalOperandKind(),                      // scale_kind
+      AnyOptionalOperandKind(),                      // bias_kind
+      fuzztest::Arbitrary<bool>()                    // is_input_constant
   );
 }
 
@@ -2343,6 +2430,8 @@ template <typename BaseFixture>
 class WebNNGraphImplFuzzerImpl
     : public fuzztest::PerFuzzTestFixtureAdapter<BaseFixture> {
  public:
+  void BatchNormalization(BatchNormalizationParams params,
+                          uint8_t seed_for_data);
   void Concat(ConcatParams params, uint8_t seed_for_data);
   void Conv2d(Conv2dParams params, uint8_t seed_for_data);
   void DequantizeLinear(DequantizeLinearParams params,
@@ -2354,6 +2443,10 @@ class WebNNGraphImplFuzzerImpl
   void Gather(GatherParams params, uint8_t seed_for_data);
   void GatherND(GatherNDParams params, uint8_t seed_for_data);
   void Gemm(GemmParams params, uint8_t seed_for_data);
+  void InstanceNormalization(InstanceNormalizationParams params,
+                             uint8_t seed_for_data);
+  void LayerNormalization(LayerNormalizationParams params,
+                          uint8_t seed_for_data);
   void Lstm(LstmParams params, uint8_t seed_for_data);
   void LstmCell(LstmCellParams params, uint8_t seed_for_data);
   void Matmul(MatmulParams params, uint8_t seed_for_data);
@@ -2442,6 +2535,98 @@ class GPU : public WebNNGraphImplFuzzerImpl<
 
 class NPU : public WebNNGraphImplFuzzerImpl<
                 WebNNGraphImplFuzzerDevice<mojom::Device::kNpu>> {};
+
+template <typename BaseFixture>
+void WebNNGraphImplFuzzerImpl<BaseFixture>::BatchNormalization(
+    BatchNormalizationParams params,
+    uint8_t seed_for_data) {
+  std::vector<uint32_t> input_dims(params.input_dims.begin(),
+                                   params.input_dims.begin() + params.rank);
+
+  params.axis = params.axis % params.rank;
+  uint32_t feature_count = input_dims[params.axis];
+
+  ASSIGN_OR_RETURN_VOID(auto input_desc, OperandDescriptor::Create(
+                                             this->context_properties(),
+                                             params.data_type, input_dims, ""));
+  ASSIGN_OR_RETURN_VOID(
+      auto mean_desc,
+      OperandDescriptor::Create(this->context_properties(), params.data_type,
+                                {feature_count}, ""));
+  ASSIGN_OR_RETURN_VOID(
+      auto variance_desc,
+      OperandDescriptor::Create(this->context_properties(), params.data_type,
+                                {feature_count}, ""));
+
+  std::optional<OperandDescriptor> scale_desc;
+  std::optional<OperandDescriptor> bias_desc;
+  if (params.scale_kind != OptionalOperandKind::kNone) {
+    ASSIGN_OR_RETURN_VOID(
+        scale_desc,
+        OperandDescriptor::Create(this->context_properties(), params.data_type,
+                                  {feature_count}, ""));
+  }
+  if (params.bias_kind != OptionalOperandKind::kNone) {
+    ASSIGN_OR_RETURN_VOID(
+        bias_desc,
+        OperandDescriptor::Create(this->context_properties(), params.data_type,
+                                  {feature_count}, ""));
+  }
+
+  BatchNormalizationAttributes attributes;
+  attributes.scale = scale_desc;
+  attributes.bias = bias_desc;
+  attributes.axis = params.axis;
+
+  ASSIGN_OR_RETURN_VOID(auto output_desc,
+                        ValidateBatchNormalizationAndInferOutput(
+                            this->context_properties(), input_desc, mean_desc,
+                            variance_desc, attributes));
+
+  mojo::Remote<mojom::WebNNGraphBuilder> remote =
+      this->BindNewGraphBuilderRemote();
+  GraphInfoBuilder builder(remote);
+
+  base::flat_map<std::string, base::span<const uint8_t>> named_inputs;
+  std::vector<std::vector<uint8_t>> data_buffers;
+  data_buffers.reserve(5);
+  OperandId input_id = BuildInputOrConstant(builder, params.is_input_constant,
+                                            "input", input_desc, seed_for_data,
+                                            data_buffers, named_inputs);
+  OperandId mean_id =
+      BuildInputOrConstant(builder, params.is_mean_constant, "mean", mean_desc,
+                           seed_for_data, data_buffers, named_inputs);
+  OperandId variance_id = BuildInputOrConstant(
+      builder, params.is_variance_constant, "variance", variance_desc,
+      seed_for_data, data_buffers, named_inputs);
+  std::optional<OperandId> scale_id =
+      BuildOptionalOperand(builder, scale_desc, params.scale_kind, "scale",
+                           seed_for_data, data_buffers, named_inputs);
+  std::optional<OperandId> bias_id =
+      BuildOptionalOperand(builder, bias_desc, params.bias_kind, "bias",
+                           seed_for_data, data_buffers, named_inputs);
+
+  OperandId output_id = builder.BuildOutput("output", output_desc.shape(),
+                                            output_desc.data_type());
+
+  BuildBatchNormalizationAttributes batch_normalization_attributes{
+      .scale_operand_id = scale_id,
+      .bias_operand_id = bias_id,
+      .axis = params.axis,
+      .epsilon = params.epsilon,
+  };
+
+  builder.BuildBatchNormalization(input_id, mean_id, variance_id, output_id,
+                                  batch_normalization_attributes);
+
+  if (!builder.IsValidGraphForTesting(this->context_properties())) {
+    return;
+  }
+  BuildAndCompute(this->context_, std::move(remote), builder.TakeGraphInfo(),
+                  std::move(named_inputs));
+
+  GetGlobalFuzzEnvironment().GetWebNNTestEnvironment().RunUntilIdle();
+}
 
 template <typename BaseFixture>
 void WebNNGraphImplFuzzerImpl<BaseFixture>::Concat(ConcatParams params,
@@ -2849,6 +3034,193 @@ void WebNNGraphImplFuzzerImpl<BaseFixture>::Gemm(GemmParams params,
                           gemm_descs.output_desc.data_type());
 
   builder.BuildGemm(a_id, b_id, output_id, gemm_attr);
+
+  if (!builder.IsValidGraphForTesting(this->context_properties())) {
+    return;
+  }
+  BuildAndCompute(this->context_, std::move(remote), builder.TakeGraphInfo(),
+                  std::move(named_inputs));
+
+  GetGlobalFuzzEnvironment().GetWebNNTestEnvironment().RunUntilIdle();
+}
+
+template <typename BaseFixture>
+void WebNNGraphImplFuzzerImpl<BaseFixture>::InstanceNormalization(
+    InstanceNormalizationParams params,
+    uint8_t seed_for_data) {
+  InputOperandLayout input_layout =
+      this->context_properties().input_operand_layout;
+
+  std::vector<uint32_t> input_dims;
+  switch (input_layout) {
+    case InputOperandLayout::kNchw: {
+      input_dims = {params.batch, params.channels, params.input_height,
+                    params.input_width};
+      break;
+    }
+    case InputOperandLayout::kNhwc: {
+      input_dims = {params.batch, params.input_height, params.input_width,
+                    params.channels};
+      break;
+    }
+  }
+
+  ASSIGN_OR_RETURN_VOID(auto input_desc, OperandDescriptor::Create(
+                                             this->context_properties(),
+                                             params.data_type, input_dims, ""));
+
+  std::optional<OperandDescriptor> scale_desc;
+  std::optional<OperandDescriptor> bias_desc;
+  if (params.scale_kind != OptionalOperandKind::kNone) {
+    ASSIGN_OR_RETURN_VOID(
+        scale_desc,
+        OperandDescriptor::Create(this->context_properties(), params.data_type,
+                                  {params.channels}, ""));
+  }
+  if (params.bias_kind != OptionalOperandKind::kNone) {
+    ASSIGN_OR_RETURN_VOID(
+        bias_desc,
+        OperandDescriptor::Create(this->context_properties(), params.data_type,
+                                  {params.channels}, ""));
+  }
+
+  InstanceNormalizationAttributes attributes;
+  attributes.scale = scale_desc;
+  attributes.bias = bias_desc;
+  attributes.layout = input_layout;
+
+  ASSIGN_OR_RETURN_VOID(
+      auto output_desc,
+      ValidateInstanceNormalizationAndInferOutput(this->context_properties(),
+                                                  input_desc, attributes));
+
+  mojo::Remote<mojom::WebNNGraphBuilder> remote =
+      this->BindNewGraphBuilderRemote();
+  GraphInfoBuilder builder(remote);
+
+  base::flat_map<std::string, base::span<const uint8_t>> named_inputs;
+  std::vector<std::vector<uint8_t>> data_buffers;
+  data_buffers.reserve(3);
+  OperandId input_id = BuildInputOrConstant(builder, params.is_input_constant,
+                                            "input", input_desc, seed_for_data,
+                                            data_buffers, named_inputs);
+  std::optional<OperandId> scale_id =
+      BuildOptionalOperand(builder, scale_desc, params.scale_kind, "scale",
+                           seed_for_data, data_buffers, named_inputs);
+  std::optional<OperandId> bias_id =
+      BuildOptionalOperand(builder, bias_desc, params.bias_kind, "bias",
+                           seed_for_data, data_buffers, named_inputs);
+
+  OperandId output_id = builder.BuildOutput("output", output_desc.shape(),
+                                            output_desc.data_type());
+
+  BuildInstanceNormalizationAttributes build_attributes{
+      .scale_operand_id = scale_id,
+      .bias_operand_id = bias_id,
+      .epsilon = params.epsilon,
+  };
+
+  builder.BuildInstanceNormalization(input_id, output_id, build_attributes);
+
+  if (!builder.IsValidGraphForTesting(this->context_properties())) {
+    return;
+  }
+  BuildAndCompute(this->context_, std::move(remote), builder.TakeGraphInfo(),
+                  std::move(named_inputs));
+
+  GetGlobalFuzzEnvironment().GetWebNNTestEnvironment().RunUntilIdle();
+}
+
+template <typename BaseFixture>
+void WebNNGraphImplFuzzerImpl<BaseFixture>::LayerNormalization(
+    LayerNormalizationParams params,
+    uint8_t seed_for_data) {
+  std::vector<uint32_t> input_dims(params.input_dims.begin(),
+                                   params.input_dims.begin() + params.rank);
+
+  // Limit the `num_axes` and remove duplicate values.
+  params.num_axes = std::min(params.num_axes, params.rank);
+  std::vector<uint32_t> axes;
+  for (uint32_t i = 0; i < params.num_axes; ++i) {
+    uint32_t axis = params.axes[i] % params.rank;
+    if (!std::ranges::contains(axes, axis)) {
+      axes.push_back(axis);
+    }
+  }
+
+  ASSIGN_OR_RETURN_VOID(auto input_desc, OperandDescriptor::Create(
+                                             this->context_properties(),
+                                             params.data_type, input_dims, ""));
+
+  // Compute the shape for scale and bias based on the normalized axes.
+  std::vector<uint32_t> scale_bias_dims;
+  scale_bias_dims.reserve(axes.size());
+  for (uint32_t axis : axes) {
+    scale_bias_dims.push_back(input_dims[axis]);
+  }
+
+  // When `axes` is empty (e.g. rank-0 input or `num_axes` == 0), there is no
+  // valid scale/bias shape, so neither operand can be built. Force both kinds
+  // to kNone so that `BuildOptionalOperand` below skips them instead of
+  // dereferencing an absent descriptor.
+  if (scale_bias_dims.empty()) {
+    params.scale_kind = OptionalOperandKind::kNone;
+    params.bias_kind = OptionalOperandKind::kNone;
+  }
+
+  std::optional<OperandDescriptor> scale_desc;
+  if (params.scale_kind != OptionalOperandKind::kNone) {
+    ASSIGN_OR_RETURN_VOID(
+        scale_desc,
+        OperandDescriptor::Create(this->context_properties(), params.data_type,
+                                  scale_bias_dims, ""));
+  }
+
+  std::optional<OperandDescriptor> bias_desc;
+  if (params.bias_kind != OptionalOperandKind::kNone) {
+    ASSIGN_OR_RETURN_VOID(
+        bias_desc,
+        OperandDescriptor::Create(this->context_properties(), params.data_type,
+                                  scale_bias_dims, ""));
+  }
+
+  LayerNormalizationAttributes attributes;
+  attributes.scale = scale_desc;
+  attributes.bias = bias_desc;
+
+  ASSIGN_OR_RETURN_VOID(
+      auto output_desc,
+      ValidateLayerNormalizationAndInferOutput(this->context_properties(),
+                                               input_desc, axes, attributes));
+
+  mojo::Remote<mojom::WebNNGraphBuilder> remote =
+      this->BindNewGraphBuilderRemote();
+  GraphInfoBuilder builder(remote);
+
+  base::flat_map<std::string, base::span<const uint8_t>> named_inputs;
+  std::vector<std::vector<uint8_t>> data_buffers;
+  data_buffers.reserve(3);
+  OperandId input_id = BuildInputOrConstant(builder, params.is_input_constant,
+                                            "input", input_desc, seed_for_data,
+                                            data_buffers, named_inputs);
+  std::optional<OperandId> scale_id =
+      BuildOptionalOperand(builder, scale_desc, params.scale_kind, "scale",
+                           seed_for_data, data_buffers, named_inputs);
+  std::optional<OperandId> bias_id =
+      BuildOptionalOperand(builder, bias_desc, params.bias_kind, "bias",
+                           seed_for_data, data_buffers, named_inputs);
+
+  OperandId output_id = builder.BuildOutput("output", output_desc.shape(),
+                                            output_desc.data_type());
+
+  BuildLayerNormalizationAttributes build_attributes{
+      .scale_operand_id = scale_id,
+      .bias_operand_id = bias_id,
+      .axes = axes,
+      .epsilon = params.epsilon,
+  };
+
+  builder.BuildLayerNormalization(input_id, output_id, build_attributes);
 
   if (!builder.IsValidGraphForTesting(this->context_properties())) {
     return;
@@ -4573,6 +4945,23 @@ void WebNNGraphImplFuzzerImpl<BaseFixture>::DQTransposeQ(
   GetGlobalFuzzEnvironment().GetWebNNTestEnvironment().RunUntilIdle();
 }
 
+WEBNN_FUZZ_TEST_F(
+    BatchNormalization,
+    .WithDomains(AnyBatchNormalizationParams(), fuzztest::Arbitrary<uint8_t>())
+        .WithSeeds({{BatchNormalizationParams{
+                         /*data_type=*/OperandDataType::kFloat32,
+                         /*rank=*/4,
+                         /*input_dims=*/{1, 3, 4, 4, 1, 1, 1, 1},
+                         /*axis=*/1,
+                         /*epsilon=*/1e-5f,
+                         /*scale_kind=*/OptionalOperandKind::kConstant,
+                         /*bias_kind=*/OptionalOperandKind::kInput,
+                         /*is_input_constant=*/false,
+                         /*is_mean_constant=*/true,
+                         /*is_variance_constant=*/true,
+                     },
+                     /*seed_for_data=*/1}}));
+
 WEBNN_FUZZ_TEST_F(Concat,
                   .WithDomains(AnyConcatParams(),
                                fuzztest::Arbitrary<uint8_t>())
@@ -4714,6 +5103,39 @@ WEBNN_FUZZ_TEST_F(Gemm,
                                        /*is_c_constant=*/true,
                                    },
                                    /*seed_for_data=*/3}}));
+
+WEBNN_FUZZ_TEST_F(
+    InstanceNormalization,
+    .WithDomains(AnyInstanceNormalizationParams(),
+                 fuzztest::Arbitrary<uint8_t>())
+        .WithSeeds({{InstanceNormalizationParams{
+                         /*data_type=*/OperandDataType::kFloat32,
+                         /*batch=*/1,
+                         /*channels=*/3,
+                         /*input_height=*/4,
+                         /*input_width=*/4,
+                         /*epsilon=*/1e-5f,
+                         /*scale_kind=*/OptionalOperandKind::kInput,
+                         /*bias_kind=*/OptionalOperandKind::kConstant,
+                         /*is_input_constant=*/false,
+                     },
+                     /*seed_for_data=*/1}}));
+
+WEBNN_FUZZ_TEST_F(
+    LayerNormalization,
+    .WithDomains(AnyLayerNormalizationParams(), fuzztest::Arbitrary<uint8_t>())
+        .WithSeeds({{LayerNormalizationParams{
+                         /*data_type=*/OperandDataType::kFloat32,
+                         /*rank=*/4,
+                         /*input_dims=*/{1, 3, 4, 4, 1, 1, 1, 1},
+                         /*num_axes=*/2,
+                         /*axes=*/{2, 3, 0, 0, 0, 0, 0, 0},
+                         /*epsilon=*/1e-5f,
+                         /*scale_kind=*/OptionalOperandKind::kInput,
+                         /*bias_kind=*/OptionalOperandKind::kConstant,
+                         /*is_input_constant=*/false,
+                     },
+                     /*seed_for_data=*/1}}));
 
 WEBNN_FUZZ_TEST_F(
     Lstm,
