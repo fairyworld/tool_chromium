@@ -544,8 +544,7 @@ void DownloadURL(BrowserWindowInterface* browser, const GURL& download_url) {
 }
 
 void WaitForAutocompleteDone(BrowserWindowInterface* browser) {
-  auto* controller = browser->GetBrowserForMigrationOnly()
-                         ->window()
+  auto* controller = BrowserWindow::FromBrowser(browser)
                          ->GetLocationBar()
                          ->GetOmniboxController()
                          ->autocomplete_controller();
@@ -752,7 +751,7 @@ void SendToOmniboxAndSubmit(BrowserWindowInterface* browser,
                             base::TimeTicks match_selection_timestamp,
                             bool wait_for_autocomplete_done) {
   LocationBar* location_bar =
-      browser->GetBrowserForMigrationOnly()->window()->GetLocationBar();
+      BrowserWindow::FromBrowser(browser)->GetLocationBar();
   OmniboxView* omnibox = location_bar->GetOmniboxView();
   location_bar->GetOmniboxController()->edit_model()->OnSetFocus(
       /*control_down=*/false);
