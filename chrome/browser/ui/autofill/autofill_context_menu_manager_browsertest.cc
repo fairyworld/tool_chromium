@@ -1071,6 +1071,16 @@ IN_PROC_BROWSER_TEST_F(AtMemoryContextMenuManagerTest,
   ASSERT_FALSE(ContainsAtMemoryFallback(*menu_model()));
 }
 
+IN_PROC_BROWSER_TEST_F(AtMemoryContextMenuManagerTest,
+                       AtMemoryFallbackDroppedOnPasswordFields) {
+  content::ContextMenuParams params = CreateContextMenuParams();
+  params.form_control_type = blink::mojom::FormControlType::kInputPassword;
+  autofill_context_menu_manager()->set_params_for_testing(params);
+
+  autofill_context_menu_manager()->AppendItems();
+  ASSERT_FALSE(ContainsAtMemoryFallback(*menu_model()));
+}
+
 // Checks if the context menu model contains ONLY @memory manual fallback entry.
 testing::AssertionResult ContainsOnlyAtMemoryFallback(
     const ui::SimpleMenuModel& arg) {

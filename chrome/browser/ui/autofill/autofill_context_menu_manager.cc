@@ -330,6 +330,12 @@ void AutofillContextMenuManager::MaybeAddAutofillAtMemoryItem() {
     return;
   }
 
+  if (params_.form_control_type &&
+      params_.form_control_type.value() ==
+          blink::mojom::FormControlType::kInputPassword) {
+    return;
+  }
+
   if (!IsAtMemoryFeatureEnabled(
           GoogleGroupsManagerFactory::GetForBrowserContext(
               rfh->GetBrowserContext()))) {
