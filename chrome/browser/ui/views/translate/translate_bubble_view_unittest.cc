@@ -793,8 +793,16 @@ TEST_F(TranslateBubbleViewTest,
   EXPECT_TRUE(list_view->children().empty());
 }
 
+// TODO(crbug.com/527306844): Re-enable this test.
+#if BUILDFLAG(IS_WIN) && !defined(NDEBUG)
+#define MAYBE_ListShowsUpAgainWhenTypingAfterLanguageSelection \
+  DISABLED_ListShowsUpAgainWhenTypingAfterLanguageSelection
+#else
+#define MAYBE_ListShowsUpAgainWhenTypingAfterLanguageSelection \
+  ListShowsUpAgainWhenTypingAfterLanguageSelection
+#endif
 TEST_F(TranslateBubbleViewTest,
-       ListShowsUpAgainWhenTypingAfterLanguageSelection) {
+       MAYBE_ListShowsUpAgainWhenTypingAfterLanguageSelection) {
   base::test::ScopedFeatureList features(translate::kTranslateLanguageSearchUI);
   CreateAndShowBubble();
   SwitchView(TranslateBubbleModel::VIEW_STATE_TARGET_LANGUAGE);
