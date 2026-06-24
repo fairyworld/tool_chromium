@@ -13191,6 +13191,14 @@ const FeatureEntry kFeatureEntries[] = {
      FEATURE_VALUE_TYPE(blink::features::kInputCursorAnchorInfoMigration)},
 #endif  // BUILDFLAG(IS_ANDROID)
 
+#if BUILDFLAG(IS_CHROMEOS)
+    {"vids-app-existing-consumer-preinstall",
+     flag_descriptions::kVidsAppExistingConsumerPreinstallName,
+     flag_descriptions::kVidsAppExistingConsumerPreinstallDescription, kOsCrOS,
+     FEATURE_VALUE_TYPE(
+         chromeos::features::kVidsAppExistingConsumerPreinstall)},
+#endif  // BUILDFLAG(IS_CHROMEOS)
+
     // Add new entries above this line.
     // NOTE: Adding a new flag requires adding a corresponding entry to enum
     // "LoginCustomFlags" in tools/metrics/histograms/enums.xml. See "Flag
