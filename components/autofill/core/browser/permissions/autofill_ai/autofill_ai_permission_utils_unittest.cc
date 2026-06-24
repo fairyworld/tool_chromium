@@ -118,9 +118,6 @@ class AutofillAiPermissionUtilsTest : public ::testing::Test {
           {{"autofill_ai_model_use_cache_results", "true"}}}},
         {});
 
-    // Pref and identity state.
-    subscription_eligibility::prefs::RegisterProfilePrefs(
-        client().GetPrefs()->registry());
     client().GetPrefs()->SetInteger(
         subscription_eligibility::prefs::kAiSubscriptionTier, 1);
 
