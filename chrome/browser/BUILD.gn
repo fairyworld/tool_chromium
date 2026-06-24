@@ -1246,6 +1246,7 @@ source_set("core") {
 
   if (!is_android) {
     public_deps = [
+      "//chrome/browser/ui/webui/omnibox_everywhere",
       "//chrome/browser/ui/webui/omnibox_popup",
       "//chrome/browser/ui/webui/omnibox_popup/mojom",
     ]
@@ -3267,6 +3268,7 @@ source_set("browser") {
       "//chrome/browser/ui/webui/new_tab_footer:impl",
       "//chrome/browser/ui/webui/omnibox",
       "//chrome/browser/ui/webui/omnibox/logging:mojo_bindings",
+      "//chrome/browser/ui/webui/omnibox_everywhere",
       "//chrome/browser/ui/webui/omnibox_popup",
       "//chrome/browser/ui/webui/omnibox_popup/mojom",
       "//chrome/browser/ui/webui/searchbox",

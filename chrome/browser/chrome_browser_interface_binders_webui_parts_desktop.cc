@@ -63,6 +63,7 @@
 #include "chrome/browser/ui/webui/ntp_microsoft_auth/ntp_microsoft_auth_untrusted_ui.h"
 #include "chrome/browser/ui/webui/omnibox/logging/logs.mojom.h"
 #include "chrome/browser/ui/webui/omnibox/omnibox_ui.h"
+#include "chrome/browser/ui/webui/omnibox_everywhere/omnibox_everywhere_ui.h"
 #include "chrome/browser/ui/webui/omnibox_popup/omnibox_popup_ui.h"
 #include "chrome/browser/ui/webui/on_device_internals/on_device_internals_ui.h"
 #include "chrome/browser/ui/webui/password_manager/password_manager_ui.h"
@@ -375,7 +376,8 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
       NewTabPageUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<searchbox::mojom::PageHandlerFactory,
-                                         NewTabPageUI, OmniboxPopupUI>(map);
+                                         NewTabPageUI, OmniboxPopupUI,
+                                         OmniboxEverywhereUI>(map);
 
   RegisterWebUIControllerInterfaceBinder<suggest_internals::mojom::PageHandler,
                                          SuggestInternalsUI>(map);
@@ -568,7 +570,7 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
       is_contextual_tasks_enabled) {
     RegisterWebUIControllerInterfaceBinder<
         composebox::mojom::PageHandlerFactory, NewTabPageUI, ContextualTasksUI,
-        OmniboxPopupUI>(map);
+        OmniboxPopupUI, OmniboxEverywhereUI>(map);
   }
 
   if (base::FeatureList::IsEnabled(

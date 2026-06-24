@@ -733,6 +733,7 @@ chromium-metrics-reviews@google.com.
   <int value="-1649429396" label="chrome://chrome-signin/edu-coexistence/"/>
   <int value="-1647734092" label="chrome://net-export/"/>
   <int value="-1638649228" label="chrome://webapks/"/>
+  <int value="-1637801196" label="chrome://omnibox-everywhere.top-chrome/"/>
   <int value="-1636191836"
       label="chrome://history-clusters-side-panel.top-chrome/"/>
   <int value="-1634933990" label="chrome://web-footer-experiment/"/>

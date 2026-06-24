@@ -1790,10 +1790,14 @@ void ContextualSearchboxHandler::OpenUrl(
   // When the everywhere Omnibox is enabled, check to see if the current web
   // contents is the everywhere omnibox popup -- if so redirect the open to
   // the everywhere service.
+  // TODO(crbug.com/526405104): This should probably be moved to the client and
+  // be based on the page classification. The service's impl should also
+  // correctly pass on context like done below.
   if (base::FeatureList::IsEnabled(omnibox::kEverywhereOmnibox)) {
-    if (auto* service =
-            EverywhereOmniboxServiceFactory::GetForProfile(profile_)) {
-      if (service->IsEverywherePopup(web_contents_)) {
+    if (web_contents_->GetVisibleURL().host() ==
+        chrome::kChromeUIOmniboxEverywhereHost) {
+      if (auto* service =
+              EverywhereOmniboxServiceFactory::GetForProfile(profile_)) {
         service->OpenUrl(url, disposition);
         return;
       }

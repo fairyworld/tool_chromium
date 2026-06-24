@@ -1741,6 +1741,7 @@ static_library("ui") {
       "//chrome/browser/ui/webui/ntp_microsoft_auth",
       "//chrome/browser/ui/webui/omnibox",
       "//chrome/browser/ui/webui/omnibox/logging:mojo_bindings",
+      "//chrome/browser/ui/webui/omnibox_everywhere",
       "//chrome/browser/ui/webui/omnibox_popup",
       "//chrome/browser/ui/webui/omnibox_popup/mojom",
       "//chrome/browser/ui/webui/personal_context",
@@ -2215,6 +2216,7 @@ static_library("ui") {
 
       # omnibox_popup includes browser_window.h and other headers from
       # //chrome/browser/ui.
+      "//chrome/browser/ui/webui/omnibox_everywhere",
       "//chrome/browser/ui/webui/omnibox_popup",
 
       # tab_search includes browser.h, browser_window.h,
