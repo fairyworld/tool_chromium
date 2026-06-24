@@ -9183,6 +9183,8 @@ Called by update_use_counter_feature_enum.py.-->
   <int value="438" label="FlexWrapBalance"/>
   <int value="439" label="TextFit"/>
   <int value="440" label="TextModules"/>
+  <int value="441" label="DRAFT_TemplateFor"/>
+  <int value="442" label="DRAFT_HTMLProcessingInstructions"/>
 </enum>
 
 <!-- LINT.ThenChange(//third_party/blink/public/mojom/use_counter/metrics/webdx_feature.mojom:WebDXFeature) -->
