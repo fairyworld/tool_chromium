@@ -306,8 +306,8 @@ TEST_F(DeviceNameUtilTest, GetDisplayNameCandidates_Linux_SigninOnly) {
       "guid", "30BDS0RA0G", DeviceInfo::OsType::kLinux, "LENOVO", "30BDS0RA0G");
   DisplayNameCandidates candidates = GetDisplayNameCandidates(device.get());
 
-  EXPECT_EQ("LENOVO Computer 30BDS0RA0G", candidates.fallback_full_name);
-  EXPECT_EQ("LENOVO Computer", candidates.preferred_name_if_unique);
+  EXPECT_EQ("Lenovo Computer 30BDS0RA0G", candidates.fallback_full_name);
+  EXPECT_EQ("Lenovo Computer", candidates.preferred_name_if_unique);
 }
 
 TEST_F(DeviceNameUtilTest, GetDisplayNameCandidates_Linux_FullySynced) {
@@ -332,15 +332,15 @@ TEST_F(DeviceNameUtilTest, CheckManufacturerNameCapitalization) {
                                 "foo1bar", "model");
   candidates = GetDisplayNameCandidates(device.get());
 
-  EXPECT_EQ("Foo1Bar Computer model", candidates.fallback_full_name);
-  EXPECT_EQ("Foo1Bar Computer", candidates.preferred_name_if_unique);
+  EXPECT_EQ("Foo1bar Computer model", candidates.fallback_full_name);
+  EXPECT_EQ("Foo1bar Computer", candidates.preferred_name_if_unique);
 
   device = CreateFakeDeviceInfo("guid", "model", DeviceInfo::OsType::kWindows,
                                 "foo_bar-FOO", "model");
   candidates = GetDisplayNameCandidates(device.get());
 
-  EXPECT_EQ("Foo_Bar-FOO Computer model", candidates.fallback_full_name);
-  EXPECT_EQ("Foo_Bar-FOO Computer", candidates.preferred_name_if_unique);
+  EXPECT_EQ("Foo_bar-Foo Computer model", candidates.fallback_full_name);
+  EXPECT_EQ("Foo_bar-Foo Computer", candidates.preferred_name_if_unique);
 
   device = CreateFakeDeviceInfo("guid", "model", DeviceInfo::OsType::kWindows,
                                 "foo&bar foo", "model");
@@ -349,13 +349,23 @@ TEST_F(DeviceNameUtilTest, CheckManufacturerNameCapitalization) {
   EXPECT_EQ("Foo&Bar Foo Computer model", candidates.fallback_full_name);
   EXPECT_EQ("Foo&Bar Foo Computer", candidates.preferred_name_if_unique);
 
-  // Non-ASCII manufacturer names should be returned as-is.
+  // Non-ASCII manufacturer names without casing (e.g. Chinese) should be
+  // returned as-is.
   device = CreateFakeDeviceInfo("guid", "model", DeviceInfo::OsType::kWindows,
                                 "电子产品", "model");
   candidates = GetDisplayNameCandidates(device.get());
 
   EXPECT_EQ("电子产品 Computer model", candidates.fallback_full_name);
   EXPECT_EQ("电子产品 Computer", candidates.preferred_name_if_unique);
+
+  // Non-ASCII manufacturer names with casing (e.g. Cyrillic) should be
+  // capitalized.
+  device = CreateFakeDeviceInfo("guid", "model", DeviceInfo::OsType::kWindows,
+                                "иван", "model");
+  candidates = GetDisplayNameCandidates(device.get());
+
+  EXPECT_EQ("Иван Computer model", candidates.fallback_full_name);
+  EXPECT_EQ("Иван Computer", candidates.preferred_name_if_unique);
 }
 
 TEST_F(DeviceNameUtilTest, DetermineDisplayNamesAndDeduplicate) {

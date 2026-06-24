@@ -11,15 +11,18 @@
 #include "base/containers/flat_map.h"
 #include "base/containers/flat_set.h"
 #include "base/containers/to_vector.h"
+#include "base/i18n/unicodestring.h"
 #include "base/memory/raw_ptr.h"
 #include "base/notreached.h"
 #include "base/strings/strcat.h"
 #include "base/strings/string_util.h"
+#include "base/strings/utf_string_conversions.h"
 #include "base/trace_event/trace_event.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/sync/base/features.h"
 #include "components/sync_device_info/device_info.h"
 #include "third_party/abseil-cpp/absl/strings/ascii.h"
+#include "third_party/icu/source/common/unicode/unistr.h"
 #include "ui/base/l10n/l10n_util.h"
 
 namespace syncer {
@@ -61,24 +64,16 @@ int GetSharingDeviceTypeStringId(const DeviceInfo& device) {
 }
 
 // Capitalizes the first letter of the string and any letter that immediately
-// follows a non-alphabetic character, if the string is entirely ASCII.
-// Non-ASCII strings are returned as-is.
-std::string CapitalizeWordsIfASCII(const std::string& sentence) {
-  if (!base::IsStringASCII(sentence)) {
-    return sentence;
-  }
-
-  std::string capitalized_sentence;
-  capitalized_sentence.reserve(sentence.size());
-
-  bool use_upper_case = true;
-  for (char ch : sentence) {
-    capitalized_sentence +=
-        (use_upper_case ? absl::ascii_toupper(static_cast<unsigned char>(ch))
-                        : ch);
-    use_upper_case = !absl::ascii_isalpha(static_cast<unsigned char>(ch));
-  }
-  return capitalized_sentence;
+// follows a non-alphabetic character, using ICU for locale-aware title casing.
+std::string CapitalizeWords(const std::string& sentence) {
+  std::u16string utf16_sentence = base::UTF8ToUTF16(sentence);
+  icu::UnicodeString unicode_sentence(utf16_sentence.data(),
+                                      utf16_sentence.length());
+  // Pass nullptr to use the default titlecase break iterator, which identifies
+  // word boundaries using standard Unicode rules.
+  unicode_sentence.toTitle(/*titleIter=*/nullptr);
+  return base::UTF16ToUTF8(
+      base::i18n::UnicodeStringToString16(unicode_sentence));
 }
 
 // Returns true if the client name looks like a Windows auto-generated name.
@@ -179,8 +174,7 @@ DisplayNameCandidates GetDisplayNameCandidates(const DeviceInfo* device) {
             .fallback_full_name = device->client_name()};
   }
 
-  std::string manufacturer =
-      CapitalizeWordsIfASCII(device->manufacturer_name());
+  std::string manufacturer = CapitalizeWords(device->manufacturer_name());
 
   // For chromeOS, return manufacturer + model.
   if (device->os_type() == DeviceInfo::OsType::kChromeOsAsh) {
