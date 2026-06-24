@@ -2099,6 +2099,20 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="PageLoad.Clients.GoogleSearch.InteractionToAFTEnd" units="ms"
+    expires_after="2026-09-24">
+  <owner>gjc@google.com</owner>
+  <owner>chrome-loading@google.com</owner>
+  <improvement direction="LOWER_IS_BETTER"/>
+  <summary>
+    Measures the duration from a) the OS-level timestamp of the user input event
+    that started a navigation to b) when the Above the Fold (AFT) content is
+    fully rendered, excluding the time spent waiting for user interaction in
+    beforeunload dialogs. This includes the time spent running beforeunload
+    JavaScript handlers. This is recorded for Google Search page loads.
+  </summary>
+</histogram>
+
 <histogram name="PageLoad.Clients.GoogleSearch.InteractionToNavigationStart"
     units="ms" expires_after="2027-02-04">
   <owner>chikamune@chromium.org</owner>

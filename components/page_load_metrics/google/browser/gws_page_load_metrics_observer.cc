@@ -62,6 +62,8 @@ const char kHistogramGWSInteractionToActualNavigationStart[] =
     HISTOGRAM_PREFIX "InteractionToActualNavigationStart";
 const char kHistogramGWSInteractionToNavigationStart[] =
     HISTOGRAM_PREFIX "InteractionToNavigationStart";
+const char kHistogramGWSInteractionToAFTEnd[] =
+    HISTOGRAM_PREFIX "InteractionToAFTEnd";
 const char kHistogramGWSNavigationStartToNavigationCommitSent[] =
     HISTOGRAM_PREFIX "NavigationStartToNavigationCommitSent";
 const char kHistogramGWSNavigationCommitSentToParseStart[] =
@@ -1165,6 +1167,19 @@ void GWSPageLoadMetricsObserver::LogMetricsOnComplete(
             internal::
                 kHistogramGWSActualNavigationStartToAFTEndWithPreNavigationLatency,
             *actual_navigation_offset + aft_end_with_prenavigation_latency);
+      }
+    }
+    if (!is_prerendered_ &&
+        !navigation_handle_timing_.user_interaction.is_null() &&
+        navigation_handle_timing_.user_interaction <=
+            GetDelegate().GetNavigationStart()) {
+      base::TimeDelta duration =
+          GetDelegate().GetNavigationStart() -
+          navigation_handle_timing_.user_interaction -
+          navigation_handle_timing_.before_unload_dialog_duration;
+      if (!duration.is_negative()) {
+        PAGE_LOAD_HISTOGRAM2(internal::kHistogramGWSInteractionToAFTEnd,
+                             duration + base_time);
       }
     }
     if (is_traverse_navigation_) {

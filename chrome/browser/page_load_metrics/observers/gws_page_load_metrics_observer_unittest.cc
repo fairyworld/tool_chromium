@@ -842,3 +842,50 @@ TEST_F(GWSPageLoadMetricsObserverTest, FontLoadingMetrics) {
   expect_script_count("Emoji", "Complete", kEmojiFallbackCount);
   expect_script_count("Zyyy", "Complete", kCommonFallbackCount);
 }
+
+TEST_F(GWSPageLoadMetricsObserverTest, InteractionToAFTEnd) {
+  // Wait until the browser init is complete.
+  AfterStartupTaskUtils::SetBrowserStartupIsCompleteForTesting();
+
+  // Set up navigation timing with user interaction.
+  content::NavigationHandleTiming timing;
+  base::TimeTicks now = base::TimeTicks::Now();
+  timing.user_interaction = now - base::Milliseconds(100);
+  timing.actual_navigation_start = now - base::Milliseconds(50);
+  timing.before_unload_dialog_duration = base::Milliseconds(10);
+
+  content::MockNavigationHandle handle(GURL(kGoogleSearchResultsUrl),
+                                       main_rfh());
+  EXPECT_CALL(handle, GetNavigationHandleTiming())
+      .WillRepeatedly(testing::ReturnRef(timing));
+  handle.set_was_response_cached(false);
+
+  NavigateAndCommit(GURL(kGoogleSearchResultsUrl));
+  observer_->OnCommit(&handle);
+
+  // Set up page load timing with FCP and LCP so LogMetricsOnComplete doesn't
+  // return early.
+  page_load_metrics::mojom::PageLoadTiming timing_update;
+  InitializeTestPageLoadTiming(&timing_update);
+  tester()->SimulateTimingUpdate(timing_update);
+
+  // Simulate AFT End mark.
+  page_load_metrics::mojom::CustomUserTimingMark timing_mark;
+  timing_mark.mark_name = internal::kGwsAFTEndMarkName;
+  timing_mark.start_time = base::Milliseconds(500);
+  tester()->SimulateCustomUserTimingUpdate(timing_mark.Clone());
+
+  // Navigate away to force logging.
+  tester()->NavigateToUntrackedUrl();
+
+  // NavigationStart is 'now'.
+  // Duration = NavigationStart - user_interaction -
+  // before_unload_dialog_duration
+  //          = now - (now - 100ms) - 10ms = 90ms.
+  // AFTEnd time = 500ms.
+  // Expected value = 90ms + 500ms = 590ms.
+  tester()->histogram_tester().ExpectTotalCount(
+      internal::kHistogramGWSInteractionToAFTEnd, 1);
+  tester()->histogram_tester().ExpectBucketCount(
+      internal::kHistogramGWSInteractionToAFTEnd, 590, 1);
+}
