@@ -1998,4 +1998,8 @@ uint32_t GetPassthroughAudioFormats() {
 #endif  // BUILDFLAG(ENABLE_PASSTHROUGH_AUDIO_CODECS)
 }
 
+#if BUILDFLAG(IS_ANDROID)
+BASE_FEATURE(kUseMediaFormatCodedSize, base::FEATURE_DISABLED_BY_DEFAULT);
+#endif
+
 }  // namespace media

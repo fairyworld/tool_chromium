@@ -171,6 +171,9 @@ public final class ProductionSupportedFlagList {
                 "Allow more than 1 buffer from AImageReader on the specific set of devices. "
                         + "Only supported on TV."),
         Flag.baseFeature(
+                MediaFeatures.USE_MEDIA_FORMAT_CODED_SIZE,
+                "Use MediaFormat provided size instead of guessing the correct alignment"),
+        Flag.baseFeature(
                 GpuFeatures.PRUNE_OLD_TRANSFER_CACHE_ENTRIES,
                 "Prune old transfer cache entries and disable pruning from client"),
         Flag.baseFeature(

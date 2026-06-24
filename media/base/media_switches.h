@@ -640,6 +640,9 @@ MEDIA_EXPORT bool IsOutOfProcessVideoDecodingEnabled();
 // Return bitmask of audio formats supported by EDID.
 MEDIA_EXPORT uint32_t GetPassthroughAudioFormats();
 
+#if BUILDFLAG(IS_ANDROID)
+MEDIA_EXPORT BASE_DECLARE_FEATURE(kUseMediaFormatCodedSize);
+#endif
 }  // namespace media
 
 #endif  // MEDIA_BASE_MEDIA_SWITCHES_H_
