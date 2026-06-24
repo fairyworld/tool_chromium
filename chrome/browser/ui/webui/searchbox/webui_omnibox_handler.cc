@@ -124,8 +124,9 @@ WebuiOmniboxHandler::WebuiOmniboxHandler(
   if (aim_eligibility_service) {
     aim_eligibility_subscription_ =
         aim_eligibility_service->RegisterEligibilityChangedCallback(
-            base::BindRepeating(&WebuiOmniboxHandler::OnAimPopupEligibilityChanged,
-                                base::Unretained(this)));
+            base::BindRepeating(
+                &WebuiOmniboxHandler::OnAimPopupEligibilityChanged,
+                base::Unretained(this)));
   }
   pref_change_registrar_.Init(profile_->GetPrefs());
   pref_change_registrar_.Add(
@@ -239,7 +240,13 @@ void WebuiOmniboxHandler::AddTabContext(int32_t tab_id,
     }
   }
 
-  edit_model()->OpenAiMode(false, /*via_context_menu=*/false);
+  // Adding tab context is arguably a hybrid of `kClickOrGesture` (clicking a
+  // chip) and `kContextMenu` (doing so adds context similar to the
+  // `kContextMenu` items). Adding context should always open the AI popup,
+  // which `kContextMenu` guarantees but `kClickOrGesture` does not. Since this
+  // feature is not likely to launch, it's probably not worth the effort to
+  // investigate if this should be changed to `kContextMenu`.
+  edit_model()->OpenAiMode(OmniboxEditModel::AimActivation::kClickOrGesture);
   std::move(callback).Run(base::ok(context_token));
 }
 void WebuiOmniboxHandler::StepSelection(

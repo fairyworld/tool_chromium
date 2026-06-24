@@ -791,18 +791,15 @@ void OmniboxEditModel::EnterKeywordModeForDefaultSearchProvider(
                    u"");
 }
 
-void OmniboxEditModel::OpenAiMode(bool via_keyboard, bool via_context_menu) {
+void OmniboxEditModel::OpenAiMode(AimActivation activation) {
   AutocompleteMatch current_match =
       CurrentMatchAndAlternateNavUrl(/*alternate_nav_url=*/nullptr);
   std::u16string query_text =
       AutocompleteMatch::IsSearchType(current_match.type)
           ? current_match.contents
           : u"";
-  RecordAiModeMetrics(query_text, /*activated=*/true, via_keyboard);
 
-  if (!via_context_menu) {
-    RecordAiModeButtonClick();
-  }
+  RecordAiModeMetrics(query_text, activation);
 
   if (GetAiModeButtonConfig(controller_)->id !=
       SearchEngineType::SEARCH_ENGINE_GOOGLE) {
@@ -810,7 +807,7 @@ void OmniboxEditModel::OpenAiMode(bool via_keyboard, bool via_context_menu) {
     return;
   }
 
-  if (ShouldOpenAimPopup(via_context_menu, current_match.type)) {
+  if (ShouldOpenAimPopup(activation, current_match.type)) {
     controller_->popup_state_manager()->SetPopupState(OmniboxPopupState::kAim);
     return;
   }
@@ -859,12 +856,13 @@ void OmniboxEditModel::OpenSelection(OmniboxPopupSelection selection,
   // of `kNoMatch`, which would otherwise be handled by the `AcceptInput` case
   // below.
   if (selection.state == OmniboxPopupSelection::FOCUSED_BUTTON_AIM) {
-    OpenAiMode(via_keyboard, /*via_context_menu=*/false);
+    OpenAiMode(via_keyboard ? AimActivation::kKeyboard
+                            : AimActivation::kClickOrGesture);
     return;
   }
   // If the AIM page action was NOT activated, then make sure we still record
   // the appropriate AI Mode UMA metrics.
-  RecordAiModeMetrics(/*query_text=*/u"", /*activated=*/false, via_keyboard);
+  RecordAiModeMetrics(/*query=*/u"", AimActivation::kNotActivated);
 
   // Intentionally accept input when selection has no line.
   // This will usually reach `OpenMatch` indirectly.
@@ -3216,9 +3214,8 @@ void OmniboxEditModel::SetKeywordInfo(
   keyword_mode_entry_method_ = keyword_mode_entry_method;
 }
 
-void OmniboxEditModel::RecordAiModeMetrics(const std::u16string& query_text,
-                                           bool activated,
-                                           bool via_keyboard) {
+void OmniboxEditModel::RecordAiModeMetrics(const std::u16string& query,
+                                           AimActivation activation) {
   const auto* triggered_feature_service =
       autocomplete_controller()
           ->autocomplete_provider_client()
@@ -3237,45 +3234,49 @@ void OmniboxEditModel::RecordAiModeMetrics(const std::u16string& query_text,
                                           ".ByPageContext.", page_context}),
                             shown_in_session);
 
-  if (!activated) {
+  if (activation == AimActivation::kNotActivated) {
     return;
   }
 
   // Record whether or not the AIM page action was activated with non-empty
   // query text.
   base::UmaHistogramBoolean(kOmniboxAimEntrypointActivatedUserTextPresent,
-                            !query_text.empty());
+                            !query.empty());
   base::UmaHistogramBoolean(
       base::StrCat({kOmniboxAimEntrypointActivatedUserTextPresent,
                     ".ByPageContext.", page_context}),
-      !query_text.empty());
+      !query.empty());
 
   // Record the entry method used to activate the AIM page action.
+  const bool via_keyboard = activation == AimActivation::kKeyboard;
   base::UmaHistogramBoolean(kOmniboxAimEntrypointActivatedViaKeyboard,
                             via_keyboard);
   base::UmaHistogramBoolean(
       base::StrCat({kOmniboxAimEntrypointActivatedViaKeyboard,
                     ".ByPageContext.", page_context}),
       via_keyboard);
-}
 
-void OmniboxEditModel::RecordAiModeButtonClick() {
-  OmniboxEventProto::PageClassification classification =
-      GetPageClassification();
-  const char* surface = "WebOmnibox";
-  if (omnibox::IsNtpOmnibox(classification)) {
-    surface = "NtpOmnibox";
-  } else if (omnibox::IsSearchResultsPage(classification)) {
-    surface = "SrpOmnibox";
+  // Record button click metrics if activated via click or keyboard (not context
+  // menu).
+  if (activation == AimActivation::kClickOrGesture ||
+      activation == AimActivation::kKeyboard) {
+    OmniboxEventProto::PageClassification classification =
+        GetPageClassification();
+    const char* surface = "WebOmnibox";
+    if (omnibox::IsNtpOmnibox(classification)) {
+      surface = "NtpOmnibox";
+    } else if (omnibox::IsSearchResultsPage(classification)) {
+      surface = "SrpOmnibox";
+    }
+    std::string action =
+        base::StrCat({"ContextualSearch.AiModeButtonClick.", surface});
+    base::RecordAction(base::UserMetricsAction(action.c_str()));
+    base::UmaHistogramBoolean(action, true);
   }
-  std::string action =
-      base::StrCat({"ContextualSearch.AiModeButtonClick.", surface});
-  base::RecordAction(base::UserMetricsAction(action.c_str()));
-  base::UmaHistogramBoolean(action, true);
 }
 
 bool OmniboxEditModel::ShouldOpenAimPopup(
-    bool via_context_menu,
+    AimActivation activation,
     AutocompleteMatchType::Type current_match_type) {
   if (!controller_->client()->IsAimPopupEnabled()) {
     return false;
@@ -3283,7 +3284,7 @@ bool OmniboxEditModel::ShouldOpenAimPopup(
 
   // In general, adding a context will always open the AIM popup, while the AIM
   // button will prefer to navigate to the AI page with a query prepopulated.
-  if (via_context_menu) {
+  if (activation == AimActivation::kContextMenu) {
     return true;
   }
 

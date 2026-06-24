@@ -226,8 +226,8 @@ void HandleDriveUploadResponse(
       OmniboxContextMenuController::GetOmniboxController(web_contents.get());
   if (omnibox_controller && omnibox_controller->edit_model()) {
     if (was_ai_mode_open || has_files_or_errors) {
-      omnibox_controller->edit_model()->OpenAiMode(/*via_keyboard=*/false,
-                                                   /*via_context_menu=*/true);
+      omnibox_controller->edit_model()->OpenAiMode(
+          OmniboxEditModel::AimActivation::kContextMenu);
     }
   }
 }
@@ -760,7 +760,7 @@ void OmniboxContextMenuController::AddTitleWithStringId(int localization_id) {
 void OmniboxContextMenuController::AddTabContext(const TabInfo& tab_info) {
   UpdateSearchboxContext(web_contents_.get(), /*tab_info=*/tab_info,
                          /*tool_mode=*/std::nullopt);
-  GetEditModel()->OpenAiMode(/*via_keyboard=*/false, /*via_context_menu=*/true);
+  GetEditModel()->OpenAiMode(OmniboxEditModel::AimActivation::kContextMenu);
 }
 
 // static
@@ -1290,8 +1290,8 @@ void OmniboxContextMenuController::ExecuteCommand(int id, int event_flags) {
         active_handler->DeleteContextFromBrowser(file_token_to_delete,
                                                  /*from_automatic_chip=*/false);
         // Refresh omnibox popup UI.
-        GetEditModel()->OpenAiMode(/*via_keyboard=*/false,
-                                   /*via_context_menu=*/true);
+        GetEditModel()->OpenAiMode(
+            OmniboxEditModel::AimActivation::kContextMenu);
       } else {  // If not staged for upload, then stage for upload.
         base::UmaHistogramExactLinear(
             "ContextualSearch.ContextAdded.ContextAddedMethod.Omnibox",
@@ -1372,8 +1372,8 @@ void OmniboxContextMenuController::ExecuteCommand(int id, int event_flags) {
         }
 
         RecordContextMenuItemSelection(sliced_prefix, id);
-        GetEditModel()->OpenAiMode(/*via_keyboard=*/false,
-                                   /*via_context_menu=*/true);
+        GetEditModel()->OpenAiMode(
+            OmniboxEditModel::AimActivation::kContextMenu);
         return;
       }
 
@@ -1389,8 +1389,8 @@ void OmniboxContextMenuController::ExecuteCommand(int id, int event_flags) {
         }
 
         RecordContextMenuItemSelection(sliced_prefix, id);
-        GetEditModel()->OpenAiMode(/*via_keyboard=*/false,
-                                   /*via_context_menu=*/true);
+        GetEditModel()->OpenAiMode(
+            OmniboxEditModel::AimActivation::kContextMenu);
         return;
       }
     }
@@ -1419,8 +1419,8 @@ void OmniboxContextMenuController::ExecuteCommand(int id, int event_flags) {
               omnibox::ToolMode::TOOL_MODE_IMAGE_GEN);
         }
         RecordContextMenuItemSelection(sliced_prefix, id);
-        GetEditModel()->OpenAiMode(/*via_keyboard=*/false,
-                                   /*via_context_menu=*/true);
+        GetEditModel()->OpenAiMode(
+            OmniboxEditModel::AimActivation::kContextMenu);
         break;
       case IDC_OMNIBOX_CONTEXT_DEEP_RESEARCH:
         if (composebox_handler) {
@@ -1430,8 +1430,8 @@ void OmniboxContextMenuController::ExecuteCommand(int id, int event_flags) {
               omnibox::ToolMode::TOOL_MODE_DEEP_SEARCH);
         }
         RecordContextMenuItemSelection(sliced_prefix, id);
-        GetEditModel()->OpenAiMode(/*via_keyboard=*/false,
-                                   /*via_context_menu=*/true);
+        GetEditModel()->OpenAiMode(
+            OmniboxEditModel::AimActivation::kContextMenu);
         break;
       case IDC_OMNIBOX_CONTEXT_CANVAS:
         if (composebox_handler) {
@@ -1441,8 +1441,8 @@ void OmniboxContextMenuController::ExecuteCommand(int id, int event_flags) {
               omnibox::ToolMode::TOOL_MODE_CANVAS);
         }
         RecordContextMenuItemSelection(sliced_prefix, id);
-        GetEditModel()->OpenAiMode(/*via_keyboard=*/false,
-                                   /*via_context_menu=*/true);
+        GetEditModel()->OpenAiMode(
+            OmniboxEditModel::AimActivation::kContextMenu);
         break;
       default:
         NOTREACHED();

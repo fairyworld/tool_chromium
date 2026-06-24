@@ -151,8 +151,9 @@ AiModePageActionController* AiModePageActionController::From(
 void AiModePageActionController::OpenAiMode(
     OmniboxController& omnibox_controller,
     bool via_keyboard) {
-  omnibox_controller.edit_model()->OpenAiMode(via_keyboard,
-                                              /*via_context_menu=*/false);
+  omnibox_controller.edit_model()->OpenAiMode(
+      via_keyboard ? OmniboxEditModel::AimActivation::kKeyboard
+                   : OmniboxEditModel::AimActivation::kClickOrGesture);
 }
 
 // static

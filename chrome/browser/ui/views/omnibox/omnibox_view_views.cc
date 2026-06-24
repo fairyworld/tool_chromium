@@ -2139,8 +2139,8 @@ bool OmniboxViewViews::HandleKeyEvent(views::Textfield* textfield,
         const bool ai_mode_modifier = control;
 #endif
         if (ai_mode_modifier && !shift) {
-          controller()->edit_model()->OpenAiMode(/*via_keyboard=*/true,
-                                                 /*via_context_menu=*/false);
+          controller()->edit_model()->OpenAiMode(
+              OmniboxEditModel::AimActivation::kKeyboard);
           return true;
         }
       }
