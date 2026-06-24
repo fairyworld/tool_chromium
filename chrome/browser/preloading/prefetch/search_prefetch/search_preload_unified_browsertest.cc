@@ -1432,7 +1432,8 @@ IN_PROC_BROWSER_TEST_F(SearchPreloadUnifiedBrowserTest, TriggerAndActivate) {
       GetSearchUrl(prerender_query, UrlType::kPrefetch);
   GURL expected_prerender_url =
       GetSearchUrl(prerender_query, UrlType::kPrerender);
-  LocationBar* location_bar = browser()->window()->GetLocationBar();
+  LocationBar* location_bar =
+      BrowserWindow::FromBrowser(browser())->GetLocationBar();
   // 2. Prepare some context and trigger prerender/prefetch.
   PrepareAutocompleteContextAndTrigger(location_bar, prerender_query);
   ChangeAutocompleteResult(search_query_1, prerender_query,
@@ -1485,7 +1486,8 @@ IN_PROC_BROWSER_TEST_F(SearchPreloadUnifiedBrowserTest,
   GURL expected_prerender_url =
       GetSearchUrl(prerender_query, UrlType::kPrerender);
   GURL expected_real_url = GetSearchUrl(prerender_query, UrlType::kReal);
-  LocationBar* location_bar = browser()->window()->GetLocationBar();
+  LocationBar* location_bar =
+      BrowserWindow::FromBrowser(browser())->GetLocationBar();
   // 2. Prepare some context and trigger prerender/prefetch.
   PrepareAutocompleteContextAndTrigger(location_bar, prerender_query);
   ChangeAutocompleteResult(prerender_query, prerender_query,

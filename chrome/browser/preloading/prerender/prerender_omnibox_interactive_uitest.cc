@@ -181,8 +181,7 @@ class PrerenderOmniboxUIBrowserTest : public InProcessBrowserTest,
       content::PrerenderHostId host_id) {
     content::test::PrerenderHostObserver prerender_observer(
         *GetActiveWebContents(), host_id);
-    browser()
-        ->window()
+    BrowserWindow::FromBrowser(browser())
         ->GetLocationBar()
         ->GetOmniboxController()
         ->edit_model()
@@ -206,14 +205,15 @@ class PrerenderOmniboxUIBrowserTest : public InProcessBrowserTest,
   }
 
   OmniboxView* omnibox() {
-    return browser()->window()->GetLocationBar()->GetOmniboxView();
+    return BrowserWindow::FromBrowser(browser())
+        ->GetLocationBar()
+        ->GetOmniboxView();
   }
 
  private:
   void FocusOmnibox() {
     // If the omnibox already has focus, just notify OmniboxTabHelper.
-    if (browser()
-            ->window()
+    if (BrowserWindow::FromBrowser(browser())
             ->GetLocationBar()
             ->GetOmniboxController()
             ->edit_model()
@@ -222,7 +222,7 @@ class PrerenderOmniboxUIBrowserTest : public InProcessBrowserTest,
           ->OnFocusChanged(OMNIBOX_FOCUS_VISIBLE,
                            OMNIBOX_FOCUS_CHANGE_EXPLICIT);
     } else {
-      browser()->window()->GetLocationBar()->FocusLocation(
+      BrowserWindow::FromBrowser(browser())->GetLocationBar()->FocusLocation(
           /*is_user_initiated=*/false, /*clear_focus_if_failed=*/false);
     }
   }
@@ -230,8 +230,7 @@ class PrerenderOmniboxUIBrowserTest : public InProcessBrowserTest,
   void SetOmniboxText(const std::string& text) {
     FocusOmnibox();
     // Enter user input mode to prevent spurious unelision.
-    browser()
-        ->window()
+    BrowserWindow::FromBrowser(browser())
         ->GetLocationBar()
         ->GetOmniboxController()
         ->edit_model()
@@ -769,8 +768,7 @@ class PrerenderOmniboxSearchSuggestionUIBrowserTest
   }
 
   AutocompleteController* GetAutocompleteController() {
-    return browser()
-        ->window()
+    return BrowserWindow::FromBrowser(browser())
         ->GetLocationBar()
         ->GetOmniboxController()
         ->autocomplete_controller();
@@ -1055,14 +1053,18 @@ class PrewarmOmniboxUIBrowserTest
 
   void TriggerZeroSuggestionPrewarm() {
     OmniboxController* omnibox_controller =
-        browser()->window()->GetLocationBar()->GetOmniboxController();
+        BrowserWindow::FromBrowser(browser())
+            ->GetLocationBar()
+            ->GetOmniboxController();
     ASSERT_TRUE(omnibox_controller);
     omnibox_controller->StartZeroSuggestPrefetch();
   }
 
   void TriggerUserInteractionPrewarm() {
     OmniboxController* omnibox_controller =
-        browser()->window()->GetLocationBar()->GetOmniboxController();
+        BrowserWindow::FromBrowser(browser())
+            ->GetLocationBar()
+            ->GetOmniboxController();
     ASSERT_TRUE(omnibox_controller);
     omnibox_controller->OnResultChanged(
         omnibox_controller->autocomplete_controller(), true);

@@ -57,9 +57,7 @@ void MaybeShowProfileSwitchIPH(Profile* profile) {
                                                    ash::kPasswordManagerAppId);
   if (launched_app && web_app::AppBrowserController::From(launched_app)
                           ->HasProfileMenuButton()) {
-    launched_app->GetBrowserForMigrationOnly()
-        ->window()
-        ->MaybeShowProfileSwitchIPH();
+    BrowserWindow::FromBrowser(launched_app)->MaybeShowProfileSwitchIPH();
   }
 #endif
 }

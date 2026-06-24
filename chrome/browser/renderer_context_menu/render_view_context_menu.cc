@@ -4083,7 +4083,7 @@ void RenderViewContextMenu::ExecuteCommand(int id, int event_flags) {
           GetBrowser() ? GetBrowser()->GetBrowserForMigrationOnly() : nullptr;
       if (browser) {
         // TODO(crbug.com/514547038): Move this to BrowserWindowFeatures.
-        browser->window()->ShowEmojiPanel();
+        BrowserWindow::FromBrowser(browser)->ShowEmojiPanel();
       } else {
         // TODO(crbug.com/40608277): Ensure this is called in the correct
         // process. This fails in print preview for PWA windows on Mac.

@@ -701,12 +701,13 @@ void SessionServiceBase::BuildCommandsForBrowser(
 
   command_storage_manager()->AppendRebuildCommand(
       sessions::CreateSetWindowWorkspaceCommand(
-          browser->session_id(), browser->window()->GetWorkspace()));
+          browser->session_id(),
+          BrowserWindow::FromBrowser(browser)->GetWorkspace()));
 
   command_storage_manager()->AppendRebuildCommand(
       sessions::CreateSetWindowVisibleOnAllWorkspacesCommand(
           browser->session_id(),
-          browser->window()->IsVisibleOnAllWorkspaces()));
+          BrowserWindow::FromBrowser(browser)->IsVisibleOnAllWorkspaces()));
 
   command_storage_manager()->AppendRebuildCommand(
       sessions::CreateSetSelectedTabInWindowCommand(
