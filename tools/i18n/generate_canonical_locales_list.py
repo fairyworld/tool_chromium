@@ -87,7 +87,6 @@ _ALL_LOCALES = [
     ("en-001", "ENGLISH_GLOBAL"),
     ("en-AU", "ENGLISH_AUSTRALIA"),
     ("en-CA", "ENGLISH_CANADA"),
-    ("en-GB", "ENGLISH_UK"),
     ("en-GB", "BRITISH_ENGLISH"),
     ("en-GB-oxendict", "ENGLISH_UK_OXENDICT"),
     ("en-IE", "ENGLISH_IRELAND"),
@@ -225,7 +224,7 @@ _ALL_LOCALES = [
     ("tr", "TURKISH"),
     ("ts", "TSONGA"),
     ("tt", "TATAR"),
-    ("ak", "TWI"),  # The 'tw' code is deprecated.
+    ("tw", "TWI"),  # The 'tw' code is deprecated.
     ("ug", "UYGHUR"),
     ("uk", "UKRAINIAN"),
     ("ur", "URDU"),
