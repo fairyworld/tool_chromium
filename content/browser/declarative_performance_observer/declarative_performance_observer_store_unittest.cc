@@ -10,6 +10,9 @@
 #include "base/run_loop.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/task_environment.h"
+#include "sql/database.h"
+#include "sql/statement.h"
+#include "sql/test/test_helpers.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 #include "url/origin.h"
@@ -545,4 +548,74 @@ TEST_F(DeclarativePerformanceObserverStoreTest, ClearDataWithFilterDuringLoad) {
   EXPECT_TRUE(store->HasEarlyFailurePolicy(kOtherOrigin));
 }
 
+TEST_F(DeclarativePerformanceObserverStoreTest, Enforces7DayTTL) {
+  const url::Origin kOrigin = url::Origin::Create(GURL("https://example.com/"));
+  base::FilePath db_path =
+      temp_dir_.GetPath().AppendASCII("declarative_performance_observer.db");
+
+  // 1. Manually populate DB with both expired (8 days old) and active (1 day
+  // old) reports. We do this by creating a transient SQL connection to bypass
+  // the store's automatic timestamping.
+  {
+    sql::Database db(sql::test::kTestTag);
+    ASSERT_TRUE(db.Open(db_path));
+
+    // Re-create tables manually if they don't exist yet (just in case)
+    ASSERT_TRUE(db.Execute(
+        "CREATE TABLE IF NOT EXISTS declarative_performance_observer_reports ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "origin TEXT NOT NULL, "
+        "payload BLOB NOT NULL, "
+        "created_at INTEGER NOT NULL)"));
+
+    int64_t eight_days_ago_us = (base::Time::Now() - base::Days(8))
+                                    .ToDeltaSinceWindowsEpoch()
+                                    .InMicroseconds();
+    int64_t one_day_ago_us = (base::Time::Now() - base::Days(1))
+                                 .ToDeltaSinceWindowsEpoch()
+                                 .InMicroseconds();
+
+    sql::Statement insert_stmt(db.GetUniqueStatement(
+        "INSERT INTO declarative_performance_observer_reports "
+        "(origin, payload, created_at) VALUES (?, ?, ?)"));
+
+    // Insert expired report (8 days old)
+    insert_stmt.BindString(0, kOrigin.Serialize());
+    insert_stmt.BindBlob(
+        1, base::as_byte_span(std::string_view("{\"test_key\":\"expired\"}")));
+    insert_stmt.BindInt64(2, eight_days_ago_us);
+    ASSERT_TRUE(insert_stmt.Run());
+
+    insert_stmt.Reset(true);
+
+    // Insert active report (1 day old)
+    insert_stmt.BindString(0, kOrigin.Serialize());
+    insert_stmt.BindBlob(
+        1, base::as_byte_span(std::string_view("{\"test_key\":\"active\"}")));
+    insert_stmt.BindInt64(2, one_day_ago_us);
+    ASSERT_TRUE(insert_stmt.Run());
+  }
+
+  // 2. Instantiate the store. Its initialization sequence should trigger the
+  // 7-day TTL cleanup.
+  auto store = CreateStore();
+
+  // 3. Take reports and verify that ONLY the active (1 day old) report remains.
+  base::ListValue reports;
+  base::RunLoop run_loop;
+  store->TakeEarlyFailureReports(
+      kOrigin, base::BindOnce(
+                   [](base::ListValue* out, base::OnceClosure quit,
+                      base::ListValue res) {
+                     *out = std::move(res);
+                     std::move(quit).Run();
+                   },
+                   &reports, run_loop.QuitClosure()));
+  run_loop.Run();
+
+  ASSERT_EQ(reports.size(), 1u);
+  const base::DictValue* dict = reports[0].GetIfDict();
+  ASSERT_TRUE(dict);
+  EXPECT_EQ(*(dict->FindString("test_key")), "active");
+}
 }  // namespace content

@@ -36,6 +36,9 @@ constexpr char kHistogramPrefix[] = "Storage.DeclarativePerformanceObserver.";
 constexpr base::FilePath::CharType kDatabaseFilename[] =
     FILE_PATH_LITERAL("declarative_performance_observer.db");
 
+// Time-to-live (TTL) for early failure reports stored in the database.
+constexpr base::TimeDelta kReportsTimeToLive = base::Days(7);
+
 // These values are persisted to logs. Entries should not be renumbered and
 // numeric values should never be reused.
 // LINT.IfChange(DeclarativePerformanceObserverStoreReportResult)
@@ -399,6 +402,18 @@ class DeclarativePerformanceObserverStore::Backend
     if (!db_->Execute(kCreateReportsIndex)) {
       return false;
     }
+
+    // Clean up expired reports (TTL = 7 days).
+    static constexpr char kCleanExpiredReports[] =
+        "DELETE FROM declarative_performance_observer_reports WHERE "
+        "created_at < ?";
+    sql::Statement clean_statement(
+        db_->GetUniqueStatement(kCleanExpiredReports));
+    int64_t threshold_us = (base::Time::Now() - kReportsTimeToLive)
+                               .ToDeltaSinceWindowsEpoch()
+                               .InMicroseconds();
+    clean_statement.BindInt64(0, threshold_us);
+    clean_statement.Run();
 
     return true;
   }
