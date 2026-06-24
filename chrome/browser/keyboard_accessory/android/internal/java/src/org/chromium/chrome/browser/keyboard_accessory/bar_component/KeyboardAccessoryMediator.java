@@ -56,6 +56,7 @@ import org.chromium.components.autofill.FillingProduct;
 import org.chromium.components.autofill.FillingProductBridge;
 import org.chromium.components.autofill.SuggestionType;
 import org.chromium.components.autofill.autofill_ai.EntityInstance;
+import org.chromium.components.autofill.autofill_ai.EntityTypeName;
 import org.chromium.components.autofill.autofill_ai.RecordType;
 import org.chromium.components.browser_ui.widget.ActionConfirmationDialog;
 import org.chromium.components.browser_ui.widget.ActionConfirmationDialog.ConfirmationDialogParams;
@@ -363,14 +364,15 @@ class KeyboardAccessoryMediator
                     delegate.suggestionSelected(pos, suggestion.showLoadingOnAcceptance());
                 },
                 result -> {
-                    if (maybeShowDialogOnLongPress(suggestion)) {
+                    if (maybeShowDialogOnLongPress(delegate, suggestion)) {
                         return;
                     }
                     delegate.deleteSuggestion(pos);
                 });
     }
 
-    private boolean maybeShowDialogOnLongPress(AutofillSuggestion suggestion) {
+    private boolean maybeShowDialogOnLongPress(
+            AutofillDelegate delegate, AutofillSuggestion suggestion) {
         AutofillAiPayload payload = suggestion.getAutofillAiPayload();
         if (payload == null || mDialog == null) {
             return false;
@@ -381,16 +383,17 @@ class KeyboardAccessoryMediator
         }
         EntityInstance entityInstance = entityDataManager.getEntityInstance(payload.getGuid());
         if (entityInstance == null
-                || entityInstance.getRecordType() != RecordType.PERSONAL_CONTEXT) {
+                || entityInstance.getRecordType() != RecordType.PERSONAL_CONTEXT
+                || !shouldOpenSettingsForEntityType(entityInstance.getEntityType().getTypeName())) {
             return false;
         }
-        String secondaryLabel = suggestion.getSecondaryLabel();
-        if (secondaryLabel == null) {
+        String sublabel = suggestion.getSublabel();
+        if (sublabel == null) {
             return false;
         }
         mDialog.show(
                 new ConfirmationDialogParams.Builder(mContext)
-                        .withTitle(secondaryLabel)
+                        .withTitle(sublabel)
                         .withDescription(
                                 mContext.getString(
                                         R.string
@@ -404,17 +407,44 @@ class KeyboardAccessoryMediator
                                         R.string
                                                 .autofill_ai_suggestion_long_press_dialog_negative_button))
                         .build(),
-                this::handleDialogAction);
+                (dismissHandler, buttonClickResult, stopShowing) ->
+                        handleDialogAction(
+                                delegate,
+                                entityInstance.getEntityType().getTypeName(),
+                                dismissHandler,
+                                buttonClickResult,
+                                stopShowing));
         return true;
     }
 
+    private boolean shouldOpenSettingsForEntityType(@EntityTypeName int entityType) {
+        switch (entityType) {
+            case EntityTypeName.PASSPORT:
+            case EntityTypeName.DRIVERS_LICENSE:
+            case EntityTypeName.NATIONAL_ID_CARD:
+            case EntityTypeName.KNOWN_TRAVELER_NUMBER:
+            case EntityTypeName.REDRESS_NUMBER:
+            case EntityTypeName.VEHICLE:
+            case EntityTypeName.ORDER:
+            case EntityTypeName.FLIGHT_RESERVATION:
+            case EntityTypeName.SHIPMENT:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     private @DialogDismissType int handleDialogAction(
-            DismissHandler dismissHandler,
+            AutofillDelegate delegate,
+            @EntityTypeName int entityTypeName,
+            DismissHandler unusedDismissHandler,
             @ButtonClickResult int buttonClickResult,
-            boolean stopShowing) {
+            boolean unusedStopShowing) {
         // TODO: crbug.com/503303085 - Log metrics to asses usage.
         if (buttonClickResult == ButtonClickResult.POSITIVE) {
-            // TODO: crbug.com/503303085 - Open the corresponding settings page.
+            // Need to go through C++ because `SettingsNavigationHelper` is in `chrome_java`.
+            // Keyboard accessory Java code should not depend on `chrome_java`.
+            delegate.openSettingsForEntityType(entityTypeName);
         }
         return DialogDismissType.DISMISS_IMMEDIATELY;
     }

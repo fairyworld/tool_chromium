@@ -194,6 +194,14 @@ void AutofillKeyboardAccessoryViewImpl::ViewDismissed(JNIEnv* env) {
   }
 }
 
+void AutofillKeyboardAccessoryViewImpl::OpenSettingsForEntityType(
+    JNIEnv* env,
+    int32_t entity_type) {
+  if (controller_) {
+    controller_->OpenSettingsForEntityType(entity_type);
+  }
+}
+
 // static
 std::unique_ptr<AutofillKeyboardAccessoryView>
 AutofillKeyboardAccessoryView::Create(

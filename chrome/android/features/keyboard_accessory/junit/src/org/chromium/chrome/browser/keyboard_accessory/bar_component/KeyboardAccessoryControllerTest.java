@@ -94,6 +94,8 @@ import org.chromium.components.autofill.FillingProductBridgeJni;
 import org.chromium.components.autofill.RecordType;
 import org.chromium.components.autofill.SuggestionType;
 import org.chromium.components.autofill.autofill_ai.EntityInstance;
+import org.chromium.components.autofill.autofill_ai.EntityType;
+import org.chromium.components.autofill.autofill_ai.EntityTypeName;
 import org.chromium.components.feature_engagement.FeatureConstants;
 import org.chromium.ui.insets.InsetObserver;
 import org.chromium.ui.modaldialog.ModalDialogManager;
@@ -467,21 +469,24 @@ public class KeyboardAccessoryControllerTest {
         assertThat(barItems.get(1).getViewState(), is(ActionBarItem.ViewState.DEACTIVATED));
     }
 
-    @Test
-    public void testLongPressOnPersonalContextSuggestionOpensDialog() {
+    private void verifyLongPressOnPersonalContextSuggestionOpensSettings(
+            @EntityTypeName int entityTypeName) {
         when(mMockIsLargeFormFactorSupplier.get()).thenReturn(false);
 
         EntityInstance entityInstance = mock(EntityInstance.class);
         when(entityInstance.getRecordType())
-                .thenReturn(org.chromium.components.autofill.autofill_ai.RecordType.PERSONAL_CONTEXT);
+                .thenReturn(
+                        org.chromium.components.autofill.autofill_ai.RecordType.PERSONAL_CONTEXT);
+        EntityType entityType = mock(EntityType.class);
+        when(entityType.getTypeName()).thenReturn(entityTypeName);
+        when(entityInstance.getEntityType()).thenReturn(entityType);
         when(mMockEntityDataManager.getEntityInstance("guid")).thenReturn(entityInstance);
 
         AutofillSuggestion suggestion =
                 new AutofillSuggestion.Builder()
                         .setLabel("Personal Context Suggestion")
-                        .setSecondaryLabel("Order * Water")
-                        .setSubLabel("")
-                        .setSuggestionType(SuggestionType.AUTOCOMPLETE_ENTRY)
+                        .setSubLabel("Order * Water")
+                        .setSuggestionType(SuggestionType.FILL_AUTOFILL_AI)
                         .setFeatureForIph("")
                         .setPayload(new AutofillAiPayload("guid", false))
                         .build();
@@ -529,6 +534,25 @@ public class KeyboardAccessoryControllerTest {
                                         R.string
                                                 .autofill_ai_suggestion_long_press_dialog_negative_button)));
         verify(mMockAutofillDelegate, never()).deleteSuggestion(anyInt());
+
+        model.get(ModalDialogProperties.CONTROLLER)
+                .onClick(model, ModalDialogProperties.ButtonType.POSITIVE);
+        verify(mMockAutofillDelegate).openSettingsForEntityType(entityTypeName);
+    }
+
+    @Test
+    public void testLongPressOnPersonalContextSuggestionOpensDialog() {
+        verifyLongPressOnPersonalContextSuggestionOpensSettings(EntityTypeName.PASSPORT);
+    }
+
+    @Test
+    public void testLongPressOnPersonalContextSuggestionOpensDialog_Travel() {
+        verifyLongPressOnPersonalContextSuggestionOpensSettings(EntityTypeName.VEHICLE);
+    }
+
+    @Test
+    public void testLongPressOnPersonalContextSuggestionOpensDialog_Shopping() {
+        verifyLongPressOnPersonalContextSuggestionOpensSettings(EntityTypeName.ORDER);
     }
 
     @Test
