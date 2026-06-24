@@ -8,6 +8,7 @@
 
 #include "base/files/scoped_temp_dir.h"
 #include "base/run_loop.h"
+#include "base/test/metrics/histogram_tester.h"
 #include "base/test/task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
@@ -155,6 +156,76 @@ TEST_F(DeclarativePerformanceObserverStoreTest, OpaqueOriginIgnored) {
   run_loop.Run();
 
   EXPECT_FALSE(store->HasEarlyFailurePolicy(kOpaqueOrigin));
+}
+
+TEST_F(DeclarativePerformanceObserverStoreTest, DiskPersistence) {
+  const url::Origin kOrigin = url::Origin::Create(GURL("https://example.com/"));
+  auto store = CreateStore();
+  base::HistogramTester histogram_tester;
+
+  base::DictValue report;
+  report.Set("test_key", "test_value");
+  base::RunLoop run_loop_store;
+  store->StoreEarlyFailureReport(kOrigin, report.Clone(),
+                                 run_loop_store.QuitClosure());
+  run_loop_store.Run();
+
+  histogram_tester.ExpectUniqueSample(
+      "Storage.DeclarativePerformanceObserver.StoreReportResult",
+      /*sample=*/0, /*expected_bucket_count=*/1);
+
+  base::ListValue taken_reports;
+  base::RunLoop run_loop_take;
+  store->TakeEarlyFailureReports(
+      kOrigin,
+      base::BindOnce(
+          [](base::OnceClosure quit, base::ListValue* out_taken_reports,
+             base::ListValue result) {
+            *out_taken_reports = std::move(result);
+            std::move(quit).Run();
+          },
+          run_loop_take.QuitClosure(), &taken_reports));
+  run_loop_take.Run();
+
+  ASSERT_EQ(taken_reports.size(), 1u);
+  const base::DictValue* dict = taken_reports[0].GetIfDict();
+  ASSERT_TRUE(dict);
+  EXPECT_EQ(*(dict->FindString("test_key")), "test_value");
+
+  // Taking reports a second time should return an empty list:
+  base::ListValue taken_reports_empty;
+  base::RunLoop run_loop_take2;
+  store->TakeEarlyFailureReports(
+      kOrigin,
+      base::BindOnce(
+          [](base::OnceClosure quit, base::ListValue* out_taken_reports,
+             base::ListValue result) {
+            *out_taken_reports = std::move(result);
+            std::move(quit).Run();
+          },
+          run_loop_take2.QuitClosure(), &taken_reports_empty));
+  run_loop_take2.Run();
+
+  EXPECT_TRUE(taken_reports_empty.empty());
+}
+
+TEST_F(DeclarativePerformanceObserverStoreTest, DatabaseSchemaConfigured) {
+  auto store = CreateStore();
+  bool table_ok = false;
+  bool index_ok = false;
+  base::RunLoop run_loop;
+  store->CheckSchemaForTesting(  // IN-TEST
+      base::BindOnce(
+          [](base::OnceClosure quit, bool* out_table, bool* out_index,
+             bool table_res, bool index_res) {
+            *out_table = table_res;
+            *out_index = index_res;
+            std::move(quit).Run();
+          },
+          run_loop.QuitClosure(), &table_ok, &index_ok));
+  run_loop.Run();
+  EXPECT_TRUE(table_ok);
+  EXPECT_TRUE(index_ok);
 }
 
 }  // namespace content

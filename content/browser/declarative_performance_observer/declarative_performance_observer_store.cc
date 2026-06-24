@@ -5,17 +5,46 @@
 #include "content/browser/declarative_performance_observer/declarative_performance_observer_store.h"
 
 #include "base/functional/bind.h"
+#include "base/functional/callback_helpers.h"
+#include "base/json/json_reader.h"
+#include "base/json/json_writer.h"
 #include "base/memory/ref_counted_delete_on_sequence.h"
+#include "base/metrics/histogram_functions.h"
 #include "base/sequence_checker.h"
+#include "base/strings/strcat.h"
 #include "base/task/sequenced_task_runner.h"
 #include "base/task/thread_pool.h"
+#include "base/time/time.h"
+#include "base/values.h"
 #include "sql/database.h"
 #include "sql/error_delegate_util.h"
 #include "sql/meta_table.h"
 #include "sql/statement.h"
+#include "sql/transaction.h"
 #include "url/gurl.h"
 
 namespace content {
+
+namespace {
+
+constexpr char kReportsTableName[] = "declarative_performance_observer_reports";
+constexpr char kReportsIndexName[] = "idx_reports_origin";
+
+constexpr char kHistogramPrefix[] = "Storage.DeclarativePerformanceObserver.";
+
+// These values are persisted to logs. Entries should not be renumbered and
+// numeric values should never be reused.
+// LINT.IfChange(DeclarativePerformanceObserverStoreReportResult)
+enum class StoreReportResult {
+  kSuccess = 0,
+  kFailedDbInit = 1,
+  kFailedJsonWrite = 2,
+  kFailedSqlRun = 3,
+  kMaxValue = kFailedSqlRun,
+};
+// LINT.ThenChange(//tools/metrics/histograms/enums.xml)
+
+}  // namespace
 
 class DeclarativePerformanceObserverStore::Backend
     : public base::RefCountedDeleteOnSequence<
@@ -79,12 +108,112 @@ class DeclarativePerformanceObserverStore::Backend
     }
   }
 
+  void StoreEarlyFailureReportOnDbSequence(url::Origin origin,
+                                           base::DictValue report) {
+    DCHECK_CALLED_ON_VALID_SEQUENCE(db_sequence_checker_);
+    if (!InitOnDbSequence()) {
+      base::UmaHistogramEnumeration(
+          base::StrCat({kHistogramPrefix, "StoreReportResult"}),
+          StoreReportResult::kFailedDbInit);
+      return;
+    }
+
+    std::string payload;
+    bool write_success = base::JSONWriter::Write(report, &payload);
+    if (!write_success) {
+      base::UmaHistogramEnumeration(
+          base::StrCat({kHistogramPrefix, "StoreReportResult"}),
+          StoreReportResult::kFailedJsonWrite);
+      return;
+    }
+
+    sql::Statement statement(db_->GetUniqueStatement(
+        "INSERT INTO declarative_performance_observer_reports "
+        "(origin, payload, created_at) VALUES (?, ?, ?)"));
+    statement.BindString(0, origin.Serialize());
+    statement.BindString(1, payload);
+    statement.BindInt64(
+        2, base::Time::Now().ToDeltaSinceWindowsEpoch().InMicroseconds());
+
+    if (!statement.Run()) {
+      base::UmaHistogramEnumeration(
+          base::StrCat({kHistogramPrefix, "StoreReportResult"}),
+          StoreReportResult::kFailedSqlRun);
+      return;
+    }
+
+    base::UmaHistogramEnumeration(
+        base::StrCat({kHistogramPrefix, "StoreReportResult"}),
+        StoreReportResult::kSuccess);
+  }
+
+  void TakeEarlyFailureReportsOnDbSequence(
+      url::Origin origin,
+      scoped_refptr<base::SequencedTaskRunner> ui_task_runner,
+      base::OnceCallback<void(base::ListValue)> callback) {
+    DCHECK_CALLED_ON_VALID_SEQUENCE(db_sequence_checker_);
+    base::ListValue reports;
+    if (!InitOnDbSequence()) {
+      ui_task_runner->PostTask(
+          FROM_HERE, base::BindOnce(std::move(callback), std::move(reports)));
+      return;
+    }
+
+    sql::Transaction transaction(db_.get());
+    if (!transaction.Begin()) {
+      ui_task_runner->PostTask(
+          FROM_HERE, base::BindOnce(std::move(callback), std::move(reports)));
+      return;
+    }
+
+    sql::Statement statement(db_->GetCachedStatement(
+        SQL_FROM_HERE,
+        "SELECT payload FROM declarative_performance_observer_reports WHERE "
+        "origin = ? ORDER BY id ASC"));
+    statement.BindString(0, origin.Serialize());
+    while (statement.Step()) {
+      std::optional<base::Value> value = base::JSONReader::Read(
+          statement.ColumnStringView(0), base::JSON_PARSE_RFC);
+      if (value && value->is_dict()) {
+        reports.Append(std::move(*value));
+      }
+    }
+
+    sql::Statement delete_statement(db_->GetUniqueStatement(
+        "DELETE FROM declarative_performance_observer_reports WHERE origin = "
+        "?"));
+    delete_statement.BindString(0, origin.Serialize());
+
+    if (delete_statement.Run() && transaction.Commit()) {
+      ui_task_runner->PostTask(
+          FROM_HERE, base::BindOnce(std::move(callback), std::move(reports)));
+    } else {
+      ui_task_runner->PostTask(
+          FROM_HERE, base::BindOnce(std::move(callback), base::ListValue()));
+    }
+  }
+
   void CloseOnDbSequence() {
     DCHECK_CALLED_ON_VALID_SEQUENCE(db_sequence_checker_);
     if (db_ && db_->is_open()) {
       db_->Close();
     }
     db_.reset();
+  }
+
+  void CheckSchemaOnDbSequence(
+      scoped_refptr<base::SequencedTaskRunner> ui_task_runner,
+      base::OnceCallback<void(bool, bool)> callback) {
+    DCHECK_CALLED_ON_VALID_SEQUENCE(db_sequence_checker_);
+    if (!InitOnDbSequence()) {
+      ui_task_runner->PostTask(
+          FROM_HERE, base::BindOnce(std::move(callback), false, false));
+      return;
+    }
+    bool table_ok = db_->DoesTableExist(kReportsTableName);
+    bool index_ok = db_->DoesIndexExist(kReportsIndexName);
+    ui_task_runner->PostTask(
+        FROM_HERE, base::BindOnce(std::move(callback), table_ok, index_ok));
   }
 
  private:
@@ -137,6 +266,23 @@ class DeclarativePerformanceObserverStore::Backend
         "origin TEXT PRIMARY KEY NOT NULL, "
         "capture_early_failures BOOLEAN NOT NULL)";
     if (!db_->Execute(kCreatePoliciesTable)) {
+      return false;
+    }
+
+    static constexpr char kCreateReportsTable[] =
+        "CREATE TABLE IF NOT EXISTS declarative_performance_observer_reports ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "origin TEXT NOT NULL, "
+        "payload TEXT NOT NULL, "
+        "created_at INTEGER NOT NULL)";
+    if (!db_->Execute(kCreateReportsTable)) {
+      return false;
+    }
+
+    static constexpr char kCreateReportsIndex[] =
+        "CREATE INDEX IF NOT EXISTS idx_reports_origin ON "
+        "declarative_performance_observer_reports(origin)";
+    if (!db_->Execute(kCreateReportsIndex)) {
       return false;
     }
 
@@ -213,10 +359,39 @@ bool DeclarativePerformanceObserverStore::HasEarlyFailurePolicy(
   return cached_policies_.contains(origin);
 }
 
+void DeclarativePerformanceObserverStore::StoreEarlyFailureReport(
+    const url::Origin& origin,
+    base::DictValue report,
+    base::OnceClosure callback) {
+  db_task_runner_->PostTaskAndReply(
+      FROM_HERE,
+      base::BindOnce(&Backend::StoreEarlyFailureReportOnDbSequence, backend_,
+                     origin, std::move(report)),
+      std::move(callback));
+}
+
+void DeclarativePerformanceObserverStore::TakeEarlyFailureReports(
+    const url::Origin& origin,
+    base::OnceCallback<void(base::ListValue)> callback) {
+  db_task_runner_->PostTask(
+      FROM_HERE,
+      base::BindOnce(&Backend::TakeEarlyFailureReportsOnDbSequence, backend_,
+                     origin, base::SequencedTaskRunner::GetCurrentDefault(),
+                     std::move(callback)));
+}
+
 void DeclarativePerformanceObserverStore::Close(base::OnceClosure callback) {
   db_task_runner_->PostTaskAndReply(
       FROM_HERE, base::BindOnce(&Backend::CloseOnDbSequence, backend_),
       std::move(callback));
+}
+
+void DeclarativePerformanceObserverStore::CheckSchemaForTesting(  // IN-TEST
+    base::OnceCallback<void(bool, bool)> callback) {
+  db_task_runner_->PostTask(
+      FROM_HERE, base::BindOnce(&Backend::CheckSchemaOnDbSequence, backend_,
+                                base::SequencedTaskRunner::GetCurrentDefault(),
+                                std::move(callback)));
 }
 
 }  // namespace content

@@ -13,6 +13,7 @@
 #include "base/functional/callback_helpers.h"
 #include "base/memory/ref_counted.h"
 #include "base/memory/weak_ptr.h"
+#include "base/values.h"
 #include "content/common/content_export.h"
 #include "url/origin.h"
 
@@ -54,9 +55,23 @@ class CONTENT_EXPORT DeclarativePerformanceObserverStore {
   // the database load completes.
   bool HasEarlyFailurePolicy(const url::Origin& origin);
 
+  // Serializes and stores an early navigation failure report for `origin`.
+  void StoreEarlyFailureReport(const url::Origin& origin,
+                               base::DictValue report,
+                               base::OnceClosure callback = base::DoNothing());
+
+  // Retrieves and deletes all stored early failure reports for `origin`.
+  void TakeEarlyFailureReports(
+      const url::Origin& origin,
+      base::OnceCallback<void(base::ListValue)> callback);
+
   // Closes the persistent SQLite database connection engine and flushes any
   // pending I/O transactions on the background sequence.
   void Close(base::OnceClosure callback = base::DoNothing());
+
+  // Verifies that database tables and indexes are properly configured.
+  void CheckSchemaForTesting(  // IN-TEST
+      base::OnceCallback<void(bool, bool)> callback);
 
  private:
   class Backend;

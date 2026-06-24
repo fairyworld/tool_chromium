@@ -1299,6 +1299,18 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Storage.DeclarativePerformanceObserver.StoreReportResult"
+    enum="DeclarativePerformanceObserverStoreReportResult"
+    expires_after="2026-12-19">
+  <owner>sisidovski@chromium.org</owner>
+  <owner>chrome-loading@google.com</owner>
+  <summary>
+    Records the outcome of attempting to serialize and store an early failure
+    report in the Declarative Performance Observer SQLite database. Recorded on
+    the database sequence for each write attempt.
+  </summary>
+</histogram>
+
 <histogram
     name="Storage.DomStorage.Compression.PrecompressionValueSize.{CompressionState}"
     units="bytes" expires_after="2027-03-24">
