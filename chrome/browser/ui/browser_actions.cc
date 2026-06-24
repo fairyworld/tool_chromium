@@ -164,6 +164,10 @@
 #include "components/split_tabs/split_tab_visual_data.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/tabs/public/tab_interface.h"
+#include "chrome/browser/translate/chrome_translate_client.h"
+#include "chrome/browser/ui/lens/lens_search_controller.h"
+#include "components/lens/lens_overlay_invocation_source.h"
+#include "components/translate/core/browser/translate_manager.h"
 #include "components/user_prefs/user_prefs.h"
 #include "components/vector_icons/vector_icons.h"
 #include "ui/accessibility/accessibility_features.h"
@@ -2855,6 +2859,92 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               },
               bwi))
           .SetActionId(kActionStatusTrayKeepChromeRunningInBackground)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                tabs::TabInterface* const active_tab =
+                    bwi->GetActiveTabInterface();
+                if (!active_tab) {
+                  return;
+                }
+                content::WebContents* const web_contents =
+                    active_tab->GetContents();
+                if (!web_contents) {
+                  return;
+                }
+                ChromeTranslateClient* chrome_translate_client =
+                    ChromeTranslateClient::FromWebContents(web_contents);
+                if (!chrome_translate_client) {
+                  return;
+                }
+                translate::TranslateManager* manager =
+                    chrome_translate_client->GetTranslateManager();
+                if (manager) {
+                  manager->ShowTranslateUI(/*auto_translate=*/true,
+                                           /*triggered_from_menu=*/true);
+                }
+              },
+              bwi))
+          .SetActionId(kActionContentContextTranslate)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                read_anything::ReadAnythingEntryPointController::ShowUI(
+                    bwi, ReadAnythingOpenTrigger::kReadAnythingContextMenu);
+              },
+              bwi))
+          .SetActionId(kActionContentContextOpenInReadingMode)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                read_anything::ReadAnythingEntryPointController::ShowUI(
+                    bwi, ReadAnythingOpenTrigger::kReadAnythingContextMenu);
+              },
+              bwi))
+          .SetActionId(kActionContentContextListenToThisPage)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                tabs::TabInterface* const active_tab =
+                    bwi->GetActiveTabInterface();
+                if (!active_tab) {
+                  return;
+                }
+                content::WebContents* const web_contents =
+                    active_tab->GetContents();
+                if (!web_contents) {
+                  return;
+                }
+                if (lens::features::IsLensOverlayEnabled()) {
+                  LensSearchController* const controller =
+                      LensSearchController::FromTabWebContents(web_contents);
+                  if (controller) {
+                    controller->OpenLensOverlay(
+                        lens::LensOverlayInvocationSource::
+                            kContentAreaContextMenuPage);
+                    return;
+                  }
+                }
+                chrome::ExecLensRegionSearch(bwi);
+              },
+              bwi))
+          .SetActionId(kActionContentContextLensRegionSearch)
           .Build());
 }
 
