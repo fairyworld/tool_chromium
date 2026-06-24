@@ -3671,10 +3671,6 @@ inline constexpr char kWebUIOmniboxHideAimUrlName[] =
 inline constexpr char kWebUIOmniboxHideAimUrlDescription[] =
     "If enabled, hides the AIM button when the default suggestion is a URL.";
 
-inline constexpr char kWebUIOmniboxFullPopupName[] = "WebUI Omnibox Full Popup";
-inline constexpr char kWebUIOmniboxFullPopupDescription[] =
-    "If enabled, shows the omnibox suggestions and the search input in the "
-    "popup in WebUI.";
 
 inline constexpr char kWebUIOmniboxFullPopupV2Name[] =
     "WebUI Omnibox Full Popup V2";

@@ -72,9 +72,6 @@ BASE_FEATURE(kWebUIOmniboxDisableCaretColorAnimation, ENABLED);
 // If enabled, there will no longer be animation when opening the WebUI Omnibox
 // AIM popup.
 BASE_FEATURE(kWebUIOmniboxAimPopupDisableAnimation, DISABLED);
-// If enabled, removes the cutout for the location bar and fills the entire
-// popup content with the WebUI WebView.
-BASE_FEATURE(kWebUIOmniboxFullPopup, DISABLED);
 // If enabled, then both the input row and suggestions dropdown (in the Omnibox)
 // will be rendered using the WebUI stack (i.e. the cutout for the location bar
 // will be removed).
@@ -239,8 +236,7 @@ bool IsWebUIOmniboxPopupEnabled() {
 }
 
 bool IsWebUIOmniboxFullPopupEnabled() {
-  return base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopup) ||
-         base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopupV2);
+  return base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopupV2);
 }
 
 bool IsWebUIOmniboxInBrowserViewEnabled() {

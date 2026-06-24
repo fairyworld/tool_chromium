@@ -61,7 +61,6 @@ BASE_DECLARE_FEATURE(kAiModeEntryPointAlwaysNavigates);
 BASE_DECLARE_FEATURE(kAiModeSpaceDoesNotActivate);
 BASE_DECLARE_FEATURE(kWebUIOmniboxDisableCaretColorAnimation);
 BASE_DECLARE_FEATURE(kWebUIOmniboxAimPopupDisableAnimation);
-BASE_DECLARE_FEATURE(kWebUIOmniboxFullPopup);
 BASE_DECLARE_FEATURE(kWebUIOmniboxFullPopupV2);
 BASE_DECLARE_FEATURE(kWebUIOmniboxFullPopupDoubleClick);
 BASE_DECLARE_FEATURE(kEverywhereOmnibox);
@@ -123,8 +122,7 @@ extern const base::FeatureParam<bool> kAskGCoBrowseWithVisualSelection;
 // Returns true if `kWebUIOmniboxPopup` is enabled.
 bool IsWebUIOmniboxPopupEnabled();
 
-// Returns true if either `kWebUIOmniboxFullPopup` or `kWebUIOmniboxFullPopupV2`
-// is enabled.
+// Returns true if `kWebUIOmniboxFullPopupV2` is enabled.
 bool IsWebUIOmniboxFullPopupEnabled();
 
 // Returns true if `kWebUIOmniboxInBrowserView` is enabled.

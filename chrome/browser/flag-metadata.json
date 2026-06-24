@@ -9973,11 +9973,6 @@
     "expiry_milestone": 160
   },
   {
-    "name": "webui-omnibox-full-popup",
-    "owners": [ "mahmadi@chromium.org", "kylixrd@chromium.org", "chrome-desktop-search@google.com" ],
-    "expiry_milestone": 160
-  },
-  {
     "name": "webui-omnibox-full-popup-v2",
     "owners": [ "avivkiss@google.com", "khalidpeer@chromium.org", "mahmadi@chromium.org", "kylixrd@chromium.org", "chrome-desktop-search@google.com" ],
     "expiry_milestone": 160

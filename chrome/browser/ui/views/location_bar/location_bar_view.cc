@@ -375,9 +375,8 @@ void LocationBarView::Init() {
         omnibox::IsWebUIOmniboxPopupEnabled() &&
         !omnibox::IsWebUIOmniboxFullPopupEnabled();
 
-    if ((web_ui_popup_dropdown_only &&
-         !base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxPopupDebug)) ||
-        base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopup)) {
+    if (web_ui_popup_dropdown_only &&
+        !base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxPopupDebug)) {
       omnibox_popup_view_ = std::make_unique<OmniboxPopupViewWebUI>(
           /*omnibox_view=*/omnibox_view_,
           /*controller=*/omnibox_controller_.get(), /*location_bar=*/this,
@@ -2007,7 +2006,6 @@ void LocationBarView::ValidatePopupState(OmniboxPopupState state) {
   // Note: GetWidget() returns the BrowserView's widget, not the popup widget.
   if (views::Widget* widget = GetWidget();
       !widget || !widget->IsVisible() ||
-      base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopup) ||
       base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopupV2)) {
     return;
   }
