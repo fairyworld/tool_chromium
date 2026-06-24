@@ -596,6 +596,7 @@ source_set("unit_tests") {
   if (!is_android) {
     sources += [
       "contextual_tasks_panel_host_desktop_unittest.cc",
+      "contextual_tasks_utils_unittest.cc",
       "contextual_tasks_web_contents_user_data_unittest.cc",
     ]
   }
