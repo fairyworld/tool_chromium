@@ -26,15 +26,30 @@ struct ExtraGlyphInfo {
 //
 // TODO(crbug.com/510015130): check `is_horizontal`: if false the rectangle
 // would need to be split on the y-axis instead of the x-axis.
+// TODO(crbug.com/507508097): Correctly handle RTL text.
 InkTextInfo MakeSubstrTextInfo(const InkTextInfo& input,
                                float y_offset,
-                               std::u16string substr,
+                               base::span<const ExtraGlyphInfo> glyph_info,
                                size_t start,
                                size_t end) {
   CHECK_LT(start, input.glyphs.size());
   CHECK_LE(end, input.glyphs.size());
   CHECK_LT(start, end);
   CHECK_EQ(input.glyphs.size(), input.glyph_positions.size());
+
+  // TODO(crbug.com/507508097): Correctly handle RTL text. The most immediate
+  // problem is that in RTL text the glyphs have been reversed in order by Blink
+  // so while `total_advance` is ascending `character_index` will be descending.
+  // Also PDFium will reverse the string in ActualText if it heuristically
+  // determines that the text is RTL. All of that is possible to handle
+  // correctly. The real problem is handling that with 2D glyph positioning at
+  // the same time. If the entire string is wrapped in a reverse ActualText it
+  // copies correctly but the highlight rect is the size of a single character.
+  // Reversing the order of the glyphs in the PDF stream and wrapping each
+  // individually with ActualText ends up not getting the right string and the
+  // 2D offsets end up inserting spaces and newlines in between the glyphs.
+  const bool is_rtl =
+      glyph_info.back().character_index < glyph_info.front().character_index;
 
   const size_t count = end - start;
   const float left = input.glyph_positions[start];
@@ -51,10 +66,14 @@ InkTextInfo MakeSubstrTextInfo(const InkTextInfo& input,
                       /*y=*/input.location.y() + y_offset,
                       /*width=*/right - left,
                       /*height=*/input.location.height());
+  uint32_t start_char = glyph_info[start].character_index;
+  size_t end_char = end == glyph_info.size() ? input.text.size()
+                                             : glyph_info[end].character_index;
+  size_t num_chars = end_char - start_char;
   return InkTextInfo(input.font_id, std::move(glyphs),
                      std::move(glyph_positions), location, input.is_horizontal,
                      input.is_synthetic_bold, input.is_synthetic_italic,
-                     std::move(substr));
+                     !is_rtl ? input.text.substr(start_char, num_chars) : u"");
 }
 
 // Because PDF text objects only support 1D glyph positioning, it is necessary
@@ -83,16 +102,12 @@ InkTextInfo MakeSubstrTextInfo(const InkTextInfo& input,
 // correct behavior should be to group multiple InkTextInfo objects into a
 // single Span mark so that the smallest ActualText string is a single complete
 // Harfbuzz glyph cluster.
-// TODO(crbug.com/507508097): Correctly handle RTL text.
 std::vector<InkTextInfo> Split2DOffsets(
     const InkTextInfo& input,
     const std::vector<ExtraGlyphInfo>& glyph_info) {
   CHECK(!glyph_info.empty());
   CHECK_EQ(glyph_info.size(), input.glyphs.size());
   CHECK_EQ(glyph_info.size(), input.glyph_positions.size());
-
-  const bool is_rtl =
-      glyph_info.back().character_index < glyph_info.front().character_index;
 
   std::vector<InkTextInfo> results;
   size_t run_start = 0;
@@ -102,14 +117,8 @@ std::vector<InkTextInfo> Split2DOffsets(
     if (!is_boundary) {
       continue;
     }
-    uint32_t start_char = glyph_info[run_start].character_index;
-    size_t end_char = i == glyph_info.size() ? input.text.size()
-                                             : glyph_info[i].character_index;
-    size_t num_chars = end_char - start_char;
-    results.push_back(MakeSubstrTextInfo(
-        input, glyph_info[i - 1].offset,
-        !is_rtl ? input.text.substr(start_char, num_chars) : u"", run_start,
-        i));
+    results.push_back(MakeSubstrTextInfo(input, glyph_info[i - 1].offset,
+                                         glyph_info, run_start, i));
     run_start = i;
   }
   return results;
@@ -247,18 +256,6 @@ std::vector<InkTextInfo> InkTextInfo::BlinkTextInfoToPDFTextInfo(
       // TODO(crbug.com/510015130): handle vertical text.
       CHECK(typeface_run->is_horizontal);
 
-      // TODO(crbug.com/507508097): Correctly handle RTL text. The most
-      // immediate problem is that in RTL text the glyphs have been reversed in
-      // order by Blink so while `total_advance` is ascending `character_index`
-      // will be descending. Also PDFium will reverse the string in ActualText
-      // if it heuristically determines that the text is RTL. All of that is
-      // possible to handle correctly. The real problem is handling that with 2D
-      // glyph positioning at the same time. If the entire string is wrapped in
-      // a reverse ActualText it copies correctly but the highlight rect is the
-      // size of a single character. Reversing the order of the glyphs in the
-      // PDF stream and wrapping each individually with ActualText ends up not
-      // getting the right string and the 2D offsets end up inserting spaces and
-      // newlines in between the glyphs.
       const bool is_rtl = typeface_run->glyphs.back()->character_index <
                           typeface_run->glyphs.front()->character_index;
 
