@@ -225,11 +225,14 @@ class VerticalTabGroupSpineDecoration extends RecyclerView.ItemDecoration {
             boolean isCollapsed) {
         View child = mSortedChildren.get(childIndex);
         View lastGroupView = child;
+        View lastStableGroupView = child;
         View nextSiblingView = null;
 
         // Scan subsequent visible items in the sorted array to find:
         // 1. lastGroupView: The last visible child tab belonging to this group.
-        // 2. nextSiblingView: The first visible tab belonging to a DIFFERENT group.
+        // 2. lastStableGroupView: The last fully visible tab, for expanding/adding tab animation if
+        // the tab group is the last one on the screen
+        // 3. nextSiblingView: The first visible tab belonging to a DIFFERENT group.
         for (int j = childIndex + 1; j < sortedChildCount; j++) {
             View v = mSortedChildren.get(j);
             int pos = parent.getChildAdapterPosition(v);
@@ -239,6 +242,9 @@ class VerticalTabGroupSpineDecoration extends RecyclerView.ItemDecoration {
             Token nextGroupId =
                     headerId != null ? headerId : nextModel.get(TabProperties.TAB_GROUP_ID);
             if (groupId.equals(nextGroupId)) {
+                if (v.getAlpha() >= 1f) {
+                    lastStableGroupView = v;
+                }
                 lastGroupView = v;
             } else {
                 nextSiblingView = v;
@@ -263,12 +269,7 @@ class VerticalTabGroupSpineDecoration extends RecyclerView.ItemDecoration {
         }
 
         // Case 3: The last group shown on the list.
-        float transY = child.getTranslationY();
-        if (transY > 0f && lastGroupView.getTranslationY() < transY) {
-            transY = lastGroupView.getTranslationY();
-        }
-
-        float targetBottom = lastGroupView.getBottom() + transY;
+        float targetBottom = lastGroupView.getBottom() + lastGroupView.getTranslationY();
 
         int lastPos = parent.getChildAdapterPosition(lastGroupView);
         boolean hasSubsequentItems = lastPos < mModel.size() - 1;
@@ -278,7 +279,7 @@ class VerticalTabGroupSpineDecoration extends RecyclerView.ItemDecoration {
             return targetBottom;
         }
 
-        float startBottom = child.getBottom();
+        float startBottom = lastStableGroupView.getBottom() + lastStableGroupView.getTranslationY();
         float t = lastGroupView.getAlpha();
         return startBottom + ((targetBottom - startBottom) * t);
     }
