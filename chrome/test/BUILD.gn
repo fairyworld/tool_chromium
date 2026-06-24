@@ -5969,6 +5969,9 @@ test("unit_tests") {
       "../browser/site_protection/site_protection_metrics_observer_unittest.cc",
       "../browser/ssl/generated_https_first_mode_pref_unittest.cc",
     ]
+  } else {
+    sources +=
+        [ "../browser/signin/signin_ui_delegate_impl_android_unittest.cc" ]
   }
 
   if (is_linux || is_chromeos) {
