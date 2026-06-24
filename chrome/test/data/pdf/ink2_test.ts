@@ -428,8 +428,7 @@ chrome.test.runTests([
 
     // Verify that the PDF content embed now has focus.
     const embed = getRequiredElement(viewer, 'embed');
-    // TODO(crbug.com/521896361): The embed should have focus.
-    chrome.test.assertNe(embed, viewer.shadowRoot.activeElement);
+    chrome.test.assertEq(embed, viewer.shadowRoot.activeElement);
 
     chrome.test.succeed();
   },

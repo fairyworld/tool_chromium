@@ -2022,7 +2022,9 @@ export class PdfViewerElement extends PdfViewerBaseElement {
 
   protected onTextBoxStateChanged_(e: CustomEvent<TextBoxState>) {
     this.textboxState_ = e.detail;
-    if (e.detail === TextBoxState.EDITED) {
+    if (e.detail === TextBoxState.INACTIVE) {
+      this.focusPlugin_();
+    } else if (e.detail === TextBoxState.EDITED) {
       this.setShowBeforeUnloadDialog_(true);
     }
   }
