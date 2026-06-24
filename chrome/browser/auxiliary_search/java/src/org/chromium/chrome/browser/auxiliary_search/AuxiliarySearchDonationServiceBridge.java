@@ -7,7 +7,9 @@ package org.chromium.chrome.browser.auxiliary_search;
 import static org.chromium.build.NullUtil.assumeNonNull;
 
 import androidx.annotation.VisibleForTesting;
+import androidx.appsearch.app.AppSearchSchema;
 import androidx.appsearch.app.AppSearchSession;
+import androidx.appsearch.app.GenericDocument;
 import androidx.appsearch.app.PackageIdentifier;
 import androidx.appsearch.app.PutDocumentsRequest;
 import androidx.appsearch.app.SetSchemaRequest;
@@ -41,6 +43,17 @@ class AuxiliarySearchDonationServiceBridge implements Closeable {
     @VisibleForTesting static final String HISTORY_NAMESPACE = "History";
     @VisibleForTesting static final long HISTORY_DOCUMENT_TTL_MILLIS = TimeUnit.HOURS.toMillis(24);
 
+    /**
+     * Name of the schema that extends `androidx.appsearch.builtintypes.WebPage` to include
+     * additional properties required by receiving apps.
+     *
+     * <p>See {@link #createSetSchemaRequest()} for the source of truth for this schema.
+     */
+    @VisibleForTesting static final String CHROME_WEB_PAGE_SCHEMA_NAME = "ChromeWebPage";
+
+    // Additional properties:
+    // (None so far.)
+
     // Future which holds the `AppSearchSession` after initialization.
     // "Awaiting" this will ensure the session is initialized and the schema is set.
     //
@@ -64,11 +77,24 @@ class AuxiliarySearchDonationServiceBridge implements Closeable {
         var unused =
                 Futures.transformAsync(
                         mSessionFuture,
-                        session ->
-                                session.putAsync(
-                                        new PutDocumentsRequest.Builder()
-                                                .addDocuments(pages)
-                                                .build()),
+                        session -> {
+                            var builder = new PutDocumentsRequest.Builder();
+                            for (WebPage page : pages) {
+                                // `GenericDocument.fromDocumentClass` can throw "if no factory for
+                                // this document class could be found on the classpath", but that
+                                // should never happen. Call it from the top-level `transformAsync`
+                                // lambda, instead of a stream map, to ensure that if an exception
+                                // _is_ thrown, it is caught by `transformAsync`.
+                                GenericDocument webPageDoc =
+                                        GenericDocument.fromDocumentClass(page);
+                                GenericDocument extendedDoc =
+                                        new GenericDocument.Builder<>(webPageDoc)
+                                                .setSchemaType(CHROME_WEB_PAGE_SCHEMA_NAME)
+                                                .build();
+                                builder.addGenericDocuments(extendedDoc);
+                            }
+                            return session.putAsync(builder.build());
+                        },
                         MoreExecutors.directExecutor());
     }
 
@@ -141,16 +167,28 @@ class AuxiliarySearchDonationServiceBridge implements Closeable {
         var builder = new SetSchemaRequest.Builder();
         // Delete old documents incompatible with the new schema.
         builder.setForceOverride(true);
+        // `addSchemas` does not include parent schemas, but `addDocumentClasses` DOES include
+        // parent schemas. Use that to add all schemas used by `extendedSchema`.
         builder.addDocumentClasses(WebPage.class);
-        builder.setDocumentClassDisplayedBySystem(WebPage.class, /* displayed= */ false);
+
+        AppSearchSchema webpageSchema = AppSearchSchema.fromDocumentClass(WebPage.class);
+        AppSearchSchema extendedSchema =
+                new AppSearchSchema.Builder(webpageSchema)
+                        .setSchemaType(CHROME_WEB_PAGE_SCHEMA_NAME)
+                        .addParentType(WebPage.SCHEMA_NAME)
+                        .build();
+        builder.addSchemas(extendedSchema);
+        // Schema visibility is for the underlying document, so there's no need to set it on parent
+        // schemas too as we only store `ChromeWebPage` and no other schemas.
+        builder.setSchemaTypeDisplayedBySystem(CHROME_WEB_PAGE_SCHEMA_NAME, /* displayed= */ false);
 
         // Always inlined by R8 - this method is only called by `setUpSessionFuture` if `hooks` is
         // non-null.
         AuxiliarySearchHooks hooks = ServiceLoaderUtil.maybeCreate(AuxiliarySearchHooks.class);
         assumeNonNull(hooks);
         for (PackageIdentifier packageIdentifier : hooks.getPackagesForBrowsingDataVisibility()) {
-            builder.setDocumentClassVisibilityForPackage(
-                    WebPage.class, /* visible= */ true, packageIdentifier);
+            builder.setSchemaTypeVisibilityForPackage(
+                    CHROME_WEB_PAGE_SCHEMA_NAME, /* visible= */ true, packageIdentifier);
         }
         return builder.build();
     }

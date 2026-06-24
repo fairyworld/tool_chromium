@@ -5,6 +5,7 @@
 package org.chromium.chrome.browser.auxiliary_search;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,6 +17,7 @@ import static org.mockito.Mockito.when;
 
 import android.content.pm.Signature;
 
+import androidx.appsearch.app.AppSearchSchema;
 import androidx.appsearch.app.AppSearchSession;
 import androidx.appsearch.app.GenericDocument;
 import androidx.appsearch.app.PackageIdentifier;
@@ -114,13 +116,31 @@ public class AuxiliarySearchDonationServiceBridgeUnitTest {
         verify(mMockSession).setSchemaAsync(mSetSchemaRequestCaptor.capture());
         SetSchemaRequest request = mSetSchemaRequestCaptor.getValue();
         assertTrue(request.isForceOverride());
-        assertTrue(request.getSchemasNotDisplayedBySystem().contains(WebPage.SCHEMA_NAME));
+        assertTrue(
+                request.getSchemasNotDisplayedBySystem()
+                        .contains(
+                                AuxiliarySearchDonationServiceBridge.CHROME_WEB_PAGE_SCHEMA_NAME));
+
         assertTrue(
                 request.getSchemas().stream()
                         .anyMatch(s -> s.getSchemaType().equals(WebPage.SCHEMA_NAME)));
+        AppSearchSchema extendedWebPageSchema =
+                request.getSchemas().stream()
+                        .filter(
+                                s ->
+                                        s.getSchemaType()
+                                                .equals(
+                                                        AuxiliarySearchDonationServiceBridge
+                                                                .CHROME_WEB_PAGE_SCHEMA_NAME))
+                        .findFirst()
+                        .orElse(null);
+        assertNotNull(extendedWebPageSchema);
+        assertEquals(List.of(WebPage.SCHEMA_NAME), extendedWebPageSchema.getParentTypes());
+
         assertEquals(
                 TEST_INTELLIGENCE_PACKAGES,
-                request.getSchemasVisibleToPackages().get(WebPage.SCHEMA_NAME));
+                request.getSchemasVisibleToPackages()
+                        .get(AuxiliarySearchDonationServiceBridge.CHROME_WEB_PAGE_SCHEMA_NAME));
     }
 
     @Test
@@ -142,7 +162,11 @@ public class AuxiliarySearchDonationServiceBridgeUnitTest {
         PutDocumentsRequest request = mPutDocumentsRequestCaptor.getValue();
         List<GenericDocument> documents = request.getGenericDocuments();
         assertEquals(1, documents.size());
-        WebPage webPage = documents.get(0).toDocumentClass(WebPage.class);
+        GenericDocument actualDoc = documents.get(0);
+        assertEquals(
+                AuxiliarySearchDonationServiceBridge.CHROME_WEB_PAGE_SCHEMA_NAME,
+                actualDoc.getSchemaType());
+        WebPage webPage = actualDoc.toDocumentClass(WebPage.class);
         assertEquals(TEST_ID, webPage.getId());
         assertEquals(
                 AuxiliarySearchDonationServiceBridge.HISTORY_NAMESPACE, webPage.getNamespace());
