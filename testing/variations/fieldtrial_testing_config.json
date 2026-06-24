@@ -2393,6 +2393,32 @@
             ]
         }
     ],
+    "AtMemoryDogfood": [
+        {
+            "platforms": [
+                "android",
+                "chromeos",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "params": {
+                        "state": "4"
+                    },
+                    "enable_features": [
+                        "AutofillAtMemory",
+                        "IPH_AutofillAtMemory",
+                        "PersonalContextFirstRun",
+                        "PersonalContextFirstRunNoticePhase2",
+                        "PersonalContextForceEnablementState"
+                    ]
+                }
+            ]
+        }
+    ],
     "AudioFocusEnforcementStudy": [
         {
             "platforms": [
