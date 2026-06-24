@@ -85,7 +85,7 @@ data_sources: {
         name: "android.track_event"
     }
 }
-duration_ms: 40000
+duration_ms: 45000
 """
 
 
@@ -311,7 +311,7 @@ def run_performance_test(
         # Set the Group of Pictures (GOP) size for better seeking.
         '-g', '60',
         # Set the duration of the recording.
-        '-t', '35',
+        '-t', '40',
         output_file
     ]
 
@@ -445,6 +445,11 @@ def run_performance_test(
                 rec_proc_local.terminate()
                 rec_proc_local.wait()
                 return None
+
+        # Let the WebRTC pipeline stabilize and adjust its bitrate before
+        # we start playback. This minimizes startup frame drops.
+        logging.info("Sleeping 2.5s to let mirroring stabilize...")
+        time.sleep(2.5)
 
         video.click()
         logging.info("Started playing video.")
