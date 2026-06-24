@@ -253,6 +253,18 @@ public class TabVerticalViewBinderUnitTest {
 
     @Test
     @SmallTest
+    public void testBindActionButtonDescription() {
+        mModel.set(
+                TabProperties.ACTION_BUTTON_DESCRIPTION_TEXT_RESOLVER,
+                (context) -> "Close Google tab");
+        TabVerticalViewBinder.bindTab(
+                mModel, mItemView, TabProperties.ACTION_BUTTON_DESCRIPTION_TEXT_RESOLVER);
+
+        assertEquals("Close Google tab", mCloseButton.getContentDescription());
+    }
+
+    @Test
+    @SmallTest
     public void testCloseButtonHover() {
         mModel.set(TabProperties.IS_SELECTED, false);
         TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.IS_SELECTED);

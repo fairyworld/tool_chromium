@@ -82,6 +82,11 @@ class TabVerticalViewBinder {
             updateChildRowPadding(model, view);
         } else if (TabProperties.CONTENT_DESCRIPTION_TEXT_RESOLVER == propertyKey) {
             TabListViewBinderUtils.updateContentDescription(model, view);
+        } else if (TabProperties.ACTION_BUTTON_DESCRIPTION_TEXT_RESOLVER == propertyKey) {
+            @Nullable View actionButton = view.findViewById(R.id.action_button);
+            if (actionButton != null) {
+                TabListViewBinderUtils.updateActionButtonContentDescription(model, actionButton);
+            }
         } else if (TabProperties.MEDIA_INDICATOR == propertyKey) {
             updateMediaIndicator(model, view);
         } else if (TabProperties.ACTOR_UI_STATE == propertyKey) {

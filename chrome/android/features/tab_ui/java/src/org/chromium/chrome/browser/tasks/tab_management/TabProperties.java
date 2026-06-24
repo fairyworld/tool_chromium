@@ -311,6 +311,7 @@ public class TabProperties {
     public static final PropertyKey[] ALL_KEYS_VERTICAL_TAB =
             new PropertyKey[] {
                 // go/keep-sorted start
+                ACTION_BUTTON_DESCRIPTION_TEXT_RESOLVER,
                 ACTOR_UI_STATE,
                 CONTENT_DESCRIPTION_TEXT_RESOLVER,
                 FAVICON_FETCHER,
