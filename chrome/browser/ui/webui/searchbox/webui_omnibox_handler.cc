@@ -325,7 +325,7 @@ void WebuiOmniboxHandler::OnFocusChanged(bool focused) {
     edit_model()->OnSetFocus(false);
   } else {
     edit_model()->OnWillKillFocus();
-    if (!base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopupV2)) {
+    if (!base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopup)) {
       edit_model()->OnKillFocus();
     }
   }
@@ -392,7 +392,7 @@ void WebuiOmniboxHandler::OnActiveTabChanged(TabListInterface& tab_list,
 }
 
 void WebuiOmniboxHandler::StopAutocomplete(bool clear_result) {
-  if (base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopupV2) &&
+  if (base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopup) &&
       clear_result) {
     controller_->edit_model()->Revert();
   }

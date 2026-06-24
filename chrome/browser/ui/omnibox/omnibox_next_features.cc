@@ -75,10 +75,7 @@ BASE_FEATURE(kWebUIOmniboxAimPopupDisableAnimation, DISABLED);
 // If enabled, then both the input row and suggestions dropdown (in the Omnibox)
 // will be rendered using the WebUI stack (i.e. the cutout for the location bar
 // will be removed).
-//
-// NOTE: This flag is intended to control the next-gen Omnibox experience and
-// will eventually supersede the `kWebUIOmniboxFullPopup` feature flag.
-BASE_FEATURE(kWebUIOmniboxFullPopupV2, DISABLED);
+BASE_FEATURE(kWebUIOmniboxFullPopup, DISABLED);
 // Enables the double click mechanism of sending selection set by
 // passing click events through the WebView.
 BASE_FEATURE(kWebUIOmniboxFullPopupDoubleClick, ENABLED);
@@ -236,12 +233,12 @@ bool IsWebUIOmniboxPopupEnabled() {
 }
 
 bool IsWebUIOmniboxFullPopupEnabled() {
-  return base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopupV2);
+  return base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopup);
 }
 
 bool IsWebUIOmniboxInBrowserViewEnabled() {
-  return base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopupV2) &&
-         kWebUIOmniboxFullPopupV2UseBrowserView.Get();
+  return base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopup) &&
+         kWebUIOmniboxFullPopupUseBrowserView.Get();
 }
 
 bool IsAimPopupFeatureEnabled() {
@@ -371,8 +368,8 @@ const base::FeatureParam<bool> kContextButtonShapeIsOblong{
 const base::FeatureParam<bool> kContextButtonShowSuggestionLabel{
     &internal::kWebUIOmniboxSimplification,
     "Omnibox_ContextButtonShowSuggestionLabel", false};
-const base::FeatureParam<bool> kWebUIOmniboxFullPopupV2UseBrowserView{
-    &kWebUIOmniboxFullPopupV2, "Omnibox_UseBrowserView", false};
+const base::FeatureParam<bool> kWebUIOmniboxFullPopupUseBrowserView{
+    &kWebUIOmniboxFullPopup, "Omnibox_UseBrowserView", false};
 
 const base::FeatureParam<bool> kAskGCoBrowse{
     &kWebUIOmniboxAskGAboutThisPage, "Omnibox_AskGCoBrowse", false};

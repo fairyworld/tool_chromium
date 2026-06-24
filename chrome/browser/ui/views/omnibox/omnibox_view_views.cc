@@ -1790,7 +1790,7 @@ void OmniboxViewViews::OnBlur() {
       !controller()->edit_model()->is_keyword_selected()) {
     // Bypass native RevertAll when Full WebUI V2 is enabled to prevent wiping
     // out active WebUI drafting states.
-    if (!base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopupV2) &&
+    if (!base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopup) &&
         ((!controller()->edit_model()->user_input_in_progress() &&
           GetText() != controller()->edit_model()->GetPermanentDisplayText()) ||
          (controller()->edit_model()->user_input_in_progress() &&
@@ -1813,7 +1813,7 @@ void OmniboxViewViews::OnBlur() {
     RevertAll();
   } else if (auto* popup_closer =
                  controller()->client()->GetOmniboxPopupCloser()) {
-    if (!base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopupV2)) {
+    if (!base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopup)) {
       popup_closer->CloseWithReason(omnibox::PopupCloseReason::kBlur);
     }
   }
