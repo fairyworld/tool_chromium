@@ -5,6 +5,7 @@
 #import <XCTest/XCTest.h>
 
 #import "base/strings/sys_string_conversions.h"
+#import "base/test/ios/wait_util.h"
 #import "components/omnibox/browser/aim_eligibility_service_features.h"
 #import "ios/chrome/browser/assistant/ui/assistant_container_detent.h"
 #import "ios/chrome/browser/cobrowse/ui/assistant_aim_ui_constants.h"
@@ -25,6 +26,8 @@
 #import "net/test/embedded_test_server/embedded_test_server.h"
 #import "ui/base/l10n/l10n_util.h"
 #import "url/gurl.h"
+
+using chrome_test_util::OmniboxText;
 
 namespace {
 
@@ -776,6 +779,60 @@ id<GREYMatcher> CloseButton() {
       waitForUIElementToAppearWithMatcher:grey_allOf(CloseButton(),
                                                      grey_sufficientlyVisible(),
                                                      nil)];
+}
+
+// Tests that pressing Return in the composebox text view sends the query,
+// and Shift+Return adds a newline.
+- (void)testComposeboxReturnKeys {
+  if ([ComposeboxAppInterface isServerSideStateEnabled]) {
+    EARL_GREY_TEST_SKIPPED(
+        @"Skipped when kComposeboxServerSideState is enabled.");
+  }
+
+  OpenCoBrowse(self.testServer);
+
+  // Wait for the assistant to appear.
+  [ChromeEarlGrey waitForUIElementToAppearWithMatcher:CloseButton()];
+
+  // Locate the composebox text input and focus it.
+  id<GREYMatcher> composeboxInput = chrome_test_util::Omnibox();
+  [[EarlGrey selectElementWithMatcher:composeboxInput]
+      performAction:grey_tap()];
+
+  // Type some text using simulated physical keyboard events.
+  [ChromeEarlGrey simulatePhysicalKeyboardEvent:@"line 1" flags:0];
+
+  // Spin the run loop to allow the async keyboard events to process.
+  base::test::ios::SpinRunLoopWithMinDelay(base::Seconds(1));
+
+  // Press Shift+Return.
+  [ChromeEarlGrey simulatePhysicalKeyboardEvent:@"\r" flags:UIKeyModifierShift];
+
+  // Type more text.
+  [ChromeEarlGrey simulatePhysicalKeyboardEvent:@"line 2" flags:0];
+
+  // Spin the run loop to allow the async keyboard events to process.
+  base::test::ios::SpinRunLoopWithMinDelay(base::Seconds(1));
+
+  // Verify that the text now contains a newline.
+  [[EarlGrey selectElementWithMatcher:composeboxInput]
+      assertWithMatcher:OmniboxText("line 1\nline 2")];
+
+  // Press Cmd+Return.
+  [ChromeEarlGrey simulatePhysicalKeyboardEvent:@"\r"
+                                          flags:UIKeyModifierCommand];
+
+  // Verify that the text is still the same (Cmd+Return did nothing).
+  [[EarlGrey selectElementWithMatcher:composeboxInput]
+      assertWithMatcher:OmniboxText("line 1\nline 2")];
+
+  // Now press Return (without shift) to send the query.
+  [ChromeEarlGrey simulatePhysicalKeyboardEvent:@"\r" flags:0];
+
+  // Verify that the query is sending (e.g. the text is cleared).
+  [ChromeEarlGrey
+      waitForUIElementToAppearWithMatcher:grey_allOf(composeboxInput,
+                                                     OmniboxText(""), nil)];
 }
 
 @end
