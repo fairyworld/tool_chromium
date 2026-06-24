@@ -186,6 +186,9 @@
 #include "components/strings/grit/components_strings.h"
 #include "components/tabs/public/tab_interface.h"
 #include "chrome/browser/feedback/show_feedback_page.h"
+#if BUILDFLAG(IS_CHROMEOS)
+#include "chrome/browser/ui/browser_commands_chromeos.h"
+#endif
 #include "components/translate/core/browser/translate_manager.h"
 #include "components/user_prefs/user_prefs.h"
 #include "components/vector_icons/vector_icons.h"
@@ -3613,6 +3616,121 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               },
               bwi))
           .SetActionId(kActionManageExtensions)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::OpenUpdateChromeDialog(bwi);
+              },
+              bwi))
+          .SetActionId(kActionUpgradeDialog)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowAvatarMenu(bwi);
+              },
+              bwi))
+          .SetActionId(kActionShowAvatarMenu)
+          .Build());
+
+#if BUILDFLAG(IS_CHROMEOS)
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                ::TakeScreenshot();
+              },
+              bwi))
+          .SetActionId(kActionTakeScreenshot)
+          .Build());
+#endif
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowBetaForum(bwi);
+              },
+              bwi))
+          .SetActionId(kActionShowBetaForum)
+          .Build());
+
+#if BUILDFLAG(IS_MAC)
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                tabs::TabInterface* const active_tab =
+                    bwi->GetActiveTabInterface();
+                if (!active_tab) {
+                  return;
+                }
+                content::WebContents* const web_contents =
+                    active_tab->GetContents();
+                if (!web_contents) {
+                  return;
+                }
+                if (base::FeatureList::IsEnabled(
+                        features::kDevToolsShowPolicyDialog) &&
+                    !DevToolsWindow::AllowDevToolsFor(bwi->GetProfile(),
+                                                      web_contents)) {
+                  DevToolsPolicyDialog::Show(web_contents);
+                } else {
+                  chrome::ToggleJavaScriptFromAppleEventsAllowed(
+                      bwi->GetBrowserForMigrationOnly());
+                }
+              },
+              bwi))
+          .SetActionId(kActionToggleJavascriptAppleEvents)
+          .Build());
+#endif
+
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING)
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowChromeTips(bwi);
+              },
+              bwi))
+          .SetActionId(kActionChromeTips)
+          .Build());
+#endif
+
+#if BUILDFLAG(GOOGLE_CHROME_BRANDING) && \
+    (BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX))
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowChromeWhatsNew(bwi);
+              },
+              bwi))
+          .SetActionId(kActionChromeWhatsNew)
+          .Build());
+#endif
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowSettingsSubPage(bwi, chrome::kPerformanceSubPage);
+              },
+              bwi))
+          .SetActionId(kActionPerformance)
           .Build());
 }
 
