@@ -658,22 +658,15 @@ bool GlicGlobalEnabling::IsSystemRequirementMet() const {
   return supported_system_requirements;
 }
 
-bool GlicGlobalEnabling::IsOsVersionSupported() const {
-  static const bool supported_os_version = [] {
+bool GlicGlobalEnabling::IsOsVersionSupported() {
 #if BUILDFLAG(IS_ANDROID)
-    // Glic requires Foreground Services (FGS) to run, which has strict
-    // requirements starting from Android S (see b/515767943).
-    if (base::android::android_info::sdk_int() <
-        base::android::android_info::SDK_VERSION_S) {
-      return false;
-    }
-    return true;
+  // Glic requires Foreground Services (FGS) to run, which has strict
+  // requirements starting from Android S (see b/515767943).
+  return base::android::android_info::sdk_int() >=
+         base::android::android_info::SDK_VERSION_S;
 #else
-    return true;
+  return true;
 #endif
-  }();
-
-  return supported_os_version;
 }
 
 bool GlicGlobalEnabling::IsEnabledByGlobalCriteria() {
@@ -687,6 +680,10 @@ bool GlicGlobalEnabling::IsEnabledByGlobalCriteria() {
                     country_enablement_.value_or(true);
 
   return is_enabled && IsOsVersionSupported() && IsSystemRequirementMet();
+}
+
+bool GlicEnabling::IsOsVersionSupported() {
+  return GlicGlobalEnabling::IsOsVersionSupported();
 }
 
 // static
