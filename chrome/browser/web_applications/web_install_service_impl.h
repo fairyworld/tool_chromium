@@ -215,7 +215,14 @@ class WebInstallServiceImpl
   // Callback for when InstallFromManifest's fetch completes.
   void OnManifestFetched(
       InstallFromManifestCallbackWithGuard callback_with_guard,
+      blink::mojom::ManifestInstallOptionsPtr options,
       base::expected<std::string, WebInstallManifestFetchError> result);
+
+  // Callback for when the manifest parse command completes.
+  void OnManifestParsed(
+      InstallFromManifestCallbackWithGuard callback_with_guard,
+      blink::mojom::ManifestInstallOptionsPtr options,
+      blink::mojom::ManifestPtr manifest);
 
   // Only one install can be in progress at a time.
   bool install_in_progress_ = false;

@@ -18,6 +18,7 @@
 #include "base/task/sequenced_task_runner.h"
 #include "base/time/time.h"
 #include "chrome/browser/profiles/profile.h"
+#include "chrome/browser/web_applications/commands/parse_manifest_from_manifest_url_command.h"
 #include "chrome/browser/web_applications/commands/web_install_from_url_command.h"
 #include "chrome/browser/web_applications/icons/icon_masker.h"
 #include "chrome/browser/web_applications/locks/app_lock.h"
@@ -356,8 +357,8 @@ void WebInstallServiceImpl::InstallFromManifestInternal(
   }
 
   // Fetch the manifest even in Incognito/off-the-record profiles so that
-  // DataErrors (invalid JSON, missing id) can be returned accurately. This
-  // prevents sites from using DataError differences to detect Incognito mode.
+  // DataErrors (invalid JSON, missing id) are returned accurately. This
+  // prevents sites from using error differences to detect Incognito mode.
   auto* profile =
       Profile::FromBrowserContext(render_frame_host().GetBrowserContext());
 
@@ -366,11 +367,12 @@ void WebInstallServiceImpl::InstallFromManifestInternal(
 
   manifest_fetcher_->Fetch(base::BindOnce(
       &WebInstallServiceImpl::OnManifestFetched, weak_ptr_factory_.GetWeakPtr(),
-      std::move(callback_with_guard)));
+      std::move(callback_with_guard), std::move(options)));
 }
 
 void WebInstallServiceImpl::OnManifestFetched(
     InstallFromManifestCallbackWithGuard callback_with_guard,
+    blink::mojom::ManifestInstallOptionsPtr options,
     base::expected<std::string, WebInstallManifestFetchError> result) {
   manifest_fetcher_.reset();
 
@@ -380,7 +382,59 @@ void WebInstallServiceImpl::OnManifestFetched(
     return;
   }
 
-  // TODO(liahiscock): Parse the manifest and continue the install flow.
+  // Use the original profile to access the web app command system for parsing,
+  // as `profile` could still be off-the-record.
+  auto* profile =
+      Profile::FromBrowserContext(render_frame_host().GetBrowserContext());
+  auto* provider = WebAppProvider::GetForWebApps(profile->GetOriginalProfile());
+  if (!provider) {
+    std::move(callback_with_guard)
+        .Run(blink::mojom::WebInstallServiceResult::kAbortError);
+    return;
+  }
+
+  const GURL manifest_url = options->manifest_url;
+  provider->command_manager().ScheduleCommand(
+      std::make_unique<ParseManifestFromManifestUrlCommand>(
+          manifest_url, std::move(*result),
+          base::BindOnce(&WebInstallServiceImpl::OnManifestParsed,
+                         weak_ptr_factory_.GetWeakPtr(),
+                         std::move(callback_with_guard), std::move(options))));
+}
+
+void WebInstallServiceImpl::OnManifestParsed(
+    InstallFromManifestCallbackWithGuard callback_with_guard,
+    blink::mojom::ManifestInstallOptionsPtr options,
+    blink::mojom::ManifestPtr parsed_manifest) {
+  // Null manifest means the command failed (invalid JSON, empty, or missing
+  // required fields like start_url/name).
+  if (!parsed_manifest) {
+    std::move(callback_with_guard)
+        .Run(blink::mojom::WebInstallServiceResult::kDataError);
+    return;
+  }
+
+  // If the developer provided a manifest ID, it should match what was just
+  // parsed and computed.
+  if (options->manifest_id.has_value()) {
+    if (parsed_manifest->id != *options->manifest_id) {
+      std::move(callback_with_guard)
+          .Run(blink::mojom::WebInstallServiceResult::kDataError);
+      return;
+    }
+  } else {
+    // The developer did not provide a manifest ID, so the parsed manifest
+    // must have declared one.
+    if (!parsed_manifest->has_custom_id) {
+      std::move(callback_with_guard)
+          .Run(blink::mojom::WebInstallServiceResult::kDataError);
+      return;
+    }
+  }
+
+  // Manifest was successfully parsed and meets all web install requirements.
+  // TODO(liahiscock): Initiate Incognito dialog and early return. Then proceed
+  // with the installation process.
   NOTIMPLEMENTED();
   std::move(callback_with_guard)
       .Run(blink::mojom::WebInstallServiceResult::kAbortError);
