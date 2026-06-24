@@ -3013,11 +3013,11 @@ public class TabListMediator implements TabListNotificationHandler {
 
     private void updateDescriptionString(Tab tab, PropertyModel model) {
         if (mLayoutType == TabListLayoutType.FLAT) return;
-        boolean isInTabGroup = isTabInTabGroup(tab);
+        boolean isTabGroup = isTabGroupHeader(model);
         int numOfRelatedTabs = getRelatedTabsForId(tab.getId()).size();
         TextResolver contentDescriptionResolver =
                 (context) -> {
-                    if (!isInTabGroup) {
+                    if (!isTabGroup) {
                         if (mComponentId == TabComponentId.ARCHIVED_TABS_DIALOG) {
                             return context.getString(
                                     R.string.accessibility_restore_tab, getTabTitleOrUrl(tab));
@@ -3138,9 +3138,9 @@ public class TabListMediator implements TabListNotificationHandler {
     private void updateActionButtonDescriptionString(Tab tab, PropertyModel model) {
         TextResolver descriptionTextResolver;
         if (mLayoutType != TabListLayoutType.FLAT) {
-            boolean isInTabGroup = isTabInTabGroup(tab);
+            boolean isTabGroup = isTabGroupHeader(model);
             int numOfRelatedTabs = getRelatedTabsForId(tab.getId()).size();
-            if (isInTabGroup) {
+            if (isTabGroup) {
                 String title = getLatestTitleForTabOrGroup(tab, model, /* useDefault= */ false);
 
                 descriptionTextResolver =
