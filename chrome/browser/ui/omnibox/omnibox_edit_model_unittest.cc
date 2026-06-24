@@ -2197,12 +2197,18 @@ TEST_F(OmniboxEditModelPopupTest, OpenFeaturedSearchMatch) {
 }
 
 TEST_F(OmniboxEditModelTest, NavigateToThirdPartyAiMode) {
-  // 1. Setup testing config.
-  ai_mode_button_config::AiModeButtonConfig test_config;
-  test_config.id = SearchEngineType::SEARCH_ENGINE_YAHOO;
-  test_config.navigation_url = "https://url.com/search?p={searchTerms}";
-  test_config.navigation_url_empty = "https://url-empty.com";
-  client()->GetAiModeButtonService()->current_config_ = test_config;
+  // Setup testing config.
+  ai_mode_button_config::AiModeButtonConfig test_config = {
+      SearchEngineType::SEARCH_ENGINE_YAHOO,
+      u"text",
+      u"tooltip",
+      u"a11y_label",
+      u"context_menu_label",
+      u"placeholder_text",
+      "favicon_url",
+      "https://url.com/search?p={searchTerms}",
+      "https://url-empty.com"};
+  client()->GetAiModeButtonService()->current_config_ = &test_config;
 
   // Test with query.
   EXPECT_CALL(*client(), OpenUrl(GURL("https://url.com/search?p=query"),
