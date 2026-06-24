@@ -64,6 +64,8 @@ mojom::ParsedHeadersPtr PopulateParsedHeaders(
   if (base::FeatureList::IsEnabled(network::features::kConnectionAllowlists)) {
     parsed_headers->connection_allowlists =
         ParseConnectionAllowlistsFromHeaders(*headers, url);
+    parsed_headers->allow_connection_allowlist_from =
+        ParseAllowConnectionAllowlistFromHeader(*headers);
   }
 
   if (base::FeatureList::IsEnabled(network::features::kIntegrityPolicyScript)) {
