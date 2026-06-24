@@ -265,6 +265,16 @@ public class TabVerticalViewBinderUnitTest {
 
     @Test
     @SmallTest
+    public void testBindAccessibilityDelegate() {
+        View.AccessibilityDelegate mockDelegate = mock(View.AccessibilityDelegate.class);
+        mModel.set(TabProperties.ACCESSIBILITY_DELEGATE, mockDelegate);
+        TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.ACCESSIBILITY_DELEGATE);
+
+        assertEquals(mockDelegate, mItemView.getAccessibilityDelegate());
+    }
+
+    @Test
+    @SmallTest
     public void testCloseButtonHover() {
         mModel.set(TabProperties.IS_SELECTED, false);
         TabVerticalViewBinder.bindTab(mModel, mItemView, TabProperties.IS_SELECTED);
