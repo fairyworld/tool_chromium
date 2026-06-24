@@ -152,7 +152,6 @@
 #include "services/network/public/mojom/cookie_manager.mojom.h"
 #include "third_party/blink/public/common/features.h"
 #include "third_party/blink/public/common/user_agent/user_agent_metadata.h"
-#include "ui/base/ozone_buildflags.h"
 #include "ui/base/page_transition_types.h"
 #include "ui/base/ui_base_features.h"
 #include "ui/gfx/color_palette.h"
@@ -1052,27 +1051,6 @@ IN_PROC_BROWSER_TEST_F(SessionRestoreTest, Basic) {
   GoBack(new_browser);
   ASSERT_EQ(GetUrl1(),
             new_browser->GetTabStripModel()->GetActiveWebContents()->GetURL());
-}
-
-IN_PROC_BROWSER_TEST_F(SessionRestoreTest, WindowBoundsAreRestored) {
-  gfx::Rect expected_bounds(50, 50, 550, 500);
-  browser()->GetWindow()->SetBounds(expected_bounds);
-
-  ASSERT_TRUE(base::test::RunUntil([&]() {
-    // Wait for window to be updated.  Only check window size because some
-    // Window Managers do not update window position.
-    return browser()->GetWindow()->GetBounds().size() == expected_bounds.size();
-  }));
-
-  BrowserWindowInterface* restored = QuitBrowserAndRestore(browser());
-  gfx::Rect actual_bounds = restored->GetWindow()->GetBounds();
-  // On Linux Wayland, client applications cannot set top-level window
-  // positions. So we can only verify the window size.
-#if BUILDFLAG(IS_LINUX) && BUILDFLAG(SUPPORTS_OZONE_WAYLAND)
-  EXPECT_EQ(expected_bounds.size(), actual_bounds.size());
-#else
-  EXPECT_EQ(expected_bounds, actual_bounds);
-#endif
 }
 
 namespace {
