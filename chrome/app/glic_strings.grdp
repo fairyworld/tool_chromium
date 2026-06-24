@@ -538,7 +538,7 @@
     Gemini in Chrome isn't available
   </message>
   <message name="IDS_GLIC_LOCATION_MISMATCH_NOTICE" desc="Text of the notice explaining location mismatch for travelers or VPN users.">
-    Gemini in Chrome is expanding to different locations but isn't available everywhere.
+    Gemini in Chrome is expanding to different locations but isn't available everywhere
   </message>
   <message name="IDS_GLIC_GET_HELP" desc="Link or button label text to open help documentation.">
     Get help
