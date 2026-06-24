@@ -72,7 +72,7 @@ found in the LICENSE file.
         android:contentDescription="@string/accessibility_btn_lens_camera"
         android:tooltipText="@string/accessibility_btn_lens_camera"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/margin_spacer"/>
+        app:layout_constraintEnd_toStartOf="@id/navigate_button"/>
 
     <!--
     Fusebox/Omnibox top-stacked elements on Active Omnibox with Non-empty content

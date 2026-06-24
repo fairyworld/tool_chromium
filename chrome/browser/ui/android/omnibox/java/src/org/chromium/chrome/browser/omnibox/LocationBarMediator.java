@@ -1390,7 +1390,6 @@ class LocationBarMediator
                 mDropdown.getId(),
                 ConstraintSet.BOTTOM);
         set.connect(R.id.mic_button, ConstraintSet.TOP, mDropdown.getId(), ConstraintSet.BOTTOM);
-        set.connect(R.id.mic_button, ConstraintSet.END, R.id.navigate_button, ConstraintSet.START);
         set.connect(
                 R.id.navigate_button, ConstraintSet.TOP, mDropdown.getId(), ConstraintSet.BOTTOM);
 
