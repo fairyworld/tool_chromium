@@ -66,7 +66,6 @@ class AppMenuItemViewBinder {
         } else if (key == AppMenuItemProperties.TITLE) {
             CharSequence title = model.get(AppMenuItemProperties.TITLE);
             ((TextView) view.findViewById(R.id.menu_item_text)).setText(title);
-            view.setTooltipText(title);
         } else if (key == AppMenuItemProperties.TITLE_CONDENSED) {
             setContentDescription(view.findViewById(R.id.menu_item_text), model);
         } else if (key == AppMenuItemProperties.ENABLED) {
