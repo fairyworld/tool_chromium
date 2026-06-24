@@ -70,14 +70,29 @@ export class FeatureShowcaseAppElement extends CrLitElement {
 
     this.matchMedia_ = window.matchMedia('(prefers-color-scheme: dark)');
     this.isDarkMode_ = this.matchMedia_.matches;
-    this.darkModeListener_ = (e: MediaQueryListEvent) => {
+    this.darkModeListener_ = async (e: MediaQueryListEvent) => {
       this.isDarkMode_ = e.matches;
+      await this.updateComplete;
+
+      // Play a single frame to prevent lottie engine from exiting internal loop
+      // early. When frames are equal, lottie thinks it has already reached the
+      // end of the animation and sends 'complete' event, cancelling all pending
+      // RequestAnimationFrame.
+      // TODO(crbug.com/500662042): Consider exposing goToAndStop(...).
+      const currentFrame = this.activeStepIndex * 120;
+      this.$.rightAnimation.playSegments([currentFrame, currentFrame + 1]);
+      this.$.bottomAnimation.playSegments([currentFrame, currentFrame + 1]);
     };
   }
 
   override connectedCallback() {
     super.connectedCallback();
     this.matchMedia_.addEventListener('change', this.darkModeListener_);
+    const updater = ColorChangeUpdater.forDocument();
+    updater.start();
+    // Force an initial refresh to avoid the race condition where the profile
+    // theme loads after the page, but before the listener is ready.
+    updater.refreshColorsCss();
   }
 
   override disconnectedCallback() {
@@ -86,7 +101,6 @@ export class FeatureShowcaseAppElement extends CrLitElement {
   }
 
   override firstUpdated() {
-    ColorChangeUpdater.forDocument().start();
     // TODO(crbug.com/500274411): Clarify if assert here is ok or it's better
     // to have more graceful handling.
     assert(
