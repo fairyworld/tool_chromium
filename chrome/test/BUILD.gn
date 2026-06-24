@@ -9438,13 +9438,7 @@ test("unit_tests") {
   }
 
   if (!is_android) {
-    sources +=
-        [ "../browser/desktop_to_mobile_promos/promos_utils_unittest.cc" ]
-
-    deps += [
-      "//chrome/browser/desktop_to_mobile_promos:utils",
-      "//components/segmentation_platform/embedder/default_model",
-    ]
+    deps += [ "//chrome/browser/desktop_to_mobile_promos:unit_tests" ]
   }
 
   if (is_win || is_mac || is_linux) {
