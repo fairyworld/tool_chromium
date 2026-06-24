@@ -57,6 +57,17 @@
 #include "chrome/browser/platform_util.h"
 #include "chrome/browser/tab_list/tab_list_interface.h"
 #include "chrome/browser/translate/chrome_translate_client.h"
+#include "chrome/browser/lifetime/application_lifetime_desktop.h"
+#include "chrome/browser/profiles/profile_window.h"
+#include "chrome/browser/shell_integration.h"
+#include "chrome/browser/signin/identity_manager_factory.h"
+#include "chrome/browser/signin/signin_ui_util.h"
+#include "chrome/browser/ui/singleton_tabs.h"
+#include "chrome/browser/web_applications/web_app_utils.h"
+#include "chrome/common/url_constants.h"
+#include "components/media_router/common/pref_names.h"
+#include "components/signin/public/base/signin_metrics.h"
+#include "components/signin/public/identity_manager/identity_manager.h"
 #include "chrome/browser/ui/actions/actions_util.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/actions/chrome_action_properties.h"
@@ -3163,6 +3174,258 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               },
               bwi))
           .SetActionId(kActionContentContextGenerateQrCode)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowSettings(bwi);
+              },
+              bwi))
+          .SetActionId(kActionOptions)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowImportDialog(bwi);
+              },
+              bwi))
+          .SetActionId(kActionImportSettings)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowSearchEngineSettings(bwi);
+              },
+              bwi))
+          .SetActionId(kActionEditSearchEngines)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                NavigateToManagePasswordsPage(
+                    bwi,
+                    password_manager::ManagePasswordsReferrer::kChromeMenuItem);
+              },
+              bwi))
+          .SetActionId(kActionViewPasswords)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowEnterpriseManagementPageInTabbedBrowser(bwi);
+              },
+              bwi))
+          .SetActionId(kActionShowManagementPage)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                Profile* profile = bwi->GetProfile();
+                if (profile->IsIncognitoProfile()) {
+                  chrome::CloseAllBrowsersWithIncognitoProfile(profile);
+                } else {
+                  profiles::CloseProfileWindows(profile);
+                }
+              },
+              bwi))
+          .SetActionId(kActionCloseProfile)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                Profile* profile = bwi->GetProfile();
+                signin::IdentityManager* identity_manager =
+                    IdentityManagerFactory::GetForProfileIfExists(profile);
+                if (identity_manager && identity_manager->HasPrimaryAccount(
+                                            signin::ConsentLevel::kSignin)) {
+                  std::string email =
+                      identity_manager
+                          ->GetPrimaryAccountInfo(signin::ConsentLevel::kSignin)
+                          .email;
+                  GURL google_account = net::AppendQueryParameter(
+                      GURL(chrome::kGoogleAccountURL), "utm_source",
+                      "chrome-profile-chooser");
+                  GURL url(chrome::kGoogleAccountChooserURL);
+                  url = net::AppendQueryParameter(url, "Email", email);
+                  url = net::AppendQueryParameter(url, "continue",
+                                                  google_account.spec());
+                  ::ShowSingletonTab(bwi, url);
+                }
+              },
+              bwi))
+          .SetActionId(kActionManageGoogleAccount)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowSettingsSubPage(bwi, chrome::kSyncSetupSubPage);
+              },
+              bwi))
+          .SetActionId(kActionShowSyncSettings)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                Profile* profile = bwi->GetProfile();
+                signin::IdentityManager* identity_manager =
+                    IdentityManagerFactory::GetForProfileIfExists(profile);
+                AccountInfo account_info;
+                if (identity_manager) {
+                  CoreAccountInfo account =
+                      identity_manager->GetPrimaryAccountInfo(
+                          signin::ConsentLevel::kSignin);
+                  account_info =
+                      identity_manager->FindExtendedAccountInfo(account);
+                }
+                signin_ui_util::EnableSyncFromSingleAccountPromo(
+                    profile, account_info, signin_metrics::AccessPoint::kMenu);
+              },
+              bwi))
+          .SetActionId(kActionTurnOnSync)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                Profile* profile = bwi->GetProfile();
+                signin::IdentityManager* identity_manager =
+                    IdentityManagerFactory::GetForProfileIfExists(profile);
+                AccountInfo account_info;
+                if (identity_manager) {
+                  CoreAccountInfo account =
+                      identity_manager->GetPrimaryAccountInfo(
+                          signin::ConsentLevel::kSignin);
+                  account_info =
+                      identity_manager->FindExtendedAccountInfo(account);
+                }
+                signin_ui_util::SignInFromSingleAccountPromo(
+                    profile, account_info, signin_metrics::AccessPoint::kMenu);
+              },
+              bwi))
+          .SetActionId(kActionShowSignin)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                Profile* profile = bwi->GetProfile();
+                signin_ui_util::ShowReauthForPrimaryAccountWithAuthError(
+                    profile, signin_metrics::AccessPoint::kMenu);
+              },
+              bwi))
+          .SetActionId(kActionShowSigninWhenPaused)
+          .Build());
+
+#if !BUILDFLAG(IS_ANDROID) && !BUILDFLAG(IS_CHROMEOS)
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                base::MakeRefCounted<shell_integration::DefaultBrowserWorker>()
+                    ->StartSetAsDefault(base::DoNothing());
+              },
+              bwi))
+          .SetActionId(kActionSetBrowserAsDefault)
+          .Build());
+#endif
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ToggleShowFullURLs(bwi);
+              },
+              bwi))
+          .SetActionId(kActionShowFullUrls)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ToggleShowGoogleLensShortcut(bwi);
+              },
+              bwi))
+          .SetActionId(kActionShowGoogleLensShortcut)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ToggleShowAiModeOmniboxButton(bwi);
+              },
+              bwi))
+          .SetActionId(kActionShowAiModeOmniboxButton)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                PrefService* pref_service = bwi->GetProfile()->GetPrefs();
+                const char* pref_name =
+                    media_router::prefs::
+                        kMediaRouterShowCastSessionsStartedByOtherDevices;
+                pref_service->SetBoolean(pref_name,
+                                         !pref_service->GetBoolean(pref_name));
+              },
+              bwi))
+          .SetActionId(kActionMediaToolbarContextShowOtherSessions)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                PrefService* prefs = bwi->GetProfile()->GetPrefs();
+                const char* pref_name =
+                    "accessibility.captions.live_caption_enabled";
+                bool is_enabled = !prefs->GetBoolean(pref_name);
+                prefs->SetBoolean(pref_name, is_enabled);
+                base::UmaHistogramBoolean(
+                    "Accessibility.LiveCaption.EnableFromContextMenu",
+                    is_enabled);
+              },
+              bwi))
+          .SetActionId(kActionLiveCaption)
           .Build());
 }
 
