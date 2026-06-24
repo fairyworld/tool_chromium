@@ -2771,10 +2771,10 @@ chromium-metrics-reviews@google.com.
 </histogram>
 
 <histogram name="Blink.FencedFrame.CreationOrNavigationOutcome"
-    enum="FencedFrameCreationOutcome" expires_after="2026-05-03">
+    enum="FencedFrameCreationOutcome" expires_after="2026-12-23">
   <owner>shivanisha@chromium.org</owner>
   <owner>dom@chromium.org</owner>
-  <owner>lbrady@google.com</owner>
+  <owner>averge@chromium.org</owner>
   <summary>
     Records creation and navigation outcomes for a fenced frame. This is written
     either when a fenced frame navigates successfully, or when some issue causes
