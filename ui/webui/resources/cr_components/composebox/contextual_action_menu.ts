@@ -619,15 +619,17 @@ export class ContextualActionMenuElement extends
 
   // Checks if a tab item in the context menu should be disabled.
   protected isTabDisabled_(tab: TabInfo): boolean {
-    const isTabCurrentlySelected = this.isTabSelected_(tab.tabId);
-
-    // Selected tabs (both newly selected and restored) must remain enabled for deselection.
-    if (isTabCurrentlySelected) {
-      return false;
+    const isRestored =
+        (this.aimThreadRestoredTabs)
+            .some(restoredTab => restoredTab.tabId === tab.tabId);
+    if (isRestored || this.isInputTypeDisabled_(InputType.kBrowserTab)) {
+      return true;
     }
 
-    if (this.isInputTypeDisabled_(InputType.kBrowserTab)) {
-      return true;
+    // Tabs selected in the current turn must remain enabled for deselection.
+    const isCurrentlySelected = this.disabledTabIds.has(tab.tabId);
+    if (isCurrentlySelected) {
+      return false;
     }
 
     if (this.enableMultiTabSelection_) {

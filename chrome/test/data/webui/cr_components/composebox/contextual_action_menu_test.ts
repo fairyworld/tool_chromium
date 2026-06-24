@@ -665,6 +665,50 @@ suite('ContextualActionMenu', () => {
         assertTrue(tabButton.disabled);
       });
 
+  test(
+      'Browser tab suggestions disabled when they are thread restored',
+      async () => {
+        loadTimeData.overrideValues({
+          contextManagementInComposeboxEnabled: true,
+        });
+        actionMenu.remove();
+        actionMenu =
+            document.createElement('cr-composebox-contextual-action-menu');
+
+        const restoredTab = createTabSuggestion({
+          tabId: 1,
+          title: 'Restored Tab',
+        });
+        const suggestionTab = createTabSuggestion({
+          tabId: 1,
+          title: 'Restored Tab',
+        });
+        actionMenu.aimThreadRestoredTabs = [restoredTab];
+        actionMenu.tabSuggestions = [suggestionTab];
+        actionMenu.inputState = new MockInputState({
+          allowedInputTypes: [InputType.kBrowserTab],
+        });
+        document.body.appendChild(actionMenu);
+        await microtasksFinished();
+
+        actionMenu.showAt(actionMenu);
+        await microtasksFinished();
+
+        const trigger = $$(actionMenu, '#shareTabsTrigger') as HTMLElement;
+        const flyout = $$(actionMenu, '.share-tabs-flyout') as HTMLElement;
+        assertTrue(!!trigger);
+        assertTrue(!!flyout);
+
+        // Hover to open flyout.
+        trigger.dispatchEvent(new PointerEvent('pointerenter'));
+        await microtasksFinished();
+
+        const buttons = Array.from(
+            flyout.querySelectorAll<HTMLButtonElement>('button.dropdown-item'));
+        assertEquals(1, buttons.length);
+        assertTrue(buttons[0]!.disabled);
+      });
+
   test('Uses configured menu labels', async () => {
     const toolsHeader = 'Tools Header';
     const deepSearchLabel = 'Custom Deep Search Label';
