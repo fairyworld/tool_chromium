@@ -637,29 +637,29 @@ source_set("unit_tests") {
     "//components/tabs:test_support",
     "//components/variations:test_support",
     "//content/test:test_support",
+    "//chrome/browser/ui/actions",
+    "//chrome/browser/ui/actions:actions_headers",
+    "//chrome/browser/ui/toolbar/pinned_toolbar",
     "//services/network/public/cpp",
     "//testing/gmock",
     "//testing/gtest",
     "//third_party/lens_server_proto:lens_overlay_proto",
+    "//ui/actions:actions_headers",
     "//ui/base/unowned_user_data",
   ]
 
   if (!is_android) {
     deps += [
       "//chrome/browser/ui:browser_actions",
-      "//chrome/browser/ui/actions",
-      "//chrome/browser/ui/actions:actions_headers",
       "//chrome/browser/ui/contextual_search",
       "//chrome/browser/ui/hats:test_support",
       "//chrome/browser/ui/lens",
       "//chrome/browser/ui/tabs:tab_list_bridge",
       "//chrome/browser/ui/tabs:test_support",
-      "//chrome/browser/ui/toolbar/pinned_toolbar",
       "//chrome/browser/ui/webui/searchbox:searchbox_test_utils",
       "//components/omnibox/browser:test_support",
       "//components/passage_embeddings/core",
       "//services/network/public/cpp",
-      "//ui/actions:actions_headers",
     ]
   }
 }

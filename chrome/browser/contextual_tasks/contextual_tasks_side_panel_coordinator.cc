@@ -357,9 +357,15 @@ void ContextualTasksSidePanelCoordinator::OpenInZeroState() {
   }
 
   CleanUpUnusedWebContents();
+  bool is_pinned =
+      contextual_tasks::IsContextualTasksPinButtonInToolbarEnabled() &&
+      contextual_tasks::GetEffectivePinState(browser_window_->GetProfile());
 
   Show(/*transition_from_tab=*/false,
-       omnibox::ChromeAimEntryPoint::DESKTOP_CHROME_COBROWSE_TOOLBAR_BUTTON);
+       is_pinned ? omnibox::ChromeAimEntryPoint::
+                       DESKTOP_CHROME_COBROWSE_PINNED_TOOLBAR_BUTTON
+                 : omnibox::ChromeAimEntryPoint::
+                       DESKTOP_CHROME_COBROWSE_TOOLBAR_BUTTON);
 }
 
 bool ContextualTasksSidePanelCoordinator::IsPanelOpenForContextualTask() const {
