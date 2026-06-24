@@ -150,7 +150,8 @@ class GeminiBrowserAgent : public BrowserUserData<GeminiBrowserAgent>,
 
   void OnViewStateChanged(ios::provider::GeminiViewState view_state) override;
   void OnProcessingStatusChanged(
-      ios::provider::GeminiClientMode processing_status) override;
+      ios::provider::GeminiClientMode processing_status,
+      ios::provider::GeminiDormantReason dormant_reason) override;
   void CollapseFloatyIfInvoked() override;
   void SetLastShownViewState(
       ios::provider::GeminiViewState view_state) override;
@@ -249,9 +250,8 @@ class GeminiBrowserAgent : public BrowserUserData<GeminiBrowserAgent>,
   // Shows a snackbar message informing the user that sign-in is required.
   void ShowSignInRequiredSnackbar(gemini::EntryPoint entry_point);
 
-  // Shows a snackbar message asking the user if they want to continue the Live
-  // session.
-  void ShowLiveSessionDormantSnackbar();
+  // Shows a snackbar message with the given message ID.
+  void ShowLiveSessionDormantSnackbar(int message_id);
 
   // Sets whether the dormant snackbar is showing.
   void SetIsShowingLiveSessionDormantSnackbar(bool showing);
@@ -438,6 +438,9 @@ class GeminiBrowserAgent : public BrowserUserData<GeminiBrowserAgent>,
 
   // Updates the Gemini availability and notifies observers if it changed.
   void UpdateGeminiAvailability();
+
+  // Handles the client transitioning to a dormant status.
+  void HandleDormantStatus(ios::provider::GeminiDormantReason dormant_reason);
 
   // Whether we are currently displaying the Live session dormant snackbar.
   bool is_showing_live_session_dormant_snackbar_ = false;

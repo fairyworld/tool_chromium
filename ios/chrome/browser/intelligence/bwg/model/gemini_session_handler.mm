@@ -162,12 +162,31 @@ IOSGeminiSessionCancellationReason HistogramEnumFromGeminiCancelType(
   [self.geminiViewStateDelegate didSwitchToViewState:viewState];
 }
 
+// TODO(crbug.com/526669545): Remove this method once the dormantReason is fully
+// plugged in.
 - (void)didUpdateProcessingStatus:(ios::provider::GeminiClientMode)processStatus
                         sessionID:(NSString*)sessionID
                    conversationID:(NSString*)conversationID {
   [self.geminiViewStateDelegate didUpdateProcessingStatus:processStatus
                                                 sessionID:sessionID
                                            conversationID:conversationID];
+}
+
+- (void)didUpdateProcessingStatus:(ios::provider::GeminiClientMode)processStatus
+                    dormantReason:
+                        (ios::provider::GeminiDormantReason)dormantReason
+                        sessionID:(NSString*)sessionID
+                   conversationID:(NSString*)conversationID {
+  if (IsGeminiLiveDormantReasonsEnabled()) {
+    [self.geminiViewStateDelegate didUpdateProcessingStatus:processStatus
+                                              dormantReason:dormantReason
+                                                  sessionID:sessionID
+                                             conversationID:conversationID];
+  } else {
+    [self.geminiViewStateDelegate didUpdateProcessingStatus:processStatus
+                                                  sessionID:sessionID
+                                             conversationID:conversationID];
+  }
 }
 
 // TODO(crbug.com/504596190): Remove this method when internal code doesn't use

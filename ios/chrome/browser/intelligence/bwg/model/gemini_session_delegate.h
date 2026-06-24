@@ -103,6 +103,13 @@ typedef NS_ENUM(NSInteger, GeminiCancelType) {
                    sessionID:(NSString*)sessionID
               conversationID:(NSString*)conversationID;
 @optional
+// Called when the processing status changes with a dormant reason.
+- (void)didUpdateProcessingStatus:(ios::provider::GeminiClientMode)processStatus
+                    dormantReason:
+                        (ios::provider::GeminiDormantReason)dormantReason
+                        sessionID:(NSString*)sessionID
+                   conversationID:(NSString*)conversationID;
+
 // Called when the processing status changes.
 - (void)didUpdateProcessingStatus:(ios::provider::GeminiClientMode)processStatus
                         sessionID:(NSString*)sessionID

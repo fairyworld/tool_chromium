@@ -632,15 +632,14 @@ void GeminiBrowserAgent::ShowSignInRequiredSnackbar(
   [snackbar_handler showSnackbarMessage:message];
 }
 
-void GeminiBrowserAgent::ShowLiveSessionDormantSnackbar() {
+void GeminiBrowserAgent::ShowLiveSessionDormantSnackbar(int message_id) {
   PrepareFloatyToBeShown();
 
   id<SnackbarCommands> snackbar_handler =
       HandlerForProtocol(browser_->GetCommandDispatcher(), SnackbarCommands);
 
   SnackbarMessage* message = [[SnackbarMessage alloc]
-      initWithTitle:l10n_util::GetNSString(
-                        IDS_IOS_GEMINI_LIVE_GENERAL_DORMANT_SNACKBAR)];
+      initWithTitle:l10n_util::GetNSString(message_id)];
 
   base::WeakPtr<GeminiBrowserAgent> weak_self = weak_factory_.GetWeakPtr();
   message.completionHandler = ^(BOOL completed) {
@@ -1009,7 +1008,8 @@ void GeminiBrowserAgent::PresentFloaty(UIViewController* base_view_controller,
 }
 
 void GeminiBrowserAgent::OnProcessingStatusChanged(
-    ios::provider::GeminiClientMode processing_status) {
+    ios::provider::GeminiClientMode processing_status,
+    ios::provider::GeminiDormantReason dormant_reason) {
   UpdateGeminiLiveIconVisibility();
   if (!IsInGeminiLiveMode()) {
     return;
@@ -1027,14 +1027,47 @@ void GeminiBrowserAgent::OnProcessingStatusChanged(
       break;
     }
     case ios::provider::GeminiClientMode::kDormant:
-      is_showing_live_session_dormant_snackbar_ = true;
-      ios::provider::SwitchToMode(ios::provider::GeminiViewMode::kFloaty,
-                                  /*animated=*/true);
-      ShowLiveSessionDormantSnackbar();
+      HandleDormantStatus(dormant_reason);
       break;
     default:
       // No-op.
       break;
+  }
+}
+
+void GeminiBrowserAgent::HandleDormantStatus(
+    ios::provider::GeminiDormantReason dormant_reason) {
+  ios::provider::SwitchToMode(ios::provider::GeminiViewMode::kFloaty,
+                              /*animated=*/true);
+
+  if (IsGeminiLiveDormantReasonsEnabled()) {
+    switch (dormant_reason) {
+      case ios::provider::GeminiDormantReason::kLowVolumeInBackground:
+      case ios::provider::GeminiDormantReason::kLowVolumeInForeground:
+      case ios::provider::GeminiDormantReason::kInterruptedByExternalAudio:
+      case ios::provider::GeminiDormantReason::kUserStop:
+      case ios::provider::GeminiDormantReason::kUserPause:
+        break;
+      case ios::provider::GeminiDormantReason::kInactivityTimeout:
+        is_showing_live_session_dormant_snackbar_ = true;
+        ShowLiveSessionDormantSnackbar(
+            IDS_IOS_GEMINI_LIVE_CONTINUE_SESSION_SNACKBAR);
+        break;
+      case ios::provider::GeminiDormantReason::kServerPause:
+        is_showing_live_session_dormant_snackbar_ = true;
+        ShowLiveSessionDormantSnackbar(
+            IDS_IOS_GEMINI_LIVE_SERVER_PAUSE_SNACKBAR);
+        break;
+      default:
+        is_showing_live_session_dormant_snackbar_ = true;
+        ShowLiveSessionDormantSnackbar(
+            IDS_IOS_GEMINI_LIVE_GENERAL_DORMANT_SNACKBAR);
+        break;
+    }
+  } else {
+    is_showing_live_session_dormant_snackbar_ = true;
+    ShowLiveSessionDormantSnackbar(
+        IDS_IOS_GEMINI_LIVE_GENERAL_DORMANT_SNACKBAR);
   }
 }
 

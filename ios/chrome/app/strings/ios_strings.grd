@@ -3406,6 +3406,9 @@ To continue from your computer, switch to <ph name="OTHER_EMAIL">$2<ex>john.doe@
       <message name="IDS_IOS_GEMINI_LIVE_RESPONDING" desc="Status text shown in the Gemini Live session when Gemini is responding to the user.">
         Responding
       </message>
+      <message name="IDS_IOS_GEMINI_LIVE_SERVER_PAUSE_SNACKBAR" desc="Snackbar message shown when a Gemini Live session is paused by the server.">
+        Something went wrong. Tap the Live button to try going Live again.
+      </message>
       <message name="IDS_IOS_GEMINI_LIVE_SHARING_LABEL" desc="Label describing the current page context shown in Gemini Live mode, indicating that the current page is being shared. [iOS only]">
         Sharing <ph name="PAGE_TITLE">$1<ex>Example Page</ex></ph>
       </message>
