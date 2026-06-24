@@ -2128,6 +2128,15 @@ chromium-metrics-reviews@google.com.
 
 <!-- LINT.ThenChange(//chrome/browser/picture_in_picture/picture_in_picture_window_manager.h:PictureInPictureDisallowedType) -->
 
+<!-- LINT.IfChange(PictureInPictureSizeConstraintResult) -->
+
+<enum name="PictureInPictureSizeConstraintResult">
+  <int value="0" label="SizeConstraintMet"/>
+  <int value="1" label="SizeConstraintNotMet"/>
+</enum>
+
+<!-- LINT.ThenChange(//third_party/blink/renderer/core/html/media/html_video_element.cc:PictureInPictureSizeConstraintResult) -->
+
 <!-- LINT.IfChange(PictureInPictureTuckedTypeEnum) -->
 
 <enum name="PictureInPictureTuckedType">
