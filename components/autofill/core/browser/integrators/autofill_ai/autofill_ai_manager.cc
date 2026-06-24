@@ -187,15 +187,6 @@ bool IsSaveAsynchronous(EntityType type,
          EntityInstance::WalletPassType::kPrivate;
 }
 
-bool IsPrefetchAmbientAutofillContextEnabled(const AutofillClient& client) {
-  if (base::FeatureList::IsEnabled(
-          features::debug::kAutofillAmbientAutofillSkipEligibilityChecks)) {
-    return true;
-  }
-
-  return MayPerformAutofillAiAction(client, AutofillAiAction::kAmbientAutofill);
-}
-
 void PrefetchAmbientAutofillContext(AutofillClient& client,
                                     AutofillManager& manager) {
   DenseSet<EntityType> relevant_types;
@@ -368,7 +359,8 @@ void AutofillAiManager::OnEditedAutofilledField(const FormStructure& form,
 
 void AutofillAiManager::OnAfterLoadedServerPredictions(
     AutofillManager& manager) {
-  if (IsPrefetchAmbientAutofillContextEnabled(*client_)) {
+  if (MayPerformAutofillAiAction(*client_,
+                                 AutofillAiAction::kAmbientAutofill)) {
     PrefetchAmbientAutofillContext(*client_, manager);
   }
 }
