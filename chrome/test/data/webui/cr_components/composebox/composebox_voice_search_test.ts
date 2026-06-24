@@ -695,7 +695,7 @@ suite('ComposeboxVoiceSearch', () => {
     await windowProxy.whenCalled('setTimeout');
 
     // start() calls setTimeout TWICE (1st: idle timer, 2nd: outside listeners).
-    // We must grab all calls and execute the callback from the SECOND call to
+    // Must grab all calls and execute the callback from the SECOND call to
     // attach listeners.
     const setTimeoutCalls = windowProxy.getArgs('setTimeout');
     assertTrue(
@@ -1380,6 +1380,56 @@ suite('ComposeboxVoiceSearch', () => {
         assertFalse(mockSpeechRecognition.voiceSearchInProgress);
 
         // Cleanup.
+        voiceSearchElement['voiceModeEndCleanup_']();
+        await microtasksFinished();
+      });
+
+  test(
+      'container position is absolute when permission prompt is closed ' +
+          'and no error; static otherwise',
+      async () => {
+        // Open voice search via UI.
+        const voiceSearchElement = await openVoiceSearchUI();
+        const container =
+            voiceSearchElement.shadowRoot.querySelector('#container');
+        assertTrue(!!container);
+
+        // Default state: no permission prompt, no error:
+        assertFalse(
+            voiceSearchElement.hasAttribute('is-permission-prompt-open'));
+        assertFalse(container.classList.contains('has-error'));
+        assertEquals('absolute', window.getComputedStyle(container).position);
+        assertEquals('0px', window.getComputedStyle(container).top);
+        assertEquals(
+            'absolute', window.getComputedStyle(voiceSearchElement).position);
+
+        // With permission prompt:
+        voiceSearchElement.isPermissionPromptOpen = true;
+        await voiceSearchElement.updateComplete;
+
+        assertTrue(
+            voiceSearchElement.hasAttribute('is-permission-prompt-open'));
+        // Should be static since permission prompt is open.
+        assertEquals('static', window.getComputedStyle(container).position);
+        // Should be absolute since `isListening`='true'.
+        assertEquals(
+            'absolute', window.getComputedStyle(voiceSearchElement).position);
+
+        // With error but no permission prompt:
+        voiceSearchElement.isPermissionPromptOpen = false;
+        mockSpeechRecognition.onerror!
+            ({error: 'network'} as SpeechRecognitionErrorEvent);
+        await microtasksFinished();
+        await voiceSearchElement.updateComplete;
+
+        assertTrue(container.classList.contains('has-error'));
+        // Should be static since error.
+        assertEquals('static', window.getComputedStyle(container).position);
+        // Should be static since `isListening`='false' due to error.
+        assertEquals(
+            'static', window.getComputedStyle(voiceSearchElement).position);
+
+        // Clean up.
         voiceSearchElement['voiceModeEndCleanup_']();
         await microtasksFinished();
       });

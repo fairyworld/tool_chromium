@@ -14,7 +14,7 @@ import {createAutocompleteResultForTesting, createSearchMatchForTesting} from 'c
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {PageCallbackRouter as SearchboxPageCallbackRouter, PageHandlerRemote as SearchboxPageHandlerRemote} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import type {PageRemote as SearchboxPageRemote} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
-import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
+import {assertEquals, assertFalse, assertNotEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import type {TestMock} from 'chrome://webui-test/test_mock.js';
 import {microtasksFinished} from 'chrome://webui-test/test_util.js';
 import {getTrustedHtml} from 'chrome://webui-test/trusted_html.js';
@@ -450,7 +450,7 @@ suite('composeboxSharedMountAutoRepositionDefault', () => {
       composeboxShowContextMenuTabPreviews: false,
       ShowContextMenuHeaders: false,
       menu: 'menu',
-      addContextTile: 'Add context',
+      addContextTitle: 'Add context',
       addContext: 'Add context',
       composeboxShowTypedSuggest: false,
       composeboxCancelButtonTitleInput: 'Cancel input',
@@ -468,8 +468,10 @@ suite('composeboxSharedMountAutoRepositionDefault', () => {
       dismissButton: 'Dismiss',
       composeboxDragAndDropHint: 'Hint',
       removeSuggestion: 'Remove',
+      voiceStop: 'Stop',
       contextManagementInComposeboxEnabled: false,
       tabFaviconChipsToCoinsEnabled: false,
+      removeToolChipAriaLabel: 'Remove $1',
     });
 
     const handler = installMock(
@@ -480,9 +482,12 @@ suite('composeboxSharedMountAutoRepositionDefault', () => {
     handler.setResultMapperFor(
         'getSmartTabSharingActive', () => Promise.resolve({active: false}));
 
-    installMock(
+    const searchboxHandler = installMock(
         SearchboxPageHandlerRemote,
         mock => ComposeboxProxyImpl.getInstance().searchboxHandler = mock);
+    searchboxHandler.setResultFor(
+        'getPageClassification',
+        Promise.resolve({metricSource: 'NTP_REALBOX'}));
 
     composebox = document.createElement('cr-composebox');
     composebox.showMenuOnClick = true;
@@ -508,5 +513,268 @@ suite('composeboxSharedMountAutoRepositionDefault', () => {
     const crActionMenu = contextualActionMenu.$.menu;
     assertTrue(crActionMenu.autoReposition);
     assertTrue(crActionMenu.hasAttribute('auto-reposition'));
+  });
+
+  test('voice search is absolute when listening', async () => {
+    // Mock WindowProxy to enable voice search.
+    const windowProxy = installMock(WindowProxy);
+    windowProxy.setResultFor('hasWebkitSpeechRecognition', true);
+    windowProxy.setResultMapperFor('matchMedia', () => ({
+                                                   addListener() {},
+                                                   addEventListener() {},
+                                                   removeListener() {},
+                                                   removeEventListener() {},
+                                                 }));
+
+    // Recreate composebox so updated loadTimeData and WindowProxy mock take
+    // effect.
+    document.body.innerHTML = window.trustedTypes!.emptyHTML;
+    composebox = document.createElement('cr-composebox');
+    composebox.showVoiceSearch = true;
+    document.body.appendChild(composebox);
+    await composebox.updateComplete;
+
+    const voiceSearch =
+        composebox.shadowRoot.querySelector('cr-composebox-voice-search');
+    assertTrue(!!voiceSearch);
+    const container = voiceSearch.shadowRoot.querySelector('#container');
+    assertTrue(!!container);
+
+    // Turn on voice search mode (sets `isListening` to true automatically).
+    composebox.inVoiceSearchMode = true;
+    await composebox.updateComplete;
+
+    // Turn off listening manually to test non-listening state.
+    composebox.isListening = false;
+    await composebox.updateComplete;
+
+    // Not listening yet. Should be static to influence height.
+    assertEquals('static', window.getComputedStyle(voiceSearch).position);
+    // Should still be absolute since permission prompt is not open and there is
+    // no error.
+    assertNotEquals('static', window.getComputedStyle(container).position);
+
+    // Turn on listening manually.
+    composebox.isListening = true;
+    await composebox.updateComplete;
+
+    // Should be absolute since listening is on (and no permission prompt is
+    // open, and no error).
+    assertEquals('absolute', window.getComputedStyle(voiceSearch).position);
+    assertEquals('0px', window.getComputedStyle(voiceSearch).top);
+    assertEquals('absolute', window.getComputedStyle(container).position);
+
+    // Turn off voice search mode.
+    composebox.inVoiceSearchMode = false;
+    await composebox.updateComplete;
+
+    // Since voice search mode is off, should be static.
+    assertEquals('static', window.getComputedStyle(voiceSearch).position);
+    // Should still be absolute since permission prompt is not open and there is
+    // no error.
+    assertEquals('absolute', window.getComputedStyle(container).position);
+  });
+
+  test(
+      'voice permission event adds classes in animated glow and ' +
+          'changes isListening and container bounds correctly',
+      async () => {
+        // Mock WindowProxy to enable voice search.
+        const windowProxy = installMock(WindowProxy);
+        windowProxy.setResultFor('hasWebkitSpeechRecognition', true);
+        windowProxy.setResultMapperFor('matchMedia', () => ({
+                                                       addListener() {},
+                                                       addEventListener() {},
+                                                       removeListener() {},
+                                                       removeEventListener() {},
+                                                     }));
+
+        // Recreate composebox so updated loadTimeData and WindowProxy mock take
+        // effect.
+        document.body.innerHTML = window.trustedTypes!.emptyHTML;
+
+        composebox = document.createElement('cr-composebox');
+        composebox.showVoiceSearch = true;
+        document.body.appendChild(composebox);
+        await composebox.updateComplete;
+
+        // Open voice search without using UI.
+        composebox.inVoiceSearchMode = true;
+        composebox.hasVoiceSearchError = false;
+        composebox.isListening = true;
+        await composebox.updateComplete;
+
+        const voiceSearch =
+            composebox.shadowRoot.querySelector('cr-composebox-voice-search');
+        assertTrue(!!voiceSearch);
+
+        const animatedGlow =
+            composebox.shadowRoot.querySelector('search-animated-glow');
+        assertTrue(!!animatedGlow);
+
+        let eventFired = false;
+        let eventDetail: any = null;
+        composebox.addEventListener(
+            'voice-permission-prompt-changed', (e: Event) => {
+              eventFired = true;
+              eventDetail = (e as CustomEvent).detail;
+            });
+
+        // Fire opened event:
+        voiceSearch.dispatchEvent(new CustomEvent('voice-permission-changed', {
+          detail: {
+            isOpened: true,
+            height: 100,
+            width: 100,
+          },
+        }));
+        await composebox.updateComplete;
+
+        // Verify that resizing occurs.
+        assertTrue(eventFired);
+        assertEquals(100, eventDetail.height);
+        assertEquals(100, eventDetail.width);
+        assertTrue(eventDetail.isOpened);
+        assertFalse(composebox.isListening);
+        // Verify that class to stop voice animation is added.
+        assertTrue(
+            animatedGlow.classList.contains('permission-prompt-showing'));
+
+        // Reset event tracker:
+        eventFired = false;
+        eventDetail = null;
+
+        // Fire closed event (query the element again in case of recreation):
+        const voiceSearch2 =
+            composebox.shadowRoot.querySelector('cr-composebox-voice-search');
+        assertTrue(!!voiceSearch2);
+        voiceSearch2.dispatchEvent(new CustomEvent('voice-permission-changed', {
+          detail: {
+            isOpened: false,
+            height: 0,
+            width: 0,
+          },
+        }));
+        await composebox.updateComplete;
+
+        // Verify that reverts back to original auto-size.
+        assertTrue(eventFired);
+        assertFalse(eventDetail.isOpened);
+        assertTrue(composebox.isListening);
+        // Verify that class to stop voice animation is removed.
+        assertFalse(
+            animatedGlow.classList.contains('permission-prompt-showing'));
+      });
+
+  test('voice permission opened event not fired if size is 0', async () => {
+    // Mock WindowProxy to enable voice search.
+    const windowProxy = installMock(WindowProxy);
+    windowProxy.setResultFor('hasWebkitSpeechRecognition', true);
+    windowProxy.setResultMapperFor('matchMedia', () => ({
+                                                   addListener() {},
+                                                   addEventListener() {},
+                                                   removeListener() {},
+                                                   removeEventListener() {},
+                                                 }));
+
+    // Recreate composebox so updated loadTimeData and WindowProxy mock take
+    // effect.
+    document.body.innerHTML = window.trustedTypes!.emptyHTML;
+    composebox = document.createElement('cr-composebox');
+    composebox.showVoiceSearch = true;
+    document.body.appendChild(composebox);
+    await composebox.updateComplete;
+
+    // Open voice search without using UI.
+    composebox.inVoiceSearchMode = true;
+    composebox.hasVoiceSearchError = false;
+    composebox.isListening = true;
+    await composebox.updateComplete;
+
+    const voiceSearch =
+        composebox.shadowRoot.querySelector('cr-composebox-voice-search');
+    assertTrue(!!voiceSearch);
+
+    let eventFired = false;
+    composebox.addEventListener('voice-permission-prompt-changed', () => {
+      eventFired = true;
+    });
+
+    // Fire opened event but with height 0 width 0.
+    voiceSearch.dispatchEvent(new CustomEvent('voice-permission-changed', {
+      detail: {
+        isOpened: true,
+        height: 0,
+        width: 0,
+      },
+    }));
+    await composebox.updateComplete;
+
+    // Should not be fired by composebox upwards to omnibox aim app
+    // because height and width are 0. No component resizing (done by
+    // omnibox aim app) required.
+    assertFalse(eventFired);
+    // Should be 'waiting' state since a permission prompt is still open.
+    assertFalse(composebox.isListening);
+  });
+
+  test('animated glow voice search slots hide when not listening', async () => {
+    // Mock WindowProxy to enable voice search.
+    const windowProxy = installMock(WindowProxy);
+    windowProxy.setResultFor('hasWebkitSpeechRecognition', true);
+    windowProxy.setResultMapperFor('matchMedia', () => ({
+                                                   addListener() {},
+                                                   addEventListener() {},
+                                                   removeListener() {},
+                                                   removeEventListener() {},
+                                                 }));
+
+    // Recreate composebox so updated loadTimeData and WindowProxy mock take
+    // effect.
+    document.body.innerHTML = window.trustedTypes!.emptyHTML;
+    composebox = document.createElement('cr-composebox');
+    composebox.showVoiceSearch = true;
+    document.body.appendChild(composebox);
+    await composebox.updateComplete;
+
+    // Open voice search without using UI.
+    composebox.voiceSearchCoherenceEnabled = true;
+    composebox.inVoiceSearchMode = true;
+    composebox.isListening = true;
+    composebox.showFileCarousel = true;
+    composebox.inToolMode = true;
+    await composebox.updateComplete;
+
+    const animatedGlow =
+        composebox.shadowRoot.querySelector('search-animated-glow');
+    assertTrue(!!animatedGlow);
+
+    // Verify voice chip slots are present when listening.
+    let carouselSlot =
+        animatedGlow.shadowRoot.querySelector('slot[name="carousel"]');
+    let toolChipSlot =
+        animatedGlow.shadowRoot.querySelector('slot[name="tool-chip"]');
+    assertTrue(!!carouselSlot);
+    assertTrue(!!toolChipSlot);
+
+    // Verify recording wave is present.
+    let recordingWave = animatedGlow.shadowRoot.querySelector('#recordingWave');
+    assertTrue(!!recordingWave);
+
+    // Turn off listening.
+    composebox.isListening = false;
+    await composebox.updateComplete;
+
+    // Verify voice chip slots are gone.
+    carouselSlot =
+        animatedGlow.shadowRoot.querySelector('slot[name="carousel"]');
+    toolChipSlot =
+        animatedGlow.shadowRoot.querySelector('slot[name="tool-chip"]');
+    assertFalse(!!carouselSlot);
+    assertFalse(!!toolChipSlot);
+
+    // Verify recording wave is still present.
+    recordingWave = animatedGlow.shadowRoot.querySelector('#recordingWave');
+    assertTrue(!!recordingWave);
   });
 });
