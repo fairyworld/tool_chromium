@@ -1408,6 +1408,21 @@ targets.mixin(
 )
 
 targets.mixin(
+    name = "mac_26_vm_optional",
+    swarming = targets.swarming(
+        dimensions = {
+            "cpu": "arm64",  # fallback on bare metal if no VMs are available
+            "os": "Mac-26",
+        },
+        optional_dimensions = {
+            30: {
+                "cpu": "Apple_(Virtual)",
+            },
+        },
+    ),
+)
+
+targets.mixin(
     name = "mac_10.15",
     swarming = targets.swarming(
         dimensions = {

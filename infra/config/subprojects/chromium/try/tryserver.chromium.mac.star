@@ -395,6 +395,30 @@ try_.builder(
 )
 
 try_.builder(
+    name = "mac26-arm64-rel-tests",
+    branch_selector = branches.selector.MAC_BRANCHES,
+    mirrors = [
+        "ci/mac-arm64-rel",
+        "ci/mac26-arm64-rel-tests",
+    ],
+    gn_args = gn_args.config(
+        configs = [
+            "arm64",
+            "gpu_tests",
+            "release_try_builder",
+            "remoteexec",
+            "no_symbols",
+            "mac",
+        ],
+    ),
+    builderless = True,
+    cores = None,
+    cpu = cpu.ARM64,
+    contact_team_email = "bling-engprod@google.com",
+    main_list_view = "try",
+)
+
+try_.builder(
     name = "mac13-tests",
     branch_selector = branches.selector.MAC_BRANCHES,
     mirrors = [
