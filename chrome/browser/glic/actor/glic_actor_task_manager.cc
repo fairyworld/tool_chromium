@@ -1124,6 +1124,13 @@ void GlicActorClientSession::RequestToShowCredentialSelectionDialog(
       std::move(dialog_request), std::move(callback));
 }
 
+void GlicActorClientSession::RequestToShowGmailOtpOptInDialog(
+    actor::TaskId task_id,
+    actor::ActorTaskDelegate::GmailOtpOptInCallback callback) {
+  actor_client_->RequestToShowGmailOtpOptInDialog(task_id.value(),
+                                                  std::move(callback));
+}
+
 void GlicActorClientSession::RequestToShowUserConfirmationDialog(
     actor::TaskId task_id,
     const url::Origin& navigation_origin,

@@ -1285,6 +1285,19 @@ void ExecutionEngine::RequestToShowAutofillSuggestions(
   task_->action_tracker_for_metrics().OnAutofillAttentionDialogPresented();
 }
 
+void ExecutionEngine::RequestToShowGmailOtpOptInDialog(
+    ToolDelegate::GmailOtpOptInCallback callback) {
+  TRACE_EVENT0("actor", "ExecutionEngine::RequestToShowGmailOtpOptInDialog");
+  if (!task_->delegate()) {
+    auto result = webui::mojom::GmailOtpOptInResult::NewErrorReason(
+        webui::mojom::GmailOtpOptInErrorReason::kRequestPromiseNoSubscriber);
+    std::move(callback).Run(std::move(result));
+    return;
+  }
+  task_->delegate()->RequestToShowGmailOtpOptInDialog(task_->id(),
+                                                      std::move(callback));
+}
+
 void ExecutionEngine::InterruptFromTool() {
   InterruptFromTool(/*retain_user_control=*/false);
 }
