@@ -96,6 +96,63 @@ class DawnClientMemoryTransferService::WriteHandleImpl
   raw_ptr<DawnClientMemoryTransferService> service_;
 };
 
+class DawnClientMemoryTransferService::MemoryHandleImpl
+    : public dawn::wire::client::MemoryTransferService::MemoryHandle {
+ public:
+  MemoryHandleImpl(base::span<std::byte> buffer,
+                   MemoryTransferHandle handle,
+                   DawnClientMemoryTransferService* service)
+      : buffer_(buffer), handle_(handle), service_(service) {}
+
+  ~MemoryHandleImpl() override {
+    // The shared memory can't be freed until the server consumes it. Add
+    // the pointer to a list of blocks to process on the next Flush.
+    service_->MarkHandleFree(buffer_.data());
+  }
+
+  size_t GetSerializeCreateSize() const override {
+    return sizeof(MemoryTransferHandle);
+  }
+  void SerializeCreate(std::span<std::byte> serialize_space) const override {
+    DCHECK(serialize_space.size() == GetSerializeCreateSize());
+    base::span<std::byte> target_untyped = serialize_space;
+    auto target = base::subtle::reinterpret_span<MemoryTransferHandle>(
+        base::as_writable_bytes(target_untyped));
+    target[0] = handle_;
+  }
+
+  std::span<std::byte> GetData() const override { return buffer_; }
+
+  size_t GetSerializeDataUpdateSize(size_t offset, size_t size) const override {
+    // No data is serialized because we're using shared memory.
+    return 0;
+  }
+  void SerializeDataUpdate(std::span<std::byte> serialize_data,
+                           size_t offset,
+                           size_t size) const override {
+    // No data is serialized because we're using shared memory.
+    DCHECK(serialize_data.size() == GetSerializeDataUpdateSize(offset, size));
+  }
+
+  bool DeserializeDataUpdate(std::span<const std::byte> deserialize_data,
+                             size_t offset,
+                             size_t size) override {
+    if (offset > buffer_.size() ||
+        deserialize_data.size() > buffer_.size() - offset) {
+      return false;
+    }
+
+    // No data is deserialized because we're using shared memory.
+    DCHECK(deserialize_data.empty());
+    return true;
+  }
+
+ private:
+  base::raw_span<std::byte> buffer_;
+  MemoryTransferHandle handle_;
+  raw_ptr<DawnClientMemoryTransferService> service_;
+};
+
 DawnClientMemoryTransferService::DawnClientMemoryTransferService(
     MappedMemoryManager* mapped_memory)
     : dawn::wire::client::MemoryTransferService(),
@@ -123,6 +180,18 @@ DawnClientMemoryTransferService::CreateWriteHandle(size_t size) {
   // Zero-initialize the data.
   std::ranges::fill(buffer, 0u);
   return new WriteHandleImpl(buffer, handle, this);
+}
+
+std::unique_ptr<dawn::wire::client::MemoryTransferService::MemoryHandle>
+DawnClientMemoryTransferService::CreateMemoryHandle(size_t size) {
+  MemoryTransferHandle handle = {};
+  base::span<uint8_t> buffer = AllocateTransferBuffer(size, &handle);
+  if (buffer.empty()) {
+    return nullptr;
+  }
+
+  return std::make_unique<MemoryHandleImpl>(
+      base::subtle::reinterpret_span<std::byte>(buffer), handle, this);
 }
 
 base::span<uint8_t> DawnClientMemoryTransferService::AllocateTransferBuffer(

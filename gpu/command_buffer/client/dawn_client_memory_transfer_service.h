@@ -35,6 +35,10 @@ class DawnClientMemoryTransferService
   // This may fail and return nullptr.
   WriteHandle* CreateWriteHandle(size_t size) override;
 
+  // Create a handle for using shared memory data.
+  // This may fail and return nullptr.
+  std::unique_ptr<MemoryHandle> CreateMemoryHandle(size_t size) override;
+
   // Free shared memory allocations after the next token passes on the GPU
   // process.
   void FreeHandles(CommandBufferHelper* helper);
@@ -44,6 +48,7 @@ class DawnClientMemoryTransferService
  private:
   class ReadHandleImpl;
   class WriteHandleImpl;
+  class MemoryHandleImpl;
 
   // Allocate a shared memory transfer buffer and populate `handle` with its
   // metadata (shm_id, shm_offset, size).

@@ -37,6 +37,12 @@ class DawnServiceMemoryTransferService final
                               size_t deserialize_size,
                               WriteHandle** write_handle) override;
 
+  // Creates a MemoryHandle from a serialized MemoryTransferHandle made of the
+  // id, offset and size of a shared memory region. Returns nullptr when the
+  // region is invalid, causing a context loss.
+  std::unique_ptr<MemoryHandle> DeserializeMemoryHandle(
+      std::span<const std::byte> creation_data) override;
+
  private:
   raw_ptr<CommonDecoder> decoder_;
 };
