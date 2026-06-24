@@ -17,12 +17,6 @@
 #include "chrome/browser/apps/app_service/metrics/website_metrics.h"
 #include "chrome/browser/profiles/profile.h"
 
-namespace base {
-class Clock;
-class TickClock;
-class SequencedTaskRunner;
-}  // namespace base
-
 class PrefRegistrySimple;
 
 namespace apps {
@@ -62,11 +56,7 @@ class AppPlatformMetricsService {
     virtual void OnAppPlatformMetricsServiceWillBeDestroyed() = 0;
   };
 
-  AppPlatformMetricsService(
-      Profile* profile,
-      const base::Clock* clock,
-      const base::TickClock* tick_clock,
-      scoped_refptr<base::SequencedTaskRunner> task_runner);
+  explicit AppPlatformMetricsService(Profile* profile);
   AppPlatformMetricsService(const AppPlatformMetricsService&) = delete;
   AppPlatformMetricsService& operator=(const AppPlatformMetricsService&) =
       delete;
@@ -132,9 +122,6 @@ class AppPlatformMetricsService {
   // List of observers that will be notified of certain component lifecycle
   // changes.
   base::ObserverList<Observer> observers_;
-
-  const raw_ref<const base::Clock> clock_;
-  const raw_ref<const base::TickClock> tick_clock_;
 };
 
 }  // namespace apps

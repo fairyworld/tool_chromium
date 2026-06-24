@@ -9,7 +9,6 @@
 
 #include "base/memory/raw_ptr.h"
 #include "base/test/test_future.h"
-#include "base/time/default_tick_clock.h"
 #include "base/values.h"
 #include "chrome/browser/apps/app_service/metrics/website_metrics.h"
 #include "chrome/browser/chromeos/reporting/metric_reporting_prefs.h"
@@ -59,8 +58,7 @@ class WebsiteEventsObserverTest : public ::testing::Test {
     ASSERT_TRUE(profile_manager_.SetUp());
     auto* const profile = profile_manager_.CreateTestingProfile(kTestUserId);
     website_metrics_ = std::make_unique<::apps::WebsiteMetrics>(
-        profile, /*user_type_by_device_type=*/0,
-        *base::DefaultTickClock::GetInstance());
+        profile, /*user_type_by_device_type=*/0);
     auto mock_website_metrics_retriever =
         std::make_unique<MockWebsiteMetricsRetriever>();
     EXPECT_CALL(*mock_website_metrics_retriever, GetWebsiteMetrics(_))
