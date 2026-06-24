@@ -1505,7 +1505,6 @@
     "expiry_milestone": 151
   },
   {
-
     "name": "cast-streaming-exponential-video-bitrate-algorithm",
     "owners": [ "jophba@chromium.org", "openscreen-eng@chromium.org" ],
     "expiry_milestone": 160
@@ -1532,6 +1531,11 @@
   },
   {
     "name": "cast-streaming-hardware-vp9",
+    "owners": [ "jophba@chromium.org", "openscreen-eng@chromium.org" ],
+    "expiry_milestone": 160
+  },
+  {
+    "name": "cast-streaming-max-video-bitrate",
     "owners": [ "jophba@chromium.org", "openscreen-eng@chromium.org" ],
     "expiry_milestone": 160
   },

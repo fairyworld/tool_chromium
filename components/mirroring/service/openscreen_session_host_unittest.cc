@@ -966,8 +966,8 @@ TEST_F(OpenscreenSessionHostTest, UpdateBandwidthEstimate) {
 
   constexpr int kMinVideoBitrate = 393216;
   constexpr int kMaxVideoBitrate = 1250000;
-  // Default bitrate should be twice the minimum.
-  EXPECT_EQ(786432, session_host().GetVideoNetworkBandwidth());
+  // Default bitrate should match kDefaultBitrate (5 Mbps).
+  EXPECT_EQ(5000000, session_host().GetVideoNetworkBandwidth());
 
   // If the estimate is below the minimum, it should stay at the minimum.
   session_host().forced_bandwidth_estimate_for_testing_ = 1000;

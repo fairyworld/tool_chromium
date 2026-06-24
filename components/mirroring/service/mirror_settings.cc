@@ -15,6 +15,7 @@
 #include "components/mirroring/service/mirroring_features.h"
 #include "media/base/audio_codecs.h"
 #include "media/base/audio_parameters.h"
+#include "media/base/media_switches.h"
 #include "media/base/video_codecs.h"
 
 using media::ResolutionChangePolicy;
@@ -41,8 +42,15 @@ constexpr int kAudioFramerate = 100;
 // Minimum video bitrate (300 kbps).
 constexpr int kMinVideoBitrate = 300000;
 
-// Maximum video bitrate (5 Mbps).
-constexpr int kMaxVideoBitrate = 5000000;
+// Start video bitrate (5 Mbps).
+constexpr int kStartVideoBitrate = 5000000;
+
+int GetMaxVideoBitrate() {
+  if (!base::FeatureList::IsEnabled(media::kCastStreamingMaxVideoBitrate)) {
+    return 5000000;  // Fallback to legacy 5 Mbps
+  }
+  return media::kCastStreamingMaxVideoBitrateMbps.Get() * 1000000;
+}
 
 // Default maximum frame rate for video (30 FPS).
 constexpr int kDefaultMaxFrameRate = 30;
@@ -120,8 +128,8 @@ FrameSenderConfig MirrorSettings::GetVideoConfig(
                             : kVideoTimebase;
   config.channels = 1;
   config.min_bitrate = kMinVideoBitrate;
-  config.max_bitrate = kMaxVideoBitrate;
-  config.start_bitrate = kMinVideoBitrate;
+  config.max_bitrate = GetMaxVideoBitrate();
+  config.start_bitrate = std::min(kStartVideoBitrate, config.max_bitrate);
   config.max_frame_rate = max_frame_rate_;
   config.video_codec_params = VideoCodecParams(codec);
 

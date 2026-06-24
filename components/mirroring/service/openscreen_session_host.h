@@ -64,10 +64,10 @@ class RpcDispatcher;
 class VideoCaptureClient;
 
 // Minimum required bitrate used for calculating bandwidth.
-constexpr int kMinRequiredBitrate = 384 << 10;  // 384 kbps
+inline constexpr int kMinRequiredBitrate = 384 << 10;  // 384 kbps
 
 // Default bitrate used before we have a calculation.
-constexpr int kDefaultBitrate = kMinRequiredBitrate * 2;  // 768 kbps
+inline constexpr int kDefaultBitrate = 5000000;  // 5 mbps
 
 // Hosts a streaming session by hosting an `openscreen::cast::SenderSession` and
 // doing all of the necessary interfacing for audio and video capture, switching

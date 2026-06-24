@@ -2640,6 +2640,12 @@ inline constexpr char kCastStreamingVp9Description[] =
     "Offers the VP9 video codec when negotiating Cast Streaming, and uses VP9 "
     "if selected for the session.";
 
+inline constexpr char kCastStreamingMaxVideoBitrateName[] =
+    "Cast Streaming Max Video Bitrate Limit";
+inline constexpr char kCastStreamingMaxVideoBitrateDescription[] =
+    "Enables configuring the maximum video bitrate limit for Cast Streaming "
+    "to experiment with different network quality ceilings.";
+
 inline constexpr char kCastStreamingExponentialVideoBitrateAlgorithmName[] =
     "Cast Streaming Exponential Video Bitrate Algorithm";
 inline constexpr char

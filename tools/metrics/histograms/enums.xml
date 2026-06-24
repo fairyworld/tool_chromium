@@ -9277,6 +9277,7 @@ from previous Chrome versions.
   <int value="-1658461830" label="SharedHighlightingRefinedBlocklist:enabled"/>
   <int value="-1658154886"
       label="CompressionDictionaryTransportRequireKnownRootCert:disabled"/>
+  <int value="-1658093371" label="cast-streaming-max-video-bitrate:enabled"/>
   <int value="-1657250488" label="ShowFrozenUpdateNotification:disabled"/>
   <int value="-1657056532" label="FilesNewDirectoryTree:disabled"/>
   <int value="-1656949556"
@@ -10267,6 +10268,7 @@ from previous Chrome versions.
   <int value="-1351968795" label="SingleProcessMash:enabled"/>
   <int value="-1351328710"
       label="OmniboxUIExperimentJogTextfieldOnPopup:disabled"/>
+  <int value="-1351140174" label="CastStreamingMaxVideoBitrate:25 Mbps"/>
   <int value="-1351107814" label="Picker:enabled"/>
   <int value="-1350572940" label="BatchUploadDesktop:enabled"/>
   <int value="-1350260119" label="OngoingProcesses:disabled"/>
@@ -12510,6 +12512,7 @@ from previous Chrome versions.
       label="OmniboxContextualSearchSingleLensAction:enabled"/>
   <int value="-630256330" label="EnableDrDc:enabled"/>
   <int value="-630241131" label="LocalNetworkAccessChecksWebSockets:disabled"/>
+  <int value="-629441422" label="CastStreamingMaxVideoBitrate:disabled"/>
   <int value="-629084845" label="UseToastManager:disabled"/>
   <int value="-629041881" label="MuteNotificationsDuringScreenShare:disabled"/>
   <int value="-628535358"
@@ -12848,6 +12851,7 @@ from previous Chrome versions.
   <int value="-517037197" label="ContextMenuToolTips:enabled"/>
   <int value="-516845951" label="enable-embedded-extension-options"/>
   <int value="-516269317" label="HttpsFirstModeV2:enabled"/>
+  <int value="-516005152" label="CastStreamingMaxVideoBitrate:enabled"/>
   <int value="-515913489" label="EphemeralTabUsingBottomSheet:disabled"/>
   <int value="-515066652"
       label="WebAuthenticationAlignErrorTypeForPaymentCredentialCreate:disabled"/>
@@ -13708,6 +13712,7 @@ from previous Chrome versions.
   <int value="-240481438"
       label="CompressionDictionaryTransportOverHttp2:enabled"/>
   <int value="-239616243" label="HighDynamicRange:enabled"/>
+  <int value="-239253496" label="CastStreamingMaxVideoBitrate:5 Mbps"/>
   <int value="-239176328" label="BluetoothAggressiveAppearanceFilter:enabled"/>
   <int value="-238925706" label="TabStripGroupReorderAndroid:disabled"/>
   <int value="-238717837" label="CellularUseSecondEuicc:disabled"/>
@@ -14501,6 +14506,7 @@ from previous Chrome versions.
   <int value="16804822" label="SpeakOnMuteEnabled:disabled"/>
   <int value="17152031"
       label="PropagateDeviceContentFiltersToSupervisedUser:enabled"/>
+  <int value="17432142" label="CastStreamingMaxVideoBitrate:50 Mbps"/>
   <int value="18929598" label="FedCmIdPRegistration:disabled"/>
   <int value="19815558" label="EnableSettingsShortcutSearch:disabled"/>
   <int value="20023271" label="AllowApnModificationPolicy:disabled"/>
@@ -15093,6 +15099,7 @@ from previous Chrome versions.
   <int value="215090886" label="GlicActorEnableScriptTools:disabled"/>
   <int value="215328738" label="ImprovedGeoLanguageData:disabled"/>
   <int value="215528151" label="NearbySharingWebRtc:enabled"/>
+  <int value="215743648" label="cast-streaming-max-video-bitrate:disabled"/>
   <int value="215966274" label="AccessibilityTextChangeTypes:enabled"/>
   <int value="217262564" label="ProfilePickerTextVariations:enabled"/>
   <int value="217284084" label="IPH_AutofillCreditCardBenefit:enabled"/>
@@ -19353,6 +19360,7 @@ from previous Chrome versions.
   <int value="1586476635" label="LargeFaviconFromGoogle:enabled"/>
   <int value="1587521886" label="SSLCommittedInterstitials:enabled"/>
   <int value="1587972722" label="TimeOfDayWallpaper:disabled"/>
+  <int value="1588173358" label="CastStreamingMaxVideoBitrate:10 Mbps"/>
   <int value="1588716465" label="CrostiniUseLxd4:disabled"/>
   <int value="1589341623" label="disable-easy-unlock"/>
   <int value="1590173007" label="AsynchronousScannerDiscovery:enabled"/>

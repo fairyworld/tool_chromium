@@ -1604,6 +1604,11 @@ const base::FeatureParam<double>
 
 BASE_FEATURE(kCastStreamingHardwareHevc, base::FEATURE_DISABLED_BY_DEFAULT);
 
+BASE_FEATURE(kCastStreamingMaxVideoBitrate, base::FEATURE_ENABLED_BY_DEFAULT);
+
+const base::FeatureParam<int> kCastStreamingMaxVideoBitrateMbps{
+    &kCastStreamingMaxVideoBitrate, "max_bitrate_mbps", 5};
+
 BASE_FEATURE(kCastStreamingPerformanceOverlay,
              base::FEATURE_DISABLED_BY_DEFAULT);
 

@@ -823,9 +823,11 @@ void OpenscreenSessionHost::SetConstraints(
     }
     video_config->min_bitrate =
         std::max(video_config->min_bitrate, video.bit_rate_limits.minimum);
-    video_config->start_bitrate = video_config->min_bitrate;
     video_config->max_bitrate =
         std::min(video_config->max_bitrate, video.bit_rate_limits.maximum);
+    video_config->start_bitrate =
+        std::clamp(video_config->start_bitrate, video_config->min_bitrate,
+                   video_config->max_bitrate);
     video_config->min_playout_delay =
         std::min(video_config->max_playout_delay,
                  base::Milliseconds(video.max_delay.count()));
@@ -847,9 +849,11 @@ void OpenscreenSessionHost::SetConstraints(
   if (audio_config) {
     audio_config->min_bitrate =
         std::max(audio_config->min_bitrate, audio.bit_rate_limits.minimum);
-    audio_config->start_bitrate = audio_config->min_bitrate;
     audio_config->max_bitrate =
         std::min(audio_config->max_bitrate, audio.bit_rate_limits.maximum);
+    audio_config->start_bitrate =
+        std::clamp(audio_config->start_bitrate, audio_config->min_bitrate,
+                   audio_config->max_bitrate);
     audio_config->max_playout_delay =
         std::min(audio_config->max_playout_delay,
                  base::Milliseconds(audio.max_delay.count()));

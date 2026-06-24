@@ -4470,6 +4470,27 @@ const FeatureEntry::FeatureVariation
         {"Large Window (60)",
          kCastStreamingExponentialVideoBitrateAlgorithmLargeWindow, nullptr},
 };
+
+const FeatureEntry::FeatureParam kCastStreamingMaxVideoBitrate5Mbps[] = {
+    {"max_bitrate_mbps", "5"},
+};
+const FeatureEntry::FeatureParam kCastStreamingMaxVideoBitrate10Mbps[] = {
+    {"max_bitrate_mbps", "10"},
+};
+const FeatureEntry::FeatureParam kCastStreamingMaxVideoBitrate25Mbps[] = {
+    {"max_bitrate_mbps", "25"},
+};
+const FeatureEntry::FeatureParam kCastStreamingMaxVideoBitrate50Mbps[] = {
+    {"max_bitrate_mbps", "50"},
+};
+
+const FeatureEntry::FeatureVariation kCastStreamingMaxVideoBitrateVariations[] =
+    {
+        {"5 Mbps", kCastStreamingMaxVideoBitrate5Mbps, nullptr},
+        {"10 Mbps", kCastStreamingMaxVideoBitrate10Mbps, nullptr},
+        {"25 Mbps", kCastStreamingMaxVideoBitrate25Mbps, nullptr},
+        {"50 Mbps", kCastStreamingMaxVideoBitrate50Mbps, nullptr},
+};
 #endif  // !BUILDFLAG(IS_ANDROID)
 
 const FeatureEntry::FeatureParam
@@ -5638,6 +5659,13 @@ const FeatureEntry kFeatureEntries[] = {
     {"enable-cast-streaming-vp9", flag_descriptions::kCastStreamingVp9Name,
      flag_descriptions::kCastStreamingVp9Description, kOsDesktop,
      FEATURE_VALUE_TYPE(media::kCastStreamingVp9)},
+
+    {"cast-streaming-max-video-bitrate",
+     flag_descriptions::kCastStreamingMaxVideoBitrateName,
+     flag_descriptions::kCastStreamingMaxVideoBitrateDescription, kOsDesktop,
+     FEATURE_WITH_PARAMS_VALUE_TYPE(media::kCastStreamingMaxVideoBitrate,
+                                    kCastStreamingMaxVideoBitrateVariations,
+                                    "CastStreamingMaxVideoBitrate")},
 
     {"enable-cast-streaming-with-hidpi",
      flag_descriptions::kCastEnableStreamingWithHiDPIName,
