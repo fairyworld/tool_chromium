@@ -1236,9 +1236,9 @@ void MetricsWebContentsObserver::UpdateTiming(
     mojom::FontLoadingMetricsPtr font_loading_metrics) {
   TRACE_EVENT("loading", "MetricsWebContentsObserver::UpdateTiming",
               "custom_timings_count", user_timings.size());
-  content::RenderFrameHost* render_frame_host =
-      page_load_metrics_receivers_.GetCurrentTargetFrame();
-  OnTimingUpdated(render_frame_host, std::move(timing), std::move(metadata),
+  content::RenderFrameHost& render_frame_host =
+      page_load_metrics_receivers_.CurrentTargetFrame();
+  OnTimingUpdated(&render_frame_host, std::move(timing), std::move(metadata),
                   new_features, resources, std::move(render_data),
                   std::move(cpu_timing), std::move(event_timings),
                   subresource_load_metrics, std::move(soft_navigation_metrics),
@@ -1250,9 +1250,9 @@ void MetricsWebContentsObserver::AddCustomUserTiming(
     mojom::CustomUserTimingMarkPtr custom_timing) {
   TRACE_EVENT("loading", "MetricsWebContentsObserver::AddCustomUserTiming",
               "mark_name", custom_timing->mark_name);
-  content::RenderFrameHost* render_frame_host =
-      page_load_metrics_receivers_.GetCurrentTargetFrame();
-  OnCustomUserTimingUpdated(render_frame_host, std::move(custom_timing));
+  content::RenderFrameHost& render_frame_host =
+      page_load_metrics_receivers_.CurrentTargetFrame();
+  OnCustomUserTimingUpdated(&render_frame_host, std::move(custom_timing));
 }
 
 bool MetricsWebContentsObserver::ShouldTrackMainFrameNavigation(
