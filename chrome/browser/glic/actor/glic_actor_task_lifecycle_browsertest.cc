@@ -7,9 +7,12 @@
 #include "chrome/browser/actor/actor_test_util.h"
 #include "chrome/browser/glic/actor/new_glic_actor_functional_browsertest.h"
 #include "chrome/browser/glic/public/service/glic_instance_coordinator.h"
+#include "chrome/browser/glic/service/glic_instance_impl.h"
 #include "components/actor/public/mojom/actor_types.mojom.h"
 #include "components/page_content_annotations/content/page_context_fetcher.h"
+#include "components/performance_manager/public/features.h"
 #include "content/public/browser/render_frame_host.h"
+#include "content/public/browser/render_process_host.h"
 #include "content/public/browser/render_widget_host.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
@@ -121,6 +124,7 @@ class GlicActorTaskLifecycleFunctionalBrowserTest
             {blink::features::kAIPageContentTrackedElementsIframe, {}},
             {page_content_annotations::kGlicTabScreenshotExperiment,
              {{"screenshot_timeout_ms", "30s"}}},
+            {performance_manager::features::kGlicActuationPriorityVoter, {}},
         },
         /*disabled_features=*/{});
   }
@@ -553,6 +557,63 @@ IN_PROC_BROWSER_TEST_F(GlicActorTaskLifecycleFunctionalBrowserTest,
   task_manager->GetClientSessionForTesting()->StopActorTask(
       task_id.value(), glic::mojom::ActorTaskStopReason::kTaskComplete);
 }
+
+#if !BUILDFLAG(IS_ANDROID)
+
+TestResult<void> RunUntilPriorityIs(content::RenderProcessHost* rph,
+                                    base::Process::Priority priority) {
+  return RunUntilEqual([&]() { return rph->GetPriority(); }, priority);
+}
+
+IN_PROC_BROWSER_TEST_F(GlicActorTaskLifecycleFunctionalBrowserTest,
+                       testActuatingPriorityChange) {
+  GlicInstanceImpl* instance = GetInstanceImpl();
+  ASSERT_TRUE(instance);
+  ASSERT_OK(WaitForGlicClient(instance));
+
+  content::WebContents* webui_contents = instance->host().webui_contents();
+  ASSERT_TRUE(webui_contents);
+  content::RenderProcessHost* webui_rph =
+      webui_contents->GetPrimaryMainFrame()->GetProcess();
+  content::WebContents* guest_contents = instance->host().web_client_contents();
+  EXPECT_TRUE(guest_contents);
+  content::RenderProcessHost* guest_rph =
+      guest_contents->GetPrimaryMainFrame()->GetProcess();
+
+  // Close glic to ensure the priority is reduced.
+  PreventDeletionOnClose(instance);
+  ToggleGlicForActiveTab();
+  EXPECT_OK(WaitForGlicClose());
+  EXPECT_OK(
+      WaitForWebUiContentsVisibility(instance, content::Visibility::HIDDEN));
+  EXPECT_EQ(guest_contents->GetVisibility(), content::Visibility::HIDDEN);
+
+  EXPECT_OK(
+      RunUntilPriorityIs(webui_rph, base::Process::Priority::kBestEffort));
+  EXPECT_OK(
+      RunUntilPriorityIs(guest_rph, base::Process::Priority::kBestEffort));
+
+  ExecuteJsTest();
+
+  // Task is now created and actuating. The process priority should be
+  // UserBlocking.
+  EXPECT_TRUE(instance->IsActuating());
+  EXPECT_OK(
+      RunUntilPriorityIs(webui_rph, base::Process::Priority::kUserBlocking));
+  EXPECT_OK(
+      RunUntilPriorityIs(guest_rph, base::Process::Priority::kUserBlocking));
+
+  // Finish/stop the task.
+  ContinueJsTest();
+  EXPECT_FALSE(instance->IsActuating());
+
+  // Now Glic is not actuating and it's closed, so the priority should drop.
+  EXPECT_OK(
+      RunUntilPriorityIs(webui_rph, base::Process::Priority::kBestEffort));
+  EXPECT_OK(
+      RunUntilPriorityIs(guest_rph, base::Process::Priority::kBestEffort));
+}
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 }  // namespace
 }  // namespace glic::actor

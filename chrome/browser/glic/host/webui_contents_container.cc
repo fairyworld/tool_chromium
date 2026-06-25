@@ -12,6 +12,7 @@
 #include "chrome/browser/glic/host/glic_ui.h"
 #include "chrome/browser/glic/host/guest_util.h"
 #include "chrome/browser/glic/host/host.h"
+#include "chrome/browser/glic/public/glic_actuation_tracker.h"
 #include "chrome/browser/glic/public/glic_keyed_service.h"
 #include "chrome/browser/glic/public/glic_keyed_service_factory.h"
 #include "chrome/browser/glic/widget/glic_view.h"
@@ -187,23 +188,31 @@ content::WebContents* WebUIContentsContainerImpl::web_contents() const {
 }
 
 void WebUIContentsContainerImpl::OnActuatingChanged(bool actuating) {
-  if (actuating) {
-    if (web_contents_) {
-      webui_capture_runner_ = web_contents_->IncrementCapturerCount(
-          gfx::Size(), /*stay_hidden=*/true, /*stay_awake=*/true,
-          /*is_activity=*/true);
-
-      if (content::WebContents* guest =
-              GetGlicGuestWebContents(web_contents_.get())) {
-        guest_capture_runner_ = guest->IncrementCapturerCount(
-            gfx::Size(), /*stay_hidden=*/true, /*stay_awake=*/true,
-            /*is_activity=*/true);
-      }
-    }
-  } else {
+  if (!actuating) {
+    // Cleanup the capturers even if the webcontents are gone.
     webui_capture_runner_.RunAndReset();
     guest_capture_runner_.RunAndReset();
   }
+  if (!web_contents_) {
+    return;
+  }
+  auto* guest = GetGlicGuestWebContents(web_contents_.get());
+  if (!guest) {
+    return;
+  }
+  if (actuating) {
+    webui_capture_runner_ = web_contents_->IncrementCapturerCount(
+        gfx::Size(), /*stay_hidden=*/true, /*stay_awake=*/true,
+        /*is_activity=*/true);
+    guest_capture_runner_ = guest->IncrementCapturerCount(
+        gfx::Size(), /*stay_hidden=*/true, /*stay_awake=*/true,
+        /*is_activity=*/true);
+  }
+
+  glic::GlicActuationTracker::GetInstance()->NotifyActuatingChanged(
+      web_contents_.get(), actuating);
+  glic::GlicActuationTracker::GetInstance()->NotifyActuatingChanged(guest,
+                                                                    actuating);
 }
 
 }  // namespace glic

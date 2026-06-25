@@ -5,6 +5,7 @@
 #ifndef CHROME_BROWSER_PERFORMANCE_MANAGER_DECORATORS_HELPERS_PAGE_LIVE_STATE_DECORATOR_HELPER_H_
 #define CHROME_BROWSER_PERFORMANCE_MANAGER_DECORATORS_HELPERS_PAGE_LIVE_STATE_DECORATOR_HELPER_H_
 
+#include "base/callback_list.h"
 #include "base/memory/raw_ptr.h"
 #include "base/sequence_checker.h"
 #include "chrome/browser/media/webrtc/media_stream_capture_indicator.h"
@@ -56,6 +57,9 @@ class PageLiveStateDecoratorHelper
  private:
   class WebContentsObserver;
 
+  void OnGlicActuatingChanged(content::WebContents* web_contents,
+                              bool is_actuating);
+
   // Linked list of WebContentsObservers created by this
   // PageLiveStateDecoratorHelper. Each WebContentsObservers removes itself from
   // the list and destroys itself when its associated WebContents is destroyed.
@@ -64,6 +68,8 @@ class PageLiveStateDecoratorHelper
   raw_ptr<WebContentsObserver> first_web_contents_observer_ = nullptr;
 
   std::unique_ptr<ActiveTabObserver> active_tab_observer_;
+
+  base::CallbackListSubscription actuating_changed_callback_subscription_;
 
   SEQUENCE_CHECKER(sequence_checker_);
 };

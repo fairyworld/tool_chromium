@@ -403,6 +403,28 @@ class GlicActorTaskLifecycleFunctionalBrowserTest extends ApiTestFixtureBase {
     assertTrue(this.host.selectGmailOtpOptInRequestHandler === undefined);
     await this.advanceToNextStep();
   }
+
+  async testActuatingPriorityChange() {
+    assertDefined(this.host.createTask);
+    assertDefined(this.host.performActions);
+    assertDefined(this.host.stopActorTask);
+
+    const taskId = await this.host.createTask();
+    assertTrue(taskId > 0);
+
+    // Start a long wait action to ensure there is enough time for checks.
+    const waitBuffer =
+        await this.browser.makeWaitAction(taskId, longWaitTimeMs);
+    const waitPromise = this.host.performActions(waitBuffer);
+
+    // Wait for the task to start acting before yielding to C++ check.
+    await this.waitForTaskState(taskId, ActorTaskState.ACTING);
+
+    await this.advanceToNextStep();
+
+    await this.host.stopActorTask(taskId, ActorTaskStopReason.TASK_COMPLETE);
+    await waitPromise;
+  }
 }
 
 testMain([

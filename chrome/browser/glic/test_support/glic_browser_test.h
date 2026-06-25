@@ -113,9 +113,10 @@ template <typename T>
     return base::ok();
   }
   std::stringstream ss;
-  ss << message << " Expected: " << expected_value << ", saw values: {";
+  ss << message << " Expected: " << base::ToString(expected_value)
+     << ", saw values: {";
   for (const auto& value : ignored_values) {
-    ss << value << ", ";
+    ss << base::ToString(value) << ", ";
   }
   ss << "}";
   return base::unexpected(ss.str());

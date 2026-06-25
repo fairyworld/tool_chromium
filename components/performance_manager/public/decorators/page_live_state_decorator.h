@@ -97,6 +97,9 @@ class PageLiveStateDecorator
   static void SetIsDevToolsOpen(content::WebContents* contents,
                                 bool is_dev_tools_open);
 
+  static void SetIsGlicActuating(content::WebContents* contents,
+                                 bool is_glic_actuating);
+
   // Convenience functions to look up the given properties from the
   // PageLiveStateDecorator::Data for the given `contents`.
   static bool IsConnectedToUSBDevice(content::WebContents* contents);
@@ -113,6 +116,7 @@ class PageLiveStateDecorator
   static bool IsActiveTab(content::WebContents* contents);
   static bool IsPinnedTab(content::WebContents* contents);
   static bool IsDevToolsOpen(content::WebContents* contents);
+  static bool IsGlicActuating(content::WebContents* contents);
   static bool UpdatedTitleOrFaviconInBackground(content::WebContents* contents);
 
  private:
@@ -163,6 +167,7 @@ class PageLiveStateDecorator::Data {
   virtual bool IsActiveTab() const = 0;
   virtual bool IsPinnedTab() const = 0;
   virtual bool IsDevToolsOpen() const = 0;
+  virtual bool IsGlicActuating() const = 0;
   virtual bool UpdatedTitleOrFaviconInBackground() const = 0;
 
   static const Data* FromPageNode(const PageNode* page_node);
@@ -182,6 +187,7 @@ class PageLiveStateDecorator::Data {
   virtual void SetIsActiveTabForTesting(bool value) = 0;
   virtual void SetIsPinnedTabForTesting(bool value) = 0;
   virtual void SetIsDevToolsOpenForTesting(bool value) = 0;
+  virtual void SetIsGlicActuatingForTesting(bool value) = 0;
   virtual void SetUpdatedTitleOrFaviconInBackgroundForTesting(bool value) = 0;
 
  protected:
@@ -212,6 +218,7 @@ class PageLiveStateObserver : public base::CheckedObserver {
   virtual void OnIsActiveTabChanged(const PageNode* page_node) {}
   virtual void OnIsPinnedTabChanged(const PageNode* page_node) {}
   virtual void OnIsDevToolsOpenChanged(const PageNode* page_node) {}
+  virtual void OnIsGlicActuatingChanged(const PageNode* page_node) {}
   virtual void OnUpdatedTitleOrFaviconInBackgroundChanged(
       const PageNode* page_node) {}
 };

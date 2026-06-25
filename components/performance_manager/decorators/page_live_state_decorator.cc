@@ -98,6 +98,10 @@ class PageLiveStateDataImpl
     DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
     return is_dev_tools_open_;
   }
+  bool IsGlicActuating() const override {
+    DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+    return is_glic_actuating_;
+  }
   bool UpdatedTitleOrFaviconInBackground() const override {
     DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
     return updated_title_or_favicon_in_background_;
@@ -144,6 +148,9 @@ class PageLiveStateDataImpl
   }
   void SetIsDevToolsOpenForTesting(bool value) override {
     set_is_dev_tools_open(value);
+  }
+  void SetIsGlicActuatingForTesting(bool value) override {
+    set_is_glic_actuating(value);
   }
   void SetUpdatedTitleOrFaviconInBackgroundForTesting(bool value) override {
     set_updated_title_or_favicon_in_background(value);
@@ -266,6 +273,16 @@ class PageLiveStateDataImpl
       obs.OnIsDevToolsOpenChanged(page_node_);
     }
   }
+  void set_is_glic_actuating(bool is_glic_actuating) {
+    DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+    if (is_glic_actuating_ == is_glic_actuating) {
+      return;
+    }
+    is_glic_actuating_ = is_glic_actuating;
+    for (auto& obs : observers_) {
+      obs.OnIsGlicActuatingChanged(page_node_);
+    }
+  }
   void set_updated_title_or_favicon_in_background(bool updated) {
     DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
     if (updated_title_or_favicon_in_background_ == updated) {
@@ -296,6 +313,7 @@ class PageLiveStateDataImpl
   bool is_active_tab_ GUARDED_BY_CONTEXT(sequence_checker_) = false;
   bool is_pinned_tab_ GUARDED_BY_CONTEXT(sequence_checker_) = false;
   bool is_dev_tools_open_ GUARDED_BY_CONTEXT(sequence_checker_) = false;
+  bool is_glic_actuating_ GUARDED_BY_CONTEXT(sequence_checker_) = false;
   bool updated_title_or_favicon_in_background_
       GUARDED_BY_CONTEXT(sequence_checker_) = false;
 
@@ -476,6 +494,14 @@ void PageLiveStateDecorator::SetIsDevToolsOpen(content::WebContents* contents,
 }
 
 // static
+void PageLiveStateDecorator::SetIsGlicActuating(content::WebContents* contents,
+                                                bool is_glic_actuating) {
+  SetPropertyForWebContentsPageNode(
+      contents, &PageLiveStateDataImpl::set_is_glic_actuating,
+      is_glic_actuating);
+}
+
+// static
 bool PageLiveStateDecorator::IsConnectedToUSBDevice(
     content::WebContents* contents) {
   return GetPropertyForWebContentsPageNode<bool>(
@@ -565,6 +591,12 @@ bool PageLiveStateDecorator::IsDevToolsOpen(content::WebContents* contents) {
 }
 
 // static
+bool PageLiveStateDecorator::IsGlicActuating(content::WebContents* contents) {
+  return GetPropertyForWebContentsPageNode<bool>(
+      contents, &PageLiveStateDataImpl::IsGlicActuating);
+}
+
+// static
 bool PageLiveStateDecorator::UpdatedTitleOrFaviconInBackground(
     content::WebContents* contents) {
   return GetPropertyForWebContentsPageNode<bool>(
@@ -603,6 +635,7 @@ base::DictValue PageLiveStateDecorator::DescribePageNodeData(
   ret.Set("IsActiveTab", data->IsActiveTab());
   ret.Set("IsPinnedTab", data->IsPinnedTab());
   ret.Set("IsDevToolsOpen", data->IsDevToolsOpen());
+  ret.Set("IsGlicActuating", data->IsGlicActuating());
   ret.Set("UpdatedTitleOrFaviconInBackground",
           data->UpdatedTitleOrFaviconInBackground());
 
