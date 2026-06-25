@@ -414,7 +414,12 @@ INSTANTIATE_TEST_SUITE_P(
     SessionRestoreWithEncryptionTest,
     testing::Values(
         TestParams{false, ""},
-        TestParams{true, kEncryptSessionStorageStageWriteBothReadOnlyClear}),
+        TestParams{true, kEncryptSessionStorageStageWriteBothReadOnlyClear},
+        TestParams{true,
+                   kEncryptSessionStorageStageWriteBothReadPreferEncrypted},
+        TestParams{
+            true,
+            kEncryptSessionStorageStageWriteEncryptedReadPreferEncrypted}),
     TestParamNameGenerator);
 
 // Tests Tab Restore functionality for a particular stage of the command storage
@@ -487,7 +492,12 @@ INSTANTIATE_TEST_SUITE_P(
     TabRestoreWithEncryptionTest,
     testing::Values(
         TestParams{false, ""},
-        TestParams{true, kEncryptSessionStorageStageWriteBothReadOnlyClear}),
+        TestParams{true, kEncryptSessionStorageStageWriteBothReadOnlyClear},
+        TestParams{true,
+                   kEncryptSessionStorageStageWriteBothReadPreferEncrypted},
+        TestParams{
+            true,
+            kEncryptSessionStorageStageWriteEncryptedReadPreferEncrypted}),
     TestParamNameGenerator);
 
 struct StageTransitionTestParams {
@@ -824,14 +834,47 @@ IN_PROC_BROWSER_TEST_P(TabRestoreAcrossStagesTest, Restore) {
 }
 
 const StageTransitionTestParams kStageTransitionTestParams[] = {
-    {// Initially, feature kEncryptSessionStorage is disabled.
-     TestParams{false, ""},
-     // Start the rollout.
+    // Starting a rollout with Stage 1
+    {TestParams{false, ""},
      TestParams{true, kEncryptSessionStorageStageWriteBothReadOnlyClear}},
-    {// Rollout in progress
-     TestParams{true, kEncryptSessionStorageStageWriteBothReadOnlyClear},
-     // Simulate a rollback
+    // Rollback from Stage 1 to Stage 0
+    {TestParams{true, kEncryptSessionStorageStageWriteBothReadOnlyClear},
      TestParams{false, ""}},
+
+    // Continuing rollout from Stage 1 to Stage 2
+    {TestParams{true, kEncryptSessionStorageStageWriteBothReadOnlyClear},
+     TestParams{true, kEncryptSessionStorageStageWriteBothReadPreferEncrypted}},
+    // Jump from Stage 0 to Stage 2
+    // This could occur if a user misses the rollout from Stage 1 to Stage 2
+    {TestParams{false, ""},
+     TestParams{true, kEncryptSessionStorageStageWriteBothReadPreferEncrypted}},
+    // Rollback from Stage 2 to Stage 1
+    {TestParams{true, kEncryptSessionStorageStageWriteBothReadPreferEncrypted},
+     TestParams{true, kEncryptSessionStorageStageWriteBothReadOnlyClear}},
+    // Rollback from Stage 2 to Stage 0
+    {TestParams{true, kEncryptSessionStorageStageWriteBothReadPreferEncrypted},
+     TestParams{false, ""}},
+
+    // Continuing rollout from Stage 2 to Stage 3
+    {TestParams{true, kEncryptSessionStorageStageWriteBothReadPreferEncrypted},
+     TestParams{true,
+                kEncryptSessionStorageStageWriteEncryptedReadPreferEncrypted}},
+    // Jump from Stage 0 to Stage 3
+    // This could occur if a user misses the rollouts to Stages 1 and 2
+    {TestParams{false, ""},
+     TestParams{true,
+                kEncryptSessionStorageStageWriteEncryptedReadPreferEncrypted}},
+    // Jump from Stage 1 to Stage 3
+    // This could occur if a user misses the rollout to Stage 2
+    {TestParams{true, kEncryptSessionStorageStageWriteBothReadOnlyClear},
+     TestParams{true,
+                kEncryptSessionStorageStageWriteEncryptedReadPreferEncrypted}},
+    // Rollback from Stage 3 to Stage 2
+    {TestParams{true,
+                kEncryptSessionStorageStageWriteEncryptedReadPreferEncrypted},
+     TestParams{true, kEncryptSessionStorageStageWriteBothReadPreferEncrypted}},
+    // Rollback from Stage 3 to Stage 0 or 1 is not possible because cleartext
+    // files are not written in Stage 3 and are required for Stages 0 and 1.
 };
 
 INSTANTIATE_TEST_SUITE_P(All,
