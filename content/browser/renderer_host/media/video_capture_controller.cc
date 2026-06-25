@@ -202,7 +202,7 @@ VideoCaptureController::VideoCaptureController(
       emit_log_message_cb_(std::move(emit_log_message_cb)),
       device_launch_observer_(nullptr),
       has_received_frames_(false) {
-  DCHECK_CURRENTLY_ON(BrowserThread::IO);
+  CHECK_CURRENTLY_ON(BrowserThread::IO, base::NotFatalUntil::M152);
 }
 
 VideoCaptureController::~VideoCaptureController() = default;
@@ -219,7 +219,7 @@ void VideoCaptureController::AddClient(
     const media::VideoCaptureSessionId& session_id,
     const media::VideoCaptureParams& params,
     std::optional<url::Origin> origin) {
-  DCHECK_CURRENTLY_ON(BrowserThread::IO);
+  CHECK_CURRENTLY_ON(BrowserThread::IO, base::NotFatalUntil::M152);
   std::ostringstream string_stream;
   string_stream << "VideoCaptureController::AddClient(): id = " << id
                 << ", session_id = " << session_id.ToString()
@@ -229,7 +229,7 @@ void VideoCaptureController::AddClient(
 
   // Params received from a renderer will have been validated by
   // VideoCaptureHost, so here we can just require validity.
-  DCHECK(params.IsValid());
+  CHECK(params.IsValid(), base::NotFatalUntil::M152);
 
   // Check that requested VideoCaptureParams are supported.  If not, report an
   // error immediately and punt.
@@ -295,7 +295,7 @@ void VideoCaptureController::AddClient(
 base::UnguessableToken VideoCaptureController::RemoveClient(
     const VideoCaptureControllerID& id,
     VideoCaptureControllerEventHandler* event_handler) {
-  DCHECK_CURRENTLY_ON(BrowserThread::IO);
+  CHECK_CURRENTLY_ON(BrowserThread::IO, base::NotFatalUntil::M152);
   std::ostringstream string_stream;
   string_stream << "VideoCaptureController::RemoveClient: id = " << id;
   EmitLogMessage(string_stream.str(), 1);
@@ -331,7 +331,7 @@ base::UnguessableToken VideoCaptureController::RemoveClient(
 void VideoCaptureController::PauseClient(
     const VideoCaptureControllerID& id,
     VideoCaptureControllerEventHandler* event_handler) {
-  DCHECK_CURRENTLY_ON(BrowserThread::IO);
+  CHECK_CURRENTLY_ON(BrowserThread::IO, base::NotFatalUntil::M152);
   DVLOG(1) << "VideoCaptureController::PauseClient: id = " << id;
 
   ControllerClient* client = FindClient(id, event_handler);
