@@ -2396,7 +2396,8 @@ void URLLoader::ResumeStart() {
 void URLLoader::OnBeforeSendHeadersComplete(
     net::NetworkDelegate::OnBeforeStartTransactionCallback callback,
     int result,
-    const std::optional<net::HttpRequestHeaders>& headers) {
+    const std::optional<net::HttpRequestHeaders>& headers,
+    std::optional<base::DictValue> extended_net_log_events) {
   CHECK(!on_before_send_headers_start_time_.is_null());
   base::UmaHistogramTimes(
       "Net.URLLoader.OnBeforeSendHeadersDuration",

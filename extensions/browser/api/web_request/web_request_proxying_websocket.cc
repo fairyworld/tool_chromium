@@ -103,7 +103,7 @@ WebRequestProxyingWebSocket::~WebRequestProxyingWebSocket() {
       ->OnRequestWillBeDestroyed(browser_context_, &info_);
   if (on_before_send_headers_callback_) {
     std::move(on_before_send_headers_callback_)
-        .Run(net::ERR_ABORTED, std::nullopt);
+        .Run(net::ERR_ABORTED, std::nullopt, std::nullopt);
   }
   if (on_headers_received_callback_) {
     std::move(on_headers_received_callback_)
@@ -401,7 +401,7 @@ void WebRequestProxyingWebSocket::OnBeforeSendHeadersComplete(
   if (receiver_as_header_client_.is_bound()) {
     DCHECK(on_before_send_headers_callback_);
     std::move(on_before_send_headers_callback_)
-        .Run(error_code, request_headers_);
+        .Run(error_code, request_headers_, std::nullopt);
   }
 
   WebRequestEventRouter::Get(browser_context_)

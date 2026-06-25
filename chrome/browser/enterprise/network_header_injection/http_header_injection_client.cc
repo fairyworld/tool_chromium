@@ -54,10 +54,10 @@ void HttpHeaderInjectionClient::OnBeforeSendHeaders(
                 &HttpHeaderInjectionClient::OnTargetBeforeSendHeadersComplete,
                 weak_ptr_factory_.GetWeakPtr(), std::move(callback),
                 request_url, headers),
-            net::ERR_FAILED, std::nullopt));
+            net::ERR_FAILED, std::nullopt, std::nullopt));
   } else {
     OnTargetBeforeSendHeadersComplete(std::move(callback), request_url, headers,
-                                      net::OK, std::nullopt);
+                                      net::OK, std::nullopt, std::nullopt);
   }
 }
 
@@ -85,16 +85,18 @@ void HttpHeaderInjectionClient::OnTargetBeforeSendHeadersComplete(
     const GURL& request_url,
     const net::HttpRequestHeaders& original_headers,
     int32_t result,
-    const std::optional<net::HttpRequestHeaders>& headers) {
+    const std::optional<net::HttpRequestHeaders>& headers,
+    std::optional<base::DictValue> extended_net_log_events) {
   if (result != net::OK) {
-    std::move(callback).Run(result, std::nullopt);
+    std::move(callback).Run(result, std::nullopt, std::nullopt);
     return;
   }
 
   std::optional<net::HttpRequestHeaders> final_headers = headers;
 
   if (!service_) {
-    std::move(callback).Run(net::OK, final_headers);
+    std::move(callback).Run(net::OK, final_headers,
+                            std::move(extended_net_log_events));
     return;
   }
 
@@ -107,7 +109,8 @@ void HttpHeaderInjectionClient::OnTargetBeforeSendHeadersComplete(
     final_headers->MergeFrom(headers_to_inject);
   }
 
-  std::move(callback).Run(net::OK, final_headers);
+  std::move(callback).Run(net::OK, final_headers,
+                          std::move(extended_net_log_events));
 }
 
 }  // namespace enterprise_custom_headers
