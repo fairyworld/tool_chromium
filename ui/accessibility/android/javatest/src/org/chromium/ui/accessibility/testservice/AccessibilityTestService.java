@@ -6,6 +6,7 @@ package org.chromium.ui.accessibility.testservice;
 
 import android.accessibilityservice.AccessibilityService;
 import android.content.Intent;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -136,7 +137,8 @@ public class AccessibilityTestService extends AccessibilityService {
         sEventCache.clear();
     }
 
-    public static boolean tryPerformActionOnNode(String className, String text, int action) {
+    public static boolean tryPerformActionOnNode(
+            NodeMatcher matcher, int action, Bundle arguments) {
         synchronized (sLock) {
             AccessibilityTestService instance = sInstance;
             if (instance == null) {
@@ -150,11 +152,16 @@ public class AccessibilityTestService extends AccessibilityService {
                 return false;
             }
 
-            AccessibilityNodeInfo targetNode = findNodeRecursive(root, className, text);
+            AccessibilityNodeInfo targetNode =
+                    findNodeRecursive(root, matcher.className, matcher.text);
 
             if (targetNode != null) {
                 Log.i(TAG, "Found node: " + targetNode.toString());
-                return targetNode.performAction(action);
+                if (arguments != null) {
+                    return targetNode.performAction(action, arguments);
+                } else {
+                    return targetNode.performAction(action);
+                }
             }
 
             Log.e(TAG, "Node not found");
