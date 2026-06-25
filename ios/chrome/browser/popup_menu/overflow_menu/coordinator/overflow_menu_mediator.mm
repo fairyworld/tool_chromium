@@ -370,6 +370,33 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
 
 #pragma mark - Property getters/setters
 
+- (OverflowMenuAction*)editActionsAction {
+  if (IsOverflowMenuNTPRefactorEnabled() && [self isCurrentWebPageNTP]) {
+    // NTP does not support the edit actions button.
+    return nil;
+  }
+
+  if (!_editActionsAction) {
+    __weak __typeof(self) weakSelf = self;
+
+    _editActionsAction = [self
+        createOverflowMenuActionWithNameID:IDS_IOS_OVERFLOW_MENU_EDIT_ACTIONS
+                                actionType:overflow_menu::ActionType::
+                                               EditActions
+                                symbolName:nil
+                              systemSymbol:NO
+                          monochromeSymbol:NO
+                           accessibilityID:kToolsMenuEditActionsId
+                              hideItemText:nil
+                                   handler:^{
+                                     [weakSelf beginCustomization];
+                                   }];
+    _editActionsAction.automaticallyUnhighlight = NO;
+    _editActionsAction.useButtonStyling = YES;
+  }
+  return _editActionsAction;
+}
+
 - (void)setModel:(OverflowMenuModel*)model {
   _model = model;
   if (_model) {
@@ -758,17 +785,6 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
                                    [weakSelf showShareSheetForChromeApp];
                                  }];
 
-  self.editActionsAction = [self
-      createOverflowMenuActionWithNameID:IDS_IOS_OVERFLOW_MENU_EDIT_ACTIONS
-                              actionType:overflow_menu::ActionType::EditActions
-                              symbolName:nil
-                            systemSymbol:NO
-                        monochromeSymbol:NO
-                         accessibilityID:kToolsMenuEditActionsId
-                            hideItemText:nil
-                                 handler:^{
-                                   [weakSelf beginCustomization];
-                                 }];
   if ([self isLensOverlayEnabled]) {
     self.lensOverlayAction = [self openLensOverlayAction];
   }
@@ -793,9 +809,6 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
     self.setTabReminderAction = [self newSetTabReminderAction];
   }
 
-  self.editActionsAction.automaticallyUnhighlight = NO;
-  self.editActionsAction.useButtonStyling = YES;
-
   // The app actions vary based on page state, so they are set in
   // `-updateModel`.
   self.appActionsGroup =
@@ -819,7 +832,8 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
 
   self.editActionsGroup = [[OverflowMenuActionGroup alloc]
       initWithGroupName:@"edit_actions"
-                actions:@[ self.editActionsAction ]
+                actions:self.editActionsAction ? @[ self.editActionsAction ]
+                                               : @[]
                  footer:nil];
 
   if (IsIdentityAwarenessEnabled()) {
@@ -1933,7 +1947,11 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
        base::FeatureList::IsEnabled(kEnableReaderModeTranslationWithInfobar));
 }
 
+// Returns whether lens overlay is enabled on the current page.
 - (BOOL)isLensOverlayEnabled {
+  if (IsOverflowMenuNTPRefactorEnabled() && [self isCurrentWebPageNTP]) {
+    return NO;
+  }
   BOOL isPortrait = !IsCompactHeight(self.baseViewController.traitCollection);
   BOOL isSupported =
       search_engines::SupportsSearchImageWithLens(self.templateURLService);
@@ -2006,6 +2024,11 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
   if (!self.webState) {
     return NO;
   }
+
+  if (IsOverflowMenuNTPRefactorEnabled() && [self isCurrentWebPageNTP]) {
+    return NO;
+  }
+
   FontSizeTabHelper* helper = FontSizeTabHelper::FromWebState(self.webState);
   if (!helper || helper->IsTextZoomUIActive()) {
     return NO;
@@ -2121,13 +2144,18 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
   }
 }
 
-/// Returns whether the Ask Gemini feature is currently available for the web
-/// state.
+// Returns whether the Ask Gemini feature is currently available for the web
+// state.
 - (BOOL)isGeminiAvailable {
   if (!IsPageActionMenuEnabled()) {
     return NO;
   }
+
   if (!_webState) {
+    return NO;
+  }
+
+  if (IsOverflowMenuNTPRefactorEnabled() && [self isCurrentWebPageNTP]) {
     return NO;
   }
 
