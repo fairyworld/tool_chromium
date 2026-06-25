@@ -4263,10 +4263,7 @@ ci.builder(
             "x86-64",
         ],
     ),
-    # TODO(crbug.com/508711260): Enable gardener rotation and tree closing once
-    # this builder is stable.
-    gardener_rotations = args.ignore_default(None),
-    tree_closing = False,
+    tree_closing = True,
     console_view_entry = consoles.console_view_entry(
         category = "emulator|x64|rel",
         short_name = "leak",
