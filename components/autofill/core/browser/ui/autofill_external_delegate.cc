@@ -814,9 +814,16 @@ void AutofillExternalDelegate::DidAcceptSuggestion(
     case SuggestionType::kSaveAndFillCreditCardEntry:
     case SuggestionType::kSeePromoCodeDetails:
     case SuggestionType::kScanCreditCard:
-    case SuggestionType::kBnplEntry:
     case SuggestionType::kMaximizeCreditCardBenefitsEntry:
       DidAcceptPaymentsSuggestion(suggestion, metadata);
+      break;
+    case SuggestionType::kBnplEntry:
+      DidAcceptPaymentsSuggestion(suggestion, metadata);
+      if (base::FeatureList::IsEnabled(
+              features::kAutofillEnablePayNowPayLaterTabs)) {
+        // The popup will instead be closed by `BnplManager`.
+        return;
+      }
       break;
     case SuggestionType::kManageAddress:
     case SuggestionType::kManageAutofillAi:
@@ -1020,7 +1027,8 @@ void AutofillExternalDelegate::DidAcceptSuggestion(
     case SuggestionType::kAtMemorySearchAffordance:
       manager_->GetAtMemoryManager().OnSearchSubmitted(
           suggestion.main_text.value);
-      break;
+      // The popup remains open to show search results once the query completes.
+      return;
     case SuggestionType::kTitle:
     case SuggestionType::kSeparator:
     case SuggestionType::kPasswordEntry:
@@ -1045,17 +1053,6 @@ void AutofillExternalDelegate::DidAcceptSuggestion(
     case SuggestionType::kAtMemoryGenericError:
     case SuggestionType::kPersonalContextNotice:
       NOTREACHED();  // Should be handled elsewhere.
-  }
-
-  if (suggestion.type == SuggestionType::kAtMemorySearchAffordance ||
-      (suggestion.type == SuggestionType::kBnplEntry &&
-       base::FeatureList::IsEnabled(
-           features::kAutofillEnablePayNowPayLaterTabs))) {
-    // Return early to prevent the popup from hiding.
-    // For `kBnplEntry`, the popup will instead be closed by `BnplManager`.
-    // For `kAtMemorySearchAffordance`, the popup remains open to show search
-    // results once the query completes.
-    return;
   }
 
   manager_->client().HideSuggestions(SuggestionHidingReason::kAcceptSuggestion,
