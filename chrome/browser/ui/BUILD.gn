@@ -5024,20 +5024,83 @@ static_library("ui") {
     # Any circular includes must depend on the target
     # "//chrome/browser:browser_public_dependencies".
     allow_circular_includes_from += [
-      # Remove this circular dependency once tab_ui_helpers are modularized.
+      # TODO(crbug.com/353332589): Remove these circular dependencies when the
+      # following headers get componentized:
+      # c/b/ui/browser_tabstrip.h
+      # c/b/ui/views/tabs/tab/tab_context_menu_controller.h
       "//chrome/browser/ui/tabs/tab_strip_api/tab_strip_model_impl",
+
+      # c/b/ui/tab_ui_helper.h
       "//chrome/browser/ui/tabs/tab_strip_api/tab_strip_model_impl/converters",
 
+      # TODO(crbug.com/353332589): Remove this circular dependency when the
+      # following headers get componentized:
+      # c/b/ui/browser.h, browser_window.h
+      # c/b/ui/views/qrcode_generator/qrcode_window_controller.h
       "//chrome/browser/ui/qrcode_generator:impl",
+
+      # TODO(crbug.com/353332589): Remove this circular dependency when the
+      # following headers get componentized:
+      # c/b/ui/browser.h
+      # c/b/ui/views/frame/browser_view.h
       "//chrome/browser/ui/send_tab_to_self:impl",
+
+      # TODO(crbug.com/353332589): This entry produces no gn check failure on
+      # the linux/wayland or linux-chromeos configs; it may be stale or its
+      # cycle may be specific to another platform (win/mac/android).
       "//chrome/browser/ui/dialogs:impl",
+
+      # TODO(crbug.com/353332589): This entry produces no gn check failure on
+      # the linux/wayland or linux-chromeos configs; it may be stale or its
+      # cycle may be specific to another platform (win/mac/android).
       "//chrome/browser/ui/views",
+
+      # TODO(crbug.com/353332589): Remove this circular dependency when the
+      # following headers get componentized:
+      # c/b/ui/browser.h
+      # c/b/ui/views/close_bubble_on_tab_activation_helper.h
       "//chrome/browser/ui/views/bubble",
+
+      # TODO(crbug.com/353332589): Remove this circular dependency when the
+      # following headers get componentized:
+      # c/b/ui/browser.h, browser_tabstrip.h, browser_window.h
+      # c/b/ui/views/frame/browser_view.h
       "//chrome/browser/ui/commerce:impl",
+
+      # TODO(crbug.com/353332589): Remove this circular dependency when the
+      # following headers get componentized:
+      # c/b/ui/browser.h, browser_commands.h, browser_window.h
       "//chrome/browser/ui/sharing_hub:impl",
+
+      # TODO(crbug.com/353332589): Remove this circular dependency when the
+      # following headers get componentized:
+      # c/b/ui/views/content_setting_bubble_contents.h
+      # c/b/ui/views/omnibox/omnibox_view_views.h
+      # c/b/ui/views/permissions/chip/multi_image_container.h
+      # c/b/ui/views/permissions/chip/permission_dashboard_controller.h
+      # c/b/ui/views/permissions/chip/permission_dashboard_view.h
+      # c/b/ui/views/permissions/chip/permission_prompt_chip_model.h
+      # c/b/ui/views/permissions/permission_prompt_bubble_view_factory.h
       "//chrome/browser/ui/views/permissions/chip:impl",
+
+      # TODO(crbug.com/353332589): Remove this circular dependency when the
+      # following headers get componentized:
+      # c/b/ui/browser.h, browser_window.h
+      # c/b/ui/views/bubble_anchor_util_views.h
+      # c/b/ui/views/page_info/page_info_main_view.h
+      # c/b/ui/views/page_info/page_info_merchant_trust_content_view.h
+      # c/b/ui/views/page_info/page_info_merchant_trust_coordinator.h
+      # c/b/ui/views/page_info/page_info_security_content_view.h
       "//chrome/browser/ui/views/page_info:impl",
+
+      # TODO(crbug.com/353332589): Remove this circular dependency when the
+      # following header gets componentized:
+      # c/b/ui/browser.h
       "//chrome/browser/ui/window_name_prompt",
+
+      # TODO(crbug.com/353332589): Remove this circular dependency when the
+      # following headers get componentized:
+      # c/b/ui/browser.h, browser_window.h
       "//chrome/browser/ui/window_metadata",
 
       # TODO(crbug.com/408801109): Remove this circular dependency when the
