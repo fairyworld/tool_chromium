@@ -1806,48 +1806,6 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
   NSMutableArray<OverflowMenuAction*>* appActions =
       [[NSMutableArray alloc] init];
 
-  if (IsIdentityAwarenessEnabled() && self.authenticationService) {
-    NSMutableArray<OverflowMenuAction*>* identityActions =
-        [NSMutableArray array];
-    if (self.authenticationService->GetPrimaryIdentity()) {
-      [self updateIdentityAction];
-      [identityActions addObject:self.identityAction];
-    } else {
-      // Hide identity action if sign-in is not allowed.
-      AuthenticationService::ServiceStatus status =
-          self.authenticationService->GetServiceStatus();
-      switch (status) {
-        case AuthenticationService::ServiceStatus::SigninForcedByPolicy:
-        case AuthenticationService::ServiceStatus::SigninAllowed:
-          [identityActions addObject:self.signinAction];
-          break;
-        case AuthenticationService::ServiceStatus::SigninDisabledByUser:
-        case AuthenticationService::ServiceStatus::SigninDisabledByPolicy:
-        case AuthenticationService::ServiceStatus::SigninDisabledByInternal:
-          break;
-      }
-    }
-    self.identityActionsGroup.actions = identityActions;
-
-    BOOL hasIdentityGroup =
-        [self.model.actionGroups containsObject:self.identityActionsGroup];
-    if ((identityActions.count > 0) && !hasIdentityGroup) {
-      // The identity group is needed, but it is currently not visible.
-      // Add the identity group from the overflow menu model.
-      NSMutableArray<OverflowMenuActionGroup*>* actionGroups =
-          [self.model.actionGroups mutableCopy];
-      [actionGroups insertObject:self.identityActionsGroup atIndex:0];
-      self.model.actionGroups = actionGroups;
-    } else if ((identityActions.count == 0) && hasIdentityGroup) {
-      // The identity group is not needed, but it is currently visible.
-      // Remove the identity group from the overflow menu model.
-      NSMutableArray<OverflowMenuActionGroup*>* actionGroups =
-          [self.model.actionGroups mutableCopy];
-      [actionGroups removeObject:self.identityActionsGroup];
-      self.model.actionGroups = actionGroups;
-    }
-  }
-
   if ((base::FeatureList::IsEnabled(kShareInOverflowMenu) ||
        (IsChromeNextIaEnabled() && !IsChromeNextIaShareIconVisible())) &&
       [self isCurrentURLWebURL]) {
@@ -1887,6 +1845,44 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
   [helpActions addObject:self.shareChromeAction];
 
   self.helpActionsGroup.actions = helpActions;
+
+  NSMutableArray<OverflowMenuActionGroup*>* actionGroups =
+      [[NSMutableArray alloc] init];
+
+  if (IsIdentityAwarenessEnabled() && self.authenticationService) {
+    NSMutableArray<OverflowMenuAction*>* identityActions =
+        [NSMutableArray array];
+    if (self.authenticationService->GetPrimaryIdentity()) {
+      [self updateIdentityAction];
+      [identityActions addObject:self.identityAction];
+    } else {
+      // Hide identity action if sign-in is not allowed.
+      AuthenticationService::ServiceStatus status =
+          self.authenticationService->GetServiceStatus();
+      switch (status) {
+        case AuthenticationService::ServiceStatus::SigninForcedByPolicy:
+        case AuthenticationService::ServiceStatus::SigninAllowed:
+          [identityActions addObject:self.signinAction];
+          break;
+        case AuthenticationService::ServiceStatus::SigninDisabledByUser:
+        case AuthenticationService::ServiceStatus::SigninDisabledByPolicy:
+        case AuthenticationService::ServiceStatus::SigninDisabledByInternal:
+          break;
+      }
+    }
+    self.identityActionsGroup.actions = identityActions;
+
+    if (identityActions.count > 0) {
+      [actionGroups addObject:self.identityActionsGroup];
+    }
+  }
+
+  [actionGroups addObjectsFromArray:@[
+    self.appActionsGroup, self.pageActionsGroup, self.editActionsGroup,
+    self.helpActionsGroup
+  ]];
+
+  self.model.actionGroups = actionGroups;
 }
 
 #pragma mark - AuthenticationServiceObserving
