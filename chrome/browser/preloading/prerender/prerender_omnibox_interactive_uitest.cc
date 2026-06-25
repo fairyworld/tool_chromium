@@ -44,6 +44,7 @@
 #include "chrome/test/base/search_test_utils.h"
 #include "chrome/test/base/ui_test_utils.h"
 #include "components/omnibox/browser/base_search_provider.h"
+#include "components/page_load_metrics/browser/navigation_handle_user_data.h"
 #include "components/performance_manager/public/features.h"
 #include "components/safe_browsing/core/common/safe_browsing_prefs.h"
 #include "components/search_engines/template_url_data.h"
@@ -105,6 +106,27 @@ class AutocompleteActionPredictorObserverImpl
       observation_{this};
 
   base::OnceClosure waiting_;
+};
+
+class TestOmniboxNavigationObserver : public content::WebContentsObserver {
+ public:
+  explicit TestOmniboxNavigationObserver(content::WebContents* web_contents)
+      : content::WebContentsObserver(web_contents) {}
+
+  void DidFinishNavigation(
+      content::NavigationHandle* navigation_handle) override {
+    if (navigation_handle->HasCommitted()) {
+      auto* user_data =
+          page_load_metrics::NavigationHandleUserData::GetForNavigationHandle(
+              *navigation_handle);
+      if (user_data) {
+        navigation_type_ = user_data->navigation_type();
+      }
+    }
+  }
+
+  std::optional<page_load_metrics::NavigationHandleUserData::InitiatorLocation>
+      navigation_type_;
 };
 
 // This is a browser test for Omnibox triggered prerendering. This is
@@ -297,6 +319,9 @@ IN_PROC_BROWSER_TEST_F(PrerenderOmniboxUIBrowserTest,
   WaitForAutocompleteActionPredictorInitialization();
   const GURL kPrerenderingUrl =
       embedded_test_server()->GetURL("/empty.html?prerender");
+
+  TestOmniboxNavigationObserver omnibox_observer(GetActiveWebContents());
+
   GetAutocompleteActionPredictor()->StartPrerendering(kPrerenderingUrl,
                                                       *GetActiveWebContents());
   StartOmniboxNavigationAndWaitForActivation(kPrerenderingUrl);
@@ -305,6 +330,11 @@ IN_PROC_BROWSER_TEST_F(PrerenderOmniboxUIBrowserTest,
                              ui::PAGE_TRANSITION_FROM_ADDRESS_BAR));
   EXPECT_TRUE(IsPrerenderingNavigation());
   EXPECT_EQ(GetActiveWebContents()->GetLastCommittedURL(), kPrerenderingUrl);
+
+  EXPECT_TRUE(omnibox_observer.navigation_type_.has_value());
+  EXPECT_EQ(omnibox_observer.navigation_type_.value(),
+            page_load_metrics::NavigationHandleUserData::InitiatorLocation::
+                kOmniboxDirectUrlInput);
 
   histogram_tester.ExpectUniqueSample(
       internal::kHistogramPrerenderPredictionStatusDirectUrlInput,
