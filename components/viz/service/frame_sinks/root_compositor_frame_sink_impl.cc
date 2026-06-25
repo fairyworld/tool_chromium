@@ -320,6 +320,15 @@ RootCompositorFrameSinkImpl::Create(
 }
 
 RootCompositorFrameSinkImpl::~RootCompositorFrameSinkImpl() {
+#if BUILDFLAG(IS_MAC)
+  if (external_begin_frame_source()) {
+    // Reset update_vsync_params_callback_ as it should not be called in
+    // destructor.
+    external_begin_frame_source()->SetUpdateVSyncParametersCallback(
+        UpdateVSyncParametersCallback());
+  }
+#endif
+
   support_->frame_sink_manager()->UnregisterBeginFrameSource(
       begin_frame_source());
 }
