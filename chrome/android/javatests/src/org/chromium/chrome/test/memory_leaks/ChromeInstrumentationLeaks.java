@@ -35,15 +35,6 @@ public class ChromeInstrumentationLeaks implements LeakCanaryConfigProvider {
     private static String sFieldPersistencePolicyCleanup =
             "org.chromium.chrome.browser.tabmodel.TabbedModeTabPersistencePolicy#sCleanupTask";
 
-    // crbug.com/512490913
-    @IdentifierNameString
-    private static String sClassVoiceHandler =
-            "org.chromium.chrome.browser.omnibox.voice.VoiceRecognitionIntentHandler";
-
-    @IdentifierNameString
-    private static String sFieldVoiceHandler =
-            "org.chromium.chrome.browser.omnibox.voice.VoiceRecognitionIntentHandler#mWindowAndroid";
-
     // crbug.com/512489883
     @IdentifierNameString
     private static String sClassTabBottomSheet =
@@ -72,8 +63,7 @@ public class ChromeInstrumentationLeaks implements LeakCanaryConfigProvider {
 
     @Override
     public Map<String, String> getInstanceFieldLeaks() {
-        return Map.of(
-                sClassVoiceHandler, sFieldVoiceHandler, sClassTabBottomSheet, sFieldTabBottomSheet);
+        return Map.of(sClassTabBottomSheet, sFieldTabBottomSheet);
     }
 
     @Override

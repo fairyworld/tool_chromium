@@ -38,6 +38,7 @@ import org.chromium.base.CallbackController;
 import org.chromium.base.CallbackUtils;
 import org.chromium.base.CommandLine;
 import org.chromium.base.ObserverList;
+import org.chromium.base.ThreadUtils;
 import org.chromium.base.TraceEvent;
 import org.chromium.base.metrics.RecordHistogram;
 import org.chromium.base.metrics.RecordUserAction;
@@ -2932,6 +2933,9 @@ class LocationBarMediator
 
     /* package */ void setVoiceRecognitionHandlerForTesting(
             VoiceRecognitionHandler voiceRecognitionHandler) {
+        if (mVoiceRecognitionHandler != null) {
+            ThreadUtils.runOnUiThreadBlocking(() -> mVoiceRecognitionHandler.destroy());
+        }
         mVoiceRecognitionHandler = voiceRecognitionHandler;
     }
 
