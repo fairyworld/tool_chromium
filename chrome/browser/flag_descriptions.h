@@ -1244,6 +1244,10 @@ inline constexpr char kBookmarksEncryptionName[] = "Bookmarks Encryption";
 inline constexpr char kBookmarksEncryptionDescription[] =
     "Enable encryption for bookmarks";
 
+inline constexpr char kSessionEncryptionName[] = "Session Encryption";
+inline constexpr char kSessionEncryptionDescription[] =
+    "Enable encryption for sessions";
+
 inline constexpr char kBookmarkTabGroupConversionName[] =
     "Bookmark and tab group conversion";
 inline constexpr char kBookmarkTabGroupConversionDescription[] =

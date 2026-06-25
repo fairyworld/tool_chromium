@@ -11928,6 +11928,7 @@ from previous Chrome versions.
   <int value="-823165021" label="MaterialDesignUserMenu:enabled"/>
   <int value="-822712881"
       label="ContextualSearchThinWebViewImplementation:enabled"/>
+  <int value="-822444836" label="EncryptSessionStorage:disabled"/>
   <int value="-822237807" label="UnifiedSidePanel:enabled"/>
   <int value="-822103041" label="SeamlessRefreshRateSwitching:disabled"/>
   <int value="-821635312" label="EyeDropper:enabled"/>
@@ -14262,6 +14263,7 @@ from previous Chrome versions.
   <int value="-72590181" label="DrawCutoutEdgeToEdge:enabled"/>
   <int value="-72581685" label="FilesDriveShortcuts:disabled"/>
   <int value="-72455054" label="WebVrAutopresent:disabled"/>
+  <int value="-71177609" label="EncryptSessionStorage:enabled"/>
   <int value="-70602185" label="LensOverlayVisualSelectionUpdates:disabled"/>
   <int value="-70595606" label="ash-enable-unified-desktop"/>
   <int value="-70434056" label="UseGles2ForOopR:enabled"/>

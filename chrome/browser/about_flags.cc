@@ -175,6 +175,7 @@
 #include "components/sensitive_content/features.h"
 #include "components/services/heap_profiling/public/cpp/switches.h"
 #include "components/services/storage/dom_storage/features.h"
+#include "components/sessions/core/command_storage_features.h"
 #include "components/shared_highlighting/core/common/shared_highlighting_features.h"
 #include "components/sharing_message/features.h"
 #include "components/signin/core/browser/dice_account_reconcilor_delegate.h"
@@ -4608,6 +4609,17 @@ const FeatureEntry::FeatureVariation kBookmarksEncryptionVariations[] = {
     {"Stage1", kBookmarksEncryptionStage1, nullptr},
     {"Stage2", kBookmarksEncryptionStage2, nullptr},
     {"Stage3", kBookmarksEncryptionStage3, nullptr}};
+
+const FeatureEntry::FeatureParam kSessionEncryptionStage1[] = {
+    {"stage", "write_both_read_only_clear"}};
+const FeatureEntry::FeatureParam kSessionEncryptionStage2[] = {
+    {"stage", "write_both_read_prefer_encrypted"}};
+const FeatureEntry::FeatureParam kSessionEncryptionStage3[] = {
+    {"stage", "write_encrypted_read_prefer_encrypted"}};
+const FeatureEntry::FeatureVariation kSessionEncryptionVariations[] = {
+    {"Stage1", kSessionEncryptionStage1, nullptr},
+    {"Stage2", kSessionEncryptionStage2, nullptr},
+    {"Stage3", kSessionEncryptionStage3, nullptr}};
 
 #if BUILDFLAG(IS_ANDROID)
 const FeatureEntry::FeatureParam kGestureUserEducationPageDelay2Seconds[] = {
@@ -12873,6 +12885,11 @@ const FeatureEntry kFeatureEntries[] = {
      FEATURE_WITH_PARAMS_VALUE_TYPE(bookmarks::kEncryptBookmarks,
                                     kBookmarksEncryptionVariations,
                                     "BookmarksEncryption")},
+    {"session-encryption", flag_descriptions::kSessionEncryptionName,
+     flag_descriptions::kSessionEncryptionDescription, kOsAll,
+     FEATURE_WITH_PARAMS_VALUE_TYPE(sessions::kEncryptSessionStorage,
+                                    kSessionEncryptionVariations,
+                                    "SessionEncryption")},
     {"autofill-upstream-enforce-strike-delay",
      flag_descriptions::kAutofillUpstreamEnforceStrikeDelayName,
      flag_descriptions::kAutofillUpstreamEnforceStrikeDelayDescription, kOsAll,
