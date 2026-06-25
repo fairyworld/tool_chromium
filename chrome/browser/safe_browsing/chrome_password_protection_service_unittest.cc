@@ -364,6 +364,11 @@ class ChromePasswordProtectionServiceTest
   }
 
   void TearDown() override {
+    security_event_recorder_ = nullptr;
+    fake_user_event_service_ = nullptr;
+#if !BUILDFLAG(IS_ANDROID)
+    test_event_router_ = nullptr;
+#endif
     base::RunLoop().RunUntilIdle();
     service_.reset();
     request_ = nullptr;
@@ -516,16 +521,16 @@ class ChromePasswordProtectionServiceTest
   std::unique_ptr<LoginReputationClientResponse> verdict_;
   std::unique_ptr<IdentityTestEnvironmentProfileAdaptor>
       identity_test_env_profile_adaptor_;
-  raw_ptr<MockSecurityEventRecorder, DanglingUntriaged>
+  raw_ptr<MockSecurityEventRecorder>
       security_event_recorder_;
   scoped_refptr<password_manager::MockPasswordStoreInterface> password_store_;
   scoped_refptr<password_manager::MockPasswordStoreInterface>
       account_password_store_;
   // Owned by KeyedServiceFactory.
-  raw_ptr<syncer::FakeUserEventService, DanglingUntriaged>
+  raw_ptr<syncer::FakeUserEventService>
       fake_user_event_service_;
 #if !BUILDFLAG(IS_ANDROID)
-  raw_ptr<extensions::TestEventRouter, DanglingUntriaged> test_event_router_;
+  raw_ptr<extensions::TestEventRouter> test_event_router_;
 #endif
 #if BUILDFLAG(IS_ANDROID)
   raw_ptr<MockPasswordCheckupLauncherHelper> mock_checkup_launcher_;
