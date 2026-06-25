@@ -412,16 +412,15 @@ bool DiceHeaderHelper::AppendOrRemoveDiceRequestHeader(
     RequestAdapter* request,
     const GURL& redirect_url,
     const GaiaId& gaia_id,
-    bool sync_feature_enabled,
+    bool sync_enabled,
     AccountConsistencyMethod account_consistency,
     const std::string& device_id) {
-  CHECK(!sync_feature_enabled || !gaia_id.empty());
   const GURL& url = redirect_url.is_empty() ? request->GetUrl() : redirect_url;
   DiceHeaderHelper dice_helper(account_consistency);
   std::string dice_header_value;
   if (dice_helper.IsUrlEligibleForRequestHeader(url)) {
     dice_header_value = dice_helper.BuildRequestHeader(
-        gaia_id, sync_feature_enabled, device_id);
+        sync_enabled ? gaia_id : GaiaId(), device_id);
   }
   return dice_helper.AppendOrRemoveRequestHeader(
       request, redirect_url, kDiceRequestHeader, dice_header_value);
@@ -435,10 +434,8 @@ bool DiceHeaderHelper::IsUrlEligibleForRequestHeader(const GURL& url) {
   return gaia::HasGaiaSchemeHostPort(url);
 }
 
-std::string DiceHeaderHelper::BuildRequestHeader(
-    const GaiaId& primary_account_gaia_id,
-    bool sync_feature_enabled,
-    const std::string& device_id) {
+std::string DiceHeaderHelper::BuildRequestHeader(const GaiaId& sync_gaia_id,
+                                                 const std::string& device_id) {
   std::vector<std::string> parts;
   parts.push_back(base::StringPrintf("version=%s", kDiceProtocolVersion));
   parts.push_back("client_id=" +
@@ -446,8 +443,8 @@ std::string DiceHeaderHelper::BuildRequestHeader(
   if (!device_id.empty()) {
     parts.push_back("device_id=" + device_id);
   }
-  if (sync_feature_enabled && !primary_account_gaia_id.empty()) {
-    parts.push_back("sync_account_id=" + primary_account_gaia_id.ToString());
+  if (!sync_gaia_id.empty()) {
+    parts.push_back("sync_account_id=" + sync_gaia_id.ToString());
   }
 
   if (base::FeatureList::IsEnabled(switches::kDiceLinkedAccounts)) {
