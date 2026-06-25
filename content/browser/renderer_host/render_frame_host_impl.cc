@@ -14799,6 +14799,11 @@ void RenderFrameHostImpl::CreateWebTransportConnector(
 
 void RenderFrameHostImpl::CreateNotificationService(
     mojo::PendingReceiver<blink::mojom::NotificationService> receiver) {
+  if (GetSiteInstance()->GetSiteInfo().is_pdf()) {
+    mojo::ReportBadMessage(
+        "PDF renderers may not bind blink.mojom.NotificationService");
+    return;
+  }
   GetProcess()->CreateNotificationService(
       GetGlobalId(),
       RenderProcessHost::NotificationServiceCreatorType::kDocument,

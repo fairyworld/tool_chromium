@@ -13,6 +13,7 @@
 #include "build/buildflag.h"
 #include "components/input/timeout_monitor.h"
 #include "content/browser/renderer_host/navigation_controller_impl.h"
+#include "content/browser/site_instance_impl.h"
 #include "content/common/content_navigation_policy.h"
 #include "content/common/features.h"
 #include "content/public/browser/cors_origin_pattern_setter.h"
@@ -27,6 +28,8 @@
 #include "content/test/test_render_frame_host.h"
 #include "content/test/test_render_view_host.h"
 #include "content/test/test_web_contents.h"
+#include "mojo/public/cpp/test_support/fake_message_dispatch_context.h"
+#include "mojo/public/cpp/test_support/test_utils.h"
 #include "net/base/features.h"
 #include "net/base/isolation_info.h"
 #include "net/base/network_isolation_partition.h"
@@ -44,6 +47,7 @@
 #include "third_party/blink/public/common/runtime_feature_state/runtime_feature_state_read_context.h"
 #include "third_party/blink/public/common/storage_key/storage_key.h"
 #include "third_party/blink/public/mojom/favicon/favicon_url.mojom.h"
+#include "third_party/blink/public/mojom/notifications/notification_service.mojom.h"
 #include "third_party/blink/public/mojom/webauthn/authenticator.mojom.h"
 #include "url/gurl.h"
 #include "url/origin.h"
@@ -1824,6 +1828,28 @@ TEST_F(RenderFrameHostImplMimeHandlerTest,
   EXPECT_TRUE(extension_frame->frame_tree_node()
                   ->current_replication_state()
                   .is_secure_context_root);
+}
+
+TEST_F(RenderFrameHostImplTest, NotificationServiceBlockedForPdf) {
+  UrlInfo url_info(
+      UrlInfoInit(GURL("https://foo.com/document.pdf"))
+          .WithEmbedderIsolationInfo(EmbedderIsolationInfo::CreateForPdf()));
+  scoped_refptr<SiteInstanceImpl> pdf_instance =
+      SiteInstanceImpl::CreateForUrlInfo(GetBrowserContext(), url_info,
+                                         /*is_guest=*/false,
+                                         /*is_fenced=*/false,
+                                         /*is_fixed_storage_partition=*/false);
+  std::unique_ptr<TestWebContents> pdf_web_contents =
+      TestWebContents::Create(GetBrowserContext(), pdf_instance);
+  TestRenderFrameHost* pdf_rfh = pdf_web_contents->GetPrimaryMainFrame();
+
+  mojo::FakeMessageDispatchContext fake_dispatch_context;
+  mojo::test::BadMessageObserver bad_message_observer;
+  mojo::Remote<blink::mojom::NotificationService> service;
+  pdf_rfh->CreateNotificationService(service.BindNewPipeAndPassReceiver());
+
+  EXPECT_EQ("PDF renderers may not bind blink.mojom.NotificationService",
+            bad_message_observer.WaitForBadMessage());
 }
 
 }  // namespace content
