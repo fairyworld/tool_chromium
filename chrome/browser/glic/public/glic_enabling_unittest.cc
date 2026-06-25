@@ -1038,7 +1038,7 @@ TEST_P(GlicEnablingContextMenuTest, ExpectedBehavior) {
   SetConsent(GetParam().has_user_consented);
   base::HistogramTester histogram_tester;
   bool expected = GetParam().expected_result;
-  EXPECT_EQ(expected, GlicEnabling::IsContextualMenuItemEnabled(profile()))
+  EXPECT_EQ(expected, GlicEnabling::IsContextualMenuItemEnabled(profile(), u""))
       << "Failed for case: " << GetParam().name;
   histogram_tester.ExpectUniqueSample("Glic.WebContentContextMenu.Enabled",
                                       expected, 1);

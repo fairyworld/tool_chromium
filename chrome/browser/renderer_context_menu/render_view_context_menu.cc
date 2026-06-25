@@ -4956,10 +4956,12 @@ void RenderViewContextMenu::ExecSaveAs() {
 }
 
 void RenderViewContextMenu::ExecGlic() {
-  if (glic::GlicEnabling::IsContextualMenuItemEnabled(GetProfile())) {
+  if (glic::GlicEnabling::IsContextualMenuItemEnabled(GetProfile(),
+                                                      params_.selection_text)) {
     glic_item_executed_ = true;
     glic::GlicContextMenuInvocationHelper::HandleContextualMenuClick(
-        tabs::TabInterface::MaybeGetFromContents(source_web_contents_));
+        tabs::TabInterface::MaybeGetFromContents(source_web_contents_),
+        params_.selection_text, GetRenderFrameHost()->GetGlobalId());
   }
 }
 
@@ -5384,18 +5386,35 @@ void RenderViewContextMenu::MaybeAppendOpenGlicItem(bool add_separator) {
     return;
   }
 
-  if (glic::GlicEnabling::IsContextualMenuItemEnabled(GetProfile()) &&
+  if (glic::GlicEnabling::IsContextualMenuItemEnabled(GetProfile(),
+                                                      params_.selection_text) &&
       !IsGlicWindow(this, browser_context_)) {
-    std::string arm = features::kGlicContextMenuArm.Get();
-    bool show_summarize_page = (arm == "arm2");
-    menu_model_.AddItemWithStringIdAndIcon(
-        IDC_CONTENT_CONTEXT_GLIC,
-        show_summarize_page ? IDS_GLIC_CONTEXT_MENU_SUMMARIZE_PAGE_WITH_GEMINI
-                            : IDS_GLIC_BUTTON_ENTRYPOINT_ASK_GEMINI_LABEL,
-        ui::ImageModel::FromVectorIcon(
-            glic::GlicVectorIconManager::GetVectorIcon(
-                IDR_GLIC_BUTTON_VECTOR_ICON),
-            ui::kColorMenuIcon, kTabMenuIconSize));
+    const bool show_text_selection_menu_item =
+        base::FeatureList::IsEnabled(features::kGlicTextSelectionContextMenu) &&
+        !params_.selection_text.empty();
+
+    const std::string arm = features::kGlicContextMenuArm.Get();
+    const bool show_summarize_page = (arm == "arm2");
+
+    std::u16string label;
+    if (show_text_selection_menu_item) {
+      std::u16string printable_selection_text = PrintableSelectionText();
+      EscapeAmpersands(&printable_selection_text);
+      label = l10n_util::GetStringFUTF16(IDS_GLIC_CONTEXT_MENU_ASK_GEMINI_ABOUT,
+                                         printable_selection_text);
+    } else if (show_summarize_page) {
+      label = l10n_util::GetStringUTF16(
+          IDS_GLIC_CONTEXT_MENU_SUMMARIZE_PAGE_WITH_GEMINI);
+    } else {
+      label = l10n_util::GetStringUTF16(
+          IDS_GLIC_BUTTON_ENTRYPOINT_ASK_GEMINI_LABEL);
+    }
+
+    menu_model_.AddItemWithIcon(IDC_CONTENT_CONTEXT_GLIC, label,
+                                ui::ImageModel::FromVectorIcon(
+                                    glic::GlicVectorIconManager::GetVectorIcon(
+                                        IDR_GLIC_BUTTON_VECTOR_ICON),
+                                    ui::kColorMenuIcon, kTabMenuIconSize));
     menu_model_.SetIsNewFeatureAt(
         menu_model_.GetItemCount() - 1,
         UserEducationService::MaybeShowNewBadge(GetBrowserContext(),

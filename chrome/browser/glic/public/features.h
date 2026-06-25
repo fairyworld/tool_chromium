@@ -57,6 +57,8 @@ BASE_DECLARE_FEATURE(kGlicContextMenu);
 extern const base::FeatureParam<std::string> kGlicContextMenuArm;
 extern const base::FeatureParam<bool> kGlicContextMenuWithOnboarding;
 
+BASE_DECLARE_FEATURE(kGlicTextSelectionContextMenu);
+
 BASE_DECLARE_FEATURE(kGlicTieredRolloutV2);
 extern const base::FeatureParam<std::string> kGlicTieredRolloutV2EligibleTiers;
 const base::flat_set<int32_t>& GetGlicTieredRolloutV2EligibleTiers();

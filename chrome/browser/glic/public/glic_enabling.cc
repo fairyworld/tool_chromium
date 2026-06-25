@@ -1017,9 +1017,15 @@ bool GlicEnabling::IsAutoOpenForPdfEnabled(Profile* profile) {
 }
 
 // static
-bool GlicEnabling::IsContextualMenuItemEnabled(Profile* profile) {
-  bool enabled = IsEnabledForProfile(profile) &&
-                 base::FeatureList::IsEnabled(features::kGlicContextMenu);
+bool GlicEnabling::IsContextualMenuItemEnabled(
+    Profile* profile, const std::u16string& selection_text) {
+  const bool text_selection_menu_enabled =
+      base::FeatureList::IsEnabled(features::kGlicTextSelectionContextMenu) &&
+      !selection_text.empty();
+  const bool enabled =
+      IsEnabledForProfile(profile) &&
+      (base::FeatureList::IsEnabled(features::kGlicContextMenu) ||
+       text_selection_menu_enabled);
   base::UmaHistogramBoolean("Glic.WebContentContextMenu.Enabled", enabled);
   return enabled;
 }
