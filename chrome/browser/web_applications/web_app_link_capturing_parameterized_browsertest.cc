@@ -1612,13 +1612,6 @@ class NavCaptureParameterizedBrowserTest
              "Add the switch '--run-all-tests' to run disabled tests too.";
     }
 
-#if BUILDFLAG(IS_CHROMEOS)
-    if (GetClientModeCombination() == ClientModeCombination::kNotSpecified) {
-      GTEST_SKIP() << "Unspecified client mode support is not yet implemented "
-                      "for ChromeOS";
-    }
-#endif  // BUILDFLAG(IS_CHROMEOS)
-
     AssertValidTestConfiguration();
     if (testing::Test::HasFatalFailure()) {
       return;
@@ -1672,12 +1665,6 @@ class NavCaptureParameterizedBrowserTest
     switch (GetLinkCapturing()) {
       case LinkCapturing::kEnabled:
       case LinkCapturing::kEnabledViaClientMode:
-#if BUILDFLAG(IS_CHROMEOS)
-        ASSERT_EQ(apps::test::EnableLinkCapturingByUser(profile(), app_a),
-                  base::ok());
-        ASSERT_EQ(apps::test::EnableLinkCapturingByUser(profile(), app_b),
-                  base::ok());
-#endif
         break;
       case LinkCapturing::kDisabled:
         ASSERT_EQ(apps::test::DisableLinkCapturingByUser(profile(), app_a),
