@@ -2649,6 +2649,7 @@ _GENERIC_PYDEPS_FILES = [
     'tools/flags/generate_expired_list.pydeps',
     'tools/grit/grit_info.pydeps',
     'tools/grit/grit.pydeps',
+    'tools/grit/preprocess_if_expr.pydeps',
     "tools/metrics/histograms/generate_allowlist_from_histograms_file.pydeps",
     'tools/perf/process_perf_results.pydeps',
     'tools/pgo/generate_profile.pydeps',
