@@ -285,7 +285,7 @@ bool IsAccessibilityFlashScreenFeatureEnabled() {
 }
 
 BASE_FEATURE(kAccessibilityInvertedMouseCursor,
-             base::FEATURE_DISABLED_BY_DEFAULT);
+             base::FEATURE_ENABLED_BY_DEFAULT);
 bool IsAccessibilityInvertedMouseCursorEnabled() {
   return base::FeatureList::IsEnabled(
       ::features::kAccessibilityInvertedMouseCursor);
