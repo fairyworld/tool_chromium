@@ -317,6 +317,10 @@ void SpellCheckProvider::CheckSpelling(
     spellcheck::PerLanguageSuggestions per_language_suggestions;
     spellcheck_->SpellCheckWord(word, GetSpellCheckHost(), &offset, &length,
                                 &per_language_suggestions);
+    ApplyDocumentCustomWords(word, offset, length);
+    if (length == 0) {
+      per_language_suggestions.clear();
+    }
 
 #if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
     spellcheck_renderer_metrics::RecordHunspellSuggestionDuration(
@@ -331,6 +335,7 @@ void SpellCheckProvider::CheckSpelling(
   } else {
     spellcheck_->SpellCheckWord(word, GetSpellCheckHost(), &offset, &length,
                                 /* optional suggestions vector */ nullptr);
+    ApplyDocumentCustomWords(word, offset, length);
     spellcheck_renderer_metrics::RecordCheckedTextLengthNoSuggestions(
         base::saturated_cast<int>(word.size()));
 
@@ -351,6 +356,20 @@ void SpellCheckProvider::RequestCheckingOfText(
                       should_force_refresh, std::move(completion));
   spellcheck_renderer_metrics::RecordAsyncCheckedTextLength(
       base::saturated_cast<int>(text.length()));
+}
+
+void SpellCheckProvider::ApplyDocumentCustomWords(const std::u16string& word,
+                                                  size_t& offset,
+                                                  size_t& length) const {
+  // An optimization to avoid a substring allocation and set lookup
+  // on this per-word path; behavior is unchanged if it is removed.
+  if (length == 0 || document_custom_words_.empty()) {
+    return;
+  }
+  if (document_custom_words_.contains(word.substr(offset, length))) {
+    offset = 0;
+    length = 0;
+  }
 }
 
 void SpellCheckProvider::SpellCheckCustomDictionaryChanged(

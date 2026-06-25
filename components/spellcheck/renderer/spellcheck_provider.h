@@ -92,6 +92,12 @@ class SpellCheckProvider : public content::RenderFrameObserver,
   // Returns the SpellCheckHost.
   spellcheck::mojom::SpellCheckHost& GetSpellCheckHost();
 
+  // The per-document custom dictionary word set supplied by the
+  // SpellCheckCustomDictionary web API.
+  const std::set<std::u16string>& document_custom_words() const {
+    return document_custom_words_;
+  }
+
  private:
   friend class TestingSpellCheckProvider;
   class DictionaryUpdateObserverImpl;
@@ -131,6 +137,13 @@ class SpellCheckProvider : public content::RenderFrameObserver,
   void SpellCheckCustomDictionaryChanged(
       const std::vector<std::string>& words_added,
       const std::vector<std::string>& words_removed) override;
+
+  // If the misspelled span [offset, offset+length) of |word| matches an entry
+  // in |document_custom_words_|, clears |offset|/|length| so the word counts
+  // as correctly spelled.
+  void ApplyDocumentCustomWords(const std::u16string& word,
+                                size_t& offset,
+                                size_t& length) const;
 
 #if BUILDFLAG(USE_RENDERER_SPELLCHECKER)
   void OnRespondSpellingService(int identifier,
