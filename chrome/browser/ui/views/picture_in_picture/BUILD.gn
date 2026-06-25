@@ -66,6 +66,12 @@ source_set("picture_in_picture") {
       "//extensions/common",
     ]
   }
+
+  if (is_mac) {
+    public += [ "document_pip_native_widget_mac.h" ]
+    sources += [ "document_pip_native_widget_mac.mm" ]
+    deps += [ "//components/remote_cocoa/common:mojo" ]
+  }
 }
 
 source_set("unit_tests") {

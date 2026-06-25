@@ -7,6 +7,7 @@
 #include "base/functional/callback_helpers.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
+#include "chrome/browser/picture_in_picture/picture_in_picture_window_manager.h"
 #include "chrome/browser/ssl/chrome_security_state_tab_helper.h"
 #include "chrome/browser/ui/views/picture_in_picture/document_pip_contents_view.h"
 #include "chrome/browser/ui/views/picture_in_picture/document_pip_widget_delegate.h"
@@ -27,6 +28,7 @@
 #include "third_party/blink/public/mojom/window_features/window_features.mojom.h"
 #include "ui/base/mojom/window_show_state.mojom.h"
 #include "ui/base/page_transition_types.h"
+#include "ui/display/screen.h"
 #include "ui/views/controls/webview/webview.h"
 #include "ui/views/widget/widget.h"
 #include "ui/views/window/non_client_view.h"
@@ -157,6 +159,16 @@ class DocumentPipHostTest : public ChromeViewsTestBase {
     auto* host = DocumentPipHost::FromWebContents(opener());
     auto child =
         content::WebContentsTester::CreateTestWebContents(&profile_, nullptr);
+    // Seed the PictureInPictureWindowManager's opener display, which production
+    // sets via CalculateInitialPictureInPictureWindowBounds() before the host
+    // is created (see
+    // PictureInPictureWindowManager::EnterDocumentPictureInPicture).
+    // DocumentPipFrameView::UpdateWindowBoundsForRequestedInnerSize(), run
+    // during CreateAndShowPipWindow() below, CHECK()s that it is set.
+    PictureInPictureWindowManager::GetInstance()
+        ->CalculateInitialPictureInPictureWindowBounds(
+            MakeDefaultPipOptions(),
+            display::Screen::Get()->GetPrimaryDisplay());
     host->CreateAndShowPipWindow(std::move(child), MakeDefaultPipOptions(),
                                  MakeDefaultInitialBounds());
     return host;

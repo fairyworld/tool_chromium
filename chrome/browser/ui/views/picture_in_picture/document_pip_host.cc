@@ -8,6 +8,7 @@
 
 #include "base/functional/bind.h"
 #include "base/memory/raw_ptr.h"
+#include "build/build_config.h"
 #include "chrome/browser/media/webrtc/media_capture_devices_dispatcher.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/ui/views/picture_in_picture/document_pip_contents_view.h"
@@ -31,6 +32,10 @@
 #include "ui/views/widget/widget.h"
 #include "ui/views/window/non_client_view.h"
 #include "url/origin.h"
+
+#if BUILDFLAG(IS_MAC)
+#include "chrome/browser/ui/views/picture_in_picture/document_pip_native_widget_mac.h"
+#endif
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "extensions/browser/extension_registry.h"
@@ -143,7 +148,26 @@ void DocumentPipHost::CreateAndShowPipWindow(
   params.bounds = initial_bounds;
 
   widget_ = std::make_unique<views::Widget>();
+#if BUILDFLAG(IS_MAC)
+  // Give the borderless PiP window the default macOS styling (rounded corners +
+  // drop shadow) so it matches the Browser-backed Document PiP window. The
+  // Widget takes ownership of the native widget. Safety: the native widget's
+  // delegate is `widget_`, which owns it, so it cannot outlive the widget.
+  params.native_widget = new DocumentPipNativeWidgetMac(widget_.get());
+#endif
   widget_->Init(std::move(params));
+  // Now that the Widget (and its native window) exist and Init has applied the
+  // InitParams bounds, recompute the outer bounds to honor a requested inner
+  // (web-contents) size. This must run *after* Init: Init applies the
+  // InitParams bounds last, so doing this from the frame view's AddedToWidget()
+  // (which fires mid-Init) would be clobbered, leaving the window one top-bar
+  // height too short. Mirrors the Browser-backed recompute in
+  // PictureInPictureBrowserFrameView::OnBrowserViewInitialized.
+  if (auto* frame_view = views::AsViewClass<DocumentPipFrameView>(
+          widget_->non_client_view()->frame_view())) {
+    frame_view->UpdateWindowBoundsForRequestedInnerSize();
+  }
+
   // Intercept external close paths (OS close button, DialogDelegate, etc.) so
   // they route through our teardown logic.
   // Safety: `this` owns `widget_` via unique_ptr, so the widget (and its
