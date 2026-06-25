@@ -456,6 +456,15 @@ struct TransposeParams {
   bool is_input_constant;
 };
 
+struct TriangularParams {
+  OperandDataType data_type;
+  uint32_t rank;
+  std::array<uint32_t, 8> input_dims;
+  bool upper;
+  int32_t diagonal;
+  bool is_input_constant;
+};
+
 SupportedDataTypes GetElementWiseBinaryDataTypes(
     mojom::ElementWiseBinary::Kind kind) {
   const auto& limits = GetContextPropertiesForTesting().data_type_limits;
@@ -1187,6 +1196,23 @@ auto AnyTransposeParams() {
       fuzztest::ArrayOf<8>(AnyDimSize()),                       // input_dims
       fuzztest::ArrayOf<8>(fuzztest::InRange<uint32_t>(0, 7)),  // permutation
       fuzztest::Arbitrary<bool>()  // is_input_constant
+  );
+}
+
+auto AnyTriangularParams() {
+  const auto& limits = GetContextPropertiesForTesting().data_type_limits;
+  return fuzztest::StructOf<TriangularParams>(
+      AnyOperandDataTypeFor(limits.triangular_input.data_types),
+      // Triangular requires a rank of at least 2.
+      fuzztest::InRange<uint32_t>(2, 8),   // rank
+      fuzztest::ArrayOf<8>(AnyDimSize()),  // input_dims
+      fuzztest::Arbitrary<bool>(),         // upper
+      // The small range biases toward diagonals that land inside the matrix
+      // (exercising the real masking path), while the arbitrary range keeps
+      // extreme values reachable to probe offset overflow.
+      fuzztest::OneOf(fuzztest::InRange<int32_t>(-10, 10),
+                      fuzztest::Arbitrary<int32_t>()),  // diagonal
+      fuzztest::Arbitrary<bool>()                       // is_input_constant
   );
 }
 
@@ -2462,6 +2488,7 @@ class WebNNGraphImplFuzzerImpl
   void Slice(SliceParams params, uint8_t seed_for_data);
   void Split(SplitParams params, uint8_t seed_for_data);
   void Transpose(TransposeParams params, uint8_t seed_for_data);
+  void Triangular(TriangularParams params, uint8_t seed_for_data);
   void DQConcatQ(ConcatParams concat_params,
                  OperandDataType quantized_type,
                  uint8_t seed_for_input,
@@ -4014,6 +4041,44 @@ void WebNNGraphImplFuzzerImpl<BaseFixture>::Transpose(TransposeParams params,
 }
 
 template <typename BaseFixture>
+void WebNNGraphImplFuzzerImpl<BaseFixture>::Triangular(TriangularParams params,
+                                                       uint8_t seed_for_data) {
+  std::vector<uint32_t> input_dims(params.input_dims.begin(),
+                                   params.input_dims.begin() + params.rank);
+
+  ASSIGN_OR_RETURN_VOID(auto input_desc, OperandDescriptor::Create(
+                                             this->context_properties(),
+                                             params.data_type, input_dims, ""));
+
+  ASSIGN_OR_RETURN_VOID(auto output_desc,
+                        ValidateTriangularAndInferOutput(
+                            this->context_properties(), input_desc, ""));
+
+  mojo::Remote<mojom::WebNNGraphBuilder> remote =
+      this->BindNewGraphBuilderRemote();
+  GraphInfoBuilder builder(remote);
+
+  base::flat_map<std::string, base::span<const uint8_t>> named_inputs;
+  std::vector<std::vector<uint8_t>> data_buffers;
+  OperandId input_id = BuildInputOrConstant(builder, params.is_input_constant,
+                                            "input", input_desc, seed_for_data,
+                                            data_buffers, named_inputs);
+
+  OperandId output_id = builder.BuildOutput("output", output_desc.shape(),
+                                            output_desc.data_type());
+
+  builder.BuildTriangular(input_id, output_id, params.upper, params.diagonal);
+
+  if (!builder.IsValidGraphForTesting(this->context_properties())) {
+    return;
+  }
+  BuildAndCompute(this->context_, std::move(remote), builder.TakeGraphInfo(),
+                  std::move(named_inputs));
+
+  GetGlobalFuzzEnvironment().GetWebNNTestEnvironment().RunUntilIdle();
+}
+
+template <typename BaseFixture>
 void WebNNGraphImplFuzzerImpl<BaseFixture>::DQConcatQ(
     ConcatParams concat_params,
     OperandDataType quantized_type,
@@ -5348,6 +5413,19 @@ WEBNN_FUZZ_TEST_F(Transpose,
                                        /*is_input_constant=*/false,
                                    },
                                    /*seed_for_data=*/4}}));
+
+WEBNN_FUZZ_TEST_F(Triangular,
+                  .WithDomains(AnyTriangularParams(),
+                               fuzztest::Arbitrary<uint8_t>())
+                      .WithSeeds({{TriangularParams{
+                                       /*data_type=*/OperandDataType::kFloat32,
+                                       /*rank=*/4,
+                                       /*input_dims=*/{2, 4, 4, 6, 1, 1, 1, 1},
+                                       /*upper=*/true,
+                                       /*diagonal=*/2,
+                                       /*is_input_constant=*/false,
+                                   },
+                                   /*seed_for_data=*/5}}));
 
 WEBNN_FUZZ_TEST_F(
     DQConcatQ,
