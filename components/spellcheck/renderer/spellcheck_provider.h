@@ -6,6 +6,8 @@
 #define COMPONENTS_SPELLCHECK_RENDERER_SPELLCHECK_PROVIDER_H_
 
 #include <memory>
+#include <set>
+#include <string>
 #include <vector>
 
 #include "base/containers/id_map.h"
@@ -18,11 +20,6 @@
 #include "mojo/public/cpp/bindings/pending_remote.h"
 #include "mojo/public/cpp/bindings/remote.h"
 #include "third_party/blink/public/web/web_text_check_client.h"
-
-#if BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-#include <set>
-#include <string>
-#endif  // BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 
 #if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 #include <unordered_map>
@@ -90,9 +87,7 @@ class SpellCheckProvider : public content::RenderFrameObserver,
 
   // content::RenderFrameObserver:
   void FocusedElementChanged(const blink::WebElement& element) override;
-#if BUILDFLAG(USE_BROWSER_SPELLCHECKER)
   void DidCreateNewDocument() override;
-#endif  // BUILDFLAG(USE_BROWSER_SPELLCHECKER)
 
   // Returns the SpellCheckHost.
   spellcheck::mojom::SpellCheckHost& GetSpellCheckHost();
@@ -194,11 +189,15 @@ class SpellCheckProvider : public content::RenderFrameObserver,
   // Dictionary updated observer.
   std::unique_ptr<DictionaryUpdateObserverImpl> dictionary_update_observer_;
 
-#if BUILDFLAG(USE_BROWSER_SPELLCHECKER)
-  // Per-document word set supplied by the SpellCheckCustomDictionary web API.
-  // Reset on cross-document navigation.
+  // Live per-document word set supplied by the SpellCheckCustomDictionary web
+  // API. Maintained on every platform: its size enforces
+  // kMaxDocumentCustomDictionaryWords, and because additions and removals both
+  // move the size, the cap bounds the resident set rather than lifetime churn.
   std::set<std::u16string> document_custom_words_;
-#endif  // BUILDFLAG(USE_BROWSER_SPELLCHECKER)
+
+  // Tracks whether a console warning has already been emitted for this
+  // document.
+  bool document_custom_dictionary_overflow_warned_ = false;
 
 #if BUILDFLAG(IS_WIN) && BUILDFLAG(USE_BROWSER_SPELLCHECKER)
   std::unordered_map<int, HybridSpellCheckRequestInfo> hybrid_requests_info_;

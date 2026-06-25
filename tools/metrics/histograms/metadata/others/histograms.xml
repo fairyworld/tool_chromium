@@ -7084,6 +7084,20 @@ useful for Chirp alerts (go/crca-alerts). -->
   </summary>
 </histogram>
 
+<histogram name="Spellcheck.DocumentCustomDictionary.WordCount" units="words"
+    expires_after="2027-06-01">
+  <owner>shend@chromium.org</owner>
+  <owner>zsun@igalia.com</owner>
+  <summary>
+    Number of words accepted into a single RenderFrame's per-document custom
+    dictionary, which is populated via the SpellCheckCustomDictionary web API.
+
+    Recorded once per document, when the document is replaced by a new document
+    (navigation) or the frame is torn down. Documents that never added a word
+    through the API are not recorded.
+  </summary>
+</histogram>
+
 <histogram name="SpellCheck.Enabled2" enum="BooleanEnabled"
     expires_after="2024-12-01">
   <owner>shend@chromium.org</owner>
