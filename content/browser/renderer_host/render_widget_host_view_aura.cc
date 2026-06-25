@@ -2477,7 +2477,10 @@ void RenderWidgetHostViewAura::OnMouseEvent(ui::MouseEvent* event) {
     StylusHandwritingControllerWin::Initialize();
   }
 #endif
-  last_pointer_type_ = ui::EventPointerType::kMouse;
+  last_pointer_type_ =
+      base::FeatureList::IsEnabled(features::kMouseEventPenPointerType)
+          ? event->pointer_details().pointer_type
+          : ui::EventPointerType::kMouse;
   event_handler_->OnMouseEvent(event);
 }
 
