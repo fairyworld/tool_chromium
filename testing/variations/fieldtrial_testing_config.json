@@ -17995,6 +17995,29 @@
             ]
         }
     ],
+    "OptimizationGuideProactivePersonalizedHintsFetching": [
+        {
+            "platforms": [
+                "android",
+                "chromeos",
+                "ios",
+                "linux",
+                "mac",
+                "windows"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled_20260625",
+                    "params": {
+                        "allowed_optimization_types": "SHOPPING_DISCOUNTS"
+                    },
+                    "enable_features": [
+                        "OptimizationGuideProactivePersonalizedHintsFetching"
+                    ]
+                }
+            ]
+        }
+    ],
     "OptimizeAssociateWindowsAndroid": [
         {
             "platforms": [
