@@ -1328,13 +1328,15 @@ void BrowserViewTabbedLayoutImpl::ConfigureTopContainerBackground(
   // fullscreen.
   if (layout_data_->tab_strip_type == TabStripType::kVertical &&
       layout_data_->window_state == WindowState::kNormal) {
-    corners.upper_trailing = background->GetWindowCorner(/*upper=*/true);
+    corners[CornerOrientation::kTopTrailing] =
+        background->GetWindowCorner(/*upper=*/true);
     const bool vertical_tab_strip_reaches_top =
         GetVerticalTabStripCollapsedState() !=
             VerticalTabStripCollapsedState::kCollapsed ||
         params.leading_exclusion.IsEmpty();
     if (!vertical_tab_strip_reaches_top) {
-      corners.upper_leading = background->GetWindowCorner(/*upper=*/true);
+      corners[CornerOrientation::kTopLeading] =
+          background->GetWindowCorner(/*upper=*/true);
     }
   }
 
@@ -1406,22 +1408,23 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
     CustomCornersBackground::Corners vertical_tabs_corners;
     if (layout_data_->window_state == WindowState::kNormal) {
       if (animation.top_offset == 0) {
-        vertical_tabs_corners.upper_leading =
+        vertical_tabs_corners[CornerOrientation::kTopLeading] =
             vertical_tabs_background->GetWindowCorner(/*upper=*/true);
       }
-      vertical_tabs_corners.lower_leading =
+      vertical_tabs_corners[CornerOrientation::kBottomLeading] =
           vertical_tabs_background->GetWindowCorner(/*upper=*/false);
     }
 
     // When the vertical tabs are below the toolbar but next to the bookmarks
     // bar, draw a curved corner.
     if (animation.top_corner < 0.0) {
-      vertical_tabs_corners.upper_trailing.type =
+      vertical_tabs_corners[CornerOrientation::kTopTrailing].type =
           views().vertical_tab_strip_region_view->is_expanded_on_hover()
               ? CustomCornersBackground::CornerType::kRounded
               : CustomCornersBackground::CornerType::kRoundedWithBackground;
-      vertical_tabs_corners.upper_trailing.radius = base::ClampRound(
-          vertical_tabs_background->default_radius() * -animation.top_corner);
+      vertical_tabs_corners[CornerOrientation::kTopTrailing].radius =
+          base::ClampRound(vertical_tabs_background->default_radius() *
+                           -animation.top_corner);
     }
 
     // When the vertical tabs are expanded for hover, it may have a concave
@@ -1430,12 +1433,12 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
     int vertical_tabs_bottom_corner_size = 0;
     if (animation.bottom_corner < 0.0) {
       vertical_tabs_bottom_corner_amount = -animation.bottom_corner;
-      vertical_tabs_corners.lower_trailing.type =
+      vertical_tabs_corners[CornerOrientation::kBottomTrailing].type =
           CustomCornersBackground::CornerType::kRounded;
       vertical_tabs_bottom_corner_size =
           base::ClampRound(vertical_tabs_background->default_radius() *
                            vertical_tabs_bottom_corner_amount);
-      vertical_tabs_corners.lower_trailing.radius =
+      vertical_tabs_corners[CornerOrientation::kBottomTrailing].radius =
           vertical_tabs_bottom_corner_size;
     }
 
@@ -1547,7 +1550,7 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
       if (toolbar_bounds.y() <= tabstrip_bounds.bottom()) {
         // Trailing curve is always shown for normal horizontal tabstrip when
         // the two are vertically adjacent.
-        toolbar_corners.upper_trailing.type =
+        toolbar_corners[CornerOrientation::kTopTrailing].type =
             CustomCornersBackground::CornerType::kRoundedWithBackground;
 
         // If there is anything on the leading side or the first tab is not
@@ -1555,7 +1558,7 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
         // corner radius. (Don't show if the left edges don't line up.)
         if (!delegate().IsActiveTabAtLeadingWindowEdge() &&
             toolbar_bounds.x() <= tabstrip_bounds.x()) {
-          toolbar_corners.upper_leading.type =
+          toolbar_corners[CornerOrientation::kTopLeading].type =
               CustomCornersBackground::CornerType::kRoundedWithBackground;
         }
       }
@@ -1567,7 +1570,7 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
       if (layout_data_->window_state == WindowState::kNormal &&
           IsParentedTo(views().top_container, views().browser_view) &&
           params.trailing_exclusion.IsEmpty()) {
-        toolbar_corners.upper_trailing =
+        toolbar_corners[CornerOrientation::kTopTrailing] =
             toolbar_background->GetWindowCorner(/*upper=*/true);
       }
       break;
@@ -1653,10 +1656,10 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
       // area, it also doesn't get rounded corners.
       if (views().main_background_region->y() <= views().top_container->y()) {
         if (!delegate().IsActiveTabAtLeadingWindowEdge()) {
-          main_background_corners.upper_leading.type =
+          main_background_corners[CornerOrientation::kTopLeading].type =
               CustomCornersBackground::CornerType::kRoundedWithBackground;
         }
-        main_background_corners.upper_trailing.type =
+        main_background_corners[CornerOrientation::kTopTrailing].type =
             CustomCornersBackground::CornerType::kRoundedWithBackground;
       }
     }
@@ -1665,10 +1668,10 @@ void BrowserViewTabbedLayoutImpl::DoPostLayoutVisualAdjustments(
     // windows.
     if (layout_data_->window_state == WindowState::kNormal) {
       if (layout_data_->tab_strip_type != TabStripType::kVertical) {
-        main_background_corners.lower_leading =
+        main_background_corners[CornerOrientation::kBottomLeading] =
             main_background->GetWindowCorner(/*upper=*/false);
       }
-      main_background_corners.lower_trailing =
+      main_background_corners[CornerOrientation::kBottomTrailing] =
           main_background->GetWindowCorner(/*upper=*/false);
     }
 

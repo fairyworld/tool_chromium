@@ -118,7 +118,7 @@ MultiContentsView::MultiContentsView(
 
   contents_separators_.corner_separator =
       AddChildView(std::make_unique<CustomFloatingCorner>(
-          *browser_view_, CustomFloatingCorner::CornerOrientation::kTopLeading,
+          *browser_view_, CornerOrientation::kTopLeading,
           views::ShapeContextTokens::kContentSeparatorRadius,
           CustomFloatingCorner::ToolbarTheme(),
           kColorToolbarContentAreaSeparator));
@@ -687,15 +687,13 @@ gfx::Rect MultiContentsView::CalculateSeparatorLayouts(
     if (should_show_leading) {
       corner_layout.bounds =
           gfx::Rect(available_space.origin(), corner_preferred_size);
-      corner_separator->SetOrientation(
-          CustomFloatingCorner::CornerOrientation::kTopLeading);
+      corner_separator->SetOrientation(CornerOrientation::kTopLeading);
     } else {
       corner_layout.bounds = gfx::Rect(
           gfx::Point(available_space.right() - corner_preferred_size.width(),
                      available_space.y()),
           corner_preferred_size);
-      corner_separator->SetOrientation(
-          CustomFloatingCorner::CornerOrientation::kTopTrailing);
+      corner_separator->SetOrientation(CornerOrientation::kTopTrailing);
     }
   }
   child_layouts.push_back(corner_layout);
