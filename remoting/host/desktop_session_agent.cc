@@ -273,13 +273,11 @@ void DesktopSessionAgent::Start(
     const base::FilePath& socket_name =
         SecurityKeyAuthHandlerPosix::GetSecurityKeySocketName();
     if (!socket_name.empty()) {
-      // While SecurityKeyAuthHandlerPosix already takes a `file_task_runner`,
-      // it is only used for creating and deleting files, while all the socket
-      // operations are still done on the caller's sequence. So we need to wrap
-      // it with a SequenceBound.
+      // Since all socket operations in SecurityKeyAuthHandlerPosix are done on
+      // the caller's sequence, we wrap it with a SequenceBound to run it on the
+      // IO thread.
       security_key_auth_handler_ =
-          base::SequenceBound<SecurityKeyAuthHandlerPosix>(io_task_runner_,
-                                                           io_task_runner_);
+          base::SequenceBound<SecurityKeyAuthHandlerPosix>(io_task_runner_);
 
       security_key_auth_handler_
           .AsyncCall(&SecurityKeyAuthHandler::SetSendMessageCallback)

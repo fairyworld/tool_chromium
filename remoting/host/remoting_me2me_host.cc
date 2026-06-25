@@ -2052,8 +2052,7 @@ void HostProcess::StartHost() {
 
   if (security_key_auth_policy_enabled_ &&
       desktop_environment_options_.enable_security_key()) {
-    host_->AddExtension(
-        std::make_unique<SecurityKeyExtension>(context_->file_task_runner()));
+    host_->AddExtension(std::make_unique<SecurityKeyExtension>());
   }
 
   host_->AddExtension(std::make_unique<TestEchoExtension>());
