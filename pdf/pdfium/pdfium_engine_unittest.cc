@@ -3208,17 +3208,20 @@ class PDFiumEngineInkDrawTextTest : public PDFiumTestBase {
   };
 
   static DrawTextData GetGlyphsForText(std::string_view text, float font_size) {
-    CHECK(base::IsStringASCII(text));
-    sk_sp<SkTypeface> default_typeface = skia::DefaultTypeface();
-    std::vector<SkGlyphID> sk_glyphs(text.size());
-    size_t glyph_count = default_typeface->textToGlyphs(
-        text.data(), text.size(), SkTextEncoding::kUTF8,
-        SkSpan<SkGlyphID>(sk_glyphs));
-    CHECK_EQ(glyph_count, sk_glyphs.size());  // Since `text` is ASCII.
+    CHECK(!text.empty());
+    SkFont default_font(skia::DefaultTypeface(), font_size);
 
-    SkFont default_font(default_typeface, font_size);
+    size_t glyph_count =
+        default_font.countText(text.data(), text.size(), SkTextEncoding::kUTF8);
+    CHECK_GT(glyph_count, 0u);
+
+    std::vector<SkGlyphID> sk_glyphs(glyph_count);
+    size_t actual_glyph_count = default_font.textToGlyphs(
+        text.data(), text.size(), SkTextEncoding::kUTF8, sk_glyphs);
+    CHECK_EQ(glyph_count, actual_glyph_count);
+
     std::vector<SkScalar> sk_xpos(sk_glyphs.size());
-    default_font.getXPos(sk_glyphs, SkSpan<SkScalar>(sk_xpos));
+    default_font.getXPos(sk_glyphs, sk_xpos);
 
     return DrawTextData{
         .glyphs = std::vector<uint32_t>(sk_glyphs.begin(), sk_glyphs.end()),
