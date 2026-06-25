@@ -376,8 +376,8 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
 
 - (OverflowMenuAction*)customizeHomepageAction {
   CHECK(IsOverflowMenuHomeCustomizationEntrypointEnabled());
-  if (![self isCurrentWebPageNTP]) {
-    // Only the NTP supports the home customization action.
+  if (self.incognito || ![self isCurrentWebPageNTP]) {
+    // Only the non-incognito NTP supports the home customization action.
     return nil;
   }
 

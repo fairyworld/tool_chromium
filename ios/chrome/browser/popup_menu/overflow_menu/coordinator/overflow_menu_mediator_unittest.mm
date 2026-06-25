@@ -1527,3 +1527,24 @@ TEST_F(OverflowMenuMediatorTest, TestCustomizeHomePageNotShownOnWebPage) {
 
   EXPECT_FALSE(HasItem(kToolsMenuCustomizeHomePageId, /*enabled=*/YES));
 }
+
+// Tests that the Customize Home Page item is NOT shown on an incognito NTP.
+TEST_F(OverflowMenuMediatorTest, TestCustomizeHomePageNotShownInIncognito) {
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitWithFeatures(
+      /*enabled_features=*/{kComposeboxIpad, kChromeNextIa,
+                            kOverflowMenuNTPRefactor,
+                            kOverflowMenuHomeCustomizationEntrypoint},
+      /*disabled_features=*/{});
+
+  navigation_item_->SetURL(GURL("chrome://newtab"));
+
+  CreateMediator(/*incognito=*/YES);
+  SetUpActiveWebState();
+  mediator_.webStateList = browser_->GetWebStateList();
+
+  // Force model update.
+  mediator_.model = model_;
+
+  EXPECT_FALSE(HasItem(kToolsMenuCustomizeHomePageId, /*enabled=*/YES));
+}
