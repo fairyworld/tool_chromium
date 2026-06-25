@@ -12,6 +12,7 @@
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback.h"
+#include "base/not_fatal_until.h"
 #include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/android/android_theme_resources.h"
 #include "chrome/browser/android/resource_mapper.h"
@@ -64,7 +65,7 @@ SaveUpdatePasswordMessageDelegate::SaveUpdatePasswordMessageDelegate(
 }
 
 SaveUpdatePasswordMessageDelegate::~SaveUpdatePasswordMessageDelegate() {
-  DCHECK(web_contents_ == nullptr);
+  CHECK(web_contents_ == nullptr, base::NotFatalUntil::M152);
 }
 
 void SaveUpdatePasswordMessageDelegate::DisplaySaveUpdatePasswordPrompt(
@@ -72,8 +73,8 @@ void SaveUpdatePasswordMessageDelegate::DisplaySaveUpdatePasswordPrompt(
     std::unique_ptr<password_manager::PasswordFormManagerForUI> form_to_save,
     bool update_password,
     password_manager::PasswordManagerClient* password_manager_client) {
-  DCHECK_NE(nullptr, web_contents);
-  DCHECK(form_to_save);
+  CHECK_NE(nullptr, web_contents, base::NotFatalUntil::M152);
+  CHECK(form_to_save, base::NotFatalUntil::M152);
 
   Profile* profile =
       Profile::FromBrowserContext(web_contents->GetBrowserContext());
@@ -109,8 +110,8 @@ void SaveUpdatePasswordMessageDelegate::DisplaySaveUpdatePasswordPromptInternal(
     password_manager::PasswordManagerClient* password_manager_client) {
   // Dismiss previous message if it is displayed.
   DismissSaveUpdatePasswordPrompt();
-  DCHECK(message_ == nullptr);
-  DCHECK(password_edit_dialog_ == nullptr);
+  CHECK(message_ == nullptr, base::NotFatalUntil::M152);
+  CHECK(password_edit_dialog_ == nullptr, base::NotFatalUntil::M152);
 
   web_contents_ = web_contents;
   passwords_state_.set_client(password_manager_client);
@@ -440,8 +441,8 @@ bool SaveUpdatePasswordMessageDelegate::IsUsingAccountStorage(
 }
 
 void SaveUpdatePasswordMessageDelegate::ClearState() {
-  DCHECK(message_ == nullptr);
-  DCHECK(password_edit_dialog_ == nullptr);
+  CHECK(message_ == nullptr, base::NotFatalUntil::M152);
+  CHECK(password_edit_dialog_ == nullptr, base::NotFatalUntil::M152);
 
   passwords_state_.OnInactive();
   // web_contents_ is set in DisplaySaveUpdatePasswordPromptInternal().
