@@ -12,4 +12,7 @@ specific_include_rules = {
   "private_insights_service\\.cc": [
     "+third_party/abseil-cpp/absl/status",
   ],
+  "fcp_http_client\\.(cc|h)": [
+    "+third_party/abseil-cpp/absl/status",
+  ],
 }

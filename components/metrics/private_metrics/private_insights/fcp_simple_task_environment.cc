@@ -4,6 +4,8 @@
 
 #include "components/metrics/private_metrics/private_insights/fcp_simple_task_environment.h"
 
+#include "components/metrics/private_metrics/private_insights/fcp_http_client.h"
+
 namespace private_insights {
 
 namespace {
@@ -57,6 +59,11 @@ FcpSimpleTaskEnvironment::CreateExampleIterator(
 
 bool FcpSimpleTaskEnvironment::TrainingConditionsSatisfied() {
   return true;
+}
+
+std::unique_ptr<fcp::client::http::HttpClient>
+FcpSimpleTaskEnvironment::CreateHttpClient() {
+  return std::make_unique<FcpHttpClient>();
 }
 
 }  // namespace private_insights

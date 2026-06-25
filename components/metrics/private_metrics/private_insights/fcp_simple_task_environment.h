@@ -30,6 +30,8 @@ class FcpSimpleTaskEnvironment : public fcp::client::SimpleTaskEnvironment {
 
   bool TrainingConditionsSatisfied() override;
 
+  std::unique_ptr<fcp::client::http::HttpClient> CreateHttpClient() override;
+
  private:
   std::string base_dir_;
   std::string cache_dir_;
