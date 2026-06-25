@@ -6,6 +6,7 @@
 
 #include <variant>
 
+#include "base/memory/weak_ptr.h"
 #include "base/metrics/histogram_functions.h"
 #include "base/metrics/user_metrics.h"
 #include "base/metrics/user_metrics_action.h"
@@ -287,6 +288,11 @@ void VerticalTabStripController::ToggleTabGroupCollapsedState(
   bool is_currently_collapsed = group->visual_data()->is_collapsed();
   bool should_toggle_group = true;
 
+  // We use a WeakPtr because switching the active tab or adding
+  // a new tab during a collapse operation can trigger the automatic
+  // closure of the group, which synchronously destroys the TabGroup.
+  base::WeakPtr<const TabGroup> weak_group = group->AsWeakPtr();
+
   tabs::TabInterface* active_tab = model_->GetActiveTab();
   if (!is_currently_collapsed && active_tab && !drag_handler_->IsDragging()) {
     if (active_tab->GetGroup() == group->id()) {
@@ -296,6 +302,7 @@ void VerticalTabStripController::ToggleTabGroupCollapsedState(
       // be created.
       const std::optional<int> next_active =
           model_->GetNextExpandedActiveTab(group->id());
+
       if (next_active.has_value()) {
         model_->ActivateTabAt(
             next_active.value(),
@@ -319,6 +326,10 @@ void VerticalTabStripController::ToggleTabGroupCollapsedState(
                 TabStripUserGestureDetails(
                     TabStripUserGestureDetails::GestureType::kOther));
     }
+  }
+
+  if (!weak_group) {
+    return;
   }
 
   if (origin != ToggleTabGroupCollapsedStateOrigin::kMenuAction ||
