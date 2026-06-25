@@ -312,6 +312,7 @@ chromium-metrics-reviews@google.com.
       label="Previous attempt to persist search engine metadata failed"/>
   <int value="7" label="Request success"/>
   <int value="8" label="Choice was already applied"/>
+  <int value="9" label="Choice renewal was skipped"/>
 </enum>
 
 <enum name="AndroidSeccompSandboxStatus">

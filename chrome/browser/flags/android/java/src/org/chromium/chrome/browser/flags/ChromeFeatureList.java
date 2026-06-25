@@ -241,6 +241,7 @@ public abstract class ChromeFeatureList {
     public static final String APB144_PATCH7 = "Apb144Patch7";
     public static final String APB144_PATCH8 = "Apb144Patch8";
     public static final String APB144_PATCH9 = "Apb144Patch9";
+    public static final String APPLY_DEVICE_CHOICE_RENEWAL = "ApplyDeviceChoiceRenewal";
     public static final String APP_SPECIFIC_HISTORY = "AppSpecificHistory";
     public static final String APP_SPECIFIC_HISTORY_VIEW_INTENT = "AppSpecificHistoryViewIntent";
     public static final String ASYNC_NOTIFICATION_MANAGER = "AsyncNotificationManager";
