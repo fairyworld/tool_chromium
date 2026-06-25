@@ -99,7 +99,8 @@ UnboundedSurfaceWindowMac::UnboundedSurfaceWindowMac(
     const gfx::Rect& bounds_in_dips)
     : parent_view_(parent_view),
       frame_sink_id_(content::AllocateFrameSinkId()) {
-  DCHECK(base::FeatureList::IsEnabled(blink::features::kUnboundedElement));
+  CHECK(base::FeatureList::IsEnabled(blink::features::kUnboundedElement),
+        base::NotFatalUntil::M152);
   if (host.is_valid()) {
     receiver_.Bind(std::move(host));
     receiver_.set_disconnect_handler(base::BindOnce(
