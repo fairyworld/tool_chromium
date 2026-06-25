@@ -67,7 +67,9 @@ public class PdfToolbarCoordinator implements View.OnClickListener, View.OnKeyLi
                         .with(PdfToolbarProperties.ZOOM_LEVEL, 1.0f)
                         .with(PdfToolbarProperties.SHOW_FIT_TO_HEIGHT_ICON, true)
                         .with(PdfToolbarProperties.TWO_PAGES_PER_ROW_ACTIVE, false)
-                        .with(PdfToolbarProperties.DOWNLOAD_BUTTON_VISIBLE, true)
+                        .with(
+                                PdfToolbarProperties.DOWNLOAD_BUTTON_VISIBLE,
+                                PdfUtils.isInlinePdfV2DownloadEnabled())
                         .with(PdfToolbarProperties.ROTATE_BUTTON_VISIBLE, true)
                         .with(PdfToolbarProperties.FIT_TO_PAGE_BUTTON_VISIBLE, true)
                         .with(PdfToolbarProperties.ZOOM_CONTROLS_VISIBLE, true)
@@ -120,7 +122,8 @@ public class PdfToolbarCoordinator implements View.OnClickListener, View.OnKeyLi
     private void showMenu(View anchorView) {
         ModelList modelList = new ModelList();
 
-        if (!mModel.get(PdfToolbarProperties.DOWNLOAD_BUTTON_VISIBLE)) {
+        if (PdfUtils.isInlinePdfV2DownloadEnabled()
+                && !mModel.get(PdfToolbarProperties.DOWNLOAD_BUTTON_VISIBLE)) {
             modelList.add(
                     new ListItemBuilder()
                             .withTitleRes(R.string.pdf_download)
@@ -318,10 +321,10 @@ public class PdfToolbarCoordinator implements View.OnClickListener, View.OnKeyLi
         float widthDp = widthPx / density;
 
         mModel.set(
-                PdfToolbarProperties.DOWNLOAD_BUTTON_VISIBLE, widthDp > THRESHOLD_DOWNLOAD_DP);
+                PdfToolbarProperties.DOWNLOAD_BUTTON_VISIBLE,
+                PdfUtils.isInlinePdfV2DownloadEnabled() && widthDp > THRESHOLD_DOWNLOAD_DP);
         mModel.set(PdfToolbarProperties.ROTATE_BUTTON_VISIBLE, widthDp > THRESHOLD_ROTATE_DP);
-        mModel.set(
-                PdfToolbarProperties.FIT_TO_PAGE_BUTTON_VISIBLE, widthDp > THRESHOLD_FIT_DP);
+        mModel.set(PdfToolbarProperties.FIT_TO_PAGE_BUTTON_VISIBLE, widthDp > THRESHOLD_FIT_DP);
         mModel.set(PdfToolbarProperties.ZOOM_CONTROLS_VISIBLE, widthDp > THRESHOLD_ZOOM_DP);
         mModel.set(PdfToolbarProperties.PAGE_NAV_AND_EDIT_VISIBLE, widthDp > THRESHOLD_NAV_EDIT_DP);
     }
