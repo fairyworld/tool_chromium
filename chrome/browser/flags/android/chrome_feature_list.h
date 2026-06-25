@@ -63,7 +63,6 @@ BASE_DECLARE_FEATURE(kAndroidTabstripStartupCaptureBugFix);
 BASE_DECLARE_FEATURE(kAndroidThemeModule);
 BASE_DECLARE_FEATURE(kAndroidThemeResourceProvider);
 BASE_DECLARE_FEATURE(kAndroidToolbarScrollAblation);
-BASE_DECLARE_FEATURE(kAndroidUseAdminsForEnterpriseInfo);
 BASE_DECLARE_FEATURE(kAndroidVerticalTabs);
 BASE_DECLARE_FEATURE(kAndroidXRUsesSurfaceControl);
 BASE_DECLARE_FEATURE(kAndroidXrImmersivePlayer);

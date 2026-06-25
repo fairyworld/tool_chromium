@@ -221,8 +221,6 @@ public abstract class ChromeFeatureList {
     public static final String ANDROID_THEME_RESOURCE_PROVIDER = "AndroidThemeResourceProvider";
     public static final String ANDROID_TIPS_NOTIFICATIONS = "AndroidTipsNotifications";
     public static final String ANDROID_TIPS_NOTIFICATIONS_V2 = "AndroidTipsNotificationsV2";
-    public static final String ANDROID_USE_ADMINS_FOR_ENTERPRISE_INFO =
-            "AndroidUseAdminsForEnterpriseInfo";
     public static final String ANDROID_VERTICAL_TABS = "AndroidVerticalTabs";
     public static final String ANDROID_WINDOW_MANAGEMENT_WEB_API = "AndroidWindowManagementWebApi";
     public static final String ANDROID_XR_IMMERSIVE_PLAYER = "AndroidXrImmersivePlayer";
@@ -826,8 +824,6 @@ public abstract class ChromeFeatureList {
     public static final CachedFlag sAndroidThemeModule = newCachedFlag(ANDROID_THEME_MODULE, true);
     public static final CachedFlag sAndroidThemeResourceProvider =
             newCachedFlag(ANDROID_THEME_RESOURCE_PROVIDER, false, /* defaultValueInTests= */ false);
-    public static final CachedFlag sAndroidUseAdminsForEnterpriseInfo =
-            newCachedFlag(ANDROID_USE_ADMINS_FOR_ENTERPRISE_INFO, true);
     public static final CachedFlag sAndroidVerticalTabs =
             newCachedFlag(
                     ANDROID_VERTICAL_TABS,
@@ -1284,7 +1280,6 @@ public abstract class ChromeFeatureList {
                     sAndroidTabstripStartupCaptureBugFix,
                     sAndroidThemeModule,
                     sAndroidThemeResourceProvider,
-                    sAndroidUseAdminsForEnterpriseInfo,
                     sAndroidVerticalTabs,
                     sAndroidWindowManagementWebApi,
                     sAndroidXrImmersivePlayer,

@@ -29,8 +29,8 @@ import org.chromium.base.task.TaskTraits;
 import org.chromium.build.annotations.MonotonicNonNull;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
-import org.chromium.chrome.browser.flags.ChromeFeatureList;
-import org.chromium.chrome.browser.flags.ChromeSwitches;
+import org.chromium.components.policy.PolicyFeatureMap;
+import org.chromium.components.policy.PolicySwitches;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -123,12 +123,12 @@ public class EnterpriseInfoImpl extends EnterpriseInfo {
                     assert devicePolicyManager != null;
 
                     if (CommandLine.getInstance()
-                            .hasSwitch(ChromeSwitches.FORCE_DEVICE_OWNERSHIP)) {
+                            .hasSwitch(PolicySwitches.FORCE_DEVICE_OWNERSHIP)) {
                         hasDeviceOwnerApp = true;
                     }
 
                     int systemCallCount = 1;
-                    if (ChromeFeatureList.sAndroidUseAdminsForEnterpriseInfo.isEnabled()) {
+                    if (PolicyFeatureMap.sAndroidUseAdminsForEnterpriseInfo.isEnabled()) {
                         List<ComponentName> activeAdmins = devicePolicyManager.getActiveAdmins();
                         if (activeAdmins != null) {
                             for (ComponentName admin : activeAdmins) {
