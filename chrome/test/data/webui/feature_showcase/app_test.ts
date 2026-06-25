@@ -17,6 +17,8 @@ import type {FeatureShowcaseStepperElement} from 'chrome://feature-showcase/feat
 import {PasswordManagerPageHandlerRemote} from 'chrome://feature-showcase/password_manager.mojom-webui.js';
 import {PasswordManagerBrowserProxyImpl} from 'chrome://feature-showcase/password_manager/password_manager_browser_proxy.js';
 import type {FeatureShowcasePasswordManagerStepElement} from 'chrome://feature-showcase/password_manager/password_manager_step.js';
+import {ThemesAndCustomizationPageHandlerRemote} from 'chrome://feature-showcase/themes_and_customization.mojom-webui.js';
+import {ThemesAndCustomizationBrowserProxyImpl} from 'chrome://feature-showcase/themes_and_customization/themes_and_customization_browser_proxy.js';
 import type {FeatureShowcaseThemesAndCustomizationStepElement} from 'chrome://feature-showcase/themes_and_customization/themes_and_customization_step.js';
 import {assertDeepEquals, assertEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {TestMock} from 'chrome://webui-test/test_mock.js';
@@ -287,15 +289,23 @@ suite('FeatureShowcasePasswordManagerStepTest', function() {
 
 suite('FeatureShowcaseThemesAndCustomizationStepTest', function() {
   let stepElement: FeatureShowcaseThemesAndCustomizationStepElement;
-    setup(function() {
-      document.body.innerHTML = window.trustedTypes!.emptyHTML;
-      stepElement = document.createElement(
+  let testHandler: TestMock<ThemesAndCustomizationPageHandlerRemote>&
+      ThemesAndCustomizationPageHandlerRemote;
+
+  setup(function() {
+    testHandler = TestMock.fromClass(ThemesAndCustomizationPageHandlerRemote);
+    ThemesAndCustomizationBrowserProxyImpl.setInstance({handler: testHandler});
+
+    document.body.innerHTML = window.trustedTypes!.emptyHTML;
+    stepElement = document.createElement(
         'feature-showcase-themes-and-customization-step');
     document.body.appendChild(stepElement);
   });
 
   test('confirm button clicked', async function() {
     await microtasksFinished();
+
+    await testHandler.whenCalled('snapshotTheme');
 
     const button =
         stepElement.shadowRoot.querySelector<HTMLElement>('#confirm-button');
@@ -307,6 +317,27 @@ suite('FeatureShowcaseThemesAndCustomizationStepTest', function() {
 
     button.click();
 
+    await testHandler.whenCalled('acceptTheme');
     await stepCompletedEvent;
+  });
+
+  test('skip button clicked', async function() {
+    await microtasksFinished();
+
+    await testHandler.whenCalled('snapshotTheme');
+
+    const button =
+        stepElement.shadowRoot.querySelector<HTMLElement>('#skip-button');
+    assertTrue(!!button);
+
+    const stepCompletedEvent = new Promise((resolve) => {
+      stepElement.addEventListener('step-completed', resolve);
+    });
+
+    button.click();
+
+    await testHandler.whenCalled('revertTheme');
+    await stepCompletedEvent;
+    assertEquals(0, testHandler.getCallCount('acceptTheme'));
   });
 });

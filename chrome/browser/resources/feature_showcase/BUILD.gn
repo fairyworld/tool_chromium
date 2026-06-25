@@ -35,6 +35,7 @@ build_webui("build") {
     "google_lens/google_lens_browser_proxy.ts",
     "google_lens/google_lens_step.ts",
     "google_lens/google_lens_step.html.ts",
+    "themes_and_customization/themes_and_customization_browser_proxy.ts",
     "themes_and_customization/themes_and_customization_step.ts",
     "themes_and_customization/themes_and_customization_step.html.ts",
     "example/example_step.ts",
@@ -73,6 +74,7 @@ build_webui("build") {
     "$root_gen_dir/chrome/browser/ui/webui/feature_showcase/feature_showcase.mojom-webui.ts",
     "$root_gen_dir/chrome/browser/ui/webui/feature_showcase/google_lens.mojom-webui.ts",
     "$root_gen_dir/chrome/browser/ui/webui/feature_showcase/password_manager.mojom-webui.ts",
+    "$root_gen_dir/chrome/browser/ui/webui/feature_showcase/themes_and_customization.mojom-webui.ts",
   ]
 
   webui_context_type = "trusted"

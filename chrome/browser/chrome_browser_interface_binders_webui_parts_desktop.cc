@@ -362,6 +362,9 @@ void PopulateChromeWebUIFrameBindersPartsDesktop(
       feature_showcase::mojom::PasswordManagerPageHandlerFactory,
       FeatureShowcaseUI>(map);
   RegisterWebUIControllerInterfaceBinder<
+      feature_showcase::mojom::ThemesAndCustomizationPageHandlerFactory,
+      FeatureShowcaseUI>(map);
+  RegisterWebUIControllerInterfaceBinder<
       feature_showcase::mojom::GoogleLensPageHandlerFactory, FeatureShowcaseUI>(
       map);
 #endif  // BUILDFLAG(ENABLE_DICE_SUPPORT)
