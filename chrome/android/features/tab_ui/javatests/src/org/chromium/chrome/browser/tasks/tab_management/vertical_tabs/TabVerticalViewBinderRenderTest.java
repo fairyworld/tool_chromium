@@ -4,6 +4,9 @@
 
 package org.chromium.chrome.browser.tasks.tab_management.vertical_tabs;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import static org.chromium.ui.test.util.RenderTestRule.Component.UI_BROWSER_MOBILE_TAB_SWITCHER_GRID;
 
 import android.app.Activity;
@@ -11,12 +14,15 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.test.filters.MediumTest;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,6 +30,8 @@ import org.junit.runner.RunWith;
 
 import org.chromium.base.Callback;
 import org.chromium.base.ThreadUtils;
+import org.chromium.base.Token;
+import org.chromium.base.supplier.ObservableSuppliers;
 import org.chromium.base.test.BaseActivityTestRule;
 import org.chromium.base.test.params.ParameterAnnotations.ClassParameter;
 import org.chromium.base.test.params.ParameterAnnotations.UseRunnerDelegate;
@@ -33,23 +41,32 @@ import org.chromium.base.test.util.Batch;
 import org.chromium.base.test.util.CommandLineFlags;
 import org.chromium.base.test.util.CriteriaHelper;
 import org.chromium.base.test.util.Feature;
+import org.chromium.build.annotations.Nullable;
 import org.chromium.chrome.browser.actor.ui.ActorUiTabController.UiTabState;
 import org.chromium.chrome.browser.actor.ui.TabIndicatorStatus;
 import org.chromium.chrome.browser.flags.ChromeSwitches;
 import org.chromium.chrome.browser.tab.MediaState;
 import org.chromium.chrome.browser.tab_ui.TabListFaviconProvider.TabFavicon;
 import org.chromium.chrome.browser.tab_ui.TabListFaviconProvider.TabFaviconFetcher;
+import org.chromium.chrome.browser.tabmodel.TabModel;
+import org.chromium.chrome.browser.tabmodel.TabModelSelector;
 import org.chromium.chrome.browser.tasks.tab_management.TabActionButtonData;
 import org.chromium.chrome.browser.tasks.tab_management.TabActionButtonData.TabActionButtonType;
+import org.chromium.chrome.browser.tasks.tab_management.TabListModel;
+import org.chromium.chrome.browser.tasks.tab_management.TabListRecyclerView;
 import org.chromium.chrome.browser.tasks.tab_management.TabProperties;
+import org.chromium.chrome.browser.tasks.tab_management.TabProperties.UiType;
 import org.chromium.chrome.tab_ui.R;
 import org.chromium.chrome.test.ChromeJUnit4RunnerDelegate;
 import org.chromium.chrome.test.util.ChromeRenderTestRule;
 import org.chromium.components.browser_ui.styles.SemanticColorUtils;
 import org.chromium.components.tab_groups.TabGroupColorId;
+import org.chromium.ui.base.LocalizationUtils;
 import org.chromium.ui.base.ViewUtils;
+import org.chromium.ui.modelutil.MVCListAdapter;
 import org.chromium.ui.modelutil.PropertyModel;
 import org.chromium.ui.modelutil.PropertyModelChangeProcessor;
+import org.chromium.ui.modelutil.SimpleRecyclerViewAdapter;
 import org.chromium.ui.test.util.BlankUiTestActivity;
 import org.chromium.ui.test.util.NightModeTestUtils;
 
@@ -57,7 +74,7 @@ import java.io.IOException;
 import java.util.List;
 
 // TODO(crbug.com/524393627): Add tests for Incognito.
-// TODO(crbug.com/521987032): Add tests for nested children with visual spine and actor indicator.
+// TODO(crbug.com/521987032): Add tests for nested children with actor indicator.
 // TODO(crbug.com/519325873): Add RenderTest for pinned tab hover state.
 // TODO(crbug.com/509226293): Add tests for RTL layout.
 
@@ -114,8 +131,7 @@ public class TabVerticalViewBinderRenderTest {
         int padding = ViewUtils.dpToPx(mActivity, 8);
         mRenderView.setPadding(padding, padding, padding, padding);
 
-        ViewGroup view =
-                (ViewGroup) LayoutInflater.from(mActivity).inflate(layoutResId, mRenderView, false);
+        ViewGroup view = inflateView(layoutResId, mRenderView);
         mRenderView.addView(view);
         int width = ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -124,6 +140,12 @@ public class TabVerticalViewBinderRenderTest {
                 new FrameLayout.LayoutParams(width, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         return view;
+    }
+
+    private ViewGroup inflateView(int layoutResId, @Nullable ViewGroup root) {
+        return (ViewGroup)
+                LayoutInflater.from(mActivity)
+                        .inflate(layoutResId, root, /* attachToRoot= */ false);
     }
 
     private TabFaviconFetcher createFaviconFetcher() {
@@ -599,5 +621,168 @@ public class TabVerticalViewBinderRenderTest {
                 });
 
         mRenderTestRule.render(mRenderView, "tab_group_header_expanded_hovered");
+    }
+
+    @Test
+    @MediumTest
+    @Feature({"RenderTest"})
+    public void testTabGroupSpine_Expanded() throws IOException {
+        testTabGroupSpine(
+                /* isCollapsed= */ false, /* isRtl= */ false, /* isHeaderOffScreen= */ false);
+    }
+
+    @Test
+    @MediumTest
+    @Feature({"RenderTest"})
+    public void testTabGroupSpine_Expanded_Rtl() throws IOException {
+        LocalizationUtils.setRtlForTesting(true);
+        try {
+            testTabGroupSpine(
+                    /* isCollapsed= */ false, /* isRtl= */ true, /* isHeaderOffScreen= */ false);
+        } finally {
+            LocalizationUtils.setRtlForTesting(false);
+        }
+    }
+
+    @Test
+    @MediumTest
+    @Feature({"RenderTest"})
+    public void testTabGroupSpine_Collapsed() throws IOException {
+        testTabGroupSpine(
+                /* isCollapsed= */ true, /* isRtl= */ false, /* isHeaderOffScreen= */ false);
+    }
+
+    @Test
+    @MediumTest
+    @Feature({"RenderTest"})
+    public void testTabGroupSpine_HeaderOffScreen() throws IOException {
+        testTabGroupSpine(
+                /* isCollapsed= */ false, /* isRtl= */ false, /* isHeaderOffScreen= */ true);
+    }
+
+    private void testTabGroupSpine(boolean isCollapsed, boolean isRtl, boolean isHeaderOffScreen)
+            throws IOException {
+        TabListRecyclerView[] view = new TabListRecyclerView[1];
+        ThreadUtils.runOnUiThreadBlocking(
+                () -> {
+                    TabListRecyclerView recyclerView;
+                    if (isHeaderOffScreen) {
+                        ViewGroup container = inflateAndAttachView(R.layout.vertical_tab_layout);
+                        int widthPx = ViewUtils.dpToPx(mActivity, 300);
+                        int heightPx = ViewUtils.dpToPx(mActivity, 400);
+                        container.setLayoutParams(new FrameLayout.LayoutParams(widthPx, heightPx));
+                        recyclerView = container.findViewById(R.id.tab_list_recycler_view);
+                    } else {
+                        recyclerView =
+                                (TabListRecyclerView)
+                                        inflateAndAttachView(
+                                                R.layout.tab_list_recycler_view_layout);
+                    }
+
+                    recyclerView.setVisibility(View.VISIBLE);
+                    if (isRtl) {
+                        recyclerView.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+                    }
+                    recyclerView.setLayoutManager(new LinearLayoutManager(mActivity));
+
+                    TabListModel tabListModel = new TabListModel();
+
+                    // Mock tabModelSelector for VerticalTabGroupSpineDecoration.
+                    TabModelSelector tabModelSelector = mock(TabModelSelector.class);
+                    TabModel tabModel = mock(TabModel.class);
+                    when(tabModelSelector.getCurrentModel()).thenReturn(tabModel);
+                    when(tabModel.isIncognitoBranded()).thenReturn(false);
+
+                    var supplier = ObservableSuppliers.<TabModel>createMonotonic();
+                    supplier.set(tabModel);
+                    when(tabModelSelector.getCurrentTabModelSupplier()).thenReturn(supplier);
+
+                    recyclerView.addItemDecoration(
+                            new VerticalTabGroupSpineDecoration(
+                                    mActivity, () -> {}, tabListModel, tabModelSelector));
+
+                    // Set up the adapter and tie it to the views.
+                    SimpleRecyclerViewAdapter adapter = new SimpleRecyclerViewAdapter(tabListModel);
+                    adapter.registerType(
+                            UiType.TAB_GROUP,
+                            parent -> inflateView(R.layout.vertical_tab_group_header, parent),
+                            TabVerticalViewBinder::bindTabGroupHeader);
+                    adapter.registerType(
+                            UiType.TAB,
+                            parent -> inflateView(R.layout.vertical_tab_item, parent),
+                            TabVerticalViewBinder::bindTab);
+
+                    recyclerView.setAdapter(adapter);
+                    view[0] = recyclerView;
+
+                    // Build mock layout.
+                    Token groupId = Token.createRandom();
+                    addGroupHeaderListItem(
+                            tabListModel, "Group", groupId, TabGroupColorId.BLUE, isCollapsed);
+                    when(tabModel.getTabGroupColorWithFallback(groupId))
+                            .thenReturn(TabGroupColorId.BLUE);
+                    if (!isCollapsed) {
+                        addTabListItem(tabListModel, "Test Tab 1", groupId);
+                        addTabListItem(tabListModel, "Test Tab 2", groupId);
+
+                        if (isHeaderOffScreen) {
+                            for (int i = 1; i <= 15; i++) {
+                                addTabListItem(tabListModel, "Test Tab " + i, groupId);
+                            }
+                        }
+                    }
+                    addTabListItem(tabListModel, "Next Tab", /* groupId= */ null);
+                });
+
+        CriteriaHelper.pollUiThread(() -> view[0].getChildCount() > 0);
+        if (isHeaderOffScreen) {
+            Assert.assertNotNull(view[0].getLayoutManager());
+            ThreadUtils.runOnUiThreadBlocking(
+                    () ->
+                            ((LinearLayoutManager) view[0].getLayoutManager())
+                                    .scrollToPositionWithOffset(1, 0));
+            CriteriaHelper.pollUiThread(
+                    () ->
+                            ((LinearLayoutManager) view[0].getLayoutManager())
+                                            .findFirstVisibleItemPosition()
+                                    >= 1);
+        }
+        mRenderTestRule.render(
+                mRenderView,
+                "tab_group_spine"
+                        + (isCollapsed ? "_collapsed" : "_expanded")
+                        + (isHeaderOffScreen ? "_header_off_screen" : "")
+                        + (isRtl ? "_rtl" : ""));
+    }
+
+    private void addTabListItem(TabListModel tabListModel, String title, @Nullable Token groupId) {
+        PropertyModel.Builder builder =
+                new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
+                        .with(TabProperties.TITLE, title)
+                        .with(TabProperties.IS_SELECTED, false)
+                        .with(TabProperties.TAB_GROUP_ID, groupId)
+                        .with(TabProperties.FAVICON_FETCHER, createFaviconFetcher());
+
+        tabListModel.add(new MVCListAdapter.ListItem(UiType.TAB, builder.build()));
+    }
+
+    private void addGroupHeaderListItem(
+            TabListModel tabListModel,
+            String title,
+            Token headerId,
+            @Nullable @TabGroupColorId Integer color,
+            boolean isCollapsed) {
+        PropertyModel.Builder builder =
+                new PropertyModel.Builder(TabProperties.ALL_KEYS_VERTICAL_TAB)
+                        .with(TabProperties.TITLE, title)
+                        .with(TabProperties.IS_SELECTED, false)
+                        .with(TabProperties.TAB_GROUP_HEADER_ID, headerId)
+                        .with(TabProperties.IS_COLLAPSED, isCollapsed);
+
+        if (color != null) {
+            builder.with(TabProperties.TAB_GROUP_CARD_COLOR, color);
+        }
+
+        tabListModel.add(new MVCListAdapter.ListItem(UiType.TAB_GROUP, builder.build()));
     }
 }
