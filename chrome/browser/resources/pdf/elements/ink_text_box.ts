@@ -308,9 +308,8 @@ export class InkTextBoxElement extends InkTextBoxElementBase {
 
     if ((this.state_ !== TextBoxState.EDITED || this.textValue_ === '') &&
         !this.existing_) {
-      this.state_ = TextBoxState.INACTIVE;
-      this.promiseResolver_.resolve();
-      this.promiseResolver_ = null;
+      // Empty textbox.
+      this.finishCommit_();
       return promise;
     }
 
@@ -347,18 +346,21 @@ export class InkTextBoxElement extends InkTextBoxElementBase {
         annotation.mojoTextInfo = result.mojoTextInfo;
         Ink2Manager.getInstance().commitTextAnnotation(
             annotation, isEdited, result.typefaces);
-        this.state_ = TextBoxState.INACTIVE;
       } catch (e) {
         console.error('Error committing text annotation:', e);
-        this.state_ = TextBoxState.INACTIVE;
       } finally {
-        assert(this.promiseResolver_);
-        this.promiseResolver_.resolve();
-        this.promiseResolver_ = null;
+        this.finishCommit_();
       }
     })();
 
     return promise;
+  }
+
+  private finishCommit_() {
+    this.state_ = TextBoxState.INACTIVE;
+    assert(this.promiseResolver_);
+    this.promiseResolver_.resolve();
+    this.promiseResolver_ = null;
   }
 
   private initializeFromProperties_() {
