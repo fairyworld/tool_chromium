@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import {createAutocompleteMatch} from '//resources/cr_components/searchbox/searchbox_browser_proxy.js';
+import type {SearchboxIconElement} from '//resources/cr_components/searchbox/searchbox_icon.js';
 import type {AutocompleteMatch} from '//resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import type {InputState} from '//resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
 import {ToolMode as ComposeboxToolMode} from '//resources/mojo/components/omnibox/composebox/composebox_query.mojom-webui.js';
@@ -129,4 +130,12 @@ export function createUrlMatch(modifiers: Partial<AutocompleteMatch> = {}):
     type: 'url-what-you-typed',
     ...modifiers,
   });
+}
+
+export function assertIconMaskImageUrl(
+    iconElement: SearchboxIconElement, url: string) {
+  assertStyle(
+      iconElement.$.icon, '-webkit-mask-image',
+      `url("${new URL(url, document.baseURI).href}")`);
+  assertStyle(iconElement.$.icon, 'background-image', 'none');
 }

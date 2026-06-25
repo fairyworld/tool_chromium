@@ -13,7 +13,7 @@ import {getDeepActiveElement} from 'chrome://resources/js/util.js';
 import type {AutocompleteMatch} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import {DriveDisclaimerStatus, RenderType, SideType} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import {assertEquals, assertFalse, assertNotEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
-import {assertStyle, createClipboardEvent, createUrlMatch, MockInputState} from 'chrome://webui-test/cr_components/searchbox/searchbox_test_utils.js';
+import {assertIconMaskImageUrl, assertStyle, createClipboardEvent, createUrlMatch, MockInputState} from 'chrome://webui-test/cr_components/searchbox/searchbox_test_utils.js';
 import {TestSearchboxBrowserProxy} from 'chrome://webui-test/cr_components/searchbox/test_searchbox_browser_proxy.js';
 import {TestMock} from 'chrome://webui-test/test_mock.js';
 import {eventToPromise, isVisible, microtasksFinished} from 'chrome://webui-test/test_util.js';
@@ -148,14 +148,6 @@ suite('SearchboxTest', () => {
       assertStyle(iconElement.$.icon, '-webkit-mask-image', 'none');
     }
   */
-
-  function assertIconMaskImageUrl(
-      iconElement: SearchboxIconElement, url: string) {
-    assertStyle(
-        iconElement.$.icon, '-webkit-mask-image',
-        `url("chrome://new-tab-page/${url}")`);
-    assertStyle(iconElement.$.icon, 'background-image', 'none');
-  }
 
   async function areMatchesShowing(): Promise<boolean> {
     // Force a synchronous render.
