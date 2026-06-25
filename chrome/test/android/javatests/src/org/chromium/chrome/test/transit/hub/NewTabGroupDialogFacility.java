@@ -35,7 +35,6 @@ import org.chromium.base.test.transit.ViewSpec;
 import org.chromium.chrome.R;
 import org.chromium.chrome.browser.ChromeTabbedActivity;
 import org.chromium.chrome.browser.tab.Tab;
-import org.chromium.chrome.browser.tabmodel.TabGroupColorUtils;
 import org.chromium.chrome.browser.tabmodel.TabModel;
 import org.chromium.chrome.browser.tabmodel.TabModelUtils;
 import org.chromium.chrome.test.transit.ChromeActivityTabModelBoundStation;
@@ -115,7 +114,7 @@ public class NewTabGroupDialogFacility<
 
         // TODO(crbug.com/346377124): Partially cut off in android_30_google_apis_x86.textpb
         declareView(withId(R.id.color_picker_container));
-        @TabGroupColorId List<Integer> colors = TabGroupColorUtils.getTabGroupColorIdList();
+        @TabGroupColorId List<Integer> colors = TabGroupColorPickerUtils.getTabGroupColorIdList();
         // Only the first 5 colors are displayed reliably when the soft keyboard opens.
         colorElements = new ViewElement[5];
         for (int i = 0; i < 5; i++) {

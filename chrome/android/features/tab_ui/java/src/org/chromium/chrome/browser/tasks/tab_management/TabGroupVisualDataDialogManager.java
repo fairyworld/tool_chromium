@@ -31,7 +31,6 @@ import org.chromium.chrome.browser.feature_engagement.TrackerFactory;
 import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.sync.SyncServiceFactory;
 import org.chromium.chrome.browser.tab_group_sync.TabGroupSyncFeatures;
-import org.chromium.chrome.browser.tabmodel.TabGroupColorUtils;
 import org.chromium.chrome.browser.tabmodel.TabGroupTitleUtils;
 import org.chromium.chrome.browser.tabmodel.TabModel;
 import org.chromium.chrome.browser.tasks.tab_management.color_picker.ColorPickerCoordinator;
@@ -44,6 +43,7 @@ import org.chromium.components.feature_engagement.Tracker;
 import org.chromium.components.sync.DataType;
 import org.chromium.components.sync.SyncService;
 import org.chromium.components.tab_groups.TabGroupColorId;
+import org.chromium.components.tab_groups.TabGroupColorPickerUtils;
 import org.chromium.ui.modaldialog.ModalDialogManager;
 import org.chromium.ui.modaldialog.ModalDialogManager.ModalDialogManagerObserver;
 import org.chromium.ui.modaldialog.ModalDialogManager.ModalDialogType;
@@ -162,7 +162,7 @@ public class TabGroupVisualDataDialogManager {
                     }
                 });
 
-        List<Integer> colors = TabGroupColorUtils.getTabGroupColorIdList();
+        List<Integer> colors = TabGroupColorPickerUtils.getTabGroupColorIdList();
         // TODO(b/330597857): Allow a dynamic incognito setting for the color picker.
         // Force a false incognito value for the color picker as this modal dialog does not
         // support incognito color themes and should just follow the system theme.

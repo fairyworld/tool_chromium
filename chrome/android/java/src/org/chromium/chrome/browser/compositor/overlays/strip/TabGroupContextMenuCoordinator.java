@@ -52,7 +52,6 @@ import org.chromium.chrome.browser.tab.TabLaunchType;
 import org.chromium.chrome.browser.tab_group_sync.TabGroupSyncServiceFactory;
 import org.chromium.chrome.browser.tabmodel.TabClosingSource;
 import org.chromium.chrome.browser.tabmodel.TabClosureParamsUtils;
-import org.chromium.chrome.browser.tabmodel.TabGroupColorUtils;
 import org.chromium.chrome.browser.tabmodel.TabGroupMetadata;
 import org.chromium.chrome.browser.tabmodel.TabGroupMetadataExtractor;
 import org.chromium.chrome.browser.tabmodel.TabGroupObserver;
@@ -79,6 +78,7 @@ import org.chromium.components.tab_group_sync.EitherId.EitherGroupId;
 import org.chromium.components.tab_group_sync.LocalTabGroupId;
 import org.chromium.components.tab_group_sync.TabGroupSyncService;
 import org.chromium.components.tab_groups.TabGroupColorId;
+import org.chromium.components.tab_groups.TabGroupColorPickerUtils;
 import org.chromium.ui.KeyboardVisibilityDelegate;
 import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.listmenu.ListMenuItemProperties;
@@ -753,7 +753,7 @@ public class TabGroupContextMenuCoordinator extends TabStripReorderingHelper<Tok
         mColorPickerCoordinator =
                 new ColorPickerCoordinator(
                         context,
-                        TabGroupColorUtils.getTabGroupColorIdList(),
+                        TabGroupColorPickerUtils.getTabGroupColorIdList(),
                         ((ViewStub) contentView.findViewById(R.id.color_picker_stub)).inflate(),
                         ColorPickerType.TAB_GROUP,
                         isIncognito,

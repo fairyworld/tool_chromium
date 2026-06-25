@@ -153,6 +153,7 @@ import org.chromium.chrome.test.util.BookmarkTestUtil;
 import org.chromium.chrome.test.util.ChromeRenderTestRule;
 import org.chromium.components.browser_ui.styles.SemanticColorUtils;
 import org.chromium.components.prefs.PrefService;
+import org.chromium.components.tab_groups.TabGroupsFeatureMap;
 import org.chromium.components.user_prefs.UserPrefs;
 import org.chromium.content_public.browser.LoadUrlParams;
 import org.chromium.ui.KeyboardVisibilityDelegate;
@@ -175,6 +176,7 @@ import java.util.concurrent.TimeoutException;
 @ParameterAnnotations.UseRunnerDelegate(ChromeJUnit4RunnerDelegate.class)
 @CommandLineFlags.Add({ChromeSwitches.DISABLE_FIRST_RUN_EXPERIENCE})
 @EnableFeatures({DATA_SHARING, DATA_SHARING_JOIN_ONLY})
+@DisableFeatures({TabGroupsFeatureMap.UPDATE_TAB_GROUP_COLORS})
 @Batch(Batch.PER_CLASS)
 @DisableIf.Device(DeviceFormFactor.DESKTOP) // crbug.com/394671175
 @DisableLeakChecks("crbug.com/527130525")

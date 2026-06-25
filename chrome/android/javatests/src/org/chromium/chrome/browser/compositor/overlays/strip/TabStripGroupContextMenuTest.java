@@ -57,7 +57,7 @@ import org.chromium.base.test.util.Criteria;
 import org.chromium.base.test.util.CriteriaHelper;
 import org.chromium.base.test.util.DisableIf;
 import org.chromium.base.test.util.Feature;
-import org.chromium.base.test.util.Features;
+import org.chromium.base.test.util.Features.DisableFeatures;
 import org.chromium.base.test.util.Restriction;
 import org.chromium.chrome.R;
 import org.chromium.chrome.browser.ChromeTabbedActivity;
@@ -70,6 +70,7 @@ import org.chromium.chrome.test.transit.AutoResetCtaTransitTestRule;
 import org.chromium.chrome.test.transit.ChromeTransitTestRules;
 import org.chromium.chrome.test.transit.page.CtaPageStation;
 import org.chromium.components.tab_groups.TabGroupColorId;
+import org.chromium.components.tab_groups.TabGroupsFeatureMap;
 import org.chromium.ui.KeyboardVisibilityDelegate;
 import org.chromium.ui.base.DeviceFormFactor;
 import org.chromium.ui.hierarchicalmenu.HierarchicalMenuController;
@@ -80,10 +81,11 @@ import org.chromium.ui.modaldialog.ModalDialogManager;
 @RunWith(ChromeJUnit4ClassRunner.class)
 @Batch(Batch.PER_CLASS)
 // TODO(crbug.com/419289558): Re-enable color surface feature flags
-@Features.DisableFeatures({
+@DisableFeatures({
     ChromeFeatureList.ANDROID_SURFACE_COLOR_UPDATE,
     ChromeFeatureList.GRID_TAB_SWITCHER_SURFACE_COLOR_UPDATE,
     ChromeFeatureList.ANDROID_THEME_MODULE,
+    TabGroupsFeatureMap.UPDATE_TAB_GROUP_COLORS,
 })
 @CommandLineFlags.Add({ChromeSwitches.DISABLE_FIRST_RUN_EXPERIENCE})
 @Restriction(DeviceFormFactor.TABLET_OR_DESKTOP)

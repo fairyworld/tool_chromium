@@ -49,7 +49,6 @@ import org.chromium.chrome.browser.tab_ui.RecyclerViewPosition;
 import org.chromium.chrome.browser.tab_ui.TabContentManager;
 import org.chromium.chrome.browser.tab_ui.TabContentManagerThumbnailProvider;
 import org.chromium.chrome.browser.tab_ui.TabListMode;
-import org.chromium.chrome.browser.tabmodel.TabGroupColorUtils;
 import org.chromium.chrome.browser.tabmodel.TabModel;
 import org.chromium.chrome.browser.tasks.tab_management.TabGridDialogMediator.AnimationSourceViewProvider;
 import org.chromium.chrome.browser.tasks.tab_management.TabListEditorCoordinator.CreationMode;
@@ -70,6 +69,7 @@ import org.chromium.components.browser_ui.widget.scrim.ScrimManager;
 import org.chromium.components.collaboration.CollaborationService;
 import org.chromium.components.collaboration.ServiceStatus;
 import org.chromium.components.data_sharing.DataSharingService;
+import org.chromium.components.tab_groups.TabGroupColorPickerUtils;
 import org.chromium.ui.modaldialog.ModalDialogManager;
 import org.chromium.ui.modelutil.LayoutViewBuilder;
 import org.chromium.ui.modelutil.PropertyModel;
@@ -417,7 +417,7 @@ public class TabGridDialogCoordinator implements TabGridDialogMediator.DialogCon
                     }
                 };
 
-        List<Integer> colors = TabGroupColorUtils.getTabGroupColorIdList();
+        List<Integer> colors = TabGroupColorPickerUtils.getTabGroupColorIdList();
         mColorPickerCoordinator =
                 new ColorPickerCoordinator(
                         mActivity,
