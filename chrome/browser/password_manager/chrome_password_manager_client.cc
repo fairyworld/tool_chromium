@@ -265,7 +265,8 @@ void ChromePasswordManagerClient::BindPasswordGenerationDriver(
 ChromePasswordManagerClient::~ChromePasswordManagerClient() = default;
 
 bool ChromePasswordManagerClient::IsSavingAndFillingEnabled(
-    const GURL& url) const {
+    const url::Origin& origin,
+    base::optional_ref<const GURL> url) const {
   if (base::CommandLine::ForCurrentProcess()->HasSwitch(
           switches::kEnableAutomation)) {
     // Disable the password saving UI for automated tests. It obscures the
@@ -277,7 +278,7 @@ bool ChromePasswordManagerClient::IsSavingAndFillingEnabled(
   return settings_service &&
          settings_service->IsSettingEnabled(
              PasswordManagerSetting::kOfferToSavePasswords) &&
-         !IsOffTheRecord() && IsFillingEnabled(url::Origin::Create(url));
+         !IsOffTheRecord() && IsFillingEnabled(origin, url);
 }
 
 bool ChromePasswordManagerClient::IsFillingEnabled(
@@ -2204,7 +2205,7 @@ void ChromePasswordManagerClient::ShowPasswordGenerationPopup(
 }
 
 void ChromePasswordManagerClient::MaybeShowSavePasswordPrimingPromo(
-    const GURL& current_url) {
+    const url::Origin& origin) {
   // If the user has any stored passwords do not show the promo.
   Profile* profile =
       Profile::FromBrowserContext(web_contents()->GetBrowserContext());
@@ -2214,9 +2215,7 @@ void ChromePasswordManagerClient::MaybeShowSavePasswordPrimingPromo(
     return;
   }
 
-  // If the current page is not eligible for password saving, do not show the
-  // promo.
-  if (!IsSavingAndFillingEnabled(current_url)) {
+  if (!IsSavingAndFillingEnabled(origin)) {
     return;
   }
 

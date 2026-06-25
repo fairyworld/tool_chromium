@@ -687,7 +687,9 @@ void PasswordManager::OnGeneratedPasswordAccepted(
 
 void PasswordManager::OnPasswordNoLongerGenerated(PasswordManagerDriver* driver,
                                                   const FormData& form_data) {
-  DCHECK(client_->IsSavingAndFillingEnabled(form_data.url()));
+  url::Origin origin = driver ? driver->GetLastCommittedOrigin()
+                              : url::Origin::Create(form_data.url());
+  DCHECK(client_->IsSavingAndFillingEnabled(origin, form_data.url()));
 
   PasswordFormManager* form_manager =
       GetMatchedManagerForForm(driver, form_data.renderer_id());
@@ -703,7 +705,9 @@ void PasswordManager::SetGenerationElementAndTypeForForm(
     autofill::password_generation::PasswordGenerationType type) {
   PasswordFormManager* form_manager = GetMatchedManagerForForm(driver, form_id);
   if (form_manager) {
-    DCHECK(client_->IsSavingAndFillingEnabled(form_manager->GetURL()));
+    url::Origin origin = driver ? driver->GetLastCommittedOrigin()
+                                : url::Origin::Create(form_manager->GetURL());
+    DCHECK(client_->IsSavingAndFillingEnabled(origin, form_manager->GetURL()));
     form_manager->SetGenerationElement(generation_element);
     form_manager->SetGenerationPopupWasShown(type);
   }
@@ -713,7 +717,9 @@ void PasswordManager::OnPresaveGeneratedPassword(
     PasswordManagerDriver* driver,
     const FormData& form_data,
     const std::u16string& generated_password) {
-  if (!client_->IsSavingAndFillingEnabled(form_data.url())) {
+  url::Origin origin = driver ? driver->GetLastCommittedOrigin()
+                              : url::Origin::Create(form_data.url());
+  if (!client_->IsSavingAndFillingEnabled(origin, form_data.url())) {
     return;
   }
   PasswordFormManager* form_manager =
@@ -1447,7 +1453,9 @@ void PasswordManager::PropagateFieldDataManagerInfo(
     if (manager->GetDriver().get() != driver) {
       continue;
     }
-    if (!client_->IsSavingAndFillingEnabled(manager->GetURL())) {
+    url::Origin origin = driver ? driver->GetLastCommittedOrigin()
+                                : url::Origin::Create(manager->GetURL());
+    if (!client_->IsSavingAndFillingEnabled(origin, manager->GetURL())) {
       RecordProvisionalSaveFailure(
           client_, PasswordManagerMetricsRecorder::SAVING_DISABLED);
       continue;
@@ -1989,8 +1997,11 @@ void PasswordManager::ShowManualFallbackForSaving(
     return;
   }
 
+  PasswordManagerDriver* const driver = form_manager->GetDriver().get();
+  url::Origin origin = driver ? driver->GetLastCommittedOrigin()
+                              : url::Origin::Create(form_data.url());
   if (!password_manager_util::IsAbleToSavePasswords(client_) ||
-      !client_->IsSavingAndFillingEnabled(form_data.url()) ||
+      !client_->IsSavingAndFillingEnabled(origin, form_data.url()) ||
       ShouldBlockPasswordForSameOriginButDifferentScheme(form_data.url())) {
     return;
   }
@@ -2061,7 +2072,9 @@ bool PasswordManager::DetectPotentialSubmission(
     const FieldDataManager& field_data_manager,
     PasswordManagerDriver* driver) {
   // Do not attempt to detect submission if saving is disabled.
-  if (!client_->IsSavingAndFillingEnabled(form_manager->GetURL())) {
+  url::Origin origin = driver ? driver->GetLastCommittedOrigin()
+                              : url::Origin::Create(form_manager->GetURL());
+  if (!client_->IsSavingAndFillingEnabled(origin, form_manager->GetURL())) {
     RecordProvisionalSaveFailure(
         client_, PasswordManagerMetricsRecorder::SAVING_DISABLED);
     return false;

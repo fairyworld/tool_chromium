@@ -135,7 +135,11 @@ class MockPasswordManagerClient
               PromptUserToSaveOrUpdatePassword,
               (std::unique_ptr<PasswordFormManagerForUI>, bool),
               (override));
-  MOCK_METHOD(bool, IsSavingAndFillingEnabled, (const GURL&), (const override));
+
+  MOCK_METHOD(bool,
+              IsSavingAndFillingEnabled,
+              (const url::Origin&, base::optional_ref<const GURL>),
+              (const, override));
 
   PrefService* GetPrefs() const override { return prefs_; }
 

@@ -606,7 +606,7 @@ TEST_F(ChromePasswordManagerClientTest,
           IsSettingEnabled(PasswordManagerSetting::kOfferToSavePasswords))
       .WillByDefault(Return(true));
   const GURL kUrlOn("https://accounts.google.com");
-  EXPECT_TRUE(client->IsSavingAndFillingEnabled(kUrlOn));
+  EXPECT_TRUE(client->IsSavingAndFillingEnabled(url::Origin::Create(kUrlOn)));
 }
 
 TEST_F(ChromePasswordManagerClientTest,
@@ -617,7 +617,7 @@ TEST_F(ChromePasswordManagerClientTest,
               IsSettingEnabled(PasswordManagerSetting::kOfferToSavePasswords))
       .WillOnce(Return(false));
   const GURL kUrlOn("https://accounts.google.com");
-  EXPECT_FALSE(client->IsSavingAndFillingEnabled(kUrlOn));
+  EXPECT_FALSE(client->IsSavingAndFillingEnabled(url::Origin::Create(kUrlOn)));
 }
 
 TEST_F(ChromePasswordManagerClientTest, SavingAndFillingEnabledConditionsTest) {
@@ -633,7 +633,7 @@ TEST_F(ChromePasswordManagerClientTest, SavingAndFillingEnabledConditionsTest) {
   EXPECT_CALL(*client, GetMainFrameCertStatus())
       .WillRepeatedly(Return(net::CERT_STATUS_AUTHORITY_INVALID));
   const GURL kUrlOn("https://accounts.google.com");
-  EXPECT_FALSE(client->IsSavingAndFillingEnabled(kUrlOn));
+  EXPECT_FALSE(client->IsSavingAndFillingEnabled(url::Origin::Create(kUrlOn)));
   EXPECT_FALSE(client->IsFillingEnabled(url::Origin::Create(kUrlOn)));
 
   // Disable password saving.
@@ -643,13 +643,13 @@ TEST_F(ChromePasswordManagerClientTest, SavingAndFillingEnabledConditionsTest) {
 
   // Functionality disabled if there are SSL errors and the manager itself is
   // disabled.
-  EXPECT_FALSE(client->IsSavingAndFillingEnabled(kUrlOn));
+  EXPECT_FALSE(client->IsSavingAndFillingEnabled(url::Origin::Create(kUrlOn)));
   EXPECT_FALSE(client->IsFillingEnabled(url::Origin::Create(kUrlOn)));
 
   // Saving disabled if there are no SSL errors, but the manager itself is
   // disabled.
   EXPECT_CALL(*client, GetMainFrameCertStatus()).WillRepeatedly(Return(0));
-  EXPECT_FALSE(client->IsSavingAndFillingEnabled(kUrlOn));
+  EXPECT_FALSE(client->IsSavingAndFillingEnabled(url::Origin::Create(kUrlOn)));
   EXPECT_TRUE(client->IsFillingEnabled(url::Origin::Create(kUrlOn)));
 
   // Enable password saving.
@@ -660,7 +660,7 @@ TEST_F(ChromePasswordManagerClientTest, SavingAndFillingEnabledConditionsTest) {
   // Functionality enabled if there are no SSL errors and the manager is
   // enabled.
   EXPECT_CALL(*client, GetMainFrameCertStatus()).WillRepeatedly(Return(0));
-  EXPECT_TRUE(client->IsSavingAndFillingEnabled(kUrlOn));
+  EXPECT_TRUE(client->IsSavingAndFillingEnabled(url::Origin::Create(kUrlOn)));
   EXPECT_TRUE(client->IsFillingEnabled(url::Origin::Create(kUrlOn)));
 }
 
@@ -681,7 +681,7 @@ TEST_F(ChromePasswordManagerClientTest,
 
   // Saving disabled in Incognito mode.
   const GURL kUrlOn("https://accounts.google.com");
-  EXPECT_FALSE(client->IsSavingAndFillingEnabled(kUrlOn));
+  EXPECT_FALSE(client->IsSavingAndFillingEnabled(url::Origin::Create(kUrlOn)));
   EXPECT_TRUE(client->IsFillingEnabled(url::Origin::Create(kUrlOn)));
 
   // In guest mode saving, filling and manual filling are disabled.
@@ -690,7 +690,7 @@ TEST_F(ChromePasswordManagerClientTest,
       ->GetPrimaryOTRProfile(/*create_if_needed=*/true)
       ->AsTestingProfile()
       ->SetGuestSession(true);
-  EXPECT_FALSE(client->IsSavingAndFillingEnabled(kUrlOn));
+  EXPECT_FALSE(client->IsSavingAndFillingEnabled(url::Origin::Create(kUrlOn)));
   EXPECT_FALSE(client->IsFillingEnabled(url::Origin::Create(kUrlOn)));
 }
 
@@ -813,8 +813,8 @@ TEST_F(ChromePasswordManagerClientTest, PasswordManagerBlocklistPolicy) {
                    .empty());
   // Expect the password manager to be disallowed for the URL
   // and thus saving passwords should be disallowed.
-  EXPECT_FALSE(
-      GetClient()->IsSavingAndFillingEnabled(GURL("https://example.com")));
+  EXPECT_FALSE(GetClient()->IsSavingAndFillingEnabled(
+      url::Origin::Create(GURL("https://example.com"))));
   // Clear the blocklist pref.
   profile()->GetTestingPrefService()->ClearPref(
       password_manager::prefs::kPasswordManagerBlocklist);
@@ -824,8 +824,8 @@ TEST_F(ChromePasswordManagerClientTest, PasswordManagerBlocklistPolicy) {
                   ->GetList(password_manager::prefs::kPasswordManagerBlocklist)
                   .empty());
   // Password manager and saving passwords should be allowed again
-  EXPECT_TRUE(
-      GetClient()->IsSavingAndFillingEnabled(GURL("https://example.com")));
+  EXPECT_TRUE(GetClient()->IsSavingAndFillingEnabled(
+      url::Origin::Create(GURL("https://example.com"))));
 }
 #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
         // BUILDFLAG(IS_CHROMEOS)
@@ -1092,7 +1092,8 @@ TEST_P(ChromePasswordManagerClientAutomatedTest, SavingDependsOnAutomation) {
           IsSettingEnabled(PasswordManagerSetting::kOfferToSavePasswords))
       .WillByDefault(Return(true));
   const GURL kUrlOn("https://accounts.google.com");
-  EXPECT_NE(client->IsSavingAndFillingEnabled(kUrlOn), GetParam());
+  EXPECT_NE(client->IsSavingAndFillingEnabled(url::Origin::Create(kUrlOn)),
+            GetParam());
 }
 
 // Check that password manager is disabled on about:blank pages.
@@ -1101,7 +1102,8 @@ TEST_F(ChromePasswordManagerClientTest, SavingAndFillingDisabledForAboutBlank) {
   const GURL kUrl(url::kAboutBlankURL);
   NavigateAndCommit(kUrl);
   EXPECT_TRUE(GetClient()->GetLastCommittedOrigin().opaque());
-  EXPECT_FALSE(GetClient()->IsSavingAndFillingEnabled(kUrl));
+  EXPECT_FALSE(
+      GetClient()->IsSavingAndFillingEnabled(url::Origin::Create(kUrl)));
   EXPECT_FALSE(GetClient()->IsFillingEnabled(url::Origin::Create(kUrl)));
 }
 
@@ -1152,7 +1154,7 @@ TEST_F(ChromePasswordManagerClientTest,
        IsFillingAndSavingOnGooglePasswordPage) {
   PasswordManagerClient* client = GetClient();
   EXPECT_FALSE(client->IsSavingAndFillingEnabled(
-      GURL("https://passwords.google.com/path?query=1")));
+      url::Origin::Create(GURL("https://passwords.google.com/path?query=1"))));
   EXPECT_FALSE(client->IsFillingEnabled(
       url::Origin::Create(GURL("https://passwords.google.com/path?query=1"))));
 }
@@ -1391,7 +1393,7 @@ TEST_P(ChromePasswordManagerClientSchemeTest,
       .WillByDefault(Return(true));
   ASSERT_FALSE(it == std::end(kSchemeTestCases));
   EXPECT_EQ(it->password_manager_works,
-            GetClient()->IsSavingAndFillingEnabled(url));
+            GetClient()->IsSavingAndFillingEnabled(url::Origin::Create(url)));
   EXPECT_EQ(it->password_manager_works,
             GetClient()->IsFillingEnabled(url::Origin::Create(url)));
 }
@@ -1583,7 +1585,7 @@ TEST_F(ChromePasswordManagerClientTest,
   ON_CALL(*client, GetMainFrameCertStatus()).WillByDefault(Return(0));
   // Saving is disabled when the page has a delayed SafeBrowsing warning.
   const GURL kUrlOn("https://accounts.google.com");
-  EXPECT_FALSE(client->IsSavingAndFillingEnabled(kUrlOn));
+  EXPECT_FALSE(client->IsSavingAndFillingEnabled(url::Origin::Create(kUrlOn)));
   EXPECT_FALSE(client->IsFillingEnabled(url::Origin::Create(kUrlOn)));
 }
 #endif
