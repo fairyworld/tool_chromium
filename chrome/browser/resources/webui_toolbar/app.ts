@@ -226,13 +226,11 @@ export class ToolbarAppElement extends AppElementBase {
       omniboxViewState: {
         browserVersion: 0,
         uiVersion: 0,
-        formattedFullUrl: '',
         textPieces: [],
         inlineAutocompletion: '',
         additionalText: '',
         selection: null,
         textIsUrl: false,
-        userInputInProgress: false,
       },
       locationBarFlags: {
         userInputInProgress: false,

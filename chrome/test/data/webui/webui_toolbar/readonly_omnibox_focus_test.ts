@@ -39,18 +39,6 @@ suite('ReadOnlyOmniboxFocus', function() {
   let other: HTMLInputElement;  // A focusable sibling element.
   let uiHandler: MockToolbarUiHandler;
 
-  const initialState = {
-    browserVersion: 0,
-    uiVersion: 0,
-    textPieces: [],
-    inlineAutocompletion: '',
-    additionalText: '',
-    formattedFullUrl: '',
-    selection: null,
-    textIsUrl: false,
-    userInputInProgress: false,
-  };
-
   function getStringSelection(): string {
     const inp = omnibox.$.textInput;
     return inp.value.substring(inp.selectionStart || 0, inp.selectionEnd || 0);
@@ -74,7 +62,8 @@ suite('ReadOnlyOmniboxFocus', function() {
 
   test('Setting text with selection', async () => {
     omnibox.omniboxViewState = {
-      ...initialState,
+      browserVersion: 0,
+      uiVersion: 0,
       textPieces: [
         {
           text: 'Hello',
@@ -82,7 +71,10 @@ suite('ReadOnlyOmniboxFocus', function() {
           color: OmniboxTextColor.kOmniboxText,
         },
       ],
+      inlineAutocompletion: '',
+      additionalText: '',
       selection: {start: 1, end: 5},
+      textIsUrl: false,
     };
     await microtasksFinished();
     assertEquals('Hello', omnibox.$.textContainer.textContent);
@@ -94,7 +86,8 @@ suite('ReadOnlyOmniboxFocus', function() {
 
   test('Setting multi-piece text with selection', async () => {
     omnibox.omniboxViewState = {
-      ...initialState,
+      browserVersion: 0,
+      uiVersion: 0,
       textPieces: [
         {
           text: 'He',
@@ -107,7 +100,10 @@ suite('ReadOnlyOmniboxFocus', function() {
           color: OmniboxTextColor.kOmniboxText,
         },
       ],
+      inlineAutocompletion: '',
+      additionalText: '',
       selection: {start: 1, end: 5},
+      textIsUrl: false,
     };
     await microtasksFinished();
     assertEquals('Hello', omnibox.$.textContainer.textContent);
@@ -121,7 +117,8 @@ suite('ReadOnlyOmniboxFocus', function() {
   // <input>.
   test('Selection on focus out and back in', async () => {
     omnibox.omniboxViewState = {
-      ...initialState,
+      browserVersion: 0,
+      uiVersion: 0,
       textPieces: [
         {
           text: 'Hello',
@@ -129,7 +126,10 @@ suite('ReadOnlyOmniboxFocus', function() {
           color: OmniboxTextColor.kOmniboxText,
         },
       ],
+      inlineAutocompletion: '',
+      additionalText: '',
       selection: {start: 1, end: 5},
+      textIsUrl: false,
     };
     await microtasksFinished();
     assertEquals('ello', getStringSelection());
@@ -149,7 +149,8 @@ suite('ReadOnlyOmniboxFocus', function() {
 
   test('Event forwarding via mojo', async () => {
     omnibox.omniboxViewState = {
-      ...initialState,
+      browserVersion: 0,
+      uiVersion: 0,
       textPieces: [
         {
           text: 'Hello',
@@ -157,7 +158,10 @@ suite('ReadOnlyOmniboxFocus', function() {
           color: OmniboxTextColor.kOmniboxText,
         },
       ],
+      inlineAutocompletion: '',
+      additionalText: '',
       selection: {start: 1, end: 5},
+      textIsUrl: false,
     };
     await microtasksFinished();
 
