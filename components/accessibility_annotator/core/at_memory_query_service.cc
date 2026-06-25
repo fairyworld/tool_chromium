@@ -156,7 +156,7 @@ void AtMemoryQueryService::Query(
 
   if (net::NetworkChangeNotifier::IsOffline()) {
     update_callback.Run(
-        MemorySearchResults(MemorySearchStatus::kDataFetchFailure));
+        MemorySearchResults(MemorySearchStatus::kNoConnectionFailure));
     return;
   }
 

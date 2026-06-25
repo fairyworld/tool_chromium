@@ -169,7 +169,7 @@ TEST_F(AtMemoryQueryServiceTest, Query_Offline) {
   ASSERT_TRUE(future.Wait());
   const auto& result = future.Get();
   EXPECT_TRUE(result.entries.empty());
-  EXPECT_EQ(result.status, MemorySearchStatus::kDataFetchFailure);
+  EXPECT_EQ(result.status, MemorySearchStatus::kNoConnectionFailure);
 }
 
 // Tests that the query service returns the expected results when the intent is

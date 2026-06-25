@@ -281,18 +281,17 @@ TEST_F(AtMemoryManagerTest,
   EXPECT_EQ(final_suggestions[0].main_text.value, u"Full Address");
 }
 
-// Tests that when the query service returns a data fetch failure (e.g. if it
-// detected an offline state or other fetch failure), the manager displays
-// the no connection suggestion.
-TEST_F(
-    AtMemoryManagerTest,
-    OnSearchSubmitted_QueryServiceReturnsDataFetchFailure_ReturnsNoConnection) {
+// Tests that when the user is offline, the manager displays the no connection
+// suggestion.
+TEST_F(AtMemoryManagerTest,
+       OnSearchSubmitted_QueryServiceReturnsNoConnectionFailure) {
   manager().OnPopupShown(AutofillSuggestionTriggerSource::kAtMemory,
                          /*is_context_secure=*/true, update_callback_.Get());
 
   std::vector<Suggestion> final_suggestions;
   MockQueryResultsAndExpectCallback(
-      u"query", accessibility_annotator::MemorySearchStatus::kDataFetchFailure,
+      u"query",
+      accessibility_annotator::MemorySearchStatus::kNoConnectionFailure,
       /*entries=*/{}, final_suggestions);
 
   manager().OnSearchSubmitted(u"query");

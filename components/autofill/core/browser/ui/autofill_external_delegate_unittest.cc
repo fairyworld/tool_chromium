@@ -1332,7 +1332,7 @@ TEST_F(AutofillExternalDelegateTest, AtMemoryRemoteQuery_NoConnection) {
 
   SetupMockAtMemoryQueryService(
       u"shoe size",
-      {accessibility_annotator::MemorySearchStatus::kDataFetchFailure, {}});
+      {accessibility_annotator::MemorySearchStatus::kNoConnectionFailure, {}});
 
   EXPECT_CALL(autofill_client(), UpdateAutofillSuggestions)
       .WillOnce(Return())

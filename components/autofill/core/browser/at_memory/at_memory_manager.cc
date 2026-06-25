@@ -783,7 +783,7 @@ void AtMemoryManager::OnSearchResultsReceived(
       break;
     case accessibility_annotator::MemorySearchStatus::kPartialResponseSuccess:
       break;
-    case accessibility_annotator::MemorySearchStatus::kDataFetchFailure:
+    case accessibility_annotator::MemorySearchStatus::kNoConnectionFailure:
       suggestions.push_back(CreateNoConnectionSuggestion());
       break;
     case accessibility_annotator::MemorySearchStatus::kInferenceFailure:
