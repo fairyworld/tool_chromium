@@ -80,7 +80,8 @@ IN_PROC_BROWSER_TEST_F(ContextualTasksBrowserTest, App_Composebox_BasicMode) {
 }
 
 // TODO(crbug.com/487147580): Re-enable the test
-#if BUILDFLAG(IS_LINUX)
+// TODO(crbug.com/527559266): Flaky on ChromeOS.
+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 #define MAYBE_Composebox DISABLED_Composebox
 #else
 #define MAYBE_Composebox Composebox
