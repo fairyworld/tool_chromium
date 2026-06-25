@@ -11,6 +11,7 @@
 #include <memory>
 #include <utility>
 
+#include "base/check_deref.h"
 #include "base/containers/flat_map.h"
 #include "base/feature_list.h"
 #include "base/memory/raw_ptr.h"
@@ -677,7 +678,7 @@ void PasswordManager::OnGeneratedPasswordAccepted(
     // Form manager might not be present at the time manual password generation
     // is triggered, but if password generation was possible, so should be the
     // creation of a new form manager.
-    manager = CreateFormManager(driver, form_data);
+    manager = CreateFormManager(CHECK_DEREF(driver), form_data);
     CHECK(manager);
   }
 
@@ -1151,35 +1152,32 @@ void PasswordManager::CreateFormManagers(
 
   // Create form manager for new forms.
   for (const FormData* new_form_data : new_forms_data) {
-    CreateFormManager(driver, *new_form_data);
+    CreateFormManager(CHECK_DEREF(driver), *new_form_data);
   }
 }
 
 PasswordFormManager* PasswordManager::CreateFormManager(
-    PasswordManagerDriver* driver,
+    PasswordManagerDriver& driver,
     const autofill::FormData& form) {
-  url::Origin origin = driver ? driver->GetLastCommittedOrigin()
-                              : url::Origin::Create(form.url());
+  url::Origin origin = driver.GetLastCommittedOrigin();
   if (!client_->IsFillingEnabled(origin, form.url())) {
     return nullptr;
   }
 
   auto manager = std::make_unique<PasswordFormManager>(
-      client_,
-      driver ? driver->AsWeakPtr() : base::WeakPtr<PasswordManagerDriver>(),
-      form, /*form_fetcher=*/nullptr,
+      client_, driver.AsWeakPtr(), form, /*form_fetcher=*/nullptr,
       std::make_unique<PasswordSaveManagerImpl>(client_),
       /*metrics_recorder=*/nullptr);
   // Process model and server predictions in case they've already arrived.
   if (auto model_form_predictions = classifier_model_predictions_.find(
-          std::make_pair(driver, form.renderer_id()));
+          std::make_pair(&driver, form.renderer_id()));
       model_form_predictions != classifier_model_predictions_.end()) {
     manager->ProcessModelPredictions(model_form_predictions->second);
   }
   manager->ProcessServerPredictions(server_predictions_);
 
   password_form_cache_.AddFormManager(std::move(manager));
-  return password_form_cache_.GetMatchedManager(driver, form.renderer_id());
+  return password_form_cache_.GetMatchedManager(&driver, form.renderer_id());
 }
 
 PasswordFormManager* PasswordManager::ProvisionallySaveForm(
@@ -1218,7 +1216,7 @@ PasswordFormManager* PasswordManager::ProvisionallySaveForm(
   if (!matched_manager) {
     RecordProvisionalSaveFailure(
         client_, PasswordManagerMetricsRecorder::NO_MATCHING_FORM);
-    matched_manager = CreateFormManager(driver, submitted_form);
+    matched_manager = CreateFormManager(CHECK_DEREF(driver), submitted_form);
     if (!matched_manager) {
       // The form manager could not be created, saving can not proceed.
       return nullptr;
@@ -1784,7 +1782,7 @@ void PasswordManager::OnLoginPotentiallyFailed(
 }
 
 void PasswordManager::ProcessAutofillPredictions(
-    PasswordManagerDriver* driver,
+    PasswordManagerDriver& driver,
     const autofill::FormData& form,
     const base::flat_map<FieldGlobalId, autofill::AutofillServerPrediction>&
         predictions) {
@@ -1799,8 +1797,7 @@ void PasswordManager::ProcessAutofillPredictions(
     logger->LogFormDataWithServerPredictions(form, predictions);
   }
 
-  // `driver` might be null in tests.
-  DriverId driver_id = driver ? driver->GetId() : DriverId();
+  DriverId driver_id = driver.GetId();
   // Update the `server_predictions_` stored as a member.
   const FormPredictions& form_predictions =
       server_predictions_
@@ -1809,7 +1806,7 @@ void PasswordManager::ProcessAutofillPredictions(
           .first->second;
 
   if (PasswordGenerationFrameHelper* password_generation_manager =
-          driver ? driver->GetPasswordGenerationHelper() : nullptr) {
+          driver.GetPasswordGenerationHelper()) {
     password_generation_manager->ProcessPasswordRequirements(form, predictions);
   }
 
@@ -1822,7 +1819,7 @@ void PasswordManager::ProcessAutofillPredictions(
 
   // Create or update the `PasswordFormManager` corresponding to `form`.
   PasswordFormManager* manager =
-      GetMatchedManagerForForm(driver, form.global_id().renderer_id);
+      GetMatchedManagerForForm(&driver, form.global_id().renderer_id);
   if (!manager) {
     // If the renderer recognizes `form` as a credential form, then we will
     // be informed about this form via `OnFormsParsed()` and `OnFormsSeen()`.
@@ -1875,7 +1872,7 @@ void PasswordManager::ProcessClassificationModelPredictions(
     if (!ModelPredictionsContainReliableCredentialTypes(predictions_for_form)) {
       return;
     }
-    manager = CreateFormManager(driver, form);
+    manager = CreateFormManager(CHECK_DEREF(driver), form);
     if (!manager) {
       return;
     }

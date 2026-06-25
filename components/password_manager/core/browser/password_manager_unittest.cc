@@ -4429,7 +4429,7 @@ TEST_P(PasswordManagerTest, AutofillPredictionBeforeFormParsed) {
   // Server predictions says that this is a sign-in form. Since they have higher
   // priority than autocomplete attributes then the form should be filled.
   manager()->ProcessAutofillPredictions(
-      &driver_, form.form_data,
+      driver_, form.form_data,
       CreateServerPredictions(form.form_data, {{1, FieldType::PASSWORD}}));
 
   EXPECT_CALL(driver_, PropagateFillDataOnParsingCompletion);
@@ -4456,7 +4456,7 @@ TEST_P(PasswordManagerTest,
   store_->AddLogin(password_manager::FromPasswordForm(form));
 
   manager()->ProcessAutofillPredictions(
-      &driver_, form.form_data,
+      driver_, form.form_data,
       CreateServerPredictions(form.form_data,
                               {{0, FieldType::SINGLE_USERNAME}}));
 
@@ -4487,7 +4487,7 @@ TEST_P(PasswordManagerTest,
   // No fill call is sent to the renderer during prediction processing.
   EXPECT_CALL(driver_, PropagateFillDataOnParsingCompletion).Times(0);
   manager()->ProcessAutofillPredictions(
-      &driver_, form.form_data,
+      driver_, form.form_data,
       CreateServerPredictions(form.form_data,
                               {{0, FieldType::SINGLE_USERNAME}}));
   Mock::VerifyAndClearExpectations(&driver_);
@@ -4516,7 +4516,7 @@ TEST_P(PasswordManagerTest,
   // recognized by the renderer (which calls `OnPasswordFormsParsed`).
   EXPECT_CALL(driver_, PropagateFillDataOnParsingCompletion);
   manager()->ProcessAutofillPredictions(
-      &driver_, form.form_data,
+      driver_, form.form_data,
       CreateServerPredictions(form.form_data, {{0, FieldType::USERNAME},
                                                {1, FieldType::PASSWORD}}));
   manager()->OnPasswordFormsParsed(&driver_, {form.form_data});
@@ -4530,7 +4530,7 @@ TEST_P(PasswordManagerTest,
 
   EXPECT_CALL(driver_, PropagateFillDataOnParsingCompletion);
   manager()->ProcessAutofillPredictions(
-      &driver_, modified_form_data,
+      driver_, modified_form_data,
       CreateServerPredictions(modified_form_data,
                               {{0, FieldType::SINGLE_USERNAME}}));
 
@@ -4554,11 +4554,11 @@ TEST_P(PasswordManagerTest, AutofillPredictionBeforeMultipleFormsParsed) {
   // Server predictions say that this is a sign-in form. Since they have higher
   // priority than autocomplete attributes, the form should be filled.
   manager()->ProcessAutofillPredictions(
-      &driver_, form1.form_data,
+      driver_, form1.form_data,
       CreateServerPredictions(form1.form_data,
                               {{0, FieldType::SINGLE_USERNAME}}));
   manager()->ProcessAutofillPredictions(
-      &driver_, form2.form_data,
+      driver_, form2.form_data,
       CreateServerPredictions(form2.form_data, {{1, FieldType::PASSWORD}}));
 
   EXPECT_CALL(driver_, PropagateFillDataOnParsingCompletion).Times(2);
@@ -4622,7 +4622,7 @@ TEST_P(PasswordManagerTest, SavingAfterUserTypingAndNavigation) {
 TEST_P(PasswordManagerTest, ProvisionallySaveFailure) {
   EXPECT_CALL(client_, IsSavingAndFillingEnabled(_, _))
       .WillRepeatedly(Return(true));
-  manager()->OnPasswordFormsParsed(nullptr, {});
+  manager()->OnPasswordFormsParsed(&driver_, {});
 
   base::HistogramTester histogram_tester;
   ukm::TestAutoSetUkmRecorder test_ukm_recorder;
@@ -4632,7 +4632,7 @@ TEST_P(PasswordManagerTest, ProvisionallySaveFailure) {
       .WillRepeatedly(Return(metrics_recorder.get()));
 
   FormData unobserved_form_data = MakeSimpleFormData();
-  manager()->OnPasswordFormSubmitted(nullptr, unobserved_form_data);
+  manager()->OnPasswordFormSubmitted(&driver_, unobserved_form_data);
 
   histogram_tester.ExpectUniqueSample(
       "PasswordManager.ProvisionalSaveFailure2",
@@ -4757,7 +4757,7 @@ TEST_P(PasswordManagerTest, ReportMissingFormManager) {
 
     SCOPED_TRACE(testing::Message() << "test case = " << test_case.description);
 
-    manager()->OnPasswordFormsParsed(nullptr, test_case.parsed_forms_data);
+    manager()->OnPasswordFormsParsed(&driver_, test_case.parsed_forms_data);
     task_environment_.RunUntilIdle();
 
     ukm::TestAutoSetUkmRecorder test_ukm_recorder;
@@ -4769,10 +4769,10 @@ TEST_P(PasswordManagerTest, ReportMissingFormManager) {
     for (const FormData& processed_form_data : test_case.processed_form_data) {
       switch (test_case.save_signal) {
         case MissingFormManagerTestCase::Signal::Automatic:
-          manager()->OnPasswordFormSubmitted(nullptr, processed_form_data);
+          manager()->OnPasswordFormSubmitted(&driver_, processed_form_data);
           break;
         case MissingFormManagerTestCase::Signal::Manual:
-          manager()->OnInformAboutUserInput(nullptr, processed_form_data);
+          manager()->OnInformAboutUserInput(&driver_, processed_form_data);
           break;
         case MissingFormManagerTestCase::Signal::None:
           break;
@@ -5125,7 +5125,7 @@ TEST_P(PasswordManagerTest, FillSingleUsername) {
   EXPECT_CALL(driver_, PropagateFillDataOnParsingCompletion)
       .WillOnce(SaveArg<0>(&fill_data));
   manager()->ProcessAutofillPredictions(
-      &driver_, form_data,
+      driver_, form_data,
       CreateServerPredictions(form_data, {{0, FieldType::SINGLE_USERNAME}}));
   ASSERT_TRUE(base::test::RunUntil(
       [&]() { return manager()->HaveFormManagersReceivedData(&driver_); }));
@@ -5155,7 +5155,7 @@ TEST_P(PasswordManagerTest, FillSingleUsernameForgotPassword) {
   EXPECT_CALL(driver_, PropagateFillDataOnParsingCompletion)
       .WillOnce(SaveArg<0>(&fill_data));
   manager()->ProcessAutofillPredictions(
-      &driver_, form_data,
+      driver_, form_data,
       CreateServerPredictions(
           form_data, {{0, FieldType::SINGLE_USERNAME_FORGOT_PASSWORD}}));
   ASSERT_TRUE(base::test::RunUntil(
@@ -5204,7 +5204,7 @@ TEST_P(PasswordManagerTest,
   EXPECT_CALL(driver_, GetLastCommittedURL)
       .WillRepeatedly(ReturnRef(form_data.url()));
   manager()->ProcessAutofillPredictions(
-      &driver_, form_data,
+      driver_, form_data,
       CreateServerPredictions(form_data,
                               {{1, FieldType::ACCOUNT_CREATION_PASSWORD}}));
   task_environment_.RunUntilIdle();
@@ -5269,7 +5269,7 @@ TEST_P(PasswordManagerTest, UsernameFirstFlowSavingWithServerPredictions) {
 
   // Set up a server prediction for the single username field.
   manager()->ProcessAutofillPredictions(
-      &driver_, username_form.form_data,
+      driver_, username_form.form_data,
       CreateServerPredictions(username_form.form_data,
                               {{0, FieldType::SINGLE_USERNAME}}));
   task_environment_.RunUntilIdle();
@@ -5342,11 +5342,11 @@ TEST_P(PasswordManagerTest, UsernameFirstFlowSignUpFormWithIntermediaryFields) {
 
   // Set up a server prediction for the single username field and password form.
   manager()->ProcessAutofillPredictions(
-      &driver_, username_form.form_data,
+      driver_, username_form.form_data,
       CreateServerPredictions(username_form.form_data,
                               {{0, FieldType::SINGLE_USERNAME}}));
   manager()->ProcessAutofillPredictions(
-      &driver_, password_form.form_data,
+      driver_, password_form.form_data,
       CreateServerPredictions(password_form.form_data,
                               {{0, FieldType::NAME_FIRST},
                                {1, FieldType::NAME_LAST},
@@ -5432,7 +5432,7 @@ TEST_P(PasswordManagerTest, UsernameFirstFlowSignInFormWithIntermediaryFields) {
 
   // Set up a server prediction for the single username field and password form.
   manager()->ProcessAutofillPredictions(
-      &driver_, username_form.form_data,
+      driver_, username_form.form_data,
       CreateServerPredictions(username_form.form_data,
                               {{0, FieldType::SINGLE_USERNAME}}));
 
@@ -5487,7 +5487,7 @@ TEST_P(PasswordManagerTest, UsernameFirstFlowSavingOnPasswordFormWithCaptcha) {
 
   // Set up a server prediction for the single username field.
   manager()->ProcessAutofillPredictions(
-      &driver_, username_form.form_data,
+      driver_, username_form.form_data,
       CreateServerPredictions(username_form.form_data,
                               {{0, FieldType::SINGLE_USERNAME}}));
 
@@ -5576,13 +5576,13 @@ TEST_P(PasswordManagerTest,
 
   // Set up a override prediction for the single username field.
   manager()->ProcessAutofillPredictions(
-      &driver_, username_form.form_data,
+      driver_, username_form.form_data,
       CreateServerPredictions(username_form.form_data,
                               {{0, FieldType::SINGLE_USERNAME}},
                               /*is_override=*/true));
 
   manager()->ProcessAutofillPredictions(
-      &driver_, signup_form.form_data,
+      driver_, signup_form.form_data,
       CreateServerPredictions(
           signup_form.form_data,
           {{1, FieldType::USERNAME}, {2, FieldType::NEW_PASSWORD}}));
@@ -5658,7 +5658,7 @@ TEST_P(PasswordManagerTest,
 
   // Set up an override prediction for the stale single username field.
   manager()->ProcessAutofillPredictions(
-      &driver_, stale_username_form.form_data,
+      driver_, stale_username_form.form_data,
       CreateServerPredictions(stale_username_form.form_data,
                               {{0, FieldType::SINGLE_USERNAME}},
                               /*is_override=*/true));
@@ -5824,7 +5824,7 @@ TEST_P(PasswordManagerTest, UsernameFirstFlowKeepServerPredictions) {
       /*is_likely_otp=*/false);
   // Received server prediction.
   manager()->ProcessAutofillPredictions(
-      &driver_, username_form.form_data,
+      driver_, username_form.form_data,
       CreateServerPredictions(username_form.form_data,
                               {{0, FieldType::SINGLE_USERNAME}},
                               /*is_override=*/false));
@@ -5862,7 +5862,7 @@ TEST_P(PasswordManagerTest, UsernameFirstFlowOTPPasswordForm) {
       /*is_likely_otp=*/false);
   // Set up a server prediction for the single username field.
   manager()->ProcessAutofillPredictions(
-      &driver_, username_form.form_data,
+      driver_, username_form.form_data,
       CreateServerPredictions(username_form.form_data,
                               {{0, FieldType::SINGLE_USERNAME}}));
 
@@ -6021,7 +6021,7 @@ TEST_P(PasswordManagerTest, GenerationOnChangedForm) {
 
   // Server predictions may arrive before the form is parsed by PasswordManager.
   manager()->ProcessAutofillPredictions(
-      &driver_, form_data,
+      driver_, form_data,
       CreateServerPredictions(form_data,
                               {{1, FieldType::ACCOUNT_CREATION_PASSWORD},
                                {2, FieldType::CONFIRMATION_PASSWORD}}));
@@ -6466,14 +6466,14 @@ TEST_P(PasswordManagerTest, ProcessingPredictionsOnSameFormSignatureForms) {
 
   manager()->OnPasswordFormsParsed(&driver_, {observed_form});
   manager()->ProcessAutofillPredictions(
-      &driver_, observed_form,
+      driver_, observed_form,
       CreateServerPredictions(
           observed_form, {{0, FieldType::USERNAME}, {1, FieldType::PASSWORD}}));
   manager()->OnPasswordFormSubmitted(&driver_, observed_form);
 
   manager()->OnPasswordFormsParsed(&driver_, {similar_form});
   manager()->ProcessAutofillPredictions(
-      &driver_, similar_form,
+      driver_, similar_form,
       CreateServerPredictions(similar_form, {{0, FieldType::USERNAME},
                                              {1, FieldType::NEW_PASSWORD}}));
   // Wait for password store response before parsing.
@@ -6680,7 +6680,7 @@ TEST_P(PasswordManagerTest,
   PasswordForm username_form(MakeSimpleFormWithOnlyUsernameField());
   const FieldType kFieldType = FieldType::SINGLE_USERNAME_FORGOT_PASSWORD;
   manager()->ProcessAutofillPredictions(
-      &driver_, username_form.form_data,
+      driver_, username_form.form_data,
       CreateServerPredictions(username_form.form_data, {{0, kFieldType}}));
 
   // Simulate the user typed in a text field..
@@ -6717,7 +6717,7 @@ TEST_P(PasswordManagerTest, FieldInfoManagerHasDataPredictionsPropagatedLater) {
   // Process server predictions.
   const FieldType kFieldType = FieldType::SINGLE_USERNAME_FORGOT_PASSWORD;
   manager()->ProcessAutofillPredictions(
-      &driver_, username_form.form_data,
+      driver_, username_form.form_data,
       CreateServerPredictions(username_form.form_data, {{0, kFieldType}}));
 
   std::string signon_realm = GetSignonRealm(username_form.url);
@@ -7212,7 +7212,7 @@ TEST_P(PasswordManagerTest,
       .WillRepeatedly(Return(false));
 
   manager()->ProcessAutofillPredictions(
-      &driver_, form,
+      driver_, form,
       CreateServerPredictions(form, {{0, FieldType::SINGLE_USERNAME}}));
 
   // Check that a form manager was not created.
@@ -7402,7 +7402,7 @@ TEST_P(PasswordManagerWithOtpVariationsTest,
       break;
     case PredictionSource::SERVER:
       manager()->ProcessAutofillPredictions(
-          &driver_, one_time_code_form.form_data,
+          driver_, one_time_code_form.form_data,
           CreateServerPredictions(
               one_time_code_form.form_data,
               {{otp_form_has_username ? 1 : 0, FieldType::NOT_PASSWORD}}));

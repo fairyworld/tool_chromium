@@ -9,6 +9,7 @@
 #include <string>
 #include <utility>
 
+#include "base/check_deref.h"
 #include "base/command_line.h"
 #include "base/containers/span.h"
 #include "base/containers/to_vector.h"
@@ -2017,7 +2018,7 @@ void ChromePasswordManagerClient::PropagatePredictionsToPasswordManager(
       case FieldTypeSource::kAutofillServer:
       case FieldTypeSource::kAutofillAiModel:
         password_manager_.ProcessAutofillPredictions(
-            driver, renderer_form,
+            CHECK_DEREF(driver), renderer_form,
             manager.GetServerPredictionsForForm(form_id,
                                                 field_ids_for_renderer_form));
         break;
