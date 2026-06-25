@@ -33,7 +33,7 @@ Polymer({
   },
 
   /** @private */
-  onDialogClose_() {
+  onDialogClose_: function() {
     chrome.send('dialogClose');
   },
 });
