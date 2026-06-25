@@ -46,6 +46,14 @@ public final class TestSideUiContainer implements SideUiContainer {
     /** Number of times {@link #onWillAutoRestore} is called. */
     public int mNumOnWillAutoRestoreReceived;
 
+    /**
+     * Whether to call {@link SideUiCoordinator#updateUi} in {@link #onWillAutoClose()}.
+     *
+     * <p>When this is true, it simulates a common mistake in a {@link SideUiContainer}. Please see
+     * the documentation of {@link #onWillAutoClose()} for details.
+     */
+    public boolean mRequestUiUpdateOnWillAutoClose;
+
     private final SideUiCoordinator mSideUiCoordinator;
     private final View mSideUiContainerView;
     private final @SideUiId int mSideUiId;
@@ -119,6 +127,11 @@ public final class TestSideUiContainer implements SideUiContainer {
     @Override
     public void onWillAutoClose() {
         mNumOnWillAutoCloseReceived++;
+
+        if (mRequestUiUpdateOnWillAutoClose) {
+            mSideUiCoordinator.updateUi(
+                    new UiUpdateRequest(mSideUiId, /* suppressAnimations= */ true));
+        }
     }
 
     @Override

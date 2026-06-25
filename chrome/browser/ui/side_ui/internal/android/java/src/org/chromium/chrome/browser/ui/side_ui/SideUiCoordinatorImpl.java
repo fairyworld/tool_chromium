@@ -66,6 +66,13 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
     private final SideUiShowabilityNotifier mShowabilityNotifier = new SideUiShowabilityNotifier();
 
     /**
+     * Whether {@link #updateUiInternal} is in progress.
+     *
+     * <p>This is used to prevent re-entrancy into {@link #updateUiInternal}.
+     */
+    private boolean mIsUpdatingUi;
+
+    /**
      * Constructor for a {@link SideUiCoordinatorImpl}.
      *
      * @param parentActivity The {@link Activity} containing all Side UIs.
@@ -308,6 +315,9 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
     }
 
     private void updateUiInternal(UiUpdateRequest request) {
+        assert !mIsUpdatingUi : "another UI update is still in progress";
+        mIsUpdatingUi = true;
+
         // 1. End any existing transitions still in progress. This needs to be done before checking
         // the current specs, since specs aren't fully updated until after all transitions have
         // finished.
@@ -356,6 +366,8 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
                     suppressAnimations ? null : collectTransitions(newSideUiSpecs, sideUiSpecsDiff);
             commitNewSideUiSpecs(newSideUiSpecs, sideUiSpecsDiff, transitionSet);
         }
+
+        mIsUpdatingUi = false;
     }
 
     private SideUiSpecs getCurrentSideUiSpecsInternal() {
