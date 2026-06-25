@@ -1324,6 +1324,17 @@ void RenderViewContextMenu::InitMenu() {
     AppendSharingItems();
   }
 
+  bool show_glic = false;
+  if (features::IsMenuSimplificationEnabled()) {
+    show_glic = !params_.selection_text.empty();
+  } else {
+    show_glic = !params_.selection_text.empty() || !params_.link_url.is_empty();
+  }
+
+  if (show_glic && !use_simplified_menu_for_text_selection) {
+    MaybeAppendOpenGlicItem(/*add_separator=*/false);
+  }
+
   if (!use_simplified_menu_for_text_selection &&
       !(features::IsMenuSimplificationEnabled() && editable) &&
       content_type_->SupportsGroup(
@@ -1338,17 +1349,6 @@ void RenderViewContextMenu::InitMenu() {
   if (!use_simplified_menu_for_text_selection &&
       !params_.selection_text.empty()) {
     AppendSaveToMemoryBanksItem();
-  }
-
-  bool show_glic = false;
-  if (features::IsMenuSimplificationEnabled()) {
-    show_glic = !params_.selection_text.empty();
-  } else {
-    show_glic = !params_.selection_text.empty() || !params_.link_url.is_empty();
-  }
-
-  if (show_glic) {
-    MaybeAppendOpenGlicItem();
   }
 
   if (!use_simplified_menu_for_text_selection && !media_image &&
@@ -2888,6 +2888,11 @@ void RenderViewContextMenu::AppendSpellingAndSearchSuggestionItems() {
 
   if (!params_.misspelled_word.empty() &&
       !features::IsMenuSimplificationEnabled()) {
+    bool show_glic =
+        !params_.selection_text.empty() || !params_.link_url.is_empty();
+    if (show_glic) {
+      MaybeAppendOpenGlicItem(/*add_separator=*/false);
+    }
     AppendSearchProvider();
     menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
   }
@@ -2994,6 +2999,7 @@ void RenderViewContextMenu::AppendOtherEditableItems() {
   if (features::IsMenuSimplificationEnabled() &&
       !params_.selection_text.empty()) {
     menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
+    MaybeAppendOpenGlicItem(/*add_separator=*/false);
     AppendSearchProvider();
     AppendPrintItem();
     if (CanPartiallyTranslateTargetLanguage()) {
@@ -5356,7 +5362,10 @@ void RenderViewContextMenu::ExecProtocolHandlerSettings(int event_flags) {
   OpenURL(url, GURL(), {}, disposition, ui::PAGE_TRANSITION_LINK);
 }
 
-void RenderViewContextMenu::MaybeAppendOpenGlicItem() {
+void RenderViewContextMenu::MaybeAppendOpenGlicItem(bool add_separator) {
+  if (glic_item_shown_) {
+    return;
+  }
   if (!content_type_->SupportsGroup(ContextMenuContentType::ITEM_GROUP_GLIC)) {
     return;
   }
@@ -5371,8 +5380,7 @@ void RenderViewContextMenu::MaybeAppendOpenGlicItem() {
     return;
   }
 
-  if (features::IsMenuSimplificationEnabled() &&
-      !params_.selection_text.empty() && IsPasswordField()) {
+  if (IsPasswordField()) {
     return;
   }
 
@@ -5392,7 +5400,9 @@ void RenderViewContextMenu::MaybeAppendOpenGlicItem() {
         menu_model_.GetItemCount() - 1,
         UserEducationService::MaybeShowNewBadge(GetBrowserContext(),
                                                 features::kGlicContextMenu));
-    menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
+    if (add_separator) {
+      menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
+    }
     glic_item_shown_ = true;
   }
 }
@@ -5787,6 +5797,7 @@ void RenderViewContextMenu::AppendRevisedTextSelectionSection() {
     // Link + Selection case
     AppendCopyItem();
     AppendLinkToTextItems();
+    MaybeAppendOpenGlicItem(/*add_separator=*/false);
     AppendSearchProvider();
     AppendSaveToMemoryBanksItem();
     AppendPrintItem();
@@ -5804,6 +5815,7 @@ void RenderViewContextMenu::AppendRevisedTextSelectionSection() {
 
     menu_model_.AddSeparator(ui::NORMAL_SEPARATOR);
 
+    MaybeAppendOpenGlicItem(/*add_separator=*/false);
     AppendSearchProvider();
     AppendReadAnythingItem();
     AppendSaveToMemoryBanksItem();
