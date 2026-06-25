@@ -447,28 +447,17 @@ class PreflightController::PreflightLoader final {
       return;
     }
 
-    // NOTE: `detected_error_status` may be non-nullopt if a PNA warning was
-    // encountered in `CreatePreflightResult()`.
-
     // Only log if there is a result to log.
     net_log_.AddEvent(net::NetLogEventType::CORS_PREFLIGHT_RESULT,
                       [&result] { return result->NetLogParams(); });
 
     // Preflight succeeded. Check `original_request_` with `result`.
-    net::Error net_error = net::OK;
-    std::optional<CorsErrorStatus> check_error_status = CheckPreflightResult(
+    detected_error_status = CheckPreflightResult(
         *result, original_request_, non_wildcard_request_headers_support_,
         acam_preflight_spec_conformant_);
 
-    // Avoid overwriting if `CheckPreflightResult()` succeeds, just in case
-    // there was a PNA warning in `detected_error_status`.
-    // TODO(crbug.com/40204695): Simplify this by always overwriting
-    // `detected_error_status` once preflights are always enforced.
-    if (check_error_status.has_value()) {
-      net_error = net::ERR_FAILED;
-      detected_error_status = std::move(check_error_status);
-    }
-
+    net::Error net_error =
+        detected_error_status.has_value() ? net::ERR_FAILED : net::OK;
     FinishHandleResponseHeader(net_error, std::move(detected_error_status),
                                std::move(result));
   }
@@ -486,6 +475,8 @@ class PreflightController::PreflightLoader final {
                                  original_request_.url, network_isolation_key_,
                                  std::move(result));
     }
+
+    CHECK(!detected_error_status.has_value() || net_error != net::OK);
 
     std::move(completion_callback_)
         .Run(net_error, detected_error_status,
@@ -509,6 +500,7 @@ class PreflightController::PreflightLoader final {
                 status.has_value() ? *status
                                    : network::URLLoaderCompletionStatus(error));
       }
+      CHECK(!status.has_value() || error != net::OK);
       std::move(completion_callback_)
           .Run(error,
                status.has_value() ? status->cors_error_status : std::nullopt,
