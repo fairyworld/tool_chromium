@@ -1040,6 +1040,16 @@ IN_PROC_BROWSER_TEST_F(
 #endif  // !BUILDFLAG(IS_CHROMEOS)
 }
 
+IN_PROC_BROWSER_TEST_F(
+    ActorPolicyCheckerBrowserTestWithManagedAccountWithPolicy,
+    InvalidPolicyValueFallsSafeAndDoesNotCrash) {
+  browser()->profile()->GetPrefs()->SetInteger(glic::prefs::kGlicActuationOnWeb,
+                                               2);
+  EXPECT_FALSE(GetPolicyChecker().CanActOnWeb());
+  EXPECT_EQ(GetPolicyChecker().CannotActOnWebReason(),
+            CannotActReason::kDisabledByPolicy);
+}
+
 IN_PROC_BROWSER_TEST_F(GlicActorPolicyCheckerBrowserTestManagedBrowser,
                        ValidateContentAllowedByDefault) {
   base::test::TestFuture<GlicActorPolicyChecker::ContentValidationReason>

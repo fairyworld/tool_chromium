@@ -5,9 +5,12 @@
 #ifndef CHROME_BROWSER_GLIC_GLIC_PREF_NAMES_H_
 #define CHROME_BROWSER_GLIC_GLIC_PREF_NAMES_H_
 
+#include <optional>
+
 #include "build/build_config.h"
 
 class PrefRegistrySimple;
+class PrefService;
 namespace user_prefs {
 class PrefRegistrySyncable;
 }  // namespace user_prefs
@@ -175,6 +178,11 @@ inline constexpr char kGlicPreviouslyNotAllowed[] =
 #if BUILDFLAG(IS_MAC)
 inline constexpr char kGlicUseAltOSIcon[] = "glic.use_alt_os_icon";
 #endif
+
+// Returns the actuation capability policy state if the preference contains a
+// valid enumerator value, or std::nullopt otherwise.
+std::optional<GlicActuationOnWebPolicyState> GetActuationOnWebCapability(
+    const PrefService* pref_service);
 
 void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry);
 void RegisterLocalStatePrefs(PrefRegistrySimple* registry);

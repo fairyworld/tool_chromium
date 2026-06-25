@@ -57,6 +57,7 @@ std::ostream& operator<<(std::ostream& os,
     case GlicActorEnterprisePrefDefault::kForcedDisabled:
       return os << "forced_disabled";
   }
+  return os << "unknown(" << static_cast<int>(value) << ")";
 }
 }  // namespace features
 
@@ -71,6 +72,7 @@ std::ostream& operator<<(std::ostream& os,
     case GlicActuationOnWebPolicyState::kDisabled:
       return os << "kDisabled";
   }
+  return os << "kUnknown(" << static_cast<int>(value) << ")";
 }
 }  // namespace prefs
 
@@ -84,6 +86,7 @@ std::ostream& operator<<(std::ostream& os,
     case GlicActorPolicyChecker::CanActOutcome::kByAllowlistOnly:
       return os << "kByAllowlistOnly";
   }
+  return os << "kUnknown(" << static_cast<int>(value) << ")";
 }
 
 std::ostream& operator<<(std::ostream& os, CannotActReason value) {
@@ -99,6 +102,7 @@ std::ostream& operator<<(std::ostream& os, CannotActReason value) {
     case CannotActReason::kEnterpriseWithoutManagement:
       return os << "kEnterpriseWithoutManagement";
   }
+  return os << "kUnknown(" << static_cast<int>(value) << ")";
 }
 
 std::ostream& operator<<(
@@ -118,8 +122,8 @@ bool ActuationEnabledForManagedUser(Profile& profile,
   CHECK(pref_service);
 
   auto capability_pref =
-      static_cast<glic::prefs::GlicActuationOnWebPolicyState>(
-          pref_service->GetInteger(glic::prefs::kGlicActuationOnWeb));
+      glic::prefs::GetActuationOnWebCapability(pref_service)
+          .value_or(glic::prefs::GlicActuationOnWebPolicyState::kDisabled);
 
   bool is_enabled = false;
   if (default_pref ==

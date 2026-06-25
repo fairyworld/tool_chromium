@@ -2537,9 +2537,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
   { key::kThirdPartyAiChatSettings,
     omnibox::kThirdPartyAiChatSettings,
     base::Value::Type::INTEGER },
-  { key::kGeminiActOnWebSettings,
-    glic::prefs::kGlicActuationOnWeb,
-    base::Value::Type::INTEGER },
 #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
   { key::kEnableProxyOverrideRulesForAllUsers,
     proxy_config::prefs::kEnableProxyOverrideRulesForAllUsers,
