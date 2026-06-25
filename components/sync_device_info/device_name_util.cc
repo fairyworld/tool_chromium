@@ -34,31 +34,31 @@ constexpr char kWindowsLaptopPrefix[] = "LAPTOP-";
 
 // Returns the localized string resource ID of the device type based on its
 // form factor, or Windows generic device type if applicable.
-int GetSharingDeviceTypeStringId(const DeviceInfo& device) {
+int GetDeviceNameFormatStringId(const DeviceInfo& device) {
   if (device.os_type() == DeviceInfo::OsType::kWindows &&
       base::FeatureList::IsEnabled(kSyncSimplifyDeviceNaming)) {
     if (base::StartsWith(device.client_name(), kWindowsDesktopPrefix,
                          base::CompareCase::SENSITIVE)) {
-      return IDS_SHARING_DEVICE_TYPE_DESKTOP;
+      return IDS_SYNC_DEVICE_NAME_DESKTOP_FORMAT;
     }
     if (base::StartsWith(device.client_name(), kWindowsLaptopPrefix,
                          base::CompareCase::SENSITIVE)) {
-      return IDS_SHARING_DEVICE_TYPE_LAPTOP;
+      return IDS_SYNC_DEVICE_NAME_LAPTOP_FORMAT;
     }
   }
 
   switch (device.form_factor()) {
     case DeviceInfo::FormFactor::kDesktop:
-      return IDS_SHARING_DEVICE_TYPE_COMPUTER;
+      return IDS_SYNC_DEVICE_NAME_COMPUTER_FORMAT;
     case DeviceInfo::FormFactor::kPhone:
-      return IDS_SHARING_DEVICE_TYPE_PHONE;
+      return IDS_SYNC_DEVICE_NAME_PHONE_FORMAT;
     case DeviceInfo::FormFactor::kTablet:
-      return IDS_SHARING_DEVICE_TYPE_TABLET;
+      return IDS_SYNC_DEVICE_NAME_TABLET_FORMAT;
     case DeviceInfo::FormFactor::kAutomotive:
     case DeviceInfo::FormFactor::kWearable:
     case DeviceInfo::FormFactor::kTv:
     case DeviceInfo::FormFactor::kUnknown:
-      return IDS_SHARING_DEVICE_TYPE_DEVICE;
+      return IDS_SYNC_DEVICE_NAME_DEVICE_FORMAT;
   }
   NOTREACHED();
 }
@@ -192,16 +192,14 @@ DisplayNameCandidates GetDisplayNameCandidates(const DeviceInfo* device) {
             .fallback_full_name = model};
   }
 
-  // TODO(crbug.com/522788942): This string concatenation is an i18n
-  // anti-pattern. It should be refactored to use a translatable string template
-  // with placeholders.
-  std::string preferred_name_if_unique = base::StrCat(
-      {manufacturer, " ",
-       l10n_util::GetStringUTF8(GetSharingDeviceTypeStringId(*device))});
-  std::string fallback_full_name =
-      base::StrCat({preferred_name_if_unique, " ", model});
-  return {.preferred_name_if_unique = preferred_name_if_unique,
-          .fallback_full_name = fallback_full_name};
+  std::u16string preferred_name_if_unique = l10n_util::GetStringFUTF16(
+      GetDeviceNameFormatStringId(*device), base::UTF8ToUTF16(manufacturer));
+  std::u16string fallback_full_name = l10n_util::GetStringFUTF16(
+      IDS_SYNC_DEVICE_NAME_WITH_MODEL_FORMAT, preferred_name_if_unique,
+      base::UTF8ToUTF16(model));
+  return {
+      .preferred_name_if_unique = base::UTF16ToUTF8(preferred_name_if_unique),
+      .fallback_full_name = base::UTF16ToUTF8(fallback_full_name)};
 }
 
 std::string GetDeviceDisplayName(const DeviceInfo* device) {
