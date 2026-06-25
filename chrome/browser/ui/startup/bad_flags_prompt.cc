@@ -267,7 +267,7 @@ void ShowBadFlagsPrompt(content::WebContents* web_contents) {
   }
 #endif
 
-#if BUILDFLAG(IS_ANDROID)
+#if BUILDFLAG(IS_ANDROID) && defined(OFFICIAL_BUILD)
   JNIEnv* env = base::android::AttachCurrentThread();
   base::CommandLine* commandLine = base::CommandLine::ForCurrentProcess();
   bool isTestIntent = commandLine->HasSwitch("enable-test-intents");
