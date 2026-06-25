@@ -230,6 +230,9 @@ GlicInstanceImpl::GlicInstanceImpl(
     actor_task_manager_ = std::make_unique<GlicActorTaskManager>(
         profile_, actor_keyed_service, service_->actor_policy_checker(),
         &instance_metrics_, &GetSharingManagerInternal(), this);
+    actuating_changed_subscription_ =
+        actor_task_manager_->AddActuatingChangedCallback(
+            base::BindRepeating(&Host::OnActuatingChanged, host_.GetWeakPtr()));
   }
 
   browser_collection_observation_.Observe(
@@ -1355,13 +1358,7 @@ void GlicInstanceImpl::OnAllEmbeddersInactive() {
           features::kGlicSetWebContentsVisibilityWhenToggling)) {
     // Make WebContents hidden to avoid frame production and reduce the priority
     // of its renderer processes.
-    // Some actuations steps need the WebContents to be visible in order to
-    // make progress, so we need to keep it visible in that case.
-    // TODO(crbug.com/513209932): Hide WebContents when Glic is not showing,
-    // regardless of whether it is actuating or not.
-    if (!IsActuating()) {
-      host_.SetWebContentsVisibility(content::Visibility::HIDDEN);
-    }
+    host_.SetWebContentsVisibility(content::Visibility::HIDDEN);
   }
 
   NotifyInstanceActivationChanged(false);

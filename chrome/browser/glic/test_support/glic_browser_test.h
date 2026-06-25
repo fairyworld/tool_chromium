@@ -397,21 +397,8 @@ class GlicBrowserTestMixin : public T {
     RETURN_IF_ERROR(
         WaitForSidePanelState(tab, GlicSidePanelCoordinator::State::kClosed));
 
-    // TODO(crbug.com/513209932): Actuating instances intentionally keep the
-    // WebContents visible on Android to make progress. On other platforms, the
-    // WebContents is hidden on close because the WebView is detached from the
-    // views hierarchy. Android doesn't seem to have the same automatic
-    // visibility change.
-#if BUILDFLAG(IS_ANDROID)
-    content::Visibility expected_visibility = instance->IsActuating()
-                                                  ? content::Visibility::VISIBLE
-                                                  : content::Visibility::HIDDEN;
-#else
-    content::Visibility expected_visibility = content::Visibility::HIDDEN;
-#endif
-
     return WaitForWebUiContentsVisibility(weak_instance.get(),
-                                          expected_visibility);
+                                          content::Visibility::HIDDEN);
   }
 
   [[nodiscard]] TestResult<GlicInstanceImpl*> WaitForGlicInstanceBoundToTab(

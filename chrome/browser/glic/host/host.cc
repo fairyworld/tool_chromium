@@ -616,6 +616,12 @@ void Host::NotifyInstanceActivationChanged(bool is_active) {
   }
 }
 
+void Host::OnActuatingChanged(bool actuating) {
+  if (contents_) {
+    contents_->OnActuatingChanged(actuating);
+  }
+}
+
 void Host::NotifyAdditionalContext(mojom::AdditionalContextPtr context) {
   if (auto* client = GetPrimaryWebClient()) {
     client->NotifyAdditionalContext(std::move(context));

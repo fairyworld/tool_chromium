@@ -186,4 +186,24 @@ content::WebContents* WebUIContentsContainerImpl::web_contents() const {
   return web_contents_.get();
 }
 
+void WebUIContentsContainerImpl::OnActuatingChanged(bool actuating) {
+  if (actuating) {
+    if (web_contents_) {
+      webui_capture_runner_ = web_contents_->IncrementCapturerCount(
+          gfx::Size(), /*stay_hidden=*/true, /*stay_awake=*/true,
+          /*is_activity=*/true);
+
+      if (content::WebContents* guest =
+              GetGlicGuestWebContents(web_contents_.get())) {
+        guest_capture_runner_ = guest->IncrementCapturerCount(
+            gfx::Size(), /*stay_hidden=*/true, /*stay_awake=*/true,
+            /*is_activity=*/true);
+      }
+    }
+  } else {
+    webui_capture_runner_.RunAndReset();
+    guest_capture_runner_.RunAndReset();
+  }
+}
+
 }  // namespace glic

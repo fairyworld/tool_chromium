@@ -417,6 +417,7 @@ class GlicInstanceImpl : public GlicInstance,
   std::unique_ptr<GlicSkillsManagerImpl> skills_manager_;
   std::unique_ptr<GlicActorTaskManager> actor_task_manager_;
   base::CallbackListSubscription pinned_tabs_change_subscription_;
+  base::CallbackListSubscription actuating_changed_subscription_;
 
   base::OneShotTimer inactivity_timer_;
   base::Time last_activation_timestamp_;
