@@ -27,6 +27,7 @@ import androidx.window.layout.WindowMetricsCalculator;
 
 import org.chromium.base.Callback;
 import org.chromium.base.ObserverList;
+import org.chromium.base.ThreadUtils;
 import org.chromium.base.supplier.NonNullObservableSupplier;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
@@ -109,6 +110,7 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
 
     @Override
     public void registerSideUiContainer(SideUiContainer sideUiContainer) {
+        ThreadUtils.assertOnUiThread();
         assert sideUiContainer.getAnchorSide() == AnchorSide.LEFT
                         || sideUiContainer.getAnchorSide() == AnchorSide.RIGHT
                 : "Only LEFT/RIGHT anchor side are supported for now";
@@ -129,6 +131,7 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
 
     @Override
     public void unregisterSideUiContainer(SideUiContainer sideUiContainer) {
+        ThreadUtils.assertOnUiThread();
         assert mSideUiContainers.contains(sideUiContainer)
                 : "Unregistering unknown SideUiContainer.";
         mSideUiContainers.remove(sideUiContainer);
@@ -136,11 +139,13 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
 
     @Override
     public void updateUi(UiUpdateRequest request) {
+        ThreadUtils.assertOnUiThread();
         updateUiInternal(request);
     }
 
     @Override
     public void destroy() {
+        ThreadUtils.assertOnUiThread();
         mSideUiContainers.clear();
         mTopMarginSupplier.removeObserver(mTopMarginObserver);
         mActivityLifecycleDispatcher.unregister(this);
@@ -156,21 +161,25 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
 
     @Override
     public void addObserver(SideUiObserver observer) {
+        ThreadUtils.assertOnUiThread();
         mSideUiObservers.addObserver(observer);
     }
 
     @Override
     public void removeObserver(SideUiObserver observer) {
+        ThreadUtils.assertOnUiThread();
         mSideUiObservers.removeObserver(observer);
     }
 
     @Override
     public SideUiSpecs getCurrentSideUiSpecs() {
+        ThreadUtils.assertOnUiThread();
         return getCurrentSideUiSpecsInternal();
     }
 
     @Override
     public boolean isSideUiShowing(@SideUiId int sideUiId) {
+        ThreadUtils.assertOnUiThread();
         var sideUiContainer = getSideUiContainerById(sideUiId);
         if (sideUiContainer == null) {
             return false;
@@ -182,6 +191,7 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
 
     @Override
     public boolean canShowSideUi(@SideUiId int sideUiId) {
+        ThreadUtils.assertOnUiThread();
         @Px int windowWidth = getWindowWidth();
         @Px int minWebContentsWidth = ViewUtils.dpToPx(mParentActivity, MIN_WEB_CONTENTS_WIDTH_DP);
         var sideUiShowability = determineSideUiShowability(windowWidth, minWebContentsWidth);
@@ -196,6 +206,7 @@ final class SideUiCoordinatorImpl implements SideUiCoordinator, ConfigurationCha
     // ConfigurationChangedObserver Implementation
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
+        ThreadUtils.assertOnUiThread();
         if (mSideUiContainers.isEmpty()) {
             return;
         }
