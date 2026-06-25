@@ -622,6 +622,7 @@ class CONTENT_EXPORT RenderFrameHostImpl
   bool HasPolicyContainerHost() const override;
   const network::CrossOriginEmbedderPolicy& GetCrossOriginEmbedderPolicy()
       const override;
+  const network::ConnectionAllowlists& GetConnectionAllowlists() const override;
 
   // Additional non-override const version of GetMainFrame.
   const RenderFrameHostImpl* GetMainFrame() const;
