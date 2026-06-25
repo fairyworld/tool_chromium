@@ -3222,13 +3222,7 @@ public class WebContentsAccessibilityTest {
                 OFFSET_TYPE_CHILD,
                 rootVvid,
                 imageIndex + 1,
-                OFFSET_TYPE_CHILD,
-                imageVvid,
-                0,
-                OFFSET_TYPE_TEXT,
-                buttonVvid,
-                0,
-                OFFSET_TYPE_TEXT);
+                OFFSET_TYPE_CHILD);
 
         // Button, although it is a non-text node, selecting by text offset as it
         // is a leaf.
@@ -3300,13 +3294,7 @@ public class WebContentsAccessibilityTest {
                 OFFSET_TYPE_CHILD,
                 rootVvid,
                 input2Index + 1,
-                OFFSET_TYPE_CHILD,
-                input1Vvid,
-                0,
-                OFFSET_TYPE_TEXT,
-                paragraph2Vvid,
-                0,
-                OFFSET_TYPE_TEXT);
+                OFFSET_TYPE_CHILD);
 
         // Selection from non-editable to the beginning of the editable.
         setAndAssertExtendedSelection(
@@ -3316,13 +3304,7 @@ public class WebContentsAccessibilityTest {
                 OFFSET_TYPE_TEXT,
                 rootVvid,
                 input1Index,
-                OFFSET_TYPE_CHILD,
-                paragraph1Vvid,
-                1,
-                OFFSET_TYPE_TEXT,
-                input1Vvid,
-                0,
-                OFFSET_TYPE_TEXT);
+                OFFSET_TYPE_CHILD);
 
         // Selection from non-editable to the end of the editable.
         setAndAssertExtendedSelection(
@@ -3332,13 +3314,7 @@ public class WebContentsAccessibilityTest {
                 OFFSET_TYPE_TEXT,
                 rootVvid,
                 input2Index + 1,
-                OFFSET_TYPE_CHILD,
-                paragraph1Vvid,
-                1,
-                OFFSET_TYPE_TEXT,
-                paragraph2Vvid,
-                0,
-                OFFSET_TYPE_TEXT);
+                OFFSET_TYPE_CHILD);
 
         // Selection from the beginning of the editable to to a non-editable.
         setAndAssertExtendedSelection(
@@ -3346,12 +3322,6 @@ public class WebContentsAccessibilityTest {
                 rootVvid,
                 input1Index,
                 OFFSET_TYPE_CHILD,
-                paragraph2Vvid,
-                10,
-                OFFSET_TYPE_TEXT,
-                input1Vvid,
-                0,
-                OFFSET_TYPE_TEXT,
                 paragraph2Vvid,
                 10,
                 OFFSET_TYPE_TEXT);
@@ -3494,13 +3464,7 @@ public class WebContentsAccessibilityTest {
                 OFFSET_TYPE_TEXT,
                 rootVvid,
                 contenteditable1Index,
-                OFFSET_TYPE_CHILD,
-                p1Vvid,
-                1,
-                OFFSET_TYPE_TEXT,
-                contenteditable1Vvid,
-                0,
-                OFFSET_TYPE_TEXT);
+                OFFSET_TYPE_CHILD);
 
         // From the end of a contenteditable to outside it.
         setAndAssertExtendedSelection(
@@ -3508,12 +3472,6 @@ public class WebContentsAccessibilityTest {
                 rootVvid,
                 contenteditable1Index + 1,
                 OFFSET_TYPE_CHILD,
-                p2Vvid,
-                5,
-                OFFSET_TYPE_TEXT,
-                p2Vvid,
-                0,
-                OFFSET_TYPE_TEXT,
                 p2Vvid,
                 5,
                 OFFSET_TYPE_TEXT);
@@ -3595,7 +3553,6 @@ public class WebContentsAccessibilityTest {
         int imageIndex = 1;
 
         // Select before and after the image using root child offsets.
-        // TODO(crbug.com/443078007): Selection end is wrong, fix it.
         setAndAssertExtendedSelection(
                 rootVvid,
                 rootVvid,
@@ -3603,13 +3560,7 @@ public class WebContentsAccessibilityTest {
                 OFFSET_TYPE_CHILD,
                 rootVvid,
                 imageIndex + 1,
-                OFFSET_TYPE_CHILD,
-                imageVvid,
-                0,
-                OFFSET_TYPE_TEXT,
-                imageVvid,
-                0,
-                OFFSET_TYPE_TEXT);
+                OFFSET_TYPE_CHILD);
     }
 
     /** Test extended selection with a leaf node at the end of root to trigger at_end_of_anchor. */
