@@ -18,12 +18,16 @@
 namespace enterprise_management {
 class BrowserDeviceIdentifier;
 enum Channel : int;
+enum FormFactor : int;
 }  // namespace enterprise_management
 
 namespace policy {
 
 // Returns the name of the machine. This function is platform specific.
 POLICY_EXPORT std::string GetMachineName();
+
+// Returns the form factor of the device.
+POLICY_EXPORT enterprise_management::FormFactor GetFormFactor();
 
 // Returns the OS version of the machine. This function is platform specific.
 POLICY_EXPORT std::string GetOSVersion();

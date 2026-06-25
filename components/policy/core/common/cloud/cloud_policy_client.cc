@@ -795,6 +795,8 @@ em::PolicyFetchRequest* CloudPolicyClient::AddPolicyFetchRequest(
 
   fetch_request->set_verification_key_hash(kPolicyVerificationKeyHash);
 
+  fetch_request->mutable_device_info()->set_form_factor(GetFormFactor());
+
   // These fields are included only in requests for chrome policy.
   if (IsChromePolicy(type_to_fetch.policy_type())) {
     if (!device_dm_token_.empty()) {
@@ -2115,6 +2117,7 @@ void CloudPolicyClient::CreateDeviceRegisterRequest(
   if (!params.oidc_state.empty()) {
     request->set_oidc_profile_enrollment_state(params.oidc_state);
   }
+  request->mutable_device_info()->set_form_factor(GetFormFactor());
 }
 
 void CloudPolicyClient::CreateUniqueRequestJob(
