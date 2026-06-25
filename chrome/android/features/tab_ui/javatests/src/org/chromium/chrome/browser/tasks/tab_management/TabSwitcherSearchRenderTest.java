@@ -213,7 +213,6 @@ public class TabSwitcherSearchRenderTest {
     @Test
     @MediumTest
     @Feature({"RenderTest"})
-    @DisableIf.Device(DeviceFormFactor.DESKTOP_FREEFORM) // crbug.com/511287342
     public void testZeroPrefixSuggestions_HiddenInIncognito() throws IOException {
         List<String> urlsToOpen = Arrays.asList("/chrome/test/data/android/test.html");
         TabSwitcherSearchStation searchStation =
@@ -251,7 +250,6 @@ public class TabSwitcherSearchRenderTest {
     @Test
     @MediumTest
     @Feature({"RenderTest"})
-    @DisableIf.Device(DeviceFormFactor.DESKTOP_FREEFORM) // crbug.com/511287342
     public void testRenderTypedSuggestions_Incognito() throws IOException {
         List<String> urlsToOpen = Arrays.asList("/chrome/test/data/android/navigate/one.html");
         TabSwitcherSearchStation searchStation =
@@ -316,7 +314,6 @@ public class TabSwitcherSearchRenderTest {
     @Feature({"RenderTest"})
     @DisableFeatures({OmniboxFeatureList.OMNIBOX_ITEM_DECORATION})
     @ParameterAnnotations.UseMethodParameter(NightModeTestUtils.NightModeParams.class)
-    @DisableIf.Device(DeviceFormFactor.DESKTOP_FREEFORM) // crbug.com/511287342
     public void testRenderTypedTabGroupSuggestions_URLMatch(boolean nightModeEnabled)
             throws IOException {
         Tab firstTab = mInitialPage.loadedTabElement.value();
