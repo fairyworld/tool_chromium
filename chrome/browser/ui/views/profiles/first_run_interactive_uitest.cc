@@ -2463,6 +2463,9 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
 
   Mock::VerifyAndClearExpectations(mock_sounds_manager_ptr);
 
+  histogram_tester().ExpectUniqueSample(
+      "ProfilePicker.FREFlow.MediaEffects.Disable", Step::kIntro, 1);
+
   // Verify that clicking on the effects control button resumes the ambient
   // sound, and DOES NOT play the one-shot sound(s) again.
   EXPECT_CALL(*mock_sounds_manager_ptr,
@@ -2472,6 +2475,9 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
   RunTestSequenceInContext(
       views::ElementTrackerViews::GetContextForView(view()),
       PressButton(kProfilePickerToolbarEffectsControlButtonElementId));
+
+  histogram_tester().ExpectUniqueSample(
+      "ProfilePicker.FREFlow.MediaEffects.Enable", Step::kIntro, 1);
 }
 
 class FirstRunRevampPostSignInInteractiveUiTest

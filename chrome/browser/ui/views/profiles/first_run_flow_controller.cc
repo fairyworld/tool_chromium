@@ -168,6 +168,11 @@ void PinToTaskbarResult(bool result) {
 }
 #endif  // BUILDFLAG(IS_WIN)
 
+std::string_view GetOnToggleMediaEffectsHistogram(bool active) {
+  return active ? "ProfilePicker.FREFlow.MediaEffects.Enable"
+                : "ProfilePicker.FREFlow.MediaEffects.Disable";
+}
+
 class IntroStepController : public ProfileManagementStepController {
  public:
   explicit IntroStepController(
@@ -1048,6 +1053,9 @@ void FirstRunFlowController::ToggleMediaEffects(bool active) {
       sounds_manager_->Stop(kWelcomeBackSoundKey);
     }
   }
+
+  base::UmaHistogramEnumeration(GetOnToggleMediaEffectsHistogram(active),
+                                current_step());
 }
 
 bool FirstRunFlowController::AreEffectsEnabled() const {
