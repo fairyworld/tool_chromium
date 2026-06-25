@@ -41,10 +41,10 @@
 #include "chrome/test/base/in_process_browser_test.h"
 #include "components/actor/core/actor_features.h"
 #include "components/actor/core/actor_util.h"
-#include "components/actor/core/origin_gating_cache.h"
 #include "components/actor/public/mojom/actor_types.mojom.h"
 #include "components/enterprise/buildflags/buildflags.h"
 #include "components/enterprise/connectors/core/features.h"
+#include "components/origin_gating/core/origin_gating_cache.h"
 #include "components/policy/core/browser/browser_policy_connector.h"
 #include "components/policy/core/common/management/scoped_management_service_override_for_testing.h"
 #include "components/policy/core/common/mock_configuration_policy_provider.h"
@@ -470,8 +470,9 @@ class GlicActorPolicyCheckerBrowserTestManagedBrowser
     base::test::TestFuture<actor::MayActOnUrlBlockReason> allowed;
     MayActOnUrl(url_to_check, /*allow_insecure_http=*/true, GetProfile(),
                 actor_service->GetJournal(), TaskId(123),
-                actor::OriginGatingCache(), policy_checker,
-                allowed.GetCallback());
+                origin_gating::OriginGatingCache(
+                    actor::kGlicNavigationGatingUseSiteNotOrigin.Get()),
+                policy_checker, allowed.GetCallback());
     EXPECT_EQ(expected_result.may_act_on_url_block_reason, allowed.Get());
   }
 

@@ -50,9 +50,9 @@
 #include "chrome/common/actor/action_result.h"
 #include "chrome/common/chrome_features.h"
 #include "components/actor/core/actor_features.h"
+#include "components/actor/core/actor_metrics.h"
 #include "components/actor/core/actor_util.h"
 #include "components/actor/core/journal_details_builder.h"
-#include "components/actor/core/origin_gating_cache.h"
 #include "components/actor/core/safety_list_manager.h"
 #include "components/actor/core/task_id.h"
 #include "components/actor/public/mojom/actor_types.mojom.h"
@@ -60,6 +60,7 @@
 #include "components/keyed_service/core/service_access_type.h"
 #include "components/optimization_guide/content/browser/page_content_proto_provider.h"
 #include "components/optimization_guide/proto/features/actions_data.pb.h"
+#include "components/origin_gating/core/origin_gating_cache.h"
 #include "components/password_manager/core/browser/actor_login/actor_login_service.h"
 #include "components/password_manager/core/browser/actor_login/actor_login_service_impl.h"
 #include "components/password_manager/core/browser/actor_login/actor_login_types.h"
@@ -205,7 +206,10 @@ ExecutionEngine::ExecutionEngine(
       actor_one_time_token_filling_service_(
           std::make_unique<autofill::ActorOneTimeTokenFillingServiceImpl>(
               task_->GetProfile())),
-      ui_event_dispatcher_(std::move(ui_event_dispatcher)) {
+      ui_event_dispatcher_(std::move(ui_event_dispatcher)),
+      origin_gating_cache_(kGlicNavigationGatingUseSiteNotOrigin.Get()),
+      dark_launch_origin_gating_cache_(
+          kGlicNavigationGatingUseSiteNotOrigin.Get()) {
   TRACE_EVENT0("actor", "ExecutionEngine::ExecutionEngine");
 }
 
@@ -230,7 +234,10 @@ std::unique_ptr<ExecutionEngine> ExecutionEngine::CreateForTesting(
 
 ExecutionEngine::~ExecutionEngine() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  origin_gating_cache_.RecordSizeMetrics();
+  origin_gating::OriginGatingCache::SizeMetrics metrics =
+      origin_gating_cache_.GetSizeMetrics();
+  RecordActorNavigationGatingListSize(metrics.allow_list_size,
+                                      metrics.confirmed_list_size);
 
   RunUserTakeoverCallbackIfExists(/*should_cancel=*/true);
 }

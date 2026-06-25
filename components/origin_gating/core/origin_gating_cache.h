@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef COMPONENTS_ACTOR_CORE_ORIGIN_GATING_CACHE_H_
-#define COMPONENTS_ACTOR_CORE_ORIGIN_GATING_CACHE_H_
+#ifndef COMPONENTS_ORIGIN_GATING_CORE_ORIGIN_GATING_CACHE_H_
+#define COMPONENTS_ORIGIN_GATING_CORE_ORIGIN_GATING_CACHE_H_
 
 #include <variant>
 
@@ -12,15 +12,25 @@
 #include "third_party/abseil-cpp/absl/container/flat_hash_set.h"
 #include "url/origin.h"
 
-namespace actor {
+namespace origin_gating {
 
-// This class acts as a cache for origin- or site-keyed decisions.  Permission
+// This class acts as a cache for origin- or site-keyed decisions. Permission
 // to navigate to an origin/site can be recorded, optionally recording that user
 // confirmation was obtained for that permission.
 class OriginGatingCache {
  public:
-  OriginGatingCache();
+  struct SizeMetrics {
+    size_t allow_list_size = 0;
+    size_t confirmed_list_size = 0;
+  };
+
+  explicit OriginGatingCache(bool use_site_not_origin);
   ~OriginGatingCache();
+
+  OriginGatingCache(const OriginGatingCache&) = delete;
+  OriginGatingCache& operator=(const OriginGatingCache&) = delete;
+  OriginGatingCache(OriginGatingCache&&);
+  OriginGatingCache& operator=(OriginGatingCache&&);
 
   // Returns true iff navigation to `destination_origin` is allowed, either
   // because the source and destination are considered the "same", or by a
@@ -38,14 +48,13 @@ class OriginGatingCache {
   // `IsNavigationConfirmedByUser` will return true for this origin in the
   // future.
   void AllowNavigationTo(url::Origin origin, bool is_user_confirmed);
+
   // Adds the given origins to the set of origins to which the actor is allowed
   // to navigate. The origins are considered non-user-confirmed.
   void AllowNavigationTo(const absl::flat_hash_set<url::Origin>& origins);
 
-  // Records histograms with size metrics for each set of origins. Callers
-  // should ensure that this method is only called in cases that are documented
-  // in the histograms' entries in histograms.xml.
-  void RecordSizeMetrics() const;
+  // Returns size metrics for UMA logging.
+  SizeMetrics GetSizeMetrics() const;
 
  private:
   struct State {
@@ -56,6 +65,7 @@ class OriginGatingCache {
   using OriginMap = absl::flat_hash_map<url::Origin, State>;
   using SiteMap = absl::flat_hash_map<net::SchemefulSite, State>;
   using StateMap = std::variant<OriginMap, SiteMap>;
+
   // The set of origins/sites which the browser is allowed to navigate to under
   // actor control. Note that presence in this map does *not* imply that the
   // actor may navigate without confirming with the user first. This set can
@@ -65,6 +75,6 @@ class OriginGatingCache {
   StateMap allowed_navigation_origins_;
 };
 
-}  // namespace actor
+}  // namespace origin_gating
 
-#endif  // COMPONENTS_ACTOR_CORE_ORIGIN_GATING_CACHE_H_
+#endif  // COMPONENTS_ORIGIN_GATING_CORE_ORIGIN_GATING_CACHE_H_

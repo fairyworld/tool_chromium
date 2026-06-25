@@ -28,9 +28,9 @@
 #include "chrome/common/actor.mojom-forward.h"
 #include "chrome/common/buildflags.h"
 #include "components/actor/core/aggregated_journal.h"
-#include "components/actor/core/origin_gating_cache.h"
 #include "components/actor/public/mojom/actor_types.mojom.h"
 #include "components/autofill/core/browser/integrators/actor/actor_form_filling_types.h"
+#include "components/origin_gating/core/origin_gating_cache.h"
 #include "components/password_manager/core/browser/actor_login/actor_login_service.h"
 #include "components/password_manager/core/browser/actor_login/actor_login_types.h"
 #include "components/tabs/public/tab_interface.h"
@@ -295,7 +295,7 @@ class ExecutionEngine : public ToolDelegate,
 
   State state() const { return state_; }
 
-  const OriginGatingCache& origin_gating_cache() const {
+  const origin_gating::OriginGatingCache& origin_gating_cache() const {
     return origin_gating_cache_;
   }
 
@@ -470,10 +470,10 @@ class ExecutionEngine : public ToolDelegate,
 
   // Manages the sets of origins that have been allowed for navigations and that
   // the user has been prompted about.
-  OriginGatingCache origin_gating_cache_;
+  origin_gating::OriginGatingCache origin_gating_cache_;
   // This will allow us to store already-recorded origins to avoid duplication
   // of dark launch metrics.
-  OriginGatingCache dark_launch_origin_gating_cache_;
+  origin_gating::OriginGatingCache dark_launch_origin_gating_cache_;
 
   TabObservationStrategy observation_strategy_;
 

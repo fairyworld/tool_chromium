@@ -1,6 +1,7 @@
 include_rules = [
   '-chrome/browser/actor/ui',
   '+components/actor',
+  '+components/origin_gating',
 ]
 
 specific_include_rules = {

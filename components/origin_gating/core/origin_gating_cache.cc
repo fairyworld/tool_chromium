@@ -2,27 +2,28 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/actor/core/origin_gating_cache.h"
+#include "components/origin_gating/core/origin_gating_cache.h"
 
 #include <algorithm>
 #include <variant>
 
 #include "base/containers/map_util.h"
-#include "components/actor/core/actor_features.h"
-#include "components/actor/core/actor_metrics.h"
-#include "components/actor/core/actor_util.h"
 #include "net/base/schemeful_site.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 #include "third_party/abseil-cpp/absl/functional/overload.h"
 #include "url/origin.h"
 
-namespace actor {
+namespace origin_gating {
 
-OriginGatingCache::OriginGatingCache()
-    : allowed_navigation_origins_(kGlicNavigationGatingUseSiteNotOrigin.Get()
-                                      ? StateMap(SiteMap())
-                                      : StateMap(OriginMap())) {}
+OriginGatingCache::OriginGatingCache(bool use_site_not_origin)
+    : allowed_navigation_origins_(use_site_not_origin ? StateMap(SiteMap())
+                                                      : StateMap(OriginMap())) {
+}
+
 OriginGatingCache::~OriginGatingCache() = default;
+
+OriginGatingCache::OriginGatingCache(OriginGatingCache&&) = default;
+OriginGatingCache& OriginGatingCache::operator=(OriginGatingCache&&) = default;
 
 bool OriginGatingCache::IsNavigationAllowed(
     const url::Origin& source_origin,
@@ -101,7 +102,7 @@ void OriginGatingCache::AllowNavigationTo(
       allowed_navigation_origins_);
 }
 
-void OriginGatingCache::RecordSizeMetrics() const {
+OriginGatingCache::SizeMetrics OriginGatingCache::GetSizeMetrics() const {
   auto [total, user_confirmed_total] =
       std::visit(absl::Overload{
                      [](const OriginMap& origins) {
@@ -120,7 +121,8 @@ void OriginGatingCache::RecordSizeMetrics() const {
                      },
                  },
                  allowed_navigation_origins_);
-  RecordActorNavigationGatingListSize(total, user_confirmed_total);
+  return SizeMetrics{static_cast<size_t>(total),
+                     static_cast<size_t>(user_confirmed_total)};
 }
 
-}  // namespace actor
+}  // namespace origin_gating

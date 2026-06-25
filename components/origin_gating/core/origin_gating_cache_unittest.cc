@@ -2,16 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "components/actor/core/origin_gating_cache.h"
+#include "components/origin_gating/core/origin_gating_cache.h"
 
-#include "base/test/metrics/histogram_tester.h"
-#include "base/test/scoped_feature_list.h"
-#include "components/actor/core/actor_features.h"
 #include "testing/gtest/include/gtest/gtest.h"
 #include "url/gurl.h"
 #include "url/origin.h"
 
-namespace actor {
+namespace origin_gating {
 namespace {
 
 constexpr std::string_view kExample = "https://example.com";
@@ -20,24 +17,15 @@ constexpr std::string_view kAnother = "https://another.com";
 
 class OriginGatingCacheTest : public ::testing::TestWithParam<bool> {
  public:
-  OriginGatingCacheTest() {
-    scoped_feature_list_.InitWithFeaturesAndParameters(
-        {{kGlicCrossOriginNavigationGating,
-          {{kGlicNavigationGatingUseSiteNotOrigin.name,
-            is_site_scoped() ? "true" : "false"}}}},
-        {});
-  }
+  OriginGatingCacheTest() = default;
   ~OriginGatingCacheTest() override = default;
 
   bool is_site_scoped() const { return GetParam(); }
-
- private:
-  base::test::ScopedFeatureList scoped_feature_list_;
 };
 
 TEST_P(OriginGatingCacheTest, InitialState) {
   const url::Origin example = url::Origin::Create(GURL(kExample));
-  OriginGatingCache origin_gating_cache;
+  OriginGatingCache origin_gating_cache(is_site_scoped());
   EXPECT_FALSE(origin_gating_cache.IsNavigationAllowed(
       example, url::Origin::Create(GURL(kAnother))));
   EXPECT_FALSE(origin_gating_cache.IsNavigationConfirmedByUser(example));
@@ -45,7 +33,7 @@ TEST_P(OriginGatingCacheTest, InitialState) {
 
 TEST_P(OriginGatingCacheTest, AllowNavigationToSingleOrigin) {
   const url::Origin example = url::Origin::Create(GURL(kExample));
-  OriginGatingCache origin_gating_cache;
+  OriginGatingCache origin_gating_cache(is_site_scoped());
   origin_gating_cache.AllowNavigationTo(example,
                                         /*is_user_confirmed=*/false);
 
@@ -63,7 +51,7 @@ TEST_P(OriginGatingCacheTest, AllowNavigationToSingleOrigin) {
 TEST_P(OriginGatingCacheTest, AllowNavigationTo_Opaque) {
   const url::Origin example = url::Origin::Create(GURL(kExample));
   const url::Origin opaque;
-  OriginGatingCache origin_gating_cache;
+  OriginGatingCache origin_gating_cache(is_site_scoped());
   origin_gating_cache.AllowNavigationTo(opaque,
                                         /*is_user_confirmed=*/false);
 
@@ -77,7 +65,7 @@ TEST_P(OriginGatingCacheTest, AllowNavigationToMultipleOrigins) {
   const url::Origin example_sub = url::Origin::Create(GURL(kExampleSub));
   const url::Origin foo = url::Origin::Create(GURL("https://foo.com"));
   const url::Origin another_origin = url::Origin::Create(GURL(kAnother));
-  OriginGatingCache origin_gating_cache;
+  OriginGatingCache origin_gating_cache(is_site_scoped());
   origin_gating_cache.AllowNavigationTo({example, foo});
 
   EXPECT_TRUE(origin_gating_cache.IsNavigationAllowed(another_origin, example));
@@ -91,13 +79,13 @@ TEST_P(OriginGatingCacheTest, AllowNavigationToMultipleOrigins) {
 
 TEST_P(OriginGatingCacheTest, IsNavigationAllowed_SameOrigin) {
   const url::Origin example = url::Origin::Create(GURL(kExample));
-  OriginGatingCache origin_gating_cache;
+  OriginGatingCache origin_gating_cache(is_site_scoped());
 
   EXPECT_TRUE(origin_gating_cache.IsNavigationAllowed(example, example));
 }
 
 TEST_P(OriginGatingCacheTest, IsNavigationAllowed_SameSite) {
-  OriginGatingCache origin_gating_cache;
+  OriginGatingCache origin_gating_cache(is_site_scoped());
   origin_gating_cache.AllowNavigationTo(url::Origin::Create(GURL(kExampleSub)),
                                         /*is_user_confirmed=*/false);
 
@@ -110,7 +98,7 @@ TEST_P(OriginGatingCacheTest, IsNavigationAllowed_SameSite) {
 TEST_P(OriginGatingCacheTest, IsNavigationAllowed_OpaqueInitiator) {
   const url::Origin example = url::Origin::Create(GURL(kExample));
   const url::Origin example_sub = url::Origin::Create(GURL(kExampleSub));
-  OriginGatingCache origin_gating_cache;
+  OriginGatingCache origin_gating_cache(is_site_scoped());
   origin_gating_cache.AllowNavigationTo(example,
                                         /*is_user_confirmed=*/false);
 
@@ -126,7 +114,7 @@ TEST_P(OriginGatingCacheTest, ConfirmOrigin_Query) {
   const url::Origin example = url::Origin::Create(GURL(kExample));
   const url::Origin example_sub = url::Origin::Create(GURL(kExampleSub));
 
-  OriginGatingCache origin_gating_cache;
+  OriginGatingCache origin_gating_cache(is_site_scoped());
   origin_gating_cache.AllowNavigationTo(example,
                                         /*is_user_confirmed=*/true);
 
@@ -142,7 +130,7 @@ TEST_P(OriginGatingCacheTest, ConfirmOrigin_AllowsNavigation) {
   const url::Origin example_sub = url::Origin::Create(GURL(kExampleSub));
   const url::Origin another_origin = url::Origin::Create(GURL(kAnother));
 
-  OriginGatingCache origin_gating_cache;
+  OriginGatingCache origin_gating_cache(is_site_scoped());
   origin_gating_cache.AllowNavigationTo(example,
                                         /*is_user_confirmed=*/true);
 
@@ -157,7 +145,7 @@ TEST_P(OriginGatingCacheTest, ConfirmOrigin_AllowsNavigation) {
 TEST_P(OriginGatingCacheTest, ConfirmOrigin_Opaque) {
   const url::Origin opaque;
 
-  OriginGatingCache origin_gating_cache;
+  OriginGatingCache origin_gating_cache(is_site_scoped());
   origin_gating_cache.AllowNavigationTo(opaque,
                                         /*is_user_confirmed=*/true);
 
@@ -170,7 +158,7 @@ TEST_P(OriginGatingCacheTest,
   const url::Origin example = url::Origin::Create(GURL(kExample));
   const url::Origin example_sub = url::Origin::Create(GURL(kExampleSub));
 
-  OriginGatingCache origin_gating_cache;
+  OriginGatingCache origin_gating_cache(is_site_scoped());
   origin_gating_cache.AllowNavigationTo(example,
                                         /*is_user_confirmed=*/false);
   origin_gating_cache.AllowNavigationTo(example,
@@ -183,28 +171,23 @@ TEST_P(OriginGatingCacheTest,
             is_site_scoped());
 }
 
-TEST_P(OriginGatingCacheTest, RecordsHistograms) {
-  base::HistogramTester histograms;
-
+TEST_P(OriginGatingCacheTest, GetSizeMetrics) {
   const url::Origin example = url::Origin::Create(GURL(kExample));
   const url::Origin example_sub = url::Origin::Create(GURL(kExampleSub));
   const url::Origin another = url::Origin::Create(GURL(kAnother));
-  OriginGatingCache origin_gating_cache;
+  OriginGatingCache origin_gating_cache(is_site_scoped());
   origin_gating_cache.AllowNavigationTo(example, /*is_user_confirmed=*/true);
   origin_gating_cache.AllowNavigationTo(example_sub,
                                         /*is_user_confirmed=*/true);
   origin_gating_cache.AllowNavigationTo(another, /*is_user_confirmed=*/false);
-  origin_gating_cache.RecordSizeMetrics();
 
-  histograms.ExpectUniqueSample("Actor.NavigationGating.AllowListSize",
-                                /*sample=*/is_site_scoped() ? 2 : 3,
-                                /*expected_bucket_count=*/1);
-  histograms.ExpectUniqueSample("Actor.NavigationGating.ConfirmedListSize2",
-                                /*sample=*/is_site_scoped() ? 1 : 2,
-                                /*expected_bucket_count=*/1);
+  OriginGatingCache::SizeMetrics metrics = origin_gating_cache.GetSizeMetrics();
+
+  EXPECT_EQ(metrics.allow_list_size, is_site_scoped() ? 2u : 3u);
+  EXPECT_EQ(metrics.confirmed_list_size, is_site_scoped() ? 1u : 2u);
 }
 
 INSTANTIATE_TEST_SUITE_P(, OriginGatingCacheTest, ::testing::Bool());
 
 }  // namespace
-}  // namespace actor
+}  // namespace origin_gating
