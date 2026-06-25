@@ -910,7 +910,9 @@ bool ShouldCreateBnplSuggestionForTouchToFill(BrowserAutofillManager& manager,
          payments::IsEligibleForBnpl(manager.client()) &&
          base::FeatureList::IsEnabled(
              features::kAutofillEnableAmountExtraction) &&
-         passes_credit_card_number_check;
+         (base::FeatureList::IsEnabled(
+              features::kAutofillEnablePayNowPayLaterTabs) ||
+          passes_credit_card_number_check);
 }
 
 std::vector<Suggestion> GetCreditCardSuggestionsForTouchToFill(
