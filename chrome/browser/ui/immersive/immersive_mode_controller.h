@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_UI_VIEWS_FRAME_IMMERSIVE_MODE_CONTROLLER_H_
-#define CHROME_BROWSER_UI_VIEWS_FRAME_IMMERSIVE_MODE_CONTROLLER_H_
+#ifndef CHROME_BROWSER_UI_IMMERSIVE_IMMERSIVE_MODE_CONTROLLER_H_
+#define CHROME_BROWSER_UI_IMMERSIVE_IMMERSIVE_MODE_CONTROLLER_H_
 
 #include <memory>
 
@@ -160,4 +160,4 @@ std::unique_ptr<ImmersiveModeController> CreateImmersiveModeController(
 
 }  // namespace chrome
 
-#endif  // CHROME_BROWSER_UI_VIEWS_FRAME_IMMERSIVE_MODE_CONTROLLER_H_
+#endif  // CHROME_BROWSER_UI_IMMERSIVE_IMMERSIVE_MODE_CONTROLLER_H_
