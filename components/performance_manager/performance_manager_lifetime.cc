@@ -49,12 +49,12 @@ GraphCreatedCallback* GetAdditionalGraphCreatedCallback() {
   return additional_graph_created_callback.get();
 }
 
+#if !BUILDFLAG(IS_ANDROID)
 // Adds the ForceForegroundVoter to the graph if the corresponding feature or
 // policy is enabled.
 void AddForceForegroundVoter(
     execution_context_priority::PriorityVotingSystem* priority_voting_system,
     PrefService* pref_service) {
-#if !BUILDFLAG(IS_ANDROID)
   if (user_tuning::prefs::IsForceForegroundPriorityForAllTabsEnabled(
           pref_service)) {
     // Casts a USER_BLOCKING vote for all frames and workers.
@@ -64,14 +64,18 @@ void AddForceForegroundVoter(
     priority_voting_system->AddPriorityVoter<
         execution_context_priority::ForceForegroundVoterForUrls>();
   }
-#endif  // BUILDFLAG(IS_ANDROID)
 }
+#endif  // BUILDFLAG(IS_ANDROID)
 
 // Adds the default set of execution context voters.
 void AddVoters(GraphImpl* graph, PrefService* pref_service) {
   if (auto* priority_voting_system =
           graph->GetRegisteredObjectAs<
               execution_context_priority::PriorityVotingSystem>()) {
+    // Disabled on Android because most of the prioritization logic still lives
+    // in ChildProcessLauncherHelperImpl.
+    // TODO(b/400850388): Enable voters on Android.
+#if !BUILDFLAG(IS_ANDROID)
     // When a frame is visible, casts either a USER_BLOCKING or USER_VISIBLE
     // vote, depending on if the frame is important.
     priority_voting_system
@@ -108,6 +112,7 @@ void AddVoters(GraphImpl* graph, PrefService* pref_service) {
     }
 
     AddForceForegroundVoter(priority_voting_system, pref_service);
+#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_MAC)
     // Casts a vote for each child frame with the parent's priority.

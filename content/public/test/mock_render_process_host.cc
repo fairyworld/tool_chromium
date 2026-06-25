@@ -382,7 +382,6 @@ void MockRenderProcessHost::RemovePriorityClient(
   priority_clients_.erase(priority_client);
 }
 
-#if !BUILDFLAG(IS_ANDROID)
 void MockRenderProcessHost::SetPriorityOverride(
     base::Process::Priority priority) {}
 
@@ -391,7 +390,6 @@ bool MockRenderProcessHost::HasPriorityOverride() {
 }
 
 void MockRenderProcessHost::ClearPriorityOverride() {}
-#endif  // !BUILDFLAG(IS_ANDROID)
 
 #if BUILDFLAG(IS_ANDROID)
 void MockRenderProcessHost::GraduateSpareToNormalRendererPriority() {}

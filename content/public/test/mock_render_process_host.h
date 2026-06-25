@@ -137,11 +137,9 @@ class MockRenderProcessHost : public RenderProcessHost {
       RenderProcessHostPriorityClient* priority_client) override;
   void RemovePriorityClient(
       RenderProcessHostPriorityClient* priority_client) override;
-#if !BUILDFLAG(IS_ANDROID)
   void SetPriorityOverride(base::Process::Priority priority) override;
   bool HasPriorityOverride() override;
   void ClearPriorityOverride() override;
-#endif
 #if BUILDFLAG(IS_ANDROID)
   void GraduateSpareToNormalRendererPriority() override;
   bool ShouldThrottleNavigationForSpareRendererGraduation() override;

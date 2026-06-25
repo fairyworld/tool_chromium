@@ -7,6 +7,7 @@
 
 #include <iosfwd>
 
+#include "base/process/process.h"
 #include "content/common/content_export.h"
 
 namespace content {
@@ -41,6 +42,11 @@ CONTENT_EXPORT std::ostream& operator<<(std::ostream& out,
 
 // Whether the device supports `ChildProcessImportance.PERCEPTIBLE` or not.
 CONTENT_EXPORT bool IsNotPerceptibleImportanceSupported();
+
+// Mapping from base::Process::Priority to ChildProcessImportance for
+// integration with Performance Manager.
+CONTENT_EXPORT ChildProcessImportance
+PriorityToChildProcessImportance(base::Process::Priority priority);
 
 }  // namespace content
 

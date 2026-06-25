@@ -29,4 +29,17 @@ bool IsNotPerceptibleImportanceSupported() {
   return base::android::android_info::sdk_int() >=
          base::android::android_info::SDK_VERSION_Q;
 }
+
+content::ChildProcessImportance PriorityToChildProcessImportance(
+    base::Process::Priority priority) {
+  switch (priority) {
+    case base::Process::Priority::kBestEffort:
+      return ChildProcessImportance::NORMAL;
+    case base::Process::Priority::kUserVisible:
+      return ChildProcessImportance::MODERATE;
+    case base::Process::Priority::kUserBlocking:
+      return ChildProcessImportance::IMPORTANT;
+  }
+}
+
 }  // namespace content
