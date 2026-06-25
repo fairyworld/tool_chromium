@@ -141,7 +141,7 @@ public class SupportLibWebViewChromiumFactory implements WebViewProviderFactoryB
                 Features.NAVIGATION_GET_WEB_RESOURCE_ERROR,
                 Features.BACK_FORWARD_CACHE_SETTINGS_V4,
                 Features.WEBVIEW_NAVIGATE_V1,
-                Features.DOWNLOAD_FAVICONS_ENABLED + Features.DEV_SUFFIX,
+                Features.DOWNLOAD_FAVICONS_ENABLED,
                 Features.HTTP_CACHE_MANAGER,
                 // Add new features above. New features must include `+ Features.DEV_SUFFIX`
                 // when they're initially added (this can be removed in a future CL). The final
