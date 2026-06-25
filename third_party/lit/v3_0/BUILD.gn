@@ -133,6 +133,7 @@ ts_library("build_ts") {
     "//chrome/test/data/webui/cr_components/custom_help_bubble:build_ts",
     "//chrome/test/data/webui/cr_components/help_bubble:build_ts",
     "//chrome/test/data/webui/cr_components/history_clusters:build_ts",
+    "//chrome/test/data/webui/cr_components/searchbox:build_ts",
     "//chrome/test/data/webui/cr_elements:build_ts",
     "//chrome/test/data/webui/extensions:build_ts",
     "//chrome/test/data/webui/history:build_ts",

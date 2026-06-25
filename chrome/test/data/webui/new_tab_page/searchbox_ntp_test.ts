@@ -9,9 +9,7 @@ import {$$, BrowserProxyImpl, MetricsReporterImpl, SearchboxBrowserProxy} from '
 import {createAutocompleteMatch, createAutocompleteResultForTesting, createSearchMatchForTesting} from 'chrome://resources/cr_components/searchbox/searchbox_browser_proxy.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {PageMetricsCallbackRouter} from 'chrome://resources/js/metrics_reporter.mojom-webui.js';
-import {isMac} from 'chrome://resources/js/platform.js';
 import {getDeepActiveElement} from 'chrome://resources/js/util.js';
-import {NavigationPredictor} from 'chrome://resources/mojo/components/omnibox/browser/omnibox.mojom-webui.js';
 import type {AutocompleteMatch} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import {DriveDisclaimerStatus, RenderType, SideType} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
 import {assertEquals, assertFalse, assertNotEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
@@ -477,133 +475,6 @@ suite('SearchboxTest', () => {
     assertEquals(1, testProxy.handler.getCallCount('queryAutocomplete'));
   });
 
-  test('arrow up/down keys in empty input query autocomplete', async () => {
-    // Query zero-prefix matches.
-    realbox.$.input.inputElement.value = '';
-    realbox.$.input.inputElement.dispatchEvent(
-        new MouseEvent('mousedown', {button: 0}));
-    const args = await testProxy.handler.whenCalled('queryAutocomplete');
-    assertEquals(args.input, realbox.$.input.inputElement.value);
-    assertFalse(args.preventInlineAutocomplete);
-    assertEquals(1, testProxy.handler.getCallCount('queryAutocomplete'));
-
-    testProxy.handler.reset();
-
-    // Show zero-prefix matches.
-    const matches = [createSearchMatchForTesting(), createUrlMatch()];
-    testProxy.callbackRouterRemote.autocompleteResultChanged(
-        createAutocompleteResultForTesting({
-          matches: matches,
-        }));
-    assertTrue(await areMatchesShowing());
-
-    const matchEls = realbox.getDropdownElement().shadowRoot.querySelectorAll(
-        'cr-searchbox-match');
-    assertEquals(2, matchEls.length);
-
-    // Arrow up/down keys do not query autocomplete when matches are showing.
-    realbox.$.input.inputElement.dispatchEvent(new KeyboardEvent('keydown', {
-      bubbles: true,
-      cancelable: true,
-      composed: true,
-      key: 'ArrowUp',
-    }));
-    await microtasksFinished();
-    assertEquals(0, testProxy.handler.getCallCount('queryAutocomplete'));
-
-    // Hide the matches by focusing out.
-    matchEls[0]!.dispatchEvent(new FocusEvent('focusout', {
-      bubbles: true,
-      cancelable: true,
-      composed: true,  // So it propagates across shadow DOM boundary.
-      relatedTarget: document.body,
-    }));
-
-    // Arrow up/down keys in multiline input do not query autocomplete.
-    realbox.multiLineEnabled = true;
-    await microtasksFinished();
-    Object.defineProperty(realbox.$.input.inputElement, 'scrollHeight', {
-      value: 51,
-      configurable: true,
-    });
-
-    realbox.$.input.inputElement.dispatchEvent(new KeyboardEvent('keydown', {
-      bubbles: true,
-      cancelable: true,
-      composed: true,
-      key: 'ArrowDown',
-    }));
-    assertEquals(0, testProxy.handler.getCallCount('queryAutocomplete'));
-  });
-
-  test('arrow up/down keys in non-empty input query autocomplete', async () => {
-    // Query matches.
-    realbox.$.input.inputElement.value = 'hello';
-    realbox.$.input.inputElement.dispatchEvent(new InputEvent('input'));
-    let args = await testProxy.handler.whenCalled('queryAutocomplete');
-    assertEquals(args.input, realbox.$.input.inputElement.value);
-    assertFalse(args.preventInlineAutocomplete);
-    assertEquals(
-        1, testProxy.handler.getCallCount('queryAutocomplete'),
-        'autocomplete queried');
-
-    testProxy.handler.reset();
-
-    // Show matches.
-    const matches = [createSearchMatchForTesting(), createUrlMatch()];
-    testProxy.callbackRouterRemote.autocompleteResultChanged(
-        createAutocompleteResultForTesting({
-          input: 'hello',
-          matches: matches,
-        }));
-    assertTrue(await areMatchesShowing(), 'matches showing');
-
-    const matchEls = realbox.getDropdownElement().shadowRoot.querySelectorAll(
-        'cr-searchbox-match');
-    assertEquals(2, matchEls.length);
-
-    // Arrow up/down keys do not query autocomplete when matches are showing.
-    realbox.$.input.inputElement.dispatchEvent(new KeyboardEvent('keydown', {
-      bubbles: true,
-      cancelable: true,
-      composed: true,
-      key: 'ArrowUp',
-    }));
-    assertEquals(0, testProxy.handler.getCallCount('queryAutocomplete'));
-
-    // Hide the matches by focusing out.
-    matchEls[0]!.dispatchEvent(new FocusEvent('focusout', {
-      bubbles: true,
-      cancelable: true,
-      composed: true,  // So it propagates across shadow DOM boundary.
-      relatedTarget: document.body,
-    }));
-
-    // Arrow up/down keys query autocomplete.
-    realbox.$.input.inputElement.dispatchEvent(new KeyboardEvent('keydown', {
-      bubbles: true,
-      cancelable: true,
-      composed: true,
-      key: 'ArrowDown',
-    }));
-    args = await testProxy.handler.whenCalled('queryAutocomplete');
-    assertEquals(args.input, realbox.$.input.inputElement.value);
-    assertFalse(args.preventInlineAutocomplete);
-    assertEquals(1, testProxy.handler.getCallCount('queryAutocomplete'));
-  });
-
-  test('empty input does not query autocomplete', () => {
-    realbox.$.input.inputElement.value = '';
-    realbox.$.input.inputElement.dispatchEvent(new InputEvent('input'));
-    assertEquals(0, testProxy.handler.getCallCount('queryAutocomplete'));
-  });
-
-  test('typing space does not query autocomplete', () => {
-    realbox.$.input.inputElement.value = ' ';
-    realbox.$.input.inputElement.dispatchEvent(new InputEvent('input'));
-    assertEquals(0, testProxy.handler.getCallCount('queryAutocomplete'));
-  });
-
   test('typing queries autocomplete', async () => {
     realbox.$.input.inputElement.value = 'he';
     realbox.$.input.inputElement.dispatchEvent(new InputEvent('input'));
@@ -684,51 +555,6 @@ suite('SearchboxTest', () => {
 
     testProxy.handler.reset();
   });
-
-  test('queryAutocomplete passes cursor position', async () => {
-    realbox.$.input.inputElement.value = 'hello';
-    realbox.$.input.inputElement.selectionStart = 3;
-    realbox.$.input.inputElement.selectionEnd = 3;
-    realbox.$.input.inputElement.dispatchEvent(new InputEvent('input'));
-
-    const args = await testProxy.handler.whenCalled('queryAutocomplete');
-    assertEquals(args.input, 'hello');
-    assertEquals(args.cursorPosition, 3);
-  });
-
-  test(
-      'queryAutocomplete passes cursor position when input is out of sync',
-      async () => {
-        // Simulate a programmatic update that makes them out of sync
-        realbox.$.input.inputElement.value = 'hello';
-        realbox.$.input.inputElement.selectionStart = 3;
-        realbox.$.input.inputElement.selectionEnd = 3;
-
-        // Dispatch event with 'hello world' but DOM is still 'hello'
-        realbox.$.input.dispatchEvent(new CustomEvent(
-            'searchbox-input-text-updated',
-            {detail: {value: 'hello world', isComposing: false}}));
-
-        const args = await testProxy.handler.whenCalled('queryAutocomplete');
-        assertEquals(args.input, 'hello world');
-        assertEquals(args.cursorPosition, 11);
-      });
-
-  test('clearing the input stops autocomplete', async () => {
-    realbox.$.input.inputElement.value = 'h';
-    realbox.$.input.inputElement.dispatchEvent(new InputEvent('input'));
-
-    let args = await testProxy.handler.whenCalled('queryAutocomplete');
-    assertEquals(args.input, realbox.$.input.inputElement.value);
-    assertFalse(args.preventInlineAutocomplete);
-    assertEquals(1, testProxy.handler.getCallCount('queryAutocomplete'));
-
-    realbox.$.input.inputElement.value = '';
-    realbox.$.input.inputElement.dispatchEvent(new InputEvent('input'));
-    args = await testProxy.handler.whenCalled('stopAutocomplete');
-    assertTrue(args.clearResult);
-  });
-
 
   //============================================================================
   // Test Autocomplete Response
@@ -867,23 +693,6 @@ suite('SearchboxTest', () => {
         'hell', realbox.$.input.inputElement.value.substring(start, end));
   });
 
-  test('stale autocomplete response is ignored', async () => {
-    realbox.$.input.inputElement.value = 'he';
-    realbox.$.input.inputElement.dispatchEvent(new InputEvent('input'));
-
-    const matches = [createSearchMatchForTesting(), createUrlMatch()];
-    testProxy.callbackRouterRemote.autocompleteResultChanged(
-        createAutocompleteResultForTesting({
-          input: 'h',  // Simulate stale response.
-          matches: matches,
-        }));
-    assertFalse(await areMatchesShowing());
-
-    const matchEls = realbox.getDropdownElement().shadowRoot.querySelectorAll(
-        'cr-searchbox-match');
-    assertEquals(0, matchEls.length);
-  });
-
   test('autocomplete response changes', async () => {
     realbox.$.input.inputElement.value = 'he';
     realbox.$.input.inputElement.dispatchEvent(new InputEvent('input'));
@@ -926,26 +735,6 @@ suite('SearchboxTest', () => {
     matchEls = realbox.getDropdownElement().shadowRoot.querySelectorAll(
         'cr-searchbox-match');
     assertEquals(2, matchEls.length);
-  });
-
-  test('autocomplete should not query for empty inputs', async () => {
-    realbox.$.input.inputElement.value = 'he';
-    realbox.$.input.inputElement.dispatchEvent(new InputEvent('input'));
-
-    await testProxy.handler.whenCalled('queryAutocomplete');
-    assertEquals(1, testProxy.handler.getCallCount('queryAutocomplete'));
-
-    // Deleting a character still queries autocomplete.
-    realbox.$.input.inputElement.value = 'h';
-    realbox.$.input.inputElement.dispatchEvent(new InputEvent('input'));
-
-    await testProxy.handler.whenCalled('queryAutocomplete');
-    assertEquals(2, testProxy.handler.getCallCount('queryAutocomplete'));
-
-    // Deleting a character does not query autocomplete for empty input.
-    realbox.$.input.inputElement.value = '';
-    realbox.$.input.inputElement.dispatchEvent(new InputEvent('input'));
-    assertEquals(2, testProxy.handler.getCallCount('queryAutocomplete'));
   });
 
   test('autocomplete result change does not impact focus', async () => {
@@ -2764,103 +2553,8 @@ suite('SearchboxTest', () => {
   });
 
   //============================================================================
-  // Test Forwarding Events
+  // Test Keydown events for multi-line input
   //============================================================================
-
-  test('arrow events are sent to handler', async () => {
-    realbox.$.input.inputElement.value = 'he';
-    realbox.$.input.inputElement.dispatchEvent(new InputEvent('input'));
-
-    const matches = [createSearchMatchForTesting()];
-    testProxy.callbackRouterRemote.autocompleteResultChanged(
-        createAutocompleteResultForTesting({
-          input: realbox.$.input.inputElement.value.trimStart(),
-          matches: matches,
-        }));
-    assertTrue(await areMatchesShowing());
-
-    arrowDown(realbox);
-
-    const args = await testProxy.handler.whenCalled('onNavigationLikely');
-    assertEquals(0, args.line);
-    assertEquals(
-        NavigationPredictor.kUpOrDownArrowButton, args.navigationPredictor);
-  });
-
-  //============================================================================
-  // Test Keyboard Events
-  //============================================================================
-
-  test('keyboard modifier keys behavior', () => {
-    const metaZEvent = new KeyboardEvent('keydown', {
-      bubbles: true,
-      cancelable: true,
-      composed: true,
-      key: 'z',
-      metaKey: true,
-    });
-    const ctrlZEvent = new KeyboardEvent('keydown', {
-      bubbles: true,
-      cancelable: true,
-      composed: true,
-      key: 'z',
-      ctrlKey: true,
-    });
-
-    let metaZPropagated = false;
-    let ctrlZPropagated = false;
-    realbox.addEventListener('keydown', e => {
-      if (e.metaKey && e.key === 'z') {
-        metaZPropagated = true;
-      }
-      if (e.ctrlKey && e.key === 'z') {
-        ctrlZPropagated = true;
-      }
-    });
-
-    // Dispatch events to the inputWrapper
-    realbox.$.inputWrapper.dispatchEvent(metaZEvent);
-    realbox.$.inputWrapper.dispatchEvent(ctrlZEvent);
-
-    // stopPropagation should be called on Mac for meta+Z, and on non-Mac for
-    // ctrl+Z.
-    assertEquals(!isMac, metaZPropagated);
-    assertEquals(isMac, ctrlZPropagated);
-
-    // Default isn't prevented for these explicitly in the handler.
-    assertFalse(metaZEvent.defaultPrevented);
-    assertFalse(ctrlZEvent.defaultPrevented);
-  });
-
-  test('pressing Enter in empty input prevents new line', async () => {
-    // Ensure the input is empty.
-    realbox.$.input.inputElement.value = '';
-    realbox.$.input.inputElement.dispatchEvent(
-        new MouseEvent('mousedown', {button: 0}));
-    await testProxy.handler.whenCalled('queryAutocomplete');
-    testProxy.callbackRouterRemote.autocompleteResultChanged(
-        createAutocompleteResultForTesting({
-          input: '',
-          matches: [createSearchMatchForTesting()],
-        }));
-    await microtasksFinished();
-    const enterEvent = new KeyboardEvent('keydown', {
-      bubbles: true,
-      cancelable: true,
-      composed: true,  // So it propagates across shadow DOM boundary.
-      key: 'Enter',
-    });
-
-    // Dispatch the Enter key event.
-    realbox.$.input.inputElement.dispatchEvent(enterEvent);
-    await microtasksFinished();
-
-    // Assert that the default action (inserting a new line) is prevented.
-    assertTrue(enterEvent.defaultPrevented);
-
-    // Assert that no navigation was triggered since the input is empty.
-    assertEquals(0, testProxy.handler.getCallCount('openAutocompleteMatch'));
-  });
 
   test('pressing Shift+Enter in multi-line input allows new line', async () => {
     // Enable multi-line mode.
@@ -2888,6 +2582,28 @@ suite('SearchboxTest', () => {
     // Assert that no navigation was triggered.
     assertEquals(0, testProxy.handler.getCallCount('openAutocompleteMatch'));
   });
+
+  test(
+      'arrow up/down keys in multi-line input do not query autocomplete',
+      async () => {
+        realbox.multiLineEnabled = true;
+        realbox.initialInputScrollHeight = 50;
+        await microtasksFinished();
+        Object.defineProperty(realbox.$.input, 'scrollHeight', {
+          value: 51,
+          configurable: true,
+        });
+
+        realbox.$.input.inputElement.dispatchEvent(
+            new KeyboardEvent('keydown', {
+              bubbles: true,
+              cancelable: true,
+              composed: true,
+              key: 'ArrowDown',
+            }));
+        await microtasksFinished();
+        assertEquals(0, testProxy.handler.getCallCount('queryAutocomplete'));
+      });
 
   test('onOpenDriveUpload_ handles accepted disclaimer', async () => {
     testProxy.handler.setResultFor('getDriveDisclaimerStatus', Promise.resolve({

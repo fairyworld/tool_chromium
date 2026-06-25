@@ -455,8 +455,7 @@ export const SearchboxMixin = <T extends Constructor<CrLitElement>>(
       await this.getDropdownElement().selectIndex(e.detail);
       // Input selection (if any) likely drops due to focus change. Simply fill
       // the input with the match and move the cursor to the end.
-      const input =
-        this.shadowRoot.querySelector<SearchboxInputElement>('#input');
+      const input = this.getInputElement();
       assert(input);
       input.setInput({
         text: this.selectedMatch!.fillIntoEdit,
