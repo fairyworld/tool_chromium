@@ -333,6 +333,15 @@ export class InkTextBoxElement extends InkTextBoxElementBase {
       viewportOrientation: this.viewportRotations_,
     };
 
+    if (!isEdited) {
+      // No edits.
+      Ink2Manager.getInstance().commitTextAnnotation(
+          annotation, isEdited, /*typefaces=*/[]);
+      this.finishCommit_();
+      return promise;
+    }
+
+    // Has edits.
     (async () => {
       try {
         const result =
