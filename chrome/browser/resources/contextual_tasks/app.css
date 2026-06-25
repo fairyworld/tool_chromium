@@ -147,6 +147,9 @@
   --toolbar-menu-background-color: rgb(255, 255, 255);
   --toolbar-text-color: rgb(31, 31, 31);
 
+  /* Overflow menu colors */
+  --toolbar-menu-icon-color: rgba(71, 71, 71, 1);
+
   /* Animations */
   --composebox-zero-state-animation: zero-state-fade-in 600ms ease forwards;
   --composebox-header-wrapper-zero-state-animation: zero-state-fade-in 600ms
@@ -281,6 +284,9 @@
   --toolbar-divider-color: rgb(94,94,94);
   --toolbar-menu-background-color: rgb(31, 31, 31);
   --toolbar-text-color: rgb(227,227,227);
+
+  /* Overflow menu colors - Dark mode */
+  --toolbar-menu-icon-color: rgba(199, 199, 199, 1);
 
   /* Color of Active tool chip */
   --color-composebox-context-entrypoint-hover-background: rgba(42, 43, 54, 1);
