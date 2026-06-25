@@ -1138,7 +1138,9 @@ ChromeAutofillClient::GetOrCreateAtMemoryBottomSheetBridge() {
     if (ui::WindowAndroid* window_android =
             web_contents()->GetTopLevelNativeWindow()) {
       at_memory_bottom_sheet_bridge_ =
-          std::make_unique<AtMemoryBottomSheetBridge>(window_android);
+          std::make_unique<AtMemoryBottomSheetBridge>(
+              window_android,
+              Profile::FromBrowserContext(web_contents()->GetBrowserContext()));
     }
   }
   return at_memory_bottom_sheet_bridge_.get();

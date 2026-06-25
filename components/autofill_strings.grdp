@@ -848,6 +848,18 @@
     <message name="IDS_AUTOFILL_AT_MEMORY_ZERO_STATE_SUBTITLE" desc="Subtitle text shown in zero state when there are no autofill suggestions in the bottom sheet." formatter_data="android_java" translateable="false">
       Type what you need and ask Gemini to recall info from your Connected Apps
     </message>
+    <message name="IDS_AT_MEMORY_NOTICE_TITLE" desc="Title for the notice shown in the @memory bottom sheet." formatter_data="android_java" translateable="false">
+      Notice title ipsum dolor sit amet, co
+    </message>
+    <message name="IDS_AT_MEMORY_NOTICE_TEXT" desc="Text for the notice shown in the @memory bottom sheet." formatter_data="android_java" translateable="false">
+      Notice content sit amet, consetetur
+    </message>
+    <message name="IDS_AT_MEMORY_NOTICE_MANAGE_SETTINGS_LINK" desc="Link text to manage settings in the @memory bottom sheet notice." formatter_data="android_java" translateable="false">
+      sadipscing elitr, sed
+    </message>
+    <message name="IDS_AT_MEMORY_NOTICE_OK_BUTTON" desc="Button text to acknowledge the notice in the @memory bottom sheet." formatter_data="android_java" translateable="false">
+      OK
+    </message>
   </if>
   <message name="IDS_AUTOFILL_AT_MEMORY_MANAGE_SUGGESTION_MAIN_TEXT" desc="The label for a button in the At Memory flyout that opens the Autofill for AI information management interface in Chrome settings." formatter_data="android_java" translateable="false">
     Manage information

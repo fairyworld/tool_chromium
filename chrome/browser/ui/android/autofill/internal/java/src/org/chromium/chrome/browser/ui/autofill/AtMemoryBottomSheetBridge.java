@@ -13,6 +13,7 @@ import org.jni_zero.NativeMethods;
 
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
+import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.components.autofill.AutofillSuggestion;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
 import org.chromium.components.browser_ui.bottomsheet.BottomSheetControllerProvider;
@@ -30,14 +31,18 @@ public class AtMemoryBottomSheetBridge implements AtMemoryBottomSheetCoordinator
     private AtMemoryBottomSheetBridge(
             long nativeAtMemoryBottomSheetBridge,
             Context context,
-            BottomSheetController bottomSheetController) {
+            BottomSheetController bottomSheetController,
+            Profile profile) {
         mNativeAtMemoryBottomSheetBridge = nativeAtMemoryBottomSheetBridge;
-        mCoordinator = new AtMemoryBottomSheetCoordinator(context, bottomSheetController, this);
+        mCoordinator =
+                new AtMemoryBottomSheetCoordinator(context, bottomSheetController, this, profile);
     }
 
     @CalledByNative
     public static @Nullable AtMemoryBottomSheetBridge create(
-            long nativeAtMemoryBottomSheetBridge, WindowAndroid windowAndroid) {
+            long nativeAtMemoryBottomSheetBridge,
+            WindowAndroid windowAndroid,
+            @JniType("Profile*") Profile profile) {
         Context context = windowAndroid.getContext().get();
         if (context == null) {
             return null;
@@ -50,7 +55,7 @@ public class AtMemoryBottomSheetBridge implements AtMemoryBottomSheetCoordinator
         }
 
         return new AtMemoryBottomSheetBridge(
-                nativeAtMemoryBottomSheetBridge, context, bottomSheetController);
+                nativeAtMemoryBottomSheetBridge, context, bottomSheetController, profile);
     }
 
     @CalledByNative

@@ -6,8 +6,10 @@ package org.chromium.chrome.browser.ui.autofill;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetCoordinator.ITEM_TYPE_ZERO_STATE;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.IS_LOADING;
@@ -31,6 +33,9 @@ import org.mockito.junit.MockitoRule;
 
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.build.annotations.NullMarked;
+import org.chromium.chrome.browser.personal_context.first_run.PersonalContextFirstRunService;
+import org.chromium.chrome.browser.personal_context.first_run.PersonalContextFirstRunServiceJni;
+import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.ui.autofill.internal.R;
 import org.chromium.components.autofill.AutofillSuggestion;
 import org.chromium.ui.modelutil.MVCListAdapter.ListItem;
@@ -47,6 +52,8 @@ public class AtMemoryBottomSheetMediatorTest {
 
     @Mock private AtMemoryBottomSheetCoordinator.Delegate mDelegate;
     @Mock private Runnable mHideKeyboardCallback;
+    @Mock private Profile mProfile;
+    @Mock private PersonalContextFirstRunService.Natives mFirstRunServiceJniMock;
 
     private PropertyModel mModel;
     private ModelList mModelList;
@@ -54,10 +61,12 @@ public class AtMemoryBottomSheetMediatorTest {
 
     @Before
     public void setUp() {
+        PersonalContextFirstRunServiceJni.setInstanceForTesting(mFirstRunServiceJniMock);
         mModelList = new ModelList();
         mMediator =
                 new AtMemoryBottomSheetMediator(
                         ApplicationProvider.getApplicationContext(),
+                        mProfile,
                         mDelegate,
                         mModelList,
                         mHideKeyboardCallback);
@@ -188,5 +197,44 @@ public class AtMemoryBottomSheetMediatorTest {
 
         assertEquals(1, mModelList.size());
         assertEquals(ITEM_TYPE_ZERO_STATE, mModelList.get(0).type);
+    }
+
+    @Test
+    public void testNoticeShownAndDismissedAfterClick() {
+        when(mFirstRunServiceJniMock.shouldShowNotice(mProfile)).thenReturn(true);
+
+        AtMemoryBottomSheetMediator mediator =
+                new AtMemoryBottomSheetMediator(
+                        ApplicationProvider.getApplicationContext(),
+                        mProfile,
+                        mDelegate,
+                        mModelList,
+                        mHideKeyboardCallback);
+        PropertyModel model = mediator.getModel();
+
+        assertTrue(model.get(AtMemoryBottomSheetProperties.IS_NOTICE_VISIBLE));
+
+        Runnable okClickListener =
+                model.get(AtMemoryBottomSheetProperties.NOTICE_OK_CLICK_LISTENER);
+        assertNotNull(okClickListener);
+        okClickListener.run();
+
+        assertFalse(model.get(AtMemoryBottomSheetProperties.IS_NOTICE_VISIBLE));
+        verify(mFirstRunServiceJniMock).noticeAcknowledged(mProfile);
+    }
+
+    @Test
+    public void testNoticeNotShown() {
+        when(mFirstRunServiceJniMock.shouldShowNotice(mProfile)).thenReturn(false);
+
+        AtMemoryBottomSheetMediator mediator =
+                new AtMemoryBottomSheetMediator(
+                        ApplicationProvider.getApplicationContext(),
+                        mProfile,
+                        mDelegate,
+                        mModelList,
+                        mHideKeyboardCallback);
+
+        assertFalse(mediator.getModel().get(AtMemoryBottomSheetProperties.IS_NOTICE_VISIBLE));
     }
 }

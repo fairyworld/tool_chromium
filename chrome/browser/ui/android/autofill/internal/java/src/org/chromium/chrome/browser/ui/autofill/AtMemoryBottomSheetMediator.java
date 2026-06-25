@@ -9,6 +9,8 @@ import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetCoordin
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetCoordinator.ITEM_TYPE_ZERO_STATE;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.FLYOUT_SUGGESTIONS;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.IS_LOADING;
+import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.IS_NOTICE_VISIBLE;
+import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.NOTICE_OK_CLICK_LISTENER;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.ON_QUERY_SUBMITTED_CALLBACK;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.ON_QUERY_TEXT_CHANGED_CALLBACK;
 import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetProperties.SHOW_SUGGESTIONS_BACKGROUND;
@@ -26,6 +28,8 @@ import static org.chromium.chrome.browser.ui.autofill.AtMemoryBottomSheetSuggest
 import android.content.Context;
 
 import org.chromium.build.annotations.NullMarked;
+import org.chromium.chrome.browser.personal_context.first_run.PersonalContextFirstRunService;
+import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.ui.autofill.internal.R;
 import org.chromium.components.autofill.AutofillSuggestion;
 import org.chromium.ui.modelutil.MVCListAdapter.ListItem;
@@ -41,23 +45,30 @@ class AtMemoryBottomSheetMediator {
     private final PropertyModel mModel;
     private final ModelList mModelList;
     private final AtMemoryBottomSheetCoordinator.Delegate mDelegate;
+    private final Profile mProfile;
     private final Runnable mHideKeyboardCallback;
 
     AtMemoryBottomSheetMediator(
             Context context,
+            Profile profile,
             AtMemoryBottomSheetCoordinator.Delegate delegate,
             ModelList modelList,
             Runnable hideKeyboardCallback) {
         mContext = context;
+        mProfile = profile;
         mModelList = modelList;
         mDelegate = delegate;
         mHideKeyboardCallback = hideKeyboardCallback;
+
+        boolean shouldShowNotice = PersonalContextFirstRunService.shouldShowNotice(mProfile);
 
         mModel =
                 new PropertyModel.Builder(AtMemoryBottomSheetProperties.ALL_KEYS)
                         .with(VISIBLE, false)
                         .with(ON_QUERY_SUBMITTED_CALLBACK, this::onQuerySubmitted)
                         .with(ON_QUERY_TEXT_CHANGED_CALLBACK, this::onQueryTextChanged)
+                        .with(IS_NOTICE_VISIBLE, shouldShowNotice)
+                        .with(NOTICE_OK_CLICK_LISTENER, this::onNoticeAcknowledged)
                         .build();
     }
 
@@ -83,6 +94,11 @@ class AtMemoryBottomSheetMediator {
         mModel.set(SHOW_SUGGESTIONS_BACKGROUND, false);
         mModel.set(VISIBLE, false);
         mDelegate.onDismissed();
+    }
+
+    private void onNoticeAcknowledged() {
+        mModel.set(IS_NOTICE_VISIBLE, false);
+        PersonalContextFirstRunService.noticeAcknowledged(mProfile);
     }
 
     private void setSuggestions(List<AutofillSuggestion> suggestions) {

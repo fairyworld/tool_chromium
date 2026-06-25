@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter;
 
 import org.chromium.base.Callback;
 import org.chromium.build.annotations.NullMarked;
+import org.chromium.chrome.browser.settings.SettingsNavigationFactory;
 import org.chromium.chrome.browser.ui.autofill.internal.R;
 import org.chromium.components.autofill.AutofillSuggestion;
 import org.chromium.components.browser_ui.styles.SemanticColorUtils;
@@ -41,6 +42,12 @@ public class AtMemoryBottomSheetView {
 
         mSearchBarView = mContentView.findViewById(R.id.search_query_input_container);
         mFlyoutView = mContentView.findViewById(R.id.at_memory_flyout_screen);
+
+        View settingsLink = mContentView.findViewById(R.id.notice_manage_settings_link);
+        settingsLink.setOnClickListener(
+                v -> {
+                    SettingsNavigationFactory.createSettingsNavigation().startSettings(context);
+                });
     }
 
     public View getContentView() {
@@ -85,6 +92,16 @@ public class AtMemoryBottomSheetView {
 
     public void setFlyoutSuggestions(List<AutofillSuggestion> suggestions) {
         mFlyoutView.setSuggestions(suggestions);
+    }
+
+    public void setNoticeVisible(boolean visible) {
+        View noticeContainer = mContentView.findViewById(R.id.notice_container);
+        noticeContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    public void setNoticeOkButtonClickListener(Runnable onClick) {
+        View okButton = mContentView.findViewById(R.id.notice_ok_button);
+        okButton.setOnClickListener(v -> onClick.run());
     }
 
     /** Draws a divider line below each item in the list except for the last item. */
