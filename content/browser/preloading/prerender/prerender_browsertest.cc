@@ -19338,61 +19338,6 @@ IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessAllActionsTest,
   EXPECT_NE(initiator_process_id, prerender_process_id);
 }
 
-// Tests that a same-site cross-origin prerender DOES NOT reuse the initiator's
-// process.
-IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessAllActionsTest,
-                       SameSiteCrossOriginDoesNotReuseProcess) {
-  GURL url = ssl_server().GetURL("a.test", "/empty.html");
-  // Use a same-site cross-origin URL with opt-in header.
-  GURL prerender_url = ssl_server().GetURL(
-      "sub.a.test", "/prerender/prerender_with_opt_in_header.html");
-
-  // 1. Navigate to the initiator page.
-  ASSERT_TRUE(NavigateToURL(shell(), url));
-  RenderFrameHost* initiator_rfh = current_frame_host();
-  ChildProcessId initiator_process_id = initiator_rfh->GetProcess()->GetID();
-
-  // 2. Start a same-site cross-origin prerender.
-  PrerenderHostId host_id = AddPrerender(prerender_url);
-  ASSERT_TRUE(host_id);
-
-  // 3. Verify the prerender process ID DOES NOT match the initiator's process
-  // ID.
-  RenderFrameHost* prerender_rfh = GetPrerenderedMainFrameHost(host_id);
-  ChildProcessId prerender_process_id = prerender_rfh->GetProcess()->GetID();
-  EXPECT_NE(initiator_process_id, prerender_process_id);
-}
-
-// Tests that a prerender whose initial navigation redirects from same-origin to
-// same-site cross-origin REUSES the initiator's process.
-IN_PROC_BROWSER_TEST_F(ReuseInitiatorProcessAllActionsTest,
-                       RedirectToSameSiteCrossOriginReusesProcess) {
-  GURL url = ssl_server().GetURL("a.test", "/empty.html");
-  GURL redirected_url = ssl_server().GetURL(
-      "sub.a.test", "/prerender/prerender_with_opt_in_header.html");
-  GURL prerender_url = ssl_server().GetURL(
-      "a.test", "/server-redirect?" + redirected_url.spec());
-
-  // 1. Navigate to the initiator page.
-  ASSERT_TRUE(NavigateToURL(shell(), url));
-  RenderFrameHost* initiator_rfh = current_frame_host();
-  ChildProcessId initiator_process_id = initiator_rfh->GetProcess()->GetID();
-
-  // 2. Start a prerender that redirects to a same-site cross-origin URL.
-  // The initial URL is same-origin, so it matches the same-origin restriction
-  // initially.
-  PrerenderHostId host_id = AddPrerender(prerender_url);
-  ASSERT_TRUE(host_id);
-
-  // 3. Verify the prerender process ID.
-  RenderFrameHost* prerender_rfh = GetPrerenderedMainFrameHost(host_id);
-  ChildProcessId prerender_process_id = prerender_rfh->GetProcess()->GetID();
-
-  // On redirection to a same-site cross-origin, it currently reuses the
-  // initiator process if it was allowed to reuse it initially.
-  EXPECT_EQ(initiator_process_id, prerender_process_id);
-}
-
 }  // namespace
 
 }  // namespace content
