@@ -266,15 +266,16 @@ void SetClipToVisibleAreaRecursive(views::View& view,
       }
     }
   } else {
+    gfx::Rect mirrored = view.GetMirroredRect(*clip_to);
     if (auto* const layer = view.layer()) {
-      layer->SetClipRect(*clip_to);
+      layer->SetClipRect(mirrored);
       layer->SetIsFastRoundedCorner(false);
     } else {
-      view.SetClipPath(SkPath::Rect(gfx::RectToSkRect(*clip_to)));
+      view.SetClipPath(SkPath::Rect(gfx::RectToSkRect(mirrored)));
     }
     if (auto* const web_view = views::AsViewClass<views::WebView>(&view)) {
       if (auto* const layer = web_view->holder()->GetUILayer()) {
-        layer->SetClipRect(*clip_to);
+        layer->SetClipRect(mirrored);
         layer->SetIsFastRoundedCorner(false);
       }
     }
