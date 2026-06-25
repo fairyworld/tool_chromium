@@ -11,6 +11,8 @@ import static org.chromium.components.permissions.PermissionUtil.getGeolocationT
 
 import android.Manifest;
 import android.text.TextUtils;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.test.filters.MediumTest;
 
@@ -34,6 +36,7 @@ import org.chromium.base.test.util.DisabledTest;
 import org.chromium.base.test.util.Features;
 import org.chromium.base.test.util.Restriction;
 import org.chromium.build.BuildConfig;
+import org.chromium.chrome.R;
 import org.chromium.chrome.browser.app.ChromeActivity;
 import org.chromium.chrome.browser.flags.ChromeSwitches;
 import org.chromium.chrome.browser.permissions.PermissionTestRule.PermissionUpdateWaiter;
@@ -172,7 +175,8 @@ public class EmbeddedPermissionPromptTest {
             final String expectedPromptText,
             final String expectedPositiveButtonText,
             final String expectedPositiveEphemeralButtonText,
-            final String expectedNegativeButtonText)
+            final String expectedNegativeButtonText,
+            final boolean expectedApproximatePreciseLocationChooser)
             throws Exception {
         runTest(
                 testAndroidPermissionDelegate,
@@ -186,6 +190,7 @@ public class EmbeddedPermissionPromptTest {
                 expectedPositiveEphemeralButtonText,
                 expectedNegativeButtonText,
                 /* expectedPermission= */ "",
+                expectedApproximatePreciseLocationChooser,
                 "promptdismiss");
     }
 
@@ -209,6 +214,8 @@ public class EmbeddedPermissionPromptTest {
      *     button on the dialog url.
      * @param expectedPermission The string that matches the text title on the page when checking
      *     permission.
+     * @param expectedApproximatePreciseLocationChooser Whether the prompt should contain the
+     *     approximate/precise location chooser or not.
      * @param expectedTitle The string that matches the text title in the permission element test
      *     page.
      * @param response The string that matches the text title in the permission element test page.
@@ -225,6 +232,7 @@ public class EmbeddedPermissionPromptTest {
             final String expectedPositiveEphemeralButtonText,
             final String expectedNegativeButtonText,
             final String expectedPermission,
+            final boolean expectedApproximatePreciseLocationChooser,
             final String expectedTitle)
             throws Exception {
 
@@ -273,6 +281,24 @@ public class EmbeddedPermissionPromptTest {
             Assert.assertEquals(
                     expectedNegativeButtonText,
                     dialogMediator.getDelegateForTest().getNegativeButtonText());
+
+            View customView =
+                    manager.getCurrentDialogForTest().get(ModalDialogProperties.CUSTOM_VIEW);
+            if (expectedApproximatePreciseLocationChooser) {
+                Assert.assertNotNull(customView);
+                View chooserContainer = customView.findViewById(R.id.custom_view_container);
+                Assert.assertNotNull(chooserContainer);
+                Assert.assertEquals(View.VISIBLE, chooserContainer.getVisibility());
+                Assert.assertTrue(chooserContainer instanceof ViewGroup);
+                Assert.assertTrue(((ViewGroup) chooserContainer).getChildCount() > 0);
+            } else {
+                if (customView != null) {
+                    View chooserContainer = customView.findViewById(R.id.custom_view_container);
+                    if (chooserContainer != null) {
+                        Assert.assertEquals(View.GONE, chooserContainer.getVisibility());
+                    }
+                }
+            }
 
             int dialogType = activity.getModalDialogManager().getCurrentType();
             switch (response) {
@@ -341,6 +367,7 @@ public class EmbeddedPermissionPromptTest {
                 "Allow this time",
                 "Don't allow",
                 expectedPermission,
+                /* expectedApproximatePreciseLocationChooser= */ true,
                 expectedTitle);
     }
 
@@ -373,6 +400,7 @@ public class EmbeddedPermissionPromptTest {
                 /* expectedPositiveEphemeralButtonText= */ "",
                 "Allow this time",
                 expectedPermission,
+                /* expectedApproximatePreciseLocationChooser= */ true,
                 expectedTitle);
     }
 
@@ -405,6 +433,7 @@ public class EmbeddedPermissionPromptTest {
                 /* expectedPositiveEphemeralButtonText= */ "",
                 "Stop allowing",
                 expectedPermission,
+                /* expectedApproximatePreciseLocationChooser= */ true,
                 expectedTitle);
     }
 
@@ -448,7 +477,8 @@ public class EmbeddedPermissionPromptTest {
                 LOOPBACK_ADDRESS + " wants to use your device's location",
                 "Allow while visiting the site",
                 "Allow this time",
-                "Don't allow");
+                "Don't allow",
+                /* expectedApproximatePreciseLocationChooser= */ true);
     }
 
     @Test
@@ -473,7 +503,8 @@ public class EmbeddedPermissionPromptTest {
                 "You previously didn't allow location for this site",
                 "Continue not allowing",
                 /* expectedPositiveEphemeralButtonText= */ "",
-                "Allow this time");
+                "Allow this time",
+                /* expectedApproximatePreciseLocationChooser= */ true);
     }
 
     @Test
@@ -498,7 +529,8 @@ public class EmbeddedPermissionPromptTest {
                 "You have allowed location on " + LOOPBACK_ADDRESS,
                 "Continue allowing",
                 /* expectedPositiveEphemeralButtonText= */ "",
-                "Stop allowing");
+                "Stop allowing",
+                /* expectedApproximatePreciseLocationChooser= */ true);
     }
 
     @Test
@@ -527,7 +559,8 @@ public class EmbeddedPermissionPromptTest {
                 "To use your location on this site, give " + productName + " access",
                 "Android settings",
                 /* expectedPositiveEphemeralButtonText= */ "",
-                "Cancel");
+                "Cancel",
+                /* expectedApproximatePreciseLocationChooser= */ false);
     }
 
     @Test
@@ -550,7 +583,8 @@ public class EmbeddedPermissionPromptTest {
                 "To use your location on this site, give " + productName + " access",
                 "Android settings",
                 /* expectedPositiveEphemeralButtonText= */ "",
-                "Cancel");
+                "Cancel",
+                /* expectedApproximatePreciseLocationChooser= */ false);
     }
 
     @Test
