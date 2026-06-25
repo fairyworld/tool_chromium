@@ -27,6 +27,16 @@ import javax.annotation.concurrent.GuardedBy;
 public class AccessibilityTestService extends AccessibilityService {
     private static final String TAG = "A11yTestService";
 
+    // Extended selection offset types, defined in:
+    // androidx.view.accessibility.AccessibilityNodeInfoCompat
+    private static final int OFFSET_TYPE_TEXT = 0;
+    private static final int OFFSET_TYPE_CHILD = 1;
+
+    private static final String EXTRA_SELECTION_START_OFFSET_TYPE =
+            "androidx.view.accessibility.AccessibilityNodeInfoCompat.SELECTION_START_OFFSET_TYPE";
+    private static final String EXTRA_SELECTION_END_OFFSET_TYPE =
+            "androidx.view.accessibility.AccessibilityNodeInfoCompat.SELECTION_END_OFFSET_TYPE";
+
     private static AccessibilityTestService sInstance;
     private static final Object sLock = new Object();
 
@@ -255,6 +265,12 @@ public class AccessibilityTestService extends AccessibilityService {
                 if (start != null) {
                     if (node.equals(start.getNode())) {
                         builder.append(" extendedSelectionStart:").append(start.getOffset());
+                        int startOffsetType =
+                                ancestor.getExtras().getInt(EXTRA_SELECTION_START_OFFSET_TYPE, -1);
+                        if (startOffsetType != -1) {
+                            builder.append(
+                                    startOffsetType == OFFSET_TYPE_TEXT ? " (text)" : " (child)");
+                        }
                         addedSelectionInfo = true;
                     }
                 }
@@ -263,6 +279,12 @@ public class AccessibilityTestService extends AccessibilityService {
                 if (end != null) {
                     if (node.equals(end.getNode())) {
                         builder.append(" extendedSelectionEnd:").append(end.getOffset());
+                        int endOffsetType =
+                                ancestor.getExtras().getInt(EXTRA_SELECTION_END_OFFSET_TYPE, -1);
+                        if (endOffsetType != -1) {
+                            builder.append(
+                                    endOffsetType == OFFSET_TYPE_TEXT ? " (text)" : " (child)");
+                        }
                         addedSelectionInfo = true;
                     }
                 }
