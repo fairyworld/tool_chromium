@@ -110,7 +110,6 @@ class COMPONENT_EXPORT(NETWORK_SERVICE) PreflightController final {
       const net::NetworkTrafficAnnotationTag& traffic_annotation,
       mojom::URLLoaderFactory* loader_factory,
       const net::IsolationInfo& isolation_info,
-      mojom::ClientSecurityStatePtr client_security_state,
       base::WeakPtr<mojo::Remote<mojom::DevToolsObserver>> devtools_observer,
       const net::NetLogWithSource& net_log,
       bool acam_preflight_spec_conformant,

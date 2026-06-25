@@ -1016,7 +1016,7 @@ void CorsURLLoader::StartRequest() {
           options_ & mojom::kURLLoadOptionUseHeaderClient),
       context_->cors_non_wildcard_request_headers_support(), tainted_,
       net::NetworkTrafficAnnotationTag(traffic_annotation_),
-      network_loader_factory_, isolation_info_, CloneClientSecurityState(),
+      network_loader_factory_, isolation_info_,
       weak_devtools_observer_factory_.GetWeakPtr(), net_log_,
       context_->acam_preflight_spec_conformant(), std::move(remote_observer));
 }
