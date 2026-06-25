@@ -25339,9 +25339,10 @@
                 {
                     "name": "Enabled",
                     "params": {
-                        "sqrt_allocation_limits_factor": "100",
+                        "sqrt_allocation_limits_factor": "80",
                         "sqrt_allocation_limits_max_growing_factor": "4",
-                        "sqrt_allocation_limits_minimal_factor": "20"
+                        "sqrt_allocation_limits_minimal_factor": "20",
+                        "sqrt_allocation_limits_slow_factor": "80"
                     },
                     "enable_features": [
                         "V8Flag_sqrt_allocation_limits"
