@@ -7,6 +7,7 @@
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
 #include "base/strings/utf_string_conversions.h"
+#include "chrome/browser/dictation/connector_component_extension.h"
 #include "chrome/browser/dictation/dictation_keyed_service_factory.h"
 #include "chrome/browser/dictation/features.h"
 #include "chrome/browser/dictation/listener_stream_provider.h"
@@ -38,7 +39,7 @@ DictationKeyedService::SessionState::SessionState(
 DictationKeyedService::SessionState::~SessionState() = default;
 
 DictationKeyedService::DictationKeyedService(Profile* profile)
-    : profile_(profile) {
+    : profile_(profile), connector_extension_(profile) {
   CHECK(base::FeatureList::IsEnabled(kDictation));
   pref_change_registrar_.Init(profile_->GetPrefs());
   pref_change_registrar_.Add(
@@ -70,7 +71,7 @@ std::unique_ptr<SessionUi> DictationKeyedService::CreateUi(
 
 void DictationKeyedService::StartSession(BrowserWindowInterface& window,
                                          std::unique_ptr<Target> target) {
-  CHECK(!IsDisabledByPolicy());
+  CHECK(IsEnabled());
   CHECK(!session_);
 
   session_.emplace(*this, window.GetWeakPtr());
@@ -87,7 +88,7 @@ void DictationKeyedService::EndSession() {
 }
 
 bool DictationKeyedService::ShouldShowContextMenuItem() const {
-  if (IsDisabledByPolicy()) {
+  if (!IsEnabled()) {
     return false;
   }
   return !session_;
@@ -98,7 +99,7 @@ void DictationKeyedService::ContextMenuHandler(
     content::RenderFrameHost& rfh,
     const std::u16string& selected_text) {
   // Policy could have changed to disabled while the context menu was open.
-  if (IsDisabledByPolicy()) {
+  if (!IsEnabled()) {
     return;
   }
 
@@ -108,14 +109,18 @@ void DictationKeyedService::ContextMenuHandler(
       window, std::make_unique<Target>(&rfh, base::UTF16ToUTF8(selected_text)));
 }
 
-bool DictationKeyedService::IsDisabledByPolicy() const {
+bool DictationKeyedService::IsEnabled() const {
   CHECK(profile_);
-  return profile_->GetPrefs()->GetInteger(prefs::kVoiceTypingSettings) ==
-         kVoiceTypingSettingsDisabled;
+  bool disabled_by_policy =
+      profile_->GetPrefs()->GetInteger(prefs::kVoiceTypingSettings) ==
+      kVoiceTypingSettingsDisabled;
+
+  // Until the connector extension is available consider the feature disabled.
+  return !connector_extension_.IsPending() && !disabled_by_policy;
 }
 
 void DictationKeyedService::OnPrefChanged() {
-  if (IsDisabledByPolicy()) {
+  if (!IsEnabled()) {
     EndSession();
   }
 }

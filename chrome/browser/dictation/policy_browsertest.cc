@@ -9,6 +9,7 @@
 #include "chrome/browser/dictation/dictation_keyed_service.h"
 #include "chrome/browser/dictation/features.h"
 #include "chrome/browser/dictation/target.h"
+#include "chrome/browser/dictation/test_util.h"
 #include "chrome/browser/policy/policy_test_utils.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/renderer_context_menu/render_view_context_menu_test_util.h"
@@ -34,9 +35,8 @@ constexpr int kDefaultSettingsValueDisabled = 2;
 
 class DictationKeyedServicePolicyTest : public policy::PolicyTest {
  public:
-  DictationKeyedServicePolicyTest() {
-    scoped_feature_list_.InitAndEnableFeature(kDictation);
-  }
+  DictationKeyedServicePolicyTest()
+      : scoped_feature_list_(CreateEnablingFeatureList()) {}
   ~DictationKeyedServicePolicyTest() override = default;
 
   Profile* profile() { return chrome_test_utils::GetProfile(this); }

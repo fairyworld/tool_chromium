@@ -58,9 +58,8 @@ class FocusLossObserver : public content::WebContentsObserver {
 
 class DictationKeyedServiceBrowserTest : public PlatformBrowserTest {
  public:
-  DictationKeyedServiceBrowserTest() {
-    scoped_feature_list_.InitAndEnableFeature(kDictation);
-  }
+  DictationKeyedServiceBrowserTest()
+      : scoped_feature_list_(CreateEnablingFeatureList()) {}
   ~DictationKeyedServiceBrowserTest() override = default;
 
   void SetUpCommandLine(base::CommandLine* command_line) override {

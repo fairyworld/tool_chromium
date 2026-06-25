@@ -4,6 +4,7 @@
 
 source_set("dictation") {
   public = [
+    "connector_component_extension.h",
     "dictation_keyed_service.h",
     "dictation_keyed_service_factory.h",
     "dictation_multiplexer.h",
@@ -27,6 +28,7 @@ source_set("dictation") {
 
 source_set("impl") {
   sources = [
+    "connector_component_extension.cc",
     "dictation_keyed_service.cc",
     "dictation_keyed_service_factory.cc",
     "dictation_multiplexer.cc",
@@ -43,6 +45,8 @@ source_set("impl") {
   deps = [
     ":dictation",
     "//base",
+    "//chrome/browser/component_updater",
+    "//chrome/browser/extensions",
     "//chrome/browser/ui",
     "//chrome/browser/ui:browser_element_identifiers",
     "//chrome/browser/ui/browser_window",
@@ -64,6 +68,7 @@ source_set("test_support") {
   public_deps = [
     ":dictation",
     "//base",
+    "//base/test:test_support",
     "//chrome/common/extensions/api",
     "//testing/gmock",
     "//testing/gtest",

@@ -33,9 +33,8 @@ using ExtensionTranscriptionType =
 
 class DictationSessionUiImplBrowserTest : public InteractiveBrowserTest {
  public:
-  DictationSessionUiImplBrowserTest() {
-    scoped_feature_list_.InitAndEnableFeature(kDictation);
-  }
+  DictationSessionUiImplBrowserTest()
+      : scoped_feature_list_(CreateEnablingFeatureList()) {}
   ~DictationSessionUiImplBrowserTest() override = default;
 
   void SetUpCommandLine(base::CommandLine* command_line) override {

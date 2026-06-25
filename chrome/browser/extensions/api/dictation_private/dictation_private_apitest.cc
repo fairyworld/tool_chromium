@@ -141,7 +141,8 @@ class DictationPrivateApiTest : public ExtensionApiTest {
   }
 
  private:
-  base::test::ScopedFeatureList feature_list_{dictation::kDictation};
+  base::test::ScopedFeatureList feature_list_ =
+      dictation::CreateEnablingFeatureList();
 };
 
 IN_PROC_BROWSER_TEST_F(DictationPrivateApiTest, Basic) {

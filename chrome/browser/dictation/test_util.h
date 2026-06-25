@@ -10,6 +10,7 @@
 #include <string_view>
 
 #include "base/memory/raw_ptr.h"
+#include "base/test/scoped_feature_list.h"
 #include "chrome/browser/dictation/dictation_multiplexer.h"
 #include "chrome/browser/dictation/session_controller_delegate.h"
 #include "chrome/browser/dictation/session_ui.h"
@@ -32,6 +33,10 @@ namespace dictation {
 
 inline constexpr std::string_view kDictationTestExtensionId =
     "dfihfgggpgemecjdjahibncmmjlfjggp";
+
+// Returns a ScopedFeatureList that enables Dictation with common params for
+// testing.
+base::test::ScopedFeatureList CreateEnablingFeatureList();
 
 // Loads an extension that provides an implementation of the connector
 // extension in a "manual" mode usable from tests which prevents the extension

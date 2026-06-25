@@ -5,8 +5,8 @@
 #include "chrome/browser/dictation/dictation_keyed_service.h"
 
 #include "base/test/scoped_feature_list.h"
-#include "chrome/browser/dictation/features.h"
 #include "chrome/browser/dictation/target.h"
+#include "chrome/browser/dictation/test_util.h"
 #include "chrome/browser/ui/browser_window/test/mock_browser_window_interface.h"
 #include "chrome/test/base/testing_profile.h"
 #include "content/public/test/browser_task_environment.h"
@@ -16,10 +16,9 @@ namespace dictation {
 
 class DictationKeyedServiceTest : public testing::Test {
  public:
-  DictationKeyedServiceTest() {
-    scoped_feature_list_.InitAndEnableFeature(kDictation);
-    service_ = std::make_unique<DictationKeyedService>(&profile_);
-  }
+  DictationKeyedServiceTest()
+      : scoped_feature_list_(CreateEnablingFeatureList()),
+        service_(std::make_unique<DictationKeyedService>(&profile_)) {}
   ~DictationKeyedServiceTest() override = default;
 
  protected:

@@ -8,7 +8,9 @@
 #include "base/path_service.h"
 #include "base/run_loop.h"
 #include "base/test/bind.h"
+#include "chrome/browser/dictation/dictation_keyed_service.h"
 #include "chrome/browser/dictation/dictation_multiplexer.h"
+#include "chrome/browser/dictation/features.h"
 #include "chrome/browser/dictation/listener_stream_provider.h"
 #include "chrome/browser/extensions/chrome_test_extension_loader.h"
 #include "chrome/browser/profiles/profile.h"
@@ -19,6 +21,13 @@
 #include "testing/gtest/include/gtest/gtest.h"
 
 namespace dictation {
+
+base::test::ScopedFeatureList CreateEnablingFeatureList() {
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndEnableFeatureWithParameters(
+      kDictation, {{"use_component_extension", "false"}});
+  return feature_list;
+}
 
 const extensions::Extension* LoadTestExtensionInManualMode(Profile* profile) {
   extensions::ExtensionRegistryTestHelper observer(
