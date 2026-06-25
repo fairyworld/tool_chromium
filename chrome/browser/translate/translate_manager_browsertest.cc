@@ -1203,8 +1203,14 @@ class TranslateManagerPrerenderBrowserTest
   base::test::ScopedFeatureList scoped_feature_list_;
 };
 
+// TODO(crbug.com/520628534): Flaky.
+#if BUILDFLAG(IS_WIN)
+#define MAYBE_SkipPrerenderPage DISABLED_SkipPrerenderPage
+#else
+#define MAYBE_SkipPrerenderPage SkipPrerenderPage
+#endif
 IN_PROC_BROWSER_TEST_F(TranslateManagerPrerenderBrowserTest,
-                       SkipPrerenderPage) {
+                       MAYBE_SkipPrerenderPage) {
   SetTranslateScript(kTestValidScript);
 
   ChromeTranslateClient* chrome_translate_client = GetChromeTranslateClient();
