@@ -287,46 +287,45 @@ into the product and does any of the following:
 We aim to eventually autoroll as many dependencies as is feasible, and track those
 that can't with an [exception](https://issues.chromium.org/issues/new?component=1801247&template=2135097).
 
-> We are currently only enforcing exceptions for **'Static'** dependencies.
-> New dependencies pulled in via DEPS should be set to **'Manual'**.
+The `Update Mechanism:` field specifies how this dependency is kept up-to-date.
+You will use one of the following values below. The bug link should be an
+approved autoroll exception ([example](https://crbug.com/422921734)).
 
-The `Update Mechanism:` field specifies how this dependency is kept
-up-to-date. You will use one of the exact string formats listed below,
-replacing `(https://crbug.com/BUG_ID)` with the actual bug link where required.
-The format is `Primary[.SubsetSpecifier] (https://crbug.com/BUG_ID)`.
-
-**Accepted Values:**
 * `Autoroll`
-* `Manual (https://crbug.com/BUG_ID)`
-* `Static (https://crbug.com/BUG_ID)`
-* `Static.HardFork (https://crbug.com/BUG_ID)`
+* `Manual (https://crbug.com/<BUG_ID>)`
+* `Static (https://crbug.com/<BUG_ID>)`
+* `Static.HardFork (https://crbug.com/<BUG_ID>)`
 
 |||---||| 3,3,6
 ### Autoroll
 
-Updated automatically by a service e.g. Skia Autoroller, Copybara.
-
-No exception required.
+Updated automatically by a service.
 
 Please refer to
 [managing-third-party](https://chromium.googlesource.com/chromium/src/+/main/docs/managing-third-party/)
-for automation options and usage guide.
+for options and user guide.
 
+*** note
 ### Manual
 
-Updated manually by OWNERS e.g., using `roll_deps`.
+**An exception is required.**
 
-No exception required *yet*.
+Updated manually by OWNERS.
+
+Owners may use `roll-dep`, or custom bespoke methods.
+***
+
 *** note
 ### Static / Static.HardFork
 
-An exception is required.
+**An exception is required.**
 
-*Changes are authored by Chromium Authors.*
+*The dependency will be treated as if it's written by Chromium Authors.*
 
-* **Static**: Origin is not a typical git repo or package manager, or package is
-intentionally never updated.
-* **Static.HardFork**: Origin is a git repo or package manager, but our version
+* **Static**: Origin is not a version controlled repository or a package
+manager, or the dependency is intentionally never updated, or the upstream Git
+repo is archived.
+* **Static.HardFork**: Origin is a Git repo or package manager, but our version
 has diverged from the upstream, and is no longer updatable.
 ***
 |||---|||
