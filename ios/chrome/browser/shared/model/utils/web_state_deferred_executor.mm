@@ -5,6 +5,7 @@
 #import "ios/chrome/browser/shared/model/utils/web_state_deferred_executor.h"
 
 #import "base/memory/weak_ptr.h"
+#import "base/scoped_multi_source_observation.h"
 #import "ios/web/public/navigation/navigation_manager.h"
 
 @implementation WebStateDeferredExecutor {
@@ -16,9 +17,11 @@
   // Stores the callbacks to be used once the web state is realized.
   std::unordered_map<web::WebStateID, WebStateRealizedCompletionBlock>
       _realizedCallbacks;
-  // Temporarily stores the active observations.
-  std::unordered_map<web::WebStateID, base::WeakPtr<web::WebState>>
-      _activeObservations;
+  // Manages observation of multiple WebStates and ensures observers are
+  // correctly removed upon destruction.
+  std::unique_ptr<
+      base::ScopedMultiSourceObservation<web::WebState, web::WebStateObserver>>
+      _scopedObservations;
 }
 
 - (instancetype)init {
@@ -26,6 +29,8 @@
   if (self) {
     _webStateObserverBridge =
         std::make_unique<web::WebStateObserverBridge>(self);
+    _scopedObservations = std::make_unique<base::ScopedMultiSourceObservation<
+        web::WebState, web::WebStateObserver>>(_webStateObserverBridge.get());
   }
 
   return self;
@@ -102,19 +107,16 @@
 #pragma mark - Private
 
 - (void)observeWebState:(web::WebState*)webState {
-  BOOL alreadyObserving =
-      _activeObservations.find(webState->GetUniqueIdentifier()) !=
-      _activeObservations.end();
-  if (alreadyObserving) {
+  if (_scopedObservations->IsObservingSource(webState)) {
     return;
   }
-  webState->AddObserver(_webStateObserverBridge.get());
-  _activeObservations[webState->GetUniqueIdentifier()] = webState->GetWeakPtr();
+  _scopedObservations->AddObservation(webState);
 }
 
 - (void)removeObserverForWebState:(web::WebState*)webState {
-  webState->RemoveObserver(_webStateObserverBridge.get());
-  _activeObservations.erase(webState->GetUniqueIdentifier());
+  if (_scopedObservations->IsObservingSource(webState)) {
+    _scopedObservations->RemoveObservation(webState);
+  }
 }
 
 - (void)forceRealizeWebState:(web::WebState*)webState {
@@ -138,25 +140,7 @@
   }
 }
 
-- (void)removeRemainingWebStateObservations {
-  std::vector<base::WeakPtr<web::WebState>> remainingObservedWebStates;
-  remainingObservedWebStates.reserve(_activeObservations.size());
 
-  for (auto kv : _activeObservations) {
-    remainingObservedWebStates.push_back(kv.second);
-  }
-
-  for (base::WeakPtr<web::WebState> weakWebState : remainingObservedWebStates) {
-    web::WebState* webState = weakWebState.get();
-    if (webState) {
-      [self removeObserverForWebState:webState];
-    }
-  }
-}
-
-- (void)dealloc {
-  [self removeRemainingWebStateObservations];
-}
 
 #pragma mark - CRWWebStateObserver
 
