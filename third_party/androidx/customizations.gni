@@ -110,6 +110,8 @@ template("_androidx_prebuilt") {
       ignore_proguard_configs = true
     } else if (target_name == "androidx_test_uiautomator_uiautomator_java") {
       deps += [ ":androidx_test_runner_java" ]
+    } else if (target_name == "androidx_tracing_tracing_android_java") {
+      ignore_native_libraries = true
     } else if (target_name == "androidx_tracing_tracing_perfetto_java") {
       # b/280878596
       jar_excluded_patterns = [ "dalvik/*" ]
