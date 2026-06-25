@@ -4,7 +4,7 @@
 
 /** @fileoverview Test implementation of PasswordManagerProxy. */
 
-import {PasswordManagerActionableError} from 'chrome://password-manager/password_manager.js';
+import {ExportPasswordsResult, ExportProgressStatus, PageCallbackRouter, PasswordManagerActionableError} from 'chrome://password-manager/password_manager.js';
 import type {AccountStorageActiveStateChangedListener, BlockedSite, BlockedSitesListChangedListener, CredentialsChangedListener, PasswordCheckInteraction, PasswordCheckStatusChangedListener, PasswordManagerActionableErrorChangedListener, PasswordManagerAuthTimeoutListener, PasswordManagerProxy, PasswordsFileExportProgressListener, PasswordViewPageInteractions, ShouldShowAccountStorageToggleChangedListener} from 'chrome://password-manager/password_manager.js';
 import {TestBrowserProxy} from 'chrome://webui-test/test_browser_proxy.js';
 
@@ -16,6 +16,8 @@ import {makeFamilyFetchResults, makePasswordCheckStatus} from './test_util.js';
  */
 export class TestPasswordManagerProxy extends TestBrowserProxy implements
     PasswordManagerProxy {
+  callbackRouter: PageCallbackRouter = new PageCallbackRouter();
+  callbackRouterRemote = this.callbackRouter.$.bindNewPipeAndPassRemote();
   data: {
     blockedSites: BlockedSite[],
     actorLoginPermissions: ActorLoginPermission[],
@@ -64,7 +66,8 @@ export class TestPasswordManagerProxy extends TestBrowserProxy implements
     fileName: '',
   };
 
-  private exportPasswordsError_: Error|null = null;
+  private exportPasswordsResult_: ExportPasswordsResult =
+      ExportPasswordsResult.kSuccess;
 
   constructor() {
     super([
@@ -297,20 +300,16 @@ export class TestPasswordManagerProxy extends TestBrowserProxy implements
 
   requestExportProgressStatus() {
     this.methodCalled('requestExportProgressStatus');
-    return Promise.resolve(
-        chrome.passwordsPrivate.ExportProgressStatus.NOT_STARTED);
+    return Promise.resolve(ExportProgressStatus.kNotStarted);
   }
 
   exportPasswords() {
     this.methodCalled('exportPasswords');
-    if (this.exportPasswordsError_ !== null) {
-      return Promise.reject(this.exportPasswordsError_);
-    }
-    return Promise.resolve();
+    return Promise.resolve(this.exportPasswordsResult_);
   }
 
-  setExportPasswordsError(error: Error) {
-    this.exportPasswordsError_ = error;
+  setExportPasswordsResult(result: ExportPasswordsResult) {
+    this.exportPasswordsResult_ = result;
   }
 
   addPasswordsFileExportProgressListener(

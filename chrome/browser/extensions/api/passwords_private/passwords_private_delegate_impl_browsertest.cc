@@ -518,7 +518,8 @@ IN_PROC_BROWSER_TEST_F(PasswordsPrivateDelegateImplTest,
   std::unique_ptr<content::WebContents> web_contents = CreateWebContents();
 
   SetUpPasswordStores({CreateSampleForm()});
-  StrictMock<base::MockCallback<base::OnceCallback<void(const std::string&)>>>
+  StrictMock<base::MockCallback<base::OnceCallback<void(
+      PasswordsPrivateDelegate::ExportPasswordsResult)>>>
       mock_accepted;
 
   auto delegate = CreateDelegate();
@@ -528,7 +529,9 @@ IN_PROC_BROWSER_TEST_F(PasswordsPrivateDelegateImplTest,
 
   ExpectAuthentication(delegate, /*successful=*/false);
 
-  EXPECT_CALL(mock_accepted, Run(std::string("reauth-failed")));
+  EXPECT_CALL(
+      mock_accepted,
+      Run(PasswordsPrivateDelegate::ExportPasswordsResult::kReauthFailed));
   delegate->ExportPasswords(mock_accepted.Get(), web_contents.get());
 }
 #endif
@@ -642,7 +645,9 @@ IN_PROC_BROWSER_TEST_F(PasswordsPrivateDelegateImplMockTaskEnvironmentTest,
   delegate->SetDeviceAuthenticatorForTesting(
       std::move(biometric_authenticator));
 
-  base::MockCallback<base::OnceCallback<void(const std::string&)>> callback;
+  base::MockCallback<
+      base::OnceCallback<void(PasswordsPrivateDelegate::ExportPasswordsResult)>>
+      callback;
   delegate->ExportPasswords(callback.Get(), web_contents_ptr);
 
   // Simulate closing tab while authentication is still ongoing.
@@ -651,7 +656,9 @@ IN_PROC_BROWSER_TEST_F(PasswordsPrivateDelegateImplMockTaskEnvironmentTest,
 
   // Now simulate auth is finished with success. Expect export to fail because
   // the tab is closed.
-  EXPECT_CALL(callback, Run("reauth-failed"));
+  EXPECT_CALL(
+      callback,
+      Run(PasswordsPrivateDelegate::ExportPasswordsResult::kReauthFailed));
   std::move(auth_result_callback).Run(true);
 }
 
@@ -674,7 +681,9 @@ IN_PROC_BROWSER_TEST_F(PasswordsPrivateDelegateImplMockTaskEnvironmentTest,
       std::move(biometric_authenticator));
 
   EXPECT_CALL(*biometric_authenticator_ptr, AuthenticateWithMessage);
-  base::MockCallback<base::OnceCallback<void(const std::string&)>> callback;
+  base::MockCallback<
+      base::OnceCallback<void(PasswordsPrivateDelegate::ExportPasswordsResult)>>
+      callback;
   delegate->ExportPasswords(callback.Get(), web_contents_ptr);
 
   // Simulate destroying delegate while authentication is still ongoing. It
