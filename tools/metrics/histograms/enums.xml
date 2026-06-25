@@ -1863,6 +1863,7 @@ Called by update_net_error_codes.py.-->
   <int value="-902" label="BLOB_FILE_WRITE_FAILED"/>
   <int value="-901" label="BLOB_OUT_OF_MEMORY"/>
   <int value="-900" label="BLOB_INVALID_CONSTRUCTION_ARGUMENTS"/>
+  <int value="-821" label="DNS_DIRECT_ONLY"/>
   <int value="-820" label="DNS_OTHER_FAILURE"/>
   <int value="-819" label="DNS_REFUSED"/>
   <int value="-818" label="DNS_NOT_IMPLEMENTED"/>
@@ -22189,6 +22190,7 @@ Called by update_net_error_codes.py.-->
   <int value="818" label="DNS_NOT_IMPLEMENTED"/>
   <int value="819" label="DNS_REFUSED"/>
   <int value="820" label="DNS_OTHER_FAILURE"/>
+  <int value="821" label="DNS_DIRECT_ONLY"/>
   <int value="900" label="BLOB_INVALID_CONSTRUCTION_ARGUMENTS"/>
   <int value="901" label="BLOB_OUT_OF_MEMORY"/>
   <int value="902" label="BLOB_FILE_WRITE_FAILED"/>
