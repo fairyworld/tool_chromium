@@ -50,6 +50,8 @@ if (is_win) {
     sources = [
       "guided_setter_overlay_window_win.cc",
       "guided_setter_overlay_window_win.h",
+      "settings_window_finder_win.cc",
+      "settings_window_finder_win.h",
       "visual_guided_setter_layout_utils.cc",
       "visual_guided_setter_layout_utils.h",
       "visual_guided_setter_ui.cc",
@@ -84,6 +86,7 @@ if (is_win) {
 
     sources = [
       "guided_setter_overlay_window_win_unittest.cc",
+      "settings_window_finder_win_unittest.cc",
       "visual_guided_setter_layout_utils_unittest.cc",
     ]
 
