@@ -464,30 +464,57 @@ TEST_F(BookmarksServiceImplTest, MoveBookmarkNode_IndexOutOfRange) {
   EXPECT_EQ(result.error()->code, mojo_base::mojom::Code::kInvalidArgument);
 }
 
-TEST_F(BookmarksServiceImplTest, DeleteBookmarkNode_Success) {
+TEST_F(BookmarksServiceImplTest, DeleteBookmarkNodes_PermanentNode_Error) {
+  const bookmarks::BookmarkNode* node = model_->bookmark_bar_node();
+  ASSERT_TRUE(node);
+
+  auto result = service_->DeleteBookmarkNodes({node->uuid()});
+  EXPECT_FALSE(result.has_value());
+  EXPECT_EQ(result.error()->code, mojo_base::mojom::Code::kInvalidArgument);
+}
+
+TEST_F(BookmarksServiceImplTest, DeleteBookmarkNodes_Success) {
+  const bookmarks::BookmarkNode* parent = model_->bookmark_bar_node();
+  ASSERT_TRUE(parent);
+  const bookmarks::BookmarkNode* node1 =
+      model_->AddURL(parent, 0, u"Title1", GURL("http://example1.com"));
+  const bookmarks::BookmarkNode* node2 =
+      model_->AddURL(parent, 1, u"Title2", GURL("http://example2.com"));
+
+  base::Uuid uuid1 = node1->uuid();
+  base::Uuid uuid2 = node2->uuid();
+
+  auto result = service_->DeleteBookmarkNodes({uuid1, uuid2});
+  EXPECT_TRUE(result.has_value());
+
+  // Verify they were removed from the model.
+  EXPECT_FALSE(model_->GetNodeByUuid(
+      uuid1,
+      bookmarks::BookmarkModel::NodeTypeForUuidLookup::kLocalOrSyncableNodes));
+  EXPECT_FALSE(model_->GetNodeByUuid(
+      uuid2,
+      bookmarks::BookmarkModel::NodeTypeForUuidLookup::kLocalOrSyncableNodes));
+  EXPECT_TRUE(parent->children().empty());
+}
+
+TEST_F(BookmarksServiceImplTest, DeleteBookmarkNodes_OnePermanent_NoneDeleted) {
   const bookmarks::BookmarkNode* parent = model_->bookmark_bar_node();
   ASSERT_TRUE(parent);
   const bookmarks::BookmarkNode* node =
       model_->AddURL(parent, 0, u"Title", GURL("http://example.com"));
 
   base::Uuid uuid = node->uuid();
-  auto result = service_->DeleteBookmarkNode(uuid);
-  EXPECT_TRUE(result.has_value());
+  base::Uuid permanent_uuid = model_->bookmark_bar_node()->uuid();
 
-  // Verify it was removed from the model.
-  EXPECT_FALSE(model_->GetNodeByUuid(
-      uuid,
-      bookmarks::BookmarkModel::NodeTypeForUuidLookup::kLocalOrSyncableNodes));
-  EXPECT_TRUE(parent->children().empty());
-}
-
-TEST_F(BookmarksServiceImplTest, DeleteBookmarkNode_PermanentNode_Error) {
-  const bookmarks::BookmarkNode* node = model_->bookmark_bar_node();
-  ASSERT_TRUE(node);
-
-  auto result = service_->DeleteBookmarkNode(node->uuid());
+  auto result = service_->DeleteBookmarkNodes({uuid, permanent_uuid});
   EXPECT_FALSE(result.has_value());
   EXPECT_EQ(result.error()->code, mojo_base::mojom::Code::kInvalidArgument);
+
+  // Verify the non-permanent node was NOT removed.
+  EXPECT_TRUE(model_->GetNodeByUuid(
+      uuid,
+      bookmarks::BookmarkModel::NodeTypeForUuidLookup::kLocalOrSyncableNodes));
+  EXPECT_EQ(parent->children().size(), 1u);
 }
 
 class TestBookmarksObserver : public mojom::BookmarksObserver {

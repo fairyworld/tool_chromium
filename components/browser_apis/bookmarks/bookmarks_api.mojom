@@ -125,8 +125,8 @@ interface BookmarksService {
                    int32? index)
       => result<mojo_base.mojom.Empty, mojo_base.mojom.Error>;
 
-  // Deletes a bookmark node.
-  // ID must not refer to a permanent node.
-  DeleteBookmarkNode(mojo_base.mojom.Uuid id)
+  // Deletes multiple bookmark nodes.
+  // IDs must not refer to permanent nodes.
+  DeleteBookmarkNodes(array<mojo_base.mojom.Uuid> ids)
       => result<mojo_base.mojom.Empty, mojo_base.mojom.Error>;
 };
