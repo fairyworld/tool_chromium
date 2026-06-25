@@ -278,8 +278,6 @@
 #define IDC_INSTALL_PWA                 40254
 #define IDC_SHOW_MANAGEMENT_PAGE             40255
 #define IDC_PASTE_AND_GO                40256
-#define IDC_SHOW_SAVE_LOCAL_CARD_SIGN_IN_PROMO_IF_APPLICABLE 40257
-#define IDC_CLOSE_SIGN_IN_PROMO        40258
 #define IDC_SHOW_FULL_URLS             40259
 #define IDC_CARET_BROWSING_TOGGLE      40260
 #define IDC_CHROME_TIPS                40263

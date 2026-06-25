@@ -1875,9 +1875,6 @@ void BrowserCommandController::InitCommandState() {
   command_updater_->UpdateCommandEnabled(IDC_SHOW_AVATAR_MENU,
                                          /*state=*/normal_window);
 #endif
-  command_updater_->UpdateCommandEnabled(
-      IDC_SHOW_SAVE_LOCAL_CARD_SIGN_IN_PROMO_IF_APPLICABLE, true);
-  command_updater_->UpdateCommandEnabled(IDC_CLOSE_SIGN_IN_PROMO, true);
   command_updater_->UpdateCommandEnabled(IDC_CARET_BROWSING_TOGGLE, true);
   // Navigation commands
   command_updater_->UpdateCommandEnabled(

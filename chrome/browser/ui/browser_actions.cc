@@ -51,23 +51,18 @@
 #include "chrome/browser/devtools/devtools_policy_dialog.h"
 #include "chrome/browser/devtools/devtools_window.h"
 #include "chrome/browser/devtools/features.h"
+#include "chrome/browser/feedback/show_feedback_page.h"
 #include "chrome/browser/glic/public/glic_enabling.h"
 #include "chrome/browser/indigo/resources/grit/indigo_strings.h"
+#include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/multistep_filter/ui/filter_ui_controller.h"
 #include "chrome/browser/platform_util.h"
-#include "chrome/browser/tab_list/tab_list_interface.h"
-#include "chrome/browser/translate/chrome_translate_client.h"
-#include "chrome/browser/lifetime/application_lifetime_desktop.h"
 #include "chrome/browser/profiles/profile_window.h"
 #include "chrome/browser/shell_integration.h"
 #include "chrome/browser/signin/identity_manager_factory.h"
 #include "chrome/browser/signin/signin_ui_util.h"
-#include "chrome/browser/ui/singleton_tabs.h"
-#include "chrome/browser/web_applications/web_app_utils.h"
-#include "chrome/common/url_constants.h"
-#include "components/media_router/common/pref_names.h"
-#include "components/signin/public/base/signin_metrics.h"
-#include "components/signin/public/identity_manager/identity_manager.h"
+#include "chrome/browser/tab_list/tab_list_interface.h"
+#include "chrome/browser/translate/chrome_translate_client.h"
 #include "chrome/browser/ui/actions/actions_util.h"
 #include "chrome/browser/ui/actions/chrome_action_id.h"
 #include "chrome/browser/ui/actions/chrome_action_properties.h"
@@ -87,9 +82,11 @@
 #include "chrome/browser/ui/browser_command_controller.h"
 #include "chrome/browser/ui/browser_commands.h"
 #include "chrome/browser/ui/browser_element_identifiers.h"
+#include "chrome/browser/ui/browser_select_file_dialog_controller.h"
 #include "chrome/browser/ui/browser_window.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_features.h"
 #include "chrome/browser/ui/browser_window/public/browser_window_interface.h"
+#include "chrome/browser/ui/bubble_anchor_util.h"
 #include "chrome/browser/ui/chrome_pages.h"
 #include "chrome/browser/ui/commerce/commerce_ui_tab_helper.h"
 #include "chrome/browser/ui/customize_chrome/side_panel_controller.h"
@@ -103,10 +100,12 @@
 #include "chrome/browser/ui/omnibox/ai_mode_page_action_controller.h"
 #include "chrome/browser/ui/page_action/page_action_controller.h"
 #include "chrome/browser/ui/page_action/page_action_triggers.h"
+#include "chrome/browser/ui/page_info/page_info_dialog.h"
 #include "chrome/browser/ui/passwords/manage_passwords_ui_controller.h"
 #include "chrome/browser/ui/passwords/passwords_model_delegate.h"
 #include "chrome/browser/ui/passwords/ui_utils.h"
 #include "chrome/browser/ui/performance_controls/memory_saver_bubble_controller.h"
+#include "chrome/browser/ui/profiles/profile_picker.h"
 #include "chrome/browser/ui/qrcode_generator/qrcode_generator_bubble_controller.h"
 #include "chrome/browser/ui/read_anything/read_anything_entry_point_controller.h"
 #include "chrome/browser/ui/search/omnibox_utils.h"
@@ -117,6 +116,7 @@
 #include "chrome/browser/ui/side_panel/side_panel_entry_key.h"
 #include "chrome/browser/ui/side_panel/side_panel_enums.h"
 #include "chrome/browser/ui/side_panel/side_panel_ui.h"
+#include "chrome/browser/ui/singleton_tabs.h"
 #include "chrome/browser/ui/tabs/features.h"
 #include "chrome/browser/ui/tabs/projects/projects_panel_state_controller.h"
 #include "chrome/browser/ui/tabs/public/tab_features.h"
@@ -155,10 +155,13 @@
 #include "chrome/browser/ui/web_applications/web_app_dialog_utils.h"
 #include "chrome/browser/ui/webauthn/ambient/ambient_signin_controller.h"
 #include "chrome/browser/ui/webid/account_selection_view.h"
+#include "chrome/browser/ui/webui/inspect/inspect_ui.h"
 #include "chrome/browser/ui/webui/side_panel/customize_chrome/customize_chrome_section.h"
 #include "chrome/browser/web_applications/web_app_install_params.h"
+#include "chrome/browser/web_applications/web_app_utils.h"
 #include "chrome/common/chrome_features.h"
 #include "chrome/common/pref_names.h"
+#include "chrome/common/url_constants.h"
 #include "chrome/grit/branded_strings.h"
 #include "chrome/grit/generated_resources.h"
 #include "components/autofill/core/common/autofill_payments_features.h"
@@ -172,6 +175,7 @@
 #include "components/lens/lens_overlay_invocation_source.h"
 #include "components/media_router/browser/media_router_dialog_controller.h"
 #include "components/media_router/browser/media_router_metrics.h"
+#include "components/media_router/common/pref_names.h"
 #include "components/multistep_filter/core/features.h"
 #include "components/omnibox/browser/omnibox_field_trial.h"
 #include "components/omnibox/browser/vector_icons.h"
@@ -182,13 +186,19 @@
 #include "components/saved_tab_groups/public/features.h"
 #include "components/search_engines/template_url.h"
 #include "components/search_engines/template_url_service.h"
+#include "components/signin/public/base/signin_metrics.h"
+#include "components/signin/public/identity_manager/identity_manager.h"
 #include "components/split_tabs/split_tab_visual_data.h"
 #include "components/strings/grit/components_strings.h"
 #include "components/tabs/public/tab_interface.h"
-#include "chrome/browser/feedback/show_feedback_page.h"
+#include "content/public/common/profiling.h"
+#include "extensions/common/extension_urls.h"
 #if BUILDFLAG(IS_CHROMEOS)
 #include "chrome/browser/ui/browser_commands_chromeos.h"
 #endif
+#include "chrome/browser/translate/chrome_translate_client.h"
+#include "chrome/browser/ui/lens/lens_search_controller.h"
+#include "components/lens/lens_overlay_invocation_source.h"
 #include "components/translate/core/browser/translate_manager.h"
 #include "components/user_prefs/user_prefs.h"
 #include "components/vector_icons/vector_icons.h"
@@ -1311,6 +1321,120 @@ void BrowserActions::InitializeChromeMenuActions() {
               ? vector_icons::kPasswordManagerIcon
               : vector_icons::kPasswordManagerOldIcon)
           .SetEnabled(!is_guest_session)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating([](actions::ActionItem* item,
+                                 actions::ActionInvocationContext context) {
+            profiles::SwitchToGuestProfile();
+          }))
+          .SetActionId(kActionOpenGuestProfile)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                InspectUI::InspectDevices(bwi->GetBrowserForMigrationOnly());
+              },
+              bwi))
+          .SetActionId(kActionDevToolsDevices)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ToggleDevToolsWindow(
+                    bwi, DevToolsToggleAction::Inspect(),
+                    DevToolsOpenedByAction::kInspectorModeShortcut);
+              },
+              bwi))
+          .SetActionId(kActionDevToolsInspect)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating([](actions::ActionItem* item,
+                                 actions::ActionInvocationContext context) {
+            content::Profiling::Toggle();
+          }))
+          .SetActionId(kActionProfilingEnabled)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                content::WebContents* const web_contents =
+                    bwi->GetTabStripModel()->GetActiveWebContents();
+                if (web_contents) {
+                  ShowPageInfoDialog(
+                      web_contents,
+                      base::BindOnce(
+                          [](BrowserWindowInterface* bwi,
+                             views::Widget::ClosedReason closed_reason,
+                             bool reload_prompt) {
+                            if (reload_prompt) {
+                              return;
+                            }
+                            if (closed_reason != views::Widget::ClosedReason::
+                                                     kEscKeyPressed &&
+                                closed_reason != views::Widget::ClosedReason::
+                                                     kCloseButtonClicked) {
+                              return;
+                            }
+                            content::WebContents* const active_contents =
+                                bwi->GetTabStripModel()->GetActiveWebContents();
+                            if (active_contents) {
+                              active_contents->Focus();
+                            }
+                          },
+                          bwi),
+                      bubble_anchor_util::Anchor::kAppMenuButton);
+                }
+              },
+              bwi))
+          .SetActionId(kActionWebAppMenuAppInfo)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                bwi->GetFeatures()
+                    .browser_select_file_dialog_controller()
+                    ->OpenFile();
+              },
+              bwi))
+          .SetActionId(kActionOpenFile)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowExtensions(bwi);
+              },
+              bwi))
+          .SetActionId(kActionExtensionsSubmenuManageExtensions)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating(
+              [](BrowserWindowInterface* bwi, actions::ActionItem* item,
+                 actions::ActionInvocationContext context) {
+                chrome::ShowWebStore(bwi, extension_urls::kAppMenuUtmSource);
+              },
+              bwi))
+          .SetActionId(kActionExtensionsSubmenuVisitChromeWebStore)
           .Build());
 }
 
@@ -3514,6 +3638,28 @@ void BrowserActions::InitializeToolbarAndMiscActions() {
               },
               bwi))
           .SetActionId(kActionWebAppSettings)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating([](actions::ActionItem* item,
+                                 actions::ActionInvocationContext context) {
+            ProfilePicker::Show(ProfilePicker::Params::FromEntryPoint(
+                ProfilePicker::EntryPoint::
+                    kAppMenuProfileSubMenuAddNewProfile));
+          }))
+          .SetActionId(kActionAddNewProfile)
+          .Build());
+
+  root_action_item_->AddChild(
+      actions::ActionItem::Builder(
+          base::BindRepeating([](actions::ActionItem* item,
+                                 actions::ActionInvocationContext context) {
+            ProfilePicker::Show(ProfilePicker::Params::FromEntryPoint(
+                ProfilePicker::EntryPoint::
+                    kAppMenuProfileSubMenuManageProfiles));
+          }))
+          .SetActionId(kActionManageChromeProfiles)
           .Build());
 #endif
 

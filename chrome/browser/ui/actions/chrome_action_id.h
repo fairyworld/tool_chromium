@@ -195,9 +195,6 @@
   E(kActionShowCollaborationRecentActivity) \
   E(kActionShowManagementPage, IDC_SHOW_MANAGEMENT_PAGE) \
   E(kActionPasteAndGo, IDC_PASTE_AND_GO) \
-  E(kActionShowSaveLocalCardSignInPromoIfApplicable, \
-    IDC_SHOW_SAVE_LOCAL_CARD_SIGN_IN_PROMO_IF_APPLICABLE) \
-  E(kActionCloseSignInPromo, IDC_CLOSE_SIGN_IN_PROMO) \
   E(kActionShowFullUrls, IDC_SHOW_FULL_URLS) \
   E(kActionShowGoogleLensShortcut, IDC_SHOW_GOOGLE_LENS_SHORTCUT) \
   E(kActionShowAiModeOmniboxButton, IDC_SHOW_AI_MODE_OMNIBOX_BUTTON) \
