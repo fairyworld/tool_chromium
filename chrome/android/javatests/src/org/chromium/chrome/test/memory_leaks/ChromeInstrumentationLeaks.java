@@ -35,15 +35,6 @@ public class ChromeInstrumentationLeaks implements LeakCanaryConfigProvider {
     private static String sFieldPersistencePolicyCleanup =
             "org.chromium.chrome.browser.tabmodel.TabbedModeTabPersistencePolicy#sCleanupTask";
 
-    // crbug.com/512490913
-    @IdentifierNameString
-    private static String sClassVoiceHandler =
-            "org.chromium.chrome.browser.omnibox.voice.VoiceRecognitionIntentHandler";
-
-    @IdentifierNameString
-    private static String sFieldVoiceHandler =
-            "org.chromium.chrome.browser.omnibox.voice.VoiceRecognitionIntentHandler#mWindowAndroid";
-
     @Override
     public Map<String, String> getStaticFieldLeaks() {
         return Map.of(
