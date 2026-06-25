@@ -5,6 +5,7 @@ Version: N/A
 Revision: 6103881d14f3425ea3aeb4b8aba8e6a9510565c1
 Update Mechanism: Autoroll
 License: MPL-2.0
+License Android Compatible: yes
 License File: LICENSE
 Security Critical: yes
 Shipped: yes
