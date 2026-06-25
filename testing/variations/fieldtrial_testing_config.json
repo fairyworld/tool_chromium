@@ -19634,24 +19634,6 @@
             ]
         }
     ],
-    "PrefetchBlockUntilHeadTimeoutForWebViewPrefetch": [
-        {
-            "platforms": [
-                "android_webview"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "params": {
-                        "block_until_head_timeout_embedder_prefetch": "0"
-                    },
-                    "enable_features": [
-                        "PrefetchUseContentRefactor"
-                    ]
-                }
-            ]
-        }
-    ],
     "PrefetchBookmarkBarTrigger": [
         {
             "platforms": [
