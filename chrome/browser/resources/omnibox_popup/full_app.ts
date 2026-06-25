@@ -21,8 +21,6 @@ export class OmniboxFullAppElement extends CrLitElement {
     return getHtml.bind(this)();
   }
 
-  private isDebug_: boolean =
-      new URLSearchParams(window.location.search).has('debug');
   private eventTracker_ = new EventTracker();
 
   constructor() {
@@ -36,12 +34,6 @@ export class OmniboxFullAppElement extends CrLitElement {
         document.documentElement, 'visibilitychange',
         this.onVisibilitychange_.bind(this));
     this.onVisibilitychange_();
-    if (!this.isDebug_) {
-      this.eventTracker_.add(
-          document.documentElement, 'contextmenu', (e: Event) => {
-            e.preventDefault();
-          });
-    }
   }
 
   override disconnectedCallback() {

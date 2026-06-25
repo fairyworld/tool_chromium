@@ -6,7 +6,7 @@ import 'chrome://omnibox-popup.top-chrome/omnibox_popup.js';
 
 import type {OmniboxFullAppElement, OmniboxPopupSearchboxElement} from 'chrome://omnibox-popup.top-chrome/omnibox_popup.js';
 import {assertEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
-import {eventToPromise, microtasksFinished} from 'chrome://webui-test/test_util.js';
+import {microtasksFinished} from 'chrome://webui-test/test_util.js';
 
 suite('FullAppTest', function() {
   let app: OmniboxFullAppElement;
@@ -14,14 +14,6 @@ suite('FullAppTest', function() {
   setup(() => {
     app = document.createElement('omnibox-full-app');
     document.body.appendChild(app);
-  });
-
-  test('ContextMenuPrevented', async function() {
-    const whenFired = eventToPromise('contextmenu', document.documentElement);
-    document.documentElement.dispatchEvent(
-        new Event('contextmenu', {cancelable: true}));
-    const e = await whenFired;
-    assertTrue(e.defaultPrevented);
   });
 
   test('FocusesInputOnVisibilityChange', async function() {
