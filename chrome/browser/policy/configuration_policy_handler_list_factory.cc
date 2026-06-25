@@ -2556,11 +2556,6 @@ const PolicyToPreferenceMapEntry kSimplePolicyMap[] = {
 const SchemaValidatingPolicyToPreferenceMapEntry kSchemaValidatingPolicyMap[] =
     {
   // Policies for all platforms - Start.
-  { key::kAutofillSettings,
-    autofill::prefs::kAutofillTypesBlocked,
-    SCHEMA_ALLOW_UNKNOWN,
-    SimpleSchemaValidatingPolicyHandler::RECOMMENDED_PROHIBITED,
-    SimpleSchemaValidatingPolicyHandler::MANDATORY_ALLOWED },
   // Policies for all platforms - End.
   // Policies for ChromeOS - Start.
 #if BUILDFLAG(IS_CHROMEOS)
@@ -2647,11 +2642,10 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
       std::make_unique<
           LocalNetworkAccessIpAddressSpaceOverridesPolicyHandler>());
   handlers->AddHandler(std::make_unique<DefaultSensorsSettingPolicyHandler>());
-  handlers->AddHandler(std::make_unique<BooleanDisablingPolicyHandler>(
-      key::kAutofillAddressEnabled, autofill::prefs::kAutofillProfileEnabled));
-  handlers->AddHandler(std::make_unique<BooleanDisablingPolicyHandler>(
-      key::kAutofillCreditCardEnabled,
-      autofill::prefs::kAutofillCreditCardEnabled));
+
+  handlers->AddHandler(
+      std::make_unique<autofill::AutofillSettingsPolicyHandler>(chrome_schema));
+
   handlers->AddHandler(std::make_unique<autofill::AutofillPolicyHandler>());
   handlers->AddHandler(std::make_unique<ChromeIncognitoModePolicyHandler>());
   handlers->AddHandler(

@@ -62,5 +62,6 @@ future_on:
 - chrome_os
 - android
 - ios
+- fuchsia
 tags: []
 type: dict
