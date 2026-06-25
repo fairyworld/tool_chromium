@@ -11,7 +11,7 @@ export function getHtml(this: OmniboxEverywhereAppElement) {
 <div id="content">
   ${
       this.isComposeboxMode_ ? html`
-    <everywhere-composebox id="composebox" searchbox-next-enabled
+    <composebox-everywhere id="composebox" searchbox-next-enabled
         searchbox-layout-mode="${this.searchboxLayoutMode_}"
         .state="${this.composeboxState_}"
         @close-composebox="${this.onCloseComposebox_}"
@@ -20,12 +20,12 @@ export function getHtml(this: OmniboxEverywhereAppElement) {
         .usePecApi="${this.usePecApi_}"
         .isOblongShape="${this.isOblongShape_}"
         entrypoint-name="Omnibox">
-    </everywhere-composebox>
+    </composebox-everywhere>
   ` :
                                html`
-    <everywhere-searchbox id="searchbox"
+    <omnibox-everywhere id="searchbox"
         @open-composebox="${this.onOpenComposebox_}">
-    </everywhere-searchbox>
+    </omnibox-everywhere>
   `}
 </div>
 <!--_html_template_end_-->`;

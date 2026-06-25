@@ -47,8 +47,8 @@
 #include "chrome/browser/ui/omnibox/omnibox_next_features.h"
 
 #if !BUILDFLAG(IS_ANDROID)
-#include "chrome/browser/ui/omnibox/everywhere_omnibox_service.h"
-#include "chrome/browser/ui/omnibox/everywhere_omnibox_service_factory.h"
+#include "chrome/browser/ui/omnibox/omnibox_everywhere_service.h"
+#include "chrome/browser/ui/omnibox/omnibox_everywhere_service_factory.h"
 #endif
 #include "chrome/browser/ui/webui/cr_components/searchbox/contextual_searchbox_tab_favicon_helper.h"
 #include "chrome/browser/ui/webui/cr_components/searchbox/searchbox_utils.h"
@@ -1793,11 +1793,11 @@ void ContextualSearchboxHandler::OpenUrl(
   // TODO(crbug.com/526405104): This should probably be moved to the client and
   // be based on the page classification. The service's impl should also
   // correctly pass on context like done below.
-  if (base::FeatureList::IsEnabled(omnibox::kEverywhereOmnibox)) {
+  if (base::FeatureList::IsEnabled(omnibox::kOmniboxEverywhere)) {
     if (web_contents_->GetVisibleURL().host() ==
         chrome::kChromeUIOmniboxEverywhereHost) {
       if (auto* service =
-              EverywhereOmniboxServiceFactory::GetForProfile(profile_)) {
+              OmniboxEverywhereServiceFactory::GetForProfile(profile_)) {
         service->OpenUrl(url, disposition);
         return;
       }

@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_UI_OMNIBOX_EVERYWHERE_OMNIBOX_SERVICE_H_
-#define CHROME_BROWSER_UI_OMNIBOX_EVERYWHERE_OMNIBOX_SERVICE_H_
+#ifndef CHROME_BROWSER_UI_OMNIBOX_OMNIBOX_EVERYWHERE_SERVICE_H_
+#define CHROME_BROWSER_UI_OMNIBOX_OMNIBOX_EVERYWHERE_SERVICE_H_
 
 #include <memory>
 #include <string>
@@ -32,15 +32,15 @@ class WebContents;
 class OmniboxController;
 class Profile;
 
-class EverywhereOmniboxService : public KeyedService,
+class OmniboxEverywhereService : public KeyedService,
                                  public ui::GlobalAcceleratorListener::Observer,
                                  public views::WidgetObserver,
                                  public WebUIContentsWrapper::Host {
  public:
-  explicit EverywhereOmniboxService(Profile* profile);
-  EverywhereOmniboxService(const EverywhereOmniboxService&) = delete;
-  EverywhereOmniboxService& operator=(const EverywhereOmniboxService&) = delete;
-  ~EverywhereOmniboxService() override;
+  explicit OmniboxEverywhereService(Profile* profile);
+  OmniboxEverywhereService(const OmniboxEverywhereService&) = delete;
+  OmniboxEverywhereService& operator=(const OmniboxEverywhereService&) = delete;
+  ~OmniboxEverywhereService() override;
 
   void TogglePopup();
   void HidePopup();
@@ -91,7 +91,7 @@ class EverywhereOmniboxService : public KeyedService,
 
   base::ScopedObservation<views::Widget, views::WidgetObserver>
       widget_observation_{this};
-  base::WeakPtrFactory<EverywhereOmniboxService> weak_factory_{this};
+  base::WeakPtrFactory<OmniboxEverywhereService> weak_factory_{this};
 };
 
-#endif  // CHROME_BROWSER_UI_OMNIBOX_EVERYWHERE_OMNIBOX_SERVICE_H_
+#endif  // CHROME_BROWSER_UI_OMNIBOX_OMNIBOX_EVERYWHERE_SERVICE_H_

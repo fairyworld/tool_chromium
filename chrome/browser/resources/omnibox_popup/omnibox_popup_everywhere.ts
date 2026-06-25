@@ -6,6 +6,6 @@ import './everywhere_app.js';
 
 export {ComposeboxProxyImpl} from '//resources/cr_components/composebox/composebox_proxy.js';
 export {SearchboxBrowserProxy} from '//resources/cr_components/searchbox/searchbox_browser_proxy.js';
+export {ComposeboxEverywhereElement} from './composebox_everywhere.js';
 export {OmniboxEverywhereAppElement} from './everywhere_app.js';
-export {EverywhereComposeboxElement} from './everywhere_composebox.js';
 export {PageCallbackRouter as OmniboxPopupPageCallbackRouter, PageHandlerRemote as OmniboxPopupPageHandlerRemote, PageRemote as OmniboxPopupPageRemote} from './omnibox_popup.mojom-webui.js';

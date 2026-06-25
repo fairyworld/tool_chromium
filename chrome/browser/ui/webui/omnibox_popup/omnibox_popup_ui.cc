@@ -67,7 +67,7 @@ bool OmniboxPopupUIConfig::IsWebUIEnabled(
   return omnibox::IsAimPopupFeatureEnabled() ||
          omnibox::IsWebUIOmniboxFullPopupEnabled() ||
          omnibox::IsWebUIOmniboxPopupEnabled() ||
-         base::FeatureList::IsEnabled(omnibox::kEverywhereOmnibox) ||
+         base::FeatureList::IsEnabled(omnibox::kOmniboxEverywhere) ||
          features::IsWebUILocationBarEnabled();
 }
 

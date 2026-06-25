@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/ui/omnibox/everywhere_omnibox_service.h"
+#include "chrome/browser/ui/omnibox/omnibox_everywhere_service.h"
 
 #include <memory>
 
@@ -20,8 +20,8 @@
 #include "chrome/browser/ui/browser_window/public/global_browser_collection.h"
 #include "chrome/browser/ui/navigator/browser_navigator.h"
 #include "chrome/browser/ui/navigator/browser_navigator_params.h"
-#include "chrome/browser/ui/omnibox/everywhere_omnibox_service_factory.h"
 #include "chrome/browser/ui/omnibox/omnibox_controller.h"
+#include "chrome/browser/ui/omnibox/omnibox_everywhere_service_factory.h"
 #include "chrome/browser/ui/omnibox/omnibox_next_features.h"
 #include "chrome/browser/ui/views/omnibox/rounded_omnibox_results_frame.h"
 #include "chrome/browser/ui/webui/cr_components/searchbox/searchbox_omnibox_client.h"
@@ -47,16 +47,16 @@
 #if BUILDFLAG(IS_MAC)
 bool IsAppActiveOnMac();
 void HideAppOnMac();
-void OrderEverywhereOmniboxFrontOnMac(views::Widget* widget);
+void OrderOmniboxEverywhereFrontOnMac(views::Widget* widget);
 #endif
 
 namespace {
 
-class EverywhereOmniboxClient : public SearchboxOmniboxClient {
+class OmniboxEverywhereClient : public SearchboxOmniboxClient {
  public:
-  EverywhereOmniboxClient(Profile* profile, EverywhereOmniboxService* service)
+  OmniboxEverywhereClient(Profile* profile, OmniboxEverywhereService* service)
       : SearchboxOmniboxClient(profile, nullptr), service_(service) {}
-  ~EverywhereOmniboxClient() override = default;
+  ~OmniboxEverywhereClient() override = default;
 
   metrics::OmniboxEventProto::PageClassification GetPageClassification(
       bool is_prefetch) const override {
@@ -84,17 +84,17 @@ class EverywhereOmniboxClient : public SearchboxOmniboxClient {
   }
 
  private:
-  raw_ptr<EverywhereOmniboxService> service_;
+  raw_ptr<OmniboxEverywhereService> service_;
 };
 
 }  // namespace
 
-EverywhereOmniboxService::EverywhereOmniboxService(Profile* profile)
+OmniboxEverywhereService::OmniboxEverywhereService(Profile* profile)
     : profile_(profile) {
   controller_ = std::make_unique<OmniboxController>(
-      std::make_unique<EverywhereOmniboxClient>(profile_, this), std::nullopt);
+      std::make_unique<OmniboxEverywhereClient>(profile_, this), std::nullopt);
 
-  if (base::FeatureList::IsEnabled(omnibox::kEverywhereOmnibox) &&
+  if (base::FeatureList::IsEnabled(omnibox::kOmniboxEverywhere) &&
       ui::GlobalAcceleratorListener::GetInstance()) {
     ui::GlobalAcceleratorListener::GetInstance()->RegisterAccelerator(
         ui::Accelerator(ui::VKEY_SPACE,
@@ -103,11 +103,11 @@ EverywhereOmniboxService::EverywhereOmniboxService(Profile* profile)
   }
 }
 
-EverywhereOmniboxService::~EverywhereOmniboxService() {
+OmniboxEverywhereService::~OmniboxEverywhereService() {
   Shutdown();
 }
 
-void EverywhereOmniboxService::Shutdown() {
+void OmniboxEverywhereService::Shutdown() {
   if (ui::GlobalAcceleratorListener::GetInstance()) {
     ui::GlobalAcceleratorListener::GetInstance()->UnregisterAccelerators(this);
   }
@@ -120,7 +120,7 @@ void EverywhereOmniboxService::Shutdown() {
   controller_.reset();
 }
 
-void EverywhereOmniboxService::TogglePopup() {
+void OmniboxEverywhereService::TogglePopup() {
   if (IsPopupVisible()) {
     HidePopup();
   } else {
@@ -128,7 +128,7 @@ void EverywhereOmniboxService::TogglePopup() {
   }
 }
 
-void EverywhereOmniboxService::HidePopup() {
+void OmniboxEverywhereService::HidePopup() {
   if (widget_) {
     widget_observation_.Reset();
     widget_->Hide();
@@ -139,7 +139,7 @@ void EverywhereOmniboxService::HidePopup() {
 #endif
     base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
         FROM_HERE, base::BindOnce(
-                       [](base::WeakPtr<EverywhereOmniboxService> service) {
+                       [](base::WeakPtr<OmniboxEverywhereService> service) {
                          if (service && service->widget_) {
                            service->widget_observation_.Reset();
                            service->widget_->CloseNow();
@@ -151,11 +151,11 @@ void EverywhereOmniboxService::HidePopup() {
   }
 }
 
-bool EverywhereOmniboxService::IsPopupVisible() const {
+bool OmniboxEverywhereService::IsPopupVisible() const {
   return widget_ && widget_->IsVisible();
 }
 
-void EverywhereOmniboxService::OnKeyPressed(
+void OmniboxEverywhereService::OnKeyPressed(
     const ui::Accelerator& accelerator) {
   base::TimeTicks now = base::TimeTicks::Now();
   if (!last_key_press_time_.is_null() &&
@@ -180,7 +180,7 @@ void EverywhereOmniboxService::OnKeyPressed(
 
   if (target_profile) {
     auto* service =
-        EverywhereOmniboxServiceFactory::GetForProfile(target_profile);
+        OmniboxEverywhereServiceFactory::GetForProfile(target_profile);
     if (service != this) {
       return;
     }
@@ -194,11 +194,11 @@ void EverywhereOmniboxService::OnKeyPressed(
   }
 }
 
-void EverywhereOmniboxService::ExecuteCommand(
+void OmniboxEverywhereService::ExecuteCommand(
     const std::string& accelerator_group_id,
     const std::string& command_id) {}
 
-void EverywhereOmniboxService::CreateAndShowWidget() {
+void OmniboxEverywhereService::CreateAndShowWidget() {
   if (!contents_wrapper_) {
     contents_wrapper_ =
         std::make_unique<WebUIContentsWrapperT<OmniboxEverywhereUI>>(
@@ -247,7 +247,7 @@ void EverywhereOmniboxService::CreateAndShowWidget() {
 
   widget_->Show();
 #if BUILDFLAG(IS_MAC)
-  OrderEverywhereOmniboxFrontOnMac(widget_.get());
+  OrderOmniboxEverywhereFrontOnMac(widget_.get());
 #else
   widget_->Activate();
 #endif
@@ -264,28 +264,28 @@ void EverywhereOmniboxService::CreateAndShowWidget() {
   }
 }
 
-void EverywhereOmniboxService::OnWidgetActivationChanged(views::Widget* widget,
+void OmniboxEverywhereService::OnWidgetActivationChanged(views::Widget* widget,
                                                          bool active) {
   if (!active) {
     HidePopup();
   }
 }
 
-void EverywhereOmniboxService::OnWidgetClosed(views::Widget* widget) {
+void OmniboxEverywhereService::OnWidgetClosed(views::Widget* widget) {
   widget_observation_.Reset();
   widget_.reset();
   contents_wrapper_.reset();
 }
 
-void EverywhereOmniboxService::CloseUI() {
+void OmniboxEverywhereService::CloseUI() {
   HidePopup();
 }
 
-void EverywhereOmniboxService::ShowUI() {
+void OmniboxEverywhereService::ShowUI() {
   if (widget_) {
     widget_->Show();
 #if BUILDFLAG(IS_MAC)
-    OrderEverywhereOmniboxFrontOnMac(widget_.get());
+    OrderOmniboxEverywhereFrontOnMac(widget_.get());
 #else
     widget_->Activate();
 #endif
@@ -298,7 +298,7 @@ void EverywhereOmniboxService::ShowUI() {
   }
 }
 
-void EverywhereOmniboxService::ResizeDueToAutoResize(
+void OmniboxEverywhereService::ResizeDueToAutoResize(
     content::WebContents* source,
     const gfx::Size& new_size) {
   if (widget_) {
@@ -308,7 +308,7 @@ void EverywhereOmniboxService::ResizeDueToAutoResize(
   }
 }
 
-void EverywhereOmniboxService::OpenUrl(const GURL& url,
+void OmniboxEverywhereService::OpenUrl(const GURL& url,
                                        WindowOpenDisposition disposition,
                                        ui::PageTransition transition) {
   SetIsNavigating(true);

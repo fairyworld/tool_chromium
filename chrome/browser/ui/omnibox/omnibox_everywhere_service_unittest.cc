@@ -2,19 +2,19 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/ui/omnibox/everywhere_omnibox_service.h"
+#include "chrome/browser/ui/omnibox/omnibox_everywhere_service.h"
 
 #include "base/test/scoped_feature_list.h"
-#include "chrome/browser/ui/omnibox/everywhere_omnibox_service_factory.h"
+#include "chrome/browser/ui/omnibox/omnibox_everywhere_service_factory.h"
 #include "chrome/browser/ui/omnibox/omnibox_next_features.h"
 #include "chrome/test/base/testing_profile.h"
 #include "content/public/test/browser_task_environment.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-class EverywhereOmniboxServiceTest : public testing::Test {
+class OmniboxEverywhereServiceTest : public testing::Test {
  public:
-  EverywhereOmniboxServiceTest() {
-    feature_list_.InitAndEnableFeature(omnibox::kEverywhereOmnibox);
+  OmniboxEverywhereServiceTest() {
+    feature_list_.InitAndEnableFeature(omnibox::kOmniboxEverywhere);
   }
 
  private:
@@ -22,10 +22,10 @@ class EverywhereOmniboxServiceTest : public testing::Test {
   base::test::ScopedFeatureList feature_list_;
 };
 
-TEST_F(EverywhereOmniboxServiceTest, GetForProfile) {
+TEST_F(OmniboxEverywhereServiceTest, GetForProfile) {
   TestingProfile profile;
-  EverywhereOmniboxService* service =
-      EverywhereOmniboxServiceFactory::GetForProfile(&profile);
+  OmniboxEverywhereService* service =
+      OmniboxEverywhereServiceFactory::GetForProfile(&profile);
   ASSERT_TRUE(service);
   EXPECT_FALSE(service->IsPopupVisible());
 }

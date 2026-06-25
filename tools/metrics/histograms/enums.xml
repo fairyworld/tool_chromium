@@ -18064,6 +18064,7 @@ from previous Chrome versions.
   <int value="1170030686" label="BookmarkBottomSheet:enabled"/>
   <int value="1170632919" label="DrawNativeEdgeToEdge:enabled"/>
   <int value="1171266638" label="AndroidWindowControlsOverlay:disabled"/>
+  <int value="1172562706" label="OmniboxEverywhere:disabled"/>
   <int value="1173253030" label="ReparentTopLevelNavigationFromPWA:disabled"/>
   <int value="1173439885"
       label="UseUnexportableKeyServiceInBrowserProcess:disabled"/>
@@ -19108,6 +19109,7 @@ from previous Chrome versions.
   <int value="1492541927" label="QuickAnswersTranslationCloudAPI:enabled"/>
   <int value="1493223152" label="CloseAllTabsModalDialog:enabled"/>
   <int value="1493727661" label="ChromeRootStoreUsed:disabled"/>
+  <int value="1494303901" label="OmniboxEverywhere:enabled"/>
   <int value="1494628887" label="MediaPickerAdoption:disabled"/>
   <int value="1495059835" label="VirtualKeyboardMultipasteSuggestion:enabled"/>
   <int value="1495341532" label="disable-mtp-write-support"/>

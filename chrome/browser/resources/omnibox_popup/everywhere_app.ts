@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import './everywhere_searchbox.js';
-import './everywhere_composebox.js';
+import './omnibox_everywhere.js';
+import './composebox_everywhere.js';
 import '/strings.m.js';
 
 import type {ComposeboxState} from '//resources/cr_components/composebox/common.js';
@@ -88,7 +88,7 @@ export class OmniboxEverywhereAppElement extends CrLitElement {
     this.composeboxState_ = e.detail;
     this.isComposeboxMode_ = true;
     await this.updateComplete;
-    const composebox = this.shadowRoot.querySelector('everywhere-composebox');
+    const composebox = this.shadowRoot.querySelector('composebox-everywhere');
     if (composebox) {
       composebox.focusInput();
       composebox.playGlowAnimation();
@@ -109,7 +109,7 @@ export class OmniboxEverywhereAppElement extends CrLitElement {
     }
 
     await this.updateComplete;
-    const searchbox = this.shadowRoot.querySelector('everywhere-searchbox');
+    const searchbox = this.shadowRoot.querySelector('omnibox-everywhere');
     if (searchbox) {
       searchbox.focusInput();
     }

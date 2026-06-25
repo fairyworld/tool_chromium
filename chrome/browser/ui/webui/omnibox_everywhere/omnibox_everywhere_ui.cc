@@ -31,7 +31,7 @@
 
 bool OmniboxEverywhereUIConfig::IsWebUIEnabled(
     content::BrowserContext* browser_context) {
-  return base::FeatureList::IsEnabled(omnibox::kEverywhereOmnibox);
+  return base::FeatureList::IsEnabled(omnibox::kOmniboxEverywhere);
 }
 
 bool OmniboxEverywhereUIConfig::ShouldCrashOnJavascriptErrorInDevelopmentBuild()
