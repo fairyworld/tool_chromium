@@ -913,6 +913,43 @@ suite('ContextualActionMenu', () => {
     assertEquals(expectedMaxHeight, flyout.offsetHeight);
   });
 
+  test('Share tabs flyout repositions on scroll', async () => {
+    loadTimeData.overrideValues({
+      contextManagementInComposeboxEnabled: true,
+    });
+
+    actionMenu.remove();
+    actionMenu = document.createElement('cr-composebox-contextual-action-menu');
+    actionMenu.tabSuggestions = [
+      createTabSuggestion({tabId: 1, title: 'Tab 1'}),
+      createTabSuggestion({tabId: 2, title: 'Tab 2'}),
+      createTabSuggestion({tabId: 3, title: 'Tab 3'}),
+    ];
+
+    actionMenu.inputState = new MockInputState({
+      allowedInputTypes: [InputType.kBrowserTab],
+    });
+    document.body.appendChild(actionMenu);
+    await microtasksFinished();
+
+    actionMenu.showAt(actionMenu);
+    await microtasksFinished();
+
+    const trigger = $$(actionMenu, '#shareTabsTrigger') as HTMLElement;
+    assertTrue(!!trigger);
+
+    trigger.dispatchEvent(new PointerEvent('pointerenter'));
+    await microtasksFinished();
+
+    const flyout = $$(actionMenu, '.share-tabs-flyout') as HTMLElement;
+    assertTrue(!!flyout);
+    assertFalse(flyout.hidden);
+
+    window.dispatchEvent(new Event('scroll'));
+    await microtasksFinished();
+    assertFalse(flyout.hidden);
+  });
+
   test(
       'Constrain height if space below plus menu button is < menu height',
       async () => {

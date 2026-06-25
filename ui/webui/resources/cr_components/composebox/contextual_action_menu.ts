@@ -147,8 +147,23 @@ export class ContextualActionMenuElement extends
   accessor shareTabsFlyoutOpen: boolean = false;
 
   private setShareTabsFlyoutOpen_(open: boolean) {
+    if (this.shareTabsFlyoutOpen === open) {
+      return;
+    }
     this.shareTabsFlyoutOpen = open;
     this.fire('share-tabs-flyout-open-changed', {open});
+    this.updateListeners_();
+  }
+
+  private updateListeners_() {
+    if (this.shareTabsFlyoutOpen) {
+      window.addEventListener('scroll', this.onScroll_, {
+        capture: true,
+        passive: true,
+      });
+    } else {
+      window.removeEventListener('scroll', this.onScroll_, {capture: true});
+    }
   }
 
   protected accessor enableMultiTabSelection_: boolean =
@@ -172,6 +187,21 @@ export class ContextualActionMenuElement extends
   private pointerOverTrigger_: boolean = false;
   private pointerOverFlyout_: boolean = false;
   private firstTabBeingAdded_: boolean = false;
+
+  private onScroll_ = (e: Event) => {
+    if (!this.shareTabsFlyoutOpen) {
+      return;
+    }
+    const flyout =
+        this.shadowRoot?.querySelector<HTMLElement>('.share-tabs-flyout');
+    // Ignore scroll events originating from within the flyout's own content
+    // (e.g. scrolling a long list of tab suggestions).
+    if (flyout && e.target instanceof Node &&
+        (e.target === flyout || flyout.contains(e.target))) {
+      return;
+    }
+    this.updateFlyoutPosition_();
+  };
 
   protected get supportedTools_(): Map<ToolMode, {
     icon: string,
@@ -248,6 +278,10 @@ export class ContextualActionMenuElement extends
         this.updateSharingTabsText_();
       }
       this.manageShareTabsInitialFocus_(changedProperties);
+    }
+
+    if (changedProperties.has('shareTabsFlyoutOpen')) {
+      this.updateListeners_();
     }
 
     if (changedProperties.has('tabSuggestions') ||
@@ -931,6 +965,7 @@ export class ContextualActionMenuElement extends
     this.pointerOverTrigger_ = false;
     this.pointerOverFlyout_ = false;
     this.setShareTabsFlyoutOpen_(false);
+    window.removeEventListener('scroll', this.onScroll_, {capture: true});
 
     const flyout =
         this.shadowRoot.querySelector<HTMLElement>('.share-tabs-flyout');
