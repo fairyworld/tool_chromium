@@ -446,6 +446,7 @@ public class TabBottomSheetManagerImpl implements TabBottomSheetManager {
             layoutStateProvider.removeObserver(mLayoutStateObserver);
         }
 
+        mNativeInterfaceDelegate = null;
         TabBottomSheetUtils.detachManagerFromWindow(mWindowAndroid);
     }
 
