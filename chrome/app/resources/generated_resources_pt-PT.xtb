@@ -611,6 +611,7 @@ Verifique as suas palavras-passe em qualquer altura no <ph name="GOOGLE_PASSWORD
 <translation id="1455119378540982311">Tamanhos de janelas predefinidos</translation>
 <translation id="1456849775870359518">Os separadores vão ser reabertos</translation>
 <translation id="146000042969587795">Esta moldura foi bloqueada, pois contém alguns conteúdos não seguros.</translation>
+<translation id="1460573197675781671">Fechar menu de idioma</translation>
 <translation id="1460751212339734034">Poupe tempo, escreva menos</translation>
 <translation id="1461041542809785877">Desempenho</translation>
 <translation id="1461177659295855031">Mover para a pasta Barra de marcadores</translation>
@@ -2200,6 +2201,7 @@ Pode gerir as definições desta conta ao instalar a aplicação Family Link no 
 <translation id="263796568413910992">Pergunte ao <ph name="SEARCH_ENGINE_NAME" /> ou escreva um URL</translation>
 <translation id="2640299212685523844">Usar GTK</translation>
 <translation id="264083724974021997">Associar ao seu telemóvel – Caixa de diálogo</translation>
+<translation id="2641174089709899456">Lembrete: navegação com tecnologia de IA no seu bolso</translation>
 <translation id="2642111877055905627">Bola de futebol</translation>
 <translation id="2642206811783203764">Sempre em <ph name="SITE_NAME" /></translation>
 <translation id="2643064289437760082">Pode sempre eliminar dados de medição de anúncios ao eliminar os seus dados de navegação</translation>
@@ -2708,6 +2710,7 @@ Quer pará-lo?</translation>
 <translation id="3000461861112256445">Áudio mono</translation>
 <translation id="3001144475369593262">Contas de criança</translation>
 <translation id="3001614333383288217">{COUNT,plural, =0{Nenhuma tecla personalizada}=1{1 tecla personalizada}other{{COUNT} teclas personalizadas}}</translation>
+<translation id="3002745665522516995">Selecione qualquer conteúdo na página para pesquisar</translation>
 <translation id="3002864108328203174">Secção inferior do Gemini a meia altura.</translation>
 <translation id="3003144360685731741">Redes preferidas</translation>
 <translation id="3003253259757197230">Os URLs que visitar são enviados para a Google para prever os sites que pode visitar a seguir e para lhe mostrar informações adicionais sobre a página que está a visitar</translation>
@@ -5632,6 +5635,7 @@ Use Ctrl + Alt + Diminuir o brilho para diminuir o zoom.</translation>
 <translation id="5173668317844998239">Adicionar e eliminar as impressões digitais guardadas na sua chave de segurança</translation>
 <translation id="5174169235862638850">Palavra-passe copiada para a área de transferência</translation>
 <translation id="517488401359338823">Desbloqueie o dispositivo de segurança</translation>
+<translation id="5176671554021050278">Use o Google Lens para saber mais sobre imagens ou texto específicos numa página.</translation>
 <translation id="5177479852722101802">Continuar a bloquear o acesso à câmara e ao microfone</translation>
 <translation id="5178667623289523808">Localizar anterior</translation>
 <translation id="5180276433875360121">Mostrar <ph name="CERT_LIST" /></translation>
@@ -6449,6 +6453,7 @@ Certifique-se de que não revela informações confidenciais.</translation>
 <translation id="581911254119283028">todas as aplicações</translation>
 <translation id="5820751560028604030">Transferência local bloqueada</translation>
 <translation id="5821565227679781414">Criar Atalho</translation>
+<translation id="5822533500175132614">Lembrete: navegação integrada no seu bolso</translation>
 <translation id="5824976764713185207">Ler automaticamente a página depois de ser carregada</translation>
 <translation id="5826395379250998812">Ligue o dispositivo <ph name="DEVICE_TYPE" /> ao telemóvel. <ph name="LINK_BEGIN" />Saiba mais<ph name="LINK_END" /></translation>
 <translation id="5826993284769733527">Semitransparente</translation>
@@ -9991,6 +9996,7 @@ Mantenha o seu ficheiro de chave num local seguro, pois irá precisar dele para 
 <translation id="8458627787104127436">Abra todos (<ph name="URL_COUNT" />) numa nova janela</translation>
 <translation id="8459023460357294721">Abrir <ph name="FILE_NAME" /> mesmo assim</translation>
 <translation id="8459333762072051247">Estado de início de sessão</translation>
+<translation id="8459596896605939741">Lembrete: o melhor das compras online no seu bolso</translation>
 <translation id="8460448946170646641">Reveja os principais controlos de privacidade e segurança</translation>
 <translation id="8460490661223303637">Para poupar memória, o Chrome removeu algum conteúdo</translation>
 <translation id="8460932807646981183">Gerir motores de pesquisa e a pesquisa de sites</translation>

@@ -477,6 +477,7 @@ Se não permitir, isto será bloqueado pelas suas definições de privacidade. I
 <translation id="173080396488393970">Este tipo de cartão não é suportado</translation>
 <translation id="1731563515262205847">ML-DSA-65</translation>
 <translation id="1732445923934584865">Pedir antes pessoalmente</translation>
+<translation id="1732796940245838248">Atualize o número de reparação na Carteira do Google</translation>
 <translation id="1733064249834771892">tipos de letra</translation>
 <translation id="1733631169686303142">Equipamento de áudio</translation>
 <translation id="1733762317901693627">Por vezes, até os sites normalmente seguros são comprometidos por atacantes. Visite <ph name="BEGIN_LINK" />este site inseguro<ph name="END_LINK" /> apenas se tiver a certeza de que compreende os riscos.</translation>
@@ -712,6 +713,7 @@ Se não permitir, isto será bloqueado pelas suas definições de privacidade. I
 <translation id="2122165854541876335">Recursos para o consumidor</translation>
 <translation id="2122214041802369259">O preço é alto</translation>
 <translation id="2122719317867821810">Esta política está a funcionar conforme esperado, mas um valor em conflito está definido noutro local e foi substituído por esta política.</translation>
+<translation id="2124081665399116863">Atualize o veículo na Carteira do Google</translation>
 <translation id="2126374524350484896">Criador do PDF:</translation>
 <translation id="2127090458081644412">Palavra-passe guardada neste dispositivo</translation>
 <translation id="2127747486437921899">Itálico</translation>
@@ -994,6 +996,7 @@ Se não permitir, isto será bloqueado pelas suas definições de privacidade. I
 <translation id="2524962131655207565"><ph name="BEGIN_BOLD" />O conteúdo da página de pagamento é partilhado com a Google para oferecer estas opções.<ph name="END_BOLD" /> Os planos de pagamento estão sujeitos a elegibilidade. Para ocultar as opções para pagar depois, aceda às <ph name="BEGIN_LINK" />definições de pagamento<ph name="END_LINK" />.</translation>
 <translation id="2526062290525841862">Para executar esta app, reative o modo de programador para apps Web isoladas</translation>
 <translation id="2526280916094749336">Pode usar moradas guardadas em produtos Google. Esta morada vai ser guardada na sua Conta Google, <ph name="ACCOUNT" />.</translation>
+<translation id="2526590354069164005">Ambiente de trabalho</translation>
 <translation id="2527451058878391043">O seu Código de Segurança/CVC encontra-se na parte da frente do cartão. É o código de 4 dígitos no canto superior direito acima do número do cartão.</translation>
 <translation id="2529899080962247600">Este campo não deve ter mais de <ph name="MAX_ITEMS_LIMIT" /> entradas. Todas as restantes entradas serão ignoradas.</translation>
 <translation id="2530042584066815841">Bloqueio e utilização do rato</translation>
@@ -1548,6 +1551,7 @@ Para ocultar as opções para pagar depois, aceda às <ph name="BEGIN_LINK" />de
 <translation id="3422472998109090673"><ph name="HOST_NAME" /> está inacessível de momento.</translation>
 <translation id="3422794267539320056">Toque no dinossauro ou prima a barra de espaço para jogar</translation>
 <translation id="3423742043356668186">Especificado pelo sistema</translation>
+<translation id="3426672782316020729">Atualize o passaporte na Carteira do Google</translation>
 <translation id="3427342743765426898">&amp;Refazer edição</translation>
 <translation id="342781501876943858">O Chromium recomenda a reposição da palavra-passe se a tiver reutilizado noutros sites.</translation>
 <translation id="3428151540071562330">Um ou mais URIs de modelos do servidor DnsOverHttpsTemplates são inválidos e não serão utilizados.</translation>
@@ -2408,6 +2412,7 @@ Para ocultar as opções para pagar depois, aceda às <ph name="BEGIN_LINK" />de
 <translation id="4766713847338118463">Agrafo duplo na parte inferior</translation>
 <translation id="4768816584204270288">Quando paga em prestações, é preenchido um número de cartão virtual único. Pode clicar para copiar e colar os detalhes do cartão para esta compra.</translation>
 <translation id="4768864802656530630">Registos de sistema detalhados. <ph name="BEGIN_LINK" />Saiba mais<ph name="END_LINK" /></translation>
+<translation id="4770909831299304090">Atualize o KTN na Carteira do Google</translation>
 <translation id="4771249073710170730">Modelismo e aparelhos telecomandados</translation>
 <translation id="4771973620359291008">Ocorreu um erro desconhecido.</translation>
 <translation id="4774055414220872623">Materiais para obras de arte e artesanato</translation>
@@ -4222,6 +4227,7 @@ Detalhes adicionais:
 <translation id="7569490014721427265">Golfe</translation>
 <translation id="7569952961197462199">Remover o cartão de crédito do Chrome?</translation>
 <translation id="7569983096843329377">Preto</translation>
+<translation id="7570524564113479209">Atualize o cartão de identificação na Carteira do Google</translation>
 <translation id="7570862164055912832">Números de correção</translation>
 <translation id="7571813784389228510">Modo IA da Google</translation>
 <translation id="7574998639136359461">Equipamento de desportos de inverno</translation>
@@ -4743,6 +4749,7 @@ Detalhes adicionais:
 <translation id="8389940864052787379">Veículos personalizados e de alto desempenho</translation>
 <translation id="8390725133630534698">A partilha a partir de <ph name="ORIGIN_NAME" /> para <ph name="VM_NAME" /> foi bloqueada por uma política do administrador.</translation>
 <translation id="8392783408127179588">A atualizar políticas</translation>
+<translation id="8393948304336153065">Atualize a carta de condução na Carteira do Google</translation>
 <translation id="8396522675989118466">Este é o código de <ph name="NUMBER_OF_DIGITS" /> dígitos na parte <ph name="SIDE_OF_CARD" /></translation>
 <translation id="8398335999901363925">Métodos de pagamento disponíveis para preenchimento com o toque abertos à altura total.</translation>
 <translation id="8398446215576328011">Reverter políticas aplicadas</translation>

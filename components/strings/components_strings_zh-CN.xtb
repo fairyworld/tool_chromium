@@ -994,6 +994,7 @@
 <translation id="2524962131655207565"><ph name="BEGIN_BOLD" />为提供以上选项，系统会将结账页中的内容分享给 Google。<ph name="END_BOLD" />付款方案需满足资格要求。如要隐藏先买后付选项，请前往<ph name="BEGIN_LINK" />支付设置<ph name="END_LINK" />。</translation>
 <translation id="2526062290525841862">如需运行此应用，请重新启用独立式 Web 应用 (IWA) 开发者模式</translation>
 <translation id="2526280916094749336">您可在各种 Google 产品中使用已保存的地址。此地址将保存到您的 Google 账号 <ph name="ACCOUNT" /> 中。</translation>
+<translation id="2526590354069164005">桌面</translation>
 <translation id="2527451058878391043">您的银行卡验证码 (CVC) 位于银行卡的正面，即卡号右上角的 4 位数代码。</translation>
 <translation id="2529899080962247600">此字段最多只能包含 <ph name="MAX_ITEMS_LIMIT" /> 个条目，在达到这一上限后添加的所有条目都将被忽略。</translation>
 <translation id="2530042584066815841">锁定和使用鼠标</translation>

@@ -2296,6 +2296,7 @@
 <translation id="2710883118091822664">ログインすると、すべてのデバイスで使用環境を簡単に同期できます</translation>
 <translation id="2713106313042589954">カメラをオフにする</translation>
 <translation id="2713444072780614174">白</translation>
+<translation id="2713529429175549458">パスワード、PIN、または指紋認証</translation>
 <translation id="2714180132046334502">暗い背景</translation>
 <translation id="2714393097308983682">Google Play ストア</translation>
 <translation id="2714617928488200509">モデル</translation>
@@ -2746,6 +2747,7 @@
 <translation id="3023204744987201088">連絡先情報(&amp;C)</translation>
 <translation id="3023464535986383522">選択して読み上げ</translation>
 <translation id="3024374909719388945">24 時間形式を使用する</translation>
+<translation id="3025905136198521738">分割表示を変更 - 左側のビューがアクティブ</translation>
 <translation id="3027296729579831126">ニアバイシェアをオンにする</translation>
 <translation id="3027644380269727216">ユーザーのウェブサイト上でのアクティビティに基づいて提案されます。この設定は有効になっています。</translation>
 <translation id="3028445648481691885">ダウンロードをキャンセルしました</translation>
@@ -3274,6 +3276,7 @@
 <translation id="3436118221454753036">AI モードに質問</translation>
 <translation id="3437072258256045988">Gemini アプリ アクティビティを管理する</translation>
 <translation id="3437397693214267762">Outlook カレンダー、SharePoint ファイル、OneDrive ファイルを表示</translation>
+<translation id="3437494162908353428">この URL では DevTools は許可されていません。</translation>
 <translation id="3438633801274389918">忍者</translation>
 <translation id="3439153939049640737"><ph name="HOST" /> によるマイクへのアクセスを常に許可する</translation>
 <translation id="3439970425423980614">PDF をプレビューしています</translation>
@@ -3486,6 +3489,7 @@
 <translation id="3596012367874587041">アプリの設定</translation>
 <translation id="3599221874935822507">浮き彫り</translation>
 <translation id="3600051066689725006">ウェブ リクエスト情報</translation>
+<translation id="3600181948754917646">Chrome Enterprise リリースノート</translation>
 <translation id="3600956933576601730">これらの機能を使用するには、利用規約を確認して同意する必要があります</translation>
 <translation id="3601374594714740284">音声の品質を高めるには、デバイスの空き容量を増やしてください</translation>
 <translation id="360180734785106144">新機能が利用可能になったときにメッセージを表示する</translation>
@@ -4298,6 +4302,7 @@
 <translation id="4177501066905053472">広告のトピック</translation>
 <translation id="4177668342649553942"><ph name="SHORTCUT_NAME" /> を開く　- <ph name="APP_NAME" /></translation>
 <translation id="4177731895051842298">拡張機能は Chrome に追加できるアドオンで、情報を整理したり、タスクを簡素化したり、ブラウジング環境をカスタマイズしたりできます</translation>
+<translation id="4177860704813504507">パスワードまたは指紋認証</translation>
 <translation id="4178220097446335546">この登録とそれに関連付けられているネットワークを削除するには、Passpoint の登録ページに移動して登録を削除してください。</translation>
 <translation id="4181376007499455822">オーバーライドしない</translation>
 <translation id="4181602000363099176">20 倍</translation>
@@ -4932,6 +4937,7 @@
 <translation id="4660540330091848931">サイズを変更しています</translation>
 <translation id="4662373422909645029">ニックネームに数字を含めることはできません</translation>
 <translation id="4663373278480897665">カメラを使用できます</translation>
+<translation id="4664375726751122009">ビジュアル表示に切り替え</translation>
 <translation id="4665014895760275686">メーカー</translation>
 <translation id="4665446389743427678"><ph name="SITE" /> で保存されたすべてのデータが削除されます。</translation>
 <translation id="4666472247053585787">スマートフォンの通知を <ph name="DEVICE_TYPE" /> で確認できます</translation>
@@ -5633,6 +5639,7 @@
 <translation id="5186381005592669696">対応アプリの表示言語をカスタマイズする</translation>
 <translation id="5186788525428341874">このパスキーを使用してどのデバイスでもすばやくログインできます。パスキーは <ph name="ACCOUNT_NAME" /> の Google パスワード マネージャーに保存されます。</translation>
 <translation id="5186792064936776005">利用可能な場合はデフォルトを使用する</translation>
+<translation id="5186931074173692059">パスワードは <ph name="EMAIL" /> の <ph name="GOOGLE_PASSWORD_MANAGER" />に保存されます。</translation>
 <translation id="5187641678926990264">ページをアプリとしてインストール(&amp;I)...</translation>
 <translation id="5187826826541650604"><ph name="KEY_NAME" />（<ph name="DEVICE" />）</translation>
 <translation id="5188242000716462162"><ph name="USER_NAME" /> さんが共有しました</translation>
@@ -5999,6 +6006,7 @@
 <translation id="5473075389972733037">IBM</translation>
 <translation id="5473099001878321374">続行すると、Google、お子様がご利用の携帯通信会社、デバイス メーカーからアップデートやアプリをこのデバイスが自動的に（場合によってはモバイルデータ接続を使用して）ダウンロードし、インストールする場合があることに同意したことになります。一部のアプリでは、アプリ内購入をご利用いただけます。</translation>
 <translation id="5473156705047072749">{NUM_CHARACTERS,plural, =1{PIN は 1 文字以上で入力してください}other{PIN は # 文字以上で入力してください}}</translation>
+<translation id="5475744834448251260">PIN または指紋認証</translation>
 <translation id="547615291475756075">最大化(&amp;X)</translation>
 <translation id="5476957746413745956">動かす方向によって速度を調整する</translation>
 <translation id="5477089831058413614"><ph name="DEVICE_TYPE" /> のアクセス ポイント設定</translation>
@@ -6582,6 +6590,7 @@
 <translation id="5933376509899483611">タイムゾーン</translation>
 <translation id="5933522550144185133"><ph name="APP_NAME" /> がカメラとマイクを使用しています</translation>
 <translation id="5935158534896975820">証明書の署名のリクエストを準備しています（サーバーで待機中）</translation>
+<translation id="5935554994339565449">新しい [テキストを追加] ツールでテキストを追加できます</translation>
 <translation id="5936065461722368675">ページ全体を翻訳</translation>
 <translation id="5937977334791924341"><ph name="APP" /> のロゴ</translation>
 <translation id="5938002010494270685">セキュリティ アップグレードが利用可能です</translation>
@@ -7851,6 +7860,7 @@
 <translation id="6883319974225028188">デバイスの設定を保存できませんでした。</translation>
 <translation id="6883606786470492001">広告トピックやその他の設定を管理して、パーソナライズド広告を表示するサイトがユーザーについて把握できる情報を制限します</translation>
 <translation id="6884474387073389421">選択したログインデータを削除してもよろしいですか？</translation>
+<translation id="6884763350679569586">PIN のみ</translation>
 <translation id="6885338910541974777">アプリケーションのインストーラ プログラムが失敗しました。</translation>
 <translation id="6885771755599377173">システム情報のプレビュー</translation>
 <translation id="6886871292305414135">新しいタブで開く(&amp;T)</translation>
@@ -8018,6 +8028,7 @@
 <translation id="7003844668372540529">不明な商品（<ph name="PRODUCT_ID" />、ベンダー: <ph name="VENDOR_NAME" />）</translation>
 <translation id="7004402701596653846">サイトに MIDI の使用が許可されています</translation>
 <translation id="7004499039102548441">最近使ったタブ</translation>
+<translation id="7004791323196577460">分割表示を変更 - 右側のビューがアクティブ</translation>
 <translation id="7004923218520748660">タブ検索を固定</translation>
 <translation id="7004969808832734860">最大 <ph name="DISCOUNT_UP_TO_AMOUNT" /> オフ</translation>
 <translation id="7005496624875927304">その他の権限</translation>
@@ -8206,6 +8217,7 @@
 <translation id="7159695867335480590">再生または一時停止します</translation>
 <translation id="7159953856712257647">デフォルトでインストール</translation>
 <translation id="7160182524506337403">スマートフォンの通知を表示できるようになりました</translation>
+<translation id="7160835047878907171">分割表示を変更 - 下のビューがアクティブ</translation>
 <translation id="7160911207516219534">サイドパネル</translation>
 <translation id="716210145227921528">パスキーを削除しました</translation>
 <translation id="7165263843655074092">このデバイスは標準のセキュリティ機能で保護されます</translation>
@@ -8340,6 +8352,7 @@
 <translation id="7261217796641151584">グループを共有</translation>
 <translation id="7261612856573623172">システムのテキスト読み上げの音声</translation>
 <translation id="7262004276116528033">このログイン サービスは <ph name="SAML_DOMAIN" /> でホストされています</translation>
+<translation id="7262162806583378242">ブラウジング中に画面上のアイテムを選択し、AI を使ってショッピング、翻訳、検索を行えます</translation>
 <translation id="7262564444061174264">ナビゲーション ショートカットの詳細</translation>
 <translation id="7262919421769447042">あなたのプロファイルは <ph name="PROFILE_MANAGER" /> によって管理されており、この組織は次の情報を見ることができます</translation>
 <translation id="7264695323040866038">サポートされているウェブリンクを開く際に、常に <ph name="APP" /> アプリを使用しますか？</translation>
@@ -9027,6 +9040,7 @@
 <translation id="7768507955883790804">サイトにアクセスしたときにこの設定の動作を自動的に行います</translation>
 <translation id="7768770796815395237">変更</translation>
 <translation id="7768784765476638775">選択して読み上げ</translation>
+<translation id="7769063984980522348">コンパクト表示に切り替え</translation>
 <translation id="7769709635093101687">一時停止のキーボード ショートカット</translation>
 <translation id="7769748505895274502">最近閉じたタブを折りたたむ</translation>
 <translation id="7770072242481632881">サイドパネル セレクタ</translation>
@@ -10271,6 +10285,7 @@
 <translation id="8687774873995698516"><ph name="HOST" /> による識別子の使用と保護されたコンテンツの再生を常にブロックする</translation>
 <translation id="8688672835843460752">使用可能</translation>
 <translation id="8689811383248488428">承認せずプロフィールを閉じる</translation>
+<translation id="8689957514193802371">Chromium で <ph name="WEBSITE" /> のパスワードを自動的に変更する</translation>
 <translation id="8689998525144040851">100</translation>
 <translation id="8690129572193755009">サイトがプロトコルの処理を要求できるようにする</translation>
 <translation id="869144235543261764">このタブはピクチャー イン ピクチャー モードで動画を再生しています</translation>
@@ -10808,6 +10823,7 @@
 <translation id="9068878141610261315">サポートされていないファイル形式です</translation>
 <translation id="9069417381769492963">検索条件に一致するブックマークはありません</translation>
 <translation id="9070342919388027491">タブを左に移動しました</translation>
+<translation id="9071664234353284876">認証なし</translation>
 <translation id="9072220108592671115">バージョン <ph name="VERSION" /> をインストールしました</translation>
 <translation id="9072918088200875065">Gemini があなたの代わりにこれらのサイトにログインして、タスクを完了することを許可しました。</translation>
 <translation id="9074618195273027322">{CORE_COUNT,plural, =1{1 コア}other{{CORE_COUNT} コア}}</translation>
@@ -10989,6 +11005,7 @@
 <translation id="9203904171912129171">デバイスを選択</translation>
 <translation id="9204881338516142227">自動パスワード変更</translation>
 <translation id="9205304506427975617">頭をわずかに動かした場合でもカーソルを安定した状態に保てます。カーソルを動かすには、大きな動きが必要になります。</translation>
+<translation id="9205396811802112046">分割表示を変更 - 上のビューがアクティブ</translation>
 <translation id="9207434080086272167">快活</translation>
 <translation id="9207669213427469593">ウィンドウを片側にスナップして分割画面を使うと、反対側のウィンドウ候補が表示されます</translation>
 <translation id="9212565256020141627">画像を Gemini と共有できませんでした。もう一度お試しいただくか、別の画像をお試しください。</translation>

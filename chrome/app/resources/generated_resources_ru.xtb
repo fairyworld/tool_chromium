@@ -611,6 +611,7 @@
 <translation id="1455119378540982311">Стандартные размеры окон</translation>
 <translation id="1456849775870359518">Ваши вкладки откроются снова</translation>
 <translation id="146000042969587795">Этот фрейм заблокирован, поскольку он содержит небезопасные элементы.</translation>
+<translation id="1460573197675781671">Закрыть меню выбора языка</translation>
 <translation id="1460751212339734034">Экономьте время</translation>
 <translation id="1461041542809785877">Производительность</translation>
 <translation id="1461177659295855031">Переместить в папку "Панель закладок"</translation>
@@ -2200,6 +2201,7 @@
 <translation id="263796568413910992">Спросите <ph name="SEARCH_ENGINE_NAME" /> или введите URL</translation>
 <translation id="2640299212685523844">Использовать тему GTK</translation>
 <translation id="264083724974021997">Подключение к телефону – диалоговое окно</translation>
+<translation id="2641174089709899456">Напоминание: ИИ в браузере на вашем телефоне</translation>
 <translation id="2642111877055905627">Футбольный мяч</translation>
 <translation id="2642206811783203764">Всегда включено для <ph name="SITE_NAME" /></translation>
 <translation id="2643064289437760082">Вы всегда можете стереть сведения для оценки эффективности рекламы, удалив данные о работе в браузере.</translation>
@@ -2707,6 +2709,7 @@
 <translation id="3000461861112256445">Монофо­нический звук</translation>
 <translation id="3001144475369593262">Детские аккаунты</translation>
 <translation id="3001614333383288217">{COUNT,plural, =0{Нет настроенных клавиш}=1{1 настроенная клавиша}one{{COUNT} настроенная клавиша}few{{COUNT} настроенные клавиши}many{{COUNT} настроенных клавиш}other{{COUNT} настроенной клавиши}}</translation>
+<translation id="3002745665522516995">Выберите интересующий вас элемент на странице</translation>
 <translation id="3002864108328203174">Нижний экран Gemini открыт наполовину.</translation>
 <translation id="3003144360685731741">Предпочитаемые сети</translation>
 <translation id="3003253259757197230">Чтобы предсказывать ваши дальнейшие запросы и показывать дополнительную информацию о просматриваемых страницах, URL посещенных вами сайтов отправляются в Google.</translation>
@@ -5630,6 +5633,7 @@
 <translation id="5173668317844998239">Добавить или удалить отпечатки пальцев, сохраненные на электронном ключе</translation>
 <translation id="5174169235862638850">Пароль скопирован в буфер обмена</translation>
 <translation id="517488401359338823">Разблокируйте устройство безопасности</translation>
+<translation id="5176671554021050278">С помощью Google Объектива можно находить сведения об изображениях или тексте на странице.</translation>
 <translation id="5177479852722101802">Всегда блокировать доступ к веб-камере и микрофону</translation>
 <translation id="5178667623289523808">Найти пред.</translation>
 <translation id="5180276433875360121">Показать <ph name="CERT_LIST" /></translation>
@@ -6446,6 +6450,7 @@
 <translation id="581911254119283028">Все приложения</translation>
 <translation id="5820751560028604030">Скачивание на устройство заблокировано</translation>
 <translation id="5821565227679781414">Создать ярлык</translation>
+<translation id="5822533500175132614">Напоминание: удобная работа в браузере на телефоне</translation>
 <translation id="5824976764713185207">Автоматически читать страницу после загрузки</translation>
 <translation id="5826395379250998812">Подключите устройство <ph name="DEVICE_TYPE" /> к телефону. <ph name="LINK_BEGIN" />Подробнее…<ph name="LINK_END" /></translation>
 <translation id="5826993284769733527">Полупрозрачный</translation>
@@ -9993,6 +9998,7 @@
 <translation id="8458627787104127436">Открыть все (<ph name="URL_COUNT" />) в новом окне</translation>
 <translation id="8459023460357294721">Все равно открыть <ph name="FILE_NAME" /></translation>
 <translation id="8459333762072051247">Статус входа</translation>
+<translation id="8459596896605939741">Напоминание: удобный онлайн-шопинг на вашем телефоне</translation>
 <translation id="8460448946170646641">Проверка основных настроек конфиденциальности и безопасности</translation>
 <translation id="8460490661223303637">Чтобы сэкономить память, браузер Chrome удалил часть контента.</translation>
 <translation id="8460932807646981183">Управление поисковыми системами и поиском по сайту</translation>

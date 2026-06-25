@@ -34,7 +34,6 @@
 <translation id="1108938384783527433">Sincronizzazione della cronologia</translation>
 <translation id="1111673857033749125">I preferiti salvati sugli altri dispositivi verranno visualizzati qui.</translation>
 <translation id="1123537484474186311"><ph name="TAB_TITLE" />, scheda Picture in picture</translation>
-<translation id="1124357650933674597">{NUM_WINDOWS,plural, =1{Ripristina 1 finestra}other{Ripristina # finestre}}</translation>
 <translation id="1126696498560056882">Gestisci gli account su questo dispositivo</translation>
 <translation id="1135018701024399762">La modalità Incognito mantiene la navigazione nascosta agli altri utenti che utilizzano il tuo dispositivo</translation>
 <translation id="113752097246673894">Accedi a Chrome come <ph name="EMAIL" /> per trovare preferiti e altri dati su tutti i tuoi dispositivi</translation>
@@ -520,7 +519,6 @@ Solo chi conosce la tua passphrase può leggere i tuoi dati criptati. La passphr
 <translation id="3166827708714933426">Scorciatoie di finestre e schede</translation>
 <translation id="3167258285411721858">Puoi richiedere il sito mobile di <ph name="HOST_NAME" /></translation>
 <translation id="3181145110929454111"><ph name="TAB_TITLE" />, schede Incognito con audio disattivato fissate selezionate</translation>
-<translation id="3183941812169784232">Ripristinare tutte le finestre?</translation>
 <translation id="3187472288455401631">Misurazione degli annunci</translation>
 <translation id="3189635831478931757">Gruppo di schede <ph name="GROUP_TITLE" /></translation>
 <translation id="3200536777393523575">Chiudere la finestra corrente?</translation>
@@ -569,6 +567,7 @@ Solo chi conosce la tua passphrase può leggere i tuoi dati criptati. La passphr
 <translation id="3435575784518354875">Per continuare ad accedere alle tue password, esportale ora, aggiorna Google Play Services e poi importale in Gestore delle password di Google. <ph name="BEGIN_LINK" />Visualizza le istruzioni complete<ph name="END_LINK" />.</translation>
 <translation id="3435738964857648380">Sicurezza</translation>
 <translation id="3435914367318771664">Agg. scheda a nuovo gruppo</translation>
+<translation id="3436118221454753036">Chiedi a AI Mode</translation>
 <translation id="3438681572027105609">Accedi a Chrome per trovare le password e altri dati su tutti i dispositivi</translation>
 <translation id="3439276997620616816">Qui troverai le schede recenti</translation>
 <translation id="3443221991560634068">Ricarica la pagina corrente</translation>

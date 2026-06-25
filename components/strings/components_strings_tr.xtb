@@ -994,6 +994,7 @@ Aksi halde bu işlem gizlilik ayarlarınız tarafından engellenecek. Buna izin 
 <translation id="2524962131655207565"><ph name="BEGIN_BOLD" />Bu seçenekleri sunmak için ödeme sayfasındaki sayfa içeriği Google ile paylaşılır.<ph name="END_BOLD" /> Ödeme planları, uygunluk durumuna bağlıdır. Sonra ödeme seçeneklerini gizlemek için <ph name="BEGIN_LINK" />ödeme ayarlarına<ph name="END_LINK" /> gidin.</translation>
 <translation id="2526062290525841862">Bu uygulamayı çalıştırmak için Yalıtılmış Web Uygulaması Geliştirici Modu'nu yeniden etkinleştirin</translation>
 <translation id="2526280916094749336">Kayıtlı adresleri tüm Google ürünlerinde kullanabilirsiniz. Bu adres Google Hesabınıza (<ph name="ACCOUNT" />) kaydedilir.</translation>
+<translation id="2526590354069164005">Masaüstü</translation>
 <translation id="2527451058878391043">CVC'niz, kartınızın ön tarafında yer alır. Bu, kart numaranızın sağ üst tarafında bulunan 4 haneli koddur.</translation>
 <translation id="2529899080962247600">Bu alanda en çok <ph name="MAX_ITEMS_LIMIT" /> giriş olabilir. Bundan sonraki tüm girişler yok sayılacak.</translation>
 <translation id="2530042584066815841">Fare kilidi ve kullanımı</translation>

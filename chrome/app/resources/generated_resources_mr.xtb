@@ -612,6 +612,7 @@
 <translation id="1455119378540982311">विंडोचा आकार प्रीसेट करा</translation>
 <translation id="1456849775870359518">तुमचे टॅब पुन्हा उघडतील</translation>
 <translation id="146000042969587795">ही फ्रेम ब्लॉक केली होती कारण यात काही असुरक्षित आशय आहे.</translation>
+<translation id="1460573197675781671">भाषा मेनू बंद करा</translation>
 <translation id="1460751212339734034">वेळ वाचवा, कमी टाइप करा</translation>
 <translation id="1461041542809785877">कार्यप्रदर्शन</translation>
 <translation id="1461177659295855031">बुकमार्क बार फोल्डरमध्ये हलवा</translation>
@@ -2213,6 +2214,7 @@
 <translation id="263796568413910992"><ph name="SEARCH_ENGINE_NAME" /> ला विचारा किंवा URL टाइप करा</translation>
 <translation id="2640299212685523844">GTK वापरा</translation>
 <translation id="264083724974021997">तुमच्या फोनशी कनेक्ट करा - डायलॉग</translation>
+<translation id="2641174089709899456">रिमाइंडर: तुमच्या खिशात AI द्वारे सक्षम केलेले ब्राउझिंग</translation>
 <translation id="2642111877055905627">सॉकर बॉल</translation>
 <translation id="2642206811783203764"><ph name="SITE_NAME" /> वर नेहमी</translation>
 <translation id="2643064289437760082">तुमचा ब्राउझिंग डेटा हटवून तुम्ही कधीही जाहिरात मापन डेटा हटवू शकता</translation>
@@ -2720,6 +2722,7 @@
 <translation id="3000461861112256445">मोनो ऑडिओ</translation>
 <translation id="3001144475369593262">लहान मुलाची खाती</translation>
 <translation id="3001614333383288217">{COUNT,plural, =0{No keys customized}=1{कस्टमाइझ केलेली १ की}other{कस्टमाइझ केलेल्या {COUNT} की}}</translation>
+<translation id="3002745665522516995">शोधण्यासाठी पेजवरील कोणताही भाग निवडा</translation>
 <translation id="3002864108328203174">Gemini च्या तळाशी असलेली शीट अर्ध्या उंचीवर उघडली.</translation>
 <translation id="3003144360685731741">प्राधान्यीकृत नेटवर्क</translation>
 <translation id="3003253259757197230">तुम्ही भेट देता त्या URLs तुम्ही पुढे कोणत्या साइटला भेट देऊ शकता याचा अंदाज घेण्यासाठी आणि तुम्ही भेट देत असलेल्या पेजबद्दल तुम्हाला अतिरिक्त माहिती दाखवण्यासाठी Google ला पाठवल्या जातात</translation>
@@ -5642,6 +5645,7 @@
 <translation id="5173668317844998239">तुमच्या सिक्युरिटी कीमध्ये सेव्ह केलेली फिंगरप्रिंट जोडा आणि हटवा</translation>
 <translation id="5174169235862638850">पासवर्ड क्लिपबोर्डवर कॉपी केला आहे</translation>
 <translation id="517488401359338823">सुरक्षा डिव्हाइस अनलॉक करा</translation>
+<translation id="5176671554021050278">पेजवरील विशिष्ट इमेज किंवा मजकुराबद्दल अधिक जाणून घेण्यासाठी Google Lens वापरा.</translation>
 <translation id="5177479852722101802">कॅमेरा ब्लॉक करणे आणि मायक्रोफोन ॲक्सेस करणे सुरू ठेवा</translation>
 <translation id="5178667623289523808">मागील शोधा</translation>
 <translation id="5180276433875360121"><ph name="CERT_LIST" /> दाखवा</translation>
@@ -6458,6 +6462,7 @@
 <translation id="581911254119283028">सर्व ॲप्लिकेशन</translation>
 <translation id="5820751560028604030">स्थानिक डाउनलोड ब्लॉक केला आहे</translation>
 <translation id="5821565227679781414">शॉर्टकट तयार करा</translation>
+<translation id="5822533500175132614">रिमाइंडर: तुमच्या खिशात अखंड ब्राउझिंग</translation>
 <translation id="5824976764713185207">पेज लोड होणे पूर्ण झाल्यावर ते आपोआप वाचा</translation>
 <translation id="5826395379250998812">तुमचे <ph name="DEVICE_TYPE" /> तुमच्या फोनसह कनेक्ट करा. <ph name="LINK_BEGIN" />अधिक जाणून घ्या<ph name="LINK_END" /></translation>
 <translation id="5826993284769733527">अर्धपारदर्शक</translation>
@@ -10002,6 +10007,7 @@ I feel - विटांची इमारत</translation>
 <translation id="8458627787104127436">नवीन विंडोमध्ये सर्व (<ph name="URL_COUNT" />) उघडा</translation>
 <translation id="8459023460357294721"><ph name="FILE_NAME" /> तरीही उघडा</translation>
 <translation id="8459333762072051247">साइन इन ची स्थिती</translation>
+<translation id="8459596896605939741">रिमाइंडर: तुमच्या खिशात ऑनलाइन खरेदीचे सर्वोत्तम पर्याय</translation>
 <translation id="8460448946170646641">महत्त्वाच्या गोपनीयता आणि सुरक्षा नियंत्रणांचे पुनरावलोकन करा</translation>
 <translation id="8460490661223303637">आठवण सेव्ह करण्यासाठी, Chrome ने काही आशय काढून टाकला</translation>
 <translation id="8460932807646981183">शोध इंजीन आणि साइट शोध व्यवस्थापित करा</translation>

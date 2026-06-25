@@ -994,6 +994,7 @@ Muussa tapauksessa tämä estetään tietosuoja-asetuksilla. Jos sallit tämän,
 <translation id="2524962131655207565"><ph name="BEGIN_BOLD" />Kassasivun sisältö jaetaan Googlelle näiden vaihtoehtojen tarjoamiseksi.<ph name="END_BOLD" /> Maksusopimukset edellyttävät kelpoisuutta. Jos haluat piilottaa maksa myöhemmin ‑vaihtoehdot, siirry <ph name="BEGIN_LINK" />maksuasetuksiin<ph name="END_LINK" />.</translation>
 <translation id="2526062290525841862">Jos haluat käyttää tätä sovellusta, ota eristetyn verkkosovelluksen kehittäjätila uudelleen käyttöön</translation>
 <translation id="2526280916094749336">Voit käyttää tallennettuja osoitteita kaikissa Googlen tuotteissa. Osoite tallennetaan Google-tilillesi (<ph name="ACCOUNT" />).</translation>
+<translation id="2526590354069164005">Työpöytä</translation>
 <translation id="2527451058878391043">CVC on kortin etuosassa. Se on nelinumeroinen koodi kortin numeron yläpuolella.</translation>
 <translation id="2529899080962247600">Kentässä voi olla korkeintaan <ph name="MAX_ITEMS_LIMIT" /> kohtaa. Tämän määrän ylittävät merkinnät ohitetaan.</translation>
 <translation id="2530042584066815841">Hiiren lukitus ja käyttö</translation>

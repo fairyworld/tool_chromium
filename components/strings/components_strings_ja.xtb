@@ -581,6 +581,7 @@
 <translation id="1902576642799138955">有効期間</translation>
 <translation id="1908217026282415406">カメラの使用と移動</translation>
 <translation id="1908690643053136980">このサイトの <ph name="PERMISSION" /> の使用は管理者が禁止しています</translation>
+<translation id="1912750443952232242">ID カードを Google ウォレットに保存</translation>
 <translation id="1913037223029790376">この仮想カードの CVC を使用してください</translation>
 <translation id="191374271204266022">JSON 形式でコピー</translation>
 <translation id="1914326953223720820">解凍サービス</translation>
@@ -993,6 +994,7 @@
 <translation id="2524962131655207565"><ph name="BEGIN_BOLD" />購入手続きページのコンテンツは、これらのオプションを提供するために Google と共有されます。<ph name="END_BOLD" />お支払いプランは、ご利用条件を満たしていることが条件となります。後払いオプションを非表示にするには、<ph name="BEGIN_LINK" />お支払い設定<ph name="END_LINK" />に移動してください。</translation>
 <translation id="2526062290525841862">このアプリを実行するには、独立したウェブアプリのデベロッパー モードを再度有効にしてください</translation>
 <translation id="2526280916094749336">この住所は Google アカウント（<ph name="ACCOUNT" />）に保存され、Google サービス全体で使用できます。</translation>
+<translation id="2526590354069164005">デスクトップ</translation>
 <translation id="2527451058878391043">CVC コードはカードの表面に記載されています。カード番号の右上にある 4 桁のコードです。</translation>
 <translation id="2529899080962247600">このフィールドで指定できるエントリは <ph name="MAX_ITEMS_LIMIT" /> 件までです。それ以降のエントリはすべて無視されます。</translation>
 <translation id="2530042584066815841">マウスのロックと使用</translation>
@@ -1493,6 +1495,7 @@
 <translation id="3325568918769906282">降順</translation>
 <translation id="3325662270238538525">最近行ったファイルへのアクセスと変更（ファイル名、ファイル コンテンツのデジタル フィンガープリント、ダウンロード元、メタデータなど）</translation>
 <translation id="3329013043687509092">彩度</translation>
+<translation id="3330483197654063678">オンの場合、このウィンドウで開いているタブが共有され、より関連性の高い回答が得られます。</translation>
 <translation id="3333762389743153920">仮想カードは使用できません</translation>
 <translation id="3338095232262050444">保護された通信</translation>
 <translation id="333839153442689579">高強度インターバル トレーニング</translation>
@@ -2846,6 +2849,7 @@
 <translation id="5458150163479425638">{CONTACT,plural, =0{<ph name="CONTACT_PREVIEW" />}=1{<ph name="CONTACT_PREVIEW" />（他 <ph name="NUMBER_OF_ADDITIONAL_CONTACTS" /> 件）}other{<ph name="CONTACT_PREVIEW" />（他 <ph name="NUMBER_OF_ADDITIONAL_CONTACTS" /> 件）}}</translation>
 <translation id="5463625433003343978">デバイスを検出しています...</translation>
 <translation id="5464236009658034488">事務用品</translation>
+<translation id="5465128270485645058">このスレッドに関連するタブがこのウィンドウで開いている場合、そのタブを自動的に共有することで、よりパーソナライズされた回答を得ることができます。</translation>
 <translation id="5465724643247062031">ガラス（不透明）</translation>
 <translation id="5466018172325111652">コードが届かない場合は、<ph name="BEGIN_LINK" />新しいコードを取得<ph name="END_LINK" />してください</translation>
 <translation id="5466818462212249084">決済アプリ</translation>
@@ -3128,6 +3132,7 @@
 <translation id="5911020115933784199">イベント情報</translation>
 <translation id="5911110632211230665">開けないようブロックされました</translation>
 <translation id="5912796581727968237">Google ウォレットを開く</translation>
+<translation id="5914185423510719251">KTN を Google ウォレットに保存</translation>
 <translation id="5914465277418006379"><ph name="MEMBER_FIRST_NAME" /> さんがこのタブを追加しました</translation>
 <translation id="5915189366813702112">フレックス タイム制</translation>
 <translation id="59174027418879706">有効</translation>
@@ -3909,6 +3914,7 @@
 <translation id="7110116949943042888">短期アルバイト、季節的な求人情報</translation>
 <translation id="7110368079836707726">短大、大学</translation>
 <translation id="7111507312244504964">不動産調査、査定</translation>
+<translation id="7117290130383718594">テキスト注釈</translation>
 <translation id="7118618213916969306">クリップボードにある URL（<ph name="SHORT_URL" />）を検索します</translation>
 <translation id="7118852830504022370">この警告は、サイトが HTTPS に対応していない場合に表示されます。<ph name="BEGIN_LEARN_MORE_LINK" />この警告の詳細<ph name="END_LEARN_MORE_LINK" /></translation>
 <translation id="7119063404975271297">テレビドラマ</translation>

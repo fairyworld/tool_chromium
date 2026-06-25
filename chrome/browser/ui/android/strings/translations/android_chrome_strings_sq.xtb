@@ -34,7 +34,6 @@
 <translation id="1108938384783527433">Sinkronizimi i historikut</translation>
 <translation id="1111673857033749125">Faqeshënuesit e ruajtur në pajisjet e tua të tjera do të shfaqen këtu.</translation>
 <translation id="1123537484474186311"><ph name="TAB_TITLE" />, skeda e "Figurë brenda figurës"</translation>
-<translation id="1124357650933674597">{NUM_WINDOWS,plural, =1{Restauro 1 dritare}other{Restauro # dritare}}</translation>
 <translation id="1126696498560056882">Menaxho llogaritë në këtë pajisje</translation>
 <translation id="1135018701024399762">Modaliteti "I fshehtë" ruan privatësinë e shfletimit tënd nga personat e tjerë që përdorin pajisjen tënde</translation>
 <translation id="113752097246673894">Për të marrë faqeshënuesit etj. në të gjitha pajisjet e tua, identifikohu në Chrome si <ph name="EMAIL" /></translation>
@@ -520,7 +519,6 @@ Vetëm dikush me frazën tënde të kalimit mund të lexojë të dhënat e tua t
 <translation id="3166827708714933426">Shkurtoret e skedës dhe dritares</translation>
 <translation id="3167258285411721858">Mund të kërkosh sajtin për celular për <ph name="HOST_NAME" /></translation>
 <translation id="3181145110929454111"><ph name="TAB_TITLE" />, skeda "e fshehtë" e gozhduar e vendosur në heshtje dhe e zgjedhur me shumë të tjera</translation>
-<translation id="3183941812169784232">Të restaurohen të gjitha dritaret?</translation>
 <translation id="3187472288455401631">Matja e reklamave</translation>
 <translation id="3189635831478931757">Grupi i skedave "<ph name="GROUP_TITLE" />"</translation>
 <translation id="3200536777393523575">Të mbyllet dritarja aktuale?</translation>
@@ -569,6 +567,7 @@ Vetëm dikush me frazën tënde të kalimit mund të lexojë të dhënat e tua t
 <translation id="3435575784518354875">Për të mbajtur qasjen te fjalëkalimet e tua, eksportoji ato tani, përditëso shërbimet e Google Play dhe më pas importoji fjalëkalimet sërish te "Menaxheri i fjalëkalimeve i Google". <ph name="BEGIN_LINK" />Shiko udhëzimet e plota<ph name="END_LINK" />.</translation>
 <translation id="3435738964857648380">Siguria</translation>
 <translation id="3435914367318771664">Shto skedën te grupi i ri</translation>
+<translation id="3436118221454753036">Pyet "Modalitetin e IA-së"</translation>
 <translation id="3438681572027105609">Për të marrë fjalëkalimet etj. në të gjitha pajisjet e tua, identifikohu në Chrome</translation>
 <translation id="3439276997620616816">Këtu do të gjesh skedat e tua të fundit</translation>
 <translation id="3443221991560634068">Ringarko faqen aktuale</translation>

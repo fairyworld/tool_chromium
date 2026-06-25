@@ -103,6 +103,7 @@
 <translation id="1335767868357998043">Vyberte umiestnenie panela s adresou</translation>
 <translation id="1347468774581902829">Spravovať aktivitu</translation>
 <translation id="1348596747084433075">https://www.amazon.com/Wife-Gifts/s?k=for+Wife+Gifts</translation>
+<translation id="1353169676553627502">Vypnúť informácie o priebehu</translation>
 <translation id="1355337783640312381">Ak chcete prepínať medzi účtami, klepnite na ikonu účtu</translation>
 <translation id="135806768612505061">Všetky karty</translation>
 <translation id="1358106883354237005">Spravovaný účet</translation>
@@ -609,6 +610,7 @@
 <translation id="3073633853887034268">Dobre</translation>
 <translation id="3080525922482950719">Stránky si môžete uložiť a prečítať neskôr či offline</translation>
 <translation id="3081338492074632642">Ukladané heslo sa musí zhodovať s tým, ktoré používate pre web <ph name="WEBSITE" />.</translation>
+<translation id="3084484227247071193">Zapnúť informácie o priebehu</translation>
 <translation id="3087734570205094154">Spodok</translation>
 <translation id="309710370695886264">Máte jedno recyklované heslo. Tento problém odstráňte, aby ste boli v bezpečí.</translation>
 <translation id="3099402981545350675">Týmto odstránite adresy uložené v tomto zariadení. Odstránia sa aj vybrané informácie z Chromu, ale nevymažú sa z vášho účtu Google.</translation>
@@ -708,6 +710,7 @@
 <translation id="3449029510150690417">Vytvorte novú skupinu kariet tak, že jej zadáte názov a farbu.</translation>
 <translation id="345348365500626747">Adresa bola nájdená</translation>
 <translation id="3459644598174926977">Prejdite s Gemini na režim Live a pýtajte sa na stránku, brainstormujte nahlas a diskutujte.</translation>
+<translation id="3462768334899086950">Znamená to, že prídete o neuložený súbor a aktuálne karty</translation>
 <translation id="3464194322481586217">Cenu sa nepodarilo sledovať.</translation>
 <translation id="3469117812148449995">Možnosti uloženia hesla</translation>
 <translation id="3472469028191701821">Otvorí sa na novej karte</translation>
@@ -965,6 +968,7 @@
 <translation id="4326912346867677256">Klepnite na Použiť heslo a bezpečne sa prihláste.</translation>
 <translation id="4328843285884395590">Môj disk</translation>
 <translation id="4331177082088332784">Môžete to spravovať v BEGIN_LINK nastaveniach obsahu END_LINK</translation>
+<translation id="4331712008356052424">Ak chcete odoslať tento odkaz, prihláste sa do iného zariadenia pomocou účtu <ph name="USER_EMAIL" /></translation>
 <translation id="4334428914252001502">1 neprečítaný článok.</translation>
 <translation id="4338258232580025606">Nemôžem sa prihlásiť</translation>
 <translation id="4338650699862464074">Odosiela Googlu webové adresy navštívených stránok.</translation>
@@ -1471,6 +1475,7 @@ Funkciu Handoff musíte povoliť v nastaveniach v časti Všeobecné a vaše zar
 <translation id="6040143037577758943">Zavrieť</translation>
 <translation id="6042308850641462728">Viac</translation>
 <translation id="6045460247888249350">Pridajte názov</translation>
+<translation id="6050237559175440178">Ak chcete používať a ukladať svoje údaje vo všetkých zariadeniach, overte svoju totožnosť</translation>
 <translation id="6052269326659653305">Prepnúť profil</translation>
 <translation id="605721222689873409">RR</translation>
 <translation id="6059830886158432458">Tu ovládajte svoje príbehy aj aktivitu</translation>
@@ -1846,6 +1851,7 @@ Ak chcete pokračovať v počítači, prepnite na účet <ph name="OTHER_EMAIL"
 <translation id="722339453342442311">Skontrolovať</translation>
 <translation id="7227235818314667565">Spravovať zdieľanie</translation>
 <translation id="7233006041370588369">Vyberte heslo, ktoré chcete doplniť.</translation>
+<translation id="723874023660911012">Prepnúť profil</translation>
 <translation id="7241135764990439166">Režim inkognito nie je k dispozícii</translation>
 <translation id="7248046129087111453"><ph name="BEGIN_LINK" />História vyhľadávania<ph name="END_LINK" /> a <ph name="BEGIN_LINK" />ďalšie formy aktivity<ph name="END_LINK" /> sa môžu ukladať do vášho účtu Google.</translation>
 <translation id="7253951228444156601">Kontrolujú sa heslá…</translation>
@@ -2072,6 +2078,7 @@ Ak chcete pokračovať v počítači, prepnite na účet <ph name="OTHER_EMAIL"
 <translation id="7996239959906074962">Nastavenie…</translation>
 <translation id="800361585186029508">Otvorí zadané webové adresy v prehliadači Google Chrome.</translation>
 <translation id="8005666035647241369">Do správcu hesiel Google v tomto zariadení</translation>
+<translation id="8007106936382123905">{count,plural, =1{1 dokončená úloha}few{# dokončené úlohy}many{# completed tasks}other{# dokončených úloh}}</translation>
 <translation id="8010488806779226127">Preskúmajte funkcie, ktoré vám pri prehliadaní pomôžu vykonávať viac</translation>
 <translation id="8011489434346330032">Kontrola internetu</translation>
 <translation id="8014007212279733632">Ak chcete automaticky dopĺňať citlivé údaje, overte svoju totožnosť</translation>
@@ -2155,6 +2162,7 @@ Ak chcete pokračovať v počítači, prepnite na účet <ph name="OTHER_EMAIL"
 <translation id="826614135184049678">V rámci resetu iPadu vás systém odhlásil z účtu <ph name="USER_NAME" />. Ak sa chcete znova prihlásiť, klepnite nižšie na Pokračovať.</translation>
 <translation id="8270320981823560179">Disk</translation>
 <translation id="8273982424131314219">Vyplníte informácie na webe <ph name="URL" /></translation>
+<translation id="8274795744553482834">Chystáte sa prepnúť profily</translation>
 <translation id="8275068909952022340">Viac…</translation>
 <translation id="8280797717392145626">Prijaté odkazy</translation>
 <translation id="8281781826761538115">Predvolené – <ph name="DEFAULT_LOCALE" /></translation>

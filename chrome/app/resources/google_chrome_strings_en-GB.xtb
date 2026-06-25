@@ -7,6 +7,7 @@
 <translation id="1026101648481255140">Resume installation</translation>
 <translation id="102763973188675173">Customise and control Google Chrome. Update is available.</translation>
 <translation id="1028061813283459617">To delete browsing data from this device only, while keeping it in your Google Account, <ph name="BEGIN_LINK" />sign out of Chrome<ph name="END_LINK" />.</translation>
+<translation id="1028770388543831319">Get Google's best safety features on the go, with the Chrome app on your phone</translation>
 <translation id="1042270987544905725">Click to close the Chrome sign-in dialogue</translation>
 <translation id="1051793555070215510">Help us improve Incognito by taking this 1-minute survey.</translation>
 <translation id="1055295352198814912">Show Gemini in Chrome in Mac menu bar and turn on keyboard shortcut</translation>
@@ -38,6 +39,7 @@ Some features may be unavailable and changes to preferences won't be saved.</tra
 <translation id="1341711321000856656">You can switch to see passwords from another Chrome profile</translation>
 <translation id="1343830902827845050">Sign in to Chrome</translation>
 <translation id="1356661055722410047">New! You can translate both text and images on your screen</translation>
+<translation id="1361351916482714918">Browse smarter with Google Lens</translation>
 <translation id="1363996462118479832">Chrome OS could not sync your data due to an error signing in.</translation>
 <translation id="137466361146087520">Google Chrome Beta</translation>
 <translation id="1383876407941801731">Search</translation>
@@ -112,6 +114,8 @@ Some features may be unavailable and changes to preferences won't be saved.</tra
 <translation id="2024959665595762054">To use and save Chrome data in your Google Account, verify that it's you</translation>
 <translation id="2034233344106846793">Chrome upgrades insecure connections to HTTPS automatically when possible</translation>
 <translation id="2039417478970545937">Settings.</translation>
+<translation id="2040220733769034247">Scan the QR code with your phone to download Chrome and sign in to your Google Account.</translation>
+<translation id="2050189601866423230">You can pin Google Search AI Mode to ask questions as you browse</translation>
 <translation id="2066690553719545730">Always show AI Mode</translation>
 <translation id="2091012649849228750">To get future Google Chrome updates, you'll need Windows 10 or later. This computer is using Windows 8.</translation>
 <translation id="2094648590148273905">Chrome OS Flex terms</translation>
@@ -255,6 +259,7 @@ If this page isn't working as expected, try allowing optimisation.</translation>
 <translation id="3451115285585441894">Adding to Chrome...</translation>
 <translation id="345171907106878721">Add yourself to Chrome</translation>
 <translation id="3453763134178591239">Chrome OS terms</translation>
+<translation id="3475778264501649775">Take your passwords, tabs and more on the go with the Chrome app on your phone</translation>
 <translation id="3503306920980160878">Chrome needs access to your location to share your location with this site</translation>
 <translation id="3512495006767217696">Built into Chrome to help you create, save and autofill strong passwords. Add the shortcut for easy access</translation>
 <translation id="3539955434060988644">Open link in Chrome Inco&amp;gnito window</translation>
@@ -328,6 +333,7 @@ If this page isn't working as expected, try allowing optimisation.</translation>
 <translation id="4242034826641750751">Chrome needs camera and microphone permissions for this site</translation>
 <translation id="424864128008805179">Sign out of Chrome?</translation>
 <translation id="4251615635259297716">Link my Chrome data to this account</translation>
+<translation id="4266456958461406346">Open the more <ph name="THREE_DOTS_ICON" /> menu</translation>
 <translation id="4280647692742956593">Download Chrome on your phone to open or create new tab groups on the go.</translation>
 <translation id="4281844954008187215">Terms of Service</translation>
 <translation id="430327780270213103">Allow extension to show access requests in the Chrome toolbar</translation>
@@ -438,6 +444,7 @@ Google Chrome is unable to recover your settings.</translation>
 <translation id="5465210843490471889">Choose a Chrome profile to use with <ph name="START_GLIC_STYLING" />Gemini<ph name="END_GLIC_STYLING" /></translation>
 <translation id="547202872422499512">Chrome now launches when Windows starts so that you can begin browsing instantly. You can turn this off in settings.</translation>
 <translation id="5486346529181556467">Improve online safety for everyone when you report a site that you think is harmful. Learn more about <ph name="BEGIN_LINK" />Google's unsafe site policy.<ph name="END_LINK" /></translation>
+<translation id="5503069778428381665">When you use Google Lens on desktop, the page title, URL and content, including PDFs, are sent to Google</translation>
 <translation id="5524890928877629608">top-left corner of search area: left <ph name="LEFT" />%, top <ph name="TOP" />%</translation>
 <translation id="5529390769101499214">Manage your extensions by clicking Extensions in the Chrome main menu.</translation>
 <translation id="5550137307985173298">Click the Customise Chrome button on the new tab page to give Chrome a new look</translation>
@@ -471,6 +478,7 @@ Google Chrome is unable to recover your settings.</translation>
 <translation id="586971344380992563"><ph name="BEGIN_LINK" />Chrome warns you<ph name="END_LINK" /> about unsafe sites and downloads</translation>
 <translation id="5894164573378901688">To use Gemini in Chrome, sign in with a different Google Account</translation>
 <translation id="5895138241574237353">Restart</translation>
+<translation id="5899008323405946573">Use Google's best AI tools with the Chrome app on your phone</translation>
 <translation id="5903106910045431592"><ph name="PAGE_TITLE" /> – Network sign-in</translation>
 <translation id="5924017743176219022">Connecting to the Internet…</translation>
 <translation id="5925596746603389877">Download Chrome installer</translation>
@@ -568,6 +576,7 @@ Google Chrome is unable to recover your settings.</translation>
 <translation id="6706525880530967390">{count,plural, =1{Chrome needs to verify that it's you before some data can be saved in your Google Account and used on all your devices. If you sign out now, this data (1 item) will be deleted.}other{Chrome needs to verify that it's you before some data can be saved in your Google Account and used on all your devices. If you sign out now, this data ({count} items) will be deleted.}}</translation>
 <translation id="6712881677154121168">Download error: <ph name="DOWNLOAD_ERROR" />.</translation>
 <translation id="6718739135284199302">Make Chrome faster</translation>
+<translation id="6723445727540769832">Get the best of Google with the Chrome app on your phone</translation>
 <translation id="6734827584173583205">You haven't visited recently. Chrome removed <ph name="PERMISSION_1" />, <ph name="PERMISSION_2" /> and <ph name="COUNT" /> more.</translation>
 <translation id="6735387454586646204">Chrome OS Flex system</translation>
 <translation id="6750954913813541382">To fix spelling errors, Chrome sends the text that you type in the browser to Google</translation>
@@ -681,6 +690,7 @@ Google Chrome is unable to recover your settings.</translation>
 <translation id="7804364787702057554">Your account in Chrome</translation>
 <translation id="7804947029129221742">Your search engine was changed from outside of Chrome. To protect you, Chrome reset it to its original default. <ph name="LEARN_MORE_LINK" /></translation>
 <translation id="7808348361785373670">Remove from Chrome...</translation>
+<translation id="7812800388699096556">An illustration showing how you can use Google Lens to look up a product</translation>
 <translation id="7827099906024714326">Chrome needs to verify that it's you before some data can be saved in your Google Account and used on all your devices. If you sign out now, this data will be deleted.</translation>
 <translation id="7832314606810669113">To get your bookmarks and more on all your devices, sign in to Chrome. This bookmark will be saved in your Google Account after you sign in.</translation>
 <translation id="7845233973568007926">Thanks for installing. You must restart your computer before using <ph name="BUNDLE_NAME" />.</translation>
@@ -698,6 +708,7 @@ Google Chrome is unable to recover your settings.</translation>
 <translation id="7951272445806340501">Chrome OS Flex needs to be restarted to apply the update.</translation>
 <translation id="7959172989483770734">Manage Chrome profiles</translation>
 <translation id="7962410387636238736">This computer will no longer receive Google Chrome updates because Windows XP and Windows Vista are no longer supported</translation>
+<translation id="7988335136512059384">Get price drop alerts on items that you're interested in with the Chrome app on your phone</translation>
 <translation id="8004582292198964060">Browser</translation>
 <translation id="8005666035647241369">To Google Password Manager on this device</translation>
 <translation id="8008534537613507642">Reinstall Chrome</translation>
@@ -809,6 +820,7 @@ New bookmarks can't be saved in your account until you delete some. If you sign 
             Bookmarks, history and saved passwords won't be affected.</translation>
 <translation id="8948460679427074738">This extension hasn't published privacy practices, such as how it collects and uses data. Chrome recommends that you remove it.</translation>
 <translation id="8958307504142971576">You now have more features available in Chrome</translation>
+<translation id="8987061207681586800">Make Chrome yours</translation>
 <translation id="8991530961471831170">Open Gemini in Chrome</translation>
 <translation id="8992769679401294069">Your data is encrypted with your passphrase. Enter it to use and save Chrome data in your Google Account.</translation>
 <translation id="8999117580775242387">When HTTPS isn't available, Chrome will use an insecure connection without warning you</translation>
@@ -817,6 +829,7 @@ New bookmarks can't be saved in your account until you delete some. If you sign 
 <translation id="9018218886431812662">Installation complete</translation>
 <translation id="9024318700713112071">Set Chrome as your default</translation>
 <translation id="9066987883552592250">Close Gemini in Chrome Canary</translation>
+<translation id="9074041031320636790">Success! You can now easily ask questions as you browse with Google Search AI Mode</translation>
 <translation id="9090566250983691233">Learn why Chrome blocks some files</translation>
 <translation id="9106236359747881194">Select text to search</translation>
 <translation id="911206726377975832">Also delete your browsing data?</translation>

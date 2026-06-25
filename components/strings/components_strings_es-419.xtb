@@ -994,6 +994,7 @@ De lo contrario, la configuración de privacidad bloqueará esta acción. Esto p
 <translation id="2524962131655207565"><ph name="BEGIN_BOLD" />El contenido de la página de confirmación de compra se comparte con Google para ofrecer estas opciones.<ph name="END_BOLD" /> Los planes de pagos están sujetos a elegibilidad. Para ocultar las opciones de pago más tarde, ve a la <ph name="BEGIN_LINK" />configuración de pagos<ph name="END_LINK" />.</translation>
 <translation id="2526062290525841862">Para ejecutar esta app, vuelve a habilitar el modo de desarrollador de apps web aisladas</translation>
 <translation id="2526280916094749336">Puedes usar las direcciones guardadas en todos los productos de Google. Esta dirección se guardará en tu Cuenta de Google, <ph name="ACCOUNT" />.</translation>
+<translation id="2526590354069164005">Escritorio</translation>
 <translation id="2527451058878391043">El CVC está en el frente de la tarjeta. Es el código de 4 dígitos que se encuentra en la parte superior derecha sobre el número de la tarjeta.</translation>
 <translation id="2529899080962247600">Esta campo no debe tener más de <ph name="MAX_ITEMS_LIMIT" /> entradas. Se ignorarán todas las entradas posteriores.</translation>
 <translation id="2530042584066815841">Bloqueo y uso del mouse</translation>

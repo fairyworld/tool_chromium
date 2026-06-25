@@ -34,7 +34,6 @@
 <translation id="1108938384783527433">همگام‌سازی سابقه</translation>
 <translation id="1111673857033749125">نشانک‌های ذخیره‌شده در سایر دستگاه‌های شما در اینجا نشان داده می‌شوند.</translation>
 <translation id="1123537484474186311">‫<ph name="TAB_TITLE" />، زبانه تصویردرتصویر</translation>
-<translation id="1124357650933674597">{NUM_WINDOWS,plural, =1{بازگرداندن ۱ پنجره}one{بازگرداندن # پنجره}other{بازگرداندن # پنجره}}</translation>
 <translation id="1126696498560056882">مدیریت حساب‌ها در این دستگاه</translation>
 <translation id="1135018701024399762">اگر افراد دیگری هم از دستگاهتان استفاده می‌کنند، «حالت ناشناس» مرورتان را از دید این افراد محفوظ نگه می‌دارد</translation>
 <translation id="113752097246673894">‏برای دریافت نشانک‌ها و موارد دیگر در همه دستگاه‌هایتان، با <ph name="EMAIL" /> به سیستم Chrome وارد شوید</translation>
@@ -520,7 +519,6 @@
 <translation id="3166827708714933426">میان‌برهای پنجره و برگه</translation>
 <translation id="3167258285411721858">می‌توانید درخواست دهید از سایت ویژه تلفن همراه <ph name="HOST_NAME" /> استفاده کنید</translation>
 <translation id="3181145110929454111">‫<ph name="TAB_TITLE" />، زبانه ناشناس بی‌صدای سنجاق‌شده چندانتخابی</translation>
-<translation id="3183941812169784232">همه پنجره‌ها بازگردانده شوند؟</translation>
 <translation id="3187472288455401631">سنجش آگهی</translation>
 <translation id="3189635831478931757">‫<ph name="GROUP_TITLE" /> گروه زبانه</translation>
 <translation id="3200536777393523575">پنجره فعلی بسته شود؟</translation>
@@ -569,6 +567,7 @@
 <translation id="3435575784518354875">‏برای اینکه دسترسی‌تان به گذرواژه‌ها حفظ شود، اکنون آن‌ها را صادر کنید، «خدمات Google Play» را به‌روز کنید، و سپس آن‌ها را دوباره به «مدیر گذرواژه Google» وارد کنید. <ph name="BEGIN_LINK" />کل دستورالعمل‌ها را ببینید<ph name="END_LINK" />.</translation>
 <translation id="3435738964857648380">امنیت</translation>
 <translation id="3435914367318771664">افزودن زبانه به گروه جدید</translation>
+<translation id="3436118221454753036">از «حالت هوشواره‌ای» بپرسید</translation>
 <translation id="3438681572027105609">‏برای دریافت گذرواژه‌ها و موارد دیگر در همه دستگاه‌هایتان، به سیستم Chrome وارد شوید</translation>
 <translation id="3439276997620616816">برگه‌های اخیر را اینجا خواهید دید</translation>
 <translation id="3443221991560634068">بار کردن مجدد صفحه کنونی</translation>

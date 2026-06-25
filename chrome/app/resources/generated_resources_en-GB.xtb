@@ -2313,6 +2313,7 @@ You can manage this account’s settings by installing the Family Link app on yo
 <translation id="2710883118091822664">Sign in to easily continue on all your devices</translation>
 <translation id="2713106313042589954">Turn off camera</translation>
 <translation id="2713444072780614174">White</translation>
+<translation id="2713529429175549458">Password, PIN or fingerprint</translation>
 <translation id="2714180132046334502">Dark background</translation>
 <translation id="2714393097308983682">Google Play Store</translation>
 <translation id="2714617928488200509">Models</translation>
@@ -2763,6 +2764,7 @@ You can manage this account’s settings by installing the Family Link app on yo
 <translation id="3023204744987201088">&amp;Contact info</translation>
 <translation id="3023464535986383522">Select to speak</translation>
 <translation id="3024374909719388945">Use 24-hour clock</translation>
+<translation id="3025905136198521738">Arrange split view – left view active</translation>
 <translation id="3027296729579831126">Turn on Nearby Share</translation>
 <translation id="3027644380269727216">Based on your activity on a site. This setting is on.</translation>
 <translation id="3028445648481691885">Download cancelled</translation>
@@ -3293,6 +3295,7 @@ You can manage this account’s settings by installing the Family Link app on yo
 <translation id="3436118221454753036">Ask AI Mode</translation>
 <translation id="3437072258256045988">Manage your Gemini Apps activity</translation>
 <translation id="3437397693214267762">See your Outlook calendar, and SharePoint and OneDrive files</translation>
+<translation id="3437494162908353428">DevTools are not allowed for this URL.</translation>
 <translation id="3438633801274389918">Ninja</translation>
 <translation id="3439153939049640737">Always allow <ph name="HOST" /> to access your microphone</translation>
 <translation id="3439970425423980614">Opening PDF in Preview</translation>
@@ -3506,6 +3509,7 @@ You can manage this account’s settings by installing the Family Link app on yo
 <translation id="3596012367874587041">App settings</translation>
 <translation id="3599221874935822507">Raised</translation>
 <translation id="3600051066689725006">Web request info</translation>
+<translation id="3600181948754917646">Chrome Enterprise release notes</translation>
 <translation id="3600956933576601730">You need to review and accept terms to use these features</translation>
 <translation id="3601374594714740284">For higher-quality voices, clear space on your device</translation>
 <translation id="360180734785106144">Offer new features as they become available</translation>
@@ -4318,6 +4322,7 @@ You can manage this account’s settings by installing the Family Link app on yo
 <translation id="4177501066905053472">Ad topics</translation>
 <translation id="4177668342649553942">Open <ph name="SHORTCUT_NAME" /> - <ph name="APP_NAME" /></translation>
 <translation id="4177731895051842298">Extensions are add-ons to Chrome that can help you stay organised, simplify tasks and customise your browsing</translation>
+<translation id="4177860704813504507">Password or fingerprint</translation>
 <translation id="4178220097446335546">To forget this subscription and its associated networks, go to the Passpoint subscription page to remove the subscription.</translation>
 <translation id="4181376007499455822">Don't override</translation>
 <translation id="4181602000363099176">20x</translation>
@@ -4953,6 +4958,7 @@ You can manage this account’s settings by installing the Family Link app on yo
 <translation id="4660540330091848931">Resizing</translation>
 <translation id="4662373422909645029">Nickname can’t include numbers</translation>
 <translation id="4663373278480897665">Camera allowed</translation>
+<translation id="4664375726751122009">Switch to visual view</translation>
 <translation id="4665014895760275686">Manufacturer</translation>
 <translation id="4665446389743427678">All data stored by <ph name="SITE" /> will be deleted.</translation>
 <translation id="4666472247053585787">View notifications from your phone on your <ph name="DEVICE_TYPE" /></translation>
@@ -5656,6 +5662,7 @@ Use Ctrl + Alt + Brightness down to zoom out.</translation>
 <translation id="5186381005592669696">Customise display language for supported apps</translation>
 <translation id="5186788525428341874">You can use this passkey to sign in faster across your devices. It will be saved to Google Password Manager for <ph name="ACCOUNT_NAME" />.</translation>
 <translation id="5186792064936776005">Use default if available</translation>
+<translation id="5186931074173692059">Your passwords are saved to <ph name="GOOGLE_PASSWORD_MANAGER" /> for <ph name="EMAIL" />.</translation>
 <translation id="5187641678926990264">&amp;Install page as app…</translation>
 <translation id="5187826826541650604"><ph name="KEY_NAME" /> (<ph name="DEVICE" />)</translation>
 <translation id="5188242000716462162">Shared by <ph name="USER_NAME" /></translation>
@@ -6025,6 +6032,7 @@ You can assign multiple switches to this action.</translation>
 <translation id="5473075389972733037">IBM</translation>
 <translation id="5473099001878321374">By continuing, you agree that this device may also automatically download and install updates and apps from Google, your child's operator and this device's manufacturer, possibly using mobile data. Some of these apps may offer in-app purchases.</translation>
 <translation id="5473156705047072749">{NUM_CHARACTERS,plural, =1{PIN must be at least one character}other{PIN must be at least # characters}}</translation>
+<translation id="5475744834448251260">PIN or fingerprint</translation>
 <translation id="547615291475756075">Ma&amp;ximise</translation>
 <translation id="5476957746413745956">Adjust speed separately for each direction</translation>
 <translation id="5477089831058413614">Configure <ph name="DEVICE_TYPE" /> hotspot</translation>
@@ -6608,6 +6616,7 @@ You can assign multiple switches to this action.</translation>
 <translation id="5933376509899483611">Time Zone</translation>
 <translation id="5933522550144185133"><ph name="APP_NAME" /> is using your camera and microphone</translation>
 <translation id="5935158534896975820">Preparing certificate signing request (waiting on server)</translation>
+<translation id="5935554994339565449">Add text with the new 'Add text' tool</translation>
 <translation id="5936065461722368675">Translate full page</translation>
 <translation id="5937977334791924341"><ph name="APP" /> logo</translation>
 <translation id="5938002010494270685">Security upgrade available</translation>
@@ -7879,6 +7888,7 @@ You have # more compromised passwords. Google Password Manager recommends checki
 <translation id="6883319974225028188">Oops!  The system failed to save device configuration.</translation>
 <translation id="6883606786470492001">Manage your ad topics and other settings to limit what sites can learn about you to show you personalised ads</translation>
 <translation id="6884474387073389421">Are you sure that you want to delete the selected sign-in data?</translation>
+<translation id="6884763350679569586">PIN only</translation>
 <translation id="6885338910541974777">The application's installer program failed.</translation>
 <translation id="6885771755599377173">System information preview</translation>
 <translation id="6886871292305414135">Open link in new &amp;tab</translation>
@@ -8046,6 +8056,7 @@ You have # more compromised passwords. Google Password Manager recommends checki
 <translation id="7003844668372540529">Unknown product <ph name="PRODUCT_ID" /> from <ph name="VENDOR_NAME" /></translation>
 <translation id="7004402701596653846">Site can use MIDI</translation>
 <translation id="7004499039102548441">Recent tabs</translation>
+<translation id="7004791323196577460">Arrange split view – right view active</translation>
 <translation id="7004923218520748660">Pin tab search</translation>
 <translation id="7004969808832734860">Up to <ph name="DISCOUNT_UP_TO_AMOUNT" /> off</translation>
 <translation id="7005496624875927304">Additional permissions</translation>
@@ -8234,6 +8245,7 @@ You have # more compromised passwords. Google Password Manager recommends checki
 <translation id="7159695867335480590">Play/pause</translation>
 <translation id="7159953856712257647">Installed by default</translation>
 <translation id="7160182524506337403">You can now view your phone's notifications</translation>
+<translation id="7160835047878907171">Arrange split view – bottom view active</translation>
 <translation id="7160911207516219534">Side panels</translation>
 <translation id="716210145227921528">Deleted passkey</translation>
 <translation id="7165263843655074092">You’re getting standard security protection on this device</translation>
@@ -8368,6 +8380,7 @@ You have # more compromised passwords. Google Password Manager recommends checki
 <translation id="7261217796641151584">Share group</translation>
 <translation id="7261612856573623172">System Text-to-Speech voice</translation>
 <translation id="7262004276116528033">This sign-in service is hosted by <ph name="SAML_DOMAIN" /></translation>
+<translation id="7262162806583378242">Select anything on your screen as you browse to shop, translate and search using AI</translation>
 <translation id="7262564444061174264">Learn more about the navigation shortcut</translation>
 <translation id="7262919421769447042">Your profile is managed by <ph name="PROFILE_MANAGER" />, which can view some information, including</translation>
 <translation id="7264695323040866038">Always use the <ph name="APP" /> app to open supported web links?</translation>
@@ -9056,6 +9069,7 @@ Press an assigned switch or key to remove assignment.</translation>
 <translation id="7768507955883790804">Sites automatically follow this setting when you visit them</translation>
 <translation id="7768770796815395237">Change</translation>
 <translation id="7768784765476638775">Select to Speak</translation>
+<translation id="7769063984980522348">Switch to compact view</translation>
 <translation id="7769709635093101687">Keyboard shortcut to pause</translation>
 <translation id="7769748505895274502">Collapse recently closed</translation>
 <translation id="7770072242481632881">Side panel selector</translation>
@@ -10300,6 +10314,7 @@ Keep your key file in a safe place. You will need it to create new versions of y
 <translation id="8687774873995698516">Always block <ph name="HOST" /> from using identifiers to play protected content</translation>
 <translation id="8688672835843460752">Available</translation>
 <translation id="8689811383248488428">Decline and close profile</translation>
+<translation id="8689957514193802371">Let Chromium automatically change password for <ph name="WEBSITE" /></translation>
 <translation id="8689998525144040851">100</translation>
 <translation id="8690129572193755009">Sites can ask to handle protocols</translation>
 <translation id="869144235543261764">This tab is playing a video in picture-in-picture mode</translation>
@@ -10837,6 +10852,7 @@ This can include information about installed software, files, your browser, the 
 <translation id="9068878141610261315">Unsupported file type</translation>
 <translation id="9069417381769492963">There are no bookmarks that match your search</translation>
 <translation id="9070342919388027491">Tab moved left</translation>
+<translation id="9071664234353284876">No authentication</translation>
 <translation id="9072220108592671115">Installed version <ph name="VERSION" /></translation>
 <translation id="9072918088200875065">You gave Gemini permission to sign in to these sites to complete tasks for you</translation>
 <translation id="9074618195273027322">{CORE_COUNT,plural, =1{1 core}other{{CORE_COUNT} cores}}</translation>
@@ -11018,6 +11034,7 @@ This can include information about installed software, files, your browser, the 
 <translation id="9203904171912129171">Select a device</translation>
 <translation id="9204881338516142227">Automated password change</translation>
 <translation id="9205304506427975617">You can keep the cursor stable even if you have slight head movements. This requires more effort to move the cursor.</translation>
+<translation id="9205396811802112046">Arrange split view – top view active</translation>
 <translation id="9207434080086272167">Sunny</translation>
 <translation id="9207669213427469593">If you snap a window to one side to use split screen, you'll see window suggestions for the other side</translation>
 <translation id="9212565256020141627">Could not share image with Gemini. Try again or try another image.</translation>

@@ -477,6 +477,7 @@
 <translation id="173080396488393970">Овој тип картичка не е поддржан</translation>
 <translation id="1731563515262205847">ML-DSA-65</translation>
 <translation id="1732445923934584865">Прашај лично</translation>
+<translation id="1732796940245838248">Ажурирајте го бројот за ревизија во Google Wallet</translation>
 <translation id="1733064249834771892">фонтови</translation>
 <translation id="1733631169686303142">Аудиоопрема</translation>
 <translation id="1733762317901693627">Дури и сајтовите што се обично безбедни понекогаш се компромитирани од напаѓачи. Одете на <ph name="BEGIN_LINK" />овој небезбеден сајт<ph name="END_LINK" /> само ако сте сигурни дека ги разбирате ризиците.</translation>
@@ -712,6 +713,7 @@
 <translation id="2122165854541876335">Потрошувачки ресурси</translation>
 <translation id="2122214041802369259">Цената е висока</translation>
 <translation id="2122719317867821810">Правилово работи како што е предвидено, но конфликтна вредност е поставена некаде на друго место и е отфрлена од правилово.</translation>
+<translation id="2124081665399116863">Ажурирајте го возилото во Google Wallet</translation>
 <translation id="2126374524350484896">Приказ во PDF:</translation>
 <translation id="2127090458081644412">Лозинката е зачувана на уредов</translation>
 <translation id="2127747486437921899">Курзив</translation>
@@ -994,6 +996,7 @@
 <translation id="2524962131655207565"><ph name="BEGIN_BOLD" />Содржините од страницата за наплата се споделуваат со Google за да се понудат опцииве.<ph name="END_BOLD" /> Тарифните пакети зависат од подобноста. За да ги скриете опциите за „Платете подоцна“, одете во <ph name="BEGIN_LINK" />поставките за плаќање<ph name="END_LINK" />.</translation>
 <translation id="2526062290525841862">За да се извршува апликацијава, овозможете го „Режимот на програмер“ во изолираните веб-апликации повторно</translation>
 <translation id="2526280916094749336">Може да ги користите зачуваните адреси на производите на Google. Адресава ќе се зачува во вашата сметка на Google, <ph name="ACCOUNT" />.</translation>
+<translation id="2526590354069164005">Десктоп</translation>
 <translation id="2527451058878391043">Вашиот CVC е на предната страна на картичката. Тоа е 4-цифрениот код горе десно, над бројот на картичката.</translation>
 <translation id="2529899080962247600">Полево не треба да има повеќе од <ph name="MAX_ITEMS_LIMIT" /> записи. Сите понатамошни записи ќе се игнорираат.</translation>
 <translation id="2530042584066815841">Заклучување и користење на глувчето</translation>
@@ -1548,6 +1551,7 @@
 <translation id="3422472998109090673"><ph name="HOST_NAME" /> е моментално недостапен.</translation>
 <translation id="3422794267539320056">Допрете го диносаурусот или притиснете Space за да играте</translation>
 <translation id="3423742043356668186">Одредено од системот</translation>
+<translation id="3426672782316020729">Ажурирајте го пасошот во Google Wallet</translation>
 <translation id="3427342743765426898">&amp;Повтори уредување</translation>
 <translation id="342781501876943858">Chromium препорачува ресетирање на лозинката ако повторно сте ја употребиле на други сајтови.</translation>
 <translation id="3428151540071562330">Една или повеќе од шаблонските URI на серверот DnsOverHttpsTemplates се неважечки и нема да се користат.</translation>
@@ -2408,6 +2412,7 @@
 <translation id="4766713847338118463">Двојно спојување долу</translation>
 <translation id="4768816584204270288">Кога плаќате на рати, се пополнува еднократен број на виртуелна картичка. Може да кликнете за да се копираат и залепат податоците за картичката за ова купување.</translation>
 <translation id="4768864802656530630">Детална системска евиденција. <ph name="BEGIN_LINK" />Дознајте повеќе<ph name="END_LINK" /></translation>
+<translation id="4770909831299304090">Ажурирајте го KTN во Google Wallet</translation>
 <translation id="4771249073710170730">Радиоконтрола и моделирање</translation>
 <translation id="4771973620359291008">Се појави непозната грешка.</translation>
 <translation id="4774055414220872623">Уметнички и занаетчиски материјали</translation>
@@ -4222,6 +4227,7 @@
 <translation id="7569490014721427265">Голф</translation>
 <translation id="7569952961197462199">Отстрани ја кредитната картичка од Chrome?</translation>
 <translation id="7569983096843329377">Црна</translation>
+<translation id="7570524564113479209">Ажурирајте го документот за идентификација во Google Wallet</translation>
 <translation id="7570862164055912832">Броеви за разрешување спорови</translation>
 <translation id="7571813784389228510">„AI-режим“ на Google</translation>
 <translation id="7574998639136359461">Опрема за зимски спортови</translation>
@@ -4743,6 +4749,7 @@
 <translation id="8389940864052787379">Приспособени и возила со перформанси</translation>
 <translation id="8390725133630534698">Споделувањето од <ph name="ORIGIN_NAME" /> на <ph name="VM_NAME" /> е блокирано со правило на администраторот</translation>
 <translation id="8392783408127179588">Правилата се вчитуваат повторно</translation>
+<translation id="8393948304336153065">Ажурирајте ја возачката дозвола во Google Wallet</translation>
 <translation id="8396522675989118466">Ова е <ph name="NUMBER_OF_DIGITS" />-цифрен код на <ph name="SIDE_OF_CARD" /></translation>
 <translation id="8398335999901363925">Достапни начини на плаќање што се пополнуваат со допир отворени на цел екран.</translation>
 <translation id="8398446215576328011">Врати ги применетите правила</translation>

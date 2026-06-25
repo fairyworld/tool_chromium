@@ -994,6 +994,7 @@ Par défaut, ce type d'accès est bloqué par vos paramètres de confidentialit�
 <translation id="2524962131655207565"><ph name="BEGIN_BOLD" />Le contenu de la page de paiement est partagé avec Google pour proposer ces options.<ph name="END_BOLD" /> Les forfaits sont soumis à des critères d'éligibilité. Pour masquer les options de paiement différé, accédez aux <ph name="BEGIN_LINK" />paramètres de paiement<ph name="END_LINK" />.</translation>
 <translation id="2526062290525841862">Pour exécuter cette appli, réactivez le mode développeur pour les applications Web isolées</translation>
 <translation id="2526280916094749336">Vous pouvez utiliser les adresses enregistrées dans les produits Google. Celle-ci sera enregistrée dans votre compte Google (<ph name="ACCOUNT" />).</translation>
+<translation id="2526590354069164005">Bureau</translation>
 <translation id="2527451058878391043">Votre code CVC figure au recto de votre carte. Il s'agit du code à quatre chiffres en haut à droite, au-dessus du numéro de votre carte.</translation>
 <translation id="2529899080962247600">Ce champ ne peut pas contenir plus de <ph name="MAX_ITEMS_LIMIT" /> entrées. Les entrées supplémentaires seront ignorées.</translation>
 <translation id="2530042584066815841">Verrouillage et utilisation de la souris</translation>

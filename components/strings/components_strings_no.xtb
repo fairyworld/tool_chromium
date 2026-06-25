@@ -994,6 +994,7 @@ I motsatt fall blir dette blokkert av personverninnstillingene. Dette gjør at i
 <translation id="2524962131655207565"><ph name="BEGIN_BOLD" />Innhold fra betalingssiden deles med Google for å tilby disse alternativene.<ph name="END_BOLD" /> Betalingsavtaler er avhengig av godkjenning. Gå til <ph name="BEGIN_LINK" />betalingsinnstillingene<ph name="END_LINK" /> for å skjule alternativene for å betale senere.</translation>
 <translation id="2526062290525841862">For å kjøre denne appen, slå på igjen utviklermodus for isolerte nettapper</translation>
 <translation id="2526280916094749336">Du kan bruke lagrede adresser i flere Google-produkter. Denne adressen lagres i Google-kontoen din, <ph name="ACCOUNT" />.</translation>
+<translation id="2526590354069164005">Skrivebordet</translation>
 <translation id="2527451058878391043">CVC-koden står på forsiden av kortet. Det er den firesifrede koden øverst til høyre over kortnummeret ditt.</translation>
 <translation id="2529899080962247600">Dette feltet skal ikke ha mer enn <ph name="MAX_ITEMS_LIMIT" /> oppføringer. Eventuelle oppføringer som overskrider dette, ignoreres.</translation>
 <translation id="2530042584066815841">Muselås og -bruk</translation>

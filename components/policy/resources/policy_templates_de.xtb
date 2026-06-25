@@ -1158,6 +1158,7 @@ Unter <ph name="MAC_OS_NAME" /> steht diese Richtlinie nur bei Instanzen zur Ver
 <translation id="1781356041596378058">Diese Richtlinie steuert zudem den Zugriff auf Android-Entwickleroptionen. Wenn du diese Richtlinie auf "true" setzt, können Nutzer nicht auf die Entwickleroptionen zugreifen. Wenn du diese Richtlinie auf "false" setzt oder nicht konfigurierst, können Nutzer auf die Entwickleroptionen zugreifen, indem sie siebenmal auf die Build-Nummer in der Android-App "Einstellungen" tippen.</translation>
 <translation id="1781720543185538098">Gibt an, ob Nutzern produktinterne <ph name="PRODUCT_NAME" />-Umfragen angezeigt werden.</translation>
 <translation id="1787790976045065845">Diese Richtlinie ist nur dann wirksam, wenn die Richtlinie „<ph name="SECURITY_TOKEN_SESSION_BEHAVIOR_POLICY_NAME" />“ auf „<ph name="SECURITY_TOKEN_SESSION_BEHAVIOR_LOCK" />“ oder „<ph name="SECURITY_TOKEN_SESSION_BEHAVIOR_LOGOUT" />“ eingestellt ist und ein Nutzer, der sich mit einer Smartcard authentifiziert hat, diese entfernt. Dann legt diese Richtlinie fest, wie viele Sekunden lang eine Benachrichtigung angezeigt wird, die den Nutzer über bevorstehende Aktionen informiert. Diese Benachrichtigung blockiert den Bildschirm. Die Aktion beginnt erst nach dem Ablauf der Benachrichtigung. Der Nutzer kann die Aktion unterbinden, wenn die Smartcard vor dem Ablauf der Benachrichtigung wieder eingeführt wird. Wenn für diese Richtlinie „0“ konfiguriert ist, wird keine Benachrichtigung angezeigt und die Aktion sofort ausgeführt.</translation>
+<translation id="1788597893274674447">Website-Isolierung für angegebene Ursprünge auf Android-Geräten aktivieren (eingestellt)</translation>
 <translation id="1793346220873697538">PIN-Druckmodus standardmäßig deaktivieren</translation>
 <translation id="1794457906032475749">Wenn die Richtlinie aktiviert ist, ist die Option zum Beibehalten bestehender Browserdaten beim Erstellen eines Unternehmensprofils standardmäßig aktiviert.
 
@@ -1968,6 +1969,25 @@ Wenn die Richtlinie deaktiviert oder nicht konfiguriert ist, können Nutzer Date
       Nutzer können diese Einstellung weder ändern noch überschreiben.
 
       Hinweis: Durch diese Richtlinie wird allen HTTP- und HTTPS-Anfragen, die an google.com-Domains gesendet werden, der Header „X-GoogApps-Allowed-Domains“ angehängt (siehe https://support.google.com/a/answer/1668854).</translation>
+<translation id="2282968242492236886">Wenn du diese Richtlinie konfigurierst, kannst du angeben, welche Autofill-Datentypen für bestimmte URL-Muster blockiert werden.
+
+Die Richtlinie ist als Liste von Wörterbüchern strukturiert. Jedes Wörterbuch muss Folgendes enthalten:
+* „url_pattern“: Ein URL-Muster für die Inhaltseinstellungen (z. B. „https://[*.]beispiel.de“).
+* „blocked_types“: Eine Liste von Strings, die die Kategorien von Autofill-Daten darstellen, die blockiert werden sollen.
+
+Die unterstützten Werte für „blocked_types“ sind:
+* „contact_info“: Das Ausfüllen und Speichern von Kontaktdaten wird blockiert.
+* „payments“: Das Ausfüllen und Speichern von Kreditkarten und Zahlungsmethoden wird blockiert.
+* „identity_docs“: Das Ausfüllen und Speichern von Identitätsdokumenten (z. B. Reisepass, Führerschein, Personalausweis) wird blockiert.
+* „travel“: Das Ausfüllen und Speichern von Reiseinformationen (z. B. Flugreservierungen, Fahrzeugkennzeichen) wird blockiert.
+
+Wenn ein Datentyp für eine Website blockiert ist, sind sowohl das Erstellen von Vorschlägen als auch die Aufforderung zum Speichern/Importieren neuer Daten dieses Typs auf dieser Website deaktiviert.
+
+Wenn eine URL mit mehreren Mustereinträgen in der Liste übereinstimmt, werden die blockierten Typen aus allen übereinstimmenden Einträgen zusammengeführt. Ungültige URL-Muster in der Liste werden ignoriert.
+
+Wenn diese Richtlinie nicht konfiguriert ist, werden keine Autofill-Datentypen nach Domain blockiert.
+
+Ausführliche Informationen zu gültigen URL‑Mustern findest du unter https://chromeenterprise.google/policies/url-patterns. Der Platzhalter * wird unterstützt. Dieses Muster entspricht jeder URL mit beliebigem Schema, Port und Pfad.</translation>
 <translation id="2287414160388710497">Ermöglicht Administratoren, das Erscheinungsbild von Wasserzeichen anzupassen, die durch Regeln zum Schutz vor Datenverlust (Data Loss Prevention, DLP) angewendet werden. Dazu gehört auch das Festlegen der Deckkraft für Füllung und Kontur sowie der Schriftgröße.
 Wenn diese Richtlinie oder einige Werte nicht konfiguriert sind, verwendet Chrome die Standardwerte für Wasserzeichen.
 Diese sind: Füllungsdeckkraft bei 4, Konturdeckkraft bei 6 und Schriftgröße bei 24.
@@ -3349,6 +3369,19 @@ Ist diese Richtlinie deaktiviert oder nicht konfiguriert, wird das unverankerte 
 <translation id="3150351525324499342"><ph name="PRODUCT_NAME" />-Symbol nicht standardmäßig in der Symbolleiste anzeigen, sondern Nutzer auswählen lassen</translation>
 <translation id="3152135410085709340">Lokalen Dateizugriff auf „file://“-URLs auf diesen Websites im PDF-Viewer zulassen</translation>
 <translation id="3152425128389603870">Unified Desktop verfügbar machen und standardmäßig aktivieren</translation>
+<translation id="3157506194753687842">Legt fest, ob der <ph name="GEMINI_SPARK_PRODUCT_NAME" />-KI-Agent eine Verbindung zu <ph name="PRODUCT_NAME" /> herstellen und das automatische Browsen verwenden darf.
+
+0 = <ph name="GEMINI_SPARK_PRODUCT_NAME" /> darf sich mit dem automatischen Browsen in <ph name="PRODUCT_NAME" /> verbinden und es verwenden
+
+1 = <ph name="GEMINI_SPARK_PRODUCT_NAME" /> darf sich nicht mit dem automatischen Browsen in <ph name="PRODUCT_NAME" /> verbinden und es nicht verwenden
+
+Warnung: Wenn du <ph name="GEMINI_SPARK_PRODUCT_NAME" /> erlaubst, sich mit <ph name="PRODUCT_NAME" /> zu verbinden und das automatische Browsen zu verwenden, kann der <ph name="GEMINI_SPARK_PRODUCT_NAME" />-KI-Agent autonome Aktionen mit mehreren Schritten auf <ph name="PRODUCT_NAME" />-Clients über die aktive Browsersitzung ausführen. Dies birgt erhebliche Sicherheitsrisiken, darunter Risiken im Zusammenhang mit Anmeldedaten, dem im lokalen Netzwerk eingehenden Traffic und dem Verlust kontextsensitiver Signale. Vorhandene Verwaltungs- und Sicherheitsmechanismen werden möglicherweise nicht berücksichtigt.
+
+Administratoren sollten das Netzwerkbedrohungsmodell sowie die Compliance- und Datenschutzrichtlinien ihrer Organisation sorgfältig prüfen, bevor sie diese Funktion aktivieren.
+
+Diese Richtlinie hat keine Auswirkungen, wenn die <ph name="GOOGLE_GEMINI_PRODUCT_NAME" /> App oder die Richtlinien für das automatische Browsen in <ph name="PRODUCT_NAME" /> deaktiviert sind. Beispielsweise kann die <ph name="GOOGLE_GEMINI_PRODUCT_NAME" /> App durch die Richtlinie „<ph name="GEMINI_SETTINGS_POLICY_NAME" />“ deaktiviert werden. Weitere Informationen zu <ph name="GOOGLE_GEMINI_PRODUCT_NAME" /> in <ph name="PRODUCT_NAME" /> findest du unter https://support.google.com/chrome/a?p=gemini_in_chrome.
+
+Automatisches Browsen in <ph name="PRODUCT_NAME" /> und <ph name="GEMINI_SPARK_PRODUCT_NAME" /> sind nicht in allen Ländern und Sprachen verfügbar. Auch wenn du für diese Richtlinie „0 – Aktiviert“ festlegst, kann die Funktion möglicherweise nicht aktiviert werden, da sie von der Verfügbarkeit abhängig ist. Weitere Informationen zur Einführung der Funktion findest du in den Versionshinweisen für Chrome Enterprise: https://chromeenterprise.google/resources/release-notes/.</translation>
 <translation id="3159375329008977062">Nutzer darf Crostini-Container über die Benutzeroberfläche exportieren/importieren</translation>
 <translation id="3163167792874598128">Wenn die Richtlinie nicht konfiguriert oder aktiviert ist, wird dem Nutzer die Werbung für App Store-Bewertungen maximal einmal pro Jahr angezeigt.
 Ist die Richtlinie deaktiviert, wird dem Nutzer die Werbung für App Store-Bewertungen nicht angezeigt.</translation>
@@ -4820,6 +4853,21 @@ Wenn die Richtlinie auf <ph name="DISABLE_UNPUBLISHED" /> (1) gesetzt ist, sind
 
           Wird sie nicht konfiguriert, ist das gesprochene Feedback auf dem Anmeldebildschirm anfangs deaktiviert, kann jedoch vom Nutzer jederzeit aktiviert werden.</translation>
 <translation id="4173974507809462880">Bildschirm für die Scrollrichtung des Touchpads bei der Anmeldung anzeigen</translation>
+<translation id="4175846494150407472">Gib eine Liste von Ursprüngen an, die auf Plattformen mit begrenzten Ressourcen in einem eigenen Prozess ausgeführt werden.
+
+Diese Richtlinie funktioniert nur auf Geräten mit begrenztem Arbeitsspeicher (zwischen 1 GB und 3,2 GB RAM), da das Isolieren zu vieler Websites auf Geräten mit begrenzten Ressourcen Leistungsprobleme verursachen kann. Verwende für leistungsstarke Umgebungen (einschließlich High-End-<ph name="ANDROID_NAME" />-Geräten) stattdessen <ph name="ISOLATE_ORIGINS_POLICY_NAME" />.
+
+Es wird nicht empfohlen, die Prozessisolation speziell für Geräte mit weniger als 1 GB Arbeitsspeicher zu konfigurieren.
+
+Jeder Prozess darf nur Dokumente aus diesem Ursprung und den zugehörigen Subdomains enthalten. Wird zum Beispiel https://a1.beispiel.de/ angegeben, ist https://a2.a1.beispiel.de/ im selben Prozess zulässig, https://beispiel.de oder https://b.beispiel.de aber nicht.
+
+Du kannst auch einen Ursprungsbereich für die Isolierung angeben. Dazu wird ein Platzhalter verwendet. Wenn du z. B. https://[*.]firma.beispiel.de angibst, wird für jeden Ursprung unter https://firma.beispiel.de ein eigener Prozess ausgeführt, einschließlich https://firma.beispiel.de selbst, https://a1.firma.beispiel.de und https://a2.a1.firma.beispiel.de.
+
+Ab <ph name="PRODUCT_NAME" />-Version 77 werden bestimmte sensible Websites unter <ph name="ANDROID_NAME" /> standardmäßig isoliert. Diese Richtlinie weitet diesen Modus auf die Isolierung zusätzlicher Ursprünge aus.
+
+Ursprünge, die durch diese Richtlinie isoliert werden, können keine anderen Ursprünge auf derselben Website skripten. Das ist sonst möglich, wenn zwei SameSite-Dokumente ihre „document.domain“-Werte so verändern, dass sie übereinstimmen. Administratoren sollten sicherstellen, dass dieses ungewöhnliche Verhalten nicht für einen Ursprung verwendet wird, bevor er isoliert wird.
+
+Wenn die Richtlinie auf einen leeren String festgelegt oder nicht konfiguriert ist, ist die Website-Isolierung für keine bestimmten Ursprünge erforderlich. Nutzer können aber weiter das Befehlszeilen-Flag verwenden, um die Prozessisolation manuell zu aktivieren.</translation>
 <translation id="417956245902013347">Hiermit wird die Bedienungshilfe "Textcursor hervorheben" auf dem Anmeldebildschirm aktiviert.
 
           Wird diese Richtlinie auf "true" gesetzt, ist die Bedienungshilfe "Textcursor hervorheben" auf dem Anmeldebildschirm immer aktiviert.
@@ -6126,6 +6174,7 @@ Ist die Richtlinie nicht konfiguriert, ist „Automatische Untertitel“ anfangs
 <translation id="4970046075219007744">Webanwendungen erlauben, um Zugriff auf Dateitypen über die File Handling API zu bitten</translation>
 <translation id="4970855112942626932">Browseranmeldung deaktivieren</translation>
 <translation id="4974091268178043378">Chrome OS-Farbmodus</translation>
+<translation id="4976824366963631628">Autofill-Datentypen für bestimmte Websites blockieren</translation>
 <translation id="4976825008579439428">KI‑basierte Verlaufssuche nicht zulassen.</translation>
 <translation id="4978533099939732984">Warnungen bei wenig Speicherplatz immer anzeigen</translation>
 <translation id="4979614740553442831">Mit dieser Richtlinie wird die Verfügbarkeit der Lens-Integration in der Gallery App unter <ph name="PRODUCT_OS_NAME" /> gesteuert.
@@ -6150,6 +6199,15 @@ Wenn die Richtlinie deaktiviert ist, ist diese Funktion nicht verfügbar.</trans
 
       Weitere Informationen zur Einstellung der U2F Security Key API findest du unter https://groups.google.com/a/chromium.org/g/blink-dev/c/xHC3AtU_65A.</translation>
 <translation id="4988291787868618635">Auszuführende Aktion bei Erreichen der Inaktivitätsverzögerung</translation>
+<translation id="4988587935113718108">Wenn die Richtlinie konfiguriert ist, wird unter <ph name="ANDROID_NAME" /> für jeden der benannten Ursprünge in einer durch Kommas getrennten Liste ein eigener Prozess ausgeführt. Jeder Prozess darf nur Dokumente aus diesem Ursprung und den zugehörigen Subdomains enthalten. Wird zum Beispiel https://a1.beispiel.de/ angegeben, ist https://a2.a1.beispiel.de/ im selben Prozess zulässig, https://beispiel.de oder https://b.beispiel.de aber nicht. Ab <ph name="PRODUCT_NAME" />-Version 77 werden unter <ph name="ANDROID_NAME" /> bestimmte sensible Websites standardmäßig isoliert. Diese Richtlinie weitet diesen Modus auf die Isolierung zusätzlicher Ursprünge aus.
+
+Seit <ph name="PRODUCT_NAME" />-Version 77 kann auch ein Ursprungsbereich für die Isolierung angegeben werden. Dazu wird ein Platzhalter verwendet. Wenn du z. B. https://[*.]firma.beispiel.de angibst, wird für jeden Ursprung unter https://firma.beispiel.de ein eigener Prozess ausgeführt, einschließlich https://firma.beispiel.de selbst, https://a1.firma.beispiel.de und https://a2.a1.firma.beispiel.de.
+
+Ursprünge, die durch diese Richtlinie isoliert werden, können keine anderen Ursprünge auf derselben Website skripten. Das ist sonst möglich, wenn zwei SameSite-Dokumente ihre „document.domain“-Werte so verändern, dass sie übereinstimmen. Administratoren sollten sicherstellen, dass dieses ungewöhnliche Verhalten nicht für einen Ursprung verwendet wird, bevor er isoliert wird.
+
+Wenn die Richtlinie auf einen leeren String festgelegt oder nicht konfiguriert ist, ist die Website-Isolierung für keine bestimmten Ursprünge erforderlich. Nutzer können aber weiter das Befehlszeilen-Flag verwenden, um die Prozessisolation manuell zu aktivieren.
+
+Hinweis: Diese Richtlinie ist veraltet. Verwende stattdessen <ph name="ISOLATE_ORIGINS_POLICY_NAME" /> (für leistungsstarke Geräte) oder <ph name="ISOLATE_ORIGINS_SHORTLIST_POLICY_NAME" />. Diese Richtlinie gilt nur für Chrome unter <ph name="ANDROID_NAME" /> auf Geräten mit mehr als 1 GB RAM, für die keine spezielle Konfiguration der Prozessisolation empfohlen wird.</translation>
 <translation id="4991786313466977061">Sichtbarkeit von Unternehmenskennzeichen steuern</translation>
 <translation id="4995123966071996433">Portweiterleitung auf virtuelle Maschinen mit Linux nicht zulassen</translation>
 <translation id="4996068111491152684">Die <ph name="PRODUCT_OS_NAME" />-Anmeldedaten werden nicht für die Netzwerkauthentifizierung verwendet.</translation>
@@ -8496,6 +8554,7 @@ HINWEIS: Das Standardverhalten hängt davon ab, ob es sich um ein Verbraucherger
 
       Hinweis: Falls die aktuelle Eingabemethode nicht unterstützt wird, wird die Eingabemethode auf das Hardware-Tastaturlayout (falls zulässig) oder den ersten gültigen Eintrag in dieser Liste eingestellt. Alle ungültigen oder nicht unterstützten Eingabemethoden in der Liste werden ignoriert.</translation>
 <translation id="6483115462650732746">Unverankertes Menü für Bedienungshilfen im Kioskmodus anzeigen</translation>
+<translation id="6488321500788319000">Website-Isolierung für angegebene Ursprünge auf Geräten mit begrenzten Ressourcen aktivieren</translation>
 <translation id="6491139795995924304">Bluetooth auf Gerät zulassen</translation>
 <translation id="6491305972928809525">Unverankertes Menü für Bedienungshilfen im Kioskmodus nicht anzeigen</translation>
 <translation id="6492177700737407141">Nutzer, die am erweiterten Sicherheitsprogramm teilnehmen, werden nur durch die Standardfunktionen für Privatnutzer geschützt</translation>
@@ -8549,6 +8608,23 @@ Das Zeitlimit bei Inaktivität bis zum Start Bildschirmschoners und das Interval
 <translation id="651248769129998376">Keine Installationsanfragen für Erweiterungen erstellen und in der Admin-Konsole hochladen</translation>
 <translation id="6513453889192806240">HTTPS-Latenz</translation>
 <translation id="6515357889978918016"><ph name="PLUGIN_VM_NAME" />-Bild</translation>
+<translation id="6515520014183265350">Gib eine Liste von Ursprüngen an, die in einem eigenen Prozess ausgeführt werden.
+
+Unter <ph name="ANDROID_NAME" /> funktioniert diese Richtlinie nur auf Geräten mit ausreichend Arbeitsspeicher (mehr als 3,2 GB RAM), da die Isolierung zu vieler Websites auf Geräten mit begrenzten Ressourcen Leistungsprobleme verursachen kann. Verwende für <ph name="ANDROID_NAME" />-Geräte mit begrenzten Ressourcen stattdessen <ph name="ISOLATE_ORIGINS_SHORTLIST_POLICY_NAME" />.
+
+Es wird nicht empfohlen, die Prozessisolation speziell für Geräte mit weniger als 1 GB Arbeitsspeicher zu konfigurieren.
+
+Jeder Prozess darf nur Dokumente aus diesem Ursprung und den zugehörigen Subdomains enthalten. Wird zum Beispiel https://a1.beispiel.de/ angegeben, ist https://a2.a1.beispiel.de/ im selben Prozess zulässig, https://beispiel.de oder https://b.beispiel.de aber nicht.
+
+Seit <ph name="PRODUCT_NAME" />-Version 77 kann auch ein Ursprungsbereich für die Isolierung angegeben werden. Dazu wird ein Platzhalter verwendet. Wenn du z. B. https://[*.]firma.beispiel.de angibst, wird für jeden Ursprung unter https://firma.beispiel.de ein eigener Prozess ausgeführt, einschließlich https://firma.beispiel.de selbst, https://a1.firma.beispiel.de und https://a2.a1.firma.beispiel.de.
+
+Alle Websites (also Protokoll plus eTLD+1, z. B. https://beispiel.de) auf Desktop-Plattformen werden bereits standardmäßig isoliert, wie in der Richtlinie <ph name="SITE_PER_PROCESS_POLICY_NAME" /> angegeben. Die Richtlinie <ph name="ISOLATE_ORIGINS_POLICY_NAME" /> bietet sich auch für die Isolierung spezifischer Ursprünge bei höherer Granularität an (z. B. https://a.beispiel.de).
+
+Ab <ph name="PRODUCT_NAME" />-Version 77 werden unter <ph name="ANDROID_NAME" /> bestimmte sensible Websites standardmäßig isoliert. Diese Richtlinie weitet diesen Modus auf die Isolierung zusätzlicher Ursprünge aus.
+
+Ursprünge, die durch diese Richtlinie isoliert werden, können keine anderen Ursprünge auf derselben Website skripten. Das ist sonst möglich, wenn zwei SameSite-Dokumente ihre „document.domain“-Werte so verändern, dass sie übereinstimmen. Administratoren sollten sicherstellen, dass dieses ungewöhnliche Verhalten nicht für einen Ursprung verwendet wird, bevor er isoliert wird.
+
+Wenn die Richtlinie auf einen leeren String festgelegt oder nicht konfiguriert ist, ist die Website-Isolierung für keine bestimmten Ursprünge erforderlich. Nutzer können aber weiter das Befehlszeilen-Flag verwenden, um die Prozessisolation manuell zu aktivieren.</translation>
 <translation id="6517859209214570623">Mit dieser Richtlinie kannst du eine Liste von URL‑Mustern erstellen, durch die angegeben wird, welche Websites keine Cookies setzen dürfen.
 
       Wenn die Richtlinie nicht konfiguriert ist, wird für alle Websites „<ph name="DEFAULT_COOKIES_SETTINGS_POLICY_NAME" />“ verwendet, sofern diese Einstellung konfiguriert ist. Falls nicht, wird die persönliche Einstellung des Nutzers verwendet.

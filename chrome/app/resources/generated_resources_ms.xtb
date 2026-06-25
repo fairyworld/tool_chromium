@@ -612,6 +612,7 @@ Semak kata laluan anda pada bila-bila masa dalam <ph name="GOOGLE_PASSWORD_MANAG
 <translation id="1455119378540982311">Saiz tetingkap pratetapan</translation>
 <translation id="1456849775870359518">Tab anda akan dibuka semula</translation>
 <translation id="146000042969587795">Bingkai ini disekat kerana ia mengandungi beberapa kandungan selamat.</translation>
+<translation id="1460573197675781671">Tutup menu bahasa</translation>
 <translation id="1460751212339734034">Jimatkan masa, kurangkan menaip</translation>
 <translation id="1461041542809785877">Prestasi</translation>
 <translation id="1461177659295855031">Alihkan ke folder Bar Penanda Halaman</translation>
@@ -2213,6 +2214,7 @@ Anda boleh mengurus tetapan akaun ini dengan memasang apl Family Link pada peran
 <translation id="263796568413910992">Tanya <ph name="SEARCH_ENGINE_NAME" /> atau taip URL</translation>
 <translation id="2640299212685523844">Gunakan GTK</translation>
 <translation id="264083724974021997">Sambungkan kepada telefon anda - Dialog</translation>
+<translation id="2641174089709899456">Peringatan: Penyemakan imbas dikuasakan AI dalam poket anda</translation>
 <translation id="2642111877055905627">Bola sepak</translation>
 <translation id="2642206811783203764">Sentiasa hidup bagi <ph name="SITE_NAME" /></translation>
 <translation id="2643064289437760082">Anda sentiasa boleh memadamkan data pengukuran iklan dengan memadamkan data semakan imbas anda</translation>
@@ -2720,6 +2722,7 @@ Anda boleh mengurus tetapan akaun ini dengan memasang apl Family Link pada peran
 <translation id="3000461861112256445">Audio mono</translation>
 <translation id="3001144475369593262">Akaun kanak-kanak</translation>
 <translation id="3001614333383288217">{COUNT,plural, =0{Tiada kekunci disesuaikan}=1{1 kekunci disesuaikan}other{{COUNT} kekunci disesuaikan}}</translation>
+<translation id="3002745665522516995">Pilih apa-apa sahaja pada halaman untuk membuat carian</translation>
 <translation id="3002864108328203174">Helaian Bawah Gemini pada ketinggian separuh.</translation>
 <translation id="3003144360685731741">Rangkaian pilihan</translation>
 <translation id="3003253259757197230">URL yang anda lawati dihantar kepada Google untuk meramal laman yang mungkin anda lawati seterusnya dan untuk menunjukkan maklumat tambahan tentang halaman yang anda lawati</translation>
@@ -5644,6 +5647,7 @@ Gunakan Ctrl + Alt + Kurangkan kecerahan untuk zum keluar.</translation>
 <translation id="5173668317844998239">Tambah dan padam cap jari yang disimpan pada kunci keselamatan anda</translation>
 <translation id="5174169235862638850">Kata laluan disalin ke papan keratan</translation>
 <translation id="517488401359338823">Buka Kunci Peranti Keselamatan</translation>
+<translation id="5176671554021050278">Gunakan Google Lens untuk mengetahui perihal imej atau teks tertentu pada halaman dengan lebih lanjut.</translation>
 <translation id="5177479852722101802">Teruskan menyekat akses kamera dan mikrofon</translation>
 <translation id="5178667623289523808">Cari Sebelumnya</translation>
 <translation id="5180276433875360121">Paparkan <ph name="CERT_LIST" /></translation>
@@ -6460,6 +6464,7 @@ Anda boleh menetapkan berbilang suis kepada tindakan ini.</translation>
 <translation id="581911254119283028">semua aplikasi</translation>
 <translation id="5820751560028604030">Muat turun setempat disekat</translation>
 <translation id="5821565227679781414">Cipta Pintasan</translation>
+<translation id="5822533500175132614">Peringatan: Penyemakan imbas yang lancar dalam poket anda</translation>
 <translation id="5824976764713185207">Baca halaman secara automatik selepas selesai dimuatkan</translation>
 <translation id="5826395379250998812">Sambungkan <ph name="DEVICE_TYPE" /> anda dengan telefon anda. <ph name="LINK_BEGIN" />Ketahui lebih lanjut<ph name="LINK_END" /></translation>
 <translation id="5826993284769733527">Separa lut sinar</translation>
@@ -10003,6 +10008,7 @@ perubahan ini berlaku, anda mungkin tidak mahukannya.</translation>
 <translation id="8458627787104127436">Buka semua (<ph name="URL_COUNT" />) dalam tetingkap baharu</translation>
 <translation id="8459023460357294721">Buka <ph name="FILE_NAME" /> juga</translation>
 <translation id="8459333762072051247">Keadaan Log Masuk</translation>
+<translation id="8459596896605939741">Peringatan: Beli-belah dalam talian terbaik dalam poket anda</translation>
 <translation id="8460448946170646641">Semak privasi dan kawalan keselamatan utama</translation>
 <translation id="8460490661223303637">Untuk menjimatkan memori, Chrome mengalih keluar sesetengah kandungan</translation>
 <translation id="8460932807646981183">Urus enjin carian dan carian laman</translation>
