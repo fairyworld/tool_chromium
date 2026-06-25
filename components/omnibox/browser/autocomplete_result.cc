@@ -477,6 +477,10 @@ void AutocompleteResult::SortAndCull(
     if (is_android_any && omnibox::IsAndroidHub(page_classification)) {
       sections.push_back(
           std::make_unique<AndroidHubZPSSection>(suggestion_groups_map_));
+    } else if (is_android_any &&
+               omnibox::IsAndroidWidget(page_classification)) {
+      sections.push_back(
+          std::make_unique<AndroidWebZpsSection>(suggestion_groups_map_));
     } else if constexpr (is_android_mobile) {
       if (omnibox::IsNTPPage(page_classification)) {
         sections.push_back(std::make_unique<AndroidNTPZpsSection>(
@@ -719,6 +723,10 @@ void AutocompleteResult::SortAndCull(
     } else if (is_android_any && omnibox::IsComposebox(page_classification)) {
       sections.push_back(std::make_unique<AndroidComposeboxNonZPSSection>(
           suggestion_groups_map_));
+    } else if (is_android_any &&
+               omnibox::IsAndroidWidget(page_classification)) {
+      sections.push_back(std::make_unique<AndroidNonZPSSection>(
+          /* show_only_search_suggestions= */ false, suggestion_groups_map_));
     } else if (is_android_mobile) {
       bool show_only_search_suggestions =
           omnibox::IsCustomTab(page_classification);
