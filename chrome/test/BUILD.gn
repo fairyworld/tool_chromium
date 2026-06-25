@@ -3912,10 +3912,10 @@ if (!is_android) {
         "../browser/pdf/pdf_extension_download_test.cc",
         "../browser/pdf/pdf_extension_js_test.cc",
         "../browser/pdf/pdf_extension_test.cc",
-        "../browser/pdf/pdf_find_request_manager_browsertest.cc",
       ]
       deps += [
         "../browser/pdf",
+        "../browser/pdf:browser_tests",
         "../browser/pdf:pdf_extension_test_utils",
         "../browser/ui/pdf",
         "//build/config/coverage:buildflags",
@@ -3925,7 +3925,6 @@ if (!is_android) {
         "//extensions/browser/mime_handler",
         "//extensions/browser/mime_handler:stream_container",
         "//pdf:features",
-        "//pdf/loader",
       ]
 
       if (enable_printing) {
@@ -3952,15 +3951,6 @@ if (!is_android) {
 
       if (enable_pdf_save_to_drive) {
         deps += [ "//chrome/browser/save_to_drive:browser_tests" ]
-      }
-
-      if (enable_screen_ai_browsertests) {
-        sources += [ "../browser/pdf/pdf_searchify_browsertest.cc" ]
-
-        # Add a data dependency to notify testing builders that this test needs
-        # ScreenAI library, which will be downloaded from CIPD as defined in
-        # //DEPS.
-        data_deps += [ "//third_party/screen-ai:screen_ai" ]
       }
     }
 
@@ -8926,13 +8916,13 @@ test("unit_tests") {
   if (enable_pdf) {
     sources += [
       "../browser/extensions/api/pdf_viewer_private/pdf_viewer_private_api_unittest.cc",
-      "../browser/pdf/mime_handler_stream_manager_pdf_unittest.cc",
       "../common/pdf_util_unittest.cc",
     ]
     deps += [
       "//base",
       "//chrome/browser/extensions/api/pdf_viewer_private",
       "//chrome/browser/pdf",
+      "//chrome/browser/pdf:unit_tests",
       "//extensions/browser",
       "//net",
       "//pdf:content_restriction",
@@ -10639,12 +10629,7 @@ if (!is_android && !is_chromeos_device) {
       ]
 
       if (enable_pdf) {
-        sources += [ "../browser/pdf/pdf_extension_interactive_uitest.cc" ]
-        deps += [
-          "../browser/pdf:pdf_extension_test_utils",
-          "//components/pdf/browser",
-          "//pdf:features",
-        ]
+        deps += [ "//chrome/browser/pdf:interactive_ui_tests" ]
         if (enable_pdf_save_to_drive) {
           deps +=
               [ "//chrome/browser/ui/views/save_to_drive:interactive_ui_tests" ]
