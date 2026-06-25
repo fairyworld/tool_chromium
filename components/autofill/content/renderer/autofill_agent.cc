@@ -1474,6 +1474,18 @@ void AutofillAgent::ApplyFieldAction(
             DCHECK(value.empty());
             content_editable.SelectText(/*select_all=*/true);
             break;
+          case mojom::FieldActionType::kReplaceAtMemoryTrigger:
+            if (auto* frame = unsafe_render_frame()) {
+              WebRange selection = frame->GetWebFrame()
+                                       ->GetInputMethodController()
+                                       ->GetSelectionOffsets();
+              if (ShouldTriggerAtMemorySearchForContentEditable(
+                      frame->GetWebFrame(), selection)) {
+                frame->GetWebFrame()->SetEditableSelectionOffsets(
+                    selection.StartOffset() - 2, selection.StartOffset());
+              }
+            }
+            [[fallthrough]];
           case mojom::FieldActionType::kReplaceAll:
             [[fallthrough]];
           case mojom::FieldActionType::kReplaceSelection:
@@ -1481,18 +1493,6 @@ void AutofillAgent::ApplyFieldAction(
                 WebString::FromUtf16(value),
                 /*replace_all=*/
                 (action_type == mojom::FieldActionType::kReplaceAll));
-            break;
-          case mojom::FieldActionType::kReplaceAtMemoryTrigger:
-            WebLocalFrame* frame = unsafe_render_frame()->GetWebFrame();
-            WebRange selection =
-                frame->GetInputMethodController()->GetSelectionOffsets();
-            if (ShouldTriggerAtMemorySearchForContentEditable(frame,
-                                                              selection)) {
-              frame->SetEditableSelectionOffsets(selection.StartOffset() - 2,
-                                                 selection.StartOffset());
-            }
-            frame->ExecuteCommand(WebString::FromAscii("InsertText"),
-                                  WebString::FromUtf16(value));
             break;
         }
     }

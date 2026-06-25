@@ -1824,11 +1824,7 @@ TEST_F(AutofillAgentTestWithFeatures, RequestRefillTimesOut) {
 
 class AutofillAgentAtMemoryTest : public AutofillAgentTest {
  public:
-  AutofillAgentAtMemoryTest() {
-    scoped_feature_list_.InitAndEnableFeature(features::kAutofillAtMemory);
-  }
-
-  void SimulateTyping(const std::string& value) {
+  void SimulateTyping(std::string_view value) {
     for (char c : value) {
       SimulateUserTypingASCIICharacter(c, true);
       task_environment_.FastForwardBy(base::Milliseconds(200));
@@ -1837,7 +1833,8 @@ class AutofillAgentAtMemoryTest : public AutofillAgentTest {
   }
 
  private:
-  base::test::ScopedFeatureList scoped_feature_list_;
+  base::test::ScopedFeatureList scoped_feature_list_{
+      features::kAutofillAtMemory};
 };
 
 TEST_F(AutofillAgentAtMemoryTest, AtMemorySearchTrigger) {
@@ -2053,7 +2050,7 @@ class AutofillAgentMemoryContentEditableTriggerTest
     ExecuteJavaScriptForTests("document.getElementById('ce').focus();");
   }
 
-  void SimulateTyping(const std::string& text) {
+  void SimulateTyping(std::string_view text) {
     for (char c : text) {
       SimulateUserTypingASCIICharacter(c, /*flush_message_loop=*/true);
       task_environment_.FastForwardBy(base::Milliseconds(100));
@@ -2199,7 +2196,8 @@ TEST_F(AutofillAgentMemoryContentEditableTriggerTest,
   blink::WebElement ce = GetWebElementById("ce");
 
   // 1. Set initial text with the trigger and position cursor at the end.
-  SimulateComplexTyping("Prefix@@");
+  SimulateComplexTyping("Prefix @@");
+  EXPECT_EQ(ce.TextContent().Utf16(), u"Prefix @@");
 
   // 2. Trigger the fill action.
   autofill_agent().ApplyFieldAction(
@@ -2208,13 +2206,13 @@ TEST_F(AutofillAgentMemoryContentEditableTriggerTest,
       u"Suffix");
 
   // 3. Verify the trigger was replaced.
-  EXPECT_EQ(u"PrefixSuffix", ce.TextContent().Utf16());
+  EXPECT_EQ(ce.TextContent().Utf16(), u"Prefix Suffix");
 
-  // 4. Verify the cursor position (at the end of "PrefixSuffix").
+  // 4. Verify the cursor position (at the end of "Prefix Suffix").
   blink::WebRange selection =
       GetMainFrame()->GetInputMethodController()->GetSelectionOffsets();
-  EXPECT_EQ(12, selection.StartOffset());
-  EXPECT_EQ(12, selection.EndOffset());
+  EXPECT_EQ(selection.StartOffset(), 13);
+  EXPECT_EQ(selection.EndOffset(), 13);
 }
 
 // Tests that kReplaceAtMemoryTrigger inserts a value at the current cursor
@@ -2232,10 +2230,11 @@ TEST_F(AutofillAgentMemoryContentEditableTriggerTest,
   test_api(autofill_agent()).ContentEditableDidChange(ce);
 
   // Verify the cursor position before triggering the fill action.
-  EXPECT_EQ(6, GetMainFrame()
-                   ->GetInputMethodController()
-                   ->GetSelectionOffsets()
-                   .StartOffset());
+  EXPECT_EQ(GetMainFrame()
+                ->GetInputMethodController()
+                ->GetSelectionOffsets()
+                .StartOffset(),
+            6);
 
   // 3. Trigger the fill action.
   autofill_agent().ApplyFieldAction(
@@ -2243,14 +2242,15 @@ TEST_F(AutofillAgentMemoryContentEditableTriggerTest,
       mojom::ActionPersistence::kFill, form_util::GetFieldRendererId(ce),
       u"Result");
 
-  // 4. Verify the text was inserted.
-  EXPECT_EQ(u"PrefixResultSuffix", ce.TextContent().Utf16());
+  // 4. Verify the text was inserted. Since WebElement::PasteText() uses Smart
+  // Replace, it inserts spaces around "Result".
+  EXPECT_EQ(ce.TextContent().Utf16(), u"Prefix Result Suffix");
 
   // 5. Verify the cursor position (at the end of "Result").
-  // "Prefix" (6) + "Result" (6) = 12.
+  // "Prefix " (7) + "Result " (7) = 14.
   blink::WebRange selection =
       GetMainFrame()->GetInputMethodController()->GetSelectionOffsets();
-  EXPECT_EQ(12, selection.StartOffset());
+  EXPECT_EQ(selection.StartOffset(), 14);
 }
 
 // Tests that kReplaceAtMemoryTrigger replaces a pre-existing selection.
@@ -2279,14 +2279,16 @@ TEST_F(AutofillAgentMemoryContentEditableTriggerTest,
       mojom::ActionPersistence::kFill, form_util::GetFieldRendererId(ce),
       u"Result");
 
-  // 3. Verify "Selected" was replaced by "Result".
-  EXPECT_EQ(u"PrefixResultSuffix", ce.TextContent().Utf16());
+  // 3. Verify "Selected" was replaced by "Result". Since
+  // WebElement::PasteText() uses Smart Replace, it inserts spaces around
+  // "Result".
+  EXPECT_EQ(ce.TextContent().Utf16(), u"Prefix Result Suffix");
 
   // 4. Verify the cursor position (at the end of "Result").
-  // "Prefix" (6) + "Result" (6) = 12.
+  // "Prefix " (7) + "Result " (7) = 14.
   blink::WebRange selection =
       GetMainFrame()->GetInputMethodController()->GetSelectionOffsets();
-  EXPECT_EQ(12, selection.StartOffset());
+  EXPECT_EQ(selection.StartOffset(), 14);
 }
 
 class AutofillAgentAtMemoryInactivityNudgeTest : public AutofillAgentTest {
@@ -2358,7 +2360,7 @@ TEST_F(EmailVerificationObserverTest,
       .email_verification_observer()
       .WillSendSubmitEvent(form_element);
 
-  EXPECT_EQ(u"evt_token_123", verification_element.Value().Utf16());
+  EXPECT_EQ(verification_element.Value().Utf16(), u"evt_token_123");
 }
 
 // Tests that the verification token is NOT injected if the email field's
@@ -2396,7 +2398,7 @@ TEST_F(EmailVerificationObserverTest,
       .email_verification_observer()
       .WillSendSubmitEvent(form_element);
 
-  EXPECT_EQ(u"", verification_element.Value().Utf16());
+  EXPECT_EQ(verification_element.Value().Utf16(), u"");
 }
 
 // Tests that the verification token is NOT injected if the email field has
@@ -2434,7 +2436,7 @@ TEST_F(EmailVerificationObserverTest,
       .email_verification_observer()
       .WillSendSubmitEvent(form_element);
 
-  EXPECT_EQ(u"", verification_element.Value().Utf16());
+  EXPECT_EQ(verification_element.Value().Utf16(), u"");
 }
 
 // Malicious web pages can attempt to steal saved autofill data via a
