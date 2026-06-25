@@ -44,21 +44,11 @@ public class ChromeInstrumentationLeaks implements LeakCanaryConfigProvider {
     private static String sFieldTabBottomSheet =
             "org.chromium.chrome.browser.tab_bottom_sheet.TabBottomSheetNativeInterface#mTab";
 
-    // crbug.com/527131033
-    @IdentifierNameString
-    private static String sClassShoppingData =
-            "org.chromium.chrome.browser.tab.state.ShoppingPersistedTabData";
-
-    @IdentifierNameString
-    private static String sFieldShoppingData =
-            "org.chromium.chrome.browser.tab.state.ShoppingPersistedTabData#sShoppingDataRequests";
-
     @Override
     public Map<String, String> getStaticFieldLeaks() {
         return Map.of(
                 sClass462704925, sField462704925,
-                sClassPersistencePolicyCleanup, sFieldPersistencePolicyCleanup,
-                sClassShoppingData, sFieldShoppingData);
+                sClassPersistencePolicyCleanup, sFieldPersistencePolicyCleanup);
     }
 
     @Override

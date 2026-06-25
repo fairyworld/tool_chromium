@@ -53,6 +53,7 @@ import org.chromium.base.ThreadUtils;
 import org.chromium.base.test.util.CommandLineFlags;
 import org.chromium.base.test.util.CriteriaHelper;
 import org.chromium.base.test.util.DisableIf;
+import org.chromium.base.test.util.DisableLeakChecks;
 import org.chromium.base.test.util.DisabledTest;
 import org.chromium.base.test.util.DoNotBatch;
 import org.chromium.base.test.util.Feature;
@@ -104,6 +105,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RunWith(ChromeJUnit4ClassRunner.class)
 @CommandLineFlags.Add({ChromeSwitches.DISABLE_FIRST_RUN_EXPERIENCE})
 @EnableFeatures({ChromeFeatureList.DATA_SHARING})
+@DisableLeakChecks("crbug.com/527131033")
 @DoNotBatch(reason = "Tabs can't be closed reliably between tests.")
 // TODO(crbug.com/399444939) Re-enable on automotive devices if needed.
 // Only run on device non-auto and with valid Google services.
