@@ -9263,4 +9263,51 @@ TEST_F(RequestTest, StartTokenRequestViaFederatedRequestService) {
   run_loop.Run();
 }
 
+TEST_F(RequestTest, AbortViaFederatedRequest) {
+  mojo::Remote<blink::mojom::FederatedRequestService> federated_request_service;
+  RequestService* service =
+      RequestService::GetOrCreateForCurrentDocument(main_test_rfh());
+  service->BindFederatedRequestService(
+      federated_request_service.BindNewPipeAndPassReceiver());
+
+  ResetAndDeleteRequest();
+
+  auto idp_ptr = blink::mojom::IdentityProviderRequestOptions::New();
+  idp_ptr->config = blink::mojom::IdentityProviderConfig::New();
+  idp_ptr->config->config_url = GURL(kProviderUrlFull);
+  idp_ptr->config->client_id = kClientId;
+  idp_ptr->nonce = kNonce;
+
+  std::vector<blink::mojom::IdentityProviderRequestOptionsPtr> idp_ptrs;
+  idp_ptrs.push_back(std::move(idp_ptr));
+
+  auto get_params = blink::mojom::IdentityProviderGetParameters::New(
+      std::move(idp_ptrs), blink::mojom::RpContext::kSignIn,
+      blink::mojom::RpMode::kPassive);
+
+  std::vector<blink::mojom::IdentityProviderGetParametersPtr> idp_get_params;
+  idp_get_params.push_back(std::move(get_params));
+
+  mojo::Remote<blink::mojom::FederatedRequest> federated_request;
+
+  base::RunLoop run_loop;
+  federated_request_service->StartTokenRequest(
+      std::move(idp_get_params), MediationRequirement::kSilent,
+      federated_request.BindNewPipeAndPassReceiver(),
+      base::BindLambdaForTesting(
+          [&](base::expected<blink::mojom::TokenRequestSuccessPtr,
+                             blink::mojom::TokenRequestFailurePtr> result) {
+            // The request should fail because it was aborted explicitly.
+            ASSERT_FALSE(result.has_value());
+            ASSERT_TRUE(result.error());
+            EXPECT_EQ(result.error()->status,
+                      blink::mojom::RequestTokenStatus::kErrorCanceled);
+            run_loop.Quit();
+          }));
+
+  // Abort the request session explicitly via the FederatedRequest pipe!
+  federated_request->Abort();
+  run_loop.Run();
+}
+
 }  // namespace content::webid

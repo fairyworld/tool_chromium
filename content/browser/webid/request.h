@@ -145,6 +145,9 @@ class CONTENT_EXPORT Request
   void Disconnect(blink::mojom::IdentityCredentialDisconnectOptionsPtr options,
                   DisconnectCallback) override;
 
+  // blink::mojom::FederatedRequest:
+  void Abort() override;
+
   // FederatedIdentityPermissionContextDelegate::IdpSigninStatusObserver:
   void OnIdpSigninStatusReceived(const url::Origin& idp_config_origin,
                                  bool idp_signin_status) override;

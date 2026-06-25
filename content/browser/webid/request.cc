@@ -198,10 +198,19 @@ void Request::BindReceiver(
   receivers_.Add(this, std::move(pending_receiver));
 }
 
-void Request::OnConnectionError() {
-  // If the renderer disconnected the FederatedRequest pipe, it means
-  // the request was aborted (e.g. via AbortController).
+void Request::Abort() {
   CancelTokenRequest();
+}
+
+void Request::OnConnectionError() {
+  // If the renderer disconnected the FederatedRequest pipe without calling
+  // Abort(), it means the frame was detached, the tab was closed, or the
+  // renderer crashed. We complete the request with an error, which will
+  // correctly record a `kUnhandledRequest` fallback metric and trigger the
+  // service-level cleanup.
+  CompleteRequestWithError(FederatedAuthRequestResult::kError,
+                           TokenStatus::kUnhandledRequest,
+                           /*should_delay_callback=*/false);
 }
 
 void Request::ReportBadMessage(const char* message) {
