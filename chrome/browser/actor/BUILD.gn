@@ -424,6 +424,7 @@ source_set("browser_tests") {
     "ui:event_dispatcher",
     "//chrome/browser:chrome_content_browser_client",
     "//chrome/browser/affiliations",
+    "//chrome/browser/autofill/actor",
     "//chrome/browser/glic",
     "//chrome/browser/glic/actor:browser_tests",
     "//chrome/browser/glic/test_support",

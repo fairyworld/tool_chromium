@@ -113,6 +113,7 @@ void MockActorLoginService::AttemptLogin(
 
   last_credential_used_ = credential;
   last_permission_was_permanent_ = should_store_permission;
+  last_frame_filling_started_cb_ = std::move(frame_filling_started_cb);
 
   if (credential.type == actor_login::CredentialType::kFederated &&
       on_federated_login_delay_) {
@@ -191,6 +192,11 @@ bool MockActorLoginService::last_permission_was_permanent() const {
 bool MockActorLoginService::last_sequence_succeeded() const {
   EXPECT_TRUE(last_sequence_succeeded_.has_value());
   return last_sequence_succeeded_.value_or(false);
+}
+
+actor_login::FrameFillingStartedCallback
+MockActorLoginService::last_frame_filling_started_cb() {
+  return std::move(last_frame_filling_started_cb_);
 }
 
 void MockActorLoginService::OnActionSequenceEnded(bool success) {
