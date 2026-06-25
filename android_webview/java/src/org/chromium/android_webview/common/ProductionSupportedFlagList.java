@@ -1395,6 +1395,9 @@ public final class ProductionSupportedFlagList {
         Flag.baseFeature(
                 "PrefetchCancelUnrelatedPrefetch",
                 "Cancels unrelated prefetch when a navigation is started."),
+        Flag.baseFeature(
+                BlinkFeatures.ANDROID_SYSTEM_FONT_PREWARMING,
+                "Prewarms system fonts on Android to improve initial rendering latency."),
         // Add new commandline switches and features above. The final entry should have a
         // trailing comma for cleaner diffs.
     };
