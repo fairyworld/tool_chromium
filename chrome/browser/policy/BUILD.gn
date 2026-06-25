@@ -415,6 +415,7 @@ source_set("browser_tests") {
     "cloud/cloud_policy_manager_browsertest.cc",
     "cloud/device_management_service_browsertest.cc",
     "test/accessibility_policy_browsertest.cc",
+    "test/default_sensors_setting_policy_handler_browsertest.cc",
   ]
 
   data_deps = [ "//components/policy:policy_templates" ]
