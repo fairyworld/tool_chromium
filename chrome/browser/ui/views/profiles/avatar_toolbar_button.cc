@@ -155,7 +155,6 @@ void AvatarToolbarButton::UpdateIcon() {
   const ui::ColorProvider* const color_provider = GetColorProvider();
   CHECK(color_provider);
   StateProvider* state_provider = state_manager_.GetActiveStateProvider();
-  CHECK(state_provider);
   auto [icon, icon_type] = state_provider->GetAvatarIcon(
       icon_size, GetForegroundColor(ButtonState::STATE_NORMAL),
       *color_provider);
@@ -291,7 +290,6 @@ void AvatarToolbarButton::UpdateText() {
   }
 
   StateProvider* state_provider = state_manager_.GetActiveStateProvider();
-  CHECK(state_provider);
   const auto* const color_provider = GetColorProvider();
   CHECK(color_provider);
 
@@ -379,7 +377,6 @@ std::optional<SkColor> AvatarToolbarButton::GetHighlightTextColor() const {
   }
 
   StateProvider* state_provider = state_manager_.GetActiveStateProvider();
-  CHECK(state_provider);
   const auto* const color_provider = GetColorProvider();
   CHECK(color_provider);
 
@@ -412,7 +409,6 @@ std::optional<SkColor> AvatarToolbarButton::GetHighlightBorderColor() const {
 
 void AvatarToolbarButton::UpdateInkdrop() {
   StateProvider* state_provider = state_manager_.GetActiveStateProvider();
-  CHECK(state_provider);
   auto [hover_color_id, ripple_color_id] = state_provider->GetInkdropColors();
   ConfigureToolbarInkdropForRefresh2023(this, hover_color_id, ripple_color_id);
 }
@@ -422,7 +418,6 @@ bool AvatarToolbarButton::ShouldPaintBorder() const {
     return false;
   }
   StateProvider* state_provider = state_manager_.GetActiveStateProvider();
-  CHECK(state_provider);
   return state_provider->ShouldPaintBorder();
 }
 
@@ -584,7 +579,6 @@ void AvatarToolbarButton::RemoveObserver(Observer* observer) {
 
 void AvatarToolbarButton::ClearActiveStateForTesting() {
   StateProvider* state_provider = state_manager_.GetActiveStateProvider();
-  CHECK(state_provider);
   state_provider->ClearForTesting();  // IN-TEST
 }
 

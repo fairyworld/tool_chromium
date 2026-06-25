@@ -462,8 +462,7 @@ std::u16string AvatarToolbarButtonTestAccessor::GetText() {
             if (ShouldUseCppFallback(button)) {
               StateProvider* active_provider =
                   button->state_manager_->GetActiveStateProvider();
-              return active_provider ? active_provider->GetText()
-                                     : std::u16string();
+              return active_provider->GetText();
             }
             content::WebContents* contents = GetWebContents();
             if (!contents) {
@@ -556,8 +555,7 @@ std::string AvatarToolbarButtonTestAccessor::GetImageUrl() {
             if (ShouldUseCppFallback(button)) {
               StateProvider* active_provider =
                   button->state_manager_->GetActiveStateProvider();
-              return active_provider ? active_provider->GetAvatarIconUrl()
-                                     : std::string();
+              return active_provider->GetAvatarIconUrl();
             }
             content::WebContents* contents = GetWebContents();
             if (!contents) {
@@ -598,8 +596,7 @@ std::u16string AvatarToolbarButtonTestAccessor::GetRenderedTooltipText(
             if (ShouldUseCppFallback(button)) {
               StateProvider* active_provider =
                   button->state_manager_->GetActiveStateProvider();
-              return active_provider ? active_provider->GetAvatarTooltipText()
-                                     : std::u16string();
+              return active_provider->GetAvatarTooltipText();
             }
             content::WebContents* contents = GetWebContents();
             if (!contents) {
@@ -640,12 +637,9 @@ std::u16string AvatarToolbarButtonTestAccessor::GetAccessibilityLabel() {
             if (ShouldUseCppFallback(button)) {
               StateProvider* active_provider =
                   button->state_manager_->GetActiveStateProvider();
-              if (active_provider) {
-                auto labels = button->state_manager_->GetAccessibilityLabels(
-                    active_provider->GetText());
-                return labels.first;
-              }
-              return std::u16string();
+              auto labels = button->state_manager_->GetAccessibilityLabels(
+                  active_provider->GetText());
+              return labels.first;
             }
             content::WebContents* contents = GetWebContents();
             if (!contents) {
@@ -687,12 +681,9 @@ std::u16string AvatarToolbarButtonTestAccessor::GetAccessibilityDescription() {
             if (ShouldUseCppFallback(button)) {
               StateProvider* active_provider =
                   button->state_manager_->GetActiveStateProvider();
-              if (active_provider) {
-                auto labels = button->state_manager_->GetAccessibilityLabels(
-                    active_provider->GetText());
-                return labels.second;
-              }
-              return std::u16string();
+              auto labels = button->state_manager_->GetAccessibilityLabels(
+                  active_provider->GetText());
+              return labels.second;
             }
             content::WebContents* contents = GetWebContents();
             if (!contents) {

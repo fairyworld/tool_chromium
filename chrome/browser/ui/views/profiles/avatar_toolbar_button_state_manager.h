@@ -213,6 +213,8 @@ class AvatarToolbarButtonStateManager
 
   Browser* browser() const { return browser_; }
 
+  // Returns the active state provider. This is guaranteed to be non-null after
+  // initialization.
   StateProvider* GetActiveStateProvider() const;
   ::AvatarToolbarButtonState GetActiveState() const;
 

@@ -2147,8 +2147,8 @@ void AvatarToolbarButtonStateManager::InitializeStates() {
 }
 
 StateProvider* AvatarToolbarButtonStateManager::GetActiveStateProvider() const {
-  return current_active_state_pair_ ? current_active_state_pair_->second.get()
-                                    : nullptr;
+  CHECK(current_active_state_pair_);
+  return current_active_state_pair_->second.get();
 }
 
 ::AvatarToolbarButtonState AvatarToolbarButtonStateManager::GetActiveState()
@@ -2241,7 +2241,6 @@ void AvatarToolbarButtonStateManager::HandleButtonPressed(
   NotifyButtonPressed();
 
   StateProvider* active_state_provider = GetActiveStateProvider();
-  CHECK(active_state_provider);
   std::optional<base::RepeatingCallback<void(bool)>> action_override =
       active_state_provider->GetButtonActionOverride();
   if (action_override.has_value()) {
@@ -2260,9 +2259,6 @@ std::pair<std::u16string, std::u16string>
 AvatarToolbarButtonStateManager::GetAccessibilityLabels(
     std::u16string_view button_text) const {
   StateProvider* state_provider = GetActiveStateProvider();
-  if (!state_provider) {
-    return {std::u16string(), std::u16string()};
-  }
   std::optional<std::u16string> accessibility_label =
       state_provider->GetAccessibilityLabel();
 
@@ -2447,6 +2443,10 @@ void AvatarToolbarButtonStateManager::CreateStatesAndListeners(
 
 void AvatarToolbarButtonStateManager::OnStateProviderUpdateRequest(
     StateProvider* requesting_state) {
+  if (is_initializing_) {
+    return;
+  }
+
   if (!requesting_state->IsActive()) {
     // Updates goes through if the requesting state was the current button
     // active state, since we are now clearing it, otherwise we just ignore
