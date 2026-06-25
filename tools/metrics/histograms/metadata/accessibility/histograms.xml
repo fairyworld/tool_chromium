@@ -479,6 +479,23 @@ chromium-metrics-reviews@google.com.
   </summary>
 </histogram>
 
+<histogram name="Accessibility.Android.Performance.FakeCache.NodeLifetime"
+    units="ms" expires_after="2026-09-02">
+  <owner>gmarcoesau@google.com</owner>
+  <owner>chrome-a11y-core@google.com</owner>
+  <summary>
+    Tracks how long (in milliseconds) a node lived in the fake Android cache.
+    Recorded when a node is removed or cleared from the fake cache.
+  </summary>
+</histogram>
+
+<histogram name="Accessibility.Android.Performance.FakeCache.Size"
+    units="nodes" expires_after="2026-09-02">
+  <owner>gmarcoesau@google.com</owner>
+  <owner>chrome-a11y-core@google.com</owner>
+  <summary>Tracks the size of the fake Android cache.</summary>
+</histogram>
+
 <histogram name="Accessibility.Android.Performance.FakeCache.{Metric}"
     units="%" expires_after="2027-04-09">
   <owner>gmarcoesau@google.com</owner>
@@ -496,16 +513,9 @@ chromium-metrics-reviews@google.com.
     <variant name="PercentageChurn"
         summary="Measures the percentage of the fake cache that was removed
                  compared to the last cache size."/>
-    <variant name="PercentageEfficiency"
-        summary="Measure how much we're deleting from the fake cache."/>
-    <variant name="PercentageOccupancy"
-        summary="Measures how much of the tree is being covered by the cache."/>
     <variant name="PercentageStaleNodes"
         summary="Measure how many nodes have become stale compared to the
                  cache size."/>
-    <variant name="PercentageThrashing"
-        summary="Measures how much was instantly removed after just being
-                 added to the fake cache."/>
   </token>
 </histogram>
 

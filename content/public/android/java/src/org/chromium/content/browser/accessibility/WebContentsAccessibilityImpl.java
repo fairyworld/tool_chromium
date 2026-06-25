@@ -696,13 +696,6 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
         return WebContentsAccessibilityImplJni.get().getRootId(mNativeObj);
     }
 
-    // TODO(crbug.com/485227837): Remove experiment's methods
-    public long getAccessibilityTreeSizeForExperiment() {
-        if (!isRootManagerConnected()) return 0;
-        return WebContentsAccessibilityImplJni.get()
-                .getAccessibilityTreeSizeForExperiment(mNativeObj);
-    }
-
     public int getMaxContentChangedEventsToFireForTesting() {
         return WebContentsAccessibilityImplJni.get()
                 .getMaxContentChangedEventsToFireForTesting(mNativeObj);
@@ -762,7 +755,9 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
     }
 
     public void forceRecordFakeCacheHistogramsForTesting() {
-        mHistogramRecorder.recordFakeCacheHistograms();
+        if (mFakeAndroidCache != null) {
+            mFakeAndroidCache.validateAccessibilityForExperiment();
+        }
     }
 
     public boolean hasFinishedLatestAccessibilitySnapshotForTesting() {
@@ -2074,9 +2069,6 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
         // Some properties like text formatting spans are populated depending on accessibility
         // focus, so we clear the cache to have them repopulated.
         clearNodeInfoCacheForGivenId(newAccessibilityFocusId);
-        if (mFakeAndroidCache != null) {
-            mFakeAndroidCache.clearNode(newAccessibilityFocusId, /* recursive= */ false);
-        }
 
         mAccessibilityFocusId = newAccessibilityFocusId;
         mSelectionGranularity = NO_GRANULARITY_SELECTED;
@@ -2865,8 +2857,6 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
                 long nativeWebContentsAccessibilityAndroid);
 
         int getRootId(long nativeWebContentsAccessibilityAndroid);
-
-        long getAccessibilityTreeSizeForExperiment(long nativeWebContentsAccessibilityAndroid);
 
         boolean isNodeValid(long nativeWebContentsAccessibilityAndroid, int id);
 
