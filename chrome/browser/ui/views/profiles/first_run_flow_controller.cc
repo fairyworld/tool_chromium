@@ -10,10 +10,12 @@
 
 #include "base/check_deref.h"
 #include "base/check_is_test.h"
+#include "base/check_op.h"
 #include "base/command_line.h"
 #include "base/containers/flat_map.h"
 #include "base/functional/bind.h"
 #include "base/functional/callback.h"
+#include "base/functional/callback_forward.h"
 #include "base/functional/callback_helpers.h"
 #include "base/memory/weak_ptr.h"
 #include "base/metrics/histogram_functions.h"
@@ -610,12 +612,18 @@ class FirstRunPostSignInAdapter : public ProfilePickerPostSignInAdapter {
 
 class FeatureShowcaseStepController : public ProfileManagementStepController {
  public:
-  FeatureShowcaseStepController(ProfilePickerWebContentsHost* host,
-                                Profile* profile,
-                                base::OnceClosure step_completed_callback)
+  FeatureShowcaseStepController(
+      ProfilePickerWebContentsHost* host,
+      Profile* profile,
+      base::OnceClosure step_completed_callback,
+      base::RepeatingClosure play_progress_sound_callback,
+      base::RepeatingCallback<void(bool)> toggle_ambient_sound_callback)
       : ProfileManagementStepController(host),
         profile_(profile),
-        step_completed_callback_(std::move(step_completed_callback)) {
+        step_completed_callback_(std::move(step_completed_callback)),
+        play_progress_sound_callback_(std::move(play_progress_sound_callback)),
+        toggle_ambient_sound_callback_(
+            std::move(toggle_ambient_sound_callback)) {
     CHECK(step_completed_callback_);
     std::vector<std::unique_ptr<FeatureShowcaseStepEligibilityChecker>>
         checkers;
@@ -748,10 +756,12 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
     showcase_ui->SetNextStepShownCallback(
         base::BindRepeating(&FeatureShowcaseStepController::OnNextStepShown,
                             weak_ptr_factory_.GetWeakPtr()));
+    toggle_ambient_sound_callback_.Run(true);
   }
 
   void OnHidden() override {
     host()->SetNativeToolbarStartBrowsingButtonVisible(false);
+    toggle_ambient_sound_callback_.Run(false);
   }
 
   void OnStepCompleted() {
@@ -766,6 +776,7 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
     } else {
       CHECK_LT(*last_active_step_index_, eligible_steps_.size() - 1);
       ++(*last_active_step_index_);
+      play_progress_sound_callback_.Run();
     }
 
     base::UmaHistogramEnumeration(
@@ -779,6 +790,9 @@ class FeatureShowcaseStepController : public ProfileManagementStepController {
   std::unique_ptr<FeatureShowcaseEligibilityTracker> tracker_;
   std::vector<std::string> eligible_steps_;
   std::optional<size_t> last_active_step_index_;
+
+  base::RepeatingClosure play_progress_sound_callback_;
+  base::RepeatingCallback<void(bool)> toggle_ambient_sound_callback_;
 
   base::WeakPtrFactory<FeatureShowcaseStepController> weak_ptr_factory_{this};
 };
@@ -804,9 +818,13 @@ std::unique_ptr<ProfileManagementStepController> CreateDefaultBrowserStep(
 std::unique_ptr<ProfileManagementStepController> CreateFeatureShowcaseStep(
     ProfilePickerWebContentsHost* host,
     Profile* profile,
-    base::OnceClosure step_completed_callback) {
+    base::OnceClosure step_completed_callback,
+    base::RepeatingClosure play_progress_sound_callback,
+    base::RepeatingCallback<void(bool)> toggle_ambient_sound_callback) {
   return std::make_unique<FeatureShowcaseStepController>(
-      host, profile, std::move(step_completed_callback));
+      host, profile, std::move(step_completed_callback),
+      std::move(play_progress_sound_callback),
+      std::move(toggle_ambient_sound_callback));
 }
 
 std::unique_ptr<ProfileManagementStepController> CreateFinishOrContinueStep(
@@ -929,6 +947,13 @@ void FirstRunFlowController::Init() {
       sounds_manager_->Initialize(kWelcomeBackSoundKey,
                                   IDR_INTRO_SOUND_WELCOME_BACK_FLAC,
                                   media::AudioCodec::kFLAC, /*loop=*/false);
+      sounds_manager_->Initialize(kFeatureShowcaseAmbientSoundKey,
+                                  IDR_INTRO_SOUND_FEATURE_SHOWCASE_AMBIENT_FLAC,
+                                  media::AudioCodec::kFLAC, /*loop=*/true);
+      sounds_manager_->Initialize(
+          kFeatureShowcaseProgressSoundKey,
+          IDR_INTRO_SOUND_FEATURE_SHOWCASE_PROGRESS_FLAC,
+          media::AudioCodec::kFLAC, /*loop=*/false);
       if (AreEffectsEnabled()) {
         sounds_manager_->Play(kLogoSoundKey);
         sounds_manager_->Play(kAmbientSoundKey);
@@ -1036,6 +1061,32 @@ std::string FirstRunFlowController::GetHatsSurveyTrigger() const {
   return kHatsSurveyTriggerIdentityFirstRunCompleted;
 }
 
+void FirstRunFlowController::UpdateAmbientSound(
+    audio::SoundsManager::SoundKey ambient_sound_key) {
+  if (!sounds_manager_) {
+    return;
+  }
+  if (ambient_sound_key_ == ambient_sound_key) {
+    return;
+  }
+  sounds_manager_->Stop(ambient_sound_key_);
+  ambient_sound_key_ = ambient_sound_key;
+  if (AreEffectsEnabled()) {
+    sounds_manager_->Play(ambient_sound_key_);
+  }
+}
+
+void FirstRunFlowController::ToggleFeatureShowcaseAmbientSound(bool active) {
+  UpdateAmbientSound(active ? kFeatureShowcaseAmbientSoundKey
+                            : kAmbientSoundKey);
+}
+
+void FirstRunFlowController::PlayFeatureShowcaseProgressSound() {
+  if (sounds_manager_ && AreEffectsEnabled()) {
+    sounds_manager_->Play(kFeatureShowcaseProgressSoundKey);
+  }
+}
+
 void FirstRunFlowController::ToggleMediaEffects(bool active) {
   if (ProfileManagementStepController* current_step_controller =
           GetCurrentStepController()) {
@@ -1045,9 +1096,9 @@ void FirstRunFlowController::ToggleMediaEffects(bool active) {
     if (active) {
       // Resume only the ambient sound, other (on action) sounds are played
       // once, and resuming them may be confusing for the user.
-      sounds_manager_->Play(kAmbientSoundKey);
+      sounds_manager_->Play(ambient_sound_key_);
     } else {
-      sounds_manager_->Pause(kAmbientSoundKey);
+      sounds_manager_->Pause(ambient_sound_key_);
       // Stop one-shot sounds, safe to call even if not playing.
       sounds_manager_->Stop(kLogoSoundKey);
       sounds_manager_->Stop(kWelcomeBackSoundKey);
@@ -1149,7 +1200,17 @@ FirstRunFlowController::RegisterPostIdentitySteps(
                        base::Unretained(this));
     auto feature_showcase_step =
         std::make_unique<FeatureShowcaseStepController>(
-            host(), profile_, std::move(feature_showcase_step_completed));
+            host(), profile_, std::move(feature_showcase_step_completed),
+            base::BindRepeating(
+                &FirstRunFlowController::PlayFeatureShowcaseProgressSound,
+                // `Unretained` is ok because `this` owns the step and
+                // will outlive it.
+                base::Unretained(this)),
+            base::BindRepeating(
+                &FirstRunFlowController::ToggleFeatureShowcaseAmbientSound,
+                // `Unretained` is ok because `this` owns the step and
+                // will outlive it.
+                base::Unretained(this)));
     feature_showcase_step_controller_ = feature_showcase_step->GetWeakPtr();
     RegisterStep(Step::kFeatureShowcase, std::move(feature_showcase_step));
     post_identity_steps.emplace(

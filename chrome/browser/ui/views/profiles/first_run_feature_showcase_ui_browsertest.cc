@@ -109,9 +109,7 @@ class FirstRunFeatureShowcasePixelTest
         base::BindRepeating(
             [](Profile* profile, ProfilePickerWebContentsHost* host)
                 -> std::unique_ptr<ProfileManagementStepController> {
-              return CreateFeatureShowcaseStep(
-                  host, profile,
-                  /*step_completed_callback=*/base::DoNothing());
+              return CreateFeatureShowcaseStep(host, profile);
             },
             browser()->profile()));
 

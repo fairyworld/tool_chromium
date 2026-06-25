@@ -2360,9 +2360,16 @@ class FirstRunRevampInteractiveUiTest : public FirstRunInteractiveUiBaseTest {
         base::JoinString(GetForcedFeatureShowcaseSteps(), ","));
   }
 
+  const DeepQuery& GetFeatureShowcaseDefaultBrowserSkipButtonQuery() const {
+    static const base::NoDestructor<DeepQuery> kQuery(
+        {"feature-showcase-app", "feature-showcase-default-browser-step",
+         "#skip-button"});
+    return *kQuery;
+  }
+
   // FirstRunInteractiveUiBaseTest:
   std::vector<std::string> GetForcedFeatureShowcaseSteps() const override {
-    return {"default-browser"};
+    return {"default-browser", "google-lens"};
   }
 };
 
@@ -2383,12 +2390,12 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest, InitSoundsOnFlowStart) {
                     return std::move(mock_sounds_manager);
                   }));
 
-  // Verify that the ambient, logo and welcome back sounds are initialized at
-  // the start.
-  EXPECT_CALL(
-      *mock_sounds_manager_ptr,
-      Initialize(FirstRunFlowController::kAmbientSoundKey,
-                 IDR_INTRO_SOUND_AMBIENT_FLAC, media::AudioCodec::kFLAC, true))
+  // Verify that the ambient, logo, welcome back and feature showcase sounds are
+  // initialized at the start.
+  EXPECT_CALL(*mock_sounds_manager_ptr,
+              Initialize(FirstRunFlowController::kAmbientSoundKey,
+                         IDR_INTRO_SOUND_AMBIENT_FLAC, media::AudioCodec::kFLAC,
+                         /*loop=*/true))
       .WillOnce(Return(true));
   EXPECT_CALL(*mock_sounds_manager_ptr,
               Initialize(FirstRunFlowController::kLogoSoundKey,
@@ -2400,6 +2407,19 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest, InitSoundsOnFlowStart) {
                          IDR_INTRO_SOUND_WELCOME_BACK_FLAC,
                          media::AudioCodec::kFLAC, /*loop=*/false))
       .WillOnce(Return(true));
+  EXPECT_CALL(
+      *mock_sounds_manager_ptr,
+      Initialize(FirstRunFlowController::kFeatureShowcaseAmbientSoundKey,
+                 IDR_INTRO_SOUND_FEATURE_SHOWCASE_AMBIENT_FLAC,
+                 media::AudioCodec::kFLAC, /*loop=*/true))
+      .WillOnce(Return(true));
+  EXPECT_CALL(
+      *mock_sounds_manager_ptr,
+      Initialize(FirstRunFlowController::kFeatureShowcaseProgressSoundKey,
+                 IDR_INTRO_SOUND_FEATURE_SHOWCASE_PROGRESS_FLAC,
+                 media::AudioCodec::kFLAC,
+                 /*loop=*/false));
+
   EXPECT_CALL(*mock_sounds_manager_ptr,
               Play(FirstRunFlowController::kAmbientSoundKey))
       .WillOnce(Return(true));
@@ -2429,7 +2449,7 @@ IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
                   }));
 
   EXPECT_CALL(*mock_sounds_manager_ptr, Initialize)
-      .Times(3)
+      .Times(5)
       .WillRepeatedly(Return(true));
   EXPECT_CALL(*mock_sounds_manager_ptr, Play)
       .Times(2)
@@ -2528,7 +2548,7 @@ IN_PROC_BROWSER_TEST_P(FirstRunRevampPostSignInInteractiveUiTest,
                   }));
 
   EXPECT_CALL(*mock_sounds_manager_ptr, Initialize)
-      .Times(3)
+      .Times(5)
       .WillRepeatedly(Return(true));
   EXPECT_CALL(*mock_sounds_manager_ptr, Play)
       .Times(2)
@@ -2581,7 +2601,7 @@ IN_PROC_BROWSER_TEST_P(FirstRunRevampPostSignInInteractiveUiTest,
                   }));
 
   EXPECT_CALL(*mock_sounds_manager_ptr, Initialize)
-      .Times(3)
+      .Times(5)
       .WillRepeatedly(Return(true));
   EXPECT_CALL(*mock_sounds_manager_ptr, Play)
       .Times(2)
@@ -2628,6 +2648,100 @@ INSTANTIATE_TEST_SUITE_P(,
                          [](const TestParamInfo<bool>& info) {
                            return info.param ? "Managed" : "Unmanaged";
                          });
+
+IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest, FeatureShowcaseSound) {
+  ASSERT_TRUE(fre_service()->ShouldOpenFirstRun());
+
+  auto mock_sounds_manager = std::make_unique<StrictMock<MockSoundsManager>>();
+  MockSoundsManager* mock_sounds_manager_ptr = mock_sounds_manager.get();
+
+  base::AutoReset<FirstRunFlowController::SoundsManagerFactory>
+      sounds_factory_reset =
+          FirstRunFlowController::SetSoundsManagerFactoryForTesting(
+              base::BindLambdaForTesting(
+                  [&mock_sounds_manager](
+                      audio::SoundsManager::StreamFactoryBinder)
+                      -> std::unique_ptr<audio::SoundsManager> {
+                    return std::move(mock_sounds_manager);
+                  }));
+
+  EXPECT_CALL(*mock_sounds_manager_ptr, Initialize)
+      .Times(5)
+      .WillRepeatedly(Return(true));
+  EXPECT_CALL(*mock_sounds_manager_ptr,
+              Play(FirstRunFlowController::kAmbientSoundKey))
+      .WillOnce(Return(true));
+  EXPECT_CALL(*mock_sounds_manager_ptr,
+              Play(FirstRunFlowController::kLogoSoundKey))
+      .WillOnce(Return(true));
+
+  base::test::TestFuture<bool> proceed_future;
+  OpenFirstRun(proceed_future.GetCallback());
+
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
+      WaitForShow(kProfilePickerViewId),
+      InstrumentNonTabWebView(kWebContentsId, web_view()));
+
+  Mock::VerifyAndClearExpectations(mock_sounds_manager_ptr);
+
+  // When entering the feature showcase, we expect ambient sound to stop and
+  // feature showcase ambient sound to play. We do NOT expect the progress sound
+  // to play on the first step of the feature showcase (enforced by
+  // `StrictMock`).
+  EXPECT_CALL(*mock_sounds_manager_ptr,
+              Stop(FirstRunFlowController::kAmbientSoundKey))
+      .WillOnce(Return(true));
+  EXPECT_CALL(*mock_sounds_manager_ptr,
+              Play(FirstRunFlowController::kFeatureShowcaseAmbientSoundKey))
+      .WillOnce(Return(true));
+
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
+      CompleteIntroStep(/*sign_in=*/false),
+      WaitForWebContentsNavigation(kWebContentsId, GetFeatureShowcaseUrl()));
+
+  Mock::VerifyAndClearExpectations(mock_sounds_manager_ptr);
+
+  // When transitioning to the next step inside the feature showcase, we expect
+  // the progress sound to play.
+  base::RunLoop progress_run_loop;
+  EXPECT_CALL(*mock_sounds_manager_ptr,
+              Play(FirstRunFlowController::kFeatureShowcaseProgressSoundKey))
+      .WillOnce([&progress_run_loop](audio::SoundsManager::SoundKey key) {
+        progress_run_loop.Quit();
+        return true;
+      });
+
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
+      WaitForButtonVisible(kWebContentsId,
+                           GetFeatureShowcaseDefaultBrowserSkipButtonQuery()),
+      EnsurePresent(kWebContentsId,
+                    GetFeatureShowcaseDefaultBrowserSkipButtonQuery()),
+      PressJsButton(kWebContentsId,
+                    GetFeatureShowcaseDefaultBrowserSkipButtonQuery()));
+
+  progress_run_loop.Run();
+  Mock::VerifyAndClearExpectations(mock_sounds_manager_ptr);
+
+  // When leaving the feature showcase, we expect feature showcase ambient sound
+  // to stop and ambient sound to play.
+  EXPECT_CALL(*mock_sounds_manager_ptr,
+              Stop(FirstRunFlowController::kFeatureShowcaseAmbientSoundKey))
+      .WillOnce(Return(true));
+  EXPECT_CALL(*mock_sounds_manager_ptr,
+              Play(FirstRunFlowController::kAmbientSoundKey))
+      .WillOnce(Return(true));
+
+  RunTestSequenceInContext(
+      views::ElementTrackerViews::GetContextForView(view()),
+      WaitForShow(kProfilePickerToolbarStartBrowsingButtonElementId),
+      PressButton(kProfilePickerToolbarStartBrowsingButtonElementId));
+
+  WaitForPickerClosed();
+  EXPECT_TRUE(proceed_future.Get());
+}
 
 IN_PROC_BROWSER_TEST_F(FirstRunRevampInteractiveUiTest,
                        StartBrowsingFromFeatureShowcase) {

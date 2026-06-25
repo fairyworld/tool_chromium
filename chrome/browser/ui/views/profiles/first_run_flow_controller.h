@@ -11,6 +11,7 @@
 #include "base/auto_reset.h"
 #include "base/functional/callback.h"
 #include "base/functional/callback_forward.h"
+#include "base/functional/callback_helpers.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "chrome/browser/shell_integration.h"
@@ -55,7 +56,10 @@ std::unique_ptr<ProfileManagementStepController> CreateDefaultBrowserStep(
 std::unique_ptr<ProfileManagementStepController> CreateFeatureShowcaseStep(
     ProfilePickerWebContentsHost* host,
     Profile* profile,
-    base::OnceClosure step_completed_callback);
+    base::OnceClosure step_completed_callback = base::DoNothing(),
+    base::RepeatingClosure play_progress_sound_callback = base::DoNothing(),
+    base::RepeatingCallback<void(bool)> toggle_ambient_sound_callback =
+        base::DoNothing());
 
 std::unique_ptr<ProfileManagementStepController> CreateFinishOrContinueStep(
     ProfilePickerWebContentsHost* host,
@@ -68,6 +72,10 @@ class FirstRunFlowController : public ProfileManagementFlowControllerImpl {
   static constexpr audio::SoundsManager::SoundKey kAmbientSoundKey = 0;
   static constexpr audio::SoundsManager::SoundKey kLogoSoundKey = 1;
   static constexpr audio::SoundsManager::SoundKey kWelcomeBackSoundKey = 2;
+  static constexpr audio::SoundsManager::SoundKey
+      kFeatureShowcaseAmbientSoundKey = 3;
+  static constexpr audio::SoundsManager::SoundKey
+      kFeatureShowcaseProgressSoundKey = 4;
 
   // Profile management flow controller that will run the FRE for `profile` in
   // `host`.
@@ -125,6 +133,12 @@ class FirstRunFlowController : public ProfileManagementFlowControllerImpl {
 
   void ToggleMediaEffects(bool active);
 
+  void UpdateAmbientSound(audio::SoundsManager::SoundKey ambient_sound_key);
+
+  void ToggleFeatureShowcaseAmbientSound(bool active);
+
+  void PlayFeatureShowcaseProgressSound();
+
   bool AreEffectsEnabled() const;
 
   void MaybeTriggerHatsSurvey();
@@ -136,6 +150,7 @@ class FirstRunFlowController : public ProfileManagementFlowControllerImpl {
   base::OnceClosure finish_flow_callback_;
 
   std::unique_ptr<audio::SoundsManager> sounds_manager_;
+  audio::SoundsManager::SoundKey ambient_sound_key_ = kAmbientSoundKey;
 
   base::WeakPtr<FeatureShowcaseStepController>
       feature_showcase_step_controller_;
