@@ -7152,7 +7152,6 @@ test("unit_tests") {
       "../browser/bookmarks//android/bookmark_bridge_unittest.cc",
       "../browser/enterprise/browser_management/platform_management_status_provider_android_unittest.cc",
       "../browser/enterprise/platform_auth/entra_provider_android_unittest.cc",
-      "../browser/enterprise/util/android_enterprise_info_unittest.cc",
       "../browser/feedback/android/family_info_feedback_source_unittest.cc",
       "../browser/media/android/cdm/media_drm_origin_id_manager_unittest.cc",
       "../browser/notifications/notification_channels_provider_android_unittest.cc",

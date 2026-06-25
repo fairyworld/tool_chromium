@@ -8,7 +8,7 @@
 #include "base/memory/raw_ptr.h"
 #include "base/test/task_environment.h"
 #include "base/test/test_future.h"
-#include "chrome/browser/enterprise/util/android_enterprise_info.h"
+#include "components/policy/core/common/management/android_enterprise_info.h"
 #include "components/policy/core/common/management/management_service.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
@@ -19,11 +19,11 @@ class AndroidManagementStatusProviderParameterizedTest
           std::tuple<bool, bool, EnterpriseManagementAuthority>> {
  protected:
   AndroidManagementStatusProviderParameterizedTest() {
-    instance_ = enterprise_util::AndroidEnterpriseInfo::GetInstance();
+    instance_ = policy::AndroidEnterpriseInfo::GetInstance();
     instance_->set_skip_jni_call_for_testing(true);
   }
 
-  raw_ptr<enterprise_util::AndroidEnterpriseInfo> instance_;
+  raw_ptr<policy::AndroidEnterpriseInfo> instance_;
   base::test::TaskEnvironment task_environment_;
 };
 

@@ -2,21 +2,21 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/enterprise/util/android_enterprise_info.h"
+#include "components/policy/core/common/management/android_enterprise_info.h"
 
 #include <jni.h>
 
 #include "base/android/jni_android.h"
 
 // Must come after all headers that specialize FromJniType() / ToJniType().
-#include "chrome/browser/enterprise/util/jni_headers/EnterpriseInfo_jni.h"
+#include "components/policy/android/jni_headers/EnterpriseInfo_jni.h"
 
 // Forward declaration
 static void JNI_EnterpriseInfo_UpdateNativeOwnedState(JNIEnv* env,
                                                       bool hasDeviceOwnerApp,
                                                       bool hasProfileOwnerApp);
 
-namespace enterprise_util {
+namespace policy {
 AndroidEnterpriseInfo::AndroidEnterpriseInfo() = default;
 AndroidEnterpriseInfo::~AndroidEnterpriseInfo() = default;
 
@@ -76,12 +76,12 @@ class AndroidEnterpriseInfoFriendHelper {
   }
 };
 
-}  // namespace enterprise_util
+}  // namespace policy
 
 static void JNI_EnterpriseInfo_UpdateNativeOwnedState(JNIEnv* env,
                                                       bool hasDeviceOwnerApp,
                                                       bool hasProfileOwnerApp) {
-  enterprise_util::AndroidEnterpriseInfoFriendHelper::ForwardToServiceCallbacks(
+  policy::AndroidEnterpriseInfoFriendHelper::ForwardToServiceCallbacks(
       hasDeviceOwnerApp, hasProfileOwnerApp);
 }
 

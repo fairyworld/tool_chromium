@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-package org.chromium.chrome.browser.enterprise.util;
+package org.chromium.components.policy;
 
 import static org.chromium.build.NullUtil.assumeNonNull;
 
@@ -29,8 +29,6 @@ import org.chromium.base.task.TaskTraits;
 import org.chromium.build.annotations.MonotonicNonNull;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
-import org.chromium.components.policy.PolicyFeatureMap;
-import org.chromium.components.policy.PolicySwitches;
 
 import java.util.ArrayDeque;
 import java.util.List;

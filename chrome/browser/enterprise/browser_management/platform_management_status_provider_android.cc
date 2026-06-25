@@ -8,7 +8,7 @@
 #include "base/functional/callback.h"
 #include "base/notreached.h"
 #include "build/build_config.h"
-#include "chrome/browser/enterprise/util/android_enterprise_info.h"
+#include "components/policy/core/common/management/android_enterprise_info.h"
 #include "components/policy/core/common/policy_pref_names.h"
 
 #if BUILDFLAG(IS_ANDROID)
@@ -28,7 +28,7 @@ void AndroidManagementStatusProvider::FetchAuthorityAsync(
     base::OnceCallback<void(std::pair<ManagementStatusProvider*,
                                       EnterpriseManagementAuthority>)>
         callback) {
-  enterprise_util::AndroidEnterpriseInfo::GetInstance()
+  policy::AndroidEnterpriseInfo::GetInstance()
       ->GetAndroidEnterpriseInfoState(
           base::BindOnce(&AndroidManagementStatusProvider::
                              OnAndroidOwnedStateCheckComplete,

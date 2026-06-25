@@ -4,26 +4,20 @@
 
 package org.chromium.chrome.browser.enterprise.util;
 
-import androidx.annotation.VisibleForTesting;
-
-import org.jni_zero.CalledByNative;
-import org.jni_zero.NativeMethods;
-
 import org.chromium.base.Callback;
-import org.chromium.base.Log;
-import org.chromium.base.ResettersForTesting;
-import org.chromium.base.ThreadUtils;
-import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
 
-/** Provide the enterprise information for the current device and profile. */
-@NullMarked
-public abstract class EnterpriseInfo {
-    private static final String TAG = "EnterpriseInfo";
-
+/**
+ * @deprecated Use {@link org.chromium.components.policy.EnterpriseInfo} instead.
+ */
+@Deprecated
+public class EnterpriseInfo {
     private static @Nullable EnterpriseInfo sInstance;
 
-    /** A simple tuple to hold onto named fields about the state of ownership. */
+    /**
+     * @deprecated Use {@link org.chromium.components.policy.EnterpriseInfo.OwnedState} instead.
+     */
+    @Deprecated
     public static class OwnedState {
         public final boolean mDeviceOwned;
         public final boolean mProfileOwned;
@@ -38,81 +32,85 @@ public abstract class EnterpriseInfo {
             if (this == other) return true;
             if (other == null) return false;
             if (!(other instanceof OwnedState)) return false;
-
             OwnedState otherOwnedState = (OwnedState) other;
-
             return this.mDeviceOwned == otherOwnedState.mDeviceOwned
                     && this.mProfileOwned == otherOwnedState.mProfileOwned;
         }
     }
 
     public static EnterpriseInfo getInstance() {
-        ThreadUtils.assertOnUiThread();
-
-        if (sInstance == null) sInstance = new EnterpriseInfoImpl();
-
+        if (sInstance == null) sInstance = new EnterpriseInfo();
         return sInstance;
     }
 
-    /**
-     * Returns, via callback, whether the device has a device owner or a profile owner. Guaranteed
-     * to not invoke the callback synchronously, instead will be posted to the UI thread, even in
-     * tests.
-     *
-     * @param callback to invoke with results.
-     */
-    public abstract void getDeviceEnterpriseInfo(Callback<OwnedState> callback);
+    public void getDeviceEnterpriseInfo(Callback<OwnedState> callback) {
+        org.chromium.components.policy.EnterpriseInfo.getInstance()
+                .getDeviceEnterpriseInfo(
+                        result -> {
+                            if (result == null) {
+                                callback.onResult(null);
+                            } else {
+                                callback.onResult(
+                                        new OwnedState(result.mDeviceOwned, result.mProfileOwned));
+                            }
+                        });
+    }
 
-    /**
-     * Returns whether the device has a device owner or a profile owner synchronously. Returns null
-     * if the OwnedState isn't yet available and kicks off a background request to fetch the state.
-     */
-    public abstract @Nullable OwnedState getDeviceEnterpriseInfoSync();
+    public @Nullable OwnedState getDeviceEnterpriseInfoSync() {
+        var result =
+                org.chromium.components.policy.EnterpriseInfo.getInstance()
+                        .getDeviceEnterpriseInfoSync();
+        if (result == null) return null;
+        return new OwnedState(result.mDeviceOwned, result.mProfileOwned);
+    }
 
-    /** Records metrics regarding whether the device has a device owner or a profile owner. */
-    public abstract void logDeviceEnterpriseInfo();
+    public void logDeviceEnterpriseInfo() {
+        org.chromium.components.policy.EnterpriseInfo.getInstance().logDeviceEnterpriseInfo();
+    }
 
-    /**
-     * Overrides the single static {@link EnterpriseInfo}. This instance is shared globally, an if
-     * native is initialized in a given test, there will likely be other keyed services crossing the
-     * JNI and calling the test instance. The test implementation must uphold the async callback
-     * behavior of {@link EnterpriseInfo#getDeviceEnterpriseInfo( Callback )}. Suggested that
-     * callers consider using {@link FakeEnterpriseInfo}.
-     */
     public static void setInstanceForTest(EnterpriseInfo instance) {
         var oldValue = sInstance;
         sInstance = instance;
-        ResettersForTesting.register(() -> sInstance = oldValue);
-    }
+        org.chromium.base.ResettersForTesting.register(() -> sInstance = oldValue);
 
-    @VisibleForTesting
-    static void reset() {
-        sInstance = null;
-    }
-
-    /**
-     * Returns, via callback, the owned state for native's AndroidEnterpriseInfo. Guaranteed to not
-     * invoke the callback synchronously, instead will be posted to the UI thread, even in tests.
-     */
-    @CalledByNative
-    public static void getManagedStateForNative() {
-        EnterpriseInfo.getInstance()
-                .getDeviceEnterpriseInfo(EnterpriseInfo::getManagedStateForNativeCallback);
-    }
-
-    private static void getManagedStateForNativeCallback(@Nullable OwnedState result) {
-        Log.i(TAG, "#getManagedStateForNative() " + result);
-        if (result == null) {
-            // Unable to determine the owned state, assume it's not owned.
-            EnterpriseInfoJni.get().updateNativeOwnedState(false, false);
+        if (instance == null) {
+            org.chromium.components.policy.EnterpriseInfo.setInstanceForTest(null); // IN-TEST
         } else {
-            EnterpriseInfoJni.get()
-                    .updateNativeOwnedState(result.mDeviceOwned, result.mProfileOwned);
-        }
-    }
+            // Forward mock calls to the underlying policy singleton to prevent split-brain mocking
+            org.chromium.components.policy.EnterpriseInfo.setInstanceForTest( // IN-TEST
+                    new org.chromium.components.policy.EnterpriseInfo() {
+                        @Override
+                        public void getDeviceEnterpriseInfo(
+                                Callback<org.chromium.components.policy.EnterpriseInfo.OwnedState>
+                                        callback) {
+                            instance.getDeviceEnterpriseInfo(
+                                    result -> {
+                                        if (result == null) {
+                                            callback.onResult(null);
+                                        } else {
+                                            callback.onResult(
+                                                    new org.chromium.components.policy
+                                                            .EnterpriseInfo.OwnedState(
+                                                            result.mDeviceOwned,
+                                                            result.mProfileOwned));
+                                        }
+                                    });
+                        }
 
-    @NativeMethods
-    interface Natives {
-        void updateNativeOwnedState(boolean hasDeviceOwnerApp, boolean hasProfileOwnerApp);
+                        @Override
+                        public org.chromium.components.policy.EnterpriseInfo.@Nullable OwnedState
+                                getDeviceEnterpriseInfoSync() {
+                            var result = instance.getDeviceEnterpriseInfoSync();
+                            if (result == null) return null;
+                            return new org.chromium.components.policy.EnterpriseInfo.OwnedState(
+                                    result.mDeviceOwned, result.mProfileOwned);
+                        }
+
+                        @Override
+                        public void logDeviceEnterpriseInfo() {
+                            instance.logDeviceEnterpriseInfo();
+                        }
+                    });
+        }
     }
 }

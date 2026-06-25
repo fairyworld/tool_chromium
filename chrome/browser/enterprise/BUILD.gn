@@ -148,7 +148,6 @@ source_set("enterprise") {
       "reporting/real_time_report_controller_android.h",
       "reporting/report_scheduler_android.h",
       "reporting/reporting_delegate_factory_android.h",
-      "util/android_enterprise_info.h",
     ]
   }
 
@@ -539,7 +538,6 @@ source_set("impl") {
       "reporting/real_time_report_controller_android.cc",
       "reporting/report_scheduler_android.cc",
       "reporting/reporting_delegate_factory_android.cc",
-      "util/android_enterprise_info.cc",
       "util/data_protection_bridge.cc",
     ]
     deps += [

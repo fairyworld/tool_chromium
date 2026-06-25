@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/browser/enterprise/util/android_enterprise_info.h"
+#include "components/policy/core/common/management/android_enterprise_info.h"
 
 #include <optional>
 
@@ -11,15 +11,17 @@
 #include "base/test/bind.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
+namespace policy {
+
 class AndroidEnterpriseInfoTest : public ::testing::Test {
  protected:
   AndroidEnterpriseInfoTest() {
-    instance_ = enterprise_util::AndroidEnterpriseInfo::GetInstance();
+    instance_ = AndroidEnterpriseInfo::GetInstance();
     // Java side isn't running, so we need to skip the call to it.
     instance_->set_skip_jni_call_for_testing(true);
   }
 
-  raw_ptr<enterprise_util::AndroidEnterpriseInfo> instance_;
+  raw_ptr<AndroidEnterpriseInfo> instance_;
 };
 
 class EnterpriseInfoCallbackHelper {
@@ -131,8 +133,7 @@ TEST_F(AndroidEnterpriseInfoTest, ReentrantCallback) {
 
   // Insert 4 callbacks into the instance, the 2nd callback will attempt to
   // insert another callback when it's serviced.
-  enterprise_util::AndroidEnterpriseInfo::EnterpriseInfoCallback
-      reentrant_callback =
+  AndroidEnterpriseInfo::EnterpriseInfoCallback reentrant_callback =
           base::BindLambdaForTesting([&](bool device_owned, bool profile_owned) -> void {
             // Do nothing with the arguments, just enter the function again.
             instance_->GetAndroidEnterpriseInfoState(
@@ -162,3 +163,5 @@ TEST_F(AndroidEnterpriseInfoTest, ReentrantCallback) {
   instance_->ServiceCallbacksForTesting(true, false);
   EXPECT_EQ(helper.num_times_called, 4);
 }
+
+}  // namespace policy

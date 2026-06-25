@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_BROWSER_ENTERPRISE_UTIL_ANDROID_ENTERPRISE_INFO_H_
-#define CHROME_BROWSER_ENTERPRISE_UTIL_ANDROID_ENTERPRISE_INFO_H_
+#ifndef COMPONENTS_POLICY_CORE_COMMON_MANAGEMENT_ANDROID_ENTERPRISE_INFO_H_
+#define COMPONENTS_POLICY_CORE_COMMON_MANAGEMENT_ANDROID_ENTERPRISE_INFO_H_
 
 #include <queue>
 
@@ -11,18 +11,19 @@
 #include "base/no_destructor.h"
 #include "base/sequence_checker.h"
 #include "build/build_config.h"
+#include "components/policy/policy_export.h"
 
 // Class to connect native calls to
-// org.chromium.chrome.browser.enterprise.util.EnterpriseInfo. This class is
+// org.chromium.components.policy.EnterpriseInfo. This class is
 // only usable for Android and is only built for Android.
 
 // Only use from the UI Thread.
 
-namespace enterprise_util {
+namespace policy {
 
 class AndroidEnterpriseInfoFriendHelper;
 
-class AndroidEnterpriseInfo {
+class POLICY_EXPORT AndroidEnterpriseInfo {
  public:
   // Callback invoked with (bool device_owned, bool profile_owned).
   using EnterpriseInfoCallback = base::OnceCallback<void(bool, bool)>;
@@ -31,7 +32,7 @@ class AndroidEnterpriseInfo {
   static AndroidEnterpriseInfo* GetInstance();
 
   // Request the owned state from
-  // org.chromium.chrome.browser.enterprise.util.EnterpriseInfo and notify
+  // org.chromium.components.policy.EnterpriseInfo and notify
   // |callback| when the request is complete. |callback| is added to a list of
   // callbacks and they are notified in the order they were received. Use from
   // the UI thread.
@@ -66,6 +67,6 @@ class AndroidEnterpriseInfo {
   SEQUENCE_CHECKER(sequence_checker_);
 };
 
-}  // namespace enterprise_util
+}  // namespace policy
 
-#endif  // CHROME_BROWSER_ENTERPRISE_UTIL_ANDROID_ENTERPRISE_INFO_H_
+#endif  // COMPONENTS_POLICY_CORE_COMMON_MANAGEMENT_ANDROID_ENTERPRISE_INFO_H_
