@@ -7,8 +7,8 @@
 #import "testing/gtest/include/gtest/gtest.h"
 #import "testing/platform_test.h"
 
-using autofill::FormRendererId;
 using autofill::FieldRendererId;
+using autofill::FormRendererId;
 
 namespace {
 NSString* const kTestFormName = @"login_form";

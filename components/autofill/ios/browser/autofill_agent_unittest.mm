@@ -109,12 +109,12 @@ FormSuggestion* SimpleFormSuggestion(std::u16string value,
 @end
 
 // Test fixture for AutofillAgent testing.
-class AutofillAgentTests : public web::WebTest {
+class AutofillAgentTest : public web::WebTest {
  public:
-  AutofillAgentTests() = default;
+  AutofillAgentTest() = default;
 
-  AutofillAgentTests(const AutofillAgentTests&) = delete;
-  AutofillAgentTests& operator=(const AutofillAgentTests&) = delete;
+  AutofillAgentTest(const AutofillAgentTest&) = delete;
+  AutofillAgentTest& operator=(const AutofillAgentTest&) = delete;
 
   // This *should* be true so that the tests mimic production code behavior, but
   // one legacy test crashes if we pass a non-nil AutofillAgent.
@@ -202,7 +202,7 @@ class AutofillAgentTests : public web::WebTest {
 
 // Tests that form's name and fields' identifiers, values, and whether they are
 // autofilled are sent to the JS.
-TEST_F(AutofillAgentTests,
+TEST_F(AutofillAgentTest,
        OnFormDataFilledTestWithFrameMessagingUsingRendererIDs) {
   std::vector<autofill::FormFieldData::FillData> fill_data;
   autofill::FormFieldData field;
@@ -259,7 +259,7 @@ TEST_F(AutofillAgentTests,
 
 // Tests that `fillSpecificFormField` in `autofill_agent_` dispatches the
 // correct javascript call to the autofill controller.
-TEST_F(AutofillAgentTests, FillSpecificFormField) {
+TEST_F(AutofillAgentTest, FillSpecificFormField) {
   autofill::FormFieldData field;
   field.set_form_control_type(autofill::FormControlType::kInputText);
   field.set_label(u"Card number");
@@ -283,8 +283,7 @@ TEST_F(AutofillAgentTests, FillSpecificFormField) {
 
 // Test that the updates are applied when filling specific form field is done
 // successfully.
-TEST_F(AutofillAgentTests,
-       FillSpecificFormField_UpdateWithResults_WhenSuccess) {
+TEST_F(AutofillAgentTest, FillSpecificFormField_UpdateWithResults_WhenSuccess) {
   std::vector<autofill::FormFieldData::FillData> fields =
       MinimalFormFieldDataForFilling();
   const std::u16string& field_value = fields[0].value;
@@ -319,8 +318,7 @@ TEST_F(AutofillAgentTests,
 
 // Test that the updates aren't applied when filling specific form field has
 // failed.
-TEST_F(AutofillAgentTests,
-       FillSpecificFormField_UpdateWithResults_WhenFailure) {
+TEST_F(AutofillAgentTest, FillSpecificFormField_UpdateWithResults_WhenFailure) {
   std::vector<autofill::FormFieldData::FillData> fields =
       MinimalFormFieldDataForFilling();
   const std::u16string& field_value = fields[0].value;
@@ -353,7 +351,7 @@ TEST_F(AutofillAgentTests,
 
 // Tests that `ApplyFieldAction` in `AutofillDriverIOS` dispatches the
 // correct javascript call to the autofill controller.
-TEST_F(AutofillAgentTests, DriverFillSpecificFormField) {
+TEST_F(AutofillAgentTest, DriverFillSpecificFormField) {
   autofill::FormFieldData field;
   field.set_form_control_type(autofill::FormControlType::kInputText);
   field.set_label(u"Card number");
@@ -390,7 +388,7 @@ TEST_F(AutofillAgentTests, DriverFillSpecificFormField) {
 
 // Tests that `ApplyFieldAction` with `ActionPersistence::kPreview`in
 // `AutofillDriverIOS` does not dispatch a JS call.
-TEST_F(AutofillAgentTests, DriverPreviewSpecificFormField) {
+TEST_F(AutofillAgentTest, DriverPreviewSpecificFormField) {
   autofill::FormFieldData field;
   field.set_form_control_type(autofill::FormControlType::kInputText);
   field.set_label(u"Card number");
@@ -426,7 +424,7 @@ TEST_F(AutofillAgentTests, DriverPreviewSpecificFormField) {
 // Tests that when a non user initiated form activity is registered the
 // completion callback passed to the call to check if suggestions are available
 // is invoked with no suggestions.
-TEST_F(AutofillAgentTests,
+TEST_F(AutofillAgentTest,
        CheckIfSuggestionsAvailable_NonUserInitiatedActivity) {
   __block BOOL completion_handler_success = NO;
   __block BOOL completion_handler_called = NO;
@@ -462,7 +460,7 @@ TEST_F(AutofillAgentTests,
 // wanted string values of (main_text, ' ', minor_text) where the main_text
 // is the 'Virtual card' string and the minor_text is the card name + last 4 or
 // the card holder's name
-TEST_F(AutofillAgentTests, showAutofillPopup_ShowVirtualCards) {
+TEST_F(AutofillAgentTest, showAutofillPopup_ShowVirtualCards) {
   __block NSUInteger suggestion_array_size = 0;
   __block FormSuggestion* virtual_card_suggestion = nil;
   __block FormSuggestion* credit_card_suggestion = nil;
@@ -561,7 +559,7 @@ TEST_F(AutofillAgentTests, showAutofillPopup_ShowVirtualCards) {
 
 // Tests that an empty network icon in a credit card suggestion will not cause
 // any problems. Regression test for crbug.com/1446933
-TEST_F(AutofillAgentTests, showAutofillPopup_EmptyIconInCreditCardSuggestion) {
+TEST_F(AutofillAgentTest, showAutofillPopup_EmptyIconInCreditCardSuggestion) {
   // Deliberately initialize this as non-nil, as we are expecting it to be set
   // to nil by the test.
   __block UIImage* completion_handler_icon = gfx::test::CreatePlatformImage();
@@ -592,7 +590,7 @@ TEST_F(AutofillAgentTests, showAutofillPopup_EmptyIconInCreditCardSuggestion) {
 
 // Tests that for credit cards, a custom icon is preferred over the default
 // icon.
-TEST_F(AutofillAgentTests,
+TEST_F(AutofillAgentTest,
        showAutofillPopup_PreferCustomIconForCreditCardSuggestions) {
   autofill::Suggestion::Icon suggestion_network_icon =
       autofill::Suggestion::Icon::kCardVisa;
@@ -646,7 +644,7 @@ TEST_F(AutofillAgentTests,
 // Tests that when Autofill suggestions are made available to AutofillAgent
 // "Clear Form" is moved to the start of the list and the order of other
 // suggestions remains unchanged.
-TEST_F(AutofillAgentTests, onSuggestionsReady_ClearForm) {
+TEST_F(AutofillAgentTest, onSuggestionsReady_ClearForm) {
   __block NSArray<FormSuggestion*>* completion_handler_suggestions = nil;
   __block BOOL completion_handler_called = NO;
 
@@ -705,7 +703,7 @@ TEST_F(AutofillAgentTests, onSuggestionsReady_ClearForm) {
 
 // Tests that when Autofill suggestions are made available to AutofillAgent
 // GPay icon remains as the first suggestion.
-TEST_F(AutofillAgentTests, onSuggestionsReady_ClearFormWithGPay) {
+TEST_F(AutofillAgentTest, onSuggestionsReady_ClearFormWithGPay) {
   __block NSArray<FormSuggestion*>* completion_handler_suggestions = nil;
   __block BOOL completion_handler_called = NO;
 
@@ -763,7 +761,7 @@ TEST_F(AutofillAgentTests, onSuggestionsReady_ClearFormWithGPay) {
 // Test that every frames are processed whatever is the order of pageloading
 // callbacks. The main frame should always be processed first.
 class AutofillAgentTestFrameInitializationOrderFrames
-    : public AutofillAgentTests {
+    : public AutofillAgentTest {
  public:
   // If we do pass `autofill_agent_` to `client_` (which would then pass it on
   // to the AutofillDriverIOS objects), then the test fixture crashes during
@@ -774,7 +772,7 @@ class AutofillAgentTestFrameInitializationOrderFrames
   bool should_set_autofill_driver_ios_bridge() const override { return false; }
 
   void SetUp() override {
-    AutofillAgentTests::SetUp();
+    AutofillAgentTest::SetUp();
     std::string frame_id = fake_main_frame_->GetFrameId();
     fake_main_frame_ = nullptr;
     RemoveWebFrame(frame_id);
@@ -899,7 +897,7 @@ TEST_F(AutofillAgentTestFrameInitializationOrderFrames,
   RemoveWebFrame(iframe->GetFrameId());
 }
 
-TEST_F(AutofillAgentTests, FillData_UpdateWithResults) {
+TEST_F(AutofillAgentTest, FillData_UpdateWithResults) {
   auto test_recorder = std::make_unique<ukm::TestAutoSetUkmRecorder>();
 
   std::vector<autofill::FormFieldData::FillData> fields =
@@ -950,7 +948,7 @@ TEST_F(AutofillAgentTests, FillData_UpdateWithResults) {
 
 // Tests that if there is an unknown field id in the results, the agent isn't
 // notified.
-TEST_F(AutofillAgentTests, FillData_UnknowFieldIdInResults) {
+TEST_F(AutofillAgentTest, FillData_UnknowFieldIdInResults) {
   std::vector<autofill::FormFieldData::FillData> fields =
       MinimalFormFieldDataForFilling();
   const FieldRendererId unknown_field_id = FieldRendererId(101);
@@ -980,7 +978,7 @@ TEST_F(AutofillAgentTests, FillData_UnknowFieldIdInResults) {
 }
 
 // Tests selecting an autocomplete suggestion.
-TEST_F(AutofillAgentTests, DidSelectSuggestion_AutocompleteEntry) {
+TEST_F(AutofillAgentTest, DidSelectSuggestion_AutocompleteEntry) {
   FormRendererId form_id(1);
   FieldRendererId field1_id(2);
   const std::u16string field1_value = u"test-value";
@@ -1071,7 +1069,7 @@ TEST_F(AutofillAgentTests, DidSelectSuggestion_AutocompleteEntry) {
   EXPECT_TRUE(completion_handler_called);
 }
 
-TEST_F(AutofillAgentTests, DidSelectSuggestion_ClearFormEntry) {
+TEST_F(AutofillAgentTest, DidSelectSuggestion_ClearFormEntry) {
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndDisableFeature(kAutofillUndoIos);
 
@@ -1132,7 +1130,7 @@ TEST_F(AutofillAgentTests, DidSelectSuggestion_ClearFormEntry) {
 }
 
 // Tests selecting the Undo autofill suggestion.
-TEST_F(AutofillAgentTests, DidSelectSuggestion_Undo) {
+TEST_F(AutofillAgentTest, DidSelectSuggestion_Undo) {
   base::test::ScopedFeatureList scoped_feature_list;
   scoped_feature_list.InitAndEnableFeature(kAutofillUndoIos);
 
