@@ -8,13 +8,14 @@ import type {ContextualTasksAppElement} from 'chrome://contextual-tasks/app.js';
 import {BrowserProxyImpl} from 'chrome://contextual-tasks/contextual_tasks_browser_proxy.js';
 import {PageCallbackRouter as ComposeboxPageCallbackRouter, PageHandlerRemote as ComposeboxPageHandlerRemote} from 'chrome://resources/cr_components/composebox/composebox.mojom-webui.js';
 import {ComposeboxProxyImpl} from 'chrome://resources/cr_components/composebox/composebox_proxy.js';
-import {ToolMode} from 'chrome://resources/cr_components/composebox/composebox_query.mojom-webui.js';
+import {InputType, ToolMode} from 'chrome://resources/cr_components/composebox/composebox_query.mojom-webui.js';
 import type {ComposeboxToolChipElement} from 'chrome://resources/cr_components/composebox/composebox_tool_chip.js';
+import {WindowProxy} from 'chrome://resources/cr_components/composebox/window_proxy.js';
 import {createAutocompleteMatch, createAutocompleteResultForTesting} from 'chrome://resources/cr_components/searchbox/searchbox_browser_proxy.js';
 import {loadTimeData} from 'chrome://resources/js/load_time_data.js';
 import {PageCallbackRouter as SearchboxPageCallbackRouter, PageHandlerRemote as SearchboxPageHandlerRemote, SuggestInventory} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
-import type {AutocompleteResult, PageRemote as SearchboxPageRemote} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
-import {assertEquals, assertFalse, assertTrue} from 'chrome://webui-test/chai_assert.js';
+import type {AutocompleteResult, PageRemote as SearchboxPageRemote, SelectedFileInfo} from 'chrome://resources/mojo/components/omnibox/browser/searchbox.mojom-webui.js';
+import {assertEquals, assertFalse, assertNotEquals, assertTrue} from 'chrome://webui-test/chai_assert.js';
 import {MockInputState} from 'chrome://webui-test/cr_components/searchbox/searchbox_test_utils.js';
 import {MockTimer} from 'chrome://webui-test/mock_timer.js';
 import {TestMock} from 'chrome://webui-test/test_mock.js';
@@ -1178,6 +1179,415 @@ suite('ContextualTasksComposeboxTest', () => {
           shouldShowErrorScrim_: () => boolean,
         }).shouldShowErrorScrim_(),
         'Error scrim should hide after clicking the details link');
+  });
+
+  // Required to test how the voice chips are integrated into contextual
+  // tasks html (event listeners, CSS ID's, CSS classes, etc.):
+  suite('voice search', () => {
+    setup(async () => {
+      const windowProxy = TestMock.fromClass(WindowProxy);
+      windowProxy.setResultFor('hasWebkitSpeechRecognition', true);
+      windowProxy.setResultMapperFor('createSpeechRecognition', () => {
+        const mock = new EventTarget() as unknown as
+            ReturnType<typeof WindowProxy.prototype.createSpeechRecognition>;
+        mock.abort = () => {};
+        mock.start = () => {};
+        mock.stop = () => {};
+        return mock;
+      });
+      windowProxy.setResultMapperFor(
+          'matchMedia', (query: string) => window.matchMedia(query));
+      WindowProxy.setInstance(windowProxy);
+
+      mockSearchboxPageHandler.setPromiseResolveFor('getPageClassification', {
+        metricSource: 'CO_BROWSING_COMPOSEBOX',
+      });
+
+      composebox.showVoiceSearch = true;
+      await composebox.updateComplete;
+    });
+
+    async function enterVoiceSearchMode() {
+      const voiceSearchButton =
+          composebox.shadowRoot.querySelector('#voiceSearchButton');
+      assertTrue(!!voiceSearchButton);
+      voiceSearchButton.click();
+      await microtasksFinished();
+      await composebox.updateComplete;
+      // Must wait for the second part of voice search to render as well.
+      const animatedGlow =
+          composebox.shadowRoot.querySelector('search-animated-glow');
+      if (animatedGlow) {
+        await animatedGlow.updateComplete;
+      }
+    }
+
+    async function submitVoiceSearch() {
+      const voiceSearch =
+          composebox.shadowRoot.querySelector('cr-composebox-voice-search');
+      assertTrue(!!voiceSearch);
+
+      const mockVoiceSearch = voiceSearch as unknown as {
+        finalResult_: string,
+        transcript_: string,
+      };
+      mockVoiceSearch.finalResult_ = 'test query';
+      mockVoiceSearch.transcript_ = 'test query';
+      voiceSearch.requestUpdate();
+      await voiceSearch.updateComplete;
+
+      const submitButton =
+          voiceSearch.shadowRoot.querySelector('cr-composebox-submit');
+      assertTrue(!!submitButton);
+      await submitButton.updateComplete;
+
+      const submitContainer =
+          submitButton.shadowRoot.querySelector('#submitContainer');
+      assertTrue(!!submitContainer);
+      submitContainer.click();
+
+      await microtasksFinished();
+      await composebox.updateComplete;
+      await mockSearchboxPageHandler.whenCalled('submitQuery');
+    }
+
+    test(
+        'voice error scrim is absolute when not hidden; display none otherwise',
+        async () => {
+          // When no error: errorScrim should be absent:
+          let errorScrim = composebox.shadowRoot.querySelector('#errorScrim');
+          assertFalse(!!errorScrim);
+
+          // When error: errorScrim is shown, must be position absolute:
+          composebox.inVoiceSearchMode = true;
+          composebox.errorMessage = 'Network error';
+          await composebox.updateComplete;
+
+          errorScrim = composebox.shadowRoot.querySelector('#errorScrim');
+          assertTrue(!!errorScrim);
+          assertEquals(
+              'absolute', window.getComputedStyle(errorScrim).position);
+
+          // When dismissed (hidden again):
+          const shadowRoot = errorScrim.shadowRoot;
+          assertTrue(!!shadowRoot);
+          if (!shadowRoot) {
+            return;
+          }
+          const dismissErrorButton =
+              shadowRoot.querySelector('#dismissErrorButton');
+          assertTrue(!!dismissErrorButton);
+          dismissErrorButton.click();
+          await microtasksFinished();
+          await composebox.updateComplete;
+
+          errorScrim = composebox.shadowRoot.querySelector('#errorScrim');
+          // Equivalent to checking 'display none':
+          assertFalse(!!errorScrim);
+        });
+
+    test('toolchip and image added, then removed in voice search', async () => {
+      // Add tool chip:
+      composebox.contextMenuEnabled = true;
+      composebox.inToolMode = true;
+      composebox.voiceSearchCoherenceEnabled = true;
+
+      // Add image:
+      const thumbnailUrl = 'data:image/png;base64,sometestdata';
+      const testToken = '12345678901234567890123456789012';
+      searchboxCallbackRouterRemote.addFileContext(testToken, {
+        fileName: 'test.png',
+        mimeType: 'image/png',
+        imageDataUrl: thumbnailUrl,
+        isDeletable: true,
+        selectionTime: new Date(),
+      } as SelectedFileInfo);
+      await searchboxCallbackRouterRemote.$.flushForTesting();
+      await microtasksFinished();
+      await composebox.updateComplete;
+
+      // Enter voice search mode:
+      await enterVoiceSearchMode();
+
+      // Ensure carousel and toolchip are visible in voice search:
+      const animatedGlow =
+          composebox.shadowRoot.querySelector('search-animated-glow');
+      assertTrue(!!animatedGlow);
+      const voiceCarouselContainer =
+          animatedGlow.querySelector('#voiceCarouselContainer');
+      assertTrue(!!voiceCarouselContainer);
+      const voiceCarousel =
+          voiceCarouselContainer.querySelector('#voiceSearchCarousel');
+      assertTrue(!!voiceCarousel);
+      const voiceToolChip =
+          animatedGlow.querySelector('#voiceToolChipsContainer');
+      assertTrue(!!voiceToolChip);
+
+      // Verify CSS order
+      assertTrue(voiceCarousel.classList.contains('top'));
+      assertEquals('0', window.getComputedStyle(voiceCarouselContainer).order);
+      assertEquals('3', window.getComputedStyle(voiceToolChip).order);
+      const recordingWave =
+          animatedGlow.shadowRoot.querySelector('#recordingWave');
+      assertTrue(!!recordingWave);
+      assertEquals('1', window.getComputedStyle(recordingWave).order);
+
+      // Remove image:
+      const shadowRoot = voiceCarousel.shadowRoot;
+      assertTrue(!!shadowRoot);
+      if (!shadowRoot) {
+        return;
+      }
+      const fileThumbnail =
+          shadowRoot.querySelector('cr-composebox-file-thumbnail');
+      assertTrue(!!fileThumbnail);
+      const removeImgButton =
+          fileThumbnail.shadowRoot.querySelector('#removeImgButton');
+      removeImgButton.click();
+      await microtasksFinished();
+      await composebox.updateComplete;
+      assertEquals(0, composebox.files.size);
+
+      // Remove toolchip:
+      composebox.inToolMode = false;
+      await composebox.updateComplete;
+      assertFalse(!!animatedGlow.querySelector('#voiceToolChipsContainer'));
+    });
+
+    test('remove image but submit toolchip in voice search mode', async () => {
+      // Add tool chip and image:
+      composebox.contextMenuEnabled = true;
+      composebox.inToolMode = true;
+      composebox.voiceSearchCoherenceEnabled = true;
+      const thumbnailUrl = 'data:image/png;base64,sometestdata';
+      const testToken = '12345678901234567890123456789012';
+      searchboxCallbackRouterRemote.addFileContext(testToken, {
+        fileName: 'test.png',
+        mimeType: 'image/png',
+        imageDataUrl: thumbnailUrl,
+        isDeletable: true,
+        selectionTime: new Date(),
+      } as SelectedFileInfo);
+      await searchboxCallbackRouterRemote.$.flushForTesting();
+      await microtasksFinished();
+      await composebox.updateComplete;
+
+      await enterVoiceSearchMode();
+
+      const animatedGlow =
+          composebox.shadowRoot.querySelector('search-animated-glow');
+      assertTrue(!!animatedGlow);
+      const voiceCarouselContainer =
+          animatedGlow.querySelector('#voiceCarouselContainer');
+      assertTrue(!!voiceCarouselContainer);
+      const voiceCarousel =
+          voiceCarouselContainer.querySelector('#voiceSearchCarousel');
+      assertTrue(!!voiceCarousel);
+
+      // Remove image from voice carousel:
+      const shadowRoot = voiceCarousel.shadowRoot;
+      assertTrue(!!shadowRoot);
+      if (!shadowRoot) {
+        return;
+      }
+      const fileThumbnail =
+          shadowRoot.querySelector('cr-composebox-file-thumbnail');
+      assertTrue(!!fileThumbnail);
+      const removeImgButton =
+          fileThumbnail.shadowRoot.querySelector('#removeImgButton');
+      removeImgButton.click();
+      await microtasksFinished();
+      await composebox.updateComplete;
+      assertEquals(0, composebox.files.size);
+
+      // Submit:
+      await submitVoiceSearch();
+
+      assertTrue(composebox.inToolMode);
+      assertEquals(0, composebox.files.size);
+    });
+
+    test('remove toolchip but submit image in voice search mode', async () => {
+      // Add tool chip and image:
+      composebox.contextMenuEnabled = true;
+      composebox.inToolMode = true;
+      composebox.voiceSearchCoherenceEnabled = true;
+      const thumbnailUrl = 'data:image/png;base64,sometestdata';
+      const testToken = '12345678901234567890123456789012';
+      searchboxCallbackRouterRemote.addFileContext(testToken, {
+        fileName: 'test.png',
+        mimeType: 'image/png',
+        imageDataUrl: thumbnailUrl,
+        isDeletable: true,
+        selectionTime: new Date(),
+      } as SelectedFileInfo);
+      await searchboxCallbackRouterRemote.$.flushForTesting();
+      await microtasksFinished();
+      await composebox.updateComplete;
+
+      await enterVoiceSearchMode();
+
+      const animatedGlow =
+          composebox.shadowRoot.querySelector('search-animated-glow');
+      assertTrue(!!animatedGlow);
+      const voiceToolChip =
+          animatedGlow.querySelector('#voiceToolChipsContainer');
+      assertTrue(!!voiceToolChip);
+
+      // Remove tool chip from voice tool chips container:
+      const toolChip = voiceToolChip.querySelector('cr-composebox-tool-chip');
+      assertTrue(!!toolChip);
+      const toolEnabledButton =
+          toolChip.shadowRoot.querySelector('#toolEnabledButton');
+      assertTrue(!!toolEnabledButton);
+      toolEnabledButton.click();
+      // Prevent the image file from being cleared on component
+      // updates (follows `inputState`):
+      searchboxCallbackRouterRemote.onInputStateChanged(new MockInputState({
+        activeTool: ToolMode.kUnspecified,
+        allowedInputTypes: [InputType.kLensImage],
+      }));
+      await microtasksFinished();
+      await composebox.updateComplete;
+      assertFalse(composebox.inToolMode);
+      assertEquals(1, composebox.files.size);
+
+      // Submit:
+      await submitVoiceSearch();
+
+      assertFalse(composebox.inToolMode);
+      // Submitting resets file count to 0:
+      assertEquals(0, composebox.files.size);
+    });
+
+    test(
+        'removing chips in voice carousel removes them from main carousel' +
+            ' after stopping recording',
+        async () => {
+          // Add tool chip and image:
+          composebox.contextMenuEnabled = true;
+          composebox.inToolMode = true;
+          composebox.voiceSearchCoherenceEnabled = true;
+          const thumbnailUrl = 'data:image/png;base64,sometestdata';
+          const testToken = '12345678901234567890123456789012';
+          searchboxCallbackRouterRemote.addFileContext(testToken, {
+            fileName: 'test.png',
+            mimeType: 'image/png',
+            imageDataUrl: thumbnailUrl,
+            isDeletable: true,
+            selectionTime: new Date(),
+          } as SelectedFileInfo);
+          await searchboxCallbackRouterRemote.$.flushForTesting();
+          await microtasksFinished();
+          await composebox.updateComplete;
+
+          // Enter voice search mode by clicking voice search button:
+          await enterVoiceSearchMode();
+
+          const animatedGlow =
+              composebox.shadowRoot.querySelector('search-animated-glow');
+          assertTrue(!!animatedGlow);
+          const voiceCarouselContainer =
+              animatedGlow.querySelector('#voiceCarouselContainer');
+          assertTrue(!!voiceCarouselContainer);
+          const voiceCarousel =
+              voiceCarouselContainer.querySelector('#voiceSearchCarousel');
+          assertTrue(!!voiceCarousel);
+          const voiceToolChip =
+              animatedGlow.querySelector('#voiceToolChipsContainer');
+          assertTrue(!!voiceToolChip);
+
+          // Remove image from voice carousel:
+          const shadowRoot = voiceCarousel.shadowRoot;
+          assertTrue(!!shadowRoot);
+          if (!shadowRoot) {
+            return;
+          }
+          const fileThumbnail =
+              shadowRoot.querySelector('cr-composebox-file-thumbnail');
+          assertTrue(!!fileThumbnail);
+          const removeImgButton =
+              fileThumbnail.shadowRoot.querySelector('#removeImgButton');
+          removeImgButton.click();
+          await microtasksFinished();
+          await composebox.updateComplete;
+          assertEquals(0, composebox.files.size);
+
+          // Remove tool chip from voice tool chips container:
+          const toolChip =
+              voiceToolChip.querySelector('cr-composebox-tool-chip');
+          assertTrue(!!toolChip);
+          const toolEnabledButton =
+              toolChip.shadowRoot.querySelector('#toolEnabledButton');
+          assertTrue(!!toolEnabledButton);
+          toolEnabledButton.click();
+          searchboxCallbackRouterRemote.onInputStateChanged(new MockInputState({
+            activeTool: ToolMode.kUnspecified,
+            allowedInputTypes: [InputType.kLensImage],
+          }));
+          await microtasksFinished();
+          await composebox.updateComplete;
+          assertFalse(composebox.inToolMode);
+
+          // Stop recording:
+          const voiceSearch =
+              composebox.shadowRoot.querySelector('cr-composebox-voice-search');
+          assertTrue(!!voiceSearch);
+          const stopButton =
+              voiceSearch.shadowRoot.querySelector('#stopButton');
+          assertTrue(!!stopButton);
+          stopButton.click();
+          await microtasksFinished();
+          await composebox.updateComplete;
+
+          assertFalse(composebox.inToolMode);
+          assertEquals(0, composebox.files.size);
+        });
+
+    test(
+        'voice search and its container are absolute when not waiting ' +
+            'and not in error',
+        async () => {
+          composebox.showVoiceSearch = true;
+          await composebox.updateComplete;
+
+          const voiceSearch =
+              composebox.shadowRoot.querySelector('cr-composebox-voice-search');
+          assertTrue(!!voiceSearch);
+
+          // Not waiting and not in error:
+          composebox.inVoiceSearchMode = true;
+          composebox.isListening = true;
+          await composebox.updateComplete;
+          voiceSearch.isPermissionPromptOpen = false;
+          await voiceSearch.updateComplete;
+
+          const voiceSearchContainer =
+              voiceSearch.shadowRoot.querySelector('#container');
+          assertTrue(!!voiceSearchContainer);
+
+          assertEquals(
+              'absolute', window.getComputedStyle(voiceSearch).position);
+          assertEquals(
+              'absolute',
+              window.getComputedStyle(voiceSearchContainer).position);
+
+          // Waiting (permission prompt open):
+          voiceSearch.isPermissionPromptOpen = true;
+          await voiceSearch.updateComplete;
+          assertNotEquals(
+              'absolute',
+              window.getComputedStyle(voiceSearchContainer).position);
+
+          // In error:
+          voiceSearch.isPermissionPromptOpen = false;
+          (voiceSearch as unknown as {errorMessage_: string}).errorMessage_ =
+              'Voice error';
+          await voiceSearch.updateComplete;
+          assertNotEquals(
+              'absolute',
+              window.getComputedStyle(voiceSearchContainer).position);
+        });
   });
 });
 
