@@ -274,8 +274,12 @@ void PermissionPromptBubbleBaseView::RunButtonCallback(int button_id) {
   permissions::PermissionUmaUtil::RecordActionBrowserAlwaysActive(
       request_type(), GetPermissionActionString(button),
       record_host_always_active_value());
+  // `GetBrowser()` can be null for hosts that are not backed by a Browser, such
+  // as a standalone Document Picture-in-Picture window. Guard against it since
+  // `GetBrowserViewForBrowser()` dereferences its argument.
+  auto* browser = GetBrowser();
   BrowserView* browser_view =
-      BrowserView::GetBrowserViewForBrowser(GetBrowser());
+      browser ? BrowserView::GetBrowserViewForBrowser(browser) : nullptr;
 #if BUILDFLAG(IS_CHROMEOS)
   // `PERMISSION_SMART_CARD` is essentially a chooser permission without an
   // actual chooser - thus, there is no blocklist of devices and no real
