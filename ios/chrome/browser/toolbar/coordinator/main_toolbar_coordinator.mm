@@ -84,9 +84,23 @@
 #import "ios/components/webui/web_ui_url_constants.h"
 #import "ios/web/public/web_state.h"
 
+namespace layout_state {
+class MainToolbarCoordinatorPassKeyFactory {
+ public:
+  static base::PassKey<MainToolbarCoordinatorPassKeyFactory> CreateKey() {
+    return base::PassKey<MainToolbarCoordinatorPassKeyFactory>();
+  }
+};
+}  // namespace layout_state
+
 namespace {
 // Extra vertical spacing when the banner promo is active on split mode.
 constexpr CGFloat kBannerPromoVerticalSpacing = 8;
+
+// Helper function to return the domain passkey used to mutate the layout state.
+inline LayoutStateToolbarPassKey PassKey() {
+  return layout_state::MainToolbarCoordinatorPassKeyFactory::CreateKey();
+}
 }  // namespace
 
 @interface MainToolbarCoordinator () <ContextualPanelEntrypointCommands,
@@ -1359,7 +1373,7 @@ constexpr CGFloat kBannerPromoVerticalSpacing = 8;
 // Updates the LayoutState's toolbarPosition property.
 - (void)updateLayoutStateToolbarPosition:(ToolbarPosition)position {
   CHECK(!IsChromeNextIaEnabled());
-  _layoutState.toolbarPosition = position;
+  [_layoutState setToolbarPosition:position passKey:PassKey()];
 }
 
 // Updates the visual layout and child coordinators to match the given position.

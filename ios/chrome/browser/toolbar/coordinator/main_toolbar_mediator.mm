@@ -13,6 +13,15 @@
 #import "ios/chrome/browser/shared/public/features/features.h"
 #import "ios/chrome/browser/shared/ui/util/uikit_ui_util.h"
 
+namespace layout_state {
+class MainToolbarMediatorPassKeyFactory {
+ public:
+  static base::PassKey<MainToolbarMediatorPassKeyFactory> CreateKey() {
+    return base::PassKey<MainToolbarMediatorPassKeyFactory>();
+  }
+};
+}  // namespace layout_state
+
 namespace {
 
 // Enum for the IOS.Omnibox.SteadyStatePosition histogram.
@@ -53,6 +62,10 @@ void LogOmniboxPosition(PrefService* local_state) {
   });
 }
 
+// Helper function to return the domain passkey used to mutate the layout state.
+inline LayoutStateToolbarPassKey PassKey() {
+  return layout_state::MainToolbarMediatorPassKeyFactory::CreateKey();
+}
 }  // namespace
 
 @interface MainToolbarMediator () <BooleanObserver>
@@ -80,9 +93,10 @@ void LogOmniboxPosition(PrefService* local_state) {
 
     if (IsChromeNextIaEnabled()) {
       // Set the initial toolbar position.
-      _layoutState.toolbarPosition = [self isBottomOmniboxPrefEnabled]
-                                         ? ToolbarPosition::kBottom
-                                         : ToolbarPosition::kTop;
+      [_layoutState setToolbarPosition:[self isBottomOmniboxPrefEnabled]
+                                           ? ToolbarPosition::kBottom
+                                           : ToolbarPosition::kTop
+                               passKey:PassKey()];
     }
   }
   return self;
@@ -98,9 +112,10 @@ void LogOmniboxPosition(PrefService* local_state) {
 - (void)booleanDidChange:(id<ObservableBoolean>)observableBoolean {
   if (observableBoolean == _bottomOmniboxPref) {
     if (IsChromeNextIaEnabled()) {
-      _layoutState.toolbarPosition = [self isBottomOmniboxPrefEnabled]
-                                         ? ToolbarPosition::kBottom
-                                         : ToolbarPosition::kTop;
+      [_layoutState setToolbarPosition:[self isBottomOmniboxPrefEnabled]
+                                           ? ToolbarPosition::kBottom
+                                           : ToolbarPosition::kTop
+                               passKey:PassKey()];
     }
   }
 }

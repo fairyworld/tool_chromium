@@ -28,6 +28,16 @@
 #import "ios/chrome/grit/ios_strings.h"
 #import "ui/base/l10n/l10n_util.h"
 
+namespace layout_state {
+class AssistantContainerViewControllerPassKeyFactory {
+ public:
+  static base::PassKey<AssistantContainerViewControllerPassKeyFactory>
+  CreateKey() {
+    return base::PassKey<AssistantContainerViewControllerPassKeyFactory>();
+  }
+};
+}  // namespace layout_state
+
 namespace {
 
 // The height assigned to a detent that isn't in the list.
@@ -54,6 +64,11 @@ NSInteger GetMediumDetentHeight(NSInteger absoluteMax) {
   return absoluteMax * (percentage / 100.0);
 }
 
+// Helper function to return the domain passkey used to mutate the layout state.
+inline LayoutStateAssistantPassKey PassKey() {
+  return layout_state::AssistantContainerViewControllerPassKeyFactory::
+      CreateKey();
+}
 }  // namespace
 
 @interface AssistantContainerViewController () <
@@ -304,8 +319,10 @@ NSInteger GetMediumDetentHeight(NSInteger absoluteMax) {
 }
 
 - (void)animateAlongsideTransitionPresented:(BOOL)presented {
-  self.layoutState.assistantContainerCutoutRadius =
+  CGFloat targetRadius =
       presented ? (_bottomCornerRadius + _bottomMargin) : 0.0;
+  [self.layoutState setAssistantContainerCutoutRadius:targetRadius
+                                              passKey:PassKey()];
 }
 
 #pragma mark - Properties
@@ -332,7 +349,7 @@ NSInteger GetMediumDetentHeight(NSInteger absoluteMax) {
   _presentationContext = presentationContext;
 
   if (_presentationContext != AssistantPresentationContext::kSheet) {
-    self.layoutState.assistantContainerCutoutRadius = 0.0;
+    [self.layoutState setAssistantContainerCutoutRadius:0.0 passKey:PassKey()];
   }
 
   if ([self.delegate respondsToSelector:@selector(assistantContainer:
@@ -573,7 +590,8 @@ NSInteger GetMediumDetentHeight(NSInteger absoluteMax) {
   }
   if (IsCornerRadiusChangeSignificant(
           self.layoutState.assistantContainerCutoutRadius, radius)) {
-    self.layoutState.assistantContainerCutoutRadius = radius;
+    [self.layoutState setAssistantContainerCutoutRadius:radius
+                                                passKey:PassKey()];
   }
 }
 

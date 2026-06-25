@@ -9,6 +9,7 @@
 #import "ios/chrome/browser/keyboard/ui_bundled/UIKeyCommand+Chrome.h"
 #import "ios/chrome/browser/keyboard/ui_bundled/key_command_actions.h"
 #import "ios/chrome/browser/shared/coordinator/scene/state/layout_state.h"
+#import "ios/chrome/browser/shared/coordinator/scene/state/layout_state_test_passkey_factory.h"
 #import "ios/chrome/browser/shared/ui/util/util_swift.h"
 #import "ios/chrome/common/ui/util/constraints_ui_util.h"
 #import "ios/chrome/test/app/uikit_test_util.h"
@@ -48,6 +49,8 @@
 @end
 
 namespace {
+
+using layout_state::LayoutStateTestPassKeyFactory;
 
 class AssistantContainerViewControllerTest : public PlatformTest {
  protected:
@@ -339,7 +342,9 @@ TEST_F(AssistantContainerViewControllerTest, UpdatesLayoutOnLayoutStateChange) {
             AssistantPresentationContext::kSheet);
 
   // Update state to supported.
-  layout_state.containedLayoutSupported = YES;
+  [layout_state setContainedLayoutSupported:YES
+                                    passKey:LayoutStateTestPassKeyFactory::
+                                                CreateSceneKey()];
 
   // Should switch to panel mode.
   EXPECT_EQ(view_controller_.presentationContext,
