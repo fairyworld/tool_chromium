@@ -196,6 +196,11 @@ constexpr NSTimeInterval kIPHTransitionDelay = 0.5;
   // This is necessary as the app bar container doesn't get all the refreshes
   // when resizing the window.
   [_appBar.view setNeedsLayout];
+  // Re-resolves the bottom anchor once the target toolbar is in the view
+  // hierarchy.
+  if (_assistantContainerViewController) {
+    [_assistantContainerViewController layoutInParentView:self.view];
+  }
 }
 
 - (void)viewSafeAreaInsetsDidChange {
