@@ -64,6 +64,7 @@
 #include "components/omnibox/browser/autocomplete_provider.h"
 #include "components/omnibox/browser/autocomplete_provider_client.h"
 #include "components/omnibox/browser/contextual_search_provider.h"
+#include "components/omnibox/browser/geolocation_header_service.h"
 #include "components/omnibox/browser/history_fuzzy_provider.h"
 #include "components/omnibox/browser/history_url_provider.h"
 #include "components/omnibox/browser/keyword_provider.h"
@@ -2989,6 +2990,12 @@ void OmniboxEditModel::OpenMatch(OmniboxPopupSelection selection,
               autocomplete_controller()->autocomplete_provider_client(),
               alternate_input, alternate_nav_url, false));
     }
+  }
+
+  if (auto* geolocation_header_service = autocomplete_controller()
+                                             ->autocomplete_provider_client()
+                                             ->GetGeolocationHeaderService()) {
+    geolocation_header_service->RecordInlineLocationSuggestionClicked(match);
   }
 }
 

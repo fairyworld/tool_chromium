@@ -58,6 +58,7 @@
 #include "components/omnibox/browser/autocomplete_provider.h"
 #include "components/omnibox/browser/autocomplete_provider_client.h"
 #include "components/omnibox/browser/autocomplete_result.h"
+#include "components/omnibox/browser/geolocation_header_service.h"
 #include "components/omnibox/browser/history_fuzzy_provider.h"
 #include "components/omnibox/browser/keyword_provider.h"
 #include "components/omnibox/browser/lens_suggest_inputs_utils.h"
@@ -468,6 +469,11 @@ void AutocompleteControllerAndroid::OnSuggestionSelected(
         "OnSuggestionSelected.AutocompleteActionPredictor.OnOmniboxOpenedUrl");
     predictors::AutocompleteActionPredictorFactory::GetForProfile(profile_)
         ->OnOmniboxOpenedUrl(log);
+  }
+  if (auto* geolocation_header_service =
+          autocomplete_controller_->autocomplete_provider_client()
+              ->GetGeolocationHeaderService()) {
+    geolocation_header_service->RecordInlineLocationSuggestionClicked(match);
   }
 }
 

@@ -2274,6 +2274,28 @@ Keep consistent with active providers. Doesn't need to include every provider in
   </summary>
 </histogram>
 
+<histogram
+    name="Omnibox.InlineLocationSuggestion.{DSEPermissionState}.{ClickType}"
+    enum="Boolean" expires_after="2026-11-12">
+  <owner>andypaicu@chromium.org</owner>
+  <owner>chrome-permissions@google.com</owner>
+  <summary>
+    Recorded when the user performs a click on an inline location suggestion or
+    its parent. Always emits true.
+  </summary>
+  <token key="DSEPermissionState">
+    <variant name="Ask" summary="DSE permission status is 'Ask'"/>
+    <variant name="Deny" summary="DSE permission status is 'Deny'"/>
+  </token>
+  <token key="ClickType">
+    <variant name="Clicked"
+        summary="Click directly on the location suggestion"/>
+    <variant name="ParentClicked"
+        summary="Click on the parent suggestion instead of the location
+                 suggestion"/>
+  </token>
+</histogram>
+
 <histogram name="Omnibox.InputToAcceptNonAction" units="microseconds"
     expires_after="2026-11-12">
   <owner>kouhei@google.com</owner>
