@@ -198,6 +198,7 @@ public class LocationBarMediatorTest {
     @Mock private StatusCoordinator mStatusCoordinator;
     @Mock private OmniboxPrerender.Natives mPrerenderJni;
     @Mock private TextView mView;
+    @Mock private View mTabView;
     @Mock private KeyEvent mKeyEvent;
     @Mock private BackKeyBehaviorDelegate mOverrideBackKeyBehaviorDelegate;
     @Mock private WindowAndroid mWindowAndroid;
@@ -236,7 +237,6 @@ public class LocationBarMediatorTest {
     @Captor private ArgumentCaptor<TabObserver> mTabObserverCaptor;
     @Captor private ArgumentCaptor<Callback<Boolean>> mOnInteractionCompletedCallbackCaptor;
     private Callback<Boolean> mOnInteractionCompletedCallback;
-
     private Context mContext;
     private SettableNonNullObservableSupplier<TabModelSelector> mTabModelSelectorSupplier;
     private final SettableMonotonicObservableSupplier<Profile> mProfileSupplier =
@@ -260,6 +260,8 @@ public class LocationBarMediatorTest {
     private final FuseboxSessionState mSessionState = new FuseboxSessionState();
     private final SettableNullableObservableSupplier<GURL> mExactMatchUrlSupplier =
             ObservableSuppliers.createNullable();
+    private final SettableNonNullObservableSupplier<Boolean> mScrimVisibilitySupplier =
+            ObservableSuppliers.createNonNull(false);
 
     // Members capturing final state of the LocationBarLayout elements.
     private boolean mNavigateButtonIsVisible;
@@ -294,6 +296,8 @@ public class LocationBarMediatorTest {
                 .when(mLocationBarDataProvider)
                 .getPrimaryColor();
         lenient().doReturn(mTab).when(mLocationBarDataProvider).getTab();
+        lenient().doReturn(true).when(mLocationBarDataProvider).hasTab();
+        lenient().doReturn(mTabView).when(mTab).getView();
         lenient()
                 .doReturn(PageClassification.OTHER_VALUE)
                 .when(mLocationBarDataProvider)
@@ -350,6 +354,7 @@ public class LocationBarMediatorTest {
                 .doReturn(mAppBannerManager)
                 .when(mAppBannerManagerJni)
                 .getJavaBannerManagerForWebContents(mWebContents);
+        doReturn(mScrimVisibilitySupplier).when(mScrimHandler).getScrimVisibilitySupplier();
         mMediator =
                 new LocationBarMediator(
                         mContext,
@@ -379,6 +384,7 @@ public class LocationBarMediatorTest {
         verify(mFuseboxCoordinator)
                 .setOnInteractionCompletedCallback(mOnInteractionCompletedCallbackCaptor.capture());
         mOnInteractionCompletedCallback = mOnInteractionCompletedCallbackCaptor.getValue();
+        lenient().doReturn(true).when(mScrimHandler).isScrimShown();
 
         mMediator.setCoordinators(mUrlCoordinator, mAutocompleteCoordinator, mStatusCoordinator);
         mMediator.setAddToHomescreenCoordinatorForTesting(mAddToHomescreenCoordinator);
@@ -861,11 +867,9 @@ public class LocationBarMediatorTest {
     public void testLoadUrl_clearsFocus() {
         mMediator.onFinishNativeInitialization();
         mProfileSupplier.set(mProfile);
-        doReturn(mTab).when(mLocationBarDataProvider).getTab();
-        doReturn(true).when(mLocationBarDataProvider).hasTab();
-        doReturn(mView).when(mTab).getView();
 
         mMediator.onUrlFocusChange(true);
+        mScrimVisibilitySupplier.set(true);
         assertTrue(mMediator.isUrlBarFocused());
 
         mMediator.loadUrl(
@@ -875,7 +879,10 @@ public class LocationBarMediatorTest {
 
         ShadowLooper.runUiThreadTasksIncludingDelayedTasks();
 
-        verify(mView).requestFocus();
+        // Simulate scrim dismissal to restore focus to the tab.
+        mScrimVisibilitySupplier.set(false);
+
+        verify(mTabView).requestFocus();
         verify(mAutocompleteCoordinator).endInput();
         verify(mUrlCoordinator).endInput();
     }
@@ -1278,6 +1285,63 @@ public class LocationBarMediatorTest {
             // Step 4: no other actions can be taken: bail
             assertFalse(mMediator.handleEscPress());
         }
+    }
+
+    @Test
+    public void testEscapePress_restoresFocusToTabAfterScrimDismissed() {
+        AutocompleteInput input = new AutocompleteInput();
+        doReturn(false).when(mAutocompleteCoordinator).isServingSuggestions();
+        mMediator.beginInput(input);
+        mScrimVisibilitySupplier.set(true);
+
+        // Press Escape (simulates 3rd press b/c serving suggestions is false and text is the same
+        // as initial text).
+        assertTrue(mMediator.handleEscPress());
+
+        // Focus should NOT be restored yet (waiting for scrim hide).
+        verify(mTabView, never()).requestFocus();
+
+        // Simulate scrim dismissal.
+        mScrimVisibilitySupplier.set(false);
+
+        // Focus should now be restored to the tab view.
+        verify(mTabView, times(1)).requestFocus();
+    }
+
+    @Test
+    public void testEscapePress_scrimShownAgain_cancelsFocusRestoration() {
+        AutocompleteInput input = new AutocompleteInput();
+        doReturn(false).when(mAutocompleteCoordinator).isServingSuggestions();
+        mMediator.beginInput(input);
+
+        // Press Escape (simulates 3rd press b/c serving suggestions is false and text is the same
+        // as initial text).
+        assertTrue(mMediator.handleEscPress());
+
+        // Simulate scrim shown again (user re-interaction).
+        mScrimVisibilitySupplier.set(true);
+
+        // Simulate scrim dismissal (animation finally completes).
+        mScrimVisibilitySupplier.set(false);
+
+        // Focus should NOT be restored because it was canceled by the show event.
+        verify(mTabView, never()).requestFocus();
+    }
+
+    @Test
+    public void testEscapePress_scrimNotShown_focusesImmediately() {
+        doReturn(false).when(mScrimHandler).isScrimShown();
+
+        AutocompleteInput input = new AutocompleteInput();
+        input.setAutocompleteState(AutocompleteState.STANDBY);
+        doReturn(false).when(mAutocompleteCoordinator).isServingSuggestions();
+        mMediator.beginInput(input);
+
+        // Press Escape (simulates 3rd press).
+        assertTrue(mMediator.handleEscPress());
+
+        // Focus should be restored immediately because no scrim is showing.
+        verify(mTabView, times(1)).requestFocus();
     }
 
     @Test
@@ -3008,6 +3072,7 @@ public class LocationBarMediatorTest {
         mMediator.onFinishNativeInitialization();
         mProfileSupplier.set(mProfile);
         mMediator.beginInput(new AutocompleteInput());
+        verify(mScrimHandler).setVisibility(true);
         clearInvocations(mScrimHandler);
 
         // Show scrim in all contexts if there are any suggestions to show.
