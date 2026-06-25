@@ -125,7 +125,6 @@ class TaskManagerView : public TableViewDelegate,
   // TODO(crbug.com/364926055): Remove after feature is enabled by default.
   struct TableConfigs {
     bool table_refresh;
-    bool dialog_button_disabled;
   };
 
   friend class TaskManagerViewTest;

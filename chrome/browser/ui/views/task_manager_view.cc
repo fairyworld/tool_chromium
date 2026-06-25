@@ -400,7 +400,6 @@ TaskManagerView* TaskManagerView::GetInstanceForTests() {
 TaskManagerView::TableConfigs TaskManagerView::GetTableConfigs() {
   return TableConfigs{
       .table_refresh = true,
-      .dialog_button_disabled = true,
   };
 }
 
