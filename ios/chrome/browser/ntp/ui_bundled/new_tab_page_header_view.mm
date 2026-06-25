@@ -2045,10 +2045,13 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
     self.fakeLocationBarTrailingConstraint.constant =
         -(self.fakeOmniboxContainer.bounds.size.width -
           (omniboxFrameInFakebox.origin.x + omniboxFrameInFakebox.size.width));
-    self.voiceSearchButton.alpha = 0;
-    self.cancelButton.alpha = 0.7;
-    self.omnibox.alpha = 1;
-    self.searchHintLabel.alpha = 0;
+    [self updateFakeboxElementsForExpansion:YES];
+  }
+}
+
+- (void)revertHeaderExpansionOnUnfocus {
+  if (!IsComposeboxIOSEnabled()) {
+    [self updateFakeboxElementsForExpansion:NO];
   }
 }
 
@@ -2107,6 +2110,21 @@ CGFloat Interpolate(CGFloat from, CGFloat to, CGFloat percent) {
 }
 
 #pragma mark - Private (Fakebox & Logo Layout Helpers)
+
+// Updates the elements inside the fakebox based on whether it is part of an
+// expansion.
+- (void)updateFakeboxElementsForExpansion:(BOOL)expansion {
+  if (expansion) {
+    self.voiceSearchButton.alpha = 0;
+    self.cancelButton.alpha = 0.7;
+    self.omnibox.alpha = 1;
+    self.searchHintLabel.alpha = 0;
+  } else {
+    self.voiceSearchButton.alpha = 1;
+    self.cancelButton.alpha = 1;
+    self.searchHintLabel.alpha = 1;
+  }
+}
 
 - (void)updateFakeboxDisplay {
   self.doodleTopMarginConstraint.constant =

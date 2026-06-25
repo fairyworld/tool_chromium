@@ -1303,6 +1303,7 @@ const CGFloat kBackgroundImageAnimationDuration = 0.2;
     weakSelf.scrolledToMinimumHeight = NO;
     weakSelf.headerView.allowFontScaleAnimation = NO;
     weakSelf.shiftDownInProgress = NO;
+    [weakSelf.headerView revertHeaderExpansionOnUnfocus];
   }];
   self.animator.interruptible = YES;
   [self.animator startAnimation];
