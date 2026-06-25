@@ -16737,31 +16737,24 @@
             ],
             "experiments": [
                 {
-                    "name": "Enabled_V2_And_SpdyDrainFix",
+                    "name": "Enabled_SpdyDrainFix",
+                    "enable_features": [
+                        "DrainSpdySessionSynchronouslyOnRemoteEndpointDisconnect",
+                        "NetTaskScheduler"
+                    ]
+                },
+                {
+                    "name": "Enabled_All",
+                    "params": {
+                        "http_cache": "true",
+                        "http_cache_transaction": "true"
+                    },
                     "enable_features": [
                         "DrainSpdySessionSynchronouslyOnRemoteEndpointDisconnect",
                         "NetTaskScheduler",
+                        "NetTaskScheduler2",
+                        "NetTaskSchedulerHostResolver",
                         "NetworkServicePerPriorityTaskQueues"
-                    ]
-                }
-            ]
-        }
-    ],
-    "NetTaskSchedulerHostResolver": [
-        {
-            "platforms": [
-                "android",
-                "android_webview",
-                "chromeos",
-                "linux",
-                "mac",
-                "windows"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "enable_features": [
-                        "NetTaskSchedulerHostResolver"
                     ]
                 }
             ]
@@ -16881,30 +16874,6 @@
                     "name": "Enabled_20231025",
                     "enable_features": [
                         "NetworkServiceSandbox"
-                    ]
-                }
-            ]
-        }
-    ],
-    "NetworkServiceTaskScheduler2": [
-        {
-            "platforms": [
-                "android",
-                "android_webview",
-                "chromeos",
-                "linux",
-                "mac",
-                "windows"
-            ],
-            "experiments": [
-                {
-                    "name": "Enabled",
-                    "params": {
-                        "http_cache": "true",
-                        "http_cache_transaction": "true"
-                    },
-                    "enable_features": [
-                        "NetTaskScheduler2"
                     ]
                 }
             ]
