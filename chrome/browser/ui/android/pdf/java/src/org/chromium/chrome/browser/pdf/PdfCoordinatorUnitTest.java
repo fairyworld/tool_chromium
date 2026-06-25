@@ -17,8 +17,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import android.content.ContentProvider;
+import android.content.ContentValues;
+import android.content.pm.ProviderInfo;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -28,6 +33,9 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.pdf.PdfDocument;
 import androidx.pdf.PdfDocument.PageInfo;
 import androidx.pdf.PdfPoint;
+import androidx.pdf.PdfWriteHandle;
+import androidx.pdf.ink.EditablePdfViewerFragment;
+import androidx.pdf.viewer.fragment.PdfViewerFragment;
 import androidx.pdf.view.PdfView;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
@@ -45,7 +53,9 @@ import org.mockito.junit.MockitoRule;
 import org.robolectric.annotation.Config;
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
+import org.robolectric.annotation.RealObject;
 import org.robolectric.shadow.api.Shadow;
+import org.robolectric.shadows.ShadowContentResolver;
 import org.robolectric.shadows.ShadowDialog;
 import org.robolectric.shadows.ShadowLooper;
 import org.robolectric.shadows.ShadowView;
@@ -69,11 +79,19 @@ import org.chromium.url.GURL;
 import org.chromium.url.Origin;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
 
 @RunWith(BaseRobolectricTestRunner.class)
 @DisableFeatures(ChromeFeatureList.PDF_REUSE_FRAGMENT)
-@Config(sdk = 35)
+@Config(
+        sdk = 35,
+        instrumentedPackages = {"androidx.fragment.app", "androidx.pdf"},
+        shadows = {
+            PdfCoordinatorUnitTest.ShadowPdfViewerFragment.class,
+            PdfCoordinatorUnitTest.ShadowEditablePdfViewerFragment.class
+        })
 public class PdfCoordinatorUnitTest {
     @Rule public MockitoRule mMockitoRule = MockitoJUnit.rule();
 
@@ -94,6 +112,8 @@ public class PdfCoordinatorUnitTest {
     private static final String LINK_URL = "https://www.bar.com";
     private static final String FILE_PATH =
             "/data/user/10/com.google.android.apps.chrome/cache/pdfs/fw4.pdf";
+    private static final String TEST_CONTENT_URI =
+            "content://com.android.chrome.provider/fw4.pdf";
     private static final int TAB_ID = 123;
     private static final int PDF_CONTENT_HEIGHT = 1000;
 
@@ -101,7 +121,7 @@ public class PdfCoordinatorUnitTest {
     public void setUp() {
         mActivityScenarioRule.getScenario().onActivity(activity -> mActivity = activity);
         PdfCoordinator.skipLoadPdfForTesting(true);
-        ChromeFileProvider.setGeneratedUriForTesting(Uri.parse(PDF_URL));
+        ChromeFileProvider.setGeneratedUriForTesting(Uri.parse(TEST_CONTENT_URI));
         PostTask.setPrenativeThreadPoolExecutorForTesting(Runnable::run);
     }
 
@@ -130,6 +150,9 @@ public class PdfCoordinatorUnitTest {
         mPdfCoordinator.mChromePdfViewerFragment.setPdfViewForTesting(mPdfView);
         ViewGroup contentView = mActivity.findViewById(android.R.id.content);
         contentView.addView(mPdfCoordinator.getView());
+        if (mPdfCoordinator.getUri() != null) {
+            mPdfCoordinator.mChromePdfViewerFragment.setDocumentUri(mPdfCoordinator.getUri());
+        }
     }
 
     @Test
@@ -755,6 +778,255 @@ public class PdfCoordinatorUnitTest {
         }
     }
 
+    @Test
+    @EnableFeatures(ChromeFeatureList.INLINE_PDF_V2)
+    @Config(shadows = {ShadowEditablePdfViewerFragment.class})
+    public void testSetEditMode_True() {
+        createPdfCoordinator();
+        ShadowEditablePdfViewerFragment shadowFragment =
+                Shadow.extract(mPdfCoordinator.mChromePdfViewerFragment);
+
+        mPdfCoordinator.setEditMode(true);
+
+        assertTrue(shadowFragment.getEditModeEnabled());
+        assertFalse(shadowFragment.wasApplyDraftEditsCalled());
+    }
+
+    @Test
+    @EnableFeatures(ChromeFeatureList.INLINE_PDF_V2)
+    @Config(shadows = {ShadowEditablePdfViewerFragment.class})
+    public void testSetEditMode_False_NoUnsavedChanges() {
+        createPdfCoordinator();
+        ShadowEditablePdfViewerFragment shadowFragment =
+                Shadow.extract(mPdfCoordinator.mChromePdfViewerFragment);
+        shadowFragment.setHasUnsavedChanges(false);
+
+        mPdfCoordinator.setEditMode(false);
+
+        assertFalse(shadowFragment.getEditModeEnabled());
+        assertFalse(shadowFragment.wasApplyDraftEditsCalled());
+    }
+
+    @Test
+    @EnableFeatures(ChromeFeatureList.INLINE_PDF_V2)
+    @Config(shadows = {ShadowEditablePdfViewerFragment.class})
+    public void testSetEditMode_False_WithUnsavedChanges_Flow() throws Exception {
+        // Use a content URI to test the save flow
+        ChromeFileProvider.setGeneratedUriForTesting(
+                Uri.parse("content://com.android.chrome.provider/test.pdf"));
+        createPdfCoordinator();
+
+        // Manually attach the fragment because loadPdfInternal skips it in tests due to
+        // sSkipLoadPdfForTesting.
+        // This is now safe because setupTouchListeners is shadowed to do nothing.
+        mActivity
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .add(mPdfCoordinator.mChromePdfViewerFragment, "test_pdf_tag")
+                .commitNow();
+
+        ShadowEditablePdfViewerFragment shadowFragment =
+                Shadow.extract(mPdfCoordinator.mChromePdfViewerFragment);
+        shadowFragment.setHasUnsavedChanges(true);
+
+        File tempFile = File.createTempFile("test_pdf", ".pdf");
+        tempFile.deleteOnExit();
+        ParcelFileDescriptor pfd =
+                ParcelFileDescriptor.open(tempFile, ParcelFileDescriptor.MODE_WRITE_ONLY);
+
+        // Register TestContentProvider
+        TestContentProvider provider = new TestContentProvider(pfd);
+        ProviderInfo providerInfo = new ProviderInfo();
+        providerInfo.authority = "com.android.chrome.provider";
+        provider.attachInfo(mActivity, providerInfo);
+        ShadowContentResolver.registerProviderInternal("com.android.chrome.provider", provider);
+
+        mPdfCoordinator.setEditMode(false);
+
+        assertTrue(shadowFragment.wasApplyDraftEditsCalled());
+        assertEquals(null, shadowFragment.getEditModeEnabled());
+
+        // Simulate success callback with fake
+        FakePdfWriteHandle fakeHandle = new FakePdfWriteHandle();
+        mPdfCoordinator.mChromePdfViewerFragment.onApplyEditsSuccess(fakeHandle);
+
+        assertTrue(fakeHandle.mWriteToCalled);
+        assertNotNull(fakeHandle.mContinuation);
+
+        // Resume continuation to finish write
+        fakeHandle.mContinuation.resumeWith(kotlin.Unit.INSTANCE);
+
+        // Run posted tasks on UI thread (finishExitingEditMode is posted)
+        ShadowLooper.idleMainLooper();
+
+        // Now it should be disabled
+        assertFalse(shadowFragment.getEditModeEnabled());
+        assertTrue(fakeHandle.mClosed);
+    }
+
+    @Test
+    @EnableFeatures(ChromeFeatureList.INLINE_PDF_V2)
+    @Config(shadows = {ShadowEditablePdfViewerFragment.class})
+    public void testSetEditMode_False_WithUnsavedChanges_AsyncFailureFlow() throws Exception {
+        ChromeFileProvider.setGeneratedUriForTesting(
+                Uri.parse("content://com.android.chrome.provider/test.pdf"));
+        createPdfCoordinator();
+
+        // Manually attach the fragment because loadPdfInternal skips it in tests due to
+        // sSkipLoadPdfForTesting.
+        // This is now safe because setupTouchListeners is shadowed to do nothing.
+        mActivity
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .add(mPdfCoordinator.mChromePdfViewerFragment, "test_pdf_tag")
+                .commitNow();
+
+        ShadowEditablePdfViewerFragment shadowFragment =
+                Shadow.extract(mPdfCoordinator.mChromePdfViewerFragment);
+        shadowFragment.setHasUnsavedChanges(true);
+
+        File tempFile = File.createTempFile("test_pdf", ".pdf");
+        tempFile.deleteOnExit();
+        ParcelFileDescriptor pfd =
+                ParcelFileDescriptor.open(tempFile, ParcelFileDescriptor.MODE_WRITE_ONLY);
+
+        TestContentProvider provider = new TestContentProvider(pfd);
+        ProviderInfo providerInfo = new ProviderInfo();
+        providerInfo.authority = "com.android.chrome.provider";
+        provider.attachInfo(mActivity, providerInfo);
+        ShadowContentResolver.registerProviderInternal("com.android.chrome.provider", provider);
+
+        mPdfCoordinator.setEditMode(false);
+
+        FakePdfWriteHandle fakeHandle = new FakePdfWriteHandle();
+        mPdfCoordinator.mChromePdfViewerFragment.onApplyEditsSuccess(fakeHandle);
+
+        // Resume continuation with failure
+        Object failure = new IOException("Test exception");
+        fakeHandle.mContinuation.resumeWith(failure);
+
+        ShadowLooper.idleMainLooper();
+
+        // It should still disable edit mode and close handles
+        assertFalse(shadowFragment.getEditModeEnabled());
+        assertTrue(fakeHandle.mClosed);
+    }
+
+    @Test
+    @EnableFeatures(ChromeFeatureList.INLINE_PDF_V2)
+    @Config(shadows = {ShadowEditablePdfViewerFragment.class})
+    public void testSetEditMode_False_WithUnsavedChanges_SyncSuccessFlow() throws Exception {
+        ChromeFileProvider.setGeneratedUriForTesting(
+                Uri.parse("content://com.android.chrome.provider/test.pdf"));
+        createPdfCoordinator();
+
+        // Manually attach the fragment because loadPdfInternal skips it in tests due to
+        // sSkipLoadPdfForTesting.
+        // This is now safe because setupTouchListeners is shadowed to do nothing.
+        mActivity
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .add(mPdfCoordinator.mChromePdfViewerFragment, "test_pdf_tag")
+                .commitNow();
+
+        ShadowEditablePdfViewerFragment shadowFragment =
+                Shadow.extract(mPdfCoordinator.mChromePdfViewerFragment);
+        shadowFragment.setHasUnsavedChanges(true);
+
+        File tempFile = File.createTempFile("test_pdf", ".pdf");
+        tempFile.deleteOnExit();
+        ParcelFileDescriptor pfd =
+                ParcelFileDescriptor.open(tempFile, ParcelFileDescriptor.MODE_WRITE_ONLY);
+
+        TestContentProvider provider = new TestContentProvider(pfd);
+        ProviderInfo providerInfo = new ProviderInfo();
+        providerInfo.authority = "com.android.chrome.provider";
+        provider.attachInfo(mActivity, providerInfo);
+        ShadowContentResolver.registerProviderInternal("com.android.chrome.provider", provider);
+
+        mPdfCoordinator.setEditMode(false);
+
+        FakePdfWriteHandle fakeHandle = new FakePdfWriteHandle();
+        // Make it return Unit.INSTANCE to simulate sync completion
+        fakeHandle.mResult = kotlin.Unit.INSTANCE;
+
+        mPdfCoordinator.mChromePdfViewerFragment.onApplyEditsSuccess(fakeHandle);
+
+        // Run posted tasks (finishExitingEditMode is posted)
+        ShadowLooper.idleMainLooper();
+
+        // For sync completion, it should finish immediately
+        assertFalse(shadowFragment.getEditModeEnabled());
+        assertTrue(fakeHandle.mClosed);
+    }
+
+    @Test
+    @EnableFeatures(ChromeFeatureList.INLINE_PDF_V2)
+    @Config(shadows = {ShadowEditablePdfViewerFragment.class})
+    public void testSetEditMode_False_WithUnsavedChanges_RuntimeExceptionFlow() throws Exception {
+        ChromeFileProvider.setGeneratedUriForTesting(
+                Uri.parse("content://com.android.chrome.provider/test.pdf"));
+        createPdfCoordinator();
+
+        mActivity
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .add(mPdfCoordinator.mChromePdfViewerFragment, "test_pdf_tag")
+                .commitNow();
+
+        ShadowEditablePdfViewerFragment shadowFragment =
+                Shadow.extract(mPdfCoordinator.mChromePdfViewerFragment);
+        shadowFragment.setHasUnsavedChanges(true);
+
+        File tempFile = File.createTempFile("test_pdf", ".pdf");
+        tempFile.deleteOnExit();
+        ParcelFileDescriptor pfd =
+                ParcelFileDescriptor.open(tempFile, ParcelFileDescriptor.MODE_WRITE_ONLY);
+
+        TestContentProvider provider = new TestContentProvider(pfd);
+        ProviderInfo providerInfo = new ProviderInfo();
+        providerInfo.authority = "com.android.chrome.provider";
+        provider.attachInfo(mActivity, providerInfo);
+        ShadowContentResolver.registerProviderInternal("com.android.chrome.provider", provider);
+
+        mPdfCoordinator.setEditMode(false);
+
+        FakePdfWriteHandle fakeHandle = new FakePdfWriteHandle() {
+            @Override
+            public Object writeTo(
+                    ParcelFileDescriptor destination, Continuation<? super kotlin.Unit> continuation) {
+                super.writeTo(destination, continuation);
+                throw new RuntimeException("Test runtime exception during writeTo");
+            }
+        };
+
+        boolean exceptionThrown = false;
+        try {
+            mPdfCoordinator.mChromePdfViewerFragment.onApplyEditsSuccess(fakeHandle);
+        } catch (RuntimeException e) {
+            if (e.getMessage().equals("Test runtime exception during writeTo")) {
+                exceptionThrown = true;
+            } else {
+                throw e;
+            }
+        }
+
+        assertTrue("Expected RuntimeException was not thrown", exceptionThrown);
+
+        // Even with RuntimeException, it should close handles and disable edit mode
+        assertTrue(fakeHandle.mClosed);
+        assertFalse(shadowFragment.getEditModeEnabled());
+
+        // Also check if pfd is closed.
+        boolean pfdClosed = false;
+        try {
+            pfd.getFd();
+        } catch (IllegalStateException e) {
+            pfdClosed = true;
+        }
+        assertTrue("ParcelFileDescriptor should be closed", pfdClosed);
+    }
+
     @Implements(PdfView.class)
     public static class ShadowPdfView extends ShadowView {
         public PdfPoint mPdfPoint;
@@ -810,6 +1082,173 @@ public class PdfCoordinatorUnitTest {
         public void onViewCreated(View view, Bundle savedInstanceState) {
             // Skip super.onViewCreated to avoid JNI initialization.
             setUpToolBoxView(view);
+        }
+    }
+
+    @Implements(EditablePdfViewerFragment.class)
+    public static class ShadowEditablePdfViewerFragment extends ShadowPdfViewerFragment {
+        @RealObject private EditablePdfViewerFragment mRealFragment;
+        private boolean mUnsavedChanges;
+        private boolean mApplyDraftEditsCalled;
+        private Boolean mEditModeEnabled;
+
+        @Implementation
+        public View onCreateView(
+                android.view.LayoutInflater inflater,
+                ViewGroup container,
+                android.os.Bundle savedInstanceState) {
+            return new FrameLayout(inflater.getContext());
+        }
+
+        @Implementation
+        public void onViewCreated(View view, android.os.Bundle savedInstanceState) {
+            // Do nothing to avoid findViewById crashes on dummy view
+        }
+
+        @Implementation
+        public boolean hasUnsavedChanges() {
+            return mUnsavedChanges;
+        }
+
+        @Implementation
+        public void applyDraftEdits() {
+            mApplyDraftEditsCalled = true;
+        }
+
+        @Implementation
+        public void setEditModeEnabled(boolean enabled) {
+            mEditModeEnabled = enabled;
+        }
+
+        @Implementation
+        public void setupTouchListeners() {
+            // Do nothing to avoid native Ink initialization
+        }
+
+        @Implementation
+        public void onDestroyView() {
+            // Bypass EditablePdfViewerFragment.onDestroyView to avoid lateinit crash.
+            // This requires "androidx.fragment.app" to be in instrumentedPackages in class Config.
+            Shadow.directlyOn(mRealFragment, androidx.fragment.app.Fragment.class, "onDestroyView");
+        }
+
+        public void setHasUnsavedChanges(boolean hasChanges) {
+            mUnsavedChanges = hasChanges;
+        }
+
+        public boolean wasApplyDraftEditsCalled() {
+            return mApplyDraftEditsCalled;
+        }
+
+        public Boolean getEditModeEnabled() {
+            return mEditModeEnabled;
+        }
+    }
+
+    @Implements(PdfViewerFragment.class)
+    public static class ShadowPdfViewerFragment {
+        @RealObject private PdfViewerFragment mRealFragment;
+        private Uri mDocumentUri;
+
+        @Implementation
+        public void setDocumentUri(Uri uri) {
+            mDocumentUri = uri;
+        }
+
+        @Implementation
+        public Uri getDocumentUri() {
+            return mDocumentUri;
+        }
+
+        @Implementation
+        public void onStart() {
+            Shadow.directlyOn(mRealFragment, androidx.fragment.app.Fragment.class, "onStart");
+        }
+
+        @Implementation
+        public void onResume() {
+            Shadow.directlyOn(mRealFragment, androidx.fragment.app.Fragment.class, "onResume");
+        }
+
+        @Implementation
+        public void onPause() {
+            Shadow.directlyOn(mRealFragment, androidx.fragment.app.Fragment.class, "onPause");
+        }
+
+        @Implementation
+        public void onStop() {
+            Shadow.directlyOn(mRealFragment, androidx.fragment.app.Fragment.class, "onStop");
+        }
+    }
+
+    public static class FakePdfWriteHandle implements PdfWriteHandle {
+        public boolean mClosed;
+        public boolean mWriteToCalled;
+        public Continuation<? super kotlin.Unit> mContinuation;
+        public Object mResult = kotlin.coroutines.intrinsics.IntrinsicsKt.getCOROUTINE_SUSPENDED();
+
+        @Override
+        public Object writeTo(
+                ParcelFileDescriptor destination, Continuation<? super kotlin.Unit> continuation) {
+            mWriteToCalled = true;
+            mContinuation = continuation;
+            return mResult;
+        }
+
+        @Override
+        public void close() throws IOException {
+            mClosed = true;
+        }
+    }
+
+    private static class TestContentProvider extends ContentProvider {
+        private final ParcelFileDescriptor mPfd;
+
+        TestContentProvider(ParcelFileDescriptor pfd) {
+            mPfd = pfd;
+        }
+
+        @Override
+        public boolean onCreate() {
+            return true;
+        }
+
+        @Override
+        public Cursor query(
+                Uri uri,
+                String[] projection,
+                String selection,
+                String[] selectionArgs,
+                String sortOrder) {
+            return null;
+        }
+
+        @Override
+        public String getType(Uri uri) {
+            return null;
+        }
+
+        @Override
+        public Uri insert(Uri uri, ContentValues values) {
+            return null;
+        }
+
+        @Override
+        public int delete(Uri uri, String selection, String[] selectionArgs) {
+            return 0;
+        }
+
+        @Override
+        public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+            return 0;
+        }
+
+        @Override
+        public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException {
+            if ("w".equals(mode)) {
+                return mPfd;
+            }
+            return super.openFile(uri, mode);
         }
     }
 }
