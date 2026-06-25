@@ -8812,6 +8812,10 @@ const FeatureEntry kFeatureEntries[] = {
      FEATURE_VALUE_TYPE(ash::features::kPhoneHubCallNotification)},
 #endif  // BUILDFLAG(IS_CHROMEOS)
 
+    {"test-root-store", flag_descriptions::kTestRootStoreName,
+     flag_descriptions::kTestRootStoreDescription, kOsAll,
+     FEATURE_VALUE_TYPE(net::features::kTestRootStore)},
+
     {"test-third-party-cookie-phaseout",
      flag_descriptions::kTestThirdPartyCookiePhaseoutName,
      flag_descriptions::kTestThirdPartyCookiePhaseoutDescription, kOsAll,

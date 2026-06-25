@@ -9173,6 +9173,11 @@
     "expiry_milestone": -1
   },
   {
+    "name": "test-root-store",
+    "owners": [ "carlosil@chromium.org", "//net/cert/OWNERS" ],
+    "expiry_milestone": 160
+  },
+  {
     "name": "test-third-party-cookie-phaseout",
     "owners": [ "selya@google.com" , "dylancutler@google.com" ],
     "expiry_milestone": 155

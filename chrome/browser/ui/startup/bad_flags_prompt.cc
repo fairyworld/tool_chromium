@@ -39,6 +39,7 @@
 #include "gpu/config/gpu_switches.h"
 #include "media/base/media_switches.h"
 #include "media/media_buildflags.h"
+#include "net/base/features.h"
 #include "net/base/switches.h"
 #include "sandbox/policy/switches.h"
 #include "services/network/public/cpp/network_switches.h"
@@ -236,6 +237,10 @@ static const std::variant<const base::Feature*, const char*>
 
         // This feature is under development and has known security risks.
         &webnn::mojom::features::kWebMachineLearningNeuralNetwork,
+
+        // This feature enables the test root store, which can contain roots
+        // that are not actually trusted.
+        &net::features::kTestRootStore,
 };
 
 void ShowBadFlagsInfoBarHelper(content::WebContents* web_contents,

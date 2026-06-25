@@ -4253,6 +4253,14 @@ inline constexpr char kSameAppWindowCycleName[] =
 inline constexpr char kSameAppWindowCycleDescription[] =
     "Use Alt+` to cycle through the windows of the active application.";
 
+inline constexpr char kTestRootStoreName[] =
+    "Enable Test-only MTC Root Store (UNSAFE)";
+inline constexpr char kTestRootStoreDescription[] =
+    "Enable MTC certificate verification based on test-only roots. This is "
+    "unsafe and may permit an attacker to intercept or modify your HTTPS "
+    "connections. Do not use this flag on an instance containing personal "
+    "data. Recommended for developer use only in isolated testing environments";
+
 inline constexpr char kTestThirdPartyCookiePhaseoutName[] =
     "Test Third Party Cookie Phaseout";
 inline constexpr char kTestThirdPartyCookiePhaseoutDescription[] =

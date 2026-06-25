@@ -915,6 +915,12 @@ NET_EXPORT BASE_DECLARE_FEATURE(kNoVarySearchCacheLoadOnSeparateTaskRunner);
 NET_EXPORT BASE_DECLARE_FEATURE_PARAM(base::TaskPriority,
                                       kNoVarySearchCacheLoadTaskRunnerPriority);
 
+// Enable MTC certificate verification based on test-only roots. This is unsafe
+// and may permit an attacker to intercept or modify your HTTPS connections. Do
+// not use this flag on an instance containing personal data. Recommended for
+// developer use only in isolated testing environments.
+NET_EXPORT BASE_DECLARE_FEATURE(kTestRootStore);
+
 }  // namespace net::features
 
 #endif  // NET_BASE_FEATURES_H_

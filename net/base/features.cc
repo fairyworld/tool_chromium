@@ -896,4 +896,6 @@ BASE_FEATURE_ENUM_PARAM(base::TaskPriority,
                         base::TaskPriority::BEST_EFFORT,
                         &kNoVarySearchCacheLoadOnSeparateTaskRunnerOptions);
 
+BASE_FEATURE(kTestRootStore, base::FEATURE_DISABLED_BY_DEFAULT);
+
 }  // namespace net::features
