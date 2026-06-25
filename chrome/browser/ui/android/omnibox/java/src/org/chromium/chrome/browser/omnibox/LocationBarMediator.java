@@ -2552,6 +2552,7 @@ class LocationBarMediator
         mHintTextUpdater.endInput();
         setAttachmentModelList(null);
         mExactMatchUrlSupplier.set(null);
+        mLocationBarLayout.setIsInStandby(false);
     }
 
     /**
@@ -2570,7 +2571,6 @@ class LocationBarMediator
         if (mUrlHasFocus) {
             mUrlCoordinator.clearFocus();
         }
-        mLocationBarLayout.setIsInStandby(false);
     }
 
     @Override
