@@ -792,6 +792,7 @@ chromium-metrics-reviews@google.com.
   <int value="200" label="HttpCache.useDefaultQuota"/>
   <int value="201" label="HttpCache.getQuotaBytes"/>
   <int value="202" label="HttpCache.setQuotaBytes"/>
+  <int value="203" label="Profile.enqueuePreconnect"/>
 <!-- LINT.ThenChange(/android_webview/support_library/java/src/org/chromium/support_lib_glue/SupportLibWebViewChromiumFactory.java:ApiCall) -->
 
 </enum>
