@@ -268,7 +268,7 @@ AvatarToolbarButtonState AvatarToolbarButtonTestAccessor::GetState() {
   return std::visit(
       absl::Overload{
           [](AvatarToolbarButton* button) -> AvatarToolbarButtonState {
-            return button ? button->state_manager_->GetActiveState()
+            return button ? button->state_manager_.GetActiveState()
                           : AvatarToolbarButtonState::kNormal;
           },
           [this](WebUIAvatarToolbarButton* button) -> AvatarToolbarButtonState {
