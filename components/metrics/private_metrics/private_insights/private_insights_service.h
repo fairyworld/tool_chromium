@@ -5,6 +5,7 @@
 #ifndef COMPONENTS_METRICS_PRIVATE_METRICS_PRIVATE_INSIGHTS_PRIVATE_INSIGHTS_SERVICE_H_
 #define COMPONENTS_METRICS_PRIVATE_METRICS_PRIVATE_INSIGHTS_PRIVATE_INSIGHTS_SERVICE_H_
 
+#include <optional>
 #include <string>
 
 #include "base/component_export.h"
@@ -47,6 +48,10 @@ inline constexpr char kUploadPendingTimeHistogram[] =
     "PrivateMetrics.PrivateInsights.Upload.PendingTime";
 inline constexpr char kUploadTimeHistogram[] =
     "PrivateMetrics.PrivateInsights.Upload.Time";
+inline constexpr char kContributedTaskCountHistogram[] =
+    "PrivateMetrics.PrivateInsights.ContributedTaskCount";
+inline constexpr char kFederatedComputationOutcomeHistogram[] =
+    "PrivateMetrics.PrivateInsights.FederatedComputationOutcome";
 
 class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
     : public KeyedService {
@@ -63,8 +68,28 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
     std::string population_name;
   };
 
+  // LINT.IfChange(PrivateInsightsFederatedComputationOutcome)
+  enum class FederatedComputationOutcome {
+    kSuccess = 0,
+    kPartial = 1,
+    kFailed = 2,
+    kUnknown = 3,
+    kErrorOther = 4,
+    kErrorNoServerUri = 5,
+    kErrorInvalidEntryPointUri = 6,
+    kErrorDatabaseReadFailed = 7,
+    kErrorDatabaseResetFailed = 8,
+    kMaxValue = kErrorDatabaseResetFailed,
+  };
+  // LINT.ThenChange(//tools/metrics/histograms/metadata/private_metrics/enums.xml:PrivateInsightsFederatedComputationOutcome)
+
+  struct FederatedComputationResult {
+    FederatedComputationOutcome outcome;
+    std::optional<size_t> contributed_task_count;
+  };
+
   using RunFederatedComputationFunc =
-      bool (*)(const FederatedComputationParams& params);
+      FederatedComputationResult (*)(const FederatedComputationParams& params);
 
   // LINT.IfChange(PrivateInsightsTriggerUploadOutcome)
   enum class TriggerUploadOutcome {
@@ -100,14 +125,16 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
   void TriggerUpload();
 
   // Runs on a background thread pool sequence (allows blocking).
-  static bool UploadBlocking(const base::FilePath& profile_dir,
-                             base::TimeTicks trigger_time);
+  static FederatedComputationResult UploadBlocking(
+      const base::FilePath& profile_dir,
+      base::TimeTicks trigger_time);
 
-  static bool RunFederatedComputation(const FederatedComputationParams& params);
+  static FederatedComputationResult RunFederatedComputation(
+      const FederatedComputationParams& params);
 
   static RunFederatedComputationFunc run_federated_computation_func;
 
-  void OnUploadComplete(bool result);
+  void OnUploadComplete(FederatedComputationResult result);
 
   raw_ptr<PrefService> local_state_ = nullptr;
   base::FilePath profile_dir_;

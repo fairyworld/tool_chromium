@@ -33,6 +33,69 @@ namespace {
 inline constexpr char kContextualCuesPopulationName[] =
     "private_insights/contextual_cues";
 
+PrivateInsightsService::FederatedComputationResult
+ParseFederatedComputationResult(
+    const absl::StatusOr<fcp::client::FLRunnerResult>& result) {  // nocheck
+  if (result.ok()) {
+    PrivateInsightsService::FederatedComputationOutcome outcome;
+    switch (result->contribution_result()) {
+      case fcp::client::FLRunnerResult::SUCCESS:
+        outcome = PrivateInsightsService::FederatedComputationOutcome::kSuccess;
+        break;
+      case fcp::client::FLRunnerResult::PARTIAL:
+        outcome = PrivateInsightsService::FederatedComputationOutcome::kPartial;
+        break;
+      case fcp::client::FLRunnerResult::FAIL:
+        outcome = PrivateInsightsService::FederatedComputationOutcome::kFailed;
+        break;
+      default:
+        outcome = PrivateInsightsService::FederatedComputationOutcome::kUnknown;
+        break;
+    }
+
+    return {
+        .outcome = outcome,
+        .contributed_task_count =
+            static_cast<size_t>(result->contributed_task_names().size()),
+    };
+  }
+
+  const absl::Status& status = result.status();
+  const absl::string_view msg = status.message();
+  const absl::StatusCode code = status.code();
+
+  if (code == absl::StatusCode::kInvalidArgument &&
+      msg.find("The entry point uri is invalid") != absl::string_view::npos) {
+    return {
+        .outcome = PrivateInsightsService::FederatedComputationOutcome::
+            kErrorInvalidEntryPointUri,
+        .contributed_task_count = std::nullopt,
+    };
+  }
+
+  if (msg.find("Failed to read from database") != absl::string_view::npos) {
+    return {
+        .outcome = PrivateInsightsService::FederatedComputationOutcome::
+            kErrorDatabaseReadFailed,
+        .contributed_task_count = std::nullopt,
+    };
+  }
+
+  if (msg.find("Failed to reset the database") != absl::string_view::npos) {
+    return {
+        .outcome = PrivateInsightsService::FederatedComputationOutcome::
+            kErrorDatabaseResetFailed,
+        .contributed_task_count = std::nullopt,
+    };
+  }
+
+  return {
+      .outcome =
+          PrivateInsightsService::FederatedComputationOutcome::kErrorOther,
+      .contributed_task_count = std::nullopt,
+  };
+}
+
 }  // namespace
 
 PrivateInsightsService::PrivateInsightsService(
@@ -114,13 +177,17 @@ void PrivateInsightsService::TriggerUpload() {
 }
 
 // static
-bool PrivateInsightsService::UploadBlocking(const base::FilePath& profile_dir,
-                                            base::TimeTicks trigger_time) {
+PrivateInsightsService::FederatedComputationResult
+PrivateInsightsService::UploadBlocking(const base::FilePath& profile_dir,
+                                       base::TimeTicks trigger_time) {
   base::UmaHistogramTimes(kUploadPendingTimeHistogram,
                           base::TimeTicks::Now() - trigger_time);
   const std::string server_uri = kFcpServerUri.Get();
   if (server_uri.empty()) {
-    return false;
+    return {
+        .outcome = FederatedComputationOutcome::kErrorNoServerUri,
+        .contributed_task_count = std::nullopt,
+    };
   }
   base::TimeTicks upload_start_time = base::TimeTicks::Now();
 
@@ -147,10 +214,7 @@ bool PrivateInsightsService::UploadBlocking(const base::FilePath& profile_dir,
       .population_name = kContextualCuesPopulationName,
   };
 
-  bool result = false;
-  if (run_federated_computation_func) {
-    result = run_federated_computation_func(params);
-  }
+  FederatedComputationResult result = run_federated_computation_func(params);
 
   base::UmaHistogramTimes(kUploadTimeHistogram,
                           base::TimeTicks::Now() - upload_start_time);
@@ -158,7 +222,8 @@ bool PrivateInsightsService::UploadBlocking(const base::FilePath& profile_dir,
 }
 
 // static
-bool PrivateInsightsService::RunFederatedComputation(
+PrivateInsightsService::FederatedComputationResult
+PrivateInsightsService::RunFederatedComputation(
     const FederatedComputationParams& params) {
   absl::StatusOr<fcp::client::FLRunnerResult> statusor =  // nocheck
       fcp::client::RunFederatedComputation(
@@ -177,7 +242,7 @@ bool PrivateInsightsService::RunFederatedComputation(
           /*retry_token=*/"",
           /*client_version=*/"",  // TODO(b/518646350): Add client version.
           /*client_attestation_measurement=*/"");
-  return statusor.ok();
+  return ParseFederatedComputationResult(statusor);
 }
 
 // static
@@ -185,10 +250,17 @@ PrivateInsightsService::RunFederatedComputationFunc
     PrivateInsightsService::run_federated_computation_func =
         &PrivateInsightsService::RunFederatedComputation;
 
-void PrivateInsightsService::OnUploadComplete(bool _result) {
+void PrivateInsightsService::OnUploadComplete(
+    FederatedComputationResult result) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
   is_upload_running_ = false;
-  // TODO(b/518646350): Handle the result of the upload.
+  base::UmaHistogramEnumeration(kFederatedComputationOutcomeHistogram,
+                                result.outcome);
+  if (result.contributed_task_count.has_value()) {
+    base::UmaHistogramCounts100(
+        kContributedTaskCountHistogram,
+        static_cast<int>(*result.contributed_task_count));
+  }
 }
 
 // static

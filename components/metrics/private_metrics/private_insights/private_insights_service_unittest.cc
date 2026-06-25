@@ -36,10 +36,15 @@ class PrivateInsightsServiceTest : public testing::Test {
     PrivateInsightsService::SetRunFederatedComputationForTesting(nullptr);
   }
 
-  static bool MockRunFederatedComputation(
+  static PrivateInsightsService::FederatedComputationResult
+  MockRunFederatedComputation(
       const PrivateInsightsService::FederatedComputationParams& params) {
     mock_run_federated_computation_call_count_++;
-    return true;
+    return {
+        .outcome =
+            PrivateInsightsService::FederatedComputationOutcome::kSuccess,
+        .contributed_task_count = 1,
+    };
   }
 
   static inline std::atomic<int> mock_run_federated_computation_call_count_ = 0;
@@ -76,6 +81,10 @@ TEST_F(PrivateInsightsServiceTest,
 
   histogram_tester.ExpectTotalCount(kUploadPendingTimeHistogram, 1);
   histogram_tester.ExpectTotalCount(kUploadTimeHistogram, 1);
+  histogram_tester.ExpectUniqueSample(
+      kFederatedComputationOutcomeHistogram,
+      PrivateInsightsService::FederatedComputationOutcome::kSuccess, 1);
+  histogram_tester.ExpectUniqueSample(kContributedTaskCountHistogram, 1, 1);
 
   // Third call: now that task completed, should post the task again.
   service.TriggerUpload();
@@ -87,6 +96,10 @@ TEST_F(PrivateInsightsServiceTest,
   ASSERT_TRUE(
       base::test::RunUntil([&]() { return !service.is_upload_running_; }));
   EXPECT_EQ(mock_run_federated_computation_call_count_, 2);
+  histogram_tester.ExpectUniqueSample(
+      kFederatedComputationOutcomeHistogram,
+      PrivateInsightsService::FederatedComputationOutcome::kSuccess, 2);
+  histogram_tester.ExpectUniqueSample(kContributedTaskCountHistogram, 1, 2);
 }
 
 TEST_F(PrivateInsightsServiceTest, MetricsChoiceCoupling) {
@@ -178,6 +191,14 @@ TEST_F(PrivateInsightsServiceTest, UploadSkippedWhenServerUriEmpty) {
   ASSERT_TRUE(
       base::test::RunUntil([&]() { return !service.is_upload_running_; }));
   EXPECT_EQ(mock_run_federated_computation_call_count_, 0);
+
+  histogram_tester.ExpectTotalCount(kUploadPendingTimeHistogram, 1);
+  histogram_tester.ExpectTotalCount(kUploadTimeHistogram, 0);
+  histogram_tester.ExpectUniqueSample(
+      kFederatedComputationOutcomeHistogram,
+      PrivateInsightsService::FederatedComputationOutcome::kErrorNoServerUri,
+      1);
+  histogram_tester.ExpectTotalCount(kContributedTaskCountHistogram, 0);
 }
 
 }  // namespace private_insights
