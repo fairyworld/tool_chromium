@@ -119,6 +119,7 @@
 #import "ios/chrome/browser/web/model/web_navigation_browser_agent.h"
 #import "ios/chrome/browser/whats_new/coordinator/whats_new_util.h"
 #import "ios/chrome/browser/window_activities/model/window_activity_helpers.h"
+#import "ios/chrome/common/ui/colors/semantic_color_names.h"
 #import "ios/chrome/grit/ios_branded_strings.h"
 #import "ios/chrome/grit/ios_strings.h"
 #import "ios/public/provider/chrome/browser/cobalt/cobalt_api.h"
@@ -251,6 +252,7 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
 @property(nonatomic, strong) OverflowMenuDestination* levelUpDestination;
 
 @property(nonatomic, strong) OverflowMenuActionGroup* identityActionsGroup;
+@property(nonatomic, strong) OverflowMenuActionGroup* customizationActionsGroup;
 @property(nonatomic, strong) OverflowMenuActionGroup* appActionsGroup;
 @property(nonatomic, strong) OverflowMenuActionGroup* pageActionsGroup;
 @property(nonatomic, strong) OverflowMenuActionGroup* helpActionsGroup;
@@ -290,6 +292,8 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
 @property(nonatomic, strong) OverflowMenuAction* askBWGAction;
 
 @property(nonatomic, strong) OverflowMenuAction* hideToolbarsAction;
+
+@property(nonatomic, strong) OverflowMenuAction* customizeHomepageAction;
 
 @property(nonatomic, strong) OverflowMenuAction* shareAction;
 
@@ -369,6 +373,37 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
 }
 
 #pragma mark - Property getters/setters
+
+- (OverflowMenuAction*)customizeHomepageAction {
+  CHECK(IsOverflowMenuHomeCustomizationEntrypointEnabled());
+  if (![self isCurrentWebPageNTP]) {
+    // Only the NTP supports the home customization action.
+    return nil;
+  }
+
+  if (!_customizeHomepageAction) {
+    // TODO(crbug.com/527016576): Add a preview image for the current NTP
+    // background to the left of the symbol.
+    _customizeHomepageAction =
+        [self createOverflowMenuActionWithNameID:
+                  IDS_IOS_TOOLS_MENU_CUSTOMIZE_HOME_PAGE
+                                      actionType:overflow_menu::ActionType::
+                                                     CustomizeHomePage
+                                      symbolName:kChevronForwardSymbol
+                                    systemSymbol:YES
+                                monochromeSymbol:YES
+                                 accessibilityID:kToolsMenuCustomizeHomePageId
+                                    hideItemText:nil
+                                         handler:^{
+                                           // TODO(crbug.com/527016576): Present
+                                           // the customization menu.
+                                           NOTIMPLEMENTED();
+                                         }];
+    _customizeHomepageAction.symbolTintColor =
+        [UIColor colorNamed:kTextQuaternaryColor];
+  }
+  return _customizeHomepageAction;
+}
 
 - (OverflowMenuAction*)editActionsAction {
   if (IsOverflowMenuNTPRefactorEnabled() && [self isCurrentWebPageNTP]) {
@@ -841,6 +876,15 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
         [[OverflowMenuActionGroup alloc] initWithGroupName:kIdentityGroupName
                                                    actions:@[]
                                                     footer:nil];
+  }
+
+  if (IsOverflowMenuHomeCustomizationEntrypointEnabled()) {
+    self.customizationActionsGroup = [[OverflowMenuActionGroup alloc]
+        initWithGroupName:@"customization_actions"
+                  actions:self.customizeHomepageAction
+                              ? @[ self.customizeHomepageAction ]
+                              : @[]
+                   footer:nil];
   }
 
   self.model.actionGroups = @[
@@ -1682,6 +1726,9 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
       return self.signinAction;
     case overflow_menu::ActionType::Identity:
       return self.identityAction;
+    case overflow_menu::ActionType::CustomizeHomePage:
+      CHECK(IsOverflowMenuHomeCustomizationEntrypointEnabled());
+      return self.customizeHomepageAction;
   }
 }
 
@@ -1875,6 +1922,10 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
     if (identityActions.count > 0) {
       [actionGroups addObject:self.identityActionsGroup];
     }
+  }
+
+  if (IsOverflowMenuHomeCustomizationEntrypointEnabled()) {
+    [actionGroups addObject:self.customizationActionsGroup];
   }
 
   [actionGroups addObjectsFromArray:@[
@@ -2523,6 +2574,7 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
     case overflow_menu::ActionType::ShareThisPage:
     case overflow_menu::ActionType::Signin:
     case overflow_menu::ActionType::Identity:
+    case overflow_menu::ActionType::CustomizeHomePage:
       NOTREACHED();
     case overflow_menu::ActionType::Bookmark:
       return [self newAddBookmarkAction];

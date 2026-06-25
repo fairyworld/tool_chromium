@@ -2854,6 +2854,11 @@ constexpr auto kFeatureEntries = std::to_array<flags_ui::FeatureEntry>({
      flag_descriptions::kOverflowMenuNTPRefactorName,
      flag_descriptions::kOverflowMenuNTPRefactorDescription, flags_ui::kOsIos,
      FEATURE_VALUE_TYPE(kOverflowMenuNTPRefactor)},
+    {"overflow-menu-home-customization-entrypoint",
+     flag_descriptions::kOverflowMenuHomeCustomizationEntrypointName,
+     flag_descriptions::kOverflowMenuHomeCustomizationEntrypointDescription,
+     flags_ui::kOsIos,
+     FEATURE_VALUE_TYPE(kOverflowMenuHomeCustomizationEntrypoint)},
 });
 
 bool SkipConditionalFeatureEntry(const flags_ui::FeatureEntry& entry) {

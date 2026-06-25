@@ -23,6 +23,9 @@ import Combine
   /// An optional subtitle to be displayed under the main title.
   @Published public var subtitle: String? = nil
 
+  /// The optional tint color of the action's symbol.
+  @Published public var symbolTintColor: UIColor? = nil
+
   /// The optional user avatar image for signed-in state, the image needs to be 40x40.
   @Published public var image: UIImage? = nil
 

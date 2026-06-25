@@ -7496,6 +7496,11 @@
     "expiry_milestone": 170
   },
   {
+    "name": "overflow-menu-home-customization-entrypoint",
+    "owners": [ "gambard@google.com", "ericekey@google.com", "bling-meridian@google.com" ],
+    "expiry_milestone": 155
+  },
+  {
     "name": "overflow-menu-ntp-refactor",
     "owners": [ "gambard@google.com", "ericekey@google.com", "bling-meridian@google.com" ],
     "expiry_milestone": 155

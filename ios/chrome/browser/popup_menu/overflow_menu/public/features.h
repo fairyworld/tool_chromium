@@ -16,4 +16,11 @@ BASE_DECLARE_FEATURE(kOverflowMenuNTPRefactor);
 // Returns true if the OverflowMenuNtpRefactor feature is enabled.
 bool IsOverflowMenuNTPRefactorEnabled();
 
+// Enables the OverflowMenuHomeCustomizationEntrypoint feature.
+BASE_DECLARE_FEATURE(kOverflowMenuHomeCustomizationEntrypoint);
+
+// Returns true if the OverflowMenuHomeCustomizationEntrypoint feature is
+// enabled.
+bool IsOverflowMenuHomeCustomizationEntrypointEnabled();
+
 #endif  // IOS_CHROME_BROWSER_POPUP_MENU_OVERFLOW_MENU_PUBLIC_FEATURES_H_

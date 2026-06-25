@@ -105,7 +105,7 @@ struct OverflowMenuActionRow: View {
         .labelStyle(.iconOnly)
         .tint(.chromeBlue)
         .accessibilityRemoveTraits(.isSelected)
-        rowIcon
+        rowIcon?.foregroundColor(action.symbolTintColor.map { Color(uiColor: $0) })
         centerTextView
         Spacer()
       }
@@ -123,9 +123,7 @@ struct OverflowMenuActionRow: View {
           newLabelIconView
         }
         Spacer()
-        if let rowIcon = rowIcon {
-          rowIcon
-        }
+        rowIcon?.foregroundColor(action.symbolTintColor.map { Color(uiColor: $0) })
       }
       .padding([.trailing], Self.rowEndPadding)
     }

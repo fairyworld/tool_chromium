@@ -14,3 +14,13 @@ bool IsOverflowMenuNTPRefactorEnabled() {
   }
   return base::FeatureList::IsEnabled(kOverflowMenuNTPRefactor);
 }
+
+BASE_FEATURE(kOverflowMenuHomeCustomizationEntrypoint,
+             base::FEATURE_DISABLED_BY_DEFAULT);
+
+bool IsOverflowMenuHomeCustomizationEntrypointEnabled() {
+  if (!IsOverflowMenuNTPRefactorEnabled()) {
+    return false;
+  }
+  return base::FeatureList::IsEnabled(kOverflowMenuHomeCustomizationEntrypoint);
+}

@@ -58,6 +58,7 @@
 #import "ios/chrome/browser/policy/model/cloud/user_policy_constants.h"
 #import "ios/chrome/browser/policy/model/enterprise_policy_test_helper.h"
 #import "ios/chrome/browser/popup_menu/overflow_menu/coordinator/overflow_menu_orderer.h"
+#import "ios/chrome/browser/popup_menu/overflow_menu/public/features.h"
 #import "ios/chrome/browser/popup_menu/overflow_menu/public/overflow_menu_constants.h"
 #import "ios/chrome/browser/popup_menu/overflow_menu/ui/ui_swift.h"
 #import "ios/chrome/browser/popup_menu/public/popup_menu_constants.h"
@@ -1481,4 +1482,48 @@ TEST_F(OverflowMenuMediatorTest, TestReadingModeMenu) {
   ASSERT_TRUE(HasItem(kToolsMenuRequestDesktopId, /*enabled=*/YES));
   ASSERT_TRUE(HasItem(kToolsMenuAddToBookmarks, /*enabled=*/YES));
   ASSERT_TRUE(HasItem(kToolsMenuReadingListId, /*enabled=*/YES));
+}
+
+// Tests that the Customize Home Page item is shown on the NTP when the
+// kOverflowMenuHomeCustomizationEntrypoint feature is enabled.
+TEST_F(OverflowMenuMediatorTest, TestCustomizeHomePageShownOnNTP) {
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitWithFeatures(
+      /*enabled_features=*/{kComposeboxIpad, kChromeNextIa,
+                            kOverflowMenuNTPRefactor,
+                            kOverflowMenuHomeCustomizationEntrypoint},
+      /*disabled_features=*/{});
+
+  navigation_item_->SetURL(GURL("chrome://newtab"));
+
+  CreateMediator(/*incognito=*/NO);
+  SetUpActiveWebState();
+  mediator_.webStateList = browser_->GetWebStateList();
+
+  // Force model update.
+  mediator_.model = model_;
+
+  EXPECT_TRUE(HasItem(kToolsMenuCustomizeHomePageId, /*enabled=*/YES));
+}
+
+// Tests that the Customize Home Page item is NOT shown on a regular web page
+// even when the kOverflowMenuHomeCustomizationEntrypoint feature is enabled.
+TEST_F(OverflowMenuMediatorTest, TestCustomizeHomePageNotShownOnWebPage) {
+  base::test::ScopedFeatureList scoped_feature_list;
+  scoped_feature_list.InitWithFeatures(
+      /*enabled_features=*/{kComposeboxIpad, kChromeNextIa,
+                            kOverflowMenuNTPRefactor,
+                            kOverflowMenuHomeCustomizationEntrypoint},
+      /*disabled_features=*/{});
+
+  navigation_item_->SetURL(GURL("https://chromium.org"));
+
+  CreateMediator(/*incognito=*/NO);
+  SetUpActiveWebState();
+  mediator_.webStateList = browser_->GetWebStateList();
+
+  // Force model update.
+  mediator_.model = model_;
+
+  EXPECT_FALSE(HasItem(kToolsMenuCustomizeHomePageId, /*enabled=*/YES));
 }

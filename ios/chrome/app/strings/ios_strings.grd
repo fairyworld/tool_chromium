@@ -8524,6 +8524,9 @@ Handoff must also be enabled in the General section of Settings, and your device
       <message name="IDS_IOS_TOOLS_MENU_CUSTOMIZATION_IPH" desc="The text on an IPH for the iOS menu telling users they can customize the menu">
         Customize your menu
       </message>
+      <message name="IDS_IOS_TOOLS_MENU_CUSTOMIZE_HOME_PAGE" desc="The iOS menu item to open the Home Customization menu [iOS only]" meaning="[Length: unlimited]">
+        Customize home page
+      </message>
       <message name="IDS_IOS_TOOLS_MENU_DOWNLOADS" desc="The iOS menu item for opening the downloads folder [iOS only]" meaning="[Length: 16em] [iOS only] This is a feature name in title case.">
         Downloads
       </message>
