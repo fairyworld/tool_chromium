@@ -36,6 +36,9 @@ class TabDragWindowAdapter {
   // Returns the window bounds in screen coordinates.
   virtual gfx::Rect GetBoundsInScreen() const = 0;
 
+  // Returns true if the given dragged tab count represents the entire window.
+  virtual bool IsDraggingEntireWindow(size_t dragged_tab_count) const = 0;
+
   // Converts a point in screen coordinates to local coordinates relative to the
   // given `target_view`.
   virtual gfx::Point ConvertScreenPointToLocal(

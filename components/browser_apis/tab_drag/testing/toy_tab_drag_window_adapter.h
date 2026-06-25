@@ -32,6 +32,7 @@ class ToyTabDragWindowAdapter : public TabDragWindowAdapter {
     return gfx::NativeWindow();
   }
   gfx::Rect GetBoundsInScreen() const override;
+  bool IsDraggingEntireWindow(size_t dragged_tab_count) const override;
   gfx::Point ConvertScreenPointToLocal(
       gfx::NativeView target_view,
       const gfx::Point& screen_point) const override;
@@ -65,6 +66,7 @@ class ToyTabDragWindowAdapter : public TabDragWindowAdapter {
   }
 
   // Toy controls:
+  void set_tab_count(size_t count) { tab_count_ = count; }
   void set_detach_to_new_window_result(
       base::expected<TabDragWindowId, mojo_base::mojom::ErrorPtr> result) {
     detach_to_new_window_result_ = std::move(result);
@@ -95,6 +97,7 @@ class ToyTabDragWindowAdapter : public TabDragWindowAdapter {
   }
 
  private:
+  size_t tab_count_ = 2;
   gfx::Rect bounds_;
   bool has_capture_ = false;
   TabDragWindowId id_;

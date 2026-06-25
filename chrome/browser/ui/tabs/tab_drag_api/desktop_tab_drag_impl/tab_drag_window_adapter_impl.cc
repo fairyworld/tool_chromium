@@ -47,6 +47,13 @@ gfx::Rect TabDragWindowAdapterImpl::GetBoundsInScreen() const {
   return browser_window_->GetWindow()->GetBounds();
 }
 
+bool TabDragWindowAdapterImpl::IsDraggingEntireWindow(
+    size_t dragged_tab_count) const {
+  return browser_window_ &&
+         dragged_tab_count ==
+             static_cast<size_t>(browser_window_->GetTabStripModel()->count());
+}
+
 namespace {
 
 // Helper to recursively find the NativeViewHost for a given NativeView.
