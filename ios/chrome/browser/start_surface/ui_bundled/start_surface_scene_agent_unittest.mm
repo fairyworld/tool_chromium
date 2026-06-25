@@ -22,6 +22,7 @@
 #import "ios/chrome/browser/shared/model/browser/browser_provider_interface.h"
 #import "ios/chrome/browser/shared/model/prefs/pref_names.h"
 #import "ios/chrome/browser/shared/model/profile/test/test_profile_ios.h"
+#import "ios/chrome/browser/shared/model/profile/test/test_profile_manager_ios.h"
 #import "ios/chrome/browser/shared/model/url/chrome_url_constants.h"
 #import "ios/chrome/browser/shared/model/url/url_util.h"
 #import "ios/chrome/browser/shared/model/web_state_list/web_state_list.h"
@@ -56,7 +57,9 @@ const char kOneHourThreshold[] = "3600";
 class StartSurfaceSceneAgentTest : public PlatformTest {
  public:
   StartSurfaceSceneAgentTest() {
-    profile_ = TestProfileIOS::Builder().Build();
+    TestProfileIOS::Builder builder;
+    builder.SetName(profile_manager_.ReserveNewProfileName());
+    profile_ = profile_manager_.AddProfileWithBuilder(std::move(builder));
     startup_information_ = [[FakeStartupInformation alloc] init];
     app_state_ = OCMClassMock([AppState class]);
     OCMStub([app_state_ startupInformation]).andReturn(startup_information_);
@@ -117,7 +120,8 @@ class StartSurfaceSceneAgentTest : public PlatformTest {
  protected:
   web::WebTaskEnvironment task_environment_;
   IOSChromeScopedTestingLocalState scoped_testing_local_state_;
-  std::unique_ptr<TestProfileIOS> profile_;
+  TestProfileManagerIOS profile_manager_;
+  raw_ptr<TestProfileIOS> profile_;
   FakeStartupInformation* startup_information_;
   AppState* app_state_;
   ProfileState* profile_state_;
