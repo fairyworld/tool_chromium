@@ -510,7 +510,6 @@ class HostProcess : public ConfigWatcher::Delegate,
 
   DesktopEnvironmentOptions desktop_environment_options_;
   bool security_key_auth_policy_enabled_ = false;
-  bool security_key_extension_supported_ = true;
 
   // Used to specify which window to stream, if enabled.
   webrtc::WindowId window_id_ = 0;
@@ -1121,10 +1120,13 @@ void HostProcess::StartOnUiThread() {
   if (!security_key_socket_name.empty()) {
     remoting::SecurityKeyAuthHandlerPosix::SetSecurityKeySocketName(
         security_key_socket_name);
-  } else if (!multi_process_) {
-    security_key_extension_supported_ = false;
+    desktop_environment_options_.set_enable_security_key(true);
+  } else if (multi_process_) {
+    desktop_environment_options_.set_enable_security_key(true);
   }
-#endif  // BUILDFLAG(IS_POSIX)
+#elif BUILDFLAG(IS_WIN)
+  desktop_environment_options_.set_enable_security_key(true);
+#endif
 
   // Create a desktop environment factory appropriate to the build type &
   // platform.
@@ -2048,7 +2050,8 @@ void HostProcess::StartHost() {
                           base::Unretained(this)),
       &local_session_policies_provider_);
 
-  if (security_key_auth_policy_enabled_ && security_key_extension_supported_) {
+  if (security_key_auth_policy_enabled_ &&
+      desktop_environment_options_.enable_security_key()) {
     host_->AddExtension(
         std::make_unique<SecurityKeyExtension>(context_->file_task_runner()));
   }
