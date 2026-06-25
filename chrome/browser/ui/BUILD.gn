@@ -5112,33 +5112,94 @@ static_library("ui") {
       # TODO(crbug.com/434882143): Remove this circular dependency when the
       # following headers get componentized:
       # c/b/ui/browser.h
-      # c/b/ui/views/web_apps/frame_toolbar/web_app_menu_button.h
+      # c/b/ui/views/omnibox/omnibox_popup_presenter_delegate.h
+      # c/b/ui/views/omnibox/webui_readonly_omnibox.h
       # c/b/ui/views/permissions/chip/permission_dashboard_controller.h
+      # c/b/ui/views/web_apps/frame_toolbar/web_app_menu_button.h
       "//chrome/browser/ui/views/location_bar",
 
       # TODO(crbug.com/434882143): Remove this circular dependency when the
       # following headers get componentized:
-      # c/b/ui/browser.h, browser_dialogs.h, browser_tabstrip.h, view_ids.h, browser_window.h.
+      # c/b/ui/browser.h, browser_command_controller.h, browser_commands.h,
+      # browser_tabstrip.h, browser_window.h, bubble_anchor_util.h,
+      # intent_picker_tab_helper.h, view_ids.h
+      # c/b/ui/views/bookmarks/bookmark_bubble_view.h
+      # c/b/ui/views/bubble_anchor_util_views.h
+      # c/b/ui/views/content_setting_bubble_contents.h
       # c/b/ui/views/frame/browser_view.h
+      # c/b/ui/views/intent_picker_bubble_view.h
+      # c/b/ui/views/omnibox/omnibox_context_menu.h
+      # c/b/ui/views/omnibox/omnibox_popup_aim_presenter.h
+      # c/b/ui/views/omnibox/omnibox_popup_closer.h
+      # c/b/ui/views/omnibox/omnibox_popup_presenter.h
+      # c/b/ui/views/omnibox/omnibox_popup_presenter_base.h
+      # c/b/ui/views/omnibox/omnibox_popup_view_browser_view.h
+      # c/b/ui/views/omnibox/omnibox_popup_view_full_webui.h
+      # c/b/ui/views/omnibox/omnibox_popup_view_views.h
+      # c/b/ui/views/omnibox/omnibox_popup_view_webui.h
+      # c/b/ui/views/omnibox/omnibox_popup_webui_base_content.h
+      # c/b/ui/views/omnibox/omnibox_popup_webui_content.h
+      # c/b/ui/views/omnibox/omnibox_view_views.h
+      # c/b/ui/views/omnibox/webui_readonly_omnibox.h
+      # c/b/ui/views/permissions/chip/permission_dashboard_controller.h
+      # c/b/ui/views/permissions/chip/permission_dashboard_view.h
+      # c/b/ui/views/permissions/chip/webui_permission_dashboard.h
+      # c/b/ui/views/record_replay/replay_recording_bubble_view.h
+      # c/b/ui/views/record_replay/save_recording_bubble_view.h
+      # c/b/ui/views/user_education/browser_help_bubble.h
       "//chrome/browser/ui/views/location_bar:impl",
 
       # TODO(crbug.com/432061436) Remove this circular dependency when the
       # following headers get componentized:
-      # c/b/ui/browser.h, browser_window.h.
+      # c/b/ui/browser.h, browser_window.h
+      # c/b/ui/views/frame/browser_view.h
+      # c/b/ui/views/webauthn/ambient/ambient_signin_bubble_view.h
       "//chrome/browser/ui/webauthn:impl",
 
       # TODO(crbug.com/434882143): Remove this circular dependency when the
       # following headers get componentized:
-      # c/b/ui/views/frame/browser_view.h
-      # c/b/ui/views/omnibox/omnibox_view_views.h
-      # c/b/ui/webui/new_tab_page/new_tab_page_ui.h
-      # c/b/ui/webui/ntp/new_tab_ui.h
+      # c/b/ui/browser.h, view_ids.h
+      # c/b/ui/views/autofill/payments/filled_card_information_icon_view.h
+      # c/b/ui/views/autofill/payments/mandatory_reauth_icon_view.h
+      # c/b/ui/views/autofill/payments/save_payment_icon_view.h
+      # c/b/ui/views/autofill/payments/virtual_card_enroll_icon_view.h
+      # c/b/ui/views/optimization_guide/optimization_guide_icon_view.h
+      # c/b/ui/views/sharing/sharing_dialog_view.h
+      # c/b/ui/views/sharing/sharing_icon_view.h
       "//chrome/browser/ui/views/page_action:impl",
 
-      # TODO(crbug.com/451609048): Remove these circular dependencies when the
-      # following header gets componentized:
+      # TODO(crbug.com/451609048): Remove this circular dependency when the
+      # following headers get componentized:
+      # - c/b/ui/browser_commands.h
       # - c/b/ui/views/bookmarks/saved_tab_groups/saved_tab_group_everything_menu.h
+      # - c/b/ui/views/frame/browser_view.h
+      # - c/b/ui/views/tab_search_bubble_host.h
       "//chrome/browser/ui/views/tabs/shared:impl",
+
+      # TODO(crbug.com/451609048): Remove this circular dependency when the
+      # following headers get componentized:
+      # - c/b/ui/browser_commands.h
+      # - c/b/ui/views/frame/browser_frame_view.h
+      # - c/b/ui/views/frame/browser_view.h
+      # - c/b/ui/views/frame/themed_background.h
+      # - c/b/ui/views/frame/vertical_tab_strip_region_view.h
+      # - c/b/ui/views/tabs/dragging/drag_session_data.h
+      # - c/b/ui/views/tabs/dragging/tab_drag_context.h
+      # - c/b/ui/views/tabs/dragging/tab_drag_controller.h
+      # - c/b/ui/views/tabs/groups/tab_group_accessibility.h
+      # - c/b/ui/views/tabs/groups/tab_group_editor_bubble_tracker.h
+      # - c/b/ui/views/tabs/hovercard/hover_card_anchor_target.h
+      # - c/b/ui/views/tabs/hovercard/tab_hover_card_controller.h
+      # - c/b/ui/views/tabs/new_tab_button.h
+      # - c/b/ui/views/tabs/tab/alert_indicator_button.h
+      # - c/b/ui/views/tabs/tab/glow_hover_controller.h
+      # - c/b/ui/views/tabs/tab/tab_accessibility.h
+      # - c/b/ui/views/tabs/tab/tab_close_button.h
+      # - c/b/ui/views/tabs/tab/tab_context_menu_controller.h
+      # - c/b/ui/views/tabs/tab/tab_icon.h
+      # - c/b/ui/views/tabs/tab/tab_title.h
+      # - c/b/ui/views/tabs/tab_slot_view.h
+      # - c/b/ui/views/tabs/vertical/vertical_tab_strip_controller.h
       "//chrome/browser/ui/views/tabs/vertical:impl",
 
       # TODO(crbug.com/434882143): Remove this circular dependency when the
