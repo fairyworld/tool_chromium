@@ -259,6 +259,25 @@ void OnFetchKeepAliveRequestComplete(
     const std::string& request_id,
     const network::URLLoaderCompletionStatus& status);
 
+// Logs prefetch/prerender activation beacon requests to the DevTools Network
+// panel as Ping resource types.
+void OnPrefetchActivationBeaconWillBeSent(
+    FrameTreeNodeId frame_tree_node_id,
+    const std::string& request_id,
+    const network::ResourceRequest& request,
+    std::optional<std::pair<const GURL&,
+                            const network::mojom::URLResponseHeadDevToolsInfo&>>
+        redirect_info = std::nullopt);
+void OnPrefetchActivationBeaconResponseReceived(
+    FrameTreeNodeId frame_tree_node_id,
+    const std::string& request_id,
+    const GURL& url,
+    const network::mojom::URLResponseHead& head);
+void OnPrefetchActivationBeaconRequestComplete(
+    FrameTreeNodeId frame_tree_node_id,
+    const std::string& request_id,
+    const network::URLLoaderCompletionStatus& status);
+
 void OnAuctionWorkletNetworkRequestWillBeSent(
     FrameTreeNodeId frame_tree_node_id,
     const network::ResourceRequest& request,

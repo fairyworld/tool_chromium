@@ -337,6 +337,17 @@ class NetworkHandler : public DevToolsDomainHandler,
                     const network::mojom::URLResponseHeadDevToolsInfo&>>
           redirect_info);
 
+  void PrefetchActivationBeaconWillBeSent(
+      const std::string& request_id,
+      const network::ResourceRequest& request,
+      const GURL& initiator_url,
+      std::optional<std::string> frame_token,
+      base::TimeTicks timestamp,
+      std::optional<
+          std::pair<const GURL&,
+                    const network::mojom::URLResponseHeadDevToolsInfo&>>
+          redirect_info);
+
   void OnSignedExchangeReceived(
       std::optional<const base::UnguessableToken> devtools_navigation_token,
       const GURL& outer_request_url,
