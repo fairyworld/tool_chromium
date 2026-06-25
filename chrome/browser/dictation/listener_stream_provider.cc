@@ -4,6 +4,7 @@
 
 #include "chrome/browser/dictation/listener_stream_provider.h"
 
+#include "base/strings/utf_string_conversions.h"
 #include "chrome/browser/dictation/dictation_keyed_service.h"
 #include "chrome/browser/dictation/stream_provider_delegate.h"
 #include "chrome/browser/dictation/target.h"
@@ -79,7 +80,9 @@ void ListenerStreamProvider::Stop() {
 void ListenerStreamProvider::OnTranscriptionUpdated(const std::string& data,
                                                     bool is_final) {
   latest_transcription_ = data;
-  is_final_ = is_final;
+  is_final_for_testing_ = is_final;
+
+  target_->SetComposition(base::UTF8ToUTF16(data), is_final);
 
   if (update_callback_for_testing_) {
     update_callback_for_testing_.Run();
@@ -92,6 +95,10 @@ void ListenerStreamProvider::OnStreamStateChanged(StreamState state) {
   state_ = state;
 
   delegate_->DidUpdateStreamProviderState(*this, old_state);
+
+  if (state == StreamState::kComplete) {
+    target_->CommitComposition(base::UTF8ToUTF16(latest_transcription_));
+  }
 
   if (update_callback_for_testing_) {
     update_callback_for_testing_.Run();
@@ -110,7 +117,7 @@ ListenerStreamProvider::GetLatestTranscriptionForTesting()  // IN-TEST
 }
 
 bool ListenerStreamProvider::IsTranscriptionFinalForTesting() const {
-  return is_final_;
+  return is_final_for_testing_;
 }
 
 ListenerStreamProvider::StreamState ListenerStreamProvider::GetState() const {

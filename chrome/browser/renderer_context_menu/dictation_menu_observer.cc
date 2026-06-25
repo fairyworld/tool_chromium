@@ -47,13 +47,14 @@ bool DictationMenuObserver::IsCommandIdEnabled(int command_id) {
 
 void DictationMenuObserver::ExecuteCommand(int command_id) {
   CHECK_EQ(command_id, IDC_CONTENT_CONTEXT_DICTATION);
-  if (!proxy_->GetRenderFrameHost()) {
+  content::RenderFrameHost* rfh = proxy_->GetRenderFrameHost();
+  if (!rfh) {
     return;
   }
 
   DictationKeyedService* service = GetDictationService();
   if (service) {
-    service->ContextMenuHandler(*window_, selection_text_);
+    service->ContextMenuHandler(*window_, *rfh, selection_text_);
   }
 }
 

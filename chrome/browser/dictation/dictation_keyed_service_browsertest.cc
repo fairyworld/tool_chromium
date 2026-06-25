@@ -22,9 +22,11 @@
 #include "chrome/test/base/chrome_test_utils.h"
 #include "chrome/test/base/platform_browser_test.h"
 #include "components/tabs/public/tab_interface.h"
+#include "content/public/browser/web_contents_observer.h"
 #include "content/public/test/browser_test.h"
 #include "content/public/test/browser_test_utils.h"
 #include "extensions/common/switches.h"
+#include "net/test/embedded_test_server/embedded_test_server.h"
 
 namespace dictation {
 
@@ -33,6 +35,26 @@ namespace {
 using ExtensionStreamState = extensions::api::dictation_private::StreamState;
 using ExtensionTranscriptionType =
     extensions::api::dictation_private::TranscriptionType;
+
+class FocusLossObserver : public content::WebContentsObserver {
+ public:
+  explicit FocusLossObserver(content::WebContents* web_contents)
+      : content::WebContentsObserver(web_contents) {}
+  FocusLossObserver(const FocusLossObserver&) = delete;
+  FocusLossObserver& operator=(const FocusLossObserver&) = delete;
+  ~FocusLossObserver() override = default;
+
+  // content::WebContentsObserver:
+  void OnWebContentsLostFocus(
+      content::RenderWidgetHost* render_widget_host) override {
+    lost_focus_called_ = true;
+  }
+
+  bool lost_focus_called() const { return lost_focus_called_; }
+
+ private:
+  bool lost_focus_called_ = false;
+};
 
 class DictationKeyedServiceBrowserTest : public PlatformBrowserTest {
  public:
@@ -163,8 +185,9 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
                        StartSessionAndReceiveTranscription) {
   LoadTestExtensionInManualMode(profile());
 
-  dictation_service().StartSession(*GetBrowserWindowInterface(),
-                                   std::make_unique<Target>());
+  dictation_service().StartSession(
+      *GetBrowserWindowInterface(),
+      std::make_unique<Target>(web_contents()->GetPrimaryMainFrame(), ""));
 
   SessionController* controller = dictation_service().session_controller();
   ASSERT_NE(controller, nullptr);
@@ -202,8 +225,9 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
                        EndActiveStreamEntersFinalizingState) {
   LoadTestExtensionInManualMode(profile());
 
-  dictation_service().StartSession(*GetBrowserWindowInterface(),
-                                   std::make_unique<Target>());
+  dictation_service().StartSession(
+      *GetBrowserWindowInterface(),
+      std::make_unique<Target>(web_contents()->GetPrimaryMainFrame(), ""));
 
   SessionController* controller = dictation_service().session_controller();
   ASSERT_NE(controller, nullptr);
@@ -245,8 +269,9 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
                        StartNewStreamWhileFinalizing) {
   LoadTestExtensionInManualMode(profile());
 
-  dictation_service().StartSession(*GetBrowserWindowInterface(),
-                                   std::make_unique<Target>());
+  dictation_service().StartSession(
+      *GetBrowserWindowInterface(),
+      std::make_unique<Target>(web_contents()->GetPrimaryMainFrame(), ""));
 
   SessionController* controller = dictation_service().session_controller();
   ASSERT_NE(controller, nullptr);
@@ -273,7 +298,8 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
 
   // Start a second stream while the first is finalizing. The controller should
   // immediately enter kStreamInitializing.
-  controller->StartDictationStream(std::make_unique<Target>());
+  controller->StartDictationStream(
+      std::make_unique<Target>(web_contents()->GetPrimaryMainFrame(), ""));
   EXPECT_EQ(controller->GetState(), SessionState::kStreamInitializing);
 
   // Wait for the stream to enter transcribing state.
@@ -293,8 +319,9 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
                        ProviderDestroyedAfterComplete) {
   LoadTestExtensionInManualMode(profile());
 
-  dictation_service().StartSession(*GetBrowserWindowInterface(),
-                                   std::make_unique<Target>());
+  dictation_service().StartSession(
+      *GetBrowserWindowInterface(),
+      std::make_unique<Target>(web_contents()->GetPrimaryMainFrame(), ""));
 
   SessionController* controller = dictation_service().session_controller();
   ASSERT_NE(controller, nullptr);
@@ -323,8 +350,9 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
                        ProviderDestroyedAfterFailed) {
   LoadTestExtensionInManualMode(profile());
 
-  dictation_service().StartSession(*GetBrowserWindowInterface(),
-                                   std::make_unique<Target>());
+  dictation_service().StartSession(
+      *GetBrowserWindowInterface(),
+      std::make_unique<Target>(web_contents()->GetPrimaryMainFrame(), ""));
 
   SessionController* controller = dictation_service().session_controller();
   ASSERT_NE(controller, nullptr);
@@ -346,6 +374,64 @@ IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
   ExtensionSendStreamStateUpdate(profile(), provider->stream_id_for_testing(),
                                  ExtensionStreamState::kFailed);
   EXPECT_TRUE(base::test::RunUntil([&]() { return provider_weak == nullptr; }));
+}
+
+IN_PROC_BROWSER_TEST_F(DictationKeyedServiceBrowserTest,
+                       TranscriptionCommittedToElement) {
+  ASSERT_TRUE(embedded_test_server()->Start());
+
+  LoadTestExtensionInManualMode(profile());
+
+  const GURL url =
+      embedded_test_server()->GetURL("/textinput/simple_textarea.html");
+  ASSERT_TRUE(content::NavigateToURL(web_contents(), url));
+  content::SimulateEndOfPaintHoldingOnPrimaryMainFrame(web_contents());
+  content::MainThreadFrameObserver frame_observer(
+      web_contents()->GetPrimaryMainFrame()->GetRenderWidgetHost());
+  frame_observer.Wait();
+
+  FocusLossObserver focus_loss_observer(web_contents());
+
+  // Focus the textarea so that dictation targets it.
+  content::SimulateMouseClickOrTapElementWithId(web_contents(), "text_id");
+
+  if (!content::IsRenderWidgetHostFocused(
+          web_contents()->GetPrimaryMainFrame()->GetRenderWidgetHost())) {
+    GTEST_SKIP() << "Test is sensitive to focus loss from test environment "
+                    "until crbug.com/525856380 is fixed.";
+  }
+
+  dictation_service().StartSession(
+      *GetBrowserWindowInterface(),
+      std::make_unique<Target>(web_contents()->GetPrimaryMainFrame(), ""));
+
+  SessionController* controller = dictation_service().session_controller();
+  ListenerStreamProvider* provider = static_cast<ListenerStreamProvider*>(
+      controller->attached_stream_provider());
+
+  ExtensionSendStreamStateUpdate(profile(), provider->stream_id_for_testing(),
+                                 ExtensionStreamState::kTranscribing);
+
+  SimulateSpeechRecognition(provider, ExtensionTranscriptionType::kPartial,
+                            "Hello");
+  SimulateSpeechRecognition(provider, ExtensionTranscriptionType::kFinal,
+                            "Hello World");
+  EXPECT_EQ(provider->GetLatestTranscriptionForTesting(), "Hello World");
+  EXPECT_TRUE(provider->IsTranscriptionFinalForTesting());
+
+  provider->Stop();
+  ExtensionSendStreamStateUpdate(profile(), provider->stream_id_for_testing(),
+                                 ExtensionStreamState::kComplete);
+
+  if (focus_loss_observer.lost_focus_called()) {
+    GTEST_SKIP() << "Test is sensitive to focus loss from test environment "
+                    "until crbug.com/525856380 is fixed.";
+  }
+
+  // Verify the transcription reached the document.
+  EXPECT_EQ("Hello World",
+            content::EvalJs(web_contents(),
+                            "document.getElementById('text_id').value;"));
 }
 
 }  // namespace

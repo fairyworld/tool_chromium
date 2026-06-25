@@ -76,7 +76,7 @@ class DictationSessionUiImplBrowserTest : public InteractiveBrowserTest {
       Do([this]{
         dictation_service().StartSession(
             *browser(),
-            std::make_unique<Target>());
+            std::make_unique<Target>(nullptr, ""));
         last_started_provider_ = static_cast<ListenerStreamProvider*>(
             dictation_service()
                 .session_controller()

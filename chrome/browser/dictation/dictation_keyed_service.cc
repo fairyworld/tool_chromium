@@ -95,16 +95,17 @@ bool DictationKeyedService::ShouldShowContextMenuItem() const {
 
 void DictationKeyedService::ContextMenuHandler(
     BrowserWindowInterface& window,
+    content::RenderFrameHost& rfh,
     const std::u16string& selected_text) {
   // Policy could have changed to disabled while the context menu was open.
   if (IsDisabledByPolicy()) {
     return;
   }
 
-  // TODO(crbug.com/508729855) Populate target with information about the
-  // targeted field from context menu params.
-  StartSession(window,
-               std::make_unique<Target>(base::UTF16ToUTF8(selected_text)));
+  // TODO(crbug.com/525856380): Handle changes to the focused element. Identify
+  // the targeted element for the dictation Target.
+  StartSession(
+      window, std::make_unique<Target>(&rfh, base::UTF16ToUTF8(selected_text)));
 }
 
 bool DictationKeyedService::IsDisabledByPolicy() const {

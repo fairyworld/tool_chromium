@@ -20,6 +20,7 @@ source_set("dictation") {
   public_deps = [
     "//base",
     "//chrome/browser/profiles:profile",
+    "//content/public/browser",
   ]
   deps = [ "//components/prefs" ]
 }

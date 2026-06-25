@@ -61,9 +61,9 @@ class ListenerStreamProvider : public StreamProvider {
   bool needs_end_stream_ = false;
   DictationMultiplexer::StreamId stream_id_;
   std::string latest_transcription_;
-  bool is_final_ = false;
   StreamState state_ = StreamState::kInitializing;
 
+  bool is_final_for_testing_ = false;
   base::RepeatingClosure update_callback_for_testing_;
 
   base::WeakPtrFactory<ListenerStreamProvider> weak_ptr_factory_{this};

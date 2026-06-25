@@ -21,6 +21,7 @@ class Profile;
 
 namespace content {
 class BrowserContext;
+class RenderFrameHost;
 }
 
 namespace dictation {
@@ -67,6 +68,7 @@ class DictationKeyedService : public KeyedService,
 
   // Handles the context menu item click.
   void ContextMenuHandler(BrowserWindowInterface& window,
+                          content::RenderFrameHost& rfh,
                           const std::u16string& selected_text);
 
   // Returns null when no session is in progress.

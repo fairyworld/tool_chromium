@@ -121,7 +121,9 @@ MockSessionControllerDelegate::MockSessionControllerDelegate() {
 }
 MockSessionControllerDelegate::~MockSessionControllerDelegate() = default;
 
-MockTarget::MockTarget() = default;
+MockTarget::MockTarget(content::RenderFrameHost* rfh,
+                       const std::string& selected_text)
+    : Target(rfh, selected_text) {}
 MockTarget::~MockTarget() = default;
 
 }  // namespace dictation

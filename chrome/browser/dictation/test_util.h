@@ -19,6 +19,11 @@
 #include "testing/gmock/include/gmock/gmock.h"
 
 class Profile;
+
+namespace content {
+class RenderFrameHost;
+}
+
 namespace extensions {
 class Extension;
 }
@@ -93,7 +98,8 @@ class MockSessionControllerDelegate : public SessionControllerDelegate {
 
 class MockTarget : public Target {
  public:
-  MockTarget();
+  explicit MockTarget(content::RenderFrameHost* rfh = nullptr,
+                      const std::string& selected_text = "");
   ~MockTarget() override;
 };
 
