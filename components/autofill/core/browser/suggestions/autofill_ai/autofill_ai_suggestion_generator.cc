@@ -29,11 +29,14 @@
 #include "base/memory/raw_ref.h"
 #include "base/notimplemented.h"
 #include "base/notreached.h"
+#include "base/strings/strcat.h"
 #include "base/strings/string_util.h"
+#include "base/strings/utf_string_conversions.h"
 #include "base/time/time.h"
 #include "base/types/optional_ref.h"
 #include "base/types/zip.h"
 #include "build/buildflag.h"
+#include "components/affiliations/core/browser/affiliation_utils.h"
 #include "components/autofill/core/browser/autofill_field.h"
 #include "components/autofill/core/browser/data_manager/autofill_ai/entity_data_manager.h"
 #include "components/autofill/core/browser/data_model/addresses/autofill_normalization_utils.h"
@@ -58,8 +61,11 @@
 #include "components/feature_engagement/public/feature_constants.h"
 #include "components/personal_context/core/personal_context_features.h"
 #include "components/strings/grit/components_strings.h"
+#include "net/base/registry_controlled_domains/registry_controlled_domain.h"
 #include "third_party/abseil-cpp/absl/container/flat_hash_map.h"
 #include "ui/base/l10n/l10n_util.h"
+#include "url/gurl.h"
+#include "url/url_constants.h"
 
 namespace autofill {
 namespace {
@@ -576,18 +582,75 @@ std::vector<const EntityInstance*> OrderedEntitiesForSuggestion(
   return sorted_entities;
 }
 
+// Returns a valid GURL parsed from a domain string. If no scheme is present in
+// `domain`, prepends "https://" to allow GURL to parse it and retrieve a host.
+GURL GetGURLFromDomain(std::u16string_view domain) {
+  const std::string domain_str = base::UTF16ToUTF8(domain);
+  if (!domain_str.contains("://")) {
+    return GURL(base::StrCat(
+        {url::kHttpsScheme, url::kStandardSchemeSeparator, domain_str}));
+  }
+  return GURL(domain_str);
+}
+
+// Returns the domain-specific AttributeType for domain-constrained entity types
+// (e.g., kOrder, kShipment), or std::nullopt if the entity type is not
+// domain-constrained.
+std::optional<AttributeType> GetDomainFilterAttributeType(
+    const EntityType& type) {
+  switch (type.name()) {
+    case EntityTypeName::kOrder:
+      return AttributeType(AttributeTypeName::kOrderMerchantDomain);
+    case EntityTypeName::kShipment:
+      return AttributeType(AttributeTypeName::kShipmentCarrierDomain);
+    case EntityTypeName::kPassport:
+    case EntityTypeName::kDriversLicense:
+    case EntityTypeName::kVehicle:
+    case EntityTypeName::kNationalIdCard:
+    case EntityTypeName::kKnownTravelerNumber:
+    case EntityTypeName::kRedressNumber:
+    case EntityTypeName::kFlightReservation:
+      return std::nullopt;
+  }
+}
+
+// Returns whether the `entity` is allowed to be suggested on `page_url`.
+// For domain-constrained entity types (such as `kOrder` or `kShipment`), this
+// requires their associated domain to match the domain of `page_url` (via PSL
+// matching). For other entity types, returns true.
+bool IsAllowedForPageUrl(const EntityInstance& entity, const GURL& page_url) {
+  std::optional<AttributeType> domain_attr_type =
+      GetDomainFilterAttributeType(entity.type());
+  if (!domain_attr_type) {
+    return true;
+  }
+  base::optional_ref<const AttributeInstance> domain_attr =
+      entity.attribute(*domain_attr_type);
+  if (!domain_attr) {
+    return false;
+  }
+  const std::u16string domain_val = domain_attr->GetCompleteRawInfo();
+  if (domain_val.empty()) {
+    return false;
+  }
+  return affiliations::IsExtendedPublicSuffixDomainMatch(
+      GetGURLFromDomain(domain_val), page_url, {});
+}
+
 std::vector<const EntityInstance*> GetEntitiesForSuggestion(
     std::vector<const EntityInstance*> entities,
     const AttributeTypeAssignment& assignment,
     const FieldGlobalId& trigger_field_id,
-    const std::string& app_locale) {
+    const std::string& app_locale,
+    const GURL& page_url) {
   std::erase_if(entities, [&](const EntityInstance* entity) {
     base::optional_ref<const AutofillFieldWithAttributeType>
         trigger_field_with_type =
             FindField(assignment.Find(entity->type()), trigger_field_id);
     return !trigger_field_with_type ||
            !EntityShouldProduceSuggestion(*entity, *trigger_field_with_type,
-                                          app_locale);
+                                          app_locale) ||
+           !IsAllowedForPageUrl(*entity, page_url);
   });
   return DedupedEntitiesForSuggestions(
       OrderedEntitiesForSuggestion(std::move(entities)), assignment,
@@ -746,7 +809,8 @@ void AutofillAiSuggestionGenerator::GenerateSuggestions(
       GetFillableEntityInstances(client),
       AttributeTypeAssignment(form_structure->fields(),
                               trigger_autofill_field->section()),
-      trigger_field.global_id(), client.GetAppLocale());
+      trigger_field.global_id(), client.GetAppLocale(),
+      client.GetLastCommittedPrimaryMainFrameURL());
 
   std::vector<Suggestion> suggestions = CreateAutofillAiFillingSuggestions(
       *form_structure, *trigger_autofill_field,
