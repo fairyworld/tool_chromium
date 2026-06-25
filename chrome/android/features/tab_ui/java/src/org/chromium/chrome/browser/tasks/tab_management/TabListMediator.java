@@ -1353,8 +1353,9 @@ public class TabListMediator implements TabListNotificationHandler {
                         // This assumes the move event is dispatched before the ungroup event
                         // (didMoveTabOutOfGroup) is processed, meaning the UI model still has the
                         // old grouping metadata.
-                        if (mModelList.get(currentUiIndex).model.get(TabProperties.TAB_GROUP_ID)
-                                != null) {
+                        PropertyModel model = mModelList.get(currentUiIndex).model;
+                        if (model.get(TabProperties.TAB_GROUP_ID) != null
+                                || model.get(TabProperties.TAB_GROUP_HEADER_ID) != null) {
                             return;
                         }
 
