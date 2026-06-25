@@ -1957,10 +1957,14 @@ id<GREYAction> grey_longPressWithDuration(base::TimeDelta duration) {
 
   NSString* hostString = base::SysUTF8ToNSString(URL.GetHost());
   XCUIApplication* currentApplication = [[XCUIApplication alloc] init];
-  BOOL hostStringPresent = [currentApplication.otherElements[hostString]
-      waitForExistenceWithTimeout:kWaitForUIElementTimeout.InSecondsF()];
-  BOOL pageTitlePresent = [currentApplication.otherElements[pageTitle]
-      waitForExistenceWithTimeout:kWaitForUIElementTimeout.InSecondsF()];
+  XCUIElementQuery* elementsQuery =
+      [currentApplication descendantsMatchingType:XCUIElementTypeAny];
+  BOOL hostStringPresent =
+      [[elementsQuery matchingIdentifier:hostString].firstMatch
+          waitForExistenceWithTimeout:kWaitForUIElementTimeout.InSecondsF()];
+  BOOL pageTitlePresent =
+      [[elementsQuery matchingIdentifier:pageTitle].firstMatch
+          waitForExistenceWithTimeout:kWaitForUIElementTimeout.InSecondsF()];
   GREYAssert(hostStringPresent || pageTitlePresent,
              @"Either hostString %d or pageTitle %d was not present",
              hostStringPresent, pageTitlePresent);
