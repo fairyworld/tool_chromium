@@ -8,6 +8,7 @@
 #include <string_view>
 
 #include "base/memory/raw_ptr.h"
+#include "base/memory/scoped_refptr.h"
 #include "base/process/kill.h"
 #include "headless/public/headless_export.h"
 #include "headless/public/headless_window_state.h"
@@ -15,7 +16,7 @@
 #include "url/gurl.h"
 
 namespace content {
-class RenderFrameHost;
+class SiteInstance;
 }  // namespace content
 
 namespace headless {
@@ -64,11 +65,9 @@ class HEADLESS_EXPORT HeadlessWebContents::Builder {
   // Specify whether BeginFrames should be controlled via DevTools commands.
   Builder& SetEnableBeginFrameControl(bool enable_begin_frame_control);
 
-  // Specify an optional opener.
-  Builder& SetOpener(content::RenderFrameHost* opener_rfh);
-
-  // Specify whether the opener should be suppressed.
-  Builder& SetOpenerSuppressed(bool opener_suppressed);
+  // Specify an optional source SiteInstance.
+  Builder& SetSourceSiteInstance(
+      scoped_refptr<content::SiteInstance> source_site_instance);
 
   // The returned object is owned by HeadlessBrowser. Call
   // HeadlessWebContents::Close() to dispose it.
@@ -88,8 +87,7 @@ class HEADLESS_EXPORT HeadlessWebContents::Builder {
   gfx::Rect window_bounds_;
   HeadlessWindowState window_state_ = HeadlessWindowState::kNormal;
   bool enable_begin_frame_control_ = false;
-  bool opener_suppressed_ = false;
-  raw_ptr<content::RenderFrameHost> opener_rfh_ = nullptr;
+  scoped_refptr<content::SiteInstance> source_site_instance_ = nullptr;
 };
 
 }  // namespace headless

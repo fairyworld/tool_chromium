@@ -35,6 +35,7 @@
 #include "content/public/browser/render_widget_host.h"
 #include "content/public/browser/render_widget_host_view.h"
 #include "content/public/browser/renderer_preferences_util.h"
+#include "content/public/browser/site_instance.h"
 #include "content/public/browser/web_contents.h"
 #include "content/public/browser/web_contents_delegate.h"
 #include "content/public/common/bindings_policy.h"
@@ -201,15 +202,11 @@ class HeadlessWebContentsImpl::Delegate : public content::WebContentsDelegate {
                 ->block_new_web_contents()) {
           return nullptr;
         }
-        content::RenderFrameHost* opener_rfh = content::RenderFrameHost::FromID(
-            params.source_render_process_id, params.source_render_frame_id);
-        bool opener_suppressed = !params.has_rel_opener;
         HeadlessWebContentsImpl* child_contents = HeadlessWebContentsImpl::From(
             headless_web_contents_->browser_context()
                 ->CreateWebContentsBuilder()
                 .SetWindowBounds(source->GetContainerBounds())
-                .SetOpener(opener_rfh)
-                .SetOpenerSuppressed(opener_suppressed)
+                .SetSourceSiteInstance(params.source_site_instance)
                 .Build());
         target = child_contents->web_contents();
         break;
@@ -387,11 +384,8 @@ class HeadlessWebContentsImpl::PendingFrame final
 std::unique_ptr<HeadlessWebContentsImpl> HeadlessWebContentsImpl::Create(
     HeadlessWebContents::Builder* builder) {
   content::WebContents::CreateParams create_params(builder->browser_context_);
-  if (builder->opener_rfh_) {
-    create_params.opener_render_process_id =
-        builder->opener_rfh_->GetProcess()->GetID().GetUnsafeValue();
-    create_params.opener_render_frame_id = builder->opener_rfh_->GetRoutingID();
-    create_params.opener_suppressed = builder->opener_suppressed_;
+  if (builder->source_site_instance_) {
+    create_params.site_instance = builder->source_site_instance_;
   }
   auto headless_web_contents = base::WrapUnique(
       new HeadlessWebContentsImpl(content::WebContents::Create(create_params)));
@@ -627,15 +621,10 @@ HeadlessWebContents::Builder::SetEnableBeginFrameControl(
   return *this;
 }
 
-HeadlessWebContents::Builder& HeadlessWebContents::Builder::SetOpener(
-    content::RenderFrameHost* opener_rfh) {
-  opener_rfh_ = opener_rfh;
-  return *this;
-}
-
-HeadlessWebContents::Builder& HeadlessWebContents::Builder::SetOpenerSuppressed(
-    bool opener_suppressed) {
-  opener_suppressed_ = opener_suppressed;
+HeadlessWebContents::Builder&
+HeadlessWebContents::Builder::SetSourceSiteInstance(
+    scoped_refptr<content::SiteInstance> source_site_instance) {
+  source_site_instance_ = std::move(source_site_instance);
   return *this;
 }
 

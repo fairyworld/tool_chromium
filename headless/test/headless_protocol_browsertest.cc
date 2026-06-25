@@ -551,9 +551,6 @@ HEADLESS_PROTOCOL_TEST(PopupWindowHasOpener,
 HEADLESS_PROTOCOL_TEST(NormalWindowHasOpener,
                        "shared/normal-window-has-opener.js")
 
-HEADLESS_PROTOCOL_TEST(OpenUrlSandboxPrivileges,
-                       "sanity/open-url-sandbox-privileges.js")
-
 class HeadlessProtocolBrowserTestWithoutSiteIsolation
     : public HeadlessProtocolBrowserTest {
  public:
@@ -685,6 +682,17 @@ HEADLESS_PROTOCOL_TEST(SetZoomedWindowBounds,
 
 HEADLESS_PROTOCOL_TEST(WindowOpenOnSecondaryScreen,
                        "shared/window-open-on-secondary-screen.js")
+
+HEADLESS_PROTOCOL_TEST(WindowOpenClickOpenerId,
+                       "shared/window-open-click-opener-id.js")
+
+HEADLESS_PROTOCOL_TEST(WindowOpenNoopenerClickOpenerId,
+                       "shared/window-open-noopener-click-opener-id.js")
+
+HEADLESS_PROTOCOL_TEST(WindowOpenShiftClickOpenerId,
+                       "shared/window-open-shift-click-opener-id.js")
+
+HEADLESS_PROTOCOL_TEST(BlockNewWebContents, "sanity/block-new-web-contents.js")
 
 HEADLESS_PROTOCOL_TEST(ScreenRotationSecondaryScreen,
                        "sanity/screen-rotation-secondary-screen.js")
