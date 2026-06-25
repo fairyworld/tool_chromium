@@ -3590,7 +3590,6 @@ if (!is_android) {
       "../browser/ui/webui/webui_load_timer_browsertest.cc",
       "../browser/ui/webui/webui_url_hashes_browsertest.cc",
       "../browser/unload_browsertest.cc",
-      "../browser/web_applications/isolated_web_apps/browser_navigator_iwa_browsertest.cc",
       "../common/chrome_paths_browsertest.cc",
       "../common/time_format_browsertest.cc",
       "../renderer/accessibility/ax_tree_distiller_browsertest.cc",
@@ -4317,6 +4316,10 @@ if (!is_android) {
       deps += [ "//ui/events:test_support" ]
     }
     if (toolkit_views) {
+      deps += [ "//chrome/browser/web_applications/isolated_web_apps/window_management:browser_tests" ]
+      if (use_aura) {
+        deps += [ "//ui/aura:test_support" ]
+      }
       sources += [
         "../browser/ui/views/autofill/autofill_ai/autofill_ai_import_data_bubble_view_browsertest.cc",
         "../browser/ui/views/autofill/autofill_ai/autofill_ai_local_save_notification_view_browsertest.cc",
@@ -4480,10 +4483,6 @@ if (!is_android) {
 
           # TaskManagerView is not used or built on Mac.
           "../browser/ui/views/task_manager_view_browsertest.cc",
-
-          # Excluded on Mac: Cannot reliably check window focus on this
-          # platform.
-          "../browser/web_applications/isolated_web_apps/window_management/isolated_web_apps_focus_window_browsertest.cc",
         ]
       }
       if (is_win || is_mac || is_linux) {
@@ -4588,10 +4587,6 @@ if (!is_android) {
       ]
       allow_circular_includes_from +=
           [ "//chrome/browser/ui/lens:browser_tests" ]
-      if (use_aura) {
-        sources += [ "../browser/web_applications/isolated_web_apps/window_management/isolated_web_apps_window_open_permission_service_browsertest.cc" ]
-        deps += [ "//ui/aura:test_support" ]
-      }
     }
 
     if (!is_android || enable_vr) {
