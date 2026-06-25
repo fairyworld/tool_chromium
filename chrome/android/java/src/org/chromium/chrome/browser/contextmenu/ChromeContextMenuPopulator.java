@@ -1234,24 +1234,6 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
                         String title = getTitleOrGuessIfNotPresent();
                         mItemDelegate.onOpenInEphemeralTab(url, title);
                     });
-        } else {
-            onTabBackedItemSelected(itemId);
-        }
-
-        return true;
-    }
-
-    private void onTabBackedItemSelected(int itemId) {
-        if (itemId == R.id.contextmenu_back) {
-            recordContextMenuSelection(ContextMenuUma.Action.BACK);
-            if (mItemDelegate instanceof TabContextMenuItemDelegate tabDelegate) {
-                tabDelegate.onCurrentTabGoBack();
-            }
-        } else if (itemId == R.id.contextmenu_forward) {
-            recordContextMenuSelection(ContextMenuUma.Action.FORWARD);
-            if (mItemDelegate instanceof TabContextMenuItemDelegate tabDelegate) {
-                tabDelegate.onCurrentTabGoForward();
-            }
         } else if (itemId == R.id.contextmenu_open_in_new_tab) {
             recordContextMenuSelection(ContextMenuUma.Action.OPEN_IN_NEW_TAB);
             RecordUserAction.record("TabContextMenu.OpenInNewTab");
@@ -1314,6 +1296,23 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
                     mParams.getReferrer(),
                     /* navigateToTab= */ true,
                     /* additionalNavigationParams= */ null);
+        } else {
+            onTabBackedItemSelected(itemId);
+        }
+
+        return true;
+    }
+
+    private void onTabBackedItemSelected(int itemId) {
+        assert mItemDelegate instanceof TabContextMenuItemDelegate;
+        TabContextMenuItemDelegate tabDelegate = (TabContextMenuItemDelegate) mItemDelegate;
+
+        if (itemId == R.id.contextmenu_back) {
+            recordContextMenuSelection(ContextMenuUma.Action.BACK);
+            tabDelegate.onCurrentTabGoBack();
+        } else if (itemId == R.id.contextmenu_forward) {
+            recordContextMenuSelection(ContextMenuUma.Action.FORWARD);
+            tabDelegate.onCurrentTabGoForward();
         } else {
             assert false;
         }
