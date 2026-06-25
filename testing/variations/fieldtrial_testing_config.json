@@ -20018,9 +20018,9 @@
             ],
             "experiments": [
                 {
-                    "name": "PreventPasswordManager",
+                    "name": "PreventAPC",
                     "enable_features": [
-                        "PreventPasswordManagerOnFederatedLogin"
+                        "PreventAPCOnFederatedLogin"
                     ]
                 }
             ]
