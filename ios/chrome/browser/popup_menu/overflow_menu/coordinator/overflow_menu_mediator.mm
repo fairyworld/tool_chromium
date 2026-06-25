@@ -1432,29 +1432,30 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
                                             handler:handlerWithMetrics];
 
   result.destination = static_cast<NSInteger>(destination);
+  if (!IsOverflowMenuNTPRefactorEnabled() || ![self isCurrentWebPageNTP]) {
+    NSMutableArray<OverflowMenuLongPressItem*>* longPressItems =
+        [[NSMutableArray alloc] init];
 
-  NSMutableArray<OverflowMenuLongPressItem*>* longPressItems =
-      [[NSMutableArray alloc] init];
-
-  NSString* hideItemText = [self hideItemTextForDestination:destination];
-  if (hideItemText) {
-    [longPressItems addObject:[[OverflowMenuLongPressItem alloc]
-                                  initWithTitle:hideItemText
-                                     symbolName:@"eye.slash"
-                                        handler:^{
-                                          [weakSelf
-                                              hideDestination:destination];
-                                        }]];
+    NSString* hideItemText = [self hideItemTextForDestination:destination];
+    if (hideItemText) {
+      [longPressItems addObject:[[OverflowMenuLongPressItem alloc]
+                                    initWithTitle:hideItemText
+                                       symbolName:kHideActionSymbol
+                                          handler:^{
+                                            [weakSelf
+                                                hideDestination:destination];
+                                          }]];
+    }
+    [longPressItems
+        addObject:[[OverflowMenuLongPressItem alloc]
+                      initWithTitle:l10n_util::GetNSString(
+                                        IDS_IOS_OVERFLOW_MENU_EDIT_ACTIONS)
+                         symbolName:kEditActionSymbol
+                            handler:^{
+                              [weakSelf beginCustomization];
+                            }]];
+    result.longPressItems = longPressItems;
   }
-  [longPressItems
-      addObject:[[OverflowMenuLongPressItem alloc]
-                    initWithTitle:l10n_util::GetNSString(
-                                      IDS_IOS_OVERFLOW_MENU_EDIT_ACTIONS)
-                       symbolName:@"pencil"
-                          handler:^{
-                            [weakSelf beginCustomization];
-                          }]];
-  result.longPressItems = longPressItems;
 
   __weak __typeof(result) weakResult = result;
   result.onShownToggleCallback = ^{
@@ -1489,15 +1490,17 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
                                        handler:newHandler];
   action.actionType = static_cast<NSInteger>(actionType);
 
-  ActionRanking reorderableActions = [self basePageActions];
-  // If this action is not reorderable, then don't add any longpress items.
-  bool actionIsReorderable =
-      std::find(reorderableActions.begin(), reorderableActions.end(),
-                actionType) != reorderableActions.end();
-  if (actionIsReorderable) {
-    action.longPressItems =
-        [self actionLongPressItemsForActionType:actionType
-                                   hideItemText:hideItemText];
+  if (!IsOverflowMenuNTPRefactorEnabled() || ![self isCurrentWebPageNTP]) {
+    ActionRanking reorderableActions = [self basePageActions];
+    // If this action is not reorderable, then don't add any longpress items.
+    bool actionIsReorderable =
+        std::find(reorderableActions.begin(), reorderableActions.end(),
+                  actionType) != reorderableActions.end();
+    if (actionIsReorderable) {
+      action.longPressItems =
+          [self actionLongPressItemsForActionType:actionType
+                                     hideItemText:hideItemText];
+    }
   }
   return action;
 }
@@ -1556,7 +1559,7 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
   if (hideItemText) {
     [longPressItems addObject:[[OverflowMenuLongPressItem alloc]
                                   initWithTitle:hideItemText
-                                     symbolName:@"eye.slash"
+                                     symbolName:kHideActionSymbol
                                         handler:^{
                                           [weakSelf hideActionType:actionType];
                                         }]];
@@ -1565,7 +1568,7 @@ OverflowMenuFooter* CreateOverflowMenuManagedFooter(
       addObject:[[OverflowMenuLongPressItem alloc]
                     initWithTitle:l10n_util::GetNSString(
                                       IDS_IOS_OVERFLOW_MENU_EDIT_ACTIONS)
-                       symbolName:@"pencil"
+                       symbolName:kEditActionSymbol
                           handler:^{
                             [weakSelf
                                 beginCustomizationFromActionType:actionType];
