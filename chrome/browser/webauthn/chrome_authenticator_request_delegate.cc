@@ -723,7 +723,8 @@ bool ChromeAuthenticatorRequestDelegate::EmbedderControlsAuthenticatorDispatch(
     // popup, while avoiding unnecessary Bluetooth advertising on other pages.
 #if BUILDFLAG(ENABLE_DICE_SUPPORT)
     if (IsChromeSigninPage(GetRenderFrameHost()) &&
-        switches::IsMagiChromePasskeyAutofillEnabled() &&
+        (switches::IsMagiChromePasskeyAutofillEnabled() ||
+         switches::IsMagiChromePasskeyBannerEnabled()) &&
         authenticator.AuthenticatorTransport() ==
             device::FidoTransportProtocol::kHybrid) {
       return false;
