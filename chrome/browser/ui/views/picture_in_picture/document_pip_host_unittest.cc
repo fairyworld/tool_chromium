@@ -14,6 +14,7 @@
 #include "chrome/test/base/testing_profile.h"
 #include "chrome/test/views/chrome_views_test_base.h"
 #include "components/input/native_web_keyboard_event.h"
+#include "components/permissions/permission_request_manager.h"
 #include "components/security_state/content/security_state_tab_helper.h"
 #include "content/public/browser/fullscreen_types.h"
 #include "content/public/browser/keyboard_event_processing_result.h"
@@ -24,6 +25,7 @@
 #include "content/public/test/test_utils.h"
 #include "content/public/test/web_contents_tester.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "third_party/blink/public/mojom/mediastream/media_stream.mojom.h"
 #include "third_party/blink/public/mojom/picture_in_picture_window_options/picture_in_picture_window_options.mojom.h"
 #include "third_party/blink/public/mojom/window_features/window_features.mojom.h"
 #include "ui/base/mojom/window_show_state.mojom.h"
@@ -32,6 +34,8 @@
 #include "ui/views/controls/webview/webview.h"
 #include "ui/views/widget/widget.h"
 #include "ui/views/window/non_client_view.h"
+#include "url/gurl.h"
+#include "url/origin.h"
 
 namespace {
 
@@ -707,4 +711,35 @@ TEST_F(DocumentPipHostTest, SetContentsBounds_ResizesWidget) {
   std::optional<gfx::Rect> bounds = host->GetWindowBoundsInScreen();
   ASSERT_TRUE(bounds.has_value());
   EXPECT_EQ(new_bounds.size(), bounds->size());
+}
+
+// --- Media permission tests ---
+
+// Opening the PiP window creates a PermissionRequestManager on the child
+// WebContents. The standalone PiP child is not a tab, so TabHelpers never runs
+// for it; without this wiring a camera/mic request would have no manager to
+// drive the prompt.
+TEST_F(DocumentPipHostTest, OpenPipWindow_CreatesPermissionRequestManager) {
+  DocumentPipHost* host = CreateHostAndOpenPipWindow();
+  ASSERT_TRUE(host);
+
+  content::WebContents* child = host->GetChildWebContents();
+  ASSERT_TRUE(child);
+  EXPECT_TRUE(permissions::PermissionRequestManager::FromWebContents(child));
+}
+
+// CheckMediaAccessPermission routes through the media-permission stack and
+// reports no permission for an origin the user has not granted camera access
+// to (the default deny path).
+TEST_F(DocumentPipHostTest, CheckMediaAccessPermission_NotGrantedByDefault) {
+  DocumentPipHost* host = CreateHostAndOpenPipWindow();
+  ASSERT_TRUE(host);
+
+  content::WebContents* child = host->GetChildWebContents();
+  const GURL kUrl("https://example.com");
+  content::WebContentsTester::For(child)->NavigateAndCommit(kUrl);
+
+  EXPECT_FALSE(host->CheckMediaAccessPermission(
+      child->GetPrimaryMainFrame(), url::Origin::Create(kUrl),
+      blink::mojom::MediaStreamType::DEVICE_VIDEO_CAPTURE));
 }
