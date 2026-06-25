@@ -807,19 +807,16 @@ TEST_P(CommandStorageManagerTest, DeleteLastSessionBeforeEncryptorIsReady) {
       stage == EncryptSessionStorageStage::kClearOnly) {
     histogram_tester.ExpectTotalCount(
         "Session.CommandStorageManager.EncryptedBackendUninitialized", 0);
-  } else if (stage == EncryptSessionStorageStage::kWriteBothReadOnlyClear) {
+  } else if (stage == EncryptSessionStorageStage::kWriteBothReadOnlyClear ||
+             stage ==
+                 EncryptSessionStorageStage::kWriteBothReadPreferEncrypted ||
+             stage == EncryptSessionStorageStage::
+                          kWriteEncryptedReadPreferEncrypted) {
     // SessionReadComparisonResult::kDeleteLastSession =2
     const int kDeleteLastSession = 2;
     histogram_tester.ExpectUniqueSample(
         "Session.CommandStorageManager.EncryptedBackendUninitialized",
         kDeleteLastSession, 1);
-  } else if (stage ==
-                 EncryptSessionStorageStage::kWriteBothReadPreferEncrypted ||
-             stage == EncryptSessionStorageStage::
-                          kWriteEncryptedReadPreferEncrypted) {
-    // TODO: crbug.com/479420496 - Update when these stages are implemented.
-    GTEST_SKIP() << "Test not implemented for this stage yet: "
-                 << static_cast<int>(stage);
   } else {
     FAIL() << "Unhandled EncryptSessionStorageStage: "
            << static_cast<int>(stage);
