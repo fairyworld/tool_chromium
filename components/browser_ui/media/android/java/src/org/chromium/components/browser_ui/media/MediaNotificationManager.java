@@ -91,6 +91,19 @@ public class MediaNotificationManager {
         return sControllers.get(notificationId);
     }
 
+    /**
+     * Notifies the controller associated with the specified notification ID that the service is
+     * being destroyed.
+     *
+     * @param notificationId the id of the notification.
+     */
+    public static void onServiceDestroyed(int notificationId) {
+        MediaNotificationController controller = getController(notificationId);
+        if (controller != null) {
+            controller.onServiceDestroyed();
+        }
+    }
+
     public static void setControllerForTesting(
             int notificationId, MediaNotificationController controller) {
         sControllers.put(notificationId, controller);

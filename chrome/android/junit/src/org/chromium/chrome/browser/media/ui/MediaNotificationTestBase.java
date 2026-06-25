@@ -104,7 +104,7 @@ public class MediaNotificationTestBase {
 
         mListener = mock(MediaNotificationListener.class);
 
-        ChromeMediaNotificationControllerDelegate.sMapNotificationIdToOptions.put(
+        ChromeMediaNotificationControllerDelegate.sMapMediaTypeIdToOptions.put(
                 getNotificationId(),
                 new ChromeMediaNotificationControllerDelegate.NotificationOptions(
                         MockListenerService.class, NOTIFICATION_GROUP_NAME));
@@ -114,7 +114,8 @@ public class MediaNotificationTestBase {
                 getNotificationId(),
                 spy(
                         new MockMediaNotificationController(
-                                new ChromeMediaNotificationControllerDelegate(getNotificationId()) {
+                                new ChromeMediaNotificationControllerDelegate(
+                                        getNotificationId(), getNotificationId()) {
                                     @Override
                                     public void logNotificationShown(
                                             NotificationWrapper notification) {
