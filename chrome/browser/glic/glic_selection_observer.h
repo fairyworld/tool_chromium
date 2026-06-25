@@ -24,16 +24,11 @@
 #include "content/public/browser/web_contents_observer.h"
 #include "mojo/public/cpp/bindings/remote.h"
 #include "third_party/blink/public/mojom/link_to_text/link_to_text.mojom.h"
-#include "ui/views/widget/widget.h"
 
 namespace content {
 class Page;
 class RenderFrameHost;
 }  // namespace content
-
-namespace views {
-class Widget;
-}  // namespace views
 
 class BrowserWindowInterface;
 
@@ -166,9 +161,8 @@ class GlicSelectionObserver
   // target dependencies in the build configuration.
   class WidgetActionDelegate;
 
-  void OnWidgetClosed(views::Widget::ClosedReason reason);
+  void OnWidgetClose();
 
-  std::unique_ptr<views::Widget> selection_widget_;
   std::unique_ptr<GlicSelectionWidgetDelegate> widget_delegate_;
   std::unique_ptr<WidgetActionDelegate> action_delegate_;
   // True if the user temporarily blocked the selection widget for the current
