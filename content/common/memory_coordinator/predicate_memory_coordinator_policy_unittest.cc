@@ -61,8 +61,7 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest, Persistence) {
         // Only match consumers in the primary process (kChildId).
         return child_process_id.is_null();
       }));
-  MemoryCoordinatorPolicyRegistration<PredicateMemoryCoordinatorPolicy>
-      registration(policy_manager(), policy);
+  MemoryCoordinatorPolicyRegistration registration(policy_manager(), policy);
 
   policy.SetLimit(50, true);
 
@@ -117,8 +116,7 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest, SetLimit) {
                              ChildProcessId child_process_id) {
         return child_process_id.is_null();
       }));
-  MemoryCoordinatorPolicyRegistration<PredicateMemoryCoordinatorPolicy>
-      registration(policy_manager(), policy);
+  MemoryCoordinatorPolicyRegistration registration(policy_manager(), policy);
 
   // Updating the limit should update all matching existing consumers.
   EXPECT_CALL(host, UpdateConsumers(UnorderedElementsAre(
@@ -159,8 +157,7 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest, ChangeReleaseMemory) {
                              ChildProcessId child_process_id) {
         return child_process_id.is_null();
       }));
-  MemoryCoordinatorPolicyRegistration<PredicateMemoryCoordinatorPolicy>
-      registration(policy_manager(), policy);
+  MemoryCoordinatorPolicyRegistration registration(policy_manager(), policy);
 
   // Initial set limit.
   EXPECT_CALL(host, UpdateConsumers(UnorderedElementsAre(
@@ -193,8 +190,7 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest, DefaultStatePersistence) {
                              ChildProcessId child_process_id) {
         return child_process_id.is_null();
       }));
-  MemoryCoordinatorPolicyRegistration<PredicateMemoryCoordinatorPolicy>
-      registration(policy_manager(), policy);
+  MemoryCoordinatorPolicyRegistration registration(policy_manager(), policy);
 
   // Adding a consumer when the policy is in its default state (100% limit,
   // no release) should NOT trigger an update.
@@ -228,8 +224,7 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest, ObserverLifecycle) {
 
   {
     PredicateMemoryCoordinatorPolicy policy(policy_manager(), predicate);
-    MemoryCoordinatorPolicyRegistration<PredicateMemoryCoordinatorPolicy>
-        registration(policy_manager(), policy);
+    MemoryCoordinatorPolicyRegistration registration(policy_manager(), policy);
     policy.SetLimit(50, false);
 
     EXPECT_CALL(host, UpdateConsumers(_)).Times(1);
@@ -295,8 +290,7 @@ TEST_F(PredicateMemoryCoordinatorPolicyTest,
                              ChildProcessId child_process_id) {
         return child_process_id.is_null();
       }));
-  MemoryCoordinatorPolicyRegistration<PredicateMemoryCoordinatorPolicy>
-      registration(policy_manager(), policy);
+  MemoryCoordinatorPolicyRegistration registration(policy_manager(), policy);
 
   // Critical pressure (limit 0, release true): all should be notified
   // initially.

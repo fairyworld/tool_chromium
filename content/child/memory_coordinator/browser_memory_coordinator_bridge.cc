@@ -7,7 +7,6 @@
 #include <utility>
 
 #include "base/check_op.h"
-#include "content/common/memory_coordinator/memory_coordinator_policy_manager.h"
 
 namespace content {
 

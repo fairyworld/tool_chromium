@@ -108,22 +108,6 @@ MemoryCoordinatorPolicyManager::MemoryCoordinatorPolicyManager() = default;
 
 MemoryCoordinatorPolicyManager::~MemoryCoordinatorPolicyManager() = default;
 
-void MemoryCoordinatorPolicyManager::AddObserver(Observer* observer) {
-  observers_.AddObserver(observer);
-
-  for (auto const& [child_id, host_state] : hosts_) {
-    for (auto const& [consumer_id, group_state] : host_state->groups) {
-      observer->OnConsumerGroupAdded(consumer_id, group_state->consumer_name(),
-                                     group_state->traits(),
-                                     group_state->process_type(), child_id);
-    }
-  }
-}
-
-void MemoryCoordinatorPolicyManager::RemoveObserver(Observer* observer) {
-  observers_.RemoveObserver(observer);
-}
-
 #if BUILDFLAG(ENABLE_MEMORY_COORDINATOR_INTERNALS)
 void MemoryCoordinatorPolicyManager::AddDiagnosticObserver(
     DiagnosticObserver* observer) {
@@ -146,12 +130,24 @@ void MemoryCoordinatorPolicyManager::RemoveDiagnosticObserver(
 
 void MemoryCoordinatorPolicyManager::AddPolicy(
     MemoryCoordinatorPolicy* policy) {
+  CHECK(!is_notifying_);
   auto [_, inserted] = policies_.insert(policy);
   CHECK(inserted);
+
+  base::AutoReset<bool> reset(&is_notifying_, true);
+  // Catch up the new policy with existing groups.
+  for (auto const& [child_id, host_state] : hosts_) {
+    for (auto const& [consumer_id, group_state] : host_state->groups) {
+      policy->OnConsumerGroupAdded(consumer_id, group_state->consumer_name(),
+                                   group_state->traits(),
+                                   group_state->process_type(), child_id);
+    }
+  }
 }
 
 void MemoryCoordinatorPolicyManager::RemovePolicy(
     MemoryCoordinatorPolicy* policy) {
+  CHECK(!is_notifying_);
   size_t removed = policies_.erase(policy);
   CHECK_EQ(removed, 1u);
 
@@ -226,17 +222,19 @@ void MemoryCoordinatorPolicyManager::OnConsumerGroupAdded(
     }
   }
 
-  for (auto& observer : observers_) {
-    observer.OnConsumerGroupAdded(consumer_id, consumer_name, traits,
-                                  process_type, child_process_id);
+  base::AutoReset<bool> reset(&is_notifying_, true);
+  for (MemoryCoordinatorPolicy* policy : policies_) {
+    policy->OnConsumerGroupAdded(consumer_id, consumer_name, traits,
+                                 process_type, child_process_id);
   }
 }
 
 void MemoryCoordinatorPolicyManager::OnConsumerGroupRemoved(
     uint32_t consumer_id,
     ChildProcessId child_process_id) {
-  for (auto& observer : observers_) {
-    observer.OnConsumerGroupRemoved(consumer_id, child_process_id);
+  base::AutoReset<bool> reset(&is_notifying_, true);
+  for (MemoryCoordinatorPolicy* policy : policies_) {
+    policy->OnConsumerGroupRemoved(consumer_id, child_process_id);
   }
 
   HostState& host_state = GetHostState(child_process_id);

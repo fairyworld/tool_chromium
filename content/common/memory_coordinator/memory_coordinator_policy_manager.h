@@ -10,6 +10,7 @@
 #include <string>
 #include <string_view>
 
+#include "base/auto_reset.h"
 #include "base/containers/flat_map.h"
 #include "base/containers/flat_set.h"
 #include "base/functional/function_ref.h"
@@ -41,26 +42,10 @@ struct GlobalMemoryConsumerUpdate {
 class CONTENT_EXPORT MemoryCoordinatorPolicyManager
     : public MemoryConsumerGroupController {
  public:
-  // An interface for observing the lifecycle of memory consumers.
-  class CONTENT_EXPORT Observer : public base::CheckedObserver {
-   public:
-    ~Observer() override = default;
-
-    // Called when a new consumer group is added/removed.
-    virtual void OnConsumerGroupAdded(
-        uint32_t consumer_id,
-        std::string_view consumer_name,
-        std::optional<base::MemoryConsumerTraits> traits,
-        ProcessType process_type,
-        ChildProcessId child_process_id) = 0;
-    virtual void OnConsumerGroupRemoved(uint32_t consumer_id,
-                                        ChildProcessId child_process_id) = 0;
-  };
-
 #if BUILDFLAG(ENABLE_MEMORY_COORDINATOR_INTERNALS)
   // An interface for observing diagnostic-only events. This is separate from
-  // `Observer` because producing memory limit changed events has an associated
-  // runtime cost. This way that cost is paid only when needed.
+  // policy notifications because producing memory limit changed events has an
+  // associated runtime cost.
   class CONTENT_EXPORT DiagnosticObserver : public base::CheckedObserver {
    public:
     ~DiagnosticObserver() override = default;
@@ -79,10 +64,6 @@ class CONTENT_EXPORT MemoryCoordinatorPolicyManager
       delete;
   MemoryCoordinatorPolicyManager& operator=(
       const MemoryCoordinatorPolicyManager&) = delete;
-
-  // Adds/removes an observer.
-  void AddObserver(Observer* observer);
-  void RemoveObserver(Observer* observer);
 
 #if BUILDFLAG(ENABLE_MEMORY_COORDINATOR_INTERNALS)
   // Adds/removes a diagnostic observer. Whenever there is one or more
@@ -219,12 +200,11 @@ class CONTENT_EXPORT MemoryCoordinatorPolicyManager
   void ApplyMemoryLimitOverrideForTesting(std::string_view consumer_name,
                                           int percentage);
 
-  base::ObserverList<Observer> observers_;
-
 #if BUILDFLAG(ENABLE_MEMORY_COORDINATOR_INTERNALS)
   base::ObserverList<DiagnosticObserver> diagnostic_observers_;
 #endif
 
+  bool is_notifying_ = false;
   base::flat_set<MemoryCoordinatorPolicy*> policies_;
 
   absl::flat_hash_map<ChildProcessId, std::unique_ptr<HostState>> hosts_;

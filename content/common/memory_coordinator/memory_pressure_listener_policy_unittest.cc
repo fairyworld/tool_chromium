@@ -13,6 +13,7 @@
 #include "base/memory/memory_pressure_listener_registry.h"
 #include "base/test/task_environment.h"
 #include "content/common/memory_coordinator/memory_consumer_group_host.h"
+#include "content/common/memory_coordinator/memory_coordinator_policy.h"
 #include "content/common/memory_coordinator/memory_coordinator_policy_manager.h"
 #include "content/public/common/memory_consumer_update.h"
 #include "testing/gmock/include/gmock/gmock.h"
@@ -63,8 +64,7 @@ TEST_F(MemoryPressureListenerPolicyTest, ResponseToPressure) {
                                         PROCESS_TYPE_BROWSER, kChildId);
 
   MemoryPressureListenerPolicy policy(policy_manager());
-  MemoryCoordinatorPolicyRegistration<MemoryPressureListenerPolicy>
-      registration(policy_manager(), policy);
+  MemoryCoordinatorPolicyRegistration registration(policy_manager(), policy);
 
   // Moderate pressure: 50% limit and release memory.
   EXPECT_CALL(host, UpdateConsumers(UnorderedElementsAre(
@@ -106,8 +106,7 @@ TEST_F(MemoryPressureListenerPolicyTest, IgnoreOtherProcesses) {
                                         PROCESS_TYPE_RENDERER, kRemoteChildId);
 
   MemoryPressureListenerPolicy policy(policy_manager());
-  MemoryCoordinatorPolicyRegistration<MemoryPressureListenerPolicy>
-      registration(policy_manager(), policy);
+  MemoryCoordinatorPolicyRegistration registration(policy_manager(), policy);
 
   // Local pressure should NOT affect remote process consumers.
   EXPECT_CALL(host, UpdateConsumers(_)).Times(0);
@@ -130,8 +129,7 @@ TEST_F(MemoryPressureListenerPolicyTest, Persistence) {
 
   {
     MemoryPressureListenerPolicy policy(policy_manager());
-    MemoryCoordinatorPolicyRegistration<MemoryPressureListenerPolicy>
-        registration(policy_manager(), policy);
+    MemoryCoordinatorPolicyRegistration registration(policy_manager(), policy);
 
     // Moderate pressure: 50% limit and release memory.
     base::MemoryPressureListener::SimulatePressureNotification(

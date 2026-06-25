@@ -29,7 +29,6 @@ namespace content {
 // signals between the browser process and the child process.
 class BrowserMemoryCoordinatorBridge
     : public MemoryCoordinatorPolicy,
-      public MemoryCoordinatorPolicyManager::Observer,
       public mojom::ChildMemoryCoordinator
 #if BUILDFLAG(ENABLE_MEMORY_COORDINATOR_INTERNALS)
     ,
@@ -41,7 +40,7 @@ class BrowserMemoryCoordinatorBridge
       MemoryCoordinatorPolicyManager& manager);
   ~BrowserMemoryCoordinatorBridge() override;
 
-  // MemoryCoordinatorPolicyManager::Observer:
+  // MemoryCoordinatorPolicy:
   void OnConsumerGroupAdded(uint32_t consumer_id,
                             std::string_view consumer_name,
                             std::optional<base::MemoryConsumerTraits> traits,

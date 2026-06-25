@@ -6,7 +6,6 @@
 
 #include <utility>
 
-#include "base/memory_coordinator/memory_consumer.h"
 #include "content/common/memory_coordinator/memory_coordinator_policy.h"
 #include "content/common/memory_coordinator/memory_coordinator_policy_manager.h"
 
