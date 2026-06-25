@@ -905,7 +905,11 @@ void AccountProfileMapper::Assigner::MaybeMigratePrimaryManagedAccount(
     local_pref_service_->SetTime(
         prefs::kWaitingForMultiProfileForcedMigrationTimestamp,
         base::Time::Now());
-    return;
+    // If the grace period is non-zero, there's nothing else to do for now. If
+    // it *is* zero, then continue so that the force-migration will run now.
+    if (!kMultiProfileMigrationGracePeriod.Get().is_zero()) {
+      return;
+    }
   }
 
   if (!base::FeatureList::IsEnabled(

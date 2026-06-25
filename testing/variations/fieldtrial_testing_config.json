@@ -22269,6 +22269,24 @@
             ]
         }
     ],
+    "SeparateProfilesForManagedAccountsForceMigration": [
+        {
+            "platforms": [
+                "ios"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "params": {
+                        "MultiProfileMigrationGracePeriod": "0"
+                    },
+                    "enable_features": [
+                        "SeparateProfilesForManagedAccountsForceMigration"
+                    ]
+                }
+            ]
+        }
+    ],
     "ServiceWorkerBackgroundUpdate": [
         {
             "platforms": [
