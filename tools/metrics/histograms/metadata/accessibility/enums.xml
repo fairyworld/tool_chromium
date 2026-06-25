@@ -1755,7 +1755,7 @@ Unknown properties are collapsed to zero. -->
       label="Reorder the currently-open tab to the left (not implemented)"/>
   <int value="29"
       label="Reorder the currently-open tab to the right (not implemented)"/>
-  <int value="30" label="Toggle caret browsing (not implemented)"/>
+  <int value="30" label="Toggle caret browsing"/>
   <int value="31" label="Focus on inactive dialogs (not implemented)"/>
   <int value="32" label="Open bookmarks"/>
   <int value="33" label="Bookmark page"/>
@@ -1775,7 +1775,7 @@ Unknown properties are collapsed to zero. -->
   <int value="46" label="Open history"/>
   <int value="47" label="Go back in history"/>
   <int value="48" label="Go forward in history"/>
-  <int value="49" label="Clear browsing data (not implemented)"/>
+  <int value="49" label="Clear browsing data"/>
   <int value="50" label="Print"/>
   <int value="51" label="Basic print (not implemented)"/>
   <int value="52" label="Zoom in"/>
