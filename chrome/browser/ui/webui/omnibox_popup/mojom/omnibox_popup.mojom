@@ -20,8 +20,6 @@ struct OmniboxInputState {
   gfx.mojom.Range selection;
   // Whether the user has edited the text or if it is unedited permanent text.
   bool user_input_in_progress;
-  // Whether the input was double clicked to open the omnibox.
-  bool is_double_click;
   // The full url to show on unelision.
   string full_url;
 };

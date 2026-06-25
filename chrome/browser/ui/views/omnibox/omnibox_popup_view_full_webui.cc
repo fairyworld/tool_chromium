@@ -47,7 +47,7 @@ void OmniboxPopupViewFullWebUI::UpdatePopupAppearance() {
   // called directly from specific events (focus, tab switch).
 }
 
-void OmniboxPopupViewFullWebUI::SyncNativeStateToWebUI(bool is_double_click) {
+void OmniboxPopupViewFullWebUI::SyncNativeStateToWebUI() {
   controller()->edit_model()->ResetDisplayTexts();
   if (auto* popup_handler = GetPopupHandler()) {
     bool user_input_in_progress =
@@ -57,12 +57,11 @@ void OmniboxPopupViewFullWebUI::SyncNativeStateToWebUI(bool is_double_click) {
             ? controller()->edit_model()->user_text()
             : controller()->edit_model()->GetPermanentDisplayText();
     gfx::Range selection = gfx::Range(0, text.length());
-    if (is_double_click) {
-      if (auto* omnibox_view_views =
-              static_cast<OmniboxViewViews*>(omnibox_view_)) {
-        selection = omnibox_view_views->GetSelectedRange();
-      }
+    if (auto* omnibox_view_views =
+            static_cast<OmniboxViewViews*>(omnibox_view_)) {
+      selection = omnibox_view_views->GetSelectedRange();
     }
+
     const std::u16string full_url =
         controller()->client()->GetFormattedFullURL();
 
@@ -77,7 +76,7 @@ void OmniboxPopupViewFullWebUI::SyncNativeStateToWebUI(bool is_double_click) {
       // changes (e.g. during double clicks or mouse dragging), we do not push
       // the input text and risk resetting DOM input state or scroll position.
       popup_handler->SetInputState(base::UTF16ToUTF8(text), selection,
-                                   user_input_in_progress, is_double_click,
+                                   user_input_in_progress,
                                    base::UTF16ToUTF8(full_url));
       last_sent_text_ = text;
     }
@@ -168,9 +167,9 @@ void OmniboxPopupViewFullWebUI::OnTabChanged(content::WebContents* contents) {
     gfx::Range selection = state ? state->selection : gfx::Range(0, 0);
     const std::u16string full_url =
         controller()->client()->GetFormattedFullURL();
-    popup_handler->SetInputState(
-        base::UTF16ToUTF8(text), selection, user_input_in_progress,
-        /*is_double_click=*/false, base::UTF16ToUTF8(full_url));
+    popup_handler->SetInputState(base::UTF16ToUTF8(text), selection,
+                                 user_input_in_progress,
+                                 base::UTF16ToUTF8(full_url));
     last_sent_text_ = text;
   }
 }
@@ -192,7 +191,7 @@ void OmniboxPopupViewFullWebUI::OnFocus() {
   controller()->popup_state_manager()->SetPopupState(OmniboxPopupState::kFull);
 
   if (changed) {
-    SyncNativeStateToWebUI(/*is_double_click=*/false);
+    SyncNativeStateToWebUI();
   }
 }
 

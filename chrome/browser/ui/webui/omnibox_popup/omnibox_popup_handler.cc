@@ -47,7 +47,6 @@ void OmniboxPopupHandler::OnContextMenuClosed() {
 void OmniboxPopupHandler::SetInputState(const std::string& text,
                                         const gfx::Range& selection,
                                         bool user_input_in_progress,
-                                        bool is_double_click,
                                         const std::string& full_url) {
   latest_selection_ = selection;
   current_sequence_number_++;
@@ -56,7 +55,6 @@ void OmniboxPopupHandler::SetInputState(const std::string& text,
   state->text = text;
   state->selection = selection;
   state->user_input_in_progress = user_input_in_progress;
-  state->is_double_click = is_double_click;
   state->full_url = full_url;
   page_->SetInputState(std::move(state));
 }

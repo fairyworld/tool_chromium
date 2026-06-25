@@ -1490,8 +1490,6 @@ bool OmniboxViewViews::OnMousePressed(const ui::MouseEvent& event) {
     next_double_click_selection_len_ = 0;
   }
 
-  bool is_double_click = false;
-
   if (!select_all_on_mouse_release_) {
     if (UnapplySteadyStateElisions(UnelisionGesture::kOther)) {
       // This ensures that when the user makes a double-click partial select, we
@@ -1499,7 +1497,6 @@ bool OmniboxViewViews::OnMousePressed(const ui::MouseEvent& event) {
       // selection, which is on mousedown.
       TextChanged();
       filter_drag_events_for_unelision_ = true;
-      is_double_click = true;
     } else if (event.GetClickCount() == 1 && event.IsLeftMouseButton()) {
       // Select the current word and record it for later. This is done to handle
       // an edge case where the wrong word is selected on a double click when
@@ -1530,21 +1527,8 @@ bool OmniboxViewViews::OnMousePressed(const ui::MouseEvent& event) {
         SetSelectedRange(gfx::Range(next_double_click_selection_offset_,
                                     next_double_click_selection_offset_ +
                                         next_double_click_selection_len_));
-        is_double_click = true;
       }
     }
-  }
-
-  // When mouse clicks are being forwarded from the WebUI popup to this native
-  // textfield, push the newly calculated selection range (e.g. word highlights)
-  // back to the WebUI searchbox so it maintains perfect visual sync. Whenever
-  // selection is set on the omnibox_view_views, it should be pushed to the
-  // popup.
-  if (location_bar_view_ && location_bar_view_->GetOmniboxPopupView() &&
-      base::FeatureList::IsEnabled(
-          omnibox::kWebUIOmniboxFullPopupDoubleClick)) {
-    location_bar_view_->GetOmniboxPopupView()->SyncNativeStateToWebUI(
-        is_double_click);
   }
 
   return handled;
@@ -1557,8 +1541,6 @@ bool OmniboxViewViews::OnMouseDragged(const ui::MouseEvent& event) {
     return true;
   }
 
-  // TODO(crbug.com/514810983): Figure out dragging behavior for full webui
-  // popup.
   if (HasTextBeingDragged()) {
     if (auto* popup_closer = controller()->client()->GetOmniboxPopupCloser()) {
       popup_closer->CloseWithReason(omnibox::PopupCloseReason::kTextDrag);
@@ -1610,6 +1592,17 @@ void OmniboxViewViews::OnMouseReleased(const ui::MouseEvent& event) {
   // case, in which we defer uneliding until mouse release.
   if (UnapplySteadyStateElisions(UnelisionGesture::kMouseRelease)) {
     TextChanged();
+  }
+
+  if (location_bar_view_) {
+    location_bar_view_->OpenOmniboxPopup();
+
+    // Transfer selection to the full webui popup.
+    if (location_bar_view_->GetOmniboxPopupView() &&
+        base::FeatureList::IsEnabled(
+            omnibox::kWebUIOmniboxFullPopupDoubleClick)) {
+      location_bar_view_->GetOmniboxPopupView()->SyncNativeStateToWebUI();
+    }
   }
 }
 
@@ -1815,6 +1808,11 @@ void OmniboxViewViews::OnBlur() {
                  controller()->client()->GetOmniboxPopupCloser()) {
     if (!base::FeatureList::IsEnabled(omnibox::kWebUIOmniboxFullPopup)) {
       popup_closer->CloseWithReason(omnibox::PopupCloseReason::kBlur);
+    } else {
+      // In the dragging case of the full webUI popup we still need to revert
+      // the text to reapply elision. Since the dropdown is not visible (popup
+      // is not open), it skips the `RevertAll` above.
+      RevertAll();
     }
   }
 

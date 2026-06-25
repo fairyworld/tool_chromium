@@ -33,7 +33,7 @@ class OmniboxPopupViewFullWebUI : public OmniboxPopupViewWebUI {
   void UpdatePopupAppearance() override;
   // Syncs the text and selection state from the native location bar to the
   // WebUI omnibox.
-  void SyncNativeStateToWebUI(bool is_double_click) override;
+  void SyncNativeStateToWebUI() override;
   // Saves the current omnibox state (e.g. input) to the given tab's
   // user data, so it can be restored when switching back to this tab.
   void SaveStateToTab(content::WebContents* tab) override;

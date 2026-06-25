@@ -124,6 +124,8 @@ export class OmniboxPopupSearchboxElement extends
   // Used to suppress intermediate selection updates until composition finishes.
   private isComposing_: boolean = false;
   private fullUrl_: string = '';
+  private pendingFocusSelection_: {start: number, end: number}|null = null;
+
 
   constructor() {
     super();
@@ -248,6 +250,12 @@ export class OmniboxPopupSearchboxElement extends
     super.onInputFocusChanged(e);
   }
 
+  override onInputWrapperFocusout(e: FocusEvent) {
+    // Clear selection when input loses focus.
+    this.getInputElement().blur();
+    super.onInputWrapperFocusout(e);
+  }
+
   private isChromeScheme_(): boolean {
     try {
       const url = new URL(this.fullUrl_);
@@ -264,9 +272,11 @@ export class OmniboxPopupSearchboxElement extends
   private onSelectionChanged_() {
     const input = this.$.input.inputElement;
     // Suppress selection updates during active IME text composition.
-    if (this.shadowRoot.activeElement !== this.$.input || this.isComposing_) {
+    if (this.shadowRoot.activeElement !== this.$.input || this.isComposing_ ||
+        this.pendingFocusSelection_) {
       return;
     }
+
     this.popupPageHandler_.onSelectionChanged(
         {start: input.selectionStart || 0, end: input.selectionEnd || 0},
         this.currentSequenceNum_);
@@ -281,24 +291,39 @@ export class OmniboxPopupSearchboxElement extends
     this.userInputInProgress_ = state.userInputInProgress;
     this.currentSequenceNum_ = state.sequenceNumber;
     this.fullUrl_ = state.fullUrl;
-    if (state.selection.start <= state.selection.end) {
-      if (state.isDoubleClick) {
-        this.$.input.setInputText(state.fullUrl);
-      }
-      this.$.input.setSelectionRange(
-          state.selection.start, state.selection.end);
-    } else {
-      // Backend can pass reversed ranges for single clicks. This should still
-      // select all.
-      this.$.input.select();
-    }
+    // Input gets focused on init which triggers blink UpdateSelectionOnFocus.
+    // Set pendingFocusSelection_ so that this update does not trigger
+    // onSelectionChanged(). See line 348 of
+    // third_party/blink/renderer/core/html/forms/html_input_element.cc.
+    this.pendingFocusSelection_ = state.selection;
+    this.selectRange(state.selection);
+
     this.getDropdownElement().unselect();
     this.pageHandler().stopAutocomplete(/*clearResult=*/ false);
     this.lastQueriedInput = state.text;
   }
 
+  private selectRange(selection: {start: number, end: number}) {
+    const {start, end} = selection;
+    const input = this.getInputElement().inputElement.value.trim();
+    // Selection can come from either direction.
+    if (!(start - end === input.length) && !(end - start === input.length)) {
+      if (this.fullUrl_) {
+        this.$.input.setInputText(this.fullUrl_);
+      }
+      this.$.input.setSelectionRange(
+          Math.min(start, end), Math.max(start, end));
+    } else {
+      this.$.input.select();
+    }
+  }
+
   protected onInputFocusin_() {
     this.searchboxPageHandler_.onFocusChanged(true);
+    if (this.pendingFocusSelection_) {
+      this.selectRange(this.pendingFocusSelection_);
+      this.pendingFocusSelection_ = null;
+    }
   }
 
   protected computePlaceholderText_(): string {

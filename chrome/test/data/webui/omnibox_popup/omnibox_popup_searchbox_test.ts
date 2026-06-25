@@ -40,7 +40,6 @@ suite('OmniboxPopupSearchboxTest', function() {
       text: testText,
       selection: {start: 0, end: 0},
       userInputInProgress: false,
-      isDoubleClick: false,
       fullUrl: '',
     });
     await microtasksFinished();
@@ -69,9 +68,12 @@ suite('OmniboxPopupSearchboxTest', function() {
       text: 'test text',
       selection: {start: 0, end: 0},
       userInputInProgress: true,
-      isDoubleClick: false,
       fullUrl: '',
     });
+    await microtasksFinished();
+
+    // Send `focusin` event to clear `pendingFocusSelection_`.
+    searchbox.$.input.dispatchEvent(new Event('focusin', {bubbles: true}));
     await microtasksFinished();
 
     // Set some selection in the HTML.
@@ -115,7 +117,6 @@ suite('OmniboxPopupSearchboxTest', function() {
       text: 'test text',
       selection: {start: 1, end: 4},
       userInputInProgress: false,
-      isDoubleClick: false,
       fullUrl: '',
     });
     await microtasksFinished();
@@ -131,7 +132,6 @@ suite('OmniboxPopupSearchboxTest', function() {
       text: 'edited text',
       selection: {start: 0, end: 0},
       userInputInProgress: true,
-      isDoubleClick: false,
       fullUrl: '',
     });
     await microtasksFinished();
@@ -146,7 +146,6 @@ suite('OmniboxPopupSearchboxTest', function() {
       text: 'permanent text',
       selection: {start: 0, end: 0},
       userInputInProgress: false,
-      isDoubleClick: false,
       fullUrl: '',
     });
     await microtasksFinished();
@@ -163,7 +162,6 @@ suite('OmniboxPopupSearchboxTest', function() {
       text: 'custom draft',
       selection: {start: 12, end: 12},
       userInputInProgress: true,
-      isDoubleClick: false,
       fullUrl: '',
     });
     await microtasksFinished();
@@ -187,7 +185,7 @@ suite('OmniboxPopupSearchboxTest', function() {
   });
 
   test('SuppressesSelectionChangedDuringComposition', async () => {
-    // Focus the input.
+    // Focus the input so it's the active element.
     const input = searchbox.$.input.inputElement;
     input.focus();
     await microtasksFinished();
@@ -197,11 +195,14 @@ suite('OmniboxPopupSearchboxTest', function() {
       text: 'CJK text',
       selection: {start: 0, end: 0},
       userInputInProgress: true,
-      isDoubleClick: false,
       fullUrl: '',
     });
     await microtasksFinished();
     handler.reset();
+
+    // Send `focusin` event to clear `pendingFocusSelection_`.
+    searchbox.$.input.dispatchEvent(new Event('focusin', {bubbles: true}));
+    await microtasksFinished();
 
     // Start IME composition.
     searchbox.$.input.dispatchEvent(new CustomEvent('compositionstart'));
@@ -236,7 +237,6 @@ suite('OmniboxPopupSearchboxTest', function() {
       text: 'test.com',
       selection: {start: 0, end: 4},
       userInputInProgress: true,
-      isDoubleClick: true,
       fullUrl: full_url,
     });
     await microtasksFinished();
