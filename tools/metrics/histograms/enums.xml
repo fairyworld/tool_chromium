@@ -10510,6 +10510,7 @@ from previous Chrome versions.
   <int value="-1281465357" label="MacV2GPUSandbox:disabled"/>
   <int value="-1280802236" label="MemorySaverAggressiveness:enabled"/>
   <int value="-1280673966" label="PluginVmFullscreen:disabled"/>
+  <int value="-1280517135" label="android-device-signals-disclaimer:enabled"/>
   <int value="-1280405905" label="LensOverlayAndroid:enabled"/>
   <int value="-1280274244" label="OmniboxClosePopupWithEscape:disabled"/>
   <int value="-1279151596" label="TreatBootstrapAsDefault:enabled"/>
@@ -11428,6 +11429,7 @@ from previous Chrome versions.
   <int value="-987470173" label="ClickToCallOpenDialerDirectly:disabled"/>
   <int value="-987191098" label="FontAccessPersistent:disabled"/>
   <int value="-987187004" label="SyncSettingsCategorization:disabled"/>
+  <int value="-986812517" label="android-device-signals-disclaimer:disabled"/>
   <int value="-986406754"
       label="UnifiedPasswordManagerLocalPasswordsAndroidWithMigration:enabled"/>
   <int value="-985964106" label="PriceTrackingIconColors:disabled"/>
@@ -16405,6 +16407,7 @@ from previous Chrome versions.
   <int value="635032392" label="QuickDeleteAndroidFollowup:disabled"/>
   <int value="635076832" label="MarkHttpAs:disabled"/>
   <int value="635533110" label="ReleaseNotes:disabled"/>
+  <int value="635892962" label="AndroidDeviceSignalsDisclaimer:disabled"/>
   <int value="635947051" label="DesktopRestructuredLanguageSettings:enabled"/>
   <int value="635971109" label="PrintPdfAsImage:disabled"/>
   <int value="636341169" label="ExploreSites:disabled"/>
@@ -20339,6 +20342,7 @@ from previous Chrome versions.
   <int value="1883000826" label="IsolatedSandboxedIframesName:disabled"/>
   <int value="1883057900" label="proactive-suggestions-framework:disabled"/>
   <int value="1883558610" label="GalleryAppPdfEditNotification:disabled"/>
+  <int value="1883670279" label="AndroidDeviceSignalsDisclaimer:enabled"/>
   <int value="1883856892" label="SupportToolCopyTokenButton:disabled"/>
   <int value="1883998150" label="WebAppsCrosapi:disabled"/>
   <int value="1885566305" label="EsbDownloadRowPromo:enabled"/>

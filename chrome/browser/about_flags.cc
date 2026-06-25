@@ -6307,6 +6307,11 @@ const FeatureEntry kFeatureEntries[] = {
                                     kAndroidAppRatingPromptVariations,
                                     "AndroidAppRatingPrompt")},
 
+    {"android-device-signals-disclaimer",
+     flag_descriptions::kAndroidDeviceSignalsDisclaimerName,
+     flag_descriptions::kAndroidDeviceSignalsDisclaimerDescription, kOsAndroid,
+     FEATURE_VALUE_TYPE(chrome::android::kAndroidDeviceSignalsDisclaimer)},
+
     {"android-media-picker", flag_descriptions::kAndroidMediaPickerName,
      flag_descriptions::kAndroidMediaPickerDescription, kOsAndroid,
      FEATURE_VALUE_TYPE(kAndroidMediaPicker)},
@@ -9383,8 +9388,7 @@ const FeatureEntry kFeatureEntries[] = {
      flag_descriptions::kWebUIOmniboxHideAimUrlDescription, kOsDesktop,
      FEATURE_VALUE_TYPE(omnibox::kHideAimEntrypointForUrlSuggestions)},
 
-    {"webui-omnibox-full-popup",
-     flag_descriptions::kWebUIOmniboxFullPopupName,
+    {"webui-omnibox-full-popup", flag_descriptions::kWebUIOmniboxFullPopupName,
      flag_descriptions::kWebUIOmniboxFullPopupDescription, kOsDesktop,
      FEATURE_WITH_PARAMS_VALUE_TYPE(omnibox::kWebUIOmniboxFullPopup,
                                     kWebUIOmniboxFullPopupVariations,

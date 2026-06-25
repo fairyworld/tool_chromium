@@ -5300,6 +5300,13 @@ inline constexpr char kAndroidDesktopZoomScalingDescription[] =
     "When enabled, this feature will scale the Desktop Android web content up "
     "by some percentage, transparent to the user.";
 
+inline constexpr char kAndroidDeviceSignalsDisclaimerName[] =
+    "Android Startup Enterprise Signals Disclaimer";
+inline constexpr char kAndroidDeviceSignalsDisclaimerDescription[] =
+    "Enables the Startup Enterprise Signals Disclaimer. The disclaimer will be "
+    "shown to managed users missing the device signals permission on chrome "
+    "startup.";
+
 inline constexpr char kAndroidDocumentPictureInPictureName[] =
     "Enable Document Picture-In-Picture in desktop windowing on Android.";
 inline constexpr char kAndroidDocumentPictureInPictureDescription[] =
