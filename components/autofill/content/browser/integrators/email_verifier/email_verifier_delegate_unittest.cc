@@ -5,6 +5,8 @@
 #include "components/autofill/content/browser/integrators/email_verifier/email_verifier_delegate.h"
 
 #include "base/run_loop.h"
+#include "base/strings/string_number_conversions.h"
+#include "base/strings/utf_string_conversions.h"
 #include "base/test/gmock_callback_support.h"
 #include "base/test/metrics/histogram_tester.h"
 #include "base/test/mock_callback.h"
@@ -923,6 +925,230 @@ TEST_F(EmailVerifierDelegateTest, DriverInactiveBeforeResponse) {
   histogram_tester.ExpectUniqueSample("Blink.Evp.Autofill.FlowResult",
                                       EvpAutofillFlowResult::kDriverInactive,
                                       1);
+}
+
+// Verifies that focus loss on an email field only triggers verification if the
+// last change to the field was a manual user edit (not autofill or JS).
+TEST_F(EmailVerifierDelegateTest, OnFieldLostFocus_OnlyTriggersOnUserEdit) {
+  FormStructure* form = SetUpValidForm();
+
+  // Expect NO verification.
+  EXPECT_CALL(email_verifier(), CheckIfVerifiable).Times(0);
+  EXPECT_CALL(email_verifier(), Verify).Times(0);
+  EXPECT_CALL(driver(), SendEmailVerificationToken).Times(0);
+
+  // Simulate non-user edit (e.g. autofill).
+  form->field(0)->set_value(u"user@example.com");
+  form->field(0)->AddFieldModifier(FieldModifier::kAutofill);
+
+  // Focus it.
+  delegate().OnAfterFocusOnFormField(manager(), form->global_id(),
+                                     form->field(0)->global_id());
+  // Focus away.
+  delegate().OnAfterFocusOnNonFormField(manager());
+}
+
+// Verifies that the delegate maintains an LRU cache of recently verified email
+// values to deduplicate verification triggers for the tab, preventing duplicate
+// prompts on alternating focus, and correctly evicting the oldest entry.
+TEST_F(EmailVerifierDelegateTest,
+       OnFieldLostFocus_DeduplicatesAlternatingFields) {
+  FormData form_data = test::GetFormData(
+      {.description_for_logging = "FormWith6Emails",
+       .fields =
+           {
+               {.label = u"Email1",
+                .name = u"email1",
+                .nonce = u"test_nonce",
+                .form_control_type = FormControlType::kInputEmail},
+               {.label = u"Email2",
+                .name = u"email2",
+                .nonce = u"test_nonce",
+                .form_control_type = FormControlType::kInputEmail},
+               {.label = u"Email3",
+                .name = u"email3",
+                .nonce = u"test_nonce",
+                .form_control_type = FormControlType::kInputEmail},
+               {.label = u"Email4",
+                .name = u"email4",
+                .nonce = u"test_nonce",
+                .form_control_type = FormControlType::kInputEmail},
+               {.label = u"Email5",
+                .name = u"email5",
+                .nonce = u"test_nonce",
+                .form_control_type = FormControlType::kInputEmail},
+               {.label = u"Email6",
+                .name = u"email6",
+                .nonce = u"test_nonce",
+                .form_control_type = FormControlType::kInputEmail},
+               {.label = u"Verification Token",
+                .name = u"verification_token",
+                .nonce = u"test_nonce",
+                .autocomplete_attribute = "email-verification-token",
+                .form_control_type =
+                    FormControlType::kInputHiddenEmailVerification},
+           },
+       .host_frame = driver().GetFrameToken()});
+  manager().AddSeenForm(
+      form_data, {EMAIL_ADDRESS, EMAIL_ADDRESS, EMAIL_ADDRESS, EMAIL_ADDRESS,
+                  EMAIL_ADDRESS, EMAIL_ADDRESS, UNKNOWN_TYPE});
+  FormStructure* form =
+      test_api(manager()).FindCachedFormById(form_data.global_id());
+  ASSERT_TRUE(form);
+  for (int i = 0; i < 6; ++i) {
+    form->field(i)->set_autofilled_type(EMAIL_ADDRESS);
+  }
+
+  // 1. Fill 5 fields with user edits.
+  std::vector<std::string> emails;
+  for (int i = 0; i < 5; ++i) {
+    std::string email = "user" + base::NumberToString(i + 1) + "@example.com";
+    emails.push_back(email);
+    form->field(i)->set_value(base::UTF8ToUTF16(email));
+    form->field(i)->AddFieldModifier(FieldModifier::kUser);
+  }
+
+  testing::Sequence s;
+  testing::MockFunction<void(int)> checkpoint;
+
+  // Set up expectations in sequence
+  // Part 1: Expect 5 sequential triggers
+  for (int i = 0; i < 5; ++i) {
+    EXPECT_CALL(email_verifier(), CheckIfVerifiable(emails[i], _))
+        .InSequence(s);
+  }
+
+  EXPECT_CALL(checkpoint, Call(1)).InSequence(s);
+
+  // Part 2: Alternating focus should NOT trigger anything.
+  // We expect Checkpoint 2 to happen immediately after Checkpoint 1 in the
+  // sequence, meaning no CheckIfVerifiable calls can happen in between.
+  EXPECT_CALL(checkpoint, Call(2)).InSequence(s);
+
+  // Part 3: 6th field trigger (evicts 1)
+  std::string email6 = "user6@example.com";
+  EXPECT_CALL(email_verifier(), CheckIfVerifiable(email6, _)).InSequence(s);
+
+  EXPECT_CALL(checkpoint, Call(3)).InSequence(s);
+
+  // Part 4: Blur email1 again (triggers because evicted)
+  std::string email1 = "user1@example.com";
+  EXPECT_CALL(email_verifier(), CheckIfVerifiable(email1, _)).InSequence(s);
+
+  EXPECT_CALL(checkpoint, Call(4)).InSequence(s);
+
+  // --- Execution ---
+
+  // 1. Trigger the 5 sequential focus losses.
+  // Focus 0. (No trigger yet)
+  delegate().OnAfterFocusOnFormField(manager(), form->global_id(),
+                                     form->field(0)->global_id());
+
+  // Focus 1. (Triggers 0)
+  delegate().OnAfterFocusOnFormField(manager(), form->global_id(),
+                                     form->field(1)->global_id());
+
+  // Focus 2. (Triggers 1)
+  delegate().OnAfterFocusOnFormField(manager(), form->global_id(),
+                                     form->field(2)->global_id());
+
+  // Focus 3. (Triggers 2)
+  delegate().OnAfterFocusOnFormField(manager(), form->global_id(),
+                                     form->field(3)->global_id());
+
+  // Focus 4. (Triggers 3)
+  delegate().OnAfterFocusOnFormField(manager(), form->global_id(),
+                                     form->field(4)->global_id());
+
+  // Focus non-form. (Triggers 4)
+  delegate().OnAfterFocusOnNonFormField(manager());
+
+  // Verify Part 1 completed
+  checkpoint.Call(1);
+
+  // 2. Alternating focus between the 5 fields without changes -> Should NOT
+  // trigger.
+  delegate().OnAfterFocusOnFormField(manager(), form->global_id(),
+                                     form->field(0)->global_id());  // Focus 0
+  delegate().OnAfterFocusOnFormField(
+      manager(), form->global_id(),
+      form->field(2)->global_id());  // Focus 2 (triggers 0)
+  delegate().OnAfterFocusOnFormField(
+      manager(), form->global_id(),
+      form->field(4)->global_id());  // Focus 4 (triggers 2)
+  delegate().OnAfterFocusOnFormField(
+      manager(), form->global_id(),
+      form->field(1)->global_id());  // Focus 1 (triggers 4)
+  delegate().OnAfterFocusOnFormField(
+      manager(), form->global_id(),
+      form->field(3)->global_id());  // Focus 3 (triggers 1)
+  delegate().OnAfterFocusOnNonFormField(
+      manager());  // Focus non-form (triggers 3)
+
+  // Verify Part 2 completed (no triggers happened)
+  checkpoint.Call(2);
+
+  // 3. Fill and blur 6th field -> Should trigger (evicts 1).
+  form->field(5)->set_value(base::UTF8ToUTF16(email6));
+  form->field(5)->AddFieldModifier(FieldModifier::kUser);
+
+  delegate().OnAfterFocusOnFormField(manager(), form_data.global_id(),
+                                     form->field(5)->global_id());  // Focus 5
+  delegate().OnAfterFocusOnNonFormField(
+      manager());  // Focus non-form (triggers 5)
+
+  // Verify Part 3 completed
+  checkpoint.Call(3);
+
+  // 4. Blur email1 again without changes -> Should trigger again because it was
+  // evicted.
+  delegate().OnAfterFocusOnFormField(manager(), form_data.global_id(),
+                                     form->field(0)->global_id());  // Focus 0
+  delegate().OnAfterFocusOnNonFormField(
+      manager());  // Focus non-form (triggers 0)
+
+  // Verify Part 4 completed
+  checkpoint.Call(4);
+}
+
+// Verifies that an email value shorter than 5 characters is rejected and does
+// not trigger verification.
+TEST_F(EmailVerifierDelegateTest, OnFieldLostFocus_RejectsShortEmail) {
+  FormStructure* form = SetUpValidForm();
+
+  // Expect NO verification.
+  EXPECT_CALL(email_verifier(), CheckIfVerifiable).Times(0);
+  EXPECT_CALL(email_verifier(), Verify).Times(0);
+  EXPECT_CALL(driver(), SendEmailVerificationToken).Times(0);
+
+  // Set a short email (length 3: "a@b").
+  form->field(0)->set_value(u"a@b");
+  form->field(0)->AddFieldModifier(FieldModifier::kUser);
+
+  // Focus and blur.
+  delegate().OnAfterFocusOnFormField(manager(), form->global_id(),
+                                     form->field(0)->global_id());
+  delegate().OnAfterFocusOnNonFormField(manager());
+}
+
+// Verifies that an email value without a dot in the domain part (after the @)
+// is rejected and does not trigger verification.
+TEST_F(EmailVerifierDelegateTest, OnFieldLostFocus_RejectsNoDomainDot) {
+  FormStructure* form = SetUpValidForm();
+
+  // Expect NO verification.
+  EXPECT_CALL(email_verifier(), CheckIfVerifiable).Times(0);
+  EXPECT_CALL(email_verifier(), Verify).Times(0);
+  EXPECT_CALL(driver(), SendEmailVerificationToken).Times(0);
+
+  // Set an email without a dot in the domain ("user@domain").
+  form->field(0)->set_value(u"user@domain");
+  form->field(0)->AddFieldModifier(FieldModifier::kUser);
+
+  // Focus and blur.
+  delegate().OnAfterFocusOnFormField(manager(), form->global_id(),
+                                     form->field(0)->global_id());
+  delegate().OnAfterFocusOnNonFormField(manager());
 }
 
 }  // namespace autofill

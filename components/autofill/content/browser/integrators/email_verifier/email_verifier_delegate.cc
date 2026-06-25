@@ -285,6 +285,8 @@ void EmailVerifierDelegate::DidFinishNavigation(
     // if the state is cleared on pushState() or #anchor navigations.
     // We clear the issuers_ map on these navigations too.
     issuers_.clear();
+    last_focused_field_ = std::nullopt;
+    last_verified_values_.clear();
   }
 }
 
@@ -377,6 +379,82 @@ void EmailVerifierDelegate::OnBeforeFormWithEmailVerificationTokenSubmitted(
     manager.client().ShowEmailVerifiedToast(issuer_url);
     NotifyFlowCompleted(EvpAutofillFlowResult::kSuccess);
   }
+}
+
+void EmailVerifierDelegate::OnAfterFocusOnFormField(AutofillManager& manager,
+                                                    FormGlobalId form_id,
+                                                    FieldGlobalId field_id) {
+  if (last_focused_field_ && *last_focused_field_ != field_id) {
+    OnFieldLostFocus(manager, *last_focused_field_);
+  }
+  last_focused_field_ = field_id;
+}
+
+void EmailVerifierDelegate::OnAfterFocusOnNonFormField(
+    AutofillManager& manager) {
+  if (last_focused_field_) {
+    OnFieldLostFocus(manager, *last_focused_field_);
+    last_focused_field_ = std::nullopt;
+  }
+}
+
+void EmailVerifierDelegate::OnFieldLostFocus(AutofillManager& manager,
+                                             const FieldGlobalId& field_id) {
+  if (!base::FeatureList::IsEnabled(::features::kEmailVerificationProtocol)) {
+    return;
+  }
+  const FormStructure* form = manager.FindCachedFormById(field_id);
+  if (!form) {
+    return;
+  }
+  const AutofillField* email_field = form->GetFieldById(field_id);
+  if (!email_field) {
+    return;
+  }
+
+  // Check 1: Type is EMAIL_ADDRESS
+  if (email_field->Type().GetAddressType() != EMAIL_ADDRESS) {
+    return;
+  }
+
+  // Check 2: User Edit (last_modifier is kUser)
+  if (email_field->last_modifier() != FieldModifier::kUser) {
+    return;
+  }
+
+  // Check 3: Value validation (length [5, 256], contains '@' and '.' after '@')
+  const std::u16string& value = email_field->value();
+  if (value.length() < 5 || value.length() > 256) {
+    return;
+  }
+  size_t at_pos = value.find(u'@');
+  if (at_pos == std::u16string::npos ||
+      value.find(u'.', at_pos) == std::u16string::npos) {
+    return;
+  }
+
+  // Check 4: Deduplication (LRU Cache)
+  auto it = std::ranges::find_if(last_verified_values_, [&](const auto& pair) {
+    return pair.first == field_id;
+  });
+  if (it != last_verified_values_.end() && it->second == value) {
+    // Value is same, deduplicate. Move to back to update LRU status.
+    auto pair = *it;
+    last_verified_values_.erase(it);
+    last_verified_values_.push_back(pair);
+    return;
+  }
+
+  // Value is different or new. Update cache and trigger.
+  if (it != last_verified_values_.end()) {
+    last_verified_values_.erase(it);
+  }
+  last_verified_values_.push_back({field_id, value});
+  if (last_verified_values_.size() > 5) {
+    last_verified_values_.erase(last_verified_values_.begin());
+  }
+
+  TriggerVerification(manager, *form, *email_field, value);
 }
 
 void EmailVerifierDelegate::TriggerVerification(
