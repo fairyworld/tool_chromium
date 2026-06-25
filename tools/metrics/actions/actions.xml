@@ -912,7 +912,6 @@ should be able to be added at any place in this file.
 
 <variants name="PersonalContextManageTarget">
   <variant name="ConnectedApps" summary="'Manage connected apps'"/>
-  <variant name="Suggestions" summary="'Manage suggestions'"/>
 </variants>
 
 <variants name="PersonalContextToggleState">

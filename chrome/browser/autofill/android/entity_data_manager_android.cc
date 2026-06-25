@@ -110,14 +110,7 @@ void EntityDataManagerAndroid::SetPersonalContextEnabled(JNIEnv* env,
 
 static std::string
 JNI_EntityDataManager_GetPersonalContextManageConnectedAppsUrl(JNIEnv* env) {
-  // TODO(b/516667536): Update url when final one is ready.
-  return personal_context::kPersonalContextSettingsURL;
-}
-
-static std::string JNI_EntityDataManager_GetPersonalContextManageSuggestionsUrl(
-    JNIEnv* env) {
-  // TODO(b/516667536): Update url when final one is ready.
-  return personal_context::kPersonalContextSettingsURL;
+  return personal_context::kPersonalContextConnectedAppsURL;
 }
 
 static int64_t JNI_EntityDataManager_Init(JNIEnv* env,
