@@ -523,6 +523,16 @@ are declared in tools/grit/grit_args.gni.
       <message name="IDS_HISTORY_TURN_ON_SYNC_PROMO_DESC" desc="Description of the turn on sync/sign-in promo. Further tells users to turn o sync/sign in to Chrome to see synced tabs from other devices.">
         To get your tabs from your other devices, turn on sync
       </message>
+      <!-- Sign in on your phone (QR code) strings  -->
+      <message name="IDS_HISTORY_SIGNIN_ON_PHONE_PROMO_TITLE" desc="Title of the Cross device sign in promo on the History page, the promo will open the QR code bubble that allows the user to sign in on their phone.">
+        Pick up where you left off
+      </message>
+      <message name="IDS_HISTORY_SIGNIN_ON_PHONE_PROMO_SUBTITLE" desc="Subtitle of the Cross device sign in promo on the History page, the promo will open the QR code bubble that allows the user to sign in on their phone.">
+        Easily get back to sites you've visited by signing in to the same account on both devices
+      </message>
+      <message name="IDS_HISTORY_SIGNIN_ON_PHONE_PROMO_BUTTON" desc="Action button of the Cross device sign in promo on the History page, the promo will open the QR code bubble that allows the user to sign in on their phone. Clicking this button opens the QR code bubble.">
+        Sign in on your phone
+      </message>
 
       <message name="IDS_HISTORY_SYNC_HISTORY_PROMO" desc="Text of the sync hystory promo. This will show up if a user is not logged in and has no synced tabs.">
         Browse across devices

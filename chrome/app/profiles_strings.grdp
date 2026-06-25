@@ -1376,4 +1376,28 @@
     <message name="IDS_SIGN_IN_BENEFITS_WITHOUT_BOOKMARKS_AND_EXTENSIONS_IPH_TEXT" desc="Text of the IPH bubble announcing benefits for users who signed in before the sync-to-signin migration, not mentioning bookmarks and extensions because they require an explicit sign in.">
       While you're signed in, you can use the themes, settings, and more saved in your Google Account on all your devices
     </message>
+    <!-- Sign in on your phone (QR code) strings  -->
+    <if expr="not use_titlecase">
+      <message name="IDS_AVATAR_BUTTON_SIGNIN_ON_PHONE" desc="Text on the avatar pill expanding while the QR code bubble is showing, which will let the user sign in on their phone.">
+        Sign in on phone?
+      </message>
+    </if>
+    <if expr="use_titlecase">
+      <message name="IDS_AVATAR_BUTTON_SIGNIN_ON_PHONE" desc="Text on the avatar pill expanding while the QR code bubble is showing, which will let the user sign in on their phone.">
+        Sign In on Phone?
+      </message>
+    </if>
+    <if expr="not use_titlecase">
+      <message name="IDS_PROFILE_MENU_SIGNIN_ON_PHONE_BUTTON_LABEL" desc="Text of the Profile Menu button that opens the QR code bubble, which will let the user sign in on their phone.">
+        Sign in on your phone
+      </message>
+    </if>
+    <if expr="use_titlecase">
+      <message name="IDS_PROFILE_MENU_SIGNIN_ON_PHONE_BUTTON_LABEL" desc="Text of the Profile Menu button that opens the QR code bubble, which will let the user sign in on their phone.">
+        Sign In on Your Phone
+      </message>
+    </if>
+    <message name="IDS_QR_CODE_BUBBLE_SIGNIN_ON_PHONE_SUBTITLE" desc="Subtitle of the QR Code bubble showing a code for the user to sign in on their phone.">
+      To pick up where you left off, sign in to the same account on both devices
+    </message>
 </grit-part>
