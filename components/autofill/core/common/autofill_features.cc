@@ -221,7 +221,7 @@ BASE_FEATURE(kAutofillAiNoFillingIconsExperiment,
              base::FEATURE_DISABLED_BY_DEFAULT);
 
 // If enabled, AutofillAi supports order entities.
-BASE_FEATURE(kAutofillAiOrder, base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kAutofillAiOrder, base::FEATURE_ENABLED_BY_DEFAULT);
 
 // If enabled, AutofillAi requires re-auth when filling/viewing sensitive
 // fields. As part of this feature sensitive fields are also obfuscated during
@@ -301,7 +301,7 @@ BASE_FEATURE_PARAM(bool,
                    true);
 
 // If enabled, AutofillAi supports shipment entities.
-BASE_FEATURE(kAutofillAiShipment, base::FEATURE_DISABLED_BY_DEFAULT);
+BASE_FEATURE(kAutofillAiShipment, base::FEATURE_ENABLED_BY_DEFAULT);
 
 #if BUILDFLAG(IS_ANDROID)
 // If enabled, the user is notified about a failure to upstream data to Wallet

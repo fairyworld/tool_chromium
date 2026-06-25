@@ -2645,12 +2645,6 @@ constexpr auto kFeatureEntries = std::to_array<flags_ui::FeatureEntry>({
      flags_ui::kOsIos,
      FEATURE_VALUE_TYPE(
          autofill::features::kAutofillAiNoFillingIconsExperiment)},
-    {"autofill-ai-order", flag_descriptions::kAutofillAiOrderName,
-     flag_descriptions::kAutofillAiOrderDescription, flags_ui::kOsIos,
-     FEATURE_VALUE_TYPE(autofill::features::kAutofillAiOrder)},
-    {"autofill-ai-shipment", flag_descriptions::kAutofillAiShipmentName,
-     flag_descriptions::kAutofillAiShipmentDescription, flags_ui::kOsIos,
-     FEATURE_VALUE_TYPE(autofill::features::kAutofillAiShipment)},
     {"autofill-ai-valuables-iph",
      flag_descriptions::kAutofillAiValuablesIPHName,
      flag_descriptions::kAutofillAiValuablesIPHDescription, flags_ui::kOsIos,
