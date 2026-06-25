@@ -57,6 +57,7 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
     raw_ptr<FcpFiles> files;
     raw_ptr<FcpLogManager> log_manager;
     raw_ptr<FcpFlags> flags;
+    std::string federated_service_uri;
     std::string api_key;
     std::string session_name;
     std::string population_name;
@@ -123,6 +124,8 @@ class COMPONENT_EXPORT(PRIVATE_INSIGHTS) PrivateInsightsService
   FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest, MetricsChoiceCoupling);
   FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest,
                            MetricsChoiceRespectedOnStartup);
+  FRIEND_TEST_ALL_PREFIXES(PrivateInsightsServiceTest,
+                           UploadSkippedWhenServerUriEmpty);
 };
 
 }  // namespace private_insights

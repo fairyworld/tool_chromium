@@ -118,6 +118,10 @@ bool PrivateInsightsService::UploadBlocking(const base::FilePath& profile_dir,
                                             base::TimeTicks trigger_time) {
   base::UmaHistogramTimes(kUploadPendingTimeHistogram,
                           base::TimeTicks::Now() - trigger_time);
+  const std::string server_uri = kFcpServerUri.Get();
+  if (server_uri.empty()) {
+    return false;
+  }
   base::TimeTicks upload_start_time = base::TimeTicks::Now();
 
   base::FilePath private_insights_dir =
@@ -138,6 +142,7 @@ bool PrivateInsightsService::UploadBlocking(const base::FilePath& profile_dir,
       .files = &fcp_files,
       .log_manager = &fcp_log_manager,
       .flags = &fcp_flags,
+      .federated_service_uri = server_uri,
       .api_key = google_apis::GetAPIKey(),
       .population_name = kContextualCuesPopulationName,
   };
@@ -162,7 +167,7 @@ bool PrivateInsightsService::RunFederatedComputation(
           /*files=*/params.files,
           /*log_manager=*/params.log_manager,
           /*flags=*/params.flags,
-          /*federated_service_uri=*/"",
+          /*federated_service_uri=*/params.federated_service_uri,
           /*api_key=*/params.api_key,
           /*test_cert_path=*/"",
           // We don't use session_name per se, so just use population name

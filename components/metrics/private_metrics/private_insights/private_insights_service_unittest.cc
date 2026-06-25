@@ -27,6 +27,9 @@ class PrivateInsightsServiceTest : public testing::Test {
     mock_run_federated_computation_call_count_ = 0;
     PrivateInsightsService::SetRunFederatedComputationForTesting(
         &MockRunFederatedComputation);
+    feature_list_.InitAndEnableFeatureWithParameters(
+        kPrivateInsightsFeature,
+        {{"fcp_server_uri", "https://example.com/test"}});
   }
 
   void TearDown() override {
@@ -44,6 +47,7 @@ class PrivateInsightsServiceTest : public testing::Test {
   base::test::TaskEnvironment task_environment_{
       base::test::TaskEnvironment::TimeSource::MOCK_TIME};
   base::ScopedTempDir tmp_profile_dir_;
+  base::test::ScopedFeatureList feature_list_;
 };
 
 TEST_F(PrivateInsightsServiceTest,
@@ -86,8 +90,6 @@ TEST_F(PrivateInsightsServiceTest,
 }
 
 TEST_F(PrivateInsightsServiceTest, MetricsChoiceCoupling) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeature(kPrivateInsightsFeature);
 
   TestingPrefServiceSimple local_state;
   metrics::MetricsReportingChoiceService::RegisterPrefs(local_state.registry());
@@ -124,8 +126,6 @@ TEST_F(PrivateInsightsServiceTest, MetricsChoiceCoupling) {
 }
 
 TEST_F(PrivateInsightsServiceTest, MetricsChoiceRespectedOnStartup) {
-  base::test::ScopedFeatureList scoped_feature_list;
-  scoped_feature_list.InitAndEnableFeature(kPrivateInsightsFeature);
 
   PrivateInsightsMetricsServiceAccessor::
       SetForceIsMetricsReportingEnabledPrefLookupForTesting(true);
@@ -162,6 +162,22 @@ TEST_F(PrivateInsightsServiceTest, MetricsChoiceRespectedOnStartup) {
 
   PrivateInsightsMetricsServiceAccessor::
       SetForceIsMetricsReportingEnabledPrefLookupForTesting(false);
+}
+
+TEST_F(PrivateInsightsServiceTest, UploadSkippedWhenServerUriEmpty) {
+  feature_list_.Reset();
+  feature_list_.InitAndEnableFeatureWithParameters(kPrivateInsightsFeature,
+                                                   {{"fcp_server_uri", ""}});
+
+  base::HistogramTester histogram_tester;
+  TestingPrefServiceSimple local_state;
+  PrivateInsightsService service(&local_state, tmp_profile_dir_.GetPath());
+
+  service.TriggerUpload();
+
+  ASSERT_TRUE(
+      base::test::RunUntil([&]() { return !service.is_upload_running_; }));
+  EXPECT_EQ(mock_run_federated_computation_call_count_, 0);
 }
 
 }  // namespace private_insights
