@@ -7450,8 +7450,6 @@ test("unit_tests") {
       "../browser/ui/webui/commerce/shopping_list_context_menu_controller_unittest.cc",
       "../browser/ui/webui/constrained_web_dialog_ui_unittest.cc",
       "../browser/ui/webui/managed_ui_handler_unittest.cc",
-      "../browser/ui/webui/password_manager/promo_cards_handler_unittest.cc",
-      "../browser/ui/webui/password_manager/sync_handler_unittest.cc",
       "../browser/ui/webui/searchbox/contextual_searchbox_handler_unittest.cc",
       "../browser/ui/webui/settings/downloads_handler_unittest.cc",
       "../browser/ui/webui/settings/hats_handler_unittest.cc",
@@ -7669,15 +7667,8 @@ test("unit_tests") {
       deps += [ "//chrome/browser/profiles/batch_upload:test_support" ]
     }
 
-    if (is_chrome_branded) {
-      sources +=
-          [ "../browser/ui/webui/password_manager/promo_card_unittest.cc" ]
-    }
     if (!is_chromeos && is_chrome_branded) {
       sources += [ "../browser/ui/webui/settings/on_device_ai_settings_handler_unittest.cc" ]
-    }
-    if ((enable_dice_support || is_chromeos) && is_chrome_branded) {
-      sources += [ "../browser/ui/webui/password_manager/promo_cards/move_passwords_promo_unittest.cc" ]
     }
 
     if (is_win) {
@@ -8577,6 +8568,8 @@ test("unit_tests") {
     ]
 
     deps += [
+      "//chrome/browser/ui/webui/password_manager:unit_tests",
+      "//chrome/browser/ui/webui/password_manager/promo_cards:unit_tests",
       "//components/invalidation:test_support",
       "//components/webauthn/core/browser:test_support",
       "//ui/webui/resources/cr_components/history:mojo_bindings",
@@ -8900,7 +8893,6 @@ test("unit_tests") {
       "../browser/enterprise/connectors/device_trust/key_management/installer:unit_tests",
       "../browser/enterprise/connectors/device_trust/signals/decorators/browser:unit_tests",
       "../browser/ui/webui/password_manager:mojo_bindings",
-      "../browser/ui/webui/password_manager:unit_tests",
       "../browser/ui/webui/whats_new:mojo_bindings",
       "//chrome/browser/browser_switcher",
       "//chrome/browser/browser_switcher:unit_tests",
@@ -9331,10 +9323,6 @@ test("unit_tests") {
         "//chrome/browser/ui/webui/unexportable_keys_internals:unit_tests",
         "//services/audio/public/cpp:test_support",
       ]
-    }
-    if (is_mac || is_linux) {
-      sources += [ "../browser/ui/webui/password_manager/promo_cards/relaunch_chrome_promo_unittest.cc" ]
-      deps += [ "//components/os_crypt/async/browser:test_support" ]
     }
     if (!is_chromeos) {
       sources += [

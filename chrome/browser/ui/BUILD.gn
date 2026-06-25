@@ -1227,7 +1227,6 @@ static_library("ui") {
     # TODO(crbug.com/437811373): Remove this circular dependency when the
     # following headers get componentized:
     # - c/b/ui/chrome_pages.h and browser.h
-    # - c/b/ui/webui/password_manager/password_manager_ui.h
     "//chrome/browser/ui/passwords:impl",
 
     # ssl:impl includes headers from //chrome/browser/ui that can't be
@@ -1460,14 +1459,6 @@ static_library("ui") {
       "webui/chrome_web_contents_handler.h",
       "webui/extension_control_handler.cc",
       "webui/extension_control_handler.h",
-      "webui/password_manager/password_manager_ui.cc",
-      "webui/password_manager/password_manager_ui.h",
-      "webui/password_manager/promo_card.cc",
-      "webui/password_manager/promo_card.h",
-      "webui/password_manager/promo_cards_handler.cc",
-      "webui/password_manager/promo_cards_handler.h",
-      "webui/password_manager/sync_handler.cc",
-      "webui/password_manager/sync_handler.h",
       "webui/policy_indicator_localized_strings_provider.cc",
       "webui/policy_indicator_localized_strings_provider.h",
       "webui/settings/about_handler.cc",
@@ -1584,26 +1575,6 @@ static_library("ui") {
       "webui/theme_colors_source_manager_factory.cc",
       "webui/theme_colors_source_manager_factory.h",
     ]
-
-    if (is_chrome_branded) {
-      sources += [
-        "webui/password_manager/promo_cards/access_on_any_device_promo.cc",
-        "webui/password_manager/promo_cards/access_on_any_device_promo.h",
-        "webui/password_manager/promo_cards/password_checkup_promo.cc",
-        "webui/password_manager/promo_cards/password_checkup_promo.h",
-        "webui/password_manager/promo_cards/password_manager_shortcut_promo.cc",
-        "webui/password_manager/promo_cards/password_manager_shortcut_promo.h",
-        "webui/password_manager/promo_cards/web_password_manager_promo.cc",
-        "webui/password_manager/promo_cards/web_password_manager_promo.h",
-      ]
-    }
-
-    if ((enable_dice_support || is_chromeos) && is_chrome_branded) {
-      sources += [
-        "webui/password_manager/promo_cards/move_passwords_promo.cc",
-        "webui/password_manager/promo_cards/move_passwords_promo.h",
-      ]
-    }
 
     if (enable_dice_support) {
       deps += [
@@ -2034,6 +2005,7 @@ static_library("ui") {
       "//chrome/browser/ui/webui/media_router",
       "//chrome/browser/ui/webui/multistep_filter_internals",
       "//chrome/browser/ui/webui/on_device_internals",
+      "//chrome/browser/ui/webui/password_manager:password_manager_ui",
       "//chrome/browser/ui/webui/search_engine_choice",
       "//chrome/browser/ui/webui/suggest_internals",
       "//chrome/browser/ui/webui/util",
@@ -2077,6 +2049,11 @@ static_library("ui") {
       # cast_feedback_ui.cc includes metrics_handler.h from
       # //chrome/browser/ui:ui.
       "//chrome/browser/ui/webui/media_router",
+
+      # password_manager_ui.cc includes managed_ui_handler.h,
+      # extension_control_handler.h and settings handler headers from
+      # //chrome/browser/ui:ui.
+      "//chrome/browser/ui/webui/password_manager:password_manager_ui",
 
       # //chrome/browser/ui/webui/util/webui_util_desktop.h is included by
       # :ui and its implementation is in //chrome/browser/ui/webui/util:impl.
@@ -3650,8 +3627,6 @@ static_library("ui") {
       "views/first_run_dialog.h",
       "views/passwords/password_relaunch_chrome_view.cc",
       "views/passwords/password_relaunch_chrome_view.h",
-      "webui/password_manager/promo_cards/relaunch_chrome_promo.cc",
-      "webui/password_manager/promo_cards/relaunch_chrome_promo.h",
     ]
     deps += [ "//components/os_crypt/async/common" ]
   }
