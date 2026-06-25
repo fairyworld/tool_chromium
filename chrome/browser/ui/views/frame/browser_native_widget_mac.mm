@@ -528,8 +528,13 @@ NativeWidgetMacNSWindow* BrowserNativeWidgetMac::CreateNSWindow(
   CHECK(browser_view_);
   NativeWidgetMacNSWindow* ns_window = NativeWidgetMac::CreateNSWindow(params);
   if (features::IsGlassFrameEnabled()) {
-    [ns_window setBackgroundColor:[NSColor clearColor]];
     [ns_window setOpaque:NO];
+    // A completely transparent background ([NSColor clearColor]) causes AppKit
+    // to continuously invalidate the window surface, resulting in high CPU
+    // and energy usage. Using an almost-transparent color (alpha 0.001) avoids
+    // this performance issue while remaining visually indistinguishable.
+    [ns_window setBackgroundColor:[[NSColor windowBackgroundColor]
+                                      colorWithAlphaComponent:0.001]];
   }
   touch_bar_delegate_ = [[BrowserWindowTouchBarViewsDelegate alloc]
       initWithBrowser:browser_view_->browser()
