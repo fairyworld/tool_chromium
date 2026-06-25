@@ -348,4 +348,33 @@
   GREYAssertTrue(NO, @"This test is expected to fail.");
 }
 
+// A test designed to crash, to verify test expectations.
+- (void)testCrashingMethod {
+  [NSException raise:@"SmokeTestCrashException"
+              format:@"Expected smoke test crash"];
+}
+
+// A test designed to fail (or pass), to verify flaky expectations.
+- (void)testFlakyFailureMethod {
+  GREYAssertTrue(NO, @"This test is expected to fail flakily.");
+}
+
+// A test designed to crash (or pass), to verify flaky crash expectations.
+- (void)testFlakyCrashMethod {
+  [NSException raise:@"SmokeTestFlakyCrashException"
+              format:@"Expected smoke test flaky crash"];
+}
+
+// A test designed to pass, to verify flaky expectations allow passing runs.
+- (void)testFlakyPassingMethod {
+  GREYAssertTrue(YES, @"This test is expected to pass.");
+}
+
+// A test designed to pass, to verify flaky crash expectations allow passing
+// runs.
+- (void)testFlakyCrashPassingMethod {
+  GREYAssertTrue(
+      YES, @"This test is expected to pass under flaky crash expectations.");
+}
+
 @end
