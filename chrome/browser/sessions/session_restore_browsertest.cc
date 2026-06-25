@@ -257,9 +257,6 @@ BrowserWindowInterface* FindBrowserWithType(BrowserWindowInterface::Type type) {
 
 }  // namespace
 
-// TODO(b/479420496): Update this test to verify navigation history, tab groups,
-// pinned tabs, the active tab index, and window state/bounds.
-// See examples in SessionRestoreAcrossStagesTest.
 class SessionRestoreTest : public InProcessBrowserTest {
  public:
   SessionRestoreTest() {

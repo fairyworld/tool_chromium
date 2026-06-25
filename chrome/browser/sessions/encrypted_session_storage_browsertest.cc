@@ -365,10 +365,6 @@ class EncryptedSessionStorageBrowserTestBase : public InProcessBrowserTest {
 // storage encryption rollout. Its purpose is to verify that sessions are
 // written and restored correctly.  For tests that span multiple
 // stages of rollout, see the SessionRestoreAcrossStagesTest.
-//
-// TODO(b/479420496): Update this test to verify navigation history, tab groups,
-// pinned tabs, the active tab index, and window state/bounds.
-// See examples in SessionRestoreAcrossStagesTest.
 class SessionRestoreWithEncryptionTest
     : public EncryptedSessionStorageBrowserTestBase,
       public testing::WithParamInterface<TestParams> {
@@ -407,6 +403,111 @@ IN_PROC_BROWSER_TEST_P(SessionRestoreWithEncryptionTest, LargeSessionRestore) {
   for (int i = 1; i < starting_tab_count; ++i) {
     EXPECT_EQ(GetUrl(i), tab_strip_model->GetWebContentsAt(i)->GetURL());
   }
+}
+
+IN_PROC_BROWSER_TEST_P(SessionRestoreWithEncryptionTest,
+                       NavigationHistoryIsRestored) {
+  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetUrl(1)));
+  ui_test_utils::NavigateToURLWithDisposition(
+      browser(), GetUrl(2), WindowOpenDisposition::NEW_FOREGROUND_TAB,
+      ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
+  ASSERT_EQ(2, browser()->tab_strip_model()->count());
+
+  // Navigate the active tab (index 1) to GetUrl(3), keeping GetUrl(2) in
+  // history.
+  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetUrl(3)));
+
+  AssertCommandStorageBackendFilesExist(SessionType::kSessionRestore);
+
+  BrowserWindowInterface* restored = QuitBrowserAndRestore(browser());
+  TabStripModel* tab_strip_model = restored->GetTabStripModel();
+  ASSERT_EQ(2, tab_strip_model->count());
+  EXPECT_EQ(GetUrl(1), tab_strip_model->GetWebContentsAt(0)->GetURL());
+
+  content::WebContents* restored_tab2 = tab_strip_model->GetWebContentsAt(1);
+  EXPECT_EQ(GetUrl(3), restored_tab2->GetURL());
+
+  content::NavigationController& controller = restored_tab2->GetController();
+  EXPECT_EQ(2, controller.GetEntryCount());
+  EXPECT_EQ(GetUrl(2), controller.GetEntryAtIndex(0)->GetURL());
+  EXPECT_EQ(GetUrl(3), controller.GetEntryAtIndex(1)->GetURL());
+}
+
+IN_PROC_BROWSER_TEST_P(SessionRestoreWithEncryptionTest, TabGroupsAreRestored) {
+  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetUrl(1)));
+  ui_test_utils::NavigateToURLWithDisposition(
+      browser(), GetUrl(2), WindowOpenDisposition::NEW_FOREGROUND_TAB,
+      ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
+  ui_test_utils::NavigateToURLWithDisposition(
+      browser(), GetUrl(3), WindowOpenDisposition::NEW_FOREGROUND_TAB,
+      ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
+  ASSERT_EQ(3, browser()->tab_strip_model()->count());
+
+  tab_groups::TabGroupId group_id =
+      browser()->tab_strip_model()->AddToNewGroup({1, 2});
+  browser()->tab_strip_model()->ChangeTabGroupVisuals(
+      group_id, tab_groups::TabGroupVisualData(
+                    u"Work", tab_groups::TabGroupColorId::kBlue));
+
+  AssertCommandStorageBackendFilesExist(SessionType::kSessionRestore);
+
+  BrowserWindowInterface* restored = QuitBrowserAndRestore(browser());
+  TabStripModel* tab_strip_model = restored->GetTabStripModel();
+  ASSERT_EQ(3, tab_strip_model->count());
+
+  EXPECT_FALSE(tab_strip_model->GetTabGroupForTab(0).has_value());
+
+  std::optional<tab_groups::TabGroupId> group_id1 =
+      tab_strip_model->GetTabGroupForTab(1);
+  std::optional<tab_groups::TabGroupId> group_id2 =
+      tab_strip_model->GetTabGroupForTab(2);
+  ASSERT_TRUE(group_id1.has_value());
+  ASSERT_TRUE(group_id2.has_value());
+  EXPECT_EQ(group_id1.value(), group_id2.value());
+
+  const tab_groups::TabGroupVisualData* visual_data =
+      tab_strip_model->group_model()
+          ->GetTabGroup(group_id1.value())
+          ->visual_data();
+  ASSERT_TRUE(visual_data);
+  EXPECT_EQ(u"Work", visual_data->title());
+  EXPECT_EQ(tab_groups::TabGroupColorId::kBlue, visual_data->color());
+}
+
+IN_PROC_BROWSER_TEST_P(SessionRestoreWithEncryptionTest,
+                       PinnedTabsAreRestored) {
+  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetUrl(1)));
+  ui_test_utils::NavigateToURLWithDisposition(
+      browser(), GetUrl(2), WindowOpenDisposition::NEW_FOREGROUND_TAB,
+      ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
+  ASSERT_EQ(2, browser()->tab_strip_model()->count());
+
+  browser()->tab_strip_model()->SetTabPinned(0, true);
+
+  AssertCommandStorageBackendFilesExist(SessionType::kSessionRestore);
+
+  BrowserWindowInterface* restored = QuitBrowserAndRestore(browser());
+  TabStripModel* tab_strip_model = restored->GetTabStripModel();
+  ASSERT_EQ(2, tab_strip_model->count());
+  EXPECT_TRUE(tab_strip_model->IsTabPinned(0));
+  EXPECT_FALSE(tab_strip_model->IsTabPinned(1));
+}
+
+IN_PROC_BROWSER_TEST_P(SessionRestoreWithEncryptionTest, ActiveTabIsRestored) {
+  ASSERT_TRUE(ui_test_utils::NavigateToURL(browser(), GetUrl(1)));
+  ui_test_utils::NavigateToURLWithDisposition(
+      browser(), GetUrl(2), WindowOpenDisposition::NEW_FOREGROUND_TAB,
+      ui_test_utils::BROWSER_TEST_WAIT_FOR_LOAD_STOP);
+  ASSERT_EQ(2, browser()->tab_strip_model()->count());
+
+  browser()->tab_strip_model()->ActivateTabAt(0);
+
+  AssertCommandStorageBackendFilesExist(SessionType::kSessionRestore);
+
+  BrowserWindowInterface* restored = QuitBrowserAndRestore(browser());
+  TabStripModel* tab_strip_model = restored->GetTabStripModel();
+  ASSERT_EQ(2, tab_strip_model->count());
+  EXPECT_EQ(0, tab_strip_model->active_index());
 }
 
 INSTANTIATE_TEST_SUITE_P(
