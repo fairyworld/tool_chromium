@@ -9965,11 +9965,29 @@ const net::HttpResponseHeaders* NavigationRequest::GetResponseHeaders() {
 
 const network::mojom::DeclarativePerformanceObserverPolicy*
 NavigationRequest::GetDeclarativePerformanceObserverPolicy() {
-  if (!response_head_.get() || !response_head_->parsed_headers) {
+  if (!response_head_.get() || !response_head_->parsed_headers ||
+      !response_head_->parsed_headers
+           ->declarative_performance_observer_policy) {
     return nullptr;
   }
-  return response_head_->parsed_headers->declarative_performance_observer_policy
-      .get();
+
+  // If globally enabled, return the parsed policy.
+  if (base::FeatureList::IsEnabled(
+          network::features::kDeclarativePerformanceObserver)) {
+    return response_head_->parsed_headers
+        ->declarative_performance_observer_policy.get();
+  }
+
+  // Otherwise, check if enabled via Origin Trial.
+  if (response_head_->headers &&
+      blink::TrialTokenValidator().RequestEnablesFeature(
+          GetURL(), response_head_->headers.get(),
+          "DeclarativePerformanceObserver", base::Time::Now())) {
+    return response_head_->parsed_headers
+        ->declarative_performance_observer_policy.get();
+  }
+
+  return nullptr;
 }
 
 mojom::DidCommitProvisionalLoadParamsPtr

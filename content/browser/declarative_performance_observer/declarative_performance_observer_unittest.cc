@@ -26,6 +26,7 @@
 #include "services/network/public/cpp/features.h"
 #include "services/network/test/test_network_context.h"
 #include "testing/gtest/include/gtest/gtest.h"
+#include "third_party/blink/public/common/origin_trials/scoped_test_origin_trial_policy.h"
 #include "third_party/blink/public/mojom/timing/declarative_performance_observer.mojom.h"
 
 namespace content {
@@ -789,6 +790,127 @@ TEST_F(DeclarativePerformanceObserverTest,
                              &default_reports, run_loop2.QuitClosure()));
   run_loop2.Run();
   EXPECT_EQ(default_reports.size(), 0u);
+}
+
+class DeclarativePerformanceObserverOriginTrialTest
+    : public DeclarativePerformanceObserverTest {
+ public:
+  DeclarativePerformanceObserverOriginTrialTest() = default;
+
+ private:
+  blink::ScopedTestOriginTrialPolicy origin_trial_policy_;
+};
+
+TEST_F(DeclarativePerformanceObserverOriginTrialTest, OriginTrialGated) {
+  const GURL kPageURL("https://example.com/index.html");
+
+  // 1. Disable the feature flag globally.
+  base::test::ScopedFeatureList feature_list;
+  feature_list.InitAndDisableFeature(
+      network::features::kDeclarativePerformanceObserver);
+
+  // 2. Try to navigate WITH the Performance-Observer header but WITHOUT the OT
+  // token.
+  {
+    auto simulator =
+        NavigationSimulator::CreateBrowserInitiated(kPageURL, web_contents());
+    simulator->Start();
+
+    auto headers =
+        base::MakeRefCounted<net::HttpResponseHeaders>("HTTP/1.1 200 OK");
+    headers->AddHeader("Performance-Observer",
+                       "report-to=\"telemetry\", capture-early-failures=true, "
+                       "entry-types=(\"navigation\")");
+    simulator->SetResponseHeaders(headers);
+    simulator->Commit();
+
+    // Verify that the observer was NOT created (because OT is missing and flag
+    // is off).
+    auto* observer =
+        DeclarativePerformanceObserver::GetForCurrentDocument(main_rfh());
+    EXPECT_FALSE(observer);
+  }
+
+  // 2b. Try to navigate WITH the Performance-Observer header AND WITH a token
+  // for a DIFFERENT feature.
+  {
+    auto simulator =
+        NavigationSimulator::CreateBrowserInitiated(kPageURL, web_contents());
+    simulator->Start();
+
+    auto headers =
+        base::MakeRefCounted<net::HttpResponseHeaders>("HTTP/1.1 200 OK");
+    headers->AddHeader("Performance-Observer",
+                       "report-to=\"telemetry\", capture-early-failures=true, "
+                       "entry-types=(\"navigation\")");
+    // Valid token for https://example.com but for "DummyFeature"
+    headers->AddHeader(
+        "Origin-Trial",
+        "A/UfT0vT/si9yD1YdLXncUei180zQQrpu8+QaF/yhQgfBhERC0jdyFswSttoojUXStecZ"
+        "0xCwL3gRiYCxsf+AwAAAABWeyJvcmlnaW4iOiAiaHR0cHM6Ly9leGFtcGxlLmNvbTo0ND"
+        "MiLCAiZmVhdHVyZSI6ICJIdW1teUZlYXR1cmUiLCAiZXhwaXJ5IjogMjAwMDAwMDAwMH0"
+        "=");
+    simulator->SetResponseHeaders(headers);
+    simulator->Commit();
+
+    // Verify that the observer was NOT created (because the token is for a
+    // different feature).
+    auto* observer =
+        DeclarativePerformanceObserver::GetForCurrentDocument(main_rfh());
+    EXPECT_FALSE(observer);
+  }
+
+  // 2c. Try to navigate WITH the Performance-Observer header AND WITH a
+  // MALFORMED token.
+  {
+    auto simulator =
+        NavigationSimulator::CreateBrowserInitiated(kPageURL, web_contents());
+    simulator->Start();
+
+    auto headers =
+        base::MakeRefCounted<net::HttpResponseHeaders>("HTTP/1.1 200 OK");
+    headers->AddHeader("Performance-Observer",
+                       "report-to=\"telemetry\", capture-early-failures=true, "
+                       "entry-types=(\"navigation\")");
+    // Malformed token
+    headers->AddHeader("Origin-Trial", "not-a-valid-token-at-all");
+    simulator->SetResponseHeaders(headers);
+    simulator->Commit();
+
+    // Verify that the observer was NOT created.
+    auto* observer =
+        DeclarativePerformanceObserver::GetForCurrentDocument(main_rfh());
+    EXPECT_FALSE(observer);
+  }
+
+  // 3. Try to navigate WITH the Performance-Observer header AND WITH a VALID OT
+  // token.
+  {
+    auto simulator =
+        NavigationSimulator::CreateBrowserInitiated(kPageURL, web_contents());
+    simulator->Start();
+
+    auto headers =
+        base::MakeRefCounted<net::HttpResponseHeaders>("HTTP/1.1 200 OK");
+    headers->AddHeader("Performance-Observer",
+                       "report-to=\"telemetry\", capture-early-failures=true, "
+                       "entry-types=(\"navigation\")");
+    // Valid token for https://example.com and DeclarativePerformanceObserver
+    headers->AddHeader(
+        "Origin-Trial",
+        "A6umeji0ZeijjMlMf+9BwGsWirfa1RScCpY7xKTExl1kdyzXKLwnYfdCIgFv4FoVaBDUzX"
+        "z15kxM/25jT7kN/gwAAABoeyJvcmlnaW4iOiAiaHR0cHM6Ly9leGFtcGxlLmNvbTo0NDM"
+        "iLCAiZmVhdHVyZSI6ICJEZWNsYXJhdGl2ZVBlcmZvcm1hbmNlT2JzZXJ2ZXIiLCAiZXhw"
+        "aXJ5IjogMjAwMDAwMDAwMH0=");
+
+    simulator->SetResponseHeaders(headers);
+    simulator->Commit();
+
+    // Verify that the observer WAS successfully created!
+    auto* observer =
+        DeclarativePerformanceObserver::GetForCurrentDocument(main_rfh());
+    EXPECT_TRUE(observer);
+  }
 }
 
 }  // namespace
