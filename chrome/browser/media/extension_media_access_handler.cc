@@ -6,8 +6,6 @@
 
 #include <utility>
 
-#include "base/command_line.h"
-#include "base/strings/string_split.h"
 #include "chrome/browser/media/webrtc/media_stream_device_permissions.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/extensions/extension_constants.h"
@@ -15,25 +13,11 @@
 #include "content/public/browser/web_contents.h"
 #include "extensions/common/extension.h"
 #include "extensions/common/permissions/permissions_data.h"
-#include "extensions/common/switches.h"
+#include "extensions/common/utils/extension_utils.h"
 
 using extensions::mojom::APIPermissionID;
 
 namespace {
-
-// Whether the extension is allowlisted for testing by
-// `kAllowlistedExtensionID`.
-bool IsExtensionAllowlisted(const extensions::Extension* extension) {
-  const std::string allowlisted_extension_ids =
-      base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(
-          extensions::switches::kAllowlistedExtensionID);
-
-  const std::vector<std::string_view> allowlist =
-      base::SplitStringPiece(allowlisted_extension_ids, ",",
-                             base::TRIM_WHITESPACE, base::SPLIT_WANT_NONEMPTY);
-
-  return std::ranges::contains(allowlist, extension->id());
-}
 
 // This is a short-term solution to grant camera and/or microphone access to
 // extensions:
@@ -53,7 +37,7 @@ bool IsExtensionAllowlisted(const extensions::Extension* extension) {
 // the user).
 bool IsMediaRequestHandledByManifestForExtension(
     const extensions::Extension* extension) {
-  if (IsExtensionAllowlisted(extension)) {
+  if (extensions::IsExtensionAllowlistedByCommandLine(*extension)) {
     // The extension is granted broad extension permissions for testing
     // (including the audio/video capture permissions), so have the extension
     // system handle the request.
