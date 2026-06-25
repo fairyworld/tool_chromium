@@ -621,6 +621,7 @@ test("components_unittests") {
       "//components/password_manager/core/common:unit_tests",
       "//components/password_manager/ios:unit_tests",
       "//components/previous_session_info:unit_tests",
+      "//components/private_ai/ios:unit_tests",
       "//components/safe_browsing/ios/browser:unit_tests",
       "//components/security_state/ios:unit_tests",
       "//components/shared_highlighting/ios:unit_tests",
@@ -781,7 +782,7 @@ test("components_unittests") {
     ]
   }
 
-  if (!is_ios && !is_fuchsia && !is_castos) {
+  if (!is_fuchsia && !is_castos) {
     deps += [ "//components/private_ai:unit_tests" ]
   }
 
