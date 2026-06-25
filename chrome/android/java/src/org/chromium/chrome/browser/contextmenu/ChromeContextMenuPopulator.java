@@ -578,7 +578,10 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
                     // have the `interestfor` attribute.
                     maybeRecordBooleanUkm("ContextMenuAndroid.Shown", "LinkWithInterestFor");
                 }
-                if ((mMode == ContextMenuMode.NORMAL || mMode == ContextMenuMode.CUSTOM_TAB)
+                if ((mMode == ContextMenuMode.NORMAL
+                                || mMode == ContextMenuMode.CUSTOM_TAB
+                                || (mMode == ContextMenuMode.THIN_WEB_VIEW
+                                        && mItemDelegate.supportsOpenInEphemeralTab()))
                         && EphemeralTabCoordinator.isSupported()) {
                     boolean showNewLabel = shouldTriggerEphemeralTabHelpUi();
                     boolean isDataUrl =
