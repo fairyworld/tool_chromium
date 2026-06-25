@@ -17,6 +17,8 @@ import static org.mockito.Mockito.when;
 
 import android.content.pm.Signature;
 
+import androidx.appsearch.app.AppSearchBatchResult;
+import androidx.appsearch.app.AppSearchResult;
 import androidx.appsearch.app.AppSearchSchema;
 import androidx.appsearch.app.AppSearchSession;
 import androidx.appsearch.app.GenericDocument;
@@ -38,7 +40,9 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.robolectric.shadows.ShadowLog;
 
+import org.chromium.base.Log;
 import org.chromium.base.ServiceLoaderUtil;
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.base.test.RobolectricUtil;
@@ -51,6 +55,7 @@ import java.util.Set;
 /** Unit tests for AuxiliarySearchDonationServiceBridge. */
 @RunWith(BaseRobolectricTestRunner.class)
 public class AuxiliarySearchDonationServiceBridgeUnitTest {
+    private static final String EXPECTED_LOG_TAG = "cr_" + AuxiliarySearchDonationServiceBridge.TAG;
     private static final String TEST_ID = "123";
     private static final String TEST_URL = "https://example.com";
     private static final String TEST_TITLE = "Example";
@@ -181,7 +186,10 @@ public class AuxiliarySearchDonationServiceBridgeUnitTest {
         when(mMockFactory.createSearchSessionAsync(anyString()))
                 .thenReturn(Futures.immediateFuture(mMockSession));
         when(mMockSession.setSchemaAsync(any())).thenReturn(Futures.immediateFuture(null));
-        when(mMockSession.putAsync(any())).thenReturn(Futures.immediateFuture(null));
+        when(mMockSession.putAsync(any()))
+                .thenReturn(
+                        Futures.immediateFuture(
+                                new AppSearchBatchResult.Builder<String, Void>().build()));
         var bridge = new AuxiliarySearchDonationServiceBridge();
         RobolectricUtil.runAllBackgroundAndUi();
         WebPage page =
@@ -244,7 +252,10 @@ public class AuxiliarySearchDonationServiceBridgeUnitTest {
         when(mMockFactory.createSearchSessionAsync(anyString()))
                 .thenReturn(Futures.immediateFuture(mMockSession));
         when(mMockSession.setSchemaAsync(any())).thenReturn(Futures.immediateFuture(null));
-        when(mMockSession.putAsync(any())).thenReturn(Futures.immediateFuture(null));
+        when(mMockSession.putAsync(any()))
+                .thenReturn(
+                        Futures.immediateFuture(
+                                new AppSearchBatchResult.Builder<String, Void>().build()));
         var bridge = new AuxiliarySearchDonationServiceBridge();
         RobolectricUtil.runAllBackgroundAndUi();
         WebPage page =
@@ -279,6 +290,66 @@ public class AuxiliarySearchDonationServiceBridgeUnitTest {
         assertEquals(
                 AuxiliarySearchDonationServiceBridge.ACCOUNT_TYPE_GOOGLE,
                 actualAccount.getAccountType());
+    }
+
+    @Test
+    public void testDonateHistory_futureFailure_logsWarning() {
+        when(mMockFactory.createSearchSessionAsync(anyString()))
+                .thenReturn(Futures.immediateFuture(mMockSession));
+        when(mMockSession.setSchemaAsync(any())).thenReturn(Futures.immediateFuture(null));
+        when(mMockSession.putAsync(any()))
+                .thenReturn(Futures.immediateFailedFuture(new RuntimeException("IPC error")));
+        // Suppress log spam in tests.
+        ShadowLog.stream = null;
+        var bridge = new AuxiliarySearchDonationServiceBridge();
+        RobolectricUtil.runAllBackgroundAndUi();
+
+        WebPage page =
+                AuxiliarySearchDonationServiceBridge.createHistoryDocument(
+                        TEST_ID, TEST_URL, TEST_TITLE, TEST_LAST_VISITED);
+        bridge.donateHistory(List.of(page), /* coreAccountInfo= */ null);
+        RobolectricUtil.runAllBackgroundAndUi();
+
+        assertTrue(
+                "Expected pipeline warning log was not found",
+                ShadowLog.getLogs().stream()
+                        .anyMatch(
+                                item ->
+                                        EXPECTED_LOG_TAG.equals(item.tag)
+                                                && item.type == Log.WARN
+                                                && item.throwable instanceof RuntimeException));
+    }
+
+    @Test
+    public void testDonateHistory_batchFailure_logsWarning() {
+        when(mMockFactory.createSearchSessionAsync(anyString()))
+                .thenReturn(Futures.immediateFuture(mMockSession));
+        when(mMockSession.setSchemaAsync(any())).thenReturn(Futures.immediateFuture(null));
+        // Suppress log spam in tests.
+        ShadowLog.stream = null;
+        AppSearchBatchResult<String, Void> failedBatchResult =
+                new AppSearchBatchResult.Builder<String, Void>()
+                        .setFailure(TEST_ID, AppSearchResult.RESULT_INTERNAL_ERROR, "Disk full")
+                        .build();
+        when(mMockSession.putAsync(any())).thenReturn(Futures.immediateFuture(failedBatchResult));
+        var bridge = new AuxiliarySearchDonationServiceBridge();
+        RobolectricUtil.runAllBackgroundAndUi();
+
+        WebPage page =
+                AuxiliarySearchDonationServiceBridge.createHistoryDocument(
+                        TEST_ID, TEST_URL, TEST_TITLE, TEST_LAST_VISITED);
+        bridge.donateHistory(List.of(page), /* coreAccountInfo= */ null);
+        RobolectricUtil.runAllBackgroundAndUi();
+
+        assertTrue(
+                "Expected batch failure warning log was not found",
+                ShadowLog.getLogs().stream()
+                        .anyMatch(
+                                item ->
+                                        EXPECTED_LOG_TAG.equals(item.tag)
+                                                && item.type == Log.WARN
+                                                && "Failed to donate documents: 1 failure(s)."
+                                                        .equals(item.msg)));
     }
 
     @Test

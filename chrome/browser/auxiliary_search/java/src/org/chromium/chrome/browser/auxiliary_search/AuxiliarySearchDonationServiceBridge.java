@@ -7,6 +7,7 @@ package org.chromium.chrome.browser.auxiliary_search;
 import static org.chromium.build.NullUtil.assumeNonNull;
 
 import androidx.annotation.VisibleForTesting;
+import androidx.appsearch.app.AppSearchBatchResult;
 import androidx.appsearch.app.AppSearchSchema;
 import androidx.appsearch.app.AppSearchSession;
 import androidx.appsearch.app.GenericDocument;
@@ -17,6 +18,7 @@ import androidx.appsearch.builtintypes.Account;
 import androidx.appsearch.builtintypes.WebPage;
 import androidx.appsearch.exceptions.AppSearchException;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -24,6 +26,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import org.jni_zero.CalledByNative;
 import org.jni_zero.JniType;
 
+import org.chromium.base.Log;
 import org.chromium.base.ServiceLoaderUtil;
 import org.chromium.build.annotations.NullMarked;
 import org.chromium.build.annotations.Nullable;
@@ -39,6 +42,8 @@ import java.util.concurrent.TimeUnit;
  */
 @NullMarked
 class AuxiliarySearchDonationServiceBridge implements Closeable {
+    @VisibleForTesting static final String TAG = "AuxSearchDonation";
+
     // Differs from `AuxiliarySearchDonor`, which uses the package name as both the database name
     // and namespace.
     @VisibleForTesting static final String DATABASE_NAME = "browsing_data";
@@ -88,7 +93,7 @@ class AuxiliarySearchDonationServiceBridge implements Closeable {
         }
         Account account = fromCoreAccountInfo(coreAccountInfo);
 
-        var unused =
+        ListenableFuture<AppSearchBatchResult<String, Void>> putFuture =
                 Futures.transformAsync(
                         mSessionFuture,
                         session -> {
@@ -114,6 +119,28 @@ class AuxiliarySearchDonationServiceBridge implements Closeable {
                             return session.putAsync(builder.build());
                         },
                         MoreExecutors.directExecutor());
+
+        // WARNING: Do not log URLs here, including document IDs which contain URLs.
+        // See docs/android_logging.md for more information.
+        Futures.addCallback(
+                putFuture,
+                new FutureCallback<AppSearchBatchResult<String, Void>>() {
+                    @Override
+                    public void onSuccess(AppSearchBatchResult<String, Void> result) {
+                        if (!result.isSuccess()) {
+                            Log.w(
+                                    TAG,
+                                    "Failed to donate documents: %d failure(s).",
+                                    result.getFailures().size());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        Log.w(TAG, "Failed to donate history to AppSearch.", t);
+                    }
+                },
+                MoreExecutors.directExecutor());
     }
 
     @CalledByNative
