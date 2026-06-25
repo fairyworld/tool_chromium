@@ -347,6 +347,12 @@ void SessionAccessor::CreateInternal(
       .enable_audio_input = params->capabilities.Has(
           on_device_model::CapabilityFlags::kAudioInput),
   };
+  VLOG(1) << __func__ << " starting session with: "
+          << "max_tokens=" << descriptor.max_tokens << ", "
+          << "top_k=" << descriptor.top_k << ", "
+          << "temperature=" << descriptor.temperature << ", "
+          << "enable_image_input=" << descriptor.enable_image_input << ", "
+          << "enable_audio_input=" << descriptor.enable_audio_input;
   ChromeMLModelData data;
   std::string weights_path_str;
   if (adaptation_params) {
