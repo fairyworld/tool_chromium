@@ -22,7 +22,6 @@
 #include "base/types/expected.h"
 #include "base/types/expected_macros.h"
 #include "base/types/optional_ref.h"
-#include "chrome/browser/web_applications/isolated_web_apps/key_distribution/features.h"
 #include "chrome/browser/web_applications/isolated_web_apps/key_distribution/iwa_key_distribution_histograms.h"
 #include "components/webapps/isolated_web_apps/key_distribution/proto/key_distribution.pb.h"
 #include "components/webapps/isolated_web_apps/public/iwa_entitlements.h"
@@ -37,11 +36,6 @@ namespace {
 // OnMaybeDownloadedComponentDataReady().
 constexpr base::TimeDelta kDownloadedComponentDataWaitTime = base::Seconds(15);
 
-IwaKeyDistributionInfoProvider::KeyRotations& GetDevModeKeyRotationData() {
-  static base::NoDestructor<IwaKeyDistributionInfoProvider::KeyRotations>
-      dev_mode_kr_data;
-  return *dev_mode_kr_data;
-}
 
 bool GetSkipCaptureStartedNotification(
     const IwaSpecialAppPermissions::SpecialAppPermissions& special_permission) {
@@ -128,10 +122,6 @@ void IwaKeyDistributionInfoProvider::SetUp(
 const IwaRuntimeDataProvider::KeyRotationInfo*
 IwaKeyDistributionInfoProvider::GetKeyRotationInfo(
     const std::string& web_bundle_id) const {
-  if (const auto* kr_info =
-          base::FindOrNull(GetDevModeKeyRotationData(), web_bundle_id)) {
-    return kr_info;
-  }
 
   base::UmaHistogramEnumeration(kIwaKeyRotationInfoSource,
                                 GetComponentDataSource());
@@ -384,14 +374,6 @@ IwaKeyDistributionInfoProvider::ParseKeyDistributionData(
               std::move(user_install_allowlist));
 }
 
-void IwaKeyDistributionInfoProvider::RotateKeyForDevMode(
-    base::PassKey<IwaInternalsHandler>,
-    const std::string& web_bundle_id,
-    const std::vector<uint8_t>& rotated_key) {
-  GetDevModeKeyRotationData().insert_or_assign(
-      web_bundle_id, IwaRuntimeDataProvider::KeyRotationInfo(rotated_key));
-  DispatchComponentUpdateSuccess();
-}
 
 base::OneShotEvent&
 IwaKeyDistributionInfoProvider::OnBestEffortRuntimeDataReady() {
@@ -436,13 +418,6 @@ IwaKeyDistributionInfoProvider::OnComponentUpdatedForTesting(
 base::Value IwaKeyDistributionInfoProvider::AsDebugValue() const {
   base::DictValue debug_data;
 
-  if (!GetDevModeKeyRotationData().empty()) {
-    auto* dev_mode_key_rotations =
-        debug_data.EnsureDict("dev_mode_key_rotations");
-    for (const auto& [web_bundle_id, kr_info] : GetDevModeKeyRotationData()) {
-      dev_mode_key_rotations->Set(web_bundle_id, kr_info.AsDebugValue());
-    }
-  }
   if (component_) {
     // Component meta data
     debug_data.Set("component_version", component_->version.GetString());

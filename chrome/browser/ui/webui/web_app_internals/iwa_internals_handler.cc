@@ -23,7 +23,6 @@
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_features.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolated_web_app_url_info.h"
 #include "chrome/browser/web_applications/isolated_web_apps/isolation_data.h"
-#include "chrome/browser/web_applications/isolated_web_apps/key_distribution/iwa_key_distribution_info_provider.h"
 #include "chrome/browser/web_applications/isolated_web_apps/update/isolated_web_app_update_check_and_prepare_task.h"
 #include "chrome/browser/web_applications/isolated_web_apps/update/isolated_web_app_update_manager.h"
 #include "chrome/browser/web_applications/isolated_web_apps/update_manifest/update_manifest.h"
@@ -583,14 +582,6 @@ void IwaInternalsHandler::ApplyDevModeUpdate(
         }
         return "Update failed: " + result.error();
       }).Then(std::move(callback)));
-}
-
-void IwaInternalsHandler::RotateKey(const std::string& web_bundle_id,
-                                    const std::vector<uint8_t>& public_key) {
-  IwaKeyDistributionInfoProvider::GetInstance(
-      base::PassKey<IwaInternalsHandler>())
-      .RotateKeyForDevMode(base::PassKey<IwaInternalsHandler>(), web_bundle_id,
-                           public_key);
 }
 
 void IwaInternalsHandler::UpdateManifestInstalledIsolatedWebApp(
