@@ -4,9 +4,25 @@
 
 #include "content/public/browser/android/child_process_importance.h"
 
+#include <ostream>
+
 #include "base/android/android_info.h"
 
 namespace content {
+
+std::ostream& operator<<(std::ostream& out, ChildProcessImportance importance) {
+  switch (importance) {
+    case ChildProcessImportance::NORMAL:
+      return out << "NORMAL";
+    case ChildProcessImportance::NOT_PERCEPTIBLE:
+      return out << "NOT_PERCEPTIBLE";
+    case ChildProcessImportance::MODERATE:
+      return out << "MODERATE";
+    case ChildProcessImportance::IMPORTANT:
+      return out << "IMPORTANT";
+  }
+}
+
 bool IsNotPerceptibleImportanceSupported() {
   // This is the same as `SUPPORT_NOT_PERCEPTIBLE_BINDING` in
   // ChildProcessConnection.java.
