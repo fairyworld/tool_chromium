@@ -255,4 +255,64 @@ chrome.test.runTests([
 
     chrome.test.succeed();
   },
+
+  async function testCommitNoEditsDoesNotFetchFont() {
+    const {manager, privateProxy, textbox, viewport} = await setupTextBoxTest();
+    assertDeepEquals([], manager.getKnownFontIds());
+
+    // Set up test font information.
+    privateProxy.reset();
+    privateProxy.setGetTextInfoResult({
+      typefaces: [{uniqueId: 123, serializedTypeface: new ArrayBuffer(10)}],
+      mojoTextInfo: new ArrayBuffer(5),
+    });
+
+    // Simulate opening a loaded text annotation by reactivating the annotation.
+    const loadedAnnotation = getTestAnnotation(
+        {locationX: 20, locationY: 27, height: 50, width: 50}, 1.0);
+    reactivateBox(textbox, viewport, loadedAnnotation);
+    await microtasksFinished();
+    chrome.test.assertTrue(isVisible(textbox));
+
+    // Commit without making any edits.
+    await textbox.commitTextAnnotation();
+    await microtasksFinished();
+
+    // TODO(crbug.com/521691726): Should be 0.
+    chrome.test.assertEq(1, privateProxy.getCallCount('getTextInfo'));
+    let getTextInfoArgs = await privateProxy.whenCalled('getTextInfo');
+    assertDeepEquals([], getTextInfoArgs.knownFontIds);
+    // TODO(crbug.com/521691726): Should be empty.
+    assertDeepEquals([123], manager.getKnownFontIds());
+
+    // In production, the proxy is responsible for never sending the same
+    // typeface twice.
+    privateProxy.reset();
+    privateProxy.setGetTextInfoResult({
+      typefaces: [],
+      mojoTextInfo: new ArrayBuffer(5),
+    });
+
+    // Initialize a new box.
+    initializeBox(100, 100, 50, 50);
+    await microtasksFinished();
+
+    // Type some text to make it edited.
+    textbox.$.textbox.value = 'New Annotation';
+    textbox.$.textbox.dispatchEvent(new CustomEvent('input'));
+    await microtasksFinished();
+
+    // Commit the new annotation.
+    await textbox.commitTextAnnotation();
+    await microtasksFinished();
+
+    // Verify that getTextInfo() was called and a new font was collected.
+    chrome.test.assertEq(1, privateProxy.getCallCount('getTextInfo'));
+    getTextInfoArgs = await privateProxy.whenCalled('getTextInfo');
+    // TODO(crbug.com/521691726): Should be empty.
+    assertDeepEquals([123], getTextInfoArgs.knownFontIds);
+    assertDeepEquals([123], manager.getKnownFontIds());
+
+    chrome.test.succeed();
+  },
 ]);
